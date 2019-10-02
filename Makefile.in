@@ -1,0 +1,14 @@
+CXX = g++
+CC = gcc
+AR = ar rcs
+FLAVOR = gnu
+LD = g++
+
+BUILDDIR = build64
+
+CXXFLAGS = -O0 -g3 -Wall -std=c++11 -DDEBUG
+LFLAGS=-std=c++11
+
+ROOTDIR= $(shell pwd | sed "s/MapleFE.*/MapleFE/")
+
+MKDIR_P = mkdir -p

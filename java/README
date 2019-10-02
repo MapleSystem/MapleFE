@@ -1,0 +1,9 @@
+This directory contains Java specific files.
+1) *.spec
+   These files are rules converted from Java language spec
+2) include/*, src/*
+   The supplemental classes to help lexer/parser. For example, to convert a string literal
+   into an integer value. The ../shared/ directory contains a base class to handle string to
+   values. However, each language could have some format for literal value. So here come
+   the supplemental classes.
+   

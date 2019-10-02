@@ -1,0 +1,235 @@
+###################################################################################
+# This file is the syntax rules for expressions extracted from
+# https://docs.oracle.com/javase/specs/jls/se12/html/jls-15.html
+###################################################################################
+
+Expression:
+  LambdaExpression 
+  AssignmentExpression
+  
+Primary:
+  PrimaryNoNewArray 
+  ArrayCreationExpression
+PrimaryNoNewArray:
+  Literal 
+  ClassLiteral 
+  this 
+  TypeName . this 
+  ( Expression ) 
+  ClassInstanceCreationExpression 
+  FieldAccess 
+  ArrayAccess 
+  MethodInvocation 
+  MethodReference
+  
+Literal:
+  IntegerLiteral 
+  FloatingPointLiteral 
+  BooleanLiteral 
+  CharacterLiteral 
+  StringLiteral 
+  NullLiteral
+  
+ClassLiteral:
+  TypeName {[ ]} . class 
+  NumericType {[ ]} . class 
+  boolean {[ ]} . class 
+  void . class
+  
+ClassInstanceCreationExpression:
+  UnqualifiedClassInstanceCreationExpression 
+  ExpressionName . UnqualifiedClassInstanceCreationExpression 
+  Primary . UnqualifiedClassInstanceCreationExpression
+UnqualifiedClassInstanceCreationExpression:
+  new [TypeArguments] ClassOrInterfaceTypeToInstantiate ( [ArgumentList] ) [ClassBody]
+ClassOrInterfaceTypeToInstantiate:
+  {Annotation} Identifier {. {Annotation} Identifier} [TypeArgumentsOrDiamond]
+TypeArgumentsOrDiamond:
+  TypeArguments 
+  <>
+  
+ArgumentList:
+  Expression {, Expression}
+  
+ArrayCreationExpression:
+  new PrimitiveType DimExprs [Dims] 
+  new ClassOrInterfaceType DimExprs [Dims] 
+  new PrimitiveType Dims ArrayInitializer 
+  new ClassOrInterfaceType Dims ArrayInitializer
+DimExprs:
+  DimExpr {DimExpr}
+DimExpr:
+  {Annotation} [ Expression ]
+  
+Dims:
+  {Annotation} [ ] {{Annotation} [ ]}
+  
+ArrayAccess:
+  ExpressionName [ Expression ] 
+  PrimaryNoNewArray [ Expression ]
+  
+FieldAccess:
+  Primary . Identifier 
+  super . Identifier 
+  TypeName . super . Identifier
+  
+MethodInvocation:
+  MethodName ( [ArgumentList] ) 
+  TypeName . [TypeArguments] Identifier ( [ArgumentList] ) 
+  ExpressionName . [TypeArguments] Identifier ( [ArgumentList] ) 
+  Primary . [TypeArguments] Identifier ( [ArgumentList] ) 
+  super . [TypeArguments] Identifier ( [ArgumentList] ) 
+  TypeName . super . [TypeArguments] Identifier ( [ArgumentList] )
+ArgumentList:
+  Expression {, Expression}
+  
+MethodReference:
+  ExpressionName :: [TypeArguments] Identifier 
+  Primary :: [TypeArguments] Identifier 
+  ReferenceType :: [TypeArguments] Identifier 
+  super :: [TypeArguments] Identifier 
+  TypeName . super :: [TypeArguments] Identifier 
+  ClassType :: [TypeArguments] new 
+  ArrayType :: new
+  
+PostfixExpression:
+  Primary 
+  ExpressionName 
+  PostIncrementExpression 
+  PostDecrementExpression
+  
+PostIncrementExpression:
+  PostfixExpression ++
+  
+PostDecrementExpression:
+  PostfixExpression --
+  
+  
+UnaryExpression:
+  PreIncrementExpression 
+  PreDecrementExpression 
+  + UnaryExpression 
+  - UnaryExpression 
+  UnaryExpressionNotPlusMinus
+PreIncrementExpression:
+  ++ UnaryExpression
+PreDecrementExpression:
+  -- UnaryExpression
+UnaryExpressionNotPlusMinus:
+  PostfixExpression 
+  ~ UnaryExpression 
+  ! UnaryExpression 
+  CastExpression
+  
+CastExpression:
+  ( PrimitiveType ) UnaryExpression 
+  ( ReferenceType {AdditionalBound} ) UnaryExpressionNotPlusMinus 
+  ( ReferenceType {AdditionalBound} ) LambdaExpression
+  
+CastExpression:
+  ( PrimitiveType ) UnaryExpression 
+  ( ReferenceType {AdditionalBound} ) UnaryExpressionNotPlusMinus 
+  ( ReferenceType {AdditionalBound} ) LambdaExpression
+  
+AdditionalBound:
+  & InterfaceType
+  
+  
+MultiplicativeExpression:
+  UnaryExpression 
+  MultiplicativeExpression * UnaryExpression 
+  MultiplicativeExpression / UnaryExpression 
+  MultiplicativeExpression % UnaryExpression
+  
+AdditiveExpression:
+  MultiplicativeExpression 
+  AdditiveExpression + MultiplicativeExpression 
+  AdditiveExpression - MultiplicativeExpression
+  
+ShiftExpression:
+  AdditiveExpression 
+  ShiftExpression << AdditiveExpression 
+  ShiftExpression >> AdditiveExpression 
+  ShiftExpression >>> AdditiveExpression
+  
+RelationalExpression:
+  ShiftExpression 
+  RelationalExpression < ShiftExpression 
+  RelationalExpression > ShiftExpression 
+  RelationalExpression <= ShiftExpression 
+  RelationalExpression >= ShiftExpression 
+  RelationalExpression instanceof ReferenceType
+  
+EqualityExpression:
+  RelationalExpression 
+  EqualityExpression == RelationalExpression 
+  EqualityExpression != RelationalExpression
+  
+AndExpression:
+  EqualityExpression 
+  AndExpression & EqualityExpression
+ExclusiveOrExpression:
+  AndExpression 
+  ExclusiveOrExpression ^ AndExpression
+InclusiveOrExpression:
+  ExclusiveOrExpression 
+  InclusiveOrExpression | ExclusiveOrExpression
+  
+ConditionalAndExpression:
+  InclusiveOrExpression 
+  ConditionalAndExpression && InclusiveOrExpression
+  
+ConditionalOrExpression:
+  ConditionalAndExpression 
+  ConditionalOrExpression || ConditionalAndExpression
+  
+ConditionalExpression:
+  ConditionalOrExpression 
+  ConditionalOrExpression ? Expression : ConditionalExpression 
+  ConditionalOrExpression ? Expression : LambdaExpression
+  
+AssignmentExpression:
+  ConditionalExpression 
+  Assignment
+Assignment:
+  LeftHandSide AssignmentOperator Expression
+LeftHandSide:
+  ExpressionName 
+  FieldAccess 
+  ArrayAccess
+AssignmentOperator:
+  (one of) 
+  =  *=  /=  %=  +=  -=  <<=  >>=  >>>=  &=  ^=  |=
+  
+LambdaExpression:
+  LambdaParameters -> LambdaBody
+  
+LambdaParameters:
+  ( [LambdaParameterList] ) 
+  Identifier
+LambdaParameterList:
+  LambdaParameter {, LambdaParameter} 
+  Identifier {, Identifier}
+LambdaParameter:
+  {VariableModifier} LambdaParameterType VariableDeclaratorId 
+  VariableArityParameter
+LambdaParameterType:
+  UnannType 
+  var
+  
+VariableArityParameter:
+  {VariableModifier} UnannType {Annotation} ... Identifier
+VariableModifier:
+  Annotation 
+  final
+VariableDeclaratorId:
+  Identifier [Dims]
+//Dims:
+  //{Annotation} [ ] {{Annotation} [ ]}
+  
+LambdaBody:
+  Expression 
+  Block
+  
+ConstantExpression:
+  Expression

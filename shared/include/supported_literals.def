@@ -1,0 +1,11 @@
+// This file defines the literals supported by AutoGen
+// Literal types defined here are also defined in shared/include/token.h.
+// See comments in shared/include/token.h
+
+LITERAL(IntegerLiteral)
+LITERAL(FPLiteral)
+LITERAL(BooleanLiteral)
+LITERAL(CharacterLiteral)
+LITERAL(StringLiteral)
+LITERAL(NullLiteral)
+

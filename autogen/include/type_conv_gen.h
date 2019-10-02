@@ -1,0 +1,9 @@
+////////////////////////////////////////////////////////////////////////
+//                     Type Conversion Generation                     //
+// This files defines the generator of type conversion.               //
+////////////////////////////////////////////////////////////////////////
+
+#ifndef __TYPE_CONV_GEN_H__
+#define __TYPE_CONV_GEN_H__
+
+#endif

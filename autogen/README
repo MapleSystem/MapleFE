@@ -1,0 +1,28 @@
+To support the common frontend of different languages which Maple targets, a
+tool which can ease the parsing of languages is strongly needed. The tool is
+supposed to handle most of the language features. This is 'autogen'.
+
+Here is the workflow of this common frontend.
+
+1. Autogen takes the .spec files as input and parse them. Each language will
+   define its own set of .spec files.
+2. Autogen generates a set of .h files, which are mainly composed of tables.
+   The tables are C version of the rules defined in .spec files.
+   The generated .h files will be located in directory of each language, such
+   as java/include/*.h.
+3. The tables tell rules of language syntax
+
+These genereted .h files will be further included in the language parsers,
+which generate an automata based on these tables (aka, syntax rules), to drive
+the parsing of a program.
+
+==== Two types of info in .spec
+
+1. STRUCT
+   This will be generated as a table whose data structure could be varied according
+   to what type of syntax it's describing. Take a look at separator.spec and 
+   gen_separator.cpp/h for example.
+
+2. RULE
+   This will be generated as a set of rule tables. Rule tables have unified data
+   structure defined in temp_table.h which is a temporary name. To be changed.

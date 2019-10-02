@@ -1,0 +1,13 @@
+// This file defines the complete set of types supported in Autogen
+
+TYPE(Boolean)
+TYPE(Byte)
+TYPE(Short)
+TYPE(Int)
+TYPE(Long)
+TYPE(Char)
+TYPE(Float)
+TYPE(Double)
+TYPE(Null)          // The Null type. It is a type.
+// TYPE(NA) , coded in the .cpp file
+

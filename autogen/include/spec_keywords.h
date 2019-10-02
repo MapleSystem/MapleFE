@@ -1,0 +1,6 @@
+KEYWORD(rule, Rule)
+KEYWORD(ONEOF, Oneof)
+KEYWORD(ZEROORONE, Zeroorone)
+KEYWORD(ZEROORMORE, Zeroormore)
+KEYWORD(STRUCT, Struct)
+KEYWORD(func, Func)

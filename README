@@ -1,0 +1,29 @@
+[Origin of MapleFE]
+
+This project is to create a programming language frontend, which leverage a tool called 'autogen' to complete
+most of work of lexing and parsing. The origin of this project is coming from the history in our parst twenty
+years of work in compiler and programming languages. We are fed up with the tons of modifications of existing
+opensource frontend project like Clang, if we want to do something in new language features. So we decided to
+have our own frontend, which could be kind of easy to handle new languages.
+
+[Key points]
+
+1. Autogen is the key idea which automatically generate lexing/parsing data structures in .h/.cpp files which
+   are further included in the language frontend. The language implementors write .spec files describing the
+   language specifications under the language directory, such as java/.
+2. A finite state automata is the key idea of parsing the programming language.
+
+[Source code directory]
+
+1. Most programming languages have very similar syntax, so it's very helpful to put
+   the shared part into a common directory. shared/ is for this usage. It contains
+     a) shared data structures representing shared syntax;
+     b) shared parser/translater components; 
+2. Language specific parts are in their own directory, such as java/. It contains some special part of this
+   language, the language .spec files, and gen_xxx.h/gen_xxx.cpp which are generted by autogen.
+3. The tool autogen is under autogen/
+
+[How to build]
+
+1. cd YOUR_PROJECT_DIR
+2. make

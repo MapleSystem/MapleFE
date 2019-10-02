@@ -1,0 +1,4 @@
+file ../build64java/java2mpl
+set args classdecl.java
+b main
+r
