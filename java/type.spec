@@ -78,13 +78,28 @@ rule PrimType : ONEOF( ZEROORMORE(Annotation) + NumericType,
 
 rule NullType : Null
 
-############################
-# The final type rule
-############################
+###################################################################################
+#                             Reference Types                                     #
+###################################################################################
 
-# This is a fake one.
-rule RefType : "ref"
+# fake one
+rule TypeArguments : "typearguments"
 
+rule ClassType : ONEOF( ZEROORMORE(Annotation) + IDENTIFIER + ZEROORONE(TypeArguments),
+                        ClassOrInterfaceType + '.' + ZEROORMORE(Annotation) + IDENTIFIER
+                           + ZEROORONE(TypeArguments))
+rule InterfaceType : ClassType
+rule TypeVariable  : ZEROORMORE(Annotation) + IDENTIFIER
+rule ArrayType     : ONEOF( PrimType + Dims,
+                            ClassOrInterfaceType + Dims,
+                            TypeVariable + Dims )
+rule Dims          : ZEROORMORE(Annotation) + '[' + ']' + ZEROORMORE(ZEROORMORE(Annotation) + '[' + ']')
+rule ClassOrInterfaceType : ONEOF(ClassType, InterfaceType)
+rule RefType : ONEOF(ClassOrInterfaceType, TypeVariable, ArrayType)
+
+###########################
+#  Final one
+###########################
 rule TYPE: ONEOF(PrimType, RefType, NullType)
 
 #####################################################################################
