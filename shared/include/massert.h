@@ -49,9 +49,26 @@
   std::cout << msg << " " << val1 << " " << val2 << std::endl; \
 } while (0)
 
+#define MMSG3(msg, val1, val2, val3) do { \
+  MLOC; \
+  std::cout << msg << " " << val1 << " " << val2 << " " << val3 << std::endl; \
+} while (0)
+
 #define MMSGA(msg, val) do { \
   MLOC; \
   std::cout << msg << " " << val << std::endl; \
+  assert(0); \
+} while (0)
+
+#define MMSGA2(msg, val1, val2) do { \
+  MLOC; \
+  std::cout << msg << " " << val1 << " " << val2 << std::endl; \
+  assert(0); \
+} while (0)
+
+#define MMSGA3(msg, val1, val2, val3) do { \
+  MLOC; \
+  std::cout << msg << " " << val1 << " " << val2 << " " << val3 << std::endl; \
   assert(0); \
 } while (0)
 

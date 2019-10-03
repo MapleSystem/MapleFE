@@ -39,6 +39,7 @@ bool SPECParser::Parse() {
       MMSG("  >>>> LINE: ", mLexer.GetLine());
     }
 
+    SPECTokenKind tk_prev = mLexer._thekind;
     SPECTokenKind tk = mLexer.GetToken();
     switch (tk) {
       case SPECTK_Rule:
@@ -51,7 +52,8 @@ bool SPECParser::Parse() {
         atEof = true;
         break;
       default:
-        MMSGA ("expect a rule or struct but get: ", mLexer.GetTokenString());
+        MMSGA3 ("expect a rule or struct, but get, Prev Token: ", mLexer.GetTokenString(tk_prev),
+                "Curr Token:",  mLexer.GetTokenString());
         break;
     }
 

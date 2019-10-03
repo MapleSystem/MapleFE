@@ -98,7 +98,8 @@ class SPECLexer {
   void SetVerbose(int v) { verboseLevel = v; }
   int GetVerbose() { return verboseLevel; }
 
-  std::string GetTokenString();  // for error reporting purpose
+  std::string GetTokenString(SPECTokenKind tk);  // for error reporting purpose
+  std::string GetTokenString();
 
   void SetFile(FILE *file) { deffile = file; }
   FILE *GetFile() const { return deffile; }

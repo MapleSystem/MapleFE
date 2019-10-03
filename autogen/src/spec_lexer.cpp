@@ -475,9 +475,9 @@ SPECTokenKind SPECLexer::NextToken() {
   return _thekind;
 }
 
-std::string SPECLexer::GetTokenString() {
+std::string SPECLexer::GetTokenString(SPECTokenKind thekind) {
   std::string temp;
-  switch (_thekind) {
+  switch (thekind) {
     default: {
       temp = "invalid token";
       break;
@@ -598,4 +598,9 @@ std::string SPECLexer::GetTokenString() {
     }
   }
   return temp;
+}
+
+
+std::string SPECLexer::GetTokenString() {
+  return GetTokenString(_thekind);
 }
