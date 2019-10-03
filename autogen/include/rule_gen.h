@@ -6,7 +6,7 @@
 
 /////////////////////////////////////////////////////////////////////////
 //                     Rule Generation                                 //
-// A rule is dumped as an TableEntry. See shared/include/temp_table.h  //
+// A rule is dumped as an TableEntry. See shared/include/ruletable.h  //
 // All tables are defined as global in .cpp file. Their extern declaration
 // is in .h file.                                                      //
 /////////////////////////////////////////////////////////////////////////

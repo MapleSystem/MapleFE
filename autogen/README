@@ -25,4 +25,4 @@ the parsing of a program.
 
 2. RULE
    This will be generated as a set of rule tables. Rule tables have unified data
-   structure defined in temp_table.h which is a temporary name. To be changed.
+   structure defined in ruletable.h.

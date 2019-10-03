@@ -95,7 +95,7 @@ void SeparatorGen::GenHeaderFile() {
 }
 
 void SeparatorGen::GenCppFile() {
-  mCppFile.WriteOneLine("#include \"temp_table.h\"", 23);
+  mCppFile.WriteOneLine("#include \"ruletable.h\"", 22);
   TableBuffer tb;
   tb.Generate(this, "SepTableEntry SepTable[SEP_NA] = {");
   mCppFile.WriteFormattedBuffer(&tb);

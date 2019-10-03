@@ -6,7 +6,7 @@
 #ifndef __COMMON_HEADER_AUTOGEN_H__
 #define __COMMON_HEADER_AUTOGEN_H__
 
-#include "temp_table.h"
+#include "ruletable.h"
 #include "gen_reserved.h"
 #include "gen_literal.h"
 #include "gen_iden.h"

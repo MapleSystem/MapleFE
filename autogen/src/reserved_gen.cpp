@@ -49,7 +49,7 @@ void ReservedGen::Generate() {
 void ReservedGen::GenHeaderFile() {
   mHeaderFile.WriteOneLine("#ifndef __RESERVED_GEN_H__", 26);
   mHeaderFile.WriteOneLine("#define __RESERVED_GEN_H__", 26);
-  mHeaderFile.WriteOneLine("#include \"temp_table.h\"", 23);
+  mHeaderFile.WriteOneLine("#include \"ruletable.h\"", 22);
   mHeaderFile.WriteFormattedBuffer(&mRuleTableHeader);
   mHeaderFile.WriteOneLine("#endif", 6);
 }

@@ -20,7 +20,7 @@ void IdenGen::Generate() {
 void IdenGen::GenHeaderFile() {
   mHeaderFile.WriteOneLine("#ifndef __IDEN_GEN_H__", 22);
   mHeaderFile.WriteOneLine("#define __IDEN_GEN_H__", 22);
-  mHeaderFile.WriteOneLine("#include \"temp_table.h\"", 23);
+  mHeaderFile.WriteOneLine("#include \"ruletable.h\"", 22);
   mHeaderFile.WriteFormattedBuffer(&mRuleTableHeader);
   mHeaderFile.WriteOneLine("#endif", 6);
 }

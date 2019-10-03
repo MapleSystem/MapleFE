@@ -94,7 +94,7 @@ void OperatorGen::GenHeaderFile() {
 }
 
 void OperatorGen::GenCppFile() {
-  mCppFile.WriteOneLine("#include \"temp_table.h\"", 23);
+  mCppFile.WriteOneLine("#include \"ruletable.h\"", 22);
   TableBuffer tb;
   tb.Generate(this, "OprTableEntry OprTable[] = {");
   mCppFile.WriteFormattedBuffer(&tb);

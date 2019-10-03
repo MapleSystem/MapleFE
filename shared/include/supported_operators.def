@@ -1,5 +1,4 @@
-// This file defines the separators supported by AutoGen
-// NOTE: These should be the same as those defined in shared/include/temp_table.h
+// This file defines the separators supported by AutoGen and MapleFE
 
 OPERATOR(Add)
 OPERATOR(Sub)

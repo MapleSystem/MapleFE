@@ -1,11 +1,10 @@
 //////////////////////////////////////////////////////////////////////////
-// This file is temporarily contains all the type information to describe
-// the tables autogen create. Later on it will be re-organized and merged
-// into different module.
+// This file contains all the information to describe the tables that
+// autogen creates. 
 //////////////////////////////////////////////////////////////////////////
 
-#ifndef __TEMP_TABLE_H__
-#define __TEMP_TABLE_H__
+#ifndef __RULE_TABLE_H__
+#define __RULE_TABLE_H__
 
 // The list of all supported types. This covers all the languages.
 // NOTE: autogen also relies on this set of supported separators

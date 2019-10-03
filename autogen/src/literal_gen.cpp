@@ -108,7 +108,7 @@ void LiteralGen::Generate() {
 void LiteralGen::GenHeaderFile() {
   mHeaderFile.WriteOneLine("#ifndef __LITERAL_GEN_H__", 25);
   mHeaderFile.WriteOneLine("#define __LITERAL_GEN_H__", 25);
-  mHeaderFile.WriteOneLine("#include \"temp_table.h\"", 23);
+  mHeaderFile.WriteOneLine("#include \"ruletable.h\"", 22);
   mHeaderFile.WriteFormattedBuffer(&mRuleTableHeader);
   mHeaderFile.WriteOneLine("#endif", 6);
 }
