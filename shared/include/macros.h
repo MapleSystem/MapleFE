@@ -16,7 +16,7 @@
   std::cout << "(" << __FILE__ << ":" << __LINE__ << ") ";\
 } while (0)
 
-#define MLOC1 do { \
+#define MLOCENDL do { \
   std::cout << "(" << __FILE__ << ":" << __LINE__ << ") " << std::endl;\
 } while (0)
 

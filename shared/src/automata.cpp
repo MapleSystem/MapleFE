@@ -392,6 +392,8 @@ void Automata::ProcessStack() {
     // go through related rules to match
     RuleBase *rule = mTokenRuleMap[tk];
 
+    MASSERT(rule && "expect non-NULL rule");
+
     // check a shorter list but more directly related rules
     for (auto it: mSimpleUsedByMap[rule]) {
       if (GetVerbose() >= 1) {
@@ -407,7 +409,7 @@ void Automata::ProcessStack() {
     // check full list of used by rules
     for (auto it: mUsedByMap[rule]) {
       if (GetVerbose() >= 1) {
-        MLOC1;
+        MLOCENDL;
         it->Dump();
       }
       status = MatchStack(it, 0, idx, tk);
@@ -554,7 +556,18 @@ bool Automata::MatchStackVec(std::vector<RuleElem *> vec, unsigned stackstart, u
 
   if (status) {
     // match after the token
-    status  = MatchStackVecRange(vec, tkidx + 1, vec.size(), stkidx + 1, mStack.size());
+    // adjust the match for trailing ';'
+    unsigned vecsize = vec.size();
+    unsigned stacksize = mStack.size();
+    if (vec[vecsize-1]->mToken != TK_Semicolon &&
+        mStack[stacksize-1].first->mToken == TK_Semicolon) {
+      stacksize--;
+    }
+    if (vec[vecsize-1]->mToken == TK_Semicolon &&
+        mStack[stacksize-1].first->mToken != TK_Semicolon) {
+      vecsize--;
+    }
+    status  = MatchStackVecRange(vec, tkidx + 1, vecsize, stkidx + 1, stacksize);
   }
 
   return status;
