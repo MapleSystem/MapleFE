@@ -14,6 +14,10 @@
 //   1. ValidityCheck is the parent class of the children classes, say JavaValidityCheck.
 //      ValidityCheck has some common implementations, and children can have their own.
 //
+//      A language can have its own special syntax checking, e.g., Java Type Argument has
+//      wildcard synatx, such as ? extend SomeClass, and we need check if two type
+//      arguments are equal, containing, contained, or distinct.
+//
 //   2. Children's validity checking is language specific, eg Java has a requirement to
 //      check if an identifier is a packagename. The package names are specific in each
 //      language.

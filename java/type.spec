@@ -82,8 +82,12 @@ rule NullType : Null
 #                             Reference Types                                     #
 ###################################################################################
 
-# fake one
-rule TypeArguments : "typearguments"
+# TypeArguments are for generic types
+rule WildcardBounds   : ONEOF( "extends" + ReferenceType, "super" + ReferenceType)
+rule Wildcard         : ZEROORMORE(Annotation) + '?' + ZEROORONE(WildcardBounds)
+rule TypeArgument     : ONEOF(ReferenceType, Wildcard)
+rule TypeArgumentList : TypeArgument + ZEROORMORE(',' + TypeArgument)
+rule TypeArguments    : '<' + TypeArgumentList + '>'
 
 rule ClassType : ONEOF( ZEROORMORE(Annotation) + IDENTIFIER + ZEROORONE(TypeArguments),
                         ClassOrInterfaceType + '.' + ZEROORMORE(Annotation) + IDENTIFIER
@@ -95,19 +99,16 @@ rule ArrayType     : ONEOF( PrimType + Dims,
                             TypeVariable + Dims )
 rule Dims          : ZEROORMORE(Annotation) + '[' + ']' + ZEROORMORE(ZEROORMORE(Annotation) + '[' + ']')
 rule ClassOrInterfaceType : ONEOF(ClassType, InterfaceType)
-rule RefType : ONEOF(ClassOrInterfaceType, TypeVariable, ArrayType)
+rule ReferenceType        : ONEOF(ClassOrInterfaceType, TypeVariable, ArrayType)
 
 ###########################
 #  Final one
 ###########################
-rule TYPE: ONEOF(PrimType, RefType, NullType)
+rule TYPE: ONEOF(PrimType, ReferenceType, NullType)
 
 #####################################################################################
 #                       Abnormal types                                              #
 #####################################################################################
-
-# this is a fake one
-rule TypeArguments : "typearguments"
 
 rule UnannClassType: ONEOF(IDENTIFIER + ZEROORONE(TypeArguments),
         UnannClassOrInterfaceType + '.' + ZEROORMORE(Annotation) + IDENTIFIER + ZEROORONE(TypeArguments))
