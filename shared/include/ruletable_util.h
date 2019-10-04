@@ -3,10 +3,13 @@
 // rule tables. Most of the functions are designed to do the following
 // 1. Validity check
 //    e.g. if an identifier is a type name, variable name, ...
+// 2. Traverse the rule tables
 //////////////////////////////////////////////////////////////////////////
 
 #ifndef __RULE_TABLE_UTIL_H__
 #define __RULE_TABLE_UTIL_H__
+
+#include "ruletable.h"
 
 // This class contains all the functions that a language could use during parsing.
 // The mechansim behind this design has three major parts.
@@ -35,6 +38,23 @@ public:
   virtual bool IsPackageName();
   virtual bool IsTypeName();
   virtual bool IsVariable();
+};
+
+// The rule tables are organized as trees. RuleTableWalker provides a set of functions to
+// traverse the trees.
+class Lexer;
+class RuleTableWalker {
+public:
+  const RuleTable *mTable;
+  const Lexer     *mLexer;
+  unsigned         mTokenNum;  // Matched token number
+  bool             mMatched;   // If the next list of tokens match the rule, aka mTable.
+
+public:
+  RuleTableWalker(const RuleTable *, const Lexer *);
+  ~RuleTableWalker(){}
+
+  void Traverse();             // Walk the tree, aka mTable, driven by lexer reading tokens
 };
 
 #endif
