@@ -1,14 +1,14 @@
-#include "block_gen.h"
+#include "expr_gen.h"
 
-void BlockGen::Generate() {
+void ExprGen::Generate() {
   GenRuleTables();
   GenHeaderFile();
   GenCppFile();
 }
 
-void BlockGen::GenHeaderFile() {
-  mHeaderFile.WriteOneLine("#ifndef __BLOCK_GEN_H__", 23);
-  mHeaderFile.WriteOneLine("#define __BLOCK_GEN_H__", 23);
+void ExprGen::GenHeaderFile() {
+  mHeaderFile.WriteOneLine("#ifndef __EXPR_GEN_H__", 22);
+  mHeaderFile.WriteOneLine("#define __EXPR_GEN_H__", 22);
 
   // generate the rule tables
   mHeaderFile.WriteFormattedBuffer(&mRuleTableHeader);
@@ -16,8 +16,9 @@ void BlockGen::GenHeaderFile() {
   mHeaderFile.WriteOneLine("#endif", 6);
 }
 
-void BlockGen::GenCppFile() {
+void ExprGen::GenCppFile() {
   mCppFile.WriteOneLine("#include \"common_header_autogen.h\"", 34);
+
   // generate the rule tables
   mCppFile.WriteFormattedBuffer(&mRuleTableCpp);
 }

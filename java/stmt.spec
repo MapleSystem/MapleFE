@@ -3,15 +3,6 @@
 # https://docs.oracle.com/javase/specs/jls/se12/html/jls-14.html
 ###################################################################################
 
-rule Block : ZEROORMORE(ZEROORONE(BlockStatements))
-
-rule BlockStatements : BlockStatement + ZEROORMORE(BlockStatement)
-
-rule BlockStatement : ONEOF(
-  LocalVariableDeclarationStatement,
-  ClassDeclaration,
-  Statement)
-
 rule LocalVariableDeclarationStatement : LocalVariableDeclaration + ';'
 
 rule LocalVariableDeclaration : ZEROORMORE(VariableModifier) + LocalVariableType + VariableDeclaratorList

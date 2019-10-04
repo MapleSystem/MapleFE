@@ -15,6 +15,7 @@
 #include "block_gen.h"
 #include "separator_gen.h"
 #include "operator_gen.h"
+#include "expr_gen.h"
 
 class AutoGen {
 private:
@@ -26,6 +27,7 @@ private:
   BlockGen     *mBlockGen;
   SeparatorGen *mSeparatorGen;
   OperatorGen  *mOperatorGen;
+  ExprGen      *mExprGen;
 
   std::vector<BaseGen*> mGenArray;
   SPECParser   *mParser;

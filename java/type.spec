@@ -69,7 +69,7 @@ rule NumericType : ONEOF(IntType, FPType)
 # this is a fake one, to make the development work.
 rule Annotation : "annotation"
 
-rule PrimType : ONEOF( ZEROORMORE(Annotation) + NumericType,
+rule PrimitiveType : ONEOF( ZEROORMORE(Annotation) + NumericType,
                        ZEROORMORE(Annotation) + BoolType )
 
 ############################
@@ -94,7 +94,7 @@ rule ClassType : ONEOF( ZEROORMORE(Annotation) + IDENTIFIER + ZEROORONE(TypeArgu
                            + ZEROORONE(TypeArguments))
 rule InterfaceType : ClassType
 rule TypeVariable  : ZEROORMORE(Annotation) + IDENTIFIER
-rule ArrayType     : ONEOF( PrimType + Dims,
+rule ArrayType     : ONEOF( PrimitiveType + Dims,
                             ClassOrInterfaceType + Dims,
                             TypeVariable + Dims )
 rule Dims          : ZEROORMORE(Annotation) + '[' + ']' + ZEROORMORE(ZEROORMORE(Annotation) + '[' + ']')
@@ -104,7 +104,7 @@ rule ReferenceType        : ONEOF(ClassOrInterfaceType, TypeVariable, ArrayType)
 ###########################
 #  Final one
 ###########################
-rule TYPE: ONEOF(PrimType, ReferenceType, NullType)
+rule TYPE: ONEOF(PrimitiveType, ReferenceType, NullType)
 
 #####################################################################################
 #                       Abnormal types                                              #

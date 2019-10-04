@@ -3,39 +3,25 @@
 # https://docs.oracle.com/javase/specs/jls/se12/html/jls-15.html
 ###################################################################################
 
-rule Identifier: IdentifierChars #but not a Keyword or BooleanLiteral or NullLiteral
-rule IdentifierChars: JavaLetter + ZEROORMORE(JavaLetterOrDigit)
+# I just put all TO-DO rules here
+rule TypeName : "typename"
+rule Class    : "class"
+rule ClassBody: "classbody"
+rule ArrayInitializer : "arrayinitializer"
+rule MethodName       : "methodname"
+
 rule JavaLetter: CHAR
-  #any Unicode character that is a "Java letter"
 rule JavaLetterOrDigit: ONEOF(CHAR, DIGIT)
-  #any Unicode character that is a "Java letter-or-digit"
+rule IdentifierChars: JavaLetter + ZEROORMORE(JavaLetterOrDigit)
+rule Identifier: IdentifierChars #but not a Keyword or BooleanLiteral or NullLiteral
 
 rule ExpressionName: Identifier
 
-rule Expression : ONEOF(
-  ExpressionName,
-  Primary,
-  UnaryExpression,
-  BinaryExpression,
-  ConditionalExpression, #TernaryExpression
-  LambdaExpression,
-  AssignmentExpression)
-
-rule BinaryExpression : ONEOF (
-  MultiplicativeExpression,
-  AdditiveExpression,
-  ShiftExpression,
-  RelationalExpression,
-  EqualityExpression,
-  AndExpression,
-  ExclusiveOrExpression,
-  InclusiveOrExpression,
-  ConditionalAndExpression,
-  ConditionalOrExpression)
-
-rule Primary : ONEOF(
-  PrimaryNoNewArray,
-  ArrayCreationExpression)
+rule ClassLiteral : ONEOF(
+  TypeName + ZEROORMORE('[' + ']') + '.' + Class,
+  NumericType + ZEROORMORE('[' + ']') + '.' + Class,
+  "boolean" + ZEROORMORE('[' + ']') + '.' + Class,
+  "void" + '.' + Class)
 
 rule PrimaryNoNewArray : ONEOF(
   Literal,
@@ -48,20 +34,6 @@ rule PrimaryNoNewArray : ONEOF(
   ArrayAccess,
   MethodInvocation,
   MethodReference)
-
-rule Literal : ONEOF(
-  IntegerLiteral,
-  FloatingPointLiteral,
-  BooleanLiteral,
-  CharacterLiteral,
-  StringLiteral,
-  NullLiteral)
-
-rule ClassLiteral : ONEOF(
-  TypeName + ZEROORMORE('[' + ']') + '.' + Class,
-  NumericType + ZEROORMORE('[' + ']') + '.' + Class,
-  "boolean" + ZEROORMORE('[' + ']') + '.' + Class,
-  "void" + '.' + Class)
 
 rule ClassInstanceCreationExpression : ONEOF(
   UnqualifiedClassInstanceCreationExpression,
@@ -89,8 +61,6 @@ rule ArrayCreationExpression : ONEOF(
 rule DimExprs : DimExpr + ZEROORMORE(DimExpr)
 
 rule DimExpr : ZEROORMORE(Annotation) + ZEROORONE(Expression)
-
-rule Dims : ZEROORMORE(Annotation) + '[' + ']' + ZEROORMORE(ZEROORMORE(Annotation) + '[' + ']')
 
 rule ArrayAccess : ONEOF(
   ExpressionName + ZEROORONE(Expression),
@@ -252,4 +222,29 @@ rule VariableDeclaratorId : Identifier + ZEROORONE(Dims)
 rule LambdaBody : ONEOF(Expression, Block)
 
 rule ConstantExpression : Expression
+
+rule Primary : ONEOF(
+  PrimaryNoNewArray,
+  ArrayCreationExpression)
+
+rule Expression : ONEOF(
+  ExpressionName,
+  Primary,
+  UnaryExpression,
+  BinaryExpression,
+  ConditionalExpression, #TernaryExpression
+  LambdaExpression,
+  AssignmentExpression)
+
+rule BinaryExpression : ONEOF (
+  MultiplicativeExpression,
+  AdditiveExpression,
+  ShiftExpression,
+  RelationalExpression,
+  EqualityExpression,
+  AndExpression,
+  ExclusiveOrExpression,
+  InclusiveOrExpression,
+  ConditionalAndExpression,
+  ConditionalOrExpression)
 
