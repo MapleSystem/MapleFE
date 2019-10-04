@@ -137,7 +137,7 @@ rule MultiplicativeExpression : ONEOF(
 
 rule AdditiveExpression : ONEOF(
   MultiplicativeExpression,
-  AdditiveExpression + '+' + MultiplicativeExpression,
+  AdditiveExpression + '+' + MultiplicativeExpression ==> func GenerateBinaryExpr(%1, %2, %3),
   AdditiveExpression + '-' + MultiplicativeExpression)
 
 rule ShiftExpression : ONEOF(
@@ -188,7 +188,7 @@ rule AssignmentExpression : ONEOF(
   ConditionalExpression,
   Assignment)
 
-rule Assignment : LeftHandSide + AssignmentOperator + Expression
+rule Assignment : LeftHandSide + AssignmentOperator + Expression ==> func GenerateAssignment(%1, %2, %3)
 
 rule LeftHandSide : ONEOF(
   ExpressionName,
