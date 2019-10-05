@@ -57,4 +57,7 @@ public:
   void Traverse();             // Walk the tree, aka mTable, driven by lexer reading tokens
 };
 
+// Exported Interfaces
+extern bool IsIdentifier(const Lexer *);
+
 #endif
