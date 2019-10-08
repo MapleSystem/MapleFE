@@ -80,3 +80,10 @@ _____________________
     single quote, e.g. 'c'; and (2) literal string embraced by quote, e.g. "abc".
 
     Empty string is allowed, i.e. "" is legal representing empty string.
+
+_____________________
+
+Separator
+_____________________
+
+ *) WhiteSpace is treated as a separator.

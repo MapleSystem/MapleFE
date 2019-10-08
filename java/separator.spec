@@ -17,4 +17,5 @@ STRUCT SEPARATOR : (("(", LeftParenthesis),
                     (".", Period),
                     ("...", Omission),
                     ("@", At),
-                    ("::", Of))
+                    ("::", Of),
+                    (" ", WhiteSpace))

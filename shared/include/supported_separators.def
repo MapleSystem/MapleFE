@@ -1,4 +1,5 @@
 // This file defines the separators supported by AutoGen and MapleFE
+// NOTE: White Space is treated as a separator
 
 SEPARATOR(LeftParenthesis)
 SEPARATOR(RightParenthesis)
@@ -12,4 +13,5 @@ SEPARATOR(Period)
 SEPARATOR(Omission)
 SEPARATOR(At)
 SEPARATOR(Of)
+SEPARATOR(WhiteSpace)
 

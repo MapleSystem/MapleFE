@@ -52,6 +52,7 @@ bool SPECParser::Parse() {
         atEof = true;
         break;
       default:
+        MMSG("  >>>> LINE: ", mLexer.GetLine());
         MMSGA3 ("expect a rule or struct, but get, Prev Token: ", mLexer.GetTokenString(tk_prev),
                 "Curr Token:",  mLexer.GetTokenString());
         break;
