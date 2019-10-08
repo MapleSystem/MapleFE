@@ -69,14 +69,6 @@ void RuleElem::Dump(bool newline) {
       break;
     case ET_Rule:
       std::cout << mData.mRule->mName;
-      // for statement
-      if (mSubElems.size()) {
-        std::cout << "   --";
-        std::vector<RuleElem *>::iterator it = mSubElems.begin();
-        for (; it != mSubElems.end(); it++) {
-          (*it)->Dump();
-        }
-      }
       break;
     case ET_Op:
     {
