@@ -147,6 +147,10 @@ void Lexer::GetName(void) {
   thename = std::string(&line[startidx], curidx - startidx);
 }
 
+// This is for testing autogen
+TokenKind Lexer::LexToken_autogen(void) {
+}
+
 TokenKind Lexer::LexToken(void) {
   // skip spaces
   while ((line[curidx] == ' ' || line[curidx] == '\t') && curidx < (size_t)current_line_size) {

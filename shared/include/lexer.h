@@ -54,6 +54,11 @@ class Lexer {
     }
   }
 
+  // These are for autogen table testing
+  TokenKind LexToken_autogen();
+  void SavePos();
+  void ResetPos();
+
   void PrepareForFile(const std::string filename);
   void PrepareForString(const std::string &src);
   TokenKind NextToken(void);
@@ -66,9 +71,11 @@ class Lexer {
     return _thekind;
   }
 
+  int GetCuridx() const { return curidx; }
+  void SetCuridx(int i) { curidx = i; }
+
   char *GetLine() const { return line; }
   int GetLineNum() const { return _linenum; }
-  int GetCuridx() const { return curidx; }
   const std::string &GetTheName() const { return thename; }
 
   std::string GetTokenString(const TokenKind tk);  // catched string
@@ -88,6 +95,7 @@ class Lexer {
   LiteralToken* ProcessLiteralTokenText(LT_Type type, TokenText text);
 */
 
+  friend class RuleTableWalker;
 };
 
 inline bool IsVarName(TokenKind tk) {

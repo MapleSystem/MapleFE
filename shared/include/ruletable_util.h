@@ -46,18 +46,24 @@ class Lexer;
 class RuleTableWalker {
 public:
   const RuleTable *mTable;
-  const Lexer     *mLexer;
+  Lexer           *mLexer;
   unsigned         mTokenNum;  // Matched token number
   bool             mMatched;   // If the next list of tokens match the rule, aka mTable.
 
 public:
-  RuleTableWalker(const RuleTable *, const Lexer *);
+  RuleTableWalker(const RuleTable *, Lexer *);
   ~RuleTableWalker(){}
 
-  void Traverse();             // Walk the tree, aka mTable, driven by lexer reading tokens
+  void  Traverse();             // Walk the tree, aka mTable, driven by lexer reading tokens
+  SepId TraverseSepTable();     // Walk the separator table
 };
 
 // Exported Interfaces
-extern bool IsIdentifier(const Lexer *);
+// NOTE: (1) All interfaces will not go the new line.
+//       (2) All interfaces will move the 'curidx' of Lexer, this actually implies 
+//             a) They do move 'curidx' if a meaningful token is consumed.
+//             b) They do move 'curidx' if there is white space WITHOUT meaningful token
 
+extern bool IsIdentifier(Lexer *);
+extern SepId GetSeparator(Lexer *);
 #endif
