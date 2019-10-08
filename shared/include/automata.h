@@ -9,6 +9,7 @@
 #include <unordered_set>
 #include <utility>
 #include "tokenkind.h"
+#include "module.h"
 #include "rule.h"
 
 class Lexer;
@@ -27,6 +28,7 @@ class Automata {
   Module     *mModule;
 
   Function   *currfunc;
+  Stmt       *stmtroot;
 
   // temp
   std::vector<std::pair<RuleElem *, Symbol *>> mStack;
@@ -84,13 +86,13 @@ public:
 
   void DumpStack();
   void ProcessStack();
-  bool MatchStack(RuleBase *rule, unsigned stackstart, unsigned idx, TokenKind tk);
-  bool MatchStackOp(RuleBase *rule, unsigned stackstart, unsigned idx, TokenKind tk);
-  bool MatchStackRule(RuleBase *rule, unsigned stackstart, unsigned idx, TokenKind tk);
-  bool MatchStackVec(std::vector<RuleElem *> vec, unsigned stackstart, unsigned idx, TokenKind tk);
-  bool MatchStackVecRange(std::vector<RuleElem *> vec, unsigned start, unsigned end,
+  bool MatchStack(Expr *&expr, RuleBase *rule, unsigned stackstart, unsigned idx, TokenKind tk);
+  bool MatchStackOp(Expr *&expr, RuleBase *rule, unsigned stackstart, unsigned idx, TokenKind tk);
+  bool MatchStackRule(Expr *&expr, RuleBase *rule, unsigned stackstart, unsigned idx, TokenKind tk);
+  bool MatchStackVec(Expr *&expr, std::vector<RuleElem *> vec, unsigned stackstart, unsigned idx, TokenKind tk);
+  bool MatchStackVecRange(Expr *&expr, std::vector<RuleElem *> vec, unsigned start, unsigned end,
                           unsigned stackstart, unsigned stackend);
-  bool MatchStackWithExpectation(RuleBase *rule, unsigned stackstart, unsigned stackend);
+  bool MatchStackWithExpectation(Expr *&expr, RuleBase *rule, unsigned stackstart, unsigned stackend);
   bool ProcessDecls();
 
   int GetVerbose();

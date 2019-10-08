@@ -2,9 +2,10 @@
 #include <string>
 #include <cstring>
 
+#include "module.h"
+#include "automata.h"
 #include "parser.h"
 #include "base_gen.h"
-#include "module.h"
 #include "massert.h"
 
 //////////////////////////////////////////////////////////////////////////////

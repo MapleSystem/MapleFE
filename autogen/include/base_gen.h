@@ -95,8 +95,10 @@ public:
   RuleBase *AddLiteralRule(std::string rulename, std::string str);
 
   RuleBase *NewRule() { return new RuleBase(); }
-  RuleElem *NewRuleElem(RuleOp op);
   RuleElem *NewRuleElem();
+  RuleElem *NewRuleElem(std::string str);
+  RuleElem *NewRuleElem(RuleOp op);
+  RuleElem *NewRuleElem(RuleBase *rule);
 
 public:
   BaseGen(const std::string &d, const std::string &h, const std::string &c);

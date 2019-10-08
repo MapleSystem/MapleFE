@@ -130,6 +130,19 @@ RuleElem* BaseGen::NewRuleElem(RuleOp op) {
   return elem;
 }
 
+RuleElem* BaseGen::NewRuleElem(RuleBase *rule) {
+  RuleElem *elem = mRuleElemPool->NewRuleElem();
+  elem->SetRule(rule);
+  return elem;
+}
+
+RuleElem* BaseGen::NewRuleElem(std::string str) {
+  RuleElem *elem = mRuleElemPool->NewRuleElem();
+  const char *name = mStringPool->FindString(str);
+  elem->SetString(name);
+  return elem;
+}
+
 ////////////////////////////////////////////////////////////////////////
 //              Major work flow functions                             //
 ////////////////////////////////////////////////////////////////////////

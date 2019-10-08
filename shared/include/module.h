@@ -9,12 +9,8 @@
 #include <fstream>
 #include <stack>
 
-#include "parser.h"
-#include "automata.h"
 #include "massert.h"
-
-class Automata;
-class Parser;
+#include "base_gen.h"
 
 typedef uint32_t stridx_t;
 typedef uint32_t tyidx_t;
@@ -89,12 +85,50 @@ class Symbol {
   void Dump();
 };
 
+class Expr {
+ public:
+  RuleElem *mElem;
+  std::vector<Expr *> mSubExprs;
+
+  Expr() : mElem(NULL) {}
+  Expr(RuleElem *elem) : mElem(elem) {}
+
+  void Dump(unsigned indent) {
+    unsigned i = indent;
+    while (i--) {
+      std::cout << "  ";
+    }
+    mElem->Dump();
+    std::cout << std::endl;
+    std::vector<Expr *>::iterator it = mSubExprs.begin();
+    for(; it != mSubExprs.end(); it++) {
+      (*it)->Dump(indent+1);
+    }
+  }
+};
+
+class Stmt {
+ public:
+  std::vector<Expr *> mExprs;
+
+  Stmt() {}
+  void Dump(unsigned indent) {
+    std::cout << "============ stmt tree ============" << std::endl;
+    std::vector<Expr *>::iterator it = mExprs.begin();
+    for(; it != mExprs.end(); it++) {
+      (*it)->Dump(indent+1);
+    }
+    std::cout << "===================================" << std::endl;
+  }
+};
+
 class Function {
  public:
   stridx_t mStridx;
   std::vector<tyidx_t> mArgTyidx;
   std::vector<Symbol *> mFormals;
   tyidx_t mRetTyidx;
+  std::vector<Stmt *> mBody;
 
   std::vector<Symbol *> mSymbolTable;
 
