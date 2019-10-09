@@ -5,6 +5,8 @@
 #include <climits>
 #include <cstdlib>
 
+#include "ruletable_util.h"
+
 #define MAX_LINE_SIZE 4096
 
 static unsigned DigitValue(char c) {
@@ -145,10 +147,6 @@ void Lexer::GetName(void) {
     curidx++;
   }
   thename = std::string(&line[startidx], curidx - startidx);
-}
-
-// This is for testing autogen
-TokenKind Lexer::LexToken_autogen(void) {
 }
 
 TokenKind Lexer::LexToken(void) {

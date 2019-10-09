@@ -32,7 +32,7 @@ typedef enum {
   ET_Pending,    // It's a pending element, to be patched in BackPatch().
                  // pending elements are unknown rule names, constituted by
                  // the 26 regular letters.
-  ET_Null
+  ET_NULL
 }ElemType;
 
 // an action is the behavior performed for a matched rule
@@ -79,7 +79,7 @@ public:
                            // Here only put the base type: RuleBase
     char        mChar;
     const char *mString;   // Pending elem. string is NULL ended in string pool
-    TypeId      mTypeId;
+    AGTypeId    mTypeId;
   }mData;
 
   TokenKind     mToken;    // record the token for rule like '(' ')' '[' ']' ';' ...
@@ -95,7 +95,7 @@ public:
   void SetRule(RuleBase *r) {mType = ET_Rule; mData.mRule = r;}
   void SetChar(char c)      {mType = ET_Char; mData.mChar = c;}
   void SetString(const char *s) {mType = ET_String; mData.mString = s;}
-  void SetTypeId(TypeId t)  {mType = ET_Type; mData.mTypeId = t;}
+  void SetTypeId(AGTypeId t)  {mType = ET_Type; mData.mTypeId = t;}
   void SetPending(const char *s) {mType = ET_Pending; mData.mString = s;}
 
   const char *GetPendingName() {return mData.mString;}

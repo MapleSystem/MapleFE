@@ -32,12 +32,14 @@ public:
 
 public:
   Parser(const char *f, Module *m);
+  Parser(const char *f);
   ~Parser() {};
 
   // for all ParseXXX routines
   // Return true  : succeed
   //        false : failed
   bool Parse();
+  bool Parse_autogen();
   bool ParseFunction(Function *func);
   bool ParseFuncArgs(Function *func);
   bool ParseFuncBody(Function *func);

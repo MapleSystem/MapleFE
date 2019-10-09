@@ -41,7 +41,7 @@ $(BUILD)/%.d : %.cpp
 # TARGET depends on OBJS and shared OBJS from shared directory
 #
 $(TARGET): $(OBJS) $(AUTOGENLIB) $(SHAREDLIB)
-	$(LD) -o $(BUILD)/$(TARGET) $(OBJS) $(AUTOGENLIB) $(SHAREDLIB)
+	$(LD) -o $(BUILD)/$(TARGET) $(OBJS) $(SHAREDLIB) $(AUTOGENLIB)
 
 #.cpp.o:
 #	$(CXX) $(CXXFLAGS) -fpermissive $(INCLUDES) -w -c $*.cpp -o $(BUILD)/$*.o

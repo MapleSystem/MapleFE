@@ -9,7 +9,7 @@ void TypeGen::ProcessStructData() {
   for (auto it: mStructs) {
     for (auto eit: it->mStructElems) {
       std::string s(eit->mDataVec[1]->GetString());
-      TypeId id = FindTypeIdLangIndep(s);
+      AGTypeId id = FindAGTypeIdLangIndep(s);
       AddEntry(eit->mDataVec[0]->GetString(), id);
     }
   }

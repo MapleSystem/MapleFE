@@ -2,22 +2,22 @@
 
 //////////////   Types supported /////////////////
 #undef  TYPE
-#define TYPE(T) {#T, TY_##T},
-TypeMapping TypesSupported[TY_NA] = {
+#define TYPE(T) {#T, AG_TY_##T},
+TypeMapping TypesSupported[AG_TY_NA] = {
 #include "supported_types.def"
 };
 
-TypeId FindTypeIdLangIndep(const std::string &s) {
-  for (unsigned u = 0; u < TY_NA; u++) {
+AGTypeId FindAGTypeIdLangIndep(const std::string &s) {
+  for (unsigned u = 0; u < AG_TY_NA; u++) {
     if (!TypesSupported[u].mName.compare(0, s.length(), s))
       return TypesSupported[u].mType;
   }
-  return TY_NA;
+  return AG_TY_NA;
 }
 
 #undef  TYPE
-#define TYPE(T) case TY_##T: return #T;
-char *GetTypeString(TypeId tid) {
+#define TYPE(T) case AG_TY_##T: return #T;
+char *GetTypeString(AGTypeId tid) {
   switch (tid) {
 #include "supported_types.def"
   default:

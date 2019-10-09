@@ -42,7 +42,7 @@ const char *RuleElem::GetElemTypeName() {
     case ET_Type:    return "ET_Type";
     case ET_Token:   return "ET_Token";
     case ET_Pending: return "ET_Pending";
-    case ET_Null:    return "ET_Null";
+    case ET_NULL:    return "ET_NULL";
     default:         MASSERT(0 && "Wrong ElemType");
   }
 }
@@ -129,7 +129,7 @@ void RuleElem::Dump(bool newline) {
     case ET_Token:
       std::cout << "\"" << mData.mString << "\"";
       break;
-    case ET_Null:
+    case ET_NULL:
       break;
   }
   if (mAction) {

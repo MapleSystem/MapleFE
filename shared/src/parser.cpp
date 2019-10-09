@@ -17,6 +17,13 @@ Parser::Parser(const char *name, Module *m) : mLexer(), filename(name), mModule(
   mLexer.PrepareForFile(file);
 }
 
+Parser::Parser(const char *name) : mLexer(), filename(name) {
+  const std::string file(name);
+  // init lexer
+  mLexer.PrepareForFile(file);
+}
+
+
 bool Parser::Parse() {
   bool atEof = false;
   bool status = true;

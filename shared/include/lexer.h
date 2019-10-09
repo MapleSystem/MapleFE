@@ -56,6 +56,7 @@ class Lexer {
 
   // These are for autogen table testing
   TokenKind LexToken_autogen();
+  bool EndOfLine() { return curidx == current_line_size; }
   void SavePos();
   void ResetPos();
 
@@ -96,6 +97,7 @@ class Lexer {
 */
 
   friend class RuleTableWalker;
+  friend class Parser;
 };
 
 inline bool IsVarName(TokenKind tk) {
