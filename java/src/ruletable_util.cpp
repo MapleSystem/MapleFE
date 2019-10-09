@@ -19,10 +19,10 @@ void RuleTableWalker::Traverse() {
 // Assuming the separator table has been sorted so as to catch the longest separator
 //   if possible.
 SepId RuleTableWalker::TraverseSepTable() {
-  unsigned i;
+  unsigned i = 0;
   for (; i < SEP_NA; i++) {
     SepTableEntry e = SepTable[i];
-    if (!strncmp(mLexer->line[mLexer->curidx], e.mText, strlen(e.mText))) {
+    if (!strncmp(mLexer->line + mLexer->curidx, e.mText, strlen(e.mText))) {
       mLexer->curidx += strlen(e.mText); 
       return e.mId;
     }
