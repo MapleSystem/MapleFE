@@ -10,6 +10,10 @@
 #include <utility>
 #include "tokenkind.h"
 #include "module.h"
+#include "expr.h"
+#include "stmt.h"
+#include "symbol.h"
+#include "function.h"
 #include "rule.h"
 
 class Lexer;

@@ -8,9 +8,13 @@
 #include <iostream>
 #include <fstream>
 #include <stack>
+#include <vector>
 
 #include "massert.h"
 #include "base_gen.h"
+
+class Symbol;
+class Function;
 
 typedef uint32_t stridx_t;
 typedef uint32_t tyidx_t;
@@ -75,75 +79,6 @@ class TypeTable {
   }
 };
 
-class Symbol {
- public:
-  stridx_t mStridx;
-  tyidx_t  mTyidx;
-
-  Symbol(stridx_t s, tyidx_t t) : mStridx(s), mTyidx(t) {}
-
-  void Dump();
-};
-
-class Expr {
- public:
-  RuleElem *mElem;
-  std::vector<Expr *> mSubExprs;
-
-  Expr() : mElem(NULL) {}
-  Expr(RuleElem *elem) : mElem(elem) {}
-
-  void Dump(unsigned indent) {
-    unsigned i = indent;
-    while (i--) {
-      std::cout << "  ";
-    }
-    mElem->Dump();
-    std::cout << std::endl;
-    std::vector<Expr *>::iterator it = mSubExprs.begin();
-    for(; it != mSubExprs.end(); it++) {
-      (*it)->Dump(indent+1);
-    }
-  }
-};
-
-class Stmt {
- public:
-  std::vector<Expr *> mExprs;
-
-  Stmt() {}
-  void Dump(unsigned indent) {
-    std::cout << "============ stmt tree ============" << std::endl;
-    std::vector<Expr *>::iterator it = mExprs.begin();
-    for(; it != mExprs.end(); it++) {
-      (*it)->Dump(indent+1);
-    }
-    std::cout << "===================================" << std::endl;
-  }
-};
-
-class Function {
- public:
-  stridx_t mStridx;
-  std::vector<tyidx_t> mArgTyidx;
-  std::vector<Symbol *> mFormals;
-  tyidx_t mRetTyidx;
-  std::vector<Stmt *> mBody;
-
-  std::vector<Symbol *> mSymbolTable;
-
-  Function(std::string funcname) {};
-  ~Function() {}
-
-  Symbol *GetSymbol(stridx_t stridx) {
-    for (auto sb: mSymbolTable) {
-      if (sb->mStridx == stridx)
-        return sb;
-    }
-    return NULL;
-  }
-};
-
 class Module {
 public:
   StringTable mStrTable;
@@ -154,14 +89,7 @@ public:
   Module() {};
   ~Module() {};
 
-  Symbol *GetSymbol(stridx_t stridx) {
-    for (auto sb: mSymbolTable) {
-      if (sb->mStridx == stridx)
-        return sb;
-    }
-    return NULL;
-  }
-
+  Symbol *GetSymbol(stridx_t stridx);
   void Dump();
 };
 

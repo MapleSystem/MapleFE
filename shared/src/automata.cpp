@@ -726,14 +726,20 @@ bool Automata::MatchStackWithExpectation(Expr *&expr, RuleBase *rule, unsigned s
   return true;
 }
 
+// need rework to be consistent with other statements
 bool Automata::ProcessDecls() {
   tyidx_t tyidx = 0;
-  for (unsigned j = 0; j < mStack.size(); j++) {
+  RuleBase *declrule = mBaseGen->FindRule("LocalVariableDeclarationStatement");
+  RuleElem *declelem = new RuleElem(declrule);
+  Expr *declexpr = new Expr(declelem);
+  stmtroot->mExprs.push_back(declexpr);
+
+  for (unsigned j = 0; j < mStack.size() - 1; j++) { // skip ';'
     RuleElem *elem = mStack[j].first;
 
     // build tree
     Expr *expr = new Expr(elem);
-    stmtroot->mExprs.push_back(expr);
+    declexpr->mSubExprs.push_back(expr);
     if (mStack[j].second) {
       MASSERT(elem->mType == ET_Rule && "expect a rule");
       // symbol expr which is a subexpr

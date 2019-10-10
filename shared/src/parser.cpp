@@ -52,7 +52,7 @@ bool Parser::Parse() {
           if (GetVerbose() >= 1) {
             MMSG("func ", s);
           }
-          Function *func = new Function(s);
+          Function *func = new Function(s, mModule);
           currfunc = func;
           mAutomata->currfunc = func;
           mModule->mFuncs.push_back(func);
@@ -60,6 +60,7 @@ bool Parser::Parse() {
           if (!ParseFunction(func)) {
             MMSG("Parse function error", s);
           }
+          func->Dump();
         } else {
           // global symbol
           stridx_t stridx = mModule->mStrTable.GetOrCreateGstridxFromName(s);
