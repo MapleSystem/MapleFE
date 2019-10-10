@@ -38,8 +38,8 @@ private:
   char* NewBlock();
 
 public:
-  TokenPool() {}
-  ~TokenPool(){};
+  TokenPool();
+  ~TokenPool(){};   // memory is freed in destructor of mMP.
 
   char* NewToken(unsigned);
 };

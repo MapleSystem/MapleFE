@@ -2,6 +2,12 @@
 #include "token.h"
 #include "mempool.h"
 
+TokenPool::TokenPool() {
+  mCurBlock = 0;
+  mCurPos = 0;
+  NewBlock();  // Need to allocate a block at beginning
+}
+
 char* TokenPool::NewBlock() {
   char *addr = mMP.AllocBlock();
   mBlocks.push_back(addr);

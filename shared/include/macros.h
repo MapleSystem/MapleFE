@@ -5,8 +5,7 @@
 #ifndef __MACROS_H__
 #define __MACROS_H__
 
-#include <cstdio>
-#include <cstdlib>
+#include <iostream>
 
 #define NEWLINE do { \
   std::cout << std::endl;\

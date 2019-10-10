@@ -14,6 +14,8 @@
 #include <vector>
 #include <unordered_map>
 
+class Token;
+
 class Lexer {
  public:
   char thechar;
@@ -55,7 +57,7 @@ class Lexer {
   }
 
   // These are for autogen table testing
-  TokenKind LexToken_autogen();
+  Token* LexToken_autogen();
   bool EndOfLine() { return curidx == current_line_size; }
   void SavePos();
   void ResetPos();

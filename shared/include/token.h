@@ -22,6 +22,7 @@ class Lexer;   // early decl, gen_separator.h needs it
 #include <vector>
 #include "element.h"
 #include "stringutil.h"
+#include "ruletable.h"
 
 // TokenText contains the text data of each token, no matter it's a
 // number or string. TokenText will be further processed by utility
@@ -43,7 +44,7 @@ public:
 public:
   Token(TK_Type t) : mTkType(t) {EType = ET_TK;}
   Token(){EType = ET_TK;}
-  virtual Dump(){}
+  virtual void Dump(){}
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -135,13 +136,15 @@ public:
 ////////////////////////////////////////////////////////////////////////
 //                       SeparatorToken                               //
 ////////////////////////////////////////////////////////////////////////
-#include "ruletable.h"
 
 class SeparatorToken : public Token {
 public:
   SepId mSepId;
 public:
   SeparatorToken(SepId si) {mTkType = TT_SP; mSepId = si;}
+
+  const char* GetName();
+  void Dump();
 };
 
 ////////////////////////////////////////////////////////////////////////

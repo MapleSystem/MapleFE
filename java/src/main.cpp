@@ -1,5 +1,6 @@
 #include "driver.h"
 #include "parser.h"
+#include "token.h"
 #include "common_header_autogen.h"
 #include "ruletable_util.h"
 
@@ -8,9 +9,15 @@
 /////////////////////////////////////
 
 // This is for testing autogen
-TokenKind Lexer::LexToken_autogen(void) {
+Token* Lexer::LexToken_autogen(void) {
   SepId sep = GetSeparator(this);
-  MMSG("sep id: ", sep);
+  if (sep != SEP_NA) {
+    SeparatorToken *t = (SeparatorToken*)mTokenPool.NewToken(sizeof(SeparatorToken)); 
+    new (t) SeparatorToken(sep);
+    return t;
+  }
+
+  return NULL;
 }
 
 bool Parser::Parse_autogen() {
@@ -20,7 +27,11 @@ bool Parser::Parse_autogen() {
 
   mLexer.ReadALine();
   while (!mLexer.EndOfLine()) {
-    TokenKind tk = mLexer.LexToken_autogen();
+    Token* t = mLexer.LexToken_autogen();
+    if (t)
+      t->Dump();
+    else
+      return;
   }
 } 
 
