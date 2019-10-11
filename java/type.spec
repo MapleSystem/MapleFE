@@ -42,6 +42,8 @@
 # The types recoganized by Autogen are in autogen/supported_types.spec
 # where Boolean, Byte, .. are defined. That said, "Boolean" and the likes are
 # used in type.spec as a keyword.
+#
+# This STRUCT tells the primitive types
 
 STRUCT Keyword : (("boolean", Boolean),
                   ("byte", Byte),
@@ -54,17 +56,13 @@ STRUCT Keyword : (("boolean", Boolean),
                   ("null", Null))
 
 ###################################################################################
-#                These are the primitive types                                    #
+#                                                                                 #
 ###################################################################################
 
 rule BoolType: Boolean
 rule IntType : ONEOF(Byte, Short, Int, Long, Char)
 rule FPType  : ONEOF(Float, Double)
 rule NumericType : ONEOF(IntType, FPType)
-
-############################
-# primitive types
-############################
 
 # this is a fake one, to make the development work.
 rule Annotation : "annotation"

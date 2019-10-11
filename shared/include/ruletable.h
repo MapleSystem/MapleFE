@@ -118,4 +118,14 @@ struct OprTableEntry {
   OprId       mId;
 };
 
+//////////////////////////////////////////////////////////////////////
+//                    Keyword   Table                               //
+// keyword tables are merely generated from STRUCT defined in       //
+// keyword.spec.                                                    //
+//////////////////////////////////////////////////////////////////////
+
+struct KeywordTableEntry {
+  const char *mText;
+};
+
 #endif

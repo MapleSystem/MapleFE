@@ -58,6 +58,12 @@ void AutoGen::Init() {
   mOperatorGen->SetReserved(mReservedGen);
   mGenArray.push_back(mOperatorGen);
 
+  hFile = lang_path_header + "gen_keyword.h";
+  cppFile = lang_path_cpp + "gen_keyword.cpp";
+  mKeywordGen  = new KeywordGen("keyword.spec", hFile.c_str(), cppFile.c_str());
+  mKeywordGen->SetReserved(mReservedGen);
+  mGenArray.push_back(mKeywordGen);
+
   hFile = lang_path_header + "gen_expr.h";
   cppFile = lang_path_cpp + "gen_expr.cpp";
   mExprGen  = new ExprGen("expr.spec", hFile.c_str(), cppFile.c_str());
@@ -82,6 +88,8 @@ AutoGen::~AutoGen() {
     delete mSeparatorGen;
   if (mOperatorGen)
     delete mOperatorGen;
+  if (mKeywordGen)
+    delete mKeywordGen;
   if (mExprGen)
     delete mExprGen;
 }
@@ -110,6 +118,7 @@ void AutoGen::Run() {
   mBlockGen->Run(mParser);
   mSeparatorGen->Run(mParser);
   mOperatorGen->Run(mParser);
+  mKeywordGen->Run(mParser);
   mExprGen->Run(mParser);
 }
 
@@ -127,6 +136,7 @@ void AutoGen::Gen() {
   mBlockGen->Generate();
   mSeparatorGen->Generate();
   mOperatorGen->Generate();
+  mKeywordGen->Generate();
   mExprGen->Generate();
 }
 
