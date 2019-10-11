@@ -17,6 +17,13 @@ Token* Lexer::LexToken_autogen(void) {
     return t;
   }
 
+  const char *keyword = GetKeyword(this);
+  if (keyword != NULL) {
+    KeywordToken *t = (KeywordToken*)mTokenPool.NewToken(sizeof(KeywordToken)); 
+    new (t) KeywordToken(keyword);
+    return t;
+  }
+
   return NULL;
 }
 

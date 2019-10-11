@@ -47,10 +47,17 @@ void KeywordGen::Generate() {
 void KeywordGen::GenHeaderFile() {
   mHeaderFile.WriteOneLine("#ifndef __KEYWORD_GEN_H__", 25);
   mHeaderFile.WriteOneLine("#define __KEYWORD_GEN_H__", 25);
+
+  // table decl
   std::string s = "extern KeywordTableEntry KeywordTable[";
   s = s + std::to_string(mKeywords.size());
   s = s + "];";
   mHeaderFile.WriteOneLine(s.c_str(), s.size());
+
+  // table size decl
+  s = "extern unsigned KeywordTableSize;";
+  mHeaderFile.WriteOneLine(s.c_str(), s.size());
+
   mHeaderFile.WriteOneLine("#endif", 6);
 }
 
@@ -63,5 +70,11 @@ void KeywordGen::GenCppFile() {
   tb.Generate(this, s);
   mCppFile.WriteFormattedBuffer(&tb);
   mCppFile.WriteOneLine("};", 2);
+
+  // table size;
+  s = "unsigned KeywordTableSize = ";
+  s = s + std::to_string(mKeywords.size());
+  s = s + ";";
+  mCppFile.WriteOneLine(s.c_str(), s.size());
 }
 

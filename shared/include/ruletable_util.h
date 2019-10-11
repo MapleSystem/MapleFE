@@ -55,15 +55,15 @@ public:
   ~RuleTableWalker(){}
 
   void  Traverse();             // Walk the tree, aka mTable, driven by lexer reading tokens
-  SepId TraverseSepTable();     // Walk the separator table
+  SepId       TraverseSepTable();     // Walk the separator table
+  const char* TraverseKeywordTable(); //
 };
 
 // Exported Interfaces
 // NOTE: (1) All interfaces will not go the new line.
-//       (2) All interfaces will move the 'curidx' of Lexer, this actually implies 
-//             a) They do move 'curidx' if a meaningful token is consumed.
-//             b) They do move 'curidx' if there is white space WITHOUT meaningful token
+//       (2) All interfaces will move the 'curidx' of Lexer, only if the target is found.
 
-extern bool IsIdentifier(Lexer *);
-extern SepId GetSeparator(Lexer *);
+extern bool        IsIdentifier(Lexer *);
+extern SepId       GetSeparator(Lexer *);
+extern const char* GetKeyword(Lexer*);
 #endif

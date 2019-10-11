@@ -80,23 +80,16 @@ typedef enum {
   KW_ID_NULL
 }KW_ID;
 
-struct KwInfo {
-  const char *mName;   // the text name.
-                       // At the declaration, this name is coming from
-                       // the keywords.def as constant string.
-                       // During initialization it will be changed to point to
-                       // address in string pool.
-  KW_ID       mId;
-  KW_Type     mType;
-};
-
-extern KwInfo KeywordsInAll[];
-
-class Keyword : public Token {
+class KeywordToken : public Token {
 public:
-  KwInfo mInfo;
+  const char *mName;   // The text name. During initialization it will be
+                       // put into string pool.
 public:
-  Keyword() : Token(TT_KW) {}
+  KeywordToken() : Token(TT_KW){ mName = NULL; }
+  KeywordToken(const char *s) : Token(TT_KW), mName(s){}
+  
+  void SetName(const char *s){ mName = s; }
+  void Dump();
 };
 
 ////////////////////////////////////////////////////////////////////////

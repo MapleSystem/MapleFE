@@ -30,6 +30,33 @@ SepId RuleTableWalker::TraverseSepTable() {
   return SEP_NA;
 }
 
+// Returen the keyword name, or else NULL.
+const char* RuleTableWalker::TraverseKeywordTable() {
+  const char *addr = NULL;
+  unsigned i = 0;
+  for (; i < KeywordTableSize; i++) {
+    KeywordTableEntry e = KeywordTable[i];
+    if (!strncmp(mLexer->line + mLexer->curidx, e.mText, strlen(e.mText))) {
+      unsigned saved_curidx = mLexer->curidx;
+
+      // Also need to make sure the following text is a separator
+      mLexer->curidx += strlen(e.mText); 
+      if (TraverseSepTable() != SEP_NA) {
+
+        // TraverseSepTable() moves 'curidx', need move it back to after keyword
+        mLexer->curidx = saved_curidx + strlen(e.mText); 
+
+        // Put into StringPool
+        addr = mLexer->mStringPool.FindString(e.mText);
+        return addr;
+      }
+
+      mLexer->curidx = saved_curidx;
+    }
+  }
+  return NULL;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 //                 Implementation of External Interfaces                      //
 ////////////////////////////////////////////////////////////////////////////////
@@ -38,4 +65,11 @@ SepId RuleTableWalker::TraverseSepTable() {
 SepId GetSeparator(Lexer *lex) {
   RuleTableWalker walker(NULL, lex);
   return walker.TraverseSepTable();
+}
+
+// I decided to put the keyword string into StringPool.
+const char* GetKeyword(Lexer *lex) {
+  RuleTableWalker walker(NULL, lex);
+  const char *addr = walker.TraverseKeywordTable();
+  return addr;
 }
