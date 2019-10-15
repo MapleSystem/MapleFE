@@ -14,6 +14,7 @@ Symbol *Function::GetSymbol(stridx_t stridx) {
 
 void Function::Dump() {
   std::string str = mModule->mStrTable.GetStringFromGstridx(mStridx);
+  std::cout << "\n\n============================== function ==============================" << std::endl;
   std::cout << "func " << str << " (";
   int argSize = mFormals.size();
   for (int i = 0; i < argSize; i++) {
@@ -35,5 +36,6 @@ void Function::Dump() {
   }
 
   std::cout << "}" << std::endl;
+  std::cout << "======================================================================\n\n" << std::endl;
 }
 

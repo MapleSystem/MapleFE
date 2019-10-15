@@ -27,7 +27,8 @@ int Automata::GetVerbose() {
 }
 
 // recursively process RuleElems to build mUsedByMap
-void Automata::ProcessUsedBy(RuleElem *elem, RuleBase *rule) {
+// note : rule is used in elem
+void Automata::ProcessUsedBy(RuleBase *rule, RuleElem *elem) {
   // process op car/string
   RuleBase *rb = NULL;
   switch (elem->mType) {
@@ -63,7 +64,7 @@ void Automata::ProcessUsedBy(RuleElem *elem, RuleBase *rule) {
 
   // recursively process sub elements
   for (auto it: elem->mSubElems) {
-    ProcessUsedBy(it, rule);
+    ProcessUsedBy(rule, it);
   }
 }
 
@@ -78,9 +79,9 @@ int Automata::GetMapSize(MapSetType map) {
 }
 
 void Automata::BuildUsedByMap() {
-  //
+  // init processing
   for (auto it: mBaseGen->mRules) {
-    ProcessUsedBy(it->mElement, it);
+    ProcessUsedBy(it, it->mElement);
   }
 
   // make a copy of current mSimpleUsedByMap

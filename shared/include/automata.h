@@ -77,7 +77,7 @@ public:
   void CollectTokenInRuleElem(RuleElem *elem);
   void CreateTokenRules();
 
-  void ProcessUsedBy(RuleElem *elem, RuleBase *rule);
+  void ProcessUsedBy(RuleBase *rule, RuleElem *elem);
   void BuildUsedByMap();
   void ProcessRules();
 
