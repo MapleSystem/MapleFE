@@ -26,10 +26,10 @@ class Lexer {
   TokenKind _thekind;
   std::vector<std::string> seencomments;
   int verboseLevel;
-
- private:
   StringPool mStringPool;
   TokenPool  mTokenPool;
+
+ private:
 
   FILE *srcfile;
   char *line;           // line buffer

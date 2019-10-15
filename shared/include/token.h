@@ -48,11 +48,16 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////
-//                            Identifier                              //
+//                       IdentifierToken                              //
 ////////////////////////////////////////////////////////////////////////
-class Identifier : public Token {
+class IdentifierToken : public Token {
 public:
-  Identifier() {mTkType = TT_ID;}
+  const char *mName;       // It's put into the Lexer's StringPool
+public:
+  IdentifierToken(const char *s) : mName(s) {mTkType = TT_ID;}
+  IdentifierToken() : mName(NULL) {mTkType = TT_ID;}
+
+  void Dump();
 };
 
 ////////////////////////////////////////////////////////////////////////

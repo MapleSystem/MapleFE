@@ -72,4 +72,16 @@
   assert(0); \
 } while (0)
 
+////////////////////////////////////////////////////////////////////////
+//  Dumping Interfaces without FILE/LINE
+////////////////////////////////////////////////////////////////////////
+
+#define DUMP1(msg, val) do { \
+  std::cout << msg << " " << val << std::endl; \
+} while (0)
+
+#define DUMP2(msg, val1, val2) do { \
+  std::cout << msg << " " << val1 << " " << val2 << std::endl; \
+} while (0)
+
 #endif /* __MASSERT_H__ */

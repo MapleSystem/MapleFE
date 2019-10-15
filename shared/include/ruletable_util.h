@@ -48,22 +48,29 @@ public:
   const RuleTable *mTable;
   Lexer           *mLexer;
   unsigned         mTokenNum;  // Matched token number
-  bool             mMatched;   // If the next list of tokens match the rule, aka mTable.
-
 public:
   RuleTableWalker(const RuleTable *, Lexer *);
   ~RuleTableWalker(){}
 
-  void  Traverse();             // Walk the tree, aka mTable, driven by lexer reading tokens
-  SepId       TraverseSepTable();     // Walk the separator table
-  const char* TraverseKeywordTable(); //
+  // Given mLexer and mTable, we can start walking on the RuleTable.
+  // It returns true : if RuleTable is met
+  //           false : if failed
+  // The found token's string is saved at mText, length at mLen. The string is already
+  // put in the string pool. 
+  bool        Traverse(const RuleTable*);
+  bool        TraverseTableData(TableData*);
+
+  SepId       TraverseSepTable();        // Walk the separator table
+  const char* TraverseKeywordTable();    //
+  const char* TraverseIdentifierTable(); //
 };
 
 // Exported Interfaces
 // NOTE: (1) All interfaces will not go the new line.
-//       (2) All interfaces will move the 'curidx' of Lexer, only if the target is found.
+//       (2) All interfaces will move the 'curidx' of Lexer right after the target.
+//           They won't move 'curidx' if target is not hit.
 
-extern bool        IsIdentifier(Lexer *);
-extern SepId       GetSeparator(Lexer *);
+extern SepId       GetSeparator(Lexer*);
 extern const char* GetKeyword(Lexer*);
+extern const char* GetIdentifier(Lexer*);
 #endif

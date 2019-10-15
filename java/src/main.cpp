@@ -24,6 +24,13 @@ Token* Lexer::LexToken_autogen(void) {
     return t;
   }
 
+  const char *identifier = GetIdentifier(this);
+  if (identifier != NULL) {
+    IdentifierToken *t = (IdentifierToken*)mTokenPool.NewToken(sizeof(IdentifierToken)); 
+    new (t) IdentifierToken(identifier);
+    return t;
+  }
+
   return NULL;
 }
 
@@ -32,7 +39,7 @@ bool Parser::Parse_autogen() {
     MMSG("\n\n>> Parsing .... ", filename);
   }
 
-  mLexer.ReadALine();
+  //mLexer.ReadALine();
   while (!mLexer.EndOfLine()) {
     Token* t = mLexer.LexToken_autogen();
     if (t)

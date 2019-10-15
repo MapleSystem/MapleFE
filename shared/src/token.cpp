@@ -20,11 +20,16 @@ const char* SeparatorToken::GetName() {
 
 void SeparatorToken::Dump() {
   const char *name = GetName();
-  MMSG("Token ", name);
+  DUMP1("Separator  Token: ", name);
   return;
 }
 
 void KeywordToken::Dump() {
-  MMSG("Keyword Token: ", mName);
+  DUMP1("Keyword    Token: ", mName);
+  return;
+}
+
+void IdentifierToken::Dump() {
+  DUMP1("Identifier Token: ", mName);
   return;
 }
