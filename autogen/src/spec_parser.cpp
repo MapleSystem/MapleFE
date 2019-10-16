@@ -17,7 +17,7 @@
 
 // pass spec file
 void SPECParser::ResetParser(const std::string &dfile) {
-  if (GetVerbose() >= 2)
+  if (GetVerbose() >= 3)
     MMSG("  >>>> File: ", dfile);
   // init lexer
   mLexer.PrepareForFile(dfile);
@@ -34,7 +34,7 @@ bool SPECParser::Parse() {
   while (!atEof) {
     // print current line
     lnum = mLexer.GetLineNum();
-    if (GetVerbose() >= 2 && lastlnum != lnum) {
+    if (GetVerbose() >= 3 && lastlnum != lnum) {
       lastlnum = lnum;
       MMSG("  >>>> LINE: ", mLexer.GetLine());
     }
@@ -62,7 +62,7 @@ bool SPECParser::Parse() {
       return status;
   }
 
-  if (GetVerbose() >= 1)
+  if (GetVerbose() >= 3)
     Dump();
 
   return status;
@@ -135,7 +135,7 @@ bool SPECParser::ParseElement(RuleElem *&elem, bool allowConcat) {
         char *str = mBaseGen->mStringPool->FindString(name);
         elem->SetPending(str);
         mBaseGen->mToBePatched.push_back(elem);
-        if (GetVerbose() >= 2)
+        if (GetVerbose() >= 3)
           MMSG("Pending rule: ", name);
       }
       tk = mLexer.NextToken();

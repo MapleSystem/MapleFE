@@ -11,9 +11,7 @@
 FileWriter::FileWriter(const std::string &s) {
   mName = s;
   mFile.open(s.c_str(), std::ofstream::out | std::ofstream::trunc);
-  if (mFile.good())
-    std::cout << "file " << s << " is good" << std::endl;
-  else
+  if (!mFile.good())
     std::cout << "file " << s << " is bad" << std::endl;
 
   mCurChar = NULL;

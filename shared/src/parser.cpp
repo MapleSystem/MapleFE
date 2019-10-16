@@ -28,7 +28,7 @@ bool Parser::Parse() {
   bool atEof = false;
   bool status = true;
 
-  if (GetVerbose() >= 1) {
+  if (GetVerbose() >= 3) {
     MMSG("\n\n>> Parsing .... ", filename);
   }
 
@@ -49,7 +49,7 @@ bool Parser::Parse() {
         tk = mLexer.NextToken();
         if (tk == TK_Lparen) {
           // function
-          if (GetVerbose() >= 1) {
+          if (GetVerbose() >= 2) {
             MMSG("func ", s);
           }
           Function *func = new Function(s, mModule);
@@ -60,7 +60,9 @@ bool Parser::Parse() {
           if (!ParseFunction(func)) {
             MMSG("Parse function error", s);
           }
-          func->Dump();
+          if (GetVerbose() >= 1) {
+            func->Dump();
+          }
         } else {
           // global symbol
           stridx_t stridx = mModule->mStrTable.GetOrCreateGstridxFromName(s);
@@ -90,7 +92,7 @@ bool Parser::Parse() {
     tk = mLexer.NextToken();
   }
 
-  if (mLexer.GetVerbose() >= 1)
+  if (mLexer.GetVerbose() >= 3)
     Dump();
 
   return status;
@@ -103,7 +105,7 @@ TokenKind Parser::GetTokenKind(const char c) {
 
 TokenKind Parser::GetTokenKind(const char *str) {
   TokenKind tk = mLexer.GetMappedToken(str);
-  if (GetVerbose() >= 2) {
+  if (GetVerbose() >= 3) {
     MLOC;
     std::cout << " GetFEOpcode() str: " << str
               << " \ttoken: " << mLexer.GetTokenKindString(tk)
@@ -124,7 +126,7 @@ FEOpcode Parser::GetFEOpcode(const char *str) {
 
   FEOPCode *opc = new FEOPCode();
   FEOpcode op = opc->Token2FEOpcode(tk);
-  if (GetVerbose() >= 2) {
+  if (GetVerbose() >= 3) {
     MLOC;
     std::cout << "GetFEOpcode() str: " << str
               << " \ttoken: " << mLexer.GetTokenKindString(tk)
@@ -166,7 +168,7 @@ bool Parser::ParseFuncArgs(Function *func) {
           stridx_t stridx = mModule->mStrTable.GetOrCreateGstridxFromName(s);
           Symbol *sb = currfunc->GetSymbol(stridx);
           if (!sb) {
-            if (GetVerbose() >= 1) {
+            if (GetVerbose() >= 3) {
               MMSG("arg ", s);
             }
             sb = new Symbol(stridx, inttyidx);

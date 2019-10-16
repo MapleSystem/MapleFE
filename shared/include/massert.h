@@ -44,6 +44,10 @@
   std::cout << msg << " " << val << std::endl; \
 } while (0)
 
+#define MMSGNOLOC(msg, val) do { \
+  std::cout << msg << " " << val << std::endl; \
+} while (0)
+
 #define MMSG2(msg, val1, val2) do { \
   MLOC; \
   std::cout << msg << " " << val1 << " " << val2 << std::endl; \

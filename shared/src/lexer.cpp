@@ -165,7 +165,7 @@ TokenKind Lexer::LexToken(void) {
     }
     _linenum++;  // a new line read.
     // print current line
-    if (GetVerbose() >= 2) {
+    if (GetVerbose() >= 3) {
       MMSG2("  >>>> LINE: ", _linenum, GetLine());
     }
 
@@ -630,7 +630,7 @@ TokenKind Lexer::GetConstVal(void) {
 
 TokenKind Lexer::NextToken() {
   _thekind = LexToken();
-  if (GetVerbose() >= 2)
+  if (GetVerbose() >= 3)
     std::cout << "Token : " << GetTokenKindString() << "   \t " << GetTokenString() << std::endl;
   return _thekind;
 }

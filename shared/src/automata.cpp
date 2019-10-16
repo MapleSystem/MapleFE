@@ -126,7 +126,7 @@ void Automata::BuildClosure(MapSetType &mapset) {
     count1 = GetMapSize(mapset);
     loopcnt++;
   }
-  if (GetVerbose() >= 1) {
+  if (GetVerbose() >= 2) {
     MMSG("Build closure loop count: ", loopcnt);
   }
 }
@@ -178,7 +178,7 @@ bool Automata::UpdatemIsAMap(RuleElem *elem, RuleBase *rule) {
     RuleBase *rule = mBaseGen->AddLiteralRule(rulename);
     rule->SetName(rulename);
 
-    if (GetVerbose() >= 1) {
+    if (GetVerbose() >= 2) {
       MMSG("Rule unknown for ", elem->mData.mString);
     }
   }
@@ -189,7 +189,7 @@ bool Automata::UpdatemIsAMap(RuleElem *elem, RuleBase *rule) {
 void Automata::BuildIsAMap() {
   mIsAMap.clear();
   for (auto rule: mBaseGen->mRules) {
-    if (GetVerbose() >= 1) {
+    if (GetVerbose() >= 3) {
       MLOC;
       rule->Dump();
     }
@@ -324,7 +324,7 @@ void Automata::ProcessRules() {
   // build mIsA relation for relations like IntegerLiteral IsA Literal
   BuildIsAMap();
 
-  if (GetVerbose() >= 1) {
+  if (GetVerbose() >= 3) {
     DumpTokenRuleMap();
     DumpIsAMap();
     DumpSimpleUsedByMap();
@@ -340,7 +340,7 @@ TokenKind Automata::GetFirstStackOpcode(unsigned start, unsigned end, unsigned &
     RuleElem *elem = mStack[idx].first;
     if (elem->mType == ET_Char || elem->mType == ET_String) {
       tk = elem->mToken;
-      if (GetVerbose() >= 1) {
+      if (GetVerbose() >= 2) {
         MMSG("found token: ", GetTokenString(tk));
       }
       break;
@@ -375,8 +375,7 @@ void Automata::ProcessStack() {
     return;
   }
 
-  if (GetVerbose() >= 1) {
-    MLOC;
+  if (GetVerbose() >= 2) {
     DumpStack();
   }
 
@@ -402,7 +401,7 @@ void Automata::ProcessStack() {
 
     // check a shorter list but more directly related rules
     for (auto it: mSimpleUsedByMap[rule]) {
-      if (GetVerbose() >= 1) {
+      if (GetVerbose() >= 3) {
         MLOC;
         it->Dump();
       }
@@ -411,8 +410,13 @@ void Automata::ProcessStack() {
       status = MatchStack(expr, it, 0, idx, tk);
       if (status) {
         stmtroot->mExprs.push_back(expr);
-        stmtroot->Dump(0);
-        MMSG("!!! Stack match result: ", status);
+        if (GetVerbose() >= 2) {
+          MLOC;
+          it->Dump();
+          stmtroot->Dump(0);
+          MLOC;
+        }
+        MMSGNOLOC("!!! Stack match result: ", status);
         return;
       } else {
         delete(expr);
@@ -421,7 +425,7 @@ void Automata::ProcessStack() {
 
     // check full list of used by rules
     for (auto it: mUsedByMap[rule]) {
-      if (GetVerbose() >= 1) {
+      if (GetVerbose() >= 3) {
         MLOCENDL;
         it->Dump();
       }
@@ -429,8 +433,11 @@ void Automata::ProcessStack() {
       status = MatchStack(expr, it, 0, idx, tk);
       if (status) {
         stmtroot->mExprs.push_back(expr);
-        stmtroot->Dump(0);
-        MMSG("!!! Stack match result: ", status);
+        if (GetVerbose() >= 2) {
+          stmtroot->Dump(0);
+          MLOC;
+        }
+        MMSGNOLOC("!!! Stack match result: ", status);
         return;
       } else {
         delete(expr);
@@ -438,8 +445,11 @@ void Automata::ProcessStack() {
     }
   }
 
-  stmtroot->Dump(0);
-  MMSG("!!! Stack match result: ", status);
+  if (GetVerbose() >= 2) {
+    stmtroot->Dump(0);
+    MLOC;
+  }
+  MMSGNOLOC("!!! Stack match result: ", status);
   return;
 }
 
@@ -456,8 +466,10 @@ bool Automata::MatchStack(Expr *&expr, RuleBase *rule, unsigned stackstart, unsi
     {
       status = MatchStackOp(expr, rule, stackstart, stkidx, tk);
       if (status) {
-        MMSG0("rule matched:");
-        rule->Dump();
+        if (GetVerbose() >= 3) {
+          MMSG0("rule matched:");
+          rule->Dump();
+        }
       }
       break;
     }
@@ -465,8 +477,10 @@ bool Automata::MatchStack(Expr *&expr, RuleBase *rule, unsigned stackstart, unsi
     {
       status = MatchStackRule(expr, rule, stackstart, stkidx, tk);
       if (status) {
-        MMSG0("rule matched:");
-        rule->Dump();
+        if (GetVerbose() >= 3) {
+          MMSG0("rule matched:");
+          rule->Dump();
+        }
       }
       break;
     }
@@ -501,8 +515,10 @@ bool Automata::MatchStackOp(Expr *&expr, RuleBase *rule, unsigned stackstart, un
               status = MatchStack(newexpr, it->mData.mRule, stackstart, stkidx, tk);
               if (status) {
                 expr->mSubExprs.push_back(newexpr);
-                MMSG0("rule matched:");
-                it->mData.mRule->Dump();
+                if (GetVerbose() >= 2) {
+                  MMSG0("rule matched:");
+                  it->mData.mRule->Dump();
+                }
                 return status;
               } else {
                 delete(newexpr);
@@ -517,8 +533,12 @@ bool Automata::MatchStackOp(Expr *&expr, RuleBase *rule, unsigned stackstart, un
               status = MatchStackVec(newexpr, it->mSubElems, stackstart, stkidx, tk);
               if (status) {
                 expr->mSubExprs.push_back(newexpr);
-                MMSG0("rule matched:");
-                it->Dump(true);
+
+                if (GetVerbose() >= 2) {
+                  MMSG0("rule matched:");
+                  it->Dump(true);
+                }
+
                 return status;
               } else {
                 delete(newexpr);
@@ -531,7 +551,7 @@ bool Automata::MatchStackOp(Expr *&expr, RuleBase *rule, unsigned stackstart, un
           case ET_String:
           default:
           {
-            if (GetVerbose() >= 1) {
+            if (GetVerbose() >= 2) {
               MMSG("To do", it->GetElemTypeName());
               it->Dump(true);
             }
@@ -547,8 +567,11 @@ bool Automata::MatchStackOp(Expr *&expr, RuleBase *rule, unsigned stackstart, un
       status = MatchStackVec(newexpr, rule->mElement->mSubElems, stackstart, stkidx, tk);
       if (status) {
         expr->mSubExprs.push_back(newexpr);
-        MMSG0("rule matched:");
-        rule->Dump();
+
+        if (GetVerbose() >= 2) {
+          MMSG0("rule matched:");
+          rule->Dump();
+        }
       } else {
         delete(newexpr);
       }
@@ -652,8 +675,10 @@ bool Automata::MatchStackVecRange(Expr *&expr, std::vector<RuleElem *> vec, unsi
           return false;
         }
       } else {
-        MMSG("not Rules?", vec[j]->GetElemTypeName());
-        MMSG("not Rules?", elem->GetElemTypeName());
+        if (GetVerbose() >= 1) {
+          MMSG("not Rules?", vec[j]->GetElemTypeName());
+          MMSG("not Rules?", elem->GetElemTypeName());
+        }
       }
     }
     // handle stmt tree once match
@@ -713,7 +738,7 @@ bool Automata::MatchStackWithExpectation(Expr *&expr, RuleBase *rule, unsigned s
     if (elem == NULL)
       continue;
 
-    if (GetVerbose() >= 1) {
+    if (GetVerbose() >= 3) {
       MLOC;
       elem->Dump();
     }
@@ -751,7 +776,7 @@ bool Automata::ProcessDecls() {
       expr->mSubExprs.push_back(symbolexpr);
     }
 
-    // update sumbol table
+    // update symbol table
     TokenKind tk = elem->mToken;
     if (IsType(tk)) {
       tyidx = inttyidx;
@@ -762,7 +787,7 @@ bool Automata::ProcessDecls() {
       if (currfunc) {
         // local symbol
         if (!currfunc->GetSymbol(stridx)) {
-          if (GetVerbose() >= 1) {
+          if (GetVerbose() >= 3) {
             MMSG("local var ", s);
           }
           Symbol *sb = new Symbol(stridx, inttyidx);
@@ -775,7 +800,7 @@ bool Automata::ProcessDecls() {
 }
 
 void Automata::DumpStack() {
-  std::cout << "\n============= Dump Stack =========" << std::endl;
+  std::cout << "\n\n============= Dump Stack =========" << std::endl;
   for (auto it: mStack) {
     std::cout << "Elem: ";
     it.first->Dump();

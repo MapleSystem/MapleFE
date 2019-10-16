@@ -101,7 +101,7 @@ AutoGen::~AutoGen() {
 // a traversal to solve one by one.
 void AutoGen::BackPatch() {
   std::vector<BaseGen*>::iterator it = mGenArray.begin();
-  std::cout << "mGenArray.size " << mGenArray.size() << std::endl;
+  //  std::cout << "mGenArray.size " << mGenArray.size() << std::endl;
   for (; it != mGenArray.end(); it++){
     BaseGen *gen = *it;
     gen->BackPatch(mGenArray);
