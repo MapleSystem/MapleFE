@@ -215,10 +215,6 @@ rule LambdaParameterType : ONEOF(UnannType, "var")
 
 rule VariableArityParameter : ZEROORMORE(VariableModifier) + UnannType + ZEROORMORE(Annotation) + "..." + Identifier
 
-rule VariableModifier : ONEOF(Annotation, "final")
-
-rule VariableDeclaratorId : Identifier + ZEROORONE(Dims)
-
 rule LambdaBody : ONEOF(Expression, Block)
 
 rule ConstantExpression : Expression

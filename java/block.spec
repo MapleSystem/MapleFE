@@ -4,9 +4,7 @@
 ###################################################################################
 
 ## fake ones
-rule LocalVariableDeclarationStatement : "xxx"
 rule ClassDeclaration : "class"
-rule Statement : "statement"
 
 rule BlockStatement  : ONEOF(LocalVariableDeclarationStatement,
                              ClassDeclaration,

@@ -12,6 +12,7 @@
 #include "gen_iden.h"
 #include "gen_type.h"
 #include "gen_expr.h"
+#include "gen_stmt.h"
 #include "gen_block.h"
 #include "gen_separator.h"
 #include "gen_keyword.h"

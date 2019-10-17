@@ -34,6 +34,7 @@ $(TARGET) : $(AUTOGENLIB)
 	@ln -sf $(ROOTDIR)/java/local_var.spec $(BUILD)/local_var.spec
 	@ln -sf $(ROOTDIR)/java/block.spec $(BUILD)/block.spec
 	@ln -sf $(ROOTDIR)/java/expr.spec $(BUILD)/expr.spec
+	@ln -sf $(ROOTDIR)/java/stmt.spec $(BUILD)/stmt.spec
 	@ln -sf $(ROOTDIR)/autogen/reserved.spec $(BUILD)/reserved.spec
 
 $(AUTOGENLIB) : $(OBJS)

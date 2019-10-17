@@ -95,7 +95,6 @@ rule TypeVariable  : ZEROORMORE(Annotation) + IDENTIFIER
 rule ArrayType     : ONEOF( PrimitiveType + Dims,
                             ClassOrInterfaceType + Dims,
                             TypeVariable + Dims )
-rule Dims          : ZEROORMORE(Annotation) + '[' + ']' + ZEROORMORE(ZEROORMORE(Annotation) + '[' + ']')
 rule ClassOrInterfaceType : ONEOF(ClassType, InterfaceType)
 rule ReferenceType        : ONEOF(ClassOrInterfaceType, TypeVariable, ArrayType)
 

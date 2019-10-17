@@ -69,6 +69,12 @@ void AutoGen::Init() {
   mExprGen  = new ExprGen("expr.spec", hFile.c_str(), cppFile.c_str());
   mExprGen->SetReserved(mReservedGen);
   mGenArray.push_back(mExprGen);
+
+  hFile = lang_path_header + "gen_stmt.h";
+  cppFile = lang_path_cpp + "gen_stmt.cpp";
+  mStmtGen  = new StmtGen("stmt.spec", hFile.c_str(), cppFile.c_str());
+  mStmtGen->SetReserved(mReservedGen);
+  mGenArray.push_back(mStmtGen);
 }
 
 AutoGen::~AutoGen() {
@@ -92,6 +98,8 @@ AutoGen::~AutoGen() {
     delete mKeywordGen;
   if (mExprGen)
     delete mExprGen;
+  if (mStmtGen)
+    delete mStmtGen;
 }
 
 // When parsing a rule, its elements could be rules in the future rules, or
@@ -120,6 +128,7 @@ void AutoGen::Run() {
   mOperatorGen->Run(mParser);
   mKeywordGen->Run(mParser);
   mExprGen->Run(mParser);
+  mStmtGen->Run(mParser);
 }
 
 void AutoGen::Gen() {
@@ -138,5 +147,6 @@ void AutoGen::Gen() {
   mOperatorGen->Generate();
   mKeywordGen->Generate();
   mExprGen->Generate();
+  mStmtGen->Generate();
 }
 
