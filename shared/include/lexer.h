@@ -37,6 +37,7 @@ class Lexer {
   ssize_t current_line_size;
   uint32_t curidx;
   uint32_t _linenum;
+  bool endoffile;
   int ReadALine();  // read a line from def file.
 
   std::unordered_map<std::string, TokenKind> keywordmap;
@@ -59,6 +60,7 @@ class Lexer {
   // These are for autogen table testing
   Token* LexToken_autogen();
   bool EndOfLine() { return curidx == current_line_size; }
+  bool EndOfFile() { return endoffile; }
   void SavePos();
   void ResetPos();
 

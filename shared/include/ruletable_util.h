@@ -61,6 +61,7 @@ public:
   bool        TraverseTableData(TableData*);
 
   SepId       TraverseSepTable();        // Walk the separator table
+  OprId       TraverseOprTable();        // Walk the operator table
   const char* TraverseKeywordTable();    //
   const char* TraverseIdentifierTable(); //
 };
@@ -71,6 +72,7 @@ public:
 //           They won't move 'curidx' if target is not hit.
 
 extern SepId       GetSeparator(Lexer*);
+extern OprId       GetOperator(Lexer*);
 extern const char* GetKeyword(Lexer*);
 extern const char* GetIdentifier(Lexer*);
 #endif

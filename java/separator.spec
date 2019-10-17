@@ -6,7 +6,8 @@
 # The second is the ID of the separator. Please check autogen/seps_supported.spec
 # to see the supported separator ID.
 
-STRUCT SEPARATOR : (("(", LeftParenthesis),
+STRUCT SEPARATOR : ((" ", WhiteSpace),
+                    ("(", LeftParenthesis),
                     (")", RightParenthesis),
                     ("{", LeftBrace),
                     ("}", RightBrace),
@@ -17,5 +18,4 @@ STRUCT SEPARATOR : (("(", LeftParenthesis),
                     (".", Period),
                     ("...", Omission),
                     ("@", At),
-                    ("::", Of),
-                    (" ", WhiteSpace))
+                    ("::", Of))

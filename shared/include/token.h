@@ -140,7 +140,6 @@ public:
   SepId mSepId;
 public:
   SeparatorToken(SepId si) {mTkType = TT_SP; mSepId = si;}
-
   const char* GetName();
   void Dump();
 };
@@ -148,9 +147,13 @@ public:
 ////////////////////////////////////////////////////////////////////////
 //                              Operator                              //
 ////////////////////////////////////////////////////////////////////////
-class Operator : public Token {
+class OperatorToken : public Token {
 public:
-  Operator() {mTkType = TT_OP;}
+  OprId mOprId;
+public:
+  OperatorToken(OprId oi) {mTkType = TT_OP; mOprId = oi;}
+  const char* GetName();
+  void Dump();
 };
 
 #endif

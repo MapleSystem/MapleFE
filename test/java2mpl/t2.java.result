@@ -1,0 +1,11 @@
+Keyword    Token:  int
+Separator  Token:  WhiteSpace
+Identifier Token:  a
+Separator  Token:  Comma
+Separator  Token:  WhiteSpace
+Identifier Token:  b
+Separator  Token:  SemiColon
+Identifier Token:  a
+Separator  Token:  WhiteSpace
+Operator   Token:  Assign
+Separator  Token:  WhiteSpace

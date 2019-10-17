@@ -167,7 +167,22 @@ SepId RuleTableWalker::TraverseSepTable() {
   return SEP_NA;
 }
 
-// Returen the keyword name, or else NULL.
+// Returen the operator ID, if it's. Or OPR_NA.
+// Assuming the operator table has been sorted so as to catch the longest separator
+//   if possible.
+OprId RuleTableWalker::TraverseOprTable() {
+  unsigned i = 0;
+  for (; i < OPR_NA; i++) {
+    OprTableEntry e = OprTable[i];
+    if (!strncmp(mLexer->line + mLexer->curidx, e.mText, strlen(e.mText))) {
+      mLexer->curidx += strlen(e.mText); 
+      return e.mId;
+    }
+  }
+  return OPR_NA;
+}
+
+// Return the keyword name, or else NULL.
 const char* RuleTableWalker::TraverseKeywordTable() {
   const char *addr = NULL;
   unsigned i = 0;
@@ -202,6 +217,12 @@ const char* RuleTableWalker::TraverseKeywordTable() {
 SepId GetSeparator(Lexer *lex) {
   RuleTableWalker walker(NULL, lex);
   return walker.TraverseSepTable();
+}
+
+// Returen the operator ID, if it's. Or OPR_NA.
+OprId GetOperator(Lexer *lex) {
+  RuleTableWalker walker(NULL, lex);
+  return walker.TraverseOprTable();
 }
 
 // keyword string was put into StringPool.

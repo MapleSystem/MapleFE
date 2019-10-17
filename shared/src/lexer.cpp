@@ -36,6 +36,7 @@ int Lexer::ReadALine() {
   if (current_line_size <= 0) {  // EOF
     fclose(srcfile);
     line[0] = '\0';
+    endoffile = true;
   } else {
     if (line[current_line_size - 1] == '\n') {
       line[current_line_size - 1] = '\0';
@@ -59,6 +60,7 @@ Lexer::Lexer()
     linebuf_size(0),
     current_line_size(0),
     curidx(0),
+    endoffile(false),
     _linenum(0) {
       seencomments.clear();
       keywordmap.clear();

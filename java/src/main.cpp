@@ -17,6 +17,13 @@ Token* Lexer::LexToken_autogen(void) {
     return t;
   }
 
+  OprId opr = GetOperator(this);
+  if (opr != OPR_NA) {
+    OperatorToken *t = (OperatorToken*)mTokenPool.NewToken(sizeof(OperatorToken)); 
+    new (t) OperatorToken(opr);
+    return t;
+  }
+
   const char *keyword = GetKeyword(this);
   if (keyword != NULL) {
     KeywordToken *t = (KeywordToken*)mTokenPool.NewToken(sizeof(KeywordToken)); 
@@ -39,13 +46,18 @@ bool Parser::Parse_autogen() {
     MMSG("\n\n>> Parsing .... ", filename);
   }
 
-  //mLexer.ReadALine();
-  while (!mLexer.EndOfLine()) {
-    Token* t = mLexer.LexToken_autogen();
-    if (t)
-      t->Dump();
-    else
-      return;
+  // mLexer.ReadALine();
+  // In Lexer::PrepareForFile() already did one ReadALine().
+
+  while (!mLexer.EndOfFile()) {
+    while (!mLexer.EndOfLine()) {
+      Token* t = mLexer.LexToken_autogen();
+      if (t)
+        t->Dump();
+      else
+        return;
+    }
+    mLexer.ReadALine();
   }
 } 
 
