@@ -33,7 +33,7 @@
 
 // The separators supported in autogen, super set of all languages.
 #undef  SEPARATOR
-#define SEPARATOR(T) SEP_##T,
+#define SEPARATOR(N, T) SEP_##T,
 enum SepId {
 #include "supported_separators.def"
 SEP_NA

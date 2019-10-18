@@ -2,7 +2,7 @@
 #include "massert.h"
 
 #undef  SEPARATOR
-#define SEPARATOR(T) case SEP_##T: return #T;
+#define SEPARATOR(N, T) case SEP_##T: return #T;
 const char* SeparatorToken::GetName() {
   switch (mSepId) {
 #include "supported_separators.def"

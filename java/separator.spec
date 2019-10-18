@@ -3,19 +3,21 @@
 # STRUCT SEPARATOR : ( ("(", LeftParenthesis),
 #                      (")", RightParenthesis),
 # The first element is the literal name of separator, it needs to be a string
-# The second is the ID of the separator. Please check autogen/seps_supported.spec
+# The second is the ID of the separator. Please check shared/include/supported_separators.def
 # to see the supported separator ID.
 
-STRUCT SEPARATOR : ((" ", WhiteSpace),
-                    ("(", LeftParenthesis),
-                    (")", RightParenthesis),
-                    ("{", LeftBrace),
-                    ("}", RightBrace),
-                    ("[", LeftBracket),
-                    ("]", RightBracket),
-                    (";", SemiColon),
+STRUCT SEPARATOR : (("(", Lparen),
+                    (")", Rparen),
+                    ("{", Lbrace),
+                    ("}", Rbrace),
+                    ("[", Lbrack),
+                    ("]", Rbrack),
+                    (";", Semicolon),
                     (",", Comma),
-                    (".", Period),
-                    ("...", Omission),
+                    (".", Dot),
+                    ("...", Dotdotdot),
+                    (":", Colon),
+                    ("::", Of),
                     ("@", At),
-                    ("::", Of))
+                    ("#", Pound),
+                    (" ", Whitespace))
