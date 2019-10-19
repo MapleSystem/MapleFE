@@ -39,7 +39,6 @@ public:
   // Return true  : succeed
   //        false : failed
   bool Parse();
-  bool Parse_autogen();
   bool ParseFunction(Function *func);
   bool ParseFuncArgs(Function *func);
   bool ParseFuncBody(Function *func);
@@ -57,6 +56,13 @@ public:
   int GetVerbose() { mLexer.GetVerbose(); }
 
   void Dump();
+
+  //////////////////////////////////////////////////////////
+  //        Framework based on Autogen+Token
+  //////////////////////////////////////////////////////////
+
+  bool Parse_autogen();
+  bool ParseStmt_autogen();
 };
 
 #endif

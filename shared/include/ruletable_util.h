@@ -10,6 +10,7 @@
 #define __RULE_TABLE_UTIL_H__
 
 #include "ruletable.h"
+#include "token.h"
 
 // This class contains all the functions that a language could use during parsing.
 // The mechansim behind this design has three major parts.
@@ -73,6 +74,7 @@ public:
 
 extern SepId       GetSeparator(Lexer*);
 extern OprId       GetOperator(Lexer*);
+extern LitData     GetLiteral(Lexer*);
 extern const char* GetKeyword(Lexer*);
 extern const char* GetIdentifier(Lexer*);
 #endif

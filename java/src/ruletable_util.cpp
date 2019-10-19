@@ -116,10 +116,19 @@ bool RuleTableWalker::Traverse(const RuleTable *rule_table) {
     break;
   }
 
-  // The next data should be either non-target or target. The lexer will
-  // always stop.
-  case ET_Zeroorone:
+  // It always matched. The lexer will stop after it zeor or at most one target
+  case ET_Zeroorone: {
+    matched = true;
+    bool found = false;
+    for (unsigned i = 0; i < rule_table->mNum; i++) {
+      TableData *data = rule_table->mData + i;
+      found = TraverseTableData(data);
+      // The first element is hit, then stop.
+      if (found)
+        break;
+    }
     break;
+  }
 
   // Lexer needs to find all elements, and in EXACTLY THE ORDER as defined.
   case ET_Concatenate: {
@@ -136,12 +145,14 @@ bool RuleTableWalker::Traverse(const RuleTable *rule_table) {
   }
 
   // Next table
-  case ET_Data:
+  case ET_Data: {
     break;
+  }
 
   case ET_Null:
-  default:
+  default: {
     break;
+  }
   }
 
   if(matched) {
@@ -245,6 +256,28 @@ const char* GetIdentifier(Lexer *lex) {
     const char *addr = lex->mStringPool.FindString(s);
     return addr;
   } else {
+    lex->SetCuridx(old_pos);
     return NULL;
   }
+}
+
+// NOTE: Literal table is always Hard Coded as TblLiteral.
+LitData GetLiteral(Lexer *lex) {
+  RuleTableWalker walker(&TblLiteral, lex);
+  unsigned old_pos = lex->GetCuridx();
+
+  LitData ld;
+  ld.mType = LT_NA;
+  bool found = walker.Traverse(&TblLiteral);
+  if (found) {
+    unsigned len = lex->GetCuridx() - old_pos;
+    MASSERT(len > 0 && "found token has 0 data?");
+    std::string s(lex->GetLine() + old_pos, len);
+    const char *addr = lex->mStringPool.FindString(s);
+    DUMP1("found literal: ", addr);
+  } else {
+    lex->SetCuridx(old_pos);
+  }
+
+  return ld;
 }
