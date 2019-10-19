@@ -352,7 +352,7 @@ SPECTokenKind SPECLexer::GetConstVal(void) {
     return SPECTK_Intconst;
   }
 
-  uint startidx = curidx;
+  uint32_t startidx = curidx;
   while (isdigit(line[curidx])) {
     curidx++;
   }

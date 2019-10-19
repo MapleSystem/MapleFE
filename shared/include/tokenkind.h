@@ -25,7 +25,7 @@ typedef enum {
   #include "opkeywords.def"
 #undef OPKEYWORD
 #define SEPARATOR(N,T) TK_##T,
-  #include "separators.def"
+  #include "supported_separators.def"
 #undef SEPARATOR
 } TokenKind;
 #endif

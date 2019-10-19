@@ -18,7 +18,7 @@ TY_NA
 // The list of all supported separators. This covers all the languages.
 // NOTE: autogen also relies on this set of supported separators
 #undef  SEPARATOR
-#define SEPARATOR(T) SEP_##T,
+#define SEPARATOR(N, T) SEP_##T,
 typedef enum {
 #include "supported_separators.def"
 SEP_NA

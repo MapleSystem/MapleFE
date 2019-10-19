@@ -1,5 +1,5 @@
-Separator  Token:  WhiteSpace
+Separator  Token:  Whitespace
 Keyword    Token:  int
-Separator  Token:  WhiteSpace
+Separator  Token:  Whitespace
 Identifier Token:  a
-Separator  Token:  SemiColon
+Separator  Token:  Semicolon

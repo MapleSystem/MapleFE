@@ -84,7 +84,7 @@ Lexer::Lexer()
     std::string str(S);       \
     keywordmap[str] = TK_##T; \
   }
-#include "separators.def"
+#include "supported_separators.def"
 #undef SEPARATOR
 }
 
@@ -514,7 +514,7 @@ TokenKind Lexer::GetConstVal(void) {
     return TK_Intconst;
   }
 
-  uint startidx = curidx;
+  uint32_t startidx = curidx;
   while (isdigit(line[curidx])) {
     curidx++;
   }
@@ -668,7 +668,7 @@ std::string Lexer::GetTokenString(const TokenKind tk) {
       temp = N;             \
       break;                \
     }
-#include "separators.def"
+#include "supported_separators.def"
 #undef SEPARATOR
     case TK_Intconst: {
       temp = "intconst";
@@ -741,7 +741,7 @@ std::string Lexer::GetTokenKindString(const TokenKind tk) {
       temp = #T;            \
       break;                \
     }
-#include "separators.def"
+#include "supported_separators.def"
 #undef SEPARATOR
 #define TOKEN(N, T)         \
     case TK_##T: {          \

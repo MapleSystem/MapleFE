@@ -309,7 +309,7 @@ void Automata::AddTokenRules() {
 #undef EYWORD
 
 #define SEPARATOR(N,T) AddLiteralTokenRule(TK_##T, #N);
-#include "separators.def"
+#include "supported_separators.def"
 #undef SEPARATOR
 
 }

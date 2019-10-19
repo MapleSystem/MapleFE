@@ -1,11 +1,11 @@
 Keyword    Token:  int
-Separator  Token:  WhiteSpace
+Separator  Token:  Whitespace
 Identifier Token:  a
 Separator  Token:  Comma
-Separator  Token:  WhiteSpace
+Separator  Token:  Whitespace
 Identifier Token:  b
-Separator  Token:  SemiColon
+Separator  Token:  Semicolon
 Identifier Token:  a
-Separator  Token:  WhiteSpace
+Separator  Token:  Whitespace
 Operator   Token:  Assign
-Separator  Token:  WhiteSpace
+Separator  Token:  Whitespace

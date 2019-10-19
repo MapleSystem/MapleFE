@@ -7,7 +7,7 @@
 
 //////////////   Separators supported /////////////////
 #undef  SEPARATOR
-#define SEPARATOR(S) {#S, SEP_##S},
+#define SEPARATOR(N, S) {#S, SEP_##S},
 SuppSepId SepsSupported[SEP_NA] = {
 #include "supported_separators.def"
 };
