@@ -49,3 +49,27 @@ void IdentifierToken::Dump() {
   DUMP1("Identifier Token: ", mName);
   return;
 }
+
+void LiteralToken::Dump() {
+  switch (mData.mType) {
+  case LT_IntegerLiteral:
+    DUMP0("Integer Literal Token:");
+    break;
+  case LT_FPLiteral:
+    DUMP0("Floating Literal Token:");
+    break;
+  case LT_BooleanLiteral:
+    DUMP0("Boolean Literal Token:");
+    break;
+  case LT_CharacterLiteral:
+    DUMP0("Character Literal Token:");
+    break;
+  case LT_NullLiteral:
+    DUMP0("Null Literal Token:");
+    break;
+  case LT_NA:
+  default:
+    DUMP0("NA Token:");
+    break;
+  }
+}

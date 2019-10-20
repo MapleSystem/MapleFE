@@ -1,5 +1,6 @@
 #include "ruletable_util.h"
 #include "lexer.h"
+#include "lang_spec.h"
 #include "massert.h"
 #include "common_header_autogen.h"
 
@@ -274,7 +275,8 @@ LitData GetLiteral(Lexer *lex) {
     MASSERT(len > 0 && "found token has 0 data?");
     std::string s(lex->GetLine() + old_pos, len);
     const char *addr = lex->mStringPool.FindString(s);
-    DUMP1("found literal: ", addr);
+    // We just support integer token right now. Value is put in LitData.mData.mStr
+    ld = ProcessLiteral(LT_IntegerLiteral, addr);
   } else {
     lex->SetCuridx(old_pos);
   }

@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////////////////////////////////////
 //            Language Specific Implementations                                //
-// This is not autogen generated.
 /////////////////////////////////////////////////////////////////////////////////
 
 #ifndef __LANG_SPEC_H__
 #define __LANG_SPEC_H__
 
 #include "stringutil.h"
+#include "token.h"
 
 class StringToValueImpl : public StringToValue {
 public:
@@ -18,4 +18,5 @@ public:
   bool   StringIsNull(std::string &s) {return false;}
 };
 
+extern LitData ProcessLiteral(LT_Type type, const char *str);
 #endif

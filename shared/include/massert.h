@@ -80,6 +80,10 @@
 //  Dumping Interfaces without FILE/LINE
 ////////////////////////////////////////////////////////////////////////
 
+#define DUMP0(msg) do { \
+  std::cout << msg << std::endl; \
+} while (0)
+
 #define DUMP1(msg, val) do { \
   std::cout << msg << " " << val << std::endl; \
 } while (0)

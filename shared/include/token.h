@@ -127,6 +127,7 @@ private:
   LitData  mData;
 public:
   LiteralToken(LitData data) {mTkType = TT_LT; mData = data;}
+  void Dump();
 };
 
 ////////////////////////////////////////////////////////////////////////
