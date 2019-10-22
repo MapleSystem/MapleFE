@@ -6,7 +6,8 @@
 # The second is the ID of the separator. Please check shared/include/supported_separators.def
 # to see the supported separator ID.
 
-STRUCT SEPARATOR : (("(", Lparen),
+STRUCT SEPARATOR : ((" ", Whitespace),
+                    ("(", Lparen),
                     (")", Rparen),
                     ("{", Lbrace),
                     ("}", Rbrace),
@@ -19,5 +20,4 @@ STRUCT SEPARATOR : (("(", Lparen),
                     (":", Colon),
                     ("::", Of),
                     ("@", At),
-                    ("#", Pound),
-                    (" ", Whitespace))
+                    ("#", Pound))
