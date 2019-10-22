@@ -27,5 +27,5 @@ typedef enum {
 #define SEPARATOR(N,T) TK_##T,
   #include "supported_separators.def"
 #undef SEPARATOR
-} TokenKind;
+} TK_Kind;
 #endif

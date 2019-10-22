@@ -22,7 +22,7 @@ class FEOPCode {
   FEOPCode(FEOpcode o) : op(o) {}
 
   std::string GetString(FEOpcode op);
-  FEOpcode Token2FEOpcode(TokenKind tk);
+  FEOpcode Token2FEOpcode(TK_Kind tk);
 };
 
 #endif

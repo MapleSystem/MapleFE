@@ -23,6 +23,7 @@ class Lexer;   // early decl, gen_separator.h needs it
 #include "element.h"
 #include "stringutil.h"
 #include "ruletable.h"
+#include "tokenkind.h"
 
 // TokenText contains the text data of each token, no matter it's a
 // number or string. TokenText will be further processed by utility
@@ -41,9 +42,13 @@ typedef enum {
 class Token : public Element {
 public:
   TK_Type mTkType;
+  TK_Kind mTkKind;
 public:
-  Token(TK_Type t) : mTkType(t) {EType = ET_TK;}
-  Token(){EType = ET_TK;}
+  Token(TK_Type t, TK_Kind k) : mTkType(t), mTkKind(k) { EType = ET_TK; }
+  Token(TK_Type t) : mTkType(t), mTkKind(TK_Invalid) { EType = ET_TK; }
+  Token() { EType = ET_TK; }
+  void SetTkType(TK_Type t) { mTkType = t; }
+  void SetTkKind(TK_Kind k) { mTkKind = k; }
   virtual void Dump(){}
 };
 

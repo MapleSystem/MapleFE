@@ -23,7 +23,7 @@ class Lexer {
   int64_t theintval;
   float thefloatval;
   double thedoubleval;
-  TokenKind _thekind;
+  TK_Kind _thekind;
   std::vector<std::string> seencomments;
   int verboseLevel;
   StringPool mStringPool;
@@ -40,11 +40,11 @@ class Lexer {
   bool endoffile;
   int ReadALine();  // read a line from def file.
 
-  std::unordered_map<std::string, TokenKind> keywordmap;
+  std::unordered_map<std::string, TK_Kind> keywordmap;
   // get the identifier name after the % or $ prefix
   void GetName(void);
 
-  TokenKind GetConstVal(void);
+  TK_Kind GetConstVal(void);
 
  public:
   Lexer(const Lexer &p) = default;
@@ -66,13 +66,13 @@ class Lexer {
 
   void PrepareForFile(const std::string filename);
   void PrepareForString(const std::string &src);
-  TokenKind NextToken(void);
-  TokenKind LexToken();
-  TokenKind ProcessToken();
+  TK_Kind NextToken(void);
+  TK_Kind LexToken();
+  TK_Kind ProcessToken();
   // used to process a local string from rule
-  TokenKind ProcessLocalToken(char *str) { line=str; curidx=0; return ProcessToken(); }
-  TokenKind GetMappedToken(std::string str) const { return keywordmap[str]; }
-  TokenKind GetToken() const {
+  TK_Kind ProcessLocalToken(char *str) { line=str; curidx=0; return ProcessToken(); }
+  TK_Kind GetMappedToken(std::string str) const { return keywordmap[str]; }
+  TK_Kind GetToken() const {
     return _thekind;
   }
 
@@ -83,10 +83,10 @@ class Lexer {
   int GetLineNum() const { return _linenum; }
   const std::string &GetTheName() const { return thename; }
 
-  std::string GetTokenString(const TokenKind tk);  // catched string
+  std::string GetTokenString(const TK_Kind tk);  // catched string
   std::string GetTokenString();
 
-  static std::string GetTokenKindString(const TokenKind tk);    // Token Kind
+  static std::string GetTokenKindString(const TK_Kind tk);    // Token Kind
   std::string GetTokenKindString();
 
   void SetFile(FILE *file) { srcfile = file; }
@@ -104,7 +104,7 @@ class Lexer {
   friend class Parser;
 };
 
-inline bool IsVarName(TokenKind tk) {
+inline bool IsVarName(TK_Kind tk) {
   return tk == TK_Name;
 }
 

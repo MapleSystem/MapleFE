@@ -151,7 +151,7 @@ void Lexer::GetName(void) {
   thename = std::string(&line[startidx], curidx - startidx);
 }
 
-TokenKind Lexer::LexToken(void) {
+TK_Kind Lexer::LexToken(void) {
   // skip spaces
   while ((line[curidx] == ' ' || line[curidx] == '\t') && curidx < (size_t)current_line_size) {
     curidx++;
@@ -199,7 +199,7 @@ TokenKind Lexer::LexToken(void) {
   return ProcessToken();
 }
 
-TokenKind Lexer::ProcessToken() {
+TK_Kind Lexer::ProcessToken() {
   char curchar = line[curidx++];
   switch (curchar) {
     case '\n':
@@ -430,7 +430,7 @@ TokenKind Lexer::ProcessToken() {
       curidx--;
       if (isalpha(line[curidx]) || line[curidx] == '_') {
         GetName();
-        TokenKind tk = keywordmap[thename];
+        TK_Kind tk = keywordmap[thename];
         if (tk == TK_Invalid)
           tk = TK_Name;
         return tk;
@@ -442,7 +442,7 @@ TokenKind Lexer::ProcessToken() {
 }
 
 // get the constant value
-TokenKind Lexer::GetConstVal(void) {
+TK_Kind Lexer::GetConstVal(void) {
   /* patterns of const value:
      1776
      707
@@ -630,7 +630,7 @@ TokenKind Lexer::GetConstVal(void) {
   }
 }
 
-TokenKind Lexer::NextToken() {
+TK_Kind Lexer::NextToken() {
   _thekind = LexToken();
   if (GetVerbose() >= 3)
     std::cout << "Token : " << GetTokenKindString() << "   \t " << GetTokenString() << std::endl;
@@ -638,11 +638,11 @@ TokenKind Lexer::NextToken() {
 }
 
 std::string Lexer::GetTokenString() {
-  TokenKind tk = _thekind;
+  TK_Kind tk = _thekind;
   return GetTokenString(tk);
 }
 
-std::string Lexer::GetTokenString(const TokenKind tk) {
+std::string Lexer::GetTokenString(const TK_Kind tk) {
   std::string temp;
   switch (tk) {
     default: {
@@ -711,11 +711,11 @@ std::string Lexer::GetTokenString(const TokenKind tk) {
 }
 
 std::string Lexer::GetTokenKindString() {
-  TokenKind tk = _thekind;
+  TK_Kind tk = _thekind;
   return GetTokenKindString(tk);
 }
 
-std::string Lexer::GetTokenKindString(const TokenKind tk) {
+std::string Lexer::GetTokenKindString(const TK_Kind tk) {
   std::string temp;
   switch (tk) {
     default: {

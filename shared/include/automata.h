@@ -43,8 +43,8 @@ class Automata {
   // string tokens rules
   std::unordered_set<std::string> mRuleStrings;
 
-  // group the rules by string literal used as key (TokenKind)
-  std::unordered_map<TokenKind, RuleBase *, EnumHash> mTokenRuleMap;
+  // group the rules by string literal used as key (TK_Kind)
+  std::unordered_map<TK_Kind, RuleBase *, EnumHash> mTokenRuleMap;
 
   typedef std::unordered_map<RuleBase *, std::unordered_set<RuleBase *>> MapSetType;
 
@@ -72,8 +72,8 @@ public:
   // add addition rules like
   // rule TK_Land : "&&"
   void AddTokenRules();
-  void AddLiteralTokenRule(TokenKind tk, char c);
-  void AddLiteralTokenRule(TokenKind tk, std::string str);
+  void AddLiteralTokenRule(TK_Kind tk, char c);
+  void AddLiteralTokenRule(TK_Kind tk, std::string str);
   void CollectTokenInRuleElem(RuleElem *elem);
   void CreateTokenRules();
 
@@ -81,7 +81,7 @@ public:
   void BuildUsedByMap();
   void ProcessRules();
 
-  bool IsType(TokenKind tk);
+  bool IsType(TK_Kind tk);
   bool IsA(RuleBase *rule1, RuleBase *rule2);
   bool IsUsedBy(RuleBase *rule1, RuleBase *rule2);
   void BuildIsAMap();
@@ -90,10 +90,10 @@ public:
 
   void DumpStack();
   void ProcessStack();
-  bool MatchStack(Expr *&expr, RuleBase *rule, unsigned stackstart, unsigned idx, TokenKind tk);
-  bool MatchStackOp(Expr *&expr, RuleBase *rule, unsigned stackstart, unsigned idx, TokenKind tk);
-  bool MatchStackRule(Expr *&expr, RuleBase *rule, unsigned stackstart, unsigned idx, TokenKind tk);
-  bool MatchStackVec(Expr *&expr, std::vector<RuleElem *> vec, unsigned stackstart, unsigned idx, TokenKind tk);
+  bool MatchStack(Expr *&expr, RuleBase *rule, unsigned stackstart, unsigned idx, TK_Kind tk);
+  bool MatchStackOp(Expr *&expr, RuleBase *rule, unsigned stackstart, unsigned idx, TK_Kind tk);
+  bool MatchStackRule(Expr *&expr, RuleBase *rule, unsigned stackstart, unsigned idx, TK_Kind tk);
+  bool MatchStackVec(Expr *&expr, std::vector<RuleElem *> vec, unsigned stackstart, unsigned idx, TK_Kind tk);
   bool MatchStackVecRange(Expr *&expr, std::vector<RuleElem *> vec, unsigned start, unsigned end,
                           unsigned stackstart, unsigned stackend);
   bool MatchStackWithExpectation(Expr *&expr, RuleBase *rule, unsigned stackstart, unsigned stackend);
@@ -101,15 +101,15 @@ public:
 
   int GetVerbose();
   int GetMapSize(MapSetType map);
-  TokenKind GetFirstStackOpcode(unsigned start, unsigned end, unsigned &idx);
+  TK_Kind GetFirstStackOpcode(unsigned start, unsigned end, unsigned &idx);
   void DumpTokenRuleMap();
   void DumpSetMap(MapSetType setmap);
   void DumpSimpleUsedByMap();
   void DumpUsedByMap();
   void DumpIsAMap();
 
-  std::string GetTokenString(TokenKind tk);
-  std::string GetTokenKindString(TokenKind tk);
+  std::string GetTokenString(TK_Kind tk);
+  std::string GetTokenKindString(TK_Kind tk);
 };
 
 #endif

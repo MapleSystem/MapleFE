@@ -44,10 +44,10 @@ public:
   bool ParseFuncBody(Function *func);
   bool ParseStmt(Function *func);
 
-  TokenKind GetTokenKind(const char c);
-  TokenKind GetTokenKind(const char *str);
+  TK_Kind GetTokenKind(const char c);
+  TK_Kind GetTokenKind(const char *str);
 
-  std::string GetTokenKindString(const TokenKind tk) { return mLexer.GetTokenKindString(tk); }
+  std::string GetTokenKindString(const TK_Kind tk) { return mLexer.GetTokenKindString(tk); }
 
   FEOpcode GetFEOpcode(const char c);
   FEOpcode GetFEOpcode(const char *str);

@@ -34,7 +34,7 @@ bool Parser::Parse() {
 
   currfunc = NULL;
 
-  TokenKind tk = mLexer.NextToken();
+  TK_Kind tk = mLexer.NextToken();
   while (!atEof) {
     tk = mLexer.GetToken();
     switch (tk) {
@@ -98,13 +98,13 @@ bool Parser::Parse() {
   return status;
 }
 
-TokenKind Parser::GetTokenKind(const char c) {
+TK_Kind Parser::GetTokenKind(const char c) {
   char s[2] = {c, 0};
   return GetTokenKind(s);
 }
 
-TokenKind Parser::GetTokenKind(const char *str) {
-  TokenKind tk = mLexer.GetMappedToken(str);
+TK_Kind Parser::GetTokenKind(const char *str) {
+  TK_Kind tk = mLexer.GetMappedToken(str);
   if (GetVerbose() >= 3) {
     MLOC;
     std::cout << " GetFEOpcode() str: " << str
@@ -120,8 +120,8 @@ FEOpcode Parser::GetFEOpcode(const char c) {
 }
 
 FEOpcode Parser::GetFEOpcode(const char *str) {
-  TokenKind tk = mLexer.ProcessLocalToken(str);
-  TokenKind tk1 = mLexer.GetMappedToken(str);
+  TK_Kind tk = mLexer.ProcessLocalToken(str);
+  TK_Kind tk1 = mLexer.GetMappedToken(str);
   assert(tk == tk1);
 
   FEOPCode *opc = new FEOPCode();
@@ -137,7 +137,7 @@ FEOpcode Parser::GetFEOpcode(const char *str) {
 }
 
 bool Parser::ParseFunction(Function *func) {
-  TokenKind tk = mLexer.GetToken();
+  TK_Kind tk = mLexer.GetToken();
   MASSERT(tk == TK_Lparen);
   tk = mLexer.NextToken();
 
@@ -153,7 +153,7 @@ bool Parser::ParseFunction(Function *func) {
 }
 
 bool Parser::ParseFuncArgs(Function *func) {
-  TokenKind tk = mLexer.GetToken();
+  TK_Kind tk = mLexer.GetToken();
   if (tk == TK_Rparen) {
     return true;
   }
@@ -192,7 +192,7 @@ bool Parser::ParseFuncArgs(Function *func) {
 }
 
 bool Parser::ParseFuncBody(Function *func) {
-  TokenKind tk = mLexer.GetToken();
+  TK_Kind tk = mLexer.GetToken();
 
   // loop till the end of function body '}'
   while (tk != TK_Rbrace) {
@@ -208,7 +208,7 @@ bool Parser::ParseFuncBody(Function *func) {
 // ParseStmt consumes ';'
 bool Parser::ParseStmt(Function *func) {
   mAutomata->mStack.clear();
-  TokenKind tk = mLexer.GetToken();
+  TK_Kind tk = mLexer.GetToken();
   bool isDecl = (mAutomata->IsType(tk));
   while (tk != TK_Invalid) {
     switch (tk) {

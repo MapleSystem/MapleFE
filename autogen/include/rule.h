@@ -82,7 +82,7 @@ public:
     AGTypeId    mTypeId;
   }mData;
 
-  TokenKind     mToken;    // record the token for rule like '(' ')' '[' ']' ';' ...
+  TK_Kind       mToken;    // record the token for rule like '(' ')' '[' ']' ';' ...
   std::vector<RuleElem *> mSubElems;  // Sub elements. It's empty if mType
                                       // is ET_Rule;
   RuleAction *mAction;

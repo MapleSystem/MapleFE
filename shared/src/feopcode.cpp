@@ -24,7 +24,7 @@ std::string FEOPCode::GetString(FEOpcode op) {
   return str;
 }
 
-FEOpcode FEOPCode::Token2FEOpcode(TokenKind tk) {
+FEOpcode FEOPCode::Token2FEOpcode(TK_Kind tk) {
   FEOpcode op = FEOP_Invalid;
   switch (tk) {
     default:

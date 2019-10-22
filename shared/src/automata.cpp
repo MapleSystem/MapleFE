@@ -14,11 +14,11 @@ Automata::Automata(AutoGen *ag, BaseGen *bg, Parser *p) :
 Automata::~Automata() {
 }
 
-std::string Automata::GetTokenString(TokenKind tk) {
+std::string Automata::GetTokenString(TK_Kind tk) {
   return mParser->mLexer.GetTokenString(tk);
 }
 
-std::string Automata::GetTokenKindString(TokenKind tk) {
+std::string Automata::GetTokenKindString(TK_Kind tk) {
   return mParser->mLexer.GetTokenKindString(tk);
 }
 
@@ -149,14 +149,14 @@ bool Automata::UpdatemIsAMap(RuleElem *elem, RuleBase *rule) {
       break;
     case ET_Char:
     {
-      TokenKind tk = mParser->GetTokenKind(elem->mData.mChar);
+      TK_Kind tk = mParser->GetTokenKind(elem->mData.mChar);
       std::string tkstr = mParser->GetTokenKindString(tk);
       rb = mBaseGen->FindRule(tkstr);
       break;
     }
     case ET_String:
     {
-      TokenKind tk = mParser->GetTokenKind(elem->mData.mString);
+      TK_Kind tk = mParser->GetTokenKind(elem->mData.mString);
       std::string tkstr = mParser->GetTokenKindString(tk);
       rb = mBaseGen->FindRule(tkstr);
       break;
@@ -249,18 +249,18 @@ void Automata::CollectTokenInRuleElem(RuleElem *elem) {
 // rule TK_Land : "&&"
 void Automata::CreateTokenRules() {
   for (auto c: mRuleChars) {
-    TokenKind tk = mParser->GetTokenKind(c);
+    TK_Kind tk = mParser->GetTokenKind(c);
     AddLiteralTokenRule(tk, c);
   }
 
   for (auto str: mRuleStrings) {
-    TokenKind tk = mParser->GetTokenKind(str.c_str());
+    TK_Kind tk = mParser->GetTokenKind(str.c_str());
     AddLiteralTokenRule(tk, str);
   }
   return;
 }
 
-void Automata::AddLiteralTokenRule(TokenKind tk, char c) {
+void Automata::AddLiteralTokenRule(TK_Kind tk, char c) {
   if (mTokenRuleMap.find(tk) != mTokenRuleMap.end()) {
     return;
   }
@@ -271,7 +271,7 @@ void Automata::AddLiteralTokenRule(TokenKind tk, char c) {
   mTokenRuleMap[tk] = rule;
 }
 
-void Automata::AddLiteralTokenRule(TokenKind tk, std::string str) {
+void Automata::AddLiteralTokenRule(TK_Kind tk, std::string str) {
   if (mTokenRuleMap.find(tk) != mTokenRuleMap.end()) {
     return;
   }
@@ -333,9 +333,9 @@ void Automata::ProcessRules() {
 }
 
 // get the first string/char literal as token in stack
-TokenKind Automata::GetFirstStackOpcode(unsigned start, unsigned end, unsigned &idx) {
+TK_Kind Automata::GetFirstStackOpcode(unsigned start, unsigned end, unsigned &idx) {
   // try to match token to start from a shorter list to match
-  TokenKind tk = TK_Invalid;
+  TK_Kind tk = TK_Invalid;
   for (idx = start; idx < end; idx++) {
     RuleElem *elem = mStack[idx].first;
     if (elem->mType == ET_Char || elem->mType == ET_String) {
@@ -349,7 +349,7 @@ TokenKind Automata::GetFirstStackOpcode(unsigned start, unsigned end, unsigned &
   return tk;
 }
 
-bool Automata::IsType(const TokenKind tk) {
+bool Automata::IsType(const TK_Kind tk) {
   if (tk == TK_Boolean ||
       tk == TK_Byte ||
       tk == TK_Char ||
@@ -383,7 +383,7 @@ void Automata::ProcessStack() {
 
   // get opcode index and token
   unsigned idx = 0;
-  TokenKind tk = GetFirstStackOpcode(0, mStack.size(), idx);
+  TK_Kind tk = GetFirstStackOpcode(0, mStack.size(), idx);
 
   stmtroot = new Stmt();;
 
@@ -454,7 +454,7 @@ void Automata::ProcessStack() {
 }
 
 // match stack to a rule
-bool Automata::MatchStack(Expr *&expr, RuleBase *rule, unsigned stackstart, unsigned stkidx, TokenKind tk) {
+bool Automata::MatchStack(Expr *&expr, RuleBase *rule, unsigned stackstart, unsigned stkidx, TK_Kind tk) {
   RuleBase *tkrule = mTokenRuleMap[tk];
   if (!IsUsedBy(tkrule, rule)) {
     return false;
@@ -493,7 +493,7 @@ bool Automata::MatchStack(Expr *&expr, RuleBase *rule, unsigned stackstart, unsi
 }
 
 // match rule which is of ET_Op
-bool Automata::MatchStackOp(Expr *&expr, RuleBase *rule, unsigned stackstart, unsigned stkidx, TokenKind tk) {
+bool Automata::MatchStackOp(Expr *&expr, RuleBase *rule, unsigned stackstart, unsigned stkidx, TK_Kind tk) {
   bool status = false;
 
   if (rule->mElement->mType != ET_Op) {
@@ -591,7 +591,7 @@ bool Automata::MatchStackOp(Expr *&expr, RuleBase *rule, unsigned stackstart, un
 }
 
 // match rule which is of ET_Rule
-bool Automata::MatchStackRule(Expr *&expr, RuleBase *rule, unsigned stackstart, unsigned stkidx, TokenKind tk) {
+bool Automata::MatchStackRule(Expr *&expr, RuleBase *rule, unsigned stackstart, unsigned stkidx, TK_Kind tk) {
   bool status = false;
 
   // check if rule is compatible with token
@@ -610,7 +610,7 @@ bool Automata::MatchStackRule(Expr *&expr, RuleBase *rule, unsigned stackstart, 
 }
 
 // match stack to a vector of rules consistent with given token
-bool Automata::MatchStackVec(Expr *&expr, std::vector<RuleElem *> vec, unsigned stackstart, unsigned stkidx, TokenKind tk) {
+bool Automata::MatchStackVec(Expr *&expr, std::vector<RuleElem *> vec, unsigned stackstart, unsigned stkidx, TK_Kind tk) {
   RuleBase *tkrule = mTokenRuleMap[tk];
   unsigned tkidx = 0xffff;
   for (unsigned i = 0; i < vec.size(); i++) {
@@ -711,7 +711,7 @@ bool Automata::MatchStackVecRange(Expr *&expr, std::vector<RuleElem *> vec, unsi
   // size == 1
   if (size == 1 && vec[start]->mType == ET_Rule) {
     unsigned idx = 0;
-    TokenKind tk = GetFirstStackOpcode(stackstart, stackend, idx);
+    TK_Kind tk = GetFirstStackOpcode(stackstart, stackend, idx);
     RuleElem *elem = mBaseGen->NewRuleElem(vec[start]->mData.mRule);
     Expr *newexpr = new Expr(elem);
     if (tk != TK_Invalid) {
@@ -777,7 +777,7 @@ bool Automata::ProcessDecls() {
     }
 
     // update symbol table
-    TokenKind tk = elem->mToken;
+    TK_Kind tk = elem->mToken;
     if (IsType(tk)) {
       tyidx = inttyidx;
     } else if (elem->mType == ET_Rule) {
