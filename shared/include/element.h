@@ -17,8 +17,6 @@
 #ifndef __Element_H__
 #define __Element_H__
 
-#include "stringmap.h"
-
 typedef enum {
   ET_WS,    // White Space
   ET_CM,    // Comment
@@ -29,13 +27,12 @@ typedef enum {
 class Element {
 public:
   ELMT_Type       EType;
-  StringMapEntry *Text;  // It saves the 'string' data
 
   bool IsToken()   {return EType == ET_TK;}
   bool IsComment() {return EType == ET_CM;}
 
-  Element(ELMT_Type t, const std::string &s);
-  Element() {EType = ET_NA; Text = NULL;}
+  Element(ELMT_Type t) {EType = t;}
+  Element() {EType = ET_NA;}
 };
 
 #endif
