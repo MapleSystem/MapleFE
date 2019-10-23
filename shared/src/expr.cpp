@@ -1,4 +1,5 @@
 #include "expr.h"
+#include "token.h"
 
 void Expr::Dump(unsigned indent) {
   unsigned i = indent;
@@ -10,6 +11,11 @@ void Expr::Dump(unsigned indent) {
   std::vector<Expr *>::iterator it = mSubExprs.begin();
   for(; it != mSubExprs.end(); it++) {
     (*it)->Dump(indent+1);
+  }
+
+  std::vector<Token *>::iterator tit = mTokens.begin();
+  for(; tit != mTokens.end(); tit++) {
+    (*tit)->Dump();
   }
 }
 

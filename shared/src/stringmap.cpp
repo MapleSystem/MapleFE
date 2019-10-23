@@ -15,7 +15,19 @@ StringMap::StringMap() {
 }
 
 StringMap::~StringMap() {
-  // iterate to delete all entries.
+  StringMapEntry *E = mBuckets;
+  for (unsigned i = 0; i < mNumBuckets; i++, E++) {
+    // iterate to delete all entries.
+    StringMapEntry *entry = E->Next;
+    StringMapEntry *temp = NULL;
+    while(entry) {
+      temp = entry->Next;
+      delete entry;
+      entry = temp;
+    } 
+  }
+
+  delete [] mBuckets;
 }
 
 void StringMap::Init(unsigned Num) {
@@ -48,6 +60,15 @@ unsigned StringMap::BucketNoFor(const std::string &S) {
 char* StringMap::LookupAddrFor(const std::string &S) { 
   unsigned BucketNo = BucketNoFor(S);
   StringMapEntry *E = &mBuckets[BucketNo];
+
+  // Since we add an empty StringMapEntry as the first entry of this
+  // bucket, we can use it at the first time.
+  if (E && !E->Addr && !E->Next) {
+    char *addr = mPool->Alloc(S);
+    E->Addr = addr;
+    return addr;
+  }
+  
   while (E && E->Addr) {
     if (S.compare(E->Addr) == 0)
       return E->Addr;

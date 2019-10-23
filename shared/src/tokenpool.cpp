@@ -29,6 +29,10 @@ char* TokenPool::NewToken(unsigned tokensize) {
     mCurPos++;
     vAddr = mBlocks[mCurBlock] + mCurPos * tokensize;
   }
+
+  // Put into mTokens;
+  mTokens.push_back((Token*)vAddr);
+
   return vAddr;
 }
   

@@ -19,6 +19,7 @@
 class Automata;
 class Module;
 class Function;
+class Stmt;
 
 class Parser {
 public:
@@ -63,6 +64,7 @@ public:
 
   bool Parse_autogen();
   bool ParseStmt_autogen();
+  void InitPredefinedTokens();
 };
 
 #endif

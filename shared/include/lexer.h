@@ -28,6 +28,7 @@ class Lexer {
   int verboseLevel;
   StringPool mStringPool;
   TokenPool  mTokenPool;
+  unsigned   mPredefinedTokenNum;   // number of predefined tokens.
 
  private:
 
@@ -59,6 +60,7 @@ class Lexer {
 
   // These are for autogen table testing
   Token* LexToken_autogen();
+  
   bool EndOfLine() { return curidx == current_line_size; }
   bool EndOfFile() { return endoffile; }
   void SavePos();

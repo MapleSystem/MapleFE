@@ -35,6 +35,17 @@ OPR_NA
 
 ///////////////////////////////////////////////////////////////////////////
 //                       Rule Table                                      //
+//
+// The most important thing to know about RuleTable is it takes two rounds
+// of generation.
+//   (1) Autogen generates .h/.cpp files with rule tables in
+//       there. In the TableData there is DT_Token because tokens are created
+//       when the language parser is running.
+//   (2) When the parser starts, we replace TableData entries which are
+//       keyword, separator, operator with tokens. This happens in memory.
+// The reason we need token is to save the time of matching a rule. Lexer
+// returns a set of tokens, so it's faster if parts of a rule are tokens
+// to compare. 
 ///////////////////////////////////////////////////////////////////////////
 
 // The list of RuleTable Entry types
@@ -52,6 +63,7 @@ typedef enum {
   DT_Char,       // It's a literal elements, char, 'c'.
   DT_String,     // It's a literal elements, string "abc".
   DT_Type,       // It's a type id
+  DT_Token,      // It's a token
   DT_Subtable,   // sub-table
   DT_Null
 }DataType;

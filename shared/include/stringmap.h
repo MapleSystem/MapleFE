@@ -27,6 +27,8 @@ public:
   StringMapEntry() { Addr = NULL; Next = NULL; }
   StringMapEntry(char *A) { Addr = A; Next = NULL; }
   StringMapEntry(char *A, StringMapEntry *E) { Addr = A; Next = E; }
+
+  ~StringMapEntry() {}
 };
 
 class StringMap {

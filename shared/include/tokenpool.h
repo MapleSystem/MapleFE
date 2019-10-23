@@ -20,6 +20,8 @@
 
 #include "mempool.h"
 
+class Token;
+
 // TokenPool will request/release memory on the Block level.
 // So far it only request new Block and keep (re)using it. It won't release
 // any memory right now, or it even doesn't let MemPool know a Block is free.
@@ -33,6 +35,8 @@ private:
   unsigned              mCurBlock;
   unsigned              mCurPos;   // current available position in mCurBlock.
                                    // Use index since Tokens have same size
+public:
+  std::vector<Token*>   mTokens;
 
 private:
   char* NewBlock();

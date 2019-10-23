@@ -42,7 +42,9 @@ typedef enum {
 class Token : public Element {
 public:
   TK_Type mTkType;
-  TK_Kind mTkKind;
+  TK_Kind mTkKind;   // This is more like Id, not kind.
+                     // Having both mTkType and mTkKind is a temporary solution
+                     // will come back.
 public:
   Token(TK_Type t, TK_Kind k) : mTkType(t), mTkKind(k) { EType = ET_TK; }
   Token(TK_Type t) : mTkType(t), mTkKind(TK_Invalid) { EType = ET_TK; }

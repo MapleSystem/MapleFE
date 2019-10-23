@@ -4,27 +4,47 @@
 #include "common_header_autogen.h"
 #include "ruletable_util.h"
 
+Token* FindSeparatorToken(Lexer * lex, SepId id) {
+  for (unsigned i = 0; i < lex->mPredefinedTokenNum; i++) {
+    Token *token = lex->mTokenPool.mTokens[i];
+    if ((token->mTkType == TT_SP) && (((SeparatorToken*)token)->mSepId == id))
+      return token;
+  }
+}
+
+Token* FindOperatorToken(Lexer * lex, OprId id) {
+  for (unsigned i = 0; i < lex->mPredefinedTokenNum; i++) {
+    Token *token = lex->mTokenPool.mTokens[i];
+    if ((token->mTkType == TT_OP) && (((OperatorToken*)token)->mOprId == id))
+      return token;
+  }
+}
+
+// The caller of this function makes sure 'key' is already in the
+// string pool of Lexer.
+Token* FindKeywordToken(Lexer * lex, char *key) {
+  for (unsigned i = 0; i < lex->mPredefinedTokenNum; i++) {
+    Token *token = lex->mTokenPool.mTokens[i];
+    if ((token->mTkType == TT_KW) && (((KeywordToken*)token)->mName == key))
+      return token;
+  }
+}
+
 // This is for testing autogen
 Token* Lexer::LexToken_autogen(void) {
   SepId sep = GetSeparator(this);
   if (sep != SEP_NA) {
-    SeparatorToken *t = (SeparatorToken*)mTokenPool.NewToken(sizeof(SeparatorToken)); 
-    new (t) SeparatorToken(sep);
-    return t;
+    return FindSeparatorToken(this, sep);
   }
 
   OprId opr = GetOperator(this);
   if (opr != OPR_NA) {
-    OperatorToken *t = (OperatorToken*)mTokenPool.NewToken(sizeof(OperatorToken)); 
-    new (t) OperatorToken(opr);
-    return t;
+    return FindOperatorToken(this, opr);
   }
 
   const char *keyword = GetKeyword(this);
   if (keyword != NULL) {
-    KeywordToken *t = (KeywordToken*)mTokenPool.NewToken(sizeof(KeywordToken)); 
-    new (t) KeywordToken(keyword);
-    return t;
+    return FindKeywordToken(this, keyword);
   }
 
   const char *identifier = GetIdentifier(this);
@@ -43,6 +63,7 @@ Token* Lexer::LexToken_autogen(void) {
 
   return NULL;
 }
+
 //////////////////////////////////////////////////////////////////////////////////
 //          Framework based on Autogen + Token
 //////////////////////////////////////////////////////////////////////////////////
@@ -72,9 +93,34 @@ bool Parser::Parse_autogen() {
 bool Parser::ParseStmt_autogen() {
 }
 
+// Initialized the predefined tokens.
+void Parser::InitPredefinedTokens() {
+  // 1. create separator Tokens.
+  for (unsigned i = 0; i < SEP_NA; i++) {
+    Token *t = (Token*)mLexer.mTokenPool.NewToken(sizeof(SeparatorToken));
+    new (t) SeparatorToken(i);
+  }
+  mLexer.mPredefinedTokenNum += SEP_NA;
+
+  // 2. create operator Tokens.
+  for (unsigned i = 0; i < OPR_NA; i++) {
+    Token *t = (Token*)mLexer.mTokenPool.NewToken(sizeof(OperatorToken));
+    new (t) OperatorToken(i);
+  }
+  mLexer.mPredefinedTokenNum += OPR_NA;
+
+  // 3. create keyword Tokens.
+  for (unsigned i = 0; i < KeywordTableSize; i++) {
+    Token *t = (Token*)mLexer.mTokenPool.NewToken(sizeof(KeywordToken));
+    char *s = mLexer.mStringPool.FindString(KeywordTable[i].mText);
+    new (t) KeywordToken(s);
+  }
+  mLexer.mPredefinedTokenNum += KeywordTableSize;
+}
 
 int main (int argc, char *argv[]) {
   Parser *parser = new Parser(argv[1]);
+  parser->InitPredefinedTokens();
   parser->Parse_autogen();
   delete parser;
   return 0;

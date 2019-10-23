@@ -1,0 +1,4 @@
+Keyword    Token:  boolean
+Separator  Token:  Whitespace
+Identifier Token:  a
+Separator  Token:  Semicolon

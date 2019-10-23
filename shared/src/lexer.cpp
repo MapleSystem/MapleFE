@@ -61,6 +61,7 @@ Lexer::Lexer()
     current_line_size(0),
     curidx(0),
     endoffile(false),
+    mPredefinedTokenNum(0),
     _linenum(0) {
       seencomments.clear();
       keywordmap.clear();
