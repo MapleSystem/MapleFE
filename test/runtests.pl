@@ -101,7 +101,8 @@ foreach my $dir (@dirname) {
             print "$pwd/../build64/autogen/sharedfe $outdir/$src_file\n";
           }
           print " ==$dir===> $file\n";
-          $flag ++;
+          $countfailedjava ++;
+          push(@failed_file, $file." ".$dir);
           next;
         }
 
@@ -146,17 +147,7 @@ foreach my $dir (@dirname) {
           }
         }
         next;
- 
-        if ($flag eq -1) {
-          push(@successed_file, $file);
-          system("rm -f $outdir/$src_file");
-          system("rm -f $outdir/$log_file");
-          system("rm -f $outdir/$oresult_file");
-          system("rm -f $outdir/$err_file");
-          system("rm -f $diffdir/$diff_file");
-          next;
-        }
-        
+
       }
       chdir $pwd;
     }
