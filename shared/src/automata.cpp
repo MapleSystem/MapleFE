@@ -15,11 +15,11 @@ Automata::~Automata() {
 }
 
 std::string Automata::GetTokenString(TK_Kind tk) {
-  return mParser->mLexer.GetTokenString(tk);
+  return mParser->mLexer->GetTokenString(tk);
 }
 
 std::string Automata::GetTokenKindString(TK_Kind tk) {
-  return mParser->mLexer.GetTokenKindString(tk);
+  return mParser->mLexer->GetTokenKindString(tk);
 }
 
 int Automata::GetVerbose() {

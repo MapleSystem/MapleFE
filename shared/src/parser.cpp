@@ -11,16 +11,18 @@
 //////////////////////////////////////////////////////////////////////////////
 
 // pass spec file
-Parser::Parser(const char *name, Module *m) : mLexer(), filename(name), mModule(m) {
+Parser::Parser(const char *name, Module *m) : filename(name), mModule(m) {
+  mLexer = new Lexer();
   const std::string file(name);
   // init lexer
-  mLexer.PrepareForFile(file);
+  mLexer->PrepareForFile(file);
 }
 
-Parser::Parser(const char *name) : mLexer(), filename(name) {
+Parser::Parser(const char *name) : filename(name) {
+  mLexer = new Lexer();
   const std::string file(name);
   // init lexer
-  mLexer.PrepareForFile(file);
+  mLexer->PrepareForFile(file);
 }
 
 
@@ -34,19 +36,19 @@ bool Parser::Parse() {
 
   currfunc = NULL;
 
-  TK_Kind tk = mLexer.NextToken();
+  TK_Kind tk = mLexer->NextToken();
   while (!atEof) {
-    tk = mLexer.GetToken();
+    tk = mLexer->GetToken();
     switch (tk) {
       case TK_Eof:
         atEof = true;
         break;
       case TK_Int: // int variable
       {
-        tk = mLexer.NextToken();
-        std::string s = mLexer.GetTokenString();
+        tk = mLexer->NextToken();
+        std::string s = mLexer->GetTokenString();
 
-        tk = mLexer.NextToken();
+        tk = mLexer->NextToken();
         if (tk == TK_Lparen) {
           // function
           if (GetVerbose() >= 2) {
@@ -76,7 +78,7 @@ bool Parser::Parse() {
       }
       case TK_Name:
       {
-        std::string s = mLexer.GetTokenString();
+        std::string s = mLexer->GetTokenString();
         stridx_t stridx = mModule->mStrTable.GetOrCreateGstridxFromName(s);
         if (mModule->GetSymbol(stridx)) {
           
@@ -89,10 +91,10 @@ bool Parser::Parse() {
     if (!status)
       return status;
 
-    tk = mLexer.NextToken();
+    tk = mLexer->NextToken();
   }
 
-  if (mLexer.GetVerbose() >= 3)
+  if (mLexer->GetVerbose() >= 3)
     Dump();
 
   return status;
@@ -104,11 +106,11 @@ TK_Kind Parser::GetTokenKind(const char c) {
 }
 
 TK_Kind Parser::GetTokenKind(const char *str) {
-  TK_Kind tk = mLexer.GetMappedToken(str);
+  TK_Kind tk = mLexer->GetMappedToken(str);
   if (GetVerbose() >= 3) {
     MLOC;
     std::cout << " GetFEOpcode() str: " << str
-              << " \ttoken: " << mLexer.GetTokenKindString(tk)
+              << " \ttoken: " << mLexer->GetTokenKindString(tk)
               <<  std::endl;
   }
   return tk;
@@ -120,8 +122,8 @@ FEOpcode Parser::GetFEOpcode(const char c) {
 }
 
 FEOpcode Parser::GetFEOpcode(const char *str) {
-  TK_Kind tk = mLexer.ProcessLocalToken(str);
-  TK_Kind tk1 = mLexer.GetMappedToken(str);
+  TK_Kind tk = mLexer->ProcessLocalToken(str);
+  TK_Kind tk1 = mLexer->GetMappedToken(str);
   assert(tk == tk1);
 
   FEOPCode *opc = new FEOPCode();
@@ -129,7 +131,7 @@ FEOpcode Parser::GetFEOpcode(const char *str) {
   if (GetVerbose() >= 3) {
     MLOC;
     std::cout << "GetFEOpcode() str: " << str
-              << " \ttoken: " << mLexer.GetTokenKindString(tk)
+              << " \ttoken: " << mLexer->GetTokenKindString(tk)
               << "   \topcode: " << opc->GetString(op)
               <<  std::endl;
   }
@@ -137,23 +139,23 @@ FEOpcode Parser::GetFEOpcode(const char *str) {
 }
 
 bool Parser::ParseFunction(Function *func) {
-  TK_Kind tk = mLexer.GetToken();
+  TK_Kind tk = mLexer->GetToken();
   MASSERT(tk == TK_Lparen);
-  tk = mLexer.NextToken();
+  tk = mLexer->NextToken();
 
   ParseFuncArgs(func);
 
-  tk = mLexer.NextToken();
+  tk = mLexer->NextToken();
   // parse function body
   if (tk == TK_Lbrace) {
-    tk = mLexer.NextToken();
+    tk = mLexer->NextToken();
     ParseFuncBody(func);
   }
   return true;
 }
 
 bool Parser::ParseFuncArgs(Function *func) {
-  TK_Kind tk = mLexer.GetToken();
+  TK_Kind tk = mLexer->GetToken();
   if (tk == TK_Rparen) {
     return true;
   }
@@ -161,10 +163,10 @@ bool Parser::ParseFuncArgs(Function *func) {
     switch (tk) {
       case TK_Int:
       {
-        tk = mLexer.NextToken();
+        tk = mLexer->NextToken();
         // check if it is prototype only without variable
         if (tk != TK_Comma || tk != TK_Rparen) {
-          std::string s = mLexer.GetTokenString();
+          std::string s = mLexer->GetTokenString();
           stridx_t stridx = mModule->mStrTable.GetOrCreateGstridxFromName(s);
           Symbol *sb = currfunc->GetSymbol(stridx);
           if (!sb) {
@@ -176,45 +178,45 @@ bool Parser::ParseFuncArgs(Function *func) {
           }
           func->mFormals.push_back(sb);
           func->mArgTyidx.push_back(inttyidx);
-          tk = mLexer.NextToken();
+          tk = mLexer->NextToken();
         }
         break;
       }
       default:
-        MMSGA("TK_ for args: ", mLexer.GetTokenKindString(tk));
+        MMSGA("TK_ for args: ", mLexer->GetTokenKindString(tk));
         break;
     }
     if (tk == TK_Comma) {
-      tk = mLexer.NextToken();
+      tk = mLexer->NextToken();
     }
   }
   return true;
 }
 
 bool Parser::ParseFuncBody(Function *func) {
-  TK_Kind tk = mLexer.GetToken();
+  TK_Kind tk = mLexer->GetToken();
 
   // loop till the end of function body '}'
   while (tk != TK_Rbrace) {
     ParseStmt(func);
-    tk = mLexer.GetToken();
+    tk = mLexer->GetToken();
   }
 
   // Consumes '}'
-  tk = mLexer.NextToken();
+  tk = mLexer->NextToken();
   return true;
 }
 
 // ParseStmt consumes ';'
 bool Parser::ParseStmt(Function *func) {
   mAutomata->mStack.clear();
-  TK_Kind tk = mLexer.GetToken();
+  TK_Kind tk = mLexer->GetToken();
   bool isDecl = (mAutomata->IsType(tk));
   while (tk != TK_Invalid) {
     switch (tk) {
       case TK_Name:
       {
-        std::string s = mLexer.GetTokenString();
+        std::string s = mLexer->GetTokenString();
         stridx_t stridx = mModule->mStrTable.GetOrCreateGstridxFromName(s);
         Symbol *sb = currfunc->GetSymbol(stridx);
         // either in decl or sb should be exist
@@ -262,12 +264,12 @@ bool Parser::ParseStmt(Function *func) {
     if (tk == TK_Semicolon) {
       break;
     }
-    tk = mLexer.NextToken();
+    tk = mLexer->NextToken();
   }
 
   mAutomata->ProcessStack();
 
-  tk = mLexer.NextToken();
+  tk = mLexer->NextToken();
   return true;
 }
 

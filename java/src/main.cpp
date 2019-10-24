@@ -73,18 +73,18 @@ bool Parser::Parse_autogen() {
     MMSG("\n\n>> Parsing .... ", filename);
   }
 
-  // mLexer.ReadALine();
+  // mLexer->ReadALine();
   // In Lexer::PrepareForFile() already did one ReadALine().
 
-  while (!mLexer.EndOfFile()) {
-    while (!mLexer.EndOfLine()) {
-      Token* t = mLexer.LexToken_autogen();
+  while (!mLexer->EndOfFile()) {
+    while (!mLexer->EndOfLine()) {
+      Token* t = mLexer->LexToken_autogen();
       if (t)
         t->Dump();
       else
         return;
     }
-    mLexer.ReadALine();
+    mLexer->ReadALine();
   }
 } 
 
@@ -97,25 +97,25 @@ bool Parser::ParseStmt_autogen() {
 void Parser::InitPredefinedTokens() {
   // 1. create separator Tokens.
   for (unsigned i = 0; i < SEP_NA; i++) {
-    Token *t = (Token*)mLexer.mTokenPool.NewToken(sizeof(SeparatorToken));
+    Token *t = (Token*)mLexer->mTokenPool.NewToken(sizeof(SeparatorToken));
     new (t) SeparatorToken(i);
   }
-  mLexer.mPredefinedTokenNum += SEP_NA;
+  mLexer->mPredefinedTokenNum += SEP_NA;
 
   // 2. create operator Tokens.
   for (unsigned i = 0; i < OPR_NA; i++) {
-    Token *t = (Token*)mLexer.mTokenPool.NewToken(sizeof(OperatorToken));
+    Token *t = (Token*)mLexer->mTokenPool.NewToken(sizeof(OperatorToken));
     new (t) OperatorToken(i);
   }
-  mLexer.mPredefinedTokenNum += OPR_NA;
+  mLexer->mPredefinedTokenNum += OPR_NA;
 
   // 3. create keyword Tokens.
   for (unsigned i = 0; i < KeywordTableSize; i++) {
-    Token *t = (Token*)mLexer.mTokenPool.NewToken(sizeof(KeywordToken));
-    char *s = mLexer.mStringPool.FindString(KeywordTable[i].mText);
+    Token *t = (Token*)mLexer->mTokenPool.NewToken(sizeof(KeywordToken));
+    char *s = mLexer->mStringPool.FindString(KeywordTable[i].mText);
     new (t) KeywordToken(s);
   }
-  mLexer.mPredefinedTokenNum += KeywordTableSize;
+  mLexer->mPredefinedTokenNum += KeywordTableSize;
 }
 
 int main (int argc, char *argv[]) {

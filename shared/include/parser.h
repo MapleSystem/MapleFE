@@ -23,7 +23,7 @@ class Stmt;
 
 class Parser {
 public:
-  Lexer mLexer;
+  Lexer *mLexer;
   const char *filename;
   Automata *mAutomata;
   Module *mModule;
@@ -48,13 +48,13 @@ public:
   TK_Kind GetTokenKind(const char c);
   TK_Kind GetTokenKind(const char *str);
 
-  std::string GetTokenKindString(const TK_Kind tk) { return mLexer.GetTokenKindString(tk); }
+  std::string GetTokenKindString(const TK_Kind tk) { return mLexer->GetTokenKindString(tk); }
 
   FEOpcode GetFEOpcode(const char c);
   FEOpcode GetFEOpcode(const char *str);
 
-  void SetVerbose(int i) { mLexer.SetVerbose(i); }
-  int GetVerbose() { mLexer.GetVerbose(); }
+  void SetVerbose(int i) { mLexer->SetVerbose(i); }
+  int GetVerbose() { mLexer->GetVerbose(); }
 
   void Dump();
 

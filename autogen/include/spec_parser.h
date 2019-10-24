@@ -23,12 +23,12 @@ class BaseGen;
 
 class SPECParser {
 public:
-  SPECLexer     mLexer;
+  SPECLexer    *mLexer;
   BaseGen      *mBaseGen;
 
 public:
-  SPECParser() : mLexer() {}
-  SPECParser(const std::string &dfile) : mLexer() { ResetParser(dfile); }
+  SPECParser() { mLexer = new SPECLexer(); }
+  SPECParser(const std::string &dfile) { mLexer = new SPECLexer(); ResetParser(dfile); }
   ~SPECParser() {};
 
   // for all ParseXXX routines
@@ -47,8 +47,8 @@ public:
   bool ParseStructElements();
   bool ParseElemData(StructElem *elem);
   
-  void SetVerbose(int i) { mLexer.SetVerbose(i); }
-  int GetVerbose() { return mLexer.GetVerbose(); }
+  void SetVerbose(int i) { mLexer->SetVerbose(i); }
+  int GetVerbose() { return mLexer->GetVerbose(); }
 
   void DumpRules();
   void DumpStruct();
