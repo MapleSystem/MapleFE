@@ -34,7 +34,7 @@ public:
 public:
   Parser(const char *f, Module *m);
   Parser(const char *f);
-  ~Parser() {};
+  ~Parser() { delete mLexer; }
 
   // for all ParseXXX routines
   // Return true  : succeed

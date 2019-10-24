@@ -29,7 +29,7 @@ public:
 public:
   SPECParser() { mLexer = new SPECLexer(); }
   SPECParser(const std::string &dfile) { mLexer = new SPECLexer(); ResetParser(dfile); }
-  ~SPECParser() {};
+  ~SPECParser() { delete mLexer; }
 
   // for all ParseXXX routines
   // Return true  : succeed
