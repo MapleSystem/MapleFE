@@ -34,7 +34,7 @@ private:
   std::vector<unsigned> mTags;
   unsigned              mCurBlock;
   unsigned              mCurPos;   // current available position in mCurBlock.
-                                   // Use index since Tokens have same size
+                                   // It's offset from starting of mCurBlock
 public:
   std::vector<Token*>   mTokens;
 

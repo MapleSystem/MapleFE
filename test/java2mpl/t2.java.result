@@ -9,5 +9,5 @@ Identifier Token:  a
 Separator  Token:  Whitespace
 Operator   Token:  Assign
 Separator  Token:  Whitespace
-Integer Literal Token:
+Integer Literal Token: 0
 Separator  Token:  Semicolon

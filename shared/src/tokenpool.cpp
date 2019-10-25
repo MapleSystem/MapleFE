@@ -15,24 +15,28 @@ char* TokenPool::NewBlock() {
 }
 
 char* TokenPool::NewToken(unsigned tokensize) {
-  char *vAddr = NULL;
-  if (tokensize > BLOCK_SIZE - (tokensize * mCurPos)) {
-    // Go to the next block
+  char *addr = NULL;
+  // If current block doesn't have enough space, just go to the next block
+  if (tokensize > BLOCK_SIZE - mCurPos) {
     if (mCurBlock >= mBlocks.size()) {
-      vAddr = NewBlock();
+      addr = NewBlock();
+      mCurBlock++;
     } else {
-      mCurBlock ++;
-      vAddr = mBlocks[mCurBlock];
+      // In current implementation, the blocks are working as a stack, meaning
+      // the top blocks are alwasy available.
+      mCurBlock++;
+      addr = mBlocks[mCurBlock];
     }
+    // mCurPos is always set to 0.
     mCurPos = 0;
   } else {
-    mCurPos++;
-    vAddr = mBlocks[mCurBlock] + mCurPos * tokensize;
+    addr = mBlocks[mCurBlock] + mCurPos;
+    mCurPos += tokensize;
   }
 
   // Put into mTokens;
-  mTokens.push_back((Token*)vAddr);
+  mTokens.push_back((Token*)addr);
 
-  return vAddr;
+  return addr;
 }
   

@@ -53,16 +53,16 @@ void IdentifierToken::Dump() {
 void LiteralToken::Dump() {
   switch (mData.mType) {
   case LT_IntegerLiteral:
-    DUMP0("Integer Literal Token:");
+    DUMP1("Integer Literal Token:", mData.mData.mInt);
     break;
   case LT_FPLiteral:
-    DUMP0("Floating Literal Token:");
+    DUMP1("Floating Literal Token:", mData.mData.mFloat);
     break;
   case LT_BooleanLiteral:
-    DUMP0("Boolean Literal Token:");
+    DUMP1("Boolean Literal Token:", mData.mData.mBool);
     break;
   case LT_CharacterLiteral:
-    DUMP0("Character Literal Token:");
+    DUMP1("Character Literal Token:", mData.mData.mChar);
     break;
   case LT_NullLiteral:
     DUMP0("Null Literal Token:");
