@@ -70,6 +70,7 @@ typedef enum {
 
 struct RuleTable;
 
+class Token;
 struct TableData {
   DataType mType;
   union {
@@ -77,6 +78,7 @@ struct TableData {
     char        mChar;
     const char *mString;
     TypeId      mTypeId;
+    Token      *mToken;
   }mData;
 };
 
