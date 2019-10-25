@@ -97,9 +97,9 @@ _____________________
     can contain multiple sub elements.
 
  *) One rule can be broken into multiple lines, e.g.
-      rule SEPARATOR : ANYOF ( "{",
+      rule SEPARATOR : ONEOF ( "{",
                               "}" )
-    However, an element cannot cross multiple lines.
+    An element can be multiple lines.
 
  *) "+" is used as concatentation.
 
@@ -126,30 +126,33 @@ _____________________
  can be applied to a rule.
 
  *) attr.type
- *) attr.validity
- *) attr.action
+ *) attr.validity[.%n] optional for specific element #n in ONEOF
+ *) attr.action[.%n]   optional for specific element #n in ONEOF
 
  The basic synatx of attributes are similar as rule's, with the common format:
     attr.type : XXX
  XXX is the value of attribute. It must be a system recognized word.
  An example is shown below.
 
- rule IntegerLiteral: ONEOF(DecimalIntegerLiteral,
-                            HexIntegerLiteral,
-                            OctalIntegerLiteral,
-                            BinaryIntegerLiteral)
+ rule Rule1: ONEOF(Rule2 + '+' + Rule3,
+                   Rule2 + Rule4 + Rule3,
+                   Rule4 + Rule5,
+                   Rule6)
       attr.type     : Integer
-      attr.validity : IsUnsigned(%1); IsUnsigned(%2)
-      attr.action   : GenerateBinaryExpr(%1, %2, %3);
-                      GenerateUnaryExpr(%4)
+      attr.validity.%1 : IsUnsigned(%3)
+      attr.validity.%2 : IsUnsigned(%2); IsUnsigned(%3)
+      attr.validity    : IsUnsigned(%1)
+      attr.action.%1   : GenerateBinaryExpr(%1, %2, %3)
+      attr.action      : GenerateUnaryExpr(%1)
 
- 1. attr.xxx must follow the rule which it attaches to.
- 2. attr.type     tells the data type of the generated IR component of this rule.
- 3. attr.validity tells the semantic limitation of each component. The corresponding
-                  functions will be called by language parser.
- 4. attr.action   tells the action (or functions) to be invoked by language parser
-                  when this rule is hit. Usually this tells the way to generate
-                  IR on target compiler.
+ 1. attr.xxx must      follow the rule which it attaches to.
+ 2. attr.type          tells the data type of the generated IR component of this rule.
+ 3. attr.validity[.%n] tells the semantic limitation of each component, with optional
+                       specific element number.  The corresponding functions will be
+                       called by language parser.
+ 4. attr.action[.%n]   tells the action (or functions) to be invoked by language parser
+                       when this rule is hit with optional specific element number.
+                       Usually this tells the way to generate IR on target compiler.
  5. The value must be system recognized value, such as a type value.
     Or, it can be a system supported functions.
     Please refer to Section 2 <Reserved or system supported items> and Appendix
