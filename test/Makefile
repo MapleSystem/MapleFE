@@ -32,7 +32,7 @@ rebuild:
 	make -C .. rebuild
 
 dbg:
-	(cd ../build64/autogen/; gdb -args ./sharedfe -verbose=2 ../../test/output/t.java)
+	(cd ../build64/autogen/; gdb -args ./sharedfe -verbose=3 ../../test/output/t.java)
 
 # only run autogen for now
 test: autogen
@@ -46,27 +46,27 @@ p0:
 	@echo "\ngdb command:\n(cd ../build64/autogen/; gdb --args ./autogen -p ../../test/test.spec)"
 
 p:
-	@echo "\ngdb command:\n(cd ../build64/autogen/; gdb --args ./autogen -verbose=2 -p ../../test/test.spec)\n"
-	(cd ../build64/autogen; ./autogen -verbose=2 -p ../../test/test.spec)
-	@echo "\ngdb command:\n(cd ../build64/autogen/; gdb --args ./autogen -verbose=2 -p ../../test/test.spec)"
+	@echo "\ngdb command:\n(cd ../build64/autogen/; gdb --args ./autogen -verbose=3 -p ../../test/test.spec)\n"
+	(cd ../build64/autogen; ./autogen -verbose=3 -p ../../test/test.spec)
+	@echo "\ngdb command:\n(cd ../build64/autogen/; gdb --args ./autogen -verbose=3 -p ../../test/test.spec)"
 
 % : %.java
 	cp $< $(build)
-	@echo "\ngdb command:\n(cd ../build64/autogen/; gdb -args ./sharedfe -verbose=2 ../../test/$(build)/$<)"
-	(cd ../build64/autogen; ./sharedfe -verbose=2 ../../test/$(build)/$<)
+	@echo "\ngdb command:\n(cd ../build64/autogen/; gdb -args ./sharedfe -verbose=3 ../../test/$(build)/$<)"
+	(cd ../build64/autogen; ./sharedfe -verbose=3 ../../test/$(build)/$<)
 	@echo "\ncommand:\n(cd ../build64/autogen/; ./sharedfe ../../test/$(build)/$<)"
-	@echo "\ngdb command:\n(cd ../build64/autogen/; gdb -args ./sharedfe -verbose=2 ../../test/$(build)/$<)"
+	@echo "\ngdb command:\n(cd ../build64/autogen/; gdb -args ./sharedfe -verbose=3 ../../test/$(build)/$<)"
 
 % : %.c
 	cp $< $(build)
-	@echo "\ngdb command:\n(cd ../build64/autogen/; gdb -args ./sharedfe -verbose=2 ../../test/$(build)/$<)"
-	(cd ../build64/autogen; ./sharedfe -verbose=2 ../../test/$(build)/$<)
+	@echo "\ngdb command:\n(cd ../build64/autogen/; gdb -args ./sharedfe -verbose=3 ../../test/$(build)/$<)"
+	(cd ../build64/autogen; ./sharedfe -verbose=3 ../../test/$(build)/$<)
 	@echo "\ncommand:\n(cd ../build64/autogen/; ./sharedfe ../../test/$(build)/$<)"
-	@echo "\ngdb command:\n(cd ../build64/autogen/; gdb -args ./sharedfe -verbose=2 ../../test/$(build)/$<)"
+	@echo "\ngdb command:\n(cd ../build64/autogen/; gdb -args ./sharedfe -verbose=3 ../../test/$(build)/$<)"
 
 % : %.cpp
 	cp $< $(build)
-	@echo "\ngdb command:\n(cd ../build64/autogen/; gdb -args ./sharedfe -verbose=2 ../../test/$(build)/$<)"
-	(cd ../build64/autogen; ./sharedfe -verbose=2 ../../test/$(build)/$<)
+	@echo "\ngdb command:\n(cd ../build64/autogen/; gdb -args ./sharedfe -verbose=3 ../../test/$(build)/$<)"
+	(cd ../build64/autogen; ./sharedfe -verbose=3 ../../test/$(build)/$<)
 	@echo "\ncommand:\n(cd ../build64/autogen/; ./sharedfe ../../test/$(build)/$<)"
-	@echo "\ngdb command:\n(cd ../build64/autogen/; gdb -args ./sharedfe -verbose=2 ../../test/$(build)/$<)"
+	@echo "\ngdb command:\n(cd ../build64/autogen/; gdb -args ./sharedfe -verbose=3 ../../test/$(build)/$<)"

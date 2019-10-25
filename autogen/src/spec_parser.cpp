@@ -48,6 +48,9 @@ bool SPECParser::Parse() {
       case SPECTK_Struct:
         status = ParseStruct();
         break;
+      case SPECTK_Attr:
+        status = ParseAttr();
+        break;
       case SPECTK_Eof:
         atEof = true;
         break;
@@ -73,6 +76,8 @@ bool SPECParser::Parse() {
 //      rule NAME : Element
 // 2) One element per rule
 bool SPECParser::ParseRule() {
+  bool status = false;
+
   // rule
   SPECTokenKind tk = mLexer->GetToken();
   if (tk != SPECTK_Rule)
@@ -91,6 +96,9 @@ bool SPECParser::ParseRule() {
     mBaseGen->mRules.push_back(rule);
   }
 
+  // set mCurrrule to be used for attribute parsing
+  mCurrrule = rule;
+
   // :
   tk = mLexer->NextToken();
   if (tk != SPECTK_Colon)
@@ -99,13 +107,14 @@ bool SPECParser::ParseRule() {
   // Element
   RuleElem *elem = NULL;
   tk = mLexer->NextToken();
-  if (ParseElement(elem, true)) {
+  status = ParseElement(elem, true);
+  if (status) {
     rule->SetElement(elem);
   } else {
     MMSGA ("Unexpected token: ", mLexer->GetTokenString());
   }
 
-  return true;
+  return status;
 }
 
 // This is to read ONE SINGLE element. it could be
@@ -163,7 +172,7 @@ bool SPECParser::ParseElement(RuleElem *&elem, bool allowConcat) {
       elem = mBaseGen->GetOrCreateRuleElemFromString(name);
       mLexer->NextToken();
       break;
-    case SPECTK_Action:
+    case SPECTK_Actionfunc:
       elem = mBaseGen->NewRuleElem();
       return status;
     case SPECTK_Eof:
@@ -193,8 +202,8 @@ bool SPECParser::ParseElement(RuleElem *&elem, bool allowConcat) {
 
   // check if there is an action
   tk = mLexer->GetToken();
-  if (tk == SPECTK_Action) {
-    status = ParseAction(elem);
+  if (tk == SPECTK_Actionfunc) {
+    status = ParseActionFunc(elem);
     if (!status) {
       MMSGA ("Error parsing action: ", mLexer->GetTokenString());
     }
@@ -203,10 +212,10 @@ bool SPECParser::ParseElement(RuleElem *&elem, bool allowConcat) {
   return status;
 }
 
-// ==> func funcname ( %1, %2, ....)
-bool SPECParser::ParseAction(RuleElem *&elem) {
+// ==> func funcname (%1, %2, ....)
+bool SPECParser::ParseActionFunc(RuleElem *&elem) {
   SPECTokenKind tk = mLexer->GetToken();
-  if (tk != SPECTK_Action)
+  if (tk != SPECTK_Actionfunc)
     MMSGA ("expect \"==>\" but get ", mLexer->GetTokenString());
 
   // func
@@ -214,13 +223,22 @@ bool SPECParser::ParseAction(RuleElem *&elem) {
   if (tk != SPECTK_Func)
     MMSGA ("expect func but get ", mLexer->GetTokenString());
 
-  // funcname
   tk = mLexer->NextToken();
+  RuleAction *action = GetAction();
+  elem->mAttr->AddAction(action);
+  return true;
+}
+
+// funcname (%1, %2, ....)
+RuleAction *SPECParser::GetAction() {
+  // funcname
+  SPECTokenKind tk = mLexer->GetToken();
   if (tk != SPECTK_Name)
     MMSGA ("expect name but get ", mLexer->GetTokenString());
   const std::string str = mLexer->GetTokenString();
   const char *name = mBaseGen->mStringPool->FindString(str);
-  elem->mAction = new RuleAction(name);
+
+  RuleAction *action = new RuleAction(name);
 
   tk = mLexer->NextToken();
   if (tk != SPECTK_Lparen)
@@ -236,7 +254,7 @@ bool SPECParser::ParseAction(RuleElem *&elem) {
       MMSGA ("expect a const but get ", mLexer->GetTokenString());
     }
     uint8_t idx = (uint8_t)mLexer->theintval;
-    elem->mAction->mArgs.push_back(idx);
+    action->mArgs.push_back(idx);
     tk = mLexer->NextToken();
     if (tk == SPECTK_Coma) {
       tk = mLexer->NextToken();
@@ -244,7 +262,7 @@ bool SPECParser::ParseAction(RuleElem *&elem) {
   }
   tk = mLexer->NextToken();
 
-  return true;
+  return action;
 }
 
 bool SPECParser::ParseElementSet(RuleElem *elem) {
@@ -410,12 +428,14 @@ bool SPECParser::ParseElemData(StructElem *elem) {
 // (a1, b1, ...), (a2, b2, ...), ...)
 // ^                                ^-- terminate
 bool SPECParser::ParseStructElements() {
+  bool status = false;
+
   SPECTokenKind tk = mLexer->GetToken();
   while (tk != SPECTK_Rparen) {
     StructElem *elem = new StructElem();
     // (a1, b1, ...)
     // ^
-    ParseElemData(elem);
+    status = ParseElemData(elem);
 
     mBaseGen->mCurStruct->mStructElems.push_back(elem);
 
@@ -435,6 +455,139 @@ bool SPECParser::ParseStructElements() {
   if (tk != SPECTK_Rparen)
     MMSGA("expect ')' but get ", mLexer->GetTokenString());
 
+  return status;
+}
+
+// attr.xxx
+bool SPECParser::ParseAttr() {
+  bool status = false;
+
+  SPECTokenKind tk = mLexer->GetToken();
+  if (tk != SPECTK_Attr)
+    MMSGA("expect attr but get ", mLexer->GetTokenString());
+
+  tk = mLexer->NextToken();
+  if (tk != SPECTK_Dot)
+    MMSGA("expect '.' but get ", mLexer->GetTokenString());
+
+  tk = mLexer->NextToken();
+  switch (tk) {
+    case SPECTK_Type:
+      status = ParseAttrType();
+      break;
+    case SPECTK_Validity:
+      status = ParseAttrValidity();
+      break;
+    case SPECTK_Action:
+      status = ParseAttrAction();
+      break;
+  }
+  return status;
+}
+
+bool SPECParser::ParseAttrType() {
+  bool status = false;
+
+  SPECTokenKind tk = mLexer->GetToken();
+  if (tk != SPECTK_Type)
+    MMSGA("expect type but get ", mLexer->GetTokenString());
+
+  tk = mLexer->NextToken();
+  if (tk != SPECTK_Colon)
+    MMSGA("expect ':' but get ", mLexer->GetTokenString());
+
+  tk = mLexer->NextToken();
+  std::string name = mLexer->GetTokenString();
+  //mCurrrule->mAttr->mType = mAutoGen->FindRule(name);
+
+  tk = mLexer->NextToken();
+  return true;
+}
+
+bool SPECParser::ParseAttrValidity() {
+  bool status = false;
+
+  SPECTokenKind tk = mLexer->GetToken();
+  if (tk != SPECTK_Validity)
+    MMSGA("expect validity but get ", mLexer->GetTokenString());
+
+  RuleAttr *attr = mCurrrule->mAttr;
+
+  tk = mLexer->NextToken();
+  if (tk == SPECTK_Dot) {
+    // for a specific element
+    tk = mLexer->NextToken();
+    if (tk != SPECTK_Percent)
+      MMSGA("expect '%' but get ", mLexer->GetTokenString());
+    tk = mLexer->NextToken();
+    if (tk != SPECTK_Intconst)
+      MMSGA("expect Intconst but get ", mLexer->GetTokenString());
+    int i = mLexer->theintval;
+
+    attr = mCurrrule->mElement->mSubElems[i]->mAttr;
+    tk = mLexer->NextToken();
+  }
+
+  if (tk != SPECTK_Colon)
+    MMSGA("expect ':' but get ", mLexer->GetTokenString());
+
+  tk = mLexer->NextToken();
+  RuleAction *action = GetAction();
+  attr->mValidity.push_back(action);
+
+  tk = mLexer->GetToken();
+  while (tk == SPECTK_Semicolon) {
+    tk = mLexer->NextToken();
+    RuleAction *action = GetAction();
+    attr->mValidity.push_back(action);
+    tk = mLexer->GetToken();
+  }
+
+  return true;
+}
+
+bool SPECParser::ParseAttrAction() {
+  SPECTokenKind tk = mLexer->GetToken();
+  if (tk != SPECTK_Action)
+    MMSGA("expect action but get ", mLexer->GetTokenString());
+
+  RuleAttr *attr = mCurrrule->mAttr;
+
+  tk = mLexer->NextToken();
+  if (tk == SPECTK_Dot) {
+    // for a specific element
+    tk = mLexer->NextToken();
+    if (tk != SPECTK_Percent)
+      MMSGA("expect '%' but get ", mLexer->GetTokenString());
+    tk = mLexer->NextToken();
+    if (tk != SPECTK_Intconst)
+      MMSGA("expect Intconst but get ", mLexer->GetTokenString());
+    int i = mLexer->theintval;
+
+    attr = mCurrrule->mElement->mSubElems[i]->mAttr;
+    tk = mLexer->NextToken();
+  }
+
+  if (tk != SPECTK_Colon)
+    MMSGA("expect ':' but get ", mLexer->GetTokenString());
+
+  tk = mLexer->NextToken();
+  RuleAction *action = GetAction();
+  attr->mAction.push_back(action);
+
+  tk = mLexer->GetToken();
+  while (tk == SPECTK_Semicolon) {
+    tk = mLexer->NextToken();
+    RuleAction *action = GetAction();
+    attr->mAction.push_back(action);
+    tk = mLexer->GetToken();
+  }
+
+  return true;
+}
+
+bool SPECParser::ParseType() {
+  SPECTokenKind tk = mLexer->NextToken();
   return true;
 }
 

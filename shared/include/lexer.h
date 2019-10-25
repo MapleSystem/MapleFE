@@ -56,6 +56,12 @@ class Lexer {
       free(line);
       line = nullptr;
     }
+    int i = 0;
+    for (auto it: keywordmap) {
+      i++;
+    }
+    keywordmap.clear();
+    return;
   }
 
   void DumpKeywordMap() {

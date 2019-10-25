@@ -17,6 +17,48 @@ void RuleAction::Dump() {
 }
 
 ////////////////////////////////////////////////////////////////////////////
+//                            RuleAttr                                    //
+////////////////////////////////////////////////////////////////////////////
+
+void RuleAttr::DumpType(int i) {
+  if (mType) {
+    std::cout << "    attr.type : " << mType->mName << std::endl;
+  }
+}
+
+void RuleAttr::DumpValidity(int i) {
+  if (mValidity.size()) {
+    if (i == 0)
+      std::cout << "    attr.validity : ";
+    else
+      std::cout << "    attr.validity.%" << i << " : ";
+    int i = 0;
+    for (auto it: mValidity) {
+      it->Dump();
+      if (++i != mValidity.size())
+        std::cout << "; ";
+    }
+    std::cout << "\n";
+  }
+}
+
+void RuleAttr::DumpAction(int i) {
+  if (mAction.size()) {
+    if (i == 0)
+      std::cout << "    attr.action : ";
+    else
+      std::cout << "    attr.action.%" << i << " : ";
+    int i = 0;
+    for (auto it: mAction) {
+      it->Dump();
+      if (++i != mAction.size())
+        std::cout << "; ";
+    }
+    std::cout << "\n";
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////
 //                            RuleElem                                    //
 ////////////////////////////////////////////////////////////////////////////
 
@@ -124,10 +166,7 @@ void RuleElem::Dump(bool newline) {
     case ET_NULL:
       break;
   }
-  if (mAction) {
-    std::cout << " ==> ";
-    mAction->Dump();
-  }
+
   if (newline) {
     std::cout << std::endl;
   }
@@ -167,6 +206,22 @@ void RuleBase::Dump() {
   }
   if (mElement->mSubElems.size())
     std::cout << ")" << std::endl;
+
+  // Dump Attributes
+  DumpAttr();
+
   return;
+}
+
+void RuleBase::DumpAttr() {
+  mAttr->DumpType(0);
+  mAttr->DumpValidity(0);
+  for (int i = 0; i < mElement->mSubElems.size(); i++) {
+    mElement->mSubElems[i]->mAttr->DumpValidity(i);
+  }
+  mAttr->DumpAction(0);
+  for (int i = 0; i < mElement->mSubElems.size(); i++) {
+    mElement->mSubElems[i]->mAttr->DumpAction(i);
+  }
 }
 

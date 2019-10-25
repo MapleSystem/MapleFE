@@ -118,7 +118,7 @@ void SPECLexer::GetName(void) {
   }
 
   while ((isalnum(line[curidx]) || line[curidx] == '_' || line[curidx] == '$' ||
-          line[curidx] == ';' || line[curidx] == '/' || line[curidx] == '|' || line[curidx] == '.' ||
+          line[curidx] == ';' || line[curidx] == '/' || line[curidx] == '|' ||
           line[curidx] == '?' || line[curidx] == '@') &&
          (curidx < (size_t)current_line_size)) {
     curidx++;
@@ -170,7 +170,7 @@ SPECTokenKind SPECLexer::LexToken(void) {
     case '=':
       if (line[curidx] == '=' || line[curidx+1] == '>') {
         curidx += 2;
-        return SPECTK_Action;
+        return SPECTK_Actionfunc;
       } else {
         return SPECTK_Eqsign;
       }
@@ -178,6 +178,8 @@ SPECTokenKind SPECLexer::LexToken(void) {
       return SPECTK_Coma;
     case ':':
       return SPECTK_Colon;
+    case ';':
+      return SPECTK_Semicolon;
     case '*':
       return SPECTK_Asterisk;
     case '+':
@@ -186,6 +188,8 @@ SPECTokenKind SPECLexer::LexToken(void) {
       if (line[curidx] == '.' && line[curidx + 1] == '.') {
         curidx += 2;
         return SPECTK_Dotdotdot;
+      } else {
+        return SPECTK_Dot;
       }
     case '0':
     case '1':
@@ -536,12 +540,20 @@ std::string SPECLexer::GetTokenString(SPECTokenKind thekind) {
       temp = ",";
       break;
     }
+    case SPECTK_Dot: {
+      temp = ".";
+      break;
+    }
     case SPECTK_Dotdotdot: {
       temp = "...";
       break;
     }
     case SPECTK_Colon: {
       temp = ":";
+      break;
+    }
+    case SPECTK_Semicolon: {
+      temp = ";";
       break;
     }
     case SPECTK_Asterisk: {
@@ -588,8 +600,24 @@ std::string SPECLexer::GetTokenString(SPECTokenKind thekind) {
       temp.append("\"");
       break;
     }
-    case SPECTK_Action: {
+    case SPECTK_Actionfunc: {
       temp = "==>";
+      break;
+    }
+    case SPECTK_Attr: {
+      temp = "attr";
+      break;
+    }
+    case SPECTK_Type: {
+      temp = "type";
+      break;
+    }
+    case SPECTK_Action: {
+      temp = "action";
+      break;
+    }
+    case SPECTK_Validity: {
+      temp = "validity";
       break;
     }
     case SPECTK_Eof: {

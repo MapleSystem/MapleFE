@@ -30,8 +30,12 @@ int main(int argc, char *argv[]) {
     }
   }
 
+  AutoGen *ag = new AutoGen(parser);
+  ag->Gen();
+
   // set verbose level
   parser->SetVerbose(verbose);
+  parser->SetAutoGen(ag);
 
   if (checkParserOnly) {
     // make the parser to process the given spec file
@@ -41,9 +45,6 @@ int main(int argc, char *argv[]) {
     delete bg;
     return 0;
   }
-
-  AutoGen *ag = new AutoGen(parser);
-  ag->Gen();
 
   delete ag;
   return 0;

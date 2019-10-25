@@ -22,14 +22,16 @@ typedef enum {
   SPECTK_Rangle,     // >
   SPECTK_Eqsign,     // =
   SPECTK_Coma,       // ,
+  SPECTK_Dot,        // .
   SPECTK_Dotdotdot,  // ...
   SPECTK_Colon,      // :
+  SPECTK_Semicolon,  // ;
   SPECTK_Asterisk,   // *
   SPECTK_Percent,    // %
   SPECTK_Char,       // a char enclosed between '
   SPECTK_String,     // a literal string enclosed between "
   SPECTK_Concat,     // +
-  SPECTK_Action,     // ==>
+  SPECTK_Actionfunc, // ==>
   SPECTK_Eof
 } SPECTokenKind;
 #endif

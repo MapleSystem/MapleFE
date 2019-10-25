@@ -19,12 +19,15 @@
 class MemPool;
 class RuleElemPool;
 class ReservedGen;
+class AutoGen;
 class BaseGen;
 
 class SPECParser {
 public:
   SPECLexer    *mLexer;
+  AutoGen      *mAutoGen;
   BaseGen      *mBaseGen;
+  RuleBase     *mCurrrule;
 
 public:
   SPECParser() { mLexer = new SPECLexer(); }
@@ -38,7 +41,8 @@ public:
   void ResetParser(const std::string &dfile);
 
   bool ParseRule();
-  bool ParseAction(RuleElem *&elem);
+  RuleAction *GetAction();
+  bool ParseActionFunc(RuleElem *&elem);
   bool ParseElement(RuleElem *&elem, bool allowConcat);
   bool ParseElementSet(RuleElem *parent);
   bool ParseConcatenate(RuleElem *parent);
@@ -47,6 +51,15 @@ public:
   bool ParseStructElements();
   bool ParseElemData(StructElem *elem);
   
+  bool ParseType();
+
+  bool ParseAttr();
+  bool ParseAttrType();
+  bool ParseAttrValidity();
+  bool ParseAttrAction();
+
+  void SetAutoGen(AutoGen *ag) { mAutoGen = ag; }
+
   void SetVerbose(int i) { mLexer->SetVerbose(i); }
   int GetVerbose() { return mLexer->GetVerbose(); }
 

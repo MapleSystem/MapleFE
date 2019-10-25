@@ -13,6 +13,7 @@
 #include "all_supported.h"
 
 class RuleBase;
+class TypeRule;
 
 typedef enum {
   RO_Oneof,      // one of (...)
@@ -36,8 +37,11 @@ typedef enum {
 }ElemType;
 
 // an action is the behavior performed for a matched rule
-// rule addexpr : expr '+' expr  ==> func foo(%1, %3)
-// where %1 and %3 are the sub elements in the matched rule element
+// rule addexpr : ONEOF( expr '+' expr,
+//                       expr '-' expr)
+//    attr.action.%2 foo(%1, %3)
+// where %2 means applys to element #2: "expr '-' expr"
+//       %1 and %3 are the sub elements in element #2
 // mName  foo
 // mArgs  1, 3
 // mOp    OP_Add
@@ -58,6 +62,25 @@ public:
   const char *GetName() { return mName; } const char *GetArg(uint8_t i) { return mArgs[i]; }
 
   void Dump();
+};
+
+// Attributes for RuleBase and RuleElem
+class RuleAttr {
+public:
+  TypeRule *mType;
+  std::vector<RuleAction*> mValidity;
+  std::vector<RuleAction*> mAction;
+
+  RuleAttr() : mType(NULL) {}
+  ~RuleAttr() { delete mType; mValidity.clear(); mAction.clear(); }
+
+  void SetType(TypeRule *r) { mType = r; }
+  void AddValidity(RuleAction *a) { mValidity.push_back(a); }
+  void AddAction(RuleAction *a) { mValidity.push_back(a); }
+
+  void DumpType(int i);
+  void DumpValidity(int i);
+  void DumpAction(int i);
 };
 
 // [NOTE] RuleElem is allocated in a pool, through placement new operation.
@@ -85,10 +108,13 @@ public:
   TK_Kind       mToken;    // record the token for rule like '(' ')' '[' ']' ';' ...
   std::vector<RuleElem *> mSubElems;  // Sub elements. It's empty if mType
                                       // is ET_Rule;
-  RuleAction *mAction;
+  RuleAttr     *mAttr;
 public:
-  RuleElem() : mAction(NULL) {}
-  RuleElem(RuleBase *rule) : mAction(NULL) { mType = ET_Rule; mData.mRule = rule; }
+  RuleElem() { mAttr = new RuleAttr(); }
+  RuleElem(RuleBase *rule) : mType(ET_Rule) {
+    mData.mRule = rule;
+    mAttr = new RuleAttr();
+  }
   ~RuleElem();
 
   void SetRuleOp(RuleOp op) {mType = ET_Op; mData.mOp = op;}
@@ -112,14 +138,20 @@ class RuleBase {
 public:
   const std::string mName;
   RuleElem         *mElement;
+  RuleAttr         *mAttr;
 public:
-  RuleBase(const std::string &s) : mName(s), mElement(NULL) {}
-  RuleBase() : mElement(NULL) {}
+  RuleBase(const std::string &s) : mName(s), mElement(NULL) {
+    mAttr = new RuleAttr();
+  }
+  RuleBase() : mElement(NULL) {
+    mAttr = new RuleAttr();
+  }
   ~RuleBase();
 
   void SetName(const std::string &n) {mName = n;}
   void SetElement(RuleElem *e)       {mElement = e;}
   void Dump();
+  void DumpAttr();
 };
 
 //////////////////////////////////////////////////////////////////////
