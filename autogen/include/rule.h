@@ -12,7 +12,7 @@
 #include "feopcode.h"
 #include "all_supported.h"
 
-class RuleBase;
+class Rule;
 class TypeRule;
 
 typedef enum {
@@ -64,7 +64,7 @@ public:
   void Dump();
 };
 
-// Attributes for RuleBase and RuleElem
+// Attributes for Rule and RuleElem
 class RuleAttr {
 public:
   TypeRule *mType;
@@ -98,8 +98,8 @@ public:
   ElemType mType;          // type
   union {
     RuleOp      mOp;       // It could be a OP
-    RuleBase   *mRule;     // It could be another defined rule
-                           // Here only put the base type: RuleBase
+    Rule       *mRule;     // It could be another defined rule
+                           // Here only put the base type: Rule
     char        mChar;
     const char *mString;   // Pending elem. string is NULL ended in string pool
     AGTypeId    mTypeId;
@@ -111,14 +111,14 @@ public:
   RuleAttr     *mAttr;
 public:
   RuleElem() { mAttr = new RuleAttr(); }
-  RuleElem(RuleBase *rule) : mType(ET_Rule) {
+  RuleElem(Rule *rule) : mType(ET_Rule) {
     mData.mRule = rule;
     mAttr = new RuleAttr();
   }
   ~RuleElem();
 
   void SetRuleOp(RuleOp op) {mType = ET_Op; mData.mOp = op;}
-  void SetRule(RuleBase *r) {mType = ET_Rule; mData.mRule = r;}
+  void SetRule(Rule *r) {mType = ET_Rule; mData.mRule = r;}
   void SetChar(char c)      {mType = ET_Char; mData.mChar = c;}
   void SetString(const char *s) {mType = ET_String; mData.mString = s;}
   void SetTypeId(AGTypeId t)  {mType = ET_Type; mData.mTypeId = t;}
@@ -134,19 +134,19 @@ public:
 };
 
 // a rule can contain multiple elements with actions
-class RuleBase {
+class Rule {
 public:
   const std::string mName;
   RuleElem         *mElement;
   RuleAttr         *mAttr;
 public:
-  RuleBase(const std::string &s) : mName(s), mElement(NULL) {
+  Rule(const std::string &s) : mName(s), mElement(NULL) {
     mAttr = new RuleAttr();
   }
-  RuleBase() : mElement(NULL) {
+  Rule() : mElement(NULL) {
     mAttr = new RuleAttr();
   }
-  ~RuleBase();
+  ~Rule();
 
   void SetName(const std::string &n) {mName = n;}
   void SetElement(RuleElem *e)       {mElement = e;}
@@ -162,9 +162,9 @@ public:
 // to form a complete identifier syntax.                            //
 //////////////////////////////////////////////////////////////////////
 
-class IdentifierRule : public RuleBase {
+class IdentifierRule : public Rule {
 public:
-  IdentifierRule(const std::string &s) : RuleBase(s) {}
+  IdentifierRule(const std::string &s) : Rule(s) {}
   IdentifierRule() {}
   ~IdentifierRule() {}
 };
@@ -173,9 +173,9 @@ public:
 //                   LiteralRule                                    //
 //////////////////////////////////////////////////////////////////////
 
-class LiteralRule : public RuleBase {
+class LiteralRule : public Rule {
 public:
-  LiteralRule(const std::string &s) : RuleBase(s) {}
+  LiteralRule(const std::string &s) : Rule(s) {}
   LiteralRule() {}
   ~LiteralRule() {}
 };
@@ -184,9 +184,9 @@ public:
 //                   TypeRule                                       //
 //////////////////////////////////////////////////////////////////////
 
-class TypeRule : public RuleBase {
+class TypeRule : public Rule {
 public:
-  TypeRule(const std::string &s) : RuleBase(s) {}
+  TypeRule(const std::string &s) : Rule(s) {}
   TypeRule() {}
   ~TypeRule() {}
 };

@@ -89,7 +89,7 @@ bool SPECParser::ParseRule() {
   if (tk != SPECTK_Name)
     MMSGA("expect a name but get ", name);
 
-  RuleBase *rule = mBaseGen->FindRule(name);
+  Rule *rule = mBaseGen->FindRule(name);
   if (!rule) {
     rule = mBaseGen->NewRule();
     rule->SetName(mLexer->GetTheName());
@@ -125,7 +125,7 @@ bool SPECParser::ParseRule() {
 //   (5) concatenation: Elem1 + Elem2
 //
 bool SPECParser::ParseElement(RuleElem *&elem, bool allowConcat) {
-  RuleBase *rule = NULL;
+  Rule *rule = NULL;
   bool status = true;
 
   SPECTokenKind tk = mLexer->GetToken();

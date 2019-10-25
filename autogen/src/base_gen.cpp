@@ -64,12 +64,12 @@ BaseGen::~BaseGen() {
   delete mMemPool;
 }
 
-RuleBase *BaseGen::AddLiteralRule(std::string rulename) {
+Rule *BaseGen::AddLiteralRule(std::string rulename) {
   if (FindRule(rulename)) {
     return;
   }
 
-  RuleBase *rule = NewRule();
+  Rule *rule = NewRule();
   rule->SetName(rulename);
   mRules.push_back(rule);
 
@@ -79,8 +79,8 @@ RuleBase *BaseGen::AddLiteralRule(std::string rulename) {
   return rule;
 }
 
-RuleBase *BaseGen::AddLiteralRule(std::string rulename, char c) {
-  RuleBase *rule = AddLiteralRule(rulename);
+Rule *BaseGen::AddLiteralRule(std::string rulename, char c) {
+  Rule *rule = AddLiteralRule(rulename);
   RuleElem *elem = GetOrCreateRuleElemFromChar(c);
   rule->mElement = elem;
   mElemString[rulename] = elem;
@@ -88,8 +88,8 @@ RuleBase *BaseGen::AddLiteralRule(std::string rulename, char c) {
   return rule;
 }
 
-RuleBase *BaseGen::AddLiteralRule(std::string rulename, std::string str) {
-  RuleBase *rule = AddLiteralRule(rulename);
+Rule *BaseGen::AddLiteralRule(std::string rulename, std::string str) {
+  Rule *rule = AddLiteralRule(rulename);
   RuleElem *elem = GetOrCreateRuleElemFromString(str);
   rule->mElement = elem;
   mElemString[rulename] = elem;
@@ -99,8 +99,8 @@ RuleBase *BaseGen::AddLiteralRule(std::string rulename, std::string str) {
 
 // Find a defined rule 'name'.
 // Return it if found, or NULL if not found.
-RuleBase* BaseGen::FindRule(const std::string name) {
-  RuleBase *ret = NULL;
+Rule* BaseGen::FindRule(const std::string name) {
+  Rule *ret = NULL;
   // search in mReserved first
   if (mReserved && mReserved != this) {
     ret = mReserved->FindRule(name);
@@ -108,9 +108,9 @@ RuleBase* BaseGen::FindRule(const std::string name) {
   if (ret)
     return ret;
 
-  std::vector<RuleBase *>::iterator it = mRules.begin();
+  std::vector<Rule *>::iterator it = mRules.begin();
   for (; it != mRules.end(); it++) {
-    RuleBase *r = *it;
+    Rule *r = *it;
     if (r->mName == name) {
       ret = r;
       break;
@@ -130,7 +130,7 @@ RuleElem* BaseGen::NewRuleElem(RuleOp op) {
   return elem;
 }
 
-RuleElem* BaseGen::NewRuleElem(RuleBase *rule) {
+RuleElem* BaseGen::NewRuleElem(Rule *rule) {
   RuleElem *elem = mRuleElemPool->NewRuleElem();
   elem->SetRule(rule);
   return elem;
@@ -174,7 +174,7 @@ void BaseGen::BackPatch(std::vector<BaseGen*> vec) {
     const char *name = eit->GetPendingName();
     // go through all XxxGen to find the rule. However, most of the time
     // the pending rule is in the same XxxGen. So we try itself first.
-    RuleBase *r = FindRule(name);
+    Rule *r = FindRule(name);
     if (!r) {
       for (auto g: vec) {
         r = g->FindRule(name);
@@ -201,9 +201,9 @@ void BaseGen::Run(SPECParser *parser) {
 
 // After the parsing of rules, this function generates the rule tables
 void BaseGen::GenRuleTables() {
-  std::vector<RuleBase *>::iterator it;
+  std::vector<Rule *>::iterator it;
   for (it = mRules.begin(); it != mRules.end(); it++) {
-    RuleBase *rule = *it;
+    Rule *rule = *it;
     RuleGen gen(rule, &mRuleTableHeader, &mRuleTableCpp);
     gen.Generate();
   }

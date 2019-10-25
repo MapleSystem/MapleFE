@@ -28,7 +28,7 @@
 // and a set of DT_xxx in the data set.
 
 // Generate the table name for mRule
-std::string RuleGen::GetTblName(const RuleBase *rule) {
+std::string RuleGen::GetTblName(const Rule *rule) {
   std::string tn = "Tbl" + rule->mName;
   return tn; 
 }
@@ -41,7 +41,7 @@ std::string RuleGen::GetSubTblName() {
 }
 
 // Return the string name of an entry type
-// In RuleBase, it has two info <type,op> to decide an element's type
+// In Rule, it has two info <type,op> to decide an element's type
 // but in the generated rule table it has only one info, EntryType
 //
 std::string RuleGen::GetEntryTypeName(ElemType type, RuleOp op) {
@@ -156,7 +156,7 @@ std::string RuleGen::Gen4TableData(const RuleElem *elem) {
 // Either rule or elem is used.
 // If it's a rule, we are generating for a rule in .spec
 // If it's an elem, we are generating a sub table for an elemen in a rule in .spec.
-void RuleGen::Gen4TableHeader(const RuleBase *rule, const RuleElem *elem){
+void RuleGen::Gen4TableHeader(const Rule *rule, const RuleElem *elem){
   std::string rule_table_name;
   if(rule) {
     rule_table_name = GetTblName(rule);
@@ -175,7 +175,7 @@ void RuleGen::Gen4TableHeader(const RuleBase *rule, const RuleElem *elem){
 // If it's a rule, we are generating for a rule defined in .spec
 // If it's an elem, we are generating a sub table for an elemen,
 //    and the table name has a suffix "_sub".
-void RuleGen::Gen4Table(const RuleBase *rule, const RuleElem *elem){
+void RuleGen::Gen4Table(const Rule *rule, const RuleElem *elem){
   std::string rule_table_name;
   if(rule) {
     rule_table_name = GetTblName(rule);

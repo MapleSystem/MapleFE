@@ -34,7 +34,7 @@ typedef enum {
 //   LANGUAGE/src/gen_reserved.cpp, and the header file too.        //
 //                                                                  //
 //   It has (1) reserved OPs, in mOps; (2) reserved rules in mRules //
-//   inherited from RuleBase.                                       //
+//   inherited from Rule.                                           //
 //////////////////////////////////////////////////////////////////////
 
 class ReservedGen : public BaseGen {

@@ -27,7 +27,7 @@ public:
   SPECLexer    *mLexer;
   AutoGen      *mAutoGen;
   BaseGen      *mBaseGen;
-  RuleBase     *mCurrrule;
+  Rule         *mCurrrule;
 
 public:
   SPECParser() { mLexer = new SPECLexer(); }

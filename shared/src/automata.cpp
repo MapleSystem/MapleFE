@@ -28,9 +28,9 @@ int Automata::GetVerbose() {
 
 // recursively process RuleElems to build mUsedByMap
 // note : rule is used in elem
-void Automata::ProcessUsedBy(RuleBase *rule, RuleElem *elem) {
+void Automata::ProcessUsedBy(Rule *rule, RuleElem *elem) {
   // process op car/string
-  RuleBase *rb = NULL;
+  Rule *rb = NULL;
   switch (elem->mType) {
     case ET_Char:
     {
@@ -131,7 +131,7 @@ void Automata::BuildClosure(MapSetType &mapset) {
   }
 }
 
-bool Automata::UpdatemIsAMap(RuleElem *elem, RuleBase *rule) {
+bool Automata::UpdatemIsAMap(RuleElem *elem, Rule *rule) {
   if (elem->mType != ET_Rule &&
       elem->mType != ET_Char &&
       elem->mType != ET_String &&
@@ -139,7 +139,7 @@ bool Automata::UpdatemIsAMap(RuleElem *elem, RuleBase *rule) {
     return false;
   }
 
-  RuleBase *rb = NULL;
+  Rule *rb = NULL;
   switch (elem->mType) {
     case ET_Pending:
       rb = mBaseGen->FindRule(elem->mData.mString);
@@ -175,7 +175,7 @@ bool Automata::UpdatemIsAMap(RuleElem *elem, RuleBase *rule) {
     // create a temp rule for elem->mData.mString
     std::string str(elem->mData.mString);
     char *rulename = mBaseGen->mStringPool->FindString(str);
-    RuleBase *rule = mBaseGen->AddLiteralRule(rulename);
+    Rule *rule = mBaseGen->AddLiteralRule(rulename);
     rule->SetName(rulename);
 
     if (GetVerbose() >= 2) {
@@ -207,7 +207,7 @@ void Automata::BuildIsAMap() {
 }
 
 // IsA relation: rule1 is a rule2: IntegerLiteral is a Literal
-bool Automata::IsA(RuleBase *rule1, RuleBase *rule2) {
+bool Automata::IsA(Rule *rule1, Rule *rule2) {
   bool result1 = (mIsAMap.find(rule1) != mIsAMap.end());
   bool result2 = false;
   if (result1)
@@ -216,7 +216,7 @@ bool Automata::IsA(RuleBase *rule1, RuleBase *rule2) {
 }
 
 // IsUsedBy relation: rule1 is used by rule2
-bool Automata::IsUsedBy(RuleBase *rule1, RuleBase *rule2) {
+bool Automata::IsUsedBy(Rule *rule1, Rule *rule2) {
   bool result1 = (mUsedByMap.find(rule1) != mUsedByMap.end());
   bool result2 = false;
   if (result1)
@@ -266,7 +266,7 @@ void Automata::AddLiteralTokenRule(TK_Kind tk, char c) {
   }
 
   std::string tkstr = mParser->GetTokenKindString(tk);
-  RuleBase *rule = mBaseGen->AddLiteralRule(tkstr, c);
+  Rule *rule = mBaseGen->AddLiteralRule(tkstr, c);
   rule->mElement->mToken = tk;
   mTokenRuleMap[tk] = rule;
 }
@@ -278,7 +278,7 @@ void Automata::AddLiteralTokenRule(TK_Kind tk, std::string str) {
 
   std::string tkstr = mParser->GetTokenKindString(tk);
   char *name = mBaseGen->mStringPool->FindString(str);
-  RuleBase *rule = mBaseGen->AddLiteralRule(tkstr, name);
+  Rule *rule = mBaseGen->AddLiteralRule(tkstr, name);
   rule->mElement->mToken = tk;
   mTokenRuleMap[tk] = rule;
 }
@@ -395,7 +395,7 @@ void Automata::ProcessStack() {
     status = ProcessDecls();
   } else if (tk != TK_Invalid) {
     // go through related rules to match
-    RuleBase *rule = mTokenRuleMap[tk];
+    Rule *rule = mTokenRuleMap[tk];
 
     MASSERT(rule && "expect non-NULL rule");
 
@@ -454,8 +454,8 @@ void Automata::ProcessStack() {
 }
 
 // match stack to a rule
-bool Automata::MatchStack(Expr *&expr, RuleBase *rule, unsigned stackstart, unsigned stkidx, TK_Kind tk) {
-  RuleBase *tkrule = mTokenRuleMap[tk];
+bool Automata::MatchStack(Expr *&expr, Rule *rule, unsigned stackstart, unsigned stkidx, TK_Kind tk) {
+  Rule *tkrule = mTokenRuleMap[tk];
   if (!IsUsedBy(tkrule, rule)) {
     return false;
   }
@@ -493,14 +493,14 @@ bool Automata::MatchStack(Expr *&expr, RuleBase *rule, unsigned stackstart, unsi
 }
 
 // match rule which is of ET_Op
-bool Automata::MatchStackOp(Expr *&expr, RuleBase *rule, unsigned stackstart, unsigned stkidx, TK_Kind tk) {
+bool Automata::MatchStackOp(Expr *&expr, Rule *rule, unsigned stackstart, unsigned stkidx, TK_Kind tk) {
   bool status = false;
 
   if (rule->mElement->mType != ET_Op) {
     return status;
   }
 
-  RuleBase *tkrule = mTokenRuleMap[tk];
+  Rule *tkrule = mTokenRuleMap[tk];
   switch (rule->mElement->mData.mOp) {
     case RO_Oneof:
     {
@@ -591,11 +591,11 @@ bool Automata::MatchStackOp(Expr *&expr, RuleBase *rule, unsigned stackstart, un
 }
 
 // match rule which is of ET_Rule
-bool Automata::MatchStackRule(Expr *&expr, RuleBase *rule, unsigned stackstart, unsigned stkidx, TK_Kind tk) {
+bool Automata::MatchStackRule(Expr *&expr, Rule *rule, unsigned stackstart, unsigned stkidx, TK_Kind tk) {
   bool status = false;
 
   // check if rule is compatible with token
-  RuleBase *tkrule = mTokenRuleMap[tk];
+  Rule *tkrule = mTokenRuleMap[tk];
   if (!IsUsedBy(tkrule, rule)) {
     return false;
   }
@@ -611,7 +611,7 @@ bool Automata::MatchStackRule(Expr *&expr, RuleBase *rule, unsigned stackstart, 
 
 // match stack to a vector of rules consistent with given token
 bool Automata::MatchStackVec(Expr *&expr, std::vector<RuleElem *> vec, unsigned stackstart, unsigned stkidx, TK_Kind tk) {
-  RuleBase *tkrule = mTokenRuleMap[tk];
+  Rule *tkrule = mTokenRuleMap[tk];
   unsigned tkidx = 0xffff;
   for (unsigned i = 0; i < vec.size(); i++) {
     ElemType et = vec[i]->mType;
@@ -731,7 +731,7 @@ bool Automata::MatchStackVecRange(Expr *&expr, std::vector<RuleElem *> vec, unsi
 }
 
 // match range of entries on stack to a rule
-bool Automata::MatchStackWithExpectation(Expr *&expr, RuleBase *rule, unsigned stackstart, unsigned stackend) {
+bool Automata::MatchStackWithExpectation(Expr *&expr, Rule *rule, unsigned stackstart, unsigned stackend) {
   MMSG("MatchStackWithExpectation", 0);
   for (unsigned j = stackstart; j < stackend; j++) {
     RuleElem *elem = mStack[j].first;
@@ -755,7 +755,7 @@ bool Automata::MatchStackWithExpectation(Expr *&expr, RuleBase *rule, unsigned s
 // need rework to be consistent with other statements
 bool Automata::ProcessDecls() {
   tyidx_t tyidx = 0;
-  RuleBase *declrule = mBaseGen->FindRule("LocalVariableDeclarationStatement");
+  Rule *declrule = mBaseGen->FindRule("LocalVariableDeclarationStatement");
   RuleElem *declelem = new RuleElem(declrule);
   Expr *declexpr = new Expr(declelem);
   stmtroot->mExprs.push_back(declexpr);

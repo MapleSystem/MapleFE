@@ -226,7 +226,7 @@ bool Parser::ParseStmt(Function *func) {
           currfunc->mSymbolTable.push_back(sb);
         }
         // found Identifier
-        RuleBase *r = mAutomata->mBaseGen->FindRule("Identifier");
+        Rule *r = mAutomata->mBaseGen->FindRule("Identifier");
         RuleElem *e = mAutomata->mBaseGen->NewRuleElem();
         e->mType = ET_Rule;
         e->mData.mRule = r;

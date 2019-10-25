@@ -62,8 +62,8 @@ public:
   SPECParser   *mParser;
 public:
   // *.spec files are free to define multiple rules.
-  std::vector<RuleBase *> mRules;
-  RuleBase *mCurRule;
+  std::vector<Rule *> mRules;
+  Rule *mCurRule;
 
   // *.spec files are free to define multiple struct.
   std::vector<StructBase *>mStructs;
@@ -88,17 +88,17 @@ public:
   std::unordered_map<char, RuleElem *> mElemChar;
 
 public:
-  RuleBase *FindRule(const char *name, int len);
-  RuleBase *FindRule(const std::string name);
-  RuleBase *AddLiteralRule(std::string rulename);
-  RuleBase *AddLiteralRule(std::string rulename, char c);
-  RuleBase *AddLiteralRule(std::string rulename, std::string str);
+  Rule *FindRule(const char *name, int len);
+  Rule *FindRule(const std::string name);
+  Rule *AddLiteralRule(std::string rulename);
+  Rule *AddLiteralRule(std::string rulename, char c);
+  Rule *AddLiteralRule(std::string rulename, std::string str);
 
-  RuleBase *NewRule() { return new RuleBase(); }
+  Rule *NewRule() { return new Rule(); }
   RuleElem *NewRuleElem();
   RuleElem *NewRuleElem(std::string str);
   RuleElem *NewRuleElem(RuleOp op);
-  RuleElem *NewRuleElem(RuleBase *rule);
+  RuleElem *NewRuleElem(Rule *rule);
 
 public:
   BaseGen(const std::string &d, const std::string &h, const std::string &c);

@@ -13,14 +13,14 @@
 
 class RuleGen {
 private:
-  const RuleBase  *mRule;
+  const Rule      *mRule;
   FormattedBuffer *mCppBuffer;
   FormattedBuffer *mHeaderBuffer;
 
 private:
   unsigned mSubTblNum;
 
-  std::string GetTblName(const RuleBase*);
+  std::string GetTblName(const Rule*);
   std::string GetSubTblName();
   std::string GetEntryTypeName(ElemType, RuleOp);
 
@@ -32,11 +32,11 @@ private:
   //   1. Generate for the current Rule from the .spec
   //   2. Generate for the RuleElem in the Rule, aka. Sub Table.
   // This is why there are two parameters, but only one of them will be used.
-  void Gen4Table(const RuleBase *, const RuleElem*);       // table def in .cpp
-  void Gen4TableHeader(const RuleBase *, const RuleElem*); // table decl in .h
+  void Gen4Table(const Rule *, const RuleElem*);       // table def in .cpp
+  void Gen4TableHeader(const Rule *, const RuleElem*); // table decl in .h
 
 public:
-  RuleGen(const RuleBase *r, FormattedBuffer *hbuf, FormattedBuffer *cbuf)
+  RuleGen(const Rule *r, FormattedBuffer *hbuf, FormattedBuffer *cbuf)
     : mRule(r), mHeaderBuffer(hbuf), mCppBuffer(cbuf), mSubTblNum(0) {}
   ~RuleGen() {}
 

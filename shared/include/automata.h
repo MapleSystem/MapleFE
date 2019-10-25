@@ -44,9 +44,9 @@ class Automata {
   std::unordered_set<std::string> mRuleStrings;
 
   // group the rules by string literal used as key (TK_Kind)
-  std::unordered_map<TK_Kind, RuleBase *, EnumHash> mTokenRuleMap;
+  std::unordered_map<TK_Kind, Rule *, EnumHash> mTokenRuleMap;
 
-  typedef std::unordered_map<RuleBase *, std::unordered_set<RuleBase *>> MapSetType;
+  typedef std::unordered_map<Rule *, std::unordered_set<Rule *>> MapSetType;
 
   // Def-Use of rules
   MapSetType mUsedByMap;
@@ -77,26 +77,26 @@ public:
   void CollectTokenInRuleElem(RuleElem *elem);
   void CreateTokenRules();
 
-  void ProcessUsedBy(RuleBase *rule, RuleElem *elem);
+  void ProcessUsedBy(Rule *rule, RuleElem *elem);
   void BuildUsedByMap();
   void ProcessRules();
 
   bool IsType(TK_Kind tk);
-  bool IsA(RuleBase *rule1, RuleBase *rule2);
-  bool IsUsedBy(RuleBase *rule1, RuleBase *rule2);
+  bool IsA(Rule *rule1, Rule *rule2);
+  bool IsUsedBy(Rule *rule1, Rule *rule2);
   void BuildIsAMap();
   void BuildClosure(MapSetType &mapset);
-  bool UpdatemIsAMap(RuleElem *elem, RuleBase *rule);
+  bool UpdatemIsAMap(RuleElem *elem, Rule *rule);
 
   void DumpStack();
   void ProcessStack();
-  bool MatchStack(Expr *&expr, RuleBase *rule, unsigned stackstart, unsigned idx, TK_Kind tk);
-  bool MatchStackOp(Expr *&expr, RuleBase *rule, unsigned stackstart, unsigned idx, TK_Kind tk);
-  bool MatchStackRule(Expr *&expr, RuleBase *rule, unsigned stackstart, unsigned idx, TK_Kind tk);
+  bool MatchStack(Expr *&expr, Rule *rule, unsigned stackstart, unsigned idx, TK_Kind tk);
+  bool MatchStackOp(Expr *&expr, Rule *rule, unsigned stackstart, unsigned idx, TK_Kind tk);
+  bool MatchStackRule(Expr *&expr, Rule *rule, unsigned stackstart, unsigned idx, TK_Kind tk);
   bool MatchStackVec(Expr *&expr, std::vector<RuleElem *> vec, unsigned stackstart, unsigned idx, TK_Kind tk);
   bool MatchStackVecRange(Expr *&expr, std::vector<RuleElem *> vec, unsigned start, unsigned end,
                           unsigned stackstart, unsigned stackend);
-  bool MatchStackWithExpectation(Expr *&expr, RuleBase *rule, unsigned stackstart, unsigned stackend);
+  bool MatchStackWithExpectation(Expr *&expr, Rule *rule, unsigned stackstart, unsigned stackend);
   bool ProcessDecls();
 
   int GetVerbose();

@@ -174,15 +174,15 @@ void RuleElem::Dump(bool newline) {
 }
 
 ////////////////////////////////////////////////////////////////////////////
-//                            RuleBase                                    //
+//                              Rule                                      //
 ////////////////////////////////////////////////////////////////////////////
 
 // Release the RuleElem
-RuleBase::~RuleBase() {
+Rule::~Rule() {
   mElement->~RuleElem();
 }
 
-void RuleBase::Dump() {
+void Rule::Dump() {
   std::cout << "rule " << mName << " : ";
   if (!mElement) {
     return;
@@ -213,7 +213,7 @@ void RuleBase::Dump() {
   return;
 }
 
-void RuleBase::DumpAttr() {
+void Rule::DumpAttr() {
   mAttr->DumpType(0);
   mAttr->DumpValidity(0);
   for (int i = 0; i < mElement->mSubElems.size(); i++) {
