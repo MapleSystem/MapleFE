@@ -58,6 +58,16 @@ class Lexer {
     }
   }
 
+  void DumpKeywordMap() {
+    int i = 0;
+    std::cout << "keywordmap.size() " << std::dec << keywordmap.size() << std::endl;
+    std::unordered_map<std::string, TK_Kind>::iterator it = keywordmap.begin();
+    for (; it != keywordmap.end(); it++) {
+      std::cout << std::dec << i << " " << std::hex << &(it->first) << " " << it->first << std::endl;
+      i++;
+    }
+  }
+
   // These are for autogen table testing
   Token* LexToken_autogen();
   

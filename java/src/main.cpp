@@ -57,6 +57,9 @@ Token* Lexer::LexToken_autogen(void) {
   LitData ld = GetLiteral(this);
   if (ld.mType != LT_NA) {
     LiteralToken *t = (LiteralToken*)mTokenPool.NewToken(sizeof(LiteralToken)); 
+    // dump keywordmap to show the memory issue for t2.java
+    std::cout << "\nnew LiteralToken *t = " << std::hex << t << std::endl;
+    DumpKeywordMap();
     new (t) LiteralToken(ld);
     return t;
   }
