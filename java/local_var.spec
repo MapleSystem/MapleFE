@@ -12,8 +12,8 @@ rule VariableModifier: "final"
 rule VariableDeclarator : VariableDeclaratorId
 rule VariableDeclaratorList : VariableDeclarator + ZEROORMORE(',' + VariableDeclarator)
 
-###rule VariableDeclaratorId : IDENTIFIER [Dims]
-rule VariableDeclaratorId : IDENTIFIER
+###rule VariableDeclaratorId : Identifier [Dims]
+rule VariableDeclaratorId : Identifier
 
 #Dims:
 #{Annotation} [ ] {{Annotation} [ ]}

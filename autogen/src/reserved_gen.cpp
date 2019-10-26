@@ -13,20 +13,6 @@ ReservedGen::ReservedGen(const char *dfile, const char *hf, const char *cppf)
   mOps.push_back(oneof);
   mOps.push_back(zeroplus);
   mOps.push_back(zeroorone);
-
-  // Initialize the reserved rules.
-  // mCurRule = NewRule();
-  // mCurRule->SetName("IDENTIFIER");
-  // mRules.push_back(mCurRule);
-  // mCurRule = NewRule();
-  // mCurRule->SetName("OPERATOR");
-  // mRules.push_back(mCurRule);
-  // mCurRule = NewRule();
-  // mCurRule->SetName("LITERAL");
-  // mRules.push_back(mCurRule);
-  // mCurRule = NewRule();
-  // mCurRule->SetName("SEPARATOR");
-  // mRules.push_back(mCurRule);
 }
 
 // Needs to override BaseGen::Run, since we dont need process

@@ -87,11 +87,11 @@ rule TypeArgument     : ONEOF(ReferenceType, Wildcard)
 rule TypeArgumentList : TypeArgument + ZEROORMORE(',' + TypeArgument)
 rule TypeArguments    : '<' + TypeArgumentList + '>'
 
-rule ClassType : ONEOF( ZEROORMORE(Annotation) + IDENTIFIER + ZEROORONE(TypeArguments),
-                        ClassOrInterfaceType + '.' + ZEROORMORE(Annotation) + IDENTIFIER
+rule ClassType : ONEOF( ZEROORMORE(Annotation) + Identifier + ZEROORONE(TypeArguments),
+                        ClassOrInterfaceType + '.' + ZEROORMORE(Annotation) + Identifier
                            + ZEROORONE(TypeArguments))
 rule InterfaceType : ClassType
-rule TypeVariable  : ZEROORMORE(Annotation) + IDENTIFIER
+rule TypeVariable  : ZEROORMORE(Annotation) + Identifier
 rule ArrayType     : ONEOF( PrimitiveType + Dims,
                             ClassOrInterfaceType + Dims,
                             TypeVariable + Dims )
@@ -107,10 +107,10 @@ rule TYPE: ONEOF(PrimitiveType, ReferenceType, NullType)
 #                       Abnormal types                                              #
 #####################################################################################
 
-rule UnannClassType: ONEOF(IDENTIFIER + ZEROORONE(TypeArguments),
-        UnannClassOrInterfaceType + '.' + ZEROORMORE(Annotation) + IDENTIFIER + ZEROORONE(TypeArguments))
+rule UnannClassType: ONEOF(Identifier + ZEROORONE(TypeArguments),
+        UnannClassOrInterfaceType + '.' + ZEROORMORE(Annotation) + Identifier + ZEROORONE(TypeArguments))
 rule UnannInterfaceType : UnannClassType
-rule UnannTypeVariable : IDENTIFIER
+rule UnannTypeVariable : Identifier
 
 # UnannArrayType no implemented yet
 #rule UnannReferenceType: ONEOF(UnannClassOrInterfaceType, UnannTypeVariable, UnannArrayType)

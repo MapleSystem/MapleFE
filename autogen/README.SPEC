@@ -47,7 +47,7 @@ AutoGen reserves some keyword, and here they are.
     the char in the target source language, please use single quote to embrace it,
     e.g. '('
 
- *) IDENTIFIER, SEPARATOR, OPERATOR, LITERAL
+ *) Identifier, Separator, Operator, Literal
     Each is a set. This matches the corresponding part in the lexer/parser
 
  *) CHAR
@@ -84,10 +84,11 @@ _____________________
 
   *) rule Expression
   *) rule Statement
-  *) rule IDENTIFIER
+  *) rule Identifier
   *) rule Literal
-  *) STRUCT SEPARATOR
-  *) STRUCT OPERATOR
+  *) STRUCT Separator
+  *) STRUCT Operator
+  *) STRUCT Keyword
 _____________________
 
 Section 4. Rule Syntax

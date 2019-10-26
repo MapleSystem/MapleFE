@@ -7,7 +7,7 @@
 #  2. The rule part, defining the language restrictions of each operator.
 ##########################################################################
 
-STRUCT OPERATOR : ONEOF(
+STRUCT Operator : ONEOF(
                     # Arithmetic
                     ("+",    Add),
                     ("-",    Sub),

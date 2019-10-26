@@ -17,16 +17,6 @@ typedef struct {
   RuleOp      mOp;
 }ReservedOp;
 
-// IDENTIFIER, SEPARATOR, OPERATOR,...
-typedef enum {
-  RE_Identifier,
-  RE_Separator,
-  RE_Operator,
-  RE_Literal,
-  RE_Char,
-  RE_Digit
-}RE_Id;
-
 //////////////////////////////////////////////////////////////////////
 //   ReservedGen generates those reserved rules in memory, which are//
 //   used by other XxxGen.

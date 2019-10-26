@@ -328,11 +328,11 @@ const char* GetKeyword(Lexer *lex) {
 }
 
 // identifier string was put into StringPool.
-// NOTE: Identifier table is always Hard Coded as TblIDENTIFIER.
+// NOTE: Identifier table is always Hard Coded as TblIdentifier.
 const char* GetIdentifier(Lexer *lex) {
-  RuleTableWalker walker(&TblIDENTIFIER, lex);
+  RuleTableWalker walker(&TblIdentifier, lex);
   unsigned old_pos = lex->GetCuridx();
-  bool found = walker.Traverse(&TblIDENTIFIER);
+  bool found = walker.Traverse(&TblIdentifier);
   if (found) {
     unsigned len = lex->GetCuridx() - old_pos;
     MASSERT(len > 0 && "found token has 0 data?");

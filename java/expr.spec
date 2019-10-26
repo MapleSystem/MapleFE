@@ -10,11 +10,6 @@ rule ClassBody: "classbody"
 rule ArrayInitializer : "arrayinitializer"
 rule MethodName       : "methodname"
 
-rule JavaLetter: CHAR
-rule JavaLetterOrDigit: ONEOF(CHAR, DIGIT)
-rule IdentifierChars: JavaLetter + ZEROORMORE(JavaLetterOrDigit)
-rule Identifier: IdentifierChars #but not a Keyword or BooleanLiteral or NullLiteral
-
 rule ExpressionName: Identifier
 
 rule ClassLiteral : ONEOF(

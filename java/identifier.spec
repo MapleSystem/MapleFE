@@ -4,4 +4,4 @@
 # TODO: So far we dont support unicode which are not major goal right now.
 
 rule JavaChar : ONEOF(CHAR, '_' , '$')
-rule IDENTIFIER : JavaChar + ZEROORMORE(CHAR, DIGIT)
+rule Identifier : JavaChar + ZEROORMORE(CHAR, DIGIT)
