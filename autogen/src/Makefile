@@ -36,6 +36,7 @@ $(TARGET) : $(AUTOGENLIB)
 	@ln -sf $(ROOTDIR)/java/expr.spec $(BUILD)/expr.spec
 	@ln -sf $(ROOTDIR)/java/stmt.spec $(BUILD)/stmt.spec
 	@ln -sf $(ROOTDIR)/autogen/reserved.spec $(BUILD)/reserved.spec
+	@ln -sf $(ROOTDIR)/java/tmp.spec $(BUILD)/tmp.spec
 
 $(AUTOGENLIB) : $(OBJS)
 	/usr/bin/ar rcs $(BUILD)/$(AUTOGENLIB) $(LIBOBJS)

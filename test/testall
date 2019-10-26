@@ -1,0 +1,2 @@
+./java2mpl_runtests.pl java2mpl
+./sharedfe_runtests.pl sharedfe

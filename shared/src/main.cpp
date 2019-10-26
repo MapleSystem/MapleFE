@@ -32,14 +32,17 @@ int main (int argc, char *argv[]) {
   ag->Gen();
 
   // process additional spec files
-  // expr.spec
-  BaseGen *bg = new BaseGen("expr.spec");
+  BaseGen *bg = new BaseGen("tmp.spec");
   bg->SetReserved(ag->GetReservedGen());
   bg->SetParser(specParser);
+  bg->Parse();
+  // expr.spec
+  bg->SetParser(specParser, "expr.spec");
   bg->Parse();
   // stmt.spec
   bg->SetParser(specParser, "stmt.spec");
   bg->Parse();
+
   bg->BackPatch(ag->GetGenArray());
 
   Module *module = new Module();
