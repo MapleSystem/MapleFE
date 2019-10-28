@@ -472,8 +472,11 @@ bool SPECParser::ParseAttr() {
 
   tk = mLexer->NextToken();
   switch (tk) {
-    case SPECTK_Type:
-      status = ParseAttrType();
+    case SPECTK_Datatype:
+      status = ParseAttrDatatype();
+      break;
+    case SPECTK_Tokentype:
+      status = ParseAttrTokentype();
       break;
     case SPECTK_Validity:
       status = ParseAttrValidity();
@@ -485,12 +488,31 @@ bool SPECParser::ParseAttr() {
   return status;
 }
 
-bool SPECParser::ParseAttrType() {
+bool SPECParser::ParseAttrDatatype() {
   bool status = false;
 
   SPECTokenKind tk = mLexer->GetToken();
-  if (tk != SPECTK_Type)
-    MMSGA("expect type but get ", mLexer->GetTokenString());
+  if (tk != SPECTK_Datatype)
+    MMSGA("expect data type but get ", mLexer->GetTokenString());
+
+  tk = mLexer->NextToken();
+  if (tk != SPECTK_Colon)
+    MMSGA("expect ':' but get ", mLexer->GetTokenString());
+
+  tk = mLexer->NextToken();
+  std::string name = mLexer->GetTokenString();
+  //mCurrrule->mAttr->mType = mAutoGen->FindRule(name);
+
+  tk = mLexer->NextToken();
+  return true;
+}
+
+bool SPECParser::ParseAttrTokentype() {
+  bool status = false;
+
+  SPECTokenKind tk = mLexer->GetToken();
+  if (tk != SPECTK_Tokentype)
+    MMSGA("expect token type but get ", mLexer->GetTokenString());
 
   tk = mLexer->NextToken();
   if (tk != SPECTK_Colon)

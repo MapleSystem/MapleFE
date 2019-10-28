@@ -13,7 +13,7 @@
 #include "all_supported.h"
 
 class Rule;
-class TypeRule;
+class StructData;
 
 typedef enum {
   RO_Oneof,      // one of (...)
@@ -21,7 +21,7 @@ typedef enum {
   RO_Zeroorone,  // zero or one ( ... )
   RO_Concatenate,// Elem + Elem + Elem
   RO_Null
-}RuleOp;
+} RuleOp;
 
 typedef enum {
   ET_Char,       // It's a literal elements, char, 'c'.
@@ -34,7 +34,13 @@ typedef enum {
                  // pending elements are unknown rule names, constituted by
                  // the 26 regular letters.
   ET_NULL
-}ElemType;
+} ElemType;
+
+typedef enum {
+  TT_Identifier,
+  TT_Literal,
+  TT_Type
+} TokenType;
 
 // an action is the behavior performed for a matched rule
 // rule addexpr : ONEOF( expr '+' expr,
@@ -67,18 +73,23 @@ public:
 // Attributes for Rule and RuleElem
 class RuleAttr {
 public:
-  TypeRule *mType;
+  Rule       *mDataType;
+  TokenType   mTokenType;
   std::vector<RuleAction*> mValidity;
   std::vector<RuleAction*> mAction;
 
-  RuleAttr() : mType(NULL) {}
-  ~RuleAttr() { delete mType; mValidity.clear(); mAction.clear(); }
+  RuleAttr() : mDataType(NULL) {}
+  ~RuleAttr() { delete mDataType; mValidity.clear(); mAction.clear(); }
 
-  void SetType(TypeRule *r) { mType = r; }
+  void SetDataType(Rule *r) { mDataType = r; }
+  void SetTokentype(TokenType t) { mTokenType = t; }
   void AddValidity(RuleAction *a) { mValidity.push_back(a); }
   void AddAction(RuleAction *a) { mValidity.push_back(a); }
 
-  void DumpType(int i);
+  std::string GetTokenTypeString(TokenType);
+
+  void DumpDataType(int i);
+  void DumpTokenType(int i);
   void DumpValidity(int i);
   void DumpAction(int i);
 };
@@ -103,7 +114,7 @@ public:
     char        mChar;
     const char *mString;   // Pending elem. string is NULL ended in string pool
     AGTypeId    mTypeId;
-  }mData;
+  } mData;
 
   TK_Kind       mToken;    // record the token for rule like '(' ')' '[' ']' ';' ...
   std::vector<RuleElem *> mSubElems;  // Sub elements. It's empty if mType
@@ -152,43 +163,6 @@ public:
   void SetElement(RuleElem *e)       {mElement = e;}
   void Dump();
   void DumpAttr();
-};
-
-//////////////////////////////////////////////////////////////////////
-//                   IdentifierRule                                 //
-// Defines the legal wording sequence of an identifier              //
-//                                                                  //
-// Each rule elements in identifierRule will be concatenate together//
-// to form a complete identifier syntax.                            //
-//////////////////////////////////////////////////////////////////////
-
-class IdentifierRule : public Rule {
-public:
-  IdentifierRule(const std::string &s) : Rule(s) {}
-  IdentifierRule() {}
-  ~IdentifierRule() {}
-};
-
-//////////////////////////////////////////////////////////////////////
-//                   LiteralRule                                    //
-//////////////////////////////////////////////////////////////////////
-
-class LiteralRule : public Rule {
-public:
-  LiteralRule(const std::string &s) : Rule(s) {}
-  LiteralRule() {}
-  ~LiteralRule() {}
-};
-
-//////////////////////////////////////////////////////////////////////
-//                   TypeRule                                       //
-//////////////////////////////////////////////////////////////////////
-
-class TypeRule : public Rule {
-public:
-  TypeRule(const std::string &s) : Rule(s) {}
-  TypeRule() {}
-  ~TypeRule() {}
 };
 
 #endif

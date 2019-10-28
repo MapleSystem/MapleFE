@@ -54,7 +54,8 @@ public:
   bool ParseType();
 
   bool ParseAttr();
-  bool ParseAttrType();
+  bool ParseAttrDatatype();
+  bool ParseAttrTokentype();
   bool ParseAttrValidity();
   bool ParseAttrAction();
 

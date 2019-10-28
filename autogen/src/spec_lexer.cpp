@@ -608,8 +608,12 @@ std::string SPECLexer::GetTokenString(SPECTokenKind thekind) {
       temp = "attr";
       break;
     }
-    case SPECTK_Type: {
-      temp = "type";
+    case SPECTK_Datatype: {
+      temp = "datatype";
+      break;
+    }
+    case SPECTK_Tokentype: {
+      temp = "tokentype";
       break;
     }
     case SPECTK_Action: {

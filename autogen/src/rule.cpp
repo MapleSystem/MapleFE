@@ -1,6 +1,7 @@
 #include <iostream>
 #include "rule.h"
 #include "massert.h"
+#include "base_struct.h"
 
 ////////////////////////////////////////////////////////////////////////////
 //                            RuleAction                                  //
@@ -20,10 +21,22 @@ void RuleAction::Dump() {
 //                            RuleAttr                                    //
 ////////////////////////////////////////////////////////////////////////////
 
-void RuleAttr::DumpType(int i) {
-  if (mType) {
-    std::cout << "    attr.type : " << mType->mName << std::endl;
+std::string RuleAttr::GetTokenTypeString(TokenType t) {
+  switch (t) {
+    case TT_Identifier: return "Identifier";
+    case TT_Literal: return "Literal";
+    case TT_Type: return "Type";
   }
+}
+
+void RuleAttr::DumpDataType(int i) {
+  if (mDataType) {
+    std::cout << "    attr.datatype : " << mDataType->mName << std::endl;
+  }
+}
+
+void RuleAttr::DumpTokenType(int i) {
+  std::cout << "    attr.tokentype : " << GetTokenTypeString(mTokenType) << std::endl;
 }
 
 void RuleAttr::DumpValidity(int i) {
@@ -214,7 +227,8 @@ void Rule::Dump() {
 }
 
 void Rule::DumpAttr() {
-  mAttr->DumpType(0);
+  mAttr->DumpDataType(0);
+  mAttr->DumpTokenType(0);
   mAttr->DumpValidity(0);
   for (int i = 0; i < mElement->mSubElems.size(); i++) {
     mElement->mSubElems[i]->mAttr->DumpValidity(i);
