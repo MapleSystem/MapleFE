@@ -16,6 +16,7 @@ Parser::Parser(const char *name, Module *m) : filename(name), mModule(m) {
   const std::string file(name);
   // init lexer
   mLexer->PrepareForFile(file);
+  mCurToken = 0;
 }
 
 Parser::Parser(const char *name) : filename(name) {
@@ -23,6 +24,7 @@ Parser::Parser(const char *name) : filename(name) {
   const std::string file(name);
   // init lexer
   mLexer->PrepareForFile(file);
+  mCurToken = 0;
 }
 
 

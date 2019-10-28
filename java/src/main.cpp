@@ -105,7 +105,161 @@ bool Parser::ParseStmt_autogen() {
   //                                (2) Identifier Table won't be traversed any more since
   //                                    lex has got the token from source program and we only
   //                                    need check if the table is &TblIdentifier.
+  bool succ = TraverseStmt();
 }
+
+// return true : if all tokens in mTokens are matched.
+//       false : if faled.
+bool Parser::TraverseStmt() {
+  return TraverseRuleTable(&TblStatement);
+}
+
+// return true : if all tokens in mTokens are matched.
+//       false : if faled.
+bool Parser::TraverseRuleTable(RuleTable *rule_table) {
+  bool matched = false;
+  unsigned old_pos = mCurToken;
+  Token *curr_token = mTokens[mCurToken];
+
+  // We don't go into Identifier table.
+  if ((rule_table == &TblIdentifier)) {
+    if (curr_token->IsIdentifier()) {
+      mCurToken++;
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  // We don't go into Literal table.
+  if ((rule_table == &TblLiteral)) {
+    if (curr_token->IsLiteral()) {
+      mCurToken++;
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  // Look into rule_table's data
+  EntryType type = rule_table->mType;
+
+  switch(type) {
+  case ET_Oneof: {
+    bool found = false;
+    for (unsigned i = 0; i < rule_table->mNum; i++) {
+      TableData *data = rule_table->mData + i;
+      found = found | TraverseTableData(data);
+      if (found)
+        break;
+    }
+    matched = found; 
+    break;
+  }
+
+  // moves until hit a NON-target data
+  // It always return true because it doesn't matter how many target hit.
+  case ET_Zeroormore: {
+    matched = true;
+    while(1) {
+      bool found = false;
+      for (unsigned i = 0; i < rule_table->mNum; i++) {
+        TableData *data = rule_table->mData + i;
+        found = found | TraverseTableData(data);
+        // The first element is hit, then we restart the loop.
+        if (found)
+          break;
+      }
+      if (!found)
+        break;
+    }
+    break;
+  }
+
+  // It always matched. The lexer will stop after it zeor or at most one target
+  case ET_Zeroorone: {
+    matched = true;
+    bool found = false;
+    for (unsigned i = 0; i < rule_table->mNum; i++) {
+      TableData *data = rule_table->mData + i;
+      found = TraverseTableData(data);
+      // The first element is hit, then stop.
+      if (found)
+        break;
+    }
+    break;
+  }
+
+  // Lexer needs to find all elements, and in EXACTLY THE ORDER as defined.
+  case ET_Concatenate: {
+    bool found = false;
+    for (unsigned i = 0; i < rule_table->mNum; i++) {
+      TableData *data = rule_table->mData + i;
+      found = TraverseTableData(data);
+      // The first element missed, then we stop.
+      if (!found)
+        break;
+    }
+    matched = found;
+    break;
+  }
+
+  // Next table
+  case ET_Data: {
+    break;
+  }
+
+  case ET_Null:
+  default: {
+    break;
+  }
+  }
+
+  if(matched) {
+    return true;
+  } else {
+    mLexer->curidx = old_pos;
+    return false;
+  }
+}
+
+// The mCurToken moves if found target, or restore the original location.
+bool Parser::TraverseTableData(TableData *data) {
+  unsigned old_pos = mCurToken;
+  bool     found = false;
+  Token   *curr_token = mTokens[mCurToken];
+
+  switch (data->mType) {
+  case DT_Char:
+  case DT_String:
+    MASSERT(0 && "Hit Char/String in TableData during matching!");
+    break;
+  // separator, operator, keywords are planted as DT_Token.
+  // just need check the pointer of token
+  case DT_Token:
+    if (data->mData.mToken == curr_token) {
+      found = true;
+      mCurToken++;
+    }
+    break;
+  case DT_Type:
+    break;
+  case DT_Subtable: {
+    RuleTable *t = data->mData.mEntry;
+    found = TraverseRuleTable(t);
+    if (!found)
+      mCurToken = old_pos;
+    break;
+  }
+  case DT_Null:
+  default:
+    break;
+  }
+
+  return found;
+}
+
+
 
 // Initialized the predefined tokens.
 void Parser::InitPredefinedTokens() {

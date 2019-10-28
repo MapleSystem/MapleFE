@@ -21,6 +21,8 @@ class Module;
 class Function;
 class Stmt;
 class Token;
+class RuleTable;
+class TableData;
 
 class Parser {
 public:
@@ -31,7 +33,15 @@ public:
   Function *currfunc;
 
   std::vector<std::string> mVars;
-  std::vector<Token*>      mTokens; // vector for tokens during matching.
+
+private:
+  std::vector<Token*>   mTokens;   // vector for tokens during matching.
+  unsigned              mCurToken; // index in mTokens, 1st to-be-matched token.
+                                   // tokens before it have been matched.
+
+  bool TraverseRuleTable(RuleTable*); // success if all tokens are matched.
+  bool TraverseTableData(TableData*); // success if all tokens are matched.
+  bool TraverseStmt();                // success if all tokens are matched.
 
 public:
   Parser(const char *f, Module *m);

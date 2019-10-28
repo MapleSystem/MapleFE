@@ -53,6 +53,8 @@ public:
   void SetTkKind(TK_Kind k) { mTkKind = k; }
 
   bool IsSeparator() {return mTkType == TT_SP;}
+  bool IsIdentifier(){return mTkType == TT_ID;}
+  bool IsLiteral()   {return mTkType == TT_LT;}
   virtual void Dump(){}
 };
 
