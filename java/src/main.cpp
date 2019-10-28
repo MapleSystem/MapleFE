@@ -121,6 +121,7 @@ void Parser::InitPredefinedTokens() {
 int main (int argc, char *argv[]) {
   Parser *parser = new Parser(argv[1]);
   parser->InitPredefinedTokens();
+  PlantTokens(parser->mLexer);
   parser->Parse_autogen();
   delete parser;
   return 0;

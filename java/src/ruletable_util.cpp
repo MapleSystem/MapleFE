@@ -124,11 +124,11 @@ bool RuleTableWalker::TraverseTableData(TableData *data) {
 
     break;
 
-  // Only separator, operator, keywords are saved as DT_Token. During Lexing, these 3 types
+  // Only separator, operator, keywords are planted as DT_Token. During Lexing, these 3 types
   // are processed through traversing the 3 arrays: SeparatorTable, OperatorTable, KeywordTable.
-  // So this case won't be hit during Lex.
+  // So this case won't be hit during Lex. We just ignore it.
   //
-  // However, it does hit this case during matching.
+  // However, it does hit this case during matching. We will handle this case in matching process.
   case DT_Token:
     break;
 
@@ -384,8 +384,20 @@ LitData GetLiteral(Lexer *lex) {
 //
 ////////////////////////////////////////////////////////////////////////////////////
 
+// All rules form many cycles. Don't want to visit them for the second time.
+static std::vector<RuleTable *> visited;
+static bool IsVisited(RuleTable *table) {
+  std::vector<RuleTable *>::iterator it;
+  for (it = visited.begin(); it != visited.end(); it++) {
+    if (table == *it)
+      return true;
+  }
+  return false;
+}
+
 // The traversal is very simple depth first.
 static void PlantTraverseRuleTable(RuleTable *table, Lexer *lex);
+
 static void PlantTraverseTableData(TableData *data, Lexer *lex) {
   switch (data->mType) {
   case DT_Char: {
@@ -459,6 +471,11 @@ static void PlantTraverseTableData(TableData *data, Lexer *lex) {
 
 // The traversal is very simple depth first.
 static void PlantTraverseRuleTable(RuleTable *table, Lexer *lex) {
+  if (IsVisited(table))
+    return;
+  else
+    visited.push_back(table);
+
   switch (table->mType) {
   case ET_Data:
   case ET_Oneof:
@@ -477,7 +494,7 @@ static void PlantTraverseRuleTable(RuleTable *table, Lexer *lex) {
   }
 }
 
-void PlantTokensInRuleTables(Lexer *lex) {
+void PlantTokens(Lexer *lex) {
   PlantTraverseRuleTable(&TblStatement, lex);
 }
 
