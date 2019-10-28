@@ -51,6 +51,8 @@ public:
   Token() { EType = ET_TK; }
   void SetTkType(TK_Type t) { mTkType = t; }
   void SetTkKind(TK_Kind k) { mTkKind = k; }
+
+  bool IsSeparator() {return mTkType == TT_SP;}
   virtual void Dump(){}
 };
 
@@ -146,6 +148,7 @@ public:
   SepId mSepId;
 public:
   SeparatorToken(SepId si) {mTkType = TT_SP; mSepId = si;}
+  bool IsWhiteSpace() {return mSepId == SEP_Whitespace;}
   const char* GetName();
   void Dump();
 };

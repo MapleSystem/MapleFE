@@ -20,6 +20,7 @@ class Automata;
 class Module;
 class Function;
 class Stmt;
+class Token;
 
 class Parser {
 public:
@@ -30,6 +31,7 @@ public:
   Function *currfunc;
 
   std::vector<std::string> mVars;
+  std::vector<Token*>      mTokens; // vector for tokens during matching.
 
 public:
   Parser(const char *f, Module *m);

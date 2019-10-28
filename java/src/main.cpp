@@ -69,28 +69,42 @@ Token* Lexer::LexToken_autogen(void) {
 //////////////////////////////////////////////////////////////////////////////////
 
 bool Parser::Parse_autogen() {
-  if (GetVerbose() >= 1) {
-    MMSG("\n\n>> Parsing .... ", filename);
-  }
-
-  // mLexer->ReadALine();
-  // In Lexer::PrepareForFile() already did one ReadALine().
-
+  // TODO: Right now assume a statement has only one line. Will come back later.
   while (!mLexer->EndOfFile()) {
-    while (!mLexer->EndOfLine()) {
-      Token* t = mLexer->LexToken_autogen();
-      if (t)
-        t->Dump();
-      else
-        return;
-    }
+    ParseStmt_autogen();
     mLexer->ReadALine();
   }
 } 
 
 // return true : if successful
 //       false : if failed
+// This parses just one single statement.
 bool Parser::ParseStmt_autogen() {
+  // 1. Lex tokens in a line
+  //    In Lexer::PrepareForFile() already did one ReadALine().
+  while (!mLexer->EndOfLine()) {
+    Token* t = mLexer->LexToken_autogen();
+    if (t) {
+      bool is_whitespace = false;
+      t->Dump();
+      if (t->IsSeparator()) {
+        SeparatorToken *sep = (SeparatorToken *)t;
+        if (sep->IsWhiteSpace())
+          is_whitespace = true;
+      }
+      if (!is_whitespace)
+        mTokens.push_back(t);
+    } else {
+      MASSERT(0 && "Non token got? Problem here!");
+      break;
+    }
+  }
+
+  // 2. Match the tokens against the rule tables.
+  //    In a rule table there are : (1) separtaor, operator, keyword, are already in token
+  //                                (2) Identifier Table won't be traversed any more since
+  //                                    lex has got the token from source program and we only
+  //                                    need check if the table is &TblIdentifier.
 }
 
 // Initialized the predefined tokens.
