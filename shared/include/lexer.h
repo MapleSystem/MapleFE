@@ -18,12 +18,12 @@ class Token;
 
 class Lexer {
  public:
+  Token *mToken;
   char thechar;
   std::string thename;
   int64_t theintval;
   float thefloatval;
   double thedoubleval;
-  TK_Kind _thekind;
   std::vector<std::string> seencomments;
   int verboseLevel;
   StringPool mStringPool;
@@ -45,7 +45,7 @@ class Lexer {
   // get the identifier name after the % or $ prefix
   void GetName(void);
 
-  TK_Kind GetConstVal(void);
+  Token *GetConstVal(void);
 
  public:
   Lexer(const Lexer &p) = default;
@@ -84,14 +84,14 @@ class Lexer {
 
   void PrepareForFile(const std::string filename);
   void PrepareForString(const std::string &src);
-  TK_Kind NextToken(void);
-  TK_Kind LexToken();
-  TK_Kind ProcessToken();
+  Token *NextToken(void);
+  Token *LexToken();
+  Token *ProcessToken();
   // used to process a local string from rule
-  TK_Kind ProcessLocalToken(char *str) { line=str; curidx=0; return ProcessToken(); }
-  TK_Kind GetMappedToken(std::string str) const { return keywordmap[str]; }
-  TK_Kind GetToken() const {
-    return _thekind;
+  Token *ProcessLocalToken(char *str) { line=str; curidx=0; return ProcessToken(); }
+  TK_Kind GetMappedTokenKind(std::string str) const { return keywordmap[str]; }
+  Token *GetToken() const {
+    return mToken;
   }
 
   int GetCuridx() const { return curidx; }

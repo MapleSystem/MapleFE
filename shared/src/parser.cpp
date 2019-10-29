@@ -7,6 +7,7 @@
 #include "parser.h"
 #include "base_gen.h"
 #include "massert.h"
+#include "token.h"
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -38,10 +39,10 @@ bool Parser::Parse() {
 
   currfunc = NULL;
 
-  TK_Kind tk = mLexer->NextToken();
+  Token *tk = mLexer->NextToken();
   while (!atEof) {
     tk = mLexer->GetToken();
-    switch (tk) {
+    switch (tk->mTkKind) {
       case TK_Eof:
         atEof = true;
         break;
@@ -51,7 +52,7 @@ bool Parser::Parse() {
         std::string s = mLexer->GetTokenString();
 
         tk = mLexer->NextToken();
-        if (tk == TK_Lparen) {
+        if (tk->mTkKind == TK_Lparen) {
           // function
           if (GetVerbose() >= 2) {
             MMSG("func ", s);
@@ -108,14 +109,14 @@ TK_Kind Parser::GetTokenKind(const char c) {
 }
 
 TK_Kind Parser::GetTokenKind(const char *str) {
-  TK_Kind tk = mLexer->GetMappedToken(str);
+  TK_Kind tkk = mLexer->GetMappedTokenKind(str);
   if (GetVerbose() >= 3) {
     MLOC;
     std::cout << " GetFEOpcode() str: " << str
-              << " \ttoken: " << mLexer->GetTokenKindString(tk)
+              << " \ttoken: " << mLexer->GetTokenKindString(tkk)
               <<  std::endl;
   }
-  return tk;
+  return tkk;
 }
 
 FEOpcode Parser::GetFEOpcode(const char c) {
@@ -124,16 +125,16 @@ FEOpcode Parser::GetFEOpcode(const char c) {
 }
 
 FEOpcode Parser::GetFEOpcode(const char *str) {
-  TK_Kind tk = mLexer->ProcessLocalToken(str);
-  TK_Kind tk1 = mLexer->GetMappedToken(str);
-  assert(tk == tk1);
+  Token *tk = mLexer->ProcessLocalToken(str);
+  TK_Kind tkk = mLexer->GetMappedTokenKind(str);
+  assert(tk->mTkKind == tkk);
 
   FEOPCode *opc = new FEOPCode();
-  FEOpcode op = opc->Token2FEOpcode(tk);
+  FEOpcode op = opc->Token2FEOpcode(tk->mTkKind);
   if (GetVerbose() >= 3) {
     MLOC;
     std::cout << "GetFEOpcode() str: " << str
-              << " \ttoken: " << mLexer->GetTokenKindString(tk)
+              << " \ttoken: " << mLexer->GetTokenKindString(tk->mTkKind)
               << "   \topcode: " << opc->GetString(op)
               <<  std::endl;
   }
@@ -141,15 +142,15 @@ FEOpcode Parser::GetFEOpcode(const char *str) {
 }
 
 bool Parser::ParseFunction(Function *func) {
-  TK_Kind tk = mLexer->GetToken();
-  MASSERT(tk == TK_Lparen);
+  Token *tk = mLexer->GetToken();
+  MASSERT(tk->mTkKind == TK_Lparen);
   tk = mLexer->NextToken();
 
   ParseFuncArgs(func);
 
   tk = mLexer->NextToken();
   // parse function body
-  if (tk == TK_Lbrace) {
+  if (tk->mTkKind == TK_Lbrace) {
     tk = mLexer->NextToken();
     ParseFuncBody(func);
   }
@@ -157,17 +158,17 @@ bool Parser::ParseFunction(Function *func) {
 }
 
 bool Parser::ParseFuncArgs(Function *func) {
-  TK_Kind tk = mLexer->GetToken();
-  if (tk == TK_Rparen) {
+  Token *tk = mLexer->GetToken();
+  if (tk->mTkKind == TK_Rparen) {
     return true;
   }
-  while (tk != TK_Rparen) {
-    switch (tk) {
+  while (tk->mTkKind != TK_Rparen) {
+    switch (tk->mTkKind) {
       case TK_Int:
       {
         tk = mLexer->NextToken();
         // check if it is prototype only without variable
-        if (tk != TK_Comma || tk != TK_Rparen) {
+        if (tk->mTkKind != TK_Comma || tk->mTkKind != TK_Rparen) {
           std::string s = mLexer->GetTokenString();
           stridx_t stridx = mModule->mStrTable.GetOrCreateGstridxFromName(s);
           Symbol *sb = currfunc->GetSymbol(stridx);
@@ -185,10 +186,10 @@ bool Parser::ParseFuncArgs(Function *func) {
         break;
       }
       default:
-        MMSGA("TK_ for args: ", mLexer->GetTokenKindString(tk));
+        MMSGA("TK_ for args: ", mLexer->GetTokenKindString(tk->mTkKind));
         break;
     }
-    if (tk == TK_Comma) {
+    if (tk->mTkKind == TK_Comma) {
       tk = mLexer->NextToken();
     }
   }
@@ -196,10 +197,10 @@ bool Parser::ParseFuncArgs(Function *func) {
 }
 
 bool Parser::ParseFuncBody(Function *func) {
-  TK_Kind tk = mLexer->GetToken();
+  Token *tk = mLexer->GetToken();
 
   // loop till the end of function body '}'
-  while (tk != TK_Rbrace) {
+  while (tk->mTkKind != TK_Rbrace) {
     ParseStmt(func);
     tk = mLexer->GetToken();
   }
@@ -212,10 +213,10 @@ bool Parser::ParseFuncBody(Function *func) {
 // ParseStmt consumes ';'
 bool Parser::ParseStmt(Function *func) {
   mAutomata->mStack.clear();
-  TK_Kind tk = mLexer->GetToken();
-  bool isDecl = (mAutomata->IsType(tk));
-  while (tk != TK_Invalid) {
-    switch (tk) {
+  Token *tk = mLexer->GetToken();
+  bool isDecl = (mAutomata->IsType(tk->mTkKind));
+  while (tk->mTkKind != TK_Invalid) {
+    switch (tk->mTkKind) {
       case TK_Name:
       {
         std::string s = mLexer->GetTokenString();
@@ -246,7 +247,7 @@ bool Parser::ParseStmt(Function *func) {
       #undef KEYWORD
       case TK_Semicolon: // end of Stmt
       {
-        std::string str = GetTokenKindString(tk);
+        std::string str = GetTokenKindString(tk->mTkKind);
         RuleElem *e = NULL;
         // "=" is considered as '='
         if (str.size() == 1) {
@@ -263,7 +264,7 @@ bool Parser::ParseStmt(Function *func) {
     }
 
     // ';' marks the end of statement
-    if (tk == TK_Semicolon) {
+    if (tk->mTkKind == TK_Semicolon) {
       break;
     }
     tk = mLexer->NextToken();
