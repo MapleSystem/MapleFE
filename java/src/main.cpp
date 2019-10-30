@@ -30,21 +30,26 @@ Token* FindKeywordToken(Lexer * lex, char *key) {
   }
 }
 
-// This is for testing autogen
 Token* Lexer::LexToken_autogen(void) {
   SepId sep = GetSeparator(this);
   if (sep != SEP_NA) {
-    return FindSeparatorToken(this, sep);
+    Token *t = FindSeparatorToken(this, sep);
+    t->Dump();
+    return t;
   }
 
   OprId opr = GetOperator(this);
   if (opr != OPR_NA) {
-    return FindOperatorToken(this, opr);
+    Token *t = FindOperatorToken(this, opr);
+    t->Dump();
+    return t;
   }
 
   const char *keyword = GetKeyword(this);
   if (keyword != NULL) {
-    return FindKeywordToken(this, keyword);
+    Token *t = FindKeywordToken(this, keyword);
+    t->Dump();
+    return t;
   }
 
   const char *identifier = GetIdentifier(this);
@@ -86,7 +91,6 @@ bool Parser::ParseStmt_autogen() {
     Token* t = mLexer->LexToken_autogen();
     if (t) {
       bool is_whitespace = false;
-      t->Dump();
       if (t->IsSeparator()) {
         SeparatorToken *sep = (SeparatorToken *)t;
         if (sep->IsWhiteSpace())
@@ -111,7 +115,13 @@ bool Parser::ParseStmt_autogen() {
 // return true : if all tokens in mTokens are matched.
 //       false : if faled.
 bool Parser::TraverseStmt() {
-  return TraverseRuleTable(&TblStatement);
+  bool succ = TraverseRuleTable(&TblStatement);
+  if (mTokens.size() != mCurToken)
+    MASSERT(0 && "some tokens left unmatched!");
+  else
+    std::cout << "Matched " << mCurToken << " tokens." << std::endl;
+
+  return succ;
 }
 
 // return true : if all tokens in mTokens are matched.
@@ -125,6 +135,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table) {
   if ((rule_table == &TblIdentifier)) {
     if (curr_token->IsIdentifier()) {
       mCurToken++;
+      //std::cout << "Matched identifier token: " << curr_token << std::endl;
       return true;
     } else {
       return false;
@@ -135,6 +146,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table) {
   if ((rule_table == &TblLiteral)) {
     if (curr_token->IsLiteral()) {
       mCurToken++;
+      //std::cout << "Matched literal token: " << curr_token << std::endl;
       return true;
     } else {
       return false;
@@ -240,6 +252,7 @@ bool Parser::TraverseTableData(TableData *data) {
     if (data->mData.mToken == curr_token) {
       found = true;
       mCurToken++;
+      //std::cout << "Matched a token: " << curr_token << std::endl;
     }
     break;
   case DT_Type:
@@ -267,6 +280,8 @@ void Parser::InitPredefinedTokens() {
   for (unsigned i = 0; i < SEP_NA; i++) {
     Token *t = (Token*)mLexer->mTokenPool.NewToken(sizeof(SeparatorToken));
     new (t) SeparatorToken(i);
+    //std::cout << "init a pre token " << t << std::endl;
+    //t->Dump();
   }
   mLexer->mPredefinedTokenNum += SEP_NA;
 
@@ -274,6 +289,8 @@ void Parser::InitPredefinedTokens() {
   for (unsigned i = 0; i < OPR_NA; i++) {
     Token *t = (Token*)mLexer->mTokenPool.NewToken(sizeof(OperatorToken));
     new (t) OperatorToken(i);
+    //std::cout << "init a pre token " << t << std::endl;
+    //t->Dump();
   }
   mLexer->mPredefinedTokenNum += OPR_NA;
 
@@ -282,6 +299,8 @@ void Parser::InitPredefinedTokens() {
     Token *t = (Token*)mLexer->mTokenPool.NewToken(sizeof(KeywordToken));
     char *s = mLexer->mStringPool.FindString(KeywordTable[i].mText);
     new (t) KeywordToken(s);
+    //std::cout << "init a pre token " << t << std::endl;
+    //t->Dump();
   }
   mLexer->mPredefinedTokenNum += KeywordTableSize;
 }

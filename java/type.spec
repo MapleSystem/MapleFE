@@ -59,9 +59,13 @@ STRUCT Keyword : (("boolean", Boolean),
 #                                                                                 #
 ###################################################################################
 
-rule BoolType: Boolean
-rule IntType : ONEOF(Byte, Short, Int, Long, Char)
-rule FPType  : ONEOF(Float, Double)
+# rule BoolType: Boolean
+# rule IntType : ONEOF(Byte, Short, Int, Long, Char)
+# rule FPType  : ONEOF(Float, Double)
+# rule NumericType : ONEOF(IntType, FPType)
+rule BoolType: "boolean"
+rule IntType : ONEOF("byte", "short", "int", "long", "char")
+rule FPType  : ONEOF("float", "double")
 rule NumericType : ONEOF(IntType, FPType)
 
 # this is a fake one, to make the development work.

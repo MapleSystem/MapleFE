@@ -28,6 +28,7 @@ rule VariableInitializer : ONEOF(
   ArrayInitializer)
 
 rule Statement : ONEOF(
+  LocalVariableDeclarationStatement,
   StatementWithoutTrailingSubstatement,
   LabeledStatement,
   IfThenStatement,

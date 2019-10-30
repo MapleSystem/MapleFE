@@ -115,11 +115,11 @@ std::string RuleGen::Gen4RuleElem(const RuleElem *elem) {
   case ET_Op: {
     // Each Op will be generated as a new sub table
     mSubTblNum++;
-    Gen4Table(NULL, elem);
-    Gen4TableHeader(NULL, elem);
     std::string tbl_name = GetSubTblName();
     data += "DT_Subtable, &";
     data += tbl_name;
+    Gen4Table(NULL, elem);
+    Gen4TableHeader(NULL, elem);
     break;
   }
   default:

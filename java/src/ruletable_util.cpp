@@ -408,6 +408,7 @@ static void PlantTraverseTableData(TableData *data, Lexer *lex) {
       Token *token = FindSeparatorToken(lex, sid);
       data->mType = DT_Token;
       data->mData.mToken = token;
+      //std::cout << "In Plant 1, plant token " << token << std::endl;
       return;
     }
     // 2. Try operator.
@@ -416,6 +417,7 @@ static void PlantTraverseTableData(TableData *data, Lexer *lex) {
       Token *token = FindOperatorToken(lex, oid);
       data->mType = DT_Token;
       data->mData.mToken = token;
+      //std::cout << "In Plant 2, plant token " << token << std::endl;
       return;
     }
     // 3. Try keyword.
@@ -432,6 +434,7 @@ static void PlantTraverseTableData(TableData *data, Lexer *lex) {
       Token *token = FindSeparatorToken(lex, sid);
       data->mType = DT_Token;
       data->mData.mToken = token;
+      //std::cout << "In Plant 3, plant token " << token << std::endl;
       return;
     }
     // 2. Try operator.
@@ -440,17 +443,19 @@ static void PlantTraverseTableData(TableData *data, Lexer *lex) {
       Token *token = FindOperatorToken(lex, oid);
       data->mType = DT_Token;
       data->mData.mToken = token;
+      //std::cout << "In Plant 4, plant token " << token << std::endl;
       return;
     }
     // 3. Try keyword.
     //    Need to make sure string is put in Lexer::StringPool, a request of
     //    FindKeywordToken(lex, key);
-    char *str = lex->mStringPool.FindString(data->mData.mString);
-    char *key = TraverseKeywordTable_core(str, 0, len);
+    char *key = TraverseKeywordTable_core(data->mData.mString, 0, len);
     if (key) {
+      key = lex->mStringPool.FindString(key);
       Token *token = FindKeywordToken(lex, key);
       data->mType = DT_Token;
       data->mData.mToken = token;
+      //std::cout << "In Plant 5, plant token " << token << std::endl;
       return;
     }
     break;
