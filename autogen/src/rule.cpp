@@ -23,9 +23,10 @@ void RuleAction::Dump() {
 
 std::string RuleAttr::GetTokenTypeString(TokenType t) {
   switch (t) {
-    case TT_Identifier: return "Identifier";
-    case TT_Literal: return "Literal";
-    case TT_Type: return "Type";
+    case TkT_Identifier: return "Identifier";
+    case TkT_Literal: return "Literal";
+    case TkT_Type: return "Type";
+    case TkT_NA: return "NA";
   }
 }
 
@@ -36,7 +37,9 @@ void RuleAttr::DumpDataType(int i) {
 }
 
 void RuleAttr::DumpTokenType(int i) {
-  std::cout << "    attr.tokentype : " << GetTokenTypeString(mTokenType) << std::endl;
+  if (mTokenType != TkT_NA) {
+    std::cout << "    attr.tokentype : " << GetTokenTypeString(mTokenType) << std::endl;
+  }
 }
 
 void RuleAttr::DumpValidity(int i) {

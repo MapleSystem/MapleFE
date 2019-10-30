@@ -46,16 +46,18 @@ public:
                      // Having both mTkType and mTkKind is a temporary solution
                      // will come back.
 public:
-  Token(TK_Type t, TK_Kind k) : mTkType(t), mTkKind(k) { EType = ET_TK; }
-  Token(TK_Type t) : mTkType(t), mTkKind(TK_Invalid) { EType = ET_TK; }
-  Token() { EType = ET_TK; }
+  Token(TK_Type t, TK_Kind k, ELMT_Type e) : Element(e), mTkType(t), mTkKind(k) {}
+  Token(TK_Type t, TK_Kind k) : Element(ET_TK), mTkType(t), mTkKind(k) {}
+  Token(TK_Type t) : mTkType(t), Element(ET_TK), mTkKind(TK_Invalid) {}
+  Token() : Element(ET_TK) {}
+
   void SetTkType(TK_Type t) { mTkType = t; }
   void SetTkKind(TK_Kind k) { mTkKind = k; }
 
-  bool IsSeparator() {return mTkType == TT_SP;}
-  bool IsIdentifier(){return mTkType == TT_ID;}
-  bool IsLiteral()   {return mTkType == TT_LT;}
-  virtual void Dump(){}
+  bool IsSeparator()  { return mTkType == TT_SP; }
+  bool IsIdentifier() { return mTkType == TT_ID; }
+  bool IsLiteral()    { return mTkType == TT_LT; }
+  virtual void Dump() {}
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -65,8 +67,8 @@ class IdentifierToken : public Token {
 public:
   const char *mName;       // It's put into the Lexer's StringPool
 public:
-  IdentifierToken(const char *s) : mName(s) {mTkType = TT_ID;}
-  IdentifierToken() : mName(NULL) {mTkType = TT_ID;}
+  IdentifierToken(const char *s) : Token(TT_ID, TK_Name), mName(s) {}
+  IdentifierToken() : Token(TT_ID, TK_Name), mName(NULL) {}
 
   void Dump();
 };
@@ -101,8 +103,9 @@ public:
   const char *mName;   // The text name. During initialization it will be
                        // put into string pool.
 public:
-  KeywordToken() : Token(TT_KW){ mName = NULL; }
+  KeywordToken(TK_Kind k) : Token(TT_KW, k) { mName = NULL; }
   KeywordToken(const char *s) : Token(TT_KW), mName(s){}
+  KeywordToken(TK_Kind k, const char *s) : Token(TT_KW, k), mName(s){}
   
   void SetName(const char *s){ mName = s; }
   void Dump();
@@ -120,24 +123,29 @@ typedef enum {
   LT_NA     // N/A, in java, Null is legal type with only one value 'null'
             // reference, a literal. So LT_Null is actually legal. 
             // So I put LT_NA for the illegal literal
-}LT_Type;
+} LT_Type;
 
-struct LitData{
+struct LitData {
   LT_Type mType; 
   union {
     int   mInt;
     float mFloat;
+    double mDouble;
     bool  mBool;
     char  mChar;
     char *mStr;   // the string is allocated through lexer's mStringPool
-  }mData;
+  } mData;
+
+  LitData() {}
+  LitData(LT_Type t) : mType(t) {}
 };
 
 class LiteralToken : public Token {
 private:
   LitData  mData;
 public:
-  LiteralToken(LitData data) {mTkType = TT_LT; mData = data;}
+  LiteralToken(LitData data) : Token(TT_LT), mData(data) {}
+  LiteralToken(TK_Kind k, LitData data) : Token(TT_LT, k), mData(data) {}
   void Dump();
 };
 

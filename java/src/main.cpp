@@ -62,7 +62,7 @@ Token* Lexer::LexToken_autogen(void) {
   LitData ld = GetLiteral(this);
   if (ld.mType != LT_NA) {
     LiteralToken *t = (LiteralToken*)mTokenPool.NewToken(sizeof(LiteralToken)); 
-    new (t) LiteralToken(ld);
+    new (t) LiteralToken(TK_Invalid, ld);
     return t;
   }
 
