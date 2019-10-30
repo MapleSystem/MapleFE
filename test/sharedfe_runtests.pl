@@ -77,7 +77,7 @@ while( ($srcdir = readdir(DIR))){
       system("cp $src_file $outdir/$src_file");
       $res = system("cd $pwd/../build64/autogen; ./sharedfe $outdir/$src_file > $outdir/$sharedfe_result_file");
       if ($res > 0) {
-        print "$pwd/../build64/autogen/sharedfe $outdir/$src_file\n";
+        print "\n(cd ../build64/autogen; gdb --args ./sharedfe $outdir/$src_file)\n";
         print " ==sharedfe===> $file\n";
 #        $countsharedfe ++;
 #        push(@failed_sharedfe_file, $file);

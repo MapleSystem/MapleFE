@@ -77,7 +77,7 @@ while( ($srcdir = readdir(DIR))){
       system("cp $src_file $outdir/$src_file");
       $res = system("cd $pwd/..; build64/java/java2mpl $outdir/$src_file > $outdir/$java2mpl_result_file");
       if ($res > 0) {
-        print "$pwd/../build64/java/java2mpl $outdir/$src_file\n";
+        print "\ngdb --args ../build64/java/java2mpl $outdir/$src_file\n";
         print " ==java2mpl===> $file\n";
 #        $countJAVA2MPL ++;
 #        push(@failed_java2mpl_file, $file);
