@@ -127,8 +127,10 @@ _____________________
  can be applied to a rule.
 
  *) attr.type
- *) attr.validity[.%n] optional for specific element #n in ONEOF
- *) attr.action[.%n]   optional for specific element #n in ONEOF
+ *) attr.validity[.%n,%m] optional for specific elements #n, #m in ONEOF
+ *) attr.action[.%n,%m]   optional for specific elements #n, #m in ONEOF
+
+ Note : all indexes start from 1
 
  The basic synatx of attributes are similar as rule's, with the common format:
     attr.type : XXX
@@ -140,13 +142,13 @@ _____________________
                    Rule4 + Rule5,
                    Rule6)
       attr.type     : Integer
-      attr.validity.%1 : IsUnsigned(%3)
-      attr.validity.%2 : IsUnsigned(%2); IsUnsigned(%3)
-      attr.validity    : IsUnsigned(%1)
-      attr.action.%1   : GenerateBinaryExpr(%1, %2, %3)
-      attr.action      : GenerateUnaryExpr(%1)
+      attr.validity.%1,%2 : IsUnsigned(%3)
+      attr.validity.%2    : IsUnsigned(%2)
+      attr.validity       : IsUnsigned(%1)
+      attr.action.%1,%2   : GenerateBinaryExpr(%1, %2, %3)
+      attr.action         : GenerateUnaryExpr(%1)
 
- 1. attr.xxx must      follow the rule which it attaches to.
+ 1. attr.xxx           must follow the rule which it attaches to.
  2. attr.type          tells the data type of the generated IR component of this rule.
  3. attr.validity[.%n] tells the semantic limitation of each component, with optional
                        specific element number.  The corresponding functions will be
@@ -158,8 +160,8 @@ _____________________
     Or, it can be a system supported functions.
     Please refer to Section 2 <Reserved or system supported items> and Appendix
     for <System Supported Functions>
- 6. Each Non-Terminate in RHS of the rule is given a number, starting from 1. It can
-    be noted as %1, %2 and etc. In the above example, %1 stands for DecimalIntegerLiteral.
+ 6. Each term in rhs of the rule is given a number, starting from 1. It can
+    be noted as %1, %2 and etc. In the above example, %1 stands for "Rule2 + '+' + Rule3".
 
 _________________________________________________
 

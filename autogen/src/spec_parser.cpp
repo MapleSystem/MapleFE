@@ -526,6 +526,7 @@ bool SPECParser::ParseAttrTokentype() {
   return true;
 }
 
+// attr.validity[.%1[,%3]] : Func(%1, %3)
 bool SPECParser::ParseAttrValidity() {
   bool status = false;
 
@@ -536,18 +537,27 @@ bool SPECParser::ParseAttrValidity() {
   RuleAttr *attr = mCurrrule->mAttr;
 
   tk = mLexer->NextToken();
+  std::vector<RuleAttr *> attrvec;
   if (tk == SPECTK_Dot) {
-    // for a specific element
+    // for specific elements
     tk = mLexer->NextToken();
     if (tk != SPECTK_Percent)
       MMSGA("expect '%' but get ", mLexer->GetTokenString());
-    tk = mLexer->NextToken();
-    if (tk != SPECTK_Intconst)
-      MMSGA("expect Intconst but get ", mLexer->GetTokenString());
-    int i = mLexer->theintval;
 
-    attr = mCurrrule->mElement->mSubElems[i]->mAttr;
-    tk = mLexer->NextToken();
+    while (tk == SPECTK_Percent) {
+      tk = mLexer->NextToken();
+      if (tk != SPECTK_Intconst)
+        MMSGA("expect Intconst but get ", mLexer->GetTokenString());
+      int i = mLexer->theintval;
+
+      attr = mCurrrule->mElement->mSubElems[i-1]->mAttr;
+      attrvec.push_back(attr);
+      tk = mLexer->NextToken();
+      if (tk == SPECTK_Coma)
+        tk = mLexer->NextToken();
+    }
+  } else {
+    attrvec.push_back(attr);
   }
 
   if (tk != SPECTK_Colon)
@@ -555,19 +565,23 @@ bool SPECParser::ParseAttrValidity() {
 
   tk = mLexer->NextToken();
   RuleAction *action = GetAction();
-  attr->mValidity.push_back(action);
 
-  tk = mLexer->GetToken();
-  while (tk == SPECTK_Semicolon) {
-    tk = mLexer->NextToken();
-    RuleAction *action = GetAction();
+  for (auto attr: attrvec) {
     attr->mValidity.push_back(action);
+
     tk = mLexer->GetToken();
+    while (tk == SPECTK_Semicolon) {
+      tk = mLexer->NextToken();
+      RuleAction *action = GetAction();
+      attr->mValidity.push_back(action);
+      tk = mLexer->GetToken();
+    }
   }
 
   return true;
 }
 
+// attr.action[.%1[,%3]] : Func(%1, %3)
 bool SPECParser::ParseAttrAction() {
   SPECTokenKind tk = mLexer->GetToken();
   if (tk != SPECTK_Action)
@@ -576,18 +590,27 @@ bool SPECParser::ParseAttrAction() {
   RuleAttr *attr = mCurrrule->mAttr;
 
   tk = mLexer->NextToken();
+  std::vector<RuleAttr *> attrvec;
   if (tk == SPECTK_Dot) {
-    // for a specific element
+    // for specific elements
     tk = mLexer->NextToken();
     if (tk != SPECTK_Percent)
       MMSGA("expect '%' but get ", mLexer->GetTokenString());
-    tk = mLexer->NextToken();
-    if (tk != SPECTK_Intconst)
-      MMSGA("expect Intconst but get ", mLexer->GetTokenString());
-    int i = mLexer->theintval;
 
-    attr = mCurrrule->mElement->mSubElems[i]->mAttr;
-    tk = mLexer->NextToken();
+    while (tk == SPECTK_Percent) {
+      tk = mLexer->NextToken();
+      if (tk != SPECTK_Intconst)
+        MMSGA("expect Intconst but get ", mLexer->GetTokenString());
+      int i = mLexer->theintval;
+
+      attr = mCurrrule->mElement->mSubElems[i-1]->mAttr;
+      attrvec.push_back(attr);
+      tk = mLexer->NextToken();
+      if (tk == SPECTK_Coma)
+        tk = mLexer->NextToken();
+    }
+  } else {
+    attrvec.push_back(attr);
   }
 
   if (tk != SPECTK_Colon)
@@ -595,14 +618,17 @@ bool SPECParser::ParseAttrAction() {
 
   tk = mLexer->NextToken();
   RuleAction *action = GetAction();
-  attr->mAction.push_back(action);
 
-  tk = mLexer->GetToken();
-  while (tk == SPECTK_Semicolon) {
-    tk = mLexer->NextToken();
-    RuleAction *action = GetAction();
+  for (auto attr: attrvec) {
     attr->mAction.push_back(action);
+
     tk = mLexer->GetToken();
+    while (tk == SPECTK_Semicolon) {
+      tk = mLexer->NextToken();
+      RuleAction *action = GetAction();
+      attr->mAction.push_back(action);
+      tk = mLexer->GetToken();
+    }
   }
 
   return true;

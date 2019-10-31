@@ -151,7 +151,8 @@ rule BreakStatement : "break" + ZEROORONE(Identifier) + ';'
 
 rule ContinueStatement : "continue" + ZEROORONE(Identifier) + ';'
 
-rule ReturnStatement : "return" + ZEROORONE(Expression) + ';' ==> func GenerateReturnStmt(%1, %2)
+rule ReturnStatement : "return" + ZEROORONE(Expression) + ';'
+  attr.action : GenerateReturnStmt(%1, %2)
 
 rule ThrowStatement : "throw" + Expression + ';'
 

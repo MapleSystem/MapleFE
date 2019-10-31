@@ -48,10 +48,10 @@ void RuleAttr::DumpValidity(int i) {
       std::cout << "    attr.validity : ";
     else
       std::cout << "    attr.validity.%" << i << " : ";
-    int i = 0;
+    int j = 0;
     for (auto it: mValidity) {
       it->Dump();
-      if (++i != mValidity.size())
+      if (++j != mValidity.size())
         std::cout << "; ";
     }
     std::cout << "\n";
@@ -64,10 +64,10 @@ void RuleAttr::DumpAction(int i) {
       std::cout << "    attr.action : ";
     else
       std::cout << "    attr.action.%" << i << " : ";
-    int i = 0;
+    int j = 0;
     for (auto it: mAction) {
       it->Dump();
-      if (++i != mAction.size())
+      if (++j != mAction.size())
         std::cout << "; ";
     }
     std::cout << "\n";
@@ -234,11 +234,11 @@ void Rule::DumpAttr() {
   mAttr->DumpTokenType(0);
   mAttr->DumpValidity(0);
   for (int i = 0; i < mElement->mSubElems.size(); i++) {
-    mElement->mSubElems[i]->mAttr->DumpValidity(i);
+    mElement->mSubElems[i]->mAttr->DumpValidity(i+1);
   }
   mAttr->DumpAction(0);
   for (int i = 0; i < mElement->mSubElems.size(); i++) {
-    mElement->mSubElems[i]->mAttr->DumpAction(i);
+    mElement->mSubElems[i]->mAttr->DumpAction(i+1);
   }
 }
 
