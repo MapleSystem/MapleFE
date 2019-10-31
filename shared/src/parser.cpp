@@ -65,7 +65,7 @@ bool Parser::Parse() {
           if (!ParseFunction(func)) {
             MMSG("Parse function error", s);
           }
-          if (GetVerbose() >= 1) {
+          if (GetVerbose() >= 0) {
             func->Dump();
           }
         } else {

@@ -336,11 +336,11 @@ void Automata::ProcessRules() {
 TK_Kind Automata::GetFirstStackOpcode(unsigned start, unsigned end, unsigned &idx) {
   // try to match token to start from a shorter list to match
   TK_Kind tk = TK_Invalid;
-  for (idx = start; idx < end; idx++) {
+  for (idx = start; idx <= end; idx++) {
     RuleElem *elem = mStack[idx].first;
     if (elem->mType == ET_Char || elem->mType == ET_String) {
       tk = elem->mToken;
-      if (GetVerbose() >= 2) {
+      if (GetVerbose() >= 4) {
         MMSG("found token: ", GetTokenString(tk));
       }
       break;
@@ -383,7 +383,7 @@ void Automata::ProcessStack() {
 
   // get opcode index and token
   unsigned idx = 0;
-  TK_Kind tk = GetFirstStackOpcode(0, mStack.size(), idx);
+  TK_Kind tk = GetFirstStackOpcode(0, mStack.size() - 1, idx);
 
   stmtroot = new Stmt();;
 
@@ -407,7 +407,7 @@ void Automata::ProcessStack() {
       }
       RuleElem *elem = mBaseGen->NewRuleElem(it);
       Expr *expr = new Expr(elem);
-      status = MatchStack(expr, it, 0, idx, tk);
+      status = MatchStackRule(expr, it, 0, mStack.size() - 1, tk);
       if (status) {
         stmtroot->mExprs.push_back(expr);
         if (GetVerbose() >= 2) {
@@ -430,7 +430,7 @@ void Automata::ProcessStack() {
         it->Dump();
       }
       Expr *expr = new Expr();
-      status = MatchStack(expr, it, 0, idx, tk);
+      status = MatchStackRule(expr, it, 0, mStack.size() - 1, tk);
       if (status) {
         stmtroot->mExprs.push_back(expr);
         if (GetVerbose() >= 2) {
@@ -444,7 +444,6 @@ void Automata::ProcessStack() {
       }
     }
   }
-
   if (GetVerbose() >= 2) {
     stmtroot->Dump(0);
     MLOC;
@@ -454,7 +453,7 @@ void Automata::ProcessStack() {
 }
 
 // match stack to a rule
-bool Automata::MatchStack(Expr *&expr, Rule *rule, unsigned stackstart, unsigned stkidx, TK_Kind tk) {
+bool Automata::MatchStackRule(Expr *&expr, Rule *rule, unsigned stkstart, unsigned stkend, TK_Kind tk) {
   Rule *tkrule = mTokenRuleMap[tk];
   if (!IsUsedBy(tkrule, rule)) {
     return false;
@@ -464,7 +463,7 @@ bool Automata::MatchStack(Expr *&expr, Rule *rule, unsigned stackstart, unsigned
   switch (rule->mElement->mType) {
     case ET_Op:
     {
-      status = MatchStackOp(expr, rule, stackstart, stkidx, tk);
+      status = MatchStackOp(expr, rule, stkstart, stkend, tk);
       if (status) {
         if (GetVerbose() >= 3) {
           MMSG0("rule matched:");
@@ -475,7 +474,7 @@ bool Automata::MatchStack(Expr *&expr, Rule *rule, unsigned stackstart, unsigned
     }
     case ET_Rule:
     {
-      status = MatchStackRule(expr, rule, stackstart, stkidx, tk);
+      status = MatchStackRule(expr, rule->mElement->mData.mRule, stkstart, stkend, tk);
       if (status) {
         if (GetVerbose() >= 3) {
           MMSG0("rule matched:");
@@ -493,7 +492,7 @@ bool Automata::MatchStack(Expr *&expr, Rule *rule, unsigned stackstart, unsigned
 }
 
 // match rule which is of ET_Op
-bool Automata::MatchStackOp(Expr *&expr, Rule *rule, unsigned stackstart, unsigned stkidx, TK_Kind tk) {
+bool Automata::MatchStackOp(Expr *&expr, Rule *rule, unsigned stkstart, unsigned stkend, TK_Kind tk) {
   bool status = false;
 
   if (rule->mElement->mType != ET_Op) {
@@ -512,7 +511,7 @@ bool Automata::MatchStackOp(Expr *&expr, Rule *rule, unsigned stackstart, unsign
             // check if rule is compatible with token
             if (IsUsedBy(tkrule, it->mData.mRule)) {
               Expr *newexpr = new Expr(it);
-              status = MatchStack(newexpr, it->mData.mRule, stackstart, stkidx, tk);
+              status = MatchStackRule(newexpr, it->mData.mRule, stkstart, stkend, tk);
               if (status) {
                 expr->mSubExprs.push_back(newexpr);
                 if (GetVerbose() >= 2) {
@@ -530,7 +529,7 @@ bool Automata::MatchStackOp(Expr *&expr, Rule *rule, unsigned stackstart, unsign
           {
             if (it->mData.mOp == RO_Concatenate) {
               Expr *newexpr = new Expr(it);
-              status = MatchStackVec(newexpr, it->mSubElems, stackstart, stkidx, tk);
+              status = MatchStackVec(newexpr, it->mSubElems, stkstart, stkend, tk);
               if (status) {
                 expr->mSubExprs.push_back(newexpr);
 
@@ -564,7 +563,7 @@ bool Automata::MatchStackOp(Expr *&expr, Rule *rule, unsigned stackstart, unsign
     case RO_Concatenate:
     {
       Expr *newexpr = new Expr(rule->mElement);
-      status = MatchStackVec(newexpr, rule->mElement->mSubElems, stackstart, stkidx, tk);
+      status = MatchStackVec(newexpr, rule->mElement->mSubElems, stkstart, stkend, tk);
       if (status) {
         expr->mSubExprs.push_back(newexpr);
 
@@ -590,27 +589,9 @@ bool Automata::MatchStackOp(Expr *&expr, Rule *rule, unsigned stackstart, unsign
   return status;
 }
 
-// match rule which is of ET_Rule
-bool Automata::MatchStackRule(Expr *&expr, Rule *rule, unsigned stackstart, unsigned stkidx, TK_Kind tk) {
-  bool status = false;
-
-  // check if rule is compatible with token
-  Rule *tkrule = mTokenRuleMap[tk];
-  if (!IsUsedBy(tkrule, rule)) {
-    return false;
-  }
-
-  // check if can be reduced to rule
-
-  if (status) {
-    expr->mElem = mBaseGen->NewRuleElem(rule);
-  }
-
-  return status;
-}
-
 // match stack to a vector of rules consistent with given token
-bool Automata::MatchStackVec(Expr *&expr, std::vector<RuleElem *> vec, unsigned stackstart, unsigned stkidx, TK_Kind tk) {
+// match both before and after token
+bool Automata::MatchStackVec(Expr *&expr, std::vector<RuleElem *> vec, unsigned stkstart, unsigned stkend, TK_Kind tk) {
   Rule *tkrule = mTokenRuleMap[tk];
   unsigned tkidx = 0xffff;
   for (unsigned i = 0; i < vec.size(); i++) {
@@ -627,43 +608,73 @@ bool Automata::MatchStackVec(Expr *&expr, std::vector<RuleElem *> vec, unsigned 
     return false;
   }
 
-  // match subvec with substack before the token
-  bool status = MatchStackVecRange(expr, vec, 0, tkidx, stackstart, stkidx);
+  bool status = false;
+  unsigned stkidx;
+  unsigned startidx = stkstart;
+  unsigned initsize = expr->mSubExprs.size();
 
-  if (status) {
-    RuleElem *elem = mStack[stkidx].first;
-    Expr *newexpr = new Expr(elem);
-    expr->mSubExprs.push_back(newexpr);
+  while (startidx <= stkend) {
+    TK_Kind tkk = GetFirstStackOpcode(startidx, stkend, stkidx);
+    startidx = stkidx + 1;
+    if (tkk != tk)
+      continue;
 
-    // match after the token
-    // adjust the match for trailing ';'
-    unsigned vecsize = vec.size();
-    unsigned stacksize = mStack.size();
-    if (vec[vecsize-1]->mToken != TK_Semicolon &&
-        mStack[stacksize-1].first->mToken == TK_Semicolon) {
-      stacksize--;
+    if (stkidx != 0) {
+      // match subvec with substack before the token
+      status = MatchStackVecRange(expr, vec, 0, tkidx - 1, stkstart, stkidx - 1);
+    } else {
+      // token is the first one and no need to match first part
+      status = true;
     }
-    if (vec[vecsize-1]->mToken == TK_Semicolon &&
-        mStack[stacksize-1].first->mToken != TK_Semicolon) {
-      vecsize--;
+
+    if (status) {
+      RuleElem *elem = mStack[stkidx].first;
+      Expr *newexpr = new Expr(elem);
+      expr->mSubExprs.push_back(newexpr);
+
+      // match after the token
+      // adjust the match for trailing ';'
+      unsigned vecend = vec.size() - 1;
+      if (vec[vecend]->mToken != TK_Semicolon &&
+          mStack[stkend].first->mToken == TK_Semicolon) {
+        stkend--;
+      }
+      if (vec[vecend]->mToken == TK_Semicolon &&
+          mStack[stkend].first->mToken != TK_Semicolon) {
+        vecend--;
+      }
+
+      status  = MatchStackVecRange(expr, vec, tkidx + 1, vecend, stkidx + 1, stkend);
+
+      if (status) {
+        break;
+      } else {
+        // restore expr by deleting newly added into expr->mSubExprs
+        unsigned newsize = expr->mSubExprs.size();
+        for (int i = initsize; i < newsize; i++) {
+          expr->mSubExprs.pop_back();
+        }
+      }
     }
-    status  = MatchStackVecRange(expr, vec, tkidx + 1, vecsize, stkidx + 1, stacksize);
   }
 
   return status;
 }
 
-// match reset of stack to the range of a vector of rules
-bool Automata::MatchStackVecRange(Expr *&expr, std::vector<RuleElem *> vec, unsigned start, unsigned end,
-                               unsigned stackstart, unsigned stackend) {
+// match subset of stack to the range of a vector of rules
+// note both are using closed intervals
+// vec    : [vecstart, vecend]
+// mStack : [stkstart, stkend]
+bool Automata::MatchStackVecRange(Expr *&expr, std::vector<RuleElem *> vec, unsigned vecstart, unsigned vecend,
+                               unsigned stkstart, unsigned stkend) {
   bool status = false;
-  unsigned size = end - start;
-  unsigned stacksize = stackend - stackstart;
+  unsigned vecsize = vecend - vecstart + 1;
+  unsigned stksize = stkend - stkstart + 1;
 
   // 1-1 match
-  if (size == stacksize) {
+  if (vecsize == stksize) {
     // first pass check if match
-    for (unsigned i = start, j = stackstart; i < end, j < stackend; i++, j++) {
+    for (unsigned i = vecstart, j = stkstart; i <= vecend, j <= stkend; i++, j++) {
       RuleElem *elem = mStack[j].first;
       RuleElem *e = vec[i];
       // RO_Zeroorone
@@ -682,7 +693,7 @@ bool Automata::MatchStackVecRange(Expr *&expr, std::vector<RuleElem *> vec, unsi
       }
     }
     // handle stmt tree once match
-    for (unsigned i = start, j = stackstart; i < end, j < stackend; i++, j++) {
+    for (unsigned i = vecstart, j = stkstart; i <= vecend, j <= stkend; i++, j++) {
       RuleElem *elem = mStack[j].first;
       RuleElem *e = vec[i];
       // RO_Zeroorone
@@ -708,17 +719,18 @@ bool Automata::MatchStackVecRange(Expr *&expr, std::vector<RuleElem *> vec, unsi
     return true;
   }
 
-  // size == 1
-  if (size == 1 && vec[start]->mType == ET_Rule) {
-    unsigned idx = 0;
-    TK_Kind tk = GetFirstStackOpcode(stackstart, stackend, idx);
-    RuleElem *elem = mBaseGen->NewRuleElem(vec[start]->mData.mRule);
+  // vecsize == 1
+  if (vecsize == 1 && vec[vecstart]->mType == ET_Rule) {
+    RuleElem *elem = mBaseGen->NewRuleElem(vec[vecstart]->mData.mRule);
     Expr *newexpr = new Expr(elem);
-    if (tk != TK_Invalid) {
-      status = MatchStack(newexpr, vec[start]->mData.mRule, stackstart, idx, tk);
-    } else {
-      status = MatchStackWithExpectation(newexpr, vec[start]->mData.mRule, stackstart, stackend);
+    unsigned tkidx = 0xffff;
+    TK_Kind tk = GetFirstStackOpcode(stkstart, stkend, tkidx);
+
+    if (tkidx == 0xffff || tk == TK_Invalid) {
+      return false;
     }
+
+    status = MatchStackRule(newexpr, vec[vecstart]->mData.mRule, stkstart, stkend, tk);
 
     if (status) {
       expr->mSubExprs.push_back(newexpr);
@@ -728,28 +740,6 @@ bool Automata::MatchStackVecRange(Expr *&expr, std::vector<RuleElem *> vec, unsi
   }
 
   return status;
-}
-
-// match range of entries on stack to a rule
-bool Automata::MatchStackWithExpectation(Expr *&expr, Rule *rule, unsigned stackstart, unsigned stackend) {
-  MMSG("MatchStackWithExpectation", 0);
-  for (unsigned j = stackstart; j < stackend; j++) {
-    RuleElem *elem = mStack[j].first;
-    if (elem == NULL)
-      continue;
-
-    if (GetVerbose() >= 3) {
-      MLOC;
-      elem->Dump();
-    }
-
-    RuleElem *lookupelem = NULL;
-    if (j < mStack.size() -1) {
-      lookupelem = mStack[j+1].first;
-    }
-  }
-
-  return true;
 }
 
 // need rework to be consistent with other statements

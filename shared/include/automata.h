@@ -90,13 +90,12 @@ public:
 
   void DumpStack();
   void ProcessStack();
-  bool MatchStack(Expr *&expr, Rule *rule, unsigned stackstart, unsigned idx, TK_Kind tk);
-  bool MatchStackOp(Expr *&expr, Rule *rule, unsigned stackstart, unsigned idx, TK_Kind tk);
-  bool MatchStackRule(Expr *&expr, Rule *rule, unsigned stackstart, unsigned idx, TK_Kind tk);
-  bool MatchStackVec(Expr *&expr, std::vector<RuleElem *> vec, unsigned stackstart, unsigned idx, TK_Kind tk);
-  bool MatchStackVecRange(Expr *&expr, std::vector<RuleElem *> vec, unsigned start, unsigned end,
-                          unsigned stackstart, unsigned stackend);
-  bool MatchStackWithExpectation(Expr *&expr, Rule *rule, unsigned stackstart, unsigned stackend);
+  bool MatchStackRule(Expr *&expr, Rule *rule, unsigned stkstart, unsigned stkend, TK_Kind tk);
+  bool MatchStackOp(Expr *&expr, Rule *rule, unsigned stkstart, unsigned stkend, TK_Kind tk);
+  bool MatchStackVec(Expr *&expr, std::vector<RuleElem *> vec, unsigned stkstart, unsigned stkend, TK_Kind tk);
+  bool MatchStackVecRange(Expr *&expr, std::vector<RuleElem *> vec,
+                          unsigned vecstart, unsigned vecend, unsigned stkstart, unsigned stkend);
+
   bool ProcessDecls();
 
   int GetVerbose();
