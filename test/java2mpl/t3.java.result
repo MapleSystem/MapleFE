@@ -1,4 +1,5 @@
 Keyword    Token:  boolean
 Separator  Token:  Whitespace
+Identifier Token:  a
 Separator  Token:  Semicolon
-Segmentation fault (core dumped)
+Matched 3 tokens.

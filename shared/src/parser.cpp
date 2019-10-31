@@ -281,3 +281,22 @@ void Parser::Dump() {
   std::cout << "==================================" << std::endl;
 }
 
+
+// Utility function to handle visited rule tables.
+bool Parser::IsVisited(RuleTable *table) {
+  std::map<RuleTable*, bool>::iterator it;
+  it = mVisited.find(table);
+  if (it == mVisited.end())
+    return false;
+  if (it->second == false)
+    return false;
+  return true;
+}
+
+void Parser::SetVisited(RuleTable *table) {
+  mVisited[table] = true;
+}
+
+void Parser::ClearVisited(RuleTable *table) {
+  mVisited[table] = false;
+}

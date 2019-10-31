@@ -56,6 +56,7 @@ Token* Lexer::LexToken_autogen(void) {
   if (identifier != NULL) {
     IdentifierToken *t = (IdentifierToken*)mTokenPool.NewToken(sizeof(IdentifierToken)); 
     new (t) IdentifierToken(identifier);
+    t->Dump();
     return t;
   }
 
@@ -63,6 +64,7 @@ Token* Lexer::LexToken_autogen(void) {
   if (ld.mType != LT_NA) {
     LiteralToken *t = (LiteralToken*)mTokenPool.NewToken(sizeof(LiteralToken)); 
     new (t) LiteralToken(TK_Invalid, ld);
+    t->Dump();
     return t;
   }
 
@@ -85,7 +87,12 @@ bool Parser::Parse_autogen() {
 //       false : if failed
 // This parses just one single statement.
 bool Parser::ParseStmt_autogen() {
-  // 1. Lex tokens in a line
+  // 1. clear mVisited for parsing every statement.
+  //    Need think about when there are compound statement. Sometimes we
+  //    should have more than one mVisited.
+  mVisited.clear();
+
+  // 2. Lex tokens in a line
   //    In Lexer::PrepareForFile() already did one ReadALine().
   while (!mLexer->EndOfLine()) {
     Token* t = mLexer->LexToken_autogen();
@@ -104,7 +111,7 @@ bool Parser::ParseStmt_autogen() {
     }
   }
 
-  // 2. Match the tokens against the rule tables.
+  // 3. Match the tokens against the rule tables.
   //    In a rule table there are : (1) separtaor, operator, keyword, are already in token
   //                                (2) Identifier Table won't be traversed any more since
   //                                    lex has got the token from source program and we only
@@ -131,8 +138,16 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table) {
   unsigned old_pos = mCurToken;
   Token *curr_token = mTokens[mCurToken];
 
+  // Loop cannot be matched. It means a visited rule table should not be
+  // visited any more.
+  if (IsVisited(rule_table))
+    return false;
+  else
+    SetVisited(rule_table);
+    
   // We don't go into Identifier table.
   if ((rule_table == &TblIdentifier)) {
+    ClearVisited(rule_table);
     if (curr_token->IsIdentifier()) {
       mCurToken++;
       //std::cout << "Matched identifier token: " << curr_token << std::endl;
@@ -144,6 +159,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table) {
 
   // We don't go into Literal table.
   if ((rule_table == &TblLiteral)) {
+    ClearVisited(rule_table);
     if (curr_token->IsLiteral()) {
       mCurToken++;
       //std::cout << "Matched literal token: " << curr_token << std::endl;
@@ -217,15 +233,19 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table) {
   }
 
   // Next table
+  // There is only one data table in this case
   case ET_Data: {
+    matched = TraverseTableData(rule_table->mData);
     break;
   }
 
   case ET_Null:
-  default: {
+  default:
     break;
   }
-  }
+
+  // We are done with this rule_table, so clear the flag.
+  ClearVisited(rule_table);
 
   if(matched) {
     return true;
@@ -244,11 +264,14 @@ bool Parser::TraverseTableData(TableData *data) {
   switch (data->mType) {
   case DT_Char:
   case DT_String:
-    MASSERT(0 && "Hit Char/String in TableData during matching!");
+    //MASSERT(0 && "Hit Char/String in TableData during matching!");
+    //TODO: Need compare literal. But so far looks like it's impossible to
+    //      have a literal token able to match a string/char in rules.
     break;
   // separator, operator, keywords are planted as DT_Token.
   // just need check the pointer of token
   case DT_Token:
+    //std::cout << "Matching a token: " << data->mData.mToken << std::endl;
     if (data->mData.mToken == curr_token) {
       found = true;
       mCurToken++;

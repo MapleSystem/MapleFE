@@ -120,7 +120,7 @@ rule UnannTypeVariable : Identifier
 #rule UnannReferenceType: ONEOF(UnannClassOrInterfaceType, UnannTypeVariable, UnannArrayType)
 rule UnannReferenceType: ONEOF(UnannClassOrInterfaceType, UnannTypeVariable)
 
-rule UnannPrimitiveType: ONEOF(NumericType, Boolean)
+rule UnannPrimitiveType: ONEOF(NumericType, BoolType)
 rule UnannType: ONEOF(UnannPrimitiveType, UnannReferenceType)
 
 rule UnannClassOrInterfaceType: ONEOF(UnannClassType, UnannInterfaceType)
