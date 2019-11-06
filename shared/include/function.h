@@ -11,6 +11,8 @@
 #include "stmt.h"
 
 class Function {
+  unsigned symbolIdx;
+
  public:
   Module *mModule;
   stridx_t mStridx;
@@ -25,8 +27,10 @@ class Function {
   ~Function() {}
 
   Symbol *GetSymbol(stridx_t stridx);
+  Symbol *GetNewSymbol(tyidx_t t);
 
   void Dump();
+  void EmitCode();
 };
 
 #endif

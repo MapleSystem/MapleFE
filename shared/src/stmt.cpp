@@ -12,3 +12,10 @@ void Stmt::Dump(unsigned indent, bool withheader) {
     std::cout << "===================================" << std::endl;
   }
 }
+
+void Stmt::EmitCode(unsigned indent) {
+  std::vector<Expr *>::iterator it = mExprs.begin();
+  for(; it != mExprs.end(); it++) {
+    (*it)->EmitAction(indent, NULL);
+  }
+}

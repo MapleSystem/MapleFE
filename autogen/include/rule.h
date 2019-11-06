@@ -90,6 +90,11 @@ public:
 
   std::string GetTokenTypeString(TokenType);
 
+  bool Empty() { return (mDataType == NULL &&
+                         mTokenType == TkT_NA &&
+                         mValidity.size() == 0 &&
+                         mAction.size() == 0); }
+
   void DumpDataType(int i);
   void DumpTokenType(int i);
   void DumpValidity(int i);
@@ -143,7 +148,12 @@ public:
 
   void AddSubElem(RuleElem *e) {mSubElems.push_back(e);}
 
+  bool IsIdentifier();
+  bool IsLeaf();
+
   void Dump(bool newline = false);
+  void DumpAttr();
+  void EmitAction();
 };
 
 // a rule can contain multiple elements with actions

@@ -19,41 +19,57 @@ class Function;
 typedef uint32_t stridx_t;
 typedef uint32_t tyidx_t;
 
+class StrPtrHash {
+ public:
+  size_t operator()(const std::string *str) const {
+    return std::hash<std::string>{}(*str);
+  }
+};
+
+class StrPtrEqual {
+ public:
+  size_t operator()(const std::string *str1, const std::string *str2) const {
+    return *str1 == *str2;
+  }
+};
+
+template<typename T, typename U>
 class StringTable {
  public:
-  std::vector<std::string> string_table_;  // index is stridx_t
-  std::unordered_map<std::string, stridx_t> string_table_map_;
+  std::vector<const T*> string_table_;  // index is stridx_t
+  std::unordered_map<const T*, U, StrPtrHash, StrPtrEqual> string_table_map_;
 
  public:
   StringTable() {
     // initialize 0th entry of string_table_ with an empty string
-    std::string temp;
-    string_table_.push_back(temp);
+    T *ptr = new (std::nothrow) T;
+    string_table_.push_back(ptr);
   }
 
   virtual ~StringTable() {}
 
-  stridx_t GetGstridxFromName(const std::string &str) const {
-    auto it = string_table_map_.find(str);
+  U GetStridxFromName(T &str) const {
+    auto it = string_table_map_.find(&str);
     if (it == string_table_map_.end()) {
-      return stridx_t(0);
+      return U(0);
     }   
     return it->second;
   }
 
-  stridx_t GetOrCreateGstridxFromName(const std::string &str) {
-    stridx_t strIdx = GetGstridxFromName(str);
+  U GetOrCreateStridxFromName(T &str) {
+    U strIdx = GetStridxFromName(str);
     if (strIdx == 0) {
       strIdx = string_table_.size();
-      string_table_.push_back(str);
-      string_table_map_[str] = strIdx;
+      T *newStr = new (std::nothrow) T(str);
+      string_table_.push_back(newStr);
+      string_table_map_[newStr] = strIdx;
     }   
     return strIdx;
   }
 
-  const std::string &GetStringFromGstridx(stridx_t stridx) const {
+  const T &GetStringFromStridx(U stridx) const {
     MASSERT(stridx < string_table_.size());
-    return string_table_.at(stridx);
+    return *string_table_[stridx];
   }
 };
 
@@ -81,7 +97,6 @@ class TypeTable {
 
 class Module {
 public:
-  StringTable mStrTable;
   std::vector<Symbol *> mSymbolTable;
   std::vector<Function *> mFuncs;
 
@@ -91,6 +106,18 @@ public:
 
   Symbol *GetSymbol(stridx_t stridx);
   void Dump();
+};
+
+class GlobalTables {
+ public:
+  GlobalTables() = default;
+  ~GlobalTables() = default;
+
+  static StringTable<std::string, stridx_t> &GetStringTable() { return globalTables.mStrTable; }
+
+ private:
+  StringTable<std::string, stridx_t> mStrTable;
+  static GlobalTables globalTables;
 };
 
 #endif
