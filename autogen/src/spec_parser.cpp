@@ -538,7 +538,9 @@ bool SPECParser::ParseAttrValidity() {
 
   tk = mLexer->NextToken();
   std::vector<RuleAttr *> attrvec;
-  if (tk == SPECTK_Dot) {
+  if (tk != SPECTK_Dot) {
+    attrvec.push_back(attr);
+  } else {
     // for specific elements
     tk = mLexer->NextToken();
     if (tk != SPECTK_Percent)
@@ -556,8 +558,6 @@ bool SPECParser::ParseAttrValidity() {
       if (tk == SPECTK_Coma)
         tk = mLexer->NextToken();
     }
-  } else {
-    attrvec.push_back(attr);
   }
 
   if (tk != SPECTK_Colon)
@@ -591,7 +591,9 @@ bool SPECParser::ParseAttrAction() {
 
   tk = mLexer->NextToken();
   std::vector<RuleAttr *> attrvec;
-  if (tk == SPECTK_Dot) {
+  if (tk != SPECTK_Dot) {
+    attrvec.push_back(attr);
+  } else {
     // for specific elements
     tk = mLexer->NextToken();
     if (tk != SPECTK_Percent)
@@ -609,8 +611,6 @@ bool SPECParser::ParseAttrAction() {
       if (tk == SPECTK_Coma)
         tk = mLexer->NextToken();
     }
-  } else {
-    attrvec.push_back(attr);
   }
 
   if (tk != SPECTK_Colon)

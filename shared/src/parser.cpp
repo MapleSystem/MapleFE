@@ -70,7 +70,7 @@ bool Parser::Parse() {
           }
         } else {
           // global symbol
-          stridx_t stridx = mModule->mStrTable.GetOrCreateGstridxFromName(s);
+          stridx_t stridx = GlobalTables::GetStringTable().GetOrCreateStridxFromName(s);
           if (!mModule->GetSymbol(stridx)) {
             MMSG("global var ", s);
             Symbol *sb = new Symbol(stridx, inttyidx);
@@ -82,7 +82,7 @@ bool Parser::Parse() {
       case TK_Name:
       {
         std::string s = mLexer->GetTokenString();
-        stridx_t stridx = mModule->mStrTable.GetOrCreateGstridxFromName(s);
+        stridx_t stridx = GlobalTables::GetStringTable().GetOrCreateStridxFromName(s);
         if (mModule->GetSymbol(stridx)) {
           
         }
@@ -170,7 +170,7 @@ bool Parser::ParseFuncArgs(Function *func) {
         // check if it is prototype only without variable
         if (tk->mTkKind != TK_Comma || tk->mTkKind != TK_Rparen) {
           std::string s = mLexer->GetTokenString();
-          stridx_t stridx = mModule->mStrTable.GetOrCreateGstridxFromName(s);
+          stridx_t stridx = GlobalTables::GetStringTable().GetOrCreateStridxFromName(s);
           Symbol *sb = currfunc->GetSymbol(stridx);
           if (!sb) {
             if (GetVerbose() >= 3) {
@@ -220,7 +220,7 @@ bool Parser::ParseStmt(Function *func) {
       case TK_Name:
       {
         std::string s = mLexer->GetTokenString();
-        stridx_t stridx = mModule->mStrTable.GetOrCreateGstridxFromName(s);
+        stridx_t stridx = GlobalTables::GetStringTable().GetOrCreateStridxFromName(s);
         Symbol *sb = currfunc->GetSymbol(stridx);
         // either in decl or sb should be exist
         MASSERT(isDecl || sb);
@@ -278,6 +278,11 @@ bool Parser::ParseStmt(Function *func) {
 
 void Parser::Dump() {
   std::cout << "\n================= Code ===========" << std::endl;
+  if (GetVerbose() >= 3) {
+    for (auto it: mModule->mFuncs) {
+      it->EmitCode();
+    }
+  }
   std::cout << "==================================" << std::endl;
 }
 

@@ -647,6 +647,13 @@ bool Automata::MatchStackVec(Expr *&expr, std::vector<RuleElem *> vec, unsigned 
       status  = MatchStackVecRange(expr, vec, tkidx + 1, vecend, stkidx + 1, stkend);
 
       if (status) {
+        // finished a match
+        expr->mSymbol = currfunc->GetNewSymbol(inttyidx);
+        if (GetVerbose() >= 3) {
+          std::cout << "match -- expr " << std::hex << expr << " " << expr->mSymbol << std::dec << std::endl;
+          std::cout << "name " << GlobalTables::GetStringTable().GetStringFromStridx(expr->mSymbol->mStridx) << std::endl;
+          expr->Dump(0);
+        }
         break;
       } else {
         // restore expr by deleting newly added into expr->mSubExprs
@@ -709,11 +716,13 @@ bool Automata::MatchStackVecRange(Expr *&expr, std::vector<RuleElem *> vec, unsi
 
           // symbol expr which is a subexpr
           stridx_t stridx = mStack[j].second->mStridx;
-          std::string str = mModule->mStrTable.GetStringFromGstridx(stridx);
+          std::string str = GlobalTables::GetStringTable().GetStringFromStridx(stridx);
           RuleElem *symbolelem = mBaseGen->NewRuleElem(str);
           Expr *symbolexpr = new Expr(symbolelem);
           newexpr->mSubExprs.push_back(symbolexpr);
         }
+      } else {
+        break;
       }
     }
     return true;
@@ -760,7 +769,7 @@ bool Automata::ProcessDecls() {
       MASSERT(elem->mType == ET_Rule && "expect a rule");
       // symbol expr which is a subexpr
       stridx_t stridx = mStack[j].second->mStridx;
-      std::string str = mModule->mStrTable.GetStringFromGstridx(stridx);
+      std::string str = GlobalTables::GetStringTable().GetStringFromStridx(stridx);
       RuleElem *symbolelem = mBaseGen->NewRuleElem(str);
       Expr *symbolexpr = new Expr(symbolelem);
       expr->mSubExprs.push_back(symbolexpr);
@@ -772,7 +781,7 @@ bool Automata::ProcessDecls() {
       tyidx = inttyidx;
     } else if (elem->mType == ET_Rule) {
       stridx_t stridx = mStack[j].second->mStridx;
-      std::string s = mModule->mStrTable.GetStringFromGstridx(stridx);
+      std::string s = GlobalTables::GetStringTable().GetStringFromStridx(stridx);
       currfunc = mParser->currfunc;
       if (currfunc) {
         // local symbol
@@ -791,11 +800,12 @@ bool Automata::ProcessDecls() {
 
 void Automata::DumpStack() {
   std::cout << "\n\n============= Dump Stack =========" << std::endl;
+  unsigned idx = 0;
   for (auto it: mStack) {
-    std::cout << "Elem: ";
+    std::cout << idx++ << " ";
     it.first->Dump();
     if (it.second) {
-      std::string str = mModule->mStrTable.GetStringFromGstridx(it.second->mStridx);
+      std::string str = GlobalTables::GetStringTable().GetStringFromStridx(it.second->mStridx);
       std::cout << "\t symbol: " << str;
     }
     std::cout << std::endl;

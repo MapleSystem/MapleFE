@@ -117,6 +117,24 @@ const char *RuleElem::GetRuleOpName() {
   return;
 }
 
+bool RuleElem::IsLeaf() {
+  if (mType == ET_Char ||
+      mType == ET_String ||
+      mType == ET_Op ||
+      mType == ET_Type)
+    return true;
+
+  return IsIdentifier();
+}
+
+bool RuleElem::IsIdentifier() {
+  if (mType != ET_Rule)
+    return false;
+  if (mData.mRule->mName == "Identifier")
+    return true;
+  return false;
+}
+
 void RuleElem::Dump(bool newline) {
   switch (mType) {
     case ET_Char:
@@ -183,10 +201,30 @@ void RuleElem::Dump(bool newline) {
       break;
   }
 
+  if (0 && !mAttr->Empty()) {
+    std::cout << " -- ";
+    // Dump Attributes
+    DumpAttr();
+  }
+
   if (newline) {
     std::cout << std::endl;
   }
+
   return;
+}
+
+void RuleElem::DumpAttr() {
+  mAttr->DumpDataType(0);
+  mAttr->DumpTokenType(0);
+  mAttr->DumpValidity(0);
+  for (int i = 0; i < mSubElems.size(); i++) {
+    mSubElems[i]->mAttr->DumpValidity(i+1);
+  }
+  mAttr->DumpAction(0);
+  for (int i = 0; i < mSubElems.size(); i++) {
+    mSubElems[i]->mAttr->DumpAction(i+1);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -223,8 +261,11 @@ void Rule::Dump() {
   if (mElement->mSubElems.size())
     std::cout << ")" << std::endl;
 
-  // Dump Attributes
-  DumpAttr();
+  if (!mAttr->Empty()) {
+    std::cout << " -- ";
+    // Dump Attributes
+    DumpAttr();
+  }
 
   return;
 }

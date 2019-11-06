@@ -14,6 +14,7 @@ class Stmt {
 
   Stmt() {}
   void Dump(unsigned indent, bool withheader = true);
+  void EmitCode(unsigned indent);
 };
 
 #endif

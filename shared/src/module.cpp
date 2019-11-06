@@ -9,3 +9,5 @@ Symbol *Module::GetSymbol(stridx_t stridx) {
   return NULL;
 }
 
+GlobalTables GlobalTables::globalTables;
+
