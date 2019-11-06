@@ -72,7 +72,59 @@ Token* Lexer::LexToken_autogen(void) {
 }
 
 //////////////////////////////////////////////////////////////////////////////////
-//          Framework based on Autogen + Token
+//                           Parsing System
+//
+// 1. Cycle Reference
+//
+// The most important thing in parsing is how to HANDLE CYCLES in the rules. Take
+// rule additiveExpression for example. It calls itself in the second element.
+// Should we keep parsing when we find a cycle? If yes, is there any concern we
+// need to address?
+//
+// rule MultiplicativeExpression : ONEOF(
+//   UnaryExpression,  ---------------------> it can parse a variable name.
+//   MultiplicativeExpression + '*' + UnaryExpression,
+//   MultiplicativeExpression + '/' + UnaryExpression,
+//   MultiplicativeExpression + '%' + UnaryExpression)
+//
+// rule AdditiveExpression : ONEOF(
+//   MultiplicativeExpression,
+//   AdditiveExpression + '+' + MultiplicativeExpression,
+//   AdditiveExpression + '-' + MultiplicativeExpression)
+//   attr.action.%2,%3 : GenerateBinaryExpr(%1, %2, %3)
+//
+// The answer is yes, cycle is useful in real life. It needs to keep looping.
+// a + b + c + d + ... is a good example showing loops of AdditiveExpression.
+//
+// Another good example is Block. There are nested blocks. So loop exists.
+//
+// However, there is a concern which is how to avoid ENDLESS LOOP, and how to
+// figure out Valuable Loop vs. Endless Loop. If it's a valuable loop we keep
+// parsing, if it's an endless loop, we stop parsing.
+//
+// A loop is valuable if the mCurToken moves after an iteration of the loop.
+// A loop is endless if mCurToken doesn't move between iterations.
+// This is determined through the mVisitedStack which records the mCurToken each
+// time we hit the ruletable once we are in a loop.
+//
+// Border conditions:  (1) The first time a table is hit, it's set Visited. We
+//                         don's push to the stack since no loop so far.
+//                     (2) The second time a table is hit, current token position
+//                         is pushed. Now we are forming a loop, but we are not
+//                         comparing its current position with the previous one since
+//                         it's just a one iteration loop. We allow it go
+//                         on until in third time where we can prove it's endless.
+//                     (3) From second time on, each time a rule is done, its token
+//                         position is popped from the stack.
+//                     (4) From the third time on, start checking if the position
+//                         has moved compared to the previous one.
+//
+// Parsing Time Issue
+// 
+// The rules are referencing each other and could increase the parsing time extremely.
+// In order to save time, the first thing is avoiding entering a rule for the second
+// time with the same token position if that rule has failed before. This is the
+// origin of mFailed.
 //////////////////////////////////////////////////////////////////////////////////
 
 bool Parser::Parse_autogen() {
@@ -88,9 +140,13 @@ bool Parser::Parse_autogen() {
 // This parses just one single statement.
 bool Parser::ParseStmt_autogen() {
   // 1. clear mVisited for parsing every statement.
-  //    Need think about when there are compound statement. Sometimes we
-  //    should have more than one mVisited.
+  //    TODO: Need think about when there are compound statement. Sometimes we
+  //          should have more than one mVisited.
+  //          Like block, which crosses multiple statements.
   mVisited.clear();
+
+  // clear the failed info.
+  ClearFailed();
 
   // 2. Lex tokens in a line
   //    In Lexer::PrepareForFile() already did one ReadALine().
@@ -124,10 +180,9 @@ bool Parser::ParseStmt_autogen() {
 bool Parser::TraverseStmt() {
   bool succ = TraverseRuleTable(&TblStatement);
   if (mTokens.size() != mCurToken)
-    MASSERT(0 && "some tokens left unmatched!");
+    std::cout << "Illegal syntax detected!" << std::endl;
   else
     std::cout << "Matched " << mCurToken << " tokens." << std::endl;
-
   return succ;
 }
 
@@ -138,14 +193,33 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table) {
   unsigned old_pos = mCurToken;
   Token *curr_token = mTokens[mCurToken];
 
-  // Loop cannot be matched. It means a visited rule table should not be
-  // visited any more.
-  if (IsVisited(rule_table))
+  //
+  if (WasFailed(rule_table, mCurToken))
     return false;
-  else
+
+  if (IsVisited(rule_table)) {
+    //std::cout << " ==== " << std::endl;
+    //std::cout << "In table " << rule_table << " mCurToken " << mCurToken;
+    // If there is already token position in stack, it means we are at at least the
+    // 3rd instance. So need check if we made any progress between the two instances.
+    //
+    // This is not a failure case, don't need put into mFailed.
+    //
+    if (mVisitedStack[rule_table].size() > 0) {
+      unsigned prev = mVisitedStack[rule_table].back();
+      if (mCurToken == prev) {
+        //std::cout << " An endless loop." << std::endl;
+        return false; 
+      }
+    }
+    // push the current token position
+    VisitedPush(rule_table);
+  } else {
     SetVisited(rule_table);
+  }
     
   // We don't go into Identifier table.
+  // No mVisitedStack invovled for identifier table.
   if ((rule_table == &TblIdentifier)) {
     ClearVisited(rule_table);
     if (curr_token->IsIdentifier()) {
@@ -153,11 +227,13 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table) {
       //std::cout << "Matched identifier token: " << curr_token << std::endl;
       return true;
     } else {
+      AddFailed(rule_table, mCurToken);
       return false;
     }
   }
 
   // We don't go into Literal table.
+  // No mVisitedStack invovled for literal table.
   if ((rule_table == &TblLiteral)) {
     ClearVisited(rule_table);
     if (curr_token->IsLiteral()) {
@@ -165,6 +241,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table) {
       //std::cout << "Matched literal token: " << curr_token << std::endl;
       return true;
     } else {
+      AddFailed(rule_table, mCurToken);
       return false;
     }
   }
@@ -173,14 +250,29 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table) {
   EntryType type = rule_table->mType;
 
   switch(type) {
+
+  // There is an issue in this case. Any rule which can consume one or more tokens is
+  // considered 'found'. However, we need find the one which consume the most tokens.
+  // [Question, TODO]: It this right? ...
+  
   case ET_Oneof: {
     bool found = false;
+    unsigned new_mCurToken = mCurToken; // position after most tokens eaten
+    unsigned old_mCurToken = mCurToken;
     for (unsigned i = 0; i < rule_table->mNum; i++) {
       TableData *data = rule_table->mData + i;
-      found = found | TraverseTableData(data);
-      if (found)
-        break;
+      bool temp_found = TraverseTableData(data);
+      found = found | temp_found;
+      if (temp_found) {
+        if (mCurToken > new_mCurToken)
+          new_mCurToken = mCurToken;
+        // Need restore the position of original mCurToken,
+        // in order to catch the most tokens.
+        mCurToken = old_mCurToken;
+      }
     }
+    // move position after most tokens are eaten
+    mCurToken = new_mCurToken;
     matched = found; 
     break;
   }
@@ -244,13 +336,20 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table) {
     break;
   }
 
-  // We are done with this rule_table, so clear the flag.
-  ClearVisited(rule_table);
+  // If we are leaving the first instance of this rule_table, so clear the flag.
+  // Or we pop out the last token position.
+  if (mVisitedStack[rule_table].size() == 0)
+    ClearVisited(rule_table);
+  else
+    VisitedPop(rule_table);
 
   if(matched) {
+    //std::cout << " matched." << std::endl;
     return true;
   } else {
-    mLexer->curidx = old_pos;
+    //std::cout << " unmatched." << std::endl;
+    mCurToken = old_pos;
+    AddFailed(rule_table, mCurToken);
     return false;
   }
 }

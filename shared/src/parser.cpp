@@ -294,9 +294,38 @@ bool Parser::IsVisited(RuleTable *table) {
 }
 
 void Parser::SetVisited(RuleTable *table) {
+  //std::cout << " set visited " << table;
   mVisited[table] = true;
 }
 
 void Parser::ClearVisited(RuleTable *table) {
+  //std::cout << " clear visited " << table;
   mVisited[table] = false;
+}
+
+// Push the current position into stack, as we are entering the table again.
+void Parser::VisitedPush(RuleTable *table) {
+  //std::cout << " push " << mCurToken << " from " << table;
+  mVisitedStack[table].push_back(mCurToken);
+}
+
+// Pop the last position in stack, as we are leaving the table again.
+void Parser::VisitedPop(RuleTable *table) {
+  //std::cout << " pop " << " from " << table;
+  mVisitedStack[table].pop_back();
+}
+
+// Add one fail case for the table
+void Parser::AddFailed(RuleTable *table, unsigned token) {
+  //std::cout << " push " << mCurToken << " from " << table;
+  mFailed[table].push_back(token);
+}
+
+bool Parser::WasFailed(RuleTable *table, unsigned token) {
+  std::vector<unsigned>::iterator it = mFailed[table].begin();
+  for (; it != mFailed[table].end(); it++) {
+    if (*it == token)
+      return true;
+  }
+  return false;
 }

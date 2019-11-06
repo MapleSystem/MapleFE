@@ -38,14 +38,18 @@ public:
 private:
   std::vector<Token*>   mTokens;   // vector for tokens during matching.
   unsigned              mCurToken; // index in mTokens, 1st to-be-matched token.
-                                   // tokens before it have been matched.
-  std::map<RuleTable *, bool> mVisited; // visited rule tables during matching a single statement.
-                                        // So far, all cases are simple. To make life easier,
-                                        // we don't need look into loops in the rules.
-                                        // However, most of case is not a loop: such as a rule is visited
-                                        // and then done. and it's correct to clear their visited mark,
-                                        // so that they can be re-visited.
-                                        // TODO: Need further investigate, Think of nested blocks
+                                   // Tokens before it have been matched.
+
+  // I'm using two data structures to record the status of cycle reference.
+  // See the detailed comments in the implementation of Parser::Parse().
+  //   1. mVisited tells if we are in a loop.
+  //   2. mVisitedStack tells the token position of each iteration in the loop
+  std::map<RuleTable *, bool> mVisited;
+  std::map<RuleTable *, std::vector<unsigned>> mVisitedStack;
+
+  // Using this map to record all the failed tokens for a rule.
+  // See the detailed comments in Parser::Parse().
+  std::map<RuleTable *, std::vector<unsigned>> mFailed;
 
   bool TraverseRuleTable(RuleTable*); // success if all tokens are matched.
   bool TraverseTableData(TableData*); // success if all tokens are matched.
@@ -53,6 +57,12 @@ private:
   bool IsVisited(RuleTable*);
   void SetVisited(RuleTable*);
   void ClearVisited(RuleTable*);
+  void VisitedPush(RuleTable*);
+  void VisitedPop(RuleTable*);
+
+  void ClearFailed() {mFailed.clear();}
+  void AddFailed(RuleTable *, unsigned);
+  bool WasFailed(RuleTable *, unsigned);
 
 public:
   Parser(const char *f, Module *m);
