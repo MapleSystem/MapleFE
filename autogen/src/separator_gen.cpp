@@ -69,8 +69,13 @@ const std::string SeparatorGen::EnumNextElem(){
 
 // Fill Map
 void SeparatorGen::ProcessStructData() {
-  for (auto it: mStructs) {
-    for (auto eit: it->mStructElems) {
+  std::vector<StructBase *>::iterator it = mStructs.begin();
+  for (; it != mStructs.end(); it++) {
+    // Sort
+    StructBase *sb = *it;
+    sb->Sort(0);
+
+    for (auto eit: sb->mStructElems) {
       const std::string s(eit->mDataVec[1]->GetString());
       SepId id = FindSeparatorId(s);
       AddEntry(eit->mDataVec[0]->GetString(), id);

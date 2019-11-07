@@ -68,8 +68,13 @@ const std::string OperatorGen::EnumNextElem(){
 
 // Fill Map
 void OperatorGen::ProcessStructData() {
-  for (auto it: mStructs) {
-    for (auto eit: it->mStructElems) {
+  std::vector<StructBase *>::iterator it = mStructs.begin();
+  for (; it != mStructs.end(); it++) {
+    // Sort
+    StructBase *sb = *it;
+    sb->Sort(0);
+
+    for (auto eit: sb->mStructElems) {
       const std::string s(eit->mDataVec[1]->GetString());
       OprId id = FindOperatorId(s);
       AddEntry(eit->mDataVec[0]->GetString(), id);

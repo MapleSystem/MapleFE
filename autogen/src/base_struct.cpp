@@ -1,4 +1,5 @@
 #include <iostream>
+#include <list>
 #include "base_struct.h"
 #include "stringpool.h"
 
@@ -54,5 +55,44 @@ void StructData::Dump() {
     case DK_String:
       std::cout << "\"" << mValue.mString << "\"";
       break;
+  }
+}
+
+// Some STRUCT has certain requirement of order. Eg. the operator
+// need to be sorted by the length of their keywords, with the longer
+// keyword operator being ahead of shorter one. In this way, the language
+// parser can find the correct operator if it find the first matching
+// keyword. Take a look at '+' and '++'. '++' should be saved before '+'.
+//
+// 'idx' is the index of the element in the StructElem, and this element
+// must be a string.
+//
+// The original data structure is a vector. The sorting is using a bubble
+// sorting. To accomodate the frequent insertion of element, I'm using a list
+// for temporary data structure. After it's done, it will be copied back to
+// the original vector.
+void StructBase::Sort(unsigned idx) {
+  std::list<StructElem*> templist;
+  std::vector<StructElem *>::iterator eit = mStructElems.begin();
+
+  for (; eit != mStructElems.end(); eit++) {
+    StructElem *elem = *eit;
+    // insert the element into the templist, making the longer elem at front
+    std::list<StructElem*>::iterator lit = templist.begin();
+    for (; lit != templist.end(); lit++) {
+      StructElem *tempelem = *lit;
+      const char *elem_str = elem->GetString(idx);
+      const char *tempelem_str = tempelem->GetString(idx);
+      if (strlen(elem_str) >= strlen(tempelem_str))
+        break;
+    }
+    templist.insert(lit, elem);
+  }
+
+  // copy list back into vector.
+  mStructElems.clear();
+  std::list<StructElem*>::iterator lit = templist.begin();
+  for (; lit != templist.end(); lit++) {
+    mStructElems.push_back(*lit);
   }
 }

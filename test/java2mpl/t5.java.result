@@ -1,7 +1,5 @@
+Keyword    Token:  int
+Separator  Token:  Whitespace
 Identifier Token:  a
-Operator   Token:  Assign
-Identifier Token:  a
-Operator   Token:  Add
-Identifier Token:  b
 Separator  Token:  Semicolon
-Matched 6 tokens.
+Matched 3 tokens.

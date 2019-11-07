@@ -77,8 +77,9 @@ class StructData {
 };
 
 class StructElem {
- public:
+public:
   std::vector<StructData *> mDataVec;
+  const char* GetString(unsigned i) {return mDataVec[i]->GetString();}
   void Dump();
 };
 
@@ -95,8 +96,9 @@ public:
   ~StructBase(){}
 
   void SetName(const char *s) { mName = s; }
-  void Dump();
   bool Empty() {return mStructElems.size() == 0;}
+  void Dump();
+  void Sort(unsigned i);  // sort by the length of i-th element which is astring 
 };
 
 #endif

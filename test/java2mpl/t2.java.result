@@ -12,4 +12,4 @@ Operator   Token:  Assign
 Separator  Token:  Whitespace
 Integer Literal Token: 0
 Separator  Token:  Semicolon
-Matched 9 tokens.
+Matched 4 tokens.

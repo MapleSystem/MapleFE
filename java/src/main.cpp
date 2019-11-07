@@ -148,6 +148,10 @@ bool Parser::ParseStmt_autogen() {
   // clear the failed info.
   ClearFailed();
 
+  // clear the tokens.
+  mTokens.clear();
+  mCurToken = 0;
+
   // 2. Lex tokens in a line
   //    In Lexer::PrepareForFile() already did one ReadALine().
   while (!mLexer->EndOfLine()) {
