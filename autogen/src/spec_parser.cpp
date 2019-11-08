@@ -20,10 +20,10 @@ void SPECParser::ParserError(std::string msg, std::string str) {
   std::cout << "file " << mFilename << std::endl;
   std::cout << "line " << mLexer->GetLineNum() << std::endl;
   std::cout << mLexer->GetLine() << std::endl;
-  if (mLexer->GetCuridx() <= 3) {
+  if (mLexer->GetCuridx() <= 2) {
     std::cout << "^\n" << std::endl;
   } else {
-    std::string s(mLexer->GetCuridx()-2, '-');
+    std::string s(mLexer->GetCuridx()-1, '-');
     std::cout << s << "^\n" << std::endl;
   }
   MLOC;
@@ -73,9 +73,7 @@ bool SPECParser::Parse() {
         atEof = true;
         break;
       default:
-        MMSG("  >>>> LINE: ", mLexer->GetLine());
-        MMSGA3 ("expect a rule or struct, but get, Prev Token: ", mLexer->GetTokenString(tk_prev),
-                "Curr Token:",  mLexer->GetTokenString());
+        ParserError("expect a rule or a struct but get ", mLexer->GetTokenString());
         break;
     }
 
