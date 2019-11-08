@@ -113,19 +113,16 @@ rule TYPE: ONEOF(PrimitiveType, ReferenceType, NullType)
 
 rule UnannClassType: ONEOF(Identifier + ZEROORONE(TypeArguments),
         UnannClassOrInterfaceType + '.' + ZEROORMORE(Annotation) + Identifier + ZEROORONE(TypeArguments))
+rule UnannClassOrInterfaceType: ONEOF(UnannClassType, UnannInterfaceType)
 rule UnannInterfaceType : UnannClassType
 rule UnannTypeVariable : Identifier
 
-# UnannArrayType no implemented yet
-#rule UnannReferenceType: ONEOF(UnannClassOrInterfaceType, UnannTypeVariable, UnannArrayType)
-rule UnannReferenceType: ONEOF(UnannClassOrInterfaceType, UnannTypeVariable)
+rule UnannArrayType : ONEOF(UnannPrimitiveType + Dims,
+                            UnannClassOrInterfaceType + Dims,
+                            UnannTypeVariable + Dims)
+rule UnannReferenceType: ONEOF(UnannClassOrInterfaceType, UnannTypeVariable, UnannArrayType)
 
 rule UnannPrimitiveType: ONEOF(NumericType, BoolType)
 rule UnannType: ONEOF(UnannPrimitiveType, UnannReferenceType)
 
-rule UnannClassOrInterfaceType: ONEOF(UnannClassType, UnannInterfaceType)
 
-# Dims is not implemented yet
-#rule UnannArrayType : ONEOF(UnannPrimitiveType + Dims,
-#                            UnannClassOrInterfaceType + Dims,
-#                            UnannTypeVariable + Dims)

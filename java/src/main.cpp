@@ -281,21 +281,37 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table) {
     break;
   }
 
-  // moves until hit a NON-target data
-  // It always return true because it doesn't matter how many target hit.
+  // It always return true.
+  // Moves until hit a NON-target data
+  // [Note]
+  //   1. Every iteration we go through all table data, and pick the one eating most tokens.
+  //   2. If noone of table data can read the token. It's the end.
+  //   3. The final mCurToken needs to be updated.
   case ET_Zeroormore: {
     matched = true;
     while(1) {
       bool found = false;
+      unsigned old_pos = mCurToken;
+      unsigned new_pos = mCurToken;
       for (unsigned i = 0; i < rule_table->mNum; i++) {
+        // every table entry starts from the old_pos
+        mCurToken = old_pos;
         TableData *data = rule_table->mData + i;
         found = found | TraverseTableData(data);
-        // The first element is hit, then we restart the loop.
-        if (found)
-          break;
+        if (mCurToken > new_pos)
+          new_pos = mCurToken;
       }
+
+      // If hit the first non-target, stop it.
       if (!found)
         break;
+
+      // Sometimes 'found' is true, but actually nothing was read becauser the 'true'
+      // is coming from a Zeroorone or Zeroormore. So need check this.
+      if (new_pos == old_pos)
+        break;
+      else
+        mCurToken = new_pos;
     }
     break;
   }
