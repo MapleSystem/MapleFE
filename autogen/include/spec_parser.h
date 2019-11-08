@@ -28,10 +28,14 @@ public:
   AutoGen      *mAutoGen;
   BaseGen      *mBaseGen;
   Rule         *mCurrrule;
+  std::string   mFilename;
 
 public:
   SPECParser() { mLexer = new SPECLexer(); }
-  SPECParser(const std::string &dfile) { mLexer = new SPECLexer(); ResetParser(dfile); }
+  SPECParser(const std::string &dfile) : mFilename(dfile) {
+    mLexer = new SPECLexer();
+    ResetParser(dfile);
+  }
   ~SPECParser() { delete mLexer; }
 
   // for all ParseXXX routines
@@ -64,6 +68,7 @@ public:
   void SetVerbose(int i) { mLexer->SetVerbose(i); }
   int GetVerbose() { return mLexer->GetVerbose(); }
 
+  void ParserError(std::string msg, std::string str);
   void DumpRules();
   void DumpStruct();
   void Dump() { DumpStruct(); DumpRules(); }

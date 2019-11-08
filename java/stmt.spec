@@ -21,7 +21,7 @@ rule VariableDeclarator : VariableDeclaratorId + ZEROORONE('=' + VariableInitial
 
 rule VariableDeclaratorId : Identifier + ZEROORONE(Dims)
 
-rule Dims : ZEROORMORE(Annotation) + '[' + ']' + ZEROORMORE(ZEROORMORE(Annotation) '[' + ']')
+rule Dims : ZEROORMORE(Annotation) + '[' + ']' + ZEROORMORE(ZEROORMORE(Annotation) + '[' + ']')
 
 rule VariableInitializer : ONEOF(
   Expression,
@@ -145,7 +145,7 @@ rule LocalVariableType : ONEOF(
 
 rule VariableDeclaratorId : Identifier + ZEROORONE(Dims)
 
-rule Dims : ZEROORMORE(Annotation) + '[' + ']' + ZEROORMORE(ZEROORMORE(Annotation) '[' + ']')
+rule Dims : ZEROORMORE(Annotation) + '[' + ']' + ZEROORMORE(ZEROORMORE(Annotation) + '[' + ']')
 
 rule BreakStatement : "break" + ZEROORONE(Identifier) + ';'
 
@@ -179,7 +179,7 @@ rule VariableModifier : ONEOF(
 
 rule VariableDeclaratorId : Identifier + ZEROORONE(Dims)
 
-rule Dims : ZEROORMORE(Annotation) + '[' + ']' + ZEROORMORE(ZEROORMORE(Annotation) '[' + ']')
+rule Dims : ZEROORMORE(Annotation) + '[' + ']' + ZEROORMORE(ZEROORMORE(Annotation) + '[' + ']')
 
 rule TryWithResourcesStatement : "try" + ResourceSpecification + Block + ZEROORONE(Catches) + ZEROORONE(Finally)
 

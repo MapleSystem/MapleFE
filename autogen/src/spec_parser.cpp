@@ -15,11 +15,29 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
+void SPECParser::ParserError(std::string msg, std::string str) { 
+  std::cout << "\n================================= spec file syntax error ============================" << std::endl;
+  std::cout << "file " << mFilename << std::endl;
+  std::cout << "line " << mLexer->GetLineNum() << std::endl;
+  std::cout << mLexer->GetLine() << std::endl;
+  if (mLexer->GetCuridx() <= 3) {
+    std::cout << "^\n" << std::endl;
+  } else {
+    std::string s(mLexer->GetCuridx()-2, '-');
+    std::cout << s << "^\n" << std::endl;
+  }
+  MLOC;
+  std::cout << msg << " " << str << std::endl;
+  std::cout << "=====================================================================================" << std::endl;
+  assert(0);
+}
+
 // pass spec file
 void SPECParser::ResetParser(const std::string &dfile) {
   if (GetVerbose() >= 3)
     MMSG("  >>>> File: ", dfile);
   // init lexer
+  mFilename = dfile;
   mLexer->PrepareForFile(dfile);
 }
 
@@ -81,13 +99,13 @@ bool SPECParser::ParseRule() {
   // rule
   SPECTokenKind tk = mLexer->GetToken();
   if (tk != SPECTK_Rule)
-    MMSGA("expect 'rule' but get ", mLexer->GetTokenString());
+    ParserError("expect 'rule' but get ", mLexer->GetTokenString());
 
   // NAME
   tk = mLexer->NextToken();
   std::string name = mLexer->GetTokenString();
   if (tk != SPECTK_Name)
-    MMSGA("expect a name but get ", name);
+    ParserError("expect a name but get ", name);
 
   Rule *rule = mBaseGen->FindRule(name);
   if (!rule) {
@@ -102,7 +120,7 @@ bool SPECParser::ParseRule() {
   // :
   tk = mLexer->NextToken();
   if (tk != SPECTK_Colon)
-    MMSGA("expect ':' but get ", mLexer->GetTokenString());
+    ParserError("expect ':' but get ", mLexer->GetTokenString());
 
   // Element
   RuleElem *elem = NULL;
@@ -111,7 +129,7 @@ bool SPECParser::ParseRule() {
   if (status) {
     rule->SetElement(elem);
   } else {
-    MMSGA ("Unexpected token: ", mLexer->GetTokenString());
+    ParserError ("Unexpected token: ", mLexer->GetTokenString());
   }
 
   return status;
@@ -179,7 +197,7 @@ bool SPECParser::ParseElement(RuleElem *&elem, bool allowConcat) {
       elem = mBaseGen->NewRuleElem();
       break;
     default: {
-      MMSGA("unexpected token ", mLexer->GetTokenString());
+      ParserError("unexpected token ", mLexer->GetTokenString());
     }
   }
 
@@ -192,7 +210,7 @@ bool SPECParser::ParseElement(RuleElem *&elem, bool allowConcat) {
     RuleElem *sub_elem = elem;
     elem = mBaseGen->NewRuleElem();
     while (sub_elem == elem) {
-      MMSGA("Should have gotten a new address", name);
+      ParserError("Should have gotten a new address", name);
       elem = mBaseGen->NewRuleElem();
     }
     elem->SetRuleOp(RO_Concatenate);
@@ -205,7 +223,7 @@ bool SPECParser::ParseElement(RuleElem *&elem, bool allowConcat) {
   if (tk == SPECTK_Actionfunc) {
     status = ParseActionFunc(elem);
     if (!status) {
-      MMSGA ("Error parsing action: ", mLexer->GetTokenString());
+      ParserError ("Error parsing action: ", mLexer->GetTokenString());
     }
   }
 
@@ -216,12 +234,12 @@ bool SPECParser::ParseElement(RuleElem *&elem, bool allowConcat) {
 bool SPECParser::ParseActionFunc(RuleElem *&elem) {
   SPECTokenKind tk = mLexer->GetToken();
   if (tk != SPECTK_Actionfunc)
-    MMSGA ("expect \"==>\" but get ", mLexer->GetTokenString());
+    ParserError ("expect \"==>\" but get ", mLexer->GetTokenString());
 
   // func
   tk = mLexer->NextToken();
   if (tk != SPECTK_Func)
-    MMSGA ("expect func but get ", mLexer->GetTokenString());
+    ParserError ("expect func but get ", mLexer->GetTokenString());
 
   tk = mLexer->NextToken();
   RuleAction *action = GetAction();
@@ -234,7 +252,7 @@ RuleAction *SPECParser::GetAction() {
   // funcname
   SPECTokenKind tk = mLexer->GetToken();
   if (tk != SPECTK_Name)
-    MMSGA ("expect name but get ", mLexer->GetTokenString());
+    ParserError ("expect name but get ", mLexer->GetTokenString());
   const std::string str = mLexer->GetTokenString();
   const char *name = mBaseGen->mStringPool->FindString(str);
 
@@ -242,16 +260,16 @@ RuleAction *SPECParser::GetAction() {
 
   tk = mLexer->NextToken();
   if (tk != SPECTK_Lparen)
-    MMSGA ("expect '(' but get ", mLexer->GetTokenString());
+    ParserError ("expect '(' but get ", mLexer->GetTokenString());
 
   tk = mLexer->NextToken();
   while (tk != SPECTK_Rparen) {
     if (tk != SPECTK_Percent) {
-      MMSGA ("expect '%' but get ", mLexer->GetTokenString());
+      ParserError ("expect '%' but get ", mLexer->GetTokenString());
     }
     tk = mLexer->NextToken();
     if (tk != SPECTK_Intconst) {
-      MMSGA ("expect a const but get ", mLexer->GetTokenString());
+      ParserError ("expect a const but get ", mLexer->GetTokenString());
     }
     uint8_t idx = (uint8_t)mLexer->theintval;
     action->mArgs.push_back(idx);
@@ -266,13 +284,13 @@ RuleAction *SPECParser::GetAction() {
 }
 
 bool SPECParser::ParseElementSet(RuleElem *elem) {
-  SPECTokenKind tk = mLexer->GetToken();
-  if (!(tk == SPECTK_Oneof || tk == SPECTK_Zeroorone || tk == SPECTK_Zeroormore))
-    MMSGA("expect ONEOF/ZEROORONE/ZEROORMORE but get ", mLexer->GetTokenString());
+  SPECTokenKind optk = mLexer->GetToken();
+  if (!(optk == SPECTK_Oneof || optk == SPECTK_Zeroorone || optk == SPECTK_Zeroormore))
+    ParserError("expect ONEOF/ZEROORONE/ZEROORMORE but get ", mLexer->GetTokenString());
 
-  tk = mLexer->NextToken();
+  SPECTokenKind tk = mLexer->NextToken();
   if (tk != SPECTK_Lparen)
-    MMSGA("expect '(' but get ", mLexer->GetTokenString());
+    ParserError("expect '(' but get ", mLexer->GetTokenString());
 
   tk = mLexer->NextToken();
   while (tk != SPECTK_Rparen && tk != SPECTK_Eof) {
@@ -280,12 +298,15 @@ bool SPECParser::ParseElementSet(RuleElem *elem) {
     if (ParseElement(sub_elem, true)) {
       elem->AddSubElem(sub_elem);
     } else {
-      MMSGA("unexpected token ", mLexer->GetTokenString());
+      ParserError("unexpected token ", mLexer->GetTokenString());
     }
 
     tk = mLexer->GetToken();
-    if (tk == SPECTK_Coma)
+    if (optk == SPECTK_Oneof && tk == SPECTK_Coma)
       tk = mLexer->NextToken();
+    else if (optk == SPECTK_Zeroorone || optk == SPECTK_Zeroormore)
+      // SPECTK_Zeroorone and SPECTK_Zeroormore only allow one element
+      break;
   }
 
   if (tk == SPECTK_Eof)
@@ -293,7 +314,7 @@ bool SPECParser::ParseElementSet(RuleElem *elem) {
 
   tk = mLexer->GetToken();
   if (tk != SPECTK_Rparen)
-    MMSGA("expect ')' but get ", mLexer->GetTokenString());
+    ParserError("expect ')' but get ", mLexer->GetTokenString());
 
   mLexer->NextToken();
   return true;
@@ -302,7 +323,7 @@ bool SPECParser::ParseElementSet(RuleElem *elem) {
 bool SPECParser::ParseConcatenate(RuleElem *elem) {
   SPECTokenKind tk = mLexer->GetToken();
   if (tk != SPECTK_Concat)
-    MMSGA("expect '+' but get ", mLexer->GetTokenString());
+    ParserError("expect '+' but get ", mLexer->GetTokenString());
 
   tk = mLexer->NextToken();
   while (tk != SPECTK_Eof) {
@@ -310,7 +331,7 @@ bool SPECParser::ParseConcatenate(RuleElem *elem) {
     if (ParseElement(sub_elem, false)) {
       elem->AddSubElem(sub_elem);
     } else {
-      MMSGA("unexpected token ", mLexer->GetTokenString());
+      ParserError("unexpected token ", mLexer->GetTokenString());
     }
 
     tk = mLexer->GetToken();
@@ -330,12 +351,12 @@ bool SPECParser::ParseStruct() {
   // STRUCT
   SPECTokenKind tk = mLexer->GetToken();
   if (tk != SPECTK_Struct)
-    MMSGA("expect STURCT but get ", mLexer->GetTokenString());
+    ParserError("expect STURCT but get ", mLexer->GetTokenString());
 
   // NAME
   tk = mLexer->NextToken();
   if (tk != SPECTK_Name)
-    MMSGA("expect a name but get ", mLexer->GetTokenString());
+    ParserError("expect a name but get ", mLexer->GetTokenString());
 
   mBaseGen->mCurStruct = new StructBase(mLexer->GetTheName().c_str());
   mBaseGen->mStructs.push_back(mBaseGen->mCurStruct);
@@ -343,7 +364,7 @@ bool SPECParser::ParseStruct() {
   // :
   tk = mLexer->NextToken();
   if (tk != SPECTK_Colon)
-    MMSGA("expect ':' but get ", mLexer->GetTokenString());
+    ParserError("expect ':' but get ", mLexer->GetTokenString());
 
   RuleElem *elem = NULL;
 
@@ -355,20 +376,20 @@ bool SPECParser::ParseStruct() {
   // leading '('
   tk = mLexer->GetToken();
   if (tk != SPECTK_Lparen)
-    MMSGA("expect '(' but get ", mLexer->GetTokenString());
+    ParserError("expect '(' but get ", mLexer->GetTokenString());
   mLexer->NextToken();
 
   // parse struct elements
   // (a1, b1, ...), (a2, b2, ...), ...
   // ^
   if (!ParseStructElements()) {
-    MMSGA ("Unexpected token: ", mLexer->GetTokenString());
+    ParserError ("Unexpected token: ", mLexer->GetTokenString());
   }
 
   // ending ')'
   tk = mLexer->GetToken();
   if (tk != SPECTK_Rparen)
-    MMSGA("expect ')' but get ", mLexer->GetTokenString());
+    ParserError("expect ')' but get ", mLexer->GetTokenString());
   mLexer->NextToken();
 
   return true;
@@ -378,7 +399,7 @@ bool SPECParser::ParseStruct() {
 bool SPECParser::ParseElemData(StructElem *elem) {
   SPECTokenKind tk = mLexer->GetToken();
   if (tk != SPECTK_Lparen)
-    MMSGA("expect '(' but get ", mLexer->GetTokenString());
+    ParserError("expect '(' but get ", mLexer->GetTokenString());
 
   // get all items in the tuple
   tk = mLexer->NextToken();
@@ -404,7 +425,7 @@ bool SPECParser::ParseElemData(StructElem *elem) {
         data->SetDouble(mLexer->thedoubleval);
         break;
       default:
-        MMSGA("expect string or name but get ", mLexer->GetTokenString());
+        ParserError("expect string or name but get ", mLexer->GetTokenString());
         break;
     }
 
@@ -412,7 +433,7 @@ bool SPECParser::ParseElemData(StructElem *elem) {
 
     tk = mLexer->NextToken();
     if (tk != SPECTK_Coma && tk != SPECTK_Rparen)
-      MMSGA("expect ',' or ')' but get ", mLexer->GetTokenString());
+      ParserError("expect ',' or ')' but get ", mLexer->GetTokenString());
 
     if (tk == SPECTK_Rparen) {
       tk = mLexer->NextToken();
@@ -443,7 +464,7 @@ bool SPECParser::ParseStructElements() {
     //              ^-- , or )
     tk = mLexer->GetToken();
     if (tk != SPECTK_Coma && tk != SPECTK_Rparen)
-      MMSGA("expect ',' or ')' but get ", mLexer->GetTokenString());
+      ParserError("expect ',' or ')' but get ", mLexer->GetTokenString());
 
     if (tk == SPECTK_Rparen)
       break;
@@ -453,7 +474,7 @@ bool SPECParser::ParseStructElements() {
 
   tk = mLexer->GetToken();
   if (tk != SPECTK_Rparen)
-    MMSGA("expect ')' but get ", mLexer->GetTokenString());
+    ParserError("expect ')' but get ", mLexer->GetTokenString());
 
   return status;
 }
@@ -464,11 +485,11 @@ bool SPECParser::ParseAttr() {
 
   SPECTokenKind tk = mLexer->GetToken();
   if (tk != SPECTK_Attr)
-    MMSGA("expect attr but get ", mLexer->GetTokenString());
+    ParserError("expect attr but get ", mLexer->GetTokenString());
 
   tk = mLexer->NextToken();
   if (tk != SPECTK_Dot)
-    MMSGA("expect '.' but get ", mLexer->GetTokenString());
+    ParserError("expect '.' but get ", mLexer->GetTokenString());
 
   tk = mLexer->NextToken();
   switch (tk) {
@@ -493,11 +514,11 @@ bool SPECParser::ParseAttrDatatype() {
 
   SPECTokenKind tk = mLexer->GetToken();
   if (tk != SPECTK_Datatype)
-    MMSGA("expect data type but get ", mLexer->GetTokenString());
+    ParserError("expect data type but get ", mLexer->GetTokenString());
 
   tk = mLexer->NextToken();
   if (tk != SPECTK_Colon)
-    MMSGA("expect ':' but get ", mLexer->GetTokenString());
+    ParserError("expect ':' but get ", mLexer->GetTokenString());
 
   tk = mLexer->NextToken();
   std::string name = mLexer->GetTokenString();
@@ -512,11 +533,11 @@ bool SPECParser::ParseAttrTokentype() {
 
   SPECTokenKind tk = mLexer->GetToken();
   if (tk != SPECTK_Tokentype)
-    MMSGA("expect token type but get ", mLexer->GetTokenString());
+    ParserError("expect token type but get ", mLexer->GetTokenString());
 
   tk = mLexer->NextToken();
   if (tk != SPECTK_Colon)
-    MMSGA("expect ':' but get ", mLexer->GetTokenString());
+    ParserError("expect ':' but get ", mLexer->GetTokenString());
 
   tk = mLexer->NextToken();
   std::string name = mLexer->GetTokenString();
@@ -532,7 +553,7 @@ bool SPECParser::ParseAttrValidity() {
 
   SPECTokenKind tk = mLexer->GetToken();
   if (tk != SPECTK_Validity)
-    MMSGA("expect validity but get ", mLexer->GetTokenString());
+    ParserError("expect validity but get ", mLexer->GetTokenString());
 
   RuleAttr *attr = mCurrrule->mAttr;
 
@@ -544,12 +565,12 @@ bool SPECParser::ParseAttrValidity() {
     // for specific elements
     tk = mLexer->NextToken();
     if (tk != SPECTK_Percent)
-      MMSGA("expect '%' but get ", mLexer->GetTokenString());
+      ParserError("expect '%' but get ", mLexer->GetTokenString());
 
     while (tk == SPECTK_Percent) {
       tk = mLexer->NextToken();
       if (tk != SPECTK_Intconst)
-        MMSGA("expect Intconst but get ", mLexer->GetTokenString());
+        ParserError("expect Intconst but get ", mLexer->GetTokenString());
       int i = mLexer->theintval;
 
       attr = mCurrrule->mElement->mSubElems[i-1]->mAttr;
@@ -561,7 +582,7 @@ bool SPECParser::ParseAttrValidity() {
   }
 
   if (tk != SPECTK_Colon)
-    MMSGA("expect ':' but get ", mLexer->GetTokenString());
+    ParserError("expect ':' but get ", mLexer->GetTokenString());
 
   tk = mLexer->NextToken();
   RuleAction *action = GetAction();
@@ -585,7 +606,7 @@ bool SPECParser::ParseAttrValidity() {
 bool SPECParser::ParseAttrAction() {
   SPECTokenKind tk = mLexer->GetToken();
   if (tk != SPECTK_Action)
-    MMSGA("expect action but get ", mLexer->GetTokenString());
+    ParserError("expect action but get ", mLexer->GetTokenString());
 
   RuleAttr *attr = mCurrrule->mAttr;
 
@@ -597,12 +618,12 @@ bool SPECParser::ParseAttrAction() {
     // for specific elements
     tk = mLexer->NextToken();
     if (tk != SPECTK_Percent)
-      MMSGA("expect '%' but get ", mLexer->GetTokenString());
+      ParserError("expect '%' but get ", mLexer->GetTokenString());
 
     while (tk == SPECTK_Percent) {
       tk = mLexer->NextToken();
       if (tk != SPECTK_Intconst)
-        MMSGA("expect Intconst but get ", mLexer->GetTokenString());
+        ParserError("expect Intconst but get ", mLexer->GetTokenString());
       int i = mLexer->theintval;
 
       attr = mCurrrule->mElement->mSubElems[i-1]->mAttr;
@@ -614,7 +635,7 @@ bool SPECParser::ParseAttrAction() {
   }
 
   if (tk != SPECTK_Colon)
-    MMSGA("expect ':' but get ", mLexer->GetTokenString());
+    ParserError("expect ':' but get ", mLexer->GetTokenString());
 
   tk = mLexer->NextToken();
   RuleAction *action = GetAction();
