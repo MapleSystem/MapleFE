@@ -135,18 +135,6 @@ rule EnhancedForStatement : "for" + '(' + ZEROORMORE(VariableModifier) + LocalVa
 
 rule EnhancedForStatementNoShortIf : "for" + '(' + ZEROORMORE(VariableModifier) + LocalVariableType + VariableDeclaratorId + ':' + Expression + ')' + StatementNoShortIf
 
-rule VariableModifier : ONEOF(
-  Annotation,
-  "final")
-
-rule LocalVariableType : ONEOF(
-  UnannType,
-  "var")
-
-rule VariableDeclaratorId : Identifier + ZEROORONE(Dims)
-
-rule Dims : ZEROORMORE(Annotation) + '[' + ']' + ZEROORMORE(ZEROORMORE(Annotation) + '[' + ']')
-
 rule BreakStatement : "break" + ZEROORONE(Identifier) + ';'
 
 rule ContinueStatement : "continue" + ZEROORONE(Identifier) + ';'
@@ -173,14 +161,6 @@ rule CatchType : UnannClassType + ZEROORMORE('|' + ClassType)
 
 rule Finally : "finally" + Block
 
-rule VariableModifier : ONEOF(
-  Annotation,
-  "final")
-
-rule VariableDeclaratorId : Identifier + ZEROORONE(Dims)
-
-rule Dims : ZEROORMORE(Annotation) + '[' + ']' + ZEROORMORE(ZEROORMORE(Annotation) + '[' + ']')
-
 rule TryWithResourcesStatement : "try" + ResourceSpecification + Block + ZEROORONE(Catches) + ZEROORONE(Finally)
 
 rule ResourceSpecification : '(' + ResourceList + ZEROORONE(';') + ')'
@@ -194,12 +174,4 @@ rule Resource : ONEOF(
 rule VariableAccess : ONEOF(
   ExpressionName,
   FieldAccess)
-
-rule VariableModifier : ONEOF(
-  Annotation,
-  "final")
-
-rule LocalVariableType : ONEOF(
-  UnannType,
-  "var")
 
