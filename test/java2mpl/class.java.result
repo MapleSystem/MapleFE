@@ -1,0 +1,11 @@
+Keyword    Token:  class
+Separator  Token:  Whitespace
+Identifier Token:  A
+Separator  Token:  Whitespace
+Separator  Token:  Lbrace
+Keyword    Token:  int
+Separator  Token:  Whitespace
+Identifier Token:  a
+Separator  Token:  Semicolon
+Separator  Token:  Rbrace
+Matched 7 tokens.

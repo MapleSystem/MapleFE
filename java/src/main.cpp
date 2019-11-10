@@ -182,7 +182,24 @@ bool Parser::ParseStmt_autogen() {
 // return true : if all tokens in mTokens are matched.
 //       false : if faled.
 bool Parser::TraverseStmt() {
-  bool succ = TraverseRuleTable(&TblStatement);
+  // right now assume statement is just one line.
+  // I'm doing a simple separation of one-line class declaration.
+  bool succ = false;
+
+  Token *curr_token = mTokens[mCurToken];
+  bool is_class = false;
+  if (curr_token->IsKeyword()) {
+    KeywordToken *kw = (KeywordToken*)curr_token;
+    const char *name = kw->GetName();
+    if (name && !strncmp(name, "class", 5))
+      is_class = true;
+  }
+
+  if (is_class)
+    succ = TraverseRuleTable(&TblClassDeclaration);
+  else
+    succ = TraverseRuleTable(&TblStatement);
+
   if (mTokens.size() != mCurToken)
     std::cout << "Illegal syntax detected!" << std::endl;
   else

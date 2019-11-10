@@ -6,7 +6,6 @@
 # I just put all TO-DO rules here
 rule TypeName : "typename"
 rule Class    : "class"
-rule ClassBody: "classbody"
 rule ArrayInitializer : "arrayinitializer"
 rule MethodName       : "methodname"
 

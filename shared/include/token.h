@@ -57,6 +57,8 @@ public:
   bool IsSeparator()  { return mTkType == TT_SP; }
   bool IsIdentifier() { return mTkType == TT_ID; }
   bool IsLiteral()    { return mTkType == TT_LT; }
+  bool IsKeyword()    { return mTkType == TT_KW; }
+
   virtual void Dump() {}
 };
 
@@ -108,6 +110,7 @@ public:
   KeywordToken(TK_Kind k, const char *s) : Token(TT_KW, k), mName(s){}
   
   void SetName(const char *s){ mName = s; }
+  const char *GetName(){ return mName; }
   void Dump();
 };
 
