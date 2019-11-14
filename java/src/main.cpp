@@ -30,7 +30,15 @@ Token* FindKeywordToken(Lexer * lex, char *key) {
   }
 }
 
+// Read a token until end of file.
+// If no remaining tokens in current line, we move to the next line.
 Token* Lexer::LexToken_autogen(void) {
+  return LexTokenNoNewLine();
+}
+
+// Read a token until end of line.
+// Return NULL if no token read.
+Token* Lexer::LexTokenNoNewLine(void) {
   SepId sep = GetSeparator(this);
   if (sep != SEP_NA) {
     Token *t = FindSeparatorToken(this, sep);
@@ -186,19 +194,28 @@ bool Parser::TraverseStmt() {
   // I'm doing a simple separation of one-line class declaration.
   bool succ = false;
 
-  Token *curr_token = mTokens[mCurToken];
-  bool is_class = false;
-  if (curr_token->IsKeyword()) {
-    KeywordToken *kw = (KeywordToken*)curr_token;
-    const char *name = kw->GetName();
-    if (name && !strncmp(name, "class", 5))
-      is_class = true;
+  // Go through the top level construct, find the right one.
+  std::vector<RuleTable*>::iterator it = mTopTables.begin();
+  for (; it != mTopTables.end(); it++) {
+    RuleTable *t = *it;
+    succ = TraverseRuleTable(t);
+    if (succ)
+      break;
   }
 
-  if (is_class)
-    succ = TraverseRuleTable(&TblClassDeclaration);
-  else
-    succ = TraverseRuleTable(&TblStatement);
+  //Token *curr_token = mTokens[mCurToken];
+  //bool is_class = false;
+  //if (curr_token->IsKeyword()) {
+  //  KeywordToken *kw = (KeywordToken*)curr_token;
+  //  const char *name = kw->GetName();
+  //  if (name && !strncmp(name, "class", 5))
+  //    is_class = true;
+  //}
+
+  //if (is_class)
+  //  succ = TraverseRuleTable(&TblClassDeclaration);
+  //else
+  //  succ = TraverseRuleTable(&TblStatement);
 
   if (mTokens.size() != mCurToken)
     std::cout << "Illegal syntax detected!" << std::endl;
@@ -464,10 +481,17 @@ void Parser::InitPredefinedTokens() {
   mLexer->mPredefinedTokenNum += KeywordTableSize;
 }
 
+// Set up the top level rule tables.
+void Parser::SetupTopTables() {
+  mTopTables.push_back(&TblStatement);
+  mTopTables.push_back(&TblClassDeclaration);
+}
+
 int main (int argc, char *argv[]) {
   Parser *parser = new Parser(argv[1]);
   parser->InitPredefinedTokens();
   PlantTokens(parser->mLexer);
+  parser->SetupTopTables();
   parser->Parse_autogen();
   delete parser;
   return 0;

@@ -75,7 +75,8 @@ class Lexer {
   }
 
   // These are for autogen table testing
-  Token* LexToken_autogen();
+  Token* LexToken_autogen();  // always return token until end of file.
+  Token* LexTokenNoNewLine(); // try to get token untile end of line.
   
   bool EndOfLine() { return curidx == current_line_size; }
   bool EndOfFile() { return endoffile; }

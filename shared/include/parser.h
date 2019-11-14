@@ -64,6 +64,14 @@ private:
   void AddFailed(RuleTable *, unsigned);
   bool WasFailed(RuleTable *, unsigned);
 
+  // Every language has a fixed number of entry point to start parsing. Eg. in Java
+  // the top level language construct is class, so the entry point is ClassDeclaration.
+  // In C, the top level construct is either function or statement.
+  //
+  // In driver function of parser needs to set up these top level rule tables which
+  // the traversal will start with.
+  std::vector<RuleTable*> mTopTables;
+
 public:
   Parser(const char *f, Module *m);
   Parser(const char *f);
@@ -98,6 +106,7 @@ public:
   bool Parse_autogen();
   bool ParseStmt_autogen();
   void InitPredefinedTokens();
+  void SetupTopTables();  //Each language parser will implement this by itself. 
 };
 
 #endif
