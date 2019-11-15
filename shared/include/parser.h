@@ -36,9 +36,14 @@ public:
   std::vector<std::string> mVars;
 
 private:
+  std::vector<Token*>   mTokens;         // Storage of all tokens, including active, discarded,
+                                         // and pending.
   std::vector<Token*>   mActiveTokens;   // vector for tokens during matching.
-  unsigned              mCurToken;       // index in mActiveTokens, 1st to-be-matched token.
-                                         // Tokens before it have been matched.
+  std::vector<unsigned> mStartingTokens; // The starting token of each self-complete statement.
+                                         // It's an index of mActiveTokens.
+  unsigned              mCurToken;       // index in mActiveTokens, the next token to be matched.
+  unsigned              mPending;        // index in mActiveTokens, the first pending token.
+                                         // All tokens after it are pending.
 
   // I'm using two data structures to record the status of cycle reference.
   // See the detailed comments in the implementation of Parser::Parse().
@@ -72,6 +77,8 @@ private:
   // the traversal will start with.
   std::vector<RuleTable*> mTopTables;
 
+  // Every language has certain number of ending separators, which means the end of
+  // a complete statement.
 public:
   Parser(const char *f, Module *m);
   Parser(const char *f);
@@ -107,6 +114,7 @@ public:
   bool ParseStmt_autogen();
   void InitPredefinedTokens();
   void SetupTopTables();  //Each language parser will implement this by itself. 
+  unsigned LexOneLine();
 };
 
 #endif

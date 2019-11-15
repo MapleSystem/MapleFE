@@ -1,8 +1,3 @@
-Identifier Token:  a
-Operator   Token:  Add
-Identifier Token:  b
-Separator  Token:  Semicolon
-Illegal syntax detected!
 Identifier Token:  c
 Operator   Token:  Assign
 Identifier Token:  a

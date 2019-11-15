@@ -119,7 +119,7 @@ Token* Lexer::LexTokenNoNewLine(void) {
 //              and anything.
 //   Ending   : Ending tokens are those represent the ending of a complete statement.
 //              It's always clearly defined in a language what token are the ending ones.
-//              For example, ';' in most languages, '}' in most languages, and New Line
+//              For example, ';' in most languages, '{' and '}' in most languages, and NewLine
 //              in Kotlin where a statement doesn't cross multiple line.
 //
 //              [TODO] Ending token should be configured in .spec file. Right now I'm
@@ -185,12 +185,51 @@ Token* Lexer::LexTokenNoNewLine(void) {
 // origin of mFailed.
 //////////////////////////////////////////////////////////////////////////////////
 
-bool Parser::Parse_autogen() {
-  // TODO: Right now assume a statement has only one line. Will come back later.
-  while (!mLexer->EndOfFile()) {
-    ParseStmt_autogen();
+
+// Lex all tokens in a line, save to mTokens.
+// If no valuable in current line, we continue to the next line.
+// Returns the number of valuable tokens read. Returns 0 if EOF.
+unsigned Parser::LexOneLine() {
+  unsigned token_num = 0;
+  while (!token_num) {
+    // read untile end of line
+    while (!mLexer->EndOfLine()) {
+      Token* t = mLexer->LexToken_autogen();
+      if (t) {
+        bool is_whitespace = false;
+        if (t->IsSeparator()) {
+          SeparatorToken *sep = (SeparatorToken *)t;
+          if (sep->IsWhiteSpace())
+            is_whitespace = true;
+        }
+        // Put into the token storage, as Pending tokens.
+        if (!is_whitespace) {
+          mActiveTokens.push_back(t);
+          token_num++;
+        }
+      } else {
+        MASSERT(0 && "Non token got? Problem here!");
+        break;
+      }
+    }
+    // Read in the next line.
     mLexer->ReadALine();
+    if (mLexer->EndOfFile())
+      break;
   }
+
+  return token_num;
+}
+
+bool Parser::Parse_autogen() {
+  bool succ = false;
+  while (!mLexer->EndOfFile()) {
+    succ = ParseStmt_autogen();
+    if (!succ)
+      break;
+  }
+
+  return succ;
 } 
 
 // return true : if successful
@@ -198,46 +237,28 @@ bool Parser::Parse_autogen() {
 // This is the parsing for highest level language constructs. It could be class
 // in Java/c++, or a function/statement in c/c++. In another word, it's the top
 // level constructs in a compilation unit (aka Module).
-//
 bool Parser::ParseStmt_autogen() {
-  // 1. clear mVisited for parsing every statement.
-  //    TODO: Need think about when there are compound statement. Sometimes we
-  //          should have more than one mVisited.
-  //          Like block, which crosses multiple statements.
+  // clear status
   mVisited.clear();
-
-  // clear the failed info.
   ClearFailed();
-
-  // clear the tokens.
+  mTokens.clear();
   mActiveTokens.clear();
+  mStartingTokens.clear();
   mCurToken = 0;
+  mPending = 0;
 
-  // 2. Lex tokens in a line
-  //    In Lexer::PrepareForFile() already did one ReadALine().
-  while (!mLexer->EndOfLine()) {
-    Token* t = mLexer->LexToken_autogen();
-    if (t) {
-      bool is_whitespace = false;
-      if (t->IsSeparator()) {
-        SeparatorToken *sep = (SeparatorToken *)t;
-        if (sep->IsWhiteSpace())
-          is_whitespace = true;
-      }
-      if (!is_whitespace)
-        mActiveTokens.push_back(t);
-    } else {
-      MASSERT(0 && "Non token got? Problem here!");
-      break;
-    }
-  }
+  unsigned token_num = LexOneLine();
+  // No more token, end of file
+  if (!token_num)
+    return false;
 
-  // 3. Match the tokens against the rule tables.
-  //    In a rule table there are : (1) separtaor, operator, keyword, are already in token
-  //                                (2) Identifier Table won't be traversed any more since
-  //                                    lex has got the token from source program and we only
-  //                                    need check if the table is &TblIdentifier.
+  // Match the tokens against the rule tables.
+  // In a rule table there are : (1) separtaor, operator, keyword, are already in token
+  //                             (2) Identifier Table won't be traversed any more since
+  //                                 lex has got the token from source program and we only
+  //                                 need check if the table is &TblIdentifier.
   bool succ = TraverseStmt();
+  return succ;
 }
 
 // return true : if all tokens in mActiveTokens are matched.
@@ -252,10 +273,13 @@ bool Parser::TraverseStmt() {
   for (; it != mTopTables.end(); it++) {
     RuleTable *t = *it;
     succ = TraverseRuleTable(t);
-    if (succ)
+    if (succ) {
+      //MASSERT((mPending == mTokens.size()) && "Num of matched token is wrong.");
       break;
+    }
   }
 
+  //if (!succ)
   if (mActiveTokens.size() != mCurToken)
     std::cout << "Illegal syntax detected!" << std::endl;
   else

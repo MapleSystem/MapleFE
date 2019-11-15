@@ -26,6 +26,7 @@ Parser::Parser(const char *name) : filename(name) {
   // init lexer
   mLexer->PrepareForFile(file);
   mCurToken = 0;
+  mPending = 0;
 }
 
 
