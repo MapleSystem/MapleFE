@@ -82,7 +82,57 @@ Token* Lexer::LexTokenNoNewLine(void) {
 //////////////////////////////////////////////////////////////////////////////////
 //                           Parsing System
 //
-// 1. Cycle Reference
+// 1. Token Management
+//
+// Thinking about compound statements which cross multiple lines including multiple
+// statement inside, we may first match a few tokens at the beginning just like the
+// starting parts of a class, and these tokens must be kept as alive (aka, not done yet).
+// Then we need go further to the body. In the body, after we successfully parse a
+// sub-statement, its tokens can be discarded, and we read new tokens to parse new
+// sub-statements. All the matched tokens of sub statements will be discarded once
+// matched. Until in the end, we get the finishing part of a class.
+//
+// So it's very clear that there are three kinds of tokens while parsing, active,
+// discarded and pending.
+//   Active    : The tokens are still in the procedure of the matching. e.g. the starting
+//               parts of a class declaration, they are always alive until all the
+//               sub statements inside are done.
+//   Discarded : The tokens finished matching, and we don't need it any more.
+//   Pending   : The tokens read in, but not invovled in the matching.
+//
+// Obviously, we need some data structures to tell these different tokens. We decided
+// to have two. (1) One for all the tokens read in. This is the superset of active, discarded,
+// and pending. It's the simple reflection of source program. It's the [[mTokens]].
+// (2) The other one is for the active tokens. It's [[mActiveTokens]].
+//
+// During matching, pending tokens are moved to [[mActiveTokens]] per request. Tokens after
+// the last active are pending.
+//
+// 2. Discard Tokens
+//
+// Now here comes a question, how to identify tokens to be discarded? or when to discard
+// what tokens? To address these questions, we need the help of two types of token,
+// starting token and ending token.
+//   Starting : Starting tokens are those represent the start of a new complete statement.
+//              It's obvious that there are no special characteristics we can tell from
+//              a starting token. It could be any token, identifier, keyword, separtor,
+//              and anything.
+//   Ending   : Ending tokens are those represent the ending of a complete statement.
+//              It's always clearly defined in a language what token are the ending ones.
+//              For example, ';' in most languages, '}' in most languages, and New Line
+//              in Kotlin where a statement doesn't cross multiple line.
+//
+//              [TODO] Ending token should be configured in .spec file. Right now I'm
+//                     just hard coded in the main.cpp.
+//
+// Actually we just need recognize the ending token, since the one behind ending token is the
+// starting token of next statement. However, during matching, we need a stack to record the
+// the starting token index-es, [[mStartingTokens]]. Each time we hit an ending token, we
+// discard the tokens on the from the starting token (the one on the top of [[mStartingTokens]]
+// to the ending token.
+// 
+//
+// 3. Cycle Reference
 //
 // The most important thing in parsing is how to HANDLE CYCLES in the rules. Take
 // rule additiveExpression for example. It calls itself in the second element.
@@ -127,7 +177,7 @@ Token* Lexer::LexTokenNoNewLine(void) {
 //                     (4) From the third time on, start checking if the position
 //                         has moved compared to the previous one.
 //
-// Parsing Time Issue
+// 4. Parsing Time Issue
 // 
 // The rules are referencing each other and could increase the parsing time extremely.
 // In order to save time, the first thing is avoiding entering a rule for the second
@@ -145,7 +195,10 @@ bool Parser::Parse_autogen() {
 
 // return true : if successful
 //       false : if failed
-// This parses just one single statement.
+// This is the parsing for highest level language constructs. It could be class
+// in Java/c++, or a function/statement in c/c++. In another word, it's the top
+// level constructs in a compilation unit (aka Module).
+//
 bool Parser::ParseStmt_autogen() {
   // 1. clear mVisited for parsing every statement.
   //    TODO: Need think about when there are compound statement. Sometimes we
@@ -157,7 +210,7 @@ bool Parser::ParseStmt_autogen() {
   ClearFailed();
 
   // clear the tokens.
-  mTokens.clear();
+  mActiveTokens.clear();
   mCurToken = 0;
 
   // 2. Lex tokens in a line
@@ -172,7 +225,7 @@ bool Parser::ParseStmt_autogen() {
           is_whitespace = true;
       }
       if (!is_whitespace)
-        mTokens.push_back(t);
+        mActiveTokens.push_back(t);
     } else {
       MASSERT(0 && "Non token got? Problem here!");
       break;
@@ -187,7 +240,7 @@ bool Parser::ParseStmt_autogen() {
   bool succ = TraverseStmt();
 }
 
-// return true : if all tokens in mTokens are matched.
+// return true : if all tokens in mActiveTokens are matched.
 //       false : if faled.
 bool Parser::TraverseStmt() {
   // right now assume statement is just one line.
@@ -203,33 +256,20 @@ bool Parser::TraverseStmt() {
       break;
   }
 
-  //Token *curr_token = mTokens[mCurToken];
-  //bool is_class = false;
-  //if (curr_token->IsKeyword()) {
-  //  KeywordToken *kw = (KeywordToken*)curr_token;
-  //  const char *name = kw->GetName();
-  //  if (name && !strncmp(name, "class", 5))
-  //    is_class = true;
-  //}
-
-  //if (is_class)
-  //  succ = TraverseRuleTable(&TblClassDeclaration);
-  //else
-  //  succ = TraverseRuleTable(&TblStatement);
-
-  if (mTokens.size() != mCurToken)
+  if (mActiveTokens.size() != mCurToken)
     std::cout << "Illegal syntax detected!" << std::endl;
   else
     std::cout << "Matched " << mCurToken << " tokens." << std::endl;
+
   return succ;
 }
 
-// return true : if all tokens in mTokens are matched.
+// return true : if all tokens in mActiveTokens are matched.
 //       false : if faled.
 bool Parser::TraverseRuleTable(RuleTable *rule_table) {
   bool matched = false;
   unsigned old_pos = mCurToken;
-  Token *curr_token = mTokens[mCurToken];
+  Token *curr_token = mActiveTokens[mCurToken];
 
   //
   if (WasFailed(rule_table, mCurToken))
@@ -412,7 +452,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table) {
 bool Parser::TraverseTableData(TableData *data) {
   unsigned old_pos = mCurToken;
   bool     found = false;
-  Token   *curr_token = mTokens[mCurToken];
+  Token   *curr_token = mActiveTokens[mCurToken];
 
   switch (data->mType) {
   case DT_Char:

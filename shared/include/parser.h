@@ -36,9 +36,9 @@ public:
   std::vector<std::string> mVars;
 
 private:
-  std::vector<Token*>   mTokens;   // vector for tokens during matching.
-  unsigned              mCurToken; // index in mTokens, 1st to-be-matched token.
-                                   // Tokens before it have been matched.
+  std::vector<Token*>   mActiveTokens;   // vector for tokens during matching.
+  unsigned              mCurToken;       // index in mActiveTokens, 1st to-be-matched token.
+                                         // Tokens before it have been matched.
 
   // I'm using two data structures to record the status of cycle reference.
   // See the detailed comments in the implementation of Parser::Parse().
