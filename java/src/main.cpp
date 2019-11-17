@@ -113,14 +113,15 @@ Token* Lexer::LexTokenNoNewLine(void) {
 // Now here comes a question, how to identify tokens to be discarded? or when to discard
 // what tokens? To address these questions, we need the help of two types of token,
 // starting token and ending token.
+//   Ending   : Ending tokens are those represent the ending of a complete statement.
+//              It's always clearly defined in a language what token are the ending ones.
+//              For example, ';' in most languages, and NewLine in Kotlin where a statement
+//              doesn't cross multiple line.
 //   Starting : Starting tokens are those represent the start of a new complete statement.
 //              It's obvious that there are no special characteristics we can tell from
 //              a starting token. It could be any token, identifier, keyword, separtor,
 //              and anything.
-//   Ending   : Ending tokens are those represent the ending of a complete statement.
-//              It's always clearly defined in a language what token are the ending ones.
-//              For example, ';' in most languages, '{' and '}' in most languages, and NewLine
-//              in Kotlin where a statement doesn't cross multiple line.
+//              To find out the starting tokens, we actually rely on.
 //
 //              [TODO] Ending token should be configured in .spec file. Right now I'm
 //                     just hard coded in the main.cpp.
@@ -191,9 +192,14 @@ Token* Lexer::LexTokenNoNewLine(void) {
 // Returns the number of valuable tokens read. Returns 0 if EOF.
 unsigned Parser::LexOneLine() {
   unsigned token_num = 0;
+
+  // Check if there are already pending tokens.
+  if (mCurToken < mActiveTokens.size())
+    return mActiveTokens.size() - mCurToken;
+
   while (!token_num) {
     // read untile end of line
-    while (!mLexer->EndOfLine()) {
+    while (!mLexer->EndOfLine() && !mLexer->EndOfFile()) {
       Token* t = mLexer->LexToken_autogen();
       if (t) {
         bool is_whitespace = false;
@@ -213,17 +219,33 @@ unsigned Parser::LexOneLine() {
       }
     }
     // Read in the next line.
-    mLexer->ReadALine();
-    if (mLexer->EndOfFile())
-      break;
+    if (!token_num) {
+      if(!mLexer->EndOfFile())
+        mLexer->ReadALine();
+      else
+        break;
+    }
   }
 
   return token_num;
 }
 
+// Move mCurToken one step. If there is no available in mActiveToken, it reads in a new line.
+// Return true : if success
+//       false : if no more valuable token read, or end of file
+bool Parser::MoveCurToken() {
+  mCurToken++;
+  if (mCurToken == mActiveTokens.size()) {
+    unsigned num = LexOneLine();
+    if (!num)
+      return false;
+  }
+  return true;
+}
+
 bool Parser::Parse_autogen() {
   bool succ = false;
-  while (!mLexer->EndOfFile()) {
+  while (1) {
     succ = ParseStmt_autogen();
     if (!succ)
       break;
@@ -242,10 +264,16 @@ bool Parser::ParseStmt_autogen() {
   mVisited.clear();
   ClearFailed();
   mTokens.clear();
-  mActiveTokens.clear();
   mStartingTokens.clear();
-  mCurToken = 0;
   mPending = 0;
+
+  // mActiveTokens contain some un-matched tokens from last time of TraverseStmt(),
+  // because at the end of every TraverseStmt() when it finishes its matching it always
+  // MoveCurToken() which in turn calls LexOneLine() to read new tokens of a new line.
+  //
+  // This means in LexOneLine() we also need check if there are already tokens pending.
+  //
+  // [TODO] Later on, we will move thoes pending tokens to a separate data structure.
 
   unsigned token_num = LexOneLine();
   // No more token, end of file
@@ -279,8 +307,7 @@ bool Parser::TraverseStmt() {
     }
   }
 
-  //if (!succ)
-  if (mActiveTokens.size() != mCurToken)
+  if (!succ)
     std::cout << "Illegal syntax detected!" << std::endl;
   else
     std::cout << "Matched " << mCurToken << " tokens." << std::endl;
@@ -325,7 +352,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table) {
   if ((rule_table == &TblIdentifier)) {
     ClearVisited(rule_table);
     if (curr_token->IsIdentifier()) {
-      mCurToken++;
+      MoveCurToken();
       //std::cout << "Matched identifier token: " << curr_token << std::endl;
       return true;
     } else {
@@ -339,7 +366,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table) {
   if ((rule_table == &TblLiteral)) {
     ClearVisited(rule_table);
     if (curr_token->IsLiteral()) {
-      mCurToken++;
+      MoveCurToken();
       //std::cout << "Matched literal token: " << curr_token << std::endl;
       return true;
     } else {
@@ -491,7 +518,7 @@ bool Parser::TraverseTableData(TableData *data) {
     //std::cout << "Matching a token: " << data->mData.mToken << std::endl;
     if (data->mData.mToken == curr_token) {
       found = true;
-      mCurToken++;
+      MoveCurToken();
       //std::cout << "Matched a token: " << curr_token << std::endl;
     }
     break;

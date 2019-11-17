@@ -69,6 +69,8 @@ private:
   void AddFailed(RuleTable *, unsigned);
   bool WasFailed(RuleTable *, unsigned);
 
+  bool MoveCurToken();  // move mCurToken one step.
+
   // Every language has a fixed number of entry point to start parsing. Eg. in Java
   // the top level language construct is class, so the entry point is ClassDeclaration.
   // In C, the top level construct is either function or statement.
@@ -78,7 +80,7 @@ private:
   std::vector<RuleTable*> mTopTables;
 
   // Every language has certain number of ending separators, which means the end of
-  // a complete statement.
+  // a complete statement. For example ';' in most languages.
 public:
   Parser(const char *f, Module *m);
   Parser(const char *f);

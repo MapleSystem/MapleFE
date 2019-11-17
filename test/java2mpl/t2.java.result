@@ -5,11 +5,11 @@ Separator  Token:  Comma
 Separator  Token:  Whitespace
 Identifier Token:  b
 Separator  Token:  Semicolon
-Matched 5 tokens.
 Identifier Token:  a
 Separator  Token:  Whitespace
 Operator   Token:  Assign
 Separator  Token:  Whitespace
 Integer Literal Token: 0
 Separator  Token:  Semicolon
-Matched 4 tokens.
+Matched 5 tokens.
+Matched 9 tokens.

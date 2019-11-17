@@ -4,7 +4,6 @@ Identifier Token:  a
 Operator   Token:  Add
 Identifier Token:  b
 Separator  Token:  Semicolon
-Matched 6 tokens.
 Identifier Token:  a
 Operator   Token:  Assign
 Separator  Token:  Lparen
@@ -13,7 +12,7 @@ Operator   Token:  Add
 Identifier Token:  b
 Separator  Token:  Rparen
 Separator  Token:  Semicolon
-Matched 8 tokens.
+Matched 6 tokens.
 Keyword    Token:  int
 Separator  Token:  Whitespace
 Identifier Token:  a
@@ -24,4 +23,5 @@ Operator   Token:  Add
 Identifier Token:  b
 Separator  Token:  Rparen
 Separator  Token:  Semicolon
-Matched 9 tokens.
+Matched 14 tokens.
+Matched 23 tokens.
