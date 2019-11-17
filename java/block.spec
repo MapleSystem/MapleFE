@@ -29,12 +29,25 @@ rule ClassBodyDeclaration   : ONEOF(ClassMemberDeclaration)
 #                                    InstanceInitializer,
 #                                    StaticInitializer,
 #                                    ConstructorDeclaration)
-rule ClassMemberDeclaration : ONEOF(FieldDeclaration)
-#                                    MethodDeclaration,
+rule ClassMemberDeclaration : ONEOF(FieldDeclaration,
+                                    MethodDeclaration)
 #                                    ClassDeclaration,
 #                                    InterfaceDeclaration,
 #                                    ';')
-rule FieldDeclaration       : ZEROORMORE(FieldModifier) + UnannType + VariableDeclaratorList + ';'
+rule FieldDeclaration  : ZEROORMORE(FieldModifier) + UnannType + VariableDeclaratorList + ';'
+
+rule MethodDeclaration : ZEROORMORE(MethodModifier) + MethodHeader + MethodBody
+rule MethodBody        : ONEOF(Block, ';')
+rule MethodHeader      : ONEOF(Result + MethodDeclarator + ZEROORONE(Throws))
+#                               TypeParameters + ZEROORMORE(Annotation) + Result + MethodDeclarator +
+#                               ZEROORONE(Throws))
+rule Result            : ONEOF(UnannType, "void")
+rule MethodDeclarator  : Identifier + '(' + ZEROORONE(FormalParameterList) + ')' + ZEROORONE(Dims)
+rule Throws            : "fakethrows"
+rule MethodModifier    : "fakeones"
+rule FormalParameterList : "fakexxx"
+
+
 # A fake ones
 rule FieldModifier          : "fakefieldmodifier"
 rule EnumDeclaration        : "fakeenumdeclaration"
