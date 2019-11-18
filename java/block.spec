@@ -45,8 +45,13 @@ rule Result            : ONEOF(UnannType, "void")
 rule MethodDeclarator  : Identifier + '(' + ZEROORONE(FormalParameterList) + ')' + ZEROORONE(Dims)
 rule Throws            : "fakethrows"
 rule MethodModifier    : "fakeones"
+
+# The Java Lang Spec v8 about FormalParameterList is wrong. It doesn't have a ZEROORONE op
+# enclosing the LastFormalParameter, in which case the parser will match all the tokens
+# of parameters before it goes to LastFormalParameter, which in turn cause LastFormalParameter
+# left un-matched. So I added ZEROORONE to fix it.
 rule FormalParameterList : ONEOF(ReceiverParameter,
-                                 FormalParameters + ',' + LastFormalParameter,
+                                 FormalParameters + ZEROORONE(',' + LastFormalParameter),
                                  LastFormalParameter)
 rule FormalParameters  : ONEOF(FormalParameter + ZEROORMORE(',' + FormalParameter),
                                ReceiverParameter + ZEROORMORE(',' + FormalParameter))
