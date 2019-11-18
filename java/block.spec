@@ -45,7 +45,16 @@ rule Result            : ONEOF(UnannType, "void")
 rule MethodDeclarator  : Identifier + '(' + ZEROORONE(FormalParameterList) + ')' + ZEROORONE(Dims)
 rule Throws            : "fakethrows"
 rule MethodModifier    : "fakeones"
-rule FormalParameterList : "fakexxx"
+rule FormalParameterList : ONEOF(ReceiverParameter,
+                                 FormalParameters + ',' + LastFormalParameter,
+                                 LastFormalParameter)
+rule FormalParameters  : ONEOF(FormalParameter + ZEROORMORE(',' + FormalParameter),
+                               ReceiverParameter + ZEROORMORE(',' + FormalParameter))
+rule FormalParameter   : ZEROORMORE(VariableModifier) + UnannType + VariableDeclaratorId
+rule ReceiverParameter : ZEROORMORE(Annotation) + UnannType + ZEROORONE(Identifier + '.') + "this"
+rule LastFormalParameter : ONEOF(ZEROORMORE(VariableModifier) + UnannType + ZEROORMORE(Annotation) +
+                                   "..." + VariableDeclaratorId,
+                                 FormalParameter)
 
 
 # A fake ones
