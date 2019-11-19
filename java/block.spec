@@ -32,8 +32,8 @@ rule ClassBodyDeclaration   : ONEOF(ClassMemberDeclaration,
 rule InstanceInitializer    : Block
 rule StaticInitializer      : "static" + Block
 rule ClassMemberDeclaration : ONEOF(FieldDeclaration,
-                                    MethodDeclaration)
-#                                    ClassDeclaration,
+                                    MethodDeclaration,
+                                    ClassDeclaration)
 #                                    InterfaceDeclaration,
 #                                    ';')
 rule FieldDeclaration  : ZEROORMORE(FieldModifier) + UnannType + VariableDeclaratorList + ';'
@@ -64,8 +64,10 @@ rule LastFormalParameter : ONEOF(ZEROORMORE(VariableModifier) + UnannType + ZERO
                                  FormalParameter)
 
 
+rule FieldModifier   : ONEOF(Annotation, "public", "protected", "private",
+                             "static", "final", "transient", "volatile")
+
 # A fake ones
-rule FieldModifier          : "fakefieldmodifier"
 rule EnumDeclaration        : "fakeenumdeclaration"
 
 rule BlockStatement  : ONEOF(LocalVariableDeclarationStatement,
