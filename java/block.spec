@@ -27,8 +27,8 @@ rule InterfaceTypeList : InterfaceType + ZEROORMORE(',' + InterfaceType)
 rule ClassBody              : "{" + ZEROORMORE(ClassBodyDeclaration) + "}"
 rule ClassBodyDeclaration   : ONEOF(ClassMemberDeclaration,
                                     InstanceInitializer,
-                                    StaticInitializer)
-#                                    ConstructorDeclaration)
+                                    StaticInitializer,
+                                    ConstructorDeclaration)
 rule InstanceInitializer    : Block
 rule StaticInitializer      : "static" + Block
 rule ClassMemberDeclaration : ONEOF(FieldDeclaration,
@@ -67,9 +67,31 @@ rule LastFormalParameter : ONEOF(ZEROORMORE(VariableModifier) + UnannType + ZERO
 rule FieldModifier   : ONEOF(Annotation, "public", "protected", "private",
                              "static", "final", "transient", "volatile")
 
+################################################################
+#                        Constructor                           #
+################################################################
+rule ConstructorDeclaration : ZEROORMORE(ConstructorModifier) + ConstructorDeclarator +
+                              ZEROORONE(Throws) + ConstructorBody
+rule ConstructorModifier    : ONEOF(Annotation, "public", "protected", "private")
+rule ConstructorDeclarator  : ZEROORONE(TypeParameters) + SimpleTypeName + '(' +
+                              ZEROORONE(FormalParameterList) + ')'
+rule SimpleTypeName         : Identifier
+rule ConstructorBody        : '{' + ZEROORONE(ExplicitConstructorInvocation) +
+                              ZEROORONE(BlockStatements) + '}'
+
+rule ExplicitConstructorInvocation : "fakeexplicit"
+#[TypeArguments] this ( [ArgumentList] ) ;
+#[TypeArguments] super ( [ArgumentList] ) ;
+#ExpressionName . [TypeArguments] super ( [ArgumentList] ) ;
+#Primary . [TypeArguments] super ( [ArgumentList] ) ;
+
+################
 # A fake ones
 rule EnumDeclaration        : "fakeenumdeclaration"
 
+######################################################################
+#                        Block                                       #
+######################################################################
 rule BlockStatement  : ONEOF(LocalVariableDeclarationStatement,
                              ClassDeclaration,
                              Statement)
