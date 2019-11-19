@@ -25,10 +25,12 @@ rule InterfaceTypeList : InterfaceType + ZEROORMORE(',' + InterfaceType)
 
 # class body
 rule ClassBody              : "{" + ZEROORMORE(ClassBodyDeclaration) + "}"
-rule ClassBodyDeclaration   : ONEOF(ClassMemberDeclaration)
-#                                    InstanceInitializer,
-#                                    StaticInitializer,
+rule ClassBodyDeclaration   : ONEOF(ClassMemberDeclaration,
+                                    InstanceInitializer,
+                                    StaticInitializer)
 #                                    ConstructorDeclaration)
+rule InstanceInitializer    : Block
+rule StaticInitializer      : "static" + Block
 rule ClassMemberDeclaration : ONEOF(FieldDeclaration,
                                     MethodDeclaration)
 #                                    ClassDeclaration,
