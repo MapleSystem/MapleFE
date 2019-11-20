@@ -79,11 +79,11 @@ rule SimpleTypeName         : Identifier
 rule ConstructorBody        : '{' + ZEROORONE(ExplicitConstructorInvocation) +
                               ZEROORONE(BlockStatements) + '}'
 
-rule ExplicitConstructorInvocation : "fakeexplicit"
-#[TypeArguments] this ( [ArgumentList] ) ;
-#[TypeArguments] super ( [ArgumentList] ) ;
-#ExpressionName . [TypeArguments] super ( [ArgumentList] ) ;
-#Primary . [TypeArguments] super ( [ArgumentList] ) ;
+rule ExplicitConstructorInvocation : ONEOF(
+         ZEROORONE(TypeArguments) + "this" + '(' + ZEROORONE(ArgumentList) + ')' +  ';',
+         ZEROORONE(TypeArguments) + "super" + '(' + ZEROORONE(ArgumentList) + ')' +  ';',
+         ExpressionName + '.' + ZEROORONE(TypeArguments) + "super" + '(' + ZEROORONE(ArgumentList) + ')' +  ';',
+         Primary + '.' + ZEROORONE(TypeArguments) + "super" + '(' + ZEROORONE(ArgumentList) + ')' +  ';')
 
 ################
 # A fake ones
