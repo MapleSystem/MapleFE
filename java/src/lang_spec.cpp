@@ -1,5 +1,15 @@
 #include "lang_spec.h"
 
+// For all the string to value functions below, we assume the syntax of 's' is correct
+// for a literal in Java.
+
+float  StringToValueImpl::StringToFloat(std::string &s) {return 0.0;}
+double StringToValueImpl::StringToDouble(std::string &s) {return 0.0;}
+bool   StringToValueImpl::StringToBool(std::string &s) {return false;}
+char   StringToValueImpl::StringToChar(std::string &s) {return 'c';}
+bool   StringToValueImpl::StringIsNull(std::string &s) {return false;}
+
+
 // Each language has its own format of literal. So this function handles Java literals.
 // It translate a string into a literal.
 //

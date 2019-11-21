@@ -10,12 +10,11 @@
 
 class StringToValueImpl : public StringToValue {
 public:
-  int    StringToInt(std::string &s) {return 0;}
-  float  StringToFloat(std::string &s) {return 0.0;}
-  double StringToDouble(std::string &s) {return 0.0;}
-  bool   StringToBool(std::string &s) {return false;}
-  char   StringToChar(std::string &s) {return 'c';}
-  bool   StringIsNull(std::string &s) {return false;}
+  float  StringToFloat(std::string &s);
+  double StringToDouble(std::string &s);
+  bool   StringToBool(std::string &s);
+  char   StringToChar(std::string &s);
+  bool   StringIsNull(std::string &s);
 };
 
 extern LitData ProcessLiteral(LT_Type type, const char *str);

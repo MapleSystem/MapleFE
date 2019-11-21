@@ -41,6 +41,25 @@ static inline bool StringEqualNoCase(const std::string& a, const std::string& b)
   return true;
 }
 
+// Remove a certain character from a string, and form a new one
+static std::string StringRemoveChar(const std::string &s, const char c) {
+  std::string result;
+  for (unsigned i = 0; i <= s.length(); i++) {
+    if (s[i] != c)
+      result.push_back(s[i]);
+  }
+  return result;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//  Below are some common practice to convert a string to a value.
+////////////////////////////////////////////////////////////////////////////////
+
+extern long StringToDecNumeral(std::string s);
+extern long StringToHexNumeral(std::string s);
+extern long StringToBinNumeral(std::string s);
+extern long StringToOctNumeral(std::string s);
+
 //////////////////////////////////////////////////////////////////////////
 //         Converting a string literal to value                         //
 // Provides a set of general functions, and allow future overriding     //
@@ -51,13 +70,13 @@ static inline bool StringEqualNoCase(const std::string& a, const std::string& b)
 
 class StringToValue {
 public:
-  virtual int    StringToInt(std::string &);
-  virtual float  StringToFloat(std::string &);
-  virtual double StringToDouble(std::string &);
-  virtual bool   StringToBool(std::string &);
-  virtual char   StringToChar(std::string &);
-
-  virtual bool   StringIsNull(std::string &);
+  int    StringToInt(std::string &);
+  long   StringToLong(std::string &);
+  float  StringToFloat(std::string &);
+  double StringToDouble(std::string &);
+  bool   StringToBool(std::string &);
+  char   StringToChar(std::string &);
+  bool   StringIsNull(std::string &);
 };
 #endif
 
