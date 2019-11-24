@@ -195,13 +195,13 @@ bool RuleTableWalker::TraverseTableData(TableData *data) {
 //           ... + ZEROORMOREE(...) + LASTELEMENT
 // [NOTE] We handle only one ZEROORMORE or ZEROORONE case.
 //
-// The algorithm is a loop walking on the mLexer->line, starting at mLexer->curidx,
-// saved as init_idx
-//   1. We skipping ZEROORXXX to match LAST_ELEMENT, starting index named start_idx
+// The algorithm is a loop walking on the mLexer->line, starting at mLexer->curidx.
+// Suppose it's saved at init_idx.
+//   1. We skipping ZEROORXXX to match LAST_ELEMENT. Suppose the starting index is
+//      saved as start_idx
 //   2. If success, we match the line from [init_idx, start_idx] against ZEROORXXX
 //   3. if success again, we move start_idx by one, repeat 1.
 // This is just a rough idea. Many border conditions will be checked while walking.
-//
 ///////////////////////////////////////////////////////////////////////////////////
 
 static bool IsZeroorxxxTableData (const TableData *td) {
