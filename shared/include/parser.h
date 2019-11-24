@@ -79,8 +79,6 @@ private:
   // the traversal will start with.
   std::vector<RuleTable*> mTopTables;
 
-  // Every language has certain number of ending separators, which means the end of
-  // a complete statement. For example ';' in most languages.
 public:
   Parser(const char *f, Module *m);
   Parser(const char *f);

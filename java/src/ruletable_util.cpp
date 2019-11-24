@@ -1,3 +1,5 @@
+#include <cstring>
+
 #include "ruletable_util.h"
 #include "lexer.h"
 #include "lang_spec.h"
@@ -89,6 +91,7 @@ RuleTableWalker::RuleTableWalker(const RuleTable *t, Lexer *l) {
   mTable = t;
   mLexer = l;
   mTokenNum = 0;
+  mCheckSeparator = true;
 }
 
 // The Lexer cursor moves if found target, or restore the original location.
@@ -98,10 +101,14 @@ bool RuleTableWalker::TraverseTableData(TableData *data) {
 
   switch (data->mType) {
 
+  // The first thinking is I also want to check if the next text after 'curidx' is a separtor.
+  // This is the case in parsing a DT_String. However, we have many rules handling DT_Char
+  // and they don't expect the following to be a separator. For example, the DecimalNumeral rule
+  // specifies its content char by char, so in this case we don't check if the next is a separator.
   case DT_Char:
     if(*(mLexer->line + mLexer->curidx) == data->mData.mChar) {
+      mLexer->curidx += 1;
       found = true;
-      mLexer->curidx++;
     }
     break;
 
@@ -109,18 +116,20 @@ bool RuleTableWalker::TraverseTableData(TableData *data) {
     if( !strncmp(mLexer->line + mLexer->curidx, data->mData.mString, strlen(data->mData.mString))) { 
       // Need to make sure the following text is a separator
       mLexer->curidx += strlen(data->mData.mString); 
-      if (TraverseSepTable() != SEP_NA) {
+      if (mCheckSeparator && (TraverseSepTable() != SEP_NA)) {
         // TraverseSepTable() moves 'curidx', need restore it
         mLexer->curidx = old_pos + strlen(data->mData.mString); 
         // Put into StringPool
         mLexer->mStringPool.FindString(data->mData.mString);
         found = true;
+      } else {
+        found = true;
       }
-     }
+    }
 
-     // If not found, restore curidx
-     if (!found)
-       mLexer->curidx = old_pos;
+    // If not found, restore curidx
+    if (!found)
+      mLexer->curidx = old_pos;
 
     break;
 
@@ -165,8 +174,170 @@ bool RuleTableWalker::TraverseTableData(TableData *data) {
 // The mLexer->curidx will move if we successfully found something. So the string
 // of found token can be obtained by the difference of 'new' and 'old' curidx.
 //
-// !!!!!!!!! right now, This just travese for one single token  !!!!!!!!!!!!!!!
+//  ======================= About Second Try ============================
+//
+// According to the spec of some languages, e.g. Java. It has productions for Hex
+// numerals as below.
+//
+// rule HexDigitOrUnderscore : ONEOF(HexDigit, '_')
+// rule HexDigitsAndUnderscores:HexDigitOrUnderscore + ZEROORMORE(HexDigitOrUnderscore)
+// rule HexDigits  : ONEOF(HexDigit,
+//             ------->    HexDigit + ZEROORONE(HexDigitsAndUnderscores) + HexDigit)
+//
+// The problem comes from the line pointed by arrow. Look at the ZEROORONE(...),
+// it's easy to see that for a string like "123", ZEROORONE(...) will eat up all the
+// characters until the end of string. Which means the third element, or the HexDigit
+// at the end will never get a chance to match.
+//
+// So we come up with a second try. The idea is simple, we want to try a second time.
+// [NOTE] we only handle the case where the production has the following patten,
+//           ... + ZEROORONE(...) + LASTELEMENT  or
+//           ... + ZEROORMOREE(...) + LASTELEMENT
+// [NOTE] We handle only one ZEROORMORE or ZEROORONE case.
+//
+// The algorithm is a loop walking on the mLexer->line, starting at mLexer->curidx,
+// saved as init_idx
+//   1. We skipping ZEROORXXX to match LAST_ELEMENT, starting index named start_idx
+//   2. If success, we match the line from [init_idx, start_idx] against ZEROORXXX
+//   3. if success again, we move start_idx by one, repeat 1.
+// This is just a rough idea. Many border conditions will be checked while walking.
+//
 ///////////////////////////////////////////////////////////////////////////////////
+
+static bool IsZeroorxxxTableData (const TableData *td) {
+  bool is_zero_xxx = false;
+  switch (td->mType) {
+  case DT_Subtable: {
+    const RuleTable *t = td->mData.mEntry;
+    EntryType type = t->mType;
+    if ((type == ET_Zeroorone) || (type == ET_Zeroormore))
+      is_zero_xxx = true;
+    break;
+  }
+  default:
+    break;
+  }
+  return is_zero_xxx;
+}
+
+bool RuleTableWalker::TraverseSecondTry(const RuleTable *rule_table) {
+  // save the status
+  char *old_line = mLexer->line;
+  unsigned old_pos = mLexer->curidx;
+
+  bool need_try = false;
+
+  EntryType type = rule_table->mType;
+  MASSERT((type == ET_Concatenate) && "Wrong entry type of table.");
+
+  // Step 1. We only handle pattens ending with ... + ZEROORXXX(...) + YYY
+  //         Anything else will return false.
+  //         So I'll check the condition.
+  unsigned i = 0;
+  for (; i < rule_table->mNum; i++) {
+    TableData *data = rule_table->mData + i;
+    if (IsZeroorxxxTableData(data))
+      break;
+  }
+  if (i == rule_table->mNum - 2)
+    need_try = true;
+
+  if (!need_try)
+    return false;
+
+  i = 0;
+  bool found = false;
+
+  // step 2. Let the parts before the ending to finish.
+  //         If those fail, we don't need go on.
+  for (; i < rule_table->mNum - 2; i++) {
+    TableData *data = rule_table->mData + i;
+    found = TraverseTableData(data);
+    if (!found)
+      break;
+  }
+  if (!found)
+    return false;
+
+  // step 3. The working loop.
+  //         NOTE: 1. We are lucky here since it's lexing, so don't need cross the line.
+  //               2. mLexer->curidx points to the part for the ending two element.
+  //               3. We need find the longest match.
+
+  // These four are the final result if success.
+  // [NOTE] The reason I use 'the one after' as xxx_end, is to check if TraverseTableData()
+  // really moves the curidx. Or in another word, if it matches anything or nother.
+  // If it matches something, xxx_end will be greater than xxx_start, or else they are equal.
+  unsigned yyy_start = mLexer->curidx;
+  unsigned yyy_end = 0;                     // the one after last char
+  unsigned zeroxxx_start = mLexer->curidx;  // A fixed index
+  unsigned zeroxxx_end = 0;                 // the one after last char
+
+  // These four are the working result.
+  unsigned w_yyy_start = mLexer->curidx;
+  unsigned w_yyy_end = 0;                     // the one after last char
+  unsigned w_zeroxxx_start = mLexer->curidx;  // A fixed index
+  unsigned w_zeroxxx_end = 0;                 // the one after last char, 
+
+  TableData *zeroxxx = rule_table->mData + i;
+  TableData *yyy = rule_table->mData + (i + 1);
+
+  found = false;
+
+  while (1) {
+    // step 3.1 try yyy first.
+    mLexer->line = old_line;
+    mLexer->curidx = w_yyy_start;
+
+    bool temp_found = TraverseTableData(yyy);
+    if (!temp_found)
+      break;
+    else
+      w_yyy_end = mLexer->curidx;
+
+    // step 3.2 try zeroxxx
+    //          Have to build a line for the lexer.
+    unsigned len = w_yyy_start - w_zeroxxx_start;
+    if (len) {
+      char *newline = (char*)malloc(len);
+      strncpy(newline, mLexer->line + w_zeroxxx_start, len);
+      mLexer->line = newline;
+      mLexer->curidx = 0;
+
+      // 1. It always get true since it's a zeroxxx
+      // 2. It may match nothing, meaning mLexer->curidx never get a chance to move one step.
+      temp_found = TraverseTableData(zeroxxx);
+      MASSERT(temp_found && "Zeroxxx didn't return true.");
+      free(newline);
+
+      w_zeroxxx_end = mLexer->curidx;
+    }
+
+    // step 3.3 Need check if zeroxxx_end is connected to yyy_start
+    if ((w_zeroxxx_end + zeroxxx_start) == w_yyy_start) {
+      found = true;
+      yyy_start = w_yyy_start;
+      yyy_end = w_yyy_end;
+      //zeroxxx_start = w_zeroxxx_start; It's a fixed number
+      zeroxxx_end = w_zeroxxx_end;
+    } else
+      break;
+
+    // move yyy start one step
+    w_yyy_start++;
+  }
+
+  // adjust the status of mLexer
+  if (found) {
+    mLexer->line = old_line;
+    mLexer->curidx = yyy_end;
+    return true;
+  } else {
+    mLexer->line = old_line;
+    mLexer->curidx = old_pos;
+    return false;
+  }
+}
 
 bool RuleTableWalker::Traverse(const RuleTable *rule_table) {
   bool matched = false;
@@ -179,13 +350,21 @@ bool RuleTableWalker::Traverse(const RuleTable *rule_table) {
 
   switch(type) {
   case ET_Oneof: {
+    // We need find the longest match.
     bool found = false;
+    unsigned new_pos = mLexer->curidx;
     for (unsigned i = 0; i < rule_table->mNum; i++) {
       TableData *data = rule_table->mData + i;
-      found = found | TraverseTableData(data);
-      if (found)
-        break;
+      bool temp_found = TraverseTableData(data);
+      if (temp_found) {
+        found = true;
+        if (mLexer->curidx > new_pos)
+          new_pos = mLexer->curidx;
+        // Need restore curidx for the next try.
+        mLexer->curidx = old_pos;
+      }
     }
+    mLexer->curidx = new_pos;
     matched = found; 
     break;
   }
@@ -233,6 +412,12 @@ bool RuleTableWalker::Traverse(const RuleTable *rule_table) {
       if (!found)
         break;
     }
+
+    if (!found) {
+      mLexer->curidx = old_pos;
+      found = TraverseSecondTry(rule_table);
+    }
+
     matched = found;
     break;
   }
@@ -346,8 +531,14 @@ const char* GetIdentifier(Lexer *lex) {
 }
 
 // NOTE: Literal table is TblLiteral.
+//
+// Literal rules are special, an element of the rules may be a char, or a string, and they
+// are not followed by separators. They may be followed by another char or string. So we
+// don't check if the following is a separator or not.
 LitData GetLiteral(Lexer *lex) {
   RuleTableWalker walker(&TblLiteral, lex);
+  walker.mCheckSeparator = false;
+
   unsigned old_pos = lex->GetCuridx();
 
   LitData ld;

@@ -1,0 +1,7 @@
+Identifier Token:  a
+Separator  Token:  Whitespace
+Operator   Token:  Assign
+Separator  Token:  Whitespace
+Integer Literal Token: 273
+Separator  Token:  Semicolon
+Matched 4 tokens.

@@ -44,7 +44,7 @@ static inline bool StringEqualNoCase(const std::string& a, const std::string& b)
 // Remove a certain character from a string, and form a new one
 static std::string StringRemoveChar(const std::string &s, const char c) {
   std::string result;
-  for (unsigned i = 0; i <= s.length(); i++) {
+  for (unsigned i = 0; i < s.length(); i++) {
     if (s[i] != c)
       result.push_back(s[i]);
   }

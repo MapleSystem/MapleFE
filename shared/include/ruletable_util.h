@@ -48,7 +48,9 @@ class RuleTableWalker {
 public:
   const RuleTable *mTable;
   Lexer           *mLexer;
-  unsigned         mTokenNum;  // Matched token number
+  unsigned         mTokenNum;       // Matched token number
+  bool             mCheckSeparator; // When we start walk a rule table to find a token,
+                                    // do we need check if the following data is a separator?
 public:
   RuleTableWalker(const RuleTable *, Lexer *);
   ~RuleTableWalker(){}
@@ -60,6 +62,7 @@ public:
   // put in the string pool. 
   bool        Traverse(const RuleTable*);
   bool        TraverseTableData(TableData*);
+  bool        TraverseSecondTry(const RuleTable*);  // See comments in the implementation.
 
   SepId       TraverseSepTable();        // Walk the separator table
   OprId       TraverseOprTable();        // Walk the operator table
