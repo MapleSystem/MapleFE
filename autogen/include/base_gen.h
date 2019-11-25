@@ -40,6 +40,9 @@ typedef enum {
   ST_Null
 }ST_status;
 
+extern FileWriter *gDebugHFile;    // debug functions
+extern FileWriter *gDebugCppFile;  // debug functions
+extern unsigned    gRuleTableNum;  // rule table number
 
 class BaseGen {
 public:

@@ -79,6 +79,9 @@ private:
   // the traversal will start with.
   std::vector<RuleTable*> mTopTables;
 
+  // debug functions
+  const char* GetRuleTableName(const RuleTable*);
+
 public:
   Parser(const char *f, Module *m);
   Parser(const char *f);

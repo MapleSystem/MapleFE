@@ -174,10 +174,28 @@ _________________________________________________
 
 __________________________________________________
 
-Appendix.  System Supported Functions
+Appendix 1.  System Supported Functions
 __________________________________________________
 
   The list of autogen supported functions are as below.
   1. IsUnsigned(%x)
   2. GenerateBinaryExpr(%x, %y)
   3. GenerateUnary(%x)
+__________________________________________________
+
+Appendix 2.  Tips for Spec Writers
+__________________________________________________
+
+Tip 1. When you write a rule production, and it's ending with ZEROORONE(...) + YYY or
+       ZEROORMORE(...) + YYY, please pay attention. The matching phase walks through the
+       rule elements and tries to match as much as it can for each element. This means
+       if ZEROORONE(...) can eat up all the text until the end if it can also match the
+       data for YYY, and YYY will never get a chance to get matched. This results in a
+       failure of matching.
+
+       Luckily, the matching algorithm will handle this by a second try which will match
+       YYY at first and then match the ZEROORONE(...). However it has a limitation for now
+       which is it only handles one single ZEROORONE(...) followed by another element.
+
+       So please keep in mind, if you do have such a need please make sure there is only
+       one single ZEROORONE(...) in such cases.
