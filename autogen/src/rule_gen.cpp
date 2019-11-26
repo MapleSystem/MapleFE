@@ -1,6 +1,7 @@
 #include "massert.h"
 #include "rule_gen.h"
 #include "buffer2write.h"
+#include "base_gen.h"
 
 // Generate one initialization function for each rule. Below is the elaboration of most of
 // of rule case.
@@ -169,6 +170,15 @@ void RuleGen::Gen4TableHeader(const Rule *rule, const RuleElem *elem){
   extern_decl += ";";
   mHeaderBuffer->NewOneBuffer(extern_decl.size(), true);
   mHeaderBuffer->AddStringWholeLine(extern_decl);
+
+  // Add the table name to debug file.
+  extern_decl = "{&";
+  extern_decl += rule_table_name;
+  extern_decl += ", \"";
+  extern_decl += rule_table_name;
+  extern_decl += "\"}\,";
+  gDebugCppFile->WriteOneLine(extern_decl.c_str(), extern_decl.size());
+  gRuleTableNum++;
 }
 
 // Either rule or elem is used.

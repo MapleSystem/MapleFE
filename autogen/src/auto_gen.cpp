@@ -27,12 +27,12 @@
 //        const char      *mName;
 //      }RuleTableName;
 //      extern RuleTableName gRuleTableNames[];
-//      extern unsigned gRuleTableNum;
+//      extern unsigned RuleTableNum;
 //
 //    In Cpp file, we need
 //
 //    #include "gen_debug.h"
-//    unsigned gRuleTableNum;
+//    unsigned RuleTableNum;
 //    RuleTableName gRuleTableNames[] = {
 //      {&TblLiteral, "TblLiteral"},
 //      ...
@@ -61,10 +61,11 @@ void AutoGen::Init() {
   gDebugHFile->WriteOneLine("  const char      *mName;", 25);
   gDebugHFile->WriteOneLine("}RuleTableName;", 15);
   gDebugHFile->WriteOneLine("extern RuleTableName gRuleTableNames[];", 39);
-  gDebugHFile->WriteOneLine("extern unsigned gRuleTableNum;", 30);
+  gDebugHFile->WriteOneLine("extern unsigned RuleTableNum;", 29);
   gDebugHFile->WriteOneLine("#endif", 6);
 
   gDebugCppFile->WriteOneLine("#include \"gen_debug.h\"", 22);
+  gDebugCppFile->WriteOneLine("#include \"common_header_autogen.h\"", 34);
   gDebugCppFile->WriteOneLine("RuleTableName gRuleTableNames[] = {", 35);
 
   std::string hFile = lang_path_header + "gen_reserved.h";
@@ -211,5 +212,10 @@ void AutoGen::Gen() {
   mStmtGen->Generate();
 
   gDebugCppFile->WriteOneLine("};", 2);
+  std::string num = std::to_string(gRuleTableNum);
+  std::string num_line = "unsigned RuleTableNum = ";
+  num_line += num;
+  num_line += ";";
+  gDebugCppFile->WriteOneLine(num_line.c_str(), num_line.size());
 }
 
