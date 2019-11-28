@@ -35,6 +35,11 @@ public:
 
   std::vector<std::string> mVars;
 
+  // debug info
+  bool mTraceTable;         // trace enter/exit rule tables
+  bool mTraceFailed;        // trace mFailed
+  bool mTraceVisited;       // trace mVisitedStack
+
 private:
   std::vector<Token*>   mTokens;         // Storage of all tokens, including active, discarded,
                                          // and pending.

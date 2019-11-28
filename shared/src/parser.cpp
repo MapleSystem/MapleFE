@@ -18,6 +18,10 @@ Parser::Parser(const char *name, Module *m) : filename(name), mModule(m) {
   // init lexer
   mLexer->PrepareForFile(file);
   mCurToken = 0;
+
+  mTraceTable = false;
+  mTraceVisited = false;
+  mTraceFailed = false;
 }
 
 Parser::Parser(const char *name) : filename(name) {
@@ -27,6 +31,10 @@ Parser::Parser(const char *name) : filename(name) {
   mLexer->PrepareForFile(file);
   mCurToken = 0;
   mPending = 0;
+
+  mTraceTable = false;
+  mTraceVisited = false;
+  mTraceFailed = false;
 }
 
 

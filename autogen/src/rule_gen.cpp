@@ -120,7 +120,6 @@ std::string RuleGen::Gen4RuleElem(const RuleElem *elem) {
     data += "DT_Subtable, &";
     data += tbl_name;
     Gen4Table(NULL, elem);
-    Gen4TableHeader(NULL, elem);
     break;
   }
   default:
@@ -154,30 +153,23 @@ std::string RuleGen::Gen4TableData(const RuleElem *elem) {
   return table_data;
 }
 
-// Either rule or elem is used.
-// If it's a rule, we are generating for a rule in .spec
-// If it's an elem, we are generating a sub table for an elemen in a rule in .spec.
-void RuleGen::Gen4TableHeader(const Rule *rule, const RuleElem *elem){
-  std::string rule_table_name;
-  if(rule) {
-    rule_table_name = GetTblName(rule);
-  } else {
-    rule_table_name = GetSubTblName();
-  }
+void RuleGen::Gen4TableHeader(const std::string &rule_table_name){
   std::string extern_decl;
   extern_decl = "extern RuleTable ";
   extern_decl += rule_table_name;
   extern_decl += ";";
   mHeaderBuffer->NewOneBuffer(extern_decl.size(), true);
   mHeaderBuffer->AddStringWholeLine(extern_decl);
+}
 
-  // Add the table name to debug file.
-  extern_decl = "{&";
-  extern_decl += rule_table_name;
-  extern_decl += ", \"";
-  extern_decl += rule_table_name;
-  extern_decl += "\"}\,";
-  gDebugCppFile->WriteOneLine(extern_decl.c_str(), extern_decl.size());
+void RuleGen::GenDebug(const std::string &rule_table_name) {
+  std::string addr_name_mapping;
+  addr_name_mapping = "{&";
+  addr_name_mapping += rule_table_name;
+  addr_name_mapping += ", \"";
+  addr_name_mapping += rule_table_name;
+  addr_name_mapping += "\"}\,";
+  gDebugCppFile->WriteOneLine(addr_name_mapping.c_str(), addr_name_mapping.size());
   gRuleTableNum++;
 }
 
@@ -193,6 +185,9 @@ void RuleGen::Gen4Table(const Rule *rule, const RuleElem *elem){
   } else {
     rule_table_name = GetSubTblName();
   }
+  
+  Gen4TableHeader(rule_table_name);
+  GenDebug(rule_table_name);
 
   std::string rule_table_data_name = rule_table_name + "_data";
   std::string rule_table_data;
@@ -240,7 +235,6 @@ void RuleGen::Gen4Table(const Rule *rule, const RuleElem *elem){
 // We generate tables for rule and its sub-rules in depth first order.
 // 
 void RuleGen::Generate() {
-  Gen4TableHeader(mRule, NULL);
   Gen4Table(mRule, NULL);
 }
 

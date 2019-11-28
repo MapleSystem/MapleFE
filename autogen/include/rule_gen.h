@@ -33,7 +33,8 @@ private:
   //   2. Generate for the RuleElem in the Rule, aka. Sub Table.
   // This is why there are two parameters, but only one of them will be used.
   void Gen4Table(const Rule *, const RuleElem*);       // table def in .cpp
-  void Gen4TableHeader(const Rule *, const RuleElem*); // table decl in .h
+  void Gen4TableHeader(const std::string &tablename); // table decl in .h
+  void GenDebug(const std::string& tablename);   // Gen debug functions
 
 public:
   RuleGen(const Rule *r, FormattedBuffer *hbuf, FormattedBuffer *cbuf)
