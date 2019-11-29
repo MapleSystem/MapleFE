@@ -316,6 +316,32 @@ bool Parser::TraverseStmt() {
   return succ;
 }
 
+void Parser::DumpEnterTable(const char *table_name, unsigned indent) {
+  for (unsigned i = 0; i < indent; i++)
+    std::cout << " ";
+  std::cout << "Enter " << table_name << "@" << mCurToken << "{" << std::endl;
+}
+
+void Parser::DumpExitTable(const char *table_name, unsigned indent, bool succ, FailReason reason) {
+  for (unsigned i = 0; i < indent; i++)
+    std::cout << " ";
+  std::cout << "Exit  " << table_name << "@" << mCurToken;
+  if (succ) {
+    std::cout << " succ" << "}" << std::endl;
+  } else {
+    if (reason == Failed)
+      std::cout << " fail@WasFailed" << "}" << std::endl;
+    else if (reason == Looped)
+      std::cout << " fail@Looped" << "}" << std::endl;
+    else if (reason == NotIdentifier)
+      std::cout << " fail@NotIdentifer" << "}" << std::endl;
+    else if (reason == NotLiteral)
+      std::cout << " fail@NotLiteral" << "}" << std::endl;
+    else if (reason == ChildrenFailed)
+      std::cout << " fail@ChildrenFailed" << "}" << std::endl;
+  }
+}
+
 // return true : if all tokens in mActiveTokens are matched.
 //       false : if faled.
 bool Parser::TraverseRuleTable(RuleTable *rule_table) {
@@ -323,14 +349,21 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table) {
   unsigned old_pos = mCurToken;
   Token *curr_token = mActiveTokens[mCurToken];
 
+  mIndentation += 2;
+  const char *name = NULL;
   if (mTraceTable) {
-    const char *name = GetRuleTableName(rule_table);
-    std::cout << "Entering " << name << std::endl;
+    name = GetRuleTableName(rule_table);
+    DumpEnterTable(name, mIndentation);
   }
 
   //
-  if (WasFailed(rule_table, mCurToken))
+  if (WasFailed(rule_table, mCurToken)) {
+    if (mTraceTable) {
+      DumpExitTable(name, mIndentation, false, Failed);
+     }
+    mIndentation -= 2;
     return false;
+  }
 
   if (IsVisited(rule_table)) {
     //std::cout << " ==== " << std::endl;
@@ -343,7 +376,9 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table) {
     if (mVisitedStack[rule_table].size() > 0) {
       unsigned prev = mVisitedStack[rule_table].back();
       if (mCurToken == prev) {
-        //std::cout << " An endless loop." << std::endl;
+        if (mTraceTable)
+          DumpExitTable(name, mIndentation, false, Looped);
+        mIndentation -= 2;
         return false; 
       }
     }
@@ -359,10 +394,15 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table) {
     ClearVisited(rule_table);
     if (curr_token->IsIdentifier()) {
       MoveCurToken();
-      //std::cout << "Matched identifier token: " << curr_token << std::endl;
+      if (mTraceTable)
+        DumpExitTable(name, mIndentation, true);
+      mIndentation -= 2;
       return true;
     } else {
       AddFailed(rule_table, mCurToken);
+      if (mTraceTable)
+        DumpExitTable(name, mIndentation, false, NotIdentifier);
+      mIndentation -= 2;
       return false;
     }
   }
@@ -373,10 +413,15 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table) {
     ClearVisited(rule_table);
     if (curr_token->IsLiteral()) {
       MoveCurToken();
-      //std::cout << "Matched literal token: " << curr_token << std::endl;
+      if (mTraceTable)
+        DumpExitTable(name, mIndentation, true);
+      mIndentation -= 2;
       return true;
     } else {
       AddFailed(rule_table, mCurToken);
+      if (mTraceTable)
+        DumpExitTable(name, mIndentation, false, NotLiteral);
+      mIndentation -= 2;
       return false;
     }
   }
@@ -494,16 +539,13 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table) {
   else
     VisitedPop(rule_table);
 
-  if (mTraceTable) {
-    const char *name = GetRuleTableName(rule_table);
-    std::cout << "Exiting " << name << std::endl;
-  }
+  if (mTraceTable)
+    DumpExitTable(name, mIndentation, matched, ChildrenFailed);
+  mIndentation -= 2;
 
   if(matched) {
-    //std::cout << " matched." << std::endl;
     return true;
   } else {
-    //std::cout << " unmatched." << std::endl;
     mCurToken = old_pos;
     AddFailed(rule_table, mCurToken);
     return false;

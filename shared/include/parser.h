@@ -25,6 +25,15 @@ class Token;
 class RuleTable;
 class TableData;
 
+typedef enum {
+  Failed,
+  Looped,
+  NotIdentifier,
+  NotLiteral,
+  ChildrenFailed,
+  Null
+}FailReason;
+
 class Parser {
 public:
   Lexer *mLexer;
@@ -36,9 +45,13 @@ public:
   std::vector<std::string> mVars;
 
   // debug info
+  unsigned mIndentation;    //
   bool mTraceTable;         // trace enter/exit rule tables
   bool mTraceFailed;        // trace mFailed
   bool mTraceVisited;       // trace mVisitedStack
+  const char* GetRuleTableName(const RuleTable*);
+  void DumpEnterTable(const char *tablename, unsigned indent);
+  void DumpExitTable(const char *tablename, unsigned indent, bool succ, FailReason reason = Null);
 
 private:
   std::vector<Token*>   mTokens;         // Storage of all tokens, including active, discarded,
@@ -84,8 +97,6 @@ private:
   // the traversal will start with.
   std::vector<RuleTable*> mTopTables;
 
-  // debug functions
-  const char* GetRuleTableName(const RuleTable*);
 
 public:
   Parser(const char *f, Module *m);

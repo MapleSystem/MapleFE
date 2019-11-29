@@ -22,6 +22,7 @@ Parser::Parser(const char *name, Module *m) : filename(name), mModule(m) {
   mTraceTable = false;
   mTraceVisited = false;
   mTraceFailed = false;
+  mIndentation = 0;
 }
 
 Parser::Parser(const char *name) : filename(name) {
@@ -35,6 +36,7 @@ Parser::Parser(const char *name) : filename(name) {
   mTraceTable = false;
   mTraceVisited = false;
   mTraceFailed = false;
+  mIndentation = 0;
 }
 
 
