@@ -111,6 +111,48 @@
 // In order to save time, the first thing is avoiding entering a rule for the second
 // time with the same token position if that rule has failed before. This is the
 // origin of mFailed.
+//
+// 5. Appealing mechanism
+//
+// Let's look at an example, suppose we have the following rules,
+//    rule Primary : ONEOF(PrimaryNoNewArray,
+//                         ...)
+//    rule PrimaryNoNewArray : ONEOF("this",
+//                                   Primary + ...,
+//                                   FieldAccess)
+//    rule FieldAccess : Primary + '.' + Identifier
+//
+// And we have a line of code,
+//    this.a = 10;
+//
+// We start with rule Primary for 1st token "this". The traversal of all the rule tables
+// form a tree, with the root node as Primary. We depict the tree as below.
+//
+// Primary  <-- first instance
+//    |
+//    |--PrimaryNoNewArray
+//         |--"this"
+//         |--Primary  <-- second instance
+//         |     |--PrimaryNoNewArray
+//         |             |--"this"
+//         |             |--Primary <-- third instance, failed @ looped
+//         |             |--FieldAccess  <-- This is the node to appeal !!!
+//         |                   |--Primary <-- forth instance, failed @ looped
+//         |--FieldAccess
+//
+// Looking at the above depict, from the third instance on, all Primary will be found
+// endless loop but they are not marked as WasFailed since we don't define loop as failure.
+// However, the problem is coming from FieldAccess, which was mistakenly marked as
+// WasFailed because its sub-rule Primary failed.
+//
+// The truth is at the end of the second PrimaryNoNewArray, it's a success since it
+// contains "this". And second Primary (or all Primary) are success too. FieldAccess
+// doesn't have a chance to clear its mistaken WasFailed.
+//
+// The next time if we are traversing FiledAccess with "this", it will give a straightforward
+// fail due to the WasFailed.
+//
+// Obviously something has to be done to correct this problem. We call this Appealing.
 //////////////////////////////////////////////////////////////////////////////////
 
 
