@@ -130,10 +130,10 @@
 //
 // Primary  <-- first instance
 //    |
-//    |--PrimaryNoNewArray
+//    |--PrimaryNoNewArray  <-- first
 //         |--"this"
 //         |--Primary  <-- second instance
-//         |     |--PrimaryNoNewArray
+//         |     |--PrimaryNoNewArray  <-- second
 //         |             |--"this"
 //         |             |--Primary <-- third instance, failed @ looped
 //         |             |--FieldAccess  <-- This is the node to appeal !!!
@@ -146,13 +146,38 @@
 // WasFailed because its sub-rule Primary failed.
 //
 // The truth is at the end of the second PrimaryNoNewArray, it's a success since it
-// contains "this". And second Primary (or all Primary) are success too. FieldAccess
-// doesn't have a chance to clear its mistaken WasFailed.
-//
-// The next time if we are traversing FiledAccess with "this", it will give a straightforward
-// fail due to the WasFailed.
+// contains "this". And second Primary (so all Primary) are success too. FieldAccess
+// doesn't have a chance to clear its mistaken WasFailed. The next time if we are
+// traversing FiledAccess with "this", it will give a straightforward failure due to the
+// WasFailed.
 //
 // Obviously something has to be done to correct this problem. We call this Appealing.
+// I'll present the rough idea of appealing first and then describe some details.
+//
+// 1) Appealing is done through the help of tree shown above. We call it AppealTree.
+//    It starts with the root node created during the traversal of a top language construct,
+//    for example 'class' in Java. Each time we traverse a rule table, we create new
+//    children nodes for all of it children tables if they have. In this way, we form
+//    the AppealTree.
+//
+// 2) Suppose we are visiting node N. Before we traverse all its children, it's guaranteed
+//    that the node is successful so far. Otherwise, it will return fail before visiting
+//    children, or in another word, N will be the leaf node.
+//
+//    After visiting all children, we check the status of N. It could be marked as
+//    FailLooped.
+//
+// 3) If we see N is of FailLooped, we start check the sub-tree to see if there is
+//    any nodes between successful N and the leaf nodes N which are marked as FailChildren.
+//    These nodes in between are those to appeal.
+//
+// == Status of node ==
+//
+// A node could be marked with different status after visiting it, including
+//   * FailLooped
+//   * FailChildren
+//   * FailWasFail
+//   * Succ
 //////////////////////////////////////////////////////////////////////////////////
 
 
