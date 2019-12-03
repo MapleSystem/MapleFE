@@ -26,13 +26,22 @@ class RuleTable;
 class TableData;
 
 typedef enum {
-  Failed,
-  Looped,
-  NotIdentifier,
-  NotLiteral,
-  ChildrenFailed,
-  Null
-}FailReason;
+  FailWasFailed,
+  FailLooped,
+  FailNotIdentifier,
+  FailNotLiteral,
+  FailChildrenFailed,
+  Succ
+}AppealStatus;
+
+struct AppealNode;
+struct AppealNode{
+  RuleTable *mTable;
+  std::vector<RuleTable*> mChildren;
+  AppealNode *mParent;
+  AppealStatus mBefore;
+  AppealStatus mAfter;
+};
 
 class Parser {
 public:
@@ -51,7 +60,8 @@ public:
   bool mTraceVisited;       // trace mVisitedStack
   const char* GetRuleTableName(const RuleTable*);
   void DumpEnterTable(const char *tablename, unsigned indent);
-  void DumpExitTable(const char *tablename, unsigned indent, bool succ, FailReason reason = Null);
+  void DumpExitTable(const char *tablename, unsigned indent,
+                     bool succ, AppealStatus reason = Succ);
 
 private:
   std::vector<Token*>   mTokens;         // Storage of all tokens, including active, discarded,
@@ -97,6 +107,8 @@ private:
   // the traversal will start with.
   std::vector<RuleTable*> mTopTables;
 
+  // Appealing System
+  std::vector<AppealNode> mAppealNodes;
 
 public:
   Parser(const char *f, Module *m);

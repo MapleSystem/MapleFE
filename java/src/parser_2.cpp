@@ -175,8 +175,10 @@
 //
 // A node could be marked with different status after visiting it, including
 //   * FailLooped
-//   * FailChildren
+//   * FailChildrenFailed
 //   * FailWasFail
+//   * FailNotLiteral
+//   * FailNotIdentifier
 //   * Succ
 //////////////////////////////////////////////////////////////////////////////////
 
@@ -259,7 +261,14 @@ bool Parser::ParseStmt_autogen() {
   ClearFailed();
   mTokens.clear();
   mStartingTokens.clear();
+  mAppealNodes.clear();
   mPending = 0;
+
+  // set the root appealing node
+  AppealNode appeal_root;
+  appeal_root.mTable = NULL;
+  appeal_root.mParent = NULL;
+  mAppealNodes.push_back(appeal_root);
 
   // mActiveTokens contain some un-matched tokens from last time of TraverseStmt(),
   // because at the end of every TraverseStmt() when it finishes its matching it always
@@ -315,22 +324,22 @@ void Parser::DumpEnterTable(const char *table_name, unsigned indent) {
   std::cout << "Enter " << table_name << "@" << mCurToken << "{" << std::endl;
 }
 
-void Parser::DumpExitTable(const char *table_name, unsigned indent, bool succ, FailReason reason) {
+void Parser::DumpExitTable(const char *table_name, unsigned indent, bool succ, AppealStatus reason) {
   for (unsigned i = 0; i < indent; i++)
     std::cout << " ";
   std::cout << "Exit  " << table_name << "@" << mCurToken;
   if (succ) {
     std::cout << " succ" << "}" << std::endl;
   } else {
-    if (reason == Failed)
+    if (reason == FailWasFailed)
       std::cout << " fail@WasFailed" << "}" << std::endl;
-    else if (reason == Looped)
+    else if (reason == FailLooped)
       std::cout << " fail@Looped" << "}" << std::endl;
-    else if (reason == NotIdentifier)
+    else if (reason == FailNotIdentifier)
       std::cout << " fail@NotIdentifer" << "}" << std::endl;
-    else if (reason == NotLiteral)
+    else if (reason == FailNotLiteral)
       std::cout << " fail@NotLiteral" << "}" << std::endl;
-    else if (reason == ChildrenFailed)
+    else if (reason == FailChildrenFailed)
       std::cout << " fail@ChildrenFailed" << "}" << std::endl;
   }
 }
@@ -352,25 +361,22 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table) {
   //
   if (WasFailed(rule_table, mCurToken)) {
     if (mTraceTable) {
-      DumpExitTable(name, mIndentation, false, Failed);
+      DumpExitTable(name, mIndentation, false, FailWasFailed);
      }
     mIndentation -= 2;
     return false;
   }
 
   if (IsVisited(rule_table)) {
-    //std::cout << " ==== " << std::endl;
-    //std::cout << "In table " << rule_table << " mCurToken " << mCurToken;
     // If there is already token position in stack, it means we are at at least the
     // 3rd instance. So need check if we made any progress between the two instances.
     //
     // This is not a failure case, don't need put into mFailed.
-    //
     if (mVisitedStack[rule_table].size() > 0) {
       unsigned prev = mVisitedStack[rule_table].back();
       if (mCurToken == prev) {
         if (mTraceTable)
-          DumpExitTable(name, mIndentation, false, Looped);
+          DumpExitTable(name, mIndentation, false, FailLooped);
         mIndentation -= 2;
         return false; 
       }
@@ -394,7 +400,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table) {
     } else {
       AddFailed(rule_table, mCurToken);
       if (mTraceTable)
-        DumpExitTable(name, mIndentation, false, NotIdentifier);
+        DumpExitTable(name, mIndentation, false, FailNotIdentifier);
       mIndentation -= 2;
       return false;
     }
@@ -413,7 +419,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table) {
     } else {
       AddFailed(rule_table, mCurToken);
       if (mTraceTable)
-        DumpExitTable(name, mIndentation, false, NotLiteral);
+        DumpExitTable(name, mIndentation, false, FailNotLiteral);
       mIndentation -= 2;
       return false;
     }
@@ -533,7 +539,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table) {
     VisitedPop(rule_table);
 
   if (mTraceTable)
-    DumpExitTable(name, mIndentation, matched, ChildrenFailed);
+    DumpExitTable(name, mIndentation, matched, FailChildrenFailed);
   mIndentation -= 2;
 
   if(matched) {
