@@ -250,6 +250,17 @@ bool Parser::Parse_autogen() {
   return succ;
 } 
 
+// Right now I didn't use mempool yet, will come back.
+// [TODO] Using mempool.
+void Parser::ClearAppealNodes() {
+  for (unsigned i = 0; i < mAppealNodes.size(); i++) {
+    AppealNode *node = mAppealNodes[i];
+    if (node)
+      delete node;
+  }
+  mAppealNodes.clear();
+}
+
 // return true : if successful
 //       false : if failed
 // This is the parsing for highest level language constructs. It could be class
@@ -261,13 +272,11 @@ bool Parser::ParseStmt_autogen() {
   ClearFailed();
   mTokens.clear();
   mStartingTokens.clear();
-  mAppealNodes.clear();
+  ClearAppealNodes();
   mPending = 0;
 
   // set the root appealing node
-  AppealNode appeal_root;
-  appeal_root.mTable = NULL;
-  appeal_root.mParent = NULL;
+  AppealNode *appeal_root = new AppealNode();
   mAppealNodes.push_back(appeal_root);
 
   // mActiveTokens contain some un-matched tokens from last time of TraverseStmt(),
@@ -303,7 +312,7 @@ bool Parser::TraverseStmt() {
   std::vector<RuleTable*>::iterator it = mTopTables.begin();
   for (; it != mTopTables.end(); it++) {
     RuleTable *t = *it;
-    succ = TraverseRuleTable(t);
+    succ = TraverseRuleTable(t, mAppealNodes[0]);
     if (succ) {
       //MASSERT((mPending == mTokens.size()) && "Num of matched token is wrong.");
       break;
@@ -346,7 +355,7 @@ void Parser::DumpExitTable(const char *table_name, unsigned indent, bool succ, A
 
 // return true : if all tokens in mActiveTokens are matched.
 //       false : if faled.
-bool Parser::TraverseRuleTable(RuleTable *rule_table) {
+bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *appeal_parent) {
   bool matched = false;
   unsigned old_pos = mCurToken;
   Token *curr_token = mActiveTokens[mCurToken];
@@ -358,12 +367,21 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table) {
     DumpEnterTable(name, mIndentation);
   }
 
+  // set the apppeal node
+  AppealNode *appeal = new AppealNode();
+  appeal->mTable = rule_table;
+  appeal->mParent = appeal_parent;
+  mAppealNodes.push_back(appeal);
+  appeal_parent->mChildren.push_back(appeal);
+
   //
   if (WasFailed(rule_table, mCurToken)) {
     if (mTraceTable) {
       DumpExitTable(name, mIndentation, false, FailWasFailed);
-     }
+    }
     mIndentation -= 2;
+    appeal->mBefore = FailWasFailed;
+    appeal->mAfter = FailWasFailed;
     return false;
   }
 
@@ -378,6 +396,8 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table) {
         if (mTraceTable)
           DumpExitTable(name, mIndentation, false, FailLooped);
         mIndentation -= 2;
+        appeal->mBefore = FailLooped;
+        appeal->mAfter = FailLooped;
         return false; 
       }
     }
@@ -396,12 +416,16 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table) {
       if (mTraceTable)
         DumpExitTable(name, mIndentation, true);
       mIndentation -= 2;
+      appeal->mBefore = Succ;
+      appeal->mAfter = Succ;
       return true;
     } else {
       AddFailed(rule_table, mCurToken);
       if (mTraceTable)
         DumpExitTable(name, mIndentation, false, FailNotIdentifier);
       mIndentation -= 2;
+      appeal->mBefore = FailNotIdentifier;
+      appeal->mAfter = FailNotIdentifier;
       return false;
     }
   }
@@ -415,32 +439,37 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table) {
       if (mTraceTable)
         DumpExitTable(name, mIndentation, true);
       mIndentation -= 2;
+      appeal->mBefore = Succ;
+      appeal->mAfter = Succ;
       return true;
     } else {
       AddFailed(rule_table, mCurToken);
       if (mTraceTable)
         DumpExitTable(name, mIndentation, false, FailNotLiteral);
       mIndentation -= 2;
+      appeal->mBefore = FailNotLiteral;
+      appeal->mAfter = FailNotLiteral;
       return false;
     }
   }
 
-  // Look into rule_table's data
-  EntryType type = rule_table->mType;
+  // Once reaching this point, the node was successful.
+  // Gonna look into rule_table's data
+  appeal->mBefore = Succ;
 
+  EntryType type = rule_table->mType;
   switch(type) {
 
   // There is an issue in this case. Any rule which can consume one or more tokens is
   // considered 'found'. However, we need find the one which consume the most tokens.
   // [Question, TODO]: It this right? ...
-  
   case ET_Oneof: {
     bool found = false;
     unsigned new_mCurToken = mCurToken; // position after most tokens eaten
     unsigned old_mCurToken = mCurToken;
     for (unsigned i = 0; i < rule_table->mNum; i++) {
       TableData *data = rule_table->mData + i;
-      bool temp_found = TraverseTableData(data);
+      bool temp_found = TraverseTableData(data, appeal);
       found = found | temp_found;
       if (temp_found) {
         if (mCurToken > new_mCurToken)
@@ -472,7 +501,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table) {
         // every table entry starts from the old_pos
         mCurToken = old_pos;
         TableData *data = rule_table->mData + i;
-        found = found | TraverseTableData(data);
+        found = found | TraverseTableData(data, appeal);
         if (mCurToken > new_pos)
           new_pos = mCurToken;
       }
@@ -497,7 +526,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table) {
     bool found = false;
     for (unsigned i = 0; i < rule_table->mNum; i++) {
       TableData *data = rule_table->mData + i;
-      found = TraverseTableData(data);
+      found = TraverseTableData(data, appeal);
       // The first element is hit, then stop.
       if (found)
         break;
@@ -510,7 +539,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table) {
     bool found = false;
     for (unsigned i = 0; i < rule_table->mNum; i++) {
       TableData *data = rule_table->mData + i;
-      found = TraverseTableData(data);
+      found = TraverseTableData(data, appeal);
       // The first element missed, then we stop.
       if (!found)
         break;
@@ -522,7 +551,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table) {
   // Next table
   // There is only one data table in this case
   case ET_Data: {
-    matched = TraverseTableData(rule_table->mData);
+    matched = TraverseTableData(rule_table->mData, appeal);
     break;
   }
 
@@ -543,8 +572,10 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table) {
   mIndentation -= 2;
 
   if(matched) {
+    appeal->mAfter = Succ;
     return true;
   } else {
+    appeal->mAfter = FailChildrenFailed;
     mCurToken = old_pos;
     AddFailed(rule_table, mCurToken);
     return false;
@@ -552,7 +583,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table) {
 }
 
 // The mCurToken moves if found target, or restore the original location.
-bool Parser::TraverseTableData(TableData *data) {
+bool Parser::TraverseTableData(TableData *data, AppealNode *parent) {
   unsigned old_pos = mCurToken;
   bool     found = false;
   Token   *curr_token = mActiveTokens[mCurToken];
@@ -578,7 +609,7 @@ bool Parser::TraverseTableData(TableData *data) {
     break;
   case DT_Subtable: {
     RuleTable *t = data->mData.mEntry;
-    found = TraverseRuleTable(t);
+    found = TraverseRuleTable(t, parent);
     if (!found)
       mCurToken = old_pos;
     break;

@@ -31,16 +31,21 @@ typedef enum {
   FailNotIdentifier,
   FailNotLiteral,
   FailChildrenFailed,
-  Succ
+  Succ,
+  NA
 }AppealStatus;
 
-struct AppealNode;
-struct AppealNode{
+class AppealNode;
+class AppealNode{
+public:
   RuleTable *mTable;
-  std::vector<RuleTable*> mChildren;
+  std::vector<AppealNode*> mChildren;
   AppealNode *mParent;
   AppealStatus mBefore;
   AppealStatus mAfter;
+
+  AppealNode() {mTable=NULL; mParent = NULL; mBefore = NA; mAfter = NA;}
+  ~AppealNode(){}
 };
 
 class Parser {
@@ -84,8 +89,8 @@ private:
   // See the detailed comments in Parser::Parse().
   std::map<RuleTable *, std::vector<unsigned>> mFailed;
 
-  bool TraverseRuleTable(RuleTable*); // success if all tokens are matched.
-  bool TraverseTableData(TableData*); // success if all tokens are matched.
+  bool TraverseRuleTable(RuleTable*, AppealNode*); // success if all tokens are matched.
+  bool TraverseTableData(TableData*, AppealNode*); // success if all tokens are matched.
   bool TraverseStmt();                // success if all tokens are matched.
   bool IsVisited(RuleTable*);
   void SetVisited(RuleTable*);
@@ -108,7 +113,8 @@ private:
   std::vector<RuleTable*> mTopTables;
 
   // Appealing System
-  std::vector<AppealNode> mAppealNodes;
+  std::vector<AppealNode*> mAppealNodes;
+  void ClearAppealNodes();
 
 public:
   Parser(const char *f, Module *m);
