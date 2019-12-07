@@ -39,6 +39,7 @@ class AppealNode;
 class AppealNode{
 public:
   RuleTable *mTable;
+  unsigned   mToken;
   std::vector<AppealNode*> mChildren;
   AppealNode *mParent;
   AppealStatus mBefore;
@@ -61,12 +62,14 @@ public:
   // debug info
   unsigned mIndentation;    //
   bool mTraceTable;         // trace enter/exit rule tables
+  bool mTraceAppeal;        // trace appealing
   bool mTraceFailed;        // trace mFailed
   bool mTraceVisited;       // trace mVisitedStack
   const char* GetRuleTableName(const RuleTable*);
   void DumpEnterTable(const char *tablename, unsigned indent);
   void DumpExitTable(const char *tablename, unsigned indent,
                      bool succ, AppealStatus reason = Succ);
+  void DumpAppeal(RuleTable *table, unsigned token);
 
 private:
   std::vector<Token*>   mTokens;         // Storage of all tokens, including active, discarded,
@@ -89,8 +92,10 @@ private:
   // See the detailed comments in Parser::Parse().
   std::map<RuleTable *, std::vector<unsigned>> mFailed;
 
-  bool TraverseRuleTable(RuleTable*, AppealNode*); // success if all tokens are matched.
-  bool TraverseTableData(TableData*, AppealNode*); // success if all tokens are matched.
+  bool TraverseRuleTable(RuleTable*, AppealNode*);  // success if all tokens are matched.
+  bool TraverseTableData(TableData*, AppealNode*);  // success if all tokens are matched.
+  bool TraverseConcatenate(RuleTable*, AppealNode*);
+
   bool TraverseStmt();                // success if all tokens are matched.
   bool IsVisited(RuleTable*);
   void SetVisited(RuleTable*);
@@ -99,8 +104,9 @@ private:
   void VisitedPop(RuleTable*);
 
   void ClearFailed() {mFailed.clear();}
-  void AddFailed(RuleTable *, unsigned);
-  bool WasFailed(RuleTable *, unsigned);
+  void AddFailed(RuleTable*, unsigned);
+  void ResetFailed(RuleTable*, unsigned);
+  bool WasFailed(RuleTable*, unsigned);
 
   bool MoveCurToken();  // move mCurToken one step.
 
@@ -115,6 +121,8 @@ private:
   // Appealing System
   std::vector<AppealNode*> mAppealNodes;
   void ClearAppealNodes();
+  void Appeal(AppealNode*);
+  void AppealTraverse(AppealNode *node, AppealNode *root);
 
 public:
   Parser(const char *f, Module *m);

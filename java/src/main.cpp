@@ -23,6 +23,8 @@ int main (int argc, char *argv[]) {
       exit(-1);
     } else if (!strncmp(argv[i], "--trace-table", 13) && (strlen(argv[i]) == 13)) {
       parser->mTraceTable = true;
+    } else if (!strncmp(argv[i], "--trace-appeal", 14) && (strlen(argv[i]) == 14)) {
+      parser->mTraceAppeal = true;
     } else if (!strncmp(argv[i], "--trace-stack", 13) && (strlen(argv[i]) == 13)) {
       parser->mTraceVisited = true;
     } else if (!strncmp(argv[i], "--trace-failed", 14) && (strlen(argv[i]) == 14)) {

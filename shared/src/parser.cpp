@@ -20,6 +20,7 @@ Parser::Parser(const char *name, Module *m) : filename(name), mModule(m) {
   mCurToken = 0;
 
   mTraceTable = false;
+  mTraceAppeal = false;
   mTraceVisited = false;
   mTraceFailed = false;
   mIndentation = 0;
@@ -34,6 +35,7 @@ Parser::Parser(const char *name) : filename(name) {
   mPending = 0;
 
   mTraceTable = false;
+  mTraceAppeal = false;
   mTraceVisited = false;
   mTraceFailed = false;
   mIndentation = 0;
@@ -335,6 +337,18 @@ void Parser::VisitedPop(RuleTable *table) {
 void Parser::AddFailed(RuleTable *table, unsigned token) {
   //std::cout << " push " << mCurToken << " from " << table;
   mFailed[table].push_back(token);
+}
+
+// Remove one fail case for the table
+void Parser::ResetFailed(RuleTable *table, unsigned token) {
+  std::vector<unsigned>::iterator it = mFailed[table].begin();;
+  for (; it != mFailed[table].end(); it++) {
+    if (*it == token)
+      break;
+  }
+
+  if (it != mFailed[table].end())
+    mFailed[table].erase(it);
 }
 
 bool Parser::WasFailed(RuleTable *table, unsigned token) {

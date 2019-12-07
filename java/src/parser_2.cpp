@@ -180,6 +180,36 @@
 //   * FailNotLiteral
 //   * FailNotIdentifier
 //   * Succ
+//
+// 6. Second Try
+//
+// This is the same issue as the second try in lexer. Please refer ruletable_util.cpp
+// for details of lexer's second try.
+//
+// Look at the following example,
+//   rule FieldAccess: Primary + '.' + Identifier
+//   rule Primary : ONEOF(...
+//                        "this"
+//                        FieldAccess)
+//
+// Suppose we have a piece of code containing "this.member", and all three token can
+// be matched by Primary, or only the first one can be matched. In my first implementation
+// we always match as many tokens as possible. However, here is the problem. If Primary
+// taken all the tokens, FieldAccess will get failure. If Primary takes only one token,
+// it will be a match. We definitly want a match!
+//
+// This brings a design which need records all the possible number of tokens a rule can match.
+// And give the following rules a chance.
+//
+// However, this creats another issue. Let's use AppealNode to explain. All nodes form
+// a tree. During the traversal, if one node can have multiple possible matchings, the number
+// of possible matchings could explode. To limit this explosion we only allow this multiple
+// choice happen for temporary, and its parent node will decide the final number of tokens
+// immediately. This means the parent node will choose the right one. In this way, the final tree
+// has no multipe options at all.
+//
+// Also this happens when the child node is a ONEOF node and parent node is a Concatenate node.
+//
 //////////////////////////////////////////////////////////////////////////////////
 
 
@@ -261,6 +291,86 @@ void Parser::ClearAppealNodes() {
   mAppealNodes.clear();
 }
 
+// As the above comments mention, this function is going to walk through the appeal
+// tree to find the appropriate nodes and clear their failure mark.
+//
+// 'root_node' is the one who returns success when traversing. So we need check if
+// it was marked failure before in its sub-tree.
+//
+//             ======  Two Issues In The Traversal ==========
+//
+// 1. The token number is different. Here is an example,
+//
+//   Primary@9 <-- Succ, mCurToken becomes 12
+//    |--Primary@9
+//    |    |--FieldAccess@9 <-- FailedChildrenFailed
+//    |            |--Primary@9 FailLooped
+//    |--SomeOtherRule Succ <-- mCurToken becomes 12
+//
+//   When FieldAccess is marked as failed, the token was 9. But when we finish the
+//   first Primary, it's a success, while token becomes 12 since SomeOtherRule eats
+//   more than one tokens. In this way, the token numbers are different at the two
+//   points.
+//
+//   Since RuleTables are marked as WasFailed regarding specific token numbers, we
+//   need figure out a way to clear the failure flag regarding a specific token. So
+//   we decided to add token num at each AppealNode.
+//
+// 2. Multiple occurrence. Use the above example again with minor changes.
+//
+//   Primary@9 <-- Succ, mCurToken becomes 12
+//    |--Primary@9
+//    |    |--FieldAccess@9 <-- FailedChildrenFailed
+//    |            |--Primary@9 FailLooped
+//    |--Expression@9
+//    |    |--FieldAccess@9 <-- FailedChildrenFailed
+//    |            |--Primary@9 FailLooped
+//    |--SomeOtherRule Succ <-- mCurToken becomes 12
+//
+//   As the example shows, FieldAccess got failures at two different places due to
+//   Primary failiing in endless loop. The appealing of FieldAccess will be done twice
+//   and at the second time we may not find the @9 token when we trying to clean WasFailed.
+//
+//   We will just ignore the second clearing of FieldAccess if we cannot find the token num
+//   in the mFailed.
+
+static std::vector<AppealNode*> traverse_list;
+void Parser::AppealTraverse(AppealNode *node, AppealNode *root) {
+  traverse_list.push_back(node);
+
+  MASSERT((root->mAfter == Succ) && "root->mAfter is not Succ.");
+  if ((node->mTable == root->mTable) && (node->mAfter == FailLooped)) {
+    // walk the list, and clear the fail flag for appropriate node
+    // we also set the mAfter of node to Succ so that the futural traversal won't
+    // modify it again.
+    for (unsigned i = 0; i < traverse_list.size(); i++) {
+      AppealNode *n = traverse_list[i];
+      if ((n->mBefore == Succ) && (n->mAfter == FailChildrenFailed)) {
+        if (mTraceAppeal)
+          DumpAppeal(n->mTable, n->mToken);
+        ResetFailed(n->mTable, n->mToken);
+        n->mAfter = Succ;
+      }
+    }
+  }
+
+
+  for (unsigned i = 0; i < node->mChildren.size(); i++) {
+    AppealTraverse(node->mChildren[i], root);
+    traverse_list.pop_back();
+  }
+}
+
+void Parser::Appeal(AppealNode *root) {
+  traverse_list.clear();
+  traverse_list.push_back(root);
+
+  for (unsigned i = 0; i < root->mChildren.size(); i++) {
+    AppealTraverse(root->mChildren[i], root);
+    traverse_list.pop_back();
+  }
+}
+
 // return true : if successful
 //       false : if failed
 // This is the parsing for highest level language constructs. It could be class
@@ -327,6 +437,13 @@ bool Parser::TraverseStmt() {
   return succ;
 }
 
+void Parser::DumpAppeal(RuleTable *table, unsigned token) {
+  for (unsigned i = 0; i < mIndentation + 2; i++)
+    std::cout << " ";
+  const char *name = GetRuleTableName(table);
+  std::cout << "!!Reset the Failed flag of " << name << " @" << token << std::endl;
+}
+
 void Parser::DumpEnterTable(const char *table_name, unsigned indent) {
   for (unsigned i = 0; i < indent; i++)
     std::cout << " ";
@@ -350,11 +467,21 @@ void Parser::DumpExitTable(const char *table_name, unsigned indent, bool succ, A
       std::cout << " fail@NotLiteral" << "}" << std::endl;
     else if (reason == FailChildrenFailed)
       std::cout << " fail@ChildrenFailed" << "}" << std::endl;
+    else if (reason == NA)
+      std::cout << " fail@NA" << "}" << std::endl;
   }
 }
 
+// Please read the comments point 6 at the beginning of this file.
+// We need prepare certain storage for multiple possible matchings. The successful token
+// number could be more than one. I'm using fixed array to save them. If needed to extend
+// in the future, just extend it.
+static unsigned gSuccTokensNum;
+static unsigned gSuccTokens[8];
+
 // return true : if all tokens in mActiveTokens are matched.
 //       false : if faled.
+//
 bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *appeal_parent) {
   bool matched = false;
   unsigned old_pos = mCurToken;
@@ -370,6 +497,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *appeal_parent)
   // set the apppeal node
   AppealNode *appeal = new AppealNode();
   appeal->mTable = rule_table;
+  appeal->mToken = mCurToken;
   appeal->mParent = appeal_parent;
   mAppealNodes.push_back(appeal);
   appeal_parent->mChildren.push_back(appeal);
@@ -456,13 +584,13 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *appeal_parent)
   // Once reaching this point, the node was successful.
   // Gonna look into rule_table's data
   appeal->mBefore = Succ;
+  gSuccTokensNum = 0;
 
   EntryType type = rule_table->mType;
   switch(type) {
 
-  // There is an issue in this case. Any rule which can consume one or more tokens is
-  // considered 'found'. However, we need find the one which consume the most tokens.
-  // [Question, TODO]: It this right? ...
+  // Need save all the possible matchings, and let the parent node to decide.
+  // But we temporarily return the longest matching.
   case ET_Oneof: {
     bool found = false;
     unsigned new_mCurToken = mCurToken; // position after most tokens eaten
@@ -472,6 +600,9 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *appeal_parent)
       bool temp_found = TraverseTableData(data, appeal);
       found = found | temp_found;
       if (temp_found) {
+        // save the possilbe matchings
+        gSuccTokens[gSuccTokensNum++] = mCurToken;
+
         if (mCurToken > new_mCurToken)
           new_mCurToken = mCurToken;
         // Need restore the position of original mCurToken,
@@ -536,14 +667,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *appeal_parent)
 
   // Lexer needs to find all elements, and in EXACTLY THE ORDER as defined.
   case ET_Concatenate: {
-    bool found = false;
-    for (unsigned i = 0; i < rule_table->mNum; i++) {
-      TableData *data = rule_table->mData + i;
-      found = TraverseTableData(data, appeal);
-      // The first element missed, then we stop.
-      if (!found)
-        break;
-    }
+    bool found = TraverseConcatenate(rule_table, appeal);
     matched = found;
     break;
   }
@@ -572,13 +696,32 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *appeal_parent)
   mIndentation -= 2;
 
   if(matched) {
+    // We try to appeal only if it succeeds at the end.
     appeal->mAfter = Succ;
+    Appeal(appeal);
     return true;
   } else {
     appeal->mAfter = FailChildrenFailed;
     mCurToken = old_pos;
     AddFailed(rule_table, mCurToken);
     return false;
+  }
+}
+
+// For concatenate rule, we need take care of multiple possible matching.
+// There could be many different scenarios regarding multiple matching,
+// Suppose a rule :  Element_1 + Element_2 + Element_3
+//    case 1:  Element_1 has multiple matching, makes Element_2 fail
+//    case 2:  Element_1 has multiple matching, makes Element_3 fail while Element_2 succ.
+//    case 3:  Element_1 has multiple matching, makes Element_3 fail while Element_2 succ.
+bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *parent) {
+  bool found = false;
+  for (unsigned i = 0; i < rule_table->mNum; i++) {
+    TableData *data = rule_table->mData + i;
+    found = TraverseTableData(data, appeal);
+    // The first element missed, then we stop.
+    if (!found)
+      break;
   }
 }
 
@@ -598,12 +741,16 @@ bool Parser::TraverseTableData(TableData *data, AppealNode *parent) {
   // separator, operator, keywords are planted as DT_Token.
   // just need check the pointer of token
   case DT_Token:
-    //std::cout << "Matching a token: " << data->mData.mToken << std::endl;
+    mIndentation += 2;
+    if (mTraceTable)
+      DumpEnterTable("token", mIndentation);
     if (data->mData.mToken == curr_token) {
       found = true;
       MoveCurToken();
-      //std::cout << "Matched a token: " << curr_token << std::endl;
     }
+    if (mTraceTable)
+      DumpExitTable("token", mIndentation, found, NA);
+    mIndentation -= 2;
     break;
   case DT_Type:
     break;
