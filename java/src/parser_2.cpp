@@ -210,6 +210,8 @@
 //
 // Also this happens when the child node is a ONEOF node and parent node is a Concatenate node.
 //
+// [NOTE] Second Try will brings in extra branches in the appealing tree. However, it seems doesn't
+//        create any serious problem.
 //////////////////////////////////////////////////////////////////////////////////
 
 
@@ -476,8 +478,9 @@ void Parser::DumpExitTable(const char *table_name, unsigned indent, bool succ, A
 // We need prepare certain storage for multiple possible matchings. The successful token
 // number could be more than one. I'm using fixed array to save them. If needed to extend
 // in the future, just extend it.
+#define MAX_SUCC_TOKENS 16
 static unsigned gSuccTokensNum;
-static unsigned gSuccTokens[8];
+static unsigned gSuccTokens[MAX_SUCC_TOKENS];
 
 // return true : if all tokens in mActiveTokens are matched.
 //       false : if faled.
@@ -486,6 +489,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *appeal_parent)
   bool matched = false;
   unsigned old_pos = mCurToken;
   Token *curr_token = mActiveTokens[mCurToken];
+  gSuccTokensNum = 0;
 
   mIndentation += 2;
   const char *name = NULL;
@@ -584,13 +588,12 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *appeal_parent)
   // Once reaching this point, the node was successful.
   // Gonna look into rule_table's data
   appeal->mBefore = Succ;
-  gSuccTokensNum = 0;
 
   EntryType type = rule_table->mType;
   switch(type) {
 
-  // Need save all the possible matchings, and let the parent node to decide.
-  // But we temporarily return the longest matching.
+  // Need save all the possible matchings, and let the parent node to decide if the
+  // parent node is a concatenate. However, for the other cases, we choose the longest matching.
   case ET_Oneof: {
     bool found = false;
     unsigned new_mCurToken = mCurToken; // position after most tokens eaten
@@ -714,15 +717,62 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *appeal_parent)
 //    case 1:  Element_1 has multiple matching, makes Element_2 fail
 //    case 2:  Element_1 has multiple matching, makes Element_3 fail while Element_2 succ.
 //    case 3:  Element_1 has multiple matching, makes Element_3 fail while Element_2 succ.
+//
+// We only handle case 1, in which a multiple matching element followed by a failed element.
+//
 bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *parent) {
   bool found = false;
+  unsigned temp_succ_tokens_num;
+  unsigned temp_succ_tokens[MAX_SUCC_TOKENS];
+
   for (unsigned i = 0; i < rule_table->mNum; i++) {
     TableData *data = rule_table->mData + i;
-    found = TraverseTableData(data, appeal);
-    // The first element missed, then we stop.
+    found = TraverseTableData(data, parent);
+
+    if (found) {
+      // For <Oneof> node it saved the matchings. For other nodes, gSuccTokensNum is 0.
+      temp_succ_tokens_num = gSuccTokensNum;
+      for (unsigned id = 0; id < gSuccTokensNum; id++)
+        temp_succ_tokens[id] = gSuccTokens[id];
+    } else {
+      MASSERT((gSuccTokensNum == 0) && "failed case has >=1 successful matching?");
+
+      // If the previous element has single matching, we give up. Or we'll give a
+      // second try.
+      if (temp_succ_tokens_num <= 1) {
+        break;
+      } else {
+        // Perform Second Try
+        // Step 1. Save the mCurToken, it supposed to be the longest matching.
+        unsigned old_pos = mCurToken;
+
+        // Step 2. Iterate and try
+        //         There are again multiple possiblilities. Could be multiple matching again.
+        //         We will never go that far. We'll stop at the first matching.
+        //         [NOTE] The problem here is we'll create extra branches in the Appealing tree.
+        bool temp_found = false;
+        for (unsigned j = 0; j < temp_succ_tokens_num; j++) {
+          // The longest matching has been proven to be a failure.
+          if (temp_succ_tokens[j] == old_pos)
+            continue;
+          mCurToken = temp_succ_tokens[j];
+          temp_found = TraverseTableData(data, parent);
+          // As mentioned above, we stop at the first successfuly second try.
+          if (temp_found)
+            break;
+        }
+
+        // Step 3. Set the 'found'
+        found = temp_found;
+      }
+    }
+
+    // After second try, if it's still failed, we quit.
     if (!found)
       break;
   }
+
+  return found;
 }
 
 // The mCurToken moves if found target, or restore the original location.
