@@ -7,10 +7,11 @@
 
 static void help() {
   std::cout << "java2mpl <arguments>:\n" << std::endl;
-  std::cout << "   --help          : print this help" << std::endl;
-  std::cout << "   --trace-table   : Trace rule table when entering and exiting" << std::endl;
-  std::cout << "   --trace-failed  : Trace failed tokens of table" << std::endl;
-  std::cout << "   --trace-stack   : Trace visited-token stack of table" << std::endl;
+  std::cout << "   --help            : print this help" << std::endl;
+  std::cout << "   --trace-table     : Trace rule table when entering and exiting" << std::endl;
+  std::cout << "   --trace-second-try: Trace parser second try." << std::endl;
+  std::cout << "   --trace-failed    : Trace failed tokens of table" << std::endl;
+  std::cout << "   --trace-stack     : Trace visited-token stack of table" << std::endl;
 }
 
 int main (int argc, char *argv[]) {
@@ -25,6 +26,8 @@ int main (int argc, char *argv[]) {
       parser->mTraceTable = true;
     } else if (!strncmp(argv[i], "--trace-appeal", 14) && (strlen(argv[i]) == 14)) {
       parser->mTraceAppeal = true;
+    } else if (!strncmp(argv[i], "--trace-second-try", 18) && (strlen(argv[i]) == 18)) {
+      parser->mTraceSecondTry = true;
     } else if (!strncmp(argv[i], "--trace-stack", 13) && (strlen(argv[i]) == 13)) {
       parser->mTraceVisited = true;
     } else if (!strncmp(argv[i], "--trace-failed", 14) && (strlen(argv[i]) == 14)) {

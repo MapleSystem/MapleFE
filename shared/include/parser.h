@@ -63,6 +63,7 @@ public:
   unsigned mIndentation;    //
   bool mTraceTable;         // trace enter/exit rule tables
   bool mTraceAppeal;        // trace appealing
+  bool mTraceSecondTry;     // trace second try in parser.
   bool mTraceFailed;        // trace mFailed
   bool mTraceVisited;       // trace mVisitedStack
   const char* GetRuleTableName(const RuleTable*);

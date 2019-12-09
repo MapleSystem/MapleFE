@@ -489,7 +489,9 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *appeal_parent)
   bool matched = false;
   unsigned old_pos = mCurToken;
   Token *curr_token = mActiveTokens[mCurToken];
-  gSuccTokensNum = 0;
+
+  unsigned succ_tokens_num = 0;
+  unsigned succ_tokens[MAX_SUCC_TOKENS];
 
   mIndentation += 2;
   const char *name = NULL;
@@ -593,7 +595,10 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *appeal_parent)
   switch(type) {
 
   // Need save all the possible matchings, and let the parent node to decide if the
-  // parent node is a concatenate. However, for the other cases, we choose the longest matching.
+  // parent node is a concatenate. However, as the return value we choose the longest matching.
+  //
+  // [NOTE] When we collect the children's succ matchings, be ware there could be multiple matchings
+  //        in children table.
   case ET_Oneof: {
     bool found = false;
     unsigned new_mCurToken = mCurToken; // position after most tokens eaten
@@ -604,7 +609,9 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *appeal_parent)
       found = found | temp_found;
       if (temp_found) {
         // save the possilbe matchings
-        gSuccTokens[gSuccTokensNum++] = mCurToken;
+        // could be duplicated matchings
+        for (unsigned j = 0; j < gSuccTokensNum; j++)
+          //[TODO]
 
         if (mCurToken > new_mCurToken)
           new_mCurToken = mCurToken;
@@ -698,6 +705,16 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *appeal_parent)
     DumpExitTable(name, mIndentation, matched, FailChildrenFailed);
   mIndentation -= 2;
 
+  // This gSuccTokensNum is used only one time after it returns and used by
+  // the second try or accumulate to the parent's succ token numbers.
+  gSuccTokensNum = succ_tokens_num;
+  for (unsigned i = 0; i < succ_tokens_num; i++)
+    gSuccTokens[i] = succ_tokens[i];
+
+  if (mTraceSecondTry) {
+    std::cout << "gSuccTokensNum = " << gSuccTokensNum << std::endl;
+  }
+
   if(matched) {
     // We try to appeal only if it succeeds at the end.
     appeal->mAfter = Succ;
@@ -722,26 +739,31 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *appeal_parent)
 //
 bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *parent) {
   bool found = false;
-  unsigned temp_succ_tokens_num;
-  unsigned temp_succ_tokens[MAX_SUCC_TOKENS];
+  unsigned prev_succ_tokens_num = 0;
+  unsigned prev_succ_tokens[MAX_SUCC_TOKENS];
+  unsigned curr_succ_tokens_num = 0;
+  unsigned curr_succ_tokens[MAX_SUCC_TOKENS];
 
   for (unsigned i = 0; i < rule_table->mNum; i++) {
     TableData *data = rule_table->mData + i;
     found = TraverseTableData(data, parent);
 
-    if (found) {
-      // For <Oneof> node it saved the matchings. For other nodes, gSuccTokensNum is 0.
-      temp_succ_tokens_num = gSuccTokensNum;
-      for (unsigned id = 0; id < gSuccTokensNum; id++)
-        temp_succ_tokens[id] = gSuccTokens[id];
-    } else {
-      MASSERT((gSuccTokensNum == 0) && "failed case has >=1 successful matching?");
+    // For <Oneof> node it saved the matchings. For other nodes, gSuccTokensNum is 0.
+    curr_succ_tokens_num = gSuccTokensNum;
+    for (unsigned id = 0; id < gSuccTokensNum; id++)
+      curr_succ_tokens[id] = gSuccTokens[id];
 
-      // If the previous element has single matching, we give up. Or we'll give a
+    if (!found) {
+      if (mTraceSecondTry) {
+        std::cout << "gSuccTokensNum = " << gSuccTokensNum << std::endl;
+      }
+
+      MASSERT((gSuccTokensNum == 0) || ((gSuccTokensNum == 1) && (data->mType == DT_Token))
+               && "failed case has >=1 successful matching?");
+
+      // If the previous element has single matching or fail, we give up. Or we'll give a
       // second try.
-      if (temp_succ_tokens_num <= 1) {
-        break;
-      } else {
+      if (prev_succ_tokens_num > 1) {
         // Perform Second Try
         // Step 1. Save the mCurToken, it supposed to be the longest matching.
         unsigned old_pos = mCurToken;
@@ -751,11 +773,11 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *parent) {
         //         We will never go that far. We'll stop at the first matching.
         //         [NOTE] The problem here is we'll create extra branches in the Appealing tree.
         bool temp_found = false;
-        for (unsigned j = 0; j < temp_succ_tokens_num; j++) {
+        for (unsigned j = 0; j < prev_succ_tokens_num; j++) {
           // The longest matching has been proven to be a failure.
-          if (temp_succ_tokens[j] == old_pos)
+          if (prev_succ_tokens[j] == old_pos)
             continue;
-          mCurToken = temp_succ_tokens[j];
+          mCurToken = prev_succ_tokens[j];
           temp_found = TraverseTableData(data, parent);
           // As mentioned above, we stop at the first successfuly second try.
           if (temp_found)
@@ -764,10 +786,18 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *parent) {
 
         // Step 3. Set the 'found'
         found = temp_found;
+
+        // Step 4. If still fail after second try, we reset the mCurToken
+        if (!found)
+          mCurToken = old_pos;
       }
     }
 
-    // After second try, if it's still failed, we quit.
+    prev_succ_tokens_num = curr_succ_tokens_num;
+    for (unsigned id = 0; id < curr_succ_tokens_num; id++)
+      prev_succ_tokens[id] = curr_succ_tokens[id];
+
+    // After second try, if it still fails, we quit.
     if (!found)
       break;
   }
@@ -780,6 +810,7 @@ bool Parser::TraverseTableData(TableData *data, AppealNode *parent) {
   unsigned old_pos = mCurToken;
   bool     found = false;
   Token   *curr_token = mActiveTokens[mCurToken];
+  gSuccTokensNum = 0;
 
   switch (data->mType) {
   case DT_Char:
@@ -796,6 +827,8 @@ bool Parser::TraverseTableData(TableData *data, AppealNode *parent) {
       DumpEnterTable("token", mIndentation);
     if (data->mData.mToken == curr_token) {
       found = true;
+      gSuccTokensNum = 1;
+      gSuccTokens[0] = mCurToken;
       MoveCurToken();
     }
     if (mTraceTable)
