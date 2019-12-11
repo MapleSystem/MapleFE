@@ -590,45 +590,21 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *appeal_parent)
 
   EntryType type = rule_table->mType;
   switch(type) {
-
-  case ET_Oneof: {
+  case ET_Oneof:
     matched = TraverseOneof(rule_table, appeal);
     break;
-  }
-
-  case ET_Zeroormore: {
+  case ET_Zeroormore:
     matched = TraverseZeroormore(rule_table, appeal);
     break;
-  }
-
-  // It always matched. The lexer will stop after it zeor or at most one target
-  case ET_Zeroorone: {
-    matched = true;
-    bool found = false;
-    for (unsigned i = 0; i < rule_table->mNum; i++) {
-      TableData *data = rule_table->mData + i;
-      found = TraverseTableData(data, appeal);
-      // The first element is hit, then stop.
-      if (found)
-        break;
-    }
+  case ET_Zeroorone:
+    matched = TraverseZeroorone(rule_table, appeal);
     break;
-  }
-
-  // Lexer needs to find all elements, and in EXACTLY THE ORDER as defined.
-  case ET_Concatenate: {
-    bool found = TraverseConcatenate(rule_table, appeal);
-    matched = found;
+  case ET_Concatenate:
+    matched = TraverseConcatenate(rule_table, appeal);
     break;
-  }
-
-  // Next table
-  // There is only one data table in this case
-  case ET_Data: {
+  case ET_Data:
     matched = TraverseTableData(rule_table->mData, appeal);
     break;
-  }
-
   case ET_Null:
   default:
     break;
@@ -662,38 +638,64 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *appeal_parent)
   }
 }
 
-  // It always return true.
-  // Moves until hit a NON-target data
-  // [Note]
-  //   1. Every iteration we go through all table data, and pick the one eating most tokens.
-  //   2. If noone of table data can read the token. It's the end.
-  //   3. The final mCurToken needs to be updated.
+// It always return true.
+// Moves until hit a NON-target data
+// [Note]
+//   1. Every iteration we go through all table data, and pick the one matching the most tokens.
+//   2. If noone of table data can match, it quit.
+//   3. gSuccTokens and gSuccTokensNum are a little bit complicated. Since Zeroormore can match
+//      any number of tokens it can, the number of matchings will grow each time one instance
+//      is matched.
 bool Parser::TraverseZeroormore(RuleTable *rule_table, AppealNode *parent) {
-    bool matched = true;
-    while(1) {
-      bool found = false;
-      unsigned old_pos = mCurToken;
-      unsigned new_pos = mCurToken;
-      for (unsigned i = 0; i < rule_table->mNum; i++) {
-        // every table entry starts from the old_pos
-        mCurToken = old_pos;
-        TableData *data = rule_table->mData + i;
-        found = found | TraverseTableData(data, parent);
-        if (mCurToken > new_pos)
-          new_pos = mCurToken;
-      }
+  unsigned succ_tokens_num = 0;
+  unsigned succ_tokens[MAX_SUCC_TOKENS];
 
-      // If hit the first non-target, stop it.
-      if (!found)
-        break;
+  gSuccTokensNum = 0;
 
-      // Sometimes 'found' is true, but actually nothing was read becauser the 'true'
-      // is coming from a Zeroorone or Zeroormore. So need check this.
-      if (new_pos == old_pos)
-        break;
-      else
-        mCurToken = new_pos;
+  while(1) {
+    bool found = false;
+    unsigned old_pos = mCurToken;
+    unsigned new_pos = mCurToken;
+
+    MASSERT((rule_table->mNum == 1) && "zeroormore node has more than one elements?");
+    for (unsigned i = 0; i < rule_table->mNum; i++) {
+      // every table entry starts from the old_pos
+      mCurToken = old_pos;
+      TableData *data = rule_table->mData + i;
+      found = found | TraverseTableData(data, parent);
+      if (mCurToken > new_pos)
+        new_pos = mCurToken;
     }
+
+    // 1. If hit the first non-target, stop it.
+    // 2. Sometimes 'found' is true, but actually nothing was read becauser the 'true'
+    //    is coming from a Zeroorone or Zeroormore. So need check this.
+    if ((!found) || (new_pos == old_pos) )
+      break;
+    else {
+      mCurToken = new_pos;
+      // Take care of the successful matchings.
+      for (unsigned i = 0; i < gSuccTokensNum; i++)
+        succ_tokens[succ_tokens_num++] = gSuccTokens[i];
+    }
+  }
+
+  return true;
+}
+
+// For Zeroorone node it's easier to handle gSuccTokens(Num). Just let the elements
+// handle themselves.
+bool Parser::TraverseZeroorone(RuleTable *rule_table, AppealNode *parent) {
+  gSuccTokensNum = 0;
+  bool found = false;
+  for (unsigned i = 0; i < rule_table->mNum; i++) {
+    TableData *data = rule_table->mData + i;
+    found = TraverseTableData(data, parent);
+    // The first element is hit, then stop.
+    if (found)
+      break;
+  }
+  return true;
 }
 
 // 1. Save all the possible matchings from children.
@@ -704,6 +706,8 @@ bool Parser::TraverseOneof(RuleTable *rule_table, AppealNode *parent) {
   unsigned succ_tokens[MAX_SUCC_TOKENS];
   unsigned new_mCurToken = mCurToken; // position after most tokens eaten
   unsigned old_mCurToken = mCurToken;
+
+  gSuccTokensNum = 0;
 
   for (unsigned i = 0; i < rule_table->mNum; i++) {
     TableData *data = rule_table->mData + i;
@@ -753,14 +757,16 @@ bool Parser::TraverseOneof(RuleTable *rule_table, AppealNode *parent) {
 //           one matching from previous node even it actually has multiple matchings.
 //        3. Only the last node could be allowed to have multiple matchings to transfer to
 //           the caller.
+// But we are lucky as the last element of Concatenate will take care of gSuccTokens by itself.
 bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *parent) {
   bool found = false;
   unsigned prev_succ_tokens_num = 0;
   unsigned prev_succ_tokens[MAX_SUCC_TOKENS];
   unsigned curr_succ_tokens_num = 0;
   unsigned curr_succ_tokens[MAX_SUCC_TOKENS];
-  unsigned all_succ_tokens_num = 0;
-  unsigned all_succ_tokens[MAX_SUCC_TOKENS];
+
+  // Make sure it's 0 when fail
+  gSuccTokensNum = 0;
 
   for (unsigned i = 0; i < rule_table->mNum; i++) {
     TableData *data = rule_table->mData + i;
