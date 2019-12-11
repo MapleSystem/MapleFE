@@ -96,6 +96,9 @@ private:
   bool TraverseRuleTable(RuleTable*, AppealNode*);  // success if all tokens are matched.
   bool TraverseTableData(TableData*, AppealNode*);  // success if all tokens are matched.
   bool TraverseConcatenate(RuleTable*, AppealNode*);
+  bool TraverseOneof(RuleTable*, AppealNode*);
+  bool TraverseZeroormore(RuleTable*, AppealNode*);
+  bool TraverseZeroorone(RuleTable*, AppealNode*);
 
   bool TraverseStmt();                // success if all tokens are matched.
   bool IsVisited(RuleTable*);

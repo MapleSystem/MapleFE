@@ -482,16 +482,13 @@ void Parser::DumpExitTable(const char *table_name, unsigned indent, bool succ, A
 static unsigned gSuccTokensNum;
 static unsigned gSuccTokens[MAX_SUCC_TOKENS];
 
-// return true : if all tokens in mActiveTokens are matched.
+// return true : if the rule_table is matched
 //       false : if faled.
-//
 bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *appeal_parent) {
   bool matched = false;
   unsigned old_pos = mCurToken;
   Token *curr_token = mActiveTokens[mCurToken];
-
-  unsigned succ_tokens_num = 0;
-  unsigned succ_tokens[MAX_SUCC_TOKENS];
+  gSuccTokensNum = 0;
 
   mIndentation += 2;
   const char *name = NULL;
@@ -594,70 +591,13 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *appeal_parent)
   EntryType type = rule_table->mType;
   switch(type) {
 
-  // Need save all the possible matchings, and let the parent node to decide if the
-  // parent node is a concatenate. However, as the return value we choose the longest matching.
-  //
-  // [NOTE] When we collect the children's succ matchings, be ware there could be multiple matchings
-  //        in children table.
   case ET_Oneof: {
-    bool found = false;
-    unsigned new_mCurToken = mCurToken; // position after most tokens eaten
-    unsigned old_mCurToken = mCurToken;
-    for (unsigned i = 0; i < rule_table->mNum; i++) {
-      TableData *data = rule_table->mData + i;
-      bool temp_found = TraverseTableData(data, appeal);
-      found = found | temp_found;
-      if (temp_found) {
-        // save the possilbe matchings
-        // could be duplicated matchings
-        for (unsigned j = 0; j < gSuccTokensNum; j++)
-          //[TODO]
-
-        if (mCurToken > new_mCurToken)
-          new_mCurToken = mCurToken;
-        // Need restore the position of original mCurToken,
-        // in order to catch the most tokens.
-        mCurToken = old_mCurToken;
-      }
-    }
-    // move position after most tokens are eaten
-    mCurToken = new_mCurToken;
-    matched = found; 
+    matched = TraverseOneof(rule_table, appeal);
     break;
   }
 
-  // It always return true.
-  // Moves until hit a NON-target data
-  // [Note]
-  //   1. Every iteration we go through all table data, and pick the one eating most tokens.
-  //   2. If noone of table data can read the token. It's the end.
-  //   3. The final mCurToken needs to be updated.
   case ET_Zeroormore: {
-    matched = true;
-    while(1) {
-      bool found = false;
-      unsigned old_pos = mCurToken;
-      unsigned new_pos = mCurToken;
-      for (unsigned i = 0; i < rule_table->mNum; i++) {
-        // every table entry starts from the old_pos
-        mCurToken = old_pos;
-        TableData *data = rule_table->mData + i;
-        found = found | TraverseTableData(data, appeal);
-        if (mCurToken > new_pos)
-          new_pos = mCurToken;
-      }
-
-      // If hit the first non-target, stop it.
-      if (!found)
-        break;
-
-      // Sometimes 'found' is true, but actually nothing was read becauser the 'true'
-      // is coming from a Zeroorone or Zeroormore. So need check this.
-      if (new_pos == old_pos)
-        break;
-      else
-        mCurToken = new_pos;
-    }
+    matched = TraverseZeroormore(rule_table, appeal);
     break;
   }
 
@@ -705,12 +645,6 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *appeal_parent)
     DumpExitTable(name, mIndentation, matched, FailChildrenFailed);
   mIndentation -= 2;
 
-  // This gSuccTokensNum is used only one time after it returns and used by
-  // the second try or accumulate to the parent's succ token numbers.
-  gSuccTokensNum = succ_tokens_num;
-  for (unsigned i = 0; i < succ_tokens_num; i++)
-    gSuccTokens[i] = succ_tokens[i];
-
   if (mTraceSecondTry) {
     std::cout << "gSuccTokensNum = " << gSuccTokensNum << std::endl;
   }
@@ -728,27 +662,110 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *appeal_parent)
   }
 }
 
-// For concatenate rule, we need take care of multiple possible matching.
-// There could be many different scenarios regarding multiple matching,
-// Suppose a rule :  Element_1 + Element_2 + Element_3
-//    case 1:  Element_1 has multiple matching, makes Element_2 fail
-//    case 2:  Element_1 has multiple matching, makes Element_3 fail while Element_2 succ.
-//    case 3:  Element_1 has multiple matching, makes Element_3 fail while Element_2 succ.
+  // It always return true.
+  // Moves until hit a NON-target data
+  // [Note]
+  //   1. Every iteration we go through all table data, and pick the one eating most tokens.
+  //   2. If noone of table data can read the token. It's the end.
+  //   3. The final mCurToken needs to be updated.
+bool Parser::TraverseZeroormore(RuleTable *rule_table, AppealNode *parent) {
+    bool matched = true;
+    while(1) {
+      bool found = false;
+      unsigned old_pos = mCurToken;
+      unsigned new_pos = mCurToken;
+      for (unsigned i = 0; i < rule_table->mNum; i++) {
+        // every table entry starts from the old_pos
+        mCurToken = old_pos;
+        TableData *data = rule_table->mData + i;
+        found = found | TraverseTableData(data, parent);
+        if (mCurToken > new_pos)
+          new_pos = mCurToken;
+      }
+
+      // If hit the first non-target, stop it.
+      if (!found)
+        break;
+
+      // Sometimes 'found' is true, but actually nothing was read becauser the 'true'
+      // is coming from a Zeroorone or Zeroormore. So need check this.
+      if (new_pos == old_pos)
+        break;
+      else
+        mCurToken = new_pos;
+    }
+}
+
+// 1. Save all the possible matchings from children.
+// 2. As return value we choose the longest matching.
+bool Parser::TraverseOneof(RuleTable *rule_table, AppealNode *parent) {
+  bool found = false;
+  unsigned succ_tokens_num = 0;
+  unsigned succ_tokens[MAX_SUCC_TOKENS];
+  unsigned new_mCurToken = mCurToken; // position after most tokens eaten
+  unsigned old_mCurToken = mCurToken;
+
+  for (unsigned i = 0; i < rule_table->mNum; i++) {
+    TableData *data = rule_table->mData + i;
+    bool temp_found = TraverseTableData(data, parent);
+    found = found | temp_found;
+    if (temp_found) {
+      // 1. Save the possilbe matchings
+      // 2. Remove be duplicated matchings
+      for (unsigned j = 0; j < gSuccTokensNum; j++) {
+        bool duplicated = false;
+        for (unsigned k = 0; k < succ_tokens_num; k++) {
+          if (succ_tokens[k] == gSuccTokens[j]) {
+            duplicated = true;
+            break;
+          }
+        }
+        if (!duplicated)
+          succ_tokens[succ_tokens_num++] = gSuccTokens[j];
+      }
+
+      if (mCurToken > new_mCurToken)
+        new_mCurToken = mCurToken;
+      // Restore the position of original mCurToken.
+      mCurToken = old_mCurToken;
+    }
+  }
+
+  gSuccTokensNum = succ_tokens_num;
+  for (unsigned k = 0; k < succ_tokens_num; k++)
+    gSuccTokens[k] = succ_tokens[k];
+
+  // move position according to the longest matching
+  mCurToken = new_mCurToken;
+  return found;
+}
+
+// For concatenate rule, we need take care second try.
+// There could be many different scenarios, but we only do it for a simplest case, in which
+// a multiple matching element followed by a failed element.
 //
-// We only handle case 1, in which a multiple matching element followed by a failed element.
-//
+// We also need take care of the gSuccTokensNum and gSuccTokens for Concatenate node.
+// [NOTE] 1. There could be an issue of matching number explosion. Each node could have
+//           multiple matchings, and when they are concatenated the number would be
+//           matchings_1 * matchings_2 * ...
+//        2. The good thing is each following node start to match from the new mCurToken
+//           after the previous node. This means we are actually assuming there is only
+//           one matching from previous node even it actually has multiple matchings.
+//        3. Only the last node could be allowed to have multiple matchings to transfer to
+//           the caller.
 bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *parent) {
   bool found = false;
   unsigned prev_succ_tokens_num = 0;
   unsigned prev_succ_tokens[MAX_SUCC_TOKENS];
   unsigned curr_succ_tokens_num = 0;
   unsigned curr_succ_tokens[MAX_SUCC_TOKENS];
+  unsigned all_succ_tokens_num = 0;
+  unsigned all_succ_tokens[MAX_SUCC_TOKENS];
 
   for (unsigned i = 0; i < rule_table->mNum; i++) {
     TableData *data = rule_table->mData + i;
     found = TraverseTableData(data, parent);
 
-    // For <Oneof> node it saved the matchings. For other nodes, gSuccTokensNum is 0.
     curr_succ_tokens_num = gSuccTokensNum;
     for (unsigned id = 0; id < gSuccTokensNum; id++)
       curr_succ_tokens[id] = gSuccTokens[id];
@@ -771,7 +788,7 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *parent) {
         // Step 2. Iterate and try
         //         There are again multiple possiblilities. Could be multiple matching again.
         //         We will never go that far. We'll stop at the first matching.
-        //         [NOTE] The problem here is we'll create extra branches in the Appealing tree.
+        //         We don't want the matching number to explode.
         bool temp_found = false;
         for (unsigned j = 0; j < prev_succ_tokens_num; j++) {
           // The longest matching has been proven to be a failure.
