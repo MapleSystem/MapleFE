@@ -482,6 +482,13 @@ void Parser::DumpExitTable(const char *table_name, unsigned indent, bool succ, A
 static unsigned gSuccTokensNum;
 static unsigned gSuccTokens[MAX_SUCC_TOKENS];
 
+void Parser::DumpSuccTokens() {
+  std::cout << "gSuccTokensNum=" << gSuccTokensNum << ": ";
+  for (unsigned i = 0; i < gSuccTokensNum; i++)
+    std::cout << gSuccTokens[i] << ",";
+  std::cout << std::endl;
+}
+
 // return true : if the rule_table is matched
 //       false : if faled.
 bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *appeal_parent) {
@@ -538,51 +545,11 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *appeal_parent)
     SetVisited(rule_table);
   }
     
-  // We don't go into Identifier table.
-  // No mVisitedStack invovled for identifier table.
-  if ((rule_table == &TblIdentifier)) {
-    ClearVisited(rule_table);
-    if (curr_token->IsIdentifier()) {
-      MoveCurToken();
-      if (mTraceTable)
-        DumpExitTable(name, mIndentation, true);
-      mIndentation -= 2;
-      appeal->mBefore = Succ;
-      appeal->mAfter = Succ;
-      return true;
-    } else {
-      AddFailed(rule_table, mCurToken);
-      if (mTraceTable)
-        DumpExitTable(name, mIndentation, false, FailNotIdentifier);
-      mIndentation -= 2;
-      appeal->mBefore = FailNotIdentifier;
-      appeal->mAfter = FailNotIdentifier;
-      return false;
-    }
-  }
+  if ((rule_table == &TblIdentifier))
+    return TraverseIdentifier(rule_table, appeal);
 
-  // We don't go into Literal table.
-  // No mVisitedStack invovled for literal table.
-  if ((rule_table == &TblLiteral)) {
-    ClearVisited(rule_table);
-    if (curr_token->IsLiteral()) {
-      MoveCurToken();
-      if (mTraceTable)
-        DumpExitTable(name, mIndentation, true);
-      mIndentation -= 2;
-      appeal->mBefore = Succ;
-      appeal->mAfter = Succ;
-      return true;
-    } else {
-      AddFailed(rule_table, mCurToken);
-      if (mTraceTable)
-        DumpExitTable(name, mIndentation, false, FailNotLiteral);
-      mIndentation -= 2;
-      appeal->mBefore = FailNotLiteral;
-      appeal->mAfter = FailNotLiteral;
-      return false;
-    }
-  }
+  if ((rule_table == &TblLiteral))
+    return TraverseLiteral(rule_table, appeal);
 
   // Once reaching this point, the node was successful.
   // Gonna look into rule_table's data
@@ -621,9 +588,8 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *appeal_parent)
     DumpExitTable(name, mIndentation, matched, FailChildrenFailed);
   mIndentation -= 2;
 
-  if (mTraceSecondTry) {
-    std::cout << "gSuccTokensNum = " << gSuccTokensNum << std::endl;
-  }
+  if (mTraceSecondTry)
+    DumpSuccTokens();
 
   if(matched) {
     // We try to appeal only if it succeeds at the end.
@@ -637,6 +603,80 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *appeal_parent)
     return false;
   }
 }
+
+// We don't go into Literal table.
+// No mVisitedStack invovled for literal table.
+bool Parser::TraverseLiteral(RuleTable *rule_table, AppealNode *appeal) {
+  Token *curr_token = mActiveTokens[mCurToken];
+  const char *name = GetRuleTableName(rule_table);
+  bool found = false;
+  gSuccTokensNum = 0;
+
+  ClearVisited(rule_table);
+
+  if (curr_token->IsLiteral()) {
+    found = true;
+    gSuccTokensNum = 1;
+    gSuccTokens[0] = mCurToken;
+    MoveCurToken();
+    if (mTraceTable)
+      DumpExitTable(name, mIndentation, true);
+    mIndentation -= 2;
+    appeal->mBefore = Succ;
+    appeal->mAfter = Succ;
+  } else {
+    AddFailed(rule_table, mCurToken);
+    if (mTraceTable)
+      DumpExitTable(name, mIndentation, false, FailNotLiteral);
+    mIndentation -= 2;
+    appeal->mBefore = FailNotLiteral;
+    appeal->mAfter = FailNotLiteral;
+  }
+
+  if (mTraceSecondTry)
+    DumpSuccTokens();
+
+  return found;
+}
+
+// We don't go into Identifier table.
+// No mVisitedStack invovled for identifier table.
+//
+// 'appeal' is the node for this rule table. This is different than TraverseOneof
+// or the others where 'appeal' is actually a parent node.
+bool Parser::TraverseIdentifier(RuleTable *rule_table, AppealNode *appeal) {
+  Token *curr_token = mActiveTokens[mCurToken];
+  const char *name = GetRuleTableName(rule_table);
+  bool found = false;
+  gSuccTokensNum = 0;
+
+  ClearVisited(rule_table);
+
+  if (curr_token->IsIdentifier()) {
+    gSuccTokensNum = 1;
+    gSuccTokens[0] = mCurToken;
+    found = true;
+    MoveCurToken();
+    if (mTraceTable)
+      DumpExitTable(name, mIndentation, true);
+    mIndentation -= 2;
+    appeal->mBefore = Succ;
+    appeal->mAfter = Succ;
+  } else {
+    AddFailed(rule_table, mCurToken);
+    if (mTraceTable)
+      DumpExitTable(name, mIndentation, false, FailNotIdentifier);
+    mIndentation -= 2;
+    appeal->mBefore = FailNotIdentifier;
+    appeal->mAfter = FailNotIdentifier;
+  }
+
+  if (mTraceSecondTry)
+    DumpSuccTokens();
+
+  return found;
+}
+
 
 // It always return true.
 // Moves until hit a NON-target data
@@ -777,9 +817,8 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *parent) {
       curr_succ_tokens[id] = gSuccTokens[id];
 
     if (!found) {
-      if (mTraceSecondTry) {
-        std::cout << "gSuccTokensNum = " << gSuccTokensNum << std::endl;
-      }
+      if (mTraceSecondTry)
+        DumpSuccTokens();
 
       MASSERT((gSuccTokensNum == 0) || ((gSuccTokensNum == 1) && (data->mType == DT_Token))
                && "failed case has >=1 successful matching?");
@@ -787,7 +826,6 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *parent) {
       // If the previous element has single matching or fail, we give up. Or we'll give a
       // second try.
       if (prev_succ_tokens_num > 1) {
-        // Perform Second Try
         // Step 1. Save the mCurToken, it supposed to be the longest matching.
         unsigned old_pos = mCurToken;
 
@@ -800,7 +838,8 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *parent) {
           // The longest matching has been proven to be a failure.
           if (prev_succ_tokens[j] == old_pos)
             continue;
-          mCurToken = prev_succ_tokens[j];
+          // Start from the one after succ token.
+          mCurToken = prev_succ_tokens[j] + 1;
           temp_found = TraverseTableData(data, parent);
           // As mentioned above, we stop at the first successfuly second try.
           if (temp_found)
@@ -856,6 +895,8 @@ bool Parser::TraverseTableData(TableData *data, AppealNode *parent) {
     }
     if (mTraceTable)
       DumpExitTable("token", mIndentation, found, NA);
+    if (mTraceSecondTry)
+      DumpSuccTokens();
     mIndentation -= 2;
     break;
   case DT_Type:

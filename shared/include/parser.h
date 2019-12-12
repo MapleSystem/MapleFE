@@ -71,6 +71,7 @@ public:
   void DumpExitTable(const char *tablename, unsigned indent,
                      bool succ, AppealStatus reason = Succ);
   void DumpAppeal(RuleTable *table, unsigned token);
+  void DumpSuccTokens();
 
 private:
   std::vector<Token*>   mTokens;         // Storage of all tokens, including active, discarded,
@@ -99,6 +100,8 @@ private:
   bool TraverseOneof(RuleTable*, AppealNode*);
   bool TraverseZeroormore(RuleTable*, AppealNode*);
   bool TraverseZeroorone(RuleTable*, AppealNode*);
+  bool TraverseLiteral(RuleTable*, AppealNode*);
+  bool TraverseIdentifier(RuleTable*, AppealNode*);
 
   bool TraverseStmt();                // success if all tokens are matched.
   bool IsVisited(RuleTable*);
