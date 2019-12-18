@@ -32,6 +32,7 @@ typedef enum {
   FailNotLiteral,
   FailChildrenFailed,
   Succ,
+  SuccWasSucc,
   NA
 }AppealStatus;
 
@@ -47,6 +48,50 @@ public:
 
   AppealNode() {mTable=NULL; mParent = NULL; mBefore = NA; mAfter = NA;}
   ~AppealNode(){}
+};
+
+// Design of the cached success info.
+// Starting from a certian token, a rule can have multiple matchings, for example,
+// an expression,  this.x, can be matched by Primary either by one token 'this', or
+// three tokens 'this.x'.
+//
+// Assuming index of 'this' is 9, we say Primary has two matches indicated by two numbers
+// 9 and 11, which represent the last successfully matched token.
+//
+// To cache all the successful results of a rule, we define a vector. The vector is composed
+// of a set of segments with variable length. One segment represents the successful matches
+// starting from a specific token. The structure is as below.
+//      9, 2, 9, 11
+// the first number 9 is the starting token. The second number, 2, is the number of matches.
+// The third number and the forth number are the last successfully matched tokens.
+// If the rule has 3 matches for token 20, its segment is 20, 3, 20, 22, 23
+// Put them together, we get the mSucc for this rule 9, 2, 9, 11, 20, 3, 20, 22, 23
+
+// This is a per-rule data structure, saving the success info of a rule.
+class SuccMatch {
+public:
+  std::vector<unsigned> mCache;
+private:
+  unsigned mTempIndex;          // A temporary index
+public:
+  SuccMatch(){}
+  ~SuccMatch() {mCache.clear();}
+public:
+  // Usually a rule may have a few matches, less than 3. So we define 3 special interfaces.
+  void AddOneMatch(unsigned t, unsigned m);                               // rule has only 1 match
+  void AddTwoMatch(unsigned t, unsigned m1, unsigned m2);                 // rule has only 2 match
+  void AddThreeMatch(unsigned t, unsigned m1, unsigned m2, unsigned m3);  // rule has only 3 match
+  // For general cases we will append matches one by one. The following two
+  // functions will be used together, as the first one set the start token, the second one
+  // add the end matching tokens one by one.
+  void AddStartToken(unsigned token);
+  void AddOneMoreMatch(unsigned last_succ_token);  // add one more match to the cach
+
+  // query functions.
+  // The three function need to be used together.
+  bool     GetStartToken(unsigned t);    // trying to get succ info for 't'
+  unsigned GetMatchNum();                // number of matches at a token;
+  unsigned GetOneMatch(unsigned i);      // Get the i-th matching token. Starts from 0.
 };
 
 class Parser {
@@ -94,6 +139,14 @@ private:
   // See the detailed comments in Parser::Parse().
   std::map<RuleTable *, std::vector<unsigned>> mFailed;
 
+  // Using this map to record all the succ info of rules.
+  std::map<RuleTable*, SuccMatch*> mSucc;
+  std::vector<SuccMatch*> mSuccPool;
+  SuccMatch* FindSucc(RuleTable*);
+  SuccMatch* FindOrCreateSucc(RuleTable*);
+  void ClearSucc();
+
+  bool TraverseStmt();                              // success if all tokens are matched.
   bool TraverseRuleTable(RuleTable*, AppealNode*);  // success if all tokens are matched.
   bool TraverseTableData(TableData*, AppealNode*);  // success if all tokens are matched.
   bool TraverseConcatenate(RuleTable*, AppealNode*);
@@ -103,7 +156,6 @@ private:
   bool TraverseLiteral(RuleTable*, AppealNode*);
   bool TraverseIdentifier(RuleTable*, AppealNode*);
 
-  bool TraverseStmt();                // success if all tokens are matched.
   bool IsVisited(RuleTable*);
   void SetVisited(RuleTable*);
   void ClearVisited(RuleTable*);

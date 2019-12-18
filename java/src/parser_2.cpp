@@ -112,6 +112,9 @@
 // time with the same token position if that rule has failed before. This is the
 // origin of mFailed.
 //
+// Also, if a rule was successful for a token and it is trying to traverse it again, it
+// can be skipped by using a cached result. This is the origin of mSucc.
+//
 // 5. Appealing mechanism
 //
 // Let's look at an example, suppose we have the following rules,
@@ -826,6 +829,9 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *parent) {
       // If the previous element has single matching or fail, we give up. Or we'll give a
       // second try.
       if (prev_succ_tokens_num > 1) {
+        if (mTraceSecondTry)
+          std::cout << "Decided to second try." << std::endl;
+
         // Step 1. Save the mCurToken, it supposed to be the longest matching.
         unsigned old_pos = mCurToken;
 
@@ -852,6 +858,13 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *parent) {
         // Step 4. If still fail after second try, we reset the mCurToken
         if (!found)
           mCurToken = old_pos;
+
+        if (mTraceSecondTry) {
+          if (found)
+            std::cout << "Second Try succ." << std::endl;
+          else
+            std::cout << "Second Try fail." << std::endl;
+        }
       }
     }
 
@@ -962,4 +975,117 @@ const char* Parser::GetRuleTableName(const RuleTable* addr) {
       return name.mName;
   }
   return NULL;
+}
+
+////////////////////////////////////////////////////////////////////////////
+//                          Succ Info Related
+////////////////////////////////////////////////////////////////////////////
+
+void Parser::ClearSucc() {
+  // clear the map
+  mSucc.clear();
+  // clear the pool
+  std::vector<SuccMatch*>::iterator it = mSuccPool.begin();
+  for (; it != mSuccPool.end(); it++) {
+    SuccMatch *m = *it;
+    delete m;
+  }
+}
+
+// Find the succ info of 'table'.
+// Return NULL if not found.
+SuccMatch* Parser::FindSucc(RuleTable *table) {
+  std::map<RuleTable*, SuccMatch*>::iterator it = mSucc.find(table);
+  SuccMatch *succ = NULL;
+  if (it != mSucc.end())
+    succ = it->second;
+  return succ;
+}
+
+// Find the succ info of 'table'.
+// If not found, create one.
+SuccMatch* Parser::FindOrCreateSucc(RuleTable *table) {
+  std::map<RuleTable*, SuccMatch*>::iterator it = mSucc.find(table);
+  SuccMatch *succ = NULL;
+  if (it != mSucc.end())
+    succ = it->second;
+  else {
+    succ = new SuccMatch();
+    mSucc.insert(std::pair<RuleTable*, SuccMatch*>(table, succ));
+  }
+  return succ;
+}
+
+// Rule has only one match at this token.
+void SuccMatch::AddOneMatch(unsigned t, unsigned m) {
+  mCache.push_back(t);
+  mCache.push_back(1);
+  mCache.push_back(m);
+}
+
+// Rule has only two matches at this token.
+void SuccMatch::AddTwoMatch(unsigned t, unsigned m1, unsigned m2) {
+  mCache.push_back(t);
+  mCache.push_back(2);
+  mCache.push_back(m1);
+  mCache.push_back(m2);
+}
+
+// Rule has only three matches at this token.
+void SuccMatch::AddThreeMatch(unsigned t, unsigned m1, unsigned m2, unsigned m3) {
+  mCache.push_back(t);
+  mCache.push_back(3);
+  mCache.push_back(m1);
+  mCache.push_back(m2);
+  mCache.push_back(m3);
+}
+
+///////////////////
+// The following two functions are used to handle general cases where the
+// total number of matches could be unknown, or could be more than 3.
+// They need be used together as mTempIndex is def-use in between.
+
+void SuccMatch::AddStartToken(unsigned t) {
+  mCache.push_back(t);
+  mCache.push_back(0);    // temporarily set the num of matches to 0
+  mTempIndex = mCache.size() - 1;
+}
+
+void SuccMatch::AddOneMoreMatch(unsigned m) {
+  mCache.push_back(m);
+  mCache[mTempIndex] += 1;
+}
+
+// Below are three Query functions for succ info
+// Again, They need be used together as mTempIndex is def-use in between.
+//
+
+// Find the succ info for token 't'. Return true if found.
+bool SuccMatch::GetStartToken(unsigned t) {
+  // traverse the vector
+  // mTempIndex is used as the index of the start token.
+  mTempIndex = 0;
+
+  while (mTempIndex < (mCache.size() - 2)) {
+    if (t != mCache[mTempIndex] ){
+      unsigned num = mCache[mTempIndex + 1];
+      mTempIndex += 1;   // skip the num
+      mTempIndex += num; // skip the following num tokens.
+    } else
+      break;
+  }
+
+  if (mTempIndex < (mCache.size() - 2))
+    return true;
+  else
+    return false;
+}
+
+unsigned SuccMatch::GetMatchNum() {
+  return mCache[mTempIndex + 1];
+}
+
+// idx starts from 0.
+unsigned SuccMatch::GetOneMatch(unsigned idx) {
+  return mCache[mTempIndex + 1 + idx + 1];
 }
