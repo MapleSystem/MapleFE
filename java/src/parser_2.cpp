@@ -460,7 +460,10 @@ void Parser::DumpExitTable(const char *table_name, unsigned indent, bool succ, A
     std::cout << " ";
   std::cout << "Exit  " << table_name << "@" << mCurToken;
   if (succ) {
-    std::cout << " succ" << "}" << std::endl;
+    if (reason == SuccWasSucc)
+      std::cout << " succ@WasSucc" << "}" << std::endl;
+    else
+      std::cout << " succ" << "}" << std::endl;
   } else {
     if (reason == FailWasFailed)
       std::cout << " fail@WasFailed" << "}" << std::endl;
@@ -514,6 +517,26 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *appeal_parent)
   appeal->mParent = appeal_parent;
   mAppealNodes.push_back(appeal);
   appeal_parent->mChildren.push_back(appeal);
+
+  // Check if it was succ. Set the gSuccTokens/gSuccTokensNum appropriately
+  SuccMatch *succ = FindSucc(rule_table);
+  if (succ) {
+    bool was_succ = succ->GetStartToken(mCurToken);
+    if (was_succ) {
+      gSuccTokensNum = succ->GetMatchNum();
+      for (unsigned i = 0; i < gSuccTokensNum; i++) {
+        gSuccTokens[i] = succ->GetOneMatch(i);
+      }
+
+      if (mTraceTable)
+        DumpExitTable(name, mIndentation, true, SuccWasSucc);
+
+      mIndentation -= 2;
+      appeal->mBefore = Succ;
+      appeal->mAfter = SuccWasSucc;
+      return true;
+    }
+  }
 
   //
   if (WasFailed(rule_table, mCurToken)) {
@@ -595,6 +618,12 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *appeal_parent)
     DumpSuccTokens();
 
   if(matched) {
+    // It's guaranteed that this rule_table was NOT succ for mCurToken. Need add it.
+    SuccMatch *succ_match = FindOrCreateSucc(rule_table);
+    succ_match->AddStartToken(old_pos);
+    for (unsigned i = 0; i < gSuccTokensNum; i++)
+      succ_match->AddOneMoreMatch(gSuccTokens[i]);
+
     // We try to appeal only if it succeeds at the end.
     appeal->mAfter = Succ;
     Appeal(appeal);
