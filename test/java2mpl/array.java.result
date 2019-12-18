@@ -1,8 +1,7 @@
 Keyword    Token:  int
 Separator  Token:  Whitespace
+Identifier Token:  a
 Separator  Token:  Lbrack
 Separator  Token:  Rbrack
-Separator  Token:  Whitespace
-Identifier Token:  a
 Separator  Token:  Semicolon
 Matched 5 tokens.

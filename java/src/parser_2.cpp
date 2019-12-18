@@ -527,7 +527,10 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *appeal_parent)
       gSuccTokensNum = succ->GetMatchNum();
       for (unsigned i = 0; i < gSuccTokensNum; i++) {
         gSuccTokens[i] = succ->GetOneMatch(i);
+        if (gSuccTokens[i] > mCurToken)
+          mCurToken = gSuccTokens[i];
       }
+      MoveCurToken();
 
       if (mTraceTable)
         DumpExitTable(name, mIndentation, true, SuccWasSucc);
@@ -1099,8 +1102,9 @@ bool SuccMatch::GetStartToken(unsigned t) {
   while (mTempIndex < (mCache.size() - 2)) {
     if (t != mCache[mTempIndex] ){
       unsigned num = mCache[mTempIndex + 1];
-      mTempIndex += 1;   // skip the num
-      mTempIndex += num; // skip the following num tokens.
+      mTempIndex += 1;   // at the num
+      mTempIndex += num; // at last num tokens.
+      mTempIndex += 1;   // at new index
     } else
       break;
   }
