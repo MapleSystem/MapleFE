@@ -385,6 +385,7 @@ bool Parser::ParseStmt_autogen() {
   // clear status
   mVisited.clear();
   ClearFailed();
+  ClearSucc();
   mTokens.clear();
   mStartingTokens.clear();
   ClearAppealNodes();
