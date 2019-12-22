@@ -1,12 +1,13 @@
 ////////////////////////////////////////////////////////////////////////
 // The lexical translation of the characters creates a sequence of input
-// elements -----> white-space
-//            |--> comments
-//            |--> tokens --->identifiers
+// elements -----> white-space (whitespace is finally put into separator)
+//            |--> comments (finally treated as a token)
+//            |--> tokens |-->identifiers
 //                        |-->keywords
 //                        |-->literals
-//                        |-->separators
+//                        |-->separators (including whitespace)
 //                        |-->operators
+//                        |-->comment
 //
 // This categorization is shared among all languages. [NOTE] If anything
 // in a new language is exceptional, please add to this.
@@ -36,6 +37,7 @@ typedef enum {
   TT_LT,    // Literal
   TT_SP,    // separator
   TT_OP,    // operator
+  TT_CM,    // comment
   TT_NA     // N.A.
 }TK_Type;
 
@@ -58,6 +60,7 @@ public:
   bool IsIdentifier() { return mTkType == TT_ID; }
   bool IsLiteral()    { return mTkType == TT_LT; }
   bool IsKeyword()    { return mTkType == TT_KW; }
+  bool IsComment()    { return mTkType == TT_CM; }
 
   virtual void Dump() {}
 };
@@ -175,6 +178,18 @@ public:
 public:
   OperatorToken(OprId oi) {mTkType = TT_OP; mOprId = oi;}
   const char* GetName();
+  void Dump();
+};
+
+////////////////////////////////////////////////////////////////////////
+//                              Comment                               //
+// we dont' want to put any additional information for comments.      //
+// The comment string is discarded.                                   //
+////////////////////////////////////////////////////////////////////////
+class CommentToken : public Token {
+public:
+  CommentToken() {mTkType = TT_CM;}
+  const char* GetName() {return NULL;}
   void Dump();
 };
 

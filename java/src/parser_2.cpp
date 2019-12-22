@@ -240,7 +240,7 @@ unsigned Parser::LexOneLine() {
             is_whitespace = true;
         }
         // Put into the token storage, as Pending tokens.
-        if (!is_whitespace) {
+        if (!is_whitespace && !t->IsComment()) {
           mActiveTokens.push_back(t);
           token_num++;
         }
@@ -993,6 +993,12 @@ void Parser::InitPredefinedTokens() {
     //t->Dump();
   }
   mLexer->mPredefinedTokenNum += KeywordTableSize;
+
+  // 4. Create a single comment token
+  //    This is the last predefined token, and we refer to it directly.
+  Token *t = (Token*)mLexer->mTokenPool.NewToken(sizeof(CommentToken));
+  new (t) CommentToken();
+  mLexer->mPredefinedTokenNum += 1;
 }
 
 // Set up the top level rule tables.

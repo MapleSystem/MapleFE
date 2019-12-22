@@ -558,6 +558,51 @@ LitData GetLiteral(Lexer *lex) {
   return ld;
 }
 
+// For comments we are not going to generate rule tables since the most common comment
+// grammar are used widely in almost every language. So we decided to have a common
+// implementation here. In case any language has specific un-usual grammar, they can
+// have their own implementation.
+//
+// The two common comments are
+//  (1) //
+//      This is the end of line
+//  (2) /* .. */
+//      This is the traditional comments
+//
+// Return true if a comment is read. The contents are ignore.
+bool GetComment(Lexer *lex) {
+  if (lex->line[lex->curidx] == '/' && lex->line[lex->curidx+1] == '/') {
+    lex->curidx = lex->current_line_size;
+    return true;
+  }
+
+  // Handle comments in /* */
+  // If there is a /* without ending */, the rest of code until the end of the current
+  // source file will be treated as comment.
+  if (lex->line[lex->curidx] == '/' && lex->line[lex->curidx+1] == '*') {
+    lex->curidx += 2; // skip /*
+    bool get_ending = false;  // if we get the ending */
+
+    // the while loop stops only at either (1) end of file (2) finding */
+    while (1) {
+      if (lex->curidx == lex->current_line_size) {
+        if (lex->ReadALine() < 0)
+          return true;
+        lex->_linenum++;  // a new line read.
+      }
+      if ((lex->line[lex->curidx] == '*' && lex->line[lex->curidx+1] == '/')) {
+        get_ending = true;
+        lex->curidx += 2;
+        break;
+      }
+      lex->curidx++;
+    }
+    return true;
+  }
+
+  return false;
+}
+
 ////////////////////////////////////////////////////////////////////////////////////
 //                       Plant Tokens in Rule Tables
 //

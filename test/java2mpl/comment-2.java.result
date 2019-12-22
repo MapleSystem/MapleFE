@@ -1,0 +1,10 @@
+Keyword    Token:  class
+Separator  Token:  Whitespace
+Identifier Token:  Point
+Separator  Token:  Whitespace
+Separator  Token:  Lbrace
+Separator  Token:  Whitespace
+Separator  Token:  Whitespace
+Comment Token: 
+Separator  Token:  Rbrace
+Matched 4 tokens.

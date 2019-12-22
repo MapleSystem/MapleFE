@@ -50,6 +50,11 @@ void IdentifierToken::Dump() {
   return;
 }
 
+void CommentToken::Dump() {
+  DUMP0("Comment Token: ");
+  return;
+}
+
 void LiteralToken::Dump() {
   switch (mData.mType) {
   case LT_IntegerLiteral:

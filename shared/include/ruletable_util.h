@@ -82,5 +82,6 @@ extern OprId       GetOperator(Lexer*);
 extern LitData     GetLiteral(Lexer*);
 extern const char* GetKeyword(Lexer*);
 extern const char* GetIdentifier(Lexer*);
+extern bool        GetComment(Lexer*);
 extern void        PlantTokens(Lexer*); // replace keyword/opr/sep... with tokens
 #endif

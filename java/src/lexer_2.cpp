@@ -4,6 +4,11 @@
 #include "common_header_autogen.h"
 #include "ruletable_util.h"
 #include "gen_debug.h"
+#include "massert.h"
+
+///////////////////////////////////////////////////////////////////////////
+//                Utilities for finding predefined tokens
+///////////////////////////////////////////////////////////////////////////
 
 Token* FindSeparatorToken(Lexer * lex, SepId id) {
   for (unsigned i = 0; i < lex->mPredefinedTokenNum; i++) {
@@ -31,6 +36,17 @@ Token* FindKeywordToken(Lexer * lex, char *key) {
   }
 }
 
+// CommentToken is the last predefined token
+Token* FindCommentToken(Lexer * lex) {
+  Token *token = lex->mTokenPool.mTokens[lex->mPredefinedTokenNum - 1];
+  MASSERT((token->mTkType == TT_CM) && "Last predefined token is not a comment token.");
+  return token;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 // Read a token until end of file.
 // If no remaining tokens in current line, we move to the next line.
 Token* Lexer::LexToken_autogen(void) {
@@ -40,6 +56,13 @@ Token* Lexer::LexToken_autogen(void) {
 // Read a token until end of line.
 // Return NULL if no token read.
 Token* Lexer::LexTokenNoNewLine(void) {
+  bool is_comment = GetComment(this);
+  if (is_comment) {
+    Token *t = FindCommentToken(this);
+    t->Dump();
+    return t;
+  }
+
   SepId sep = GetSeparator(this);
   if (sep != SEP_NA) {
     Token *t = FindSeparatorToken(this, sep);

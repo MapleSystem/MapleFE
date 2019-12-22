@@ -30,7 +30,7 @@ class Lexer {
   TokenPool  mTokenPool;
   unsigned   mPredefinedTokenNum;   // number of predefined tokens.
 
- private:
+ public:
 
   FILE *srcfile;
   char *line;           // line buffer
