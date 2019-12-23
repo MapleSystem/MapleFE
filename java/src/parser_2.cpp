@@ -725,6 +725,7 @@ bool Parser::TraverseIdentifier(RuleTable *rule_table, AppealNode *appeal) {
 bool Parser::TraverseZeroormore(RuleTable *rule_table, AppealNode *parent) {
   unsigned succ_tokens_num = 0;
   unsigned succ_tokens[MAX_SUCC_TOKENS];
+  bool matched = false;
 
   gSuccTokensNum = 0;
 
@@ -749,11 +750,24 @@ bool Parser::TraverseZeroormore(RuleTable *rule_table, AppealNode *parent) {
     if ((!found) || (new_pos == old_pos) )
       break;
     else {
+      matched = true;
       mCurToken = new_pos;
       // Take care of the successful matchings.
       for (unsigned i = 0; i < gSuccTokensNum; i++)
         succ_tokens[succ_tokens_num++] = gSuccTokens[i];
     }
+  }
+
+  if (matched) {
+    gSuccTokensNum = succ_tokens_num;
+    for (unsigned i = 0; i < succ_tokens_num; i++)
+      gSuccTokens[i] = succ_tokens[i];
+  } else {
+    // Even if nothing is found, we still treat it as one success without moving
+    // mCurToken forward. Since gSuccTokens[] record the success matched tokens, and
+    // mCurToken is not matched, we have to set the previous token as successful token.
+    gSuccTokensNum = 1;
+    gSuccTokens[0] = mCurToken - 1;
   }
 
   return true;
@@ -771,6 +785,15 @@ bool Parser::TraverseZeroorone(RuleTable *rule_table, AppealNode *parent) {
     if (found)
       break;
   }
+
+  // Even if nothing is found, we still treat it as one success without moving
+  // mCurToken forward. Since gSuccTokens[] record the success matched tokens, and
+  // mCurToken is not matched, we have to set the previous token as successful token.
+  if (!found) {
+    gSuccTokensNum = 1;
+    gSuccTokens[0] = mCurToken - 1;
+  }
+
   return true;
 }
 
