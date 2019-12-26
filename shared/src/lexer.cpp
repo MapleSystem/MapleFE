@@ -2,6 +2,11 @@
 #include <cmath>
 #include "massert.h"
 #include "lexer.h"
+#include "token.h"
+#include "common_header_autogen.h"
+#include "ruletable_util.h"
+#include "gen_debug.h"
+#include "massert.h"
 #include <climits>
 #include <cstdlib>
 
@@ -110,28 +115,6 @@ void Lexer::PrepareForFile(const std::string filename) {
   }
 }
 
-void Lexer::PrepareForString(const std::string &src) {
-  // allocate line buffer.
-  if (!line) {
-    linebuf_size = (size_t)MAX_LINE_SIZE;
-    line = static_cast<char *>(malloc(linebuf_size));  // initial line buffer.
-    if (!line) {
-      MASSERT("cannot allocate line buffer\n");
-    }
-  }
-
-  MASSERT(src.length() < linebuf_size && "needs larger buffer");
-  strcpy(line, src.c_str());
-  current_line_size = strlen(line);
-  if (line[current_line_size - 1] == '\n') {
-    line[current_line_size - 1] = '\0';
-    current_line_size--;
-  }
-  curidx = 0;
-
-  NextToken();
-}
-
 void Lexer::GetName(void) {
   int startidx = curidx;
   if ((isalnum(line[curidx]) || line[curidx] == '_' || line[curidx] == '$' ||
@@ -147,600 +130,6 @@ void Lexer::GetName(void) {
     curidx++;
   }
   thename = std::string(&line[startidx], curidx - startidx);
-}
-
-Token *Lexer::LexToken(void) {
-  // skip spaces
-  while ((line[curidx] == ' ' || line[curidx] == '\t') && curidx < (size_t)current_line_size) {
-    mToken = new Token(TT_NA, TK_Invalid, ET_WS);
-    curidx++;
-    return mToken;
-  }
-  // check end of line
-  while (curidx == (size_t)current_line_size || (line[curidx] == '/' && line[curidx+1] == '/')) {
-    if (line[curidx] == '/' && line[curidx+1] == '/') {  // process comment contents
-      seencomments.push_back(std::string(&line[curidx + 2], current_line_size - curidx - 1));
-      mToken = new Token(TT_SP, TK_Invalid, ET_CM);
-      // need to store comment
-      return mToken;
-    }
-
-    if (ReadALine() < 0) {
-      mToken = new Token(TT_NA, TK_Eof, ET_NA);
-      return mToken;
-    }
-    _linenum++;  // a new line read.
-    // print current line
-    if (GetVerbose() >= 3) {
-      MMSG2("  >>>> LINE: ", _linenum, GetLine());
-    }
-
-    // skip spaces
-    while ((line[curidx] == ' ' || line[curidx] == '\t') && curidx < (size_t)current_line_size) {
-      mToken = new Token(TT_NA, TK_Invalid, ET_WS);
-      curidx++;
-      return mToken;
-    }
-  }
-  // handle comments in /* */
-  if (line[curidx] == '/' && line[curidx+1] == '*') {
-    curidx += 2; // skip : /*
-    while (curidx < (size_t)current_line_size && !(line[curidx] == '*' && line[curidx+1] == '/')) {
-      curidx++;
-      if (curidx == (size_t)current_line_size) {
-        if (ReadALine() < 0) {
-          mToken = new Token(TT_NA, TK_Eof, ET_NA);
-          return mToken;
-        }
-        _linenum++;  // a new line read.
-      }
-    }
-    curidx += 2; // skip : */
-    // skip spaces
-    while ((line[curidx] == ' ' || line[curidx] == '\t') && curidx < (size_t)current_line_size) {
-      curidx++;
-    }
-  }
-
-  // process the token
-  return ProcessToken();
-}
-
-Token *Lexer::ProcessToken() {
-  char curchar = line[curidx++];
-  switch (curchar) {
-    case '\n':
-      mToken = new Token(TT_SP, TK_Newline);
-      return mToken;
-    case '(':
-      mToken = new Token(TT_SP, TK_Lparen);
-      return mToken;
-    case ')':
-      mToken = new Token(TT_SP, TK_Rparen);
-      return mToken;
-    case '{':
-      mToken = new Token(TT_SP, TK_Lbrace);
-      return mToken;
-    case '}':
-      mToken = new Token(TT_SP, TK_Rbrace);
-      return mToken;
-    case '[':
-      mToken = new Token(TT_SP, TK_Lbrack);
-      return mToken;
-    case ']':
-      mToken = new Token(TT_SP, TK_Rbrack);
-      return mToken;
-    case ',':
-      mToken = new Token(TT_SP, TK_Comma);
-      return mToken;
-    case ';':
-      mToken = new Token(TT_SP, TK_Semicolon);
-      return mToken;
-    case '@':
-      mToken = new Token(TT_OP, TK_At);
-      return mToken;
-    case '.':
-      if (line[curidx] == '.' && line[curidx + 1] == '.') {
-        curidx += 2;
-        mToken = new Token(TT_OP, TK_Dotdotdot);
-        return mToken;
-      } else {
-        mToken = new Token(TT_OP, TK_Dot);
-        return mToken;
-      }
-    case '+':
-      if (line[curidx] == '+') {
-        curidx++;
-        mToken = new Token(TT_OP, TK_Inc);
-        return mToken;
-      } else if (line[curidx] == '=') {
-        curidx++;
-        mToken = new Token(TT_OP, TK_Addassign);
-        return mToken;
-      } else {
-        mToken = new Token(TT_OP, TK_Add);
-        return mToken;
-      }
-    case '-':
-      if (line[curidx] == '-') {
-        curidx++;
-        mToken = new Token(TT_OP, TK_Dec);
-        return mToken;
-      } else if (line[curidx] == '=') {
-        curidx++;
-        mToken = new Token(TT_OP, TK_Subassign);
-        return mToken;
-      } else if (line[curidx] == '>') {
-        curidx++;
-        mToken = new Token(TT_OP, TK_Arrow);
-        return mToken;
-      } else {
-        mToken = new Token(TT_OP, TK_Sub);
-        return mToken;
-      }
-    case '*':
-      if (line[curidx] == '=') {
-        curidx++;
-        mToken = new Token(TT_OP, TK_Mulassign);
-        return mToken;
-      } else {
-        mToken = new Token(TT_OP, TK_Mul);
-        return mToken;
-      }
-    case '/':
-      if (line[curidx] == '=') {
-        curidx++;
-        mToken = new Token(TT_OP, TK_Divassign);
-        return mToken;
-      } else {
-        mToken = new Token(TT_OP, TK_Div);
-        return mToken;
-      }
-    case '%':
-      if (line[curidx] == '=') {
-        curidx++;
-        mToken = new Token(TT_OP, TK_Modassign);
-        return mToken;
-      } else {
-        mToken = new Token(TT_OP, TK_Mod);
-        return mToken;
-      }
-    case '&':
-      if (line[curidx] == '&') {
-        curidx++;
-        mToken = new Token(TT_OP, TK_Land);
-        return mToken;
-      } else if (line[curidx] == '=') {
-        curidx++;
-        mToken = new Token(TT_OP, TK_Bandassign);
-        return mToken;
-      } else {
-        mToken = new Token(TT_OP, TK_Band);
-        return mToken;
-      }
-    case '|':
-      if (line[curidx] == '|') {
-        curidx++;
-        mToken = new Token(TT_OP, TK_Lor);
-        return mToken;
-      } else if (line[curidx] == '=') {
-        curidx++;
-        mToken = new Token(TT_OP, TK_Borassign);
-        return mToken;
-      } else {
-        mToken = new Token(TT_OP, TK_Bor);
-        return mToken;
-      }
-    case '!':
-      if (line[curidx] == '=') {
-        curidx++;
-        mToken = new Token(TT_OP, TK_Ne);
-        return mToken;
-      } else {
-        mToken = new Token(TT_OP, TK_Not);
-        return mToken;
-      }
-    case '^':
-      if (line[curidx] == '=') {
-        curidx++;
-        mToken = new Token(TT_OP, TK_Bxorassign);
-        return mToken;
-      } else {
-        mToken = new Token(TT_OP, TK_Bxor);
-        return mToken;
-      }
-    case '~':
-      mToken = new Token(TT_OP, TK_Bcomp);
-      return mToken;
-    case '>':
-      if (line[curidx] == '>' && line[curidx + 1] == '>' && line[curidx + 2] == '=') {
-        curidx += 3;
-        mToken = new Token(TT_OP, TK_Zextassign);
-        return mToken;
-      } else if (line[curidx] == '>' && line[curidx + 1] == '>') {
-        curidx += 2;
-        mToken = new Token(TT_OP, TK_Zext);
-        return mToken;
-      } else if (line[curidx] == '>' && line[curidx + 1] == '=') {
-        curidx += 2;
-        mToken = new Token(TT_OP, TK_Shrassign);
-        return mToken;
-      } else if (line[curidx] == '>') {
-        curidx++;
-        mToken = new Token(TT_OP, TK_Shr);
-        return mToken;
-      } else if (line[curidx] == '=') {
-        curidx++;
-        mToken = new Token(TT_OP, TK_Ge);
-        return mToken;
-      } else {
-        mToken = new Token(TT_OP, TK_Gt);
-        return mToken;
-      }
-    case '<':
-      if (line[curidx] == '<' && line[curidx + 1] == '=') {
-        curidx += 2;
-        mToken = new Token(TT_OP, TK_Shlassign);
-        return mToken;
-      } else if (line[curidx] == '<') {
-        curidx++;
-        mToken = new Token(TT_OP, TK_Shl);
-        return mToken;
-      } else if (line[curidx] == '=') {
-        curidx++;
-        mToken = new Token(TT_OP, TK_Le);
-        return mToken;
-      } else if (line[curidx] == '>') {
-        curidx++;
-        mToken = new Token(TT_OP, TK_Diamond);
-        return mToken;
-      } else {
-        mToken = new Token(TT_OP, TK_Lt);
-        return mToken;
-      }
-    case '=':
-      if (line[curidx] == '=') {
-        curidx++;
-        mToken = new Token(TT_OP, TK_Eq);
-        return mToken;
-      } else {
-        mToken = new Token(TT_OP, TK_Assign);
-        return mToken;
-      }
-    case '?':
-      mToken = new Token(TT_OP, TK_Cond);
-      return mToken;
-    case ':':
-      if (line[curidx] == ':') {
-        curidx++;
-        mToken = new Token(TT_OP, TK_Of);
-        return mToken;
-      } else {
-        mToken = new Token(TT_OP, TK_Colon);
-        return mToken;
-      }
-    case '0':
-    case '1':
-    case '2':
-    case '3':
-    case '4':
-    case '5':
-    case '6':
-    case '7':
-    case '8':
-    case '9': {
-      curidx--;
-      return GetConstVal();
-    }
-    case '#':
-      mToken = new Token(TT_OP, TK_Pound);
-      return mToken;
-    case '\'':
-      if (line[curidx + 1] == '\'') {
-        thechar = line[curidx];
-        curidx += 2;
-        mToken = new Token(TT_LT, TK_Achar);
-        return mToken;
-      } else {
-        mToken = new Token(TT_NA, TK_Invalid);
-        return mToken;
-      }
-    case '\"': {
-      unsigned startidx = curidx;
-      unsigned shift = 0;
-      unsigned c = 0;
-      // for \", skip the \ to leave " only internally
-      // and also for the pair of chars \ and n become '\n' etc.
-      while ((line[curidx] != '\"' || (line[curidx] == '\"' && curidx > 0 && line[curidx - 1] == '\\')) &&
-             curidx < (size_t)current_line_size) {
-        if (curidx > 0 && line[curidx - 1] == '\\') {
-          shift++;
-          switch (line[curidx]) {
-            case '"':
-              line[curidx - shift] = line[curidx];
-              break;
-            case '\\':
-              line[curidx - shift] = line[curidx];
-              // avoid 3rd \ in \\\ being treated as an escaped one
-              line[curidx] = 0;
-              break;
-            default:
-              line[curidx - shift] = '\\';
-              shift--;
-              line[curidx - shift] = line[curidx];
-              break;
-          }
-        } else if (shift) {
-          line[curidx - shift] = line[curidx];
-        }
-        curidx++;
-      }
-      if (line[curidx] != '\"') {
-        mToken = new Token(TT_LT, TK_Invalid);
-        return mToken;
-      }
-      // for empty string
-      if (startidx == curidx) {
-        thename = std::string("");
-      } else {
-        thename = std::string(&line[startidx], curidx - startidx - shift);
-      }
-      curidx++;
-
-      LitData *data = new LitData(LT_StringLiteral);
-      char *name = mStringPool.FindString(thename);
-      data->mData.mStr = name;
-      mToken = new LiteralToken(TK_String, *data);
-      return mToken;
-    }
-
-    default:
-      curidx--;
-      if (isalpha(line[curidx]) || line[curidx] == '_') {
-        GetName();
-        TK_Kind tkk = keywordmap[thename];
-        char *name = mStringPool.FindString(thename);
-        if (tkk != TK_Invalid) {
-          mToken = new KeywordToken(tkk, name);
-        } else {
-          mToken = new IdentifierToken(name);
-        }
-        return mToken;
-      }
-
-      MASSERT("error in input file\n");
-      mToken = new Token(TT_NA, TK_Eof, ET_NA);
-      return mToken;
-  }
-}
-
-// get the constant value
-Token *Lexer::GetConstVal(void) {
-  /* patterns of const value:
-     1776
-     707
-     -273
-     75         // decimal
-     0113       // octal
-     0x4b       // hexadecimal
-     75         // int
-     75u        // unsigned int
-     75l        // long
-     75ul       // unsigned long
-     75lu       // unsigned long
-     3.14159    // 3.14159
-     6.02e23    // 6.02 x 10^23
-     1.6e-19    // 1.6 x 10^-19
-     3.0        // 3.0
-     3.14159L   // long double (not yet support)
-     6.02e23f   // float
-     .233  //float
-   */
-  bool negative = false;
-  int valstart = curidx;
-  if (line[curidx] == '-') {
-    curidx++;
-    if (line[curidx] == 'i' && line[curidx + 1] == 'n' && line[curidx + 2] == 'f' && line[curidx + 3] == 'f' &&
-        !isalnum(line[curidx + 4])) {
-      curidx += 4;
-      thefloatval = -INFINITY;
-      LitData *data = new LitData(LT_FPLiteral);
-      data->mData.mFloat = thefloatval;;
-      mToken = new LiteralToken(TK_Floatconst, *data);
-      return mToken;
-    }
-    if (line[curidx] == 'i' && line[curidx + 1] == 'n' && line[curidx + 2] == 'f' && !isalnum(line[curidx + 3])) {
-      curidx += 3;
-      thedoubleval = -INFINITY;
-      LitData *data = new LitData(LT_FPLiteral);
-      data->mData.mDouble = thedoubleval;;
-      mToken = new LiteralToken(TK_Doubleconst, *data);
-      return mToken;
-    }
-    if (line[curidx] == 'n' && line[curidx + 1] == 'a' && line[curidx + 2] == 'n' && line[curidx + 3] == 'f' &&
-        !isalnum(line[curidx + 4])) {
-      curidx += 4;
-      thefloatval = -NAN;
-      LitData *data = new LitData(LT_FPLiteral);
-      data->mData.mFloat = thefloatval;;
-      mToken = new LiteralToken(TK_Floatconst, *data);
-      return mToken;
-    }
-    if (line[curidx] == 'n' && line[curidx + 1] == 'a' && line[curidx + 2] == 'n' && !isalnum(line[curidx + 3])) {
-      curidx += 3;
-      thedoubleval = -NAN;
-      LitData *data = new LitData(LT_FPLiteral);
-      data->mData.mDouble = thedoubleval;;
-      mToken = new LiteralToken(TK_Doubleconst, *data);
-      return mToken;
-    }
-    negative = true;
-  }
-  if (line[curidx] == '0' && line[curidx + 1] == 'x') {
-    curidx += 2;
-    if (!isxdigit(line[curidx])) {
-      thename = std::string(&line[valstart], curidx - valstart);
-      mToken = new Token(TT_NA);
-      return mToken;
-    }
-    theintval = DigitValue(line[curidx++]);
-    while (isxdigit(line[curidx])) {
-      theintval = (theintval << 4) + DigitValue(line[curidx++]);
-    }
-    if (negative) {
-      theintval = -theintval;
-    }
-
-    thefloatval = static_cast<float>(theintval);
-    thedoubleval = static_cast<double>(theintval);
-    if (negative && theintval == 0) {
-      thefloatval = -thefloatval;
-      thedoubleval = -thedoubleval;
-    }
-    thename = std::string(&line[valstart], curidx - valstart);
-
-    LitData *data = new LitData(LT_IntegerLiteral);
-    data->mData.mDouble = theintval;;
-    mToken = new LiteralToken(TK_Intconst, *data);
-    return mToken;
-  }
-
-  uint32_t startidx = curidx;
-  while (isdigit(line[curidx])) {
-    curidx++;
-  }
-
-  if (!isdigit(line[startidx]) && line[curidx] != '.') {
-    mToken = new Token(TT_NA);
-    return mToken;
-  }
-
-  if (line[curidx] != '.' && line[curidx] != 'f' && line[curidx] != 'F' && line[curidx] != 'e' && line[curidx] != 'E') {
-    curidx = startidx;
-    theintval = DigitValue(line[curidx++]);
-    if (theintval == 0)  // octal
-      while (isdigit(line[curidx])) {
-        theintval = ((static_cast<uint64_t>(theintval)) << 3) + DigitValue(line[curidx++]);
-      }
-    else
-      while (isdigit(line[curidx])) {
-        theintval = (theintval * 10) + DigitValue(line[curidx++]);
-      }
-    if (negative) {
-      theintval = -theintval;
-    }
-    if (line[curidx] == 'u' || line[curidx] == 'U') {  // skip 'u' or 'U'
-      curidx++;
-      if (line[curidx] == 'l' || line[curidx] == 'L') {
-        curidx++;
-      }
-    }
-    if (line[curidx] == 'l' || line[curidx] == 'L') {
-      curidx++;
-      if (line[curidx] == 'l' || line[curidx] == 'L' || line[curidx] == 'u' || line[curidx] == 'U') {
-        curidx++;
-      }
-    }
-    thename = std::string(&line[valstart], curidx - valstart);
-    thefloatval = static_cast<float>(theintval);
-    thedoubleval = static_cast<double>(theintval);
-    if (negative && theintval == 0) {
-      thefloatval = -thefloatval;
-      thedoubleval = -thedoubleval;
-    }
-
-    LitData *data = new LitData(LT_IntegerLiteral);
-    data->mData.mDouble = theintval;;
-    mToken = new LiteralToken(TK_Intconst, *data);
-    return mToken;
-  } else {  // float value
-    if (line[curidx] == '.') {
-      curidx++;
-    }
-    while (isdigit(line[curidx])) {
-      curidx++;
-    }
-    bool doublePrec = true;
-    if (line[curidx] == 'e' || line[curidx] == 'E') {
-      curidx++;
-      if (!isdigit(line[curidx]) && line[curidx] != '-' && line[curidx] != '+') {
-        thename = std::string(&line[valstart], curidx - valstart);
-        mToken = new Token(TT_NA);
-        return mToken;
-      }
-
-      if (line[curidx] == '-' || line[curidx] == '+') {
-        curidx++;
-      }
-      while (isdigit(line[curidx])) {
-        curidx++;
-      }
-    }
-    if (line[curidx] == 'f' || line[curidx] == 'F') {
-      doublePrec = false;
-      curidx++;
-    }
-    if (line[curidx] == 'l' || line[curidx] == 'L') {
-      MASSERT("warning: not yet support long double\n");
-      curidx++;
-    }
-    // copy to buffer
-    char buffer[30];
-    int i;
-    int length = curidx - startidx;
-    for (i = 0; i < length; i++, startidx++) {
-      buffer[i] = line[startidx];
-    }
-    buffer[length] = 0;
-    // get the float constant value
-    if (!doublePrec) {
-      int eNum = sscanf(buffer, "%e", &thefloatval);
-      if (eNum == -1) {
-        MASSERT("sscanf_s failed");
-      }
-      if (negative) {
-        thefloatval = -thefloatval;
-      }
-      theintval = static_cast<int>(thefloatval);
-      thedoubleval = static_cast<double>(thedoubleval);
-      if (thefloatval == -0) {
-        thedoubleval = -thedoubleval;
-      }
-      thename = std::string(&line[valstart], curidx - valstart);
-      LitData *data = new LitData(LT_FPLiteral);
-      data->mData.mFloat = thefloatval;;
-      mToken = new LiteralToken(TK_Floatconst, *data);
-      return mToken;
-    } else {
-      int eNum = sscanf(buffer, "%le", &thedoubleval);
-      if (eNum == -1) {
-        MASSERT("sscanf_s failed");
-      }
-      if (negative) {
-        thedoubleval = -thedoubleval;
-      }
-      theintval = static_cast<int>(thedoubleval);
-      thefloatval = static_cast<float>(thedoubleval);
-      if (thedoubleval == -0) {
-        thefloatval = -thefloatval;
-      }
-      thename = std::string(&line[valstart], curidx - valstart);
-      LitData *data = new LitData(LT_FPLiteral);
-      data->mData.mDouble = thedoubleval;;
-      mToken = new LiteralToken(TK_Doubleconst, *data);
-      return mToken;
-    }
-  }
-}
-
-Token *Lexer::NextToken() {
-  mToken = LexToken();
-  // skip whitespace and comments for now
-  while (mToken->EType == ET_WS || mToken->EType == ET_CM)
-    mToken = LexToken();
-  if (GetVerbose() >= 3)
-    std::cout << "Token : " << GetTokenKindString() << "   \t " << GetTokenString() << std::endl;
-  return mToken;
 }
 
 std::string Lexer::GetTokenString() {
@@ -860,3 +249,99 @@ std::string Lexer::GetTokenKindString(const TK_Kind tkk) {
   return "TK_" + temp;
 }
 
+///////////////////////////////////////////////////////////////////////////
+//                Utilities for finding predefined tokens
+///////////////////////////////////////////////////////////////////////////
+
+Token* FindSeparatorToken(Lexer * lex, SepId id) {
+  for (unsigned i = 0; i < lex->mPredefinedTokenNum; i++) {
+    Token *token = lex->mTokenPool.mTokens[i];
+    if ((token->mTkType == TT_SP) && (((SeparatorToken*)token)->mSepId == id))
+      return token;
+  }
+}
+
+Token* FindOperatorToken(Lexer * lex, OprId id) {
+  for (unsigned i = 0; i < lex->mPredefinedTokenNum; i++) {
+    Token *token = lex->mTokenPool.mTokens[i];
+    if ((token->mTkType == TT_OP) && (((OperatorToken*)token)->mOprId == id))
+      return token;
+  }
+}
+
+// The caller of this function makes sure 'key' is already in the
+// string pool of Lexer.
+Token* FindKeywordToken(Lexer * lex, char *key) {
+  for (unsigned i = 0; i < lex->mPredefinedTokenNum; i++) {
+    Token *token = lex->mTokenPool.mTokens[i];
+    if ((token->mTkType == TT_KW) && (((KeywordToken*)token)->mName == key))
+      return token;
+  }
+}
+
+// CommentToken is the last predefined token
+Token* FindCommentToken(Lexer * lex) {
+  Token *token = lex->mTokenPool.mTokens[lex->mPredefinedTokenNum - 1];
+  MASSERT((token->mTkType == TT_CM) && "Last predefined token is not a comment token.");
+  return token;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+// Read a token until end of file.
+// If no remaining tokens in current line, we move to the next line.
+Token* Lexer::LexToken_autogen(void) {
+  return LexTokenNoNewLine();
+}
+
+// Read a token until end of line.
+// Return NULL if no token read.
+Token* Lexer::LexTokenNoNewLine(void) {
+  bool is_comment = GetComment(this);
+  if (is_comment) {
+    Token *t = FindCommentToken(this);
+    t->Dump();
+    return t;
+  }
+
+  SepId sep = GetSeparator(this);
+  if (sep != SEP_NA) {
+    Token *t = FindSeparatorToken(this, sep);
+    t->Dump();
+    return t;
+  }
+
+  OprId opr = GetOperator(this);
+  if (opr != OPR_NA) {
+    Token *t = FindOperatorToken(this, opr);
+    t->Dump();
+    return t;
+  }
+
+  const char *keyword = GetKeyword(this);
+  if (keyword != NULL) {
+    Token *t = FindKeywordToken(this, keyword);
+    t->Dump();
+    return t;
+  }
+
+  const char *identifier = GetIdentifier(this);
+  if (identifier != NULL) {
+    IdentifierToken *t = (IdentifierToken*)mTokenPool.NewToken(sizeof(IdentifierToken)); 
+    new (t) IdentifierToken(identifier);
+    t->Dump();
+    return t;
+  }
+
+  LitData ld = GetLiteral(this);
+  if (ld.mType != LT_NA) {
+    LiteralToken *t = (LiteralToken*)mTokenPool.NewToken(sizeof(LiteralToken)); 
+    new (t) LiteralToken(TK_Invalid, ld);
+    t->Dump();
+    return t;
+  }
+
+  return NULL;
+}

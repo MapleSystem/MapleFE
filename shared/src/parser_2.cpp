@@ -414,6 +414,10 @@ bool Parser::ParseStmt_autogen() {
   //                                 lex has got the token from source program and we only
   //                                 need check if the table is &TblIdentifier.
   bool succ = TraverseStmt();
+
+  // After matching there is a tree with each node being a AppealNode. Through the tree is only
+  // one sub-tree which successfully matches all the tokens. This is what we are looking for.
+
   return succ;
 }
 

@@ -9,7 +9,6 @@ void Expr::Dump(unsigned indent) {
   while (i--) {
     std::cout << "  ";
   }
-  mElem->Dump();
 #if 0
   std::cout << "\t\t-- expr0 " << std::hex << this << " mElem " << mElem << std::dec;
   if (mSymbol)
@@ -67,9 +66,9 @@ void Expr::EmitAction(unsigned indent, Symbol *symbol) {
             // std::cout << "symbol ";
             stridx_t stridx = e->mSymbol->mStridx;
             std::cout << GlobalTables::GetStringTable().GetStringFromStridx(stridx) << std::endl;
-          } else if (mSubExprs[k-1]->mElem->IsLeaf()) {
-            // std::cout << "leaf ";
-            mSubExprs[k-1]->Dump(3);
+          //} else if (mSubExprs[k-1]->mElem->IsLeaf()) {
+          //  // std::cout << "leaf ";
+          //  mSubExprs[k-1]->Dump(3);
           } else {
             // std::cout << "else ";
             mSubExprs[k-1]->EmitAction(3, NULL);

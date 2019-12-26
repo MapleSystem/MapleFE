@@ -88,8 +88,6 @@ class Lexer {
   Token *NextToken(void);
   Token *LexToken();
   Token *ProcessToken();
-  // used to process a local string from rule
-  Token *ProcessLocalToken(char *str) { line=str; curidx=0; return ProcessToken(); }
   TK_Kind GetMappedTokenKind(std::string str) const { return keywordmap[str]; }
   Token *GetToken() const {
     return mToken;

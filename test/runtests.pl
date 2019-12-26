@@ -11,15 +11,15 @@ my $pwd = getcwd;
 
 if(!(defined $ARGV[0])) {
   print "------------------------------------------------\n";
-  print "usage: runtests.pl all_orall_or__java2mpl_or_sharedfe\n";
+  print "usage: runtests.pl all or java2mpl\n";
   print "------------------------------------------------\n";
   exit;
 }
 
 if ($ARGV[0] eq 'all') {
-  @dirname = qw(java2mpl sharedfe);
-  print "Run both java2mpl and sharedfe test\n";
-} elsif (($ARGV[0] eq 'java2mpl') || ($ARGV[0] eq 'sharedfe')) {
+  @dirname = qw(java2mpl);
+  print "Run java2mpl test\n";
+} elsif (($ARGV[0] eq 'java2mpl')) {
   @dirname = "$ARGV[0]";
   print "Run $ARGV[0] test\n";
 } else {
@@ -90,7 +90,7 @@ foreach my $dir (@dirname) {
         if ($dir eq "java2mpl") {
           $res = system("cd $pwd/..; build64/java/java2mpl $outdir/$src_file > $outdir/$result_file");
         } else {
-          $res = system("cd $pwd/../build64/autogen; ./sharedfe $outdir/$src_file > $outdir/$result_file");
+          ##$res = system("cd $pwd/../build64/autogen; ./sharedfe $outdir/$src_file > $outdir/$result_file");
         }
         
         if ($res > 0) {
@@ -98,7 +98,7 @@ foreach my $dir (@dirname) {
           if ($dir eq "java2mpl") { 
             print "$pwd/../build64/java/java2mpl $outdir/$src_file\n";
           } else {
-            print "$pwd/../build64/autogen/sharedfe $outdir/$src_file\n";
+            ##print "$pwd/../build64/autogen/sharedfe $outdir/$src_file\n";
           }
           print " ==$dir===> $file\n";
           $countfailedjava ++;

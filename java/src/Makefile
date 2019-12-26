@@ -16,7 +16,6 @@ INCLUDES := -I $(ROOTDIR)/shared/include \
 
 TARGET=java2mpl
 
-AUTOGENLIB = $(ROOTDIR)/$(BUILDDIR)/autogen/autogen.a
 SHAREDLIB = $(ROOTDIR)/$(BUILDDIR)/shared/shared.a
 
 .PHONY: all
@@ -40,8 +39,8 @@ $(BUILD)/%.d : %.cpp
 
 # TARGET depends on OBJS and shared OBJS from shared directory
 #
-$(TARGET): $(OBJS) $(AUTOGENLIB) $(SHAREDLIB)
-	$(LD) -o $(BUILD)/$(TARGET) $(OBJS) $(SHAREDLIB) $(AUTOGENLIB)
+$(TARGET): $(OBJS) $(SHAREDLIB)
+	$(LD) -o $(BUILD)/$(TARGET) $(OBJS) $(SHAREDLIB)
 
 #.cpp.o:
 #	$(CXX) $(CXXFLAGS) -fpermissive $(INCLUDES) -w -c $*.cpp -o $(BUILD)/$*.o
