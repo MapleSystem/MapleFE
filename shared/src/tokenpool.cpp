@@ -18,7 +18,7 @@ char* TokenPool::NewToken(unsigned tokensize) {
   char *addr = NULL;
   // If current block doesn't have enough space, just go to the next block
   if (tokensize > BLOCK_SIZE - mCurPos) {
-    if (mCurBlock >= mBlocks.size()) {
+    if (mCurBlock >= (mBlocks.size()-1)) {
       addr = NewBlock();
       mCurBlock++;
     } else {
