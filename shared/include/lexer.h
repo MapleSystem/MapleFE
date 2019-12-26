@@ -75,7 +75,7 @@ class Lexer {
   }
 
   // These are for autogen table testing
-  Token* LexToken_autogen();  // always return token until end of file.
+  Token* LexToken();  // always return token until end of file.
   Token* LexTokenNoNewLine(); // try to get token untile end of line.
   
   bool EndOfLine() { return curidx == current_line_size; }
@@ -85,13 +85,6 @@ class Lexer {
 
   void PrepareForFile(const std::string filename);
   void PrepareForString(const std::string &src);
-  Token *NextToken(void);
-  Token *LexToken();
-  Token *ProcessToken();
-  TK_Kind GetMappedTokenKind(std::string str) const { return keywordmap[str]; }
-  Token *GetToken() const {
-    return mToken;
-  }
 
   int GetCuridx() const { return curidx; }
   void SetCuridx(int i) { curidx = i; }

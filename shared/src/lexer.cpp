@@ -292,7 +292,7 @@ Token* FindCommentToken(Lexer * lex) {
 
 // Read a token until end of file.
 // If no remaining tokens in current line, we move to the next line.
-Token* Lexer::LexToken_autogen(void) {
+Token* Lexer::LexToken(void) {
   return LexTokenNoNewLine();
 }
 

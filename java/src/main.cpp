@@ -38,7 +38,7 @@ int main (int argc, char *argv[]) {
   parser->InitPredefinedTokens();
   PlantTokens(parser->mLexer);
   parser->SetupTopTables();
-  parser->Parse_autogen();
+  parser->Parse();
   delete parser;
   return 0;
 }

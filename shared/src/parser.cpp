@@ -47,22 +47,6 @@ Parser::Parser(const char *name) : filename(name) {
 }
 
 
-TK_Kind Parser::GetTokenKind(const char c) {
-  char s[2] = {c, 0};
-  return GetTokenKind(s);
-}
-
-TK_Kind Parser::GetTokenKind(const char *str) {
-  TK_Kind tkk = mLexer->GetMappedTokenKind(str);
-  if (GetVerbose() >= 3) {
-    MLOC;
-    std::cout << " GetFEOpcode() str: " << str
-              << " \ttoken: " << mLexer->GetTokenKindString(tkk)
-              <<  std::endl;
-  }
-  return tkk;
-}
-
 void Parser::Dump() {
   std::cout << "\n================= Code ===========" << std::endl;
   if (GetVerbose() >= 3) {
@@ -359,7 +343,7 @@ unsigned Parser::LexOneLine() {
   while (!token_num) {
     // read untile end of line
     while (!mLexer->EndOfLine() && !mLexer->EndOfFile()) {
-      Token* t = mLexer->LexToken_autogen();
+      Token* t = mLexer->LexToken();
       if (t) {
         bool is_whitespace = false;
         if (t->IsSeparator()) {
@@ -402,10 +386,10 @@ bool Parser::MoveCurToken() {
   return true;
 }
 
-bool Parser::Parse_autogen() {
+bool Parser::Parse() {
   bool succ = false;
   while (1) {
-    succ = ParseStmt_autogen();
+    succ = ParseStmt();
     if (!succ)
       break;
   }
@@ -509,7 +493,7 @@ void Parser::Appeal(AppealNode *root) {
 // This is the parsing for highest level language constructs. It could be class
 // in Java/c++, or a function/statement in c/c++. In another word, it's the top
 // level constructs in a compilation unit (aka Module).
-bool Parser::ParseStmt_autogen() {
+bool Parser::ParseStmt() {
   // clear status
   mVisited.clear();
   ClearFailed();

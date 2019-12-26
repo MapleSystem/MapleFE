@@ -188,15 +188,6 @@ public:
   Parser(const char *f);
   ~Parser() { delete mLexer; }
 
-  // for all ParseXXX routines
-  // Return true  : succeed
-  //        false : failed
-  bool Parse();
-  bool ParseFunction(Function *func);
-  bool ParseFuncArgs(Function *func);
-  bool ParseFuncBody(Function *func);
-  bool ParseStmt(Function *func);
-
   TK_Kind GetTokenKind(const char c);
   TK_Kind GetTokenKind(const char *str);
 
@@ -210,12 +201,8 @@ public:
 
   void Dump();
 
-  //////////////////////////////////////////////////////////
-  //        Framework based on Autogen+Token
-  //////////////////////////////////////////////////////////
-
-  bool Parse_autogen();
-  bool ParseStmt_autogen();
+  bool Parse();
+  bool ParseStmt();
   void InitPredefinedTokens();
   void SetupTopTables();  //Each language parser will implement this by itself. 
   unsigned LexOneLine();
