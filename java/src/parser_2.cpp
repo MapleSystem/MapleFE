@@ -1028,6 +1028,7 @@ void Parser::InitPredefinedTokens() {
 void Parser::SetupTopTables() {
   mTopTables.push_back(&TblStatement);
   mTopTables.push_back(&TblClassDeclaration);
+  mTopTables.push_back(&TblInterfaceDeclaration);
 }
 
 const char* Parser::GetRuleTableName(const RuleTable* addr) {

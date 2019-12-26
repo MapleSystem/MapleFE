@@ -68,9 +68,6 @@ rule IntType : ONEOF("byte", "short", "int", "long", "char")
 rule FPType  : ONEOF("float", "double")
 rule NumericType : ONEOF(IntType, FPType)
 
-# this is a fake one, to make the development work.
-rule Annotation : "annotation"
-
 rule PrimitiveType : ONEOF( ZEROORMORE(Annotation) + NumericType,
                        ZEROORMORE(Annotation) + BoolType )
 

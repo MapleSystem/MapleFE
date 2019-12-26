@@ -1,0 +1,49 @@
+Comment Token: 
+Separator  Token:  At
+Keyword    Token:  interface
+Separator  Token:  Whitespace
+Identifier Token:  RequestForEnhancement
+Separator  Token:  Whitespace
+Separator  Token:  Lbrace
+Separator  Token:  Whitespace
+Separator  Token:  Whitespace
+Keyword    Token:  int
+Separator  Token:  Whitespace
+Identifier Token:  id
+Separator  Token:  Lparen
+Separator  Token:  Rparen
+Separator  Token:  Semicolon
+Separator  Token:  Whitespace
+Comment Token: 
+Separator  Token:  Whitespace
+Separator  Token:  Whitespace
+Identifier Token:  String
+Separator  Token:  Whitespace
+Identifier Token:  synopsis
+Separator  Token:  Lparen
+Separator  Token:  Rparen
+Separator  Token:  Semicolon
+Separator  Token:  Whitespace
+Comment Token: 
+Separator  Token:  Whitespace
+Separator  Token:  Whitespace
+Identifier Token:  String
+Separator  Token:  Whitespace
+Identifier Token:  engineer
+Separator  Token:  Lparen
+Separator  Token:  Rparen
+Separator  Token:  Semicolon
+Separator  Token:  Whitespace
+Comment Token: 
+Separator  Token:  Whitespace
+Separator  Token:  Whitespace
+Identifier Token:  String
+Separator  Token:  Whitespace
+Identifier Token:  date
+Separator  Token:  Lparen
+Separator  Token:  Rparen
+Separator  Token:  Semicolon
+Separator  Token:  Whitespace
+Comment Token: 
+Separator  Token:  Rbrace
+Matched 25 tokens.

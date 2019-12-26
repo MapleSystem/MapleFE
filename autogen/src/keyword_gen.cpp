@@ -28,8 +28,12 @@ const std::string KeywordGen::EnumNextElem(){
 /////////////////////////////////////////////////////////////////////
 
 void KeywordGen::ProcessStructData() {
-  for (auto it: mStructs) {
-    for (auto eit: it->mStructElems) {
+  std::vector<StructBase *>::iterator it = mStructs.begin();
+  for (; it != mStructs.end(); it++) {
+    StructBase *sb = *it;
+    sb->Sort(0);
+
+    for (auto eit: sb->mStructElems) {
       AddEntry(eit->mDataVec[0]->GetString());
     }
   }

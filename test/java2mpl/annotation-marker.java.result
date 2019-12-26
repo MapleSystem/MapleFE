@@ -1,0 +1,9 @@
+Comment Token: 
+Separator  Token:  At
+Keyword    Token:  interface
+Separator  Token:  Whitespace
+Identifier Token:  Preliminary
+Separator  Token:  Whitespace
+Separator  Token:  Lbrace
+Separator  Token:  Rbrace
+Matched 5 tokens.

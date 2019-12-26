@@ -121,8 +121,6 @@ rule CastExpression : ONEOF(
   '(' + ReferenceType + ZEROORMORE(AdditionalBound) + ')' + UnaryExpressionNotPlusMinus,
   '(' + ReferenceType + ZEROORMORE(AdditionalBound) + ')' + LambdaExpression)
 
-rule AdditionalBound : '&' + InterfaceType
-
 rule MultiplicativeExpression : ONEOF(
   UnaryExpression,
   MultiplicativeExpression + '*' + UnaryExpression,
