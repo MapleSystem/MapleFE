@@ -48,7 +48,8 @@ rule MethodHeader      : ONEOF(Result + MethodDeclarator + ZEROORONE(Throws),
 rule Result            : ONEOF(UnannType, "void")
 rule MethodDeclarator  : Identifier + '(' + ZEROORONE(FormalParameterList) + ')' + ZEROORONE(Dims)
 rule Throws            : "fakethrows"
-rule MethodModifier    : "fakeones"
+rule MethodModifier    : ONEOF(Annotation, "public", "protected", "private", "abstract", "static",
+                               "final", "synchronized", "native", "strictfp")
 
 # The Java Lang Spec v8 about FormalParameterList is wrong. It doesn't have a ZEROORONE op
 # enclosing the LastFormalParameter, in which case the parser will match all the tokens

@@ -4,12 +4,20 @@
 ###################################################################################
 
 # I just put all TO-DO rules here
-rule TypeName : "typename"
 rule Class    : "class"
 rule ArrayInitializer : "arrayinitializer"
-rule MethodName       : "methodname"
 
-rule ExpressionName: Identifier
+rule PackageName : ONEOF(Identifier,
+                         PackageName + '.' + Identifier)
+rule TypeName    : ONEOF(Identifier,
+                         PackageOrTypeName + '.' + Identifier)
+rule PackageOrTypeName : ONEOF(Identifier,
+                               PackageOrTypeName + '.' + Identifier)
+rule ExpressionName : ONEOF(Identifier,
+                            AmbiguousName + '.' + Identifier)
+rule MethodName     : Identifier
+rule AmbiguousName  : ONEOF(Identifier,
+                            AmbiguousName + '.' + Identifier)
 
 rule ClassLiteral : ONEOF(
   TypeName + ZEROORMORE('[' + ']') + '.' + Class,
