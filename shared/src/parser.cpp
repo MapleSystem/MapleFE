@@ -12,114 +12,8 @@
 #include "ruletable_util.h"
 #include "gen_debug.h"
 
-//////////////////////////////////////////////////////////////////////////////
-
-// pass spec file
-Parser::Parser(const char *name, Module *m) : filename(name), mModule(m) {
-  mLexer = new Lexer();
-  const std::string file(name);
-  // init lexer
-  mLexer->PrepareForFile(file);
-  mCurToken = 0;
-
-  mTraceTable = false;
-  mTraceAppeal = false;
-  mTraceSecondTry = false;
-  mTraceVisited = false;
-  mTraceFailed = false;
-  mIndentation = 0;
-}
-
-Parser::Parser(const char *name) : filename(name) {
-  mLexer = new Lexer();
-  const std::string file(name);
-  // init lexer
-  mLexer->PrepareForFile(file);
-  mCurToken = 0;
-  mPending = 0;
-
-  mTraceTable = false;
-  mTraceAppeal = false;
-  mTraceSecondTry = false;
-  mTraceVisited = false;
-  mTraceFailed = false;
-  mIndentation = 0;
-}
-
-
-void Parser::Dump() {
-  std::cout << "\n================= Code ===========" << std::endl;
-  if (GetVerbose() >= 3) {
-    for (auto it: mModule->mFuncs) {
-      it->EmitCode();
-    }
-  }
-  std::cout << "==================================" << std::endl;
-}
-
-
-// Utility function to handle visited rule tables.
-bool Parser::IsVisited(RuleTable *table) {
-  std::map<RuleTable*, bool>::iterator it;
-  it = mVisited.find(table);
-  if (it == mVisited.end())
-    return false;
-  if (it->second == false)
-    return false;
-  return true;
-}
-
-void Parser::SetVisited(RuleTable *table) {
-  //std::cout << " set visited " << table;
-  mVisited[table] = true;
-}
-
-void Parser::ClearVisited(RuleTable *table) {
-  //std::cout << " clear visited " << table;
-  mVisited[table] = false;
-}
-
-// Push the current position into stack, as we are entering the table again.
-void Parser::VisitedPush(RuleTable *table) {
-  //std::cout << " push " << mCurToken << " from " << table;
-  mVisitedStack[table].push_back(mCurToken);
-}
-
-// Pop the last position in stack, as we are leaving the table again.
-void Parser::VisitedPop(RuleTable *table) {
-  //std::cout << " pop " << " from " << table;
-  mVisitedStack[table].pop_back();
-}
-
-// Add one fail case for the table
-void Parser::AddFailed(RuleTable *table, unsigned token) {
-  //std::cout << " push " << mCurToken << " from " << table;
-  mFailed[table].push_back(token);
-}
-
-// Remove one fail case for the table
-void Parser::ResetFailed(RuleTable *table, unsigned token) {
-  std::vector<unsigned>::iterator it = mFailed[table].begin();;
-  for (; it != mFailed[table].end(); it++) {
-    if (*it == token)
-      break;
-  }
-
-  if (it != mFailed[table].end())
-    mFailed[table].erase(it);
-}
-
-bool Parser::WasFailed(RuleTable *table, unsigned token) {
-  std::vector<unsigned>::iterator it = mFailed[table].begin();
-  for (; it != mFailed[table].end(); it++) {
-    if (*it == token)
-      return true;
-  }
-  return false;
-}
-
 //////////////////////////////////////////////////////////////////////////////////
-//                           Parsing System
+//                   Top Issues in Parsing System
 //
 // 1. Token Management
 //
@@ -327,8 +221,121 @@ bool Parser::WasFailed(RuleTable *table, unsigned token) {
 //
 // [NOTE] Second Try will brings in extra branches in the appealing tree. However, it seems doesn't
 //        create any serious problem.
+//
+//
+// 7. SortOut Process
+//
+// After traversing the rule tables and successfully matching all the tokens, we have created
+// a big tree with Top Table as the root. However, the real matching part is just a small part
+// of the tree. We need sort out all the nodes and figure out the exactly matching sub-tree.
+// Based on this sub-tree, we can further apply the action of each node to build the MapleIR.
+//
+// The tree is made up of AppealNode-s, and we will walk the tree and examine the nodes during
+// the SortOut process.
 //////////////////////////////////////////////////////////////////////////////////
 
+Parser::Parser(const char *name, Module *m) : filename(name), mModule(m) {
+  mLexer = new Lexer();
+  const std::string file(name);
+  // init lexer
+  mLexer->PrepareForFile(file);
+  mCurToken = 0;
+
+  mTraceTable = false;
+  mTraceAppeal = false;
+  mTraceSecondTry = false;
+  mTraceVisited = false;
+  mTraceFailed = false;
+  mIndentation = 0;
+}
+
+Parser::Parser(const char *name) : filename(name) {
+  mLexer = new Lexer();
+  const std::string file(name);
+  // init lexer
+  mLexer->PrepareForFile(file);
+  mCurToken = 0;
+  mPending = 0;
+
+  mTraceTable = false;
+  mTraceAppeal = false;
+  mTraceSecondTry = false;
+  mTraceVisited = false;
+  mTraceFailed = false;
+  mIndentation = 0;
+}
+
+
+void Parser::Dump() {
+  std::cout << "\n================= Code ===========" << std::endl;
+  if (GetVerbose() >= 3) {
+    for (auto it: mModule->mFuncs) {
+      it->EmitCode();
+    }
+  }
+  std::cout << "==================================" << std::endl;
+}
+
+
+// Utility function to handle visited rule tables.
+bool Parser::IsVisited(RuleTable *table) {
+  std::map<RuleTable*, bool>::iterator it;
+  it = mVisited.find(table);
+  if (it == mVisited.end())
+    return false;
+  if (it->second == false)
+    return false;
+  return true;
+}
+
+void Parser::SetVisited(RuleTable *table) {
+  //std::cout << " set visited " << table;
+  mVisited[table] = true;
+}
+
+void Parser::ClearVisited(RuleTable *table) {
+  //std::cout << " clear visited " << table;
+  mVisited[table] = false;
+}
+
+// Push the current position into stack, as we are entering the table again.
+void Parser::VisitedPush(RuleTable *table) {
+  //std::cout << " push " << mCurToken << " from " << table;
+  mVisitedStack[table].push_back(mCurToken);
+}
+
+// Pop the last position in stack, as we are leaving the table again.
+void Parser::VisitedPop(RuleTable *table) {
+  //std::cout << " pop " << " from " << table;
+  mVisitedStack[table].pop_back();
+}
+
+// Add one fail case for the table
+void Parser::AddFailed(RuleTable *table, unsigned token) {
+  //std::cout << " push " << mCurToken << " from " << table;
+  mFailed[table].push_back(token);
+}
+
+// Remove one fail case for the table
+void Parser::ResetFailed(RuleTable *table, unsigned token) {
+  std::vector<unsigned>::iterator it = mFailed[table].begin();;
+  for (; it != mFailed[table].end(); it++) {
+    if (*it == token)
+      break;
+  }
+
+  if (it != mFailed[table].end())
+    mFailed[table].erase(it);
+}
+
+bool Parser::WasFailed(RuleTable *table, unsigned token) {
+  std::vector<unsigned>::iterator it = mFailed[table].begin();
+  for (; it != mFailed[table].end(); it++) {
+    if (*it == token)
+      return true;
+  }
+  return false;
+}
 
 // Lex all tokens in a line, save to mTokens.
 // If no valuable in current line, we continue to the next line.
@@ -456,7 +463,7 @@ void Parser::AppealTraverse(AppealNode *node, AppealNode *root) {
   traverse_list.push_back(node);
 
   MASSERT((root->mAfter == Succ) && "root->mAfter is not Succ.");
-  if ((node->mTable == root->mTable) && (node->mAfter == FailLooped)) {
+  if ((node->GetTable() == root->GetTable()) && (node->mAfter == FailLooped)) {
     // walk the list, and clear the fail flag for appropriate node
     // we also set the mAfter of node to Succ so that the futural traversal won't
     // modify it again.
@@ -464,8 +471,8 @@ void Parser::AppealTraverse(AppealNode *node, AppealNode *root) {
       AppealNode *n = traverse_list[i];
       if ((n->mBefore == Succ) && (n->mAfter == FailChildrenFailed)) {
         if (mTraceAppeal)
-          DumpAppeal(n->mTable, n->mToken);
-        ResetFailed(n->mTable, n->mToken);
+          DumpAppeal(n->GetTable(), n->mStartIndex);
+        ResetFailed(n->GetTable(), n->mStartIndex);
         n->mAfter = Succ;
       }
     }
@@ -473,7 +480,10 @@ void Parser::AppealTraverse(AppealNode *node, AppealNode *root) {
 
 
   for (unsigned i = 0; i < node->mChildren.size(); i++) {
-    AppealTraverse(node->mChildren[i], root);
+    AppealNode *child = node->mChildren[i];
+    if (child->IsToken())
+      continue;
+    AppealTraverse(child, root);
     traverse_list.pop_back();
   }
 }
@@ -483,7 +493,10 @@ void Parser::Appeal(AppealNode *root) {
   traverse_list.push_back(root);
 
   for (unsigned i = 0; i < root->mChildren.size(); i++) {
-    AppealTraverse(root->mChildren[i], root);
+    AppealNode *child = root->mChildren[i];
+    if (child->IsToken())
+      continue;
+    AppealTraverse(child, root);
     traverse_list.pop_back();
   }
 }
@@ -504,8 +517,8 @@ bool Parser::ParseStmt() {
   mPending = 0;
 
   // set the root appealing node
-  AppealNode *appeal_root = new AppealNode();
-  mAppealNodes.push_back(appeal_root);
+  mRootNode = new AppealNode();
+  mAppealNodes.push_back(mRootNode);
 
   // mActiveTokens contain some un-matched tokens from last time of TraverseStmt(),
   // because at the end of every TraverseStmt() when it finishes its matching it always
@@ -544,9 +557,10 @@ bool Parser::TraverseStmt() {
   std::vector<RuleTable*>::iterator it = mTopTables.begin();
   for (; it != mTopTables.end(); it++) {
     RuleTable *t = *it;
-    succ = TraverseRuleTable(t, mAppealNodes[0]);
+    succ = TraverseRuleTable(t, mRootNode);
     if (succ) {
-      //MASSERT((mPending == mTokens.size()) && "Num of matched token is wrong.");
+      mRootNode->mAfter = Succ;
+      SortOut();
       break;
     }
   }
@@ -629,11 +643,11 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *appeal_parent)
 
   // set the apppeal node
   AppealNode *appeal = new AppealNode();
-  appeal->mTable = rule_table;
-  appeal->mToken = mCurToken;
+  appeal->SetTable(rule_table);
+  appeal->mStartIndex = mCurToken;
   appeal->mParent = appeal_parent;
   mAppealNodes.push_back(appeal);
-  appeal_parent->mChildren.push_back(appeal);
+  appeal_parent->AddChild(appeal);
 
   // Check if it was succ. Set the gSuccTokens/gSuccTokensNum appropriately
   SuccMatch *succ = FindSucc(rule_table);
@@ -746,7 +760,8 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *appeal_parent)
 
     // We try to appeal only if it succeeds at the end.
     appeal->mAfter = Succ;
-    Appeal(appeal);
+    if (appeal->IsTable())
+      Appeal(appeal);
     return true;
   } else {
     appeal->mAfter = FailChildrenFailed;
@@ -758,6 +773,11 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *appeal_parent)
 
 // We don't go into Literal table.
 // No mVisitedStack invovled for literal table.
+//
+// 'appeal' is the node for this rule table. This is different than TraverseOneof
+// or the others where 'appeal' is actually a parent node.
+//
+// Also since it's actually a token, we will relate 'appeal' to the token.
 bool Parser::TraverseLiteral(RuleTable *rule_table, AppealNode *appeal) {
   Token *curr_token = mActiveTokens[mCurToken];
   const char *name = GetRuleTableName(rule_table);
@@ -770,12 +790,16 @@ bool Parser::TraverseLiteral(RuleTable *rule_table, AppealNode *appeal) {
     found = true;
     gSuccTokensNum = 1;
     gSuccTokens[0] = mCurToken;
+
+    appeal->mBefore = Succ;
+    appeal->mAfter = Succ;
+    appeal->SetToken(curr_token);
+    appeal->mStartIndex = mCurToken;
+
     MoveCurToken();
     if (mTraceTable)
       DumpExitTable(name, mIndentation, true);
     mIndentation -= 2;
-    appeal->mBefore = Succ;
-    appeal->mAfter = Succ;
   } else {
     AddFailed(rule_table, mCurToken);
     if (mTraceTable)
@@ -796,6 +820,8 @@ bool Parser::TraverseLiteral(RuleTable *rule_table, AppealNode *appeal) {
 //
 // 'appeal' is the node for this rule table. This is different than TraverseOneof
 // or the others where 'appeal' is actually a parent node.
+//
+// Also since it's actually a token, we will relate 'appeal' to the token.
 bool Parser::TraverseIdentifier(RuleTable *rule_table, AppealNode *appeal) {
   Token *curr_token = mActiveTokens[mCurToken];
   const char *name = GetRuleTableName(rule_table);
@@ -807,13 +833,17 @@ bool Parser::TraverseIdentifier(RuleTable *rule_table, AppealNode *appeal) {
   if (curr_token->IsIdentifier()) {
     gSuccTokensNum = 1;
     gSuccTokens[0] = mCurToken;
+
+    appeal->mBefore = Succ;
+    appeal->mAfter = Succ;
+    appeal->SetToken(curr_token);
+    appeal->mStartIndex = mCurToken;
+
     found = true;
     MoveCurToken();
     if (mTraceTable)
       DumpExitTable(name, mIndentation, true);
     mIndentation -= 2;
-    appeal->mBefore = Succ;
-    appeal->mAfter = Succ;
   } else {
     AddFailed(rule_table, mCurToken);
     if (mTraceTable)
@@ -1073,6 +1103,14 @@ bool Parser::TraverseTableData(TableData *data, AppealNode *parent) {
     if (mTraceTable)
       DumpEnterTable("token", mIndentation);
     if (data->mData.mToken == curr_token) {
+      AppealNode *appeal = new AppealNode();
+      appeal->mBefore = Succ;
+      appeal->mAfter = Succ;
+      appeal->SetToken(curr_token);
+      appeal->mStartIndex = mCurToken;
+      appeal->mParent = parent;
+      parent->AddChild(appeal);
+
       found = true;
       gSuccTokensNum = 1;
       gSuccTokens[0] = mCurToken;
@@ -1101,9 +1139,42 @@ bool Parser::TraverseTableData(TableData *data, AppealNode *parent) {
   return found;
 }
 
+/////////////////////////////////////////////////////////////////////////////
+//                              SortOut
+// We will start from the root of the tree composed of AppealNode, and find one
+// sub-tree which successfully matched all tokens. The algorithm has a few key
+// parts.
+//
+// 1. Start from mRootNode, and do a traversal similar as matching process, but
+//    much simpler.
+// 2. If a node is failed, it's removed from its parents children list.
+// 3. If a node is success, it's guaranteed its starting token is parent's last
+//    token plus one.
+// 4. There should be the same amount of succ children as the vector length
+//    of parent's SuccMatch.
+// 5. There should be only one final matching in the end. Otherwise it's
+//    ambiguouse.
+/////////////////////////////////////////////////////////////////////////////
 
+// We don't want to use recursive. So a deque is used here.
+void Parser::SortOut() {
+  std::deque<AppealNode*> active_nodes;
+  active_nodes.push_back(mRootNode);
+  while(!active_nodes.empty()) {
+    AppealNode *node = active_nodes.front();
+    active_nodes.pop_front();
+    SortOutNode(node);
+  }
+}
 
-// Initialized the predefined tokens.
+void Parser::SortOutNode(AppealNode *node) {
+  MASSERT(node->IsSucc() && "Failed node in SortOut?");
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//             Initialized the predefined tokens.
+/////////////////////////////////////////////////////////////////////////////
+
 void Parser::InitPredefinedTokens() {
   // 1. create separator Tokens.
   for (unsigned i = 0; i < SEP_NA; i++) {

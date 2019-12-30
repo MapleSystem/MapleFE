@@ -38,16 +38,33 @@ typedef enum {
 
 class AppealNode;
 class AppealNode{
+private:
+  bool mIsTable;  // A AppealNode could relate to either rule table or token.
 public:
-  RuleTable *mTable;
-  unsigned   mToken;
+  union {
+    RuleTable *mTable;
+    Token     *mToken;
+  }mData;
+  unsigned   mStartIndex;     // index of start matching token
   std::vector<AppealNode*> mChildren;
   AppealNode *mParent;
   AppealStatus mBefore;
   AppealStatus mAfter;
 
-  AppealNode() {mTable=NULL; mParent = NULL; mBefore = NA; mAfter = NA;}
+  AppealNode() {mData.mTable=NULL; mParent = NULL; mBefore = NA; mAfter = NA; mIsTable = true;}
   ~AppealNode(){}
+
+  void AddChild(AppealNode *n) { mChildren.push_back(n); }
+
+  bool IsSucc() { return (mAfter == Succ) || (mAfter == SuccWasSucc); }
+  bool IsFail() { return !IsSucc(); }
+
+  bool IsTable(){ return mIsTable; }
+  bool IsToken(){ return !mIsTable; }
+  void SetTable(RuleTable *t) { mIsTable = true; mData.mTable = t; }
+  void SetToken(Token *t)     { mIsTable = false; mData.mToken = t; }
+  RuleTable* GetTable() { return mData.mTable; }
+  Token*     GetToken() { return mData.mToken; }
 };
 
 // Design of the cached success info.
@@ -179,9 +196,14 @@ private:
 
   // Appealing System
   std::vector<AppealNode*> mAppealNodes;
+  AppealNode *mRootNode;
   void ClearAppealNodes();
   void Appeal(AppealNode*);
   void AppealTraverse(AppealNode *node, AppealNode *root);
+
+  // Sort Out
+  void SortOut();
+  void SortOutNode(AppealNode*);
 
 public:
   Parser(const char *f, Module *m);
