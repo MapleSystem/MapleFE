@@ -9,6 +9,7 @@
 #include <iostream>
 #include <fstream>
 #include <stack>
+#include <list>
 #include <map>
 
 #include "feopcode.h"
@@ -46,7 +47,9 @@ public:
     Token     *mToken;
   }mData;
   unsigned   mStartIndex;     // index of start matching token
-  std::vector<AppealNode*> mChildren;
+  std::list<AppealNode*> mChildren;   // Use list instead of vector since SortOut
+                                      // will remove some nodes, and it has sort of
+                                      // frequent.
   AppealNode *mParent;
   AppealStatus mBefore;
   AppealStatus mAfter;
@@ -55,6 +58,7 @@ public:
   ~AppealNode(){}
 
   void AddChild(AppealNode *n) { mChildren.push_back(n); }
+  void RemoveChild(AppealNode *n);
 
   bool IsSucc() { return (mAfter == Succ) || (mAfter == SuccWasSucc); }
   bool IsFail() { return !IsSucc(); }
@@ -87,6 +91,8 @@ public:
 // This is a per-rule data structure, saving the success info of a rule.
 class SuccMatch {
 public:
+  // I use vector instead of list, although we will remove some elements in SortOut.
+  // The reason is we will use operator[] a lot during query. Vector is better.
   std::vector<unsigned> mCache;
 private:
   unsigned mTempIndex;          // A temporary index
@@ -103,6 +109,9 @@ public:
   // add the end matching tokens one by one.
   void AddStartToken(unsigned token);
   void AddOneMoreMatch(unsigned last_succ_token);  // add one more match to the cach
+
+  // Reduce tokens, used during SortOut
+  void ReduceOneMatch(unsigned token);
 
   // query functions.
   // The three function need to be used together.
@@ -204,6 +213,11 @@ private:
   // Sort Out
   void SortOut();
   void SortOutNode(AppealNode*);
+  void SortOutOneof(AppealNode*);
+  void SortOutZeroormore(AppealNode*);
+  void SortOutZeroorone(AppealNode*);
+  void SortOutConcatenate(AppealNode*);
+  void SortOutData(AppealNode*);
 
 public:
   Parser(const char *f, Module *m);

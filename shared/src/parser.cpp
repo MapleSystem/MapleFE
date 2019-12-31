@@ -478,9 +478,9 @@ void Parser::AppealTraverse(AppealNode *node, AppealNode *root) {
     }
   }
 
-
-  for (unsigned i = 0; i < node->mChildren.size(); i++) {
-    AppealNode *child = node->mChildren[i];
+  std::list<AppealNode*>::iterator it = node->mChildren.begin();
+  for (; it != node->mChildren.end(); it++) {
+    AppealNode *child = *it;
     if (child->IsToken())
       continue;
     AppealTraverse(child, root);
@@ -492,8 +492,9 @@ void Parser::Appeal(AppealNode *root) {
   traverse_list.clear();
   traverse_list.push_back(root);
 
-  for (unsigned i = 0; i < root->mChildren.size(); i++) {
-    AppealNode *child = root->mChildren[i];
+  std::list<AppealNode*>::iterator it = root->mChildren.begin();
+  for (; it != root->mChildren.end(); it++) {
+    AppealNode *child = *it;
     if (child->IsToken())
       continue;
     AppealTraverse(child, root);
@@ -560,7 +561,7 @@ bool Parser::TraverseStmt() {
     succ = TraverseRuleTable(t, mRootNode);
     if (succ) {
       mRootNode->mAfter = Succ;
-      SortOut();
+      //SortOut();
       break;
     }
   }
@@ -1141,6 +1142,12 @@ bool Parser::TraverseTableData(TableData *data, AppealNode *parent) {
 
 /////////////////////////////////////////////////////////////////////////////
 //                              SortOut
+//
+// The principle of Match-SortOut is very similar as Map-Reduce. During the
+// Match phase, the SuccMatch could have multiple choices, and it keeps growing.
+// During the SortOut phase, we are reducing the SuccMatch, removing the misleading
+// matches.
+//
 // We will start from the root of the tree composed of AppealNode, and find one
 // sub-tree which successfully matched all tokens. The algorithm has a few key
 // parts.
@@ -1154,6 +1161,11 @@ bool Parser::TraverseTableData(TableData *data, AppealNode *parent) {
 //    of parent's SuccMatch.
 // 5. There should be only one final matching in the end. Otherwise it's
 //    ambiguouse.
+// 6. [NOTE] During the matching phase, a node could have multiple successful
+//           matching. However, during SortOut, starting from mRootNode, there is
+//           only possible matching. We will trim the SuccMatch vector of each
+//           child node according to their parent node. In this way, we will finally
+//           get a single tree.
 /////////////////////////////////////////////////////////////////////////////
 
 // We don't want to use recursive. So a deque is used here.
@@ -1167,8 +1179,118 @@ void Parser::SortOut() {
   }
 }
 
+// 'node' is already trimmed when passing into this function. This assertion
+//  will be done in the SortOutXXX() which handles children node.
 void Parser::SortOutNode(AppealNode *node) {
   MASSERT(node->IsSucc() && "Failed node in SortOut?");
+
+  // A token's appeal node doesn't need to do anything
+  if (node->IsToken())
+    return;
+
+  RuleTable *rule_table = node->GetTable();
+  EntryType type = rule_table->mType;
+  switch(type) {
+  case ET_Oneof:
+    SortOutOneof(node);
+    break;
+  case ET_Zeroormore:
+    SortOutZeroormore(node);
+    break;
+  case ET_Zeroorone:
+    SortOutZeroorone(node);
+    break;
+  case ET_Concatenate:
+    SortOutConcatenate(node);
+    break;
+  case ET_Data:
+    SortOutData(node);
+    break;
+  case ET_Null:
+  default:
+    break;
+  }
+
+  return;
+}
+
+// 'parent' is already trimmed when passing into this function.
+void Parser::SortOutOneof(AppealNode *parent) {
+  RuleTable *table = parent->GetTable();
+  MASSERT(table && "parent is not a table?");
+
+  SuccMatch *succ = FindSucc(table);
+  MASSERT(succ && "parent has no SuccMatch?");
+  MASSERT((succ->GetMatchNum() == 1) && "trimmed parent has >1 matches?");
+
+  unsigned parent_match = succ->GetOneMatch(0);
+
+  unsigned good_children = 0;
+  std::vector<AppealNode*> bad_children;
+
+  std::list<AppealNode*>::iterator it = parent->mChildren.begin();
+  for (; it != parent->mChildren.end(); it++) {
+    AppealNode *child = *it;
+    if (child->IsFail())
+      continue;
+
+    // In OneOf node, A successful child node must have its last matching
+    // token the same as parent. Look into the child's SuccMatch, trim it
+    // if it has multiple matching.
+
+    if (child->IsToken()) {
+      // Token node matches just one token.
+      if (child->mStartIndex == parent_match)
+        good_children++;
+    } else {
+      SuccMatch *succ = FindSucc(child->GetTable());
+      MASSERT(succ && "ruletable node has no SuccMatch?");
+
+      std::vector<unsigned> to_be_moved;
+      std::vector<unsigned>::iterator mit = succ->mCache.begin();
+      for (; mit != succ->mCache.end(); mit++) {
+        if (*mit != parent_match)
+          to_be_moved.push_back(*mit);
+      }
+
+      mit = to_be_moved.begin();
+      for (; mit != to_be_moved.end(); mit++) {
+        succ->ReduceOneMatch(*mit);
+      }
+
+      unsigned num = succ->GetMatchNum();
+      if (num > 1)
+        MASSERT(0 && "reduced node has >1 matches?");
+      else if (num == 0)
+        bad_children.push_back(child);
+      else
+        good_children++;
+    }
+  }
+
+  MASSERT((good_children==1) && "more than one good children in Sortout?");
+
+  // remove the bad children AppealNode
+  std::vector<AppealNode*>::iterator badit = bad_children.begin();
+  for (; badit != bad_children.end(); badit++) {
+    parent->RemoveChild(*badit);
+  }
+}
+
+// 'parent' is already trimmed when passing into this function.
+void Parser::SortOutZeroormore(AppealNode *parent) {
+}
+
+// 'parent' is already trimmed when passing into this function.
+void Parser::SortOutZeroorone(AppealNode *parent) {
+}
+
+// 'parent' is already trimmed when passing into this function.
+void Parser::SortOutConcatenate(AppealNode *parent) {
+}
+
+// 'parent' is already trimmed when passing into this function.
+void Parser::SortOutData(AppealNode *parent) {
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1306,6 +1428,10 @@ void SuccMatch::AddOneMoreMatch(unsigned m) {
   mCache[mTempIndex] += 1;
 }
 
+// [TODO]
+void SuccMatch::ReduceOneMatch(unsigned m) {
+}
+
 // Below are three Query functions for succ info
 // Again, They need be used together as mTempIndex is def-use in between.
 //
@@ -1339,4 +1465,11 @@ unsigned SuccMatch::GetMatchNum() {
 // idx starts from 0.
 unsigned SuccMatch::GetOneMatch(unsigned idx) {
   return mCache[mTempIndex + 1 + idx + 1];
+}
+
+///////////////////////////////////////////////////////////////
+//            AppealNode function
+///////////////////////////////////////////////////////////////
+
+void AppealNode::RemoveChild(AppealNode *child) {
 }
