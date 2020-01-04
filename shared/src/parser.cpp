@@ -909,12 +909,6 @@ bool Parser::TraverseZeroormore(RuleTable *rule_table, AppealNode *parent) {
     gSuccTokensNum = succ_tokens_num;
     for (unsigned i = 0; i < succ_tokens_num; i++)
       gSuccTokens[i] = succ_tokens[i];
-  } else {
-    // Even if nothing is found, we still treat it as one success without moving
-    // mCurToken forward. Since gSuccTokens[] record the success matched tokens, and
-    // mCurToken is not matched, we have to set the previous token as successful token.
-    gSuccTokensNum = 1;
-    gSuccTokens[0] = mCurToken - 1;
   }
 
   return true;
@@ -933,12 +927,9 @@ bool Parser::TraverseZeroorone(RuleTable *rule_table, AppealNode *parent) {
       break;
   }
 
-  // Even if nothing is found, we still treat it as one success without moving
-  // mCurToken forward. Since gSuccTokens[] record the success matched tokens, and
-  // mCurToken is not matched, we have to set the previous token as successful token.
   if (!found) {
-    gSuccTokensNum = 1;
-    gSuccTokens[0] = mCurToken - 1;
+    if (gSuccTokensNum != 0)
+      std::cout << "weird.... gSuccTokensNum=" << gSuccTokensNum << std::endl;
   }
 
   return true;
@@ -1000,16 +991,22 @@ bool Parser::TraverseOneof(RuleTable *rule_table, AppealNode *parent) {
 //           matchings_1 * matchings_2 * ...
 //        2. The good thing is each following node start to match from the new mCurToken
 //           after the previous node. This means we are actually assuming there is only
-//           one matching from previous node even it actually has multiple matchings.
+//           one matching in previous node even it actually has multiple matchings.
 //        3. Only the last node could be allowed to have multiple matchings to transfer to
 //           the caller.
-// But we are lucky as the last element of Concatenate will take care of gSuccTokens by itself.
+//        4. The gSuccTokensNum/gSuccTokens need be taken care since in a rule like below
+//              rule AA : BB + CC + ZEROORONE(xxx)
+//           If ZEROORONE(xxx) doesn't match anything, it sets gSuccTokensNum to 0. However
+//           rule AA matches multiple tokens. So gSuccTokensNum needs to be accumulated.
+
 bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *parent) {
   bool found = false;
   unsigned prev_succ_tokens_num = 0;
   unsigned prev_succ_tokens[MAX_SUCC_TOKENS];
   unsigned curr_succ_tokens_num = 0;
   unsigned curr_succ_tokens[MAX_SUCC_TOKENS];
+  unsigned final_succ_tokens_num = 0;
+  unsigned final_succ_tokens[MAX_SUCC_TOKENS];
 
   // Make sure it's 0 when fail
   gSuccTokensNum = 0;
@@ -1022,7 +1019,15 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *parent) {
     for (unsigned id = 0; id < gSuccTokensNum; id++)
       curr_succ_tokens[id] = gSuccTokens[id];
 
-    if (!found) {
+    if (found) {
+      // for Zeroorone/Zeroormore node, it set found to true, but actually it may matching
+      // nothing. In this case, we don't change final_succ_tokens_num.
+      if (gSuccTokensNum > 0) {
+        final_succ_tokens_num = gSuccTokensNum;
+        for (unsigned id = 0; id < gSuccTokensNum; id++)
+          final_succ_tokens[id] = gSuccTokens[id];
+      }
+    } else {
       if (mTraceSecondTry)
         DumpSuccTokens();
 
@@ -1059,8 +1064,17 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *parent) {
         found = temp_found;
 
         // Step 4. If still fail after second try, we reset the mCurToken
-        if (!found)
+        if (!found) {
           mCurToken = old_pos;
+        } else {
+          // for Zeroorone/Zeroormore node, it set found to true, but actually it may matching
+          // nothing. In this case, we don't change final_succ_tokens_num.
+          if (gSuccTokensNum > 0) {
+            final_succ_tokens_num = gSuccTokensNum;
+            for (unsigned id = 0; id < gSuccTokensNum; id++)
+              final_succ_tokens[id] = gSuccTokens[id];
+          }
+        }
 
         if (mTraceSecondTry) {
           if (found)
@@ -1078,6 +1092,14 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *parent) {
     // After second try, if it still fails, we quit.
     if (!found)
       break;
+  }
+
+  if (found) {
+     gSuccTokensNum = final_succ_tokens_num;
+     for (unsigned id = 0; id < final_succ_tokens_num; id++)
+       gSuccTokens[id] = final_succ_tokens[id];
+  } else {
+    gSuccTokensNum = 0;
   }
 
   return found;
@@ -1278,7 +1300,70 @@ void Parser::SortOutOneof(AppealNode *parent) {
 }
 
 // 'parent' is already trimmed when passing into this function.
+//
+// Zeorormore node is like Concatenate node, where all children's matching tokens are linked
+// together one after another. Zeroorone is also similar with at most one child.
 void Parser::SortOutZeroormore(AppealNode *parent) {
+  RuleTable *table = parent->GetTable();
+  MASSERT(table && "parent is not a table?");
+
+  SuccMatch *succ = FindSucc(table);
+  MASSERT(succ && "parent has no SuccMatch?");
+  MASSERT((succ->GetMatchNum() == 1) && "trimmed parent has >1 matches?");
+
+  // find the parent's last matching token.
+  unsigned parent_match = succ->GetOneMatch(0);
+
+  unsigned good_children = 0;
+  std::vector<AppealNode*> bad_children;
+
+  std::list<AppealNode*>::iterator it = parent->mChildren.begin();
+  for (; it != parent->mChildren.end(); it++) {
+    AppealNode *child = *it;
+    if (child->IsFail())
+      continue;
+
+    // In OneOf node, A successful child node must have its last matching
+    // token the same as parent. Look into the child's SuccMatch, trim it
+    // if it has multiple matching.
+
+    if (child->IsToken()) {
+      // Token node matches just one token.
+      if (child->mStartIndex == parent_match)
+        good_children++;
+    } else {
+      SuccMatch *succ = FindSucc(child->GetTable());
+      MASSERT(succ && "ruletable node has no SuccMatch?");
+
+      std::vector<unsigned> to_be_moved;
+      std::vector<unsigned>::iterator mit = succ->mCache.begin();
+      for (; mit != succ->mCache.end(); mit++) {
+        if (*mit != parent_match)
+          to_be_moved.push_back(*mit);
+      }
+
+      mit = to_be_moved.begin();
+      for (; mit != to_be_moved.end(); mit++) {
+        succ->ReduceOneMatch(*mit);
+      }
+
+      unsigned num = succ->GetMatchNum();
+      if (num > 1)
+        MASSERT(0 && "reduced node has >1 matches?");
+      else if (num == 0)
+        bad_children.push_back(child);
+      else
+        good_children++;
+    }
+  }
+
+  MASSERT((good_children==1) && "more than one good children in Sortout?");
+
+  // remove the bad children AppealNode
+  std::vector<AppealNode*>::iterator badit = bad_children.begin();
+  for (; badit != bad_children.end(); badit++) {
+    parent->RemoveChild(*badit);
+  }
 }
 
 // 'parent' is already trimmed when passing into this function.
@@ -1416,10 +1501,13 @@ void SuccMatch::AddThreeMatch(unsigned t, unsigned m1, unsigned m2, unsigned m3)
 // The following two functions are used to handle general cases where the
 // total number of matches could be unknown, or could be more than 3.
 // They need be used together as mTempIndex is def-use in between.
-
+//
+// Temporarily set the num of matches to 0. For the ZeroorXXX node, even there is no
+// matching it is still a succ. This will also be saved in SuccMatch, with matching num
+// set as 0.
 void SuccMatch::AddStartToken(unsigned t) {
   mCache.push_back(t);
-  mCache.push_back(0);    // temporarily set the num of matches to 0
+  mCache.push_back(0);
   mTempIndex = mCache.size() - 1;
 }
 
