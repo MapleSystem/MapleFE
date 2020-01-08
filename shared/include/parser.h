@@ -39,8 +39,9 @@ typedef enum {
 
 class AppealNode;
 class AppealNode{
-private:
-  bool mIsTable;  // A AppealNode could relate to either rule table or token.
+public:
+  bool mIsTable;     // A AppealNode could relate to either rule table or token.
+  bool mIsSecondTry; // The node is created after second try. This flag is used during SortOut.
 public:
   union {
     RuleTable *mTable;
@@ -48,17 +49,18 @@ public:
   }mData;
   unsigned   mStartIndex;     // index of start matching token
   std::list<AppealNode*> mChildren;   // Use list instead of vector since SortOut
-                                      // will remove some nodes, and it has sort of
-                                      // frequent.
+                                      // will remove some nodes, and it happens often
   AppealNode *mParent;
   AppealStatus mBefore;
   AppealStatus mAfter;
 
-  AppealNode() {mData.mTable=NULL; mParent = NULL; mBefore = NA; mAfter = NA; mIsTable = true;}
+  AppealNode() {mData.mTable=NULL; mParent = NULL; mBefore = NA; mAfter = NA;
+                mIsTable = true; mIsSecondTry = false;}
   ~AppealNode(){}
 
   void AddChild(AppealNode *n) { mChildren.push_back(n); }
   void RemoveChild(AppealNode *n);
+  void ClearChildren() { mChildren.clear(); }
 
   bool IsSucc() { return (mAfter == Succ) || (mAfter == SuccWasSucc); }
   bool IsFail() { return !IsSucc(); }
@@ -111,13 +113,14 @@ public:
   void AddOneMoreMatch(unsigned last_succ_token);  // add one more match to the cach
 
   // Reduce tokens, used during SortOut
-  void ReduceOneMatch(unsigned token);
 
-  // query functions.
-  // The three function need to be used together.
+  // Query functions.
+  // The four function need to be used together since mTempIndex is only defined in
+  // GetStartToken(unsigned).
   bool     GetStartToken(unsigned t);    // trying to get succ info for 't'
   unsigned GetMatchNum();                // number of matches at a token;
   unsigned GetOneMatch(unsigned i);      // Get the i-th matching token. Starts from 0.
+  void     ReduceMatches(unsigned i);    // Reduce all matches except the i-th.
 };
 
 class Parser {
@@ -153,6 +156,8 @@ private:
   unsigned              mCurToken;       // index in mActiveTokens, the next token to be matched.
   unsigned              mPending;        // index in mActiveTokens, the first pending token.
                                          // All tokens after it are pending.
+
+  bool                  mInSecondTry;    // A temporary flag to tell we are in second try.
 
   // I'm using two data structures to record the status of cycle reference.
   // See the detailed comments in the implementation of Parser::Parse().
@@ -211,6 +216,7 @@ private:
   void AppealTraverse(AppealNode *node, AppealNode *root);
 
   // Sort Out
+  std::deque<AppealNode*> to_be_sorted;  // a temp data structure during sort out.
   void SortOut();
   void SortOutNode(AppealNode*);
   void SortOutOneof(AppealNode*);

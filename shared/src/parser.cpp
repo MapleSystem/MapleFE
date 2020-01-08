@@ -247,6 +247,8 @@ Parser::Parser(const char *name, Module *m) : filename(name), mModule(m) {
   mTraceVisited = false;
   mTraceFailed = false;
   mIndentation = 0;
+
+  mInSecondTry = false;
 }
 
 Parser::Parser(const char *name) : filename(name) {
@@ -263,6 +265,8 @@ Parser::Parser(const char *name) : filename(name) {
   mTraceVisited = false;
   mTraceFailed = false;
   mIndentation = 0;
+
+  mInSecondTry = false;
 }
 
 
@@ -647,6 +651,11 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *appeal_parent)
   appeal->SetTable(rule_table);
   appeal->mStartIndex = mCurToken;
   appeal->mParent = appeal_parent;
+  if (mInSecondTry) {
+    appeal->mIsSecondTry = true;
+    mInSecondTry = false;
+  }
+
   mAppealNodes.push_back(appeal);
   appeal_parent->AddChild(appeal);
 
@@ -909,6 +918,8 @@ bool Parser::TraverseZeroormore(RuleTable *rule_table, AppealNode *parent) {
     gSuccTokensNum = succ_tokens_num;
     for (unsigned i = 0; i < succ_tokens_num; i++)
       gSuccTokens[i] = succ_tokens[i];
+  } else {
+    gSuccTokensNum = 0;
   }
 
   return true;
@@ -1037,6 +1048,7 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *parent) {
       // If the previous element has single matching or fail, we give up. Or we'll give a
       // second try.
       if (prev_succ_tokens_num > 1) {
+
         if (mTraceSecondTry)
           std::cout << "Decided to second try." << std::endl;
 
@@ -1052,6 +1064,9 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *parent) {
           // The longest matching has been proven to be a failure.
           if (prev_succ_tokens[j] == old_pos)
             continue;
+
+          mInSecondTry = true;
+
           // Start from the one after succ token.
           mCurToken = prev_succ_tokens[j] + 1;
           temp_found = TraverseTableData(data, parent);
@@ -1132,6 +1147,11 @@ bool Parser::TraverseTableData(TableData *data, AppealNode *parent) {
       appeal->SetToken(curr_token);
       appeal->mStartIndex = mCurToken;
       appeal->mParent = parent;
+      if (mInSecondTry) {
+        appeal->mIsSecondTry = true;
+        mInSecondTry = false;
+      }
+
       parent->AddChild(appeal);
 
       found = true;
@@ -1192,21 +1212,21 @@ bool Parser::TraverseTableData(TableData *data, AppealNode *parent) {
 
 // We don't want to use recursive. So a deque is used here.
 void Parser::SortOut() {
-  std::deque<AppealNode*> active_nodes;
-  active_nodes.push_back(mRootNode);
-  while(!active_nodes.empty()) {
-    AppealNode *node = active_nodes.front();
-    active_nodes.pop_front();
+  to_be_sorted.clear();
+  to_be_sorted.push_back(mRootNode);
+  while(!to_be_sorted.empty()) {
+    AppealNode *node = to_be_sorted.front();
+    to_be_sorted.pop_front();
     SortOutNode(node);
   }
 }
 
-// 'node' is already trimmed when passing into this function. This assertion
+// 'node' is already trimmed when passed into this function. This assertion
 //  will be done in the SortOutXXX() which handles children node.
 void Parser::SortOutNode(AppealNode *node) {
   MASSERT(node->IsSucc() && "Failed node in SortOut?");
 
-  // A token's appeal node doesn't need to do anything
+  // A token's appeal node is a leaf node. Just return.
   if (node->IsToken())
     return;
 
@@ -1236,14 +1256,17 @@ void Parser::SortOutNode(AppealNode *node) {
   return;
 }
 
-// 'parent' is already trimmed when passing into this function.
+// 'parent' is already trimmed when passed into this function.
 void Parser::SortOutOneof(AppealNode *parent) {
   RuleTable *table = parent->GetTable();
   MASSERT(table && "parent is not a table?");
 
   SuccMatch *succ = FindSucc(table);
   MASSERT(succ && "parent has no SuccMatch?");
-  MASSERT((succ->GetMatchNum() == 1) && "trimmed parent has >1 matches?");
+
+  bool found = succ->GetStartToken(parent->mStartIndex);
+  unsigned match_num = succ->GetMatchNum();
+  MASSERT((match_num == 1) && "trimmed parent has >1 matches?");
 
   unsigned parent_match = succ->GetOneMatch(0);
 
@@ -1268,25 +1291,26 @@ void Parser::SortOutOneof(AppealNode *parent) {
       SuccMatch *succ = FindSucc(child->GetTable());
       MASSERT(succ && "ruletable node has no SuccMatch?");
 
-      std::vector<unsigned> to_be_moved;
-      std::vector<unsigned>::iterator mit = succ->mCache.begin();
-      for (; mit != succ->mCache.end(); mit++) {
-        if (*mit != parent_match)
-          to_be_moved.push_back(*mit);
+      int except_index = -1;
+      unsigned found = 0;
+      for (unsigned idx = 0; idx < succ->mCache.size(); idx++) {
+        if (succ->mCache[idx] == parent_match) {
+          except_index = idx;
+          found++;
+        }
       }
 
-      mit = to_be_moved.begin();
-      for (; mit != to_be_moved.end(); mit++) {
-        succ->ReduceOneMatch(*mit);
-      }
-
-      unsigned num = succ->GetMatchNum();
-      if (num > 1)
-        MASSERT(0 && "reduced node has >1 matches?");
-      else if (num == 0)
+      if (found == 0)
         bad_children.push_back(child);
-      else
+      else if (found == 1) {
+        succ->ReduceMatches(except_index);
         good_children++;
+        to_be_sorted.push_back(child); // add good child to to_be_sorted
+      } else if (found > 1) {
+        std::cout << "Oneof node has more than one rules matching same num of tokens? Ambiguous!"
+                  << std::endl;
+        exit(1);
+      }
     }
   }
 
@@ -1299,82 +1323,87 @@ void Parser::SortOutOneof(AppealNode *parent) {
   }
 }
 
-// 'parent' is already trimmed when passing into this function.
+// 'parent' is already trimmed when passed into this function.
 //
-// Zeorormore node is like Concatenate node, where all children's matching tokens are linked
-// together one after another. Zeroorone is also similar with at most one child.
+// For Zeroormore node, where all children's matching tokens are linked together one after another.
+// All children nodes have the same rule table, but each has its unique AppealNode.
+//
 void Parser::SortOutZeroormore(AppealNode *parent) {
   RuleTable *table = parent->GetTable();
   MASSERT(table && "parent is not a table?");
 
-  SuccMatch *succ = FindSucc(table);
-  MASSERT(succ && "parent has no SuccMatch?");
-  MASSERT((succ->GetMatchNum() == 1) && "trimmed parent has >1 matches?");
+  SuccMatch *parent_succ = FindSucc(table);
+  MASSERT(parent_succ && "parent has no SuccMatch?");
 
-  // find the parent's last matching token.
-  unsigned parent_match = succ->GetOneMatch(0);
+  unsigned parent_start = parent->mStartIndex;
+  bool     found = parent_succ->GetStartToken(parent_start);
+  unsigned parent_match = parent_succ->GetOneMatch(0);
 
-  unsigned good_children = 0;
-  std::vector<AppealNode*> bad_children;
+  // Find the parent's last matching token.
+  // Zeroormore could matching nothing. We just remove all children node in this case.
+  unsigned match_num = parent_succ->GetMatchNum();
+  if (match_num == 0) {
+    parent->ClearChildren();
+    return;
+  }
+
+  // In Zeroormore node, all children should have 'really' matched tokens which means they 
+  // did move forward as token index. So there shouldn't be any bad children. 
+  // The major work of this loop is to verify the above claim is abided by.
+
+  unsigned last_match = parent_start - 1;
 
   std::list<AppealNode*>::iterator it = parent->mChildren.begin();
   for (; it != parent->mChildren.end(); it++) {
     AppealNode *child = *it;
-    if (child->IsFail())
-      continue;
+    MASSERT(child->IsSucc() && "Successful zeroormore node has a failed child node?");
 
-    // In OneOf node, A successful child node must have its last matching
-    // token the same as parent. Look into the child's SuccMatch, trim it
-    // if it has multiple matching.
+    MASSERT((last_match + 1 == child->mStartIndex)
+             && "Node match index are not connected in SortOut Zeroormore.");
 
     if (child->IsToken()) {
       // Token node matches just one token.
-      if (child->mStartIndex == parent_match)
-        good_children++;
+      last_match++;
     } else {
       SuccMatch *succ = FindSucc(child->GetTable());
       MASSERT(succ && "ruletable node has no SuccMatch?");
 
-      std::vector<unsigned> to_be_moved;
-      std::vector<unsigned>::iterator mit = succ->mCache.begin();
-      for (; mit != succ->mCache.end(); mit++) {
-        if (*mit != parent_match)
-          to_be_moved.push_back(*mit);
-      }
+      unsigned start_node = last_match + 1;
+      bool found = succ->GetStartToken(start_node);  // in order to set mTempIndex
+      MASSERT(found && "Couldn't find start token?");
 
-      mit = to_be_moved.begin();
-      for (; mit != to_be_moved.end(); mit++) {
-        succ->ReduceOneMatch(*mit);
+      // We only preserve the longest matching. Else nodes will be reduced.
+      unsigned longest = start_node;
+      unsigned longest_index = 0;
+      for (unsigned i = 0; i < succ->GetMatchNum(); i++) {
+        unsigned curr_match = succ->GetOneMatch(i);
+        if (curr_match > longest) {
+          longest = curr_match;
+          longest_index = i;
+        }
       }
+      succ->ReduceMatches(longest_index);
+      last_match = longest;
 
-      unsigned num = succ->GetMatchNum();
-      if (num > 1)
-        MASSERT(0 && "reduced node has >1 matches?");
-      else if (num == 0)
-        bad_children.push_back(child);
-      else
-        good_children++;
+      // Add child to the working list
+      to_be_sorted.push_back(child);
     }
   }
 
-  MASSERT((good_children==1) && "more than one good children in Sortout?");
-
-  // remove the bad children AppealNode
-  std::vector<AppealNode*>::iterator badit = bad_children.begin();
-  for (; badit != bad_children.end(); badit++) {
-    parent->RemoveChild(*badit);
-  }
+  return;
 }
 
-// 'parent' is already trimmed when passing into this function.
+// 'parent' is already trimmed when passed into this function.
 void Parser::SortOutZeroorone(AppealNode *parent) {
 }
 
-// 'parent' is already trimmed when passing into this function.
+// 'parent' is already trimmed when passed into this function.
+// [NOTE] Concatenate will conduct SecondTry if possible. This means it's possible
+//        for a node not to connect to the longest match of its previous node.
 void Parser::SortOutConcatenate(AppealNode *parent) {
 }
 
-// 'parent' is already trimmed when passing into this function.
+// 'parent' is already trimmed when passed into this function.
 void Parser::SortOutData(AppealNode *parent) {
 }
 
@@ -1500,8 +1529,11 @@ void SuccMatch::AddThreeMatch(unsigned t, unsigned m1, unsigned m2, unsigned m3)
 ///////////////////
 // The following two functions are used to handle general cases where the
 // total number of matches could be unknown, or could be more than 3.
-// They need be used together as mTempIndex is def-use in between.
+// They need be used together as mTempIndex is defined/used between them.
 //
+// If you do want to use them separately, you need set the mTempIndex correctly through
+// GetStartToken(t).
+
 // Temporarily set the num of matches to 0. For the ZeroorXXX node, even there is no
 // matching it is still a succ. This will also be saved in SuccMatch, with matching num
 // set as 0.
@@ -1516,13 +1548,8 @@ void SuccMatch::AddOneMoreMatch(unsigned m) {
   mCache[mTempIndex] += 1;
 }
 
-// [TODO]
-void SuccMatch::ReduceOneMatch(unsigned m) {
-}
-
 // Below are three Query functions for succ info
-// Again, They need be used together as mTempIndex is def-use in between.
-//
+// Again, They need be used together as mTempIndex is transferred between them.
 
 // Find the succ info for token 't'. Return true if found.
 bool SuccMatch::GetStartToken(unsigned t) {
@@ -1555,9 +1582,34 @@ unsigned SuccMatch::GetOneMatch(unsigned idx) {
   return mCache[mTempIndex + 1 + idx + 1];
 }
 
+// Reduce all matches except the except-th.
+// Since we are in the vector, we have to manipulate this by ourselves.
+void SuccMatch::ReduceMatches(unsigned except) {
+  unsigned reserved_match = GetOneMatch(except);
+  unsigned orig_num = GetMatchNum();
+  unsigned reduced_num = orig_num - 1;
+  MASSERT( (reduced_num > 0) && "Nothing to reduce while in ReduceMatches()?");
+
+  // Step 1. Set the num of match to 1
+  mCache[mTempIndex + 1] = 1;
+
+  // Step 2. Set the only match
+  mCache[mTempIndex + 2] = reserved_match;
+
+  // Step 3. Move all the rest data 'reduced_num' position ahead
+  unsigned index = mTempIndex + 3;
+  unsigned new_vector_size = mCache.size() - reduced_num;
+  for (; index < new_vector_size; index++)
+    mCache[index] = mCache[index + reduced_num];
+
+  // Step 4. update the vector size
+  mCache.resize(new_vector_size);
+}
+
 ///////////////////////////////////////////////////////////////
 //            AppealNode function
 ///////////////////////////////////////////////////////////////
 
 void AppealNode::RemoveChild(AppealNode *child) {
+  mChildren.remove(child);
 }
