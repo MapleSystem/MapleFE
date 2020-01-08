@@ -120,7 +120,8 @@ public:
   bool     GetStartToken(unsigned t);    // trying to get succ info for 't'
   unsigned GetMatchNum();                // number of matches at a token;
   unsigned GetOneMatch(unsigned i);      // Get the i-th matching token. Starts from 0.
-  void     ReduceMatches(unsigned i);    // Reduce all matches except the i-th.
+  bool     ReduceMatches(unsigned starttoken, unsigned val);    // Reduce all matches except 'val'.
+  void     ReduceMatches(unsigned idx);    // Reduce all matches except idx-th.
 };
 
 class Parser {

@@ -1291,25 +1291,12 @@ void Parser::SortOutOneof(AppealNode *parent) {
       SuccMatch *succ = FindSucc(child->GetTable());
       MASSERT(succ && "ruletable node has no SuccMatch?");
 
-      int except_index = -1;
-      unsigned found = 0;
-      for (unsigned idx = 0; idx < succ->mCache.size(); idx++) {
-        if (succ->mCache[idx] == parent_match) {
-          except_index = idx;
-          found++;
-        }
-      }
-
-      if (found == 0)
-        bad_children.push_back(child);
-      else if (found == 1) {
-        succ->ReduceMatches(except_index);
+      bool found = succ->ReduceMatches(child->mStartIndex, parent_match);
+      if (found) {
         good_children++;
         to_be_sorted.push_back(child); // add good child to to_be_sorted
-      } else if (found > 1) {
-        std::cout << "Oneof node has more than one rules matching same num of tokens? Ambiguous!"
-                  << std::endl;
-        exit(1);
+      } else {
+        bad_children.push_back(child);
       }
     }
   }
@@ -1339,8 +1326,7 @@ void Parser::SortOutZeroormore(AppealNode *parent) {
   bool     found = parent_succ->GetStartToken(parent_start);
   unsigned parent_match = parent_succ->GetOneMatch(0);
 
-  // Find the parent's last matching token.
-  // Zeroormore could matching nothing. We just remove all children node in this case.
+  // Zeroormore could match nothing. We just remove all children node in this case.
   unsigned match_num = parent_succ->GetMatchNum();
   if (match_num == 0) {
     parent->ClearChildren();
@@ -1395,6 +1381,46 @@ void Parser::SortOutZeroormore(AppealNode *parent) {
 
 // 'parent' is already trimmed when passed into this function.
 void Parser::SortOutZeroorone(AppealNode *parent) {
+  RuleTable *table = parent->GetTable();
+  MASSERT(table && "parent is not a table?");
+
+  SuccMatch *parent_succ = FindSucc(table);
+  MASSERT(parent_succ && "parent has no SuccMatch?");
+
+  unsigned parent_start = parent->mStartIndex;
+  bool     found = parent_succ->GetStartToken(parent_start);
+  unsigned parent_match = parent_succ->GetOneMatch(0);
+
+  // Zeroorone could match nothing. We just remove all children node in this case.
+  unsigned match_num = parent_succ->GetMatchNum();
+  if (match_num == 0) {
+    parent->ClearChildren();
+    return;
+  }
+
+  // At this point, there is one and only one child which did match some tokens.
+  // The major work of this loop is to verify the child's SuccMatch is consistent with parent's
+  // SuccMatch.
+
+  MASSERT((parent->mChildren.size() == 1) && "Zeroorone has >1 valid children?");
+
+  AppealNode *child = parent->mChildren.front();
+  unsigned child_start = child->mStartIndex;
+  MASSERT(child->IsSucc() && "Successful child is failed?");
+  MASSERT((parent_start == child_start)
+          && "In Zeroorone node parent and child has different start index");
+
+  if (child->IsToken()) {
+    // The only child is a token.
+    MASSERT((parent_match == child_start)
+            && "Token node match_index != start_index ??");
+  } else {
+    // 1. We only preserve the one same as parent_match. Else will be reduced.
+    // 2. Add child to the working list
+    SuccMatch *succ = FindSucc(child->GetTable());
+    succ->ReduceMatches(child_start, parent_match);
+    to_be_sorted.push_back(child);
+  }
 }
 
 // 'parent' is already trimmed when passed into this function.
@@ -1582,19 +1608,22 @@ unsigned SuccMatch::GetOneMatch(unsigned idx) {
   return mCache[mTempIndex + 1 + idx + 1];
 }
 
-// Reduce all matches except the except-th.
+// Reduce all matchings, except the except-th
+// Assume mTempIndex is already set through GetStartToken().
+//
 // Since we are in the vector, we have to manipulate this by ourselves.
-void SuccMatch::ReduceMatches(unsigned except) {
-  unsigned reserved_match = GetOneMatch(except);
+void SuccMatch::ReduceMatches(unsigned e_idx) {
+  unsigned except = GetOneMatch(e_idx);
   unsigned orig_num = GetMatchNum();
   unsigned reduced_num = orig_num - 1;
-  MASSERT( (reduced_num > 0) && "Nothing to reduce while in ReduceMatches()?");
+  if (!reduced_num)
+    return;
 
   // Step 1. Set the num of match to 1
   mCache[mTempIndex + 1] = 1;
 
   // Step 2. Set the only match
-  mCache[mTempIndex + 2] = reserved_match;
+  mCache[mTempIndex + 2] = except;
 
   // Step 3. Move all the rest data 'reduced_num' position ahead
   unsigned index = mTempIndex + 3;
@@ -1604,6 +1633,45 @@ void SuccMatch::ReduceMatches(unsigned except) {
 
   // Step 4. update the vector size
   mCache.resize(new_vector_size);
+}
+
+// 1. Check all matches to verify there is only one matching 'except'
+//    if no matching, returns false
+//    if >1 matchings, it's an error, ambiguous
+//    if 1  matching, success
+// 2. Reduce all matches except the one equal to except.
+// 3. Returns true : if it successfully remove all rest matchings.
+//           false : if the verification fails
+//
+// Since we are in the vector, we have to manipulate this by ourselves.
+bool SuccMatch::ReduceMatches(unsigned start, unsigned except) {
+  bool found = GetStartToken(start);
+  MASSERT( found && "Couldn't find the start token?");
+
+  // Verify there is one and only one match equal to 'except'
+
+  int except_index = -1;
+  unsigned except_num = 0;
+  unsigned orig_num = GetMatchNum();
+  for (unsigned idx = 0; idx < orig_num; idx++) {
+    if (GetOneMatch(idx) == except) {
+      except_index = idx;
+      except_num++;
+    }
+  }
+
+  if (except_num == 0) {
+    return false;
+  } else if (except_num > 1) {
+    std::cout << "Oneof node has more than one rules matching same num of tokens? Ambiguous!"
+              << std::endl;
+    exit(1);
+  }
+
+  // At this point, except_num == 1, there is one and only one matching. Now reduce them.
+  ReduceMatches(except_index);
+
+  return true;
 }
 
 ///////////////////////////////////////////////////////////////
