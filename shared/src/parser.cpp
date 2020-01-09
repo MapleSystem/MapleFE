@@ -1265,7 +1265,16 @@ void Parser::SortOutOneof(AppealNode *parent) {
   MASSERT(succ && "parent has no SuccMatch?");
 
   bool found = succ->GetStartToken(parent->mStartIndex);
+
+  // It's possible it actually matches nothing, such as all children are Zeroorxxx
+  // and they match nothing.
   unsigned match_num = succ->GetMatchNum();
+  if (match_num == 0) {
+    parent->ClearChildren();
+    return;
+  }
+
+  // At this point, it has one and only one succ match.
   MASSERT((match_num == 1) && "trimmed parent has >1 matches?");
 
   unsigned parent_match = succ->GetOneMatch(0);
@@ -1324,7 +1333,6 @@ void Parser::SortOutZeroormore(AppealNode *parent) {
 
   unsigned parent_start = parent->mStartIndex;
   bool     found = parent_succ->GetStartToken(parent_start);
-  unsigned parent_match = parent_succ->GetOneMatch(0);
 
   // Zeroormore could match nothing. We just remove all children node in this case.
   unsigned match_num = parent_succ->GetMatchNum();
@@ -1332,6 +1340,8 @@ void Parser::SortOutZeroormore(AppealNode *parent) {
     parent->ClearChildren();
     return;
   }
+
+  unsigned parent_match = parent_succ->GetOneMatch(0);
 
   // In Zeroormore node, all children should have 'really' matched tokens which means they 
   // did move forward as token index. So there shouldn't be any bad children. 
@@ -1389,7 +1399,6 @@ void Parser::SortOutZeroorone(AppealNode *parent) {
 
   unsigned parent_start = parent->mStartIndex;
   bool     found = parent_succ->GetStartToken(parent_start);
-  unsigned parent_match = parent_succ->GetOneMatch(0);
 
   // Zeroorone could match nothing. We just remove all children node in this case.
   unsigned match_num = parent_succ->GetMatchNum();
@@ -1397,6 +1406,8 @@ void Parser::SortOutZeroorone(AppealNode *parent) {
     parent->ClearChildren();
     return;
   }
+
+  unsigned parent_match = parent_succ->GetOneMatch(0);
 
   // At this point, there is one and only one child which did match some tokens.
   // The major work of this loop is to verify the child's SuccMatch is consistent with parent's
@@ -1427,10 +1438,114 @@ void Parser::SortOutZeroorone(AppealNode *parent) {
 // [NOTE] Concatenate will conduct SecondTry if possible. This means it's possible
 //        for a node not to connect to the longest match of its previous node.
 void Parser::SortOutConcatenate(AppealNode *parent) {
+  RuleTable *table = parent->GetTable();
+  MASSERT(table && "parent is not a table?");
+
+  SuccMatch *parent_succ = FindSucc(table);
+  MASSERT(parent_succ && "parent has no SuccMatch?");
+
+  unsigned parent_start = parent->mStartIndex;
+  bool     found = parent_succ->GetStartToken(parent_start);
+  unsigned parent_match = parent_succ->GetOneMatch(0);
+
+  // It's possible for 'parent' to match nothing if all children are Zeroorxxx
+  // which matches nothing.
+  unsigned match_num = parent_succ->GetMatchNum();
+  if (match_num == 0) {
+    parent->ClearChildren();
+    return;
+  }
+
+  // In Concatenate node, some children could match nothing. They are the bad children.
+  // This loop mainly verifies if the matches are connected between children.
+
+  unsigned last_match = parent_start - 1;
+
+  std::vector<AppealNode*> bad_children;
+  std::list<AppealNode*>::iterator it = parent->mChildren.begin();
+  for (; it != parent->mChildren.end(); it++) {
+    AppealNode *child = *it;
+    MASSERT(child->IsSucc() && "Successful concatenate node has a failed child node?");
+
+    MASSERT((last_match + 1 == child->mStartIndex)
+             && "Node match index are not connected in SortOut Concatenate.");
+
+    if (child->IsToken()) {
+      // Token node matches just one token.
+      last_match++;
+    } else {
+      SuccMatch *succ = FindSucc(child->GetTable());
+      MASSERT(succ && "ruletable node has no SuccMatch?");
+
+      unsigned start_node = last_match + 1;
+      bool found = succ->GetStartToken(start_node);  // in order to set mTempIndex
+      MASSERT(found && "Couldn't find start token?");
+
+      unsigned match_num = succ->GetMatchNum();
+      if (match_num == 0) {
+        // It could be ZeroorXXX node matching nothing. Just remove the node.
+        bad_children.push_back(child);
+      } else if (match_num == 1) {
+        last_match = succ->GetOneMatch(0);
+        // Add child to the working list
+        to_be_sorted.push_back(child);
+      } else {
+        // We only preserve the longest matching. Else nodes will be reduced.
+        unsigned longest = start_node;
+        unsigned longest_index = 0;
+        for (unsigned i = 0; i < succ->GetMatchNum(); i++) {
+          unsigned curr_match = succ->GetOneMatch(i);
+          if (curr_match > longest) {
+            longest = curr_match;
+            longest_index = i;
+          }
+        }
+        succ->ReduceMatches(longest_index);
+        last_match = longest;
+
+        // Add child to the working list
+        to_be_sorted.push_back(child);
+      }
+
+    }
+  }
+
+  // The last valid child's match token should be the same as parent's
+  MASSERT((last_match == parent_match) && "Concatenate children not connected?");
+
+  // remove the bad children AppealNode
+  std::vector<AppealNode*>::iterator badit = bad_children.begin();
+  for (; badit != bad_children.end(); badit++) {
+    parent->RemoveChild(*badit);
+  }
+
+  return;
 }
 
 // 'parent' is already trimmed when passed into this function.
 void Parser::SortOutData(AppealNode *parent) {
+  RuleTable *parent_table = parent->GetTable();
+  MASSERT(parent_table && "parent is not a table?");
+
+  TableData *data = parent_table->mData;
+  switch (data->mType) {
+  case DT_Subtable:
+    // There should be one child node, which represents the subtable.
+    // we just need to add the child node to working list.
+    MASSERT((parent->mChildren.size() == 1) && "Should have only one child?");
+    to_be_sorted.push_back(parent->mChildren.front());
+    break;
+  case DT_Token:
+    // token in table-data created a Child AppealNode
+    // Just keep the child node. Don't need do anything.
+    break;
+  case DT_Char:
+  case DT_String:
+  case DT_Type:
+  case DT_Null:
+  default:
+    break;
+  }
 }
 
 /////////////////////////////////////////////////////////////////////////////
