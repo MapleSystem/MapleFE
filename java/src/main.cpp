@@ -9,9 +9,11 @@ static void help() {
   std::cout << "java2mpl <arguments>:\n" << std::endl;
   std::cout << "   --help            : print this help" << std::endl;
   std::cout << "   --trace-table     : Trace rule table when entering and exiting" << std::endl;
+  std::cout << "   --trace-appeal    : Trace appeal process" << std::endl;
   std::cout << "   --trace-second-try: Trace parser second try." << std::endl;
   std::cout << "   --trace-failed    : Trace failed tokens of table" << std::endl;
   std::cout << "   --trace-stack     : Trace visited-token stack of table" << std::endl;
+  std::cout << "   --trace-sortout   : Trace SortOut" << std::endl;
 }
 
 int main (int argc, char *argv[]) {
@@ -32,6 +34,8 @@ int main (int argc, char *argv[]) {
       parser->mTraceVisited = true;
     } else if (!strncmp(argv[i], "--trace-failed", 14) && (strlen(argv[i]) == 14)) {
       parser->mTraceFailed = true;
+    } else if (!strncmp(argv[i], "--trace-sortout", 15) && (strlen(argv[i]) == 15)) {
+      parser->mTraceSortOut = true;
     }
   }
 

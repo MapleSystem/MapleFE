@@ -141,12 +141,16 @@ public:
   bool mTraceSecondTry;     // trace second try in parser.
   bool mTraceFailed;        // trace mFailed
   bool mTraceVisited;       // trace mVisitedStack
+  bool mTraceSortOut;       // trace Sort out.
+
   const char* GetRuleTableName(const RuleTable*);
   void DumpEnterTable(const char *tablename, unsigned indent);
   void DumpExitTable(const char *tablename, unsigned indent,
                      bool succ, AppealStatus reason = Succ);
   void DumpAppeal(RuleTable *table, unsigned token);
   void DumpSuccTokens();
+  void DumpSortOut();
+  void DumpSortOutNode(AppealNode*);
 
 private:
   std::vector<Token*>   mTokens;         // Storage of all tokens, including active, discarded,

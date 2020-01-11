@@ -246,6 +246,7 @@ Parser::Parser(const char *name, Module *m) : filename(name), mModule(m) {
   mTraceSecondTry = false;
   mTraceVisited = false;
   mTraceFailed = false;
+  mTraceSortOut = false;
   mIndentation = 0;
 
   mInSecondTry = false;
@@ -264,6 +265,7 @@ Parser::Parser(const char *name) : filename(name) {
   mTraceSecondTry = false;
   mTraceVisited = false;
   mTraceFailed = false;
+  mTraceSortOut = false;
   mIndentation = 0;
 
   mInSecondTry = false;
@@ -1212,13 +1214,32 @@ bool Parser::TraverseTableData(TableData *data, AppealNode *parent) {
 
 // We don't want to use recursive. So a deque is used here.
 void Parser::SortOut() {
+  // we remove all failed children, leaving only succ child
+  std::vector<AppealNode*> bad_children;
+  std::list<AppealNode*>::iterator it = mRootNode->mChildren.begin();
+  for (; it != mRootNode->mChildren.end(); it++) {
+    AppealNode *n = *it;
+    if (n->IsFail())
+      bad_children.push_back(n);
+  }
+
+  std::vector<AppealNode*>::iterator badit = bad_children.begin();
+  for (; badit != bad_children.end(); badit++) {
+    mRootNode->RemoveChild(*badit);
+  }
+  MASSERT(mRootNode->mChildren.size()==1);
+
   to_be_sorted.clear();
-  to_be_sorted.push_back(mRootNode);
+  to_be_sorted.push_back(mRootNode->mChildren.front());
+
   while(!to_be_sorted.empty()) {
     AppealNode *node = to_be_sorted.front();
     to_be_sorted.pop_front();
     SortOutNode(node);
   }
+
+  if (mTraceSortOut)
+    DumpSortOut();
 }
 
 // 'node' is already trimmed when passed into this function. This assertion
@@ -1285,8 +1306,10 @@ void Parser::SortOutOneof(AppealNode *parent) {
   std::list<AppealNode*>::iterator it = parent->mChildren.begin();
   for (; it != parent->mChildren.end(); it++) {
     AppealNode *child = *it;
-    if (child->IsFail())
+    if (child->IsFail()) {
+      bad_children.push_back(child);
       continue;
+    }
 
     // In OneOf node, A successful child node must have its last matching
     // token the same as parent. Look into the child's SuccMatch, trim it
@@ -1310,7 +1333,9 @@ void Parser::SortOutOneof(AppealNode *parent) {
     }
   }
 
-  MASSERT((good_children==1) && "more than one good children in Sortout?");
+  if(good_children!=1)
+    std::cout << "Warning: Multiple succ children" << std::endl;
+
 
   // remove the bad children AppealNode
   std::vector<AppealNode*>::iterator badit = bad_children.begin();
@@ -1346,6 +1371,12 @@ void Parser::SortOutZeroormore(AppealNode *parent) {
   // In Zeroormore node, all children should have 'really' matched tokens which means they 
   // did move forward as token index. So there shouldn't be any bad children. 
   // The major work of this loop is to verify the above claim is abided by.
+
+  // There is only failed child which is the last one. Remember in TraverseZeroormore() we
+  // keep trying until the last one is faile? So at this point we will first remove the
+  // last failed child node.
+  AppealNode *failed = parent->mChildren.back();
+  parent->RemoveChild(failed);
 
   unsigned last_match = parent_start - 1;
 
@@ -1409,15 +1440,20 @@ void Parser::SortOutZeroorone(AppealNode *parent) {
 
   unsigned parent_match = parent_succ->GetOneMatch(0);
 
-  // At this point, there is one and only one child which did match some tokens.
-  // The major work of this loop is to verify the child's SuccMatch is consistent with parent's
-  // SuccMatch.
+  // At this point, there is one and only one child which may or may not match some tokens.
+  // 1. If the child is failed, just remove it.
+  // 2. If the child is succ, the major work of this loop is to verify the child's SuccMatch is
+  //    consistent with parent's.
 
   MASSERT((parent->mChildren.size() == 1) && "Zeroorone has >1 valid children?");
-
   AppealNode *child = parent->mChildren.front();
+
+  if (child->IsFail()) {
+    parent->RemoveChild(child);
+    return;
+  }
+
   unsigned child_start = child->mStartIndex;
-  MASSERT(child->IsSucc() && "Successful child is failed?");
   MASSERT((parent_start == child_start)
           && "In Zeroorone node parent and child has different start index");
 
@@ -1545,6 +1581,50 @@ void Parser::SortOutData(AppealNode *parent) {
   case DT_Null:
   default:
     break;
+  }
+}
+
+// Dump the result after SortOut. We should see a tree with root being one of the
+// top rules. We ignore mRootNode since it's just a fake one.
+
+static std::deque<AppealNode *> to_be_dumped;
+static std::deque<unsigned> to_be_dumped_id;
+static unsigned seq_num = 1;
+
+void Parser::DumpSortOut() {
+  std::cout << "=======  Dump SortOut =======  " << std::endl;
+  // we start from the only child of mRootNode.
+  to_be_dumped.clear();
+  to_be_dumped_id.clear();
+  MASSERT(mRootNode->mChildren.size()==1);
+
+  to_be_dumped.push_back(mRootNode->mChildren.front());
+  to_be_dumped_id.push_back(seq_num++);
+
+  while(!to_be_dumped.empty()) {
+    AppealNode *node = to_be_dumped.front();
+    to_be_dumped.pop_front();
+    DumpSortOutNode(node);
+  }
+}
+
+void Parser::DumpSortOutNode(AppealNode *n) {
+  unsigned dump_id = to_be_dumped_id.front();
+  to_be_dumped_id.pop_front();
+
+  std::cout << "[" << dump_id << "] ";
+  if (n->IsToken()) {
+    std::cout << "Token" << std::endl;
+  } else {
+    RuleTable *t = n->GetTable();
+    std::cout << "Table " << GetRuleTableName(t) << ": ";
+    std::list<AppealNode*>::iterator it = n->mChildren.begin();
+    for (; it != n->mChildren.end(); it++) {
+      std::cout << seq_num << ",";
+      to_be_dumped.push_back(*it);
+      to_be_dumped_id.push_back(seq_num++);
+    }
+    std::cout << std::endl;
   }
 }
 
@@ -1698,17 +1778,21 @@ bool SuccMatch::GetStartToken(unsigned t) {
   // mTempIndex is used as the index of the start token.
   mTempIndex = 0;
 
-  while (mTempIndex < (mCache.size() - 2)) {
+  // The last position mTempIndex can be nearest to the end of mCache vector, is
+  // when the last start token has 0 matching, so it looks like,
+  //  ...., N, 0
+  // 'N' represents the position of last mTempIndex.
+  while (mTempIndex < (mCache.size() - 1)) {
     if (t != mCache[mTempIndex] ){
       unsigned num = mCache[mTempIndex + 1];
       mTempIndex += 1;   // at the num
-      mTempIndex += num; // at last num tokens.
+      mTempIndex += num; // at last matching token.
       mTempIndex += 1;   // at new index
     } else
       break;
   }
 
-  if (mTempIndex < (mCache.size() - 2))
+  if (mTempIndex < (mCache.size() - 1))
     return true;
   else
     return false;
