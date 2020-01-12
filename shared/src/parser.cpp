@@ -470,16 +470,14 @@ void Parser::AppealTraverse(AppealNode *node, AppealNode *root) {
 
   MASSERT((root->mAfter == Succ) && "root->mAfter is not Succ.");
   if ((node->GetTable() == root->GetTable()) && (node->mAfter == FailLooped)) {
-    // walk the list, and clear the fail flag for appropriate node
-    // we also set the mAfter of node to Succ so that the futural traversal won't
-    // modify it again.
+    // 1. Walk the list, and clear the fail flag for corresponding rule table.
+    // 2. For this specific AppealNode, it's mAfter is set to Fail, we are not changing it.
     for (unsigned i = 0; i < traverse_list.size(); i++) {
       AppealNode *n = traverse_list[i];
       if ((n->mBefore == Succ) && (n->mAfter == FailChildrenFailed)) {
         if (mTraceAppeal)
           DumpAppeal(n->GetTable(), n->mStartIndex);
         ResetFailed(n->GetTable(), n->mStartIndex);
-        n->mAfter = Succ;
       }
     }
   }
@@ -1566,6 +1564,12 @@ void Parser::SortOutData(AppealNode *parent) {
   TableData *data = parent_table->mData;
   switch (data->mType) {
   case DT_Subtable:
+    // Sometimes an AppealNode is set SuccWasSucc and we skip creating its children nodes.
+    // However, during IR generation, we need to create the sub-tree. We can also reuse
+    // the symbol of previous sub-tree.
+    if (parent->mChildren.size() == 0)
+      break;
+
     // There should be one child node, which represents the subtable.
     // we just need to add the child node to working list.
     MASSERT((parent->mChildren.size() == 1) && "Should have only one child?");
