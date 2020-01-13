@@ -246,7 +246,7 @@ Parser::Parser(const char *name, Module *m) : filename(name), mModule(m) {
   mTraceSecondTry = false;
   mTraceVisited = false;
   mTraceFailed = false;
-  mTraceSortOut = false;
+  mTraceSortOut = true;
   mIndentation = 0;
 
   mInSecondTry = false;
@@ -265,7 +265,7 @@ Parser::Parser(const char *name) : filename(name) {
   mTraceSecondTry = false;
   mTraceVisited = false;
   mTraceFailed = false;
-  mTraceSortOut = false;
+  mTraceSortOut = true;
   mIndentation = 0;
 
   mInSecondTry = false;
@@ -1296,6 +1296,13 @@ void Parser::SortOutOneof(AppealNode *parent) {
   // At this point, it has one and only one succ match.
   MASSERT((match_num == 1) && "trimmed parent has >1 matches?");
 
+  // If parent->mAfter is SuccWasSucc, it means we didn't traverse its children
+  // during matching. In SortOut, we simple return. However, when generating IR,
+  // the children have to be created, either reusing previous symbol or copying the
+  // IR tree.
+  if (parent->mAfter == SuccWasSucc && parent->mChildren.size() == 0)
+    return;
+
   unsigned parent_match = succ->GetOneMatch(0);
 
   unsigned good_children = 0;
@@ -1363,6 +1370,13 @@ void Parser::SortOutZeroormore(AppealNode *parent) {
     parent->ClearChildren();
     return;
   }
+
+  // If parent->mAfter is SuccWasSucc, it means we didn't traverse its children
+  // during matching. In SortOut, we simple return. However, when generating IR,
+  // the children have to be created, either reusing previous symbol or copying the
+  // IR tree.
+  if (parent->mAfter == SuccWasSucc && parent->mChildren.size() == 0)
+    return;
 
   unsigned parent_match = parent_succ->GetOneMatch(0);
 
@@ -1436,6 +1450,13 @@ void Parser::SortOutZeroorone(AppealNode *parent) {
     return;
   }
 
+  // If parent->mAfter is SuccWasSucc, it means we didn't traverse its children
+  // during matching. In SortOut, we simple return. However, when generating IR,
+  // the children have to be created, either reusing previous symbol or copying the
+  // IR tree.
+  if (parent->mAfter == SuccWasSucc && parent->mChildren.size() == 0)
+    return;
+
   unsigned parent_match = parent_succ->GetOneMatch(0);
 
   // At this point, there is one and only one child which may or may not match some tokens.
@@ -1490,7 +1511,15 @@ void Parser::SortOutConcatenate(AppealNode *parent) {
     return;
   }
 
-  // In Concatenate node, some children could match nothing. They are the bad children.
+  // If parent->mAfter is SuccWasSucc, it means we didn't traverse its children
+  // during matching. In SortOut, we simple return. However, when generating IR,
+  // the children have to be created, either reusing previous symbol or copying the
+  // IR tree.
+  if (parent->mAfter == SuccWasSucc && parent->mChildren.size() == 0)
+    return;
+
+  // In Concatenate node, some ZeroorXXX children could match nothing.i
+  // Although they are succ, but we treat them as bad children.
   // This loop mainly verifies if the matches are connected between children.
 
   unsigned last_match = parent_start - 1;
@@ -1567,7 +1596,7 @@ void Parser::SortOutData(AppealNode *parent) {
     // Sometimes an AppealNode is set SuccWasSucc and we skip creating its children nodes.
     // However, during IR generation, we need to create the sub-tree. We can also reuse
     // the symbol of previous sub-tree.
-    if (parent->mChildren.size() == 0)
+    if (parent->mAfter == SuccWasSucc && parent->mChildren.size() == 0)
       break;
 
     // There should be one child node, which represents the subtable.
