@@ -48,4 +48,175 @@ Separator  Token:  Semicolon
 Separator  Token:  Whitespace
 Separator  Token:  Rbrace
 Separator  Token:  Rbrace
+Warning: Multiple succ children
+Warning: Multiple succ children
+Warning: Multiple succ children
+Warning: Multiple succ children
+Warning: Multiple succ children
+Warning: Multiple succ children
+Warning: Multiple succ children
+=======  Dump SortOut =======  
+[1] Table TblClassDeclaration: 2,
+[2] Table TblNormalClassDeclaration: 3,4,5,
+[3] Token
+[4] Token
+[5] Table TblClassBody: 6,7,8,
+[6] Token
+[7] Table TblClassBody_sub1: 9,10,
+[8] Token
+[9] Table TblClassBodyDeclaration: 11,
+[10] Table TblClassBodyDeclaration: 12,
+[11] Table TblClassMemberDeclaration: 13,
+[12] Table TblConstructorDeclaration: 14,15,
+[13] Table TblFieldDeclaration: 16,17,18,
+[14] Table TblConstructorDeclarator: 19,20,21,22,
+[15] Table TblConstructorBody: 23,24,25,
+[16] Table TblUnannType: 26,
+[17] Table TblVariableDeclaratorList: 27,28,
+[18] Token
+[19] Table TblSimpleTypeName: 29,
+[20] Token
+[21] Table TblConstructorDeclarator_sub2: 30,
+[22] Token
+[23] Token
+[24] Table TblConstructorBody_sub2: 31,
+[25] Token
+[26] Table TblUnannPrimitiveType: 32,
+[27] Table TblVariableDeclarator: 33,
+[28] Table TblVariableDeclaratorList_sub1: 34,
+[29] Token
+[30] Table TblFormalParameterList: 35,
+[31] Table TblBlockStatements: 36,37,
+[32] Table TblNumericType: 38,
+[33] Table TblVariableDeclaratorId: 39,
+[34] Table TblVariableDeclaratorList_sub2: 40,41,
+[35] Table TblFormalParameterList_sub1: 42,
+[36] Table TblBlockStatement: 43,
+[37] Table TblBlockStatements_sub1: 44,
+[38] Table TblIntType: 45,
+[39] Token
+[40] Token
+[41] Table TblVariableDeclarator: 46,
+[42] Table TblFormalParameters: 47,
+[43] Table TblStatement: 48,
+[44] Table TblBlockStatement: 49,
+[45] Token
+[46] Table TblVariableDeclaratorId: 50,
+[47] Table TblFormalParameters_sub1: 51,52,
+[48] Table TblStatementWithoutTrailingSubstatement: 53,
+[49] Table TblStatement: 54,
+[50] Token
+[51] Table TblFormalParameter: 55,56,
+[52] Table TblFormalParameters_sub2: 57,
+[53] Table TblExpressionStatement: 58,59,
+[54] Table TblStatementWithoutTrailingSubstatement: 60,
+[55] Table TblUnannType: 
+[56] Table TblVariableDeclaratorId: 61,
+[57] Table TblFormalParameters_sub3: 62,63,
+[58] Table TblStatementExpression: 64,
+[59] Token
+[60] Table TblExpressionStatement: 65,66,
+[61] Token
+[62] Token
+[63] Table TblFormalParameter: 67,68,
+[64] Table TblAssignment: 69,70,71,
+[65] Table TblStatementExpression: 72,
+[66] Token
+[67] Table TblUnannType: 73,
+[68] Table TblVariableDeclaratorId: 74,
+[69] Table TblLeftHandSide: 75,
+[70] Table TblAssignmentOperator: 76,
+[71] Table TblExpression: 77,78,79,80,81,82,
+[72] Table TblAssignment: 83,84,85,
+[73] Table TblUnannPrimitiveType: 86,
+[74] Token
+[75] Table TblFieldAccess: 
+[76] Token
+[77] Table TblExpressionName: 87,
+[78] Table TblPrimary: 88,
+[79] Table TblUnaryExpression: 89,
+[80] Table TblBinaryExpression: 90,91,92,93,94,95,96,97,98,99,
+[81] Table TblConditionalExpression: 100,
+[82] Table TblAssignmentExpression: 101,
+[83] Table TblLeftHandSide: 102,
+[84] Table TblAssignmentOperator: 103,
+[85] Table TblExpression: 104,105,106,107,108,109,
+[86] Table TblNumericType: 110,
+[87] Token
+[88] Table TblPrimaryNoNewArray: 111,
+[89] Table TblUnaryExpressionNotPlusMinus: 112,
+[90] Table TblMultiplicativeExpression: 113,
+[91] Table TblAdditiveExpression: 114,
+[92] Table TblShiftExpression: 115,
+[93] Table TblRelationalExpression: 116,
+[94] Table TblEqualityExpression: 117,
+[95] Table TblAndExpression: 118,
+[96] Table TblExclusiveOrExpression: 119,
+[97] Table TblInclusiveOrExpression: 120,
+[98] Table TblConditionalAndExpression: 121,
+[99] Table TblConditionalOrExpression: 122,
+[100] Table TblConditionalOrExpression: 
+[101] Table TblConditionalExpression: 
+[102] Table TblFieldAccess: 123,
+[103] Token
+[104] Table TblExpressionName: 124,
+[105] Table TblPrimary: 125,
+[106] Table TblUnaryExpression: 126,
+[107] Table TblBinaryExpression: 127,128,129,130,131,132,133,134,135,136,
+[108] Table TblConditionalExpression: 137,
+[109] Table TblAssignmentExpression: 138,
+[110] Table TblIntType: 139,
+[111] Table TblArrayAccess: 
+[112] Table TblPostfixExpression: 140,141,
+[113] Table TblUnaryExpression: 
+[114] Table TblMultiplicativeExpression: 
+[115] Table TblAdditiveExpression: 
+[116] Table TblShiftExpression: 
+[117] Table TblRelationalExpression: 
+[118] Table TblEqualityExpression: 
+[119] Table TblAndExpression: 
+[120] Table TblExclusiveOrExpression: 
+[121] Table TblInclusiveOrExpression: 
+[122] Table TblConditionalAndExpression: 
+[123] Table TblFieldAccess_sub1: 142,143,144,
+[124] Token
+[125] Table TblPrimaryNoNewArray: 145,
+[126] Table TblUnaryExpressionNotPlusMinus: 146,
+[127] Table TblMultiplicativeExpression: 147,
+[128] Table TblAdditiveExpression: 148,
+[129] Table TblShiftExpression: 149,
+[130] Table TblRelationalExpression: 150,
+[131] Table TblEqualityExpression: 151,
+[132] Table TblAndExpression: 152,
+[133] Table TblExclusiveOrExpression: 153,
+[134] Table TblInclusiveOrExpression: 154,
+[135] Table TblConditionalAndExpression: 155,
+[136] Table TblConditionalOrExpression: 156,
+[137] Table TblConditionalOrExpression: 
+[138] Table TblConditionalExpression: 
+[139] Token
+[140] Table TblPrimary: 
+[141] Table TblExpressionName: 
+[142] Table TblPrimary: 157,
+[143] Token
+[144] Token
+[145] Table TblArrayAccess: 
+[146] Table TblPostfixExpression: 158,159,
+[147] Table TblUnaryExpression: 
+[148] Table TblMultiplicativeExpression: 
+[149] Table TblAdditiveExpression: 
+[150] Table TblShiftExpression: 
+[151] Table TblRelationalExpression: 
+[152] Table TblEqualityExpression: 
+[153] Table TblAndExpression: 
+[154] Table TblExclusiveOrExpression: 
+[155] Table TblInclusiveOrExpression: 
+[156] Table TblConditionalAndExpression: 
+[157] Table TblPrimaryNoNewArray: 160,161,
+[158] Table TblPrimary: 
+[159] Table TblExpressionName: 
+[160] Token
+[161] Table TblArrayAccess: 162,
+[162] Table TblArrayAccess_sub3: 163,
+[163] Table TblPrimaryNoNewArray: 
 Matched 31 tokens.

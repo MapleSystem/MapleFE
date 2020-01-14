@@ -36,4 +36,99 @@ Separator  Token:  Whitespace
 Separator  Token:  Whitespace
 Separator  Token:  Rbrace
 Separator  Token:  Rbrace
+Warning: Multiple succ children
+Warning: Multiple succ children
+Warning: Multiple succ children
+=======  Dump SortOut =======  
+[1] Table TblClassDeclaration: 2,
+[2] Table TblNormalClassDeclaration: 3,4,5,
+[3] Token
+[4] Token
+[5] Table TblClassBody: 6,7,8,
+[6] Token
+[7] Table TblClassBody_sub1: 9,
+[8] Token
+[9] Table TblClassBodyDeclaration: 10,
+[10] Table TblClassMemberDeclaration: 11,
+[11] Table TblMethodDeclaration: 12,13,
+[12] Table TblMethodHeader: 14,
+[13] Table TblMethodBody: 15,
+[14] Table TblMethodHeader_sub1: 16,17,
+[15] Table TblBlock: 18,19,20,
+[16] Table TblResult: 21,
+[17] Table TblMethodDeclarator: 22,23,24,25,
+[18] Token
+[19] Table TblBlock_sub1: 26,
+[20] Token
+[21] Table TblUnannType: 
+[22] Token
+[23] Token
+[24] Table TblMethodDeclarator_sub1: 27,
+[25] Token
+[26] Table TblBlockStatements: 28,
+[27] Table TblFormalParameterList: 29,
+[28] Table TblBlockStatement: 30,
+[29] Table TblFormalParameterList_sub1: 31,
+[30] Table TblStatement: 32,
+[31] Table TblFormalParameters: 33,
+[32] Table TblStatementWithoutTrailingSubstatement: 34,
+[33] Table TblFormalParameters_sub1: 35,36,
+[34] Table TblReturnStatement: 37,38,39,
+[35] Table TblFormalParameter: 40,41,
+[36] Table TblFormalParameters_sub2: 42,
+[37] Token
+[38] Table TblReturnStatement_sub1: 43,
+[39] Token
+[40] Table TblUnannType: 
+[41] Table TblVariableDeclaratorId: 44,
+[42] Table TblFormalParameters_sub3: 45,46,
+[43] Table TblExpression: 47,48,49,50,51,
+[44] Token
+[45] Token
+[46] Table TblFormalParameter: 52,53,
+[47] Table TblPrimary: 54,
+[48] Table TblUnaryExpression: 55,
+[49] Table TblBinaryExpression: 56,57,58,59,60,61,62,63,64,65,
+[50] Table TblConditionalExpression: 66,
+[51] Table TblAssignmentExpression: 67,
+[52] Table TblUnannType: 68,
+[53] Table TblVariableDeclaratorId: 69,
+[54] Table TblPrimaryNoNewArray: 70,
+[55] Table TblUnaryExpressionNotPlusMinus: 71,
+[56] Table TblMultiplicativeExpression: 72,
+[57] Table TblAdditiveExpression: 73,74,
+[58] Table TblShiftExpression: 75,
+[59] Table TblRelationalExpression: 76,
+[60] Table TblEqualityExpression: 77,
+[61] Table TblAndExpression: 78,
+[62] Table TblExclusiveOrExpression: 79,
+[63] Table TblInclusiveOrExpression: 80,
+[64] Table TblConditionalAndExpression: 81,
+[65] Table TblConditionalOrExpression: 82,
+[66] Table TblConditionalOrExpression: 
+[67] Table TblConditionalExpression: 
+[68] Table TblUnannPrimitiveType: 83,
+[69] Token
+[70] Table TblArrayAccess: 
+[71] Table TblPostfixExpression: 84,
+[72] Table TblUnaryExpression: 
+[73] Table TblMultiplicativeExpression: 
+[74] Table TblAdditiveExpression_sub1: 85,86,87,
+[75] Table TblAdditiveExpression: 
+[76] Table TblShiftExpression: 
+[77] Table TblRelationalExpression: 
+[78] Table TblEqualityExpression: 
+[79] Table TblAndExpression: 
+[80] Table TblExclusiveOrExpression: 
+[81] Table TblInclusiveOrExpression: 
+[82] Table TblConditionalAndExpression: 
+[83] Table TblNumericType: 88,
+[84] Table TblPrimary: 
+[85] Table TblAdditiveExpression: 89,
+[86] Token
+[87] Table TblMultiplicativeExpression: 90,
+[88] Table TblIntType: 91,
+[89] Table TblMultiplicativeExpression: 
+[90] Table TblUnaryExpression: 
+[91] Token
 Matched 20 tokens.

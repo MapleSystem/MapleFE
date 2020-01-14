@@ -21,4 +21,51 @@ Identifier Token:  c
 Separator  Token:  Rparen
 Separator  Token:  Semicolon
 Separator  Token:  Rbrace
+Warning: Multiple succ children
+=======  Dump SortOut =======  
+[1] Table TblClassDeclaration: 2,
+[2] Table TblNormalClassDeclaration: 3,4,5,
+[3] Token
+[4] Token
+[5] Table TblClassBody: 6,7,8,
+[6] Token
+[7] Table TblClassBody_sub1: 9,10,
+[8] Token
+[9] Table TblClassBodyDeclaration: 11,
+[10] Table TblClassBodyDeclaration: 12,
+[11] Table TblClassMemberDeclaration: 13,
+[12] Table TblClassMemberDeclaration: 14,
+[13] Table TblFieldDeclaration: 15,16,17,
+[14] Table TblMethodDeclaration: 18,19,
+[15] Table TblUnannType: 20,
+[16] Table TblVariableDeclaratorList: 21,
+[17] Token
+[18] Table TblMethodHeader: 22,
+[19] Table TblMethodBody: 23,
+[20] Table TblUnannPrimitiveType: 24,
+[21] Table TblVariableDeclarator: 25,
+[22] Table TblMethodHeader_sub1: 26,27,
+[23] Token
+[24] Table TblNumericType: 28,
+[25] Table TblVariableDeclaratorId: 29,
+[26] Table TblResult: 30,
+[27] Table TblMethodDeclarator: 31,32,33,34,
+[28] Table TblIntType: 35,
+[29] Token
+[30] Table TblUnannType: 
+[31] Token
+[32] Token
+[33] Table TblMethodDeclarator_sub1: 36,
+[34] Token
+[35] Token
+[36] Table TblFormalParameterList: 37,38,
+[37] Table TblFormalParameterList_sub1: 39,
+[38] Table TblLastFormalParameter: 40,
+[39] Table TblFormalParameters: 41,
+[40] Table TblFormalParameter: 
+[41] Table TblFormalParameters_sub1: 42,
+[42] Table TblFormalParameter: 43,44,
+[43] Table TblUnannType: 
+[44] Table TblVariableDeclaratorId: 45,
+[45] Token
 Matched 14 tokens.

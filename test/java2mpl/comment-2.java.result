@@ -7,4 +7,12 @@ Separator  Token:  Whitespace
 Separator  Token:  Whitespace
 Comment Token: 
 Separator  Token:  Rbrace
+=======  Dump SortOut =======  
+[1] Table TblClassDeclaration: 2,
+[2] Table TblNormalClassDeclaration: 3,4,5,
+[3] Token
+[4] Token
+[5] Table TblClassBody: 6,7,
+[6] Token
+[7] Token
 Matched 4 tokens.

@@ -4,4 +4,60 @@ Identifier Token:  a
 Operator   Token:  Add
 Identifier Token:  b
 Separator  Token:  Semicolon
+Warning: Multiple succ children
+Warning: Multiple succ children
+Warning: Multiple succ children
+Warning: Multiple succ children
+=======  Dump SortOut =======  
+[1] Table TblStatement: 2,
+[2] Table TblStatementWithoutTrailingSubstatement: 3,
+[3] Table TblExpressionStatement: 4,5,
+[4] Table TblStatementExpression: 6,
+[5] Token
+[6] Table TblAssignment: 7,8,9,
+[7] Table TblLeftHandSide: 10,11,
+[8] Table TblAssignmentOperator: 12,
+[9] Table TblExpression: 13,14,15,16,17,
+[10] Table TblExpressionName: 18,
+[11] Table TblArrayAccess: 
+[12] Token
+[13] Table TblPrimary: 19,
+[14] Table TblUnaryExpression: 20,
+[15] Table TblBinaryExpression: 21,22,23,24,25,26,27,28,29,30,
+[16] Table TblConditionalExpression: 31,
+[17] Table TblAssignmentExpression: 32,
+[18] Token
+[19] Table TblPrimaryNoNewArray: 33,
+[20] Table TblUnaryExpressionNotPlusMinus: 34,
+[21] Table TblMultiplicativeExpression: 35,
+[22] Table TblAdditiveExpression: 36,37,
+[23] Table TblShiftExpression: 38,
+[24] Table TblRelationalExpression: 39,
+[25] Table TblEqualityExpression: 40,
+[26] Table TblAndExpression: 41,
+[27] Table TblExclusiveOrExpression: 42,
+[28] Table TblInclusiveOrExpression: 43,
+[29] Table TblConditionalAndExpression: 44,
+[30] Table TblConditionalOrExpression: 45,
+[31] Table TblConditionalOrExpression: 
+[32] Table TblConditionalExpression: 
+[33] Table TblArrayAccess: 
+[34] Table TblPostfixExpression: 46,
+[35] Table TblUnaryExpression: 
+[36] Table TblMultiplicativeExpression: 
+[37] Table TblAdditiveExpression_sub1: 47,48,49,
+[38] Table TblAdditiveExpression: 
+[39] Table TblShiftExpression: 
+[40] Table TblRelationalExpression: 
+[41] Table TblEqualityExpression: 
+[42] Table TblAndExpression: 
+[43] Table TblExclusiveOrExpression: 
+[44] Table TblInclusiveOrExpression: 
+[45] Table TblConditionalAndExpression: 
+[46] Table TblPrimary: 
+[47] Table TblAdditiveExpression: 50,
+[48] Token
+[49] Table TblMultiplicativeExpression: 51,
+[50] Table TblMultiplicativeExpression: 
+[51] Table TblUnaryExpression: 
 Matched 6 tokens.

@@ -3,4 +3,19 @@ Keyword    Token:  int
 Separator  Token:  Whitespace
 Identifier Token:  a
 Separator  Token:  Semicolon
+=======  Dump SortOut =======  
+[1] Table TblStatement: 2,
+[2] Table TblLocalVariableDeclarationStatement: 3,4,
+[3] Table TblLocalVariableDeclaration: 5,6,
+[4] Token
+[5] Table TblLocalVariableType: 7,
+[6] Table TblVariableDeclaratorList: 8,
+[7] Table TblUnannType: 9,
+[8] Table TblVariableDeclarator: 10,
+[9] Table TblUnannPrimitiveType: 11,
+[10] Table TblVariableDeclaratorId: 12,
+[11] Table TblNumericType: 13,
+[12] Token
+[13] Table TblIntType: 14,
+[14] Token
 Matched 3 tokens.

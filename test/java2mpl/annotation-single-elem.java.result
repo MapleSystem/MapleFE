@@ -20,6 +20,33 @@ Separator  Token:  Whitespace
 Identifier Token:  Endorsers
 Separator  Token:  Whitespace
 Separator  Token:  Lbrace
+Warning: Multiple succ children
+Warning: Multiple succ children
+=======  Dump SortOut =======  
+[1] Table TblInterfaceDeclaration: 2,
+[2] Table TblAnnotationTypeDeclaration: 3,4,5,6,
+[3] Token
+[4] Token
+[5] Token
+[6] Table TblAnnotationTypeBody: 7,8,9,
+[7] Token
+[8] Table TblAnnotationTypeBody_sub1: 10,
+[9] Token
+[10] Table TblAnnotationTypeMemberDeclaration: 11,
+[11] Table TblAnnotationTypeElementDeclaration: 12,13,14,15,16,
+[12] Table TblUnannType: 17,
+[13] Token
+[14] Token
+[15] Token
+[16] Token
+[17] Table TblUnannReferenceType: 18,19,
+[18] Table TblUnannClassOrInterfaceType: 20,21,
+[19] Table TblUnannTypeVariable: 22,
+[20] Table TblUnannClassType: 23,
+[21] Table TblUnannInterfaceType: 
+[22] Token
+[23] Table TblUnannClassType_sub1: 24,
+[24] Token
 Matched 10 tokens.
 Separator  Token:  Whitespace
 Separator  Token:  Whitespace
@@ -32,4 +59,32 @@ Separator  Token:  Lparen
 Separator  Token:  Rparen
 Separator  Token:  Semicolon
 Separator  Token:  Rbrace
+Warning: Multiple succ children
+=======  Dump SortOut =======  
+[25] Table TblInterfaceDeclaration: 26,
+[26] Table TblAnnotationTypeDeclaration: 27,28,29,30,
+[27] Token
+[28] Token
+[29] Token
+[30] Table TblAnnotationTypeBody: 31,32,33,
+[31] Token
+[32] Table TblAnnotationTypeBody_sub1: 34,
+[33] Token
+[34] Table TblAnnotationTypeMemberDeclaration: 35,
+[35] Table TblAnnotationTypeElementDeclaration: 36,37,38,39,40,
+[36] Table TblUnannType: 41,
+[37] Token
+[38] Token
+[39] Token
+[40] Token
+[41] Table TblUnannReferenceType: 42,
+[42] Table TblUnannArrayType: 43,44,
+[43] Table TblUnannArrayType_sub2: 45,46,
+[44] Table TblUnannArrayType_sub3: 47,48,
+[45] Table TblUnannClassOrInterfaceType: 
+[46] Table TblDims: 49,50,
+[47] Table TblUnannTypeVariable: 
+[48] Table TblDims: 
+[49] Token
+[50] Token
 Matched 22 tokens.

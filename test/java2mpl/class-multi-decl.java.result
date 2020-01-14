@@ -16,4 +16,39 @@ Separator  Token:  Whitespace
 Identifier Token:  b
 Separator  Token:  Semicolon
 Separator  Token:  Rbrace
+=======  Dump SortOut =======  
+[1] Table TblClassDeclaration: 2,
+[2] Table TblNormalClassDeclaration: 3,4,5,
+[3] Token
+[4] Token
+[5] Table TblClassBody: 6,7,8,
+[6] Token
+[7] Table TblClassBody_sub1: 9,10,
+[8] Token
+[9] Table TblClassBodyDeclaration: 11,
+[10] Table TblClassBodyDeclaration: 12,
+[11] Table TblClassMemberDeclaration: 13,
+[12] Table TblClassMemberDeclaration: 14,
+[13] Table TblFieldDeclaration: 15,16,17,
+[14] Table TblFieldDeclaration: 18,19,20,
+[15] Table TblUnannType: 21,
+[16] Table TblVariableDeclaratorList: 22,
+[17] Token
+[18] Table TblUnannType: 23,
+[19] Table TblVariableDeclaratorList: 24,
+[20] Token
+[21] Table TblUnannPrimitiveType: 25,
+[22] Table TblVariableDeclarator: 26,
+[23] Table TblUnannPrimitiveType: 27,
+[24] Table TblVariableDeclarator: 28,
+[25] Table TblNumericType: 29,
+[26] Table TblVariableDeclaratorId: 30,
+[27] Table TblNumericType: 31,
+[28] Table TblVariableDeclaratorId: 32,
+[29] Table TblIntType: 33,
+[30] Token
+[31] Table TblIntType: 34,
+[32] Token
+[33] Token
+[34] Token
 Matched 10 tokens.

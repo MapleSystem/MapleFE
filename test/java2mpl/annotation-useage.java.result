@@ -38,4 +38,47 @@ Separator  Token:  Whitespace
 Separator  Token:  Lbrace
 Separator  Token:  Rbrace
 Separator  Token:  Rbrace
+Warning: Multiple succ children
+=======  Dump SortOut =======  
+[1] Table TblClassDeclaration: 2,
+[2] Table TblNormalClassDeclaration: 3,4,5,
+[3] Token
+[4] Token
+[5] Table TblClassBody: 6,7,8,
+[6] Token
+[7] Table TblClassBody_sub1: 9,
+[8] Token
+[9] Table TblClassBodyDeclaration: 10,
+[10] Table TblClassMemberDeclaration: 11,
+[11] Table TblMethodDeclaration: 12,13,14,
+[12] Table TblMethodDeclaration_sub1: 15,16,17,
+[13] Table TblMethodHeader: 18,
+[14] Table TblMethodBody: 19,
+[15] Table TblMethodModifier: 20,
+[16] Table TblMethodModifier: 21,
+[17] Table TblMethodModifier: 22,
+[18] Table TblMethodHeader_sub1: 23,24,
+[19] Table TblBlock: 25,26,
+[20] Table TblAnnotation: 
+[21] Token
+[22] Token
+[23] Table TblResult: 27,
+[24] Table TblMethodDeclarator: 28,29,30,31,
+[25] Token
+[26] Token
+[27] Token
+[28] Token
+[29] Token
+[30] Table TblMethodDeclarator_sub1: 32,
+[31] Token
+[32] Table TblFormalParameterList: 33,34,
+[33] Table TblFormalParameterList_sub1: 35,
+[34] Table TblLastFormalParameter: 36,
+[35] Table TblFormalParameters: 37,
+[36] Table TblFormalParameter: 
+[37] Table TblFormalParameters_sub1: 38,
+[38] Table TblFormalParameter: 39,40,
+[39] Table TblUnannType: 
+[40] Table TblVariableDeclaratorId: 41,
+[41] Token
 Matched 21 tokens.

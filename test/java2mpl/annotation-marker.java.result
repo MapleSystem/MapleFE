@@ -6,4 +6,13 @@ Identifier Token:  Preliminary
 Separator  Token:  Whitespace
 Separator  Token:  Lbrace
 Separator  Token:  Rbrace
+=======  Dump SortOut =======  
+[1] Table TblInterfaceDeclaration: 2,
+[2] Table TblAnnotationTypeDeclaration: 3,4,5,6,
+[3] Token
+[4] Token
+[5] Token
+[6] Table TblAnnotationTypeBody: 7,8,
+[7] Token
+[8] Token
 Matched 5 tokens.

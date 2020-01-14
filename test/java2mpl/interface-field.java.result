@@ -37,6 +37,167 @@ Separator  Token:  Whitespace
 Identifier Token:  BaseColors
 Separator  Token:  Whitespace
 Separator  Token:  Lbrace
+Warning: Multiple succ children
+Warning: Multiple succ children
+Warning: Multiple succ children
+Warning: Multiple succ children
+Warning: Multiple succ children
+Warning: Multiple succ children
+Warning: Multiple succ children
+Warning: Multiple succ children
+Warning: Multiple succ children
+=======  Dump SortOut =======  
+[1] Table TblInterfaceDeclaration: 2,
+[2] Table TblNormalInterfaceDeclaration: 3,4,5,
+[3] Token
+[4] Token
+[5] Table TblInterfaceBody: 6,7,8,
+[6] Token
+[7] Table TblInterfaceBody_sub1: 9,
+[8] Token
+[9] Table TblInterfaceMemberDeclaration: 10,
+[10] Table TblConstantDeclaration: 11,12,13,
+[11] Table TblUnannType: 14,
+[12] Table TblVariableDeclaratorList: 15,16,
+[13] Token
+[14] Table TblUnannPrimitiveType: 17,
+[15] Table TblVariableDeclarator: 18,19,
+[16] Table TblVariableDeclaratorList_sub1: 20,21,
+[17] Table TblNumericType: 22,
+[18] Table TblVariableDeclaratorId: 23,
+[19] Table TblVariableDeclarator_sub1: 24,
+[20] Table TblVariableDeclaratorList_sub2: 25,26,
+[21] Table TblVariableDeclaratorList_sub2: 27,28,
+[22] Table TblIntType: 29,
+[23] Token
+[24] Table TblVariableDeclarator_sub2: 30,31,
+[25] Token
+[26] Table TblVariableDeclarator: 32,33,
+[27] Token
+[28] Table TblVariableDeclarator: 34,35,
+[29] Token
+[30] Token
+[31] Table TblVariableInitializer: 36,
+[32] Table TblVariableDeclaratorId: 37,
+[33] Table TblVariableDeclarator_sub1: 38,
+[34] Table TblVariableDeclaratorId: 39,
+[35] Table TblVariableDeclarator_sub1: 40,
+[36] Table TblExpression: 41,42,43,44,45,
+[37] Token
+[38] Table TblVariableDeclarator_sub2: 46,47,
+[39] Token
+[40] Table TblVariableDeclarator_sub2: 48,49,
+[41] Table TblPrimary: 50,
+[42] Table TblUnaryExpression: 51,
+[43] Table TblBinaryExpression: 52,53,54,55,56,57,58,59,60,61,
+[44] Table TblConditionalExpression: 62,
+[45] Table TblAssignmentExpression: 63,
+[46] Token
+[47] Table TblVariableInitializer: 64,
+[48] Token
+[49] Table TblVariableInitializer: 65,
+[50] Table TblPrimaryNoNewArray: 66,67,
+[51] Table TblUnaryExpressionNotPlusMinus: 68,
+[52] Table TblMultiplicativeExpression: 69,
+[53] Table TblAdditiveExpression: 70,
+[54] Table TblShiftExpression: 71,
+[55] Table TblRelationalExpression: 72,
+[56] Table TblEqualityExpression: 73,
+[57] Table TblAndExpression: 74,
+[58] Table TblExclusiveOrExpression: 75,
+[59] Table TblInclusiveOrExpression: 76,
+[60] Table TblConditionalAndExpression: 77,
+[61] Table TblConditionalOrExpression: 78,
+[62] Table TblConditionalOrExpression: 
+[63] Table TblConditionalExpression: 
+[64] Table TblExpression: 79,80,81,82,83,
+[65] Table TblExpression: 84,85,86,87,88,
+[66] Token
+[67] Table TblArrayAccess: 89,
+[68] Table TblPostfixExpression: 90,
+[69] Table TblUnaryExpression: 
+[70] Table TblMultiplicativeExpression: 
+[71] Table TblAdditiveExpression: 
+[72] Table TblShiftExpression: 
+[73] Table TblRelationalExpression: 
+[74] Table TblEqualityExpression: 
+[75] Table TblAndExpression: 
+[76] Table TblExclusiveOrExpression: 
+[77] Table TblInclusiveOrExpression: 
+[78] Table TblConditionalAndExpression: 
+[79] Table TblPrimary: 91,
+[80] Table TblUnaryExpression: 92,
+[81] Table TblBinaryExpression: 93,94,95,96,97,98,99,100,101,102,
+[82] Table TblConditionalExpression: 103,
+[83] Table TblAssignmentExpression: 104,
+[84] Table TblPrimary: 105,
+[85] Table TblUnaryExpression: 106,
+[86] Table TblBinaryExpression: 107,108,109,110,111,112,113,114,115,116,
+[87] Table TblConditionalExpression: 117,
+[88] Table TblAssignmentExpression: 118,
+[89] Table TblArrayAccess_sub3: 119,
+[90] Table TblPrimary: 
+[91] Table TblPrimaryNoNewArray: 120,121,
+[92] Table TblUnaryExpressionNotPlusMinus: 122,
+[93] Table TblMultiplicativeExpression: 123,
+[94] Table TblAdditiveExpression: 124,
+[95] Table TblShiftExpression: 125,
+[96] Table TblRelationalExpression: 126,
+[97] Table TblEqualityExpression: 127,
+[98] Table TblAndExpression: 128,
+[99] Table TblExclusiveOrExpression: 129,
+[100] Table TblInclusiveOrExpression: 130,
+[101] Table TblConditionalAndExpression: 131,
+[102] Table TblConditionalOrExpression: 132,
+[103] Table TblConditionalOrExpression: 
+[104] Table TblConditionalExpression: 
+[105] Table TblPrimaryNoNewArray: 133,134,
+[106] Table TblUnaryExpressionNotPlusMinus: 135,
+[107] Table TblMultiplicativeExpression: 136,
+[108] Table TblAdditiveExpression: 137,
+[109] Table TblShiftExpression: 138,
+[110] Table TblRelationalExpression: 139,
+[111] Table TblEqualityExpression: 140,
+[112] Table TblAndExpression: 141,
+[113] Table TblExclusiveOrExpression: 142,
+[114] Table TblInclusiveOrExpression: 143,
+[115] Table TblConditionalAndExpression: 144,
+[116] Table TblConditionalOrExpression: 145,
+[117] Table TblConditionalOrExpression: 
+[118] Table TblConditionalExpression: 
+[119] Table TblPrimaryNoNewArray: 
+[120] Token
+[121] Table TblArrayAccess: 146,
+[122] Table TblPostfixExpression: 147,
+[123] Table TblUnaryExpression: 
+[124] Table TblMultiplicativeExpression: 
+[125] Table TblAdditiveExpression: 
+[126] Table TblShiftExpression: 
+[127] Table TblRelationalExpression: 
+[128] Table TblEqualityExpression: 
+[129] Table TblAndExpression: 
+[130] Table TblExclusiveOrExpression: 
+[131] Table TblInclusiveOrExpression: 
+[132] Table TblConditionalAndExpression: 
+[133] Token
+[134] Table TblArrayAccess: 148,
+[135] Table TblPostfixExpression: 149,
+[136] Table TblUnaryExpression: 
+[137] Table TblMultiplicativeExpression: 
+[138] Table TblAdditiveExpression: 
+[139] Table TblShiftExpression: 
+[140] Table TblRelationalExpression: 
+[141] Table TblEqualityExpression: 
+[142] Table TblAndExpression: 
+[143] Table TblExclusiveOrExpression: 
+[144] Table TblInclusiveOrExpression: 
+[145] Table TblConditionalAndExpression: 
+[146] Table TblArrayAccess_sub3: 150,
+[147] Table TblPrimary: 
+[148] Table TblArrayAccess_sub3: 151,
+[149] Table TblPrimary: 
+[150] Table TblPrimaryNoNewArray: 
+[151] Table TblPrimaryNoNewArray: 
 Matched 17 tokens.
 Separator  Token:  Whitespace
 Separator  Token:  Whitespace
@@ -79,6 +240,223 @@ Separator  Token:  Whitespace
 Identifier Token:  BaseColors
 Separator  Token:  Whitespace
 Separator  Token:  Lbrace
+Warning: Multiple succ children
+Warning: Multiple succ children
+Warning: Multiple succ children
+Warning: Multiple succ children
+Warning: Multiple succ children
+Warning: Multiple succ children
+Warning: Multiple succ children
+Warning: Multiple succ children
+Warning: Multiple succ children
+Warning: Multiple succ children
+Warning: Multiple succ children
+Warning: Multiple succ children
+=======  Dump SortOut =======  
+[152] Table TblInterfaceDeclaration: 153,
+[153] Table TblNormalInterfaceDeclaration: 154,155,156,157,
+[154] Token
+[155] Token
+[156] Table TblNormalInterfaceDeclaration_sub3: 158,
+[157] Table TblInterfaceBody: 159,160,161,
+[158] Table TblExtendsInterfaces: 162,163,
+[159] Token
+[160] Table TblInterfaceBody_sub1: 164,
+[161] Token
+[162] Token
+[163] Table TblInterfaceTypeList: 165,
+[164] Table TblInterfaceMemberDeclaration: 166,
+[165] Table TblInterfaceType: 167,
+[166] Table TblConstantDeclaration: 168,169,170,
+[167] Table TblClassType: 171,
+[168] Table TblUnannType: 172,
+[169] Table TblVariableDeclaratorList: 173,174,
+[170] Token
+[171] Table TblClassType_sub1: 175,
+[172] Table TblUnannPrimitiveType: 176,
+[173] Table TblVariableDeclarator: 177,178,
+[174] Table TblVariableDeclaratorList_sub1: 179,180,181,
+[175] Token
+[176] Table TblNumericType: 182,
+[177] Table TblVariableDeclaratorId: 183,
+[178] Table TblVariableDeclarator_sub1: 184,
+[179] Table TblVariableDeclaratorList_sub2: 185,186,
+[180] Table TblVariableDeclaratorList_sub2: 187,188,
+[181] Table TblVariableDeclaratorList_sub2: 189,190,
+[182] Table TblIntType: 191,
+[183] Token
+[184] Table TblVariableDeclarator_sub2: 192,193,
+[185] Token
+[186] Table TblVariableDeclarator: 194,195,
+[187] Token
+[188] Table TblVariableDeclarator: 196,197,
+[189] Token
+[190] Table TblVariableDeclarator: 198,199,
+[191] Token
+[192] Token
+[193] Table TblVariableInitializer: 200,
+[194] Table TblVariableDeclaratorId: 201,
+[195] Table TblVariableDeclarator_sub1: 202,
+[196] Table TblVariableDeclaratorId: 203,
+[197] Table TblVariableDeclarator_sub1: 204,
+[198] Table TblVariableDeclaratorId: 205,
+[199] Table TblVariableDeclarator_sub1: 206,
+[200] Table TblExpression: 207,208,209,210,211,
+[201] Token
+[202] Table TblVariableDeclarator_sub2: 212,213,
+[203] Token
+[204] Table TblVariableDeclarator_sub2: 214,215,
+[205] Token
+[206] Table TblVariableDeclarator_sub2: 216,217,
+[207] Table TblPrimary: 218,
+[208] Table TblUnaryExpression: 219,
+[209] Table TblBinaryExpression: 220,221,222,223,224,225,226,227,228,229,
+[210] Table TblConditionalExpression: 230,
+[211] Table TblAssignmentExpression: 231,
+[212] Token
+[213] Table TblVariableInitializer: 232,
+[214] Token
+[215] Table TblVariableInitializer: 233,
+[216] Token
+[217] Table TblVariableInitializer: 234,
+[218] Table TblPrimaryNoNewArray: 235,236,
+[219] Table TblUnaryExpressionNotPlusMinus: 237,
+[220] Table TblMultiplicativeExpression: 238,
+[221] Table TblAdditiveExpression: 239,
+[222] Table TblShiftExpression: 240,
+[223] Table TblRelationalExpression: 241,
+[224] Table TblEqualityExpression: 242,
+[225] Table TblAndExpression: 243,
+[226] Table TblExclusiveOrExpression: 244,
+[227] Table TblInclusiveOrExpression: 245,
+[228] Table TblConditionalAndExpression: 246,
+[229] Table TblConditionalOrExpression: 247,
+[230] Table TblConditionalOrExpression: 
+[231] Table TblConditionalExpression: 
+[232] Table TblExpression: 248,249,250,251,252,
+[233] Table TblExpression: 253,254,255,256,257,
+[234] Table TblExpression: 258,259,260,261,262,
+[235] Token
+[236] Table TblArrayAccess: 263,
+[237] Table TblPostfixExpression: 264,
+[238] Table TblUnaryExpression: 
+[239] Table TblMultiplicativeExpression: 
+[240] Table TblAdditiveExpression: 
+[241] Table TblShiftExpression: 
+[242] Table TblRelationalExpression: 
+[243] Table TblEqualityExpression: 
+[244] Table TblAndExpression: 
+[245] Table TblExclusiveOrExpression: 
+[246] Table TblInclusiveOrExpression: 
+[247] Table TblConditionalAndExpression: 
+[248] Table TblPrimary: 265,
+[249] Table TblUnaryExpression: 266,
+[250] Table TblBinaryExpression: 267,268,269,270,271,272,273,274,275,276,
+[251] Table TblConditionalExpression: 277,
+[252] Table TblAssignmentExpression: 278,
+[253] Table TblPrimary: 279,
+[254] Table TblUnaryExpression: 280,
+[255] Table TblBinaryExpression: 281,282,283,284,285,286,287,288,289,290,
+[256] Table TblConditionalExpression: 291,
+[257] Table TblAssignmentExpression: 292,
+[258] Table TblPrimary: 293,
+[259] Table TblUnaryExpression: 294,
+[260] Table TblBinaryExpression: 295,296,297,298,299,300,301,302,303,304,
+[261] Table TblConditionalExpression: 305,
+[262] Table TblAssignmentExpression: 306,
+[263] Table TblArrayAccess_sub3: 307,
+[264] Table TblPrimary: 
+[265] Table TblPrimaryNoNewArray: 308,309,
+[266] Table TblUnaryExpressionNotPlusMinus: 310,
+[267] Table TblMultiplicativeExpression: 311,
+[268] Table TblAdditiveExpression: 312,
+[269] Table TblShiftExpression: 313,
+[270] Table TblRelationalExpression: 314,
+[271] Table TblEqualityExpression: 315,
+[272] Table TblAndExpression: 316,
+[273] Table TblExclusiveOrExpression: 317,
+[274] Table TblInclusiveOrExpression: 318,
+[275] Table TblConditionalAndExpression: 319,
+[276] Table TblConditionalOrExpression: 320,
+[277] Table TblConditionalOrExpression: 
+[278] Table TblConditionalExpression: 
+[279] Table TblPrimaryNoNewArray: 321,322,
+[280] Table TblUnaryExpressionNotPlusMinus: 323,
+[281] Table TblMultiplicativeExpression: 324,
+[282] Table TblAdditiveExpression: 325,
+[283] Table TblShiftExpression: 326,
+[284] Table TblRelationalExpression: 327,
+[285] Table TblEqualityExpression: 328,
+[286] Table TblAndExpression: 329,
+[287] Table TblExclusiveOrExpression: 330,
+[288] Table TblInclusiveOrExpression: 331,
+[289] Table TblConditionalAndExpression: 332,
+[290] Table TblConditionalOrExpression: 333,
+[291] Table TblConditionalOrExpression: 
+[292] Table TblConditionalExpression: 
+[293] Table TblPrimaryNoNewArray: 334,335,
+[294] Table TblUnaryExpressionNotPlusMinus: 336,
+[295] Table TblMultiplicativeExpression: 337,
+[296] Table TblAdditiveExpression: 338,
+[297] Table TblShiftExpression: 339,
+[298] Table TblRelationalExpression: 340,
+[299] Table TblEqualityExpression: 341,
+[300] Table TblAndExpression: 342,
+[301] Table TblExclusiveOrExpression: 343,
+[302] Table TblInclusiveOrExpression: 344,
+[303] Table TblConditionalAndExpression: 345,
+[304] Table TblConditionalOrExpression: 346,
+[305] Table TblConditionalOrExpression: 
+[306] Table TblConditionalExpression: 
+[307] Table TblPrimaryNoNewArray: 
+[308] Token
+[309] Table TblArrayAccess: 347,
+[310] Table TblPostfixExpression: 348,
+[311] Table TblUnaryExpression: 
+[312] Table TblMultiplicativeExpression: 
+[313] Table TblAdditiveExpression: 
+[314] Table TblShiftExpression: 
+[315] Table TblRelationalExpression: 
+[316] Table TblEqualityExpression: 
+[317] Table TblAndExpression: 
+[318] Table TblExclusiveOrExpression: 
+[319] Table TblInclusiveOrExpression: 
+[320] Table TblConditionalAndExpression: 
+[321] Token
+[322] Table TblArrayAccess: 349,
+[323] Table TblPostfixExpression: 350,
+[324] Table TblUnaryExpression: 
+[325] Table TblMultiplicativeExpression: 
+[326] Table TblAdditiveExpression: 
+[327] Table TblShiftExpression: 
+[328] Table TblRelationalExpression: 
+[329] Table TblEqualityExpression: 
+[330] Table TblAndExpression: 
+[331] Table TblExclusiveOrExpression: 
+[332] Table TblInclusiveOrExpression: 
+[333] Table TblConditionalAndExpression: 
+[334] Token
+[335] Table TblArrayAccess: 351,
+[336] Table TblPostfixExpression: 352,
+[337] Table TblUnaryExpression: 
+[338] Table TblMultiplicativeExpression: 
+[339] Table TblAdditiveExpression: 
+[340] Table TblShiftExpression: 
+[341] Table TblRelationalExpression: 
+[342] Table TblEqualityExpression: 
+[343] Table TblAndExpression: 
+[344] Table TblExclusiveOrExpression: 
+[345] Table TblInclusiveOrExpression: 
+[346] Table TblConditionalAndExpression: 
+[347] Table TblArrayAccess_sub3: 353,
+[348] Table TblPrimary: 
+[349] Table TblArrayAccess_sub3: 354,
+[350] Table TblPrimary: 
+[351] Table TblArrayAccess_sub3: 355,
+[352] Table TblPrimary: 
+[353] Table TblPrimaryNoNewArray: 
+[354] Table TblPrimaryNoNewArray: 
+[355] Table TblPrimaryNoNewArray: 
 Matched 40 tokens.
 Separator  Token:  Whitespace
 Separator  Token:  Whitespace
@@ -117,6 +495,175 @@ Separator  Token:  Whitespace
 Identifier Token:  PrintColors
 Separator  Token:  Whitespace
 Separator  Token:  Lbrace
+Warning: Multiple succ children
+Warning: Multiple succ children
+Warning: Multiple succ children
+Warning: Multiple succ children
+Warning: Multiple succ children
+Warning: Multiple succ children
+Warning: Multiple succ children
+Warning: Multiple succ children
+Warning: Multiple succ children
+=======  Dump SortOut =======  
+[356] Table TblInterfaceDeclaration: 357,
+[357] Table TblNormalInterfaceDeclaration: 358,359,360,361,
+[358] Token
+[359] Token
+[360] Table TblNormalInterfaceDeclaration_sub3: 362,
+[361] Table TblInterfaceBody: 363,364,365,
+[362] Table TblExtendsInterfaces: 366,367,
+[363] Token
+[364] Table TblInterfaceBody_sub1: 368,
+[365] Token
+[366] Token
+[367] Table TblInterfaceTypeList: 369,
+[368] Table TblInterfaceMemberDeclaration: 370,
+[369] Table TblInterfaceType: 371,
+[370] Table TblConstantDeclaration: 372,373,374,
+[371] Table TblClassType: 375,
+[372] Table TblUnannType: 376,
+[373] Table TblVariableDeclaratorList: 377,378,
+[374] Token
+[375] Table TblClassType_sub1: 379,
+[376] Table TblUnannPrimitiveType: 380,
+[377] Table TblVariableDeclarator: 381,382,
+[378] Table TblVariableDeclaratorList_sub1: 383,384,
+[379] Token
+[380] Table TblNumericType: 385,
+[381] Table TblVariableDeclaratorId: 386,
+[382] Table TblVariableDeclarator_sub1: 387,
+[383] Table TblVariableDeclaratorList_sub2: 388,389,
+[384] Table TblVariableDeclaratorList_sub2: 390,391,
+[385] Table TblIntType: 392,
+[386] Token
+[387] Table TblVariableDeclarator_sub2: 393,394,
+[388] Token
+[389] Table TblVariableDeclarator: 395,396,
+[390] Token
+[391] Table TblVariableDeclarator: 397,398,
+[392] Token
+[393] Token
+[394] Table TblVariableInitializer: 399,
+[395] Table TblVariableDeclaratorId: 400,
+[396] Table TblVariableDeclarator_sub1: 401,
+[397] Table TblVariableDeclaratorId: 402,
+[398] Table TblVariableDeclarator_sub1: 403,
+[399] Table TblExpression: 404,405,406,407,408,
+[400] Token
+[401] Table TblVariableDeclarator_sub2: 409,410,
+[402] Token
+[403] Table TblVariableDeclarator_sub2: 411,412,
+[404] Table TblPrimary: 413,
+[405] Table TblUnaryExpression: 414,
+[406] Table TblBinaryExpression: 415,416,417,418,419,420,421,422,423,424,
+[407] Table TblConditionalExpression: 425,
+[408] Table TblAssignmentExpression: 426,
+[409] Token
+[410] Table TblVariableInitializer: 427,
+[411] Token
+[412] Table TblVariableInitializer: 428,
+[413] Table TblPrimaryNoNewArray: 429,430,
+[414] Table TblUnaryExpressionNotPlusMinus: 431,
+[415] Table TblMultiplicativeExpression: 432,
+[416] Table TblAdditiveExpression: 433,
+[417] Table TblShiftExpression: 434,
+[418] Table TblRelationalExpression: 435,
+[419] Table TblEqualityExpression: 436,
+[420] Table TblAndExpression: 437,
+[421] Table TblExclusiveOrExpression: 438,
+[422] Table TblInclusiveOrExpression: 439,
+[423] Table TblConditionalAndExpression: 440,
+[424] Table TblConditionalOrExpression: 441,
+[425] Table TblConditionalOrExpression: 
+[426] Table TblConditionalExpression: 
+[427] Table TblExpression: 442,443,444,445,446,
+[428] Table TblExpression: 447,448,449,450,451,
+[429] Token
+[430] Table TblArrayAccess: 452,
+[431] Table TblPostfixExpression: 453,
+[432] Table TblUnaryExpression: 
+[433] Table TblMultiplicativeExpression: 
+[434] Table TblAdditiveExpression: 
+[435] Table TblShiftExpression: 
+[436] Table TblRelationalExpression: 
+[437] Table TblEqualityExpression: 
+[438] Table TblAndExpression: 
+[439] Table TblExclusiveOrExpression: 
+[440] Table TblInclusiveOrExpression: 
+[441] Table TblConditionalAndExpression: 
+[442] Table TblPrimary: 454,
+[443] Table TblUnaryExpression: 455,
+[444] Table TblBinaryExpression: 456,457,458,459,460,461,462,463,464,465,
+[445] Table TblConditionalExpression: 466,
+[446] Table TblAssignmentExpression: 467,
+[447] Table TblPrimary: 468,
+[448] Table TblUnaryExpression: 469,
+[449] Table TblBinaryExpression: 470,471,472,473,474,475,476,477,478,479,
+[450] Table TblConditionalExpression: 480,
+[451] Table TblAssignmentExpression: 481,
+[452] Table TblArrayAccess_sub3: 482,
+[453] Table TblPrimary: 
+[454] Table TblPrimaryNoNewArray: 483,484,
+[455] Table TblUnaryExpressionNotPlusMinus: 485,
+[456] Table TblMultiplicativeExpression: 486,
+[457] Table TblAdditiveExpression: 487,
+[458] Table TblShiftExpression: 488,
+[459] Table TblRelationalExpression: 489,
+[460] Table TblEqualityExpression: 490,
+[461] Table TblAndExpression: 491,
+[462] Table TblExclusiveOrExpression: 492,
+[463] Table TblInclusiveOrExpression: 493,
+[464] Table TblConditionalAndExpression: 494,
+[465] Table TblConditionalOrExpression: 495,
+[466] Table TblConditionalOrExpression: 
+[467] Table TblConditionalExpression: 
+[468] Table TblPrimaryNoNewArray: 496,497,
+[469] Table TblUnaryExpressionNotPlusMinus: 498,
+[470] Table TblMultiplicativeExpression: 499,
+[471] Table TblAdditiveExpression: 500,
+[472] Table TblShiftExpression: 501,
+[473] Table TblRelationalExpression: 502,
+[474] Table TblEqualityExpression: 503,
+[475] Table TblAndExpression: 504,
+[476] Table TblExclusiveOrExpression: 505,
+[477] Table TblInclusiveOrExpression: 506,
+[478] Table TblConditionalAndExpression: 507,
+[479] Table TblConditionalOrExpression: 508,
+[480] Table TblConditionalOrExpression: 
+[481] Table TblConditionalExpression: 
+[482] Table TblPrimaryNoNewArray: 
+[483] Token
+[484] Table TblArrayAccess: 509,
+[485] Table TblPostfixExpression: 510,
+[486] Table TblUnaryExpression: 
+[487] Table TblMultiplicativeExpression: 
+[488] Table TblAdditiveExpression: 
+[489] Table TblShiftExpression: 
+[490] Table TblRelationalExpression: 
+[491] Table TblEqualityExpression: 
+[492] Table TblAndExpression: 
+[493] Table TblExclusiveOrExpression: 
+[494] Table TblInclusiveOrExpression: 
+[495] Table TblConditionalAndExpression: 
+[496] Token
+[497] Table TblArrayAccess: 511,
+[498] Table TblPostfixExpression: 512,
+[499] Table TblUnaryExpression: 
+[500] Table TblMultiplicativeExpression: 
+[501] Table TblAdditiveExpression: 
+[502] Table TblShiftExpression: 
+[503] Table TblRelationalExpression: 
+[504] Table TblEqualityExpression: 
+[505] Table TblAndExpression: 
+[506] Table TblExclusiveOrExpression: 
+[507] Table TblInclusiveOrExpression: 
+[508] Table TblConditionalAndExpression: 
+[509] Table TblArrayAccess_sub3: 513,
+[510] Table TblPrimary: 
+[511] Table TblArrayAccess_sub3: 514,
+[512] Table TblPrimary: 
+[513] Table TblPrimaryNoNewArray: 
+[514] Table TblPrimaryNoNewArray: 
 Matched 59 tokens.
 Separator  Token:  Whitespace
 Separator  Token:  Whitespace
@@ -145,4 +692,183 @@ Operator   Token:  Add
 Integer Literal Token: 90
 Separator  Token:  Semicolon
 Separator  Token:  Rbrace
+Warning: Multiple succ children
+Warning: Multiple succ children
+Warning: Multiple succ children
+Warning: Multiple succ children
+Warning: Multiple succ children
+Warning: Multiple succ children
+Warning: Multiple succ children
+Warning: Multiple succ children
+Warning: Multiple succ children
+=======  Dump SortOut =======  
+[515] Table TblInterfaceDeclaration: 516,
+[516] Table TblNormalInterfaceDeclaration: 517,518,519,520,
+[517] Token
+[518] Token
+[519] Table TblNormalInterfaceDeclaration_sub3: 521,
+[520] Table TblInterfaceBody: 522,523,524,
+[521] Table TblExtendsInterfaces: 525,526,
+[522] Token
+[523] Table TblInterfaceBody_sub1: 527,
+[524] Token
+[525] Token
+[526] Table TblInterfaceTypeList: 528,529,
+[527] Table TblInterfaceMemberDeclaration: 530,
+[528] Table TblInterfaceType: 531,
+[529] Table TblInterfaceTypeList_sub1: 532,
+[530] Table TblConstantDeclaration: 533,534,535,
+[531] Table TblClassType: 536,
+[532] Table TblInterfaceTypeList_sub2: 537,538,
+[533] Table TblUnannType: 539,
+[534] Table TblVariableDeclaratorList: 540,541,
+[535] Token
+[536] Table TblClassType_sub1: 542,
+[537] Token
+[538] Table TblInterfaceType: 543,
+[539] Table TblUnannPrimitiveType: 544,
+[540] Table TblVariableDeclarator: 545,546,
+[541] Table TblVariableDeclaratorList_sub1: 547,548,
+[542] Token
+[543] Table TblClassType: 549,
+[544] Table TblNumericType: 550,
+[545] Table TblVariableDeclaratorId: 551,
+[546] Table TblVariableDeclarator_sub1: 552,
+[547] Table TblVariableDeclaratorList_sub2: 553,554,
+[548] Table TblVariableDeclaratorList_sub2: 555,556,
+[549] Table TblClassType_sub1: 557,
+[550] Table TblIntType: 558,
+[551] Token
+[552] Table TblVariableDeclarator_sub2: 559,560,
+[553] Token
+[554] Table TblVariableDeclarator: 561,562,
+[555] Token
+[556] Table TblVariableDeclarator: 563,564,
+[557] Token
+[558] Token
+[559] Token
+[560] Table TblVariableInitializer: 565,
+[561] Table TblVariableDeclaratorId: 566,
+[562] Table TblVariableDeclarator_sub1: 567,
+[563] Table TblVariableDeclaratorId: 568,
+[564] Table TblVariableDeclarator_sub1: 569,
+[565] Table TblExpression: 570,571,572,573,574,
+[566] Token
+[567] Table TblVariableDeclarator_sub2: 575,576,
+[568] Token
+[569] Table TblVariableDeclarator_sub2: 577,578,
+[570] Table TblPrimary: 579,
+[571] Table TblUnaryExpression: 580,
+[572] Table TblBinaryExpression: 581,582,583,584,585,586,587,588,589,590,
+[573] Table TblConditionalExpression: 591,
+[574] Table TblAssignmentExpression: 592,
+[575] Token
+[576] Table TblVariableInitializer: 593,
+[577] Token
+[578] Table TblVariableInitializer: 594,
+[579] Table TblPrimaryNoNewArray: 595,596,
+[580] Table TblUnaryExpressionNotPlusMinus: 597,
+[581] Table TblMultiplicativeExpression: 598,
+[582] Table TblAdditiveExpression: 599,
+[583] Table TblShiftExpression: 600,
+[584] Table TblRelationalExpression: 601,
+[585] Table TblEqualityExpression: 602,
+[586] Table TblAndExpression: 603,
+[587] Table TblExclusiveOrExpression: 604,
+[588] Table TblInclusiveOrExpression: 605,
+[589] Table TblConditionalAndExpression: 606,
+[590] Table TblConditionalOrExpression: 607,
+[591] Table TblConditionalOrExpression: 
+[592] Table TblConditionalExpression: 
+[593] Table TblExpression: 608,609,610,611,612,
+[594] Table TblExpression: 613,614,615,616,617,
+[595] Token
+[596] Table TblArrayAccess: 618,
+[597] Table TblPostfixExpression: 619,
+[598] Table TblUnaryExpression: 
+[599] Table TblMultiplicativeExpression: 
+[600] Table TblAdditiveExpression: 
+[601] Table TblShiftExpression: 
+[602] Table TblRelationalExpression: 
+[603] Table TblEqualityExpression: 
+[604] Table TblAndExpression: 
+[605] Table TblExclusiveOrExpression: 
+[606] Table TblInclusiveOrExpression: 
+[607] Table TblConditionalAndExpression: 
+[608] Table TblPrimary: 620,
+[609] Table TblUnaryExpression: 621,
+[610] Table TblBinaryExpression: 622,623,624,625,626,627,628,629,630,631,
+[611] Table TblConditionalExpression: 632,
+[612] Table TblAssignmentExpression: 633,
+[613] Table TblPrimary: 634,
+[614] Table TblUnaryExpression: 635,
+[615] Table TblBinaryExpression: 636,637,638,639,640,641,642,643,644,645,
+[616] Table TblConditionalExpression: 646,
+[617] Table TblAssignmentExpression: 647,
+[618] Table TblArrayAccess_sub3: 648,
+[619] Table TblPrimary: 
+[620] Table TblPrimaryNoNewArray: 649,650,
+[621] Table TblUnaryExpressionNotPlusMinus: 651,
+[622] Table TblMultiplicativeExpression: 652,
+[623] Table TblAdditiveExpression: 653,
+[624] Table TblShiftExpression: 654,
+[625] Table TblRelationalExpression: 655,
+[626] Table TblEqualityExpression: 656,
+[627] Table TblAndExpression: 657,
+[628] Table TblExclusiveOrExpression: 658,
+[629] Table TblInclusiveOrExpression: 659,
+[630] Table TblConditionalAndExpression: 660,
+[631] Table TblConditionalOrExpression: 661,
+[632] Table TblConditionalOrExpression: 
+[633] Table TblConditionalExpression: 
+[634] Table TblPrimaryNoNewArray: 662,
+[635] Table TblUnaryExpressionNotPlusMinus: 663,
+[636] Table TblMultiplicativeExpression: 664,
+[637] Table TblAdditiveExpression: 665,666,
+[638] Table TblShiftExpression: 667,
+[639] Table TblRelationalExpression: 668,
+[640] Table TblEqualityExpression: 669,
+[641] Table TblAndExpression: 670,
+[642] Table TblExclusiveOrExpression: 671,
+[643] Table TblInclusiveOrExpression: 672,
+[644] Table TblConditionalAndExpression: 673,
+[645] Table TblConditionalOrExpression: 674,
+[646] Table TblConditionalOrExpression: 
+[647] Table TblConditionalExpression: 
+[648] Table TblPrimaryNoNewArray: 
+[649] Token
+[650] Table TblArrayAccess: 675,
+[651] Table TblPostfixExpression: 676,
+[652] Table TblUnaryExpression: 
+[653] Table TblMultiplicativeExpression: 
+[654] Table TblAdditiveExpression: 
+[655] Table TblShiftExpression: 
+[656] Table TblRelationalExpression: 
+[657] Table TblEqualityExpression: 
+[658] Table TblAndExpression: 
+[659] Table TblExclusiveOrExpression: 
+[660] Table TblInclusiveOrExpression: 
+[661] Table TblConditionalAndExpression: 
+[662] Table TblArrayAccess: 
+[663] Table TblPostfixExpression: 677,
+[664] Table TblUnaryExpression: 
+[665] Table TblMultiplicativeExpression: 
+[666] Table TblAdditiveExpression_sub1: 678,679,680,
+[667] Table TblAdditiveExpression: 
+[668] Table TblShiftExpression: 
+[669] Table TblRelationalExpression: 
+[670] Table TblEqualityExpression: 
+[671] Table TblAndExpression: 
+[672] Table TblExclusiveOrExpression: 
+[673] Table TblInclusiveOrExpression: 
+[674] Table TblConditionalAndExpression: 
+[675] Table TblArrayAccess_sub3: 681,
+[676] Table TblPrimary: 
+[677] Table TblPrimary: 
+[678] Table TblAdditiveExpression: 682,
+[679] Token
+[680] Table TblMultiplicativeExpression: 683,
+[681] Table TblPrimaryNoNewArray: 
+[682] Table TblMultiplicativeExpression: 
+[683] Table TblUnaryExpression: 
 Matched 82 tokens.

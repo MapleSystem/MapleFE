@@ -565,7 +565,7 @@ bool Parser::TraverseStmt() {
     succ = TraverseRuleTable(t, mRootNode);
     if (succ) {
       mRootNode->mAfter = Succ;
-      //SortOut();
+      SortOut();
       break;
     }
   }
@@ -1524,11 +1524,28 @@ void Parser::SortOutConcatenate(AppealNode *parent) {
 
   unsigned last_match = parent_start - 1;
 
+  // [TODO] If we did second try, it's possible there are failed children of parent.
+  //        But it's sure that the failed children will be followed directly by a
+  //        succ child with the same rule table, same start index, and mIsSecondTry.
+  //
+  //        I'll come back to remove those failed children, before doing following
+  //        verification.
+
   std::vector<AppealNode*> bad_children;
   std::list<AppealNode*>::iterator it = parent->mChildren.begin();
+  AppealNode *prev_child;
+
   for (; it != parent->mChildren.end(); it++) {
     AppealNode *child = *it;
     MASSERT(child->IsSucc() && "Successful concatenate node has a failed child node?");
+
+    // Clean the useless matches of prev_child, leaving the only one connecting to
+    // the current child.
+    if (child->mIsSecondTry) {
+      SuccMatch *prev_succ = FindSucc(prev_child->GetTable());
+      last_match = child->mStartIndex - 1;
+      prev_succ->ReduceMatches(prev_child->mStartIndex, last_match);
+    }
 
     MASSERT((last_match + 1 == child->mStartIndex)
              && "Node match index are not connected in SortOut Concatenate.");
@@ -1569,8 +1586,9 @@ void Parser::SortOutConcatenate(AppealNode *parent) {
         // Add child to the working list
         to_be_sorted.push_back(child);
       }
-
     }
+    
+    prev_child = child;
   }
 
   // The last valid child's match token should be the same as parent's
