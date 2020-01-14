@@ -648,6 +648,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *appeal_parent)
 
   // set the apppeal node
   AppealNode *appeal = new AppealNode();
+  mAppealNodes.push_back(appeal);
   appeal->SetTable(rule_table);
   appeal->mStartIndex = mCurToken;
   appeal->mParent = appeal_parent;
@@ -656,7 +657,6 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *appeal_parent)
     mInSecondTry = false;
   }
 
-  mAppealNodes.push_back(appeal);
   appeal_parent->AddChild(appeal);
 
   // Check if it was succ. Set the gSuccTokens/gSuccTokensNum appropriately
@@ -1142,6 +1142,7 @@ bool Parser::TraverseTableData(TableData *data, AppealNode *parent) {
       DumpEnterTable("token", mIndentation);
     if (data->mData.mToken == curr_token) {
       AppealNode *appeal = new AppealNode();
+      mAppealNodes.push_back(appeal);
       appeal->mBefore = Succ;
       appeal->mAfter = Succ;
       appeal->SetToken(curr_token);
@@ -1524,12 +1525,10 @@ void Parser::SortOutConcatenate(AppealNode *parent) {
 
   unsigned last_match = parent_start - 1;
 
-  // [TODO] If we did second try, it's possible there are failed children of parent.
-  //        But it's sure that the failed children will be followed directly by a
-  //        succ child with the same rule table, same start index, and mIsSecondTry.
-  //
-  //        I'll come back to remove those failed children, before doing following
-  //        verification.
+  // If we did second try, it's possible there are failed children of parent.
+  // The failed children will be followed directly by a
+  // succ child with the same rule table, same start index, and mIsSecondTry.
+  CleanFailedSecondTry(parent);
 
   std::vector<AppealNode*> bad_children;
   std::list<AppealNode*>::iterator it = parent->mChildren.begin();
@@ -1632,6 +1631,49 @@ void Parser::SortOutData(AppealNode *parent) {
   case DT_Null:
   default:
     break;
+  }
+}
+
+// This is for Concatenate node.
+// If there are any failed children node and they are failed second try, clean them.
+void Parser::CleanFailedSecondTry(AppealNode *parent) {
+  std::list<AppealNode*>::iterator it = parent->mChildren.begin();
+  std::vector<AppealNode*> bad_children;
+
+  bool found = false;
+  AppealNode *prev_child = NULL;
+  for (; it != parent->mChildren.end(); it++) {
+    AppealNode *child = *it;
+    if (child->IsFail()) {
+      bad_children.push_back(child);
+      if (!found) {
+        found = true;
+      } else {
+        // Prev_child is also failed, they should share the same startindex, rule table
+        MASSERT( (child->mStartIndex == prev_child->mStartIndex)
+                 && (child->GetTable() == prev_child->GetTable())
+                 && "Not the same startindex or ruletable in failed 2nd try?");
+      }
+    } else {
+      // For a succ second try, it may or may not have some prev children sharing same
+      // start index. (1) If it's a token, we don't create appeal node for failed token.
+      // So it have NO failed children. (2) for table, we are sure to have failed children.
+      if (found) {
+        MASSERT( (child->mStartIndex == prev_child->mStartIndex)
+                 && (child->GetTable() == prev_child->GetTable())
+                 && "Not the same startindex or ruletable in failed 2nd try?");
+        MASSERT( child->mIsSecondTry && "Not a second try after a failed node?");
+        // clear the status, ending a session of second try.
+        found = false;
+      }
+    }
+    prev_child = child;
+  }
+
+  // remove the bad children AppealNode
+  std::vector<AppealNode*>::iterator badit = bad_children.begin();
+  for (; badit != bad_children.end(); badit++) {
+    parent->RemoveChild(*badit);
   }
 }
 

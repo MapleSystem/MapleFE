@@ -229,6 +229,7 @@ private:
   void SortOutZeroorone(AppealNode*);
   void SortOutConcatenate(AppealNode*);
   void SortOutData(AppealNode*);
+  void CleanFailedSecondTry(AppealNode*);
 
 public:
   Parser(const char *f, Module *m);
