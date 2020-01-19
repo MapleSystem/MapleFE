@@ -1,4 +1,4 @@
-// This file defines the separators supported by AutoGen and MapleFE
+// This file defines the operators supported by AutoGen and MapleFE
 
 OPERATOR(Add)
 OPERATOR(Sub)
