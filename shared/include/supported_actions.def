@@ -1,0 +1,14 @@
+// This file defines Rule Actions supported in both Autogen and Parser. The cooperation between
+// all modules are as below.
+// 1. The Action names in .spec files should be one of Actions below.
+// 2. Autogen generates rule tables in gen_xxx.h/cpp files. It user ActionId.
+// 3. AST maintains a table which is basically a mapping between ActionId and the corresponding
+//    utility functions.
+// 4. The utility functions (1) do the validation (2) create the tree node.
+//
+// [NOTE] This file only contains actions to create common tree node seen in most programming
+//        languages. If a language has tree nodes not covered here, they can be defined in its
+//        dedicated directory.
+
+ACTION(BuildBinaryOperation)
+ACTION(BuildAssignment)

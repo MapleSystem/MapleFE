@@ -71,6 +71,7 @@ typedef enum {
 struct RuleTable;
 
 class Token;
+
 struct TableData {
   DataType mType;
   union {
@@ -82,11 +83,35 @@ struct TableData {
   }mData;
 };
 
+// TODO: The action id will come from both the shared part and language specific part.
+//       For now I just put everything together in order to expediate the overall
+//       progress. Will come back.
+
+#undef  ACTION
+#define ACTION(T) ACT_##T,
+typedef enum {
+#include "supported_actions.def"
+ACT_NA
+}ActionId;
+
+// We give the biggest number of elements in an action to 16
+#define MAX_ACT_ELEM_NUM 16
+
+struct RuleAction {
+  ActionId  mId;
+  unsigned  mNumElem;
+  unsigned  mElems[MAX_ACT_ELEM_NUM]; // the index of elements involved in the action
+                                      // As mentioned in README.spec, the index
+                                      // starts from 1. So 0 means nothing.
+};
+
 // Struct of the table entry
 struct RuleTable{
-  EntryType  mType;    
-  unsigned   mNum;
-  TableData *mData;
+  EntryType   mType;
+  unsigned    mNum;        // Num of TableData entries
+  TableData  *mData;
+  unsigned    mNumAction;  // Num of actions
+  RuleAction *mActions;
 };
 
 //////////////////////////////////////////////////////////////////////

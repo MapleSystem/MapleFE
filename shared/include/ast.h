@@ -12,22 +12,29 @@
 #ifndef __AST_HEADER__
 #define __AST_HEADER__
 
-// A node in AST could be one of the three types.
+// A node in AST could be one of the following types.
 //
-// Token
+// 1. Token
 //    This is the leaf node in an AST. It could be a variable, a literal.
-// Operator
+//
+// 2. Operator
 //    This is one of the operators defined in supported_operators.def
 //    As you may know, operators, literals and variables (identifiers) are all preprocessed
 //    to be a token. But we also define 'Token' as a NodeKind. So please keep in mind, we
 //    catagorize operator to a dedicated NodeKind.
-// Construct
+//
+// 3. Construct
 //    This is syntax construct, such as for(..) loop construct. This is language specific,
 //    and most of these nodes are defined under each language, such as java/ directory.
 //    However, I do define some popular construct in shared/ directory.
-// Function
+//
+// 4. Function
 //    A Function node have its arguments as children node. The return value is not counted.
 //
+
+#include "ast_type.h"
+#include "ast_mempool.h"
+#include "token.h"
 
 enum NodeKind {
   Token,
@@ -38,7 +45,7 @@ enum NodeKind {
 
 class TreeNode {
 public:
-  NodeKind mType;
+  NodeKind mKind;
 public:
   void Dump();
 };
@@ -51,6 +58,8 @@ public:
   void Dump();
 };
 
+class TreeSymbol;
+
 class FunctionNode : public TreeNode {
 public:
   TreeType mRetType;
@@ -60,6 +69,18 @@ public:
 };
 
 class TokenNode : public TreeNode {
+};
+
+////////////////////////////////////////////////////////////////////////
+//                  The AST Tree
+////////////////////////////////////////////////////////////////////////
+
+class ASTTree {
+public:
+  TreePool  mMemPool;
+  TreeNode *mRootNode;
+public:
+
 };
 
 #endif

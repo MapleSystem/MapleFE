@@ -51,7 +51,6 @@ typedef enum {
 //       %1 and %3 are the sub elements in element #2
 // mName  foo
 // mArgs  1, 3
-// mOp    OP_Add
 class RuleAction {
 public:
   const char          *mName;
@@ -60,7 +59,6 @@ public:
 public:
   RuleAction(){}
   RuleAction(const char *name) : mName(name), mOpcode(FEOP_Invalid) {}
-  RuleAction(const char *name, FEOpcode op) : mName(name), mOpcode(op) {}
   ~RuleAction();
 
   void SetName(const char *name) { mName = name; }

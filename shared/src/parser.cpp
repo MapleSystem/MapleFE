@@ -2,10 +2,7 @@
 #include <string>
 #include <cstring>
 
-#include "module.h"
-#include "automata.h"
 #include "parser.h"
-#include "base_gen.h"
 #include "massert.h"
 #include "token.h"
 #include "common_header_autogen.h"
@@ -273,13 +270,6 @@ Parser::Parser(const char *name) : filename(name) {
 
 
 void Parser::Dump() {
-  std::cout << "\n================= Code ===========" << std::endl;
-  if (GetVerbose() >= 3) {
-    for (auto it: mModule->mFuncs) {
-      it->EmitCode();
-    }
-  }
-  std::cout << "==================================" << std::endl;
 }
 
 
