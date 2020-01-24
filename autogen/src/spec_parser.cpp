@@ -241,7 +241,7 @@ bool SPECParser::ParseActionFunc(RuleElem *&elem) {
 
   tk = mLexer->NextToken();
   RuleAction *action = GetAction();
-  elem->mAttr->AddAction(action);
+  elem->mAttr.AddAction(action);
   return true;
 }
 
@@ -553,7 +553,7 @@ bool SPECParser::ParseAttrValidity() {
   if (tk != SPECTK_Validity)
     ParserError("expect validity but get ", mLexer->GetTokenString());
 
-  RuleAttr *attr = mCurrrule->mAttr;
+  RuleAttr *attr = &(mCurrrule->mAttr);
 
   tk = mLexer->NextToken();
   std::vector<RuleAttr *> attrvec;
@@ -571,7 +571,7 @@ bool SPECParser::ParseAttrValidity() {
         ParserError("expect Intconst but get ", mLexer->GetTokenString());
       int i = mLexer->theintval;
 
-      attr = mCurrrule->mElement->mSubElems[i-1]->mAttr;
+      attr = &(mCurrrule->mElement->mSubElems[i-1]->mAttr);
       attrvec.push_back(attr);
       tk = mLexer->NextToken();
       if (tk == SPECTK_Coma)
@@ -606,7 +606,7 @@ bool SPECParser::ParseAttrAction() {
   if (tk != SPECTK_Action)
     ParserError("expect action but get ", mLexer->GetTokenString());
 
-  RuleAttr *attr = mCurrrule->mAttr;
+  RuleAttr *attr = &(mCurrrule->mAttr);
 
   tk = mLexer->NextToken();
   std::vector<RuleAttr *> attrvec;
@@ -624,7 +624,7 @@ bool SPECParser::ParseAttrAction() {
         ParserError("expect Intconst but get ", mLexer->GetTokenString());
       int i = mLexer->theintval;
 
-      attr = mCurrrule->mElement->mSubElems[i-1]->mAttr;
+      attr = &(mCurrrule->mElement->mSubElems[i-1]->mAttr);
       attrvec.push_back(attr);
       tk = mLexer->NextToken();
       if (tk == SPECTK_Coma)

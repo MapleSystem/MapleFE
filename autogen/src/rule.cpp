@@ -201,7 +201,7 @@ void RuleElem::Dump(bool newline) {
       break;
   }
 
-  if (0 && !mAttr->Empty()) {
+  if (0 && !mAttr.Empty()) {
     std::cout << " -- ";
     // Dump Attributes
     DumpAttr();
@@ -215,15 +215,15 @@ void RuleElem::Dump(bool newline) {
 }
 
 void RuleElem::DumpAttr() {
-  mAttr->DumpDataType(0);
-  mAttr->DumpTokenType(0);
-  mAttr->DumpValidity(0);
+  mAttr.DumpDataType(0);
+  mAttr.DumpTokenType(0);
+  mAttr.DumpValidity(0);
   for (int i = 0; i < mSubElems.size(); i++) {
-    mSubElems[i]->mAttr->DumpValidity(i+1);
+    mSubElems[i]->mAttr.DumpValidity(i+1);
   }
-  mAttr->DumpAction(0);
+  mAttr.DumpAction(0);
   for (int i = 0; i < mSubElems.size(); i++) {
-    mSubElems[i]->mAttr->DumpAction(i+1);
+    mSubElems[i]->mAttr.DumpAction(i+1);
   }
 }
 
@@ -261,7 +261,7 @@ void Rule::Dump() {
   if (mElement->mSubElems.size())
     std::cout << ")" << std::endl;
 
-  if (!mAttr->Empty()) {
+  if (!mAttr.Empty()) {
     std::cout << " -- ";
     // Dump Attributes
     DumpAttr();
@@ -271,15 +271,15 @@ void Rule::Dump() {
 }
 
 void Rule::DumpAttr() {
-  mAttr->DumpDataType(0);
-  mAttr->DumpTokenType(0);
-  mAttr->DumpValidity(0);
+  mAttr.DumpDataType(0);
+  mAttr.DumpTokenType(0);
+  mAttr.DumpValidity(0);
   for (int i = 0; i < mElement->mSubElems.size(); i++) {
-    mElement->mSubElems[i]->mAttr->DumpValidity(i+1);
+    mElement->mSubElems[i]->mAttr.DumpValidity(i+1);
   }
-  mAttr->DumpAction(0);
+  mAttr.DumpAction(0);
   for (int i = 0; i < mElement->mSubElems.size(); i++) {
-    mElement->mSubElems[i]->mAttr->DumpAction(i+1);
+    mElement->mSubElems[i]->mAttr.DumpAction(i+1);
   }
 }
 

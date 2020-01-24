@@ -55,16 +55,16 @@ class RuleAction {
 public:
   const char          *mName;
   std::vector<uint8_t> mArgs;
-  FEOpcode             mOpcode;
 public:
   RuleAction(){}
-  RuleAction(const char *name) : mName(name), mOpcode(FEOP_Invalid) {}
+  RuleAction(const char *name) : mName(name){}
   ~RuleAction();
 
   void SetName(const char *name) { mName = name; }
   void AddArg(uint8_t idx) { mArgs.push_back(idx); }
 
-  const char *GetName() { return mName; } const char *GetArg(uint8_t i) { return mArgs[i]; }
+  const char* GetName() { return mName; }
+  const char* GetArg(uint8_t i) { return mArgs[i]; }
 
   void Dump();
 };
@@ -124,13 +124,10 @@ public:
   TK_Kind       mToken;    // record the token for rule like '(' ')' '[' ']' ';' ...
   std::vector<RuleElem *> mSubElems;  // Sub elements. It's empty if mType
                                       // is ET_Rule;
-  RuleAttr     *mAttr;
+  RuleAttr      mAttr;
 public:
-  RuleElem() { mAttr = new RuleAttr(); }
-  RuleElem(Rule *rule) : mType(ET_Rule) {
-    mData.mRule = rule;
-    mAttr = new RuleAttr();
-  }
+  RuleElem() {}
+  RuleElem(Rule *rule) : mType(ET_Rule) { mData.mRule = rule; }
   ~RuleElem();
 
   void SetRuleOp(RuleOp op) {mType = ET_Op; mData.mOp = op;}
@@ -159,14 +156,10 @@ class Rule {
 public:
   const std::string mName;
   RuleElem         *mElement;
-  RuleAttr         *mAttr;
+  RuleAttr          mAttr;
 public:
-  Rule(const std::string &s) : mName(s), mElement(NULL) {
-    mAttr = new RuleAttr();
-  }
-  Rule() : mElement(NULL) {
-    mAttr = new RuleAttr();
-  }
+  Rule(const std::string &s) : mName(s), mElement(NULL) {}
+  Rule() : mElement(NULL) {}
   ~Rule();
 
   void SetName(const std::string &n) {mName = n;}
