@@ -10,23 +10,52 @@
 //
 //                                   ==>
 //
-//
-//    EntryData TblNonZeroDigit_data[9] = {{DT_Char, {.mChar='1'}}, ... {DT_Char, {.mChar='9'}}};
+//    TableData TblNonZeroDigit_data[9] = {{DT_Char, {.mChar='1'}}, ... {DT_Char, {.mChar='9'}}};
 //    RuleTable TblNonZeroDigit = {ET_Oneof, 9, TblNonZeroDigit_data};
 //
 // 2) rule Underscores    : '_' + ZEROORMORE('_')
 //
 //                                   ==>
 //
-//    EntryData TblUnderscores_sub1_data[1] = {{DT_Char, {.mChar='_'}}};
+//    TableData TblUnderscores_sub1_data[1] = {{DT_Char, {.mChar='_'}}};
 //    RuleTable TblUnderscores_sub1 = {ET_Zeroormore, 1, TblUnderscores_sub1_data};
 //
-//    EntryData TblUnderscores_data[2] = {{DT_Char, {.mChar='_'}}, {DT_Subtable, {.mEntry=&TblUnderscores_sub1}}};
+//    TableData TblUnderscores_data[2] = {{DT_Char, {.mChar='_'}}, {DT_Subtable, {.mEntry=&TblUnderscores_sub1}}};
 //    RuleTable TblUnderscores = {ET_Concatenate, 2, TblUnderscores_data};
 //
+//    So look carefully at the RuleTable of a rule, it contains two types: an ET_xxx
+//    and a set of DT_xxx in the data set.
 //
-// So look carefully at the RuleTable of a rule, it contains two types: an ET_xxx
-// and a set of DT_xxx in the data set.
+// 3) If the rule has attr
+//
+//   rule AdditiveExpression : ONEOF(
+//     MultiplicativeExpression,
+//     AdditiveExpression + '+' + MultiplicativeExpression,
+//     AdditiveExpression + '-' + MultiplicativeExpression)
+//     attr.action.%2,%3 : BuildBinaryOperation(%1, %2, %3)
+//
+//                                   ==>
+//
+// TableData TblAdditiveExpression_sub1_data[3] ={{DT_Subtable, &TblAdditiveExpression},
+//                                                {DT_Char, {.mChar='+'}},
+//                                                {DT_Subtable, &TblMultiplicativeExpression}};
+// RuleAction TblAdditiveExpression_sub1_action[1] = {{ACT_BuildBinaryOperation, 1, 2, 3}};
+// RuleTable TblAdditiveExpression_sub1 ={ET_Concatenate, 3, TblAdditiveExpression_sub1_data,
+//                                                        1, &TblAdditiveExpression_sub1_action};
+//
+// TableData TblAdditiveExpression_sub2_data[3] ={{DT_Subtable, &TblAdditiveExpression},
+//                                                {DT_Char, {.mChar='-'}},
+//                                                {DT_Subtable, &TblMultiplicativeExpression}};
+// RuleAction TblAdditiveExpression_sub2_action[1] = {{ACT_BuildBinaryOperation, 1, 2, 3}};
+// RuleTable TblAdditiveExpression_sub2 ={ET_Concatenate, 3, TblAdditiveExpression_sub2_data,
+//                                                        1, &TblAdditiveExpression_sub2_action};
+//
+// TableData TblAdditiveExpression_data[3] ={{DT_Subtable, &TblMultiplicativeExpression},
+//                                           {DT_Subtable, &TblAdditiveExpression_sub1},
+//                                           {DT_Subtable, &TblAdditiveExpression_sub2}};
+// RuleTable TblAdditiveExpression ={ET_Oneof, 3, TblAdditiveExpression_data, 0, NULL};
+
+
 
 // Generate the table name for mRule
 std::string RuleGen::GetTblName(const Rule *rule) {
@@ -173,19 +202,76 @@ void RuleGen::GenDebug(const std::string &rule_table_name) {
   gRuleTableNum++;
 }
 
+// The format of RuleAttr table is like below,
+//   RuleAction TblAdditiveExpression_sub1_action[2] = {
+//           {ACT_BuildBinaryOperation, 3, {1, 2, 3}}, {ACT_XXX, 2, {2, 3}}};
+//
+// For the time being, I'll generate only actions. The validity will be done later
+
+void RuleGen::Gen4RuleAttr(std::string rule_table_name, RuleAttr *attr) {
+  std::string attr_table;
+
+  if (attr->mAction.size() == 0)
+    return;
+
+  attr_table += "RuleAction ";
+  attr_table += rule_table_name;
+  attr_table += "_action[";
+  attr_table += std::to_string(attr->mAction.size());
+  attr_table += "] = {";
+
+  // Add all actions
+  for (unsigned i = 0; i < attr->mAction.size(); i++) {
+    RuleAction *action = attr->mAction[i];
+    // The validity of action->mName should be already checked by the SPECParser
+    attr_table += "{ACT_";
+    attr_table += action->mName;
+    attr_table += ",";
+
+    // the number of element index should be already checked by SPECParser,
+    // it should be <= MAX_ACT_ELEM_NUM
+    attr_table += std::to_string(action->mArgs.size());
+    attr_table += ",";
+
+    // action element
+    attr_table += "{";
+    for (unsigned j = 0; j < action->mArgs.size(); j++) {
+      attr_table += std::to_string(action->mArgs[j]);
+      if (j < action->mArgs.size() - 1)
+        attr_table += ",";
+    }
+    attr_table += "}";
+
+    // end of this action
+    attr_table += "}";
+    if (i < attr->mAction.size() - 1)
+      attr_table += ",";
+  }
+
+  attr_table += "};";
+
+  mCppBuffer->NewOneBuffer(attr_table.size(), true);
+  mCppBuffer->AddStringWholeLine(attr_table);
+}
+
 // Either rule or elem is used.
 // If it's a rule, we are generating for a rule defined in .spec
 // If it's an elem, we are generating a sub table for an elemen,
 //    and the table name has a suffix "_sub".
 void RuleGen::Gen4Table(const Rule *rule, const RuleElem *elem){
   std::string rule_table_name;
+  RuleAttr *attr;
+
   if(rule) {
     rule_table_name = GetTblName(rule);
     elem = rule->mElement;
+    attr = &(rule->mAttr);
   } else {
     rule_table_name = GetSubTblName();
+    attr = &(elem->mAttr);
   }
   
+  Gen4RuleAttr(rule_table_name, attr);
   Gen4TableHeader(rule_table_name);
   GenDebug(rule_table_name);
 
@@ -211,10 +297,20 @@ void RuleGen::Gen4Table(const Rule *rule, const RuleElem *elem){
   rule_table += '{';
 
   // 3. Add the Entry, it contains a type and a set of data
-  //    EntryType, NumOfElem, TableData
+  //    EntryType, NumOfElem, TableData, NumAction, ActionTable
   std::string entrytype = GetEntryTypeName(elem->mType, elem->mData.mOp);
   entrytype = entrytype + ", ";
   rule_table += entrytype + elemnum + ", " + rule_table_data_name;
+  if (attr->mAction.size() > 0) {
+    rule_table += ", ";
+    rule_table += std::to_string(attr->mAction.size());
+    rule_table += ", ";
+    rule_table += rule_table_name;
+    rule_table += "_action";
+  } else {
+    rule_table += ", 0, NULL";
+  }
+
   rule_table += "};";
 
  
@@ -229,8 +325,8 @@ void RuleGen::Gen4Table(const Rule *rule, const RuleElem *elem){
   mCppBuffer->AddStringWholeLine(rule_table_data);
   mCppBuffer->NewOneBuffer(rule_table.size(), true);
   mCppBuffer->AddStringWholeLine(rule_table);
-
 }
+
 // The structure of rule and its sub-rule can be viewed as a tree.
 // We generate tables for rule and its sub-rules in depth first order.
 // 

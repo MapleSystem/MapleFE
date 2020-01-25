@@ -12,3 +12,4 @@
 
 ACTION(BuildBinaryOperation)
 ACTION(BuildAssignment)
+ACTION(BuildReturn)

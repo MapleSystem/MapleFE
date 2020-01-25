@@ -6,6 +6,8 @@
 #ifndef __COMMON_HEADER_AUTOGEN_H__
 #define __COMMON_HEADER_AUTOGEN_H__
 
+#include <cstddef>
+
 #include "ruletable.h"
 #include "gen_reserved.h"
 #include "gen_literal.h"

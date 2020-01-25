@@ -21,18 +21,30 @@ void RuleAction::Dump() {
 //                            RuleAttr                                    //
 ////////////////////////////////////////////////////////////////////////////
 
+RuleAttr::~RuleAttr() {
+  std::vector<RuleAction*>::iterator it = mValidity.begin();
+  for (; it != mValidity.end(); it++) {
+    RuleAction *vld = *it;
+    if (vld)
+      delete vld;
+  }
+  mValidity.clear();
+
+  it = mAction.begin();
+  for (; it != mAction.end(); it++) {
+    RuleAction *act = *it;
+    if (act)
+      delete act;
+  }
+  mAction.clear();
+}
+
 std::string RuleAttr::GetTokenTypeString(TokenType t) {
   switch (t) {
     case TkT_Identifier: return "Identifier";
     case TkT_Literal: return "Literal";
     case TkT_Type: return "Type";
     case TkT_NA: return "NA";
-  }
-}
-
-void RuleAttr::DumpDataType(int i) {
-  if (mDataType) {
-    std::cout << "    attr.datatype : " << mDataType->mName << std::endl;
   }
 }
 
@@ -215,7 +227,6 @@ void RuleElem::Dump(bool newline) {
 }
 
 void RuleElem::DumpAttr() {
-  mAttr.DumpDataType(0);
   mAttr.DumpTokenType(0);
   mAttr.DumpValidity(0);
   for (int i = 0; i < mSubElems.size(); i++) {
@@ -271,7 +282,6 @@ void Rule::Dump() {
 }
 
 void Rule::DumpAttr() {
-  mAttr.DumpDataType(0);
   mAttr.DumpTokenType(0);
   mAttr.DumpValidity(0);
   for (int i = 0; i < mElement->mSubElems.size(); i++) {

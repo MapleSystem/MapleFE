@@ -140,7 +140,7 @@ rule BreakStatement : "break" + ZEROORONE(Identifier) + ';'
 rule ContinueStatement : "continue" + ZEROORONE(Identifier) + ';'
 
 rule ReturnStatement : "return" + ZEROORONE(Expression) + ';'
-  attr.action : GenerateReturnStmt(%1, %2)
+  attr.action : BuildReturn(%2)
 
 rule ThrowStatement : "throw" + Expression + ';'
 

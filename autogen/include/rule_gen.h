@@ -27,6 +27,10 @@ private:
   std::string Gen4RuleElem(const RuleElem*);
   std::string Gen4TableData(const RuleElem*);
 
+  // RuleAttr can be either in Rule or RuleElem in a Rule
+  // This is why there are two parameters, but only one of them will be used.
+  void Gen4RuleAttr(std::string rule_table_name, RuleAttr *attr);
+
   // These are the two major interfaces used by Generate().
   // There are two scenarios they are called:
   //   1. Generate for the current Rule from the .spec

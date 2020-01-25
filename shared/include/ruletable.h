@@ -94,8 +94,10 @@ typedef enum {
 ACT_NA
 }ActionId;
 
-// We give the biggest number of elements in an action to 16
-#define MAX_ACT_ELEM_NUM 16
+// We give the biggest number of elements in an action to 12
+// Please keep this number the same as the one in Autogen. We verify this number
+// in Autogen to make sure it doesn't exceed.
+#define MAX_ACT_ELEM_NUM 12
 
 struct RuleAction {
   ActionId  mId;

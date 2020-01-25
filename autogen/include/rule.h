@@ -58,7 +58,7 @@ public:
 public:
   RuleAction(){}
   RuleAction(const char *name) : mName(name){}
-  ~RuleAction();
+  ~RuleAction() {}
 
   void SetName(const char *name) { mName = name; }
   void AddArg(uint8_t idx) { mArgs.push_back(idx); }
@@ -72,24 +72,21 @@ public:
 // Attributes for Rule and RuleElem
 class RuleAttr {
 public:
-  Rule       *mDataType;
   TokenType   mTokenType;
   std::vector<RuleAction*> mValidity;
   std::vector<RuleAction*> mAction;
 
-  RuleAttr() : mDataType(NULL), mTokenType(TkT_NA) {}
-  RuleAttr(TokenType tt) : mDataType(NULL), mTokenType(tt) {}
-  ~RuleAttr() { delete mDataType; mValidity.clear(); mAction.clear(); }
+  RuleAttr() : mTokenType(TkT_NA) {}
+  RuleAttr(TokenType tt) : mTokenType(tt) {}
+  ~RuleAttr();
 
-  void SetDataType(Rule *r) { mDataType = r; }
   void SetTokentype(TokenType t) { mTokenType = t; }
   void AddValidity(RuleAction *a) { mValidity.push_back(a); }
   void AddAction(RuleAction *a) { mValidity.push_back(a); }
 
   std::string GetTokenTypeString(TokenType);
 
-  bool Empty() { return (mDataType == NULL &&
-                         mTokenType == TkT_NA &&
+  bool Empty() { return (mTokenType == TkT_NA &&
                          mValidity.size() == 0 &&
                          mAction.size() == 0); }
 
