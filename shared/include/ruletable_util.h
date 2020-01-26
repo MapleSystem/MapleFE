@@ -70,18 +70,7 @@ public:
   const char* TraverseIdentifierTable(); //
 };
 
-//////////////////////////////////////////////////////////////////////////////////////////
-//                         Exported Interfaces
-// NOTE: (1) All interfaces will not go the new line.
-//       (2) All interfaces will move the 'curidx' of Lexer right after the target.
-//           They won't move 'curidx' if target is not hit.
-//////////////////////////////////////////////////////////////////////////////////////////
-
-extern SepId       GetSeparator(Lexer*);
-extern OprId       GetOperator(Lexer*);
-extern LitData     GetLiteral(Lexer*);
-extern const char* GetKeyword(Lexer*);
-extern const char* GetIdentifier(Lexer*);
-extern bool        GetComment(Lexer*);
-extern void        PlantTokens(Lexer*); // replace keyword/opr/sep... with tokens
+extern SepId FindSeparator(const char *str, const char c, unsigned &len);
+extern OprId FindOperator(const char *str, const char c, unsigned &len);
+extern const char* FindKeyword(const char *str, const char c, unsigned &len);
 #endif

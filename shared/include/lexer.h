@@ -6,7 +6,9 @@
 #include "element.h"
 #include "tokenkind.h"
 #include "stringpool.h"
+#include "token.h"
 #include "tokenpool.h"
+#include "ruletable.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -64,20 +66,6 @@ class Lexer {
     return;
   }
 
-  void DumpKeywordMap() {
-    int i = 0;
-    std::cout << "keywordmap.size() " << std::dec << keywordmap.size() << std::endl;
-    std::unordered_map<std::string, TK_Kind>::iterator it = keywordmap.begin();
-    for (; it != keywordmap.end(); it++) {
-      std::cout << std::dec << i << " " << std::hex << &(it->first) << " " << it->first << std::endl;
-      i++;
-    }
-  }
-
-  // These are for autogen table testing
-  Token* LexToken();  // always return token until end of file.
-  Token* LexTokenNoNewLine(); // try to get token untile end of line.
-  
   bool EndOfLine() { return curidx == current_line_size; }
   bool EndOfFile() { return endoffile; }
   void SavePos();
@@ -105,17 +93,44 @@ class Lexer {
   void SetVerbose(int l) { verboseLevel = l; }
   int GetVerbose() { return verboseLevel; }
 
-/*
- private:
-  LiteralToken* ProcessLiteralTokenText(LT_Type type, TokenText text);
-*/
-
-  friend class RuleTableWalker;
   friend class Parser;
+
+  // These are for autogen table testing
+  Token* LexToken();  // always return token until end of file.
+  Token* LexTokenNoNewLine(); // try to get token untile end of line.
+
+  ///////////////////////////////////////////////////////////////////////////////////
+  // NOTE: (1) All interfaces will not go the new line.
+  //       (2) All interfaces will move the 'curidx' of Lexer right after the target.
+  //           They won't move 'curidx' if target is not hit.
+  ///////////////////////////////////////////////////////////////////////////////////
+
+  SepId       GetSeparator();
+  OprId       GetOperator();
+  LitData     GetLiteral();
+  const char* GetKeyword();
+  const char* GetIdentifier();
+  bool        GetComment();
+
+  // replace keyword/opr/sep... with tokens
+  void PlantTokens();
+  void PlantTraverseRuleTable(RuleTable*);
+  void PlantTraverseTableData(TableData*);
+
+  //
+  Token* FindSeparatorToken(SepId id);
+  Token* FindOperatorToken(OprId id);
+  Token* FindKeywordToken(char *key);
+  Token* FindCommentToken();
 };
 
 inline bool IsVarName(TK_Kind tk) {
   return tk == TK_Name;
 }
+
+// This is language specific function. Please implement this in LANG/src,
+// such as java/src/lang_spec.cpp
+
+extern LitData ProcessLiteral(LT_Type type, const char *str);
 
 #endif  // INCLUDE_LEXER_H

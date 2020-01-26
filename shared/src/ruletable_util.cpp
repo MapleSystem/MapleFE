@@ -10,16 +10,12 @@
 //                Utility Functions to walk tables
 ////////////////////////////////////////////////////////////////////////////////////
 
-extern Token* FindSeparatorToken(Lexer*, SepId);
-extern Token* FindOperatorToken(Lexer*, OprId);
-extern Token* FindKeywordToken(Lexer*, char*);
-
 // Return the separator ID, if it's. Or SEP_NA.
 //        len : length of matching text.
 // Only one of 'str' or 'c' will be valid.
 //
 // Assumption: Table has been sorted by length.
-static SepId TraverseSepTable_core(const char *str, const char c, unsigned &len) {
+SepId FindSeparator(const char *str, const char c, unsigned &len) {
   std::string text;
   if (str)
     text = str;
@@ -42,7 +38,7 @@ static SepId TraverseSepTable_core(const char *str, const char c, unsigned &len)
 // Only one of 'str' or 'c' will be valid.
 //
 // Assumption: Table has been sorted by length.
-static OprId TraverseOprTable_core(const char *str, const char c, unsigned &len) {
+OprId FindOperator(const char *str, const char c, unsigned &len) {
   std::string text;
   if (str)
     text = str;
@@ -65,7 +61,7 @@ static OprId TraverseOprTable_core(const char *str, const char c, unsigned &len)
 // Only one of 'str' or 'c' will be valid.
 //
 // Assumption: Table has been sorted by length.
-static const char* TraverseKeywordTable_core(const char *str, const char c, unsigned &len) {
+const char* FindKeyword(const char *str, const char c, unsigned &len) {
   std::string text;
   if (str)
     text = str;
@@ -446,7 +442,7 @@ bool RuleTableWalker::Traverse(const RuleTable *rule_table) {
 //   if possible.
 SepId RuleTableWalker::TraverseSepTable() {
   unsigned len = 0;
-  SepId id = TraverseSepTable_core(mLexer->line + mLexer->curidx, 0, len);
+  SepId id = FindSeparator(mLexer->line + mLexer->curidx, 0, len);
   if (id != SEP_NA) {
     mLexer->curidx += len;
     return id;
@@ -459,7 +455,7 @@ SepId RuleTableWalker::TraverseSepTable() {
 //   if possible.
 OprId RuleTableWalker::TraverseOprTable() {
   unsigned len = 0;
-  OprId id = TraverseOprTable_core(mLexer->line + mLexer->curidx, 0, len);
+  OprId id = FindOperator(mLexer->line + mLexer->curidx, 0, len);
   if (id != OPR_NA) {
     mLexer->curidx += len;
     return id;
@@ -470,7 +466,7 @@ OprId RuleTableWalker::TraverseOprTable() {
 // Return the keyword name, or else NULL.
 const char* RuleTableWalker::TraverseKeywordTable() {
   unsigned len = 0;
-  const char *addr = TraverseKeywordTable_core(mLexer->line + mLexer->curidx, 0, len);
+  const char *addr = FindKeyword(mLexer->line + mLexer->curidx, 0, len);
   if (addr) {
     unsigned saved_curidx = mLexer->curidx;
 
@@ -487,255 +483,5 @@ const char* RuleTableWalker::TraverseKeywordTable() {
     }
   }
   return NULL;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-//                 Implementation of External Interfaces                      //
-////////////////////////////////////////////////////////////////////////////////
-
-// Returen the separator ID, if it's. Or SEP_NA.
-SepId GetSeparator(Lexer *lex) {
-  RuleTableWalker walker(NULL, lex);
-  return walker.TraverseSepTable();
-}
-
-// Returen the operator ID, if it's. Or OPR_NA.
-OprId GetOperator(Lexer *lex) {
-  RuleTableWalker walker(NULL, lex);
-  return walker.TraverseOprTable();
-}
-
-// keyword string was put into StringPool by walker.TraverseKeywordTable().
-const char* GetKeyword(Lexer *lex) {
-  RuleTableWalker walker(NULL, lex);
-  const char *addr = walker.TraverseKeywordTable();
-  return addr;
-}
-
-// identifier string was put into StringPool.
-// NOTE: Identifier table is always Hard Coded as TblIdentifier.
-const char* GetIdentifier(Lexer *lex) {
-  RuleTableWalker walker(&TblIdentifier, lex);
-  unsigned old_pos = lex->GetCuridx();
-  bool found = walker.Traverse(&TblIdentifier);
-  if (found) {
-    unsigned len = lex->GetCuridx() - old_pos;
-    MASSERT(len > 0 && "found token has 0 data?");
-    std::string s(lex->GetLine() + old_pos, len);
-    const char *addr = lex->mStringPool.FindString(s);
-    return addr;
-  } else {
-    lex->SetCuridx(old_pos);
-    return NULL;
-  }
-}
-
-// NOTE: Literal table is TblLiteral.
-//
-// Literal rules are special, an element of the rules may be a char, or a string, and they
-// are not followed by separators. They may be followed by another char or string. So we
-// don't check if the following is a separator or not.
-LitData GetLiteral(Lexer *lex) {
-  RuleTableWalker walker(&TblLiteral, lex);
-  walker.mCheckSeparator = false;
-
-  unsigned old_pos = lex->GetCuridx();
-
-  LitData ld;
-  ld.mType = LT_NA;
-  bool found = walker.Traverse(&TblLiteral);
-  if (found) {
-    unsigned len = lex->GetCuridx() - old_pos;
-    MASSERT(len > 0 && "found token has 0 data?");
-    std::string s(lex->GetLine() + old_pos, len);
-    const char *addr = lex->mStringPool.FindString(s);
-    // We just support integer token right now. Value is put in LitData.mData.mStr
-    ld = ProcessLiteral(LT_IntegerLiteral, addr);
-  } else {
-    lex->SetCuridx(old_pos);
-  }
-
-  return ld;
-}
-
-// For comments we are not going to generate rule tables since the most common comment
-// grammar are used widely in almost every language. So we decided to have a common
-// implementation here. In case any language has specific un-usual grammar, they can
-// have their own implementation.
-//
-// The two common comments are
-//  (1) //
-//      This is the end of line
-//  (2) /* .. */
-//      This is the traditional comments
-//
-// Return true if a comment is read. The contents are ignore.
-bool GetComment(Lexer *lex) {
-  if (lex->line[lex->curidx] == '/' && lex->line[lex->curidx+1] == '/') {
-    lex->curidx = lex->current_line_size;
-    return true;
-  }
-
-  // Handle comments in /* */
-  // If there is a /* without ending */, the rest of code until the end of the current
-  // source file will be treated as comment.
-  if (lex->line[lex->curidx] == '/' && lex->line[lex->curidx+1] == '*') {
-    lex->curidx += 2; // skip /*
-    bool get_ending = false;  // if we get the ending */
-
-    // the while loop stops only at either (1) end of file (2) finding */
-    while (1) {
-      if (lex->curidx == lex->current_line_size) {
-        if (lex->ReadALine() < 0)
-          return true;
-        lex->_linenum++;  // a new line read.
-      }
-      if ((lex->line[lex->curidx] == '*' && lex->line[lex->curidx+1] == '/')) {
-        get_ending = true;
-        lex->curidx += 2;
-        break;
-      }
-      lex->curidx++;
-    }
-    return true;
-  }
-
-  return false;
-}
-
-////////////////////////////////////////////////////////////////////////////////////
-//                       Plant Tokens in Rule Tables
-//
-// RuleTable's are generated by Autogen, at that time there is no Token.
-// However, during language parsing we are using tokens from lexer. So it's
-// more efficient if the rule tables can have tokens embeded during the traversing
-// and matching process.
-//
-// One point to notice is this Planting process is a traversal of rule tables. It's
-// better that we start from the root of the trees. Or there many be several roots.
-// This has to be compliant with the Parser::Parse().
-//
-// NOTE: Here and right now, we take TblStatement as the only root. This is subject
-//       to change.
-//
-////////////////////////////////////////////////////////////////////////////////////
-
-// All rules form many cycles. Don't want to visit them for the second time.
-static std::vector<RuleTable *> visited;
-static bool IsVisited(RuleTable *table) {
-  std::vector<RuleTable *>::iterator it;
-  for (it = visited.begin(); it != visited.end(); it++) {
-    if (table == *it)
-      return true;
-  }
-  return false;
-}
-
-// The traversal is very simple depth first.
-static void PlantTraverseRuleTable(RuleTable *table, Lexer *lex);
-
-static void PlantTraverseTableData(TableData *data, Lexer *lex) {
-  switch (data->mType) {
-  case DT_Char: {
-    unsigned len = 0;
-    // 1. Try separator.
-    SepId sid = TraverseSepTable_core(NULL, data->mData.mChar, len);
-    if (sid != SEP_NA) {
-      Token *token = FindSeparatorToken(lex, sid);
-      data->mType = DT_Token;
-      data->mData.mToken = token;
-      //std::cout << "In Plant 1, plant token " << token << std::endl;
-      return;
-    }
-    // 2. Try operator.
-    OprId oid = TraverseOprTable_core(NULL, data->mData.mChar, len);
-    if (oid != OPR_NA) {
-      Token *token = FindOperatorToken(lex, oid);
-      data->mType = DT_Token;
-      data->mData.mToken = token;
-      //std::cout << "In Plant 2, plant token " << token << std::endl;
-      return;
-    }
-    // 3. Try keyword.
-    //    Don't need try keyword since there is no one-character keyword
-    break;
-  }
-
-  //
-  case DT_String: {
-    unsigned len = 0;
-    // 1. Try separator.
-    SepId sid = TraverseSepTable_core(data->mData.mString, 0, len);
-    if (sid != SEP_NA) {
-      Token *token = FindSeparatorToken(lex, sid);
-      data->mType = DT_Token;
-      data->mData.mToken = token;
-      //std::cout << "In Plant 3, plant token " << token << std::endl;
-      return;
-    }
-    // 2. Try operator.
-    OprId oid = TraverseOprTable_core(data->mData.mString, 0, len);
-    if (oid != OPR_NA) {
-      Token *token = FindOperatorToken(lex, oid);
-      data->mType = DT_Token;
-      data->mData.mToken = token;
-      //std::cout << "In Plant 4, plant token " << token << std::endl;
-      return;
-    }
-    // 3. Try keyword.
-    //    Need to make sure string is put in Lexer::StringPool, a request of
-    //    FindKeywordToken(lex, key);
-    char *key = TraverseKeywordTable_core(data->mData.mString, 0, len);
-    if (key) {
-      key = lex->mStringPool.FindString(key);
-      Token *token = FindKeywordToken(lex, key);
-      data->mType = DT_Token;
-      data->mData.mToken = token;
-      //std::cout << "In Plant 5, plant token " << token << std::endl;
-      return;
-    }
-    break;
-  }
-
-  case DT_Subtable: {
-    RuleTable *t = data->mData.mEntry;
-    PlantTraverseRuleTable(t, lex);
-  }
-
-  case DT_Type:
-  case DT_Token:
-  case DT_Null:
-  default:
-    break;
-  }
-}
-
-// The traversal is very simple depth first.
-static void PlantTraverseRuleTable(RuleTable *table, Lexer *lex) {
-  if (IsVisited(table))
-    return;
-  else
-    visited.push_back(table);
-
-  switch (table->mType) {
-  case ET_Data:
-  case ET_Oneof:
-  case ET_Zeroormore:
-  case ET_Zeroorone:
-  case ET_Concatenate: {
-    for (unsigned i = 0; i < table->mNum; i++) {
-      TableData *data = table->mData + i;
-      PlantTraverseTableData(data, lex);
-    }
-    break;
-  }
-  case ET_Null:
-  default:
-    break;
-  }
-}
-
-void PlantTokens(Lexer *lex) {
-  PlantTraverseRuleTable(&TblStatement, lex);
 }
 
