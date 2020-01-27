@@ -122,6 +122,22 @@ class Lexer {
   Token* FindOperatorToken(OprId id);
   Token* FindKeywordToken(char *key);
   Token* FindCommentToken();
+
+  // Traverse the rule table
+  bool mCheckSeparator; // When we start walk a rule table to find a token,
+                        // do we need check if the following data is a separator?
+  // It returns true : if RuleTable is met
+  //           false : if failed
+  // The found token's string is saved at mText, length at mLen. The string is already
+  // put in the string pool.
+  bool        Traverse(const RuleTable*);
+  bool        TraverseTableData(TableData*);
+  bool        TraverseSecondTry(const RuleTable*);  // See comments in the implementation.
+
+  SepId       TraverseSepTable();        // Walk the separator table
+  OprId       TraverseOprTable();        // Walk the operator table
+  const char* TraverseKeywordTable();    //
+  const char* TraverseIdentifierTable(); //
 };
 
 inline bool IsVarName(TK_Kind tk) {

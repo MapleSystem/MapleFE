@@ -69,6 +69,7 @@ Lexer::Lexer()
     _linenum(0) {
       seencomments.clear();
       keywordmap.clear();
+      mCheckSeparator = true;
 
 #define KEYWORD(S, T, I)      \
   {                           \
@@ -348,29 +349,25 @@ Token* Lexer::LexTokenNoNewLine(void) {
 
 // Returen the separator ID, if it's. Or SEP_NA.
 SepId Lexer::GetSeparator() {
-  RuleTableWalker walker(NULL, this);
-  return walker.TraverseSepTable();
+  return TraverseSepTable();
 }
 
 // Returen the operator ID, if it's. Or OPR_NA.
 OprId Lexer::GetOperator() {
-  RuleTableWalker walker(NULL, this);
-  return walker.TraverseOprTable();
+  return TraverseOprTable();
 }
 
 // keyword string was put into StringPool by walker.TraverseKeywordTable().
 const char* Lexer::GetKeyword() {
-  RuleTableWalker walker(NULL, this);
-  const char *addr = walker.TraverseKeywordTable();
+  const char *addr = TraverseKeywordTable();
   return addr;
 }
 
 // identifier string was put into StringPool.
 // NOTE: Identifier table is always Hard Coded as TblIdentifier.
 const char* Lexer::GetIdentifier() {
-  RuleTableWalker walker(&TblIdentifier, this);
   unsigned old_pos = GetCuridx();
-  bool found = walker.Traverse(&TblIdentifier);
+  bool found = Traverse(&TblIdentifier);
   if (found) {
     unsigned len = GetCuridx() - old_pos;
     MASSERT(len > 0 && "found token has 0 data?");
@@ -389,14 +386,13 @@ const char* Lexer::GetIdentifier() {
 // are not followed by separators. They may be followed by another char or string. So we
 // don't check if the following is a separator or not.
 LitData Lexer::GetLiteral() {
-  RuleTableWalker walker(&TblLiteral, this);
-  walker.mCheckSeparator = false;
+  mCheckSeparator = false;
 
   unsigned old_pos = GetCuridx();
 
   LitData ld;
   ld.mType = LT_NA;
-  bool found = walker.Traverse(&TblLiteral);
+  bool found = Traverse(&TblLiteral);
   if (found) {
     unsigned len = GetCuridx() - old_pos;
     MASSERT(len > 0 && "found token has 0 data?");
@@ -407,6 +403,8 @@ LitData Lexer::GetLiteral() {
   } else {
     SetCuridx(old_pos);
   }
+
+  mCheckSeparator = true;
 
   return ld;
 }
@@ -454,6 +452,404 @@ bool Lexer::GetComment() {
   }
 
   return false;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//           Traverse The Rule Tables during Lexing
+//
+// Traverse the rule table by reading tokens through lexer.
+// Sub Tables are traversed recursively.
+//
+// It returns true : if RuleTable is met
+//           false : if failed
+//
+// The curidx will move if we successfully found something. So the string
+// of found token can be obtained by the difference of 'new' and 'old' curidx.
+//
+//  ======================= About Second Try ============================
+//
+// According to the spec of some languages, e.g. Java. It has productions for Hex
+// numerals as below.
+//
+// rule HexDigitOrUnderscore : ONEOF(HexDigit, '_')
+// rule HexDigitsAndUnderscores:HexDigitOrUnderscore + ZEROORMORE(HexDigitOrUnderscore)
+// rule HexDigits  : ONEOF(HexDigit,
+//             ------->    HexDigit + ZEROORONE(HexDigitsAndUnderscores) + HexDigit)
+//
+// The problem comes from the line pointed by arrow. Look at the ZEROORONE(...),
+// it's easy to see that for a string like "123", ZEROORONE(...) will eat up all the
+// characters until the end of string. Which means the third element, or the HexDigit
+// at the end will never get a chance to match.
+//
+// So we come up with a second try. The idea is simple, we want to try a second time.
+// [NOTE] we only handle the case where the production has the following patten,
+//           ... + ZEROORONE(...) + LASTELEMENT  or
+//           ... + ZEROORMOREE(...) + LASTELEMENT
+// [NOTE] We handle only one ZEROORMORE or ZEROORONE case.
+//
+// The algorithm is a loop walking on the line, starting at curidx.
+// Suppose it's saved at init_idx.
+//   1. We skip ZEROORXXX and try to match LAST_ELEMENT. Suppose the starting index is
+//      saved as start_idx
+//   2. If success, we continue matching line[init_idx, start_idx] against ZEROORXXX
+//   3. if success again, we move start_idx by one, repeat step 1.
+// This is just a rough idea. Many border conditions will be checked while walking.
+///////////////////////////////////////////////////////////////////////////////////
+
+
+// The Lexer cursor moves if found target, or restore the original location.
+bool Lexer::TraverseTableData(TableData *data) {
+  unsigned old_pos = curidx;
+  bool found = false;
+
+  switch (data->mType) {
+
+  // The first thinking is I also want to check if the next text after 'curidx' is a separtor
+  // or operator.
+  //
+  // This is the case in parsing a DT_String. However, we have many rules handling DT_Char
+  // and they don't expect the following to be a separator. For example, the DecimalNumeral rule
+  // specifies its content char by char, so in this case we don't check if the next is a separator.
+  case DT_Char:
+    if(*(line + curidx) == data->mData.mChar) {
+      curidx += 1;
+      found = true;
+    }
+    break;
+
+  case DT_String:
+    if( !strncmp(line + curidx, data->mData.mString, strlen(data->mData.mString))) {
+      // Need to make sure the following text is a separator
+      curidx += strlen(data->mData.mString);
+      if (mCheckSeparator && (TraverseSepTable() != SEP_NA) && (TraverseOprTable() != OPR_NA)) {
+        // TraverseSepTable() moves 'curidx', need restore it
+        curidx = old_pos + strlen(data->mData.mString);
+        // Put into StringPool
+        mStringPool.FindString(data->mData.mString);
+        found = true;
+      } else {
+        found = true;
+      }
+    }
+
+    // If not found, restore curidx
+    if (!found)
+      curidx = old_pos;
+
+    break;
+
+  // Only separator, operator, keywords are planted as DT_Token. During Lexing, these 3 types
+  // are processed through traversing the 3 arrays: SeparatorTable, OperatorTable, KeywordTable.
+  // So this case won't be hit during Lex. We just ignore it.
+  //
+  // However, it does hit this case during matching. We will handle this case in matching process.
+  case DT_Token:
+    break;
+
+  case DT_Type:
+    break;
+
+  case DT_Subtable: {
+    RuleTable *t = data->mData.mEntry;
+    found = Traverse(t);
+
+    if (!found)
+      curidx = old_pos;
+
+    break;
+  }
+
+  case DT_Null:
+  default:
+    break;
+  }
+
+  return found;
+}
+
+static bool IsZeroorxxxTableData (const TableData *td) {
+  bool is_zero_xxx = false;
+  switch (td->mType) {
+  case DT_Subtable: {
+    const RuleTable *t = td->mData.mEntry;
+    EntryType type = t->mType;
+    if ((type == ET_Zeroorone) || (type == ET_Zeroormore))
+      is_zero_xxx = true;
+    break;
+  }
+  default:
+    break;
+  }
+  return is_zero_xxx;
+}
+
+bool Lexer::TraverseSecondTry(const RuleTable *rule_table) {
+  // save the status
+  char *old_line = line;
+  unsigned old_pos = curidx;
+
+  bool need_try = false;
+
+  EntryType type = rule_table->mType;
+  MASSERT((type == ET_Concatenate) && "Wrong entry type of table.");
+
+  // Step 1. We only handle pattens ending with ... + ZEROORXXX(...) + YYY
+  //         Anything else will return false.
+  //         So I'll check the condition.
+  unsigned i = 0;
+  for (; i < rule_table->mNum; i++) {
+    TableData *data = rule_table->mData + i;
+    if (IsZeroorxxxTableData(data))
+      break;
+  }
+  if (i == rule_table->mNum - 2)
+    need_try = true;
+
+  if (!need_try)
+    return false;
+
+  i = 0;
+  bool found = false;
+
+  // step 2. Let the parts before the ending to finish.
+  //         If those fail, we don't need go on.
+  for (; i < rule_table->mNum - 2; i++) {
+    TableData *data = rule_table->mData + i;
+    found = TraverseTableData(data);
+    if (!found)
+      break;
+  }
+  if (!found)
+    return false;
+
+  // step 3. The working loop.
+  //         NOTE: 1. We are lucky here since it's lexing, so don't need cross the line.
+  //               2. curidx points to the part for the ending two element.
+  //               3. We need find the longest match.
+
+  // These four are the final result if success.
+  // [NOTE] The reason I use 'the one after' as xxx_end, is to check if TraverseTableData()
+  // really moves the curidx. Or in another word, if it matches anything or nother.
+  // If it matches something, xxx_end will be greater than xxx_start, or else they are equal.
+  unsigned yyy_start = curidx;
+  unsigned yyy_end = 0;             // the one after last char
+  unsigned zeroxxx_start = curidx;  // A fixed index
+  unsigned zeroxxx_end = 0;         // the one after last char
+
+  // These four are the working result.
+  unsigned w_yyy_start = curidx;
+  unsigned w_yyy_end = 0;             // the one after last char
+  unsigned w_zeroxxx_start = curidx;  // A fixed index
+  unsigned w_zeroxxx_end = 0;         // the one after last char,
+
+  TableData *zeroxxx = rule_table->mData + i;
+  TableData *yyy = rule_table->mData + (i + 1);
+
+  found = false;
+
+  while (1) {
+    // step 3.1 try yyy first.
+    line = old_line;
+    curidx = w_yyy_start;
+
+    bool temp_found = TraverseTableData(yyy);
+    if (!temp_found)
+      break;
+    else
+      w_yyy_end = curidx;
+
+    // step 3.2 try zeroxxx
+    //          Have to build a line for the lexer.
+    unsigned len = w_yyy_start - w_zeroxxx_start;
+    if (len) {
+      char *newline = (char*)malloc(len);
+      strncpy(newline, line + w_zeroxxx_start, len);
+      line = newline;
+      curidx = 0;
+
+      // 1. It always get true since it's a zeroxxx
+      // 2. It may match nothing, meaning curidx never get a chance to move one step.
+      temp_found = TraverseTableData(zeroxxx);
+      MASSERT(temp_found && "Zeroxxx didn't return true.");
+      free(newline);
+
+      w_zeroxxx_end = curidx;
+    }
+
+    // step 3.3 Need check if zeroxxx_end is connected to yyy_start
+    if ((w_zeroxxx_end + zeroxxx_start) == w_yyy_start) {
+      found = true;
+      yyy_start = w_yyy_start;
+      yyy_end = w_yyy_end;
+      //zeroxxx_start = w_zeroxxx_start; It's a fixed number
+      zeroxxx_end = w_zeroxxx_end;
+    } else
+      break;
+
+    // move yyy start one step
+    w_yyy_start++;
+  }
+
+  // adjust the status
+  if (found) {
+    line = old_line;
+    curidx = yyy_end;
+    return true;
+  } else {
+    line = old_line;
+    curidx = old_pos;
+    return false;
+  }
+}
+
+bool Lexer::Traverse(const RuleTable *rule_table) {
+  bool matched = false;
+
+  // save the original location
+  unsigned old_pos = curidx;
+
+  // Look into rule_table's data
+  EntryType type = rule_table->mType;
+
+  switch(type) {
+  case ET_Oneof: {
+    // We need find the longest match.
+    bool found = false;
+    unsigned new_pos = curidx;
+    for (unsigned i = 0; i < rule_table->mNum; i++) {
+      TableData *data = rule_table->mData + i;
+      bool temp_found = TraverseTableData(data);
+      if (temp_found) {
+        found = true;
+        if (curidx > new_pos)
+          new_pos = curidx;
+        // Need restore curidx for the next try.
+        curidx = old_pos;
+      }
+    }
+    curidx = new_pos;
+    matched = found; 
+    break;
+  }
+
+  // Lexer moves until hit a NON-target data
+  // It always return true because it doesn't matter how many target hit.
+  case ET_Zeroormore: {
+    matched = true;
+    while(1) {
+      bool found = false;
+      for (unsigned i = 0; i < rule_table->mNum; i++) {
+        TableData *data = rule_table->mData + i;
+        found = found | TraverseTableData(data);
+        // The first element is hit, then we restart the loop.
+        if (found)
+          break;
+      }
+      if (!found)
+        break;
+    }
+    break;
+  }
+
+  // It always matched. The lexer will stop after it zeor or at most one target
+  case ET_Zeroorone: {
+    matched = true;
+    bool found = false;
+    for (unsigned i = 0; i < rule_table->mNum; i++) {
+      TableData *data = rule_table->mData + i;
+      found = TraverseTableData(data);
+      // The first element is hit, then stop.
+      if (found)
+        break;
+    }
+    break;
+  }
+
+  // Lexer needs to find all elements, and in EXACTLY THE ORDER as defined.
+  case ET_Concatenate: {
+    bool found = false;
+    for (unsigned i = 0; i < rule_table->mNum; i++) {
+      TableData *data = rule_table->mData + i;
+      found = TraverseTableData(data);
+      // The first element missed, then we stop.
+      if (!found)
+        break;
+    }
+
+    if (!found) {
+      curidx = old_pos;
+      found = TraverseSecondTry(rule_table);
+    }
+
+    matched = found;
+    break;
+  }
+
+  // Next table
+  case ET_Data: {
+    break;
+  }
+
+  case ET_Null:
+  default: {
+    break;
+  }
+  }
+
+  if(matched) {
+    return true;
+  } else {
+    curidx = old_pos;
+    return false;
+  }
+}
+
+// Return the separator ID, if it's. Or SEP_NA.
+// Assuming the separator table has been sorted so as to catch the longest separator
+//   if possible.
+SepId Lexer::TraverseSepTable() {
+  unsigned len = 0;
+  SepId id = FindSeparator(line + curidx, 0, len);
+  if (id != SEP_NA) {
+    curidx += len;
+    return id;
+  }
+  return SEP_NA;
+}
+
+// Returen the operator ID, if it's. Or OPR_NA.
+// Assuming the operator table has been sorted so as to catch the longest separator
+//   if possible.
+OprId Lexer::TraverseOprTable() {
+  unsigned len = 0;
+  OprId id = FindOperator(line + curidx, 0, len);
+  if (id != OPR_NA) {
+    curidx += len;
+    return id;
+  }
+  return OPR_NA;
+}
+
+// Return the keyword name, or else NULL.
+const char* Lexer::TraverseKeywordTable() {
+  unsigned len = 0;
+  const char *addr = FindKeyword(line + curidx, 0, len);
+  if (addr) {
+    unsigned saved_curidx = curidx;
+
+    // It's a keyword only if the following is a separator
+    curidx += len;
+    if (TraverseSepTable() != SEP_NA) {
+      // TraverseSepTable() moves 'curidx', need move it back to after keyword
+      curidx = saved_curidx + len;
+      addr = mStringPool.FindString(addr);
+      return addr;
+    } else {
+      // failed, restore curidx
+      curidx = saved_curidx;
+    }
+  }
+  return NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////

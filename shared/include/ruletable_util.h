@@ -41,35 +41,6 @@ public:
   virtual bool IsVariable();
 };
 
-// The rule tables are organized as trees. RuleTableWalker provides a set of functions to
-// traverse the trees.
-class Lexer;
-class RuleTableWalker {
-public:
-  const RuleTable *mTable;
-  Lexer           *mLexer;
-  unsigned         mTokenNum;       // Matched token number
-  bool             mCheckSeparator; // When we start walk a rule table to find a token,
-                                    // do we need check if the following data is a separator?
-public:
-  RuleTableWalker(const RuleTable *, Lexer *);
-  ~RuleTableWalker(){}
-
-  // Given mLexer and mTable, we can start walking on the RuleTable.
-  // It returns true : if RuleTable is met
-  //           false : if failed
-  // The found token's string is saved at mText, length at mLen. The string is already
-  // put in the string pool. 
-  bool        Traverse(const RuleTable*);
-  bool        TraverseTableData(TableData*);
-  bool        TraverseSecondTry(const RuleTable*);  // See comments in the implementation.
-
-  SepId       TraverseSepTable();        // Walk the separator table
-  OprId       TraverseOprTable();        // Walk the operator table
-  const char* TraverseKeywordTable();    //
-  const char* TraverseIdentifierTable(); //
-};
-
 extern SepId FindSeparator(const char *str, const char c, unsigned &len);
 extern OprId FindOperator(const char *str, const char c, unsigned &len);
 extern const char* FindKeyword(const char *str, const char c, unsigned &len);
