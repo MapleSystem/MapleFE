@@ -12,78 +12,44 @@ Separator  Token:  Whitespace
 Integer Literal Token: 0
 Separator  Token:  Semicolon
 =======  Dump SortOut =======  
-[1] Table TblStatement: 2,
-[2] Table TblLocalVariableDeclarationStatement: 3,4,
-[3] Table TblLocalVariableDeclaration: 5,6,
+[1] Table TblStatement@0: 2,
+[2] Table TblLocalVariableDeclarationStatement@0: 3,4,
+[3] Table TblLocalVariableDeclaration@0: 5,6,
 [4] Token
-[5] Table TblLocalVariableType: 7,
-[6] Table TblVariableDeclaratorList: 8,9,
-[7] Table TblUnannType: 10,
-[8] Table TblVariableDeclarator: 11,
-[9] Table TblVariableDeclaratorList_sub1: 12,
-[10] Table TblUnannPrimitiveType: 13,
-[11] Table TblVariableDeclaratorId: 14,
-[12] Table TblVariableDeclaratorList_sub2: 15,16,
-[13] Table TblNumericType: 17,
+[5] Table TblLocalVariableType@0: 7,
+[6] Table TblVariableDeclaratorList@1: 8,9,
+[7] Table TblUnannType@0: 10,
+[8] Table TblVariableDeclarator@1: 11,
+[9] Table TblVariableDeclaratorList_sub1@2: 12,
+[10] Table TblUnannPrimitiveType@0: 13,
+[11] Table TblVariableDeclaratorId@1: 14,
+[12] Table TblVariableDeclaratorList_sub2@2: 15,16,
+[13] Table TblNumericType@0: 17,
 [14] Token
 [15] Token
-[16] Table TblVariableDeclarator: 18,
-[17] Table TblIntType: 19,
-[18] Table TblVariableDeclaratorId: 20,
+[16] Table TblVariableDeclarator@3: 18,
+[17] Table TblIntType@0: 19,
+[18] Table TblVariableDeclaratorId@3: 20,
 [19] Token
 [20] Token
 Matched 5 tokens.
-Warning: Multiple succ children
-Warning: Multiple succ children
-Warning: Multiple succ children
-Warning: Multiple succ children
 =======  Dump SortOut =======  
-[21] Table TblStatement: 22,
-[22] Table TblStatementWithoutTrailingSubstatement: 23,
-[23] Table TblExpressionStatement: 24,25,
-[24] Table TblStatementExpression: 26,
+[21] Table TblStatement@5: 22,
+[22] Table TblStatementWithoutTrailingSubstatement@5: 23,
+[23] Table TblExpressionStatement@5: 24,25,
+[24] Table TblStatementExpression@5: 26,
 [25] Token
-[26] Table TblAssignment: 27,28,29,
-[27] Table TblLeftHandSide: 30,31,
-[28] Table TblAssignmentOperator: 32,
-[29] Table TblExpression: 33,34,35,36,37,
-[30] Table TblExpressionName: 38,
-[31] Table TblArrayAccess: 
-[32] Token
-[33] Table TblPrimary: 39,
-[34] Table TblUnaryExpression: 40,
-[35] Table TblBinaryExpression: 41,42,43,44,45,46,47,48,49,50,
-[36] Table TblConditionalExpression: 51,
-[37] Table TblAssignmentExpression: 52,
-[38] Token
-[39] Table TblPrimaryNoNewArray: 53,54,
-[40] Table TblUnaryExpressionNotPlusMinus: 55,
-[41] Table TblMultiplicativeExpression: 56,
-[42] Table TblAdditiveExpression: 57,
-[43] Table TblShiftExpression: 58,
-[44] Table TblRelationalExpression: 59,
-[45] Table TblEqualityExpression: 60,
-[46] Table TblAndExpression: 61,
-[47] Table TblExclusiveOrExpression: 62,
-[48] Table TblInclusiveOrExpression: 63,
-[49] Table TblConditionalAndExpression: 64,
-[50] Table TblConditionalOrExpression: 65,
-[51] Table TblConditionalOrExpression: 
-[52] Table TblConditionalExpression: 
-[53] Token
-[54] Table TblArrayAccess: 66,
-[55] Table TblPostfixExpression: 67,
-[56] Table TblUnaryExpression: 
-[57] Table TblMultiplicativeExpression: 
-[58] Table TblAdditiveExpression: 
-[59] Table TblShiftExpression: 
-[60] Table TblRelationalExpression: 
-[61] Table TblEqualityExpression: 
-[62] Table TblAndExpression: 
-[63] Table TblExclusiveOrExpression: 
-[64] Table TblInclusiveOrExpression: 
-[65] Table TblConditionalAndExpression: 
-[66] Table TblArrayAccess_sub3: 68,
-[67] Table TblPrimary: 
-[68] Table TblPrimaryNoNewArray: 
+[26] Table TblAssignment@5: 27,28,29,
+[27] Table TblLeftHandSide@5: 30,
+[28] Table TblAssignmentOperator@6: 31,
+[29] Table TblExpression@7: 32,
+[30] Table TblExpressionName@5: 33,
+[31] Token
+[32] Table TblPrimary@7: 34,
+[33] Token
+[34] Table TblPrimaryNoNewArray@7: 35,36,
+[35] Token
+[36] Table TblArrayAccess@7: 37,
+[37] Table TblArrayAccess_sub3@7: 38,
+[38] Table TblPrimaryNoNewArray@7: WasSucc
 Matched 9 tokens.

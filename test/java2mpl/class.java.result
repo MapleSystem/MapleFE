@@ -9,25 +9,25 @@ Identifier Token:  a
 Separator  Token:  Semicolon
 Separator  Token:  Rbrace
 =======  Dump SortOut =======  
-[1] Table TblClassDeclaration: 2,
-[2] Table TblNormalClassDeclaration: 3,4,5,
+[1] Table TblClassDeclaration@0: 2,
+[2] Table TblNormalClassDeclaration@0: 3,4,5,
 [3] Token
 [4] Token
-[5] Table TblClassBody: 6,7,8,
+[5] Table TblClassBody@2: 6,7,8,
 [6] Token
-[7] Table TblClassBody_sub1: 9,
+[7] Table TblClassBody_sub1@3: 9,
 [8] Token
-[9] Table TblClassBodyDeclaration: 10,
-[10] Table TblClassMemberDeclaration: 11,
-[11] Table TblFieldDeclaration: 12,13,14,
-[12] Table TblUnannType: 15,
-[13] Table TblVariableDeclaratorList: 16,
+[9] Table TblClassBodyDeclaration@3: 10,
+[10] Table TblClassMemberDeclaration@3: 11,
+[11] Table TblFieldDeclaration@3: 12,13,14,
+[12] Table TblUnannType@3: 15,
+[13] Table TblVariableDeclaratorList@4: 16,
 [14] Token
-[15] Table TblUnannPrimitiveType: 17,
-[16] Table TblVariableDeclarator: 18,
-[17] Table TblNumericType: 19,
-[18] Table TblVariableDeclaratorId: 20,
-[19] Table TblIntType: 21,
+[15] Table TblUnannPrimitiveType@3: 17,
+[16] Table TblVariableDeclarator@4: 18,
+[17] Table TblNumericType@3: 19,
+[18] Table TblVariableDeclaratorId@4: 20,
+[19] Table TblIntType@3: 21,
 [20] Token
 [21] Token
 Matched 7 tokens.

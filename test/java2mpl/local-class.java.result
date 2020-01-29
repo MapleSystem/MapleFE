@@ -147,119 +147,119 @@ Separator  Token:  Whitespace
 Separator  Token:  Rbrace
 Separator  Token:  Rbrace
 =======  Dump SortOut =======  
-[1] Table TblClassDeclaration: 2,
-[2] Table TblNormalClassDeclaration: 3,4,5,
+[1] Table TblClassDeclaration@0: 2,
+[2] Table TblNormalClassDeclaration@0: 3,4,5,
 [3] Token
 [4] Token
-[5] Table TblClassBody: 6,7,8,
+[5] Table TblClassBody@2: 6,7,8,
 [6] Token
-[7] Table TblClassBody_sub1: 9,10,
+[7] Table TblClassBody_sub1@3: 9,10,
 [8] Token
-[9] Table TblClassBodyDeclaration: 11,
-[10] Table TblClassBodyDeclaration: 12,
-[11] Table TblClassMemberDeclaration: 13,
-[12] Table TblClassMemberDeclaration: 14,
-[13] Table TblClassDeclaration: 15,
-[14] Table TblMethodDeclaration: 16,17,
-[15] Table TblNormalClassDeclaration: 18,19,20,
-[16] Table TblMethodHeader: 21,
-[17] Table TblMethodBody: 22,
+[9] Table TblClassBodyDeclaration@3: 11,
+[10] Table TblClassBodyDeclaration@7: 12,
+[11] Table TblClassMemberDeclaration@3: 13,
+[12] Table TblClassMemberDeclaration@7: 14,
+[13] Table TblClassDeclaration@3: 15,
+[14] Table TblMethodDeclaration@7: 16,17,
+[15] Table TblNormalClassDeclaration@3: 18,19,20,
+[16] Table TblMethodHeader@7: 21,
+[17] Table TblMethodBody@11: 22,
 [18] Token
 [19] Token
-[20] Table TblClassBody: 23,24,
-[21] Table TblMethodHeader_sub1: 25,26,
-[22] Table TblBlock: 27,28,29,
+[20] Table TblClassBody@5: 23,24,
+[21] Table TblMethodHeader_sub1@7: 25,26,
+[22] Table TblBlock@11: 27,28,29,
 [23] Token
 [24] Token
-[25] Table TblResult: 30,
-[26] Table TblMethodDeclarator: 31,32,33,
+[25] Table TblResult@7: 30,
+[26] Table TblMethodDeclarator@8: 31,32,33,
 [27] Token
-[28] Table TblBlock_sub1: 34,
+[28] Table TblBlock_sub1@12: 34,
 [29] Token
 [30] Token
 [31] Token
 [32] Token
 [33] Token
-[34] Table TblBlockStatements: 35,36,
-[35] Table TblBlockStatement: 37,
-[36] Table TblBlockStatements_sub1: 38,39,40,
-[37] Table TblStatement: 41,
-[38] Table TblBlockStatement: 42,
-[39] Table TblBlockStatement: 43,
-[40] Table TblBlockStatement: 44,
-[41] Table TblStatementWithoutTrailingSubstatement: 45,
-[42] Table TblClassDeclaration: 46,
-[43] Table TblStatement: 47,
-[44] Table TblClassDeclaration: 48,
-[45] Table TblExpressionStatement: 49,50,
-[46] Table TblNormalClassDeclaration: 51,52,53,54,
-[47] Table TblStatementWithoutTrailingSubstatement: 55,
-[48] Table TblNormalClassDeclaration: 56,57,58,
-[49] Table TblStatementExpression: 59,
+[34] Table TblBlockStatements@12: 35,36,
+[35] Table TblBlockStatement@12: 37,
+[36] Table TblBlockStatements_sub1@17: 38,39,40,
+[37] Table TblStatement@12: 41,
+[38] Table TblBlockStatement@17: 42,
+[39] Table TblBlockStatement@23: 43,
+[40] Table TblBlockStatement@43: 44,
+[41] Table TblStatementWithoutTrailingSubstatement@12: 45,
+[42] Table TblClassDeclaration@17: 46,
+[43] Table TblStatement@23: 47,
+[44] Table TblClassDeclaration@43: 48,
+[45] Table TblExpressionStatement@12: 49,50,
+[46] Table TblNormalClassDeclaration@17: 51,52,53,54,
+[47] Table TblStatementWithoutTrailingSubstatement@23: 55,
+[48] Table TblNormalClassDeclaration@43: 56,57,58,
+[49] Table TblStatementExpression@12: 59,
 [50] Token
 [51] Token
 [52] Token
-[53] Table TblNormalClassDeclaration_sub3: 60,
-[54] Table TblClassBody: 61,62,
-[55] Table TblBlock: 63,64,65,
+[53] Table TblNormalClassDeclaration_sub3@19: 60,
+[54] Table TblClassBody@21: 61,62,
+[55] Table TblBlock@23: 63,64,65,
 [56] Token
 [57] Token
-[58] Table TblClassBody: 66,67,
-[59] Table TblClassInstanceCreationExpression: 
-[60] Table TblSuperclass: 68,69,
+[58] Table TblClassBody@45: 66,67,
+[59] Table TblClassInstanceCreationExpression@12: WasSucc
+[60] Table TblSuperclass@19: 68,69,
 [61] Token
 [62] Token
 [63] Token
-[64] Table TblBlock_sub1: 70,
+[64] Table TblBlock_sub1@24: 70,
 [65] Token
 [66] Token
 [67] Token
 [68] Token
-[69] Table TblClassType: 71,
-[70] Table TblBlockStatements: 72,73,
-[71] Table TblClassType_sub1: 74,
-[72] Table TblBlockStatement: 75,
-[73] Table TblBlockStatements_sub1: 76,
+[69] Table TblClassType@20: 71,
+[70] Table TblBlockStatements@24: 72,73,
+[71] Table TblClassType_sub1@20: 74,
+[72] Table TblBlockStatement@24: 75,
+[73] Table TblBlockStatements_sub1@28: 76,
 [74] Token
-[75] Table TblClassDeclaration: 77,
-[76] Table TblBlockStatement: 78,
-[77] Table TblNormalClassDeclaration: 79,80,81,
-[78] Table TblClassDeclaration: 82,
+[75] Table TblClassDeclaration@24: 77,
+[76] Table TblBlockStatement@28: 78,
+[77] Table TblNormalClassDeclaration@24: 79,80,81,
+[78] Table TblClassDeclaration@28: 82,
 [79] Token
 [80] Token
-[81] Table TblClassBody: 83,84,
-[82] Table TblNormalClassDeclaration: 85,86,87,
+[81] Table TblClassBody@26: 83,84,
+[82] Table TblNormalClassDeclaration@28: 85,86,87,
 [83] Token
 [84] Token
 [85] Token
 [86] Token
-[87] Table TblClassBody: 88,89,90,
+[87] Table TblClassBody@30: 88,89,90,
 [88] Token
-[89] Table TblClassBody_sub1: 91,
+[89] Table TblClassBody_sub1@31: 91,
 [90] Token
-[91] Table TblClassBodyDeclaration: 92,
-[92] Table TblClassMemberDeclaration: 93,
-[93] Table TblMethodDeclaration: 94,95,
-[94] Table TblMethodHeader: 96,
-[95] Table TblMethodBody: 97,
-[96] Table TblMethodHeader_sub1: 98,99,
-[97] Table TblBlock: 100,101,102,
-[98] Table TblResult: 103,
-[99] Table TblMethodDeclarator: 104,105,106,
+[91] Table TblClassBodyDeclaration@31: 92,
+[92] Table TblClassMemberDeclaration@31: 93,
+[93] Table TblMethodDeclaration@31: 94,95,
+[94] Table TblMethodHeader@31: 96,
+[95] Table TblMethodBody@35: 97,
+[96] Table TblMethodHeader_sub1@31: 98,99,
+[97] Table TblBlock@35: 100,101,102,
+[98] Table TblResult@31: 103,
+[99] Table TblMethodDeclarator@32: 104,105,106,
 [100] Token
-[101] Table TblBlock_sub1: 107,
+[101] Table TblBlock_sub1@36: 107,
 [102] Token
 [103] Token
 [104] Token
 [105] Token
 [106] Token
-[107] Table TblBlockStatements: 108,
-[108] Table TblBlockStatement: 109,
-[109] Table TblClassDeclaration: 110,
-[110] Table TblNormalClassDeclaration: 111,112,113,
+[107] Table TblBlockStatements@36: 108,
+[108] Table TblBlockStatement@36: 109,
+[109] Table TblClassDeclaration@36: 110,
+[110] Table TblNormalClassDeclaration@36: 111,112,113,
 [111] Token
 [112] Token
-[113] Table TblClassBody: 114,115,
+[113] Table TblClassBody@38: 114,115,
 [114] Token
 [115] Token
 Matched 49 tokens.

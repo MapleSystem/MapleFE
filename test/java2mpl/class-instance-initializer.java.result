@@ -26,86 +26,52 @@ Separator  Token:  Whitespace
 Separator  Token:  Whitespace
 Separator  Token:  Rbrace
 Separator  Token:  Rbrace
-Warning: Multiple succ children
-Warning: Multiple succ children
-Warning: Multiple succ children
-Warning: Multiple succ children
 =======  Dump SortOut =======  
-[1] Table TblClassDeclaration: 2,
-[2] Table TblNormalClassDeclaration: 3,4,5,
+[1] Table TblClassDeclaration@0: 2,
+[2] Table TblNormalClassDeclaration@0: 3,4,5,
 [3] Token
 [4] Token
-[5] Table TblClassBody: 6,7,8,
+[5] Table TblClassBody@2: 6,7,8,
 [6] Token
-[7] Table TblClassBody_sub1: 9,10,
+[7] Table TblClassBody_sub1@3: 9,10,
 [8] Token
-[9] Table TblClassBodyDeclaration: 11,
-[10] Table TblClassBodyDeclaration: 12,
-[11] Table TblClassMemberDeclaration: 13,
-[12] Table TblInstanceInitializer: 14,
-[13] Table TblFieldDeclaration: 15,16,17,
-[14] Table TblBlock: 18,19,20,
-[15] Table TblUnannType: 21,
-[16] Table TblVariableDeclaratorList: 22,
+[9] Table TblClassBodyDeclaration@3: 11,
+[10] Table TblClassBodyDeclaration@6: 12,
+[11] Table TblClassMemberDeclaration@3: 13,
+[12] Table TblInstanceInitializer@6: 14,
+[13] Table TblFieldDeclaration@3: 15,16,17,
+[14] Table TblBlock@6: 18,19,20,
+[15] Table TblUnannType@3: 21,
+[16] Table TblVariableDeclaratorList@4: 22,
 [17] Token
 [18] Token
-[19] Table TblBlock_sub1: 23,
+[19] Table TblBlock_sub1@7: 23,
 [20] Token
-[21] Table TblUnannPrimitiveType: 24,
-[22] Table TblVariableDeclarator: 25,
-[23] Table TblBlockStatements: 26,
-[24] Table TblNumericType: 27,
-[25] Table TblVariableDeclaratorId: 28,
-[26] Table TblBlockStatement: 29,
-[27] Table TblIntType: 30,
+[21] Table TblUnannPrimitiveType@3: 24,
+[22] Table TblVariableDeclarator@4: 25,
+[23] Table TblBlockStatements@7: 26,
+[24] Table TblNumericType@3: 27,
+[25] Table TblVariableDeclaratorId@4: 28,
+[26] Table TblBlockStatement@7: 29,
+[27] Table TblIntType@3: 30,
 [28] Token
-[29] Table TblStatement: 31,
+[29] Table TblStatement@7: 31,
 [30] Token
-[31] Table TblStatementWithoutTrailingSubstatement: 32,
-[32] Table TblExpressionStatement: 33,34,
-[33] Table TblStatementExpression: 35,
+[31] Table TblStatementWithoutTrailingSubstatement@7: 32,
+[32] Table TblExpressionStatement@7: 33,34,
+[33] Table TblStatementExpression@7: 35,
 [34] Token
-[35] Table TblAssignment: 36,37,38,
-[36] Table TblLeftHandSide: 39,40,
-[37] Table TblAssignmentOperator: 41,
-[38] Table TblExpression: 42,43,44,45,46,
-[39] Table TblExpressionName: 47,
-[40] Table TblArrayAccess: 
-[41] Token
-[42] Table TblPrimary: 48,
-[43] Table TblUnaryExpression: 49,
-[44] Table TblBinaryExpression: 50,51,52,53,54,55,56,57,58,59,
-[45] Table TblConditionalExpression: 60,
-[46] Table TblAssignmentExpression: 61,
-[47] Token
-[48] Table TblPrimaryNoNewArray: 62,63,
-[49] Table TblUnaryExpressionNotPlusMinus: 64,
-[50] Table TblMultiplicativeExpression: 65,
-[51] Table TblAdditiveExpression: 66,
-[52] Table TblShiftExpression: 67,
-[53] Table TblRelationalExpression: 68,
-[54] Table TblEqualityExpression: 69,
-[55] Table TblAndExpression: 70,
-[56] Table TblExclusiveOrExpression: 71,
-[57] Table TblInclusiveOrExpression: 72,
-[58] Table TblConditionalAndExpression: 73,
-[59] Table TblConditionalOrExpression: 74,
-[60] Table TblConditionalOrExpression: 
-[61] Table TblConditionalExpression: 
-[62] Token
-[63] Table TblArrayAccess: 75,
-[64] Table TblPostfixExpression: 76,
-[65] Table TblUnaryExpression: 
-[66] Table TblMultiplicativeExpression: 
-[67] Table TblAdditiveExpression: 
-[68] Table TblShiftExpression: 
-[69] Table TblRelationalExpression: 
-[70] Table TblEqualityExpression: 
-[71] Table TblAndExpression: 
-[72] Table TblExclusiveOrExpression: 
-[73] Table TblInclusiveOrExpression: 
-[74] Table TblConditionalAndExpression: 
-[75] Table TblArrayAccess_sub3: 77,
-[76] Table TblPrimary: 
-[77] Table TblPrimaryNoNewArray: 
+[35] Table TblAssignment@7: 36,37,38,
+[36] Table TblLeftHandSide@7: 39,
+[37] Table TblAssignmentOperator@8: 40,
+[38] Table TblExpression@9: 41,
+[39] Table TblExpressionName@7: 42,
+[40] Token
+[41] Table TblPrimary@9: 43,
+[42] Token
+[43] Table TblPrimaryNoNewArray@9: 44,45,
+[44] Token
+[45] Table TblArrayAccess@9: 46,
+[46] Table TblArrayAccess_sub3@9: 47,
+[47] Table TblPrimaryNoNewArray@9: WasSucc
 Matched 13 tokens.

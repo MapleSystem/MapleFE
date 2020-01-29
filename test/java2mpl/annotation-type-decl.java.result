@@ -46,76 +46,61 @@ Separator  Token:  Semicolon
 Separator  Token:  Whitespace
 Comment Token: 
 Separator  Token:  Rbrace
-Warning: Multiple succ children
-Warning: Multiple succ children
-Warning: Multiple succ children
-Warning: Multiple succ children
-Warning: Multiple succ children
-Warning: Multiple succ children
 =======  Dump SortOut =======  
-[1] Table TblInterfaceDeclaration: 2,
-[2] Table TblAnnotationTypeDeclaration: 3,4,5,6,
+[1] Table TblInterfaceDeclaration@0: 2,
+[2] Table TblAnnotationTypeDeclaration@0: 3,4,5,6,
 [3] Token
 [4] Token
 [5] Token
-[6] Table TblAnnotationTypeBody: 7,8,9,
+[6] Table TblAnnotationTypeBody@3: 7,8,9,
 [7] Token
-[8] Table TblAnnotationTypeBody_sub1: 10,11,12,13,
+[8] Table TblAnnotationTypeBody_sub1@4: 10,11,12,13,
 [9] Token
-[10] Table TblAnnotationTypeMemberDeclaration: 14,
-[11] Table TblAnnotationTypeMemberDeclaration: 15,
-[12] Table TblAnnotationTypeMemberDeclaration: 16,
-[13] Table TblAnnotationTypeMemberDeclaration: 17,
-[14] Table TblAnnotationTypeElementDeclaration: 18,19,20,21,22,
-[15] Table TblAnnotationTypeElementDeclaration: 23,24,25,26,27,
-[16] Table TblAnnotationTypeElementDeclaration: 28,29,30,31,32,
-[17] Table TblAnnotationTypeElementDeclaration: 33,34,35,36,37,
-[18] Table TblUnannType: 38,
+[10] Table TblAnnotationTypeMemberDeclaration@4: 14,
+[11] Table TblAnnotationTypeMemberDeclaration@9: 15,
+[12] Table TblAnnotationTypeMemberDeclaration@14: 16,
+[13] Table TblAnnotationTypeMemberDeclaration@19: 17,
+[14] Table TblAnnotationTypeElementDeclaration@4: 18,19,20,21,22,
+[15] Table TblAnnotationTypeElementDeclaration@9: 23,24,25,26,27,
+[16] Table TblAnnotationTypeElementDeclaration@14: 28,29,30,31,32,
+[17] Table TblAnnotationTypeElementDeclaration@19: 33,34,35,36,37,
+[18] Table TblUnannType@4: 38,
 [19] Token
 [20] Token
 [21] Token
 [22] Token
-[23] Table TblUnannType: 39,
+[23] Table TblUnannType@9: 39,
 [24] Token
 [25] Token
 [26] Token
 [27] Token
-[28] Table TblUnannType: 40,
+[28] Table TblUnannType@14: 40,
 [29] Token
 [30] Token
 [31] Token
 [32] Token
-[33] Table TblUnannType: 41,
+[33] Table TblUnannType@19: 41,
 [34] Token
 [35] Token
 [36] Token
 [37] Token
-[38] Table TblUnannPrimitiveType: 42,
-[39] Table TblUnannReferenceType: 43,44,
-[40] Table TblUnannReferenceType: 45,46,
-[41] Table TblUnannReferenceType: 47,48,
-[42] Table TblNumericType: 49,
-[43] Table TblUnannClassOrInterfaceType: 50,51,
-[44] Table TblUnannTypeVariable: 52,
-[45] Table TblUnannClassOrInterfaceType: 53,54,
-[46] Table TblUnannTypeVariable: 55,
-[47] Table TblUnannClassOrInterfaceType: 56,57,
-[48] Table TblUnannTypeVariable: 58,
-[49] Table TblIntType: 59,
-[50] Table TblUnannClassType: 60,
-[51] Table TblUnannInterfaceType: 
-[52] Token
-[53] Table TblUnannClassType: 61,
-[54] Table TblUnannInterfaceType: 
+[38] Table TblUnannPrimitiveType@4: 42,
+[39] Table TblUnannReferenceType@9: 43,
+[40] Table TblUnannReferenceType@14: 44,
+[41] Table TblUnannReferenceType@19: 45,
+[42] Table TblNumericType@4: 46,
+[43] Table TblUnannClassOrInterfaceType@9: 47,
+[44] Table TblUnannClassOrInterfaceType@14: 48,
+[45] Table TblUnannClassOrInterfaceType@19: 49,
+[46] Table TblIntType@4: 50,
+[47] Table TblUnannClassType@9: 51,
+[48] Table TblUnannClassType@14: 52,
+[49] Table TblUnannClassType@19: 53,
+[50] Token
+[51] Table TblUnannClassType_sub1@9: 54,
+[52] Table TblUnannClassType_sub1@14: 55,
+[53] Table TblUnannClassType_sub1@19: 56,
+[54] Token
 [55] Token
-[56] Table TblUnannClassType: 62,
-[57] Table TblUnannInterfaceType: 
-[58] Token
-[59] Token
-[60] Table TblUnannClassType_sub1: 63,
-[61] Table TblUnannClassType_sub1: 64,
-[62] Table TblUnannClassType_sub1: 65,
-[63] Token
-[64] Token
-[65] Token
+[56] Token
 Matched 25 tokens.

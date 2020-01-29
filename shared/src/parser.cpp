@@ -244,6 +244,8 @@ Parser::Parser(const char *name, Module *m) : filename(name), mModule(m) {
   mTraceVisited = false;
   mTraceFailed = false;
   mTraceSortOut = true;
+  mTraceWarning = false;
+
   mIndentation = 0;
 
   mInSecondTry = false;
@@ -263,6 +265,8 @@ Parser::Parser(const char *name) : filename(name) {
   mTraceVisited = false;
   mTraceFailed = false;
   mTraceSortOut = true;
+  mTraceWarning = false;
+
   mIndentation = 0;
 
   mInSecondTry = false;
@@ -1291,12 +1295,18 @@ void Parser::SortOutOneof(AppealNode *parent) {
   // during matching. In SortOut, we simple return. However, when generating IR,
   // the children have to be created, either reusing previous symbol or copying the
   // IR tree.
+  //
+  // [TODO] [NOTE] However, the problem here is the previous successful matching
+  //               could be inside a bigger failed sub-tree. I guess, when creating IR
+  //               a possible re-visit of that sub-tree, or some data structure to
+  //               record that sub-tree.
   if (parent->mAfter == SuccWasSucc && parent->mChildren.size() == 0)
     return;
 
   unsigned parent_match = succ->GetOneMatch(0);
 
   unsigned good_children = 0;
+  bool     good_child_elected = false;
   std::vector<AppealNode*> bad_children;
 
   std::list<AppealNode*>::iterator it = parent->mChildren.begin();
@@ -1322,16 +1332,21 @@ void Parser::SortOutOneof(AppealNode *parent) {
       bool found = succ->ReduceMatches(child->mStartIndex, parent_match);
       if (found) {
         good_children++;
-        to_be_sorted.push_back(child); // add good child to to_be_sorted
+        // We only elect the first good child.
+        if (!good_child_elected) {
+          to_be_sorted.push_back(child);
+          good_child_elected = true;
+        } else {
+          bad_children.push_back(child);
+        }
       } else {
         bad_children.push_back(child);
       }
     }
   }
 
-  if(good_children!=1)
-    std::cout << "Warning: Multiple succ children" << std::endl;
-
+  if(good_children > 1 && mTraceWarning)
+    std::cout << "Warning: Multiple succ children. We only keep one." << std::endl;
 
   // remove the bad children AppealNode
   std::vector<AppealNode*>::iterator badit = bad_children.begin();
@@ -1700,7 +1715,9 @@ void Parser::DumpSortOutNode(AppealNode *n) {
     std::cout << "Token" << std::endl;
   } else {
     RuleTable *t = n->GetTable();
-    std::cout << "Table " << GetRuleTableName(t) << ": ";
+    std::cout << "Table " << GetRuleTableName(t) << "@" << n->mStartIndex << ": ";
+    if (n->mAfter == SuccWasSucc)
+      std::cout << "WasSucc";
     std::list<AppealNode*>::iterator it = n->mChildren.begin();
     for (; it != n->mChildren.end(); it++) {
       std::cout << seq_num << ",";
