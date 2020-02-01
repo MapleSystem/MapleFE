@@ -2,10 +2,19 @@
 #include "rule.h"
 #include "massert.h"
 #include "base_struct.h"
+#include "ruletable.h"  // need MAX_ACT_ELEM_NUM
 
 ////////////////////////////////////////////////////////////////////////////
 //                            RuleAction                                  //
 ////////////////////////////////////////////////////////////////////////////
+
+void RuleAction::AddArg(uint8_t idx) {
+  if (mArgs.size() >= MAX_ACT_ELEM_NUM) {
+    std::cout << "Too many arguments of RuleAction." << std::endl;
+    exit(1);
+  }
+  mArgs.push_back(idx);
+}
 
 void RuleAction::Dump() {
   std::cout << mName << "(";

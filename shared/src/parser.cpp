@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <cstring>
+#include <stack>
 
 #include "parser.h"
 #include "massert.h"
@@ -8,6 +9,7 @@
 #include "common_header_autogen.h"
 #include "ruletable_util.h"
 #include "gen_debug.h"
+#include "ast.h"
 
 //////////////////////////////////////////////////////////////////////////////////
 //                   Top Issues in Parsing System
@@ -272,6 +274,17 @@ Parser::Parser(const char *name) : filename(name) {
   mInSecondTry = false;
 }
 
+Parser::~Parser() {
+  delete mLexer;
+
+  std::vector<ASTTree*>::iterator it = mASTTrees.begin();
+  for (; it != mASTTrees.end(); it++) {
+    ASTTree *tree = *it;
+    if (tree)
+      delete tree;
+  }
+  mASTTrees.clear();
+}
 
 void Parser::Dump() {
 }
@@ -342,6 +355,7 @@ bool Parser::WasFailed(RuleTable *table, unsigned token) {
 // Returns the number of valuable tokens read. Returns 0 if EOF.
 unsigned Parser::LexOneLine() {
   unsigned token_num = 0;
+  Token *t = NULL;
 
   // Check if there are already pending tokens.
   if (mCurToken < mActiveTokens.size())
@@ -350,7 +364,7 @@ unsigned Parser::LexOneLine() {
   while (!token_num) {
     // read untile end of line
     while (!mLexer->EndOfLine() && !mLexer->EndOfFile()) {
-      Token* t = mLexer->LexToken();
+      t = mLexer->LexToken();
       if (t) {
         bool is_whitespace = false;
         if (t->IsSeparator()) {
@@ -539,8 +553,16 @@ bool Parser::ParseStmt() {
   //                                 need check if the table is &TblIdentifier.
   bool succ = TraverseStmt();
 
-  // After matching there is a tree with each node being a AppealNode. Through the tree is only
-  // one sub-tree which successfully matches all the tokens. This is what we are looking for.
+  // After matching&SortOut there is a tree with each node being a AppealNode.
+  // Now we need build AST based on the AppealNode tree. This involves the rule Actions
+  // we are used to build AST. So far we haven't done the syntax checking yet. [TODO]
+  //
+  // Each top level construct gets a AST tree.
+  if (succ) {
+    ASTTree *tree = BuildAST(mRootNode);
+    if (tree)
+      mASTTrees.push_back(tree);
+  }
 
   return succ;
 }
@@ -1726,6 +1748,78 @@ void Parser::DumpSortOutNode(AppealNode *n) {
     }
     std::cout << std::endl;
   }
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//                       Build AST
+/////////////////////////////////////////////////////////////////////////////
+
+// The tree is created dynamically, remember to release it if not used any more.
+//
+// The AppealNode tree will be depth first traversed. The node will be put in
+// a stack and its TreeNode will be created FILO. In this way, the leaf node will
+// be first created and the parents.
+
+// A appealnode is popped out and create tree node if and only if all its
+// children have been generated a tree node for them.
+static std::vector<AppealNode*> done_nodes;
+static bool NodeIsDone(AppealNode *n) {
+  std::vector<AppealNode*>::const_iterator cit = done_nodes.begin();
+  for (; cit != done_nodes.end(); cit++) {
+    if (*cit == n)
+      return true;
+  }
+  return false;
+}
+
+
+ASTTree* Parser::BuildAST(AppealNode *root) {
+  // temporarily disable BuildAST.
+  return NULL;
+
+  if (!root)
+    return NULL;
+
+  done_nodes.clear();
+
+  ASTTree *tree = new ASTTree();
+
+  std::stack<AppealNode*> appeal_stack;
+  appeal_stack.push(root);
+
+  // Need a map between an AppealNode and a TreeNode.
+  std::map<AppealNode*, TreeNode*> nodes_map;
+
+  while(!appeal_stack.empty()) {
+    AppealNode *node = appeal_stack.top();
+    // 1) If all children done. Time to create tree node for 'node'
+    // 2) If some are done, some not. Add the first not-done child to stack 
+    bool children_done = true;
+    std::list<AppealNode*>::iterator it = node->mChildren.begin();
+    for (; it != node->mChildren.end(); it++) {
+      AppealNode *child = *it;
+      if (!NodeIsDone(child)) {
+        appeal_stack.push(child);
+        children_done = false;
+        break;
+      }
+    }
+
+    if (children_done) {
+      appeal_stack.pop();
+      // create the tree node for node.
+    }
+  }
+}
+
+// We take two parameters. One is the AST Tree, since the tree node is part of
+// of the tree and will be allocated in the tree's memory pool. The other is
+// the appeal node.
+//
+// For many rules, it's just a Oneof node, which means the appeal_node itself
+// doesn't introduce anything into the tree. It's just transferring. 
+TreeNode* Parser::NewTreeNode(ASTTree *tree, AppealNode *appeal_node) {
+  return NULL;
 }
 
 /////////////////////////////////////////////////////////////////////////////

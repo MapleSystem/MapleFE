@@ -25,6 +25,8 @@ class Stmt;
 class Token;
 class RuleTable;
 class TableData;
+class ASTTree;
+class TreeNode;
 
 typedef enum {
   FailWasFailed,
@@ -232,10 +234,15 @@ private:
   void SortOutData(AppealNode*);
   void CleanFailedSecondTry(AppealNode*);
 
+  // Build AST
+  std::vector<ASTTree*> mASTTrees;      // All AST trees in this module
+  ASTTree*  BuildAST(AppealNode*); // Each top level construct gets a AST
+  TreeNode* NewTreeNode(ASTTree*, AppealNode*);
+
 public:
   Parser(const char *f, Module *m);
   Parser(const char *f);
-  ~Parser() { delete mLexer; }
+  ~Parser();
 
   TK_Kind GetTokenKind(const char c);
   TK_Kind GetTokenKind(const char *str);

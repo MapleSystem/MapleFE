@@ -99,7 +99,7 @@ ACT_NA
 // in Autogen to make sure it doesn't exceed.
 #define MAX_ACT_ELEM_NUM 12
 
-struct RuleAction {
+struct Action {
   ActionId  mId;
   unsigned  mNumElem;
   unsigned  mElems[MAX_ACT_ELEM_NUM]; // the index of elements involved in the action
@@ -113,7 +113,7 @@ struct RuleTable{
   unsigned    mNum;        // Num of TableData entries
   TableData  *mData;
   unsigned    mNumAction;  // Num of actions
-  RuleAction *mActions;
+  Action     *mActions;
 };
 
 //////////////////////////////////////////////////////////////////////

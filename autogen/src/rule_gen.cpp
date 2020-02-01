@@ -39,14 +39,14 @@
 // TableData TblAdditiveExpression_sub1_data[3] ={{DT_Subtable, &TblAdditiveExpression},
 //                                                {DT_Char, {.mChar='+'}},
 //                                                {DT_Subtable, &TblMultiplicativeExpression}};
-// RuleAction TblAdditiveExpression_sub1_action[1] = {{ACT_BuildBinaryOperation, 1, 2, 3}};
+// Action TblAdditiveExpression_sub1_action[1] = {{ACT_BuildBinaryOperation, 1, 2, 3}};
 // RuleTable TblAdditiveExpression_sub1 ={ET_Concatenate, 3, TblAdditiveExpression_sub1_data,
 //                                                        1, &TblAdditiveExpression_sub1_action};
 //
 // TableData TblAdditiveExpression_sub2_data[3] ={{DT_Subtable, &TblAdditiveExpression},
 //                                                {DT_Char, {.mChar='-'}},
 //                                                {DT_Subtable, &TblMultiplicativeExpression}};
-// RuleAction TblAdditiveExpression_sub2_action[1] = {{ACT_BuildBinaryOperation, 1, 2, 3}};
+// Action TblAdditiveExpression_sub2_action[1] = {{ACT_BuildBinaryOperation, 1, 2, 3}};
 // RuleTable TblAdditiveExpression_sub2 ={ET_Concatenate, 3, TblAdditiveExpression_sub2_data,
 //                                                        1, &TblAdditiveExpression_sub2_action};
 //
@@ -203,7 +203,7 @@ void RuleGen::GenDebug(const std::string &rule_table_name) {
 }
 
 // The format of RuleAttr table is like below,
-//   RuleAction TblAdditiveExpression_sub1_action[2] = {
+//   Action TblAdditiveExpression_sub1_action[2] = {
 //           {ACT_BuildBinaryOperation, 3, {1, 2, 3}}, {ACT_XXX, 2, {2, 3}}};
 //
 // For the time being, I'll generate only actions. The validity will be done later
@@ -214,7 +214,7 @@ void RuleGen::Gen4RuleAttr(std::string rule_table_name, RuleAttr *attr) {
   if (attr->mAction.size() == 0)
     return;
 
-  attr_table += "RuleAction ";
+  attr_table += "Action ";
   attr_table += rule_table_name;
   attr_table += "_action[";
   attr_table += std::to_string(attr->mAction.size());

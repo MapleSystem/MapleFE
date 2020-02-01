@@ -61,7 +61,7 @@ public:
   ~RuleAction() {}
 
   void SetName(const char *name) { mName = name; }
-  void AddArg(uint8_t idx) { mArgs.push_back(idx); }
+  void AddArg(uint8_t idx);
 
   const char* GetName() { return mName; }
   const char* GetArg(uint8_t i) { return mArgs[i]; }

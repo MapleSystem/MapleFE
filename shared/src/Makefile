@@ -11,7 +11,6 @@ LIBOBJS :=$(patsubst $(BUILD)/main.o,,$(OBJS))
 DEPS :=$(foreach dep,$(DEP), $(BUILD)/$(dep))
 
 INCLUDES := -I $(ROOTDIR)/shared/include \
-            -I $(ROOTDIR)/autogen/include \
             -I $(ROOTDIR)/java/include \
             -I .
 

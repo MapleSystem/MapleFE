@@ -34,13 +34,13 @@
 
 #include "ast_type.h"
 #include "ast_mempool.h"
-#include "token.h"
+#include "ruletable.h"
 
 enum NodeKind {
-  Token,
-  Operator,
-  Construct,
-  Function,
+  NK_Token,
+  NK_Operator,
+  NK_Construct,
+  NK_Function,
 };
 
 class TreeNode {
@@ -80,7 +80,8 @@ public:
   TreePool  mMemPool;
   TreeNode *mRootNode;
 public:
-
+  ASTTree() {mRootNode = NULL;}
+  ~ASTTree(){}
 };
 
 #endif
