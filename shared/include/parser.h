@@ -64,8 +64,8 @@ public:
     Token     *mToken;
   }mData;
   unsigned   mStartIndex;     // index of start matching token
-  std::list<AppealNode*> mChildren;   // Use list instead of vector since SortOut
-                                      // will remove some nodes, and it happens often
+
+  std::vector<AppealNode*> mChildren;
 
   // I use an additional vector for the sorted out children. Why do we have two duplicated
   // children vectors? The reason is coming from sortout. After SortOut we need remove some

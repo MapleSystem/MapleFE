@@ -504,7 +504,7 @@ void Parser::AppealTraverse(AppealNode *node, AppealNode *root) {
     }
   }
 
-  std::list<AppealNode*>::iterator it = node->mChildren.begin();
+  std::vector<AppealNode*>::iterator it = node->mChildren.begin();
   for (; it != node->mChildren.end(); it++) {
     AppealNode *child = *it;
     if (child->IsToken())
@@ -518,7 +518,7 @@ void Parser::Appeal(AppealNode *root) {
   traverse_list.clear();
   traverse_list.push_back(root);
 
-  std::list<AppealNode*>::iterator it = root->mChildren.begin();
+  std::vector<AppealNode*>::iterator it = root->mChildren.begin();
   for (; it != root->mChildren.end(); it++) {
     AppealNode *child = *it;
     if (child->IsToken())
@@ -1245,7 +1245,7 @@ bool Parser::TraverseTableData(TableData *data, AppealNode *parent) {
 // We don't want to use recursive. So a deque is used here.
 void Parser::SortOut() {
   // we remove all failed children, leaving only succ child
-  std::list<AppealNode*>::iterator it = mRootNode->mChildren.begin();
+  std::vector<AppealNode*>::iterator it = mRootNode->mChildren.begin();
   for (; it != mRootNode->mChildren.end(); it++) {
     AppealNode *n = *it;
     if (!n->IsFail())
@@ -1339,7 +1339,7 @@ void Parser::SortOutOneof(AppealNode *parent) {
   unsigned good_children = 0;
   bool     good_child_elected = false;
 
-  std::list<AppealNode*>::iterator it = parent->mChildren.begin();
+  std::vector<AppealNode*>::iterator it = parent->mChildren.begin();
   for (; it != parent->mChildren.end(); it++) {
     AppealNode *child = *it;
     if (child->IsFail())
@@ -1415,7 +1415,7 @@ void Parser::SortOutZeroormore(AppealNode *parent) {
   // keep trying until the last one is faile? So at this point we will first skip the
   // last failed child node.
   AppealNode *failed = parent->mChildren.back();
-  std::list<AppealNode*>::iterator childit = parent->mChildren.begin();
+  std::vector<AppealNode*>::iterator childit = parent->mChildren.begin();
   for (; childit != parent->mChildren.end(); childit++) {
     if (*childit != failed)
       parent->mSortedChildren.push_back(*childit);
@@ -1562,7 +1562,7 @@ void Parser::SortOutConcatenate(AppealNode *parent) {
   //
   //CleanFailedSecondTry(parent);
 
-  std::list<AppealNode*>::iterator it = parent->mChildren.begin();
+  std::vector<AppealNode*>::iterator it = parent->mChildren.begin();
   AppealNode *prev_child;
 
   for (; it != parent->mChildren.end(); it++) {
@@ -1673,7 +1673,7 @@ void Parser::SortOutData(AppealNode *parent) {
 // This is for Concatenate node.
 // If there are any failed children node and they are failed second try, clean them.
 void Parser::CleanFailedSecondTry(AppealNode *parent) {
-  std::list<AppealNode*>::iterator it = parent->mChildren.begin();
+  std::vector<AppealNode*>::iterator it = parent->mChildren.begin();
   std::vector<AppealNode*> bad_children;
 
   bool found = false;
@@ -1817,7 +1817,7 @@ ASTTree* Parser::BuildAST(AppealNode *root) {
     // 1) If all children done. Time to create tree node for 'node'
     // 2) If some are done, some not. Add the first not-done child to stack 
     bool children_done = true;
-    std::list<AppealNode*>::iterator it = node->mChildren.begin();
+    std::vector<AppealNode*>::iterator it = node->mChildren.begin();
     for (; it != node->mChildren.end(); it++) {
       AppealNode *child = *it;
       if (!NodeIsDone(child)) {
@@ -2094,5 +2094,13 @@ bool SuccMatch::ReduceMatches(unsigned start, unsigned except) {
 ///////////////////////////////////////////////////////////////
 
 void AppealNode::RemoveChild(AppealNode *child) {
-  mChildren.remove(child);
+  std::vector<AppealNode*> temp_vector;
+  std::vector<AppealNode*>::iterator it = mChildren.begin();
+  for (; it != mChildren.end(); it++) {
+    if (*it != child)
+      temp_vector.push_back(*it);
+  }
+
+  mChildren.clear();
+  mChildren.assign(temp_vector.begin(), temp_vector.end());
 }
