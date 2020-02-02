@@ -21,6 +21,7 @@ Separator  Token:  Semicolon
 [14] Table TblPrimaryNoNewArray@2: 15,16,
 [15] Token
 [16] Table TblArrayAccess@2: 17,
-[17] Table TblArrayAccess_sub3@2: 18,
+[17] Table TblArrayAccess_sub3@2: 18,19,
 [18] Table TblPrimaryNoNewArray@2: WasSucc
+[19] Table TblArrayAccess_sub4@3: KeepPosition
 Matched 4 tokens.

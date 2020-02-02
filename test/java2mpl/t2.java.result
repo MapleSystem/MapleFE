@@ -14,42 +14,48 @@ Separator  Token:  Semicolon
 =======  Dump SortOut =======  
 [1] Table TblStatement@0: 2,
 [2] Table TblLocalVariableDeclarationStatement@0: 3,4,
-[3] Table TblLocalVariableDeclaration@0: 5,6,
+[3] Table TblLocalVariableDeclaration@0: 5,6,7,
 [4] Token
-[5] Table TblLocalVariableType@0: 7,
-[6] Table TblVariableDeclaratorList@1: 8,9,
-[7] Table TblUnannType@0: 10,
-[8] Table TblVariableDeclarator@1: 11,
-[9] Table TblVariableDeclaratorList_sub1@2: 12,
-[10] Table TblUnannPrimitiveType@0: 13,
-[11] Table TblVariableDeclaratorId@1: 14,
-[12] Table TblVariableDeclaratorList_sub2@2: 15,16,
-[13] Table TblNumericType@0: 17,
-[14] Token
-[15] Token
-[16] Table TblVariableDeclarator@3: 18,
-[17] Table TblIntType@0: 19,
-[18] Table TblVariableDeclaratorId@3: 20,
-[19] Token
-[20] Token
+[5] Table TblLocalVariableDeclaration_sub1@0: KeepPosition
+[6] Table TblLocalVariableType@0: 8,
+[7] Table TblVariableDeclaratorList@1: 9,10,
+[8] Table TblUnannType@0: 11,
+[9] Table TblVariableDeclarator@1: 12,13,
+[10] Table TblVariableDeclaratorList_sub1@2: 14,
+[11] Table TblUnannPrimitiveType@0: 15,
+[12] Table TblVariableDeclaratorId@1: 16,17,
+[13] Table TblVariableDeclarator_sub1@2: KeepPosition
+[14] Table TblVariableDeclaratorList_sub2@2: 18,19,
+[15] Table TblNumericType@0: 20,
+[16] Token
+[17] Table TblVariableDeclaratorId_sub1@2: KeepPosition
+[18] Token
+[19] Table TblVariableDeclarator@3: 21,22,
+[20] Table TblIntType@0: 23,
+[21] Table TblVariableDeclaratorId@3: 24,25,
+[22] Table TblVariableDeclarator_sub1@4: KeepPosition
+[23] Token
+[24] Token
+[25] Table TblVariableDeclaratorId_sub1@4: KeepPosition
 Matched 5 tokens.
 =======  Dump SortOut =======  
-[21] Table TblStatement@5: 22,
-[22] Table TblStatementWithoutTrailingSubstatement@5: 23,
-[23] Table TblExpressionStatement@5: 24,25,
-[24] Table TblStatementExpression@5: 26,
-[25] Token
-[26] Table TblAssignment@5: 27,28,29,
-[27] Table TblLeftHandSide@5: 30,
-[28] Table TblAssignmentOperator@6: 31,
-[29] Table TblExpression@7: 32,
-[30] Table TblExpressionName@5: 33,
-[31] Token
-[32] Table TblPrimary@7: 34,
-[33] Token
-[34] Table TblPrimaryNoNewArray@7: 35,36,
-[35] Token
-[36] Table TblArrayAccess@7: 37,
-[37] Table TblArrayAccess_sub3@7: 38,
-[38] Table TblPrimaryNoNewArray@7: WasSucc
+[26] Table TblStatement@5: 27,
+[27] Table TblStatementWithoutTrailingSubstatement@5: 28,
+[28] Table TblExpressionStatement@5: 29,30,
+[29] Table TblStatementExpression@5: 31,
+[30] Token
+[31] Table TblAssignment@5: 32,33,34,
+[32] Table TblLeftHandSide@5: 35,
+[33] Table TblAssignmentOperator@6: 36,
+[34] Table TblExpression@7: 37,
+[35] Table TblExpressionName@5: 38,
+[36] Token
+[37] Table TblPrimary@7: 39,
+[38] Token
+[39] Table TblPrimaryNoNewArray@7: 40,41,
+[40] Token
+[41] Table TblArrayAccess@7: 42,
+[42] Table TblArrayAccess_sub3@7: 43,44,
+[43] Table TblPrimaryNoNewArray@7: WasSucc
+[44] Table TblArrayAccess_sub4@8: KeepPosition
 Matched 9 tokens.

@@ -28,35 +28,44 @@ Separator  Token:  Rbrace
 Separator  Token:  Rbrace
 =======  Dump SortOut =======  
 [1] Table TblClassDeclaration@0: 2,
-[2] Table TblNormalClassDeclaration@0: 3,4,5,
-[3] Token
+[2] Table TblNormalClassDeclaration@0: 3,4,5,6,7,8,9,
+[3] Table TblNormalClassDeclaration_sub1@0: KeepPosition
 [4] Token
-[5] Table TblClassBody@2: 6,7,8,
-[6] Token
-[7] Table TblClassBody_sub1@3: 9,
-[8] Token
-[9] Table TblClassBodyDeclaration@3: 10,
-[10] Table TblClassMemberDeclaration@3: 11,
-[11] Table TblMethodDeclaration@3: 12,13,
-[12] Table TblMethodHeader@3: 14,
-[13] Table TblMethodBody@7: 15,
-[14] Table TblMethodHeader_sub1@3: 16,17,
-[15] Table TblBlock@7: 18,19,20,
-[16] Table TblResult@3: 21,
-[17] Table TblMethodDeclarator@4: 22,23,24,
-[18] Token
-[19] Table TblBlock_sub1@8: 25,
-[20] Token
-[21] Token
-[22] Token
-[23] Token
+[5] Token
+[6] Table TblNormalClassDeclaration_sub2@2: KeepPosition
+[7] Table TblNormalClassDeclaration_sub3@2: KeepPosition
+[8] Table TblNormalClassDeclaration_sub4@2: KeepPosition
+[9] Table TblClassBody@2: 10,11,12,
+[10] Token
+[11] Table TblClassBody_sub1@3: 13,
+[12] Token
+[13] Table TblClassBodyDeclaration@3: 14,
+[14] Table TblClassMemberDeclaration@3: 15,
+[15] Table TblMethodDeclaration@3: 16,17,18,
+[16] Table TblMethodDeclaration_sub1@3: KeepPosition
+[17] Table TblMethodHeader@3: 19,
+[18] Table TblMethodBody@7: 20,
+[19] Table TblMethodHeader_sub1@3: 21,22,23,
+[20] Table TblBlock@7: 24,25,26,
+[21] Table TblResult@3: 27,
+[22] Table TblMethodDeclarator@4: 28,29,30,31,32,
+[23] Table TblMethodHeader_sub2@7: KeepPosition
 [24] Token
-[25] Table TblBlockStatements@8: 26,
-[26] Table TblBlockStatement@8: 27,
-[27] Table TblStatement@8: 28,
-[28] Table TblStatementWithoutTrailingSubstatement@8: 29,
-[29] Table TblExpressionStatement@8: 30,31,
-[30] Table TblStatementExpression@8: 32,
+[25] Table TblBlock_sub1@8: 33,
+[26] Token
+[27] Token
+[28] Token
+[29] Token
+[30] Table TblMethodDeclarator_sub1@6: KeepPosition
 [31] Token
-[32] Table TblClassInstanceCreationExpression@8: WasSucc
+[32] Table TblMethodDeclarator_sub2@7: KeepPosition
+[33] Table TblBlockStatements@8: 34,35,
+[34] Table TblBlockStatement@8: 36,
+[35] Table TblBlockStatements_sub1@13: KeepPosition
+[36] Table TblStatement@8: 37,
+[37] Table TblStatementWithoutTrailingSubstatement@8: 38,
+[38] Table TblExpressionStatement@8: 39,40,
+[39] Table TblStatementExpression@8: 41,
+[40] Token
+[41] Table TblClassInstanceCreationExpression@8: WasSucc
 Matched 15 tokens.

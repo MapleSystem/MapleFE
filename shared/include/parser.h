@@ -66,6 +66,18 @@ public:
   unsigned   mStartIndex;     // index of start matching token
   std::list<AppealNode*> mChildren;   // Use list instead of vector since SortOut
                                       // will remove some nodes, and it happens often
+
+  // I use an additional vector for the sorted out children. Why do we have two duplicated
+  // children vectors? The reason is coming from sortout. After SortOut we need remove some
+  // failed children and only keep the successful children. However, a successful child could
+  // be SuccWasSucc, and the real successfully matching sub-tree could be hidden in a previously
+  // faild tree.
+  //
+  // During AST tree generation, for the SuccWasSucc child we need find the original matching
+  // tree. That means the original mChildren vector needs to be traversed to locate that tree.
+  // So we keep mChildren untouched and define a second vector for the SortOut-ed children.
+  std::vector<AppealNode*> mSortedChildren;
+
   AppealNode *mParent;
   AppealStatus mBefore;
   AppealStatus mAfter;
@@ -251,6 +263,7 @@ private:
   // Build AST
   std::vector<ASTTree*> mASTTrees;      // All AST trees in this module
   ASTTree*  BuildAST(AppealNode*); // Each top level construct gets a AST
+  void      SimplifySortedTree(AppealNode*);
   TreeNode* NewTreeNode(ASTTree*, AppealNode*);
 
 public:

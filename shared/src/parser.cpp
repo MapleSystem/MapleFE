@@ -573,6 +573,7 @@ bool Parser::ParseStmt() {
   //
   // Each top level construct gets a AST tree.
   if (succ) {
+    SimplifySortedTree(mRootNode);
     ASTTree *tree = BuildAST(mRootNode);
     if (tree)
       mASTTrees.push_back(tree);
@@ -1244,22 +1245,16 @@ bool Parser::TraverseTableData(TableData *data, AppealNode *parent) {
 // We don't want to use recursive. So a deque is used here.
 void Parser::SortOut() {
   // we remove all failed children, leaving only succ child
-  std::vector<AppealNode*> bad_children;
   std::list<AppealNode*>::iterator it = mRootNode->mChildren.begin();
   for (; it != mRootNode->mChildren.end(); it++) {
     AppealNode *n = *it;
-    if (n->IsFail())
-      bad_children.push_back(n);
+    if (!n->IsFail())
+      mRootNode->mSortedChildren.push_back(n);
   }
-
-  std::vector<AppealNode*>::iterator badit = bad_children.begin();
-  for (; badit != bad_children.end(); badit++) {
-    mRootNode->RemoveChild(*badit);
-  }
-  MASSERT(mRootNode->mChildren.size()==1);
+  MASSERT(mRootNode->mSortedChildren.size()==1);
 
   to_be_sorted.clear();
-  to_be_sorted.push_back(mRootNode->mChildren.front());
+  to_be_sorted.push_back(mRootNode->mSortedChildren.front());
 
   while(!to_be_sorted.empty()) {
     AppealNode *node = to_be_sorted.front();
@@ -1343,15 +1338,12 @@ void Parser::SortOutOneof(AppealNode *parent) {
 
   unsigned good_children = 0;
   bool     good_child_elected = false;
-  std::vector<AppealNode*> bad_children;
 
   std::list<AppealNode*>::iterator it = parent->mChildren.begin();
   for (; it != parent->mChildren.end(); it++) {
     AppealNode *child = *it;
-    if (child->IsFail()) {
-      bad_children.push_back(child);
+    if (child->IsFail())
       continue;
-    }
 
     // In OneOf node, A successful child node must have its last matching
     // token the same as parent. Look into the child's SuccMatch, trim it
@@ -1359,8 +1351,10 @@ void Parser::SortOutOneof(AppealNode *parent) {
 
     if (child->IsToken()) {
       // Token node matches just one token.
-      if (child->mStartIndex == parent_match)
+      if (child->mStartIndex == parent_match) {
         good_children++;
+        parent->mSortedChildren.push_back(child);
+      }
     } else {
       SuccMatch *succ = FindSucc(child->GetTable());
       MASSERT(succ && "ruletable node has no SuccMatch?");
@@ -1371,24 +1365,15 @@ void Parser::SortOutOneof(AppealNode *parent) {
         // We only elect the first good child.
         if (!good_child_elected) {
           to_be_sorted.push_back(child);
+          parent->mSortedChildren.push_back(child);
           good_child_elected = true;
-        } else {
-          bad_children.push_back(child);
         }
-      } else {
-        bad_children.push_back(child);
       }
     }
   }
 
   if(good_children > 1 && mTraceWarning)
     std::cout << "Warning: Multiple succ children. We only keep one." << std::endl;
-
-  // remove the bad children AppealNode
-  std::vector<AppealNode*>::iterator badit = bad_children.begin();
-  for (; badit != bad_children.end(); badit++) {
-    parent->RemoveChild(*badit);
-  }
 }
 
 // 'parent' is already trimmed when passed into this function.
@@ -1427,15 +1412,19 @@ void Parser::SortOutZeroormore(AppealNode *parent) {
   // The major work of this loop is to verify the above claim is abided by.
 
   // There is only failed child which is the last one. Remember in TraverseZeroormore() we
-  // keep trying until the last one is faile? So at this point we will first remove the
+  // keep trying until the last one is faile? So at this point we will first skip the
   // last failed child node.
   AppealNode *failed = parent->mChildren.back();
-  parent->RemoveChild(failed);
+  std::list<AppealNode*>::iterator childit = parent->mChildren.begin();
+  for (; childit != parent->mChildren.end(); childit++) {
+    if (*childit != failed)
+      parent->mSortedChildren.push_back(*childit);
+  }
 
   unsigned last_match = parent_start - 1;
 
-  std::list<AppealNode*>::iterator it = parent->mChildren.begin();
-  for (; it != parent->mChildren.end(); it++) {
+  std::vector<AppealNode*>::iterator it = parent->mSortedChildren.begin();
+  for (; it != parent->mSortedChildren.end(); it++) {
     AppealNode *child = *it;
     MASSERT(child->IsSucc() && "Successful zeroormore node has a failed child node?");
 
@@ -1453,7 +1442,7 @@ void Parser::SortOutZeroormore(AppealNode *parent) {
       bool found = succ->GetStartToken(start_node);  // in order to set mTempIndex
       MASSERT(found && "Couldn't find start token?");
 
-      // We only preserve the longest matching. Else nodes will be reduced.
+      // We only preserve the longest matching. The other nodes will be reduced.
       unsigned longest = start_node;
       unsigned longest_index = 0;
       for (unsigned i = 0; i < succ->GetMatchNum(); i++) {
@@ -1485,12 +1474,10 @@ void Parser::SortOutZeroorone(AppealNode *parent) {
   unsigned parent_start = parent->mStartIndex;
   bool     found = parent_succ->GetStartToken(parent_start);
 
-  // Zeroorone could match nothing. We just remove all children node in this case.
+  // Zeroorone could match nothing. We just do nothing in this case.
   unsigned match_num = parent_succ->GetMatchNum();
-  if (match_num == 0) {
-    parent->ClearChildren();
+  if (match_num == 0)
     return;
-  }
 
   // If parent->mAfter is SuccWasSucc, it means we didn't traverse its children
   // during matching. In SortOut, we simple return. However, when generating IR,
@@ -1509,10 +1496,8 @@ void Parser::SortOutZeroorone(AppealNode *parent) {
   MASSERT((parent->mChildren.size() == 1) && "Zeroorone has >1 valid children?");
   AppealNode *child = parent->mChildren.front();
 
-  if (child->IsFail()) {
-    parent->RemoveChild(child);
+  if (child->IsFail())
     return;
-  }
 
   unsigned child_start = child->mStartIndex;
   MASSERT((parent_start == child_start)
@@ -1529,6 +1514,9 @@ void Parser::SortOutZeroorone(AppealNode *parent) {
     succ->ReduceMatches(child_start, parent_match);
     to_be_sorted.push_back(child);
   }
+
+  // Finally add the only successful child to mSortedChildren
+  parent->mSortedChildren.push_back(child);
 }
 
 // 'parent' is already trimmed when passed into this function.
@@ -1548,10 +1536,8 @@ void Parser::SortOutConcatenate(AppealNode *parent) {
   // It's possible for 'parent' to match nothing if all children are Zeroorxxx
   // which matches nothing.
   unsigned match_num = parent_succ->GetMatchNum();
-  if (match_num == 0) {
-    parent->ClearChildren();
+  if (match_num == 0)
     return;
-  }
 
   // If parent->mAfter is SuccWasSucc, it means we didn't traverse its children
   // during matching. In SortOut, we simple return. However, when generating IR,
@@ -1569,15 +1555,22 @@ void Parser::SortOutConcatenate(AppealNode *parent) {
   // If we did second try, it's possible there are failed children of parent.
   // The failed children will be followed directly by a
   // succ child with the same rule table, same start index, and mIsSecondTry.
-  CleanFailedSecondTry(parent);
+  //
+  // Decided not to clean failed second try, since it may contain successful matching
+  // which cause later good nodes as SuccWasSucc, and we need re-traverse it
+  // when creating AST. So the following line is commented.
+  //
+  //CleanFailedSecondTry(parent);
 
-  std::vector<AppealNode*> bad_children;
   std::list<AppealNode*>::iterator it = parent->mChildren.begin();
   AppealNode *prev_child;
 
   for (; it != parent->mChildren.end(); it++) {
     AppealNode *child = *it;
-    MASSERT(child->IsSucc() && "Successful concatenate node has a failed child node?");
+
+    // Failed not should be failed second try node.
+    if(child->IsFail())
+      continue;
 
     // Clean the useless matches of prev_child, leaving the only one connecting to
     // the current child.
@@ -1602,14 +1595,18 @@ void Parser::SortOutConcatenate(AppealNode *parent) {
       MASSERT(found && "Couldn't find start token?");
 
       unsigned match_num = succ->GetMatchNum();
-      if (match_num == 0) {
-        // It could be ZeroorXXX node matching nothing. Just remove the node.
-        bad_children.push_back(child);
-      } else if (match_num == 1) {
+
+      // if (match_num == 0) 
+      // It could be ZeroorXXX node matching nothing. Just keep it in mSortedChildren
+      // since during AST generation we need index of a child. So keeping it for
+      // the position.
+
+      // we only handle cases where match_num >= 1
+      if (match_num == 1) {
         last_match = succ->GetOneMatch(0);
         // Add child to the working list
         to_be_sorted.push_back(child);
-      } else {
+      } else if (match_num > 1) {
         // We only preserve the longest matching. Else nodes will be reduced.
         unsigned longest = start_node;
         unsigned longest_index = 0;
@@ -1627,18 +1624,14 @@ void Parser::SortOutConcatenate(AppealNode *parent) {
         to_be_sorted.push_back(child);
       }
     }
+
+    parent->mSortedChildren.push_back(child);
     
     prev_child = child;
   }
 
   // The last valid child's match token should be the same as parent's
   MASSERT((last_match == parent_match) && "Concatenate children not connected?");
-
-  // remove the bad children AppealNode
-  std::vector<AppealNode*>::iterator badit = bad_children.begin();
-  for (; badit != bad_children.end(); badit++) {
-    parent->RemoveChild(*badit);
-  }
 
   return;
 }
@@ -1661,10 +1654,12 @@ void Parser::SortOutData(AppealNode *parent) {
     // we just need to add the child node to working list.
     MASSERT((parent->mChildren.size() == 1) && "Should have only one child?");
     to_be_sorted.push_back(parent->mChildren.front());
+    parent->mSortedChildren.push_back(parent->mChildren.front());
     break;
   case DT_Token:
     // token in table-data created a Child AppealNode
     // Just keep the child node. Don't need do anything.
+    parent->mSortedChildren.push_back(parent->mChildren.front());
     break;
   case DT_Char:
   case DT_String:
@@ -1730,9 +1725,9 @@ void Parser::DumpSortOut() {
   // we start from the only child of mRootNode.
   to_be_dumped.clear();
   to_be_dumped_id.clear();
-  MASSERT(mRootNode->mChildren.size()==1);
+  MASSERT(mRootNode->mSortedChildren.size()==1);
 
-  to_be_dumped.push_back(mRootNode->mChildren.front());
+  to_be_dumped.push_back(mRootNode->mSortedChildren.front());
   to_be_dumped_id.push_back(seq_num++);
 
   while(!to_be_dumped.empty()) {
@@ -1752,10 +1747,21 @@ void Parser::DumpSortOutNode(AppealNode *n) {
   } else {
     RuleTable *t = n->GetTable();
     std::cout << "Table " << GetRuleTableName(t) << "@" << n->mStartIndex << ": ";
+
     if (n->mAfter == SuccWasSucc)
       std::cout << "WasSucc";
-    std::list<AppealNode*>::iterator it = n->mChildren.begin();
-    for (; it != n->mChildren.end(); it++) {
+
+    EntryType type = t->mType;
+    if (type == ET_Zeroorone || type == ET_Zeroormore) {
+      SuccMatch *succ = FindSucc(t);
+      bool found = succ->GetStartToken(n->mStartIndex);  // in order to set mTempIndex
+      unsigned match_num = succ->GetMatchNum();
+      if (match_num == 0)
+        std::cout << "KeepPosition";
+    }
+
+    std::vector<AppealNode*>::iterator it = n->mSortedChildren.begin();
+    for (; it != n->mSortedChildren.end(); it++) {
       std::cout << seq_num << ",";
       to_be_dumped.push_back(*it);
       to_be_dumped_id.push_back(seq_num++);
@@ -1786,6 +1792,8 @@ static bool NodeIsDone(AppealNode *n) {
   return false;
 }
 
+void Parser::SimplifySortedTree(AppealNode *root) {
+}
 
 ASTTree* Parser::BuildAST(AppealNode *root) {
   // temporarily disable BuildAST.

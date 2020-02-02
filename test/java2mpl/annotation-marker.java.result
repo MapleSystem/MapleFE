@@ -8,11 +8,13 @@ Separator  Token:  Lbrace
 Separator  Token:  Rbrace
 =======  Dump SortOut =======  
 [1] Table TblInterfaceDeclaration@0: 2,
-[2] Table TblAnnotationTypeDeclaration@0: 3,4,5,6,
-[3] Token
+[2] Table TblAnnotationTypeDeclaration@0: 3,4,5,6,7,
+[3] Table TblAnnotationTypeDeclaration_sub1@0: KeepPosition
 [4] Token
 [5] Token
-[6] Table TblAnnotationTypeBody@3: 7,8,
-[7] Token
+[6] Token
+[7] Table TblAnnotationTypeBody@3: 8,9,10,
 [8] Token
+[9] Table TblAnnotationTypeBody_sub1@4: KeepPosition
+[10] Token
 Matched 5 tokens.
