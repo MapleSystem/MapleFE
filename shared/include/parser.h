@@ -264,6 +264,7 @@ private:
   std::vector<ASTTree*> mASTTrees;      // All AST trees in this module
   ASTTree*  BuildAST(AppealNode*); // Each top level construct gets a AST
   void      SimplifySortedTree(AppealNode*);
+  void      PatchWasSucc(AppealNode*);
   TreeNode* NewTreeNode(ASTTree*, AppealNode*);
 
 public:

@@ -573,6 +573,7 @@ bool Parser::ParseStmt() {
   //
   // Each top level construct gets a AST tree.
   if (succ) {
+    PatchWasSucc(mRootNode);
     SimplifySortedTree(mRootNode);
     ASTTree *tree = BuildAST(mRootNode);
     if (tree)
@@ -1314,10 +1315,8 @@ void Parser::SortOutOneof(AppealNode *parent) {
   // It's possible it actually matches nothing, such as all children are Zeroorxxx
   // and they match nothing.
   unsigned match_num = succ->GetMatchNum();
-  if (match_num == 0) {
-    parent->ClearChildren();
+  if (match_num == 0)
     return;
-  }
 
   // At this point, it has one and only one succ match.
   MASSERT((match_num == 1) && "trimmed parent has >1 matches?");
@@ -1391,12 +1390,10 @@ void Parser::SortOutZeroormore(AppealNode *parent) {
   unsigned parent_start = parent->mStartIndex;
   bool     found = parent_succ->GetStartToken(parent_start);
 
-  // Zeroormore could match nothing. We just remove all children node in this case.
+  // Zeroormore could match nothing.
   unsigned match_num = parent_succ->GetMatchNum();
-  if (match_num == 0) {
-    parent->ClearChildren();
+  if (match_num == 0)
     return;
-  }
 
   // If parent->mAfter is SuccWasSucc, it means we didn't traverse its children
   // during matching. In SortOut, we simple return. However, when generating IR,
@@ -1790,6 +1787,11 @@ static bool NodeIsDone(AppealNode *n) {
       return true;
   }
   return false;
+}
+
+// In the tree after SortOut, some nodes could be SuccWasSucc and we didn't build
+// sub-tree for its children. Now it's time to patch the sub-tree.
+void Parser::PatchWasSucc(AppealNode *root) {
 }
 
 void Parser::SimplifySortedTree(AppealNode *root) {
