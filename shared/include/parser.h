@@ -263,9 +263,11 @@ private:
   // Build AST
   std::vector<ASTTree*> mASTTrees;      // All AST trees in this module
   ASTTree*  BuildAST(AppealNode*); // Each top level construct gets a AST
+  TreeNode* NewTreeNode(ASTTree*, AppealNode*);
   void      SimplifySortedTree(AppealNode*);
   void      PatchWasSucc(AppealNode*);
-  TreeNode* NewTreeNode(ASTTree*, AppealNode*);
+  void      FindWasSucc(AppealNode *root);
+  void      FindPatchingNodes(AppealNode *root);
 
 public:
   Parser(const char *f, Module *m);

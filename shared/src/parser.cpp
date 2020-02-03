@@ -1755,9 +1755,47 @@ static bool NodeIsDone(AppealNode *n) {
   return false;
 }
 
+static std::vector<AppealNode*> was_succ_list;
+static std::vector<AppealNode*> patching_list;
+
+// Find the nodes which are SuccWasSucc
+void Parser::FindWasSucc(AppealNode *root) {
+  std::deque<AppealNode*> working_list;
+  working_list.push_back(root);
+  while (!working_list.empty()) {
+    AppealNode *node = working_list.front();
+    working_list.pop_front();
+    if (node->mAfter == SuccWasSucc)
+      was_succ_list.push_back(node);
+    else {
+      std::vector<AppealNode*>::iterator it = node->mSortedChildren.begin();
+      for (; it != node->mSortedChildren.end(); it++)
+        working_list.push_back(*it);
+    }
+  }
+  return NULL;
+}
+
+// For each node in was_succ_list there is one and only patching subtree.
+void Parser::FindPatchingNodes(AppealNode *root) {
+}
+
 // In the tree after SortOut, some nodes could be SuccWasSucc and we didn't build
 // sub-tree for its children. Now it's time to patch the sub-tree.
 void Parser::PatchWasSucc(AppealNode *root) {
+  return; // ===== > > to be removed
+
+  while(1) {
+    // step 1. Traverse the sorted tree, find the target node which is SuccWasSucc
+    was_succ_list.clear();
+    FindWasSucc(root);
+    if (was_succ_list.empty())
+      break;
+
+    // step 2. Traverse the original tree, find the subtree matching target
+    // step 3. Assert the subtree is not sorted. Then SupplementalSortOut()
+    // step 4. Add the subtree to the children list of target
+  }
 }
 
 void Parser::SimplifySortedTree(AppealNode *root) {
