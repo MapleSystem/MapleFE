@@ -1276,6 +1276,12 @@ void Parser::SortOutNode(AppealNode *node) {
   if (node->IsToken())
     return;
 
+  // If node->mAfter is SuccWasSucc, it means we didn't traverse its children
+  // during matching. In SortOut, we simple return. However, when generating IR,
+  // the children have to be created. A re-traversal of AppealNode tree is needed.
+  if (node->mAfter == SuccWasSucc && node->mChildren.size() == 0)
+    return;
+
   RuleTable *rule_table = node->GetTable();
   EntryType type = rule_table->mType;
   switch(type) {
@@ -1320,19 +1326,6 @@ void Parser::SortOutOneof(AppealNode *parent) {
 
   // At this point, it has one and only one succ match.
   MASSERT((match_num == 1) && "trimmed parent has >1 matches?");
-
-  // If parent->mAfter is SuccWasSucc, it means we didn't traverse its children
-  // during matching. In SortOut, we simple return. However, when generating IR,
-  // the children have to be created, either reusing previous symbol or copying the
-  // IR tree.
-  //
-  // [TODO] [NOTE] However, the problem here is the previous successful matching
-  //               could be inside a bigger failed sub-tree. I guess, when creating IR
-  //               a possible re-visit of that sub-tree, or some data structure to
-  //               record that sub-tree.
-  if (parent->mAfter == SuccWasSucc && parent->mChildren.size() == 0)
-    return;
-
   unsigned parent_match = succ->GetOneMatch(0);
 
   unsigned good_children = 0;
@@ -1393,13 +1386,6 @@ void Parser::SortOutZeroormore(AppealNode *parent) {
   // Zeroormore could match nothing.
   unsigned match_num = parent_succ->GetMatchNum();
   if (match_num == 0)
-    return;
-
-  // If parent->mAfter is SuccWasSucc, it means we didn't traverse its children
-  // during matching. In SortOut, we simple return. However, when generating IR,
-  // the children have to be created, either reusing previous symbol or copying the
-  // IR tree.
-  if (parent->mAfter == SuccWasSucc && parent->mChildren.size() == 0)
     return;
 
   unsigned parent_match = parent_succ->GetOneMatch(0);
@@ -1476,13 +1462,6 @@ void Parser::SortOutZeroorone(AppealNode *parent) {
   if (match_num == 0)
     return;
 
-  // If parent->mAfter is SuccWasSucc, it means we didn't traverse its children
-  // during matching. In SortOut, we simple return. However, when generating IR,
-  // the children have to be created, either reusing previous symbol or copying the
-  // IR tree.
-  if (parent->mAfter == SuccWasSucc && parent->mChildren.size() == 0)
-    return;
-
   unsigned parent_match = parent_succ->GetOneMatch(0);
 
   // At this point, there is one and only one child which may or may not match some tokens.
@@ -1534,13 +1513,6 @@ void Parser::SortOutConcatenate(AppealNode *parent) {
   // which matches nothing.
   unsigned match_num = parent_succ->GetMatchNum();
   if (match_num == 0)
-    return;
-
-  // If parent->mAfter is SuccWasSucc, it means we didn't traverse its children
-  // during matching. In SortOut, we simple return. However, when generating IR,
-  // the children have to be created, either reusing previous symbol or copying the
-  // IR tree.
-  if (parent->mAfter == SuccWasSucc && parent->mChildren.size() == 0)
     return;
 
   // In Concatenate node, some ZeroorXXX children could match nothing.i
@@ -1641,12 +1613,6 @@ void Parser::SortOutData(AppealNode *parent) {
   TableData *data = parent_table->mData;
   switch (data->mType) {
   case DT_Subtable:
-    // Sometimes an AppealNode is set SuccWasSucc and we skip creating its children nodes.
-    // However, during IR generation, we need to create the sub-tree. We can also reuse
-    // the symbol of previous sub-tree.
-    if (parent->mAfter == SuccWasSucc && parent->mChildren.size() == 0)
-      break;
-
     // There should be one child node, which represents the subtable.
     // we just need to add the child node to working list.
     MASSERT((parent->mChildren.size() == 1) && "Should have only one child?");
