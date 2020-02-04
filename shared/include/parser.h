@@ -99,6 +99,8 @@ public:
   void SetToken(Token *t)     { mIsTable = false; mData.mToken = t; }
   RuleTable* GetTable() { return mData.mTable; }
   Token*     GetToken() { return mData.mToken; }
+
+  bool SuccEqualTo(AppealNode*);
 };
 
 // Design of the cached success info.
@@ -260,14 +262,16 @@ private:
   void SortOutData(AppealNode*);
   void CleanFailedSecondTry(AppealNode*);
 
+  void SimplifySortedTree(AppealNode*);
+  void PatchWasSucc(AppealNode*);
+  void FindWasSucc(AppealNode *root);
+  void FindPatchingNodes(AppealNode *root);
+  void SupplementalSortOut(AppealNode *root, AppealNode *target);
+
   // Build AST
   std::vector<ASTTree*> mASTTrees;      // All AST trees in this module
   ASTTree*  BuildAST(AppealNode*); // Each top level construct gets a AST
   TreeNode* NewTreeNode(ASTTree*, AppealNode*);
-  void      SimplifySortedTree(AppealNode*);
-  void      PatchWasSucc(AppealNode*);
-  void      FindWasSucc(AppealNode *root);
-  void      FindPatchingNodes(AppealNode *root);
 
 public:
   Parser(const char *f, Module *m);

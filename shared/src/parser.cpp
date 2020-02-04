@@ -1756,6 +1756,12 @@ static bool NodeIsDone(AppealNode *n) {
 }
 
 static std::vector<AppealNode*> was_succ_list;
+
+// The SuccWasSucc node and its patching node is a one-one mapping.
+// We don't use a map to maintain this. We use to vectors to do this
+// by adding the pair of nodes at the same time. Their index in the
+// vectors are the same.
+static std::vector<AppealNode*> was_succ_matched_list;
 static std::vector<AppealNode*> patching_list;
 
 // Find the nodes which are SuccWasSucc
@@ -1776,15 +1782,103 @@ void Parser::FindWasSucc(AppealNode *root) {
   return NULL;
 }
 
+// Check if 'n' is a matching for one and only one in was_succ_list.
+// Return the one in was_succ_list.
+static bool IsGoodMatching(AppealNode *n) {
+  // step 1. It should be succ.
+  if (n->IsFail())
+    return false;
+
+  // step 2. Find the correct SuccWasSucc node
+  std::vector<AppealNode*>::iterator it = was_succ_list.begin();
+  AppealNode *found = NULL;
+  for (; it != was_succ_list.end(); it++) {
+    AppealNode *was_succ = *it;
+    if (n->SuccEqualTo(was_succ)) {
+      MASSERT( !found && "This should be a one-one mapping, got wrong?");
+      found = was_succ;
+      // We don't break the loop here. Let it finish to verify the
+      // one-one mapping
+    }
+  }
+
+  if (!found)
+    return false;
+
+  // step 3. Make sure was_succ is not duplicated in the was_succ_list
+  it = was_succ_list.begin();
+  for (; it != was_succ_list.end(); it++) {
+    if (*it == found)
+      MASSERT(0 && "Not a one-one mapping?");
+  }
+
+  // step 4. Put the was_succ into was_succ_matched_list.
+  //         And put the 'n' into patching_list. This maintains one-one mapping.
+  was_succ_matched_list.push_back(found);
+  patching_list.push_back(n);
+
+  return true;
+}
+
 // For each node in was_succ_list there is one and only patching subtree.
 void Parser::FindPatchingNodes(AppealNode *root) {
+  std::deque<AppealNode*> working_list;
+  working_list.push_back(root);
+  while (!working_list.empty()) {
+    AppealNode *node = working_list.front();
+    working_list.pop_front();
+    bool was_succ = IsGoodMatching(node);
+    if (!was_succ) {
+      std::vector<AppealNode*>::iterator it = node->mChildren.begin();
+      for (; it != node->mChildren.end(); it++)
+        working_list.push_back(*it);
+    }
+  }
+}
+
+// This is another entry point of sort, similar as SortOut().
+// The only difference is we use 'target' as the reference of 'root'
+// when trimming 'root'.
+void Parser::SupplementalSortOut(AppealNode *root, AppealNode *target) {
+  MASSERT(root->mSortedChildren.size()==0 && "root should be un-sorted.");
+  MASSERT(root->IsTable() && "root should be a table node.");
+
+  // step 1. Find the only matching token index we want.
+
+  SuccMatch *succ = FindSucc(target->GetTable());
+  MASSERT(succ && "ruletable node has no SuccMatch?");
+
+  bool found = succ->GetStartToken(target->mStartIndex);  // in order to set mTempIndex
+  MASSERT(found && "Couldn't find start token?");
+  unsigned match_num = succ->GetMatchNum();
+  MASSERT(match_num == 0 && "target should have been trimmed.");
+  unsigned match = succ->GetOneMatch(0);
+
+  // step 2. Trim the root.
+
+  succ = FindSucc(root->GetTable());
+  MASSERT(succ && "ruletable node has no SuccMatch?");
+  succ->ReduceMatches(root->mStartIndex, match);
+
+  // step 3. Start the sort out
+
+  to_be_sorted.clear();
+  to_be_sorted.push_back(root);
+
+  while(!to_be_sorted.empty()) {
+    AppealNode *node = to_be_sorted.front();
+    to_be_sorted.pop_front();
+    SortOutNode(node);
+  }
+
+  if (mTraceSortOut)
+    DumpSortOut();
 }
 
 // In the tree after SortOut, some nodes could be SuccWasSucc and we didn't build
 // sub-tree for its children. Now it's time to patch the sub-tree.
 void Parser::PatchWasSucc(AppealNode *root) {
-  return; // ===== > > to be removed
-
+  return;
   while(1) {
     // step 1. Traverse the sorted tree, find the target node which is SuccWasSucc
     was_succ_list.clear();
@@ -1793,8 +1887,20 @@ void Parser::PatchWasSucc(AppealNode *root) {
       break;
 
     // step 2. Traverse the original tree, find the subtree matching target
+    was_succ_matched_list.clear();
+    patching_list.clear();
+    FindPatchingNodes(root);
+    MASSERT( !patching_list.empty() && "Cannot find any patching for SuccWasSucc.");
+
     // step 3. Assert the subtree is not sorted. Then SupplementalSortOut()
-    // step 4. Add the subtree to the children list of target
+    //         Copy the subtree of patch to was_succ
+    for (unsigned i = 0; i < was_succ_matched_list.size(); i++) {
+      AppealNode *patch = patching_list[i];
+      AppealNode *was_succ = was_succ_matched_list[i];
+      SupplementalSortOut(patch, was_succ);
+      for (unsigned j = 0; j < patch->mChildren.size(); j++)
+        was_succ->AddChild(patch->mChildren[j]);
+    }
   }
 }
 
@@ -2098,6 +2204,19 @@ bool SuccMatch::ReduceMatches(unsigned start, unsigned except) {
 ///////////////////////////////////////////////////////////////
 //            AppealNode function
 ///////////////////////////////////////////////////////////////
+
+// Returns true, if both nodes are successful and match the same tokens
+// with the same rule table
+bool AppealNode::SuccEqualTo(AppealNode *other) {
+  if (IsSucc() && other->IsSucc() && mStartIndex == other->mStartIndex) {
+    if (IsToken() && other->IsToken()) {
+      return GetToken() == other->GetToken();
+    } else if (IsTable() && other->IsTable()) {
+      return GetTable() == other->GetTable();
+    }
+  }
+  return false;
+}
 
 void AppealNode::RemoveChild(AppealNode *child) {
   std::vector<AppealNode*> temp_vector;
