@@ -1263,8 +1263,10 @@ void Parser::SortOut() {
     SortOutNode(node);
   }
 
-  if (mTraceSortOut)
-    DumpSortOut();
+  if (mTraceSortOut) {
+    MASSERT(mRootNode->mSortedChildren.size()==1);
+    DumpSortOut(mRootNode->mSortedChildren[0]);
+  }
 }
 
 // 'node' is already trimmed when passed into this function. This assertion
@@ -1683,14 +1685,13 @@ static std::deque<AppealNode *> to_be_dumped;
 static std::deque<unsigned> to_be_dumped_id;
 static unsigned seq_num = 1;
 
-void Parser::DumpSortOut() {
+void Parser::DumpSortOut(AppealNode *root) {
   std::cout << "=======  Dump SortOut =======  " << std::endl;
   // we start from the only child of mRootNode.
   to_be_dumped.clear();
   to_be_dumped_id.clear();
-  MASSERT(mRootNode->mSortedChildren.size()==1);
 
-  to_be_dumped.push_back(mRootNode->mSortedChildren.front());
+  to_be_dumped.push_back(root);
   to_be_dumped_id.push_back(seq_num++);
 
   while(!to_be_dumped.empty()) {
@@ -1805,14 +1806,7 @@ static bool IsGoodMatching(AppealNode *n) {
   if (!found)
     return false;
 
-  // step 3. Make sure was_succ is not duplicated in the was_succ_list
-  it = was_succ_list.begin();
-  for (; it != was_succ_list.end(); it++) {
-    if (*it == found)
-      MASSERT(0 && "Not a one-one mapping?");
-  }
-
-  // step 4. Put the was_succ into was_succ_matched_list.
+  // step 3. Put the was_succ into was_succ_matched_list.
   //         And put the 'n' into patching_list. This maintains one-one mapping.
   was_succ_matched_list.push_back(found);
   patching_list.push_back(n);
@@ -1851,7 +1845,7 @@ void Parser::SupplementalSortOut(AppealNode *root, AppealNode *target) {
   bool found = succ->GetStartToken(target->mStartIndex);  // in order to set mTempIndex
   MASSERT(found && "Couldn't find start token?");
   unsigned match_num = succ->GetMatchNum();
-  MASSERT(match_num == 0 && "target should have been trimmed.");
+  MASSERT(match_num == 1 && "target should have been trimmed.");
   unsigned match = succ->GetOneMatch(0);
 
   // step 2. Trim the root.
@@ -1872,7 +1866,7 @@ void Parser::SupplementalSortOut(AppealNode *root, AppealNode *target) {
   }
 
   if (mTraceSortOut)
-    DumpSortOut();
+    DumpSortOut(root);
 }
 
 // In the tree after SortOut, some nodes could be SuccWasSucc and we didn't build
