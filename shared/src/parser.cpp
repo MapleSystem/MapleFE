@@ -573,7 +573,7 @@ bool Parser::ParseStmt() {
   //
   // Each top level construct gets a AST tree.
   if (succ) {
-    PatchWasSucc(mRootNode);
+    PatchWasSucc(mRootNode->mSortedChildren[0]);
     SimplifySortedTree(mRootNode);
     ASTTree *tree = BuildAST(mRootNode);
     if (tree)
@@ -1685,11 +1685,13 @@ static std::deque<AppealNode *> to_be_dumped;
 static std::deque<unsigned> to_be_dumped_id;
 static unsigned seq_num = 1;
 
+// 'root' cannot be mRootNode which is just a fake node.
 void Parser::DumpSortOut(AppealNode *root) {
   std::cout << "=======  Dump SortOut =======  " << std::endl;
   // we start from the only child of mRootNode.
   to_be_dumped.clear();
   to_be_dumped_id.clear();
+  seq_num = 1;
 
   to_be_dumped.push_back(root);
   to_be_dumped_id.push_back(seq_num++);
@@ -1795,7 +1797,7 @@ static bool IsGoodMatching(AppealNode *n) {
   AppealNode *found = NULL;
   for (; it != was_succ_list.end(); it++) {
     AppealNode *was_succ = *it;
-    if (n->SuccEqualTo(was_succ)) {
+    if (n->SuccEqualTo(was_succ) && n->mAfter != SuccWasSucc) {
       MASSERT( !found && "This should be a one-one mapping, got wrong?");
       found = was_succ;
       // We don't break the loop here. Let it finish to verify the
@@ -1834,6 +1836,8 @@ void Parser::FindPatchingNodes(AppealNode *root) {
 // The only difference is we use 'target' as the reference of 'root'
 // when trimming 'root'.
 void Parser::SupplementalSortOut(AppealNode *root, AppealNode *target) {
+  if(root->mSortedChildren.size()!=0)
+    std::cout << "got one sorted again." << std::endl;
   MASSERT(root->mSortedChildren.size()==0 && "root should be un-sorted.");
   MASSERT(root->IsTable() && "root should be a table node.");
 
@@ -1886,16 +1890,20 @@ void Parser::PatchWasSucc(AppealNode *root) {
     FindPatchingNodes(root);
     MASSERT( !patching_list.empty() && "Cannot find any patching for SuccWasSucc.");
 
-    // step 3. Assert the subtree is not sorted. Then SupplementalSortOut()
+    // step 3. Assert the sorted subtree is not sorted. Then SupplementalSortOut()
     //         Copy the subtree of patch to was_succ
     for (unsigned i = 0; i < was_succ_matched_list.size(); i++) {
       AppealNode *patch = patching_list[i];
       AppealNode *was_succ = was_succ_matched_list[i];
       SupplementalSortOut(patch, was_succ);
-      for (unsigned j = 0; j < patch->mChildren.size(); j++)
-        was_succ->AddChild(patch->mChildren[j]);
+      was_succ->mAfter = Succ;
+      for (unsigned j = 0; j < patch->mSortedChildren.size(); j++)
+        was_succ->AddSortedChild(patch->mSortedChildren[j]);
     }
   }
+
+  if (mTraceSortOut)
+    DumpSortOut(root);
 }
 
 void Parser::SimplifySortedTree(AppealNode *root) {

@@ -89,6 +89,7 @@ public:
   void AddChild(AppealNode *n) { mChildren.push_back(n); }
   void RemoveChild(AppealNode *n);
   void ClearChildren() { mChildren.clear(); }
+  void AddSortedChild(AppealNode *n) { mSortedChildren.push_back(n); }
 
   bool IsSucc() { return (mAfter == Succ) || (mAfter == SuccWasSucc); }
   bool IsFail() { return !IsSucc(); }

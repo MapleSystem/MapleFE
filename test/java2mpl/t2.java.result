@@ -39,23 +39,23 @@ Separator  Token:  Semicolon
 [25] Table TblVariableDeclaratorId_sub1@4: KeepPosition
 Matched 5 tokens.
 =======  Dump SortOut =======  
-[26] Table TblStatement@5: 27,
-[27] Table TblStatementWithoutTrailingSubstatement@5: 28,
-[28] Table TblExpressionStatement@5: 29,30,
-[29] Table TblStatementExpression@5: 31,
-[30] Token
-[31] Table TblAssignment@5: 32,33,34,
-[32] Table TblLeftHandSide@5: 35,
-[33] Table TblAssignmentOperator@6: 36,
-[34] Table TblExpression@7: 37,
-[35] Table TblExpressionName@5: 38,
-[36] Token
-[37] Table TblPrimary@7: 39,
-[38] Token
-[39] Table TblPrimaryNoNewArray@7: 40,41,
-[40] Token
-[41] Table TblArrayAccess@7: 42,
-[42] Table TblArrayAccess_sub3@7: 43,44,
-[43] Table TblPrimaryNoNewArray@7: WasSucc
-[44] Table TblArrayAccess_sub4@8: KeepPosition
+[1] Table TblStatement@5: 2,
+[2] Table TblStatementWithoutTrailingSubstatement@5: 3,
+[3] Table TblExpressionStatement@5: 4,5,
+[4] Table TblStatementExpression@5: 6,
+[5] Token
+[6] Table TblAssignment@5: 7,8,9,
+[7] Table TblLeftHandSide@5: 10,
+[8] Table TblAssignmentOperator@6: 11,
+[9] Table TblExpression@7: 12,
+[10] Table TblExpressionName@5: 13,
+[11] Token
+[12] Table TblPrimary@7: 14,
+[13] Token
+[14] Table TblPrimaryNoNewArray@7: 15,16,
+[15] Token
+[16] Table TblArrayAccess@7: 17,
+[17] Table TblArrayAccess_sub3@7: 18,19,
+[18] Table TblPrimaryNoNewArray@7: WasSucc
+[19] Table TblArrayAccess_sub4@8: KeepPosition
 Matched 9 tokens.
