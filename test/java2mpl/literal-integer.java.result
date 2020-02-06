@@ -86,7 +86,7 @@ Separator  Token:  Whitespace
 Separator  Token:  Whitespace
 Separator  Token:  Rbrace
 Separator  Token:  Rbrace
-=======  Dump SortOut =======  
+======= Main sortout Dump SortOut =======  
 [1] Table TblClassDeclaration@0: 2,
 [2] Table TblNormalClassDeclaration@0: 3,4,5,6,7,8,9,
 [3] Table TblNormalClassDeclaration_sub1@0: KeepPosition
@@ -198,70 +198,42 @@ Separator  Token:  Rbrace
 [109] Table TblAssignmentOperator@32: 129,
 [110] Table TblExpression@33: 130,
 [111] Token
-[112] Table TblPrimaryNoNewArray@9: 131,132,
-[113] Table TblExpressionName@11: 133,
+[112] Table TblPrimaryNoNewArray@9: 131,
+[113] Table TblExpressionName@11: 132,
 [114] Token
-[115] Table TblPrimary@13: 134,
-[116] Table TblExpressionName@15: 135,
+[115] Table TblPrimary@13: 133,
+[116] Table TblExpressionName@15: 134,
 [117] Token
-[118] Table TblPrimary@17: 136,
-[119] Table TblExpressionName@19: 137,
+[118] Table TblPrimary@17: 135,
+[119] Table TblExpressionName@19: 136,
 [120] Token
-[121] Table TblPrimary@21: 138,
-[122] Table TblExpressionName@23: 139,
+[121] Table TblPrimary@21: 137,
+[122] Table TblExpressionName@23: 138,
 [123] Token
-[124] Table TblPrimary@25: 140,
-[125] Table TblExpressionName@27: 141,
+[124] Table TblPrimary@25: 139,
+[125] Table TblExpressionName@27: 140,
 [126] Token
-[127] Table TblPrimary@29: 142,
-[128] Table TblExpressionName@31: 143,
+[127] Table TblPrimary@29: 141,
+[128] Table TblExpressionName@31: 142,
 [129] Token
-[130] Table TblPrimary@33: 144,
+[130] Table TblPrimary@33: 143,
 [131] Token
-[132] Table TblArrayAccess@9: 145,
-[133] Token
-[134] Table TblPrimaryNoNewArray@13: 146,147,
-[135] Token
-[136] Table TblPrimaryNoNewArray@17: 148,149,
-[137] Token
-[138] Table TblPrimaryNoNewArray@21: 150,151,
-[139] Token
-[140] Table TblPrimaryNoNewArray@25: 152,153,
-[141] Token
-[142] Table TblPrimaryNoNewArray@29: 154,155,
-[143] Token
-[144] Table TblPrimaryNoNewArray@33: 156,157,
-[145] Table TblArrayAccess_sub3@9: 158,159,
+[132] Token
+[133] Table TblPrimaryNoNewArray@13: 144,
+[134] Token
+[135] Table TblPrimaryNoNewArray@17: 145,
+[136] Token
+[137] Table TblPrimaryNoNewArray@21: 146,
+[138] Token
+[139] Table TblPrimaryNoNewArray@25: 147,
+[140] Token
+[141] Table TblPrimaryNoNewArray@29: 148,
+[142] Token
+[143] Table TblPrimaryNoNewArray@33: 149,
+[144] Token
+[145] Token
 [146] Token
-[147] Table TblArrayAccess@13: 160,
+[147] Token
 [148] Token
-[149] Table TblArrayAccess@17: 161,
-[150] Token
-[151] Table TblArrayAccess@21: 162,
-[152] Token
-[153] Table TblArrayAccess@25: 163,
-[154] Token
-[155] Table TblArrayAccess@29: 164,
-[156] Token
-[157] Table TblArrayAccess@33: 165,
-[158] Table TblPrimaryNoNewArray@9: WasSucc
-[159] Table TblArrayAccess_sub4@10: KeepPosition
-[160] Table TblArrayAccess_sub3@13: 166,167,
-[161] Table TblArrayAccess_sub3@17: 168,169,
-[162] Table TblArrayAccess_sub3@21: 170,171,
-[163] Table TblArrayAccess_sub3@25: 172,173,
-[164] Table TblArrayAccess_sub3@29: 174,175,
-[165] Table TblArrayAccess_sub3@33: 176,177,
-[166] Table TblPrimaryNoNewArray@13: WasSucc
-[167] Table TblArrayAccess_sub4@14: KeepPosition
-[168] Table TblPrimaryNoNewArray@17: WasSucc
-[169] Table TblArrayAccess_sub4@18: KeepPosition
-[170] Table TblPrimaryNoNewArray@21: WasSucc
-[171] Table TblArrayAccess_sub4@22: KeepPosition
-[172] Table TblPrimaryNoNewArray@25: WasSucc
-[173] Table TblArrayAccess_sub4@26: KeepPosition
-[174] Table TblPrimaryNoNewArray@29: WasSucc
-[175] Table TblArrayAccess_sub4@30: KeepPosition
-[176] Table TblPrimaryNoNewArray@33: WasSucc
-[177] Table TblArrayAccess_sub4@34: KeepPosition
+[149] Token
 Matched 37 tokens.

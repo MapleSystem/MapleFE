@@ -181,7 +181,7 @@ public:
                      bool succ, AppealStatus reason = Succ);
   void DumpAppeal(RuleTable *table, unsigned token);
   void DumpSuccTokens();
-  void DumpSortOut(AppealNode *root);
+  void DumpSortOut(AppealNode *root, const char * /*hint*/);
   void DumpSortOutNode(AppealNode*);
 
 private:

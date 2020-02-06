@@ -20,7 +20,7 @@ Separator  Token:  Whitespace
 Identifier Token:  Endorsers
 Separator  Token:  Whitespace
 Separator  Token:  Lbrace
-=======  Dump SortOut =======  
+======= Main sortout Dump SortOut =======  
 [1] Table TblInterfaceDeclaration@0: 2,
 [2] Table TblAnnotationTypeDeclaration@0: 3,4,5,6,7,
 [3] Table TblAnnotationTypeDeclaration_sub1@0: KeepPosition
@@ -59,7 +59,7 @@ Separator  Token:  Lparen
 Separator  Token:  Rparen
 Separator  Token:  Semicolon
 Separator  Token:  Rbrace
-=======  Dump SortOut =======  
+======= Main sortout Dump SortOut =======  
 [1] Table TblInterfaceDeclaration@10: 2,
 [2] Table TblAnnotationTypeDeclaration@10: 3,4,5,6,7,
 [3] Table TblAnnotationTypeDeclaration_sub1@10: KeepPosition

@@ -1265,7 +1265,7 @@ void Parser::SortOut() {
 
   if (mTraceSortOut) {
     MASSERT(mRootNode->mSortedChildren.size()==1);
-    DumpSortOut(mRootNode->mSortedChildren[0]);
+    DumpSortOut(mRootNode->mSortedChildren[0], "Main sortout");
   }
 }
 
@@ -1331,7 +1331,6 @@ void Parser::SortOutOneof(AppealNode *parent) {
   unsigned parent_match = succ->GetOneMatch(0);
 
   unsigned good_children = 0;
-  bool     good_child_elected = false;
 
   std::vector<AppealNode*>::iterator it = parent->mChildren.begin();
   for (; it != parent->mChildren.end(); it++) {
@@ -1356,18 +1355,15 @@ void Parser::SortOutOneof(AppealNode *parent) {
       bool found = succ->ReduceMatches(child->mStartIndex, parent_match);
       if (found) {
         good_children++;
-        // We only elect the first good child.
-        if (!good_child_elected) {
-          to_be_sorted.push_back(child);
-          parent->mSortedChildren.push_back(child);
-          good_child_elected = true;
-        }
+        to_be_sorted.push_back(child);
+        parent->mSortedChildren.push_back(child);
       }
     }
-  }
 
-  if(good_children > 1 && mTraceWarning)
-    std::cout << "Warning: Multiple succ children. We only keep one." << std::endl;
+    // We only pick the first good child.
+    if (good_children > 0)
+      break;
+  }
 }
 
 // 'parent' is already trimmed when passed into this function.
@@ -1686,8 +1682,8 @@ static std::deque<unsigned> to_be_dumped_id;
 static unsigned seq_num = 1;
 
 // 'root' cannot be mRootNode which is just a fake node.
-void Parser::DumpSortOut(AppealNode *root) {
-  std::cout << "=======  Dump SortOut =======  " << std::endl;
+void Parser::DumpSortOut(AppealNode *root, const char *phase) {
+  std::cout << "======= " << phase << " Dump SortOut =======  " << std::endl;
   // we start from the only child of mRootNode.
   to_be_dumped.clear();
   to_be_dumped_id.clear();
@@ -1870,7 +1866,7 @@ void Parser::SupplementalSortOut(AppealNode *root, AppealNode *target) {
   }
 
   if (mTraceSortOut)
-    DumpSortOut(root);
+    DumpSortOut(root, "supplemental sortout");
 }
 
 // In the tree after SortOut, some nodes could be SuccWasSucc and we didn't build
@@ -1903,7 +1899,7 @@ void Parser::PatchWasSucc(AppealNode *root) {
   }
 
   if (mTraceSortOut)
-    DumpSortOut(root);
+    DumpSortOut(root, "patch-was-succ");
 }
 
 void Parser::SimplifySortedTree(AppealNode *root) {

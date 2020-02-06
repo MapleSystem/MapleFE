@@ -11,7 +11,7 @@ Operator   Token:  Assign
 Separator  Token:  Whitespace
 Integer Literal Token: 0
 Separator  Token:  Semicolon
-=======  Dump SortOut =======  
+======= Main sortout Dump SortOut =======  
 [1] Table TblStatement@0: 2,
 [2] Table TblLocalVariableDeclarationStatement@0: 3,4,
 [3] Table TblLocalVariableDeclaration@0: 5,6,7,
@@ -38,7 +38,7 @@ Separator  Token:  Semicolon
 [24] Token
 [25] Table TblVariableDeclaratorId_sub1@4: KeepPosition
 Matched 5 tokens.
-=======  Dump SortOut =======  
+======= Main sortout Dump SortOut =======  
 [1] Table TblStatement@5: 2,
 [2] Table TblStatementWithoutTrailingSubstatement@5: 3,
 [3] Table TblExpressionStatement@5: 4,5,
@@ -52,10 +52,6 @@ Matched 5 tokens.
 [11] Token
 [12] Table TblPrimary@7: 14,
 [13] Token
-[14] Table TblPrimaryNoNewArray@7: 15,16,
+[14] Table TblPrimaryNoNewArray@7: 15,
 [15] Token
-[16] Table TblArrayAccess@7: 17,
-[17] Table TblArrayAccess_sub3@7: 18,19,
-[18] Table TblPrimaryNoNewArray@7: WasSucc
-[19] Table TblArrayAccess_sub4@8: KeepPosition
 Matched 9 tokens.

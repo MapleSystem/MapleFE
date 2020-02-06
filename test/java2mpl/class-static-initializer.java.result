@@ -30,7 +30,7 @@ Separator  Token:  Whitespace
 Separator  Token:  Whitespace
 Separator  Token:  Rbrace
 Separator  Token:  Rbrace
-=======  Dump SortOut =======  
+======= Main sortout Dump SortOut =======  
 [1] Table TblClassDeclaration@0: 2,
 [2] Table TblNormalClassDeclaration@0: 3,4,5,6,7,8,9,
 [3] Table TblNormalClassDeclaration_sub1@0: KeepPosition
@@ -85,10 +85,6 @@ Separator  Token:  Rbrace
 [52] Token
 [53] Table TblPrimary@11: 55,
 [54] Token
-[55] Table TblPrimaryNoNewArray@11: 56,57,
+[55] Table TblPrimaryNoNewArray@11: 56,
 [56] Token
-[57] Table TblArrayAccess@11: 58,
-[58] Table TblArrayAccess_sub3@11: 59,60,
-[59] Table TblPrimaryNoNewArray@11: WasSucc
-[60] Table TblArrayAccess_sub4@12: KeepPosition
 Matched 15 tokens.
