@@ -20,7 +20,7 @@ Separator  Token:  Whitespace
 Identifier Token:  Endorsers
 Separator  Token:  Whitespace
 Separator  Token:  Lbrace
-======= Main sortout Dump SortOut =======  
+======= Main sortout Dump SortOut =======
 [1] Table TblInterfaceDeclaration@0: 2,
 [2] Table TblAnnotationTypeDeclaration@0: 3,4,5,6,7,
 [3] Table TblAnnotationTypeDeclaration_sub1@0: KeepPosition
@@ -48,6 +48,33 @@ Separator  Token:  Lbrace
 [25] Token
 [26] Table TblUnannClassType_sub2@5: KeepPosition
 Matched 10 tokens.
+======= patch-was-succ Dump SortOut =======
+[1] Table TblInterfaceDeclaration@0: 2,
+[2] Table TblAnnotationTypeDeclaration@0: 3,4,5,6,7,
+[3] Table TblAnnotationTypeDeclaration_sub1@0: KeepPosition
+[4] Token
+[5] Token
+[6] Token
+[7] Table TblAnnotationTypeBody@3: 8,9,10,
+[8] Token
+[9] Table TblAnnotationTypeBody_sub1@4: 11,
+[10] Token
+[11] Table TblAnnotationTypeMemberDeclaration@4: 12,
+[12] Table TblAnnotationTypeElementDeclaration@4: 13,14,15,16,17,18,19,20,
+[13] Table TblAnnotationTypeElementDeclaration_sub1@4: KeepPosition
+[14] Table TblUnannType@4: 21,
+[15] Token
+[16] Token
+[17] Token
+[18] Table TblAnnotationTypeElementDeclaration_sub2@8: KeepPosition
+[19] Table TblAnnotationTypeElementDeclaration_sub3@8: KeepPosition
+[20] Token
+[21] Table TblUnannReferenceType@4: 22,
+[22] Table TblUnannClassOrInterfaceType@4: 23,
+[23] Table TblUnannClassType@4: 24,
+[24] Table TblUnannClassType_sub1@4: 25,26,
+[25] Token
+[26] Table TblUnannClassType_sub2@5: KeepPosition
 Separator  Token:  Whitespace
 Separator  Token:  Whitespace
 Identifier Token:  String
@@ -59,7 +86,7 @@ Separator  Token:  Lparen
 Separator  Token:  Rparen
 Separator  Token:  Semicolon
 Separator  Token:  Rbrace
-======= Main sortout Dump SortOut =======  
+======= Main sortout Dump SortOut =======
 [1] Table TblInterfaceDeclaration@10: 2,
 [2] Table TblAnnotationTypeDeclaration@10: 3,4,5,6,7,
 [3] Table TblAnnotationTypeDeclaration_sub1@10: KeepPosition
@@ -90,3 +117,43 @@ Separator  Token:  Rbrace
 [28] Token
 [29] Table TblDims_sub2@17: KeepPosition
 Matched 22 tokens.
+======= supplemental sortout Dump SortOut =======
+[1] Table TblUnannClassOrInterfaceType@14: 2,
+[2] Table TblUnannClassType@14: 3,
+[3] Table TblUnannClassType_sub1@14: 4,5,
+[4] Token
+[5] Table TblUnannClassType_sub2@15: KeepPosition
+======= patch-was-succ Dump SortOut =======
+[1] Table TblInterfaceDeclaration@10: 2,
+[2] Table TblAnnotationTypeDeclaration@10: 3,4,5,6,7,
+[3] Table TblAnnotationTypeDeclaration_sub1@10: KeepPosition
+[4] Token
+[5] Token
+[6] Token
+[7] Table TblAnnotationTypeBody@13: 8,9,10,
+[8] Token
+[9] Table TblAnnotationTypeBody_sub1@14: 11,
+[10] Token
+[11] Table TblAnnotationTypeMemberDeclaration@14: 12,
+[12] Table TblAnnotationTypeElementDeclaration@14: 13,14,15,16,17,18,19,20,
+[13] Table TblAnnotationTypeElementDeclaration_sub1@14: KeepPosition
+[14] Table TblUnannType@14: 21,
+[15] Token
+[16] Token
+[17] Token
+[18] Table TblAnnotationTypeElementDeclaration_sub2@20: KeepPosition
+[19] Table TblAnnotationTypeElementDeclaration_sub3@20: KeepPosition
+[20] Token
+[21] Table TblUnannReferenceType@14: 22,
+[22] Table TblUnannArrayType@14: 23,
+[23] Table TblUnannArrayType_sub2@14: 24,25,
+[24] Table TblUnannClassOrInterfaceType@14: 26,
+[25] Table TblDims@15: 27,28,29,30,
+[26] Table TblUnannClassType@14: 31,
+[27] Table TblDims_sub1@15: KeepPosition
+[28] Token
+[29] Token
+[30] Table TblDims_sub2@17: KeepPosition
+[31] Table TblUnannClassType_sub1@14: 32,33,
+[32] Token
+[33] Table TblUnannClassType_sub2@15: KeepPosition

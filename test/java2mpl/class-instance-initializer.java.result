@@ -26,7 +26,7 @@ Separator  Token:  Whitespace
 Separator  Token:  Whitespace
 Separator  Token:  Rbrace
 Separator  Token:  Rbrace
-======= Main sortout Dump SortOut =======  
+======= Main sortout Dump SortOut =======
 [1] Table TblClassDeclaration@0: 2,
 [2] Table TblNormalClassDeclaration@0: 3,4,5,6,7,8,9,
 [3] Table TblNormalClassDeclaration_sub1@0: KeepPosition
@@ -81,3 +81,57 @@ Separator  Token:  Rbrace
 [52] Table TblPrimaryNoNewArray@9: 53,
 [53] Token
 Matched 13 tokens.
+======= patch-was-succ Dump SortOut =======
+[1] Table TblClassDeclaration@0: 2,
+[2] Table TblNormalClassDeclaration@0: 3,4,5,6,7,8,9,
+[3] Table TblNormalClassDeclaration_sub1@0: KeepPosition
+[4] Token
+[5] Token
+[6] Table TblNormalClassDeclaration_sub2@2: KeepPosition
+[7] Table TblNormalClassDeclaration_sub3@2: KeepPosition
+[8] Table TblNormalClassDeclaration_sub4@2: KeepPosition
+[9] Table TblClassBody@2: 10,11,12,
+[10] Token
+[11] Table TblClassBody_sub1@3: 13,14,
+[12] Token
+[13] Table TblClassBodyDeclaration@3: 15,
+[14] Table TblClassBodyDeclaration@6: 16,
+[15] Table TblClassMemberDeclaration@3: 17,
+[16] Table TblInstanceInitializer@6: 18,
+[17] Table TblFieldDeclaration@3: 19,20,21,22,
+[18] Table TblBlock@6: 23,24,25,
+[19] Table TblFieldDeclaration_sub1@3: KeepPosition
+[20] Table TblUnannType@3: 26,
+[21] Table TblVariableDeclaratorList@4: 27,28,
+[22] Token
+[23] Token
+[24] Table TblBlock_sub1@7: 29,
+[25] Token
+[26] Table TblUnannPrimitiveType@3: 30,
+[27] Table TblVariableDeclarator@4: 31,32,
+[28] Table TblVariableDeclaratorList_sub1@5: KeepPosition
+[29] Table TblBlockStatements@7: 33,34,
+[30] Table TblNumericType@3: 35,
+[31] Table TblVariableDeclaratorId@4: 36,37,
+[32] Table TblVariableDeclarator_sub1@5: KeepPosition
+[33] Table TblBlockStatement@7: 38,
+[34] Table TblBlockStatements_sub1@11: KeepPosition
+[35] Table TblIntType@3: 39,
+[36] Token
+[37] Table TblVariableDeclaratorId_sub1@5: KeepPosition
+[38] Table TblStatement@7: 40,
+[39] Token
+[40] Table TblStatementWithoutTrailingSubstatement@7: 41,
+[41] Table TblExpressionStatement@7: 42,43,
+[42] Table TblStatementExpression@7: 44,
+[43] Token
+[44] Table TblAssignment@7: 45,46,47,
+[45] Table TblLeftHandSide@7: 48,
+[46] Table TblAssignmentOperator@8: 49,
+[47] Table TblExpression@9: 50,
+[48] Table TblExpressionName@7: 51,
+[49] Token
+[50] Table TblPrimary@9: 52,
+[51] Token
+[52] Table TblPrimaryNoNewArray@9: 53,
+[53] Token

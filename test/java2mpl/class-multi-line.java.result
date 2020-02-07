@@ -10,7 +10,7 @@ Separator  Token:  Whitespace
 Identifier Token:  a
 Separator  Token:  Semicolon
 Separator  Token:  Rbrace
-======= Main sortout Dump SortOut =======  
+======= Main sortout Dump SortOut =======
 [1] Table TblClassDeclaration@0: 2,
 [2] Table TblNormalClassDeclaration@0: 3,4,5,6,7,8,9,
 [3] Table TblNormalClassDeclaration_sub1@0: KeepPosition
@@ -41,3 +41,33 @@ Separator  Token:  Rbrace
 [28] Table TblVariableDeclaratorId_sub1@5: KeepPosition
 [29] Token
 Matched 7 tokens.
+======= patch-was-succ Dump SortOut =======
+[1] Table TblClassDeclaration@0: 2,
+[2] Table TblNormalClassDeclaration@0: 3,4,5,6,7,8,9,
+[3] Table TblNormalClassDeclaration_sub1@0: KeepPosition
+[4] Token
+[5] Token
+[6] Table TblNormalClassDeclaration_sub2@2: KeepPosition
+[7] Table TblNormalClassDeclaration_sub3@2: KeepPosition
+[8] Table TblNormalClassDeclaration_sub4@2: KeepPosition
+[9] Table TblClassBody@2: 10,11,12,
+[10] Token
+[11] Table TblClassBody_sub1@3: 13,
+[12] Token
+[13] Table TblClassBodyDeclaration@3: 14,
+[14] Table TblClassMemberDeclaration@3: 15,
+[15] Table TblFieldDeclaration@3: 16,17,18,19,
+[16] Table TblFieldDeclaration_sub1@3: KeepPosition
+[17] Table TblUnannType@3: 20,
+[18] Table TblVariableDeclaratorList@4: 21,22,
+[19] Token
+[20] Table TblUnannPrimitiveType@3: 23,
+[21] Table TblVariableDeclarator@4: 24,25,
+[22] Table TblVariableDeclaratorList_sub1@5: KeepPosition
+[23] Table TblNumericType@3: 26,
+[24] Table TblVariableDeclaratorId@4: 27,28,
+[25] Table TblVariableDeclarator_sub1@5: KeepPosition
+[26] Table TblIntType@3: 29,
+[27] Token
+[28] Table TblVariableDeclaratorId_sub1@5: KeepPosition
+[29] Token

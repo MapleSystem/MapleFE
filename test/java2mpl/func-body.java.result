@@ -36,7 +36,7 @@ Separator  Token:  Whitespace
 Separator  Token:  Whitespace
 Separator  Token:  Rbrace
 Separator  Token:  Rbrace
-======= Main sortout Dump SortOut =======  
+======= Main sortout Dump SortOut =======
 [1] Table TblClassDeclaration@0: 2,
 [2] Table TblNormalClassDeclaration@0: 3,4,5,6,7,8,9,
 [3] Table TblNormalClassDeclaration_sub1@0: KeepPosition
@@ -107,3 +107,135 @@ Separator  Token:  Rbrace
 [68] Table TblIntType@9: 69,
 [69] Token
 Matched 20 tokens.
+======= supplemental sortout Dump SortOut =======
+[1] Table TblUnannType@3: 2,
+[2] Table TblUnannPrimitiveType@3: 3,
+[3] Table TblNumericType@3: 4,
+[4] Table TblIntType@3: 5,
+[5] Token
+======= supplemental sortout Dump SortOut =======
+[1] Table TblUnannType@6: 2,
+[2] Table TblUnannPrimitiveType@6: 3,
+[3] Table TblNumericType@6: 4,
+[4] Table TblIntType@6: 5,
+[5] Token
+======= supplemental sortout Dump SortOut =======
+[1] Table TblArrayAccess@14: 2,
+[2] Table TblArrayAccess_sub1@14: 3,4,
+[3] Table TblExpressionName@14: WasSucc
+[4] Table TblArrayAccess_sub2@15: 5,
+[5] Table TblExpression@15: 6,
+[6] Table TblUnaryExpression@15: 7,
+[7] Table TblUnaryExpression_sub1@15: 8,9,
+[8] Token
+[9] Table TblUnaryExpression@16: 10,
+[10] Table TblUnaryExpressionNotPlusMinus@16: 11,
+[11] Table TblPostfixExpression@16: 12,
+[12] Table TblPrimary@16: 13,
+[13] Table TblPrimaryNoNewArray@16: 14,
+[14] Table TblArrayAccess@16: 15,
+[15] Table TblArrayAccess_sub1@16: 16,17,
+[16] Table TblExpressionName@16: WasSucc
+[17] Table TblArrayAccess_sub2@17: KeepPosition
+======= supplemental sortout Dump SortOut =======
+[1] Table TblExpressionName@14: 2,
+[2] Token
+======= supplemental sortout Dump SortOut =======
+[1] Table TblExpressionName@16: 2,
+[2] Token
+======= patch-was-succ Dump SortOut =======
+[1] Table TblClassDeclaration@0: 2,
+[2] Table TblNormalClassDeclaration@0: 3,4,5,6,7,8,9,
+[3] Table TblNormalClassDeclaration_sub1@0: KeepPosition
+[4] Token
+[5] Token
+[6] Table TblNormalClassDeclaration_sub2@2: KeepPosition
+[7] Table TblNormalClassDeclaration_sub3@2: KeepPosition
+[8] Table TblNormalClassDeclaration_sub4@2: KeepPosition
+[9] Table TblClassBody@2: 10,11,12,
+[10] Token
+[11] Table TblClassBody_sub1@3: 13,
+[12] Token
+[13] Table TblClassBodyDeclaration@3: 14,
+[14] Table TblClassMemberDeclaration@3: 15,
+[15] Table TblMethodDeclaration@3: 16,17,18,
+[16] Table TblMethodDeclaration_sub1@3: KeepPosition
+[17] Table TblMethodHeader@3: 19,
+[18] Table TblMethodBody@12: 20,
+[19] Table TblMethodHeader_sub1@3: 21,22,23,
+[20] Table TblBlock@12: 24,25,26,
+[21] Table TblResult@3: 27,
+[22] Table TblMethodDeclarator@4: 28,29,30,31,32,
+[23] Table TblMethodHeader_sub2@12: KeepPosition
+[24] Token
+[25] Table TblBlock_sub1@13: 33,
+[26] Token
+[27] Table TblUnannType@3: 34,
+[28] Token
+[29] Token
+[30] Table TblMethodDeclarator_sub1@6: 35,
+[31] Token
+[32] Table TblMethodDeclarator_sub2@12: KeepPosition
+[33] Table TblBlockStatements@13: 36,37,
+[34] Table TblUnannPrimitiveType@3: 38,
+[35] Table TblFormalParameterList@6: 39,
+[36] Table TblBlockStatement@13: 40,
+[37] Table TblBlockStatements_sub1@18: KeepPosition
+[38] Table TblNumericType@3: 41,
+[39] Table TblFormalParameterList_sub1@6: 42,43,
+[40] Table TblStatement@13: 44,
+[41] Table TblIntType@3: 45,
+[42] Table TblFormalParameters@6: 46,
+[43] Table TblFormalParameterList_sub2@11: KeepPosition
+[44] Table TblStatementWithoutTrailingSubstatement@13: 47,
+[45] Token
+[46] Table TblFormalParameters_sub1@6: 48,49,
+[47] Table TblReturnStatement@13: 50,51,52,
+[48] Table TblFormalParameter@6: 53,54,55,
+[49] Table TblFormalParameters_sub2@8: 56,
+[50] Token
+[51] Table TblReturnStatement_sub1@14: 57,
+[52] Token
+[53] Table TblFormalParameter_sub1@6: KeepPosition
+[54] Table TblUnannType@6: 58,
+[55] Table TblVariableDeclaratorId@7: 59,60,
+[56] Table TblFormalParameters_sub3@8: 61,62,
+[57] Table TblExpression@14: 63,
+[58] Table TblUnannPrimitiveType@6: 64,
+[59] Token
+[60] Table TblVariableDeclaratorId_sub1@8: KeepPosition
+[61] Token
+[62] Table TblFormalParameter@9: 65,66,67,
+[63] Table TblPrimary@14: 68,
+[64] Table TblNumericType@6: 69,
+[65] Table TblFormalParameter_sub1@9: KeepPosition
+[66] Table TblUnannType@9: 70,
+[67] Table TblVariableDeclaratorId@10: 71,72,
+[68] Table TblPrimaryNoNewArray@14: 73,
+[69] Table TblIntType@6: 74,
+[70] Table TblUnannPrimitiveType@9: 75,
+[71] Token
+[72] Table TblVariableDeclaratorId_sub1@11: KeepPosition
+[73] Table TblArrayAccess@14: 76,
+[74] Token
+[75] Table TblNumericType@9: 77,
+[76] Table TblArrayAccess_sub1@14: 78,79,
+[77] Table TblIntType@9: 80,
+[78] Table TblExpressionName@14: 81,
+[79] Table TblArrayAccess_sub2@15: 82,
+[80] Token
+[81] Token
+[82] Table TblExpression@15: 83,
+[83] Table TblUnaryExpression@15: 84,
+[84] Table TblUnaryExpression_sub1@15: 85,86,
+[85] Token
+[86] Table TblUnaryExpression@16: 87,
+[87] Table TblUnaryExpressionNotPlusMinus@16: 88,
+[88] Table TblPostfixExpression@16: 89,
+[89] Table TblPrimary@16: 90,
+[90] Table TblPrimaryNoNewArray@16: 91,
+[91] Table TblArrayAccess@16: 92,
+[92] Table TblArrayAccess_sub1@16: 93,94,
+[93] Table TblExpressionName@16: 95,
+[94] Table TblArrayAccess_sub2@17: KeepPosition
+[95] Token

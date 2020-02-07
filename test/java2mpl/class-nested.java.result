@@ -28,7 +28,7 @@ Separator  Token:  Whitespace
 Separator  Token:  Whitespace
 Separator  Token:  Rbrace
 Separator  Token:  Rbrace
-======= Main sortout Dump SortOut =======  
+======= Main sortout Dump SortOut =======
 [1] Table TblClassDeclaration@0: 2,
 [2] Table TblNormalClassDeclaration@0: 3,4,5,6,7,8,9,
 [3] Table TblNormalClassDeclaration_sub1@0: KeepPosition
@@ -90,3 +90,64 @@ Separator  Token:  Rbrace
 [59] Table TblVariableDeclaratorId_sub1@11: KeepPosition
 [60] Token
 Matched 14 tokens.
+======= patch-was-succ Dump SortOut =======
+[1] Table TblClassDeclaration@0: 2,
+[2] Table TblNormalClassDeclaration@0: 3,4,5,6,7,8,9,
+[3] Table TblNormalClassDeclaration_sub1@0: KeepPosition
+[4] Token
+[5] Token
+[6] Table TblNormalClassDeclaration_sub2@2: KeepPosition
+[7] Table TblNormalClassDeclaration_sub3@2: KeepPosition
+[8] Table TblNormalClassDeclaration_sub4@2: KeepPosition
+[9] Table TblClassBody@2: 10,11,12,
+[10] Token
+[11] Table TblClassBody_sub1@3: 13,14,
+[12] Token
+[13] Table TblClassBodyDeclaration@3: 15,
+[14] Table TblClassBodyDeclaration@6: 16,
+[15] Table TblClassMemberDeclaration@3: 17,
+[16] Table TblClassMemberDeclaration@6: 18,
+[17] Table TblFieldDeclaration@3: 19,20,21,22,
+[18] Table TblClassDeclaration@6: 23,
+[19] Table TblFieldDeclaration_sub1@3: KeepPosition
+[20] Table TblUnannType@3: 24,
+[21] Table TblVariableDeclaratorList@4: 25,26,
+[22] Token
+[23] Table TblNormalClassDeclaration@6: 27,28,29,30,31,32,33,
+[24] Table TblUnannPrimitiveType@3: 34,
+[25] Table TblVariableDeclarator@4: 35,36,
+[26] Table TblVariableDeclaratorList_sub1@5: KeepPosition
+[27] Table TblNormalClassDeclaration_sub1@6: KeepPosition
+[28] Token
+[29] Token
+[30] Table TblNormalClassDeclaration_sub2@8: KeepPosition
+[31] Table TblNormalClassDeclaration_sub3@8: KeepPosition
+[32] Table TblNormalClassDeclaration_sub4@8: KeepPosition
+[33] Table TblClassBody@8: 37,38,39,
+[34] Table TblNumericType@3: 40,
+[35] Table TblVariableDeclaratorId@4: 41,42,
+[36] Table TblVariableDeclarator_sub1@5: KeepPosition
+[37] Token
+[38] Table TblClassBody_sub1@9: 43,
+[39] Token
+[40] Table TblIntType@3: 44,
+[41] Token
+[42] Table TblVariableDeclaratorId_sub1@5: KeepPosition
+[43] Table TblClassBodyDeclaration@9: 45,
+[44] Token
+[45] Table TblClassMemberDeclaration@9: 46,
+[46] Table TblFieldDeclaration@9: 47,48,49,50,
+[47] Table TblFieldDeclaration_sub1@9: KeepPosition
+[48] Table TblUnannType@9: 51,
+[49] Table TblVariableDeclaratorList@10: 52,53,
+[50] Token
+[51] Table TblUnannPrimitiveType@9: 54,
+[52] Table TblVariableDeclarator@10: 55,56,
+[53] Table TblVariableDeclaratorList_sub1@11: KeepPosition
+[54] Table TblNumericType@9: 57,
+[55] Table TblVariableDeclaratorId@10: 58,59,
+[56] Table TblVariableDeclarator_sub1@11: KeepPosition
+[57] Table TblIntType@9: 60,
+[58] Token
+[59] Table TblVariableDeclaratorId_sub1@11: KeepPosition
+[60] Token

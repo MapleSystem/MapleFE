@@ -1683,7 +1683,7 @@ static unsigned seq_num = 1;
 
 // 'root' cannot be mRootNode which is just a fake node.
 void Parser::DumpSortOut(AppealNode *root, const char *phase) {
-  std::cout << "======= " << phase << " Dump SortOut =======  " << std::endl;
+  std::cout << "======= " << phase << " Dump SortOut =======" << std::endl;
   // we start from the only child of mRootNode.
   to_be_dumped.clear();
   to_be_dumped_id.clear();
@@ -1872,7 +1872,6 @@ void Parser::SupplementalSortOut(AppealNode *root, AppealNode *target) {
 // In the tree after SortOut, some nodes could be SuccWasSucc and we didn't build
 // sub-tree for its children. Now it's time to patch the sub-tree.
 void Parser::PatchWasSucc(AppealNode *root) {
-  return;
   while(1) {
     // step 1. Traverse the sorted tree, find the target node which is SuccWasSucc
     was_succ_list.clear();

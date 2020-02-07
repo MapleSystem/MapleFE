@@ -4,7 +4,7 @@ Identifier Token:  a
 Operator   Token:  Add
 Identifier Token:  b
 Separator  Token:  Semicolon
-======= Main sortout Dump SortOut =======  
+======= Main sortout Dump SortOut =======
 [1] Table TblStatement@0: 2,
 [2] Table TblStatementWithoutTrailingSubstatement@0: 3,
 [3] Table TblExpressionStatement@0: 4,5,
@@ -21,3 +21,61 @@ Separator  Token:  Semicolon
 [14] Table TblPrimaryNoNewArray@2: 15,
 [15] Table TblArrayAccess@2: WasSucc
 Matched 6 tokens.
+======= supplemental sortout Dump SortOut =======
+[1] Table TblArrayAccess@2: 2,
+[2] Table TblArrayAccess_sub1@2: 3,4,
+[3] Table TblExpressionName@2: WasSucc
+[4] Table TblArrayAccess_sub2@3: 5,
+[5] Table TblExpression@3: 6,
+[6] Table TblUnaryExpression@3: 7,
+[7] Table TblUnaryExpression_sub1@3: 8,9,
+[8] Token
+[9] Table TblUnaryExpression@4: 10,
+[10] Table TblUnaryExpressionNotPlusMinus@4: 11,
+[11] Table TblPostfixExpression@4: 12,
+[12] Table TblPrimary@4: 13,
+[13] Table TblPrimaryNoNewArray@4: 14,
+[14] Table TblArrayAccess@4: 15,
+[15] Table TblArrayAccess_sub1@4: 16,17,
+[16] Table TblExpressionName@4: WasSucc
+[17] Table TblArrayAccess_sub2@5: KeepPosition
+======= supplemental sortout Dump SortOut =======
+[1] Table TblExpressionName@2: 2,
+[2] Token
+======= supplemental sortout Dump SortOut =======
+[1] Table TblExpressionName@4: 2,
+[2] Token
+======= patch-was-succ Dump SortOut =======
+[1] Table TblStatement@0: 2,
+[2] Table TblStatementWithoutTrailingSubstatement@0: 3,
+[3] Table TblExpressionStatement@0: 4,5,
+[4] Table TblStatementExpression@0: 6,
+[5] Token
+[6] Table TblAssignment@0: 7,8,9,
+[7] Table TblLeftHandSide@0: 10,
+[8] Table TblAssignmentOperator@1: 11,
+[9] Table TblExpression@2: 12,
+[10] Table TblExpressionName@0: 13,
+[11] Token
+[12] Table TblPrimary@2: 14,
+[13] Token
+[14] Table TblPrimaryNoNewArray@2: 15,
+[15] Table TblArrayAccess@2: 16,
+[16] Table TblArrayAccess_sub1@2: 17,18,
+[17] Table TblExpressionName@2: 19,
+[18] Table TblArrayAccess_sub2@3: 20,
+[19] Token
+[20] Table TblExpression@3: 21,
+[21] Table TblUnaryExpression@3: 22,
+[22] Table TblUnaryExpression_sub1@3: 23,24,
+[23] Token
+[24] Table TblUnaryExpression@4: 25,
+[25] Table TblUnaryExpressionNotPlusMinus@4: 26,
+[26] Table TblPostfixExpression@4: 27,
+[27] Table TblPrimary@4: 28,
+[28] Table TblPrimaryNoNewArray@4: 29,
+[29] Table TblArrayAccess@4: 30,
+[30] Table TblArrayAccess_sub1@4: 31,32,
+[31] Table TblExpressionName@4: 33,
+[32] Table TblArrayAccess_sub2@5: KeepPosition
+[33] Token

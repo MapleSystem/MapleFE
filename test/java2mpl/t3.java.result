@@ -2,7 +2,7 @@ Keyword    Token:  boolean
 Separator  Token:  Whitespace
 Identifier Token:  a
 Separator  Token:  Semicolon
-======= Main sortout Dump SortOut =======  
+======= Main sortout Dump SortOut =======
 [1] Table TblStatement@0: 2,
 [2] Table TblLocalVariableDeclarationStatement@0: 3,4,
 [3] Table TblLocalVariableDeclaration@0: 5,6,7,
@@ -21,3 +21,21 @@ Separator  Token:  Semicolon
 [16] Table TblVariableDeclaratorId_sub1@2: KeepPosition
 [17] Token
 Matched 3 tokens.
+======= patch-was-succ Dump SortOut =======
+[1] Table TblStatement@0: 2,
+[2] Table TblLocalVariableDeclarationStatement@0: 3,4,
+[3] Table TblLocalVariableDeclaration@0: 5,6,7,
+[4] Token
+[5] Table TblLocalVariableDeclaration_sub1@0: KeepPosition
+[6] Table TblLocalVariableType@0: 8,
+[7] Table TblVariableDeclaratorList@1: 9,10,
+[8] Table TblUnannType@0: 11,
+[9] Table TblVariableDeclarator@1: 12,13,
+[10] Table TblVariableDeclaratorList_sub1@2: KeepPosition
+[11] Table TblUnannPrimitiveType@0: 14,
+[12] Table TblVariableDeclaratorId@1: 15,16,
+[13] Table TblVariableDeclarator_sub1@2: KeepPosition
+[14] Table TblBoolType@0: 17,
+[15] Token
+[16] Table TblVariableDeclaratorId_sub1@2: KeepPosition
+[17] Token

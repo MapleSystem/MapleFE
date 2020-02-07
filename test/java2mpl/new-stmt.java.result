@@ -26,7 +26,7 @@ Separator  Token:  Whitespace
 Separator  Token:  Whitespace
 Separator  Token:  Rbrace
 Separator  Token:  Rbrace
-======= Main sortout Dump SortOut =======  
+======= Main sortout Dump SortOut =======
 [1] Table TblClassDeclaration@0: 2,
 [2] Table TblNormalClassDeclaration@0: 3,4,5,6,7,8,9,
 [3] Table TblNormalClassDeclaration_sub1@0: KeepPosition
@@ -69,3 +69,75 @@ Separator  Token:  Rbrace
 [40] Token
 [41] Table TblClassInstanceCreationExpression@8: WasSucc
 Matched 15 tokens.
+======= supplemental sortout Dump SortOut =======
+[1] Table TblClassInstanceCreationExpression@8: 2,
+[2] Table TblUnqualifiedClassInstanceCreationExpression@8: 3,
+[3] Table TblUnqualifiedClassInstanceCreationExpression_sub1@8: 4,5,6,7,8,9,10,
+[4] Token
+[5] Table TblUnqualifiedClassInstanceCreationExpression_sub2@9: KeepPosition
+[6] Table TblClassOrInterfaceTypeToInstantiate@9: 11,
+[7] Token
+[8] Table TblUnqualifiedClassInstanceCreationExpression_sub3@11: KeepPosition
+[9] Token
+[10] Table TblUnqualifiedClassInstanceCreationExpression_sub4@12: KeepPosition
+[11] Table TblClassOrInterfaceTypeToInstantiate_sub1@9: 12,13,14,15,
+[12] Table TblClassOrInterfaceTypeToInstantiate_sub2@9: KeepPosition
+[13] Token
+[14] Table TblClassOrInterfaceTypeToInstantiate_sub3@10: KeepPosition
+[15] Table TblClassOrInterfaceTypeToInstantiate_sub6@10: KeepPosition
+======= patch-was-succ Dump SortOut =======
+[1] Table TblClassDeclaration@0: 2,
+[2] Table TblNormalClassDeclaration@0: 3,4,5,6,7,8,9,
+[3] Table TblNormalClassDeclaration_sub1@0: KeepPosition
+[4] Token
+[5] Token
+[6] Table TblNormalClassDeclaration_sub2@2: KeepPosition
+[7] Table TblNormalClassDeclaration_sub3@2: KeepPosition
+[8] Table TblNormalClassDeclaration_sub4@2: KeepPosition
+[9] Table TblClassBody@2: 10,11,12,
+[10] Token
+[11] Table TblClassBody_sub1@3: 13,
+[12] Token
+[13] Table TblClassBodyDeclaration@3: 14,
+[14] Table TblClassMemberDeclaration@3: 15,
+[15] Table TblMethodDeclaration@3: 16,17,18,
+[16] Table TblMethodDeclaration_sub1@3: KeepPosition
+[17] Table TblMethodHeader@3: 19,
+[18] Table TblMethodBody@7: 20,
+[19] Table TblMethodHeader_sub1@3: 21,22,23,
+[20] Table TblBlock@7: 24,25,26,
+[21] Table TblResult@3: 27,
+[22] Table TblMethodDeclarator@4: 28,29,30,31,32,
+[23] Table TblMethodHeader_sub2@7: KeepPosition
+[24] Token
+[25] Table TblBlock_sub1@8: 33,
+[26] Token
+[27] Token
+[28] Token
+[29] Token
+[30] Table TblMethodDeclarator_sub1@6: KeepPosition
+[31] Token
+[32] Table TblMethodDeclarator_sub2@7: KeepPosition
+[33] Table TblBlockStatements@8: 34,35,
+[34] Table TblBlockStatement@8: 36,
+[35] Table TblBlockStatements_sub1@13: KeepPosition
+[36] Table TblStatement@8: 37,
+[37] Table TblStatementWithoutTrailingSubstatement@8: 38,
+[38] Table TblExpressionStatement@8: 39,40,
+[39] Table TblStatementExpression@8: 41,
+[40] Token
+[41] Table TblClassInstanceCreationExpression@8: 42,
+[42] Table TblUnqualifiedClassInstanceCreationExpression@8: 43,
+[43] Table TblUnqualifiedClassInstanceCreationExpression_sub1@8: 44,45,46,47,48,49,50,
+[44] Token
+[45] Table TblUnqualifiedClassInstanceCreationExpression_sub2@9: KeepPosition
+[46] Table TblClassOrInterfaceTypeToInstantiate@9: 51,
+[47] Token
+[48] Table TblUnqualifiedClassInstanceCreationExpression_sub3@11: KeepPosition
+[49] Token
+[50] Table TblUnqualifiedClassInstanceCreationExpression_sub4@12: KeepPosition
+[51] Table TblClassOrInterfaceTypeToInstantiate_sub1@9: 52,53,54,55,
+[52] Table TblClassOrInterfaceTypeToInstantiate_sub2@9: KeepPosition
+[53] Token
+[54] Table TblClassOrInterfaceTypeToInstantiate_sub3@10: KeepPosition
+[55] Table TblClassOrInterfaceTypeToInstantiate_sub6@10: KeepPosition

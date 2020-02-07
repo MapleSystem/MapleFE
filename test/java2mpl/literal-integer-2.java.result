@@ -4,7 +4,7 @@ Operator   Token:  Assign
 Separator  Token:  Whitespace
 Integer Literal Token: 273
 Separator  Token:  Semicolon
-======= Main sortout Dump SortOut =======  
+======= Main sortout Dump SortOut =======
 [1] Table TblStatement@0: 2,
 [2] Table TblStatementWithoutTrailingSubstatement@0: 3,
 [3] Table TblExpressionStatement@0: 4,5,
@@ -21,3 +21,19 @@ Separator  Token:  Semicolon
 [14] Table TblPrimaryNoNewArray@2: 15,
 [15] Token
 Matched 4 tokens.
+======= patch-was-succ Dump SortOut =======
+[1] Table TblStatement@0: 2,
+[2] Table TblStatementWithoutTrailingSubstatement@0: 3,
+[3] Table TblExpressionStatement@0: 4,5,
+[4] Table TblStatementExpression@0: 6,
+[5] Token
+[6] Table TblAssignment@0: 7,8,9,
+[7] Table TblLeftHandSide@0: 10,
+[8] Table TblAssignmentOperator@1: 11,
+[9] Table TblExpression@2: 12,
+[10] Table TblExpressionName@0: 13,
+[11] Token
+[12] Table TblPrimary@2: 14,
+[13] Token
+[14] Table TblPrimaryNoNewArray@2: 15,
+[15] Token
