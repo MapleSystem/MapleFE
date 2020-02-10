@@ -1535,7 +1535,7 @@ void Parser::SortOutConcatenate(AppealNode *parent) {
   for (; it != parent->mChildren.end(); it++) {
     AppealNode *child = *it;
 
-    // Failed not should be failed second try node.
+    // A Failed node, it should be failed second try node.
     if(child->IsFail())
       continue;
 
@@ -1901,8 +1901,83 @@ void Parser::PatchWasSucc(AppealNode *root) {
     DumpSortOut(root, "patch-was-succ");
 }
 
+// The idea is to make the Sorted tree simplest. After PatchWasSucc(), there are many
+// edges with pred having only one succ and succ having only one pred. If there is no
+// any Action (either for building tree or checking validity), this edge can be shrinked
+// and reduce the problem size.
+//
+// However, there is one problem as whether we need add additional fields in the AppealNode
+// to save this simplified tree, or we just modify the mSortedChildren on the tree?
+// The answer is: We just modify the mSortedChildren to shrink the useless edges.
+
 void Parser::SimplifySortedTree(AppealNode *root) {
+  return;
+  // start with the only child of mRootNode.
+  std::deque<AppealNode*> working_list;
+  working_list.push_back(root->mSortedChildren[0]);
+
+  while(!working_list.empty()) {
+    AppealNode *node = working_list.front();
+    working_list.pop_front();
+    MASSERT(node->IsSucc() && "Sorted node is not succ?");
+
+    // Shrink edges
+    if (node->IsToken())
+      continue;
+    node = SimplifyShrinkEdges(node);
+
+    std::vector<AppealNode*>::iterator it = node->mSortedChildren.begin();
+    for (; it != node->mSortedChildren.end(); it++) {
+      working_list.push_back(*it);
+    }
+  }
+
+  if (mTraceSortOut)
+    DumpSortOut(root, "Simplify Trees");
 }
+
+// Reduce an edge is (1) Pred has only one succ
+//                   (2) Succ has only one pred (this is always true)
+//                   (3) There is no Rule Action of pred's rule table, regarding this succ.
+// Keep this reduction until the conditions are violated
+//
+// Returns the new 'node' which stops the shrinking.
+AppealNode* Parser::SimplifyShrinkEdges(AppealNode *node) {
+  while(1) {
+    // step 1. Check condition (1) (2)
+    if (node->mSortedChildren.size() != 1)
+      break;
+    AppealNode *child = node->mSortedChildren[0];
+
+    // step 2. Find out the index of child, through looking into mChildren
+    //         At this point, there is only one sorted child. It's guaranteed not
+    //         a concatenate table. It could be Oneof, Zeroorxxx, etc.
+    unsigned index;
+    bool found = node->GetSortedChildIndex(child, index);
+    MASSERT(found && "Could not find child index?");
+
+    // step 3. check condition (3)
+    //         [NOTE] in RuleAction, element index starts from 1.
+    RuleTable *rt = node->GetTable();
+    bool has_action = RuleActionHasElem(rt, index);
+    if (has_action)
+      break;
+
+    // step 4. Shrink the edge. This is to remove 'node' by connecting 'node's father
+    //         to child. We need go on shrinking with child.
+    AppealNode *parent = node->mParent;
+    parent->ReplaceSortedChild(node, child);
+
+    // step 5. keep going
+    node = child;
+  }
+
+  return node;
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+//                             Build the AST
+////////////////////////////////////////////////////////////////////////////////////
 
 ASTTree* Parser::BuildAST(AppealNode *root) {
   // temporarily disable BuildAST.
@@ -2225,4 +2300,63 @@ void AppealNode::RemoveChild(AppealNode *child) {
 
   mChildren.clear();
   mChildren.assign(temp_vector.begin(), temp_vector.end());
+}
+
+void AppealNode::ReplaceSortedChild(AppealNode *existing, AppealNode *replacement) {
+  unsigned index;
+  bool found = false;
+  for (unsigned i = 0; i < mSortedChildren.size(); i++) {
+    if (mSortedChildren[i] == existing) {
+      index = i;
+      found = true;
+      break;
+    }
+  }
+  MASSERT(found && "ReplaceSortedChild could not find existing node?");
+
+  mSortedChildren[index] = replacement;
+}
+
+// Returns true : if successfully found the index.
+// [NOTE] This is the index in the Rule Spec description, which are used in the
+//        building of AST. So remember it starts from 1.
+bool AppealNode::GetSortedChildIndex(AppealNode *child, unsigned &index) {
+  bool found = false;
+  RuleTable *rule_table = GetTable();
+  EntryType type = rule_table->mType;
+  switch(type) {
+  case ET_Oneof:
+    for (unsigned i = 0; i < mChildren.size(); i++) {
+      if (child == mChildren[i]) {
+        MASSERT(!found && "Duplicated children node?");
+        index = i + 1;
+        found = true;
+      }
+    }
+    break;
+  case ET_Concatenate:
+    for (unsigned i = 0; i < mSortedChildren.size(); i++) {
+      if (child == mSortedChildren[i]) {
+        MASSERT(!found && "Duplicated children node?");
+        index = i + 1;
+        found = true;
+      }
+    }
+    break;
+  case ET_Zeroormore:
+  case ET_Zeroorone:
+  case ET_Data:
+    // It's always the first element, with index being 1. No matter how many
+    // real sorted children here, there is only one child element of the rule.
+    for (unsigned i = 0; i < mSortedChildren.size(); i++) {
+      if (child == mSortedChildren[i]) {
+        MASSERT(!found && "Duplicated children node?");
+        index = 1;
+        found = true;
+      }
+    }
+    break;
+  }
+
+  return found;
 }

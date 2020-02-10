@@ -95,3 +95,16 @@ const char* FindKeyword(const char *str, const char c, unsigned &len) {
   return NULL;
 }
 
+// Returns true : The rule actions in 'table' involves i-th element
+// [NOTE] i starts from 1.
+bool RuleActionHasElem(RuleTable *table, unsigned target_idx) {
+  for (unsigned i = 0; i < table->mNumAction; i++) {
+    Action *act = table->mActions + i;
+    for (unsigned j = 0; j < act->mNumElem; j++) {
+      unsigned index = act->mElems[j];
+      if (index = target_idx)
+        return true;
+    }
+  }
+  return false;
+}

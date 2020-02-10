@@ -58,4 +58,6 @@ public:
 extern SepId FindSeparator(const char *str, const char c, unsigned &len);
 extern OprId FindOperator(const char *str, const char c, unsigned &len);
 extern const char* FindKeyword(const char *str, const char c, unsigned &len);
+
+extern bool RuleActionHasElem(RuleTable*, unsigned);
 #endif
