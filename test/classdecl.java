@@ -1,4 +1,0 @@
-// abc
-/* */
-public class A{
-}
