@@ -1884,6 +1884,7 @@ void Parser::PatchWasSucc(AppealNode *root) {
     patching_list.clear();
     FindPatchingNodes(root);
     MASSERT( !patching_list.empty() && "Cannot find any patching for SuccWasSucc.");
+    MASSERT( was_succ_list.size() == was_succ_matched_list.size() && "Some WasSucc not matched.");
 
     // step 3. Assert the sorted subtree is not sorted. Then SupplementalSortOut()
     //         Copy the subtree of patch to was_succ
@@ -1892,6 +1893,11 @@ void Parser::PatchWasSucc(AppealNode *root) {
       AppealNode *was_succ = was_succ_matched_list[i];
       SupplementalSortOut(patch, was_succ);
       was_succ->mAfter = Succ;
+
+      // We can copy only sorted nodes. The original mChildren cannot be copied since
+      // it's the original tree. We don't want to mess it up. Think about it, if you
+      // copy the mChildren to was_succ, there are duplicated tree nodes. This violates
+      // the definition of the original tree.
       for (unsigned j = 0; j < patch->mSortedChildren.size(); j++)
         was_succ->AddSortedChild(patch->mSortedChildren[j]);
     }
