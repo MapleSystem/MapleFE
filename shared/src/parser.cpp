@@ -1939,7 +1939,7 @@ void Parser::SimplifySortedTree(AppealNode *root) {
   }
 
   if (mTraceSortOut)
-    DumpSortOut(root, "Simplify Trees");
+    DumpSortOut(root->mSortedChildren[0], "Simplify Trees");
 }
 
 // Reduce an edge is (1) Pred has only one succ
@@ -2326,42 +2326,54 @@ void AppealNode::ReplaceSortedChild(AppealNode *existing, AppealNode *replacemen
 // Returns true : if successfully found the index.
 // [NOTE] This is the index in the Rule Spec description, which are used in the
 //        building of AST. So remember it starts from 1.
+//
+// The AppealNode tree has many messy nodes generated during second try, or others.
+// It's not a good idea to find the index through the tree. The final real solution
+// is to go through the RuleTable and locate the child's index.
 bool AppealNode::GetSortedChildIndex(AppealNode *child, unsigned &index) {
   bool found = false;
+  MASSERT(IsTable() && "Parent node is not a RuleTable");
   RuleTable *rule_table = GetTable();
-  EntryType type = rule_table->mType;
-  switch(type) {
-  case ET_Oneof:
-    for (unsigned i = 0; i < mChildren.size(); i++) {
-      if (child == mChildren[i]) {
-        MASSERT(!found && "Duplicated children node?");
-        index = i + 1;
+
+  for (unsigned i = 0; i < rule_table->mNum; i++) {
+    TableData *data = rule_table->mData + i;
+    switch (data->mType) {
+    case DT_Token: {
+      Token *t = data->mData.mToken;
+      if (child->IsToken() && child->GetToken() == t) {
         found = true;
+        index = i+1;
       }
+      break;
     }
-    break;
-  case ET_Concatenate:
-    for (unsigned i = 0; i < mSortedChildren.size(); i++) {
-      if (child == mSortedChildren[i]) {
-        MASSERT(!found && "Duplicated children node?");
-        index = i + 1;
+    case DT_Subtable: {
+      RuleTable *t = data->mData.mEntry;
+      if (t == &TblIdentifier) {
+        if (child->IsToken()) {
+          Token *token = child->GetToken();
+          if (token->IsIdentifier()) {
+            found = true;
+            index = i+1;
+          }
+        }
+      } else if (t == &TblLiteral) {
+        if (child->IsToken()) {
+          Token *token = child->GetToken();
+          if (token->IsLiteral()) {
+            found = true;
+            index = i+1;
+          }
+        }
+      } else if (child->IsTable() && child->GetTable() == t) {
         found = true;
+        index = i+1;
       }
+      break;
     }
-    break;
-  case ET_Zeroormore:
-  case ET_Zeroorone:
-  case ET_Data:
-    // It's always the first element, with index being 1. No matter how many
-    // real sorted children here, there is only one child element of the rule.
-    for (unsigned i = 0; i < mSortedChildren.size(); i++) {
-      if (child == mSortedChildren[i]) {
-        MASSERT(!found && "Duplicated children node?");
-        index = 1;
-        found = true;
-      }
+    default:
+      MASSERT(0 && "Unknown entry in TableData");
+      break;
     }
-    break;
   }
 
   return found;
