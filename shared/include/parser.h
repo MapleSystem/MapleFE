@@ -58,6 +58,10 @@ class AppealNode{
 public:
   bool mIsTable;     // A AppealNode could relate to either rule table or token.
   bool mIsSecondTry; // The node is created after second try. This flag is used during SortOut.
+  unsigned int mSimplifiedIndex;  // After SimplifyShrinkEdges, a node could be moved to
+                                  // connect to a new 'parent' node, replacing its ancestor.
+                                  // To make AST building work, it needs to inherit ancestor's
+                                  // index in the rule table.
 public:
   union {
     RuleTable *mTable;
@@ -83,7 +87,7 @@ public:
   AppealStatus mAfter;
 
   AppealNode() {mData.mTable=NULL; mParent = NULL; mBefore = NA; mAfter = NA;
-                mIsTable = true; mIsSecondTry = false;}
+                mSimplifiedIndex = 0; mIsTable = true; mIsSecondTry = false;}
   ~AppealNode(){}
 
   void AddChild(AppealNode *n) { mChildren.push_back(n); }
@@ -266,7 +270,7 @@ private:
   void SortOutData(AppealNode*);
   void CleanFailedSecondTry(AppealNode*);
 
-  void SimplifySortedTree(AppealNode*);
+  void SimplifySortedTree();
   AppealNode* SimplifyShrinkEdges(AppealNode*);
 
   void PatchWasSucc(AppealNode*);

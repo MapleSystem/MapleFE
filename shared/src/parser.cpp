@@ -574,7 +574,7 @@ bool Parser::ParseStmt() {
   // Each top level construct gets a AST tree.
   if (succ) {
     PatchWasSucc(mRootNode->mSortedChildren[0]);
-    SimplifySortedTree(mRootNode);
+    SimplifySortedTree();
     ASTTree *tree = BuildAST(mRootNode);
     if (tree)
       mASTTrees.push_back(tree);
@@ -1703,7 +1703,10 @@ void Parser::DumpSortOutNode(AppealNode *n) {
   unsigned dump_id = to_be_dumped_id.front();
   to_be_dumped_id.pop_front();
 
-  std::cout << "[" << dump_id << "] ";
+  if (n->mSimplifiedIndex > 0)
+    std::cout << "[" << dump_id << ":" << n->mSimplifiedIndex<< "] ";
+  else
+    std::cout << "[" << dump_id << "] ";
   if (n->IsToken()) {
     std::cout << "Token" << std::endl;
   } else {
@@ -1916,11 +1919,11 @@ void Parser::PatchWasSucc(AppealNode *root) {
 // to save this simplified tree, or we just modify the mSortedChildren on the tree?
 // The answer is: We just modify the mSortedChildren to shrink the useless edges.
 
-void Parser::SimplifySortedTree(AppealNode *root) {
+void Parser::SimplifySortedTree() {
   return;
   // start with the only child of mRootNode.
   std::deque<AppealNode*> working_list;
-  working_list.push_back(root->mSortedChildren[0]);
+  working_list.push_back(mRootNode->mSortedChildren[0]);
 
   while(!working_list.empty()) {
     AppealNode *node = working_list.front();
@@ -1939,7 +1942,7 @@ void Parser::SimplifySortedTree(AppealNode *root) {
   }
 
   if (mTraceSortOut)
-    DumpSortOut(root->mSortedChildren[0], "Simplify Trees");
+    DumpSortOut(mRootNode->mSortedChildren[0], "Simplify Trees");
 }
 
 // Reduce an edge is (1) Pred has only one succ
@@ -1949,6 +1952,11 @@ void Parser::SimplifySortedTree(AppealNode *root) {
 //
 // Returns the new 'node' which stops the shrinking.
 AppealNode* Parser::SimplifyShrinkEdges(AppealNode *node) {
+
+  // index will be defined only once since it's the index-child of the 'node'
+  // transferred into this function.
+  unsigned index = 0;
+
   while(1) {
     // step 1. Check condition (1) (2)
     if (node->mSortedChildren.size() != 1)
@@ -1958,14 +1966,14 @@ AppealNode* Parser::SimplifyShrinkEdges(AppealNode *node) {
     // step 2. Find out the index of child, through looking into mChildren
     //         At this point, there is only one sorted child. It's guaranteed not
     //         a concatenate table. It could be Oneof, Zeroorxxx, etc.
-    unsigned index;
-    bool found = node->GetSortedChildIndex(child, index);
+    unsigned child_index;
+    bool found = node->GetSortedChildIndex(child, child_index);
     MASSERT(found && "Could not find child index?");
 
     // step 3. check condition (3)
     //         [NOTE] in RuleAction, element index starts from 1.
     RuleTable *rt = node->GetTable();
-    bool has_action = RuleActionHasElem(rt, index);
+    bool has_action = RuleActionHasElem(rt, child_index);
     if (has_action)
       break;
 
@@ -1973,6 +1981,15 @@ AppealNode* Parser::SimplifyShrinkEdges(AppealNode *node) {
     //         to child. We need go on shrinking with child.
     AppealNode *parent = node->mParent;
     parent->ReplaceSortedChild(node, child);
+
+    // 1. mRootNode won't have RuleAction, so the index is never used.
+    // 2. 'index' just need be calculated once, at the first ancestor which is 'node'
+    //    transferred into this function.
+    if (parent != mRootNode && index == 0) {
+      found = parent->GetSortedChildIndex(node, index);
+      MASSERT(found && "Could not find child index?");
+    }
+    child->mSimplifiedIndex = index;
 
     // step 5. keep going
     node = child;
@@ -2321,6 +2338,7 @@ void AppealNode::ReplaceSortedChild(AppealNode *existing, AppealNode *replacemen
   MASSERT(found && "ReplaceSortedChild could not find existing node?");
 
   mSortedChildren[index] = replacement;
+  replacement->mParent = this;
 }
 
 // Returns true : if successfully found the index.
