@@ -1920,7 +1920,6 @@ void Parser::PatchWasSucc(AppealNode *root) {
 // The answer is: We just modify the mSortedChildren to shrink the useless edges.
 
 void Parser::SimplifySortedTree() {
-  return;
   // start with the only child of mRootNode.
   std::deque<AppealNode*> working_list;
   working_list.push_back(mRootNode->mSortedChildren[0]);

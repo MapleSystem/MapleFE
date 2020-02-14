@@ -67,3 +67,20 @@ Matched 5 tokens.
 [21] Token
 [22] Token
 [23] Table TblDims_sub2@4: KeepPosition
+======= Simplify Trees Dump SortOut =======
+[1] Table TblLocalVariableDeclarationStatement@0: 2,3,
+[2] Table TblLocalVariableDeclaration@0: 4,5,6,
+[3] Token
+[4] Table TblLocalVariableDeclaration_sub1@0: KeepPosition
+[5:2] Token
+[6] Table TblVariableDeclaratorList@1: 7,8,
+[7] Table TblVariableDeclarator@1: 9,10,
+[8] Table TblVariableDeclaratorList_sub1@4: KeepPosition
+[9] Table TblVariableDeclaratorId@1: 11,12,
+[10] Table TblVariableDeclarator_sub1@4: KeepPosition
+[11] Token
+[12:2] Table TblDims@2: 13,14,15,16,
+[13] Table TblDims_sub1@2: KeepPosition
+[14] Token
+[15] Token
+[16] Table TblDims_sub2@4: KeepPosition

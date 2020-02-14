@@ -137,3 +137,38 @@ Matched 12 tokens.
 [48] Table TblNumericType@6: 49,
 [49] Table TblIntType@6: 50,
 [50] Token
+======= Simplify Trees Dump SortOut =======
+[1] Table TblNormalClassDeclaration@0: 2,3,4,5,6,7,8,
+[2] Table TblNormalClassDeclaration_sub1@0: KeepPosition
+[3] Token
+[4] Token
+[5] Table TblNormalClassDeclaration_sub2@2: KeepPosition
+[6] Table TblNormalClassDeclaration_sub3@2: KeepPosition
+[7] Table TblNormalClassDeclaration_sub4@2: KeepPosition
+[8] Table TblClassBody@2: 9,10,11,
+[9] Token
+[10] Table TblClassBody_sub1@3: 12,13,
+[11] Token
+[12:1] Table TblFieldDeclaration@3: 14,15,16,17,
+[13:1] Table TblMethodDeclaration@6: 18,19,20,
+[14] Table TblFieldDeclaration_sub1@3: KeepPosition
+[15:2] Token
+[16] Table TblVariableDeclaratorList@4: 21,22,
+[17] Token
+[18] Table TblMethodDeclaration_sub1@6: KeepPosition
+[19:2] Table TblMethodHeader_sub1@6: 23,24,25,
+[20:3] Token
+[21] Table TblVariableDeclarator@4: 26,27,
+[22] Table TblVariableDeclaratorList_sub1@5: KeepPosition
+[23:1] Token
+[24] Table TblMethodDeclarator@7: 28,29,30,31,32,
+[25] Table TblMethodHeader_sub2@10: KeepPosition
+[26] Table TblVariableDeclaratorId@4: 33,34,
+[27] Table TblVariableDeclarator_sub1@5: KeepPosition
+[28] Token
+[29] Token
+[30] Table TblMethodDeclarator_sub1@9: KeepPosition
+[31] Token
+[32] Table TblMethodDeclarator_sub2@10: KeepPosition
+[33] Token
+[34] Table TblVariableDeclaratorId_sub1@5: KeepPosition

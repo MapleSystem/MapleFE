@@ -89,6 +89,26 @@ Matched 10 tokens.
 [24] Table TblUnannClassType_sub1@4: 25,26,
 [25] Token
 [26] Table TblUnannClassType_sub2@5: KeepPosition
+======= Simplify Trees Dump SortOut =======
+[1] Table TblAnnotationTypeDeclaration@0: 2,3,4,5,6,
+[2] Table TblAnnotationTypeDeclaration_sub1@0: KeepPosition
+[3] Token
+[4] Token
+[5] Token
+[6] Table TblAnnotationTypeBody@3: 7,8,9,
+[7] Token
+[8:2] Table TblAnnotationTypeElementDeclaration@4: 10,11,12,13,14,15,16,17,
+[9] Token
+[10] Table TblAnnotationTypeElementDeclaration_sub1@4: KeepPosition
+[11:2] Table TblUnannClassType_sub1@4: 18,19,
+[12] Token
+[13] Token
+[14] Token
+[15] Table TblAnnotationTypeElementDeclaration_sub2@8: KeepPosition
+[16] Table TblAnnotationTypeElementDeclaration_sub3@8: KeepPosition
+[17] Token
+[18] Token
+[19] Table TblUnannClassType_sub2@5: KeepPosition
 Separator  Token:  Whitespace
 Separator  Token:  Whitespace
 Identifier Token:  String
@@ -171,3 +191,29 @@ Matched 22 tokens.
 [31] Table TblUnannClassType_sub1@14: 32,33,
 [32] Token
 [33] Table TblUnannClassType_sub2@15: KeepPosition
+======= Simplify Trees Dump SortOut =======
+[1] Table TblAnnotationTypeDeclaration@10: 2,3,4,5,6,
+[2] Table TblAnnotationTypeDeclaration_sub1@10: KeepPosition
+[3] Token
+[4] Token
+[5] Token
+[6] Table TblAnnotationTypeBody@13: 7,8,9,
+[7] Token
+[8:2] Table TblAnnotationTypeElementDeclaration@14: 10,11,12,13,14,15,16,17,
+[9] Token
+[10] Table TblAnnotationTypeElementDeclaration_sub1@14: KeepPosition
+[11:2] Table TblUnannArrayType_sub2@14: 18,19,
+[12] Token
+[13] Token
+[14] Token
+[15] Table TblAnnotationTypeElementDeclaration_sub2@20: KeepPosition
+[16] Table TblAnnotationTypeElementDeclaration_sub3@20: KeepPosition
+[17] Token
+[18:1] Table TblUnannClassType_sub1@14: 20,21,
+[19] Table TblDims@15: 22,23,24,25,
+[20] Token
+[21] Table TblUnannClassType_sub2@15: KeepPosition
+[22] Table TblDims_sub1@15: KeepPosition
+[23] Token
+[24] Token
+[25] Table TblDims_sub2@17: KeepPosition

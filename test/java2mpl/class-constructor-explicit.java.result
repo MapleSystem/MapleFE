@@ -237,3 +237,65 @@ Matched 22 tokens.
 [88] Token
 [89] Table TblPrimaryNoNewArray@14: 90,
 [90] Token
+======= Simplify Trees Dump SortOut =======
+[1] Table TblNormalClassDeclaration@0: 2,3,4,5,6,7,8,
+[2] Table TblNormalClassDeclaration_sub1@0: KeepPosition
+[3] Token
+[4] Token
+[5] Table TblNormalClassDeclaration_sub2@2: KeepPosition
+[6] Table TblNormalClassDeclaration_sub3@2: KeepPosition
+[7] Table TblNormalClassDeclaration_sub4@2: KeepPosition
+[8] Table TblClassBody@2: 9,10,11,
+[9] Token
+[10] Table TblClassBody_sub1@3: 12,13,
+[11] Token
+[12:1] Table TblFieldDeclaration@3: 14,15,16,17,
+[13:1] Table TblConstructorDeclaration@8: 18,19,20,21,
+[14] Table TblFieldDeclaration_sub1@3: KeepPosition
+[15:2] Token
+[16] Table TblVariableDeclaratorList@4: 22,23,
+[17] Token
+[18] Table TblConstructorDeclaration_sub1@8: KeepPosition
+[19] Table TblConstructorDeclarator@8: 24,25,26,27,28,
+[20] Table TblConstructorDeclaration_sub2@13: KeepPosition
+[21] Table TblConstructorBody@13: 29,30,31,32,
+[22] Table TblVariableDeclarator@4: 33,34,
+[23:2] Table TblVariableDeclaratorList_sub2@5: 35,36,
+[24] Table TblConstructorDeclarator_sub1@8: KeepPosition
+[25:2] Token
+[26] Token
+[27:4] Table TblFormalParameterList_sub1@10: 37,38,
+[28] Token
+[29] Token
+[30] Table TblConstructorBody_sub1@14: KeepPosition
+[31:3] Table TblBlockStatements@14: 39,40,
+[32] Token
+[33] Table TblVariableDeclaratorId@4: 41,42,
+[34] Table TblVariableDeclarator_sub1@5: KeepPosition
+[35] Token
+[36] Table TblVariableDeclarator@6: 43,44,
+[37:1] Table TblFormalParameters_sub1@10: 45,46,
+[38] Table TblFormalParameterList_sub2@12: KeepPosition
+[39:1] Table TblExpressionStatement@14: 47,48,
+[40] Table TblBlockStatements_sub1@20: KeepPosition
+[41] Token
+[42] Table TblVariableDeclaratorId_sub1@5: KeepPosition
+[43] Table TblVariableDeclaratorId@6: 49,50,
+[44] Table TblVariableDeclarator_sub1@7: KeepPosition
+[45] Table TblFormalParameter@10: 51,52,53,
+[46] Table TblFormalParameters_sub2@12: KeepPosition
+[47:1] Table TblAssignment@14: 54,55,56,
+[48] Token
+[49] Token
+[50] Table TblVariableDeclaratorId_sub1@7: KeepPosition
+[51] Table TblFormalParameter_sub1@10: KeepPosition
+[52:2] Token
+[53] Table TblVariableDeclaratorId@11: 57,58,
+[54:1] Table TblFieldAccess_sub1@14: 59,60,61,
+[55:2] Token
+[56:3] Token
+[57] Token
+[58] Table TblVariableDeclaratorId_sub1@12: KeepPosition
+[59:1] Token
+[60] Token
+[61] Token

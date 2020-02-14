@@ -231,3 +231,53 @@ Matched 21 tokens.
 [84] Table TblPrimary@8: 85,
 [85] Table TblPrimaryNoNewArray@8: 86,
 [86] Token
+======= Simplify Trees Dump SortOut =======
+[1] Table TblNormalClassDeclaration@0: 2,3,4,5,6,7,8,
+[2] Table TblNormalClassDeclaration_sub1@0: KeepPosition
+[3] Token
+[4] Token
+[5] Table TblNormalClassDeclaration_sub2@2: KeepPosition
+[6] Table TblNormalClassDeclaration_sub3@2: KeepPosition
+[7] Table TblNormalClassDeclaration_sub4@2: KeepPosition
+[8] Table TblClassBody@2: 9,10,11,
+[9] Token
+[10:2] Table TblMethodDeclaration@3: 12,13,14,
+[11] Token
+[12] Table TblMethodDeclaration_sub1@3: 15,16,17,
+[13:2] Table TblMethodHeader_sub1@12: 18,19,20,
+[14:3] Table TblBlock@18: 21,22,23,
+[15:1] Table TblNormalAnnotation@3: 24,25,26,27,28,
+[16:1] Token
+[17:1] Token
+[18:1] Token
+[19] Table TblMethodDeclarator@13: 29,30,31,32,33,
+[20] Table TblMethodHeader_sub2@18: KeepPosition
+[21] Token
+[22] Table TblBlock_sub1@19: KeepPosition
+[23] Token
+[24] Token
+[25:2] Token
+[26] Token
+[27:4] Table TblElementValuePairList@6: 34,35,
+[28] Token
+[29] Token
+[30] Token
+[31:3] Table TblFormalParameterList_sub1@15: 36,37,
+[32] Token
+[33] Table TblMethodDeclarator_sub2@18: KeepPosition
+[34] Table TblElementValuePair@6: 38,39,40,
+[35] Table TblElementValuePairList_sub1@9: KeepPosition
+[36:1] Table TblFormalParameters_sub1@15: 41,42,
+[37] Table TblFormalParameterList_sub2@17: KeepPosition
+[38] Token
+[39] Token
+[40:3] Token
+[41] Table TblFormalParameter@15: 43,44,45,
+[42] Table TblFormalParameters_sub2@17: KeepPosition
+[43] Table TblFormalParameter_sub1@15: KeepPosition
+[44:2] Table TblUnannClassType_sub1@15: 46,47,
+[45] Table TblVariableDeclaratorId@16: 48,49,
+[46] Token
+[47] Table TblUnannClassType_sub2@16: KeepPosition
+[48] Token
+[49] Table TblVariableDeclaratorId_sub1@17: KeepPosition

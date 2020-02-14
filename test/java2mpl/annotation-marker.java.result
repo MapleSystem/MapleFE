@@ -43,3 +43,13 @@ Matched 5 tokens.
 [8] Token
 [9] Table TblAnnotationTypeBody_sub1@4: KeepPosition
 [10] Token
+======= Simplify Trees Dump SortOut =======
+[1] Table TblAnnotationTypeDeclaration@0: 2,3,4,5,6,
+[2] Table TblAnnotationTypeDeclaration_sub1@0: KeepPosition
+[3] Token
+[4] Token
+[5] Token
+[6] Table TblAnnotationTypeBody@3: 7,8,9,
+[7] Token
+[8] Table TblAnnotationTypeBody_sub1@4: KeepPosition
+[9] Token

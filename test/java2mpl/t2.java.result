@@ -78,6 +78,25 @@ Matched 5 tokens.
 [23] Token
 [24] Token
 [25] Table TblVariableDeclaratorId_sub1@4: KeepPosition
+======= Simplify Trees Dump SortOut =======
+[1] Table TblLocalVariableDeclarationStatement@0: 2,3,
+[2] Table TblLocalVariableDeclaration@0: 4,5,6,
+[3] Token
+[4] Table TblLocalVariableDeclaration_sub1@0: KeepPosition
+[5:2] Token
+[6] Table TblVariableDeclaratorList@1: 7,8,
+[7] Table TblVariableDeclarator@1: 9,10,
+[8:2] Table TblVariableDeclaratorList_sub2@2: 11,12,
+[9] Table TblVariableDeclaratorId@1: 13,14,
+[10] Table TblVariableDeclarator_sub1@2: KeepPosition
+[11] Token
+[12] Table TblVariableDeclarator@3: 15,16,
+[13] Token
+[14] Table TblVariableDeclaratorId_sub1@2: KeepPosition
+[15] Table TblVariableDeclaratorId@3: 17,18,
+[16] Table TblVariableDeclarator_sub1@4: KeepPosition
+[17] Token
+[18] Table TblVariableDeclaratorId_sub1@4: KeepPosition
 ======= Main sortout Dump SortOut =======
 [1] Table TblStatement@5: 2,
 [2] Table TblStatementWithoutTrailingSubstatement@5: 3,
@@ -111,3 +130,10 @@ Matched 9 tokens.
 [13] Token
 [14] Table TblPrimaryNoNewArray@7: 15,
 [15] Token
+======= Simplify Trees Dump SortOut =======
+[1] Table TblExpressionStatement@5: 2,3,
+[2:1] Table TblAssignment@5: 4,5,6,
+[3] Token
+[4:1] Token
+[5:2] Token
+[6:3] Token

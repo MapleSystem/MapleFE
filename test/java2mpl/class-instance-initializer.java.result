@@ -149,3 +149,37 @@ Matched 13 tokens.
 [51] Token
 [52] Table TblPrimaryNoNewArray@9: 53,
 [53] Token
+======= Simplify Trees Dump SortOut =======
+[1] Table TblNormalClassDeclaration@0: 2,3,4,5,6,7,8,
+[2] Table TblNormalClassDeclaration_sub1@0: KeepPosition
+[3] Token
+[4] Token
+[5] Table TblNormalClassDeclaration_sub2@2: KeepPosition
+[6] Table TblNormalClassDeclaration_sub3@2: KeepPosition
+[7] Table TblNormalClassDeclaration_sub4@2: KeepPosition
+[8] Table TblClassBody@2: 9,10,11,
+[9] Token
+[10] Table TblClassBody_sub1@3: 12,13,
+[11] Token
+[12:1] Table TblFieldDeclaration@3: 14,15,16,17,
+[13:1] Table TblBlock@6: 18,19,20,
+[14] Table TblFieldDeclaration_sub1@3: KeepPosition
+[15:2] Token
+[16] Table TblVariableDeclaratorList@4: 21,22,
+[17] Token
+[18] Token
+[19:2] Table TblBlockStatements@7: 23,24,
+[20] Token
+[21] Table TblVariableDeclarator@4: 25,26,
+[22] Table TblVariableDeclaratorList_sub1@5: KeepPosition
+[23:1] Table TblExpressionStatement@7: 27,28,
+[24] Table TblBlockStatements_sub1@11: KeepPosition
+[25] Table TblVariableDeclaratorId@4: 29,30,
+[26] Table TblVariableDeclarator_sub1@5: KeepPosition
+[27:1] Table TblAssignment@7: 31,32,33,
+[28] Token
+[29] Token
+[30] Table TblVariableDeclaratorId_sub1@5: KeepPosition
+[31:1] Token
+[32:2] Token
+[33:3] Token

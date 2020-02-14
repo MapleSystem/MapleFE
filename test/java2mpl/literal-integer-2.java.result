@@ -51,3 +51,10 @@ Matched 4 tokens.
 [13] Token
 [14] Table TblPrimaryNoNewArray@2: 15,
 [15] Token
+======= Simplify Trees Dump SortOut =======
+[1] Table TblExpressionStatement@0: 2,3,
+[2:1] Table TblAssignment@0: 4,5,6,
+[3] Token
+[4:1] Token
+[5:2] Token
+[6:3] Token

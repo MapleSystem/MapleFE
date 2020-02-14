@@ -155,3 +155,44 @@ Matched 15 tokens.
 [53] Token
 [54] Table TblClassOrInterfaceTypeToInstantiate_sub3@10: KeepPosition
 [55] Table TblClassOrInterfaceTypeToInstantiate_sub6@10: KeepPosition
+======= Simplify Trees Dump SortOut =======
+[1] Table TblNormalClassDeclaration@0: 2,3,4,5,6,7,8,
+[2] Table TblNormalClassDeclaration_sub1@0: KeepPosition
+[3] Token
+[4] Token
+[5] Table TblNormalClassDeclaration_sub2@2: KeepPosition
+[6] Table TblNormalClassDeclaration_sub3@2: KeepPosition
+[7] Table TblNormalClassDeclaration_sub4@2: KeepPosition
+[8] Table TblClassBody@2: 9,10,11,
+[9] Token
+[10:2] Table TblMethodDeclaration@3: 12,13,14,
+[11] Token
+[12] Table TblMethodDeclaration_sub1@3: KeepPosition
+[13:2] Table TblMethodHeader_sub1@3: 15,16,17,
+[14:3] Table TblBlock@7: 18,19,20,
+[15:1] Token
+[16] Table TblMethodDeclarator@4: 21,22,23,24,25,
+[17] Table TblMethodHeader_sub2@7: KeepPosition
+[18] Token
+[19:2] Table TblBlockStatements@8: 26,27,
+[20] Token
+[21] Token
+[22] Token
+[23] Table TblMethodDeclarator_sub1@6: KeepPosition
+[24] Token
+[25] Table TblMethodDeclarator_sub2@7: KeepPosition
+[26:1] Table TblExpressionStatement@8: 28,29,
+[27] Table TblBlockStatements_sub1@13: KeepPosition
+[28:1] Table TblUnqualifiedClassInstanceCreationExpression_sub1@8: 30,31,32,33,34,35,36,
+[29] Token
+[30] Token
+[31] Table TblUnqualifiedClassInstanceCreationExpression_sub2@9: KeepPosition
+[32:3] Table TblClassOrInterfaceTypeToInstantiate_sub1@9: 37,38,39,40,
+[33] Token
+[34] Table TblUnqualifiedClassInstanceCreationExpression_sub3@11: KeepPosition
+[35] Token
+[36] Table TblUnqualifiedClassInstanceCreationExpression_sub4@12: KeepPosition
+[37] Table TblClassOrInterfaceTypeToInstantiate_sub2@9: KeepPosition
+[38] Token
+[39] Table TblClassOrInterfaceTypeToInstantiate_sub3@10: KeepPosition
+[40] Table TblClassOrInterfaceTypeToInstantiate_sub6@10: KeepPosition

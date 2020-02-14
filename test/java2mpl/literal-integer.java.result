@@ -401,3 +401,73 @@ Matched 37 tokens.
 [147] Token
 [148] Token
 [149] Token
+======= Simplify Trees Dump SortOut =======
+[1] Table TblNormalClassDeclaration@0: 2,3,4,5,6,7,8,
+[2] Table TblNormalClassDeclaration_sub1@0: KeepPosition
+[3] Token
+[4] Token
+[5] Table TblNormalClassDeclaration_sub2@2: KeepPosition
+[6] Table TblNormalClassDeclaration_sub3@2: KeepPosition
+[7] Table TblNormalClassDeclaration_sub4@2: KeepPosition
+[8] Table TblClassBody@2: 9,10,11,
+[9] Token
+[10] Table TblClassBody_sub1@3: 12,13,
+[11] Token
+[12:1] Table TblFieldDeclaration@3: 14,15,16,17,
+[13:1] Table TblBlock@6: 18,19,20,
+[14] Table TblFieldDeclaration_sub1@3: KeepPosition
+[15:2] Token
+[16] Table TblVariableDeclaratorList@4: 21,22,
+[17] Token
+[18] Token
+[19:2] Table TblBlockStatements@7: 23,24,
+[20] Token
+[21] Table TblVariableDeclarator@4: 25,26,
+[22] Table TblVariableDeclaratorList_sub1@5: KeepPosition
+[23:1] Table TblExpressionStatement@7: 27,28,
+[24] Table TblBlockStatements_sub1@11: 29,30,31,32,33,34,
+[25] Table TblVariableDeclaratorId@4: 35,36,
+[26] Table TblVariableDeclarator_sub1@5: KeepPosition
+[27:1] Table TblAssignment@7: 37,38,39,
+[28] Token
+[29:1] Table TblExpressionStatement@11: 40,41,
+[30:1] Table TblExpressionStatement@15: 42,43,
+[31:1] Table TblExpressionStatement@19: 44,45,
+[32:1] Table TblExpressionStatement@23: 46,47,
+[33:1] Table TblExpressionStatement@27: 48,49,
+[34:1] Table TblExpressionStatement@31: 50,51,
+[35] Token
+[36] Table TblVariableDeclaratorId_sub1@5: KeepPosition
+[37:1] Token
+[38:2] Token
+[39:3] Token
+[40:1] Table TblAssignment@11: 52,53,54,
+[41] Token
+[42:1] Table TblAssignment@15: 55,56,57,
+[43] Token
+[44:1] Table TblAssignment@19: 58,59,60,
+[45] Token
+[46:1] Table TblAssignment@23: 61,62,63,
+[47] Token
+[48:1] Table TblAssignment@27: 64,65,66,
+[49] Token
+[50:1] Table TblAssignment@31: 67,68,69,
+[51] Token
+[52:1] Token
+[53:2] Token
+[54:3] Token
+[55:1] Token
+[56:2] Token
+[57:3] Token
+[58:1] Token
+[59:2] Token
+[60:3] Token
+[61:1] Token
+[62:2] Token
+[63:3] Token
+[64:1] Token
+[65:2] Token
+[66:3] Token
+[67:1] Token
+[68:2] Token
+[69:3] Token

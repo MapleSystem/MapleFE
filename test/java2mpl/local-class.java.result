@@ -509,3 +509,135 @@ Matched 49 tokens.
 [170] Token
 [171] Table TblClassBody_sub1@39: KeepPosition
 [172] Token
+======= Simplify Trees Dump SortOut =======
+[1] Table TblNormalClassDeclaration@0: 2,3,4,5,6,7,8,
+[2] Table TblNormalClassDeclaration_sub1@0: KeepPosition
+[3] Token
+[4] Token
+[5] Table TblNormalClassDeclaration_sub2@2: KeepPosition
+[6] Table TblNormalClassDeclaration_sub3@2: KeepPosition
+[7] Table TblNormalClassDeclaration_sub4@2: KeepPosition
+[8] Table TblClassBody@2: 9,10,11,
+[9] Token
+[10] Table TblClassBody_sub1@3: 12,13,
+[11] Token
+[12:1] Table TblNormalClassDeclaration@3: 14,15,16,17,18,19,20,
+[13:1] Table TblMethodDeclaration@7: 21,22,23,
+[14] Table TblNormalClassDeclaration_sub1@3: KeepPosition
+[15] Token
+[16] Token
+[17] Table TblNormalClassDeclaration_sub2@5: KeepPosition
+[18] Table TblNormalClassDeclaration_sub3@5: KeepPosition
+[19] Table TblNormalClassDeclaration_sub4@5: KeepPosition
+[20] Table TblClassBody@5: 24,25,26,
+[21] Table TblMethodDeclaration_sub1@7: KeepPosition
+[22:2] Table TblMethodHeader_sub1@7: 27,28,29,
+[23:3] Table TblBlock@11: 30,31,32,
+[24] Token
+[25] Table TblClassBody_sub1@6: KeepPosition
+[26] Token
+[27:1] Token
+[28] Table TblMethodDeclarator@8: 33,34,35,36,37,
+[29] Table TblMethodHeader_sub2@11: KeepPosition
+[30] Token
+[31:2] Table TblBlockStatements@12: 38,39,
+[32] Token
+[33] Token
+[34] Token
+[35] Table TblMethodDeclarator_sub1@10: KeepPosition
+[36] Token
+[37] Table TblMethodDeclarator_sub2@11: KeepPosition
+[38:1] Table TblExpressionStatement@12: 40,41,
+[39] Table TblBlockStatements_sub1@17: 42,43,44,
+[40:1] Table TblUnqualifiedClassInstanceCreationExpression_sub1@12: 45,46,47,48,49,50,51,
+[41] Token
+[42:1] Table TblNormalClassDeclaration@17: 52,53,54,55,56,57,58,
+[43:1] Table TblBlock@23: 59,60,61,
+[44:1] Table TblNormalClassDeclaration@43: 62,63,64,65,66,67,68,
+[45] Token
+[46] Table TblUnqualifiedClassInstanceCreationExpression_sub2@13: KeepPosition
+[47:3] Table TblClassOrInterfaceTypeToInstantiate_sub1@13: 69,70,71,72,
+[48] Token
+[49] Table TblUnqualifiedClassInstanceCreationExpression_sub3@15: KeepPosition
+[50] Token
+[51] Table TblUnqualifiedClassInstanceCreationExpression_sub4@16: KeepPosition
+[52] Table TblNormalClassDeclaration_sub1@17: KeepPosition
+[53] Token
+[54] Token
+[55] Table TblNormalClassDeclaration_sub2@19: KeepPosition
+[56:5] Table TblSuperclass@19: 73,74,
+[57] Table TblNormalClassDeclaration_sub4@21: KeepPosition
+[58] Table TblClassBody@21: 75,76,77,
+[59] Token
+[60:2] Table TblBlockStatements@24: 78,79,
+[61] Token
+[62] Table TblNormalClassDeclaration_sub1@43: KeepPosition
+[63] Token
+[64] Token
+[65] Table TblNormalClassDeclaration_sub2@45: KeepPosition
+[66] Table TblNormalClassDeclaration_sub3@45: KeepPosition
+[67] Table TblNormalClassDeclaration_sub4@45: KeepPosition
+[68] Table TblClassBody@45: 80,81,82,
+[69] Table TblClassOrInterfaceTypeToInstantiate_sub2@13: KeepPosition
+[70] Token
+[71] Table TblClassOrInterfaceTypeToInstantiate_sub3@14: KeepPosition
+[72] Table TblClassOrInterfaceTypeToInstantiate_sub6@14: KeepPosition
+[73] Token
+[74:2] Table TblClassType_sub1@20: 83,84,85,
+[75] Token
+[76] Table TblClassBody_sub1@22: KeepPosition
+[77] Token
+[78:1] Table TblNormalClassDeclaration@24: 86,87,88,89,90,91,92,
+[79:2] Table TblNormalClassDeclaration@28: 93,94,95,96,97,98,99,
+[80] Token
+[81] Table TblClassBody_sub1@46: KeepPosition
+[82] Token
+[83] Table TblClassType_sub2@20: KeepPosition
+[84] Token
+[85] Table TblClassType_sub3@21: KeepPosition
+[86] Table TblNormalClassDeclaration_sub1@24: KeepPosition
+[87] Token
+[88] Token
+[89] Table TblNormalClassDeclaration_sub2@26: KeepPosition
+[90] Table TblNormalClassDeclaration_sub3@26: KeepPosition
+[91] Table TblNormalClassDeclaration_sub4@26: KeepPosition
+[92] Table TblClassBody@26: 100,101,102,
+[93] Table TblNormalClassDeclaration_sub1@28: KeepPosition
+[94] Token
+[95] Token
+[96] Table TblNormalClassDeclaration_sub2@30: KeepPosition
+[97] Table TblNormalClassDeclaration_sub3@30: KeepPosition
+[98] Table TblNormalClassDeclaration_sub4@30: KeepPosition
+[99] Table TblClassBody@30: 103,104,105,
+[100] Token
+[101] Table TblClassBody_sub1@27: KeepPosition
+[102] Token
+[103] Token
+[104:2] Table TblMethodDeclaration@31: 106,107,108,
+[105] Token
+[106] Table TblMethodDeclaration_sub1@31: KeepPosition
+[107:2] Table TblMethodHeader_sub1@31: 109,110,111,
+[108:3] Table TblBlock@35: 112,113,114,
+[109:1] Token
+[110] Table TblMethodDeclarator@32: 115,116,117,118,119,
+[111] Table TblMethodHeader_sub2@35: KeepPosition
+[112] Token
+[113:2] Table TblBlockStatements@36: 120,121,
+[114] Token
+[115] Token
+[116] Token
+[117] Table TblMethodDeclarator_sub1@34: KeepPosition
+[118] Token
+[119] Table TblMethodDeclarator_sub2@35: KeepPosition
+[120:1] Table TblNormalClassDeclaration@36: 122,123,124,125,126,127,128,
+[121] Table TblBlockStatements_sub1@40: KeepPosition
+[122] Table TblNormalClassDeclaration_sub1@36: KeepPosition
+[123] Token
+[124] Token
+[125] Table TblNormalClassDeclaration_sub2@38: KeepPosition
+[126] Table TblNormalClassDeclaration_sub3@38: KeepPosition
+[127] Table TblNormalClassDeclaration_sub4@38: KeepPosition
+[128] Table TblClassBody@38: 129,130,131,
+[129] Token
+[130] Table TblClassBody_sub1@39: KeepPosition
+[131] Token

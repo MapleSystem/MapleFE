@@ -207,3 +207,55 @@ Matched 25 tokens.
 [70] Table TblUnannClassType_sub2@15: KeepPosition
 [71] Token
 [72] Table TblUnannClassType_sub2@20: KeepPosition
+======= Simplify Trees Dump SortOut =======
+[1] Table TblAnnotationTypeDeclaration@0: 2,3,4,5,6,
+[2] Table TblAnnotationTypeDeclaration_sub1@0: KeepPosition
+[3] Token
+[4] Token
+[5] Token
+[6] Table TblAnnotationTypeBody@3: 7,8,9,
+[7] Token
+[8] Table TblAnnotationTypeBody_sub1@4: 10,11,12,13,
+[9] Token
+[10:1] Table TblAnnotationTypeElementDeclaration@4: 14,15,16,17,18,19,20,21,
+[11:1] Table TblAnnotationTypeElementDeclaration@9: 22,23,24,25,26,27,28,29,
+[12:1] Table TblAnnotationTypeElementDeclaration@14: 30,31,32,33,34,35,36,37,
+[13:1] Table TblAnnotationTypeElementDeclaration@19: 38,39,40,41,42,43,44,45,
+[14] Table TblAnnotationTypeElementDeclaration_sub1@4: KeepPosition
+[15:2] Token
+[16] Token
+[17] Token
+[18] Token
+[19] Table TblAnnotationTypeElementDeclaration_sub2@8: KeepPosition
+[20] Table TblAnnotationTypeElementDeclaration_sub3@8: KeepPosition
+[21] Token
+[22] Table TblAnnotationTypeElementDeclaration_sub1@9: KeepPosition
+[23:2] Table TblUnannClassType_sub1@9: 46,47,
+[24] Token
+[25] Token
+[26] Token
+[27] Table TblAnnotationTypeElementDeclaration_sub2@13: KeepPosition
+[28] Table TblAnnotationTypeElementDeclaration_sub3@13: KeepPosition
+[29] Token
+[30] Table TblAnnotationTypeElementDeclaration_sub1@14: KeepPosition
+[31:2] Table TblUnannClassType_sub1@14: 48,49,
+[32] Token
+[33] Token
+[34] Token
+[35] Table TblAnnotationTypeElementDeclaration_sub2@18: KeepPosition
+[36] Table TblAnnotationTypeElementDeclaration_sub3@18: KeepPosition
+[37] Token
+[38] Table TblAnnotationTypeElementDeclaration_sub1@19: KeepPosition
+[39:2] Table TblUnannClassType_sub1@19: 50,51,
+[40] Token
+[41] Token
+[42] Token
+[43] Table TblAnnotationTypeElementDeclaration_sub2@23: KeepPosition
+[44] Table TblAnnotationTypeElementDeclaration_sub3@23: KeepPosition
+[45] Token
+[46] Token
+[47] Table TblUnannClassType_sub2@10: KeepPosition
+[48] Token
+[49] Table TblUnannClassType_sub2@15: KeepPosition
+[50] Token
+[51] Table TblUnannClassType_sub2@20: KeepPosition
