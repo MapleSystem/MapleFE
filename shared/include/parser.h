@@ -28,12 +28,12 @@
 
 #include "feopcode.h"
 #include "lexer.h"
+#include "ast_module.h"
 
 // tyidx for int for the time being
 #define inttyidx 1
 
 class Automata;
-class Module;
 class Function;
 class Stmt;
 class Token;
@@ -166,8 +166,9 @@ class Parser {
 public:
   Lexer *mLexer;
   const char *filename;
+  ASTModule mModule;     // A source file has a module
+
   Automata *mAutomata;
-  Module *mModule;
   Function *currfunc;
 
   std::vector<std::string> mVars;
@@ -260,7 +261,6 @@ private:
   void AppealTraverse(AppealNode *node, AppealNode *root);
 
   // Sort Out
-  std::deque<AppealNode*> to_be_sorted;  // a temp data structure during sort out.
   void SortOut();
   void SortOutNode(AppealNode*);
   void SortOutOneof(AppealNode*);
@@ -279,12 +279,10 @@ private:
   void SupplementalSortOut(AppealNode *root, AppealNode *target);
 
   // Build AST
-  std::vector<ASTTree*> mASTTrees;      // All AST trees in this module
   ASTTree*  BuildAST(AppealNode*); // Each top level construct gets a AST
   TreeNode* NewTreeNode(ASTTree*, AppealNode*);
 
 public:
-  Parser(const char *f, Module *m);
   Parser(const char *f);
   ~Parser();
 

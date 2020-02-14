@@ -247,26 +247,6 @@
 // the SortOut process.
 //////////////////////////////////////////////////////////////////////////////////
 
-Parser::Parser(const char *name, Module *m) : filename(name), mModule(m) {
-  mLexer = new Lexer();
-  const std::string file(name);
-  // init lexer
-  mLexer->PrepareForFile(file);
-  mCurToken = 0;
-
-  mTraceTable = false;
-  mTraceAppeal = false;
-  mTraceSecondTry = false;
-  mTraceVisited = false;
-  mTraceFailed = false;
-  mTraceSortOut = true;
-  mTraceWarning = false;
-
-  mIndentation = 0;
-
-  mInSecondTry = false;
-}
-
 Parser::Parser(const char *name) : filename(name) {
   mLexer = new Lexer();
   const std::string file(name);
@@ -290,14 +270,6 @@ Parser::Parser(const char *name) : filename(name) {
 
 Parser::~Parser() {
   delete mLexer;
-
-  std::vector<ASTTree*>::iterator it = mASTTrees.begin();
-  for (; it != mASTTrees.end(); it++) {
-    ASTTree *tree = *it;
-    if (tree)
-      delete tree;
-  }
-  mASTTrees.clear();
 }
 
 void Parser::Dump() {
@@ -577,7 +549,7 @@ bool Parser::ParseStmt() {
     SimplifySortedTree();
     ASTTree *tree = BuildAST(mRootNode);
     if (tree)
-      mASTTrees.push_back(tree);
+      mModule.AddTree(tree);
   }
 
   return succ;
@@ -1244,6 +1216,8 @@ bool Parser::TraverseTableData(TableData *data, AppealNode *parent) {
 /////////////////////////////////////////////////////////////////////////////
 
 // We don't want to use recursive. So a deque is used here.
+static std::deque<AppealNode*> to_be_sorted;
+
 void Parser::SortOut() {
   // we remove all failed children, leaving only succ child
   std::vector<AppealNode*>::iterator it = mRootNode->mChildren.begin();
