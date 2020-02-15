@@ -41,14 +41,15 @@ private:
   unsigned              mCurPos;   // current available position in mCurBlock.
                                    // It's offset from starting of mCurBlock
 public:
-  std::vector<TreeNode*>   mTreeNodes;
+  std::vector<TreeNode*>   mTreeNodes; // only TreeNode* is stored, no matter what's
+                                       // the exact derived class.
 
 private:
   char* NewBlock();
 
 public:
   TreePool();
-  ~TreePool(){};   // memory is freed in destructor of mMP.
+  ~TreePool();   // memory is freed in destructor of mMP.
 
   char* NewTreeNode(unsigned);
 };

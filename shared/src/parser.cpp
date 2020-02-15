@@ -547,7 +547,7 @@ bool Parser::ParseStmt() {
   if (succ) {
     PatchWasSucc(mRootNode->mSortedChildren[0]);
     SimplifySortedTree();
-    ASTTree *tree = BuildAST(mRootNode);
+    ASTTree *tree = BuildAST();
     if (tree)
       mModule.AddTree(tree);
   }
@@ -1975,30 +1975,25 @@ AppealNode* Parser::SimplifyShrinkEdges(AppealNode *node) {
 //                             Build the AST
 ////////////////////////////////////////////////////////////////////////////////////
 
-ASTTree* Parser::BuildAST(AppealNode *root) {
-  // temporarily disable BuildAST.
+ASTTree* Parser::BuildAST() {
   return NULL;
-
-  if (!root)
-    return NULL;
-
   done_nodes.clear();
 
   ASTTree *tree = new ASTTree();
 
   std::stack<AppealNode*> appeal_stack;
-  appeal_stack.push(root);
+  appeal_stack.push(mRootNode->mSortedChildren[0]);
 
-  // Need a map between an AppealNode and a TreeNode.
+  // A map between an AppealNode and a TreeNode.
   std::map<AppealNode*, TreeNode*> nodes_map;
 
+  // 1) If all children done. Time to create tree node for 'appeal_node'
+  // 2) If some are done, some not. Add the first not-done child to stack
   while(!appeal_stack.empty()) {
-    AppealNode *node = appeal_stack.top();
-    // 1) If all children done. Time to create tree node for 'node'
-    // 2) If some are done, some not. Add the first not-done child to stack 
+    AppealNode *appeal_node = appeal_stack.top();
     bool children_done = true;
-    std::vector<AppealNode*>::iterator it = node->mChildren.begin();
-    for (; it != node->mChildren.end(); it++) {
+    std::vector<AppealNode*>::iterator it = appeal_node->mChildren.begin();
+    for (; it != appeal_node->mChildren.end(); it++) {
       AppealNode *child = *it;
       if (!NodeIsDone(child)) {
         appeal_stack.push(child);
@@ -2008,20 +2003,18 @@ ASTTree* Parser::BuildAST(AppealNode *root) {
     }
 
     if (children_done) {
+      //
       appeal_stack.pop();
-      // create the tree node for node.
+      TreeNode *tree_node = tree->NewNode(appeal_node);
+      if (tree_node) {
+        std::cout << "new tree node" << std::endl;
+      } else {
+        // Look into the RuleAction, create the tree node acc
+      }
     }
   }
-}
 
-// We take two parameters. One is the AST Tree, since the tree node is part of
-// of the tree and will be allocated in the tree's memory pool. The other is
-// the appeal node.
-//
-// For many rules, it's just a Oneof node, which means the appeal_node itself
-// doesn't introduce anything into the tree. It's just transferring. 
-TreeNode* Parser::NewTreeNode(ASTTree *tree, AppealNode *appeal_node) {
-  return NULL;
+  return tree;
 }
 
 /////////////////////////////////////////////////////////////////////////////

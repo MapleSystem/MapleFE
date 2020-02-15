@@ -21,6 +21,17 @@ TreePool::TreePool() {
   NewBlock();  // Need to allocate a block at beginning
 }
 
+TreePool::~TreePool() {
+  // We only call the destructor of each node. The derived destructor will be
+  // called since TreeNode has only virtual destructor.
+  std::vector<TreeNode*>::iterator it = mTreeNodes.begin();
+  for (; it != mTreeNodes.end(); it++) {
+    TreeNode *tn = *it;
+    delete tn;
+  }
+  mTreeNodes.clear();
+}
+
 char* TreePool::NewBlock() {
   char *addr = mMP.AllocBlock();
   mBlocks.push_back(addr);

@@ -279,7 +279,7 @@ private:
   void SupplementalSortOut(AppealNode *root, AppealNode *target);
 
   // Build AST
-  ASTTree*  BuildAST(AppealNode*); // Each top level construct gets a AST
+  ASTTree*  BuildAST(); // Each top level construct gets a AST
   TreeNode* NewTreeNode(ASTTree*, AppealNode*);
 
 public:

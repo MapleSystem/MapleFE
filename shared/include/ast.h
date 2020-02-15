@@ -49,18 +49,36 @@
 #include "ast_type.h"
 #include "ast_mempool.h"
 #include "ruletable.h"
+#include "token.h"
 
 enum NodeKind {
-  NK_Token,
+  NK_Identifier,
+  NK_Literal,
   NK_Operator,
   NK_Construct,
   NK_Function,
+  NK_Null,
 };
+
+// TreeNode has a VIRTUAL destructor. Why?
+//
+// Derived TreeNodes are allocated in a mempool and are referenced identically as TreeNode*,
+// no matter what derived class they are. So when free the mempool, we call the destructor
+// of each node through a TreeNode pointer. In this way, a virtual destructor of TreeNode
+// if needed in order to invoke the derived class destructor.
 
 class TreeNode {
 public:
   NodeKind mKind;
 public:
+  TreeNode() {mKind = NK_Null;}
+  virtual ~TreeNode() {}
+
+  bool IsIdentifier() {return mKind == NK_Identifier;}
+  bool IsLiteral()    {return mKind == NK_Literal;}
+  bool IsOperator()   {return mKind == NK_Operator;}
+  bool IsConstruct()  {return mKind == NK_Construct;}
+  bool IsFunction()   {return mKind == NK_Function;}
   void Dump();
 };
 
@@ -69,6 +87,9 @@ class OperatorNode : public TreeNode {
 public:
   OprId mOprId;
 public:
+  OperatorNode(OprId id) : mOprId(id) {mKind = NK_Operator;}
+  ~OperatorNode() {}
+
   void Dump();
 };
 
@@ -82,12 +103,31 @@ public:
   void Dump();
 };
 
-class TokenNode : public TreeNode {
+class IdentifierNode : public TreeNode {
+public:
+  const char *mName; // In the lexer's StringPool
+public:
+  IdentifierNode(const char *s) : mName(s) {mKind = NK_Identifier;}
+  ~IdentifierNode(){}
+
+  void Dump();
+};
+
+class LiteralNode : public TreeNode {
+public:
+  LitData mData;
+public:
+  LiteralNode(LitData d) : mData(d) {mKind = NK_Literal;}
+  ~LiteralNode(){}
+
+  void Dump();
 };
 
 ////////////////////////////////////////////////////////////////////////
 //                  The AST Tree
 ////////////////////////////////////////////////////////////////////////
+
+class AppealNode;
 
 class ASTTree {
 public:
@@ -96,6 +136,8 @@ public:
 public:
   ASTTree() {mRootNode = NULL;}
   ~ASTTree(){}
+
+  TreeNode* NewNode(const AppealNode *);
 };
 
 #endif

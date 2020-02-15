@@ -71,6 +71,7 @@ public:
   void SetTkKind(TK_Kind k) { mTkKind = k; }
 
   bool IsSeparator()  { return mTkType == TT_SP; }
+  bool IsOperator()   { return mTkType == TT_OP; }
   bool IsIdentifier() { return mTkType == TT_ID; }
   bool IsLiteral()    { return mTkType == TT_LT; }
   bool IsKeyword()    { return mTkType == TT_KW; }
@@ -166,6 +167,9 @@ private:
 public:
   LiteralToken(LitData data) : Token(TT_LT), mData(data) {}
   LiteralToken(TK_Kind k, LitData data) : Token(TT_LT, k), mData(data) {}
+
+  LitData GetLitData() {return mData;}
+
   void Dump();
 };
 
