@@ -1936,7 +1936,7 @@ AppealNode* Parser::SimplifyShrinkEdges(AppealNode *node) {
       break;
     AppealNode *child = node->mSortedChildren[0];
 
-    // step 2. Find out the index of child, through looking into mChildren
+    // step 2. Find out the index of child, through looking into sub-ruletable or token.
     //         At this point, there is only one sorted child. It's guaranteed not
     //         a concatenate table. It could be Oneof, Zeroorxxx, etc.
     unsigned child_index;
@@ -2003,14 +2003,20 @@ ASTTree* Parser::BuildAST() {
     }
 
     if (children_done) {
-      //
+      // pop out the 'appeal_node'
       appeal_stack.pop();
-      TreeNode *tree_node = tree->NewNode(appeal_node);
+      // See if we can get a token tree node
+      TreeNode *tree_node = tree->NewTokenTreeNode(appeal_node);
       if (tree_node) {
         std::cout << "new tree node" << std::endl;
       } else {
-        // Look into the RuleAction, create the tree node acc
+        // Token should have already been give a new tree node. Double check.
+        MASSERT(appeal_node->IsTable() && "Token didn't get a new tree node. Fix it!");
+        // Look into the RuleAction, create the tree node.
+        tree_node = tree->NewActionTreeNode(appeal_node, nodes_map);
       }
+      // Put into the map
+      nodes_map.insert(std::pair<AppealNode*, TreeNode*>(appeal_node, tree_node));
     }
   }
 
@@ -2319,6 +2325,14 @@ bool AppealNode::GetSortedChildIndex(AppealNode *child, unsigned &index) {
   MASSERT(IsTable() && "Parent node is not a RuleTable");
   RuleTable *rule_table = GetTable();
 
+  // In SimplifyShrinkEdge, the tree could be simplified and a node could be given an index
+  // to his ancestor.
+  if (child->mSimplifiedIndex != 0) {
+    index = child->mSimplifiedIndex;
+    return true;
+  }
+
+  // If the edge is not shrinked, we just look into the rule tabls or tokens.
   for (unsigned i = 0; i < rule_table->mNum; i++) {
     TableData *data = rule_table->mData + i;
     switch (data->mType) {
@@ -2361,4 +2375,17 @@ bool AppealNode::GetSortedChildIndex(AppealNode *child, unsigned &index) {
   }
 
   return found;
+}
+
+AppealNode* AppealNode::GetSortedChildByIndex(unsigned index) {
+  std::vector<AppealNode*>::iterator it = mSortedChildren.begin();
+  for (; it != mSortedChildren.end(); it++) {
+    AppealNode *child = *it;
+    unsigned id = 0;
+    bool found = GetSortedChildIndex(child, id);
+    MASSERT(found && "sorted child has no index..");
+    if (id == index)
+      return child;
+  }
+  return NULL;
 }

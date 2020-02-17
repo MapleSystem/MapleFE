@@ -123,21 +123,45 @@ public:
   void Dump();
 };
 
-////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+//                  The AST Builder
+// ASTBuilder takes the action Id and parameter list, to create a sub tree.
+// Its main body contains huge amount of building functions.
+//
+// The treenode mempool is part of ASTTree since the memory goes with the
+// tree not the builder. The Builder is purely a collect of functions to build
+// sub trees.
+////////////////////////////////////////////////////////////////////////////
+
+class ASTBuilder {
+public:
+  unsigned                mActionId;
+  std::vector<TreeNode *> mParams;
+  TreePool               *mTreePool;
+public:
+  TreeNode* Build();
+  void AddParam(TreeNode *n) {mParams.push_back(n);}
+
+  TreeNode* BuildBinaryOperator(TreeNode *op1, TreeNode *opr, TreeNode *op2);
+};
+
+////////////////////////////////////////////////////////////////////////////
 //                  The AST Tree
-////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 
 class AppealNode;
 
 class ASTTree {
 public:
-  TreePool  mMemPool;
-  TreeNode *mRootNode;
+  TreePool   mTreePool;
+  TreeNode  *mRootNode;
+  ASTBuilder mBuilder;
 public:
-  ASTTree() {mRootNode = NULL;}
+  ASTTree() {mRootNode = NULL; mBuilder.mTreePool = &mTreePool;}
   ~ASTTree(){}
 
-  TreeNode* NewNode(const AppealNode *);
+  TreeNode* NewTokenTreeNode(const AppealNode *);
+  TreeNode* NewActionTreeNode(const AppealNode *, std::map<AppealNode*, TreeNode*> &);
 };
 
 #endif

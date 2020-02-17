@@ -97,6 +97,7 @@ public:
   void ReplaceSortedChild(AppealNode *existing, AppealNode *replacement);
   void AddSortedChild(AppealNode *n) { mSortedChildren.push_back(n); }
   bool GetSortedChildIndex(AppealNode*, unsigned &);
+  AppealNode* GetSortedChildByIndex(unsigned idx);
 
   bool IsSucc() { return (mAfter == Succ) || (mAfter == SuccWasSucc); }
   bool IsFail() { return !IsSucc(); }
