@@ -82,16 +82,52 @@ public:
   void Dump();
 };
 
-// OperatorNode-s are coming from operator token.
-class OperatorNode : public TreeNode {
+//////////////////////////////////////////////////////////////////////////
+//              Operator Nodes
+//////////////////////////////////////////////////////////////////////////
+
+class UnaryOperatorNode : public TreeNode {
 public:
-  OprId mOprId;
+  OprId     mOprId;
+  TreeNode *mOpnd;
 public:
-  OperatorNode(OprId id) : mOprId(id) {mKind = NK_Operator;}
-  ~OperatorNode() {}
+  UnaryOperatorNode(OprId id) : mOprId(id) {mKind = NK_Operator;}
+  UnaryOperatorNode() {mKind = NK_Operator;}
+  ~UnaryOperatorNode() {}
 
   void Dump();
 };
+
+class BinaryOperatorNode : public TreeNode {
+public:
+  OprId     mOprId;
+  TreeNode *mOpndA;
+  TreeNode *mOpndB;
+public:
+  BinaryOperatorNode(OprId id) : mOprId(id) {mKind = NK_Operator;}
+  BinaryOperatorNode() {mKind = NK_Operator;}
+  ~BinaryOperatorNode() {}
+
+  void Dump();
+};
+
+class TernaryOperatorNode : public TreeNode {
+public:
+  OprId     mOprId;
+  TreeNode *mOpndA;
+  TreeNode *mOpndB;
+  TreeNode *mOpndC;
+public:
+  TernaryOperatorNode(OprId id) : mOprId(id) {mKind = NK_Operator;}
+  TernaryOperatorNode() {mKind = NK_Operator;}
+  ~TernaryOperatorNode() {}
+
+  void Dump();
+};
+
+//////////////////////////////////////////////////////////////////////////
+//                         Function Nodes
+//////////////////////////////////////////////////////////////////////////
 
 class TreeSymbol;
 
@@ -139,34 +175,9 @@ public:
   ASTTree();
   ~ASTTree();
 
-  TreeNode* NewTokenTreeNode(const AppealNode *);
-  TreeNode* NewActionTreeNode(const AppealNode *, std::map<AppealNode*, TreeNode*> &);
-};
+  TreeNode* NewTreeNode(const AppealNode *, std::map<AppealNode*, TreeNode*> &);
 
-////////////////////////////////////////////////////////////////////////////
-//                  The AST Builder
-// ASTBuilder takes the action Id and parameter list, to create a sub tree.
-// Its main body contains huge amount of building functions.
-//
-// The treenode mempool is part of ASTTree since the memory goes with the
-// tree not the builder. The Builder is purely a collect of functions to build
-// sub trees.
-////////////////////////////////////////////////////////////////////////////
-
-class ASTBuilder {
-public:
-  unsigned                mActionId;
-  std::vector<TreeNode *> mParams;
-  TreePool               *mTreePool;
-public:
-  ASTBuilder(TreePool *p) : mTreePool(p) {}
-  ~ASTBuilder() {}
-  TreeNode* Build();
-  void AddParam(TreeNode *n) {mParams.push_back(n);}
-
-  TreeNode* BuildBinaryOperation();
-  TreeNode* BuildAssignment();
-  TreeNode* BuildReturn();
+  void Dump();
 };
 
 #endif

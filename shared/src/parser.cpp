@@ -1992,8 +1992,8 @@ ASTTree* Parser::BuildAST() {
   while(!appeal_stack.empty()) {
     AppealNode *appeal_node = appeal_stack.top();
     bool children_done = true;
-    std::vector<AppealNode*>::iterator it = appeal_node->mChildren.begin();
-    for (; it != appeal_node->mChildren.end(); it++) {
+    std::vector<AppealNode*>::iterator it = appeal_node->mSortedChildren.begin();
+    for (; it != appeal_node->mSortedChildren.end(); it++) {
       AppealNode *child = *it;
       if (!NodeIsDone(child)) {
         appeal_stack.push(child);
@@ -2003,20 +2003,16 @@ ASTTree* Parser::BuildAST() {
     }
 
     if (children_done) {
+      // Create tree node when there is a rule table.
+      // Look into the RuleAction, create the tree node.
+      if(appeal_node->IsTable()) {
+        TreeNode *tree_node = tree->NewTreeNode(appeal_node, nodes_map);
+        nodes_map.insert(std::pair<AppealNode*, TreeNode*>(appeal_node, tree_node));
+      }
+
       // pop out the 'appeal_node'
       appeal_stack.pop();
-      // See if we can get a token tree node
-      TreeNode *tree_node = tree->NewTokenTreeNode(appeal_node);
-      if (tree_node) {
-        std::cout << "new tree node" << std::endl;
-      } else {
-        // Token should have already been give a new tree node. Double check.
-        MASSERT(appeal_node->IsTable() && "Token didn't get a new tree node. Fix it!");
-        // Look into the RuleAction, create the tree node.
-        tree_node = tree->NewActionTreeNode(appeal_node, nodes_map);
-      }
-      // Put into the map
-      nodes_map.insert(std::pair<AppealNode*, TreeNode*>(appeal_node, tree_node));
+      done_nodes.push_back(appeal_node);
     }
   }
 
