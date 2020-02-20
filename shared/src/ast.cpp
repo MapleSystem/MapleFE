@@ -20,6 +20,15 @@
 
 #include "massert.h"
 
+ASTTree::ASTTree() {
+  mRootNode = NULL;
+  mBuilder = new ASTBuilder(&mTreePool);
+}
+
+ASTTree::~ASTTree() {
+  delete mBuilder;
+}
+
 TreeNode* ASTTree::NewTokenTreeNode(const AppealNode *anode) {
   unsigned size = 0;
   if (anode->IsToken()) {
@@ -67,7 +76,7 @@ TreeNode* ASTTree::NewActionTreeNode(const AppealNode *appeal_node, std::map<App
 
   for (unsigned i = 0; i < rule_table->mNumAction; i++) {
     Action *action = rule_table->mActions + i;
-    mBuilder.mActionId = action->mId;
+    mBuilder->mActionId = action->mId;
 
     for (unsigned j = 0; j < action->mNumElem; j++) {
       // find the appeal node child
@@ -78,10 +87,10 @@ TreeNode* ASTTree::NewActionTreeNode(const AppealNode *appeal_node, std::map<App
       std::map<AppealNode*, TreeNode*>::iterator it = map.find(child_app_node);
       MASSERT(it != map.end() && "Could find the tree node in map?");
       TreeNode *tree_node = it->second;
-      mBuilder.AddParam(tree_node);
+      mBuilder->AddParam(tree_node);
     }
 
-    TreeNode *sub_tree = mBuilder.Build();
+    TreeNode *sub_tree = mBuilder->Build();
     return sub_tree;
   }
 }
@@ -94,4 +103,13 @@ TreeNode* ASTTree::NewActionTreeNode(const AppealNode *appeal_node, std::map<App
 
 // Return the sub-tree.
 TreeNode* ASTBuilder::Build() {
+  TreeNode *tree_node = NULL;
+#define ACTION(A) \
+  case (ACT_##A): \
+    tree_node = A(); \
+    break;
+
+  switch (mActionId) {
+#include "supported_actions.def"
+  }
 }
