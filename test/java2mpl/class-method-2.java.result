@@ -37,63 +37,48 @@ Separator  Token:  Semicolon
 Separator  Token:  Rbrace
 ======= Main sortout Dump SortOut =======
 [1] Table TblClassDeclaration@0: 2,
-[2] Table TblNormalClassDeclaration@0: 3,4,5,6,7,8,9,
-[3] Table TblNormalClassDeclaration_sub1@0: KeepPosition
+[2] Table TblNormalClassDeclaration@0: 3,4,5,
+[3] Token
 [4] Token
-[5] Token
-[6] Table TblNormalClassDeclaration_sub2@2: KeepPosition
-[7] Table TblNormalClassDeclaration_sub3@2: KeepPosition
-[8] Table TblNormalClassDeclaration_sub4@2: KeepPosition
-[9] Table TblClassBody@2: 10,11,12,
-[10] Token
-[11] Table TblClassBody_sub1@3: 13,14,
-[12] Token
-[13] Table TblClassBodyDeclaration@3: 15,
-[14] Table TblClassBodyDeclaration@6: 16,
-[15] Table TblClassMemberDeclaration@3: 17,
-[16] Table TblClassMemberDeclaration@6: 18,
-[17] Table TblFieldDeclaration@3: 19,20,21,22,
-[18] Table TblMethodDeclaration@6: 23,24,25,
-[19] Table TblFieldDeclaration_sub1@3: KeepPosition
-[20] Table TblUnannType@3: 26,
-[21] Table TblVariableDeclaratorList@4: 27,28,
-[22] Token
-[23] Table TblMethodDeclaration_sub1@6: KeepPosition
-[24] Table TblMethodHeader@6: 29,
-[25] Table TblMethodBody@12: 30,
-[26] Table TblUnannPrimitiveType@3: 31,
-[27] Table TblVariableDeclarator@4: 32,33,
-[28] Table TblVariableDeclaratorList_sub1@5: KeepPosition
-[29] Table TblMethodHeader_sub1@6: 34,35,36,
-[30] Token
-[31] Table TblNumericType@3: 37,
-[32] Table TblVariableDeclaratorId@4: 38,39,
-[33] Table TblVariableDeclarator_sub1@5: KeepPosition
-[34] Table TblResult@6: 40,
-[35] Table TblMethodDeclarator@7: 41,42,43,44,45,
-[36] Table TblMethodHeader_sub2@12: KeepPosition
-[37] Table TblIntType@3: 46,
-[38] Token
-[39] Table TblVariableDeclaratorId_sub1@5: KeepPosition
-[40] Table TblUnannType@6: WasSucc
-[41] Token
-[42] Token
-[43] Table TblMethodDeclarator_sub1@9: 47,
-[44] Token
-[45] Table TblMethodDeclarator_sub2@12: KeepPosition
-[46] Token
-[47] Table TblFormalParameterList@9: 48,
-[48] Table TblFormalParameterList_sub1@9: 49,50,
-[49] Table TblFormalParameters@9: 51,
-[50] Table TblFormalParameterList_sub2@11: KeepPosition
-[51] Table TblFormalParameters_sub1@9: 52,53,
-[52] Table TblFormalParameter@9: 54,55,56,
-[53] Table TblFormalParameters_sub2@11: KeepPosition
-[54] Table TblFormalParameter_sub1@9: KeepPosition
-[55] Table TblUnannType@9: WasSucc
-[56] Table TblVariableDeclaratorId@10: 57,58,
-[57] Token
-[58] Table TblVariableDeclaratorId_sub1@11: KeepPosition
+[5] Table TblClassBody@2: 6,7,8,
+[6] Token
+[7] Table TblClassBody_sub1@3: 9,10,
+[8] Token
+[9] Table TblClassBodyDeclaration@3: 11,
+[10] Table TblClassBodyDeclaration@6: 12,
+[11] Table TblClassMemberDeclaration@3: 13,
+[12] Table TblClassMemberDeclaration@6: 14,
+[13] Table TblFieldDeclaration@3: 15,16,17,
+[14] Table TblMethodDeclaration@6: 18,19,
+[15] Table TblUnannType@3: 20,
+[16] Table TblVariableDeclaratorList@4: 21,
+[17] Token
+[18] Table TblMethodHeader@6: 22,
+[19] Table TblMethodBody@12: 23,
+[20] Table TblUnannPrimitiveType@3: 24,
+[21] Table TblVariableDeclarator@4: 25,
+[22] Table TblMethodHeader_sub1@6: 26,27,
+[23] Token
+[24] Table TblNumericType@3: 28,
+[25] Table TblVariableDeclaratorId@4: 29,
+[26] Table TblResult@6: 30,
+[27] Table TblMethodDeclarator@7: 31,32,33,34,
+[28] Table TblIntType@3: 35,
+[29] Token
+[30] Table TblUnannType@6: WasSucc
+[31] Token
+[32] Token
+[33] Table TblMethodDeclarator_sub1@9: 36,
+[34] Token
+[35] Token
+[36] Table TblFormalParameterList@9: 37,
+[37] Table TblFormalParameterList_sub1@9: 38,
+[38] Table TblFormalParameters@9: 39,
+[39] Table TblFormalParameters_sub1@9: 40,
+[40] Table TblFormalParameter@9: 41,42,
+[41] Table TblUnannType@9: WasSucc
+[42] Table TblVariableDeclaratorId@10: 43,
+[43] Token
 Matched 14 tokens.
 ======= supplemental sortout Dump SortOut =======
 [1] Table TblUnannType@6: 2,
@@ -109,112 +94,76 @@ Matched 14 tokens.
 [5] Token
 ======= patch-was-succ Dump SortOut =======
 [1] Table TblClassDeclaration@0: 2,
-[2] Table TblNormalClassDeclaration@0: 3,4,5,6,7,8,9,
-[3] Table TblNormalClassDeclaration_sub1@0: KeepPosition
-[4] Token
-[5] Token
-[6] Table TblNormalClassDeclaration_sub2@2: KeepPosition
-[7] Table TblNormalClassDeclaration_sub3@2: KeepPosition
-[8] Table TblNormalClassDeclaration_sub4@2: KeepPosition
-[9] Table TblClassBody@2: 10,11,12,
-[10] Token
-[11] Table TblClassBody_sub1@3: 13,14,
-[12] Token
-[13] Table TblClassBodyDeclaration@3: 15,
-[14] Table TblClassBodyDeclaration@6: 16,
-[15] Table TblClassMemberDeclaration@3: 17,
-[16] Table TblClassMemberDeclaration@6: 18,
-[17] Table TblFieldDeclaration@3: 19,20,21,22,
-[18] Table TblMethodDeclaration@6: 23,24,25,
-[19] Table TblFieldDeclaration_sub1@3: KeepPosition
-[20] Table TblUnannType@3: 26,
-[21] Table TblVariableDeclaratorList@4: 27,28,
-[22] Token
-[23] Table TblMethodDeclaration_sub1@6: KeepPosition
-[24] Table TblMethodHeader@6: 29,
-[25] Table TblMethodBody@12: 30,
-[26] Table TblUnannPrimitiveType@3: 31,
-[27] Table TblVariableDeclarator@4: 32,33,
-[28] Table TblVariableDeclaratorList_sub1@5: KeepPosition
-[29] Table TblMethodHeader_sub1@6: 34,35,36,
-[30] Token
-[31] Table TblNumericType@3: 37,
-[32] Table TblVariableDeclaratorId@4: 38,39,
-[33] Table TblVariableDeclarator_sub1@5: KeepPosition
-[34] Table TblResult@6: 40,
-[35] Table TblMethodDeclarator@7: 41,42,43,44,45,
-[36] Table TblMethodHeader_sub2@12: KeepPosition
-[37] Table TblIntType@3: 46,
-[38] Token
-[39] Table TblVariableDeclaratorId_sub1@5: KeepPosition
-[40] Table TblUnannType@6: 47,
-[41] Token
-[42] Token
-[43] Table TblMethodDeclarator_sub1@9: 48,
-[44] Token
-[45] Table TblMethodDeclarator_sub2@12: KeepPosition
-[46] Token
-[47] Table TblUnannPrimitiveType@6: 49,
-[48] Table TblFormalParameterList@9: 50,
-[49] Table TblNumericType@6: 51,
-[50] Table TblFormalParameterList_sub1@9: 52,53,
-[51] Table TblIntType@6: 54,
-[52] Table TblFormalParameters@9: 55,
-[53] Table TblFormalParameterList_sub2@11: KeepPosition
-[54] Token
-[55] Table TblFormalParameters_sub1@9: 56,57,
-[56] Table TblFormalParameter@9: 58,59,60,
-[57] Table TblFormalParameters_sub2@11: KeepPosition
-[58] Table TblFormalParameter_sub1@9: KeepPosition
-[59] Table TblUnannType@9: 61,
-[60] Table TblVariableDeclaratorId@10: 62,63,
-[61] Table TblUnannPrimitiveType@9: 64,
-[62] Token
-[63] Table TblVariableDeclaratorId_sub1@11: KeepPosition
-[64] Table TblNumericType@9: 65,
-[65] Table TblIntType@9: 66,
-[66] Token
-======= Simplify Trees Dump SortOut =======
-[1] Table TblNormalClassDeclaration@0: 2,3,4,5,6,7,8,
-[2] Table TblNormalClassDeclaration_sub1@0: KeepPosition
+[2] Table TblNormalClassDeclaration@0: 3,4,5,
 [3] Token
 [4] Token
-[5] Table TblNormalClassDeclaration_sub2@2: KeepPosition
-[6] Table TblNormalClassDeclaration_sub3@2: KeepPosition
-[7] Table TblNormalClassDeclaration_sub4@2: KeepPosition
-[8] Table TblClassBody@2: 9,10,11,
-[9] Token
-[10] Table TblClassBody_sub1@3: 12,13,
-[11] Token
-[12:1] Table TblFieldDeclaration@3: 14,15,16,17,
-[13:1] Table TblMethodDeclaration@6: 18,19,20,
-[14] Table TblFieldDeclaration_sub1@3: KeepPosition
-[15:2] Token
-[16] Table TblVariableDeclaratorList@4: 21,22,
+[5] Table TblClassBody@2: 6,7,8,
+[6] Token
+[7] Table TblClassBody_sub1@3: 9,10,
+[8] Token
+[9] Table TblClassBodyDeclaration@3: 11,
+[10] Table TblClassBodyDeclaration@6: 12,
+[11] Table TblClassMemberDeclaration@3: 13,
+[12] Table TblClassMemberDeclaration@6: 14,
+[13] Table TblFieldDeclaration@3: 15,16,17,
+[14] Table TblMethodDeclaration@6: 18,19,
+[15] Table TblUnannType@3: 20,
+[16] Table TblVariableDeclaratorList@4: 21,
 [17] Token
-[18] Table TblMethodDeclaration_sub1@6: KeepPosition
-[19:2] Table TblMethodHeader_sub1@6: 23,24,25,
-[20:3] Token
-[21] Table TblVariableDeclarator@4: 26,27,
-[22] Table TblVariableDeclaratorList_sub1@5: KeepPosition
-[23:1] Token
-[24] Table TblMethodDeclarator@7: 28,29,30,31,32,
-[25] Table TblMethodHeader_sub2@12: KeepPosition
-[26] Table TblVariableDeclaratorId@4: 33,34,
-[27] Table TblVariableDeclarator_sub1@5: KeepPosition
-[28] Token
+[18] Table TblMethodHeader@6: 22,
+[19] Table TblMethodBody@12: 23,
+[20] Table TblUnannPrimitiveType@3: 24,
+[21] Table TblVariableDeclarator@4: 25,
+[22] Table TblMethodHeader_sub1@6: 26,27,
+[23] Token
+[24] Table TblNumericType@3: 28,
+[25] Table TblVariableDeclaratorId@4: 29,
+[26] Table TblResult@6: 30,
+[27] Table TblMethodDeclarator@7: 31,32,33,34,
+[28] Table TblIntType@3: 35,
 [29] Token
-[30:3] Table TblFormalParameterList_sub1@9: 35,36,
+[30] Table TblUnannType@6: 36,
 [31] Token
-[32] Table TblMethodDeclarator_sub2@12: KeepPosition
-[33] Token
-[34] Table TblVariableDeclaratorId_sub1@5: KeepPosition
-[35:1] Table TblFormalParameters_sub1@9: 37,38,
-[36] Table TblFormalParameterList_sub2@11: KeepPosition
-[37] Table TblFormalParameter@9: 39,40,41,
-[38] Table TblFormalParameters_sub2@11: KeepPosition
-[39] Table TblFormalParameter_sub1@9: KeepPosition
-[40:2] Token
-[41] Table TblVariableDeclaratorId@10: 42,43,
+[32] Token
+[33] Table TblMethodDeclarator_sub1@9: 37,
+[34] Token
+[35] Token
+[36] Table TblUnannPrimitiveType@6: 38,
+[37] Table TblFormalParameterList@9: 39,
+[38] Table TblNumericType@6: 40,
+[39] Table TblFormalParameterList_sub1@9: 41,
+[40] Table TblIntType@6: 42,
+[41] Table TblFormalParameters@9: 43,
 [42] Token
-[43] Table TblVariableDeclaratorId_sub1@11: KeepPosition
+[43] Table TblFormalParameters_sub1@9: 44,
+[44] Table TblFormalParameter@9: 45,46,
+[45] Table TblUnannType@9: 47,
+[46] Table TblVariableDeclaratorId@10: 48,
+[47] Table TblUnannPrimitiveType@9: 49,
+[48] Token
+[49] Table TblNumericType@9: 50,
+[50] Table TblIntType@9: 51,
+[51] Token
+======= Simplify Trees Dump SortOut =======
+[1] Table TblNormalClassDeclaration@0: 2,3,4,
+[2] Token
+[3] Token
+[4] Table TblClassBody@2: 5,6,7,
+[5] Token
+[6] Table TblClassBody_sub1@3: 8,9,
+[7] Token
+[8:1] Table TblFieldDeclaration@3: 10,11,12,
+[9:1] Table TblMethodDeclaration@6: 13,14,
+[10:2] Token
+[11:3] Token
+[12] Token
+[13:2] Table TblMethodHeader_sub1@6: 15,16,
+[14:3] Token
+[15:1] Token
+[16] Table TblMethodDeclarator@7: 17,18,19,20,
+[17] Token
+[18] Token
+[19:3] Table TblFormalParameter@9: 21,22,
+[20] Token
+[21:2] Token
+[22:3] Token

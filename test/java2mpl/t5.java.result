@@ -58,9 +58,8 @@ Matched 6 tokens.
 [12] Table TblPrimary@4: 13,
 [13] Table TblPrimaryNoNewArray@4: 14,
 [14] Table TblArrayAccess@4: 15,
-[15] Table TblArrayAccess_sub1@4: 16,17,
+[15] Table TblArrayAccess_sub1@4: 16,
 [16] Table TblExpressionName@4: WasSucc
-[17] Table TblArrayAccess_sub2@5: KeepPosition
 ======= supplemental sortout Dump SortOut =======
 [1] Table TblExpressionName@2: 2,
 [2] Token
@@ -97,10 +96,9 @@ Matched 6 tokens.
 [27] Table TblPrimary@4: 28,
 [28] Table TblPrimaryNoNewArray@4: 29,
 [29] Table TblArrayAccess@4: 30,
-[30] Table TblArrayAccess_sub1@4: 31,32,
-[31] Table TblExpressionName@4: 33,
-[32] Table TblArrayAccess_sub2@5: KeepPosition
-[33] Token
+[30] Table TblArrayAccess_sub1@4: 31,
+[31] Table TblExpressionName@4: 32,
+[32] Token
 ======= Simplify Trees Dump SortOut =======
 [1] Table TblExpressionStatement@0: 2,3,
 [2:1] Table TblAssignment@0: 4,5,6,
@@ -111,9 +109,7 @@ Matched 6 tokens.
 [7:1] Token
 [8:2] Table TblUnaryExpression_sub1@3: 9,10,
 [9] Token
-[10:2] Table TblArrayAccess_sub1@4: 11,12,
-[11:1] Token
-[12] Table TblArrayAccess_sub2@5: KeepPosition
+[10:2] Token
 Keyword    Token:  int
 Separator  Token:  Whitespace
 Identifier Token:  a
@@ -159,9 +155,8 @@ Separator  Token:  Semicolon
 [32] Table TblPrimary@11: 33,
 [33] Table TblPrimaryNoNewArray@11: 34,
 [34] Table TblArrayAccess@11: 35,
-[35] Table TblArrayAccess_sub1@11: 36,37,
+[35] Table TblArrayAccess_sub1@11: 36,
 [36] Table TblExpressionName@11: WasSucc
-[37] Table TblArrayAccess_sub2@12: KeepPosition
 Matched 14 tokens.
 ======= supplemental sortout Dump SortOut =======
 [1] Table TblExpressionName@9: 2,
@@ -205,10 +200,9 @@ Matched 14 tokens.
 [33] Table TblPrimary@11: 34,
 [34] Table TblPrimaryNoNewArray@11: 35,
 [35] Table TblArrayAccess@11: 36,
-[36] Table TblArrayAccess_sub1@11: 37,38,
-[37] Table TblExpressionName@11: 39,
-[38] Table TblArrayAccess_sub2@12: KeepPosition
-[39] Token
+[36] Table TblArrayAccess_sub1@11: 37,
+[37] Table TblExpressionName@11: 38,
+[38] Token
 ======= Simplify Trees Dump SortOut =======
 [1] Table TblExpressionStatement@6: 2,3,
 [2:1] Table TblAssignment@6: 4,5,6,
@@ -222,57 +216,51 @@ Matched 14 tokens.
 [10:1] Token
 [11:2] Table TblUnaryExpression_sub1@10: 12,13,
 [12] Token
-[13:2] Table TblArrayAccess_sub1@11: 14,15,
-[14:1] Token
-[15] Table TblArrayAccess_sub2@12: KeepPosition
+[13:2] Token
 ======= Main sortout Dump SortOut =======
 [1] Table TblStatement@14: 2,
 [2] Table TblLocalVariableDeclarationStatement@14: 3,4,
-[3] Table TblLocalVariableDeclaration@14: 5,6,7,
+[3] Table TblLocalVariableDeclaration@14: 5,6,
 [4] Token
-[5] Table TblLocalVariableDeclaration_sub1@14: KeepPosition
-[6] Table TblLocalVariableType@14: 8,
-[7] Table TblVariableDeclaratorList@15: 9,10,
-[8] Table TblUnannType@14: 11,
-[9] Table TblVariableDeclarator@15: 12,13,
-[10] Table TblVariableDeclaratorList_sub1@22: KeepPosition
-[11] Table TblUnannPrimitiveType@14: 14,
-[12] Table TblVariableDeclaratorId@15: 15,16,
-[13] Table TblVariableDeclarator_sub1@16: 17,
-[14] Table TblNumericType@14: 18,
-[15] Token
-[16] Table TblVariableDeclaratorId_sub1@16: KeepPosition
-[17] Table TblVariableDeclarator_sub2@16: 19,20,
-[18] Table TblIntType@14: 21,
-[19] Token
-[20] Table TblVariableInitializer@17: 22,
-[21] Token
-[22] Table TblExpression@17: 23,
-[23] Table TblPrimary@17: 24,
-[24] Table TblPrimaryNoNewArray@17: 25,
-[25] Table TblPrimaryNoNewArray_sub2@17: 26,27,28,
-[26] Token
-[27] Table TblExpression@18: 29,
-[28] Token
-[29] Table TblPrimary@18: 30,
-[30] Table TblPrimaryNoNewArray@18: 31,
-[31] Table TblArrayAccess@18: 32,
-[32] Table TblArrayAccess_sub1@18: 33,34,
-[33] Table TblExpressionName@18: WasSucc
-[34] Table TblArrayAccess_sub2@19: 35,
-[35] Table TblExpression@19: 36,
-[36] Table TblUnaryExpression@19: 37,
-[37] Table TblUnaryExpression_sub1@19: 38,39,
-[38] Token
-[39] Table TblUnaryExpression@20: 40,
-[40] Table TblUnaryExpressionNotPlusMinus@20: 41,
-[41] Table TblPostfixExpression@20: 42,
-[42] Table TblPrimary@20: 43,
-[43] Table TblPrimaryNoNewArray@20: 44,
-[44] Table TblArrayAccess@20: 45,
-[45] Table TblArrayAccess_sub1@20: 46,47,
-[46] Table TblExpressionName@20: WasSucc
-[47] Table TblArrayAccess_sub2@21: KeepPosition
+[5] Table TblLocalVariableType@14: 7,
+[6] Table TblVariableDeclaratorList@15: 8,
+[7] Table TblUnannType@14: 9,
+[8] Table TblVariableDeclarator@15: 10,11,
+[9] Table TblUnannPrimitiveType@14: 12,
+[10] Table TblVariableDeclaratorId@15: 13,
+[11] Table TblVariableDeclarator_sub1@16: 14,
+[12] Table TblNumericType@14: 15,
+[13] Token
+[14] Table TblVariableDeclarator_sub2@16: 16,17,
+[15] Table TblIntType@14: 18,
+[16] Token
+[17] Table TblVariableInitializer@17: 19,
+[18] Token
+[19] Table TblExpression@17: 20,
+[20] Table TblPrimary@17: 21,
+[21] Table TblPrimaryNoNewArray@17: 22,
+[22] Table TblPrimaryNoNewArray_sub2@17: 23,24,25,
+[23] Token
+[24] Table TblExpression@18: 26,
+[25] Token
+[26] Table TblPrimary@18: 27,
+[27] Table TblPrimaryNoNewArray@18: 28,
+[28] Table TblArrayAccess@18: 29,
+[29] Table TblArrayAccess_sub1@18: 30,31,
+[30] Table TblExpressionName@18: WasSucc
+[31] Table TblArrayAccess_sub2@19: 32,
+[32] Table TblExpression@19: 33,
+[33] Table TblUnaryExpression@19: 34,
+[34] Table TblUnaryExpression_sub1@19: 35,36,
+[35] Token
+[36] Table TblUnaryExpression@20: 37,
+[37] Table TblUnaryExpressionNotPlusMinus@20: 38,
+[38] Table TblPostfixExpression@20: 39,
+[39] Table TblPrimary@20: 40,
+[40] Table TblPrimaryNoNewArray@20: 41,
+[41] Table TblArrayAccess@20: 42,
+[42] Table TblArrayAccess_sub1@20: 43,
+[43] Table TblExpressionName@20: WasSucc
 Matched 23 tokens.
 ======= supplemental sortout Dump SortOut =======
 [1] Table TblExpressionName@18: 2,
@@ -283,74 +271,63 @@ Matched 23 tokens.
 ======= patch-was-succ Dump SortOut =======
 [1] Table TblStatement@14: 2,
 [2] Table TblLocalVariableDeclarationStatement@14: 3,4,
-[3] Table TblLocalVariableDeclaration@14: 5,6,7,
+[3] Table TblLocalVariableDeclaration@14: 5,6,
 [4] Token
-[5] Table TblLocalVariableDeclaration_sub1@14: KeepPosition
-[6] Table TblLocalVariableType@14: 8,
-[7] Table TblVariableDeclaratorList@15: 9,10,
-[8] Table TblUnannType@14: 11,
-[9] Table TblVariableDeclarator@15: 12,13,
-[10] Table TblVariableDeclaratorList_sub1@22: KeepPosition
-[11] Table TblUnannPrimitiveType@14: 14,
-[12] Table TblVariableDeclaratorId@15: 15,16,
-[13] Table TblVariableDeclarator_sub1@16: 17,
-[14] Table TblNumericType@14: 18,
-[15] Token
-[16] Table TblVariableDeclaratorId_sub1@16: KeepPosition
-[17] Table TblVariableDeclarator_sub2@16: 19,20,
-[18] Table TblIntType@14: 21,
-[19] Token
-[20] Table TblVariableInitializer@17: 22,
-[21] Token
-[22] Table TblExpression@17: 23,
-[23] Table TblPrimary@17: 24,
-[24] Table TblPrimaryNoNewArray@17: 25,
-[25] Table TblPrimaryNoNewArray_sub2@17: 26,27,28,
-[26] Token
-[27] Table TblExpression@18: 29,
-[28] Token
-[29] Table TblPrimary@18: 30,
-[30] Table TblPrimaryNoNewArray@18: 31,
-[31] Table TblArrayAccess@18: 32,
-[32] Table TblArrayAccess_sub1@18: 33,34,
-[33] Table TblExpressionName@18: 35,
-[34] Table TblArrayAccess_sub2@19: 36,
-[35] Token
-[36] Table TblExpression@19: 37,
-[37] Table TblUnaryExpression@19: 38,
-[38] Table TblUnaryExpression_sub1@19: 39,40,
-[39] Token
-[40] Table TblUnaryExpression@20: 41,
-[41] Table TblUnaryExpressionNotPlusMinus@20: 42,
-[42] Table TblPostfixExpression@20: 43,
-[43] Table TblPrimary@20: 44,
-[44] Table TblPrimaryNoNewArray@20: 45,
-[45] Table TblArrayAccess@20: 46,
-[46] Table TblArrayAccess_sub1@20: 47,48,
-[47] Table TblExpressionName@20: 49,
-[48] Table TblArrayAccess_sub2@21: KeepPosition
-[49] Token
+[5] Table TblLocalVariableType@14: 7,
+[6] Table TblVariableDeclaratorList@15: 8,
+[7] Table TblUnannType@14: 9,
+[8] Table TblVariableDeclarator@15: 10,11,
+[9] Table TblUnannPrimitiveType@14: 12,
+[10] Table TblVariableDeclaratorId@15: 13,
+[11] Table TblVariableDeclarator_sub1@16: 14,
+[12] Table TblNumericType@14: 15,
+[13] Token
+[14] Table TblVariableDeclarator_sub2@16: 16,17,
+[15] Table TblIntType@14: 18,
+[16] Token
+[17] Table TblVariableInitializer@17: 19,
+[18] Token
+[19] Table TblExpression@17: 20,
+[20] Table TblPrimary@17: 21,
+[21] Table TblPrimaryNoNewArray@17: 22,
+[22] Table TblPrimaryNoNewArray_sub2@17: 23,24,25,
+[23] Token
+[24] Table TblExpression@18: 26,
+[25] Token
+[26] Table TblPrimary@18: 27,
+[27] Table TblPrimaryNoNewArray@18: 28,
+[28] Table TblArrayAccess@18: 29,
+[29] Table TblArrayAccess_sub1@18: 30,31,
+[30] Table TblExpressionName@18: 32,
+[31] Table TblArrayAccess_sub2@19: 33,
+[32] Token
+[33] Table TblExpression@19: 34,
+[34] Table TblUnaryExpression@19: 35,
+[35] Table TblUnaryExpression_sub1@19: 36,37,
+[36] Token
+[37] Table TblUnaryExpression@20: 38,
+[38] Table TblUnaryExpressionNotPlusMinus@20: 39,
+[39] Table TblPostfixExpression@20: 40,
+[40] Table TblPrimary@20: 41,
+[41] Table TblPrimaryNoNewArray@20: 42,
+[42] Table TblArrayAccess@20: 43,
+[43] Table TblArrayAccess_sub1@20: 44,
+[44] Table TblExpressionName@20: 45,
+[45] Token
 ======= Simplify Trees Dump SortOut =======
 [1] Table TblLocalVariableDeclarationStatement@14: 2,3,
-[2] Table TblLocalVariableDeclaration@14: 4,5,6,
+[2] Table TblLocalVariableDeclaration@14: 4,5,
 [3] Token
-[4] Table TblLocalVariableDeclaration_sub1@14: KeepPosition
-[5:2] Token
-[6] Table TblVariableDeclaratorList@15: 7,8,
-[7] Table TblVariableDeclarator@15: 9,10,
-[8] Table TblVariableDeclaratorList_sub1@22: KeepPosition
-[9] Table TblVariableDeclaratorId@15: 11,12,
-[10:2] Table TblVariableDeclarator_sub2@16: 13,14,
-[11] Token
-[12] Table TblVariableDeclaratorId_sub1@16: KeepPosition
-[13] Token
-[14:2] Table TblPrimaryNoNewArray_sub2@17: 15,16,17,
+[4:2] Token
+[5:3] Table TblVariableDeclarator@15: 6,7,
+[6:1] Token
+[7:2] Table TblVariableDeclarator_sub2@16: 8,9,
+[8] Token
+[9:2] Table TblPrimaryNoNewArray_sub2@17: 10,11,12,
+[10] Token
+[11:2] Table TblArrayAccess_sub1@18: 13,14,
+[12] Token
+[13:1] Token
+[14:2] Table TblUnaryExpression_sub1@19: 15,16,
 [15] Token
-[16:2] Table TblArrayAccess_sub1@18: 18,19,
-[17] Token
-[18:1] Token
-[19:2] Table TblUnaryExpression_sub1@19: 20,21,
-[20] Token
-[21:2] Table TblArrayAccess_sub1@20: 22,23,
-[22:1] Token
-[23] Table TblArrayAccess_sub2@21: KeepPosition
+[16:2] Token

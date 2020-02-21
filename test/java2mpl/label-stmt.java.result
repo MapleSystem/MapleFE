@@ -46,60 +46,50 @@ Separator  Token:  Rbrace
 Separator  Token:  Rbrace
 ======= Main sortout Dump SortOut =======
 [1] Table TblClassDeclaration@0: 2,
-[2] Table TblNormalClassDeclaration@0: 3,4,5,6,7,8,9,
-[3] Table TblNormalClassDeclaration_sub1@0: KeepPosition
+[2] Table TblNormalClassDeclaration@0: 3,4,5,
+[3] Token
 [4] Token
-[5] Token
-[6] Table TblNormalClassDeclaration_sub2@2: KeepPosition
-[7] Table TblNormalClassDeclaration_sub3@2: KeepPosition
-[8] Table TblNormalClassDeclaration_sub4@2: KeepPosition
-[9] Table TblClassBody@2: 10,11,12,
-[10] Token
-[11] Table TblClassBody_sub1@3: 13,
-[12] Token
-[13] Table TblClassBodyDeclaration@3: 14,
-[14] Table TblClassMemberDeclaration@3: 15,
-[15] Table TblMethodDeclaration@3: 16,17,18,
-[16] Table TblMethodDeclaration_sub1@3: KeepPosition
-[17] Table TblMethodHeader@3: 19,
-[18] Table TblMethodBody@7: 20,
-[19] Table TblMethodHeader_sub1@3: 21,22,23,
-[20] Table TblBlock@7: 24,25,26,
-[21] Table TblResult@3: 27,
-[22] Table TblMethodDeclarator@4: 28,29,30,31,32,
-[23] Table TblMethodHeader_sub2@7: KeepPosition
+[5] Table TblClassBody@2: 6,7,8,
+[6] Token
+[7] Table TblClassBody_sub1@3: 9,
+[8] Token
+[9] Table TblClassBodyDeclaration@3: 10,
+[10] Table TblClassMemberDeclaration@3: 11,
+[11] Table TblMethodDeclaration@3: 12,13,
+[12] Table TblMethodHeader@3: 14,
+[13] Table TblMethodBody@7: 15,
+[14] Table TblMethodHeader_sub1@3: 16,17,
+[15] Table TblBlock@7: 18,19,20,
+[16] Table TblResult@3: 21,
+[17] Table TblMethodDeclarator@4: 22,23,24,
+[18] Token
+[19] Table TblBlock_sub1@8: 25,
+[20] Token
+[21] Table TblUnannType@3: WasSucc
+[22] Token
+[23] Token
 [24] Token
-[25] Table TblBlock_sub1@8: 33,
-[26] Token
-[27] Table TblUnannType@3: WasSucc
-[28] Token
+[25] Table TblBlockStatements@8: 26,
+[26] Table TblBlockStatement@8: 27,
+[27] Table TblStatement@8: 28,
+[28] Table TblLabeledStatement@8: 29,30,31,
 [29] Token
-[30] Table TblMethodDeclarator_sub1@6: KeepPosition
-[31] Token
-[32] Table TblMethodDeclarator_sub2@7: KeepPosition
-[33] Table TblBlockStatements@8: 34,35,
-[34] Table TblBlockStatement@8: 36,
-[35] Table TblBlockStatements_sub1@15: KeepPosition
-[36] Table TblStatement@8: 37,
-[37] Table TblLabeledStatement@8: 38,39,40,
-[38] Token
-[39] Token
-[40] Table TblStatement@10: 41,
-[41] Table TblStatementWithoutTrailingSubstatement@10: 42,
-[42] Table TblBlock@10: 43,44,45,
-[43] Token
-[44] Table TblBlock_sub1@11: 46,
+[30] Token
+[31] Table TblStatement@10: 32,
+[32] Table TblStatementWithoutTrailingSubstatement@10: 33,
+[33] Table TblBlock@10: 34,35,36,
+[34] Token
+[35] Table TblBlock_sub1@11: 37,
+[36] Token
+[37] Table TblBlockStatements@11: 38,
+[38] Table TblBlockStatement@11: 39,
+[39] Table TblStatement@11: 40,
+[40] Table TblStatementWithoutTrailingSubstatement@11: 41,
+[41] Table TblBreakStatement@11: 42,43,44,
+[42] Token
+[43] Table TblBreakStatement_sub1@12: 45,
+[44] Token
 [45] Token
-[46] Table TblBlockStatements@11: 47,48,
-[47] Table TblBlockStatement@11: 49,
-[48] Table TblBlockStatements_sub1@14: KeepPosition
-[49] Table TblStatement@11: 50,
-[50] Table TblStatementWithoutTrailingSubstatement@11: 51,
-[51] Table TblBreakStatement@11: 52,53,54,
-[52] Token
-[53] Table TblBreakStatement_sub1@12: 55,
-[54] Token
-[55] Token
 Matched 17 tokens.
 ======= supplemental sortout Dump SortOut =======
 [1] Table TblUnannType@3: 2,
@@ -109,100 +99,78 @@ Matched 17 tokens.
 [5] Token
 ======= patch-was-succ Dump SortOut =======
 [1] Table TblClassDeclaration@0: 2,
-[2] Table TblNormalClassDeclaration@0: 3,4,5,6,7,8,9,
-[3] Table TblNormalClassDeclaration_sub1@0: KeepPosition
-[4] Token
-[5] Token
-[6] Table TblNormalClassDeclaration_sub2@2: KeepPosition
-[7] Table TblNormalClassDeclaration_sub3@2: KeepPosition
-[8] Table TblNormalClassDeclaration_sub4@2: KeepPosition
-[9] Table TblClassBody@2: 10,11,12,
-[10] Token
-[11] Table TblClassBody_sub1@3: 13,
-[12] Token
-[13] Table TblClassBodyDeclaration@3: 14,
-[14] Table TblClassMemberDeclaration@3: 15,
-[15] Table TblMethodDeclaration@3: 16,17,18,
-[16] Table TblMethodDeclaration_sub1@3: KeepPosition
-[17] Table TblMethodHeader@3: 19,
-[18] Table TblMethodBody@7: 20,
-[19] Table TblMethodHeader_sub1@3: 21,22,23,
-[20] Table TblBlock@7: 24,25,26,
-[21] Table TblResult@3: 27,
-[22] Table TblMethodDeclarator@4: 28,29,30,31,32,
-[23] Table TblMethodHeader_sub2@7: KeepPosition
-[24] Token
-[25] Table TblBlock_sub1@8: 33,
-[26] Token
-[27] Table TblUnannType@3: 34,
-[28] Token
-[29] Token
-[30] Table TblMethodDeclarator_sub1@6: KeepPosition
-[31] Token
-[32] Table TblMethodDeclarator_sub2@7: KeepPosition
-[33] Table TblBlockStatements@8: 35,36,
-[34] Table TblUnannPrimitiveType@3: 37,
-[35] Table TblBlockStatement@8: 38,
-[36] Table TblBlockStatements_sub1@15: KeepPosition
-[37] Table TblNumericType@3: 39,
-[38] Table TblStatement@8: 40,
-[39] Table TblIntType@3: 41,
-[40] Table TblLabeledStatement@8: 42,43,44,
-[41] Token
-[42] Token
-[43] Token
-[44] Table TblStatement@10: 45,
-[45] Table TblStatementWithoutTrailingSubstatement@10: 46,
-[46] Table TblBlock@10: 47,48,49,
-[47] Token
-[48] Table TblBlock_sub1@11: 50,
-[49] Token
-[50] Table TblBlockStatements@11: 51,52,
-[51] Table TblBlockStatement@11: 53,
-[52] Table TblBlockStatements_sub1@14: KeepPosition
-[53] Table TblStatement@11: 54,
-[54] Table TblStatementWithoutTrailingSubstatement@11: 55,
-[55] Table TblBreakStatement@11: 56,57,58,
-[56] Token
-[57] Table TblBreakStatement_sub1@12: 59,
-[58] Token
-[59] Token
-======= Simplify Trees Dump SortOut =======
-[1] Table TblNormalClassDeclaration@0: 2,3,4,5,6,7,8,
-[2] Table TblNormalClassDeclaration_sub1@0: KeepPosition
+[2] Table TblNormalClassDeclaration@0: 3,4,5,
 [3] Token
 [4] Token
-[5] Table TblNormalClassDeclaration_sub2@2: KeepPosition
-[6] Table TblNormalClassDeclaration_sub3@2: KeepPosition
-[7] Table TblNormalClassDeclaration_sub4@2: KeepPosition
-[8] Table TblClassBody@2: 9,10,11,
-[9] Token
-[10:2] Table TblMethodDeclaration@3: 12,13,14,
-[11] Token
-[12] Table TblMethodDeclaration_sub1@3: KeepPosition
-[13:2] Table TblMethodHeader_sub1@3: 15,16,17,
-[14:3] Table TblBlock@7: 18,19,20,
-[15:1] Token
-[16] Table TblMethodDeclarator@4: 21,22,23,24,25,
-[17] Table TblMethodHeader_sub2@7: KeepPosition
+[5] Table TblClassBody@2: 6,7,8,
+[6] Token
+[7] Table TblClassBody_sub1@3: 9,
+[8] Token
+[9] Table TblClassBodyDeclaration@3: 10,
+[10] Table TblClassMemberDeclaration@3: 11,
+[11] Table TblMethodDeclaration@3: 12,13,
+[12] Table TblMethodHeader@3: 14,
+[13] Table TblMethodBody@7: 15,
+[14] Table TblMethodHeader_sub1@3: 16,17,
+[15] Table TblBlock@7: 18,19,20,
+[16] Table TblResult@3: 21,
+[17] Table TblMethodDeclarator@4: 22,23,24,
 [18] Token
-[19:2] Table TblBlockStatements@8: 26,27,
+[19] Table TblBlock_sub1@8: 25,
 [20] Token
-[21] Token
+[21] Table TblUnannType@3: 26,
 [22] Token
-[23] Table TblMethodDeclarator_sub1@6: KeepPosition
+[23] Token
 [24] Token
-[25] Table TblMethodDeclarator_sub2@7: KeepPosition
-[26:1] Table TblLabeledStatement@8: 28,29,30,
-[27] Table TblBlockStatements_sub1@15: KeepPosition
-[28] Token
-[29] Token
-[30:3] Table TblBlock@10: 31,32,33,
-[31] Token
-[32:2] Table TblBlockStatements@11: 34,35,
+[25] Table TblBlockStatements@8: 27,
+[26] Table TblUnannPrimitiveType@3: 28,
+[27] Table TblBlockStatement@8: 29,
+[28] Table TblNumericType@3: 30,
+[29] Table TblStatement@8: 31,
+[30] Table TblIntType@3: 32,
+[31] Table TblLabeledStatement@8: 33,34,35,
+[32] Token
 [33] Token
-[34:1] Table TblBreakStatement@11: 36,37,38,
-[35] Table TblBlockStatements_sub1@14: KeepPosition
-[36] Token
-[37:2] Token
+[34] Token
+[35] Table TblStatement@10: 36,
+[36] Table TblStatementWithoutTrailingSubstatement@10: 37,
+[37] Table TblBlock@10: 38,39,40,
 [38] Token
+[39] Table TblBlock_sub1@11: 41,
+[40] Token
+[41] Table TblBlockStatements@11: 42,
+[42] Table TblBlockStatement@11: 43,
+[43] Table TblStatement@11: 44,
+[44] Table TblStatementWithoutTrailingSubstatement@11: 45,
+[45] Table TblBreakStatement@11: 46,47,48,
+[46] Token
+[47] Table TblBreakStatement_sub1@12: 49,
+[48] Token
+[49] Token
+======= Simplify Trees Dump SortOut =======
+[1] Table TblNormalClassDeclaration@0: 2,3,4,
+[2] Token
+[3] Token
+[4] Table TblClassBody@2: 5,6,7,
+[5] Token
+[6:2] Table TblMethodDeclaration@3: 8,9,
+[7] Token
+[8:2] Table TblMethodHeader_sub1@3: 10,11,
+[9:3] Table TblBlock@7: 12,13,14,
+[10:1] Token
+[11] Table TblMethodDeclarator@4: 15,16,17,
+[12] Token
+[13:2] Table TblLabeledStatement@8: 18,19,20,
+[14] Token
+[15] Token
+[16] Token
+[17] Token
+[18] Token
+[19] Token
+[20:3] Table TblBlock@10: 21,22,23,
+[21] Token
+[22:2] Table TblBreakStatement@11: 24,25,26,
+[23] Token
+[24] Token
+[25:2] Token
+[26] Token

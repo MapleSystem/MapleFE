@@ -50,9 +50,8 @@ Matched 6 tokens.
 [12] Table TblPrimary@4: 13,
 [13] Table TblPrimaryNoNewArray@4: 14,
 [14] Table TblArrayAccess@4: 15,
-[15] Table TblArrayAccess_sub1@4: 16,17,
+[15] Table TblArrayAccess_sub1@4: 16,
 [16] Table TblExpressionName@4: WasSucc
-[17] Table TblArrayAccess_sub2@5: KeepPosition
 ======= supplemental sortout Dump SortOut =======
 [1] Table TblExpressionName@2: 2,
 [2] Token
@@ -89,10 +88,9 @@ Matched 6 tokens.
 [27] Table TblPrimary@4: 28,
 [28] Table TblPrimaryNoNewArray@4: 29,
 [29] Table TblArrayAccess@4: 30,
-[30] Table TblArrayAccess_sub1@4: 31,32,
-[31] Table TblExpressionName@4: 33,
-[32] Table TblArrayAccess_sub2@5: KeepPosition
-[33] Token
+[30] Table TblArrayAccess_sub1@4: 31,
+[31] Table TblExpressionName@4: 32,
+[32] Token
 ======= Simplify Trees Dump SortOut =======
 [1] Table TblExpressionStatement@0: 2,3,
 [2:1] Table TblAssignment@0: 4,5,6,
@@ -103,6 +101,4 @@ Matched 6 tokens.
 [7:1] Token
 [8:2] Table TblUnaryExpression_sub1@3: 9,10,
 [9] Token
-[10:2] Table TblArrayAccess_sub1@4: 11,12,
-[11:1] Token
-[12] Table TblArrayAccess_sub2@5: KeepPosition
+[10:2] Token

@@ -28,75 +28,56 @@ Separator  Token:  Semicolon
 ======= Main sortout Dump SortOut =======
 [1] Table TblStatement@0: 2,
 [2] Table TblLocalVariableDeclarationStatement@0: 3,4,
-[3] Table TblLocalVariableDeclaration@0: 5,6,7,
+[3] Table TblLocalVariableDeclaration@0: 5,6,
 [4] Token
-[5] Table TblLocalVariableDeclaration_sub1@0: KeepPosition
-[6] Table TblLocalVariableType@0: 8,
-[7] Table TblVariableDeclaratorList@1: 9,10,
-[8] Table TblUnannType@0: 11,
-[9] Table TblVariableDeclarator@1: 12,13,
-[10] Table TblVariableDeclaratorList_sub1@2: 14,
-[11] Table TblUnannPrimitiveType@0: 15,
-[12] Table TblVariableDeclaratorId@1: 16,17,
-[13] Table TblVariableDeclarator_sub1@2: KeepPosition
-[14] Table TblVariableDeclaratorList_sub2@2: 18,19,
-[15] Table TblNumericType@0: 20,
-[16] Token
-[17] Table TblVariableDeclaratorId_sub1@2: KeepPosition
-[18] Token
-[19] Table TblVariableDeclarator@3: 21,22,
-[20] Table TblIntType@0: 23,
-[21] Table TblVariableDeclaratorId@3: 24,25,
-[22] Table TblVariableDeclarator_sub1@4: KeepPosition
-[23] Token
-[24] Token
-[25] Table TblVariableDeclaratorId_sub1@4: KeepPosition
+[5] Table TblLocalVariableType@0: 7,
+[6] Table TblVariableDeclaratorList@1: 8,9,
+[7] Table TblUnannType@0: 10,
+[8] Table TblVariableDeclarator@1: 11,
+[9] Table TblVariableDeclaratorList_sub1@2: 12,
+[10] Table TblUnannPrimitiveType@0: 13,
+[11] Table TblVariableDeclaratorId@1: 14,
+[12] Table TblVariableDeclaratorList_sub2@2: 15,16,
+[13] Table TblNumericType@0: 17,
+[14] Token
+[15] Token
+[16] Table TblVariableDeclarator@3: 18,
+[17] Table TblIntType@0: 19,
+[18] Table TblVariableDeclaratorId@3: 20,
+[19] Token
+[20] Token
 Matched 5 tokens.
 ======= patch-was-succ Dump SortOut =======
 [1] Table TblStatement@0: 2,
 [2] Table TblLocalVariableDeclarationStatement@0: 3,4,
-[3] Table TblLocalVariableDeclaration@0: 5,6,7,
+[3] Table TblLocalVariableDeclaration@0: 5,6,
 [4] Token
-[5] Table TblLocalVariableDeclaration_sub1@0: KeepPosition
-[6] Table TblLocalVariableType@0: 8,
-[7] Table TblVariableDeclaratorList@1: 9,10,
-[8] Table TblUnannType@0: 11,
-[9] Table TblVariableDeclarator@1: 12,13,
-[10] Table TblVariableDeclaratorList_sub1@2: 14,
-[11] Table TblUnannPrimitiveType@0: 15,
-[12] Table TblVariableDeclaratorId@1: 16,17,
-[13] Table TblVariableDeclarator_sub1@2: KeepPosition
-[14] Table TblVariableDeclaratorList_sub2@2: 18,19,
-[15] Table TblNumericType@0: 20,
-[16] Token
-[17] Table TblVariableDeclaratorId_sub1@2: KeepPosition
-[18] Token
-[19] Table TblVariableDeclarator@3: 21,22,
-[20] Table TblIntType@0: 23,
-[21] Table TblVariableDeclaratorId@3: 24,25,
-[22] Table TblVariableDeclarator_sub1@4: KeepPosition
-[23] Token
-[24] Token
-[25] Table TblVariableDeclaratorId_sub1@4: KeepPosition
+[5] Table TblLocalVariableType@0: 7,
+[6] Table TblVariableDeclaratorList@1: 8,9,
+[7] Table TblUnannType@0: 10,
+[8] Table TblVariableDeclarator@1: 11,
+[9] Table TblVariableDeclaratorList_sub1@2: 12,
+[10] Table TblUnannPrimitiveType@0: 13,
+[11] Table TblVariableDeclaratorId@1: 14,
+[12] Table TblVariableDeclaratorList_sub2@2: 15,16,
+[13] Table TblNumericType@0: 17,
+[14] Token
+[15] Token
+[16] Table TblVariableDeclarator@3: 18,
+[17] Table TblIntType@0: 19,
+[18] Table TblVariableDeclaratorId@3: 20,
+[19] Token
+[20] Token
 ======= Simplify Trees Dump SortOut =======
 [1] Table TblLocalVariableDeclarationStatement@0: 2,3,
-[2] Table TblLocalVariableDeclaration@0: 4,5,6,
+[2] Table TblLocalVariableDeclaration@0: 4,5,
 [3] Token
-[4] Table TblLocalVariableDeclaration_sub1@0: KeepPosition
-[5:2] Token
-[6] Table TblVariableDeclaratorList@1: 7,8,
-[7] Table TblVariableDeclarator@1: 9,10,
-[8:2] Table TblVariableDeclaratorList_sub2@2: 11,12,
-[9] Table TblVariableDeclaratorId@1: 13,14,
-[10] Table TblVariableDeclarator_sub1@2: KeepPosition
-[11] Token
-[12] Table TblVariableDeclarator@3: 15,16,
-[13] Token
-[14] Table TblVariableDeclaratorId_sub1@2: KeepPosition
-[15] Table TblVariableDeclaratorId@3: 17,18,
-[16] Table TblVariableDeclarator_sub1@4: KeepPosition
-[17] Token
-[18] Table TblVariableDeclaratorId_sub1@4: KeepPosition
+[4:2] Token
+[5] Table TblVariableDeclaratorList@1: 6,7,
+[6:1] Token
+[7:2] Table TblVariableDeclaratorList_sub2@2: 8,9,
+[8] Token
+[9:2] Token
 ======= Main sortout Dump SortOut =======
 [1] Table TblStatement@5: 2,
 [2] Table TblStatementWithoutTrailingSubstatement@5: 3,

@@ -53,172 +53,148 @@ Separator  Token:  Whitespace
 Separator  Token:  Lbrace
 ======= Main sortout Dump SortOut =======
 [1] Table TblInterfaceDeclaration@0: 2,
-[2] Table TblNormalInterfaceDeclaration@0: 3,4,5,6,7,8,
-[3] Table TblNormalInterfaceDeclaration_sub1@0: KeepPosition
+[2] Table TblNormalInterfaceDeclaration@0: 3,4,5,
+[3] Token
 [4] Token
-[5] Token
-[6] Table TblNormalInterfaceDeclaration_sub2@2: KeepPosition
-[7] Table TblNormalInterfaceDeclaration_sub3@2: KeepPosition
-[8] Table TblInterfaceBody@2: 9,10,11,
-[9] Token
-[10] Table TblInterfaceBody_sub1@3: 12,
-[11] Token
-[12] Table TblInterfaceMemberDeclaration@3: 13,
-[13] Table TblConstantDeclaration@3: 14,15,16,17,
-[14] Table TblConstantDeclaration_sub1@3: KeepPosition
-[15] Table TblUnannType@3: 18,
-[16] Table TblVariableDeclaratorList@4: 19,20,
-[17] Token
-[18] Table TblUnannPrimitiveType@3: 21,
-[19] Table TblVariableDeclarator@4: 22,23,
-[20] Table TblVariableDeclaratorList_sub1@7: 24,25,
-[21] Table TblNumericType@3: 26,
-[22] Table TblVariableDeclaratorId@4: 27,28,
-[23] Table TblVariableDeclarator_sub1@5: 29,
-[24] Table TblVariableDeclaratorList_sub2@7: 30,31,
-[25] Table TblVariableDeclaratorList_sub2@11: 32,33,
-[26] Table TblIntType@3: 34,
+[5] Table TblInterfaceBody@2: 6,7,8,
+[6] Token
+[7] Table TblInterfaceBody_sub1@3: 9,
+[8] Token
+[9] Table TblInterfaceMemberDeclaration@3: 10,
+[10] Table TblConstantDeclaration@3: 11,12,13,
+[11] Table TblUnannType@3: 14,
+[12] Table TblVariableDeclaratorList@4: 15,16,
+[13] Token
+[14] Table TblUnannPrimitiveType@3: 17,
+[15] Table TblVariableDeclarator@4: 18,19,
+[16] Table TblVariableDeclaratorList_sub1@7: 20,21,
+[17] Table TblNumericType@3: 22,
+[18] Table TblVariableDeclaratorId@4: 23,
+[19] Table TblVariableDeclarator_sub1@5: 24,
+[20] Table TblVariableDeclaratorList_sub2@7: 25,26,
+[21] Table TblVariableDeclaratorList_sub2@11: 27,28,
+[22] Table TblIntType@3: 29,
+[23] Token
+[24] Table TblVariableDeclarator_sub2@5: 30,31,
+[25] Token
+[26] Table TblVariableDeclarator@8: 32,33,
 [27] Token
-[28] Table TblVariableDeclaratorId_sub1@5: KeepPosition
-[29] Table TblVariableDeclarator_sub2@5: 35,36,
+[28] Table TblVariableDeclarator@12: 34,35,
+[29] Token
 [30] Token
-[31] Table TblVariableDeclarator@8: 37,38,
-[32] Token
-[33] Table TblVariableDeclarator@12: 39,40,
-[34] Token
-[35] Token
-[36] Table TblVariableInitializer@6: 41,
-[37] Table TblVariableDeclaratorId@8: 42,43,
-[38] Table TblVariableDeclarator_sub1@9: 44,
-[39] Table TblVariableDeclaratorId@12: 45,46,
-[40] Table TblVariableDeclarator_sub1@13: 47,
-[41] Table TblExpression@6: 48,
+[31] Table TblVariableInitializer@6: 36,
+[32] Table TblVariableDeclaratorId@8: 37,
+[33] Table TblVariableDeclarator_sub1@9: 38,
+[34] Table TblVariableDeclaratorId@12: 39,
+[35] Table TblVariableDeclarator_sub1@13: 40,
+[36] Table TblExpression@6: 41,
+[37] Token
+[38] Table TblVariableDeclarator_sub2@9: 42,43,
+[39] Token
+[40] Table TblVariableDeclarator_sub2@13: 44,45,
+[41] Table TblPrimary@6: 46,
 [42] Token
-[43] Table TblVariableDeclaratorId_sub1@9: KeepPosition
-[44] Table TblVariableDeclarator_sub2@9: 49,50,
-[45] Token
-[46] Table TblVariableDeclaratorId_sub1@13: KeepPosition
-[47] Table TblVariableDeclarator_sub2@13: 51,52,
-[48] Table TblPrimary@6: 53,
+[43] Table TblVariableInitializer@10: 47,
+[44] Token
+[45] Table TblVariableInitializer@14: 48,
+[46] Table TblPrimaryNoNewArray@6: 49,
+[47] Table TblExpression@10: 50,
+[48] Table TblExpression@14: 51,
 [49] Token
-[50] Table TblVariableInitializer@10: 54,
-[51] Token
-[52] Table TblVariableInitializer@14: 55,
-[53] Table TblPrimaryNoNewArray@6: 56,
-[54] Table TblExpression@10: 57,
-[55] Table TblExpression@14: 58,
-[56] Token
-[57] Table TblPrimary@10: 59,
-[58] Table TblPrimary@14: 60,
-[59] Table TblPrimaryNoNewArray@10: 61,
-[60] Table TblPrimaryNoNewArray@14: 62,
-[61] Token
-[62] Token
+[50] Table TblPrimary@10: 52,
+[51] Table TblPrimary@14: 53,
+[52] Table TblPrimaryNoNewArray@10: 54,
+[53] Table TblPrimaryNoNewArray@14: 55,
+[54] Token
+[55] Token
 Matched 17 tokens.
 ======= patch-was-succ Dump SortOut =======
 [1] Table TblInterfaceDeclaration@0: 2,
-[2] Table TblNormalInterfaceDeclaration@0: 3,4,5,6,7,8,
-[3] Table TblNormalInterfaceDeclaration_sub1@0: KeepPosition
-[4] Token
-[5] Token
-[6] Table TblNormalInterfaceDeclaration_sub2@2: KeepPosition
-[7] Table TblNormalInterfaceDeclaration_sub3@2: KeepPosition
-[8] Table TblInterfaceBody@2: 9,10,11,
-[9] Token
-[10] Table TblInterfaceBody_sub1@3: 12,
-[11] Token
-[12] Table TblInterfaceMemberDeclaration@3: 13,
-[13] Table TblConstantDeclaration@3: 14,15,16,17,
-[14] Table TblConstantDeclaration_sub1@3: KeepPosition
-[15] Table TblUnannType@3: 18,
-[16] Table TblVariableDeclaratorList@4: 19,20,
-[17] Token
-[18] Table TblUnannPrimitiveType@3: 21,
-[19] Table TblVariableDeclarator@4: 22,23,
-[20] Table TblVariableDeclaratorList_sub1@7: 24,25,
-[21] Table TblNumericType@3: 26,
-[22] Table TblVariableDeclaratorId@4: 27,28,
-[23] Table TblVariableDeclarator_sub1@5: 29,
-[24] Table TblVariableDeclaratorList_sub2@7: 30,31,
-[25] Table TblVariableDeclaratorList_sub2@11: 32,33,
-[26] Table TblIntType@3: 34,
-[27] Token
-[28] Table TblVariableDeclaratorId_sub1@5: KeepPosition
-[29] Table TblVariableDeclarator_sub2@5: 35,36,
-[30] Token
-[31] Table TblVariableDeclarator@8: 37,38,
-[32] Token
-[33] Table TblVariableDeclarator@12: 39,40,
-[34] Token
-[35] Token
-[36] Table TblVariableInitializer@6: 41,
-[37] Table TblVariableDeclaratorId@8: 42,43,
-[38] Table TblVariableDeclarator_sub1@9: 44,
-[39] Table TblVariableDeclaratorId@12: 45,46,
-[40] Table TblVariableDeclarator_sub1@13: 47,
-[41] Table TblExpression@6: 48,
-[42] Token
-[43] Table TblVariableDeclaratorId_sub1@9: KeepPosition
-[44] Table TblVariableDeclarator_sub2@9: 49,50,
-[45] Token
-[46] Table TblVariableDeclaratorId_sub1@13: KeepPosition
-[47] Table TblVariableDeclarator_sub2@13: 51,52,
-[48] Table TblPrimary@6: 53,
-[49] Token
-[50] Table TblVariableInitializer@10: 54,
-[51] Token
-[52] Table TblVariableInitializer@14: 55,
-[53] Table TblPrimaryNoNewArray@6: 56,
-[54] Table TblExpression@10: 57,
-[55] Table TblExpression@14: 58,
-[56] Token
-[57] Table TblPrimary@10: 59,
-[58] Table TblPrimary@14: 60,
-[59] Table TblPrimaryNoNewArray@10: 61,
-[60] Table TblPrimaryNoNewArray@14: 62,
-[61] Token
-[62] Token
-======= Simplify Trees Dump SortOut =======
-[1] Table TblNormalInterfaceDeclaration@0: 2,3,4,5,6,7,
-[2] Table TblNormalInterfaceDeclaration_sub1@0: KeepPosition
+[2] Table TblNormalInterfaceDeclaration@0: 3,4,5,
 [3] Token
 [4] Token
-[5] Table TblNormalInterfaceDeclaration_sub2@2: KeepPosition
-[6] Table TblNormalInterfaceDeclaration_sub3@2: KeepPosition
-[7] Table TblInterfaceBody@2: 8,9,10,
+[5] Table TblInterfaceBody@2: 6,7,8,
+[6] Token
+[7] Table TblInterfaceBody_sub1@3: 9,
 [8] Token
-[9:2] Table TblConstantDeclaration@3: 11,12,13,14,
-[10] Token
-[11] Table TblConstantDeclaration_sub1@3: KeepPosition
-[12:2] Token
-[13] Table TblVariableDeclaratorList@4: 15,16,
-[14] Token
-[15] Table TblVariableDeclarator@4: 17,18,
-[16] Table TblVariableDeclaratorList_sub1@7: 19,20,
-[17] Table TblVariableDeclaratorId@4: 21,22,
-[18:2] Table TblVariableDeclarator_sub2@5: 23,24,
-[19] Table TblVariableDeclaratorList_sub2@7: 25,26,
-[20] Table TblVariableDeclaratorList_sub2@11: 27,28,
-[21] Token
-[22] Table TblVariableDeclaratorId_sub1@5: KeepPosition
+[9] Table TblInterfaceMemberDeclaration@3: 10,
+[10] Table TblConstantDeclaration@3: 11,12,13,
+[11] Table TblUnannType@3: 14,
+[12] Table TblVariableDeclaratorList@4: 15,16,
+[13] Token
+[14] Table TblUnannPrimitiveType@3: 17,
+[15] Table TblVariableDeclarator@4: 18,19,
+[16] Table TblVariableDeclaratorList_sub1@7: 20,21,
+[17] Table TblNumericType@3: 22,
+[18] Table TblVariableDeclaratorId@4: 23,
+[19] Table TblVariableDeclarator_sub1@5: 24,
+[20] Table TblVariableDeclaratorList_sub2@7: 25,26,
+[21] Table TblVariableDeclaratorList_sub2@11: 27,28,
+[22] Table TblIntType@3: 29,
 [23] Token
-[24:2] Token
+[24] Table TblVariableDeclarator_sub2@5: 30,31,
 [25] Token
-[26] Table TblVariableDeclarator@8: 29,30,
+[26] Table TblVariableDeclarator@8: 32,33,
 [27] Token
-[28] Table TblVariableDeclarator@12: 31,32,
-[29] Table TblVariableDeclaratorId@8: 33,34,
-[30:2] Table TblVariableDeclarator_sub2@9: 35,36,
-[31] Table TblVariableDeclaratorId@12: 37,38,
-[32:2] Table TblVariableDeclarator_sub2@13: 39,40,
-[33] Token
-[34] Table TblVariableDeclaratorId_sub1@9: KeepPosition
-[35] Token
-[36:2] Token
+[28] Table TblVariableDeclarator@12: 34,35,
+[29] Token
+[30] Token
+[31] Table TblVariableInitializer@6: 36,
+[32] Table TblVariableDeclaratorId@8: 37,
+[33] Table TblVariableDeclarator_sub1@9: 38,
+[34] Table TblVariableDeclaratorId@12: 39,
+[35] Table TblVariableDeclarator_sub1@13: 40,
+[36] Table TblExpression@6: 41,
 [37] Token
-[38] Table TblVariableDeclaratorId_sub1@13: KeepPosition
+[38] Table TblVariableDeclarator_sub2@9: 42,43,
 [39] Token
-[40:2] Token
+[40] Table TblVariableDeclarator_sub2@13: 44,45,
+[41] Table TblPrimary@6: 46,
+[42] Token
+[43] Table TblVariableInitializer@10: 47,
+[44] Token
+[45] Table TblVariableInitializer@14: 48,
+[46] Table TblPrimaryNoNewArray@6: 49,
+[47] Table TblExpression@10: 50,
+[48] Table TblExpression@14: 51,
+[49] Token
+[50] Table TblPrimary@10: 52,
+[51] Table TblPrimary@14: 53,
+[52] Table TblPrimaryNoNewArray@10: 54,
+[53] Table TblPrimaryNoNewArray@14: 55,
+[54] Token
+[55] Token
+======= Simplify Trees Dump SortOut =======
+[1] Table TblNormalInterfaceDeclaration@0: 2,3,4,
+[2] Token
+[3] Token
+[4] Table TblInterfaceBody@2: 5,6,7,
+[5] Token
+[6:2] Table TblConstantDeclaration@3: 8,9,10,
+[7] Token
+[8:2] Token
+[9] Table TblVariableDeclaratorList@4: 11,12,
+[10] Token
+[11] Table TblVariableDeclarator@4: 13,14,
+[12] Table TblVariableDeclaratorList_sub1@7: 15,16,
+[13:1] Token
+[14:2] Table TblVariableDeclarator_sub2@5: 17,18,
+[15] Table TblVariableDeclaratorList_sub2@7: 19,20,
+[16] Table TblVariableDeclaratorList_sub2@11: 21,22,
+[17] Token
+[18:2] Token
+[19] Token
+[20] Table TblVariableDeclarator@8: 23,24,
+[21] Token
+[22] Table TblVariableDeclarator@12: 25,26,
+[23:1] Token
+[24:2] Table TblVariableDeclarator_sub2@9: 27,28,
+[25:1] Token
+[26:2] Table TblVariableDeclarator_sub2@13: 29,30,
+[27] Token
+[28:2] Token
+[29] Token
+[30:2] Token
 Separator  Token:  Whitespace
 Separator  Token:  Whitespace
 Keyword    Token:  int
@@ -262,236 +238,200 @@ Separator  Token:  Whitespace
 Separator  Token:  Lbrace
 ======= Main sortout Dump SortOut =======
 [1] Table TblInterfaceDeclaration@17: 2,
-[2] Table TblNormalInterfaceDeclaration@17: 3,4,5,6,7,8,
-[3] Table TblNormalInterfaceDeclaration_sub1@17: KeepPosition
+[2] Table TblNormalInterfaceDeclaration@17: 3,4,5,6,
+[3] Token
 [4] Token
-[5] Token
-[6] Table TblNormalInterfaceDeclaration_sub2@19: KeepPosition
-[7] Table TblNormalInterfaceDeclaration_sub3@19: 9,
-[8] Table TblInterfaceBody@21: 10,11,12,
-[9] Table TblExtendsInterfaces@19: 13,14,
+[5] Table TblNormalInterfaceDeclaration_sub3@19: 7,
+[6] Table TblInterfaceBody@21: 8,9,10,
+[7] Table TblExtendsInterfaces@19: 11,12,
+[8] Token
+[9] Table TblInterfaceBody_sub1@22: 13,
 [10] Token
-[11] Table TblInterfaceBody_sub1@22: 15,
-[12] Token
-[13] Token
-[14] Table TblInterfaceTypeList@20: 16,17,
-[15] Table TblInterfaceMemberDeclaration@22: 18,
-[16] Table TblInterfaceType@20: 19,
-[17] Table TblInterfaceTypeList_sub1@21: KeepPosition
-[18] Table TblConstantDeclaration@22: 20,21,22,23,
-[19] Table TblClassType@20: 24,
-[20] Table TblConstantDeclaration_sub1@22: KeepPosition
-[21] Table TblUnannType@22: 25,
-[22] Table TblVariableDeclaratorList@23: 26,27,
-[23] Token
-[24] Table TblClassType_sub1@20: 28,29,30,
-[25] Table TblUnannPrimitiveType@22: 31,
-[26] Table TblVariableDeclarator@23: 32,33,
-[27] Table TblVariableDeclaratorList_sub1@26: 34,35,36,
-[28] Table TblClassType_sub2@20: KeepPosition
-[29] Token
-[30] Table TblClassType_sub3@21: KeepPosition
-[31] Table TblNumericType@22: 37,
-[32] Table TblVariableDeclaratorId@23: 38,39,
-[33] Table TblVariableDeclarator_sub1@24: 40,
-[34] Table TblVariableDeclaratorList_sub2@26: 41,42,
-[35] Table TblVariableDeclaratorList_sub2@30: 43,44,
-[36] Table TblVariableDeclaratorList_sub2@34: 45,46,
-[37] Table TblIntType@22: 47,
+[11] Token
+[12] Table TblInterfaceTypeList@20: 14,
+[13] Table TblInterfaceMemberDeclaration@22: 15,
+[14] Table TblInterfaceType@20: 16,
+[15] Table TblConstantDeclaration@22: 17,18,19,
+[16] Table TblClassType@20: 20,
+[17] Table TblUnannType@22: 21,
+[18] Table TblVariableDeclaratorList@23: 22,23,
+[19] Token
+[20] Table TblClassType_sub1@20: 24,
+[21] Table TblUnannPrimitiveType@22: 25,
+[22] Table TblVariableDeclarator@23: 26,27,
+[23] Table TblVariableDeclaratorList_sub1@26: 28,29,30,
+[24] Token
+[25] Table TblNumericType@22: 31,
+[26] Table TblVariableDeclaratorId@23: 32,
+[27] Table TblVariableDeclarator_sub1@24: 33,
+[28] Table TblVariableDeclaratorList_sub2@26: 34,35,
+[29] Table TblVariableDeclaratorList_sub2@30: 36,37,
+[30] Table TblVariableDeclaratorList_sub2@34: 38,39,
+[31] Table TblIntType@22: 40,
+[32] Token
+[33] Table TblVariableDeclarator_sub2@24: 41,42,
+[34] Token
+[35] Table TblVariableDeclarator@27: 43,44,
+[36] Token
+[37] Table TblVariableDeclarator@31: 45,46,
 [38] Token
-[39] Table TblVariableDeclaratorId_sub1@24: KeepPosition
-[40] Table TblVariableDeclarator_sub2@24: 48,49,
+[39] Table TblVariableDeclarator@35: 47,48,
+[40] Token
 [41] Token
-[42] Table TblVariableDeclarator@27: 50,51,
-[43] Token
-[44] Table TblVariableDeclarator@31: 52,53,
-[45] Token
-[46] Table TblVariableDeclarator@35: 54,55,
-[47] Token
-[48] Token
-[49] Table TblVariableInitializer@25: 56,
-[50] Table TblVariableDeclaratorId@27: 57,58,
-[51] Table TblVariableDeclarator_sub1@28: 59,
-[52] Table TblVariableDeclaratorId@31: 60,61,
-[53] Table TblVariableDeclarator_sub1@32: 62,
-[54] Table TblVariableDeclaratorId@35: 63,64,
-[55] Table TblVariableDeclarator_sub1@36: 65,
-[56] Table TblExpression@25: 66,
+[42] Table TblVariableInitializer@25: 49,
+[43] Table TblVariableDeclaratorId@27: 50,
+[44] Table TblVariableDeclarator_sub1@28: 51,
+[45] Table TblVariableDeclaratorId@31: 52,
+[46] Table TblVariableDeclarator_sub1@32: 53,
+[47] Table TblVariableDeclaratorId@35: 54,
+[48] Table TblVariableDeclarator_sub1@36: 55,
+[49] Table TblExpression@25: 56,
+[50] Token
+[51] Table TblVariableDeclarator_sub2@28: 57,58,
+[52] Token
+[53] Table TblVariableDeclarator_sub2@32: 59,60,
+[54] Token
+[55] Table TblVariableDeclarator_sub2@36: 61,62,
+[56] Table TblPrimary@25: 63,
 [57] Token
-[58] Table TblVariableDeclaratorId_sub1@28: KeepPosition
-[59] Table TblVariableDeclarator_sub2@28: 67,68,
-[60] Token
-[61] Table TblVariableDeclaratorId_sub1@32: KeepPosition
-[62] Table TblVariableDeclarator_sub2@32: 69,70,
-[63] Token
-[64] Table TblVariableDeclaratorId_sub1@36: KeepPosition
-[65] Table TblVariableDeclarator_sub2@36: 71,72,
-[66] Table TblPrimary@25: 73,
+[58] Table TblVariableInitializer@29: 64,
+[59] Token
+[60] Table TblVariableInitializer@33: 65,
+[61] Token
+[62] Table TblVariableInitializer@37: 66,
+[63] Table TblPrimaryNoNewArray@25: 67,
+[64] Table TblExpression@29: 68,
+[65] Table TblExpression@33: 69,
+[66] Table TblExpression@37: 70,
 [67] Token
-[68] Table TblVariableInitializer@29: 74,
-[69] Token
-[70] Table TblVariableInitializer@33: 75,
-[71] Token
-[72] Table TblVariableInitializer@37: 76,
-[73] Table TblPrimaryNoNewArray@25: 77,
-[74] Table TblExpression@29: 78,
-[75] Table TblExpression@33: 79,
-[76] Table TblExpression@37: 80,
-[77] Token
-[78] Table TblPrimary@29: 81,
-[79] Table TblPrimary@33: 82,
-[80] Table TblPrimary@37: 83,
-[81] Table TblPrimaryNoNewArray@29: 84,
-[82] Table TblPrimaryNoNewArray@33: 85,
-[83] Table TblPrimaryNoNewArray@37: 86,
-[84] Token
-[85] Token
-[86] Token
+[68] Table TblPrimary@29: 71,
+[69] Table TblPrimary@33: 72,
+[70] Table TblPrimary@37: 73,
+[71] Table TblPrimaryNoNewArray@29: 74,
+[72] Table TblPrimaryNoNewArray@33: 75,
+[73] Table TblPrimaryNoNewArray@37: 76,
+[74] Token
+[75] Token
+[76] Token
 Matched 40 tokens.
 ======= patch-was-succ Dump SortOut =======
 [1] Table TblInterfaceDeclaration@17: 2,
-[2] Table TblNormalInterfaceDeclaration@17: 3,4,5,6,7,8,
-[3] Table TblNormalInterfaceDeclaration_sub1@17: KeepPosition
-[4] Token
-[5] Token
-[6] Table TblNormalInterfaceDeclaration_sub2@19: KeepPosition
-[7] Table TblNormalInterfaceDeclaration_sub3@19: 9,
-[8] Table TblInterfaceBody@21: 10,11,12,
-[9] Table TblExtendsInterfaces@19: 13,14,
-[10] Token
-[11] Table TblInterfaceBody_sub1@22: 15,
-[12] Token
-[13] Token
-[14] Table TblInterfaceTypeList@20: 16,17,
-[15] Table TblInterfaceMemberDeclaration@22: 18,
-[16] Table TblInterfaceType@20: 19,
-[17] Table TblInterfaceTypeList_sub1@21: KeepPosition
-[18] Table TblConstantDeclaration@22: 20,21,22,23,
-[19] Table TblClassType@20: 24,
-[20] Table TblConstantDeclaration_sub1@22: KeepPosition
-[21] Table TblUnannType@22: 25,
-[22] Table TblVariableDeclaratorList@23: 26,27,
-[23] Token
-[24] Table TblClassType_sub1@20: 28,29,30,
-[25] Table TblUnannPrimitiveType@22: 31,
-[26] Table TblVariableDeclarator@23: 32,33,
-[27] Table TblVariableDeclaratorList_sub1@26: 34,35,36,
-[28] Table TblClassType_sub2@20: KeepPosition
-[29] Token
-[30] Table TblClassType_sub3@21: KeepPosition
-[31] Table TblNumericType@22: 37,
-[32] Table TblVariableDeclaratorId@23: 38,39,
-[33] Table TblVariableDeclarator_sub1@24: 40,
-[34] Table TblVariableDeclaratorList_sub2@26: 41,42,
-[35] Table TblVariableDeclaratorList_sub2@30: 43,44,
-[36] Table TblVariableDeclaratorList_sub2@34: 45,46,
-[37] Table TblIntType@22: 47,
-[38] Token
-[39] Table TblVariableDeclaratorId_sub1@24: KeepPosition
-[40] Table TblVariableDeclarator_sub2@24: 48,49,
-[41] Token
-[42] Table TblVariableDeclarator@27: 50,51,
-[43] Token
-[44] Table TblVariableDeclarator@31: 52,53,
-[45] Token
-[46] Table TblVariableDeclarator@35: 54,55,
-[47] Token
-[48] Token
-[49] Table TblVariableInitializer@25: 56,
-[50] Table TblVariableDeclaratorId@27: 57,58,
-[51] Table TblVariableDeclarator_sub1@28: 59,
-[52] Table TblVariableDeclaratorId@31: 60,61,
-[53] Table TblVariableDeclarator_sub1@32: 62,
-[54] Table TblVariableDeclaratorId@35: 63,64,
-[55] Table TblVariableDeclarator_sub1@36: 65,
-[56] Table TblExpression@25: 66,
-[57] Token
-[58] Table TblVariableDeclaratorId_sub1@28: KeepPosition
-[59] Table TblVariableDeclarator_sub2@28: 67,68,
-[60] Token
-[61] Table TblVariableDeclaratorId_sub1@32: KeepPosition
-[62] Table TblVariableDeclarator_sub2@32: 69,70,
-[63] Token
-[64] Table TblVariableDeclaratorId_sub1@36: KeepPosition
-[65] Table TblVariableDeclarator_sub2@36: 71,72,
-[66] Table TblPrimary@25: 73,
-[67] Token
-[68] Table TblVariableInitializer@29: 74,
-[69] Token
-[70] Table TblVariableInitializer@33: 75,
-[71] Token
-[72] Table TblVariableInitializer@37: 76,
-[73] Table TblPrimaryNoNewArray@25: 77,
-[74] Table TblExpression@29: 78,
-[75] Table TblExpression@33: 79,
-[76] Table TblExpression@37: 80,
-[77] Token
-[78] Table TblPrimary@29: 81,
-[79] Table TblPrimary@33: 82,
-[80] Table TblPrimary@37: 83,
-[81] Table TblPrimaryNoNewArray@29: 84,
-[82] Table TblPrimaryNoNewArray@33: 85,
-[83] Table TblPrimaryNoNewArray@37: 86,
-[84] Token
-[85] Token
-[86] Token
-======= Simplify Trees Dump SortOut =======
-[1] Table TblNormalInterfaceDeclaration@17: 2,3,4,5,6,7,
-[2] Table TblNormalInterfaceDeclaration_sub1@17: KeepPosition
+[2] Table TblNormalInterfaceDeclaration@17: 3,4,5,6,
 [3] Token
 [4] Token
-[5] Table TblNormalInterfaceDeclaration_sub2@19: KeepPosition
-[6:5] Table TblExtendsInterfaces@19: 8,9,
-[7] Table TblInterfaceBody@21: 10,11,12,
+[5] Table TblNormalInterfaceDeclaration_sub3@19: 7,
+[6] Table TblInterfaceBody@21: 8,9,10,
+[7] Table TblExtendsInterfaces@19: 11,12,
 [8] Token
-[9] Table TblInterfaceTypeList@20: 13,14,
+[9] Table TblInterfaceBody_sub1@22: 13,
 [10] Token
-[11:2] Table TblConstantDeclaration@22: 15,16,17,18,
-[12] Token
-[13:1] Table TblClassType_sub1@20: 19,20,21,
-[14] Table TblInterfaceTypeList_sub1@21: KeepPosition
-[15] Table TblConstantDeclaration_sub1@22: KeepPosition
-[16:2] Token
-[17] Table TblVariableDeclaratorList@23: 22,23,
-[18] Token
-[19] Table TblClassType_sub2@20: KeepPosition
-[20] Token
-[21] Table TblClassType_sub3@21: KeepPosition
-[22] Table TblVariableDeclarator@23: 24,25,
-[23] Table TblVariableDeclaratorList_sub1@26: 26,27,28,
-[24] Table TblVariableDeclaratorId@23: 29,30,
-[25:2] Table TblVariableDeclarator_sub2@24: 31,32,
-[26] Table TblVariableDeclaratorList_sub2@26: 33,34,
-[27] Table TblVariableDeclaratorList_sub2@30: 35,36,
-[28] Table TblVariableDeclaratorList_sub2@34: 37,38,
-[29] Token
-[30] Table TblVariableDeclaratorId_sub1@24: KeepPosition
-[31] Token
-[32:2] Token
-[33] Token
-[34] Table TblVariableDeclarator@27: 39,40,
+[11] Token
+[12] Table TblInterfaceTypeList@20: 14,
+[13] Table TblInterfaceMemberDeclaration@22: 15,
+[14] Table TblInterfaceType@20: 16,
+[15] Table TblConstantDeclaration@22: 17,18,19,
+[16] Table TblClassType@20: 20,
+[17] Table TblUnannType@22: 21,
+[18] Table TblVariableDeclaratorList@23: 22,23,
+[19] Token
+[20] Table TblClassType_sub1@20: 24,
+[21] Table TblUnannPrimitiveType@22: 25,
+[22] Table TblVariableDeclarator@23: 26,27,
+[23] Table TblVariableDeclaratorList_sub1@26: 28,29,30,
+[24] Token
+[25] Table TblNumericType@22: 31,
+[26] Table TblVariableDeclaratorId@23: 32,
+[27] Table TblVariableDeclarator_sub1@24: 33,
+[28] Table TblVariableDeclaratorList_sub2@26: 34,35,
+[29] Table TblVariableDeclaratorList_sub2@30: 36,37,
+[30] Table TblVariableDeclaratorList_sub2@34: 38,39,
+[31] Table TblIntType@22: 40,
+[32] Token
+[33] Table TblVariableDeclarator_sub2@24: 41,42,
+[34] Token
+[35] Table TblVariableDeclarator@27: 43,44,
+[36] Token
+[37] Table TblVariableDeclarator@31: 45,46,
+[38] Token
+[39] Table TblVariableDeclarator@35: 47,48,
+[40] Token
+[41] Token
+[42] Table TblVariableInitializer@25: 49,
+[43] Table TblVariableDeclaratorId@27: 50,
+[44] Table TblVariableDeclarator_sub1@28: 51,
+[45] Table TblVariableDeclaratorId@31: 52,
+[46] Table TblVariableDeclarator_sub1@32: 53,
+[47] Table TblVariableDeclaratorId@35: 54,
+[48] Table TblVariableDeclarator_sub1@36: 55,
+[49] Table TblExpression@25: 56,
+[50] Token
+[51] Table TblVariableDeclarator_sub2@28: 57,58,
+[52] Token
+[53] Table TblVariableDeclarator_sub2@32: 59,60,
+[54] Token
+[55] Table TblVariableDeclarator_sub2@36: 61,62,
+[56] Table TblPrimary@25: 63,
+[57] Token
+[58] Table TblVariableInitializer@29: 64,
+[59] Token
+[60] Table TblVariableInitializer@33: 65,
+[61] Token
+[62] Table TblVariableInitializer@37: 66,
+[63] Table TblPrimaryNoNewArray@25: 67,
+[64] Table TblExpression@29: 68,
+[65] Table TblExpression@33: 69,
+[66] Table TblExpression@37: 70,
+[67] Token
+[68] Table TblPrimary@29: 71,
+[69] Table TblPrimary@33: 72,
+[70] Table TblPrimary@37: 73,
+[71] Table TblPrimaryNoNewArray@29: 74,
+[72] Table TblPrimaryNoNewArray@33: 75,
+[73] Table TblPrimaryNoNewArray@37: 76,
+[74] Token
+[75] Token
+[76] Token
+======= Simplify Trees Dump SortOut =======
+[1] Table TblNormalInterfaceDeclaration@17: 2,3,4,5,
+[2] Token
+[3] Token
+[4:5] Table TblExtendsInterfaces@19: 6,7,
+[5] Table TblInterfaceBody@21: 8,9,10,
+[6] Token
+[7:2] Token
+[8] Token
+[9:2] Table TblConstantDeclaration@22: 11,12,13,
+[10] Token
+[11:2] Token
+[12] Table TblVariableDeclaratorList@23: 14,15,
+[13] Token
+[14] Table TblVariableDeclarator@23: 16,17,
+[15] Table TblVariableDeclaratorList_sub1@26: 18,19,20,
+[16:1] Token
+[17:2] Table TblVariableDeclarator_sub2@24: 21,22,
+[18] Table TblVariableDeclaratorList_sub2@26: 23,24,
+[19] Table TblVariableDeclaratorList_sub2@30: 25,26,
+[20] Table TblVariableDeclaratorList_sub2@34: 27,28,
+[21] Token
+[22:2] Token
+[23] Token
+[24] Table TblVariableDeclarator@27: 29,30,
+[25] Token
+[26] Table TblVariableDeclarator@31: 31,32,
+[27] Token
+[28] Table TblVariableDeclarator@35: 33,34,
+[29:1] Token
+[30:2] Table TblVariableDeclarator_sub2@28: 35,36,
+[31:1] Token
+[32:2] Table TblVariableDeclarator_sub2@32: 37,38,
+[33:1] Token
+[34:2] Table TblVariableDeclarator_sub2@36: 39,40,
 [35] Token
-[36] Table TblVariableDeclarator@31: 41,42,
+[36:2] Token
 [37] Token
-[38] Table TblVariableDeclarator@35: 43,44,
-[39] Table TblVariableDeclaratorId@27: 45,46,
-[40:2] Table TblVariableDeclarator_sub2@28: 47,48,
-[41] Table TblVariableDeclaratorId@31: 49,50,
-[42:2] Table TblVariableDeclarator_sub2@32: 51,52,
-[43] Table TblVariableDeclaratorId@35: 53,54,
-[44:2] Table TblVariableDeclarator_sub2@36: 55,56,
-[45] Token
-[46] Table TblVariableDeclaratorId_sub1@28: KeepPosition
-[47] Token
-[48:2] Token
-[49] Token
-[50] Table TblVariableDeclaratorId_sub1@32: KeepPosition
-[51] Token
-[52:2] Token
-[53] Token
-[54] Table TblVariableDeclaratorId_sub1@36: KeepPosition
-[55] Token
-[56:2] Token
+[38:2] Token
+[39] Token
+[40:2] Token
 Separator  Token:  Whitespace
 Separator  Token:  Whitespace
 Keyword    Token:  int
@@ -531,199 +471,167 @@ Separator  Token:  Whitespace
 Separator  Token:  Lbrace
 ======= Main sortout Dump SortOut =======
 [1] Table TblInterfaceDeclaration@40: 2,
-[2] Table TblNormalInterfaceDeclaration@40: 3,4,5,6,7,8,
-[3] Table TblNormalInterfaceDeclaration_sub1@40: KeepPosition
+[2] Table TblNormalInterfaceDeclaration@40: 3,4,5,6,
+[3] Token
 [4] Token
-[5] Token
-[6] Table TblNormalInterfaceDeclaration_sub2@42: KeepPosition
-[7] Table TblNormalInterfaceDeclaration_sub3@42: 9,
-[8] Table TblInterfaceBody@44: 10,11,12,
-[9] Table TblExtendsInterfaces@42: 13,14,
+[5] Table TblNormalInterfaceDeclaration_sub3@42: 7,
+[6] Table TblInterfaceBody@44: 8,9,10,
+[7] Table TblExtendsInterfaces@42: 11,12,
+[8] Token
+[9] Table TblInterfaceBody_sub1@45: 13,
 [10] Token
-[11] Table TblInterfaceBody_sub1@45: 15,
-[12] Token
-[13] Token
-[14] Table TblInterfaceTypeList@43: 16,17,
-[15] Table TblInterfaceMemberDeclaration@45: 18,
-[16] Table TblInterfaceType@43: 19,
-[17] Table TblInterfaceTypeList_sub1@44: KeepPosition
-[18] Table TblConstantDeclaration@45: 20,21,22,23,
-[19] Table TblClassType@43: 24,
-[20] Table TblConstantDeclaration_sub1@45: KeepPosition
-[21] Table TblUnannType@45: 25,
-[22] Table TblVariableDeclaratorList@46: 26,27,
-[23] Token
-[24] Table TblClassType_sub1@43: 28,29,30,
-[25] Table TblUnannPrimitiveType@45: 31,
-[26] Table TblVariableDeclarator@46: 32,33,
-[27] Table TblVariableDeclaratorList_sub1@49: 34,35,
-[28] Table TblClassType_sub2@43: KeepPosition
-[29] Token
-[30] Table TblClassType_sub3@44: KeepPosition
-[31] Table TblNumericType@45: 36,
-[32] Table TblVariableDeclaratorId@46: 37,38,
-[33] Table TblVariableDeclarator_sub1@47: 39,
-[34] Table TblVariableDeclaratorList_sub2@49: 40,41,
-[35] Table TblVariableDeclaratorList_sub2@53: 42,43,
-[36] Table TblIntType@45: 44,
+[11] Token
+[12] Table TblInterfaceTypeList@43: 14,
+[13] Table TblInterfaceMemberDeclaration@45: 15,
+[14] Table TblInterfaceType@43: 16,
+[15] Table TblConstantDeclaration@45: 17,18,19,
+[16] Table TblClassType@43: 20,
+[17] Table TblUnannType@45: 21,
+[18] Table TblVariableDeclaratorList@46: 22,23,
+[19] Token
+[20] Table TblClassType_sub1@43: 24,
+[21] Table TblUnannPrimitiveType@45: 25,
+[22] Table TblVariableDeclarator@46: 26,27,
+[23] Table TblVariableDeclaratorList_sub1@49: 28,29,
+[24] Token
+[25] Table TblNumericType@45: 30,
+[26] Table TblVariableDeclaratorId@46: 31,
+[27] Table TblVariableDeclarator_sub1@47: 32,
+[28] Table TblVariableDeclaratorList_sub2@49: 33,34,
+[29] Table TblVariableDeclaratorList_sub2@53: 35,36,
+[30] Table TblIntType@45: 37,
+[31] Token
+[32] Table TblVariableDeclarator_sub2@47: 38,39,
+[33] Token
+[34] Table TblVariableDeclarator@50: 40,41,
+[35] Token
+[36] Table TblVariableDeclarator@54: 42,43,
 [37] Token
-[38] Table TblVariableDeclaratorId_sub1@47: KeepPosition
-[39] Table TblVariableDeclarator_sub2@47: 45,46,
-[40] Token
-[41] Table TblVariableDeclarator@50: 47,48,
-[42] Token
-[43] Table TblVariableDeclarator@54: 49,50,
-[44] Token
+[38] Token
+[39] Table TblVariableInitializer@48: 44,
+[40] Table TblVariableDeclaratorId@50: 45,
+[41] Table TblVariableDeclarator_sub1@51: 46,
+[42] Table TblVariableDeclaratorId@54: 47,
+[43] Table TblVariableDeclarator_sub1@55: 48,
+[44] Table TblExpression@48: 49,
 [45] Token
-[46] Table TblVariableInitializer@48: 51,
-[47] Table TblVariableDeclaratorId@50: 52,53,
-[48] Table TblVariableDeclarator_sub1@51: 54,
-[49] Table TblVariableDeclaratorId@54: 55,56,
-[50] Table TblVariableDeclarator_sub1@55: 57,
-[51] Table TblExpression@48: 58,
+[46] Table TblVariableDeclarator_sub2@51: 50,51,
+[47] Token
+[48] Table TblVariableDeclarator_sub2@55: 52,53,
+[49] Table TblPrimary@48: 54,
+[50] Token
+[51] Table TblVariableInitializer@52: 55,
 [52] Token
-[53] Table TblVariableDeclaratorId_sub1@51: KeepPosition
-[54] Table TblVariableDeclarator_sub2@51: 59,60,
-[55] Token
-[56] Table TblVariableDeclaratorId_sub1@55: KeepPosition
-[57] Table TblVariableDeclarator_sub2@55: 61,62,
-[58] Table TblPrimary@48: 63,
-[59] Token
-[60] Table TblVariableInitializer@52: 64,
-[61] Token
-[62] Table TblVariableInitializer@56: 65,
-[63] Table TblPrimaryNoNewArray@48: 66,
-[64] Table TblExpression@52: 67,
-[65] Table TblExpression@56: 68,
-[66] Token
-[67] Table TblPrimary@52: 69,
-[68] Table TblPrimary@56: 70,
-[69] Table TblPrimaryNoNewArray@52: 71,
-[70] Table TblPrimaryNoNewArray@56: 72,
-[71] Token
-[72] Token
+[53] Table TblVariableInitializer@56: 56,
+[54] Table TblPrimaryNoNewArray@48: 57,
+[55] Table TblExpression@52: 58,
+[56] Table TblExpression@56: 59,
+[57] Token
+[58] Table TblPrimary@52: 60,
+[59] Table TblPrimary@56: 61,
+[60] Table TblPrimaryNoNewArray@52: 62,
+[61] Table TblPrimaryNoNewArray@56: 63,
+[62] Token
+[63] Token
 Matched 59 tokens.
 ======= patch-was-succ Dump SortOut =======
 [1] Table TblInterfaceDeclaration@40: 2,
-[2] Table TblNormalInterfaceDeclaration@40: 3,4,5,6,7,8,
-[3] Table TblNormalInterfaceDeclaration_sub1@40: KeepPosition
-[4] Token
-[5] Token
-[6] Table TblNormalInterfaceDeclaration_sub2@42: KeepPosition
-[7] Table TblNormalInterfaceDeclaration_sub3@42: 9,
-[8] Table TblInterfaceBody@44: 10,11,12,
-[9] Table TblExtendsInterfaces@42: 13,14,
-[10] Token
-[11] Table TblInterfaceBody_sub1@45: 15,
-[12] Token
-[13] Token
-[14] Table TblInterfaceTypeList@43: 16,17,
-[15] Table TblInterfaceMemberDeclaration@45: 18,
-[16] Table TblInterfaceType@43: 19,
-[17] Table TblInterfaceTypeList_sub1@44: KeepPosition
-[18] Table TblConstantDeclaration@45: 20,21,22,23,
-[19] Table TblClassType@43: 24,
-[20] Table TblConstantDeclaration_sub1@45: KeepPosition
-[21] Table TblUnannType@45: 25,
-[22] Table TblVariableDeclaratorList@46: 26,27,
-[23] Token
-[24] Table TblClassType_sub1@43: 28,29,30,
-[25] Table TblUnannPrimitiveType@45: 31,
-[26] Table TblVariableDeclarator@46: 32,33,
-[27] Table TblVariableDeclaratorList_sub1@49: 34,35,
-[28] Table TblClassType_sub2@43: KeepPosition
-[29] Token
-[30] Table TblClassType_sub3@44: KeepPosition
-[31] Table TblNumericType@45: 36,
-[32] Table TblVariableDeclaratorId@46: 37,38,
-[33] Table TblVariableDeclarator_sub1@47: 39,
-[34] Table TblVariableDeclaratorList_sub2@49: 40,41,
-[35] Table TblVariableDeclaratorList_sub2@53: 42,43,
-[36] Table TblIntType@45: 44,
-[37] Token
-[38] Table TblVariableDeclaratorId_sub1@47: KeepPosition
-[39] Table TblVariableDeclarator_sub2@47: 45,46,
-[40] Token
-[41] Table TblVariableDeclarator@50: 47,48,
-[42] Token
-[43] Table TblVariableDeclarator@54: 49,50,
-[44] Token
-[45] Token
-[46] Table TblVariableInitializer@48: 51,
-[47] Table TblVariableDeclaratorId@50: 52,53,
-[48] Table TblVariableDeclarator_sub1@51: 54,
-[49] Table TblVariableDeclaratorId@54: 55,56,
-[50] Table TblVariableDeclarator_sub1@55: 57,
-[51] Table TblExpression@48: 58,
-[52] Token
-[53] Table TblVariableDeclaratorId_sub1@51: KeepPosition
-[54] Table TblVariableDeclarator_sub2@51: 59,60,
-[55] Token
-[56] Table TblVariableDeclaratorId_sub1@55: KeepPosition
-[57] Table TblVariableDeclarator_sub2@55: 61,62,
-[58] Table TblPrimary@48: 63,
-[59] Token
-[60] Table TblVariableInitializer@52: 64,
-[61] Token
-[62] Table TblVariableInitializer@56: 65,
-[63] Table TblPrimaryNoNewArray@48: 66,
-[64] Table TblExpression@52: 67,
-[65] Table TblExpression@56: 68,
-[66] Token
-[67] Table TblPrimary@52: 69,
-[68] Table TblPrimary@56: 70,
-[69] Table TblPrimaryNoNewArray@52: 71,
-[70] Table TblPrimaryNoNewArray@56: 72,
-[71] Token
-[72] Token
-======= Simplify Trees Dump SortOut =======
-[1] Table TblNormalInterfaceDeclaration@40: 2,3,4,5,6,7,
-[2] Table TblNormalInterfaceDeclaration_sub1@40: KeepPosition
+[2] Table TblNormalInterfaceDeclaration@40: 3,4,5,6,
 [3] Token
 [4] Token
-[5] Table TblNormalInterfaceDeclaration_sub2@42: KeepPosition
-[6:5] Table TblExtendsInterfaces@42: 8,9,
-[7] Table TblInterfaceBody@44: 10,11,12,
+[5] Table TblNormalInterfaceDeclaration_sub3@42: 7,
+[6] Table TblInterfaceBody@44: 8,9,10,
+[7] Table TblExtendsInterfaces@42: 11,12,
 [8] Token
-[9] Table TblInterfaceTypeList@43: 13,14,
+[9] Table TblInterfaceBody_sub1@45: 13,
 [10] Token
-[11:2] Table TblConstantDeclaration@45: 15,16,17,18,
-[12] Token
-[13:1] Table TblClassType_sub1@43: 19,20,21,
-[14] Table TblInterfaceTypeList_sub1@44: KeepPosition
-[15] Table TblConstantDeclaration_sub1@45: KeepPosition
-[16:2] Token
-[17] Table TblVariableDeclaratorList@46: 22,23,
-[18] Token
-[19] Table TblClassType_sub2@43: KeepPosition
+[11] Token
+[12] Table TblInterfaceTypeList@43: 14,
+[13] Table TblInterfaceMemberDeclaration@45: 15,
+[14] Table TblInterfaceType@43: 16,
+[15] Table TblConstantDeclaration@45: 17,18,19,
+[16] Table TblClassType@43: 20,
+[17] Table TblUnannType@45: 21,
+[18] Table TblVariableDeclaratorList@46: 22,23,
+[19] Token
+[20] Table TblClassType_sub1@43: 24,
+[21] Table TblUnannPrimitiveType@45: 25,
+[22] Table TblVariableDeclarator@46: 26,27,
+[23] Table TblVariableDeclaratorList_sub1@49: 28,29,
+[24] Token
+[25] Table TblNumericType@45: 30,
+[26] Table TblVariableDeclaratorId@46: 31,
+[27] Table TblVariableDeclarator_sub1@47: 32,
+[28] Table TblVariableDeclaratorList_sub2@49: 33,34,
+[29] Table TblVariableDeclaratorList_sub2@53: 35,36,
+[30] Table TblIntType@45: 37,
+[31] Token
+[32] Table TblVariableDeclarator_sub2@47: 38,39,
+[33] Token
+[34] Table TblVariableDeclarator@50: 40,41,
+[35] Token
+[36] Table TblVariableDeclarator@54: 42,43,
+[37] Token
+[38] Token
+[39] Table TblVariableInitializer@48: 44,
+[40] Table TblVariableDeclaratorId@50: 45,
+[41] Table TblVariableDeclarator_sub1@51: 46,
+[42] Table TblVariableDeclaratorId@54: 47,
+[43] Table TblVariableDeclarator_sub1@55: 48,
+[44] Table TblExpression@48: 49,
+[45] Token
+[46] Table TblVariableDeclarator_sub2@51: 50,51,
+[47] Token
+[48] Table TblVariableDeclarator_sub2@55: 52,53,
+[49] Table TblPrimary@48: 54,
+[50] Token
+[51] Table TblVariableInitializer@52: 55,
+[52] Token
+[53] Table TblVariableInitializer@56: 56,
+[54] Table TblPrimaryNoNewArray@48: 57,
+[55] Table TblExpression@52: 58,
+[56] Table TblExpression@56: 59,
+[57] Token
+[58] Table TblPrimary@52: 60,
+[59] Table TblPrimary@56: 61,
+[60] Table TblPrimaryNoNewArray@52: 62,
+[61] Table TblPrimaryNoNewArray@56: 63,
+[62] Token
+[63] Token
+======= Simplify Trees Dump SortOut =======
+[1] Table TblNormalInterfaceDeclaration@40: 2,3,4,5,
+[2] Token
+[3] Token
+[4:5] Table TblExtendsInterfaces@42: 6,7,
+[5] Table TblInterfaceBody@44: 8,9,10,
+[6] Token
+[7:2] Token
+[8] Token
+[9:2] Table TblConstantDeclaration@45: 11,12,13,
+[10] Token
+[11:2] Token
+[12] Table TblVariableDeclaratorList@46: 14,15,
+[13] Token
+[14] Table TblVariableDeclarator@46: 16,17,
+[15] Table TblVariableDeclaratorList_sub1@49: 18,19,
+[16:1] Token
+[17:2] Table TblVariableDeclarator_sub2@47: 20,21,
+[18] Table TblVariableDeclaratorList_sub2@49: 22,23,
+[19] Table TblVariableDeclaratorList_sub2@53: 24,25,
 [20] Token
-[21] Table TblClassType_sub3@44: KeepPosition
-[22] Table TblVariableDeclarator@46: 24,25,
-[23] Table TblVariableDeclaratorList_sub1@49: 26,27,
-[24] Table TblVariableDeclaratorId@46: 28,29,
-[25:2] Table TblVariableDeclarator_sub2@47: 30,31,
-[26] Table TblVariableDeclaratorList_sub2@49: 32,33,
-[27] Table TblVariableDeclaratorList_sub2@53: 34,35,
-[28] Token
-[29] Table TblVariableDeclaratorId_sub1@47: KeepPosition
+[21:2] Token
+[22] Token
+[23] Table TblVariableDeclarator@50: 26,27,
+[24] Token
+[25] Table TblVariableDeclarator@54: 28,29,
+[26:1] Token
+[27:2] Table TblVariableDeclarator_sub2@51: 30,31,
+[28:1] Token
+[29:2] Table TblVariableDeclarator_sub2@55: 32,33,
 [30] Token
 [31:2] Token
 [32] Token
-[33] Table TblVariableDeclarator@50: 36,37,
-[34] Token
-[35] Table TblVariableDeclarator@54: 38,39,
-[36] Table TblVariableDeclaratorId@50: 40,41,
-[37:2] Table TblVariableDeclarator_sub2@51: 42,43,
-[38] Table TblVariableDeclaratorId@54: 44,45,
-[39:2] Table TblVariableDeclarator_sub2@55: 46,47,
-[40] Token
-[41] Table TblVariableDeclaratorId_sub1@51: KeepPosition
-[42] Token
-[43:2] Token
-[44] Token
-[45] Table TblVariableDeclaratorId_sub1@55: KeepPosition
-[46] Token
-[47:2] Token
+[33:2] Token
 Separator  Token:  Whitespace
 Separator  Token:  Whitespace
 Keyword    Token:  int
@@ -753,85 +661,75 @@ Separator  Token:  Semicolon
 Separator  Token:  Rbrace
 ======= Main sortout Dump SortOut =======
 [1] Table TblInterfaceDeclaration@59: 2,
-[2] Table TblNormalInterfaceDeclaration@59: 3,4,5,6,7,8,
-[3] Table TblNormalInterfaceDeclaration_sub1@59: KeepPosition
+[2] Table TblNormalInterfaceDeclaration@59: 3,4,5,6,
+[3] Token
 [4] Token
-[5] Token
-[6] Table TblNormalInterfaceDeclaration_sub2@61: KeepPosition
-[7] Table TblNormalInterfaceDeclaration_sub3@61: 9,
-[8] Table TblInterfaceBody@65: 10,11,12,
-[9] Table TblExtendsInterfaces@61: 13,14,
+[5] Table TblNormalInterfaceDeclaration_sub3@61: 7,
+[6] Table TblInterfaceBody@65: 8,9,10,
+[7] Table TblExtendsInterfaces@61: 11,12,
+[8] Token
+[9] Table TblInterfaceBody_sub1@66: 13,
 [10] Token
-[11] Table TblInterfaceBody_sub1@66: 15,
-[12] Token
-[13] Token
-[14] Table TblInterfaceTypeList@62: 16,17,
-[15] Table TblInterfaceMemberDeclaration@66: 18,
-[16] Table TblInterfaceType@62: 19,
-[17] Table TblInterfaceTypeList_sub1@63: 20,
-[18] Table TblConstantDeclaration@66: 21,22,23,24,
-[19] Table TblClassType@62: 25,
-[20] Table TblInterfaceTypeList_sub2@63: 26,27,
-[21] Table TblConstantDeclaration_sub1@66: KeepPosition
-[22] Table TblUnannType@66: 28,
-[23] Table TblVariableDeclaratorList@67: 29,30,
-[24] Token
-[25] Table TblClassType_sub1@62: 31,32,33,
-[26] Token
-[27] Table TblInterfaceType@64: 34,
-[28] Table TblUnannPrimitiveType@66: 35,
-[29] Table TblVariableDeclarator@67: 36,37,
-[30] Table TblVariableDeclaratorList_sub1@70: 38,39,
-[31] Table TblClassType_sub2@62: KeepPosition
-[32] Token
-[33] Table TblClassType_sub3@63: KeepPosition
-[34] Table TblClassType@64: 40,
-[35] Table TblNumericType@66: 41,
-[36] Table TblVariableDeclaratorId@67: 42,43,
-[37] Table TblVariableDeclarator_sub1@68: 44,
-[38] Table TblVariableDeclaratorList_sub2@70: 45,46,
-[39] Table TblVariableDeclaratorList_sub2@74: 47,48,
-[40] Table TblClassType_sub1@64: 49,50,51,
-[41] Table TblIntType@66: 52,
-[42] Token
-[43] Table TblVariableDeclaratorId_sub1@68: KeepPosition
-[44] Table TblVariableDeclarator_sub2@68: 53,54,
+[11] Token
+[12] Table TblInterfaceTypeList@62: 14,15,
+[13] Table TblInterfaceMemberDeclaration@66: 16,
+[14] Table TblInterfaceType@62: 17,
+[15] Table TblInterfaceTypeList_sub1@63: 18,
+[16] Table TblConstantDeclaration@66: 19,20,21,
+[17] Table TblClassType@62: 22,
+[18] Table TblInterfaceTypeList_sub2@63: 23,24,
+[19] Table TblUnannType@66: 25,
+[20] Table TblVariableDeclaratorList@67: 26,27,
+[21] Token
+[22] Table TblClassType_sub1@62: 28,
+[23] Token
+[24] Table TblInterfaceType@64: 29,
+[25] Table TblUnannPrimitiveType@66: 30,
+[26] Table TblVariableDeclarator@67: 31,32,
+[27] Table TblVariableDeclaratorList_sub1@70: 33,34,
+[28] Token
+[29] Table TblClassType@64: 35,
+[30] Table TblNumericType@66: 36,
+[31] Table TblVariableDeclaratorId@67: 37,
+[32] Table TblVariableDeclarator_sub1@68: 38,
+[33] Table TblVariableDeclaratorList_sub2@70: 39,40,
+[34] Table TblVariableDeclaratorList_sub2@74: 41,42,
+[35] Table TblClassType_sub1@64: 43,
+[36] Table TblIntType@66: 44,
+[37] Token
+[38] Table TblVariableDeclarator_sub2@68: 45,46,
+[39] Token
+[40] Table TblVariableDeclarator@71: 47,48,
+[41] Token
+[42] Table TblVariableDeclarator@75: 49,50,
+[43] Token
+[44] Token
 [45] Token
-[46] Table TblVariableDeclarator@71: 55,56,
-[47] Token
-[48] Table TblVariableDeclarator@75: 57,58,
-[49] Table TblClassType_sub2@64: KeepPosition
-[50] Token
-[51] Table TblClassType_sub3@65: KeepPosition
+[46] Table TblVariableInitializer@69: 51,
+[47] Table TblVariableDeclaratorId@71: 52,
+[48] Table TblVariableDeclarator_sub1@72: 53,
+[49] Table TblVariableDeclaratorId@75: 54,
+[50] Table TblVariableDeclarator_sub1@76: 55,
+[51] Table TblExpression@69: 56,
 [52] Token
-[53] Token
-[54] Table TblVariableInitializer@69: 59,
-[55] Table TblVariableDeclaratorId@71: 60,61,
-[56] Table TblVariableDeclarator_sub1@72: 62,
-[57] Table TblVariableDeclaratorId@75: 63,64,
-[58] Table TblVariableDeclarator_sub1@76: 65,
-[59] Table TblExpression@69: 66,
-[60] Token
-[61] Table TblVariableDeclaratorId_sub1@72: KeepPosition
-[62] Table TblVariableDeclarator_sub2@72: 67,68,
-[63] Token
-[64] Table TblVariableDeclaratorId_sub1@76: KeepPosition
-[65] Table TblVariableDeclarator_sub2@76: 69,70,
-[66] Table TblPrimary@69: 71,
-[67] Token
-[68] Table TblVariableInitializer@73: 72,
+[53] Table TblVariableDeclarator_sub2@72: 57,58,
+[54] Token
+[55] Table TblVariableDeclarator_sub2@76: 59,60,
+[56] Table TblPrimary@69: 61,
+[57] Token
+[58] Table TblVariableInitializer@73: 62,
+[59] Token
+[60] Table TblVariableInitializer@77: 63,
+[61] Table TblPrimaryNoNewArray@69: 64,
+[62] Table TblExpression@73: 65,
+[63] Table TblExpression@77: 66,
+[64] Token
+[65] Table TblPrimary@73: 67,
+[66] Table TblPrimary@77: 68,
+[67] Table TblPrimaryNoNewArray@73: 69,
+[68] Table TblPrimaryNoNewArray@77: 70,
 [69] Token
-[70] Table TblVariableInitializer@77: 73,
-[71] Table TblPrimaryNoNewArray@69: 74,
-[72] Table TblExpression@73: 75,
-[73] Table TblExpression@77: 76,
-[74] Token
-[75] Table TblPrimary@73: 77,
-[76] Table TblPrimary@77: 78,
-[77] Table TblPrimaryNoNewArray@73: 79,
-[78] Table TblPrimaryNoNewArray@77: 80,
-[79] Token
-[80] Table TblArrayAccess@77: WasSucc
+[70] Table TblArrayAccess@77: WasSucc
 Matched 82 tokens.
 ======= supplemental sortout Dump SortOut =======
 [1] Table TblArrayAccess@77: 2,
@@ -853,153 +751,128 @@ Matched 82 tokens.
 [2] Token
 ======= patch-was-succ Dump SortOut =======
 [1] Table TblInterfaceDeclaration@59: 2,
-[2] Table TblNormalInterfaceDeclaration@59: 3,4,5,6,7,8,
-[3] Table TblNormalInterfaceDeclaration_sub1@59: KeepPosition
-[4] Token
-[5] Token
-[6] Table TblNormalInterfaceDeclaration_sub2@61: KeepPosition
-[7] Table TblNormalInterfaceDeclaration_sub3@61: 9,
-[8] Table TblInterfaceBody@65: 10,11,12,
-[9] Table TblExtendsInterfaces@61: 13,14,
-[10] Token
-[11] Table TblInterfaceBody_sub1@66: 15,
-[12] Token
-[13] Token
-[14] Table TblInterfaceTypeList@62: 16,17,
-[15] Table TblInterfaceMemberDeclaration@66: 18,
-[16] Table TblInterfaceType@62: 19,
-[17] Table TblInterfaceTypeList_sub1@63: 20,
-[18] Table TblConstantDeclaration@66: 21,22,23,24,
-[19] Table TblClassType@62: 25,
-[20] Table TblInterfaceTypeList_sub2@63: 26,27,
-[21] Table TblConstantDeclaration_sub1@66: KeepPosition
-[22] Table TblUnannType@66: 28,
-[23] Table TblVariableDeclaratorList@67: 29,30,
-[24] Token
-[25] Table TblClassType_sub1@62: 31,32,33,
-[26] Token
-[27] Table TblInterfaceType@64: 34,
-[28] Table TblUnannPrimitiveType@66: 35,
-[29] Table TblVariableDeclarator@67: 36,37,
-[30] Table TblVariableDeclaratorList_sub1@70: 38,39,
-[31] Table TblClassType_sub2@62: KeepPosition
-[32] Token
-[33] Table TblClassType_sub3@63: KeepPosition
-[34] Table TblClassType@64: 40,
-[35] Table TblNumericType@66: 41,
-[36] Table TblVariableDeclaratorId@67: 42,43,
-[37] Table TblVariableDeclarator_sub1@68: 44,
-[38] Table TblVariableDeclaratorList_sub2@70: 45,46,
-[39] Table TblVariableDeclaratorList_sub2@74: 47,48,
-[40] Table TblClassType_sub1@64: 49,50,51,
-[41] Table TblIntType@66: 52,
-[42] Token
-[43] Table TblVariableDeclaratorId_sub1@68: KeepPosition
-[44] Table TblVariableDeclarator_sub2@68: 53,54,
-[45] Token
-[46] Table TblVariableDeclarator@71: 55,56,
-[47] Token
-[48] Table TblVariableDeclarator@75: 57,58,
-[49] Table TblClassType_sub2@64: KeepPosition
-[50] Token
-[51] Table TblClassType_sub3@65: KeepPosition
-[52] Token
-[53] Token
-[54] Table TblVariableInitializer@69: 59,
-[55] Table TblVariableDeclaratorId@71: 60,61,
-[56] Table TblVariableDeclarator_sub1@72: 62,
-[57] Table TblVariableDeclaratorId@75: 63,64,
-[58] Table TblVariableDeclarator_sub1@76: 65,
-[59] Table TblExpression@69: 66,
-[60] Token
-[61] Table TblVariableDeclaratorId_sub1@72: KeepPosition
-[62] Table TblVariableDeclarator_sub2@72: 67,68,
-[63] Token
-[64] Table TblVariableDeclaratorId_sub1@76: KeepPosition
-[65] Table TblVariableDeclarator_sub2@76: 69,70,
-[66] Table TblPrimary@69: 71,
-[67] Token
-[68] Table TblVariableInitializer@73: 72,
-[69] Token
-[70] Table TblVariableInitializer@77: 73,
-[71] Table TblPrimaryNoNewArray@69: 74,
-[72] Table TblExpression@73: 75,
-[73] Table TblExpression@77: 76,
-[74] Token
-[75] Table TblPrimary@73: 77,
-[76] Table TblPrimary@77: 78,
-[77] Table TblPrimaryNoNewArray@73: 79,
-[78] Table TblPrimaryNoNewArray@77: 80,
-[79] Token
-[80] Table TblArrayAccess@77: 81,
-[81] Table TblArrayAccess_sub1@77: 82,83,
-[82] Table TblExpressionName@77: 84,
-[83] Table TblArrayAccess_sub2@78: 85,
-[84] Token
-[85] Table TblExpression@78: 86,
-[86] Table TblUnaryExpression@78: 87,
-[87] Table TblUnaryExpression_sub1@78: 88,89,
-[88] Token
-[89] Table TblUnaryExpression@79: 90,
-[90] Table TblUnaryExpressionNotPlusMinus@79: 91,
-[91] Table TblPostfixExpression@79: 92,
-[92] Table TblPrimary@79: 93,
-[93] Table TblPrimaryNoNewArray@79: 94,
-[94] Token
-======= Simplify Trees Dump SortOut =======
-[1] Table TblNormalInterfaceDeclaration@59: 2,3,4,5,6,7,
-[2] Table TblNormalInterfaceDeclaration_sub1@59: KeepPosition
+[2] Table TblNormalInterfaceDeclaration@59: 3,4,5,6,
 [3] Token
 [4] Token
-[5] Table TblNormalInterfaceDeclaration_sub2@61: KeepPosition
-[6:5] Table TblExtendsInterfaces@61: 8,9,
-[7] Table TblInterfaceBody@65: 10,11,12,
+[5] Table TblNormalInterfaceDeclaration_sub3@61: 7,
+[6] Table TblInterfaceBody@65: 8,9,10,
+[7] Table TblExtendsInterfaces@61: 11,12,
 [8] Token
-[9] Table TblInterfaceTypeList@62: 13,14,
+[9] Table TblInterfaceBody_sub1@66: 13,
 [10] Token
-[11:2] Table TblConstantDeclaration@66: 15,16,17,18,
-[12] Token
-[13:1] Table TblClassType_sub1@62: 19,20,21,
-[14:2] Table TblInterfaceTypeList_sub2@63: 22,23,
-[15] Table TblConstantDeclaration_sub1@66: KeepPosition
-[16:2] Token
-[17] Table TblVariableDeclaratorList@67: 24,25,
-[18] Token
-[19] Table TblClassType_sub2@62: KeepPosition
-[20] Token
-[21] Table TblClassType_sub3@63: KeepPosition
-[22] Token
-[23:2] Table TblClassType_sub1@64: 26,27,28,
-[24] Table TblVariableDeclarator@67: 29,30,
-[25] Table TblVariableDeclaratorList_sub1@70: 31,32,
-[26] Table TblClassType_sub2@64: KeepPosition
-[27] Token
-[28] Table TblClassType_sub3@65: KeepPosition
-[29] Table TblVariableDeclaratorId@67: 33,34,
-[30:2] Table TblVariableDeclarator_sub2@68: 35,36,
-[31] Table TblVariableDeclaratorList_sub2@70: 37,38,
-[32] Table TblVariableDeclaratorList_sub2@74: 39,40,
-[33] Token
-[34] Table TblVariableDeclaratorId_sub1@68: KeepPosition
-[35] Token
-[36:2] Token
+[11] Token
+[12] Table TblInterfaceTypeList@62: 14,15,
+[13] Table TblInterfaceMemberDeclaration@66: 16,
+[14] Table TblInterfaceType@62: 17,
+[15] Table TblInterfaceTypeList_sub1@63: 18,
+[16] Table TblConstantDeclaration@66: 19,20,21,
+[17] Table TblClassType@62: 22,
+[18] Table TblInterfaceTypeList_sub2@63: 23,24,
+[19] Table TblUnannType@66: 25,
+[20] Table TblVariableDeclaratorList@67: 26,27,
+[21] Token
+[22] Table TblClassType_sub1@62: 28,
+[23] Token
+[24] Table TblInterfaceType@64: 29,
+[25] Table TblUnannPrimitiveType@66: 30,
+[26] Table TblVariableDeclarator@67: 31,32,
+[27] Table TblVariableDeclaratorList_sub1@70: 33,34,
+[28] Token
+[29] Table TblClassType@64: 35,
+[30] Table TblNumericType@66: 36,
+[31] Table TblVariableDeclaratorId@67: 37,
+[32] Table TblVariableDeclarator_sub1@68: 38,
+[33] Table TblVariableDeclaratorList_sub2@70: 39,40,
+[34] Table TblVariableDeclaratorList_sub2@74: 41,42,
+[35] Table TblClassType_sub1@64: 43,
+[36] Table TblIntType@66: 44,
 [37] Token
-[38] Table TblVariableDeclarator@71: 41,42,
+[38] Table TblVariableDeclarator_sub2@68: 45,46,
 [39] Token
-[40] Table TblVariableDeclarator@75: 43,44,
-[41] Table TblVariableDeclaratorId@71: 45,46,
-[42:2] Table TblVariableDeclarator_sub2@72: 47,48,
-[43] Table TblVariableDeclaratorId@75: 49,50,
-[44:2] Table TblVariableDeclarator_sub2@76: 51,52,
+[40] Table TblVariableDeclarator@71: 47,48,
+[41] Token
+[42] Table TblVariableDeclarator@75: 49,50,
+[43] Token
+[44] Token
 [45] Token
-[46] Table TblVariableDeclaratorId_sub1@72: KeepPosition
-[47] Token
-[48:2] Token
-[49] Token
-[50] Table TblVariableDeclaratorId_sub1@76: KeepPosition
-[51] Token
-[52:2] Table TblArrayAccess_sub1@77: 53,54,
-[53:1] Token
-[54:2] Table TblUnaryExpression_sub1@78: 55,56,
-[55] Token
-[56:2] Token
+[46] Table TblVariableInitializer@69: 51,
+[47] Table TblVariableDeclaratorId@71: 52,
+[48] Table TblVariableDeclarator_sub1@72: 53,
+[49] Table TblVariableDeclaratorId@75: 54,
+[50] Table TblVariableDeclarator_sub1@76: 55,
+[51] Table TblExpression@69: 56,
+[52] Token
+[53] Table TblVariableDeclarator_sub2@72: 57,58,
+[54] Token
+[55] Table TblVariableDeclarator_sub2@76: 59,60,
+[56] Table TblPrimary@69: 61,
+[57] Token
+[58] Table TblVariableInitializer@73: 62,
+[59] Token
+[60] Table TblVariableInitializer@77: 63,
+[61] Table TblPrimaryNoNewArray@69: 64,
+[62] Table TblExpression@73: 65,
+[63] Table TblExpression@77: 66,
+[64] Token
+[65] Table TblPrimary@73: 67,
+[66] Table TblPrimary@77: 68,
+[67] Table TblPrimaryNoNewArray@73: 69,
+[68] Table TblPrimaryNoNewArray@77: 70,
+[69] Token
+[70] Table TblArrayAccess@77: 71,
+[71] Table TblArrayAccess_sub1@77: 72,73,
+[72] Table TblExpressionName@77: 74,
+[73] Table TblArrayAccess_sub2@78: 75,
+[74] Token
+[75] Table TblExpression@78: 76,
+[76] Table TblUnaryExpression@78: 77,
+[77] Table TblUnaryExpression_sub1@78: 78,79,
+[78] Token
+[79] Table TblUnaryExpression@79: 80,
+[80] Table TblUnaryExpressionNotPlusMinus@79: 81,
+[81] Table TblPostfixExpression@79: 82,
+[82] Table TblPrimary@79: 83,
+[83] Table TblPrimaryNoNewArray@79: 84,
+[84] Token
+======= Simplify Trees Dump SortOut =======
+[1] Table TblNormalInterfaceDeclaration@59: 2,3,4,5,
+[2] Token
+[3] Token
+[4:5] Table TblExtendsInterfaces@61: 6,7,
+[5] Table TblInterfaceBody@65: 8,9,10,
+[6] Token
+[7] Table TblInterfaceTypeList@62: 11,12,
+[8] Token
+[9:2] Table TblConstantDeclaration@66: 13,14,15,
+[10] Token
+[11:1] Token
+[12:2] Table TblInterfaceTypeList_sub2@63: 16,17,
+[13:2] Token
+[14] Table TblVariableDeclaratorList@67: 18,19,
+[15] Token
+[16] Token
+[17:2] Token
+[18] Table TblVariableDeclarator@67: 20,21,
+[19] Table TblVariableDeclaratorList_sub1@70: 22,23,
+[20:1] Token
+[21:2] Table TblVariableDeclarator_sub2@68: 24,25,
+[22] Table TblVariableDeclaratorList_sub2@70: 26,27,
+[23] Table TblVariableDeclaratorList_sub2@74: 28,29,
+[24] Token
+[25:2] Token
+[26] Token
+[27] Table TblVariableDeclarator@71: 30,31,
+[28] Token
+[29] Table TblVariableDeclarator@75: 32,33,
+[30:1] Token
+[31:2] Table TblVariableDeclarator_sub2@72: 34,35,
+[32:1] Token
+[33:2] Table TblVariableDeclarator_sub2@76: 36,37,
+[34] Token
+[35:2] Token
+[36] Token
+[37:2] Table TblArrayAccess_sub1@77: 38,39,
+[38:1] Token
+[39:2] Table TblUnaryExpression_sub1@78: 40,41,
+[40] Token
+[41:2] Token

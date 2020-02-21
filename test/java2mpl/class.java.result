@@ -24,84 +24,57 @@ Separator  Token:  Semicolon
 Separator  Token:  Rbrace
 ======= Main sortout Dump SortOut =======
 [1] Table TblClassDeclaration@0: 2,
-[2] Table TblNormalClassDeclaration@0: 3,4,5,6,7,8,9,
-[3] Table TblNormalClassDeclaration_sub1@0: KeepPosition
+[2] Table TblNormalClassDeclaration@0: 3,4,5,
+[3] Token
 [4] Token
-[5] Token
-[6] Table TblNormalClassDeclaration_sub2@2: KeepPosition
-[7] Table TblNormalClassDeclaration_sub3@2: KeepPosition
-[8] Table TblNormalClassDeclaration_sub4@2: KeepPosition
-[9] Table TblClassBody@2: 10,11,12,
-[10] Token
-[11] Table TblClassBody_sub1@3: 13,
-[12] Token
-[13] Table TblClassBodyDeclaration@3: 14,
-[14] Table TblClassMemberDeclaration@3: 15,
-[15] Table TblFieldDeclaration@3: 16,17,18,19,
-[16] Table TblFieldDeclaration_sub1@3: KeepPosition
-[17] Table TblUnannType@3: 20,
-[18] Table TblVariableDeclaratorList@4: 21,22,
-[19] Token
-[20] Table TblUnannPrimitiveType@3: 23,
-[21] Table TblVariableDeclarator@4: 24,25,
-[22] Table TblVariableDeclaratorList_sub1@5: KeepPosition
-[23] Table TblNumericType@3: 26,
-[24] Table TblVariableDeclaratorId@4: 27,28,
-[25] Table TblVariableDeclarator_sub1@5: KeepPosition
-[26] Table TblIntType@3: 29,
-[27] Token
-[28] Table TblVariableDeclaratorId_sub1@5: KeepPosition
-[29] Token
+[5] Table TblClassBody@2: 6,7,8,
+[6] Token
+[7] Table TblClassBody_sub1@3: 9,
+[8] Token
+[9] Table TblClassBodyDeclaration@3: 10,
+[10] Table TblClassMemberDeclaration@3: 11,
+[11] Table TblFieldDeclaration@3: 12,13,14,
+[12] Table TblUnannType@3: 15,
+[13] Table TblVariableDeclaratorList@4: 16,
+[14] Token
+[15] Table TblUnannPrimitiveType@3: 17,
+[16] Table TblVariableDeclarator@4: 18,
+[17] Table TblNumericType@3: 19,
+[18] Table TblVariableDeclaratorId@4: 20,
+[19] Table TblIntType@3: 21,
+[20] Token
+[21] Token
 Matched 7 tokens.
 ======= patch-was-succ Dump SortOut =======
 [1] Table TblClassDeclaration@0: 2,
-[2] Table TblNormalClassDeclaration@0: 3,4,5,6,7,8,9,
-[3] Table TblNormalClassDeclaration_sub1@0: KeepPosition
-[4] Token
-[5] Token
-[6] Table TblNormalClassDeclaration_sub2@2: KeepPosition
-[7] Table TblNormalClassDeclaration_sub3@2: KeepPosition
-[8] Table TblNormalClassDeclaration_sub4@2: KeepPosition
-[9] Table TblClassBody@2: 10,11,12,
-[10] Token
-[11] Table TblClassBody_sub1@3: 13,
-[12] Token
-[13] Table TblClassBodyDeclaration@3: 14,
-[14] Table TblClassMemberDeclaration@3: 15,
-[15] Table TblFieldDeclaration@3: 16,17,18,19,
-[16] Table TblFieldDeclaration_sub1@3: KeepPosition
-[17] Table TblUnannType@3: 20,
-[18] Table TblVariableDeclaratorList@4: 21,22,
-[19] Token
-[20] Table TblUnannPrimitiveType@3: 23,
-[21] Table TblVariableDeclarator@4: 24,25,
-[22] Table TblVariableDeclaratorList_sub1@5: KeepPosition
-[23] Table TblNumericType@3: 26,
-[24] Table TblVariableDeclaratorId@4: 27,28,
-[25] Table TblVariableDeclarator_sub1@5: KeepPosition
-[26] Table TblIntType@3: 29,
-[27] Token
-[28] Table TblVariableDeclaratorId_sub1@5: KeepPosition
-[29] Token
-======= Simplify Trees Dump SortOut =======
-[1] Table TblNormalClassDeclaration@0: 2,3,4,5,6,7,8,
-[2] Table TblNormalClassDeclaration_sub1@0: KeepPosition
+[2] Table TblNormalClassDeclaration@0: 3,4,5,
 [3] Token
 [4] Token
-[5] Table TblNormalClassDeclaration_sub2@2: KeepPosition
-[6] Table TblNormalClassDeclaration_sub3@2: KeepPosition
-[7] Table TblNormalClassDeclaration_sub4@2: KeepPosition
-[8] Table TblClassBody@2: 9,10,11,
-[9] Token
-[10:2] Table TblFieldDeclaration@3: 12,13,14,15,
-[11] Token
-[12] Table TblFieldDeclaration_sub1@3: KeepPosition
-[13:2] Token
-[14] Table TblVariableDeclaratorList@4: 16,17,
-[15] Token
-[16] Table TblVariableDeclarator@4: 18,19,
-[17] Table TblVariableDeclaratorList_sub1@5: KeepPosition
-[18] Table TblVariableDeclaratorId@4: 20,21,
-[19] Table TblVariableDeclarator_sub1@5: KeepPosition
+[5] Table TblClassBody@2: 6,7,8,
+[6] Token
+[7] Table TblClassBody_sub1@3: 9,
+[8] Token
+[9] Table TblClassBodyDeclaration@3: 10,
+[10] Table TblClassMemberDeclaration@3: 11,
+[11] Table TblFieldDeclaration@3: 12,13,14,
+[12] Table TblUnannType@3: 15,
+[13] Table TblVariableDeclaratorList@4: 16,
+[14] Token
+[15] Table TblUnannPrimitiveType@3: 17,
+[16] Table TblVariableDeclarator@4: 18,
+[17] Table TblNumericType@3: 19,
+[18] Table TblVariableDeclaratorId@4: 20,
+[19] Table TblIntType@3: 21,
 [20] Token
-[21] Table TblVariableDeclaratorId_sub1@5: KeepPosition
+[21] Token
+======= Simplify Trees Dump SortOut =======
+[1] Table TblNormalClassDeclaration@0: 2,3,4,
+[2] Token
+[3] Token
+[4] Table TblClassBody@2: 5,6,7,
+[5] Token
+[6:2] Table TblFieldDeclaration@3: 8,9,10,
+[7] Token
+[8:2] Token
+[9:3] Token
+[10] Token

@@ -22,34 +22,28 @@ Separator  Token:  Lbrace
 Separator  Token:  Rbrace
 ======= Main sortout Dump SortOut =======
 [1] Table TblInterfaceDeclaration@0: 2,
-[2] Table TblAnnotationTypeDeclaration@0: 3,4,5,6,7,
-[3] Table TblAnnotationTypeDeclaration_sub1@0: KeepPosition
-[4] Token
-[5] Token
-[6] Token
-[7] Table TblAnnotationTypeBody@3: 8,9,10,
-[8] Token
-[9] Table TblAnnotationTypeBody_sub1@4: KeepPosition
-[10] Token
-Matched 5 tokens.
-======= patch-was-succ Dump SortOut =======
-[1] Table TblInterfaceDeclaration@0: 2,
-[2] Table TblAnnotationTypeDeclaration@0: 3,4,5,6,7,
-[3] Table TblAnnotationTypeDeclaration_sub1@0: KeepPosition
-[4] Token
-[5] Token
-[6] Token
-[7] Table TblAnnotationTypeBody@3: 8,9,10,
-[8] Token
-[9] Table TblAnnotationTypeBody_sub1@4: KeepPosition
-[10] Token
-======= Simplify Trees Dump SortOut =======
-[1] Table TblAnnotationTypeDeclaration@0: 2,3,4,5,6,
-[2] Table TblAnnotationTypeDeclaration_sub1@0: KeepPosition
+[2] Table TblAnnotationTypeDeclaration@0: 3,4,5,6,
 [3] Token
 [4] Token
 [5] Token
-[6] Table TblAnnotationTypeBody@3: 7,8,9,
+[6] Table TblAnnotationTypeBody@3: 7,8,
 [7] Token
-[8] Table TblAnnotationTypeBody_sub1@4: KeepPosition
-[9] Token
+[8] Token
+Matched 5 tokens.
+======= patch-was-succ Dump SortOut =======
+[1] Table TblInterfaceDeclaration@0: 2,
+[2] Table TblAnnotationTypeDeclaration@0: 3,4,5,6,
+[3] Token
+[4] Token
+[5] Token
+[6] Table TblAnnotationTypeBody@3: 7,8,
+[7] Token
+[8] Token
+======= Simplify Trees Dump SortOut =======
+[1] Table TblAnnotationTypeDeclaration@0: 2,3,4,5,
+[2] Token
+[3] Token
+[4] Token
+[5] Table TblAnnotationTypeBody@3: 6,7,
+[6] Token
+[7] Token

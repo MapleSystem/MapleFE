@@ -36,79 +36,63 @@ Separator  Token:  Whitespace
 Separator  Token:  Lbrace
 ======= Main sortout Dump SortOut =======
 [1] Table TblInterfaceDeclaration@0: 2,
-[2] Table TblAnnotationTypeDeclaration@0: 3,4,5,6,7,
-[3] Table TblAnnotationTypeDeclaration_sub1@0: KeepPosition
-[4] Token
-[5] Token
-[6] Token
-[7] Table TblAnnotationTypeBody@3: 8,9,10,
-[8] Token
-[9] Table TblAnnotationTypeBody_sub1@4: 11,
-[10] Token
-[11] Table TblAnnotationTypeMemberDeclaration@4: 12,
-[12] Table TblAnnotationTypeElementDeclaration@4: 13,14,15,16,17,18,19,20,
-[13] Table TblAnnotationTypeElementDeclaration_sub1@4: KeepPosition
-[14] Table TblUnannType@4: 21,
-[15] Token
-[16] Token
-[17] Token
-[18] Table TblAnnotationTypeElementDeclaration_sub2@8: KeepPosition
-[19] Table TblAnnotationTypeElementDeclaration_sub3@8: KeepPosition
-[20] Token
-[21] Table TblUnannReferenceType@4: 22,
-[22] Table TblUnannClassOrInterfaceType@4: 23,
-[23] Table TblUnannClassType@4: 24,
-[24] Table TblUnannClassType_sub1@4: 25,26,
-[25] Token
-[26] Table TblUnannClassType_sub2@5: KeepPosition
-Matched 10 tokens.
-======= patch-was-succ Dump SortOut =======
-[1] Table TblInterfaceDeclaration@0: 2,
-[2] Table TblAnnotationTypeDeclaration@0: 3,4,5,6,7,
-[3] Table TblAnnotationTypeDeclaration_sub1@0: KeepPosition
-[4] Token
-[5] Token
-[6] Token
-[7] Table TblAnnotationTypeBody@3: 8,9,10,
-[8] Token
-[9] Table TblAnnotationTypeBody_sub1@4: 11,
-[10] Token
-[11] Table TblAnnotationTypeMemberDeclaration@4: 12,
-[12] Table TblAnnotationTypeElementDeclaration@4: 13,14,15,16,17,18,19,20,
-[13] Table TblAnnotationTypeElementDeclaration_sub1@4: KeepPosition
-[14] Table TblUnannType@4: 21,
-[15] Token
-[16] Token
-[17] Token
-[18] Table TblAnnotationTypeElementDeclaration_sub2@8: KeepPosition
-[19] Table TblAnnotationTypeElementDeclaration_sub3@8: KeepPosition
-[20] Token
-[21] Table TblUnannReferenceType@4: 22,
-[22] Table TblUnannClassOrInterfaceType@4: 23,
-[23] Table TblUnannClassType@4: 24,
-[24] Table TblUnannClassType_sub1@4: 25,26,
-[25] Token
-[26] Table TblUnannClassType_sub2@5: KeepPosition
-======= Simplify Trees Dump SortOut =======
-[1] Table TblAnnotationTypeDeclaration@0: 2,3,4,5,6,
-[2] Table TblAnnotationTypeDeclaration_sub1@0: KeepPosition
+[2] Table TblAnnotationTypeDeclaration@0: 3,4,5,6,
 [3] Token
 [4] Token
 [5] Token
 [6] Table TblAnnotationTypeBody@3: 7,8,9,
 [7] Token
-[8:2] Table TblAnnotationTypeElementDeclaration@4: 10,11,12,13,14,15,16,17,
+[8] Table TblAnnotationTypeBody_sub1@4: 10,
 [9] Token
-[10] Table TblAnnotationTypeElementDeclaration_sub1@4: KeepPosition
-[11:2] Table TblUnannClassType_sub1@4: 18,19,
-[12] Token
+[10] Table TblAnnotationTypeMemberDeclaration@4: 11,
+[11] Table TblAnnotationTypeElementDeclaration@4: 12,13,14,15,16,
+[12] Table TblUnannType@4: 17,
 [13] Token
 [14] Token
-[15] Table TblAnnotationTypeElementDeclaration_sub2@8: KeepPosition
-[16] Table TblAnnotationTypeElementDeclaration_sub3@8: KeepPosition
-[17] Token
-[18] Token
-[19] Table TblUnannClassType_sub2@5: KeepPosition
+[15] Token
+[16] Token
+[17] Table TblUnannReferenceType@4: 18,
+[18] Table TblUnannClassOrInterfaceType@4: 19,
+[19] Table TblUnannClassType@4: 20,
+[20] Table TblUnannClassType_sub1@4: 21,
+[21] Token
+Matched 10 tokens.
+======= patch-was-succ Dump SortOut =======
+[1] Table TblInterfaceDeclaration@0: 2,
+[2] Table TblAnnotationTypeDeclaration@0: 3,4,5,6,
+[3] Token
+[4] Token
+[5] Token
+[6] Table TblAnnotationTypeBody@3: 7,8,9,
+[7] Token
+[8] Table TblAnnotationTypeBody_sub1@4: 10,
+[9] Token
+[10] Table TblAnnotationTypeMemberDeclaration@4: 11,
+[11] Table TblAnnotationTypeElementDeclaration@4: 12,13,14,15,16,
+[12] Table TblUnannType@4: 17,
+[13] Token
+[14] Token
+[15] Token
+[16] Token
+[17] Table TblUnannReferenceType@4: 18,
+[18] Table TblUnannClassOrInterfaceType@4: 19,
+[19] Table TblUnannClassType@4: 20,
+[20] Table TblUnannClassType_sub1@4: 21,
+[21] Token
+======= Simplify Trees Dump SortOut =======
+[1] Table TblAnnotationTypeDeclaration@0: 2,3,4,5,
+[2] Token
+[3] Token
+[4] Token
+[5] Table TblAnnotationTypeBody@3: 6,7,8,
+[6] Token
+[7:2] Table TblAnnotationTypeElementDeclaration@4: 9,10,11,12,13,
+[8] Token
+[9:2] Token
+[10] Token
+[11] Token
+[12] Token
+[13] Token
 Separator  Token:  Whitespace
 Separator  Token:  Whitespace
 Identifier Token:  String
@@ -122,98 +106,76 @@ Separator  Token:  Semicolon
 Separator  Token:  Rbrace
 ======= Main sortout Dump SortOut =======
 [1] Table TblInterfaceDeclaration@10: 2,
-[2] Table TblAnnotationTypeDeclaration@10: 3,4,5,6,7,
-[3] Table TblAnnotationTypeDeclaration_sub1@10: KeepPosition
-[4] Token
-[5] Token
-[6] Token
-[7] Table TblAnnotationTypeBody@13: 8,9,10,
-[8] Token
-[9] Table TblAnnotationTypeBody_sub1@14: 11,
-[10] Token
-[11] Table TblAnnotationTypeMemberDeclaration@14: 12,
-[12] Table TblAnnotationTypeElementDeclaration@14: 13,14,15,16,17,18,19,20,
-[13] Table TblAnnotationTypeElementDeclaration_sub1@14: KeepPosition
-[14] Table TblUnannType@14: 21,
-[15] Token
-[16] Token
-[17] Token
-[18] Table TblAnnotationTypeElementDeclaration_sub2@20: KeepPosition
-[19] Table TblAnnotationTypeElementDeclaration_sub3@20: KeepPosition
-[20] Token
-[21] Table TblUnannReferenceType@14: 22,
-[22] Table TblUnannArrayType@14: 23,
-[23] Table TblUnannArrayType_sub2@14: 24,25,
-[24] Table TblUnannClassOrInterfaceType@14: WasSucc
-[25] Table TblDims@15: 26,27,28,29,
-[26] Table TblDims_sub1@15: KeepPosition
-[27] Token
-[28] Token
-[29] Table TblDims_sub2@17: KeepPosition
-Matched 22 tokens.
-======= supplemental sortout Dump SortOut =======
-[1] Table TblUnannClassOrInterfaceType@14: 2,
-[2] Table TblUnannClassType@14: 3,
-[3] Table TblUnannClassType_sub1@14: 4,5,
-[4] Token
-[5] Table TblUnannClassType_sub2@15: KeepPosition
-======= patch-was-succ Dump SortOut =======
-[1] Table TblInterfaceDeclaration@10: 2,
-[2] Table TblAnnotationTypeDeclaration@10: 3,4,5,6,7,
-[3] Table TblAnnotationTypeDeclaration_sub1@10: KeepPosition
-[4] Token
-[5] Token
-[6] Token
-[7] Table TblAnnotationTypeBody@13: 8,9,10,
-[8] Token
-[9] Table TblAnnotationTypeBody_sub1@14: 11,
-[10] Token
-[11] Table TblAnnotationTypeMemberDeclaration@14: 12,
-[12] Table TblAnnotationTypeElementDeclaration@14: 13,14,15,16,17,18,19,20,
-[13] Table TblAnnotationTypeElementDeclaration_sub1@14: KeepPosition
-[14] Table TblUnannType@14: 21,
-[15] Token
-[16] Token
-[17] Token
-[18] Table TblAnnotationTypeElementDeclaration_sub2@20: KeepPosition
-[19] Table TblAnnotationTypeElementDeclaration_sub3@20: KeepPosition
-[20] Token
-[21] Table TblUnannReferenceType@14: 22,
-[22] Table TblUnannArrayType@14: 23,
-[23] Table TblUnannArrayType_sub2@14: 24,25,
-[24] Table TblUnannClassOrInterfaceType@14: 26,
-[25] Table TblDims@15: 27,28,29,30,
-[26] Table TblUnannClassType@14: 31,
-[27] Table TblDims_sub1@15: KeepPosition
-[28] Token
-[29] Token
-[30] Table TblDims_sub2@17: KeepPosition
-[31] Table TblUnannClassType_sub1@14: 32,33,
-[32] Token
-[33] Table TblUnannClassType_sub2@15: KeepPosition
-======= Simplify Trees Dump SortOut =======
-[1] Table TblAnnotationTypeDeclaration@10: 2,3,4,5,6,
-[2] Table TblAnnotationTypeDeclaration_sub1@10: KeepPosition
+[2] Table TblAnnotationTypeDeclaration@10: 3,4,5,6,
 [3] Token
 [4] Token
 [5] Token
 [6] Table TblAnnotationTypeBody@13: 7,8,9,
 [7] Token
-[8:2] Table TblAnnotationTypeElementDeclaration@14: 10,11,12,13,14,15,16,17,
+[8] Table TblAnnotationTypeBody_sub1@14: 10,
 [9] Token
-[10] Table TblAnnotationTypeElementDeclaration_sub1@14: KeepPosition
-[11:2] Table TblUnannArrayType_sub2@14: 18,19,
-[12] Token
+[10] Table TblAnnotationTypeMemberDeclaration@14: 11,
+[11] Table TblAnnotationTypeElementDeclaration@14: 12,13,14,15,16,
+[12] Table TblUnannType@14: 17,
 [13] Token
 [14] Token
-[15] Table TblAnnotationTypeElementDeclaration_sub2@20: KeepPosition
-[16] Table TblAnnotationTypeElementDeclaration_sub3@20: KeepPosition
-[17] Token
-[18:1] Table TblUnannClassType_sub1@14: 20,21,
-[19] Table TblDims@15: 22,23,24,25,
-[20] Token
-[21] Table TblUnannClassType_sub2@15: KeepPosition
-[22] Table TblDims_sub1@15: KeepPosition
+[15] Token
+[16] Token
+[17] Table TblUnannReferenceType@14: 18,
+[18] Table TblUnannArrayType@14: 19,
+[19] Table TblUnannArrayType_sub2@14: 20,21,
+[20] Table TblUnannClassOrInterfaceType@14: WasSucc
+[21] Table TblDims@15: 22,23,
+[22] Token
+[23] Token
+Matched 22 tokens.
+======= supplemental sortout Dump SortOut =======
+[1] Table TblUnannClassOrInterfaceType@14: 2,
+[2] Table TblUnannClassType@14: 3,
+[3] Table TblUnannClassType_sub1@14: 4,
+[4] Token
+======= patch-was-succ Dump SortOut =======
+[1] Table TblInterfaceDeclaration@10: 2,
+[2] Table TblAnnotationTypeDeclaration@10: 3,4,5,6,
+[3] Token
+[4] Token
+[5] Token
+[6] Table TblAnnotationTypeBody@13: 7,8,9,
+[7] Token
+[8] Table TblAnnotationTypeBody_sub1@14: 10,
+[9] Token
+[10] Table TblAnnotationTypeMemberDeclaration@14: 11,
+[11] Table TblAnnotationTypeElementDeclaration@14: 12,13,14,15,16,
+[12] Table TblUnannType@14: 17,
+[13] Token
+[14] Token
+[15] Token
+[16] Token
+[17] Table TblUnannReferenceType@14: 18,
+[18] Table TblUnannArrayType@14: 19,
+[19] Table TblUnannArrayType_sub2@14: 20,21,
+[20] Table TblUnannClassOrInterfaceType@14: 22,
+[21] Table TblDims@15: 23,24,
+[22] Table TblUnannClassType@14: 25,
 [23] Token
 [24] Token
-[25] Table TblDims_sub2@17: KeepPosition
+[25] Table TblUnannClassType_sub1@14: 26,
+[26] Token
+======= Simplify Trees Dump SortOut =======
+[1] Table TblAnnotationTypeDeclaration@10: 2,3,4,5,
+[2] Token
+[3] Token
+[4] Token
+[5] Table TblAnnotationTypeBody@13: 6,7,8,
+[6] Token
+[7:2] Table TblAnnotationTypeElementDeclaration@14: 9,10,11,12,13,
+[8] Token
+[9:2] Table TblUnannArrayType_sub2@14: 14,15,
+[10] Token
+[11] Token
+[12] Token
+[13] Token
+[14:1] Token
+[15] Table TblDims@15: 16,17,
+[16] Token
+[17] Token

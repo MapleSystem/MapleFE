@@ -1527,6 +1527,7 @@ void Parser::SortOutConcatenate(AppealNode *parent) {
     if (child->IsToken()) {
       // Token node matches just one token.
       last_match++;
+      parent->mSortedChildren.push_back(child);
     } else {
       SuccMatch *succ = FindSucc(child->GetTable());
       MASSERT(succ && "ruletable node has no SuccMatch?");
@@ -1538,15 +1539,13 @@ void Parser::SortOutConcatenate(AppealNode *parent) {
       unsigned match_num = succ->GetMatchNum();
 
       // if (match_num == 0) 
-      // It could be ZeroorXXX node matching nothing. Just keep it in mSortedChildren
-      // since during AST generation we need index of a child. So keeping it for
-      // the position.
+      // It could be ZeroorXXX node matching nothing. We just skip this child.
 
-      // we only handle cases where match_num >= 1
       if (match_num == 1) {
         last_match = succ->GetOneMatch(0);
         // Add child to the working list
         to_be_sorted.push_back(child);
+        parent->mSortedChildren.push_back(child);
       } else if (match_num > 1) {
         // We only preserve the longest matching. Else nodes will be reduced.
         unsigned longest = start_node;
@@ -1563,11 +1562,10 @@ void Parser::SortOutConcatenate(AppealNode *parent) {
 
         // Add child to the working list
         to_be_sorted.push_back(child);
+        parent->mSortedChildren.push_back(child);
       }
     }
 
-    parent->mSortedChildren.push_back(child);
-    
     prev_child = child;
   }
 
@@ -1689,15 +1687,6 @@ void Parser::DumpSortOutNode(AppealNode *n) {
 
     if (n->mAfter == SuccWasSucc)
       std::cout << "WasSucc";
-
-    EntryType type = t->mType;
-    if (type == ET_Zeroorone || type == ET_Zeroormore) {
-      SuccMatch *succ = FindSucc(t);
-      bool found = succ->GetStartToken(n->mStartIndex);  // in order to set mTempIndex
-      unsigned match_num = succ->GetMatchNum();
-      if (match_num == 0)
-        std::cout << "KeepPosition";
-    }
 
     std::vector<AppealNode*>::iterator it = n->mSortedChildren.begin();
     for (; it != n->mSortedChildren.end(); it++) {
@@ -1976,6 +1965,7 @@ AppealNode* Parser::SimplifyShrinkEdges(AppealNode *node) {
 ////////////////////////////////////////////////////////////////////////////////////
 
 ASTTree* Parser::BuildAST() {
+  return NULL;
   done_nodes.clear();
 
   ASTTree *tree = new ASTTree();
