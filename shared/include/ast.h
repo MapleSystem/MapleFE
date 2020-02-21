@@ -79,7 +79,7 @@ public:
   bool IsOperator()   {return mKind == NK_Operator;}
   bool IsConstruct()  {return mKind == NK_Construct;}
   bool IsFunction()   {return mKind == NK_Function;}
-  void Dump();
+  virtual void Dump(){}
 };
 
 //////////////////////////////////////////////////////////////////////////

@@ -121,6 +121,7 @@ rule UnaryExpression : ONEOF(
   '+' + UnaryExpression,
   '-' + UnaryExpression,
   UnaryExpressionNotPlusMinus)
+  attr.action.%3,%4 : BuildUnaryOperation(%1, %2)
 
 rule PreIncrementExpression : "++" + UnaryExpression
 

@@ -49,10 +49,12 @@ public:
   ~ASTBuilder() {}
 
   void AddParam(Param p) {mParams.push_back(p);}
+  void ClearParams() {mParams.clear();}
 
   TreeNode* CreateTokenTreeNode(const Token*);
 
   TreeNode* Build();
+  TreeNode* BuildUnaryOperation();
   TreeNode* BuildBinaryOperation();
   TreeNode* BuildAssignment();
   TreeNode* BuildReturn();

@@ -1976,7 +1976,6 @@ AppealNode* Parser::SimplifyShrinkEdges(AppealNode *node) {
 ////////////////////////////////////////////////////////////////////////////////////
 
 ASTTree* Parser::BuildAST() {
-  return NULL;
   done_nodes.clear();
 
   ASTTree *tree = new ASTTree();
@@ -2006,8 +2005,14 @@ ASTTree* Parser::BuildAST() {
       // Create tree node when there is a rule table.
       // Look into the RuleAction, create the tree node.
       if(appeal_node->IsTable()) {
-        TreeNode *tree_node = tree->NewTreeNode(appeal_node, nodes_map);
-        nodes_map.insert(std::pair<AppealNode*, TreeNode*>(appeal_node, tree_node));
+        TreeNode *sub_tree = tree->NewTreeNode(appeal_node, nodes_map);
+        nodes_map.insert(std::pair<AppealNode*, TreeNode*>(appeal_node, sub_tree));
+
+        // Each time the mRootNode is overwritten until the last one, or
+        // the top meaningful node in the tree. It could be Not the top node since
+        // some nodes have no action. But it's the topmost node with sub-tree.
+        if (sub_tree)
+          tree->mRootNode = sub_tree;
       }
 
       // pop out the 'appeal_node'
@@ -2015,6 +2020,9 @@ ASTTree* Parser::BuildAST() {
       done_nodes.push_back(appeal_node);
     }
   }
+
+  if (tree)
+    tree->Dump();
 
   return tree;
 }

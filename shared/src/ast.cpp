@@ -45,6 +45,7 @@ TreeNode* ASTTree::NewTreeNode(const AppealNode *appeal_node, std::map<AppealNod
   for (unsigned i = 0; i < rule_table->mNumAction; i++) {
     Action *action = rule_table->mActions + i;
     mBuilder->mActionId = action->mId;
+    mBuilder->ClearParams();
 
     for (unsigned j = 0; j < action->mNumElem; j++) {
       // find the appeal node child
@@ -69,4 +70,43 @@ TreeNode* ASTTree::NewTreeNode(const AppealNode *appeal_node, std::map<AppealNod
     TreeNode *sub_tree = mBuilder->Build();
     return sub_tree;
   }
+}
+
+void ASTTree::Dump() {
+  DUMP0("Sub Tree:\n");
+  mRootNode->Dump();
+}
+
+//////////////////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////////////////
+
+#undef  OPERATOR
+#define OPERATOR(T) case OPR_##T: return #T;
+static const char* GetOperatorName(OprId opr) {
+  switch (opr) {
+#include "supported_operators.def"
+  default:
+    return "NA";
+  }
+};
+
+void BinaryOperatorNode::Dump() {
+  const char *name = GetOperatorName(mOprId);
+  mOpndA->Dump();
+  DUMP0(name);
+  mOpndB->Dump();
+}
+
+void UnaryOperatorNode::Dump() {
+  const char *name = GetOperatorName(mOprId);
+  DUMP0(name);
+  mOpnd->Dump();
+}
+
+void IdentifierNode::Dump() {
+  DUMP0(mName);
+}
+
+void LiteralNode::Dump() {
 }

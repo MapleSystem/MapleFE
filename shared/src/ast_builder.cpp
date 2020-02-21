@@ -59,8 +59,35 @@ TreeNode* ASTBuilder::CreateTokenTreeNode(const Token *token) {
   }
 }
 
+// For first parameter has to be an operator.
+TreeNode* ASTBuilder::BuildUnaryOperation() {
+  std::cout << "In build unary" << std::endl;
+
+  MASSERT(mParams.size() == 2 && "Binary Operator has NO 2 params?");
+  Param p_a = mParams[0];
+  Param p_b = mParams[1];
+  MASSERT(!p_a.mIsTreeNode && "First param of Unary Operator is not a token?");
+
+  Token *token = p_a.mData.mToken;
+  MASSERT(token->IsOperator() && "First param of Unary Operator is not an operator token?");
+
+  // create the sub tree
+  UnaryOperatorNode *n = (UnaryOperatorNode*)mTreePool->NewTreeNode(sizeof(UnaryOperatorNode));
+  new (n) UnaryOperatorNode(((OperatorToken*)token)->mOprId);
+
+  // set 1st param
+  if (p_b.mIsTreeNode)
+    n->mOpnd = p_b.mData.mTreeNode;
+  else {
+    TreeNode *tn = CreateTokenTreeNode(p_b.mData.mToken);
+    n->mOpnd = tn;
+  }
+}
+
 // For second parameter has to be an operator.
 TreeNode* ASTBuilder::BuildBinaryOperation() {
+  std::cout << "In build binary" << std::endl;
+
   MASSERT(mParams.size() == 3 && "Binary Operator has NO 3 params?");
   Param p_a = mParams[0];
   Param p_b = mParams[1];
@@ -93,6 +120,7 @@ TreeNode* ASTBuilder::BuildBinaryOperation() {
 
 // Assignment is actually a binary operator.
 TreeNode* ASTBuilder::BuildAssignment() {
+  std::cout << "In assignment" << std::endl;
   return BuildBinaryOperation();
 }
 
