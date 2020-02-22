@@ -39,7 +39,7 @@ Matched 5 tokens.
 [6] Table TblAnnotationTypeBody@3: 7,8,
 [7] Token
 [8] Token
-======= Simplify Trees Dump SortOut =======
+======= Simplify AppealNode Trees Dump SortOut =======
 [1] Table TblAnnotationTypeDeclaration@0: 2,3,4,5,
 [2] Token
 [3] Token

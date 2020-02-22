@@ -38,7 +38,7 @@ Matched 4 tokens.
 [5] Table TblClassBody@2: 6,7,
 [6] Token
 [7] Token
-======= Simplify Trees Dump SortOut =======
+======= Simplify AppealNode Trees Dump SortOut =======
 [1] Table TblNormalClassDeclaration@0: 2,3,4,
 [2] Token
 [3] Token

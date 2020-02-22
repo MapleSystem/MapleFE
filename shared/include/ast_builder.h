@@ -26,7 +26,10 @@
 //
 // The treenode mempool is part of ASTTree since the memory goes with the
 // tree not the builder. The Builder is purely a collect of functions to build
-// sub trees.
+// sub trees from AppealNode.
+//
+// This is different than those BuildXXX() functions in AST, which creates
+// trees from existing children trees.
 ////////////////////////////////////////////////////////////////////////////
 
 class Token;

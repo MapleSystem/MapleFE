@@ -68,7 +68,7 @@ Matched 5 tokens.
 [18] Table TblVariableDeclaratorId@3: 20,
 [19] Token
 [20] Token
-======= Simplify Trees Dump SortOut =======
+======= Simplify AppealNode Trees Dump SortOut =======
 [1] Table TblLocalVariableDeclarationStatement@0: 2,3,
 [2] Table TblLocalVariableDeclaration@0: 4,5,
 [3] Token
@@ -111,7 +111,7 @@ Matched 9 tokens.
 [13] Token
 [14] Table TblPrimaryNoNewArray@7: 15,
 [15] Token
-======= Simplify Trees Dump SortOut =======
+======= Simplify AppealNode Trees Dump SortOut =======
 [1] Table TblExpressionStatement@5: 2,3,
 [2:1] Table TblAssignment@5: 4,5,6,
 [3] Token

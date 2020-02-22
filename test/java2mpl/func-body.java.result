@@ -225,7 +225,7 @@ Matched 20 tokens.
 [79] Table TblArrayAccess_sub1@16: 80,
 [80] Table TblExpressionName@16: 81,
 [81] Token
-======= Simplify Trees Dump SortOut =======
+======= Simplify AppealNode Trees Dump SortOut =======
 [1] Table TblNormalClassDeclaration@0: 2,3,4,
 [2] Token
 [3] Token

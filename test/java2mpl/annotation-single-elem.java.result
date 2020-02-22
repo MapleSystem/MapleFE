@@ -79,7 +79,7 @@ Matched 10 tokens.
 [19] Table TblUnannClassType@4: 20,
 [20] Table TblUnannClassType_sub1@4: 21,
 [21] Token
-======= Simplify Trees Dump SortOut =======
+======= Simplify AppealNode Trees Dump SortOut =======
 [1] Table TblAnnotationTypeDeclaration@0: 2,3,4,5,
 [2] Token
 [3] Token
@@ -161,7 +161,7 @@ Matched 22 tokens.
 [24] Token
 [25] Table TblUnannClassType_sub1@14: 26,
 [26] Token
-======= Simplify Trees Dump SortOut =======
+======= Simplify AppealNode Trees Dump SortOut =======
 [1] Table TblAnnotationTypeDeclaration@10: 2,3,4,5,
 [2] Token
 [3] Token

@@ -164,7 +164,7 @@ Matched 17 tokens.
 [53] Table TblPrimaryNoNewArray@14: 55,
 [54] Token
 [55] Token
-======= Simplify Trees Dump SortOut =======
+======= Simplify AppealNode Trees Dump SortOut =======
 [1] Table TblNormalInterfaceDeclaration@0: 2,3,4,
 [2] Token
 [3] Token
@@ -391,7 +391,7 @@ Matched 40 tokens.
 [74] Token
 [75] Token
 [76] Token
-======= Simplify Trees Dump SortOut =======
+======= Simplify AppealNode Trees Dump SortOut =======
 [1] Table TblNormalInterfaceDeclaration@17: 2,3,4,5,
 [2] Token
 [3] Token
@@ -598,7 +598,7 @@ Matched 59 tokens.
 [61] Table TblPrimaryNoNewArray@56: 63,
 [62] Token
 [63] Token
-======= Simplify Trees Dump SortOut =======
+======= Simplify AppealNode Trees Dump SortOut =======
 [1] Table TblNormalInterfaceDeclaration@40: 2,3,4,5,
 [2] Token
 [3] Token
@@ -834,7 +834,7 @@ Matched 82 tokens.
 [82] Table TblPrimary@79: 83,
 [83] Table TblPrimaryNoNewArray@79: 84,
 [84] Token
-======= Simplify Trees Dump SortOut =======
+======= Simplify AppealNode Trees Dump SortOut =======
 [1] Table TblNormalInterfaceDeclaration@59: 2,3,4,5,
 [2] Token
 [3] Token

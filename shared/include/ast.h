@@ -54,7 +54,9 @@
 enum NodeKind {
   NK_Identifier,
   NK_Literal,
-  NK_Operator,
+  NK_UnaOperator,
+  NK_BinOperator,
+  NK_TerOperator,
   NK_Construct,
   NK_Function,
   NK_Null,
@@ -69,16 +71,21 @@ enum NodeKind {
 
 class TreeNode {
 public:
-  NodeKind mKind;
+  NodeKind  mKind;
+  TreeNode *mParent;
 public:
   TreeNode() {mKind = NK_Null;}
   virtual ~TreeNode() {}
 
   bool IsIdentifier() {return mKind == NK_Identifier;}
   bool IsLiteral()    {return mKind == NK_Literal;}
-  bool IsOperator()   {return mKind == NK_Operator;}
+  bool IsUnaOperator()   {return mKind == NK_UnaOperator;}
+  bool IsBinOperator()   {return mKind == NK_BinOperator;}
+  bool IsTerOperator()   {return mKind == NK_TerOperator;}
   bool IsConstruct()  {return mKind == NK_Construct;}
   bool IsFunction()   {return mKind == NK_Function;}
+
+  void SetParent(TreeNode *p) {mParent = p;}
   virtual void Dump(){}
 };
 
@@ -87,12 +94,12 @@ public:
 //////////////////////////////////////////////////////////////////////////
 
 enum OperatorProperty {
-  Unary,
-  Binary,
-  Ternary,
-  Pre,
-  Post,
-  OperatorProperty_NA
+  Unary = 1,
+  Binary= 2,
+  Ternary = 4,
+  Pre = 8,
+  Post = 16,
+  OperatorProperty_NA = 32
 };
 
 struct OperatorDesc {
@@ -100,14 +107,15 @@ struct OperatorDesc {
   OperatorProperty  mDesc;
 };
 extern OperatorDesc gOperatorDesc[OPR_NA];
+extern unsigned GetOperatorProperty(OprId);
 
 class UnaryOperatorNode : public TreeNode {
 public:
   OprId     mOprId;
   TreeNode *mOpnd;
 public:
-  UnaryOperatorNode(OprId id) : mOprId(id) {mKind = NK_Operator;}
-  UnaryOperatorNode() {mKind = NK_Operator;}
+  UnaryOperatorNode(OprId id) : mOprId(id) {mKind = NK_UnaOperator;}
+  UnaryOperatorNode() {mKind = NK_UnaOperator;}
   ~UnaryOperatorNode() {}
 
   void Dump();
@@ -119,8 +127,8 @@ public:
   TreeNode *mOpndA;
   TreeNode *mOpndB;
 public:
-  BinaryOperatorNode(OprId id) : mOprId(id) {mKind = NK_Operator;}
-  BinaryOperatorNode() {mKind = NK_Operator;}
+  BinaryOperatorNode(OprId id) : mOprId(id) {mKind = NK_BinOperator;}
+  BinaryOperatorNode() {mKind = NK_BinOperator;}
   ~BinaryOperatorNode() {}
 
   void Dump();
@@ -133,8 +141,8 @@ public:
   TreeNode *mOpndB;
   TreeNode *mOpndC;
 public:
-  TernaryOperatorNode(OprId id) : mOprId(id) {mKind = NK_Operator;}
-  TernaryOperatorNode() {mKind = NK_Operator;}
+  TernaryOperatorNode(OprId id) : mOprId(id) {mKind = NK_TerOperator;}
+  TernaryOperatorNode() {mKind = NK_TerOperator;}
   ~TernaryOperatorNode() {}
 
   void Dump();
@@ -190,7 +198,10 @@ public:
   ASTTree();
   ~ASTTree();
 
-  TreeNode* NewTreeNode(const AppealNode *, std::map<AppealNode*, TreeNode*> &);
+  TreeNode* NewTreeNode(const AppealNode*, std::map<AppealNode*, TreeNode*> &);
+  TreeNode* SimplifySubTree(AppealNode*, std::map<AppealNode*, TreeNode*> &);
+
+  TreeNode* BuildBinaryOperation(TreeNode *, TreeNode *, OprId);
 
   void Dump();
 };

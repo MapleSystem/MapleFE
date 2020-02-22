@@ -144,7 +144,7 @@ Matched 14 tokens.
 [49] Table TblNumericType@9: 50,
 [50] Table TblIntType@9: 51,
 [51] Token
-======= Simplify Trees Dump SortOut =======
+======= Simplify AppealNode Trees Dump SortOut =======
 [1] Table TblNormalClassDeclaration@0: 2,3,4,
 [2] Token
 [3] Token

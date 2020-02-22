@@ -82,6 +82,8 @@ TreeNode* ASTBuilder::BuildUnaryOperation() {
     TreeNode *tn = CreateTokenTreeNode(p_b.mData.mToken);
     n->mOpnd = tn;
   }
+
+  n->mOpnd->SetParent(n);
 }
 
 // For second parameter has to be an operator.
@@ -109,6 +111,8 @@ TreeNode* ASTBuilder::BuildBinaryOperation() {
     n->mOpndA = tn;
   }
 
+  n->mOpndA->SetParent(n);
+
   // set 2nd param
   if (p_c.mIsTreeNode)
     n->mOpndB = p_c.mData.mTreeNode;
@@ -116,11 +120,13 @@ TreeNode* ASTBuilder::BuildBinaryOperation() {
     TreeNode *tn = CreateTokenTreeNode(p_c.mData.mToken);
     n->mOpndB = tn;
   }
+
+  n->mOpndB->SetParent(n);
 }
 
 // Assignment is actually a binary operator.
 TreeNode* ASTBuilder::BuildAssignment() {
-  std::cout << "In assignment" << std::endl;
+  std::cout << "In assignment --> BuildBinary" << std::endl;
   return BuildBinaryOperation();
 }
 

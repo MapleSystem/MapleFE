@@ -45,7 +45,7 @@ Matched 3 tokens.
 [11] Table TblBoolType@0: 13,
 [12] Token
 [13] Token
-======= Simplify Trees Dump SortOut =======
+======= Simplify AppealNode Trees Dump SortOut =======
 [1] Table TblLocalVariableDeclarationStatement@0: 2,3,
 [2] Table TblLocalVariableDeclaration@0: 4,5,
 [3] Token

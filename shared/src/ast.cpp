@@ -72,13 +72,79 @@ TreeNode* ASTTree::NewTreeNode(const AppealNode *appeal_node, std::map<AppealNod
   }
 }
 
+// SimplifySubTree only works if there is no tree nodes for 'parent'.
+//
+// It does two jobs.
+// 1) Move sub-trees upwards to parent if parent has no tree node, under a few conditions.
+// 2) Convert couple of smaller sub-trees to a bigger sub-tree
+
+TreeNode* ASTTree::SimplifySubTree(AppealNode *parent, std::map<AppealNode*, TreeNode*> &map) {
+  std::vector<TreeNode*> child_trees;
+  std::map<AppealNode*, TreeNode*>::iterator it = map.find(parent);
+  if (it != map.end()) {
+    return it->second;
+  } else {
+    // Simplification 1. If there is only child having tree node, attach it to parent.
+    std::vector<AppealNode*>::iterator cit = parent->mSortedChildren.begin();
+    for (; cit != parent->mSortedChildren.end(); cit++) {
+      std::map<AppealNode*, TreeNode*>::iterator child_tree_it = map.find(parent);
+      if (child_tree_it != map.end()) {
+        child_trees.push_back(child_tree_it->second);
+      }
+    }
+
+    if (child_trees.size() == 1) {
+      std::cout << "Attached a tree node" << std::endl;
+      map.insert(std::pair<AppealNode*, TreeNode*>(parent, child_trees[0]));
+      return child_trees[0];
+    } else {
+      MERROR("We got a broken AST tree, not connected sub tree.");
+    }
+
+    // Simplification 2. If the two children can be converted to one through operation conversion.
+    //          [NOTE]   Right now we are just starting from the simplest case, since I have no idea
+    //                   what else situation I'll hit. Just do it step by step. Later maybe will
+    //                   come up a nice algorithm.
+    if (child_trees.size() == 2) {
+      TreeNode *child_a = child_trees[0];
+      TreeNode *child_b = child_trees[1];
+      if (child_b->IsUnaOperator()) {
+        UnaryOperatorNode *unary = (UnaryOperatorNode*)child_b;
+        unsigned property = GetOperatorProperty(unary->mOprId);
+        if ((property & Binary) && (property & Pre)) {
+          std::cout << "Convert unary --> binary" << std::endl;
+          TreeNode *new_tree = BuildBinaryOperation(child_a, unary, unary->mOprId);
+          map.insert(std::pair<AppealNode*, TreeNode*>(parent, new_tree));
+          return new_tree;
+        }
+      }
+    }
+  }
+
+  return NULL;
+}
+
 void ASTTree::Dump() {
   DUMP0("== Sub Tree ==");
   mRootNode->Dump();
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
-//
+//                          Tree building functions
+//////////////////////////////////////////////////////////////////////////////////////
+
+TreeNode* ASTTree::BuildBinaryOperation(TreeNode *childA, TreeNode *childB, OprId id) {
+  BinaryOperatorNode *n = (BinaryOperatorNode*)mTreePool.NewTreeNode(sizeof(BinaryOperatorNode));
+  new (n) BinaryOperatorNode(id);
+  n->mOpndA = childA;
+  n->mOpndB = childB;
+  childA->SetParent(n);
+  childB->SetParent(n);
+  return n;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////
+//                          Misc    Functions
 //////////////////////////////////////////////////////////////////////////////////////
 
 #undef  OPERATOR
@@ -86,6 +152,14 @@ void ASTTree::Dump() {
 OperatorDesc gOperatorDesc[OPR_NA] = {
 #include "supported_operators.def"
 };
+
+unsigned GetOperatorProperty(OprId id) {
+  for (unsigned i = 0; i < OPR_NA; i++) {
+    if (gOperatorDesc[i].mOprId == id)
+      return gOperatorDesc[i].mDesc;
+  }
+  MERROR("I shouldn't reach this point.");
+}
 
 #undef  OPERATOR
 #define OPERATOR(T, D) case OPR_##T: return #T;

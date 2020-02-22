@@ -279,7 +279,7 @@ Matched 31 tokens.
 [102] Token
 [103] Table TblPrimaryNoNewArray@23: 104,
 [104] Token
-======= Simplify Trees Dump SortOut =======
+======= Simplify AppealNode Trees Dump SortOut =======
 [1] Table TblNormalClassDeclaration@0: 2,3,4,
 [2] Token
 [3] Token

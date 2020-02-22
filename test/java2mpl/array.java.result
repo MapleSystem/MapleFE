@@ -57,7 +57,7 @@ Matched 5 tokens.
 [16] Token
 [17] Token
 [18] Token
-======= Simplify Trees Dump SortOut =======
+======= Simplify AppealNode Trees Dump SortOut =======
 [1] Table TblLocalVariableDeclarationStatement@0: 2,3,
 [2] Table TblLocalVariableDeclaration@0: 4,5,
 [3] Token

@@ -99,7 +99,7 @@ Matched 6 tokens.
 [30] Table TblArrayAccess_sub1@4: 31,
 [31] Table TblExpressionName@4: 32,
 [32] Token
-======= Simplify Trees Dump SortOut =======
+======= Simplify AppealNode Trees Dump SortOut =======
 [1] Table TblExpressionStatement@0: 2,3,
 [2:1] Table TblAssignment@0: 4,5,6,
 [3] Token
@@ -203,7 +203,7 @@ Matched 14 tokens.
 [36] Table TblArrayAccess_sub1@11: 37,
 [37] Table TblExpressionName@11: 38,
 [38] Token
-======= Simplify Trees Dump SortOut =======
+======= Simplify AppealNode Trees Dump SortOut =======
 [1] Table TblExpressionStatement@6: 2,3,
 [2:1] Table TblAssignment@6: 4,5,6,
 [3] Token
@@ -314,7 +314,7 @@ Matched 23 tokens.
 [43] Table TblArrayAccess_sub1@20: 44,
 [44] Table TblExpressionName@20: 45,
 [45] Token
-======= Simplify Trees Dump SortOut =======
+======= Simplify AppealNode Trees Dump SortOut =======
 [1] Table TblLocalVariableDeclarationStatement@14: 2,3,
 [2] Table TblLocalVariableDeclaration@14: 4,5,
 [3] Token

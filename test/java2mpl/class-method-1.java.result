@@ -113,7 +113,7 @@ Matched 12 tokens.
 [36] Table TblNumericType@6: 37,
 [37] Table TblIntType@6: 38,
 [38] Token
-======= Simplify Trees Dump SortOut =======
+======= Simplify AppealNode Trees Dump SortOut =======
 [1] Table TblNormalClassDeclaration@0: 2,3,4,
 [2] Token
 [3] Token

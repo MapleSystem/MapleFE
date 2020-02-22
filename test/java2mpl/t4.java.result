@@ -91,7 +91,7 @@ Matched 6 tokens.
 [30] Table TblArrayAccess_sub1@4: 31,
 [31] Table TblExpressionName@4: 32,
 [32] Token
-======= Simplify Trees Dump SortOut =======
+======= Simplify AppealNode Trees Dump SortOut =======
 [1] Table TblExpressionStatement@0: 2,3,
 [2:1] Table TblAssignment@0: 4,5,6,
 [3] Token

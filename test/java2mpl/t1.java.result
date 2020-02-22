@@ -48,7 +48,7 @@ Matched 3 tokens.
 [12] Token
 [13] Table TblIntType@0: 14,
 [14] Token
-======= Simplify Trees Dump SortOut =======
+======= Simplify AppealNode Trees Dump SortOut =======
 [1] Table TblLocalVariableDeclarationStatement@0: 2,3,
 [2] Table TblLocalVariableDeclaration@0: 4,5,
 [3] Token
