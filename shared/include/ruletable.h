@@ -41,7 +41,7 @@ SEP_NA
 // The list of all supported operators. This covers all the languages.
 // NOTE: autogen also relies on this set of supported operators.
 #undef  OPERATOR
-#define OPERATOR(T) OPR_##T,
+#define OPERATOR(T, D) OPR_##T,
 typedef enum {
 #include "supported_operators.def"
 OPR_NA

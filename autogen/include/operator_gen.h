@@ -39,7 +39,7 @@
 
 // The operators supported in autogen, super set of all languages.
 #undef  OPERATOR
-#define OPERATOR(T) OPR_##T,
+#define OPERATOR(T, D) OPR_##T,
 enum OprId {
 #include "supported_operators.def"
 OPR_NA

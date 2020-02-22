@@ -32,7 +32,7 @@ void SeparatorToken::Dump() {
 }
 
 #undef  OPERATOR
-#define OPERATOR(T) case OPR_##T: return #T;
+#define OPERATOR(T, D) case OPR_##T: return #T;
 const char* OperatorToken::GetName() {
   switch (mOprId) {
 #include "supported_operators.def"

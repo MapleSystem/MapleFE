@@ -615,7 +615,7 @@ void Parser::DumpExitTable(const char *table_name, unsigned indent, bool succ, A
       std::cout << " fail@NotLiteral" << "}" << std::endl;
     else if (reason == FailChildrenFailed)
       std::cout << " fail@ChildrenFailed" << "}" << std::endl;
-    else if (reason == NA)
+    else if (reason == AppealStatus_NA)
       std::cout << " fail@NA" << "}" << std::endl;
   }
 }
@@ -1165,7 +1165,7 @@ bool Parser::TraverseTableData(TableData *data, AppealNode *parent) {
       MoveCurToken();
     }
     if (mTraceTable)
-      DumpExitTable("token", mIndentation, found, NA);
+      DumpExitTable("token", mIndentation, found, AppealStatus_NA);
     if (mTraceSecondTry)
       DumpSuccTokens();
     mIndentation -= 2;

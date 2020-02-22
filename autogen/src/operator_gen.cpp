@@ -20,7 +20,7 @@
 
 //////////////  Operators supported /////////////////
 #undef  OPERATOR
-#define OPERATOR(S) {#S, OPR_##S},
+#define OPERATOR(S, D) {#S, OPR_##S},
 OperatorId OprsSupported[OPR_NA] = {
 #include "supported_operators.def"
 };

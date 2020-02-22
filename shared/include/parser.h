@@ -50,7 +50,7 @@ typedef enum {
   FailChildrenFailed,
   Succ,
   SuccWasSucc,
-  NA
+  AppealStatus_NA
 }AppealStatus;
 
 class AppealNode;
@@ -86,7 +86,7 @@ public:
   AppealStatus mBefore;
   AppealStatus mAfter;
 
-  AppealNode() {mData.mTable=NULL; mParent = NULL; mBefore = NA; mAfter = NA;
+  AppealNode() {mData.mTable=NULL; mParent = NULL; mBefore = AppealStatus_NA; mAfter = AppealStatus_NA;
                 mSimplifiedIndex = 0; mIsTable = true; mIsSecondTry = false;}
   ~AppealNode(){}
 

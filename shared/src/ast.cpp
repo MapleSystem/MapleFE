@@ -73,7 +73,7 @@ TreeNode* ASTTree::NewTreeNode(const AppealNode *appeal_node, std::map<AppealNod
 }
 
 void ASTTree::Dump() {
-  DUMP0("Sub Tree:\n");
+  DUMP0("== Sub Tree ==");
   mRootNode->Dump();
 }
 
@@ -82,7 +82,13 @@ void ASTTree::Dump() {
 //////////////////////////////////////////////////////////////////////////////////////
 
 #undef  OPERATOR
-#define OPERATOR(T) case OPR_##T: return #T;
+#define OPERATOR(T, D)  {OPR_##T, D},
+OperatorDesc gOperatorDesc[OPR_NA] = {
+#include "supported_operators.def"
+};
+
+#undef  OPERATOR
+#define OPERATOR(T, D) case OPR_##T: return #T;
 static const char* GetOperatorName(OprId opr) {
   switch (opr) {
 #include "supported_operators.def"

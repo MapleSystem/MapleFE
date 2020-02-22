@@ -86,6 +86,21 @@ public:
 //              Operator Nodes
 //////////////////////////////////////////////////////////////////////////
 
+enum OperatorProperty {
+  Unary,
+  Binary,
+  Ternary,
+  Pre,
+  Post,
+  OperatorProperty_NA
+};
+
+struct OperatorDesc {
+  OprId             mOprId;
+  OperatorProperty  mDesc;
+};
+extern OperatorDesc gOperatorDesc[OPR_NA];
+
 class UnaryOperatorNode : public TreeNode {
 public:
   OprId     mOprId;
