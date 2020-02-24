@@ -151,9 +151,9 @@ TreeNode* ASTTree::NewTreeNode(AppealNode *appeal_node, std::map<AppealNode*, Tr
     MERROR("We got a broken AST tree, not connected sub tree.");
 }
 
-void ASTTree::Dump() {
+void ASTTree::Dump(unsigned indent) {
   DUMP0("== Sub Tree ==");
-  mRootNode->Dump();
+  mRootNode->Dump(indent);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -173,6 +173,11 @@ TreeNode* ASTTree::BuildBinaryOperation(TreeNode *childA, TreeNode *childB, OprI
 //////////////////////////////////////////////////////////////////////////////////////
 //                          Misc    Functions
 //////////////////////////////////////////////////////////////////////////////////////
+
+void TreeNode::DumpIndentation(unsigned ind) {
+  for (unsigned i = 0; i < ind; i++)
+    DUMP0_NORETURN(' ');
+}
 
 #undef  OPERATOR
 #define OPERATOR(T, D)  {OPR_##T, D},
@@ -198,22 +203,28 @@ static const char* GetOperatorName(OprId opr) {
   }
 };
 
-void BinaryOperatorNode::Dump() {
+void BinaryOperatorNode::Dump(unsigned indent) {
   const char *name = GetOperatorName(mOprId);
-  mOpndA->Dump();
+  DumpIndentation(indent);
   DUMP0(name);
-  mOpndB->Dump();
+  mOpndA->Dump(indent + 2);
+  DUMP_RETURN();
+  mOpndB->Dump(indent + 2);
+  DUMP_RETURN();
 }
 
-void UnaryOperatorNode::Dump() {
+void UnaryOperatorNode::Dump(unsigned indent) {
   const char *name = GetOperatorName(mOprId);
+  DumpIndentation(indent);
   DUMP0(name);
-  mOpnd->Dump();
+  mOpnd->Dump(indent + 2);
 }
 
-void IdentifierNode::Dump() {
-  DUMP0(mName);
+void IdentifierNode::Dump(unsigned indent) {
+  DumpIndentation(indent);
+  DUMP0_NORETURN(mName);
 }
 
-void LiteralNode::Dump() {
+void LiteralNode::Dump(unsigned indent) {
+  DumpIndentation(indent);
 }

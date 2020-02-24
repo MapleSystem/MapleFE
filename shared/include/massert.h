@@ -106,4 +106,20 @@
   std::cout << msg << " " << val1 << " " << val2 << std::endl; \
 } while (0)
 
+#define DUMP0_NORETURN(msg) do { \
+  std::cout << msg; \
+} while (0)
+
+#define DUMP1_NORETURN(msg, val) do { \
+  std::cout << msg << " " << val; \
+} while (0)
+
+#define DUMP2_NORETURN(msg, val1, val2) do { \
+  std::cout << msg << " " << val1 << " " << val2; \
+} while (0)
+
+#define DUMP_RETURN() do { \
+  std::cout << std::endl; \
+} while (0)
+
 #endif /* __MASSERT_H__ */

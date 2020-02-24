@@ -86,7 +86,9 @@ public:
   bool IsFunction()   {return mKind == NK_Function;}
 
   void SetParent(TreeNode *p) {mParent = p;}
-  virtual void Dump(){}
+
+  virtual void Dump(unsigned){}
+  void DumpIndentation(unsigned);
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -118,7 +120,7 @@ public:
   UnaryOperatorNode() {mKind = NK_UnaOperator;}
   ~UnaryOperatorNode() {}
 
-  void Dump();
+  void Dump(unsigned);
 };
 
 class BinaryOperatorNode : public TreeNode {
@@ -131,7 +133,7 @@ public:
   BinaryOperatorNode() {mKind = NK_BinOperator;}
   ~BinaryOperatorNode() {}
 
-  void Dump();
+  void Dump(unsigned);
 };
 
 class TernaryOperatorNode : public TreeNode {
@@ -145,7 +147,7 @@ public:
   TernaryOperatorNode() {mKind = NK_TerOperator;}
   ~TernaryOperatorNode() {}
 
-  void Dump();
+  void Dump(unsigned);
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -159,7 +161,7 @@ public:
   TreeType mRetType;
   std::vector<TreeSymbol*> mParams;
 public:
-  void Dump();
+  void Dump(unsigned);
 };
 
 class IdentifierNode : public TreeNode {
@@ -169,7 +171,7 @@ public:
   IdentifierNode(const char *s) : mName(s) {mKind = NK_Identifier;}
   ~IdentifierNode(){}
 
-  void Dump();
+  void Dump(unsigned);
 };
 
 class LiteralNode : public TreeNode {
@@ -179,7 +181,7 @@ public:
   LiteralNode(LitData d) : mData(d) {mKind = NK_Literal;}
   ~LiteralNode(){}
 
-  void Dump();
+  void Dump(unsigned);
 };
 
 ////////////////////////////////////////////////////////////////////////////
@@ -194,6 +196,7 @@ public:
   TreePool    mTreePool;
   TreeNode   *mRootNode;
   ASTBuilder *mBuilder;
+
 public:
   ASTTree();
   ~ASTTree();
@@ -202,7 +205,7 @@ public:
 
   TreeNode* BuildBinaryOperation(TreeNode *, TreeNode *, OprId);
 
-  void Dump();
+  void Dump(unsigned);
 };
 
 #endif

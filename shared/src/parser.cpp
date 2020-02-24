@@ -1965,7 +1965,6 @@ AppealNode* Parser::SimplifyShrinkEdges(AppealNode *node) {
 ////////////////////////////////////////////////////////////////////////////////////
 
 ASTTree* Parser::BuildAST() {
-  return NULL;
   done_nodes.clear();
 
   ASTTree *tree = new ASTTree();
@@ -2010,7 +2009,7 @@ ASTTree* Parser::BuildAST() {
   }
 
   if (tree->mRootNode)
-    tree->Dump();
+    tree->Dump(0);
   else
     MERROR("We got a statement failed to create AST!");
 

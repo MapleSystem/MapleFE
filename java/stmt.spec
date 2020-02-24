@@ -18,11 +18,7 @@
 
 rule LocalVariableDeclarationStatement : LocalVariableDeclaration + ';'
 
-rule LocalVariableDeclaration : ZEROORMORE(VariableModifier) + LocalVariableType + VariableDeclaratorList
-
-rule LocalVariableType : ONEOF(
-  UnannType,
-  "var")
+rule LocalVariableDeclaration : ZEROORMORE(VariableModifier) + UnannType + VariableDeclaratorList
 
 rule VariableModifier : ONEOF(
   Annotation,
