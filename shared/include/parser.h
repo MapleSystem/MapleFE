@@ -281,8 +281,6 @@ private:
 
   // Build AST
   ASTTree*  BuildAST(); // Each top level construct gets a AST
-  TreeNode* SimplifyAST(ASTTree*);
-  TreeNode* NewTreeNode(ASTTree*, AppealNode*);
 
 public:
   Parser(const char *f);

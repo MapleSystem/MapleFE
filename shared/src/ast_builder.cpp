@@ -52,10 +52,8 @@ TreeNode* ASTBuilder::CreateTokenTreeNode(const Token *token) {
     new (n) LiteralNode(data);
     return n;
   } else {
-    // Other tokens shouldn't be involved in the tree creation. They should have
-    // already been digested and used in the RuleTable actions.
-    std::cout << "Unexpected token types to create AST node" << std::endl; 
-    exit(1);
+    // Other tokens shouldn't be involved in the tree creation.
+    return NULL;
   }
 }
 
@@ -82,8 +80,9 @@ TreeNode* ASTBuilder::BuildUnaryOperation() {
     TreeNode *tn = CreateTokenTreeNode(p_b.mData.mToken);
     n->mOpnd = tn;
   }
-
   n->mOpnd->SetParent(n);
+
+  return n;
 }
 
 // For second parameter has to be an operator.
@@ -110,7 +109,6 @@ TreeNode* ASTBuilder::BuildBinaryOperation() {
     TreeNode *tn = CreateTokenTreeNode(p_a.mData.mToken);
     n->mOpndA = tn;
   }
-
   n->mOpndA->SetParent(n);
 
   // set 2nd param
@@ -120,8 +118,9 @@ TreeNode* ASTBuilder::BuildBinaryOperation() {
     TreeNode *tn = CreateTokenTreeNode(p_c.mData.mToken);
     n->mOpndB = tn;
   }
-
   n->mOpndB->SetParent(n);
+
+  return n;
 }
 
 // Assignment is actually a binary operator.

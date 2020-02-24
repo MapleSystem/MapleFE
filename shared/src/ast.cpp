@@ -31,16 +31,52 @@ ASTTree::~ASTTree() {
 }
 
 // Create tree node. Its children have been created tree nodes.
-// The appeal_node should be a rule table node.
+// There are couple issueshere.
 //
-// It's caller's job to make sure appeal_node is for RuleTalbe.
-TreeNode* ASTTree::NewTreeNode(const AppealNode *appeal_node, std::map<AppealNode*, TreeNode*> &map) {
-  RuleTable *rule_table = appeal_node->GetTable();
+// 1. An sorted AppealNode could have NO tree node, because it may have NO RuleAction to
+//    create the sub tree. This happens if the RuleTable is just a temporary intermediate
+//    table created by Autogen, or its rule is just ONEOF without real syntax. Here
+//    is an example.
+//
+//       The AST after BuildAST() for a simple statment: c=a+b;
+//
+//       ======= Simplify Trees Dump SortOut =======
+//       [1] Table TblExpressionStatement@0: 2,3,
+//       [2:1] Table TblAssignment@0: 4,5,6,
+//       [3] Token
+//       [4:1] Token
+//       [5:2] Token
+//       [6:3] Table TblArrayAccess_sub1@2: 7,8,  <-- supposed to get a binary expression
+//       [7:1] Token                              <-- a
+//       [8:2] Table TblUnaryExpression_sub1@3: 9,10, <-- +b
+//       [9] Token
+//       [10:2] Token
+//
+//    Node [1] won't have a tree node at all since it has no Rule Action attached.
+//    Node [6] won't have a tree node either.
+//
+// 2. A binary operation like a+b could be parsed as (1) expression: a, and (2) a
+//    unary operation: +b. This is because we parse them in favor to ArrayAccess before
+//    Binary Operation. Usually to handle this issue, in some system like ANTLR,
+//    they require you to list the priority, by writing rules from higher priority to
+//    lower priority.
+//
+//    We are going to do a consolidation of the sub-trees, by converting smaller trees
+//    to a more compact bigger trees. However, to do this we want to set some rules.
+//    *) The parent AppealNode of these sub-trees has no tree node. So the conversion
+//       helps make the tree complete.
 
-  if (rule_table->mNumAction > 1) {
-    std::cout << "Need further implementation!!!" << std::endl;
-    exit (1);
+TreeNode* ASTTree::NewTreeNode(AppealNode *appeal_node, std::map<AppealNode*, TreeNode*> &map) {
+  TreeNode *sub_tree = NULL;
+
+  if (appeal_node->IsToken()) {
+    sub_tree = mBuilder->CreateTokenTreeNode(appeal_node->GetToken());
+    return sub_tree;
   }
+
+  RuleTable *rule_table = appeal_node->GetTable();
+  if (rule_table->mNumAction > 1)
+    MERROR("Need further implementation!!!");
 
   for (unsigned i = 0; i < rule_table->mNumAction; i++) {
     Action *action = rule_table->mActions + i;
@@ -54,74 +90,65 @@ TreeNode* ASTTree::NewTreeNode(const AppealNode *appeal_node, std::map<AppealNod
       MASSERT(child && "Couldnot find sorted child of an index");
 
       Param p;
-      if (child->IsToken()) {
+      std::map<AppealNode*, TreeNode*>::iterator it = map.find(child);
+      if (it == map.end()) {
+        // only token children could have NO tree node.
+        MASSERT(child->IsToken() && "A RuleTable node has no tree node?");
         p.mIsTreeNode = false;
         p.mData.mToken = child->GetToken();
       } else {
-        // find the tree node
-        std::map<AppealNode*, TreeNode*>::iterator it = map.find(child);
-        MASSERT(it != map.end() && "Could find the child-s tree node in map?");
         p.mIsTreeNode = true;
         p.mData.mTreeNode = it->second;
       }
       mBuilder->AddParam(p);
     }
 
-    TreeNode *sub_tree = mBuilder->Build();
+    // Build the tree
+    sub_tree = mBuilder->Build();
+  }
+
+  if (sub_tree)
     return sub_tree;
-  }
-}
 
-// SimplifySubTree only works if there is no tree nodes for 'parent'.
-//
-// It does two jobs.
-// 1) Move sub-trees upwards to parent if parent has no tree node, under a few conditions.
-// 2) Convert couple of smaller sub-trees to a bigger sub-tree
-
-TreeNode* ASTTree::SimplifySubTree(AppealNode *parent, std::map<AppealNode*, TreeNode*> &map) {
+  // It's possible that the Rule has no action, meaning it cannot create tree node.
+  // In this case, we will take the child's tree node if it has one and only one
+  // sub tree among all children.
   std::vector<TreeNode*> child_trees;
-  std::map<AppealNode*, TreeNode*>::iterator it = map.find(parent);
-  if (it != map.end()) {
-    return it->second;
-  } else {
-    // Simplification 1. If there is only child having tree node, attach it to parent.
-    std::vector<AppealNode*>::iterator cit = parent->mSortedChildren.begin();
-    for (; cit != parent->mSortedChildren.end(); cit++) {
-      std::map<AppealNode*, TreeNode*>::iterator child_tree_it = map.find(parent);
-      if (child_tree_it != map.end()) {
-        child_trees.push_back(child_tree_it->second);
-      }
+  std::vector<AppealNode*>::iterator cit = appeal_node->mSortedChildren.begin();
+  for (; cit != appeal_node->mSortedChildren.end(); cit++) {
+    std::map<AppealNode*, TreeNode*>::iterator child_tree_it = map.find(*cit);
+    if (child_tree_it != map.end()) {
+      child_trees.push_back(child_tree_it->second);
     }
+  }
 
-    if (child_trees.size() == 1) {
-      std::cout << "Attached a tree node" << std::endl;
-      map.insert(std::pair<AppealNode*, TreeNode*>(parent, child_trees[0]));
-      return child_trees[0];
-    } else {
-      MERROR("We got a broken AST tree, not connected sub tree.");
-    }
-
-    // Simplification 2. If the two children can be converted to one through operation conversion.
-    //          [NOTE]   Right now we are just starting from the simplest case, since I have no idea
-    //                   what else situation I'll hit. Just do it step by step. Later maybe will
-    //                   come up a nice algorithm.
-    if (child_trees.size() == 2) {
-      TreeNode *child_a = child_trees[0];
-      TreeNode *child_b = child_trees[1];
-      if (child_b->IsUnaOperator()) {
-        UnaryOperatorNode *unary = (UnaryOperatorNode*)child_b;
-        unsigned property = GetOperatorProperty(unary->mOprId);
-        if ((property & Binary) && (property & Pre)) {
-          std::cout << "Convert unary --> binary" << std::endl;
-          TreeNode *new_tree = BuildBinaryOperation(child_a, unary, unary->mOprId);
-          map.insert(std::pair<AppealNode*, TreeNode*>(parent, new_tree));
-          return new_tree;
-        }
+  if (child_trees.size() == 1) {
+    std::cout << "Attached a tree node from Child" << std::endl;
+    map.insert(std::pair<AppealNode*, TreeNode*>(appeal_node, child_trees[0]));
+    sub_tree = child_trees[0];
+  } else if (child_trees.size() == 2) {
+    // There are cases like a+b could be parsed as "a" and "+b", a symbol and a
+    // unary operation. However, we do prefer binary operation than unary. So a
+    // combination is needed here, especially when the parent node is NULL.
+    TreeNode *child_a = child_trees[0];
+    TreeNode *child_b = child_trees[1];
+    if (child_b->IsUnaOperator()) {
+      UnaryOperatorNode *unary = (UnaryOperatorNode*)child_b;
+      unsigned property = GetOperatorProperty(unary->mOprId);
+      if ((property & Binary) && (property & Unary)) {
+        std::cout << "Convert unary --> binary" << std::endl;
+        TreeNode *unary_sub = unary->mOpnd;
+        TreeNode *binary = BuildBinaryOperation(child_a, unary_sub, unary->mOprId);
+        map.insert(std::pair<AppealNode*, TreeNode*>(appeal_node, binary));
+        sub_tree = binary;
       }
     }
   }
 
-  return NULL;
+  if (sub_tree)
+    return sub_tree;
+   else
+    MERROR("We got a broken AST tree, not connected sub tree.");
 }
 
 void ASTTree::Dump() {

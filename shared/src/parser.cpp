@@ -1992,109 +1992,29 @@ ASTTree* Parser::BuildAST() {
     }
 
     if (children_done) {
-      // Create tree node when there is a rule table.
-      // Look into the RuleAction, create the tree node.
-      if(appeal_node->IsTable()) {
-        TreeNode *sub_tree = tree->NewTreeNode(appeal_node, nodes_map);
+      // Create tree node when there is a rule table, or meanful tokens.
+      // Only put in the nodes_map if tree node is really created, since some
+      // some tokens like separators don't need tree nodes.
+      TreeNode *sub_tree = tree->NewTreeNode(appeal_node, nodes_map);
+      if (sub_tree) {
         nodes_map.insert(std::pair<AppealNode*, TreeNode*>(appeal_node, sub_tree));
+        // mRootNode is overwritten each time until the last one which is
+        // the real root node.
+        tree->mRootNode = sub_tree;
       }
+
       // pop out the 'appeal_node'
       appeal_stack.pop();
       done_nodes.push_back(appeal_node);
     }
   }
 
-  TreeNode *root_node = SimplifyAST(tree);
-  if (root_node) {
-    tree->mRootNode = root_node;
+  if (tree->mRootNode)
     tree->Dump();
-  } else {
+  else
     MERROR("We got a statement failed to create AST!");
-  }
 
   return tree;
-}
-
-// There are couple issues after BuildAST.
-//
-// 1. An sorted AppealNode could have NO tree node, because it may have RuleAction to
-//    create the sub tree. This happens if the RuleTable is just a temporary intermediate
-//    table created by Autogen, or its rule is just ONEOF without real syntax. Here
-//    is an example.
-//
-//       The AST after BuildAST() for a simple statment: c=a+b;
-//
-//       ======= Simplify Trees Dump SortOut =======
-//       [1] Table TblExpressionStatement@0: 2,3,
-//       [2:1] Table TblAssignment@0: 4,5,6,
-//       [3] Token
-//       [4:1] Token
-//       [5:2] Token
-//       [6:3] Table TblArrayAccess_sub1@2: 7,8,  <-- supposed to get a binary expression
-//       [7:1] Token                              <-- a
-//       [8:2] Table TblUnaryExpression_sub1@3: 9,10, <-- +b
-//       [9] Token
-//       [10:2] Token
-//
-//    Node [1] won't have a tree node at all since it has no Rule Action attached.
-//    Node [6] won't have a tree node either.
-//
-// 2. A binary operation like a+b could be parsed as (1) expression: a, and (2) a
-//    unary operation: +b. This is because we parse them in favor to ArrayAccess before
-//    Binary Operation. Usually to handle this issue, in some system like ANTLR,
-//    they require you to list the priority, by writing rules from higher priority to
-//    lower priority.
-//
-//    We are going to do a consolidation of the sub-trees, by converting smaller trees
-//    to a more compact bigger trees. However, to do this we want to set some rules.
-//    *) The parent AppealNode of these sub-trees has no tree node. So the conversion
-//       helps make the tree complete.
-//
-// The algorithm of SimplifyAST is simple. (1) We simply all the children before handling
-// the parent. (2) Handling of an AppealNode includes, first the empty subtree issue, then
-// the conversion issue.
-//
-// [NOTE] After SimplifyAST, there is no more need of AppealNode, and there is going to
-//        a very pure AST.
-//
-TreeNode* Parser::SimplifyAST(ASTTree *tree) {
-  TreeNode *root_tree_node = NULL;
-
-  done_nodes.clear();
-
-  std::stack<AppealNode*> appeal_stack;
-  appeal_stack.push(mRootNode->mSortedChildren[0]);
-
-  // A map between an AppealNode and a TreeNode.
-  std::map<AppealNode*, TreeNode*> nodes_map;
-
-  // 1) If all children done. Time to create tree node for 'appeal_node'
-  // 2) If some are done, some not. Add the first not-done child to stack
-  while(!appeal_stack.empty()) {
-    AppealNode *appeal_node = appeal_stack.top();
-    bool children_done = true;
-    std::vector<AppealNode*>::iterator it = appeal_node->mSortedChildren.begin();
-    for (; it != appeal_node->mSortedChildren.end(); it++) {
-      AppealNode *child = *it;
-      if (!NodeIsDone(child)) {
-        appeal_stack.push(child);
-        children_done = false;
-        break;
-      }
-    }
-
-    if (children_done) {
-      // root_tree_node is overwritten every time, but it finally points
-      // to the root tree.
-      root_tree_node = tree->SimplifySubTree(appeal_node, nodes_map);
-      appeal_stack.pop();
-      done_nodes.push_back(appeal_node);
-    }
-  }
-
-  tree->Dump();
-
-  return root_tree_node;
 }
 
 /////////////////////////////////////////////////////////////////////////////

@@ -94,11 +94,11 @@ public:
 //////////////////////////////////////////////////////////////////////////
 
 enum OperatorProperty {
-  Unary = 1,
+  Unary = 1,   // Unary operator, in front of symbol, like +a, -a
   Binary= 2,
   Ternary = 4,
-  Pre = 8,
-  Post = 16,
+  Pre = 8,     // PreCompute, compute before evaluate value, --, ++
+  Post = 16,   // PostCompute,evaluate before compute,
   OperatorProperty_NA = 32
 };
 
@@ -198,8 +198,7 @@ public:
   ASTTree();
   ~ASTTree();
 
-  TreeNode* NewTreeNode(const AppealNode*, std::map<AppealNode*, TreeNode*> &);
-  TreeNode* SimplifySubTree(AppealNode*, std::map<AppealNode*, TreeNode*> &);
+  TreeNode* NewTreeNode(AppealNode*, std::map<AppealNode*, TreeNode*> &);
 
   TreeNode* BuildBinaryOperation(TreeNode *, TreeNode *, OprId);
 
