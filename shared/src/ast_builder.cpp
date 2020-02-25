@@ -132,3 +132,11 @@ TreeNode* ASTBuilder::BuildAssignment() {
 TreeNode* ASTBuilder::BuildReturn() {
   return NULL;
 }
+
+TreeNode* ASTBuilder::BuildDecl() {
+  return NULL;
+}
+
+TreeNode* ASTBuilder::AddAttribute() {
+  return NULL;
+}

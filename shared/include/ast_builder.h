@@ -61,6 +61,9 @@ public:
   TreeNode* BuildBinaryOperation();
   TreeNode* BuildAssignment();
   TreeNode* BuildReturn();
+  TreeNode* BuildDecl();
+  TreeNode* AddAttribute();
+
 };
 
 #endif

@@ -170,7 +170,8 @@ _________________________________________________
 
  *) WhiteSpace is treated as a separator.
     We recommend list WhiteSpace as your first separator since this is the top 1
-    separators we hit in all kinds of languages.
+    separators we hit in all kinds of languages. Putting it at the first place can
+    speed up the parsing.
 
 __________________________________________________
 

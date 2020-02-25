@@ -11,14 +11,12 @@
 # FIT FOR A PARTICULAR PURPOSE.
 # See the Mulan PSL v1 for more details.
 #
-###################################################################################
-# This file is the syntax rules for statements extracted from
-# https://docs.oracle.com/javase/specs/jls/se12/html/jls-14.html
-###################################################################################
 
 rule LocalVariableDeclarationStatement : LocalVariableDeclaration + ';'
 
 rule LocalVariableDeclaration : ZEROORMORE(VariableModifier) + UnannType + VariableDeclaratorList
+  attr.action: BuildDecl(%2, %3)
+  attr.action: AddAttribute(%1)
 
 rule VariableModifier : ONEOF(
   Annotation,
@@ -140,9 +138,9 @@ rule ForUpdate : StatementExpressionList
 
 rule StatementExpressionList : StatementExpression + ZEROORMORE(',' + StatementExpression)
 
-rule EnhancedForStatement : "for" + '(' + ZEROORMORE(VariableModifier) + LocalVariableType + VariableDeclaratorId + ':' + Expression + ')' + Statement
+rule EnhancedForStatement : "for" + '(' + ZEROORMORE(VariableModifier) + UnannType + VariableDeclaratorId + ':' + Expression + ')' + Statement
 
-rule EnhancedForStatementNoShortIf : "for" + '(' + ZEROORMORE(VariableModifier) + LocalVariableType + VariableDeclaratorId + ':' + Expression + ')' + StatementNoShortIf
+rule EnhancedForStatementNoShortIf : "for" + '(' + ZEROORMORE(VariableModifier) + UnannType + VariableDeclaratorId + ':' + Expression + ')' + StatementNoShortIf
 
 rule BreakStatement : "break" + ZEROORONE(Identifier) + ';'
 
@@ -177,7 +175,7 @@ rule ResourceSpecification : '(' + ResourceList + ZEROORONE(';') + ')'
 rule ResourceList : Resource + ZEROORMORE(';' + Resource)
 
 rule Resource : ONEOF(
-  ZEROORMORE(VariableModifier) + LocalVariableType + Identifier + '=' + Expression,
+  ZEROORMORE(VariableModifier) + UnannType + Identifier + '=' + Expression,
   VariableAccess)
 
 rule VariableAccess : ONEOF(

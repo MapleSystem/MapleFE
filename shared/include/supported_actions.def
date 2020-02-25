@@ -18,13 +18,19 @@
 // 2. Autogen generates rule tables in gen_xxx.h/cpp files. It user ActionId.
 // 3. AST maintains a table which is basically a mapping between ActionId and the corresponding
 //    utility functions.
-// 4. The utility functions (1) do the validation (2) create the tree node.
+// 4. The utility functions will (1) do the validation (2) create the tree node.
 //
 // [NOTE] This file only contains actions to create common tree node seen in most programming
 //        languages. If a language has tree nodes not covered here, they can be defined in its
 //        dedicated directory.
+//
+// [Format] The Format tells the parameters it needs when writing .spec files.
+//          It also shows the internal parameters when parser creates the AST tree node.
+//          Please refer autogen/README.ACTIONS for details.
 
 ACTION(BuildBinaryOperation)
 ACTION(BuildUnaryOperation)
 ACTION(BuildAssignment)
 ACTION(BuildReturn)
+ACTION(BuildDecl)
+ACTION(AddAttribute)
