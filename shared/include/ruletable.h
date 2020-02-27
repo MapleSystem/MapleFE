@@ -148,9 +148,6 @@ struct TypeKeyword {
   TypeId      mId;
 };
 
-// The rule table of types
-extern const RuleTable TypeTable;
-
 //////////////////////////////////////////////////////////////////////
 //                    Separator Table                               //
 // separator tables are merely generated from STRUCT defined in     //

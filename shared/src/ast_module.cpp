@@ -14,8 +14,14 @@
 */
 
 #include "ast_module.h"
+#include "ast.h"
+
+ASTModule::ASTModule() {
+  mRootScope = new ASTScope();
+}
 
 ASTModule::~ASTModule() {
+  // free trees
   std::vector<ASTTree*>::iterator it = mTrees.begin();
   for (; it != mTrees.end(); it++) {
     ASTTree *tree = *it;
@@ -23,4 +29,13 @@ ASTModule::~ASTModule() {
       delete tree;
   }
   mTrees.clear();
+
+  // free scopes
+  std::vector<ASTScope*>::iterator scope_it = mScopes.begin();
+  for (; scope_it != mScopes.end(); scope_it++) {
+    ASTScope *scope = *scope_it;
+    if (scope)
+      delete scope;
+  }
+  mScopes.clear();
 }

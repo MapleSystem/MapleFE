@@ -58,6 +58,7 @@ enum NodeKind {
   NK_BinOperator,
   NK_TerOperator,
   NK_Construct,
+  NK_Block,        // A block node
   NK_Function,
   NK_Null,
 };
@@ -79,11 +80,15 @@ public:
 
   bool IsIdentifier() {return mKind == NK_Identifier;}
   bool IsLiteral()    {return mKind == NK_Literal;}
-  bool IsUnaOperator()   {return mKind == NK_UnaOperator;}
-  bool IsBinOperator()   {return mKind == NK_BinOperator;}
-  bool IsTerOperator()   {return mKind == NK_TerOperator;}
+  bool IsUnaOperator(){return mKind == NK_UnaOperator;}
+  bool IsBinOperator(){return mKind == NK_BinOperator;}
+  bool IsTerOperator(){return mKind == NK_TerOperator;}
   bool IsConstruct()  {return mKind == NK_Construct;}
+  bool IsBlock()      {return mKind == NK_Block;}
   bool IsFunction()   {return mKind == NK_Function;}
+
+  // If this is a scope. If yes, we can request the ASTScope.
+  bool IsScope()      {return IsBlock() || IsFunction();}
 
   void SetParent(TreeNode *p) {mParent = p;}
 
@@ -155,24 +160,49 @@ public:
 //////////////////////////////////////////////////////////////////////////
 
 class TreeSymbol;
+class ASTScope;
 
 class FunctionNode : public TreeNode {
 public:
-  TreeType mRetType;
+  ASTType                  mRetType;
   std::vector<TreeSymbol*> mParams;
+  ASTScope                *mScope;
+
 public:
+  ASTScope* GetScope() {return mScope;}
+  void      SetScope(ASTScope *s) {mScope = s;}
+
   void Dump(unsigned);
 };
+
+//////////////////////////////////////////////////////////////////////////
+//                         Identifier Nodes
+// Everything having a name will be treated as an Identifier node at the
+// first place. There are some issues here.
+// 1) Each appearance of identifier will be given a new IdentifierNode at
+//    the first place. Later, when the scope tree is ready, we can reduce
+//    the nodes by merging multiple nodes into one if they are actually
+//    semantically equal. For example, a same variable appears in multiple
+//    places in a function, and these multiple appearance will be same node.
+// 2) The name is pointing to the stringpool, which is residing in Lexer.
+//    [TODO] we'll have standalone stringpool...
+//////////////////////////////////////////////////////////////////////////
 
 class IdentifierNode : public TreeNode {
 public:
   const char *mName; // In the lexer's StringPool
+  ASTType    *mType;
 public:
-  IdentifierNode(const char *s) : mName(s) {mKind = NK_Identifier;}
+  IdentifierNode(const char *s) : mName(s) {mKind = NK_Identifier; mType = NULL;}
   ~IdentifierNode(){}
 
+  const char* GetName() {return mName;}
   void Dump(unsigned);
 };
+
+//////////////////////////////////////////////////////////////////////////
+//                         Literal Nodes
+//////////////////////////////////////////////////////////////////////////
 
 class LiteralNode : public TreeNode {
 public:
@@ -182,6 +212,27 @@ public:
   ~LiteralNode(){}
 
   void Dump(unsigned);
+};
+
+////////////////////////////////////////////////////////////////////////////
+//                         AST Scope
+// Scope in a file are arranged as a tree. The root of each tree
+// is a top level of scope in the module. However, the module has a topmost
+// scope which could contain some file level variables.
+////////////////////////////////////////////////////////////////////////////
+
+class ASTScope {
+public:
+  ASTScope              *mParent;
+  std::vector<ASTScope*> mChildren;
+  TreeNode              *mTree;      // corresponding TreeNode
+  std::vector<IdentifierNode*> mIdentifiers;  // Local identifiers
+public:
+  ASTScope() {}
+  ~ASTScope() {}
+
+  void AddChildScope(ASTScope *s) {mChildren.push_back(s);}
+  void AddIdentifier(IdentifierNode *n) {mIdentifiers.push_back(n);}
 };
 
 ////////////////////////////////////////////////////////////////////////////

@@ -27,22 +27,22 @@ all modules are as below.
 [Format] The Format tells the parameters it needs when writing .spec files.
          It also shows the internal parameters when parser creates the AST tree node.
 
-BuildBinaryOperation
+* BuildBinaryOperation
   Format: BuildBinaryOperation(Left operand, Operator, Right Operand)
 
-BuildUnaryOperation
+* BuildUnaryOperation
   Format: BuildUnaryOperation(Operator, Operand)
 
-BuildAssignment
+* BuildAssignment
   Format: BuildAssignment(Left operand, Operator, Right Operand)
           The operator is the assignment in the language
 
-ACTION(BuildReturn)
+* BuildReturn
 
-BuildDecl
+* BuildDecl
   Format: BuildDecl(Type, Variable)
 
-AddAttribute
+* AddAttribute
   Format: AddAttribute(Attribute list)
   AddAttribute is attached together with its previous BuildDecl. They should inside the same Rule.
   The attributes will be applied to the tree node of BuildDecl().

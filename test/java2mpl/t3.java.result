@@ -21,30 +21,28 @@ Separator  Token:  Semicolon
 [2] Table TblLocalVariableDeclarationStatement@0: 3,4,
 [3] Table TblLocalVariableDeclaration@0: 5,6,
 [4] Token
-[5] Table TblLocalVariableType@0: 7,
+[5] Table TblUnannType@0: 7,
 [6] Table TblVariableDeclaratorList@1: 8,
-[7] Table TblUnannType@0: 9,
+[7] Table TblUnannPrimitiveType@0: 9,
 [8] Table TblVariableDeclarator@1: 10,
-[9] Table TblUnannPrimitiveType@0: 11,
+[9] Table TblBoolType@0: 11,
 [10] Table TblVariableDeclaratorId@1: 12,
-[11] Table TblBoolType@0: 13,
+[11] Token
 [12] Token
-[13] Token
 Matched 3 tokens.
 ======= patch-was-succ Dump SortOut =======
 [1] Table TblStatement@0: 2,
 [2] Table TblLocalVariableDeclarationStatement@0: 3,4,
 [3] Table TblLocalVariableDeclaration@0: 5,6,
 [4] Token
-[5] Table TblLocalVariableType@0: 7,
+[5] Table TblUnannType@0: 7,
 [6] Table TblVariableDeclaratorList@1: 8,
-[7] Table TblUnannType@0: 9,
+[7] Table TblUnannPrimitiveType@0: 9,
 [8] Table TblVariableDeclarator@1: 10,
-[9] Table TblUnannPrimitiveType@0: 11,
+[9] Table TblBoolType@0: 11,
 [10] Table TblVariableDeclaratorId@1: 12,
-[11] Table TblBoolType@0: 13,
+[11] Token
 [12] Token
-[13] Token
 ======= Simplify AppealNode Trees Dump SortOut =======
 [1] Table TblLocalVariableDeclarationStatement@0: 2,3,
 [2] Table TblLocalVariableDeclaration@0: 4,5,

@@ -44,8 +44,13 @@ struct Param {
 
 class ASTBuilder {
 public:
+  // information for a single action
   unsigned                mActionId;
   std::vector<Param>      mParams;
+
+  // Pending declarations before their scope is created
+  std::vector<TreeNode*>  mPendingDecls;
+
   TreePool               *mTreePool;
 public:
   ASTBuilder(TreePool *p) : mTreePool(p) {}
@@ -63,7 +68,6 @@ public:
   TreeNode* BuildReturn();
   TreeNode* BuildDecl();
   TreeNode* AddAttribute();
-
 };
 
 #endif

@@ -24,15 +24,30 @@
 #ifndef __AST_TYPE_H__
 #define __AST_TYPE_H__
 
+#include "ruletable.h"   // to include TypeId
+
+class IdentifierNode;
+
 enum TypeCategory {
   Primitive,
-  Named
+  User
 };
 
-class TreeType {
+class ASTType {
 public:
   TypeCategory mCat;
+  union {
+    IdentifierNode *mIdentifier;  // user type
+    TypeId          mPrimType;    // primitive type
+  }mType;
+
 public:
+  bool IsPrim() {return mCat == Primitive;}
+  bool IsUser() {return mCat == User;}
+
+  IdentifierNode* GetIdentifier() {return mType.mIdentifier;}
+  TypeId          GetPrimType()   {return mType.mPrimType;}
+
   const char* GetName();  // type name
 };
 

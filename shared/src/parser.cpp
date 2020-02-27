@@ -1965,6 +1965,7 @@ AppealNode* Parser::SimplifyShrinkEdges(AppealNode *node) {
 ////////////////////////////////////////////////////////////////////////////////////
 
 ASTTree* Parser::BuildAST() {
+  return NULL;
   done_nodes.clear();
 
   ASTTree *tree = new ASTTree();

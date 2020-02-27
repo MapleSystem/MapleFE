@@ -23,5 +23,4 @@ TYPE(Char)
 TYPE(Float)
 TYPE(Double)
 TYPE(Null)          // The Null type. It is a type.
-// TYPE(NA) , coded in the .cpp file
 
