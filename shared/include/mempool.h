@@ -13,9 +13,22 @@
 * See the Mulan PSL v1 for more details.
 */
 //////////////////////////////////////////////////////////////////////////////
-// This file contains the Memory Pool for String pool.                      //
-//                                                                          //
+// This file contains the Memory Pool for many place.
+//
+// [NOTE]
+//
+// There is one assumption when using this memory pool. The object in the pool
+// doesn't rely on destructor to free any additional memory. All the memory
+// usage involved in the object is allocated by the memory pool at the first
+// place. So the destructor of the memory pool cleans everything related to
+// the object.
+//
+// Here are example of good candidates, Tokens, string.
 //////////////////////////////////////////////////////////////////////////////
+
+// So far it only request new Block and keep using it. It won't release
+// any memory right now, or it even doesn't let MemPool know a Block is free.
+// TODO: We will come back to this.
 
 #ifndef __MEMPOOL_H__
 #define __MEMPOOL_H__
@@ -39,7 +52,7 @@ struct Block {
 class MemPool {
 private:
   std::vector<Block> mBlocks;
-  int                 mFirstAvail;// first block available; -1 means no available
+  int                mFirstAvail;// first block available; -1 means no available
 public:
   MemPool() {mFirstAvail = -1;}
   ~MemPool();

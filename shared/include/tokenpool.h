@@ -36,28 +36,15 @@
 
 class Token;
 
-// TokenPool will request/release memory on the Block level.
-// So far it only request new Block and keep (re)using it. It won't release
-// any memory right now, or it even doesn't let MemPool know a Block is free.
-// TODO: We will come back to this.
-
 class TokenPool {
 private:
-  MemPool               mMP;       //
-  std::vector<char *>   mBlocks;
-  std::vector<unsigned> mTags;
-  unsigned              mCurBlock;
-  unsigned              mCurPos;   // current available position in mCurBlock.
-                                   // It's offset from starting of mCurBlock
+  MemPool mMemPool;
 public:
   std::vector<Token*>   mTokens;
 
-private:
-  char* NewBlock();
-
 public:
-  TokenPool();
-  ~TokenPool(){};   // memory is freed in destructor of mMP.
+  TokenPool() {}
+  ~TokenPool(){}   // memory is freed in destructor of mMP.
 
   char* NewToken(unsigned);
 };
