@@ -25,6 +25,7 @@
 #define __AST_TYPE_H__
 
 #include "ruletable.h"   // to include TypeId
+#include "mempool.h"
 
 class IdentifierNode;
 
@@ -42,13 +43,41 @@ public:
   }mType;
 
 public:
+  ASTType() {mCat = Primitive;}
+  ~ASTType(){}
+
+public:
   bool IsPrim() {return mCat == Primitive;}
   bool IsUser() {return mCat == User;}
 
   IdentifierNode* GetIdentifier() {return mType.mIdentifier;}
   TypeId          GetPrimType()   {return mType.mPrimType;}
+  void SetPrimType(TypeId id)            { mCat = Primitive; mType.mPrimType = id; }
+  void SetUserType(IdentifierNode *node) { mCat = User; mType.mIdentifier = node; }
 
   const char* GetName();  // type name
+};
+
+///////////////////////////////////////////////////////////////////////////////
+//                      ASTTypePool
+// The size of ASTType is fixed, so it's good to use MemPool for the storage.
+///////////////////////////////////////////////////////////////////////////////
+
+class ASTTypePool {
+private:
+  MemPool               mMemPool;
+  std::vector<ASTType*> mTypes;
+
+  void InitSystemTypes();
+public:
+  ASTTypePool();
+  ~ASTTypePool();
+
+  ASTType* FindUserType(IdentifierNode *node);
+  ASTType* FindOrCreateUserType(IdentifierNode *node);
+
+  ASTType* FindPrimType(const char *keyword);
+  ASTType* FindPrimType(TypeId id);
 };
 
 #endif

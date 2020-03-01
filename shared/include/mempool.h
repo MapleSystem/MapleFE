@@ -53,6 +53,7 @@ class MemPool {
 private:
   std::vector<Block> mBlocks;
   int                mFirstAvail;// first block available; -1 means no available
+
 public:
   MemPool() {mFirstAvail = -1;}
   ~MemPool();
