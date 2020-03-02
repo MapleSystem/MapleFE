@@ -13,20 +13,15 @@
 * See the Mulan PSL v1 for more details.
 */
 
-#include "ast_module.h"
-#include "ast.h"
+#include "ast_scope.h"
 
-ASTModule::ASTModule() {
-  mRootScope = new ASTScope();
-}
-
-ASTModule::~ASTModule() {
-  // free trees
-  std::vector<ASTTree*>::iterator it = mTrees.begin();
-  for (; it != mTrees.end(); it++) {
-    ASTTree *tree = *it;
-    if (tree)
-      delete tree;
+ASTScopePool::~ASTScopePool() {
+  // free scopes
+  std::vector<ASTScope*>::iterator scope_it = mScopes.begin();
+  for (; scope_it != mScopes.end(); scope_it++) {
+    ASTScope *scope = *scope_it;
+    if (scope)
+      delete scope;
   }
-  mTrees.clear();
+  mScopes.clear();
 }

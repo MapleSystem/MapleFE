@@ -60,6 +60,9 @@ const char* ASTType::GetName() {
 //                           ASTTypePool                                //
 //////////////////////////////////////////////////////////////////////////
 
+// The global Pool for ASTType
+ASTTypePool gASTTypePool;
+
 ASTTypePool::ASTTypePool() {
   InitSystemTypes();
 }

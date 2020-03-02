@@ -215,27 +215,6 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////
-//                         AST Scope
-// Scope in a file are arranged as a tree. The root of each tree
-// is a top level of scope in the module. However, the module has a topmost
-// scope which could contain some file level variables.
-////////////////////////////////////////////////////////////////////////////
-
-class ASTScope {
-public:
-  ASTScope              *mParent;
-  std::vector<ASTScope*> mChildren;
-  TreeNode              *mTree;      // corresponding TreeNode
-  std::vector<IdentifierNode*> mIdentifiers;  // Local identifiers
-public:
-  ASTScope() {}
-  ~ASTScope() {}
-
-  void AddChildScope(ASTScope *s) {mChildren.push_back(s);}
-  void AddIdentifier(IdentifierNode *n) {mIdentifiers.push_back(n);}
-};
-
-////////////////////////////////////////////////////////////////////////////
 //                  The AST Tree
 ////////////////////////////////////////////////////////////////////////////
 

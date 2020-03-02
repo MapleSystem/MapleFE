@@ -61,6 +61,7 @@ public:
 ///////////////////////////////////////////////////////////////////////////////
 //                      ASTTypePool
 // The size of ASTType is fixed, so it's good to use MemPool for the storage.
+// The ASTType pool is global, across all modules.
 ///////////////////////////////////////////////////////////////////////////////
 
 class ASTTypePool {
@@ -69,6 +70,7 @@ private:
   std::vector<ASTType*> mTypes;
 
   void InitSystemTypes();
+
 public:
   ASTTypePool();
   ~ASTTypePool();
@@ -79,5 +81,8 @@ public:
   ASTType* FindPrimType(const char *keyword);
   ASTType* FindPrimType(TypeId id);
 };
+
+// A global pool for all ASTType-s.
+extern ASTTypePool gASTTypePool;
 
 #endif

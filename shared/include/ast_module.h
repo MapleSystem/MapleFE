@@ -18,6 +18,8 @@
 
 #include <vector>
 
+#include "ast_scope.h"
+
 class ASTTree;
 class ASTScope;
 
@@ -28,11 +30,10 @@ public:
                                   // Everything else will be treated as a TreeNode, not a tree,
                                   // even if it's a local class.
                                   // Memory is released in ~ASTModule();
-  std::vector<ASTScope*> mScopes; // All TOP scopes. The inside scopes can be traversed
-                                  // through the scope tree.
-                                  // Memory is released in ~ASTModule();
   ASTScope              *mRootScope; // the scope corresponding to a module. All other scopes
                                      // are children of mRootScope.
+  ASTScopePool           mScopePool; // All the scopes are store in this pool. It also contains
+                                     // a vector of ASTScope pointer for traversal. 
 public:
   ASTModule();
   ~ASTModule();
