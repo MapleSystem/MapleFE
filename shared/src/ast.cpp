@@ -75,8 +75,6 @@ TreeNode* ASTTree::NewTreeNode(AppealNode *appeal_node, std::map<AppealNode*, Tr
   }
 
   RuleTable *rule_table = appeal_node->GetTable();
-  if (rule_table->mNumAction > 1)
-    MERROR("Need further implementation!!!");
 
   for (unsigned i = 0; i < rule_table->mNumAction; i++) {
     Action *action = rule_table->mActions + i;
@@ -87,18 +85,22 @@ TreeNode* ASTTree::NewTreeNode(AppealNode *appeal_node, std::map<AppealNode*, Tr
       // find the appeal node child
       unsigned elem_idx = action->mElems[j];
       AppealNode *child = appeal_node->GetSortedChildByIndex(elem_idx);
-      MASSERT(child && "Couldnot find sorted child of an index");
 
       Param p;
-      std::map<AppealNode*, TreeNode*>::iterator it = map.find(child);
-      if (it == map.end()) {
-        // only token children could have NO tree node.
-        MASSERT(child->IsToken() && "A RuleTable node has no tree node?");
-        p.mIsTreeNode = false;
-        p.mData.mToken = child->GetToken();
+      if (child) {
+        p.mIsEmpty = false;
+        std::map<AppealNode*, TreeNode*>::iterator it = map.find(child);
+        if (it == map.end()) {
+          // only token children could have NO tree node.
+          MASSERT(child->IsToken() && "A RuleTable node has no tree node?");
+          p.mIsTreeNode = false;
+          p.mData.mToken = child->GetToken();
+        } else {
+          p.mIsTreeNode = true;
+          p.mData.mTreeNode = it->second;
+        }
       } else {
-        p.mIsTreeNode = true;
-        p.mData.mTreeNode = it->second;
+        p.mIsEmpty = true;
       }
       mBuilder->AddParam(p);
     }

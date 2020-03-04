@@ -41,6 +41,8 @@ all modules are as below.
 
 * BuildDecl
   Format: BuildDecl(Type, Variable)
+  The Decl will be added to its scope. Every Decl has a scope which is the nearest one
+  enclosing it.
 
 * AddAttribute
   Format: AddAttribute(Attribute list)

@@ -35,6 +35,7 @@
 class Token;
 
 struct Param {
+  bool mIsEmpty;    // some parameters could be missing
   bool mIsTreeNode;
   union {
     TreeNode   *mTreeNode;
@@ -48,8 +49,11 @@ public:
   unsigned                mActionId;
   std::vector<Param>      mParams;
 
-  // Pending declarations before their scope is created
+  // 1. Pending declarations before their scope is created
+  // 2. The last created Decl node. It will be referenced by the
+  //    following AddAttribute() or other functions.
   std::vector<TreeNode*>  mPendingDecls;
+  TreeNode               *mLastDecl;
 
   TreePool               *mTreePool;
 public:

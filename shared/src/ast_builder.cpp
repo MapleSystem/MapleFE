@@ -137,9 +137,8 @@ TreeNode* ASTBuilder::BuildReturn() {
 // Issues in building declarations.
 // 1) First we are going to create an IdentifierNode, which should be attached
 //    to a ASTScope.
-// 2) The current scope should be able to locate. However, the problem is the tree
-//    is created in order of children-first, so the scope is not there yet.
-//    We need have a list of these pending declarations until the scope is created.
+// 2) The tree is created in order of children-first, so the scope is not there yet.
+//    We need have a list of pending declarations until the scope is created.
 ////////////////////////////////////////////////////////////////////////////////
 
 // BuildDecl takes two param
