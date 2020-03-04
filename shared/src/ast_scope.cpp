@@ -15,13 +15,37 @@
 
 #include "ast_scope.h"
 
-ASTScopePool::~ASTScopePool() {
-  // free scopes
-  std::vector<ASTScope*>::iterator scope_it = mScopes.begin();
-  for (; scope_it != mScopes.end(); scope_it++) {
-    ASTScope *scope = *scope_it;
-    if (scope)
-      delete scope;
+ASTScope::ASTScope(ASTScope *parent) {
+  if (parent)
+    SetParent(parent);
+}
+
+void ASTScope::AddChild(ASTScope *s) {
+  std::vector<ASTScope*>::iterator it = mChildren.begin();
+  for (; it != mChildren.end(); it++) {
+    if (*it == s)
+      return;
   }
-  mScopes.clear();
+
+  mChildren.push_back(s);
+  s->SetParent(this);
+}
+
+///////////////////////////////////////////////////////////////////
+//               AST Scope Pool
+///////////////////////////////////////////////////////////////////
+
+ASTScopePool::~ASTScopePool() {
+}
+
+// Create a new scope under 'parent'.
+ASTScope* ASTScopePool::NewScope(ASTScope *parent) {
+  char *addr = mMemPool.Alloc(sizeof(ASTScope));
+  ASTScope *s = NULL;
+  if (parent)
+    s = new (addr) ASTScope(parent);
+  else
+    s = new (addr) ASTScope();
+  mScopes.push_back(s);
+  return s;
 }

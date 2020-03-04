@@ -25,7 +25,7 @@
 //                         AST Scope
 // Scope in a file are arranged as a tree. The root of each tree
 // is a top level of scope in the module. However, the module has a topmost
-// scope which could contain some file level variables.
+// scope which could contain the file level variables.
 ////////////////////////////////////////////////////////////////////////////
 
 class ASTScope {
@@ -35,10 +35,14 @@ public:
   TreeNode              *mTree;      // corresponding TreeNode
   std::vector<IdentifierNode*> mIdentifiers;  // Local identifiers
 public:
-  ASTScope() {}
+  ASTScope(){}
+  ASTScope(ASTScope *p);
   ~ASTScope() {}
 
-  void AddChildScope(ASTScope *s) {mChildren.push_back(s);}
+  // It's the caller's duty to make sure p is not NULL
+  void SetParent(ASTScope *p) {mParent = p; p->AddChild(this);}
+
+  void AddChild(ASTScope *s);
   void AddIdentifier(IdentifierNode *n) {mIdentifiers.push_back(n);}
 };
 
@@ -56,7 +60,7 @@ public:
   ASTScopePool() {}
   ~ASTScopePool();
   
-  ASTScope* NewScope();
+  ASTScope* NewScope(ASTScope *parent);
 };
 
 #endif

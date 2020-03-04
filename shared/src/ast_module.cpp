@@ -17,7 +17,8 @@
 #include "ast.h"
 
 ASTModule::ASTModule() {
-  mRootScope = new ASTScope();
+  mRootScope = mScopePool.NewScope(NULL);
+  mCurrScope = mRootScope;
 }
 
 ASTModule::~ASTModule() {

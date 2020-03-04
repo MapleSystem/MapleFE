@@ -250,7 +250,8 @@
 Parser::Parser(const char *name) : filename(name) {
   mLexer = new Lexer();
   const std::string file(name);
-  // init lexer
+
+  mModule.SetFileName(name);
   mLexer->PrepareForFile(file);
   mCurToken = 0;
   mPending = 0;
@@ -1965,7 +1966,6 @@ AppealNode* Parser::SimplifyShrinkEdges(AppealNode *node) {
 ////////////////////////////////////////////////////////////////////////////////////
 
 ASTTree* Parser::BuildAST() {
-  return NULL;
   done_nodes.clear();
 
   ASTTree *tree = new ASTTree();
