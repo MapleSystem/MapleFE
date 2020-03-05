@@ -105,8 +105,12 @@ TreeNode* ASTTree::NewTreeNode(AppealNode *appeal_node, std::map<AppealNode*, Tr
       mBuilder->AddParam(p);
     }
 
-    // Build the tree
-    sub_tree = mBuilder->Build();
+    // For multiple actions of a rule, there should be only action which create tree.
+    // The others are just for adding attribute or else. So we take the only one which
+    // creates tree.
+    TreeNode *temp_tree = mBuilder->Build();
+    if (temp_tree)
+      sub_tree = temp_tree;
   }
 
   if (sub_tree)

@@ -68,12 +68,6 @@ ASTTypePool::ASTTypePool() {
 }
 
 ASTTypePool::~ASTTypePool() {
-  std::vector<ASTType*>::iterator it = mTypes.begin();
-  for (; it != mTypes.end(); it++ ){
-    ASTType *t = *it;
-    delete t;
-  }
-  mTypes.clear();
 }
 
 void ASTTypePool::InitSystemTypes() {

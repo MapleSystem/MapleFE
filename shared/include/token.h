@@ -90,6 +90,7 @@ public:
   IdentifierToken(const char *s) : Token(TT_ID, TK_Name), mName(s) {}
   IdentifierToken() : Token(TT_ID, TK_Name), mName(NULL) {}
 
+  const char* GetName() {return mName;}
   void Dump();
 };
 

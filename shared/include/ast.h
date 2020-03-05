@@ -184,7 +184,10 @@ public:
 //    the nodes by merging multiple nodes into one if they are actually
 //    semantically equal. For example, a same variable appears in multiple
 //    places in a function, and these multiple appearance will be same node.
-// 2) The name is pointing to the stringpool, which is residing in Lexer.
+// 2) The IdentifierNode at the declaration point will have mType. The other
+//    appearance of the identifier node won't have mType. After merging, they
+//    will point to the same node.
+// 3) The name is pointing to the stringpool, which is residing in Lexer.
 //    [TODO] we'll have standalone stringpool...
 //////////////////////////////////////////////////////////////////////////
 
@@ -194,9 +197,11 @@ public:
   ASTType    *mType;
 public:
   IdentifierNode(const char *s) : mName(s) {mKind = NK_Identifier; mType = NULL;}
+  IdentifierNode(const char *s, ASTType *t) : mName(s), mType(t) {mKind = NK_Identifier;}
   ~IdentifierNode(){}
 
   const char* GetName() {return mName;}
+  void SetType(ASTType *t) {mType = t;}
   void Dump(unsigned);
 };
 

@@ -141,11 +141,46 @@ TreeNode* ASTBuilder::BuildReturn() {
 //    We need have a list of pending declarations until the scope is created.
 ////////////////////////////////////////////////////////////////////////////////
 
-// BuildDecl takes two param
+// BuildDecl takes two parameters, type and name
 TreeNode* ASTBuilder::BuildDecl() {
-  return NULL;
+  std::cout << "In build Decl" << std::endl;
+
+  MASSERT(mParams.size() == 2 && "BinaryDecl has NO 2 params?");
+  Param p_type = mParams[0];
+  Param p_name = mParams[1];
+
+  // Step 1. Get the Type
+  //         We only deal with keyword type right now.
+  if (p_type.mIsTreeNode) {
+    MERROR("We only handle keyword type now. To Be Implemented.");
+  }
+
+  Token *token = p_type.mData.mToken;
+  if (!token->IsKeyword())
+    MERROR("Type is not a keyword.");
+
+  KeywordToken *kw_token = (KeywordToken*)token;
+  ASTType *type = gASTTypePool.FindPrimType(kw_token->GetName());
+
+  // Step 2. Get the name, which is already a IdentifierNode.
+  if (!p_name.mIsTreeNode)
+    MERROR("The variable name should be a IdentifierNode already, but actually NOT?");
+
+  IdentifierNode *n = p_name.mData.mTreeNode;
+  if (!n->IsIdentifier())
+    MERROR("Variable is not an identifier.");
+  n->SetType(type);
+
+  // Step 3. Save this decl
+  mPendingDecls.push_back((TreeNode*)n);
+  mLastDecl = (TreeNode*)n;
+
+  return n;
 }
 
 TreeNode* ASTBuilder::AddAttribute() {
+  std::cout << "In AddAttribute" << std::endl;
+  Param p_attr = mParams[0];
+  // we simply return NULL for now.
   return NULL;
 }
