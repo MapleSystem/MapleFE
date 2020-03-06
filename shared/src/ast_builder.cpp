@@ -17,6 +17,7 @@
 #include "ast_builder.h"
 #include "token.h"
 #include "ruletable.h"
+#include "ast_scope.h"
 
 #include "massert.h"
 
@@ -183,4 +184,16 @@ TreeNode* ASTBuilder::AddAttribute() {
   Param p_attr = mParams[0];
   // we simply return NULL for now.
   return NULL;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//                   Other Functions
+////////////////////////////////////////////////////////////////////////////////
+
+void ASTBuilder::AssignRemainingDecls(ASTScope *scope) {
+  std::vector<TreeNode *>::iterator it = mPendingDecls.begin();
+  for (; it != mPendingDecls.end(); it++) {
+    TreeNode *n = *it;
+    scope->AddDecl(n);
+  }
 }

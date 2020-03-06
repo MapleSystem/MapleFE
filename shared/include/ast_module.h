@@ -35,7 +35,6 @@ public:
                                   // Memory is released in ~ASTModule();
   ASTScope              *mRootScope; // the scope corresponding to a module. All other scopes
                                      // are children of mRootScope.
-  ASTScope              *mCurrScope; // current working scope.
   ASTScopePool           mScopePool; // All the scopes are store in this pool. It also contains
                                      // a vector of ASTScope pointer for traversal. 
 public:
@@ -43,8 +42,9 @@ public:
   ~ASTModule();
 
   void SetFileName(const char *f) {mFileName = f;}
-  void SetCurrScope(ASTScope *scp){mCurrScope = scp;}
   void AddTree(ASTTree* t) { mTrees.push_back(t); }
+
+  void Dump();
 };
 
 #endif

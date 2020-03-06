@@ -114,3 +114,15 @@ Assign
     a
     b
 
+
+============= Module ===========
+[Global Decls]
+
+== Sub Tree ==
+Assign
+  c
+  Add
+    a
+    b
+
+

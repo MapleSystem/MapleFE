@@ -18,7 +18,6 @@
 
 ASTModule::ASTModule() {
   mRootScope = mScopePool.NewScope(NULL);
-  mCurrScope = mRootScope;
 }
 
 ASTModule::~ASTModule() {
@@ -30,4 +29,27 @@ ASTModule::~ASTModule() {
       delete tree;
   }
   mTrees.clear();
+}
+
+void ASTModule::Dump() {
+  std::cout << "============= Module ===========" << std::endl;
+
+  // step 1. Dump global decls.
+  std::cout << "[Global Decls]" << std::endl;
+  std::vector<TreeNode*>::iterator it = mRootScope->mDecls.begin();
+  for (; it != mRootScope->mDecls.end(); it++) {
+    TreeNode *n = *it;
+    MASSERT(n->IsIdentifier() && "Decl is not an IdentifierNode.");
+    IdentifierNode *in = (IdentifierNode*) n;
+    n->Dump(0);
+  }
+
+  std::cout << std::endl;
+
+  // step 2. Dump the top trees.
+  std::vector<ASTTree*>::iterator tree_it = mTrees.begin();
+  for (; tree_it != mTrees.end(); tree_it++) {
+    ASTTree *tree = *tree_it;
+    tree->Dump(0);
+  }
 }

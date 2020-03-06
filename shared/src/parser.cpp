@@ -24,6 +24,7 @@
 #include "ruletable_util.h"
 #include "gen_debug.h"
 #include "ast.h"
+#include "ast_builder.h"
 
 //////////////////////////////////////////////////////////////////////////////////
 //                   Top Issues in Parsing System
@@ -402,6 +403,8 @@ bool Parser::Parse() {
       break;
   }
 
+  mModule.Dump();
+
   return succ;
 }
 
@@ -549,8 +552,10 @@ bool Parser::ParseStmt() {
     PatchWasSucc(mRootNode->mSortedChildren[0]);
     SimplifySortedTree();
     ASTTree *tree = BuildAST();
-    if (tree)
+    if (tree) {
+      tree->mBuilder->AssignRemainingDecls(mModule.mRootScope);
       mModule.AddTree(tree);
+    }
   }
 
   return succ;

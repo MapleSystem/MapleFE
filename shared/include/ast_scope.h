@@ -32,8 +32,8 @@ class ASTScope {
 public:
   ASTScope              *mParent;
   std::vector<ASTScope*> mChildren;
-  TreeNode              *mTree;      // corresponding TreeNode
-  std::vector<IdentifierNode*> mIdentifiers;  // Local identifiers
+  TreeNode              *mTree;   // corresponding TreeNode
+  std::vector<TreeNode*> mDecls;  // Local Decls
 public:
   ASTScope(){}
   ASTScope(ASTScope *p);
@@ -43,7 +43,7 @@ public:
   void SetParent(ASTScope *p) {mParent = p; p->AddChild(this);}
 
   void AddChild(ASTScope *s);
-  void AddIdentifier(IdentifierNode *n) {mIdentifiers.push_back(n);}
+  void AddDecl(TreeNode *n) {mDecls.push_back(n);}
 };
 
 ////////////////////////////////////////////////////////////////////////////

@@ -160,6 +160,7 @@ TreeNode* ASTTree::NewTreeNode(AppealNode *appeal_node, std::map<AppealNode*, Tr
 void ASTTree::Dump(unsigned indent) {
   DUMP0("== Sub Tree ==");
   mRootNode->Dump(indent);
+  std::cout << std::endl;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
