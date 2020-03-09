@@ -23,6 +23,7 @@ rule VariableModifier : ONEOF(
   "final")
 
 rule VariableDeclaratorList : VariableDeclarator + ZEROORMORE(',' + VariableDeclarator)
+  attr.action: BuildVarList(%1, %2)
 
 rule VariableDeclarator : VariableDeclaratorId + ZEROORONE('=' + VariableInitializer)
 

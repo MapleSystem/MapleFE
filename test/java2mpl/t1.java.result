@@ -51,7 +51,9 @@ Matched 3 tokens.
 [2] Table TblLocalVariableDeclaration@0: 4,5,
 [3] Token
 [4:2] Token
-[5:3] Token
+[5] Table TblVariableDeclaratorList@1: 6,
+[6:1] Token
+In build Variable List
 In build Decl
 In AddAttribute
 Attached a tree node from Child

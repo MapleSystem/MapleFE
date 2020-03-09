@@ -21,6 +21,38 @@
 
 #include "massert.h"
 
+//////////////////////////////////////////////////////////////////////////////////////
+//                          Utility    Functions
+//////////////////////////////////////////////////////////////////////////////////////
+
+#undef  OPERATOR
+#define OPERATOR(T, D)  {OPR_##T, D},
+OperatorDesc gOperatorDesc[OPR_NA] = {
+#include "supported_operators.def"
+};
+
+unsigned GetOperatorProperty(OprId id) {
+  for (unsigned i = 0; i < OPR_NA; i++) {
+    if (gOperatorDesc[i].mOprId == id)
+      return gOperatorDesc[i].mDesc;
+  }
+  MERROR("I shouldn't reach this point.");
+}
+
+#undef  OPERATOR
+#define OPERATOR(T, D) case OPR_##T: return #T;
+static const char* GetOperatorName(OprId opr) {
+  switch (opr) {
+#include "supported_operators.def"
+  default:
+    return "NA";
+  }
+};
+
+//////////////////////////////////////////////////////////////////////////////////////
+//                             ASTTree
+//////////////////////////////////////////////////////////////////////////////////////
+
 ASTTree::ASTTree() {
   mRootNode = NULL;
   mBuilder = new ASTBuilder(&mTreePool);
@@ -106,11 +138,9 @@ TreeNode* ASTTree::NewTreeNode(AppealNode *appeal_node, std::map<AppealNode*, Tr
     }
 
     // For multiple actions of a rule, there should be only action which create tree.
-    // The others are just for adding attribute or else. So we take the only one which
-    // creates tree.
-    TreeNode *temp_tree = mBuilder->Build();
-    if (temp_tree)
-      sub_tree = temp_tree;
+    // The others are just for adding attribute or else, and return the same tree
+    // with additional attributes.
+    sub_tree = mBuilder->Build();
   }
 
   if (sub_tree)
@@ -163,10 +193,6 @@ void ASTTree::Dump(unsigned indent) {
   std::cout << std::endl;
 }
 
-//////////////////////////////////////////////////////////////////////////////////////
-//                          Tree building functions
-//////////////////////////////////////////////////////////////////////////////////////
-
 TreeNode* ASTTree::BuildBinaryOperation(TreeNode *childA, TreeNode *childB, OprId id) {
   BinaryOperatorNode *n = (BinaryOperatorNode*)mTreePool.NewTreeNode(sizeof(BinaryOperatorNode));
   new (n) BinaryOperatorNode(id);
@@ -178,7 +204,7 @@ TreeNode* ASTTree::BuildBinaryOperation(TreeNode *childA, TreeNode *childB, OprI
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
-//                          Misc    Functions
+//                               TreeNode
 //////////////////////////////////////////////////////////////////////////////////////
 
 void TreeNode::DumpIndentation(unsigned ind) {
@@ -186,29 +212,9 @@ void TreeNode::DumpIndentation(unsigned ind) {
     DUMP0_NORETURN(' ');
 }
 
-#undef  OPERATOR
-#define OPERATOR(T, D)  {OPR_##T, D},
-OperatorDesc gOperatorDesc[OPR_NA] = {
-#include "supported_operators.def"
-};
-
-unsigned GetOperatorProperty(OprId id) {
-  for (unsigned i = 0; i < OPR_NA; i++) {
-    if (gOperatorDesc[i].mOprId == id)
-      return gOperatorDesc[i].mDesc;
-  }
-  MERROR("I shouldn't reach this point.");
-}
-
-#undef  OPERATOR
-#define OPERATOR(T, D) case OPR_##T: return #T;
-static const char* GetOperatorName(OprId opr) {
-  switch (opr) {
-#include "supported_operators.def"
-  default:
-    return "NA";
-  }
-};
+//////////////////////////////////////////////////////////////////////////////////////
+//                          BinaryOperatorNode
+//////////////////////////////////////////////////////////////////////////////////////
 
 void BinaryOperatorNode::Dump(unsigned indent) {
   const char *name = GetOperatorName(mOprId);
@@ -220,6 +226,10 @@ void BinaryOperatorNode::Dump(unsigned indent) {
   DUMP_RETURN();
 }
 
+//////////////////////////////////////////////////////////////////////////////////////
+//                           UnaryOperatorNode
+//////////////////////////////////////////////////////////////////////////////////////
+
 void UnaryOperatorNode::Dump(unsigned indent) {
   const char *name = GetOperatorName(mOprId);
   DumpIndentation(indent);
@@ -227,11 +237,52 @@ void UnaryOperatorNode::Dump(unsigned indent) {
   mOpnd->Dump(indent + 2);
 }
 
+//////////////////////////////////////////////////////////////////////////////////////
+//                          IdentifierNode
+//////////////////////////////////////////////////////////////////////////////////////
+
 void IdentifierNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   DUMP0_NORETURN(mName);
 }
 
+//////////////////////////////////////////////////////////////////////////////////////
+//                          VarListNode
+//////////////////////////////////////////////////////////////////////////////////////
+
+void VarListNode::AddVar(IdentifierNode *n) {
+  if (mNum >= MAX_VAR_LIST_NUM)
+    MERROR("No more space for adding a new var in VarListNode");
+  mVars[mNum++] = n;
+}
+
+// Merge a node.
+// 'n' could be either IdentifierNode or another VarListNode.
+void VarListNode::Merge(TreeNode *n) {
+  if (n->IsIdentifier()) {
+    AddVar((IdentifierNode*)n);
+  } else if (n->IsVarList()) {
+    VarListNode *varlist = (VarListNode*)n;
+    for (unsigned i = 0; i < varlist->mNum; i++)
+      AddVar(varlist->mVars[i]);
+  } else {
+    MERROR("VarListNode cannot merge a non-identifier or non-varlist node");
+  }
+}
+
+void VarListNode::Dump(unsigned indent) {
+  DumpIndentation(indent);
+  for (unsigned i = 0; i < mNum; i++) {
+    DUMP0_NORETURN(mVars[i]->GetName());
+    if (i != mNum-1)
+      DUMP0_NORETURN(",");
+  }
+}
+//////////////////////////////////////////////////////////////////////////////////////
+//                          LiteralNode
+//////////////////////////////////////////////////////////////////////////////////////
+
 void LiteralNode::Dump(unsigned indent) {
   DumpIndentation(indent);
 }
+

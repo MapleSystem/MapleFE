@@ -167,23 +167,72 @@ TreeNode* ASTBuilder::BuildDecl() {
   if (!p_name.mIsTreeNode)
     MERROR("The variable name should be a IdentifierNode already, but actually NOT?");
 
-  IdentifierNode *n = p_name.mData.mTreeNode;
-  if (!n->IsIdentifier())
-    MERROR("Variable is not an identifier.");
-  n->SetType(type);
+  TreeNode *n = p_name.mData.mTreeNode;
+  if (!n->IsIdentifier() && !n->IsVarList())
+    MERROR("Variable is not an identifier or VarList.");
+
+  if (n->IsIdentifier()) {
+    ((IdentifierNode *)n)->SetType(type);
+  } else if (n->IsVarList()) {
+    VarListNode *vl = (VarListNode*)n;
+    for (unsigned i = 0; i < vl->mNum; i++)
+      vl->mVars[i]->SetType(type);
+  }
 
   // Step 3. Save this decl
   mPendingDecls.push_back((TreeNode*)n);
-  mLastDecl = (TreeNode*)n;
+  mLastTreeNode = (TreeNode*)n;
 
   return n;
+}
+
+// BuildVariableList takes two parameters, var 1 and var 2
+TreeNode* ASTBuilder::BuildVarList() {
+  std::cout << "In build Variable List" << std::endl;
+
+  MASSERT(mParams.size() == 2 && "BuildVarList has NO 2 params?");
+  Param p_var_a = mParams[0];
+  Param p_var_b = mParams[1];
+
+  // Both variable should have been created as tree node.
+  if (!p_var_a.mIsTreeNode || !p_var_b.mIsTreeNode) {
+    MERROR("The var in BuildVarList is not a treenode");
+  }
+
+  TreeNode *node_a = p_var_a.mIsEmpty ? NULL : p_var_a.mData.mTreeNode;
+  TreeNode *node_b = p_var_b.mIsEmpty ? NULL : p_var_b.mData.mTreeNode;
+
+  // There are a few different scenarios.
+  // (1) node_a is a VarListNode, and we dont care about node_b
+  // (2) node_a is an IdentifierNode, node_b is a VarListNode
+  // (4) both are IdentifierNode
+  // The solution is simple, pick an existing varListNode as the result
+  // or create a new one. Merge the remaining node(s) to the result node.
+
+  VarListNode *node_ret = NULL;
+  if (node_a && node_a->IsVarList()) {
+    node_ret = (VarListNode*)node_a;
+    node_ret->Merge(node_b);
+  } else if (node_b && node_b->IsVarList()) {
+    node_ret = (VarListNode*)node_b;
+    node_ret->Merge(node_a);
+  } else {
+    // both nodes are not VarListNode
+    node_ret = (VarListNode*)mTreePool->NewTreeNode(sizeof(VarListNode));
+    new (node_ret) VarListNode();
+    if (node_a)
+      node_ret->Merge(node_a);
+    if (node_b)
+      node_ret->Merge(node_b);
+  }
+
+  return node_ret;
 }
 
 TreeNode* ASTBuilder::AddAttribute() {
   std::cout << "In AddAttribute" << std::endl;
   Param p_attr = mParams[0];
-  // we simply return NULL for now.
-  return NULL;
+  return mLastTreeNode;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

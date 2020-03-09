@@ -68,9 +68,9 @@ private:
   std::vector<unsigned>   mScopeStartDecls;
   ASTScope               *mCurrScope; // current working scope.
 
-  // The last created Decl node. It will be referenced by the
+  // The last created node. It will be referenced by the
   // following AddAttribute() or other functions.
-  TreeNode               *mLastDecl;
+  TreeNode               *mLastTreeNode;
 
 public:
   ASTBuilder(TreePool *p) : mTreePool(p) {}
@@ -89,6 +89,7 @@ public:
   TreeNode* BuildAssignment();
   TreeNode* BuildReturn();
   TreeNode* BuildDecl();
+  TreeNode* BuildVarList();
   TreeNode* AddAttribute();
 
   // Move the remaining Pending Decls into the ASTScope, which is mostly

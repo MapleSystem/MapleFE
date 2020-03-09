@@ -39,8 +39,8 @@ void ASTModule::Dump() {
   std::vector<TreeNode*>::iterator it = mRootScope->mDecls.begin();
   for (; it != mRootScope->mDecls.end(); it++) {
     TreeNode *n = *it;
-    MASSERT(n->IsIdentifier() && "Decl is not an IdentifierNode.");
-    IdentifierNode *in = (IdentifierNode*) n;
+    MASSERT((n->IsIdentifier() || n->IsVarList())
+            && "Decl is not an IdentifierNode or VarListNode.");
     n->Dump(0);
   }
 

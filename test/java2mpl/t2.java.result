@@ -76,6 +76,13 @@ Matched 5 tokens.
 [7:2] Table TblVariableDeclaratorList_sub2@2: 8,9,
 [8] Token
 [9:2] Token
+Attached a tree node from Child
+In build Variable List
+In build Decl
+In AddAttribute
+Attached a tree node from Child
+== Sub Tree ==
+a,b
 ======= Main sortout Dump SortOut =======
 [1] Table TblStatement@5: 2,
 [2] Table TblStatementWithoutTrailingSubstatement@5: 3,
@@ -116,3 +123,21 @@ Matched 9 tokens.
 [4:1] Token
 [5:2] Token
 [6:3] Token
+In assignment --> BuildBinary
+In build binary
+Attached a tree node from Child
+== Sub Tree ==
+Assign
+  a
+  
+
+============= Module ===========
+[Global Decls]
+a,b
+== Sub Tree ==
+a,b
+== Sub Tree ==
+Assign
+  a
+  
+

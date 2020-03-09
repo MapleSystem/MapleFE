@@ -36,13 +36,33 @@ all modules are as below.
 * BuildAssignment
   Format: BuildAssignment(Left operand, Operator, Right Operand)
           The operator is the assignment in the language
+  The reason we take Operator as an operand is there could be different types of assignment,
+  like +=, -=, etc.
 
 * BuildReturn
 
 * BuildDecl
   Format: BuildDecl(Type, Variable)
+
   The Decl will be added to its scope. Every Decl has a scope which is the nearest one
   enclosing it.
+
+* BuildVarList
+  Format: BuildVarlList(Variable_A, Variable_B)
+
+  1) This is the build a list of variables. This could be used in multiple place, as long as
+     they have the syntax like: a, b, c. For example, in variable declarations like
+       int a, b;
+     or in function parameters like
+       foo (a ,b);
+     Right now we only support two parameters. It can be extended later if needed.
+
+  2) The ',' in between is a separator which could be varied between different languages. some
+     language may use whitespace as separator between variables.
+  3) The result will be a VariableListNode, which contains a list of IdentifierNode (Variable).
+  4) If a variable is a tree containing multiple variables, the function will do a consolidatation
+     to put all the variables in the list, and removing the tree from the resulting tree.
+  5) If a variable is a already a VariableListNode, 4) is applied too.
 
 * AddAttribute
   Format: AddAttribute(Attribute list)

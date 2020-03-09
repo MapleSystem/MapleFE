@@ -53,6 +53,7 @@
 
 enum NodeKind {
   NK_Identifier,
+  NK_VarList,     // A varialble list
   NK_Literal,
   NK_UnaOperator,
   NK_BinOperator,
@@ -79,6 +80,7 @@ public:
   virtual ~TreeNode() {}
 
   bool IsIdentifier() {return mKind == NK_Identifier;}
+  bool IsVarList()    {return mKind == NK_VarList;}
   bool IsLiteral()    {return mKind == NK_Literal;}
   bool IsUnaOperator(){return mKind == NK_UnaOperator;}
   bool IsBinOperator(){return mKind == NK_BinOperator;}
@@ -202,6 +204,31 @@ public:
 
   const char* GetName() {return mName;}
   void SetType(ASTType *t) {mType = t;}
+  void Dump(unsigned);
+};
+
+//////////////////////////////////////////////////////////////////////////
+//                           VarList Node
+// Why do we need a VarListNode? Often in the program we have multiple
+// variables like parameters in function, or varable list in declaration.
+//////////////////////////////////////////////////////////////////////////
+
+// 1. We decided to give the children a fixed number.
+//    It's fixed sized, can be allocated by MemPool. All var-s have been
+//    created and allocated by MemPool.
+// 2. Each Var in the VarList is an
+
+#define MAX_VAR_LIST_NUM 12
+class VarListNode : public TreeNode {
+public:
+  IdentifierNode *mVars[MAX_VAR_LIST_NUM];
+  unsigned        mNum;
+public:
+  VarListNode() {mKind = NK_VarList;}
+  ~VarListNode() {}
+
+  void AddVar(IdentifierNode *n);
+  void Merge(TreeNode*);
   void Dump(unsigned);
 };
 
