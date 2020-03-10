@@ -39,7 +39,7 @@ MemPool::~MemPool() {
 
 
 char* MemPool::AllocBlock() {
-  char *addr = (char*)malloc(BLOCK_SIZE);
+  char *addr = (char*)malloc(mBlockSize);
   Block block = {addr, 0};
   mBlocks.push_back(block);
   return addr;
@@ -58,9 +58,8 @@ char* MemPool::AllocBlock() {
 char* MemPool::Alloc(unsigned int size) {
   char *addr = NULL;
 
-  if (size > BLOCK_SIZE) {
+  if (size > mBlockSize)
     MERROR ("Requsted size is bigger than block size");
-  }
 
   if (mFirstAvail == -1) {
     addr = AllocBlock(); 
@@ -68,7 +67,7 @@ char* MemPool::Alloc(unsigned int size) {
     mFirstAvail = 0;
   }
 
-  int avail = BLOCK_SIZE - mBlocks[mFirstAvail].used;
+  int avail = mBlockSize - mBlocks[mFirstAvail].used;
 
   if (avail < size) { 
     mFirstAvail++;

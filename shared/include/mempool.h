@@ -37,9 +37,9 @@
 #include <vector>
 
 //  Each time when extra memory is needed, a fixed size BLOCK will be allocated.
-//  It's defined by BLOCK_SIZE. Anything above this size will not
+//  It's defined by mBlockSize. Anything above this size will not
 //  be supported.
-#define BLOCK_SIZE 4096
+#define DEFAULT_BLOCK_SIZE 4096
 
 struct Block {
   char *addr;        // starting address
@@ -49,15 +49,17 @@ struct Block {
 // So far there is nothing like free list. Everything will be released when
 // StaticMemPool is destructed.
 //
-class MemPool {
+class MemPool{
 private:
   std::vector<Block> mBlocks;
   int                mFirstAvail;// first block available; -1 means no available
+  unsigned           mBlockSize;
 
 public:
-  MemPool() {mFirstAvail = -1;}
+  MemPool() {mFirstAvail = -1; mBlockSize = DEFAULT_BLOCK_SIZE;}
   ~MemPool();
 
+  void  SetBlockSize(unsigned i) {mBlockSize = i;}
   char* AllocBlock();
   char* Alloc(unsigned int);
 };

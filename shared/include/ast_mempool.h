@@ -27,29 +27,14 @@
 
 class TreeNode;
 
-// TreePool will request/release memory on the Block level.
-// So far it only request new Block and keep (re)using it. It won't release
-// any memory right now, or it even doesn't let MemPool know a Block is free.
-// TODO: We will come back to this.
-
 class TreePool {
 private:
-  MemPool               mMP;       //
-  std::vector<char *>   mBlocks;
-  std::vector<unsigned> mTags;
-  unsigned              mCurBlock;
-  unsigned              mCurPos;   // current available position in mCurBlock.
-                                   // It's offset from starting of mCurBlock
+  MemPool mMP;
 public:
-  std::vector<TreeNode*>   mTreeNodes; // only TreeNode* is stored, no matter what's
-                                       // the exact derived class.
-
-private:
-  char* NewBlock();
-
+  std::vector<TreeNode*> mTreeNodes; // only TreeNode* is stored, no matter what's
 public:
-  TreePool();
-  ~TreePool();   // memory is freed in destructor of mMP.
+  TreePool(){}
+  ~TreePool(){}
 
   char* NewTreeNode(unsigned);
 };
