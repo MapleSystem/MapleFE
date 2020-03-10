@@ -19,6 +19,11 @@ rule ClassDeclaration : ONEOF(NormalClassDeclaration, EnumDeclaration)
 rule NormalClassDeclaration : ZEROORMORE(ClassModifier) + "class" + Identifier +
                               ZEROORONE(TypeParameters) + ZEROORONE(Superclass) +
                               ZEROORONE(Superinterfaces) + ClassBody
+attr.action : BuildClass(%3)
+attr.action : AddAttribute(%1)
+attr.action : AddClassBody(%7)
+attr.action : AddSuperClass(%5)
+attr.action : AddSuperInterface(%6)
 
 rule ClassModifier : ONEOF(Annotation, "public", "protected", "private", "abstract",
                            "static", "final", "strictfp")

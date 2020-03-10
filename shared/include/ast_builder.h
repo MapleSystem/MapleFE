@@ -88,9 +88,16 @@ public:
   TreeNode* BuildBinaryOperation();
   TreeNode* BuildAssignment();
   TreeNode* BuildReturn();
+
   TreeNode* BuildDecl();
   TreeNode* BuildVarList();
+
   TreeNode* AddAttribute();
+
+  TreeNode* BuildClass();
+  TreeNode* AddClassBody();
+  TreeNode* AddSuperClass();
+  TreeNode* AddSuperInterface();
 
   // Move the remaining Pending Decls into the ASTScope, which is mostly
   // the module's root scope. The remaining Decls are usually the global

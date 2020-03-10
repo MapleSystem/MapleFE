@@ -32,6 +32,15 @@ ACTION(BuildBinaryOperation)
 ACTION(BuildUnaryOperation)
 ACTION(BuildAssignment)
 ACTION(BuildReturn)
+
+// For variable declaration
 ACTION(BuildDecl)
 ACTION(BuildVarList)
+
+// For class/inheritance
+ACTION(BuildClass)
+ACTION(AddSuperClass)
+ACTION(AddSuperInterface)
+ACTION(AddClassBody)
+
 ACTION(AddAttribute)

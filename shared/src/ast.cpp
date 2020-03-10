@@ -284,5 +284,26 @@ void VarListNode::Dump(unsigned indent) {
 
 void LiteralNode::Dump(unsigned indent) {
   DumpIndentation(indent);
+  switch (mData.mType) {
+  case LT_IntegerLiteral:
+    DUMP0(mData.mData.mInt);
+    break;
+  case LT_FPLiteral:
+    DUMP0(mData.mData.mFloat);
+    break;
+  case LT_BooleanLiteral:
+    DUMP0(mData.mData.mBool);
+    break;
+  case LT_CharacterLiteral:
+    DUMP0(mData.mData.mChar);
+    break;
+  case LT_NullLiteral:
+    DUMP0("null");
+    break;
+  case LT_NA:
+  default:
+    DUMP0("NA Token:");
+    break;
+  }
 }
 

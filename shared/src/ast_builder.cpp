@@ -235,6 +235,30 @@ TreeNode* ASTBuilder::AddAttribute() {
   return mLastTreeNode;
 }
 
+TreeNode* ASTBuilder::BuildClass() {
+  std::cout << "In BuildClass" << std::endl;
+  Param p_attr = mParams[0];
+  return mLastTreeNode;
+}
+
+TreeNode* ASTBuilder::AddSuperClass() {
+  std::cout << "In AddSuperClass" << std::endl;
+  Param p_attr = mParams[0];
+  return mLastTreeNode;
+}
+
+TreeNode* ASTBuilder::AddSuperInterface() {
+  std::cout << "In AddSuperInterface" << std::endl;
+  Param p_attr = mParams[0];
+  return mLastTreeNode;
+}
+
+TreeNode* ASTBuilder::AddClassBody() {
+  std::cout << "In AddClassBody" << std::endl;
+  Param p_attr = mParams[0];
+  return mLastTreeNode;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 //                   Other Functions
 ////////////////////////////////////////////////////////////////////////////////

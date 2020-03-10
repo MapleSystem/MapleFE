@@ -129,7 +129,8 @@ Attached a tree node from Child
 == Sub Tree ==
 Assign
   a
-  
+  0
+
 
 ============= Module ===========
 [Global Decls]
@@ -139,5 +140,6 @@ a,b
 == Sub Tree ==
 Assign
   a
-  
+  0
+
 

@@ -64,6 +64,18 @@ all modules are as below.
      to put all the variables in the list, and removing the tree from the resulting tree.
   5) If a variable is a already a VariableListNode, 4) is applied too.
 
+* BuildClass
+  Format: BuildClass(classIdentifier)
+
+* AddSuperClass
+  Format: AddSuperClass(superclassIdentifier)
+
+* AddSuperInterface
+  Format: AddSuperInterface(superInterfaceIdentifier)
+
+* AddClassBody
+  Format: AddClassBody(classbody)
+
 * AddAttribute
   Format: AddAttribute(Attribute list)
   AddAttribute is attached together with its previous BuildDecl. They should inside the same Rule.
