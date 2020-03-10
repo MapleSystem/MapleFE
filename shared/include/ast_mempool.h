@@ -27,6 +27,14 @@
 
 class TreeNode;
 
+// TreePool contains two types of dynamic memory.
+// (1) Those managed by mMP. This is where all the TreeNode come from.
+// (2) Those managed by some containers in some TreeNodes. For example, the
+//     SmallVector of children nodes. These are maintained by containers.
+//
+// To accomodate to the two different scenarios, we add Release() to allow
+// each tree node explicitly release container-managed memory.
+
 class TreePool {
 private:
   MemPool mMP;
@@ -34,9 +42,13 @@ public:
   std::vector<TreeNode*> mTreeNodes; // only TreeNode* is stored, no matter what's
 public:
   TreePool(){}
-  ~TreePool(){}
+  ~TreePool();
 
   char* NewTreeNode(unsigned);
+  void  Release();  // Allow user to explicitly
+                    // (1) release memory by mMP
+                    // (2) release memory allocated inside each TreeNode, which
+                    //     is out of the control of mMP.
 };
 
 #endif

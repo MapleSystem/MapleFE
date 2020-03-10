@@ -15,9 +15,26 @@
 #include "ast_mempool.h"
 #include "ast.h"
 
+TreePool::~TreePool() {
+  Release();
+}
+
 char* TreePool::NewTreeNode(unsigned size) {
   char *addr = mMP.Alloc(size);
   mTreeNodes.push_back((TreeNode*)addr);
   return addr;
 }
   
+void TreePool::Release() {
+  // step 1. Release the containers in each tree node.
+  std::vector<TreeNode*>::iterator it = mTreeNodes.begin();
+  for (; it != mTreeNodes.end(); it++) {
+    TreeNode *n = *it;
+    n->Release();
+  }
+
+  mTreeNodes.clear();
+
+  // step 2. Release mMP
+  mMP.Release();
+}

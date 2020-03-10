@@ -89,13 +89,15 @@ public:
   bool IsBlock()      {return mKind == NK_Block;}
   bool IsFunction()   {return mKind == NK_Function;}
 
-  // If this is a scope. If yes, we can request the ASTScope.
   bool IsScope()      {return IsBlock() || IsFunction();}
 
   void SetParent(TreeNode *p) {mParent = p;}
 
   virtual void Dump(unsigned){}
   void DumpIndentation(unsigned);
+
+  // Release the dynamically allocated memory by this tree node.
+  virtual void Release(){}
 };
 
 //////////////////////////////////////////////////////////////////////////

@@ -54,7 +54,6 @@ private:
   std::vector<Block> mBlocks;
   int                mFirstAvail;// first block available; -1 means no available
   unsigned           mBlockSize;
-
 public:
   MemPool() {mFirstAvail = -1; mBlockSize = DEFAULT_BLOCK_SIZE;}
   ~MemPool();
@@ -62,6 +61,8 @@ public:
   void  SetBlockSize(unsigned i) {mBlockSize = i;}
   char* AllocBlock();
   char* Alloc(unsigned int);
+
+  void  Release(); // Allow users to free memory explicitly.
 };
 
 #endif  // __MEMPOOL_H__

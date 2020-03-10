@@ -30,13 +30,20 @@
 
 // Release the mBlocks
 MemPool::~MemPool() {
+  Release();
+}
+
+void MemPool::Release() {
   std::vector<Block>::iterator it;
   for (it = mBlocks.begin(); it != mBlocks.end(); it++) {
     Block block = *it;
     free(block.addr);
   }
-}
 
+  // Clear it, so that it's impossible to double free it in destructor if someone
+  // already called Release().
+  mBlocks.clear();
+}
 
 char* MemPool::AllocBlock() {
   char *addr = (char*)malloc(mBlockSize);
