@@ -51,7 +51,7 @@ struct Block {
 // StaticMemPool is destructed.
 //
 class MemPool{
-private:
+protected:
   //std::vector<Block> mBlocks;
   //int                mFirstAvail;// first block available; -1 means no available
   Block             *mCurrBlock; // Currently available block
