@@ -15,29 +15,68 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // This file contains the popular container for most data structures.
-//===----------------------------------------------------------------------===//
+//
+// [NOTE] For containers, there is one basic rule that is THE CONTAINTER ITSELF
+//        SHOULD BE SELF CONTAINED. In another word, all the memory should be
+//        contained in the container itself. Once the destructor or Release()
+//        is called, all memory should be freed.
+//
+// The user of containers need explictly call Release() to free
+// the memory, if he won't trigger the destructor of the containers. This
+// is actually common case, like tree nodes which is maintained by a memory
+// pool and won't call destructor, so any memory allocated at runtime won't
+// be released.
+//
+///////////////////////////////////////////////////////////////////////////////
 
 #ifndef __CONTAINER_H__
 #define __CONTAINER_H__
 
 #include "massert.h"
-#include "mempool.h"
 
-// The user of containers need explictly call Release() to free
-// the memory, if user won't trigger the destructor of the containers. This
-// is actually common case, like tree nodes which is maintained by a memory
-// pool and not calling destructor, so any memory allocated at runtime won't
-// be released. SmallVector is widely used in the tree nodes to save children
-// nodes, and they should call Release() explicitly.
+// We define a ContainerMemPool, which is slightly different than the other MemPool.
+// There are three major differences.
+// (1) Size of each allocation will be the same.
+// (2) Support indexing.
+// (3) No STL involved, meaning self contained.
+struct ContainerBlock {
+  char           *mAddr;
+  unsigned int    mUsed;    // bytes used
+  ContainerBlock *mNext;
+};
 
-class SmallVector {
+// SmallVector is widely used in the tree nodes to save children nodes, and
+// they should call Release() explicitly, if the destructor of SmallVector
+// won't be called.
+
+template <class T> class SmallVector {
 private:
-  MemPool mMemPool;
+  // To make sure SmallVector is self contained, we manage the memory allocated
+  // by a linked list.
+  ContainerBlock *mBlocks;
+
+  // the current block which is available to use.
+  ContainerBlock *mCurrBlock;
+
+  // size of a block. Most of data is small, like a pointer. Usually 128 is good
+  // enough for block size.
+  unsigned mBlockSize;
+
+private:
+  ContainerBlock* AllocBlock();
+  char* Alloc(unsigned);
+
 public:
-  SmallVector(MemPool *mp) : mMemPool(mp) {mMemPool.SetBlockSize(256);}
-  ~SmallVector(){}
+  SmallVector() {mBlockSize = 128; mBlocks = NULL; mCurrBlock = NULL;}
+  ~SmallVector(){Release();}
+
+  void SetBlockSize(unsigned i) {mBlockSize = i;}
 
   void Release();
+
+  void PushBack(T);
+  void PopBack(T);
+  T    AtIndex(unsigned);
 };
 
 #endif

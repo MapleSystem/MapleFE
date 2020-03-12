@@ -18,7 +18,7 @@
 // [NOTE]
 //
 // There is one assumption when using this memory pool. The object in the pool
-// doesn't rely on destructor to free any additional memory. All the memory
+// doesn't rely on destructor to free memory. All the memory
 // usage involved in the object is allocated by the memory pool at the first
 // place. So the destructor of the memory pool cleans everything related to
 // the object.
@@ -44,6 +44,7 @@
 struct Block {
   char *addr;        // starting address
   unsigned int used; // bytes used
+  Block *next;       // next block
 };
 
 // So far there is nothing like free list. Everything will be released when
@@ -51,16 +52,18 @@ struct Block {
 //
 class MemPool{
 private:
-  std::vector<Block> mBlocks;
-  int                mFirstAvail;// first block available; -1 means no available
+  //std::vector<Block> mBlocks;
+  //int                mFirstAvail;// first block available; -1 means no available
+  Block             *mCurrBlock; // Currently available block
+  Block             *mBlocks;
   unsigned           mBlockSize;
 public:
-  MemPool() {mFirstAvail = -1; mBlockSize = DEFAULT_BLOCK_SIZE;}
+  MemPool() : mCurrBlock(NULL), mBlocks(NULL), mBlockSize(DEFAULT_BLOCK_SIZE) {}
   ~MemPool();
 
   void  SetBlockSize(unsigned i) {mBlockSize = i;}
   char* AllocBlock();
-  char* Alloc(unsigned int);
+  char* Alloc(unsigned);
 
   void  Release(); // Allow users to free memory explicitly.
 };

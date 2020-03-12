@@ -34,59 +34,64 @@ MemPool::~MemPool() {
 }
 
 void MemPool::Release() {
-  std::vector<Block>::iterator it;
-  for (it = mBlocks.begin(); it != mBlocks.end(); it++) {
-    Block block = *it;
-    free(block.addr);
+  Block *block = mBlocks;
+  while (block) {
+    Block *next_block = block->next;
+    free(block->addr);
+    delete block;
+    block = next_block;
   }
-
-  // Clear it, so that it's impossible to double free it in destructor if someone
-  // already called Release().
-  mBlocks.clear();
+  mBlocks = NULL;
+  mCurrBlock = NULL;
 }
 
 char* MemPool::AllocBlock() {
-  char *addr = (char*)malloc(mBlockSize);
-  Block block = {addr, 0};
-  mBlocks.push_back(block);
-  return addr;
+  Block *block = new Block;
+  block->addr = (char*)malloc(mBlockSize);
+  block->used = 0;
+  block->next = NULL;
+
+  if (!mBlocks) {
+    mBlocks = block;
+    mCurrBlock = block;
+  } else {
+    MASSERT(mCurrBlock && "No mCurrBlock while memory already allocated.");
+    mCurrBlock->next = block;
+    mCurrBlock = block;
+  }
+
+  return block->addr;
 }
 
-// The searching for available block is going forward in the vector of 'mBlocks',
+// The searching for available block is going forward in the list of 'mBlocks',
 // and if one block is not big enough to hold 'size', it will be skipped and
 // we search the next block.
 //
-// the 'firstavil' is always incremental, so that means even if a block before
-// 'mFirstAvail' contains enough space for 'size', we still won't allocate
+// The mCurrBlock is always moving forward, so that means even if a block before
+// mCurrBlock contains enough space for 'size', we still won't allocate
 // from that block. So, Yes, we are wasting space.
 //
 // TODO: will come back to remove this wasting.
 //
-char* MemPool::Alloc(unsigned int size) {
+char* MemPool::Alloc(unsigned size) {
   char *addr = NULL;
 
   if (size > mBlockSize)
     MERROR ("Requsted size is bigger than block size");
 
-  if (mFirstAvail == -1) {
+  if (!mCurrBlock) {
     addr = AllocBlock(); 
-    MASSERT (addr && "StaticMemPool failed to alloc a block");
-    mFirstAvail = 0;
-  }
-
-  int avail = mBlockSize - mBlocks[mFirstAvail].used;
-
-  if (avail < size) { 
-    mFirstAvail++;
-    if (mFirstAvail >= mBlocks.size()) {
+    MASSERT (addr && "MemPool failed to alloc a block");
+  } else {
+    int avail = mBlockSize - mCurrBlock->used;
+    if (avail < size) {
       addr = AllocBlock(); 
-      MASSERT (addr && "StaticMemPool failed to alloc a block");
+      MASSERT (addr && "MemPool failed to alloc a block");
     }
   }
     
   // At this point, it's guaranteed that 'b' is able to hold 'size'
-  Block *b = &mBlocks[mFirstAvail];
-  addr = b->addr + b->used;
-  b->used += size;
+  addr = mCurrBlock->addr + mCurrBlock->used;
+  mCurrBlock->used += size;
   return addr;
 }
