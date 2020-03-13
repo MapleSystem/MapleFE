@@ -80,3 +80,17 @@ all modules are as below.
   Format: AddAttribute(Attribute list)
   AddAttribute is attached together with its previous BuildDecl. They should inside the same Rule.
   The attributes will be applied to the tree node of BuildDecl().
+
+* AddAttributeTo
+  Format: AddAttributeTo(Tree, Attribute list)
+  This is another format of adding attribute. The first argument is the target of attribute. This
+  function doesn't depend on any already built declarator. An example is
+    rule VariableDeclarator : VariableDeclaratorId + ZEROORONE('=' + VariableInitializer)
+      attr.action: AddAttributeTo(%1, %2)
+
+* AddInitTo
+  Format: AddInitTo(Target, InitValue)
+  The first argument is the target declarator, or expression, or etc. The second is the init value.
+  An example is
+    rule VariableDeclarator : VariableDeclaratorId + ZEROORONE('=' + VariableInitializer)
+      attr.action: AddInitTo(%1, %2)

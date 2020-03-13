@@ -44,3 +44,5 @@ ACTION(AddSuperInterface)
 ACTION(AddClassBody)
 
 ACTION(AddAttribute)
+ACTION(AddAttributeTo)
+ACTION(AddInitTo)

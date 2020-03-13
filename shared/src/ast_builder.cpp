@@ -235,6 +235,41 @@ TreeNode* ASTBuilder::AddAttribute() {
   return mLastTreeNode;
 }
 
+TreeNode* ASTBuilder::AddAttributeTo() {
+  std::cout << "In AddAttributeTo" << std::endl;
+  Param p_attr = mParams[0];
+  return mLastTreeNode;
+}
+
+TreeNode* ASTBuilder::AddInitTo() {
+  std::cout << "In AddInitTo" << std::endl;
+  Param p_decl = mParams[0];
+  Param p_init;
+
+  // If there is no init value, return NULL.
+  if (mParams.size() == 1)
+    return NULL;
+
+  p_init = mParams[1];
+  if (p_init.mIsEmpty)
+    return NULL;
+
+  // Both variable should have been created as tree node.
+  if (!p_decl.mIsTreeNode || !p_init.mIsTreeNode)
+    MERROR("The decl or init is not a treenode in AddInitTo()");
+
+  TreeNode *node_decl = p_decl.mData.mTreeNode;
+  TreeNode *node_init = p_init.mData.mTreeNode;
+
+  if (!node_decl->IsIdentifier())
+    MERROR("The target of AddInitTo should be an indentifier node. Not?");
+
+  IdentifierNode *in = (IdentifierNode*)node_decl;
+  in->SetInit(node_init);
+
+  return in;
+}
+
 TreeNode* ASTBuilder::BuildClass() {
   std::cout << "In BuildClass" << std::endl;
   Param p_attr = mParams[0];

@@ -201,13 +201,16 @@ class IdentifierNode : public TreeNode {
 public:
   const char *mName; // In the lexer's StringPool
   ASTType    *mType;
+  TreeNode   *mInit; // Init value
 public:
-  IdentifierNode(const char *s) : mName(s) {mKind = NK_Identifier; mType = NULL;}
+  IdentifierNode(const char *s) : mName(s), mType(NULL), mInit(NULL) {
+    mKind = NK_Identifier; }
   IdentifierNode(const char *s, ASTType *t) : mName(s), mType(t) {mKind = NK_Identifier;}
   ~IdentifierNode(){}
 
-  const char* GetName() {return mName;}
-  void SetType(ASTType *t) {mType = t;}
+  const char* GetName()     {return mName;}
+  void SetType(ASTType *t)  {mType = t;}
+  void SetInit(TreeNode *t) {mInit = t;}
   void Dump(unsigned);
 };
 

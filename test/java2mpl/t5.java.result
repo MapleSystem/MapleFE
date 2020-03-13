@@ -110,6 +110,19 @@ Matched 6 tokens.
 [8:2] Table TblUnaryExpression_sub1@3: 9,10,
 [9] Token
 [10:2] Token
+In build unary
+Convert unary --> binary
+In assignment --> BuildBinary
+In build binary
+Attached a tree node from Child
+== Sub Tree ==
+Assign
+  c
+  Add
+    a
+    b
+
+
 Keyword    Token:  int
 Separator  Token:  Whitespace
 Identifier Token:  a
@@ -217,6 +230,20 @@ Matched 14 tokens.
 [11:2] Table TblUnaryExpression_sub1@10: 12,13,
 [12] Token
 [13:2] Token
+In build unary
+Convert unary --> binary
+Attached a tree node from Child
+In assignment --> BuildBinary
+In build binary
+Attached a tree node from Child
+== Sub Tree ==
+Assign
+  a
+  Add
+    a
+    b
+
+
 ======= Main sortout Dump SortOut =======
 [1] Table TblStatement@14: 2,
 [2] Table TblLocalVariableDeclarationStatement@14: 3,4,
@@ -317,15 +344,57 @@ Matched 23 tokens.
 [2] Table TblLocalVariableDeclaration@14: 4,5,
 [3] Token
 [4:2] Token
-[5:3] Table TblVariableDeclarator@15: 6,7,
-[6:1] Token
-[7:2] Table TblVariableDeclarator_sub2@16: 8,9,
-[8] Token
-[9:2] Table TblPrimaryNoNewArray_sub2@17: 10,11,12,
-[10] Token
-[11:2] Table TblArrayAccess_sub1@18: 13,14,
-[12] Token
-[13:1] Token
-[14:2] Table TblUnaryExpression_sub1@19: 15,16,
-[15] Token
-[16:2] Token
+[5] Table TblVariableDeclaratorList@15: 6,
+[6] Table TblVariableDeclarator@15: 7,8,
+[7:1] Token
+[8:2] Table TblVariableDeclarator_sub2@16: 9,10,
+[9] Token
+[10:2] Table TblPrimaryNoNewArray_sub2@17: 11,12,13,
+[11] Token
+[12:2] Table TblArrayAccess_sub1@18: 14,15,
+[13] Token
+[14:1] Token
+[15:2] Table TblUnaryExpression_sub1@19: 16,17,
+[16] Token
+[17:2] Token
+In build unary
+Convert unary --> binary
+Attached a tree node from Child
+Attached a tree node from Child
+In AddInitTo
+In build Variable List
+In build Decl
+In AddAttribute
+Attached a tree node from Child
+== Sub Tree ==
+a=Add
+  a
+  b
+
+============= Module ===========
+[Global Decls]
+a=Add
+  a
+  b
+
+== Sub Tree ==
+Assign
+  c
+  Add
+    a
+    b
+
+
+== Sub Tree ==
+Assign
+  a
+  Add
+    a
+    b
+
+
+== Sub Tree ==
+a=Add
+  a
+  b
+

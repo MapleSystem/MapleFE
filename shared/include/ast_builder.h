@@ -93,6 +93,9 @@ public:
   TreeNode* BuildVarList();
 
   TreeNode* AddAttribute();
+  TreeNode* AddAttributeTo();
+
+  TreeNode* AddInitTo();
 
   TreeNode* BuildClass();
   TreeNode* AddClassBody();

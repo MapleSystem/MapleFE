@@ -26,6 +26,7 @@ rule VariableDeclaratorList : VariableDeclarator + ZEROORMORE(',' + VariableDecl
   attr.action: BuildVarList(%1, %2)
 
 rule VariableDeclarator : VariableDeclaratorId + ZEROORONE('=' + VariableInitializer)
+  attr.action: AddInitTo(%1, %2)
 
 rule VariableDeclaratorId : Identifier + ZEROORONE(Dims)
 

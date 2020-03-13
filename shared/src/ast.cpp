@@ -245,6 +245,10 @@ void UnaryOperatorNode::Dump(unsigned indent) {
 void IdentifierNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   DUMP0_NORETURN(mName);
+  if (mInit) {
+    DUMP0_NORETURN('=');
+    mInit->Dump(0);
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -272,7 +276,8 @@ void VarListNode::Merge(TreeNode *n) {
 void VarListNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   for (unsigned i = 0; i < mVars.GetNum(); i++) {
-    DUMP0_NORETURN(mVars.AtIndex(i)->GetName());
+    //DUMP0_NORETURN(mVars.AtIndex(i)->GetName());
+    mVars.AtIndex(i)->Dump(0);
     if (i != mVars.GetNum()-1)
       DUMP0_NORETURN(",");
   }
