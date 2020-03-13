@@ -175,8 +175,8 @@ TreeNode* ASTBuilder::BuildDecl() {
     ((IdentifierNode *)n)->SetType(type);
   } else if (n->IsVarList()) {
     VarListNode *vl = (VarListNode*)n;
-    for (unsigned i = 0; i < vl->mNum; i++)
-      vl->mVars[i]->SetType(type);
+    for (unsigned i = 0; i < vl->mVars.GetNum(); i++)
+      vl->mVars.AtIndex(i)->SetType(type);
   }
 
   // Step 3. Save this decl

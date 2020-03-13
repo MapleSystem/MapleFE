@@ -48,6 +48,8 @@
 
 #include "ast_type.h"
 #include "ast_mempool.h"
+#include "container.h"
+
 #include "ruletable.h"
 #include "token.h"
 
@@ -215,16 +217,9 @@ public:
 // variables like parameters in function, or varable list in declaration.
 //////////////////////////////////////////////////////////////////////////
 
-// 1. We decided to give the children a fixed number.
-//    It's fixed sized, can be allocated by MemPool. All var-s have been
-//    created and allocated by MemPool.
-// 2. Each Var in the VarList is an
-
-#define MAX_VAR_LIST_NUM 12
 class VarListNode : public TreeNode {
 public:
-  IdentifierNode *mVars[MAX_VAR_LIST_NUM];
-  unsigned        mNum;
+  SmallVector<IdentifierNode*> mVars;
 public:
   VarListNode() {mKind = NK_VarList;}
   ~VarListNode() {}

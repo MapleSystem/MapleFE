@@ -61,18 +61,34 @@ template <class T> class SmallVector {
 private:
   ContainerMemPool mMemPool;
   unsigned         mNum;     // element number
+
 public:
-  SmallVector();
-  ~SmallVector();
+  SmallVector() {
+    mNum = 0;
+    SetBlockSize(128);
+    mMemPool.SetElemSize(sizeof(T));
+  }
+  ~SmallVector() {Release();}
 
   void SetBlockSize(unsigned i) {mMemPool.SetBlockSize(i);}
   void Release() {mMemPool.Release();}
 
-  void PushBack(T);
+  void PushBack(T t) {
+    char *addr = mMemPool.AllocElem();
+    *(T*)addr = t;
+    mNum++;
+  }
+
   void PopBack(T);
+
   unsigned GetNum() {return mNum;}
-  T    Back();
-  T    AtIndex(unsigned);
+
+  T Back();
+
+  T AtIndex(unsigned i) {
+    char *addr = mMemPool.AddrOfIndex(i);
+    return *(T*)addr;
+  }
 };
 
 #endif

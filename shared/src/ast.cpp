@@ -16,6 +16,7 @@
 #include "ast.h"
 #include "ast_builder.h"
 #include "parser.h"
+#include "container.h"
 #include "token.h"
 #include "ruletable.h"
 
@@ -251,9 +252,7 @@ void IdentifierNode::Dump(unsigned indent) {
 //////////////////////////////////////////////////////////////////////////////////////
 
 void VarListNode::AddVar(IdentifierNode *n) {
-  if (mNum >= MAX_VAR_LIST_NUM)
-    MERROR("No more space for adding a new var in VarListNode");
-  mVars[mNum++] = n;
+  mVars.PushBack(n);
 }
 
 // Merge a node.
@@ -263,8 +262,8 @@ void VarListNode::Merge(TreeNode *n) {
     AddVar((IdentifierNode*)n);
   } else if (n->IsVarList()) {
     VarListNode *varlist = (VarListNode*)n;
-    for (unsigned i = 0; i < varlist->mNum; i++)
-      AddVar(varlist->mVars[i]);
+    for (unsigned i = 0; i < varlist->mVars.GetNum(); i++)
+      AddVar(varlist->mVars.AtIndex(i));
   } else {
     MERROR("VarListNode cannot merge a non-identifier or non-varlist node");
   }
@@ -272,9 +271,9 @@ void VarListNode::Merge(TreeNode *n) {
 
 void VarListNode::Dump(unsigned indent) {
   DumpIndentation(indent);
-  for (unsigned i = 0; i < mNum; i++) {
-    DUMP0_NORETURN(mVars[i]->GetName());
-    if (i != mNum-1)
+  for (unsigned i = 0; i < mVars.GetNum(); i++) {
+    DUMP0_NORETURN(mVars.AtIndex(i)->GetName());
+    if (i != mVars.GetNum()-1)
       DUMP0_NORETURN(",");
   }
 }

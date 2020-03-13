@@ -35,32 +35,3 @@ char* ContainerMemPool::AddrOfIndex(unsigned index) {
   char *addr = block->addr + index_in_blk * mElemSize;
   return addr;
 }
-
-//////////////////////////////////////////////////////////////////////////////
-//                            SmallVector
-//////////////////////////////////////////////////////////////////////////////
-
-template <class T>
-SmallVector<T>::SmallVector() {
-  mNum = 0;
-  SetBlockSize(128);
-  mMemPool.SetElemSize(sizeof(T));
-}
-
-template <class T>
-SmallVector<T>::~SmallVector() {
-  Release();
-}
-
-template <class T>
-void SmallVector<T>::PushBack(T t) {
-  char *addr = mMemPool.AllocElem();
-  *(T*)addr = t;
-  mNum++;
-}
-
-template <class T>
-T SmallVector<T>::AtIndex(unsigned i) {
-  char *addr = mMemPool.AddrOfIndex(i);
-  return *(T*)addr;
-}
