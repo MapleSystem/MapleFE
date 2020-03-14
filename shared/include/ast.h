@@ -53,6 +53,12 @@
 #include "ruletable.h"
 #include "token.h"
 
+#undef ATTRIBUTE
+#define ATTRIBUTE(X) ATTR_##X,
+enum ASTAttribute {
+#include "supported_attributes.def"
+};
+
 enum NodeKind {
   NK_Identifier,
   NK_VarList,     // A varialble list
@@ -63,6 +69,8 @@ enum NodeKind {
   NK_Construct,
   NK_Block,        // A block node
   NK_Function,
+  NK_Class,
+  NK_Interface,
   NK_Null,
 };
 
@@ -90,6 +98,8 @@ public:
   bool IsConstruct()  {return mKind == NK_Construct;}
   bool IsBlock()      {return mKind == NK_Block;}
   bool IsFunction()   {return mKind == NK_Function;}
+  bool IsClass()      {return mKind == NK_Class;}
+  bool IsInterface()      {return mKind == NK_Interface;}
 
   bool IsScope()      {return IsBlock() || IsFunction();}
 
@@ -162,26 +172,6 @@ public:
 };
 
 //////////////////////////////////////////////////////////////////////////
-//                         Function Nodes
-//////////////////////////////////////////////////////////////////////////
-
-class TreeSymbol;
-class ASTScope;
-
-class FunctionNode : public TreeNode {
-public:
-  ASTType                  mRetType;
-  std::vector<TreeSymbol*> mParams;
-  ASTScope                *mScope;
-
-public:
-  ASTScope* GetScope() {return mScope;}
-  void      SetScope(ASTScope *s) {mScope = s;}
-
-  void Dump(unsigned);
-};
-
-//////////////////////////////////////////////////////////////////////////
 //                         Identifier Nodes
 // Everything having a name will be treated as an Identifier node at the
 // first place. There are some issues here.
@@ -229,6 +219,7 @@ public:
 
   void AddVar(IdentifierNode *n);
   void Merge(TreeNode*);
+  void Release() {mVars.Release();}
   void Dump(unsigned);
 };
 
@@ -244,6 +235,69 @@ public:
   ~LiteralNode(){}
 
   void Dump(unsigned);
+};
+
+//////////////////////////////////////////////////////////////////////////
+//                         Block Nodes
+//////////////////////////////////////////////////////////////////////////
+
+class BlockNode : public TreeNode {
+};
+
+//////////////////////////////////////////////////////////////////////////
+//                         Function Nodes
+//////////////////////////////////////////////////////////////////////////
+
+class ASTScope;
+
+class FunctionNode : public TreeNode {
+public:
+  ASTType      mRetType;
+  VarListNode *mParams;
+  ASTScope    *mScope;
+  BlockNode   *mBody;
+public:
+  ASTScope* GetScope() {return mScope;}
+  void      SetScope(ASTScope *s) {mScope = s;}
+
+  void Dump(unsigned);
+};
+
+//////////////////////////////////////////////////////////////////////////
+//                         Interface Nodes
+//////////////////////////////////////////////////////////////////////////
+
+class InterfaceNode : public TreeNode {
+public:
+  IdentifierNode           *mName;
+public:
+  InterfaceNode() {mKind = NK_Interface;}
+  ~InterfaceNode() {}
+  void Dump();
+};
+
+//////////////////////////////////////////////////////////////////////////
+//                         Class Nodes
+//////////////////////////////////////////////////////////////////////////
+
+class ClassNode : public TreeNode {
+public:
+  IdentifierNode              *mName;
+  SmallVector<ClassNode*>      mSuperClasses;
+  SmallVector<InterfaceNode*>  mSuperInterfaces;
+  SmallVector<ASTAttribute>    mAttributes;
+  BlockNode                   *mBody;
+public:
+  ClassNode(){mKind = NK_Class;}
+  ~ClassNode() {Release();}
+
+  void SetName(IdentifierNode *n) {mName = n;}
+  void AddSuperClass(ClassNode *n) {mSuperClasses.PushBack(n);}
+  void AddSuperClass(InterfaceNode *n) {mSuperInterfaces.PushBack(n);}
+  void AddAttribute(ASTAttribute a) {mAttributes.PushBack(a);}
+
+  void Release();
+  void Dump();
 };
 
 ////////////////////////////////////////////////////////////////////////////
