@@ -78,5 +78,26 @@ Matched 7 tokens.
 [6:2] Table TblFieldDeclaration@3: 8,9,10,
 [7] Token
 [8:2] Token
-[9:3] Token
+[9] Table TblVariableDeclaratorList@4: 11,
 [10] Token
+[11] Table TblVariableDeclarator@4: 12,
+[12:1] Token
+In AddInitTo
+Attached a tree node from Child
+In build Variable List
+Attached a tree node from Child
+Attached a tree node from Child
+In BuildClass
+In AddAttribute
+In AddClassBody
+In AddSuperClass
+In AddSuperInterface
+== Sub Tree ==
+class A
+
+============= Module ===========
+[Global Decls]
+
+== Sub Tree ==
+class A
+

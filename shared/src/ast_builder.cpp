@@ -45,12 +45,14 @@ TreeNode* ASTBuilder::CreateTokenTreeNode(const Token *token) {
     IdentifierToken *t = (IdentifierToken*)token;
     IdentifierNode *n = (IdentifierNode*)mTreePool->NewTreeNode(sizeof(IdentifierNode));
     new (n) IdentifierNode(t->mName);
+    mLastTreeNode = n;
     return n;
   } else if (token->IsLiteral()) {
     LiteralToken *lt = (LiteralToken*)token;
     LitData data = lt->GetLitData();
     LiteralNode *n = (LiteralNode*)mTreePool->NewTreeNode(sizeof(LiteralNode));
     new (n) LiteralNode(data);
+    mLastTreeNode = n;
     return n;
   } else {
     // Other tokens shouldn't be involved in the tree creation.
@@ -73,6 +75,7 @@ TreeNode* ASTBuilder::BuildUnaryOperation() {
   // create the sub tree
   UnaryOperatorNode *n = (UnaryOperatorNode*)mTreePool->NewTreeNode(sizeof(UnaryOperatorNode));
   new (n) UnaryOperatorNode(((OperatorToken*)token)->mOprId);
+  mLastTreeNode = n;
 
   // set 1st param
   if (p_b.mIsTreeNode)
@@ -102,6 +105,7 @@ TreeNode* ASTBuilder::BuildBinaryOperation() {
   // create the sub tree
   BinaryOperatorNode *n = (BinaryOperatorNode*)mTreePool->NewTreeNode(sizeof(BinaryOperatorNode));
   new (n) BinaryOperatorNode(((OperatorToken*)token)->mOprId);
+  mLastTreeNode = n;
 
   // set 1st param
   if (p_a.mIsTreeNode)
@@ -226,6 +230,9 @@ TreeNode* ASTBuilder::BuildVarList() {
       node_ret->Merge(node_b);
   }
 
+  // Set last tree node
+  mLastTreeNode = node_ret;
+
   return node_ret;
 }
 
@@ -270,9 +277,27 @@ TreeNode* ASTBuilder::AddInitTo() {
   return in;
 }
 
+// This takes just one argument which is the class name.
 TreeNode* ASTBuilder::BuildClass() {
   std::cout << "In BuildClass" << std::endl;
-  Param p_attr = mParams[0];
+
+  Param p_name = mParams[0];
+
+  if (!p_name.mIsTreeNode)
+    MERROR("The class name is not a treenode in BuildClass()");
+  TreeNode *node_name = p_name.mData.mTreeNode;
+
+  if (!node_name->IsIdentifier())
+    MERROR("The class name should be an indentifier node. Not?");
+  IdentifierNode *in = (IdentifierNode*)node_name;
+
+  ClassNode *node_class = (ClassNode*)mTreePool->NewTreeNode(sizeof(ClassNode));
+  new (node_class) ClassNode();
+  node_class->SetName(node_name);
+
+  // set last tree node
+  mLastTreeNode = node_class;
+
   return mLastTreeNode;
 }
 

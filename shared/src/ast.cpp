@@ -282,6 +282,7 @@ void VarListNode::Dump(unsigned indent) {
       DUMP0_NORETURN(",");
   }
 }
+
 //////////////////////////////////////////////////////////////////////////////////////
 //                          LiteralNode
 //////////////////////////////////////////////////////////////////////////////////////
@@ -311,3 +312,21 @@ void LiteralNode::Dump(unsigned indent) {
   }
 }
 
+//////////////////////////////////////////////////////////////////////////////////////
+//                          ClassNode
+//////////////////////////////////////////////////////////////////////////////////////
+
+// Release() only takes care of those container memory. The release of all tree nodes
+// is taken care by the tree node pool.
+void ClassNode::Release() {
+  mSuperClasses.Release();
+  mSuperInterfaces.Release();
+  mAttributes.Release();
+}
+
+void ClassNode::Dump(unsigned indent) {
+  DumpIndentation(indent);
+  DUMP0_NORETURN("class ");
+  mName->Dump(0);
+  DUMP_RETURN();
+}

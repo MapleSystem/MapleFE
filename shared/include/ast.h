@@ -297,7 +297,7 @@ public:
   void AddAttribute(ASTAttribute a) {mAttributes.PushBack(a);}
 
   void Release();
-  void Dump();
+  void Dump(unsigned);
 };
 
 ////////////////////////////////////////////////////////////////////////////
