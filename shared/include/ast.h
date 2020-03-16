@@ -71,6 +71,11 @@ enum NodeKind {
   NK_Function,
   NK_Class,
   NK_Interface,
+
+  // Following are nodes to facilitate parsing.
+  NK_Pass,         // see details in PassNode
+  NK_ClassBody,    // see details in ClassBodyNode
+
   NK_Null,
 };
 
@@ -99,7 +104,9 @@ public:
   bool IsBlock()      {return mKind == NK_Block;}
   bool IsFunction()   {return mKind == NK_Function;}
   bool IsClass()      {return mKind == NK_Class;}
-  bool IsInterface()      {return mKind == NK_Interface;}
+  bool IsInterface()  {return mKind == NK_Interface;}
+  bool IsPass()       {return mKind == NK_Pass;}
+  bool IsClassBody()  {return mKind == NK_ClassBody;}
 
   bool IsScope()      {return IsBlock() || IsFunction();}
 
@@ -248,6 +255,13 @@ public:
 //////////////////////////////////////////////////////////////////////////
 
 class BlockNode : public TreeNode {
+public:
+  SmallVector<TreeNode*> mChildren;
+public:
+  BlockNode(){mKind = NK_Block;}
+  ~BlockNode() {Release();}
+
+  void Release() {mChildren.Release();}
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -299,6 +313,11 @@ public:
 class ClassBodyNode : public TreeNode {
 public:
   SmallVector<TreeNode*> mChildren;
+public:
+  ClassBodyNode() {mKind = NK_ClassBody;}
+  ~ClassBodyNode() {}
+
+  void AddChild(TreeNode *c) {mChildren.PushBack(c);}
   void Release() {mChildren.Release();}
 };
 
@@ -326,6 +345,30 @@ public:
   void Dump(unsigned);
 };
 
+//////////////////////////////////////////////////////////////////////////
+//                         PassNode
+// When Autogen creates rule tables, it could create some temp tables without
+// any actions. The corresponding AppealNode will be given a PassNode to
+// pass its subtrees to the parent.
+//
+// Also some rules in .spec don't have action at the beginning, and they
+// will be given a PassNode too.
+//
+// One the subtrees are passed to parents, this PassNode can call Release()
+// to free its memory.
+//////////////////////////////////////////////////////////////////////////
+
+class PassNode : public TreeNode {
+public:
+  SmallVector<TreeNode*> mChildren;
+public:
+  PassNode() {mKind = NK_Pass;}
+  ~PassNode() {}
+
+  void AddChild(TreeNode *c) {mChildren.PushBack(c);}
+  void Release() {mChildren.Release();}
+};
+
 ////////////////////////////////////////////////////////////////////////////
 //                  The AST Tree
 ////////////////////////////////////////////////////////////////////////////
@@ -346,6 +389,7 @@ public:
   TreeNode* NewTreeNode(AppealNode*, std::map<AppealNode*, TreeNode*> &);
 
   TreeNode* BuildBinaryOperation(TreeNode *, TreeNode *, OprId);
+  TreeNode* BuildPassNode();
 
   void Dump(unsigned);
 };

@@ -323,13 +323,21 @@ TreeNode* ASTBuilder::BuildClassBody() {
   std::cout << "In BuildClassBody" << std::endl;
 
   Param p_subtree = mParams[0];
-
   if (!p_subtree.mIsTreeNode)
     MERROR("The subtree is not a treenode in BuildBlock()");
-  TreeNode *subtree = p_subtree.mData.mTreeNode;
 
   ClassBodyNode *class_body = (ClassBodyNode*)mTreePool->NewTreeNode(sizeof(ClassBodyNode));
   new (class_body) ClassBodyNode();
+
+  // Add the children to class_body
+  TreeNode *subtree = p_subtree.mData.mTreeNode;
+  if (subtree->IsPass()) {
+    PassNode *pass_node = (PassNode*)subtree;
+    for (unsigned i = 0; i < pass_node->mChildren.GetNum(); i++)
+      class_body->AddChild(pass_node->mChildren.AtIndex(i));
+  } else {
+    class_body->AddChild(subtree);
+  }
 
   // set last tree node
   mLastTreeNode = class_body;

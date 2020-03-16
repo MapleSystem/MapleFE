@@ -60,6 +60,11 @@ private:
   // following AddAttribute() or other functions.
   TreeNode               *mLastTreeNode;
 
+  // Some pending tree nodes exist because their rule tables don't have
+  // actions. These pending treenodes are supposed to transferred further
+  // to their ancestors, until they are consumed by one of them.
+  SmallVector<TreeNode*>  mPendingNodes;
+
 public:
   ASTBuilder(TreePool *p) : mTreePool(p) {}
   ~ASTBuilder() {}

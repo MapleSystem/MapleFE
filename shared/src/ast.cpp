@@ -163,10 +163,16 @@ TreeNode* ASTTree::NewTreeNode(AppealNode *appeal_node, std::map<AppealNode*, Tr
     std::cout << "Attached a tree node from Child" << std::endl;
     map.insert(std::pair<AppealNode*, TreeNode*>(appeal_node, child_trees[0]));
     sub_tree = child_trees[0];
-  } else if (child_trees.size() == 2) {
-    // There are cases like a+b could be parsed as "a" and "+b", a symbol and a
-    // unary operation. However, we do prefer binary operation than unary. So a
-    // combination is needed here, especially when the parent node is NULL.
+    if (sub_tree)
+      return sub_tree;
+    else
+      MERROR("We got a broken AST tree, not connected sub tree.");
+  }
+
+  // There are cases like a+b could be parsed as "a" and "+b", a symbol and a
+  // unary operation. However, we do prefer binary operation than unary. So a
+  // combination is needed here, especially when the parent node is NULL.
+  if (child_trees.size() == 2) {
     TreeNode *child_a = child_trees[0];
     TreeNode *child_b = child_trees[1];
     if (child_b->IsUnaOperator()) {
@@ -177,15 +183,22 @@ TreeNode* ASTTree::NewTreeNode(AppealNode *appeal_node, std::map<AppealNode*, Tr
         TreeNode *unary_sub = unary->mOpnd;
         TreeNode *binary = BuildBinaryOperation(child_a, unary_sub, unary->mOprId);
         map.insert(std::pair<AppealNode*, TreeNode*>(appeal_node, binary));
-        sub_tree = binary;
+        return binary;
       }
     }
   }
 
-  if (sub_tree)
-    return sub_tree;
-   else
-    MERROR("We got a broken AST tree, not connected sub tree.");
+  // In the end, we will put subtrees into a PassNode to pass to parent.
+  if (child_trees.size() > 0) {
+    PassNode *pass = BuildPassNode();
+    std::vector<TreeNode*>::iterator child_it = child_trees.begin();
+    for (; child_it != child_trees.end(); child_it++)
+      pass->AddChild(*child_it);
+    map.insert(std::pair<AppealNode*, TreeNode*>(appeal_node, pass));
+    return pass;
+  }
+
+  MERROR("We got a broken AST tree, not connected sub tree.");
 }
 
 void ASTTree::Dump(unsigned indent) {
@@ -201,6 +214,12 @@ TreeNode* ASTTree::BuildBinaryOperation(TreeNode *childA, TreeNode *childB, OprI
   n->mOpndB = childB;
   childA->SetParent(n);
   childB->SetParent(n);
+  return n;
+}
+
+TreeNode* ASTTree::BuildPassNode() {
+  PassNode *n = (PassNode*)mTreePool.NewTreeNode(sizeof(PassNode));
+  new (n) PassNode();
   return n;
 }
 
