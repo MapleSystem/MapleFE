@@ -57,6 +57,45 @@ FileWriter *gDebugHFile;
 FileWriter *gDebugCppFile;
 unsigned    gRuleTableNum;
 
+static void WriteDebugHFile() {
+  gDebugHFile->WriteOneLine("#ifndef __DEBUG_GEN_H__", 23);
+  gDebugHFile->WriteOneLine("#define __DEBUG_GEN_H__", 23);
+  gDebugHFile->WriteOneLine("#include \"ruletable.h\"", 22);
+  gDebugHFile->WriteOneLine("typedef struct {", 16);
+  gDebugHFile->WriteOneLine("  const RuleTable *mAddr;", 25);
+  gDebugHFile->WriteOneLine("  const char      *mName;", 25);
+  gDebugHFile->WriteOneLine("}RuleTableName;", 15);
+  gDebugHFile->WriteOneLine("extern RuleTableName gRuleTableNames[];", 39);
+  gDebugHFile->WriteOneLine("extern unsigned RuleTableNum;", 29);
+  gDebugHFile->WriteOneLine("extern const char* GetRuleTableName(const RuleTable*);", 54);
+  gDebugHFile->WriteOneLine("#endif", 6);
+}
+
+// write the beginning part of debug file
+static void PrepareDebugCppFile() {
+  gDebugCppFile->WriteOneLine("#include \"gen_debug.h\"", 22);
+  gDebugCppFile->WriteOneLine("#include \"common_header_autogen.h\"", 34);
+  gDebugCppFile->WriteOneLine("RuleTableName gRuleTableNames[] = {", 35);
+}
+
+// write the ending part of debug file
+static void FinishDebugCppFile() {
+  gDebugCppFile->WriteOneLine("};", 2);
+  std::string num = std::to_string(gRuleTableNum);
+  std::string num_line = "unsigned RuleTableNum = ";
+  num_line += num;
+  num_line += ";";
+  gDebugCppFile->WriteOneLine(num_line.c_str(), num_line.size());
+  gDebugCppFile->WriteOneLine("const char* GetRuleTableName(const RuleTable* addr) {", 53);
+  gDebugCppFile->WriteOneLine("  for (unsigned i = 0; i < RuleTableNum; i++) {", 47);
+  gDebugCppFile->WriteOneLine("    RuleTableName name = gRuleTableNames[i];", 44);
+  gDebugCppFile->WriteOneLine("    if (name.mAddr == addr)", 27);
+  gDebugCppFile->WriteOneLine("      return name.mName;", 24);
+  gDebugCppFile->WriteOneLine("  }", 3);
+  gDebugCppFile->WriteOneLine("  return NULL;", 14);
+  gDebugCppFile->WriteOneLine("}", 1);
+}
+
 void AutoGen::Init() {
   std::string lang_path_header("../../java/include/");
   std::string lang_path_cpp("../../java/src/");
@@ -67,20 +106,8 @@ void AutoGen::Init() {
   gDebugHFile = new FileWriter(debug_file_name);
   gRuleTableNum = 0;
 
-  gDebugHFile->WriteOneLine("#ifndef __DEBUG_GEN_H__", 23);
-  gDebugHFile->WriteOneLine("#define __DEBUG_GEN_H__", 23);
-  gDebugHFile->WriteOneLine("#include \"ruletable.h\"", 22);
-  gDebugHFile->WriteOneLine("typedef struct {", 16);
-  gDebugHFile->WriteOneLine("  const RuleTable *mAddr;", 25);
-  gDebugHFile->WriteOneLine("  const char      *mName;", 25);
-  gDebugHFile->WriteOneLine("}RuleTableName;", 15);
-  gDebugHFile->WriteOneLine("extern RuleTableName gRuleTableNames[];", 39);
-  gDebugHFile->WriteOneLine("extern unsigned RuleTableNum;", 29);
-  gDebugHFile->WriteOneLine("#endif", 6);
-
-  gDebugCppFile->WriteOneLine("#include \"gen_debug.h\"", 22);
-  gDebugCppFile->WriteOneLine("#include \"common_header_autogen.h\"", 34);
-  gDebugCppFile->WriteOneLine("RuleTableName gRuleTableNames[] = {", 35);
+  WriteDebugHFile();
+  PrepareDebugCppFile();
 
   std::string hFile = lang_path_header + "gen_reserved.h";
   std::string cppFile = lang_path_cpp + "gen_reserved.cpp";
@@ -225,11 +252,6 @@ void AutoGen::Gen() {
   mExprGen->Generate();
   mStmtGen->Generate();
 
-  gDebugCppFile->WriteOneLine("};", 2);
-  std::string num = std::to_string(gRuleTableNum);
-  std::string num_line = "unsigned RuleTableNum = ";
-  num_line += num;
-  num_line += ";";
-  gDebugCppFile->WriteOneLine(num_line.c_str(), num_line.size());
+  FinishDebugCppFile();
 }
 

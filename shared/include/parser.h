@@ -184,7 +184,6 @@ public:
   bool mTraceSortOut;       // trace Sort out.
   bool mTraceWarning;       // print the warning.
 
-  const char* GetRuleTableName(const RuleTable*);
   void DumpEnterTable(const char *tablename, unsigned indent);
   void DumpExitTable(const char *tablename, unsigned indent,
                      bool succ, AppealStatus reason = Succ);

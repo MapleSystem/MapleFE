@@ -2068,15 +2068,6 @@ void Parser::SetupTopTables() {
   mTopTables.push_back(&TblInterfaceDeclaration);
 }
 
-const char* Parser::GetRuleTableName(const RuleTable* addr) {
-  for (unsigned i = 0; i < RuleTableNum; i++) {
-    RuleTableName name = gRuleTableNames[i];
-    if (name.mAddr == addr)
-      return name.mName;
-  }
-  return NULL;
-}
-
 ////////////////////////////////////////////////////////////////////////////
 //                          Succ Info Related
 ////////////////////////////////////////////////////////////////////////////
