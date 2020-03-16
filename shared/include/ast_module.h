@@ -43,6 +43,7 @@ public:
 
   void SetFileName(const char *f) {mFileName = f;}
   void AddTree(ASTTree* t) { mTrees.push_back(t); }
+  void Organize();
 
   void Dump();
 };

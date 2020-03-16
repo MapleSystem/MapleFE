@@ -45,6 +45,8 @@ rule InterfaceTypeList : InterfaceType + ZEROORMORE(',' + InterfaceType)
 
 # class body
 rule ClassBody              : "{" + ZEROORMORE(ClassBodyDeclaration) + "}"
+  attr.action: BuildClassBody(%2)
+
 rule ClassBodyDeclaration   : ONEOF(ClassMemberDeclaration,
                                     InstanceInitializer,
                                     StaticInitializer,
@@ -57,6 +59,8 @@ rule ClassMemberDeclaration : ONEOF(FieldDeclaration,
                                     InterfaceDeclaration,
                                     ';')
 rule FieldDeclaration  : ZEROORMORE(FieldModifier) + UnannType + VariableDeclaratorList + ';'
+  attr.action: BuildDecl(%2, %3)
+  attr.action: AddAttribute(%1)
 
 rule MethodDeclaration : ZEROORMORE(MethodModifier) + MethodHeader + MethodBody
 rule MethodBody        : ONEOF(Block, ';')
@@ -118,6 +122,7 @@ rule BlockStatement  : ONEOF(LocalVariableDeclarationStatement,
                              Statement)
 rule BlockStatements : BlockStatement + ZEROORMORE(BlockStatement)
 rule Block           : '{' + ZEROORONE(BlockStatements) + '}'
+  attr.action: BuildBlock(%2)
 
 
 ######################################################################

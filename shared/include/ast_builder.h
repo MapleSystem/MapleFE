@@ -54,18 +54,6 @@ public:
   TreePool               *mTreePool;
 
 private:
-  // A few information to locate each decl into their scope
-  // 1. Pending declarations before their scope is created
-  // 2. Since the scopes are created as a tree, children-first
-  //    parent-last order. Some parent's Decls could be created
-  //    before children's, so they have to wait in the stack
-  //    untile children are done.
-  // 3. As the tree could be multiple-layer, we need to record
-  //    which Decls are for which scope, so comes the mScopeStartDecls.
-  //    Each number in mScopeStartDecls represents the index of
-  //    Decl for that layer of scope.
-  std::vector<TreeNode*>  mPendingDecls;
-  std::vector<unsigned>   mScopeStartDecls;
   ASTScope               *mCurrScope; // current working scope.
 
   // The last created node. It will be referenced by the
@@ -84,6 +72,9 @@ public:
 
   // Create Functions for AppealNode Tree
   TreeNode* Build();
+
+  TreeNode* BuildBlock();
+
   TreeNode* BuildUnaryOperation();
   TreeNode* BuildBinaryOperation();
   TreeNode* BuildAssignment();
@@ -98,15 +89,10 @@ public:
   TreeNode* AddInitTo();
 
   TreeNode* BuildClass();
+  TreeNode* BuildClassBody();
   TreeNode* AddClassBody();
   TreeNode* AddSuperClass();
   TreeNode* AddSuperInterface();
-
-  // Move the remaining Pending Decls into the ASTScope, which is mostly
-  // the module's root scope. The remaining Decls are usually the global
-  // Decls. This is usually called when BuildAST() is done, which creates
-  // the top level ASTTree.
-  void AssignRemainingDecls(ASTScope*);
 };
 
 #endif

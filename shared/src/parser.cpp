@@ -402,7 +402,7 @@ bool Parser::Parse() {
     if (!succ)
       break;
   }
-
+  mModule.Organize();
   mModule.Dump();
 
   return succ;
@@ -553,7 +553,6 @@ bool Parser::ParseStmt() {
     SimplifySortedTree();
     ASTTree *tree = BuildAST();
     if (tree) {
-      tree->mBuilder->AssignRemainingDecls(mModule.mRootScope);
       mModule.AddTree(tree);
     }
   }

@@ -239,6 +239,12 @@ public:
 
 //////////////////////////////////////////////////////////////////////////
 //                         Block Nodes
+// A block is common in all languages, and it serves different function in
+// different context. Here is a few examples.
+//   1) As function body, it could contain variable decl, statement, lambda,
+//      inner function, inner class, ...
+//   2) As a function block, it could contain variable declaration, statement
+//      lambda, ...
 //////////////////////////////////////////////////////////////////////////
 
 class BlockNode : public TreeNode {
@@ -274,6 +280,26 @@ public:
   InterfaceNode() {mKind = NK_Interface;}
   ~InterfaceNode() {}
   void Dump();
+};
+
+//////////////////////////////////////////////////////////////////////////
+//                         ClassBody
+// In reality there is no such thing as ClassBody, since this 'body' will
+// eventually become field and method of a class. However, during parsing
+// the children are processed before parents, which means we could have
+// all fields and members before the class is ready. So we come up with
+// this ClassBody to temporarily hold these subtrees, and let the class
+// to interpret it in the future. Once the class is done, this ClassBody
+// is useless and will call Release() in BuildClass().
+//
+// Since it is just a temp storage having nothing to do with tree, we create
+// a standalone data structure for it.
+//////////////////////////////////////////////////////////////////////////
+
+class ClassBodyNode : public TreeNode {
+public:
+  SmallVector<TreeNode*> mChildren;
+  void Release() {mChildren.Release();}
 };
 
 //////////////////////////////////////////////////////////////////////////

@@ -83,8 +83,9 @@ Matched 7 tokens.
 In AddInitTo
 Attached a tree node from Child
 In build Variable List
-Attached a tree node from Child
-Attached a tree node from Child
+In build Decl
+In AddAttribute
+In BuildClassBody
 In BuildClass
 In AddAttribute
 In AddClassBody

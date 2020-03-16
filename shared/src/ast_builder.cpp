@@ -184,7 +184,6 @@ TreeNode* ASTBuilder::BuildDecl() {
   }
 
   // Step 3. Save this decl
-  mPendingDecls.push_back((TreeNode*)n);
   mLastTreeNode = (TreeNode*)n;
 
   return n;
@@ -277,6 +276,24 @@ TreeNode* ASTBuilder::AddInitTo() {
   return in;
 }
 
+// This takes just one argument which is the root of sub tree
+TreeNode* ASTBuilder::BuildBlock() {
+  std::cout << "In BuildBlock" << std::endl;
+
+  Param p_subtree = mParams[0];
+
+  if (!p_subtree.mIsTreeNode)
+    MERROR("The subtree is not a treenode in BuildBlock()");
+  TreeNode *subtree = p_subtree.mData.mTreeNode;
+
+  BlockNode *block = (BlockNode*)mTreePool->NewTreeNode(sizeof(BlockNode));
+  new (block) BlockNode();
+
+  // set last tree node
+  mLastTreeNode = block;
+  return mLastTreeNode;
+}
+
 // This takes just one argument which is the class name.
 TreeNode* ASTBuilder::BuildClass() {
   std::cout << "In BuildClass" << std::endl;
@@ -298,6 +315,24 @@ TreeNode* ASTBuilder::BuildClass() {
   // set last tree node
   mLastTreeNode = node_class;
 
+  return mLastTreeNode;
+}
+
+// This takes just one argument which is the root of sub tree
+TreeNode* ASTBuilder::BuildClassBody() {
+  std::cout << "In BuildClassBody" << std::endl;
+
+  Param p_subtree = mParams[0];
+
+  if (!p_subtree.mIsTreeNode)
+    MERROR("The subtree is not a treenode in BuildBlock()");
+  TreeNode *subtree = p_subtree.mData.mTreeNode;
+
+  ClassBodyNode *class_body = (ClassBodyNode*)mTreePool->NewTreeNode(sizeof(ClassBodyNode));
+  new (class_body) ClassBodyNode();
+
+  // set last tree node
+  mLastTreeNode = class_body;
   return mLastTreeNode;
 }
 
@@ -323,10 +358,3 @@ TreeNode* ASTBuilder::AddClassBody() {
 //                   Other Functions
 ////////////////////////////////////////////////////////////////////////////////
 
-void ASTBuilder::AssignRemainingDecls(ASTScope *scope) {
-  std::vector<TreeNode *>::iterator it = mPendingDecls.begin();
-  for (; it != mPendingDecls.end(); it++) {
-    TreeNode *n = *it;
-    scope->AddDecl(n);
-  }
-}

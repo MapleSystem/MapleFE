@@ -28,6 +28,8 @@
 //          It also shows the internal parameters when parser creates the AST tree node.
 //          Please refer autogen/README.ACTIONS for details.
 
+ACTION(BuildBlock)
+
 ACTION(BuildBinaryOperation)
 ACTION(BuildUnaryOperation)
 ACTION(BuildAssignment)
@@ -39,6 +41,7 @@ ACTION(BuildVarList)
 
 // For class/inheritance
 ACTION(BuildClass)
+ACTION(BuildClassBody)
 ACTION(AddSuperClass)
 ACTION(AddSuperInterface)
 ACTION(AddClassBody)

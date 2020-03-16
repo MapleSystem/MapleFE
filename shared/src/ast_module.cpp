@@ -31,6 +31,19 @@ ASTModule::~ASTModule() {
   mTrees.clear();
 }
 
+// After parsing is done, we need re-org the trees in the module. Some trees
+// are global declaration of variables, functions, and we want to put them into
+// the global scope.
+void ASTModule::Organize() {
+  std::vector<ASTTree*>::iterator tree_it = mTrees.begin();
+  for (; tree_it != mTrees.end(); tree_it++) {
+    ASTTree *tree = *tree_it;
+    TreeNode *root = tree->mRootNode;
+    if (root->IsIdentifier() || root->IsVarList())
+      mRootScope->mDecls.push_back(root);
+  }
+}
+
 void ASTModule::Dump() {
   std::cout << "============= Module ===========" << std::endl;
 
