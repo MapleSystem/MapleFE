@@ -314,3 +314,30 @@ Matched 27 tokens.
 [45:3] Token
 [46:2] Token
 [47:3] Token
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+In BuildClassBody
+In BuildClass
+In AddAttribute
+In AddClassBody
+In AddSuperClass
+In AddSuperInterface
+== Sub Tree ==
+class A
+
+============= Module ===========
+[Global Decls]
+
+== Sub Tree ==
+class A
+

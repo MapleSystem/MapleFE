@@ -142,13 +142,39 @@ Matched 13 tokens.
 [8:1] Table TblFieldDeclaration@3: 10,11,12,
 [9:1] Table TblBlock@6: 13,14,15,
 [10:2] Token
-[11:3] Token
+[11] Table TblVariableDeclaratorList@4: 16,
 [12] Token
 [13] Token
-[14:2] Table TblExpressionStatement@7: 16,17,
+[14:2] Table TblExpressionStatement@7: 17,18,
 [15] Token
-[16:1] Table TblAssignment@7: 18,19,20,
-[17] Token
-[18:1] Token
-[19:2] Token
-[20:3] Token
+[16] Table TblVariableDeclarator@4: 19,
+[17:1] Table TblAssignment@7: 20,21,22,
+[18] Token
+[19:1] Token
+[20:1] Token
+[21:2] Token
+[22:3] Token
+In AddInitTo
+Attached a tree node from Child
+In build Variable List
+In build Decl
+In AddAttribute
+In assignment --> BuildBinary
+In build binary
+Attached a tree node from Child
+In BuildBlock
+In BuildClassBody
+In BuildClass
+In AddAttribute
+In AddClassBody
+In AddSuperClass
+In AddSuperInterface
+== Sub Tree ==
+class A
+
+============= Module ===========
+[Global Decls]
+
+== Sub Tree ==
+class A
+

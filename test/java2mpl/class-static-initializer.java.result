@@ -155,15 +155,42 @@ Matched 15 tokens.
 [9:1] Table TblStaticInitializer@7: 14,15,
 [10:1] Token
 [11:2] Token
-[12:3] Token
+[12] Table TblVariableDeclaratorList@5: 16,
 [13] Token
 [14] Token
-[15] Table TblBlock@8: 16,17,18,
-[16] Token
-[17:2] Table TblExpressionStatement@9: 19,20,
-[18] Token
-[19:1] Table TblAssignment@9: 21,22,23,
-[20] Token
-[21:1] Token
-[22:2] Token
-[23:3] Token
+[15] Table TblBlock@8: 17,18,19,
+[16] Table TblVariableDeclarator@5: 20,
+[17] Token
+[18:2] Table TblExpressionStatement@9: 21,22,
+[19] Token
+[20:1] Token
+[21:1] Table TblAssignment@9: 23,24,25,
+[22] Token
+[23:1] Token
+[24:2] Token
+[25:3] Token
+In AddInitTo
+Attached a tree node from Child
+In build Variable List
+In build Decl
+In AddAttribute
+In assignment --> BuildBinary
+In build binary
+Attached a tree node from Child
+In BuildBlock
+Attached a tree node from Child
+In BuildClassBody
+In BuildClass
+In AddAttribute
+In AddClassBody
+In AddSuperClass
+In AddSuperInterface
+== Sub Tree ==
+class A
+
+============= Module ===========
+[Global Decls]
+
+== Sub Tree ==
+class A
+

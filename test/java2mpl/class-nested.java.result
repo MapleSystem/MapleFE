@@ -144,14 +144,49 @@ Matched 14 tokens.
 [8:1] Table TblFieldDeclaration@3: 10,11,12,
 [9:1] Table TblNormalClassDeclaration@6: 13,14,15,
 [10:2] Token
-[11:3] Token
+[11] Table TblVariableDeclaratorList@4: 16,
 [12] Token
 [13] Token
 [14] Token
-[15] Table TblClassBody@8: 16,17,18,
-[16] Token
-[17:2] Table TblFieldDeclaration@9: 19,20,21,
-[18] Token
-[19:2] Token
-[20:3] Token
-[21] Token
+[15] Table TblClassBody@8: 17,18,19,
+[16] Table TblVariableDeclarator@4: 20,
+[17] Token
+[18:2] Table TblFieldDeclaration@9: 21,22,23,
+[19] Token
+[20:1] Token
+[21:2] Token
+[22] Table TblVariableDeclaratorList@10: 24,
+[23] Token
+[24] Table TblVariableDeclarator@10: 25,
+[25:1] Token
+In AddInitTo
+Attached a tree node from Child
+In build Variable List
+In build Decl
+In AddAttribute
+In AddInitTo
+Attached a tree node from Child
+In build Variable List
+In build Decl
+In AddAttribute
+In BuildClassBody
+In BuildClass
+In AddAttribute
+In AddClassBody
+In AddSuperClass
+In AddSuperInterface
+In BuildClassBody
+In BuildClass
+In AddAttribute
+In AddClassBody
+In AddSuperClass
+In AddSuperInterface
+== Sub Tree ==
+class A
+
+============= Module ===========
+[Global Decls]
+
+== Sub Tree ==
+class A
+

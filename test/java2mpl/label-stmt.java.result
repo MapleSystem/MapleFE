@@ -174,3 +174,23 @@ Matched 17 tokens.
 [24] Token
 [25:2] Token
 [26] Token
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+In BuildBlock
+In BuildBlock
+In BuildClassBody
+In BuildClass
+In AddAttribute
+In AddClassBody
+In AddSuperClass
+In AddSuperInterface
+== Sub Tree ==
+class A
+
+============= Module ===========
+[Global Decls]
+
+== Sub Tree ==
+class A
+

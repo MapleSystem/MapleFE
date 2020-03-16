@@ -259,3 +259,26 @@ Matched 20 tokens.
 [31:2] Token
 [32:2] Token
 [33:3] Token
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+In build unary
+Convert unary --> binary
+Attached a tree node from Child
+In BuildBlock
+In BuildClassBody
+In BuildClass
+In AddAttribute
+In AddClassBody
+In AddSuperClass
+In AddSuperInterface
+== Sub Tree ==
+class A
+
+============= Module ===========
+[Global Decls]
+
+== Sub Tree ==
+class A
+

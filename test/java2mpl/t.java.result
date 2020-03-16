@@ -180,3 +180,24 @@ Matched 17 tokens.
 [24:1] Token
 [25] Token
 [26] Token
+Attached a tree node from Child
+Attached a tree node from Child
+In assignment --> BuildBinary
+In build binary
+Attached a tree node from Child
+Attached a tree node from Child
+In BuildClassBody
+In BuildClass
+In AddAttribute
+In AddClassBody
+In AddSuperClass
+In AddSuperInterface
+== Sub Tree ==
+class Point
+
+============= Module ===========
+[Global Decls]
+
+== Sub Tree ==
+class Point
+
