@@ -100,3 +100,13 @@ all modules are as below.
   An example is
     rule VariableDeclarator : VariableDeclaratorId + ZEROORONE('=' + VariableInitializer)
       attr.action: AddInitTo(%1, %2)
+
+* BuildAnnotationType
+  Format: BuildAnnotationType(annotation-name)
+
+* BuildAnnotation
+  Format: BuildAnnotation(annotation-name)
+
+* AddAnnotationTypeBody
+  Format: AddAnnotationTypeBody(annotation-type-body)
+

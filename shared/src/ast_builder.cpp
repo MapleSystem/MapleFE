@@ -329,7 +329,8 @@ TreeNode* ASTBuilder::BuildClassBody() {
   ClassBodyNode *class_body = (ClassBodyNode*)mTreePool->NewTreeNode(sizeof(ClassBodyNode));
   new (class_body) ClassBodyNode();
 
-  // Add the children to class_body
+  // If the subtree is PassNode, we need add all children to class_body
+  // If else, simply assign subtree as child.
   TreeNode *subtree = p_subtree.mData.mTreeNode;
   if (subtree->IsPass()) {
     PassNode *pass_node = (PassNode*)subtree;
@@ -362,6 +363,40 @@ TreeNode* ASTBuilder::AddClassBody() {
   return mLastTreeNode;
 }
 
+// This takes just one argument which is the annotation type name.
+TreeNode* ASTBuilder::BuildAnnotationType() {
+  std::cout << "In BuildAnnotationType" << std::endl;
+
+  Param p_name = mParams[0];
+
+  if (!p_name.mIsTreeNode)
+    MERROR("The annotationtype name is not a treenode in BuildAnnotationtType()");
+  TreeNode *node_name = p_name.mData.mTreeNode;
+
+  if (!node_name->IsIdentifier())
+    MERROR("The annotation type name should be an indentifier node. Not?");
+  IdentifierNode *in = (IdentifierNode*)node_name;
+
+  AnnotationTypeNode *annon_type = (AnnotationTypeNode*)mTreePool->NewTreeNode(sizeof(AnnotationTypeNode));
+  new (annon_type) AnnotationTypeNode();
+  annon_type->SetName(node_name);
+
+  // set last tree node and return it.
+  mLastTreeNode = annon_type;
+  return mLastTreeNode;
+}
+
+TreeNode* ASTBuilder::AddAnnotationTypeBody() {
+  std::cout << "In AddAnnotationTypeBody" << std::endl;
+  Param p_attr = mParams[0];
+  return mLastTreeNode;
+}
+
+TreeNode* ASTBuilder::BuildAnnotation() {
+  std::cout << "In BuildAnnotation" << std::endl;
+  Param p_attr = mParams[0];
+  return mLastTreeNode;
+}
 ////////////////////////////////////////////////////////////////////////////////
 //                   Other Functions
 ////////////////////////////////////////////////////////////////////////////////

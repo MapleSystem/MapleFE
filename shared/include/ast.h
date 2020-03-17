@@ -72,6 +72,13 @@ enum NodeKind {
   NK_Class,
   NK_Interface,
 
+  // These two are first coming from Java language. Annotation has no meaning
+  // for execution, but has meanings for compiler or runtime.
+  // AnnotationType : The definition of a type of annotation
+  // Annotation     : The usage of an annotation type
+  NK_AnnotationType,
+  NK_Annotation,
+
   // Following are nodes to facilitate parsing.
   NK_Pass,         // see details in PassNode
   NK_ClassBody,    // see details in ClassBodyNode
@@ -343,6 +350,26 @@ public:
 
   void Release();
   void Dump(unsigned);
+};
+
+//////////////////////////////////////////////////////////////////////////
+//                  AnnotationTypeNode and AnnotationNode
+//
+// Annotation is quite common in modern languages, and we decided to support.
+// Here we define two tree nodes, one for the type definition and one for
+// the annotation usage.
+//////////////////////////////////////////////////////////////////////////
+
+class AnnotationTypeNode : public TreeNode {
+public:
+  IdentifierNode *mName;
+
+  void SetName(IdentifierNode *n) {mName = n;}
+};
+
+class AnnotationNode : public TreeNode {
+public:
+  AnnotationTypeNode *mType;
 };
 
 //////////////////////////////////////////////////////////////////////////

@@ -25,7 +25,7 @@ LIBOBJS :=$(patsubst $(BUILD)/main.o,,$(OBJS))
 DEPS :=$(foreach dep,$(DEP), $(BUILD)/$(dep))
 
 INCLUDES := -I $(ROOTDIR)/shared/include \
-            -I $(ROOTDIR)/java/include \
+            -I $(ROOTDIR)/$(LANG)/include \
             -I .
 
 SHAREDLIB = shared.a

@@ -98,6 +98,11 @@ public:
   TreeNode* AddClassBody();
   TreeNode* AddSuperClass();
   TreeNode* AddSuperInterface();
+
+  // Annotation related
+  TreeNode* BuildAnnotationType();
+  TreeNode* BuildAnnotation();
+  TreeNode* AddAnnotationTypeBody();
 };
 
 #endif

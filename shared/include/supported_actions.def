@@ -49,3 +49,8 @@ ACTION(AddClassBody)
 ACTION(AddAttribute)
 ACTION(AddAttributeTo)
 ACTION(AddInitTo)
+
+// Annotation
+ACTION(BuildAnnotationType)
+ACTION(BuildAnnotation)
+ACTION(AddAnnotationTypeBody)

@@ -153,6 +153,10 @@ rule InterfaceMethodModifier : ONEOF(Annotation, "public", "abstract", "default"
 ######################################################################
 rule AnnotationTypeDeclaration : ZEROORMORE(InterfaceModifier) + '@' + "interface" +
                                  Identifier + AnnotationTypeBody
+  attr.action : BuildAnnotationType(%4)
+  attr.action : AddAttribute(%1)
+  attr.action : AddAnnotationTypeBody(%5)
+
 rule AnnotationTypeBody : '{' + ZEROORMORE(AnnotationTypeMemberDeclaration) + '}'
 rule AnnotationTypeMemberDeclaration : ONEOF(AnnotationTypeElementDeclaration,
                                              ConstantDeclaration,

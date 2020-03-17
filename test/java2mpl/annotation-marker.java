@@ -12,9 +12,4 @@
 //FIT FOR A PARTICULAR PURPOSE.
 //See the Mulan PSL v1 for more details.
 //
-/**
-* An annotation with this type indicates that the
-* specification of the annotated API element is
-* preliminary and subject to change.
-*/
 @interface Preliminary {}
