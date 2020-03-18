@@ -346,17 +346,19 @@ Matched 23 tokens.
 [4:2] Token
 [5] Table TblVariableDeclaratorList@15: 6,
 [6] Table TblVariableDeclarator@15: 7,8,
-[7:1] Token
-[8:2] Table TblVariableDeclarator_sub2@16: 9,10,
+[7] Table TblVariableDeclaratorId@15: 9,
+[8:2] Table TblVariableDeclarator_sub2@16: 10,11,
 [9] Token
-[10:2] Table TblPrimaryNoNewArray_sub2@17: 11,12,13,
-[11] Token
-[12:2] Table TblArrayAccess_sub1@18: 14,15,
-[13] Token
-[14:1] Token
-[15:2] Table TblUnaryExpression_sub1@19: 16,17,
-[16] Token
-[17:2] Token
+[10] Token
+[11:2] Table TblPrimaryNoNewArray_sub2@17: 12,13,14,
+[12] Token
+[13:2] Table TblArrayAccess_sub1@18: 15,16,
+[14] Token
+[15:1] Token
+[16:2] Table TblUnaryExpression_sub1@19: 17,18,
+[17] Token
+[18:2] Token
+In Add Dimensions
 In build unary
 Convert unary --> binary
 Attached a tree node from Child

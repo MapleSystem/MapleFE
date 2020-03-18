@@ -29,8 +29,13 @@ rule VariableDeclarator : VariableDeclaratorId + ZEROORONE('=' + VariableInitial
   attr.action: AddInitTo(%1, %2)
 
 rule VariableDeclaratorId : Identifier + ZEROORONE(Dims)
+  attr.action: AddDims(%1, %2)
 
-rule Dims : ZEROORMORE(Annotation) + '[' + ']' + ZEROORMORE(ZEROORMORE(Annotation) + '[' + ']')
+rule Dims : Dim + ZEROORMORE(Dim)
+ attr.action: BuildDims(%1, %2)
+
+rule Dim  : ZEROORMORE(Annotation) + '[' + ']'
+ attr.action: BuildDim(%1)
 
 rule VariableInitializer : ONEOF(
   Expression,

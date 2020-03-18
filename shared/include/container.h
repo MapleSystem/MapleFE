@@ -85,9 +85,14 @@ public:
 
   T Back();
 
-  T AtIndex(unsigned i) {
+  T ValueAtIndex(unsigned i) {
     char *addr = mMemPool.AddrOfIndex(i);
     return *(T*)addr;
+  }
+
+  T* RefAtIndex(unsigned i) {
+    char *addr = mMemPool.AddrOfIndex(i);
+    return (T*)addr;
   }
 };
 

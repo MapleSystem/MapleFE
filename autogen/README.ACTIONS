@@ -110,3 +110,15 @@ all modules are as below.
 * AddAnnotationTypeBody
   Format: AddAnnotationTypeBody(annotation-type-body)
 
+* BuildDim
+  Format: BuildDim(annotation-of-dim)
+  Build one dimension with possible annotation
+
+* BuildDims
+  Format: BuildDims(the-first-set-of-dims, the-rest-dims)
+  Build multiple dimensions. The first set of dimensions is the first parameter, this could be
+  multiple dimension already. The second parameter tells the rest of dimensions.
+
+* AddDims
+  Format: AddDims(variable, dims)
+  Add the dimensions into the variable.

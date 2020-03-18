@@ -150,10 +150,12 @@ Matched 13 tokens.
 [16] Table TblVariableDeclarator@4: 19,
 [17:1] Table TblAssignment@7: 20,21,22,
 [18] Token
-[19:1] Token
+[19] Table TblVariableDeclaratorId@4: 23,
 [20:1] Token
 [21:2] Token
 [22:3] Token
+[23] Token
+In Add Dimensions
 In AddInitTo
 Attached a tree node from Child
 In build Variable List

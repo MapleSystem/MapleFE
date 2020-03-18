@@ -30,7 +30,8 @@ Identifier Token:  id
 Separator  Token:  Whitespace
 Operator   Token:  Assign
 Separator  Token:  Whitespace
-Integer Literal Token: 2868724
+Integer Literal Token: 286
+Integer Literal Token: 8724
 Separator  Token:  Whitespace
 Separator  Token:  Whitespace
 Separator  Token:  Rparen
@@ -65,34 +66,34 @@ Separator  Token:  Rbrace
 [10] Table TblClassMemberDeclaration@3: 11,
 [11] Table TblMethodDeclaration@3: 12,13,14,
 [12] Table TblMethodDeclaration_sub1@3: 15,16,17,
-[13] Table TblMethodHeader@12: 18,
-[14] Table TblMethodBody@18: 19,
+[13] Table TblMethodHeader@13: 18,
+[14] Table TblMethodBody@19: 19,
 [15] Table TblMethodModifier@3: 20,
-[16] Table TblMethodModifier@10: 21,
-[17] Table TblMethodModifier@11: 22,
-[18] Table TblMethodHeader_sub1@12: 23,24,
-[19] Table TblBlock@18: 25,26,
+[16] Table TblMethodModifier@11: 21,
+[17] Table TblMethodModifier@12: 22,
+[18] Table TblMethodHeader_sub1@13: 23,24,
+[19] Table TblBlock@19: 25,26,
 [20] Table TblAnnotation@3: WasSucc
 [21] Token
 [22] Token
-[23] Table TblResult@12: 27,
-[24] Table TblMethodDeclarator@13: 28,29,30,31,
+[23] Table TblResult@13: 27,
+[24] Table TblMethodDeclarator@14: 28,29,30,31,
 [25] Token
 [26] Token
 [27] Token
 [28] Token
 [29] Token
-[30] Table TblMethodDeclarator_sub1@15: 32,
+[30] Table TblMethodDeclarator_sub1@16: 32,
 [31] Token
-[32] Table TblFormalParameterList@15: 33,
-[33] Table TblFormalParameterList_sub1@15: 34,
-[34] Table TblFormalParameters@15: 35,
-[35] Table TblFormalParameters_sub1@15: 36,
-[36] Table TblFormalParameter@15: 37,38,
-[37] Table TblUnannType@15: WasSucc
-[38] Table TblVariableDeclaratorId@16: 39,
+[32] Table TblFormalParameterList@16: 33,
+[33] Table TblFormalParameterList_sub1@16: 34,
+[34] Table TblFormalParameters@16: 35,
+[35] Table TblFormalParameters_sub1@16: 36,
+[36] Table TblFormalParameter@16: 37,38,
+[37] Table TblUnannType@16: WasSucc
+[38] Table TblVariableDeclaratorId@17: 39,
 [39] Token
-Matched 21 tokens.
+Matched 22 tokens.
 ======= supplemental sortout Dump SortOut =======
 [1] Table TblAnnotation@3: 2,
 [2] Table TblNormalAnnotation@3: 3,4,5,6,7,
@@ -119,17 +120,13 @@ Matched 21 tokens.
 [23] Table TblAdditiveExpression@8: 24,
 [24] Table TblMultiplicativeExpression@8: 25,
 [25] Table TblUnaryExpression@8: 26,
-[26] Table TblUnaryExpressionNotPlusMinus@8: 27,
-[27] Table TblPostfixExpression@8: 28,
-[28] Table TblPrimary@8: 29,
-[29] Table TblPrimaryNoNewArray@8: 30,
-[30] Token
+[26] Table TblUnaryExpressionNotPlusMinus@8: 
 ======= supplemental sortout Dump SortOut =======
-[1] Table TblUnannType@15: 2,
-[2] Table TblUnannReferenceType@15: 3,
-[3] Table TblUnannClassOrInterfaceType@15: 4,
-[4] Table TblUnannClassType@15: 5,
-[5] Table TblUnannClassType_sub1@15: 6,
+[1] Table TblUnannType@16: 2,
+[2] Table TblUnannReferenceType@16: 3,
+[3] Table TblUnannClassOrInterfaceType@16: 4,
+[4] Table TblUnannClassType@16: 5,
+[5] Table TblUnannClassType_sub1@16: 6,
 [6] Token
 ======= patch-was-succ Dump SortOut =======
 [1] Table TblClassDeclaration@0: 2,
@@ -144,55 +141,55 @@ Matched 21 tokens.
 [10] Table TblClassMemberDeclaration@3: 11,
 [11] Table TblMethodDeclaration@3: 12,13,14,
 [12] Table TblMethodDeclaration_sub1@3: 15,16,17,
-[13] Table TblMethodHeader@12: 18,
-[14] Table TblMethodBody@18: 19,
+[13] Table TblMethodHeader@13: 18,
+[14] Table TblMethodBody@19: 19,
 [15] Table TblMethodModifier@3: 20,
-[16] Table TblMethodModifier@10: 21,
-[17] Table TblMethodModifier@11: 22,
-[18] Table TblMethodHeader_sub1@12: 23,24,
-[19] Table TblBlock@18: 25,26,
+[16] Table TblMethodModifier@11: 21,
+[17] Table TblMethodModifier@12: 22,
+[18] Table TblMethodHeader_sub1@13: 23,24,
+[19] Table TblBlock@19: 25,26,
 [20] Table TblAnnotation@3: 27,
 [21] Token
 [22] Token
-[23] Table TblResult@12: 28,
-[24] Table TblMethodDeclarator@13: 29,30,31,32,
+[23] Table TblResult@13: 28,
+[24] Table TblMethodDeclarator@14: 29,30,31,32,
 [25] Token
 [26] Token
 [27] Table TblNormalAnnotation@3: 33,34,35,36,37,
 [28] Token
 [29] Token
 [30] Token
-[31] Table TblMethodDeclarator_sub1@15: 38,
+[31] Table TblMethodDeclarator_sub1@16: 38,
 [32] Token
 [33] Token
 [34] Table TblTypeName@4: 39,
 [35] Token
 [36] Table TblNormalAnnotation_sub1@6: 40,
 [37] Token
-[38] Table TblFormalParameterList@15: 41,
+[38] Table TblFormalParameterList@16: 41,
 [39] Token
 [40] Table TblElementValuePairList@6: 42,
-[41] Table TblFormalParameterList_sub1@15: 43,
+[41] Table TblFormalParameterList_sub1@16: 43,
 [42] Table TblElementValuePair@6: 44,45,46,
-[43] Table TblFormalParameters@15: 47,
+[43] Table TblFormalParameters@16: 47,
 [44] Token
 [45] Token
 [46] Table TblElementValue@8: 48,
-[47] Table TblFormalParameters_sub1@15: 49,
+[47] Table TblFormalParameters_sub1@16: 49,
 [48] Table TblConditionalExpression@8: 50,
-[49] Table TblFormalParameter@15: 51,52,
+[49] Table TblFormalParameter@16: 51,52,
 [50] Table TblConditionalOrExpression@8: 53,
-[51] Table TblUnannType@15: 54,
-[52] Table TblVariableDeclaratorId@16: 55,
+[51] Table TblUnannType@16: 54,
+[52] Table TblVariableDeclaratorId@17: 55,
 [53] Table TblConditionalAndExpression@8: 56,
-[54] Table TblUnannReferenceType@15: 57,
+[54] Table TblUnannReferenceType@16: 57,
 [55] Token
 [56] Table TblInclusiveOrExpression@8: 58,
-[57] Table TblUnannClassOrInterfaceType@15: 59,
+[57] Table TblUnannClassOrInterfaceType@16: 59,
 [58] Table TblExclusiveOrExpression@8: 60,
-[59] Table TblUnannClassType@15: 61,
+[59] Table TblUnannClassType@16: 61,
 [60] Table TblAndExpression@8: 62,
-[61] Table TblUnannClassType_sub1@15: 63,
+[61] Table TblUnannClassType_sub1@16: 63,
 [62] Table TblEqualityExpression@8: 64,
 [63] Token
 [64] Table TblRelationalExpression@8: 65,
@@ -200,11 +197,7 @@ Matched 21 tokens.
 [66] Table TblAdditiveExpression@8: 67,
 [67] Table TblMultiplicativeExpression@8: 68,
 [68] Table TblUnaryExpression@8: 69,
-[69] Table TblUnaryExpressionNotPlusMinus@8: 70,
-[70] Table TblPostfixExpression@8: 71,
-[71] Table TblPrimary@8: 72,
-[72] Table TblPrimaryNoNewArray@8: 73,
-[73] Token
+[69] Table TblUnaryExpressionNotPlusMinus@8: 
 ======= Simplify AppealNode Trees Dump SortOut =======
 [1] Table TblNormalClassDeclaration@0: 2,3,4,
 [2] Token
@@ -214,13 +207,13 @@ Matched 21 tokens.
 [6:2] Table TblMethodDeclaration@3: 8,9,10,
 [7] Token
 [8] Table TblMethodDeclaration_sub1@3: 11,12,13,
-[9:2] Table TblMethodHeader_sub1@12: 14,15,
-[10:3] Table TblBlock@18: 16,17,
+[9:2] Table TblMethodHeader_sub1@13: 14,15,
+[10:3] Table TblBlock@19: 16,17,
 [11:1] Table TblNormalAnnotation@3: 18,19,20,21,22,
 [12:1] Token
 [13:1] Token
 [14:1] Token
-[15] Table TblMethodDeclarator@13: 23,24,25,26,
+[15] Table TblMethodDeclarator@14: 23,24,25,26,
 [16] Token
 [17] Token
 [18] Token
@@ -230,10 +223,11 @@ Matched 21 tokens.
 [22] Token
 [23] Token
 [24] Token
-[25:3] Table TblFormalParameter@15: 30,31,
+[25:3] Table TblFormalParameter@16: 30,31,
 [26] Token
 [27] Token
 [28] Token
-[29:3] Token
+[29:3] Table TblUnaryExpressionNotPlusMinus@8: 
 [30:2] Token
-[31:3] Token
+[31] Table TblVariableDeclaratorId@17: 32,
+[32] Token

@@ -54,3 +54,8 @@ ACTION(AddInitTo)
 ACTION(BuildAnnotationType)
 ACTION(BuildAnnotation)
 ACTION(AddAnnotationTypeBody)
+
+// Dimension
+ACTION(BuildDim)
+ACTION(BuildDims)
+ACTION(AddDims)

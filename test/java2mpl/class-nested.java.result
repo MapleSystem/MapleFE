@@ -153,17 +153,21 @@ Matched 14 tokens.
 [17] Token
 [18:2] Table TblFieldDeclaration@9: 21,22,23,
 [19] Token
-[20:1] Token
+[20] Table TblVariableDeclaratorId@4: 24,
 [21:2] Token
-[22] Table TblVariableDeclaratorList@10: 24,
+[22] Table TblVariableDeclaratorList@10: 25,
 [23] Token
-[24] Table TblVariableDeclarator@10: 25,
-[25:1] Token
+[24] Token
+[25] Table TblVariableDeclarator@10: 26,
+[26] Table TblVariableDeclaratorId@10: 27,
+[27] Token
+In Add Dimensions
 In AddInitTo
 Attached a tree node from Child
 In build Variable List
 In build Decl
 In AddAttribute
+In Add Dimensions
 In AddInitTo
 Attached a tree node from Child
 In build Variable List

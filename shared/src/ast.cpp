@@ -258,6 +258,30 @@ void UnaryOperatorNode::Dump(unsigned indent) {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
+//                          DimensionNode
+//////////////////////////////////////////////////////////////////////////////////////
+
+// Merge 'node' into 'this'.
+void DimensionNode::Merge(const TreeNode *node) {
+  if (!node)
+    return;
+
+  if (node->IsDimension()) {
+    DimensionNode *n = (DimensionNode *)node;
+    for (unsigned i = 0; i < n->GetDimsNum(); i++)
+      AddDim(n->GetNthDim(i));
+  } else if (node->IsPass()) {
+    PassNode *n = (PassNode*)node;
+    for (unsigned i = 0; i < n->GetChildrenNum(); i++) {
+      TreeNode *child = n->GetChild(i);
+      Merge(child);
+    }
+  } else {
+    MERROR("DimensionNode.Merge() cannot handle the node");
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////
 //                          IdentifierNode
 //////////////////////////////////////////////////////////////////////////////////////
 
@@ -267,6 +291,11 @@ void IdentifierNode::Dump(unsigned indent) {
   if (mInit) {
     DUMP0_NORETURN('=');
     mInit->Dump(0);
+  }
+
+  if (IsArray()){
+    for (unsigned i = 0; i < GetDimsNum(); i++)
+      DUMP0_NORETURN("[]");
   }
 }
 
@@ -286,7 +315,13 @@ void VarListNode::Merge(TreeNode *n) {
   } else if (n->IsVarList()) {
     VarListNode *varlist = (VarListNode*)n;
     for (unsigned i = 0; i < varlist->mVars.GetNum(); i++)
-      AddVar(varlist->mVars.AtIndex(i));
+      AddVar(varlist->mVars.ValueAtIndex(i));
+  } else if (n->IsPass()) {
+    PassNode *p = (PassNode*)n;
+    for (unsigned i = 0; i < p->GetChildrenNum(); i++) {
+      TreeNode *child = p->GetChild(i);
+      Merge(child);
+    }
   } else {
     MERROR("VarListNode cannot merge a non-identifier or non-varlist node");
   }
@@ -295,8 +330,8 @@ void VarListNode::Merge(TreeNode *n) {
 void VarListNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   for (unsigned i = 0; i < mVars.GetNum(); i++) {
-    //DUMP0_NORETURN(mVars.AtIndex(i)->GetName());
-    mVars.AtIndex(i)->Dump(0);
+    //DUMP0_NORETURN(mVars.ValueAtIndex(i)->GetName());
+    mVars.ValueAtIndex(i)->Dump(0);
     if (i != mVars.GetNum()-1)
       DUMP0_NORETURN(",");
   }

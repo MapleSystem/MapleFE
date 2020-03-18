@@ -61,6 +61,8 @@ enum ASTAttribute {
 
 enum NodeKind {
   NK_Identifier,
+  NK_Dimension,
+
   NK_VarList,     // A varialble list
   NK_Literal,
   NK_UnaOperator,
@@ -102,6 +104,7 @@ public:
   virtual ~TreeNode() {}
 
   bool IsIdentifier() {return mKind == NK_Identifier;}
+  bool IsDimension()  {return mKind == NK_Dimension;}
   bool IsVarList()    {return mKind == NK_VarList;}
   bool IsLiteral()    {return mKind == NK_Literal;}
   bool IsUnaOperator(){return mKind == NK_UnaOperator;}
@@ -199,22 +202,65 @@ public:
 //    will point to the same node.
 // 3) The name is pointing to the stringpool, which is residing in Lexer.
 //    [TODO] we'll have standalone stringpool...
+//
+//
+//                        Dimension of IdentifierNode
+//
+// For a simple case like, int a[], the dimension info could be attached to
+// type info or identifier. I finally decided to put in the identifier since
+// it's actually a feature of the object not the type. The type only tells
+// what each element is. But anyway, it doesn't matter much in either way.
+// A slight advantage puting dimension in identifier is we don't need so many
+// types.
 //////////////////////////////////////////////////////////////////////////
+
+// mDimensions[N] tells the Nst dimension.
+// mDimensions[N] = 0, means the length of that dimension is unspecified.
+class DimensionNode : public TreeNode {
+private:
+  SmallVector<unsigned> mDimensions;
+public:
+  DimensionNode() {mKind = NK_Dimension;}
+  ~DimensionNode(){Release();}
+
+  unsigned GetDimsNum() {return mDimensions.GetNum();}
+  unsigned GetNthDim(unsigned n) {return mDimensions.ValueAtIndex(n);} // 0 means unspecified.
+  void     SetNthDim(unsigned n, unsigned i) {
+    unsigned *addr = mDimensions.RefAtIndex(n);
+    *addr = i;
+  }
+  unsigned AddDim(unsigned i = 0) {mDimensions.PushBack(i);}
+  void     Merge(const TreeNode*);
+
+  void Release() {mDimensions.Release();}
+  void Dump();
+};
 
 class IdentifierNode : public TreeNode {
 public:
-  const char *mName; // In the lexer's StringPool
-  ASTType    *mType;
-  TreeNode   *mInit; // Init value
+  const char    *mName; // In the lexer's StringPool
+  ASTType       *mType;
+  TreeNode      *mInit; // Init value
+  DimensionNode *mDims;
 public:
-  IdentifierNode(const char *s) : mName(s), mType(NULL), mInit(NULL) {
+  IdentifierNode(const char *s) : mName(s), mType(NULL), mInit(NULL), mDims(NULL) {
     mKind = NK_Identifier; }
   IdentifierNode(const char *s, ASTType *t) : mName(s), mType(t) {mKind = NK_Identifier;}
   ~IdentifierNode(){}
 
   const char* GetName()     {return mName;}
-  void SetType(ASTType *t)  {mType = t;}
-  void SetInit(TreeNode *t) {mInit = t;}
+
+  void SetType(ASTType *t)       {mType = t;}
+  void SetInit(TreeNode *t)      {mInit = t;}
+  void SetDims(DimensionNode *t) {mDims = t;}
+
+  unsigned GetDimsNum()          {return mDims->GetDimsNum();}
+  bool     IsArray()             {return mDims && GetDimsNum() > 0;}
+  unsigned AddDim(unsigned i = 0){mDims->AddDim(i);}           // 0 means unspecified
+  unsigned GetNthNum(unsigned n) {return mDims->GetNthDim(n);} // 0 means unspecified.
+  void     SetNthNum(unsigned n, unsigned i) {mDims->SetNthDim(n, i);}
+
+  void Release() { if (mDims) mDims->Release();}
   void Dump(unsigned);
 };
 
@@ -361,15 +407,16 @@ public:
 //////////////////////////////////////////////////////////////////////////
 
 class AnnotationTypeNode : public TreeNode {
-public:
+private:
   IdentifierNode *mName;
-
+public:
   void SetName(IdentifierNode *n) {mName = n;}
 };
 
 class AnnotationNode : public TreeNode {
-public:
+private:
   AnnotationTypeNode *mType;
+public:
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -386,11 +433,14 @@ public:
 //////////////////////////////////////////////////////////////////////////
 
 class PassNode : public TreeNode {
-public:
+private:
   SmallVector<TreeNode*> mChildren;
 public:
   PassNode() {mKind = NK_Pass;}
   ~PassNode() {}
+
+  unsigned  GetChildrenNum() {return mChildren.GetNum();}
+  TreeNode* GetChild(unsigned idx) {return mChildren.ValueAtIndex(idx);}
 
   void AddChild(TreeNode *c) {mChildren.PushBack(c);}
   void Release() {mChildren.Release();}

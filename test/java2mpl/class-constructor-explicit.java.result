@@ -225,28 +225,34 @@ Matched 22 tokens.
 [21] Token
 [22:3] Table TblExpressionStatement@14: 29,30,
 [23] Token
-[24:1] Token
+[24] Table TblVariableDeclaratorId@4: 31,
 [25] Token
-[26] Table TblVariableDeclarator@6: 31,
+[26] Table TblVariableDeclarator@6: 32,
 [27:2] Token
-[28:3] Token
-[29:1] Table TblAssignment@14: 32,33,34,
+[28] Table TblVariableDeclaratorId@11: 33,
+[29:1] Table TblAssignment@14: 34,35,36,
 [30] Token
-[31:1] Token
-[32:1] Table TblFieldAccess_sub1@14: 35,36,37,
-[33:2] Token
-[34:3] Token
-[35:1] Token
-[36] Token
+[31] Token
+[32] Table TblVariableDeclaratorId@6: 37,
+[33] Token
+[34:1] Table TblFieldAccess_sub1@14: 38,39,40,
+[35:2] Token
+[36:3] Token
 [37] Token
+[38:1] Token
+[39] Token
+[40] Token
+In Add Dimensions
 In AddInitTo
 Attached a tree node from Child
+In Add Dimensions
 In AddInitTo
 Attached a tree node from Child
 Attached a tree node from Child
 In build Variable List
 In build Decl
 In AddAttribute
+In Add Dimensions
 Attached a tree node from Child
 Attached a tree node from Child
 In assignment --> BuildBinary

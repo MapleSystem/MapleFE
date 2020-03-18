@@ -177,24 +177,43 @@ Matched 17 tokens.
 [10] Token
 [11] Table TblVariableDeclarator@4: 13,14,
 [12] Table TblVariableDeclaratorList_sub1@7: 15,16,
-[13:1] Token
-[14:2] Table TblVariableDeclarator_sub2@5: 17,18,
-[15] Table TblVariableDeclaratorList_sub2@7: 19,20,
-[16] Table TblVariableDeclaratorList_sub2@11: 21,22,
+[13] Table TblVariableDeclaratorId@4: 17,
+[14:2] Table TblVariableDeclarator_sub2@5: 18,19,
+[15] Table TblVariableDeclaratorList_sub2@7: 20,21,
+[16] Table TblVariableDeclaratorList_sub2@11: 22,23,
 [17] Token
-[18:2] Token
-[19] Token
-[20] Table TblVariableDeclarator@8: 23,24,
-[21] Token
-[22] Table TblVariableDeclarator@12: 25,26,
-[23:1] Token
-[24:2] Table TblVariableDeclarator_sub2@9: 27,28,
-[25:1] Token
-[26:2] Table TblVariableDeclarator_sub2@13: 29,30,
-[27] Token
-[28:2] Token
+[18] Token
+[19:2] Token
+[20] Token
+[21] Table TblVariableDeclarator@8: 24,25,
+[22] Token
+[23] Table TblVariableDeclarator@12: 26,27,
+[24] Table TblVariableDeclaratorId@8: 28,
+[25:2] Table TblVariableDeclarator_sub2@9: 29,30,
+[26] Table TblVariableDeclaratorId@12: 31,
+[27:2] Table TblVariableDeclarator_sub2@13: 32,33,
+[28] Token
 [29] Token
 [30:2] Token
+[31] Token
+[32] Token
+[33:2] Token
+In Add Dimensions
+Attached a tree node from Child
+In AddInitTo
+In Add Dimensions
+Attached a tree node from Child
+In AddInitTo
+Attached a tree node from Child
+In Add Dimensions
+Attached a tree node from Child
+In AddInitTo
+Attached a tree node from Child
+In build Variable List
+Attached a tree node from Child
+Attached a tree node from Child
+== Sub Tree ==
+
 Separator  Token:  Whitespace
 Separator  Token:  Whitespace
 Keyword    Token:  int
@@ -407,31 +426,56 @@ Matched 40 tokens.
 [13] Token
 [14] Table TblVariableDeclarator@23: 16,17,
 [15] Table TblVariableDeclaratorList_sub1@26: 18,19,20,
-[16:1] Token
-[17:2] Table TblVariableDeclarator_sub2@24: 21,22,
-[18] Table TblVariableDeclaratorList_sub2@26: 23,24,
-[19] Table TblVariableDeclaratorList_sub2@30: 25,26,
-[20] Table TblVariableDeclaratorList_sub2@34: 27,28,
+[16] Table TblVariableDeclaratorId@23: 21,
+[17:2] Table TblVariableDeclarator_sub2@24: 22,23,
+[18] Table TblVariableDeclaratorList_sub2@26: 24,25,
+[19] Table TblVariableDeclaratorList_sub2@30: 26,27,
+[20] Table TblVariableDeclaratorList_sub2@34: 28,29,
 [21] Token
-[22:2] Token
-[23] Token
-[24] Table TblVariableDeclarator@27: 29,30,
-[25] Token
-[26] Table TblVariableDeclarator@31: 31,32,
-[27] Token
-[28] Table TblVariableDeclarator@35: 33,34,
-[29:1] Token
-[30:2] Table TblVariableDeclarator_sub2@28: 35,36,
-[31:1] Token
-[32:2] Table TblVariableDeclarator_sub2@32: 37,38,
-[33:1] Token
-[34:2] Table TblVariableDeclarator_sub2@36: 39,40,
-[35] Token
-[36:2] Token
+[22] Token
+[23:2] Token
+[24] Token
+[25] Table TblVariableDeclarator@27: 30,31,
+[26] Token
+[27] Table TblVariableDeclarator@31: 32,33,
+[28] Token
+[29] Table TblVariableDeclarator@35: 34,35,
+[30] Table TblVariableDeclaratorId@27: 36,
+[31:2] Table TblVariableDeclarator_sub2@28: 37,38,
+[32] Table TblVariableDeclaratorId@31: 39,
+[33:2] Table TblVariableDeclarator_sub2@32: 40,41,
+[34] Table TblVariableDeclaratorId@35: 42,
+[35:2] Table TblVariableDeclarator_sub2@36: 43,44,
+[36] Token
 [37] Token
 [38:2] Token
 [39] Token
-[40:2] Token
+[40] Token
+[41:2] Token
+[42] Token
+[43] Token
+[44:2] Token
+Attached a tree node from Child
+In Add Dimensions
+Attached a tree node from Child
+In AddInitTo
+In Add Dimensions
+Attached a tree node from Child
+In AddInitTo
+Attached a tree node from Child
+In Add Dimensions
+Attached a tree node from Child
+In AddInitTo
+Attached a tree node from Child
+In Add Dimensions
+Attached a tree node from Child
+In AddInitTo
+Attached a tree node from Child
+In build Variable List
+Attached a tree node from Child
+Attached a tree node from Child
+== Sub Tree ==
+
 Separator  Token:  Whitespace
 Separator  Token:  Whitespace
 Keyword    Token:  int
@@ -614,24 +658,44 @@ Matched 59 tokens.
 [13] Token
 [14] Table TblVariableDeclarator@46: 16,17,
 [15] Table TblVariableDeclaratorList_sub1@49: 18,19,
-[16:1] Token
-[17:2] Table TblVariableDeclarator_sub2@47: 20,21,
-[18] Table TblVariableDeclaratorList_sub2@49: 22,23,
-[19] Table TblVariableDeclaratorList_sub2@53: 24,25,
+[16] Table TblVariableDeclaratorId@46: 20,
+[17:2] Table TblVariableDeclarator_sub2@47: 21,22,
+[18] Table TblVariableDeclaratorList_sub2@49: 23,24,
+[19] Table TblVariableDeclaratorList_sub2@53: 25,26,
 [20] Token
-[21:2] Token
-[22] Token
-[23] Table TblVariableDeclarator@50: 26,27,
-[24] Token
-[25] Table TblVariableDeclarator@54: 28,29,
-[26:1] Token
-[27:2] Table TblVariableDeclarator_sub2@51: 30,31,
-[28:1] Token
-[29:2] Table TblVariableDeclarator_sub2@55: 32,33,
-[30] Token
-[31:2] Token
+[21] Token
+[22:2] Token
+[23] Token
+[24] Table TblVariableDeclarator@50: 27,28,
+[25] Token
+[26] Table TblVariableDeclarator@54: 29,30,
+[27] Table TblVariableDeclaratorId@50: 31,
+[28:2] Table TblVariableDeclarator_sub2@51: 32,33,
+[29] Table TblVariableDeclaratorId@54: 34,
+[30:2] Table TblVariableDeclarator_sub2@55: 35,36,
+[31] Token
 [32] Token
 [33:2] Token
+[34] Token
+[35] Token
+[36:2] Token
+Attached a tree node from Child
+In Add Dimensions
+Attached a tree node from Child
+In AddInitTo
+In Add Dimensions
+Attached a tree node from Child
+In AddInitTo
+Attached a tree node from Child
+In Add Dimensions
+Attached a tree node from Child
+In AddInitTo
+Attached a tree node from Child
+In build Variable List
+Attached a tree node from Child
+Attached a tree node from Child
+== Sub Tree ==
+
 Separator  Token:  Whitespace
 Separator  Token:  Whitespace
 Keyword    Token:  int
@@ -854,25 +918,59 @@ Matched 82 tokens.
 [17:2] Token
 [18] Table TblVariableDeclarator@67: 20,21,
 [19] Table TblVariableDeclaratorList_sub1@70: 22,23,
-[20:1] Token
-[21:2] Table TblVariableDeclarator_sub2@68: 24,25,
-[22] Table TblVariableDeclaratorList_sub2@70: 26,27,
-[23] Table TblVariableDeclaratorList_sub2@74: 28,29,
+[20] Table TblVariableDeclaratorId@67: 24,
+[21:2] Table TblVariableDeclarator_sub2@68: 25,26,
+[22] Table TblVariableDeclaratorList_sub2@70: 27,28,
+[23] Table TblVariableDeclaratorList_sub2@74: 29,30,
 [24] Token
-[25:2] Token
-[26] Token
-[27] Table TblVariableDeclarator@71: 30,31,
-[28] Token
-[29] Table TblVariableDeclarator@75: 32,33,
-[30:1] Token
-[31:2] Table TblVariableDeclarator_sub2@72: 34,35,
-[32:1] Token
-[33:2] Table TblVariableDeclarator_sub2@76: 36,37,
-[34] Token
-[35:2] Token
+[25] Token
+[26:2] Token
+[27] Token
+[28] Table TblVariableDeclarator@71: 31,32,
+[29] Token
+[30] Table TblVariableDeclarator@75: 33,34,
+[31] Table TblVariableDeclaratorId@71: 35,
+[32:2] Table TblVariableDeclarator_sub2@72: 36,37,
+[33] Table TblVariableDeclaratorId@75: 38,
+[34:2] Table TblVariableDeclarator_sub2@76: 39,40,
+[35] Token
 [36] Token
-[37:2] Table TblArrayAccess_sub1@77: 38,39,
-[38:1] Token
-[39:2] Table TblUnaryExpression_sub1@78: 40,41,
-[40] Token
-[41:2] Token
+[37:2] Token
+[38] Token
+[39] Token
+[40:2] Table TblArrayAccess_sub1@77: 41,42,
+[41:1] Token
+[42:2] Table TblUnaryExpression_sub1@78: 43,44,
+[43] Token
+[44:2] Token
+Attached a tree node from Child
+Attached a tree node from Child
+In Add Dimensions
+Attached a tree node from Child
+In AddInitTo
+In Add Dimensions
+Attached a tree node from Child
+In AddInitTo
+Attached a tree node from Child
+In Add Dimensions
+In build unary
+Convert unary --> binary
+Attached a tree node from Child
+In AddInitTo
+Attached a tree node from Child
+In build Variable List
+Attached a tree node from Child
+Attached a tree node from Child
+== Sub Tree ==
+
+============= Module ===========
+[Global Decls]
+
+== Sub Tree ==
+
+== Sub Tree ==
+
+== Sub Tree ==
+
+== Sub Tree ==
+

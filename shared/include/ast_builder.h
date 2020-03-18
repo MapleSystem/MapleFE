@@ -103,6 +103,11 @@ public:
   TreeNode* BuildAnnotationType();
   TreeNode* BuildAnnotation();
   TreeNode* AddAnnotationTypeBody();
+
+  // Dimension Related
+  TreeNode* BuildDim();
+  TreeNode* BuildDims();
+  TreeNode* AddDims();
 };
 
 #endif

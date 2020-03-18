@@ -180,7 +180,7 @@ TreeNode* ASTBuilder::BuildDecl() {
   } else if (n->IsVarList()) {
     VarListNode *vl = (VarListNode*)n;
     for (unsigned i = 0; i < vl->mVars.GetNum(); i++)
-      vl->mVars.AtIndex(i)->SetType(type);
+      vl->mVars.ValueAtIndex(i)->SetType(type);
   }
 
   // Step 3. Save this decl
@@ -334,8 +334,8 @@ TreeNode* ASTBuilder::BuildClassBody() {
   TreeNode *subtree = p_subtree.mData.mTreeNode;
   if (subtree->IsPass()) {
     PassNode *pass_node = (PassNode*)subtree;
-    for (unsigned i = 0; i < pass_node->mChildren.GetNum(); i++)
-      class_body->AddChild(pass_node->mChildren.AtIndex(i));
+    for (unsigned i = 0; i < pass_node->GetChildrenNum(); i++)
+      class_body->AddChild(pass_node->GetChild(i));
   } else {
     class_body->AddChild(subtree);
   }
@@ -397,6 +397,80 @@ TreeNode* ASTBuilder::BuildAnnotation() {
   Param p_attr = mParams[0];
   return mLastTreeNode;
 }
+
+// This takes just one argument which is the length of this dimension
+// [TODO] Don't support yet.
+TreeNode* ASTBuilder::BuildDim() {
+  std::cout << "In BuildDim" << std::endl;
+
+  DimensionNode *dim = (DimensionNode*)mTreePool->NewTreeNode(sizeof(DimensionNode));
+  new (dim) DimensionNode();
+  dim->AddDim();
+
+  // set last tree node and return it.
+  mLastTreeNode = dim;
+  return mLastTreeNode;
+}
+
+// BuildDims() takes two parameters. Each contains a set of dimension info.
+// Each is a DimensionNode.
+TreeNode* ASTBuilder::BuildDims() {
+  std::cout << "In build dimension List" << std::endl;
+
+  MASSERT(mParams.size() == 2 && "BuildDims has NO 2 params?");
+  Param p_dims_a = mParams[0];
+  Param p_dims_b = mParams[1];
+
+  // Both variable should have been created as tree node.
+  if (!p_dims_a.mIsTreeNode || !p_dims_b.mIsTreeNode) {
+    MERROR("The var in BuildVarList is not a treenode");
+  }
+
+  TreeNode *node_a = p_dims_a.mIsEmpty ? NULL : p_dims_a.mData.mTreeNode;
+  TreeNode *node_b = p_dims_b.mIsEmpty ? NULL : p_dims_b.mData.mTreeNode;
+
+  // Pick an existing node, merge the other into to.
+  DimensionNode *node_ret = NULL;
+  if (node_a) {
+    node_ret = (DimensionNode*)node_a;
+    node_ret->Merge(node_b);
+  } else if (node_b) {
+    node_ret = (DimensionNode*)node_b;
+    node_ret->Merge(node_a);
+  } else {
+    // both nodes are NULL
+    MERROR("BuildDims() has two NULL parameters?");
+  }
+
+  // Set last tree node
+  mLastTreeNode = node_ret;
+  return node_ret;
+}
+
+// AddDims() takes two parameters. The first is the variable,
+// the second is the dims.
+TreeNode* ASTBuilder::AddDims() {
+  std::cout << "In Add Dimensions" << std::endl;
+
+  MASSERT(mParams.size() == 2 && "AddDims has NO 2 params?");
+  Param p_dims_a = mParams[0];
+  Param p_dims_b = mParams[1];
+
+  // Both variable should have been created as tree node.
+  if (p_dims_a.mIsEmpty)
+    MERROR("The var in AddDims() is empty?");
+
+  TreeNode *node_a = p_dims_a.mData.mTreeNode;
+  TreeNode *node_b = p_dims_b.mIsEmpty ? NULL : p_dims_b.mData.mTreeNode;
+  if (node_b) {
+    IdentifierNode *inode = (IdentifierNode*)node_a;
+    inode->SetDims(node_b);
+  }
+
+  mLastTreeNode = node_a;
+  return node_a;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 //                   Other Functions
 ////////////////////////////////////////////////////////////////////////////////

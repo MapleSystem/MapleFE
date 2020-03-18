@@ -35,7 +35,7 @@ enum TypeCategory {
 };
 
 class ASTType {
-public:
+private:
   TypeCategory mCat;
   union {
     IdentifierNode *mIdentifier;  // user type
@@ -46,7 +46,6 @@ public:
   ASTType() {mCat = Primitive;}
   ~ASTType(){}
 
-public:
   bool IsPrim() {return mCat == Primitive;}
   bool IsUser() {return mCat == User;}
 

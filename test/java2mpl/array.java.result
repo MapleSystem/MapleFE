@@ -33,9 +33,10 @@ Separator  Token:  Semicolon
 [12] Token
 [13] Table TblVariableDeclaratorId_sub1@2: 15,
 [14] Token
-[15] Table TblDims@2: 16,17,
-[16] Token
+[15] Table TblDims@2: 16,
+[16] Table TblDim@2: 17,18,
 [17] Token
+[18] Token
 Matched 5 tokens.
 ======= patch-was-succ Dump SortOut =======
 [1] Table TblStatement@0: 2,
@@ -52,16 +53,36 @@ Matched 5 tokens.
 [12] Token
 [13] Table TblVariableDeclaratorId_sub1@2: 15,
 [14] Token
-[15] Table TblDims@2: 16,17,
-[16] Token
+[15] Table TblDims@2: 16,
+[16] Table TblDim@2: 17,18,
 [17] Token
+[18] Token
 ======= Simplify AppealNode Trees Dump SortOut =======
 [1] Table TblLocalVariableDeclarationStatement@0: 2,3,
 [2] Table TblLocalVariableDeclaration@0: 4,5,
 [3] Token
 [4:2] Token
-[5:3] Table TblVariableDeclaratorId@1: 6,7,
-[6] Token
-[7:2] Table TblDims@2: 8,9,
+[5] Table TblVariableDeclaratorList@1: 6,
+[6] Table TblVariableDeclarator@1: 7,
+[7] Table TblVariableDeclaratorId@1: 8,9,
 [8] Token
-[9] Token
+[9:2] Table TblDims@2: 10,
+[10] Table TblDim@2: 11,12,
+[11] Token
+[12] Token
+In BuildDim
+In build dimension List
+In Add Dimensions
+In AddInitTo
+Attached a tree node from Child
+In build Variable List
+In build Decl
+In AddAttribute
+Attached a tree node from Child
+== Sub Tree ==
+a[]
+============= Module ===========
+[Global Decls]
+a[]
+== Sub Tree ==
+a[]

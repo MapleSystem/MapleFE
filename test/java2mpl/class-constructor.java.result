@@ -303,45 +303,53 @@ Matched 31 tokens.
 [21] Token
 [22:3] Table TblBlockStatements@17: 29,30,
 [23] Token
-[24:1] Token
+[24] Table TblVariableDeclaratorId@4: 31,
 [25] Token
-[26] Table TblVariableDeclarator@6: 31,
-[27] Table TblFormalParameter@10: 32,33,
-[28:2] Table TblFormalParameters_sub3@12: 34,35,
-[29:1] Table TblExpressionStatement@17: 36,37,
-[30:2] Table TblExpressionStatement@23: 38,39,
-[31:1] Token
-[32:2] Token
-[33:3] Token
-[34] Token
-[35] Table TblFormalParameter@13: 40,41,
-[36:1] Table TblAssignment@17: 42,43,44,
-[37] Token
-[38:1] Table TblAssignment@23: 45,46,47,
-[39] Token
-[40:2] Token
-[41:3] Token
-[42:1] Table TblFieldAccess_sub1@17: 48,49,50,
+[26] Table TblVariableDeclarator@6: 32,
+[27] Table TblFormalParameter@10: 33,34,
+[28:2] Table TblFormalParameters_sub3@12: 35,36,
+[29:1] Table TblExpressionStatement@17: 37,38,
+[30:2] Table TblExpressionStatement@23: 39,40,
+[31] Token
+[32] Table TblVariableDeclaratorId@6: 41,
+[33:2] Token
+[34] Table TblVariableDeclaratorId@11: 42,
+[35] Token
+[36] Table TblFormalParameter@13: 43,44,
+[37:1] Table TblAssignment@17: 45,46,47,
+[38] Token
+[39:1] Table TblAssignment@23: 48,49,50,
+[40] Token
+[41] Token
+[42] Token
 [43:2] Token
-[44:3] Token
-[45:1] Table TblFieldAccess_sub1@23: 51,52,53,
+[44] Table TblVariableDeclaratorId@14: 51,
+[45:1] Table TblFieldAccess_sub1@17: 52,53,54,
 [46:2] Token
 [47:3] Token
-[48:1] Token
-[49] Token
-[50] Token
-[51:1] Token
-[52] Token
+[48:1] Table TblFieldAccess_sub1@23: 55,56,57,
+[49:2] Token
+[50:3] Token
+[51] Token
+[52:1] Token
 [53] Token
+[54] Token
+[55:1] Token
+[56] Token
+[57] Token
+In Add Dimensions
 In AddInitTo
 Attached a tree node from Child
+In Add Dimensions
 In AddInitTo
 Attached a tree node from Child
 Attached a tree node from Child
 In build Variable List
 In build Decl
 In AddAttribute
+In Add Dimensions
 Attached a tree node from Child
+In Add Dimensions
 Attached a tree node from Child
 Attached a tree node from Child
 Attached a tree node from Child
