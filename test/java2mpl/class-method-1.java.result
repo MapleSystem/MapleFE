@@ -136,21 +136,10 @@ Matched 12 tokens.
 [20] Token
 [21] Token
 [22] Token
-In Add Dimensions
-In AddInitTo
-Attached a tree node from Child
-In build Variable List
-In build Decl
-In AddAttribute
 Attached a tree node from Child
 Attached a tree node from Child
 Attached a tree node from Child
-In BuildClassBody
-In BuildClass
-In AddAttribute
-In AddClassBody
-In AddSuperClass
-In AddSuperInterface
+Attached a tree node from Child
 == Sub Tree ==
 class A
 

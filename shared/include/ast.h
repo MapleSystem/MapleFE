@@ -464,6 +464,7 @@ public:
   ~ASTTree();
 
   TreeNode* NewTreeNode(AppealNode*, std::map<AppealNode*, TreeNode*> &);
+  void      SetTraceBuild(bool b);
 
   TreeNode* BuildBinaryOperation(TreeNode *, TreeNode *, OprId);
   TreeNode* BuildPassNode();

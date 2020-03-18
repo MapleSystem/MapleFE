@@ -319,29 +319,18 @@ Matched 27 tokens.
 [50] Table TblVariableDeclaratorId@23: 52,
 [51] Token
 [52] Token
-In Add Dimensions
-Attached a tree node from Child
-In Add Dimensions
 Attached a tree node from Child
 Attached a tree node from Child
 Attached a tree node from Child
 Attached a tree node from Child
-In Add Dimensions
-Attached a tree node from Child
-In Add Dimensions
-Attached a tree node from Child
-Attached a tree node from Child
-In Add Dimensions
 Attached a tree node from Child
 Attached a tree node from Child
 Attached a tree node from Child
 Attached a tree node from Child
-In BuildClassBody
-In BuildClass
-In AddAttribute
-In AddClassBody
-In AddSuperClass
-In AddSuperInterface
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
 == Sub Tree ==
 class A
 

@@ -182,6 +182,7 @@ public:
   bool mTraceFailed;        // trace mFailed
   bool mTraceVisited;       // trace mVisitedStack
   bool mTraceSortOut;       // trace Sort out.
+  bool mTraceAstBuild;      // trace Sort out.
   bool mTraceWarning;       // print the warning.
 
   void DumpEnterTable(const char *tablename, unsigned indent);

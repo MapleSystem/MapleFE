@@ -346,36 +346,17 @@ Matched 31 tokens.
 [55:1] Token
 [56] Token
 [57] Token
-In Add Dimensions
-In AddInitTo
-Attached a tree node from Child
-In Add Dimensions
-In AddInitTo
-Attached a tree node from Child
-Attached a tree node from Child
-In build Variable List
-In build Decl
-In AddAttribute
-In Add Dimensions
-Attached a tree node from Child
-In Add Dimensions
 Attached a tree node from Child
 Attached a tree node from Child
 Attached a tree node from Child
-In assignment --> BuildBinary
-In build binary
 Attached a tree node from Child
 Attached a tree node from Child
-In assignment --> BuildBinary
-In build binary
 Attached a tree node from Child
 Attached a tree node from Child
-In BuildClassBody
-In BuildClass
-In AddAttribute
-In AddClassBody
-In AddSuperClass
-In AddSuperInterface
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
 == Sub Tree ==
 class Point
 

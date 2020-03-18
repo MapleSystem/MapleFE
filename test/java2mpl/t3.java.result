@@ -52,12 +52,7 @@ Matched 3 tokens.
 [6] Table TblVariableDeclarator@1: 7,
 [7] Table TblVariableDeclaratorId@1: 8,
 [8] Token
-In Add Dimensions
-In AddInitTo
 Attached a tree node from Child
-In build Variable List
-In build Decl
-In AddAttribute
 Attached a tree node from Child
 == Sub Tree ==
 a

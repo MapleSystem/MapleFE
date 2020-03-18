@@ -46,6 +46,9 @@ struct Param {
 class ASTScope;
 
 class ASTBuilder {
+private:
+  bool mTrace;
+
 public:
   // information for a single action
   unsigned                mActionId;
@@ -66,8 +69,10 @@ private:
   SmallVector<TreeNode*>  mPendingNodes;
 
 public:
-  ASTBuilder(TreePool *p) : mTreePool(p) {}
+  ASTBuilder(TreePool *p, bool trace=false) : mTreePool(p), mTrace(trace) {}
   ~ASTBuilder() {}
+
+  void SetTrace(bool b) {mTrace = b;}
 
   void AddParam(Param p) {mParams.push_back(p);}
   void ClearParams() {mParams.clear();}

@@ -70,14 +70,7 @@ Matched 5 tokens.
 [10] Table TblDim@2: 11,12,
 [11] Token
 [12] Token
-In BuildDim
-In build dimension List
-In Add Dimensions
-In AddInitTo
 Attached a tree node from Child
-In build Variable List
-In build Decl
-In AddAttribute
 Attached a tree node from Child
 == Sub Tree ==
 a[]

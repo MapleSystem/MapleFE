@@ -198,18 +198,11 @@ Matched 17 tokens.
 [31] Token
 [32] Token
 [33:2] Token
-In Add Dimensions
 Attached a tree node from Child
-In AddInitTo
-In Add Dimensions
 Attached a tree node from Child
-In AddInitTo
 Attached a tree node from Child
-In Add Dimensions
 Attached a tree node from Child
-In AddInitTo
 Attached a tree node from Child
-In build Variable List
 Attached a tree node from Child
 Attached a tree node from Child
 == Sub Tree ==
@@ -456,22 +449,13 @@ Matched 40 tokens.
 [43] Token
 [44:2] Token
 Attached a tree node from Child
-In Add Dimensions
 Attached a tree node from Child
-In AddInitTo
-In Add Dimensions
 Attached a tree node from Child
-In AddInitTo
 Attached a tree node from Child
-In Add Dimensions
 Attached a tree node from Child
-In AddInitTo
 Attached a tree node from Child
-In Add Dimensions
 Attached a tree node from Child
-In AddInitTo
 Attached a tree node from Child
-In build Variable List
 Attached a tree node from Child
 Attached a tree node from Child
 == Sub Tree ==
@@ -680,18 +664,11 @@ Matched 59 tokens.
 [35] Token
 [36:2] Token
 Attached a tree node from Child
-In Add Dimensions
 Attached a tree node from Child
-In AddInitTo
-In Add Dimensions
 Attached a tree node from Child
-In AddInitTo
 Attached a tree node from Child
-In Add Dimensions
 Attached a tree node from Child
-In AddInitTo
 Attached a tree node from Child
-In build Variable List
 Attached a tree node from Child
 Attached a tree node from Child
 == Sub Tree ==
@@ -945,20 +922,12 @@ Matched 82 tokens.
 [44:2] Token
 Attached a tree node from Child
 Attached a tree node from Child
-In Add Dimensions
 Attached a tree node from Child
-In AddInitTo
-In Add Dimensions
 Attached a tree node from Child
-In AddInitTo
 Attached a tree node from Child
-In Add Dimensions
-In build unary
 Convert unary --> binary
 Attached a tree node from Child
-In AddInitTo
 Attached a tree node from Child
-In build Variable List
 Attached a tree node from Child
 Attached a tree node from Child
 == Sub Tree ==

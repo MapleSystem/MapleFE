@@ -62,7 +62,8 @@ TreeNode* ASTBuilder::CreateTokenTreeNode(const Token *token) {
 
 // For first parameter has to be an operator.
 TreeNode* ASTBuilder::BuildUnaryOperation() {
-  std::cout << "In build unary" << std::endl;
+  if (mTrace)
+    std::cout << "In build unary" << std::endl;
 
   MASSERT(mParams.size() == 2 && "Binary Operator has NO 2 params?");
   Param p_a = mParams[0];
@@ -91,7 +92,8 @@ TreeNode* ASTBuilder::BuildUnaryOperation() {
 
 // For second parameter has to be an operator.
 TreeNode* ASTBuilder::BuildBinaryOperation() {
-  std::cout << "In build binary" << std::endl;
+  if (mTrace)
+    std::cout << "In build binary" << std::endl;
 
   MASSERT(mParams.size() == 3 && "Binary Operator has NO 3 params?");
   Param p_a = mParams[0];
@@ -130,7 +132,8 @@ TreeNode* ASTBuilder::BuildBinaryOperation() {
 
 // Assignment is actually a binary operator.
 TreeNode* ASTBuilder::BuildAssignment() {
-  std::cout << "In assignment --> BuildBinary" << std::endl;
+  if (mTrace)
+    std::cout << "In assignment --> BuildBinary" << std::endl;
   return BuildBinaryOperation();
 }
 
@@ -148,7 +151,8 @@ TreeNode* ASTBuilder::BuildReturn() {
 
 // BuildDecl takes two parameters, type and name
 TreeNode* ASTBuilder::BuildDecl() {
-  std::cout << "In build Decl" << std::endl;
+  if (mTrace)
+    std::cout << "In build Decl" << std::endl;
 
   MASSERT(mParams.size() == 2 && "BinaryDecl has NO 2 params?");
   Param p_type = mParams[0];
@@ -191,7 +195,8 @@ TreeNode* ASTBuilder::BuildDecl() {
 
 // BuildVariableList takes two parameters, var 1 and var 2
 TreeNode* ASTBuilder::BuildVarList() {
-  std::cout << "In build Variable List" << std::endl;
+  if (mTrace)
+    std::cout << "In build Variable List" << std::endl;
 
   MASSERT(mParams.size() == 2 && "BuildVarList has NO 2 params?");
   Param p_var_a = mParams[0];
@@ -236,19 +241,22 @@ TreeNode* ASTBuilder::BuildVarList() {
 }
 
 TreeNode* ASTBuilder::AddAttribute() {
-  std::cout << "In AddAttribute" << std::endl;
+  if (mTrace)
+    std::cout << "In AddAttribute" << std::endl;
   Param p_attr = mParams[0];
   return mLastTreeNode;
 }
 
 TreeNode* ASTBuilder::AddAttributeTo() {
-  std::cout << "In AddAttributeTo" << std::endl;
+  if (mTrace)
+    std::cout << "In AddAttributeTo" << std::endl;
   Param p_attr = mParams[0];
   return mLastTreeNode;
 }
 
 TreeNode* ASTBuilder::AddInitTo() {
-  std::cout << "In AddInitTo" << std::endl;
+  if (mTrace)
+    std::cout << "In AddInitTo" << std::endl;
   Param p_decl = mParams[0];
   Param p_init;
 
@@ -278,7 +286,8 @@ TreeNode* ASTBuilder::AddInitTo() {
 
 // This takes just one argument which is the root of sub tree
 TreeNode* ASTBuilder::BuildBlock() {
-  std::cout << "In BuildBlock" << std::endl;
+  if (mTrace)
+    std::cout << "In BuildBlock" << std::endl;
 
   Param p_subtree = mParams[0];
 
@@ -296,7 +305,8 @@ TreeNode* ASTBuilder::BuildBlock() {
 
 // This takes just one argument which is the class name.
 TreeNode* ASTBuilder::BuildClass() {
-  std::cout << "In BuildClass" << std::endl;
+  if (mTrace)
+    std::cout << "In BuildClass" << std::endl;
 
   Param p_name = mParams[0];
 
@@ -320,7 +330,8 @@ TreeNode* ASTBuilder::BuildClass() {
 
 // This takes just one argument which is the root of sub tree
 TreeNode* ASTBuilder::BuildClassBody() {
-  std::cout << "In BuildClassBody" << std::endl;
+  if (mTrace)
+    std::cout << "In BuildClassBody" << std::endl;
 
   Param p_subtree = mParams[0];
   if (!p_subtree.mIsTreeNode)
@@ -346,26 +357,30 @@ TreeNode* ASTBuilder::BuildClassBody() {
 }
 
 TreeNode* ASTBuilder::AddSuperClass() {
-  std::cout << "In AddSuperClass" << std::endl;
+  if (mTrace)
+    std::cout << "In AddSuperClass" << std::endl;
   Param p_attr = mParams[0];
   return mLastTreeNode;
 }
 
 TreeNode* ASTBuilder::AddSuperInterface() {
-  std::cout << "In AddSuperInterface" << std::endl;
+  if (mTrace)
+    std::cout << "In AddSuperInterface" << std::endl;
   Param p_attr = mParams[0];
   return mLastTreeNode;
 }
 
 TreeNode* ASTBuilder::AddClassBody() {
-  std::cout << "In AddClassBody" << std::endl;
+  if (mTrace)
+    std::cout << "In AddClassBody" << std::endl;
   Param p_attr = mParams[0];
   return mLastTreeNode;
 }
 
 // This takes just one argument which is the annotation type name.
 TreeNode* ASTBuilder::BuildAnnotationType() {
-  std::cout << "In BuildAnnotationType" << std::endl;
+  if (mTrace)
+    std::cout << "In BuildAnnotationType" << std::endl;
 
   Param p_name = mParams[0];
 
@@ -387,13 +402,15 @@ TreeNode* ASTBuilder::BuildAnnotationType() {
 }
 
 TreeNode* ASTBuilder::AddAnnotationTypeBody() {
-  std::cout << "In AddAnnotationTypeBody" << std::endl;
+  if (mTrace)
+    std::cout << "In AddAnnotationTypeBody" << std::endl;
   Param p_attr = mParams[0];
   return mLastTreeNode;
 }
 
 TreeNode* ASTBuilder::BuildAnnotation() {
-  std::cout << "In BuildAnnotation" << std::endl;
+  if (mTrace)
+    std::cout << "In BuildAnnotation" << std::endl;
   Param p_attr = mParams[0];
   return mLastTreeNode;
 }
@@ -401,7 +418,8 @@ TreeNode* ASTBuilder::BuildAnnotation() {
 // This takes just one argument which is the length of this dimension
 // [TODO] Don't support yet.
 TreeNode* ASTBuilder::BuildDim() {
-  std::cout << "In BuildDim" << std::endl;
+  if (mTrace)
+    std::cout << "In BuildDim" << std::endl;
 
   DimensionNode *dim = (DimensionNode*)mTreePool->NewTreeNode(sizeof(DimensionNode));
   new (dim) DimensionNode();
@@ -415,7 +433,8 @@ TreeNode* ASTBuilder::BuildDim() {
 // BuildDims() takes two parameters. Each contains a set of dimension info.
 // Each is a DimensionNode.
 TreeNode* ASTBuilder::BuildDims() {
-  std::cout << "In build dimension List" << std::endl;
+  if (mTrace)
+    std::cout << "In build dimension List" << std::endl;
 
   MASSERT(mParams.size() == 2 && "BuildDims has NO 2 params?");
   Param p_dims_a = mParams[0];
@@ -450,7 +469,8 @@ TreeNode* ASTBuilder::BuildDims() {
 // AddDims() takes two parameters. The first is the variable,
 // the second is the dims.
 TreeNode* ASTBuilder::AddDims() {
-  std::cout << "In Add Dimensions" << std::endl;
+  if (mTrace)
+    std::cout << "In Add Dimensions" << std::endl;
 
   MASSERT(mParams.size() == 2 && "AddDims has NO 2 params?");
   Param p_dims_a = mParams[0];

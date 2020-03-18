@@ -263,6 +263,7 @@ Parser::Parser(const char *name) : filename(name) {
   mTraceVisited = false;
   mTraceFailed = false;
   mTraceSortOut = true;
+  mTraceAstBuild = false;
   mTraceWarning = false;
 
   mIndentation = 0;
@@ -1973,6 +1974,7 @@ ASTTree* Parser::BuildAST() {
   done_nodes.clear();
 
   ASTTree *tree = new ASTTree();
+  tree->SetTraceBuild(mTraceAstBuild);
 
   std::stack<AppealNode*> appeal_stack;
   appeal_stack.push(mRootNode->mSortedChildren[0]);

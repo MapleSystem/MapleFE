@@ -63,6 +63,10 @@ ASTTree::~ASTTree() {
   delete mBuilder;
 }
 
+void ASTTree::SetTraceBuild(bool b) {
+  mBuilder->SetTrace(b);
+}
+
 // Create tree node. Its children have been created tree nodes.
 // There are couple issueshere.
 //

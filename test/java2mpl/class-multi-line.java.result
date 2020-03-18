@@ -83,18 +83,7 @@ Matched 7 tokens.
 [11] Table TblVariableDeclarator@4: 12,
 [12] Table TblVariableDeclaratorId@4: 13,
 [13] Token
-In Add Dimensions
-In AddInitTo
 Attached a tree node from Child
-In build Variable List
-In build Decl
-In AddAttribute
-In BuildClassBody
-In BuildClass
-In AddAttribute
-In AddClassBody
-In AddSuperClass
-In AddSuperInterface
 == Sub Tree ==
 class A
 

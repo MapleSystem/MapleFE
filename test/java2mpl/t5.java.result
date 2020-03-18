@@ -110,10 +110,7 @@ Matched 6 tokens.
 [8:2] Table TblUnaryExpression_sub1@3: 9,10,
 [9] Token
 [10:2] Token
-In build unary
 Convert unary --> binary
-In assignment --> BuildBinary
-In build binary
 Attached a tree node from Child
 == Sub Tree ==
 Assign
@@ -230,11 +227,8 @@ Matched 14 tokens.
 [11:2] Table TblUnaryExpression_sub1@10: 12,13,
 [12] Token
 [13:2] Token
-In build unary
 Convert unary --> binary
 Attached a tree node from Child
-In assignment --> BuildBinary
-In build binary
 Attached a tree node from Child
 == Sub Tree ==
 Assign
@@ -358,15 +352,9 @@ Matched 23 tokens.
 [16:2] Table TblUnaryExpression_sub1@19: 17,18,
 [17] Token
 [18:2] Token
-In Add Dimensions
-In build unary
 Convert unary --> binary
 Attached a tree node from Child
 Attached a tree node from Child
-In AddInitTo
-In build Variable List
-In build Decl
-In AddAttribute
 Attached a tree node from Child
 == Sub Tree ==
 a=Add
