@@ -82,30 +82,7 @@ Lexer::Lexer()
     mPredefinedTokenNum(0),
     _linenum(0) {
       seencomments.clear();
-      keywordmap.clear();
       mCheckSeparator = true;
-
-#define KEYWORD(S, T, I)      \
-  {                           \
-    std::string str(#S);      \
-    keywordmap[str] = TK_##T; \
-  }
-#include "keywords.def"
-#undef KEYWORD
-#define OPKEYWORD(S, T, I)    \
-  {                           \
-    std::string str(S);       \
-    keywordmap[str] = TK_##I; \
-  }
-#include "opkeywords.def"
-#undef OPKEYWORD
-#define SEPARATOR(S, T)     \
-  {                           \
-    std::string str(S);       \
-    keywordmap[str] = TK_##T; \
-  }
-#include "supported_separators.def"
-#undef SEPARATOR
 }
 
 void Lexer::PrepareForFile(const std::string filename) {

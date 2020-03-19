@@ -57,7 +57,6 @@ class Lexer {
   bool endoffile;
   int ReadALine();  // read a line from def file.
 
-  std::unordered_map<std::string, TK_Kind> keywordmap;
   // get the identifier name after the % or $ prefix
   void GetName(void);
 
@@ -72,12 +71,6 @@ class Lexer {
       free(line);
       line = nullptr;
     }
-    int i = 0;
-    for (auto it: keywordmap) {
-      i++;
-    }
-    keywordmap.clear();
-    return;
   }
 
   bool EndOfLine() { return curidx == current_line_size; }
@@ -153,10 +146,6 @@ class Lexer {
   const char* TraverseKeywordTable();    //
   const char* TraverseIdentifierTable(); //
 };
-
-inline bool IsVarName(TK_Kind tk) {
-  return tk == TK_Name;
-}
 
 // This is language specific function. Please implement this in LANG/src,
 // such as java/src/lang_spec.cpp

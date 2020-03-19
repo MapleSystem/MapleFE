@@ -135,10 +135,8 @@ public:
 
 ////////////////////////////////////////////////////////////////////////
 //                       LiteralToken                                 //
-// The literals defined here are from autogen/supported_literals.def  //
-// Autogen generates GenIntegerLiteral(...) and etc. which recognize  //
-// LT_Int and the correspondings.                                     //
 ////////////////////////////////////////////////////////////////////////
+
 struct LitData {
   LT_Type mType; 
   union {
