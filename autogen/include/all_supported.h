@@ -21,28 +21,22 @@
 #define __ALL_SUPPORTED_H__
 
 #include <string>
+#include "supported.h"
 
 ///////////////////////////////////////////////////////////////////////////////////
 //                                  Type Info                                    //
 ///////////////////////////////////////////////////////////////////////////////////
 
-// The types supported in autogen, this is language independent.
-#undef  TYPE
-#define TYPE(T) AG_TY_##T,
-enum AGTypeId {
-#include "supported_types.def"
-AG_TY_NA
-};
-
+// The types supported in autogen, shared with parser. this is language independent.
 // The supported types and their name.
 // The 'name' is used as known word in type.spec
 struct TypeMapping {
   std::string mName;
-  AGTypeId      mType;
+  TypeId      mType;
 };
 
-extern AGTypeId FindAGTypeIdLangIndep(const std::string &s);
-extern char *GetTypeString(AGTypeId tid);
+extern TypeId FindTypeIdLangIndep(const std::string &s);
+extern char *GetTypeString(TypeId tid);
 
 ///////////////////////////////////////////////////////////////////////////////////
 //                                 Literal Info                                  //

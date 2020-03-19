@@ -160,7 +160,7 @@ bool SPECParser::ParseElement(RuleElem *&elem, bool allowConcat) {
 
   SPECTokenKind tk = mLexer->GetToken();
   const std::string name = mLexer->GetTheName();
-  AGTypeId t = FindAGTypeIdLangIndep(name);
+  TypeId t = FindTypeIdLangIndep(name);
 
   switch (tk) {
     case SPECTK_Name: {
@@ -168,7 +168,7 @@ bool SPECParser::ParseElement(RuleElem *&elem, bool allowConcat) {
       rule = mBaseGen->FindRule(name);
       if (rule) {
         elem->SetRule(rule);
-      } else if (t != AG_TY_NA) {
+      } else if (t != TY_NA) {
         elem->SetTypeId(t);
       } else {
         char *str = mBaseGen->mStringPool->FindString(name);

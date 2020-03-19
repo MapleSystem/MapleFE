@@ -38,20 +38,13 @@
 
 #include "base_struct.h"
 #include "base_gen.h"
+#include "supported.h"
 
 // For each separator, it has three parts involved in the generation.
 //   1. SepId:   Used inside autogen, connection between LANGUAGE and SUPPORTED
 //               .spec files
 //   2. Name:    Name of SEP_ID, to be generated in gen_separator.cpp 
 //   4. Keyword: LANGUAGE syntax text, to be in gen_separator.cpp
-
-// The separators supported in autogen, super set of all languages.
-#undef  SEPARATOR
-#define SEPARATOR(N, T) SEP_##T,
-enum SepId {
-#include "supported_separators.def"
-SEP_NA
-};
 
 // The SUPPORTED separator and their name.
 // The 'name' is used as known word in separator.spec

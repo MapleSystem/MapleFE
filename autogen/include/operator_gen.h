@@ -30,20 +30,13 @@
 
 #include "base_struct.h"
 #include "base_gen.h"
+#include "supported.h"
 
 // For each operator, it has three parts involved in the generation.
 //   1. OprId: Used inside autogen, connection between LANGUAGE and
 //             supported_operators.spec files
 //   2. Name:  Name of OPR ID, to be generated in gen_operator.cpp 
 //   4. Text:  LANGUAGE syntax text, to be in gen_operator.cpp
-
-// The operators supported in autogen, super set of all languages.
-#undef  OPERATOR
-#define OPERATOR(T, D) OPR_##T,
-enum OprId {
-#include "supported_operators.def"
-OPR_NA
-};
 
 // The SUPPORTED operator and their name.
 // 'name' is used as known word in operator.spec

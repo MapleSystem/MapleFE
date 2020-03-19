@@ -34,7 +34,7 @@
 
 struct Keyword2Type {
   std::string mKeyword;
-  AGTypeId    mId;
+  TypeId    mId;
 };
 
 class TypeGen : public BaseGen {
@@ -46,7 +46,7 @@ public:
   ~TypeGen(){}
 
   void ProcessStructData();
-  void AddEntry(std::string s, AGTypeId t) { mTypes.push_back({s, t}); }
+  void AddEntry(std::string s, TypeId t) { mTypes.push_back({s, t}); }
 
   void Generate();
   void GenCppFile();

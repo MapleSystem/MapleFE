@@ -129,7 +129,7 @@ public:
                            // Here only put the base type: Rule
     char        mChar;
     const char *mString;   // Pending elem. string is NULL ended in string pool
-    AGTypeId    mTypeId;
+    TypeId    mTypeId;
   } mData;
 
   TK_Kind       mToken;    // record the token for rule like '(' ')' '[' ']' ';' ...
@@ -145,7 +145,7 @@ public:
   void SetRule(Rule *r) {mType = ET_Rule; mData.mRule = r;}
   void SetChar(char c)      {mType = ET_Char; mData.mChar = c;}
   void SetString(const char *s) {mType = ET_String; mData.mString = s;}
-  void SetTypeId(AGTypeId t)  {mType = ET_Type; mData.mTypeId = t;}
+  void SetTypeId(TypeId t)  {mType = ET_Type; mData.mTypeId = t;}
   void SetPending(const char *s) {mType = ET_Pending; mData.mString = s;}
 
   const char *GetPendingName() {return mData.mString;}
