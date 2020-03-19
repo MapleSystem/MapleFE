@@ -333,22 +333,24 @@ TreeNode* ASTBuilder::BuildClassBody() {
   if (mTrace)
     std::cout << "In BuildClassBody" << std::endl;
 
-  Param p_subtree = mParams[0];
-  if (!p_subtree.mIsTreeNode)
-    MERROR("The subtree is not a treenode in BuildBlock()");
-
   ClassBodyNode *class_body = (ClassBodyNode*)mTreePool->NewTreeNode(sizeof(ClassBodyNode));
   new (class_body) ClassBodyNode();
 
-  // If the subtree is PassNode, we need add all children to class_body
-  // If else, simply assign subtree as child.
-  TreeNode *subtree = p_subtree.mData.mTreeNode;
-  if (subtree->IsPass()) {
-    PassNode *pass_node = (PassNode*)subtree;
-    for (unsigned i = 0; i < pass_node->GetChildrenNum(); i++)
-      class_body->AddChild(pass_node->GetChild(i));
-  } else {
-    class_body->AddChild(subtree);
+  Param p_subtree = mParams[0];
+  if (!p_subtree.mIsEmpty) {
+    if (!p_subtree.mIsTreeNode)
+      MERROR("The subtree is not a treenode in BuildBlock()");
+
+    // If the subtree is PassNode, we need add all children to class_body
+    // If else, simply assign subtree as child.
+    TreeNode *subtree = p_subtree.mData.mTreeNode;
+    if (subtree->IsPass()) {
+      PassNode *pass_node = (PassNode*)subtree;
+      for (unsigned i = 0; i < pass_node->GetChildrenNum(); i++)
+        class_body->AddChild(pass_node->GetChild(i));
+    } else {
+      class_body->AddChild(subtree);
+    }
   }
 
   // set last tree node
