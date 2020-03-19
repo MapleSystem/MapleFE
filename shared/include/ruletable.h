@@ -20,32 +20,7 @@
 #ifndef __RULE_TABLE_H__
 #define __RULE_TABLE_H__
 
-// The list of all supported types. This covers all the languages.
-// NOTE: autogen also relies on this set of supported separators
-#undef  TYPE
-#define TYPE(T) TY_##T,
-typedef enum {
-#include "supported_types.def"
-TY_NA
-}TypeId;
-
-// The list of all supported separators. This covers all the languages.
-// NOTE: autogen also relies on this set of supported separators
-#undef  SEPARATOR
-#define SEPARATOR(N, T) SEP_##T,
-typedef enum {
-#include "supported_separators.def"
-SEP_NA
-}SepId;
-
-// The list of all supported operators. This covers all the languages.
-// NOTE: autogen also relies on this set of supported operators.
-#undef  OPERATOR
-#define OPERATOR(T, D) OPR_##T,
-typedef enum {
-#include "supported_operators.def"
-OPR_NA
-}OprId;
+#include "supported.h"
 
 ///////////////////////////////////////////////////////////////////////////
 //                       Rule Table                                      //
@@ -96,17 +71,6 @@ struct TableData {
     Token      *mToken;
   }mData;
 };
-
-// TODO: The action id will come from both the shared part and language specific part.
-//       For now I just put everything together in order to expediate the overall
-//       progress. Will come back.
-
-#undef  ACTION
-#define ACTION(T) ACT_##T,
-typedef enum {
-#include "supported_actions.def"
-ACT_NA
-}ActionId;
 
 // We give the biggest number of elements in an action to 12
 // Please keep this number the same as the one in Autogen. We verify this number

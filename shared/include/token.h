@@ -37,7 +37,7 @@ class Lexer;   // early decl, gen_separator.h needs it
 #include <vector>
 #include "element.h"
 #include "stringutil.h"
-#include "ruletable.h"
+#include "supported.h"
 #include "tokenkind.h"
 
 // TokenText contains the text data of each token, no matter it's a
@@ -139,14 +139,6 @@ public:
 // Autogen generates GenIntegerLiteral(...) and etc. which recognize  //
 // LT_Int and the correspondings.                                     //
 ////////////////////////////////////////////////////////////////////////
-#define LITERAL(T) LT_##T,
-typedef enum {
-#include "supported_literals.def"
-  LT_NA     // N/A, in java, Null is legal type with only one value 'null'
-            // reference, a literal. So LT_Null is actually legal. 
-            // So I put LT_NA for the illegal literal
-} LT_Type;
-
 struct LitData {
   LT_Type mType; 
   union {

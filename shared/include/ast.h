@@ -50,14 +50,8 @@
 #include "ast_mempool.h"
 #include "container.h"
 
-#include "ruletable.h"
+#include "supported.h"
 #include "token.h"
-
-#undef ATTRIBUTE
-#define ATTRIBUTE(X) ATTR_##X,
-enum ASTAttribute {
-#include "supported_attributes.def"
-};
 
 enum NodeKind {
   NK_Identifier,

@@ -28,15 +28,4 @@ enum FEOpcode {
   FEOP_Invalid
 };
 
-class FEOPCode {
-  FEOpcode  op;
-
- public:
-  FEOPCode() : op(FEOP_Invalid) {}
-  FEOPCode(FEOpcode o) : op(o) {}
-
-  std::string GetString(FEOpcode op);
-  FEOpcode Token2FEOpcode(TK_Kind tk);
-};
-
 #endif

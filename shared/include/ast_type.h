@@ -24,7 +24,7 @@
 #ifndef __AST_TYPE_H__
 #define __AST_TYPE_H__
 
-#include "ruletable.h"   // to include TypeId
+#include "ruletable.h"
 #include "mempool.h"
 
 class IdentifierNode;
