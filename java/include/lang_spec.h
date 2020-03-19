@@ -31,5 +31,5 @@ public:
   bool   StringIsNull(std::string &s);
 };
 
-extern LitData ProcessLiteral(LT_Type type, const char *str);
+extern LitData ProcessLiteral(LitId type, const char *str);
 #endif

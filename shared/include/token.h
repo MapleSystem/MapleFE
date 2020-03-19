@@ -138,7 +138,7 @@ public:
 ////////////////////////////////////////////////////////////////////////
 
 struct LitData {
-  LT_Type mType; 
+  LitId mType;
   union {
     int   mInt;
     float mFloat;
@@ -149,7 +149,7 @@ struct LitData {
   } mData;
 
   LitData() {}
-  LitData(LT_Type t) : mType(t) {}
+  LitData(LitId t) : mType(t) {}
 };
 
 class LiteralToken : public Token {

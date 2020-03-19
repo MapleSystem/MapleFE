@@ -29,12 +29,12 @@ bool   StringToValueImpl::StringIsNull(std::string &s) {return false;}
 //
 // 'str' is in the Lexer's string pool.
 //
-LitData ProcessLiteral(LT_Type type, const char *str) {
+LitData ProcessLiteral(LitId id, const char *str) {
   LitData data;
   std::string value_text(str);
   StringToValueImpl s2v;
 
-  switch (type) {
+  switch (id) {
   case LT_IntegerLiteral: {
     int i = s2v.StringToInt(value_text);
     data.mType = LT_IntegerLiteral;
@@ -60,7 +60,7 @@ LitData ProcessLiteral(LT_Type type, const char *str) {
     data.mData.mStr = str;
     break; }
   case LT_NullLiteral: {
-    // Just need set the type
+    // Just need set the id
     data.mType = LT_NullLiteral;
     break; }
   case LT_NA:    // N/A,

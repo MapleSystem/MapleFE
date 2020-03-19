@@ -42,24 +42,24 @@ char *GetTypeString(TypeId tid) {
 //////////////   literals supported /////////////////
 
 #undef  LITERAL
-#define LITERAL(S) {#S, LIT_##S},
-LiteralSuppStruct LiteralsSupported[LIT_NA] = {
+#define LITERAL(S) {#S, LT_##S},
+LiteralSuppStruct LiteralsSupported[LT_NA] = {
 #include "supported_literals.def"
 };
 
 // s : the name 
-// return the LiteralId
-LiteralId FindLiteralId(const std::string &s) {
-  for (unsigned u = 0; u < LIT_NA; u++) {
+// return the LitId
+LitId FindLiteralId(const std::string &s) {
+  for (unsigned u = 0; u < LT_NA; u++) {
     if (!LiteralsSupported[u].mName.compare(0, s.length(), s))
       return LiteralsSupported[u].mLiteralId;
   }
-  return LIT_NA;
+  return LT_NA;
 }
 
-std::string FindLiteralName(LiteralId id) {
+std::string FindLiteralName(LitId id) {
   std::string s("");
-  for (unsigned u = 0; u < LIT_NA; u++) {
+  for (unsigned u = 0; u < LT_NA; u++) {
     if (LiteralsSupported[u].mLiteralId == id){
       s = LiteralsSupported[u].mName;
       break;

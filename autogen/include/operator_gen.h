@@ -34,7 +34,7 @@
 
 // For each operator, it has three parts involved in the generation.
 //   1. OprId: Used inside autogen, connection between LANGUAGE and
-//             supported_operators.spec files
+//             shared/supported.h files
 //   2. Name:  Name of OPR ID, to be generated in gen_operator.cpp 
 //   4. Text:  LANGUAGE syntax text, to be in gen_operator.cpp
 

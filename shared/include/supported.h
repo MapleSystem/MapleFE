@@ -52,7 +52,7 @@ typedef enum {
   LT_NA     // N/A, in java, Null is legal type with only one value 'null'
             // reference, a literal. So LT_Null is actually legal. 
             // So I put LT_NA for the illegal literal
-} LT_Type;
+}LitId;
 
 
 #undef ATTRIBUTE

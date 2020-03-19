@@ -150,6 +150,6 @@ class Lexer {
 // This is language specific function. Please implement this in LANG/src,
 // such as java/src/lang_spec.cpp
 
-extern LitData ProcessLiteral(LT_Type type, const char *str);
+extern LitData ProcessLiteral(LitId type, const char *str);
 
 #endif  // INCLUDE_LEXER_H
