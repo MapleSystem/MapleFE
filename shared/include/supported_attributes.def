@@ -16,6 +16,13 @@
 // This file defines attributes supported which are common in most languages.
 // Each language can define its unique attributes in its directory.
 
-ATTRIBUTE(public)
-ATTRIBUTE(protect)
+ATTRIBUTE(abstract)
+ATTRIBUTE(const)
+ATTRIBUTE(volatile)
+ATTRIBUTE(final)
+ATTRIBUTE(native)
 ATTRIBUTE(private)
+ATTRIBUTE(protected)
+ATTRIBUTE(public)
+ATTRIBUTE(static)
+ATTRIBUTE(strictfp)

@@ -102,14 +102,22 @@ extern const RuleTable LiteralTable;
 
 //////////////////////////////////////////////////////////////////////
 //                       Type   Table                               //
-// Type tables contain two parts. The keyword tables and rule tables//
+// Tells the keyword of each supported type in language.            //
 //////////////////////////////////////////////////////////////////////
 
-// The declaration and definition of TYPE KEYWORD TABLE are generated
-// in LANGUAGE/include/gen_type.h and LANGUAGE/src/gen_type.cpp
 struct TypeKeyword {
   const char *mText;
   TypeId      mId;
+};
+
+//////////////////////////////////////////////////////////////////////
+//                     Attribute  Table                             //
+// Tells the keyword of each supported attribute in language.       //
+//////////////////////////////////////////////////////////////////////
+
+struct AttrKeyword {
+  const char *mText;
+  AttrId      mId;
 };
 
 //////////////////////////////////////////////////////////////////////

@@ -133,6 +133,12 @@ void AutoGen::Init() {
   mTypeGen->SetReserved(mReservedGen);
   mGenArray.push_back(mTypeGen);
 
+  hFile = lang_path_header + "gen_attr.h";
+  cppFile = lang_path_cpp + "gen_attr.cpp";
+  mAttrGen  = new AttrGen("attr.spec", hFile.c_str(), cppFile.c_str());
+  mAttrGen->SetReserved(mReservedGen);
+  mGenArray.push_back(mAttrGen);
+
   hFile = lang_path_header + "gen_local_var.h";
   cppFile = lang_path_cpp + "gen_local_var.cpp";
   mLocalvarGen  = new LocalvarGen("local_var.spec", hFile.c_str(), cppFile.c_str());
@@ -185,6 +191,8 @@ AutoGen::~AutoGen() {
     delete mLitGen;
   if (mTypeGen)
     delete mTypeGen;
+  if (mAttrGen)
+    delete mAttrGen;
   if (mLocalvarGen)
     delete mLocalvarGen;
   if (mBlockGen)
@@ -224,6 +232,7 @@ void AutoGen::Run() {
   mIdenGen->Run(mParser);
   mLitGen->Run(mParser);
   mTypeGen->Run(mParser);
+  mAttrGen->Run(mParser);
 
   mLocalvarGen->Run(mParser);
   mBlockGen->Run(mParser);
@@ -243,6 +252,7 @@ void AutoGen::Gen() {
   mIdenGen->Generate();
   mLitGen->Generate();
   mTypeGen->Generate();
+  mAttrGen->Generate();
 
   mLocalvarGen->Generate();
   mBlockGen->Generate();

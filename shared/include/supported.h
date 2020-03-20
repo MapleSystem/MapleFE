@@ -57,8 +57,9 @@ typedef enum {
 
 #undef ATTRIBUTE
 #define ATTRIBUTE(X) ATTR_##X,
-enum ASTAttribute {
+enum AttrId {
 #include "supported_attributes.def"
+ATTR_NA
 };
 
 
@@ -69,9 +70,9 @@ enum ASTAttribute {
 
 #undef  ACTION
 #define ACTION(T) ACT_##T,
-typedef enum {
+enum ActionId{
 #include "supported_actions.def"
 ACT_NA
-}ActionId;
+};
 
 #endif

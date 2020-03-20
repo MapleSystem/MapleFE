@@ -377,7 +377,7 @@ public:
   IdentifierNode              *mName;
   SmallVector<ClassNode*>      mSuperClasses;
   SmallVector<InterfaceNode*>  mSuperInterfaces;
-  SmallVector<ASTAttribute>    mAttributes;
+  SmallVector<AttrId>          mAttributes;
   BlockNode                   *mBody;
 public:
   ClassNode(){mKind = NK_Class;}
@@ -386,7 +386,7 @@ public:
   void SetName(IdentifierNode *n) {mName = n;}
   void AddSuperClass(ClassNode *n) {mSuperClasses.PushBack(n);}
   void AddSuperClass(InterfaceNode *n) {mSuperInterfaces.PushBack(n);}
-  void AddAttribute(ASTAttribute a) {mAttributes.PushBack(a);}
+  void AddAttribute(AttrId a) {mAttributes.PushBack(a);}
 
   void Release();
   void Dump(unsigned);

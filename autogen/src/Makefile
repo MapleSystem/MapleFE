@@ -31,6 +31,7 @@ $(TARGET) : $(AUTOGENLIB)
 	@ln -sf $(ROOTDIR)/java/separator.spec $(BUILD)/separator.spec
 	@ln -sf $(ROOTDIR)/java/keyword.spec $(BUILD)/keyword.spec
 	@ln -sf $(ROOTDIR)/java/type.spec $(BUILD)/type.spec
+	@ln -sf $(ROOTDIR)/java/attr.spec $(BUILD)/attr.spec
 	@ln -sf $(ROOTDIR)/java/local_var.spec $(BUILD)/local_var.spec
 	@ln -sf $(ROOTDIR)/java/block.spec $(BUILD)/block.spec
 	@ln -sf $(ROOTDIR)/java/expr.spec $(BUILD)/expr.spec

@@ -12,6 +12,7 @@
 * FIT FOR A PARTICULAR PURPOSE.
 * See the Mulan PSL v1 for more details.
 */
+
 //////////////////////////////////////////////////////////////////////////////////////
 //  This file defines all the supported information in Autogen.                     //
 //  All information in this file is language independent.                           //
@@ -39,8 +40,22 @@ extern TypeId FindTypeIdLangIndep(const std::string &s);
 extern char *GetTypeString(TypeId tid);
 
 ///////////////////////////////////////////////////////////////////////////////////
+//                             Attribute Info                                    //
+///////////////////////////////////////////////////////////////////////////////////
+
+// The attribute supported in autogen, shared with parser. this is language independent.
+// The supported attributes and their name.
+struct AttrMapping {
+  std::string mName;
+  AttrId      mId;
+};
+
+extern AttrId FindAttrId(const std::string &s); // from name to id
+extern char *GetAttrString(AttrId tid);         // from id to name
+
+///////////////////////////////////////////////////////////////////////////////////
 //                                 Literal Info                                  //
-// This is languange independent. This info is just about the LitId and its  //
+// This is languange independent. This info is just about the LitId and     its  //
 // names.                                                                        //
 // This is the SUPER SET of all languages' literals.                             //
 ///////////////////////////////////////////////////////////////////////////////////

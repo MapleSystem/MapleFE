@@ -32,6 +32,7 @@
 #include "expr_gen.h"
 #include "stmt_gen.h"
 #include "keyword_gen.h"
+#include "attr_gen.h"
 
 class AutoGen {
 private:
@@ -39,6 +40,7 @@ private:
   ReservedGen  *mReservedGen;
   LiteralGen   *mLitGen;
   TypeGen      *mTypeGen;
+  AttrGen      *mAttrGen;
   LocalvarGen  *mLocalvarGen;
   BlockGen     *mBlockGen;
   SeparatorGen *mSeparatorGen;

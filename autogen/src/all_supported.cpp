@@ -12,9 +12,13 @@
 * FIT FOR A PARTICULAR PURPOSE.
 * See the Mulan PSL v1 for more details.
 */
+
 #include "all_supported.h"
 
-//////////////   Types supported /////////////////
+//////////////////////////////////////////////////////////////////////
+//                     Types supported
+//////////////////////////////////////////////////////////////////////
+
 #undef  TYPE
 #define TYPE(T) {#T, TY_##T},
 TypeMapping TypesSupported[TY_NA] = {
@@ -39,7 +43,37 @@ char *GetTypeString(TypeId tid) {
   }
 };
 
-//////////////   literals supported /////////////////
+//////////////////////////////////////////////////////////////////////
+//                     Attributes supported
+//////////////////////////////////////////////////////////////////////
+
+#undef  ATTRIBUTE
+#define ATTRIBUTE(T) {#T, ATTR_##T},
+AttrMapping AttrsSupported[ATTR_NA] = {
+#include "supported_attributes.def"
+};
+
+AttrId FindAttrId(const std::string &s) {
+  for (unsigned u = 0; u < ATTR_NA; u++) {
+    if (!AttrsSupported[u].mName.compare(0, s.length(), s))
+      return AttrsSupported[u].mId;
+  }
+  return ATTR_NA;
+}
+
+#undef  ATTRIBUTE
+#define ATTRIBUTE(T) case ATTR_##T: return #T;
+char *GetAttrString(AttrId tid) {
+  switch (tid) {
+#include "supported_attributes.def"
+  default:
+    return "NA";
+  }
+};
+
+//////////////////////////////////////////////////////////////////////
+//                     Literals supported
+//////////////////////////////////////////////////////////////////////
 
 #undef  LITERAL
 #define LITERAL(S) {#S, LT_##S},
