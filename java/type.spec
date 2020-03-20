@@ -52,7 +52,7 @@
 #     It is highly possible that a .spec file needs more than one STRUCT.
 ###################################################################################
 
-# The types recoganized by Autogen are in autogen/supported_types.spec
+# The types recoganized by Autogen are in shared/supported_types.def
 # where Boolean, Byte, .. are defined. That said, "Boolean" and the likes are
 # used in type.spec as a keyword.
 #
