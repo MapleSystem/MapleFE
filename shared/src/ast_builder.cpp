@@ -18,6 +18,7 @@
 #include "token.h"
 #include "ruletable.h"
 #include "ast_scope.h"
+#include "ast_attr.h"
 
 #include "massert.h"
 
@@ -54,10 +55,17 @@ TreeNode* ASTBuilder::CreateTokenTreeNode(const Token *token) {
     new (n) LiteralNode(data);
     mLastTreeNode = n;
     return n;
-  } else {
-    // Other tokens shouldn't be involved in the tree creation.
-    return NULL;
+  } else if (token->IsKeyword()) {
+    // Right now only build tree node for attribute keyword
+    KeywordToken *kt = (KeywordToken*)token;
+    const char *keyword = kt->GetName();
+    AttrNode *n = gAttrPool.GetAttrNode(keyword);
+    if (n)
+      return n;
   }
+
+  // Other tokens shouldn't be involved in the tree creation.
+  return NULL;
 }
 
 // For first parameter has to be an operator.
@@ -240,10 +248,59 @@ TreeNode* ASTBuilder::BuildVarList() {
   return node_ret;
 }
 
+// Attache the attributes to mLastTreeNode.
+// We only take the AttrId from the tree node.
 TreeNode* ASTBuilder::AddAttribute() {
   if (mTrace)
-    std::cout << "In AddAttribute" << std::endl;
+    std::cout << "In AddAttribute";
+
   Param p_attr = mParams[0];
+  if (p_attr.mIsEmpty) {
+    if (mTrace)
+      std::cout << " do nothing." << std::endl;
+    return mLastTreeNode;
+  }
+
+  if (!p_attr.mIsTreeNode)
+    MERROR("The attribue is not a treenode");
+
+  TreeNode *tree_node = p_attr.mData.mTreeNode;
+  if (tree_node->IsAttribute()) {
+    AttrNode *attr_node = (AttrNode*)tree_node;
+    if (mLastTreeNode->IsFunction()) {
+      FunctionNode *func = (FunctionNode*)mLastTreeNode;
+      func->AddAttr(attr_node->GetId());
+    } else if (mLastTreeNode->IsIdentifier()) {
+      IdentifierNode *iden = (IdentifierNode*)mLastTreeNode;
+      iden->AddAttr(attr_node->GetId());
+    }
+    if (mTrace)
+      std::cout << " add attr:" << attr_node->GetId() << std::endl;
+  } else if (tree_node->IsPass()) {
+    PassNode *pass = (PassNode*)tree_node;
+    for (unsigned i = 0; i < pass->GetChildrenNum(); i++) {
+      TreeNode *child = pass->GetChild(i);
+      if (child->IsAttribute()) {
+        AttrNode *attr_node = (AttrNode*)child;
+        if (mLastTreeNode->IsFunction()) {
+          FunctionNode *func = (FunctionNode*)mLastTreeNode;
+          func->AddAttr(attr_node->GetId());
+        } else if (mLastTreeNode->IsIdentifier()) {
+          IdentifierNode *iden = (IdentifierNode*)mLastTreeNode;
+          iden->AddAttr(attr_node->GetId());
+        }
+        if (mTrace)
+          std::cout << " add attr:" << attr_node->GetId();
+      } else {
+        MERROR("The to-be-added node is not an attribute?");
+      }
+    }
+    if (mTrace)
+      std::cout << std::endl;
+  } else {
+    MERROR("The to-be-added node is not an attribute?");
+  }
+
   return mLastTreeNode;
 }
 

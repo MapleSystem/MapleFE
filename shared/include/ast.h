@@ -56,6 +56,7 @@
 enum NodeKind {
   NK_Identifier,
   NK_Dimension,
+  NK_Attr,
 
   NK_VarList,     // A varialble list
   NK_Literal,
@@ -99,6 +100,7 @@ public:
 
   bool IsIdentifier() {return mKind == NK_Identifier;}
   bool IsDimension()  {return mKind == NK_Dimension;}
+  bool IsAttribute()  {return mKind == NK_Attr;}
   bool IsVarList()    {return mKind == NK_VarList;}
   bool IsLiteral()    {return mKind == NK_Literal;}
   bool IsUnaOperator(){return mKind == NK_UnaOperator;}
@@ -230,7 +232,11 @@ public:
   void Dump();
 };
 
+// IdentifierNode is the most important node, and we usually call it symbol.
+// It has most of the syntax information.
 class IdentifierNode : public TreeNode {
+private:
+  SmallVector<AttrId> mAttrs;
 public:
   const char    *mName; // In the lexer's StringPool
   ASTType       *mType;
@@ -253,6 +259,11 @@ public:
   unsigned AddDim(unsigned i = 0){mDims->AddDim(i);}           // 0 means unspecified
   unsigned GetNthNum(unsigned n) {return mDims->GetNthDim(n);} // 0 means unspecified.
   void     SetNthNum(unsigned n, unsigned i) {mDims->SetNthDim(n, i);}
+
+  // Attributes related
+  unsigned GetAttrsNum()           {return mAttrs.GetNum();}
+  void     AddAttr(AttrId a)       {mAttrs.PushBack(a);}
+  AttrId   AttrAtIndex(unsigned i) {return mAttrs.ValueAtIndex(i);}
 
   void Release() { if (mDims) mDims->Release();}
   void Dump(unsigned);
@@ -318,15 +329,24 @@ public:
 class ASTScope;
 
 class FunctionNode : public TreeNode {
+private:
+  SmallVector<AttrId> mAttrs;
 public:
   ASTType      mRetType;
   VarListNode *mParams;
   ASTScope    *mScope;
   BlockNode   *mBody;
+
 public:
   ASTScope* GetScope() {return mScope;}
   void      SetScope(ASTScope *s) {mScope = s;}
 
+  // Attributes related
+  unsigned GetAttrsNum()           {return mAttrs.GetNum();}
+  void     AddAttr(AttrId a)       {mAttrs.PushBack(a);}
+  AttrId   AttrAtIndex(unsigned i) {return mAttrs.ValueAtIndex(i);}
+
+  void Release() {mAttrs.Release();}
   void Dump(unsigned);
 };
 
@@ -421,9 +441,6 @@ public:
 //
 // Also some rules in .spec don't have action at the beginning, and they
 // will be given a PassNode too.
-//
-// One the subtrees are passed to parents, this PassNode can call Release()
-// to free its memory.
 //////////////////////////////////////////////////////////////////////////
 
 class PassNode : public TreeNode {
@@ -431,7 +448,7 @@ private:
   SmallVector<TreeNode*> mChildren;
 public:
   PassNode() {mKind = NK_Pass;}
-  ~PassNode() {}
+  ~PassNode() {Release();}
 
   unsigned  GetChildrenNum() {return mChildren.GetNum();}
   TreeNode* GetChild(unsigned idx) {return mChildren.ValueAtIndex(idx);}
