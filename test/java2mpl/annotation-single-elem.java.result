@@ -93,7 +93,6 @@ Matched 10 tokens.
 [11] Token
 [12] Token
 [13] Token
-Attached a tree node from Child
 == Sub Tree ==
 
 Separator  Token:  Whitespace
@@ -185,7 +184,6 @@ Matched 22 tokens.
 [16] Table TblDim@15: 17,18,
 [17] Token
 [18] Token
-Attached a tree node from Child
 == Sub Tree ==
 
 ============= Module ===========

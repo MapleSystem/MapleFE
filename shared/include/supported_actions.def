@@ -41,7 +41,6 @@ ACTION(BuildVarList)
 
 // For class/inheritance
 ACTION(BuildClass)
-ACTION(BuildClassBody)
 ACTION(AddSuperClass)
 ACTION(AddSuperInterface)
 ACTION(AddClassBody)

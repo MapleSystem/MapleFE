@@ -341,24 +341,6 @@ TreeNode* ASTBuilder::AddInitTo() {
   return in;
 }
 
-// This takes just one argument which is the root of sub tree
-TreeNode* ASTBuilder::BuildBlock() {
-  if (mTrace)
-    std::cout << "In BuildBlock" << std::endl;
-
-  Param p_subtree = mParams[0];
-
-  if (!p_subtree.mIsTreeNode)
-    MERROR("The subtree is not a treenode in BuildBlock()");
-  TreeNode *subtree = p_subtree.mData.mTreeNode;
-
-  BlockNode *block = (BlockNode*)mTreePool->NewTreeNode(sizeof(BlockNode));
-  new (block) BlockNode();
-
-  // set last tree node
-  mLastTreeNode = block;
-  return mLastTreeNode;
-}
 
 // This takes just one argument which is the class name.
 TreeNode* ASTBuilder::BuildClass() {
@@ -386,32 +368,32 @@ TreeNode* ASTBuilder::BuildClass() {
 }
 
 // This takes just one argument which is the root of sub tree
-TreeNode* ASTBuilder::BuildClassBody() {
+TreeNode* ASTBuilder::BuildBlock() {
   if (mTrace)
-    std::cout << "In BuildClassBody" << std::endl;
+    std::cout << "In BuildBlock" << std::endl;
 
-  ClassBodyNode *class_body = (ClassBodyNode*)mTreePool->NewTreeNode(sizeof(ClassBodyNode));
-  new (class_body) ClassBodyNode();
+  BlockNode *block = (BlockNode*)mTreePool->NewTreeNode(sizeof(BlockNode));
+  new (block) BlockNode();
 
   Param p_subtree = mParams[0];
   if (!p_subtree.mIsEmpty) {
     if (!p_subtree.mIsTreeNode)
       MERROR("The subtree is not a treenode in BuildBlock()");
 
-    // If the subtree is PassNode, we need add all children to class_body
+    // If the subtree is PassNode, we need add all children to block
     // If else, simply assign subtree as child.
     TreeNode *subtree = p_subtree.mData.mTreeNode;
     if (subtree->IsPass()) {
       PassNode *pass_node = (PassNode*)subtree;
       for (unsigned i = 0; i < pass_node->GetChildrenNum(); i++)
-        class_body->AddChild(pass_node->GetChild(i));
+        block->AddChild(pass_node->GetChild(i));
     } else {
-      class_body->AddChild(subtree);
+      block->AddChild(subtree);
     }
   }
 
   // set last tree node
-  mLastTreeNode = class_body;
+  mLastTreeNode = block;
   return mLastTreeNode;
 }
 
@@ -429,10 +411,22 @@ TreeNode* ASTBuilder::AddSuperInterface() {
   return mLastTreeNode;
 }
 
+// Takes one parameter which is the tree of class body.
 TreeNode* ASTBuilder::AddClassBody() {
   if (mTrace)
     std::cout << "In AddClassBody" << std::endl;
-  Param p_attr = mParams[0];
+
+  Param p_body = mParams[0];
+  if (!p_body.mIsTreeNode)
+    MERROR("The class body is not a tree node.");
+  TreeNode *tree_node = p_body.mData.mTreeNode;
+  MASSERT(tree_node->IsBlock() && "Class body is not a BlockNode?");
+  BlockNode *block = (BlockNode*)tree_node;
+
+  MASSERT(mLastTreeNode->IsClass() && "Class is not a ClassNode?");
+  ClassNode *klass = (ClassNode*)mLastTreeNode;
+  klass->AddClassBody(block);
+
   return mLastTreeNode;
 }
 

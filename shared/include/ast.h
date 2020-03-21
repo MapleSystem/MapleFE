@@ -78,7 +78,6 @@ enum NodeKind {
 
   // Following are nodes to facilitate parsing.
   NK_Pass,         // see details in PassNode
-  NK_ClassBody,    // see details in ClassBodyNode
 
   NK_Null,
 };
@@ -112,7 +111,6 @@ public:
   bool IsClass()      {return mKind == NK_Class;}
   bool IsInterface()  {return mKind == NK_Interface;}
   bool IsPass()       {return mKind == NK_Pass;}
-  bool IsClassBody()  {return mKind == NK_ClassBody;}
 
   bool IsScope()      {return IsBlock() || IsFunction();}
 
@@ -319,6 +317,7 @@ public:
   BlockNode(){mKind = NK_Block;}
   ~BlockNode() {Release();}
 
+  void AddChild(TreeNode *c) {mChildren.PushBack(c);}
   void Release() {mChildren.Release();}
 };
 
@@ -364,29 +363,16 @@ public:
 };
 
 //////////////////////////////////////////////////////////////////////////
-//                         ClassBody
+//                         ClassBody -->BlockNode
 // In reality there is no such thing as ClassBody, since this 'body' will
 // eventually become field and method of a class. However, during parsing
 // the children are processed before parents, which means we could have
 // all fields and members before the class is ready. So we come up with
 // this ClassBody to temporarily hold these subtrees, and let the class
 // to interpret it in the future. Once the class is done, this ClassBody
-// is useless and will call Release() in BuildClass().
-//
-// Since it is just a temp storage having nothing to do with tree, we create
-// a standalone data structure for it.
+// is useless.
+// In the real implementation, ClassBody is actually a BlockNode.
 //////////////////////////////////////////////////////////////////////////
-
-class ClassBodyNode : public TreeNode {
-public:
-  SmallVector<TreeNode*> mChildren;
-public:
-  ClassBodyNode() {mKind = NK_ClassBody;}
-  ~ClassBodyNode() {}
-
-  void AddChild(TreeNode *c) {mChildren.PushBack(c);}
-  void Release() {mChildren.Release();}
-};
 
 //////////////////////////////////////////////////////////////////////////
 //                         Class Nodes
@@ -407,6 +393,7 @@ public:
   void AddSuperClass(ClassNode *n) {mSuperClasses.PushBack(n);}
   void AddSuperClass(InterfaceNode *n) {mSuperInterfaces.PushBack(n);}
   void AddAttribute(AttrId a) {mAttributes.PushBack(a);}
+  void AddClassBody(BlockNode *b) {mBody = b;}
 
   void Release();
   void Dump(unsigned);

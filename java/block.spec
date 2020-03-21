@@ -45,7 +45,7 @@ rule InterfaceTypeList : InterfaceType + ZEROORMORE(',' + InterfaceType)
 
 # class body
 rule ClassBody              : "{" + ZEROORMORE(ClassBodyDeclaration) + "}"
-  attr.action: BuildClassBody(%2)
+  attr.action: BuildBlock(%2)
 
 rule ClassBodyDeclaration   : ONEOF(ClassMemberDeclaration,
                                     InstanceInitializer,
@@ -158,6 +158,7 @@ rule AnnotationTypeDeclaration : ZEROORMORE(InterfaceModifier) + '@' + "interfac
   attr.action : AddAnnotationTypeBody(%5)
 
 rule AnnotationTypeBody : '{' + ZEROORMORE(AnnotationTypeMemberDeclaration) + '}'
+  attr.action : BuildBlock(%2)
 rule AnnotationTypeMemberDeclaration : ONEOF(AnnotationTypeElementDeclaration,
                                              ConstantDeclaration,
                                              ClassDeclaration,

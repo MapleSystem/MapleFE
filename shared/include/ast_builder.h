@@ -99,7 +99,6 @@ public:
   TreeNode* AddInitTo();
 
   TreeNode* BuildClass();
-  TreeNode* BuildClassBody();
   TreeNode* AddClassBody();
   TreeNode* AddSuperClass();
   TreeNode* AddSuperInterface();
