@@ -12,76 +12,77 @@
 * FIT FOR A PARTICULAR PURPOSE.
 * See the Mulan PSL v1 for more details.
 */
+
 ///////////////////////////////////////////////////////////////////////////////
-// We need give each symbol, expression a type. The type in AST doesn't have
-// any physical representation. It's merely for syntax validation and potential
-// optimizations for future R&D project.
+// The type in AST doesn't have any physical representation. It's merely for
+// syntax validation and potential optimizations for future R&D project.
 //
 // Each language should define its own type system, and its own validation rules.
-// We only define two categories of types in this file, Primitive and Named types.
-///////////////////////////////////////////////////////////////////////////////
+// We only define two categories of types in this file, Primitive and User types.
+//
+//
+//                    About the User Type
+//
+// The user type could come from class, struct, interface, ...
+// To accomodate the above multiple cases, we simply put TreeNode*
+// as the type info. And there are some issues.
+// (1) During parsing, each instance of identifier is given a new tree node,
+//     and multiple instance of a same user type are treated as different types.
+// (2) Of course, situation in (1) is wrong, we need consolidate all these
+//     instance into one single same type. This has to be done when the tree
+//     is done creation.
+// (3) To consolidate the multiple instances of a type symbol, the scope
+//     info has to kick in. This is another issue.
+// Right now, I just let each instance represent a separate type, and will
+// come back to this.
+//
+// So we a TreeNode of the type identifier can be a type, and we don't have
+// to give any special data struct for it. A user type is created as a treenode
+// (IdentifierNode) at the beginning, but later we will do consolidation,
+// and it may be turned into a function, struct, etc. So a TreeNode is good here.
+//
+// So, we only need to handle the primitive types which are coming
+// from language keywords.  This file handles the primitive types.
+//////////////////////////////////////////////////////////////////////////
 
 #ifndef __AST_TYPE_H__
 #define __AST_TYPE_H__
 
 #include "ruletable.h"
 #include "mempool.h"
+#include "ast.h"
 
-class IdentifierNode;
-
-enum TypeCategory {
-  Primitive,
-  User
-};
-
-class ASTType {
+class PrimTypeNode : public TreeNode {
 private:
-  TypeCategory mCat;
-  union {
-    IdentifierNode *mIdentifier;  // user type
-    TypeId          mPrimType;    // primitive type
-  }mType;
-
+  TypeId    mPrimType; // primitive type
 public:
-  ASTType() {mCat = Primitive;}
-  ~ASTType(){}
+  PrimTypeNode() {mKind = NK_PrimType;}
+  ~PrimTypeNode(){}
 
-  bool IsPrim() {return mCat == Primitive;}
-  bool IsUser() {return mCat == User;}
-
-  IdentifierNode* GetIdentifier() {return mType.mIdentifier;}
-  TypeId          GetPrimType()   {return mType.mPrimType;}
-  void SetPrimType(TypeId id)            { mCat = Primitive; mType.mPrimType = id; }
-  void SetUserType(IdentifierNode *node) { mCat = User; mType.mIdentifier = node; }
-
+  TypeId    GetPrimType()     {return mPrimType;}
+  void SetPrimType(TypeId id) {mPrimType = id; }
   const char* GetName();  // type name
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-//                      ASTTypePool
-// The size of ASTType is fixed, so it's good to use MemPool for the storage.
-// The ASTType pool is global, across all modules.
+//                          PrimTypePool
+// The size of PrimTypeNode is fixed, so it's good to use container for the storage.
+// The PrimTypeNode pool is global, across all modules.
 ///////////////////////////////////////////////////////////////////////////////
 
-class ASTTypePool {
+class PrimTypePool {
 private:
-  MemPool               mMemPool;
-  std::vector<ASTType*> mTypes;
-
-  void InitSystemTypes();
-
+  SmallVector<PrimTypeNode> mTypes;
+  void Init();
 public:
-  ASTTypePool();
-  ~ASTTypePool();
+  PrimTypePool();
+  ~PrimTypePool();
 
-  ASTType* FindUserType(IdentifierNode *node);
-  ASTType* FindOrCreateUserType(IdentifierNode *node);
-
-  ASTType* FindPrimType(const char *keyword);
-  ASTType* FindPrimType(TypeId id);
+  PrimTypeNode* FindType(const char *keyword);
+  PrimTypeNode* FindType(TypeId id);
 };
 
-// A global pool for all ASTType-s.
-extern ASTTypePool gASTTypePool;
+// A global pool for Primitive TypeNodes.
+extern PrimTypePool gPrimTypePool;
 
 #endif

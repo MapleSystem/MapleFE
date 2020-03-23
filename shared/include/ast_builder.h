@@ -80,7 +80,6 @@ public:
   // Create Functions for Token
   TreeNode* CreateTokenTreeNode(const Token*);
 
-  // Create Functions for AppealNode Tree
   TreeNode* Build();
 
   TreeNode* BuildBlock();
@@ -93,10 +92,14 @@ public:
   TreeNode* BuildDecl();
   TreeNode* BuildVarList();
 
+  TreeNode* AddInitTo();
+  TreeNode* AddTypeTo();
   TreeNode* AddAttribute();
   TreeNode* AddAttributeTo();
 
-  TreeNode* AddInitTo();
+  // Function related
+  TreeNode* BuildFunction();
+  TreeNode* AddFunctionBodyTo();
 
   TreeNode* BuildClass();
   TreeNode* AddClassBody();

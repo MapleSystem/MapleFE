@@ -22,5 +22,6 @@ TYPE(Long)
 TYPE(Char)
 TYPE(Float)
 TYPE(Double)
-TYPE(Null)          // The Null type. It is a type.
+TYPE(Void)      // Although this is not a type, it does categorize the types.
+TYPE(Null)      // The Null type. It is a type.
 

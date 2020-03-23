@@ -39,6 +39,10 @@ ACTION(BuildReturn)
 ACTION(BuildDecl)
 ACTION(BuildVarList)
 
+// For function
+ACTION(BuildFunction)
+ACTION(AddFunctionBodyTo)
+
 // For class/inheritance
 ACTION(BuildClass)
 ACTION(AddSuperClass)
@@ -48,6 +52,7 @@ ACTION(AddClassBody)
 ACTION(AddAttribute)
 ACTION(AddAttributeTo)
 ACTION(AddInitTo)
+ACTION(AddTypeTo)
 
 // Annotation
 ACTION(BuildAnnotationType)

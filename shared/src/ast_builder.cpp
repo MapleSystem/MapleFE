@@ -13,12 +13,12 @@
 * See the Mulan PSL v1 for more details.
 */
 
-#include "ast.h"
-#include "ast_builder.h"
 #include "token.h"
 #include "ruletable.h"
+#include "ast_builder.h"
 #include "ast_scope.h"
 #include "ast_attr.h"
+#include "ast_type.h"
 
 #include "massert.h"
 
@@ -56,17 +56,85 @@ TreeNode* ASTBuilder::CreateTokenTreeNode(const Token *token) {
     mLastTreeNode = n;
     return n;
   } else if (token->IsKeyword()) {
-    // Right now only build tree node for attribute keyword
     KeywordToken *kt = (KeywordToken*)token;
     const char *keyword = kt->GetName();
+
+    // Check if it's an attribute
     AttrNode *n = gAttrPool.GetAttrNode(keyword);
-    if (n)
+    if (n) {
+      mLastTreeNode = n;
       return n;
+    }
+
+    // Check if it's a type
+    PrimTypeNode *type = gPrimTypePool.FindType(keyword);
+    if (n) {
+      mLastTreeNode = n;
+      return n;
+    }
   }
 
   // Other tokens shouldn't be involved in the tree creation.
   return NULL;
 }
+
+////////////////////////////////////////////////////////////////////////////////////////
+//                      Static Functions help build the tree
+////////////////////////////////////////////////////////////////////////////////////////
+
+// It's the caller to assure both arguments are valid.
+static void add_attribute_to_kernel(TreeNode *tree, AttrNode *attr) {
+  if (tree->IsFunction()) {
+    FunctionNode *func = (FunctionNode*)tree;
+    func->AddAttr(attr->GetId());
+  } else if (tree->IsIdentifier()) {
+    IdentifierNode *iden = (IdentifierNode*)tree;
+    iden->AddAttr(attr->GetId());
+  } else {
+    MERROR("Unsupported tree, wanting to add attribute.");
+  }
+}
+
+static void add_attribute_to(TreeNode *tree_node, TreeNode *attr) {
+  if (attr->IsAttribute()) {
+    AttrNode *attr_node = (AttrNode*)attr;
+    add_attribute_to_kernel(tree_node, attr_node);
+  } else if (attr->IsPass()) {
+    PassNode *pass = (PassNode*)attr;
+    for (unsigned i = 0; i < pass->GetChildrenNum(); i++) {
+      TreeNode *child = pass->GetChild(i);
+      if (child->IsAttribute()) {
+        AttrNode *attr_node = (AttrNode*)child;
+        add_attribute_to_kernel(tree_node, attr_node);
+      } else {
+        MERROR("The to-be-added node is not an attribute?");
+      }
+    }
+  } else {
+    MERROR("The to-be-added node is not an attribute?");
+  }
+}
+
+// It's the caller to assure tree is valid, meaning something could carry type.
+static void add_type_to(TreeNode *tree, TreeNode *type) {
+  if (tree->IsIdentifier()) {
+    IdentifierNode *in = (IdentifierNode*)tree;
+    in->SetType(type);
+  } else if (tree->IsVarList()) {
+    VarListNode *vl = (VarListNode*)tree;
+    for (unsigned i = 0; i < vl->GetNum(); i++)
+      vl->VarAtIndex(i)->SetType(type);
+  } else if (tree->IsFunction()) {
+    FunctionNode *func = (FunctionNode*)tree;
+    func->SetType(type);
+  } else {
+    MERROR("Unsupported tree node in add_type_to()");
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+//                      Major Functions to build the tree
+////////////////////////////////////////////////////////////////////////////////////////
 
 // For first parameter has to be an operator.
 TreeNode* ASTBuilder::BuildUnaryOperation() {
@@ -157,7 +225,29 @@ TreeNode* ASTBuilder::BuildReturn() {
 //    We need have a list of pending declarations until the scope is created.
 ////////////////////////////////////////////////////////////////////////////////
 
-// BuildDecl takes two parameters, type and name
+// AddTypeTo takes two parameters, 1) tree; 2) type
+TreeNode* ASTBuilder::AddTypeTo() {
+  if (mTrace)
+    std::cout << "In build Decl" << std::endl;
+
+  MASSERT(mParams.size() == 2 && "BinaryDecl has NO 2 params?");
+  Param p_type = mParams[1];
+  Param p_name = mParams[0];
+
+  MASSERT(!p_type.mIsEmpty && p_type.mIsTreeNode
+          && "Not appropriate type node in AddTypeTo()");
+  TreeNode *tree_type = p_type.mData.mTreeNode;
+
+  if (!p_name.mIsTreeNode)
+    MERROR("The variable name should be a IdentifierNode already, but actually NOT?");
+  TreeNode *node = p_name.mData.mTreeNode;
+
+  add_type_to(node, tree_type);
+
+  return node;
+}
+
+// BuildDecl takes two parameters, 1) type; 2) name
 TreeNode* ASTBuilder::BuildDecl() {
   if (mTrace)
     std::cout << "In build Decl" << std::endl;
@@ -166,39 +256,18 @@ TreeNode* ASTBuilder::BuildDecl() {
   Param p_type = mParams[0];
   Param p_name = mParams[1];
 
-  // Step 1. Get the Type
-  //         We only deal with keyword type right now.
-  if (p_type.mIsTreeNode) {
-    MERROR("We only handle keyword type now. To Be Implemented.");
-  }
+  MASSERT(!p_type.mIsEmpty && p_type.mIsTreeNode
+          && "Not appropriate type node in BuildDecl()");
+  TreeNode *tree_type = p_type.mData.mTreeNode;
 
-  Token *token = p_type.mData.mToken;
-  if (!token->IsKeyword())
-    MERROR("Type is not a keyword.");
-
-  KeywordToken *kw_token = (KeywordToken*)token;
-  ASTType *type = gASTTypePool.FindPrimType(kw_token->GetName());
-
-  // Step 2. Get the name, which is already a IdentifierNode.
   if (!p_name.mIsTreeNode)
     MERROR("The variable name should be a IdentifierNode already, but actually NOT?");
+  TreeNode *node = p_name.mData.mTreeNode;
 
-  TreeNode *n = p_name.mData.mTreeNode;
-  if (!n->IsIdentifier() && !n->IsVarList())
-    MERROR("Variable is not an identifier or VarList.");
+  add_type_to(node, tree_type);
 
-  if (n->IsIdentifier()) {
-    ((IdentifierNode *)n)->SetType(type);
-  } else if (n->IsVarList()) {
-    VarListNode *vl = (VarListNode*)n;
-    for (unsigned i = 0; i < vl->mVars.GetNum(); i++)
-      vl->mVars.ValueAtIndex(i)->SetType(type);
-  }
-
-  // Step 3. Save this decl
-  mLastTreeNode = (TreeNode*)n;
-
-  return n;
+  mLastTreeNode = node;
+  return node;
 }
 
 // BuildVariableList takes two parameters, var 1 and var 2
@@ -248,11 +317,11 @@ TreeNode* ASTBuilder::BuildVarList() {
   return node_ret;
 }
 
-// Attache the attributes to mLastTreeNode.
+// Attach the attributes to mLastTreeNode.
 // We only take the AttrId from the tree node.
 TreeNode* ASTBuilder::AddAttribute() {
   if (mTrace)
-    std::cout << "In AddAttribute";
+    std::cout << "In AddAttribute" << std::endl;
 
   Param p_attr = mParams[0];
   if (p_attr.mIsEmpty) {
@@ -263,52 +332,30 @@ TreeNode* ASTBuilder::AddAttribute() {
 
   if (!p_attr.mIsTreeNode)
     MERROR("The attribue is not a treenode");
-
-  TreeNode *tree_node = p_attr.mData.mTreeNode;
-  if (tree_node->IsAttribute()) {
-    AttrNode *attr_node = (AttrNode*)tree_node;
-    if (mLastTreeNode->IsFunction()) {
-      FunctionNode *func = (FunctionNode*)mLastTreeNode;
-      func->AddAttr(attr_node->GetId());
-    } else if (mLastTreeNode->IsIdentifier()) {
-      IdentifierNode *iden = (IdentifierNode*)mLastTreeNode;
-      iden->AddAttr(attr_node->GetId());
-    }
-    if (mTrace)
-      std::cout << " add attr:" << attr_node->GetId() << std::endl;
-  } else if (tree_node->IsPass()) {
-    PassNode *pass = (PassNode*)tree_node;
-    for (unsigned i = 0; i < pass->GetChildrenNum(); i++) {
-      TreeNode *child = pass->GetChild(i);
-      if (child->IsAttribute()) {
-        AttrNode *attr_node = (AttrNode*)child;
-        if (mLastTreeNode->IsFunction()) {
-          FunctionNode *func = (FunctionNode*)mLastTreeNode;
-          func->AddAttr(attr_node->GetId());
-        } else if (mLastTreeNode->IsIdentifier()) {
-          IdentifierNode *iden = (IdentifierNode*)mLastTreeNode;
-          iden->AddAttr(attr_node->GetId());
-        }
-        if (mTrace)
-          std::cout << " add attr:" << attr_node->GetId();
-      } else {
-        MERROR("The to-be-added node is not an attribute?");
-      }
-    }
-    if (mTrace)
-      std::cout << std::endl;
-  } else {
-    MERROR("The to-be-added node is not an attribute?");
-  }
+  TreeNode *attr= p_attr.mData.mTreeNode;
+  add_attribute_to(mLastTreeNode, attr);
 
   return mLastTreeNode;
 }
 
+// Takes two arguments. 1) target tree node; 2) attribute
 TreeNode* ASTBuilder::AddAttributeTo() {
   if (mTrace)
-    std::cout << "In AddAttributeTo" << std::endl;
-  Param p_attr = mParams[0];
-  return mLastTreeNode;
+    std::cout << "In AddAttributeTo " << std::endl;
+
+  Param p_tree = mParams[0];
+  MASSERT(!p_tree.mIsEmpty && "Treenode cannot be empty in AddAttributeTo");
+  MASSERT(p_tree.mIsTreeNode && "The tree node is not a treenode in AddAttributeTo()");
+  TreeNode *tree = p_tree.mData.mTreeNode;
+
+  Param p_attr = mParams[1];
+  MASSERT(!p_attr.mIsEmpty && "Attr cannot be empty in AddAttributeTo");
+  MASSERT(p_attr.mIsTreeNode && "The Attr is not a treenode in AddAttributeTo()");
+  TreeNode *attr = p_attr.mData.mTreeNode;
+
+  add_attribute_to(tree, attr);
+
+  return tree;
 }
 
 TreeNode* ASTBuilder::AddInitTo() {
@@ -359,11 +406,9 @@ TreeNode* ASTBuilder::BuildClass() {
 
   ClassNode *node_class = (ClassNode*)mTreePool->NewTreeNode(sizeof(ClassNode));
   new (node_class) ClassNode();
-  node_class->SetName(node_name);
+  node_class->SetName(in->GetName());
 
-  // set last tree node
   mLastTreeNode = node_class;
-
   return mLastTreeNode;
 }
 
@@ -425,7 +470,8 @@ TreeNode* ASTBuilder::AddClassBody() {
 
   MASSERT(mLastTreeNode->IsClass() && "Class is not a ClassNode?");
   ClassNode *klass = (ClassNode*)mLastTreeNode;
-  klass->AddClassBody(block);
+  klass->AddBody(block);
+  klass->Construct();
 
   return mLastTreeNode;
 }
@@ -548,3 +594,51 @@ TreeNode* ASTBuilder::AddDims() {
 //                   Other Functions
 ////////////////////////////////////////////////////////////////////////////////
 
+// This takes just one argument which is the function name.
+TreeNode* ASTBuilder::BuildFunction() {
+  if (mTrace)
+    std::cout << "In BuildFunction" << std::endl;
+
+  Param p_name = mParams[0];
+
+  if (!p_name.mIsTreeNode)
+    MERROR("The function name is not a treenode in BuildFunction()");
+  TreeNode *node_name = p_name.mData.mTreeNode;
+
+  if (!node_name->IsIdentifier())
+    MERROR("The function name should be an indentifier node. Not?");
+  IdentifierNode *in = (IdentifierNode*)node_name;
+
+  FunctionNode *function = (FunctionNode*)mTreePool->NewTreeNode(sizeof(FunctionNode));
+  new (function) FunctionNode();
+  function->SetName(node_name->GetName());
+
+  mLastTreeNode = function;
+  return mLastTreeNode;
+}
+
+// Takes two arguments.
+// 1st: Function
+// 2nd: body
+TreeNode* ASTBuilder::AddFunctionBodyTo() {
+  if (mTrace)
+    std::cout << "In AddFunctionBodyTo" << std::endl;
+
+  Param p_body = mParams[1];
+  if (!p_body.mIsTreeNode)
+    MERROR("The class body is not a tree node.");
+  TreeNode *tree_node = p_body.mData.mTreeNode;
+  MASSERT(tree_node->IsBlock() && "Class body is not a BlockNode?");
+  BlockNode *block = (BlockNode*)tree_node;
+
+  Param p_func = mParams[1];
+  if (!p_func.mIsTreeNode)
+    MERROR("The Function is not a tree node.");
+  TreeNode *func_node = p_func.mData.mTreeNode;
+  MASSERT(func_node->IsFunction() && "Function is not a FunctionNode?");
+  FunctionNode *func = (FunctionNode*)func_node;
+  func->AddBody(block);
+  func->Construct();
+
+  return mLastTreeNode;
+}

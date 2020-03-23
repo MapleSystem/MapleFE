@@ -63,12 +63,20 @@ rule FieldDeclaration  : ZEROORMORE(FieldModifier) + UnannType + VariableDeclara
   attr.action: AddAttribute(%1)
 
 rule MethodDeclaration : ZEROORMORE(MethodModifier) + MethodHeader + MethodBody
+  attr.action: AddAttributeTo(%2, %1)
+  attr.action: AddFunctionBodyTo(%2, %3)
+
 rule MethodBody        : ONEOF(Block, ';')
 rule MethodHeader      : ONEOF(Result + MethodDeclarator + ZEROORONE(Throws),
                                TypeParameters + ZEROORMORE(Annotation) + Result + MethodDeclarator +
                                ZEROORONE(Throws))
+  attr.action.%1: AddTypeTo(%2, %1)
+
 rule Result            : ONEOF(UnannType, "void")
 rule MethodDeclarator  : Identifier + '(' + ZEROORONE(FormalParameterList) + ')' + ZEROORONE(Dims)
+  attr.action: BuildFunction(%1)
+  attr.action: AddDims(%1, %5)
+
 rule Throws            : "fakethrows"
 rule MethodModifier    : ONEOF(Annotation, "public", "protected", "private", "abstract", "static",
                                "final", "synchronized", "native", "strictfp")

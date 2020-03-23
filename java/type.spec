@@ -66,6 +66,7 @@ STRUCT Keyword : (("boolean", Boolean),
                   ("char", Char),
                   ("float", Float),
                   ("double", Double),
+                  ("void", Void),
                   ("null", Null))
 
 ###################################################################################

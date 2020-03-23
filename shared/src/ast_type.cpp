@@ -21,6 +21,10 @@
 #include "ast.h"
 #include "massert.h"
 
+//////////////////////////////////////////////////////////////////////////
+//                          Local functions                             //
+//////////////////////////////////////////////////////////////////////////
+
 static const char* FindPrimTypeName(TypeId id) {
   for (unsigned i = 0; i < TY_NA; i++) {
     if (TypeKeywordTable[i].mId == id)
@@ -39,97 +43,52 @@ static TypeId FindPrimTypeId(const char *keyword) {
 }
 
 //////////////////////////////////////////////////////////////////////////
-//                               ASTType                                //
+//                             PrimTypeNode                             //
 //////////////////////////////////////////////////////////////////////////
 
-const char* ASTType::GetName() {
-  const char *name = NULL;
-  if (IsPrim()) {
-    // Get name from keyword table
-    name = FindPrimTypeName(GetPrimType());
-  } else if (IsUser()) {
-    // Get name from Identifier stringpool
-    IdentifierNode *node = GetIdentifier();
-    name = node->GetName();
-  }
-
-  MASSERT(name && "Could not find prim type name!");
+const char* PrimTypeNode::GetName() {
+  const char *name = FindPrimTypeName(GetPrimType());
   return name;
 }
 
 //////////////////////////////////////////////////////////////////////////
-//                           ASTTypePool                                //
+//                           PrimTypePool                               //
 //////////////////////////////////////////////////////////////////////////
 
-// The global Pool for ASTType
-ASTTypePool gASTTypePool;
+// The global Pool for 
+PrimTypePool gPrimTypePool;
 
-ASTTypePool::ASTTypePool() {
-  InitSystemTypes();
+PrimTypePool::PrimTypePool() {
+  // 1024 per block could be better.
+  mTypes.SetBlockSize(1024);
+  Init();
 }
 
-ASTTypePool::~ASTTypePool() {
+PrimTypePool::~PrimTypePool() {
+  mTypes.Release();
 }
 
-void ASTTypePool::InitSystemTypes() {
+void PrimTypePool::Init() {
   for (unsigned i = 0; i < TY_NA; i++) {
-    char *addr = mMemPool.Alloc(sizeof(ASTType));
-    ASTType *type = new (addr) ASTType();
-    type->SetPrimType((TypeId)i);
-    mTypes.push_back(type);
+    PrimTypeNode type;
+    type.SetPrimType((TypeId)i);
+    mTypes.PushBack(type);
   }
 }
 
 // It's caller's duty to check if the return value is NULL.
-ASTType* ASTTypePool::FindPrimType(const char *keyword) {
+PrimTypeNode* PrimTypePool::FindType(const char *keyword) {
   TypeId id = FindPrimTypeId(keyword);
   if (id == TY_NA)
     return NULL;
-  return FindPrimType(id);
+  return FindType(id);
 }
 
-// Just need search the first TY_NA since primitive types are created
-// at the beginning.
-ASTType* ASTTypePool::FindPrimType(TypeId id) {
+PrimTypeNode* PrimTypePool::FindType(TypeId id) {
   for (unsigned i = 0; i < TY_NA; i++) {
-    ASTType *type = mTypes[i];
-    if (type->IsPrim() && type->GetPrimType() == id)
+    PrimTypeNode *type = mTypes.RefAtIndex(i);
+    if (type->GetPrimType() == id)
       return type;
   }
   MERROR("Cannot find the prim type of an TypeId.");
-}
-
-// Try to find the type of identifier 'node'.
-// If not found, return NULL.
-//
-// [NOTE] Assume all types' IdentifierNode are the same. This requires
-//        an extra pass to Reduce the IdentifierNode-s, so as to make
-//        sure there is only one IdentifierNode for all appearance of a
-//        type name.
-ASTType* ASTTypePool::FindUserType(IdentifierNode *node) {
-  for (unsigned i = 0; i < mTypes.size(); i++) {
-    ASTType *type = mTypes[i];
-    if (type->IsUser() && type->GetIdentifier() == node)
-      return type;
-  }
-  return NULL;
-}
-
-// Try to find the type of identifier 'node'.
-// If not found, create one.
-//
-// [NOTE] Assume all types' IdentifierNode are the same. This requires
-//        an extra pass to Reduce the IdentifierNode-s, so as to make
-//        sure there is only one IdentifierNode for all appearance of a
-//        type name.
-ASTType* ASTTypePool::FindOrCreateUserType(IdentifierNode *node) {
-  ASTType *t = FindUserType(node);
-  if (t)
-    return t;
-
-  char *addr = mMemPool.Alloc(sizeof(ASTType));
-  t = new (addr) ASTType();
-  t->SetUserType(node);
-  mTypes.push_back(t);
-  return t;
 }

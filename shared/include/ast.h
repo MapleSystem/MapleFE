@@ -46,7 +46,6 @@
 //    A Function node have its arguments as children node. The return value is not counted.
 //
 
-#include "ast_type.h"
 #include "ast_mempool.h"
 #include "container.h"
 
@@ -57,6 +56,8 @@ enum NodeKind {
   NK_Identifier,
   NK_Dimension,
   NK_Attr,
+  NK_PrimType,    // Primitive types. User types are indentifiers, functions, or etc.
+                  // See ast_type.h for details.
 
   NK_VarList,     // A varialble list
   NK_Literal,
@@ -100,6 +101,7 @@ public:
   bool IsIdentifier() {return mKind == NK_Identifier;}
   bool IsDimension()  {return mKind == NK_Dimension;}
   bool IsAttribute()  {return mKind == NK_Attr;}
+  bool IsPrimType()       {return mKind == NK_PrimType;}
   bool IsVarList()    {return mKind == NK_VarList;}
   bool IsLiteral()    {return mKind == NK_Literal;}
   bool IsUnaOperator(){return mKind == NK_UnaOperator;}
@@ -116,6 +118,7 @@ public:
 
   void SetParent(TreeNode *p) {mParent = p;}
 
+  virtual const char* GetName() {return NULL;}
   virtual void Dump(unsigned){}
   void DumpIndentation(unsigned);
 
@@ -237,18 +240,18 @@ private:
   SmallVector<AttrId> mAttrs;
 public:
   const char    *mName; // In the lexer's StringPool
-  ASTType       *mType;
+  TreeNode      *mType; // PrimTypeNode, or IdentifierNode
   TreeNode      *mInit; // Init value
   DimensionNode *mDims;
 public:
   IdentifierNode(const char *s) : mName(s), mType(NULL), mInit(NULL), mDims(NULL) {
     mKind = NK_Identifier; }
-  IdentifierNode(const char *s, ASTType *t) : mName(s), mType(t) {mKind = NK_Identifier;}
+  IdentifierNode(const char *s, TreeNode *t) : mName(s), mType(t) {mKind = NK_Identifier;}
   ~IdentifierNode(){}
 
   const char* GetName()     {return mName;}
 
-  void SetType(ASTType *t)       {mType = t;}
+  void SetType(TreeNode *t)      {mType = t;}
   void SetInit(TreeNode *t)      {mInit = t;}
   void SetDims(DimensionNode *t) {mDims = t;}
 
@@ -274,11 +277,14 @@ public:
 //////////////////////////////////////////////////////////////////////////
 
 class VarListNode : public TreeNode {
-public:
+private:
   SmallVector<IdentifierNode*> mVars;
 public:
   VarListNode() {mKind = NK_VarList;}
   ~VarListNode() {}
+
+  unsigned GetNum() {return mVars.GetNum();}
+  IdentifierNode* VarAtIndex(unsigned i) {return mVars.ValueAtIndex(i);}
 
   void AddVar(IdentifierNode *n);
   void Merge(TreeNode*);
@@ -311,11 +317,14 @@ public:
 //////////////////////////////////////////////////////////////////////////
 
 class BlockNode : public TreeNode {
-public:
+private:
   SmallVector<TreeNode*> mChildren;
 public:
   BlockNode(){mKind = NK_Block;}
   ~BlockNode() {Release();}
+
+  unsigned  GetChildrenNum()            {return mChildren.GetNum();}
+  TreeNode* GetChildAtIndex(unsigned i) {return mChildren.ValueAtIndex(i);}
 
   void AddChild(TreeNode *c) {mChildren.PushBack(c);}
   void Release() {mChildren.Release();}
@@ -329,22 +338,32 @@ class ASTScope;
 
 class FunctionNode : public TreeNode {
 private:
+  const char  *mName;
   SmallVector<AttrId> mAttrs;
-public:
-  ASTType      mRetType;
+  TreeNode    *mType;   // return type
   VarListNode *mParams;
   ASTScope    *mScope;
   BlockNode   *mBody;
 
 public:
+  FunctionNode();
+  ~FunctionNode() {Release();}
+
   ASTScope* GetScope() {return mScope;}
   void      SetScope(ASTScope *s) {mScope = s;}
+
+  void AddBody(BlockNode *b) {mBody = b;}
+  void Construct();
 
   // Attributes related
   unsigned GetAttrsNum()           {return mAttrs.GetNum();}
   void     AddAttr(AttrId a)       {mAttrs.PushBack(a);}
   AttrId   AttrAtIndex(unsigned i) {return mAttrs.ValueAtIndex(i);}
 
+  const char* GetName()      {return mName;}
+  void SetName(const char*s) {mName = s;}
+
+  void SetType(TreeNode *t) {mType = t;}
   void Release() {mAttrs.Release();}
   void Dump(unsigned);
 };
@@ -363,6 +382,8 @@ public:
 };
 
 //////////////////////////////////////////////////////////////////////////
+//                         Class Nodes
+//                             &
 //                         ClassBody -->BlockNode
 // In reality there is no such thing as ClassBody, since this 'body' will
 // eventually become field and method of a class. However, during parsing
@@ -374,27 +395,32 @@ public:
 // In the real implementation, ClassBody is actually a BlockNode.
 //////////////////////////////////////////////////////////////////////////
 
-//////////////////////////////////////////////////////////////////////////
-//                         Class Nodes
-//////////////////////////////////////////////////////////////////////////
-
 class ClassNode : public TreeNode {
-public:
-  IdentifierNode              *mName;
+private:
+  const char                  *mName;
   SmallVector<ClassNode*>      mSuperClasses;
   SmallVector<InterfaceNode*>  mSuperInterfaces;
   SmallVector<AttrId>          mAttributes;
   BlockNode                   *mBody;
+
+  SmallVector<IdentifierNode*> mMembers;
+  SmallVector<FunctionNode*>   mMethods;
+  SmallVector<ClassNode*>      mLocalClasses;
+  SmallVector<InterfaceNode*>  mLocalInterfaces;
+
 public:
   ClassNode(){mKind = NK_Class;}
   ~ClassNode() {Release();}
 
-  void SetName(IdentifierNode *n) {mName = n;}
+  void SetName(const char *n) {mName = n;}
+  const char* GetName()       {return mName;}
+
   void AddSuperClass(ClassNode *n) {mSuperClasses.PushBack(n);}
   void AddSuperClass(InterfaceNode *n) {mSuperInterfaces.PushBack(n);}
   void AddAttribute(AttrId a) {mAttributes.PushBack(a);}
-  void AddClassBody(BlockNode *b) {mBody = b;}
+  void AddBody(BlockNode *b) {mBody = b;}
 
+  void Construct();
   void Release();
   void Dump(unsigned);
 };

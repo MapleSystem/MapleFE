@@ -374,17 +374,96 @@ void LiteralNode::Dump(unsigned indent) {
 //                          ClassNode
 //////////////////////////////////////////////////////////////////////////////////////
 
+// When the class body, a BlockNode, is added to the ClassNode, we need further
+// categorize the subtrees into members, methods, local classes, interfaces, etc.
+void ClassNode::Construct() {
+  for (unsigned i = 0; i < mBody->GetChildrenNum(); i++) {
+    TreeNode *tree_node = mBody->GetChildAtIndex(i);
+    if (tree_node->IsVarList()) {
+      VarListNode *vlnode = (VarListNode*)tree_node;
+      for (unsigned i = 0; i < vlnode->GetNum(); i++) {
+        IdentifierNode *inode = vlnode->VarAtIndex(i);
+        mMembers.PushBack(tree_node);
+      }
+    } else if (tree_node->IsIdentifier())
+      mMembers.PushBack(tree_node);
+    else if (tree_node->IsFunction())
+      mMethods.PushBack(tree_node);
+    else if (tree_node->IsClass())
+      mLocalClasses.PushBack(tree_node);
+    else if (tree_node->IsInterface())
+      mLocalInterfaces.PushBack(tree_node);
+    else
+      MERROR("Unsupported tree node in class body.");
+  }
+}
+
 // Release() only takes care of those container memory. The release of all tree nodes
 // is taken care by the tree node pool.
 void ClassNode::Release() {
   mSuperClasses.Release();
   mSuperInterfaces.Release();
   mAttributes.Release();
+  mMembers.Release();
+  mMethods.Release();
+  mLocalClasses.Release();
+  mLocalInterfaces.Release();
 }
 
 void ClassNode::Dump(unsigned indent) {
   DumpIndentation(indent);
-  DUMP0_NORETURN("class ");
-  mName->Dump(0);
+  DUMP1_NORETURN("class ", mName);
+  DUMP_RETURN();
+
+  DUMP0("  Members: ");
+  for (unsigned i = 0; i < mMembers.GetNum(); i++) {
+    TreeNode *node = mMembers.ValueAtIndex(i);
+    node->Dump(4);
+  }
+  DUMP_RETURN();
+
+  DUMP0("  Methods: ");
+  for (unsigned i = 0; i < mMethods.GetNum(); i++) {
+    TreeNode *node = mMethods.ValueAtIndex(i);
+    node->Dump(4);
+  }
+
+  DUMP0("  LocalClasses: ");
+  for (unsigned i = 0; i < mLocalClasses.GetNum(); i++) {
+    TreeNode *node = mLocalClasses.ValueAtIndex(i);
+    node->Dump(4);
+  }
+
+  DUMP0("  LocalInterfaces: ");
+  for (unsigned i = 0; i < mLocalInterfaces.GetNum(); i++) {
+    TreeNode *node = mLocalInterfaces.ValueAtIndex(i);
+    node->Dump(4);
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////
+//                          FunctionNode
+//////////////////////////////////////////////////////////////////////////////////////
+
+FunctionNode::FunctionNode() {
+  mKind = NK_Function;
+  mName = NULL;
+  mType = NULL;
+  mParams = NULL;
+  mScope = NULL;
+  mBody = NULL;
+}
+
+// When BlockNode is added to the ClassNode, we need further
+// categorize the subtrees into members, methods, local classes, interfaces, etc.
+void FunctionNode::Construct() {
+  for (unsigned i = 0; i < mBody->GetChildrenNum(); i++) {
+    TreeNode *tree_node = mBody->GetChildAtIndex(i);
+  }
+}
+
+void FunctionNode::Dump(unsigned indent) {
+  DumpIndentation(indent);
+  DUMP1_NORETURN("func ", mName);
   DUMP_RETURN();
 }
