@@ -125,7 +125,11 @@ all modules are as below.
   Add the dimensions into the variable.
 
 * BuildFunction
-  Format: BuildClass(function-Identifier)
+  Format: BuildFunction(function-Identifier)
+
+* BuildConstructor
+  Format: BuildConstructor(function-Identifier)
+  This is almost the same as BuildFunction, except it has no return type.
 
 * AddFunctionBody
   Format: AddFunctionBody(funcbody)

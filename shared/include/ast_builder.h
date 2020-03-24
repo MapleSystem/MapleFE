@@ -99,6 +99,7 @@ public:
 
   // Function related
   TreeNode* BuildFunction();
+  TreeNode* BuildConstructor();
   TreeNode* AddFunctionBodyTo();
 
   TreeNode* BuildClass();

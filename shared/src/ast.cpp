@@ -383,7 +383,7 @@ void ClassNode::Construct() {
       VarListNode *vlnode = (VarListNode*)tree_node;
       for (unsigned i = 0; i < vlnode->GetNum(); i++) {
         IdentifierNode *inode = vlnode->VarAtIndex(i);
-        mMembers.PushBack(tree_node);
+        mMembers.PushBack(inode);
       }
     } else if (tree_node->IsIdentifier())
       mMembers.PushBack(tree_node);
@@ -452,6 +452,7 @@ FunctionNode::FunctionNode() {
   mParams = NULL;
   mScope = NULL;
   mBody = NULL;
+  mIsConstructor = false;
 }
 
 // When BlockNode is added to the ClassNode, we need further
@@ -464,6 +465,9 @@ void FunctionNode::Construct() {
 
 void FunctionNode::Dump(unsigned indent) {
   DumpIndentation(indent);
-  DUMP1_NORETURN("func ", mName);
+  if (mIsConstructor)
+    DUMP1_NORETURN("constructor ", mName);
+  else 
+    DUMP1_NORETURN("func ", mName);
   DUMP_RETURN();
 }

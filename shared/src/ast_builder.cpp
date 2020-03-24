@@ -68,9 +68,9 @@ TreeNode* ASTBuilder::CreateTokenTreeNode(const Token *token) {
 
     // Check if it's a type
     PrimTypeNode *type = gPrimTypePool.FindType(keyword);
-    if (n) {
-      mLastTreeNode = n;
-      return n;
+    if (type) {
+      mLastTreeNode = type;
+      return type;
     }
   }
 
@@ -617,12 +617,29 @@ TreeNode* ASTBuilder::BuildFunction() {
   return mLastTreeNode;
 }
 
+// This takes just one argument which is the function name.
+TreeNode* ASTBuilder::BuildConstructor() {
+  TreeNode *t = BuildFunction();
+  FunctionNode *cons = (FunctionNode*)t;
+  cons->SetIsConstructor();
+
+  mLastTreeNode = cons;
+  return cons;
+}
+
 // Takes two arguments.
 // 1st: Function
 // 2nd: body
 TreeNode* ASTBuilder::AddFunctionBodyTo() {
   if (mTrace)
     std::cout << "In AddFunctionBodyTo" << std::endl;
+
+  Param p_func = mParams[0];
+  if (!p_func.mIsTreeNode)
+    MERROR("The Function is not a tree node.");
+  TreeNode *func_node = p_func.mData.mTreeNode;
+  MASSERT(func_node->IsFunction() && "Function is not a FunctionNode?");
+  FunctionNode *func = (FunctionNode*)func_node;
 
   Param p_body = mParams[1];
   if (!p_body.mIsTreeNode)
@@ -631,14 +648,9 @@ TreeNode* ASTBuilder::AddFunctionBodyTo() {
   MASSERT(tree_node->IsBlock() && "Class body is not a BlockNode?");
   BlockNode *block = (BlockNode*)tree_node;
 
-  Param p_func = mParams[1];
-  if (!p_func.mIsTreeNode)
-    MERROR("The Function is not a tree node.");
-  TreeNode *func_node = p_func.mData.mTreeNode;
-  MASSERT(func_node->IsFunction() && "Function is not a FunctionNode?");
-  FunctionNode *func = (FunctionNode*)func_node;
   func->AddBody(block);
   func->Construct();
 
+  mLastTreeNode = func;
   return mLastTreeNode;
 }

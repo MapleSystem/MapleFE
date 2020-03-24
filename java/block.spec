@@ -105,12 +105,16 @@ rule FieldModifier   : ONEOF(Annotation, "public", "protected", "private",
 ################################################################
 rule ConstructorDeclaration : ZEROORMORE(ConstructorModifier) + ConstructorDeclarator +
                               ZEROORONE(Throws) + ConstructorBody
+  attr.action : AddFunctionBodyTo(%2, %4)
+
 rule ConstructorModifier    : ONEOF(Annotation, "public", "protected", "private")
 rule ConstructorDeclarator  : ZEROORONE(TypeParameters) + SimpleTypeName + '(' +
                               ZEROORONE(FormalParameterList) + ')'
+  attr.action : BuildConstructor(%2)
 rule SimpleTypeName         : Identifier
 rule ConstructorBody        : '{' + ZEROORONE(ExplicitConstructorInvocation) +
                               ZEROORONE(BlockStatements) + '}'
+  attr.action : BuildBlock(%3)
 
 rule ExplicitConstructorInvocation : ONEOF(
          ZEROORONE(TypeArguments) + "this" + '(' + ZEROORONE(ArgumentList) + ')' +  ';',

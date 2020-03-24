@@ -332,6 +332,8 @@ public:
 
 //////////////////////////////////////////////////////////////////////////
 //                         Function Nodes
+// Normal constructors are treated as function too, with mIsConstructor
+// being true.
 //////////////////////////////////////////////////////////////////////////
 
 class ASTScope;
@@ -344,7 +346,7 @@ private:
   VarListNode *mParams;
   ASTScope    *mScope;
   BlockNode   *mBody;
-
+  bool         mIsConstructor;  // If it's a constructor of class.
 public:
   FunctionNode();
   ~FunctionNode() {Release();}
@@ -354,6 +356,8 @@ public:
 
   void AddBody(BlockNode *b) {mBody = b;}
   void Construct();
+
+  void SetIsConstructor() {mIsConstructor = true;}
 
   // Attributes related
   unsigned GetAttrsNum()           {return mAttrs.GetNum();}

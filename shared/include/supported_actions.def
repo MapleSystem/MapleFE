@@ -41,6 +41,7 @@ ACTION(BuildVarList)
 
 // For function
 ACTION(BuildFunction)
+ACTION(BuildConstructor)
 ACTION(AddFunctionBodyTo)
 
 // For class/inheritance
