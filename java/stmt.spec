@@ -29,7 +29,7 @@ rule VariableDeclarator : VariableDeclaratorId + ZEROORONE('=' + VariableInitial
   attr.action: AddInitTo(%1, %2)
 
 rule VariableDeclaratorId : Identifier + ZEROORONE(Dims)
-  attr.action: AddDims(%1, %2)
+  attr.action: AddDimsTo(%1, %2)
 
 rule Dims : Dim + ZEROORMORE(Dim)
  attr.action: BuildDims(%1, %2)

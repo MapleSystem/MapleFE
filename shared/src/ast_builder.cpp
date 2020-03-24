@@ -228,7 +228,7 @@ TreeNode* ASTBuilder::BuildReturn() {
 // AddTypeTo takes two parameters, 1) tree; 2) type
 TreeNode* ASTBuilder::AddTypeTo() {
   if (mTrace)
-    std::cout << "In build Decl" << std::endl;
+    std::cout << "In AddTypeTo " << std::endl;
 
   MASSERT(mParams.size() == 2 && "BinaryDecl has NO 2 params?");
   Param p_type = mParams[1];
@@ -250,7 +250,7 @@ TreeNode* ASTBuilder::AddTypeTo() {
 // BuildDecl takes two parameters, 1) type; 2) name
 TreeNode* ASTBuilder::BuildDecl() {
   if (mTrace)
-    std::cout << "In build Decl" << std::endl;
+    std::cout << "In BuildDecl" << std::endl;
 
   MASSERT(mParams.size() == 2 && "BinaryDecl has NO 2 params?");
   Param p_type = mParams[0];
@@ -349,7 +349,9 @@ TreeNode* ASTBuilder::AddAttributeTo() {
   TreeNode *tree = p_tree.mData.mTreeNode;
 
   Param p_attr = mParams[1];
-  MASSERT(!p_attr.mIsEmpty && "Attr cannot be empty in AddAttributeTo");
+  if(p_attr.mIsEmpty)
+    return tree;
+
   MASSERT(p_attr.mIsTreeNode && "The Attr is not a treenode in AddAttributeTo()");
   TreeNode *attr = p_attr.mData.mTreeNode;
 
@@ -565,19 +567,19 @@ TreeNode* ASTBuilder::BuildDims() {
   return node_ret;
 }
 
-// AddDims() takes two parameters. The first is the variable,
+// AddDimsTo() takes two parameters. The first is the variable,
 // the second is the dims.
-TreeNode* ASTBuilder::AddDims() {
+TreeNode* ASTBuilder::AddDimsTo() {
   if (mTrace)
-    std::cout << "In Add Dimensions" << std::endl;
+    std::cout << "In AddDimsTo " << std::endl;
 
-  MASSERT(mParams.size() == 2 && "AddDims has NO 2 params?");
+  MASSERT(mParams.size() == 2 && "AddDimsTo has NO 2 params?");
   Param p_dims_a = mParams[0];
   Param p_dims_b = mParams[1];
 
   // Both variable should have been created as tree node.
   if (p_dims_a.mIsEmpty)
-    MERROR("The var in AddDims() is empty?");
+    MERROR("The var in AddDimsTo() is empty?");
 
   TreeNode *node_a = p_dims_a.mData.mTreeNode;
   TreeNode *node_b = p_dims_b.mIsEmpty ? NULL : p_dims_b.mData.mTreeNode;
@@ -588,6 +590,30 @@ TreeNode* ASTBuilder::AddDims() {
 
   mLastTreeNode = node_a;
   return node_a;
+}
+
+// AddDims() takes one parameters, the dims.
+// Add to mLastTreeNode
+TreeNode* ASTBuilder::AddDims() {
+  if (mTrace)
+    std::cout << "In AddDims " << std::endl;
+
+  Param p_dims = mParams[0];
+
+  if (p_dims.mIsEmpty)
+    return mLastTreeNode;
+
+  TreeNode *dims = p_dims.mData.mTreeNode;
+
+  if (mLastTreeNode->IsIdentifier()) {
+    IdentifierNode *node = (IdentifierNode*)mLastTreeNode;
+    node->SetDims(dims);
+  } else if (mLastTreeNode->IsFunction()) {
+    FunctionNode *node = (FunctionNode*)mLastTreeNode;
+    node->SetDims(dims);
+  }
+
+  return mLastTreeNode;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

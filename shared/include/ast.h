@@ -346,6 +346,7 @@ private:
   VarListNode *mParams;
   ASTScope    *mScope;
   BlockNode   *mBody;
+  DimensionNode *mDims;
   bool         mIsConstructor;  // If it's a constructor of class.
 public:
   FunctionNode();
@@ -368,7 +369,17 @@ public:
   void SetName(const char*s) {mName = s;}
 
   void SetType(TreeNode *t) {mType = t;}
-  void Release() {mAttrs.Release();}
+
+  void SetDims(DimensionNode *t) {mDims = t;}
+  unsigned GetDimsNum()          {return mDims->GetDimsNum();}
+  bool     IsArray()             {return mDims && GetDimsNum() > 0;}
+  unsigned AddDim(unsigned i = 0){mDims->AddDim(i);}           // 0 means unspecified
+  unsigned GetNthNum(unsigned n) {return mDims->GetNthDim(n);} // 0 means unspecified.
+  void     SetNthNum(unsigned n, unsigned i) {mDims->SetNthDim(n, i);}
+
+
+  void Release() { mAttrs.Release();
+                   if (mDims) mDims->Release();}
   void Dump(unsigned);
 };
 

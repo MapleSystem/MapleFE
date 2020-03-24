@@ -121,8 +121,12 @@ all modules are as below.
   multiple dimension already. The second parameter tells the rest of dimensions.
 
 * AddDims
-  Format: AddDims(variable, dims)
-  Add the dimensions into the variable.
+  Format: AddDims(dims)
+  Add the dimensions into the mLastTreeNode.
+
+* AddDimsTo
+  Format: AddDimsTo(var, dims)
+  Add the dimensions into var.
 
 * BuildFunction
   Format: BuildFunction(function-Identifier)

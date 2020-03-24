@@ -75,7 +75,7 @@ rule MethodHeader      : ONEOF(Result + MethodDeclarator + ZEROORONE(Throws),
 rule Result            : ONEOF(UnannType, "void")
 rule MethodDeclarator  : Identifier + '(' + ZEROORONE(FormalParameterList) + ')' + ZEROORONE(Dims)
   attr.action: BuildFunction(%1)
-  attr.action: AddDims(%1, %5)
+  attr.action: AddDims(%5)
 
 rule Throws            : "fakethrows"
 rule MethodModifier    : ONEOF(Annotation, "public", "protected", "private", "abstract", "static",

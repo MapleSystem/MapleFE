@@ -116,6 +116,7 @@ public:
   TreeNode* BuildDim();
   TreeNode* BuildDims();
   TreeNode* AddDims();
+  TreeNode* AddDimsTo();
 };
 
 #endif
