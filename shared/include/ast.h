@@ -64,8 +64,7 @@ enum NodeKind {
   NK_UnaOperator,
   NK_BinOperator,
   NK_TerOperator,
-  NK_Construct,
-  NK_Block,        // A block node
+  NK_Block,        // A block node. Java Instance Initializer also a block node.
   NK_Function,
   NK_Class,
   NK_Interface,
@@ -107,7 +106,6 @@ public:
   bool IsUnaOperator(){return mKind == NK_UnaOperator;}
   bool IsBinOperator(){return mKind == NK_BinOperator;}
   bool IsTerOperator(){return mKind == NK_TerOperator;}
-  bool IsConstruct()  {return mKind == NK_Construct;}
   bool IsBlock()      {return mKind == NK_Block;}
   bool IsFunction()   {return mKind == NK_Function;}
   bool IsClass()      {return mKind == NK_Class;}
@@ -311,17 +309,39 @@ public:
 // A block is common in all languages, and it serves different function in
 // different context. Here is a few examples.
 //   1) As function body, it could contain variable decl, statement, lambda,
-//      inner function, inner class, ...
+//      inner function, inner class, instance initializer....
 //   2) As a function block, it could contain variable declaration, statement
 //      lambda, ...
+//
+//                       Instance Initializer
+//
+// Java instance initializer is a block node, and it's a shared part of all
+// constructors. It's always executed. We simply let BlockNode describe
+// instance initializer.
+// C++ has similiar instance initializer, but its bound to a specific constructor.
+// We may move those initializer into the constructor body.
 //////////////////////////////////////////////////////////////////////////
 
 class BlockNode : public TreeNode {
 private:
   SmallVector<TreeNode*> mChildren;
+
+  // Some blocks are instance initializer in languages like Java,
+  // and they can have attributes.
+  bool mIsInstInit; // Instance Initializer
+  SmallVector<AttrId> mAttrs;
+
 public:
-  BlockNode(){mKind = NK_Block;}
+  BlockNode(){mKind = NK_Block; mIsInstInit = false;}
   ~BlockNode() {Release();}
+
+  // Instance Initializer and Attributes related
+  bool IsInstInit()    {return mIsInstInit;}
+  void SetIsInstInit() {mIsInstInit = true;}
+  unsigned GetAttrsNum()           {return mAttrs.GetNum();}
+  void     AddAttr(AttrId a)       {mAttrs.PushBack(a);}
+  AttrId   AttrAtIndex(unsigned i) {return mAttrs.ValueAtIndex(i);}
+
 
   unsigned  GetChildrenNum()            {return mChildren.GetNum();}
   TreeNode* GetChildAtIndex(unsigned i) {return mChildren.ValueAtIndex(i);}
@@ -358,6 +378,7 @@ public:
   void AddBody(BlockNode *b) {mBody = b;}
   void Construct();
 
+  bool IsConstructor()    {return mIsConstructor;}
   void SetIsConstructor() {mIsConstructor = true;}
 
   // Attributes related
@@ -420,6 +441,8 @@ private:
 
   SmallVector<IdentifierNode*> mMembers;
   SmallVector<FunctionNode*>   mMethods;
+  SmallVector<FunctionNode*>   mConstructors;
+  SmallVector<BlockNode*>      mInstInits;     // instance initializer
   SmallVector<ClassNode*>      mLocalClasses;
   SmallVector<InterfaceNode*>  mLocalInterfaces;
 

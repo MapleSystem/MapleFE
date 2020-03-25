@@ -49,6 +49,7 @@ ACTION(BuildClass)
 ACTION(AddSuperClass)
 ACTION(AddSuperInterface)
 ACTION(AddClassBody)
+ACTION(BuildInstInit)
 
 ACTION(AddAttribute)
 ACTION(AddAttributeTo)

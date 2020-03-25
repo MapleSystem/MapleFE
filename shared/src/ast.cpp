@@ -387,13 +387,21 @@ void ClassNode::Construct() {
       }
     } else if (tree_node->IsIdentifier())
       mMembers.PushBack(tree_node);
-    else if (tree_node->IsFunction())
-      mMethods.PushBack(tree_node);
-    else if (tree_node->IsClass())
+    else if (tree_node->IsFunction()) {
+      FunctionNode *f = (FunctionNode*)tree_node;
+      if (f->IsConstructor())
+        mConstructors.PushBack(tree_node);
+      else
+        mMethods.PushBack(tree_node);
+    } else if (tree_node->IsClass())
       mLocalClasses.PushBack(tree_node);
     else if (tree_node->IsInterface())
       mLocalInterfaces.PushBack(tree_node);
-    else
+    else if (tree_node->IsBlock()) {
+      BlockNode *block = (BlockNode*)tree_node;
+      MASSERT(block->IsInstInit() && "unnamed block in class is not inst init?");
+      mInstInits.PushBack(tree_node);
+    } else
       MERROR("Unsupported tree node in class body.");
   }
 }
@@ -418,6 +426,20 @@ void ClassNode::Dump(unsigned indent) {
   DUMP0("  Members: ");
   for (unsigned i = 0; i < mMembers.GetNum(); i++) {
     TreeNode *node = mMembers.ValueAtIndex(i);
+    node->Dump(4);
+  }
+  DUMP_RETURN();
+
+  DUMP0("  Instance Initializer: ");
+  for (unsigned i = 0; i < mInstInits.GetNum(); i++) {
+    TreeNode *node = mInstInits.ValueAtIndex(i);
+    DUMP1("    InstInit-", i);
+  }
+  DUMP_RETURN();
+
+  DUMP0("  Constructors: ");
+  for (unsigned i = 0; i < mConstructors.GetNum(); i++) {
+    TreeNode *node = mConstructors.ValueAtIndex(i);
     node->Dump(4);
   }
   DUMP_RETURN();

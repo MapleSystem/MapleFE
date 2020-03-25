@@ -135,6 +135,13 @@ all modules are as below.
   Format: BuildConstructor(function-Identifier)
   This is almost the same as BuildFunction, except it has no return type.
 
+* BuildInstInit
+  Format: BuildInstInit(block-tree, or an existing block node)
+  It takes one argument, either a tree, or an existing block node.
+  This is the same as BuildBlock, except setting it's a instance initializer.
+  This is to accomadate Java spec. C++ has different syntax/semantic regarding
+  instance initializer.
+
 * AddFunctionBody
   Format: AddFunctionBody(funcbody)
   Add a funcbody to mLastTreeNode, which should be a FunctionNode.

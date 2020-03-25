@@ -84,15 +84,30 @@ TreeNode* ASTBuilder::CreateTokenTreeNode(const Token *token) {
 
 // It's the caller to assure both arguments are valid.
 static void add_attribute_to_kernel(TreeNode *tree, AttrNode *attr) {
-  if (tree->IsFunction()) {
+  AttrId aid = attr->GetId();
+  if (tree->IsVarList()) {
+    VarListNode *vl = (VarListNode*)tree;
+    for (unsigned i = 0; i < vl->GetNum(); i++) {
+      IdentifierNode *inode = vl->VarAtIndex(i);
+      inode->AddAttr(aid);
+    }
+    return;
+  } else if (tree->IsFunction()) {
     FunctionNode *func = (FunctionNode*)tree;
-    func->AddAttr(attr->GetId());
+    func->AddAttr(aid);
+    return;
   } else if (tree->IsIdentifier()) {
     IdentifierNode *iden = (IdentifierNode*)tree;
-    iden->AddAttr(attr->GetId());
-  } else {
-    MERROR("Unsupported tree, wanting to add attribute.");
+    iden->AddAttr(aid);
+    return;
+  } else if (tree->IsBlock()){
+    BlockNode *b = (BlockNode*)b;
+    if (b->IsInstInit()) {
+      b->AddAttr(aid);
+      return;
+    }
   }
+  MERROR("Unsupported tree, wanting to add attribute.");
 }
 
 static void add_attribute_to(TreeNode *tree_node, TreeNode *attr) {
@@ -444,6 +459,35 @@ TreeNode* ASTBuilder::BuildBlock() {
   return mLastTreeNode;
 }
 
+// This takes just one argument which either a block node, or the root of sub tree
+TreeNode* ASTBuilder::BuildInstInit() {
+  if (mTrace)
+    std::cout << "In BuildInstInit" << std::endl;
+
+  BlockNode *b = NULL;
+
+  Param p_subtree = mParams[0];
+  if (!p_subtree.mIsEmpty) {
+    if (!p_subtree.mIsTreeNode)
+      MERROR("The subtree is not a treenode in BuildInstInit()");
+
+    TreeNode *subtree = p_subtree.mData.mTreeNode;
+    if (subtree->IsBlock()) {
+      b = (BlockNode*)subtree;
+      b->SetIsInstInit();
+    }
+  }
+
+  if (!b) {
+    b = BuildBlock();
+    b->SetIsInstInit();
+  }
+
+  // set last tree node
+  mLastTreeNode = b;
+  return mLastTreeNode;
+}
+
 TreeNode* ASTBuilder::AddSuperClass() {
   if (mTrace)
     std::cout << "In AddSuperClass" << std::endl;
@@ -667,15 +711,17 @@ TreeNode* ASTBuilder::AddFunctionBodyTo() {
   MASSERT(func_node->IsFunction() && "Function is not a FunctionNode?");
   FunctionNode *func = (FunctionNode*)func_node;
 
+  // It's possible that the func body is empty, such as in the
+  // function header declaration. Usually it's just a token ';'.
   Param p_body = mParams[1];
-  if (!p_body.mIsTreeNode)
-    MERROR("The class body is not a tree node.");
-  TreeNode *tree_node = p_body.mData.mTreeNode;
-  MASSERT(tree_node->IsBlock() && "Class body is not a BlockNode?");
-  BlockNode *block = (BlockNode*)tree_node;
+  if (p_body.mIsTreeNode) {
+    TreeNode *tree_node = p_body.mData.mTreeNode;
+    MASSERT(tree_node->IsBlock() && "Class body is not a BlockNode?");
+    BlockNode *block = (BlockNode*)tree_node;
 
-  func->AddBody(block);
-  func->Construct();
+    func->AddBody(block);
+    func->Construct();
+  }
 
   mLastTreeNode = func;
   return mLastTreeNode;

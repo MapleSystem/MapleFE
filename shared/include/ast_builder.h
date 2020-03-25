@@ -106,6 +106,7 @@ public:
   TreeNode* AddClassBody();
   TreeNode* AddSuperClass();
   TreeNode* AddSuperInterface();
+  TreeNode* BuildInstInit();
 
   // Annotation related
   TreeNode* BuildAnnotationType();

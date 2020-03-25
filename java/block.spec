@@ -52,7 +52,11 @@ rule ClassBodyDeclaration   : ONEOF(ClassMemberDeclaration,
                                     StaticInitializer,
                                     ConstructorDeclaration)
 rule InstanceInitializer    : Block
+  attr.action: BuildInstInit(%1)
 rule StaticInitializer      : "static" + Block
+  attr.action: BuildInstInit(%2)
+  attr.action: AddAttributeTo(%2, %1)
+
 rule ClassMemberDeclaration : ONEOF(FieldDeclaration,
                                     MethodDeclaration,
                                     ClassDeclaration,
