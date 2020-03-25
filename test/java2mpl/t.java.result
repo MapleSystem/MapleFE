@@ -183,14 +183,32 @@ Matched 17 tokens.
 [27] Token
 Attached a tree node from Child
 Attached a tree node from Child
-Attached a tree node from Child
-Attached a tree node from Child
 == Sub Tree ==
-class Point
+class  Point
+  Members: 
+
+  Instance Initializer: 
+
+  Constructors: 
+    constructor  Point
+
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
 
 ============= Module ===========
 [Global Decls]
 
 == Sub Tree ==
-class Point
+class  Point
+  Members: 
+
+  Instance Initializer: 
+
+  Constructors: 
+    constructor  Point
+
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
 

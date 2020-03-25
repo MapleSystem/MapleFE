@@ -172,15 +172,32 @@ Matched 14 tokens.
 [25] Table TblVariableDeclaratorId@10: 26,
 [26] Token
 Attached a tree node from Child
-Attached a tree node from Child
-Attached a tree node from Child
-Attached a tree node from Child
 == Sub Tree ==
-class A
+class  A
+  Members: 
+    a
+  Instance Initializer: 
+
+  Constructors: 
+
+  Methods: 
+    func  foo
+  LocalClasses: 
+  LocalInterfaces: 
 
 ============= Module ===========
 [Global Decls]
 
 == Sub Tree ==
-class A
+class  A
+  Members: 
+    a
+  Instance Initializer: 
+
+  Constructors: 
+
+  Methods: 
+    func  foo
+  LocalClasses: 
+  LocalInterfaces: 
 

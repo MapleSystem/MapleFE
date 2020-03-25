@@ -85,11 +85,29 @@ Matched 7 tokens.
 [13] Token
 Attached a tree node from Child
 == Sub Tree ==
-class A
+class  A
+  Members: 
+    a
+  Instance Initializer: 
+
+  Constructors: 
+
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
 
 ============= Module ===========
 [Global Decls]
 
 == Sub Tree ==
-class A
+class  A
+  Members: 
+    a
+  Instance Initializer: 
+
+  Constructors: 
+
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
 

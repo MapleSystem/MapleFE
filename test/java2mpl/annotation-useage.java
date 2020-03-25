@@ -13,8 +13,8 @@
 //See the Mulan PSL v1 for more details.
 //
 class A {
-  @RequestForEnhancement(
-    id = 2868724
-  )
+  //@RequestForEnhancement(
+  //  id = 2868724
+  //)
   public static void travelThroughTime(Date destination) {}
 }

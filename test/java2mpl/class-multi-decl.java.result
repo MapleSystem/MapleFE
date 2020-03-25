@@ -129,6 +129,10 @@ Attached a tree node from Child
 class  A
   Members: 
     a    b
+  Instance Initializer: 
+
+  Constructors: 
+
   Methods: 
   LocalClasses: 
   LocalInterfaces: 
@@ -140,6 +144,10 @@ class  A
 class  A
   Members: 
     a    b
+  Instance Initializer: 
+
+  Constructors: 
+
   Methods: 
   LocalClasses: 
   LocalInterfaces: 

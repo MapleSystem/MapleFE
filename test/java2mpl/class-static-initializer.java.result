@@ -173,11 +173,31 @@ Matched 15 tokens.
 Attached a tree node from Child
 Attached a tree node from Child
 == Sub Tree ==
-class A
+class  A
+  Members: 
+    a
+  Instance Initializer: 
+    InstInit- 0
+
+  Constructors: 
+
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
 
 ============= Module ===========
 [Global Decls]
 
 == Sub Tree ==
-class A
+class  A
+  Members: 
+    a
+  Instance Initializer: 
+    InstInit- 0
+
+  Constructors: 
+
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
 

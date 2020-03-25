@@ -204,7 +204,6 @@ Attached a tree node from Child
 Attached a tree node from Child
 Attached a tree node from Child
 Attached a tree node from Child
-Attached a tree node from Child
 == Sub Tree ==
 
 Separator  Token:  Whitespace
@@ -457,7 +456,6 @@ Attached a tree node from Child
 Attached a tree node from Child
 Attached a tree node from Child
 Attached a tree node from Child
-Attached a tree node from Child
 == Sub Tree ==
 
 Separator  Token:  Whitespace
@@ -663,7 +661,6 @@ Matched 59 tokens.
 [34] Token
 [35] Token
 [36:2] Token
-Attached a tree node from Child
 Attached a tree node from Child
 Attached a tree node from Child
 Attached a tree node from Child
@@ -926,7 +923,6 @@ Attached a tree node from Child
 Attached a tree node from Child
 Attached a tree node from Child
 Convert unary --> binary
-Attached a tree node from Child
 Attached a tree node from Child
 Attached a tree node from Child
 Attached a tree node from Child

@@ -175,14 +175,32 @@ Matched 17 tokens.
 [25:2] Token
 [26] Token
 Attached a tree node from Child
-Attached a tree node from Child
-Attached a tree node from Child
 == Sub Tree ==
-class A
+class  A
+  Members: 
+
+  Instance Initializer: 
+
+  Constructors: 
+
+  Methods: 
+    func  loseEdges
+  LocalClasses: 
+  LocalInterfaces: 
 
 ============= Module ===========
 [Global Decls]
 
 == Sub Tree ==
-class A
+class  A
+  Members: 
+
+  Instance Initializer: 
+
+  Constructors: 
+
+  Methods: 
+    func  loseEdges
+  LocalClasses: 
+  LocalInterfaces: 
 

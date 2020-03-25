@@ -394,59 +394,60 @@ Matched 37 tokens.
 [6] Table TblClassBody_sub1@3: 8,9,
 [7] Token
 [8:1] Table TblFieldDeclaration@3: 10,11,12,
-[9:1] Table TblBlock@6: 13,14,15,
+[9:1] Table TblInstanceInitializer@6: 13,
 [10:2] Token
-[11] Table TblVariableDeclaratorList@4: 16,
+[11] Table TblVariableDeclaratorList@4: 14,
 [12] Token
-[13] Token
-[14:2] Table TblBlockStatements@7: 17,18,
+[13] Table TblBlock@6: 15,16,17,
+[14] Table TblVariableDeclarator@4: 18,
 [15] Token
-[16] Table TblVariableDeclarator@4: 19,
-[17:1] Table TblExpressionStatement@7: 20,21,
-[18] Table TblBlockStatements_sub1@11: 22,23,24,25,26,27,
-[19] Table TblVariableDeclaratorId@4: 28,
-[20:1] Table TblAssignment@7: 29,30,31,
+[16:2] Table TblBlockStatements@7: 19,20,
+[17] Token
+[18] Table TblVariableDeclaratorId@4: 21,
+[19:1] Table TblExpressionStatement@7: 22,23,
+[20] Table TblBlockStatements_sub1@11: 24,25,26,27,28,29,
 [21] Token
-[22:1] Table TblExpressionStatement@11: 32,33,
-[23:1] Table TblExpressionStatement@15: 34,35,
-[24:1] Table TblExpressionStatement@19: 36,37,
-[25:1] Table TblExpressionStatement@23: 38,39,
-[26:1] Table TblExpressionStatement@27: 40,41,
-[27:1] Table TblExpressionStatement@31: 42,43,
-[28] Token
-[29:1] Token
-[30:2] Token
-[31:3] Token
-[32:1] Table TblAssignment@11: 44,45,46,
-[33] Token
-[34:1] Table TblAssignment@15: 47,48,49,
-[35] Token
-[36:1] Table TblAssignment@19: 50,51,52,
-[37] Token
-[38:1] Table TblAssignment@23: 53,54,55,
-[39] Token
-[40:1] Table TblAssignment@27: 56,57,58,
-[41] Token
-[42:1] Table TblAssignment@31: 59,60,61,
-[43] Token
-[44:1] Token
-[45:2] Token
-[46:3] Token
-[47:1] Token
-[48:2] Token
-[49:3] Token
-[50:1] Token
-[51:2] Token
-[52:3] Token
-[53:1] Token
-[54:2] Token
-[55:3] Token
-[56:1] Token
-[57:2] Token
-[58:3] Token
-[59:1] Token
-[60:2] Token
-[61:3] Token
+[22:1] Table TblAssignment@7: 30,31,32,
+[23] Token
+[24:1] Table TblExpressionStatement@11: 33,34,
+[25:1] Table TblExpressionStatement@15: 35,36,
+[26:1] Table TblExpressionStatement@19: 37,38,
+[27:1] Table TblExpressionStatement@23: 39,40,
+[28:1] Table TblExpressionStatement@27: 41,42,
+[29:1] Table TblExpressionStatement@31: 43,44,
+[30:1] Token
+[31:2] Token
+[32:3] Token
+[33:1] Table TblAssignment@11: 45,46,47,
+[34] Token
+[35:1] Table TblAssignment@15: 48,49,50,
+[36] Token
+[37:1] Table TblAssignment@19: 51,52,53,
+[38] Token
+[39:1] Table TblAssignment@23: 54,55,56,
+[40] Token
+[41:1] Table TblAssignment@27: 57,58,59,
+[42] Token
+[43:1] Table TblAssignment@31: 60,61,62,
+[44] Token
+[45:1] Token
+[46:2] Token
+[47:3] Token
+[48:1] Token
+[49:2] Token
+[50:3] Token
+[51:1] Token
+[52:2] Token
+[53:3] Token
+[54:1] Token
+[55:2] Token
+[56:3] Token
+[57:1] Token
+[58:2] Token
+[59:3] Token
+[60:1] Token
+[61:2] Token
+[62:3] Token
 Attached a tree node from Child
 Attached a tree node from Child
 Attached a tree node from Child
@@ -456,11 +457,31 @@ Attached a tree node from Child
 Attached a tree node from Child
 Attached a tree node from Child
 == Sub Tree ==
-class A
+class  A
+  Members: 
+    a
+  Instance Initializer: 
+    InstInit- 0
+
+  Constructors: 
+
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
 
 ============= Module ===========
 [Global Decls]
 
 == Sub Tree ==
-class A
+class  A
+  Members: 
+    a
+  Instance Initializer: 
+    InstInit- 0
+
+  Constructors: 
+
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
 

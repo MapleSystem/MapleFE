@@ -46,11 +46,29 @@ Matched 4 tokens.
 [5] Token
 [6] Token
 == Sub Tree ==
-class Point
+class  Point
+  Members: 
+
+  Instance Initializer: 
+
+  Constructors: 
+
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
 
 ============= Module ===========
 [Global Decls]
 
 == Sub Tree ==
-class Point
+class  Point
+  Members: 
+
+  Instance Initializer: 
+
+  Constructors: 
+
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
 

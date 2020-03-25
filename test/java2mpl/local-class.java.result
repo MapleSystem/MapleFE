@@ -494,16 +494,52 @@ Matched 49 tokens.
 Attached a tree node from Child
 Attached a tree node from Child
 Attached a tree node from Child
-Attached a tree node from Child
-Attached a tree node from Child
-Attached a tree node from Child
-Attached a tree node from Child
 == Sub Tree ==
-class Global
+class  Global
+  Members: 
+
+  Instance Initializer: 
+
+  Constructors: 
+
+  Methods: 
+    func  foo
+  LocalClasses: 
+    class  Cyclic
+  Members: 
+
+  Instance Initializer: 
+
+  Constructors: 
+
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+  LocalInterfaces: 
 
 ============= Module ===========
 [Global Decls]
 
 == Sub Tree ==
-class Global
+class  Global
+  Members: 
+
+  Instance Initializer: 
+
+  Constructors: 
+
+  Methods: 
+    func  foo
+  LocalClasses: 
+    class  Cyclic
+  Members: 
+
+  Instance Initializer: 
+
+  Constructors: 
+
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+  LocalInterfaces: 
 
