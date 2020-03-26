@@ -380,6 +380,27 @@ void ReturnNode::Dump(unsigned ind) {
   GetResult()->Dump(ind + 2);
 }
 
+CondBranchNode::CondBranchNode() {
+  mCond = NULL;
+  mTrueBranch = NULL;
+  mFalseBranch = NULL;
+}
+
+void CondBranchNode::Dump(unsigned ind) {
+  DumpIndentation(ind);
+  DUMP0_NORETURN("cond-branch cond:");
+  mCond->Dump(0);
+  DUMP_RETURN();
+  DumpIndentation(ind);
+  DUMP0("true branch :");
+  if (mTrueBranch)
+    mTrueBranch->Dump(ind+2);
+  DumpIndentation(ind);
+  DUMP0("false branch :");
+  if (mFalseBranch)
+    mFalseBranch->Dump(ind+2);
+}
+
 //////////////////////////////////////////////////////////////////////////////////////
 //                          BlockNode
 //////////////////////////////////////////////////////////////////////////////////////

@@ -72,6 +72,8 @@ rule StatementWithoutTrailingSubstatement : ONEOF(
   TryStatement)
 
 rule IfThenStatement : "if" + '(' + Expression + ')' + Statement
+  attr.action: BuildCondBranch(%3)
+  attr.action: AddCondBranchTrueStatement(%5)
 
 rule IfThenElseStatement : "if" + '(' + Expression + ')' + StatementNoShortIf + "else" + Statement
 

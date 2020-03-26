@@ -45,6 +45,16 @@ all modules are as below.
   like +=, -=, etc.
 
 * BuildReturn
+  Format: BuildReturn(return-value)
+
+* BuildCondBranch
+  Format: BuildCondBranch(cond-expre)
+
+* AddCondBranchTrueStatement
+  Format: BuildCondBranch(true-expre)
+
+* AddCondBranchFalseStatement
+  Format: BuildFalseBranch(false-expre)
 
 * BuildDecl
   Format: BuildDecl(Type, Variable)

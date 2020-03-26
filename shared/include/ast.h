@@ -115,7 +115,10 @@ public:
   bool IsFunction()   {return mKind == NK_Function;}
   bool IsClass()      {return mKind == NK_Class;}
   bool IsInterface()  {return mKind == NK_Interface;}
-  bool IsReturn()  {return mKind == NK_Return;}
+
+  bool IsReturn()     {return mKind == NK_Return;}
+  bool IsCondBranch() {return mKind == NK_CondBranch;}
+
   bool IsPass()       {return mKind == NK_Pass;}
 
   bool IsScope()      {return IsBlock() || IsFunction();}
@@ -323,6 +326,26 @@ public:
 
   void SetResult(TreeNode *t) {mResult = t;}
   TreeNode* GetResult() { return mResult; }
+  void Dump(unsigned);
+};
+
+class CondBranchNode : public TreeNode {
+private:
+  TreeNode *mCond;
+  TreeNode *mTrueBranch;
+  TreeNode *mFalseBranch;
+public:
+  CondBranchNode();
+  ~CondBranchNode(){}
+
+  void SetCond(TreeNode *t)       {mCond = t;}
+  void SetTrueBranch(TreeNode *t) {mTrueBranch = t;}
+  void SetFalseBranch(TreeNode *t){mFalseBranch = t;}
+
+  TreeNode* GetCond()        {return mCond;}
+  TreeNode* GetTrueBranch()  {return mTrueBranch;}
+  TreeNode* GetFalseBranch() {return mFalseBranch;}
+
   void Dump(unsigned);
 };
 

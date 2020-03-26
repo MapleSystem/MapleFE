@@ -1,0 +1,94 @@
+Comment Token: 
+Comment Token: 
+Comment Token: 
+Comment Token: 
+Comment Token: 
+Comment Token: 
+Comment Token: 
+Comment Token: 
+Comment Token: 
+Comment Token: 
+Comment Token: 
+Comment Token: 
+Comment Token: 
+Comment Token: 
+Keyword    Token:  int
+Separator  Token:  Whitespace
+Identifier Token:  a
+Separator  Token:  Lbrack
+Separator  Token:  Rbrack
+Separator  Token:  Lbrack
+Separator  Token:  Rbrack
+Separator  Token:  Semicolon
+======= Main sortout Dump SortOut =======
+[1] Table TblStatement@0: 2,
+[2] Table TblLocalVariableDeclarationStatement@0: 3,4,
+[3] Table TblLocalVariableDeclaration@0: 5,6,
+[4] Token
+[5] Table TblUnannType@0: 7,
+[6] Table TblVariableDeclaratorList@1: 8,
+[7] Table TblUnannPrimitiveType@0: 9,
+[8] Table TblVariableDeclarator@1: 10,
+[9] Table TblNumericType@0: 11,
+[10] Table TblVariableDeclaratorId@1: 12,13,
+[11] Table TblIntType@0: 14,
+[12] Token
+[13] Table TblVariableDeclaratorId_sub1@2: 15,
+[14] Token
+[15] Table TblDims@2: 16,17,
+[16] Table TblDim@2: 18,19,
+[17] Table TblDims_sub1@4: 20,
+[18] Token
+[19] Token
+[20] Table TblDim@4: 21,22,
+[21] Token
+[22] Token
+Matched 7 tokens.
+======= patch-was-succ Dump SortOut =======
+[1] Table TblStatement@0: 2,
+[2] Table TblLocalVariableDeclarationStatement@0: 3,4,
+[3] Table TblLocalVariableDeclaration@0: 5,6,
+[4] Token
+[5] Table TblUnannType@0: 7,
+[6] Table TblVariableDeclaratorList@1: 8,
+[7] Table TblUnannPrimitiveType@0: 9,
+[8] Table TblVariableDeclarator@1: 10,
+[9] Table TblNumericType@0: 11,
+[10] Table TblVariableDeclaratorId@1: 12,13,
+[11] Table TblIntType@0: 14,
+[12] Token
+[13] Table TblVariableDeclaratorId_sub1@2: 15,
+[14] Token
+[15] Table TblDims@2: 16,17,
+[16] Table TblDim@2: 18,19,
+[17] Table TblDims_sub1@4: 20,
+[18] Token
+[19] Token
+[20] Table TblDim@4: 21,22,
+[21] Token
+[22] Token
+======= Simplify AppealNode Trees Dump SortOut =======
+[1] Table TblLocalVariableDeclarationStatement@0: 2,3,
+[2] Table TblLocalVariableDeclaration@0: 4,5,
+[3] Token
+[4:2] Token
+[5] Table TblVariableDeclaratorList@1: 6,
+[6] Table TblVariableDeclarator@1: 7,
+[7] Table TblVariableDeclaratorId@1: 8,9,
+[8] Token
+[9:2] Table TblDims@2: 10,11,
+[10] Table TblDim@2: 12,13,
+[11:2] Table TblDim@4: 14,15,
+[12] Token
+[13] Token
+[14] Token
+[15] Token
+Attached a tree node from Child
+Attached a tree node from Child
+== Sub Tree ==
+a[][]
+============= Module ===========
+[Global Decls]
+a[][]
+== Sub Tree ==
+a[][]

@@ -248,6 +248,62 @@ TreeNode* ASTBuilder::BuildReturn() {
   return mLastTreeNode;
 }
 
+// Takes one argument, the condition expression
+TreeNode* ASTBuilder::BuildCondBranch() {
+  if (mTrace)
+    std::cout << "In BuildCondBranch" << std::endl;
+
+  CondBranchNode *cond_branch = (CondBranchNode*)mTreePool->NewTreeNode(sizeof(CondBranchNode));
+  new (cond_branch) CondBranchNode();
+
+  Param p_cond = mParams[0];
+  if (p_cond.mIsEmpty)
+    MERROR("The condition expression is empty in building conditional branch.");
+
+  if (!p_cond.mIsTreeNode)
+    MERROR("The condition expr is not a tree node.");
+
+  TreeNode *cond_expr = p_cond.mData.mTreeNode;
+  cond_branch->SetCond(cond_expr);
+
+  mLastTreeNode = cond_branch;
+  return mLastTreeNode;
+}
+
+// Takes one argument, the body of true statement/block
+TreeNode* ASTBuilder::AddCondBranchTrueStatement() {
+  if (mTrace)
+    std::cout << "In AddCondBranchTrueStatement" << std::endl;
+
+  CondBranchNode *cond_branch = (CondBranchNode*)mLastTreeNode;
+  Param p_true = mParams[0];
+  if (!p_true.mIsEmpty) {
+    if (!p_true.mIsTreeNode)
+      MERROR("The condition expr is not a tree node.");
+    TreeNode *true_expr = p_true.mData.mTreeNode;
+    cond_branch->SetTrueBranch(true_expr);
+  }
+
+  return mLastTreeNode;
+}
+
+// Takes one argument, the body of false statement/block
+TreeNode* ASTBuilder::AddCondBranchFalseStatement() {
+  if (mTrace)
+    std::cout << "In AddCondBranchFalseStatement" << std::endl;
+
+  CondBranchNode *cond_branch = (CondBranchNode*)mLastTreeNode;
+  Param p_false = mParams[0];
+  if (!p_false.mIsEmpty) {
+    if (!p_false.mIsTreeNode)
+      MERROR("The condition expr is not a tree node.");
+    TreeNode *false_expr = p_false.mData.mTreeNode;
+    cond_branch->SetFalseBranch(false_expr);
+  }
+
+  return mLastTreeNode;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Issues in building declarations.
 // 1) First we are going to create an IdentifierNode, which should be attached

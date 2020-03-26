@@ -120,6 +120,9 @@ public:
   // Statements, Control Flow
   TreeNode* BuildAssignment();
   TreeNode* BuildReturn();
+  TreeNode* BuildCondBranch();
+  TreeNode* AddCondBranchTrueStatement();
+  TreeNode* AddCondBranchFalseStatement();
 };
 
 #endif
