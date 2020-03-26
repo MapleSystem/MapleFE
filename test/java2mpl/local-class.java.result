@@ -504,7 +504,7 @@ class  Global
 
   Methods: 
     func  foo
-  LocalClasses: 
+    Cyclic  LocalClasses: 
     class  Cyclic
   Members: 
 
@@ -530,7 +530,7 @@ class  Global
 
   Methods: 
     func  foo
-  LocalClasses: 
+    Cyclic  LocalClasses: 
     class  Cyclic
   Members: 
 

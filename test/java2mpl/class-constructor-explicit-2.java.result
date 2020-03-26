@@ -362,6 +362,12 @@ class  Point
 
   Constructors: 
     constructor  Point
+    Assign
+      x
+      x
+    Assign
+      y
+      y
 
   Methods: 
   LocalClasses: 
@@ -996,6 +1002,9 @@ class  ColoredPoint
   Constructors: 
     constructor  ColoredPoint
     constructor  ColoredPoint
+    Assign
+      color
+      color
 
   Methods: 
   LocalClasses: 
@@ -1012,6 +1021,12 @@ class  Point
 
   Constructors: 
     constructor  Point
+    Assign
+      x
+      x
+    Assign
+      y
+      y
 
   Methods: 
   LocalClasses: 
@@ -1027,6 +1042,9 @@ class  ColoredPoint
   Constructors: 
     constructor  ColoredPoint
     constructor  ColoredPoint
+    Assign
+      color
+      color
 
   Methods: 
   LocalClasses: 

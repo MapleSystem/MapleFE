@@ -263,7 +263,6 @@ Matched 20 tokens.
 [35] Token
 Attached a tree node from Child
 Convert unary --> binary
-Attached a tree node from Child
 == Sub Tree ==
 class  A
   Members: 
@@ -274,6 +273,10 @@ class  A
 
   Methods: 
     func  foo
+    return:
+      Add
+        c
+        b
   LocalClasses: 
   LocalInterfaces: 
 
@@ -290,6 +293,10 @@ class  A
 
   Methods: 
     func  foo
+    return:
+      Add
+        c
+        b
   LocalClasses: 
   LocalInterfaces: 
 

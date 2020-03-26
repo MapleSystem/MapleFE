@@ -191,6 +191,9 @@ class  Point
 
   Constructors: 
     constructor  Point
+    Assign
+      x
+      x
 
   Methods: 
   LocalClasses: 
@@ -207,6 +210,9 @@ class  Point
 
   Constructors: 
     constructor  Point
+    Assign
+      x
+      x
 
   Methods: 
   LocalClasses: 

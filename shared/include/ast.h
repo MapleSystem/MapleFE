@@ -76,6 +76,11 @@ enum NodeKind {
   NK_AnnotationType,
   NK_Annotation,
 
+  // These are statement nodes, or control flow related nodes. They are
+  // common in most languages.
+  NK_Return,
+  NK_CondBranch,
+
   // Following are nodes to facilitate parsing.
   NK_Pass,         // see details in PassNode
 
@@ -110,6 +115,7 @@ public:
   bool IsFunction()   {return mKind == NK_Function;}
   bool IsClass()      {return mKind == NK_Class;}
   bool IsInterface()  {return mKind == NK_Interface;}
+  bool IsReturn()  {return mKind == NK_Return;}
   bool IsPass()       {return mKind == NK_Pass;}
 
   bool IsScope()      {return IsBlock() || IsFunction();}
@@ -305,6 +311,22 @@ public:
 };
 
 //////////////////////////////////////////////////////////////////////////
+//          Statement Node, Control Flow related nodes
+//////////////////////////////////////////////////////////////////////////
+
+class ReturnNode : public TreeNode {
+private:
+  TreeNode *mResult;
+public:
+  ReturnNode() : mResult(NULL) {}
+  ~ReturnNode(){}
+
+  void SetResult(TreeNode *t) {mResult = t;}
+  TreeNode* GetResult() { return mResult; }
+  void Dump(unsigned);
+};
+
+//////////////////////////////////////////////////////////////////////////
 //                         Block Nodes
 // A block is common in all languages, and it serves different function in
 // different context. Here is a few examples.
@@ -327,8 +349,8 @@ private:
   SmallVector<TreeNode*> mChildren;
 
   // Some blocks are instance initializer in languages like Java,
-  // and they can have attributes.
-  bool mIsInstInit; // Instance Initializer
+  // and they can have attributes, such as static instance initializer.
+  bool                mIsInstInit; // Instance Initializer
   SmallVector<AttrId> mAttrs;
 
 public:
@@ -348,6 +370,8 @@ public:
 
   void AddChild(TreeNode *c) {mChildren.PushBack(c);}
   void Release() {mChildren.Release();}
+
+  void Dump(unsigned);
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -375,6 +399,7 @@ public:
   ASTScope* GetScope() {return mScope;}
   void      SetScope(ASTScope *s) {mScope = s;}
 
+  BlockNode* GetBody() {return mBody;}
   void AddBody(BlockNode *b) {mBody = b;}
   void Construct();
 

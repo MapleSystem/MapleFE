@@ -228,8 +228,24 @@ TreeNode* ASTBuilder::BuildAssignment() {
   return BuildBinaryOperation();
 }
 
+// Takes one argument, the result expression
 TreeNode* ASTBuilder::BuildReturn() {
-  return NULL;
+  if (mTrace)
+    std::cout << "In BuildReturn" << std::endl;
+
+  ReturnNode *result = (ReturnNode*)mTreePool->NewTreeNode(sizeof(ReturnNode));
+  new (result) ReturnNode();
+
+  Param p_result = mParams[0];
+  if (!p_result.mIsEmpty) {
+    if (!p_result.mIsTreeNode)
+      MERROR("The Function is not a tree node.");
+    TreeNode *result_value = p_result.mData.mTreeNode;
+    result->SetResult(result_value);
+  }
+
+  mLastTreeNode = result;
+  return mLastTreeNode;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

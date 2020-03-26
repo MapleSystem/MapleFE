@@ -86,8 +86,6 @@ public:
 
   TreeNode* BuildUnaryOperation();
   TreeNode* BuildBinaryOperation();
-  TreeNode* BuildAssignment();
-  TreeNode* BuildReturn();
 
   TreeNode* BuildDecl();
   TreeNode* BuildVarList();
@@ -118,6 +116,10 @@ public:
   TreeNode* BuildDims();
   TreeNode* AddDims();
   TreeNode* AddDimsTo();
+
+  // Statements, Control Flow
+  TreeNode* BuildAssignment();
+  TreeNode* BuildReturn();
 };
 
 #endif
