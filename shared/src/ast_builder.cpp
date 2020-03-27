@@ -101,7 +101,7 @@ static void add_attribute_to_kernel(TreeNode *tree, AttrNode *attr) {
     iden->AddAttr(aid);
     return;
   } else if (tree->IsBlock()){
-    BlockNode *b = (BlockNode*)b;
+    BlockNode *b = (BlockNode*)tree;
     if (b->IsInstInit()) {
       b->AddAttr(aid);
       return;
@@ -302,6 +302,32 @@ TreeNode* ASTBuilder::AddCondBranchFalseStatement() {
   }
 
   return mLastTreeNode;
+}
+
+// AddLabel tabkes two arguments, target tree, and label
+TreeNode* ASTBuilder::AddLabel() {
+  if (mTrace)
+    std::cout << "In AddLabel " << std::endl;
+
+  MASSERT(mParams.size() == 2 && "AddLabel has NO 2 params?");
+  Param p_tree = mParams[0];
+  Param p_label = mParams[1];
+  MASSERT(p_tree.mIsTreeNode && "Target tree in AddLabel is not a tree.");
+
+  TreeNode *tree = p_tree.mData.mTreeNode;
+
+  if (p_label.mIsEmpty)
+    return tree;
+
+  // Label should be an identifier node
+  MASSERT(p_label.mIsTreeNode && "Label in AddLabel is not a tree.");
+  TreeNode *label = p_label.mData.mTreeNode;
+  MASSERT(label->IsIdentifier() && "Label in AddLabel is not an identifier.");
+
+  tree->SetLabel(label);
+
+  mLastTreeNode = tree;
+  return tree;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

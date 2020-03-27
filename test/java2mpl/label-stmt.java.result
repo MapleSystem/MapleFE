@@ -185,7 +185,8 @@ class  A
 
   Methods: 
     func  loseEdges
-    search    search  LocalClasses: 
+    search:
+    search  LocalClasses: 
   LocalInterfaces: 
 
 ============= Module ===========
@@ -201,6 +202,7 @@ class  A
 
   Methods: 
     func  loseEdges
-    search    search  LocalClasses: 
+    search:
+    search  LocalClasses: 
   LocalInterfaces: 
 

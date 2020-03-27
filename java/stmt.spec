@@ -76,12 +76,19 @@ rule IfThenStatement : "if" + '(' + Expression + ')' + Statement
   attr.action: AddCondBranchTrueStatement(%5)
 
 rule IfThenElseStatement : "if" + '(' + Expression + ')' + StatementNoShortIf + "else" + Statement
+  attr.action: BuildCondBranch(%3)
+  attr.action: AddCondBranchTrueStatement(%5)
+  attr.action: AddCondBranchFalseStatement(%7)
 
 rule IfThenElseStatementNoShortIf : "if" + '(' + Expression + ')' + StatementNoShortIf + "else" + StatementNoShortIf
+  attr.action: BuildCondBranch(%3)
+  attr.action: AddCondBranchTrueStatement(%5)
+  attr.action: AddCondBranchFalseStatement(%7)
 
 rule EmptyStatement : ';'
 
 rule LabeledStatement : Identifier + ':' + Statement
+  attr.action: AddLabel(%3, %1)
 
 rule LabeledStatementNoShortIf : Identifier + ':' + StatementNoShortIf
 

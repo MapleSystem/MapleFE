@@ -38,6 +38,10 @@ all modules are as below.
 * BuildUnaryOperation
   Format: BuildUnaryOperation(Operator, Operand)
 
+* AddLabel
+  Format: AddLabel(Stmt-or-expr, Label)
+  It returns the statment or expr with label attached.
+
 * BuildAssignment
   Format: BuildAssignment(Left operand, Operator, Right Operand)
           The operator is the assignment in the language

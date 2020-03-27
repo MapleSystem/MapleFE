@@ -123,6 +123,7 @@ public:
   TreeNode* BuildCondBranch();
   TreeNode* AddCondBranchTrueStatement();
   TreeNode* AddCondBranchFalseStatement();
+  TreeNode* AddLabel();
 };
 
 #endif

@@ -95,11 +95,12 @@ enum NodeKind {
 // if needed in order to invoke the derived class destructor.
 
 class TreeNode {
-public:
+protected:
   NodeKind  mKind;
   TreeNode *mParent;
+  TreeNode *mLabel;   // label of a statement, or expression.
 public:
-  TreeNode() {mKind = NK_Null;}
+  TreeNode() {mKind = NK_Null; mLabel = NULL;}
   virtual ~TreeNode() {}
 
   bool IsIdentifier() {return mKind == NK_Identifier;}
@@ -124,10 +125,14 @@ public:
   bool IsScope()      {return IsBlock() || IsFunction();}
 
   void SetParent(TreeNode *p) {mParent = p;}
+  void SetLabel (TreeNode *p) {mLabel = p;}
+  TreeNode* GetParent() {return mParent;}
+  TreeNode* GetLabel()  {return mLabel;}
 
   virtual const char* GetName() {return NULL;}
   virtual void Dump(unsigned){}
   void DumpIndentation(unsigned);
+  void DumpLabel(unsigned);
 
   // Release the dynamically allocated memory by this tree node.
   virtual void Release(){}

@@ -231,6 +231,19 @@ TreeNode* ASTTree::BuildPassNode() {
 //                               TreeNode
 //////////////////////////////////////////////////////////////////////////////////////
 
+void TreeNode::DumpLabel(unsigned ind) {
+  TreeNode *label = GetLabel();
+  if (label) {
+    MASSERT(label->IsIdentifier() && "Label is not an identifier.");
+    IdentifierNode *inode = (IdentifierNode*)label;
+    for (unsigned i = 0; i < ind; i++)
+      DUMP0_NORETURN(' ');
+    DUMP0_NORETURN(inode->GetName());
+    DUMP0_NORETURN(':');
+    DUMP_RETURN();
+  }
+}
+
 void TreeNode::DumpIndentation(unsigned ind) {
   for (unsigned i = 0; i < ind; i++)
     DUMP0_NORETURN(' ');
@@ -375,6 +388,7 @@ void LiteralNode::Dump(unsigned indent) {
 //////////////////////////////////////////////////////////////////////////
 
 void ReturnNode::Dump(unsigned ind) {
+  DumpLabel(ind);
   DumpIndentation(ind);
   DUMP0("return:");
   GetResult()->Dump(ind + 2);
@@ -387,6 +401,7 @@ CondBranchNode::CondBranchNode() {
 }
 
 void CondBranchNode::Dump(unsigned ind) {
+  DumpLabel(ind);
   DumpIndentation(ind);
   DUMP0_NORETURN("cond-branch cond:");
   mCond->Dump(0);
@@ -406,6 +421,7 @@ void CondBranchNode::Dump(unsigned ind) {
 //////////////////////////////////////////////////////////////////////////////////////
 
 void BlockNode::Dump(unsigned ind) {
+  DumpLabel(ind);
   for (unsigned i = 0; i < GetChildrenNum(); i++) {
     TreeNode *child = GetChildAtIndex(i);
     child->Dump(ind);
