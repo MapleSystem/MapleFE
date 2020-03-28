@@ -425,6 +425,17 @@ void BreakNode::Dump(unsigned ind) {
   DUMP_RETURN();
 }
 
+void ForLoopNode::Dump(unsigned ind) {
+  DumpLabel(ind);
+  DumpIndentation(ind);
+  DUMP0_NORETURN("for ( ");
+
+  DUMP0_NORETURN(")");
+  DUMP_RETURN();
+  if (GetBody())
+    GetBody()->Dump(ind +2);
+}
+
 //////////////////////////////////////////////////////////////////////////////////////
 //                          BlockNode
 //////////////////////////////////////////////////////////////////////////////////////

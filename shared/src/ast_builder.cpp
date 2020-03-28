@@ -351,6 +351,64 @@ TreeNode* ASTBuilder::BuildBreak() {
   return break_node;
 }
 
+// BuildForLoop takes four arguments.
+//  1. init statement, could be a list
+//  2. cond expression, should be a boolean expresion.
+//  3. update statement, could be a list
+//  4. body.
+TreeNode* ASTBuilder::BuildForLoop() {
+  if (mTrace)
+    std::cout << "In BuildForLoop " << std::endl;
+
+  ForLoopNode *for_loop = (ForLoopNode*)mTreePool->NewTreeNode(sizeof(ForLoopNode));
+  new (for_loop) ForLoopNode();
+
+  MASSERT(mParams.size() == 4 && "BuildForLoop has NO 4 params?");
+
+  Param p_init = mParams[0];
+  if (!p_init.mIsEmpty) {
+    MASSERT(p_init.mIsTreeNode && "ForLoop init is not a treenode.");
+    TreeNode *init = p_init.mData.mTreeNode;
+    if (init->IsPass()) {
+      PassNode *pass_node = (PassNode*)init;
+      for (unsigned i = 0; i < pass_node->GetChildrenNum(); i++)
+        for_loop->AddInit(pass_node->GetChild(i));
+    } else {
+      for_loop->AddInit(init);
+    }
+  }
+
+  Param p_cond = mParams[1];
+  if (!p_cond.mIsEmpty) {
+    MASSERT(p_cond.mIsTreeNode && "ForLoop init is not a treenode.");
+    TreeNode *cond = p_cond.mData.mTreeNode;
+    for_loop->SetCond(cond);
+  }
+
+  Param p_update = mParams[2];
+  if (!p_update.mIsEmpty) {
+    MASSERT(p_update.mIsTreeNode && "ForLoop update is not a treenode.");
+    TreeNode *update = p_update.mData.mTreeNode;
+    if (update->IsPass()) {
+      PassNode *pass_node = (PassNode*)update;
+      for (unsigned i = 0; i < pass_node->GetChildrenNum(); i++)
+        for_loop->AddUpdate(pass_node->GetChild(i));
+    } else {
+      for_loop->AddUpdate(update);
+    }
+  }
+
+  Param p_body = mParams[3];
+  if (!p_body.mIsEmpty) {
+    MASSERT(p_body.mIsTreeNode && "ForLoop body is not a treenode.");
+    TreeNode *body = p_body.mData.mTreeNode;
+    for_loop->SetBody(body);
+  }
+
+  mLastTreeNode = for_loop;
+  return mLastTreeNode;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Issues in building declarations.
 // 1) First we are going to create an IdentifierNode, which should be attached

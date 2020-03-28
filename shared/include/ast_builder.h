@@ -125,6 +125,7 @@ public:
   TreeNode* AddCondBranchFalseStatement();
   TreeNode* AddLabel();
   TreeNode* BuildBreak();
+  TreeNode* BuildForLoop();
 };
 
 #endif

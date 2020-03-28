@@ -64,6 +64,12 @@ all modules are as below.
   BuildBreak(break-identifier)
   Build a break statement. The break point could be an identifier or empty.
 
+* BuildForLoop
+  BuildForLoop(init, cond, update, body)
+  Build a common for loop. 'init' could be a list of expression, 'cond' should be boolean
+  expression, 'update' could be a list of expression. 'body' could be a single statement
+  or a block or empty.
+
 * BuildDecl
   Format: BuildDecl(Type, Variable)
 

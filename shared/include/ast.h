@@ -81,6 +81,7 @@ enum NodeKind {
   NK_Return,
   NK_CondBranch,
   NK_Break,
+  NK_ForLoop,
 
   // Following are nodes to facilitate parsing.
   NK_Pass,         // see details in PassNode
@@ -121,6 +122,7 @@ public:
   bool IsReturn()     {return mKind == NK_Return;}
   bool IsCondBranch() {return mKind == NK_CondBranch;}
   bool IsBreak()      {return mKind == NK_Break;}
+  bool IsForLoop()    {return mKind == NK_ForLoop;}
 
   bool IsPass()       {return mKind == NK_Pass;}
 
@@ -367,6 +369,32 @@ public:
   TreeNode* GetTarget()           {return mTarget;}
   void      SetTarget(TreeNode* t){mTarget = t;}
   void      Dump(unsigned);
+};
+
+class ForLoopNode : public TreeNode {
+private:
+  SmallVector<TreeNode *> mInit;
+  TreeNode               *mCond;
+  SmallVector<TreeNode *> mUpdate;
+  TreeNode               *mBody;   // This could be a single statement, or a block node
+public:
+  ForLoopNode() {mCond = NULL; mBody = NULL;}
+  ~ForLoopNode() {Release();}
+
+  void AddInit(TreeNode *t)   {mInit.PushBack(t);}
+  void AddUpdate(TreeNode *t) {mUpdate.PushBack(t);}
+  void SetCond(TreeNode *t)   {mCond = t;}
+  void SetBody(TreeNode *t)   {mBody = t;}
+
+  unsigned GetInitNum()       {return mInit.GetNum();}
+  unsigned GetUpdateNum()     {return mUpdate.GetNum();}
+  TreeNode* InitAtIndex(unsigned i)   {return mInit.ValueAtIndex(i);}
+  TreeNode* UpdateAtIndex(unsigned i) {return mUpdate.ValueAtIndex(i);}
+  TreeNode* GetCond() {return mCond;}
+  TreeNode* GetBody() {return mBody;}
+
+  void Release() {mInit.Release(); mUpdate.Release();}
+  void Dump(unsigned);
 };
 
 //////////////////////////////////////////////////////////////////////////

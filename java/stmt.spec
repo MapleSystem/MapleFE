@@ -91,6 +91,7 @@ rule LabeledStatement : Identifier + ':' + Statement
   attr.action: AddLabel(%3, %1)
 
 rule LabeledStatementNoShortIf : Identifier + ':' + StatementNoShortIf
+  attr.action: AddLabel(%3, %1)
 
 rule ExpressionStatement : StatementExpression + ';'
 
@@ -102,12 +103,6 @@ rule StatementExpression : ONEOF(
   PostDecrementExpression,
   MethodInvocation,
   ClassInstanceCreationExpression)
-
-rule IfThenStatement : "if" + '(' + Expression + ')' + Statement
-
-rule IfThenElseStatement : "if" + '(' + Expression + ')' + StatementNoShortIf + "else" + Statement
-
-rule IfThenElseStatementNoShortIf : "if" + '(' + Expression + ')' + StatementNoShortIf + "else" + StatementNoShortIf
 
 rule AssertStatement : ONEOF(
   "assert" + Expression + ';',
@@ -143,8 +138,10 @@ rule ForStatementNoShortIf : ONEOF(
   EnhancedForStatementNoShortIf)
 
 rule BasicForStatement : "for" + '(' + ZEROORONE(ForInit) + ';' + ZEROORONE(Expression) + ';' + ZEROORONE(ForUpdate) + ')' + Statement
+  attr.action: BuildForLoop(%3, %5, %7, %9)
 
 rule BasicForStatementNoShortIf : "for" + '(' + ZEROORONE(ForInit) + ';' + ZEROORONE(Expression) + ';' + ZEROORONE(ForUpdate) + ')' + StatementNoShortIf
+  attr.action: BuildForLoop(%3, %5, %7, %9)
 
 rule ForInit : ONEOF(
   StatementExpressionList,
