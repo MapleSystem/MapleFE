@@ -161,7 +161,7 @@ class  A
 
   Methods: 
     func  foo
-    Cyclic  LocalClasses: 
+      Cyclic  LocalClasses: 
   LocalInterfaces: 
 
 ============= Module ===========
@@ -177,6 +177,6 @@ class  A
 
   Methods: 
     func  foo
-    Cyclic  LocalClasses: 
+      Cyclic  LocalClasses: 
   LocalInterfaces: 
 

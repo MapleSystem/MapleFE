@@ -80,6 +80,7 @@ enum NodeKind {
   // common in most languages.
   NK_Return,
   NK_CondBranch,
+  NK_Break,
 
   // Following are nodes to facilitate parsing.
   NK_Pass,         // see details in PassNode
@@ -119,6 +120,7 @@ public:
 
   bool IsReturn()     {return mKind == NK_Return;}
   bool IsCondBranch() {return mKind == NK_CondBranch;}
+  bool IsBreak()      {return mKind == NK_Break;}
 
   bool IsPass()       {return mKind == NK_Pass;}
 
@@ -326,7 +328,7 @@ class ReturnNode : public TreeNode {
 private:
   TreeNode *mResult;
 public:
-  ReturnNode() : mResult(NULL) {}
+  ReturnNode() : mResult(NULL) {mKind = NK_Return;}
   ~ReturnNode(){}
 
   void SetResult(TreeNode *t) {mResult = t;}
@@ -352,6 +354,19 @@ public:
   TreeNode* GetFalseBranch() {return mFalseBranch;}
 
   void Dump(unsigned);
+};
+
+// Break statement. Break targets could be one identifier or empty.
+class BreakNode : public TreeNode {
+private:
+  TreeNode* mTarget;
+public:
+  BreakNode() {mKind = NK_Break; mTarget = NULL;}
+  ~BreakNode(){}
+
+  TreeNode* GetTarget()           {return mTarget;}
+  void      SetTarget(TreeNode* t){mTarget = t;}
+  void      Dump(unsigned);
 };
 
 //////////////////////////////////////////////////////////////////////////

@@ -395,6 +395,7 @@ void ReturnNode::Dump(unsigned ind) {
 }
 
 CondBranchNode::CondBranchNode() {
+  mKind = NK_CondBranch;
   mCond = NULL;
   mTrueBranch = NULL;
   mFalseBranch = NULL;
@@ -414,6 +415,14 @@ void CondBranchNode::Dump(unsigned ind) {
   DUMP0("false branch :");
   if (mFalseBranch)
     mFalseBranch->Dump(ind+2);
+}
+
+void BreakNode::Dump(unsigned ind) {
+  DumpLabel(ind);
+  DumpIndentation(ind);
+  DUMP0_NORETURN("break ");
+  GetTarget()->Dump(0);
+  DUMP_RETURN();
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -556,5 +565,5 @@ void FunctionNode::Dump(unsigned indent) {
 
   // dump function body
   if (GetBody())
-    GetBody()->Dump(indent);
+    GetBody()->Dump(indent+2);
 }

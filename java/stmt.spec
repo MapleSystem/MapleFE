@@ -159,6 +159,7 @@ rule EnhancedForStatement : "for" + '(' + ZEROORMORE(VariableModifier) + UnannTy
 rule EnhancedForStatementNoShortIf : "for" + '(' + ZEROORMORE(VariableModifier) + UnannType + VariableDeclaratorId + ':' + Expression + ')' + StatementNoShortIf
 
 rule BreakStatement : "break" + ZEROORONE(Identifier) + ';'
+  attr.action: BuildBreak(%2)
 
 rule ContinueStatement : "continue" + ZEROORONE(Identifier) + ';'
 

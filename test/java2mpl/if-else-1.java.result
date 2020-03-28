@@ -212,11 +212,11 @@ class  A
 
   Methods: 
     func  foo
-    cond-branch cond:a
-    true branch :
-      return:
-        0
-    false branch :
+      cond-branch cond:a
+      true branch :
+        return:
+          0
+      false branch :
   LocalClasses: 
   LocalInterfaces: 
 
@@ -233,11 +233,11 @@ class  A
 
   Methods: 
     func  foo
-    cond-branch cond:a
-    true branch :
-      return:
-        0
-    false branch :
+      cond-branch cond:a
+      true branch :
+        return:
+          0
+      false branch :
   LocalClasses: 
   LocalInterfaces: 
 

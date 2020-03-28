@@ -174,7 +174,6 @@ Matched 17 tokens.
 [24] Token
 [25:2] Token
 [26] Token
-Attached a tree node from Child
 == Sub Tree ==
 class  A
   Members: 
@@ -185,8 +184,9 @@ class  A
 
   Methods: 
     func  loseEdges
-    search:
-    search  LocalClasses: 
+      search:
+      break search
+  LocalClasses: 
   LocalInterfaces: 
 
 ============= Module ===========
@@ -202,7 +202,8 @@ class  A
 
   Methods: 
     func  loseEdges
-    search:
-    search  LocalClasses: 
+      search:
+      break search
+  LocalClasses: 
   LocalInterfaces: 
 

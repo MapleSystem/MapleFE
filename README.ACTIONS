@@ -60,6 +60,10 @@ all modules are as below.
 * AddCondBranchFalseStatement
   Format: BuildFalseBranch(false-expre)
 
+* BuildBreak
+  BuildBreak(break-identifier)
+  Build a break statement. The break point could be an identifier or empty.
+
 * BuildDecl
   Format: BuildDecl(Type, Variable)
 

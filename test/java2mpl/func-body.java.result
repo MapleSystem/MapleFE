@@ -273,10 +273,10 @@ class  A
 
   Methods: 
     func  foo
-    return:
-      Add
-        c
-        b
+      return:
+        Add
+          c
+          b
   LocalClasses: 
   LocalInterfaces: 
 
@@ -293,10 +293,10 @@ class  A
 
   Methods: 
     func  foo
-    return:
-      Add
-        c
-        b
+      return:
+        Add
+          c
+          b
   LocalClasses: 
   LocalInterfaces: 
 

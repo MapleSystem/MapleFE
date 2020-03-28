@@ -124,6 +124,7 @@ public:
   TreeNode* AddCondBranchTrueStatement();
   TreeNode* AddCondBranchFalseStatement();
   TreeNode* AddLabel();
+  TreeNode* BuildBreak();
 };
 
 #endif

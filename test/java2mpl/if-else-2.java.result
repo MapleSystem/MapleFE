@@ -281,13 +281,13 @@ class  A
 
   Methods: 
     func  foo
-    cond-branch cond:a
-    true branch :
-      return:
-        0
-    false branch :
-      return:
-        1
+      cond-branch cond:a
+      true branch :
+        return:
+          0
+      false branch :
+        return:
+          1
   LocalClasses: 
   LocalInterfaces: 
 
@@ -304,13 +304,13 @@ class  A
 
   Methods: 
     func  foo
-    cond-branch cond:a
-    true branch :
-      return:
-        0
-    false branch :
-      return:
-        1
+      cond-branch cond:a
+      true branch :
+        return:
+          0
+      false branch :
+        return:
+          1
   LocalClasses: 
   LocalInterfaces: 
 
