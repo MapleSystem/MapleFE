@@ -181,11 +181,11 @@ TreeNode* ASTTree::NewTreeNode(AppealNode *appeal_node, std::map<AppealNode*, Tr
     TreeNode *child_b = child_trees[1];
     if (child_b->IsUnaOperator()) {
       UnaryOperatorNode *unary = (UnaryOperatorNode*)child_b;
-      unsigned property = GetOperatorProperty(unary->mOprId);
+      unsigned property = GetOperatorProperty(unary->GetOprId());
       if ((property & Binary) && (property & Unary)) {
         std::cout << "Convert unary --> binary" << std::endl;
-        TreeNode *unary_sub = unary->mOpnd;
-        TreeNode *binary = BuildBinaryOperation(child_a, unary_sub, unary->mOprId);
+        TreeNode *unary_sub = unary->GetOpnd();
+        TreeNode *binary = BuildBinaryOperation(child_a, unary_sub, unary->GetOprId());
         map.insert(std::pair<AppealNode*, TreeNode*>(appeal_node, binary));
         return binary;
       }
@@ -270,8 +270,13 @@ void BinaryOperatorNode::Dump(unsigned indent) {
 void UnaryOperatorNode::Dump(unsigned indent) {
   const char *name = GetOperatorName(mOprId);
   DumpIndentation(indent);
-  DUMP0(name);
-  mOpnd->Dump(indent + 2);
+  if (IsPost()) {
+    mOpnd->Dump(indent + 2);
+    DUMP0(name);
+  } else {
+    DUMP0(name);
+    mOpnd->Dump(indent + 2);
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////////////////

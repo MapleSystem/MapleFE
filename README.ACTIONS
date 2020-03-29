@@ -37,6 +37,12 @@ all modules are as below.
 
 * BuildUnaryOperation
   Format: BuildUnaryOperation(Operator, Operand)
+  This is the prefix unary operation. It's the default mode of a unary operation. So we don't
+  give it a name like BuildPreUnaryOperation...
+
+* BuildPostfixOperation
+  Format: BuildPostfixOperation(Operator, Operand)
+  This is the postfix unary operation.
 
 * AddLabel
   Format: AddLabel(Stmt-or-expr, Label)

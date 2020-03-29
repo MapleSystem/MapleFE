@@ -85,6 +85,7 @@ public:
   TreeNode* BuildBlock();
 
   TreeNode* BuildUnaryOperation();
+  TreeNode* BuildPostfixOperation();
   TreeNode* BuildBinaryOperation();
 
   TreeNode* BuildDecl();

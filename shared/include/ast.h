@@ -163,13 +163,23 @@ extern OperatorDesc gOperatorDesc[OPR_NA];
 extern unsigned GetOperatorProperty(OprId);
 
 class UnaryOperatorNode : public TreeNode {
-public:
+private:
+  bool      mIsPost;  // if it's a postfix operation?
   OprId     mOprId;
   TreeNode *mOpnd;
 public:
-  UnaryOperatorNode(OprId id) : mOprId(id) {mKind = NK_UnaOperator;}
-  UnaryOperatorNode() {mKind = NK_UnaOperator;}
+  UnaryOperatorNode(OprId id) : mOprId(id), mOpnd(NULL), mIsPost(false)
+    {mKind = NK_UnaOperator;}
+  UnaryOperatorNode() : mOpnd(NULL), mIsPost(false) {mKind = NK_UnaOperator;}
   ~UnaryOperatorNode() {}
+
+  void SetIsPost(bool b)    {mIsPost = b;}
+  void SetOpnd(TreeNode* t) {mOpnd = t;}
+  void SetOprId(OprId o)    {mOprId = o;}
+
+  bool      IsPost()  {return mIsPost;}
+  TreeNode* GetOpnd() {return mOpnd;}
+  OprId     GetOprId(){return mOprId;}
 
   void Dump(unsigned);
 };

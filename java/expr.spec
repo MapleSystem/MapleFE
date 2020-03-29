@@ -112,8 +112,9 @@ rule PostfixExpression : ONEOF(
   PostDecrementExpression)
 
 rule PostIncrementExpression : PostfixExpression + "++"
-
+  attr.action : BuildPostfixOperation(%2, %1)
 rule PostDecrementExpression : PostfixExpression + "--"
+  attr.action : BuildPostfixOperation(%2, %1)
 
 rule UnaryExpression : ONEOF(
   PreIncrementExpression,
@@ -124,8 +125,10 @@ rule UnaryExpression : ONEOF(
   attr.action.%3,%4 : BuildUnaryOperation(%1, %2)
 
 rule PreIncrementExpression : "++" + UnaryExpression
+  attr.action : BuildUnaryOperation(%1, %2)
 
 rule PreDecrementExpression : "--" + UnaryExpression
+  attr.action : BuildUnaryOperation(%1, %2)
 
 rule UnaryExpressionNotPlusMinus : ONEOF(
   PostfixExpression,

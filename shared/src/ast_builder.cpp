@@ -167,18 +167,28 @@ TreeNode* ASTBuilder::BuildUnaryOperation() {
   // create the sub tree
   UnaryOperatorNode *n = (UnaryOperatorNode*)mTreePool->NewTreeNode(sizeof(UnaryOperatorNode));
   new (n) UnaryOperatorNode(((OperatorToken*)token)->mOprId);
-  mLastTreeNode = n;
 
   // set 1st param
   if (p_b.mIsTreeNode)
-    n->mOpnd = p_b.mData.mTreeNode;
+    n->SetOpnd(p_b.mData.mTreeNode);
   else {
     TreeNode *tn = CreateTokenTreeNode(p_b.mData.mToken);
-    n->mOpnd = tn;
+    n->SetOpnd(tn);
   }
-  n->mOpnd->SetParent(n);
+  n->GetOpnd()->SetParent(n);
 
+  mLastTreeNode = n;
   return n;
+}
+
+// This is the same as BuildUnaryOperation, except setting mIsPost to true.
+TreeNode* ASTBuilder::BuildPostfixOperation() {
+  if (mTrace)
+    std::cout << "In BuildPostfixOperation" << std::endl;
+  UnaryOperatorNode * t = (UnaryOperatorNode*)BuildUnaryOperation();
+  t->SetIsPost(true);
+  mLastTreeNode = t;
+  return t;
 }
 
 // For second parameter has to be an operator.
