@@ -230,8 +230,11 @@ private:
   bool TraverseOneof(RuleTable*, AppealNode*);
   bool TraverseZeroormore(RuleTable*, AppealNode*);
   bool TraverseZeroorone(RuleTable*, AppealNode*);
+
   bool TraverseLiteral(RuleTable*, AppealNode*);
   bool TraverseIdentifier(RuleTable*, AppealNode*);
+  void TraverseSpecialTableSucc(RuleTable*, AppealNode*);
+  void TraverseSpecialTableFail(RuleTable*, AppealNode*, AppealStatus);
 
   bool IsVisited(RuleTable*);
   void SetVisited(RuleTable*);

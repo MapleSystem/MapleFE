@@ -791,6 +791,39 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *appeal_parent)
   }
 }
 
+// Supplemental function invoked when TraverseSpecialToken succeeds.
+// It helps set all the data structures.
+void Parser::TraverseSpecialTableSucc(RuleTable *rule_table, AppealNode *appeal) {
+  const char *name = GetRuleTableName(rule_table);
+  Token *curr_token = mActiveTokens[mCurToken];
+  gSuccTokensNum = 1;
+  gSuccTokens[0] = mCurToken;
+
+  appeal->mBefore = Succ;
+  appeal->mAfter = Succ;
+  appeal->SetToken(curr_token);
+  appeal->mStartIndex = mCurToken;
+
+  MoveCurToken();
+  if (mTraceTable)
+    DumpExitTable(name, mIndentation, true);
+  mIndentation -= 2;
+}
+
+// Supplemental function invoked when TraverseSpecialToken fails.
+// It helps set all the data structures.
+void Parser::TraverseSpecialTableFail(RuleTable *rule_table,
+                                      AppealNode *appeal,
+                                      AppealStatus status) {
+  const char *name = GetRuleTableName(rule_table);
+  AddFailed(rule_table, mCurToken);
+  if (mTraceTable)
+    DumpExitTable(name, mIndentation, false, status);
+  mIndentation -= 2;
+  appeal->mBefore = status;
+  appeal->mAfter = status;
+}
+
 // We don't go into Literal table.
 // No mVisitedStack invovled for literal table.
 //
@@ -808,25 +841,9 @@ bool Parser::TraverseLiteral(RuleTable *rule_table, AppealNode *appeal) {
 
   if (curr_token->IsLiteral()) {
     found = true;
-    gSuccTokensNum = 1;
-    gSuccTokens[0] = mCurToken;
-
-    appeal->mBefore = Succ;
-    appeal->mAfter = Succ;
-    appeal->SetToken(curr_token);
-    appeal->mStartIndex = mCurToken;
-
-    MoveCurToken();
-    if (mTraceTable)
-      DumpExitTable(name, mIndentation, true);
-    mIndentation -= 2;
+    TraverseSpecialTableSucc(rule_table, appeal);
   } else {
-    AddFailed(rule_table, mCurToken);
-    if (mTraceTable)
-      DumpExitTable(name, mIndentation, false, FailNotLiteral);
-    mIndentation -= 2;
-    appeal->mBefore = FailNotLiteral;
-    appeal->mAfter = FailNotLiteral;
+    TraverseSpecialTableFail(rule_table, appeal, FailNotLiteral);
   }
 
   if (mTraceSecondTry)
@@ -851,26 +868,10 @@ bool Parser::TraverseIdentifier(RuleTable *rule_table, AppealNode *appeal) {
   ClearVisited(rule_table);
 
   if (curr_token->IsIdentifier()) {
-    gSuccTokensNum = 1;
-    gSuccTokens[0] = mCurToken;
-
-    appeal->mBefore = Succ;
-    appeal->mAfter = Succ;
-    appeal->SetToken(curr_token);
-    appeal->mStartIndex = mCurToken;
-
     found = true;
-    MoveCurToken();
-    if (mTraceTable)
-      DumpExitTable(name, mIndentation, true);
-    mIndentation -= 2;
+    TraverseSpecialTableSucc(rule_table, appeal);
   } else {
-    AddFailed(rule_table, mCurToken);
-    if (mTraceTable)
-      DumpExitTable(name, mIndentation, false, FailNotIdentifier);
-    mIndentation -= 2;
-    appeal->mBefore = FailNotIdentifier;
-    appeal->mAfter = FailNotIdentifier;
+    TraverseSpecialTableFail(rule_table, appeal, FailNotIdentifier);
   }
 
   if (mTraceSecondTry)
