@@ -171,6 +171,7 @@ rule RelationalExpression : ONEOF(
   RelationalExpression + "<=" + ShiftExpression,
   RelationalExpression + ">=" + ShiftExpression,
   RelationalExpression + "instanceof" + ReferenceType)
+  attr.action.%2,%3,%4,%5 : BuildBinaryOperation(%1, %2, %3)
 
 rule EqualityExpression : ONEOF(
   RelationalExpression,
