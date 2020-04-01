@@ -96,4 +96,136 @@ public:
   }
 };
 
+/////////////////////////////////////////////////////////////////////////
+//                      Guamian
+// Guamian, aka Hanging Noodle, represents a 2-D data structure shown below.
+//
+//  --K--->K--->K--->K-->
+//    |    |    |    |
+//    E    E    E    E
+//    |    |         |
+//    E    E         E
+//         |
+//         E
+// The horizontal bar is a one directional linked list. It's like the stick
+// of Guamian. Each vertical list is like one noodle string, which is also
+// one direction linked list. The node on the stick is called (K)nob, the node
+// on the noodle string is called (E)lement.
+//
+// None of the two lists are sorted since our target scenarios are usually
+// at small scope.
+//
+// Duplication of knobs or elements is not supported in Guamian.
+/////////////////////////////////////////////////////////////////////////
+
+template <class K, class E> class Guamian {
+private:
+  struct Elem{
+    E     mData;
+    Elem *mNext;
+  };
+  struct Knob{
+    K     mData;
+    Knob *mNext;
+    Elem *mChildren; // pointing to the first child
+  };
+
+private:
+  MemPool mMemPool;
+  Knob   *mHeader;
+
+  // allocate a new knob
+  Knob* NewKnob() {
+    Knob *knob = (Knob*)mMemPool.Alloc(sizeof(Knob));
+    knob->mNext = NULL;
+    return knob;
+  }
+
+  // allocate a new element
+  Elem* NewElem() {
+    Elem *elem = (Elem*)mMemPool.Alloc(sizeof(Elem));
+    elem->mNext = NULL;
+    return elem;
+  }
+
+public:
+  Guamian() {mHeader = NULL;}
+  ~Guamian(){Release();}
+
+  void AddElem(K key, E data) {
+    Knob *knob = FindOrCreateKnob(key);
+    Elem *elem = knob->mChildren;
+    Elem *found = NULL;
+    while (elem) {
+      if (elem->mData == data) {
+        found = elem;
+        std::cout << "duplicate element" << std::endl;
+        break;
+      }
+      elem = elem->mNext;
+    }
+
+    if (!found) {
+      std::cout << "new element" << std::endl;
+      Elem *e = NewElem();
+      e->mData = data;
+      e->mNext = knob->mChildren;
+      knob->mChildren = e;
+    }
+  }
+
+  // Try to find the first child of Knob k. Return the data.
+  // found is set to false if fails, or true.
+  // [NOTE] It's the user's responsibilty to make sure the Knob
+  //        of 'key' exists.
+  E FindFirstElem(K key, bool &found) {
+    Knob *knob = FindKnob(key);
+    if (!knob) {
+      found = false;
+      return 0;   // return value doesn't matter when fails.
+    }
+
+    Elem *e = knob->mChildren;
+    if (!e) {
+      found = false;
+      return 0;
+    }
+
+    found = true;
+    return e->mData;
+  }
+
+  // Just try to find the Knob.
+  // return NULL if fails.
+  Knob* FindKnob(K key) {
+    Knob *result = NULL;
+    Knob *knob = mHeader;
+    while (knob) {
+      if (knob->mData == key) {
+        result = knob;
+        break;
+      }
+      knob = knob->mNext;
+    }
+    return result;
+  }
+
+  // Try to find the Knob. Create one if failed
+  // and add it to the list.
+  Knob* FindOrCreateKnob(K key) {
+    // Find the knob. If cannot find, create a new one
+    // We always put the new one as the new header.
+    Knob *knob = FindKnob(key);
+    if (!knob) {
+      knob = NewKnob();
+      knob->mNext = mHeader;
+      knob->mData = key;
+      mHeader = knob;
+    }
+    return knob;
+  }
+
+  void Release() {mMemPool.Release();}
+};
+
 #endif

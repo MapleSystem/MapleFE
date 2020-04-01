@@ -80,16 +80,16 @@ char* MemPool::Alloc(unsigned size) {
     MERROR ("Requsted size is bigger than block size");
 
   if (!mCurrBlock) {
-    addr = AllocBlock(); 
+    addr = AllocBlock();
     MASSERT (addr && "MemPool failed to alloc a block");
   } else {
     int avail = mBlockSize - mCurrBlock->used;
     if (avail < size) {
-      addr = AllocBlock(); 
+      addr = AllocBlock();
       MASSERT (addr && "MemPool failed to alloc a block");
     }
   }
-    
+
   // At this point, it's guaranteed that 'b' is able to hold 'size'
   addr = mCurrBlock->addr + mCurrBlock->used;
   mCurrBlock->used += size;
