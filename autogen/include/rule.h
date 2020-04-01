@@ -23,7 +23,6 @@
 #include <vector>
 #include <queue>
 
-#include "feopcode.h"
 #include "all_supported.h"
 
 class Rule;
@@ -123,6 +122,7 @@ public:
 class RuleElem {
 public:
   ElemType mType;          // type
+  RuleAttr mAttr;
   union {
     RuleOp      mOp;       // It could be a OP
     Rule       *mRule;     // It could be another defined rule
@@ -132,10 +132,8 @@ public:
     TypeId    mTypeId;
   } mData;
 
-  TK_Kind       mToken;    // record the token for rule like '(' ')' '[' ']' ';' ...
   std::vector<RuleElem *> mSubElems;  // Sub elements. It's empty if mType
                                       // is ET_Rule;
-  RuleAttr      mAttr;
 public:
   RuleElem() {}
   RuleElem(Rule *rule) : mType(ET_Rule) { mData.mRule = rule; }
