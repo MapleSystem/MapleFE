@@ -68,7 +68,6 @@ public:
   Token() : Element(ET_TK) {}
 
   void SetTkType(TK_Type t) { mTkType = t; }
-  void SetTkKind(TK_Kind k) { mTkKind = k; }
 
   bool IsSeparator()  { return mTkType == TT_SP; }
   bool IsOperator()   { return mTkType == TT_OP; }

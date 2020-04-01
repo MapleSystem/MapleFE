@@ -26,12 +26,8 @@
 #include <list>
 #include <map>
 
-#include "feopcode.h"
 #include "lexer.h"
 #include "ast_module.h"
-
-// tyidx for int for the time being
-#define inttyidx 1
 
 class Automata;
 class Function;
@@ -169,11 +165,6 @@ public:
   const char *filename;
   ASTModule mModule;     // A source file has a module
 
-  Automata *mAutomata;
-  Function *currfunc;
-
-  std::vector<std::string> mVars;
-
   // debug info
   unsigned mIndentation;    //
   bool mTraceTable;         // trace enter/exit rule tables
@@ -289,16 +280,8 @@ public:
   Parser(const char *f);
   ~Parser();
 
-  TK_Kind GetTokenKind(const char c);
-  TK_Kind GetTokenKind(const char *str);
-
-  std::string GetTokenKindString(const TK_Kind tk) { return mLexer->GetTokenKindString(tk); }
-
-  FEOpcode GetFEOpcode(const char c);
-  FEOpcode GetFEOpcode(const char *str);
-
   void SetVerbose(int i) { mLexer->SetVerbose(i); }
-  int GetVerbose() { mLexer->GetVerbose(); }
+  int  GetVerbose() { mLexer->GetVerbose(); }
 
   void Dump();
 

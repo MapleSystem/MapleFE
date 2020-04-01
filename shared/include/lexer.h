@@ -18,7 +18,6 @@
 #define __LEXER_H
 
 #include "element.h"
-#include "tokenkind.h"
 #include "stringpool.h"
 #include "token.h"
 #include "tokenpool.h"
@@ -33,7 +32,7 @@
 class Token;
 
 class Lexer {
- public:
+public:
   Token *mToken;
   char thechar;
   std::string thename;
@@ -46,8 +45,7 @@ class Lexer {
   TokenPool  mTokenPool;
   unsigned   mPredefinedTokenNum;   // number of predefined tokens.
 
- public:
-
+public:
   FILE *srcfile;
   char *line;           // line buffer
   size_t linebuf_size;  // the allocated size of line(buffer).
@@ -62,7 +60,7 @@ class Lexer {
 
   Token *GetConstVal(void);
 
- public:
+public:
   Lexer(const Lexer &p) = default;
   Lexer &operator=(const Lexer &p) = default;
   Lexer(void);
