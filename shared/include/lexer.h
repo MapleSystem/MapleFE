@@ -86,12 +86,6 @@ public:
   int GetLineNum() const { return _linenum; }
   const std::string &GetTheName() const { return thename; }
 
-  std::string GetTokenString(const TK_Kind tk);  // catched string
-  std::string GetTokenString();
-
-  static std::string GetTokenKindString(const TK_Kind tk);    // Token Kind
-  std::string GetTokenKindString();
-
   void SetFile(FILE *file) { srcfile = file; }
   FILE *GetFile() const { return srcfile; }
 

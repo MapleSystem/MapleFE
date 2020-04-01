@@ -185,7 +185,7 @@ Token* Lexer::LexTokenNoNewLine(void) {
   LitData ld = GetLiteral();
   if (ld.mType != LT_NA) {
     LiteralToken *t = (LiteralToken*)mTokenPool.NewToken(sizeof(LiteralToken)); 
-    new (t) LiteralToken(TK_Invalid, ld);
+    new (t) LiteralToken(ld);
     t->Dump();
     return t;
   }

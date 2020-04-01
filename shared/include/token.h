@@ -32,13 +32,10 @@
 #ifndef __Token_H__
 #define __Token_H__
 
-class Lexer;   // early decl, gen_separator.h needs it
-
 #include <vector>
 #include "element.h"
 #include "stringutil.h"
 #include "supported.h"
-#include "tokenkind.h"
 
 // TokenText contains the text data of each token, no matter it's a
 // number or string. TokenText will be further processed by utility
@@ -58,13 +55,8 @@ typedef enum {
 class Token : public Element {
 public:
   TK_Type mTkType;
-  TK_Kind mTkKind;   // This is more like Id, not kind.
-                     // Having both mTkType and mTkKind is a temporary solution
-                     // will come back.
 public:
-  Token(TK_Type t, TK_Kind k, ELMT_Type e) : Element(e), mTkType(t), mTkKind(k) {}
-  Token(TK_Type t, TK_Kind k) : Element(ET_TK), mTkType(t), mTkKind(k) {}
-  Token(TK_Type t) : mTkType(t), Element(ET_TK), mTkKind(TK_Invalid) {}
+  Token(TK_Type t) : mTkType(t), Element(ET_TK) {}
   Token() : Element(ET_TK) {}
 
   void SetTkType(TK_Type t) { mTkType = t; }
@@ -86,8 +78,8 @@ class IdentifierToken : public Token {
 public:
   const char *mName;       // It's put into the Lexer's StringPool
 public:
-  IdentifierToken(const char *s) : Token(TT_ID, TK_Name), mName(s) {}
-  IdentifierToken() : Token(TT_ID, TK_Name), mName(NULL) {}
+  IdentifierToken(const char *s) : mName(s) {mTkType = TT_ID;}
+  IdentifierToken() : mName(NULL) {mTkType = TT_ID;}
 
   const char* GetName() {return mName;}
   void Dump();
@@ -123,9 +115,7 @@ public:
   const char *mName;   // The text name. During initialization it will be
                        // put into string pool.
 public:
-  KeywordToken(TK_Kind k) : Token(TT_KW, k) { mName = NULL; }
   KeywordToken(const char *s) : Token(TT_KW), mName(s){}
-  KeywordToken(TK_Kind k, const char *s) : Token(TT_KW, k), mName(s){}
   
   void SetName(const char *s){ mName = s; }
   const char *GetName(){ return mName; }
@@ -156,10 +146,8 @@ private:
   LitData  mData;
 public:
   LiteralToken(LitData data) : Token(TT_LT), mData(data) {}
-  LiteralToken(TK_Kind k, LitData data) : Token(TT_LT, k), mData(data) {}
 
   LitData GetLitData() {return mData;}
-
   void Dump();
 };
 
