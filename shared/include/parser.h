@@ -28,6 +28,7 @@
 
 #include "lexer.h"
 #include "ast_module.h"
+#include "container.h"
 
 class Automata;
 class Function;
@@ -116,26 +117,18 @@ public:
 // Assuming index of 'this' is 9, we say Primary has two matches indicated by two numbers
 // 9 and 11, which represent the last successfully matched token.
 //
-// To cache all the successful results of a rule, we define a vector. The vector is composed
-// of a set of segments with variable length. One segment represents the successful matches
-// starting from a specific token. The structure is as below.
-//      9, 2, 9, 11
-// the first number 9 is the starting token. The second number, 2, is the number of matches.
-// The third number and the forth number are the last successfully matched tokens.
-// If the rule has 3 matches for token 20, its segment is 20, 3, 20, 22, 23
-// Put them together, we get the mSucc for this rule 9, 2, 9, 11, 20, 3, 20, 22, 23
-
+// To cache all the successful results of a rule, we use a container called Guamian, aka
+// Hanging Noodle. Each knob of Guamian has index of start token. Each string of noodle
+// contains the successful matches.
+//
 // This is a per-rule data structure, saving the success info of a rule.
+
 class SuccMatch {
-public:
-  // I use vector instead of list, although we will remove some elements in SortOut.
-  // The reason is we will use operator[] a lot during query. Vector is better.
-  std::vector<unsigned> mCache;
 private:
-  unsigned mTempIndex;          // A temporary index
+  Guamian<unsigned, unsigned> mCache;
 public:
   SuccMatch(){}
-  ~SuccMatch() {mCache.clear();}
+  ~SuccMatch() {mCache.Release();}
 public:
   // Usually a rule may have a few matches, less than 3. So we define 3 special interfaces.
   void AddOneMatch(unsigned t, unsigned m);                               // rule has only 1 match
@@ -150,13 +143,18 @@ public:
   // Reduce tokens, used during SortOut
 
   // Query functions.
-  // The four function need to be used together since mTempIndex is only defined in
+  // The four function need to be used together since internal data is defiined in
   // GetStartToken(unsigned).
   bool     GetStartToken(unsigned t);    // trying to get succ info for 't'
+  bool     IsReduced();                  // It's already reduced.
+  bool     FindMatch(unsigned i);        // If a match exist?
   unsigned GetMatchNum();                // number of matches at a token;
   unsigned GetOneMatch(unsigned i);      // Get the i-th matching token. Starts from 0.
-  bool     ReduceMatches(unsigned starttoken, unsigned val);    // Reduce all matches except 'val'.
-  void     ReduceMatches(unsigned idx);    // Reduce all matches except idx-th.
+  void     ReduceMatches(unsigned idx);  // Reduce all matches except idx-th.
+
+  // This is an independent function. The start token is in argument.
+  // Reduce all matches except 'val'.
+  bool     ReduceMatches(unsigned starttoken, unsigned val);
 };
 
 class Parser {

@@ -1308,7 +1308,8 @@ void Parser::SortOutOneof(AppealNode *parent) {
     return;
 
   // At this point, it has one and only one succ match.
-  MASSERT((match_num == 1) && "trimmed parent has >1 matches?");
+  MASSERT((match_num == 1 || succ->IsReduced())
+           && "trimmed parent has >1 un-reduced matches?");
   unsigned parent_match = succ->GetOneMatch(0);
 
   unsigned good_children = 0;
@@ -1406,15 +1407,12 @@ void Parser::SortOutZeroormore(AppealNode *parent) {
 
       // We only preserve the longest matching. The other nodes will be reduced.
       unsigned longest = start_node;
-      unsigned longest_index = 0;
       for (unsigned i = 0; i < succ->GetMatchNum(); i++) {
         unsigned curr_match = succ->GetOneMatch(i);
-        if (curr_match > longest) {
+        if (curr_match > longest)
           longest = curr_match;
-          longest_index = i;
-        }
       }
-      succ->ReduceMatches(longest_index);
+      succ->ReduceMatches(longest);
       last_match = longest;
 
       // Add child to the working list
@@ -1528,8 +1526,22 @@ void Parser::SortOutConcatenate(AppealNode *parent) {
       prev_succ->ReduceMatches(prev_child->mStartIndex, last_match);
     }
 
-    MASSERT((last_match + 1 == child->mStartIndex)
-             && "Node match index are not connected in SortOut Concatenate.");
+    if (last_match + 1 != child->mStartIndex) {
+      // If the prev_child has the same rule table as one of the ancestors in
+      // tree, last_match+1 could be bigger than child->mStartIndex.
+      //
+      // Please see the comments below at SuccMatch::ReduceMatches().
+      //
+      SuccMatch *prev_succ = FindSucc(prev_child->GetTable());
+      bool correct = last_match + 1 > child->mStartIndex
+                     && prev_succ->GetStartToken(prev_child->mStartIndex)
+                     && prev_succ->FindMatch(child->mStartIndex - 1)
+                     && prev_succ->IsReduced();
+      if (correct)
+        last_match = child->mStartIndex - 1;
+      else
+        MERROR("Node match index are not connected in SortOut Concatenate.");
+    }
 
     if (child->IsToken()) {
       // Token node matches just one token.
@@ -1540,7 +1552,7 @@ void Parser::SortOutConcatenate(AppealNode *parent) {
       MASSERT(succ && "ruletable node has no SuccMatch?");
 
       unsigned start_node = last_match + 1;
-      bool found = succ->GetStartToken(start_node);  // in order to set mTempIndex
+      bool found = succ->GetStartToken(start_node);
       MASSERT(found && "Couldn't find start token?");
 
       unsigned match_num = succ->GetMatchNum();
@@ -1556,15 +1568,13 @@ void Parser::SortOutConcatenate(AppealNode *parent) {
       } else if (match_num > 1) {
         // We only preserve the longest matching. Else nodes will be reduced.
         unsigned longest = start_node;
-        unsigned longest_index = 0;
         for (unsigned i = 0; i < succ->GetMatchNum(); i++) {
           unsigned curr_match = succ->GetOneMatch(i);
           if (curr_match > longest) {
             longest = curr_match;
-            longest_index = i;
           }
         }
-        succ->ReduceMatches(longest_index);
+        succ->ReduceMatches(longest);
         last_match = longest;
 
         // Add child to the working list
@@ -1754,8 +1764,20 @@ void Parser::FindWasSucc(AppealNode *root) {
   return NULL;
 }
 
-// Check if 'n' is a matching for one and only one in was_succ_list.
-// Return the one in was_succ_list.
+// Check if 'n' is a matching for one node in was_succ_list.
+//
+// 1) One node in patching_list maps to one and only one in was_succ_list,
+//    because there won't be two nodes in the sorted tree with same
+//    rule table, same start index and both WasSucc.
+// 2) One node in was_succ_list could match multiple patching node.
+//
+// Here is an example:
+//      Rule RelationalExpresion: ONEOF( ...
+//                                       RelationalExpression + ..
+//                                     )
+// The start token of both RelationalExpression nodes are the same, but the
+// parent node matches more tokens.
+//
 static bool IsGoodMatching(AppealNode *n) {
   // step 1. It should be succ.
   if (n->IsFail())
@@ -1767,10 +1789,8 @@ static bool IsGoodMatching(AppealNode *n) {
   for (; it != was_succ_list.end(); it++) {
     AppealNode *was_succ = *it;
     if (n->SuccEqualTo(was_succ) && n->mAfter != SuccWasSucc) {
-      MASSERT( !found && "This should be a one-one mapping, got wrong?");
+      MASSERT(!found);
       found = was_succ;
-      // We don't break the loop here. Let it finish to verify the
-      // one-one mapping
     }
   }
 
@@ -1793,11 +1813,9 @@ void Parser::FindPatchingNodes(AppealNode *root) {
     AppealNode *node = working_list.front();
     working_list.pop_front();
     bool was_succ = IsGoodMatching(node);
-    if (!was_succ) {
-      std::vector<AppealNode*>::iterator it = node->mChildren.begin();
-      for (; it != node->mChildren.end(); it++)
-        working_list.push_back(*it);
-    }
+    std::vector<AppealNode*>::iterator it = node->mChildren.begin();
+    for (; it != node->mChildren.end(); it++)
+      working_list.push_back(*it);
   }
 }
 
@@ -1815,10 +1833,10 @@ void Parser::SupplementalSortOut(AppealNode *root, AppealNode *target) {
   SuccMatch *succ = FindSucc(target->GetTable());
   MASSERT(succ && "ruletable node has no SuccMatch?");
 
-  bool found = succ->GetStartToken(target->mStartIndex);  // in order to set mTempIndex
+  bool found = succ->GetStartToken(target->mStartIndex);
   MASSERT(found && "Couldn't find start token?");
   unsigned match_num = succ->GetMatchNum();
-  MASSERT(match_num == 1 && "target should have been trimmed.");
+  MASSERT((match_num == 1 || succ->IsReduced()) && "target should have been trimmed.");
   unsigned match = succ->GetOneMatch(0);
 
   // step 2. Trim the root.
@@ -2112,138 +2130,134 @@ SuccMatch* Parser::FindOrCreateSucc(RuleTable *table) {
 
 // Rule has only one match at this token.
 void SuccMatch::AddOneMatch(unsigned t, unsigned m) {
-  mCache.push_back(t);
-  mCache.push_back(1);
-  mCache.push_back(m);
+  mCache.AddElem(t, m);
 }
 
 // Rule has only two matches at this token.
 void SuccMatch::AddTwoMatch(unsigned t, unsigned m1, unsigned m2) {
-  mCache.push_back(t);
-  mCache.push_back(2);
-  mCache.push_back(m1);
-  mCache.push_back(m2);
+  mCache.PairedFindOrCreateKnob(t);
+  mCache.PairedAddElem(m1);
+  mCache.PairedAddElem(m2);
 }
 
 // Rule has only three matches at this token.
 void SuccMatch::AddThreeMatch(unsigned t, unsigned m1, unsigned m2, unsigned m3) {
-  mCache.push_back(t);
-  mCache.push_back(3);
-  mCache.push_back(m1);
-  mCache.push_back(m2);
-  mCache.push_back(m3);
+  mCache.PairedFindOrCreateKnob(t);
+  mCache.PairedAddElem(m1);
+  mCache.PairedAddElem(m2);
+  mCache.PairedAddElem(m3);
 }
 
-///////////////////
+/////////////////////////////////////////////////////////////////////////
 // The following two functions are used to handle general cases where the
 // total number of matches could be unknown, or could be more than 3.
-// They need be used together as mTempIndex is defined/used between them.
-//
-// If you do want to use them separately, you need set the mTempIndex correctly through
-// GetStartToken(t).
+// They need be used together.
+////////////////////////////////////////////////////////////////////////
 
-// Temporarily set the num of matches to 0. For the ZeroorXXX node, even there is no
-// matching it is still a succ. This will also be saved in SuccMatch, with matching num
-// set as 0.
 void SuccMatch::AddStartToken(unsigned t) {
-  mCache.push_back(t);
-  mCache.push_back(0);
-  mTempIndex = mCache.size() - 1;
+  mCache.PairedFindOrCreateKnob(t);
 }
 
 void SuccMatch::AddOneMoreMatch(unsigned m) {
-  mCache.push_back(m);
-  mCache[mTempIndex] += 1;
+  mCache.PairedAddElem(m);
 }
 
+/////////////////////////////////////////////////////////////////////////
 // Below are three Query functions for succ info
-// Again, They need be used together as mTempIndex is transferred between them.
+// Again, They need be used together.
+/////////////////////////////////////////////////////////////////////////
 
 // Find the succ info for token 't'. Return true if found.
 bool SuccMatch::GetStartToken(unsigned t) {
-  // traverse the vector
-  // mTempIndex is used as the index of the start token.
-  mTempIndex = 0;
+  return mCache.PairedFindKnob(t);
+}
 
-  // The last position mTempIndex can be nearest to the end of mCache vector, is
-  // when the last start token has 0 matching, so it looks like,
-  //  ...., N, 0
-  // 'N' represents the position of last mTempIndex.
-  while (mTempIndex < (mCache.size() - 1)) {
-    if (t != mCache[mTempIndex] ){
-      unsigned num = mCache[mTempIndex + 1];
-      mTempIndex += 1;   // at the num
-      mTempIndex += num; // at last matching token.
-      mTempIndex += 1;   // at new index
-    } else
-      break;
-  }
+bool SuccMatch::IsReduced() {
+  return mCache.PairedGetAttr() == 1;
+}
 
-  if (mTempIndex < (mCache.size() - 1))
-    return true;
-  else
-    return false;
+bool SuccMatch::FindMatch(unsigned m) {
+  return mCache.PairedFindElem(m);
 }
 
 unsigned SuccMatch::GetMatchNum() {
-  return mCache[mTempIndex + 1];
+  return mCache.PairedNumOfElem();
 }
 
 // idx starts from 0.
 unsigned SuccMatch::GetOneMatch(unsigned idx) {
-  return mCache[mTempIndex + 1 + idx + 1];
+  return mCache.PairedGetElemAtIndex(idx);
 }
 
-// Reduce all matchings, except the except-th
-// Assume mTempIndex is already set through GetStartToken().
+/////////////////////////////////////////////////////////////////////////
+//                   Reduce functions
+// ReduceMatches(except index) assumes you already did GetStartToken()
+// since this is a paired operation.
 //
-// Since we are in the vector, we have to manipulate this by ourselves.
-void SuccMatch::ReduceMatches(unsigned e_idx) {
-  unsigned except = GetOneMatch(e_idx);
-  unsigned orig_num = GetMatchNum();
-  unsigned reduced_num = orig_num - 1;
-  if (!reduced_num)
-    return;
+// ReduceMatches(start token, except index) is not paired since it takes
+// start token with him.
+/////////////////////////////////////////////////////////////////////////
 
-  // Step 1. Set the num of match to 1
-  mCache[mTempIndex + 1] = 1;
-
-  // Step 2. Set the only match
-  mCache[mTempIndex + 2] = except;
-
-  // Step 3. Move all the rest data 'reduced_num' position ahead
-  unsigned index = mTempIndex + 3;
-  unsigned new_vector_size = mCache.size() - reduced_num;
-  for (; index < new_vector_size; index++)
-    mCache[index] = mCache[index + reduced_num];
-
-  // Step 4. update the vector size
-  mCache.resize(new_vector_size);
+// Reduce all matchings, except the except. Actually we are not remove
+// the matches, we just move 'except' to be the first child, and set up
+// the attribute. This way we can tell if a SuccMatch is reduced or not.
+//
+// Assume already set through GetStartToken().
+void SuccMatch::ReduceMatches(unsigned except) {
+  mCache.PairedMoveElemToHead(except);
+  mCache.PairedSetAttr(1);
 }
 
-// 1. Check all matches to verify there is only one matching 'except'
-//    if no matching, returns false
-//    if >1 matchings, it's an error, ambiguous
-//    if 1  matching, success
+// 1. Check all matches to verify there is only one matching 'except'.
+//    If no matching, returns false
+//    If >1 matchings, it's an error, ambiguous
+//    If 1  matching, success
 // 2. Reduce all matches except the one equal to except.
 // 3. Returns true : if it successfully remove all rest matchings.
 //           false : if the verification fails
 //
-// Since we are in the vector, we have to manipulate this by ourselves.
+// A ruletable could be applied ReduceMatches(..,..) multiplie times on the
+// same start token. Think about the recursive rules like:
+//
+// Rule Expression : ONEOF( ...,
+//                          RelatioinExpression,
+//                          ...)
+// Rule RelationExpression: ONEOF(...
+//                                RelatioinExpression + '<' + ...
+//                                ...)
+// At The first time RelationExpression is applied ReduceMatches(), it already
+// move a match to the head of the list, and Attr is set to 1. However, the
+// second time it is applied again, but in one of its sub-tree.
+//
+// In this case, we respect the parent node's result, which is bigger match than
+// the child node. And this is reasonable. We also keep those 'reduced' matches
+// without really removing them. So during child node's SortOut, we can look into
+// those 'reduced' matches, and see if it's matching.
+//
+// [NOTE] Keep in mind, The goal of SortOut is not removing matches. It's to
+// sort out the tree.
+
 bool SuccMatch::ReduceMatches(unsigned start, unsigned except) {
   bool found = GetStartToken(start);
   MASSERT( found && "Couldn't find the start token?");
 
-  // Verify there is one and only one match equal to 'except'
+  if (mCache.PairedGetAttr() == 1) {
+    bool found = false;
+    unsigned except_prev = mCache.PairedFindFirstElem(found);
+    MASSERT( found && "In second ReduceMatch, Couldn't find the prev except?");
 
-  int except_index = -1;
+    if (except_prev >= except)
+      return true;
+    else
+      MERROR("In second ReduceMatch, prev except less than curr except?");
+  }
+
+  // Verify there is one and only one match equal to 'except'
   unsigned except_num = 0;
   unsigned orig_num = GetMatchNum();
   for (unsigned idx = 0; idx < orig_num; idx++) {
-    if (GetOneMatch(idx) == except) {
-      except_index = idx;
+    if (GetOneMatch(idx) == except)
       except_num++;
-    }
   }
 
   if (except_num == 0) {
@@ -2255,8 +2269,7 @@ bool SuccMatch::ReduceMatches(unsigned start, unsigned except) {
   }
 
   // At this point, except_num == 1, there is one and only one matching. Now reduce them.
-  ReduceMatches(except_index);
-
+  ReduceMatches(except);
   return true;
 }
 
