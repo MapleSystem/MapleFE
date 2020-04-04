@@ -1805,30 +1805,34 @@ void Parser::FindWasSucc(AppealNode *root) {
   return NULL;
 }
 
-// Check if 'n' is a matching for one node in was_succ_list.
-//
-// 1) One node in patching_list maps to one and only one in was_succ_list,
-//    because there won't be two nodes in the sorted tree with same
-//    rule table, same start index and both WasSucc.
-// 2) One node in was_succ_list could match multiple patching node.
-//
-// Here is an example:
-//      Rule RelationalExpresion: ONEOF( ...
-//                                       RelationalExpression + ..
-//                                     )
-// The start token of both RelationalExpression nodes are the same, but the
-// parent node matches more tokens.
-//
-static bool IsGoodMatching(AppealNode *n) {
+// [Principle] There should be one and only one matching tree for each node
+//             in was_succ_list.
+// To find this one-one mapping, we will conduct two rounds of pairing.
+//   1) During the first round of pairing by using SuccEqualTo(), you could
+//      find multiple matching trees for a to-be-patched node. Some are sorted,
+//      some not. The unsorted matching tree is succ but its parent could be
+//      failed. But they do create SuccMatch and cause the target node in
+//      was_succ_list to be Wassucc.
+//   2) We have to do a second round of pairing. We use target node's information,
+//      mainly the mNumTokens, and sort out the matching subtree. If the matching
+//      tree can be sorted out with the same mNumTokens, it's the matching. We
+//      ignore the rest matching subtrees.
+static void FindGoodMatching(AppealNode *n) {
   // step 1. It should be succ.
   if (n->IsFail())
-    return false;
+    return;
 
-  // step 2. Find the correct SuccWasSucc node
+  // step 2. First round of pairing
   std::vector<AppealNode*>::iterator it = was_succ_list.begin();
   AppealNode *found = NULL;
   for (; it != was_succ_list.end(); it++) {
     AppealNode *was_succ = *it;
+    // There could NOT be such situation: (1) n is SuccEqualTo was_succ
+    // and at the same time (2) n->mAfter is SuccWasSucc. Here is the reason.
+    // Two nodes in the sorted tree with same start index must be an ancestor and
+    // a descend. However, if the ancestor is WasSucc, we will skip the sorting
+    // of all its sub-trees. So there won't be such situation.
+    // The code below is to assert this.
     if (n->SuccEqualTo(was_succ) && n->mAfter != SuccWasSucc) {
       MASSERT(!found);
       found = was_succ;
@@ -1836,14 +1840,21 @@ static bool IsGoodMatching(AppealNode *n) {
   }
 
   if (!found)
-    return false;
+    return;
 
-  // step 3. Put the was_succ into was_succ_matched_list.
+  // step 3. Second round of pairing.
+
+  // if n is already sorted and is not WasSucc, it's a real one. It should be an
+  // ancestor of the to-be-patched node. We cannot patch it with its ancestor.
+  if (n->IsSorted())
+    return;
+
+  // Try to sort out 'n'.
+
+  // step 4. Put the was_succ into was_succ_matched_list.
   //         And put the 'n' into patching_list. This maintains one-one mapping.
   was_succ_matched_list.push_back(found);
   patching_list.push_back(n);
-
-  return true;
 }
 
 // For each node in was_succ_list there is one and only patching subtree.
@@ -1853,7 +1864,7 @@ void Parser::FindPatchingNodes(AppealNode *root) {
   while (!working_list.empty()) {
     AppealNode *node = working_list.front();
     working_list.pop_front();
-    bool was_succ = IsGoodMatching(node);
+    FindGoodMatching(node);
     std::vector<AppealNode*>::iterator it = node->mChildren.begin();
     for (; it != node->mChildren.end(); it++)
       working_list.push_back(*it);
