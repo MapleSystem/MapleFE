@@ -475,8 +475,8 @@ void Parser::AppealTraverse(AppealNode *node, AppealNode *root) {
       AppealNode *n = traverse_list[i];
       if ((n->mBefore == Succ) && (n->mAfter == FailChildrenFailed)) {
         if (mTraceAppeal)
-          DumpAppeal(n->GetTable(), n->mStartIndex);
-        ResetFailed(n->GetTable(), n->mStartIndex);
+          DumpAppeal(n->GetTable(), n->GetStartIndex());
+        ResetFailed(n->GetTable(), n->GetStartIndex());
       }
     }
   }
@@ -660,7 +660,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *appeal_parent)
   AppealNode *appeal = new AppealNode();
   mAppealNodes.push_back(appeal);
   appeal->SetTable(rule_table);
-  appeal->mStartIndex = mCurToken;
+  appeal->SetStartIndex(mCurToken);
   appeal->mParent = appeal_parent;
   if (mInSecondTry) {
     appeal->mIsSecondTry = true;
@@ -802,7 +802,7 @@ void Parser::TraverseSpecialTableSucc(RuleTable *rule_table, AppealNode *appeal)
   appeal->mBefore = Succ;
   appeal->mAfter = Succ;
   appeal->SetToken(curr_token);
-  appeal->mStartIndex = mCurToken;
+  appeal->SetStartIndex(mCurToken);
 
   MoveCurToken();
   if (mTraceTable)
@@ -1157,7 +1157,7 @@ bool Parser::TraverseTableData(TableData *data, AppealNode *parent) {
       appeal->mBefore = Succ;
       appeal->mAfter = Succ;
       appeal->SetToken(curr_token);
-      appeal->mStartIndex = mCurToken;
+      appeal->SetStartIndex(mCurToken);
       appeal->mParent = parent;
       if (mInSecondTry) {
         appeal->mIsSecondTry = true;
@@ -1234,9 +1234,24 @@ void Parser::SortOut() {
       mRootNode->mSortedChildren.push_back(n);
   }
   MASSERT(mRootNode->mSortedChildren.size()==1);
+  AppealNode *root = mRootNode->mSortedChildren.front();
+
+  // First sort the root.
+  RuleTable *table = root->GetTable();
+  MASSERT(table && "root is not a table?");
+  SuccMatch *succ = FindSucc(table);
+  MASSERT(succ && "root has no SuccMatch?");
+  bool found = succ->GetStartToken(root->GetStartIndex());
+
+  // Top level tree can have only one match
+  unsigned match_num = succ->GetMatchNum();
+  MASSERT(match_num == 1 && "Top level tree has >1 matches?");
+  unsigned match = succ->GetOneMatch(0);
+
+  root->SetNumTokens(match - root->GetStartIndex() + 1);
 
   to_be_sorted.clear();
-  to_be_sorted.push_back(mRootNode->mSortedChildren.front());
+  to_be_sorted.push_back(root);
 
   while(!to_be_sorted.empty()) {
     AppealNode *node = to_be_sorted.front();
@@ -1256,8 +1271,10 @@ void Parser::SortOutNode(AppealNode *node) {
   MASSERT(node->IsSucc() && "Failed node in SortOut?");
 
   // A token's appeal node is a leaf node. Just return.
-  if (node->IsToken())
+  if (node->IsToken()) {
+    node->SetNumTokens(1);
     return;
+  }
 
   // If node->mAfter is SuccWasSucc, it means we didn't traverse its children
   // during matching. In SortOut, we simple return. However, when generating IR,
@@ -1291,7 +1308,7 @@ void Parser::SortOutNode(AppealNode *node) {
   return;
 }
 
-// 'parent' is already trimmed when passed into this function.
+// 'parent' is already sorted when passed into this function.
 void Parser::SortOutOneof(AppealNode *parent) {
   RuleTable *table = parent->GetTable();
   MASSERT(table && "parent is not a table?");
@@ -1299,18 +1316,19 @@ void Parser::SortOutOneof(AppealNode *parent) {
   SuccMatch *succ = FindSucc(table);
   MASSERT(succ && "parent has no SuccMatch?");
 
-  bool found = succ->GetStartToken(parent->mStartIndex);
+  bool found = succ->GetStartToken(parent->GetStartIndex());
 
   // It's possible it actually matches nothing, such as all children are Zeroorxxx
-  // and they match nothing.
+  // and they match nothing. But they ARE successful.
   unsigned match_num = succ->GetMatchNum();
-  if (match_num == 0)
+  if (match_num == 0) {
+    MASSERT(parent->GetNumTokens() == 0
+            && "Node matching nothing while GetNumTokens() > 0?");
     return;
+  }
 
-  // At this point, it has one and only one succ match.
-  MASSERT((match_num == 1 || succ->IsReduced())
-           && "trimmed parent has >1 un-reduced matches?");
-  unsigned parent_match = succ->GetOneMatch(0);
+  MASSERT(parent->IsSorted() && "parent is not sorted?");
+  unsigned parent_match = parent->GetStartIndex() + parent->GetNumTokens() - 1;
 
   unsigned good_children = 0;
 
@@ -1326,7 +1344,7 @@ void Parser::SortOutOneof(AppealNode *parent) {
 
     if (child->IsToken()) {
       // Token node matches just one token.
-      if (child->mStartIndex == parent_match) {
+      if (child->GetStartIndex() == parent_match) {
         good_children++;
         parent->mSortedChildren.push_back(child);
       }
@@ -1334,11 +1352,12 @@ void Parser::SortOutOneof(AppealNode *parent) {
       SuccMatch *succ = FindSucc(child->GetTable());
       MASSERT(succ && "ruletable node has no SuccMatch?");
 
-      bool found = succ->ReduceMatches(child->mStartIndex, parent_match);
+      bool found = succ->FindMatch(child->GetStartIndex(), parent_match);
       if (found) {
         good_children++;
         to_be_sorted.push_back(child);
         parent->mSortedChildren.push_back(child);
+        child->SetNumTokens(parent_match + 1 - child->GetStartIndex());
       }
     }
 
@@ -1360,15 +1379,18 @@ void Parser::SortOutZeroormore(AppealNode *parent) {
   SuccMatch *parent_succ = FindSucc(table);
   MASSERT(parent_succ && "parent has no SuccMatch?");
 
-  unsigned parent_start = parent->mStartIndex;
+  unsigned parent_start = parent->GetStartIndex();
   bool     found = parent_succ->GetStartToken(parent_start);
 
   // Zeroormore could match nothing.
   unsigned match_num = parent_succ->GetMatchNum();
-  if (match_num == 0)
+  if (match_num == 0) {
+    MASSERT(parent->GetNumTokens() == 0
+            && "Node matching nothing while GetNumTokens() > 0?");
     return;
+  }
 
-  unsigned parent_match = parent_succ->GetOneMatch(0);
+  unsigned parent_match = parent->GetStartIndex() + parent->GetNumTokens() - 1;
 
   // In Zeroormore node, all children should have 'really' matched tokens which means they 
   // did move forward as token index. So there shouldn't be any bad children. 
@@ -1377,6 +1399,7 @@ void Parser::SortOutZeroormore(AppealNode *parent) {
   // There is only failed child which is the last one. Remember in TraverseZeroormore() we
   // keep trying until the last one is faile? So at this point we will first skip the
   // last failed child node.
+
   AppealNode *failed = parent->mChildren.back();
   std::vector<AppealNode*>::iterator childit = parent->mChildren.begin();
   for (; childit != parent->mChildren.end(); childit++) {
@@ -1391,28 +1414,29 @@ void Parser::SortOutZeroormore(AppealNode *parent) {
     AppealNode *child = *it;
     MASSERT(child->IsSucc() && "Successful zeroormore node has a failed child node?");
 
-    MASSERT((last_match + 1 == child->mStartIndex)
+    MASSERT((last_match + 1 == child->GetStartIndex())
              && "Node match index are not connected in SortOut Zeroormore.");
 
     if (child->IsToken()) {
       // Token node matches just one token.
       last_match++;
+      child->SetNumTokens(1);
     } else {
       SuccMatch *succ = FindSucc(child->GetTable());
       MASSERT(succ && "ruletable node has no SuccMatch?");
 
       unsigned start_node = last_match + 1;
-      bool found = succ->GetStartToken(start_node);  // in order to set mTempIndex
+      bool found = succ->GetStartToken(start_node);
       MASSERT(found && "Couldn't find start token?");
 
-      // We only preserve the longest matching. The other nodes will be reduced.
+      // We count the longest matching.
       unsigned longest = start_node;
       for (unsigned i = 0; i < succ->GetMatchNum(); i++) {
         unsigned curr_match = succ->GetOneMatch(i);
         if (curr_match > longest)
           longest = curr_match;
       }
-      succ->ReduceMatches(longest);
+      child->SetNumTokens(longest - start_node + 1);
       last_match = longest;
 
       // Add child to the working list
@@ -1423,7 +1447,7 @@ void Parser::SortOutZeroormore(AppealNode *parent) {
   return;
 }
 
-// 'parent' is already trimmed when passed into this function.
+// 'parent' is already sorted when passed into this function.
 void Parser::SortOutZeroorone(AppealNode *parent) {
   RuleTable *table = parent->GetTable();
   MASSERT(table && "parent is not a table?");
@@ -1431,15 +1455,18 @@ void Parser::SortOutZeroorone(AppealNode *parent) {
   SuccMatch *parent_succ = FindSucc(table);
   MASSERT(parent_succ && "parent has no SuccMatch?");
 
-  unsigned parent_start = parent->mStartIndex;
+  unsigned parent_start = parent->GetStartIndex();
   bool     found = parent_succ->GetStartToken(parent_start);
 
   // Zeroorone could match nothing. We just do nothing in this case.
   unsigned match_num = parent_succ->GetMatchNum();
-  if (match_num == 0)
+  if (match_num == 0){
+    MASSERT(parent->GetNumTokens() == 0
+            && "Node matching nothing while GetNumTokens() > 0?");
     return;
+  }
 
-  unsigned parent_match = parent_succ->GetOneMatch(0);
+  unsigned parent_match = parent->GetStartIndex() + parent->GetNumTokens() - 1;
 
   // At this point, there is one and only one child which may or may not match some tokens.
   // 1. If the child is failed, just remove it.
@@ -1452,7 +1479,7 @@ void Parser::SortOutZeroorone(AppealNode *parent) {
   if (child->IsFail())
     return;
 
-  unsigned child_start = child->mStartIndex;
+  unsigned child_start = child->GetStartIndex();
   MASSERT((parent_start == child_start)
           && "In Zeroorone node parent and child has different start index");
 
@@ -1460,11 +1487,14 @@ void Parser::SortOutZeroorone(AppealNode *parent) {
     // The only child is a token.
     MASSERT((parent_match == child_start)
             && "Token node match_index != start_index ??");
+    child->SetNumTokens(1);
   } else {
     // 1. We only preserve the one same as parent_match. Else will be reduced.
     // 2. Add child to the working list
     SuccMatch *succ = FindSucc(child->GetTable());
-    succ->ReduceMatches(child_start, parent_match);
+    bool found = succ->FindMatch(child_start, parent_match);
+    MASSERT(found && "Only child has different match than parent.");
+    child->SetNumTokens(parent_match - child_start + 1);
     to_be_sorted.push_back(child);
   }
 
@@ -1472,7 +1502,7 @@ void Parser::SortOutZeroorone(AppealNode *parent) {
   parent->mSortedChildren.push_back(child);
 }
 
-// 'parent' is already trimmed when passed into this function.
+// 'parent' is already sorted when passed into this function.
 // [NOTE] Concatenate will conduct SecondTry if possible. This means it's possible
 //        for a node not to connect to the longest match of its previous node.
 void Parser::SortOutConcatenate(AppealNode *parent) {
@@ -1482,17 +1512,20 @@ void Parser::SortOutConcatenate(AppealNode *parent) {
   SuccMatch *parent_succ = FindSucc(table);
   MASSERT(parent_succ && "parent has no SuccMatch?");
 
-  unsigned parent_start = parent->mStartIndex;
+  unsigned parent_start = parent->GetStartIndex();
   bool     found = parent_succ->GetStartToken(parent_start);
-  unsigned parent_match = parent_succ->GetOneMatch(0);
+  unsigned parent_match = parent->GetStartIndex() + parent->GetNumTokens() - 1;
 
   // It's possible for 'parent' to match nothing if all children are Zeroorxxx
   // which matches nothing.
   unsigned match_num = parent_succ->GetMatchNum();
-  if (match_num == 0)
+  if (match_num == 0){
+    MASSERT(parent->GetNumTokens() == 0
+            && "Node matching nothing while GetNumTokens() > 0?");
     return;
+  }
 
-  // In Concatenate node, some ZeroorXXX children could match nothing.i
+  // In Concatenate node, some ZeroorXXX children could match nothing.
   // Although they are succ, but we treat them as bad children.
   // This loop mainly verifies if the matches are connected between children.
 
@@ -1502,14 +1535,12 @@ void Parser::SortOutConcatenate(AppealNode *parent) {
   // The failed children will be followed directly by a
   // succ child with the same rule table, same start index, and mIsSecondTry.
   //
-  // Decided not to clean failed second try, since it may contain successful matching
-  // which cause later good nodes as SuccWasSucc, and we need re-traverse it
-  // when creating AST. So the following line is commented.
-  //
-  //CleanFailedSecondTry(parent);
+  // We did not remove failed second try, since it may contain successful matching
+  // which later good nodes as SuccWasSucc will need. Also we need re-traverse it
+  // when creating AST during PatchWasSucc().
 
   std::vector<AppealNode*>::iterator it = parent->mChildren.begin();
-  AppealNode *prev_child;
+  AppealNode *prev_child = NULL;
 
   for (; it != parent->mChildren.end(); it++) {
     AppealNode *child = *it;
@@ -1521,31 +1552,41 @@ void Parser::SortOutConcatenate(AppealNode *parent) {
     // Clean the useless matches of prev_child, leaving the only one connecting to
     // the current child.
     if (child->mIsSecondTry) {
-      SuccMatch *prev_succ = FindSucc(prev_child->GetTable());
-      last_match = child->mStartIndex - 1;
-      prev_succ->ReduceMatches(prev_child->mStartIndex, last_match);
+      last_match = child->GetStartIndex() - 1;
+      prev_child->SetNumTokens(child->GetStartIndex() - prev_child->GetStartIndex());
     }
 
-    if (last_match + 1 != child->mStartIndex) {
+    // A ruletable could be applied multiplie times on the same start token.
+    // Think about the recursive rules like:
+    //
+    // Rule Expression : ONEOF( ...,
+    //                          RelatioinalExpression,
+    //                          ...)
+    // Rule RelationalExpression: RelatioinalExpression + '<' + Expression
+    //
+    // The RelationalExpression in the RHS of the second rule will have its mNumTokens
+    // based on its longest match, as the code below tells. This is actually its
+    // parent's match. This means last_match+1 could be bigger than the start index
+    // '<'. So we need adjust this based on the node after it.
+
+    if (last_match + 1 != child->GetStartIndex()) {
       // If the prev_child has the same rule table as one of the ancestors in
-      // tree, last_match+1 could be bigger than child->mStartIndex.
-      //
-      // Please see the comments below at SuccMatch::ReduceMatches().
-      //
       SuccMatch *prev_succ = FindSucc(prev_child->GetTable());
-      bool correct = last_match + 1 > child->mStartIndex
-                     && prev_succ->GetStartToken(prev_child->mStartIndex)
-                     && prev_succ->FindMatch(child->mStartIndex - 1)
-                     && prev_succ->IsReduced();
-      if (correct)
-        last_match = child->mStartIndex - 1;
-      else
+      bool correct = last_match + 1 > child->GetStartIndex()
+                     && prev_succ->GetStartToken(prev_child->GetStartIndex())
+                     && prev_succ->FindMatch(child->GetStartIndex() - 1)
+                     && prev_child->IsSorted();
+      if (correct) {
+        last_match = child->GetStartIndex() - 1;
+        prev_child->SetNumTokens(child->GetStartIndex() - prev_child->GetStartIndex());
+      } else
         MERROR("Node match index are not connected in SortOut Concatenate.");
     }
 
     if (child->IsToken()) {
       // Token node matches just one token.
       last_match++;
+      child->SetNumTokens(1);
       parent->mSortedChildren.push_back(child);
     } else {
       SuccMatch *succ = FindSucc(child->GetTable());
@@ -1557,16 +1598,16 @@ void Parser::SortOutConcatenate(AppealNode *parent) {
 
       unsigned match_num = succ->GetMatchNum();
 
-      // if (match_num == 0) 
-      // It could be ZeroorXXX node matching nothing. We just skip this child.
+      // if match_num == 0, It could be ZeroorXXX node matching nothing.
+      // We just skip this child.
 
       if (match_num == 1) {
         last_match = succ->GetOneMatch(0);
-        // Add child to the working list
+        child->SetNumTokens(last_match - child->GetStartIndex() + 1);
         to_be_sorted.push_back(child);
         parent->mSortedChildren.push_back(child);
       } else if (match_num > 1) {
-        // We only preserve the longest matching. Else nodes will be reduced.
+        // We only preserve the longest matching.
         unsigned longest = start_node;
         for (unsigned i = 0; i < succ->GetMatchNum(); i++) {
           unsigned curr_match = succ->GetOneMatch(i);
@@ -1574,7 +1615,7 @@ void Parser::SortOutConcatenate(AppealNode *parent) {
             longest = curr_match;
           }
         }
-        succ->ReduceMatches(longest);
+        child->SetNumTokens(longest - child->GetStartIndex() + 1);
         last_match = longest;
 
         // Add child to the working list
@@ -1636,7 +1677,7 @@ void Parser::CleanFailedSecondTry(AppealNode *parent) {
         found = true;
       } else {
         // Prev_child is also failed, they should share the same startindex, rule table
-        MASSERT( (child->mStartIndex == prev_child->mStartIndex)
+        MASSERT( (child->GetStartIndex() == prev_child->GetStartIndex())
                  && (child->GetTable() == prev_child->GetTable())
                  && "Not the same startindex or ruletable in failed 2nd try?");
       }
@@ -1645,7 +1686,7 @@ void Parser::CleanFailedSecondTry(AppealNode *parent) {
       // start index. (1) If it's a token, we don't create appeal node for failed token.
       // So it have NO failed children. (2) for table, we are sure to have failed children.
       if (found) {
-        MASSERT( (child->mStartIndex == prev_child->mStartIndex)
+        MASSERT( (child->GetStartIndex() == prev_child->GetStartIndex())
                  && (child->GetTable() == prev_child->GetTable())
                  && "Not the same startindex or ruletable in failed 2nd try?");
         MASSERT( child->mIsSecondTry && "Not a second try after a failed node?");
@@ -1700,7 +1741,7 @@ void Parser::DumpSortOutNode(AppealNode *n) {
     std::cout << "Token" << std::endl;
   } else {
     RuleTable *t = n->GetTable();
-    std::cout << "Table " << GetRuleTableName(t) << "@" << n->mStartIndex << ": ";
+    std::cout << "Table " << GetRuleTableName(t) << "@" << n->GetStartIndex() << ": ";
 
     if (n->mAfter == SuccWasSucc)
       std::cout << "WasSucc";
@@ -1820,33 +1861,23 @@ void Parser::FindPatchingNodes(AppealNode *root) {
 }
 
 // This is another entry point of sort, similar as SortOut().
-// The only difference is we use 'target' as the reference of 'root'
-// when trimming 'root'.
+// The only difference is we use 'target' is the goal that we want
+// 'root' to be sorted.
 void Parser::SupplementalSortOut(AppealNode *root, AppealNode *target) {
   if(root->mSortedChildren.size()!=0)
     std::cout << "got one sorted again." << std::endl;
   MASSERT(root->mSortedChildren.size()==0 && "root should be un-sorted.");
   MASSERT(root->IsTable() && "root should be a table node.");
 
-  // step 1. Find the only matching token index we want.
+  // step 1. Find the last matching token index we want.
+  MASSERT(target->IsSorted() && "target is not sorted?");
 
-  SuccMatch *succ = FindSucc(target->GetTable());
-  MASSERT(succ && "ruletable node has no SuccMatch?");
-
-  bool found = succ->GetStartToken(target->mStartIndex);
-  MASSERT(found && "Couldn't find start token?");
-  unsigned match_num = succ->GetMatchNum();
-  MASSERT((match_num == 1 || succ->IsReduced()) && "target should have been trimmed.");
-  unsigned match = succ->GetOneMatch(0);
-
-  // step 2. Trim the root.
-
-  succ = FindSucc(root->GetTable());
-  MASSERT(succ && "ruletable node has no SuccMatch?");
-  succ->ReduceMatches(root->mStartIndex, match);
+  // step 2. Set the root.
+  SuccMatch *succ = FindSucc(root->GetTable());
+  MASSERT(succ && "root node has no SuccMatch?");
+  root->SetNumTokens(target->GetNumTokens());
 
   // step 3. Start the sort out
-
   to_be_sorted.clear();
   to_be_sorted.push_back(root);
 
@@ -2273,6 +2304,15 @@ bool SuccMatch::ReduceMatches(unsigned start, unsigned except) {
   return true;
 }
 
+// Return true : if target is found
+//       false : if fail
+bool SuccMatch::FindMatch(unsigned start, unsigned target) {
+  bool found = GetStartToken(start);
+  MASSERT( found && "Couldn't find the start token?");
+  found = FindMatch(target);
+  return found;
+}
+
 ///////////////////////////////////////////////////////////////
 //            AppealNode function
 ///////////////////////////////////////////////////////////////
@@ -2280,7 +2320,7 @@ bool SuccMatch::ReduceMatches(unsigned start, unsigned except) {
 // Returns true, if both nodes are successful and match the same tokens
 // with the same rule table
 bool AppealNode::SuccEqualTo(AppealNode *other) {
-  if (IsSucc() && other->IsSucc() && mStartIndex == other->mStartIndex) {
+  if (IsSucc() && other->IsSucc() && mStartIndex == other->GetStartIndex()) {
     if (IsToken() && other->IsToken()) {
       return GetToken() == other->GetToken();
     } else if (IsTable() && other->IsTable()) {

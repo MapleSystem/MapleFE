@@ -52,6 +52,18 @@ typedef enum {
 
 class AppealNode;
 class AppealNode{
+private:
+  unsigned  mStartIndex;     // index of start matching token
+  unsigned  mNumTokens;      // num of matched token, set when sorted.
+  bool      mSorted;         //
+public:
+  unsigned GetStartIndex()        {return mStartIndex;}
+  unsigned GetNumTokens()         {return mNumTokens;}
+  bool     IsSorted()             {return mSorted;}
+  void SetStartIndex(unsigned i)  {mStartIndex = i;}
+  void SetNumTokens(unsigned i)   {mNumTokens = i; mSorted = true;}
+  void SetSorted()                {mSorted = true;}
+
 public:
   bool mIsTable;     // A AppealNode could relate to either rule table or token.
   bool mIsSecondTry; // The node is created after second try. This flag is used during SortOut.
@@ -64,7 +76,6 @@ public:
     RuleTable *mTable;
     Token     *mToken;
   }mData;
-  unsigned   mStartIndex;     // index of start matching token
 
   std::vector<AppealNode*> mChildren;
 
@@ -83,8 +94,9 @@ public:
   AppealStatus mBefore;
   AppealStatus mAfter;
 
-  AppealNode() {mData.mTable=NULL; mParent = NULL; mBefore = AppealStatus_NA; mAfter = AppealStatus_NA;
-                mSimplifiedIndex = 0; mIsTable = true; mIsSecondTry = false;}
+  AppealNode() {mData.mTable=NULL; mParent = NULL; mBefore = AppealStatus_NA;
+                mAfter = AppealStatus_NA; mSimplifiedIndex = 0; mIsTable = true;
+                mIsSecondTry = false; mStartIndex = 0; mNumTokens = 0; mSorted = false;}
   ~AppealNode(){}
 
   void AddChild(AppealNode *n) { mChildren.push_back(n); }
@@ -152,9 +164,9 @@ public:
   unsigned GetOneMatch(unsigned i);      // Get the i-th matching token. Starts from 0.
   void     ReduceMatches(unsigned idx);  // Reduce all matches except idx-th.
 
-  // This is an independent function. The start token is in argument.
-  // Reduce all matches except 'val'.
-  bool     ReduceMatches(unsigned starttoken, unsigned val);
+  // Below are independent functions. The start token is in argument.
+  bool ReduceMatches(unsigned starttoken, unsigned except);
+  bool FindMatch(unsigned starttoken, unsigned target);
 };
 
 class Parser {
