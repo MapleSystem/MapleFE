@@ -395,8 +395,8 @@ void LiteralNode::Dump(unsigned indent) {
 void ReturnNode::Dump(unsigned ind) {
   DumpLabel(ind);
   DumpIndentation(ind);
-  DUMP0("return:");
-  GetResult()->Dump(ind + 2);
+  DUMP0_NORETURN("return ");
+  GetResult()->Dump(0);
 }
 
 CondBranchNode::CondBranchNode() {

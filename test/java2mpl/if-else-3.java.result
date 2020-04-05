@@ -62,6 +62,29 @@ Separator  Token:  Whitespace
 Separator  Token:  Whitespace
 Separator  Token:  Whitespace
 Separator  Token:  Whitespace
+Keyword    Token:  if
+Separator  Token:  Whitespace
+Separator  Token:  Lparen
+Identifier Token:  b
+Separator  Token:  Rparen
+Separator  Token:  Whitespace
+Separator  Token:  Whitespace
+Separator  Token:  Whitespace
+Separator  Token:  Whitespace
+Separator  Token:  Whitespace
+Separator  Token:  Whitespace
+Separator  Token:  Whitespace
+Separator  Token:  Whitespace
+Keyword    Token:  return
+Separator  Token:  Whitespace
+Integer Literal Token: 3
+Separator  Token:  Semicolon
+Separator  Token:  Whitespace
+Separator  Token:  Whitespace
+Separator  Token:  Whitespace
+Separator  Token:  Whitespace
+Separator  Token:  Whitespace
+Separator  Token:  Whitespace
 Keyword    Token:  return
 Separator  Token:  Whitespace
 Integer Literal Token: 1
@@ -117,19 +140,39 @@ Separator  Token:  Rbrace
 [39] Token
 [40] Table TblBlock_sub1@19: 42,
 [41] Token
-[42] Table TblBlockStatements@19: 43,
-[43] Table TblBlockStatement@19: 44,
-[44] Table TblStatement@19: 45,
-[45] Table TblStatementWithoutTrailingSubstatement@19: 46,
-[46] Table TblReturnStatement@19: 47,48,49,
-[47] Token
-[48] Table TblReturnStatement_sub1@20: 50,
+[42] Table TblBlockStatements@19: 43,44,
+[43] Table TblBlockStatement@19: 45,
+[44] Table TblBlockStatements_sub1@26: 46,
+[45] Table TblStatement@19: 47,
+[46] Table TblBlockStatement@26: 48,
+[47] Table TblIfThenStatement@19: 49,50,51,52,53,
+[48] Table TblStatement@26: 54,
 [49] Token
-[50] Table TblExpression@20: 51,
-[51] Table TblPrimary@20: 52,
-[52] Table TblPrimaryNoNewArray@20: 53,
-[53] Token
-Matched 25 tokens.
+[50] Token
+[51] Table TblExpression@21: 55,
+[52] Token
+[53] Table TblStatement@23: 56,
+[54] Table TblStatementWithoutTrailingSubstatement@26: 57,
+[55] Table TblExpressionName@21: 58,
+[56] Table TblStatementWithoutTrailingSubstatement@23: 59,
+[57] Table TblReturnStatement@26: 60,61,62,
+[58] Token
+[59] Table TblReturnStatement@23: 63,64,65,
+[60] Token
+[61] Table TblReturnStatement_sub1@27: 66,
+[62] Token
+[63] Token
+[64] Table TblReturnStatement_sub1@24: 67,
+[65] Token
+[66] Table TblExpression@27: 68,
+[67] Table TblExpression@24: 69,
+[68] Table TblPrimary@27: 70,
+[69] Table TblPrimary@24: 71,
+[70] Table TblPrimaryNoNewArray@27: 72,
+[71] Table TblPrimaryNoNewArray@24: 73,
+[72] Token
+[73] Token
+Matched 32 tokens.
 ======= supplemental sortout Dump SortOut =======
 [1] Table TblUnannType@3: 2,
 [2] Table TblUnannPrimitiveType@3: 3,
@@ -211,29 +254,49 @@ Matched 25 tokens.
 [50] Table TblBlock_sub1@19: 53,
 [51] Token
 [52] Table TblBlockStatements@13: 54,
-[53] Table TblBlockStatements@19: 55,
-[54] Table TblBlockStatement@13: 56,
-[55] Table TblBlockStatement@19: 57,
-[56] Table TblStatement@13: 58,
-[57] Table TblStatement@19: 59,
-[58] Table TblStatementWithoutTrailingSubstatement@13: 60,
-[59] Table TblStatementWithoutTrailingSubstatement@19: 61,
-[60] Table TblReturnStatement@13: 62,63,64,
-[61] Table TblReturnStatement@19: 65,66,67,
-[62] Token
-[63] Table TblReturnStatement_sub1@14: 68,
+[53] Table TblBlockStatements@19: 55,56,
+[54] Table TblBlockStatement@13: 57,
+[55] Table TblBlockStatement@19: 58,
+[56] Table TblBlockStatements_sub1@26: 59,
+[57] Table TblStatement@13: 60,
+[58] Table TblStatement@19: 61,
+[59] Table TblBlockStatement@26: 62,
+[60] Table TblStatementWithoutTrailingSubstatement@13: 63,
+[61] Table TblIfThenStatement@19: 64,65,66,67,68,
+[62] Table TblStatement@26: 69,
+[63] Table TblReturnStatement@13: 70,71,72,
 [64] Token
 [65] Token
-[66] Table TblReturnStatement_sub1@20: 69,
+[66] Table TblExpression@21: 73,
 [67] Token
-[68] Table TblExpression@14: 70,
-[69] Table TblExpression@20: 71,
-[70] Table TblPrimary@14: 72,
-[71] Table TblPrimary@20: 73,
-[72] Table TblPrimaryNoNewArray@14: 74,
-[73] Table TblPrimaryNoNewArray@20: 75,
-[74] Token
-[75] Token
+[68] Table TblStatement@23: 74,
+[69] Table TblStatementWithoutTrailingSubstatement@26: 75,
+[70] Token
+[71] Table TblReturnStatement_sub1@14: 76,
+[72] Token
+[73] Table TblExpressionName@21: 77,
+[74] Table TblStatementWithoutTrailingSubstatement@23: 78,
+[75] Table TblReturnStatement@26: 79,80,81,
+[76] Table TblExpression@14: 82,
+[77] Token
+[78] Table TblReturnStatement@23: 83,84,85,
+[79] Token
+[80] Table TblReturnStatement_sub1@27: 86,
+[81] Token
+[82] Table TblPrimary@14: 87,
+[83] Token
+[84] Table TblReturnStatement_sub1@24: 88,
+[85] Token
+[86] Table TblExpression@27: 89,
+[87] Table TblPrimaryNoNewArray@14: 90,
+[88] Table TblExpression@24: 91,
+[89] Table TblPrimary@27: 92,
+[90] Token
+[91] Table TblPrimary@24: 93,
+[92] Table TblPrimaryNoNewArray@27: 94,
+[93] Table TblPrimaryNoNewArray@24: 95,
+[94] Token
+[95] Token
 ======= Simplify AppealNode Trees Dump SortOut =======
 [1] Table TblNormalClassDeclaration@0: 2,3,4,
 [2] Token
@@ -263,14 +326,24 @@ Matched 25 tokens.
 [26:2] Table TblReturnStatement@13: 31,32,33,
 [27] Token
 [28] Token
-[29:2] Table TblReturnStatement@19: 34,35,36,
+[29:2] Table TblBlockStatements@19: 34,35,
 [30] Token
 [31] Token
 [32:2] Token
 [33] Token
-[34] Token
-[35:2] Token
+[34:1] Table TblIfThenStatement@19: 36,37,38,39,40,
+[35:2] Table TblReturnStatement@26: 41,42,43,
 [36] Token
+[37] Token
+[38:3] Token
+[39] Token
+[40:5] Table TblReturnStatement@23: 44,45,46,
+[41] Token
+[42:2] Token
+[43] Token
+[44] Token
+[45:2] Token
+[46] Token
 == Sub Tree ==
 class  A
   Members: 
@@ -285,6 +358,10 @@ class  A
       true branch :
         return 0
       false branch :
+        cond-branch cond:b
+        true branch :
+          return 3
+        false branch :
         return 1
   LocalClasses: 
   LocalInterfaces: 
@@ -306,6 +383,10 @@ class  A
       true branch :
         return 0
       false branch :
+        cond-branch cond:b
+        true branch :
+          return 3
+        false branch :
         return 1
   LocalClasses: 
   LocalInterfaces: 
