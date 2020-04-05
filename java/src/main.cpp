@@ -28,6 +28,7 @@ static void help() {
   std::cout << "   --trace-stack     : Trace visited-token stack of table" << std::endl;
   std::cout << "   --trace-sortout   : Trace SortOut" << std::endl;
   std::cout << "   --trace-ast-build : Trace AST Builder" << std::endl;
+  std::cout << "   --trace-patch-was-succ : Trace Patching of WasSucc nodes" << std::endl;
   std::cout << "   --trace-warning   : Print Warning" << std::endl;
 }
 
@@ -53,6 +54,8 @@ int main (int argc, char *argv[]) {
       parser->mTraceSortOut = true;
     } else if (!strncmp(argv[i], "--trace-ast-build", 17) && (strlen(argv[i]) == 17)) {
       parser->mTraceAstBuild = true;
+    } else if (!strncmp(argv[i], "--trace-patch-was-succ", 22) && (strlen(argv[i]) == 22)) {
+      parser->mTracePatchWasSucc = true;
     } else if (!strncmp(argv[i], "--trace-warning", 15) && (strlen(argv[i]) == 15)) {
       parser->mTraceWarning = true;
     }

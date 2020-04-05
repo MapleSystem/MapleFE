@@ -119,6 +119,9 @@ public:
   Token*     GetToken() { return mData.mToken; }
 
   bool SuccEqualTo(AppealNode*);
+
+  // If 'p' is a parent of 'this'
+  bool IsParent(AppealNode *p);
 };
 
 // Design of the cached success info.
@@ -183,7 +186,8 @@ public:
   bool mTraceFailed;        // trace mFailed
   bool mTraceVisited;       // trace mVisitedStack
   bool mTraceSortOut;       // trace Sort out.
-  bool mTraceAstBuild;      // trace Sort out.
+  bool mTraceAstBuild;      // trace AST build.
+  bool mTracePatchWasSucc;  // trace patching was succ node.
   bool mTraceWarning;       // print the warning.
 
   void DumpEnterTable(const char *tablename, unsigned indent);
@@ -278,9 +282,14 @@ private:
   void SimplifySortedTree();
   AppealNode* SimplifyShrinkEdges(AppealNode*);
 
+  // Patch Was Succ
+  SmallVector<AppealNode*> mOrigPatchedNodes;
+  unsigned mRoundsOfPatching;
   void PatchWasSucc(AppealNode*);
   void FindWasSucc(AppealNode *root);
   void FindPatchingNodes(AppealNode *root);
+  void FindGoodMatching(AppealNode *node);
+  void CleanPatchingNodes();
   void SupplementalSortOut(AppealNode *root, AppealNode *target);
 
   // Build AST

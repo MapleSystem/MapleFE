@@ -76,14 +76,16 @@ Separator  Token:  Rbrace
 Matched 15 tokens.
 ======= supplemental sortout Dump SortOut =======
 [1] Table TblClassInstanceCreationExpression@8: 2,
-[2] Table TblUnqualifiedClassInstanceCreationExpression@8: 3,
-[3] Table TblUnqualifiedClassInstanceCreationExpression_sub1@8: 4,5,6,7,
-[4] Token
-[5] Table TblClassOrInterfaceTypeToInstantiate@9: 8,
+[2] Table TblUnqualifiedClassInstanceCreationExpression@8: WasSucc
+======= supplemental sortout Dump SortOut =======
+[1] Table TblUnqualifiedClassInstanceCreationExpression@8: 2,
+[2] Table TblUnqualifiedClassInstanceCreationExpression_sub1@8: 3,4,5,6,
+[3] Token
+[4] Table TblClassOrInterfaceTypeToInstantiate@9: 7,
+[5] Token
 [6] Token
-[7] Token
-[8] Table TblClassOrInterfaceTypeToInstantiate_sub1@9: 9,
-[9] Token
+[7] Table TblClassOrInterfaceTypeToInstantiate_sub1@9: 8,
+[8] Token
 ======= patch-was-succ Dump SortOut =======
 [1] Table TblClassDeclaration@0: 2,
 [2] Table TblNormalClassDeclaration@0: 3,4,5,

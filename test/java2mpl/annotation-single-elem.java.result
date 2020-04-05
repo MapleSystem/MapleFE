@@ -135,8 +135,10 @@ Matched 22 tokens.
 ======= supplemental sortout Dump SortOut =======
 [1] Table TblUnannClassOrInterfaceType@14: 2,
 [2] Table TblUnannClassType@14: 3,
-[3] Table TblUnannClassType_sub1@14: 4,
-[4] Token
+[3] Table TblUnannClassType_sub1@14: WasSucc
+======= supplemental sortout Dump SortOut =======
+[1] Table TblUnannClassType_sub1@14: 2,
+[2] Token
 ======= patch-was-succ Dump SortOut =======
 [1] Table TblInterfaceDeclaration@10: 2,
 [2] Table TblAnnotationTypeDeclaration@10: 3,4,5,6,

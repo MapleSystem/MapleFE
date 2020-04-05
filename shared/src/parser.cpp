@@ -264,11 +264,12 @@ Parser::Parser(const char *name) : filename(name) {
   mTraceFailed = false;
   mTraceSortOut = true;
   mTraceAstBuild = false;
+  mTracePatchWasSucc = false;
   mTraceWarning = false;
 
   mIndentation = 0;
-
   mInSecondTry = false;
+  mRoundsOfPatching = 0;
 }
 
 Parser::~Parser() {
@@ -1794,9 +1795,14 @@ void Parser::FindWasSucc(AppealNode *root) {
   while (!working_list.empty()) {
     AppealNode *node = working_list.front();
     working_list.pop_front();
-    if (node->mAfter == SuccWasSucc)
+    if (node->mAfter == SuccWasSucc) {
       was_succ_list.push_back(node);
-    else {
+      if (mTracePatchWasSucc)
+        std::cout << "Find WasSucc " << node << std::endl;
+      if (mRoundsOfPatching == 1) {
+        mOrigPatchedNodes.PushBack(node);
+      }
+    } else {
       std::vector<AppealNode*>::iterator it = node->mSortedChildren.begin();
       for (; it != node->mSortedChildren.end(); it++)
         working_list.push_back(*it);
@@ -1817,7 +1823,7 @@ void Parser::FindWasSucc(AppealNode *root) {
 //      mainly the mNumTokens, and sort out the matching subtree. If the matching
 //      tree can be sorted out with the same mNumTokens, it's the matching. We
 //      ignore the rest matching subtrees.
-static void FindGoodMatching(AppealNode *n) {
+void Parser::FindGoodMatching(AppealNode *n) {
   // step 1. It should be succ.
   if (n->IsFail())
     return;
@@ -1827,12 +1833,9 @@ static void FindGoodMatching(AppealNode *n) {
   AppealNode *found = NULL;
   for (; it != was_succ_list.end(); it++) {
     AppealNode *was_succ = *it;
-    // There could NOT be such situation: (1) n is SuccEqualTo was_succ
-    // and at the same time (2) n->mAfter is SuccWasSucc. Here is the reason.
-    // Two nodes in the sorted tree with same start index must be an ancestor and
-    // a descend. However, if the ancestor is WasSucc, we will skip the sorting
-    // of all its sub-trees. So there won't be such situation.
-    // The code below is to assert this.
+    // After traversal, for each rule at each start index, there can be only
+    // one successful node without being WasSucc. It's right because once it's
+    // successful, everyone else will be simply WasSucc.
     if (n->SuccEqualTo(was_succ) && n->mAfter != SuccWasSucc) {
       MASSERT(!found);
       found = was_succ;
@@ -1853,6 +1856,8 @@ static void FindGoodMatching(AppealNode *n) {
 
   // step 4. Put the was_succ into was_succ_matched_list.
   //         And put the 'n' into patching_list. This maintains one-one mapping.
+  if (mTracePatchWasSucc)
+    std::cout << "Find one match " << n << std::endl;
   was_succ_matched_list.push_back(found);
   patching_list.push_back(n);
 }
@@ -1864,6 +1869,15 @@ void Parser::FindPatchingNodes(AppealNode *root) {
   while (!working_list.empty()) {
     AppealNode *node = working_list.front();
     working_list.pop_front();
+
+    // The patching is iterative until no more nodes needing be patched.
+    // We won't look into those sub-tree patched, since they are duplicated.
+    if (mOrigPatchedNodes.Find(node)) {
+      if (mTracePatchWasSucc)
+        std::cout << " skip " << node << std::endl;
+      continue;
+    }
+
     FindGoodMatching(node);
     std::vector<AppealNode*>::iterator it = node->mChildren.begin();
     for (; it != node->mChildren.end(); it++)
@@ -1902,10 +1916,65 @@ void Parser::SupplementalSortOut(AppealNode *root, AppealNode *target) {
     DumpSortOut(root, "supplemental sortout");
 }
 
+// For most cases, for a rule table and a specific start index, you will get only
+// one Real Succ AppealNode. All the other nodes with same rule and same start
+// index will be set as WasSucc. However, there are opportunities you can get
+// two Real Succ nodes. Below is an example.
+//    Rule RelationalExpression : ONEOF(...,
+//                                      RelationalExpression + ...,
+//                                     )
+// The child node and parent node could be both successful if the child node is
+// the real one who matches. The parent node simply takes all the match results.
+// But they both will set as real Succ.
+//
+// This is the only case you can have >1 Real Succ. The third one will treated as
+// failed of loop, because that enters in an endless loop and Traversal algorithm
+// won't allow it.
+//
+// This provides the idea of CleanPatchingNodes(), where we simply check the inheritance
+// relationship between the two 'duplicated' nodes, and ignore the parent node.
+void Parser::CleanPatchingNodes() {
+  MASSERT(patching_list.size() == was_succ_matched_list.size());
+  std::vector<AppealNode*>::iterator ws_it = was_succ_list.begin();
+  for (; ws_it != was_succ_list.end(); ws_it++) {
+    AppealNode *was_succ = *ws_it;
+    unsigned num_matched = 0;
+    AppealNode *patching[2] = {NULL, NULL};
+    unsigned    indexes[2] = {0, 0};
+    for (unsigned i = 0; i < was_succ_matched_list.size(); i++) {
+      AppealNode *ws_matched = was_succ_matched_list[i];
+      AppealNode *p_node = patching_list[i];
+      if (was_succ == ws_matched) {
+        patching[num_matched] = p_node;
+        indexes[num_matched] = i;
+        num_matched++;
+        MASSERT(num_matched <= 2);
+      }
+    }
+
+    MASSERT(num_matched >= 1 && "A WasSucc node cannot find patching tree.");
+    if (num_matched == 2) {
+      if (mTracePatchWasSucc)
+      std::cout << "Need Clean Patching" << std::endl;
+      // Based on the traversal sequence and the sequence of finding patching trees,
+      // the first node is always the ancestor, the second the descendant.
+      MASSERT(patching[1]->IsParent(patching[0]) && "Not a parent?");
+
+      // remove the parent patching node and its was_succ_matched node.
+      was_succ_matched_list.erase(was_succ_matched_list.begin() + indexes[0]);
+      patching_list.erase(patching_list.begin() + indexes[0]);
+    }
+  }
+}
+
 // In the tree after SortOut, some nodes could be SuccWasSucc and we didn't build
 // sub-tree for its children. Now it's time to patch the sub-tree.
 void Parser::PatchWasSucc(AppealNode *root) {
   while(1) {
+    mRoundsOfPatching++;
+    if (mTracePatchWasSucc)
+      std::cout << "=== In round " << mRoundsOfPatching << std::endl;
+
     // step 1. Traverse the sorted tree, find the target node which is SuccWasSucc
     was_succ_list.clear();
     FindWasSucc(root);
@@ -1917,6 +1986,9 @@ void Parser::PatchWasSucc(AppealNode *root) {
     patching_list.clear();
     FindPatchingNodes(root);
     MASSERT( !patching_list.empty() && "Cannot find any patching for SuccWasSucc.");
+
+    if( was_succ_list.size() != was_succ_matched_list.size())
+      CleanPatchingNodes();
     MASSERT( was_succ_list.size() == was_succ_matched_list.size() && "Some WasSucc not matched.");
 
     // step 3. Assert the sorted subtree is not sorted. Then SupplementalSortOut()
@@ -2327,6 +2399,17 @@ bool SuccMatch::FindMatch(unsigned start, unsigned target) {
 ///////////////////////////////////////////////////////////////
 //            AppealNode function
 ///////////////////////////////////////////////////////////////
+
+// return true if 'parent' is a parent of this.
+bool AppealNode::IsParent(AppealNode *parent) {
+  AppealNode *node = mParent;
+  while (node) {
+    if (node == parent)
+      return true;
+    node = node->mParent;
+  }
+  return false;
+}
 
 // Returns true, if both nodes are successful and match the same tokens
 // with the same rule table

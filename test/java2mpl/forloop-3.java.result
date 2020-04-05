@@ -1,0 +1,163 @@
+Comment Token: 
+Comment Token: 
+Comment Token: 
+Comment Token: 
+Comment Token: 
+Comment Token: 
+Comment Token: 
+Comment Token: 
+Comment Token: 
+Comment Token: 
+Comment Token: 
+Comment Token: 
+Comment Token: 
+Comment Token: 
+Comment Token: 
+Comment Token: 
+Comment Token: 
+Comment Token: 
+Comment Token: 
+Comment Token: 
+Comment Token: 
+Comment Token: 
+Identifier Token:  a
+Separator  Token:  Whitespace
+Operator   Token:  Assign
+Separator  Token:  Whitespace
+Identifier Token:  i
+Operator   Token:  GT
+Identifier Token:  k
+Separator  Token:  Semicolon
+======= Main sortout Dump SortOut =======
+[1] Table TblStatement@0: 2,
+[2] Table TblStatementWithoutTrailingSubstatement@0: 3,
+[3] Table TblExpressionStatement@0: 4,5,
+[4] Table TblStatementExpression@0: 6,
+[5] Token
+[6] Table TblAssignment@0: 7,8,9,
+[7] Table TblLeftHandSide@0: 10,
+[8] Table TblAssignmentOperator@1: 11,
+[9] Table TblExpression@2: 12,
+[10] Table TblExpressionName@0: 13,
+[11] Token
+[12] Table TblBinaryExpression@2: 14,
+[13] Token
+[14] Table TblRelationalExpression@2: 15,
+[15] Table TblRelationalExpression_sub2@2: 16,17,18,
+[16] Table TblRelationalExpression@2: WasSucc
+[17] Token
+[18] Table TblShiftExpression@4: 19,
+[19] Table TblAdditiveExpression@4: 20,
+[20] Table TblMultiplicativeExpression@4: 21,
+[21] Table TblUnaryExpression@4: 22,
+[22] Table TblUnaryExpressionNotPlusMinus@4: 23,
+[23] Table TblPostfixExpression@4: 24,
+[24] Table TblPrimary@4: 25,
+[25] Table TblPrimaryNoNewArray@4: 26,
+[26] Table TblArrayAccess@4: WasSucc
+Matched 6 tokens.
+======= supplemental sortout Dump SortOut =======
+[1] Table TblRelationalExpression@2: 2,
+[2] Table TblShiftExpression@2: WasSucc
+======= supplemental sortout Dump SortOut =======
+[1] Table TblArrayAccess@4: 2,
+[2] Table TblArrayAccess_sub1@4: 3,
+[3] Table TblExpressionName@4: WasSucc
+======= supplemental sortout Dump SortOut =======
+[1] Table TblShiftExpression@2: 2,
+[2] Table TblAdditiveExpression@2: WasSucc
+======= supplemental sortout Dump SortOut =======
+[1] Table TblExpressionName@4: 2,
+[2] Token
+======= supplemental sortout Dump SortOut =======
+[1] Table TblAdditiveExpression@2: 2,
+[2] Table TblMultiplicativeExpression@2: WasSucc
+======= supplemental sortout Dump SortOut =======
+[1] Table TblMultiplicativeExpression@2: 2,
+[2] Table TblUnaryExpression@2: WasSucc
+======= supplemental sortout Dump SortOut =======
+[1] Table TblUnaryExpression@2: 2,
+[2] Table TblUnaryExpressionNotPlusMinus@2: 3,
+[3] Table TblPostfixExpression@2: 4,
+[4] Table TblPrimary@2: WasSucc
+======= supplemental sortout Dump SortOut =======
+[1] Table TblPrimary@2: 2,
+[2] Table TblPrimaryNoNewArray@2: 3,
+[3] Table TblArrayAccess@2: 4,
+[4] Table TblArrayAccess_sub1@2: 5,
+[5] Table TblExpressionName@2: WasSucc
+======= supplemental sortout Dump SortOut =======
+[1] Table TblExpressionName@2: 2,
+[2] Token
+======= patch-was-succ Dump SortOut =======
+[1] Table TblStatement@0: 2,
+[2] Table TblStatementWithoutTrailingSubstatement@0: 3,
+[3] Table TblExpressionStatement@0: 4,5,
+[4] Table TblStatementExpression@0: 6,
+[5] Token
+[6] Table TblAssignment@0: 7,8,9,
+[7] Table TblLeftHandSide@0: 10,
+[8] Table TblAssignmentOperator@1: 11,
+[9] Table TblExpression@2: 12,
+[10] Table TblExpressionName@0: 13,
+[11] Token
+[12] Table TblBinaryExpression@2: 14,
+[13] Token
+[14] Table TblRelationalExpression@2: 15,
+[15] Table TblRelationalExpression_sub2@2: 16,17,18,
+[16] Table TblRelationalExpression@2: 19,
+[17] Token
+[18] Table TblShiftExpression@4: 20,
+[19] Table TblShiftExpression@2: 21,
+[20] Table TblAdditiveExpression@4: 22,
+[21] Table TblAdditiveExpression@2: 23,
+[22] Table TblMultiplicativeExpression@4: 24,
+[23] Table TblMultiplicativeExpression@2: 25,
+[24] Table TblUnaryExpression@4: 26,
+[25] Table TblUnaryExpression@2: 27,
+[26] Table TblUnaryExpressionNotPlusMinus@4: 28,
+[27] Table TblUnaryExpressionNotPlusMinus@2: 29,
+[28] Table TblPostfixExpression@4: 30,
+[29] Table TblPostfixExpression@2: 31,
+[30] Table TblPrimary@4: 32,
+[31] Table TblPrimary@2: 33,
+[32] Table TblPrimaryNoNewArray@4: 34,
+[33] Table TblPrimaryNoNewArray@2: 35,
+[34] Table TblArrayAccess@4: 36,
+[35] Table TblArrayAccess@2: 37,
+[36] Table TblArrayAccess_sub1@4: 38,
+[37] Table TblArrayAccess_sub1@2: 39,
+[38] Table TblExpressionName@4: 40,
+[39] Table TblExpressionName@2: 41,
+[40] Token
+[41] Token
+======= Simplify AppealNode Trees Dump SortOut =======
+[1] Table TblExpressionStatement@0: 2,3,
+[2:1] Table TblAssignment@0: 4,5,6,
+[3] Token
+[4:1] Token
+[5:2] Token
+[6:3] Table TblRelationalExpression_sub2@2: 7,8,9,
+[7:1] Token
+[8] Token
+[9:3] Token
+Attached a tree node from Child
+== Sub Tree ==
+Assign
+  a
+  GT
+    i
+    k
+
+
+============= Module ===========
+[Global Decls]
+
+== Sub Tree ==
+Assign
+  a
+  GT
+    i
+    k
+
+

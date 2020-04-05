@@ -94,6 +94,15 @@ public:
     char *addr = mMemPool.AddrOfIndex(i);
     return (T*)addr;
   }
+
+  bool Find(T t) {
+    for (unsigned i = 0; i < mNum; i++) {
+      T temp = ValueAtIndex(i);
+      if (temp == t)
+        return true;
+    }
+    return false;
+  }
 };
 
 /////////////////////////////////////////////////////////////////////////
