@@ -163,6 +163,7 @@ rule ShiftExpression : ONEOF(
   ShiftExpression + "<<" + AdditiveExpression,
   ShiftExpression + ">>" + AdditiveExpression,
   ShiftExpression + ">>>" + AdditiveExpression)
+  attr.action.%2,%3,%4 : BuildBinaryOperation(%1, %2, %3)
 
 rule RelationalExpression : ONEOF(
   ShiftExpression,

@@ -21,6 +21,7 @@
 static void help() {
   std::cout << "java2mpl <arguments>:\n" << std::endl;
   std::cout << "   --help            : print this help" << std::endl;
+  std::cout << "   --trace-lexer     : Trace lexing" << std::endl;
   std::cout << "   --trace-table     : Trace rule table when entering and exiting" << std::endl;
   std::cout << "   --trace-appeal    : Trace appeal process" << std::endl;
   std::cout << "   --trace-second-try: Trace parser second try." << std::endl;
@@ -40,6 +41,8 @@ int main (int argc, char *argv[]) {
     if (!strncmp(argv[i], "--help", 6) && (strlen(argv[i]) == 6)) {
       help();
       exit(-1);
+    } else if (!strncmp(argv[i], "--trace-lexer", 13) && (strlen(argv[i]) == 13)) {
+      parser->SetLexerTrace();
     } else if (!strncmp(argv[i], "--trace-table", 13) && (strlen(argv[i]) == 13)) {
       parser->mTraceTable = true;
     } else if (!strncmp(argv[i], "--trace-appeal", 14) && (strlen(argv[i]) == 14)) {

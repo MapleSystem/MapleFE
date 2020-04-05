@@ -1,23 +1,3 @@
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Identifier Token:  a
-Separator  Token:  Whitespace
-Operator   Token:  Assign
-Separator  Token:  Whitespace
-Integer Literal Token: 273
-Separator  Token:  Semicolon
 ======= Main sortout Dump SortOut =======
 [1] Table TblStatement@0: 2,
 [2] Table TblStatementWithoutTrailingSubstatement@0: 3,

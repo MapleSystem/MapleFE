@@ -190,6 +190,7 @@ public:
   bool mTracePatchWasSucc;  // trace patching was succ node.
   bool mTraceWarning;       // print the warning.
 
+  void SetLexerTrace() {mLexer->SetTrace();}
   void DumpEnterTable(const char *tablename, unsigned indent);
   void DumpExitTable(const char *tablename, unsigned indent,
                      bool succ, AppealStatus reason = Succ);

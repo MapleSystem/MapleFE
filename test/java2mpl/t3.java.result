@@ -1,21 +1,3 @@
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Keyword    Token:  boolean
-Separator  Token:  Whitespace
-Identifier Token:  a
-Separator  Token:  Semicolon
 ======= Main sortout Dump SortOut =======
 [1] Table TblStatement@0: 2,
 [2] Table TblLocalVariableDeclarationStatement@0: 3,4,

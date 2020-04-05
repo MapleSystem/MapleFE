@@ -69,6 +69,7 @@ Lexer::Lexer()
     curidx(0),
     endoffile(false),
     mPredefinedTokenNum(0),
+    mTrace(false),
     _linenum(0) {
       seencomments.clear();
       mCheckSeparator = true;
@@ -149,28 +150,32 @@ Token* Lexer::LexTokenNoNewLine(void) {
   bool is_comment = GetComment();
   if (is_comment) {
     Token *t = FindCommentToken();
-    t->Dump();
+    if (mTrace)
+      t->Dump();
     return t;
   }
 
   SepId sep = GetSeparator();
   if (sep != SEP_NA) {
     Token *t = FindSeparatorToken(sep);
-    t->Dump();
+    if (mTrace)
+      t->Dump();
     return t;
   }
 
   OprId opr = GetOperator();
   if (opr != OPR_NA) {
     Token *t = FindOperatorToken(opr);
-    t->Dump();
+    if (mTrace)
+      t->Dump();
     return t;
   }
 
   const char *keyword = GetKeyword();
   if (keyword != NULL) {
     Token *t = FindKeywordToken(keyword);
-    t->Dump();
+    if (mTrace)
+      t->Dump();
     return t;
   }
 
@@ -178,7 +183,8 @@ Token* Lexer::LexTokenNoNewLine(void) {
   if (identifier != NULL) {
     IdentifierToken *t = (IdentifierToken*)mTokenPool.NewToken(sizeof(IdentifierToken)); 
     new (t) IdentifierToken(identifier);
-    t->Dump();
+    if (mTrace)
+      t->Dump();
     return t;
   }
 
@@ -186,7 +192,8 @@ Token* Lexer::LexTokenNoNewLine(void) {
   if (ld.mType != LT_NA) {
     LiteralToken *t = (LiteralToken*)mTokenPool.NewToken(sizeof(LiteralToken)); 
     new (t) LiteralToken(ld);
-    t->Dump();
+    if (mTrace)
+      t->Dump();
     return t;
   }
 

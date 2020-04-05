@@ -1,24 +1,3 @@
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Separator  Token:  At
-Keyword    Token:  interface
-Separator  Token:  Whitespace
-Identifier Token:  Preliminary
-Separator  Token:  Whitespace
-Separator  Token:  Lbrace
-Separator  Token:  Rbrace
 ======= Main sortout Dump SortOut =======
 [1] Table TblInterfaceDeclaration@0: 2,
 [2] Table TblAnnotationTypeDeclaration@0: 3,4,5,6,

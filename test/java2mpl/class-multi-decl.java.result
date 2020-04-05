@@ -1,35 +1,3 @@
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Keyword    Token:  class
-Separator  Token:  Whitespace
-Identifier Token:  A
-Separator  Token:  Whitespace
-Separator  Token:  Lbrace
-Separator  Token:  Whitespace
-Separator  Token:  Whitespace
-Keyword    Token:  int
-Separator  Token:  Whitespace
-Identifier Token:  a
-Separator  Token:  Semicolon
-Separator  Token:  Whitespace
-Separator  Token:  Whitespace
-Keyword    Token:  int
-Separator  Token:  Whitespace
-Identifier Token:  b
-Separator  Token:  Semicolon
-Separator  Token:  Rbrace
 ======= Main sortout Dump SortOut =======
 [1] Table TblClassDeclaration@0: 2,
 [2] Table TblNormalClassDeclaration@0: 3,4,5,

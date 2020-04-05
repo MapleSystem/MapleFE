@@ -1,56 +1,3 @@
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Comment Token: 
-Keyword    Token:  interface
-Separator  Token:  Whitespace
-Identifier Token:  BaseColors
-Separator  Token:  Whitespace
-Separator  Token:  Lbrace
-Separator  Token:  Whitespace
-Separator  Token:  Whitespace
-Keyword    Token:  int
-Separator  Token:  Whitespace
-Identifier Token:  RED
-Separator  Token:  Whitespace
-Operator   Token:  Assign
-Separator  Token:  Whitespace
-Integer Literal Token: 1
-Separator  Token:  Comma
-Separator  Token:  Whitespace
-Identifier Token:  GREEN
-Separator  Token:  Whitespace
-Operator   Token:  Assign
-Separator  Token:  Whitespace
-Integer Literal Token: 2
-Separator  Token:  Comma
-Separator  Token:  Whitespace
-Identifier Token:  BLUE
-Separator  Token:  Whitespace
-Operator   Token:  Assign
-Separator  Token:  Whitespace
-Integer Literal Token: 4
-Separator  Token:  Semicolon
-Separator  Token:  Rbrace
-Keyword    Token:  interface
-Separator  Token:  Whitespace
-Identifier Token:  RainbowColors
-Separator  Token:  Whitespace
-Keyword    Token:  extends
-Separator  Token:  Whitespace
-Identifier Token:  BaseColors
-Separator  Token:  Whitespace
-Separator  Token:  Lbrace
 ======= Main sortout Dump SortOut =======
 [1] Table TblInterfaceDeclaration@0: 2,
 [2] Table TblNormalInterfaceDeclaration@0: 3,4,5,
@@ -206,47 +153,6 @@ Attached a tree node from Child
 Attached a tree node from Child
 == Sub Tree ==
 
-Separator  Token:  Whitespace
-Separator  Token:  Whitespace
-Keyword    Token:  int
-Separator  Token:  Whitespace
-Identifier Token:  YELLOW
-Separator  Token:  Whitespace
-Operator   Token:  Assign
-Separator  Token:  Whitespace
-Integer Literal Token: 3
-Separator  Token:  Comma
-Separator  Token:  Whitespace
-Identifier Token:  ORANGE
-Separator  Token:  Whitespace
-Operator   Token:  Assign
-Separator  Token:  Whitespace
-Integer Literal Token: 5
-Separator  Token:  Comma
-Separator  Token:  Whitespace
-Identifier Token:  INDIGO
-Separator  Token:  Whitespace
-Operator   Token:  Assign
-Separator  Token:  Whitespace
-Integer Literal Token: 6
-Separator  Token:  Comma
-Separator  Token:  Whitespace
-Identifier Token:  VIOLET
-Separator  Token:  Whitespace
-Operator   Token:  Assign
-Separator  Token:  Whitespace
-Integer Literal Token: 7
-Separator  Token:  Semicolon
-Separator  Token:  Rbrace
-Keyword    Token:  interface
-Separator  Token:  Whitespace
-Identifier Token:  PrintColors
-Separator  Token:  Whitespace
-Keyword    Token:  extends
-Separator  Token:  Whitespace
-Identifier Token:  BaseColors
-Separator  Token:  Whitespace
-Separator  Token:  Lbrace
 ======= Main sortout Dump SortOut =======
 [1] Table TblInterfaceDeclaration@17: 2,
 [2] Table TblNormalInterfaceDeclaration@17: 3,4,5,6,
@@ -458,43 +364,6 @@ Attached a tree node from Child
 Attached a tree node from Child
 == Sub Tree ==
 
-Separator  Token:  Whitespace
-Separator  Token:  Whitespace
-Keyword    Token:  int
-Separator  Token:  Whitespace
-Identifier Token:  YELLOW
-Separator  Token:  Whitespace
-Operator   Token:  Assign
-Separator  Token:  Whitespace
-Integer Literal Token: 8
-Separator  Token:  Comma
-Separator  Token:  Whitespace
-Identifier Token:  CYAN
-Separator  Token:  Whitespace
-Operator   Token:  Assign
-Separator  Token:  Whitespace
-Integer Literal Token: 16
-Separator  Token:  Comma
-Separator  Token:  Whitespace
-Identifier Token:  MAGENTA
-Separator  Token:  Whitespace
-Operator   Token:  Assign
-Separator  Token:  Whitespace
-Integer Literal Token: 32
-Separator  Token:  Semicolon
-Separator  Token:  Rbrace
-Keyword    Token:  interface
-Separator  Token:  Whitespace
-Identifier Token:  LotsOfColors
-Separator  Token:  Whitespace
-Keyword    Token:  extends
-Separator  Token:  Whitespace
-Identifier Token:  RainbowColors
-Separator  Token:  Comma
-Separator  Token:  Whitespace
-Identifier Token:  PrintColors
-Separator  Token:  Whitespace
-Separator  Token:  Lbrace
 ======= Main sortout Dump SortOut =======
 [1] Table TblInterfaceDeclaration@40: 2,
 [2] Table TblNormalInterfaceDeclaration@40: 3,4,5,6,
@@ -670,33 +539,6 @@ Attached a tree node from Child
 Attached a tree node from Child
 == Sub Tree ==
 
-Separator  Token:  Whitespace
-Separator  Token:  Whitespace
-Keyword    Token:  int
-Separator  Token:  Whitespace
-Identifier Token:  FUCHSIA
-Separator  Token:  Whitespace
-Operator   Token:  Assign
-Separator  Token:  Whitespace
-Integer Literal Token: 17
-Separator  Token:  Comma
-Separator  Token:  Whitespace
-Identifier Token:  VERMILION
-Separator  Token:  Whitespace
-Operator   Token:  Assign
-Separator  Token:  Whitespace
-Integer Literal Token: 43
-Separator  Token:  Comma
-Separator  Token:  Whitespace
-Identifier Token:  CHARTREUSE
-Separator  Token:  Whitespace
-Operator   Token:  Assign
-Separator  Token:  Whitespace
-Identifier Token:  RED
-Operator   Token:  Add
-Integer Literal Token: 90
-Separator  Token:  Semicolon
-Separator  Token:  Rbrace
 ======= Main sortout Dump SortOut =======
 [1] Table TblInterfaceDeclaration@59: 2,
 [2] Table TblNormalInterfaceDeclaration@59: 3,4,5,6,

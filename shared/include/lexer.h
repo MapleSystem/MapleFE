@@ -44,6 +44,7 @@ public:
   StringPool mStringPool;
   TokenPool  mTokenPool;
   unsigned   mPredefinedTokenNum;   // number of predefined tokens.
+  bool       mTrace;
 
 public:
   FILE *srcfile;
@@ -70,6 +71,8 @@ public:
       line = nullptr;
     }
   }
+
+  void SetTrace() {mTrace = true;}
 
   bool EndOfLine() { return curidx == current_line_size; }
   bool EndOfFile() { return endoffile; }
