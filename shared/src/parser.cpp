@@ -1269,6 +1269,7 @@ void Parser::SortOut() {
 // 'node' is already trimmed when passed into this function. This assertion
 //  will be done in the SortOutXXX() which handles children node.
 void Parser::SortOutNode(AppealNode *node) {
+  MASSERT(node->IsSorted() && "Node is NOT sorted?");
   MASSERT(node->IsSucc() && "Failed node in SortOut?");
 
   // A token's appeal node is a leaf node. Just return.
@@ -1642,12 +1643,16 @@ void Parser::SortOutData(AppealNode *parent) {
   TableData *data = parent_table->mData;
   switch (data->mType) {
   case DT_Subtable:
-    // There should be one child node, which represents the subtable.
-    // we just need to add the child node to working list.
-    MASSERT((parent->mChildren.size() == 1) && "Should have only one child?");
-    to_be_sorted.push_back(parent->mChildren.front());
-    parent->mSortedChildren.push_back(parent->mChildren.front());
-    break;
+    {
+      // There should be one child node, which represents the subtable.
+      // we just need to add the child node to working list.
+      MASSERT((parent->mChildren.size() == 1) && "Should have only one child?");
+      AppealNode *child = parent->mChildren.front();
+      child->SetNumTokens(parent->GetNumTokens());
+      to_be_sorted.push_back(child);
+      parent->mSortedChildren.push_back(child);
+      break;
+    }
   case DT_Token:
     // token in table-data created a Child AppealNode
     // Just keep the child node. Don't need do anything.

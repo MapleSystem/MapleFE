@@ -180,37 +180,33 @@ Matched 30 tokens.
 [4] Table TblIntType@3: 5,
 [5] Token
 ======= supplemental sortout Dump SortOut =======
-[1] Table TblPrimary@17: 2,
-[2] Table TblPrimaryNoNewArray@17: 3,
-[3] Table TblArrayAccess@17: WasSucc
-======= supplemental sortout Dump SortOut =======
 [1] Table TblNumericType@10: 2,
 [2] Table TblIntType@10: 3,
 [3] Token
 ======= supplemental sortout Dump SortOut =======
+[1] Table TblPrimary@17: 2,
+[2] Table TblPrimaryNoNewArray@17: 3,
+[3] Table TblArrayAccess@17: 4,
+[4] Table TblArrayAccess_sub1@17: 5,
+[5] Table TblExpressionName@17: WasSucc
+======= supplemental sortout Dump SortOut =======
 [1] Table TblPrimary@24: 2,
 [2] Table TblPrimaryNoNewArray@24: 3,
-[3] Table TblArrayAccess@24: WasSucc
+[3] Table TblArrayAccess@24: 4,
+[4] Table TblArrayAccess_sub1@24: 5,
+[5] Table TblExpressionName@24: WasSucc
 ======= supplemental sortout Dump SortOut =======
 [1] Table TblArrayAccess@22: 2,
 [2] Table TblArrayAccess_sub1@22: 3,
 [3] Table TblExpressionName@22: WasSucc
 ======= supplemental sortout Dump SortOut =======
-[1] Table TblArrayAccess@17: 2,
-[2] Table TblArrayAccess_sub1@17: 3,
-[3] Table TblExpressionName@17: WasSucc
-======= supplemental sortout Dump SortOut =======
-[1] Table TblExpressionName@22: 2,
-[2] Token
-======= supplemental sortout Dump SortOut =======
-[1] Table TblArrayAccess@24: 2,
-[2] Table TblArrayAccess_sub1@24: 3,
-[3] Table TblExpressionName@24: WasSucc
-======= supplemental sortout Dump SortOut =======
 [1] Table TblExpressionName@17: 2,
 [2] Token
 ======= supplemental sortout Dump SortOut =======
 [1] Table TblExpressionName@24: 2,
+[2] Token
+======= supplemental sortout Dump SortOut =======
+[1] Table TblExpressionName@22: 2,
 [2] Token
 ======= patch-was-succ Dump SortOut =======
 [1] Table TblClassDeclaration@0: 2,

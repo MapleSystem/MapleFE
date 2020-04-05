@@ -12,12 +12,11 @@
 //FIT FOR A PARTICULAR PURPOSE.
 //See the Mulan PSL v1 for more details.
 //
-//class A {
-//  int foo() {
-//    for (int i=0; i<k; i++) {
-//      ++k;
-//      i++;
-//    }
-//  }
-//}
-a = i>k;
+class A {
+  int foo() {
+    for (int i=0; i<k; i++) {
+      ++k;
+      i++;
+    }
+  }
+}
