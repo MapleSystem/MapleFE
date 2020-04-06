@@ -41,6 +41,7 @@ ACTION(BuildVarList)
 // For function
 ACTION(BuildFunction)
 ACTION(BuildConstructor)
+ACTION(AddFunctionBody)
 ACTION(AddFunctionBodyTo)
 
 // For class/inheritance
@@ -75,3 +76,7 @@ ACTION(AddCondBranchFalseStatement)
 ACTION(AddLabel)
 ACTION(BuildBreak)
 ACTION(BuildForLoop)
+
+// Exceptions, Throws
+ACTION(BuildThrows)
+ACTION(AddThrowsTo)

@@ -75,6 +75,8 @@ rule MethodHeader      : ONEOF(Result + MethodDeclarator + ZEROORONE(Throws),
                                TypeParameters + ZEROORMORE(Annotation) + Result + MethodDeclarator +
                                ZEROORONE(Throws))
   attr.action.%1: AddTypeTo(%2, %1)
+  attr.action.%1: AddThrowsTo(%2, %3)
+  attr.action.%2: AddThrowsTo(%4, %5)
 
 rule Result            : ONEOF(UnannType, "void")
 rule MethodDeclarator  : Identifier + '(' + ZEROORONE(FormalParameterList) + ')' + ZEROORONE(Dims)
@@ -82,6 +84,8 @@ rule MethodDeclarator  : Identifier + '(' + ZEROORONE(FormalParameterList) + ')'
   attr.action: AddDims(%5)
 
 rule Throws            : "throws" + ExceptionTypeList
+  attr.action: BuildThrows(%2)
+
 rule ExceptionTypeList : ExceptionType + ZEROORMORE(',' + ExceptionType)
 rule ExceptionType     : ONEOF(ClassType, TypeVariable)
 

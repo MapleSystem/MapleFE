@@ -220,10 +220,11 @@ class  A
   Constructors: 
 
   Methods: 
-    func  foo
+    func  foo()  throws: 
       return Add
   c
   b
+
   LocalClasses: 
   LocalInterfaces: 
 
@@ -239,10 +240,11 @@ class  A
   Constructors: 
 
   Methods: 
-    func  foo
+    func  foo()  throws: 
       return Add
   c
   b
+
   LocalClasses: 
   LocalInterfaces: 
 

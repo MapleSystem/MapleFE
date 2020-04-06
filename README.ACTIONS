@@ -185,3 +185,12 @@ all modules are as below.
 * AddTypeTo
   Format: AddTypeTo(tree, type)
 
+* BuildThrows
+  Format: BuildThrows(tree)
+  It builds a list of thrown exceptions. It's actually a PassNode.
+
+* AddThrowsTo
+  Format: AddThrowsTo(tree, throws)
+  It builds a list of thrown exceptions. It's actually a PassNode with >1 exception,
+  or just a simple IdentifierNode with exception name. It returns the tree with
+  throws attached.

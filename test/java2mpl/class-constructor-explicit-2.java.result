@@ -288,13 +288,14 @@ class  Point
   Instance Initializer: 
 
   Constructors: 
-    constructor  Point
+    constructor  Point()  throws: 
       Assign
         x
         x
       Assign
         y
         y
+
 
   Methods: 
   LocalClasses: 
@@ -825,11 +826,13 @@ class  ColoredPoint
   Instance Initializer: 
 
   Constructors: 
-    constructor  ColoredPoint
-    constructor  ColoredPoint
+    constructor  ColoredPoint()  throws: 
+
+    constructor  ColoredPoint()  throws: 
       Assign
         color
         color
+
 
   Methods: 
   LocalClasses: 
@@ -845,13 +848,14 @@ class  Point
   Instance Initializer: 
 
   Constructors: 
-    constructor  Point
+    constructor  Point()  throws: 
       Assign
         x
         x
       Assign
         y
         y
+
 
   Methods: 
   LocalClasses: 
@@ -865,11 +869,13 @@ class  ColoredPoint
   Instance Initializer: 
 
   Constructors: 
-    constructor  ColoredPoint
-    constructor  ColoredPoint
+    constructor  ColoredPoint()  throws: 
+
+    constructor  ColoredPoint()  throws: 
       Assign
         color
         color
+
 
   Methods: 
   LocalClasses: 

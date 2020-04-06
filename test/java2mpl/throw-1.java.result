@@ -87,7 +87,6 @@ Matched 11 tokens.
 [15] Token
 [16] Token
 [17:2] Token
-Attached a tree node from Child
 == Sub Tree ==
 class  A
   Members: 
@@ -97,7 +96,8 @@ class  A
   Constructors: 
 
   Methods: 
-    func  foo
+    func  foo()  throws:     A
+
   LocalClasses: 
   LocalInterfaces: 
 
@@ -113,7 +113,8 @@ class  A
   Constructors: 
 
   Methods: 
-    func  foo
+    func  foo()  throws:     A
+
   LocalClasses: 
   LocalInterfaces: 
 

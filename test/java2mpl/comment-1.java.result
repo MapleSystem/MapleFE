@@ -150,10 +150,11 @@ class  Point
   Instance Initializer: 
 
   Constructors: 
-    constructor  Point
+    constructor  Point()  throws: 
       Assign
         x
         x
+
 
   Methods: 
   LocalClasses: 
@@ -169,10 +170,11 @@ class  Point
   Instance Initializer: 
 
   Constructors: 
-    constructor  Point
+    constructor  Point()  throws: 
       Assign
         x
         x
+
 
   Methods: 
   LocalClasses: 

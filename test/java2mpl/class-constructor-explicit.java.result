@@ -204,10 +204,11 @@ class  Point
   Instance Initializer: 
 
   Constructors: 
-    constructor  Point
+    constructor  Point()  throws: 
       Assign
         y
         y
+
 
   Methods: 
   LocalClasses: 
@@ -223,10 +224,11 @@ class  Point
   Instance Initializer: 
 
   Constructors: 
-    constructor  Point
+    constructor  Point()  throws: 
       Assign
         y
         y
+
 
   Methods: 
   LocalClasses: 

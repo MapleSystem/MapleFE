@@ -226,11 +226,12 @@ class  A
   Constructors: 
 
   Methods: 
-    func  foo
+    func  foo()  throws: 
       for ( )
         Assign
           k
           i
+
   LocalClasses: 
   LocalInterfaces: 
 
@@ -246,11 +247,12 @@ class  A
   Constructors: 
 
   Methods: 
-    func  foo
+    func  foo()  throws: 
       for ( )
         Assign
           k
           i
+
   LocalClasses: 
   LocalInterfaces: 
 

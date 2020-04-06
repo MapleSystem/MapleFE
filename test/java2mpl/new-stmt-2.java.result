@@ -147,8 +147,9 @@ class  A
   Constructors: 
 
   Methods: 
-    func  foo
-      Cyclic  LocalClasses: 
+    func  foo()  throws: 
+      Cyclic
+  LocalClasses: 
   LocalInterfaces: 
 
 ============= Module ===========
@@ -163,7 +164,8 @@ class  A
   Constructors: 
 
   Methods: 
-    func  foo
-      Cyclic  LocalClasses: 
+    func  foo()  throws: 
+      Cyclic
+  LocalClasses: 
   LocalInterfaces: 
 

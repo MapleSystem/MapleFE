@@ -64,6 +64,7 @@ enum NodeKind {
   NK_UnaOperator,
   NK_BinOperator,
   NK_TerOperator,
+
   NK_Block,        // A block node. Java Instance Initializer also a block node.
   NK_Function,
   NK_Class,
@@ -75,6 +76,8 @@ enum NodeKind {
   // Annotation     : The usage of an annotation type
   NK_AnnotationType,
   NK_Annotation,
+
+  NK_Exception,
 
   // These are statement nodes, or control flow related nodes. They are
   // common in most languages.
@@ -118,6 +121,8 @@ public:
   bool IsFunction()   {return mKind == NK_Function;}
   bool IsClass()      {return mKind == NK_Class;}
   bool IsInterface()  {return mKind == NK_Interface;}
+
+  bool IsException()  {return mKind == NK_Exception;}
 
   bool IsReturn()     {return mKind == NK_Return;}
   bool IsCondBranch() {return mKind == NK_CondBranch;}
@@ -333,6 +338,25 @@ public:
 };
 
 //////////////////////////////////////////////////////////////////////////
+//                         Exception Node
+//////////////////////////////////////////////////////////////////////////
+
+class ExceptionNode : public TreeNode {
+private:
+  // right now I only put a name for it. It could have more properties.
+  IdentifierNode *mException;
+public:
+  ExceptionNode() : mException(NULL) {mKind = NK_Exception;}
+  ExceptionNode(IdentifierNode *inode) : mException(inode) {mKind = NK_Exception;}
+  ~ExceptionNode(){}
+
+  IdentifierNode* GetException()       {return mException;}
+  void SetException(IdentifierNode *n) {mException = n;}
+
+  void Dump(unsigned);
+};
+
+//////////////////////////////////////////////////////////////////////////
 //          Statement Node, Control Flow related nodes
 //////////////////////////////////////////////////////////////////////////
 
@@ -465,14 +489,16 @@ class ASTScope;
 
 class FunctionNode : public TreeNode {
 private:
-  const char  *mName;
-  SmallVector<AttrId> mAttrs;
-  TreeNode    *mType;   // return type
-  VarListNode *mParams;
-  ASTScope    *mScope;
-  BlockNode   *mBody;
-  DimensionNode *mDims;
-  bool         mIsConstructor;  // If it's a constructor of class.
+  const char                 *mName;
+  SmallVector<AttrId>         mAttrs;
+  SmallVector<ExceptionNode*> mThrows; // exceptions it can throw
+  TreeNode                   *mType;   // return type
+  VarListNode                *mParams;
+  ASTScope                   *mScope;
+  BlockNode                  *mBody;
+  DimensionNode              *mDims;
+  bool                        mIsConstructor;
+
 public:
   FunctionNode();
   ~FunctionNode() {Release();}
@@ -491,6 +517,11 @@ public:
   unsigned GetAttrsNum()           {return mAttrs.GetNum();}
   void     AddAttr(AttrId a)       {mAttrs.PushBack(a);}
   AttrId   AttrAtIndex(unsigned i) {return mAttrs.ValueAtIndex(i);}
+
+  // Exception/throw related
+  unsigned       GetThrowNum()             {return mThrows.GetNum();}
+  void           AddThrow(ExceptionNode *n){mThrows.PushBack(n);}
+  ExceptionNode* ThrowAtIndex(unsigned i)  {return mThrows.ValueAtIndex(i);}
 
   const char* GetName()      {return mName;}
   void SetName(const char*s) {mName = s;}

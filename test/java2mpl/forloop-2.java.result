@@ -309,10 +309,11 @@ class  A
   Constructors: 
 
   Methods: 
-    func  foo
+    func  foo()  throws: 
       for ( )
         Inc
           k                  iInc
+
   LocalClasses: 
   LocalInterfaces: 
 
@@ -328,10 +329,11 @@ class  A
   Constructors: 
 
   Methods: 
-    func  foo
+    func  foo()  throws: 
       for ( )
         Inc
           k                  iInc
+
   LocalClasses: 
   LocalInterfaces: 
 

@@ -343,8 +343,9 @@ class  Global
   Constructors: 
 
   Methods: 
-    func  foo
-      Cyclic  LocalClasses: 
+    func  foo()  throws: 
+      Cyclic
+  LocalClasses: 
     class  Cyclic
   Members: 
 
@@ -369,8 +370,9 @@ class  Global
   Constructors: 
 
   Methods: 
-    func  foo
-      Cyclic  LocalClasses: 
+    func  foo()  throws: 
+      Cyclic
+  LocalClasses: 
     class  Cyclic
   Members: 
 

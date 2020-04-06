@@ -274,8 +274,10 @@ class  A
   Constructors: 
 
   Methods: 
-    func  foo
-    func  foo
+    func  foo()  throws: 
+
+    func  foo()  throws: 
+
   LocalClasses: 
   LocalInterfaces: 
 
@@ -291,8 +293,10 @@ class  A
   Constructors: 
 
   Methods: 
-    func  foo
-    func  foo
+    func  foo()  throws: 
+
+    func  foo()  throws: 
+
   LocalClasses: 
   LocalInterfaces: 
 

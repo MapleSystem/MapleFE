@@ -137,9 +137,10 @@ class  A
   Constructors: 
 
   Methods: 
-    func  loseEdges
+    func  loseEdges()  throws: 
       search:
       break search
+
   LocalClasses: 
   LocalInterfaces: 
 
@@ -155,9 +156,10 @@ class  A
   Constructors: 
 
   Methods: 
-    func  loseEdges
+    func  loseEdges()  throws: 
       search:
       break search
+
   LocalClasses: 
   LocalInterfaces: 
 

@@ -99,6 +99,7 @@ public:
   // Function related
   TreeNode* BuildFunction();
   TreeNode* BuildConstructor();
+  TreeNode* AddFunctionBody();
   TreeNode* AddFunctionBodyTo();
 
   TreeNode* BuildClass();
@@ -127,6 +128,10 @@ public:
   TreeNode* AddLabel();
   TreeNode* BuildBreak();
   TreeNode* BuildForLoop();
+
+  // Exception, throw
+  TreeNode* BuildThrows();
+  TreeNode* AddThrowsTo();
 };
 
 #endif

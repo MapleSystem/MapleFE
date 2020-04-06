@@ -388,6 +388,14 @@ void LiteralNode::Dump(unsigned indent) {
   }
 }
 
+//////////////////////////////////////////////////////////////////////////////////////
+//                          ExceptionNode
+//////////////////////////////////////////////////////////////////////////////////////
+
+void ExceptionNode::Dump(unsigned indent) {
+  GetException()->Dump(indent);
+}
+
 //////////////////////////////////////////////////////////////////////////
 //          Statement Node, Control Flow related nodes
 //////////////////////////////////////////////////////////////////////////
@@ -575,11 +583,21 @@ void FunctionNode::Dump(unsigned indent) {
     DUMP1_NORETURN("constructor ", mName);
   else 
     DUMP1_NORETURN("func ", mName);
-  DUMP_RETURN();
 
   // dump parameters
+  DUMP0_NORETURN("()");
+
+  // dump throws
+  DUMP0_NORETURN("  throws: ");
+  for (unsigned i = 0; i < mThrows.GetNum(); i++) {
+    TreeNode *node = mThrows.ValueAtIndex(i);
+    node->Dump(4);
+  }
+  DUMP_RETURN();
 
   // dump function body
   if (GetBody())
     GetBody()->Dump(indent+2);
+
+  DUMP_RETURN();
 }

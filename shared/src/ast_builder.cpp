@@ -848,7 +848,7 @@ TreeNode* ASTBuilder::AddDims() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-//                   Other Functions
+//                    FunctionNode related
 ////////////////////////////////////////////////////////////////////////////////
 
 // This takes just one argument which is the function name.
@@ -884,6 +884,29 @@ TreeNode* ASTBuilder::BuildConstructor() {
   return cons;
 }
 
+// Takes func_body as argument, to mLastTreeNode which is a function.
+TreeNode* ASTBuilder::AddFunctionBody() {
+  if (mTrace)
+    std::cout << "In AddFunctionBody" << std::endl;
+
+  FunctionNode *func = (FunctionNode*)mLastTreeNode;
+
+  // It's possible that the func body is empty, such as in the
+  // function header declaration. Usually it's just a token ';'.
+  Param p_body = mParams[0];
+  if (p_body.mIsTreeNode) {
+    TreeNode *tree_node = p_body.mData.mTreeNode;
+    MASSERT(tree_node->IsBlock() && "Class body is not a BlockNode?");
+    BlockNode *block = (BlockNode*)tree_node;
+
+    func->AddBody(block);
+    func->Construct();
+  }
+
+  mLastTreeNode = func;
+  return mLastTreeNode;
+}
+
 // Takes two arguments.
 // 1st: Function
 // 2nd: body
@@ -913,3 +936,72 @@ TreeNode* ASTBuilder::AddFunctionBodyTo() {
   mLastTreeNode = func;
   return mLastTreeNode;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+//                   Other Functions
+////////////////////////////////////////////////////////////////////////////////
+
+// This takes just one argument which is the tree passed from the
+// children. It could be single IdentifierNode, or a PassNode with
+// more than one tree nodes.
+TreeNode* ASTBuilder::BuildThrows() {
+  if (mTrace)
+    std::cout << "In BuildThrows" << std::endl;
+
+  Param p_throws = mParams[0];
+
+  if (!p_throws.mIsTreeNode)
+    MERROR("The exceptions is not a treenode in BuildThrows()");
+  TreeNode *node_throws = p_throws.mData.mTreeNode;
+
+  if (!node_throws->IsIdentifier() && !node_throws->IsPass())
+    MERROR("The throws should be an indentifier node or pass node. Not?");
+
+  mLastTreeNode = node_throws;
+  return mLastTreeNode;
+}
+
+// Takes two arguments.
+// 1st: Function
+// 2nd: throws
+TreeNode* ASTBuilder::AddThrowsTo() {
+  if (mTrace)
+    std::cout << "In AddThrowsTo" << std::endl;
+
+  Param p_func = mParams[0];
+  if (!p_func.mIsTreeNode)
+    MERROR("The Function is not a tree node.");
+  TreeNode *func_node = p_func.mData.mTreeNode;
+  MASSERT(func_node->IsFunction() && "Function is not a FunctionNode?");
+  FunctionNode *func = (FunctionNode*)func_node;
+
+  // It's possible that the throws is a single identifier node,
+  // or a pass node.
+  Param p_body = mParams[1];
+  if (p_body.mIsTreeNode) {
+    TreeNode *tree_node = p_body.mData.mTreeNode;
+    if (tree_node->IsIdentifier()) {
+      IdentifierNode *id = (IdentifierNode*)tree_node;
+      ExceptionNode *exception = (ExceptionNode*)mTreePool->NewTreeNode(sizeof(ExceptionNode));
+      new (exception) ExceptionNode(id);
+      func->AddThrow(exception);
+    } else if (tree_node->IsPass()) {
+      PassNode *pass = (PassNode*)tree_node;
+      for (unsigned i = 0; i < pass->GetChildrenNum(); i++) {
+        TreeNode *child = pass->GetChild(i);
+        if (child->IsIdentifier()) {
+          IdentifierNode *id = (IdentifierNode*)child;
+          ExceptionNode *exception = (ExceptionNode*)mTreePool->NewTreeNode(sizeof(ExceptionNode));
+          new (exception) ExceptionNode(id);
+          func->AddThrow(exception);
+        } else {
+          MERROR("The to-be-added exception is not an identifier?");
+        }
+      }
+    }
+  }
+
+  mLastTreeNode = func;
+  return mLastTreeNode;
+}
+

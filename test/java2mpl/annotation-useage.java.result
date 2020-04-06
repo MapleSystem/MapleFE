@@ -120,7 +120,8 @@ class  A
   Constructors: 
 
   Methods: 
-    func  travelThroughTime
+    func  travelThroughTime()  throws: 
+
   LocalClasses: 
   LocalInterfaces: 
 
@@ -136,7 +137,8 @@ class  A
   Constructors: 
 
   Methods: 
-    func  travelThroughTime
+    func  travelThroughTime()  throws: 
+
   LocalClasses: 
   LocalInterfaces: 
 

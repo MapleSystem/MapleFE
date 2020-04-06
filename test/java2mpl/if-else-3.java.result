@@ -253,7 +253,7 @@ class  A
   Constructors: 
 
   Methods: 
-    func  foo
+    func  foo()  throws: 
       cond-branch cond:a
       true branch :
         return 0
@@ -263,6 +263,7 @@ class  A
           return 3
         false branch :
         return 1
+
   LocalClasses: 
   LocalInterfaces: 
 
@@ -278,7 +279,7 @@ class  A
   Constructors: 
 
   Methods: 
-    func  foo
+    func  foo()  throws: 
       cond-branch cond:a
       true branch :
         return 0
@@ -288,6 +289,7 @@ class  A
           return 3
         false branch :
         return 1
+
   LocalClasses: 
   LocalInterfaces: 
 
