@@ -68,6 +68,7 @@ STRUCT KeyWord : ((boolean),
                   (synchroniz),
                   (this),
                   (throw),
+                  (throws),
                   (transient),
                   
                   (final),

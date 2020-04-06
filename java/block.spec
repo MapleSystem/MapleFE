@@ -81,7 +81,10 @@ rule MethodDeclarator  : Identifier + '(' + ZEROORONE(FormalParameterList) + ')'
   attr.action: BuildFunction(%1)
   attr.action: AddDims(%5)
 
-rule Throws            : "fakethrows"
+rule Throws            : "throws" + ExceptionTypeList
+rule ExceptionTypeList : ExceptionType + ZEROORMORE(',' + ExceptionType)
+rule ExceptionType     : ONEOF(ClassType, TypeVariable)
+
 rule MethodModifier    : ONEOF(Annotation, "public", "protected", "private", "abstract", "static",
                                "final", "synchronized", "native", "strictfp")
 

@@ -2291,10 +2291,6 @@ bool SuccMatch::GetStartToken(unsigned t) {
   return mCache.PairedFindKnob(t);
 }
 
-bool SuccMatch::IsReduced() {
-  return mCache.PairedGetAttr() == 1;
-}
-
 bool SuccMatch::FindMatch(unsigned m) {
   return mCache.PairedFindElem(m);
 }
@@ -2306,90 +2302,6 @@ unsigned SuccMatch::GetMatchNum() {
 // idx starts from 0.
 unsigned SuccMatch::GetOneMatch(unsigned idx) {
   return mCache.PairedGetElemAtIndex(idx);
-}
-
-/////////////////////////////////////////////////////////////////////////
-//                   Reduce functions
-// ReduceMatches(except index) assumes you already did GetStartToken()
-// since this is a paired operation.
-//
-// ReduceMatches(start token, except index) is not paired since it takes
-// start token with him.
-/////////////////////////////////////////////////////////////////////////
-
-// Reduce all matchings, except the except. Actually we are not remove
-// the matches, we just move 'except' to be the first child, and set up
-// the attribute. This way we can tell if a SuccMatch is reduced or not.
-//
-// Assume already set through GetStartToken().
-void SuccMatch::ReduceMatches(unsigned except) {
-  mCache.PairedMoveElemToHead(except);
-  mCache.PairedSetAttr(1);
-}
-
-// 1. Check all matches to verify there is only one matching 'except'.
-//    If no matching, returns false
-//    If >1 matchings, it's an error, ambiguous
-//    If 1  matching, success
-// 2. Reduce all matches except the one equal to except.
-// 3. Returns true : if it successfully remove all rest matchings.
-//           false : if the verification fails
-//
-// A ruletable could be applied ReduceMatches(..,..) multiplie times on the
-// same start token. Think about the recursive rules like:
-//
-// Rule Expression : ONEOF( ...,
-//                          RelatioinExpression,
-//                          ...)
-// Rule RelationExpression: ONEOF(...
-//                                RelatioinExpression + '<' + ...
-//                                ...)
-// At The first time RelationExpression is applied ReduceMatches(), it already
-// move a match to the head of the list, and Attr is set to 1. However, the
-// second time it is applied again, but in one of its sub-tree.
-//
-// In this case, we respect the parent node's result, which is bigger match than
-// the child node. And this is reasonable. We also keep those 'reduced' matches
-// without really removing them. So during child node's SortOut, we can look into
-// those 'reduced' matches, and see if it's matching.
-//
-// [NOTE] Keep in mind, The goal of SortOut is not removing matches. It's to
-// sort out the tree.
-
-bool SuccMatch::ReduceMatches(unsigned start, unsigned except) {
-  bool found = GetStartToken(start);
-  MASSERT( found && "Couldn't find the start token?");
-
-  if (mCache.PairedGetAttr() == 1) {
-    bool found = false;
-    unsigned except_prev = mCache.PairedFindFirstElem(found);
-    MASSERT( found && "In second ReduceMatch, Couldn't find the prev except?");
-
-    if (except_prev >= except)
-      return true;
-    else
-      MERROR("In second ReduceMatch, prev except less than curr except?");
-  }
-
-  // Verify there is one and only one match equal to 'except'
-  unsigned except_num = 0;
-  unsigned orig_num = GetMatchNum();
-  for (unsigned idx = 0; idx < orig_num; idx++) {
-    if (GetOneMatch(idx) == except)
-      except_num++;
-  }
-
-  if (except_num == 0) {
-    return false;
-  } else if (except_num > 1) {
-    std::cout << "Oneof node has more than one rules matching same num of tokens? Ambiguous!"
-              << std::endl;
-    exit(1);
-  }
-
-  // At this point, except_num == 1, there is one and only one matching. Now reduce them.
-  ReduceMatches(except);
-  return true;
 }
 
 // Return true : if target is found

@@ -1,0 +1,230 @@
+======= Main sortout Dump SortOut =======
+[1] Table TblClassDeclaration@0: 2,
+[2] Table TblNormalClassDeclaration@0: 3,4,5,
+[3] Token
+[4] Token
+[5] Table TblClassBody@2: 6,7,8,
+[6] Token
+[7] Table TblClassBody_sub1@3: 9,10,
+[8] Token
+[9] Table TblClassBodyDeclaration@3: 11,
+[10] Table TblClassBodyDeclaration@12: 12,
+[11] Table TblClassMemberDeclaration@3: 13,
+[12] Table TblClassMemberDeclaration@12: 14,
+[13] Table TblMethodDeclaration@3: 15,16,
+[14] Table TblMethodDeclaration@12: 17,18,
+[15] Table TblMethodHeader@3: 19,
+[16] Table TblMethodBody@11: 20,
+[17] Table TblMethodHeader@12: 21,
+[18] Table TblMethodBody@20: 22,
+[19] Table TblMethodHeader_sub1@3: 23,24,25,
+[20] Token
+[21] Table TblMethodHeader_sub1@12: 26,27,28,
+[22] Table TblBlock@20: 29,30,
+[23] Table TblResult@3: 31,
+[24] Table TblMethodDeclarator@4: 32,33,34,
+[25] Table TblMethodHeader_sub2@7: 35,
+[26] Table TblResult@12: 36,
+[27] Table TblMethodDeclarator@13: 37,38,39,
+[28] Table TblMethodHeader_sub2@16: 40,
+[29] Token
+[30] Token
+[31] Table TblUnannType@3: WasSucc
+[32] Token
+[33] Token
+[34] Token
+[35] Table TblThrows@7: 41,42,
+[36] Table TblUnannType@12: WasSucc
+[37] Token
+[38] Token
+[39] Token
+[40] Table TblThrows@16: 43,44,
+[41] Token
+[42] Table TblExceptionTypeList@8: 45,46,
+[43] Token
+[44] Table TblExceptionTypeList@17: 47,48,
+[45] Table TblExceptionType@8: 49,
+[46] Table TblExceptionTypeList_sub1@9: 50,
+[47] Table TblExceptionType@17: 51,
+[48] Table TblExceptionTypeList_sub1@18: 52,
+[49] Table TblClassType@8: 53,
+[50] Table TblExceptionTypeList_sub2@9: 54,55,
+[51] Table TblClassType@17: 56,
+[52] Table TblExceptionTypeList_sub2@18: 57,58,
+[53] Table TblClassType_sub1@8: 59,
+[54] Token
+[55] Table TblExceptionType@10: 60,
+[56] Table TblClassType_sub1@17: 61,
+[57] Token
+[58] Table TblExceptionType@19: 62,
+[59] Token
+[60] Table TblClassType@10: 63,
+[61] Token
+[62] Table TblClassType@19: 64,
+[63] Table TblClassType_sub1@10: 65,
+[64] Table TblClassType_sub1@19: 66,
+[65] Token
+[66] Token
+Matched 23 tokens.
+======= supplemental sortout Dump SortOut =======
+[1] Table TblUnannType@3: 2,
+[2] Table TblUnannPrimitiveType@3: 3,
+[3] Table TblNumericType@3: 4,
+[4] Table TblIntType@3: 5,
+[5] Token
+======= supplemental sortout Dump SortOut =======
+[1] Table TblUnannType@12: 2,
+[2] Table TblUnannPrimitiveType@12: 3,
+[3] Table TblNumericType@12: 4,
+[4] Table TblIntType@12: 5,
+[5] Token
+======= patch-was-succ Dump SortOut =======
+[1] Table TblClassDeclaration@0: 2,
+[2] Table TblNormalClassDeclaration@0: 3,4,5,
+[3] Token
+[4] Token
+[5] Table TblClassBody@2: 6,7,8,
+[6] Token
+[7] Table TblClassBody_sub1@3: 9,10,
+[8] Token
+[9] Table TblClassBodyDeclaration@3: 11,
+[10] Table TblClassBodyDeclaration@12: 12,
+[11] Table TblClassMemberDeclaration@3: 13,
+[12] Table TblClassMemberDeclaration@12: 14,
+[13] Table TblMethodDeclaration@3: 15,16,
+[14] Table TblMethodDeclaration@12: 17,18,
+[15] Table TblMethodHeader@3: 19,
+[16] Table TblMethodBody@11: 20,
+[17] Table TblMethodHeader@12: 21,
+[18] Table TblMethodBody@20: 22,
+[19] Table TblMethodHeader_sub1@3: 23,24,25,
+[20] Token
+[21] Table TblMethodHeader_sub1@12: 26,27,28,
+[22] Table TblBlock@20: 29,30,
+[23] Table TblResult@3: 31,
+[24] Table TblMethodDeclarator@4: 32,33,34,
+[25] Table TblMethodHeader_sub2@7: 35,
+[26] Table TblResult@12: 36,
+[27] Table TblMethodDeclarator@13: 37,38,39,
+[28] Table TblMethodHeader_sub2@16: 40,
+[29] Token
+[30] Token
+[31] Table TblUnannType@3: 41,
+[32] Token
+[33] Token
+[34] Token
+[35] Table TblThrows@7: 42,43,
+[36] Table TblUnannType@12: 44,
+[37] Token
+[38] Token
+[39] Token
+[40] Table TblThrows@16: 45,46,
+[41] Table TblUnannPrimitiveType@3: 47,
+[42] Token
+[43] Table TblExceptionTypeList@8: 48,49,
+[44] Table TblUnannPrimitiveType@12: 50,
+[45] Token
+[46] Table TblExceptionTypeList@17: 51,52,
+[47] Table TblNumericType@3: 53,
+[48] Table TblExceptionType@8: 54,
+[49] Table TblExceptionTypeList_sub1@9: 55,
+[50] Table TblNumericType@12: 56,
+[51] Table TblExceptionType@17: 57,
+[52] Table TblExceptionTypeList_sub1@18: 58,
+[53] Table TblIntType@3: 59,
+[54] Table TblClassType@8: 60,
+[55] Table TblExceptionTypeList_sub2@9: 61,62,
+[56] Table TblIntType@12: 63,
+[57] Table TblClassType@17: 64,
+[58] Table TblExceptionTypeList_sub2@18: 65,66,
+[59] Token
+[60] Table TblClassType_sub1@8: 67,
+[61] Token
+[62] Table TblExceptionType@10: 68,
+[63] Token
+[64] Table TblClassType_sub1@17: 69,
+[65] Token
+[66] Table TblExceptionType@19: 70,
+[67] Token
+[68] Table TblClassType@10: 71,
+[69] Token
+[70] Table TblClassType@19: 72,
+[71] Table TblClassType_sub1@10: 73,
+[72] Table TblClassType_sub1@19: 74,
+[73] Token
+[74] Token
+======= Simplify AppealNode Trees Dump SortOut =======
+[1] Table TblNormalClassDeclaration@0: 2,3,4,
+[2] Token
+[3] Token
+[4] Table TblClassBody@2: 5,6,7,
+[5] Token
+[6] Table TblClassBody_sub1@3: 8,9,
+[7] Token
+[8:1] Table TblMethodDeclaration@3: 10,11,
+[9:1] Table TblMethodDeclaration@12: 12,13,
+[10:2] Table TblMethodHeader_sub1@3: 14,15,16,
+[11:3] Token
+[12:2] Table TblMethodHeader_sub1@12: 17,18,19,
+[13:3] Table TblBlock@20: 20,21,
+[14:1] Token
+[15] Table TblMethodDeclarator@4: 22,23,24,
+[16:3] Table TblThrows@7: 25,26,
+[17:1] Token
+[18] Table TblMethodDeclarator@13: 27,28,29,
+[19:3] Table TblThrows@16: 30,31,
+[20] Token
+[21] Token
+[22] Token
+[23] Token
+[24] Token
+[25] Token
+[26] Table TblExceptionTypeList@8: 32,33,
+[27] Token
+[28] Token
+[29] Token
+[30] Token
+[31] Table TblExceptionTypeList@17: 34,35,
+[32:1] Token
+[33:2] Table TblExceptionTypeList_sub2@9: 36,37,
+[34:1] Token
+[35:2] Table TblExceptionTypeList_sub2@18: 38,39,
+[36] Token
+[37:2] Token
+[38] Token
+[39:2] Token
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+== Sub Tree ==
+class  A
+  Members: 
+
+  Instance Initializer: 
+
+  Constructors: 
+
+  Methods: 
+    func  foo
+    func  foo
+  LocalClasses: 
+  LocalInterfaces: 
+
+============= Module ===========
+[Global Decls]
+
+== Sub Tree ==
+class  A
+  Members: 
+
+  Instance Initializer: 
+
+  Constructors: 
+
+  Methods: 
+    func  foo
+    func  foo
+  LocalClasses: 
+  LocalInterfaces: 
+

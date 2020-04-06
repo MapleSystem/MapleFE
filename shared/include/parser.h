@@ -161,14 +161,11 @@ public:
   // The four function need to be used together since internal data is defiined in
   // GetStartToken(unsigned).
   bool     GetStartToken(unsigned t);    // trying to get succ info for 't'
-  bool     IsReduced();                  // It's already reduced.
   bool     FindMatch(unsigned i);        // If a match exist?
   unsigned GetMatchNum();                // number of matches at a token;
   unsigned GetOneMatch(unsigned i);      // Get the i-th matching token. Starts from 0.
-  void     ReduceMatches(unsigned idx);  // Reduce all matches except idx-th.
 
   // Below are independent functions. The start token is in argument.
-  bool ReduceMatches(unsigned starttoken, unsigned except);
   bool FindMatch(unsigned starttoken, unsigned target);
 };
 
