@@ -116,12 +116,12 @@ Matched 32 tokens.
 [4] Table TblIntType@3: 5,
 [5] Token
 ======= supplemental sortout Dump SortOut =======
-[1] Table TblShiftExpression@15: 2,
-[2] Table TblAdditiveExpression@15: WasSucc
-======= supplemental sortout Dump SortOut =======
 [1] Table TblNumericType@10: 2,
 [2] Table TblIntType@10: 3,
 [3] Token
+======= supplemental sortout Dump SortOut =======
+[1] Table TblShiftExpression@15: 2,
+[2] Table TblAdditiveExpression@15: WasSucc
 ======= supplemental sortout Dump SortOut =======
 [1] Table TblPrimary@19: 2,
 [2] Table TblPrimaryNoNewArray@19: 3,
@@ -149,10 +149,10 @@ Matched 32 tokens.
 [1] Table TblExpressionName@19: 2,
 [2] Token
 ======= supplemental sortout Dump SortOut =======
-[1] Table TblExpressionName@26: 2,
+[1] Table TblExpressionName@17: 2,
 [2] Token
 ======= supplemental sortout Dump SortOut =======
-[1] Table TblExpressionName@17: 2,
+[1] Table TblExpressionName@26: 2,
 [2] Token
 ======= supplemental sortout Dump SortOut =======
 [1] Table TblExpressionName@24: 2,

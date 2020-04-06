@@ -170,10 +170,11 @@ public:
   // Query functions.
   // The four function need to be used together since internal data is defiined in
   // GetStartToken(unsigned).
-  bool     GetStartToken(unsigned t);    // trying to get succ info for 't'
-  bool     FindMatch(unsigned i);        // If a match exist?
-  unsigned GetMatchNum();                // number of matches at a token;
-  unsigned GetOneMatch(unsigned i);      // Get the i-th matching token. Starts from 0.
+  bool        GetStartToken(unsigned t);    // trying to get succ info for 't'
+  AppealNode* GetSuccNode();
+  bool        FindMatch(unsigned i);        // If a match exist?
+  unsigned    GetMatchNum();                // number of matches at a token;
+  unsigned    GetOneMatch(unsigned i);      // Get the i-th matching token. Starts from 0.
 
   // Below are independent functions. The start token is in argument.
   bool FindMatch(unsigned starttoken, unsigned target);
@@ -295,9 +296,7 @@ private:
   unsigned mRoundsOfPatching;
   void PatchWasSucc(AppealNode*);
   void FindWasSucc(AppealNode *root);
-  void FindPatchingNodes(AppealNode *root);
-  void FindGoodMatching(AppealNode *node);
-  void CleanPatchingNodes();
+  void FindPatchingNodes();
   void SupplementalSortOut(AppealNode *root, AppealNode *target);
 
   // Build AST
