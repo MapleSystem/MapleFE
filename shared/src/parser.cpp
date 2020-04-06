@@ -2247,26 +2247,6 @@ SuccMatch* Parser::FindOrCreateSucc(RuleTable *table) {
   return succ;
 }
 
-// Rule has only one match at this token.
-void SuccMatch::AddOneMatch(unsigned t, unsigned m) {
-  mCache.AddElem(t, m);
-}
-
-// Rule has only two matches at this token.
-void SuccMatch::AddTwoMatch(unsigned t, unsigned m1, unsigned m2) {
-  mCache.PairedFindOrCreateKnob(t);
-  mCache.PairedAddElem(m1);
-  mCache.PairedAddElem(m2);
-}
-
-// Rule has only three matches at this token.
-void SuccMatch::AddThreeMatch(unsigned t, unsigned m1, unsigned m2, unsigned m3) {
-  mCache.PairedFindOrCreateKnob(t);
-  mCache.PairedAddElem(m1);
-  mCache.PairedAddElem(m2);
-  mCache.PairedAddElem(m3);
-}
-
 /////////////////////////////////////////////////////////////////////////
 // The following two functions are used to handle general cases where the
 // total number of matches could be unknown, or could be more than 3.

@@ -127,7 +127,7 @@ public:
 // Duplication of knobs or elements is not supported in Guamian.
 /////////////////////////////////////////////////////////////////////////
 
-template <class K, class E> class Guamian {
+template <class K = unsigned, class D = unsigned, class E = unsigned> class Guamian {
 private:
   struct Elem{
     E     mData;
@@ -135,11 +135,10 @@ private:
   };
 
   // Sometimes people need save certain additional information to
-  // each knob. So we define 'mAttr' as an unsigned. We think 8bit
-  // is quite enough.
+  // each knob. So we define mData.
   struct Knob{
-    unsigned mAttr;
-    K        mData;
+    K        mKey;
+    D        mData;
     Knob    *mNext;
     Elem    *mChildren; // pointing to the first child
   };
@@ -151,7 +150,7 @@ private:
   // allocate a new knob
   Knob* NewKnob() {
     Knob *knob = (Knob*)mMemPool.Alloc(sizeof(Knob));
-    knob->mAttr = 0;
+    knob->mKey = 0;
     knob->mData = 0;
     knob->mNext = NULL;
     knob->mChildren = NULL;
@@ -182,7 +181,7 @@ private:
     Knob *result = NULL;
     Knob *knob = mHeader;
     while (knob) {
-      if (knob->mData == key) {
+      if (knob->mKey == key) {
         result = knob;
         break;
       }
@@ -200,7 +199,7 @@ private:
     if (!knob) {
       knob = NewKnob();
       knob->mNext = mHeader;
-      knob->mData = key;
+      knob->mKey = key;
       mHeader = knob;
     }
     return knob;
@@ -438,12 +437,12 @@ public:
     ReduceElems(mTempKnob, exc_idx);
   }
 
-  void PairedSetAttr(unsigned i) {
-    mTempKnob->mAttr = i;
+  void PairedSetKnobData(D d) {
+    mTempKnob->mData = d;
   }
 
-  unsigned PairedGetAttr() {
-    return mTempKnob->mAttr;
+  D PairedGetKnobData() {
+    return mTempKnob->mData;
   }
 
   /////////////////////////////////////////////////////////

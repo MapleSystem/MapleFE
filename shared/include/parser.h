@@ -133,26 +133,36 @@ public:
 // 9 and 11, which represent the last successfully matched token.
 //
 // To cache all the successful results of a rule, we use a container called Guamian, aka
-// Hanging Noodle. Each knob of Guamian has index of start token. Each string of noodle
-// contains the successful matches.
+// Hanging Noodle. Each knob of Guamian contains the ONLY REAL successful appeal node and
+// the starting index. Each string of noodle contains the successful matches.
+//
+// In traversal, for most cases there is one and only one instance of a rule successful
+// matches a starting index, every other instance will be set WasSucc. However, in some
+// cases like
+//    Rule RelationalExpression : ONEOF(...
+//                                      RelationalExpression + '>' + ...
+//                                     )
+// It's the second instance (the child) really matches the tokens. But the parent will also
+// be considered succ during traversal. So there could be two succ. There won't be a third
+// one down toward the same tree, because that is a failure of Looped.
+//
+// But we actually just need one. So during SuccMatch::AddSuccNode(), we will check if there
+// is such cases. We will remove the parent node if necessary.
 //
 // This is a per-rule data structure, saving the success info of a rule.
 
 class SuccMatch {
 private:
-  Guamian<unsigned, unsigned> mCache;
+  Guamian<unsigned, AppealNode*, unsigned> mCache;
 public:
   SuccMatch(){}
   ~SuccMatch() {mCache.Release();}
 public:
-  // Usually a rule may have a few matches, less than 3. So we define 3 special interfaces.
-  void AddOneMatch(unsigned t, unsigned m);                               // rule has only 1 match
-  void AddTwoMatch(unsigned t, unsigned m1, unsigned m2);                 // rule has only 2 match
-  void AddThreeMatch(unsigned t, unsigned m1, unsigned m2, unsigned m3);  // rule has only 3 match
   // For general cases we will append matches one by one. The following two
   // functions will be used together, as the first one set the start token, the second one
   // add the end matching tokens one by one.
   void AddStartToken(unsigned token);
+  void AddSuccNode(AppealNode *node);
   void AddOneMoreMatch(unsigned last_succ_token);  // add one more match to the cach
 
   // Reduce tokens, used during SortOut
