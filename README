@@ -29,3 +29,11 @@ have our own frontend, which could be easier to handle new languages.
 2. make
 3. If you are working at Java frontend, you will see build64/java/java2mpl. This is the executable
    frontend.
+
+[How to test]
+
+1. cd YOUR_PROJECT_DIR/test
+2. ./runtests.pl all
+
+You can find all Java test cases in YOUR_PROJECT_DIR/test/java2mpl. Right now only java test cases
+are used.
