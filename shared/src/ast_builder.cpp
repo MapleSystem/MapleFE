@@ -111,14 +111,14 @@ static void add_attribute_to_kernel(TreeNode *tree, AttrNode *attr) {
 }
 
 static void add_attribute_to(TreeNode *tree_node, TreeNode *attr) {
-  if (attr->IsAttribute()) {
+  if (attr->IsAttr()) {
     AttrNode *attr_node = (AttrNode*)attr;
     add_attribute_to_kernel(tree_node, attr_node);
   } else if (attr->IsPass()) {
     PassNode *pass = (PassNode*)attr;
     for (unsigned i = 0; i < pass->GetChildrenNum(); i++) {
       TreeNode *child = pass->GetChild(i);
-      if (child->IsAttribute()) {
+      if (child->IsAttr()) {
         AttrNode *attr_node = (AttrNode*)child;
         add_attribute_to_kernel(tree_node, attr_node);
       } else {

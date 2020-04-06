@@ -53,42 +53,9 @@
 #include "token.h"
 
 enum NodeKind {
-  NK_Identifier,
-  NK_Dimension,
-  NK_Attr,
-  NK_PrimType,    // Primitive types. User types are indentifiers, functions, or etc.
-                  // See ast_type.h for details.
-
-  NK_VarList,     // A varialble list
-  NK_Literal,
-  NK_UnaOperator,
-  NK_BinOperator,
-  NK_TerOperator,
-
-  NK_Block,        // A block node. Java Instance Initializer also a block node.
-  NK_Function,
-  NK_Class,
-  NK_Interface,
-
-  // These two are first coming from Java language. Annotation has no meaning
-  // for execution, but has meanings for compiler or runtime.
-  // AnnotationType : The definition of a type of annotation
-  // Annotation     : The usage of an annotation type
-  NK_AnnotationType,
-  NK_Annotation,
-
-  NK_Exception,
-
-  // These are statement nodes, or control flow related nodes. They are
-  // common in most languages.
-  NK_Return,
-  NK_CondBranch,
-  NK_Break,
-  NK_ForLoop,
-
-  // Following are nodes to facilitate parsing.
-  NK_Pass,         // see details in PassNode
-
+#undef  NODEKIND
+#define NODEKIND(K) NK_##K,
+#include "ast_nk.def"
   NK_Null,
 };
 
@@ -108,28 +75,9 @@ public:
   TreeNode() {mKind = NK_Null; mLabel = NULL;}
   virtual ~TreeNode() {}
 
-  bool IsIdentifier() {return mKind == NK_Identifier;}
-  bool IsDimension()  {return mKind == NK_Dimension;}
-  bool IsAttribute()  {return mKind == NK_Attr;}
-  bool IsPrimType()       {return mKind == NK_PrimType;}
-  bool IsVarList()    {return mKind == NK_VarList;}
-  bool IsLiteral()    {return mKind == NK_Literal;}
-  bool IsUnaOperator(){return mKind == NK_UnaOperator;}
-  bool IsBinOperator(){return mKind == NK_BinOperator;}
-  bool IsTerOperator(){return mKind == NK_TerOperator;}
-  bool IsBlock()      {return mKind == NK_Block;}
-  bool IsFunction()   {return mKind == NK_Function;}
-  bool IsClass()      {return mKind == NK_Class;}
-  bool IsInterface()  {return mKind == NK_Interface;}
-
-  bool IsException()  {return mKind == NK_Exception;}
-
-  bool IsReturn()     {return mKind == NK_Return;}
-  bool IsCondBranch() {return mKind == NK_CondBranch;}
-  bool IsBreak()      {return mKind == NK_Break;}
-  bool IsForLoop()    {return mKind == NK_ForLoop;}
-
-  bool IsPass()       {return mKind == NK_Pass;}
+#undef  NODEKIND
+#define NODEKIND(K) bool Is##K() {return mKind == NK_##K;}
+#include "ast_nk.def"
 
   bool IsScope()      {return IsBlock() || IsFunction();}
 

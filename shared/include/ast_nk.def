@@ -1,0 +1,51 @@
+/*
+* Copyright (C) [2020] Futurewei Technologies, Inc. All rights reverved.
+*
+* OpenArkFE is licensed under the Mulan PSL v1.
+* You can use this software according to the terms and conditions of the Mulan PSL v1.
+* You may obtain a copy of Mulan PSL v1 at:
+*
+*  http://license.coscl.org.cn/MulanPSL
+*
+* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR
+* FIT FOR A PARTICULAR PURPOSE.
+* See the Mulan PSL v1 for more details.
+*/
+
+// This file defines the AST Node Kind list. It is shared nodes among different languages.
+// Each language can have its own unique set of noke kind list, and be included too.
+
+NODEKIND(Identifier)
+NODEKIND(Dimension)
+NODEKIND(Attr)
+NODEKIND(PrimType)
+
+NODEKIND(VarList)
+NODEKIND(Literal)
+NODEKIND(UnaOperator)
+NODEKIND(BinOperator)
+NODEKIND(TerOperator)
+
+NODEKIND(Block)
+NODEKIND(Function)
+NODEKIND(Class)
+NODEKIND(Interface)
+
+// These two are first coming from Java language. Annotation has no meaning
+// for execution, but has meanings for compiler or runtime.
+// AnnotationType : The definition of a type of annotation
+// Annotation     : The usage of an annotation type
+NODEKIND(AnnotationType)
+NODEKIND(Annotation)
+
+NODEKIND(Exception)
+
+// These are statement nodes, or control flow related nodes. They are
+// common in most languages.
+NODEKIND(Return)
+NODEKIND(CondBranch)
+NODEKIND(Break)
+NODEKIND(ForLoop)
+
+NODEKIND(Pass)
