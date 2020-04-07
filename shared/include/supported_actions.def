@@ -77,6 +77,13 @@ ACTION(AddLabel)
 ACTION(BuildBreak)
 ACTION(BuildForLoop)
 
+ACTION(BuildSwitchLabel)
+ACTION(BuildDefaultSwitchLabel)
+ACTION(BuildOneCase)
+ACTION(BuildAllCases)
+ACTION(BuildSwitch)
+
+
 // Exceptions, Throws
 ACTION(BuildThrows)
 ACTION(AddThrowsTo)

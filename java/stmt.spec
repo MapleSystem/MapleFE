@@ -109,16 +109,22 @@ rule AssertStatement : ONEOF(
   "assert" + Expression + ':' + Expression + ';')
 
 rule SwitchStatement : "switch" + '(' + Expression + ')' + SwitchBlock
+  attr.action : BuildSwitch(%3, %5)
 
 rule SwitchBlock : '{' + ZEROORMORE(ZEROORMORE(SwitchBlockStatementGroup) + ZEROORMORE(SwitchLabel)) + '}'
+  attr.action : BuildAllCases(%2)
 
 rule SwitchBlockStatementGroup : SwitchLabels + BlockStatements
+  attr.action : BuildOneCase(%1, %2)
 
 rule SwitchLabels : SwitchLabel + ZEROORMORE(SwitchLabel)
 
 rule SwitchLabel : ONEOF("case" + ConstantExpression + ':',
                          "case" + EnumConstantName + ':',
                          "default" + ':')
+  attr.action.%1,%2 : BuildSwitchLabel(%2)
+  attr.action.%3    : BuildDefaultSwitchLabel()
+
 
 rule EnumConstantName : Identifier
 

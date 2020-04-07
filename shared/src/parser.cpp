@@ -682,7 +682,11 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *appeal_parent)
         if (gSuccTokens[i] > mCurToken)
           mCurToken = gSuccTokens[i];
       }
-      MoveCurToken();
+
+      // In ZeroorXXX cases, it was successful and has SuccMatch. However,
+      // it could be a failure. In this case, we shouldn't move mCurToken.
+      if (gSuccTokensNum > 0)
+        MoveCurToken();
 
       if (mTraceTable)
         DumpExitTable(name, mIndentation, true, SuccWasSucc);

@@ -48,4 +48,8 @@ NODEKIND(CondBranch)
 NODEKIND(Break)
 NODEKIND(ForLoop)
 
+NODEKIND(SwitchLabel)
+NODEKIND(SwitchCase)
+NODEKIND(Switch)
+
 NODEKIND(Pass)

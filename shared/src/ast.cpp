@@ -449,6 +449,67 @@ void ForLoopNode::Dump(unsigned ind) {
     GetBody()->Dump(ind +2);
 }
 
+void SwitchLabelNode::Dump(unsigned ind) {
+}
+
+void SwitchCaseNode::AddLabel(TreeNode *t) {
+  std::list<TreeNode*> working_list;
+  working_list.push_back(t);
+  while (!working_list.empty()) {
+    TreeNode *t = working_list.front();
+    working_list.pop_front();
+    if (t->IsPass()) {
+      PassNode *labels = (PassNode*)t;
+      for (unsigned i = 0; i < labels->GetChildrenNum(); i++)
+        working_list.push_back(labels->GetChild(i));
+    } else {
+      MASSERT(t->IsSwitchLabel());
+      mLabels.PushBack(t);
+    }
+  }
+}
+
+void SwitchCaseNode::AddStmt(TreeNode *t) {
+  std::list<TreeNode*> working_list;
+  working_list.push_back(t);
+  while (!working_list.empty()) {
+    TreeNode *t = working_list.front();
+    working_list.pop_front();
+    if (t->IsPass()) {
+      PassNode *stmts = (PassNode*)t;
+      for (unsigned i = 0; i < stmts->GetChildrenNum(); i++)
+        working_list.push_back(stmts->GetChild(i));
+    } else {
+      mStmts.PushBack(t);
+    }
+  }
+}
+
+void SwitchCaseNode::Dump(unsigned ind) {
+}
+
+void SwitchNode::AddCase(TreeNode *tree) {
+  std::list<TreeNode*> working_list;
+  working_list.push_back(tree);
+  while (!working_list.empty()) {
+    TreeNode *t = working_list.front();
+    working_list.pop_front();
+    if (t->IsPass()) {
+      PassNode *cases = (PassNode*)t;
+      for (unsigned i = 0; i < cases->GetChildrenNum(); i++)
+        working_list.push_back(cases->GetChild(i));
+    } else {
+      MASSERT(t->IsSwitchCase());
+      mCases.PushBack(t);
+    }
+  }
+}
+
+void SwitchNode::Dump(unsigned ind) {
+  DumpIndentation(ind);
+  DUMP0("A switch");
+}
+
 //////////////////////////////////////////////////////////////////////////////////////
 //                          BlockNode
 //////////////////////////////////////////////////////////////////////////////////////

@@ -419,6 +419,113 @@ TreeNode* ASTBuilder::BuildForLoop() {
   return mLastTreeNode;
 }
 
+// BuildSwitchLabel takes one argument, the expression telling the value of label.
+TreeNode* ASTBuilder::BuildSwitchLabel() {
+  if (mTrace)
+    std::cout << "In BuildSwitchLabel " << std::endl;
+
+  SwitchLabelNode *label =
+    (SwitchLabelNode*)mTreePool->NewTreeNode(sizeof(SwitchLabelNode));
+  new (label) SwitchLabelNode();
+
+  MASSERT(mParams.size() == 1 && "BuildSwitchLabel has NO 1 params?");
+  Param p_value = mParams[0];
+  MASSERT(!p_value.mIsEmpty);
+  MASSERT(p_value.mIsTreeNode && "Label in BuildSwitchLabel is not a tree.");
+
+  TreeNode *value = p_value.mData.mTreeNode;
+  label->SetValue(value);
+
+  mLastTreeNode = label;
+  return label;
+}
+
+// BuildDefaultSwitchLabel takes NO argument.
+TreeNode* ASTBuilder::BuildDefaultSwitchLabel() {
+  if (mTrace)
+    std::cout << "In BuildDefaultSwitchLabel " << std::endl;
+  SwitchLabelNode *label =
+    (SwitchLabelNode*)mTreePool->NewTreeNode(sizeof(SwitchLabelNode));
+  new (label) SwitchLabelNode();
+  label->SetIsDefault(true);
+  mLastTreeNode = label;
+  return label;
+}
+
+// BuildOneCase takes two arguments, the expression of a label and a
+// and the statements under the label. Both the label and the statements
+// could be a PassNode, and I need look into it. We don't want to carry
+// PassNode into the SwitchCaseNode.
+
+TreeNode* ASTBuilder::BuildOneCase() {
+  if (mTrace)
+    std::cout << "In BuildOneCase " << std::endl;
+
+  SwitchCaseNode *case_node =
+    (SwitchCaseNode*)mTreePool->NewTreeNode(sizeof(SwitchCaseNode));
+  new (case_node) SwitchCaseNode();
+
+  MASSERT(mParams.size() == 2 && "BuildOneCase has NO 1 params?");
+
+  Param p_label = mParams[0];
+  MASSERT(!p_label.mIsEmpty);
+  MASSERT(p_label.mIsTreeNode && "Labels in BuildOneCase is not a tree.");
+  TreeNode *label = p_label.mData.mTreeNode;
+  case_node->AddLabel(label);
+
+  Param p_stmt = mParams[1];
+  MASSERT(!p_stmt.mIsEmpty);
+  MASSERT(p_stmt.mIsTreeNode && "Stmts in BuildOneCase is not a tree.");
+  TreeNode *stmt = p_stmt.mData.mTreeNode;
+  case_node->AddStmt(stmt);
+
+  mLastTreeNode = case_node;
+  return case_node;
+}
+
+// This takes one argument, which is all SwitchCaseNode-s. It could be
+// a PassNode. We don't handle it at all. We simply forward this tree node
+// up to the parent, which should be final Switch Node.
+TreeNode* ASTBuilder::BuildAllCases() {
+  if (mTrace)
+    std::cout << "In BuildAllCases " << std::endl;
+
+  MASSERT(mParams.size() == 1 && "BuildAllCases has NO 1 params?");
+  Param p_cases = mParams[0];
+  MASSERT(!p_cases.mIsEmpty);
+  MASSERT(p_cases.mIsTreeNode && "Cases in BuildAllCases is not a tree.");
+  TreeNode *cases = p_cases.mData.mTreeNode;
+
+  mLastTreeNode = cases;
+  return cases;
+}
+
+TreeNode* ASTBuilder::BuildSwitch() {
+  if (mTrace)
+    std::cout << "In BuildSwitch " << std::endl;
+
+  SwitchNode *switch_node =
+    (SwitchNode*)mTreePool->NewTreeNode(sizeof(SwitchNode));
+  new (switch_node) SwitchNode();
+
+  MASSERT(mParams.size() == 2 && "BuildSwitch has NO 1 params?");
+
+  Param p_cond = mParams[0];
+  MASSERT(!p_cond.mIsEmpty);
+  MASSERT(p_cond.mIsTreeNode && "Condition in BuildSwitch is not a tree.");
+  TreeNode *cond = p_cond.mData.mTreeNode;
+  switch_node->SetCond(cond);
+
+  Param p_cases = mParams[1];
+  MASSERT(!p_cases.mIsEmpty);
+  MASSERT(p_cases.mIsTreeNode && "Cases in BuildSwitch is not a tree.");
+  TreeNode *cases = p_cases.mData.mTreeNode;
+  switch_node->AddCase(cases);
+
+  mLastTreeNode = switch_node;
+  return switch_node;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Issues in building declarations.
 // 1) First we are going to create an IdentifierNode, which should be attached

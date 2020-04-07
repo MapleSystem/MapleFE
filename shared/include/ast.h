@@ -360,7 +360,7 @@ private:
   SmallVector<TreeNode *> mUpdate;
   TreeNode               *mBody;   // This could be a single statement, or a block node
 public:
-  ForLoopNode() {mCond = NULL; mBody = NULL;}
+  ForLoopNode() {mCond = NULL; mBody = NULL; mKind = NK_ForLoop;}
   ~ForLoopNode() {Release();}
 
   void AddInit(TreeNode *t)   {mInit.PushBack(t);}
@@ -376,6 +376,73 @@ public:
   TreeNode* GetBody() {return mBody;}
 
   void Release() {mInit.Release(); mUpdate.Release();}
+  void Dump(unsigned);
+};
+
+// The switch-case statement is divided into three components,
+// SwitchLabelNode  : The expression of each case. The reason it's called a label is
+//                    it is written as
+//                       case 123:
+//                    which looks like a label.
+// SwitchCaseNode   : SwitchLabelNode + the statements under this label
+// SwitchNode       : The main node of all.
+
+class SwitchLabelNode : public TreeNode {
+private:
+  bool      mIsDefault; // default lable
+  TreeNode *mValue;     // the constant expression
+public:
+  SwitchLabelNode() : mIsDefault(false), mValue(NULL) {mKind = NK_SwitchLabel;}
+  ~SwitchLabelNode(){}
+
+  void SetIsDefault(bool b) {mIsDefault = b;}
+  void SetValue(TreeNode *t){mValue = t;}
+  bool IsDefault()     {return mIsDefault;}
+  TreeNode* GetValue() {return mValue;}
+
+  void Dump(unsigned);
+};
+
+// One thing to note is about the mStmts. When creating this node, we should
+// dig into subtree and resolve all the PassNode and make sure every node
+// in mStmts and mLabels has semanteme. PassNode has no semanteme.
+class SwitchCaseNode : public TreeNode {
+private:
+  SmallVector<SwitchLabelNode*> mLabels;
+  SmallVector<TreeNode*>    mStmts;
+
+public:
+  SwitchCaseNode() {mKind = NK_SwitchCase;}
+  ~SwitchCaseNode() {Release();}
+
+  unsigned  GetLabelsNum()            {return mLabels.GetNum();}
+  TreeNode* GetLabelAtIndex(unsigned i) {return mLabels.ValueAtIndex(i);}
+  void      AddLabel(TreeNode*);
+
+  unsigned  GetStmtsNum()            {return mStmts.GetNum();}
+  TreeNode* GetStmtAtIndex(unsigned i) {return mStmts.ValueAtIndex(i);}
+  void      AddStmt(TreeNode*);
+
+  void Release() {mStmts.Release(); mLabels.Release();}
+  void Dump(unsigned);
+};
+
+class SwitchNode : public TreeNode {
+private:
+  TreeNode *mCond;
+  SmallVector<SwitchCaseNode*> mCases;
+public:
+  SwitchNode() : mCond(NULL) {mKind = NK_Switch;}
+  ~SwitchNode() {Release();}
+
+  TreeNode* GetCond() {return mCond;}
+  void SetCond(TreeNode *c) {mCond = c;}
+
+  unsigned  GetCasesNum() {return mCases.GetNum();}
+  TreeNode* GetCaseAtIndex(unsigned i) {return mCases.ValueAtIndex(i);}
+  void      AddCase(TreeNode *c);
+
+  void Release() {mCases.Release();}
   void Dump(unsigned);
 };
 
@@ -417,13 +484,11 @@ public:
   void     AddAttr(AttrId a)       {mAttrs.PushBack(a);}
   AttrId   AttrAtIndex(unsigned i) {return mAttrs.ValueAtIndex(i);}
 
-
   unsigned  GetChildrenNum()            {return mChildren.GetNum();}
   TreeNode* GetChildAtIndex(unsigned i) {return mChildren.ValueAtIndex(i);}
+  void      AddChild(TreeNode *c)       {mChildren.PushBack(c);}
 
-  void AddChild(TreeNode *c) {mChildren.PushBack(c);}
   void Release() {mChildren.Release();}
-
   void Dump(unsigned);
 };
 

@@ -76,6 +76,9 @@ all modules are as below.
   expression, 'update' could be a list of expression. 'body' could be a single statement
   or a block or empty.
 
+* BuildSwitchLabel
+  BuildForLoop(init, cond, update, body)
+
 * BuildDecl
   Format: BuildDecl(Type, Variable)
 

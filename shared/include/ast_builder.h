@@ -129,6 +129,12 @@ public:
   TreeNode* BuildBreak();
   TreeNode* BuildForLoop();
 
+  TreeNode* BuildSwitchLabel();
+  TreeNode* BuildDefaultSwitchLabel();
+  TreeNode* BuildOneCase();
+  TreeNode* BuildAllCases();
+  TreeNode* BuildSwitch();
+
   // Exception, throw
   TreeNode* BuildThrows();
   TreeNode* AddThrowsTo();
