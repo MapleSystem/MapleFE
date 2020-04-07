@@ -110,16 +110,15 @@ rule AssertStatement : ONEOF(
 
 rule SwitchStatement : "switch" + '(' + Expression + ')' + SwitchBlock
 
-rule SwitchBlock : ZEROORMORE(ZEROORMORE(SwitchBlockStatementGroup) + ZEROORMORE(SwitchLabel))
+rule SwitchBlock : '{' + ZEROORMORE(ZEROORMORE(SwitchBlockStatementGroup) + ZEROORMORE(SwitchLabel)) + '}'
 
 rule SwitchBlockStatementGroup : SwitchLabels + BlockStatements
 
 rule SwitchLabels : SwitchLabel + ZEROORMORE(SwitchLabel)
 
-rule SwitchLabel : ONEOF(
-  "case" + ConstantExpression + ':',
-  "case" + EnumConstantName + ':',
-  "default" + ':')
+rule SwitchLabel : ONEOF("case" + ConstantExpression + ':',
+                         "case" + EnumConstantName + ':',
+                         "default" + ':')
 
 rule EnumConstantName : Identifier
 
