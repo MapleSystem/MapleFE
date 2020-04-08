@@ -129,6 +129,7 @@ public:
   TreeNode* BuildBreak();
   TreeNode* BuildForLoop();
 
+  SwitchCaseNode* SwitchLabelToCase(SwitchLabelNode*);
   TreeNode* BuildSwitchLabel();
   TreeNode* BuildDefaultSwitchLabel();
   TreeNode* BuildOneCase();

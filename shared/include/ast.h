@@ -653,6 +653,7 @@ public:
 
   unsigned  GetChildrenNum() {return mChildren.GetNum();}
   TreeNode* GetChild(unsigned idx) {return mChildren.ValueAtIndex(idx);}
+  void SetChild(unsigned idx, TreeNode *t) {*(mChildren.RefAtIndex(idx)) = t;}
 
   void AddChild(TreeNode *c) {mChildren.PushBack(c);}
   void Release() {mChildren.Release();}
