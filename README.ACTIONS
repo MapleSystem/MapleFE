@@ -77,7 +77,25 @@ all modules are as below.
   or a block or empty.
 
 * BuildSwitchLabel
-  BuildForLoop(init, cond, update, body)
+  BuildSwitchLabel(const-expr)
+  The only argument is the expression of 'case'.
+
+* BuildDefaultSwitchLabel
+  Formate: BuildDefaultSwitchLabel()
+  It takes NO argument. This is to build 'default' label.
+
+* BuildOneCase
+  Formate : BuildOneCase(label, statement)
+  It takes two arguments. First is the tree node of label built by BuildSwitchLabel.
+  The second the statements under this label.
+
+* BuildAllCases
+  Formate : BuildAllCases(list-of-cases)
+  It builds the body of the switch statement. It includes all cases.
+  The only argument is the tree node of all-cases.
+
+* BuildSwitch
+  Formate : BuildSwitch(cond-expr, all-cases)
 
 * BuildDecl
   Format: BuildDecl(Type, Variable)
