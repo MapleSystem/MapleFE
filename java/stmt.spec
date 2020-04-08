@@ -129,10 +129,13 @@ rule SwitchLabel : ONEOF("case" + ConstantExpression + ':',
 rule EnumConstantName : Identifier
 
 rule WhileStatement : "while" + '(' + Expression + ')' + Statement
+  attr.action : BuildWhileLoop(%3, %5)
 
 rule WhileStatementNoShortIf : "while" + '(' + Expression + ')' + StatementNoShortIf
+  attr.action : BuildWhileLoop(%3, %5)
 
 rule DoStatement : "do" + Statement + "while" + '(' + Expression + ')' + ';'
+  attr.action : BuildDoLoop(%5, %2)
 
 rule ForStatement : ONEOF(
   BasicForStatement,

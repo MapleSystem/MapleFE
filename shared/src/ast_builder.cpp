@@ -419,6 +419,60 @@ TreeNode* ASTBuilder::BuildForLoop() {
   return mLastTreeNode;
 }
 
+TreeNode* ASTBuilder::BuildWhileLoop() {
+  if (mTrace)
+    std::cout << "In BuildWhileLoop " << std::endl;
+
+  WhileLoopNode *while_loop = (WhileLoopNode*)mTreePool->NewTreeNode(sizeof(WhileLoopNode));
+  new (while_loop) WhileLoopNode();
+
+  MASSERT(mParams.size() == 2 && "BuildWhileLoop has NO 2 params?");
+
+  Param p_cond = mParams[0];
+  if (!p_cond.mIsEmpty) {
+    MASSERT(p_cond.mIsTreeNode && "WhileLoop condition is not a treenode.");
+    TreeNode *cond = p_cond.mData.mTreeNode;
+    while_loop->SetCond(cond);
+  }
+
+  Param p_body = mParams[1];
+  if (!p_body.mIsEmpty) {
+    MASSERT(p_body.mIsTreeNode && "WhileLoop body is not a treenode.");
+    TreeNode *body = p_body.mData.mTreeNode;
+    while_loop->SetBody(body);
+  }
+
+  mLastTreeNode = while_loop;
+  return mLastTreeNode;
+}
+
+TreeNode* ASTBuilder::BuildDoLoop() {
+  if (mTrace)
+    std::cout << "In BuildDoLoop " << std::endl;
+
+  DoLoopNode *do_loop = (DoLoopNode*)mTreePool->NewTreeNode(sizeof(DoLoopNode));
+  new (do_loop) DoLoopNode();
+
+  MASSERT(mParams.size() == 2 && "BuildDoLoop has NO 2 params?");
+
+  Param p_cond = mParams[0];
+  if (!p_cond.mIsEmpty) {
+    MASSERT(p_cond.mIsTreeNode && "DoLoop condition is not a treenode.");
+    TreeNode *cond = p_cond.mData.mTreeNode;
+    do_loop->SetCond(cond);
+  }
+
+  Param p_body = mParams[1];
+  if (!p_body.mIsEmpty) {
+    MASSERT(p_body.mIsTreeNode && "DoLoop body is not a treenode.");
+    TreeNode *body = p_body.mData.mTreeNode;
+    do_loop->SetBody(body);
+  }
+
+  mLastTreeNode = do_loop;
+  return mLastTreeNode;
+}
+
 // BuildSwitchLabel takes one argument, the expression telling the value of label.
 TreeNode* ASTBuilder::BuildSwitchLabel() {
   if (mTrace)

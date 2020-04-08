@@ -128,6 +128,8 @@ public:
   TreeNode* AddLabel();
   TreeNode* BuildBreak();
   TreeNode* BuildForLoop();
+  TreeNode* BuildWhileLoop();
+  TreeNode* BuildDoLoop();
 
   SwitchCaseNode* SwitchLabelToCase(SwitchLabelNode*);
   TreeNode* BuildSwitchLabel();

@@ -449,6 +449,25 @@ void ForLoopNode::Dump(unsigned ind) {
     GetBody()->Dump(ind +2);
 }
 
+void WhileLoopNode::Dump(unsigned ind) {
+  DumpIndentation(ind);
+  DUMP0_NORETURN("while ");
+  if (mCond)
+    mCond->Dump(0);
+  if (GetBody())
+    GetBody()->Dump(ind +2);
+}
+
+void DoLoopNode::Dump(unsigned ind) {
+  DumpIndentation(ind);
+  DUMP0_NORETURN("do ");
+  if (GetBody())
+    GetBody()->Dump(ind +2);
+  DUMP0_NORETURN("while ");
+  if (mCond)
+    mCond->Dump(0);
+}
+
 void SwitchLabelNode::Dump(unsigned ind) {
 }
 

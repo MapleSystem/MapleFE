@@ -76,26 +76,32 @@ all modules are as below.
   expression, 'update' could be a list of expression. 'body' could be a single statement
   or a block or empty.
 
+* BuildWhileLoop
+  Format : BuildWhileLoop(cond, body)
+
+* BuildDoLoop
+  Format : BuildDoLoop(cond, body)
+
 * BuildSwitchLabel
   BuildSwitchLabel(const-expr)
   The only argument is the expression of 'case'.
 
 * BuildDefaultSwitchLabel
-  Formate: BuildDefaultSwitchLabel()
+  Format: BuildDefaultSwitchLabel()
   It takes NO argument. This is to build 'default' label.
 
 * BuildOneCase
-  Formate : BuildOneCase(label, statement)
+  Format : BuildOneCase(label, statement)
   It takes two arguments. First is the tree node of label built by BuildSwitchLabel.
   The second the statements under this label.
 
 * BuildAllCases
-  Formate : BuildAllCases(list-of-cases)
+  Format : BuildAllCases(list-of-cases)
   It builds the body of the switch statement. It includes all cases.
   The only argument is the tree node of all-cases.
 
 * BuildSwitch
-  Formate : BuildSwitch(cond-expr, all-cases)
+  Format : BuildSwitch(cond-expr, all-cases)
 
 * BuildDecl
   Format: BuildDecl(Type, Variable)

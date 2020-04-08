@@ -47,6 +47,8 @@ NODEKIND(Return)
 NODEKIND(CondBranch)
 NODEKIND(Break)
 NODEKIND(ForLoop)
+NODEKIND(WhileLoop)
+NODEKIND(DoLoop)
 
 NODEKIND(SwitchLabel)
 NODEKIND(SwitchCase)

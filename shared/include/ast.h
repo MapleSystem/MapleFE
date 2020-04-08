@@ -379,6 +379,40 @@ public:
   void Dump(unsigned);
 };
 
+class WhileLoopNode : public TreeNode {
+private:
+  TreeNode *mCond;
+  TreeNode *mBody; // This could be a single statement, or a block node
+public:
+  WhileLoopNode() {mCond = NULL; mBody = NULL; mKind = NK_WhileLoop;}
+  ~WhileLoopNode() {Release();}
+
+  void SetCond(TreeNode *t) {mCond = t;}
+  void SetBody(TreeNode *t) {mBody = t;}
+  TreeNode* GetCond()       {return mCond;}
+  TreeNode* GetBody()       {return mBody;}
+
+  void Release(){}
+  void Dump(unsigned);
+};
+
+class DoLoopNode : public TreeNode {
+private:
+  TreeNode *mCond;
+  TreeNode *mBody; // This could be a single statement, or a block node
+public:
+  DoLoopNode() {mCond = NULL; mBody = NULL; mKind = NK_DoLoop;}
+  ~DoLoopNode(){Release();}
+
+  void SetCond(TreeNode *t) {mCond = t;}
+  void SetBody(TreeNode *t) {mBody = t;}
+  TreeNode* GetCond()       {return mCond;}
+  TreeNode* GetBody()       {return mBody;}
+
+  void Release(){}
+  void Dump(unsigned);
+};
+
 // The switch-case statement is divided into three components,
 // SwitchLabelNode  : The expression of each case. The reason it's called a label is
 //                    it is written as

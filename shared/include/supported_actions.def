@@ -76,6 +76,8 @@ ACTION(AddCondBranchFalseStatement)
 ACTION(AddLabel)
 ACTION(BuildBreak)
 ACTION(BuildForLoop)
+ACTION(BuildWhileLoop)
+ACTION(BuildDoLoop)
 
 ACTION(BuildSwitchLabel)
 ACTION(BuildDefaultSwitchLabel)
