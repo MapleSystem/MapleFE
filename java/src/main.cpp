@@ -17,6 +17,7 @@
 #include "common_header_autogen.h"
 #include "ruletable_util.h"
 #include "gen_debug.h"
+#include "vfy.h"
 
 static void help() {
   std::cout << "java2mpl <arguments>:\n" << std::endl;
@@ -68,6 +69,11 @@ int main (int argc, char *argv[]) {
   parser->mLexer->PlantTokens();
   parser->SetupTopTables();
   parser->Parse();
+
+  Verifier V;
+  V.Do();
+
   delete parser;
+
   return 0;
 }

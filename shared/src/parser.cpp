@@ -252,7 +252,7 @@ Parser::Parser(const char *name) : filename(name) {
   mLexer = new Lexer();
   const std::string file(name);
 
-  mModule.SetFileName(name);
+  gModule.SetFileName(name);
   mLexer->PrepareForFile(file);
   mCurToken = 0;
   mPending = 0;
@@ -404,8 +404,8 @@ bool Parser::Parse() {
     if (!succ)
       break;
   }
-  mModule.Organize();
-  mModule.Dump();
+  gModule.Organize();
+  gModule.Dump();
 
   return succ;
 }
@@ -556,7 +556,7 @@ bool Parser::ParseStmt() {
     SimplifySortedTree();
     ASTTree *tree = BuildAST();
     if (tree) {
-      mModule.AddTree(tree);
+      gModule.AddTree(tree);
     }
   }
 

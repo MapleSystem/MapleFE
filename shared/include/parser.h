@@ -184,7 +184,6 @@ class Parser {
 public:
   Lexer *mLexer;
   const char *filename;
-  ASTModule mModule;     // A source file has a module
 
   // debug info
   unsigned mIndentation;    //

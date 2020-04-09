@@ -16,6 +16,8 @@
 #include "ast_module.h"
 #include "ast.h"
 
+ASTModule gModule;
+
 ASTModule::ASTModule() {
   mRootScope = mScopePool.NewScope(NULL);
 }
