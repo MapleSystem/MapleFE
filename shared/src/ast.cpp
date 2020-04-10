@@ -180,7 +180,7 @@ TreeNode* ASTTree::NewTreeNode(AppealNode *appeal_node, std::map<AppealNode*, Tr
     TreeNode *child_a = child_trees[0];
     TreeNode *child_b = child_trees[1];
     if (child_b->IsUnaOperator()) {
-      UnaryOperatorNode *unary = (UnaryOperatorNode*)child_b;
+      UnaOperatorNode *unary = (UnaOperatorNode*)child_b;
       unsigned property = GetOperatorProperty(unary->GetOprId());
       if ((property & Binary) && (property & Unary)) {
         std::cout << "Convert unary --> binary" << std::endl;
@@ -212,8 +212,8 @@ void ASTTree::Dump(unsigned indent) {
 }
 
 TreeNode* ASTTree::BuildBinaryOperation(TreeNode *childA, TreeNode *childB, OprId id) {
-  BinaryOperatorNode *n = (BinaryOperatorNode*)mTreePool.NewTreeNode(sizeof(BinaryOperatorNode));
-  new (n) BinaryOperatorNode(id);
+  BinOperatorNode *n = (BinOperatorNode*)mTreePool.NewTreeNode(sizeof(BinOperatorNode));
+  new (n) BinOperatorNode(id);
   n->mOpndA = childA;
   n->mOpndB = childB;
   childA->SetParent(n);
@@ -250,10 +250,10 @@ void TreeNode::DumpIndentation(unsigned ind) {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
-//                          BinaryOperatorNode
+//                          BinOperatorNode
 //////////////////////////////////////////////////////////////////////////////////////
 
-void BinaryOperatorNode::Dump(unsigned indent) {
+void BinOperatorNode::Dump(unsigned indent) {
   const char *name = GetOperatorName(mOprId);
   DumpIndentation(indent);
   DUMP0(name);
@@ -264,10 +264,10 @@ void BinaryOperatorNode::Dump(unsigned indent) {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
-//                           UnaryOperatorNode
+//                           UnaOperatorNode
 //////////////////////////////////////////////////////////////////////////////////////
 
-void UnaryOperatorNode::Dump(unsigned indent) {
+void UnaOperatorNode::Dump(unsigned indent) {
   const char *name = GetOperatorName(mOprId);
   DumpIndentation(indent);
   if (IsPost()) {

@@ -165,8 +165,8 @@ TreeNode* ASTBuilder::BuildUnaryOperation() {
   MASSERT(token->IsOperator() && "First param of Unary Operator is not an operator token?");
 
   // create the sub tree
-  UnaryOperatorNode *n = (UnaryOperatorNode*)mTreePool->NewTreeNode(sizeof(UnaryOperatorNode));
-  new (n) UnaryOperatorNode(((OperatorToken*)token)->mOprId);
+  UnaOperatorNode *n = (UnaOperatorNode*)mTreePool->NewTreeNode(sizeof(UnaOperatorNode));
+  new (n) UnaOperatorNode(((OperatorToken*)token)->mOprId);
 
   // set 1st param
   if (p_b.mIsTreeNode)
@@ -185,7 +185,7 @@ TreeNode* ASTBuilder::BuildUnaryOperation() {
 TreeNode* ASTBuilder::BuildPostfixOperation() {
   if (mTrace)
     std::cout << "In BuildPostfixOperation" << std::endl;
-  UnaryOperatorNode * t = (UnaryOperatorNode*)BuildUnaryOperation();
+  UnaOperatorNode * t = (UnaOperatorNode*)BuildUnaryOperation();
   t->SetIsPost(true);
   mLastTreeNode = t;
   return t;
@@ -206,8 +206,8 @@ TreeNode* ASTBuilder::BuildBinaryOperation() {
   MASSERT(token->IsOperator() && "Second param of Binary Operator is not an operator token?");
 
   // create the sub tree
-  BinaryOperatorNode *n = (BinaryOperatorNode*)mTreePool->NewTreeNode(sizeof(BinaryOperatorNode));
-  new (n) BinaryOperatorNode(((OperatorToken*)token)->mOprId);
+  BinOperatorNode *n = (BinOperatorNode*)mTreePool->NewTreeNode(sizeof(BinOperatorNode));
+  new (n) BinOperatorNode(((OperatorToken*)token)->mOprId);
   mLastTreeNode = n;
 
   // set 1st param

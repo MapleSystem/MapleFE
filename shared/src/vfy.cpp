@@ -43,6 +43,11 @@ void Verifier::Do() {
 // Each time when we enter a new scope, we need handle possible local
 // variable declarations or type declaration. So it's different than
 // VerifyTree().
+//
+// If you have a sharp eye, you can tell the Decl list of the scope is
+// built progressively with verification of sub trees. This means
+// only Decl-s before a subtree can be seen by it, which is reasonable
+// for most languages.
 
 void Verifier::VerifyScope(ASTScope *scope) {
   mCurrScope = scope;
@@ -69,80 +74,83 @@ void Verifier::VerifyTree(TreeNode *tree) {
 #include "ast_nk.def"
 }
 
-void Verifier::VerifyIdentifier(TreeNode *tree) {
+// It looks into the Decl's of this scope and its ancestors' scopes,
+// to find a decl with the same name.
+void Verifier::VerifyIdentifier(IdentifierNode *tree) {
+  
 }
 
-void Verifier::VerifyDimension(TreeNode *tree){
+void Verifier::VerifyDimension(DimensionNode *tree){
 }
 
-void Verifier::VerifyAttr(TreeNode *tree){
+void Verifier::VerifyAttr(AttrNode *tree){
 }
 
-void Verifier::VerifyPrimType(TreeNode *tree){
+void Verifier::VerifyPrimType(PrimTypeNode *tree){
 }
 
-void Verifier::VerifyVarList(TreeNode *tree){
+void Verifier::VerifyVarList(VarListNode *tree){
 }
 
-void Verifier::VerifyLiteral(TreeNode *tree){
+void Verifier::VerifyLiteral(LiteralNode *tree){
 }
 
-void Verifier::VerifyUnaOperator(TreeNode *tree){
+void Verifier::VerifyUnaOperator(UnaOperatorNode *tree){
 }
 
-void Verifier::VerifyBinOperator(TreeNode *tree){
+void Verifier::VerifyBinOperator(BinOperatorNode *tree){
 }
 
-void Verifier::VerifyTerOperator(TreeNode *tree){
+void Verifier::VerifyTerOperator(TerOperatorNode *tree){
 }
 
-void Verifier::VerifyBlock(TreeNode *tree){
+void Verifier::VerifyBlock(BlockNode *tree){
 }
 
-void Verifier::VerifyFunction(TreeNode *tree){
+void Verifier::VerifyFunction(FunctionNode *tree){
 }
 
-void Verifier::VerifyClass(TreeNode *tree){
+void Verifier::VerifyClass(ClassNode *tree){
 }
 
-void Verifier::VerifyInterface(TreeNode *tree){
+void Verifier::VerifyInterface(InterfaceNode *tree){
 }
 
-void Verifier::VerifyAnnotationType(TreeNode *tree){
+void Verifier::VerifyAnnotationType(AnnotationTypeNode *tree){
 }
 
-void Verifier::VerifyAnnotation(TreeNode *tree){
+void Verifier::VerifyAnnotation(AnnotationNode *tree){
 }
 
-void Verifier::VerifyException(TreeNode *tree){
+void Verifier::VerifyException(ExceptionNode *tree){
 }
 
-void Verifier::VerifyReturn(TreeNode *tree){
+void Verifier::VerifyReturn(ReturnNode *tree){
 }
 
-void Verifier::VerifyCondBranch(TreeNode *tree){
+void Verifier::VerifyCondBranch(CondBranchNode *tree){
 }
 
-void Verifier::VerifyBreak(TreeNode *tree){
+void Verifier::VerifyBreak(BreakNode *tree){
 }
 
-void Verifier::VerifyForLoop(TreeNode *tree){
+void Verifier::VerifyForLoop(ForLoopNode *tree){
 }
 
-void Verifier::VerifyWhileLoop(TreeNode *tree){
+void Verifier::VerifyWhileLoop(WhileLoopNode *tree){
 }
 
-void Verifier::VerifyDoLoop(TreeNode *tree){
+void Verifier::VerifyDoLoop(DoLoopNode *tree){
 }
 
-void Verifier::VerifySwitchLabel(TreeNode *tree){
+void Verifier::VerifySwitchLabel(SwitchLabelNode *tree){
 }
 
-void Verifier::VerifySwitchCase(TreeNode *tree){
+void Verifier::VerifySwitchCase(SwitchCaseNode *tree){
 }
 
-void Verifier::VerifySwitch(TreeNode *tree){
+void Verifier::VerifySwitch(SwitchNode *tree){
 }
 
-void Verifier::VerifyPass(TreeNode *tree){
+void Verifier::VerifyPass(PassNode *tree){
 }

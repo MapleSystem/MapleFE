@@ -38,6 +38,10 @@
 #ifndef __VFY_HEADER__
 #define __VFY_HEADER__
 
+#include "ast.h"
+#include "ast_attr.h"
+#include "ast_type.h"
+
 class ASTScope;
 class TreeNode;
 
@@ -56,7 +60,7 @@ public:
 
   // Verify of each type of node
 #undef  NODEKIND
-#define NODEKIND(K) virtual void Verify##K(TreeNode*);
+#define NODEKIND(K) virtual void Verify##K(K##Node*);
 #include "ast_nk.def"
 
 };

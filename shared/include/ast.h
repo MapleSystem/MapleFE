@@ -115,16 +115,16 @@ struct OperatorDesc {
 extern OperatorDesc gOperatorDesc[OPR_NA];
 extern unsigned GetOperatorProperty(OprId);
 
-class UnaryOperatorNode : public TreeNode {
+class UnaOperatorNode : public TreeNode {
 private:
   bool      mIsPost;  // if it's a postfix operation?
   OprId     mOprId;
   TreeNode *mOpnd;
 public:
-  UnaryOperatorNode(OprId id) : mOprId(id), mOpnd(NULL), mIsPost(false)
+  UnaOperatorNode(OprId id) : mOprId(id), mOpnd(NULL), mIsPost(false)
     {mKind = NK_UnaOperator;}
-  UnaryOperatorNode() : mOpnd(NULL), mIsPost(false) {mKind = NK_UnaOperator;}
-  ~UnaryOperatorNode() {}
+  UnaOperatorNode() : mOpnd(NULL), mIsPost(false) {mKind = NK_UnaOperator;}
+  ~UnaOperatorNode() {}
 
   void SetIsPost(bool b)    {mIsPost = b;}
   void SetOpnd(TreeNode* t) {mOpnd = t;}
@@ -137,29 +137,29 @@ public:
   void Dump(unsigned);
 };
 
-class BinaryOperatorNode : public TreeNode {
+class BinOperatorNode : public TreeNode {
 public:
   OprId     mOprId;
   TreeNode *mOpndA;
   TreeNode *mOpndB;
 public:
-  BinaryOperatorNode(OprId id) : mOprId(id) {mKind = NK_BinOperator;}
-  BinaryOperatorNode() {mKind = NK_BinOperator;}
-  ~BinaryOperatorNode() {}
+  BinOperatorNode(OprId id) : mOprId(id) {mKind = NK_BinOperator;}
+  BinOperatorNode() {mKind = NK_BinOperator;}
+  ~BinOperatorNode() {}
 
   void Dump(unsigned);
 };
 
-class TernaryOperatorNode : public TreeNode {
+class TerOperatorNode : public TreeNode {
 public:
   OprId     mOprId;
   TreeNode *mOpndA;
   TreeNode *mOpndB;
   TreeNode *mOpndC;
 public:
-  TernaryOperatorNode(OprId id) : mOprId(id) {mKind = NK_TerOperator;}
-  TernaryOperatorNode() {mKind = NK_TerOperator;}
-  ~TernaryOperatorNode() {}
+  TerOperatorNode(OprId id) : mOprId(id) {mKind = NK_TerOperator;}
+  TerOperatorNode() {mKind = NK_TerOperator;}
+  ~TerOperatorNode() {}
 
   void Dump(unsigned);
 };
