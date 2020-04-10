@@ -17,7 +17,7 @@
 #include "common_header_autogen.h"
 #include "ruletable_util.h"
 #include "gen_debug.h"
-#include "vfy.h"
+#include "vfy_java.h"
 
 static void help() {
   std::cout << "java2mpl <arguments>:\n" << std::endl;
@@ -70,8 +70,8 @@ int main (int argc, char *argv[]) {
   parser->SetupTopTables();
   parser->Parse();
 
-  Verifier V;
-  V.Do();
+  VerifierJava VJ;
+  VJ.Do();
 
   delete parser;
 

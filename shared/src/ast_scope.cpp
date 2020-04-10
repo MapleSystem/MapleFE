@@ -32,15 +32,24 @@ void ASTScope::AddChild(ASTScope *s) {
 }
 
 // If it's a local declaration, add it to mDecls.
+// This is a general common implementaiton, it assumes
+// the correct declaration is IdentifierNode with type.
+// So, following is not a decl,
+//     a;
+// It's legal in c/c++ as an expression statement, but not a
+// legal decl.
+
 void ASTScope::TryAddDecl(TreeNode *tree) {
   if (tree->IsIdentifier()) {
     IdentifierNode *inode = (IdentifierNode*)tree;
-    mDecls.PushBack(inode);
+    if (inode->GetType())
+      mDecls.PushBack(inode);
   } else if (tree->IsVarList()) {
     VarListNode *vl = (VarListNode*)tree;
     for (unsigned i = 0; i < vl->GetNum(); i++) {
       IdentifierNode *inode = vl->VarAtIndex(i);
-      mDecls.PushBack(inode);
+      if (inode->GetType())
+        mDecls.PushBack(inode);
     }
   }
 }

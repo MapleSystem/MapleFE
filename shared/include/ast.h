@@ -79,7 +79,7 @@ public:
 #define NODEKIND(K) bool Is##K() {return mKind == NK_##K;}
 #include "ast_nk.def"
 
-  bool IsScope()      {return IsBlock() || IsFunction();}
+  bool IsScope() {return IsBlock();}
 
   void SetParent(TreeNode *p) {mParent = p;}
   void SetLabel (TreeNode *p) {mLabel = p;}
@@ -217,7 +217,6 @@ public:
 class IdentifierNode : public TreeNode {
 private:
   SmallVector<AttrId> mAttrs;
-public:
   const char    *mName; // In the lexer's StringPool
   TreeNode      *mType; // PrimTypeNode, or IdentifierNode
   TreeNode      *mInit; // Init value
@@ -228,7 +227,9 @@ public:
   IdentifierNode(const char *s, TreeNode *t) : mName(s), mType(t) {mKind = NK_Identifier;}
   ~IdentifierNode(){}
 
-  const char* GetName()     {return mName;}
+  const char* GetName() {return mName;}
+  TreeNode*   GetType() {return mType;}
+  TreeNode*   GetInit() {return mInit;}
 
   void SetType(TreeNode *t)      {mType = t;}
   void SetInit(TreeNode *t)      {mInit = t;}

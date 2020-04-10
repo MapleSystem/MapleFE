@@ -51,8 +51,14 @@ public:
 
   void Do();
 
-  virtual void Verify(ASTScope*);
-  virtual void Verify(TreeNode*);
+  virtual void VerifyScope(ASTScope*);
+  virtual void VerifyTree(TreeNode*);
+
+  // Verify of each type of node
+#undef  NODEKIND
+#define NODEKIND(K) virtual void Verify##K(TreeNode*);
+#include "ast_nk.def"
+
 };
 
 #endif
