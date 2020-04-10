@@ -594,10 +594,11 @@ public:
 
 class InterfaceNode : public TreeNode {
 public:
-  IdentifierNode           *mName;
+  IdentifierNode *mName;
 public:
   InterfaceNode() {mKind = NK_Interface;}
   ~InterfaceNode() {}
+
   void Dump();
 };
 

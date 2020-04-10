@@ -33,35 +33,21 @@ ASTModule::~ASTModule() {
   mTrees.clear();
 }
 
-// After parsing is done, we need re-org the trees in the module. Some trees
-// are global declaration of variables, functions, and we want to put them into
-// the global scope.
-void ASTModule::Organize() {
+// This does the following jobs.
+// 1. Add the top trees in module to the scope, since verfication is
+//    done on each sub tree.
+
+void ASTModule::PreVerify() {
   std::vector<ASTTree*>::iterator tree_it = mTrees.begin();
   for (; tree_it != mTrees.end(); tree_it++) {
     ASTTree *tree = *tree_it;
     TreeNode *root = tree->mRootNode;
-    if (root->IsIdentifier() || root->IsVarList())
-      mRootScope->mDecls.push_back(root);
+    mRootScope->AddTree(root);
   }
 }
 
 void ASTModule::Dump() {
   std::cout << "============= Module ===========" << std::endl;
-
-  // step 1. Dump global decls.
-  std::cout << "[Global Decls]" << std::endl;
-  std::vector<TreeNode*>::iterator it = mRootScope->mDecls.begin();
-  for (; it != mRootScope->mDecls.end(); it++) {
-    TreeNode *n = *it;
-    MASSERT((n->IsIdentifier() || n->IsVarList())
-            && "Decl is not an IdentifierNode or VarListNode.");
-    n->Dump(0);
-  }
-
-  std::cout << std::endl;
-
-  // step 2. Dump the top trees.
   std::vector<ASTTree*>::iterator tree_it = mTrees.begin();
   for (; tree_it != mTrees.end(); tree_it++) {
     ASTTree *tree = *tree_it;

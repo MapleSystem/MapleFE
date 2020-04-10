@@ -359,8 +359,6 @@ class  Global
   LocalInterfaces: 
 
 ============= Module ===========
-[Global Decls]
-
 == Sub Tree ==
 class  Global
   Members: 

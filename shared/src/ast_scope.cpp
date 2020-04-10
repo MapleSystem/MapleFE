@@ -21,14 +21,50 @@ ASTScope::ASTScope(ASTScope *parent) {
 }
 
 void ASTScope::AddChild(ASTScope *s) {
-  std::vector<ASTScope*>::iterator it = mChildren.begin();
-  for (; it != mChildren.end(); it++) {
-    if (*it == s)
+  for (unsigned i = 0; i < mChildren.GetNum(); i++) {
+    ASTScope *scope = mChildren.ValueAtIndex(i);
+    if (s == scope)
       return;
   }
 
-  mChildren.push_back(s);
+  mChildren.PushBack(s);
   s->SetParent(this);
+}
+
+// If it's a local declaration, add it to mDecls.
+void ASTScope::TryAddDecl(TreeNode *tree) {
+  if (tree->IsIdentifier()) {
+    IdentifierNode *inode = (IdentifierNode*)tree;
+    mDecls.PushBack(inode);
+  } else if (tree->IsVarList()) {
+    VarListNode *vl = (VarListNode*)tree;
+    for (unsigned i = 0; i < vl->GetNum(); i++) {
+      IdentifierNode *inode = vl->VarAtIndex(i);
+      mDecls.PushBack(inode);
+    }
+  }
+}
+
+// If it's a local type declaration, add it to mTypes.
+void ASTScope::TryAddType(TreeNode *tree) {
+  if (tree->IsClass()) {
+    LocalType lt = {TK_Class, tree};
+    mTypes.PushBack(lt);
+  } else if (tree->IsInterface()) {
+    LocalType lt = {TK_Interface, tree};
+    mTypes.PushBack(lt);
+  } else if (tree->IsFunction()) {
+    FunctionNode *func = (FunctionNode*)tree;
+    LocalType lt = {TK_Function, func};
+    mTypes.PushBack(lt);
+  }
+}
+
+void ASTScope::Release() {
+  mChildren.Release();
+  mTrees.Release();
+  mTypes.Release();
+  mDecls.Release();
 }
 
 ///////////////////////////////////////////////////////////////////

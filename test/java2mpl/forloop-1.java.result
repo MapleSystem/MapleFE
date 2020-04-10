@@ -236,8 +236,6 @@ class  A
   LocalInterfaces: 
 
 ============= Module ===========
-[Global Decls]
-
 == Sub Tree ==
 class  A
   Members: 

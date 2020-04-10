@@ -404,7 +404,7 @@ bool Parser::Parse() {
     if (!succ)
       break;
   }
-  gModule.Organize();
+
   gModule.Dump();
 
   return succ;

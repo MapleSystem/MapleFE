@@ -12,7 +12,9 @@
 * FIT FOR A PARTICULAR PURPOSE.
 * See the Mulan PSL v1 for more details.
 */
+
 // This file defines the complete set of primitive types supported in Autogen
+// and the parser.
 
 TYPE(Boolean)
 TYPE(Byte)

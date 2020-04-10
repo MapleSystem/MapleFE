@@ -20,6 +20,7 @@
 
 #include "ast.h"
 #include "mempool.h"
+#include "container.h"
 
 ////////////////////////////////////////////////////////////////////////////
 //                         AST Scope
@@ -28,22 +29,60 @@
 // scope which could contain the file level variables.
 ////////////////////////////////////////////////////////////////////////////
 
+// Local Types involved in the scope.
+enum TypeKind {
+  TK_Prim,
+  TK_Class,
+  TK_Interface,
+  TK_Function,
+  TK_Struct,
+  TK_Null
+};
+
+struct LocalType {
+  TypeKind  mTypeId;
+  TreeNode *mTree;
+};
+
 class ASTScope {
-public:
+private:
   ASTScope              *mParent;
-  std::vector<ASTScope*> mChildren;
-  TreeNode              *mTree;   // corresponding TreeNode
-  std::vector<TreeNode*> mDecls;  // Local Decls
+  SmallVector<ASTScope*> mChildren;
+  SmallVector<TreeNode*> mTrees;  // TreeNodes contained in this scope.
+  SmallVector<LocalType> mTypes;  // Local types. Could be primitive or
+                                  // user type include class, struct, etc.
+
+  // Local Variable Decls. We use IdentifierNode here. The type info is
+  // inside the IdentifierNode class.
+  SmallVector<IdentifierNode*> mDecls;
+
 public:
   ASTScope(){}
   ASTScope(ASTScope *p);
-  ~ASTScope() {}
+  ~ASTScope() {Release();}
 
   // It's the caller's duty to make sure p is not NULL
   void SetParent(ASTScope *p) {mParent = p; p->AddChild(this);}
 
-  void AddChild(ASTScope *s);
-  void AddDecl(TreeNode *n) {mDecls.push_back(n);}
+  void AddChild(ASTScope*);
+  void AddTree(TreeNode* t) {mTrees.PushBack(t);}
+
+  unsigned GetTreeNum() {return mTrees.GetNum();}
+  unsigned GetDeclNum() {return mDecls.GetNum();}
+  unsigned GetTypeNum() {return mTypes.GetNum();}
+  TreeNode*       GetTree(unsigned i) {return mTrees.ValueAtIndex(i);}
+  IdentifierNode* GetDecl(unsigned i) {return mDecls.ValueAtIndex(i);}
+  LocalType       GetType(unsigned i) {return mTypes.ValueAtIndex(i);}
+
+  // Each language could have different specification for declaration,
+  // types, or else. So we put them as virtual functions. So is the
+  // Release(). We provide the common implementation which most languages
+  // adopt.
+
+  virtual void TryAddDecl(TreeNode *n);
+  virtual void TryAddType(TreeNode *n);
+
+  virtual void Release();
 };
 
 ////////////////////////////////////////////////////////////////////////////

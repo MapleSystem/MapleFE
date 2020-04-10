@@ -18,23 +18,41 @@
 // which takes an ASTModule recently generated. At this point we have a complete
 // module with AST trees created by ASTBuilder.
 //
-// 1. The verification is a top-down traversal on the AST trees. 
-// 2. It contains two parts. One is verification, the other locating and reporting.
+// The verification is a top-down traversal on the AST trees. 
+//
+// It carries on more than one jobs.
+// Verification : Checks the validity of semanteme
+// Updating     : This is an additional work besides verification. The trees at
+//                this point are incomplete because a lot of information is missing
+//                and some tree nodes are temporary. For example, a variable was
+//                give a new IdentifierNode each time it appears. It doesn't point
+//                to the one which was declared before. So this type nodes need
+//                be updated.
+// Locating     : Locate where in source code is wrong.
+// Logging      : Record the verification result into a log.
+//
+// As each language has different semantic spec, most of the functions below
+// will be virtual, allowing to be overidden.
 /////////////////////////////////////////////////////////////////////////////////
 
 #ifndef __VFY_HEADER__
 #define __VFY_HEADER__
 
-class ASTModule;
+class ASTScope;
+class TreeNode;
 
 class Verifier {
 private:
+  ASTScope *mCurrScope;
 
 public:
   Verifier();
   ~Verifier();
 
   void Do();
+
+  virtual void Verify(ASTScope*);
+  virtual void Verify(TreeNode*);
 };
 
 #endif

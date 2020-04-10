@@ -839,8 +839,6 @@ class  ColoredPoint
   LocalInterfaces: 
 
 ============= Module ===========
-[Global Decls]
-
 == Sub Tree ==
 class  Point
   Members: 

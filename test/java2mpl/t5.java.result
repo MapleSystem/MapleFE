@@ -324,11 +324,6 @@ a=Add
   b
 
 ============= Module ===========
-[Global Decls]
-a=Add
-  a
-  b
-
 == Sub Tree ==
 Assign
   c

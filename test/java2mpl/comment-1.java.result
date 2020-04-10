@@ -161,8 +161,6 @@ class  Point
   LocalInterfaces: 
 
 ============= Module ===========
-[Global Decls]
-
 == Sub Tree ==
 class  Point
   Members: 
