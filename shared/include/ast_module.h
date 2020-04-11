@@ -43,7 +43,8 @@ public:
 
   void SetFileName(const char *f) {mFileName = f;}
   void AddTree(ASTTree* t) { mTrees.push_back(t); }
-  void PreVerify();
+
+  ASTScope* NewScope(ASTScope *p);
 
   void Dump();
 };

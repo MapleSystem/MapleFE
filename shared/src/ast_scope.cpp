@@ -16,6 +16,8 @@
 #include "ast_scope.h"
 
 ASTScope::ASTScope(ASTScope *parent) {
+  mParent = NULL;
+  mTree = NULL;
   if (parent)
     SetParent(parent);
 }
@@ -71,7 +73,6 @@ void ASTScope::TryAddType(TreeNode *tree) {
 
 void ASTScope::Release() {
   mChildren.Release();
-  mTrees.Release();
   mTypes.Release();
   mDecls.Release();
 }

@@ -103,6 +103,12 @@ public:
     }
     return false;
   }
+
+  // clear the data, but keep the memory, no free.
+  void Clear(){
+    mNum = 0;
+    mMemPool.Clear();
+  }
 };
 
 /////////////////////////////////////////////////////////////////////////

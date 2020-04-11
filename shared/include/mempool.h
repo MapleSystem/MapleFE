@@ -65,6 +65,7 @@ public:
   char* AllocBlock();
   char* Alloc(unsigned);
 
+  void  Clear();   // remove all data, but keep memory.
   void  Release(); // Allow users to free memory explicitly.
 };
 

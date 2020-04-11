@@ -643,7 +643,6 @@ FunctionNode::FunctionNode() {
   mName = NULL;
   mType = NULL;
   mParams = NULL;
-  mScope = NULL;
   mBody = NULL;
   mDims = NULL;
   mIsConstructor = false;

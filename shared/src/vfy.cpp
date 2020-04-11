@@ -36,8 +36,7 @@ Verifier::~Verifier() {
 }
 
 void Verifier::Do() {
-  gModule.PreVerify();
-  VerifyScope(gModule.mRootScope);
+  VerifyGlobalScope();
 }
 
 // Each time when we enter a new scope, we need handle possible local
@@ -49,17 +48,38 @@ void Verifier::Do() {
 // only Decl-s before a subtree can be seen by it, which is reasonable
 // for most languages.
 
+void Verifier::VerifyGlobalScope() {
+  mCurrScope = gModule.mRootScope;
+  std::vector<ASTTree*>::iterator tree_it = gModule.mTrees.begin();
+  for (; tree_it != gModule.mTrees.end(); tree_it++) {
+    ASTTree *asttree = *tree_it;
+    TreeNode *tree = asttree->mRootNode;
+    // Step 1. Try to add decl.
+    mCurrScope->TryAddDecl(tree);
+    // Step 2. Try to add type.
+    mCurrScope->TryAddType(tree);
+    // Step 3. Verify the tree.
+    VerifyTree(tree);
+  }
+}
+
+// 
+void Verifier::PrepareTempTrees() {
+  mTempTrees.Clear();
+}
+
 void Verifier::VerifyScope(ASTScope *scope) {
   mCurrScope = scope;
-  for (unsigned i = 0; i < scope->GetTreeNum(); i++) {
-    TreeNode *tree = scope->GetTree(i);
+  TreeNode *tree = scope->GetTree();
 
+  PrepareTempTrees();
+
+  for (unsigned i = 0; i < mTempTrees.GetNum(); i++) {
+    TreeNode *tree = mTempTrees.ValueAtIndex(i);
     // Step 1. Try to add decl.
     scope->TryAddDecl(tree);
-
     // Step 2. Try to add type.
     scope->TryAddType(tree);
-
     // Step 3. Verify the tree.
     VerifyTree(tree);
   }
@@ -69,6 +89,14 @@ void Verifier::VerifyScope(ASTScope *scope) {
 // is a scope. It's caller's duty to assure this assumption.
 
 void Verifier::VerifyTree(TreeNode *tree) {
+  // If a tree is also scope, it's handled differently as local
+  // decls and local types need be taken care of.
+  if (tree->IsScope()) {
+    ASTScope *scope = gModule.NewScope(mCurrScope);
+    scope->SetTree(tree);
+    VerifyScope(scope);
+    return;
+  }
 #undef  NODEKIND
 #define NODEKIND(K) if (tree->Is##K()) Verify##K(tree);
 #include "ast_nk.def"

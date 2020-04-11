@@ -95,3 +95,15 @@ char* MemPool::Alloc(unsigned size) {
   mCurrBlock->used += size;
   return addr;
 }
+
+// Removes all data in the memory pool. Reset everything to the beginning
+// of the pool. But we keep the memory.
+void MemPool::Clear() {
+  mCurrBlock = mBlocks;
+  Block *temp_block = mCurrBlock;
+  while(temp_block) {
+    temp_block->used = 0;
+    temp_block = temp_block->next;
+  }
+}
+

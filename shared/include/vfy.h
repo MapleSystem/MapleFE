@@ -41,20 +41,30 @@
 #include "ast.h"
 #include "ast_attr.h"
 #include "ast_type.h"
+#include "container.h"
 
 class ASTScope;
 class TreeNode;
 
 class Verifier {
-private:
+protected:
   ASTScope *mCurrScope;
 
+  // I need a temporary place to save the trees in a scope to
+  // be verified.
+  SmallVector<TreeNode*> mTempTrees;
+
+  // This must be virtual as different language had different
+  // scope nodes.
+  virtual void PrepareTempTrees();
+ 
 public:
   Verifier();
   ~Verifier();
 
   void Do();
 
+  virtual void VerifyGlobalScope();
   virtual void VerifyScope(ASTScope*);
   virtual void VerifyTree(TreeNode*);
 

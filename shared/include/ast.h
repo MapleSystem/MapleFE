@@ -542,7 +542,6 @@ private:
   SmallVector<ExceptionNode*> mThrows; // exceptions it can throw
   TreeNode                   *mType;   // return type
   VarListNode                *mParams;
-  ASTScope                   *mScope;
   BlockNode                  *mBody;
   DimensionNode              *mDims;
   bool                        mIsConstructor;
@@ -550,9 +549,6 @@ private:
 public:
   FunctionNode();
   ~FunctionNode() {Release();}
-
-  ASTScope* GetScope() {return mScope;}
-  void      SetScope(ASTScope *s) {mScope = s;}
 
   BlockNode* GetBody() {return mBody;}
   void AddBody(BlockNode *b) {mBody = b;}

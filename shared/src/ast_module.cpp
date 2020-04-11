@@ -33,17 +33,11 @@ ASTModule::~ASTModule() {
   mTrees.clear();
 }
 
-// This does the following jobs.
-// 1. Add the top trees in module to the scope, since verfication is
-//    done on each sub tree.
-
-void ASTModule::PreVerify() {
-  std::vector<ASTTree*>::iterator tree_it = mTrees.begin();
-  for (; tree_it != mTrees.end(); tree_it++) {
-    ASTTree *tree = *tree_it;
-    TreeNode *root = tree->mRootNode;
-    mRootScope->AddTree(root);
-  }
+// Return a new scope newly created.
+// Set the parent<->child relation between it and p.
+ASTScope* ASTModule::NewScope(ASTScope *p) {
+  ASTScope *newscope = mScopePool.NewScope(p);
+  return newscope;
 }
 
 void ASTModule::Dump() {

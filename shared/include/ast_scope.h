@@ -46,31 +46,37 @@ struct LocalType {
 
 class ASTScope {
 private:
-  ASTScope              *mParent;
+  ASTScope *mParent;
+
+  // TreeNode corresponding to this scope. It's a different story of
+  // global scope and other local scope. Global scope has no corresponding
+  // tree with it. It actually related to the module. Local scope always
+  // has a local TreeNode with it.
+  TreeNode *mTree;
+ 
   SmallVector<ASTScope*> mChildren;
-  SmallVector<TreeNode*> mTrees;  // TreeNodes contained in this scope.
-  SmallVector<LocalType> mTypes;  // Local types. Could be primitive or
-                                  // user type include class, struct, etc.
+  SmallVector<LocalType> mTypes;   // Local types. Could be primitive or
+                                   // user type include class, struct, etc.
 
   // Local Variable Decls. We use IdentifierNode here. The type info is
   // inside the IdentifierNode class.
   SmallVector<IdentifierNode*> mDecls;
 
 public:
-  ASTScope(){}
+  ASTScope() : mParent(NULL), mTree(NULL) {}
   ASTScope(ASTScope *p);
   ~ASTScope() {Release();}
 
   // It's the caller's duty to make sure p is not NULL
   void SetParent(ASTScope *p) {mParent = p; p->AddChild(this);}
 
-  void AddChild(ASTScope*);
-  void AddTree(TreeNode* t) {mTrees.PushBack(t);}
+  TreeNode* GetTree() {return mTree;}
+  void SetTree(TreeNode* t) {mTree = t;}
 
-  unsigned GetTreeNum() {return mTrees.GetNum();}
+  void AddChild(ASTScope*);
+
   unsigned GetDeclNum() {return mDecls.GetNum();}
   unsigned GetTypeNum() {return mTypes.GetNum();}
-  TreeNode*       GetTree(unsigned i) {return mTrees.ValueAtIndex(i);}
   IdentifierNode* GetDecl(unsigned i) {return mDecls.ValueAtIndex(i);}
   LocalType       GetType(unsigned i) {return mTypes.ValueAtIndex(i);}
 
