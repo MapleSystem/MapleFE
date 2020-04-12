@@ -25,7 +25,6 @@
 #include "iden_gen.h"
 #include "literal_gen.h"
 #include "type_gen.h"
-#include "localvar_gen.h"
 #include "block_gen.h"
 #include "separator_gen.h"
 #include "operator_gen.h"
@@ -41,7 +40,6 @@ private:
   LiteralGen   *mLitGen;
   TypeGen      *mTypeGen;
   AttrGen      *mAttrGen;
-  LocalvarGen  *mLocalvarGen;
   BlockGen     *mBlockGen;
   SeparatorGen *mSeparatorGen;
   OperatorGen  *mOperatorGen;

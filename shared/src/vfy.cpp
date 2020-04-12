@@ -138,6 +138,14 @@ void Verifier::VerifyIdentifier(IdentifierNode *inode) {
 
   if (!decl) {
     std::cout << "Error: Var " << inode->GetName() << " not found decl." << std::endl;
+  } else {
+    // Replace the temp IdentifierNode with the found Decl.
+    // Sometimes inode and decl are the same, which happens for the declaration statement.
+    // We will verify decl statement as the others, so its inode is the same as decl.
+    if (inode != decl) {
+      mTempParent->ReplaceChild(inode, decl);
+      //std::cout << "Replace " << inode << " with " << decl << std::endl;
+    }
   }
 }
 

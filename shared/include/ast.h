@@ -87,7 +87,10 @@ public:
   TreeNode* GetLabel()  {return mLabel;}
 
   virtual const char* GetName() {return NULL;}
+  virtual void ReplaceChild(TreeNode *oldchild, TreeNode *newchild){}
+
   virtual void Dump(unsigned){}
+
   void DumpIndentation(unsigned);
   void DumpLabel(unsigned);
 
