@@ -1,24 +1,21 @@
-Matched 5 tokens.
-Attached a tree node from Child
-Attached a tree node from Child
+Matched 3 tokens.
 Attached a tree node from Child
 Attached a tree node from Child
 == Sub Tree ==
-a,b
-Matched 9 tokens.
+a
+Matched 7 tokens.
 Attached a tree node from Child
 == Sub Tree ==
 Assign
   a
-  0
-
+  b
 
 ============= Module ===========
 == Sub Tree ==
-a,b
+a
 == Sub Tree ==
 Assign
   a
-  0
+  b
 
-
+Error: Var b not found decl.

@@ -1,0 +1,23 @@
+Matched 6 tokens.
+Convert unary --> binary
+Attached a tree node from Child
+== Sub Tree ==
+Assign
+  c
+  Add
+    a
+    b
+
+
+============= Module ===========
+== Sub Tree ==
+Assign
+  c
+  Add
+    a
+    b
+
+
+Error: Var c not found decl.
+Error: Var a not found decl.
+Error: Var b not found decl.

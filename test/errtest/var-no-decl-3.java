@@ -12,11 +12,4 @@
 //FIT FOR A PARTICULAR PURPOSE.
 //See the Mulan PSL v1 for more details.
 //
-int a,b;
-int c;
-c=a+b;
-
-a=(a+b);
-
-a=(a+b);
-
+a = 0x111;

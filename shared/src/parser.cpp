@@ -262,7 +262,7 @@ Parser::Parser(const char *name) : filename(name) {
   mTraceSecondTry = false;
   mTraceVisited = false;
   mTraceFailed = false;
-  mTraceSortOut = true;
+  mTraceSortOut = false;
   mTraceAstBuild = false;
   mTracePatchWasSucc = false;
   mTraceWarning = false;

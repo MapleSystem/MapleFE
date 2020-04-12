@@ -12,4 +12,6 @@
 //FIT FOR A PARTICULAR PURPOSE.
 //See the Mulan PSL v1 for more details.
 //
- int a;
+
+int a;
+a = b;

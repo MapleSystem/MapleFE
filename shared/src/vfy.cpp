@@ -137,8 +137,7 @@ void Verifier::VerifyIdentifier(IdentifierNode *inode) {
   }
 
   if (!decl) {
-    std::cout << "Var " << inode->GetName() << " not found decl." << std::endl;
-    exit(1);
+    std::cout << "Error: Var " << inode->GetName() << " not found decl." << std::endl;
   }
 }
 
@@ -151,7 +150,14 @@ void Verifier::VerifyAttr(AttrNode *tree){
 void Verifier::VerifyPrimType(PrimTypeNode *tree){
 }
 
-void Verifier::VerifyVarList(VarListNode *tree){
+void Verifier::VerifyVarList(VarListNode *vlnode){
+  TreeNode *old_temp_parent = mTempParent;
+  mTempParent = vlnode;
+  for (unsigned i = 0; i < vlnode->GetNum(); i++) {
+    IdentifierNode *n = vlnode->VarAtIndex(i);
+    VerifyIdentifier(n);
+  }
+  mTempParent = old_temp_parent;
 }
 
 void Verifier::VerifyLiteral(LiteralNode *tree){
@@ -160,7 +166,12 @@ void Verifier::VerifyLiteral(LiteralNode *tree){
 void Verifier::VerifyUnaOperator(UnaOperatorNode *tree){
 }
 
-void Verifier::VerifyBinOperator(BinOperatorNode *tree){
+void Verifier::VerifyBinOperator(BinOperatorNode *binop){
+  TreeNode *old_temp_parent = mTempParent;
+  mTempParent = binop;
+  VerifyTree(binop->mOpndA);
+  VerifyTree(binop->mOpndB);
+  mTempParent = old_temp_parent;
 }
 
 void Verifier::VerifyTerOperator(TerOperatorNode *tree){

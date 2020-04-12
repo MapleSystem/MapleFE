@@ -22,6 +22,9 @@ if ($ARGV[0] eq 'all') {
 } elsif (($ARGV[0] eq 'java2mpl')) {
   @dirname = "$ARGV[0]";
   print "Run $ARGV[0] test\n";
+} elsif (($ARGV[0] eq 'errtest')) {
+  @dirname = "$ARGV[0]";
+  print "Run $ARGV[0] test\n";
 } else {
   print "$ARGV[0] is an invalid option\n";
   exit;
@@ -89,16 +92,18 @@ foreach my $dir (@dirname) {
 #print "here16 src_file $src_file\n";
         if ($dir eq "java2mpl") {
           $res = system("cd $pwd/..; build64/java/java2mpl $outdir/$src_file > $outdir/$result_file");
-        } else {
-          ##$res = system("cd $pwd/../build64/autogen; ./sharedfe $outdir/$src_file > $outdir/$result_file");
+        }
+        if ($dir eq "errtest") {
+          $res = system("cd $pwd/..; build64/java/java2mpl $outdir/$src_file > $outdir/$result_file");
         }
         
         if ($res > 0) {
 #print "over here1...\n";
           if ($dir eq "java2mpl") { 
             print "$pwd/../build64/java/java2mpl $outdir/$src_file\n";
-          } else {
-            ##print "$pwd/../build64/autogen/sharedfe $outdir/$src_file\n";
+          }
+          if ($dir eq "errtest") { 
+            print "$pwd/../build64/java/java2mpl $outdir/$src_file\n";
           }
           print " ==$dir===> $file\n";
           $countfailedjava ++;

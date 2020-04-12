@@ -1,87 +1,16 @@
-======= Main sortout Dump SortOut =======
-[1] Table TblStatement@0: 2,
-[2] Table TblStatementWithoutTrailingSubstatement@0: 3,
-[3] Table TblExpressionStatement@0: 4,5,
-[4] Table TblStatementExpression@0: 6,
-[5] Token
-[6] Table TblAssignment@0: 7,8,9,
-[7] Table TblLeftHandSide@0: 10,
-[8] Table TblAssignmentOperator@1: 11,
-[9] Table TblExpression@2: 12,
-[10] Table TblExpressionName@0: 13,
-[11] Token
-[12] Table TblPrimary@2: 14,
-[13] Token
-[14] Table TblPrimaryNoNewArray@2: 15,
-[15] Table TblArrayAccess@2: WasSucc
-Matched 6 tokens.
-======= supplemental sortout Dump SortOut =======
-[1] Table TblArrayAccess@2: 2,
-[2] Table TblArrayAccess_sub1@2: 3,4,
-[3] Table TblExpressionName@2: WasSucc
-[4] Table TblArrayAccess_sub2@3: 5,
-[5] Table TblExpression@3: 6,
-[6] Table TblUnaryExpression@3: 7,
-[7] Table TblUnaryExpression_sub1@3: 8,9,
-[8] Token
-[9] Table TblUnaryExpression@4: 10,
-[10] Table TblUnaryExpressionNotPlusMinus@4: 11,
-[11] Table TblPostfixExpression@4: 12,
-[12] Table TblPrimary@4: 13,
-[13] Table TblPrimaryNoNewArray@4: 14,
-[14] Table TblArrayAccess@4: 15,
-[15] Table TblArrayAccess_sub1@4: 16,
-[16] Table TblExpressionName@4: WasSucc
-======= supplemental sortout Dump SortOut =======
-[1] Table TblExpressionName@2: 2,
-[2] Token
-======= supplemental sortout Dump SortOut =======
-[1] Table TblExpressionName@4: 2,
-[2] Token
-======= patch-was-succ Dump SortOut =======
-[1] Table TblStatement@0: 2,
-[2] Table TblStatementWithoutTrailingSubstatement@0: 3,
-[3] Table TblExpressionStatement@0: 4,5,
-[4] Table TblStatementExpression@0: 6,
-[5] Token
-[6] Table TblAssignment@0: 7,8,9,
-[7] Table TblLeftHandSide@0: 10,
-[8] Table TblAssignmentOperator@1: 11,
-[9] Table TblExpression@2: 12,
-[10] Table TblExpressionName@0: 13,
-[11] Token
-[12] Table TblPrimary@2: 14,
-[13] Token
-[14] Table TblPrimaryNoNewArray@2: 15,
-[15] Table TblArrayAccess@2: 16,
-[16] Table TblArrayAccess_sub1@2: 17,18,
-[17] Table TblExpressionName@2: 19,
-[18] Table TblArrayAccess_sub2@3: 20,
-[19] Token
-[20] Table TblExpression@3: 21,
-[21] Table TblUnaryExpression@3: 22,
-[22] Table TblUnaryExpression_sub1@3: 23,24,
-[23] Token
-[24] Table TblUnaryExpression@4: 25,
-[25] Table TblUnaryExpressionNotPlusMinus@4: 26,
-[26] Table TblPostfixExpression@4: 27,
-[27] Table TblPrimary@4: 28,
-[28] Table TblPrimaryNoNewArray@4: 29,
-[29] Table TblArrayAccess@4: 30,
-[30] Table TblArrayAccess_sub1@4: 31,
-[31] Table TblExpressionName@4: 32,
-[32] Token
-======= Simplify AppealNode Trees Dump SortOut =======
-[1] Table TblExpressionStatement@0: 2,3,
-[2:1] Table TblAssignment@0: 4,5,6,
-[3] Token
-[4:1] Token
-[5:2] Token
-[6:3] Table TblArrayAccess_sub1@2: 7,8,
-[7:1] Token
-[8:2] Table TblUnaryExpression_sub1@3: 9,10,
-[9] Token
-[10:2] Token
+Matched 5 tokens.
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+== Sub Tree ==
+a,b
+Matched 8 tokens.
+Attached a tree node from Child
+Attached a tree node from Child
+== Sub Tree ==
+c
+Matched 14 tokens.
 Convert unary --> binary
 Attached a tree node from Child
 == Sub Tree ==
@@ -92,103 +21,7 @@ Assign
     b
 
 
-======= Main sortout Dump SortOut =======
-[1] Table TblStatement@6: 2,
-[2] Table TblStatementWithoutTrailingSubstatement@6: 3,
-[3] Table TblExpressionStatement@6: 4,5,
-[4] Table TblStatementExpression@6: 6,
-[5] Token
-[6] Table TblAssignment@6: 7,8,9,
-[7] Table TblLeftHandSide@6: 10,
-[8] Table TblAssignmentOperator@7: 11,
-[9] Table TblExpression@8: 12,
-[10] Table TblExpressionName@6: 13,
-[11] Token
-[12] Table TblPrimary@8: 14,
-[13] Token
-[14] Table TblPrimaryNoNewArray@8: 15,
-[15] Table TblPrimaryNoNewArray_sub2@8: 16,17,18,
-[16] Token
-[17] Table TblExpression@9: 19,
-[18] Token
-[19] Table TblPrimary@9: 20,
-[20] Table TblPrimaryNoNewArray@9: 21,
-[21] Table TblArrayAccess@9: 22,
-[22] Table TblArrayAccess_sub1@9: 23,24,
-[23] Table TblExpressionName@9: WasSucc
-[24] Table TblArrayAccess_sub2@10: 25,
-[25] Table TblExpression@10: 26,
-[26] Table TblUnaryExpression@10: 27,
-[27] Table TblUnaryExpression_sub1@10: 28,29,
-[28] Token
-[29] Table TblUnaryExpression@11: 30,
-[30] Table TblUnaryExpressionNotPlusMinus@11: 31,
-[31] Table TblPostfixExpression@11: 32,
-[32] Table TblPrimary@11: 33,
-[33] Table TblPrimaryNoNewArray@11: 34,
-[34] Table TblArrayAccess@11: 35,
-[35] Table TblArrayAccess_sub1@11: 36,
-[36] Table TblExpressionName@11: WasSucc
-Matched 14 tokens.
-======= supplemental sortout Dump SortOut =======
-[1] Table TblExpressionName@9: 2,
-[2] Token
-======= supplemental sortout Dump SortOut =======
-[1] Table TblExpressionName@11: 2,
-[2] Token
-======= patch-was-succ Dump SortOut =======
-[1] Table TblStatement@6: 2,
-[2] Table TblStatementWithoutTrailingSubstatement@6: 3,
-[3] Table TblExpressionStatement@6: 4,5,
-[4] Table TblStatementExpression@6: 6,
-[5] Token
-[6] Table TblAssignment@6: 7,8,9,
-[7] Table TblLeftHandSide@6: 10,
-[8] Table TblAssignmentOperator@7: 11,
-[9] Table TblExpression@8: 12,
-[10] Table TblExpressionName@6: 13,
-[11] Token
-[12] Table TblPrimary@8: 14,
-[13] Token
-[14] Table TblPrimaryNoNewArray@8: 15,
-[15] Table TblPrimaryNoNewArray_sub2@8: 16,17,18,
-[16] Token
-[17] Table TblExpression@9: 19,
-[18] Token
-[19] Table TblPrimary@9: 20,
-[20] Table TblPrimaryNoNewArray@9: 21,
-[21] Table TblArrayAccess@9: 22,
-[22] Table TblArrayAccess_sub1@9: 23,24,
-[23] Table TblExpressionName@9: 25,
-[24] Table TblArrayAccess_sub2@10: 26,
-[25] Token
-[26] Table TblExpression@10: 27,
-[27] Table TblUnaryExpression@10: 28,
-[28] Table TblUnaryExpression_sub1@10: 29,30,
-[29] Token
-[30] Table TblUnaryExpression@11: 31,
-[31] Table TblUnaryExpressionNotPlusMinus@11: 32,
-[32] Table TblPostfixExpression@11: 33,
-[33] Table TblPrimary@11: 34,
-[34] Table TblPrimaryNoNewArray@11: 35,
-[35] Table TblArrayAccess@11: 36,
-[36] Table TblArrayAccess_sub1@11: 37,
-[37] Table TblExpressionName@11: 38,
-[38] Token
-======= Simplify AppealNode Trees Dump SortOut =======
-[1] Table TblExpressionStatement@6: 2,3,
-[2:1] Table TblAssignment@6: 4,5,6,
-[3] Token
-[4:1] Token
-[5:2] Token
-[6:3] Table TblPrimaryNoNewArray_sub2@8: 7,8,9,
-[7] Token
-[8:2] Table TblArrayAccess_sub1@9: 10,11,
-[9] Token
-[10:1] Token
-[11:2] Table TblUnaryExpression_sub1@10: 12,13,
-[12] Token
-[13:2] Token
+Matched 22 tokens.
 Convert unary --> binary
 Attached a tree node from Child
 Attached a tree node from Child
@@ -200,131 +33,24 @@ Assign
     b
 
 
-======= Main sortout Dump SortOut =======
-[1] Table TblStatement@14: 2,
-[2] Table TblLocalVariableDeclarationStatement@14: 3,4,
-[3] Table TblLocalVariableDeclaration@14: 5,6,
-[4] Token
-[5] Table TblUnannType@14: 7,
-[6] Table TblVariableDeclaratorList@15: 8,
-[7] Table TblUnannPrimitiveType@14: 9,
-[8] Table TblVariableDeclarator@15: 10,11,
-[9] Table TblNumericType@14: 12,
-[10] Table TblVariableDeclaratorId@15: 13,
-[11] Table TblVariableDeclarator_sub1@16: 14,
-[12] Table TblIntType@14: 15,
-[13] Token
-[14] Table TblVariableDeclarator_sub2@16: 16,17,
-[15] Token
-[16] Token
-[17] Table TblVariableInitializer@17: 18,
-[18] Table TblExpression@17: 19,
-[19] Table TblPrimary@17: 20,
-[20] Table TblPrimaryNoNewArray@17: 21,
-[21] Table TblPrimaryNoNewArray_sub2@17: 22,23,24,
-[22] Token
-[23] Table TblExpression@18: 25,
-[24] Token
-[25] Table TblPrimary@18: 26,
-[26] Table TblPrimaryNoNewArray@18: 27,
-[27] Table TblArrayAccess@18: 28,
-[28] Table TblArrayAccess_sub1@18: 29,30,
-[29] Table TblExpressionName@18: WasSucc
-[30] Table TblArrayAccess_sub2@19: 31,
-[31] Table TblExpression@19: 32,
-[32] Table TblUnaryExpression@19: 33,
-[33] Table TblUnaryExpression_sub1@19: 34,35,
-[34] Token
-[35] Table TblUnaryExpression@20: 36,
-[36] Table TblUnaryExpressionNotPlusMinus@20: 37,
-[37] Table TblPostfixExpression@20: 38,
-[38] Table TblPrimary@20: 39,
-[39] Table TblPrimaryNoNewArray@20: 40,
-[40] Table TblArrayAccess@20: 41,
-[41] Table TblArrayAccess_sub1@20: 42,
-[42] Table TblExpressionName@20: WasSucc
-Matched 23 tokens.
-======= supplemental sortout Dump SortOut =======
-[1] Table TblExpressionName@18: 2,
-[2] Token
-======= supplemental sortout Dump SortOut =======
-[1] Table TblExpressionName@20: 2,
-[2] Token
-======= patch-was-succ Dump SortOut =======
-[1] Table TblStatement@14: 2,
-[2] Table TblLocalVariableDeclarationStatement@14: 3,4,
-[3] Table TblLocalVariableDeclaration@14: 5,6,
-[4] Token
-[5] Table TblUnannType@14: 7,
-[6] Table TblVariableDeclaratorList@15: 8,
-[7] Table TblUnannPrimitiveType@14: 9,
-[8] Table TblVariableDeclarator@15: 10,11,
-[9] Table TblNumericType@14: 12,
-[10] Table TblVariableDeclaratorId@15: 13,
-[11] Table TblVariableDeclarator_sub1@16: 14,
-[12] Table TblIntType@14: 15,
-[13] Token
-[14] Table TblVariableDeclarator_sub2@16: 16,17,
-[15] Token
-[16] Token
-[17] Table TblVariableInitializer@17: 18,
-[18] Table TblExpression@17: 19,
-[19] Table TblPrimary@17: 20,
-[20] Table TblPrimaryNoNewArray@17: 21,
-[21] Table TblPrimaryNoNewArray_sub2@17: 22,23,24,
-[22] Token
-[23] Table TblExpression@18: 25,
-[24] Token
-[25] Table TblPrimary@18: 26,
-[26] Table TblPrimaryNoNewArray@18: 27,
-[27] Table TblArrayAccess@18: 28,
-[28] Table TblArrayAccess_sub1@18: 29,30,
-[29] Table TblExpressionName@18: 31,
-[30] Table TblArrayAccess_sub2@19: 32,
-[31] Token
-[32] Table TblExpression@19: 33,
-[33] Table TblUnaryExpression@19: 34,
-[34] Table TblUnaryExpression_sub1@19: 35,36,
-[35] Token
-[36] Table TblUnaryExpression@20: 37,
-[37] Table TblUnaryExpressionNotPlusMinus@20: 38,
-[38] Table TblPostfixExpression@20: 39,
-[39] Table TblPrimary@20: 40,
-[40] Table TblPrimaryNoNewArray@20: 41,
-[41] Table TblArrayAccess@20: 42,
-[42] Table TblArrayAccess_sub1@20: 43,
-[43] Table TblExpressionName@20: 44,
-[44] Token
-======= Simplify AppealNode Trees Dump SortOut =======
-[1] Table TblLocalVariableDeclarationStatement@14: 2,3,
-[2] Table TblLocalVariableDeclaration@14: 4,5,
-[3] Token
-[4:2] Token
-[5] Table TblVariableDeclaratorList@15: 6,
-[6] Table TblVariableDeclarator@15: 7,8,
-[7] Table TblVariableDeclaratorId@15: 9,
-[8:2] Table TblVariableDeclarator_sub2@16: 10,11,
-[9] Token
-[10] Token
-[11:2] Table TblPrimaryNoNewArray_sub2@17: 12,13,14,
-[12] Token
-[13:2] Table TblArrayAccess_sub1@18: 15,16,
-[14] Token
-[15:1] Token
-[16:2] Table TblUnaryExpression_sub1@19: 17,18,
-[17] Token
-[18:2] Token
+Matched 30 tokens.
 Convert unary --> binary
 Attached a tree node from Child
 Attached a tree node from Child
-Attached a tree node from Child
 == Sub Tree ==
-a=Add
+Assign
   a
-  b
+  Add
+    a
+    b
+
 
 ============= Module ===========
 == Sub Tree ==
+a,b
+== Sub Tree ==
+c
+== Sub Tree ==
 Assign
   c
   Add
@@ -341,7 +67,10 @@ Assign
 
 
 == Sub Tree ==
-a=Add
+Assign
   a
-  b
+  Add
+    a
+    b
+
 
