@@ -54,6 +54,13 @@ protected:
   // be verified.
   SmallVector<TreeNode*> mTempTrees;
 
+  // I need a temporary place to save the parent node when we
+  // handle a child node, since sometimes we need replace the child
+  // node with a new one.
+  TreeNode *mTempParent;
+
+protected:
+
   // This must be virtual as different language had different
   // scope nodes.
   virtual void PrepareTempTrees();

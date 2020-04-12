@@ -30,9 +30,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 Verifier::Verifier() {
+  mCurrScope = NULL;
+  mTempParent = NULL;
 }
 
 Verifier::~Verifier() {
+  mTempTrees.Release();
 }
 
 void Verifier::Do() {
@@ -63,15 +66,27 @@ void Verifier::VerifyGlobalScope() {
   }
 }
 
-// 
+// To copy the sub trees in the corresponding tree of currect scope
+// into a temp SmallVector. This provides an opportunity for each language
+// to define its own treatment of PrepareTempTrees(). And provides
+// a unified structure of mTempTrees for traversal.
 void Verifier::PrepareTempTrees() {
   mTempTrees.Clear();
+
+  // The default implementation only takes care of block node.
+  TreeNode *tree = mCurrScope->GetTree();
+  if (tree->IsBlock()) {
+    BlockNode *block = (BlockNode*)tree;
+    for (unsigned i = 0; i < block->GetChildrenNum(); i++) {
+      TreeNode *t = block->GetChildAtIndex(i);
+      mTempTrees.PushBack(t);
+    }
+  }
 }
 
 void Verifier::VerifyScope(ASTScope *scope) {
   mCurrScope = scope;
   TreeNode *tree = scope->GetTree();
-
   PrepareTempTrees();
 
   for (unsigned i = 0; i < mTempTrees.GetNum(); i++) {
@@ -102,10 +117,29 @@ void Verifier::VerifyTree(TreeNode *tree) {
 #include "ast_nk.def"
 }
 
-// It looks into the Decl's of this scope and its ancestors' scopes,
-// to find a decl with the same name.
-void Verifier::VerifyIdentifier(IdentifierNode *tree) {
-  
+// This function has two jobs.
+// 1. It looks into the Decl's of this scope and its ancestors' scopes,
+//    to find a decl with the same name. If not found, the identifier
+//    is undeclaraed.
+// 2. Replace this node with the decl node, since they are the same node.
+//    The abandoned one was created at the first time Parser saw it. At
+//    that time parser has no idea what it is, and just give it a new
+//    identifier node. So After verification, they should point to the
+//    real one.
+void Verifier::VerifyIdentifier(IdentifierNode *inode) {
+  ASTScope *scope = mCurrScope;
+  IdentifierNode *decl = NULL;
+  while (scope) {
+    if (decl = scope->FindDeclOf(inode)) {
+      break;
+    }
+    scope = scope->GetParent();
+  }
+
+  if (!decl) {
+    std::cout << "Var " << inode->GetName() << " not found decl." << std::endl;
+    exit(1);
+  }
 }
 
 void Verifier::VerifyDimension(DimensionNode *tree){

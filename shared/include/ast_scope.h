@@ -69,6 +69,7 @@ public:
 
   // It's the caller's duty to make sure p is not NULL
   void SetParent(ASTScope *p) {mParent = p; p->AddChild(this);}
+  ASTScope* GetParent() {return mParent;}
 
   TreeNode* GetTree() {return mTree;}
   void SetTree(TreeNode* t) {mTree = t;}
@@ -79,6 +80,8 @@ public:
   unsigned GetTypeNum() {return mTypes.GetNum();}
   IdentifierNode* GetDecl(unsigned i) {return mDecls.ValueAtIndex(i);}
   LocalType       GetType(unsigned i) {return mTypes.ValueAtIndex(i);}
+
+  IdentifierNode* FindDeclOf(IdentifierNode*);
 
   // Each language could have different specification for declaration,
   // types, or else. So we put them as virtual functions. So is the

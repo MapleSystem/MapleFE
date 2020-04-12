@@ -33,6 +33,18 @@ void ASTScope::AddChild(ASTScope *s) {
   s->SetParent(this);
 }
 
+// We are using name address to decide if two names are equal, since we have a
+// string pool with any two equal strings will be at the same address.
+IdentifierNode* ASTScope::FindDeclOf(IdentifierNode *inode) {
+  for (unsigned i = 0; i < GetDeclNum(); i++) {
+    IdentifierNode *decl = GetDecl(i);
+    MASSERT(decl->GetType() && "Decl has no type?");
+    if (decl->GetName() == inode->GetName())
+      return decl;
+  }
+  return NULL;
+}
+
 // If it's a local declaration, add it to mDecls.
 // This is a general common implementaiton, it assumes
 // the correct declaration is IdentifierNode with type.
