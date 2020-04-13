@@ -176,11 +176,26 @@ void Verifier::VerifyFunction(FunctionNode *tree){
 /////////////////////////////////////////////////////////////////////////////////////
 
 // This verification follows the most common rules of many languages.
+// Each language can have its own implementation, and maybe reuse this implementation
+// together with its own specific ones.
 void Verifier::VerifyClassFields(ClassNode *klass) {
   // rule 1. No duplicated fields name.
+  for (unsigned i = 0; i < klass->GetFieldsNum(); i++) {
+    IdentifierNode *na = klass->GetField(i);
+    for (unsigned j = i + 1; j < klass->GetFieldsNum(); j++) {
+      IdentifierNode *nb = klass->GetField(j);
+      if (na->GetName() == nb->GetName()) {
+        std::cout << "Field: " << na->GetName() << " duplicated." << std::endl;
+      }
+    }
+  }
 }
 
 void Verifier::VerifyClassMethods(ClassNode *klass) {
+  for (unsigned i = 0; i < klass->GetMethodsNum(); i++) {
+    FunctionNode *method = klass->GetMethod(i);
+    VerifyFunction(method);
+  }
 }
 
 void Verifier::VerifyClassSuperClasses(ClassNode *klass) {

@@ -1,0 +1,29 @@
+Matched 10 tokens.
+Attached a tree node from Child
+Attached a tree node from Child
+== Sub Tree ==
+class  A
+  Fields: 
+    a    a
+  Instance Initializer: 
+
+  Constructors: 
+
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+============= Module ===========
+== Sub Tree ==
+class  A
+  Fields: 
+    a    a
+  Instance Initializer: 
+
+  Constructors: 
+
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+Field: a duplicated.

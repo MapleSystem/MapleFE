@@ -611,12 +611,21 @@ public:
 //                         ClassBody -->BlockNode
 // In reality there is no such thing as ClassBody, since this 'body' will
 // eventually become field and method of a class. However, during parsing
-// the children are processed before parents, which means we could have
-// all fields and members before the class is ready. So we come up with
+// the children are processed before parents, which means we need to have
+// all fields and members ready before the class. So we come up with
 // this ClassBody to temporarily hold these subtrees, and let the class
 // to interpret it in the future. Once the class is done, this ClassBody
-// is useless.
-// In the real implementation, ClassBody is actually a BlockNode.
+// is useless. In the real implementation, ClassBody is actually a BlockNode.
+//
+// NOTE. There is one important thing to know is This design is following
+//       the common rules of Java/C++, where a declaration of field or
+//       method has the scope of the whole class. This means it can be
+//       used before the declaratioin. There is no order of first decl then
+//       use. So we can do a Construct() which collect all Fields & Methods.
+//
+//       However, we still keep mBody, which actually tells the order of
+//       the original program. Any language requiring order could use mBody
+//       to implement.
 //////////////////////////////////////////////////////////////////////////
 
 class ClassNode : public TreeNode {
@@ -646,11 +655,13 @@ public:
   void AddAttribute(AttrId a) {mAttributes.PushBack(a);}
   void AddBody(BlockNode *b) {mBody = b;}
 
+  unsigned GetFieldsNum()      {return mFields.GetNum();}
   unsigned GetMethodsNum()     {return mMethods.GetNum();}
   unsigned GetConstructorNum() {return mConstructors.GetNum();}
   unsigned GetInstInitsNum()   {return mInstInits.GetNum();}
   unsigned GetInstLocalClassesNum()   {return mLocalClasses.GetNum();}
   unsigned GetInstLocalInterfacesNum(){return mLocalInterfaces.GetNum();}
+  IdentifierNode* GetField(unsigned i)     {return mFields.ValueAtIndex(i);}
   FunctionNode* GetMethod(unsigned i)      {return mMethods.ValueAtIndex(i);}
   FunctionNode* GetConstructor(unsigned i) {return mConstructors.ValueAtIndex(i);}
   BlockNode* GetInstInit(unsigned i)       {return mInstInits.ValueAtIndex(i);}
