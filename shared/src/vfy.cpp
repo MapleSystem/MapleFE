@@ -51,6 +51,8 @@ void Verifier::Do() {
 // only Decl-s before a subtree can be seen by it, which is reasonable
 // for most languages.
 
+// [TODO] Java class in Global scope is special, it doesn't need a
+//        forward declaration....
 void Verifier::VerifyGlobalScope() {
   mCurrScope = gModule.mRootScope;
   std::vector<ASTTree*>::iterator tree_it = gModule.mTrees.begin();
@@ -153,9 +155,11 @@ void Verifier::VerifyDimension(DimensionNode *tree){
 }
 
 void Verifier::VerifyAttr(AttrNode *tree){
+  return;
 }
 
 void Verifier::VerifyPrimType(PrimTypeNode *tree){
+  return;
 }
 
 void Verifier::VerifyVarList(VarListNode *vlnode){
@@ -169,6 +173,7 @@ void Verifier::VerifyVarList(VarListNode *vlnode){
 }
 
 void Verifier::VerifyLiteral(LiteralNode *tree){
+  return;
 }
 
 void Verifier::VerifyUnaOperator(UnaOperatorNode *tree){

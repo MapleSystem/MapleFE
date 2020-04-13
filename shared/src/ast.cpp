@@ -253,6 +253,17 @@ void TreeNode::DumpIndentation(unsigned ind) {
 //                          BinOperatorNode
 //////////////////////////////////////////////////////////////////////////////////////
 
+// It's caller's duty to assure old_child is a child
+void BinOperatorNode::ReplaceChild(TreeNode *old_child, TreeNode *new_child) {
+  if (mOpndA == old_child) {
+    mOpndA = new_child;
+  } else if (mOpndB == old_child) {
+    mOpndB = new_child;
+  } else {
+    MERROR("To-be-replaced node is not a child of BinOperatorNode?");
+  }
+}
+
 void BinOperatorNode::Dump(unsigned indent) {
   const char *name = GetOperatorName(mOprId);
   DumpIndentation(indent);
@@ -266,6 +277,12 @@ void BinOperatorNode::Dump(unsigned indent) {
 //////////////////////////////////////////////////////////////////////////////////////
 //                           UnaOperatorNode
 //////////////////////////////////////////////////////////////////////////////////////
+
+// It's caller's duty to assure old_child is a child
+void UnaOperatorNode::ReplaceChild(TreeNode *old_child, TreeNode *new_child) {
+  MASSERT((mOpnd == old_child) && "To-be-replaced node is not a child?");
+  SetOpnd(new_child);
+}
 
 void UnaOperatorNode::Dump(unsigned indent) {
   const char *name = GetOperatorName(mOprId);

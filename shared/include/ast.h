@@ -137,6 +137,8 @@ public:
   TreeNode* GetOpnd() {return mOpnd;}
   OprId     GetOprId(){return mOprId;}
 
+  void ReplaceChild(TreeNode*, TreeNode*);
+
   void Dump(unsigned);
 };
 
@@ -150,6 +152,7 @@ public:
   BinOperatorNode() {mKind = NK_BinOperator;}
   ~BinOperatorNode() {}
 
+  void ReplaceChild(TreeNode*, TreeNode*);
   void Dump(unsigned);
 };
 
@@ -638,10 +641,21 @@ public:
   void SetName(const char *n) {mName = n;}
   const char* GetName()       {return mName;}
 
-  void AddSuperClass(ClassNode *n) {mSuperClasses.PushBack(n);}
-  void AddSuperClass(InterfaceNode *n) {mSuperInterfaces.PushBack(n);}
+  void AddSuperClass(ClassNode *n)         {mSuperClasses.PushBack(n);}
+  void AddSuperInterface(InterfaceNode *n) {mSuperInterfaces.PushBack(n);}
   void AddAttribute(AttrId a) {mAttributes.PushBack(a);}
   void AddBody(BlockNode *b) {mBody = b;}
+
+  unsigned GetMethodsNum()     {return mMethods.GetNum();}
+  unsigned GetConstructorNum() {return mConstructors.GetNum();}
+  unsigned GetInstInitsNum()   {return mInstInits.GetNum();}
+  unsigned GetInstLocalClassesNum()   {return mLocalClasses.GetNum();}
+  unsigned GetInstLocalInterfacesNum(){return mLocalInterfaces.GetNum();}
+  FunctionNode* GetMethod(unsigned i)      {return mMethods.ValueAtIndex(i);}
+  FunctionNode* GetConstructor(unsigned i) {return mConstructors.ValueAtIndex(i);}
+  BlockNode* GetInstInit(unsigned i)       {return mInstInits.ValueAtIndex(i);}
+  ClassNode* GetLocalClass(unsigned i)     {return mLocalClasses.ValueAtIndex(i);}
+  InterfaceNode* GetLocalInterface(unsigned i)  {return mLocalInterfaces.ValueAtIndex(i);}
 
   void Construct();
   void Release();
