@@ -1,7 +1,7 @@
 Matched 19 tokens.
 == Sub Tree ==
 class  A
-  Members: 
+  Fields: 
 
   Instance Initializer: 
 
@@ -20,7 +20,7 @@ class  A
 ============= Module ===========
 == Sub Tree ==
 class  A
-  Members: 
+  Fields: 
 
   Instance Initializer: 
 

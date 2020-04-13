@@ -4,7 +4,7 @@ Attached a tree node from Child
 Attached a tree node from Child
 == Sub Tree ==
 class  Global
-  Members: 
+  Fields: 
 
   Instance Initializer: 
 
@@ -15,7 +15,7 @@ class  Global
       Cyclic
   LocalClasses: 
     class  Cyclic
-  Members: 
+  Fields: 
 
   Instance Initializer: 
 
@@ -29,7 +29,7 @@ class  Global
 ============= Module ===========
 == Sub Tree ==
 class  Global
-  Members: 
+  Fields: 
 
   Instance Initializer: 
 
@@ -40,7 +40,7 @@ class  Global
       Cyclic
   LocalClasses: 
     class  Cyclic
-  Members: 
+  Fields: 
 
   Instance Initializer: 
 

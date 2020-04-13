@@ -79,7 +79,7 @@ public:
 #define NODEKIND(K) bool Is##K() {return mKind == NK_##K;}
 #include "ast_nk.def"
 
-  bool IsScope() {return IsBlock();}
+  bool IsScope() {return IsBlock() || IsClass() || IsFunction() || IsInterface();}
 
   void SetParent(TreeNode *p) {mParent = p;}
   void SetLabel (TreeNode *p) {mLabel = p;}
@@ -627,7 +627,7 @@ private:
   SmallVector<AttrId>          mAttributes;
   BlockNode                   *mBody;
 
-  SmallVector<IdentifierNode*> mMembers;
+  SmallVector<IdentifierNode*> mFields;       // aka Field
   SmallVector<FunctionNode*>   mMethods;
   SmallVector<FunctionNode*>   mConstructors;
   SmallVector<BlockNode*>      mInstInits;     // instance initializer

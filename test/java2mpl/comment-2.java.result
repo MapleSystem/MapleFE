@@ -1,7 +1,7 @@
 Matched 4 tokens.
 == Sub Tree ==
 class  Point
-  Members: 
+  Fields: 
 
   Instance Initializer: 
 
@@ -14,7 +14,7 @@ class  Point
 ============= Module ===========
 == Sub Tree ==
 class  Point
-  Members: 
+  Fields: 
 
   Instance Initializer: 
 

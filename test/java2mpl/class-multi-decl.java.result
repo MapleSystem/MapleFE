@@ -3,7 +3,7 @@ Attached a tree node from Child
 Attached a tree node from Child
 == Sub Tree ==
 class  A
-  Members: 
+  Fields: 
     a    b
   Instance Initializer: 
 
@@ -16,7 +16,7 @@ class  A
 ============= Module ===========
 == Sub Tree ==
 class  A
-  Members: 
+  Fields: 
     a    b
   Instance Initializer: 
 

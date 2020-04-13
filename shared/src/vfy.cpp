@@ -35,7 +35,6 @@ Verifier::Verifier() {
 }
 
 Verifier::~Verifier() {
-  mTempTrees.Release();
 }
 
 void Verifier::Do() {
@@ -68,52 +67,10 @@ void Verifier::VerifyGlobalScope() {
   }
 }
 
-// To copy the sub trees in the corresponding tree of currect scope
-// into a temp SmallVector. This provides an opportunity for each language
-// to define its own treatment of PrepareTempTrees(). And provides
-// a unified structure of mTempTrees for traversal.
-void Verifier::PrepareTempTrees() {
-  mTempTrees.Clear();
-
-  // The default implementation only takes care of block node.
-  TreeNode *tree = mCurrScope->GetTree();
-  if (tree->IsBlock()) {
-    BlockNode *block = (BlockNode*)tree;
-    for (unsigned i = 0; i < block->GetChildrenNum(); i++) {
-      TreeNode *t = block->GetChildAtIndex(i);
-      mTempTrees.PushBack(t);
-    }
-  }
-}
-
-void Verifier::VerifyScope(ASTScope *scope) {
-  mCurrScope = scope;
-  TreeNode *tree = scope->GetTree();
-  PrepareTempTrees();
-
-  for (unsigned i = 0; i < mTempTrees.GetNum(); i++) {
-    TreeNode *tree = mTempTrees.ValueAtIndex(i);
-    // Step 1. Try to add decl.
-    scope->TryAddDecl(tree);
-    // Step 2. Try to add type.
-    scope->TryAddType(tree);
-    // Step 3. Verify the tree.
-    VerifyTree(tree);
-  }
-}
-
 // Before entering VerifyTree(), tree has been done with VerifyScope if it
 // is a scope. It's caller's duty to assure this assumption.
 
 void Verifier::VerifyTree(TreeNode *tree) {
-  // If a tree is also scope, it's handled differently as local
-  // decls and local types need be taken care of.
-  if (tree->IsScope()) {
-    ASTScope *scope = gModule.NewScope(mCurrScope);
-    scope->SetTree(tree);
-    VerifyScope(scope);
-    return;
-  }
 #undef  NODEKIND
 #define NODEKIND(K) if (tree->Is##K()) Verify##K(tree);
 #include "ast_nk.def"
@@ -154,10 +111,12 @@ void Verifier::VerifyIdentifier(IdentifierNode *inode) {
 void Verifier::VerifyDimension(DimensionNode *tree){
 }
 
+// Nothing needed for Attr
 void Verifier::VerifyAttr(AttrNode *tree){
   return;
 }
 
+// Nothing needed for PrimType
 void Verifier::VerifyPrimType(PrimTypeNode *tree){
   return;
 }
@@ -172,6 +131,7 @@ void Verifier::VerifyVarList(VarListNode *vlnode){
   mTempParent = old_temp_parent;
 }
 
+// Nothing needed for Literal
 void Verifier::VerifyLiteral(LiteralNode *tree){
   return;
 }
@@ -190,13 +150,62 @@ void Verifier::VerifyBinOperator(BinOperatorNode *binop){
 void Verifier::VerifyTerOperator(TerOperatorNode *tree){
 }
 
-void Verifier::VerifyBlock(BlockNode *tree){
+void Verifier::VerifyBlock(BlockNode *block){
+  ASTScope *scope = gModule.NewScope(mCurrScope);
+  mCurrScope = scope;
+  scope->SetTree(block);
+
+  for (unsigned i = 0; i < block->GetChildrenNum(); i++) {
+    TreeNode *t = block->GetChildAtIndex(i);
+    // Step 1. Try to add decl.
+    scope->TryAddDecl(t);
+    // Step 2. Try to add type.
+    scope->TryAddType(t);
+    // Step 3. Verify the t.
+    VerifyTree(t);
+  }
 }
 
 void Verifier::VerifyFunction(FunctionNode *tree){
 }
 
-void Verifier::VerifyClass(ClassNode *tree){
+/////////////////////////////////////////////////////////////////////////////////////
+//                              ClassNode verification
+// ClassNode is the most complicated. We decided to separate it into multiple
+// functions to allow the language specific implementation more easilier.
+/////////////////////////////////////////////////////////////////////////////////////
+
+// This verification follows the most common rules of many languages.
+void Verifier::VerifyClassFields(ClassNode *klass) {
+  // rule 1. No duplicated fields name.
+}
+
+void Verifier::VerifyClassMethods(ClassNode *klass) {
+}
+
+void Verifier::VerifyClassSuperClasses(ClassNode *klass) {
+}
+
+void Verifier::VerifyClassSuperInterfaces(ClassNode *klass) {
+}
+
+void Verifier::VerifyClass(ClassNode *klass){
+  // Step 1. Create a new scope
+  ASTScope *scope = gModule.NewScope(mCurrScope);
+  mCurrScope = scope;
+  scope->SetTree(klass);
+
+  // Step 2. Verifiy Fields.
+  VerifyClassFields(klass);
+
+  // Step 3. Verifiy Methods.
+  VerifyClassMethods(klass);
+
+  // Step 4. Verifiy super classes.
+  VerifyClassSuperClasses(klass);
+
+  // Step 5. Verifiy super interfaces.
+  VerifyClassSuperInterfaces(klass);
 }
 
 void Verifier::VerifyInterface(InterfaceNode *tree){

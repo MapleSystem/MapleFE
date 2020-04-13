@@ -3,7 +3,7 @@ Attached a tree node from Child
 Attached a tree node from Child
 == Sub Tree ==
 class  Point
-  Members: 
+  Fields: 
 
   Instance Initializer: 
 
@@ -21,7 +21,7 @@ class  Point
 ============= Module ===========
 == Sub Tree ==
 class  Point
-  Members: 
+  Fields: 
 
   Instance Initializer: 
 

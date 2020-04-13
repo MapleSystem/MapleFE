@@ -50,10 +50,6 @@ class Verifier {
 protected:
   ASTScope *mCurrScope;
 
-  // I need a temporary place to save the trees in a scope to
-  // be verified.
-  SmallVector<TreeNode*> mTempTrees;
-
   // I need a temporary place to save the parent node when we
   // handle a child node, since sometimes we need replace the child
   // node with a new one.
@@ -61,10 +57,12 @@ protected:
 
 protected:
 
-  // This must be virtual as different language had different
-  // scope nodes.
-  virtual void PrepareTempTrees();
- 
+  // A list of class node verification make language specific implementation easier.
+  virtual void VerifyClassFields(ClassNode*);
+  virtual void VerifyClassMethods(ClassNode*);
+  virtual void VerifyClassSuperClasses(ClassNode*);
+  virtual void VerifyClassSuperInterfaces(ClassNode*);
+
 public:
   Verifier();
   ~Verifier();
@@ -72,7 +70,6 @@ public:
   void Do();
 
   virtual void VerifyGlobalScope();
-  virtual void VerifyScope(ASTScope*);
   virtual void VerifyTree(TreeNode*);
 
   // Verify of each type of node

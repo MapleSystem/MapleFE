@@ -9,7 +9,7 @@ Attached a tree node from Child
 Attached a tree node from Child
 == Sub Tree ==
 class  Point
-  Members: 
+  Fields: 
     x    y
   Instance Initializer: 
 
@@ -43,7 +43,7 @@ Attached a tree node from Child
 Attached a tree node from Child
 == Sub Tree ==
 class  ColoredPoint
-  Members: 
+  Fields: 
     WHITE=0
     color
   Instance Initializer: 
@@ -64,7 +64,7 @@ class  ColoredPoint
 ============= Module ===========
 == Sub Tree ==
 class  Point
-  Members: 
+  Fields: 
     x    y
   Instance Initializer: 
 
@@ -84,7 +84,7 @@ class  Point
 
 == Sub Tree ==
 class  ColoredPoint
-  Members: 
+  Fields: 
     WHITE=0
     color
   Instance Initializer: 

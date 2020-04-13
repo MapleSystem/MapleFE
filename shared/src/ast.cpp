@@ -571,10 +571,10 @@ void ClassNode::Construct() {
       VarListNode *vlnode = (VarListNode*)tree_node;
       for (unsigned i = 0; i < vlnode->GetNum(); i++) {
         IdentifierNode *inode = vlnode->VarAtIndex(i);
-        mMembers.PushBack(inode);
+        mFields.PushBack(inode);
       }
     } else if (tree_node->IsIdentifier())
-      mMembers.PushBack(tree_node);
+      mFields.PushBack(tree_node);
     else if (tree_node->IsFunction()) {
       FunctionNode *f = (FunctionNode*)tree_node;
       if (f->IsConstructor())
@@ -600,7 +600,7 @@ void ClassNode::Release() {
   mSuperClasses.Release();
   mSuperInterfaces.Release();
   mAttributes.Release();
-  mMembers.Release();
+  mFields.Release();
   mMethods.Release();
   mLocalClasses.Release();
   mLocalInterfaces.Release();
@@ -611,9 +611,9 @@ void ClassNode::Dump(unsigned indent) {
   DUMP1_NORETURN("class ", mName);
   DUMP_RETURN();
 
-  DUMP0("  Members: ");
-  for (unsigned i = 0; i < mMembers.GetNum(); i++) {
-    TreeNode *node = mMembers.ValueAtIndex(i);
+  DUMP0("  Fields: ");
+  for (unsigned i = 0; i < mFields.GetNum(); i++) {
+    TreeNode *node = mFields.ValueAtIndex(i);
     node->Dump(4);
   }
   DUMP_RETURN();

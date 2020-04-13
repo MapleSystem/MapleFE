@@ -2,7 +2,7 @@ Matched 22 tokens.
 Attached a tree node from Child
 == Sub Tree ==
 class  A
-  Members: 
+  Fields: 
 
   Instance Initializer: 
 
@@ -20,7 +20,7 @@ while true
 ============= Module ===========
 == Sub Tree ==
 class  A
-  Members: 
+  Fields: 
 
   Instance Initializer: 
 
