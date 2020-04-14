@@ -84,8 +84,25 @@ void Verifier::CollectAllDeclsTypes(ASTScope *scope) {
   ClassNode *klass = (ClassNode*)t;
 
   // All fields, methods, local classes, local interfaces are decls.
-
   // All local classes/interfaces are types.
+  for (unsigned i = 0; i < klass->GetFieldsNum(); i++) {
+    IdentifierNode *in = klass->GetField(i);
+    scope->AddDecl(in);
+  }
+  for (unsigned i = 0; i < klass->GetMethodsNum(); i++) {
+    FunctionNode *n = klass->GetMethod(i);
+    scope->AddDecl(n);
+  }
+  for (unsigned i = 0; i < klass->GetLocalClassesNum(); i++) {
+    ClassNode *n = klass->GetLocalClass(i);
+    scope->AddDecl(n);
+    scope->AddType(n);
+  }
+  for (unsigned i = 0; i < klass->GetLocalInterfacesNum(); i++) {
+    InterfaceNode *n = klass->GetLocalInterface(i);
+    scope->AddDecl(n);
+    scope->AddType(n);
+  }
 }
 
 // This function has two jobs.
@@ -101,9 +118,8 @@ void Verifier::VerifyIdentifier(IdentifierNode *inode) {
   ASTScope *scope = mCurrScope;
   IdentifierNode *decl = NULL;
   while (scope) {
-    if (decl = scope->FindDeclOf(inode)) {
+    if (decl = scope->FindDeclOf(inode))
       break;
-    }
     scope = scope->GetParent();
   }
 
@@ -191,13 +207,23 @@ void Verifier::VerifyFunction(FunctionNode *tree){
 // Each language can have its own implementation, and maybe reuse this implementation
 // together with its own specific ones.
 void Verifier::VerifyClassFields(ClassNode *klass) {
-  // rule 1. No duplicated fields name.
+  // rule 1. No duplicated fields name with another decls.
   for (unsigned i = 0; i < klass->GetFieldsNum(); i++) {
     IdentifierNode *na = klass->GetField(i);
-    for (unsigned j = i + 1; j < klass->GetFieldsNum(); j++) {
-      IdentifierNode *nb = klass->GetField(j);
+    unsigned hit_self = false;
+    for (unsigned j = 0; j < mCurrScope->GetDeclNum(); j++) {
+      TreeNode *nb = mCurrScope->GetDecl(j);
       if (na->GetName() == nb->GetName()) {
-        std::cout << "Field: " << na->GetName() << " duplicated." << std::endl;
+        if (nb->IsIdentifier()) {
+          if (!hit_self)
+            hit_self = true;
+          else
+            std::cout << "Field: " << na->GetName()
+              << " duplicated with another field." << std::endl;
+        } else {
+          std::cout << "Field: " << na->GetName()
+            << " duplicated with another method/class/interface." << std::endl;
+        }
       }
     }
   }

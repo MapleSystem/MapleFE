@@ -1,15 +1,16 @@
-Matched 10 tokens.
-Attached a tree node from Child
+Matched 13 tokens.
 Attached a tree node from Child
 == Sub Tree ==
 class  A
   Fields: 
-    a    a
+    a
   Instance Initializer: 
 
   Constructors: 
 
   Methods: 
+    func  a()  throws: 
+
   LocalClasses: 
   LocalInterfaces: 
 
@@ -17,14 +18,15 @@ class  A
 == Sub Tree ==
 class  A
   Fields: 
-    a    a
+    a
   Instance Initializer: 
 
   Constructors: 
 
   Methods: 
+    func  a()  throws: 
+
   LocalClasses: 
   LocalInterfaces: 
 
-Field: a duplicated with another field.
-Field: a duplicated with another field.
+Field: a duplicated with another method/class/interface.

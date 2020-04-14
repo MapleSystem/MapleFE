@@ -29,21 +29,6 @@
 // scope which could contain the file level variables.
 ////////////////////////////////////////////////////////////////////////////
 
-// Local Types involved in the scope.
-enum TypeKind {
-  TK_Prim,
-  TK_Class,
-  TK_Interface,
-  TK_Function,
-  TK_Struct,
-  TK_Null
-};
-
-struct LocalType {
-  TypeKind  mTypeId;
-  TreeNode *mTree;
-};
-
 class ASTScope {
 private:
   ASTScope *mParent;
@@ -55,8 +40,9 @@ private:
   TreeNode *mTree;
  
   SmallVector<ASTScope*> mChildren;
-  SmallVector<LocalType> mTypes;   // Local types. Could be primitive or
-                                   // user type include class, struct, etc.
+
+  // Local User types like local class,etc.
+  SmallVector<TreeNode*> mTypes;
 
   // The decls in a scope could have many variaties, it could be a variable, a
   // class, a field of a class, a method of a class, an interface, a lambda, etc.
@@ -80,10 +66,12 @@ public:
   unsigned GetDeclNum() {return mDecls.GetNum();}
   unsigned GetTypeNum() {return mTypes.GetNum();}
   TreeNode* GetDecl(unsigned i) {return mDecls.ValueAtIndex(i);}
-  LocalType       GetType(unsigned i) {return mTypes.ValueAtIndex(i);}
+  TreeNode* GetType(unsigned i) {return mTypes.ValueAtIndex(i);}
 
   TreeNode* FindDeclOf(IdentifierNode*);
 
+  void AddDecl(TreeNode *n) {mDecls.PushBack(n);}
+  void AddType(TreeNode *n) {mTypes.PushBack(n);}
   void TryAddDecl(TreeNode *n);
   void TryAddType(TreeNode *n);
 

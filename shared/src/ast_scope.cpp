@@ -39,11 +39,11 @@ TreeNode* ASTScope::FindDeclOf(IdentifierNode *inode) {
   for (unsigned i = 0; i < GetDeclNum(); i++) {
     TreeNode *tree = GetDecl(i);
     if (tree->IsIdentifier()) {
-      IdentifierNode *decl = (IdentifierNode*)tree;
-      MASSERT(decl->GetType() && "Decl has no type?");
-      if (decl->GetName() == inode->GetName())
-        return decl;
+      IdentifierNode *id = (IdentifierNode*)tree;
+      MASSERT(id->GetType() && "Identifier has no type?");
     }
+    if (tree->GetName() == inode->GetName())
+      return tree;
   }
   return NULL;
 }
@@ -73,16 +73,8 @@ void ASTScope::TryAddDecl(TreeNode *tree) {
 
 // If it's a local type declaration, add it to mTypes.
 void ASTScope::TryAddType(TreeNode *tree) {
-  if (tree->IsClass()) {
-    LocalType lt = {TK_Class, tree};
-    mTypes.PushBack(lt);
-  } else if (tree->IsInterface()) {
-    LocalType lt = {TK_Interface, tree};
-    mTypes.PushBack(lt);
-  } else if (tree->IsFunction()) {
-    FunctionNode *func = (FunctionNode*)tree;
-    LocalType lt = {TK_Function, func};
-    mTypes.PushBack(lt);
+  if (tree->IsClass() || tree->IsInterface() || tree->IsFunction()) {
+    mTypes.PushBack(tree);
   }
 }
 
