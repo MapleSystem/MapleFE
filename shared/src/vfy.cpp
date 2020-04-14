@@ -50,8 +50,6 @@ void Verifier::Do() {
 // only Decl-s before a subtree can be seen by it, which is reasonable
 // for most languages.
 
-// [TODO] Java class in Global scope is special, it doesn't need a
-//        forward declaration....
 void Verifier::VerifyGlobalScope() {
   mCurrScope = gModule.mRootScope;
   std::vector<ASTTree*>::iterator tree_it = gModule.mTrees.begin();
@@ -74,6 +72,20 @@ void Verifier::VerifyTree(TreeNode *tree) {
 #undef  NODEKIND
 #define NODEKIND(K) if (tree->Is##K()) Verify##K(tree);
 #include "ast_nk.def"
+}
+
+// This collect all decls and types in a whole scope. This is useful for
+// some languages like C++/Java where a field or function has scope of
+// the whole class body. Even the code before the field decl can still
+// reference it.
+void Verifier::CollectAllDeclsTypes(ASTScope *scope) {
+  TreeNode *t = scope->GetTree();
+  MASSERT(t->IsClass() && "right now we only support class node here");
+  ClassNode *klass = (ClassNode*)t;
+
+  // All fields, methods, local classes, local interfaces are decls.
+
+  // All local classes/interfaces are types.
 }
 
 // This function has two jobs.
@@ -209,6 +221,8 @@ void Verifier::VerifyClass(ClassNode *klass){
   ASTScope *scope = gModule.NewScope(mCurrScope);
   mCurrScope = scope;
   scope->SetTree(klass);
+
+  CollectAllDeclsTypes(mCurrScope);
 
   // Step 2. Verifiy Fields.
   VerifyClassFields(klass);

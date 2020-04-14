@@ -57,7 +57,10 @@ protected:
 
 protected:
 
-  // A list of class node verification make language specific implementation easier.
+  // collect decls and types in the whole scope.
+  virtual void CollectAllDeclsTypes(ASTScope*);
+
+  // A list of class node verification.
   virtual void VerifyClassFields(ClassNode*);
   virtual void VerifyClassMethods(ClassNode*);
   virtual void VerifyClassSuperClasses(ClassNode*);

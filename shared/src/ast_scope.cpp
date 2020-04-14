@@ -35,12 +35,15 @@ void ASTScope::AddChild(ASTScope *s) {
 
 // We are using name address to decide if two names are equal, since we have a
 // string pool with any two equal strings will be at the same address.
-IdentifierNode* ASTScope::FindDeclOf(IdentifierNode *inode) {
+TreeNode* ASTScope::FindDeclOf(IdentifierNode *inode) {
   for (unsigned i = 0; i < GetDeclNum(); i++) {
-    IdentifierNode *decl = GetDecl(i);
-    MASSERT(decl->GetType() && "Decl has no type?");
-    if (decl->GetName() == inode->GetName())
-      return decl;
+    TreeNode *tree = GetDecl(i);
+    if (tree->IsIdentifier()) {
+      IdentifierNode *decl = (IdentifierNode*)tree;
+      MASSERT(decl->GetType() && "Decl has no type?");
+      if (decl->GetName() == inode->GetName())
+        return decl;
+    }
   }
   return NULL;
 }

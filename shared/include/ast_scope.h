@@ -58,9 +58,10 @@ private:
   SmallVector<LocalType> mTypes;   // Local types. Could be primitive or
                                    // user type include class, struct, etc.
 
-  // Local Variable Decls. We use IdentifierNode here. The type info is
-  // inside the IdentifierNode class.
-  SmallVector<IdentifierNode*> mDecls;
+  // The decls in a scope could have many variaties, it could be a variable, a
+  // class, a field of a class, a method of a class, an interface, a lambda, etc.
+  // So TreeNode is the only choice for it.
+  SmallVector<TreeNode*> mDecls;
 
 public:
   ASTScope() : mParent(NULL), mTree(NULL) {}
@@ -78,18 +79,13 @@ public:
 
   unsigned GetDeclNum() {return mDecls.GetNum();}
   unsigned GetTypeNum() {return mTypes.GetNum();}
-  IdentifierNode* GetDecl(unsigned i) {return mDecls.ValueAtIndex(i);}
+  TreeNode* GetDecl(unsigned i) {return mDecls.ValueAtIndex(i);}
   LocalType       GetType(unsigned i) {return mTypes.ValueAtIndex(i);}
 
-  IdentifierNode* FindDeclOf(IdentifierNode*);
+  TreeNode* FindDeclOf(IdentifierNode*);
 
-  // Each language could have different specification for declaration,
-  // types, or else. So we put them as virtual functions. So is the
-  // Release(). We provide the common implementation which most languages
-  // adopt.
-
-  virtual void TryAddDecl(TreeNode *n);
-  virtual void TryAddType(TreeNode *n);
+  void TryAddDecl(TreeNode *n);
+  void TryAddType(TreeNode *n);
 
   virtual void Release();
 };
