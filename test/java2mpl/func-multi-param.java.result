@@ -13,7 +13,7 @@ class  A
   Methods: 
     func  foo()  throws: 
 
-    func  foo()  throws: 
+    func  bar()  throws: 
 
   LocalClasses: 
   LocalInterfaces: 
@@ -30,7 +30,7 @@ class  A
   Methods: 
     func  foo()  throws: 
 
-    func  foo()  throws: 
+    func  bar()  throws: 
 
   LocalClasses: 
   LocalInterfaces: 

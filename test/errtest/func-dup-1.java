@@ -13,7 +13,6 @@
 //See the Mulan PSL v1 for more details.
 //
 class A {
-  int foo() throws A, B;
-  int bar() throws A, B {
-  }
+  int foo(int c, byte b);
+  int foo(int i, byte b, char c);
 }

@@ -29,4 +29,4 @@ class  A
   LocalClasses: 
   LocalInterfaces: 
 
-Decl Duplication! Identifier:a is duplicated with Function:a
+Field Decl Duplication! Identifier:a is duplicated with Function:a

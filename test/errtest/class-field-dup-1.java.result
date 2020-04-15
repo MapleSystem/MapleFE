@@ -26,5 +26,5 @@ class  A
   LocalClasses: 
   LocalInterfaces: 
 
-Decl Duplication! Identifier:a is duplicated with Identifier:a
-Decl Duplication! Identifier:a is duplicated with Identifier:a
+Field Decl Duplication! Identifier:a is duplicated with Identifier:a
+Field Decl Duplication! Identifier:a is duplicated with Identifier:a

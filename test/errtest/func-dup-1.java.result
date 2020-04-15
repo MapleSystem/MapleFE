@@ -1,4 +1,5 @@
-Matched 23 tokens.
+Matched 27 tokens.
+Attached a tree node from Child
 Attached a tree node from Child
 Attached a tree node from Child
 == Sub Tree ==
@@ -10,9 +11,9 @@ class  A
   Constructors: 
 
   Methods: 
-    func  foo()  throws:     A    B
+    func  foo()  throws: 
 
-    func  bar()  throws:     A    B
+    func  foo()  throws: 
 
   LocalClasses: 
   LocalInterfaces: 
@@ -27,10 +28,12 @@ class  A
   Constructors: 
 
   Methods: 
-    func  foo()  throws:     A    B
+    func  foo()  throws: 
 
-    func  bar()  throws:     A    B
+    func  foo()  throws: 
 
   LocalClasses: 
   LocalInterfaces: 
 
+Function Decl Duplication! Function:foo is duplicated with Function:foo
+Function Decl Duplication! Function:foo is duplicated with Function:foo

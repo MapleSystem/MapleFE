@@ -211,7 +211,7 @@ void Verifier::VerifyClassFields(ClassNode *klass) {
   // rule 1. No duplicated fields name with another decls.
   for (unsigned i = 0; i < klass->GetFieldsNum(); i++) {
     IdentifierNode *na = klass->GetField(i);
-    unsigned hit_self = false;
+    bool hit_self = false;
     for (unsigned j = 0; j < mCurrScope->GetDeclNum(); j++) {
       TreeNode *nb = mCurrScope->GetDecl(j);
       if (na->GetName() == nb->GetName()) {
@@ -219,9 +219,9 @@ void Verifier::VerifyClassFields(ClassNode *klass) {
           if (!hit_self)
             hit_self = true;
           else
-            mLog.Duplicate("Decl Duplication! ", na, nb);
+            mLog.Duplicate("Field Decl Duplication! ", na, nb);
         } else {
-          mLog.Duplicate("Decl Duplication! ", na, nb);
+          mLog.Duplicate("Field Decl Duplication! ", na, nb);
         }
       }
     }
@@ -235,6 +235,24 @@ void Verifier::VerifyClassMethods(ClassNode *klass) {
   for (unsigned i = 0; i < klass->GetMethodsNum(); i++) {
     FunctionNode *method = klass->GetMethod(i);
     // step 1. verify the duplication
+    bool hit_self = false;
+    for (unsigned j = 0; j < mCurrScope->GetDeclNum(); j++) {
+      TreeNode *nb = mCurrScope->GetDecl(j);
+      // Fields have been checked. No need here.
+      if (nb->IsIdentifier())
+        continue;
+
+      if (method->GetName() == nb->GetName()) {
+        if (nb->IsFunction()) {
+          if (!hit_self)
+            hit_self = true;
+          else
+            mLog.Duplicate("Function Decl Duplication! ", method, nb);
+        } else {
+          mLog.Duplicate("Function Decl Duplication! ", method, nb);
+        }
+      }
+    }
 
     // step 2. verify functioin.
     VerifyFunction(method);

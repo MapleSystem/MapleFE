@@ -14,5 +14,5 @@
 //
 class A {
   int foo(int c, byte b);
-  int foo(int i, byte b, char c);
+  int bar(int i, byte b, char c);
 }
