@@ -21,6 +21,10 @@
 
 class TreeNode;
 
+// We allow the verification to be done through the whole module. So there could be
+// multiple error/warning messages. We use VfyLog to record them and dump them once
+// the whole module is done verification.
+
 class VfyLog {
 private:
   StringPool         mPool;
@@ -29,8 +33,8 @@ public:
   VfyLog() {}
   ~VfyLog(){mEntries.Release();}
 
-  void Duplicate(const char *desc1, TreeNode *n1,
-                 const char *desc2, TreeNode *n2);
+  void Duplicate(const char *desc, TreeNode *n1, TreeNode *n2);
+  void MissDecl(TreeNode *n);
 
   void Dump();
 };

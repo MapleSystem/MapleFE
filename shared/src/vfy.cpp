@@ -39,6 +39,7 @@ Verifier::~Verifier() {
 
 void Verifier::Do() {
   VerifyGlobalScope();
+  mLog.Dump();
 }
 
 // Each time when we enter a new scope, we need handle possible local
@@ -124,7 +125,7 @@ void Verifier::VerifyIdentifier(IdentifierNode *inode) {
   }
 
   if (!decl) {
-    std::cout << "Error: Var " << inode->GetName() << " not found decl." << std::endl;
+    mLog.MissDecl(inode);
   } else {
     // Replace the temp IdentifierNode with the found Decl.
     // Sometimes inode and decl are the same, which happens for the declaration statement.
@@ -218,11 +219,9 @@ void Verifier::VerifyClassFields(ClassNode *klass) {
           if (!hit_self)
             hit_self = true;
           else
-            std::cout << "Field: " << na->GetName()
-              << " duplicated with another field." << std::endl;
+            mLog.Duplicate("Decl Duplication! ", na, nb);
         } else {
-          std::cout << "Field: " << na->GetName()
-            << " duplicated with another method/class/interface." << std::endl;
+          mLog.Duplicate("Decl Duplication! ", na, nb);
         }
       }
     }

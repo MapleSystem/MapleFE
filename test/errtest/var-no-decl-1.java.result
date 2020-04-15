@@ -18,4 +18,4 @@ Assign
   a
   b
 
-Error: Var b not found decl.
+Identifier:b has no decl.

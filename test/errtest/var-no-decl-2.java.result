@@ -18,6 +18,6 @@ Assign
     b
 
 
-Error: Var c not found decl.
-Error: Var a not found decl.
-Error: Var b not found decl.
+Identifier:c has no decl.
+Identifier:a has no decl.
+Identifier:b has no decl.

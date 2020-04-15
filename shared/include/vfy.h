@@ -42,11 +42,15 @@
 #include "ast_attr.h"
 #include "ast_type.h"
 #include "container.h"
+#include "vfy_log.h"
 
 class ASTScope;
 class TreeNode;
 
 class Verifier {
+private:
+  VfyLog    mLog;
+
 protected:
   ASTScope *mCurrScope;
 
