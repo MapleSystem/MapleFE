@@ -229,9 +229,15 @@ void Verifier::VerifyClassFields(ClassNode *klass) {
   }
 }
 
+// Several things to verify.
+// 1) Duplication decl. We dont check against field since they are already checked.
+// 2) Verify the function body, which is complicated.
 void Verifier::VerifyClassMethods(ClassNode *klass) {
   for (unsigned i = 0; i < klass->GetMethodsNum(); i++) {
     FunctionNode *method = klass->GetMethod(i);
+    // step 1. verify the duplication
+
+    // step 2. verify functioin.
     VerifyFunction(method);
   }
 }
