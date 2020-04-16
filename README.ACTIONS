@@ -44,6 +44,11 @@ all modules are as below.
   Format: BuildPostfixOperation(Operator, Operand)
   This is the postfix unary operation.
 
+* BuildNewOperation
+  Format: BuildNewOperation(class-name, argument-list, class-body)
+  This is to build a 'new' operation, which is generally a class instance creation.
+  If class-body is not empty, this defines an anonymous class.
+
 * AddLabel
   Format: AddLabel(Stmt-or-expr, Label)
   It returns the statment or expr with label attached.

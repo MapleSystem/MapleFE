@@ -171,6 +171,24 @@ public:
 };
 
 //////////////////////////////////////////////////////////////////////////
+//                      New and Delete operation
+// Java and C++ have new operation, with different syntax and semantics.
+// C++ also has delete operation. The tree nodes below contains most of
+// the information many similar languages need. But the semantic
+// verification will have to be done specifically by each language.
+//////////////////////////////////////////////////////////////////////////
+
+class NewNode : public TreeNode {
+private:
+  TreeNode  *mName; // A name could be qualified, like Outer.Inner
+  SmallVector<TreeNode*> mParams;
+  BlockNode *mBody; // When body is not empty, it's an anonymous class.
+};
+
+class DeleteNode : public TreeNode {
+};
+
+//////////////////////////////////////////////////////////////////////////
 //                         Identifier Nodes
 // Everything having a name will be treated as an Identifier node at the
 // first place. There are some issues here.

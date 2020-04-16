@@ -55,11 +55,14 @@ rule ClassInstanceCreationExpression : ONEOF(
   ExpressionName + '.' + UnqualifiedClassInstanceCreationExpression,
   Primary + '.' + UnqualifiedClassInstanceCreationExpression)
 
-rule UnqualifiedClassInstanceCreationExpression : ONEOF(
-  "new" + ZEROORONE(TypeArguments) + ClassOrInterfaceTypeToInstantiate + '(' + ZEROORONE(ArgumentList) + ')' + ZEROORONE(ClassBody))
+rule UnqualifiedClassInstanceCreationExpression :
+  "new" + ZEROORONE(TypeArguments) + ClassOrInterfaceTypeToInstantiate +
+  '(' + ZEROORONE(ArgumentList) + ')' + ZEROORONE(ClassBody)
+  attr.action : BuildNewOperation(%3, %5, %7)
 
-rule ClassOrInterfaceTypeToInstantiate : ONEOF(
-  ZEROORMORE(Annotation) + Identifier + ZEROORMORE('.' + ZEROORMORE(Annotation) + Identifier) + ZEROORONE(TypeArgumentsOrDiamond))
+rule ClassOrInterfaceTypeToInstantiate :
+  ZEROORMORE(Annotation) + Identifier + ZEROORMORE('.' + ZEROORMORE(Annotation) + Identifier) +
+  ZEROORONE(TypeArgumentsOrDiamond)
 
 rule TypeArgumentsOrDiamond : ONEOF(
   TypeArguments,
