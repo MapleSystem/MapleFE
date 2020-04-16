@@ -16,18 +16,25 @@
 //                   Java Specific Verification                                //
 /////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VERIFIER_JAVA_H__
-#define __VERIFIER_JAVA_H__
+#include "vfy_java.h"
+#include "ast_module.h"
+#include "ast_scope.h"
 
-#include "vfy.h"
+// Collect all types, decls of global scope all at once.
+void VerifierJava::VerifyGlobalScope() {
+  mCurrScope = gModule.mRootScope;
+  std::vector<ASTTree*>::iterator tree_it = gModule.mTrees.begin();
+  for (; tree_it != gModule.mTrees.end(); tree_it++) {
+    ASTTree *asttree = *tree_it;
+    TreeNode *tree = asttree->mRootNode;
+    mCurrScope->TryAddDecl(tree);
+    mCurrScope->TryAddType(tree);
+  } 
 
-class VerifierJava : public Verifier {
-private:
-public:
-  VerifierJava(){}
-  ~VerifierJava(){}
-
-  void VerifyGlobalScope();
-};
-
-#endif
+  tree_it = gModule.mTrees.begin();
+  for (; tree_it != gModule.mTrees.end(); tree_it++) {
+    ASTTree *asttree = *tree_it;
+    TreeNode *tree = asttree->mRootNode;
+    VerifyTree(tree);
+  }
+}

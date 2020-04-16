@@ -563,6 +563,10 @@ public:
   bool IsConstructor()    {return mIsConstructor;}
   void SetIsConstructor() {mIsConstructor = true;}
 
+  unsigned GetParamsNum() { if (mParams) return mParams->GetNum(); else return 0;}
+  void     AddParam(IdentifierNode *n)     {mParams->AddVar(n);}
+  IdentifierNode* ParamAtIndex(unsigned i) {return mParams->VarAtIndex(i);}
+  
   // Attributes related
   unsigned GetAttrsNum()           {return mAttrs.GetNum();}
   void     AddAttr(AttrId a)       {mAttrs.PushBack(a);}

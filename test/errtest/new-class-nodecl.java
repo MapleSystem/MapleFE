@@ -17,6 +17,3 @@ class A {
     new Cyclic();
   }
 }
-
-class Cyclic {
-}

@@ -42,14 +42,12 @@ void Verifier::Do() {
   mLog.Dump();
 }
 
-// Each time when we enter a new scope, we need handle possible local
-// variable declarations or type declaration. So it's different than
-// VerifyTree().
+// In this implementation, the decls and types are recognized while
+// verifying a tree. So this implies only Decl-s before a subtree can
+// be seen by it, which is reasonable for most languages like C/C++.
 //
-// If you have a sharp eye, you can tell the Decl list of the scope is
-// built progressively with verification of sub trees. This means
-// only Decl-s before a subtree can be seen by it, which is reasonable
-// for most languages.
+// Java has a different story, so it has its own implementation. Please
+// see java/vfy_java.cpp.
 
 void Verifier::VerifyGlobalScope() {
   mCurrScope = gModule.mRootScope;
@@ -180,22 +178,43 @@ void Verifier::VerifyTerOperator(TerOperatorNode *tree){
 }
 
 void Verifier::VerifyBlock(BlockNode *block){
-  ASTScope *scope = gModule.NewScope(mCurrScope);
-  mCurrScope = scope;
-  scope->SetTree(block);
+  mCurrScope = gModule.NewScope(mCurrScope);
+  mCurrScope->SetTree(block);
 
   for (unsigned i = 0; i < block->GetChildrenNum(); i++) {
     TreeNode *t = block->GetChildAtIndex(i);
     // Step 1. Try to add decl.
-    scope->TryAddDecl(t);
+    mCurrScope->TryAddDecl(t);
     // Step 2. Try to add type.
-    scope->TryAddType(t);
+    mCurrScope->TryAddType(t);
     // Step 3. Verify the t.
     VerifyTree(t);
   }
 }
 
-void Verifier::VerifyFunction(FunctionNode *tree){
+// Function body's block is different than a pure BlockNode.
+void Verifier::VerifyFunction(FunctionNode *func){
+  mCurrScope = gModule.NewScope(mCurrScope);
+  mCurrScope->SetTree(func);
+
+  // Add the parameters to the decl. Since we search for the decl of a var from
+  // nearest scope to the farest, so it will shadown the
+  // decl with same name in the ancestors' scope.
+  for (unsigned i = 0; i < func->GetParamsNum(); i++) {
+    IdentifierNode *inode = func->ParamAtIndex(i);
+    mCurrScope->TryAddDecl(inode);
+  }
+
+  BlockNode *block = func->GetBody();
+  for (unsigned i = 0; block && i < block->GetChildrenNum(); i++) {
+    TreeNode *t = block->GetChildAtIndex(i);
+    // Step 1. Try to add decl.
+    mCurrScope->TryAddDecl(t);
+    // Step 2. Try to add type.
+    mCurrScope->TryAddType(t);
+    // Step 3. Verify the t.
+    VerifyTree(t);
+  }
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
