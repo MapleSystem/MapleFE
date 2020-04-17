@@ -191,13 +191,14 @@ public:
   NewNode() : mId(NULL), mBody(NULL) {mKind = NK_New;}
   ~NewNode() {mParams.Release();}
 
-  TreeNode* GetId()       {return mId;}
-  void SetId(TreeNode *n) {mId = n;}
-
+  TreeNode* GetId()          {return mId;}
+  void SetId(TreeNode *n)    {mId = n;}
   BlockNode* GetBody()       {return mBody;}
   void SetBody(BlockNode *n) {mBody = n;}
-
   void AddParam(TreeNode *t) {mParams.PushBack(t);}
+
+  void ReplaceChild(TreeNode *oldone, TreeNode *newone);
+  void Dump(unsigned);
 };
 
 class DeleteNode : public TreeNode {

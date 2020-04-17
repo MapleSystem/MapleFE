@@ -335,7 +335,45 @@ void Verifier::VerifyWhileLoop(WhileLoopNode *tree){
 void Verifier::VerifyDoLoop(DoLoopNode *tree){
 }
 
-void Verifier::VerifyNew(NewNode *tree){
+// This verifies if identifier is a type, like class. If yes, replace
+// it with the original type decl node.
+void Verifier::VerifyType(IdentifierNode *inode) {
+  ASTScope *scope = mCurrScope;
+  TreeNode *type = NULL;
+  while (scope) {
+    if (type = scope->FindTypeOf(inode))
+      break;
+    scope = scope->GetParent();
+  }
+
+  if (!type) {
+    mLog.MissDecl(inode);
+  } else {
+    // Replace the temp IdentifierNode with the found Decl.
+    // Sometimes inode and type are the same, which happens for the declaration statement.
+    // We will verify type statement as the others, so its inode is the same as type.
+    if (inode != type) {
+      mTempParent->ReplaceChild(inode, type);
+      //std::cout << "Replace " << inode << " with " << type << std::endl;
+    }
+  }
+}
+
+// We only verify the class name is available. Replace it with
+// the original class node. This is not about decl, it's about type
+// since we put class declaration as a type.
+void Verifier::VerifyNew(NewNode *new_node){
+  TreeNode *tree = new_node->GetId();
+  MASSERT(tree
+          && tree->IsIdentifier()
+          && "We only support single identifier in NewNode right now");
+  IdentifierNode *inode = (IdentifierNode*)tree;
+
+  // verify and replace if possible.
+  TreeNode *old_temp_parent = mTempParent;
+  mTempParent = new_node;
+  VerifyType(inode);
+  mTempParent = old_temp_parent;
 }
 
 void Verifier::VerifyDelete(DeleteNode *tree){

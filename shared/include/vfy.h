@@ -60,7 +60,6 @@ protected:
   TreeNode *mTempParent;
 
 protected:
-
   // collect decls and types in the whole scope.
   virtual void CollectAllDeclsTypes(ASTScope*);
 
@@ -70,6 +69,7 @@ protected:
   virtual void VerifyClassSuperClasses(ClassNode*);
   virtual void VerifyClassSuperInterfaces(ClassNode*);
 
+  virtual void VerifyType(IdentifierNode*);
 public:
   Verifier();
   ~Verifier();

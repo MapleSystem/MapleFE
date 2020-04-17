@@ -48,6 +48,19 @@ TreeNode* ASTScope::FindDeclOf(IdentifierNode *inode) {
   return NULL;
 }
 
+// This is to find the type having the same name as 'inode'.
+//
+// We are using name address to decide if two names are equal, since we have a
+// string pool with any two equal strings will be at the same address.
+TreeNode* ASTScope::FindTypeOf(IdentifierNode *inode) {
+  for (unsigned i = 0; i < GetTypeNum(); i++) {
+    TreeNode *tree = GetType(i);
+    if (tree->GetName() == inode->GetName())
+      return tree;
+  }
+  return NULL;
+}
+
 // If it's a local declaration, add it to mDecls.
 // This is a general common implementaiton, it assumes
 // the correct declaration is IdentifierNode with type.

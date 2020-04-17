@@ -11,7 +11,20 @@ class  A
 
   Methods: 
     func  foo()  throws: 
-      Cyclic
+      new Cyclic
+  LocalClasses: 
+  LocalInterfaces: 
+
+Matched 19 tokens.
+== Sub Tree ==
+class  Cyclic
+  Fields: 
+
+  Instance Initializer: 
+
+  Constructors: 
+
+  Methods: 
   LocalClasses: 
   LocalInterfaces: 
 
@@ -26,7 +39,19 @@ class  A
 
   Methods: 
     func  foo()  throws: 
-      Cyclic
+      new Cyclic
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+class  Cyclic
+  Fields: 
+
+  Instance Initializer: 
+
+  Constructors: 
+
+  Methods: 
   LocalClasses: 
   LocalInterfaces: 
 

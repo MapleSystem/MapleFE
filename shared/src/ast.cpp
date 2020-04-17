@@ -296,6 +296,24 @@ void UnaOperatorNode::Dump(unsigned indent) {
   }
 }
 
+
+//////////////////////////////////////////////////////////////////////////////////////
+//                           NewNode
+//////////////////////////////////////////////////////////////////////////////////////
+
+// It's caller's duty to assure old_child is a child
+void NewNode::ReplaceChild(TreeNode *old_child, TreeNode *new_child) {
+  MASSERT((mId == old_child) && "Old child not class id?");
+  SetId(new_child);
+}
+
+void NewNode::Dump(unsigned indent) {
+  DumpIndentation(indent);
+  DUMP0_NORETURN("new ");
+  TreeNode *id = GetId();
+  DUMP0_NORETURN(id->GetName());
+}
+
 //////////////////////////////////////////////////////////////////////////////////////
 //                          DimensionNode
 //////////////////////////////////////////////////////////////////////////////////////
