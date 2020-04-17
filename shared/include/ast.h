@@ -178,11 +178,26 @@ public:
 // verification will have to be done specifically by each language.
 //////////////////////////////////////////////////////////////////////////
 
+class BlockNode;
 class NewNode : public TreeNode {
 private:
-  TreeNode  *mName; // A name could be qualified, like Outer.Inner
-  SmallVector<TreeNode*> mParams;
-  BlockNode *mBody; // When body is not empty, it's an anonymous class.
+  TreeNode  *mId;                  // A name could be like Outer.Inner
+                                   // Hard to give a const char* as name.
+                                   // So give it an id.
+  SmallVector<TreeNode*> mParams;  //
+  BlockNode *mBody;                // When body is not empty, it's an
+                                   // anonymous class.
+public:
+  NewNode() : mId(NULL), mBody(NULL) {mKind = NK_New;}
+  ~NewNode() {mParams.Release();}
+
+  TreeNode* GetId()       {return mId;}
+  void SetId(TreeNode *n) {mId = n;}
+
+  BlockNode* GetBody()       {return mBody;}
+  void SetBody(BlockNode *n) {mBody = n;}
+
+  void AddParam(TreeNode *t) {mParams.PushBack(t);}
 };
 
 class DeleteNode : public TreeNode {

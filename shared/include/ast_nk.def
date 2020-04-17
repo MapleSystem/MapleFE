@@ -49,6 +49,8 @@ NODEKIND(Break)
 NODEKIND(ForLoop)
 NODEKIND(WhileLoop)
 NODEKIND(DoLoop)
+NODEKIND(New)
+NODEKIND(Delete)
 
 NODEKIND(SwitchLabel)
 NODEKIND(SwitchCase)

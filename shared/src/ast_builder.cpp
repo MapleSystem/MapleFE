@@ -1037,6 +1037,50 @@ TreeNode* ASTBuilder::AddDims() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+//                    New & Delete operation related
+////////////////////////////////////////////////////////////////////////////////
+
+TreeNode* ASTBuilder::BuildNewOperation() {
+  if (mTrace)
+    std::cout << "In BuildNewOperation " << std::endl;
+
+  NewNode *new_node = (NewNode*)mTreePool->NewTreeNode(sizeof(NewNode));
+  new (new_node) NewNode();
+
+  MASSERT(mParams.size() == 3 && "BuildNewOperation has NO 3 params?");
+  Param p_a = mParams[0];
+  Param p_b = mParams[1];
+  Param p_c = mParams[2];
+
+  // Name could not be empty
+  if (p_a.mIsEmpty)
+    MERROR("The name in BuildNewOperation() is empty?");
+  MASSERT(p_a.mIsTreeNode && "Name of new expression is not a tree?");
+  TreeNode *name = p_a.mData.mTreeNode;
+  new_node->SetId(name);
+  
+  TreeNode *node_b = p_b.mIsEmpty ? NULL : p_b.mData.mTreeNode;
+  if (node_b) {
+    MASSERT(node_b->IsIdentifier() && "Only support one single iden as argument.");
+    IdentifierNode *inode = (IdentifierNode*)node_b;
+    new_node->AddParam(inode);
+  }
+
+  TreeNode *node_c = p_c.mIsEmpty ? NULL : p_c.mData.mTreeNode;
+  if (node_c) {
+    MASSERT(node_c->IsBlock() && "ClassBody is not a block?");
+    BlockNode *b = (BlockNode*)node_c;
+    new_node->SetBody(b);
+  }
+
+  mLastTreeNode = new_node;
+  return new_node;
+}
+
+TreeNode* ASTBuilder::BuildDeleteOperation() {
+}
+
+////////////////////////////////////////////////////////////////////////////////
 //                    FunctionNode related
 ////////////////////////////////////////////////////////////////////////////////
 

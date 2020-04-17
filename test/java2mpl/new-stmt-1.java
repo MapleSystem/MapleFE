@@ -18,5 +18,5 @@ class A {
   }
 }
 
-class Cyclic {
-}
+//class Cyclic {
+//}

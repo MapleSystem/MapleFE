@@ -130,6 +130,8 @@ public:
   TreeNode* BuildForLoop();
   TreeNode* BuildWhileLoop();
   TreeNode* BuildDoLoop();
+  TreeNode* BuildNewOperation();
+  TreeNode* BuildDeleteOperation();
 
   SwitchCaseNode* SwitchLabelToCase(SwitchLabelNode*);
   TreeNode* BuildSwitchLabel();

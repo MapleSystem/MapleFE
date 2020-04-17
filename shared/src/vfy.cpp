@@ -335,6 +335,12 @@ void Verifier::VerifyWhileLoop(WhileLoopNode *tree){
 void Verifier::VerifyDoLoop(DoLoopNode *tree){
 }
 
+void Verifier::VerifyNew(NewNode *tree){
+}
+
+void Verifier::VerifyDelete(DeleteNode *tree){
+}
+
 void Verifier::VerifySwitchLabel(SwitchLabelNode *tree){
 }
 

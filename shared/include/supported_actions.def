@@ -78,6 +78,8 @@ ACTION(BuildBreak)
 ACTION(BuildForLoop)
 ACTION(BuildWhileLoop)
 ACTION(BuildDoLoop)
+ACTION(BuildNewOperation)
+ACTION(BuildDeleteOperation)
 
 ACTION(BuildSwitchLabel)
 ACTION(BuildDefaultSwitchLabel)
