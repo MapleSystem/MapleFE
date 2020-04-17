@@ -194,6 +194,7 @@ void Verifier::VerifyBlock(BlockNode *block){
 
 // Function body's block is different than a pure BlockNode.
 void Verifier::VerifyFunction(FunctionNode *func){
+  ASTScope *old_scope = mCurrScope;
   mCurrScope = gModule.NewScope(mCurrScope);
   mCurrScope->SetTree(func);
 
@@ -215,6 +216,8 @@ void Verifier::VerifyFunction(FunctionNode *func){
     // Step 3. Verify the t.
     VerifyTree(t);
   }
+
+  mCurrScope = old_scope;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
