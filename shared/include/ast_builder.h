@@ -97,6 +97,8 @@ public:
   TreeNode* AddAttributeTo();
 
   // Function related
+  void AddParams(TreeNode *func, TreeNode *params);
+  TreeNode* AddParams();
   TreeNode* BuildFunction();
   TreeNode* BuildConstructor();
   TreeNode* AddFunctionBody();

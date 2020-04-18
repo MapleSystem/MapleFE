@@ -1,4 +1,4 @@
-Matched 16 tokens.
+Matched 18 tokens.
 Attached a tree node from Child
 Attached a tree node from Child
 Attached a tree node from Child
@@ -19,7 +19,7 @@ class  A
   LocalClasses: 
   LocalInterfaces: 
 
-Matched 20 tokens.
+Matched 22 tokens.
 == Sub Tree ==
 class  Cyclic
   Fields: 

@@ -684,7 +684,6 @@ FunctionNode::FunctionNode() {
   mKind = NK_Function;
   mName = NULL;
   mType = NULL;
-  mParams = NULL;
   mBody = NULL;
   mDims = NULL;
   mIsConstructor = false;

@@ -1040,6 +1040,51 @@ TreeNode* ASTBuilder::AddDims() {
 //                    New & Delete operation related
 ////////////////////////////////////////////////////////////////////////////////
 
+// This is a help function which adds parameters to a function. It can be
+// a function declaration statement or a call site. The difference is function
+// declaration needs a list of decls as formal parameters, while call site
+// needs a list of identifiers. Since we are using TreeNode*, it can be used
+// for both scenarios.
+
+// It's the caller's duty to assure 'func' and 'params' are non null.
+void ASTBuilder::AddParams(TreeNode *func, TreeNode *params) {
+  if (params->IsIdentifier()) {
+    // one single parameter at call site
+    IdentifierNode *inode = (IdentifierNode*)params;
+    if (func->IsFunction())
+      ((FunctionNode*)func)->AddParam(inode);
+    else if (func->IsNew())
+      ((NewNode*)func)->AddParam(inode);
+    else
+      MERROR("Unsupported yet.");
+  } else if (params->IsVarList()) {
+    // a list of decls at function declaration
+    VarListNode *vl = (VarListNode*)params;
+    for (unsigned i = 0; i < vl->GetNum(); i++) {
+      IdentifierNode *inode = vl->VarAtIndex(i);
+      if (func->IsFunction())
+        ((FunctionNode*)func)->AddParam(inode);
+      else if (func->IsNew())
+        ((NewNode*)func)->AddParam(inode);
+      else
+        MERROR("Unsupported yet.");
+    }
+  } else if (params->IsPass()) {
+    // a list of identifiers at call site.
+    PassNode *pass = (PassNode*)params;
+    for (unsigned i = 0; i < pass->GetChildrenNum(); i++) {
+      TreeNode *child = pass->GetChild(i);
+      MASSERT(child->IsIdentifier() && "Unsupported non-iden node");
+      if (func->IsFunction())
+        ((FunctionNode*)func)->AddParam(child);
+      else if (func->IsNew())
+        ((NewNode*)func)->AddParam(child);
+      else
+        MERROR("Unsupported yet.");
+    }
+  }
+}
+
 TreeNode* ASTBuilder::BuildNewOperation() {
   if (mTrace)
     std::cout << "In BuildNewOperation " << std::endl;
@@ -1060,25 +1105,8 @@ TreeNode* ASTBuilder::BuildNewOperation() {
   new_node->SetId(name);
   
   TreeNode *node_b = p_b.mIsEmpty ? NULL : p_b.mData.mTreeNode;
-  if (node_b) {
-    if (node_b->IsIdentifier()) {
-      IdentifierNode *inode = (IdentifierNode*)node_b;
-      new_node->AddParam(inode);
-    } else if (node_b->IsVarList()) {
-      VarListNode *vl = (VarListNode*)node_b;
-      for (unsigned i = 0; i < vl->GetNum(); i++) {
-        IdentifierNode *inode = vl->VarAtIndex(i);
-        new_node->AddParam(inode);
-      }
-    } else if (node_b->IsPass()) {
-      PassNode *pass = (PassNode*)node_b;
-      for (unsigned i = 0; i < pass->GetChildrenNum(); i++) {
-        TreeNode *child = pass->GetChild(i);
-        MASSERT(child->IsIdentifier() && "Unsupported non-iden node");
-        new_node->AddParam(child);
-      }
-    }
-  }
+  if (node_b)
+    AddParams(new_node, node_b);
 
   TreeNode *node_c = p_c.mIsEmpty ? NULL : p_c.mData.mTreeNode;
   if (node_c) {
@@ -1097,6 +1125,21 @@ TreeNode* ASTBuilder::BuildDeleteOperation() {
 ////////////////////////////////////////////////////////////////////////////////
 //                    FunctionNode related
 ////////////////////////////////////////////////////////////////////////////////
+
+TreeNode* ASTBuilder::AddParams() {
+  if (mTrace)
+    std::cout << "In AddParams" << std::endl;
+
+  Param p_params = mParams[0];
+  if (!p_params.mIsEmpty) {
+    if (!p_params.mIsTreeNode)
+      MERROR("The parameters is not a treenode in AddParams()");
+    TreeNode *params = p_params.mData.mTreeNode;
+    AddParams(mLastTreeNode, params);
+  }
+
+  return mLastTreeNode;
+}
 
 // This takes just one argument which is the function name.
 TreeNode* ASTBuilder::BuildFunction() {

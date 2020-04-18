@@ -202,7 +202,7 @@ void Verifier::VerifyFunction(FunctionNode *func){
   // nearest scope to the farest, so it will shadown the
   // decl with same name in the ancestors' scope.
   for (unsigned i = 0; i < func->GetParamsNum(); i++) {
-    IdentifierNode *inode = func->ParamAtIndex(i);
+    IdentifierNode *inode = func->GetParam(i);
     mCurrScope->TryAddDecl(inode);
   }
 

@@ -110,12 +110,16 @@ all modules are as below.
 
 * BuildDecl
   Format: BuildDecl(Type, Variable)
-
   The Decl will be added to its scope. Every Decl has a scope which is the nearest one
   enclosing it.
 
+  [NOTE] It's usually combined with BuildVarList().
+
 * BuildVarList
   Format: BuildVarlList(Variable_A, Variable_B)
+
+  [NOTE] THIS MUST BE CALLED WHEN BUILDING A LIST OF PARAMETERS, ARGUMENTS, ...
+         Please see examples in java/stmt.spec or java/stmt.block.spec
 
   1) This is the build a list of variables. This could be used in multiple place, as long as
      they have the syntax like: a, b, c. For example, in variable declarations like
@@ -192,6 +196,10 @@ all modules are as below.
 
 * BuildFunction
   Format: BuildFunction(function-Identifier)
+
+* AddParams
+  Format: AddParams(parameters)
+  Adds the parameters into the mLastTreeNode.
 
 * BuildConstructor
   Format: BuildConstructor(function-Identifier)
