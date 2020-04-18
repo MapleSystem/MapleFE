@@ -1061,9 +1061,16 @@ TreeNode* ASTBuilder::BuildNewOperation() {
   
   TreeNode *node_b = p_b.mIsEmpty ? NULL : p_b.mData.mTreeNode;
   if (node_b) {
-    MASSERT(node_b->IsIdentifier() && "Only support one single iden as argument.");
-    IdentifierNode *inode = (IdentifierNode*)node_b;
-    new_node->AddParam(inode);
+    if (node_b->IsIdentifier()) {
+      IdentifierNode *inode = (IdentifierNode*)node_b;
+      new_node->AddParam(inode);
+    } else if (node_b->IsVarList()) {
+      VarListNode *vl = (VarListNode*)node_b;
+      for (unsigned i = 0; i < vl->GetNum(); i++) {
+        IdentifierNode *inode = vl->VarAtIndex(i);
+        new_node->AddParam(inode);
+      }
+    }
   }
 
   TreeNode *node_c = p_c.mIsEmpty ? NULL : p_c.mData.mTreeNode;

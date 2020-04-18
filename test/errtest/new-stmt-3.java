@@ -14,7 +14,7 @@
 //
 class A {
   void foo() {
-    new Cyclic(a);
+    new Cyclic(a, b);
   }
 }
 

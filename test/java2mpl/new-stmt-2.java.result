@@ -1,4 +1,8 @@
-Matched 18 tokens.
+Matched 16 tokens.
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
 Attached a tree node from Child
 Attached a tree node from Child
 == Sub Tree ==
@@ -11,7 +15,20 @@ class  A
 
   Methods: 
     func  foo()  throws: 
-      Cyclic
+      new Cyclic
+  LocalClasses: 
+  LocalInterfaces: 
+
+Matched 20 tokens.
+== Sub Tree ==
+class  Cyclic
+  Fields: 
+
+  Instance Initializer: 
+
+  Constructors: 
+
+  Methods: 
   LocalClasses: 
   LocalInterfaces: 
 
@@ -26,7 +43,19 @@ class  A
 
   Methods: 
     func  foo()  throws: 
-      Cyclic
+      new Cyclic
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+class  Cyclic
+  Fields: 
+
+  Instance Initializer: 
+
+  Constructors: 
+
+  Methods: 
   LocalClasses: 
   LocalInterfaces: 
 
