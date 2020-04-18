@@ -1070,6 +1070,13 @@ TreeNode* ASTBuilder::BuildNewOperation() {
         IdentifierNode *inode = vl->VarAtIndex(i);
         new_node->AddParam(inode);
       }
+    } else if (node_b->IsPass()) {
+      PassNode *pass = (PassNode*)node_b;
+      for (unsigned i = 0; i < pass->GetChildrenNum(); i++) {
+        TreeNode *child = pass->GetChild(i);
+        MASSERT(child->IsIdentifier() && "Unsupported non-iden node");
+        new_node->AddParam(child);
+      }
     }
   }
 

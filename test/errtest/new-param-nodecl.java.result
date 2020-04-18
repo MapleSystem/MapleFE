@@ -1,0 +1,61 @@
+Matched 18 tokens.
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+== Sub Tree ==
+class  A
+  Fields: 
+
+  Instance Initializer: 
+
+  Constructors: 
+
+  Methods: 
+    func  foo()  throws: 
+      new Cyclic
+  LocalClasses: 
+  LocalInterfaces: 
+
+Matched 22 tokens.
+== Sub Tree ==
+class  Cyclic
+  Fields: 
+
+  Instance Initializer: 
+
+  Constructors: 
+
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+============= Module ===========
+== Sub Tree ==
+class  A
+  Fields: 
+
+  Instance Initializer: 
+
+  Constructors: 
+
+  Methods: 
+    func  foo()  throws: 
+      new Cyclic
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+class  Cyclic
+  Fields: 
+
+  Instance Initializer: 
+
+  Constructors: 
+
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+Identifier:a has no decl.
+Identifier:b has no decl.

@@ -195,7 +195,10 @@ public:
   void SetId(TreeNode *n)    {mId = n;}
   BlockNode* GetBody()       {return mBody;}
   void SetBody(BlockNode *n) {mBody = n;}
-  void AddParam(TreeNode *t) {mParams.PushBack(t);}
+
+  unsigned  GetParamsNum()        {return mParams.GetNum();}
+  TreeNode* GetParam(unsigned i)  {return mParams.ValueAtIndex(i);}
+  void      AddParam(TreeNode *t) {mParams.PushBack(t);}
 
   void ReplaceChild(TreeNode *oldone, TreeNode *newone);
   void Dump(unsigned);
