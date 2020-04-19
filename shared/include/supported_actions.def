@@ -39,6 +39,7 @@ ACTION(BuildDecl)
 ACTION(BuildVarList)
 
 // For function
+ACTION(AddParams)
 ACTION(BuildFunction)
 ACTION(BuildConstructor)
 ACTION(AddFunctionBody)

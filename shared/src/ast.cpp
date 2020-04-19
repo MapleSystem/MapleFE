@@ -303,8 +303,15 @@ void UnaOperatorNode::Dump(unsigned indent) {
 
 // It's caller's duty to assure old_child is a child
 void NewNode::ReplaceChild(TreeNode *old_child, TreeNode *new_child) {
-  MASSERT((mId == old_child) && "Old child not class id?");
-  SetId(new_child);
+  if (mId == old_child) {
+    SetId(new_child);
+    return;
+  } else {
+    for (unsigned i = 0; i < GetParamsNum(); i++) {
+      if (GetParam(i) == old_child)
+        mParams.SetElem(i, new_child);
+    }
+  }
 }
 
 void NewNode::Dump(unsigned indent) {
@@ -677,7 +684,6 @@ FunctionNode::FunctionNode() {
   mKind = NK_Function;
   mName = NULL;
   mType = NULL;
-  mParams = NULL;
   mBody = NULL;
   mDims = NULL;
   mIsConstructor = false;

@@ -195,7 +195,10 @@ public:
   void SetId(TreeNode *n)    {mId = n;}
   BlockNode* GetBody()       {return mBody;}
   void SetBody(BlockNode *n) {mBody = n;}
-  void AddParam(TreeNode *t) {mParams.PushBack(t);}
+
+  unsigned  GetParamsNum()        {return mParams.GetNum();}
+  TreeNode* GetParam(unsigned i)  {return mParams.ValueAtIndex(i);}
+  void      AddParam(TreeNode *t) {mParams.PushBack(t);}
 
   void ReplaceChild(TreeNode *oldone, TreeNode *newone);
   void Dump(unsigned);
@@ -581,7 +584,7 @@ private:
   SmallVector<AttrId>         mAttrs;
   SmallVector<ExceptionNode*> mThrows; // exceptions it can throw
   TreeNode                   *mType;   // return type
-  VarListNode                *mParams;
+  SmallVector<TreeNode*>      mParams;  //
   BlockNode                  *mBody;
   DimensionNode              *mDims;
   bool                        mIsConstructor;
@@ -597,9 +600,9 @@ public:
   bool IsConstructor()    {return mIsConstructor;}
   void SetIsConstructor() {mIsConstructor = true;}
 
-  unsigned GetParamsNum() { if (mParams) return mParams->GetNum(); else return 0;}
-  void     AddParam(IdentifierNode *n)     {mParams->AddVar(n);}
-  IdentifierNode* ParamAtIndex(unsigned i) {return mParams->VarAtIndex(i);}
+  unsigned  GetParamsNum()        {return mParams.GetNum();}
+  TreeNode* GetParam(unsigned i)  {return mParams.ValueAtIndex(i);}
+  void      AddParam(TreeNode *t) {mParams.PushBack(t);}
   
   // Attributes related
   unsigned GetAttrsNum()           {return mAttrs.GetNum();}
@@ -625,6 +628,7 @@ public:
 
 
   void Release() { mAttrs.Release();
+                   mParams.Release();
                    if (mDims) mDims->Release();}
   void Dump(unsigned);
 };

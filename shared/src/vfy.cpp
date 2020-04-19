@@ -202,7 +202,7 @@ void Verifier::VerifyFunction(FunctionNode *func){
   // nearest scope to the farest, so it will shadown the
   // decl with same name in the ancestors' scope.
   for (unsigned i = 0; i < func->GetParamsNum(); i++) {
-    IdentifierNode *inode = func->ParamAtIndex(i);
+    IdentifierNode *inode = func->GetParam(i);
     mCurrScope->TryAddDecl(inode);
   }
 
@@ -362,9 +362,10 @@ void Verifier::VerifyType(IdentifierNode *inode) {
   }
 }
 
-// We only verify the class name is available. Replace it with
-// the original class node. This is not about decl, it's about type
-// since we put class declaration as a type.
+// Verify if the class name and parameter are available. Replace it with
+// the original class node or decl node.
+// Class is not about decl, it's about type since we put class declaration as a type.
+// Param is about decl.
 void Verifier::VerifyNew(NewNode *new_node){
   TreeNode *tree = new_node->GetId();
   MASSERT(tree
@@ -372,10 +373,19 @@ void Verifier::VerifyNew(NewNode *new_node){
           && "We only support single identifier in NewNode right now");
   IdentifierNode *inode = (IdentifierNode*)tree;
 
-  // verify and replace if possible.
   TreeNode *old_temp_parent = mTempParent;
   mTempParent = new_node;
+
+  // verify class type
   VerifyType(inode);
+  // verify parameters
+  for (unsigned i = 0; i < new_node->GetParamsNum(); i++) {
+    TreeNode *p = new_node->GetParam(i);
+    MASSERT(p->IsIdentifier() && "Param is not an identifier.");
+    IdentifierNode *inode = (IdentifierNode*)p;
+    VerifyIdentifier(inode);
+  }
+
   mTempParent = old_temp_parent;
 }
 

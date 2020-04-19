@@ -81,6 +81,7 @@ rule MethodHeader      : ONEOF(Result + MethodDeclarator + ZEROORONE(Throws),
 rule Result            : ONEOF(UnannType, "void")
 rule MethodDeclarator  : Identifier + '(' + ZEROORONE(FormalParameterList) + ')' + ZEROORONE(Dims)
   attr.action: BuildFunction(%1)
+  attr.action: AddParams(%3)
   attr.action: AddDims(%5)
 
 rule Throws            : "throws" + ExceptionTypeList
@@ -101,7 +102,11 @@ rule FormalParameterList : ONEOF(ReceiverParameter,
                                  LastFormalParameter)
 rule FormalParameters  : ONEOF(FormalParameter + ZEROORMORE(',' + FormalParameter),
                                ReceiverParameter + ZEROORMORE(',' + FormalParameter))
+  attr.action.%1: BuildVarList(%1, %2)
+
 rule FormalParameter   : ZEROORMORE(VariableModifier) + UnannType + VariableDeclaratorId
+  attr.action: BuildDecl(%2, %3)
+  attr.action: AddAttribute(%1)
 rule ReceiverParameter : ZEROORMORE(Annotation) + UnannType + ZEROORONE(Identifier + '.') + "this"
 rule LastFormalParameter : ONEOF(ZEROORMORE(VariableModifier) + UnannType + ZEROORMORE(Annotation) +
                                    "..." + VariableDeclaratorId,

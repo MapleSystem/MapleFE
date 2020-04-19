@@ -95,6 +95,12 @@ public:
     return (T*)addr;
   }
 
+  // It's the caller's duty to make sure ith element is valid.
+  void SetElem(unsigned i, T t) {
+    char *addr = mMemPool.AddrOfIndex(i);
+    *(T*)addr = t;
+  }
+
   bool Find(T t) {
     for (unsigned i = 0; i < mNum; i++) {
       T temp = ValueAtIndex(i);
