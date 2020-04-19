@@ -107,7 +107,7 @@ foreach my $dir (@dirname) {
           }
           print " ==$dir===> $file\n";
           $countfailedjava ++;
-          push(@failed_file, $file." ".$dir);
+          push(@failed_file, $dir.":  ".$file);
           next;
         }
 
@@ -121,7 +121,7 @@ foreach my $dir (@dirname) {
           print "Original file $oresult_file does NOT exists!\n";
           system("touch $notexistsdir/$oresult_file");
           $countfailedjava ++;
-          push(@failed_file, $file." ".$dir);
+          push(@failed_file, $dir.": ".$file);
         } else {
           if ((!(-e "$outdir/$result_file")) || (-z "$outdir/$result_file")) { 
             if(!(-e "$notexistsdir")) {
@@ -131,7 +131,7 @@ foreach my $dir (@dirname) {
             print "$result_file either empty or not exists!\n";
             system("touch $notexistsdir/$result_file");
             $countfailedjava ++;
-            push(@failed_file, $file." ".$dir);
+            push(@failed_file, $dir.": ".$file);
           } else {
 #print "COMPARE file $pwd/$dir/$oresult_file and $outdir/$result_file\n";
             $res2 = system("diff $pwd/$dir/$oresult_file $outdir/$result_file");
@@ -144,7 +144,7 @@ foreach my $dir (@dirname) {
               print "$oresult_file $result_file are different!!!\n";
               system("touch $diffdir/$diff_file");
               $countfailedjava ++;
-              push(@failed_file, $file." ".$dir);
+              push(@failed_file, $dir.": ".$file);
             } else {
 #print "GOOD files: $file\n";
               push(@successed_file, $file." ".$dir);
@@ -185,15 +185,15 @@ if ($countFailed eq 0) {
   print "Total Test Cases: $count\n";
   if(scalar(@successed_file) > 0) {
     print "\n=========================\npassed $countPassed tests:\n\n";
-    foreach $passed (@successed_file) {
-      print $passed."\n";
-    }
-    print $fh "$countPassed testcases passed\n";
+    #foreach $passed (@successed_file) {
+    #  print $passed."\n";
+    #}
+    #print $fh "$countPassed testcases passed\n";
   }
   print "\n=========================\nfailed $countFailed tests:\n\n";
   if(scalar(@failed_file) > 0){
     print("=== failed : $countfailedjava tests\n");
-    print $fh "$countfailedjava testcases failed\n";
+    #print $fh "$countfailedjava testcases failed\n";
 
     foreach $failed (@failed_file) {
       print $failed."\n";
