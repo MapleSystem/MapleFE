@@ -252,7 +252,7 @@ rule Expression : ONEOF(
   Primary,
   UnaryExpression,
   BinaryExpression,
-  ConditionalExpression, #TernaryExpression
+  ConditionalExpression,
   LambdaExpression,
   AssignmentExpression)
 

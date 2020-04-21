@@ -1032,8 +1032,12 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *parent) {
   bool found = false;
   unsigned prev_succ_tokens_num = 0;
   unsigned prev_succ_tokens[MAX_SUCC_TOKENS];
+
+  // Curr status, it could be failure.
   unsigned curr_succ_tokens_num = 0;
   unsigned curr_succ_tokens[MAX_SUCC_TOKENS];
+
+  // Final status. It only saves the latest successful status.
   unsigned final_succ_tokens_num = 0;
   unsigned final_succ_tokens[MAX_SUCC_TOKENS];
 
@@ -1075,8 +1079,9 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *parent) {
 
         // Step 2. Iterate and try
         //         There are again multiple possiblilities. Could be multiple matching again.
-        //         We will never go that far. We'll stop at the first matching.
-        //         We don't want the matching number to explode.
+        //         We will never go that far. We'll stop at the first matching which matches
+        //         the most tokens. So a small sorting is required.
+
         bool temp_found = false;
         for (unsigned j = 0; j < prev_succ_tokens_num; j++) {
           // The longest matching has been proven to be a failure.
@@ -1100,31 +1105,33 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *parent) {
         if (!found) {
           mCurToken = old_pos;
         } else {
-          // for Zeroorone/Zeroormore node, it set found to true, but actually it may matching
-          // nothing. In this case, we don't change final_succ_tokens_num.
-          if (gSuccTokensNum > 0) {
-            final_succ_tokens_num = gSuccTokensNum;
-            for (unsigned id = 0; id < gSuccTokensNum; id++)
-              final_succ_tokens[id] = gSuccTokens[id];
-          }
+          // Usually, for Zeroorone/Zeroormore node, it may set found to true, but actually
+          // it may matching nothing. Although it doesn't move mCurToken, it does move the
+          // rule. I'll buy this succ.
+          final_succ_tokens_num = gSuccTokensNum;
+          for (unsigned id = 0; id < gSuccTokensNum; id++)
+            final_succ_tokens[id] = gSuccTokens[id];
+          curr_succ_tokens_num = gSuccTokensNum;
+          for (unsigned id = 0; id < gSuccTokensNum; id++)
+            curr_succ_tokens[id] = gSuccTokens[id];
         }
 
         if (mTraceSecondTry) {
           if (found)
-            std::cout << "Second Try succ." << std::endl;
+            std::cout << "Second Try succ. mCurToken=" << mCurToken << std::endl;
           else
             std::cout << "Second Try fail." << std::endl;
         }
       }
     }
 
-    prev_succ_tokens_num = curr_succ_tokens_num;
-    for (unsigned id = 0; id < curr_succ_tokens_num; id++)
-      prev_succ_tokens[id] = curr_succ_tokens[id];
-
     // After second try, if it still fails, we quit.
     if (!found)
       break;
+
+    prev_succ_tokens_num = curr_succ_tokens_num;
+    for (unsigned id = 0; id < curr_succ_tokens_num; id++)
+      prev_succ_tokens[id] = curr_succ_tokens[id];
   }
 
   if (found) {
