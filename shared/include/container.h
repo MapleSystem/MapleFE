@@ -117,6 +117,189 @@ public:
   }
 };
 
+// The reason we need a SmallList is trying to provide a structure
+// easy for delete and insert element, and also easy for access
+// through index. The indexing is currently through traversing element
+// from the head (index 0). This is acceptable since it's a 'Small'
+// list.
+//
+// [NOTE] Again, as SmallVector it's the user's duty to assure the
+//        element indexing is not out of boundary.
+//
+// SmallList provides a mechanism of insertion, the usage pattern is as
+// below.
+//    SmallList list;
+//    list.LocateValue(T existingvalue), or LocateIndex(index);
+//    list.InsertBefore(T newvalue)
+//    list.InsertAfter(T newvalue)
+//
+// No matter what the operations behind list.LocateXXX are, the position
+// always at the 'located' element. Please make sure
+// there are no duplicated value, or else it always locate the first
+// one.
+
+template <class T> class SmallList {
+private:
+  struct Elem {
+    T mData;
+    Elem *mNext;
+    Elem *mPrev;
+  };
+
+private:
+  ContainerMemPool mMemPool;
+  unsigned mNum;     // element number
+  Elem    *mHead;    // index = 0
+  Elem    *mTail;    // index = mNum - 1
+  Elem    *mPointer; // temp pointer
+private:
+  Elem* NewElem(T t) {
+    char *addr = mMemPool.AllocElem();
+    Elem *elem = (Elem*)addr;
+    elem->mData = t;
+    elem->mNext = NULL;
+    elem->mPrev = NULL;
+    mNum++;
+    return elem;
+  }
+
+  Elem* ElemAtIndex(unsigned i) {
+    unsigned idx = 0;
+    Elem *temp_elem = mHead;
+    while (temp_elem) {
+      if (idx == i)
+        break;
+      idx++;
+      temp_elem = temp_elem->mNext;
+    }
+    return temp_elem;
+  }
+
+public:
+  SmallList() {
+    mHead = NULL;
+    mTail = NULL;
+    mPointer = NULL;
+    mNum = 0;
+    SetBlockSize(256);
+    mMemPool.SetElemSize(sizeof(Elem));
+  }
+  ~SmallList() {Release();}
+
+  void SetBlockSize(unsigned i) {mMemPool.SetBlockSize(i);}
+  void Release() {mMemPool.Release();}
+
+  void PushBack(T t) {
+    Elem *e = NewElem(t);
+    if (mTail) {
+      mTail->mNext = e;
+      e->mPrev = mTail;
+    } else {
+      MASSERT(!mHead);
+      mHead = e;
+    }
+    mTail = e;
+  }
+
+  void PushFront(T t) {
+    Elem *e = NewElem(t);
+    e->mNext = mHead;
+    if (mHead) {
+      mHead->mPrev = e;
+    } else {
+      MASSERT(!mTail);
+      mTail = e;
+    }
+    mHead = e;
+  }
+
+  unsigned GetNum() {return mNum;}
+
+  // Caller's duty to assure Back() has existing element.
+  T Back() {return mTail->mData;}
+
+  // Caller's duty to assure Front() has existing element.
+  T Front() {return mHead->mData;}
+
+  T ValueAtIndex(unsigned i) {
+    Elem *e = ElemAtIndex(i);
+    return e->mData;
+  }
+
+  T* RefAtIndex(unsigned i) {
+    Elem *e = ElemAtIndex(i);
+    return &(e->mData);
+  }
+
+  bool Find(T t) {
+    Elem *temp = mHead;
+    while (temp) {
+      if (temp->mData == t)
+        return true;
+      temp = temp->mNext;
+    }
+    return false;
+  }
+
+  // The following three functions are used together, with a leading
+  // Locate() followed by any number of InsertBefore() or InsertAfter().
+  // Keep in mind, the pointer always point to the one by Locate().
+
+  // It's caller's duty to make sure 't' really exists.
+  void LocateValue(T t) {
+    Elem *temp = mHead;
+    while (temp) {
+      if (temp->mData == t) {
+        mPointer = temp;
+        return;
+      }
+      temp = temp->mNext;
+    }
+  }
+
+  void LocateIndex(unsigned idx) {
+    mPointer = ElemAtIndex(idx);
+  }
+
+  void InsertAfter(T t) {
+    Elem *new_elem = NewElem(t);
+    MASSERT(mPointer);
+    Elem *old_next = mPointer->mNext;
+    mPointer->mNext = new_elem;
+    new_elem->mNext = old_next;
+    new_elem->mPrev = mPointer;
+    if (old_next)
+      old_next->mPrev = new_elem;
+    else {
+      MASSERT(mPointer == mTail);
+      mTail = new_elem;
+    }
+  }
+
+  void InsertBefore(T t) {
+    Elem *new_elem = NewElem(t);
+    MASSERT(mPointer);
+    Elem *old_prev = mPointer->mPrev;
+    mPointer->mPrev = new_elem;
+    new_elem->mNext = mPointer;
+    new_elem->mPrev = old_prev;
+    if (old_prev)
+      old_prev->mNext = new_elem;
+    else {
+      MASSERT(mPointer = mHead);
+      mHead = new_elem;
+    }
+  }
+
+  // clear the data, but keep the memory, no free.
+  void Clear(){
+    mNum = 0;
+    mHead = NULL;
+    mTail = NULL;
+    mMemPool.Clear();
+  }
+};
+
 /////////////////////////////////////////////////////////////////////////
 //                      Guamian
 // Guamian, aka Hanging Noodle, represents a 2-D data structure shown below.
