@@ -1082,16 +1082,21 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *parent) {
         //         We will never go that far. We'll stop at the first matching which matches
         //         the most tokens. So a small sorting is required.
 
+        SmallList<unsigned> sorted;
+        for (unsigned j = 0; j < prev_succ_tokens_num; j++)
+          sorted.PushBack(prev_succ_tokens[j]);
+        sorted.SortDescending();
+
         bool temp_found = false;
-        for (unsigned j = 0; j < prev_succ_tokens_num; j++) {
+        for (unsigned j = 0; j < sorted.GetNum(); j++) {
           // The longest matching has been proven to be a failure.
-          if (prev_succ_tokens[j] == old_pos)
+          if (sorted.ValueAtIndex(j)== old_pos)
             continue;
 
           mInSecondTry = true;
 
           // Start from the one after succ token.
-          mCurToken = prev_succ_tokens[j] + 1;
+          mCurToken = sorted.ValueAtIndex(j) + 1;
           temp_found = TraverseTableData(data, parent);
           // As mentioned above, we stop at the first successfuly second try.
           if (temp_found)

@@ -291,6 +291,60 @@ public:
     }
   }
 
+  // Swap the position of A and B.
+  // [NOTE] We assume that A is before B in the list.
+  void Swap(Elem *A, Elem *B) {
+    MASSERT(A && B);
+    MASSERT(A->mNext && B->mPrev);
+    Elem *A_prev = A->mPrev;
+    Elem *A_next = A->mNext;
+    Elem *B_prev = B->mPrev;
+    Elem *B_next = B->mNext;
+
+    if (A_prev)
+      A_prev->mNext = B;
+    if (B_next)
+      B_next->mPrev = A;
+    B->mPrev = A_prev;
+    A->mNext = B_next;
+
+    // If the two nodes are connected, it's easier to handle.
+    if (B_prev == A) {
+      A->mPrev = B;
+      B->mNext = A;
+    } else {
+      B_prev->mNext = A;
+      A->mPrev = B_prev;
+      A_next->mPrev = B;
+      B->mNext = A_next;
+    }
+
+    if (mHead == A)
+      mHead = B;
+    if (mTail == B)
+      mTail = A;
+  }
+
+  // Sort all elements in descending order, the largest element
+  // having 0th index. [NOTE] The user needs provide the operator <
+  // of T.
+  void SortDescending() {
+    Elem *target = mHead;
+    while (target) {
+      Elem *peer = target->mNext;
+      while (peer) {
+        if (target->mData < peer->mData) {
+          Swap(target, peer);
+          Elem *temp = target;
+          target = peer;
+          peer = temp;
+        }
+        peer = peer->mNext;
+      }
+      target = target->mNext;
+    }
+  }
+
   // clear the data, but keep the memory, no free.
   void Clear(){
     mNum = 0;
