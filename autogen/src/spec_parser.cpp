@@ -534,7 +534,6 @@ bool SPECParser::ParseAttrDatatype() {
 
   tk = mLexer->NextToken();
   std::string name = mLexer->GetTokenString();
-  //mCurrrule->mAttr->mType = mAutoGen->FindRule(name);
 
   tk = mLexer->NextToken();
   return true;
@@ -553,7 +552,6 @@ bool SPECParser::ParseAttrTokentype() {
 
   tk = mLexer->NextToken();
   std::string name = mLexer->GetTokenString();
-  //mCurrrule->mAttr->mType = mAutoGen->FindRule(name);
 
   tk = mLexer->NextToken();
   return true;

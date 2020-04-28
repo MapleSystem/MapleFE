@@ -56,12 +56,9 @@ int main(int argc, char *argv[]) {
     return 0;
   }
 
-  AutoGen *ag = new AutoGen(parser);
-  ag->Gen();
+  AutoGen ag(parser);
+  ag.Gen();
 
-  parser->SetAutoGen(ag);
-
-  delete ag;
   return 0;
 }
 

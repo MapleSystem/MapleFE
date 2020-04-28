@@ -39,7 +39,6 @@ class BaseGen;
 class SPECParser {
 public:
   SPECLexer    *mLexer;
-  AutoGen      *mAutoGen;
   BaseGen      *mBaseGen;
   Rule         *mCurrrule;
   std::string   mFilename;
@@ -76,8 +75,6 @@ public:
   bool ParseAttrTokentype();
   bool ParseAttrValidity();
   bool ParseAttrAction();
-
-  void SetAutoGen(AutoGen *ag) { mAutoGen = ag; }
 
   void SetVerbose(int i) { mLexer->SetVerbose(i); }
   int GetVerbose() { return mLexer->GetVerbose(); }
