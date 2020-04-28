@@ -62,21 +62,6 @@ RuleAttr::~RuleAttr() {
   mAction.clear();
 }
 
-std::string RuleAttr::GetTokenTypeString(TokenType t) {
-  switch (t) {
-    case TkT_Identifier: return "Identifier";
-    case TkT_Literal: return "Literal";
-    case TkT_Type: return "Type";
-    case TkT_NA: return "NA";
-  }
-}
-
-void RuleAttr::DumpTokenType(int i) {
-  if (mTokenType != TkT_NA) {
-    std::cout << "    attr.tokentype : " << GetTokenTypeString(mTokenType) << std::endl;
-  }
-}
-
 void RuleAttr::DumpValidity(int i) {
   if (mValidity.size()) {
     if (i == 0)
@@ -250,7 +235,6 @@ void RuleElem::Dump(bool newline) {
 }
 
 void RuleElem::DumpAttr() {
-  mAttr.DumpTokenType(0);
   mAttr.DumpValidity(0);
   for (int i = 0; i < mSubElems.size(); i++) {
     mSubElems[i]->mAttr.DumpValidity(i+1);
@@ -305,7 +289,6 @@ void Rule::Dump() {
 }
 
 void Rule::DumpAttr() {
-  mAttr.DumpTokenType(0);
   mAttr.DumpValidity(0);
   for (int i = 0; i < mElement->mSubElems.size(); i++) {
     mElement->mSubElems[i]->mAttr.DumpValidity(i+1);

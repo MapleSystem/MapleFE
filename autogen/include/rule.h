@@ -49,13 +49,6 @@ typedef enum {
   ET_NULL
 } ElemType;
 
-typedef enum {
-  TkT_Identifier,
-  TkT_Literal,
-  TkT_Type,
-  TkT_NA
-} TokenType;
-
 // an action is the behavior performed for a matched rule
 // rule addexpr : ONEOF( expr '+' expr,
 //                       expr '-' expr)
@@ -85,23 +78,16 @@ public:
 // Attributes for Rule and RuleElem
 class RuleAttr {
 public:
-  TokenType   mTokenType;
   std::vector<RuleAction*> mValidity;
   std::vector<RuleAction*> mAction;
 
-  RuleAttr() : mTokenType(TkT_NA) {}
-  RuleAttr(TokenType tt) : mTokenType(tt) {}
+  RuleAttr(){}
   ~RuleAttr();
 
-  void SetTokentype(TokenType t) { mTokenType = t; }
   void AddValidity(RuleAction *a) { mValidity.push_back(a); }
   void AddAction(RuleAction *a) { mValidity.push_back(a); }
 
-  std::string GetTokenTypeString(TokenType);
-
-  bool Empty() { return (mTokenType == TkT_NA &&
-                         mValidity.size() == 0 &&
-                         mAction.size() == 0); }
+  bool Empty() { return mValidity.size() == 0 && mAction.size() == 0; }
 
   void DumpDataType(int i);
   void DumpTokenType(int i);
