@@ -134,7 +134,7 @@ public:
 //    list.InsertAfter(T newvalue)
 //
 // No matter what the operations behind list.LocateXXX are, the position
-// always at the 'located' element. Please make sure
+// is always at the 'located' element. Please make sure
 // there are no duplicated value, or else it always locate the first
 // one.
 
@@ -342,6 +342,40 @@ public:
         peer = peer->mNext;
       }
       target = target->mNext;
+    }
+  }
+
+  // Remove the element.
+  void Remove(Elem *elem) {
+    if (!elem)
+      return;
+
+    Elem *prev = elem->mPrev;
+    Elem *next = elem->mNext;
+
+    if (prev)
+      prev->mNext = next;
+    if (next)
+      next->mPrev = prev;
+
+    if (elem == mHead)
+      mHead = elem->mNext;
+    if (mTail == elem)
+      mTail = NULL;
+
+    mNum--;
+  }
+
+  // Remove the first element having value of 't'. If not found
+  // it exist quietly.
+  void Remove(T t) {
+    Elem *temp = mHead;
+    while (temp) {
+      if (temp->mData == t) {
+        Remove(temp);
+        return;
+      }
+      temp = temp->mNext;
     }
   }
 
