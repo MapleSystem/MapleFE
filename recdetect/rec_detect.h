@@ -49,15 +49,27 @@ public:
   ~RuleRecursion(){}
 };
 
-class LRecDetector {
+class RecDetector {
 private:
   SmallVector<RuleRecursion*> mRuleRecursions;
+  SmallVector<RuleTable*> mTopTables;     // top tables we start detection from.
+  SmallVector<RuleTable*> mProcessed;     // tables we already processed.
 
-public:
-  LRecDetector(){}
-  ~LRecDetector(){}
+  bool IsProcessed(RuleTable*);
+  void SetupTopTables();
 
   void Detect(RuleTable*);
+  void DetectOneof(RuleTable*);
+  void DetectZeroormore(RuleTable*);
+  void DetectZeroorone(RuleTable*);
+  void DetectConcatenate(RuleTable*);
+  void DetectTableData(TableData*);
+
+public:
+  RecDetector(){}
+  ~RecDetector(){}
+
+  void Detect();
 };
 
 #endif

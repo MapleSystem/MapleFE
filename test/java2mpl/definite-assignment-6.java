@@ -23,10 +23,12 @@
 //
 // All other expressions are not taken into account.
 //
-class A{
-  void foo() {
-    int k;
-    if (v > 0 && (k = System.read()) >= 0)
-      System.println(k);
-  }
-}
+//class A{
+//  void foo() {
+//    int k;
+//    if (v > 0 && (k = System.read()) >= 0)
+//      System.println(k);
+//  }
+//}
+    if (v > 0 && k >= 0)
+      return 0;

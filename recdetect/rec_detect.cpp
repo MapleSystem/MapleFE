@@ -13,13 +13,70 @@
 * See the Mulan PSL v1 for more details.
 */
 
+#include "common_header_autogen.h"
 #include "rec_detect.h"
 
-void LRecDetector::Detect(RuleTable *rule) {
-  
+void RecDetector::SetupTopTables() {
+  mTopTables.PushBack(&TblStatement);
+  mTopTables.PushBack(&TblClassDeclaration);
+  mTopTables.PushBack(&TblInterfaceDeclaration);
+}
+
+// A talbe is already been processed.
+bool RecDetector::IsProcessed(RuleTable *t) {
+  for (unsigned i = 0; i < mProcessed.GetNum(); i++) {
+    if (t == mProcessed.ValueAtIndex(i))
+      return true;
+  }
+  return false;
+}
+
+void RecDetector::Detect(RuleTable *rule_table) {
+  EntryType type = rule_table->mType;
+  switch(type) {
+  case ET_Oneof:
+    DetectOneof(rule_table);
+    break;
+  case ET_Zeroormore:
+    DetectZeroormore(rule_table);
+    break;
+  case ET_Zeroorone:
+    DetectZeroorone(rule_table);
+    break;
+  case ET_Concatenate:
+    DetectConcatenate(rule_table);
+    break;
+  case ET_Data:
+    DetectTableData(rule_table->mData);
+    break;
+  case ET_Null:
+  default:
+    break;
+  }
+}
+
+void RecDetector::DetectOneof(RuleTable *rule_table) {
+}
+
+void RecDetector::DetectZeroormore(RuleTable *rule_table) {
+}
+
+void RecDetector::DetectZeroorone(RuleTable *rule_table) {
+}
+
+void RecDetector::DetectConcatenate(RuleTable *rule_table) {
+}
+
+void RecDetector::DetectTableData(TableData *table_data) {
+}
+
+// We start from the top tables.
+// Tables not accssible from top tables won't be handled.
+void RecDetector::Detect() {
 }
 
 int main(int argc, char *argv[]) {
-  LRecDetector dtc;
+  RecDetector dtc;
+  dtc.Detect();
   return 0;
 }
