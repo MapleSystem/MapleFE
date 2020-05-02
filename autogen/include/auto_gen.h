@@ -58,9 +58,6 @@ public:
   void Run();
   void BackPatch();
   void Gen();
-  ReservedGen *GetReservedGen() { return mReservedGen; }
-
-  std::vector<BaseGen*> GetGenArray() { return mGenArray; }
 };
 
 #endif
