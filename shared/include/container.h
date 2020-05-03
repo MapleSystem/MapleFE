@@ -735,4 +735,126 @@ public:
   void Release() {mMemPool.Release();}
 };
 
+//////////////////////////////////////////////////////////////////////////////////////
+//                                 Tree
+// This is a regular tree. It simply maintains the basic operations of a tree, like
+// insertion and deletion. However,
+//   1. It does not sort
+//   2. It is not a binary tree
+//   3. The number of children of node could vary on a big range from 0 to many.
+//
+// We presumably give each node TREE_MAX_CHILDREN_NUM, but we also provides extendable
+// children number.
+//////////////////////////////////////////////////////////////////////////////////////
+
+// We first give each node certain children. If it needs more, an allocation from
+// memory pool is needed.
+#define TREE_MAX_CHILDREN_NUM 12
+#define TREE_CHILDREN_NUM     4
+
+template <class T> class Tree {
+private:
+  // mExtraChildrenPool won't go element by element. So just need basic
+  // operations from MemPool. Don't need SetElemSize().
+  ContainerMemPool mExtraChildrenPool;
+
+  // For regular tree nodes
+  ContainerMemPool mMemPool;
+
+private:
+  struct Elem {
+    T     mData;
+    unsigned mChildrenNum;
+    Elem *mParent;
+    Elem *mChildren[TREE_CHILDREN_NUM];
+    Elem **mChildrenExtra;      // if more children needed, coming into this.
+
+    Elem() {Init();}
+
+    void Init() {
+      mChildrenNum = 0;
+      mParent = NULL;
+      mChildrenExtra = NULL;
+      for (unsigned i = 0; i < TREE_CHILDREN_NUM; i++)
+        mChildren[i] = NULL;
+    }
+
+    Elem* GetChild(unsigned i) {
+      if (i < TREE_MAX_CHILDREN_NUM)
+        return mChildren[i];
+      else
+        return mChildrenExtra + (i - 4);
+    }
+
+    // We don't support NULL child, so caller need make sure 'e' is valid.
+    void AddChild(Elem *e) {
+      if (!e)
+        return;
+
+      if (mChildrenNum + 1 > TREE_MAX_CHILDREN_NUM) {
+        MERROR("Error: Too many children, not supported.");
+      }
+
+      // The first time it cross TREE_CHILDREN_NUM, we allocate
+      if (mChildrenNum == TREE_CHILDREN_NUM) {
+        unsigned sz = (TREE_MAX_CHILDREN_NUM - TREE_CHILDREN_NUM) * sizeof(Elem*);
+        mChildrenExtra = (Elem**)mExtraChildrenPool.Alloc(sz);
+        *mChildrenExtra = e;
+      } else if (mChildrenNum < TREE_CHILDREN_NUM) {
+        mChildren[mChildrenNum] = e;
+      } else {
+        mChildrenExtra[mChildrenNum - TREE_CHILDREN_NUM] = e;
+      }
+
+      mChildrenNum++;
+    }
+  };
+
+private:
+  Elem *mRoot;
+
+public:
+  Tree() {
+    mRoot = NULL;
+    mMemPool.SetBlockSize(1024);
+    mMemPool.SetElemSize(sizeof(Elem));
+
+    // mExtraChildrenPool won't go element by element. So just need basic
+    // operations from MemPool. Don't need SetElemSize().
+    mExtraChildrenPool.SetBlockSize(1024);
+  }
+  ~Tree() {Release();}
+
+  void NewElem(T data, Elem *parent) {
+    char *addr = mMemPool.AllocElem();
+    Elem *e = (Elem*)addr;
+    e->Init();
+    e->mData = data;
+
+    if (!parent)
+      MASSERT(!mRoot);
+    if (!mRoot) {
+      mRoot = e;
+      return;
+    }
+
+    parent->AddChild(e);
+    e->mParent = parent;
+  }
+
+  // It's caller's duty to assure p and c are valid. Otherwise it quits
+  // quietly.
+  void AddChild(Elem *p, Elem *c) {
+    if (!p || !c)
+      return;
+    p->AddChild(c);
+    c->mParent = p;
+  }
+
+  void Release() {
+    mMemPool.Release();
+    mExtraChildrenPool.Release();
+  }
+};
+
 #endif
