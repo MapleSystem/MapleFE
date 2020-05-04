@@ -60,6 +60,8 @@ private:
 
   bool IsInProcess(RuleTable*);
   bool IsDone(RuleTable*);
+
+  void AddRecursion(RuleTable*, ContTreeNode<RuleTable*>*);
   void SetupTopTables();
 
   void Detect(RuleTable*, ContTreeNode<RuleTable*>*);

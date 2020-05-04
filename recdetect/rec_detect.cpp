@@ -40,36 +40,39 @@ bool RecDetector::IsDone(RuleTable *t) {
   return false;
 }
 
+void RecDetector::AddRecursion(RuleTable *rt, ContTreeNode<RuleTable*> *p) {
+}
 
-void RecDetector::Detect(RuleTable *rule_table, ContTreeNode<RuleTable*> *parent) {
-  if (IsDone(rule_table))
+void RecDetector::Detect(RuleTable *rt, ContTreeNode<RuleTable*> *p) {
+  if (IsDone(rt))
     return;
 
-  if (IsInProcess(rule_table)) {
+  if (IsInProcess(rt)) {
     // Find a new circle.
+    AddRecursion(rt, p);
   } else {
-    mInProcess.PushBack(rule_table);
+    mInProcess.PushBack(rt);
   }
 
   // Create new tree node.
-  ContTreeNode<RuleTable*> *node = mTree.NewNode(rule_table, parent);
+  ContTreeNode<RuleTable*> *node = mTree.NewNode(rt, p);
 
-  EntryType type = rule_table->mType;
+  EntryType type = rt->mType;
   switch(type) {
   case ET_Oneof:
-    DetectOneof(rule_table, node);
+    DetectOneof(rt, node);
     break;
   case ET_Zeroormore:
-    DetectZeroormore(rule_table, node);
+    DetectZeroormore(rt, node);
     break;
   case ET_Zeroorone:
-    DetectZeroorone(rule_table, node);
+    DetectZeroorone(rt, node);
     break;
   case ET_Concatenate:
-    DetectConcatenate(rule_table, node);
+    DetectConcatenate(rt, node);
     break;
   case ET_Data:
-    DetectTableData(rule_table->mData, node);
+    DetectTableData(rt->mData, node);
     break;
   case ET_Null:
   default:
