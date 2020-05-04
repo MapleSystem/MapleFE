@@ -53,17 +53,21 @@ class RecDetector {
 private:
   SmallVector<RuleRecursion*> mRuleRecursions;
   SmallVector<RuleTable*> mTopTables;     // top tables we start detection from.
-  SmallVector<RuleTable*> mProcessed;     // tables we already processed.
 
-  bool IsProcessed(RuleTable*);
+  SmallVector<RuleTable*> mInProcess;     // tables currently in process.
+  SmallVector<RuleTable*> mDone;          // tables done.
+  ContTree<RuleTable*>    mTree;          // the traversing tree.
+
+  bool IsInProcess(RuleTable*);
+  bool IsDone(RuleTable*);
   void SetupTopTables();
 
-  void Detect(RuleTable*);
-  void DetectOneof(RuleTable*);
-  void DetectZeroormore(RuleTable*);
-  void DetectZeroorone(RuleTable*);
-  void DetectConcatenate(RuleTable*);
-  void DetectTableData(TableData*);
+  void Detect(RuleTable*, ContTreeNode<RuleTable*>*);
+  void DetectOneof(RuleTable*, ContTreeNode<RuleTable*>*);
+  void DetectZeroormore(RuleTable*, ContTreeNode<RuleTable*>*);
+  void DetectZeroorone(RuleTable*, ContTreeNode<RuleTable*>*);
+  void DetectConcatenate(RuleTable*, ContTreeNode<RuleTable*>*);
+  void DetectTableData(TableData*, ContTreeNode<RuleTable*>*);
 
 public:
   RecDetector(){}

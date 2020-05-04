@@ -874,6 +874,11 @@ public:
     mMemPool.Release();
     mExtraChildrenPool.Release();
   }
+
+  void Clear() {
+    mRoot = NULL;
+    Release();
+  }
 };
 
 #endif

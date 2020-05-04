@@ -23,31 +23,53 @@ void RecDetector::SetupTopTables() {
 }
 
 // A talbe is already been processed.
-bool RecDetector::IsProcessed(RuleTable *t) {
-  for (unsigned i = 0; i < mProcessed.GetNum(); i++) {
-    if (t == mProcessed.ValueAtIndex(i))
+bool RecDetector::IsInProcess(RuleTable *t) {
+  for (unsigned i = 0; i < mInProcess.GetNum(); i++) {
+    if (t == mInProcess.ValueAtIndex(i))
       return true;
   }
   return false;
 }
 
-void RecDetector::Detect(RuleTable *rule_table) {
+// A talbe is already done.
+bool RecDetector::IsDone(RuleTable *t) {
+  for (unsigned i = 0; i < mDone.GetNum(); i++) {
+    if (t == mDone.ValueAtIndex(i))
+      return true;
+  }
+  return false;
+}
+
+
+void RecDetector::Detect(RuleTable *rule_table, ContTreeNode<RuleTable*> *parent) {
+  if (IsDone(rule_table))
+    return;
+
+  if (IsInProcess(rule_table)) {
+    // Find a new circle.
+  } else {
+    mInProcess.PushBack(rule_table);
+  }
+
+  // Create new tree node.
+  ContTreeNode<RuleTable*> *node = mTree.NewNode(rule_table, parent);
+
   EntryType type = rule_table->mType;
   switch(type) {
   case ET_Oneof:
-    DetectOneof(rule_table);
+    DetectOneof(rule_table, node);
     break;
   case ET_Zeroormore:
-    DetectZeroormore(rule_table);
+    DetectZeroormore(rule_table, node);
     break;
   case ET_Zeroorone:
-    DetectZeroorone(rule_table);
+    DetectZeroorone(rule_table, node);
     break;
   case ET_Concatenate:
-    DetectConcatenate(rule_table);
+    DetectConcatenate(rule_table, node);
     break;
   case ET_Data:
-    DetectTableData(rule_table->mData);
+    DetectTableData(rule_table->mData, node);
     break;
   case ET_Null:
   default:
@@ -55,24 +77,32 @@ void RecDetector::Detect(RuleTable *rule_table) {
   }
 }
 
-void RecDetector::DetectOneof(RuleTable *rule_table) {
+void RecDetector::DetectOneof(RuleTable *rule_table, ContTreeNode<RuleTable*> *p) {
 }
 
-void RecDetector::DetectZeroormore(RuleTable *rule_table) {
+void RecDetector::DetectZeroormore(RuleTable *rule_table, ContTreeNode<RuleTable*> *p) {
 }
 
-void RecDetector::DetectZeroorone(RuleTable *rule_table) {
+void RecDetector::DetectZeroorone(RuleTable *rule_table, ContTreeNode<RuleTable*> *p) {
 }
 
-void RecDetector::DetectConcatenate(RuleTable *rule_table) {
+void RecDetector::DetectConcatenate(RuleTable *rule_table, ContTreeNode<RuleTable*> *p) {
 }
 
-void RecDetector::DetectTableData(TableData *table_data) {
+void RecDetector::DetectTableData(TableData *table_data, ContTreeNode<RuleTable*> *p) {
 }
 
 // We start from the top tables.
 // Tables not accssible from top tables won't be handled.
 void RecDetector::Detect() {
+  for (unsigned i = 0; i < mTopTables.GetNum(); i++) {
+    mInProcess.Clear();
+    mDone.Clear();
+    mTree.Clear();
+
+    RuleTable *top = mTopTables.ValueAtIndex(i);
+    Detect(top, NULL);
+  }
 }
 
 int main(int argc, char *argv[]) {
