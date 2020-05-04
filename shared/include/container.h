@@ -752,103 +752,122 @@ public:
 #define TREE_MAX_CHILDREN_NUM 12
 #define TREE_CHILDREN_NUM     4
 
-template <class T> class Tree {
+template<class T> class ContTreeNode {
+private:
+  T     mData;
+  unsigned mChildrenNum;
+  ContTreeNode *mParent;
+  ContTreeNode *mChildren[TREE_CHILDREN_NUM];
+  ContTreeNode **mChildrenExtra;      // if more children needed, coming into this.
+
+public:
+  ContTreeNode() {Init();}
+
+  void Init() {
+    mChildrenNum = 0;
+    mParent = NULL;
+    mChildrenExtra = NULL;
+    for (unsigned i = 0; i < TREE_CHILDREN_NUM; i++)
+      mChildren[i] = NULL;
+  }
+
+  T GetData() {return mData;}
+  void SetData(T d) {mData = d;}
+
+  ContTreeNode* GetParent() {return mParent;}
+  void SetParent(ContTreeNode *n) {mParent = n;}
+
+  unsigned GetChildrenNum() {return mChildrenNum;}
+
+  // index 'i' starts from 0.
+  ContTreeNode* GetChild(unsigned i) {
+    if (i < TREE_CHILDREN_NUM)
+      return mChildren[i];
+    else
+      return mChildrenExtra[i - 4];
+  }
+
+  // We don't support NULL child, so caller need make sure 'e' is valid.
+  void AddChild(ContTreeNode *e, MemPool *mp) {
+    if (!e)
+      return;
+
+    if (mChildrenNum + 1 > TREE_MAX_CHILDREN_NUM) {
+      MERROR("Error: Too many children, not supported.");
+    }
+
+    // The first time it cross TREE_CHILDREN_NUM, we allocate
+    if (mChildrenNum == TREE_CHILDREN_NUM) {
+      unsigned sz = (TREE_MAX_CHILDREN_NUM - TREE_CHILDREN_NUM) * sizeof(ContTreeNode*);
+      mChildrenExtra = (ContTreeNode**)mp->Alloc(sz);
+      *mChildrenExtra = e;
+    } else if (mChildrenNum < TREE_CHILDREN_NUM) {
+      mChildren[mChildrenNum] = e;
+    } else {
+      mChildrenExtra[mChildrenNum - TREE_CHILDREN_NUM] = e;
+    }
+
+    mChildrenNum++;
+  }
+
+  void Dump() {
+    std::cout << " " << mData << " #Children " << GetChildrenNum() << std::endl;
+    for (unsigned i = 0; i < GetChildrenNum(); i++) {
+      ContTreeNode *c = GetChild(i);
+      c->Dump();
+    }
+  }
+};
+
+template <class T> class ContTree {
 private:
   // mExtraChildrenPool won't go element by element. So just need basic
   // operations from MemPool. Don't need SetElemSize().
-  ContainerMemPool mExtraChildrenPool;
+  MemPool mExtraChildrenPool;
 
   // For regular tree nodes
   ContainerMemPool mMemPool;
 
-private:
-  struct Elem {
-    T     mData;
-    unsigned mChildrenNum;
-    Elem *mParent;
-    Elem *mChildren[TREE_CHILDREN_NUM];
-    Elem **mChildrenExtra;      // if more children needed, coming into this.
-
-    Elem() {Init();}
-
-    void Init() {
-      mChildrenNum = 0;
-      mParent = NULL;
-      mChildrenExtra = NULL;
-      for (unsigned i = 0; i < TREE_CHILDREN_NUM; i++)
-        mChildren[i] = NULL;
-    }
-
-    Elem* GetChild(unsigned i) {
-      if (i < TREE_MAX_CHILDREN_NUM)
-        return mChildren[i];
-      else
-        return mChildrenExtra + (i - 4);
-    }
-
-    // We don't support NULL child, so caller need make sure 'e' is valid.
-    void AddChild(Elem *e) {
-      if (!e)
-        return;
-
-      if (mChildrenNum + 1 > TREE_MAX_CHILDREN_NUM) {
-        MERROR("Error: Too many children, not supported.");
-      }
-
-      // The first time it cross TREE_CHILDREN_NUM, we allocate
-      if (mChildrenNum == TREE_CHILDREN_NUM) {
-        unsigned sz = (TREE_MAX_CHILDREN_NUM - TREE_CHILDREN_NUM) * sizeof(Elem*);
-        mChildrenExtra = (Elem**)mExtraChildrenPool.Alloc(sz);
-        *mChildrenExtra = e;
-      } else if (mChildrenNum < TREE_CHILDREN_NUM) {
-        mChildren[mChildrenNum] = e;
-      } else {
-        mChildrenExtra[mChildrenNum - TREE_CHILDREN_NUM] = e;
-      }
-
-      mChildrenNum++;
-    }
-  };
-
-private:
-  Elem *mRoot;
+  ContTreeNode<T> *mRoot;
 
 public:
-  Tree() {
+  ContTree() {
     mRoot = NULL;
     mMemPool.SetBlockSize(1024);
-    mMemPool.SetElemSize(sizeof(Elem));
+    mMemPool.SetElemSize(sizeof(ContTreeNode<T>));
 
     // mExtraChildrenPool won't go element by element. So just need basic
     // operations from MemPool. Don't need SetElemSize().
     mExtraChildrenPool.SetBlockSize(1024);
   }
-  ~Tree() {Release();}
+  ~ContTree() {Release();}
 
-  void NewElem(T data, Elem *parent) {
+  ContTreeNode<T>* NewNode(T data, ContTreeNode<T> *parent) {
     char *addr = mMemPool.AllocElem();
-    Elem *e = (Elem*)addr;
+    ContTreeNode<T> *e = (ContTreeNode<T>*)addr;
     e->Init();
-    e->mData = data;
+    e->SetData(data);
 
     if (!parent)
       MASSERT(!mRoot);
     if (!mRoot) {
       mRoot = e;
-      return;
+      return e;
     }
 
-    parent->AddChild(e);
-    e->mParent = parent;
+    parent->AddChild(e, &mExtraChildrenPool);
+    e->SetParent(parent);
+
+    return e;
   }
 
   // It's caller's duty to assure p and c are valid. Otherwise it quits
   // quietly.
-  void AddChild(Elem *p, Elem *c) {
+  void AddChild(ContTreeNode<T> *p, ContTreeNode<T> *c) {
     if (!p || !c)
       return;
     p->AddChild(c);
-    c->mParent = p;
+    c->SetParent(p);
   }
 
   void Release() {
