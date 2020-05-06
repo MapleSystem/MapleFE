@@ -14,7 +14,47 @@
 */
 
 #include "common_header_autogen.h"
+#include "ruletable_util.h"
 #include "rec_detect.h"
+
+////////////////////////////////////////////////////////////////////////////////////
+// The idea of Rursion Dectect is through a Depth First Traversal in the tree.
+// There are a few things we need make it clear.
+//  1) We are looking for back edge when traversing the tree. Those back edges form
+//     the recursions. We differentiate a recursion using the first node, ie, the topmost
+//     node in the tree in this recursion.
+//  2) Each node (ie rule table) could have multiple recursions.
+//  3) Recursions could include children recursions inside. 
+////////////////////////////////////////////////////////////////////////////////////
+
+
+////////////////////////////////////////////////////////////////////////////////////
+//                                RecPath
+////////////////////////////////////////////////////////////////////////////////////
+
+void RecPath::Dump() {
+  for (unsigned i = 0; i < mPositions.GetNum(); i++) {
+    std::cout << mPositions.ValueAtIndex(i) << ",";
+  }
+  std::cout << std::endl;
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+//                                Recursion
+////////////////////////////////////////////////////////////////////////////////////
+
+void Recursion::Release() {
+  for (unsigned i = 0; i < mPaths.GetNum(); i++) {
+    RecPath *path = mPaths.ValueAtIndex(i);
+    path->Release();
+  }
+
+  mPaths.Release();
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+//                                RecDetector
+////////////////////////////////////////////////////////////////////////////////////
 
 void RecDetector::SetupTopTables() {
   mTopTables.PushBack(&TblStatement);
@@ -40,10 +80,63 @@ bool RecDetector::IsDone(RuleTable *t) {
   return false;
 }
 
+// There is a back edge from 'p' to the first appearance of 'rt'. Actually in our
+// traversal tree, in the current path (from 'p' upward to the root) there is one
+// and only node representing 'rt', since the second appearance will be treated
+// as a back edge. 
 void RecDetector::AddRecursion(RuleTable *rt, ContTreeNode<RuleTable*> *p) {
+  RecPath *path = (RecPath*)gMemPool.Alloc(sizeof(RecPath));
+  new (path) RecPath();
+
+  // Step 1. Traverse upwards to find the target tree node.
+  ContTreeNode<RuleTable*> *target = NULL;
+  ContTreeNode<RuleTable*> *node = p;
+  SmallVector<ContTreeNode<RuleTable*>*> node_list;
+  while (node) {
+    node_list.PushBack(node);
+    // I will let it go until the root, even we already find the target in middle.
+    // I do this to verify my code is correct. [TODO] will come back to remove
+    // this extra cost.
+    if (node->GetData() == rt) {
+      MASSERT(!target && "duplicated target node in a path.");
+      target = node;
+      break;
+    }
+    node = node->GetParent();
+  }
+
+  MASSERT(target);
+
+  // Step 2. Construct the path from target to 'p'. It's already in node_list,
+  //         and we simply read it in reverse order. Also find the index of
+  //         of each child rule in the parent rule.
+  //
+  // There are some cases that are instant recursion, like:
+  //   rule A : A + B
+  // where there is only one position which should 0.
+  RuleTable *parent_rule = target->GetData();
+
+  for (unsigned i = node_list.GetNum() - 2; i >= 0; i--) {
+    ContTreeNode<RuleTable*> *child_node = node_list.ValueAtIndex(i);
+    RuleTable *child_rule = child_node->GetData();
+    unsigned index = 0;
+    bool succ = RuleFindChild(parent_rule, child_rule, index);
+    MASSERT(succ && "Cannot find child rule in parent rule.");
+    path->AddPos(index);
+  }
+
+  if (node_list.GetNum() == 1) {
+    unsigned index = 0;
+    bool succ = RuleFindChild(parent_rule, parent_rule, index);
+    MASSERT(succ && (index == 0) && "Cannot find child rule in parent rule.");
+    path->AddPos(index);
+  }
+
+  // Step 3. Find the right Recursion, if not found, create one.
+  //         Add the path to the Recursioin.
 }
 
-void RecDetector::Detect(RuleTable *rt, ContTreeNode<RuleTable*> *p) {
+void RecDetector::DetectRuleTable(RuleTable *rt, ContTreeNode<RuleTable*> *p) {
   if (IsDone(rt))
     return;
 
@@ -89,6 +182,8 @@ void RecDetector::DetectZeroormore(RuleTable *rule_table, ContTreeNode<RuleTable
 void RecDetector::DetectZeroorone(RuleTable *rule_table, ContTreeNode<RuleTable*> *p) {
 }
 
+// For Concatenate node, only the first child is checked. If it's a token, just end.
+// If it's a rule table, go deeper.
 void RecDetector::DetectConcatenate(RuleTable *rule_table, ContTreeNode<RuleTable*> *p) {
 }
 
@@ -104,12 +199,29 @@ void RecDetector::Detect() {
     mTree.Clear();
 
     RuleTable *top = mTopTables.ValueAtIndex(i);
-    Detect(top, NULL);
+    DetectRuleTable(top, NULL);
   }
 }
 
+// The reason I have a Release() is to make sure the destructors of Recursion and Paths
+// are invoked ahead of destructor of gMemPool.
+void RecDetector::Release() {
+  for (unsigned i = 0; i < mRecursions.GetNum(); i++) {
+    Recursion *rec = mRecursions.ValueAtIndex(i);
+    rec->Release();
+  }
+
+  mRecursions.Release();
+  mTopTables.Release();
+  mInProcess.Release();
+  mDone.Release();
+  mTree.Release();
+}
+
 int main(int argc, char *argv[]) {
+  gMemPool.SetBlockSize(4096);
   RecDetector dtc;
   dtc.Detect();
+  dtc.Release();
   return 0;
 }

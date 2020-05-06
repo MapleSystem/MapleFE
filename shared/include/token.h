@@ -104,12 +104,6 @@ typedef enum {
   KW_UN      // Undefined
 }KW_Type;
 
-#define KEYWORD(N,I,T) KW_ID_##I,
-typedef enum {
-#include "keywords.def"
-  KW_ID_NULL
-}KW_ID;
-
 class KeywordToken : public Token {
 public:
   const char *mName;   // The text name. During initialization it will be

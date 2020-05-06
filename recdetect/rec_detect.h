@@ -24,34 +24,41 @@
 #include "ruletable.h"
 
 // There are some observations that help build the recursion data structure.
-// 1. A circle is composed of a list of positions. Each position tells which rule elem
+// 1. A path is composed of a list of positions. Each position tells which rule elem
 //    it goes into from current rule. So a list of unsigned integer make up the cirle.
 // 2. Each elem in this circle is a rule by itself. It cannot be token.
 
 // This defines one left recursion, and it's just one path of circle. A rule could
-// have multiple recursions (cirle routes). We define one circle route as a Recursion.
-class Recursion {
+// have multiple recursions. We define one circle route as a RecPath.
+class RecPath {
 private:
   SmallVector<unsigned> mPositions;
 public:
-  Recursion(){}
-  ~Recursion(){}
+  RecPath(){}
+  ~RecPath(){ Release(); }
+
+  void AddPos(unsigned i) { mPositions.PushBack(i); }
+  void Release() {mPositions.Clear(); mPositions.Release();}
+  void Dump();
 };
 
 // All recursions of a rule.
-class RuleRecursion {
+class Recursion {
 private:
-  SmallVector<Recursion*> mRecursions;
-  RuleTable *mRuleTable;
+  SmallVector<RecPath*> mPaths;
+  RuleTable            *mRuleTable;
 
 public:
-  RuleRecursion(){}
-  ~RuleRecursion(){}
+  Recursion(){}
+  ~Recursion() {Release();}
+
+  void Release();
 };
 
+// Left Recursion Detector.
 class RecDetector {
 private:
-  SmallVector<RuleRecursion*> mRuleRecursions;
+  SmallVector<Recursion*> mRecursions;
   SmallVector<RuleTable*> mTopTables;     // top tables we start detection from.
 
   SmallVector<RuleTable*> mInProcess;     // tables currently in process.
@@ -64,7 +71,7 @@ private:
   void AddRecursion(RuleTable*, ContTreeNode<RuleTable*>*);
   void SetupTopTables();
 
-  void Detect(RuleTable*, ContTreeNode<RuleTable*>*);
+  void DetectRuleTable(RuleTable*, ContTreeNode<RuleTable*>*);
   void DetectOneof(RuleTable*, ContTreeNode<RuleTable*>*);
   void DetectZeroormore(RuleTable*, ContTreeNode<RuleTable*>*);
   void DetectZeroorone(RuleTable*, ContTreeNode<RuleTable*>*);
@@ -73,9 +80,14 @@ private:
 
 public:
   RecDetector(){}
-  ~RecDetector(){}
+  ~RecDetector(){Release();}
 
   void Detect();
+  void Release();
 };
+
+// We are using a single memory pool to allocate everything in the tool.
+// The pool will free all memory automatically.
+MemPool gMemPool;
 
 #endif

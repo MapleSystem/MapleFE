@@ -47,13 +47,6 @@ void OperatorToken::Dump() {
   return;
 }
 
-//#undef  KEYWORD
-//#define KEYWORD(N,I,T) {#N, KW_ID_##I, T},
-//
-//#include "keywords.def"
-//{"", KW_ID_NULL, KW_UN}
-//};
-
 void KeywordToken::Dump() {
   DUMP1("Keyword    Token: ", mName);
   return;

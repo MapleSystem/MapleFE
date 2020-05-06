@@ -108,3 +108,51 @@ bool RuleActionHasElem(RuleTable *table, unsigned target_idx) {
   }
   return false;
 }
+
+// Returns true if child is found. Also set the 'index'.
+// NOTE: We don't go deeper into grandchildren.
+bool RuleFindChild(RuleTable *parent, RuleTable *child, unsigned &index) {
+  bool found = false;
+  EntryType type = parent->mType;
+
+  switch(type) {
+  // Concatenate and Oneof, can be handled the same
+  case ET_Concatenate:
+  case ET_Oneof: {
+    for (unsigned i = 0; i < parent->mNum; i++) {
+      index = i;
+      TableData *data = parent->mData + i;
+      switch (data->mType) {
+      case DT_Subtable:
+        if (data->mData.mEntry == child)
+          found = true;
+        break;
+      default:
+        break;
+      }
+    }
+    break;
+  }
+
+  // Zeroorone, Zeroormore and Data can be handled the same way.
+  case ET_Data:
+  case ET_Zeroorone:
+  case ET_Zeroormore: {
+    MASSERT((parent->mNum == 1) && "zeroormore node has more than one elements?");
+    index = 0; // index is always 0.
+    TableData *data = parent->mData;
+    switch (data->mType) {
+    case DT_Subtable:
+      if (data->mData.mEntry == child)
+        found = true;
+      break;
+    default:
+      break;
+    }
+    break;
+  }
+
+  default:
+    break;
+  }
+}
