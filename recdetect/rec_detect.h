@@ -52,6 +52,10 @@ public:
   Recursion(){}
   ~Recursion() {Release();}
 
+  void SetRuleTable(RuleTable *t) {mRuleTable = t;}
+  RuleTable* GetRuleTable() {return mRuleTable;}
+
+  void AddPath(RecPath *p) {mPaths.PushBack(p);}
   void Release();
 };
 
@@ -69,6 +73,8 @@ private:
   bool IsDone(RuleTable*);
 
   void AddRecursion(RuleTable*, ContTreeNode<RuleTable*>*);
+  Recursion* FindOrCreateRecursion(RuleTable*);
+
   void SetupTopTables();
 
   void DetectRuleTable(RuleTable*, ContTreeNode<RuleTable*>*);

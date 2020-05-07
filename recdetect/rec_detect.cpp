@@ -89,6 +89,7 @@ void RecDetector::AddRecursion(RuleTable *rt, ContTreeNode<RuleTable*> *p) {
   new (path) RecPath();
 
   // Step 1. Traverse upwards to find the target tree node.
+
   ContTreeNode<RuleTable*> *target = NULL;
   ContTreeNode<RuleTable*> *node = p;
   SmallVector<ContTreeNode<RuleTable*>*> node_list;
@@ -106,6 +107,7 @@ void RecDetector::AddRecursion(RuleTable *rt, ContTreeNode<RuleTable*> *p) {
   }
 
   MASSERT(target);
+  MASSERT(target->GetData() == rt);
 
   // Step 2. Construct the path from target to 'p'. It's already in node_list,
   //         and we simply read it in reverse order. Also find the index of
@@ -114,34 +116,53 @@ void RecDetector::AddRecursion(RuleTable *rt, ContTreeNode<RuleTable*> *p) {
   // There are some cases that are instant recursion, like:
   //   rule A : A + B
   // where there is only one position which should 0.
-  RuleTable *parent_rule = target->GetData();
 
   for (unsigned i = node_list.GetNum() - 2; i >= 0; i--) {
     ContTreeNode<RuleTable*> *child_node = node_list.ValueAtIndex(i);
     RuleTable *child_rule = child_node->GetData();
     unsigned index = 0;
-    bool succ = RuleFindChild(parent_rule, child_rule, index);
+    bool succ = RuleFindChild(rt, child_rule, index);
     MASSERT(succ && "Cannot find child rule in parent rule.");
     path->AddPos(index);
   }
 
   if (node_list.GetNum() == 1) {
     unsigned index = 0;
-    bool succ = RuleFindChild(parent_rule, parent_rule, index);
+    bool succ = RuleFindChild(rt, rt, index);
     MASSERT(succ && (index == 0) && "Cannot find child rule in parent rule.");
     path->AddPos(index);
   }
 
-  // Step 3. Find the right Recursion, if not found, create one.
-  //         Add the path to the Recursioin.
+  // Step 3. Get the right Recursion, Add the path to the Recursioin.
+  Recursion *rec = FindOrCreateRecursion(rt);
+  rec->AddPath(path);
 }
 
+// Find the Recursion of 'rule'.
+// If Not found, create one.
+Recursion* RecDetector::FindOrCreateRecursion(RuleTable *rule) {
+  for (unsigned i = 0; i < mRecursions.GetNum(); i++) {
+    Recursion *rec = mRecursions.ValueAtIndex(i);
+    if (rec->GetRuleTable() == rule)
+      return rec;
+  }
+
+  Recursion *rec = (Recursion*)gMemPool.Alloc(sizeof(Recursion));
+  new (rec) Recursion();
+  rec->SetRuleTable(rule);
+  mRecursions.PushBack(rec);
+
+  return rec;
+}
+
+// 1. There is one and only one chance to traverse a rule table. Once it's done
+//    it will never be traversed again.
 void RecDetector::DetectRuleTable(RuleTable *rt, ContTreeNode<RuleTable*> *p) {
   if (IsDone(rt))
     return;
 
+  // If find a new circle.
   if (IsInProcess(rt)) {
-    // Find a new circle.
     AddRecursion(rt, p);
   } else {
     mInProcess.PushBack(rt);
@@ -171,6 +192,10 @@ void RecDetector::DetectRuleTable(RuleTable *rt, ContTreeNode<RuleTable*> *p) {
   default:
     break;
   }
+
+  // It's done.
+  MASSERT(!IsDone(rt));
+  mDone.PushBack(rt);
 }
 
 void RecDetector::DetectOneof(RuleTable *rule_table, ContTreeNode<RuleTable*> *p) {
