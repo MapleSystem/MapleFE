@@ -176,17 +176,13 @@ void RecDetector::DetectRuleTable(RuleTable *rt, ContTreeNode<RuleTable*> *p) {
   case ET_Oneof:
     DetectOneof(rt, node);
     break;
+  case ET_Data:
+  case ET_Zeroorone:
   case ET_Zeroormore:
     DetectZeroormore(rt, node);
     break;
-  case ET_Zeroorone:
-    DetectZeroorone(rt, node);
-    break;
   case ET_Concatenate:
     DetectConcatenate(rt, node);
-    break;
-  case ET_Data:
-    DetectTableData(rt->mData, node);
     break;
   case ET_Null:
   default:
@@ -198,21 +194,35 @@ void RecDetector::DetectRuleTable(RuleTable *rt, ContTreeNode<RuleTable*> *p) {
   mDone.PushBack(rt);
 }
 
+// For Oneof rule, we try to detect for all its children if they are a rule table too.
 void RecDetector::DetectOneof(RuleTable *rule_table, ContTreeNode<RuleTable*> *p) {
+  for (unsigned i = 0; i < rule_table->mNum; i++) {
+    TableData *data = rule_table->mData + i;
+    if (data->mType == DT_Subtable) {
+      RuleTable *child = data->mData.mEntry;
+      DetectRuleTable(child, p);
+    }
+  }
 }
 
+// Data, Zeroormore and Zeroorone has the same way to handle.
 void RecDetector::DetectZeroormore(RuleTable *rule_table, ContTreeNode<RuleTable*> *p) {
-}
-
-void RecDetector::DetectZeroorone(RuleTable *rule_table, ContTreeNode<RuleTable*> *p) {
+  MASSERT((rule_table->mNum == 1) && "zeroormore node has more than one elements?");
+  TableData *data = rule_table->mData;
+  if (data->mType == DT_Subtable) {
+    RuleTable *child = data->mData.mEntry;
+    DetectRuleTable(child, p);
+  }
 }
 
 // For Concatenate node, only the first child is checked. If it's a token, just end.
 // If it's a rule table, go deeper.
 void RecDetector::DetectConcatenate(RuleTable *rule_table, ContTreeNode<RuleTable*> *p) {
-}
-
-void RecDetector::DetectTableData(TableData *table_data, ContTreeNode<RuleTable*> *p) {
+  TableData *data = rule_table->mData;
+  if (data->mType == DT_Subtable) {
+    RuleTable *child = data->mData.mEntry;
+    DetectRuleTable(child, p);
+  }
 }
 
 // We start from the top tables.

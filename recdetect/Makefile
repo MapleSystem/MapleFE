@@ -4,6 +4,13 @@ include ../Makefile.in
 BUILD=$(ROOTDIR)/$(BUILDDIR)/recdetect
 $(shell $(MKDIR_P) $(BUILD))
 
+# TEMPVAR=$(shell rm -rf $(LANG))
+# TEMPVAR=$(shell mkdir -p $(LANG))
+# TEMPVAR=$(shell cp ../$(LANG)/include/gen_*.h $(LANG)/)
+# TEMPVAR=$(shell cp ../$(LANG)/src/gen_*.cpp $(LANG)/)
+# TEMPVAR=$(shell mkdir -p $(BUILD))
+# TEMPVAR=$(shell mkdir -p $(BUILD)/$(LANG))
+
 LANGSRC=$(shell ls $(LANG)/*.cpp)
 SRC := $(LANGSRC) $(wildcard *.cpp)
 OBJ := $(patsubst %.cpp, %.o, $(SRC))
