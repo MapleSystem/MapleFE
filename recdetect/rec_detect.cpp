@@ -85,7 +85,7 @@ bool RecDetector::IsDone(RuleTable *t) {
 // and only node representing 'rt', since the second appearance will be treated
 // as a back edge. 
 void RecDetector::AddRecursion(RuleTable *rt, ContTreeNode<RuleTable*> *p) {
-  std::cout << "Recursion in " << GetRuleTableName(rt) << std::endl;
+  std::cout << "Recursion in " << GetRuleTableName(rt);
 
   RecPath *path = (RecPath*)gMemPool.Alloc(sizeof(RecPath));
   new (path) RecPath();
@@ -96,14 +96,12 @@ void RecDetector::AddRecursion(RuleTable *rt, ContTreeNode<RuleTable*> *p) {
   ContTreeNode<RuleTable*> *node = p;
   SmallVector<ContTreeNode<RuleTable*>*> node_list;
   while (node) {
-    node_list.PushBack(node);
-    // I will let it go until the root, even we already find the target in middle.
-    // I do this to verify my code is correct. [TODO] will come back to remove
-    // this extra cost.
     if (node->GetData() == rt) {
       MASSERT(!target && "duplicated target node in a path.");
       target = node;
       break;
+    } else {
+      node_list.PushBack(node);
     }
     node = node->GetParent();
   }
@@ -119,20 +117,25 @@ void RecDetector::AddRecursion(RuleTable *rt, ContTreeNode<RuleTable*> *p) {
   //   rule A : A + B
   // where there is only one position which should 0.
 
-  for (int i = node_list.GetNum() - 2; i >= 0; i--) {
+  RuleTable *parent_rule = rt;
+  for (int i = node_list.GetNum() - 1; i >= 0; i--) {
     ContTreeNode<RuleTable*> *child_node = node_list.ValueAtIndex(i);
     RuleTable *child_rule = child_node->GetData();
     unsigned index = 0;
-    bool succ = RuleFindChild(rt, child_rule, index);
+    bool succ = RuleFindChild(parent_rule, child_rule, index);
     MASSERT(succ && "Cannot find child rule in parent rule.");
     path->AddPos(index);
+    parent_rule = child_rule;
+
+    std::cout << " child: " << GetRuleTableName(child_rule) << "@" << index << std::endl;
   }
 
-  if (node_list.GetNum() == 1) {
+  if (node_list.GetNum() == 0) {
     unsigned index = 0;
     bool succ = RuleFindChild(rt, rt, index);
     MASSERT(succ && (index == 0) && "Cannot find child rule in parent rule.");
     path->AddPos(index);
+    std::cout << " self recursion" << std::endl;
   }
 
   // Step 3. Get the right Recursion, Add the path to the Recursioin.
@@ -220,13 +223,37 @@ void RecDetector::DetectZeroormore(RuleTable *rule_table, ContTreeNode<RuleTable
   }
 }
 
-// For Concatenate node, only the first child is checked. If it's a token, just end.
-// If it's a rule table, go deeper.
+// Concatenate node is quite complicated, let's look at the first case.
+//  E ---> '{' + E + '}',
+//     |-> other rules
+// It's obvious that E on RHS won't be considered as recursion child, and we can stop
+// at this point. Now let's look at the second case.
+//  A ---> '{' + E + '}',
+//     |-> other rules
+// E on RHS is the first time it's computed, and it's possible there are recursions
+// inside E. We of course need keep working on it.
+//
+// So here is the question we need answer, when should we keep working on an item
+// of a concatenate node? The answer is, if E is already InProcess(), we stop, otherwise,
+// we keep working.
+//
+// There is a special child node, which is the first one. It always will go through
+// further process in DectecRuleTable() who will handle it over there.
+
 void RecDetector::DetectConcatenate(RuleTable *rule_table, ContTreeNode<RuleTable*> *p) {
   TableData *data = rule_table->mData;
   if (data->mType == DT_Subtable) {
     RuleTable *child = data->mData.mEntry;
     DetectRuleTable(child, p);
+  }
+
+  for (unsigned i = 1; i < rule_table->mNum; i++) {
+    TableData *data = rule_table->mData + i;
+    if (data->mType == DT_Subtable) {
+      RuleTable *child = data->mData.mEntry;
+      if (!IsInProcess(child))
+        DetectRuleTable(child, p);
+    }
   }
 }
 
