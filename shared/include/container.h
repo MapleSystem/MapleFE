@@ -71,7 +71,7 @@ public:
   ~SmallVector() {Release();}
 
   void SetBlockSize(unsigned i) {mMemPool.SetBlockSize(i);}
-  void Release() {mMemPool.Release();}
+  void Release() {mMemPool.Release(); mNum = 0;}
 
   void PushBack(T t) {
     char *addr = mMemPool.AllocElem();
@@ -187,7 +187,12 @@ public:
   ~SmallList() {Release();}
 
   void SetBlockSize(unsigned i) {mMemPool.SetBlockSize(i);}
-  void Release() {mMemPool.Release();}
+  void Release() {
+    mMemPool.Release();
+    mNum = 0;
+    mHead = NULL;
+    mTail = NULL;
+    mPointer = NULL; }
 
   void PushBack(T t) {
     Elem *e = NewElem(t);
@@ -732,7 +737,8 @@ public:
   //                 Other functions
   /////////////////////////////////////////////////////////
 
-  void Release() {mMemPool.Release();}
+  void Release() {mMemPool.Release();
+                  mHeader = NULL; }
 };
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -840,7 +846,7 @@ public:
     // operations from MemPool. Don't need SetElemSize().
     mExtraChildrenPool.SetBlockSize(1024);
   }
-  ~ContTree() {Release();}
+  ~ContTree() {Release(); mRoot = NULL;}
 
   ContTreeNode<T>* NewNode(T data, ContTreeNode<T> *parent) {
     char *addr = mMemPool.AllocElem();

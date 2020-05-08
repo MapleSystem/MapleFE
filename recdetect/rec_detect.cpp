@@ -85,6 +85,8 @@ bool RecDetector::IsDone(RuleTable *t) {
 // and only node representing 'rt', since the second appearance will be treated
 // as a back edge. 
 void RecDetector::AddRecursion(RuleTable *rt, ContTreeNode<RuleTable*> *p) {
+  std::cout << "Recursion in " << GetRuleTableName(rt) << std::endl;
+
   RecPath *path = (RecPath*)gMemPool.Alloc(sizeof(RecPath));
   new (path) RecPath();
 
@@ -117,7 +119,7 @@ void RecDetector::AddRecursion(RuleTable *rt, ContTreeNode<RuleTable*> *p) {
   //   rule A : A + B
   // where there is only one position which should 0.
 
-  for (unsigned i = node_list.GetNum() - 2; i >= 0; i--) {
+  for (int i = node_list.GetNum() - 2; i >= 0; i--) {
     ContTreeNode<RuleTable*> *child_node = node_list.ValueAtIndex(i);
     RuleTable *child_rule = child_node->GetData();
     unsigned index = 0;
@@ -161,9 +163,12 @@ void RecDetector::DetectRuleTable(RuleTable *rt, ContTreeNode<RuleTable*> *p) {
   if (IsDone(rt))
     return;
 
-  // If find a new circle.
+  // If find a new Recursion, we are done. Don't need go deeper into
+  // children nodes. However, 'rt' is not done yet since the current path
+  // is just one path. We cannot set IsDone().
   if (IsInProcess(rt)) {
     AddRecursion(rt, p);
+    return;
   } else {
     mInProcess.PushBack(rt);
   }
@@ -228,6 +233,7 @@ void RecDetector::DetectConcatenate(RuleTable *rule_table, ContTreeNode<RuleTabl
 // We start from the top tables.
 // Tables not accssible from top tables won't be handled.
 void RecDetector::Detect() {
+  SetupTopTables();
   for (unsigned i = 0; i < mTopTables.GetNum(); i++) {
     mInProcess.Clear();
     mDone.Clear();
