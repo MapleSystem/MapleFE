@@ -28,8 +28,25 @@
 //    it goes into from current rule. So a list of unsigned integer make up the cirle.
 // 2. Each elem in this circle is a rule by itself. It cannot be token.
 
-// This defines one left recursion, and it's just one path of circle. A rule could
-// have multiple recursions. We define one circle route as a RecPath.
+// This defines one left recursion, and it's just one path. A rule could
+// have multiple recursions. We define one recursion route as a RecPath.
+//
+// Take a look at an example to understand the meaning of position vector.
+// rule PackageOrTypeName : Oneof ( xxxx
+//                                  PackageOrTypeName + xxx + xxx)
+// The recusion will look like below.
+//   PackageOrTypeName <----------
+//          |                     |
+//          |                     |
+//       PackageOrTypeName_sub1 ---
+//
+// So here is the sequence of position, ie. index of each child in its parent.
+// The Path of the above diagram will be <1, 1>. The first '1' means the index of
+// PackageOrTypeName_sub1 in PackageOrTypeName, remember index starts from 0. The
+// second '1' means the index of PackageOrTypeName in PackageOrTypeName_sub1.
+//
+// [NOTE] The last index in path is always telling the back edge.
+
 class RecPath {
 private:
   SmallVector<unsigned> mPositions;

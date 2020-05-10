@@ -85,42 +85,42 @@ bool RecDetector::IsDone(RuleTable *t) {
 // and only node representing 'rt', since the second appearance will be treated
 // as a back edge. 
 void RecDetector::AddRecursion(RuleTable *rt, ContTreeNode<RuleTable*> *p) {
-  std::cout << "Recursion in " << GetRuleTableName(rt);
+  std::cout << "Recursion in " << GetRuleTableName(rt) << std::endl;
 
   RecPath *path = (RecPath*)gMemPool.Alloc(sizeof(RecPath));
   new (path) RecPath();
 
-  // Step 1. Traverse upwards to find the target tree node.
+  // Step 1. Traverse upwards to find the target tree node, and add the node
+  //         to the node_list. But the first to add is the back edge.
 
   ContTreeNode<RuleTable*> *target = NULL;
   ContTreeNode<RuleTable*> *node = p;
-  SmallVector<ContTreeNode<RuleTable*>*> node_list;
+  SmallVector<RuleTable*> node_list;
+
+  node_list.PushBack(rt);
+
   while (node) {
     if (node->GetData() == rt) {
       MASSERT(!target && "duplicated target node in a path.");
       target = node;
       break;
     } else {
-      node_list.PushBack(node);
+      node_list.PushBack(node->GetData());
     }
     node = node->GetParent();
   }
 
+  MASSERT(node_list.GetNum() > 0);
   MASSERT(target);
   MASSERT(target->GetData() == rt);
 
   // Step 2. Construct the path from target to 'p'. It's already in node_list,
   //         and we simply read it in reverse order. Also find the index of
   //         of each child rule in the parent rule.
-  //
-  // There are some cases that are instant recursion, like:
-  //   rule A : A + B
-  // where there is only one position which should 0.
 
   RuleTable *parent_rule = rt;
   for (int i = node_list.GetNum() - 1; i >= 0; i--) {
-    ContTreeNode<RuleTable*> *child_node = node_list.ValueAtIndex(i);
-    RuleTable *child_rule = child_node->GetData();
+    RuleTable *child_rule = node_list.ValueAtIndex(i);
     unsigned index = 0;
     bool succ = RuleFindChild(parent_rule, child_rule, index);
     MASSERT(succ && "Cannot find child rule in parent rule.");
@@ -128,14 +128,6 @@ void RecDetector::AddRecursion(RuleTable *rt, ContTreeNode<RuleTable*> *p) {
     parent_rule = child_rule;
 
     std::cout << " child: " << GetRuleTableName(child_rule) << "@" << index << std::endl;
-  }
-
-  if (node_list.GetNum() == 0) {
-    unsigned index = 0;
-    bool succ = RuleFindChild(rt, rt, index);
-    MASSERT(succ && (index == 0) && "Cannot find child rule in parent rule.");
-    path->AddPos(index);
-    std::cout << " self recursion" << std::endl;
   }
 
   // Step 3. Get the right Recursion, Add the path to the Recursioin.

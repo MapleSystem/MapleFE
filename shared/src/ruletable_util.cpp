@@ -130,6 +130,9 @@ bool RuleFindChild(RuleTable *parent, RuleTable *child, unsigned &index) {
       default:
         break;
       }
+
+      if (found)
+        break;
     }
     break;
   }

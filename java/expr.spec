@@ -18,6 +18,7 @@
 
 # I just put all TO-DO rules here
 rule Class    : "class"
+
 rule ArrayInitializer : "arrayinitializer"
 
 rule PackageName : ONEOF(Identifier,
