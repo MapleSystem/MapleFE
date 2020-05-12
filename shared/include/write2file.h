@@ -16,29 +16,43 @@
 //   This file defines interfaces of file operations                   //
 /////////////////////////////////////////////////////////////////////////
 
-#ifndef __FILE_WRITE_H__
-#define __FILE_WRITE_H__
+#ifndef __WRITE2FILE_H__
+#define __WRITE2FILE_H__
 
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
 
-#include "write2file.h"
-#include "buffer2write.h"
+#define MAX_LINE_LIMIT  100
+#define LINES_PER_BLOCK 4     // This must be 2^x
 
-class FileWriter : public Write2File {
+class Write2File {
 public:
-  FileWriter() {}
-  FileWriter(const std::string &s) : Write2File(s) {}
-  ~FileWriter(){}
+  std::string   mName;
+  std::ofstream mFile;
 
-  void WriteSimpleBuffers(const FormattedBuffer *);
+  std::string   mCurLine;
+  const char   *mCurChar;
+  unsigned      mPos;      //The index of mCurChar, or #chars processed
 
-  // Write a formatted buffer.
-  void WriteFormattedBuffer(const FormattedBuffer *);
-  void WriteIfBuffer(const IfBuffer*);
-  void WriteScopedBuffer(const ScopedBuffer*);
+  unsigned      mIndentation; // indentation
+  unsigned      mLineLimit;   // max length of a line
+
+public:
+  Write2File() {}
+  Write2File(const std::string &s);
+  ~Write2File(){ mFile.close(); }
+
+  // Only one line
+  void WriteOneLine(const char *s, int l, bool iscomment = false);
+
+  // Could be split into multi lines
+  void WriteLine(const char *s, int l,
+                 bool extraindent = false, bool iscomment=false);
+
+  // Write a block in the FormattedBuffer
+  void WriteBlock(const char *);
 };
 
 #endif

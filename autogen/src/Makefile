@@ -4,7 +4,7 @@ include ../../Makefile.in
 BUILD=$(ROOTDIR)/$(BUILDDIR)/autogen
 $(shell $(MKDIR_P) $(BUILD))
 
-SHAREDSRC := mempool.cpp stringmap.cpp stringpool.cpp
+SHAREDSRC := mempool.cpp stringmap.cpp stringpool.cpp write2file.cpp
 SRC := $(wildcard *.cpp) $(SHAREDSRC)
 OBJ := $(patsubst %.cpp, %.o, $(SRC))
 DEP := $(patsubst %.cpp, %.d, $(SRC))
