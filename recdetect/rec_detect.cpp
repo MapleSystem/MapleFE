@@ -160,7 +160,7 @@ void RecDetector::DetectRuleTable(RuleTable *rt, ContTreeNode<RuleTable*> *p) {
 
   // If find a new Recursion, we are done. Don't need go deeper into
   // children nodes. However, 'rt' is not done yet since the current path
-  // is just one path. We cannot set IsDone().
+  // is just one path. We cannot set IsDone() at here.
   if (IsInProcess(rt)) {
     AddRecursion(rt, p);
     return;
@@ -252,12 +252,12 @@ void RecDetector::DetectConcatenate(RuleTable *rule_table, ContTreeNode<RuleTabl
 // We start from the top tables.
 // Tables not accssible from top tables won't be handled.
 void RecDetector::Detect() {
+  mDone.Clear();
+
   SetupTopTables();
   for (unsigned i = 0; i < mTopTables.GetNum(); i++) {
     mInProcess.Clear();
-    mDone.Clear();
     mTree.Clear();
-
     RuleTable *top = mTopTables.ValueAtIndex(i);
     DetectRuleTable(top, NULL);
   }
