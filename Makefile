@@ -24,6 +24,7 @@ java2mpl: autogen recdetect shared
 
 recdetect: autogen shared
 	(cd recdetect; ./build.sh java)
+	(cd $(BUILDDIR)/recdetect; ./recdetect)
 
 shared: autogen
 	$(MAKE) LANG=java -C shared

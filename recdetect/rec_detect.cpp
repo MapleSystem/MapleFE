@@ -39,6 +39,19 @@ void RecPath::Dump() {
   std::cout << std::endl;
 }
 
+std::string RecPath::DumpToString() {
+  std::string s;
+  s += "{";
+  for (unsigned i = 0; i < mPositions.GetNum(); i++) {
+    std::string num = std::to_string(mPositions.ValueAtIndex(i));
+    s += num;
+    if (i < mPositions.GetNum() - 1)
+      s += ",";
+  }
+  s += "}";
+  return s;
+}
+
 ////////////////////////////////////////////////////////////////////////////////////
 //                                Recursion
 ////////////////////////////////////////////////////////////////////////////////////
@@ -289,6 +302,67 @@ void RecDetector::WriteHeaderFile() {
 void RecDetector::WriteCppFile() {
   mCppFile->WriteOneLine("#include \"gen_recursion.h\"", 26);
   mCppFile->WriteOneLine("#include \"common_header_autogen.h\"", 34);
+
+  // Step 1. Dump num of Recursions
+  std::string s = "unsigned gLeftRecursionsNum=";
+  std::string num = std::to_string(mRecursions.GetNum());
+  s += num;
+  s += ';';
+  mCppFile->WriteOneLine(s.c_str(), s.size());
+
+  //Step 2. Dump paths of a rule table's recursions.
+  //  unsigned tablename_path_1[N]={1, 2, ...};
+  //  unsigned tablename_path_2[M]={1, 2, ...};
+  //  unsigned *tablename_path_list[2] = {tablename_path_1, tablename_path_2};
+  //  LeftRecursion tablename_rec = {&Tbltablename, 2, tablename_path_list};
+  for (unsigned i = 0; i < mRecursions.GetNum(); i++) {
+    Recursion *rec = mRecursions.ValueAtIndex(i);
+    const char *tablename = GetRuleTableName(rec->GetRuleTable());
+
+    // dump comment of tablename
+    std::string comment("// ");
+    comment += tablename;
+    mCppFile->WriteOneLine(comment.c_str(), comment.size());
+
+    // dump : unsigned tablename_path_1[N]={1, 2, ...};
+    for (unsigned j = 0; j < rec->PathsNum(); j++) {
+      RecPath *path = rec->GetPath(j);
+      std::string path_str = "unsigned ";
+      path_str += tablename;
+      path_str += "_path_";
+      std::string index_str = std::to_string(j);
+      path_str += index_str;
+      path_str += "[";
+      std::string num_str = std::to_string(path->PositionsNum());
+      path_str += num_str;
+      path_str += "]=";
+      std::string path_dump = path->DumpToString();
+      path_str += path_dump;
+      path_str += ";";
+      mCppFile->WriteOneLine(path_str.c_str(), path_str.size());
+    }
+
+    //  to dump
+    //  unsigned *tablename_path_list[2] = {tablename_path_1, tablename_path_2};
+    std::string path_list = "unsigned *";
+    path_list += tablename;
+    path_list += "_path_list[";
+    std::string num_str = std::to_string(rec->PathsNum());
+    path_list += num_str;
+    path_list += "]={";
+    for (unsigned j = 0; j < rec->PathsNum(); j++) {
+      std::string path_str;
+      path_str += tablename;
+      path_str += "_path_";
+      std::string index_str = std::to_string(j);
+      path_str += index_str;
+      if (j < rec->PathsNum() - 1)
+        path_str += ",";
+      path_list += path_str;
+    }
+    path_list += "};";
+    mCppFile->WriteOneLine(path_list.c_str(), path_list.size());
+  }
 }
 
 // Write the recursion to java/gen_recursion.h and java/gen_recursion.cpp

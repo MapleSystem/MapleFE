@@ -55,9 +55,13 @@ public:
   RecPath(){}
   ~RecPath(){ Release(); }
 
+  unsigned PositionsNum() {return mPositions.GetNum();}
   void AddPos(unsigned i) { mPositions.PushBack(i); }
+
   void Release() {mPositions.Clear(); mPositions.Release();}
+
   void Dump();
+  std::string DumpToString();
 };
 
 // All recursions of a rule.
@@ -72,6 +76,9 @@ public:
 
   void SetRuleTable(RuleTable *t) {mRuleTable = t;}
   RuleTable* GetRuleTable() {return mRuleTable;}
+
+  unsigned PathsNum() {return mPaths.GetNum();}
+  RecPath* GetPath(unsigned i) {return mPaths.ValueAtIndex(i);}
 
   void AddPath(RecPath *p) {mPaths.PushBack(p);}
   void Release();
