@@ -22,6 +22,7 @@
 
 #include "container.h"
 #include "ruletable.h"
+#include "write2file.h"
 
 // There are some observations that help build the recursion data structure.
 // 1. A path is composed of a list of positions. Each position tells which rule elem
@@ -101,11 +102,19 @@ private:
   void DetectConcatenate(RuleTable*, ContTreeNode<RuleTable*>*);
   void DetectTableData(TableData*, ContTreeNode<RuleTable*>*);
 
+private:
+  Write2File *mCppFile;
+  Write2File *mHeaderFile;
+
+  void WriteHeaderFile();
+  void WriteCppFile();
+
 public:
-  RecDetector(){}
+  RecDetector() : mCppFile(NULL), mHeaderFile(NULL) {}
   ~RecDetector(){Release();}
 
   void Detect();
+  void Write();
   void Release();
 };
 

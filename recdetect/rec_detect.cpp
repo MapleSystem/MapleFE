@@ -278,10 +278,41 @@ void RecDetector::Release() {
   mTree.Release();
 }
 
+// The header file would be java/include/gen_recursion.h.
+void RecDetector::WriteHeaderFile() {
+  mHeaderFile->WriteOneLine("#ifndef __GEN_RECUR_H__", 23);
+  mHeaderFile->WriteOneLine("#define __GEN_RECUR_H__", 23);
+  mHeaderFile->WriteOneLine("#include \"recursion.h\"", 22);
+  mHeaderFile->WriteOneLine("#endif", 6);
+}
+
+void RecDetector::WriteCppFile() {
+  mCppFile->WriteOneLine("#include \"gen_recursion.h\"", 26);
+  mCppFile->WriteOneLine("#include \"common_header_autogen.h\"", 34);
+}
+
+// Write the recursion to java/gen_recursion.h and java/gen_recursion.cpp
+void RecDetector::Write() {
+  std::string lang_path_header("../../java/include/");
+  std::string lang_path_cpp("../../java/src/");
+
+  std::string file_name = lang_path_cpp + "gen_recursion.cpp";
+  mCppFile = new Write2File(file_name);
+  file_name = lang_path_header + "gen_recursion.h";
+  mHeaderFile = new Write2File(file_name);
+
+  WriteHeaderFile();
+  WriteCppFile();
+
+  delete mCppFile;
+  delete mHeaderFile;
+}
+
 int main(int argc, char *argv[]) {
   gMemPool.SetBlockSize(4096);
   RecDetector dtc;
   dtc.Detect();
+  dtc.Write();
   dtc.Release();
   return 0;
 }
