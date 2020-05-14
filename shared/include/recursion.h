@@ -30,7 +30,7 @@ struct LeftRecursion {
   unsigned **mPaths; // 
 };
 
-extern LeftRecursion *gLeftRecursions; //
+extern LeftRecursion **gLeftRecursions; //
 extern unsigned gLeftRecursionsNum;  // total number of rule tables having recursion.
 
 #endif

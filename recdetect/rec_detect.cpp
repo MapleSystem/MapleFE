@@ -303,14 +303,7 @@ void RecDetector::WriteCppFile() {
   mCppFile->WriteOneLine("#include \"gen_recursion.h\"", 26);
   mCppFile->WriteOneLine("#include \"common_header_autogen.h\"", 34);
 
-  // Step 1. Dump num of Recursions
-  std::string s = "unsigned gLeftRecursionsNum=";
-  std::string num = std::to_string(mRecursions.GetNum());
-  s += num;
-  s += ';';
-  mCppFile->WriteOneLine(s.c_str(), s.size());
-
-  //Step 2. Dump paths of a rule table's recursions.
+  //Step 1. Dump paths of a rule table's recursions.
   //  unsigned tablename_path_1[N]={1, 2, ...};
   //  unsigned tablename_path_2[M]={1, 2, ...};
   //  unsigned *tablename_path_list[2] = {tablename_path_1, tablename_path_2};
@@ -362,7 +355,51 @@ void RecDetector::WriteCppFile() {
     }
     path_list += "};";
     mCppFile->WriteOneLine(path_list.c_str(), path_list.size());
+
+    // dump
+    //  LeftRecursion tablename_rec = {&Tbltablename, 2, tablename_path_list};
+    std::string rec_str = "LeftRecursion ";
+    rec_str += tablename;
+    rec_str += "_rec = {&";
+    rec_str += tablename;
+    rec_str += ", ";
+    rec_str += num_str,
+    rec_str += ", ";
+    rec_str += tablename;
+    rec_str += "_path_list};";
+    mCppFile->WriteOneLine(rec_str.c_str(), rec_str.size());
   }
+
+  // Step 2. Dump num of Recursions
+
+  mCppFile->WriteOneLine("// Total recursions", 19);
+
+  std::string s = "unsigned gLeftRecursionsNum=";
+  std::string num = std::to_string(mRecursions.GetNum());
+  s += num;
+  s += ';';
+  mCppFile->WriteOneLine(s.c_str(), s.size());
+
+  // Step 3. dump all the recursions array, as below
+  //   Recusion* TotalRecursions[N] = {&tablename_rec, &tablename_rec, ...};
+  //   Recursion **gLeftRecursions = TotalRecursions;
+  std::string total_str = "LeftRecursion* TotalRecursions[";
+  std::string num_rec = std::to_string(mRecursions.GetNum());
+  total_str += num_rec;
+  total_str += "] = {";
+  for (unsigned i = 0; i < mRecursions.GetNum(); i++) {
+    Recursion *rec = mRecursions.ValueAtIndex(i);
+    const char *tablename = GetRuleTableName(rec->GetRuleTable());
+    total_str += "&";
+    total_str += tablename;
+    total_str += "_rec";
+    if (i < mRecursions.GetNum() - 1)
+      total_str += ", ";
+  }
+  total_str += "};";
+  mCppFile->WriteOneLine(total_str.c_str(), total_str.size());
+  std::string last_str = "LeftRecursion **gLeftRecursions = TotalRecursions;";
+  mCppFile->WriteOneLine(last_str.c_str(), last_str.size());
 }
 
 // Write the recursion to java/gen_recursion.h and java/gen_recursion.cpp
