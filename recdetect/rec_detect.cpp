@@ -25,6 +25,14 @@
 //     node in the tree in this recursion.
 //  2) Each node (ie rule table) could have multiple recursions.
 //  3) Recursions could include children recursions inside. 
+//
+// [NOTE] The key point in recursion detector is to make sure for each loop, there
+//        should be one and only one recursion counted, even if there are multiple
+//        nodes in the loop.
+//        To achieve this, we build the tree, and those back edges of recursion won't
+//        be counted as tree. So in DFS traversal, children are done before parents.
+//        If a child is involved in a loop, only the topmost ancestor will be the
+//        leader of this loop.
 ////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -167,6 +175,8 @@ Recursion* RecDetector::FindOrCreateRecursion(RuleTable *rule) {
 
 // 1. There is one and only one chance to traverse a rule table. Once it's done
 //    it will never be traversed again.
+// 2. This guarantees there is one and only one recursion recorded for a loop
+//    even if the loop has multiple nodes.
 void RecDetector::DetectRuleTable(RuleTable *rt, ContTreeNode<RuleTable*> *p) {
   if (IsDone(rt))
     return;

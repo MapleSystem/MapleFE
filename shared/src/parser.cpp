@@ -80,12 +80,20 @@
 // to the ending token.
 //
 //
-// 3. Cycle Reference
+// 3. Left Recursion
 //
-// The most important thing in parsing is how to HANDLE CYCLES in the rules. Take
-// rule additiveExpression for example. It calls itself in the second element.
-// Should we keep parsing when we find a cycle? If yes, is there any concern we
-// need to address?
+// MapleFE is an LL parser, and left recursion has to be handled if we allow language
+// designer to write left recursion. I personally believe left recursion is a much
+// simpler, more human friendly and stronger way to describe language spec. To
+// provide this juicy feature, parser has to do extra job.
+//
+// The main idea of handling left recursion includes two parts.
+// (1) Tool 'recdetect' finds out all the left recursions in the language spec.
+//     Dump them as tables into source code as part of parser.
+// (2) When parser is traversing the rule tables, whenever it sees a left recursion,
+//     it simply tries the recursion to see how many tokens the recursion can eat.
+//
+// Let's look at a few examples.
 //
 // rule MultiplicativeExpression : ONEOF(
 //   UnaryExpression,  ---------------------> it can parse a variable name.
@@ -99,31 +107,9 @@
 //   AdditiveExpression + '-' + MultiplicativeExpression)
 //   attr.action.%2,%3 : GenerateBinaryExpr(%1, %2, %3)
 //
-// The answer is yes, cycle is useful in real life. It needs to keep looping.
-// a + b + c + d + ... is a good example showing loops of AdditiveExpression.
+// a + b + c + d + ... is a good example.
 //
 // Another good example is Block. There are nested blocks. So loop exists.
-//
-// However, there is a concern which is how to avoid ENDLESS LOOP, and how to
-// figure out Valuable Loop vs. Endless Loop. If it's a valuable loop we keep
-// parsing, if it's an endless loop, we stop parsing.
-//
-// A loop is valuable if the mCurToken moves after an iteration of the loop.
-// A loop is endless if mCurToken doesn't move between iterations.
-// This is determined through the mVisitedStack which records the mCurToken each
-// time we hit the ruletable once we are in a loop.
-//
-// Border conditions:  (1) The first time a table is hit, it's set Visited. We
-//                         don's push to the stack since no loop so far.
-//                     (2) The second time a table is hit, current token position
-//                         is pushed. Now we are forming a loop, but we are not
-//                         comparing its current position with the previous one since
-//                         it's just a one iteration loop. We allow it go
-//                         on until in third time where we can prove it's endless.
-//                     (3) From second time on, each time a rule is done, its token
-//                         position is popped from the stack.
-//                     (4) From the third time on, start checking if the position
-//                         has moved compared to the previous one.
 //
 // 4. Parsing Time Issue
 //
