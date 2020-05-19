@@ -29,6 +29,7 @@
 #include "lexer.h"
 #include "ast_module.h"
 #include "container.h"
+#include "recursion.h"
 
 class Automata;
 class Function;
@@ -300,6 +301,13 @@ private:
 
   // Build AST
   ASTTree*  BuildAST(); // Each top level construct gets a AST
+
+private:
+  // These are all about left recursion parsing
+  LeftRecursion* FindRecursion(RuleTable *);
+  bool IsLeadNode(RuleTable *);
+  void FindLeadFronNodes(RuleTable*, LeftRecursion*, SmallVector<RuleTable*>*);
+  void TraverseLeadNode(AppealNode *node, AppealNode *parent);
 
 public:
   Parser(const char *f);

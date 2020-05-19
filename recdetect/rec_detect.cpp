@@ -106,7 +106,7 @@ bool RecDetector::IsDone(RuleTable *t) {
 // and only node representing 'rt', since the second appearance will be treated
 // as a back edge. 
 void RecDetector::AddRecursion(RuleTable *rt, ContTreeNode<RuleTable*> *p) {
-  std::cout << "Recursion in " << GetRuleTableName(rt) << std::endl;
+  //std::cout << "Recursion in " << GetRuleTableName(rt) << std::endl;
 
   RecPath *path = (RecPath*)gMemPool.Alloc(sizeof(RecPath));
   new (path) RecPath();
@@ -148,7 +148,7 @@ void RecDetector::AddRecursion(RuleTable *rt, ContTreeNode<RuleTable*> *p) {
     path->AddPos(index);
     parent_rule = child_rule;
 
-    std::cout << " child: " << GetRuleTableName(child_rule) << "@" << index << std::endl;
+    //std::cout << " child: " << GetRuleTableName(child_rule) << "@" << index << std::endl;
   }
 
   // Step 3. Get the right Recursion, Add the path to the Recursioin.
