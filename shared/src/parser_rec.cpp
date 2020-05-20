@@ -56,6 +56,10 @@ void Parser::FindLeadFronNodes(RuleTable *rt,
     TableData *data = rt->mData;
     MASSERT(data->mType == DT_Subtable);
     for (unsigned i = 0; i < rec->mNum; i++) {
+      unsigned *path = rec->mPaths[i];
+      // second element is the first child table's index
+      MASSERT(path[0] >= 1);
+      MASSERT(path[1] == 0);
     }
     break;
   case ET_Concatenate:

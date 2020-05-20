@@ -49,14 +49,12 @@ void RecPath::Dump() {
 
 std::string RecPath::DumpToString() {
   std::string s;
-  s += "{";
   for (unsigned i = 0; i < mPositions.GetNum(); i++) {
     std::string num = std::to_string(mPositions.ValueAtIndex(i));
     s += num;
     if (i < mPositions.GetNum() - 1)
       s += ",";
   }
-  s += "}";
   return s;
 }
 
@@ -336,12 +334,17 @@ void RecDetector::WriteCppFile() {
       std::string index_str = std::to_string(j);
       path_str += index_str;
       path_str += "[";
-      std::string num_str = std::to_string(path->PositionsNum());
+      // As mentioned in recursion.h, we put the #elem in the first element
+      // tell the users of the array length.
+      std::string num_str = std::to_string(path->PositionsNum()+1);
       path_str += num_str;
-      path_str += "]=";
+      path_str += "]= {";
+      num_str = std::to_string(path->PositionsNum());
+      path_str += num_str;
+      path_str += ",";
       std::string path_dump = path->DumpToString();
       path_str += path_dump;
-      path_str += ";";
+      path_str += "};";
       mCppFile->WriteOneLine(path_str.c_str(), path_str.size());
     }
 

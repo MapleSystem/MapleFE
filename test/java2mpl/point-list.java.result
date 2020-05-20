@@ -1,0 +1,69 @@
+Matched 40 tokens.
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+== Sub Tree ==
+class  Point
+  Fields: 
+    x    y    list    next
+  Instance Initializer: 
+
+  Constructors: 
+
+  Methods: 
+    func  foo()  throws: 
+      pl=new PointList
+  LocalClasses: 
+  LocalInterfaces: 
+
+Matched 56 tokens.
+Attached a tree node from Child
+Attached a tree node from Child
+== Sub Tree ==
+class  PointList
+  Fields: 
+    z    first
+  Instance Initializer: 
+
+  Constructors: 
+    constructor  PointList()  throws: 
+
+
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+============= Module ===========
+== Sub Tree ==
+class  Point
+  Fields: 
+    x    y    list    next
+  Instance Initializer: 
+
+  Constructors: 
+
+  Methods: 
+    func  foo()  throws: 
+      pl=new PointList
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+class  PointList
+  Fields: 
+    z    first
+  Instance Initializer: 
+
+  Constructors: 
+    constructor  PointList()  throws: 
+
+
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+

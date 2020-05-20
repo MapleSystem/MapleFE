@@ -22,8 +22,9 @@
 
 #include "ruletable.h"
 
-// For each rule it could have multiple left recursions.
-// We give each ruletable a LeftRecursion.
+// For each rule it could have multiple left recursions. Each recursion is represented
+// as a 'path'. A 'path' is simply an integer array, with the first element being the
+// length of the array.
 struct LeftRecursion {
   RuleTable *mRuleTable;
   unsigned   mNum;  // How many recursions
