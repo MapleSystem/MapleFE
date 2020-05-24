@@ -84,6 +84,22 @@ public:
   void Release();
 };
 
+// RuleTable to Recursion Mapping.
+// A rule table could be involved in multiple recursions. This information is
+// needed in the parser. The LeadNode of a recursion is also counted a mapping
+// to its own recursion.
+class Rule2Recursion {
+public:
+  RuleTable *mRule;
+  SmallVector<Recursion*> mRecursions;
+public:
+  Rule2Recursion() {mRule = NULL;}
+  ~Rule2Recursion() {Release();}
+
+  void AddRecursion(Recursion *rec);
+  void Release() {mRecursions.Release();}
+};
+
 // Left Recursion Detector.
 class RecDetector {
 private:
@@ -108,6 +124,11 @@ private:
   void DetectZeroorone(RuleTable*, ContTreeNode<RuleTable*>*);
   void DetectConcatenate(RuleTable*, ContTreeNode<RuleTable*>*);
   void DetectTableData(TableData*, ContTreeNode<RuleTable*>*);
+
+  // rule to recursion mapping.
+  SmallVector<Rule2Recursion*> mRule2Recursions;
+  void AddRule2Recursion(RuleTable*, Recursion*);
+  void WriteRule2Recursion();
 
 private:
   Write2File *mCppFile;

@@ -72,6 +72,20 @@ void Recursion::Release() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
+//                                Rule2Recursion
+////////////////////////////////////////////////////////////////////////////////////
+
+// A rule table could have multiple instance in a recursion if the recursion has
+// multiple circle and the rule appears in multiple circles.
+void Rule2Recursion::AddRecursion(Recursion *rec) {
+  for (unsigned i = 0; i < mRecursions.GetNum(); i++) {
+    if (rec == mRecursions.ValueAtIndex(i))
+      return;
+  }
+  mRecursions.PushBack(rec);
+}
+
+////////////////////////////////////////////////////////////////////////////////////
 //                                RecDetector
 ////////////////////////////////////////////////////////////////////////////////////
 
@@ -97,6 +111,43 @@ bool RecDetector::IsDone(RuleTable *t) {
       return true;
   }
   return false;
+}
+
+// A rule could have multiple appearances in a rec, but it's OK.
+// We just need add one instance of it.
+// LeadNode and its recursion also are added as a mapping.
+void RecDetector::AddRule2Recursion(RuleTable *rule, Recursion *rec) {
+  Rule2Recursion *map = NULL;
+  bool found = false;
+
+  // If the rule table already mapping to some recursion?
+  for (unsigned i = 0; i < mRule2Recursions.GetNum(); i++) {
+    Rule2Recursion *r2r = mRule2Recursions.ValueAtIndex(i);
+    if (rule == r2r->mRule) {
+      map = r2r;
+      break;
+    }
+  }
+
+  if (!map) {
+    map = (Rule2Recursion*)gMemPool.Alloc(sizeof(Rule2Recursion));
+    new (map) Rule2Recursion();
+    map->mRule = rule;
+    mRule2Recursions.PushBack(map);
+  }
+
+  // if the mapping already exists?
+  for (unsigned i = 0; i < map->mRecursions.GetNum(); i++) {
+    Recursion *r = map->mRecursions.ValueAtIndex(i);
+    if (rec == r) {
+      found = true;
+      break;
+    }
+  }
+
+  if (!found) {
+    map->mRecursions.PushBack(rec);
+  }
 }
 
 // There is a back edge from 'p' to the first appearance of 'rt'. Actually in our
@@ -152,6 +203,12 @@ void RecDetector::AddRecursion(RuleTable *rt, ContTreeNode<RuleTable*> *p) {
   // Step 3. Get the right Recursion, Add the path to the Recursioin.
   Recursion *rec = FindOrCreateRecursion(rt);
   rec->AddPath(path);
+
+  // Step 4. Add the Rule2Recursion mapping
+  for (int i = node_list.GetNum() - 1; i >= 0; i--) {
+    RuleTable *rule = node_list.ValueAtIndex(i);
+    AddRule2Recursion(rule, rec);
+  }
 }
 
 // Find the Recursion of 'rule'.
@@ -292,6 +349,12 @@ void RecDetector::Release() {
     rec->Release();
   }
 
+  for (unsigned i = 0; i < mRule2Recursions.GetNum(); i++) {
+    Rule2Recursion *map = mRule2Recursions.ValueAtIndex(i);
+    map->Release();
+  }
+
+  mRule2Recursions.Release();
   mRecursions.Release();
   mTopTables.Release();
   mInProcess.Release();
@@ -413,6 +476,94 @@ void RecDetector::WriteCppFile() {
   mCppFile->WriteOneLine(total_str.c_str(), total_str.size());
   std::string last_str = "LeftRecursion **gLeftRecursions = TotalRecursions;";
   mCppFile->WriteOneLine(last_str.c_str(), last_str.size());
+
+  // step 4. Write Rule2Recursion mapping.
+  WriteRule2Recursion();
+}
+
+// Dump rule2recursion mapping, as below
+//   LeftRecursion *TblPrimary_r2r_data[2] = {&TblPrimary_rec, &TblBinary_rec};
+//   Rule2Recursion TblPrimary_r2r = {&TblPrimary, 2, TblPrimary_r2r_data};
+//     ....
+//   Rule2Recursion *arrayRule2Recursion[yyy] = {&TblPrimary_r2r, &TblTypeOrPackNam_r2r,...}
+//   gRule2RecursionNum = xxx;
+//   Rule2Recursion **gRule2Recursion = arrayRule2Recursion;
+void RecDetector::WriteRule2Recursion() {
+  std::string comment = "// Rule2Recursion mapping";
+  mCppFile->WriteOneLine(comment.c_str(), comment.size());
+
+  // Step 1. Write each r2r data.
+  for (unsigned i = 0; i < mRule2Recursions.GetNum(); i++) {
+    // Dump:
+    //   LeftRecursion *TblPrimary_r2r_data[2] = {&TblPrimary_rec, &TblBinary_rec};
+    Rule2Recursion *r2r = mRule2Recursions.ValueAtIndex(i);
+    const char *tablename = GetRuleTableName(r2r->mRule);
+    std::string dump = "LeftRecursion *";
+    dump += tablename;
+    dump += "_r2r_data[";
+    std::string num = std::to_string(r2r->mRecursions.GetNum());
+    dump += num;
+    dump += "] = {";
+    // get the list of recursions.
+    std::string lr_str;
+    for (unsigned j = 0; j < r2r->mRecursions.GetNum(); j++) {
+      Recursion *lr = r2r->mRecursions.ValueAtIndex(j);
+      lr_str += "&";
+      const char *n = GetRuleTableName(lr->GetRuleTable());
+      lr_str += n;
+      lr_str += "_rec";
+      if (j < (r2r->mRecursions.GetNum() - 1))
+        lr_str += ",";
+    }
+    dump += lr_str;
+    dump += "};";
+    mCppFile->WriteOneLine(dump.c_str(), dump.size());
+
+    // Dump:
+    //   Rule2Recursion TblPrimary_r2r = {&TblPrimary, 2, TblPrimary_r2r_data};
+    dump = "Rule2Recursion ";
+    dump += tablename;
+    dump += "_r2r = {&";
+    dump += tablename;
+    dump += ", ";
+    dump += num;
+    dump += ", ";
+    dump += tablename;
+    dump += "_r2r_data};";
+    mCppFile->WriteOneLine(dump.c_str(), dump.size());
+  }
+
+  // Step 2. Write arryRule2Recursion as below
+  //   Rule2Recursion *arrayRule2Recursion[yyy] = {&TblPrimary_r2r, &TblTypeOrPackNam_r2r,...}
+  std::string dump = "Rule2Recursion *arrayRule2Recursion[";
+  std::string num = std::to_string(mRule2Recursions.GetNum());
+  dump += num;
+  dump += "] = {";
+  std::string r2r_list;
+  for (unsigned i = 0; i < mRule2Recursions.GetNum(); i++) {
+    //   &TblPrimary_rec, &TblBinary_rec, ..
+    Rule2Recursion *r2r = mRule2Recursions.ValueAtIndex(i);
+    const char *tablename = GetRuleTableName(r2r->mRule);
+    r2r_list += "&";
+    r2r_list += tablename;
+    r2r_list += "_r2r";
+    if (i < (mRule2Recursions.GetNum() - 1))
+      r2r_list += ", ";
+  }
+  dump += r2r_list;
+  dump += "};";
+  mCppFile->WriteOneLine(dump.c_str(), dump.size());
+
+  // Step 3. Write gRule2RecursionNum and gRule2Recursion
+  //   gRule2RecursionNum = xxx;
+  //   Rule2Recursion **gRule2Recursion = arrayRule2Recursion;
+  dump = "unsigned gRule2RecursionNum = ";
+  dump += num;
+  dump += ";";
+  mCppFile->WriteOneLine(dump.c_str(), dump.size());
+
+  dump = "Rule2Recursion **gRule2Recursion = arrayRule2Recursion;";
+  mCppFile->WriteOneLine(dump.c_str(), dump.size());
 }
 
 // Write the recursion to java/gen_recursion.h and java/gen_recursion.cpp

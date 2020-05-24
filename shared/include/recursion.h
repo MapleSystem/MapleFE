@@ -23,15 +23,29 @@
 #include "ruletable.h"
 
 // For each rule it could have multiple left recursions. Each recursion is represented
-// as a 'path'. A 'path' is simply an integer array, with the first element being the
+// as a 'circle'. A 'circle' is simply an integer array, with the first element being the
 // length of the array.
+
 struct LeftRecursion {
   RuleTable *mRuleTable;
   unsigned   mNum;  // How many recursions
-  unsigned **mPaths; // 
+  unsigned **mCircles; // 
 };
 
 extern LeftRecursion **gLeftRecursions; //
 extern unsigned gLeftRecursionsNum;  // total number of rule tables having recursion.
+
+// Mapping from a rule table node to all the recursions it's part of. This is useful
+// when parser traverse into a node, and wants to know if it's in a recursion.
+// I'm using an array for temporary use. Will improve the searching if necessary later.
+
+struct Rule2Recursion {
+  RuleTable      *mRuleTable;
+  unsigned        mNum;          // num of recursions it's involved.
+  LeftRecursion **mRecursions;
+};
+
+extern Rule2Recursion **gRule2Recursion;
+extern unsigned gRule2RecursionNum;
 
 #endif
