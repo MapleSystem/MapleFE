@@ -50,6 +50,7 @@ char* MemPool::AllocBlock() {
   block->addr = (char*)malloc(mBlockSize);
   block->used = 0;
   block->next = NULL;
+  block->prev = NULL;
 
   if (!mBlocks) {
     mBlocks = block;
@@ -57,6 +58,7 @@ char* MemPool::AllocBlock() {
   } else {
     MASSERT(mCurrBlock && "No mCurrBlock while memory already allocated.");
     mCurrBlock->next = block;
+    block->prev = mCurrBlock;
     mCurrBlock = block;
   }
 
@@ -70,6 +72,9 @@ char* MemPool::AllocBlock() {
 // The mCurrBlock is always moving forward, so that means even if a block before
 // mCurrBlock contains enough space for 'size', we still won't allocate
 // from that block. So, Yes, we are wasting space.
+//
+// [NOTE] The waste only happen at the end of a block. It won't happen in the
+//        middle of a block. This is expected in Release(num).
 //
 // TODO: will come back to remove this wasting.
 //
@@ -94,6 +99,32 @@ char* MemPool::Alloc(unsigned size) {
   addr = mCurrBlock->addr + mCurrBlock->used;
   mCurrBlock->used += size;
   return addr;
+}
+
+// Release the last used 'num' bytes in the pool.
+// It's the caller's duty to assure using this function correctly.
+// So I used MERROR instead of MASSERT.
+//
+// [NOTE] There could be wasted space at the end of a block. So each
+//        block can contribute 'used' bytes at most.
+void MemPool::Release(unsigned num) {
+  if (!mCurrBlock)
+    MERROR("Release on empty pool.");
+
+  while(mCurrBlock) {
+    if (num > mCurrBlock->used) {
+      num -= mCurrBlock->used;
+      mCurrBlock->used = 0;
+      mCurrBlock = mCurrBlock->prev;
+    } else {
+      mCurrBlock->used -= num;
+      num -= num;
+      break;
+    }
+  }
+
+  if (!mCurrBlock && num > 0)
+    MERROR("Release of num bytes failed.");
 }
 
 // Removes all data in the memory pool. Reset everything to the beginning

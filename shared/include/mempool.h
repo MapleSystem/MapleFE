@@ -26,15 +26,15 @@
 // Here are example of good candidates, Tokens, string.
 //////////////////////////////////////////////////////////////////////////////
 
-// So far it only request new Block and keep using it. It won't release
-// any memory right now, or it even doesn't let MemPool know a Block is free.
-// TODO: We will come back to this.
+// So far it supports:
+//    1. Request new memory allocation.
+//    2. Release from the end of a certain bytes of space. So it supports
+//       a very simple reuse of memory space.
 
 #ifndef __MEMPOOL_H__
 #define __MEMPOOL_H__
 
-#include <map>
-#include <vector>
+#include <cstdlib>
 
 //  Each time when extra memory is needed, a fixed size BLOCK will be allocated.
 //  It's defined by mBlockSize. Anything above this size will not
@@ -45,6 +45,7 @@ struct Block {
   char *addr;        // starting address
   unsigned int used; // bytes used
   Block *next;       // next block
+  Block *prev;       // prev block
 };
 
 // So far there is nothing like free list. Everything will be released when
@@ -52,11 +53,9 @@ struct Block {
 //
 class MemPool{
 protected:
-  //std::vector<Block> mBlocks;
-  //int                mFirstAvail;// first block available; -1 means no available
-  Block             *mCurrBlock; // Currently available block
-  Block             *mBlocks;
-  unsigned           mBlockSize;
+  Block    *mCurrBlock; // Currently available block
+  Block    *mBlocks;    // all blocks, with the ending blocks could be free.
+  unsigned  mBlockSize;
 public:
   MemPool() : mCurrBlock(NULL), mBlocks(NULL), mBlockSize(DEFAULT_BLOCK_SIZE) {}
   ~MemPool();
@@ -64,6 +63,7 @@ public:
   void  SetBlockSize(unsigned i) {mBlockSize = i;}
   char* AllocBlock();
   char* Alloc(unsigned);
+  void  Release(unsigned i);  // release the last occupied i bytes.
 
   void  Clear();   // remove all data, but keep memory.
   void  Release(); // Allow users to free memory explicitly.

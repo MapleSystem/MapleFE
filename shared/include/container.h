@@ -79,7 +79,11 @@ public:
     mNum++;
   }
 
-  void PopBack(T);
+  // Caller's duty to assure action is legal.
+  void PopBack() {
+    mNum--;
+    mMemPool.Release(mMemPool.mElemSize);
+  }
 
   unsigned GetNum() {return mNum;}
 
@@ -414,6 +418,10 @@ public:
 //
 // Duplication of knobs or elements is not supported in Guamian.
 /////////////////////////////////////////////////////////////////////////
+
+// K : the type of the key
+// D : The data type at the knob. For most time, you don't need 'D'.
+// E : The data type of element
 
 template <class K = unsigned, class D = unsigned, class E = unsigned> class Guamian {
 private:
