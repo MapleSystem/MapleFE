@@ -105,24 +105,39 @@ void Parser::TraverseLeadNode(RuleTable *rt, AppealNode *parent) {
   LeftRecursion *rec = FindRecursion(rt);
   FindLeadFronNodes(rt, rec, &lead_fron_nodes);
 
+  // Step 3. Exhausting Algorithm
+  //         To find the best matching of this recursion, we decided to do an
+  //         exhausting algorithm, which tries all possible matchings.
   while(1) {
-    // Traverse LeadFronNodes
+    bool found = false;
+
     for (unsigned i = 0; i < lead_fron_nodes.GetNum(); i++){
-      bool found = false;
+      bool temp_found = false;
       gSuccTokensNum = 0;
       FronNode fnode = lead_fron_nodes.ValueAtIndex(i);
       if (!fnode.IsTable) {
-        found = TraverseToken(fnode.mData.mToken, parent);
+        temp_found = TraverseToken(fnode.mData.mToken, appeal);
       } else {
-        found = TraverseRuleTable(fnode.mData.mTable, parent);
+        temp_found = TraverseRuleTable(fnode.mData.mTable, appeal);
       }
+      
+      found |= temp_found;
+
+      // Add succ to 'appeal'.
+      for (unsigned j = 0; j < gSuccTokensNum; j++)
+        appeal->AddMatch(gSuccTokens[j]);
     }
 
-    // Traverse Circles.
-  }
+    // Step 3.2 Traverse Circles.
+    for (unsigned i = 0; i < rec->mNum; i++) {
+      unsigned *circle = rec->mCircles[i];
+      bool temp_found = TraverseCircle(appeal, circle);
+      found |= temp_found;
+    }
 
-  // Step 2. Traverse the Lead Fron Nodes to see if they reduce tokens.
-  //         Need take care of 
+    if (!found)
+      break;
+  }
 
   // Step x. Restore the recursion stack.
   RecStackEntry entry = RecStack.Back();

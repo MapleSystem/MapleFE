@@ -68,6 +68,10 @@ public:
   bool IsSorted()  {return mSorted;}
   void SetSorted() {mSorted = true;}
 
+  unsigned GetMatchNum() {return mMatches.GetNum();}
+  unsigned GetMatch(unsigned i) {return mMatches.ValueAtIndex(i);}
+  void     AddMatch(unsigned i);
+
 public:
   bool mIsTable;     // A AppealNode could relate to either rule table or token.
   bool mIsSecondTry; // The node is created after second try. This flag is used during SortOut.
@@ -303,6 +307,7 @@ private:
   LeftRecursion* FindRecursion(RuleTable *);
   bool IsLeadNode(RuleTable *);
   void TraverseLeadNode(AppealNode *node, AppealNode *parent);
+  bool TraverseCircle(AppealNode *leadnode, unsigned *circle);
 
 public:
   Parser(const char *f);

@@ -2187,6 +2187,14 @@ bool SuccMatch::FindMatch(unsigned start, unsigned target) {
 //            AppealNode function
 ///////////////////////////////////////////////////////////////
 
+void AppealNode::AddMatch(unsigned m) {
+  for (unsigned i = 0; i < mMatches.GetNum(); i++) {
+    if (m == mMatches.ValueAtIndex(i))
+      return;
+  }
+  mMatches.PushBack(m);
+}
+
 // return true if 'parent' is a parent of this.
 bool AppealNode::IsParent(AppealNode *parent) {
   AppealNode *node = mParent;
