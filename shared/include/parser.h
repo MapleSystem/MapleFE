@@ -31,7 +31,6 @@
 #include "container.h"
 #include "recursion.h"
 
-class Automata;
 class Function;
 class Stmt;
 class Token;
@@ -42,7 +41,6 @@ class TreeNode;
 
 typedef enum {
   FailWasFailed,
-  FailLooped,
   FailNotIdentifier,
   FailNotLiteral,
   FailChildrenFailed,
@@ -51,19 +49,24 @@ typedef enum {
   AppealStatus_NA
 }AppealStatus;
 
+// As in Left Recursion scenario, a rule can have multiple matches on a start token.
+// Each AppealNode represents an instance in the recursion, and it matches different
+// number of tokens. However, truth is the parent nodes matches more than children
+// nodes, since parent nodes means more circles traversed.
+
 class AppealNode;
 class AppealNode{
 private:
-  unsigned  mStartIndex;     // index of start matching token
-  unsigned  mNumTokens;      // num of matched token, set when sorted.
-  bool      mSorted;         //
+  unsigned  mStartIndex;          // index of start matching token
+  bool      mSorted;              // already sorted out?
+  unsigned  mFinalMatch;          // the final match after sort out.
+  SmallVector<unsigned> mMatches; // all of the last matching token.
 public:
   unsigned GetStartIndex()        {return mStartIndex;}
-  unsigned GetNumTokens()         {return mNumTokens;}
-  bool     IsSorted()             {return mSorted;}
   void SetStartIndex(unsigned i)  {mStartIndex = i;}
-  void SetNumTokens(unsigned i)   {mNumTokens = i; mSorted = true;}
-  void SetSorted()                {mSorted = true;}
+
+  bool IsSorted()  {return mSorted;}
+  void SetSorted() {mSorted = true;}
 
 public:
   bool mIsTable;     // A AppealNode could relate to either rule table or token.
@@ -98,7 +101,7 @@ public:
   AppealNode() {mData.mTable=NULL; mParent = NULL; mBefore = AppealStatus_NA;
                 mAfter = AppealStatus_NA; mSimplifiedIndex = 0; mIsTable = true;
                 mIsSecondTry = false; mStartIndex = 0; mNumTokens = 0; mSorted = false;}
-  ~AppealNode(){}
+  ~AppealNode(){mMatches.Release();}
 
   void AddChild(AppealNode *n) { mChildren.push_back(n); }
   void RemoveChild(AppealNode *n);
@@ -125,60 +128,41 @@ public:
   bool IsParent(AppealNode *p);
 };
 
-// Design of the cached success info.
-// Starting from a certian token, a rule can have multiple matchings, for example,
-// an expression,  this.x, can be matched by Primary either by one token 'this', or
-// three tokens 'this.x'.
-//
-// Assuming index of 'this' is 9, we say Primary has two matches indicated by two numbers
-// 9 and 11, which represent the last successfully matched token.
-//
 // To cache all the successful results of a rule, we use a container called Guamian, aka
-// Hanging Noodle. Each knob of Guamian contains the ONLY REAL successful appeal node and
-// the starting index. Each string of noodle contains the successful matches.
-//
-// In traversal, for most cases there is one and only one instance of a rule successful
-// matches a starting index, every other instance will be set WasSucc. However, in some
-// cases like
-//    Rule RelationalExpression : ONEOF(...
-//                                      RelationalExpression + '>' + ...
-//                                     )
-// It's the second instance (the child) really matches the tokens. But the parent will also
-// be considered succ during traversal. So there could be two succ. There won't be a third
-// one down toward the same tree, because that is a failure of Looped.
-//
-// But we actually just need one. So during SuccMatch::AddSuccNode(), we will check if there
-// is such cases. We will remove the parent node if necessary.
-//
+// Hanging Noodle. Each knob of Guamian contains the starting index. Each string of
+// noodle contains the successful nodes.
+
 // This is a per-rule data structure, saving the success info of a rule.
+// The second 'unsigned' is unused.
+// We are using the first 'unsigned' as the key to the knob. All successful nodes
+// are added in the elements of the knob.
 
 class SuccMatch {
 private:
-  Guamian<unsigned, AppealNode*, unsigned> mCache;
+  Guamian<unsigned, unsigned, AppealNode*> mData;
 public:
   SuccMatch(){}
-  ~SuccMatch() {mCache.Release();}
+  ~SuccMatch() {mData.Release();}
 public:
-  // For general cases we will append matches one by one. The following two
-  // functions will be used together, as the first one set the start token, the second one
-  // add the end matching tokens one by one.
+  // The following two functions need be used together, as the first one set the start
+  // token (aka the key), the second one add a matching AppealNode.
   void AddStartToken(unsigned token);
   void AddSuccNode(AppealNode *node);
-  void AddOneMoreMatch(unsigned last_succ_token);  // add one more match to the cach
-
-  // Reduce tokens, used during SortOut
 
   // Query functions.
   // The four function need to be used together since internal data is defiined in
   // GetStartToken(unsigned).
   bool        GetStartToken(unsigned t);    // trying to get succ info for 't'
-  AppealNode* GetSuccNode();
-  bool        FindMatch(unsigned i);        // If a match exist?
-  unsigned    GetMatchNum();                // number of matches at a token;
-  unsigned    GetOneMatch(unsigned i);      // Get the i-th matching token. Starts from 0.
+  unsigned    GetSuccNodesNum();            // number of matching nodes sat a token;
+  AppealNode* GetSuccNode(unsigned i);      // get succ node at index i;
 
   // Below are independent functions. The start token is in argument.
-  bool FindMatch(unsigned starttoken, unsigned target);
+  bool FindMatch(unsigned starttoken, unsigned target_match);
+};
+
+struct RecStackEntry {
+  RuleTable *mLeadNode;
+  unsigned   mStartToken;
 };
 
 class Parser {
@@ -237,14 +221,20 @@ private:
   SuccMatch* FindOrCreateSucc(RuleTable*);
   void ClearSucc();
 
-  bool TraverseStmt();                              // success if all tokens are matched.
-  bool TraverseRuleTable(RuleTable*, AppealNode*);  // success if all tokens are matched.
-  bool TraverseTableData(TableData*, AppealNode*);  // success if all tokens are matched.
+  bool TraverseStmt();                                // success if all tokens are matched.
+  bool TraverseRuleTable(RuleTable*, AppealNode*);    // success if all tokens are matched.
+  bool TraverseRuleTablePre(RuleTable*, AppealNode*); // success if all tokens are matched.
+  bool TraverseTableData(TableData*, AppealNode*);    // success if all tokens are matched.
   bool TraverseConcatenate(RuleTable*, AppealNode*);
   bool TraverseOneof(RuleTable*, AppealNode*);
   bool TraverseZeroormore(RuleTable*, AppealNode*);
   bool TraverseZeroorone(RuleTable*, AppealNode*);
 
+  // There are some special cases we can speed up the traversal.
+  // 1. If the target is a token, we just need compare mCurToken with it.
+  // 2. If the target is a special rule table, like literal, identifier, we just
+  //    need check the type of mCurToken.
+  bool TraverseToken(Token*, AppealNode*);
   bool TraverseLiteral(RuleTable*, AppealNode*);
   bool TraverseIdentifier(RuleTable*, AppealNode*);
   void TraverseSpecialTableSucc(RuleTable*, AppealNode*);
@@ -302,11 +292,16 @@ private:
   // Build AST
   ASTTree*  BuildAST(); // Each top level construct gets a AST
 
+//////////////////////////////////////////////////////////////
+// The following section is all about left recursion parsing
+/////////////////////////////////////////////////////////////
 private:
-  // These are all about left recursion parsing
+  SmallVector<RecStackEntry> RecStack;
+  void PushRecStack(RuleTable *rt, unsigned cur_token);
+  void InRecStack(RuleTable*, unsigned);
+
   LeftRecursion* FindRecursion(RuleTable *);
   bool IsLeadNode(RuleTable *);
-  void FindLeadFronNodes(RuleTable*, LeftRecursion*, SmallVector<RuleTable*>*);
   void TraverseLeadNode(AppealNode *node, AppealNode *parent);
 
 public:

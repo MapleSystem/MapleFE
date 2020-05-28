@@ -87,8 +87,6 @@ public:
 
   unsigned GetNum() {return mNum;}
 
-  T Back();
-
   T ValueAtIndex(unsigned i) {
     char *addr = mMemPool.AddrOfIndex(i);
     return *(T*)addr;
@@ -97,6 +95,11 @@ public:
   T* RefAtIndex(unsigned i) {
     char *addr = mMemPool.AddrOfIndex(i);
     return (T*)addr;
+  }
+
+  T Back() {
+    MASSERT(mNum >= 1);
+    return ValueAtIndex(mNum-1);
   }
 
   // It's the caller's duty to make sure ith element is valid.

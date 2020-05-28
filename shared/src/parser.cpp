@@ -629,14 +629,8 @@ void Parser::DumpSuccTokens() {
   std::cout << std::endl;
 }
 
-// return true : if the rule_table is matched
-//       false : if faled.
-bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *appeal_parent) {
-  bool matched = false;
-  unsigned old_pos = mCurToken;
-  Token *curr_token = mActiveTokens[mCurToken];
-  gSuccTokensNum = 0;
-
+// The preparation of TraverseRuleTable().
+AppealNode* Parser::TraverseRuleTablePre(RuleTable *rt, AppealNode *parent) {
   mIndentation += 2;
   const char *name = NULL;
   if (mTraceTable) {
@@ -649,13 +643,13 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *appeal_parent)
   mAppealNodes.push_back(appeal);
   appeal->SetTable(rule_table);
   appeal->SetStartIndex(mCurToken);
-  appeal->mParent = appeal_parent;
+  appeal->mParent = parent;
   if (mInSecondTry) {
     appeal->mIsSecondTry = true;
     mInSecondTry = false;
   }
 
-  appeal_parent->AddChild(appeal);
+  parent->AddChild(appeal);
 
   // Check if it was succ. Set the gSuccTokens/gSuccTokensNum appropriately
   SuccMatch *succ = FindSucc(rule_table);
@@ -684,7 +678,6 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *appeal_parent)
     }
   }
 
-  //
   if (WasFailed(rule_table, mCurToken)) {
     if (mTraceTable) {
       DumpExitTable(name, mIndentation, false, FailWasFailed);
@@ -692,30 +685,23 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *appeal_parent)
     mIndentation -= 2;
     appeal->mBefore = FailWasFailed;
     appeal->mAfter = FailWasFailed;
-    return false;
+    return NULL;
   }
 
-  if (IsVisited(rule_table)) {
-    // If there is already token position in stack, it means we are at at least the
-    // 3rd instance. So need check if we made any progress between the two instances.
-    //
-    // This is not a failure case, don't need put into mFailed.
-    if (mVisitedStack[rule_table].size() > 0) {
-      unsigned prev = mVisitedStack[rule_table].back();
-      if (mCurToken == prev) {
-        if (mTraceTable)
-          DumpExitTable(name, mIndentation, false, FailLooped);
-        mIndentation -= 2;
-        appeal->mBefore = FailLooped;
-        appeal->mAfter = FailLooped;
-        return false;
-      }
-    }
-    // push the current token position
-    VisitedPush(rule_table);
-  } else {
-    SetVisited(rule_table);
-  }
+  return appeal;
+}
+
+// return true : if the rule_table is matched
+//       false : if faled.
+bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
+  AppealNode *appeal = TraverseRuleTablePre(rule_table, parent);
+  if (!appeal)
+    return false;
+
+  bool matched = false;
+  unsigned old_pos = mCurToken;
+  Token *curr_token = mActiveTokens[mCurToken];
+  gSuccTokensNum = 0;
 
   if ((rule_table == &TblIdentifier))
     return TraverseIdentifier(rule_table, appeal);
@@ -749,13 +735,6 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *appeal_parent)
     break;
   }
 
-  // If we are leaving the first instance of this rule_table, so clear the flag.
-  // Or we pop out the last token position.
-  if (mVisitedStack[rule_table].size() == 0)
-    ClearVisited(rule_table);
-  else
-    VisitedPop(rule_table);
-
   if (mTraceTable)
     DumpExitTable(name, mIndentation, matched, FailChildrenFailed);
   mIndentation -= 2;
@@ -782,6 +761,43 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *appeal_parent)
     AddFailed(rule_table, mCurToken);
     return false;
   }
+}
+
+bool Parser::TraverseToken(Token *token, AppealNode *parent) {
+  bool found = false;
+  mIndentation += 2;
+
+  if (mTraceTable)
+    DumpEnterTable("token", mIndentation);
+
+  if (data->mData.mToken == curr_token) {
+    AppealNode *appeal = new AppealNode();
+    mAppealNodes.push_back(appeal);
+    appeal->mBefore = Succ;
+    appeal->mAfter = Succ;
+    appeal->SetToken(curr_token);
+    appeal->SetStartIndex(mCurToken);
+    appeal->mParent = parent;
+    if (mInSecondTry) {
+      appeal->mIsSecondTry = true;
+      mInSecondTry = false;
+    }
+
+    parent->AddChild(appeal);
+
+    found = true;
+    gSuccTokensNum = 1;
+    gSuccTokens[0] = mCurToken;
+    MoveCurToken();
+  }
+
+  if (mTraceTable)
+    DumpExitTable("token", mIndentation, found, AppealStatus_NA);
+  if (mTraceSecondTry)
+    DumpSuccTokens();
+
+  mIndentation -= 2;
+  return found;
 }
 
 // Supplemental function invoked when TraverseSpecialToken succeeds.
@@ -1153,34 +1169,7 @@ bool Parser::TraverseTableData(TableData *data, AppealNode *parent) {
   // separator, operator, keywords are planted as DT_Token.
   // just need check the pointer of token
   case DT_Token:
-    mIndentation += 2;
-    if (mTraceTable)
-      DumpEnterTable("token", mIndentation);
-    if (data->mData.mToken == curr_token) {
-      AppealNode *appeal = new AppealNode();
-      mAppealNodes.push_back(appeal);
-      appeal->mBefore = Succ;
-      appeal->mAfter = Succ;
-      appeal->SetToken(curr_token);
-      appeal->SetStartIndex(mCurToken);
-      appeal->mParent = parent;
-      if (mInSecondTry) {
-        appeal->mIsSecondTry = true;
-        mInSecondTry = false;
-      }
-
-      parent->AddChild(appeal);
-
-      found = true;
-      gSuccTokensNum = 1;
-      gSuccTokens[0] = mCurToken;
-      MoveCurToken();
-    }
-    if (mTraceTable)
-      DumpExitTable("token", mIndentation, found, AppealStatus_NA);
-    if (mTraceSecondTry)
-      DumpSuccTokens();
-    mIndentation -= 2;
+    found = TraverseToken(data->mData.mToken, parent);
     break;
   case DT_Type:
     break;
@@ -2148,61 +2137,41 @@ SuccMatch* Parser::FindOrCreateSucc(RuleTable *table) {
 }
 
 /////////////////////////////////////////////////////////////////////////
-// The following three functions are used to handle general cases where the
-// total number of matches could be unknown, or could be more than 3.
-// They need be used together.
+//                     SuccMatch Implementation
 ////////////////////////////////////////////////////////////////////////
 
 void SuccMatch::AddStartToken(unsigned t) {
-  mCache.PairedFindOrCreateKnob(t);
+  mData.PairedFindOrCreateKnob(t);
 }
 
-// As commented in the header file, there could be up to 2 nodes with the
-// same ruletable matching the token. But they are parent&children. We only
-// keep the child. As the logic of TraverseRuleTable, child node is always
-// done before the parent node. So the parent-child relationship can be
-// identified when parent is done.
+// The container Guamian assures 'n' is not duplicated.
 void SuccMatch::AddSuccNode(AppealNode *n) {
-  AppealNode *existing = mCache.PairedGetKnobData();
-  if (existing) {
-    // It's very sure that n is parent, existing is child.
-    MASSERT(existing->IsParent(n) && "not parent-child relation?");
-    //std::cout << "Find parent matching" << std::endl;
-  } else {
-    // it's a child.
-    mCache.PairedSetKnobData(n);
-  }
+  mData.PairedAddElem(n);
 }
 
-void SuccMatch::AddOneMoreMatch(unsigned m) {
-  mCache.PairedAddElem(m);
-}
-
-/////////////////////////////////////////////////////////////////////////
-// Below are three Query functions for succ info
-// Again, They need be used together.
-/////////////////////////////////////////////////////////////////////////
+// Below are three Query functions for succ info.
+// They need be used together.
 
 // Find the succ info for token 't'. Return true if found.
 bool SuccMatch::GetStartToken(unsigned t) {
-  return mCache.PairedFindKnob(t);
+  return mData.PairedFindKnob(t);
 }
 
 AppealNode* SuccMatch::GetSuccNode() {
-  return mCache.PairedGetKnobData();
+  return mData.PairedGetKnobData();
 }
 
 bool SuccMatch::FindMatch(unsigned m) {
-  return mCache.PairedFindElem(m);
+  return mData.PairedFindElem(m);
 }
 
 unsigned SuccMatch::GetMatchNum() {
-  return mCache.PairedNumOfElem();
+  return mData.PairedNumOfElem();
 }
 
 // idx starts from 0.
 unsigned SuccMatch::GetOneMatch(unsigned idx) {
-  return mCache.PairedGetElemAtIndex(idx);
+  return mData.PairedGetElemAtIndex(idx);
 }
 
 // Return true : if target is found

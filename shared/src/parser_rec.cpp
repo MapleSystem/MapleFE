@@ -19,6 +19,7 @@
 
 #include "container.h"
 #include "parser.h"
+#include "parser_rec.h"
 
 // Find the LeftRecursion with 'rt' the LeadNode.
 LeftRecursion* Parser::FindRecursion(RuleTable *rt) {
@@ -39,9 +40,9 @@ bool Parser::IsLeadNode(RuleTable *rt) {
 
 // Find the LeadFronNode-s of a LeadNode.
 // Caller assures 'rt' is a LeadNode.
-void Parser::FindLeadFronNodes(RuleTable *rt,
-                               LeftRecursion *rec,
-                               SmallVector<RuleTable*> *nodes) {
+static void FindLeadFronNodes(RuleTable *rt,
+                       LeftRecursion *rec,
+                       SmallVector<FronNode> *nodes) {
   EntryType type = rt->mType;
   switch(type) {
   case ET_Oneof:
@@ -52,6 +53,8 @@ void Parser::FindLeadFronNodes(RuleTable *rt,
     // There is one and only one child. And it must be in loop.
     // There could be more than one loops for 'rt'. I need check if
     // every loop contains the first only child.
+    //
+    // In this case, there is no (Lead)FronNode.
     MASSERT((rt->mNum == 1) && "zeroorxxx node has more than one elements?");
     TableData *data = rt->mData;
     MASSERT(data->mType == DT_Subtable);
@@ -72,12 +75,56 @@ void Parser::FindLeadFronNodes(RuleTable *rt,
   }
 }
 
-// 'node' is assured to be a real LeadNode by caller.
-void Parser::TraverseLeadNode(AppealNode *node, AppealNode *parent) {
-  RuleTable *rt = node->GetTable();
-  LeftRecursion *rec = FindRecursion(rt);
+bool Parser::InRecStack(RuleTable *rt, unsigned start_token) {
+  RecStackEntry e = {rt, start_token};
+  return RecStack.Find(e);
+}
 
-  // step 1. Find the Loops and LeadFronNodes
-  SmallVector<RuleTable*> lead_fron_nodes;
+bool Parser::PushRecStack(RuleTable *rt, unsigned start_token) {
+  RecStackEntry e = {rt, start_token};
+  return RecStack.PushBack(e);
+}
+
+// This is the main entry for traversing a new recursion.
+// 'node' is assured to be a real LeadNode by caller.
+void Parser::TraverseLeadNode(RuleTable *rt, AppealNode *parent) {
+  // Preparation
+  AppealNode *appeal = TraverseRuleTablePre(rt, parent);
+  if (!appeal)
+    return;
+
+  // Step 1. We are entering a new recursion right now. Need prepare the
+  //         the recursion stack information.
+  unsigned saved_curtoken = mCurToken;
+  if (InRecStack(rt, mCurToken))
+    return;
+  PushRecStack(rt, mCurToken);
+
+  // Step 2. Find the Loops and LeadFronNodes
+  SmallVector<FronNode> lead_fron_nodes;
+  LeftRecursion *rec = FindRecursion(rt);
   FindLeadFronNodes(rt, rec, &lead_fron_nodes);
+
+  while(1) {
+    // Traverse LeadFronNodes
+    for (unsigned i = 0; i < lead_fron_nodes.GetNum(); i++){
+      bool found = false;
+      gSuccTokensNum = 0;
+      FronNode fnode = lead_fron_nodes.ValueAtIndex(i);
+      if (!fnode.IsTable) {
+        found = TraverseToken(fnode.mData.mToken, parent);
+      } else {
+        found = TraverseRuleTable(fnode.mData.mTable, parent);
+      }
+    }
+
+    // Traverse Circles.
+  }
+
+  // Step 2. Traverse the Lead Fron Nodes to see if they reduce tokens.
+  //         Need take care of 
+
+  // Step x. Restore the recursion stack.
+  RecStackEntry entry = RecStack.Back();
+  MASSERT((entry.mLeadNode == rt) && (entry.mStartToken == saved_curtoken));
 }
