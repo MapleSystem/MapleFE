@@ -38,7 +38,7 @@ class AppealNode;
 class RecPath {
 public:
   AppealNode *mLeadNode;
-  bool       *mInCircle;  // true : from FronNode of a circle.
+  bool        mInCircle;  // true : from FronNode of a circle.
                           // false: from a LeadFronNode
   unsigned    mCircleIdx; // Index of the Circle in the circle vector of LeadNode.
 

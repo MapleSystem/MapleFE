@@ -325,4 +325,8 @@ public:
   unsigned LexOneLine();
 };
 
+#define MAX_SUCC_TOKENS 16
+extern unsigned gSuccTokensNum;
+extern unsigned gSuccTokens[MAX_SUCC_TOKENS];
+
 #endif

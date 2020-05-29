@@ -619,8 +619,8 @@ void Parser::DumpExitTable(const char *table_name, unsigned indent, bool succ, A
 // number could be more than one. I'm using fixed array to save them. If needed to extend
 // in the future, just extend it.
 #define MAX_SUCC_TOKENS 16
-static unsigned gSuccTokensNum;
-static unsigned gSuccTokens[MAX_SUCC_TOKENS];
+unsigned gSuccTokensNum;
+unsigned gSuccTokens[MAX_SUCC_TOKENS];
 
 void Parser::DumpSuccTokens() {
   std::cout << "gSuccTokensNum=" << gSuccTokensNum << ": ";
