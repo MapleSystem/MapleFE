@@ -40,9 +40,35 @@ bool Parser::IsLeadNode(RuleTable *rt) {
 
 // Find the LeadFronNode-s of a LeadNode.
 // Caller assures 'rt' is a LeadNode.
-static void FindLeadFronNodes(RuleTable *rt,
-                       LeftRecursion *rec,
-                       SmallVector<FronNode> *nodes) {
+static void FindLeadFronNodes(RuleTable *rt, LeftRecursion *rec, SmallVector<FronNode> *nodes) {
+  SmallVector<unsigned> circle_nodes;
+  for (unsigned i = 0; i < rec->mNum; i++) {
+    unsigned *circle = rec->mCircles[i];
+    unsigned num = circle[0];
+    MASSERT((num >= 1) && "Circle has no nodes?");
+    unsigned first_node = circle[1];
+    circle_nodes.PushBack(first_node);
+  }
+
+  for (unsigned i = 0; i < rt->mNum; i++) {
+    bool found = false;
+    for (unsigned j = 0; j < circle_nodes.GetNum(); j++) {
+      if (i == circle_nodes.ValueAtIndex(j)) {
+        found = true;
+        break;
+      }
+    }
+
+    if (!found) {
+      FronNode = FindChildAtIndex(rt, i);
+      nodes->PushBack(FronNode);
+    }
+  }
+}
+
+// Find the FronNode along one of the circles.
+// Caller assures 'rt' is a LeadNode.
+static void FindFronNodes(RuleTable *rt, unsigned *circle, SmallVector<FronNode> *nodes) {
   EntryType type = rt->mType;
   switch(type) {
   case ET_Oneof:
@@ -56,7 +82,7 @@ static void FindLeadFronNodes(RuleTable *rt,
     //
     // In this case, there is no (Lead)FronNode.
     MASSERT((rt->mNum == 1) && "zeroorxxx node has more than one elements?");
-    TableData *data = rt->mData;
+    TableData *data = rt->mData + index;
     MASSERT(data->mType == DT_Subtable);
     for (unsigned i = 0; i < rec->mNum; i++) {
       unsigned *path = rec->mCircles[i];
@@ -148,4 +174,13 @@ void Parser::TraverseLeadNode(RuleTable *rt, AppealNode *parent) {
   // Step 4. Restore the recursion stack.
   RecStackEntry entry = RecStack.Back();
   MASSERT((entry.mLeadNode == rt) && (entry.mStartToken == saved_curtoken));
+}
+
+// There are several things to be done in this function.
+// 1. Traverse each FronNode
+// 2. if succ, build the path in Appeal tree, and add succ match info to
+//    all node in the path and the lead node.
+bool Parser::TraverseCircle(AppealNode *lead, unsigned *circle) {
+  SmallVector<FronNode> fron_nodes;
+  FindFronNodes(rt, circle, &fron_nodes);
 }

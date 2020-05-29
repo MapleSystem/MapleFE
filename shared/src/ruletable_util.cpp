@@ -161,3 +161,59 @@ bool RuleFindChild(RuleTable *parent, RuleTable *child, unsigned &index) {
 
   return found;
 }
+
+// Find the index-th child and return it.
+FronNode FindChildAtIndex(RuleTable *parent, unsigned index) {
+  FronNode node;
+  EntryType type = parent->mType;
+
+  switch(type) {
+  // Concatenate and Oneof, can be handled the same
+  case ET_Concatenate:
+  case ET_Oneof: {
+    TableData *data = parent->mData + i;
+    switch (data->mType) {
+    case DT_Subtable:
+      node.mIsTable = true;
+      node.mData.mTable = data->mData.mEntry;
+      break;
+    case DT_Token:
+      node.mIsTable = false;
+      node.mData.mToken = data->mData.mToken;
+      break;
+    default:
+      MERROR("Unkown type in table data");
+      break;
+    }
+    break;
+  }
+
+  // Zeroorone, Zeroormore and Data can be handled the same way.
+  case ET_Data:
+  case ET_Zeroorone:
+  case ET_Zeroormore: {
+    MASSERT((index == 0) && "zeroormore node has more than one elements?");
+    TableData *data = parent->mData;
+    switch (data->mType) {
+    case DT_Subtable:
+      node.mIsTable = true;
+      node.mData.mTable = data->mData.mEntry;
+      break;
+    case DT_Token:
+      node.mIsTable = false;
+      node.mData.mToken = data->mData.mToken;
+      break;
+    default:
+      MERROR("Unkown type in table data");
+      break;
+    }
+    break;
+  }
+
+  default:
+    MERROR("Unkown type of table");
+    break;
+  }
+
+  return node;
+}

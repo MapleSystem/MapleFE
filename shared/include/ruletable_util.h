@@ -61,4 +61,16 @@ extern const char* FindKeyword(const char *str, const char c, unsigned &len);
 
 extern bool RuleActionHasElem(RuleTable*, unsigned);
 extern bool RuleFindChild(RuleTable *p, RuleTable *c, unsigned&);
+
+// This struct is named 'FronNode' since its mainly usage is the FronNode
+// in LeftRecursion handling.
+struct FronNode {
+  bool mIsTable;   // is a rule table or token?
+  union {
+    RuleTable *mTable;
+    Token     *mToken;
+  }mData;
+};
+extern FronNode FindChildAtIndex(RuleTable *r, unsigned index);
+
 #endif

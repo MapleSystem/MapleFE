@@ -23,14 +23,6 @@
 
 #include "ruletable.h"
 
-struct FronNode {
-  bool IsTable;   // is a rule table or token?
-  union {
-    RuleTable *mTable;
-    Token     *mToken;
-  }mData;
-};
-
 // After we traverse successfully on a LeadFronNode or a Circle, we need record
 // the path which reach from LeadNode to the successful LeadFronNode or FronNode
 // of a circle.
@@ -48,7 +40,6 @@ public:
 public:
   RecPath(){};
   ~RecPath() {mPath.Release();}
-
   
 };
 
