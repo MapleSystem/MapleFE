@@ -66,9 +66,53 @@ static void FindLeadFronNodes(RuleTable *rt, LeftRecursion *rec, SmallVector<Fro
   }
 }
 
+// Find all the nodes in all circles of the recursion, save them in 'nodes'.
+// Each node should be a RuleTable* since it forms a circle.
+static void FindRecursionNodes(RuleTable *lead,
+                               LeftRecursion *rec,
+                               SmallVector<RuleTable*> *nodes) {
+  nodes->PushBack(lead);
+  for (unsigned i = 0; i < rec->mNum; i++) {
+    unsigned *circle = rec->mCircles[i];
+    unsigned len = circle[0];
+    RuleTable *prev = lead;
+    for (j = 1; j <= len; j++) {
+      unsigned child_index = circle[j];
+      FronNode node = RuleFindChildAtIndex(prev, j);
+      MASSERT(node.mIsTable);
+      RuleTable *rt = node.mData.mTable;
+
+      if (j == len) {
+        // The last one should be the back edge.
+        MASSERT(rt == lead);
+      } else {
+        // a node could be shared among multiple circles, need avoid duplication.
+        bool found = false;
+        for (unsigned k = 0; k < nodes->GetNum(); k++) {
+          if (rt == nodes->ValueAtIndex(k)) {
+            found = true;
+            break;
+          }
+        }
+        if (!found)
+          nodes->PushBack(rt);
+      }
+
+      prev = rt;
+    }
+  }
+}
+
 // Find the FronNode along one of the circles.
-// Caller assures 'rt' is a LeadNode.
-static void FindFronNodes(RuleTable *rt, unsigned *circle, SmallVector<FronNode> *nodes) {
+// The algorithm is simple and includes two steps.
+//   1. Find all the nodes belong to the Recursion, that is all nodes on
+//      all circles of the recursion. This is said RecursionNodes.
+//   2. Nodes directly accessible from 'circle' but not in RecursionNodes.
+static void FindFronNodes(RuleTable *rt,
+                          LeftRecursion *rec,
+                          SmallVector<RuleTable*> *rec_nodes,
+                          unsigned *circle,
+                          SmallVector<FronNode> *nodes) {
   EntryType type = rt->mType;
   switch(type) {
   case ET_Oneof:
@@ -126,10 +170,12 @@ void Parser::TraverseLeadNode(RuleTable *rt, AppealNode *parent) {
     return;
   PushRecStack(rt, mCurToken);
 
-  // Step 2. Find the Loops and LeadFronNodes
-  SmallVector<FronNode> lead_fron_nodes;
+  // Step 2. Find RecursionNode, LeadFronNodes
+  SmallVector<RuleTable*> rec_nodes;     // all recursion nodes, should be RuleTable
+  SmallVector<FronNode> lead_fron_nodes; // all LeadFronNodes.
   LeftRecursion *rec = FindRecursion(rt);
   FindLeadFronNodes(rt, rec, &lead_fron_nodes);
+  FindRecursionNodes(rt, rec, &rec_nodes);
 
   // Step 3. Exhausting Algorithm
   //         To find the best matching of this recursion, we decided to do an
@@ -163,7 +209,7 @@ void Parser::TraverseLeadNode(RuleTable *rt, AppealNode *parent) {
     for (unsigned i = 0; i < rec->mNum; i++) {
       unsigned *circle = rec->mCircles[i];
       mCurToken = saved_mCurToken;
-      bool temp_found = TraverseCircle(appeal, circle);
+      bool temp_found = TraverseCircle(appeal, rec, circle, &rec_nodes);
       found |= temp_found;
     }
 
@@ -180,7 +226,12 @@ void Parser::TraverseLeadNode(RuleTable *rt, AppealNode *parent) {
 // 1. Traverse each FronNode
 // 2. if succ, build the path in Appeal tree, and add succ match info to
 //    all node in the path and the lead node.
-bool Parser::TraverseCircle(AppealNode *lead, unsigned *circle) {
+bool Parser::TraverseCircle(AppealNode *lead,
+                            LeftRecursion *rec,
+                            unsigned *circle,
+                            SmallVector<RuleTable*> *rec_nodes) {
   SmallVector<FronNode> fron_nodes;
-  FindFronNodes(rt, circle, &fron_nodes);
+  RuleTable *rt = lead->GetTable();
+
+  FindFronNodes(rt, rec, &rec_nodes, circle, &fron_nodes);
 }

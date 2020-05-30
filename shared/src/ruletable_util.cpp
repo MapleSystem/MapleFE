@@ -163,7 +163,7 @@ bool RuleFindChild(RuleTable *parent, RuleTable *child, unsigned &index) {
 }
 
 // Find the index-th child and return it.
-FronNode FindChildAtIndex(RuleTable *parent, unsigned index) {
+FronNode RuleFindChildAtIndex(RuleTable *parent, unsigned index) {
   FronNode node;
   EntryType type = parent->mType;
 

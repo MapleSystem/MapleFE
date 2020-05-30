@@ -71,6 +71,6 @@ struct FronNode {
     Token     *mToken;
   }mData;
 };
-extern FronNode FindChildAtIndex(RuleTable *r, unsigned index);
+extern FronNode RuleFindChildAtIndex(RuleTable *r, unsigned index);
 
 #endif
