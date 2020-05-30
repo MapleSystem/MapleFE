@@ -104,44 +104,69 @@ static void FindRecursionNodes(RuleTable *lead,
 }
 
 // Find the FronNode along one of the circles.
-// The algorithm is simple and includes two steps.
-//   1. Find all the nodes belong to the Recursion, that is all nodes on
-//      all circles of the recursion. This is said RecursionNodes.
-//   2. Nodes directly accessible from 'circle' but not in RecursionNodes.
-static void FindFronNodes(RuleTable *rt,
+// FronNode: Nodes directly accessible from 'circle' but not in RecursionNodes.
+//           NOTE. If 'prev' node is concatenate, 'next' must be its 1st child. And
+//                 the rest children are not counted as FronNode since they cannot
+//                 be matched alone without 'next'.
+static void FindFronNodes(RuleTable *lead,
                           LeftRecursion *rec,
                           SmallVector<RuleTable*> *rec_nodes,
                           unsigned *circle,
                           SmallVector<FronNode> *nodes) {
-  EntryType type = rt->mType;
-  switch(type) {
-  case ET_Oneof:
-    break;
+  unsigned len = circle[0];
+  RuleTable *prev = lead;
+  for (j = 1; j <= len; j++) {
+    unsigned child_index = circle[j];
+    FronNode node = RuleFindChildAtIndex(prev, j);
+    MASSERT(node.mIsTable);
+    RuleTable *next = node.mData.mTable;
 
-  case ET_Zeroormore:
-  case ET_Zeroorone:
-    // There is one and only one child. And it must be in loop.
-    // There could be more than one loops for 'rt'. I need check if
-    // every loop contains the first only child.
-    //
-    // In this case, there is no (Lead)FronNode.
-    MASSERT((rt->mNum == 1) && "zeroorxxx node has more than one elements?");
-    TableData *data = rt->mData + index;
-    MASSERT(data->mType == DT_Subtable);
-    for (unsigned i = 0; i < rec->mNum; i++) {
-      unsigned *path = rec->mCircles[i];
-      // second element is the first child table's index
-      MASSERT(path[0] >= 1);
-      MASSERT(path[1] == 0);
+    // The last one should be the back edge.
+    if (j == len)
+      MASSERT(next == lead);
+
+    // prev is lead, FronNode here is a LeadFronNode and will be
+    // traversed in TraverseLeadNode();
+    if (j == 1) {
+      prev = next;
+      continue;
     }
-    break;
-  case ET_Concatenate:
-    break;
-  case ET_Data:
-    break;
-  case ET_Null:
-  default:
-    break;
+
+    EntryType prev_type = prev->mType;
+    switch(prev_type) {
+    case ET_Oneof: {
+      bool found = false;
+      for (unsigned k = 0; k < rec_nodes->GetNum(); k++) {
+        if (next == rec_nodes->ValueAtIndex(k)) {
+          found = true;
+          break;
+        }
+      }
+      if (!found)
+        nodes->PushBack(next);
+      break;
+    }
+    case ET_Zeroormore:
+    case ET_Zeroorone:
+      // There is one and only one child. And it must be in circle.
+      // In this case, there is no FronNode.
+      MASSERT((prev->mNum == 1) && "zeroorxxx node has more than one elements?");
+      MASSERT((len == 1) && "Prev node (Zeroxxx) has more than one child in circle?");
+      MASSERT((child_index == 0));
+      break;
+    case ET_Concatenate:
+      // In Concatenate node, only first child can form a Left Recursion.
+      // And the other children wont be considered FronNode.
+      MASSERT(child_index == 0);
+      break;
+    case ET_Data:
+    case ET_Null:
+    default:
+      MASSERT(0 && "Wrong node type in a circle");
+      break;
+    }// end of switch
+
+    prev = next;
   }
 }
 
@@ -233,5 +258,8 @@ bool Parser::TraverseCircle(AppealNode *lead,
   SmallVector<FronNode> fron_nodes;
   RuleTable *rt = lead->GetTable();
 
+  // A FronNode in a circle be also a FronNode in another circle. They
+  // are duplicated and traversed twice. But only the first time we do real
+  // traversal, the other times will just check the succ or failure info.
   FindFronNodes(rt, rec, &rec_nodes, circle, &fron_nodes);
 }
