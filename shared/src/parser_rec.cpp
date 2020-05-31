@@ -132,20 +132,40 @@ static void FindFronNodes(RuleTable *lead,
       continue;
     }
 
+    // Only Oneof node is qualified to have FronNode.
     EntryType prev_type = prev->mType;
     switch(prev_type) {
     case ET_Oneof: {
-      bool found = false;
-      for (unsigned k = 0; k < rec_nodes->GetNum(); k++) {
-        if (next == rec_nodes->ValueAtIndex(k)) {
-          found = true;
-          break;
+      // Look into every childof 'prev'. If it's not 'next' and
+      // not in 'rec_nodes', it's a FronNode.
+      for (unsigned i = 0; i < prev->mNum; i++) {
+        TableData *data = prev->mData + i;
+        FronNode fnode;
+        if (data->mType == DT_Token) {
+          fnode.mIsTable = false;
+          fnode.mData.mToken = data->mData.mToken;
+          nodes->PushBack(fnode);
+        } else if (data->mType = DT_Subtable) {
+          RuleTable *ruletable = data->mData.mTable;
+          bool found = false;
+          for (unsigned k = 0; k < rec_nodes->GetNum(); k++) {
+            if (ruletable == rec_nodes->ValueAtIndex(k)) {
+              found = true;
+              break;
+            }
+          }
+          if (!found && (ruletable != next)) {
+            fnode.mIsTable = true;
+            fnode.mData.mTable = ruletable;
+            nodes->PushBack(fnode);
+          }
         }
+      } else {
+        MASSERT(0 && "unexpected data type in ruletable.");
       }
-      if (!found)
-        nodes->PushBack(next);
       break;
     }
+
     case ET_Zeroormore:
     case ET_Zeroorone:
       // There is one and only one child. And it must be in circle.
@@ -154,11 +174,13 @@ static void FindFronNodes(RuleTable *lead,
       MASSERT((len == 1) && "Prev node (Zeroxxx) has more than one child in circle?");
       MASSERT((child_index == 0));
       break;
+
     case ET_Concatenate:
       // In Concatenate node, only first child can form a Left Recursion.
       // And the other children wont be considered FronNode.
       MASSERT(child_index == 0);
       break;
+
     case ET_Data:
     case ET_Null:
     default:
@@ -262,4 +284,12 @@ bool Parser::TraverseCircle(AppealNode *lead,
   // are duplicated and traversed twice. But only the first time we do real
   // traversal, the other times will just check the succ or failure info.
   FindFronNodes(rt, rec, &rec_nodes, circle, &fron_nodes);
+
+  // Try each FronNode
+  for (unsigned i = 0; i < fron_nodes.GetNum(); i++) {
+    unsigned saved_mCurToken = mCurToken;
+    FronNode = fron_nodes.ValueAtIndex();
+
+    mCurToken = saved_mCurToken;
+  }
 }
