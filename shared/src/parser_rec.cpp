@@ -104,6 +104,8 @@ static void FindRecursionNodes(RuleTable *lead,
 }
 
 // Find the FronNode along one of the circles.
+// We also record the position of each FronNode at the circle. 1 means the first
+// node after LeadNode.
 // FronNode: Nodes directly accessible from 'circle' but not in RecursionNodes.
 //           NOTE. If 'prev' node is concatenate, 'next' must be its 1st child. And
 //                 the rest children are not counted as FronNode since they cannot
@@ -112,7 +114,8 @@ static void FindFronNodes(RuleTable *lead,
                           LeftRecursion *rec,
                           SmallVector<RuleTable*> *rec_nodes,
                           unsigned *circle,
-                          SmallVector<FronNode> *nodes) {
+                          SmallVector<FronNode> *nodes,
+                          SmallVector<unsigned> *pos) {
   unsigned len = circle[0];
   RuleTable *prev = lead;
   for (j = 1; j <= len; j++) {
@@ -145,6 +148,7 @@ static void FindFronNodes(RuleTable *lead,
           fnode.mIsTable = false;
           fnode.mData.mToken = data->mData.mToken;
           nodes->PushBack(fnode);
+          pos->PushBack(j);
         } else if (data->mType = DT_Subtable) {
           RuleTable *ruletable = data->mData.mTable;
           bool found = false;
@@ -158,6 +162,7 @@ static void FindFronNodes(RuleTable *lead,
             fnode.mIsTable = true;
             fnode.mData.mTable = ruletable;
             nodes->PushBack(fnode);
+            pos->PushBack(j);
           }
         }
       } else {
@@ -204,12 +209,11 @@ bool Parser::PushRecStack(RuleTable *rt, unsigned start_token) {
 
 // This is the main entry for traversing a new recursion.
 // 'node' is assured to be a real LeadNode by caller.
-void Parser::TraverseLeadNode(RuleTable *rt, AppealNode *parent) {
-  // Preparation
-  AppealNode *appeal = TraverseRuleTablePre(rt, parent);
-  if (!appeal)
-    return;
+//
+// TraverseRuleTablePre() has been called before this function, to check
+// the already-succ or already-fail scenarios.
 
+bool Parser::TraverseLeadNode(RuleTable *rt, AppealNode *parent) {
   // Step 1. We are entering a new recursion right now. Need prepare the
   //         the recursion stack information.
   unsigned saved_curtoken = mCurToken;
@@ -271,25 +275,95 @@ void Parser::TraverseLeadNode(RuleTable *rt, AppealNode *parent) {
 
 // There are several things to be done in this function.
 // 1. Traverse each FronNode
-// 2. if succ, build the path in Appeal tree, and add succ match info to
-//    all node in the path and the lead node.
+// 2. No matter succ or fail, build the path in Appeal tree, and add succ match
+//    info to all node in the path and the lead node.
 bool Parser::TraverseCircle(AppealNode *lead,
                             LeftRecursion *rec,
                             unsigned *circle,
                             SmallVector<RuleTable*> *rec_nodes) {
   SmallVector<FronNode> fron_nodes;
+  SmallVector<unsigned> fron_pos;   // position in circle of each fron node.
+                                    // 1 means the first node after lead.
   RuleTable *rt = lead->GetTable();
 
   // A FronNode in a circle be also a FronNode in another circle. They
   // are duplicated and traversed twice. But only the first time we do real
   // traversal, the other times will just check the succ or failure info.
-  FindFronNodes(rt, rec, &rec_nodes, circle, &fron_nodes);
+  FindFronNodes(rt, rec, &rec_nodes, circle, &fron_nodes, &fron_pos);
 
-  // Try each FronNode
+  // Try each FronNode.
+  // To access the Appeal Tree created of each FronNode, we use pseudo nodes
+  // which play the role of parent of the created nodes.
+  unsigned saved_mCurToken = mCurToken;
+  SmallVector<AppealNode*> PseudoParents;
   for (unsigned i = 0; i < fron_nodes.GetNum(); i++) {
-    unsigned saved_mCurToken = mCurToken;
-    FronNode = fron_nodes.ValueAtIndex();
+    AppealNode *pseudo_parent = new AppealNode();
+    pseudo_parent->SetIsPseudo();
+    pseudo_parent->SetStartIndex(mCurToken);
+    mAppealNodes.push_back(pseudo_parent);
 
+    FronNode = fron_nodes.ValueAtIndex();
+    bool found = false;
+    if (!FronNode.mIsTable) {
+      Token *token = FronNode.mData.mToken;
+      found = TraverseToken(token, pseudo_parent);
+    } else {
+      RuleTable *rt = FronNode.mData.mTable;
+      found = TraverseRuleTable(rt, pseudo_parent);
+    }
+
+    // Create a path.
+    ConstructPath(lead, pseudo_parent, circle, fron_pos.ValueAtIndex(i));
+
+    // Apply the start index / succ info to the path.
     mCurToken = saved_mCurToken;
+    ApplySuccInfoOnPath(lead, pseudo_parent);
+  }
+}
+
+// Construct a path from 'lead' to 'ps_node'. The rule tables in between are
+// determined by 'circle'. Totoal number of rule tables involved is num_steps - 1.
+// The path should be like,
+//  lead -> rule table 1 -> ... -> rule table(num_steps-1) -> ps_node
+void Parser::ConstructPath(AppealNode *lead, AppealNode *ps_node, unsigned *circle,
+                           unsigned num_steps) {
+  RuleTable *prev = lead->GetTable();
+  AppealNode *prev_anode = lead;
+  RuleTable *next = NULL;
+  AppealNode *next_anode = NULL;
+
+  unsigned len = circle[0];
+  for (j = 1; j < num_steps; j++) {
+    unsigned child_index = circle[j];
+    FronNode node = RuleFindChildAtIndex(prev, j);
+    MASSERT(node.mIsTable);
+
+    next = node.mData.mTable;
+    AppealNode *next_anode = new AppealNode();
+    next_anode->SetTable(next);
+    mAppealNodes.push_back(next_anode);
+    next_anode->SetParent(prev_anode);
+    prev_anode->AddChild(next_anode);
+
+    prev = next;
+    prev_anode = next_anode;
+  }
+
+  // in the end, we need connect to ps_node.
+  ps_node->SetParent(prev_anode);
+  prev_anode->AddChild(ps_node);
+}
+
+// set start index, and succ info in all node from 'lead' to 'pseudo'.
+void Parser::ApplySuccInfoOnPath(AppealNode *lead, AppealNode *pseudo) {
+  AppealNode *node = pseudo;
+  while(1) {
+    node->SetStartIndex(mCurToken);
+    for (unsigned i = 0; i < gSuccTokensNum; i++)
+      node->AddMatch(gSuccTokens[i];
+    if (node == lead)
+      break;
+    else
+      node = node->GetParent();
   }
 }

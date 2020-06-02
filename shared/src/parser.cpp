@@ -643,13 +643,14 @@ AppealNode* Parser::TraverseRuleTablePre(RuleTable *rt, AppealNode *parent) {
   mAppealNodes.push_back(appeal);
   appeal->SetTable(rule_table);
   appeal->SetStartIndex(mCurToken);
-  appeal->mParent = parent;
+  appeal->SetParent(parent);
+  parent->AddChild(appeal);
+
   if (mInSecondTry) {
     appeal->mIsSecondTry = true;
     mInSecondTry = false;
   }
 
-  parent->AddChild(appeal);
 
   // Check if it was succ. Set the gSuccTokens/gSuccTokensNum appropriately
   SuccMatch *succ = FindSucc(rule_table);
@@ -674,7 +675,7 @@ AppealNode* Parser::TraverseRuleTablePre(RuleTable *rt, AppealNode *parent) {
       mIndentation -= 2;
       appeal->mBefore = Succ;
       appeal->mAfter = SuccWasSucc;
-      return true;
+      return appeal;
     }
   }
 
@@ -685,7 +686,7 @@ AppealNode* Parser::TraverseRuleTablePre(RuleTable *rt, AppealNode *parent) {
     mIndentation -= 2;
     appeal->mBefore = FailWasFailed;
     appeal->mAfter = FailWasFailed;
-    return NULL;
+    return appeal;
   }
 
   return appeal;
@@ -694,10 +695,20 @@ AppealNode* Parser::TraverseRuleTablePre(RuleTable *rt, AppealNode *parent) {
 // return true : if the rule_table is matched
 //       false : if faled.
 bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
+  // Step 1. If the 'rule_table' has already been done, we just reuse the result.
+  //         This step is in TraverseRuleTablePre().
   AppealNode *appeal = TraverseRuleTablePre(rule_table, parent);
-  if (!appeal)
+  if (appeal->IsSucc())
+    return true;
+  else if (appeal->IsFail())
     return false;
+  MASSERT(appeal->IsNA());
 
+  // Step 2. If it's a LeadNode, we will go through special handling.
+  if (IsLeadNode(rule_table))
+    return TraverseLeadNode(rule_table, parent);
+
+  // Step 3. Now it's a regular table.
   bool matched = false;
   unsigned old_pos = mCurToken;
   Token *curr_token = mActiveTokens[mCurToken];

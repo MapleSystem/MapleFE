@@ -54,19 +54,28 @@ typedef enum {
 // number of tokens. However, truth is the parent nodes matches more than children
 // nodes, since parent nodes means more circles traversed.
 
-class AppealNode;
 class AppealNode{
 private:
-  unsigned  mStartIndex;          // index of start matching token
-  bool      mSorted;              // already sorted out?
-  unsigned  mFinalMatch;          // the final match after sort out.
+  AppealNode  *mParent;
+  unsigned     mStartIndex;       // index of start matching token
+  bool         mSorted;           // already sorted out?
+  bool         mIsPseudo;         // A pseudo node, mainly used for sub trees connection
+                                  // It has no real program meaning, but can be used
+                                  // to transfer information among nodes.
+  unsigned     mFinalMatch;       // the final match after sort out.
   SmallVector<unsigned> mMatches; // all of the last matching token.
-public:
-  unsigned GetStartIndex()        {return mStartIndex;}
-  void SetStartIndex(unsigned i)  {mStartIndex = i;}
 
-  bool IsSorted()  {return mSorted;}
-  void SetSorted() {mSorted = true;}
+public:
+  AppealNode* GetParent()       {return mParent;}
+  void SetParent(AppealNode *n) {mParent = n;}
+
+  unsigned GetStartIndex()      {return mStartIndex;}
+  void SetStartIndex(unsigned i){mStartIndex = i;}
+
+  bool IsPseudo()   {return mIsPseudo;}
+  void SetIsPseudo(){mIsPseudo = true;}
+  bool IsSorted()   {return mSorted;}
+  void SetSorted()  {mSorted = true;}
 
   unsigned GetMatchNum() {return mMatches.GetNum();}
   unsigned GetMatch(unsigned i) {return mMatches.ValueAtIndex(i);}
@@ -98,13 +107,13 @@ public:
   // So we keep mChildren untouched and define a second vector for the SortOut-ed children.
   std::vector<AppealNode*> mSortedChildren;
 
-  AppealNode  *mParent;
   AppealStatus mBefore;
   AppealStatus mAfter;
 
   AppealNode() {mData.mTable=NULL; mParent = NULL; mBefore = AppealStatus_NA;
                 mAfter = AppealStatus_NA; mSimplifiedIndex = 0; mIsTable = true;
-                mIsSecondTry = false; mStartIndex = 0; mNumTokens = 0; mSorted = false;}
+                mIsSecondTry = false; mStartIndex = 0; mNumTokens = 0; mSorted = false;
+                mIsPseudo = false;}
   ~AppealNode(){mMatches.Release();}
 
   void AddChild(AppealNode *n) { mChildren.push_back(n); }
@@ -117,7 +126,11 @@ public:
   AppealNode* GetSortedChildByIndex(unsigned idx);
 
   bool IsSucc() { return (mAfter == Succ) || (mAfter == SuccWasSucc); }
-  bool IsFail() { return !IsSucc(); }
+  bool IsFail() { return (mAfter == FailWasFailed)
+                         || (mAfter == FailNotIdentifier)
+                         || (mAfter == FailNotLiteral)
+                         || (mAfter == FailChildrenFailed);}
+  bool IsNA() {return mAfter == AppealStatus_NA;}
 
   bool IsTable(){ return mIsTable; }
   bool IsToken(){ return !mIsTable; }
@@ -306,7 +319,7 @@ private:
 
   LeftRecursion* FindRecursion(RuleTable *);
   bool IsLeadNode(RuleTable *);
-  void TraverseLeadNode(AppealNode *node, AppealNode *parent);
+  bool TraverseLeadNode(AppealNode *node, AppealNode *parent);
   bool TraverseCircle(AppealNode *leadnode, unsigned *circle);
 
 public:
