@@ -451,47 +451,47 @@ void Parser::ClearAppealNodes() {
 //   We will just ignore the second clearing of FieldAccess if we cannot find the token num
 //   in the mFailed.
 
-static std::vector<AppealNode*> traverse_list;
-void Parser::AppealTraverse(AppealNode *node, AppealNode *root) {
-  traverse_list.push_back(node);
+//static std::vector<AppealNode*> traverse_list;
+//void Parser::AppealTraverse(AppealNode *node, AppealNode *root) {
+//  traverse_list.push_back(node);
+//
+//  MASSERT((root->mAfter == Succ) && "root->mAfter is not Succ.");
+//  if ((node->GetTable() == root->GetTable()) && (node->mAfter == FailLooped)) {
+//    // 1. Walk the list, and clear the fail flag for corresponding rule table.
+//    // 2. For this specific AppealNode, it's mAfter is set to Fail, we are not changing it.
+//    for (unsigned i = 0; i < traverse_list.size(); i++) {
+//      AppealNode *n = traverse_list[i];
+//      if ((n->mBefore == Succ) && (n->mAfter == FailChildrenFailed)) {
+//        if (mTraceAppeal)
+//          DumpAppeal(n->GetTable(), n->GetStartIndex());
+//        ResetFailed(n->GetTable(), n->GetStartIndex());
+//      }
+//    }
+//  }
+//
+//  std::vector<AppealNode*>::iterator it = node->mChildren.begin();
+//  for (; it != node->mChildren.end(); it++) {
+//    AppealNode *child = *it;
+//    if (child->IsToken())
+//      continue;
+//    AppealTraverse(child, root);
+//    traverse_list.pop_back();
+//  }
+//}
 
-  MASSERT((root->mAfter == Succ) && "root->mAfter is not Succ.");
-  if ((node->GetTable() == root->GetTable()) && (node->mAfter == FailLooped)) {
-    // 1. Walk the list, and clear the fail flag for corresponding rule table.
-    // 2. For this specific AppealNode, it's mAfter is set to Fail, we are not changing it.
-    for (unsigned i = 0; i < traverse_list.size(); i++) {
-      AppealNode *n = traverse_list[i];
-      if ((n->mBefore == Succ) && (n->mAfter == FailChildrenFailed)) {
-        if (mTraceAppeal)
-          DumpAppeal(n->GetTable(), n->GetStartIndex());
-        ResetFailed(n->GetTable(), n->GetStartIndex());
-      }
-    }
-  }
-
-  std::vector<AppealNode*>::iterator it = node->mChildren.begin();
-  for (; it != node->mChildren.end(); it++) {
-    AppealNode *child = *it;
-    if (child->IsToken())
-      continue;
-    AppealTraverse(child, root);
-    traverse_list.pop_back();
-  }
-}
-
-void Parser::Appeal(AppealNode *root) {
-  traverse_list.clear();
-  traverse_list.push_back(root);
-
-  std::vector<AppealNode*>::iterator it = root->mChildren.begin();
-  for (; it != root->mChildren.end(); it++) {
-    AppealNode *child = *it;
-    if (child->IsToken())
-      continue;
-    AppealTraverse(child, root);
-    traverse_list.pop_back();
-  }
-}
+//void Parser::Appeal(AppealNode *root) {
+//  traverse_list.clear();
+//  traverse_list.push_back(root);
+//
+//  std::vector<AppealNode*>::iterator it = root->mChildren.begin();
+//  for (; it != root->mChildren.end(); it++) {
+//    AppealNode *child = *it;
+//    if (child->IsToken())
+//      continue;
+//    AppealTraverse(child, root);
+//    traverse_list.pop_back();
+//  }
+//}
 
 // return true : if successful
 //       false : if failed
@@ -601,8 +601,6 @@ void Parser::DumpExitTable(const char *table_name, unsigned indent, bool succ, A
   } else {
     if (reason == FailWasFailed)
       std::cout << " fail@WasFailed" << "}" << std::endl;
-    else if (reason == FailLooped)
-      std::cout << " fail@Looped" << "}" << std::endl;
     else if (reason == FailNotIdentifier)
       std::cout << " fail@NotIdentifer" << "}" << std::endl;
     else if (reason == FailNotLiteral)
@@ -630,7 +628,7 @@ void Parser::DumpSuccTokens() {
 }
 
 // The preparation of TraverseRuleTable().
-AppealNode* Parser::TraverseRuleTablePre(RuleTable *rt, AppealNode *parent) {
+AppealNode* Parser::TraverseRuleTablePre(RuleTable *rule_table, AppealNode *parent) {
   mIndentation += 2;
   const char *name = NULL;
   if (mTraceTable) {
@@ -706,7 +704,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
 
   // Step 2. If it's a LeadNode, we will go through special handling.
   if (IsLeadNode(rule_table))
-    return TraverseLeadNode(rule_table, parent);
+    return TraverseLeadNode(appeal, parent);
 
   // Step 3. Now it's a regular table.
   bool matched = false;
@@ -763,8 +761,8 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
 
     // We try to appeal only if it succeeds at the end.
     appeal->mAfter = Succ;
-    if (appeal->IsTable())
-      Appeal(appeal);
+    //if (appeal->IsTable())
+    //  Appeal(appeal);
     return true;
   } else {
     appeal->mAfter = FailChildrenFailed;

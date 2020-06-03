@@ -171,7 +171,7 @@ FronNode RuleFindChildAtIndex(RuleTable *parent, unsigned index) {
   // Concatenate and Oneof, can be handled the same
   case ET_Concatenate:
   case ET_Oneof: {
-    TableData *data = parent->mData + i;
+    TableData *data = parent->mData + index;
     switch (data->mType) {
     case DT_Subtable:
       node.mIsTable = true;

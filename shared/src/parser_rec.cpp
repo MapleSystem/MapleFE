@@ -214,9 +214,10 @@ void Parser::PushRecStack(RuleTable *rt, unsigned start_token) {
 // TraverseRuleTablePre() has been called before this function, to check
 // the already-succ or already-fail scenarios.
 
-bool Parser::TraverseLeadNode(RuleTable *rt, AppealNode *parent) {
+bool Parser::TraverseLeadNode(AppealNode *appeal, AppealNode *parent) {
   // Step 1. We are entering a new recursion right now. Need prepare the
   //         the recursion stack information.
+  RuleTable *rt = appeal->GetTable();
   unsigned saved_curtoken = mCurToken;
   if (InRecStack(rt, mCurToken)) {
     MERROR("Unexpected nested lead node traversal");

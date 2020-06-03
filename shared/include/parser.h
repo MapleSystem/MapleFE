@@ -156,7 +156,7 @@ public:
 
 class SuccMatch {
 private:
-  Guamian<unsigned, unsigned, AppealNode*> mData;
+  Guamian<unsigned, unsigned /*unused*/, AppealNode*> mData;
 public:
   SuccMatch(){}
   ~SuccMatch() {mData.Release();}
@@ -180,6 +180,10 @@ public:
 struct RecStackEntry {
   RuleTable *mLeadNode;
   unsigned   mStartToken;
+  bool operator== (const RecStackEntry &right) {
+    return ((mLeadNode == right.mLeadNode)
+            && (mStartToken == right.mStartToken));
+  }
 };
 
 class Parser {
@@ -240,7 +244,7 @@ private:
 
   bool TraverseStmt();                                // success if all tokens are matched.
   bool TraverseRuleTable(RuleTable*, AppealNode*);    // success if all tokens are matched.
-  bool TraverseRuleTablePre(RuleTable*, AppealNode*); // success if all tokens are matched.
+  AppealNode* TraverseRuleTablePre(RuleTable*, AppealNode*); // success if all tokens are matched.
   bool TraverseTableData(TableData*, AppealNode*);    // success if all tokens are matched.
   bool TraverseConcatenate(RuleTable*, AppealNode*);
   bool TraverseOneof(RuleTable*, AppealNode*);
@@ -319,7 +323,7 @@ private:
 
   LeftRecursion* FindRecursion(RuleTable *);
   bool IsLeadNode(RuleTable *);
-  bool TraverseLeadNode(RuleTable*, AppealNode *parent);
+  bool TraverseLeadNode(AppealNode*, AppealNode *parent);
   bool TraverseCircle(AppealNode*, LeftRecursion*, unsigned*,
                       SmallVector<RuleTable*> *);
   void ApplySuccInfoOnPath(AppealNode *lead, AppealNode *pseudo);
