@@ -112,7 +112,7 @@ public:
 
   AppealNode() {mData.mTable=NULL; mParent = NULL; mBefore = AppealStatus_NA;
                 mAfter = AppealStatus_NA; mSimplifiedIndex = 0; mIsTable = true;
-                mIsSecondTry = false; mStartIndex = 0; mNumTokens = 0; mSorted = false;
+                mIsSecondTry = false; mStartIndex = 0; mSorted = false;
                 mIsPseudo = false;}
   ~AppealNode(){mMatches.Release();}
 
@@ -315,12 +315,15 @@ private:
 private:
   SmallVector<RecStackEntry> RecStack;
   void PushRecStack(RuleTable *rt, unsigned cur_token);
-  void InRecStack(RuleTable*, unsigned);
+  bool InRecStack(RuleTable*, unsigned);
 
   LeftRecursion* FindRecursion(RuleTable *);
   bool IsLeadNode(RuleTable *);
-  bool TraverseLeadNode(AppealNode *node, AppealNode *parent);
-  bool TraverseCircle(AppealNode *leadnode, unsigned *circle);
+  bool TraverseLeadNode(RuleTable*, AppealNode *parent);
+  bool TraverseCircle(AppealNode*, LeftRecursion*, unsigned*,
+                      SmallVector<RuleTable*> *);
+  void ApplySuccInfoOnPath(AppealNode *lead, AppealNode *pseudo);
+  void ConstructPath(AppealNode*, AppealNode*, unsigned*, unsigned);
 
 public:
   Parser(const char *f);
