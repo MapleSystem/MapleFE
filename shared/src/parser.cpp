@@ -671,7 +671,6 @@ AppealNode* Parser::TraverseRuleTablePre(RuleTable *rule_table, AppealNode *pare
         DumpExitTable(name, mIndentation, true, SuccWasSucc);
 
       mIndentation -= 2;
-      appeal->mBefore = Succ;
       appeal->mAfter = SuccWasSucc;
       return appeal;
     }
@@ -682,7 +681,6 @@ AppealNode* Parser::TraverseRuleTablePre(RuleTable *rule_table, AppealNode *pare
       DumpExitTable(name, mIndentation, false, FailWasFailed);
     }
     mIndentation -= 2;
-    appeal->mBefore = FailWasFailed;
     appeal->mAfter = FailWasFailed;
     return appeal;
   }
@@ -718,10 +716,6 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
   if ((rule_table == &TblLiteral))
     return TraverseLiteral(rule_table, appeal);
 
-  // Once reaching this point, the node was successful.
-  // Gonna look into rule_table's data
-  appeal->mBefore = Succ;
-
   EntryType type = rule_table->mType;
   switch(type) {
   case ET_Oneof:
@@ -744,8 +738,10 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
     break;
   }
 
-  if (mTraceTable)
+  if (mTraceTable) {
+    const char *name = GetRuleTableName(rule_table);
     DumpExitTable(name, mIndentation, matched, FailChildrenFailed);
+  }
   mIndentation -= 2;
 
   if (mTraceSecondTry)
@@ -782,7 +778,6 @@ bool Parser::TraverseToken(Token *token, AppealNode *parent) {
   if (data->mData.mToken == curr_token) {
     AppealNode *appeal = new AppealNode();
     mAppealNodes.push_back(appeal);
-    appeal->mBefore = Succ;
     appeal->mAfter = Succ;
     appeal->SetToken(curr_token);
     appeal->SetStartIndex(mCurToken);
@@ -817,7 +812,6 @@ void Parser::TraverseSpecialTableSucc(RuleTable *rule_table, AppealNode *appeal)
   gSuccTokensNum = 1;
   gSuccTokens[0] = mCurToken;
 
-  appeal->mBefore = Succ;
   appeal->mAfter = Succ;
   appeal->SetToken(curr_token);
   appeal->SetStartIndex(mCurToken);
@@ -838,7 +832,6 @@ void Parser::TraverseSpecialTableFail(RuleTable *rule_table,
   if (mTraceTable)
     DumpExitTable(name, mIndentation, false, status);
   mIndentation -= 2;
-  appeal->mBefore = status;
   appeal->mAfter = status;
 }
 
@@ -1842,7 +1835,7 @@ void Parser::FindPatchingNodes() {
 }
 
 // This is another entry point of sort, similar as SortOut().
-// The only difference is we use 'target' is the goal that we want
+// The only difference is we use 'target' as the refrence that we want
 // 'root' to be sorted.
 void Parser::SupplementalSortOut(AppealNode *root, AppealNode *target) {
   if(root->mSortedChildren.size()!=0)
@@ -1983,7 +1976,7 @@ AppealNode* Parser::SimplifyShrinkEdges(AppealNode *node) {
 
     // step 4. Shrink the edge. This is to remove 'node' by connecting 'node's father
     //         to child. We need go on shrinking with child.
-    AppealNode *parent = node->mParent;
+    AppealNode *parent = node->GetParent();
     parent->ReplaceSortedChild(node, child);
 
     // 1. mRootNode won't have RuleAction, so the index is never used.
@@ -2150,37 +2143,55 @@ SuccMatch* Parser::FindOrCreateSucc(RuleTable *table) {
 ////////////////////////////////////////////////////////////////////////
 
 void SuccMatch::AddStartToken(unsigned t) {
-  mData.PairedFindOrCreateKnob(t);
+  mNodes.PairedFindOrCreateKnob(t);
+  mMatches.PairedFindOrCreateKnob(t);
 }
 
 // The container Guamian assures 'n' is not duplicated.
 void SuccMatch::AddSuccNode(AppealNode *n) {
-  mData.PairedAddElem(n);
+  MASSERT(mNodes.PairedGetKnobData() == n->GetStartIndex());
+  MASSERT(mMatches.PairedGetKnobData() == n->GetStartIndex());
+  mNodes.PairedAddElem(n);
+  for (unsigned i = 0; i < n->GetMatchNum(); i++) {
+    unsigned m = n->GetMatch(i);
+    mMatches.PairedAddElem(m);
+  }
 }
 
-// Below are three Query functions for succ info.
-// They need be used together.
+// Below are Query functions. They need be used together
+// with GetStartToken().
 
 // Find the succ info for token 't'. Return true if found.
 bool SuccMatch::GetStartToken(unsigned t) {
-  return mData.PairedFindKnob(t);
+  bool found_n = mNodes.PairedFindKnob(t);
+  bool found_m = mMatches.PairedFindKnob(t);
+  MASSERT(found_n == found_m);
+  return found_n;
 }
 
-AppealNode* SuccMatch::GetSuccNode() {
-  return mData.PairedGetKnobData();
+unsigned SuccMatch::GetSuccNodesNum() {
+  return mNodes.PairedNumOfElem();
 }
 
-bool SuccMatch::FindMatch(unsigned m) {
-  return mData.PairedFindElem(m);
+AppealNode* SuccMatch::GetSuccNode(unsigned idx) {
+  return mNodes.PairedGetElemAtIndex(idx);
+}
+
+bool SuccMatch::FindNode(AppealNode *n) {
+  return mNodes.PairedFindElem(n);
 }
 
 unsigned SuccMatch::GetMatchNum() {
-  return mData.PairedNumOfElem();
+  return mMatches.PairedNumOfElem();
 }
 
 // idx starts from 0.
 unsigned SuccMatch::GetOneMatch(unsigned idx) {
-  return mData.PairedGetElemAtIndex(idx);
+  return mMatches.PairedGetElemAtIndex(idx);
+}
+
+bool SuccMatch::FindMatch(unsigned m) {
+  return mMatches.PairedFindElem(m);
 }
 
 // Return true : if target is found

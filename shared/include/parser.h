@@ -107,10 +107,9 @@ public:
   // So we keep mChildren untouched and define a second vector for the SortOut-ed children.
   std::vector<AppealNode*> mSortedChildren;
 
-  AppealStatus mBefore;
   AppealStatus mAfter;
 
-  AppealNode() {mData.mTable=NULL; mParent = NULL; mBefore = AppealStatus_NA;
+  AppealNode() {mData.mTable=NULL; mParent = NULL;
                 mAfter = AppealStatus_NA; mSimplifiedIndex = 0; mIsTable = true;
                 mIsSecondTry = false; mStartIndex = 0; mSorted = false;
                 mIsPseudo = false;}
@@ -145,33 +144,43 @@ public:
   bool IsParent(AppealNode *p);
 };
 
-// To cache all the successful results of a rule, we use a container called Guamian, aka
-// Hanging Noodle. Each knob of Guamian contains the starting index. Each string of
-// noodle contains the successful nodes.
-
-// This is a per-rule data structure, saving the success info of a rule.
-// The second 'unsigned' is unused.
-// We are using the first 'unsigned' as the key to the knob. All successful nodes
-// are added in the elements of the knob.
+// To save all the successful results of a rule, we use a container called Guamian, aka
+// Hanging Noodle. We save two types of information, one is the succ AppealNodes. The
+// other one is the last matching token index. The second info can be also found through
+// AppealNode, but we save it for convenience of query.
+//
+// This is a per-rule data structure. The first 'unsigned' is the start token index.
+// It's the key to the knob. The second 'unsigned' is unused. The third data is the
+// content which users are looking for, either AppealNodes or matching tokens.
 
 class SuccMatch {
 private:
-  Guamian<unsigned, unsigned /*unused*/, AppealNode*> mData;
+  Guamian<unsigned, unsigned /*unused*/, AppealNode*> mNodes;
+  Guamian<unsigned, unsigned /*unused*/, unsigned> mMatches;
+
 public:
   SuccMatch(){}
-  ~SuccMatch() {mData.Release();}
+  ~SuccMatch() {mNodes.Release(); mMatches.Release();}
+
 public:
   // The following two functions need be used together, as the first one set the start
-  // token (aka the key), the second one add a matching AppealNode.
+  // token (aka the key), the second one add a matching AppealNode and also updates
+  // matchings tokens in mMatches.
   void AddStartToken(unsigned token);
   void AddSuccNode(AppealNode *node);
 
   // Query functions.
-  // The four function need to be used together since internal data is defiined in
-  // GetStartToken(unsigned).
-  bool        GetStartToken(unsigned t);    // trying to get succ info for 't'
-  unsigned    GetSuccNodesNum();            // number of matching nodes sat a token;
-  AppealNode* GetSuccNode(unsigned i);      // get succ node at index i;
+  // The last four functions should be used together with GetStartToken(unsigned). 
+  // Internal data is defined in GetStartToken(i);
+  bool        GetStartToken(unsigned t); // trying to get succ info for 't'
+
+  unsigned    GetSuccNodesNum();         // number of matching nodes sat a token;
+  AppealNode* GetSuccNode(unsigned i);   // get succ node at index i;
+  bool        FindNode(AppealNode*);     // can we find the node?
+
+  unsigned    GetMatchNum();             // Num of matchings.
+  unsigned    GetOneMatch(unsigned i);   // The ith matching.
+  bool        FindMatch(unsigned);       // can we find the matching token?
 
   // Below are independent functions. The start token is in argument.
   bool FindMatch(unsigned starttoken, unsigned target_match);
