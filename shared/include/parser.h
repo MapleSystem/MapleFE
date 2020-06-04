@@ -77,6 +77,9 @@ public:
   bool IsSorted()   {return mSorted;}
   void SetSorted()  {mSorted = true;}
 
+  unsigned GetFinalMatch()           {return mFinalMatch;}
+  void     SetFinalMatch(unsigned m) {mFinalMatch = m; mSorted = true;}
+
   unsigned GetMatchNum() {return mMatches.GetNum();}
   unsigned GetMatch(unsigned i) {return mMatches.ValueAtIndex(i);}
   void     AddMatch(unsigned i);
@@ -111,7 +114,7 @@ public:
 
   AppealNode() {mData.mTable=NULL; mParent = NULL;
                 mAfter = AppealStatus_NA; mSimplifiedIndex = 0; mIsTable = true;
-                mIsSecondTry = false; mStartIndex = 0; mSorted = false;
+                mIsSecondTry = false; mStartIndex = 0; mSorted = false; mFinalMatch = 0;
                 mIsPseudo = false;}
   ~AppealNode(){mMatches.Release();}
 

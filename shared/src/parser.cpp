@@ -651,6 +651,7 @@ AppealNode* Parser::TraverseRuleTablePre(RuleTable *rule_table, AppealNode *pare
 
 
   // Check if it was succ. Set the gSuccTokens/gSuccTokensNum appropriately
+  // The longest matching is chosen for the next rule table to match.
   SuccMatch *succ = FindSucc(rule_table);
   if (succ) {
     bool was_succ = succ->GetStartToken(mCurToken);
@@ -669,17 +670,18 @@ AppealNode* Parser::TraverseRuleTablePre(RuleTable *rule_table, AppealNode *pare
 
       if (mTraceTable)
         DumpExitTable(name, mIndentation, true, SuccWasSucc);
-
       mIndentation -= 2;
+
+      // For WasSucc node, we did not add the successful matchings to it,
+      // because this info can be found through SuccMatch info.
       appeal->mAfter = SuccWasSucc;
       return appeal;
     }
   }
 
   if (WasFailed(rule_table, mCurToken)) {
-    if (mTraceTable) {
+    if (mTraceTable)
       DumpExitTable(name, mIndentation, false, FailWasFailed);
-    }
     mIndentation -= 2;
     appeal->mAfter = FailWasFailed;
     return appeal;
@@ -691,20 +693,26 @@ AppealNode* Parser::TraverseRuleTablePre(RuleTable *rule_table, AppealNode *pare
 // return true : if the rule_table is matched
 //       false : if faled.
 bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
+
   // Step 1. If the 'rule_table' has already been done, we just reuse the result.
   //         This step is in TraverseRuleTablePre().
+
   AppealNode *appeal = TraverseRuleTablePre(rule_table, parent);
   if (appeal->IsSucc())
     return true;
   else if (appeal->IsFail())
     return false;
+
+  // At this point, the node is at the initial status. It needs traversal.
   MASSERT(appeal->IsNA());
 
   // Step 2. If it's a LeadNode, we will go through special handling.
+
   if (IsLeadNode(rule_table))
     return TraverseLeadNode(appeal, parent);
 
-  // Step 3. Now it's a regular table.
+  // Step 3. It's a regular table. Traverse children in DFS.
+
   bool matched = false;
   unsigned old_pos = mCurToken;
   Token *curr_token = mActiveTokens[mCurToken];
@@ -815,8 +823,10 @@ void Parser::TraverseSpecialTableSucc(RuleTable *rule_table, AppealNode *appeal)
   appeal->mAfter = Succ;
   appeal->SetToken(curr_token);
   appeal->SetStartIndex(mCurToken);
+  appeal->AddMatch(mCurToken);
 
   MoveCurToken();
+
   if (mTraceTable)
     DumpExitTable(name, mIndentation, true);
   mIndentation -= 2;
@@ -836,19 +846,13 @@ void Parser::TraverseSpecialTableFail(RuleTable *rule_table,
 }
 
 // We don't go into Literal table.
-// No mVisitedStack invovled for literal table.
-//
 // 'appeal' is the node for this rule table. This is different than TraverseOneof
 // or the others where 'appeal' is actually a parent node.
-//
-// Also since it's actually a token, we will relate 'appeal' to the token.
 bool Parser::TraverseLiteral(RuleTable *rule_table, AppealNode *appeal) {
   Token *curr_token = mActiveTokens[mCurToken];
   const char *name = GetRuleTableName(rule_table);
   bool found = false;
   gSuccTokensNum = 0;
-
-  ClearVisited(rule_table);
 
   if (curr_token->IsLiteral()) {
     found = true;
@@ -864,19 +868,13 @@ bool Parser::TraverseLiteral(RuleTable *rule_table, AppealNode *appeal) {
 }
 
 // We don't go into Identifier table.
-// No mVisitedStack invovled for identifier table.
-//
-// 'appeal' is the node for this rule table. This is different than TraverseOneof
-// or the others where 'appeal' is actually a parent node.
-//
-// Also since it's actually a token, we will relate 'appeal' to the token.
+// 'appeal' is the node for this rule table. In other TraverseXXX(),
+// 'appeal' is parent node.
 bool Parser::TraverseIdentifier(RuleTable *rule_table, AppealNode *appeal) {
   Token *curr_token = mActiveTokens[mCurToken];
   const char *name = GetRuleTableName(rule_table);
   bool found = false;
   gSuccTokensNum = 0;
-
-  ClearVisited(rule_table);
 
   if (curr_token->IsIdentifier()) {
     found = true;
@@ -1239,12 +1237,13 @@ void Parser::SortOut() {
   MASSERT(succ && "root has no SuccMatch?");
   bool found = succ->GetStartToken(root->GetStartIndex());
 
-  // Top level tree can have only one match
+  // Top level tree can have only one match, otherwise, the language
+  // is ambiguous.
   unsigned match_num = succ->GetMatchNum();
   MASSERT(match_num == 1 && "Top level tree has >1 matches?");
   unsigned match = succ->GetOneMatch(0);
-
-  root->SetNumTokens(match - root->GetStartIndex() + 1);
+  root->SetFinalMatch(match);
+  root->SetSorted();
 
   to_be_sorted.clear();
   to_be_sorted.push_back(root);
@@ -1255,10 +1254,8 @@ void Parser::SortOut() {
     SortOutNode(node);
   }
 
-  if (mTraceSortOut) {
-    MASSERT(mRootNode->mSortedChildren.size()==1);
-    DumpSortOut(mRootNode->mSortedChildren[0], "Main sortout");
-  }
+  if (mTraceSortOut)
+    DumpSortOut(root, "Main sortout");
 }
 
 // 'node' is already trimmed when passed into this function. This assertion
@@ -1269,15 +1266,17 @@ void Parser::SortOutNode(AppealNode *node) {
 
   // A token's appeal node is a leaf node. Just return.
   if (node->IsToken()) {
-    node->SetNumTokens(1);
+    node->SetFinalMatch(node->GetStartIndex());
     return;
   }
 
   // If node->mAfter is SuccWasSucc, it means we didn't traverse its children
   // during matching. In SortOut, we simple return. However, when generating IR,
   // the children have to be created. A re-traversal of AppealNode tree is needed.
-  if (node->mAfter == SuccWasSucc && node->mChildren.size() == 0)
+  if (node->mAfter == SuccWasSucc) {
+    MASSERT(node->mChildren.size() == 0);
     return;
+  }
 
   RuleTable *rule_table = node->GetTable();
   EntryType type = rule_table->mType;
