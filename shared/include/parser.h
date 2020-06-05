@@ -83,6 +83,7 @@ public:
   unsigned GetMatchNum() {return mMatches.GetNum();}
   unsigned GetMatch(unsigned i) {return mMatches.ValueAtIndex(i);}
   void     AddMatch(unsigned i);
+  bool     FindMatch(unsigned m); // if 'm' exists?
 
 public:
   bool mIsTable;     // A AppealNode could relate to either rule table or token.
@@ -166,13 +167,17 @@ public:
   ~SuccMatch() {mNodes.Release(); mMatches.Release();}
 
 public:
-  // The following two functions need be used together, as the first one set the start
+  // The following functions need be used together, as the first one set the start
   // token (aka the key), the second one add a matching AppealNode and also updates
   // matchings tokens in mMatches.
   void AddStartToken(unsigned token);
   void AddSuccNode(AppealNode *node);
+  void AddMatch(unsigned);
 
-  // Query functions.
+  ////////////////////////////////////////////////////////////////////////////
+  //                     Query functions.
+  ////////////////////////////////////////////////////////////////////////////
+
   // The last four functions should be used together with GetStartToken(unsigned). 
   // Internal data is defined in GetStartToken(i);
   bool        GetStartToken(unsigned t); // trying to get succ info for 't'
