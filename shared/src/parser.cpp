@@ -1582,13 +1582,14 @@ void Parser::SortOutData(AppealNode *parent) {
     parent->mSortedChildren.push_back(child);
     break;
   }
-  case DT_Token:
+  case DT_Token: {
     // token in table-data created a Child AppealNode
     // Just keep the child node. Don't need do anything.
     AppealNode *child = parent->mChildren.front();
     child->SetFinalMatch(child->GetStartIndex());
     parent->mSortedChildren.push_back(child);
     break;
+  }
   case DT_Char:
   case DT_String:
   case DT_Type:

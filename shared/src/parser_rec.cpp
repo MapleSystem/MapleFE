@@ -177,14 +177,10 @@ static void FindFronNodes(RuleTable *lead,
       // There is one and only one child. And it must be in circle.
       // In this case, there is no FronNode.
       MASSERT((prev->mNum == 1) && "zeroorxxx node has more than one elements?");
-      MASSERT((len == 1) && "Prev node (Zeroxxx) has more than one child in circle?");
       MASSERT((child_index == 0));
       break;
 
     case ET_Concatenate:
-      // In Concatenate node, only first child can form a Left Recursion.
-      // And the other children wont be considered FronNode.
-      MASSERT(child_index == 0);
       break;
 
     case ET_Data:
