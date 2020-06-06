@@ -659,7 +659,8 @@ AppealNode* Parser::TraverseRuleTablePre(RuleTable *rule_table, AppealNode *pare
       gSuccTokensNum = succ->GetMatchNum();
       for (unsigned i = 0; i < gSuccTokensNum; i++) {
         gSuccTokens[i] = succ->GetOneMatch(i);
-        // WasSucc node also needs Match info.
+        // WasSucc nodes need Match info, which will be used later
+        // in the sort out.
         appeal->AddMatch(gSuccTokens[i]);
         if (gSuccTokens[i] > mCurToken)
           mCurToken = gSuccTokens[i];
@@ -674,8 +675,6 @@ AppealNode* Parser::TraverseRuleTablePre(RuleTable *rule_table, AppealNode *pare
         DumpExitTable(name, mIndentation, true, SuccWasSucc);
       mIndentation -= 2;
 
-      // For WasSucc node, we did not add the successful matchings to it,
-      // because this info can be found through SuccMatch info.
       appeal->mAfter = SuccWasSucc;
       return appeal;
     }
@@ -784,19 +783,21 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
 }
 
 bool Parser::TraverseToken(Token *token, AppealNode *parent) {
+  Token *curr_token = mActiveTokens[mCurToken];
   bool found = false;
   mIndentation += 2;
 
   if (mTraceTable)
     DumpEnterTable("token", mIndentation);
 
-  if (data->mData.mToken == curr_token) {
+  if (token == curr_token) {
     AppealNode *appeal = new AppealNode();
     mAppealNodes.push_back(appeal);
     appeal->mAfter = Succ;
     appeal->SetToken(curr_token);
     appeal->SetStartIndex(mCurToken);
-    appeal->mParent = parent;
+    appeal->AddMatch(mCurToken);
+    appeal->SetParent(parent);
     if (mInSecondTry) {
       appeal->mIsSecondTry = true;
       mInSecondTry = false;
@@ -1426,7 +1427,7 @@ void Parser::SortOutZeroorone(AppealNode *parent) {
   MASSERT(table && "parent is not a table?");
 
   // Zeroorone could match nothing. We just do nothing in this case.
-  unsigned match_num = parent_succ->GetMatchNum();
+  unsigned match_num = parent->GetMatchNum();
   if (match_num == 0)
     return;
 
@@ -1443,6 +1444,7 @@ void Parser::SortOutZeroorone(AppealNode *parent) {
   if (child->IsFail())
     return;
 
+  unsigned parent_start = parent->GetStartIndex();
   unsigned child_start = child->GetStartIndex();
   MASSERT((parent_start == child_start)
           && "In Zeroorone node parent and child has different start index");
@@ -1733,9 +1735,6 @@ void Parser::FindWasSucc(AppealNode *root) {
       was_succ_list.push_back(node);
       if (mTracePatchWasSucc)
         std::cout << "Find WasSucc " << node << std::endl;
-      if (mRoundsOfPatching == 1) {
-        mOrigPatchedNodes.PushBack(node);
-      }
     } else {
       std::vector<AppealNode*>::iterator it = node->mSortedChildren.begin();
       for (; it != node->mSortedChildren.end(); it++)
@@ -1745,7 +1744,12 @@ void Parser::FindWasSucc(AppealNode *root) {
   return NULL;
 }
 
-// For each node in was_succ_list there is one and only patching subtree.
+// For each node in was_succ_list there are one or more patching subtree.
+// A succ parent node contains the matching of succ children nodes. But we
+// only want the real matching which comes from the children. So, we look into
+// those nodes and find the node being the youngest descendant, which has the
+// smallest sub-tree.
+
 void Parser::FindPatchingNodes() {
   std::vector<AppealNode*>::iterator it = was_succ_list.begin();
   for (; it != was_succ_list.end(); it++) {
@@ -1753,18 +1757,26 @@ void Parser::FindPatchingNodes() {
 
     SuccMatch *succ = FindSucc(was_succ->GetTable());
     MASSERT(succ && "WasSucc's rule has no SuccMatch?");
-
     bool found = succ->GetStartToken(was_succ->GetStartIndex());
     MASSERT(found && "WasSucc cannot find start index in SuccMatch?");
 
-    AppealNode *patch = succ->GetSuccNode();
-    MASSERT(patch && "succ node is missing?");
+    AppealNode *youngest = succ->GetSuccNode(0);
+    for (unsigned i = 1; i < succ->GetSuccNodesNum(); i++) {
+      AppealNode *node = succ->GetSuccNode(i);
+      if (node->DescendantOf(youngest)) {
+        youngest = node;
+      } else {
+        // Any two nodes should be in a ancestor-descendant relationship.
+        MASSERT(youngest->DescendantOf(node));
+      }
+    }
+    MASSERT(youngest && "succ matching node is missing?");
 
     if (mTracePatchWasSucc)
-      std::cout << "Find one match " << patch << std::endl;
+      std::cout << "Find one match " << youngest << std::endl;
 
     was_succ_matched_list.push_back(was_succ);
-    patching_list.push_back(patch);
+    patching_list.push_back(youngest);
   }
 }
 
@@ -1783,7 +1795,8 @@ void Parser::SupplementalSortOut(AppealNode *root, AppealNode *target) {
   // step 2. Set the root.
   SuccMatch *succ = FindSucc(root->GetTable());
   MASSERT(succ && "root node has no SuccMatch?");
-  root->SetNumTokens(target->GetNumTokens());
+  root->SetFinalMatch(target->GetFinalMatch());
+  root->SetSorted();
 
   // step 3. Start the sort out
   to_be_sorted.clear();
@@ -2162,7 +2175,7 @@ void AppealNode::AddMatch(unsigned m) {
 }
 
 // return true if 'parent' is a parent of this.
-bool AppealNode::IsParent(AppealNode *parent) {
+bool AppealNode::DescendantOf(AppealNode *parent) {
   AppealNode *node = mParent;
   while (node) {
     if (node == parent)

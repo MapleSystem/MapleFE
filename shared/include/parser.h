@@ -144,8 +144,8 @@ public:
 
   bool SuccEqualTo(AppealNode*);
 
-  // If 'p' is a parent of 'this'
-  bool IsParent(AppealNode *p);
+  // If 'this' is a descendant of 'p'.
+  bool DescendantOf(AppealNode *p);
 };
 
 // To save all the successful results of a rule, we use a container called Guamian, aka
@@ -182,7 +182,7 @@ public:
   // Internal data is defined in GetStartToken(i);
   bool        GetStartToken(unsigned t); // trying to get succ info for 't'
 
-  unsigned    GetSuccNodesNum();         // number of matching nodes sat a token;
+  unsigned    GetSuccNodesNum();         // number of matching nodes at a token;
   AppealNode* GetSuccNode(unsigned i);   // get succ node at index i;
   bool        FindNode(AppealNode*);     // can we find the node?
 
@@ -320,7 +320,6 @@ private:
   AppealNode* SimplifyShrinkEdges(AppealNode*);
 
   // Patch Was Succ
-  SmallVector<AppealNode*> mOrigPatchedNodes;
   unsigned mRoundsOfPatching;
   void PatchWasSucc(AppealNode*);
   void FindWasSucc(AppealNode *root);
