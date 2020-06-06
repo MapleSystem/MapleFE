@@ -79,7 +79,7 @@ static void FindRecursionNodes(RuleTable *lead,
     RuleTable *prev = lead;
     for (unsigned j = 1; j <= len; j++) {
       unsigned child_index = circle[j];
-      FronNode node = RuleFindChildAtIndex(prev, j);
+      FronNode node = RuleFindChildAtIndex(prev, child_index);
       MASSERT(node.mIsTable);
       RuleTable *rt = node.mData.mTable;
 
@@ -121,7 +121,7 @@ static void FindFronNodes(RuleTable *lead,
   RuleTable *prev = lead;
   for (unsigned j = 1; j <= len; j++) {
     unsigned child_index = circle[j];
-    FronNode node = RuleFindChildAtIndex(prev, j);
+    FronNode node = RuleFindChildAtIndex(prev, child_index);
     MASSERT(node.mIsTable);
     RuleTable *next = node.mData.mTable;
 
@@ -340,7 +340,7 @@ void Parser::ConstructPath(AppealNode *lead, AppealNode *ps_node, unsigned *circ
   unsigned len = circle[0];
   for (unsigned j = 1; j < num_steps; j++) {
     unsigned child_index = circle[j];
-    FronNode node = RuleFindChildAtIndex(prev, j);
+    FronNode node = RuleFindChildAtIndex(prev, child_index);
     MASSERT(node.mIsTable);
 
     next = node.mData.mTable;
