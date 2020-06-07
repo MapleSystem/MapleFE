@@ -627,6 +627,19 @@ void Parser::DumpSuccTokens() {
   std::cout << std::endl;
 }
 
+// Update gSuccTokens into 'node'.
+void Parser::UpdateSuccInfo(unsigned curr_token, AppealNode *node) {
+  MASSERT(node->IsTable());
+  RuleTable *rule_table = node->GetTable();
+  SuccMatch *succ_match = FindOrCreateSucc(rule_table);
+  succ_match->AddStartToken(curr_token);
+  succ_match->AddSuccNode(node);
+  for (unsigned i = 0; i < gSuccTokensNum; i++) {
+    node->AddMatch(gSuccTokens[i]);
+    succ_match->AddMatch(gSuccTokens[i]);
+  }
+}
+
 // The preparation of TraverseRuleTable().
 AppealNode* Parser::TraverseRuleTablePre(RuleTable *rule_table, AppealNode *parent) {
   mIndentation += 2;
@@ -708,6 +721,8 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
   MASSERT(appeal->IsNA());
 
   // Step 2. If it's a LeadNode, we will go through special handling.
+  //         The match info of 'appeal' and its SuccMatch will be updated
+  //         inside TraverseLeadNode().
 
   if (IsLeadNode(rule_table))
     return TraverseLeadNode(appeal, parent);
@@ -760,16 +775,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
     DumpSuccTokens();
 
   if(matched) {
-    // It's guaranteed that this rule_table was NOT succ for mCurToken. Need add it.
-    SuccMatch *succ_match = FindOrCreateSucc(rule_table);
-    succ_match->AddStartToken(old_pos);
-    succ_match->AddSuccNode(appeal);
-    for (unsigned i = 0; i < gSuccTokensNum; i++) {
-      appeal->AddMatch(gSuccTokens[i]);
-      succ_match->AddMatch(gSuccTokens[i]);
-    }
-
-    // We try to appeal only if it succeeds at the end.
+    UpdateSuccInfo(old_pos, appeal);
     appeal->mAfter = Succ;
     //if (appeal->IsTable())
     //  Appeal(appeal);
@@ -2097,8 +2103,8 @@ void SuccMatch::AddStartToken(unsigned t) {
 
 // The container Guamian assures 'n' is not duplicated.
 void SuccMatch::AddSuccNode(AppealNode *n) {
-  MASSERT(mNodes.PairedGetKnobData() == n->GetStartIndex());
-  MASSERT(mMatches.PairedGetKnobData() == n->GetStartIndex());
+  MASSERT(mNodes.PairedGetKnobKey() == n->GetStartIndex());
+  MASSERT(mMatches.PairedGetKnobKey() == n->GetStartIndex());
   mNodes.PairedAddElem(n);
   for (unsigned i = 0; i < n->GetMatchNum(); i++) {
     unsigned m = n->GetMatch(i);

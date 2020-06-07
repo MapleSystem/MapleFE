@@ -21,6 +21,7 @@
 #include "parser.h"
 #include "parser_rec.h"
 #include "ruletable_util.h"
+#include "gen_debug.h"
 
 // Find the LeftRecursion with 'rt' the LeadNode.
 LeftRecursion* Parser::FindRecursion(RuleTable *rt) {
@@ -214,6 +215,9 @@ bool Parser::TraverseLeadNode(AppealNode *appeal, AppealNode *parent) {
   // Step 1. We are entering a new recursion right now. Need prepare the
   //         the recursion stack information.
   RuleTable *rt = appeal->GetTable();
+
+  std::cout << "Enter LeadNode " << GetRuleTableName(rt)  << std::endl;
+
   unsigned saved_curtoken = mCurToken;
   if (InRecStack(rt, mCurToken)) {
     MERROR("Unexpected nested lead node traversal");
@@ -235,6 +239,8 @@ bool Parser::TraverseLeadNode(AppealNode *appeal, AppealNode *parent) {
   unsigned saved_mCurToken = mCurToken;
   while(1) {
     bool found = false;
+
+    // Step 3.1 Traverse LeadFronNodes
     for (unsigned i = 0; i < lead_fron_nodes.GetNum(); i++){
       bool temp_found = false;
       gSuccTokensNum = 0;
@@ -243,14 +249,18 @@ bool Parser::TraverseLeadNode(AppealNode *appeal, AppealNode *parent) {
       if (!fnode.mIsTable) {
         temp_found = TraverseToken(fnode.mData.mToken, parent);
       } else {
+        RuleTable *rt = fnode.mData.mTable;
+        std::cout << "Enter LeadFronNode " << GetRuleTableName(rt) << std::endl;
         temp_found = TraverseRuleTable(fnode.mData.mTable, parent);
       }
       
       found |= temp_found;
 
-      // Add succ to 'appeal'.
-      for (unsigned j = 0; j < gSuccTokensNum; j++)
-        parent->AddMatch(gSuccTokens[j]);
+      // Add succ to 'appeal' and SuccMatch.
+      if (found) {
+        appeal->mAfter = Succ;
+        UpdateSuccInfo(saved_mCurToken, appeal);
+      }
     }
 
     // Step 3.2 Traverse Circles.
@@ -261,6 +271,7 @@ bool Parser::TraverseLeadNode(AppealNode *appeal, AppealNode *parent) {
     for (unsigned i = 0; i < rec->mNum; i++) {
       unsigned *circle = rec->mCircles[i];
       mCurToken = saved_mCurToken;
+      std::cout << "TraverseCircle:" << i << std::endl;
       bool temp_found = TraverseCircle(appeal, rec, circle, &rec_nodes);
       found |= temp_found;
     }
@@ -272,6 +283,8 @@ bool Parser::TraverseLeadNode(AppealNode *appeal, AppealNode *parent) {
   // Step 4. Restore the recursion stack.
   RecStackEntry entry = RecStack.Back();
   MASSERT((entry.mLeadNode == rt) && (entry.mStartToken == saved_curtoken));
+
+  std::cout << "Exit a LeadNode " << GetRuleTableName(rt)  << std::endl;
 }
 
 // There are several things to be done in this function.
@@ -297,6 +310,7 @@ bool Parser::TraverseCircle(AppealNode *lead,
   // which play the role of parent of the created nodes.
   unsigned saved_mCurToken = mCurToken;
   SmallVector<AppealNode*> PseudoParents;
+  bool found = false;
   for (unsigned i = 0; i < fron_nodes.GetNum(); i++) {
     AppealNode *pseudo_parent = new AppealNode();
     pseudo_parent->SetIsPseudo();
@@ -304,13 +318,14 @@ bool Parser::TraverseCircle(AppealNode *lead,
     mAppealNodes.push_back(pseudo_parent);
 
     FronNode fnode = fron_nodes.ValueAtIndex(i);
-    bool found = false;
     if (!fnode.mIsTable) {
       Token *token = fnode.mData.mToken;
-      found = TraverseToken(token, pseudo_parent);
+      bool temp_found = TraverseToken(token, pseudo_parent);
+      found |= temp_found;
     } else {
       RuleTable *rt = fnode.mData.mTable;
-      found = TraverseRuleTable(rt, pseudo_parent);
+      bool temp_found = TraverseRuleTable(rt, pseudo_parent);
+      found |= temp_found;
     }
 
     // Create a path.
@@ -318,14 +333,19 @@ bool Parser::TraverseCircle(AppealNode *lead,
 
     // Apply the start index / succ info to the path.
     mCurToken = saved_mCurToken;
-    ApplySuccInfoOnPath(lead, pseudo_parent);
+    ApplySuccInfoOnPath(lead, pseudo_parent, found);
   }
+
+  return found;
 }
 
 // Construct a path from 'lead' to 'ps_node'. The rule tables in between are
 // determined by 'circle'. Totoal number of rule tables involved is num_steps - 1.
 // The path should be like,
 //  lead -> rule table 1 -> ... -> rule table(num_steps-1) -> ps_node
+//
+// [NOTE] Since it's a circle, you can actually create endless number of paths.
+//        However, in reality we need only the simplest path.
 void Parser::ConstructPath(AppealNode *lead, AppealNode *ps_node, unsigned *circle,
                            unsigned num_steps) {
   RuleTable *prev = lead->GetTable();
@@ -356,12 +376,17 @@ void Parser::ConstructPath(AppealNode *lead, AppealNode *ps_node, unsigned *circ
 }
 
 // set start index, and succ info in all node from 'lead' to 'pseudo'.
-void Parser::ApplySuccInfoOnPath(AppealNode *lead, AppealNode *pseudo) {
+void Parser::ApplySuccInfoOnPath(AppealNode *lead, AppealNode *pseudo, bool succ) {
   AppealNode *node = pseudo;
   while(1) {
-    node->SetStartIndex(mCurToken);
-    for (unsigned i = 0; i < gSuccTokensNum; i++)
-      node->AddMatch(gSuccTokens[i]);
+    if (succ) {
+      node->SetStartIndex(mCurToken);
+      UpdateSuccInfo(mCurToken, node);
+      node->mAfter = Succ;
+    } else {
+      node->mAfter = FailChildrenFailed;
+    }
+
     if (node == lead)
       break;
     else

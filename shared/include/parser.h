@@ -258,6 +258,7 @@ private:
   SuccMatch* FindSucc(RuleTable*);
   SuccMatch* FindOrCreateSucc(RuleTable*);
   void ClearSucc();
+  void UpdateSuccInfo(unsigned, AppealNode*);
 
   bool TraverseStmt();                                // success if all tokens are matched.
   bool TraverseRuleTable(RuleTable*, AppealNode*);    // success if all tokens are matched.
@@ -342,7 +343,7 @@ private:
   bool TraverseLeadNode(AppealNode*, AppealNode *parent);
   bool TraverseCircle(AppealNode*, LeftRecursion*, unsigned*,
                       SmallVector<RuleTable*> *);
-  void ApplySuccInfoOnPath(AppealNode *lead, AppealNode *pseudo);
+  void ApplySuccInfoOnPath(AppealNode *lead, AppealNode *pseudo, bool succ);
   void ConstructPath(AppealNode*, AppealNode*, unsigned*, unsigned);
 
 public:

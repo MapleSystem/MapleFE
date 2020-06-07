@@ -744,6 +744,10 @@ public:
     return mTempKnob->mData;
   }
 
+  K PairedGetKnobKey() {
+    return mTempKnob->mKey;
+  }
+
   /////////////////////////////////////////////////////////
   //                 Other functions
   /////////////////////////////////////////////////////////
