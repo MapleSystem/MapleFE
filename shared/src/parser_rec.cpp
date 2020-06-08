@@ -218,13 +218,14 @@ bool Parser::TraverseLeadNode(AppealNode *appeal, AppealNode *parent) {
 
   std::cout << "Enter LeadNode " << GetRuleTableName(rt)  << std::endl;
 
-  unsigned saved_curtoken = mCurToken;
+  // It's possible that we re-enter a LeadNode. But we will skip it if it's
+  // already in the middle of traversal.
   if (InRecStack(rt, mCurToken)) {
-    MERROR("Unexpected nested lead node traversal");
     return false;
   }
-
   PushRecStack(rt, mCurToken);
+
+  unsigned saved_curtoken = mCurToken;
 
   // Step 2. Find RecursionNode, LeadFronNodes
   SmallVector<RuleTable*> rec_nodes;     // all recursion nodes, should be RuleTable
@@ -233,56 +234,50 @@ bool Parser::TraverseLeadNode(AppealNode *appeal, AppealNode *parent) {
   FindLeadFronNodes(rt, rec, &lead_fron_nodes);
   FindRecursionNodes(rt, rec, &rec_nodes);
 
-  // Step 3. Exhausting Algorithm
-  //         To find the best matching of this recursion, we decided to do an
-  //         exhausting algorithm, which tries all possible matchings.
   unsigned saved_mCurToken = mCurToken;
-  while(1) {
-    bool found = false;
+  bool found = false;
 
-    // Step 3.1 Traverse LeadFronNodes
-    for (unsigned i = 0; i < lead_fron_nodes.GetNum(); i++){
-      bool temp_found = false;
-      gSuccTokensNum = 0;
-      mCurToken = saved_mCurToken;
-      FronNode fnode = lead_fron_nodes.ValueAtIndex(i);
-      if (!fnode.mIsTable) {
-        temp_found = TraverseToken(fnode.mData.mToken, parent);
-      } else {
-        RuleTable *rt = fnode.mData.mTable;
-        std::cout << "Enter LeadFronNode " << GetRuleTableName(rt) << std::endl;
-        temp_found = TraverseRuleTable(fnode.mData.mTable, parent);
-      }
-      
-      found |= temp_found;
-
-      // Add succ to 'appeal' and SuccMatch.
-      if (found) {
-        appeal->mAfter = Succ;
-        UpdateSuccInfo(saved_mCurToken, appeal);
-      }
+  // Step 3. Traverse LeadFronNodes
+  for (unsigned i = 0; i < lead_fron_nodes.GetNum(); i++){
+    bool temp_found = false;
+    gSuccTokensNum = 0;
+    mCurToken = saved_mCurToken;
+    FronNode fnode = lead_fron_nodes.ValueAtIndex(i);
+    if (!fnode.mIsTable) {
+      temp_found = TraverseToken(fnode.mData.mToken, parent);
+    } else {
+      RuleTable *rt = fnode.mData.mTable;
+      std::cout << "Enter LeadFronNode " << GetRuleTableName(rt) << std::endl;
+      temp_found = TraverseRuleTable(fnode.mData.mTable, parent);
     }
 
-    // Step 3.2 Traverse Circles.
-    //          The 'appeal' succ match info will be saved inside TraverseCircle()
-    //          which also construct the path.
-    unsigned temp_gSuccTokensNum = 0;
-    unsigned temp_gSuccTokens[MAX_SUCC_TOKENS];
-    for (unsigned i = 0; i < rec->mNum; i++) {
-      unsigned *circle = rec->mCircles[i];
-      mCurToken = saved_mCurToken;
-      std::cout << "TraverseCircle:" << i << std::endl;
-      bool temp_found = TraverseCircle(appeal, rec, circle, &rec_nodes);
-      found |= temp_found;
-    }
+    found |= temp_found;
 
-    if (!found)
-      break;
+    // Add succ to 'appeal' and SuccMatch.
+    if (found) {
+      appeal->mAfter = Succ;
+      UpdateSuccInfo(saved_mCurToken, appeal);
+    }
   }
 
-  // Step 4. Restore the recursion stack.
+  // Step 4. Traverse Circles.
+  //         The 'appeal' succ match info will be saved inside TraverseCircle()
+  //         which also construct the path.
+  unsigned temp_gSuccTokensNum = 0;
+  unsigned temp_gSuccTokens[MAX_SUCC_TOKENS];
+  for (unsigned i = 0; i < rec->mNum; i++) {
+    unsigned *circle = rec->mCircles[i];
+    mCurToken = saved_mCurToken;
+    std::cout << "TraverseCircle:" << i << std::endl;
+    bool temp_found = TraverseCircle(appeal, rec, circle, &rec_nodes);
+    found |= temp_found;
+  }
+
+  // Step 5. Restore the recursion stack.
   RecStackEntry entry = RecStack.Back();
   MASSERT((entry.mLeadNode == rt) && (entry.mStartToken == saved_curtoken));
+
+  // Step 6. The gSuccTokens/Num will be updated in the caller in parser.cpp
 
   std::cout << "Exit a LeadNode " << GetRuleTableName(rt)  << std::endl;
 }

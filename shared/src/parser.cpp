@@ -724,8 +724,19 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
   //         The match info of 'appeal' and its SuccMatch will be updated
   //         inside TraverseLeadNode().
 
-  if (IsLeadNode(rule_table))
-    return TraverseLeadNode(appeal, parent);
+  if (IsLeadNode(rule_table)) {
+    bool found = TraverseLeadNode(appeal, parent);
+    if (!found) {
+      appeal->mAfter = FailChildrenFailed;
+      gSuccTokensNum = 0;
+      return false;
+    } else {
+      gSuccTokensNum = appeal->GetMatchNum();
+      for (unsigned i = 0; i < gSuccTokensNum; i++)
+        gSuccTokens[i] = appeal->GetMatch(i);
+      return true;
+    }
+  }
 
   // Step 3. It's a regular table. Traverse children in DFS.
 
