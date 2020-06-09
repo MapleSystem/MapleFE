@@ -175,6 +175,7 @@ static void FindFronNodes(RuleTable *lead,
 
     case ET_Zeroormore:
     case ET_Zeroorone:
+    case ET_Data:
       // There is one and only one child. And it must be in circle.
       // In this case, there is no FronNode.
       MASSERT((prev->mNum == 1) && "zeroorxxx node has more than one elements?");
@@ -184,7 +185,6 @@ static void FindFronNodes(RuleTable *lead,
     case ET_Concatenate:
       break;
 
-    case ET_Data:
     case ET_Null:
     default:
       MASSERT(0 && "Wrong node type in a circle");
@@ -276,6 +276,7 @@ bool Parser::TraverseLeadNode(AppealNode *appeal, AppealNode *parent) {
   // Step 5. Restore the recursion stack.
   RecStackEntry entry = RecStack.Back();
   MASSERT((entry.mLeadNode == rt) && (entry.mStartToken == saved_curtoken));
+  RecStack.PopBack();
 
   // Step 6. The gSuccTokens/Num will be updated in the caller in parser.cpp
 
