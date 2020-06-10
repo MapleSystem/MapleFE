@@ -383,6 +383,12 @@ bool Parser::MoveCurToken() {
   return true;
 }
 
+Token* Parser::GetActiveToken(unsigned i) {
+  if (i >= mActiveTokens.size())
+    MASSERT(0 && "mActiveTokens OutOfBound");
+  return mActiveTokens[i];
+}
+
 bool Parser::Parse() {
   bool succ = false;
   while (1) {
@@ -742,7 +748,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
 
   bool matched = false;
   unsigned old_pos = mCurToken;
-  Token *curr_token = mActiveTokens[mCurToken];
+  Token *curr_token = GetActiveToken(mCurToken);
   gSuccTokensNum = 0;
 
   // [NOTE] TblLiteral and TblIdentifier don't use the SuccMatch info,
@@ -800,7 +806,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
 }
 
 bool Parser::TraverseToken(Token *token, AppealNode *parent) {
-  Token *curr_token = mActiveTokens[mCurToken];
+  Token *curr_token = GetActiveToken(mCurToken);
   bool found = false;
   mIndentation += 2;
 
@@ -841,7 +847,7 @@ bool Parser::TraverseToken(Token *token, AppealNode *parent) {
 // It helps set all the data structures.
 void Parser::TraverseSpecialTableSucc(RuleTable *rule_table, AppealNode *appeal) {
   const char *name = GetRuleTableName(rule_table);
-  Token *curr_token = mActiveTokens[mCurToken];
+  Token *curr_token = GetActiveToken(mCurToken);
   gSuccTokensNum = 1;
   gSuccTokens[0] = mCurToken;
 
@@ -874,7 +880,7 @@ void Parser::TraverseSpecialTableFail(RuleTable *rule_table,
 // 'appeal' is the node for this rule table. This is different than TraverseOneof
 // or the others where 'appeal' is actually a parent node.
 bool Parser::TraverseLiteral(RuleTable *rule_table, AppealNode *appeal) {
-  Token *curr_token = mActiveTokens[mCurToken];
+  Token *curr_token = GetActiveToken(mCurToken);
   const char *name = GetRuleTableName(rule_table);
   bool found = false;
   gSuccTokensNum = 0;
@@ -896,7 +902,7 @@ bool Parser::TraverseLiteral(RuleTable *rule_table, AppealNode *appeal) {
 // 'appeal' is the node for this rule table. In other TraverseXXX(),
 // 'appeal' is parent node.
 bool Parser::TraverseIdentifier(RuleTable *rule_table, AppealNode *appeal) {
-  Token *curr_token = mActiveTokens[mCurToken];
+  Token *curr_token = GetActiveToken(mCurToken);
   const char *name = GetRuleTableName(rule_table);
   bool found = false;
   gSuccTokensNum = 0;
@@ -1181,7 +1187,7 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *parent) {
 bool Parser::TraverseTableData(TableData *data, AppealNode *parent) {
   unsigned old_pos = mCurToken;
   bool     found = false;
-  Token   *curr_token = mActiveTokens[mCurToken];
+  Token   *curr_token = GetActiveToken(mCurToken);
   gSuccTokensNum = 0;
 
   switch (data->mType) {

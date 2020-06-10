@@ -290,7 +290,8 @@ private:
   void ResetFailed(RuleTable*, unsigned);
   bool WasFailed(RuleTable*, unsigned);
 
-  bool MoveCurToken();  // move mCurToken one step.
+  bool MoveCurToken();             // move mCurToken one step.
+  Token* GetActiveToken(unsigned); // Get an active token.
 
   // Every language has a fixed number of entry point to start parsing. Eg. in Java
   // the top level language construct is class, so the entry point is ClassDeclaration.
