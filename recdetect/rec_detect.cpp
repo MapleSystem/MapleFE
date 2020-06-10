@@ -267,6 +267,11 @@ void RecDetector::DetectRuleTable(RuleTable *rt, ContTreeNode<RuleTable*> *p) {
     break;
   }
 
+  MASSERT(IsInProcess(rt));
+  RuleTable *back = mInProcess.Back();
+  MASSERT(back == rt);
+  mInProcess.PopBack();
+
   // It's done.
   MASSERT(!IsDone(rt));
   mDone.PushBack(rt);
