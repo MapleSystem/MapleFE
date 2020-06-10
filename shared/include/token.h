@@ -68,7 +68,7 @@ public:
   bool IsKeyword()    { return mTkType == TT_KW; }
   bool IsComment()    { return mTkType == TT_CM; }
 
-  virtual const char* GetName(){return NULL;}
+  virtual const char* GetName(){return "null";}
   virtual void Dump() {}
 };
 
@@ -180,7 +180,7 @@ public:
 class CommentToken : public Token {
 public:
   CommentToken() {mTkType = TT_CM;}
-  const char* GetName() {return NULL;}
+  const char* GetName() {return "comment";}
   void Dump();
 };
 

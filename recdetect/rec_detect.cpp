@@ -298,11 +298,16 @@ void RecDetector::DetectZeroormore(RuleTable *rule_table, ContTreeNode<RuleTable
   }
 }
 
+// [case 1]
+//
 // Concatenate node is quite complicated, let's look at the first case.
 //  E ---> '{' + E + '}',
 //     |-> other rules
 // It's obvious that E on RHS won't be considered as recursion child, and we can stop
 // at this point. Now let's look at the second case.
+//
+// [case 2]
+//
 //  A ---> '{' + E + '}',
 //     |-> other rules
 // E on RHS is the first time it's computed, and it's possible there are recursions
@@ -314,14 +319,27 @@ void RecDetector::DetectZeroormore(RuleTable *rule_table, ContTreeNode<RuleTable
 //
 // There is a special child node, which is the first one. It always will go through
 // further process in DectecRuleTable() who will handle it over there.
+//
+// [case 3]
+//
+// However, let's look at the another case.
+// E ---> F + G,
+//     |-> other rules
+// F ---> ZEROORMORE(...)
+// G ---> E + ...
+// This forms a left recursion of E since F could be empty.
+// If F is not ZeroorXXX(), there is no left recursion of rule E.
+// Problem is this is complicated to find out...
 
 void RecDetector::DetectConcatenate(RuleTable *rule_table, ContTreeNode<RuleTable*> *p) {
+  // First element is always searched.
   TableData *data = rule_table->mData;
   if (data->mType == DT_Subtable) {
     RuleTable *child = data->mData.mEntry;
     DetectRuleTable(child, p);
   }
 
+  // The remaining elements will be searched if they are not InProcess().
   for (unsigned i = 1; i < rule_table->mNum; i++) {
     TableData *data = rule_table->mData + i;
     if (data->mType == DT_Subtable) {

@@ -318,11 +318,19 @@ bool Parser::TraverseCircle(AppealNode *lead,
       Token *token = fnode.mData.mToken;
       bool temp_found = TraverseToken(token, pseudo_parent);
       found |= temp_found;
+
+      const char *name = token->GetName();
+      std::cout << "FronNode " << name << " " << temp_found << std::endl;
     } else {
       RuleTable *rt = fnode.mData.mTable;
       bool temp_found = TraverseRuleTable(rt, pseudo_parent);
       found |= temp_found;
+
+      const char *name = GetRuleTableName(rt);
+      std::cout << "FronNode " << name << " " << temp_found << std::endl;
     }
+
+    std::cout << "Before construct path LeadNode " << GetRuleTableName(rt) << std::endl;
 
     // Create a path.
     ConstructPath(lead, pseudo_parent, circle, fron_pos.ValueAtIndex(i));
@@ -374,13 +382,24 @@ void Parser::ConstructPath(AppealNode *lead, AppealNode *ps_node, unsigned *circ
 // set start index, and succ info in all node from 'lead' to 'pseudo'.
 void Parser::ApplySuccInfoOnPath(AppealNode *lead, AppealNode *pseudo, bool succ) {
   AppealNode *node = pseudo;
+  RuleTable *rt = NULL;
+  const char *name = NULL;
   while(1) {
+    if (node->IsPseudo()) {
+      name = " pseudo ";
+    } else {
+      name = GetRuleTableName(node->GetTable());
+    }
+
+    std::cout << "Update rule:" << name << "@" << mCurToken;
     if (succ) {
       node->SetStartIndex(mCurToken);
       UpdateSuccInfo(mCurToken, node);
       node->mAfter = Succ;
+      std::cout << " succ." << std::endl;
     } else {
       node->mAfter = FailChildrenFailed;
+      std::cout << " fail." << std::endl;
     }
 
     if (node == lead)
