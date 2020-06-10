@@ -280,7 +280,7 @@ bool Parser::TraverseLeadNode(AppealNode *appeal, AppealNode *parent) {
 
   // Step 6. The gSuccTokens/Num will be updated in the caller in parser.cpp
 
-  std::cout << "Exit a LeadNode " << GetRuleTableName(rt)  << std::endl;
+  std::cout << "Exit LeadNode " << GetRuleTableName(rt)  << std::endl;
 }
 
 // There are several things to be done in this function.

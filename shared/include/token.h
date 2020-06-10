@@ -68,6 +68,7 @@ public:
   bool IsKeyword()    { return mTkType == TT_KW; }
   bool IsComment()    { return mTkType == TT_CM; }
 
+  virtual const char* GetName(){return NULL;}
   virtual void Dump() {}
 };
 

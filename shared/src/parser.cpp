@@ -810,8 +810,11 @@ bool Parser::TraverseToken(Token *token, AppealNode *parent) {
   bool found = false;
   mIndentation += 2;
 
-  if (mTraceTable)
-    DumpEnterTable("token", mIndentation);
+  if (mTraceTable) {
+    std::string name = "token:";
+    name += token->GetName();
+    DumpEnterTable(name.c_str(), mIndentation);
+  }
 
   if (token == curr_token) {
     AppealNode *appeal = new AppealNode();
@@ -834,8 +837,12 @@ bool Parser::TraverseToken(Token *token, AppealNode *parent) {
     MoveCurToken();
   }
 
-  if (mTraceTable)
-    DumpExitTable("token", mIndentation, found, AppealStatus_NA);
+  if (mTraceTable) {
+    std::string name = "token:";
+    name += token->GetName();
+    DumpExitTable(name.c_str(), mIndentation, found, AppealStatus_NA);
+  }
+
   if (mTraceSecondTry)
     DumpSuccTokens();
 
