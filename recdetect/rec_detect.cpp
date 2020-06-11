@@ -30,9 +30,13 @@
 //        should be one and only one recursion counted, even if there are multiple
 //        nodes in the loop.
 //        To achieve this, we build the tree, and those back edges of recursion won't
-//        be counted as tree. So in DFS traversal, children are done before parents.
+//        be counted as tree edge. So in DFS traversal, children are done before parents.
 //        If a child is involved in a loop, only the topmost ancestor will be the
 //        leader of this loop.
+//
+//        This DFS traversal also assures once a node is traversed, all the loops
+//        containing it will be found at this single time. We don't need traverse
+//        this node any more. -- This is the base of our algorithm.
 ////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -298,38 +302,87 @@ void RecDetector::DetectZeroormore(RuleTable *rule_table, ContTreeNode<RuleTable
   }
 }
 
-// [case 1]
+// The real challenge in left recursion detection is coming from Concatenate node. Before
+// we explain the details, we introduce three sets to keep rule table status.
+//   ToDo     : The main driver will walk on this list. Any rules which is encountered
+//              in the traversal but we won't keep on traversing on it, will be put in
+//              this todo list for later traversal.
+//   InProcess: The rules are right now in the middle of traversal. This actually tells
+//              the current working path of the DFS traversal.
+//   Done     : The rules that are finished.
+// It's obviously true the sum of the three sets is the total of rule tables.
 //
-// Concatenate node is quite complicated, let's look at the first case.
+// We also elaborate a few rules which build the foundation of the algorithm.
+//
+// [Rule 1]
+//
 //  E ---> '{' + E + '}',
 //     |-> other rules
-// It's obvious that E on RHS won't be considered as recursion child, and we can stop
-// at this point. Now let's look at the second case.
 //
-// [case 2]
+// It's obvious that E on RHS won't be considered as recursion child, and we can stop
+// at this point. The and parent rule will give up on it.
+//
+// [Rule 2]
 //
 //  A ---> '{' + E + '}',
 //     |-> other rules
-// E on RHS is the first time it's computed, and it's possible there are recursions
-// inside E. We of course need keep working on it.
 //
-// So here is the question we need answer, when should we keep working on an item
-// of a concatenate node? The answer is, if E is already InProcess(), we stop, otherwise,
-// we keep working.
+// E on the RHS is not the first element. It won't be traversed at this DFS path.
+// The traversal stops at this point, and parent node will give up on this path.
+// But later we will work on it to see if there is recursion. So, E will be put into
+// ToDo list if it's not in Done or InProcess.
 //
-// There is a special child node, which is the first one. It always will go through
-// further process in DectecRuleTable() who will handle it over there.
+// Question is, what if the first element is not a token? See Rule 4.
 //
-// [case 3]
+// [Rule 3]
 //
-// However, let's look at the another case.
+//  A ---> E + '}',
+//     |-> other rules
+//
+// E is the first one. It always will go through the following traversal.
+//
+// [Rule 4]
+//
 // E ---> F + G,
 //     |-> other rules
-// F ---> ZEROORMORE(...)
+// F ---> ZEROORMORE()
 // G ---> E + ...
-// This forms a left recursion of E since F could be empty.
-// If F is not ZeroorXXX(), there is no left recursion of rule E.
-// Problem is this is complicated to find out...
+//
+// In this case F is an explicit ZeroorXXX() rule. E and G forms a left recursion.
+// Let's look at an even more complicated case.
+//
+// E ---> F + G,
+//     |-> other rules
+// F ---> H
+// H ---> ZEROORMORE()
+// G ---> E + ...
+//
+// In this case F is an IMPLICIT ZeroorXXX() rule table. E and G form a left
+// recursion too. We cannot put G in ToDo list and give up the path.
+// Go further there are more complicated case like
+//
+// E ---> F + G,
+//     |-> other rules
+// F ---> H
+// H ---> ZEROORMORE() + K
+// K ---> ZERORORMORE()
+// G ---> E + ...
+//
+// H is a ZeroorXXX() or not depends on all grand children's result.
+// And looks like the result of a parent node will consider all children's result.
+// So we have to introduce a set of TResult to indicate the result of a rule table.
+//   TRS_Fail:      Definitely a fail for left recursion. Just stop here.
+//   TRS_MaybeZero: The rule table could be empty.
+//   TRS_Done:      The children is done with traversal before. This means we need
+//                  stop here too, because all the further traversal from this point
+//                  have been done already. People may ask, what if I miss a recursion
+//                  from this rule table? The answer is you will never miss a single
+//                  one. Because any recursion including this rule will be found
+//                  the first time it's traversed. (We also addressed this at the
+//                  beginning of this file)
+//
+// Keep in mind, all TResult of leading elements are only used for determining
+// if the following element should be traversed, or just stop and put into ToDo list.
 
 void RecDetector::DetectConcatenate(RuleTable *rule_table, ContTreeNode<RuleTable*> *p) {
   // First element is always searched.

@@ -225,7 +225,14 @@ public:
     mHead = e;
   }
 
+  // Caller needs to assure mHead is valid.
+  void PopFront() {
+    MASSERT(mHead);
+    Remove(mHead);
+  }
+
   unsigned GetNum() {return mNum;}
+  bool Empty() {return mNum == 0;}
 
   // Caller's duty to assure Back() has existing element.
   T Back() {return mTail->mData;}
