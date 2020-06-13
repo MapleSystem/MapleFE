@@ -100,30 +100,53 @@ public:
   void Release() {mRecursions.Release();}
 };
 
+// The traversal result of a rule table. The details can be found
+// in the comment of DetectConcatenate(). This is corresponding to the
+// following three SmallVector's of mMaybeZero, mNonZero, mFail.
+enum TResult {
+  TRS_NonZero,
+  TRS_MaybeZero,
+  TRS_Fail
+};
+
 // Left Recursion Detector.
 class RecDetector {
 private:
   SmallVector<Recursion*> mRecursions;
-  SmallVector<RuleTable*> mTopTables;     // top tables we start detection from.
 
   SmallVector<RuleTable*> mInProcess;     // tables currently in process.
   SmallVector<RuleTable*> mDone;          // tables done.
+  SmallList<RuleTable*>   mToDo;          // tables to be traversed.
+
+  // We put rules into three categories: Fail, MaybeZero, NonZero.
+  // Both MaybeZero and NonZero could help build recursion.
+  SmallVector<RuleTable*> mMaybeZero;
+  SmallVector<RuleTable*> mNonZero;
+  SmallVector<RuleTable*> mFail;
+
   ContTree<RuleTable*>    mTree;          // the traversing tree.
 
   bool IsInProcess(RuleTable*);
   bool IsDone(RuleTable*);
+  bool IsToDo(RuleTable*);
+  void AddToDo(RuleTable*);
+  void AddToDo(RuleTable*, unsigned);
+
+  bool IsMaybeZero(RuleTable*);
+  bool IsNonZero(RuleTable*);
+  bool IsFail(RuleTable*);
 
   void AddRecursion(RuleTable*, ContTreeNode<RuleTable*>*);
   Recursion* FindOrCreateRecursion(RuleTable*);
 
   void SetupTopTables();
 
-  void DetectRuleTable(RuleTable*, ContTreeNode<RuleTable*>*);
-  void DetectOneof(RuleTable*, ContTreeNode<RuleTable*>*);
-  void DetectZeroormore(RuleTable*, ContTreeNode<RuleTable*>*);
-  void DetectZeroorone(RuleTable*, ContTreeNode<RuleTable*>*);
-  void DetectConcatenate(RuleTable*, ContTreeNode<RuleTable*>*);
-  void DetectTableData(TableData*, ContTreeNode<RuleTable*>*);
+  TResult DetectRuleTable(RuleTable*, ContTreeNode<RuleTable*>*);
+  TResult DetectOneof(RuleTable*, ContTreeNode<RuleTable*>*);
+  TResult DetectZeroormore(RuleTable*, ContTreeNode<RuleTable*>*);
+  TResult DetectZeroorone(RuleTable*, ContTreeNode<RuleTable*>*);
+  TResult DetectConcatenate(RuleTable*, ContTreeNode<RuleTable*>*);
+  TResult DetectTableData(TableData*, ContTreeNode<RuleTable*>*);
 
   // rule to recursion mapping.
   SmallVector<Rule2Recursion*> mRule2Recursions;

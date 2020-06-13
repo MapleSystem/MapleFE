@@ -94,9 +94,9 @@ void Rule2Recursion::AddRecursion(Recursion *rec) {
 ////////////////////////////////////////////////////////////////////////////////////
 
 void RecDetector::SetupTopTables() {
-  mTopTables.PushBack(&TblStatement);
-  mTopTables.PushBack(&TblClassDeclaration);
-  mTopTables.PushBack(&TblInterfaceDeclaration);
+  mToDo.PushBack(&TblStatement);
+  mToDo.PushBack(&TblClassDeclaration);
+  mToDo.PushBack(&TblInterfaceDeclaration);
 }
 
 // A talbe is already been processed.
@@ -112,6 +112,57 @@ bool RecDetector::IsInProcess(RuleTable *t) {
 bool RecDetector::IsDone(RuleTable *t) {
   for (unsigned i = 0; i < mDone.GetNum(); i++) {
     if (t == mDone.ValueAtIndex(i))
+      return true;
+  }
+  return false;
+}
+
+// A talbe is in ToDo
+bool RecDetector::IsToDo(RuleTable *t) {
+  for (unsigned i = 0; i < mToDo.GetNum(); i++) {
+    if (t == mToDo.ValueAtIndex(i))
+      return true;
+  }
+  return false;
+}
+
+// Add a rule to the ToDo list, if it's not in any of the following list,
+// mInProcess, mDone, mToDo.
+void RecDetector::AddToDo(RuleTable *rule) {
+  if (!IsInProcess(rule) && !IsDone(rule) && !IsToDo(rule))
+    mToDo.PushBack(rule);
+}
+
+// Add all child rules into ToDo, starting from index 'start'.
+void RecDetector::AddToDo(RuleTable *rule, unsigned start) {
+  for (unsigned i = start; i < rule_table->mNum; i++) {
+    TableData *data = rule_table->mData + i;
+    if (data->mType == DT_Subtable) {
+      RuleTable *child = data->mData.mEntry;
+      AddToDo(child);
+    }
+  }
+}
+
+bool RecDetector::IsNonZero(RuleTable *t) {
+  for (unsigned i = 0; i < mNonZero.GetNum(); i++) {
+    if (t == mNonZero.ValueAtIndex(i))
+      return true;
+  }
+  return false;
+}
+
+bool RecDetector::IsMaybeZero(RuleTable *t) {
+  for (unsigned i = 0; i < mMaybeZero.GetNum(); i++) {
+    if (t == mMaybeZero.ValueAtIndex(i))
+      return true;
+  }
+  return false;
+}
+
+bool RecDetector::IsFail(RuleTable *t) {
+  for (unsigned i = 0; i < mFail.GetNum(); i++) {
+    if (t == mFail.ValueAtIndex(i))
       return true;
   }
   return false;
@@ -232,11 +283,16 @@ Recursion* RecDetector::FindOrCreateRecursion(RuleTable *rule) {
   return rec;
 }
 
-// 1. There is one and only one chance to traverse a rule table. Once it's done
-//    it will never be traversed again.
-// 2. This guarantees there is one and only one recursion recorded for a loop
-//    even if the loop has multiple nodes.
 void RecDetector::DetectRuleTable(RuleTable *rt, ContTreeNode<RuleTable*> *p) {
+  // The children is done with traversal before. This means we need
+  // stop here too, because all the further traversal from this point
+  // have been done already. People may ask, what if I miss a recursion
+  // from this rule table? The answer is you will never miss a single
+  // one. Because any recursion including this rule will be found
+  // the first time it's traversed. (We also addressed this at the
+  // beginning of this file).
+  // This guarantees there is one and only one recursion recorded for a loop
+  // even if the loop has multiple nodes.
   if (IsDone(rt))
     return;
 
@@ -369,32 +425,65 @@ void RecDetector::DetectZeroormore(RuleTable *rule_table, ContTreeNode<RuleTable
 // G ---> E + ...
 //
 // H is a ZeroorXXX() or not depends on all grand children's result.
-// And looks like the result of a parent node will consider all children's result.
-// So we have to introduce a set of TResult to indicate the result of a rule table.
-//   TRS_Fail:      Definitely a fail for left recursion. Just stop here.
-//   TRS_MaybeZero: The rule table could be empty.
-//   TRS_Done:      The children is done with traversal before. This means we need
-//                  stop here too, because all the further traversal from this point
-//                  have been done already. People may ask, what if I miss a recursion
-//                  from this rule table? The answer is you will never miss a single
-//                  one. Because any recursion including this rule will be found
-//                  the first time it's traversed. (We also addressed this at the
-//                  beginning of this file)
 //
+// We introduce a set of TResult to indicate the result of a rule table. This is
+// corresponding to the three catagories of rule.
+//   TRS_Fail:      Definitely a fail for left recursion. Just stop here.
+//   TRS_MaybeZero: The rule table could be empty. For a rule table, at the first
+//                  time it's traversed, we will save it to mMaybeZero if it's.
+//   TRS_NonZero:   The rule is not empty. It could help to form a recurion.
+
 // Keep in mind, all TResult of leading elements are only used for determining
 // if the following element should be traversed, or just stop and put into ToDo list.
 
-void RecDetector::DetectConcatenate(RuleTable *rule_table, ContTreeNode<RuleTable*> *p) {
-  // First element is always searched.
-  TableData *data = rule_table->mData;
-  if (data->mType == DT_Subtable) {
-    RuleTable *child = data->mData.mEntry;
-    DetectRuleTable(child, p);
-  }
+// At any point when we want to return, we need take the remaining elements
+// to ToDo list, if they are not in any of InProcess, Done and ToDo.
 
-  // The remaining elements will be searched if they are not InProcess().
-  for (unsigned i = 1; i < rule_table->mNum; i++) {
+// The return result tells how good this rule does in loop detection, and we define
+// the algorithm of computing parent node based on children as below.
+//   a. If the first child is TRS_Fail, the parent is TRS_Fail. The rest children
+//      put into ToDo.
+//   b. If all children are TRS_MaybeZero, the parent is MaybeZero.
+//   c. If more than one leading children are TRS_MaybeZero, followed by a TRS_Fail child,
+//      the parent is TRS_NonZero. It's possible the leading children can form
+//      a circle, so we cannot say the parent is fail. It should be NonZero.
+//   a. If more than one leading children are TRS_MaybeZero, followed by a TRS_Done child,
+//      we'll further check that child is MaybeZero. We keep check the children until
+//      a child is TRS_Fail, or a child is TRS_Done and NOT MaybeZero.
+//      a circle.
+//      
+TResult RecDetector::DetectConcatenate(RuleTable *rule_table, ContTreeNode<RuleTable*> *p) {
+  // We use 'res' to record the status of the leading children. TRS_MaybeZero is good
+  // for the beginning as it means it's empty right now.
+  TResult res = TRS_MaybeZero;
+
+  TableData *data = rule_table->mData;
+  RuleTable *child = NULL;
+
+  // We accumulate and calculate the status from the beginning of the first child, and
+  // make decision of the rest children accordingly.
+  for (unsigned i = 0; i < rule_table->mNum; i++) {
     TableData *data = rule_table->mData + i;
+    TResult temp_res = TRS_MaybeZero;
+    if (data->mType == DT_Subtable) {
+      child = data->mData.mEntry;
+      temp_res = DetectRuleTable(child, p);
+    } else {
+      temp_res = TRS_Fail;
+    }
+  
+    MASSERT(res == TRS_MaybeZero);
+
+    // If we hit a explicitly failed child, the parent is also fail.
+    // Add the rest children to ToDo list.
+    if (temp_res == TRS_Fail) {
+      res = TRS_Fail;
+      AddToDo(rule_table, i+1);
+      return TRS_Fail;
+    } else if (temp_res == TRS_MaybeZero) {
+      res = TRS_MaybeZero;
+    }
+
     if (data->mType == DT_Subtable) {
       RuleTable *child = data->mData.mEntry;
       if (!IsInProcess(child))
@@ -404,16 +493,19 @@ void RecDetector::DetectConcatenate(RuleTable *rule_table, ContTreeNode<RuleTabl
 }
 
 // We start from the top tables.
-// Tables not accssible from top tables won't be handled.
+// Iterate untile mToDo is empty.
 void RecDetector::Detect() {
   mDone.Clear();
-
   SetupTopTables();
-  for (unsigned i = 0; i < mTopTables.GetNum(); i++) {
+  while(!mToDo.Empty()) {
     mInProcess.Clear();
     mTree.Clear();
-    RuleTable *top = mTopTables.ValueAtIndex(i);
-    DetectRuleTable(top, NULL);
+    RuleTable *front = mToDo.Front();
+    mToDo.PopFront();
+    // It's possible that a ToDo rule was later finished or in the middle of process
+    // after it was put into the ToDo list.
+    if (!IsDone(front) && !IsInProcess())
+      DetectRuleTable(front, NULL);
   }
 }
 
@@ -432,7 +524,7 @@ void RecDetector::Release() {
 
   mRule2Recursions.Release();
   mRecursions.Release();
-  mTopTables.Release();
+  mToDo.Release();
   mInProcess.Release();
   mDone.Release();
   mTree.Release();
