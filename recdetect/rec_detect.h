@@ -106,7 +106,11 @@ public:
 enum TResult {
   TRS_NonZero,
   TRS_MaybeZero,
-  TRS_Fail
+  TRS_Fail,
+  TRS_Done,       // This is special one since the rule is done before, we don't
+                  // know the real status, but we can find it out by check IsFail()
+                  // IsMaybeZero() and IsNonZero().
+  TRS_NA          // Simply used as the initial status.
 };
 
 // Left Recursion Detector.
@@ -143,8 +147,8 @@ private:
 
   TResult DetectRuleTable(RuleTable*, ContTreeNode<RuleTable*>*);
   TResult DetectOneof(RuleTable*, ContTreeNode<RuleTable*>*);
-  TResult DetectZeroormore(RuleTable*, ContTreeNode<RuleTable*>*);
-  TResult DetectZeroorone(RuleTable*, ContTreeNode<RuleTable*>*);
+  TResult DetectData(RuleTable*, ContTreeNode<RuleTable*>*);
+  TResult DetectZeroorXXX(RuleTable*, ContTreeNode<RuleTable*>*);
   TResult DetectConcatenate(RuleTable*, ContTreeNode<RuleTable*>*);
   TResult DetectTableData(TableData*, ContTreeNode<RuleTable*>*);
 

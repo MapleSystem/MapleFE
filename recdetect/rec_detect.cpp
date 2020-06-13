@@ -134,7 +134,7 @@ void RecDetector::AddToDo(RuleTable *rule) {
 }
 
 // Add all child rules into ToDo, starting from index 'start'.
-void RecDetector::AddToDo(RuleTable *rule, unsigned start) {
+void RecDetector::AddToDo(RuleTable *rule_table, unsigned start) {
   for (unsigned i = start; i < rule_table->mNum; i++) {
     TableData *data = rule_table->mData + i;
     if (data->mType == DT_Subtable) {
@@ -283,7 +283,7 @@ Recursion* RecDetector::FindOrCreateRecursion(RuleTable *rule) {
   return rec;
 }
 
-void RecDetector::DetectRuleTable(RuleTable *rt, ContTreeNode<RuleTable*> *p) {
+TResult RecDetector::DetectRuleTable(RuleTable *rt, ContTreeNode<RuleTable*> *p) {
   // The children is done with traversal before. This means we need
   // stop here too, because all the further traversal from this point
   // have been done already. People may ask, what if I miss a recursion
@@ -294,11 +294,10 @@ void RecDetector::DetectRuleTable(RuleTable *rt, ContTreeNode<RuleTable*> *p) {
   // This guarantees there is one and only one recursion recorded for a loop
   // even if the loop has multiple nodes.
   if (IsDone(rt))
-    return;
+    return TRS_Done;
 
   // If find a new Recursion, we are done. Don't need go deeper into
-  // children nodes. However, 'rt' is not done yet since the current path
-  // is just one path. We cannot set IsDone() at here.
+  // children nodes because they will be handled in the first traversal.
   if (IsInProcess(rt)) {
     AddRecursion(rt, p);
     return;
@@ -308,22 +307,25 @@ void RecDetector::DetectRuleTable(RuleTable *rt, ContTreeNode<RuleTable*> *p) {
 
   // Create new tree node.
   ContTreeNode<RuleTable*> *node = mTree.NewNode(rt, p);
-
   EntryType type = rt->mType;
+  TResult res = TRS_MaybeZero;
   switch(type) {
   case ET_Oneof:
-    DetectOneof(rt, node);
+    res = DetectOneof(rt, node);
     break;
   case ET_Data:
+    res = DetectData(rt, node);
+    break;
   case ET_Zeroorone:
   case ET_Zeroormore:
-    DetectZeroormore(rt, node);
+    res = DetectZeroorXXX(rt, node);
     break;
   case ET_Concatenate:
-    DetectConcatenate(rt, node);
+    res = DetectConcatenate(rt, node);
     break;
   case ET_Null:
   default:
+    MASSERT(0 && "Unexpected EntryType of rule.");
     break;
   }
 
@@ -335,27 +337,117 @@ void RecDetector::DetectRuleTable(RuleTable *rt, ContTreeNode<RuleTable*> *p) {
   // It's done.
   MASSERT(!IsDone(rt));
   mDone.PushBack(rt);
+
+  if (res == TRS_Fail) {
+    MASSERT(!IsFail(rt));
+    mFail.PushBack(rt);
+  } else if (res == TRS_MaybeZero) {
+    MASSERT(!IsMaybeZero(rt));
+    mMaybeZero.PushBack(rt);
+  } else if (res == TRS_NonZero) {
+    MASSERT(!IsNonZero(rt));
+    mNonZero.PushBack(rt);
+  } else {
+    // It couldn't be TRS_Done or TRS_NA, since we already
+    // handled TRS_Done in those DetectXXX().
+    MASSERT(0 && "Unexpected return result.");
+  }
+
+  return res;
 }
 
 // For Oneof rule, we try to detect for all its children if they are a rule table too.
-void RecDetector::DetectOneof(RuleTable *rule_table, ContTreeNode<RuleTable*> *p) {
+// 1. If there is one or more children are MaybeZero, the parent is MaybeZero
+// 2. If and only if all chidlren are Fail, the parent is Fail.
+// 3. All other cases, the parent is NonZero.
+//
+// No children will be put in ToDo, since all of them should be traversed.
+TResult RecDetector::DetectOneof(RuleTable *rule_table, ContTreeNode<RuleTable*> *p) {
+  TResult result = TRS_NA;
   for (unsigned i = 0; i < rule_table->mNum; i++) {
     TableData *data = rule_table->mData + i;
+    TResult temp_res = TRS_MaybeZero;
+    RuleTable *child = NULL;
     if (data->mType == DT_Subtable) {
-      RuleTable *child = data->mData.mEntry;
-      DetectRuleTable(child, p);
+      child = data->mData.mEntry;
+      temp_res = DetectRuleTable(child, p);
+    } else {
+      temp_res = TRS_Fail;
     }
+
+    if (temp_res == TRS_MaybeZero) {
+      // MaybeZero is the strongest claim.
+      result = TRS_MaybeZero;
+    } else if (temp_res == TRS_NonZero) {
+      // Nonzero is just weaker than MaybeZero
+      if (result != TRS_MaybeZero)
+        result = TRS_NonZero;
+    } else if (temp_res == TRS_Fail) {
+      // Fail is the weakest,
+      if (result == TRS_NA)
+        result = TRS_Fail;
+    } else if (temp_res == TRS_Done) {
+      if (IsMaybeZero(child)) {
+        result = TRS_MaybeZero;
+      } else if (IsNonZero(child)) {
+        if (result != TRS_MaybeZero)
+          result = TRS_NonZero;
+      } else if (IsFail(child)) {
+        if (result == TRS_NA)
+          result = TRS_Fail;
+      } else
+        MASSERT(0 && "Unexpected result of done child.");
+    } else
+      MASSERT(0 && "Unexpected temp_res of child");
   }
+
+  return result;
 }
 
-// Data, Zeroormore and Zeroorone has the same way to handle.
-void RecDetector::DetectZeroormore(RuleTable *rule_table, ContTreeNode<RuleTable*> *p) {
+// Zeroormore and Zeroorone has the same way to handle.
+TResult RecDetector::DetectZeroorXXX(RuleTable *rule_table, ContTreeNode<RuleTable*> *p) {
+  TResult result = TRS_NA;
   MASSERT((rule_table->mNum == 1) && "zeroormore node has more than one elements?");
   TableData *data = rule_table->mData;
   if (data->mType == DT_Subtable) {
     RuleTable *child = data->mData.mEntry;
-    DetectRuleTable(child, p);
+    result = DetectRuleTable(child, p);
+  } else {
+    // For the non-table data, we just do nothing
   }
+
+  return TRS_MaybeZero;
+}
+
+TResult RecDetector::DetectData(RuleTable *rule_table, ContTreeNode<RuleTable*> *p) {
+  TResult result = TRS_NA;
+  RuleTable *child = NULL;
+  MASSERT((rule_table->mNum == 1) && "Data node has more than one elements?");
+  TableData *data = rule_table->mData;
+  if (data->mType == DT_Subtable) {
+    child = data->mData.mEntry;
+    result = DetectRuleTable(child, p);
+  } else {
+    result = TRS_Fail;
+  }
+
+  if (result == TRS_Done) {
+    MASSERT(child);
+    if (IsMaybeZero(child)) {
+      MASSERT(!IsNonZero(child) && !IsFail(child));
+      result = TRS_MaybeZero;
+    } else if (IsNonZero(child)) {
+      MASSERT(!IsMaybeZero(child) && !IsFail(child));
+      result = TRS_NonZero;
+    } else if (IsFail(child)) {
+      MASSERT(!IsMaybeZero(child) && !IsNonZero(child));
+      result = TRS_Fail;
+    } else {
+      MASSERT(0 && "Child is not in any categories.");
+    }
+  }
+
+  return result;
 }
 
 // The real challenge in left recursion detection is coming from Concatenate node. Before
@@ -431,7 +523,11 @@ void RecDetector::DetectZeroormore(RuleTable *rule_table, ContTreeNode<RuleTable
 //   TRS_Fail:      Definitely a fail for left recursion. Just stop here.
 //   TRS_MaybeZero: The rule table could be empty. For a rule table, at the first
 //                  time it's traversed, we will save it to mMaybeZero if it's.
-//   TRS_NonZero:   The rule is not empty. It could help to form a recurion.
+//   TRS_NonZero:   The rule is not empty. It may or may not help to form a recurion.
+//   TRS_Done:      This one is extra return result which doesn't have corresponding
+//                  rule catogeries of it. But the rule can be figured out by
+//                  checking IsFail(), IsMaybeZero() and IsNonZero(), because this
+//                  rule is done before.
 
 // Keep in mind, all TResult of leading elements are only used for determining
 // if the following element should be traversed, or just stop and put into ToDo list.
@@ -447,10 +543,12 @@ void RecDetector::DetectZeroormore(RuleTable *rule_table, ContTreeNode<RuleTable
 //   c. If more than one leading children are TRS_MaybeZero, followed by a TRS_Fail child,
 //      the parent is TRS_NonZero. It's possible the leading children can form
 //      a circle, so we cannot say the parent is fail. It should be NonZero.
-//   a. If more than one leading children are TRS_MaybeZero, followed by a TRS_Done child,
+//   d. If more than one leading children are TRS_MaybeZero, followed by a TRS_Done child,
 //      we'll further check that child is MaybeZero. We keep check the children until
 //      a child is TRS_Fail, or a child is TRS_Done and NOT MaybeZero.
 //      a circle.
+//   e. No matter how many leading children of TRS_NonZero or MaybeZero, if the current
+//      child is Nonzero, we just keep going. And the parent is NonZero.
 //      
 TResult RecDetector::DetectConcatenate(RuleTable *rule_table, ContTreeNode<RuleTable*> *p) {
   // We use 'res' to record the status of the leading children. TRS_MaybeZero is good
@@ -465,6 +563,7 @@ TResult RecDetector::DetectConcatenate(RuleTable *rule_table, ContTreeNode<RuleT
   for (unsigned i = 0; i < rule_table->mNum; i++) {
     TableData *data = rule_table->mData + i;
     TResult temp_res = TRS_MaybeZero;
+    child = NULL;
     if (data->mType == DT_Subtable) {
       child = data->mData.mEntry;
       temp_res = DetectRuleTable(child, p);
@@ -472,24 +571,50 @@ TResult RecDetector::DetectConcatenate(RuleTable *rule_table, ContTreeNode<RuleT
       temp_res = TRS_Fail;
     }
   
-    MASSERT(res == TRS_MaybeZero);
+    MASSERT((res == TRS_MaybeZero) || (res == TRS_NonZero));
 
-    // If we hit a explicitly failed child, the parent is also fail.
-    // Add the rest children to ToDo list.
-    if (temp_res == TRS_Fail) {
-      res = TRS_Fail;
-      AddToDo(rule_table, i+1);
-      return TRS_Fail;
-    } else if (temp_res == TRS_MaybeZero) {
-      res = TRS_MaybeZero;
-    }
-
-    if (data->mType == DT_Subtable) {
-      RuleTable *child = data->mData.mEntry;
-      if (!IsInProcess(child))
-        DetectRuleTable(child, p);
+    if (temp_res == TRS_MaybeZero) {
+      // The leading nodes are all MaybeZero at this point.
+      // Just let the traversal go on with the rest children rules.
+      if (res == TRS_MaybeZero)
+        res = TRS_MaybeZero;
+    } else if (temp_res == TRS_NonZero) {
+      // No matter how many leading children of NonZero or MaybeZero
+      // Just let the traversal go on with the rest children rules.
+      res = TRS_NonZero;
+    } else if (temp_res == TRS_Fail) {
+      if (i == 0) {
+        res = TRS_Fail;
+        AddToDo(rule_table, 1);
+        return res;
+      } else  {
+        res = TRS_NonZero;
+        AddToDo(rule_table, 1);
+        return res;
+      }
+    } else if (temp_res == TRS_Done) {
+      // further checking the real status of rule.
+      MASSERT(child);
+      if (IsFail(child)) {
+        if (i == 0) {
+          res = TRS_Fail;
+          AddToDo(rule_table, 1);
+          return res;
+        } else  {
+          res = TRS_NonZero;
+          AddToDo(rule_table, 1);
+          return res;
+        }
+      } else if (IsMaybeZero(child)) {
+        if (res == TRS_MaybeZero)
+          res = TRS_MaybeZero;
+      } else if (IsNonZero(child)) {
+        res = TRS_NonZero;
+      }
     }
   }
+
+  return res;
 }
 
 // We start from the top tables.
@@ -504,7 +629,7 @@ void RecDetector::Detect() {
     mToDo.PopFront();
     // It's possible that a ToDo rule was later finished or in the middle of process
     // after it was put into the ToDo list.
-    if (!IsDone(front) && !IsInProcess())
+    if (!IsDone(front) && !IsInProcess(front))
       DetectRuleTable(front, NULL);
   }
 }
@@ -524,9 +649,15 @@ void RecDetector::Release() {
 
   mRule2Recursions.Release();
   mRecursions.Release();
+
   mToDo.Release();
   mInProcess.Release();
   mDone.Release();
+
+  mMaybeZero.Release();
+  mNonZero.Release();
+  mFail.Release();
+
   mTree.Release();
 }
 
