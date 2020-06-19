@@ -20,6 +20,7 @@
 /////////////////////////////////////////////////////////////////////////////////////
 
 #include "recursion.h"
+#include "gen_debug.h"
 
 // Find the index-th child and return it.
 // This function only returns Token or RuleTable, it won't take of FNT_Concat.
@@ -440,7 +441,7 @@ void Recursion::FindFronNodes(unsigned circle_index) {
 
 void Recursion::FindFronNodes() {
   const char *name = GetRuleTableName(mLeadNode);
-  std::cout << "FindFronNodes for " << name << std::endl;
+  //std::cout << "FindFronNodes for " << name << std::endl;
   for (unsigned i = 0; i < mNum; i++)
     FindFronNodes(i);
 }

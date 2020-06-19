@@ -48,8 +48,14 @@ bool Parser::TraverseFronNode(AppealNode *parent, FronNode fnode, Recursion *rec
     //std::cout << "FronNode " << name << " " << temp_found << std::endl;
   } else if (fnode.mType == FNT_Concat) {
     // All rules/tokens from the starting point will be checked.
-    RuleTable *ruletable = rec->FindRuleOnCricle(cir_idx, fnode.mPos);
-    found = TraverseConcatenate(ruletable, parent, fnode.mData.mStartingIndex);
+    RuleTable *ruletable = NULL;
+    if (!rec) {
+      MASSERT(!parent->IsPseudo());
+      ruletable = parent->GetTable();
+    } else {
+      ruletable = rec->FindRuleOnCircle(cir_idx, fnode.mPos);
+    }
+    found = TraverseConcatenate(ruletable, parent, fnode.mData.mStartIndex);
   } else {
     MASSERT(0 && "Unexpected FronNode type.");
   }
