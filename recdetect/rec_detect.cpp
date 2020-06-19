@@ -776,6 +776,14 @@ void RecDetector::WriteCppFile() {
   std::string last_str = "LeftRecursion **gLeftRecursions = TotalRecursions;";
   mCppFile->WriteOneLine(last_str.c_str(), last_str.size());
 
+  // Dump the separating lines.
+  last_str = "///////////////////////////////////////////////////////////////";
+  mCppFile->WriteOneLine(last_str.c_str(), last_str.size());
+  last_str = "//                       Ruel2Recursion                      //";
+  mCppFile->WriteOneLine(last_str.c_str(), last_str.size());
+  last_str = "///////////////////////////////////////////////////////////////";
+  mCppFile->WriteOneLine(last_str.c_str(), last_str.size());
+
   // step 4. Write Rule2Recursion mapping.
   WriteRule2Recursion();
 }

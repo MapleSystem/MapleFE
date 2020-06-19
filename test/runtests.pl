@@ -185,9 +185,9 @@ if ($countFailed eq 0) {
   print "Total Test Cases: $count\n";
   if(scalar(@successed_file) > 0) {
     print "\n=========================\npassed $countPassed tests:\n\n";
-    #foreach $passed (@successed_file) {
-    #  print $passed."\n";
-    #}
+    foreach $passed (@successed_file) {
+      print $passed."\n";
+    }
     #print $fh "$countPassed testcases passed\n";
   }
   print "\n=========================\nfailed $countFailed tests:\n\n";

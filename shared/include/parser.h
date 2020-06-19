@@ -264,7 +264,7 @@ private:
   bool TraverseRuleTable(RuleTable*, AppealNode*);    // success if all tokens are matched.
   AppealNode* TraverseRuleTablePre(RuleTable*, AppealNode*); // success if all tokens are matched.
   bool TraverseTableData(TableData*, AppealNode*);    // success if all tokens are matched.
-  bool TraverseConcatenate(RuleTable*, AppealNode*);
+  bool TraverseConcatenate(RuleTable*, AppealNode*, unsigned start = 0);
   bool TraverseOneof(RuleTable*, AppealNode*);
   bool TraverseZeroormore(RuleTable*, AppealNode*);
   bool TraverseZeroorone(RuleTable*, AppealNode*);
@@ -335,15 +335,17 @@ private:
 // The following section is all about left recursion parsing
 /////////////////////////////////////////////////////////////
 private:
-  SmallVector<RecStackEntry> RecStack;
+  RecursionAll               mRecursionAll;
+  SmallVector<RecStackEntry> mRecStack;
+
   void PushRecStack(RuleTable *rt, unsigned cur_token);
   bool InRecStack(RuleTable*, unsigned);
 
   LeftRecursion* FindRecursion(RuleTable *);
   bool IsLeadNode(RuleTable *);
   bool TraverseLeadNode(AppealNode*, AppealNode *parent);
-  bool TraverseCircle(AppealNode*, LeftRecursion*, unsigned*,
-                      SmallVector<RuleTable*> *);
+  bool TraverseCircle(AppealNode *lead, Recursion *rec, unsigned idx);
+  bool TraverseFronNode(AppealNode *parent, FronNode fnode);
   void ApplySuccInfoOnPath(AppealNode *lead, AppealNode *pseudo, bool succ);
   void ConstructPath(AppealNode*, AppealNode*, unsigned*, unsigned);
 
@@ -360,6 +362,7 @@ public:
   bool ParseStmt();
   void InitPredefinedTokens();
   void SetupTopTables();  //Each language parser will implement this by itself. 
+  void InitRecursion();
   unsigned LexOneLine();
 };
 

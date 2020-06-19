@@ -23,186 +23,35 @@
 #include "ruletable_util.h"
 #include "gen_debug.h"
 
-// Find the LeftRecursion with 'rt' the LeadNode.
-LeftRecursion* Parser::FindRecursion(RuleTable *rt) {
-  for (unsigned i = 0; i < gLeftRecursionsNum; i++) {
-    LeftRecursion *rec = gLeftRecursions[i];
-    if (rec->mRuleTable == rt)
-      return rec;
-  }
-  return NULL;
-}
-
-bool Parser::IsLeadNode(RuleTable *rt) {
-  if (FindRecursion(rt))
-    return true;
-  else
-    return false;
-}
-
-// Find the LeadFronNode-s of a LeadNode.
-// Caller assures 'rt' is a LeadNode.
-static void FindLeadFronNodes(RuleTable *rt, LeftRecursion *rec, SmallVector<FronNode> *nodes) {
-  SmallVector<unsigned> circle_nodes;
-  for (unsigned i = 0; i < rec->mNum; i++) {
-    unsigned *circle = rec->mCircles[i];
-    unsigned num = circle[0];
-    MASSERT((num >= 1) && "Circle has no nodes?");
-    unsigned first_node = circle[1];
-    circle_nodes.PushBack(first_node);
-  }
-
-  for (unsigned i = 0; i < rt->mNum; i++) {
-    bool found = false;
-    for (unsigned j = 0; j < circle_nodes.GetNum(); j++) {
-      if (i == circle_nodes.ValueAtIndex(j)) {
-        found = true;
-        break;
-      }
-    }
-
-    if (!found) {
-      FronNode fnode = RuleFindChildAtIndex(rt, i);
-      nodes->PushBack(fnode);
-    }
-  }
-}
-
-// Find all the nodes in all circles of the recursion, save them in 'nodes'.
-// Each node should be a RuleTable* since it forms a circle.
-static void FindRecursionNodes(RuleTable *lead,
-                               LeftRecursion *rec,
-                               SmallVector<RuleTable*> *nodes) {
-  nodes->PushBack(lead);
-  for (unsigned i = 0; i < rec->mNum; i++) {
-    unsigned *circle = rec->mCircles[i];
-    unsigned len = circle[0];
-    RuleTable *prev = lead;
-    for (unsigned j = 1; j <= len; j++) {
-      unsigned child_index = circle[j];
-      FronNode node = RuleFindChildAtIndex(prev, child_index);
-      MASSERT(node.mIsTable);
-      RuleTable *rt = node.mData.mTable;
-
-      if (j == len) {
-        // The last one should be the back edge.
-        MASSERT(rt == lead);
-      } else {
-        // a node could be shared among multiple circles, need avoid duplication.
-        bool found = false;
-        for (unsigned k = 0; k < nodes->GetNum(); k++) {
-          if (rt == nodes->ValueAtIndex(k)) {
-            found = true;
-            break;
-          }
-        }
-        if (!found)
-          nodes->PushBack(rt);
-      }
-
-      prev = rt;
-    }
-  }
-}
-
-// Find the FronNode along one of the circles.
-// We also record the position of each FronNode at the circle. 1 means the first
-// node after LeadNode.
-// FronNode: Nodes directly accessible from 'circle' but not in RecursionNodes.
-//           NOTE. If 'prev' node is concatenate, 'next' must be its 1st child. And
-//                 the rest children are not counted as FronNode since they cannot
-//                 be matched alone without 'next'.
-static void FindFronNodes(RuleTable *lead,
-                          LeftRecursion *rec,
-                          SmallVector<RuleTable*> *rec_nodes,
-                          unsigned *circle,
-                          SmallVector<FronNode> *nodes,
-                          SmallVector<unsigned> *pos) {
-  unsigned len = circle[0];
-  RuleTable *prev = lead;
-  for (unsigned j = 1; j <= len; j++) {
-    unsigned child_index = circle[j];
-    FronNode node = RuleFindChildAtIndex(prev, child_index);
-    MASSERT(node.mIsTable);
-    RuleTable *next = node.mData.mTable;
-
-    // The last one should be the back edge.
-    if (j == len)
-      MASSERT(next == lead);
-
-    // prev is lead, FronNode here is a LeadFronNode and will be
-    // traversed in TraverseLeadNode();
-    if (j == 1) {
-      prev = next;
-      continue;
-    }
-
-    // Only Oneof node is qualified to have FronNode.
-    EntryType prev_type = prev->mType;
-    switch(prev_type) {
-    case ET_Oneof: {
-      // Look into every childof 'prev'. If it's not 'next' and
-      // not in 'rec_nodes', it's a FronNode.
-      for (unsigned i = 0; i < prev->mNum; i++) {
-        TableData *data = prev->mData + i;
-        FronNode fnode;
-        if (data->mType == DT_Token) {
-          fnode.mIsTable = false;
-          fnode.mData.mToken = data->mData.mToken;
-          nodes->PushBack(fnode);
-          pos->PushBack(j);
-        } else if (data->mType = DT_Subtable) {
-          RuleTable *ruletable = data->mData.mEntry;
-          bool found = false;
-          for (unsigned k = 0; k < rec_nodes->GetNum(); k++) {
-            if (ruletable == rec_nodes->ValueAtIndex(k)) {
-              found = true;
-              break;
-            }
-          }
-          if (!found && (ruletable != next)) {
-            fnode.mIsTable = true;
-            fnode.mData.mTable = ruletable;
-            nodes->PushBack(fnode);
-            pos->PushBack(j);
-          }
-        } else {
-          MASSERT(0 && "unexpected data type in ruletable.");
-        }
-      }
-      break;
-    }
-
-    case ET_Zeroormore:
-    case ET_Zeroorone:
-    case ET_Data:
-      // There is one and only one child. And it must be in circle.
-      // In this case, there is no FronNode.
-      MASSERT((prev->mNum == 1) && "zeroorxxx node has more than one elements?");
-      MASSERT((child_index == 0));
-      break;
-
-    case ET_Concatenate:
-      break;
-
-    case ET_Null:
-    default:
-      MASSERT(0 && "Wrong node type in a circle");
-      break;
-    }// end of switch
-
-    prev = next;
-  }
-}
 
 bool Parser::InRecStack(RuleTable *rt, unsigned start_token) {
   RecStackEntry e = {rt, start_token};
-  return RecStack.Find(e);
+  return mRecStack.Find(e);
 }
 
 void Parser::PushRecStack(RuleTable *rt, unsigned start_token) {
   RecStackEntry e = {rt, start_token};
-  return RecStack.PushBack(e);
+  return mRecStack.PushBack(e);
+}
+
+bool Parser::TraverseFronNode(AppealNode *parent, FronNode fnode) {
+  bool found = false;
+  if (fnode.mType == FNT_Token) {
+    Token *token = fnode.mData.mToken;
+    found = TraverseToken(token, parent);
+    //const char *name = token->GetName();
+    //std::cout << "FronNode " << name << " " << temp_found << std::endl;
+  } else if (fnode.mType == FNT_Rule) {
+    RuleTable *rt = fnode.mData.mTable;
+    found = TraverseRuleTable(rt, parent);
+    //const char *name = GetRuleTableName(rt);
+    //std::cout << "FronNode " << name << " " << temp_found << std::endl;
+  } else if (fnode.mType == FNT_Concat) {
+    // All rules/tokens from the starting point will be checked.
+    found = TraverseConcatenate(fnode.mData.mTable, parent, fnode.mPos);
+  } else {
+    MASSERT(0 && "Unexpected FronNode type.");
+  }
 }
 
 // This is the main entry for traversing a new recursion.
@@ -216,41 +65,27 @@ bool Parser::TraverseLeadNode(AppealNode *appeal, AppealNode *parent) {
   //         the recursion stack information.
   RuleTable *rt = appeal->GetTable();
 
-  std::cout << "Enter LeadNode " << GetRuleTableName(rt)  << std::endl;
+  //std::cout << "Enter LeadNode " << GetRuleTableName(rt)  << std::endl;
 
   // It's possible that we re-enter a LeadNode. But we will skip it if it's
   // already in the middle of traversal.
-  if (InRecStack(rt, mCurToken)) {
+  if (InRecStack(rt, mCurToken))
     return false;
-  }
   PushRecStack(rt, mCurToken);
 
-  unsigned saved_curtoken = mCurToken;
+  // Step 2. Find Recursion
+  Recursion *rec = mRecursionAll.FindRecursion(rt);
 
-  // Step 2. Find RecursionNode, LeadFronNodes
-  SmallVector<RuleTable*> rec_nodes;     // all recursion nodes, should be RuleTable
-  SmallVector<FronNode> lead_fron_nodes; // all LeadFronNodes.
-  LeftRecursion *rec = FindRecursion(rt);
-  FindLeadFronNodes(rt, rec, &lead_fron_nodes);
-  FindRecursionNodes(rt, rec, &rec_nodes);
-
+  // Step 3. Traverse LeadFronNodes
   unsigned saved_mCurToken = mCurToken;
   bool found = false;
 
-  // Step 3. Traverse LeadFronNodes
-  for (unsigned i = 0; i < lead_fron_nodes.GetNum(); i++){
+  for (unsigned i = 0; i < rec->mLeadFronNodes.GetNum(); i++){
     bool temp_found = false;
     gSuccTokensNum = 0;
     mCurToken = saved_mCurToken;
-    FronNode fnode = lead_fron_nodes.ValueAtIndex(i);
-    if (!fnode.mIsTable) {
-      temp_found = TraverseToken(fnode.mData.mToken, parent);
-    } else {
-      RuleTable *rt = fnode.mData.mTable;
-      std::cout << "Enter LeadFronNode " << GetRuleTableName(rt) << std::endl;
-      temp_found = TraverseRuleTable(fnode.mData.mTable, parent);
-    }
-
+    FronNode fnode = rec->mLeadFronNodes.ValueAtIndex(i);
+    temp_found = TraverseFronNode(appeal, fnode);
     found |= temp_found;
 
     // Add succ to 'appeal' and SuccMatch.
@@ -266,74 +101,46 @@ bool Parser::TraverseLeadNode(AppealNode *appeal, AppealNode *parent) {
   unsigned temp_gSuccTokensNum = 0;
   unsigned temp_gSuccTokens[MAX_SUCC_TOKENS];
   for (unsigned i = 0; i < rec->mNum; i++) {
-    unsigned *circle = rec->mCircles[i];
     mCurToken = saved_mCurToken;
-    std::cout << "TraverseCircle:" << i << std::endl;
-    bool temp_found = TraverseCircle(appeal, rec, circle, &rec_nodes);
+    //std::cout << "TraverseCircle:" << i << std::endl;
+    bool temp_found = TraverseCircle(appeal, rec, i);
     found |= temp_found;
   }
 
   // Step 5. Restore the recursion stack.
-  RecStackEntry entry = RecStack.Back();
-  MASSERT((entry.mLeadNode == rt) && (entry.mStartToken == saved_curtoken));
-  RecStack.PopBack();
+  RecStackEntry entry = mRecStack.Back();
+  MASSERT((entry.mLeadNode == rt) && (entry.mStartToken == saved_mCurToken));
+  mRecStack.PopBack();
 
   // Step 6. The gSuccTokens/Num will be updated in the caller in parser.cpp
 
-  std::cout << "Exit LeadNode " << GetRuleTableName(rt)  << std::endl;
+  //std::cout << "Exit LeadNode " << GetRuleTableName(rt)  << std::endl;
 }
 
 // There are several things to be done in this function.
 // 1. Traverse each FronNode
 // 2. No matter succ or fail, build the path in Appeal tree, and add succ match
 //    info to all node in the path and the lead node.
-bool Parser::TraverseCircle(AppealNode *lead,
-                            LeftRecursion *rec,
-                            unsigned *circle,
-                            SmallVector<RuleTable*> *rec_nodes) {
-  SmallVector<FronNode> fron_nodes;
-  SmallVector<unsigned> fron_pos;   // position in circle of each fron node.
-                                    // 1 means the first node after lead.
-  RuleTable *rt = lead->GetTable();
-
-  // A FronNode in a circle be also a FronNode in another circle. They
-  // are duplicated and traversed twice. But only the first time we do real
-  // traversal, the other times will just check the succ or failure info.
-  FindFronNodes(rt, rec, rec_nodes, circle, &fron_nodes, &fron_pos);
-
-  // Try each FronNode.
-  // To access the Appeal Tree created of each FronNode, we use pseudo nodes
-  // which play the role of parent of the created nodes.
+bool Parser::TraverseCircle(AppealNode *lead, Recursion *rec, unsigned idx) {
+  SmallVector<FronNode> *fron_nodes = rec->mFronNodes.ValueAtIndex(idx);
   unsigned saved_mCurToken = mCurToken;
-  SmallVector<AppealNode*> PseudoParents;
   bool found = false;
-  for (unsigned i = 0; i < fron_nodes.GetNum(); i++) {
+
+  for (unsigned i = 0; i < fron_nodes->GetNum(); i++) {
+    // To access the Appeal Tree created of each FronNode, we use pseudo nodes
+    // which play the role of parent of the created nodes.
     AppealNode *pseudo_parent = new AppealNode();
     pseudo_parent->SetIsPseudo();
     pseudo_parent->SetStartIndex(mCurToken);
     mAppealNodes.push_back(pseudo_parent);
 
-    FronNode fnode = fron_nodes.ValueAtIndex(i);
-    if (!fnode.mIsTable) {
-      Token *token = fnode.mData.mToken;
-      bool temp_found = TraverseToken(token, pseudo_parent);
-      found |= temp_found;
-
-      const char *name = token->GetName();
-      std::cout << "FronNode " << name << " " << temp_found << std::endl;
-    } else {
-      RuleTable *rt = fnode.mData.mTable;
-      bool temp_found = TraverseRuleTable(rt, pseudo_parent);
-      found |= temp_found;
-
-      const char *name = GetRuleTableName(rt);
-      std::cout << "FronNode " << name << " " << temp_found << std::endl;
-    }
-
-    std::cout << "Before construct path LeadNode " << GetRuleTableName(rt) << std::endl;
+    FronNode fnode = fron_nodes->ValueAtIndex(i);
+    bool temp_found = TraverseFronNode(pseudo_parent, fnode);
+    found |= temp_found;
 
     // Create a path.
-    ConstructPath(lead, pseudo_parent, circle, fron_pos.ValueAtIndex(i));
+    unsigned *circle = rec->mCircles[idx];
+    ConstructPath(lead, pseudo_parent, circle, fnode.mPos);
 
     // Apply the start index / succ info to the path.
     mCurToken = saved_mCurToken;
@@ -361,7 +168,7 @@ void Parser::ConstructPath(AppealNode *lead, AppealNode *ps_node, unsigned *circ
   for (unsigned j = 1; j < num_steps; j++) {
     unsigned child_index = circle[j];
     FronNode node = RuleFindChildAtIndex(prev, child_index);
-    MASSERT(node.mIsTable);
+    MASSERT(node.mType == FNT_Rule);
 
     next = node.mData.mTable;
     AppealNode *next_anode = new AppealNode();
@@ -391,15 +198,15 @@ void Parser::ApplySuccInfoOnPath(AppealNode *lead, AppealNode *pseudo, bool succ
       name = GetRuleTableName(node->GetTable());
     }
 
-    std::cout << "Update rule:" << name << "@" << mCurToken;
+    //std::cout << "Update rule:" << name << "@" << mCurToken;
     if (succ) {
       node->SetStartIndex(mCurToken);
       UpdateSuccInfo(mCurToken, node);
       node->mAfter = Succ;
-      std::cout << " succ." << std::endl;
+      //std::cout << " succ." << std::endl;
     } else {
       node->mAfter = FailChildrenFailed;
-      std::cout << " fail." << std::endl;
+      //std::cout << " fail." << std::endl;
     }
 
     if (node == lead)

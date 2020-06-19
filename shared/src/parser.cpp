@@ -730,7 +730,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
   //         The match info of 'appeal' and its SuccMatch will be updated
   //         inside TraverseLeadNode().
 
-  if (IsLeadNode(rule_table)) {
+  if (mRecursionAll.IsLeadNode(rule_table)) {
     bool found = TraverseLeadNode(appeal, parent);
     if (!found) {
       appeal->mAfter = FailChildrenFailed;
@@ -1068,7 +1068,10 @@ bool Parser::TraverseOneof(RuleTable *rule_table, AppealNode *parent) {
 //           If ZEROORONE(xxx) doesn't match anything, it sets gSuccTokensNum to 0. However
 //           rule AA matches multiple tokens. So gSuccTokensNum needs to be accumulated.
 
-bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *parent) {
+// 'start' tells which child rule to start the matching. It's mainly used in FronNode matching
+// where FronNode could start from the middle of a set of Concatenate children. Most of
+// the time start is 0.
+bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *parent, unsigned start) {
   bool found = false;
   unsigned prev_succ_tokens_num = 0;
   unsigned prev_succ_tokens[MAX_SUCC_TOKENS];
@@ -1084,7 +1087,7 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *parent) {
   // Make sure it's 0 when fail
   gSuccTokensNum = 0;
 
-  for (unsigned i = 0; i < rule_table->mNum; i++) {
+  for (unsigned i = start; i < rule_table->mNum; i++) {
     TableData *data = rule_table->mData + i;
     found = TraverseTableData(data, parent);
 
@@ -2075,6 +2078,16 @@ void Parser::SetupTopTables() {
   mTopTables.push_back(&TblStatement);
   mTopTables.push_back(&TblClassDeclaration);
   mTopTables.push_back(&TblInterfaceDeclaration);
+}
+
+////////////////////////////////////////////////////////////////////////////
+//         Initialize the Left Recursion Information
+// It collects all information from gen_recursion.h/cpp into RecursionAll,
+// and calculate the LeadFronNode and FronNode accordingly.
+////////////////////////////////////////////////////////////////////////////
+
+void Parser::InitRecursion() {
+  mRecursionAll.Init();
 }
 
 ////////////////////////////////////////////////////////////////////////////

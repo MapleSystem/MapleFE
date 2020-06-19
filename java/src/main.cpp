@@ -68,10 +68,11 @@ int main (int argc, char *argv[]) {
   parser->InitPredefinedTokens();
   parser->mLexer->PlantTokens();
   parser->SetupTopTables();
+  parser->InitRecursion();
   parser->Parse();
 
-  VerifierJava VJ;
-  VJ.Do();
+  VerifierJava vfy_java;
+  vfy_java.Do();
 
   delete parser;
 
