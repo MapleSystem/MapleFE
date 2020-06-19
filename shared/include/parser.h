@@ -345,7 +345,7 @@ private:
   bool IsLeadNode(RuleTable *);
   bool TraverseLeadNode(AppealNode*, AppealNode *parent);
   bool TraverseCircle(AppealNode *lead, Recursion *rec, unsigned idx);
-  bool TraverseFronNode(AppealNode *parent, FronNode fnode);
+  bool TraverseFronNode(AppealNode *parent, FronNode fnode, Recursion *rec = NULL, unsigned cir=0);
   void ApplySuccInfoOnPath(AppealNode *lead, AppealNode *pseudo, bool succ);
   void ConstructPath(AppealNode*, AppealNode*, unsigned*, unsigned);
 

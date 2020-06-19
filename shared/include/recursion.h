@@ -62,7 +62,10 @@ enum FronNodeType {
 // children nodes. we need know the starting index of the first child node.
 //
 // We also need know the information of corresponding Recursion node in the circle.
-// We use mPos to save it. Later on we need this info to build a path in the Appeal Tree.
+// We use mPos to save it. mPos tells the parent of this FronNode in the circle.
+// mPos == 0 means circle[0], which is the length of circle.
+// mPos == i means circle[i], which is the i-1 th element on the circle.
+// Later on we need this info to build a path in the Appeal Tree.
 struct FronNode {
   unsigned     mPos;
   FronNodeType mType;
@@ -94,7 +97,7 @@ public:
   ~Recursion() {Release();}
 
   RuleTable* GetLeadNode() {return mLeadNode;}
-
+  RuleTable* FindRuleOnCircle(unsigned cir_idx, unsigned pos);
   void Init(LeftRecursion*);
   void Release();
 

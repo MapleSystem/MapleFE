@@ -162,6 +162,28 @@ void Recursion::FindRecursionNodes() {
   }
 }
 
+// cir_idx : the index of circle.
+// pos     : the position of the rule on the circle.
+//           0 is the length of circle.
+RuleTable* Recursion::FindRuleOnCircle(unsigned cir_idx, unsigned pos) {
+  unsigned *circle = mCircles[cir_idx];
+  unsigned len = circle[0];
+  MASSERT(pos <= len);
+  RuleTable *prev = mLeadNode;
+  for (unsigned j = 1; j <= pos; j++) {
+    unsigned child_index = circle[j];
+    FronNode node = RuleFindChildAtIndex(prev, child_index);
+    MASSERT(node.mType == FNT_Rule);
+    RuleTable *rt = node.mData.mTable;
+    // The last one should be the back edge.
+    if (j == len)
+      MASSERT(rt == mLeadNode);
+    prev = rt;
+  }
+  MASSERT(prev);
+  return prev;
+}
+
 // Find the LeadFronNodes. It has the similar logic as the following function,
 // FindFronNodes(), and please see the comments before it.
 //
@@ -363,6 +385,7 @@ void Recursion::FindFronNodes(unsigned circle_index) {
           fnode.mType = FNT_Token;
           fnode.mData.mToken = data->mData.mToken;
           fron_nodes->PushBack(fnode);
+          //std::cout << "  Token " << data->mData.mToken->GetName() << std::endl;
         } else if (data->mType = DT_Subtable) {
           RuleTable *ruletable = data->mData.mEntry;
           bool found = IsRecursionNode(ruletable);
@@ -371,6 +394,7 @@ void Recursion::FindFronNodes(unsigned circle_index) {
             fnode.mType = FNT_Rule;
             fnode.mData.mTable = ruletable;
             fron_nodes->PushBack(fnode);
+            //std::cout << "  Rule " << GetRuleTableName(ruletable) << std::endl;
           }
         } else {
           MASSERT(0 && "unexpected data type in ruletable.");
@@ -415,6 +439,8 @@ void Recursion::FindFronNodes(unsigned circle_index) {
 }
 
 void Recursion::FindFronNodes() {
+  const char *name = GetRuleTableName(mLeadNode);
+  std::cout << "FindFronNodes for " << name << std::endl;
   for (unsigned i = 0; i < mNum; i++)
     FindFronNodes(i);
 }

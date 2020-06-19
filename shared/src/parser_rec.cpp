@@ -34,7 +34,7 @@ void Parser::PushRecStack(RuleTable *rt, unsigned start_token) {
   return mRecStack.PushBack(e);
 }
 
-bool Parser::TraverseFronNode(AppealNode *parent, FronNode fnode) {
+bool Parser::TraverseFronNode(AppealNode *parent, FronNode fnode, Recursion *rec, unsigned cir_idx) {
   bool found = false;
   if (fnode.mType == FNT_Token) {
     Token *token = fnode.mData.mToken;
@@ -48,7 +48,8 @@ bool Parser::TraverseFronNode(AppealNode *parent, FronNode fnode) {
     //std::cout << "FronNode " << name << " " << temp_found << std::endl;
   } else if (fnode.mType == FNT_Concat) {
     // All rules/tokens from the starting point will be checked.
-    found = TraverseConcatenate(fnode.mData.mTable, parent, fnode.mPos);
+    RuleTable *ruletable = rec->FindRuleOnCricle(cir_idx, fnode.mPos);
+    found = TraverseConcatenate(ruletable, parent, fnode.mData.mStartingIndex);
   } else {
     MASSERT(0 && "Unexpected FronNode type.");
   }
@@ -135,7 +136,7 @@ bool Parser::TraverseCircle(AppealNode *lead, Recursion *rec, unsigned idx) {
     mAppealNodes.push_back(pseudo_parent);
 
     FronNode fnode = fron_nodes->ValueAtIndex(i);
-    bool temp_found = TraverseFronNode(pseudo_parent, fnode);
+    bool temp_found = TraverseFronNode(pseudo_parent, fnode, rec, idx);
     found |= temp_found;
 
     // Create a path.
