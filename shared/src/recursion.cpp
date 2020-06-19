@@ -107,6 +107,7 @@ void Recursion::Init(LeftRecursion *lr) {
   // Alloc/Init of FronNodes of each circle.
   for (unsigned i = 0; i < gLeftRecursionsNum; i++) {
     SmallVector<FronNode> *p_fnodes = new SmallVector<FronNode>();
+    mFronNodes.PushBack(p_fnodes);
   }
 
   // Collect info
