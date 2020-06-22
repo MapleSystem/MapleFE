@@ -99,10 +99,15 @@ bool Parser::TraverseLeadNode(AppealNode *appeal, AppealNode *parent) {
   // already in the middle of traversal.
   if (InRecStack(rt, mCurToken))
     return false;
+
   PushRecStack(rt, mCurToken);
 
   // Step 2. Find Recursion
   Recursion *rec = mRecursionAll.FindRecursion(rt);
+
+  // We will set the new mCurToken to the largest one.
+  // LeadFronNode and Circle's FronNodes are like OneOf children of LeadNode.
+  unsigned new_mCurToken = mCurToken;
 
   // Step 3. Traverse LeadFronNodes
   unsigned saved_mCurToken = mCurToken;
@@ -116,7 +121,9 @@ bool Parser::TraverseLeadNode(AppealNode *appeal, AppealNode *parent) {
     temp_found = TraverseFronNode(appeal, fnode);
     found |= temp_found;
 
-    // Add succ to 'appeal' and SuccMatch.
+    new_mCurToken = mCurToken > new_mCurToken ? mCurToken : new_mCurToken;
+
+    // Add succ to 'appeal' and SuccMatch, using gSuccTokens.
     if (found) {
       appeal->mAfter = Succ;
       UpdateSuccInfo(saved_mCurToken, appeal);
@@ -134,13 +141,16 @@ bool Parser::TraverseLeadNode(AppealNode *appeal, AppealNode *parent) {
       DumpIndentation();
       std::cout << "<<<Enter TraverseCircle:" << i << std::endl;
     }
-    bool temp_found = TraverseCircle(appeal, rec, i);
+    bool temp_found = TraverseCircle(appeal, rec, i, new_mCurToken);
     if (mTraceLeftRec) {
       DumpIndentation();
       std::cout << "<<<Exit TraverseCircle:" << i << std::endl;
     }
     found |= temp_found;
   }
+
+  MASSERT(new_mCurToken >= saved_mCurToken);
+  mCurToken = new_mCurToken;
 
   // Step 5. Restore the recursion stack.
   RecStackEntry entry = mRecStack.Back();
@@ -153,13 +163,18 @@ bool Parser::TraverseLeadNode(AppealNode *appeal, AppealNode *parent) {
     DumpIndentation();
     std::cout << "<<<Exit LeadNode " << GetRuleTableName(rt)  << std::endl;
   }
+
+  return found;
 }
 
 // There are several things to be done in this function.
 // 1. Traverse each FronNode
 // 2. No matter succ or fail, build the path in Appeal tree, and add succ match
 //    info to all node in the path and the lead node.
-bool Parser::TraverseCircle(AppealNode *lead, Recursion *rec, unsigned idx) {
+bool Parser::TraverseCircle(AppealNode *lead,
+                            Recursion *rec,
+                            unsigned idx,
+                            unsigned &new_mCurToken) {
   SmallVector<FronNode> *fron_nodes = rec->mFronNodes.ValueAtIndex(idx);
   unsigned saved_mCurToken = mCurToken;
   bool found = false;
@@ -175,6 +190,9 @@ bool Parser::TraverseCircle(AppealNode *lead, Recursion *rec, unsigned idx) {
     FronNode fnode = fron_nodes->ValueAtIndex(i);
     bool temp_found = TraverseFronNode(pseudo_parent, fnode, rec, idx);
     found |= temp_found;
+
+    if (mCurToken > new_mCurToken)
+      new_mCurToken = mCurToken;
 
     // Create a path.
     unsigned *circle = rec->mCircles[idx];
