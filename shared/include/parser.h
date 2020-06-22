@@ -209,8 +209,9 @@ public:
   const char *filename;
 
   // debug info
-  unsigned mIndentation;    //
+  int  mIndentation;
   bool mTraceTable;         // trace enter/exit rule tables
+  bool mTraceLeftRec;       // trace enter/exit rule tables
   bool mTraceAppeal;        // trace appealing
   bool mTraceSecondTry;     // trace second try in parser.
   bool mTraceFailed;        // trace mFailed
@@ -221,6 +222,7 @@ public:
   bool mTraceWarning;       // print the warning.
 
   void SetLexerTrace() {mLexer->SetTrace();}
+  void DumpIndentation();
   void DumpEnterTable(const char *tablename, unsigned indent);
   void DumpExitTable(const char *tablename, unsigned indent,
                      bool succ, AppealStatus reason = Succ);

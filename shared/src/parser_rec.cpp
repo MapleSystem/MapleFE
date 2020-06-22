@@ -36,19 +36,22 @@ void Parser::PushRecStack(RuleTable *rt, unsigned start_token) {
 
 bool Parser::TraverseFronNode(AppealNode *parent, FronNode fnode, Recursion *rec, unsigned cir_idx) {
   bool found = false;
+  const char *name = NULL;
   if (fnode.mType == FNT_Token) {
     Token *token = fnode.mData.mToken;
     found = TraverseToken(token, parent);
-    //const char *name = token->GetName();
-    //std::cout << "FronNode " << name << " " << temp_found << std::endl;
+    if (mTraceLeftRec)
+      name = token->GetName();
   } else if (fnode.mType == FNT_Rule) {
     RuleTable *rt = fnode.mData.mTable;
     found = TraverseRuleTable(rt, parent);
-    //const char *name = GetRuleTableName(rt);
-    //std::cout << "FronNode " << name << " " << temp_found << std::endl;
+    if (mTraceLeftRec)
+      name = GetRuleTableName(rt);
   } else if (fnode.mType == FNT_Concat) {
     // All rules/tokens from the starting point will be checked.
     RuleTable *ruletable = NULL;
+    if (mTraceLeftRec)
+      name = "FronNode Concat ";
     if (!rec) {
       MASSERT(!parent->IsPseudo());
       ruletable = parent->GetTable();
@@ -59,6 +62,19 @@ bool Parser::TraverseFronNode(AppealNode *parent, FronNode fnode, Recursion *rec
   } else {
     MASSERT(0 && "Unexpected FronNode type.");
   }
+
+  if (mTraceLeftRec) {
+    std::string trace("TraverseFronNode ");
+    trace += name;
+    if(found)
+      trace += " succ";
+    else
+      trace += " fail";
+    DumpIndentation();
+    std::cout << "<<<" << trace.c_str() << std::endl; 
+  }
+
+  return found;
 }
 
 // This is the main entry for traversing a new recursion.
@@ -66,13 +82,18 @@ bool Parser::TraverseFronNode(AppealNode *parent, FronNode fnode, Recursion *rec
 //
 // TraverseRuleTablePre() has been called before this function, to check
 // the already-succ or already-fail scenarios.
-
+//
+// [NOTE] Move mCurToken when succ, and restore it when fails.
+//
 bool Parser::TraverseLeadNode(AppealNode *appeal, AppealNode *parent) {
   // Step 1. We are entering a new recursion right now. Need prepare the
   //         the recursion stack information.
   RuleTable *rt = appeal->GetTable();
 
-  //std::cout << "Enter LeadNode " << GetRuleTableName(rt)  << std::endl;
+  if (mTraceLeftRec) {
+    DumpIndentation();
+    std::cout << "<<<Enter LeadNode " << GetRuleTableName(rt)  << std::endl;
+  }
 
   // It's possible that we re-enter a LeadNode. But we will skip it if it's
   // already in the middle of traversal.
@@ -109,8 +130,15 @@ bool Parser::TraverseLeadNode(AppealNode *appeal, AppealNode *parent) {
   unsigned temp_gSuccTokens[MAX_SUCC_TOKENS];
   for (unsigned i = 0; i < rec->mNum; i++) {
     mCurToken = saved_mCurToken;
-    //std::cout << "TraverseCircle:" << i << std::endl;
+    if (mTraceLeftRec) {
+      DumpIndentation();
+      std::cout << "<<<Enter TraverseCircle:" << i << std::endl;
+    }
     bool temp_found = TraverseCircle(appeal, rec, i);
+    if (mTraceLeftRec) {
+      DumpIndentation();
+      std::cout << "<<<Exit TraverseCircle:" << i << std::endl;
+    }
     found |= temp_found;
   }
 
@@ -121,7 +149,10 @@ bool Parser::TraverseLeadNode(AppealNode *appeal, AppealNode *parent) {
 
   // Step 6. The gSuccTokens/Num will be updated in the caller in parser.cpp
 
-  //std::cout << "Exit LeadNode " << GetRuleTableName(rt)  << std::endl;
+  if (mTraceLeftRec) {
+    DumpIndentation();
+    std::cout << "<<<Exit LeadNode " << GetRuleTableName(rt)  << std::endl;
+  }
 }
 
 // There are several things to be done in this function.

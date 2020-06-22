@@ -244,6 +244,7 @@ Parser::Parser(const char *name) : filename(name) {
   mPending = 0;
 
   mTraceTable = false;
+  mTraceLeftRec = false;
   mTraceAppeal = false;
   mTraceSecondTry = false;
   mTraceVisited = false;
@@ -253,7 +254,7 @@ Parser::Parser(const char *name) : filename(name) {
   mTracePatchWasSucc = false;
   mTraceWarning = false;
 
-  mIndentation = 0;
+  mIndentation = -2;
   mInSecondTry = false;
   mRoundsOfPatching = 0;
 }
@@ -589,6 +590,11 @@ void Parser::DumpAppeal(RuleTable *table, unsigned token) {
   std::cout << "!!Reset the Failed flag of " << name << " @" << token << std::endl;
 }
 
+void Parser::DumpIndentation() {
+  for (unsigned i = 0; i < mIndentation; i++)
+    std::cout << " ";
+}
+
 void Parser::DumpEnterTable(const char *table_name, unsigned indent) {
   for (unsigned i = 0; i < indent; i++)
     std::cout << " ";
@@ -648,7 +654,6 @@ void Parser::UpdateSuccInfo(unsigned curr_token, AppealNode *node) {
 
 // The preparation of TraverseRuleTable().
 AppealNode* Parser::TraverseRuleTablePre(RuleTable *rule_table, AppealNode *parent) {
-  mIndentation += 2;
   const char *name = NULL;
   if (mTraceTable) {
     name = GetRuleTableName(rule_table);
@@ -712,7 +717,21 @@ AppealNode* Parser::TraverseRuleTablePre(RuleTable *rule_table, AppealNode *pare
 
 // return true : if the rule_table is matched
 //       false : if faled.
+//
+// [NOTE] About how to move mCurToken
+//        1. TraverseRuleTable will restore the mCurToken if it fails.
+//        2. TraverseRuleTable will let the children's traverse to move mCurToken
+//           if they succeeded.
+//        3. TraverseOneof, TraverseZeroxxxx, TraverseConcatenate follow rule 1&2.
+//        4. TraverseRuleTablePre and TraverseLeadNode both exit early, so they
+//           need follow the rule 1&1 also.
+//        3. TraverseRuleTablePre move mCurToken is succ, and actually it doesn't
+//           touch mCurToken when fail.
+//        4. TraverseLeadNode() also follows the rule 1&2. It moves mCurToken
+//           when succ and restore it when fail.
 bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
+
+  mIndentation += 2;
 
   // Step 1. If the 'rule_table' has already been done, we just reuse the result.
   //         This step is in TraverseRuleTablePre().
@@ -735,13 +754,17 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
     if (!found) {
       appeal->mAfter = FailChildrenFailed;
       gSuccTokensNum = 0;
-      return false;
     } else {
       gSuccTokensNum = appeal->GetMatchNum();
       for (unsigned i = 0; i < gSuccTokensNum; i++)
         gSuccTokens[i] = appeal->GetMatch(i);
-      return true;
     }
+    if (mTraceTable) {
+      const char *name = GetRuleTableName(rule_table);
+      DumpExitTable(name, mIndentation, found, FailChildrenFailed);
+    }
+    mIndentation -= 2;
+    return found;
   }
 
   // Step 3. It's a regular table. Traverse children in DFS.

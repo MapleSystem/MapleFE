@@ -108,6 +108,7 @@ foreach my $dir (@dirname) {
           print " ==$dir===> $file\n";
           $countfailedjava ++;
           push(@failed_file, $dir.":  ".$file);
+          print "---------------------------\n";
           next;
         }
 
@@ -122,6 +123,7 @@ foreach my $dir (@dirname) {
           system("touch $notexistsdir/$oresult_file");
           $countfailedjava ++;
           push(@failed_file, $dir.": ".$file);
+          print "---------------------------\n";
         } else {
           if ((!(-e "$outdir/$result_file")) || (-z "$outdir/$result_file")) { 
             if(!(-e "$notexistsdir")) {
@@ -132,6 +134,7 @@ foreach my $dir (@dirname) {
             system("touch $notexistsdir/$result_file");
             $countfailedjava ++;
             push(@failed_file, $dir.": ".$file);
+            print "---------------------------\n";
           } else {
 #print "COMPARE file $pwd/$dir/$oresult_file and $outdir/$result_file\n";
             $res2 = system("diff $pwd/$dir/$oresult_file $outdir/$result_file");
@@ -145,9 +148,11 @@ foreach my $dir (@dirname) {
               system("touch $diffdir/$diff_file");
               $countfailedjava ++;
               push(@failed_file, $dir.": ".$file);
+              print "---------------------------\n";
             } else {
 #print "GOOD files: $file\n";
               push(@successed_file, $file." ".$dir);
+              print "---------------------------\n";
             }
           }
         }
