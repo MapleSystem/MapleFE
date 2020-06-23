@@ -21,6 +21,7 @@
 
 #include "recursion.h"
 #include "gen_debug.h"
+#include "token.h"
 
 // Find the index-th child and return it.
 // This function only returns Token or RuleTable, it won't take of FNT_Concat.
@@ -100,21 +101,29 @@ void Recursion::Release() {
     delete p_fnodes;
   }
   mFronNodes.Release();
+
+  for (unsigned i = 0; i <mRecursionNodes.GetNum(); i++) {
+    SmallVector<RuleTable*> *rec_nodes = mRecursionNodes.ValueAtIndex(i);
+    delete rec_nodes;
+  }
+  mRecursionNodes.Release();
 }
 
 // 1. Collect all info from LeftRecursion.
 // 2. Calculate RecursionNods, LeadFronNode and FronNode.
 void Recursion::Init(LeftRecursion *lr) {
-  // Alloc/Init of FronNodes of each circle.
-  for (unsigned i = 0; i < gLeftRecursionsNum; i++) {
-    SmallVector<FronNode> *p_fnodes = new SmallVector<FronNode>();
-    mFronNodes.PushBack(p_fnodes);
-  }
-
   // Collect info
   mLeadNode = lr->mRuleTable;
   mNum = lr->mNum;
   mCircles = lr->mCircles;
+
+  // Alloc/Init of FronNodes/RecursionNodes of all circle.
+  for (unsigned i = 0; i < mNum; i++) {
+    SmallVector<FronNode> *p_fnodes = new SmallVector<FronNode>();
+    mFronNodes.PushBack(p_fnodes);
+    SmallVector<RuleTable*> *rts = new SmallVector<RuleTable*>();
+    mRecursionNodes.PushBack(rts);
+  }
 
   // Find all recursion nodes which are on the circles.
   FindRecursionNodes();
@@ -127,36 +136,35 @@ void Recursion::Init(LeftRecursion *lr) {
 
 bool Recursion::IsRecursionNode(RuleTable *rt) {
   for (unsigned k = 0; k < mRecursionNodes.GetNum(); k++) {
-    if (rt == mRecursionNodes.ValueAtIndex(k)) {
+    SmallVector<RuleTable*> *rec_nodes = mRecursionNodes.ValueAtIndex(k);
+    if (rec_nodes->Find(rt))
       return true;
-    }
   }
   return false;
 }
 
 // Find all the nodes in all circles of the recursion.
 // Each node should be a RuleTable* since it forms a circle.
+// A node could be shared among multiple circles.
 void Recursion::FindRecursionNodes() {
-  mRecursionNodes.PushBack(mLeadNode);
   for (unsigned i = 0; i < mNum; i++) {
     unsigned *circle = mCircles[i];
     unsigned len = circle[0];
     RuleTable *prev = mLeadNode;
+
+    SmallVector<RuleTable*> *rec_nodes = mRecursionNodes.ValueAtIndex(i);
+    rec_nodes->PushBack(mLeadNode);
+
     for (unsigned j = 1; j <= len; j++) {
       unsigned child_index = circle[j];
       FronNode node = RuleFindChildAtIndex(prev, child_index);
       MASSERT(node.mType == FNT_Rule);
       RuleTable *rt = node.mData.mTable;
 
-      if (j == len) {
-        // The last one should be the back edge.
+      if (j == len)
         MASSERT(rt == mLeadNode);
-      } else {
-        // a node could be shared among multiple circles, need avoid duplication.
-        bool found = IsRecursionNode(rt);
-        if (!found)
-          mRecursionNodes.PushBack(rt);
-      }
+      else
+        rec_nodes->PushBack(rt);
 
       prev = rt;
     }
@@ -446,6 +454,50 @@ void Recursion::FindFronNodes() {
     FindFronNodes(i);
 }
 
+void Recursion::DumpFronNode(FronNode fnode) {
+  std::cout << "Pos:" << fnode.mPos << " ";
+  switch (fnode.mType) {
+  case FNT_Token:
+    std::cout << "token ";
+    std::cout << fnode.mData.mToken->GetName();
+    break;
+  case FNT_Rule:
+    std::cout << "Rule ";
+    std::cout << GetRuleTableName(fnode.mData.mTable);
+    break;
+  case FNT_Concat:
+    std::cout << "Concat@";
+    std::cout << fnode.mData.mStartIndex;
+    break;
+  }
+}
+
+void Recursion::Dump() {
+  MASSERT(mRecursionNodes.GetNum() == mNum);
+  std::cout << "LeadNode:" << GetRuleTableName(mLeadNode) << std::endl;
+  for (unsigned i = 0; i < mRecursionNodes.GetNum(); i++) {
+    // dump recursion nodes
+    std::cout << "Circle " << i << " RecNodes: ";
+    SmallVector<RuleTable*> *rec_nodes = mRecursionNodes.ValueAtIndex(i);
+    for (unsigned j = 0; j < rec_nodes->GetNum(); j++) {
+      RuleTable *rt = rec_nodes->ValueAtIndex(j);
+      std::cout << GetRuleTableName(rt) << ", ";
+    }
+    std::cout << std::endl;
+
+    // dump FronNodes
+    std::cout << "Circle " << i << " FronNodes: ";
+    SmallVector<FronNode> *fron_nodes = mFronNodes.ValueAtIndex(i);
+    for (unsigned j = 0; j < fron_nodes->GetNum(); j++) {
+      std::cout << "[";
+      FronNode fn = fron_nodes->ValueAtIndex(j);
+      DumpFronNode(fn);
+      std::cout << "], ";
+    }
+    std::cout << std::endl;
+  }
+}
+
 /////////////////////////////////////////////////////////////////////////////////////
 //               Implementation of class RecursionAll
 /////////////////////////////////////////////////////////////////////////////////////
@@ -483,3 +535,15 @@ bool RecursionAll::IsLeadNode(RuleTable *rt) {
     return false;
 }
 
+void RecursionAll::Dump() {
+  std::cout << "===================== Total ";
+  std::cout << mRecursions.GetNum();
+  std::cout << " Recursions =====================" << std::endl;
+  for (unsigned i = 0; i < mRecursions.GetNum(); i++) {
+    std::cout << "No." << i << std::endl;
+    Recursion *rec = mRecursions.ValueAtIndex(i);
+    rec->Dump();
+  }
+  std::cout << "===================== End Recursions Dump ===============";
+  std::cout << std::endl;
+}

@@ -87,10 +87,10 @@ public:
   unsigned   mNum;       // num of circles
   unsigned **mCircles;   // circles
 
-  SmallVector<RuleTable*>             mRecursionNodes;// nodes of all circles
-  SmallVector<FronNode>               mLeadFronNodes;
-  SmallVector<SmallVector<FronNode>*> mFronNodes;  // a set of vectors of mFronNodes
-                                                   // in correspondant to each circle.
+  SmallVector<FronNode>                 mLeadFronNodes;
+  SmallVector<SmallVector<RuleTable*>*> mRecursionNodes;// nodes of all circles
+  SmallVector<SmallVector<FronNode>*>   mFronNodes;     // a set of vectors of mFronNodes
+                                                        // in correspondant to each circle.
 public:
   Recursion() {mNum = 0; mLeadNode = NULL; mCircles = NULL;}
   Recursion(LeftRecursion*);
@@ -98,7 +98,10 @@ public:
 
   RuleTable* GetLeadNode() {return mLeadNode;}
   RuleTable* FindRuleOnCircle(unsigned cir_idx, unsigned pos);
+
   void Init(LeftRecursion*);
+  void Dump();
+  void DumpFronNode(FronNode fn);
   void Release();
 
 public:
@@ -118,6 +121,7 @@ public:
   ~RecursionAll() {Release();}
 
   void Init();
+  void Dump();
   void Release();
 
   Recursion* FindRecursion(RuleTable *lead);

@@ -64,7 +64,7 @@ bool Parser::TraverseFronNode(AppealNode *parent, FronNode fnode, Recursion *rec
   }
 
   if (mTraceLeftRec) {
-    std::string trace("TraverseFronNode ");
+    std::string trace("Done TraverseFronNode ");
     trace += name;
     if(found)
       trace += " succ";
