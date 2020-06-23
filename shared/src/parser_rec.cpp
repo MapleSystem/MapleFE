@@ -196,11 +196,11 @@ bool Parser::TraverseCircle(AppealNode *lead,
 
     // Create a path.
     unsigned *circle = rec->mCircles[idx];
-    ConstructPath(lead, pseudo_parent, circle, fnode.mPos);
+    AppealNode *last = ConstructPath(lead, pseudo_parent, circle, fnode.mPos);
 
     // Apply the start index / succ info to the path.
     mCurToken = saved_mCurToken;
-    ApplySuccInfoOnPath(lead, pseudo_parent, found);
+    ApplySuccInfoOnPath(lead, last, found);
   }
 
   return found;
@@ -209,12 +209,15 @@ bool Parser::TraverseCircle(AppealNode *lead,
 // Construct a path from 'lead' to 'ps_node'. The rule tables in between are
 // determined by 'circle'. Totoal number of rule tables involved is num_steps - 1.
 // The path should be like,
-//  lead -> rule table 1 -> ... -> rule table(num_steps-1) -> ps_node
+//  lead -> rule table 1 -> ... -> rule table(num_steps-1) -> children in ps_node
+// We return rule-table (num_steps-1) as the ending one.
 //
 // [NOTE] Since it's a circle, you can actually create endless number of paths.
 //        However, in reality we need only the simplest path.
-void Parser::ConstructPath(AppealNode *lead, AppealNode *ps_node, unsigned *circle,
-                           unsigned num_steps) {
+AppealNode* Parser::ConstructPath(AppealNode *lead,
+                                  AppealNode *ps_node,
+                                  unsigned *circle,
+                                  unsigned num_steps) {
   RuleTable *prev = lead->GetTable();
   AppealNode *prev_anode = lead;
   RuleTable *next = NULL;
@@ -237,19 +240,26 @@ void Parser::ConstructPath(AppealNode *lead, AppealNode *ps_node, unsigned *circ
     prev_anode = next_anode;
   }
 
-  // in the end, we need connect to ps_node.
-  ps_node->SetParent(prev_anode);
-  prev_anode->AddChild(ps_node);
+  // in the end, we need remove ps_node, and connect real children node to
+  // prev_anode.
+  std::vector<AppealNode*>::iterator cit = ps_node->mChildren.begin();
+  for (; cit != ps_node->mChildren.end(); cit++) {
+    AppealNode *child = *cit;
+    child->SetParent(prev_anode);
+    prev_anode->AddChild(child);
+  }
+
+  return prev_anode;
 }
 
-// set start index, and succ info in all node from 'lead' to 'pseudo'.
-void Parser::ApplySuccInfoOnPath(AppealNode *lead, AppealNode *pseudo, bool succ) {
-  AppealNode *node = pseudo;
+// set start index, and succ info in all node from 'lead' to 'last'.
+void Parser::ApplySuccInfoOnPath(AppealNode *lead, AppealNode *last, bool succ) {
+  AppealNode *node = last;
   RuleTable *rt = NULL;
   const char *name = NULL;
   while(1) {
     if (node->IsPseudo()) {
-      name = " pseudo ";
+      name = " last ";
     } else {
       name = GetRuleTableName(node->GetTable());
     }
