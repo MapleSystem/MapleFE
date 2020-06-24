@@ -296,8 +296,10 @@ TResult RecDetector::DetectRuleTable(RuleTable *rt, ContTreeNode<RuleTable*> *p)
   if (IsDone(rt))
     return TRS_Done;
 
-  // If find a new Recursion, we are done. Don't need go deeper into
-  // children nodes because they will be handled in the first traversal.
+  // If find a new Recursion, create the recursion.
+  // This is the ending point of a back edge. As mentioned in the comments in
+  // the beginning of this file, back edge won't be furhter traversed as it is
+  // NOT part of the traversal tree.
   if (IsInProcess(rt)) {
     AddRecursion(rt, p);
     return;
@@ -329,12 +331,13 @@ TResult RecDetector::DetectRuleTable(RuleTable *rt, ContTreeNode<RuleTable*> *p)
     break;
   }
 
+  // Remove it from InProcess.
   MASSERT(IsInProcess(rt));
   RuleTable *back = mInProcess.Back();
   MASSERT(back == rt);
   mInProcess.PopBack();
 
-  // It's done.
+  // Add it to IsDone
   MASSERT(!IsDone(rt));
   mDone.PushBack(rt);
 
@@ -458,7 +461,8 @@ TResult RecDetector::DetectData(RuleTable *rule_table, ContTreeNode<RuleTable*> 
 //   InProcess: The rules are right now in the middle of traversal. This actually tells
 //              the current working path of the DFS traversal.
 //   Done     : The rules that are finished.
-// It's obviously true the sum of the three sets is the total of rule tables.
+// The sum of the three sets is the total of rule tables.
+// And there is no overlapping among the three sets.
 //
 // We also elaborate a few rules which build the foundation of the algorithm.
 //
@@ -480,7 +484,7 @@ TResult RecDetector::DetectData(RuleTable *rule_table, ContTreeNode<RuleTable*> 
 // But later we will work on it to see if there is recursion. So, E will be put into
 // ToDo list if it's not in Done or InProcess.
 //
-// Question is, what if the first element is not a token? See Rule 4.
+// Question is, what if the first element is not a token?
 //
 // [Rule 3]
 //
@@ -535,20 +539,18 @@ TResult RecDetector::DetectData(RuleTable *rule_table, ContTreeNode<RuleTable*> 
 // At any point when we want to return, we need take the remaining elements
 // to ToDo list, if they are not in any of InProcess, Done and ToDo.
 
-// The return result tells how good this rule does in loop detection, and we define
+// The return result tells how a rule does in loop detection, and we define
 // the algorithm of computing parent node based on children as below.
-//   a. If the first child is TRS_Fail, the parent is TRS_Fail. The rest children
-//      put into ToDo.
-//   b. If all children are TRS_MaybeZero, the parent is MaybeZero.
-//   c. If more than one leading children are TRS_MaybeZero, followed by a TRS_Fail child,
-//      the parent is TRS_NonZero. It's possible the leading children can form
-//      a circle, so we cannot say the parent is fail. It should be NonZero.
-//   d. If more than one leading children are TRS_MaybeZero, followed by a TRS_Done child,
-//      we'll further check that child is MaybeZero. We keep check the children until
-//      a child is TRS_Fail, or a child is TRS_Done and NOT MaybeZero.
-//      a circle.
-//   e. No matter how many leading children of TRS_NonZero or MaybeZero, if the current
-//      child is Nonzero, we just keep going. And the parent is NonZero.
+//   a. The first time we get a NonZero or Fail child, the parent stops,
+//      and puts rest of children to ToDo list. So this means all the previous
+//      children are MaybeZero.
+//   b. If TRS_Fail child is the first one, the parent is TRS_Fail. Otherwise, 
+//      the parent is NonZero.
+//   c. If we get Nonzero, we Stop going furhter, and put the rest children to ToDo list.
+//      And the parent is NonZero.
+//   d. If all children are TRS_MaybeZero, the parent is MaybeZero.
+//   e. If get a TRS_Done child, check if its NonZero, Fail or MaybeZero, and handle it
+//      accordingly.
 //      
 TResult RecDetector::DetectConcatenate(RuleTable *rule_table, ContTreeNode<RuleTable*> *p) {
   // We use 'res' to record the status of the leading children. TRS_MaybeZero is good
@@ -568,52 +570,41 @@ TResult RecDetector::DetectConcatenate(RuleTable *rule_table, ContTreeNode<RuleT
       child = data->mData.mEntry;
       temp_res = DetectRuleTable(child, p);
     } else {
+      // Whenever we got a non-table child, eg. Token, the following children
+      // won't be counted, and we return TRS_Fail at the end.
       temp_res = TRS_Fail;
     }
   
-    MASSERT((res == TRS_MaybeZero) || (res == TRS_NonZero));
+    MASSERT((res == TRS_MaybeZero));
 
-    if (temp_res == TRS_MaybeZero) {
-      // The leading nodes are all MaybeZero at this point.
-      // Just let the traversal go on with the rest children rules.
-      if (res == TRS_MaybeZero)
-        res = TRS_MaybeZero;
-    } else if (temp_res == TRS_NonZero) {
-      // No matter how many leading children of NonZero or MaybeZero
-      // Just let the traversal go on with the rest children rules.
+    if (temp_res == TRS_NonZero) {
+      // No matter how many leading children of MaybeZero, the first time
+      // we get a NonZero, the whole result is NonZero. The rest children
+      // cannot be traversed for these existing ancestors since they cannot
+      // help form a LEFT recursion any more due to this NonZero child.
+      // However, we do need add them into ToDo list.
       res = TRS_NonZero;
+      AddToDo(rule_table, i+1);
+      return res;
     } else if (temp_res == TRS_Fail) {
-      if (i == 0) {
-        res = TRS_Fail;
-        AddToDo(rule_table, 1);
-        return res;
-      } else  {
-        res = TRS_NonZero;
-        AddToDo(rule_table, 1);
-        return res;
-      }
+      res = (i == 0) ? TRS_Fail : TRS_NonZero;
+      AddToDo(rule_table, i+1);
+      return res;
     } else if (temp_res == TRS_Done) {
-      // further checking the real status of rule.
       MASSERT(child);
       if (IsFail(child)) {
-        if (i == 0) {
-          res = TRS_Fail;
-          AddToDo(rule_table, 1);
-          return res;
-        } else  {
-          res = TRS_NonZero;
-          AddToDo(rule_table, 1);
-          return res;
-        }
-      } else if (IsMaybeZero(child)) {
-        if (res == TRS_MaybeZero)
-          res = TRS_MaybeZero;
+        res = (i == 0) ? TRS_Fail : TRS_NonZero;
+        AddToDo(rule_table, i+1);
+        return res;
       } else if (IsNonZero(child)) {
         res = TRS_NonZero;
+        AddToDo(rule_table, i+1);
+        return res;
       }
     }
   }
 
+  MASSERT(res == TRS_MaybeZero);
   return res;
 }
 
