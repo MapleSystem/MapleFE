@@ -34,6 +34,9 @@ void Parser::PushRecStack(RuleTable *rt, unsigned start_token) {
   return mRecStack.PushBack(e);
 }
 
+// This is used in traversal of both LeadFronNode and FronNode.
+// When in LeadFronNode, rec is NULL and cir_idx is useless.
+// When in FronNode, rec tells the LeftRecursion and cir_idx tells the circle index.
 bool Parser::TraverseFronNode(AppealNode *parent, FronNode fnode, Recursion *rec, unsigned cir_idx) {
   bool found = false;
   const char *name = NULL;
@@ -271,8 +274,15 @@ void Parser::ApplySuccInfoOnPath(AppealNode *lead, AppealNode *last, bool succ) 
       node->mAfter = Succ;
       //std::cout << " succ." << std::endl;
     } else {
-      node->mAfter = FailChildrenFailed;
-      //std::cout << " fail." << std::endl;
+      // 'lead' could be a Oneof node containing multiple children, and it could
+      // already be Succ due to its other children. We won't update it to Fail.
+      if (node->mAfter != AppealStatus_NA) {
+        MASSERT(node == lead);
+        //std::cout << " not changed." << std::endl;
+      } else {
+        node->mAfter = FailChildrenFailed;
+        //std::cout << " fail." << std::endl;
+      }
     }
 
     if (node == lead)

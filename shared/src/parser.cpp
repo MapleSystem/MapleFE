@@ -768,6 +768,8 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
   }
 
   // Step 3. It's a regular table. Traverse children in DFS.
+  //         If it's inside a Left Recursion, it will finally goes to that
+  //         recursion. I don't need take care here.
 
   bool matched = false;
   unsigned old_pos = mCurToken;
