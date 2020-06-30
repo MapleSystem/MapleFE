@@ -204,6 +204,9 @@ struct RecStackEntry {
 };
 
 class Parser {
+private:
+  friend class RecursionTraversal;
+
 public:
   Lexer *mLexer;
   const char *filename;

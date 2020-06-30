@@ -88,87 +88,87 @@ bool Parser::TraverseFronNode(AppealNode *parent, FronNode fnode, Recursion *rec
 //
 // [NOTE] Move mCurToken when succ, and restore it when fails.
 //
-bool Parser::TraverseLeadNode(AppealNode *appeal, AppealNode *parent) {
-  // Step 1. We are entering a new recursion right now. Need prepare the
-  //         the recursion stack information.
-  RuleTable *rt = appeal->GetTable();
-
-  if (mTraceLeftRec) {
-    DumpIndentation();
-    std::cout << "<<<Enter LeadNode " << GetRuleTableName(rt)  << std::endl;
-  }
-
-  // It's possible that we re-enter a LeadNode. But we will skip it if it's
-  // already in the middle of traversal.
-  if (InRecStack(rt, mCurToken))
-    return false;
-
-  PushRecStack(rt, mCurToken);
-
-  // Step 2. Find Recursion
-  Recursion *rec = mRecursionAll.FindRecursion(rt);
-
-  // We will set the new mCurToken to the largest one.
-  // LeadFronNode and Circle's FronNodes are like OneOf children of LeadNode.
-  unsigned new_mCurToken = mCurToken;
-
-  // Step 3. Traverse LeadFronNodes
-  unsigned saved_mCurToken = mCurToken;
-  bool found = false;
-
-  for (unsigned i = 0; i < rec->mLeadFronNodes.GetNum(); i++){
-    bool temp_found = false;
-    gSuccTokensNum = 0;
-    mCurToken = saved_mCurToken;
-    FronNode fnode = rec->mLeadFronNodes.ValueAtIndex(i);
-    temp_found = TraverseFronNode(appeal, fnode);
-    found |= temp_found;
-
-    new_mCurToken = mCurToken > new_mCurToken ? mCurToken : new_mCurToken;
-
-    // Add succ to 'appeal' and SuccMatch, using gSuccTokens.
-    if (found) {
-      appeal->mAfter = Succ;
-      UpdateSuccInfo(saved_mCurToken, appeal);
-    }
-  }
-
-  // Step 4. Traverse Circles.
-  //         The 'appeal' succ match info will be saved inside TraverseCircle()
-  //         which also construct the path.
-  unsigned temp_gSuccTokensNum = 0;
-  unsigned temp_gSuccTokens[MAX_SUCC_TOKENS];
-  for (unsigned i = 0; i < rec->mNum; i++) {
-    mCurToken = saved_mCurToken;
-    if (mTraceLeftRec) {
-      DumpIndentation();
-      std::cout << "<<<Enter TraverseCircle:" << i << std::endl;
-    }
-    bool temp_found = TraverseCircle(appeal, rec, i, new_mCurToken);
-    if (mTraceLeftRec) {
-      DumpIndentation();
-      std::cout << "<<<Exit TraverseCircle:" << i << std::endl;
-    }
-    found |= temp_found;
-  }
-
-  MASSERT(new_mCurToken >= saved_mCurToken);
-  mCurToken = new_mCurToken;
-
-  // Step 5. Restore the recursion stack.
-  RecStackEntry entry = mRecStack.Back();
-  MASSERT((entry.mLeadNode == rt) && (entry.mStartToken == saved_mCurToken));
-  mRecStack.PopBack();
-
-  // Step 6. The gSuccTokens/Num will be updated in the caller in parser.cpp
-
-  if (mTraceLeftRec) {
-    DumpIndentation();
-    std::cout << "<<<Exit LeadNode " << GetRuleTableName(rt)  << std::endl;
-  }
-
-  return found;
-}
+//bool Parser::TraverseLeadNode(AppealNode *appeal, AppealNode *parent) {
+//  // Step 1. We are entering a new recursion right now. Need prepare the
+//  //         the recursion stack information.
+//  RuleTable *rt = appeal->GetTable();
+//
+//  if (mTraceLeftRec) {
+//    DumpIndentation();
+//    std::cout << "<<<Enter LeadNode " << GetRuleTableName(rt)  << std::endl;
+//  }
+//
+//  // It's possible that we re-enter a LeadNode. But we will skip it if it's
+//  // already in the middle of traversal.
+//  if (InRecStack(rt, mCurToken))
+//    return false;
+//
+//  PushRecStack(rt, mCurToken);
+//
+//  // Step 2. Find Recursion
+//  Recursion *rec = mRecursionAll.FindRecursion(rt);
+//
+//  // We will set the new mCurToken to the largest one.
+//  // LeadFronNode and Circle's FronNodes are like OneOf children of LeadNode.
+//  unsigned new_mCurToken = mCurToken;
+//
+//  // Step 3. Traverse LeadFronNodes
+//  unsigned saved_mCurToken = mCurToken;
+//  bool found = false;
+//
+//  for (unsigned i = 0; i < rec->mLeadFronNodes.GetNum(); i++){
+//    bool temp_found = false;
+//    gSuccTokensNum = 0;
+//    mCurToken = saved_mCurToken;
+//    FronNode fnode = rec->mLeadFronNodes.ValueAtIndex(i);
+//    temp_found = TraverseFronNode(appeal, fnode);
+//    found |= temp_found;
+//
+//    new_mCurToken = mCurToken > new_mCurToken ? mCurToken : new_mCurToken;
+//
+//    // Add succ to 'appeal' and SuccMatch, using gSuccTokens.
+//    if (found) {
+//      appeal->mAfter = Succ;
+//      UpdateSuccInfo(saved_mCurToken, appeal);
+//    }
+//  }
+//
+//  // Step 4. Traverse Circles.
+//  //         The 'appeal' succ match info will be saved inside TraverseCircle()
+//  //         which also construct the path.
+//  unsigned temp_gSuccTokensNum = 0;
+//  unsigned temp_gSuccTokens[MAX_SUCC_TOKENS];
+//  for (unsigned i = 0; i < rec->mNum; i++) {
+//    mCurToken = saved_mCurToken;
+//    if (mTraceLeftRec) {
+//      DumpIndentation();
+//      std::cout << "<<<Enter TraverseCircle:" << i << std::endl;
+//    }
+//    bool temp_found = TraverseCircle(appeal, rec, i, new_mCurToken);
+//    if (mTraceLeftRec) {
+//      DumpIndentation();
+//      std::cout << "<<<Exit TraverseCircle:" << i << std::endl;
+//    }
+//    found |= temp_found;
+//  }
+//
+//  MASSERT(new_mCurToken >= saved_mCurToken);
+//  mCurToken = new_mCurToken;
+//
+//  // Step 5. Restore the recursion stack.
+//  RecStackEntry entry = mRecStack.Back();
+//  MASSERT((entry.mLeadNode == rt) && (entry.mStartToken == saved_mCurToken));
+//  mRecStack.PopBack();
+//
+//  // Step 6. The gSuccTokens/Num will be updated in the caller in parser.cpp
+//
+//  if (mTraceLeftRec) {
+//    DumpIndentation();
+//    std::cout << "<<<Exit LeadNode " << GetRuleTableName(rt)  << std::endl;
+//  }
+//
+//  return found;
+//}
 
 // There are several things to be done in this function.
 // 1. Traverse each FronNode
@@ -290,4 +290,94 @@ void Parser::ApplySuccInfoOnPath(AppealNode *lead, AppealNode *last, bool succ) 
     else
       node = node->GetParent();
   }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////
+//                           RecursionTraversal
+///////////////////////////////////////////////////////////////////////////////////////////
+
+bool Parser::TraverseLeadNode(AppealNode *appeal, AppealNode *parent) {
+  bool found = false;
+  unsigned saved_mCurToken = mCurToken;
+
+  // Preprocess the recursion stack information.
+  RuleTable *rt = appeal->GetTable();
+  if (mTraceLeftRec) {
+    DumpIndentation();
+    std::cout << "<<<Enter LeadNode " << GetRuleTableName(rt)  << std::endl;
+  }
+
+  // It's possible that we re-enter a LeadNode. We will skip if re-entering.
+  if (InRecStack(rt, mCurToken))
+    return false;
+  PushRecStack(rt, mCurToken);
+
+  // Main body of recursion traversal.
+  RecursionTraversal rec_tra(appeal, parent, this);
+  rec_tra.Work();
+
+  // We only update the mCurToken when succeeds. The restore of mCurToken
+  // when fail is handled by TraverseRuleTable.
+  if (rec_tra.mSucc)
+    mCurToken = rec_tra.mLastToken;
+
+  RecStackEntry entry = mRecStack.Back();
+  MASSERT((entry.mLeadNode == rt) && (entry.mStartToken == saved_mCurToken));
+  mRecStack.PopBack();
+
+  // The gSuccTokens/Num will be updated in the caller in parser.cpp
+  // We don't handle over here.
+
+  if (mTraceLeftRec) {
+    DumpIndentation();
+    std::cout << "<<<Exit LeadNode " << GetRuleTableName(rt)  << std::endl;
+  }
+
+  return found;
+}
+
+RecursionTraversal::RecursionTraversal(AppealNode *self, AppealNode *parent, Parser *parser) {
+  mParser = parser;
+  mSelf = self;
+  mParent = parent;
+  mRuleTable = mSelf->GetTable();
+  mRec = mParser->mRecursionAll.FindRecursion(mRuleTable);
+
+  mSucc = false;
+  mStartToken = mParser->mCurToken;
+  mLastToken = 0;
+}
+
+RecursionTraversal::~RecursionTraversal() {
+}
+
+void RecursionTraversal::Work() {
+  mSucc = FindInstances();
+  if (mSucc)
+    ConnectInstances();
+}
+
+bool RecursionTraversal::FindInstances() {
+  bool found = false;
+  bool temp_found = FindFirstInstance();
+  found |= temp_found;
+  while (temp_found) {
+    bool temp_found = FindNextInstance();
+    found |= temp_found;
+  }
+  return found;
+}
+
+bool RecursionTraversal::FindFirstInstance() {
+  bool found = false;
+  return found;
+}
+
+bool RecursionTraversal::FindNextInstance() {
+  bool found = false;
+  return found;
+}
+
+void RecursionTraversal::ConnectInstances() {
 }
