@@ -44,24 +44,38 @@ public:
 };
 
 // The traverse of recursion will be handled in its own approach. It will be achieved
-// through two phases. One is FindInstance, which tries to find on instance of a
+// through two phases. One is FindInstance, which tries to find all instance of a
 // recursion that matches tokens. The other is ConnectInstance, which connects all
 // successful instances to become an AppealTree.
 
+enum RecTraInstance {
+  InstanceFirst,    // we are handling the first instance
+  InstanceRest,     // we are handling the rest instances.
+  InstanceNA
+};
+
 class RecursionTraversal {
-public:
+private:
   Parser     *mParser;
   Recursion  *mRec;
   RuleTable  *mRuleTable;
   AppealNode *mSelf;
   AppealNode *mParent;
 
+  RecTraInstance mInstance;
+
+private:
+  // Some temporary members to help find instance.
+  AppealNode *mPseudoParent;
+  AppealNode *mLead;
+
+public:
   bool        mSucc;
   unsigned    mStartToken;
   unsigned    mLastToken;  // the last token this recursion matches.
 
   bool FindFirstInstance();
-  bool FindNextInstance();
+  bool FindRestInstance();
 
   bool FindInstances();
   void ConnectInstances();

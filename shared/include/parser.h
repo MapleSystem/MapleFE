@@ -194,9 +194,13 @@ public:
   bool FindMatch(unsigned starttoken, unsigned target_match);
 };
 
+class RecursionTraversal;
 struct RecStackEntry {
-  RuleTable *mLeadNode;
-  unsigned   mStartToken;
+  RecursionTraversal *mRecTra;
+  RuleTable          *mLeadNode;
+  unsigned            mStartToken;
+  // mRecTra and mLeadNode are 1-1 mapping, so the operator==
+  // uses only one of them.
   bool operator== (const RecStackEntry &right) {
     return ((mLeadNode == right.mLeadNode)
             && (mStartToken == right.mStartToken));
@@ -343,7 +347,7 @@ private:
   RecursionAll               mRecursionAll;
   SmallVector<RecStackEntry> mRecStack;
 
-  void PushRecStack(RuleTable *rt, unsigned cur_token);
+  void PushRecStack(RuleTable *rt, RecursionTraversal *rectra, unsigned cur_token);
   bool InRecStack(RuleTable*, unsigned);
 
   LeftRecursion* FindRecursion(RuleTable *);

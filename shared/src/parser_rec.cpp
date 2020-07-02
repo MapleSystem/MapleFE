@@ -25,12 +25,16 @@
 
 
 bool Parser::InRecStack(RuleTable *rt, unsigned start_token) {
-  RecStackEntry e = {rt, start_token};
-  return mRecStack.Find(e);
+  for (unsigned i = 0; i < mRecStack.GetNum(); i++) {
+    RecStackEntry e = mRecStack.ValueAtIndex(i);
+    if ((e.mLeadNode == rt) && (e.mStartToken == start_token))
+      return true;
+  }
+  return false;
 }
 
-void Parser::PushRecStack(RuleTable *rt, unsigned start_token) {
-  RecStackEntry e = {rt, start_token};
+void Parser::PushRecStack(RuleTable *rt, RecursionTraversal *rectra, unsigned start_token) {
+  RecStackEntry e = {rt, rectra, start_token};
   return mRecStack.PushBack(e);
 }
 
@@ -308,13 +312,16 @@ bool Parser::TraverseLeadNode(AppealNode *appeal, AppealNode *parent) {
     std::cout << "<<<Enter LeadNode " << GetRuleTableName(rt)  << std::endl;
   }
 
-  // It's possible that we re-enter a LeadNode. We will skip if re-entering.
-  if (InRecStack(rt, mCurToken))
-    return false;
-  PushRecStack(rt, mCurToken);
+  // If we re-enter a LeadNode.
+  if (InRecStack(rt, mCurToken)) {
+    RecStackEntry entry = mRecStack.Back();
+    RecursionTraversal *rec_tra = entry.mRecTra;
+    return rec_tra->HandleReEnter(appeal);
+  }
 
   // Main body of recursion traversal.
   RecursionTraversal rec_tra(appeal, parent, this);
+  PushRecStack(rt, &rec_tra, mCurToken);
   rec_tra.Work();
 
   // We only update the mCurToken when succeeds. The restore of mCurToken
@@ -344,6 +351,10 @@ RecursionTraversal::RecursionTraversal(AppealNode *self, AppealNode *parent, Par
   mRuleTable = mSelf->GetTable();
   mRec = mParser->mRecursionAll.FindRecursion(mRuleTable);
 
+  mInstance = InstanceNA;
+  mPseudoParent = NULL;
+  mLead = NULL;
+
   mSucc = false;
   mStartToken = mParser->mCurToken;
   mLastToken = 0;
@@ -358,12 +369,41 @@ void RecursionTraversal::Work() {
     ConnectInstances();
 }
 
+// The first instance will be connected as the last child on the
+// connected instances tree. It's like a leaf node, and has no more
+// children. So the traversal for this instance will treat re-entering
+// the recursion as a failure. The re-entering could come from its own
+// back edge, or from multiple jumps out of the circles. But in any case
+// it will simply return false.
+//
+// For the rest instance finding, it will be complicated.
+// (1) If it re-enters from its own back-edge, the succ result of the
+//     previous instance is used as the matching result. 
+// (2) If the re-entering comes from other paths, it returns false since
+//     we don't look for recursion in any one instance.
+
+bool RecursionTraversal::HandleReEnter(AppealNode *curr_node) {
+  MASSERT(mInstance != InstanceNA);
+  if (mInstance == InstanceFirst)
+    return false;
+
+  MASSERT(mInstance == InstanceRest);
+  MASSERT(curr_node);
+
+  // iterate on all circles, to check if this re-entering is on a circle.
+  AppealNode *node = curr_node;
+  while(node) {
+
+    node = node->GetParent();
+  }
+}
+
 bool RecursionTraversal::FindInstances() {
   bool found = false;
   bool temp_found = FindFirstInstance();
   found |= temp_found;
   while (temp_found) {
-    bool temp_found = FindNextInstance();
+    bool temp_found = FindRestInstance();
     found |= temp_found;
   }
   return found;
@@ -371,11 +411,24 @@ bool RecursionTraversal::FindInstances() {
 
 bool RecursionTraversal::FindFirstInstance() {
   bool found = false;
+  mInstance = InstanceFirst;
+
+  // Create a pseudo parent node for easy access.
+  AppealNode *pseudo_parent = new AppealNode();
+  pseudo_parent->SetIsPseudo();
+  pseudo_parent->SetStartIndex(mStartToken);
+  mPseudoParent = pseudo_parent;
+  mParser->mAppealNodes.push_back(pseudo_parent);
+
+  found = mParser->TraverseRuleTable(mRuleTable, pseudo_parent);
   return found;
 }
 
-bool RecursionTraversal::FindNextInstance() {
+// Find one of the rest instances. Excludes the first instance.
+bool RecursionTraversal::FindRestInstance() {
   bool found = false;
+  mInstance = InstanceRest;
+  found = mParser->TraverseRuleTable(mRuleTable, mStartToken);
   return found;
 }
 
