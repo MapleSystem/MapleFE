@@ -381,6 +381,7 @@ void RecursionTraversal::Work() {
 //     previous instance is used as the matching result. 
 // (2) If the re-entering comes from other paths, it returns false since
 //     we don't look for recursion in any one instance.
+// Based on current design, it's pretty sure that only (1) is valid.
 
 bool RecursionTraversal::HandleReEnter(AppealNode *curr_node) {
   MASSERT(mInstance != InstanceNA);
@@ -390,12 +391,56 @@ bool RecursionTraversal::HandleReEnter(AppealNode *curr_node) {
   MASSERT(mInstance == InstanceRest);
   MASSERT(curr_node);
 
-  // iterate on all circles, to check if this re-entering is on a circle.
-  AppealNode *node = curr_node;
-  while(node) {
+  // Check if this re-entering is on a circle.
+  // curr_node is the re-entering AppealNode of lead rule table.
+  MASSERT(mPsedudoParent->mChildren.size() == 1);
+  AppealNode *ancestor_lead = mPseudoParent->mChildren[0];
+  MASSERT(IsOnCircle(curr_node, ancestor_lead));
 
-    node = node->GetParent();
+  // copy the previous instance result to 'curr_node'.
+  AppealNode *prev_lead = mLeadNodes.Back();
+  for (unsigned i = 0; i < prev_lead->GetMatchNum(); i++) {
+    unsigned m = prev_lead->GetMatch(i);
+    curr_node->AddMatch(m);
   }
+  curr_node->mAfter = prev_lead->mAfter;
+  
+  return curr_node->IsSucc();
+}
+
+// Returns true if first->...->second is one of the circles of mRec
+bool RecursionTraversal::IsOnCircle(AppealNode *second, AppealNode *first) {
+  unsigned on_times = 0;
+  for (unsigned i = 0; i < mRec->mRecursionNodes.GetNum(); i++) {
+    SmallVector<RuleTable*> *circle = mRec->mRecursionNodes.ValueAtIndex(i);
+    unsigned index = circle->GetNum() - 1;
+
+    // we check backwards.
+    // 'second' is not in the circle, 'first' is in circle.
+    bool found = true;
+    AppealNode *node = second->GetParent();
+    while(node != mPseudoParent) {
+      RuleTable *rt = node->GetTable();
+      RuleTable *c_rt = circle->ValueAtIndex(index);
+      if (rt != c_rt) {
+        found = false;
+        break;
+      }
+      node = node->GetParent();
+      index--;
+    }
+
+    if (found) {
+      MASSERT(index == 0);
+      on_times++;
+    }
+  }
+
+  MASSERT(on_times <= 1);
+  if (on_times == 1)
+    return true;
+  else
+    return false;
 }
 
 bool RecursionTraversal::FindInstances() {
@@ -421,6 +466,10 @@ bool RecursionTraversal::FindFirstInstance() {
   mParser->mAppealNodes.push_back(pseudo_parent);
 
   found = mParser->TraverseRuleTable(mRuleTable, pseudo_parent);
+  MASSERT(pseudo_parent->mChildren.size() == 1);
+  AppealNode *lead = pseudo_parent->mChildren[0];
+  mLeadNodes.PushBack(lead);
+
   return found;
 }
 

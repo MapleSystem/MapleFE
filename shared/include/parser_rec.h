@@ -63,13 +63,13 @@ private:
   AppealNode *mParent;
 
   RecTraInstance mInstance;
+  SmallVector<AppealNode*> mLeadNodes; // lead nodes of all instances
 
 private:
   // Some temporary members to help find instance.
   AppealNode *mPseudoParent;
-  AppealNode *mLead;
 
-public:
+private:
   bool        mSucc;
   unsigned    mStartToken;
   unsigned    mLastToken;  // the last token this recursion matches.
