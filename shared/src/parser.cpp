@@ -1396,6 +1396,7 @@ void Parser::SortOutOneof(AppealNode *parent) {
       if (child->GetStartIndex() == parent_match) {
         child->SetSorted();
         child->SetFinalMatch(parent_match);
+        child->SetParent(parent);
         good_children++;
         parent->mSortedChildren.push_back(child);
       }
@@ -1407,6 +1408,7 @@ void Parser::SortOutOneof(AppealNode *parent) {
         parent->mSortedChildren.push_back(child);
         child->SetFinalMatch(parent_match);
         child->SetSorted();
+        child->SetParent(parent);
       }
     }
 
@@ -1441,8 +1443,11 @@ void Parser::SortOutZeroormore(AppealNode *parent) {
   AppealNode *failed = parent->mChildren.back();
   std::vector<AppealNode*>::iterator childit = parent->mChildren.begin();
   for (; childit != parent->mChildren.end(); childit++) {
-    if (*childit != failed)
-      parent->mSortedChildren.push_back(*childit);
+    AppealNode *child = *childit;
+    if (child != failed) {
+      parent->mSortedChildren.push_back(child);
+      child->SetParent(parent);
+    }
   }
 
   unsigned last_match = parent_start - 1;
@@ -1525,6 +1530,7 @@ void Parser::SortOutZeroorone(AppealNode *parent) {
 
   // Finally add the only successful child to mSortedChildren
   parent->mSortedChildren.push_back(child);
+  child->SetParent(parent);
 }
 
 // [NOTE] Concatenate will conduct SecondTry if possible. This means it's possible
@@ -1583,6 +1589,7 @@ void Parser::SortOutConcatenate(AppealNode *parent) {
       child->SetFinalMatch(last_match);
 
       parent->mSortedChildren.push_back(child);
+      child->SetParent(parent);
       prev_child = child;
     } else {
       unsigned match_num = child->GetMatchNum();
@@ -1596,6 +1603,7 @@ void Parser::SortOutConcatenate(AppealNode *parent) {
 
         to_be_sorted.push_back(child);
         parent->mSortedChildren.push_back(child);
+        child->SetParent(parent);
         prev_child = child;
       } else if (match_num > 1) {
         // We only preserve the longest matching.
@@ -1611,6 +1619,7 @@ void Parser::SortOutConcatenate(AppealNode *parent) {
         // Add child to the working list
         to_be_sorted.push_back(child);
         parent->mSortedChildren.push_back(child);
+        child->SetParent(parent);
 
         prev_child = child;
       }
@@ -1638,6 +1647,7 @@ void Parser::SortOutData(AppealNode *parent) {
     child->SetSorted();
     to_be_sorted.push_back(child);
     parent->mSortedChildren.push_back(child);
+    child->SetParent(parent);
     break;
   }
   case DT_Token: {
@@ -1646,6 +1656,7 @@ void Parser::SortOutData(AppealNode *parent) {
     AppealNode *child = parent->mChildren.front();
     child->SetFinalMatch(child->GetStartIndex());
     parent->mSortedChildren.push_back(child);
+    child->SetParent(parent);
     break;
   }
   case DT_Char:
@@ -2243,6 +2254,17 @@ void AppealNode::AddMatch(unsigned m) {
   if (FindMatch(m))
     return;
   mMatches.PushBack(m);
+}
+
+// The existing match of 'this' is kept.
+// mAfter is changed only when it's changed from fail to succ.
+void AppealNode::CopyMatch(AppealNode *another) {
+  for (unsigned i = 0; i < another->GetMatchNum(); i++) {
+    unsigned m = another->GetMatch(i);
+    AddMatch(m);
+  }
+  if (IsFail())
+    mAfter = another->mAfter;
 }
 
 // return true if 'parent' is a parent of this.

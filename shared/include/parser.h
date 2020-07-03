@@ -56,7 +56,13 @@ typedef enum {
 
 class AppealNode{
 private:
+  // In theory a tree shouldn't merge. But we do allow merge in the recursion
+  // parsing. mParent is the first level parent. mSecondParents are second level, and
+  // they are used during manipulation at certain phases like connecting instances
+  // of recursion. However, after SortOut, only mParent is valid.
   AppealNode  *mParent;
+  SmallVector<AppealNode*> mSecondParents;
+
   unsigned     mStartIndex;       // index of start matching token
   bool         mSorted;           // already sorted out?
   bool         mIsPseudo;         // A pseudo node, mainly used for sub trees connection
@@ -68,6 +74,7 @@ private:
 public:
   AppealNode* GetParent()       {return mParent;}
   void SetParent(AppealNode *n) {mParent = n;}
+  void AddParent(AppealNode *n) {mSecondParents.PushBack(n);}
 
   unsigned GetStartIndex()      {return mStartIndex;}
   void SetStartIndex(unsigned i){mStartIndex = i;}
@@ -84,6 +91,8 @@ public:
   unsigned GetMatch(unsigned i) {return mMatches.ValueAtIndex(i);}
   void     AddMatch(unsigned i);
   bool     FindMatch(unsigned m); // if 'm' exists?
+  void     CopyMatch(AppealNode *another); // copy match info from another node.
+                                           // The existing matching of 'this' is kept.
 
 public:
   bool mIsTable;     // A AppealNode could relate to either rule table or token.

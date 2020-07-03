@@ -399,11 +399,7 @@ bool RecursionTraversal::HandleReEnter(AppealNode *curr_node) {
 
   // copy the previous instance result to 'curr_node'.
   AppealNode *prev_lead = mLeadNodes.Back();
-  for (unsigned i = 0; i < prev_lead->GetMatchNum(); i++) {
-    unsigned m = prev_lead->GetMatch(i);
-    curr_node->AddMatch(m);
-  }
-  curr_node->mAfter = prev_lead->mAfter;
+  curr_node->CopyMatch(prev_lead);
   
   return curr_node->IsSucc();
 }
@@ -447,10 +443,8 @@ bool RecursionTraversal::FindInstances() {
   bool found = false;
   bool temp_found = FindFirstInstance();
   found |= temp_found;
-  while (temp_found) {
-    bool temp_found = FindRestInstance();
-    found |= temp_found;
-  }
+  while (temp_found)
+    temp_found = FindRestInstance();
   return found;
 }
 
@@ -477,9 +471,41 @@ bool RecursionTraversal::FindFirstInstance() {
 bool RecursionTraversal::FindRestInstance() {
   bool found = false;
   mInstance = InstanceRest;
-  found = mParser->TraverseRuleTable(mRuleTable, mStartToken);
+
+  // Create a pseudo parent node for easy access.
+  AppealNode *pseudo_parent = new AppealNode();
+  pseudo_parent->SetIsPseudo();
+  pseudo_parent->SetStartIndex(mStartToken);
+  mPseudoParent = pseudo_parent;
+  mParser->mAppealNodes.push_back(pseudo_parent);
+
+  found = mParser->TraverseRuleTable(mRuleTable, pseudo_parent);
+  MASSERT(pseudo_parent->mChildren.size() == 1);
+  AppealNode *lead = pseudo_parent->mChildren[0];
+  mLeadNodes.PushBack(lead);
+
   return found;
 }
 
+// Connect all the instances.
+// A previous instance could be used by multiple circles in the next instance.
+// This causes merging of Appeal Tree. But it looks fine since the later
+// phases can handle such merging.
 void RecursionTraversal::ConnectInstances() {
+  // the latest instance is Fail.
+  AppealNode *curr_lead = mLeadNodes.Back();
+  MASSERT(curr_lead->IsFail());
+
+  // Connect mSelf to the last succ instance. Update the match info.
+  unsigned num = mLeadNodes.GetNum();
+  MASSERT(num > 1);
+  curr_lead = mLeadNodes.ValueAtIndex(num - 2);
+  curr_lead->SetParent(mSelf);
+  mSelf->AddChild(curr_lead);
+  mSefl->CopyMatch(curr_lead);
+
+  for (unsigned i = 0; i < num - 2; i++) {
+    unsigned id_to = num - 2 - i;
+    unsigned id_from = id_to - 1;
+  }
 }
