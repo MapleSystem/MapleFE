@@ -1825,14 +1825,14 @@ void Parser::FindPatchingNodes() {
   for (; it != was_succ_list.end(); it++) {
     AppealNode *was_succ = *it;
 
-    SuccMatch *succ = FindSucc(was_succ->GetTable());
-    MASSERT(succ && "WasSucc's rule has no SuccMatch?");
-    bool found = succ->GetStartToken(was_succ->GetStartIndex());
+    SuccMatch *succ_match = FindSucc(was_succ->GetTable());
+    MASSERT(succ_match && "WasSucc's rule has no SuccMatch?");
+    bool found = succ_match->GetStartToken(was_succ->GetStartIndex());
     MASSERT(found && "WasSucc cannot find start index in SuccMatch?");
 
-    AppealNode *youngest = succ->GetSuccNode(0);
-    for (unsigned i = 1; i < succ->GetSuccNodesNum(); i++) {
-      AppealNode *node = succ->GetSuccNode(i);
+    AppealNode *youngest = succ_match->GetSuccNode(0);
+    for (unsigned i = 1; i < succ_match->GetSuccNodesNum(); i++) {
+      AppealNode *node = succ_match->GetSuccNode(i);
       if (node->DescendantOf(youngest)) {
         youngest = node;
       } else {
@@ -2241,6 +2241,14 @@ bool SuccMatch::FindMatch(unsigned start, unsigned target) {
 //            AppealNode function
 ///////////////////////////////////////////////////////////////
 
+void AppealNode::AddParent(AppealNode *p) {
+  if (!mParent || mParent->IsPseudo())
+    mParent = p;
+  else
+    mSecondParents.PushBack(p);
+  return;
+}
+
 // If match 'm' is in the node?
 bool AppealNode::FindMatch(unsigned m) {
   for (unsigned i = 0; i < mMatches.GetNum(); i++) {
@@ -2254,6 +2262,17 @@ void AppealNode::AddMatch(unsigned m) {
   if (FindMatch(m))
     return;
   mMatches.PushBack(m);
+}
+
+unsigned AppealNode::LongestMatch() {
+  unsigned longest = 0;
+  MASSERT(IsSucc());
+  MASSERT(mMatches.GetNum() > 0);
+  for (unsigned i = 0; i < mMatches.GetNum(); i++) {
+    unsigned m = mMatches.ValueAtIndex(i);
+    longest = m > longest ? m : longest;
+  }
+  return longest;
 }
 
 // The existing match of 'this' is kept.

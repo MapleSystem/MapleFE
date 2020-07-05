@@ -72,19 +72,24 @@ private:
 private:
   bool        mSucc;
   unsigned    mStartToken;
-  unsigned    mLastToken;  // the last token this recursion matches.
 
+  bool IsOnCircle(AppealNode*, AppealNode*);
   bool FindFirstInstance();
   bool FindRestInstance();
-
   bool FindInstances();
   void ConnectInstances();
+
+public:
+  bool     IsSucc()        {return mSucc;}
+  unsigned GetStartToken() {return mStartToken;}
+  unsigned LongestMatch()  {return mSelf->LongestMatch();}
 
 public:
   RecursionTraversal(AppealNode *sel, AppealNode *parent, Parser *parser);
   ~RecursionTraversal();
 
   void Work();
+  bool HandleReEnter(AppealNode*);
 };
 
 #endif

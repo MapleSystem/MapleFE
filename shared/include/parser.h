@@ -72,9 +72,12 @@ private:
   SmallVector<unsigned> mMatches; // all of the last matching token.
 
 public:
+  AppealNode* GetSecondParentsNum() {return mSecondParents.GetNum();}
+  AppealNode* GetSecondParent(unsigned i) {return mSecondParents.ValueAtIndex(i);}
+  void        ClearSecondParents() {mSecondParents.Clear();}
   AppealNode* GetParent()       {return mParent;}
-  void SetParent(AppealNode *n) {mParent = n;}
-  void AddParent(AppealNode *n) {mSecondParents.PushBack(n);}
+  void        SetParent(AppealNode *n) {mParent = n;}
+  void        AddParent(AppealNode *n);
 
   unsigned GetStartIndex()      {return mStartIndex;}
   void SetStartIndex(unsigned i){mStartIndex = i;}
@@ -87,9 +90,10 @@ public:
   unsigned GetFinalMatch()           {return mFinalMatch;}
   void     SetFinalMatch(unsigned m) {mFinalMatch = m; mSorted = true;}
 
-  unsigned GetMatchNum() {return mMatches.GetNum();}
+  unsigned GetMatchNum()        {return mMatches.GetNum();}
   unsigned GetMatch(unsigned i) {return mMatches.ValueAtIndex(i);}
   void     AddMatch(unsigned i);
+  unsigned LongestMatch();        // find the longest match.
   bool     FindMatch(unsigned m); // if 'm' exists?
   void     CopyMatch(AppealNode *another); // copy match info from another node.
                                            // The existing matching of 'this' is kept.
@@ -219,7 +223,6 @@ struct RecStackEntry {
 class Parser {
 private:
   friend class RecursionTraversal;
-
 public:
   Lexer *mLexer;
   const char *filename;
@@ -355,6 +358,8 @@ private:
 private:
   RecursionAll               mRecursionAll;
   SmallVector<RecStackEntry> mRecStack;
+  SmallVector<AppealNode*>   mSeparatedTrees;   // we may created some seperated
+                                                // trees during recursion parsing.
 
   void PushRecStack(RuleTable *rt, RecursionTraversal *rectra, unsigned cur_token);
   bool InRecStack(RuleTable*, unsigned);
@@ -366,6 +371,9 @@ private:
   bool TraverseFronNode(AppealNode *parent, FronNode fnode, Recursion *rec = NULL, unsigned cir=0);
   void ApplySuccInfoOnPath(AppealNode *lead, AppealNode *pseudo, bool succ);
   AppealNode* ConstructPath(AppealNode*, AppealNode*, unsigned*, unsigned);
+
+public:
+  void AddSeparatedTree(AppealNode *n) {mSeparatedTrees.PushBack(n);}
 
 public:
   Parser(const char *f);

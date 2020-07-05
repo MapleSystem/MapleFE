@@ -34,7 +34,7 @@ bool Parser::InRecStack(RuleTable *rt, unsigned start_token) {
 }
 
 void Parser::PushRecStack(RuleTable *rt, RecursionTraversal *rectra, unsigned start_token) {
-  RecStackEntry e = {rt, rectra, start_token};
+  RecStackEntry e = {rectra, rt, start_token};
   return mRecStack.PushBack(e);
 }
 
@@ -326,8 +326,10 @@ bool Parser::TraverseLeadNode(AppealNode *appeal, AppealNode *parent) {
 
   // We only update the mCurToken when succeeds. The restore of mCurToken
   // when fail is handled by TraverseRuleTable.
-  if (rec_tra.mSucc)
-    mCurToken = rec_tra.mLastToken;
+  // We pick the longest match rec_tra.
+  if (rec_tra.IsSucc()) {
+    mCurToken = rec_tra.LongestMatch();
+  }
 
   RecStackEntry entry = mRecStack.Back();
   MASSERT((entry.mLeadNode == rt) && (entry.mStartToken == saved_mCurToken));
@@ -353,20 +355,18 @@ RecursionTraversal::RecursionTraversal(AppealNode *self, AppealNode *parent, Par
 
   mInstance = InstanceNA;
   mPseudoParent = NULL;
-  mLead = NULL;
 
   mSucc = false;
   mStartToken = mParser->mCurToken;
-  mLastToken = 0;
 }
 
 RecursionTraversal::~RecursionTraversal() {
+  mLeadNodes.Release();
 }
 
 void RecursionTraversal::Work() {
   mSucc = FindInstances();
-  if (mSucc)
-    ConnectInstances();
+  ConnectInstances();
 }
 
 // The first instance will be connected as the last child on the
@@ -393,13 +393,20 @@ bool RecursionTraversal::HandleReEnter(AppealNode *curr_node) {
 
   // Check if this re-entering is on a circle.
   // curr_node is the re-entering AppealNode of lead rule table.
-  MASSERT(mPsedudoParent->mChildren.size() == 1);
+  MASSERT(mPseudoParent->mChildren.size() == 1);
   AppealNode *ancestor_lead = mPseudoParent->mChildren[0];
   MASSERT(IsOnCircle(curr_node, ancestor_lead));
 
   // copy the previous instance result to 'curr_node'.
   AppealNode *prev_lead = mLeadNodes.Back();
   curr_node->CopyMatch(prev_lead);
+
+  // connect the previous instance to 'curr_node'.
+  // It's obvious that A previous instance could be connected to multiple
+  // back edge in multiple circles of a next instance of recursion. AddParent()
+  // will handle the multiple parents issue.
+  curr_node->AddChild(prev_lead);
+  prev_lead->AddParent(curr_node);
   
   return curr_node->IsSucc();
 }
@@ -487,25 +494,43 @@ bool RecursionTraversal::FindRestInstance() {
   return found;
 }
 
-// Connect all the instances.
-// A previous instance could be used by multiple circles in the next instance.
-// This causes merging of Appeal Tree. But it looks fine since the later
-// phases can handle such merging.
+// The connection between neighbouring instances has been handled in
+// HandleReEnter(). Here we need connect the generated tree to mParent, which
+// is the main body of whole tree.
 void RecursionTraversal::ConnectInstances() {
-  // the latest instance is Fail.
-  AppealNode *curr_lead = mLeadNodes.Back();
-  MASSERT(curr_lead->IsFail());
+  // The latest instance is Fail.
+  // The one before last instance is succ.
 
-  // Connect mSelf to the last succ instance. Update the match info.
+  // If there are succ instances, then 
+  // 1. connect mSelf to the last succ instance. Update the match info.
+  // 2. add the last instance to mParser's separated trees.
   unsigned num = mLeadNodes.GetNum();
-  MASSERT(num > 1);
-  curr_lead = mLeadNodes.ValueAtIndex(num - 2);
-  curr_lead->SetParent(mSelf);
-  mSelf->AddChild(curr_lead);
-  mSefl->CopyMatch(curr_lead);
+  if (num > 1) {
+    AppealNode *last_succ = mLeadNodes.ValueAtIndex(num - 2);
+    MASSERT(last_succ->GetParent()->IsPseudo());
+    last_succ->SetParent(mSelf);
+    mSelf->AddChild(last_succ);
+    mSelf->CopyMatch(last_succ);
 
-  for (unsigned i = 0; i < num - 2; i++) {
-    unsigned id_to = num - 2 - i;
-    unsigned id_from = id_to - 1;
+    // Also need add the last instance which is failed to the Parser::mSeparatedTrees.
+    AppealNode *last_fail = mLeadNodes.Back();
+    MASSERT(last_fail->IsFail());
+    mParser->AddSeparatedTree(last_fail);
+
+    // Need also clean the connection between this last fail instance to the previous
+    // successful instances. We do this by looking into last_succ's parent.
+    for (unsigned i = 0; i < last_succ->GetSecondParentsNum(); i++) {
+      AppealNode *second_parent = last_succ->GetSecondParent(i);
+      MASSERT(second_parent->mChildren.size() == 1);
+      second_parent->ClearChildren();
+    }
+    last_succ->ClearSecondParents();
+  } else {
+    // if there is no succ instance, simply connect the only failed instance to mSelf
+    AppealNode *last_fail = mLeadNodes.Back();
+    MASSERT(last_fail->IsFail());
+    last_fail->SetParent(mSelf);
+    mSelf->AddChild(last_fail);
+    mSelf->mAfter = FailChildrenFailed;
   }
 }
