@@ -321,6 +321,8 @@ bool Parser::TraverseLeadNode(AppealNode *appeal, AppealNode *parent) {
 
   // Main body of recursion traversal.
   RecursionTraversal rec_tra(appeal, parent, this);
+  rec_tra.SetTrace(mTraceLeftRec);
+  rec_tra.SetIndentation(mIndentation);
   PushRecStack(rt, &rec_tra, mCurToken);
   rec_tra.Work();
 
@@ -358,6 +360,9 @@ RecursionTraversal::RecursionTraversal(AppealNode *self, AppealNode *parent, Par
 
   mSucc = false;
   mStartToken = mParser->mCurToken;
+
+  mTrace = false;
+  mIndentation = 0;
 }
 
 RecursionTraversal::~RecursionTraversal() {
@@ -533,4 +538,9 @@ void RecursionTraversal::ConnectInstances() {
     mSelf->AddChild(last_fail);
     mSelf->mAfter = FailChildrenFailed;
   }
+}
+
+void RecursionTraversal::DumpIndentation() {
+  for (unsigned i=0; i < mIndentation; i++)
+    std::cout << " ";
 }

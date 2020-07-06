@@ -697,7 +697,6 @@ AppealNode* Parser::TraverseRuleTablePre(RuleTable *rule_table, AppealNode *pare
 
       if (mTraceTable)
         DumpExitTable(name, mIndentation, true, SuccWasSucc);
-      mIndentation -= 2;
 
       appeal->mAfter = SuccWasSucc;
       return appeal;
@@ -707,7 +706,6 @@ AppealNode* Parser::TraverseRuleTablePre(RuleTable *rule_table, AppealNode *pare
   if (WasFailed(rule_table, mCurToken)) {
     if (mTraceTable)
       DumpExitTable(name, mIndentation, false, FailWasFailed);
-    mIndentation -= 2;
     appeal->mAfter = FailWasFailed;
     return appeal;
   }
@@ -730,25 +728,23 @@ AppealNode* Parser::TraverseRuleTablePre(RuleTable *rule_table, AppealNode *pare
 //        4. TraverseLeadNode() also follows the rule 1&2. It moves mCurToken
 //           when succ and restore it when fail.
 bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
-
   mIndentation += 2;
 
   // Step 1. If the 'rule_table' has already been done, we just reuse the result.
   //         This step is in TraverseRuleTablePre().
-
   AppealNode *appeal = TraverseRuleTablePre(rule_table, parent);
-  if (appeal->IsSucc())
+  if (appeal->IsSucc()) {
+    mIndentation -= 2;
     return true;
-  else if (appeal->IsFail())
+  } else if (appeal->IsFail()) {
+    mIndentation -= 2;
     return false;
-
-  // At this point, the node is at the initial status. It needs traversal.
+  }
   MASSERT(appeal->IsNA());
 
   // Step 2. If it's a LeadNode, we will go through special handling.
   //         The match info of 'appeal' and its SuccMatch will be updated
   //         inside TraverseLeadNode().
-
   if (mRecursionAll.IsLeadNode(rule_table)) {
     bool found = TraverseLeadNode(appeal, parent);
     if (!found) {
@@ -770,37 +766,41 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
   // Step 3. It's a regular table. Traverse children in DFS.
   //         If it's inside a Left Recursion, it will finally goes to that
   //         recursion. I don't need take care here.
+  bool matched = TraverseRuleTableRegular(rule_table, appeal);
+  mIndentation -= 2;
+  return matched;
+}
 
+bool Parser::TraverseRuleTableRegular(RuleTable *rule_table, AppealNode *parent) {
   bool matched = false;
   unsigned old_pos = mCurToken;
-  Token *curr_token = GetActiveToken(mCurToken);
   gSuccTokensNum = 0;
 
   // [NOTE] TblLiteral and TblIdentifier don't use the SuccMatch info,
   //        since it's quite simple, we don't need SuccMatch to reduce
   //        the traversal time.
   if ((rule_table == &TblIdentifier))
-    return TraverseIdentifier(rule_table, appeal);
+    return TraverseIdentifier(rule_table, parent);
 
   if ((rule_table == &TblLiteral))
-    return TraverseLiteral(rule_table, appeal);
+    return TraverseLiteral(rule_table, parent);
 
   EntryType type = rule_table->mType;
   switch(type) {
   case ET_Oneof:
-    matched = TraverseOneof(rule_table, appeal);
+    matched = TraverseOneof(rule_table, parent);
     break;
   case ET_Zeroormore:
-    matched = TraverseZeroormore(rule_table, appeal);
+    matched = TraverseZeroormore(rule_table, parent);
     break;
   case ET_Zeroorone:
-    matched = TraverseZeroorone(rule_table, appeal);
+    matched = TraverseZeroorone(rule_table, parent);
     break;
   case ET_Concatenate:
-    matched = TraverseConcatenate(rule_table, appeal);
+    matched = TraverseConcatenate(rule_table, parent);
     break;
   case ET_Data:
-    matched = TraverseTableData(rule_table->mData, appeal);
+    matched = TraverseTableData(rule_table->mData, parent);
     break;
   case ET_Null:
   default:
@@ -811,19 +811,18 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
     const char *name = GetRuleTableName(rule_table);
     DumpExitTable(name, mIndentation, matched, FailChildrenFailed);
   }
-  mIndentation -= 2;
 
   if (mTraceSecondTry)
     DumpSuccTokens();
 
   if(matched) {
-    UpdateSuccInfo(old_pos, appeal);
-    appeal->mAfter = Succ;
-    //if (appeal->IsTable())
-    //  Appeal(appeal);
+    UpdateSuccInfo(old_pos, parent);
+    parent->mAfter = Succ;
+    //if (parent->IsTable())
+    //  Appeal(parent);
     return true;
   } else {
-    appeal->mAfter = FailChildrenFailed;
+    parent->mAfter = FailChildrenFailed;
     mCurToken = old_pos;
     AddFailed(rule_table, mCurToken);
     return false;

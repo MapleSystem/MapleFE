@@ -65,6 +65,9 @@ private:
   RecTraInstance mInstance;
   SmallVector<AppealNode*> mLeadNodes; // lead nodes of all instances
 
+  bool     mTrace;
+  unsigned mIndentation;
+
 private:
   // Some temporary members to help find instance.
   AppealNode *mPseudoParent;
@@ -83,6 +86,9 @@ public:
   bool     IsSucc()        {return mSucc;}
   unsigned GetStartToken() {return mStartToken;}
   unsigned LongestMatch()  {return mSelf->LongestMatch();}
+  void     SetTrace(bool b){mTrace = b;}
+  void     SetIndentation(unsigned i) {mIndentation = i;}
+  void     DumpIndentation();
 
 public:
   RecursionTraversal(AppealNode *sel, AppealNode *parent, Parser *parser);
