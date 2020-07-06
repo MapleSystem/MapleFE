@@ -356,8 +356,6 @@ RecursionTraversal::RecursionTraversal(AppealNode *self, AppealNode *parent, Par
   mRec = mParser->mRecursionAll.FindRecursion(mRuleTable);
 
   mInstance = InstanceNA;
-  mPseudoParent = NULL;
-
   mSucc = false;
   mStartToken = mParser->mCurToken;
 
@@ -398,12 +396,10 @@ bool RecursionTraversal::HandleReEnter(AppealNode *curr_node) {
 
   // Check if this re-entering is on a circle.
   // curr_node is the re-entering AppealNode of lead rule table.
-  MASSERT(mPseudoParent->mChildren.size() == 1);
-  AppealNode *ancestor_lead = mPseudoParent->mChildren[0];
-  MASSERT(IsOnCircle(curr_node, ancestor_lead));
+  AppealNode *prev_lead = mLeadNodes.Back();
+  MASSERT(IsOnCircle(curr_node, prev_lead));
 
   // copy the previous instance result to 'curr_node'.
-  AppealNode *prev_lead = mLeadNodes.Back();
   curr_node->CopyMatch(prev_lead);
 
   // connect the previous instance to 'curr_node'.
@@ -427,7 +423,7 @@ bool RecursionTraversal::IsOnCircle(AppealNode *second, AppealNode *first) {
     // 'second' is not in the circle, 'first' is in circle.
     bool found = true;
     AppealNode *node = second->GetParent();
-    while(node != mPseudoParent) {
+    while(node) {
       RuleTable *rt = node->GetTable();
       RuleTable *c_rt = circle->ValueAtIndex(index);
       if (rt != c_rt) {
@@ -435,6 +431,8 @@ bool RecursionTraversal::IsOnCircle(AppealNode *second, AppealNode *first) {
         break;
       }
       node = node->GetParent();
+      if (node == first)
+        break;
       index--;
     }
 
@@ -464,18 +462,14 @@ bool RecursionTraversal::FindFirstInstance() {
   bool found = false;
   mInstance = InstanceFirst;
 
-  // Create a pseudo parent node for easy access.
-  AppealNode *pseudo_parent = new AppealNode();
-  pseudo_parent->SetIsPseudo();
-  pseudo_parent->SetStartIndex(mStartToken);
-  mPseudoParent = pseudo_parent;
-  mParser->mAppealNodes.push_back(pseudo_parent);
-
-  found = mParser->TraverseRuleTable(mRuleTable, pseudo_parent);
-  MASSERT(pseudo_parent->mChildren.size() == 1);
-  AppealNode *lead = pseudo_parent->mChildren[0];
+  // Create a lead node
+  AppealNode *lead = new AppealNode();
+  lead->SetStartIndex(mStartToken);
+  lead->SetTable(mRuleTable);
   mLeadNodes.PushBack(lead);
+  mParser->mAppealNodes.push_back(lead);
 
+  found = mParser->TraverseRuleTableRegular(mRuleTable, lead);
   return found;
 }
 
@@ -484,18 +478,14 @@ bool RecursionTraversal::FindRestInstance() {
   bool found = false;
   mInstance = InstanceRest;
 
-  // Create a pseudo parent node for easy access.
-  AppealNode *pseudo_parent = new AppealNode();
-  pseudo_parent->SetIsPseudo();
-  pseudo_parent->SetStartIndex(mStartToken);
-  mPseudoParent = pseudo_parent;
-  mParser->mAppealNodes.push_back(pseudo_parent);
-
-  found = mParser->TraverseRuleTable(mRuleTable, pseudo_parent);
-  MASSERT(pseudo_parent->mChildren.size() == 1);
-  AppealNode *lead = pseudo_parent->mChildren[0];
+  // Create a lead node
+  AppealNode *lead = new AppealNode();
+  lead->SetStartIndex(mStartToken);
+  lead->SetTable(mRuleTable);
   mLeadNodes.PushBack(lead);
+  mParser->mAppealNodes.push_back(lead);
 
+  found = mParser->TraverseRuleTableRegular(mRuleTable, lead);
   return found;
 }
 

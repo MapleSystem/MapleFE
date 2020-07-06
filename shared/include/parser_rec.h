@@ -69,10 +69,6 @@ private:
   unsigned mIndentation;
 
 private:
-  // Some temporary members to help find instance.
-  AppealNode *mPseudoParent;
-
-private:
   bool        mSucc;
   unsigned    mStartToken;
 
