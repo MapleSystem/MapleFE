@@ -502,7 +502,6 @@ void RecursionTraversal::ConnectInstances() {
   unsigned num = mLeadNodes.GetNum();
   if (num > 1) {
     AppealNode *last_succ = mLeadNodes.ValueAtIndex(num - 2);
-    MASSERT(last_succ->GetParent()->IsPseudo());
     last_succ->SetParent(mSelf);
     mSelf->AddChild(last_succ);
     mSelf->CopyMatch(last_succ);

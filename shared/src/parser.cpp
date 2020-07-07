@@ -2281,7 +2281,7 @@ void AppealNode::CopyMatch(AppealNode *another) {
     unsigned m = another->GetMatch(i);
     AddMatch(m);
   }
-  if (IsFail())
+  if (IsFail() || IsNA())
     mAfter = another->mAfter;
 }
 
