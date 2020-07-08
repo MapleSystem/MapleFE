@@ -309,7 +309,7 @@ bool Parser::TraverseLeadNode(AppealNode *appeal, AppealNode *parent) {
   RuleTable *rt = appeal->GetTable();
   if (mTraceLeftRec) {
     DumpIndentation();
-    std::cout << "LR: Enter LeadNode " << GetRuleTableName(rt)
+    std::cout << "<LR>: Enter LeadNode " << GetRuleTableName(rt)
       << "@" << appeal->GetStartIndex() << std::endl;
   }
 
@@ -337,20 +337,24 @@ bool Parser::TraverseLeadNode(AppealNode *appeal, AppealNode *parent) {
   // We pick the longest match rec_tra.
   if (rec_tra.IsSucc()) {
     mCurToken = rec_tra.LongestMatch();
+    mCurToken++;
   }
-
-  RecStackEntry entry = mRecStack.Back();
-  MASSERT((entry.mLeadNode == rt) && (entry.mStartToken == saved_mCurToken));
-  mRecStack.PopBack();
 
   // The gSuccTokens/Num will be updated in the caller in parser.cpp
   // We don't handle over here.
 
   if (mTraceLeftRec) {
     DumpIndentation();
-    std::cout << "<LR>: Exit LeadNode " << GetRuleTableName(rt)
-      << "@" << appeal->GetStartIndex() << std::endl;
+    std::cout << "<LR>: Exit LeadNode " << GetRuleTableName(rt);
+    if (appeal->IsSucc())
+      std::cout << " succ longest match@" << appeal->LongestMatch() << std::endl;
+    else
+      std::cout << " fail" << std::endl;
   }
+
+  RecStackEntry entry = mRecStack.Back();
+  MASSERT((entry.mLeadNode == rt) && (entry.mStartToken == saved_mCurToken));
+  mRecStack.PopBack();
 
   return found;
 }

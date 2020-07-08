@@ -655,10 +655,8 @@ void Parser::UpdateSuccInfo(unsigned curr_token, AppealNode *node) {
 // The preparation of TraverseRuleTable().
 AppealNode* Parser::TraverseRuleTablePre(RuleTable *rule_table, AppealNode *parent) {
   const char *name = NULL;
-  if (mTraceTable) {
+  if (mTraceTable)
     name = GetRuleTableName(rule_table);
-    DumpEnterTable(name, mIndentation);
-  }
 
   // set the apppeal node
   AppealNode *appeal = new AppealNode();
@@ -729,6 +727,11 @@ AppealNode* Parser::TraverseRuleTablePre(RuleTable *rule_table, AppealNode *pare
 //           when succ and restore it when fail.
 bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
   mIndentation += 2;
+  const char *name = NULL;
+  if (mTraceTable) {
+    name = GetRuleTableName(rule_table);
+    DumpEnterTable(name, mIndentation);
+  }
 
   // Step 1. If the 'rule_table' has already been done, we just reuse the result.
   //         This step is in TraverseRuleTablePre().
@@ -767,6 +770,9 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
   //         If it's inside a Left Recursion, it will finally goes to that
   //         recursion. I don't need take care here.
   bool matched = TraverseRuleTableRegular(rule_table, appeal);
+  if (mTraceTable)
+    DumpExitTable(name, mIndentation, matched, FailChildrenFailed);
+
   mIndentation -= 2;
   return matched;
 }
@@ -805,11 +811,6 @@ bool Parser::TraverseRuleTableRegular(RuleTable *rule_table, AppealNode *parent)
   case ET_Null:
   default:
     break;
-  }
-
-  if (mTraceTable) {
-    const char *name = GetRuleTableName(rule_table);
-    DumpExitTable(name, mIndentation, matched, FailChildrenFailed);
   }
 
   if (mTraceSecondTry)
@@ -888,9 +889,6 @@ void Parser::TraverseSpecialTableSucc(RuleTable *rule_table, AppealNode *appeal)
   appeal->AddMatch(mCurToken);
 
   MoveCurToken();
-
-  if (mTraceTable)
-    DumpExitTable(name, mIndentation, true);
 }
 
 // Supplemental function invoked when TraverseSpecialToken fails.
@@ -900,8 +898,6 @@ void Parser::TraverseSpecialTableFail(RuleTable *rule_table,
                                       AppealStatus status) {
   const char *name = GetRuleTableName(rule_table);
   AddFailed(rule_table, mCurToken);
-  if (mTraceTable)
-    DumpExitTable(name, mIndentation, false, status);
   appeal->mAfter = status;
 }
 
