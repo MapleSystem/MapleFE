@@ -309,11 +309,17 @@ bool Parser::TraverseLeadNode(AppealNode *appeal, AppealNode *parent) {
   RuleTable *rt = appeal->GetTable();
   if (mTraceLeftRec) {
     DumpIndentation();
-    std::cout << "<<<Enter LeadNode " << GetRuleTableName(rt)  << std::endl;
+    std::cout << "LR: Enter LeadNode " << GetRuleTableName(rt)
+      << "@" << appeal->GetStartIndex() << std::endl;
   }
 
   // If we re-enter a LeadNode.
   if (InRecStack(rt, mCurToken)) {
+    if (mTraceLeftRec) {
+      DumpIndentation();
+      std::cout << "<LR>: HandleReEnter " << GetRuleTableName(rt)
+      << "@" << appeal->GetStartIndex() << std::endl;
+    }
     RecStackEntry entry = mRecStack.Back();
     RecursionTraversal *rec_tra = entry.mRecTra;
     return rec_tra->HandleReEnter(appeal);
@@ -342,7 +348,8 @@ bool Parser::TraverseLeadNode(AppealNode *appeal, AppealNode *parent) {
 
   if (mTraceLeftRec) {
     DumpIndentation();
-    std::cout << "<<<Exit LeadNode " << GetRuleTableName(rt)  << std::endl;
+    std::cout << "<LR>: Exit LeadNode " << GetRuleTableName(rt)
+      << "@" << appeal->GetStartIndex() << std::endl;
   }
 
   return found;
@@ -462,6 +469,11 @@ bool RecursionTraversal::FindFirstInstance() {
   bool found = false;
   mInstance = InstanceFirst;
 
+  if (mTrace) {
+    DumpIndentation();
+    std::cout << "<LR>: FirstInstance" << std::endl;
+  }
+
   // Create a lead node
   AppealNode *lead = new AppealNode();
   lead->SetStartIndex(mStartToken);
@@ -477,6 +489,11 @@ bool RecursionTraversal::FindFirstInstance() {
 bool RecursionTraversal::FindRestInstance() {
   bool found = false;
   mInstance = InstanceRest;
+
+  if (mTrace) {
+    DumpIndentation();
+    std::cout << "<LR>: RestInstance" << std::endl;
+  }
 
   // Create a lead node
   AppealNode *lead = new AppealNode();

@@ -891,7 +891,6 @@ void Parser::TraverseSpecialTableSucc(RuleTable *rule_table, AppealNode *appeal)
 
   if (mTraceTable)
     DumpExitTable(name, mIndentation, true);
-  mIndentation -= 2;
 }
 
 // Supplemental function invoked when TraverseSpecialToken fails.
@@ -903,7 +902,6 @@ void Parser::TraverseSpecialTableFail(RuleTable *rule_table,
   AddFailed(rule_table, mCurToken);
   if (mTraceTable)
     DumpExitTable(name, mIndentation, false, status);
-  mIndentation -= 2;
   appeal->mAfter = status;
 }
 
