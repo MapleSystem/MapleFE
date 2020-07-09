@@ -337,7 +337,7 @@ bool Parser::TraverseLeadNode(AppealNode *appeal, AppealNode *parent) {
   // We pick the longest match rec_tra.
   if (rec_tra.IsSucc()) {
     mCurToken = rec_tra.LongestMatch();
-    mCurToken++;
+    MoveCurToken();
   }
 
   // The gSuccTokens/Num will be updated in the caller in parser.cpp
