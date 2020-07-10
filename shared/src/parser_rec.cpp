@@ -336,6 +336,7 @@ bool Parser::TraverseLeadNode(AppealNode *appeal, AppealNode *parent) {
   // when fail is handled by TraverseRuleTable.
   // We pick the longest match rec_tra.
   if (rec_tra.IsSucc()) {
+    found = true;
     mCurToken = rec_tra.LongestMatch();
     MoveCurToken();
   }
