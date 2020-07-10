@@ -1971,18 +1971,29 @@ AppealNode* Parser::SimplifyShrinkEdges(AppealNode *node) {
     AppealNode *child = node->mSortedChildren[0];
 
     // step 2. Find out the index of child, through looking into sub-ruletable or token.
-    //         At this point, there is only one sorted child. It's guaranteed not
-    //         a concatenate table. It could be Oneof, Zeroorxxx, etc.
+    //         At this point, there is only one sorted child.
     unsigned child_index;
     bool found = node->GetSortedChildIndex(child, child_index);
-    MASSERT(found && "Could not find child index?");
+    if (!found) {
+      // There is one case where it cannot find child_index. In the left recursion
+      // parsing, each instance is connected to its previous one through the lead node.
+      // The connected two nodes are both lead rule table. We need remove one of them.
+      //
+      // In this case we don't worry about action since one of them is kept and the
+      // actions are kept actually.
 
-    // step 3. check condition (3)
-    //         [NOTE] in RuleAction, element index starts from 1.
-    RuleTable *rt = node->GetTable();
-    bool has_action = RuleActionHasElem(rt, child_index);
-    if (has_action)
-      break;
+      RuleTable *rt_p = node->GetTable();
+      RuleTable *rt_c = child->GetTable();
+      MASSERT((rt_p == rt_c));
+      MASSERT(mRecursionAll.IsLeadNode(rt_p));
+    } else {
+      // step 3. check condition (3)
+      //         [NOTE] in RuleAction, element index starts from 1.
+      RuleTable *rt = node->GetTable();
+      bool has_action = RuleActionHasElem(rt, child_index);
+      if (has_action)
+        break;
+    }
 
     // step 4. Shrink the edge. This is to remove 'node' by connecting 'node's father
     //         to child. We need go on shrinking with child.
@@ -2328,7 +2339,7 @@ void AppealNode::ReplaceSortedChild(AppealNode *existing, AppealNode *replacemen
   MASSERT(found && "ReplaceSortedChild could not find existing node?");
 
   mSortedChildren[index] = replacement;
-  replacement->mParent = this;
+  replacement->SetParent(this);
 }
 
 // Returns true : if successfully found the index.
