@@ -653,24 +653,11 @@ void Parser::UpdateSuccInfo(unsigned curr_token, AppealNode *node) {
 }
 
 // The preparation of TraverseRuleTable().
-AppealNode* Parser::TraverseRuleTablePre(RuleTable *rule_table, AppealNode *parent) {
+void Parser::TraverseRuleTablePre(AppealNode *appeal, AppealNode *parent) {
+  RuleTable *rule_table = appeal->GetTable();
   const char *name = NULL;
   if (mTraceTable)
     name = GetRuleTableName(rule_table);
-
-  // set the apppeal node
-  AppealNode *appeal = new AppealNode();
-  mAppealNodes.push_back(appeal);
-  appeal->SetTable(rule_table);
-  appeal->SetStartIndex(mCurToken);
-  appeal->SetParent(parent);
-  parent->AddChild(appeal);
-
-  if (mInSecondTry) {
-    appeal->mIsSecondTry = true;
-    mInSecondTry = false;
-  }
-
 
   // Check if it was succ. Set the gSuccTokens/gSuccTokensNum appropriately
   // The longest matching is chosen for the next rule table to match.
@@ -733,9 +720,23 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
     DumpEnterTable(name, mIndentation);
   }
 
+  // set the apppeal node
+  AppealNode *appeal = new AppealNode();
+  mAppealNodes.push_back(appeal);
+  appeal->SetTable(rule_table);
+  appeal->SetStartIndex(mCurToken);
+  appeal->SetParent(parent);
+  parent->AddChild(appeal);
+
+  if (mInSecondTry) {
+    appeal->mIsSecondTry = true;
+    mInSecondTry = false;
+  }
+
+
   // Step 1. If the 'rule_table' has already been done, we just reuse the result.
   //         This step is in TraverseRuleTablePre().
-  AppealNode *appeal = TraverseRuleTablePre(rule_table, parent);
+  TraverseRuleTablePre(appeal, parent);
   if (appeal->IsSucc()) {
     mIndentation -= 2;
     return true;
