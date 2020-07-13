@@ -25,6 +25,7 @@
 #include "gen_debug.h"
 #include "ast.h"
 #include "ast_builder.h"
+#include "parser_rec.h"
 
 //////////////////////////////////////////////////////////////////////////////////
 //                   Top Issues in Parsing System
@@ -733,11 +734,23 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
     mInSecondTry = false;
   }
 
-
   // Step 1. If the 'rule_table' has already been done, we just reuse the result.
-  //         This step is in TraverseRuleTablePre().
   TraverseRuleTablePre(appeal, parent);
+
+  // If we are re-entering a lead node, which is also in RecStack, we need
+  // connect this instance with previous one.
   if (appeal->IsSucc()) {
+    RecursionTraversal *rec_tra = FindRecStack(rule_table, mCurToken);
+    if (rec_tra) {
+      if (mTraceLeftRec) {
+        DumpIndentation();
+        std::cout << "<LR>: HandleReEnter " << GetRuleTableName(rule_table)
+                  << "@" << appeal->GetStartIndex() << std::endl;
+      }
+      mIndentation -= 2;
+      return rec_tra->HandleReEnter(appeal);
+    }
+
     mIndentation -= 2;
     return true;
   } else if (appeal->IsFail()) {

@@ -363,7 +363,7 @@ private:
                                                 // trees during recursion parsing.
 
   void PushRecStack(RuleTable *rt, RecursionTraversal *rectra, unsigned cur_token);
-  bool InRecStack(RuleTable*, unsigned);
+  RecursionTraversal* FindRecStack(RuleTable*, unsigned);
 
   LeftRecursion* FindRecursion(RuleTable *);
   bool IsLeadNode(RuleTable *);

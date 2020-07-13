@@ -24,13 +24,13 @@
 #include "gen_debug.h"
 
 
-bool Parser::InRecStack(RuleTable *rt, unsigned start_token) {
+RecursionTraversal* Parser::FindRecStack(RuleTable *rt, unsigned start_token) {
   for (unsigned i = 0; i < mRecStack.GetNum(); i++) {
     RecStackEntry e = mRecStack.ValueAtIndex(i);
     if ((e.mLeadNode == rt) && (e.mStartToken == start_token))
-      return true;
+      return e.mRecTra;
   }
-  return false;
+  return NULL;
 }
 
 void Parser::PushRecStack(RuleTable *rt, RecursionTraversal *rectra, unsigned start_token) {
@@ -313,16 +313,17 @@ bool Parser::TraverseLeadNode(AppealNode *appeal, AppealNode *parent) {
       << "@" << appeal->GetStartIndex() << std::endl;
   }
 
-  // If we re-enter a LeadNode.
-  if (InRecStack(rt, mCurToken)) {
+  // If we re-enter a LeadNode. This is only possible for the re-enterings from first instance
+  // to arrive at this point. All the rest instance re-entering will be blocked by
+  // TraverseRuleTablePre().
+  RecursionTraversal *rec_reenter = FindRecStack(rt, mCurToken);
+  if (rec_reenter) {
     if (mTraceLeftRec) {
       DumpIndentation();
       std::cout << "<LR>: HandleReEnter " << GetRuleTableName(rt)
       << "@" << appeal->GetStartIndex() << std::endl;
     }
-    RecStackEntry entry = mRecStack.Back();
-    RecursionTraversal *rec_tra = entry.mRecTra;
-    return rec_tra->HandleReEnter(appeal);
+    return rec_reenter->HandleReEnter(appeal);
   }
 
   // Main body of recursion traversal.
@@ -461,12 +462,17 @@ bool RecursionTraversal::IsOnCircle(AppealNode *second, AppealNode *first) {
     return false;
 }
 
+// I don't need worry about moving mCurToken if succ, because
+// it's handled in TraverseLeadNode().
 bool RecursionTraversal::FindInstances() {
   bool found = false;
+  unsigned saved_mCurToken = mParser->mCurToken;
   bool temp_found = FindFirstInstance();
   found |= temp_found;
-  while (temp_found)
+  while (temp_found) {
+    mParser->mCurToken = saved_mCurToken;
     temp_found = FindRestInstance();
+  }
   return found;
 }
 
@@ -500,6 +506,8 @@ bool RecursionTraversal::FindRestInstance() {
     std::cout << "<LR>: RestInstance" << std::endl;
   }
 
+  AppealNode *prev_lead = mLeadNodes.Back();
+
   // Create a lead node
   AppealNode *lead = new AppealNode();
   lead->SetStartIndex(mStartToken);
@@ -508,7 +516,19 @@ bool RecursionTraversal::FindRestInstance() {
   mParser->mAppealNodes.push_back(lead);
 
   found = mParser->TraverseRuleTableRegular(mRuleTable, lead);
-  return found;
+  MASSERT(found);
+
+  // Need check if 'lead' REALLY matches tokens. Rest instance always
+  // returns true since the prev instance is succ.
+  if (lead->LongestMatch() > prev_lead->LongestMatch()) {
+    return true;
+  } else {
+    if (mTrace) {
+      DumpIndentation();
+      std::cout << "<LR>: Fake Succ" << std::endl;
+    }
+    return false;
+  }
 }
 
 // The connection between neighbouring instances has been handled in
@@ -519,7 +539,8 @@ void RecursionTraversal::ConnectInstances() {
   // The one before last instance is succ.
 
   // If there are succ instances, then 
-  // 1. connect mSelf to the last succ instance. Update the match info.
+  // 1. connect mSelf to the last succ instance.
+  // 2. Update the match info to mSelf. gSuccTokens is updated in TraverseRuleTable().
   // 2. add the last instance to mParser's separated trees.
   unsigned num = mLeadNodes.GetNum();
   if (num > 1) {
@@ -528,9 +549,9 @@ void RecursionTraversal::ConnectInstances() {
     mSelf->AddChild(last_succ);
     mSelf->CopyMatch(last_succ);
 
-    // Also need add the last instance which is failed to the Parser::mSeparatedTrees.
+    // Also need add the last instance which is fake 'succ' to the Parser::mSeparatedTrees.
     AppealNode *last_fail = mLeadNodes.Back();
-    MASSERT(last_fail->IsFail());
+    MASSERT(last_fail->IsSucc());
     mParser->AddSeparatedTree(last_fail);
 
     // Need also clean the connection between this last fail instance to the previous
