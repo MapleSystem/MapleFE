@@ -198,6 +198,7 @@ public:
   unsigned    GetSuccNodesNum();         // number of matching nodes at a token;
   AppealNode* GetSuccNode(unsigned i);   // get succ node at index i;
   bool        FindNode(AppealNode*);     // can we find the node?
+  void        RemoveNode(AppealNode*);
 
   unsigned    GetMatchNum();             // Num of matchings.
   unsigned    GetOneMatch(unsigned i);   // The ith matching.
@@ -278,6 +279,7 @@ private:
   std::vector<SuccMatch*> mSuccPool;
   SuccMatch* FindSucc(RuleTable*);
   SuccMatch* FindOrCreateSucc(RuleTable*);
+  void RemoveSuccNode(unsigned curr_token, AppealNode *node);
   void ClearSucc();
   void UpdateSuccInfo(unsigned, AppealNode*);
 
@@ -327,8 +329,8 @@ private:
   std::vector<AppealNode*> mAppealNodes;
   AppealNode *mRootNode;
   void ClearAppealNodes();
-  void Appeal(AppealNode*);
-  void AppealTraverse(AppealNode *node, AppealNode *root);
+
+  void Appeal(AppealNode *node, AppealNode *root);
 
   // Sort Out
   void SortOut();

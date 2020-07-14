@@ -310,7 +310,7 @@ bool Parser::TraverseLeadNode(AppealNode *appeal, AppealNode *parent) {
   if (mTraceLeftRec) {
     DumpIndentation();
     std::cout << "<LR>: Enter LeadNode " << GetRuleTableName(rt)
-      << "@" << appeal->GetStartIndex() << std::endl;
+      << "@" << appeal->GetStartIndex() << " node:" << appeal << std::endl;
   }
 
   // If we re-enter a LeadNode. This is only possible for the re-enterings from first instance
@@ -321,9 +321,11 @@ bool Parser::TraverseLeadNode(AppealNode *appeal, AppealNode *parent) {
     if (mTraceLeftRec) {
       DumpIndentation();
       std::cout << "<LR>: HandleReEnter " << GetRuleTableName(rt)
-      << "@" << appeal->GetStartIndex() << std::endl;
+      << "@" << appeal->GetStartIndex() << " Simply Return false" << std::endl;
     }
-    return rec_reenter->HandleReEnter(appeal);
+    MASSERT(rec_reenter->GetInstance() == InstanceFirst);
+    rec_reenter->AddAppealPoint(appeal);
+    return false;
   }
 
   // Main body of recursion traversal.
@@ -400,17 +402,13 @@ void RecursionTraversal::Work() {
 // Based on current design, it's pretty sure that only (1) is valid.
 
 bool RecursionTraversal::HandleReEnter(AppealNode *curr_node) {
-  MASSERT(mInstance != InstanceNA);
-  if (mInstance == InstanceFirst)
-    return false;
-
   MASSERT(mInstance == InstanceRest);
   MASSERT(curr_node);
 
-  // Check if this re-entering is on a circle.
-  // curr_node is the re-entering AppealNode of lead rule table.
-  AppealNode *prev_lead = mLeadNodes.Back();
-  MASSERT(IsOnCircle(curr_node, prev_lead));
+  // The latest lead node in mLeadNodes is the current instance.
+  // We need the previous one.
+  MASSERT(mLeadNodes.GetNum() >= 2);
+  AppealNode *prev_lead = mLeadNodes.ValueAtIndex(mLeadNodes.GetNum() - 2);
 
   // copy the previous instance result to 'curr_node'.
   curr_node->CopyMatch(prev_lead);
@@ -480,11 +478,6 @@ bool RecursionTraversal::FindFirstInstance() {
   bool found = false;
   mInstance = InstanceFirst;
 
-  if (mTrace) {
-    DumpIndentation();
-    std::cout << "<LR>: FirstInstance" << std::endl;
-  }
-
   // Create a lead node
   AppealNode *lead = new AppealNode();
   lead->SetStartIndex(mStartToken);
@@ -492,7 +485,21 @@ bool RecursionTraversal::FindFirstInstance() {
   mLeadNodes.PushBack(lead);
   mParser->mAppealNodes.push_back(lead);
 
+  if (mTrace) {
+    DumpIndentation();
+    std::cout << "<LR>: FirstInstance " << lead << std::endl;
+  }
+
   found = mParser->TraverseRuleTableRegular(mRuleTable, lead);
+
+  // Appealing of the mistaken Fail nodes.
+  if (found) {
+    for (unsigned i = 0; i < mAppealPoints.GetNum(); i++) {
+      AppealNode *start = mAppealPoints.ValueAtIndex(i);
+      mParser->Appeal(start, lead);
+    }
+  }
+
   return found;
 }
 
@@ -500,11 +507,6 @@ bool RecursionTraversal::FindFirstInstance() {
 bool RecursionTraversal::FindRestInstance() {
   bool found = false;
   mInstance = InstanceRest;
-
-  if (mTrace) {
-    DumpIndentation();
-    std::cout << "<LR>: RestInstance" << std::endl;
-  }
 
   AppealNode *prev_lead = mLeadNodes.Back();
 
@@ -514,6 +516,11 @@ bool RecursionTraversal::FindRestInstance() {
   lead->SetTable(mRuleTable);
   mLeadNodes.PushBack(lead);
   mParser->mAppealNodes.push_back(lead);
+
+  if (mTrace) {
+    DumpIndentation();
+    std::cout << "<LR>: RestInstance " << lead << std::endl;
+  }
 
   found = mParser->TraverseRuleTableRegular(mRuleTable, lead);
   MASSERT(found);
@@ -527,6 +534,8 @@ bool RecursionTraversal::FindRestInstance() {
       DumpIndentation();
       std::cout << "<LR>: Fake Succ" << std::endl;
     }
+    // Need remove it from the SuccMatch.
+    mParser->RemoveSuccNode(mStartToken, lead);
     return false;
   }
 }
@@ -543,6 +552,14 @@ void RecursionTraversal::ConnectInstances() {
   // 2. Update the match info to mSelf. gSuccTokens is updated in TraverseRuleTable().
   // 2. add the last instance to mParser's separated trees.
   unsigned num = mLeadNodes.GetNum();
+  if (mTrace) {
+    for (unsigned i =0; i < num; i++) {
+      AppealNode *lead = mLeadNodes.ValueAtIndex(i);
+      DumpIndentation();
+      std::cout << "lead " << lead << " parent:" << lead->GetParent() << std::endl;
+    }
+  }
+
   if (num > 1) {
     AppealNode *last_succ = mLeadNodes.ValueAtIndex(num - 2);
     last_succ->SetParent(mSelf);

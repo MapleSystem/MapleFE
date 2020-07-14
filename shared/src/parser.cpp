@@ -415,91 +415,23 @@ void Parser::ClearAppealNodes() {
   mAppealNodes.clear();
 }
 
-// As the above comments mention, this function is going to walk through the appeal
-// tree to find the appropriate nodes and clear their failure mark.
-//
-// 'root_node' is the one who returns success when traversing. So we need check if
-// it was marked failure before in its sub-tree.
-//
-//             ======  Two Issues In The Traversal ==========
-//
-// 1. The token number is different. Here is an example,
-//
-//   Primary@9 <-- Succ, mCurToken becomes 12
-//    |--Primary@9
-//    |    |--FieldAccess@9 <-- FailedChildrenFailed
-//    |            |--Primary@9 FailLooped
-//    |--SomeOtherRule Succ <-- mCurToken becomes 12
-//
-//   When FieldAccess is marked as failed, the token was 9. But when we finish the
-//   first Primary, it's a success, while token becomes 12 since SomeOtherRule eats
-//   more than one tokens. In this way, the token numbers are different at the two
-//   points.
-//
-//   Since RuleTables are marked as WasFailed regarding specific token numbers, we
-//   need figure out a way to clear the failure flag regarding a specific token. So
-//   we decided to add token num at each AppealNode.
-//
-// 2. Multiple occurrence. Use the above example again with minor changes.
-//
-//   Primary@9 <-- Succ, mCurToken becomes 12
-//    |--Primary@9
-//    |    |--FieldAccess@9 <-- FailedChildrenFailed
-//    |            |--Primary@9 FailLooped
-//    |--Expression@9
-//    |    |--FieldAccess@9 <-- FailedChildrenFailed
-//    |            |--Primary@9 FailLooped
-//    |--SomeOtherRule Succ <-- mCurToken becomes 12
-//
-//   As the example shows, FieldAccess got failures at two different places due to
-//   Primary failiing in endless loop. The appealing of FieldAccess will be done twice
-//   and at the second time we may not find the @9 token when we trying to clean WasFailed
-//   because it was already cleared.
-//
-//   We will just ignore the second clearing of FieldAccess if we cannot find the token num
-//   in the mFailed.
+// This is for the appealing of mistaken Fail cases created during the first instance
+// of LeadNode traversal. We appeal all nodes from start up to root. We do backwards
+// traversal from 'start' upto 'root'.
+void Parser::Appeal(AppealNode *start, AppealNode *root) {
+  MASSERT((root->IsSucc()) && "root->mAfter is not Succ.");
+  MASSERT(start->GetTable() == root->GetTable());
 
-//static std::vector<AppealNode*> traverse_list;
-//void Parser::AppealTraverse(AppealNode *node, AppealNode *root) {
-//  traverse_list.push_back(node);
-//
-//  MASSERT((root->mAfter == Succ) && "root->mAfter is not Succ.");
-//  if ((node->GetTable() == root->GetTable()) && (node->mAfter == FailLooped)) {
-//    // 1. Walk the list, and clear the fail flag for corresponding rule table.
-//    // 2. For this specific AppealNode, it's mAfter is set to Fail, we are not changing it.
-//    for (unsigned i = 0; i < traverse_list.size(); i++) {
-//      AppealNode *n = traverse_list[i];
-//      if ((n->mBefore == Succ) && (n->mAfter == FailChildrenFailed)) {
-//        if (mTraceAppeal)
-//          DumpAppeal(n->GetTable(), n->GetStartIndex());
-//        ResetFailed(n->GetTable(), n->GetStartIndex());
-//      }
-//    }
-//  }
-//
-//  std::vector<AppealNode*>::iterator it = node->mChildren.begin();
-//  for (; it != node->mChildren.end(); it++) {
-//    AppealNode *child = *it;
-//    if (child->IsToken())
-//      continue;
-//    AppealTraverse(child, root);
-//    traverse_list.pop_back();
-//  }
-//}
-
-//void Parser::Appeal(AppealNode *root) {
-//  traverse_list.clear();
-//  traverse_list.push_back(root);
-//
-//  std::vector<AppealNode*>::iterator it = root->mChildren.begin();
-//  for (; it != root->mChildren.end(); it++) {
-//    AppealNode *child = *it;
-//    if (child->IsToken())
-//      continue;
-//    AppealTraverse(child, root);
-//    traverse_list.pop_back();
-//  }
-//}
+  AppealNode *node = start->GetParent();
+  while(node != root) {
+    if ((node->mAfter == FailChildrenFailed)) {
+      if (mTraceAppeal)
+        DumpAppeal(node->GetTable(), node->GetStartIndex());
+      ResetFailed(node->GetTable(), node->GetStartIndex());
+    }
+    node = node->GetParent();
+  }
+}
 
 // return true : if successful
 //       false : if failed
@@ -653,6 +585,16 @@ void Parser::UpdateSuccInfo(unsigned curr_token, AppealNode *node) {
   }
 }
 
+// Remove 'node' from its SuccMatch
+void Parser::RemoveSuccNode(unsigned curr_token, AppealNode *node) {
+  MASSERT(node->IsTable());
+  RuleTable *rule_table = node->GetTable();
+  SuccMatch *succ_match = FindSucc(rule_table);
+  MASSERT(succ_match);
+  succ_match->GetStartToken(curr_token);
+  succ_match->RemoveNode(node);
+}
+
 // The preparation of TraverseRuleTable().
 void Parser::TraverseRuleTablePre(AppealNode *appeal, AppealNode *parent) {
   RuleTable *rule_table = appeal->GetTable();
@@ -740,13 +682,18 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
   // If we are re-entering a lead node, which is also in RecStack, we need
   // connect this instance with previous one.
   if (appeal->IsSucc()) {
-    RecursionTraversal *rec_tra = FindRecStack(rule_table, mCurToken);
+    RecursionTraversal *rec_tra = FindRecStack(rule_table, appeal->GetStartIndex());
     if (rec_tra) {
       if (mTraceLeftRec) {
         DumpIndentation();
         std::cout << "<LR>: HandleReEnter " << GetRuleTableName(rule_table)
-                  << "@" << appeal->GetStartIndex() << std::endl;
+                  << "@" << appeal->GetStartIndex()
+                  << " node:" << appeal << std::endl;
       }
+      // It will be connect to the previous instance, which have full appeal tree.
+      // WasSucc node is used for succ node which has no full appeal tree. So better
+      // change the status to Succ.
+      appeal->mAfter = Succ;
       mIndentation -= 2;
       return rec_tra->HandleReEnter(appeal);
     }
@@ -833,8 +780,6 @@ bool Parser::TraverseRuleTableRegular(RuleTable *rule_table, AppealNode *parent)
   if(matched) {
     UpdateSuccInfo(old_pos, parent);
     parent->mAfter = Succ;
-    //if (parent->IsTable())
-    //  Appeal(parent);
     return true;
   } else {
     parent->mAfter = FailChildrenFailed;
@@ -2210,7 +2155,7 @@ void SuccMatch::AddMatch(unsigned m) {
   mMatches.PairedAddElem(m);
 }
 
-// Below are Query functions. They need be used together
+// Below are paired functions. They need be used together
 // with GetStartToken().
 
 // Find the succ info for token 't'. Return true if found.
@@ -2231,6 +2176,10 @@ AppealNode* SuccMatch::GetSuccNode(unsigned idx) {
 
 bool SuccMatch::FindNode(AppealNode *n) {
   return mNodes.PairedFindElem(n);
+}
+
+void SuccMatch::RemoveNode(AppealNode *n) {
+  return mNodes.PairedRemoveElem(n);
 }
 
 unsigned SuccMatch::GetMatchNum() {

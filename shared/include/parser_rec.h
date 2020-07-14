@@ -63,7 +63,8 @@ private:
   AppealNode *mParent;
 
   RecTraInstance mInstance;
-  SmallVector<AppealNode*> mLeadNodes; // lead nodes of all instances
+  SmallVector<AppealNode*> mLeadNodes;    // lead nodes of all instances
+  SmallVector<AppealNode*> mAppealPoints; // places to start appealing
 
   bool     mTrace;
   unsigned mIndentation;
@@ -81,7 +82,10 @@ private:
 public:
   bool     IsSucc()        {return mSucc;}
   unsigned GetStartToken() {return mStartToken;}
+  RecTraInstance GetInstance() {return mInstance;}
   unsigned LongestMatch()  {return mSelf->LongestMatch();}
+  void     AddAppealPoint(AppealNode *n) {mAppealPoints.PushBack(n);}
+
   void     SetTrace(bool b){mTrace = b;}
   void     SetIndentation(unsigned i) {mIndentation = i;}
   void     DumpIndentation();

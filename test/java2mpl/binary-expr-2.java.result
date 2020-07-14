@@ -1,0 +1,22 @@
+Matched 6 tokens.
+Attached a tree node from Child
+== Sub Tree ==
+Assign
+  a
+  GT
+    b
+    c
+
+
+============= Module ===========
+== Sub Tree ==
+Assign
+  a
+  GT
+    b
+    c
+
+
+Identifier:a has no decl.
+Identifier:b has no decl.
+Identifier:c has no decl.
