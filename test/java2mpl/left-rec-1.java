@@ -12,4 +12,16 @@
 //FIT FOR A PARTICULAR PURPOSE.
 //See the Mulan PSL v1 for more details.
 //
- int a;
+
+// Java has a rule 'Definite Assignment'.
+//
+// This case is from JLS 8.
+//
+// In this case, k is definitely assigned before use. Compiler should be able to evaluate
+// the special treatment of the conditional boolean operators &&, ||, and
+// ? : and of boolean-valued constant expressions
+//
+// All other expressions are not taken into account.
+//
+//if ((k = System.in.read()) >= 0)
+System.out.println(k);
