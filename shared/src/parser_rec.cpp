@@ -320,8 +320,10 @@ bool Parser::TraverseLeadNode(AppealNode *appeal, AppealNode *parent) {
   if (rec_reenter) {
     if (mTraceLeftRec) {
       DumpIndentation();
-      std::cout << "<LR>: HandleReEnter " << GetRuleTableName(rt)
+      std::cout << "<LR>: HandleReEnter FirstInstance " << GetRuleTableName(rt)
       << "@" << appeal->GetStartIndex() << " Simply Return false" << std::endl;
+      DumpIndentation();
+      std::cout << "<LR>: Add Appeal Point " << appeal << std::endl;
     }
     MASSERT(rec_reenter->GetInstance() == InstanceFirst);
     rec_reenter->AddAppealPoint(appeal);

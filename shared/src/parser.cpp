@@ -418,12 +418,23 @@ void Parser::ClearAppealNodes() {
 // This is for the appealing of mistaken Fail cases created during the first instance
 // of LeadNode traversal. We appeal all nodes from start up to root. We do backwards
 // traversal from 'start' upto 'root'.
+//
+// [NOTE] We will clear the Fail info from the mFaild map, so that it won't be
+//        treated as WasFail during TraverseRuleTable(). However, the appeal tree
+//        should be remained as fail, because it IS a fail indeed for this sub-tree.
 void Parser::Appeal(AppealNode *start, AppealNode *root) {
   MASSERT((root->IsSucc()) && "root->mAfter is not Succ.");
   MASSERT(start->GetTable() == root->GetTable());
 
   AppealNode *node = start->GetParent();
-  while(node != root) {
+
+  // It's possible that this sub-tree could be separated. For example, the last
+  // instance of RecursionTraversal, which is a Fake Succ, and is separated
+  // from the main tree. However, the tree itself is useful, and we do want to
+  // clear the mistaken Fail flag of useful rule tables.
+  //
+  // So a check for 'node' Not Null is to handle separated trees.
+  while(node && (node != root)) {
     if ((node->mAfter == FailChildrenFailed)) {
       if (mTraceAppeal)
         DumpAppeal(node->GetTable(), node->GetStartIndex());

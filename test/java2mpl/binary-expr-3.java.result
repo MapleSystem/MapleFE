@@ -1,0 +1,39 @@
+Matched 10 tokens.
+Convert unary --> binary
+Convert unary --> binary
+Convert unary --> binary
+Attached a tree node from Child
+== Sub Tree ==
+Assign
+  a
+  Add
+    b
+    Add
+      c
+      Add
+        d
+        e
+
+
+
+
+============= Module ===========
+== Sub Tree ==
+Assign
+  a
+  Add
+    b
+    Add
+      c
+      Add
+        d
+        e
+
+
+
+
+Identifier:a has no decl.
+Identifier:b has no decl.
+Identifier:c has no decl.
+Identifier:d has no decl.
+Identifier:e has no decl.
