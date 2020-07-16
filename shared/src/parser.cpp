@@ -551,9 +551,11 @@ void Parser::DumpExitTable(const char *table_name, unsigned indent, bool succ, A
   std::cout << "Exit  " << table_name << "@" << mCurToken;
   if (succ) {
     if (reason == SuccWasSucc)
-      std::cout << " succ@WasSucc" << "}" << std::endl;
+      std::cout << " succ@WasSucc" << "}";
     else
-      std::cout << " succ" << "}" << std::endl;
+      std::cout << " succ" << "}";
+    DumpSuccTokens();
+    std::cout << std::endl;
   } else {
     if (reason == FailWasFailed)
       std::cout << " fail@WasFailed" << "}" << std::endl;
@@ -577,10 +579,9 @@ unsigned gSuccTokensNum;
 unsigned gSuccTokens[MAX_SUCC_TOKENS];
 
 void Parser::DumpSuccTokens() {
-  std::cout << "gSuccTokensNum=" << gSuccTokensNum << ": ";
+  std::cout << " " << gSuccTokensNum << ": ";
   for (unsigned i = 0; i < gSuccTokensNum; i++)
     std::cout << gSuccTokens[i] << ",";
-  std::cout << std::endl;
 }
 
 // Update gSuccTokens into 'node'.
@@ -785,9 +786,6 @@ bool Parser::TraverseRuleTableRegular(RuleTable *rule_table, AppealNode *parent)
     break;
   }
 
-  if (mTraceSecondTry)
-    DumpSuccTokens();
-
   if(matched) {
     UpdateSuccInfo(old_pos, parent);
     parent->mAfter = Succ;
@@ -838,9 +836,6 @@ bool Parser::TraverseToken(Token *token, AppealNode *parent) {
     DumpExitTable(name.c_str(), mIndentation, found, AppealStatus_NA);
   }
 
-  if (mTraceSecondTry)
-    DumpSuccTokens();
-
   mIndentation -= 2;
   return found;
 }
@@ -887,9 +882,6 @@ bool Parser::TraverseLiteral(RuleTable *rule_table, AppealNode *appeal) {
     TraverseSpecialTableFail(rule_table, appeal, FailNotLiteral);
   }
 
-  if (mTraceSecondTry)
-    DumpSuccTokens();
-
   return found;
 }
 
@@ -908,9 +900,6 @@ bool Parser::TraverseIdentifier(RuleTable *rule_table, AppealNode *appeal) {
   } else {
     TraverseSpecialTableFail(rule_table, appeal, FailNotIdentifier);
   }
-
-  if (mTraceSecondTry)
-    DumpSuccTokens();
 
   return found;
 }
@@ -1092,9 +1081,6 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *parent, unsi
           final_succ_tokens[id] = gSuccTokens[id];
       }
     } else {
-      if (mTraceSecondTry)
-        DumpSuccTokens();
-
       MASSERT((gSuccTokensNum == 0) || ((gSuccTokensNum == 1) && (data->mType == DT_Token))
                && "failed case has >=1 successful matching?");
 

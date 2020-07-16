@@ -543,14 +543,15 @@ bool RecursionTraversal::FindRestInstance() {
 }
 
 // The connection between neighbouring instances has been handled in
-// HandleReEnter(). Here we need connect the generated tree to mParent, which
-// is the main body of whole tree.
+// HandleReEnter(). Here we need connect the generated tree to mSelf, which
+// is the main entry of whole tree.
 void RecursionTraversal::ConnectInstances() {
   // The latest instance is Fail.
   // The one before last instance is succ.
 
   // If there are succ instances, then 
-  // 1. connect mSelf to the last succ instance.
+  // 1. connect mSelf to every succ instance, since each succ instance means a possible
+  //    solution, and they will be counted as a succ child of mSelf.
   // 2. Update the match info to mSelf. gSuccTokens is updated in TraverseRuleTable().
   // 2. add the last instance to mParser's separated trees.
   unsigned num = mLeadNodes.GetNum();
@@ -562,19 +563,27 @@ void RecursionTraversal::ConnectInstances() {
     }
   }
 
-  if (num > 1) {
-    AppealNode *last_succ = mLeadNodes.ValueAtIndex(num - 2);
-    last_succ->SetParent(mSelf);
-    mSelf->AddChild(last_succ);
-    mSelf->CopyMatch(last_succ);
+  // The last instance could be succ when 'num' is more than one, and it's a fake succ.
+  // We put them in separated trees, not connected to mSelf.
+  // It also could be fail if it fails. We connect it to mSelf this time.
+  AppealNode *last = mLeadNodes.Back();
 
-    // Also need add the last instance which is fake 'succ' to the Parser::mSeparatedTrees.
-    AppealNode *last_fail = mLeadNodes.Back();
-    MASSERT(last_fail->IsSucc());
-    mParser->AddSeparatedTree(last_fail);
+  if (num > 1) {
+    // Connect mSelf with all REAL succ instance.
+    for (unsigned i = 0; i < mLeadNodes.GetNum() - 1; i++) {
+      AppealNode *instance = mLeadNodes.ValueAtIndex(i);
+      instance->SetParent(mSelf);
+      mSelf->AddChild(instance);
+      mSelf->CopyMatch(instance);
+    }
+
+    // Add the last instance which is fake 'succ' to the Parser::mSeparatedTrees.
+    MASSERT(last->IsSucc());
+    mParser->AddSeparatedTree(last);
 
     // Need also clean the connection between this last fail instance to the previous
     // successful instances. We do this by looking into last_succ's parent.
+    AppealNode *last_succ = mLeadNodes.ValueAtIndex(mLeadNodes.GetNum() - 2);
     for (unsigned i = 0; i < last_succ->GetSecondParentsNum(); i++) {
       AppealNode *second_parent = last_succ->GetSecondParent(i);
       MASSERT(second_parent->mChildren.size() == 1);
@@ -583,10 +592,9 @@ void RecursionTraversal::ConnectInstances() {
     last_succ->ClearSecondParents();
   } else {
     // if there is no succ instance, simply connect the only failed instance to mSelf
-    AppealNode *last_fail = mLeadNodes.Back();
-    MASSERT(last_fail->IsFail());
-    last_fail->SetParent(mSelf);
-    mSelf->AddChild(last_fail);
+    MASSERT(last->IsFail());
+    last->SetParent(mSelf);
+    mSelf->AddChild(last);
     mSelf->mAfter = FailChildrenFailed;
   }
 }
