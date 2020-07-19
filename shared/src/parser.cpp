@@ -639,7 +639,7 @@ void Parser::TraverseRuleTablePre(AppealNode *appeal, AppealNode *parent) {
         DumpExitTable(name, mIndentation, true, SuccWasSucc);
 
       appeal->mAfter = SuccWasSucc;
-      return appeal;
+      return;
     }
   }
 
@@ -647,10 +647,7 @@ void Parser::TraverseRuleTablePre(AppealNode *appeal, AppealNode *parent) {
     if (mTraceTable)
       DumpExitTable(name, mIndentation, false, FailWasFailed);
     appeal->mAfter = FailWasFailed;
-    return appeal;
   }
-
-  return appeal;
 }
 
 // return true : if the rule_table is matched
@@ -789,6 +786,7 @@ bool Parser::TraverseRuleTableRegular(RuleTable *rule_table, AppealNode *parent)
   if(matched) {
     UpdateSuccInfo(old_pos, parent);
     parent->mAfter = Succ;
+    ResetFailed(rule_table, old_pos);
     return true;
   } else {
     parent->mAfter = FailChildrenFailed;
