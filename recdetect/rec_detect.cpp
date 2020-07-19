@@ -296,10 +296,9 @@ TResult RecDetector::DetectRuleTable(RuleTable *rt, ContTreeNode<RuleTable*> *p)
   if (IsDone(rt))
     return TRS_Done;
 
-  // If find a new Recursion, create the recursion.
-  // This is the ending point of a back edge. As mentioned in the comments in
-  // the beginning of this file, back edge won't be furhter traversed as it is
-  // NOT part of the traversal tree.
+  // If find a new Recursion, create the recursion. It is the successor of thei
+  // back edge. As mentioned in the comments in the beginning of this file, back
+  // edge won't be furhter traversed as it is NOT part of the traversal tree.
   if (IsInProcess(rt)) {
     AddRecursion(rt, p);
     return;
@@ -338,6 +337,8 @@ TResult RecDetector::DetectRuleTable(RuleTable *rt, ContTreeNode<RuleTable*> *p)
   mInProcess.PopBack();
 
   // Add it to IsDone
+  // It's clear that a node is push&pop in/off the stack just once, and then
+  // it's set as IsDone. It's traversed only once.
   MASSERT(!IsDone(rt));
   mDone.PushBack(rt);
 

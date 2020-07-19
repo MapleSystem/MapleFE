@@ -48,6 +48,7 @@ struct Rule2Recursion {
 
 extern Rule2Recursion **gRule2Recursion;
 extern unsigned gRule2RecursionNum;
+extern Rule2Recursion* GetRule2Recursion(RuleTable *);
 
 // This struct is named 'FronNode' since its mainly usage is the FronNode
 // in LeftRecursion handling.

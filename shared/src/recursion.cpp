@@ -23,6 +23,15 @@
 #include "gen_debug.h"
 #include "token.h"
 
+Rule2Recursion* GetRule2Recursion(RuleTable *rule_table){
+  for (unsigned i = 0; i < gRule2RecursionNum; i++) {
+    Rule2Recursion *r2r = gRule2Recursion[i];
+    if (r2r->mRuleTable == rule_table)
+      return r2r;
+  }
+  return NULL;
+}
+
 // Find the index-th child and return it.
 // This function only returns Token or RuleTable, it won't take of FNT_Concat.
 FronNode RuleFindChildAtIndex(RuleTable *parent, unsigned index) {
