@@ -14,6 +14,11 @@
 
 #!/bin/bash
 
+# Usage:
+#  ./build.sh [LANG]
+#
+# eg. ./build.sh java
+
 rm -rf ../build64/recdetect
 rm -rf ../build64/recdetect/$1
 

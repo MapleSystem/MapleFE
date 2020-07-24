@@ -73,6 +73,7 @@ void Recursion::Release() {
   }
 
   mPaths.Release();
+  mRuleTables.Release();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -207,8 +208,8 @@ void RecDetector::AddRule2Recursion(RuleTable *rule, Recursion *rec) {
 
 // There is a back edge from 'p' to the first appearance of 'rt'. Actually in our
 // traversal tree, in the current path (from 'p' upward to the root) there is one
-// and only node representing 'rt', since the second appearance will be treated
-// as a back edge. 
+// and only node representing 'rt', which is the root. The successor of the back
+// edge is ignored.
 void RecDetector::AddRecursion(RuleTable *rt, ContTreeNode<RuleTable*> *p) {
   //std::cout << "Recursion in " << GetRuleTableName(rt) << std::endl;
 
@@ -263,6 +264,7 @@ void RecDetector::AddRecursion(RuleTable *rt, ContTreeNode<RuleTable*> *p) {
   for (int i = node_list.GetNum() - 1; i >= 0; i--) {
     RuleTable *rule = node_list.ValueAtIndex(i);
     AddRule2Recursion(rule, rec);
+    rec->AddRuleTable(rule);
   }
 }
 
@@ -271,13 +273,13 @@ void RecDetector::AddRecursion(RuleTable *rt, ContTreeNode<RuleTable*> *p) {
 Recursion* RecDetector::FindOrCreateRecursion(RuleTable *rule) {
   for (unsigned i = 0; i < mRecursions.GetNum(); i++) {
     Recursion *rec = mRecursions.ValueAtIndex(i);
-    if (rec->GetRuleTable() == rule)
+    if (rec->GetLead() == rule)
       return rec;
   }
 
   Recursion *rec = (Recursion*)gMemPool.Alloc(sizeof(Recursion));
   new (rec) Recursion();
-  rec->SetRuleTable(rule);
+  rec->SetLead(rule);
   mRecursions.PushBack(rec);
 
   return rec;
@@ -610,7 +612,7 @@ TResult RecDetector::DetectConcatenate(RuleTable *rule_table, ContTreeNode<RuleT
 }
 
 // We start from the top tables.
-// Iterate untile mToDo is empty.
+// Iterate until mToDo is empty.
 void RecDetector::Detect() {
   mDone.Clear();
   SetupTopTables();
@@ -623,6 +625,96 @@ void RecDetector::Detect() {
     // after it was put into the ToDo list.
     if (!IsDone(front) && !IsInProcess(front))
       DetectRuleTable(front, NULL);
+  }
+}
+
+// If there is a path from 'from' to 'to'.
+bool RecDetector::RuleTableReachable(RuleTable *from, RuleTable *to) {
+  bool found = false;
+  SmallList<RuleTable*> working_list;
+  SmallVector<RuleTable*> done_list;
+
+  working_list.PushBack(from);
+  while (!working_list.Empty()) {
+    RuleTable *rt = working_list.Front();
+    working_list.PopFront();
+
+    if (rt == to) {
+      found = true;
+      break;
+    }
+
+    bool is_done = false;
+    for (unsigned i = 0; i < done_list.GetNum(); i++) {
+      if (rt = done_list.ValueAtIndex(i)) {
+        is_done = true;
+        break;
+      }
+    }
+
+    if (is_done)
+      continue;
+
+    // Add all children rule table to working list
+    for (unsigned i = 0; i < rt->mNum; i++) {
+      TableData *data = rt->mData + i;
+      RuleTable *child = NULL;
+      if (data->mType == DT_Subtable) {
+        child = data->mData.mEntry;
+        working_list.PushBack(child);
+      }
+    }
+
+    done_list.PushBack(rt);
+  }
+
+  return found;
+}
+
+// Return the RecursionGroup if there is one containing 'rec'.
+RecursionGroup* RecDetector::FindRecursionGroup(Recursion *rec) {
+  RecursionGroup *group = NULL;
+  for (unsigned i = 0; i < mRecursionGroups.GetNum(); i++) {
+    RecursionGroup *rg = mRecursionGroups.ValueAtIndex(i);
+    for (unsigned j = 0; j < rg->mRecursions.GetNum(); j++) {
+      Recursion *r = mRecursions.ValueAtIndex(j);
+      if (rec == r) {
+        group = rg;
+        break;
+      }
+    }
+    if (group)
+      break;
+  }
+  return group;
+}
+
+// We are iterate the recursions in order. It has two level of iterations.
+// In this algorithm,
+// 1. The recursion which doesn't belong to any existing group is always
+//    the one to create its group.
+// 2. All recursions of a group can be identified in just one single
+//    inner iteration.
+void RecDetector::DetectGroups() {
+  for (unsigned i = 0; i < mRecursions.GetNum(); i++) {
+    Recursion *rec_i = mRecursions.ValueAtIndex(i);
+    RecursionGroup *group_i = FindRecursionGroup(rec_i);
+    // It's already done.
+    if (group_i)
+      continue;
+
+    group_i = new RecursionGroup();
+    mRecursionGroups.PushBack(group_i);
+
+    for (unsigned j = i + 1; j < mRecursions.GetNum(); j++) {
+      Recursion *rec_j = mRecursions.ValueAtIndex(j);
+      if (RuleTableReachable(rec_i->GetLead(), rec_j->GetLead()) &&
+          RuleTableReachable(rec_j->GetLead(), rec_i->GetLead())) {
+        RecursionGroup *group_j = FindRecursionGroup(rec_j);
+        MASSERT(!group_j);
+        group_i->AddRecursion(rec_j);
+      }
+    }
   }
 }
 
@@ -639,8 +731,14 @@ void RecDetector::Release() {
     map->Release();
   }
 
+  for (unsigned i = 0; i < mRecursionGroups.GetNum(); i++) {
+    RecursionGroup *rg = mRecursionGroups.ValueAtIndex(i);
+    rg->Release();
+  }
+
   mRule2Recursions.Release();
   mRecursions.Release();
+  mRecursionGroups.Release();
 
   mToDo.Release();
   mInProcess.Release();
@@ -672,7 +770,7 @@ void RecDetector::WriteCppFile() {
   //  LeftRecursion tablename_rec = {&Tbltablename, 2, tablename_path_list};
   for (unsigned i = 0; i < mRecursions.GetNum(); i++) {
     Recursion *rec = mRecursions.ValueAtIndex(i);
-    const char *tablename = GetRuleTableName(rec->GetRuleTable());
+    const char *tablename = GetRuleTableName(rec->GetLead());
 
     // dump comment of tablename
     std::string comment("// ");
@@ -756,7 +854,7 @@ void RecDetector::WriteCppFile() {
   total_str += "] = {";
   for (unsigned i = 0; i < mRecursions.GetNum(); i++) {
     Recursion *rec = mRecursions.ValueAtIndex(i);
-    const char *tablename = GetRuleTableName(rec->GetRuleTable());
+    const char *tablename = GetRuleTableName(rec->GetLead());
     total_str += "&";
     total_str += tablename;
     total_str += "_rec";
@@ -808,7 +906,7 @@ void RecDetector::WriteRule2Recursion() {
     for (unsigned j = 0; j < r2r->mRecursions.GetNum(); j++) {
       Recursion *lr = r2r->mRecursions.ValueAtIndex(j);
       lr_str += "&";
-      const char *n = GetRuleTableName(lr->GetRuleTable());
+      const char *n = GetRuleTableName(lr->GetLead());
       lr_str += n;
       lr_str += "_rec";
       if (j < (r2r->mRecursions.GetNum() - 1))
@@ -886,6 +984,7 @@ int main(int argc, char *argv[]) {
   gMemPool.SetBlockSize(4096);
   RecDetector dtc;
   dtc.Detect();
+  dtc.DetectGroups();
   dtc.Write();
   dtc.Release();
   return 0;

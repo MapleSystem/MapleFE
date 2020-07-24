@@ -67,15 +67,19 @@ public:
 // All recursions of a rule.
 class Recursion {
 private:
-  SmallVector<RecPath*> mPaths;
-  RuleTable            *mRuleTable;
+  SmallVector<RecPath*>   mPaths;
+  RuleTable              *mLead;
+  SmallVector<RuleTable*> mRuleTables;
 
 public:
   Recursion(){}
   ~Recursion() {Release();}
 
-  void SetRuleTable(RuleTable *t) {mRuleTable = t;}
-  RuleTable* GetRuleTable() {return mRuleTable;}
+  void SetLead(RuleTable *t) {mLead = t;}
+  RuleTable* GetLead() {return mLead;}
+
+  void AddRuleTable(RuleTable *rt) {mRuleTables.PushBack(rt);}
+  bool HaveRuleTable(RuleTable *rt){return mRuleTables.Find(rt);}
 
   unsigned PathsNum() {return mPaths.GetNum();}
   RecPath* GetPath(unsigned i) {return mPaths.ValueAtIndex(i);}
@@ -111,6 +115,17 @@ enum TResult {
                   // know the real status, but we can find it out by check IsFail()
                   // IsMaybeZero() and IsNonZero().
   TRS_NA          // Simply used as the initial status.
+};
+
+// Recursion Group: Every recursion can reach to any other recursion in the same group.
+// A group could contains only one recursion.
+class RecursionGroup {
+public:
+  RecursionGroup() {}
+  ~RecursionGroup(){}
+  SmallVector<Recursion*> mRecursions;
+  void AddRecursion(Recursion *r) {mRecursions.PushBack(r);}
+  void Release() {mRecursions.Release();}
 };
 
 // Left Recursion Detector.
@@ -157,6 +172,11 @@ private:
   void AddRule2Recursion(RuleTable*, Recursion*);
   void WriteRule2Recursion();
 
+  // recursion group
+  SmallVector<RecursionGroup*> mRecursionGroups;
+  bool RuleTableReachable(RuleTable *from, RuleTable *to);
+  RecursionGroup* FindRecursionGroup(Recursion*);
+
 private:
   Write2File *mCppFile;
   Write2File *mHeaderFile;
@@ -169,6 +189,7 @@ public:
   ~RecDetector(){Release();}
 
   void Detect();
+  void DetectGroups();
   void Write();
   void Release();
 };
