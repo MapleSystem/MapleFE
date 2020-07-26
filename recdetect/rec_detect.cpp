@@ -646,7 +646,7 @@ bool RecDetector::RuleTableReachable(RuleTable *from, RuleTable *to) {
 
     bool is_done = false;
     for (unsigned i = 0; i < done_list.GetNum(); i++) {
-      if (rt = done_list.ValueAtIndex(i)) {
+      if (rt == done_list.ValueAtIndex(i)) {
         is_done = true;
         break;
       }
@@ -677,7 +677,7 @@ RecursionGroup* RecDetector::FindRecursionGroup(Recursion *rec) {
   for (unsigned i = 0; i < mRecursionGroups.GetNum(); i++) {
     RecursionGroup *rg = mRecursionGroups.ValueAtIndex(i);
     for (unsigned j = 0; j < rg->mRecursions.GetNum(); j++) {
-      Recursion *r = mRecursions.ValueAtIndex(j);
+      Recursion *r = rg->mRecursions.ValueAtIndex(j);
       if (rec == r) {
         group = rg;
         break;
@@ -704,6 +704,7 @@ void RecDetector::DetectGroups() {
       continue;
 
     group_i = new RecursionGroup();
+    group_i->AddRecursion(rec_i);
     mRecursionGroups.PushBack(group_i);
 
     for (unsigned j = i + 1; j < mRecursions.GetNum(); j++) {
