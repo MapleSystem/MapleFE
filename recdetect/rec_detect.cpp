@@ -866,7 +866,18 @@ void RecDetector::WriteCppFile() {
   std::string last_str = "LeftRecursion **gLeftRecursions = TotalRecursions;";
   mCppFile->WriteOneLine(last_str.c_str(), last_str.size());
 
-  // Dump the separating lines.
+  // Step 4. Write RecursionGroups
+  last_str = "///////////////////////////////////////////////////////////////";
+  mCppFile->WriteOneLine(last_str.c_str(), last_str.size());
+  last_str = "//                       RecursionGroup                      //";
+  mCppFile->WriteOneLine(last_str.c_str(), last_str.size());
+  last_str = "///////////////////////////////////////////////////////////////";
+  mCppFile->WriteOneLine(last_str.c_str(), last_str.size());
+
+  WriteRecursionGroups();
+
+  // step 5. Write Rule2Recursion mapping.
+
   last_str = "///////////////////////////////////////////////////////////////";
   mCppFile->WriteOneLine(last_str.c_str(), last_str.size());
   last_str = "//                       Ruel2Recursion                      //";
@@ -874,8 +885,85 @@ void RecDetector::WriteCppFile() {
   last_str = "///////////////////////////////////////////////////////////////";
   mCppFile->WriteOneLine(last_str.c_str(), last_str.size());
 
-  // step 4. Write Rule2Recursion mapping.
   WriteRule2Recursion();
+}
+
+// unsigned gRecursionGroupsNum = N;
+// unsigned group_sizes[N] = {1,2,...};
+// unsigned *gRecursionGroupSizes = group_sizes;
+// LeftRecursion *RecursionGroup_1[1] = {&TblPrimary_rec, ...};
+// LeftRecursion *RecursionGroup_2[1] = {&TblPrimary_rec, ...};
+// LeftRecursion **recursion_groups[N] = {RecursionGroup_1, RecursionGroup_2...};
+// LeftRecursion ***gRecursionGroups = recursion_groups;
+void RecDetector::WriteRecursionGroups() {
+  // groups num
+  std::string groups_num = "unsigned gRecursionGroupsNum = ";
+  std::string num_str = std::to_string(mRecursionGroups.GetNum());
+  groups_num += num_str;
+  groups_num += ";";
+  mCppFile->WriteOneLine(groups_num.c_str(), groups_num.size());
+
+  // group sizes
+  std::string group_sizes = "unsigned group_sizes[";
+  group_sizes += num_str;
+  group_sizes += "] = {";
+  for (unsigned i = 0; i < mRecursionGroups.GetNum(); i++) {
+    RecursionGroup *rg = mRecursionGroups.ValueAtIndex(i);
+    unsigned size = rg->mRecursions.GetNum();
+    std::string size_str = std::to_string(size);
+    group_sizes += size_str;
+    if (i != (mRecursionGroups.GetNum() - 1))
+      group_sizes += ",";
+  }
+  group_sizes += "};";
+  mCppFile->WriteOneLine(group_sizes.c_str(), group_sizes.size());
+
+  group_sizes = "unsigned *gRecursionGroupSizes = group_sizes;";
+  mCppFile->WriteOneLine(group_sizes.c_str(), group_sizes.size());
+
+  // LeftRecursion *RecursionGroup_1[1] = {&TblPrimary_rec, ...};
+  // LeftRecursion *RecursionGroup_2[1] = {&TblPrimary_rec, ...};
+  for (unsigned i = 0; i < mRecursionGroups.GetNum(); i++) {
+    std::string group = "LeftRecursion *RecursionGroup_";
+    std::string i_str = std::to_string(i);
+    group += i_str;
+    group += "[";
+    RecursionGroup *rg = mRecursionGroups.ValueAtIndex(i);
+    unsigned size = rg->mRecursions.GetNum();
+    i_str = std::to_string(size);
+    group += i_str;
+    group += "] = {";
+    for (unsigned j = 0; j < rg->mRecursions.GetNum(); j++) {
+      Recursion *rec = rg->mRecursions.ValueAtIndex(j);
+      RuleTable *rule_table = rec->GetLead();
+      const char *name = GetRuleTableName(rule_table);
+      group += "&";
+      group += name;
+      group += "_rec";
+      if (j < (rg->mRecursions.GetNum() - 1))
+        group += ",";
+    }
+    group += "};";
+    mCppFile->WriteOneLine(group.c_str(), group.size());
+  } 
+
+  // LeftRecursion **recursion_groups[N] = {RecursionGroup_1, RecursionGroup_2...};
+  // LeftRecursion ***gRecursionGroups = recursion_groups;
+  std::string final_groups = "LeftRecursion **recursion_groups[";
+  final_groups += num_str;
+  final_groups += "] = {";
+  for (unsigned i = 0; i < mRecursionGroups.GetNum(); i++) {
+    final_groups += "RecursionGroup_";
+    std::string i_str = std::to_string(i);
+    final_groups += i_str;
+    if (i < (mRecursionGroups.GetNum() - 1))
+      final_groups += ",";
+  }
+  final_groups += "};";
+  mCppFile->WriteOneLine(final_groups.c_str(), final_groups.size());
+
+  final_groups = "LeftRecursion ***gRecursionGroups = recursion_groups;";
+  mCppFile->WriteOneLine(final_groups.c_str(), final_groups.size());
 }
 
 // Dump rule2recursion mapping, as below

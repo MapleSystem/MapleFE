@@ -176,6 +176,7 @@ private:
   SmallVector<RecursionGroup*> mRecursionGroups;
   bool RuleTableReachable(RuleTable *from, RuleTable *to);
   RecursionGroup* FindRecursionGroup(Recursion*);
+  void WriteRecursionGroups();
 
 private:
   Write2File *mCppFile;

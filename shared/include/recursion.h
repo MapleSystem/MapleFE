@@ -36,6 +36,13 @@ struct LeftRecursion {
 extern LeftRecursion **gLeftRecursions; //
 extern unsigned gLeftRecursionsNum;  // total number of rule tables having recursion.
 
+// RecursionGroups.
+extern unsigned  gRecursionGroupsNum;  // number of groups
+extern unsigned *gRecursionGroupSizes; // size of each group
+extern LeftRecursion ***gRecursionGroups; // all groups. It's organized as a one
+                                          // dimensional array, one group after another.
+extern LeftRecursion* GetRecursionInGroup(unsigned, unsigned);
+
 // Mapping from a rule table node to all the recursions it's part of. This is useful
 // when parser traverse into a node, and wants to know if it's in a recursion.
 // I'm using an array for temporary use. Will improve the searching if necessary later.
