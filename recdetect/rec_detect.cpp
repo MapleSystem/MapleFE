@@ -628,8 +628,15 @@ void RecDetector::Detect() {
   }
 }
 
-// If there is a path from 'from' to 'to'.
-bool RecDetector::RuleTableReachable(RuleTable *from, RuleTable *to) {
+// If there is a path from 'from' to 'to', and it's LeftRecursive reachable which
+// means 'from' to 'to' could be a left recursion valid path.
+//
+// Left Recursive Reachable is the fundamental idea of building recursion group.
+// We look for recursion group and parse on the groups like waves moving forward.
+// A non-left-recursive reachable group breaks this moving since it goes the different
+// tokens.
+
+bool RecDetector::LRReachable(RuleTable *from, RuleTable *to) {
   bool found = false;
   SmallList<RuleTable*> working_list;
   SmallVector<RuleTable*> done_list;
@@ -651,18 +658,55 @@ bool RecDetector::RuleTableReachable(RuleTable *from, RuleTable *to) {
         break;
       }
     }
-
     if (is_done)
       continue;
 
-    // Add all children rule table to working list
-    for (unsigned i = 0; i < rt->mNum; i++) {
-      TableData *data = rt->mData + i;
-      RuleTable *child = NULL;
+    EntryType type = rt->mType;
+    switch(type) {
+    case ET_Oneof: {
+      // Add all table children to working list.
+      for (unsigned i = 0; i < rt->mNum; i++) {
+        TableData *data = rt->mData + i;
+        if (data->mType == DT_Subtable) {
+          RuleTable *child = data->mData.mEntry;
+          working_list.PushBack(child);
+        }
+      }
+      break;
+    }
+    case ET_Zeroorone:
+    case ET_Zeroormore:
+    case ET_Data: {
+      MASSERT(rt->mNum == 1);
+      TableData *data = rt->mData;
       if (data->mType == DT_Subtable) {
-        child = data->mData.mEntry;
+        RuleTable *child = data->mData.mEntry;
         working_list.PushBack(child);
       }
+      break;
+    }
+    case ET_Concatenate: {
+      for (unsigned i = 0; i < rt->mNum; i++) {
+        TableData *data = rt->mData + i;
+        // If the child is not a rule table, all the rest children
+        // including this one are not left recursive legitimate.
+        if (data->mType != DT_Subtable)
+          break;
+
+        RuleTable *child = data->mData.mEntry;
+        working_list.PushBack(child);
+
+        // If 'child' is not MaybeZero, the rest children are
+        // not left recursive legitimate.
+        if (!IsMaybeZero(child))
+          break;
+      }
+      break;
+    }
+    case ET_Null:
+    default:
+      MASSERT(0 && "Unexpected EntryType of rule.");
+      break;
     }
 
     done_list.PushBack(rt);
@@ -709,8 +753,8 @@ void RecDetector::DetectGroups() {
 
     for (unsigned j = i + 1; j < mRecursions.GetNum(); j++) {
       Recursion *rec_j = mRecursions.ValueAtIndex(j);
-      if (RuleTableReachable(rec_i->GetLead(), rec_j->GetLead()) &&
-          RuleTableReachable(rec_j->GetLead(), rec_i->GetLead())) {
+      if (LRReachable(rec_i->GetLead(), rec_j->GetLead()) &&
+          LRReachable(rec_j->GetLead(), rec_i->GetLead())) {
         RecursionGroup *group_j = FindRecursionGroup(rec_j);
         MASSERT(!group_j);
         group_i->AddRecursion(rec_j);

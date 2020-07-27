@@ -174,7 +174,7 @@ private:
 
   // recursion group
   SmallVector<RecursionGroup*> mRecursionGroups;
-  bool RuleTableReachable(RuleTable *from, RuleTable *to);
+  bool LRReachable(RuleTable *from, RuleTable *to);
   RecursionGroup* FindRecursionGroup(Recursion*);
   void WriteRecursionGroups();
 
