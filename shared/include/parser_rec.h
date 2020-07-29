@@ -78,6 +78,7 @@ private:
   bool FindRestInstance();
   bool FindInstances();
   void ConnectInstances();
+  void SetIsDone();
 
 public:
   bool     IsSucc()        {return mSucc;}

@@ -36,7 +36,9 @@ struct LeftRecursion {
 extern LeftRecursion **gLeftRecursions; //
 extern unsigned gLeftRecursionsNum;  // total number of rule tables having recursion.
 
-// RecursionGroups.
+// RecursionGroups: A group of recursions where each can reach another
+// from both directions.
+
 extern unsigned  gRecursionGroupsNum;  // number of groups
 extern unsigned *gRecursionGroupSizes; // size of each group
 extern LeftRecursion ***gRecursionGroups; // all groups. It's organized as a one
@@ -56,6 +58,16 @@ struct Rule2Recursion {
 extern Rule2Recursion **gRule2Recursion;
 extern unsigned gRule2RecursionNum;
 extern Rule2Recursion* GetRule2Recursion(RuleTable *);
+
+// Rule2Group mapping.
+// A rule table maps to a recursion group, or No group at all.
+
+struct Rule2Group {
+  RuleTable *mRuleTable;
+  unsigned   mGroupId;
+};
+extern unsigned gRule2GroupNum;
+extern Rule2Group *gRule2Group;
 
 // This struct is named 'FronNode' since its mainly usage is the FronNode
 // in LeftRecursion handling.

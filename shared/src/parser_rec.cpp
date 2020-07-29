@@ -534,12 +534,21 @@ bool RecursionTraversal::FindRestInstance() {
   } else {
     if (mTrace) {
       DumpIndentation();
-      std::cout << "<LR>: Fake Succ" << std::endl;
+      std::cout << "<LR>: Fake Succ. Fixed Point." << std::endl;
     }
-    // Need remove it from the SuccMatch.
+    // Need remove it from the SuccMatch, so that later parser won't
+    // take it as an input.
     mParser->RemoveSuccNode(mStartToken, lead);
+
+    // Set all ruletable's SuccMatch to IsDone in this recursion group.
+    SetIsDone();
+
     return false;
   }
+}
+
+// Set IsDone for all ruletables in the same recursion group.
+void RecursionTraversal::SetIsDone() {
 }
 
 // The connection between neighbouring instances has been handled in

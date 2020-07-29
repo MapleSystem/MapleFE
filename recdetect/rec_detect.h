@@ -66,7 +66,7 @@ public:
 
 // All recursions of a rule.
 class Recursion {
-private:
+public:
   SmallVector<RecPath*>   mPaths;
   RuleTable              *mLead;
   SmallVector<RuleTable*> mRuleTables;
@@ -128,6 +128,13 @@ public:
   void Release() {mRecursions.Release();}
 };
 
+// RuleTable 2 RecursionGroup mapping.
+// A rule can only map to one single group. But a rule can maps to multiple recursions.
+struct Rule2Group{
+  RuleTable      *mRuleTable;
+  RecursionGroup *mGroup;
+};
+
 // Left Recursion Detector.
 class RecDetector {
 private:
@@ -177,6 +184,11 @@ private:
   bool LRReachable(RuleTable *from, RuleTable *to);
   RecursionGroup* FindRecursionGroup(Recursion*);
   void WriteRecursionGroups();
+
+  // rule to group mapping
+  SmallVector<Rule2Group> mRule2Group;
+  void AddRule2Group(RuleTable*, RecursionGroup*);
+  void WriteRule2Group();
 
 private:
   Write2File *mCppFile;

@@ -762,6 +762,36 @@ void RecDetector::DetectGroups() {
       }
     }
   }
+
+  // Build the rule2group
+  for (unsigned i = 0; i < mRecursionGroups.GetNum(); i++) {
+    RecursionGroup *group = mRecursionGroups.ValueAtIndex(i);
+    for (unsigned j = 0; j < group->mRecursions.GetNum(); j++) {
+      Recursion *rec = group->mRecursions.ValueAtIndex(j);
+      for (unsigned k = 0; k < rec->mRuleTables.GetNum(); k++) {
+        RuleTable *rt = rec->mRuleTables.ValueAtIndex(k);
+        // Duplication is checked in AddRule2Group().
+        AddRule2Group(rt, group);
+      }
+    }
+  }
+}
+
+void RecDetector::AddRule2Group(RuleTable *rt, RecursionGroup *group) {
+  bool found = false;
+  for (unsigned i = 0; i < mRule2Group.GetNum(); i++) {
+    Rule2Group r2g = mRule2Group.ValueAtIndex(i);
+    if ((r2g.mRuleTable == rt) && (r2g.mGroup == group)) {
+      found = true;
+      break;
+    }
+  }
+
+  if (found)
+    return;
+
+  Rule2Group r2g = {rt, group};
+  mRule2Group.PushBack(r2g);
 }
 
 // The reason I have a Release() is to make sure the destructors of Recursion and Paths
@@ -932,6 +962,17 @@ void RecDetector::WriteCppFile() {
   mCppFile->WriteOneLine(last_str.c_str(), last_str.size());
 
   WriteRule2Recursion();
+
+  // step 6. Write Rule2Group mapping.
+
+  last_str = "///////////////////////////////////////////////////////////////";
+  mCppFile->WriteOneLine(last_str.c_str(), last_str.size());
+  last_str = "//                       Ruel2Group                      //";
+  mCppFile->WriteOneLine(last_str.c_str(), last_str.size());
+  last_str = "///////////////////////////////////////////////////////////////";
+  mCppFile->WriteOneLine(last_str.c_str(), last_str.size());
+
+  WriteRule2Group();
 }
 
 // unsigned gRecursionGroupsNum = N;
@@ -1010,6 +1051,60 @@ void RecDetector::WriteRecursionGroups() {
 
   final_groups = "LeftRecursion ***gRecursionGroups = recursion_groups;";
   mCppFile->WriteOneLine(final_groups.c_str(), final_groups.size());
+}
+
+// We want to dump like below.
+//   unsigned gRule2GroupNum = X;
+//   Rule2Group gRule2Group[X] = {{&TblPrimary, 1}, {...}, ...};
+
+void RecDetector::WriteRule2Group() {
+  std::string comment = "// Rule2Group mapping";
+  mCppFile->WriteOneLine(comment.c_str(), comment.size());
+
+  std::string groups_num = "unsigned gRule2GroupNum = ";
+  std::string num_str = std::to_string(mRule2Group.GetNum());
+  groups_num += num_str;
+  groups_num += ";";
+  mCppFile->WriteOneLine(groups_num.c_str(), groups_num.size());
+
+  std::string groups = "Rule2Group rule2group[";
+  groups += num_str;
+  groups += "] = {";
+  mCppFile->WriteOneLine(groups.c_str(), groups.size());
+
+  for (unsigned i = 0; i < mRule2Group.GetNum(); i++) {
+    Rule2Group r2g = mRule2Group.ValueAtIndex(i);
+    RuleTable *rt = r2g.mRuleTable;
+    RecursionGroup *group = r2g.mGroup;
+    // finde the index of group.
+    int index = -1;
+    for (unsigned j = 0; j < mRecursionGroups.GetNum(); j++) {
+      if (group == mRecursionGroups.ValueAtIndex(j)) {
+        index = j;
+        break;
+      }
+    }
+    MASSERT(index >= 0);
+
+    std::string map = "  {&";
+    const char *tablename = GetRuleTableName(rt);
+    map += tablename;
+    map += ", ";
+    std::string id_str = std::to_string(index);
+    map += id_str;
+    map += "}";
+    if (i < mRule2Group.GetNum() - 1)
+      map += ",";
+
+    mCppFile->WriteOneLine(map.c_str(), map.size());
+  }
+
+  // The ending
+  groups = "};";
+  mCppFile->WriteOneLine(groups.c_str(), groups.size());
+
+  groups = "Rule2Group *gRule2Group = rule2group;";
+  mCppFile->WriteOneLine(groups.c_str(), groups.size());
 }
 
 // Dump rule2recursion mapping, as below
