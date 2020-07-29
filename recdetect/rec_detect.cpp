@@ -530,7 +530,8 @@ TResult RecDetector::DetectData(RuleTable *rule_table, ContTreeNode<RuleTable*> 
 //   TRS_Fail:      Definitely a fail for left recursion. Just stop here.
 //   TRS_MaybeZero: The rule table could be empty. For a rule table, at the first
 //                  time it's traversed, we will save it to mMaybeZero if it's.
-//   TRS_NonZero:   The rule is not empty. It may or may not help to form a recurion.
+//   TRS_NonZero:   The rule is not empty. The detection for parent stop here. But
+//                  the rest children could form some new recursions.
 //   TRS_Done:      This one is extra return result which doesn't have corresponding
 //                  rule catogeries of it. But the rule can be figured out by
 //                  checking IsFail(), IsMaybeZero() and IsNonZero(), because this

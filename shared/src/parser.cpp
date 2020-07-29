@@ -2199,6 +2199,18 @@ bool SuccMatch::FindMatch(unsigned start, unsigned target) {
   return found;
 }
 
+void SuccMatch::SetIsDone() {
+  mNodes.PairedSetKnobData(1);
+  mMatches.PairedSetKnobData(1);
+}
+
+bool SuccMatch::IsDone() {
+  unsigned u1 = mNodes.PairedGetKnobData();
+  unsigned u2 = mMatches.PairedGetKnobData();
+  MASSERT(u1 == u2);
+  return (bool)u1;
+}
+
 ///////////////////////////////////////////////////////////////
 //            AppealNode function
 ///////////////////////////////////////////////////////////////

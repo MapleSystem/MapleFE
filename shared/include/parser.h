@@ -166,14 +166,20 @@ public:
 // other one is the last matching token index. The second info can be also found through
 // AppealNode, but we save it for convenience of query.
 //
-// This is a per-rule data structure. The first 'unsigned' is the start token index.
-// It's the key to the knob. The second 'unsigned' is unused. The third data is the
-// content which users are looking for, either AppealNodes or matching tokens.
+// This is a per-rule data structure.
+// 1. The first 'unsigned' is the start token index. It's the key to the knob.
+// 2. The second 'unsigned' is used for 'IsDone' right now. It tells if the current
+//    recursion group has finished its parsing on this StartIndex. We conduct the parsing
+//    on every recursion group in a wavefront manner. Although after each iteration of
+//    the wavefront we got succ/fail info, but it's not complete yet. This field tells
+//    if we have reached the fixed point or not.
+// 3. The third data is the content which users are looking for, either AppealNodes or
+//    matching tokens.
 
 class SuccMatch {
 private:
-  Guamian<unsigned, unsigned /*unused*/, AppealNode*> mNodes;
-  Guamian<unsigned, unsigned /*unused*/, unsigned> mMatches;
+  Guamian<unsigned, unsigned, AppealNode*> mNodes;
+  Guamian<unsigned, unsigned, unsigned> mMatches;
 
 public:
   SuccMatch(){}
@@ -189,10 +195,10 @@ public:
 
   ////////////////////////////////////////////////////////////////////////////
   //                     Query functions.
+  // All functions in this section should be used together with GetStartToken()
+  // or AddStartToken() above. Internal data is defined in GetStartToken(i);
   ////////////////////////////////////////////////////////////////////////////
 
-  // The last four functions should be used together with GetStartToken(unsigned). 
-  // Internal data is defined in GetStartToken(i);
   bool        GetStartToken(unsigned t); // trying to get succ info for 't'
 
   unsigned    GetSuccNodesNum();         // number of matching nodes at a token;
@@ -204,7 +210,13 @@ public:
   unsigned    GetOneMatch(unsigned i);   // The ith matching.
   bool        FindMatch(unsigned);       // can we find the matching token?
 
+  // Note, the init value of Knob's data is set to 0, meaning IsDone is false.
+  void        SetIsDone();
+  bool        IsDone();
+
+  ////////////////////////////////////////////////////////////////////////////
   // Below are independent functions. The start token is in argument.
+  ////////////////////////////////////////////////////////////////////////////
   bool FindMatch(unsigned starttoken, unsigned target_match);
 };
 
