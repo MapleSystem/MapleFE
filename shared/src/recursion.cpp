@@ -32,6 +32,25 @@ Rule2Recursion* GetRule2Recursion(RuleTable *rule_table){
   return NULL;
 }
 
+// Find the RecursionGroup 'rt' belongs to
+bool FindRecursionGroup(RuleTable *rt, unsigned &id) {
+  bool found = false;
+  for (unsigned i = 0; i < gRule2GroupNum; i++) {
+    Rule2Group r2g = gRule2Group[i];
+    if (r2g.mRuleTable == rt) {
+      id = r2g.mGroupId;
+      found = true;
+      break;
+    }
+  }
+
+  if (found) {
+    MASSERT(id < gRecursionGroupsNum);
+    return true;
+  } else
+    return false;
+}
+
 // Find the index-th child and return it.
 // This function only returns Token or RuleTable, it won't take of FNT_Concat.
 FronNode RuleFindChildAtIndex(RuleTable *parent, unsigned index) {

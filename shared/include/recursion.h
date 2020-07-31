@@ -68,6 +68,7 @@ struct Rule2Group {
 };
 extern unsigned gRule2GroupNum;
 extern Rule2Group *gRule2Group;
+extern bool FindRecursionGroup(RuleTable *rt, unsigned &id); // find group id
 
 // This struct is named 'FronNode' since its mainly usage is the FronNode
 // in LeftRecursion handling.

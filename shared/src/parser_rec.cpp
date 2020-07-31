@@ -378,6 +378,9 @@ RecursionTraversal::RecursionTraversal(AppealNode *self, AppealNode *parent, Par
 
   mTrace = false;
   mIndentation = 0;
+
+  bool found = FindRecursionGroup(mRuleTable, mGroupId);
+  MASSERT(found);
 }
 
 RecursionTraversal::~RecursionTraversal() {
@@ -541,7 +544,7 @@ bool RecursionTraversal::FindRestInstance() {
     mParser->RemoveSuccNode(mStartToken, lead);
 
     // Set all ruletable's SuccMatch to IsDone in this recursion group.
-    SetIsDone();
+    // SetIsDone();
 
     return false;
   }
@@ -549,6 +552,8 @@ bool RecursionTraversal::FindRestInstance() {
 
 // Set IsDone for all ruletables in the same recursion group.
 void RecursionTraversal::SetIsDone() {
+  //RecursionGroup *group = FindRecursionGroup(mRuleTable);
+  //mParser->SetIsDone(group, mStartToken);
 }
 
 // The connection between neighbouring instances has been handled in

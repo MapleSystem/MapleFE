@@ -61,6 +61,7 @@ private:
   RuleTable  *mRuleTable;
   AppealNode *mSelf;
   AppealNode *mParent;
+  unsigned    mGroupId;   // Id of recursion group
 
   RecTraInstance mInstance;
   SmallVector<AppealNode*> mLeadNodes;    // lead nodes of all instances
