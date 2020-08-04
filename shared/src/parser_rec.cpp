@@ -24,17 +24,17 @@
 #include "gen_debug.h"
 
 
-RecursionTraversal* Parser::FindRecStack(RuleTable *rt, unsigned start_token) {
+RecursionTraversal* Parser::FindRecStack(unsigned group_id, unsigned start_token) {
   for (unsigned i = 0; i < mRecStack.GetNum(); i++) {
     RecStackEntry e = mRecStack.ValueAtIndex(i);
-    if ((e.mLeadNode == rt) && (e.mStartToken == start_token))
+    if ((e.mGroupId == group_id) && (e.mStartToken == start_token))
       return e.mRecTra;
   }
   return NULL;
 }
 
-void Parser::PushRecStack(RuleTable *rt, RecursionTraversal *rectra, unsigned start_token) {
-  RecStackEntry e = {rectra, rt, start_token};
+void Parser::PushRecStack(unsigned group_id, RecursionTraversal *rectra, unsigned start_token) {
+  RecStackEntry e = {rectra, group_id, start_token};
   return mRecStack.PushBack(e);
 }
 
@@ -301,48 +301,43 @@ void Parser::ApplySuccInfoOnPath(AppealNode *lead, AppealNode *last, bool succ) 
 //                           RecursionTraversal
 ///////////////////////////////////////////////////////////////////////////////////////////
 
+// We arrive here only when the first time we hit this RecursionGroup because
+// 1. All the 2nd appearance of all instance is caught by TraverseRuleTable()
+//    before entering this function.
+// 2. All the 1st appearance of all instances is done by FindInstance() and then
+//    TraverseRuleTableRegular().
 bool Parser::TraverseLeadNode(AppealNode *appeal, AppealNode *parent) {
-  bool found = false;
   unsigned saved_mCurToken = mCurToken;
-
-  // Preprocess the recursion stack information.
   RuleTable *rt = appeal->GetTable();
+  unsigned group_id;
+  bool found = false;
+  found = FindRecursionGroup(rt, group_id);
+  MASSERT(found);
+
   if (mTraceLeftRec) {
     DumpIndentation();
     std::cout << "<LR>: Enter LeadNode " << GetRuleTableName(rt)
-      << "@" << appeal->GetStartIndex() << " node:" << appeal << std::endl;
+      << "@" << appeal->GetStartIndex() << " node:" << appeal;
+    std::cout << " group id:" << group_id << std::endl;
   }
 
-  // If we re-enter a LeadNode. This is only possible for the re-enterings from first instance
-  // to arrive at this point. All the rest instance re-entering will be blocked by
-  // TraverseRuleTablePre().
-  RecursionTraversal *rec_reenter = FindRecStack(rt, mCurToken);
-  if (rec_reenter) {
-    if (mTraceLeftRec) {
-      DumpIndentation();
-      std::cout << "<LR>: HandleReEnter FirstInstance " << GetRuleTableName(rt)
-      << "@" << appeal->GetStartIndex() << " Simply Return false" << std::endl;
-      DumpIndentation();
-      std::cout << "<LR>: Add Appeal Point " << appeal << std::endl;
-    }
-    MASSERT(rec_reenter->GetInstance() == InstanceFirst);
-    rec_reenter->AddAppealPoint(appeal);
-    return false;
-  }
+  RecursionTraversal *rec_tra= FindRecStack(group_id, mCurToken);
+  MASSERT (!rec_tra);
+
+  rec_tra = new RecursionTraversal(appeal, parent, this);
+  rec_tra->SetTrace(mTraceLeftRec);
+  rec_tra->SetIndentation(mIndentation);
+  PushRecStack(group_id, rec_tra, mCurToken);
 
   // Main body of recursion traversal.
-  RecursionTraversal rec_tra(appeal, parent, this);
-  rec_tra.SetTrace(mTraceLeftRec);
-  rec_tra.SetIndentation(mIndentation);
-  PushRecStack(rt, &rec_tra, mCurToken);
-  rec_tra.Work();
+  rec_tra->Work();
 
   // We only update the mCurToken when succeeds. The restore of mCurToken
   // when fail is handled by TraverseRuleTable.
   // We pick the longest match rec_tra.
-  if (rec_tra.IsSucc()) {
+  if (rec_tra->IsSucc()) {
     found = true;
-    mCurToken = rec_tra.LongestMatch();
+    mCurToken = rec_tra->LongestMatch();
     MoveCurToken();
   }
 
@@ -359,7 +354,7 @@ bool Parser::TraverseLeadNode(AppealNode *appeal, AppealNode *parent) {
   }
 
   RecStackEntry entry = mRecStack.Back();
-  MASSERT((entry.mLeadNode == rt) && (entry.mStartToken == saved_mCurToken));
+  MASSERT((entry.mGroupId == group_id) && (entry.mStartToken == saved_mCurToken));
   mRecStack.PopBack();
 
   return found;
@@ -406,7 +401,7 @@ void RecursionTraversal::Work() {
 //     we don't look for recursion in any one instance.
 // Based on current design, it's pretty sure that only (1) is valid.
 
-bool RecursionTraversal::HandleReEnter(AppealNode *curr_node) {
+bool RecursionTraversal::ConnectPrevious(AppealNode *curr_node) {
   MASSERT(mInstance == InstanceRest);
   MASSERT(curr_node);
 
@@ -544,20 +539,14 @@ bool RecursionTraversal::FindRestInstance() {
     mParser->RemoveSuccNode(mStartToken, lead);
 
     // Set all ruletable's SuccMatch to IsDone in this recursion group.
-    // SetIsDone();
+    mParser->SetIsDone(mGroupId, mStartToken);
 
     return false;
   }
 }
 
-// Set IsDone for all ruletables in the same recursion group.
-void RecursionTraversal::SetIsDone() {
-  //RecursionGroup *group = FindRecursionGroup(mRuleTable);
-  //mParser->SetIsDone(group, mStartToken);
-}
-
 // The connection between neighbouring instances has been handled in
-// HandleReEnter(). Here we need connect the generated tree to mSelf, which
+// ConnectPrevious(). Here we need connect the generated tree to mSelf, which
 // is the main entry of whole tree.
 void RecursionTraversal::ConnectInstances() {
   // The latest instance is Fail.

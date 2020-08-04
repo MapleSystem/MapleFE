@@ -44,6 +44,7 @@ typedef enum {
   FailNotIdentifier,
   FailNotLiteral,
   FailChildrenFailed,
+  Fail2ndOf1st,
   Succ,
   SuccWasSucc,
   AppealStatus_NA
@@ -223,12 +224,12 @@ public:
 class RecursionTraversal;
 struct RecStackEntry {
   RecursionTraversal *mRecTra;
-  RuleTable          *mLeadNode;
-  unsigned            mStartToken;
+  unsigned *mGroupId;
+  unsigned  mStartToken;
   // mRecTra and mLeadNode are 1-1 mapping, so the operator==
   // uses only one of them.
   bool operator== (const RecStackEntry &right) {
-    return ((mLeadNode == right.mLeadNode)
+    return ((mGroupId == right.mGroupId)
             && (mStartToken == right.mStartToken));
   }
 };
@@ -298,7 +299,7 @@ private:
   bool TraverseStmt();                                // success if all tokens are matched.
   bool TraverseRuleTable(RuleTable*, AppealNode*);    // success if all tokens are matched.
   bool TraverseRuleTableRegular(RuleTable*, AppealNode*);    // success if all tokens are matched.
-  void TraverseRuleTablePre(AppealNode*, AppealNode*); // success if all tokens are matched.
+  bool TraverseRuleTablePre(AppealNode*, AppealNode*);
   bool TraverseTableData(TableData*, AppealNode*);    // success if all tokens are matched.
   bool TraverseConcatenate(RuleTable*, AppealNode*, unsigned start = 0);
   bool TraverseOneof(RuleTable*, AppealNode*);
@@ -376,8 +377,8 @@ private:
   SmallVector<AppealNode*>   mSeparatedTrees;   // we may created some seperated
                                                 // trees during recursion parsing.
 
-  void PushRecStack(RuleTable *rt, RecursionTraversal *rectra, unsigned cur_token);
-  RecursionTraversal* FindRecStack(RuleTable*, unsigned);
+  void PushRecStack(unsigned, RecursionTraversal*, unsigned);
+  RecursionTraversal* FindRecStack(unsigned /*group id*/, unsigned /*token*/);
 
   LeftRecursion* FindRecursion(RuleTable *);
   bool IsLeadNode(RuleTable *);
@@ -386,6 +387,7 @@ private:
   bool TraverseFronNode(AppealNode *parent, FronNode fnode, Recursion *rec = NULL, unsigned cir=0);
   void ApplySuccInfoOnPath(AppealNode *lead, AppealNode *pseudo, bool succ);
   AppealNode* ConstructPath(AppealNode*, AppealNode*, unsigned*, unsigned);
+  void SetIsDone(unsigned /*group*/, unsigned /*token*/);
 
 public:
   void AddSeparatedTree(AppealNode *n) {mSeparatedTrees.PushBack(n);}

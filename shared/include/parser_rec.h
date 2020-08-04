@@ -43,16 +43,21 @@ public:
   
 };
 
-// The traverse of recursion will be handled in its own approach. It will be achieved
-// through two phases. One is FindInstance, which tries to find all instance of a
-// recursion that matches tokens. The other is ConnectInstance, which connects all
-// successful instances to become an AppealTree.
-
 enum RecTraInstance {
   InstanceFirst,    // we are handling the first instance
   InstanceRest,     // we are handling the rest instances.
   InstanceNA
 };
+
+// The parsing is done as a Wavefront traversal. It takes a recursion group
+// as a unit for traversal. Other rule tables not belonging to any recursion
+// groups are treated as a standalone unit without iteration.
+
+// Wavefront traversal on the recursion group is done by iterations. Each
+// iteration it walks through all recursion nodes of the group, and also the
+// FronNodes. If it hit a LeadNode for the second time in one iteration, it
+// takes the result of the previous iteration, and build a edge between
+// this iteration and the preivous iteration.
 
 class RecursionTraversal {
 private:
@@ -62,9 +67,20 @@ private:
   AppealNode *mSelf;
   AppealNode *mParent;
   unsigned    mGroupId;   // Id of recursion group
-
   RecTraInstance mInstance;
-  SmallVector<AppealNode*> mLeadNodes;    // lead nodes of all instances
+
+  // LeadNodes of all instances. Although in a recursion group there could
+  // be multiple recursion each of which has its own LeadNode, the Wavefront
+  // traversal will always entering the only chosen LeadNode rule.
+  SmallVector<AppealNode*> mLeadNodes;
+
+  // Visited LeadNodes. This is a per-iteration data.
+  //
+  // In each iteration, the first time a LeadNode is visited, it will be saved
+  // in this vector. The second time it's visited, it should go to connect
+  // with the node in the previous instance.
+  SmallVector<RuleTable*> mVisitedLeadNodes;
+
   SmallVector<AppealNode*> mAppealPoints; // places to start appealing
 
   bool     mTrace;
@@ -79,7 +95,6 @@ private:
   bool FindRestInstance();
   bool FindInstances();
   void ConnectInstances();
-  void SetIsDone();
 
 public:
   bool     IsSucc()        {return mSucc;}
@@ -92,12 +107,15 @@ public:
   void     SetIndentation(unsigned i) {mIndentation = i;}
   void     DumpIndentation();
 
+  void AddVisitedLeadNode(RuleTable *rt) {mVisitedLeadNodes.PushBack(rt);}
+  bool LeadNodeVisited(RuleTable *rt) {return mVisitedLeadNodes.Find(rt);}
+
 public:
   RecursionTraversal(AppealNode *sel, AppealNode *parent, Parser *parser);
   ~RecursionTraversal();
 
   void Work();
-  bool HandleReEnter(AppealNode*);
+  bool ConnectPrevious(AppealNode*);
 };
 
 #endif

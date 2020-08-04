@@ -565,6 +565,8 @@ void Parser::DumpExitTable(const char *table_name, unsigned indent, bool succ, A
       std::cout << " fail@NotLiteral" << "}" << std::endl;
     else if (reason == FailChildrenFailed)
       std::cout << " fail@ChildrenFailed" << "}" << std::endl;
+    else if (reason == Fail2ndOf1st)
+      std::cout << " fail@2ndOf1st" << "}" << std::endl;
     else if (reason == AppealStatus_NA)
       std::cout << " fail@NA" << "}" << std::endl;
   }
@@ -607,8 +609,17 @@ void Parser::RemoveSuccNode(unsigned curr_token, AppealNode *node) {
   succ_match->RemoveNode(node);
 }
 
-// The preparation of TraverseRuleTable().
-void Parser::TraverseRuleTablePre(AppealNode *appeal, AppealNode *parent) {
+// The PreProcessing of TraverseRuleTable().
+// Under the Wavefront algorithm of recursion group traversal, things are
+// are a little complicated.
+// 1. If a rule is already failed at some token, it's always failed.
+// 2. If a rule is succ at some token, it doesn't mean it's finished, and
+//    there could be more matchings. So 
+//
+// Returns true : if SuccMatch is done.
+
+bool Parser::TraverseRuleTablePre(AppealNode *appeal, AppealNode *parent) {
+  bool is_done = false;
   RuleTable *rule_table = appeal->GetTable();
   const char *name = NULL;
   if (mTraceTable)
@@ -620,6 +631,9 @@ void Parser::TraverseRuleTablePre(AppealNode *appeal, AppealNode *parent) {
   if (succ) {
     bool was_succ = succ->GetStartToken(mCurToken);
     if (was_succ) {
+      MASSERT(!WasFailed(rule_table, mCurToken));
+      is_done = succ->IsDone();
+
       gSuccTokensNum = succ->GetMatchNum();
       for (unsigned i = 0; i < gSuccTokensNum; i++) {
         gSuccTokens[i] = succ->GetOneMatch(i);
@@ -639,7 +653,6 @@ void Parser::TraverseRuleTablePre(AppealNode *appeal, AppealNode *parent) {
         DumpExitTable(name, mIndentation, true, SuccWasSucc);
 
       appeal->mAfter = SuccWasSucc;
-      return;
     }
   }
 
@@ -648,6 +661,8 @@ void Parser::TraverseRuleTablePre(AppealNode *appeal, AppealNode *parent) {
       DumpExitTable(name, mIndentation, false, FailWasFailed);
     appeal->mAfter = FailWasFailed;
   }
+
+  return is_done;
 }
 
 // return true : if the rule_table is matched
@@ -685,17 +700,45 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
     mInSecondTry = false;
   }
 
-  // Step 1. If the 'rule_table' has already been done, we just reuse the result.
-  TraverseRuleTablePre(appeal, parent);
+  bool is_done = TraverseRuleTablePre(appeal, parent);
 
-  // If we are re-entering a lead node, which is also in RecStack, we need
-  // connect this instance with previous one.
+  if (appeal->IsFail()) {
+    mIndentation -= 2;
+    return false;
+  }
+
+  unsigned group_id;
+  bool in_group = FindRecursionGroup(rule_table, group_id);
+
+  // If the rule is NOT in any recursion group, we simply return the result.
+  // If the rule is done, we also simply return the result.
   if (appeal->IsSucc()) {
-    RecursionTraversal *rec_tra = FindRecStack(rule_table, appeal->GetStartIndex());
-    if (rec_tra) {
+    if (!in_group || is_done) {
+      mIndentation -= 2;
+      return true;
+    }
+  }
+
+  // This part is to handle the connect-to-previous issue.
+  //
+  // If we are entering a lead node which already succssfully matched some
+  // tokens and not IsDone yet, it means we are in second or later instances.
+  // We should find RecursionTraversal for it.
+  //
+  // We also need check if it's visited in this instance. Only the visited
+  // LeadNodes will connect to prev instance. Actually there are only two
+  // nodes for the Leading rule table in one single wave (instance) of the
+  // Wavefront traversal, one is not visited, the other visited.
+
+  RecursionTraversal *rec_tra = FindRecStack(group_id, appeal->GetStartIndex());
+
+  if (appeal->IsSucc() && mRecursionAll.IsLeadNode(rule_table)) {
+    MASSERT(rec_tra);
+    // check if it's visited in current instance.
+    if (rec_tra->LeadNodeVisited(rule_table)) {  
       if (mTraceLeftRec) {
         DumpIndentation();
-        std::cout << "<LR>: HandleReEnter " << GetRuleTableName(rule_table)
+        std::cout << "<LR>: ConnectPrevious " << GetRuleTableName(rule_table)
                   << "@" << appeal->GetStartIndex()
                   << " node:" << appeal << std::endl;
       }
@@ -704,20 +747,32 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
       // change the status to Succ.
       appeal->mAfter = Succ;
       mIndentation -= 2;
-      return rec_tra->HandleReEnter(appeal);
+      return rec_tra->ConnectPrevious(appeal);
     }
+  }
 
-    mIndentation -= 2;
-    return true;
-  } else if (appeal->IsFail()) {
+  // This part is to handle a special case: The second appearance in the first instance
+  // (wave) in the Wavefront algorithm. At this moment, the first appearance in this
+  // instance hasn't finished its traversal, so there is no previous succ or fail case.
+  //
+  // We need to simply return false, but we cannot add them to the Fail mapping.
+  if (rec_tra &&
+      rec_tra->GetInstance() == InstanceFirst &&
+      rec_tra->LeadNodeVisited(rule_table)) {
+    if (mTraceTable)
+      DumpExitTable(name, mIndentation, false, Fail2ndOf1st);
     mIndentation -= 2;
     return false;
   }
-  MASSERT(appeal->IsNA());
 
-  // Step 2. If it's a LeadNode, we will go through special handling.
-  //         The match info of 'appeal' and its SuccMatch will be updated
-  //         inside TraverseLeadNode().
+  // Now it's time to do regular traversal on a LeadNode.
+  // The scenarios of LeadNode is one of the below.
+  // 1. The first time we hit the LeadNode
+  // 2. The first time in an instance we hit the LeadNode
+  //
+  // The match info of 'appeal' and its SuccMatch will be updated
+  // inside TraverseLeadNode().
+
   if (mRecursionAll.IsLeadNode(rule_table)) {
     bool found = TraverseLeadNode(appeal, parent);
     if (!found) {
@@ -736,9 +791,11 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
     return found;
   }
 
-  // Step 3. It's a regular table. Traverse children in DFS.
-  //         If it's inside a Left Recursion, it will finally goes to that
-  //         recursion. I don't need take care here.
+  // It's a regular (non leadnode) table, either inside or outside of a
+  // recursion, we just need do the regular traversal.
+  // If it's inside a Left Recursion, it will finally goes to that
+  // recursion. I don't need take care here.
+
   bool matched = TraverseRuleTableRegular(rule_table, appeal);
   if (mTraceTable)
     DumpExitTable(name, mIndentation, matched, FailChildrenFailed);
@@ -1199,6 +1256,20 @@ bool Parser::TraverseTableData(TableData *data, AppealNode *parent) {
   }
 
   return found;
+}
+
+void Parser::SetIsDone(unsigned group_id, unsigned start_token) {
+  for (unsigned i = 0; i < gRule2GroupNum; i++) {
+    Rule2Group r2g = gRule2Group[i];
+    if (r2g.mGroupId == group_id) {
+      RuleTable *rt = r2g.mRuleTable;
+      SuccMatch *succ = FindSucc(rt);
+      MASSERT(succ && "root has no SuccMatch?");
+      bool found = succ->GetStartToken(start_token);
+      MASSERT(found);
+      succ->SetIsDone();
+    }
+  }
 }
 
 /////////////////////////////////////////////////////////////////////////////
