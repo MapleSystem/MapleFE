@@ -302,13 +302,18 @@ void Parser::ApplySuccInfoOnPath(AppealNode *lead, AppealNode *last, bool succ) 
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 // We arrive here only when the first time we hit this RecursionGroup because
-// 1. All the 2nd appearance of all instance is caught by TraverseRuleTable()
-//    before entering this function.
-// 2. All the 1st appearance of all instances is done by FindInstance() and then
-//    TraverseRuleTableRegular().
+// 1. All the 2nd appearance (of all LeadNodes) of all instance is caught by
+//    TraverseRuleTable() before entering this function.
+// 2. All the 1st appearance (of the first LeadNode) of all instances is done by
+//    FindInstance() and then TraverseRuleTableRegular().
+//                       --- OR ---
+// we arrive TraverseLeadNode because it's the first time we hit 'other' LeadNodes
+// of this group.
+
 bool Parser::TraverseLeadNode(AppealNode *appeal, AppealNode *parent) {
   unsigned saved_mCurToken = mCurToken;
   RuleTable *rt = appeal->GetTable();
+  const char *name = GetRuleTableName(rt);
   unsigned group_id;
   bool found = false;
   found = FindRecursionGroup(rt, group_id);
@@ -316,13 +321,28 @@ bool Parser::TraverseLeadNode(AppealNode *appeal, AppealNode *parent) {
 
   if (mTraceLeftRec) {
     DumpIndentation();
-    std::cout << "<LR>: Enter LeadNode " << GetRuleTableName(rt)
+    std::cout << "<LR>: Enter LeadNode " << name
       << "@" << appeal->GetStartIndex() << " node:" << appeal;
     std::cout << " group id:" << group_id << std::endl;
   }
 
   RecursionTraversal *rec_tra= FindRecStack(group_id, mCurToken);
-  MASSERT (!rec_tra);
+
+  // A recurion group could have multiple recursions or multiple LeadNodes.
+  // We could have already rec_tra. In this case, it should be done through
+  // regular traversal
+  if (rec_tra) {
+    MASSERT(rt != rec_tra->GetRuleTable());
+    rec_tra->AddVisitedLeadNode(rt);
+    rec_tra->AddLeadNode(appeal);
+    bool found = TraverseRuleTableRegular(rt, appeal);
+    if (mTraceTable) {
+      DumpIndentation();
+      std::cout << "<LR>: Enter Other LeadNode " << name << std::endl;
+      DumpExitTable(name, mIndentation, found, FailChildrenFailed);
+    }
+    return found;
+  }
 
   rec_tra = new RecursionTraversal(appeal, parent, this);
   rec_tra->SetTrace(mTraceLeftRec);
@@ -382,44 +402,52 @@ RecursionTraversal::~RecursionTraversal() {
   mLeadNodes.Release();
 }
 
+// We only do FinalConnection when succ.
 void RecursionTraversal::Work() {
   mSucc = FindInstances();
-  ConnectInstances();
+  if (mSucc)
+    FinalConnection();
+  else
+    mSelf->mAfter = FailChildrenFailed;
 }
 
-// The first instance will be connected as the last child on the
-// connected instances tree. It's like a leaf node, and has no more
-// children. So the traversal for this instance will treat re-entering
-// the recursion as a failure. The re-entering could come from its own
-// back edge, or from multiple jumps out of the circles. But in any case
-// it will simply return false.
-//
-// For the rest instance finding, it will be complicated.
-// (1) If it re-enters from its own back-edge, the succ result of the
-//     previous instance is used as the matching result. 
-// (2) If the re-entering comes from other paths, it returns false since
-//     we don't look for recursion in any one instance.
-// Based on current design, it's pretty sure that only (1) is valid.
-
+// Connect curr_node to its counterpart in the prev instance.
+// [NOTE] There are two appearance of a rule in each instance. The connection
+//        happens between the second appearance of current instance and
+//        the first appearance of the prev instance.
 bool RecursionTraversal::ConnectPrevious(AppealNode *curr_node) {
   MASSERT(mInstance == InstanceRest);
-  MASSERT(curr_node);
+  MASSERT(curr_node->IsTable());
+  bool found = false;
 
-  // The latest lead node in mLeadNodes is the current instance.
-  // We need the previous one.
-  MASSERT(mLeadNodes.GetNum() >= 2);
-  AppealNode *prev_lead = mLeadNodes.ValueAtIndex(mLeadNodes.GetNum() - 2);
+  // Connect to the previous one.
+  for (unsigned i = 0; i < mPrevLeadNodes.GetNum(); i++) {
+    AppealNode *prev_lead = mPrevLeadNodes.ValueAtIndex(i);
+    MASSERT(prev_lead->IsTable());
+    if (prev_lead->GetTable() == curr_node->GetTable()) {
+      // It could be a fail.
+      if (prev_lead->IsFail()) {
+        curr_node->mAfter = FailChildrenFailed;
+        break;
+      }
 
-  // copy the previous instance result to 'curr_node'.
-  curr_node->CopyMatch(prev_lead);
+      // copy the previous instance result to 'curr_node'.
+      curr_node->CopyMatch(prev_lead);
 
-  // connect the previous instance to 'curr_node'.
-  // It's obvious that A previous instance could be connected to multiple
-  // back edge in multiple circles of a next instance of recursion. AddParent()
-  // will handle the multiple parents issue.
-  curr_node->AddChild(prev_lead);
-  prev_lead->AddParent(curr_node);
-  
+      // connect the previous instance to 'curr_node'.
+      // It's obvious that A previous instance could be connected to multiple
+      // back edge in multiple circles of a next instance of recursion. AddParent()
+      // will handle the multiple parents issue.
+      curr_node->AddChild(prev_lead);
+      prev_lead->AddParent(curr_node);
+      
+      // there should be only one match.
+      MASSERT(!found);
+      found = true;
+    }
+  }
+  MASSERT(found);
+
   return curr_node->IsSucc();
 }
 
@@ -468,9 +496,20 @@ bool RecursionTraversal::FindInstances() {
   bool temp_found = FindFirstInstance();
   found |= temp_found;
   while (temp_found) {
+    // Move current mLeadNodes to mPrevLeadNodes
+    mPrevLeadNodes.Clear();
+    for (unsigned i = 0; i < mLeadNodes.GetNum(); i++)
+      mPrevLeadNodes.PushBack(mLeadNodes.ValueAtIndex(i));
+
+    // Clear LeadNodes and Visited LeadNodes
+    mVisitedLeadNodes.Clear();
+    mLeadNodes.Clear();
+
+    // Find the instance
     mParser->mCurToken = saved_mCurToken;
     temp_found = FindRestInstance();
   }
+
   return found;
 }
 
@@ -482,13 +521,15 @@ bool RecursionTraversal::FindFirstInstance() {
   AppealNode *lead = new AppealNode();
   lead->SetStartIndex(mStartToken);
   lead->SetTable(mRuleTable);
-  mLeadNodes.PushBack(lead);
   mParser->mAppealNodes.push_back(lead);
 
   if (mTrace) {
     DumpIndentation();
     std::cout << "<LR>: FirstInstance " << lead << std::endl;
   }
+
+  AddLeadNode(lead);
+  AddVisitedLeadNode(mRuleTable);
 
   found = mParser->TraverseRuleTableRegular(mRuleTable, lead);
 
@@ -514,8 +555,10 @@ bool RecursionTraversal::FindRestInstance() {
   AppealNode *lead = new AppealNode();
   lead->SetStartIndex(mStartToken);
   lead->SetTable(mRuleTable);
-  mLeadNodes.PushBack(lead);
   mParser->mAppealNodes.push_back(lead);
+
+  AddLeadNode(lead);
+  AddVisitedLeadNode(mRuleTable);
 
   if (mTrace) {
     DumpIndentation();
@@ -545,61 +588,19 @@ bool RecursionTraversal::FindRestInstance() {
   }
 }
 
-// The connection between neighbouring instances has been handled in
-// ConnectPrevious(). Here we need connect the generated tree to mSelf, which
-// is the main entry of whole tree.
-void RecursionTraversal::ConnectInstances() {
-  // The latest instance is Fail.
-  // The one before last instance is succ.
+// Connect the generated tree to mSelf, which is the main entry of whole tree.
+// We only do FinalConnection when succ. It's caller's duty to assure it's succ.
 
-  // If there are succ instances, then 
-  // 1. connect mSelf to every succ instance, since each succ instance means a possible
-  //    solution, and they will be counted as a succ child of mSelf.
-  // 2. Update the match info to mSelf. gSuccTokens is updated in TraverseRuleTable().
-  // 2. add the last instance to mParser's separated trees.
-  unsigned num = mLeadNodes.GetNum();
-  if (mTrace) {
-    for (unsigned i =0; i < num; i++) {
-      AppealNode *lead = mLeadNodes.ValueAtIndex(i);
-      DumpIndentation();
-      std::cout << "lead " << lead << " parent:" << lead->GetParent() << std::endl;
-    }
-  }
+void RecursionTraversal::FinalConnection() {
+  // The latest instance is Fail. The one before last instance is succ.
+  MASSERT(mSucc);
 
-  // The last instance could be succ when 'num' is more than one, and it's a fake succ.
-  // We put them in separated trees, not connected to mSelf.
-  // It also could be fail if it fails. We connect it to mSelf this time.
-  AppealNode *last = mLeadNodes.Back();
+  AppealNode *last = mPrevLeadNodes.ValueAtIndex(0);
+  MASSERT(last->IsSucc());
 
-  if (num > 1) {
-    // Connect mSelf with all REAL succ instance.
-    for (unsigned i = 0; i < mLeadNodes.GetNum() - 1; i++) {
-      AppealNode *instance = mLeadNodes.ValueAtIndex(i);
-      instance->SetParent(mSelf);
-      mSelf->AddChild(instance);
-      mSelf->CopyMatch(instance);
-    }
-
-    // Add the last instance which is fake 'succ' to the Parser::mSeparatedTrees.
-    MASSERT(last->IsSucc());
-    mParser->AddSeparatedTree(last);
-
-    // Need also clean the connection between this last fail instance to the previous
-    // successful instances. We do this by looking into last_succ's parent.
-    AppealNode *last_succ = mLeadNodes.ValueAtIndex(mLeadNodes.GetNum() - 2);
-    for (unsigned i = 0; i < last_succ->GetSecondParentsNum(); i++) {
-      AppealNode *second_parent = last_succ->GetSecondParent(i);
-      MASSERT(second_parent->mChildren.size() == 1);
-      second_parent->ClearChildren();
-    }
-    last_succ->ClearSecondParents();
-  } else {
-    // if there is no succ instance, simply connect the only failed instance to mSelf
-    MASSERT(last->IsFail());
-    last->SetParent(mSelf);
-    mSelf->AddChild(last);
-    mSelf->mAfter = FailChildrenFailed;
-  }
+  last->SetParent(mSelf);
+  mSelf->AddChild(last);
+  mSelf->CopyMatch(last);
 }
 
 void RecursionTraversal::DumpIndentation() {

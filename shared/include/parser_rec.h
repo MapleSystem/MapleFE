@@ -69,10 +69,12 @@ private:
   unsigned    mGroupId;   // Id of recursion group
   RecTraInstance mInstance;
 
-  // LeadNodes of all instances. Although in a recursion group there could
-  // be multiple recursion each of which has its own LeadNode, the Wavefront
-  // traversal will always entering the only chosen LeadNode rule.
+  // These are the 1st appearance of current instance.
   SmallVector<AppealNode*> mLeadNodes;
+
+  // These are the 1st appearance of previous instance. Used when
+  // connect the 2nd appearance of current instance to the previous.
+  SmallVector<AppealNode*> mPrevLeadNodes;
 
   // Visited LeadNodes. This is a per-iteration data.
   //
@@ -94,7 +96,7 @@ private:
   bool FindFirstInstance();
   bool FindRestInstance();
   bool FindInstances();
-  void ConnectInstances();
+  void FinalConnection();
 
 public:
   bool     IsSucc()        {return mSucc;}
@@ -103,12 +105,16 @@ public:
   unsigned LongestMatch()  {return mSelf->LongestMatch();}
   void     AddAppealPoint(AppealNode *n) {mAppealPoints.PushBack(n);}
 
+  RuleTable* GetRuleTable() {return mRuleTable;}
+
   void     SetTrace(bool b){mTrace = b;}
   void     SetIndentation(unsigned i) {mIndentation = i;}
   void     DumpIndentation();
 
   void AddVisitedLeadNode(RuleTable *rt) {mVisitedLeadNodes.PushBack(rt);}
   bool LeadNodeVisited(RuleTable *rt) {return mVisitedLeadNodes.Find(rt);}
+
+  void AddLeadNode(AppealNode *n) {mLeadNodes.PushBack(n);}
 
 public:
   RecursionTraversal(AppealNode *sel, AppealNode *parent, Parser *parser);

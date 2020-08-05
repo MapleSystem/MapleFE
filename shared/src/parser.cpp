@@ -719,22 +719,23 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
     }
   }
 
-  // This part is to handle the connect-to-previous issue.
-  //
-  // If we are entering a lead node which already succssfully matched some
-  // tokens and not IsDone yet, it means we are in second or later instances.
-  // We should find RecursionTraversal for it.
-  //
-  // We also need check if it's visited in this instance. Only the visited
-  // LeadNodes will connect to prev instance. Actually there are only two
-  // nodes for the Leading rule table in one single wave (instance) of the
-  // Wavefront traversal, one is not visited, the other visited.
 
   RecursionTraversal *rec_tra = FindRecStack(group_id, appeal->GetStartIndex());
 
+  // This part is to handle the 2nd appearance of the Rest Instances
+  // Why not 2nd appearance of 1st Instance?
+  // Because the 1st instantce is not done yet and cannot be IsSucc().
   if (appeal->IsSucc() && mRecursionAll.IsLeadNode(rule_table)) {
+    // If we are entering a lead node which already succssfully matched some
+    // tokens and not IsDone yet, it means we are in second or later instances.
+    // We should find RecursionTraversal for it.
     MASSERT(rec_tra);
-    // check if it's visited in current instance.
+
+    // Check if it's visited, aka 2nd appearance.
+    // There are only two appearances of the Leading rule tables in one single
+    // wave (instance) of the Wavefront traversal, the 1st is not visited, the
+    // 2nd is visited.
+
     if (rec_tra->LeadNodeVisited(rule_table)) {  
       if (mTraceLeftRec) {
         DumpIndentation();
@@ -2322,6 +2323,8 @@ unsigned AppealNode::LongestMatch() {
 
 // The existing match of 'this' is kept.
 // mAfter is changed only when it's changed from fail to succ.
+//
+// The node is not added to SuccMatch since we can use 'another'.
 void AppealNode::CopyMatch(AppealNode *another) {
   for (unsigned i = 0; i < another->GetMatchNum(); i++) {
     unsigned m = another->GetMatch(i);

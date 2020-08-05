@@ -143,10 +143,11 @@ public:
   AppealNode* GetSortedChildByIndex(unsigned idx);
 
   bool IsSucc() { return (mAfter == Succ) || (mAfter == SuccWasSucc); }
-  bool IsFail() { return (mAfter == FailWasFailed)
-                         || (mAfter == FailNotIdentifier)
-                         || (mAfter == FailNotLiteral)
-                         || (mAfter == FailChildrenFailed);}
+  bool IsFail() { return (mAfter == FailWasFailed) ||
+                         (mAfter == FailNotIdentifier) ||
+                         (mAfter == FailNotLiteral) ||
+                         (mAfter == FailChildrenFailed) ||
+                         (mAfter == Fail2ndOf1st);}
   bool IsNA() {return mAfter == AppealStatus_NA;}
 
   bool IsTable(){ return mIsTable; }
