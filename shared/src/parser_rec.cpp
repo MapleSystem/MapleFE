@@ -549,7 +549,7 @@ bool RecursionTraversal::FindRestInstance() {
   bool found = false;
   mInstance = InstanceRest;
 
-  AppealNode *prev_lead = mLeadNodes.Back();
+  AppealNode *prev_lead = mPrevLeadNodes.ValueAtIndex(0);
 
   // Create a lead node
   AppealNode *lead = new AppealNode();
