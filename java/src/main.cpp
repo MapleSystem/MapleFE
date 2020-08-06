@@ -20,7 +20,7 @@
 #include "vfy_java.h"
 
 static void help() {
-  std::cout << "java2mpl <arguments>:\n" << std::endl;
+  std::cout << "java2mpl sourcefile [arguments]:\n" << std::endl;
   std::cout << "   --help            : print this help" << std::endl;
   std::cout << "   --trace-lexer     : Trace lexing" << std::endl;
   std::cout << "   --trace-table     : Trace rule table when entering and exiting" << std::endl;
@@ -39,7 +39,7 @@ int main (int argc, char *argv[]) {
   Parser *parser = new Parser(argv[1]);
 
   // Parse the argument
-  for (unsigned i = 1; i < argc; i++) {
+  for (unsigned i = 2; i < argc; i++) {
     if (!strncmp(argv[i], "--help", 6) && (strlen(argv[i]) == 6)) {
       help();
       exit(-1);

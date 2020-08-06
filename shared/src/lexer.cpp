@@ -79,7 +79,8 @@ void Lexer::PrepareForFile(const std::string filename) {
   // open file
   srcfile = fopen(filename.c_str(), "r");
   if (!srcfile) {
-    MASSERT("cannot open file\n");
+    std::cerr << "cannot open file " << filename << std::endl;
+    exit(1);
   }
 
   // allocate line buffer.
