@@ -20,7 +20,7 @@
 #include "vfy_java.h"
 
 static void help() {
-  std::cout << "java2mpl sourcefile [arguments]:\n" << std::endl;
+  std::cout << "java2mpl sourcefile [options]:\n" << std::endl;
   std::cout << "   --help            : print this help" << std::endl;
   std::cout << "   --trace-lexer     : Trace lexing" << std::endl;
   std::cout << "   --trace-table     : Trace rule table when entering and exiting" << std::endl;
@@ -36,14 +36,16 @@ static void help() {
 }
 
 int main (int argc, char *argv[]) {
+  if (!strncmp(argv[1], "--help", 6) && (strlen(argv[1]) == 6)) {
+    help();
+    exit(-1);
+  }
+
   Parser *parser = new Parser(argv[1]);
 
   // Parse the argument
   for (unsigned i = 2; i < argc; i++) {
-    if (!strncmp(argv[i], "--help", 6) && (strlen(argv[i]) == 6)) {
-      help();
-      exit(-1);
-    } else if (!strncmp(argv[i], "--trace-lexer", 13) && (strlen(argv[i]) == 13)) {
+    if (!strncmp(argv[i], "--trace-lexer", 13) && (strlen(argv[i]) == 13)) {
       parser->SetLexerTrace();
     } else if (!strncmp(argv[i], "--trace-table", 13) && (strlen(argv[i]) == 13)) {
       parser->mTraceTable = true;
@@ -65,6 +67,9 @@ int main (int argc, char *argv[]) {
       parser->mTracePatchWasSucc = true;
     } else if (!strncmp(argv[i], "--trace-warning", 15) && (strlen(argv[i]) == 15)) {
       parser->mTraceWarning = true;
+    } else {
+      std::cerr << "unknown option " << argv[i] << std::endl;
+      exit(-1);
     }
   }
 
