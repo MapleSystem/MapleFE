@@ -66,6 +66,11 @@ std::string RecPath::DumpToString() {
 //                                Recursion
 ////////////////////////////////////////////////////////////////////////////////////
 
+void Recursion::AddRuleTable(RuleTable *rt) {
+  if (!HaveRuleTable(rt))
+    mRuleTables.PushBack(rt);
+}
+
 void Recursion::Release() {
   for (unsigned i = 0; i < mPaths.GetNum(); i++) {
     RecPath *path = mPaths.ValueAtIndex(i);
@@ -285,47 +290,20 @@ Recursion* RecDetector::FindOrCreateRecursion(RuleTable *rule) {
   return rec;
 }
 
-void RecDetector::HandleIsDoneRuleTable(RuleTable *rt, ContTreeNode<RuleTable*> *p) {
-#if 0
-  Rule2Recursion *map = FindRule2Recursion(rt);
+// 'done' is an IsDone node.
+// If 'p' can be reached from and to the recursion of 'done', add it to them.
+void RecDetector::HandleIsDoneRuleTable(RuleTable *done, ContTreeNode<RuleTable*> *p) {
+  RuleTable *rule = p->GetData();
+  Rule2Recursion *map = FindRule2Recursion(done);
   if (map) {
     for (unsigned i = 0; i < map->mRecursions.GetNum(); i++) {
       Recursion *rec = map->mRecursions.ValueAtIndex(i);
-      for (unsigned j = 0; j < rec->mPaths.GetNum(); j++) {
-        RecPath *path = rec->GetPath(j);
-        SmallVector<RuleTable*> whole_list;  //
-        SmallVector<RuleTable*> remain_list; // from 'rt' to the one before the
-                                             // lead, which is the succ of back edge.
-
-        // step 1. Check if this path contains 'rt'.
-        RuleTable *curr_rt = rec->GetLead();
-        bool found = false;
-        for (unsigned k = 0; k < path->GetPositionsNum(); k++) {
-          whole_list.PushBack(curr_rt);
-          if (found)
-            remain_list.PushBack(curr_rt);
-
-          unsigned pos = path->GetPosition(k);
-          RuleTable *child_rt = RuleFindChild(curr_rt, pos);
-          if (child_rt == rt)
-            found = true;
-
-          curr_rt = child_rt;
-        }
-
-        if (!found)
-          continue;
-
-        // step 2. Check if this path can reach 'p'.
-        for (unsigned k = 0; k < whole_list.GetNum(); k++) {
-          RuleTable *
-        }
-
-        // step 3. Create new path from lead to 'p', then 'rt', then rest of path
+      if (RuleReachable(rec->mLead, rule)) {
+        AddRule2Recursion(rule, rec);
+        rec->AddRuleTable(rule);
       }
     }
   }
-#endif
 }
 
 TResult RecDetector::DetectRuleTable(RuleTable *rt, ContTreeNode<RuleTable*> *p) {
@@ -358,7 +336,6 @@ TResult RecDetector::DetectRuleTable(RuleTable *rt, ContTreeNode<RuleTable*> *p)
   // which can reach the focal node 'p'.
 
   if (IsDone(rt)) {
-    //HandleIsDoneRuleTable(rt, p);
     return TRS_Done;
   }
 
@@ -446,14 +423,11 @@ TResult RecDetector::DetectOneof(RuleTable *rule_table, ContTreeNode<RuleTable*>
     }
 
     if (temp_res == TRS_MaybeZero) {
-      // MaybeZero is the strongest claim.
       result = TRS_MaybeZero;
     } else if (temp_res == TRS_NonZero) {
-      // Nonzero is just weaker than MaybeZero
       if (result != TRS_MaybeZero)
         result = TRS_NonZero;
     } else if (temp_res == TRS_Fail) {
-      // Fail is the weakest,
       if (result == TRS_NA)
         result = TRS_Fail;
     } else if (temp_res == TRS_Done) {

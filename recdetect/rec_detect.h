@@ -80,7 +80,7 @@ public:
   void SetLead(RuleTable *t) {mLead = t;}
   RuleTable* GetLead() {return mLead;}
 
-  void AddRuleTable(RuleTable *rt) {mRuleTables.PushBack(rt);}
+  void AddRuleTable(RuleTable *rt);
   bool HaveRuleTable(RuleTable *rt){return mRuleTables.Find(rt);}
 
   unsigned PathsNum() {return mPaths.GetNum();}
