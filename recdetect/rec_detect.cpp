@@ -169,14 +169,8 @@ bool RecDetector::IsFail(RuleTable *t) {
   return false;
 }
 
-// A rule could have multiple appearances in a rec, but it's OK.
-// We just need add one instance of it.
-// LeadNode and its recursion also are added as a mapping.
-void RecDetector::AddRule2Recursion(RuleTable *rule, Recursion *rec) {
+Rule2Recursion* RecDetector::FindRule2Recursion(RuleTable *rule) {
   Rule2Recursion *map = NULL;
-  bool found = false;
-
-  // If the rule table already mapping to some recursion?
   for (unsigned i = 0; i < mRule2Recursions.GetNum(); i++) {
     Rule2Recursion *r2r = mRule2Recursions.ValueAtIndex(i);
     if (rule == r2r->mRule) {
@@ -184,7 +178,12 @@ void RecDetector::AddRule2Recursion(RuleTable *rule, Recursion *rec) {
       break;
     }
   }
+  return map;
+}
 
+// Add 'rec' to the Rule2Recursion of 'rule' if not existing.
+void RecDetector::AddRule2Recursion(RuleTable *rule, Recursion *rec) {
+  Rule2Recursion *map = FindRule2Recursion(rule);
   if (!map) {
     map = (Rule2Recursion*)gMemPool.Alloc(sizeof(Rule2Recursion));
     new (map) Rule2Recursion();
@@ -193,6 +192,7 @@ void RecDetector::AddRule2Recursion(RuleTable *rule, Recursion *rec) {
   }
 
   // if the mapping already exists?
+  bool found = false;
   for (unsigned i = 0; i < map->mRecursions.GetNum(); i++) {
     Recursion *r = map->mRecursions.ValueAtIndex(i);
     if (rec == r) {
@@ -248,7 +248,7 @@ void RecDetector::AddRecursion(RuleTable *rt, ContTreeNode<RuleTable*> *p) {
   for (int i = node_list.GetNum() - 1; i >= 0; i--) {
     RuleTable *child_rule = node_list.ValueAtIndex(i);
     unsigned index = 0;
-    bool succ = RuleFindChild(parent_rule, child_rule, index);
+    bool succ = RuleFindChildIndex(parent_rule, child_rule, index);
     MASSERT(succ && "Cannot find child rule in parent rule.");
     path->AddPos(index);
     parent_rule = child_rule;
@@ -285,6 +285,49 @@ Recursion* RecDetector::FindOrCreateRecursion(RuleTable *rule) {
   return rec;
 }
 
+void RecDetector::HandleIsDoneRuleTable(RuleTable *rt, ContTreeNode<RuleTable*> *p) {
+#if 0
+  Rule2Recursion *map = FindRule2Recursion(rt);
+  if (map) {
+    for (unsigned i = 0; i < map->mRecursions.GetNum(); i++) {
+      Recursion *rec = map->mRecursions.ValueAtIndex(i);
+      for (unsigned j = 0; j < rec->mPaths.GetNum(); j++) {
+        RecPath *path = rec->GetPath(j);
+        SmallVector<RuleTable*> whole_list;  //
+        SmallVector<RuleTable*> remain_list; // from 'rt' to the one before the
+                                             // lead, which is the succ of back edge.
+
+        // step 1. Check if this path contains 'rt'.
+        RuleTable *curr_rt = rec->GetLead();
+        bool found = false;
+        for (unsigned k = 0; k < path->GetPositionsNum(); k++) {
+          whole_list.PushBack(curr_rt);
+          if (found)
+            remain_list.PushBack(curr_rt);
+
+          unsigned pos = path->GetPosition(k);
+          RuleTable *child_rt = RuleFindChild(curr_rt, pos);
+          if (child_rt == rt)
+            found = true;
+
+          curr_rt = child_rt;
+        }
+
+        if (!found)
+          continue;
+
+        // step 2. Check if this path can reach 'p'.
+        for (unsigned k = 0; k < whole_list.GetNum(); k++) {
+          RuleTable *
+        }
+
+        // step 3. Create new path from lead to 'p', then 'rt', then rest of path
+      }
+    }
+  }
+#endif
+}
+
 TResult RecDetector::DetectRuleTable(RuleTable *rt, ContTreeNode<RuleTable*> *p) {
   // The children is done with traversal before. This means we need
   // stop here too, because all the further traversal from this point
@@ -295,8 +338,29 @@ TResult RecDetector::DetectRuleTable(RuleTable *rt, ContTreeNode<RuleTable*> *p)
   // beginning of this file).
   // This guarantees there is one and only one recursion recorded for a loop
   // even if the loop has multiple nodes.
-  if (IsDone(rt))
+
+  // However, there is one complication scenario that we need take care. Below
+  // is an example.
+  // rule UnannClassType: ONEOF(Identifier + ZEROORONE(TypeArguments),
+  //                            UnannClassOrInterfaceType + '.' + ...)
+  // rule UnannClassOrInterfaceType: ONEOF(UnannClassType, UnannInterfaceType)
+  // rule UnannInterfaceType : UnannClassType
+  //
+  // These rules form a recursion where there are 2 paths. During recdetect traversal
+  // UnannClassOrInterfaceType is the first to hit and becomes the LeadNode.
+  // The problem is when handling the edge UnannClassOrInterfaceType --> UnannClassType,
+  // we find the first path, and UnannClassType becomes IsDone. Now, we need deal
+  // with UnannClassOrInterfaceType --> UnannInterfaceType, but UnannClassType which
+  // is the child of UnannInterfaceType is IsDone.
+  //
+  // In this case, we cannot return directly. We will have to check if the finished child
+  // is in a recursion. If it's in a recursion, we need further check if there is a path
+  // which can reach the focal node 'p'.
+
+  if (IsDone(rt)) {
+    //HandleIsDoneRuleTable(rt, p);
     return TRS_Done;
+  }
 
   // If find a new Recursion, create the recursion. It is the successor of thei
   // back edge. As mentioned in the comments in the beginning of this file, back

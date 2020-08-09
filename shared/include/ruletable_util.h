@@ -60,6 +60,9 @@ extern OprId FindOperator(const char *str, const char c, unsigned &len);
 extern const char* FindKeyword(const char *str, const char c, unsigned &len);
 
 extern bool RuleActionHasElem(RuleTable*, unsigned);
-extern bool RuleFindChild(RuleTable *p, RuleTable *c, unsigned&);
+extern bool RuleFindChildIndex(RuleTable *p, RuleTable *c, unsigned&);
+extern RuleTable* RuleFindChild(RuleTable *p, unsigned index);
+
+extern bool RuleReachable(RuleTable *from, RuleTable *to);
 
 #endif

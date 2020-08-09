@@ -56,6 +56,8 @@ public:
   ~RecPath(){ Release(); }
 
   unsigned PositionsNum() {return mPositions.GetNum();}
+  unsigned GetPosition(unsigned i) {return mPositions.ValueAtIndex(i);}
+
   void AddPos(unsigned i) { mPositions.PushBack(i); }
 
   void Release() {mPositions.Clear(); mPositions.Release();}
@@ -176,8 +178,10 @@ private:
 
   // rule to recursion mapping.
   SmallVector<Rule2Recursion*> mRule2Recursions;
+  Rule2Recursion* FindRule2Recursion(RuleTable *);
   void AddRule2Recursion(RuleTable*, Recursion*);
   void WriteRule2Recursion();
+  void HandleIsDoneRuleTable(RuleTable *rt, ContTreeNode<RuleTable*> *p);
 
   // recursion group
   SmallVector<RecursionGroup*> mRecursionGroups;

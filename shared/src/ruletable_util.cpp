@@ -19,6 +19,7 @@
 #include "lang_spec.h"
 #include "massert.h"
 #include "common_header_autogen.h"
+#include "container.h"
 
 ////////////////////////////////////////////////////////////////////////////////////
 //                Utility Functions to walk tables
@@ -111,7 +112,7 @@ bool RuleActionHasElem(RuleTable *table, unsigned target_idx) {
 
 // Returns true if child is found. Also set the 'index'.
 // NOTE: We don't go deeper into grandchildren.
-bool RuleFindChild(RuleTable *parent, RuleTable *child, unsigned &index) {
+bool RuleFindChildIndex(RuleTable *parent, RuleTable *child, unsigned &index) {
   bool found = false;
   EntryType type = parent->mType;
 
@@ -161,3 +162,61 @@ bool RuleFindChild(RuleTable *parent, RuleTable *child, unsigned &index) {
 
   return found;
 }
+
+// Returns the child table if found.
+// [NOTE] Caller needs check if the return is NULL if needed.
+RuleTable* RuleFindChild(RuleTable *parent, unsigned index) {
+  RuleTable *child = NULL;
+  TableData *data = parent->mData + index;
+  switch (data->mType) {
+  case DT_Subtable:
+    child = data->mData.mEntry;
+    break;
+  default:
+    break;
+  }
+
+  return child;
+}
+
+// If it's reachable from 'from' to 'to'.
+bool RuleReachable(RuleTable *from, RuleTable *to) {
+  bool found = false;
+  SmallList<RuleTable*> working_list;
+  SmallVector<RuleTable*> done_list;
+
+  working_list.PushBack(from);
+  while (!working_list.Empty()) {
+    RuleTable *rt = working_list.Front();
+    working_list.PopFront();
+
+    if (rt == to) {
+      found = true;
+      break;
+    }
+
+    bool is_done = false;
+    for (unsigned i = 0; i < done_list.GetNum(); i++) {
+      if (rt == done_list.ValueAtIndex(i)) {
+        is_done = true;
+        break;
+      }
+    }
+    if (is_done)
+      continue;
+
+    // Add all table children to working list.
+    for (unsigned i = 0; i < rt->mNum; i++) {
+      TableData *data = rt->mData + i;
+      if (data->mType == DT_Subtable) {
+        RuleTable *child = data->mData.mEntry;
+        working_list.PushBack(child);
+      }
+    }
+
+    done_list.PushBack(rt);
+  }
+
+  return found;
+}
+
