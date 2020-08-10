@@ -150,14 +150,6 @@ void RecDetector::AddToDo(RuleTable *rule_table, unsigned start) {
   }
 }
 
-bool RecDetector::IsNonZero(RuleTable *t) {
-  for (unsigned i = 0; i < mNonZero.GetNum(); i++) {
-    if (t == mNonZero.ValueAtIndex(i))
-      return true;
-  }
-  return false;
-}
-
 bool RecDetector::IsMaybeZero(RuleTable *t) {
   for (unsigned i = 0; i < mMaybeZero.GetNum(); i++) {
     if (t == mMaybeZero.ValueAtIndex(i))
@@ -339,12 +331,17 @@ TResult RecDetector::DetectRuleTable(RuleTable *rt, ContTreeNode<RuleTable*> *p)
     return TRS_Done;
   }
 
-  // If find a new Recursion, create the recursion. It is the successor of thei
+  // If find a new Recursion, create the recursion. It is the successor of the
   // back edge. As mentioned in the comments in the beginning of this file, back
   // edge won't be furhter traversed as it is NOT part of the traversal tree.
+  //
+  // The key problem here is what value to return after AddRecursion(). The caller
+  // does request a return value. We decided to return TRS_Fail because this is
+  // the most possible value for a LeadNode of recursion. We actually don't expect
+  // a lead node could be MaybeZero, which means it won't produce epsilon expression.
   if (IsInProcess(rt)) {
     AddRecursion(rt, p);
-    return;
+    return TRS_Fail;
   } else {
     mInProcess.PushBack(rt);
   }
@@ -391,9 +388,6 @@ TResult RecDetector::DetectRuleTable(RuleTable *rt, ContTreeNode<RuleTable*> *p)
   } else if (res == TRS_MaybeZero) {
     MASSERT(!IsMaybeZero(rt));
     mMaybeZero.PushBack(rt);
-  } else if (res == TRS_NonZero) {
-    MASSERT(!IsNonZero(rt));
-    mNonZero.PushBack(rt);
   } else {
     // It couldn't be TRS_Done or TRS_NA, since we already
     // handled TRS_Done in those DetectXXX().
@@ -405,8 +399,7 @@ TResult RecDetector::DetectRuleTable(RuleTable *rt, ContTreeNode<RuleTable*> *p)
 
 // For Oneof rule, we try to detect for all its children if they are a rule table too.
 // 1. If there is one or more children are MaybeZero, the parent is MaybeZero
-// 2. If and only if all chidlren are Fail, the parent is Fail.
-// 3. All other cases, the parent is NonZero.
+// 2. Or the parent is Fail.
 //
 // No children will be put in ToDo, since all of them should be traversed.
 TResult RecDetector::DetectOneof(RuleTable *rule_table, ContTreeNode<RuleTable*> *p) {
@@ -424,20 +417,14 @@ TResult RecDetector::DetectOneof(RuleTable *rule_table, ContTreeNode<RuleTable*>
 
     if (temp_res == TRS_MaybeZero) {
       result = TRS_MaybeZero;
-    } else if (temp_res == TRS_NonZero) {
-      if (result != TRS_MaybeZero)
-        result = TRS_NonZero;
     } else if (temp_res == TRS_Fail) {
-      if (result == TRS_NA)
+      if (result != TRS_MaybeZero)
         result = TRS_Fail;
     } else if (temp_res == TRS_Done) {
       if (IsMaybeZero(child)) {
         result = TRS_MaybeZero;
-      } else if (IsNonZero(child)) {
-        if (result != TRS_MaybeZero)
-          result = TRS_NonZero;
       } else if (IsFail(child)) {
-        if (result == TRS_NA)
+        if (result != TRS_MaybeZero)
           result = TRS_Fail;
       } else
         MASSERT(0 && "Unexpected result of done child.");
@@ -453,13 +440,11 @@ TResult RecDetector::DetectZeroorXXX(RuleTable *rule_table, ContTreeNode<RuleTab
   TResult result = TRS_NA;
   MASSERT((rule_table->mNum == 1) && "zeroormore node has more than one elements?");
   TableData *data = rule_table->mData;
+  // For the non-table data, we just do nothing
   if (data->mType == DT_Subtable) {
     RuleTable *child = data->mData.mEntry;
     result = DetectRuleTable(child, p);
-  } else {
-    // For the non-table data, we just do nothing
   }
-
   return TRS_MaybeZero;
 }
 
@@ -478,13 +463,10 @@ TResult RecDetector::DetectData(RuleTable *rule_table, ContTreeNode<RuleTable*> 
   if (result == TRS_Done) {
     MASSERT(child);
     if (IsMaybeZero(child)) {
-      MASSERT(!IsNonZero(child) && !IsFail(child));
+      MASSERT(!IsFail(child));
       result = TRS_MaybeZero;
-    } else if (IsNonZero(child)) {
-      MASSERT(!IsMaybeZero(child) && !IsFail(child));
-      result = TRS_NonZero;
     } else if (IsFail(child)) {
-      MASSERT(!IsMaybeZero(child) && !IsNonZero(child));
+      MASSERT(!IsMaybeZero(child));
       result = TRS_Fail;
     } else {
       MASSERT(0 && "Child is not in any categories.");
@@ -566,13 +548,12 @@ TResult RecDetector::DetectData(RuleTable *rule_table, ContTreeNode<RuleTable*> 
 // We introduce a set of TResult to indicate the result of a rule table. This is
 // corresponding to the three catagories of rule.
 //   TRS_Fail:      Definitely a fail for left recursion. Just stop here.
+//                  But the rest children could form some new recursions.
 //   TRS_MaybeZero: The rule table could be empty. For a rule table, at the first
 //                  time it's traversed, we will save it to mMaybeZero if it's.
-//   TRS_NonZero:   The rule is not empty. The detection for parent stop here. But
-//                  the rest children could form some new recursions.
 //   TRS_Done:      This one is extra return result which doesn't have corresponding
 //                  rule catogeries of it. But the rule can be figured out by
-//                  checking IsFail(), IsMaybeZero() and IsNonZero(), because this
+//                  checking IsFail() and IsMaybeZero(), because this
 //                  rule is done before.
 
 // Keep in mind, all TResult of leading elements are only used for determining
@@ -580,20 +561,7 @@ TResult RecDetector::DetectData(RuleTable *rule_table, ContTreeNode<RuleTable*> 
 
 // At any point when we want to return, we need take the remaining elements
 // to ToDo list, if they are not in any of InProcess, Done and ToDo.
-
-// The return result tells how a rule does in loop detection, and we define
-// the algorithm of computing parent node based on children as below.
-//   a. The first time we get a NonZero or Fail child, the parent stops,
-//      and puts rest of children to ToDo list. So this means all the previous
-//      children are MaybeZero.
-//   b. If TRS_Fail child is the first one, the parent is TRS_Fail. Otherwise, 
-//      the parent is NonZero.
-//   c. If we get Nonzero, we Stop going furhter, and put the rest children to ToDo list.
-//      And the parent is NonZero.
-//   d. If all children are TRS_MaybeZero, the parent is MaybeZero.
-//   e. If get a TRS_Done child, check if its NonZero, Fail or MaybeZero, and handle it
-//      accordingly.
-//      
+ 
 TResult RecDetector::DetectConcatenate(RuleTable *rule_table, ContTreeNode<RuleTable*> *p) {
   // We use 'res' to record the status of the leading children. TRS_MaybeZero is good
   // for the beginning as it means it's empty right now.
@@ -619,27 +587,19 @@ TResult RecDetector::DetectConcatenate(RuleTable *rule_table, ContTreeNode<RuleT
   
     MASSERT((res == TRS_MaybeZero));
 
-    if (temp_res == TRS_NonZero) {
+    if (temp_res == TRS_Fail) {
       // No matter how many leading children of MaybeZero, the first time
-      // we get a NonZero, the whole result is NonZero. The rest children
+      // we get a Fail, the whole result is Fail. The rest children
       // cannot be traversed for these existing ancestors since they cannot
-      // help form a LEFT recursion any more due to this NonZero child.
+      // help form a LEFT recursion any more due to this Fail child.
       // However, we do need add them into ToDo list.
-      res = TRS_NonZero;
-      AddToDo(rule_table, i+1);
-      return res;
-    } else if (temp_res == TRS_Fail) {
-      res = (i == 0) ? TRS_Fail : TRS_NonZero;
+      res = TRS_Fail;
       AddToDo(rule_table, i+1);
       return res;
     } else if (temp_res == TRS_Done) {
       MASSERT(child);
       if (IsFail(child)) {
-        res = (i == 0) ? TRS_Fail : TRS_NonZero;
-        AddToDo(rule_table, i+1);
-        return res;
-      } else if (IsNonZero(child)) {
-        res = TRS_NonZero;
+        res = TRS_Fail;
         AddToDo(rule_table, i+1);
         return res;
       }
@@ -859,7 +819,6 @@ void RecDetector::Release() {
   mDone.Release();
 
   mMaybeZero.Release();
-  mNonZero.Release();
   mFail.Release();
 
   mTree.Release();

@@ -107,15 +107,13 @@ public:
 };
 
 // The traversal result of a rule table. The details can be found
-// in the comment of DetectConcatenate(). This is corresponding to the
-// following three SmallVector's of mMaybeZero, mNonZero, mFail.
+// in the comment of DetectConcatenate().
 enum TResult {
-  TRS_NonZero,
   TRS_MaybeZero,
-  TRS_Fail,
+  TRS_Fail,       // Failed for Left Recursive.
   TRS_Done,       // This is special one since the rule is done before, we don't
                   // know the real status, but we can find it out by check IsFail()
-                  // IsMaybeZero() and IsNonZero().
+                  // and IsMaybeZero().
   TRS_NA          // Simply used as the initial status.
 };
 
@@ -146,10 +144,8 @@ private:
   SmallVector<RuleTable*> mDone;          // tables done.
   SmallList<RuleTable*>   mToDo;          // tables to be traversed.
 
-  // We put rules into three categories: Fail, MaybeZero, NonZero.
-  // Both MaybeZero and NonZero could help build recursion.
+  // We put rules into two categories: Fail, MaybeZero.
   SmallVector<RuleTable*> mMaybeZero;
-  SmallVector<RuleTable*> mNonZero;
   SmallVector<RuleTable*> mFail;
 
   ContTree<RuleTable*>    mTree;          // the traversing tree.
@@ -161,7 +157,6 @@ private:
   void AddToDo(RuleTable*, unsigned);
 
   bool IsMaybeZero(RuleTable*);
-  bool IsNonZero(RuleTable*);
   bool IsFail(RuleTable*);
 
   void AddRecursion(RuleTable*, ContTreeNode<RuleTable*>*);
