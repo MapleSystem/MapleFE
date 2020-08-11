@@ -150,6 +150,8 @@ private:
 
   ContTree<RuleTable*>    mTree;          // the traversing tree.
 
+  bool                    mChanged;       // Used in the backpatch process
+
   bool IsInProcess(RuleTable*);
   bool IsDone(RuleTable*);
   bool IsToDo(RuleTable*);
@@ -170,6 +172,7 @@ private:
   TResult DetectZeroorXXX(RuleTable*, ContTreeNode<RuleTable*>*);
   TResult DetectConcatenate(RuleTable*, ContTreeNode<RuleTable*>*);
   TResult DetectTableData(TableData*, ContTreeNode<RuleTable*>*);
+  void BackPatch(RuleTable*);
 
   // rule to recursion mapping.
   SmallVector<Rule2Recursion*> mRule2Recursions;

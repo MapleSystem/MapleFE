@@ -309,23 +309,8 @@ TResult RecDetector::DetectRuleTable(RuleTable *rt, ContTreeNode<RuleTable*> *p)
   // This guarantees there is one and only one recursion recorded for a loop
   // even if the loop has multiple nodes.
 
-  // However, there is one complication scenario that we need take care. Below
-  // is an example.
-  // rule UnannClassType: ONEOF(Identifier + ZEROORONE(TypeArguments),
-  //                            UnannClassOrInterfaceType + '.' + ...)
-  // rule UnannClassOrInterfaceType: ONEOF(UnannClassType, UnannInterfaceType)
-  // rule UnannInterfaceType : UnannClassType
-  //
-  // These rules form a recursion where there are 2 paths. During recdetect traversal
-  // UnannClassOrInterfaceType is the first to hit and becomes the LeadNode.
-  // The problem is when handling the edge UnannClassOrInterfaceType --> UnannClassType,
-  // we find the first path, and UnannClassType becomes IsDone. Now, we need deal
-  // with UnannClassOrInterfaceType --> UnannInterfaceType, but UnannClassType which
-  // is the child of UnannInterfaceType is IsDone.
-  //
-  // In this case, we cannot return directly. We will have to check if the finished child
-  // is in a recursion. If it's in a recursion, we need further check if there is a path
-  // which can reach the focal node 'p'.
+  // However, there is one complication scenario that we need take care. Please
+  // see comments in BackPatch.
 
   if (IsDone(rt)) {
     return TRS_Done;
@@ -620,10 +605,104 @@ void RecDetector::Detect() {
     mTree.Clear();
     RuleTable *front = mToDo.Front();
     mToDo.PopFront();
-    // It's possible that a ToDo rule was later finished or in the middle of process
-    // after it was put into the ToDo list.
+    // It's possible that a rule is put in ToDo multiple times. So it's possible
+    // the first instance IsDone while the second is still in ToDo. So is InProcess.
     if (!IsDone(front) && !IsInProcess(front))
       DetectRuleTable(front, NULL);
+  }
+
+  // Back Patch
+  // During TraverseRuleTable(), once we see a child IsDone(), we simply return.
+  // This brings an issue that we may miss the opportunity to identify the parent
+  // node as a Recursion Node.
+
+  // Below is an example.
+  // rule UnannClassType: ONEOF(Identifier + ZEROORONE(TypeArguments),
+  //                            UnannClassOrInterfaceType + '.' + ...)
+  // rule UnannClassOrInterfaceType: ONEOF(UnannClassType, UnannInterfaceType)
+  // rule UnannInterfaceType : UnannClassType
+  //
+  // These rules form a recursion where there are 2 paths. During recdetect traversal
+  // UnannClassOrInterfaceType is the first to hit and becomes the LeadNode.
+  // The problem is when handling the edge UnannClassOrInterfaceType --> UnannClassType,
+  // we find the first path, and UnannClassType becomes IsDone. Now, we need deal
+  // with UnannClassOrInterfaceType --> UnannInterfaceType, but UnannClassType which
+  // is the child of UnannInterfaceType is IsDone.
+
+  // Why we do it after DetectRuleTable is completely done? We need the complete
+  // information of IsDone, MaybeZero, Fail, which can be available only after all
+  // DetectRuleTable is done.
+
+  mChanged = true;
+  while(mChanged) {
+    mChanged = false;
+    mDone.Clear();
+    mToDo.Clear();
+    SetupTopTables();
+    while(!mToDo.Empty()) {
+      RuleTable *front = mToDo.Front();
+      mToDo.PopFront();
+      if (!IsDone(front)) {
+        BackPatch(front);
+        mDone.PushBack(front);
+      }
+    }
+  }
+}
+
+// The algorithm is simple, we only check the direct children to see if they are
+// in some recursion which 'parent' is not in or not in the same group.
+void RecDetector::BackPatch(RuleTable *parent) {
+  Rule2Recursion *parent_r2r = FindRule2Recursion(parent);
+  Rule2Recursion *child_r2r = NULL;
+  for (unsigned i = 0; i < parent->mNum; i++) {
+    TableData *data = parent->mData + i;
+    if (data->mType == DT_Subtable) {
+      RuleTable *child = data->mData.mEntry;
+
+      // add child to ToDo list
+      if (!IsDone(child))
+        mToDo.PushBack(child);
+
+      child_r2r = FindRule2Recursion(child);
+      if (!child_r2r)
+        continue;
+
+      // If parent and child share some recursion, we skip
+      bool found = false;
+      for (unsigned j = 0; parent_r2r && (j < parent_r2r->mRecursions.GetNum()); j++) {
+        Recursion *pr = parent_r2r->mRecursions.ValueAtIndex(j);
+        for (unsigned k = 0; k < child_r2r->mRecursions.GetNum(); k++) {
+          Recursion *cr = child_r2r->mRecursions.ValueAtIndex(k);
+          if (cr == pr) {
+            found = true;
+            break;
+          }
+        }
+        if (found)
+          break;
+      }
+
+      if (found)
+        continue;
+
+      // Now they are sharing any common recursion, and child has its
+      // exclusive recursions.
+      bool lr_reachable = false;
+      for (unsigned k = 0; k < child_r2r->mRecursions.GetNum(); k++) {
+        Recursion *rec = child_r2r->mRecursions.ValueAtIndex(k);
+        RuleTable *lead = rec->GetLead();
+        lr_reachable = LRReachable(lead, parent) && LRReachable(parent, child);
+        // Adding parent to one of recursion is good enough. Don't need add
+        // to all appropriate recursions since they will be grouped together
+        // later and parsing is on group unit.
+        if (lr_reachable) {
+          AddRule2Recursion(parent, rec);
+          rec->AddRuleTable(parent);
+          mChanged = true;
+        }
+      }
+    }
   }
 }
 
