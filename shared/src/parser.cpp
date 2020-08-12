@@ -649,9 +649,6 @@ bool Parser::TraverseRuleTablePre(AppealNode *appeal, AppealNode *parent) {
       if (gSuccTokensNum > 0)
         MoveCurToken();
 
-      if (mTraceTable)
-        DumpExitTable(name, mIndentation, true, SuccWasSucc);
-
       appeal->mAfter = SuccWasSucc;
     }
   }
@@ -695,6 +692,8 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
   appeal->SetParent(parent);
   parent->AddChild(appeal);
 
+  unsigned saved_mCurToken = mCurToken;
+
   if (mInSecondTry) {
     appeal->mIsSecondTry = true;
     mInSecondTry = false;
@@ -714,16 +713,41 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
   // If the rule is done, we also simply return the result.
   if (appeal->IsSucc()) {
     if (!in_group || is_done) {
+      if (mTraceTable)
+        DumpExitTable(name, mIndentation, true, SuccWasSucc);
       mIndentation -= 2;
       return true;
+    } else {
+      if (mTraceTable) {
+        DumpIndentation();
+        std::cout << "Traverse-Pre WasSucc, mCurToken:" << mCurToken;
+        std::cout << std::endl;
+      }
     }
   }
 
-
   RecursionTraversal *rec_tra = FindRecStack(group_id, appeal->GetStartIndex());
 
+  // group_id is 0 which is the default value if rule_table is not in a group
+  // Need to reset rec_tra;
+  if (!in_group)
+    rec_tra = NULL;
+
+  // If the rule is already traversed in this iteration(instance), we return the result.
+  if (rec_tra && rec_tra->RecursionNodeVisited(rule_table)) {
+    if (mTraceTable)
+      DumpExitTable(name, mIndentation, true, SuccWasSucc);
+    mIndentation -= 2;
+    return true;
+  }
+
+  // Restore the mCurToken since TraverseRuleTablePre() update the mCurToken
+  // if succ.
+  mCurToken = saved_mCurToken;
+
   // This part is to handle the 2nd appearance of the Rest Instances
-  // Why not 2nd appearance of 1st Instance?
+  //
+  // IsSucc() assures it's not 2nd appearance of 1st Instance?
   // Because the 1st instantce is not done yet and cannot be IsSucc().
   if (appeal->IsSucc() && mRecursionAll.IsLeadNode(rule_table)) {
     // If we are entering a lead node which already succssfully matched some
@@ -731,7 +755,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
     // We should find RecursionTraversal for it.
     MASSERT(rec_tra);
 
-    // Check if it's visited, aka 2nd appearance.
+    // Check if it's visited, assure it's 2nd appearance.
     // There are only two appearances of the Leading rule tables in one single
     // wave (instance) of the Wavefront traversal, the 1st is not visited, the
     // 2nd is visited.
@@ -798,6 +822,9 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
   // recursion. I don't need take care here.
 
   bool matched = TraverseRuleTableRegular(rule_table, appeal);
+  if (rec_tra)
+    rec_tra->AddVisitedRecursionNode(rule_table);
+
   if (mTraceTable)
     DumpExitTable(name, mIndentation, matched, FailChildrenFailed);
 
@@ -1265,10 +1292,12 @@ void Parser::SetIsDone(unsigned group_id, unsigned start_token) {
     if (r2g.mGroupId == group_id) {
       RuleTable *rt = r2g.mRuleTable;
       SuccMatch *succ = FindSucc(rt);
-      MASSERT(succ && "root has no SuccMatch?");
-      bool found = succ->GetStartToken(start_token);
-      MASSERT(found);
-      succ->SetIsDone();
+      // Some node in a recursion fails, like some children of a Oneof node
+      if (succ) {
+        bool found = succ->GetStartToken(start_token);
+        MASSERT(found);
+        succ->SetIsDone();
+      }
     }
   }
 }

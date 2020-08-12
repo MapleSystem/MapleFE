@@ -83,6 +83,12 @@ private:
   // with the node in the previous instance.
   SmallVector<RuleTable*> mVisitedLeadNodes;
 
+  // Visited Recursion Node. This is a per-iteration data too.
+  // This doesn't include lead node.
+  // Visiting an un-visited recursion node will do the regular traversal.
+  // Visiting a visited recursion node will take the result of TraversalRuleTablePre().
+  SmallVector<RuleTable*> mVisitedRecursionNodes;
+
   SmallVector<AppealNode*> mAppealPoints; // places to start appealing
 
   bool     mTrace;
@@ -113,6 +119,9 @@ public:
 
   void AddVisitedLeadNode(RuleTable *rt) {mVisitedLeadNodes.PushBack(rt);}
   bool LeadNodeVisited(RuleTable *rt) {return mVisitedLeadNodes.Find(rt);}
+
+  void AddVisitedRecursionNode(RuleTable *rt) {mVisitedRecursionNodes.PushBack(rt);}
+  bool RecursionNodeVisited(RuleTable *rt) {return mVisitedRecursionNodes.Find(rt);}
 
   void AddLeadNode(AppealNode *n) {mLeadNodes.PushBack(n);}
 

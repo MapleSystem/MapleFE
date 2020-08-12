@@ -501,8 +501,9 @@ bool RecursionTraversal::FindInstances() {
     for (unsigned i = 0; i < mLeadNodes.GetNum(); i++)
       mPrevLeadNodes.PushBack(mLeadNodes.ValueAtIndex(i));
 
-    // Clear LeadNodes and Visited LeadNodes
+    // Clear LeadNodes and Visited LeadNodes/recursion nodes
     mVisitedLeadNodes.Clear();
+    mVisitedRecursionNodes.Clear();
     mLeadNodes.Clear();
 
     // Find the instance
