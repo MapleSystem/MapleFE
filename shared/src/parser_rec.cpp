@@ -377,6 +377,8 @@ bool Parser::TraverseLeadNode(AppealNode *appeal, AppealNode *parent) {
   MASSERT((entry.mGroupId == group_id) && (entry.mStartToken == saved_mCurToken));
   mRecStack.PopBack();
 
+  delete rec_tra;
+
   return found;
 }
 
