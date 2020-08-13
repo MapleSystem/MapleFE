@@ -316,8 +316,9 @@ bool Parser::TraverseLeadNode(AppealNode *appeal, AppealNode *parent) {
   const char *name = GetRuleTableName(rt);
   unsigned group_id;
   bool found = false;
-  found = FindRecursionGroup(rt, group_id);
-  MASSERT(found);
+  bool found_group = false;
+  found_group = FindRecursionGroup(rt, group_id);
+  MASSERT(found_group);
 
   if (mTraceLeftRec) {
     DumpIndentation();
@@ -338,8 +339,8 @@ bool Parser::TraverseLeadNode(AppealNode *appeal, AppealNode *parent) {
     bool found = TraverseRuleTableRegular(rt, appeal);
     if (mTraceTable) {
       DumpIndentation();
-      std::cout << "<LR>: Enter Other LeadNode " << name << std::endl;
-      DumpExitTable(name, mIndentation, found, FailChildrenFailed);
+      std::cout << "<LR>: Exit Other LeadNode " << name << std::endl;
+      //DumpExitTable(...) is called in the caller. We don't dump here.
     }
     return found;
   }

@@ -389,6 +389,7 @@ private:
   void ApplySuccInfoOnPath(AppealNode *lead, AppealNode *pseudo, bool succ);
   AppealNode* ConstructPath(AppealNode*, AppealNode*, unsigned*, unsigned);
   void SetIsDone(unsigned /*group*/, unsigned /*token*/);
+  void SetIsDone(RuleTable*, unsigned);
 
 public:
   void AddSeparatedTree(AppealNode *n) {mSeparatedTrees.PushBack(n);}

@@ -619,6 +619,7 @@ void Parser::RemoveSuccNode(unsigned curr_token, AppealNode *node) {
 // Returns true : if SuccMatch is done.
 
 bool Parser::TraverseRuleTablePre(AppealNode *appeal, AppealNode *parent) {
+  unsigned saved_mCurToken = mCurToken;
   bool is_done = false;
   RuleTable *rule_table = appeal->GetTable();
   const char *name = NULL;
@@ -653,7 +654,7 @@ bool Parser::TraverseRuleTablePre(AppealNode *appeal, AppealNode *parent) {
     }
   }
 
-  if (WasFailed(rule_table, mCurToken)) {
+  if (WasFailed(rule_table, saved_mCurToken)) {
     if (mTraceTable)
       DumpExitTable(name, mIndentation, false, FailWasFailed);
     appeal->mAfter = FailWasFailed;
@@ -824,6 +825,9 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
   bool matched = TraverseRuleTableRegular(rule_table, appeal);
   if (rec_tra)
     rec_tra->AddVisitedRecursionNode(rule_table);
+
+  if (!in_group && matched)
+    SetIsDone(rule_table, saved_mCurToken);
 
   if (mTraceTable)
     DumpExitTable(name, mIndentation, matched, FailChildrenFailed);
@@ -1300,6 +1304,18 @@ void Parser::SetIsDone(unsigned group_id, unsigned start_token) {
       }
     }
   }
+}
+
+void Parser::SetIsDone(RuleTable *rt, unsigned start_token) {
+  // We don't save SuccMatch for TblLiteral and TblIdentifier
+  if((rt == &TblLiteral) || (rt == &TblIdentifier))
+    return;
+
+  SuccMatch *succ = FindSucc(rt);
+  MASSERT(succ);
+  bool found = succ->GetStartToken(start_token);
+  MASSERT(found);
+  succ->SetIsDone();
 }
 
 /////////////////////////////////////////////////////////////////////////////
