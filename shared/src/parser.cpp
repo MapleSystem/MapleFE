@@ -632,7 +632,14 @@ bool Parser::TraverseRuleTablePre(AppealNode *appeal, AppealNode *parent) {
   if (succ) {
     bool was_succ = succ->GetStartToken(mCurToken);
     if (was_succ) {
+      // Those affected by the 1st appearance of 1st instance which returns false.
+      // 1stOf1st is not add to WasFail, but those affected will be added to WasFail.
+      // The affected can be succ later. So there is possibility both succ and fail
+      // exist at the same time.
+      //
+      // I still keep this assertion. We will see. Maybe we'll remove it.
       MASSERT(!WasFailed(rule_table, mCurToken));
+
       is_done = succ->IsDone();
 
       gSuccTokensNum = succ->GetMatchNum();
@@ -1299,8 +1306,8 @@ void Parser::SetIsDone(unsigned group_id, unsigned start_token) {
       // Some node in a recursion fails, like some children of a Oneof node
       if (succ) {
         bool found = succ->GetStartToken(start_token);
-        MASSERT(found);
-        succ->SetIsDone();
+        if(found)
+          succ->SetIsDone();
       }
     }
   }

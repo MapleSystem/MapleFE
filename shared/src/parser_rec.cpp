@@ -514,6 +514,10 @@ bool RecursionTraversal::FindInstances() {
     temp_found = FindRestInstance();
   }
 
+  // Set all ruletable's SuccMatch to IsDone in this recursion group.
+  // Even though the whole recursion fails, some nodes can succeed.
+  mParser->SetIsDone(mGroupId, mStartToken);
+
   return found;
 }
 
@@ -538,6 +542,20 @@ bool RecursionTraversal::FindFirstInstance() {
   found = mParser->TraverseRuleTableRegular(mRuleTable, lead);
 
   // Appealing of the mistaken Fail nodes.
+  //
+  // Originally, this is for appealing those affected by the 1st appearance
+  // of 1st instance which returns false. 1stOf1st is not add to WasFail, but
+  // those affected will be added to WasFail.
+  // Later, we changed the algorithm  of TraverseRuleTablePre() which checks
+  // the SuccMatch at first. This means if the affected was later found succ,
+  // they can still return succ.
+  //
+  // So this Appeal seems not needed any more.
+  //
+  // I still keep an assertion in TraverseRuleTablePre() when it has SuccMatch,
+  // asserting !WasFail. But I believe there are still WasFail at the same time.
+  // We will see.
+
   if (found) {
     for (unsigned i = 0; i < mAppealPoints.GetNum(); i++) {
       AppealNode *start = mAppealPoints.ValueAtIndex(i);
@@ -584,9 +602,6 @@ bool RecursionTraversal::FindRestInstance() {
     // Need remove it from the SuccMatch, so that later parser won't
     // take it as an input.
     mParser->RemoveSuccNode(mStartToken, lead);
-
-    // Set all ruletable's SuccMatch to IsDone in this recursion group.
-    mParser->SetIsDone(mGroupId, mStartToken);
 
     return false;
   }
