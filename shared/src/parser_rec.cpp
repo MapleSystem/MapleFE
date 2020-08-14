@@ -543,21 +543,17 @@ bool RecursionTraversal::FindFirstInstance() {
 
   // Appealing of the mistaken Fail nodes.
   //
-  // Originally, this is for appealing those affected by the 1st appearance
+  // This is for appealing those affected by the 1st appearance
   // of 1st instance which returns false. 1stOf1st is not add to WasFail, but
   // those affected will be added to WasFail.
-  // Later, we changed the algorithm  of TraverseRuleTablePre() which checks
-  // the SuccMatch at first. This means if the affected was later found succ,
-  // they can still return succ.
-  //
-  // So this Appeal seems not needed any more.
   //
   // I still keep an assertion in TraverseRuleTablePre() when it has SuccMatch,
   // asserting !WasFail. But I believe there are still WasFail at the same time.
   // We will see.
 
   if (found) {
-    for (unsigned i = 0; i < mAppealPoints.GetNum(); i++) {
+    unsigned num = mAppealPoints.GetNum();
+    for (unsigned i = 0; i < num; i++) {
       AppealNode *start = mAppealPoints.ValueAtIndex(i);
       mParser->Appeal(start, lead);
     }

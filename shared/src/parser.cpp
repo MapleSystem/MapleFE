@@ -424,7 +424,9 @@ void Parser::ClearAppealNodes() {
 //        should be remained as fail, because it IS a fail indeed for this sub-tree.
 void Parser::Appeal(AppealNode *start, AppealNode *root) {
   MASSERT((root->IsSucc()) && "root->mAfter is not Succ.");
-  MASSERT(start->GetTable() == root->GetTable());
+
+  // A recursion group could have >1 lead node. 'start' could be a different leadnode
+  // than 'root'.
 
   AppealNode *node = start->GetParent();
 
@@ -552,8 +554,11 @@ void Parser::DumpExitTable(const char *table_name, unsigned indent, bool succ, A
   if (succ) {
     if (reason == SuccWasSucc)
       std::cout << " succ@WasSucc" << "}";
-    else
+    else if (reason == SuccStillWasSucc)
+      std::cout << " succ@StillWasSucc" << "}";
+    else if (reason == Succ)
       std::cout << " succ" << "}";
+
     DumpSuccTokens();
     std::cout << std::endl;
   } else {
@@ -662,9 +667,9 @@ bool Parser::TraverseRuleTablePre(AppealNode *appeal, AppealNode *parent) {
   }
 
   if (WasFailed(rule_table, saved_mCurToken)) {
-    if (mTraceTable)
-      DumpExitTable(name, mIndentation, false, FailWasFailed);
     appeal->mAfter = FailWasFailed;
+    if (mTraceTable)
+      DumpExitTable(name, mIndentation, false, appeal->mAfter);
   }
 
   return is_done;
@@ -722,7 +727,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
   if (appeal->IsSucc()) {
     if (!in_group || is_done) {
       if (mTraceTable)
-        DumpExitTable(name, mIndentation, true, SuccWasSucc);
+        DumpExitTable(name, mIndentation, true, appeal->mAfter);
       mIndentation -= 2;
       return true;
     } else {
@@ -744,7 +749,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
   // If the rule is already traversed in this iteration(instance), we return the result.
   if (rec_tra && rec_tra->RecursionNodeVisited(rule_table)) {
     if (mTraceTable)
-      DumpExitTable(name, mIndentation, true, SuccWasSucc);
+      DumpExitTable(name, mIndentation, true, appeal->mAfter);
     mIndentation -= 2;
     return true;
   }
@@ -792,6 +797,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
   if (rec_tra &&
       rec_tra->GetInstance() == InstanceFirst &&
       rec_tra->LeadNodeVisited(rule_table)) {
+    //rec_tra->AddAppealPoint(appeal);
     if (mTraceTable)
       DumpExitTable(name, mIndentation, false, Fail2ndOf1st);
     mIndentation -= 2;
@@ -818,7 +824,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
     }
     if (mTraceTable) {
       const char *name = GetRuleTableName(rule_table);
-      DumpExitTable(name, mIndentation, found, FailChildrenFailed);
+      DumpExitTable(name, mIndentation, found, appeal->mAfter);
     }
     mIndentation -= 2;
     return found;
@@ -837,7 +843,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
     SetIsDone(rule_table, saved_mCurToken);
 
   if (mTraceTable)
-    DumpExitTable(name, mIndentation, matched, FailChildrenFailed);
+    DumpExitTable(name, mIndentation, matched, appeal->mAfter);
 
   mIndentation -= 2;
   return matched;
@@ -847,6 +853,12 @@ bool Parser::TraverseRuleTableRegular(RuleTable *rule_table, AppealNode *parent)
   bool matched = false;
   unsigned old_pos = mCurToken;
   gSuccTokensNum = 0;
+
+  bool was_succ = (parent->mAfter == SuccWasSucc) || (parent->mAfter == SuccStillWasSucc);
+  unsigned match_num = parent->GetMatchNum();
+  unsigned longest_match = 0;
+  if (was_succ)
+    longest_match = parent->LongestMatch();
 
   // [NOTE] TblLiteral and TblIdentifier don't use the SuccMatch info,
   //        since it's quite simple, we don't need SuccMatch to reduce
@@ -880,8 +892,21 @@ bool Parser::TraverseRuleTableRegular(RuleTable *rule_table, AppealNode *parent)
   }
 
   if(matched) {
-    UpdateSuccInfo(old_pos, parent);
-    parent->mAfter = Succ;
+    // If parent WasSucc before entering this function, and have the same
+    // or bigger longest match, it's StillWasSucc. Don't need update succinfo.
+    unsigned longest = 0;
+    for (unsigned i = 0; i < gSuccTokensNum; i++) {
+      unsigned m = gSuccTokens[i];
+      longest = m > longest ? m : longest;
+    }
+
+    if (!was_succ || (longest > longest_match)) {
+      UpdateSuccInfo(old_pos, parent);
+      parent->mAfter = Succ;
+    } else {
+      parent->mAfter = SuccStillWasSucc;
+    }
+
     ResetFailed(rule_table, old_pos);
     return true;
   } else {

@@ -45,8 +45,18 @@ typedef enum {
   FailNotLiteral,
   FailChildrenFailed,
   Fail2ndOf1st,
+
+  // Succ :             Really does the matching, will be saved in SuccMatch
+  // SuccWasSucc :      Was matched, not tried traversal for a second timewill,
+  //                    It will NOT be saved in SuccMatch
+  // SuccStillWasSucc : was matched, but tried traversal again. This happens
+  //                    in RecurionNodes where it does multiple instances of
+  //                    traversal. But it doesn't make any change compared
+  //                    to the last real Succ. It will NOT be saved in SuccMatch
   Succ,
   SuccWasSucc,
+  SuccStillWasSucc,
+
   AppealStatus_NA
 }AppealStatus;
 
@@ -142,7 +152,9 @@ public:
   bool GetSortedChildIndex(AppealNode*, unsigned &);
   AppealNode* GetSortedChildByIndex(unsigned idx);
 
-  bool IsSucc() { return (mAfter == Succ) || (mAfter == SuccWasSucc); }
+  bool IsSucc() { return (mAfter == Succ) ||
+                         (mAfter == SuccWasSucc) ||
+                         (mAfter == SuccStillWasSucc); }
   bool IsFail() { return (mAfter == FailWasFailed) ||
                          (mAfter == FailNotIdentifier) ||
                          (mAfter == FailNotLiteral) ||
