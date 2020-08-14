@@ -754,10 +754,6 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
     return true;
   }
 
-  // Restore the mCurToken since TraverseRuleTablePre() update the mCurToken
-  // if succ.
-  mCurToken = saved_mCurToken;
-
   // This part is to handle the 2nd appearance of the Rest Instances
   //
   // IsSucc() assures it's not 2nd appearance of 1st Instance?
@@ -784,6 +780,9 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
       // WasSucc node is used for succ node which has no full appeal tree. So better
       // change the status to Succ.
       appeal->mAfter = Succ;
+      if (mTraceTable)
+        DumpExitTable(name, mIndentation, true, Succ);
+
       mIndentation -= 2;
       return rec_tra->ConnectPrevious(appeal);
     }
@@ -797,17 +796,22 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
   if (rec_tra &&
       rec_tra->GetInstance() == InstanceFirst &&
       rec_tra->LeadNodeVisited(rule_table)) {
-    //rec_tra->AddAppealPoint(appeal);
+    rec_tra->AddAppealPoint(appeal);
     if (mTraceTable)
       DumpExitTable(name, mIndentation, false, Fail2ndOf1st);
     mIndentation -= 2;
     return false;
   }
 
+  // Restore the mCurToken since TraverseRuleTablePre() update the mCurToken
+  // if succ. And we need use the old mCurToken.
+  mCurToken = saved_mCurToken;
+
   // Now it's time to do regular traversal on a LeadNode.
   // The scenarios of LeadNode is one of the below.
   // 1. The first time we hit the LeadNode
-  // 2. The first time in an instance we hit the LeadNode
+  // 2. The first time in an instance we hit the LeadNode. It WasSucc, but
+  //    we have to do re-traversal.
   //
   // The match info of 'appeal' and its SuccMatch will be updated
   // inside TraverseLeadNode().
@@ -952,7 +956,10 @@ bool Parser::TraverseToken(Token *token, AppealNode *parent) {
   if (mTraceTable) {
     std::string name = "token:";
     name += token->GetName();
-    DumpExitTable(name.c_str(), mIndentation, found, AppealStatus_NA);
+    if (found)
+      DumpExitTable(name.c_str(), mIndentation, true, Succ);
+    else
+      DumpExitTable(name.c_str(), mIndentation, false, AppealStatus_NA);
   }
 
   mIndentation -= 2;
