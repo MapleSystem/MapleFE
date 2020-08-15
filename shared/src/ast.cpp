@@ -202,7 +202,7 @@ TreeNode* ASTTree::NewTreeNode(AppealNode *appeal_node, std::map<AppealNode*, Tr
     return pass;
   }
 
-  MERROR("We got a broken AST tree, not connected sub tree.");
+  MASSERT(0 && "We got a broken AST tree, not connected sub tree.");
 }
 
 void ASTTree::Dump(unsigned indent) {

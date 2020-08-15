@@ -1927,20 +1927,26 @@ void Parser::FindPatchingNodes() {
   std::vector<AppealNode*>::iterator it = was_succ_list.begin();
   for (; it != was_succ_list.end(); it++) {
     AppealNode *was_succ = *it;
+    MASSERT(was_succ->IsSorted());
+    unsigned final_match = was_succ->GetFinalMatch();
 
     SuccMatch *succ_match = FindSucc(was_succ->GetTable());
     MASSERT(succ_match && "WasSucc's rule has no SuccMatch?");
     bool found = succ_match->GetStartToken(was_succ->GetStartIndex());
     MASSERT(found && "WasSucc cannot find start index in SuccMatch?");
 
-    AppealNode *youngest = succ_match->GetSuccNode(0);
-    for (unsigned i = 1; i < succ_match->GetSuccNodesNum(); i++) {
+    AppealNode *youngest = NULL;
+    for (unsigned i = 0; i < succ_match->GetSuccNodesNum(); i++) {
       AppealNode *node = succ_match->GetSuccNode(i);
-      if (node->DescendantOf(youngest)) {
-        youngest = node;
-      } else {
-        // Any two nodes should be in a ancestor-descendant relationship.
-        MASSERT(youngest->DescendantOf(node));
+      if (node->FindMatch(final_match)) {
+        if (!youngest)
+          youngest = node;
+        else if (node->DescendantOf(youngest)) {
+          youngest = node;
+        } else {
+          // Any two nodes should be in a ancestor-descendant relationship.
+          MASSERT(youngest->DescendantOf(node));
+        }
       }
     }
     MASSERT(youngest && "succ matching node is missing?");
@@ -1954,21 +1960,18 @@ void Parser::FindPatchingNodes() {
 }
 
 // This is another entry point of sort, similar as SortOut().
-// The only difference is we use 'target' as the refrence that we want
-// 'root' to be sorted.
-void Parser::SupplementalSortOut(AppealNode *root, AppealNode *target) {
-  if(root->mSortedChildren.size()!=0)
-    std::cout << "got one sorted again." << std::endl;
+// The only difference is we use 'reference' as the refrence of final match.
+void Parser::SupplementalSortOut(AppealNode *root, AppealNode *reference) {
   MASSERT(root->mSortedChildren.size()==0 && "root should be un-sorted.");
   MASSERT(root->IsTable() && "root should be a table node.");
 
   // step 1. Find the last matching token index we want.
-  MASSERT(target->IsSorted() && "target is not sorted?");
+  MASSERT(reference->IsSorted() && "reference is not sorted?");
 
   // step 2. Set the root.
   SuccMatch *succ = FindSucc(root->GetTable());
   MASSERT(succ && "root node has no SuccMatch?");
-  root->SetFinalMatch(target->GetFinalMatch());
+  root->SetFinalMatch(reference->GetFinalMatch());
   root->SetSorted();
 
   // step 3. Start the sort out
