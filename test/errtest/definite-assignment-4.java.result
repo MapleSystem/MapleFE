@@ -1,0 +1,53 @@
+Matched 30 tokens.
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+== Sub Tree ==
+class  Point
+  Fields: 
+    x
+  Instance Initializer: 
+
+  Constructors: 
+    constructor  Point()  throws: 
+      Assign
+        x
+        0
+
+
+
+  Methods: 
+    func  foo()  throws: 
+      Assign
+        x
+        4
+
+      return x
+  LocalClasses: 
+  LocalInterfaces: 
+
+============= Module ===========
+== Sub Tree ==
+class  Point
+  Fields: 
+    x
+  Instance Initializer: 
+
+  Constructors: 
+    constructor  Point()  throws: 
+      Assign
+        x
+        0
+
+
+
+  Methods: 
+    func  foo()  throws: 
+      Assign
+        x
+        4
+
+      return x
+  LocalClasses: 
+  LocalInterfaces: 
+
