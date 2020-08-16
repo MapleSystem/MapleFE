@@ -243,6 +243,7 @@ Parser::Parser(const char *name) : filename(name) {
   mLexer->PrepareForFile(file);
   mCurToken = 0;
   mPending = 0;
+  mEndOfFile = false;
 
   mTraceTable = false;
   mTraceLeftRec = false;
@@ -379,8 +380,10 @@ bool Parser::MoveCurToken() {
   mCurToken++;
   if (mCurToken == mActiveTokens.size()) {
     unsigned num = LexOneLine();
-    if (!num)
+    if (!num) {
+      mEndOfFile = true;
       return false;
+    }
   }
   return true;
 }
@@ -690,6 +693,9 @@ bool Parser::TraverseRuleTablePre(AppealNode *appeal, AppealNode *parent) {
 //        4. TraverseLeadNode() also follows the rule 1&2. It moves mCurToken
 //           when succ and restore it when fail.
 bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
+  if (mEndOfFile)
+    return false;
+
   mIndentation += 2;
   const char *name = NULL;
   if (mTraceTable) {
@@ -1295,6 +1301,9 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *parent, unsi
 
 // The mCurToken moves if found target, or restore the original location.
 bool Parser::TraverseTableData(TableData *data, AppealNode *parent) {
+  if (mEndOfFile)
+    return false;
+
   unsigned old_pos = mCurToken;
   bool     found = false;
   Token   *curr_token = GetActiveToken(mCurToken);

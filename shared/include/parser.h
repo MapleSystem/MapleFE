@@ -253,6 +253,7 @@ private:
 public:
   Lexer *mLexer;
   const char *filename;
+  bool mEndOfFile;
 
   // debug info
   int  mIndentation;
