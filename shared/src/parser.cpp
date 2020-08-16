@@ -2253,8 +2253,6 @@ void Parser::SetupTopTables() {
 
 void Parser::InitRecursion() {
   mRecursionAll.Init();
-  if (mTraceLeftRec)
-    mRecursionAll.Dump();
 }
 
 ////////////////////////////////////////////////////////////////////////////
