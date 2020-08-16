@@ -98,7 +98,6 @@ private:
   bool        mSucc;
   unsigned    mStartToken;
 
-  bool IsOnCircle(AppealNode*, AppealNode*);
   bool FindFirstInstance();
   bool FindRestInstance();
   bool FindInstances();

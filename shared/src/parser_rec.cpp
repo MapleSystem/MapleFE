@@ -195,43 +195,6 @@ bool RecursionTraversal::ConnectPrevious(AppealNode *curr_node) {
   return curr_node->IsSucc();
 }
 
-// Returns true if first->...->second is one of the circles of mRec
-bool RecursionTraversal::IsOnCircle(AppealNode *second, AppealNode *first) {
-  unsigned on_times = 0;
-  for (unsigned i = 0; i < mRec->mRecursionNodes.GetNum(); i++) {
-    SmallVector<RuleTable*> *circle = mRec->mRecursionNodes.ValueAtIndex(i);
-    unsigned index = circle->GetNum() - 1;
-
-    // we check backwards.
-    // 'second' is not in the circle, 'first' is in circle.
-    bool found = true;
-    AppealNode *node = second->GetParent();
-    while(node) {
-      RuleTable *rt = node->GetTable();
-      RuleTable *c_rt = circle->ValueAtIndex(index);
-      if (rt != c_rt) {
-        found = false;
-        break;
-      }
-      node = node->GetParent();
-      if (node == first)
-        break;
-      index--;
-    }
-
-    if (found) {
-      MASSERT(index == 0);
-      on_times++;
-    }
-  }
-
-  MASSERT(on_times <= 1);
-  if (on_times == 1)
-    return true;
-  else
-    return false;
-}
-
 // I don't need worry about moving mCurToken if succ, because
 // it's handled in TraverseLeadNode().
 bool RecursionTraversal::FindInstances() {
