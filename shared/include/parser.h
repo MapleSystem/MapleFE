@@ -397,10 +397,6 @@ private:
   LeftRecursion* FindRecursion(RuleTable *);
   bool IsLeadNode(RuleTable *);
   bool TraverseLeadNode(AppealNode*, AppealNode *parent);
-  bool TraverseCircle(AppealNode *lead, Recursion *rec, unsigned idx, unsigned &newcurtoken);
-  bool TraverseFronNode(AppealNode *parent, FronNode fnode, Recursion *rec = NULL, unsigned cir=0);
-  void ApplySuccInfoOnPath(AppealNode *lead, AppealNode *pseudo, bool succ);
-  AppealNode* ConstructPath(AppealNode*, AppealNode*, unsigned*, unsigned);
   void SetIsDone(unsigned /*group*/, unsigned /*token*/);
   void SetIsDone(RuleTable*, unsigned);
 
