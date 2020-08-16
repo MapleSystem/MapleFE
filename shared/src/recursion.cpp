@@ -144,22 +144,6 @@ void Recursion::Init(LeftRecursion *lr) {
   mLeadNode = lr->mRuleTable;
   mNum = lr->mNum;
   mCircles = lr->mCircles;
-
-  // Alloc/Init of FronNodes/RecursionNodes of all circle.
-  for (unsigned i = 0; i < mNum; i++) {
-    SmallVector<FronNode> *p_fnodes = new SmallVector<FronNode>();
-    mFronNodes.PushBack(p_fnodes);
-    SmallVector<RuleTable*> *rts = new SmallVector<RuleTable*>();
-    mRecursionNodes.PushBack(rts);
-  }
-
-  // Find all recursion nodes which are on the circles.
-  FindRecursionNodes();
-
-  // Find LeadFronNodes
-  FindLeadFronNodes();
-
-  FindFronNodes();
 }
 
 bool Recursion::IsRecursionNode(RuleTable *rt) {

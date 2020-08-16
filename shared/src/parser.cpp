@@ -1528,6 +1528,9 @@ void Parser::SortOutOneof(AppealNode *parent) {
     if (good_children > 0)
       break;
   }
+
+  // There should be at least one good_children.
+  MASSERT(good_children);
 }
 
 // For Zeroormore node, where all children's matching tokens are linked together one after another.
