@@ -145,11 +145,6 @@ rule CastExpression : ONEOF(
   '(' + ReferenceType + ZEROORMORE(AdditionalBound) + ')' + UnaryExpressionNotPlusMinus,
   '(' + ReferenceType + ZEROORMORE(AdditionalBound) + ')' + LambdaExpression)
 
-rule CastExpression : ONEOF(
-  '(' + PrimitiveType + ')' + UnaryExpression,
-  '(' + ReferenceType + ZEROORMORE(AdditionalBound) + ')' + UnaryExpressionNotPlusMinus,
-  '(' + ReferenceType + ZEROORMORE(AdditionalBound) + ')' + LambdaExpression)
-
 rule MultiplicativeExpression : ONEOF(
   UnaryExpression,
   MultiplicativeExpression + '*' + UnaryExpression,
