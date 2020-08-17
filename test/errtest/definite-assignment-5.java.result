@@ -1,12 +1,4 @@
 Matched 35 tokens.
-Attached a tree node from Child
-Attached a tree node from Child
-Attached a tree node from Child
-Attached a tree node from Child
-Attached a tree node from Child
-Attached a tree node from Child
-Attached a tree node from Child
-Attached a tree node from Child
 == Sub Tree ==
 class  Point
   Fields: 
@@ -22,8 +14,6 @@ class  Point
   LocalInterfaces: 
 
 Matched 51 tokens.
-Attached a tree node from Child
-Attached a tree node from Child
 == Sub Tree ==
 class  PointList
   Fields: 

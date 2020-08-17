@@ -164,7 +164,6 @@ TreeNode* ASTTree::NewTreeNode(AppealNode *appeal_node, std::map<AppealNode*, Tr
   }
 
   if (child_trees.size() == 1) {
-    std::cout << "Attached a tree node from Child" << std::endl;
     map.insert(std::pair<AppealNode*, TreeNode*>(appeal_node, child_trees[0]));
     sub_tree = child_trees[0];
     if (sub_tree)

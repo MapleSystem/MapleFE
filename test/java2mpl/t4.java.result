@@ -1,15 +1,8 @@
 Matched 7 tokens.
-Attached a tree node from Child
-Attached a tree node from Child
-Attached a tree node from Child
-Attached a tree node from Child
-Attached a tree node from Child
-Attached a tree node from Child
 == Sub Tree ==
 a,b,c
 Matched 13 tokens.
 Convert unary --> binary
-Attached a tree node from Child
 == Sub Tree ==
 Assign
   c

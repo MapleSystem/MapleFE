@@ -1,15 +1,8 @@
 Matched 7 tokens.
-Attached a tree node from Child
-Attached a tree node from Child
-Attached a tree node from Child
-Attached a tree node from Child
-Attached a tree node from Child
-Attached a tree node from Child
 == Sub Tree ==
 a,b,c
 Matched 13 tokens.
 Convert unary --> binary
-Attached a tree node from Child
 == Sub Tree ==
 Assign
   a
@@ -20,7 +13,6 @@ Assign
 
 Matched 19 tokens.
 Convert unary --> binary
-Attached a tree node from Child
 == Sub Tree ==
 Assign
   a
@@ -30,7 +22,6 @@ Assign
 
 
 Matched 25 tokens.
-Attached a tree node from Child
 == Sub Tree ==
 Assign
   a
@@ -40,7 +31,6 @@ Assign
 
 
 Matched 31 tokens.
-Attached a tree node from Child
 == Sub Tree ==
 Assign
   a
@@ -50,7 +40,6 @@ Assign
 
 
 Matched 37 tokens.
-Attached a tree node from Child
 == Sub Tree ==
 Assign
   a
@@ -60,7 +49,6 @@ Assign
 
 
 Matched 43 tokens.
-Attached a tree node from Child
 == Sub Tree ==
 Assign
   a
@@ -70,7 +58,6 @@ Assign
 
 
 Matched 49 tokens.
-Attached a tree node from Child
 == Sub Tree ==
 Assign
   a
@@ -80,7 +67,6 @@ Assign
 
 
 Matched 55 tokens.
-Attached a tree node from Child
 == Sub Tree ==
 Assign
   a
@@ -90,7 +76,6 @@ Assign
 
 
 Matched 61 tokens.
-Attached a tree node from Child
 == Sub Tree ==
 Assign
   a

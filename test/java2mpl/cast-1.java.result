@@ -1,7 +1,4 @@
 Matched 9 tokens.
-Attached a tree node from Child
-Attached a tree node from Child
-Attached a tree node from Child
 == Sub Tree ==
 class  Point
   Fields: 
@@ -15,16 +12,9 @@ class  Point
   LocalInterfaces: 
 
 Matched 20 tokens.
-Attached a tree node from Child
-Attached a tree node from Child
 == Sub Tree ==
 
 Matched 46 tokens.
-Attached a tree node from Child
-Attached a tree node from Child
-Attached a tree node from Child
-Attached a tree node from Child
-Attached a tree node from Child
 == Sub Tree ==
 class  ColoredPoint
   Fields: 
@@ -43,7 +33,6 @@ class  ColoredPoint
   LocalInterfaces: 
 
 Matched 53 tokens.
-Attached a tree node from Child
 == Sub Tree ==
 class  EndPoint
   Fields: 
@@ -57,23 +46,6 @@ class  EndPoint
   LocalInterfaces: 
 
 Matched 125 tokens.
-Attached a tree node from Child
-Attached a tree node from Child
-Attached a tree node from Child
-Attached a tree node from Child
-Attached a tree node from Child
-Attached a tree node from Child
-Attached a tree node from Child
-Attached a tree node from Child
-Attached a tree node from Child
-Attached a tree node from Child
-Attached a tree node from Child
-Attached a tree node from Child
-Attached a tree node from Child
-Attached a tree node from Child
-Attached a tree node from Child
-Attached a tree node from Child
-Attached a tree node from Child
 == Sub Tree ==
 class  Test
   Fields: 
