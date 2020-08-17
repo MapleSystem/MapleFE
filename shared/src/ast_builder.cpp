@@ -92,6 +92,10 @@ static void add_attribute_to_kernel(TreeNode *tree, AttrNode *attr) {
       inode->AddAttr(aid);
     }
     return;
+  } else if (tree->IsClass()) {
+    ClassNode *klass = (ClassNode*)tree;
+    klass->AddAttr(aid);
+    return;
   } else if (tree->IsFunction()) {
     FunctionNode *func = (FunctionNode*)tree;
     func->AddAttr(aid);
@@ -107,7 +111,7 @@ static void add_attribute_to_kernel(TreeNode *tree, AttrNode *attr) {
       return;
     }
   }
-  MERROR("Unsupported tree, wanting to add attribute.");
+  MASSERT(0 && "Unsupported tree, wanting to add attribute.");
 }
 
 static void add_attribute_to(TreeNode *tree_node, TreeNode *attr) {

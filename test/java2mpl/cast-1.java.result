@@ -1,0 +1,148 @@
+Matched 9 tokens.
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+== Sub Tree ==
+class  Point
+  Fields: 
+    x    y
+  Instance Initializer: 
+
+  Constructors: 
+
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+Matched 20 tokens.
+Attached a tree node from Child
+Attached a tree node from Child
+== Sub Tree ==
+
+Matched 46 tokens.
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+== Sub Tree ==
+class  ColoredPoint
+  Fields: 
+    color
+  Instance Initializer: 
+
+  Constructors: 
+
+  Methods: 
+    func  setColor()  throws: 
+      Assign
+        color
+        color
+
+  LocalClasses: 
+  LocalInterfaces: 
+
+Matched 53 tokens.
+Attached a tree node from Child
+== Sub Tree ==
+class  EndPoint
+  Fields: 
+
+  Instance Initializer: 
+
+  Constructors: 
+
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+Matched 125 tokens.
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+Attached a tree node from Child
+== Sub Tree ==
+class  Test
+  Fields: 
+
+  Instance Initializer: 
+
+  Constructors: 
+
+  Methods: 
+    func  main()  throws: 
+      p=new Point
+  LocalClasses: 
+  LocalInterfaces: 
+
+============= Module ===========
+== Sub Tree ==
+class  Point
+  Fields: 
+    x    y
+  Instance Initializer: 
+
+  Constructors: 
+
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+
+== Sub Tree ==
+class  ColoredPoint
+  Fields: 
+    color
+  Instance Initializer: 
+
+  Constructors: 
+
+  Methods: 
+    func  setColor()  throws: 
+      Assign
+        color
+        color
+
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+class  EndPoint
+  Fields: 
+
+  Instance Initializer: 
+
+  Constructors: 
+
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+class  Test
+  Fields: 
+
+  Instance Initializer: 
+
+  Constructors: 
+
+  Methods: 
+    func  main()  throws: 
+      p=new Point
+  LocalClasses: 
+  LocalInterfaces: 
+

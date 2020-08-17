@@ -694,7 +694,7 @@ public:
 
   void AddSuperClass(ClassNode *n)         {mSuperClasses.PushBack(n);}
   void AddSuperInterface(InterfaceNode *n) {mSuperInterfaces.PushBack(n);}
-  void AddAttribute(AttrId a) {mAttributes.PushBack(a);}
+  void AddAttr(AttrId a) {mAttributes.PushBack(a);}
   void AddBody(BlockNode *b) {mBody = b;}
 
   unsigned GetFieldsNum()      {return mFields.GetNum();}
