@@ -12,6 +12,9 @@
 //FIT FOR A PARTICULAR PURPOSE.
 //See the Mulan PSL v2 for more details.
 //
+
+// This cases is taken from JLS 8.0 spec.
+
 class Point { int x, y; }
 interface Colorable { void setColor(int color); }
 class ColoredPoint extends Point implements Colorable {

@@ -86,6 +86,12 @@ _____________________
   *) rule Statement
   *) rule Identifier
   *) rule Literal
+    *) IntergerLiteral
+    *) FPLiteral
+    *) BooleanLiteral
+    *) CharLiteral
+    *) StringLiteral
+    *) NullLiteral
   *) STRUCT Separator
   *) STRUCT Operator
   *) STRUCT Keyword

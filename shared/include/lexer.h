@@ -125,9 +125,17 @@ public:
   Token* FindKeywordToken(char *key);
   Token* FindCommentToken();
 
-  // Traverse the rule table
-  bool mCheckSeparator; // When we start walk a rule table to find a token,
-                        // do we need check if the following data is a separator?
+  // When we start walk a rule table to find a token, do we need check if
+  // the following data is a separator?
+  bool mCheckSeparator;
+
+  // Need take care of token during traversing a rule table?
+  bool mMatchToken;
+
+  // When lexing a literal, it's easier if we know the type of literal before
+  // we do ProcessLiteral()
+  LitId mLastLiteralId;
+
   // It returns true : if RuleTable is met
   //           false : if failed
   // The found token's string is saved at mText, length at mLen. The string is already
@@ -140,6 +148,7 @@ public:
   OprId       TraverseOprTable();        // Walk the operator table
   const char* TraverseKeywordTable();    //
   const char* TraverseIdentifierTable(); //
+  bool        MatchToken(Token*);
 };
 
 // This is language specific function. Please implement this in LANG/src,

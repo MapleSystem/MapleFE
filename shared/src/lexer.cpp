@@ -73,6 +73,8 @@ Lexer::Lexer()
     _linenum(0) {
       seencomments.clear();
       mCheckSeparator = true;
+      mMatchToken = false;
+      mLastLiteralId = LT_NullLiteral;
 }
 
 void Lexer::PrepareForFile(const std::string filename) {
@@ -242,6 +244,10 @@ const char* Lexer::GetIdentifier() {
 LitData Lexer::GetLiteral() {
   mCheckSeparator = false;
 
+  // The literal could be complicated and includes some tokens inside the rule, so
+  // we are gonna take care of it.
+  mMatchToken = true;
+
   unsigned old_pos = GetCuridx();
 
   LitData ld;
@@ -253,12 +259,13 @@ LitData Lexer::GetLiteral() {
     std::string s(GetLine() + old_pos, len);
     const char *addr = mStringPool.FindString(s);
     // We just support integer token right now. Value is put in LitData.mData.mStr
-    ld = ProcessLiteral(LT_IntegerLiteral, addr);
+    ld = ProcessLiteral(mLastLiteralId, addr);
   } else {
     SetCuridx(old_pos);
   }
 
   mCheckSeparator = true;
+  mMatchToken = false;
 
   return ld;
 }
@@ -364,14 +371,15 @@ bool Lexer::TraverseTableData(TableData *data) {
   // This is the case in parsing a DT_String. However, we have many rules handling DT_Char
   // and they don't expect the following to be a separator. For example, the DecimalNumeral rule
   // specifies its content char by char, so in this case we don't check if the next is a separator.
-  case DT_Char:
+  case DT_Char: {
     if(*(line + curidx) == data->mData.mChar) {
       curidx += 1;
       found = true;
     }
     break;
+  }
 
-  case DT_String:
+  case DT_String: {
     if( !strncmp(line + curidx, data->mData.mString, strlen(data->mData.mString))) {
       // Need to make sure the following text is a separator
       curidx += strlen(data->mData.mString);
@@ -391,17 +399,17 @@ bool Lexer::TraverseTableData(TableData *data) {
       curidx = old_pos;
 
     break;
+  }
 
-  // Only separator, operator, keywords are planted as DT_Token. During Lexing, these 3 types
-  // are processed through traversing the 3 arrays: SeparatorTable, OperatorTable, KeywordTable.
-  // So this case won't be hit during Lex. We just ignore it.
-  //
-  // However, it does hit this case during matching. We will handle this case in matching process.
-  case DT_Token:
+  // An example of this case is a rule of Decimal FP literal, like 12.5f.
+  // rule DecFPLiteral contains '.' which is a token.
+  case DT_Token: {
+    if (mMatchToken) {
+      Token *token = data->mData.mToken;
+      found = MatchToken(token);
+    }
     break;
-
-  case DT_Type:
-    break;
+  }
 
   case DT_Subtable: {
     RuleTable *t = data->mData.mEntry;
@@ -413,8 +421,43 @@ bool Lexer::TraverseTableData(TableData *data) {
     break;
   }
 
+  case DT_Type:
   case DT_Null:
   default:
+    break;
+  }
+
+  return found;
+}
+
+// 1. Returns true if match succ, or false.
+// 2. move curidx if succ.
+bool Lexer::MatchToken(Token *token) {
+  unsigned old_idx = curidx;
+  bool found = false;
+
+  switch (token->mTkType) {
+  case TT_SP: {
+    // Pick the longest matching separator.
+    SeparatorToken *sep_token = (SeparatorToken*)token;
+    unsigned longest = 0;
+    for (unsigned i = 0; i < SEP_NA; i++) {
+      SepTableEntry e = SepTable[i];
+      if ((e.mId == sep_token->mSepId) &&
+          !strncmp(line + curidx, e.mText, strlen(e.mText))) {
+        found = true;
+        unsigned len = strlen(e.mText);
+        longest = len > longest ? len : longest;
+      }
+    }
+
+    if (found)
+      curidx += longest;
+    break;
+  }
+
+  default:
+    MASSERT(0 && "NIY: Not support token type in Lexer");
     break;
   }
 
@@ -575,8 +618,25 @@ bool Lexer::Traverse(const RuleTable *rule_table) {
       bool temp_found = TraverseTableData(data);
       if (temp_found) {
         found = true;
-        if (curidx > new_pos)
+        if (curidx > new_pos) {
           new_pos = curidx;
+          // Need set the literal type in order to make it easier
+          // to ProcessLiteral().
+          if (data->mType == DT_Subtable && rule_table == &TblLiteral) {
+            if (data->mData.mEntry == &TblIntegerLiteral)
+              mLastLiteralId = LT_IntegerLiteral;
+            else if (data->mData.mEntry == &TblFPLiteral)
+              mLastLiteralId = LT_FPLiteral;
+            else if (data->mData.mEntry == &TblBooleanLiteral)
+              mLastLiteralId = LT_BooleanLiteral;
+            else if (data->mData.mEntry == &TblCharacterLiteral)
+              mLastLiteralId = LT_CharacterLiteral;
+            else if (data->mData.mEntry == &TblStringLiteral)
+              mLastLiteralId = LT_StringLiteral;
+            else if (data->mData.mEntry == &TblNullLiteral)
+              mLastLiteralId = LT_NullLiteral;
+          }
+        }
         // Need restore curidx for the next try.
         curidx = old_pos;
       }
