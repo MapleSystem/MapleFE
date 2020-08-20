@@ -22,8 +22,8 @@ class Test {
     // narrowing conversion (5.1.3):
     int i = (int)12.5f;
     // String conversion (5.4) of i's int value:
-    // System.out.println("(int)12.5f==" + i);
-    System.out.println("int" + i);
+     System.out.println("(int)12.5f==" + i);
+    //System.out.println("int" + i);
     // Assignment conversion (5.2) of i's value to type
     // float. This is a widening conversion (5.1.2):
     float f = i;

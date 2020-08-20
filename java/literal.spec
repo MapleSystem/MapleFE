@@ -123,9 +123,10 @@ rule CharacterLiteral : ''' + CHAR + '''
 ##                           String                                    ##
 #########################################################################
 
-### TODO: so far support simple character
-
-rule StringLiteral : '"' + ZEROORMORE(CHAR) + '"'
+# It takes efforts to make a complete set of string characters.
+# It also requires to implement the EXCLUDE operation.
+# Here and right now I only support ASCII character
+rule StringLiteral : '"' + ZEROORMORE(ASCII) + '"'
 
 #########################################################################
 ##                           Null                                      ##

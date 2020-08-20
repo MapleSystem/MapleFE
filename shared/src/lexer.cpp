@@ -437,6 +437,25 @@ bool Lexer::MatchToken(Token *token) {
   bool found = false;
 
   switch (token->mTkType) {
+  case TT_OP: {
+    // Pick the longest matching operator.
+    OperatorToken *opr_token = (OperatorToken*)token;
+    unsigned longest = 0;
+    for (unsigned i = 0; i < OPR_NA; i++) {
+      OprTableEntry e = OprTable[i];
+      if ((e.mId == opr_token->mOprId) &&
+          !strncmp(line + curidx, e.mText, strlen(e.mText))) {
+        found = true;
+        unsigned len = strlen(e.mText);
+        longest = len > longest ? len : longest;
+      }
+    }
+
+    if (found)
+      curidx += longest;
+    break;
+  }
+
   case TT_SP: {
     // Pick the longest matching separator.
     SeparatorToken *sep_token = (SeparatorToken*)token;
