@@ -411,7 +411,13 @@ void LiteralNode::Dump(unsigned indent) {
     DUMP0(mData.mData.mInt);
     break;
   case LT_FPLiteral:
-    DUMP0(mData.mData.mFloat);
+    if (mData.mIsDouble)
+      DUMP0(mData.mData.mDouble);
+    else
+      DUMP0(mData.mData.mFloat);
+    break;
+  case LT_StringLiteral:
+    DUMP0(mData.mData.mStr);
     break;
   case LT_BooleanLiteral:
     DUMP0(mData.mData.mBool);

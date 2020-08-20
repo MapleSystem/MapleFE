@@ -121,18 +121,23 @@ public:
 //                       LiteralToken                                 //
 ////////////////////////////////////////////////////////////////////////
 
+// One of the concern here is we are using c++ type to store java
+// data which could mess the precision. Need look into it in the future.
+
 struct LitData {
   LitId mType;
+  bool  mIsDouble;   // Since LitId just has FPLiteral, it doesn't differentiate
+                     // float and double. So we make the difference here.
   union {
-    int   mInt;
-    float mFloat;
+    int    mInt;
+    float  mFloat;
     double mDouble;
-    bool  mBool;
-    char  mChar;
-    char *mStr;   // the string is allocated through lexer's mStringPool
+    bool   mBool;
+    char   mChar;
+    char  *mStr;     // the string is allocated through lexer's mStringPool
   } mData;
 
-  LitData() {}
+  LitData() {mIsDouble = false;}
   LitData(LitId t) : mType(t) {}
 };
 

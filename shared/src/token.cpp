@@ -68,13 +68,19 @@ void LiteralToken::Dump() {
     DUMP1("Integer Literal Token:", mData.mData.mInt);
     break;
   case LT_FPLiteral:
-    DUMP1("Floating Literal Token:", mData.mData.mFloat);
+    if (mData.mIsDouble)
+      DUMP1("Double Literal Token:", mData.mData.mDouble);
+    else
+      DUMP1("Floating Literal Token:", mData.mData.mFloat);
     break;
   case LT_BooleanLiteral:
     DUMP1("Boolean Literal Token:", mData.mData.mBool);
     break;
   case LT_CharacterLiteral:
     DUMP1("Character Literal Token:", mData.mData.mChar);
+    break;
+  case LT_StringLiteral:
+    DUMP1("String Literal Token:", mData.mData.mStr);
     break;
   case LT_NullLiteral:
     DUMP0("Null Literal Token:");
