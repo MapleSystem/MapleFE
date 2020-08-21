@@ -524,6 +524,24 @@ public:
   void Dump(unsigned);
 };
 
+// This is the node for a call site.
+// The argument could be any expression even including another callsite.
+class CallNode : public TreeNode {
+private:
+  TreeNode   *mMethod;
+  SmallVector<TreeNode *> mArgs;
+public:
+  CallNode() {}
+  ~CallNode(){}
+
+  TreeNode* GetMethod() {return mMethod;}
+  void SetMethod(TreeNode *t) {mMethod = t;}
+
+  void AddArg(TreeNode *t) {mArgs.PushBack(t);}
+  unsigned GetArgsNum() {return mArgs.GetNum();}
+  TreeNode* GetArg(unsigned index) {return mArgs.ValueAtIndex(index);}
+};
+
 //////////////////////////////////////////////////////////////////////////
 //                         Block Nodes
 // A block is common in all languages, and it serves different function in
