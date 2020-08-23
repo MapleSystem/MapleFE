@@ -45,6 +45,10 @@ ACTION(BuildConstructor)
 ACTION(AddFunctionBody)
 ACTION(AddFunctionBodyTo)
 
+// For callsite
+ACTION(BuildCall)
+ACTION(AddArguments)
+
 // For class/inheritance
 ACTION(BuildClass)
 ACTION(AddSuperClass)

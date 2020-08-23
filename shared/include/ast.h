@@ -525,14 +525,19 @@ public:
 };
 
 // This is the node for a call site.
-// The argument could be any expression even including another callsite.
+// 1. The method could be class method, a global method, or ...
+// 2. The argument could be any expression even including another callsite.
+// So I'm using TreeNode for all of them.
 class CallNode : public TreeNode {
 private:
   TreeNode   *mMethod;
   SmallVector<TreeNode *> mArgs;
+  const char *mName;
 public:
   CallNode() {}
   ~CallNode(){}
+
+  void Init();
 
   TreeNode* GetMethod() {return mMethod;}
   void SetMethod(TreeNode *t) {mMethod = t;}
@@ -540,6 +545,9 @@ public:
   void AddArg(TreeNode *t) {mArgs.PushBack(t);}
   unsigned GetArgsNum() {return mArgs.GetNum();}
   TreeNode* GetArg(unsigned index) {return mArgs.ValueAtIndex(index);}
+
+  void Release() {mArgs.Release();}
+  void Dump(unsigned);
 };
 
 //////////////////////////////////////////////////////////////////////////

@@ -1044,12 +1044,7 @@ TreeNode* ASTBuilder::AddDims() {
 //                    New & Delete operation related
 ////////////////////////////////////////////////////////////////////////////////
 
-// This is a help function which adds parameters to a function. It can be
-// a function declaration statement or a call site. The difference is function
-// declaration needs a list of decls as formal parameters, while call site
-// needs a list of identifiers. Since we are using TreeNode*, it can be used
-// for both scenarios.
-
+// This is a help function which adds parameters to a function decl.
 // It's the caller's duty to assure 'func' and 'params' are non null.
 void ASTBuilder::AddParams(TreeNode *func, TreeNode *params) {
   if (params->IsIdentifier()) {
@@ -1124,6 +1119,72 @@ TreeNode* ASTBuilder::BuildNewOperation() {
 }
 
 TreeNode* ASTBuilder::BuildDeleteOperation() {
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//                    CallSite related
+////////////////////////////////////////////////////////////////////////////////
+
+// This takes just one argument which is the function name.
+TreeNode* ASTBuilder::BuildCall() {
+  if (mTrace)
+    std::cout << "In BuildCall" << std::endl;
+
+  Param p_method = mParams[0];
+  if (!p_method.mIsTreeNode)
+    MERROR("The function name is not a treenode in BuildFunction()");
+  TreeNode *method = p_method.mData.mTreeNode;
+
+  CallNode *call = (CallNode*)mTreePool->NewTreeNode(sizeof(CallNode));
+  new (call) CallNode();
+  call->SetMethod(method);
+  call->Init();
+
+  mLastTreeNode = call;
+  return mLastTreeNode;
+}
+
+// The argument could be any kind of expression, like arithmetic expression,
+// identifier, call, or any valid expression.
+//
+// This AddArguments can be used for CallNode, NewNode, etc.
+// Right now I just support CallNode. NewNode will be moved from AddParams()
+// to here.
+
+TreeNode* ASTBuilder::AddArguments() {
+  if (mTrace)
+    std::cout << "In AddArguments" << std::endl;
+
+  Param p_params = mParams[0];
+  TreeNode *params = NULL;
+  if (!p_params.mIsEmpty) {
+    if (!p_params.mIsTreeNode)
+      MERROR("The parameters is not a treenode in AddArguments()");
+    params = p_params.mData.mTreeNode;
+  }
+
+  if (!params)
+    return mLastTreeNode;
+
+  CallNode *call = (CallNode*)mLastTreeNode;
+
+  if (params->IsVarList()) {
+    VarListNode *vl = (VarListNode*)params;
+    for (unsigned i = 0; i < vl->GetNum(); i++) {
+      IdentifierNode *inode = vl->VarAtIndex(i);
+      call->AddArg(inode);
+    }
+  } else if (params->IsPass()) {
+    PassNode *pass = (PassNode*)params;
+    for (unsigned i = 0; i < pass->GetChildrenNum(); i++) {
+      TreeNode *child = pass->GetChild(i);
+      call->AddArg(child);
+    }
+  } else {
+    call->AddArg(params);
+  }
+
+  return mLastTreeNode;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

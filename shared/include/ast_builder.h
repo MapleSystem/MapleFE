@@ -96,6 +96,10 @@ public:
   TreeNode* AddAttribute();
   TreeNode* AddAttributeTo();
 
+  // Callsite
+  TreeNode* AddArguments();
+  TreeNode* BuildCall();
+
   // Function related
   void AddParams(TreeNode *func, TreeNode *params);
   TreeNode* AddParams();

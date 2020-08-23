@@ -321,6 +321,32 @@ void NewNode::Dump(unsigned indent) {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
+//                          CallNode
+//////////////////////////////////////////////////////////////////////////////////////
+
+void CallNode::Init() {
+  // Init the mName;
+  if (mMethod->IsIdentifier()) {
+    mName = mMethod->GetName();
+  } else {
+    MASSERT(0 && "Unsupported method type in CallNode");
+  }
+}
+
+void CallNode::Dump(unsigned indent) {
+  DumpIndentation(indent);
+  DUMP0_NORETURN(mName);
+  DUMP0_NORETURN("(");
+  for (unsigned i = 0; i < GetArgsNum(); i++) {
+    TreeNode *arg = GetArg(i);
+    DUMP0_NORETURN(arg->GetName());
+    if (i < GetArgsNum() - 1)
+      DUMP0_NORETURN(",");
+  }
+  DUMP0_NORETURN(")");
+}
+
+//////////////////////////////////////////////////////////////////////////////////////
 //                          DimensionNode
 //////////////////////////////////////////////////////////////////////////////////////
 
