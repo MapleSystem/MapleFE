@@ -25,6 +25,10 @@
 #include "stringmap.h"
 #include "massert.h"
 
+// The global string pool for lexing, parsing, ast building and ir building
+// for the symbols, etc.
+StringPool gStringPool;
+
 StringPool::StringPool() {
   mMap = new StringMap();
   mMap->SetPool(this);

@@ -2224,7 +2224,7 @@ void Parser::InitPredefinedTokens() {
   // 3. create keyword Tokens.
   for (unsigned i = 0; i < KeywordTableSize; i++) {
     Token *t = (Token*)mLexer->mTokenPool.NewToken(sizeof(KeywordToken));
-    char *s = mLexer->mStringPool.FindString(KeywordTable[i].mText);
+    char *s = gStringPool.FindString(KeywordTable[i].mText);
     new (t) KeywordToken(s);
     //std::cout << "init a pre token " << t << std::endl;
     //t->Dump();

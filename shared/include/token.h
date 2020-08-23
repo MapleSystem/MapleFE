@@ -77,7 +77,7 @@ public:
 ////////////////////////////////////////////////////////////////////////
 class IdentifierToken : public Token {
 public:
-  const char *mName;       // It's put into the Lexer's StringPool
+  const char *mName;       // It's put into the gStringPool
 public:
   IdentifierToken(const char *s) : mName(s) {mTkType = TT_ID;}
   IdentifierToken() : mName(NULL) {mTkType = TT_ID;}
@@ -134,7 +134,7 @@ struct LitData {
     double mDouble;
     bool   mBool;
     char   mChar;
-    char  *mStr;     // the string is allocated through lexer's mStringPool
+    char  *mStr;     // the string is allocated in gStringPool
   } mData;
 
   LitData() {mIsDouble = false;}

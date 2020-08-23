@@ -213,13 +213,13 @@ OprId Lexer::GetOperator() {
   return TraverseOprTable();
 }
 
-// keyword string was put into StringPool by walker.TraverseKeywordTable().
+// keyword string was put into gStringPool by walker.TraverseKeywordTable().
 const char* Lexer::GetKeyword() {
   const char *addr = TraverseKeywordTable();
   return addr;
 }
 
-// identifier string was put into StringPool.
+// identifier string was put into gStringPool.
 // NOTE: Identifier table is always Hard Coded as TblIdentifier.
 const char* Lexer::GetIdentifier() {
   unsigned old_pos = GetCuridx();
@@ -228,7 +228,7 @@ const char* Lexer::GetIdentifier() {
     unsigned len = GetCuridx() - old_pos;
     MASSERT(len > 0 && "found token has 0 data?");
     std::string s(GetLine() + old_pos, len);
-    const char *addr = mStringPool.FindString(s);
+    const char *addr = gStringPool.FindString(s);
     return addr;
   } else {
     SetCuridx(old_pos);
@@ -257,7 +257,7 @@ LitData Lexer::GetLiteral() {
     unsigned len = GetCuridx() - old_pos;
     MASSERT(len > 0 && "found token has 0 data?");
     std::string s(GetLine() + old_pos, len);
-    const char *addr = mStringPool.FindString(s);
+    const char *addr = gStringPool.FindString(s);
     // We just support integer token right now. Value is put in LitData.mData.mStr
     ld = ProcessLiteral(mLastLiteralId, addr);
   } else {
@@ -386,8 +386,8 @@ bool Lexer::TraverseTableData(TableData *data) {
       if (mCheckSeparator && (TraverseSepTable() != SEP_NA) && (TraverseOprTable() != OPR_NA)) {
         // TraverseSepTable() moves 'curidx', need restore it
         curidx = old_pos + strlen(data->mData.mString);
-        // Put into StringPool
-        mStringPool.FindString(data->mData.mString);
+        // Put into gStringPool
+        gStringPool.FindString(data->mData.mString);
         found = true;
       } else {
         found = true;
@@ -775,7 +775,7 @@ const char* Lexer::TraverseKeywordTable() {
     if (TraverseSepTable() != SEP_NA) {
       // TraverseSepTable() moves 'curidx', need move it back to after keyword
       curidx = saved_curidx + len;
-      addr = mStringPool.FindString(addr);
+      addr = gStringPool.FindString(addr);
       return addr;
     } else {
       // failed, restore curidx
@@ -862,11 +862,11 @@ void Lexer::PlantTraverseTableData(TableData *data) {
       return;
     }
     // 3. Try keyword.
-    //    Need to make sure string is put in Lexer::StringPool, a request of
+    //    Need to make sure string is put in gStringPool, a request of
     //    FindKeywordToken(key);
     char *key = FindKeyword(data->mData.mString, 0, len);
     if (key) {
-      key = mStringPool.FindString(key);
+      key = gStringPool.FindString(key);
       Token *token = FindKeywordToken(key);
       data->mType = DT_Token;
       data->mData.mToken = token;
