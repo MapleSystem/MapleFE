@@ -158,6 +158,10 @@ void Verifier::VerifyVarList(VarListNode *vlnode){
   mTempParent = old_temp_parent;
 }
 
+void Verifier::VerifyExprList(ExprListNode *expr_list){
+  return;
+}
+
 // Nothing needed for Literal
 void Verifier::VerifyLiteral(LiteralNode *tree){
   return;

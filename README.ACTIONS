@@ -118,7 +118,7 @@ all modules are as below.
 * BuildVarList
   Format: BuildVarlList(Variable_A, Variable_B)
 
-  [NOTE] THIS MUST BE CALLED WHEN BUILDING A LIST OF PARAMETERS, ARGUMENTS, ...
+  [NOTE] THIS MUST BE CALLED WHEN BUILDING A LIST OF PARAMETERS, ...
          Please see examples in java/stmt.spec or java/stmt.block.spec
 
   1) This is the build a list of variables. This could be used in multiple place, as long as

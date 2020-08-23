@@ -316,6 +316,27 @@ public:
 };
 
 //////////////////////////////////////////////////////////////////////////
+//                           ExprList Node
+// It's for list of expressions. This covers more than VarList.
+//////////////////////////////////////////////////////////////////////////
+
+class ExprListNode : public TreeNode {
+private:
+  SmallVector<TreeNode*> mExprs;
+public:
+  ExprListNode() {mKind = NK_ExprList;}
+  ~ExprListNode() {}
+
+  unsigned GetNum() {return mExprs.GetNum();}
+  TreeNode* ExprAtIndex(unsigned i) {return mExprs.ValueAtIndex(i);}
+
+  void AddExpr(TreeNode *n) {mExprs.PushBack(n);}
+  void Merge(TreeNode*);
+  void Release() {mExprs.Release();}
+  void Dump(unsigned);
+};
+
+//////////////////////////////////////////////////////////////////////////
 //                         Literal Nodes
 //////////////////////////////////////////////////////////////////////////
 

@@ -427,6 +427,37 @@ void VarListNode::Dump(unsigned indent) {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
+//                          ExprListNode
+//////////////////////////////////////////////////////////////////////////////////////
+
+// Merge a node.
+// 'n' could be either TreeNode or another ExprListNode.
+void ExprListNode::Merge(TreeNode *n) {
+  if (n->IsExprList()) {
+    ExprListNode *expr_list = (ExprListNode*)n;
+    for (unsigned i = 0; i < expr_list->GetNum(); i++)
+      AddExpr(expr_list->ExprAtIndex(i));
+  } else if (n->IsPass()) {
+    PassNode *p = (PassNode*)n;
+    for (unsigned i = 0; i < p->GetChildrenNum(); i++) {
+      TreeNode *child = p->GetChild(i);
+      Merge(child);
+    }
+  } else {
+    AddExpr(n);
+  }
+}
+
+void ExprListNode::Dump(unsigned indent) {
+  DumpIndentation(indent);
+  for (unsigned i = 0; i < mExprs.GetNum(); i++) {
+    mExprs.ValueAtIndex(i)->Dump(0);
+    if (i != mExprs.GetNum()-1)
+      DUMP0_NORETURN(",");
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////
 //                          LiteralNode
 //////////////////////////////////////////////////////////////////////////////////////
 
