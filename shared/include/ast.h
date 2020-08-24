@@ -316,6 +316,27 @@ public:
 };
 
 //////////////////////////////////////////////////////////////////////////
+//                           ExprList Node
+// This is used mostly as arguments of call site.
+//////////////////////////////////////////////////////////////////////////
+
+class ExprListNode : public TreeNode {
+private:
+  SmallVector<TreeNode*> mExprs;
+public:
+  ExprListNode() {mKind = NK_ExprList;}
+  ~ExprListNode() {}
+
+  unsigned GetNum() {return mExprs.GetNum();}
+  TreeNode* ExprAtIndex(unsigned i) {return mExprs.ValueAtIndex(i);}
+
+  void AddExpr(TreeNode *n) {mExprs.PushBack(n);}
+  void Merge(TreeNode*);
+  void Release() {mExprs.Release();}
+  void Dump(unsigned);
+};
+
+//////////////////////////////////////////////////////////////////////////
 //                         Literal Nodes
 //////////////////////////////////////////////////////////////////////////
 
@@ -530,9 +551,9 @@ public:
 // So I'm using TreeNode for all of them.
 class CallNode : public TreeNode {
 private:
-  TreeNode   *mMethod;
-  SmallVector<TreeNode *> mArgs;
-  const char *mName;
+  TreeNode    *mMethod;
+  ExprListNode mArgs;
+  const char  *mName;
 public:
   CallNode() {}
   ~CallNode(){}
@@ -542,9 +563,9 @@ public:
   TreeNode* GetMethod() {return mMethod;}
   void SetMethod(TreeNode *t) {mMethod = t;}
 
-  void AddArg(TreeNode *t) {mArgs.PushBack(t);}
+  void AddArg(TreeNode *t);
   unsigned GetArgsNum() {return mArgs.GetNum();}
-  TreeNode* GetArg(unsigned index) {return mArgs.ValueAtIndex(index);}
+  TreeNode* GetArg(unsigned index) {return mArgs.ExprAtIndex(index);}
 
   void Release() {mArgs.Release();}
   void Dump(unsigned);

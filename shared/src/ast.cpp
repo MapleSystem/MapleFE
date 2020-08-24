@@ -333,16 +333,15 @@ void CallNode::Init() {
   }
 }
 
+void CallNode::AddArg(TreeNode *arg) {
+  mArgs.Merge(arg);
+}
+
 void CallNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   DUMP0_NORETURN(mName);
   DUMP0_NORETURN("(");
-  for (unsigned i = 0; i < GetArgsNum(); i++) {
-    TreeNode *arg = GetArg(i);
-    DUMP0_NORETURN(arg->GetName());
-    if (i < GetArgsNum() - 1)
-      DUMP0_NORETURN(",");
-  }
+  mArgs.Dump(0);
   DUMP0_NORETURN(")");
 }
 
@@ -422,6 +421,34 @@ void VarListNode::Dump(unsigned indent) {
     //DUMP0_NORETURN(mVars.ValueAtIndex(i)->GetName());
     mVars.ValueAtIndex(i)->Dump(0);
     if (i != mVars.GetNum()-1)
+      DUMP0_NORETURN(",");
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////
+//                          ExprListNode
+//////////////////////////////////////////////////////////////////////////////////////
+
+void ExprListNode::Merge(TreeNode *n) {
+  if (n->IsExprList()) {
+    ExprListNode *exprlist = (ExprListNode*)n;
+    for (unsigned i = 0; i < exprlist->mExprs.GetNum(); i++)
+      AddExpr(exprlist->mExprs.ValueAtIndex(i));
+  } else if (n->IsPass()) {
+    PassNode *p = (PassNode*)n;
+    for (unsigned i = 0; i < p->GetChildrenNum(); i++) {
+      TreeNode *child = p->GetChild(i);
+      Merge(child);
+    }
+  } else
+    AddExpr(n);
+}
+
+void ExprListNode::Dump(unsigned indent) {
+  DumpIndentation(indent);
+  for (unsigned i = 0; i < mExprs.GetNum(); i++) {
+    mExprs.ValueAtIndex(i)->Dump(0);
+    if (i != mExprs.GetNum()-1)
       DUMP0_NORETURN(",");
   }
 }

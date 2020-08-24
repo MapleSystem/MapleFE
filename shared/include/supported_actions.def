@@ -48,6 +48,7 @@ ACTION(AddFunctionBodyTo)
 // For callsite
 ACTION(BuildCall)
 ACTION(AddArguments)
+ACTION(BuildExprList)
 
 // For class/inheritance
 ACTION(BuildClass)

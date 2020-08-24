@@ -99,6 +99,7 @@ public:
   // Callsite
   TreeNode* AddArguments();
   TreeNode* BuildCall();
+  TreeNode* BuildExprList();
 
   // Function related
   void AddParams(TreeNode *func, TreeNode *params);

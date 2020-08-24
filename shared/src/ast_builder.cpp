@@ -1187,6 +1187,46 @@ TreeNode* ASTBuilder::AddArguments() {
   return mLastTreeNode;
 }
 
+// BuildVariableList takes two parameters, var 1 and var 2
+TreeNode* ASTBuilder::BuildExprList() {
+  if (mTrace)
+    std::cout << "In build Expr List" << std::endl;
+
+  MASSERT(mParams.size() == 2 && "BuildExprList has NO 2 params?");
+  Param p_var_a = mParams[0];
+  Param p_var_b = mParams[1];
+
+  // Both variable should have been created as tree node.
+  if (!p_var_a.mIsTreeNode || !p_var_b.mIsTreeNode) {
+    MERROR("The expr in BuildExprList is not a treenode");
+  }
+
+  TreeNode *node_a = p_var_a.mIsEmpty ? NULL : p_var_a.mData.mTreeNode;
+  TreeNode *node_b = p_var_b.mIsEmpty ? NULL : p_var_b.mData.mTreeNode;
+
+  ExprListNode *node_ret = NULL;
+  if (node_a && node_a->IsExprList()) {
+    node_ret = (ExprListNode*)node_a;
+    node_ret->Merge(node_b);
+  } else if (node_b && node_b->IsExprList()) {
+    node_ret = (ExprListNode*)node_b;
+    node_ret->Merge(node_a);
+  } else {
+    // both nodes are not ExprListNode
+    node_ret = (ExprListNode*)mTreePool->NewTreeNode(sizeof(ExprListNode));
+    new (node_ret) ExprListNode();
+    if (node_a)
+      node_ret->Merge(node_a);
+    if (node_b)
+      node_ret->Merge(node_b);
+  }
+
+  // Set last tree node
+  mLastTreeNode = node_ret;
+
+  return node_ret;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 //                    FunctionNode related
 ////////////////////////////////////////////////////////////////////////////////

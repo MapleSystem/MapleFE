@@ -403,3 +403,11 @@ void Verifier::VerifySwitch(SwitchNode *tree){
 
 void Verifier::VerifyPass(PassNode *tree){
 }
+
+void Verifier::VerifyExprList(ExprListNode *tree){
+  return;
+}
+
+void Verifier::VerifyCall(CallNode *tree){
+  return;
+}

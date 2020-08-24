@@ -101,7 +101,7 @@ rule MethodInvocation : ONEOF(
   attr.action.%1 : AddArguments(%3)
 
 rule ArgumentList : Expression + ZEROORMORE(',' + Expression)
-#  attr.action.%1: BuildVarList(%1, %2)
+  attr.action.%1: BuildExprList(%1, %2)
 
 rule MethodReference : ONEOF(
   ExpressionName + "::" + ZEROORONE(TypeArguments) + Identifier,
