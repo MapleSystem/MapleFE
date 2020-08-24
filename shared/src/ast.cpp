@@ -429,11 +429,13 @@ void VarListNode::Dump(unsigned indent) {
 //                          ExprListNode
 //////////////////////////////////////////////////////////////////////////////////////
 
+// Merge a node.
+// 'n' could be either TreeNode or another ExprListNode.
 void ExprListNode::Merge(TreeNode *n) {
   if (n->IsExprList()) {
-    ExprListNode *exprlist = (ExprListNode*)n;
-    for (unsigned i = 0; i < exprlist->mExprs.GetNum(); i++)
-      AddExpr(exprlist->mExprs.ValueAtIndex(i));
+    ExprListNode *expr_list = (ExprListNode*)n;
+    for (unsigned i = 0; i < expr_list->GetNum(); i++)
+      AddExpr(expr_list->ExprAtIndex(i));
   } else if (n->IsPass()) {
     PassNode *p = (PassNode*)n;
     for (unsigned i = 0; i < p->GetChildrenNum(); i++) {

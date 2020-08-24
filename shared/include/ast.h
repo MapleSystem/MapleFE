@@ -260,7 +260,7 @@ public:
 class IdentifierNode : public TreeNode {
 private:
   SmallVector<AttrId> mAttrs;
-  const char    *mName; // In the lexer's StringPool
+  const char    *mName; // In the gStringPool
   TreeNode      *mType; // PrimTypeNode, or IdentifierNode
   TreeNode      *mInit; // Init value
   DimensionNode *mDims;
@@ -317,6 +317,7 @@ public:
 
 //////////////////////////////////////////////////////////////////////////
 //                           ExprList Node
+// It's for list of expressions. This covers more than VarList.
 // This is used mostly as arguments of call site.
 //////////////////////////////////////////////////////////////////////////
 

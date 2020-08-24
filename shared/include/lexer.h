@@ -41,7 +41,6 @@ public:
   double thedoubleval;
   std::vector<std::string> seencomments;
   int verboseLevel;
-  StringPool mStringPool;
   TokenPool  mTokenPool;
   unsigned   mPredefinedTokenNum;   // number of predefined tokens.
   bool       mTrace;

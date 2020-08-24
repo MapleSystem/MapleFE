@@ -59,5 +59,8 @@ public:
   char* FindString(const char*, size_t);
 };
 
+// Lexing, Parsing, AST Building and IR Building all share one global
+// StringPool for their symbols or necessary strings.
+extern StringPool gStringPool;
 
 #endif  // __STRINGPOOL_H__

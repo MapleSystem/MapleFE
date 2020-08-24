@@ -21,8 +21,11 @@ NODEKIND(Dimension)
 NODEKIND(Attr)
 NODEKIND(PrimType)
 
+// VarList is for identifier list only.
+// ExprList is for all kinds of node.
 NODEKIND(VarList)
 NODEKIND(ExprList)
+
 NODEKIND(Literal)
 NODEKIND(UnaOperator)
 NODEKIND(BinOperator)
