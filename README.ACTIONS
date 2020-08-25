@@ -202,8 +202,11 @@ all modules are as below.
   Adds the parameters into the mLastTreeNode.
 
 * BuildCall
-  Format: BuildCall(function-Identifier)
-  To build a call site.
+  Format: BuildCall(function)
+  To build a call site. The method is 'function'.
+
+  Format: BuildCall()
+  To build a call site. The method is mLastTreeNode which was just created.
 
 * AddArguments
   Format: AddArguments(Arguments)

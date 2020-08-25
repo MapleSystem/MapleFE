@@ -25,6 +25,8 @@ rule PackageName : ONEOF(Identifier,
                          PackageName + '.' + Identifier)
 rule TypeName    : ONEOF(Identifier,
                          PackageOrTypeName + '.' + Identifier)
+  attr.action.%2 : BuildField(%1, %3)
+
 rule PackageOrTypeName : ONEOF(Identifier,
                                PackageOrTypeName + '.' + Identifier)
 rule ExpressionName : ONEOF(Identifier,
@@ -99,6 +101,9 @@ rule MethodInvocation : ONEOF(
   TypeName + '.' + "super" + '.' + ZEROORONE(TypeArguments) + Identifier + '(' + ZEROORONE(ArgumentList) + ')')
   attr.action.%1 : BuildCall(%1)
   attr.action.%1 : AddArguments(%3)
+  attr.action.%2 : BuildField(%1, %4)
+  attr.action.%2 : BuildCall()
+  attr.action.%2 : AddArguments(%6)
 
 rule ArgumentList : Expression + ZEROORMORE(',' + Expression)
   attr.action.%1: BuildExprList(%1, %2)

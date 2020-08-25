@@ -295,6 +295,17 @@ void UnaOperatorNode::Dump(unsigned indent) {
   }
 }
 
+//////////////////////////////////////////////////////////////////////////////////////
+//                           FieldNode
+//////////////////////////////////////////////////////////////////////////////////////
+
+// Right now it's major work is to init the name
+void FieldNode::Init() {
+  std::string name = mParent->GetName();
+  name += '.';
+  name += mField->GetName();
+  mName = gStringPool.FindString(name);
+}
 
 //////////////////////////////////////////////////////////////////////////////////////
 //                           NewNode
@@ -326,7 +337,7 @@ void NewNode::Dump(unsigned indent) {
 
 void CallNode::Init() {
   // Init the mName;
-  if (mMethod->IsIdentifier()) {
+  if (mMethod->IsIdentifier() || mMethod->IsField()) {
     mName = mMethod->GetName();
   } else {
     MASSERT(0 && "Unsupported method type in CallNode");

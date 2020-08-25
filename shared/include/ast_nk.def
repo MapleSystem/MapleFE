@@ -17,6 +17,7 @@
 // Each language can have its own unique set of noke kind list, and be included too.
 
 NODEKIND(Identifier)
+NODEKIND(Field)
 NODEKIND(Dimension)
 NODEKIND(Attr)
 NODEKIND(PrimType)

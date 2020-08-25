@@ -34,8 +34,9 @@ ACTION(BuildBinaryOperation)
 ACTION(BuildUnaryOperation)
 ACTION(BuildPostfixOperation)
 
-// For variable declaration
+// For variable declaration, expression
 ACTION(BuildDecl)
+ACTION(BuildField)
 ACTION(BuildVarList)
 
 // For function

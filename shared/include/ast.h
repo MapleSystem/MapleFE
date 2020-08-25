@@ -294,6 +294,32 @@ public:
 };
 
 //////////////////////////////////////////////////////////////////////////
+//                           FieldNode
+// This is used for field reference. It includes both member field and
+// member function.
+//////////////////////////////////////////////////////////////////////////
+
+class FieldNode : public TreeNode {
+private:
+  TreeNode *mParent;      // A parent could be another field.
+  IdentifierNode *mField;
+  const char     *mName;  // Name, initialized by Init().
+public:
+  FieldNode() : mParent(NULL), mField(NULL), mName(NULL) {mKind = NK_Field;}
+  ~FieldNode(){}
+
+  void Init();
+
+  TreeNode* GetParent() {return mParent;}
+  void SetParent(TreeNode *t) {mParent = t;}
+
+  IdentifierNode* GetField() {return mField;}
+  void SetField(IdentifierNode *f) {mField = f;}
+
+  const char* GetName() {return mName;}
+};
+
+//////////////////////////////////////////////////////////////////////////
 //                           VarList Node
 // Why do we need a VarListNode? Often in the program we have multiple
 // variables like parameters in function, or varable list in declaration.
@@ -556,7 +582,7 @@ private:
   ExprListNode mArgs;
   const char  *mName;
 public:
-  CallNode() {}
+  CallNode() : mMethod(NULL), mName(NULL) {mKind = NK_Call;}
   ~CallNode(){}
 
   void Init();

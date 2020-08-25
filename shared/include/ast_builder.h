@@ -76,6 +76,7 @@ public:
 
   void AddParam(Param p) {mParams.push_back(p);}
   void ClearParams() {mParams.clear();}
+  bool ParamsEmpty() {return mParams.empty();}
 
   // Create Functions for Token
   TreeNode* CreateTokenTreeNode(const Token*);
@@ -89,6 +90,7 @@ public:
   TreeNode* BuildBinaryOperation();
 
   TreeNode* BuildDecl();
+  TreeNode* BuildField();
   TreeNode* BuildVarList();
 
   TreeNode* AddInitTo();

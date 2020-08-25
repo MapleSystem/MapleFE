@@ -11,7 +11,7 @@ class  A
     func  foo()  throws: 
       k      cond-branch cond:
       true branch :
-      false branch :
+        System.out.println(k)      false branch :
 
   LocalClasses: 
   LocalInterfaces: 
@@ -29,7 +29,7 @@ class  A
     func  foo()  throws: 
       k      cond-branch cond:
       true branch :
-      false branch :
+        System.out.println(k)      false branch :
 
   LocalClasses: 
   LocalInterfaces: 

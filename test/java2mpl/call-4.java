@@ -12,4 +12,4 @@
 //FIT FOR A PARTICULAR PURPOSE.
 //See the Mulan PSL v1 for more details.
 //
-println(c);
+System.out.println(c, a);

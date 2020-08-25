@@ -665,6 +665,37 @@ TreeNode* ASTBuilder::BuildDecl() {
   return node;
 }
 
+// BuildField takes two parameters,
+// 1) parent node, could be another field.
+// 2) name of this field.
+TreeNode* ASTBuilder::BuildField() {
+  if (mTrace)
+    std::cout << "In BuildField" << std::endl;
+
+  MASSERT(mParams.size() == 2 && "BuildField has NO 2 params?");
+  Param p_var_a = mParams[0];
+  Param p_var_b = mParams[1];
+
+  // Both variable should have been created as tree node.
+  if (!p_var_a.mIsTreeNode || !p_var_b.mIsTreeNode) {
+    MERROR("The param in BuildField is not a treenode");
+  }
+
+  // The second param should be an IdentifierNode
+  TreeNode *node_a = p_var_a.mIsEmpty ? NULL : p_var_a.mData.mTreeNode;
+  TreeNode *node_b = p_var_b.mIsEmpty ? NULL : p_var_b.mData.mTreeNode;
+  MASSERT(node_b->IsIdentifier());
+
+  FieldNode *field = (FieldNode*)mTreePool->NewTreeNode(sizeof(FieldNode));
+  new (field) FieldNode();
+  field->SetParent(node_a);
+  field->SetField(node_b);
+  field->Init();
+
+  mLastTreeNode = field;
+  return mLastTreeNode;
+}
+
 // BuildVariableList takes two parameters, var 1 and var 2
 TreeNode* ASTBuilder::BuildVarList() {
   if (mTrace)
@@ -1125,18 +1156,24 @@ TreeNode* ASTBuilder::BuildDeleteOperation() {
 //                    CallSite related
 ////////////////////////////////////////////////////////////////////////////////
 
-// This takes just one argument which is the function name.
+// There are two formats of BuildCall, one with one param, the other no param.
 TreeNode* ASTBuilder::BuildCall() {
   if (mTrace)
     std::cout << "In BuildCall" << std::endl;
 
-  Param p_method = mParams[0];
-  if (!p_method.mIsTreeNode)
-    MERROR("The function name is not a treenode in BuildFunction()");
-  TreeNode *method = p_method.mData.mTreeNode;
-
   CallNode *call = (CallNode*)mTreePool->NewTreeNode(sizeof(CallNode));
   new (call) CallNode();
+
+  // The default is having no param.
+  TreeNode *method = mLastTreeNode;
+
+  if (!ParamsEmpty()) {
+    Param p_method = mParams[0];
+    if (!p_method.mIsTreeNode)
+      MERROR("The function name is not a treenode in BuildFunction()");
+    method = p_method.mData.mTreeNode;
+  }
+
   call->SetMethod(method);
   call->Init();
 

@@ -11,7 +11,9 @@ have our own frontend, which could be easier to handle new languages.
 1. Autogen is the key idea which automatically generates lexing/parsing data structures in .h/.cpp files which
    are further included in the language frontend. The language implementors write .spec files describing the
    language specifications under the language directory, such as java/.
-2. A finite state automata is the key idea of parsing the programming language.
+2. The parsing algorithm is named Wavefront. The rules are categorized into recursions, and recursions are
+   combined into group if they reach each other. The Wavefront parsing is working on the recursion group.
+   It works wave by wave until it reaches the fixed point.
 
 [Source code directory]
 
@@ -22,6 +24,7 @@ have our own frontend, which could be easier to handle new languages.
 2. Language specific parts are in their own directory, such as java/. It contains some special part of this
    language, the language .spec files, and gen_xxx.h/gen_xxx.cpp which are generted by autogen.
 3. The tool autogen is under autogen/
+4. The tool recdetect is under recdetec/. It's used to find the recursions and recursion groups.
 
 [How to build]
 

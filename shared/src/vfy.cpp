@@ -411,3 +411,7 @@ void Verifier::VerifyExprList(ExprListNode *tree){
 void Verifier::VerifyCall(CallNode *tree){
   return;
 }
+
+void Verifier::VerifyField(FieldNode *tree){
+  return;
+}
