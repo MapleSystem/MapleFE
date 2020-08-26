@@ -32,6 +32,10 @@ all modules are as below.
   Block is widely used in many scenarios, like function body, class body, or just a block.
   It only takes one parameter which is the root node of block tree.
 
+* BuildCast
+  Format: BuildCast(DestType, Expression)
+  Cast Expression to DestType. Returns mLastTreeNode.
+
 * BuildBinaryOperation
   Format: BuildBinaryOperation(Left operand, Operator, Right Operand)
 

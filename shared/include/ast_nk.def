@@ -22,6 +22,8 @@ NODEKIND(Dimension)
 NODEKIND(Attr)
 NODEKIND(PrimType)
 
+NODEKIND(Cast)
+
 // VarList is for identifier list only.
 // ExprList is for all kinds of node.
 NODEKIND(VarList)

@@ -415,3 +415,7 @@ void Verifier::VerifyCall(CallNode *tree){
 void Verifier::VerifyField(FieldNode *tree){
   return;
 }
+
+void Verifier::VerifyCast(CastNode *tree){
+  return;
+}

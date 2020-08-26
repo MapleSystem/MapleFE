@@ -152,6 +152,8 @@ rule CastExpression : ONEOF(
   '(' + PrimitiveType + ')' + UnaryExpression,
   '(' + ReferenceType + ZEROORMORE(AdditionalBound) + ')' + UnaryExpressionNotPlusMinus,
   '(' + ReferenceType + ZEROORMORE(AdditionalBound) + ')' + LambdaExpression)
+  attr.action.%1 : BuildCast(%2, %4)
+  attr.action.%2,%3 : BuildCast(%2, %5)
 
 rule MultiplicativeExpression : ONEOF(
   UnaryExpression,

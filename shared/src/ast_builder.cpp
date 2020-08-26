@@ -156,6 +156,31 @@ static void add_type_to(TreeNode *tree, TreeNode *type) {
 ////////////////////////////////////////////////////////////////////////////////////////
 
 // For first parameter has to be an operator.
+TreeNode* ASTBuilder::BuildCast() {
+  if (mTrace)
+    std::cout << "In BuildCast" << std::endl;
+
+  MASSERT(mParams.size() == 2 && "BuildCast has NO 2 params?");
+  Param p_a = mParams[0];
+  Param p_b = mParams[1];
+  MASSERT(!p_a.mIsEmpty && !p_a.mIsEmpty);
+  MASSERT(p_a.mIsTreeNode && p_a.mIsTreeNode);
+
+  TreeNode *desttype = p_a.mData.mTreeNode;
+  TreeNode *expr = p_b.mData.mTreeNode;
+
+  CastNode *n = (CastNode*)mTreePool->NewTreeNode(sizeof(CastNode));
+  new (n) CastNode();
+
+  n->SetDestType(desttype);
+  n->SetExpr(expr);
+
+  mLastTreeNode = n;
+  return n;
+}
+
+
+// For first parameter has to be an operator.
 TreeNode* ASTBuilder::BuildUnaryOperation() {
   if (mTrace)
     std::cout << "In build unary" << std::endl;

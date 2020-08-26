@@ -294,6 +294,28 @@ public:
 };
 
 //////////////////////////////////////////////////////////////////////////
+//                           CastNode
+// This node is for type casting node, implicit or explicit.
+//////////////////////////////////////////////////////////////////////////
+
+class CastNode : public TreeNode {
+private:
+  TreeNode *mDestType;
+  TreeNode *mExpr;
+public:
+  CastNode() : mDestType(NULL), mExpr(NULL) {mKind = NK_Cast;}
+  ~CastNode(){}
+
+  TreeNode* GetDestType() {return mDestType;}
+  void SetDestType(TreeNode *t) {mDestType = t;}
+
+  TreeNode* GetExpr() {return mExpr;}
+  void SetExpr(TreeNode *t) {mExpr = t;}
+
+  void Dump(unsigned);
+};
+
+//////////////////////////////////////////////////////////////////////////
 //                           FieldNode
 // This is used for field reference. It includes both member field and
 // member function.

@@ -30,6 +30,7 @@
 
 ACTION(BuildBlock)
 
+ACTION(BuildCast)
 ACTION(BuildBinaryOperation)
 ACTION(BuildUnaryOperation)
 ACTION(BuildPostfixOperation)
