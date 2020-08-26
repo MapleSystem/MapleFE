@@ -428,6 +428,7 @@ void VarListNode::Merge(TreeNode *n) {
 
 void VarListNode::Dump(unsigned indent) {
   DumpIndentation(indent);
+  DUMP0_NORETURN("var:");
   for (unsigned i = 0; i < mVars.GetNum(); i++) {
     //DUMP0_NORETURN(mVars.ValueAtIndex(i)->GetName());
     mVars.ValueAtIndex(i)->Dump(0);
@@ -651,6 +652,7 @@ void BlockNode::Dump(unsigned ind) {
   for (unsigned i = 0; i < GetChildrenNum(); i++) {
     TreeNode *child = GetChildAtIndex(i);
     child->Dump(ind);
+    DUMP_RETURN();
   }
 }
 
@@ -707,43 +709,48 @@ void ClassNode::Dump(unsigned indent) {
   DUMP1_NORETURN("class ", mName);
   DUMP_RETURN();
 
-  DUMP0("  Fields: ");
+  DumpIndentation(indent + 2);
+  DUMP0("Fields: ");
   for (unsigned i = 0; i < mFields.GetNum(); i++) {
     TreeNode *node = mFields.ValueAtIndex(i);
-    node->Dump(4);
+    node->Dump(indent + 4);
   }
   DUMP_RETURN();
 
-  DUMP0("  Instance Initializer: ");
+  DumpIndentation(indent + 2);
+  DUMP0("Instance Initializer: ");
   for (unsigned i = 0; i < mInstInits.GetNum(); i++) {
     TreeNode *node = mInstInits.ValueAtIndex(i);
-    DUMP1("    InstInit-", i);
+    DumpIndentation(indent + 4);
+    DUMP1("InstInit-", i);
   }
-  DUMP_RETURN();
 
-  DUMP0("  Constructors: ");
+  DumpIndentation(indent + 2);
+  DUMP0("Constructors: ");
   for (unsigned i = 0; i < mConstructors.GetNum(); i++) {
     TreeNode *node = mConstructors.ValueAtIndex(i);
-    node->Dump(4);
+    node->Dump(indent + 4);
   }
-  DUMP_RETURN();
 
-  DUMP0("  Methods: ");
+  DumpIndentation(indent + 2);
+  DUMP0("Methods: ");
   for (unsigned i = 0; i < mMethods.GetNum(); i++) {
     TreeNode *node = mMethods.ValueAtIndex(i);
-    node->Dump(4);
+    node->Dump(indent + 4);
   }
 
-  DUMP0("  LocalClasses: ");
+  DumpIndentation(indent + 2);
+  DUMP0("LocalClasses: ");
   for (unsigned i = 0; i < mLocalClasses.GetNum(); i++) {
     TreeNode *node = mLocalClasses.ValueAtIndex(i);
-    node->Dump(4);
+    node->Dump(indent + 4);
   }
 
-  DUMP0("  LocalInterfaces: ");
+  DumpIndentation(indent + 2);
+  DUMP0("LocalInterfaces: ");
   for (unsigned i = 0; i < mLocalInterfaces.GetNum(); i++) {
     TreeNode *node = mLocalInterfaces.ValueAtIndex(i);
-    node->Dump(4);
+    node->Dump(indent + 4);
   }
 }
 
@@ -789,6 +796,4 @@ void FunctionNode::Dump(unsigned indent) {
   // dump function body
   if (GetBody())
     GetBody()->Dump(indent+2);
-
-  DUMP_RETURN();
 }
