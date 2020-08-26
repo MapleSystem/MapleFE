@@ -1,65 +1,29 @@
 Matched 5 tokens.
 == Sub Tree ==
-a,b
+var:a,b
 Matched 8 tokens.
 == Sub Tree ==
-c
+var:c
 Matched 14 tokens.
 Convert unary --> binary
 == Sub Tree ==
-Assign
-  c
-  Add
-    a
-    b
-
-
+c Assign a Add b
 Matched 22 tokens.
 Convert unary --> binary
 == Sub Tree ==
-Assign
-  a
-  Add
-    a
-    b
-
-
+a Assign a Add b
 Matched 30 tokens.
 Convert unary --> binary
 == Sub Tree ==
-Assign
-  a
-  Add
-    a
-    b
-
-
+a Assign a Add b
 ============= Module ===========
 == Sub Tree ==
-a,b
+var:a,b
 == Sub Tree ==
-c
+var:c
 == Sub Tree ==
-Assign
-  c
-  Add
-    a
-    b
-
-
+c Assign a Add b
 == Sub Tree ==
-Assign
-  a
-  Add
-    a
-    b
-
-
+a Assign a Add b
 == Sub Tree ==
-Assign
-  a
-  Add
-    a
-    b
-
-
+a Assign a Add b

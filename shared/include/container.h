@@ -378,9 +378,10 @@ public:
       next->mPrev = prev;
 
     if (elem == mHead)
-      mHead = elem->mNext;
+      mHead = next;
+
     if (mTail == elem)
-      mTail = NULL;
+      mTail = prev;
 
     mNum--;
   }

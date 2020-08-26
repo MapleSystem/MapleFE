@@ -4,12 +4,14 @@ class  Point
   Fields: 
     x
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
     func  foo()  throws: 
-      k
+      var:k
+      while n LT 4        k Assign n
+
+
+      System.out.println(k)
   LocalClasses: 
   LocalInterfaces: 
 
@@ -19,12 +21,14 @@ class  Point
   Fields: 
     x
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
     func  foo()  throws: 
-      k
+      var:k
+      while n LT 4        k Assign n
+
+
+      System.out.println(k)
   LocalClasses: 
   LocalInterfaces: 
 

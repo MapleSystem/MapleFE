@@ -1,22 +1,10 @@
 Matched 6 tokens.
 Convert unary --> binary
 == Sub Tree ==
-Assign
-  c
-  Add
-    a
-    b
-
-
+c Assign a Add b
 ============= Module ===========
 == Sub Tree ==
-Assign
-  c
-  Add
-    a
-    b
-
-
+c Assign a Add b
 Identifier:c has no decl.
 Identifier:a has no decl.
 Identifier:b has no decl.

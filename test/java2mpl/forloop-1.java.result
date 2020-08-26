@@ -4,15 +4,11 @@ class  A
   Fields: 
 
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
     func  foo()  throws: 
       for ( )
-        Assign
-          k
-          i
+        k Assign i
 
   LocalClasses: 
   LocalInterfaces: 
@@ -23,15 +19,11 @@ class  A
   Fields: 
 
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
     func  foo()  throws: 
       for ( )
-        Assign
-          k
-          i
+        k Assign i
 
   LocalClasses: 
   LocalInterfaces: 

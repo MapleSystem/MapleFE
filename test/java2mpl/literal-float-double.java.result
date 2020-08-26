@@ -1,15 +1,11 @@
 Matched 5 tokens.
 == Sub Tree ==
-a=11.1
-
+var:a=11.1
 Matched 10 tokens.
 == Sub Tree ==
-a=22.2
-
+var:a=22.2
 ============= Module ===========
 == Sub Tree ==
-a=11.1
-
+var:a=11.1
 == Sub Tree ==
-a=22.2
-
+var:a=22.2

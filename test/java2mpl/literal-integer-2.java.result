@@ -1,8 +1,6 @@
 Matched 5 tokens.
 == Sub Tree ==
-a=273
-
+var:a=273
 ============= Module ===========
 == Sub Tree ==
-a=273
-
+var:a=273

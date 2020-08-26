@@ -4,15 +4,10 @@ class  Point
   Fields: 
     x
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
     func  foo()  throws: 
-      Assign
-        x
-        0
-
+      x Assign 0
       return x
   LocalClasses: 
   LocalInterfaces: 
@@ -23,15 +18,10 @@ class  Point
   Fields: 
     x
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
     func  foo()  throws: 
-      Assign
-        x
-        0
-
+      x Assign 0
       return x
   LocalClasses: 
   LocalInterfaces: 

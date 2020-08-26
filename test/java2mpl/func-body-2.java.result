@@ -1,4 +1,5 @@
-Matched 32 tokens.
+Matched 24 tokens.
+Convert unary --> binary
 == Sub Tree ==
 class  A
   Fields: 
@@ -7,12 +8,8 @@ class  A
   Constructors: 
   Methods: 
     func  foo()  throws: 
-      for ( )
-        Inc
-          k
-                  iInc
-
-
+      c Assign 3
+      return c Add b
   LocalClasses: 
   LocalInterfaces: 
 
@@ -25,12 +22,8 @@ class  A
   Constructors: 
   Methods: 
     func  foo()  throws: 
-      for ( )
-        Inc
-          k
-                  iInc
-
-
+      c Assign 3
+      return c Add b
   LocalClasses: 
   LocalInterfaces: 
 

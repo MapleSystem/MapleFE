@@ -4,23 +4,66 @@ class  Global
   Fields: 
 
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
     func  foo()  throws: 
       new Cyclic
+      class  Cyclic
+        Fields: 
+
+        Instance Initializer: 
+        Constructors: 
+        Methods: 
+        LocalClasses: 
+        LocalInterfaces: 
+
+      class  Local
+        Fields: 
+
+        Instance Initializer: 
+        Constructors: 
+        Methods: 
+        LocalClasses: 
+        LocalInterfaces: 
+
+      class  AnotherLocal
+        Fields: 
+
+        Instance Initializer: 
+        Constructors: 
+        Methods: 
+          func  bar()  throws: 
+            class  Local
+              Fields: 
+
+              Instance Initializer: 
+              Constructors: 
+              Methods: 
+              LocalClasses: 
+              LocalInterfaces: 
+
+        LocalClasses: 
+        LocalInterfaces: 
+
+
+      class  Local
+        Fields: 
+
+        Instance Initializer: 
+        Constructors: 
+        Methods: 
+        LocalClasses: 
+        LocalInterfaces: 
+
   LocalClasses: 
     class  Cyclic
-  Fields: 
+      Fields: 
 
-  Instance Initializer: 
-
-  Constructors: 
-
-  Methods: 
-  LocalClasses: 
-  LocalInterfaces: 
+      Instance Initializer: 
+      Constructors: 
+      Methods: 
+      LocalClasses: 
+      LocalInterfaces: 
   LocalInterfaces: 
 
 ============= Module ===========
@@ -29,22 +72,65 @@ class  Global
   Fields: 
 
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
     func  foo()  throws: 
       new Cyclic
+      class  Cyclic
+        Fields: 
+
+        Instance Initializer: 
+        Constructors: 
+        Methods: 
+        LocalClasses: 
+        LocalInterfaces: 
+
+      class  Local
+        Fields: 
+
+        Instance Initializer: 
+        Constructors: 
+        Methods: 
+        LocalClasses: 
+        LocalInterfaces: 
+
+      class  AnotherLocal
+        Fields: 
+
+        Instance Initializer: 
+        Constructors: 
+        Methods: 
+          func  bar()  throws: 
+            class  Local
+              Fields: 
+
+              Instance Initializer: 
+              Constructors: 
+              Methods: 
+              LocalClasses: 
+              LocalInterfaces: 
+
+        LocalClasses: 
+        LocalInterfaces: 
+
+
+      class  Local
+        Fields: 
+
+        Instance Initializer: 
+        Constructors: 
+        Methods: 
+        LocalClasses: 
+        LocalInterfaces: 
+
   LocalClasses: 
     class  Cyclic
-  Fields: 
+      Fields: 
 
-  Instance Initializer: 
-
-  Constructors: 
-
-  Methods: 
-  LocalClasses: 
-  LocalInterfaces: 
+      Instance Initializer: 
+      Constructors: 
+      Methods: 
+      LocalClasses: 
+      LocalInterfaces: 
   LocalInterfaces: 
 

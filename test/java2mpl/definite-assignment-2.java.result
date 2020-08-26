@@ -4,15 +4,9 @@ class  Point
   Fields: 
     x
   Instance Initializer: 
-
   Constructors: 
     constructor  Point()  throws: 
-      Assign
-        x
-        1
-
-
-
+      x Assign 1
   Methods: 
     func  foo()  throws: 
       return x
@@ -25,15 +19,9 @@ class  Point
   Fields: 
     x
   Instance Initializer: 
-
   Constructors: 
     constructor  Point()  throws: 
-      Assign
-        x
-        1
-
-
-
+      x Assign 1
   Methods: 
     func  foo()  throws: 
       return x

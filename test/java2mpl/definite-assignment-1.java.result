@@ -3,11 +3,8 @@ Matched 19 tokens.
 class  Point
   Fields: 
     x=1
-
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
     func  foo()  throws: 
       return x
@@ -19,11 +16,8 @@ class  Point
 class  Point
   Fields: 
     x=1
-
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
     func  foo()  throws: 
       return x

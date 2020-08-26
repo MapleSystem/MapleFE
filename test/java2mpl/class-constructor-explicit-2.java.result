@@ -4,17 +4,10 @@ class  Point
   Fields: 
     x    y
   Instance Initializer: 
-
   Constructors: 
     constructor  Point()  throws: 
-      Assign
-        x
-        x
-      Assign
-        y
-        y
-
-
+      x Assign x
+      y Assign y
   Methods: 
   LocalClasses: 
   LocalInterfaces: 
@@ -23,19 +16,12 @@ Matched 92 tokens.
 == Sub Tree ==
 class  ColoredPoint
   Fields: 
-    WHITE=0
-    color
+    WHITE=0    color
   Instance Initializer: 
-
   Constructors: 
     constructor  ColoredPoint()  throws: 
-
     constructor  ColoredPoint()  throws: 
-      Assign
-        color
-        color
-
-
+      color Assign color
   Methods: 
   LocalClasses: 
   LocalInterfaces: 
@@ -46,17 +32,10 @@ class  Point
   Fields: 
     x    y
   Instance Initializer: 
-
   Constructors: 
     constructor  Point()  throws: 
-      Assign
-        x
-        x
-      Assign
-        y
-        y
-
-
+      x Assign x
+      y Assign y
   Methods: 
   LocalClasses: 
   LocalInterfaces: 
@@ -64,19 +43,12 @@ class  Point
 == Sub Tree ==
 class  ColoredPoint
   Fields: 
-    WHITE=0
-    color
+    WHITE=0    color
   Instance Initializer: 
-
   Constructors: 
     constructor  ColoredPoint()  throws: 
-
     constructor  ColoredPoint()  throws: 
-      Assign
-        color
-        color
-
-
+      color Assign color
   Methods: 
   LocalClasses: 
   LocalInterfaces: 

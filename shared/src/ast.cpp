@@ -266,11 +266,11 @@ void BinOperatorNode::ReplaceChild(TreeNode *old_child, TreeNode *new_child) {
 void BinOperatorNode::Dump(unsigned indent) {
   const char *name = GetOperatorName(mOprId);
   DumpIndentation(indent);
-  DUMP0(name);
-  mOpndA->Dump(indent + 2);
-  DUMP_RETURN();
-  mOpndB->Dump(indent + 2);
-  DUMP_RETURN();
+  mOpndA->Dump(0);
+  DUMP0_NORETURN(' ');
+  DUMP0_NORETURN(name);
+  DUMP0_NORETURN(' ');
+  mOpndB->Dump(0);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -475,29 +475,29 @@ void LiteralNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   switch (mData.mType) {
   case LT_IntegerLiteral:
-    DUMP0(mData.mData.mInt);
+    DUMP0_NORETURN(mData.mData.mInt);
     break;
   case LT_FPLiteral:
     if (mData.mIsDouble)
-      DUMP0(mData.mData.mDouble);
+      DUMP0_NORETURN(mData.mData.mDouble);
     else
-      DUMP0(mData.mData.mFloat);
+      DUMP0_NORETURN(mData.mData.mFloat);
     break;
   case LT_StringLiteral:
-    DUMP0(mData.mData.mStr);
+    DUMP0_NORETURN(mData.mData.mStr);
     break;
   case LT_BooleanLiteral:
-    DUMP0(mData.mData.mBool);
+    DUMP0_NORETURN(mData.mData.mBool);
     break;
   case LT_CharacterLiteral:
-    DUMP0(mData.mData.mChar);
+    DUMP0_NORETURN(mData.mData.mChar);
     break;
   case LT_NullLiteral:
-    DUMP0("null");
+    DUMP0_NORETURN("null");
     break;
   case LT_NA:
   default:
-    DUMP0("NA Token:");
+    DUMP0_NORETURN("NA Token:");
     break;
   }
 }
@@ -767,12 +767,68 @@ FunctionNode::FunctionNode() {
   mIsConstructor = false;
 }
 
-// When BlockNode is added to the ClassNode, we need further
-// categorize the subtrees into members, methods, local classes, interfaces, etc.
-void FunctionNode::Construct() {
-  for (unsigned i = 0; i < mBody->GetChildrenNum(); i++) {
-    TreeNode *tree_node = mBody->GetChildAtIndex(i);
-  }
+// When BlockNode is added to the FunctionNode, we need further
+// cleanup, eg. clean up the PassNode.
+void FunctionNode::CleanUp() {
+  TreeNode *prev = NULL;
+  TreeNode *next = NULL;
+  unsigned num = mBody->GetChildrenNum();
+  if (num == 0)
+    return;
+
+  bool changed = true;
+  while(changed) {
+    changed = false;
+    for (unsigned i = 0; i < num; i++) {
+      TreeNode *tree = mBody->GetChildAtIndex(i);
+      if (tree->IsPass()) {
+        PassNode *passnode = (PassNode*)tree;
+
+        // Body has only one PassNode. Remove it, and add all its children
+        if (num == 1) {
+          mBody->ClearChildren();
+          for (unsigned j = 0; j < passnode->GetChildrenNum(); j++) {
+            TreeNode *child = passnode->GetChild(j);
+            mBody->AddChild(child);
+          }
+        } else {
+          // If pass node is the header, insert before next.
+          // If pass node is the last or any one else, insert after prev.
+          if (i == 0) {
+            next = mBody->GetChildAtIndex(1);
+          } else {
+            prev = mBody->GetChildAtIndex(i-1);
+          }
+
+          // remove the passnode
+          mBody->mChildren.Remove(tree);
+
+          // set anchor, and add children
+          if (next) {
+            mBody->mChildren.LocateValue(next);
+            for (unsigned j = 0; j < passnode->GetChildrenNum(); j++) {
+              TreeNode *child = passnode->GetChild(j);
+              mBody->mChildren.InsertBefore(child);
+            }
+          } else {
+            MASSERT(prev);
+            mBody->mChildren.LocateValue(prev);
+            // [NOTE] We need start from the last child to the first,
+            //        because the earlier inserted child will be pushed back
+            //        by the later one.
+            for (int j = passnode->GetChildrenNum() - 1; j >= 0; j--) {
+              TreeNode *child = passnode->GetChild(j);
+              mBody->mChildren.InsertAfter(child);
+            }
+          }
+        }
+
+        // Exit the for iteration. One pass node each time.
+        changed = true;
+        break;
+      }
+    } // end for
+  } // end while
 }
 
 void FunctionNode::Dump(unsigned indent) {

@@ -4,9 +4,7 @@ class  A
   Fields: 
 
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
     func  foo()  throws: 
       cond-branch cond:a
@@ -23,9 +21,7 @@ class  A
   Fields: 
 
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
     func  foo()  throws: 
       cond-branch cond:a

@@ -4,9 +4,7 @@ class  Point
   Fields: 
     x    y
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
   LocalClasses: 
   LocalInterfaces: 
@@ -20,15 +18,10 @@ class  ColoredPoint
   Fields: 
     color
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
     func  setColor()  throws: 
-      Assign
-        color
-        color
-
+      color Assign color
   LocalClasses: 
   LocalInterfaces: 
 
@@ -38,9 +31,7 @@ class  EndPoint
   Fields: 
 
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
   LocalClasses: 
   LocalInterfaces: 
@@ -51,12 +42,17 @@ class  Test
   Fields: 
 
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
     func  main()  throws: 
-      p=new Point
+      var:p=new Point
+      var:cp=new ColoredPoint
+      var:c
+      cp Assign 
+      c Assign 
+      var:l=
+      var:e=new EndPoint
+      c Assign 
   LocalClasses: 
   LocalInterfaces: 
 
@@ -66,9 +62,7 @@ class  Point
   Fields: 
     x    y
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
   LocalClasses: 
   LocalInterfaces: 
@@ -80,15 +74,10 @@ class  ColoredPoint
   Fields: 
     color
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
     func  setColor()  throws: 
-      Assign
-        color
-        color
-
+      color Assign color
   LocalClasses: 
   LocalInterfaces: 
 
@@ -97,9 +86,7 @@ class  EndPoint
   Fields: 
 
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
   LocalClasses: 
   LocalInterfaces: 
@@ -109,12 +96,17 @@ class  Test
   Fields: 
 
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
     func  main()  throws: 
-      p=new Point
+      var:p=new Point
+      var:cp=new ColoredPoint
+      var:c
+      cp Assign 
+      c Assign 
+      var:l=
+      var:e=new EndPoint
+      c Assign 
   LocalClasses: 
   LocalInterfaces: 
 

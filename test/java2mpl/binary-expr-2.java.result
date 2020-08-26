@@ -1,21 +1,9 @@
 Matched 6 tokens.
 == Sub Tree ==
-Assign
-  a
-  GT
-    b
-    c
-
-
+a Assign b GT c
 ============= Module ===========
 == Sub Tree ==
-Assign
-  a
-  GT
-    b
-    c
-
-
+a Assign b GT c
 Identifier:a has no decl.
 Identifier:b has no decl.
 Identifier:c has no decl.

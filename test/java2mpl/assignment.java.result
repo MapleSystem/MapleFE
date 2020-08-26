@@ -1,14 +1,8 @@
 Matched 4 tokens.
 == Sub Tree ==
-Assign
-  a
-  b
-
+a Assign b
 ============= Module ===========
 == Sub Tree ==
-Assign
-  a
-  b
-
+a Assign b
 Identifier:a has no decl.
 Identifier:b has no decl.

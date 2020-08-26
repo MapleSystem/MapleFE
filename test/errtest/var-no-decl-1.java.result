@@ -1,18 +1,12 @@
 Matched 3 tokens.
 == Sub Tree ==
-a
+var:a
 Matched 7 tokens.
 == Sub Tree ==
-Assign
-  a
-  b
-
+a Assign b
 ============= Module ===========
 == Sub Tree ==
-a
+var:a
 == Sub Tree ==
-Assign
-  a
-  b
-
+a Assign b
 Identifier:b has no decl.

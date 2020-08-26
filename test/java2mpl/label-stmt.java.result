@@ -4,13 +4,12 @@ class  A
   Fields: 
 
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
     func  loseEdges()  throws: 
       search:
       break search
+
 
   LocalClasses: 
   LocalInterfaces: 
@@ -21,13 +20,12 @@ class  A
   Fields: 
 
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
     func  loseEdges()  throws: 
       search:
       break search
+
 
   LocalClasses: 
   LocalInterfaces: 

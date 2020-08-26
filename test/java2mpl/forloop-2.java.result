@@ -4,14 +4,14 @@ class  A
   Fields: 
 
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
     func  foo()  throws: 
       for ( )
         Inc
-          k                  iInc
+          k
+                  iInc
+
 
   LocalClasses: 
   LocalInterfaces: 
@@ -22,14 +22,14 @@ class  A
   Fields: 
 
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
     func  foo()  throws: 
       for ( )
         Inc
-          k                  iInc
+          k
+                  iInc
+
 
   LocalClasses: 
   LocalInterfaces: 

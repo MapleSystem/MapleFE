@@ -1,15 +1,7 @@
 Matched 4 tokens.
 == Sub Tree ==
-Assign
-  a
-  273
-
-
+a Assign 273
 ============= Module ===========
 == Sub Tree ==
-Assign
-  a
-  273
-
-
+a Assign 273
 Identifier:a has no decl.

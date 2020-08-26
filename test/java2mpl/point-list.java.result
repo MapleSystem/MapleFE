@@ -4,12 +4,12 @@ class  Point
   Fields: 
     x    y    list    next
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
     func  foo()  throws: 
-      pl=new PointList
+      var:pl=new PointList
+       Assign 1
+      return 
   LocalClasses: 
   LocalInterfaces: 
 
@@ -19,11 +19,8 @@ class  PointList
   Fields: 
     z    first
   Instance Initializer: 
-
   Constructors: 
     constructor  PointList()  throws: 
-
-
   Methods: 
   LocalClasses: 
   LocalInterfaces: 
@@ -34,12 +31,12 @@ class  Point
   Fields: 
     x    y    list    next
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
     func  foo()  throws: 
-      pl=new PointList
+      var:pl=new PointList
+       Assign 1
+      return 
   LocalClasses: 
   LocalInterfaces: 
 
@@ -48,11 +45,8 @@ class  PointList
   Fields: 
     z    first
   Instance Initializer: 
-
   Constructors: 
     constructor  PointList()  throws: 
-
-
   Methods: 
   LocalClasses: 
   LocalInterfaces: 

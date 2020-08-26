@@ -4,14 +4,10 @@ class  A
   Fields: 
 
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
     func  foo()  throws: 
-      while true        Assign
-          k
-          i
+      while true        k Assign i
 
   LocalClasses: 
   LocalInterfaces: 
@@ -22,14 +18,10 @@ class  A
   Fields: 
 
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
     func  foo()  throws: 
-      while true        Assign
-          k
-          i
+      while true        k Assign i
 
   LocalClasses: 
   LocalInterfaces: 

@@ -4,9 +4,7 @@ class  A
   Fields: 
 
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
     func  foo()  throws: 
       new Cyclic
@@ -19,9 +17,7 @@ class  Cyclic
   Fields: 
 
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
   LocalClasses: 
   LocalInterfaces: 
@@ -32,9 +28,7 @@ class  A
   Fields: 
 
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
     func  foo()  throws: 
       new Cyclic
@@ -46,9 +40,7 @@ class  Cyclic
   Fields: 
 
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
   LocalClasses: 
   LocalInterfaces: 

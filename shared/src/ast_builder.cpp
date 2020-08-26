@@ -1330,9 +1330,7 @@ TreeNode* ASTBuilder::AddFunctionBody() {
     TreeNode *tree_node = p_body.mData.mTreeNode;
     MASSERT(tree_node->IsBlock() && "Class body is not a BlockNode?");
     BlockNode *block = (BlockNode*)tree_node;
-
     func->AddBody(block);
-    func->Construct();
   }
 
   mLastTreeNode = func;
@@ -1360,9 +1358,7 @@ TreeNode* ASTBuilder::AddFunctionBodyTo() {
     TreeNode *tree_node = p_body.mData.mTreeNode;
     MASSERT(tree_node->IsBlock() && "Class body is not a BlockNode?");
     BlockNode *block = (BlockNode*)tree_node;
-
     func->AddBody(block);
-    func->Construct();
   }
 
   mLastTreeNode = func;

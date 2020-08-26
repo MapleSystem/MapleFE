@@ -4,9 +4,7 @@ class  Point
   Fields: 
     x
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
     func  foo()  throws: 
       return x
@@ -19,9 +17,7 @@ class  Point
   Fields: 
     x
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
     func  foo()  throws: 
       return x

@@ -4,12 +4,11 @@ class  A
   Fields: 
 
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
     func  foo()  throws: 
-      k      cond-branch cond:
+      var:k
+      cond-branch cond:
       true branch :
         System.out.println(k)      false branch :
 
@@ -22,12 +21,11 @@ class  A
   Fields: 
 
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
     func  foo()  throws: 
-      k      cond-branch cond:
+      var:k
+      cond-branch cond:
       true branch :
         System.out.println(k)      false branch :
 

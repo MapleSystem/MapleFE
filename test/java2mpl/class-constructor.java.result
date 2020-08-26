@@ -4,17 +4,10 @@ class  Point
   Fields: 
     x    y
   Instance Initializer: 
-
   Constructors: 
     constructor  Point()  throws: 
-      Assign
-        x
-        x
-      Assign
-        y
-        y
-
-
+      x Assign x
+      y Assign y
   Methods: 
   LocalClasses: 
   LocalInterfaces: 
@@ -25,17 +18,10 @@ class  Point
   Fields: 
     x    y
   Instance Initializer: 
-
   Constructors: 
     constructor  Point()  throws: 
-      Assign
-        x
-        x
-      Assign
-        y
-        y
-
-
+      x Assign x
+      y Assign y
   Methods: 
   LocalClasses: 
   LocalInterfaces: 

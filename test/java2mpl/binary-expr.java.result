@@ -1,161 +1,53 @@
 Matched 7 tokens.
 == Sub Tree ==
-a,b,c
+var:a,b,c
 Matched 13 tokens.
 Convert unary --> binary
 == Sub Tree ==
-Assign
-  a
-  Add
-    b
-    c
-
-
+a Assign b Add c
 Matched 19 tokens.
 Convert unary --> binary
 == Sub Tree ==
-Assign
-  a
-  Sub
-    b
-    c
-
-
+a Assign b Sub c
 Matched 25 tokens.
 == Sub Tree ==
-Assign
-  a
-  GT
-    b
-    c
-
-
+a Assign b GT c
 Matched 31 tokens.
 == Sub Tree ==
-Assign
-  a
-  GE
-    b
-    c
-
-
+a Assign b GE c
 Matched 37 tokens.
 == Sub Tree ==
-Assign
-  a
-  LT
-    b
-    c
-
-
+a Assign b LT c
 Matched 43 tokens.
 == Sub Tree ==
-Assign
-  a
-  LE
-    b
-    c
-
-
+a Assign b LE c
 Matched 49 tokens.
 == Sub Tree ==
-Assign
-  a
-  Shl
-    b
-    c
-
-
+a Assign b Shl c
 Matched 55 tokens.
 == Sub Tree ==
-Assign
-  a
-  Shr
-    b
-    c
-
-
+a Assign b Shr c
 Matched 61 tokens.
 == Sub Tree ==
-Assign
-  a
-  Zext
-    b
-    c
-
-
+a Assign b Zext c
 ============= Module ===========
 == Sub Tree ==
-a,b,c
+var:a,b,c
 == Sub Tree ==
-Assign
-  a
-  Add
-    b
-    c
-
-
+a Assign b Add c
 == Sub Tree ==
-Assign
-  a
-  Sub
-    b
-    c
-
-
+a Assign b Sub c
 == Sub Tree ==
-Assign
-  a
-  GT
-    b
-    c
-
-
+a Assign b GT c
 == Sub Tree ==
-Assign
-  a
-  GE
-    b
-    c
-
-
+a Assign b GE c
 == Sub Tree ==
-Assign
-  a
-  LT
-    b
-    c
-
-
+a Assign b LT c
 == Sub Tree ==
-Assign
-  a
-  LE
-    b
-    c
-
-
+a Assign b LE c
 == Sub Tree ==
-Assign
-  a
-  Shl
-    b
-    c
-
-
+a Assign b Shl c
 == Sub Tree ==
-Assign
-  a
-  Shr
-    b
-    c
-
-
+a Assign b Shr c
 == Sub Tree ==
-Assign
-  a
-  Zext
-    b
-    c
-
-
+a Assign b Zext c

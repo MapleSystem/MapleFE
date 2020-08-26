@@ -3,34 +3,10 @@ Convert unary --> binary
 Convert unary --> binary
 Convert unary --> binary
 == Sub Tree ==
-Assign
-  a
-  Add
-    b
-    Add
-      c
-      Add
-        d
-        e
-
-
-
-
+a Assign b Add c Add d Add e
 ============= Module ===========
 == Sub Tree ==
-Assign
-  a
-  Add
-    b
-    Add
-      c
-      Add
-        d
-        e
-
-
-
-
+a Assign b Add c Add d Add e
 Identifier:a has no decl.
 Identifier:b has no decl.
 Identifier:c has no decl.

@@ -4,12 +4,16 @@ class  Point
   Fields: 
     x
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
     func  foo()  throws: 
-      k
+      var:k
+      var:n=5
+      cond-branch cond:n GT 2
+      true branch :
+        k Assign 3      false branch :
+
+      System.out.println(k)
   LocalClasses: 
   LocalInterfaces: 
 
@@ -19,12 +23,16 @@ class  Point
   Fields: 
     x
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
     func  foo()  throws: 
-      k
+      var:k
+      var:n=5
+      cond-branch cond:n GT 2
+      true branch :
+        k Assign 3      false branch :
+
+      System.out.println(k)
   LocalClasses: 
   LocalInterfaces: 
 

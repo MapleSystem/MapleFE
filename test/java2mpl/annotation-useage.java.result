@@ -4,12 +4,9 @@ class  A
   Fields: 
 
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
     func  travelThroughTime()  throws: 
-
   LocalClasses: 
   LocalInterfaces: 
 
@@ -19,12 +16,9 @@ class  A
   Fields: 
 
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
     func  travelThroughTime()  throws: 
-
   LocalClasses: 
   LocalInterfaces: 
 

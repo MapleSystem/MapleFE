@@ -617,8 +617,8 @@ public:
 //////////////////////////////////////////////////////////////////////////
 
 class BlockNode : public TreeNode {
-private:
-  SmallVector<TreeNode*> mChildren;
+public:
+  SmallList<TreeNode*> mChildren;
 
   // Some blocks are instance initializer in languages like Java,
   // and they can have attributes, such as static instance initializer.
@@ -639,6 +639,7 @@ public:
   unsigned  GetChildrenNum()            {return mChildren.GetNum();}
   TreeNode* GetChildAtIndex(unsigned i) {return mChildren.ValueAtIndex(i);}
   void      AddChild(TreeNode *c)       {mChildren.PushBack(c);}
+  void      ClearChildren()             {mChildren.Clear();}
 
   void Release() {mChildren.Release();}
   void Dump(unsigned);
@@ -667,9 +668,12 @@ public:
   FunctionNode();
   ~FunctionNode() {Release();}
 
+  // After function body is added, we need some clean up work, eg. cleaning
+  // the PassNode in the tree.
+  void CleanUp();
+
   BlockNode* GetBody() {return mBody;}
-  void AddBody(BlockNode *b) {mBody = b;}
-  void Construct();
+  void AddBody(BlockNode *b) {mBody = b; CleanUp();}
 
   bool IsConstructor()    {return mIsConstructor;}
   void SetIsConstructor() {mIsConstructor = true;}

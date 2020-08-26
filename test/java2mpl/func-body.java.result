@@ -5,15 +5,10 @@ class  A
   Fields: 
 
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
     func  foo()  throws: 
-      return Add
-  c
-  b
-
+      return c Add b
   LocalClasses: 
   LocalInterfaces: 
 
@@ -23,15 +18,10 @@ class  A
   Fields: 
 
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
     func  foo()  throws: 
-      return Add
-  c
-  b
-
+      return c Add b
   LocalClasses: 
   LocalInterfaces: 
 

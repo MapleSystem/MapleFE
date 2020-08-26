@@ -5,12 +5,15 @@ class  Test
   Fields: 
 
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
     func  main()  throws: 
-      i=
+      var:i=
+      System.out.println("(int)12.5f==" Add i)
+      var:f=i
+      System.out.print(f)
+      f Assign 
+      var:d=
   LocalClasses: 
   LocalInterfaces: 
 
@@ -20,12 +23,15 @@ class  Test
   Fields: 
 
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
     func  main()  throws: 
-      i=
+      var:i=
+      System.out.println("(int)12.5f==" Add i)
+      var:f=i
+      System.out.print(f)
+      f Assign 
+      var:d=
   LocalClasses: 
   LocalInterfaces: 
 

@@ -4,12 +4,16 @@ class  A
   Fields: 
 
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
     func  flow()  throws: 
-      k
+      var:k
+      cond-branch cond:flag
+      true branch :
+        k Assign 3      false branch :
+
+      var:k=4
+      System.out.println(k)
   LocalClasses: 
   LocalInterfaces: 
 
@@ -19,12 +23,16 @@ class  A
   Fields: 
 
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
     func  flow()  throws: 
-      k
+      var:k
+      cond-branch cond:flag
+      true branch :
+        k Assign 3      false branch :
+
+      var:k=4
+      System.out.println(k)
   LocalClasses: 
   LocalInterfaces: 
 

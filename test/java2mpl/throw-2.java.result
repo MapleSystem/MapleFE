@@ -4,14 +4,10 @@ class  A
   Fields: 
 
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
     func  foo()  throws:     A    B
-
     func  bar()  throws:     A    B
-
   LocalClasses: 
   LocalInterfaces: 
 
@@ -21,14 +17,10 @@ class  A
   Fields: 
 
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
     func  foo()  throws:     A    B
-
     func  bar()  throws:     A    B
-
   LocalClasses: 
   LocalInterfaces: 
 

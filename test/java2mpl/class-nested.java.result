@@ -4,21 +4,17 @@ class  A
   Fields: 
     a
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
   LocalClasses: 
     class  B
-  Fields: 
-    b
-  Instance Initializer: 
-
-  Constructors: 
-
-  Methods: 
-  LocalClasses: 
-  LocalInterfaces: 
+      Fields: 
+        b
+      Instance Initializer: 
+      Constructors: 
+      Methods: 
+      LocalClasses: 
+      LocalInterfaces: 
   LocalInterfaces: 
 
 ============= Module ===========
@@ -27,20 +23,16 @@ class  A
   Fields: 
     a
   Instance Initializer: 
-
   Constructors: 
-
   Methods: 
   LocalClasses: 
     class  B
-  Fields: 
-    b
-  Instance Initializer: 
-
-  Constructors: 
-
-  Methods: 
-  LocalClasses: 
-  LocalInterfaces: 
+      Fields: 
+        b
+      Instance Initializer: 
+      Constructors: 
+      Methods: 
+      LocalClasses: 
+      LocalInterfaces: 
   LocalInterfaces: 
 
