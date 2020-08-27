@@ -379,8 +379,10 @@ private:
   void FindPatchingNodes();
   void SupplementalSortOut(AppealNode *root, AppealNode *target);
 
-  // Build AST
-  ASTTree*  BuildAST(); // Each top level construct gets a AST
+  // Build AST, for each top level construct.
+  ASTTree*  BuildAST();
+  std::map<AppealNode*, TreeNode*> mNodeTreeMap;
+
 
 //////////////////////////////////////////////////////////////
 // The following section is all about left recursion parsing

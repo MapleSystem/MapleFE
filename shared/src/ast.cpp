@@ -103,7 +103,7 @@ void ASTTree::SetTraceBuild(bool b) {
 //    *) The parent AppealNode of these sub-trees has no tree node. So the conversion
 //       helps make the tree complete.
 
-TreeNode* ASTTree::NewTreeNode(AppealNode *appeal_node, std::map<AppealNode*, TreeNode*> &map) {
+TreeNode* ASTTree::NewTreeNode(AppealNode *appeal_node) {
   TreeNode *sub_tree = NULL;
 
   if (appeal_node->IsToken()) {
@@ -126,8 +126,8 @@ TreeNode* ASTTree::NewTreeNode(AppealNode *appeal_node, std::map<AppealNode*, Tr
       Param p;
       if (child) {
         p.mIsEmpty = false;
-        std::map<AppealNode*, TreeNode*>::iterator it = map.find(child);
-        if (it == map.end()) {
+        std::map<AppealNode*, TreeNode*>::iterator it = mNodeTreeMap->find(child);
+        if (it == mNodeTreeMap->end()) {
           // only token children could have NO tree node.
           MASSERT(child->IsToken() && "A RuleTable node has no tree node?");
           p.mIsTreeNode = false;
@@ -153,18 +153,17 @@ TreeNode* ASTTree::NewTreeNode(AppealNode *appeal_node, std::map<AppealNode*, Tr
 
   // It's possible that the Rule has no action, meaning it cannot create tree node.
   // In this case, we will take the child's tree node if it has one and only one
-  // sub tree among all children.
+  // sub tree.
   std::vector<TreeNode*> child_trees;
   std::vector<AppealNode*>::iterator cit = appeal_node->mSortedChildren.begin();
   for (; cit != appeal_node->mSortedChildren.end(); cit++) {
-    std::map<AppealNode*, TreeNode*>::iterator child_tree_it = map.find(*cit);
-    if (child_tree_it != map.end()) {
+    std::map<AppealNode*, TreeNode*>::iterator child_tree_it = mNodeTreeMap->find(*cit);
+    if (child_tree_it != mNodeTreeMap->end()) {
       child_trees.push_back(child_tree_it->second);
     }
   }
 
   if (child_trees.size() == 1) {
-    map.insert(std::pair<AppealNode*, TreeNode*>(appeal_node, child_trees[0]));
     sub_tree = child_trees[0];
     if (sub_tree)
       return sub_tree;
@@ -185,7 +184,6 @@ TreeNode* ASTTree::NewTreeNode(AppealNode *appeal_node, std::map<AppealNode*, Tr
         std::cout << "Convert unary --> binary" << std::endl;
         TreeNode *unary_sub = unary->GetOpnd();
         TreeNode *binary = BuildBinaryOperation(child_a, unary_sub, unary->GetOprId());
-        map.insert(std::pair<AppealNode*, TreeNode*>(appeal_node, binary));
         return binary;
       }
     }
@@ -197,7 +195,6 @@ TreeNode* ASTTree::NewTreeNode(AppealNode *appeal_node, std::map<AppealNode*, Tr
     std::vector<TreeNode*>::iterator child_it = child_trees.begin();
     for (; child_it != child_trees.end(); child_it++)
       pass->AddChild(*child_it);
-    map.insert(std::pair<AppealNode*, TreeNode*>(appeal_node, pass));
     return pass;
   }
 

@@ -2147,15 +2147,14 @@ AppealNode* Parser::SimplifyShrinkEdges(AppealNode *node) {
 
 ASTTree* Parser::BuildAST() {
   done_nodes.clear();
+  mNodeTreeMap.clear();
 
   ASTTree *tree = new ASTTree();
   tree->SetTraceBuild(mTraceAstBuild);
+  tree->SetNodeTreeMap(&mNodeTreeMap);
 
   std::stack<AppealNode*> appeal_stack;
   appeal_stack.push(mRootNode->mSortedChildren[0]);
-
-  // A map between an AppealNode and a TreeNode.
-  std::map<AppealNode*, TreeNode*> nodes_map;
 
   // 1) If all children done. Time to create tree node for 'appeal_node'
   // 2) If some are done, some not. Add the first not-done child to stack
@@ -2174,11 +2173,11 @@ ASTTree* Parser::BuildAST() {
 
     if (children_done) {
       // Create tree node when there is a rule table, or meanful tokens.
-      // Only put in the nodes_map if tree node is really created, since some
+      // Only put in the mNodeTreeMap if tree node is really created, since some
       // some tokens like separators don't need tree nodes.
-      TreeNode *sub_tree = tree->NewTreeNode(appeal_node, nodes_map);
+      TreeNode *sub_tree = tree->NewTreeNode(appeal_node);
       if (sub_tree) {
-        nodes_map.insert(std::pair<AppealNode*, TreeNode*>(appeal_node, sub_tree));
+        mNodeTreeMap.insert(std::pair<AppealNode*, TreeNode*>(appeal_node, sub_tree));
         // mRootNode is overwritten each time until the last one which is
         // the real root node.
         tree->mRootNode = sub_tree;
