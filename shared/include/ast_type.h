@@ -51,6 +51,7 @@
 #include "ruletable.h"
 #include "mempool.h"
 #include "ast.h"
+#include "ast_mempool.h"
 
 class PrimTypeNode : public TreeNode {
 private:
@@ -62,6 +63,8 @@ public:
   TypeId    GetPrimType()     {return mPrimType;}
   void SetPrimType(TypeId id) {mPrimType = id; }
   const char* GetName();  // type name
+
+  void Dump(unsigned);
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -72,8 +75,11 @@ public:
 
 class PrimTypePool {
 private:
-  SmallVector<PrimTypeNode> mTypes;
+  TreePool                   mTreePool;
+  SmallVector<PrimTypeNode*> mTypes;
+
   void Init();
+
 public:
   PrimTypePool();
   ~PrimTypePool();

@@ -44,6 +44,8 @@ public:
   TreePool(){}
   ~TreePool();
 
+  void  SetBlockSize(unsigned s) {mMP.SetBlockSize(s);}
+
   char* NewTreeNode(unsigned);
   void  Release();  // Allow user to explicitly
                     // (1) release memory by mMP

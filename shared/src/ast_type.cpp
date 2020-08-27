@@ -51,6 +51,11 @@ const char* PrimTypeNode::GetName() {
   return name;
 }
 
+void PrimTypeNode::Dump(unsigned indent) {
+  DumpIndentation(indent);
+  DUMP0_NORETURN(GetName());
+}
+
 //////////////////////////////////////////////////////////////////////////
 //                           PrimTypePool                               //
 //////////////////////////////////////////////////////////////////////////
@@ -60,7 +65,7 @@ PrimTypePool gPrimTypePool;
 
 PrimTypePool::PrimTypePool() {
   // 1024 per block could be better.
-  mTypes.SetBlockSize(1024);
+  mTreePool.SetBlockSize(1024);
   Init();
 }
 
@@ -70,9 +75,10 @@ PrimTypePool::~PrimTypePool() {
 
 void PrimTypePool::Init() {
   for (unsigned i = 0; i < TY_NA; i++) {
-    PrimTypeNode type;
-    type.SetPrimType((TypeId)i);
-    mTypes.PushBack(type);
+    PrimTypeNode *n = (PrimTypeNode*)mTreePool.NewTreeNode(sizeof(PrimTypeNode));
+    new (n) PrimTypeNode();
+    n->SetPrimType((TypeId)i);
+    mTypes.PushBack(n);
   }
 }
 
@@ -86,7 +92,7 @@ PrimTypeNode* PrimTypePool::FindType(const char *keyword) {
 
 PrimTypeNode* PrimTypePool::FindType(TypeId id) {
   for (unsigned i = 0; i < TY_NA; i++) {
-    PrimTypeNode *type = mTypes.RefAtIndex(i);
+    PrimTypeNode *type = mTypes.ValueAtIndex(i);
     if (type->GetPrimType() == id)
       return type;
   }
