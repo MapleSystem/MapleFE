@@ -152,8 +152,16 @@ TreeNode* ASTTree::NewTreeNode(AppealNode *appeal_node) {
     return sub_tree;
 
   // It's possible that the Rule has no action, meaning it cannot create tree node.
-  // In this case, we will take the child's tree node if it has one and only one
-  // sub tree.
+  // Now we have to do some manipulation. Please check if you need all of them.
+  sub_tree = Manipulate(appeal_node);
+  MASSERT(sub_tree);
+
+  return sub_tree;
+}
+
+TreeNode* ASTTree::Manipulate(AppealNode *appeal_node) {
+  TreeNode *sub_tree = NULL;
+
   std::vector<TreeNode*> child_trees;
   std::vector<AppealNode*>::iterator cit = appeal_node->mSortedChildren.begin();
   for (; cit != appeal_node->mSortedChildren.end(); cit++) {
@@ -163,6 +171,7 @@ TreeNode* ASTTree::NewTreeNode(AppealNode *appeal_node) {
     }
   }
 
+  // If we have one and only one child's tree node, we take it.
   if (child_trees.size() == 1) {
     sub_tree = child_trees[0];
     if (sub_tree)
@@ -177,19 +186,13 @@ TreeNode* ASTTree::NewTreeNode(AppealNode *appeal_node) {
   if (child_trees.size() == 2) {
     TreeNode *child_a = child_trees[0];
     TreeNode *child_b = child_trees[1];
-    if (child_b->IsUnaOperator()) {
-      UnaOperatorNode *unary = (UnaOperatorNode*)child_b;
-      unsigned property = GetOperatorProperty(unary->GetOprId());
-      if ((property & Binary) && (property & Unary)) {
-        std::cout << "Convert unary --> binary" << std::endl;
-        TreeNode *unary_sub = unary->GetOpnd();
-        TreeNode *binary = BuildBinaryOperation(child_a, unary_sub, unary->GetOprId());
-        return binary;
-      }
-    }
+    sub_tree = Manipulate2Binary(child_a, child_b);
+    if (sub_tree)
+      return sub_tree;
   }
 
-  // In the end, we will put subtrees into a PassNode to pass to parent.
+  // In the end, if we still have no suitable solution to create the tree,
+  //  we will put subtrees into a PassNode to pass to parent.
   if (child_trees.size() > 0) {
     PassNode *pass = BuildPassNode();
     std::vector<TreeNode*>::iterator child_it = child_trees.begin();
@@ -199,6 +202,20 @@ TreeNode* ASTTree::NewTreeNode(AppealNode *appeal_node) {
   }
 
   MASSERT(0 && "We got a broken AST tree, not connected sub tree.");
+}
+
+TreeNode* ASTTree::Manipulate2Binary(TreeNode *child_a, TreeNode *child_b) {
+  if (child_b->IsUnaOperator()) {
+    UnaOperatorNode *unary = (UnaOperatorNode*)child_b;
+    unsigned property = GetOperatorProperty(unary->GetOprId());
+    if ((property & Binary) && (property & Unary)) {
+      std::cout << "Convert unary --> binary" << std::endl;
+      TreeNode *unary_sub = unary->GetOpnd();
+      TreeNode *binary = BuildBinaryOperation(child_a, unary_sub, unary->GetOprId());
+      return binary;
+    }
+  }
+  return NULL;
 }
 
 void ASTTree::Dump(unsigned indent) {

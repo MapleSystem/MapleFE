@@ -880,6 +880,8 @@ private:
   // We need a set of functions to deal with some common manipulations of
   // most languages during AST Building. You can disable it if some functions
   // are not what you want.
+  TreeNode* Manipulate(AppealNode*);
+  TreeNode* Manipulate2Binary(TreeNode*, TreeNode*);
 
 public:
   ASTTree();
