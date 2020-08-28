@@ -180,12 +180,24 @@ TreeNode* ASTTree::Manipulate(AppealNode *appeal_node) {
       MERROR("We got a broken AST tree, not connected sub tree.");
   }
 
-  // There are cases like a+b could be parsed as "a" and "+b", a symbol and a
-  // unary operation. However, we do prefer binary operation than unary. So a
-  // combination is needed here, especially when the parent node is NULL.
+  // For the tree having two children, there are a few approaches to further
+  // manipulate them in order to obtain better AST.
+  //
+  // 1. There are cases like (type)value, but they are not recoganized as cast.
+  //    Insteand they are seperated into two nodes, one is (type), the other value.
+  //    So we define ParenthesisNode for (type), and build a CastNode over here.
+  //
+  // 2. There are cases like a+b could be parsed as "a" and "+b", a symbol and a
+  //    unary operation. However, we do prefer binary operation than unary. So a
+  //    combination is needed here, especially when the parent node is NULL.
   if (child_trees.size() == 2) {
     TreeNode *child_a = child_trees[0];
     TreeNode *child_b = child_trees[1];
+
+    sub_tree = Manipulate2Cast(child_a, child_b);
+    if (sub_tree)
+      return sub_tree;
+
     sub_tree = Manipulate2Binary(child_a, child_b);
     if (sub_tree)
       return sub_tree;
@@ -202,6 +214,18 @@ TreeNode* ASTTree::Manipulate(AppealNode *appeal_node) {
   }
 
   MASSERT(0 && "We got a broken AST tree, not connected sub tree.");
+}
+
+TreeNode* ASTTree::Manipulate2Cast(TreeNode *child_a, TreeNode *child_b) {
+  if (child_a->IsParenthesis()) {
+    ParenthesisNode *type = (ParenthesisNode*)child_a;
+    CastNode *n = (CastNode*)mTreePool.NewTreeNode(sizeof(CastNode));
+    new (n) CastNode();
+    n->SetDestType(type->GetExpr());
+    n->SetExpr(child_b);
+    return n;
+  }
+  return NULL;
 }
 
 TreeNode* ASTTree::Manipulate2Binary(TreeNode *child_a, TreeNode *child_b) {
@@ -260,6 +284,17 @@ void TreeNode::DumpLabel(unsigned ind) {
 void TreeNode::DumpIndentation(unsigned ind) {
   for (unsigned i = 0; i < ind; i++)
     DUMP0_NORETURN(' ');
+}
+
+//////////////////////////////////////////////////////////////////////////////////////
+//                          ParenthesisNode
+//////////////////////////////////////////////////////////////////////////////////////
+
+void ParenthesisNode::Dump(unsigned indent) {
+  DumpIndentation(indent);
+  DUMP0_NORETURN('(');
+  mExpr->Dump(0);
+  DUMP0_NORETURN(')');
 }
 
 //////////////////////////////////////////////////////////////////////////////////////

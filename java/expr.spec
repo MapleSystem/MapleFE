@@ -52,6 +52,7 @@ rule PrimaryNoNewArray : ONEOF(
   ArrayAccess,
   MethodInvocation,
   MethodReference)
+  attr.action.%5 : BuildParenthesis(%2)
 
 rule ClassInstanceCreationExpression : ONEOF(
   UnqualifiedClassInstanceCreationExpression,

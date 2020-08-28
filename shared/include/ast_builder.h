@@ -89,6 +89,7 @@ public:
   TreeNode* BuildPostfixOperation();
   TreeNode* BuildBinaryOperation();
   TreeNode* BuildCast();
+  TreeNode* BuildParenthesis();
 
   TreeNode* BuildDecl();
   TreeNode* BuildField();

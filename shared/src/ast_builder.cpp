@@ -155,6 +155,26 @@ static void add_type_to(TreeNode *tree, TreeNode *type) {
 //                      Major Functions to build the tree
 ////////////////////////////////////////////////////////////////////////////////////////
 
+// Takes one argument, the expression of the parenthesis
+TreeNode* ASTBuilder::BuildParenthesis() {
+  if (mTrace)
+    std::cout << "In BuildParenthesis" << std::endl;
+
+  TreeNode *expr = NULL;
+
+  MASSERT(mParams.size() == 1);
+  Param p = mParams[0];
+  MASSERT(!p.mIsEmpty && p.mIsTreeNode);
+  expr = p.mData.mTreeNode;
+
+  ParenthesisNode *n = (ParenthesisNode*)mTreePool->NewTreeNode(sizeof(ParenthesisNode));
+  new (n) ParenthesisNode();
+  n->SetExpr(expr);
+
+  mLastTreeNode = n;
+  return mLastTreeNode;
+}
+
 // For first parameter has to be an operator.
 TreeNode* ASTBuilder::BuildCast() {
   if (mTrace)

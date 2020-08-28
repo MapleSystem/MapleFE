@@ -316,6 +316,31 @@ public:
 };
 
 //////////////////////////////////////////////////////////////////////////
+//                           ParenthesisNode
+// In many languages like Java, c, c++, an Cast Expression has common
+// patten like (TypeExpr)ValueExpr. The type is represented by a parenthesis
+// expression. However, as language designers writing the Rules of spec,
+// the (TypeExpr) and ValueExpr could be matched by different rules, which
+// are not recoganized as a cast expression. It needs some manipulation
+// after the tree is built at the first time.
+//
+// We define a Parenthesis node to help ASTTree::Manipulate2Cast().
+//////////////////////////////////////////////////////////////////////////
+
+class ParenthesisNode : public TreeNode {
+private:
+  TreeNode *mExpr;
+public:
+  ParenthesisNode() : mExpr(NULL) {mKind = NK_Parenthesis;}
+  ~ParenthesisNode(){}
+
+  TreeNode* GetExpr() {return mExpr;}
+  void SetExpr(TreeNode *t) {mExpr = t;}
+
+  void Dump(unsigned);
+};
+
+//////////////////////////////////////////////////////////////////////////
 //                           FieldNode
 // This is used for field reference. It includes both member field and
 // member function.
@@ -882,6 +907,7 @@ private:
   // are not what you want.
   TreeNode* Manipulate(AppealNode*);
   TreeNode* Manipulate2Binary(TreeNode*, TreeNode*);
+  TreeNode* Manipulate2Cast(TreeNode*, TreeNode*);
 
 public:
   ASTTree();

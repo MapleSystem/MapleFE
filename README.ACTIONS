@@ -32,6 +32,10 @@ all modules are as below.
   Block is widely used in many scenarios, like function body, class body, or just a block.
   It only takes one parameter which is the root node of block tree.
 
+* BuildParenthesis
+  Format: BuildParenthesis(Expression)
+  Returns mLastTreeNode.
+
 * BuildCast
   Format: BuildCast(DestType, Expression)
   Cast Expression to DestType. Returns mLastTreeNode.

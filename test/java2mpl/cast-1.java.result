@@ -48,11 +48,11 @@ class  Test
       var:p=new Point
       var:cp=new ColoredPoint
       var:c
-      cp Assign 
-      c Assign 
-      var:l=
+      cp Assign (ColoredPoint)p
+      c Assign (Colorable)p
+      var:l=(Long)p
       var:e=new EndPoint
-      c Assign 
+      c Assign (Colorable)e
   LocalClasses: 
   LocalInterfaces: 
 
@@ -102,11 +102,11 @@ class  Test
       var:p=new Point
       var:cp=new ColoredPoint
       var:c
-      cp Assign 
-      c Assign 
-      var:l=
+      cp Assign (ColoredPoint)p
+      c Assign (Colorable)p
+      var:l=(Long)p
       var:e=new EndPoint
-      c Assign 
+      c Assign (Colorable)e
   LocalClasses: 
   LocalInterfaces: 
 

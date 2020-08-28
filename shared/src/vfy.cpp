@@ -419,3 +419,7 @@ void Verifier::VerifyField(FieldNode *tree){
 void Verifier::VerifyCast(CastNode *tree){
   return;
 }
+
+void Verifier::VerifyParenthesis(ParenthesisNode *tree){
+  return;
+}

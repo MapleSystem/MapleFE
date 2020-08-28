@@ -23,6 +23,7 @@ NODEKIND(Attr)
 NODEKIND(PrimType)
 
 NODEKIND(Cast)
+NODEKIND(Parenthesis)
 
 // VarList is for identifier list only.
 // ExprList is for all kinds of node.
