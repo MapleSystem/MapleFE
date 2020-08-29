@@ -1,0 +1,10 @@
+This directory contains the test framework and test cases.
+The test cases are in 3 directories.
+1. java2mpl
+   This is for the Java test cases. They are correct code.
+2. errtest
+   This is for the Java test cases. They are incorrect code.
+3. others
+   This is for the Java test cases. They are taken from 3rd party open source projects,
+   in order to have a complete coverage of the testing. If you want to reuse the code
+   please read the LICENSE carefully.
