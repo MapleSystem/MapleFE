@@ -26,7 +26,7 @@
 //                this point are incomplete because a lot of information is missing
 //                and some tree nodes are temporary. For example, a variable was
 //                give a new IdentifierNode each time it appears. It doesn't point
-//                to the one which was declared before. So this type nodes need
+//                to the one which was declared before. So these nodes need
 //                be updated.
 // Locating     : Locate where in source code is wrong.
 // Logging      : Record the verification result into a log.

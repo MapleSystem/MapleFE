@@ -216,3 +216,20 @@ rule ElementValueList : ElementValue + ZEROORMORE(',' + ElementValue)
 
 rule MarkerAnnotation : '@' + TypeName
 rule SingleElementAnnotation : '@' + TypeName + '(' + ElementValue + ')'
+
+######################################################################
+#                        Package                                     #
+######################################################################
+rule PackageDeclaration: ZEROORMORE(PackageModifier) + "package" + Identifier + ZEROORMORE('.' + Identifier) + ';'
+rule PackageModifier: Annotation
+rule ImportDeclaration: ONEOF(SingleTypeImportDeclaration,
+                              TypeImportOnDemandDeclaration,
+                              SingleStaticImportDeclaration,
+                              StaticImportOnDemandDeclaration)
+rule SingleTypeImportDeclaration: "import" + TypeName + ';'
+rule TypeImportOnDemandDeclaration: "import" + PackageOrTypeName + '.' + '*' + ';'
+rule SingleStaticImportDeclaration: "import" + "static" + TypeName + '.' + Identifier + ';'
+rule StaticImportOnDemandDeclaration: "import" + "static" + TypeName + '.' + '*' + ';'
+rule TypeDeclaration: ONEOF(ClassDeclaration,
+                            InterfaceDeclaration,
+                            ';')

@@ -915,6 +915,9 @@ void Lexer::PlantTraverseRuleTable(RuleTable *table) {
 }
 
 void Lexer::PlantTokens() {
-  PlantTraverseRuleTable(&TblStatement);
+  PlantTraverseRuleTable(&TblImportDeclaration);
+  PlantTraverseRuleTable(&TblPackageDeclaration);
+  PlantTraverseRuleTable(&TblClassDeclaration);
+  PlantTraverseRuleTable(&TblInterfaceDeclaration);
 }
 

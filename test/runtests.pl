@@ -17,7 +17,7 @@ if(!(defined $ARGV[0])) {
 }
 
 if ($ARGV[0] eq 'all') {
-  @dirname = qw(java2mpl errtest);
+  @dirname = qw(java2mpl errtest others);
   print "Run java2mpl errtest\n";
 } elsif (($ARGV[0] eq 'java2mpl')) {
   @dirname = "$ARGV[0]";
