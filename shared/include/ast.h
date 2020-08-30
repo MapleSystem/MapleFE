@@ -897,7 +897,6 @@ class ASTTree {
 public:
   TreePool    mTreePool;
   TreeNode   *mRootNode;
-  ASTBuilder *mBuilder;
 
 private:
   std::map<AppealNode*, TreeNode*> *mNodeTreeMap;
@@ -914,7 +913,6 @@ public:
   ~ASTTree();
 
   TreeNode* NewTreeNode(AppealNode*);
-  void SetTraceBuild(bool b);
   void SetNodeTreeMap(std::map<AppealNode*, TreeNode*> *m) {mNodeTreeMap = m;}
 
   TreeNode* BuildBinaryOperation(TreeNode *, TreeNode *, OprId);

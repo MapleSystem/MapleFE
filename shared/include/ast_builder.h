@@ -60,10 +60,11 @@ public:
   TreePool               *mTreePool;
 
 public:
-  ASTBuilder(TreePool *p, bool trace=false) : mTreePool(p), mTrace(trace) {}
+  ASTBuilder() : mTreePool(NULL), mTrace(false) {}
   ~ASTBuilder() {}
 
   void SetTrace(bool b) {mTrace = b;}
+  void SetTreePool(TreePool *p) {mTreePool = p;}
 
   void AddParam(Param p) {mParams.push_back(p);}
   void ClearParams() {mParams.clear();}
@@ -147,4 +148,6 @@ public:
   TreeNode* AddThrowsTo();
 };
 
+// A global builder is good enough.
+extern ASTBuilder gASTBuilder;
 #endif

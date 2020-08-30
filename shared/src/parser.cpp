@@ -395,6 +395,7 @@ Token* Parser::GetActiveToken(unsigned i) {
 }
 
 bool Parser::Parse() {
+  gASTBuilder.SetTrace(mTraceAstBuild);
   bool succ = false;
   while (1) {
     succ = ParseStmt();
@@ -2150,7 +2151,6 @@ ASTTree* Parser::BuildAST() {
   mNodeTreeMap.clear();
 
   ASTTree *tree = new ASTTree();
-  tree->SetTraceBuild(mTraceAstBuild);
   tree->SetNodeTreeMap(&mNodeTreeMap);
 
   std::stack<AppealNode*> appeal_stack;

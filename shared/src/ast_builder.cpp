@@ -22,6 +22,8 @@
 
 #include "massert.h"
 
+ASTBuilder gASTBuilder;
+
 ////////////////////////////////////////////////////////////////////////////////////////
 // For the time being, we simply use a big switch-case. Later on we could use a more
 // flexible solution.

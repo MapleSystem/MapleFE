@@ -56,15 +56,10 @@ static const char* GetOperatorName(OprId opr) {
 
 ASTTree::ASTTree() {
   mRootNode = NULL;
-  mBuilder = new ASTBuilder(&mTreePool);
+  gASTBuilder.SetTreePool(&mTreePool);
 }
 
 ASTTree::~ASTTree() {
-  delete mBuilder;
-}
-
-void ASTTree::SetTraceBuild(bool b) {
-  mBuilder->SetTrace(b);
 }
 
 // Create tree node. Its children have been created tree nodes.
@@ -107,7 +102,7 @@ TreeNode* ASTTree::NewTreeNode(AppealNode *appeal_node) {
   TreeNode *sub_tree = NULL;
 
   if (appeal_node->IsToken()) {
-    sub_tree = mBuilder->CreateTokenTreeNode(appeal_node->GetToken());
+    sub_tree = gASTBuilder.CreateTokenTreeNode(appeal_node->GetToken());
     return sub_tree;
   }
 
@@ -115,8 +110,8 @@ TreeNode* ASTTree::NewTreeNode(AppealNode *appeal_node) {
 
   for (unsigned i = 0; i < rule_table->mNumAction; i++) {
     Action *action = rule_table->mActions + i;
-    mBuilder->mActionId = action->mId;
-    mBuilder->ClearParams();
+    gASTBuilder.mActionId = action->mId;
+    gASTBuilder.ClearParams();
 
     for (unsigned j = 0; j < action->mNumElem; j++) {
       // find the appeal node child
@@ -139,13 +134,13 @@ TreeNode* ASTTree::NewTreeNode(AppealNode *appeal_node) {
       } else {
         p.mIsEmpty = true;
       }
-      mBuilder->AddParam(p);
+      gASTBuilder.AddParam(p);
     }
 
     // For multiple actions of a rule, there should be only action which create tree.
     // The others are just for adding attribute or else, and return the same tree
     // with additional attributes.
-    sub_tree = mBuilder->Build();
+    sub_tree = gASTBuilder.Build();
   }
 
   if (sub_tree)
