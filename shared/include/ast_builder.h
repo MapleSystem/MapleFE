@@ -49,24 +49,15 @@ class ASTBuilder {
 private:
   bool mTrace;
 
-public:
-  // information for a single action
-  unsigned                mActionId;
-  std::vector<Param>      mParams;
-
-  TreePool               *mTreePool;
-
-private:
-  ASTScope               *mCurrScope; // current working scope.
-
   // The last created node. It will be referenced by the
   // following AddAttribute() or other functions.
   TreeNode               *mLastTreeNode;
 
-  // Some pending tree nodes exist because their rule tables don't have
-  // actions. These pending treenodes are supposed to transferred further
-  // to their ancestors, until they are consumed by one of them.
-  SmallVector<TreeNode*>  mPendingNodes;
+public:
+  // information for a single action
+  unsigned                mActionId;
+  std::vector<Param>      mParams;
+  TreePool               *mTreePool;
 
 public:
   ASTBuilder(TreePool *p, bool trace=false) : mTreePool(p), mTrace(trace) {}
