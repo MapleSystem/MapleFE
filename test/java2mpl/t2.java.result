@@ -1,9 +1,5 @@
 Matched 5 tokens.
-== Sub Tree ==
-var:a,b
 Matched 9 tokens.
-== Sub Tree ==
-a Assign 0
 ============= Module ===========
 == Sub Tree ==
 var:a,b

@@ -1,16 +1,4 @@
 Matched 22 tokens.
-== Sub Tree ==
-class  Point
-  Fields: 
-    x    y
-  Instance Initializer: 
-  Constructors: 
-    constructor  Point()  throws: 
-      y Assign y
-  Methods: 
-  LocalClasses: 
-  LocalInterfaces: 
-
 ============= Module ===========
 == Sub Tree ==
 class  Point

@@ -1,9 +1,4 @@
 Matched 13 tokens.
-== Sub Tree ==
-cond-branch cond:
-true branch :
-  return 0false branch :
-
 ============= Module ===========
 == Sub Tree ==
 cond-branch cond:

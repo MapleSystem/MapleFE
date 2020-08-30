@@ -1,20 +1,4 @@
 Matched 50 tokens.
-== Sub Tree ==
-class  Point
-  Fields: 
-    x
-  Instance Initializer: 
-  Constructors: 
-  Methods: 
-    func  foo()  throws: 
-      var:k
-      while n LT 4        k Assign n
-
-
-      System.out.println(k)
-  LocalClasses: 
-  LocalInterfaces: 
-
 ============= Module ===========
 == Sub Tree ==
 class  Point

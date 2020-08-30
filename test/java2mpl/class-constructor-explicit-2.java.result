@@ -1,31 +1,5 @@
 Matched 31 tokens.
-== Sub Tree ==
-class  Point
-  Fields: 
-    x    y
-  Instance Initializer: 
-  Constructors: 
-    constructor  Point()  throws: 
-      x Assign x
-      y Assign y
-  Methods: 
-  LocalClasses: 
-  LocalInterfaces: 
-
 Matched 92 tokens.
-== Sub Tree ==
-class  ColoredPoint
-  Fields: 
-    WHITE=0    color
-  Instance Initializer: 
-  Constructors: 
-    constructor  ColoredPoint()  throws: 
-    constructor  ColoredPoint()  throws: 
-      color Assign color
-  Methods: 
-  LocalClasses: 
-  LocalInterfaces: 
-
 ============= Module ===========
 == Sub Tree ==
 class  Point

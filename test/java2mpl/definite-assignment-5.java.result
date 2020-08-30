@@ -1,22 +1,4 @@
 Matched 37 tokens.
-== Sub Tree ==
-class  A
-  Fields: 
-
-  Instance Initializer: 
-  Constructors: 
-  Methods: 
-    func  flow()  throws: 
-      var:k
-      cond-branch cond:flag
-      true branch :
-        k Assign 3      false branch :
-
-      var:k=4
-      System.out.println(k)
-  LocalClasses: 
-  LocalInterfaces: 
-
 ============= Module ===========
 == Sub Tree ==
 class  A

@@ -1,17 +1,5 @@
 Matched 20 tokens.
 Convert unary --> binary
-== Sub Tree ==
-class  A
-  Fields: 
-
-  Instance Initializer: 
-  Constructors: 
-  Methods: 
-    func  foo()  throws: 
-      return c Add b
-  LocalClasses: 
-  LocalInterfaces: 
-
 ============= Module ===========
 == Sub Tree ==
 class  A

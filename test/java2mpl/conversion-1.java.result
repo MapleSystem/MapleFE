@@ -1,22 +1,5 @@
 Matched 65 tokens.
 Convert unary --> binary
-== Sub Tree ==
-class  Test
-  Fields: 
-
-  Instance Initializer: 
-  Constructors: 
-  Methods: 
-    func  main()  throws: 
-      var:i=(int)12.5
-      System.out.println("(int)12.5f==" Add i)
-      var:f=i
-      System.out.print(f)
-      f Assign 
-      var:d=
-  LocalClasses: 
-  LocalInterfaces: 
-
 ============= Module ===========
 == Sub Tree ==
 class  Test

@@ -1,35 +1,15 @@
 Matched 7 tokens.
-== Sub Tree ==
-var:a,b,c
 Matched 13 tokens.
 Convert unary --> binary
-== Sub Tree ==
-a Assign b Add c
 Matched 19 tokens.
 Convert unary --> binary
-== Sub Tree ==
-a Assign b Sub c
 Matched 25 tokens.
-== Sub Tree ==
-a Assign b GT c
 Matched 31 tokens.
-== Sub Tree ==
-a Assign b GE c
 Matched 37 tokens.
-== Sub Tree ==
-a Assign b LT c
 Matched 43 tokens.
-== Sub Tree ==
-a Assign b LE c
 Matched 49 tokens.
-== Sub Tree ==
-a Assign b Shl c
 Matched 55 tokens.
-== Sub Tree ==
-a Assign b Shr c
 Matched 61 tokens.
-== Sub Tree ==
-a Assign b Zext c
 ============= Module ===========
 == Sub Tree ==
 var:a,b,c

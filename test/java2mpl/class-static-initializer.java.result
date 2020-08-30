@@ -1,15 +1,4 @@
 Matched 15 tokens.
-== Sub Tree ==
-class  A
-  Fields: 
-    a
-  Instance Initializer: 
-    InstInit- 0
-  Constructors: 
-  Methods: 
-  LocalClasses: 
-  LocalInterfaces: 
-
 ============= Module ===========
 == Sub Tree ==
 class  A

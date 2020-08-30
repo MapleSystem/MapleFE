@@ -1,61 +1,8 @@
 Matched 9 tokens.
-== Sub Tree ==
-class  Point
-  Fields: 
-    x    y
-  Instance Initializer: 
-  Constructors: 
-  Methods: 
-  LocalClasses: 
-  LocalInterfaces: 
-
 Matched 20 tokens.
-== Sub Tree ==
-
 Matched 46 tokens.
-== Sub Tree ==
-class  ColoredPoint
-  Fields: 
-    color
-  Instance Initializer: 
-  Constructors: 
-  Methods: 
-    func  setColor()  throws: 
-      color Assign color
-  LocalClasses: 
-  LocalInterfaces: 
-
 Matched 53 tokens.
-== Sub Tree ==
-class  EndPoint
-  Fields: 
-
-  Instance Initializer: 
-  Constructors: 
-  Methods: 
-  LocalClasses: 
-  LocalInterfaces: 
-
 Matched 125 tokens.
-== Sub Tree ==
-class  Test
-  Fields: 
-
-  Instance Initializer: 
-  Constructors: 
-  Methods: 
-    func  main()  throws: 
-      var:p=new Point
-      var:cp=new ColoredPoint
-      var:c
-      cp Assign (ColoredPoint)p
-      c Assign (Colorable)p
-      var:l=(Long)p
-      var:e=new EndPoint
-      c Assign (Colorable)e
-  LocalClasses: 
-  LocalInterfaces: 
-
 ============= Module ===========
 == Sub Tree ==
 class  Point

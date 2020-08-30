@@ -1,20 +1,4 @@
 Matched 19 tokens.
-== Sub Tree ==
-class  A
-  Fields: 
-
-  Instance Initializer: 
-  Constructors: 
-  Methods: 
-    func  foo()  throws: 
-      cond-branch cond:a
-      true branch :
-        return 0
-      false branch :
-
-  LocalClasses: 
-  LocalInterfaces: 
-
 ============= Module ===========
 == Sub Tree ==
 class  A

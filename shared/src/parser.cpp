@@ -2189,9 +2189,7 @@ ASTTree* Parser::BuildAST() {
     }
   }
 
-  if (tree->mRootNode)
-    tree->Dump(0);
-  else
+  if (!tree->mRootNode)
     MERROR("We got a statement failed to create AST!");
 
   return tree;
