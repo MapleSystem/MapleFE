@@ -174,9 +174,37 @@ TreeNode* ASTBuilder::BuildPackageName() {
 }
 
 TreeNode* ASTBuilder::BuildSingleTypeImport() {
+  ImportNode *n = (ImportNode*)mTreePool->NewTreeNode(sizeof(ImportNode));
+  new (n) ImportNode();
+  n->SetImportSingle();
+  n->SetImportType();
+
+  MASSERT(mParams.size() == 1);
+  Param p = mParams[0];
+  MASSERT(!p.mIsEmpty && p.mIsTreeNode);
+  TreeNode *tree = p.mData.mTreeNode;
+  MASSERT(tree->IsIdentifier() || tree->IsField());
+
+  n->SetName(tree->GetName());
+  mLastTreeNode = n;
+  return mLastTreeNode;
 }
 
 TreeNode* ASTBuilder::BuildAllTypeImport() {
+  ImportNode *n = (ImportNode*)mTreePool->NewTreeNode(sizeof(ImportNode));
+  new (n) ImportNode();
+  n->SetImportAll();
+  n->SetImportType();
+
+  MASSERT(mParams.size() == 1);
+  Param p = mParams[0];
+  MASSERT(!p.mIsEmpty && p.mIsTreeNode);
+  TreeNode *tree = p.mData.mTreeNode;
+  MASSERT(tree->IsIdentifier() || tree->IsField());
+
+  n->SetName(tree->GetName());
+  mLastTreeNode = n;
+  return mLastTreeNode;
 }
 
 TreeNode* ASTBuilder::BuildSingleStaticImport() {

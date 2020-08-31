@@ -236,7 +236,7 @@ rule TypeImportOnDemandDeclaration: "import" + PackageOrTypeName + '.' + '*' + '
 rule SingleStaticImportDeclaration: "import" + "static" + TypeName + '.' + Identifier + ';'
   attr.action : BuildSingleStaticImport(%3, %4)
 rule StaticImportOnDemandDeclaration: "import" + "static" + TypeName + '.' + '*' + ';'
-  attr.action : BuildAllStaticImport(%3, %4)
+  attr.action : BuildAllStaticImport(%3)
 
 rule TypeDeclaration: ONEOF(ClassDeclaration,
                             InterfaceDeclaration,
