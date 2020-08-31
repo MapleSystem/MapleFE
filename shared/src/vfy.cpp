@@ -423,3 +423,11 @@ void Verifier::VerifyCast(CastNode *tree){
 void Verifier::VerifyParenthesis(ParenthesisNode *tree){
   return;
 }
+
+void Verifier::VerifyPackage(PackageNode *tree){
+  return;
+}
+
+void Verifier::VerifyImport(ImportNode *tree){
+  return;
+}

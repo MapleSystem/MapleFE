@@ -16,6 +16,9 @@
 // This file defines the AST Node Kind list. It is shared nodes among different languages.
 // Each language can have its own unique set of noke kind list, and be included too.
 
+NODEKIND(Package)
+NODEKIND(Import)
+
 NODEKIND(Identifier)
 NODEKIND(Field)
 NODEKIND(Dimension)

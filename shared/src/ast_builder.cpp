@@ -19,6 +19,7 @@
 #include "ast_scope.h"
 #include "ast_attr.h"
 #include "ast_type.h"
+#include "ast_module.h"
 
 #include "massert.h"
 
@@ -158,6 +159,18 @@ static void add_type_to(TreeNode *tree, TreeNode *type) {
 ////////////////////////////////////////////////////////////////////////////////////////
 
 TreeNode* ASTBuilder::BuildPackageName() {
+  MASSERT(!gModule.mPackage);
+  MASSERT(mLastTreeNode->IsField() || mLastTreeNode->IsIdentifier());
+
+  PackageNode *n = (PackageNode*)mTreePool->NewTreeNode(sizeof(PackageNode));
+  new (n) PackageNode();
+  const char *name = mLastTreeNode->GetName();
+  n->SetName(name);
+
+  gModule.SetPackage(n);
+
+  mLastTreeNode = n;
+  return mLastTreeNode;
 }
 
 TreeNode* ASTBuilder::BuildSingleTypeImport() {
@@ -749,13 +762,32 @@ TreeNode* ASTBuilder::BuildField() {
   // The second param should be an IdentifierNode
   TreeNode *node_a = p_var_a.mIsEmpty ? NULL : p_var_a.mData.mTreeNode;
   TreeNode *node_b = p_var_b.mIsEmpty ? NULL : p_var_b.mData.mTreeNode;
-  MASSERT(node_b->IsIdentifier());
 
-  FieldNode *field = (FieldNode*)mTreePool->NewTreeNode(sizeof(FieldNode));
-  new (field) FieldNode();
-  field->SetParent(node_a);
-  field->SetField(node_b);
-  field->Init();
+  FieldNode *field = NULL;
+
+  if (node_b->IsPass()) {
+    TreeNode *parent = node_a;
+    PassNode *pass = (PassNode*)node_b;
+    for (unsigned i = 0; i < pass->GetChildrenNum(); i++) {
+      TreeNode *child = pass->GetChild(i);
+      MASSERT(child->IsIdentifier());
+
+      field = (FieldNode*)mTreePool->NewTreeNode(sizeof(FieldNode));
+      new (field) FieldNode();
+      field->SetParent(parent);
+      field->SetField(child);
+      field->Init();
+
+      parent = field;
+    }
+  } else {
+    MASSERT(node_b->IsIdentifier());
+    field = (FieldNode*)mTreePool->NewTreeNode(sizeof(FieldNode));
+    new (field) FieldNode();
+    field->SetParent(node_a);
+    field->SetField(node_b);
+    field->Init();
+  }
 
   mLastTreeNode = field;
   return mLastTreeNode;

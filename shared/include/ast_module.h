@@ -26,9 +26,9 @@ class ASTScope;
 
 // The module is a member of class Parser.
 class ASTModule {
-private:
-  const char *mFileName;
-  const char *mPackage;
+public:
+  const char              *mFileName;
+  PackageNode             *mPackage;
   SmallVector<ImportNode*> mImports;
 public:
   std::vector<ASTTree*>  mTrees;  // All trees in the module. There is no root tree
@@ -45,7 +45,7 @@ public:
   ~ASTModule();
 
   void SetFileName(const char *f) {mFileName = f;}
-  void SetPackage(const char *p);
+  void SetPackage(PackageNode *p);
   void AddImport(ImportNode *imp) {mImports.PushBack(imp);}
 
   void AddTree(ASTTree* t) { mTrees.push_back(t); }

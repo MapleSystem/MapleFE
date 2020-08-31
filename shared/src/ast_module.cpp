@@ -37,7 +37,7 @@ ASTModule::~ASTModule() {
 }
 
 // AFAIK, all languages allow only one package name if it allows.
-void ASTModule::SetPackage(const char *p) {
+void ASTModule::SetPackage(PackageNode *p) {
   MASSERT(!mPackage);
   mPackage = p;
 }

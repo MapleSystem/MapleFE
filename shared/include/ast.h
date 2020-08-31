@@ -99,6 +99,22 @@ public:
 };
 
 //////////////////////////////////////////////////////////////////////////
+//                     Package Node
+//////////////////////////////////////////////////////////////////////////
+
+class PackageNode : public TreeNode {
+private:
+  const char *mName;   // name to include. In c/c++ it's file name
+public:
+  PackageNode() : mName(NULL) {mKind = NK_Package;}
+  PackageNode(const char *s) : mName(s) {mKind = NK_Package;}
+  ~PackageNode() {}
+
+  void SetName(const char *s) {mName = s;}
+  void Dump(unsigned indent);
+};
+
+//////////////////////////////////////////////////////////////////////////
 //                     Import Node
 // Java import, c/c++ include, are the same scenarios. We just save the
 // original string and let the language's verifier to check. We do borrow
@@ -124,7 +140,7 @@ private:
                        // In java, it's type or static member.
   unsigned    mProperty;
 public:
-  ImportNode() {mName = NULL; mProperty = 0;}
+  ImportNode() {mName = NULL; mProperty = 0; mKind = NK_Import;}
   ~ImportNode(){}
 
   void SetName(const char *s) {mName = s;}
@@ -142,6 +158,8 @@ public:
   bool IsImportAll()    {return mProperty & ImpAll;}
   bool IsImportLocal()  {return mProperty & ImpLocal;}
   bool IsImportSystem() {return mProperty & ImpSystem;}
+
+  void Dump(unsigned indent);
 };
 
 //////////////////////////////////////////////////////////////////////////
