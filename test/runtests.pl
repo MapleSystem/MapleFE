@@ -11,7 +11,7 @@ my $pwd = getcwd;
 
 if(!(defined $ARGV[0])) {
   print "------------------------------------------------\n";
-  print "usage: runtests.pl all or java2mpl\n";
+  print "usage: runtests.pl all or java2mpl or errtest or others\n";
   print "------------------------------------------------\n";
   exit;
 }
@@ -23,6 +23,9 @@ if ($ARGV[0] eq 'all') {
   @dirname = "$ARGV[0]";
   print "Run $ARGV[0] test\n";
 } elsif (($ARGV[0] eq 'errtest')) {
+  @dirname = "$ARGV[0]";
+  print "Run $ARGV[0] test\n";
+} elsif (($ARGV[0] eq 'others')) {
   @dirname = "$ARGV[0]";
   print "Run $ARGV[0] test\n";
 } else {
@@ -96,6 +99,9 @@ foreach my $dir (@dirname) {
         if ($dir eq "errtest") {
           $res = system("cd $pwd/..; build64/java/java2mpl $outdir/$src_file > $outdir/$result_file");
         }
+        if ($dir eq "others") {
+          $res = system("cd $pwd/..; build64/java/java2mpl $outdir/$src_file > $outdir/$result_file");
+        }
         
         if ($res > 0) {
 #print "over here1...\n";
@@ -103,6 +109,9 @@ foreach my $dir (@dirname) {
             print "$pwd/../build64/java/java2mpl $outdir/$src_file\n";
           }
           if ($dir eq "errtest") { 
+            print "$pwd/../build64/java/java2mpl $outdir/$src_file\n";
+          }
+          if ($dir eq "others") {
             print "$pwd/../build64/java/java2mpl $outdir/$src_file\n";
           }
           print " ==$dir===> $file\n";
