@@ -20,6 +20,7 @@ ASTModule gModule;
 
 ASTModule::ASTModule() {
   mRootScope = mScopePool.NewScope(NULL);
+  mPackage = NULL;
 }
 
 ASTModule::~ASTModule() {
@@ -31,6 +32,14 @@ ASTModule::~ASTModule() {
       delete tree;
   }
   mTrees.clear();
+
+  mImports.Release();
+}
+
+// AFAIK, all languages allow only one package name if it allows.
+void ASTModule::SetPackage(const char *p) {
+  MASSERT(!mPackage);
+  mPackage = p;
 }
 
 // Return a new scope newly created.

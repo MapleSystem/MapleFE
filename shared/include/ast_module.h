@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "ast_scope.h"
+#include "container.h"
 
 class ASTTree;
 class ASTScope;
@@ -27,6 +28,8 @@ class ASTScope;
 class ASTModule {
 private:
   const char *mFileName;
+  const char *mPackage;
+  SmallVector<ImportNode*> mImports;
 public:
   std::vector<ASTTree*>  mTrees;  // All trees in the module. There is no root tree
                                   // which covers all the others.
@@ -42,6 +45,9 @@ public:
   ~ASTModule();
 
   void SetFileName(const char *f) {mFileName = f;}
+  void SetPackage(const char *p);
+  void AddImport(ImportNode *imp) {mImports.PushBack(imp);}
+
   void AddTree(ASTTree* t) { mTrees.push_back(t); }
 
   ASTScope* NewScope(ASTScope *p);

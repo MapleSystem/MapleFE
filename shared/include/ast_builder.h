@@ -75,6 +75,14 @@ public:
 
   TreeNode* Build();
 
+  TreeNode* BuildPackageName();
+
+  TreeNode* BuildSingleTypeImport();
+  TreeNode* BuildAllTypeImport();
+  TreeNode* BuildSingleStaticImport();
+  TreeNode* BuildAllStaticImport();
+  TreeNode* BuildAllImport();
+
   TreeNode* BuildBlock();
 
   TreeNode* BuildUnaryOperation();

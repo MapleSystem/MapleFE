@@ -27,6 +27,13 @@ all modules are as below.
 [Format] The Format tells the parameters it needs when writing .spec files.
          It also shows the internal parameters when parser creates the AST tree node.
 
+* BuildField
+  Format: BuildField(parent, field-name)
+  It takes two arguments. The first is parent tree node. The second is the field.
+  It also handles a much more complicated case, where 'field-name' is actually a list
+  of identifiers. This actually tells more than one levels down to the children
+  fields.
+
 * BuildBlock
   Format: BuildBlock(block-tree)
   Block is widely used in many scenarios, like function body, class body, or just a block.

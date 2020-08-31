@@ -220,16 +220,24 @@ rule SingleElementAnnotation : '@' + TypeName + '(' + ElementValue + ')'
 ######################################################################
 #                        Package                                     #
 ######################################################################
-rule PackageDeclaration: ZEROORMORE(PackageModifier) + "package" + Identifier + ZEROORMORE('.' + Identifier) + ';'
 rule PackageModifier: Annotation
+rule PackageDeclaration: ZEROORMORE(PackageModifier) + "package" + Identifier + ZEROORMORE('.' + Identifier) + ';'
+  attr.action : BuildField(%3, %4)
+  attr.action : BuildPackageName()
+
 rule ImportDeclaration: ONEOF(SingleTypeImportDeclaration,
                               TypeImportOnDemandDeclaration,
                               SingleStaticImportDeclaration,
                               StaticImportOnDemandDeclaration)
 rule SingleTypeImportDeclaration: "import" + TypeName + ';'
+  attr.action : BuildSingleTypeImport(%2)
 rule TypeImportOnDemandDeclaration: "import" + PackageOrTypeName + '.' + '*' + ';'
+  attr.action : BuildAllTypeImport(%2)
 rule SingleStaticImportDeclaration: "import" + "static" + TypeName + '.' + Identifier + ';'
+  attr.action : BuildSingleStaticImport(%3, %4)
 rule StaticImportOnDemandDeclaration: "import" + "static" + TypeName + '.' + '*' + ';'
+  attr.action : BuildAllStaticImport(%3, %4)
+
 rule TypeDeclaration: ONEOF(ClassDeclaration,
                             InterfaceDeclaration,
                             ';')

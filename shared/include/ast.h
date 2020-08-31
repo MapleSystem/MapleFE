@@ -99,6 +99,52 @@ public:
 };
 
 //////////////////////////////////////////////////////////////////////////
+//                     Import Node
+// Java import, c/c++ include, are the same scenarios. We just save the
+// original string and let the language's verifier to check. We do borrow
+// the idea from Java so as to separate type.vs.static and single.vs.ondemand.
+// We also borrow the idea of system directory vs. local directory from c/c++.
+//////////////////////////////////////////////////////////////////////////
+
+enum ImportProperty {
+  ImpType = 1,        // Java like, import type
+  ImpStatic = 1 << 1, // Java like, import static field.
+                      // If we don't specify the data type of imported, it's
+                      // everything. This is c/c++ style.
+  ImpSingle = 1 << 2,
+  ImpAll = 1 << 3,    // Java's OnDemand import. c/c++ style too.
+
+  ImpLocal = 1 << 4,
+  ImpSystem = 1 << 5
+};
+
+class ImportNode : public TreeNode {
+private:
+  const char *mName;   // name to include. In c/c++ it's file name
+                       // In java, it's type or static member.
+  unsigned    mProperty;
+public:
+  ImportNode() {mName = NULL; mProperty = 0;}
+  ~ImportNode(){}
+
+  void SetName(const char *s) {mName = s;}
+  const char* GetName() {return mName;}
+
+  void SetImportType()   {mProperty |= ImpType;}
+  void SetImportStatic() {mProperty |= ImpStatic;}
+  void SetImportSingle() {mProperty |= ImpSingle;}
+  void SetImportAll()    {mProperty |= ImpAll;}
+  void SetImportLocal()  {mProperty |= ImpLocal;}
+  void SetImportSystem() {mProperty |= ImpSystem;}
+  bool IsImportType()   {return mProperty & ImpType;}
+  bool IsImportStatic() {return mProperty & ImpStatic;}
+  bool IsImportSingle() {return mProperty & ImpSingle;}
+  bool IsImportAll()    {return mProperty & ImpAll;}
+  bool IsImportLocal()  {return mProperty & ImpLocal;}
+  bool IsImportSystem() {return mProperty & ImpSystem;}
+};
+
+//////////////////////////////////////////////////////////////////////////
 //              Operator Nodes
 //////////////////////////////////////////////////////////////////////////
 

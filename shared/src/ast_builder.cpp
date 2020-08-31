@@ -157,6 +157,24 @@ static void add_type_to(TreeNode *tree, TreeNode *type) {
 //                      Major Functions to build the tree
 ////////////////////////////////////////////////////////////////////////////////////////
 
+TreeNode* ASTBuilder::BuildPackageName() {
+}
+
+TreeNode* ASTBuilder::BuildSingleTypeImport() {
+}
+
+TreeNode* ASTBuilder::BuildAllTypeImport() {
+}
+
+TreeNode* ASTBuilder::BuildSingleStaticImport() {
+}
+
+TreeNode* ASTBuilder::BuildAllStaticImport() {
+}
+
+TreeNode* ASTBuilder::BuildAllImport() {
+}
+
 // Takes one argument, the expression of the parenthesis
 TreeNode* ASTBuilder::BuildParenthesis() {
   if (mTrace)

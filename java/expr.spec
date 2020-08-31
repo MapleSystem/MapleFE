@@ -11,29 +11,28 @@
 # FIT FOR A PARTICULAR PURPOSE.
 # See the Mulan PSL v1 for more details.
 #
-###################################################################################
-# This file defines the Java Expr
-# https://docs.oracle.com/javase/specs/jls/se12/html/jls-15.html
-###################################################################################
 
 # I just put all TO-DO rules here
 rule Class    : "class"
 
 rule ArrayInitializer : "arrayinitializer"
 
-rule PackageName : ONEOF(Identifier,
-                         PackageName + '.' + Identifier)
-rule TypeName    : ONEOF(Identifier,
-                         PackageOrTypeName + '.' + Identifier)
+rule PackageName : ONEOF(Identifier, PackageName + '.' + Identifier)
   attr.action.%2 : BuildField(%1, %3)
 
-rule PackageOrTypeName : ONEOF(Identifier,
-                               PackageOrTypeName + '.' + Identifier)
-rule ExpressionName : ONEOF(Identifier,
-                            AmbiguousName + '.' + Identifier)
+rule TypeName    : ONEOF(Identifier, PackageOrTypeName + '.' + Identifier)
+  attr.action.%2 : BuildField(%1, %3)
+
+rule PackageOrTypeName : ONEOF(Identifier, PackageOrTypeName + '.' + Identifier)
+  attr.action.%2 : BuildField(%1, %3)
+
+rule ExpressionName : ONEOF(Identifier, AmbiguousName + '.' + Identifier)
+  attr.action.%2 : BuildField(%1, %3)
+
 rule MethodName     : Identifier
-rule AmbiguousName  : ONEOF(Identifier,
-                            AmbiguousName + '.' + Identifier)
+
+rule AmbiguousName  : ONEOF(Identifier, AmbiguousName + '.' + Identifier)
+  attr.action.%2 : BuildField(%1, %3)
 
 rule ClassLiteral : ONEOF(
   TypeName + ZEROORMORE('[' + ']') + '.' + Class,
