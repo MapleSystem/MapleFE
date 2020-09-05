@@ -93,13 +93,10 @@ rule ExceptionType     : ONEOF(ClassType, TypeVariable)
 rule MethodModifier    : ONEOF(Annotation, "public", "protected", "private", "abstract", "static",
                                "final", "synchronized", "native", "strictfp")
 
-# The Java Lang Spec v8 about FormalParameterList is wrong. It doesn't have a ZEROORONE op
-# enclosing the LastFormalParameter, in which case the parser will match all the tokens
-# of parameters before it goes to LastFormalParameter, which in turn cause LastFormalParameter
-# left un-matched. So I added ZEROORONE to fix it.
 rule FormalParameterList : ONEOF(ReceiverParameter,
-                                 FormalParameters + ZEROORONE(',' + LastFormalParameter),
+                                 FormalParameters + ',' + LastFormalParameter,
                                  LastFormalParameter)
+  attr.action.%2: BuildVarList(%1, %3)
 rule FormalParameters  : ONEOF(FormalParameter + ZEROORMORE(',' + FormalParameter),
                                ReceiverParameter + ZEROORMORE(',' + FormalParameter))
   attr.action.%1: BuildVarList(%1, %2)

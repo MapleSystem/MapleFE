@@ -1567,16 +1567,27 @@ void Parser::SortOutZeroormore(AppealNode *parent) {
   // There is only failed child which is the last one. Remember in TraverseZeroormore() we
   // keep trying until the last one is faile? So at this point we will first skip the
   // last failed child node.
+  //
+  // It's possible that some of succ children are redundant and should be removed by
+  // sort out. This is done through checking the parent_match.
 
   AppealNode *failed = parent->mChildren.back();
   std::vector<AppealNode*>::iterator childit = parent->mChildren.begin();
+  bool found = false;
   for (; childit != parent->mChildren.end(); childit++) {
     AppealNode *child = *childit;
     if (child != failed) {
+      // It's guaranteed by TraverseZeroormore(), the matching tokens are increasing
+      // for each child. So the first child having parent_match is the ending point.
       parent->mSortedChildren.push_back(child);
       child->SetParent(parent);
+      if (child->FindMatch(parent_match)) {
+        found = true;
+        break;
+      }
     }
   }
+  MASSERT(found);
 
   unsigned last_match = parent_start - 1;
 
