@@ -45,7 +45,7 @@ void Parser::PushRecStack(unsigned group_id, RecursionTraversal *rectra, unsigne
 // We arrive here only when the first time we hit this RecursionGroup because
 // 1. All the 2nd appearance (of all LeadNodes) of all instance is caught by
 //    TraverseRuleTable() before entering this function.
-// 2. All the 1st appearance (of the first LeadNode) of all instances is done by
+// 2. All the 1st appearance (of the mast LeadNode) of all instances is done by
 //    FindInstance() and then TraverseRuleTableRegular().
 //                       --- OR ---
 // we arrive TraverseLeadNode because it's the first time we hit 'other' LeadNodes
@@ -203,6 +203,12 @@ bool RecursionTraversal::FindInstances() {
   bool temp_found = FindFirstInstance();
   found |= temp_found;
   while (temp_found) {
+    // Copy the match info to mSelf
+    AppealNode *prev_lead = mLeadNodes.ValueAtIndex(0);
+    mSelf->CopyMatch(prev_lead);
+    mSelf->AddChild(prev_lead);
+    prev_lead->AddParent(mSelf);
+
     // Move current mLeadNodes to mPrevLeadNodes
     mPrevLeadNodes.Clear();
     for (unsigned i = 0; i < mLeadNodes.GetNum(); i++)

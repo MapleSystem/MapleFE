@@ -1,8 +1,8 @@
 // This is a test file taken from open source project.
 // https://github.com/eugenp/tutorials/blob/master/jmh/src/main/java/com/baeldung/bitset/Plotter.java
 package com.baeldung.bitset;
-//import org.openjdk.jol.info.ClassLayout;
-//import org.openjdk.jol.info.GraphLayout;
+import org.openjdk.jol.info.ClassLayout;
+import org.openjdk.jol.info.GraphLayout;
 //
 //import java.io.BufferedWriter;
 //import java.io.IOException;

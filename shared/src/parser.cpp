@@ -585,7 +585,6 @@ void Parser::DumpExitTable(const char *table_name, unsigned indent, bool succ, A
 // We need prepare certain storage for multiple possible matchings. The successful token
 // number could be more than one. I'm using fixed array to save them. If needed to extend
 // in the future, just extend it.
-#define MAX_SUCC_TOKENS 16
 unsigned gSuccTokensNum;
 unsigned gSuccTokens[MAX_SUCC_TOKENS];
 
@@ -903,8 +902,10 @@ bool Parser::TraverseRuleTableRegular(RuleTable *rule_table, AppealNode *parent)
   }
 
   if(matched) {
+
     // If parent WasSucc before entering this function, and have the same
     // or bigger longest match, it's StillWasSucc. Don't need update succinfo.
+
     unsigned longest = 0;
     for (unsigned i = 0; i < gSuccTokensNum; i++) {
       unsigned m = gSuccTokens[i];
@@ -1160,133 +1161,83 @@ bool Parser::TraverseOneof(RuleTable *rule_table, AppealNode *parent) {
   return found;
 }
 
-// For concatenate rule, we need take care second try.
-// There could be many different scenarios, but we only do it for a simplest case, in which
-// a multiple matching element followed by a failed element.
 //
-// We also need take care of the gSuccTokensNum and gSuccTokens for Concatenate node.
 // [NOTE] 1. There could be an issue of matching number explosion. Each node could have
 //           multiple matchings, and when they are concatenated the number would be
-//           matchings_1 * matchings_2 * ...
-//        2. The good thing is each following node start to match from the new mCurToken
-//           after the previous node. This means we are actually assuming there is only
-//           one matching in previous node even it actually has multiple matchings.
-//        3. Only the last node could be allowed to have multiple matchings to transfer to
-//           the caller.
-//        4. The gSuccTokensNum/gSuccTokens need be taken care since in a rule like below
+//           matchings_1 * matchings_2 * ... This needs to be taken care of since we need
+//           all the possible matches so that later nodes can still have opportunity.
+//        2. Each node will try all starting tokens which are the ending token of previous
+//           node.
+//        3. We need take care of the gSuccTokensNum and gSuccTokens carefully. Eg.
+//           The gSuccTokensNum/gSuccTokens need be taken care in a rule like below
 //              rule AA : BB + CC + ZEROORONE(xxx)
 //           If ZEROORONE(xxx) doesn't match anything, it sets gSuccTokensNum to 0. However
-//           rule AA matches multiple tokens. So gSuccTokensNum needs to be accumulated.
+//           rule AA matches multiple tokens. So gSuccTokensNum needs to be recalculated.
+//        4. We are going to take succ match info from SuccMatch, not from a specific
+//           AppealNode. SuccMatch has the complete info.
+//
+bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *parent) {
+  // Init found to true.
+  bool found = true;
 
-// 'start' tells which child rule to start the matching. It's mainly used in FronNode matching
-// where FronNode could start from the middle of a set of Concatenate children. Most of
-// the time start is 0.
-bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *parent, unsigned start) {
-  bool found = false;
   unsigned prev_succ_tokens_num = 0;
   unsigned prev_succ_tokens[MAX_SUCC_TOKENS];
-
-  // Curr status, it could be failure.
-  unsigned curr_succ_tokens_num = 0;
-  unsigned curr_succ_tokens[MAX_SUCC_TOKENS];
 
   // Final status. It only saves the latest successful status.
   unsigned final_succ_tokens_num = 0;
   unsigned final_succ_tokens[MAX_SUCC_TOKENS];
 
-  // Make sure it's 0 when fail
+  // Make sure it's 0 when fail and restore mCurToken;
   gSuccTokensNum = 0;
+  unsigned saved_mCurToken = mCurToken;
 
-  for (unsigned i = start; i < rule_table->mNum; i++) {
+  // prepare the prev_succ_tokens[_num] for the 1st iteration.
+  prev_succ_tokens_num = 1;
+  prev_succ_tokens[0] = mCurToken - 1;
+
+  for (unsigned i = 0; i < rule_table->mNum; i++) {
     TableData *data = rule_table->mData + i;
-    found = TraverseTableData(data, parent);
 
-    curr_succ_tokens_num = gSuccTokensNum;
-    for (unsigned id = 0; id < gSuccTokensNum; id++)
-      curr_succ_tokens[id] = gSuccTokens[id];
+    // A set of results of current subtable
+    bool found_subtable = false;
+    unsigned subtable_tokens_num = 0;
+    unsigned subtable_succ_tokens[MAX_SUCC_TOKENS];
 
-    if (found) {
-      // for Zeroorone/Zeroormore node, it set found to true, but actually it may matching
-      // nothing. In this case, we don't change final_succ_tokens_num.
-      if (gSuccTokensNum > 0) {
-        final_succ_tokens_num = gSuccTokensNum;
-        for (unsigned id = 0; id < gSuccTokensNum; id++)
-          final_succ_tokens[id] = gSuccTokens[id];
-      }
-    } else {
-      MASSERT((gSuccTokensNum == 0) || ((gSuccTokensNum == 1) && (data->mType == DT_Token))
-               && "failed case has >=1 successful matching?");
+    // We will iterate on all previous succ matches.
+    for (unsigned j = 0; j < prev_succ_tokens_num; j++) {
+      mCurToken = prev_succ_tokens[j] + 1;
 
-      // If the previous element has single matching or fail, we give up. Or we'll give a
-      // second try.
-      if (prev_succ_tokens_num > 1) {
+      bool temp_found = TraverseTableData(data, parent);
+      found_subtable |= temp_found;
 
-        if (mTraceSecondTry)
-          std::cout << "Decided to second try." << std::endl;
-
-        // Step 1. Save the mCurToken, it supposed to be the longest matching.
-        unsigned old_pos = mCurToken;
-
-        // Step 2. Iterate and try
-        //         There are again multiple possiblilities. Could be multiple matching again.
-        //         We will never go that far. We'll stop at the first matching which matches
-        //         the most tokens. So a small sorting is required.
-
-        SmallList<unsigned> sorted;
-        for (unsigned j = 0; j < prev_succ_tokens_num; j++)
-          sorted.PushBack(prev_succ_tokens[j]);
-        sorted.SortDescending();
-
-        bool temp_found = false;
-        for (unsigned j = 0; j < sorted.GetNum(); j++) {
-          // The longest matching has been proven to be a failure.
-          if (sorted.ValueAtIndex(j)== old_pos)
-            continue;
-
-          mInSecondTry = true;
-
-          // Start from the one after succ token.
-          mCurToken = sorted.ValueAtIndex(j) + 1;
-          temp_found = TraverseTableData(data, parent);
-          // As mentioned above, we stop at the first successfuly second try.
-          if (temp_found)
-            break;
-        }
-
-        // Step 3. Set the 'found'
-        found = temp_found;
-
-        // Step 4. If still fail after second try, we reset the mCurToken
-        if (!found) {
-          mCurToken = old_pos;
-        } else {
-          // Usually, for Zeroorone/Zeroormore node, it may set found to true, but actually
-          // it may matching nothing. Although it doesn't move mCurToken, it does move the
-          // rule. I'll buy this succ.
-          final_succ_tokens_num = gSuccTokensNum;
+      if (temp_found) {
+        // for Zeroorone/Zeroormore node it returns true, but actually it may matching
+        // nothing. In this case, we don't change final_succ_tokens_num.
+        if (gSuccTokensNum > 0) {
           for (unsigned id = 0; id < gSuccTokensNum; id++)
-            final_succ_tokens[id] = gSuccTokens[id];
-          curr_succ_tokens_num = gSuccTokensNum;
-          for (unsigned id = 0; id < gSuccTokensNum; id++)
-            curr_succ_tokens[id] = gSuccTokens[id];
-        }
-
-        if (mTraceSecondTry) {
-          if (found)
-            std::cout << "Second Try succ. mCurToken=" << mCurToken << std::endl;
-          else
-            std::cout << "Second Try fail." << std::endl;
+            subtable_succ_tokens[subtable_tokens_num + id] = gSuccTokens[id];
+          subtable_tokens_num += gSuccTokensNum;
         }
       }
     }
 
-    // After second try, if it still fails, we quit.
-    if (!found)
+    if (found_subtable) {
+      // ZEROORXXX subtable may match nothing. Although it doesn't move mCurToken,
+      // it does move the rule. It's still a good succ.
+      if (subtable_tokens_num > 0) {
+        // 1. set final
+        final_succ_tokens_num = subtable_tokens_num;
+        for (unsigned id = 0; id < subtable_tokens_num; id++)
+          final_succ_tokens[id] = subtable_succ_tokens[id];
+        // 2. set prev
+        prev_succ_tokens_num = subtable_tokens_num;
+        for (unsigned id = 0; id < subtable_tokens_num; id++)
+          prev_succ_tokens[id] = subtable_succ_tokens[id];
+      }
+    } else {
+      found = false;
       break;
-
-    prev_succ_tokens_num = curr_succ_tokens_num;
-    for (unsigned id = 0; id < curr_succ_tokens_num; id++)
-      prev_succ_tokens[id] = curr_succ_tokens[id];
+    }
   }
 
   if (found) {
@@ -1294,7 +1245,9 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *parent, unsi
      for (unsigned id = 0; id < final_succ_tokens_num; id++)
        gSuccTokens[id] = final_succ_tokens[id];
   } else {
+    // Need reset gSuccTokensNum and mCurToken;
     gSuccTokensNum = 0;
+    mCurToken = saved_mCurToken;
   }
 
   return found;
@@ -1456,7 +1409,35 @@ void Parser::SortOutNode(AppealNode *node) {
     return;
   }
 
+  // The last instance of recursion traversal doesn't need SortOut.
+  if (node->mAfter == SuccStillWasSucc)
+    return;
+
   RuleTable *rule_table = node->GetTable();
+
+  // Table Identifier and Literal don't need sort.
+  if (rule_table == &TblIdentifier || rule_table == &TblLiteral)
+    return;
+
+  // The lead node of a traversal group need special solution, if they are
+  // simply connect to previous instance(s).
+  if (mRecursionAll.IsLeadNode(rule_table)) {
+    bool connect_only = true;
+    std::vector<AppealNode*>::iterator it = node->mChildren.begin();
+    for (; it != node->mChildren.end(); it++) {
+      AppealNode *child = *it;
+      if (!child->IsTable() || child->GetTable() != rule_table) {
+        connect_only = false;
+        break;
+      }
+    }
+
+    if (connect_only) {
+      SortOutRecursionHead(node);
+      return;
+    }
+  }
+
   EntryType type = rule_table->mType;
   switch(type) {
   case ET_Oneof:
@@ -1480,6 +1461,34 @@ void Parser::SortOutNode(AppealNode *node) {
   }
 
   return;
+}
+
+// RecursionHead is any of the LeadNodes of a recursion group. There could be
+// multiple leaders in a group, but only one master leader which is mSelf of
+// class TraverseRecurson.
+// The children of them could be
+//   1. multiple lead nodes of multiple instance, for the master leader of group.
+//   2. The single node of previous instance, for non-master leaders.
+// In any case, parent and children have the same rule table.
+void Parser::SortOutRecursionHead(AppealNode *parent) {
+  unsigned parent_match = parent->GetFinalMatch();
+
+  //Find the first child having the same match as parent.
+  std::vector<AppealNode*>::iterator it = parent->mChildren.begin();
+  for (; it != parent->mChildren.end(); it++) {
+    AppealNode *child = *it;
+    if (child->IsFail())
+      continue;
+    bool found = child->FindMatch(parent_match);
+    if (found) {
+      to_be_sorted.push_back(child);
+      parent->mSortedChildren.push_back(child);
+      child->SetFinalMatch(parent_match);
+      child->SetSorted();
+      child->SetParent(parent);
+      break;
+    }
+  }
 }
 
 // 'parent' is already sorted when passed into this function.
@@ -1530,8 +1539,11 @@ void Parser::SortOutOneof(AppealNode *parent) {
       break;
   }
 
-  // There should be at least one good_children.
-  MASSERT(good_children);
+  // If we find good_children in the DIRECT children, good to return.
+  if(good_children)
+    return;
+
+  // If no good child found in direct children, we look into
 }
 
 // For Zeroormore node, where all children's matching tokens are linked together one after another.
@@ -1649,13 +1661,17 @@ void Parser::SortOutZeroorone(AppealNode *parent) {
   child->SetParent(parent);
 }
 
-// [NOTE] Concatenate will conduct SecondTry if possible. This means it's possible
-//        for a successful node not to connect to the longest match of its
-//        previous node.
+// [NOTE] Concatenate could have more than one succ matches. These matches
+//        logically form different trees. But they are all children AppealNodes
+//        of 'parent'. So sortout will find the matching subtree.
+//
+// The algorithm is going from the children of last sub-rule element. And traverse
+// backwards until reaching the beginning.
+
 void Parser::SortOutConcatenate(AppealNode *parent) {
   MASSERT(parent->IsSorted());
-  RuleTable *table = parent->GetTable();
-  MASSERT(table && "parent is not a table?");
+  RuleTable *rule_table = parent->GetTable();
+  MASSERT(rule_table && "parent is not a table?");
 
   unsigned parent_start = parent->GetStartIndex();
   unsigned parent_match = parent->GetFinalMatch();
@@ -1666,84 +1682,40 @@ void Parser::SortOutConcatenate(AppealNode *parent) {
   if (match_num == 0)
     return;
 
-  // In Concatenate node, some ZeroorXXX children could match nothing.
-  // Although they are succ, but we treat them as bad children.
-  // This loop mainly verifies if the matches are connected between children.
+  unsigned last_match = parent_match;
 
-  unsigned last_match = parent_start - 1;
-
-  // If we did second try, it's possible there are failed children of parent.
-  // The failed children will be followed directly by a
-  // succ child with the same rule table, same start index, and mIsSecondTry.
-  //
-  // We did not remove failed second try, since it may contain successful matching
-  // which later good nodes as SuccWasSucc will need.
-
-  std::vector<AppealNode*>::iterator it = parent->mChildren.begin();
-  AppealNode *prev_child = NULL;
-
-  for (; it != parent->mChildren.end(); it++) {
-    AppealNode *child = *it;
-
-    // A Failed node, it should be failed second try node.
-    if(child->IsFail())
-      continue;
-
-    // Clean the useless matches of prev_child, leaving the only one connecting to
-    // the current child.
-    if (child->mIsSecondTry) {
-      last_match = child->GetStartIndex() - 1;
-      MASSERT(prev_child->FindMatch(last_match));
-      prev_child->SetFinalMatch(last_match);
-      prev_child->SetSorted();
-    }
-
-    if (child->IsToken()) {
-      // Token node matches just one token.
-      last_match++;
-      MASSERT(last_match == child->GetStartIndex());
-      child->SetFinalMatch(last_match);
-
-      parent->mSortedChildren.push_back(child);
-      child->SetParent(parent);
-      prev_child = child;
-    } else {
-      unsigned match_num = child->GetMatchNum();
-
-      // if match_num == 0, It could be ZeroorXXX node matching nothing.
-      // We just skip this child.
-      if (match_num == 1) {
-        last_match = child->GetMatch(0);
-        child->SetFinalMatch(last_match);
-        child->SetSorted();
-
-        to_be_sorted.push_back(child);
-        parent->mSortedChildren.push_back(child);
-        child->SetParent(parent);
-        prev_child = child;
-      } else if (match_num > 1) {
-        // We only preserve the longest matching.
-        unsigned longest = child->GetStartIndex();
-        for (unsigned i = 0; i < child->GetMatchNum(); i++) {
-          unsigned curr_match = child->GetMatch(i);
-          if (curr_match > longest)
-            longest = curr_match;
-        }
-        child->SetFinalMatch(longest);
-        last_match = longest;
-
-        // Add child to the working list
-        to_be_sorted.push_back(child);
-        parent->mSortedChildren.push_back(child);
-        child->SetParent(parent);
-
-        prev_child = child;
+  // We look into all children, and find out the one with matching ruletable/token
+  // and token index.
+  SmallVector<AppealNode*> sorted_children;
+  for (int i = rule_table->mNum - 1; i >= 0; i--) {
+    TableData *data = rule_table->mData + i;
+    AppealNode *child = parent->FindSpecChild(data, last_match);
+    // It's possible that we find NO child if 'data' is a ZEROORxxx table
+    bool good_child = false;
+    if (!child) {
+      if (data->mType == DT_Subtable) {
+        RuleTable *table = data->mData.mEntry;
+        if (table->mType == ET_Zeroorone || table->mType == ET_Zeroormore)
+          good_child = true;
       }
+      MASSERT(good_child);
+    } else {
+      sorted_children.PushBack(child);
+      child->SetFinalMatch(last_match);
+      child->SetParent(parent);
+      child->SetSorted();
+      last_match = child->GetStartIndex() - 1;
     }
   }
+  MASSERT(last_match + 1 == parent->GetStartIndex());
 
-  // The last valid child's match token should be the same as parent's
-  MASSERT((last_match == parent_match) && "Concatenate children not connected?");
+  for (int i = sorted_children.GetNum() - 1; i >= 0; i--) {
+    AppealNode *child = sorted_children.ValueAtIndex(i);
+    parent->mSortedChildren.push_back(child);
+    if (child->IsTable())
+      to_be_sorted.push_back(child);
+  }
+
   return;
 }
 
@@ -2081,6 +2053,8 @@ void Parser::SimplifySortedTree() {
 // Reduce an edge is (1) Pred has only one succ
 //                   (2) Succ has only one pred (this is always true)
 //                   (3) There is no Rule Action of pred's rule table, regarding this succ.
+//                       Or, the rule is a LeadNode of recursion and succ is one of the
+//                       instance. In this case, we don't care about the rule action.
 // Keep this reduction until the conditions are violated
 //
 // Returns the new 'node' which stops the shrinking.
@@ -2559,4 +2533,42 @@ AppealNode* AppealNode::GetSortedChildByIndex(unsigned index) {
       return child;
   }
   return NULL;
+}
+
+// Look for a specific un-sorted child having the ruletable/token and match.
+// There could be multiple, but we return the first good one.
+AppealNode* AppealNode::FindSpecChild(TableData *tdata, unsigned match) {
+  AppealNode *ret_child = NULL;
+
+  std::vector<AppealNode*>::iterator it = mChildren.begin();
+  for (; it != mChildren.end(); it++) {
+    AppealNode *child = *it;
+    if (child->IsSucc() && child->FindMatch(match)) {
+      switch (tdata->mType) {
+      case DT_Subtable: {
+        RuleTable *child_rule = tdata->mData.mEntry;
+        if (child->IsTable() && child->GetTable() == child_rule)
+          ret_child = child;
+        // Literal and Identifier are treated as token.
+        if (child->IsToken() && (child_rule == &TblLiteral || child_rule == &TblIdentifier))
+          ret_child = child;
+        break;
+      }
+      case DT_Token: {
+        Token *token = tdata->mData.mToken;
+        if (child->IsToken() && child->GetToken() == token)
+          ret_child = child;
+        break;
+      }
+      case DT_Char:
+      case DT_String:
+      case DT_Type:
+      case DT_Null:
+      default:
+        break;
+      }
+    }
+  }
+
+  return ret_child;
 }

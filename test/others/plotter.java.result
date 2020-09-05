@@ -1,4 +1,10 @@
 Matched 7 tokens.
+Matched 18 tokens.
+Matched 29 tokens.
 ============= Module ===========
 == Sub Tree ==
 package com.baeldung.bitset
+== Sub Tree ==
+import org.openjdk.jol.info.ClassLayout
+== Sub Tree ==
+import org.openjdk.jol.info.GraphLayout

@@ -151,6 +151,7 @@ public:
   void AddSortedChild(AppealNode *n) { mSortedChildren.push_back(n); }
   bool GetSortedChildIndex(AppealNode*, unsigned &);
   AppealNode* GetSortedChildByIndex(unsigned idx);
+  AppealNode* FindSpecChild(TableData *tdata, unsigned match);
 
   bool IsSucc() { return (mAfter == Succ) ||
                          (mAfter == SuccWasSucc) ||
@@ -315,7 +316,7 @@ private:
   bool TraverseRuleTableRegular(RuleTable*, AppealNode*);    // success if all tokens are matched.
   bool TraverseRuleTablePre(AppealNode*, AppealNode*);
   bool TraverseTableData(TableData*, AppealNode*);    // success if all tokens are matched.
-  bool TraverseConcatenate(RuleTable*, AppealNode*, unsigned start = 0);
+  bool TraverseConcatenate(RuleTable*, AppealNode*);
   bool TraverseOneof(RuleTable*, AppealNode*);
   bool TraverseZeroormore(RuleTable*, AppealNode*);
   bool TraverseZeroorone(RuleTable*, AppealNode*);
@@ -362,6 +363,7 @@ private:
   // Sort Out
   void SortOut();
   void SortOutNode(AppealNode*);
+  void SortOutRecursionHead(AppealNode*);
   void SortOutOneof(AppealNode*);
   void SortOutZeroormore(AppealNode*);
   void SortOutZeroorone(AppealNode*);
@@ -390,8 +392,6 @@ private:
 private:
   RecursionAll               mRecursionAll;
   SmallVector<RecStackEntry> mRecStack;
-  SmallVector<AppealNode*>   mSeparatedTrees;   // we may created some seperated
-                                                // trees during recursion parsing.
 
   void PushRecStack(unsigned, RecursionTraversal*, unsigned);
   RecursionTraversal* FindRecStack(unsigned /*group id*/, unsigned /*token*/);
@@ -401,9 +401,6 @@ private:
   bool TraverseLeadNode(AppealNode*, AppealNode *parent);
   void SetIsDone(unsigned /*group*/, unsigned /*token*/);
   void SetIsDone(RuleTable*, unsigned);
-
-public:
-  void AddSeparatedTree(AppealNode *n) {mSeparatedTrees.PushBack(n);}
 
 public:
   Parser(const char *f);
@@ -422,7 +419,7 @@ public:
   unsigned LexOneLine();
 };
 
-#define MAX_SUCC_TOKENS 16
+#define MAX_SUCC_TOKENS 32
 extern unsigned gSuccTokensNum;
 extern unsigned gSuccTokens[MAX_SUCC_TOKENS];
 
