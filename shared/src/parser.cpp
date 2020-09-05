@@ -517,8 +517,22 @@ bool Parser::TraverseStmt() {
   std::vector<RuleTable*>::iterator it = mTopTables.begin();
   for (; it != mTopTables.end(); it++) {
     RuleTable *t = *it;
+    mRootNode->ClearChildren();
     succ = TraverseRuleTable(t, mRootNode);
     if (succ) {
+      // Need adjust the mCurToken. A rule could try multiple possible
+      // children rules, although there is one any only one valid child
+      // for a Top table. However, the mCurToken could deviate from
+      // the valid children and reflect the invalid children.
+      MASSERT(mRootNode->mChildren.size() == 1);
+      AppealNode *topnode = mRootNode->mChildren[0];
+      MASSERT(topnode->IsSucc());
+
+      // Top level table should have only one valid matching. Otherwise,
+      // the language is ambiguous.
+      MASSERT(topnode->GetMatchNum() == 1);
+      mCurToken = topnode->GetMatch(0) + 1;
+
       mRootNode->mAfter = Succ;
       SortOut();
       break;
