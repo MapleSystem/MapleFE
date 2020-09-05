@@ -1065,23 +1065,18 @@ bool Parser::TraverseZeroormore(RuleTable *rule_table, AppealNode *parent) {
   unsigned succ_tokens_num = 0;
   unsigned succ_tokens[MAX_SUCC_TOKENS];
   bool matched = false;
-
   gSuccTokensNum = 0;
+  MASSERT((rule_table->mNum == 1) && "zeroormore node has more than one elements?");
 
   while(1) {
     bool found = false;
     unsigned old_pos = mCurToken;
     unsigned new_pos = mCurToken;
 
-    MASSERT((rule_table->mNum == 1) && "zeroormore node has more than one elements?");
-    for (unsigned i = 0; i < rule_table->mNum; i++) {
-      // every table entry starts from the old_pos
-      mCurToken = old_pos;
-      TableData *data = rule_table->mData + i;
-      found = found | TraverseTableData(data, parent);
-      if (mCurToken > new_pos)
-        new_pos = mCurToken;
-    }
+    TableData *data = rule_table->mData;
+    found = found | TraverseTableData(data, parent);
+    if (mCurToken > new_pos)
+      new_pos = mCurToken;
 
     // 1. If hit the first non-target, stop it.
     // 2. Sometimes 'found' is true, but actually nothing was read becauser the 'true'
@@ -1210,7 +1205,13 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *parent) {
   prev_succ_tokens[0] = mCurToken - 1;
 
   for (unsigned i = 0; i < rule_table->mNum; i++) {
+    bool is_zeroxxx = false;
     TableData *data = rule_table->mData + i;
+    if (data->mType == DT_Subtable) {
+      RuleTable *zero_rt = data->mData.mEntry;
+      if (zero_rt->mType == ET_Zeroormore || zero_rt->mType == ET_Zeroorone)
+        is_zeroxxx = true;
+    }
 
     // A set of results of current subtable
     bool found_subtable = false;
@@ -1225,12 +1226,16 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *parent) {
       found_subtable |= temp_found;
 
       if (temp_found) {
-        // for Zeroorone/Zeroormore node it returns true, but actually it may matching
-        // nothing. In this case, we don't change final_succ_tokens_num.
-        if (gSuccTokensNum > 0) {
-          for (unsigned id = 0; id < gSuccTokensNum; id++)
-            subtable_succ_tokens[subtable_tokens_num + id] = gSuccTokens[id];
-          subtable_tokens_num += gSuccTokensNum;
+        for (unsigned id = 0; id < gSuccTokensNum; id++)
+          subtable_succ_tokens[subtable_tokens_num + id] = gSuccTokens[id];
+        subtable_tokens_num += gSuccTokensNum;
+
+        // for Zeroorone/Zeroormore node it always returns true. NO matter how
+        // many tokens it really matches, 'zero' is also a correct match. we
+        // need take it into account.
+        if (is_zeroxxx) {
+          subtable_succ_tokens[subtable_tokens_num] = prev_succ_tokens[j];
+          subtable_tokens_num++;
         }
       }
     }
@@ -1255,9 +1260,19 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *parent) {
   }
 
   if (found) {
+     // mCurToken doesn't have much meaning in current algorithm when
+     // transfer to the next rule table, because the next rule will take
+     // the succ info and get all matching token of prev, and set them
+     // as the starting mCurToken.
+     //
+     // However, we do set mCurToken to the biggest matching.
      gSuccTokensNum = final_succ_tokens_num;
-     for (unsigned id = 0; id < final_succ_tokens_num; id++)
-       gSuccTokens[id] = final_succ_tokens[id];
+     for (unsigned id = 0; id < final_succ_tokens_num; id++) {
+       unsigned token = final_succ_tokens[id];
+       if (token + 1 > mCurToken)
+         mCurToken = token + 1;
+       gSuccTokens[id] = token;
+     }
   } else {
     // Need reset gSuccTokensNum and mCurToken;
     gSuccTokensNum = 0;
