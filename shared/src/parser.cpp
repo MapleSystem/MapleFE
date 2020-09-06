@@ -1062,43 +1062,82 @@ bool Parser::TraverseIdentifier(RuleTable *rule_table, AppealNode *appeal) {
 //      any number of tokens it can, the number of matchings will grow each time one instance
 //      is matched.
 bool Parser::TraverseZeroormore(RuleTable *rule_table, AppealNode *parent) {
-  unsigned succ_tokens_num = 0;
-  unsigned succ_tokens[MAX_SUCC_TOKENS];
-  bool matched = false;
+  unsigned saved_mCurToken = mCurToken;
   gSuccTokensNum = 0;
+
   MASSERT((rule_table->mNum == 1) && "zeroormore node has more than one elements?");
+  TableData *data = rule_table->mData;
+
+  unsigned final_succ_tokens_num = 0;
+  unsigned final_succ_tokens[MAX_SUCC_TOKENS];
+
+  // prepare the prev_succ_tokens[_num] for the 1st iteration.
+  unsigned prev_succ_tokens_num = 1;
+  unsigned prev_succ_tokens[MAX_SUCC_TOKENS];
+  prev_succ_tokens[0] = mCurToken - 1;
+
+  // Need to avoid duplicated mCurToken. Look at the rule
+  // rule SwitchBlock : '{' + ZEROORMORE(ZEROORMORE(SwitchBlockStatementGroup) + ZEROORMORE(SwitchLabel)) + '}'
+  // The inner "ZEROORMORE(SwitchBlockStatementGroup) + ZEROORMORE(SwitchLabel)" could return multiple
+  // succ matches including the 'zero' match. The next time we go through the outer ZEROORMORE(...) it
+  // could traverse the same mCurToken again, at least 'zero' is always duplicated. This will be
+  // an endless loop.
+  SmallVector<unsigned> visited;
 
   while(1) {
-    bool found = false;
-    unsigned old_pos = mCurToken;
-    unsigned new_pos = mCurToken;
+    // A set of results of current instance
+    bool found_subtable = false;
+    unsigned subtable_tokens_num = 0;
+    unsigned subtable_succ_tokens[MAX_SUCC_TOKENS];
 
-    TableData *data = rule_table->mData;
-    found = found | TraverseTableData(data, parent);
-    if (mCurToken > new_pos)
-      new_pos = mCurToken;
+    // Like TraverseConcatenate, we will try all good matchings of previous instance.
+    for (unsigned j = 0; j < prev_succ_tokens_num; j++) {
+      mCurToken = prev_succ_tokens[j] + 1;
+      visited.PushBack(prev_succ_tokens[j]);
 
-    // 1. If hit the first non-target, stop it.
-    // 2. Sometimes 'found' is true, but actually nothing was read becauser the 'true'
-    //    is coming from a Zeroorone or Zeroormore. So need check this.
-    if ((!found) || (new_pos == old_pos) )
+      bool temp_found = TraverseTableData(data, parent);
+      found_subtable |= temp_found;
+
+      if (temp_found) {
+        for (unsigned id = 0; id < gSuccTokensNum; id++)
+          subtable_succ_tokens[subtable_tokens_num + id] = gSuccTokens[id];
+        subtable_tokens_num += gSuccTokensNum;
+      }
+    }
+
+    // It's possible that sub-table is in the end a ZEROORxxx, and is succ without
+    // real matching. This will be considered as a STOP.
+    if (found_subtable && (subtable_tokens_num > 0)) {
+      // set final
+      for (unsigned id = 0; id < subtable_tokens_num; id++)
+        final_succ_tokens[final_succ_tokens_num + id] = subtable_succ_tokens[id];
+      final_succ_tokens_num += subtable_tokens_num;
+
+      // set prev
+      prev_succ_tokens_num = 0;
+      for (unsigned id = 0; id < subtable_tokens_num; id++) {
+        unsigned t = subtable_succ_tokens[id];
+        if (!visited.Find(t))
+          prev_succ_tokens[prev_succ_tokens_num++] = t;
+      }
+    } else {
       break;
-    else {
-      matched = true;
-      mCurToken = new_pos;
-      // Take care of the successful matchings.
-      for (unsigned i = 0; i < gSuccTokensNum; i++)
-        succ_tokens[succ_tokens_num++] = gSuccTokens[i];
     }
   }
 
-  if (matched) {
-    gSuccTokensNum = succ_tokens_num;
-    for (unsigned i = 0; i < succ_tokens_num; i++)
-      gSuccTokens[i] = succ_tokens[i];
-  } else {
-    gSuccTokensNum = 0;
+  gSuccTokensNum = final_succ_tokens_num;
+  for (unsigned id = 0; id < final_succ_tokens_num; id++) {
+    unsigned token = final_succ_tokens[id];
+    gSuccTokens[id] = token;
+    // Actually we don't transfer mCurToken from one table to another.
+    // We are look into the succ info instead. However, we up mCurToken
+    // here for easy dump info.
+    if (token + 1 > mCurToken)
+      mCurToken = token + 1;
   }
+
+  if (!gSuccTokensNum)
+    mCurToken = saved_mCurToken;
 
   return true;
 }
@@ -1189,6 +1228,9 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *parent) {
   gSuccTokensNum = 0;
   unsigned saved_mCurToken = mCurToken;
 
+  // It's possible last_matched become -1.
+  int last_matched = mCurToken - 1;
+
   // prepare the prev_succ_tokens[_num] for the 1st iteration.
   prev_succ_tokens_num = 1;
   prev_succ_tokens[0] = mCurToken - 1;
@@ -1246,6 +1288,16 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *parent) {
       found = false;
       break;
     }
+  }
+
+  // Look at this special case, where all children are ZEROORxxx
+  //   rule DimExpr : ZEROORMORE(Annotation) + ZEROORONE(Expression)
+  // It's possible it actually matches nothing, but we fake it as 1 matching
+  // with 'zero' token. This need be adjusted at the end of traversal.
+  if (final_succ_tokens_num == 1) {
+    int compare = final_succ_tokens[0];
+    if (compare == last_matched)
+      found = false;
   }
 
   if (found) {
@@ -1565,8 +1617,7 @@ void Parser::SortOutOneof(AppealNode *parent) {
 }
 
 // For Zeroormore node, where all children's matching tokens are linked together one after another.
-// All children nodes have the same rule table, but each has its unique AppealNode.
-//
+// All children nodes have the same rule table.
 void Parser::SortOutZeroormore(AppealNode *parent) {
   MASSERT(parent->IsSorted());
 
@@ -1578,23 +1629,11 @@ void Parser::SortOutZeroormore(AppealNode *parent) {
   unsigned parent_start = parent->GetStartIndex();
   unsigned parent_match = parent->GetFinalMatch();
 
-  // In Zeroormore node, all children should have 'really' matched tokens which means they 
-  // did move forward as token index. So there shouldn't be any bad children. 
-  // The major work of this loop is to verify the above claim is abided by.
-  //
-  // There is only failed child which is the last one. Remember in TraverseZeroormore() we
-  // keep trying until the last one is faile? So at this point we will first skip the
-  // last failed child node.
-  //
-  // It's possible that some of succ children are redundant and should be removed by
-  // sort out. This is done through checking the parent_match.
-
-  AppealNode *failed = parent->mChildren.back();
   std::vector<AppealNode*>::iterator childit = parent->mChildren.begin();
   bool found = false;
   for (; childit != parent->mChildren.end(); childit++) {
     AppealNode *child = *childit;
-    if (child != failed) {
+    if (child->IsSucc()) {
       // It's guaranteed by TraverseZeroormore(), the matching tokens are increasing
       // for each child. So the first child having parent_match is the ending point.
       parent->mSortedChildren.push_back(child);
