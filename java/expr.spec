@@ -12,10 +12,6 @@
 # See the Mulan PSL v1 for more details.
 #
 
-# I just put all TO-DO rules here
-rule Class    : "class"
-
-rule ArrayInitializer : "arrayinitializer"
 
 rule PackageName : ONEOF(Identifier, PackageName + '.' + Identifier)
   attr.action.%2 : BuildField(%1, %3)
@@ -34,6 +30,7 @@ rule MethodName     : Identifier
 rule AmbiguousName  : ONEOF(Identifier, AmbiguousName + '.' + Identifier)
   attr.action.%2 : BuildField(%1, %3)
 
+rule Class : "class"
 rule ClassLiteral : ONEOF(
   TypeName + ZEROORMORE('[' + ']') + '.' + Class,
   NumericType + ZEROORMORE('[' + ']') + '.' + Class,
@@ -73,6 +70,7 @@ rule TypeArgumentsOrDiamond : ONEOF(
 
 rule ArgumentList : Expression + ZEROORMORE(',' + Expression)
 
+rule ArrayInitializer : '{' + ZEROORMORE(ZEROORONE(VariableInitializerList) + ZEROORONE(',')) + '}'
 rule ArrayCreationExpression : ONEOF(
   "new" + PrimitiveType + DimExprs + ZEROORONE(Dims),
   "new" + ClassOrInterfaceType + DimExprs + ZEROORONE(Dims),
@@ -81,7 +79,7 @@ rule ArrayCreationExpression : ONEOF(
 
 rule DimExprs : DimExpr + ZEROORMORE(DimExpr)
 
-rule DimExpr : ZEROORMORE(Annotation) + ZEROORONE(Expression)
+rule DimExpr : ZEROORMORE(Annotation) + '[' + Expression + ']'
 
 rule ArrayAccess : ONEOF(
   ExpressionName + ZEROORONE(Expression),

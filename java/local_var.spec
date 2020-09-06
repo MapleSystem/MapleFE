@@ -28,12 +28,6 @@ rule VariableDeclaratorList : VariableDeclarator + ZEROORMORE(',' + VariableDecl
 ###rule VariableDeclaratorId : Identifier [Dims]
 rule VariableDeclaratorId : Identifier
 
-#Dims:
-#{Annotation} [ ] {{Annotation} [ ]}
-#VariableInitializer:
-#Expression
-#ArrayInitializer
-
 #rule UnannPrimitiveType : ONEOF(NumericType, Boolean)
 rule UnannPrimitiveType : ONEOF("int", "boolean")
 

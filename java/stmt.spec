@@ -41,6 +41,8 @@ rule VariableInitializer : ONEOF(
   Expression,
   ArrayInitializer)
 
+rule VariableInitializerList: VariableInitializer + ZEROORMORE(',' + VariableInitializer)
+
 rule Statement : ONEOF(
   LocalVariableDeclarationStatement,
   StatementWithoutTrailingSubstatement,
