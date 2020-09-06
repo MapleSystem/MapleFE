@@ -1629,53 +1629,45 @@ void Parser::SortOutZeroormore(AppealNode *parent) {
   unsigned parent_start = parent->GetStartIndex();
   unsigned parent_match = parent->GetFinalMatch();
 
-  std::vector<AppealNode*>::iterator childit = parent->mChildren.begin();
-  bool found = false;
-  for (; childit != parent->mChildren.end(); childit++) {
-    AppealNode *child = *childit;
-    if (child->IsSucc()) {
-      // It's guaranteed by TraverseZeroormore(), the matching tokens are increasing
-      // for each child. So the first child having parent_match is the ending point.
-      parent->mSortedChildren.push_back(child);
-      child->SetParent(parent);
-      if (child->FindMatch(parent_match)) {
-        found = true;
+  unsigned last_match = parent_match;
+
+  // We look into all children, and find out the one with matching token.
+  // We do it in a backwards way. Find the one matching 'last_match' at first,
+  // and move backward until find the one starting with parent_start.
+  SmallVector<AppealNode*> sorted_children;
+  while(1) {
+    AppealNode *good_child = NULL;
+    std::vector<AppealNode*>::iterator it = parent->mChildren.begin();
+    for (; it != parent->mChildren.end(); it++) {
+      AppealNode *child = *it;
+      if (sorted_children.Find(child))
+        continue;
+      if (child->IsSucc() && child->FindMatch(last_match)) {
+        good_child = child;
         break;
       }
     }
+    MASSERT(good_child);
+
+    sorted_children.PushBack(good_child);
+    good_child->SetFinalMatch(last_match);
+    good_child->SetParent(parent);
+    good_child->SetSorted();
+    last_match = good_child->GetStartIndex() - 1;
+
+    // Finished the backward searching.
+    if (good_child->GetStartIndex() == parent_start)
+      break;
   }
-  MASSERT(found);
 
-  unsigned last_match = parent_start - 1;
+  MASSERT(last_match + 1 == parent->GetStartIndex());
 
-  std::vector<AppealNode*>::iterator it = parent->mSortedChildren.begin();
-  for (; it != parent->mSortedChildren.end(); it++) {
-    AppealNode *child = *it;
-    MASSERT(child->IsSucc() && "Successful zeroormore node has a failed child node?");
-
-    MASSERT((last_match + 1 == child->GetStartIndex())
-             && "Node match index are not connected in SortOut Zeroormore.");
-
-    if (child->IsToken()) {
-      // Token node matches just one token.
-      last_match++;
-      child->SetSorted();
-      child->SetFinalMatch(last_match);
-    } else {
-      // We choose the longest match.
-      unsigned longest = last_match + 1;
-      for (unsigned i = 0; i < child->GetMatchNum(); i++) {
-        unsigned curr_match = child->GetMatch(i);
-        if (curr_match > longest)
-          longest = curr_match;
-      }
-      child->SetFinalMatch(longest);
-      child->SetSorted();
-      last_match = longest;
+  for (int i = sorted_children.GetNum() - 1; i >= 0; i--) {
+    AppealNode *child = sorted_children.ValueAtIndex(i);
+    parent->mSortedChildren.push_back(child);
+    if (child->IsTable())
       to_be_sorted.push_back(child);
-    }
   }
-
   return;
 }
 
