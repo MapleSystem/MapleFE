@@ -1106,21 +1106,10 @@ bool Parser::TraverseZeroormore(RuleTable *rule_table, AppealNode *parent) {
 // For Zeroorone node it's easier to handle gSuccTokens(Num). Just let the elements
 // handle themselves.
 bool Parser::TraverseZeroorone(RuleTable *rule_table, AppealNode *parent) {
+  MASSERT((rule_table->mNum == 1) && "zeroormore node has more than one elements?");
+  TableData *data = rule_table->mData;
   gSuccTokensNum = 0;
-  bool found = false;
-  for (unsigned i = 0; i < rule_table->mNum; i++) {
-    TableData *data = rule_table->mData + i;
-    found = TraverseTableData(data, parent);
-    // The first element is hit, then stop.
-    if (found)
-      break;
-  }
-
-  if (!found) {
-    if (gSuccTokensNum != 0)
-      std::cout << "weird.... gSuccTokensNum=" << gSuccTokensNum << std::endl;
-  }
-
+  bool found = TraverseTableData(data, parent);
   return true;
 }
 
