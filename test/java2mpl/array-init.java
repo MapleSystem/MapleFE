@@ -13,9 +13,9 @@
 //See the Mulan PSL v2 for more details.
 //
 public class A {
-    public static void main(String[] args) {
+    public int foo() {
         int[] ba = new boolean[] {1};
         int array[] = { 1, 2, 3, 4, 5 };
-        //String array[] = new String[] {"Toyota", "Mercedes", "BMW", "Volkswagen", "Skoda" };
+        String array[] = new String[] {"Toyota", "Mercedes", "BMW", "Volkswagen", "Skoda" };
     }
 }

@@ -70,7 +70,7 @@ rule TypeArgumentsOrDiamond : ONEOF(
 
 rule ArgumentList : Expression + ZEROORMORE(',' + Expression)
 
-rule ArrayInitializer : '{' + ZEROORMORE(ZEROORONE(VariableInitializerList) + ZEROORONE(',')) + '}'
+rule ArrayInitializer : '{' + ZEROORONE(VariableInitializerList) + ZEROORONE(',') + '}'
 rule ArrayCreationExpression : ONEOF(
   "new" + PrimitiveType + DimExprs + ZEROORONE(Dims),
   "new" + ClassOrInterfaceType + DimExprs + ZEROORONE(Dims),
