@@ -1229,7 +1229,6 @@ void ASTBuilder::AddParams(TreeNode *func, TreeNode *params) {
     PassNode *pass = (PassNode*)params;
     for (unsigned i = 0; i < pass->GetChildrenNum(); i++) {
       TreeNode *child = pass->GetChild(i);
-      MASSERT(child->IsIdentifier() && "Unsupported non-iden node");
       if (func->IsFunction())
         ((FunctionNode*)func)->AddParam(child);
       else if (func->IsNew())

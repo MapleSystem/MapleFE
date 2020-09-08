@@ -26,5 +26,9 @@ rule CHAR  : ONEOF('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','
 # DIGIT refers to the 10 digits
 rule DIGIT : ONEOF('0', '1', '2', '3', '4', '5', '6', '7', '8', '9')
 
-# The ASCII character exclude " and \
-rule ASCII : ONEOF(' ', '!', '#', '$', '%', '&', ''', '(', ')', '*', '+', ',', '-', '.', '/', ':', ';', '<', '=', '>', '?', '@', '[', ']', '^', '_', '`', '{', '|', '}', '~', CHAR, DIGIT)
+# The ASCII character exclude ", ', and \
+rule ASCII : ONEOF(' ', '!', '#', '$', '%', '&', '(', ')', '*', '+', ',', '-', '.', '/', ':', ';', '<', '=', '>', '?', '@', '[', ']', '^', '_', '`', '{', '|', '}', '~', CHAR, DIGIT)
+
+# About the handling of escape character in autogen, xx_gen.cpp/h, and stringutil.cpp
+# please refer to the comments in StringToValue::StringToString() in stringutil.cpp
+rule ESCAPE : ONEOF('\' + 'b', '\' + 't', '\' + 'n', '\' + 'f', '\' + 'r', '\' + '"', '\' + ''', '\' + '\')

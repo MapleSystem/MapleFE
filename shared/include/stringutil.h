@@ -90,6 +90,7 @@ public:
   double StringToDouble(std::string &);
   bool   StringToBool(std::string &);
   char   StringToChar(std::string &);
+  const char*   StringToString(std::string &);
   bool   StringIsNull(std::string &);
 };
 #endif

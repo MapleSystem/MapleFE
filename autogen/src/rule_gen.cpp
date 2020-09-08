@@ -132,10 +132,14 @@ std::string RuleGen::Gen4RuleElem(const RuleElem *elem) {
   data = '{';
 
   switch(elem->mType) {
+  // character need special handling of escape character, please see comments
+  // in StringToValue::StringToString() in shared/stringutil.cpp.
   case ET_Char:
     data += "DT_Char, {.mChar=\'";
-    if (elem->mData.mChar == '\'')
-      data += "\\'";
+    if (elem->mData.mChar == '\\')
+      data += "\\\\";
+    else if (elem->mData.mChar == '\'')
+      data += "\\\'";
     else
       data += elem->mData.mChar;
     data += "\'}";

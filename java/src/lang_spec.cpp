@@ -79,8 +79,9 @@ LitData ProcessLiteral(LitId id, const char *str) {
     data.mData.mChar = c;
     break; }
   case LT_StringLiteral: {
+    const char *s = s2v.StringToString(value_text);
     data.mType = LT_StringLiteral;
-    data.mData.mStr = str;
+    data.mData.mStr = s;
     break; }
   case LT_NullLiteral: {
     // Just need set the id

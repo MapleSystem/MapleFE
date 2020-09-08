@@ -15,6 +15,7 @@
 #include <string>
 
 #include "stringutil.h"
+#include "stringpool.h"
 
 // Assume the 'l' or 'L' is removed by the caller.
 long StringToDecNumeral(std::string s) {
@@ -135,6 +136,77 @@ bool StringToValue::StringToBool(std::string &str) {
 char StringToValue::StringToChar(std::string &str) {
   const char *s = str.c_str();
   return *s;
+}
+
+// [NOTE] This is to handle escape character in different language.
+//        This implementation is common in many languages. If you have
+//        special escape character solution, please do it in you-lang directory.
+
+// There are 4 different places involved in escape character.
+//
+// 1. In the .spec file. Here is an example
+//      rule ESCAPE : ONEOF('\' + 'b', '\' + 't', '\' + 'n')
+//    When Autogen read the .spec file, it reads a plain text file. so '\' will be
+//    read as 3 characters. The backslash is already himself. Don't need be escaped.
+//
+// 2. In the gen_xxx.cpp file created by autogen, the output should be
+//      TableData TblESCAPE_sub1_data[2] ={{DT_Char, {.mChar='\\'}},{DT_Char, {.mChar='b'}}};
+//    Because we are creating C++ source code, and it's a character literal, so we need
+//    the additional backslash to escape. So in autogen we will have to check if the character
+//    in .spec is \ or ', and handle them specially, like
+//      case ET_Char:
+//        data += "DT_Char, {.mChar=\'";
+//        if (elem->mData.mChar == '\\')
+//          data += "\\\\";   <-- Need four backslash to output two in .cpp file.
+//        else if (elem->mData.mChar == '\'')
+//          data += "\\\'";
+//        else
+//          data += elem->mData.mChar;
+//        data += "\'}";
+//        break;
+//
+// 3. The application program of user programming language write:
+//      printf("test\n");
+//    When parser read it, it's just a plain text file. So it will see 6 characters actually.
+//    The backslash is itself a character.
+//    After parser read this string into buffer, you can see it in gdb is "test\\n".
+//
+// 4. StringToValue need convert the two characters into an escape character.
+//    This is what we are doing here.
+
+const char* StringToValue::StringToString(std::string &str) {
+  std::string target;
+  for (unsigned i = 0; i < str.size(); i++) {
+    char c = str[i];
+    if ((c == '\\') && (i < str.size() - 1)) {
+      char c_next = str[i+1];
+      char c_target = 0;
+      if (c_next == 'n')
+        c_target = '\n';
+      else if (c_next == '\\')
+        c_target = '\\';
+      else if (c_next == '\'')
+        c_target = '\'';
+      else if (c_next == '\"')
+        c_target = '\"';
+      else if (c_next == 'b')
+        c_target = '\b';
+      else if (c_next == 'f')
+        c_target = '\f';
+      else if (c_next == 'r')
+        c_target = '\r';
+
+      if (c_target) {
+        target += c_target;
+        i++;
+      }
+    } else {
+      target += c;
+    }
+  }
+
+  const char *s = gStringPool.FindString(target);
+  return s;
 }
 
 // Some languares have 'null' keyword with Null type.
