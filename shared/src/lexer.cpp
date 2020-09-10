@@ -619,6 +619,28 @@ bool Lexer::TraverseSecondTry(const RuleTable *rule_table) {
 }
 
 bool Lexer::Traverse(const RuleTable *rule_table) {
+  // CHAR, DIGIT are reserved rules. It should NOT be changed. We can
+  // expediate the lexing.
+  if (rule_table == &TblCHAR) {
+    char c = *(line + curidx);
+    if( (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
+      curidx += 1;
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  if (rule_table == &TblDIGIT) {
+    char c = *(line + curidx);
+    if(c >= '0' && c <= '9') {
+      curidx += 1;
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   bool matched = false;
 
   // save the original location
