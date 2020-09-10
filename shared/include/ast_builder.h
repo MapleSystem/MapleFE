@@ -50,7 +50,7 @@ private:
   bool mTrace;
 
   // The last created node. It will be referenced by the
-  // following AddAttribute() or other functions.
+  // following AddModifier() or other functions.
   TreeNode               *mLastTreeNode;
 
 public:
@@ -97,8 +97,8 @@ public:
 
   TreeNode* AddInitTo();
   TreeNode* AddTypeTo();
-  TreeNode* AddAttribute();
-  TreeNode* AddAttributeTo();
+  TreeNode* AddModifier();
+  TreeNode* AddModifierTo();
 
   // Callsite
   TreeNode* AddArguments();

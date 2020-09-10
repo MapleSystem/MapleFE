@@ -20,13 +20,14 @@ rule NormalClassDeclaration : ZEROORMORE(ClassModifier) + "class" + Identifier +
                               ZEROORONE(TypeParameters) + ZEROORONE(Superclass) +
                               ZEROORONE(Superinterfaces) + ClassBody
 attr.action : BuildClass(%3)
-attr.action : AddAttribute(%1)
+attr.action : AddModifier(%1)
 attr.action : AddClassBody(%7)
 attr.action : AddSuperClass(%5)
 attr.action : AddSuperInterface(%6)
 
-rule ClassModifier : ONEOF(Annotation, "public", "protected", "private", "abstract",
+rule ClassAttr : ONEOF("public", "protected", "private", "abstract",
                            "static", "final", "strictfp")
+rule ClassModifier : ONEOF(Annotation, ClassAttr)
 
 # 1. Generic class
 # 2. TypeParameter will be defined in type.spec
@@ -55,7 +56,7 @@ rule InstanceInitializer    : Block
   attr.action: BuildInstInit(%1)
 rule StaticInitializer      : "static" + Block
   attr.action: BuildInstInit(%2)
-  attr.action: AddAttributeTo(%2, %1)
+  attr.action: AddModifierTo(%2, %1)
 
 rule ClassMemberDeclaration : ONEOF(FieldDeclaration,
                                     MethodDeclaration,
@@ -64,10 +65,10 @@ rule ClassMemberDeclaration : ONEOF(FieldDeclaration,
                                     ';')
 rule FieldDeclaration  : ZEROORMORE(FieldModifier) + UnannType + VariableDeclaratorList + ';'
   attr.action: BuildDecl(%2, %3)
-  attr.action: AddAttribute(%1)
+  attr.action: AddModifier(%1)
 
 rule MethodDeclaration : ZEROORMORE(MethodModifier) + MethodHeader + MethodBody
-  attr.action: AddAttributeTo(%2, %1)
+  attr.action: AddModifierTo(%2, %1)
   attr.action: AddFunctionBodyTo(%2, %3)
 
 rule MethodBody        : ONEOF(Block, ';')
@@ -90,8 +91,9 @@ rule Throws            : "throws" + ExceptionTypeList
 rule ExceptionTypeList : ExceptionType + ZEROORMORE(',' + ExceptionType)
 rule ExceptionType     : ONEOF(ClassType, TypeVariable)
 
-rule MethodModifier    : ONEOF(Annotation, "public", "protected", "private", "abstract", "static",
-                               "final", "synchronized", "native", "strictfp")
+rule MethodAttr : ONEOF("public", "protected", "private", "abstract", "static",
+                        "final", "synchronized", "native", "strictfp")
+rule MethodModifier    : ONEOF(Annotation, MethodAttr)
 
 rule FormalParameterList : ONEOF(ReceiverParameter,
                                  FormalParameters + ',' + LastFormalParameter,
@@ -103,15 +105,15 @@ rule FormalParameters  : ONEOF(FormalParameter + ZEROORMORE(',' + FormalParamete
 
 rule FormalParameter   : ZEROORMORE(VariableModifier) + UnannType + VariableDeclaratorId
   attr.action: BuildDecl(%2, %3)
-  attr.action: AddAttribute(%1)
+  attr.action: AddModifier(%1)
 rule ReceiverParameter : ZEROORMORE(Annotation) + UnannType + ZEROORONE(Identifier + '.') + "this"
 rule LastFormalParameter : ONEOF(ZEROORMORE(VariableModifier) + UnannType + ZEROORMORE(Annotation) +
                                    "..." + VariableDeclaratorId,
                                  FormalParameter)
 
 
-rule FieldModifier   : ONEOF(Annotation, "public", "protected", "private",
-                             "static", "final", "transient", "volatile")
+rule FieldAttr : ONEOF("public", "protected", "private", "static", "final", "transient", "volatile")
+rule FieldModifier : ONEOF(Annotation, FieldAttr)
 
 ################################################################
 #                        Constructor                           #
@@ -120,7 +122,8 @@ rule ConstructorDeclaration : ZEROORMORE(ConstructorModifier) + ConstructorDecla
                               ZEROORONE(Throws) + ConstructorBody
   attr.action : AddFunctionBodyTo(%2, %4)
 
-rule ConstructorModifier    : ONEOF(Annotation, "public", "protected", "private")
+rule ConstructorAttr : ONEOF("public", "protected", "private")
+rule ConstructorModifier    : ONEOF(Annotation, ConstructorAttr)
 rule ConstructorDeclarator  : ZEROORONE(TypeParameters) + SimpleTypeName + '(' +
                               ZEROORONE(FormalParameterList) + ')'
   attr.action : BuildConstructor(%2)
@@ -156,8 +159,8 @@ rule Block           : '{' + ZEROORONE(BlockStatements) + '}'
 rule InterfaceDeclaration : ONEOF(NormalInterfaceDeclaration, AnnotationTypeDeclaration)
 rule NormalInterfaceDeclaration : ZEROORMORE(InterfaceModifier) + "interface" + Identifier +
                                   ZEROORONE(TypeParameters) + ZEROORONE(ExtendsInterfaces) + InterfaceBody
-rule InterfaceModifier : ONEOF(Annotation, "public", "protected", "private", "abstract",
-                               "static", "strictfp")
+rule InterfaceAttr : ONEOF("public", "protected", "private", "abstract", "static", "strictfp")
+rule InterfaceModifier : ONEOF(Annotation, InterfaceAttr)
 rule ExtendsInterfaces : "extends" + InterfaceTypeList
 rule InterfaceBody     : '{' + ZEROORMORE(InterfaceMemberDeclaration) + '}'
 rule InterfaceMemberDeclaration : ONEOF(ConstantDeclaration,
@@ -168,10 +171,12 @@ rule InterfaceMemberDeclaration : ONEOF(ConstantDeclaration,
 # constant decl is also called field decl. In interface, field must have a variable initializer
 # However, the rules below don't tell this limitation.
 rule ConstantDeclaration : ZEROORMORE(ConstantModifier) + UnannType + VariableDeclaratorList + ';'
-rule ConstantModifier : ONEOF(Annotation, "public", "static", "final")
+rule ConstantAttr : ONEOF("public", "static", "final")
+rule ConstantModifier : ONEOF(Annotation, ConstantAttr)
 
 rule InterfaceMethodDeclaration : ZEROORMORE(InterfaceMethodModifier) + MethodHeader + MethodBody
-rule InterfaceMethodModifier : ONEOF(Annotation, "public", "abstract", "default", "static", "strictfp")
+rule InterfaceMethodAttr : ONEOF("public", "abstract", "default", "static", "strictfp")
+rule InterfaceMethodModifier : ONEOF(Annotation, InterfaceMethodAttr)
 
 ######################################################################
 #                        Annotation Type                             #
@@ -179,7 +184,7 @@ rule InterfaceMethodModifier : ONEOF(Annotation, "public", "abstract", "default"
 rule AnnotationTypeDeclaration : ZEROORMORE(InterfaceModifier) + '@' + "interface" +
                                  Identifier + AnnotationTypeBody
   attr.action : BuildAnnotationType(%4)
-  attr.action : AddAttribute(%1)
+  attr.action : AddModifier(%1)
   attr.action : AddAnnotationTypeBody(%5)
 
 rule AnnotationTypeBody : '{' + ZEROORMORE(AnnotationTypeMemberDeclaration) + '}'
@@ -192,7 +197,8 @@ rule AnnotationTypeMemberDeclaration : ONEOF(AnnotationTypeElementDeclaration,
 rule AnnotationTypeElementDeclaration : ZEROORMORE(AnnotationTypeElementModifier) + UnannType +
                                           Identifier + '(' +  ')' + ZEROORONE(Dims) +
                                           ZEROORONE(DefaultValue) + ';'
-rule AnnotationTypeElementModifier : ONEOF(Annotation, "public", "abstract")
+rule AnnotationTypeElementAttr : ONEOF("public", "abstract")
+rule AnnotationTypeElementModifier : ONEOF(Annotation, AnnotationTypeElementAttr)
 rule DefaultValue : "default" + ElementValue
 
 ######################################################################
@@ -203,6 +209,14 @@ rule Annotation : ONEOF(NormalAnnotation,
                         SingleElementAnnotation)
 
 rule NormalAnnotation : '@' + TypeName + '(' + ZEROORONE(ElementValuePairList) + ')'
+  attr.action : BuildAnnotation(%2)
+
+rule MarkerAnnotation : '@' + TypeName
+  attr.action : BuildAnnotation(%2)
+
+rule SingleElementAnnotation : '@' + TypeName + '(' + ElementValue + ')'
+  attr.action : BuildAnnotation(%2)
+
 rule ElementValuePairList : ElementValuePair + ZEROORMORE(',' + ElementValuePair)
 rule ElementValuePair : Identifier + '=' + ElementValue
 rule ElementValue : ONEOF(ConditionalExpression,
@@ -210,9 +224,6 @@ rule ElementValue : ONEOF(ConditionalExpression,
                           Annotation)
 rule ElementValueArrayInitializer : '{' + ZEROORONE(ElementValueList) + ZEROORONE(',') + '}'
 rule ElementValueList : ElementValue + ZEROORMORE(',' + ElementValue)
-
-rule MarkerAnnotation : '@' + TypeName
-rule SingleElementAnnotation : '@' + TypeName + '(' + ElementValue + ')'
 
 ######################################################################
 #                        Package                                     #

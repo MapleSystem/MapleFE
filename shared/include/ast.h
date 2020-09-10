@@ -66,6 +66,7 @@ enum NodeKind {
 // of each node through a TreeNode pointer. In this way, a virtual destructor of TreeNode
 // if needed in order to invoke the derived class destructor.
 
+class AnnotationNode;
 class TreeNode {
 protected:
   NodeKind  mKind;
@@ -88,7 +89,8 @@ public:
 
   virtual const char* GetName() {return NULL;}
   virtual void ReplaceChild(TreeNode *oldchild, TreeNode *newchild){}
-
+  virtual void AddAttr(AttrId) {}
+  virtual void AddAnnotation(AnnotationNode *n){}
   virtual void Dump(unsigned){}
 
   void DumpIndentation(unsigned);
@@ -283,9 +285,6 @@ class DeleteNode : public TreeNode {
 // 2) The IdentifierNode at the declaration point will have mType. The other
 //    appearance of the identifier node won't have mType. After merging, they
 //    will point to the same node.
-// 3) The name is pointing to the stringpool, which is residing in Lexer.
-//    [TODO] we'll have standalone stringpool...
-//
 //
 //                        Dimension of IdentifierNode
 //
@@ -355,6 +354,46 @@ public:
 
   void Release() { if (mDims) mDims->Release();}
   void Dump(unsigned);
+};
+
+//////////////////////////////////////////////////////////////////////////
+//                         AnnotationNode
+//
+// Pragma or Annotation are language constructs to help (1) compiler
+// (2) runtime (3) other tools, to better analyze or execute the program.
+// It doesn't change the program behaviour, but may be improve static
+// and/or dynamic analysis and/or performance.
+//
+// We have a dedicated AnnotationNode here. The program/annotation syntax
+// could be complicated, eg. c99 introduce function call like pragma.
+//
+// The difference between Java annotation and C/c++ pragma is annotation
+// is user defined and pragma is compiler/system defined. In another word
+// Java annoation has unlimited number while pragmas are limited.
+//////////////////////////////////////////////////////////////////////////
+
+class AnnotationTypeNode : public TreeNode {
+private:
+  IdentifierNode *mName;
+public:
+  void SetName(IdentifierNode *n) {mName = n;}
+};
+
+// Annotation/Pragma is complicated, but everything starts from the
+// name. So at construction, we will take in the name at first.
+// Later we will initialize mType, mExpr based on the 'name' and other
+// expression.
+class AnnotationNode : public TreeNode {
+private:
+  IdentifierNode     *mName;
+  AnnotationTypeNode *mType;
+  TreeNode           *mExpr;
+public:
+  AnnotationNode() : mName(NULL), mType(NULL), mExpr(NULL) {
+    mKind = NK_Annotation;}
+  ~AnnotationNode(){}
+
+  void SetName(IdentifierNode *n) {mName = n;}
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -766,14 +805,15 @@ class ASTScope;
 
 class FunctionNode : public TreeNode {
 private:
-  const char                 *mName;
-  SmallVector<AttrId>         mAttrs;
-  SmallVector<ExceptionNode*> mThrows; // exceptions it can throw
-  TreeNode                   *mType;   // return type
-  SmallVector<TreeNode*>      mParams;  //
-  BlockNode                  *mBody;
-  DimensionNode              *mDims;
-  bool                        mIsConstructor;
+  const char                  *mName;
+  SmallVector<AttrId>          mAttrs;
+  SmallVector<AnnotationNode*> mAnnotations; //annotation or pragma
+  SmallVector<ExceptionNode*>  mThrows; // exceptions it can throw
+  TreeNode                    *mType;   // return type
+  SmallVector<TreeNode*>       mParams;  //
+  BlockNode                   *mBody;
+  DimensionNode               *mDims;
+  bool                         mIsConstructor;
 
 public:
   FunctionNode();
@@ -798,6 +838,11 @@ public:
   void     AddAttr(AttrId a)       {mAttrs.PushBack(a);}
   AttrId   AttrAtIndex(unsigned i) {return mAttrs.ValueAtIndex(i);}
 
+  // Annotation/Pragma related
+  unsigned GetAnnotationsNum()           {return mAnnotations.GetNum();}
+  void     AddAnnotation(AnnotationNode *n) {mAnnotations.PushBack(n);}
+  AnnotationNode* AnnotationAtIndex(unsigned i) {return mAnnotations.ValueAtIndex(i);}
+
   // Exception/throw related
   unsigned       GetThrowNum()             {return mThrows.GetNum();}
   void           AddThrow(ExceptionNode *n){mThrows.PushBack(n);}
@@ -818,6 +863,7 @@ public:
 
   void Release() { mAttrs.Release();
                    mParams.Release();
+                   mAnnotations.Release();
                    if (mDims) mDims->Release();}
   void Dump(unsigned);
 };
@@ -902,27 +948,6 @@ public:
   void Construct();
   void Release();
   void Dump(unsigned);
-};
-
-//////////////////////////////////////////////////////////////////////////
-//                  AnnotationTypeNode and AnnotationNode
-//
-// Annotation is quite common in modern languages, and we decided to support.
-// Here we define two tree nodes, one for the type definition and one for
-// the annotation usage.
-//////////////////////////////////////////////////////////////////////////
-
-class AnnotationTypeNode : public TreeNode {
-private:
-  IdentifierNode *mName;
-public:
-  void SetName(IdentifierNode *n) {mName = n;}
-};
-
-class AnnotationNode : public TreeNode {
-private:
-  AnnotationTypeNode *mType;
-public:
 };
 
 //////////////////////////////////////////////////////////////////////////

@@ -85,9 +85,10 @@ TreeNode* ASTBuilder::CreateTokenTreeNode(const Token *token) {
 //                      Static Functions help build the tree
 ////////////////////////////////////////////////////////////////////////////////////////
 
-// It's the caller to assure both arguments are valid.
-static void add_attribute_to_kernel(TreeNode *tree, AttrNode *attr) {
-  AttrId aid = attr->GetId();
+static void add_attribute_to(TreeNode *tree, TreeNode *attr) {
+  MASSERT(attr->IsAttr());
+  AttrNode *attr_node = (AttrNode*)attr;
+  AttrId aid = attr_node->GetId();
   if (tree->IsVarList()) {
     VarListNode *vl = (VarListNode*)tree;
     for (unsigned i = 0; i < vl->GetNum(); i++) {
@@ -95,45 +96,16 @@ static void add_attribute_to_kernel(TreeNode *tree, AttrNode *attr) {
       inode->AddAttr(aid);
     }
     return;
-  } else if (tree->IsClass()) {
-    ClassNode *klass = (ClassNode*)tree;
-    klass->AddAttr(aid);
-    return;
-  } else if (tree->IsFunction()) {
-    FunctionNode *func = (FunctionNode*)tree;
-    func->AddAttr(aid);
-    return;
-  } else if (tree->IsIdentifier()) {
-    IdentifierNode *iden = (IdentifierNode*)tree;
-    iden->AddAttr(aid);
-    return;
   } else if (tree->IsBlock()){
     BlockNode *b = (BlockNode*)tree;
     if (b->IsInstInit()) {
       b->AddAttr(aid);
       return;
     }
-  }
-  MASSERT(0 && "Unsupported tree, wanting to add attribute.");
-}
-
-static void add_attribute_to(TreeNode *tree_node, TreeNode *attr) {
-  if (attr->IsAttr()) {
-    AttrNode *attr_node = (AttrNode*)attr;
-    add_attribute_to_kernel(tree_node, attr_node);
-  } else if (attr->IsPass()) {
-    PassNode *pass = (PassNode*)attr;
-    for (unsigned i = 0; i < pass->GetChildrenNum(); i++) {
-      TreeNode *child = pass->GetChild(i);
-      if (child->IsAttr()) {
-        AttrNode *attr_node = (AttrNode*)child;
-        add_attribute_to_kernel(tree_node, attr_node);
-      } else {
-        MERROR("The to-be-added node is not an attribute?");
-      }
-    }
   } else {
-    MERROR("The to-be-added node is not an attribute?");
+    ClassNode *klass = (ClassNode*)tree;
+    klass->AddAttr(aid);
+    return;
   }
 }
 
@@ -868,45 +840,80 @@ TreeNode* ASTBuilder::BuildVarList() {
   return node_ret;
 }
 
-// Attach the attributes to mLastTreeNode.
-// We only take the AttrId from the tree node.
-TreeNode* ASTBuilder::AddAttribute() {
+// Attach the modifier(s) to mLastTreeNode.
+TreeNode* ASTBuilder::AddModifier() {
   if (mTrace)
-    std::cout << "In AddAttribute" << std::endl;
+    std::cout << "In AddModifier" << std::endl;
 
-  Param p_attr = mParams[0];
-  if (p_attr.mIsEmpty) {
+  Param p_mod = mParams[0];
+  if (p_mod.mIsEmpty) {
     if (mTrace)
       std::cout << " do nothing." << std::endl;
     return mLastTreeNode;
   }
 
-  if (!p_attr.mIsTreeNode)
-    MERROR("The attribue is not a treenode");
-  TreeNode *attr= p_attr.mData.mTreeNode;
-  add_attribute_to(mLastTreeNode, attr);
+  if (!p_mod.mIsTreeNode)
+    MERROR("The modifier is not a treenode");
+  TreeNode *mod= p_mod.mData.mTreeNode;
+
+  if (mod->IsPass()) {
+    PassNode *pass = (PassNode*)mod;
+    for (unsigned i = 0; i < pass->GetChildrenNum(); i++) {
+      TreeNode *child = pass->GetChild(i);
+      if (child->IsAnnotation()) {
+        AnnotationNode *a = (AnnotationNode*)child;
+        mLastTreeNode->AddAnnotation(a);
+      } else {
+        add_attribute_to(mLastTreeNode, child);
+      }
+    }
+  } else if (mod->IsAnnotation()) {
+    AnnotationNode *a = (AnnotationNode*)mod;
+    mLastTreeNode->AddAnnotation(a);
+  } else {
+    add_attribute_to(mLastTreeNode, mod);
+  }
 
   return mLastTreeNode;
 }
 
-// Takes two arguments. 1) target tree node; 2) attribute
-TreeNode* ASTBuilder::AddAttributeTo() {
+// Takes two arguments. 1) target tree node; 2) modifier, which could be
+// attr, annotation/pragma.
+//
+// This function doesn't update mLastTreeNode.
+TreeNode* ASTBuilder::AddModifierTo() {
   if (mTrace)
-    std::cout << "In AddAttributeTo " << std::endl;
+    std::cout << "In AddModifierTo " << std::endl;
 
   Param p_tree = mParams[0];
-  MASSERT(!p_tree.mIsEmpty && "Treenode cannot be empty in AddAttributeTo");
-  MASSERT(p_tree.mIsTreeNode && "The tree node is not a treenode in AddAttributeTo()");
+  MASSERT(!p_tree.mIsEmpty && "Treenode cannot be empty in AddModifierTo");
+  MASSERT(p_tree.mIsTreeNode && "The tree node is not a treenode in AddModifierTo()");
   TreeNode *tree = p_tree.mData.mTreeNode;
 
-  Param p_attr = mParams[1];
-  if(p_attr.mIsEmpty)
+  Param p_mod = mParams[1];
+  if(p_mod.mIsEmpty)
     return tree;
 
-  MASSERT(p_attr.mIsTreeNode && "The Attr is not a treenode in AddAttributeTo()");
-  TreeNode *attr = p_attr.mData.mTreeNode;
+  MASSERT(p_mod.mIsTreeNode && "The Attr is not a treenode in AddModifierTo()");
+  TreeNode *mod = p_mod.mData.mTreeNode;
 
-  add_attribute_to(tree, attr);
+  if (mod->IsPass()) {
+    PassNode *pass = (PassNode*)mod;
+    for (unsigned i = 0; i < pass->GetChildrenNum(); i++) {
+      TreeNode *child = pass->GetChild(i);
+      if (child->IsAnnotation()) {
+        AnnotationNode *a = (AnnotationNode*)child;
+        tree->AddAnnotation(a);
+      } else {
+        add_attribute_to(tree, child);
+      }
+    }
+  } else if (mod->IsAnnotation()) {
+    AnnotationNode *a = (AnnotationNode*)mod;
+    tree->AddAnnotation(a);
+  } else {
+    add_attribute_to(tree, mod);
+  }
 
   return tree;
 }
@@ -1092,7 +1099,22 @@ TreeNode* ASTBuilder::AddAnnotationTypeBody() {
 TreeNode* ASTBuilder::BuildAnnotation() {
   if (mTrace)
     std::cout << "In BuildAnnotation" << std::endl;
-  Param p_attr = mParams[0];
+  Param p_name = mParams[0];
+
+  if (!p_name.mIsTreeNode)
+    MERROR("The annotationtype name is not a treenode in BuildAnnotationtType()");
+  TreeNode *node_name = p_name.mData.mTreeNode;
+
+  if (!node_name->IsIdentifier())
+    MERROR("The annotation name is NOT an indentifier node.");
+  IdentifierNode *in = (IdentifierNode*)node_name;
+
+  AnnotationNode *annot = (AnnotationNode*)mTreePool->NewTreeNode(sizeof(AnnotationNode));
+  new (annot) AnnotationNode();
+  annot->SetName(node_name);
+
+  // set last tree node and return it.
+  mLastTreeNode = annot;
   return mLastTreeNode;
 }
 

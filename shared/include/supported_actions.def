@@ -69,8 +69,8 @@ ACTION(AddSuperInterface)
 ACTION(AddClassBody)
 ACTION(BuildInstInit)
 
-ACTION(AddAttribute)
-ACTION(AddAttributeTo)
+ACTION(AddModifier)
+ACTION(AddModifierTo)
 ACTION(AddInitTo)
 ACTION(AddTypeTo)
 

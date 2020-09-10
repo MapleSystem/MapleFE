@@ -43,10 +43,12 @@ NODEKIND(Function)
 NODEKIND(Class)
 NODEKIND(Interface)
 
-// These two are first coming from Java language. Annotation has no meaning
-// for execution, but has meanings for compiler or runtime.
+// Annotation, Pragma in c/c++, has no effects for execution, but has meanings
+// for compiler or runtime.
+//
 // AnnotationType : The definition of a type of annotation
 // Annotation     : The usage of an annotation type
+
 NODEKIND(AnnotationType)
 NODEKIND(Annotation)
 
