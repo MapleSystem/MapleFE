@@ -1,12 +1,29 @@
-Matched 247 tokens.
+Matched 484 tokens.
 ============= Module ===========
 == Sub Tree ==
 class  ChatTest
   Fields: 
-
+    listeningPort=0
   Instance Initializer: 
   Constructors: 
   Methods: 
+    func  main()  throws:     Throwable
+      testStartStop()
+      testPortOpen()
+      testAsksForName()
+      testUseName()
+      testConnectDisconnectConnect()
+      testUsernameAndMessage()
+      testDontReceiveMessageInNameState()
+    func  startServer()  throws:     IOException
+      var:server=new ChatServer
+      var:address=(InetSocketAddress)server.getSocketAddress()
+      listeningPort Assign address.getPort()
+      server.run()
+      return server
+    func  testStartStop()  throws:     Exception
+      var:server=startServer()
+      server.shutdown()
     func  testPortOpen()  throws:     Exception
       var:server=startServer()
       var:socket=new Socket
@@ -15,6 +32,19 @@ class  ChatTest
         new RuntimeException
       false branch :
 
+
+      server.shutdown()
+
+    func  testAsksForName()  throws:     Exception
+      var:server=startServer()
+      var:socket=new Socket
+
+
+      server.shutdown()
+
+    func  testUseName()  throws:     Throwable
+      var:server=startServer()
+      performTestUseName()
 
       server.shutdown()
 

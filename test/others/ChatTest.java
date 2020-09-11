@@ -41,30 +41,30 @@
 //import java.util.concurrent.CyclicBarrier;
 
 public class ChatTest {
-//    public static int listeningPort = 0;
+    public static int listeningPort = 0;
 
-//    public static void main(String[] args) throws Throwable {
-//        testStartStop();
-//        testPortOpen();
-//        testAsksForName();
-//        testUseName();
-//        testConnectDisconnectConnect();
-//        testUsernameAndMessage();
-//        testDontReceiveMessageInNameState();
-//    }
-//
-//    private static ChatServer startServer() throws IOException {
-//        ChatServer server = new ChatServer(0);
-//        InetSocketAddress address = (InetSocketAddress) server.getSocketAddress();
-//        listeningPort = address.getPort();
-//        server.run();
-//        return server;
-//    }
+    public static void main(String[] args) throws Throwable {
+        testStartStop();
+        testPortOpen();
+        testAsksForName();
+        testUseName();
+        testConnectDisconnectConnect();
+        testUsernameAndMessage();
+        testDontReceiveMessageInNameState();
+    }
 
-//    public static void testStartStop() throws Exception {
-//        ChatServer server = startServer();
-//        server.shutdown();
-//    }
+    private static ChatServer startServer() throws IOException {
+        ChatServer server = new ChatServer(0);
+        InetSocketAddress address = (InetSocketAddress) server.getSocketAddress();
+        listeningPort = address.getPort();
+        server.run();
+        return server;
+    }
+
+    public static void testStartStop() throws Exception {
+        ChatServer server = startServer();
+        server.shutdown();
+    }
 
     public static void testPortOpen() throws Exception {
         ChatServer server = startServer();
@@ -78,29 +78,29 @@ public class ChatTest {
         }
     }
 
-//    public static void testAsksForName() throws Exception {
-//        ChatServer server = startServer();
-//        try {
-//            Socket socket = new Socket("localhost", listeningPort);
-//
-//            Reader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-//            String string = readAvailableString(reader);
-//            if (!string.equals("Name: ")) {
-//                throw new RuntimeException("Server doesn't send Name: ");
-//            }
-//        } finally {
-//            server.shutdown();
-//        }
-//    }
-//
-//    public static void testUseName() throws Throwable {
-//        ChatServer server = startServer();
-//        try {
-//            performTestUseName();
-//        } finally {
-//            server.shutdown();
-//        }
-//    }
+    public static void testAsksForName() throws Exception {
+        ChatServer server = startServer();
+        try {
+            Socket socket = new Socket("localhost", listeningPort);
+
+            Reader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            String string = readAvailableString(reader);
+            if (!string.equals("Name: ")) {
+                throw new RuntimeException("Server doesn't send Name: ");
+            }
+        } finally {
+            server.shutdown();
+        }
+    }
+
+    public static void testUseName() throws Throwable {
+        ChatServer server = startServer();
+        try {
+            performTestUseName();
+        } finally {
+            server.shutdown();
+        }
+    }
 
 //    public static void testConnectDisconnectConnect() throws Exception {
 //        ChatServer server = startServer();
