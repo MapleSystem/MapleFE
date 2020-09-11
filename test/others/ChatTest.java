@@ -102,46 +102,46 @@ public class ChatTest {
         }
     }
 
-//    public static void testConnectDisconnectConnect() throws Exception {
-//        ChatServer server = startServer();
-//        try {
-//            performTestConnectDisconnectConnect();
-//        } finally {
-//            server.shutdown();
-//        }
-//    }
-//
-//    public static void testUsernameAndMessage() throws Exception {
-//        ChatServer server = startServer();
-//        try {
-//            performTestUsernameAndMessage();
-//        } finally {
-//            server.shutdown();
-//        }
-//    }
-//
-//    public static void testDontReceiveMessageInNameState() throws Exception {
-//        ChatServer server = startServer();
-//        try {
-//            performDontReceiveMessageInNameState();
-//        } finally {
-//            server.shutdown();
-//        }
-//    }
-//
-//    private static void assertEqual(List<Exception> exception, Object value, Object expected) {
-//        if (expected == value) {
-//            return;
-//        }
-//        if (expected == null) {
-//            exception.add(new RuntimeException("Expected null, but was: " + value));
-//            return;
-//        }
-//        if (!expected.equals(value)) {
-//            exception.add(new RuntimeException("Expected: " + expected + " but was: " + value));
-//            return;
-//        }
-//    }
+    public static void testConnectDisconnectConnect() throws Exception {
+        ChatServer server = startServer();
+        try {
+            performTestConnectDisconnectConnect();
+        } finally {
+            server.shutdown();
+        }
+    }
+
+    public static void testUsernameAndMessage() throws Exception {
+        ChatServer server = startServer();
+        try {
+            performTestUsernameAndMessage();
+        } finally {
+            server.shutdown();
+        }
+    }
+
+    public static void testDontReceiveMessageInNameState() throws Exception {
+        ChatServer server = startServer();
+        try {
+            performDontReceiveMessageInNameState();
+        } finally {
+            server.shutdown();
+        }
+    }
+
+    private static void assertEqual(List<Exception> exception, Object value, Object expected) {
+        if (expected == value) {
+            return;
+        }
+        if (expected == null) {
+            exception.add(new RuntimeException("Expected null, but was: " + value));
+            return;
+        }
+        if (!expected.equals(value)) {
+            exception.add(new RuntimeException("Expected: " + expected + " but was: " + value));
+            return;
+        }
+    }
 
     private static void performDontReceiveMessageInNameState() throws Exception {
         final CyclicBarrier barrier1 = new CyclicBarrier(2);
@@ -149,19 +149,19 @@ public class ChatTest {
         final CyclicBarrier barrier3 = new CyclicBarrier(2);
         final List<Exception> exceptions = Collections.synchronizedList(new ArrayList<Exception>());
 
-//        ChatConnection chatConnection = new ChatConnection() {
-//            @Override
-//            public void run(Socket socket, BufferedReader reader, Writer writer) throws Exception {
-//                String string = readAvailableString(reader);
-//                assertEqual(exceptions, string, "Name: ");
-//                writer.write("testClient1\n");
-//                waitForJoin(reader, "testClient1");
-//                barrier1.await();
-//                writer.write("Ignore this!\n");
-//                barrier2.await();
-//                barrier3.await();
-//            }
-//        };
+        ChatConnection chatConnection = new ChatConnection() {
+            @Override
+            public void run(Socket socket, BufferedReader reader, Writer writer) throws Exception {
+                String string = readAvailableString(reader);
+                assertEqual(exceptions, string, "Name: ");
+                writer.write("testClient1\n");
+                waitForJoin(reader, "testClient1");
+                barrier1.await();
+                writer.write("Ignore this!\n");
+                barrier2.await();
+                barrier3.await();
+            }
+        };
 
         Thread client2 = new Thread(new ChatConnection() {
             @Override
