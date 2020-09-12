@@ -12,4 +12,8 @@
 //FIT FOR A PARTICULAR PURPOSE.
 //See the Mulan PSL v1 for more details.
 //
-a = b > c;
+class A {
+  void foo() {
+    a = b > c;
+  }
+}

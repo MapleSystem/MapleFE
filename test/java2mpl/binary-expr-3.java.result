@@ -1,10 +1,20 @@
-Matched 10 tokens.
+Matched 20 tokens.
 Convert unary --> binary
 Convert unary --> binary
 Convert unary --> binary
 ============= Module ===========
 == Sub Tree ==
-a Assign b Add c Add d Add e
+class  A
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+    func  foo()  throws: 
+      a Assign b Add c Add d Add e
+  LocalClasses: 
+  LocalInterfaces: 
+
 Identifier:a has no decl.
 Identifier:b has no decl.
 Identifier:c has no decl.

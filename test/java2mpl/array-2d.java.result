@@ -1,4 +1,12 @@
-Matched 7 tokens.
+Matched 11 tokens.
 ============= Module ===========
 == Sub Tree ==
-var:a[][]
+class  A
+  Fields: 
+    a[][]
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
