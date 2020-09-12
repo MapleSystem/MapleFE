@@ -12,4 +12,8 @@
 //FIT FOR A PARTICULAR PURPOSE.
 //See the Mulan PSL v2 for more details.
 //
-println(c);
+class A {
+  void foo() {
+    println(c);
+  }
+}

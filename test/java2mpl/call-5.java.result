@@ -1,4 +1,14 @@
-Matched 11 tokens.
+Matched 21 tokens.
 ============= Module ===========
 == Sub Tree ==
-var:socket=new Socket
+class  A
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+    func  foo()  throws: 
+      var:socket=new Socket
+  LocalClasses: 
+  LocalInterfaces: 
+

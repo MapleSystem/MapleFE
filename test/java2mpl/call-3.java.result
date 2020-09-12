@@ -1,5 +1,15 @@
-Matched 9 tokens.
+Matched 19 tokens.
 Convert unary --> binary
 ============= Module ===========
 == Sub Tree ==
-println(c Add 1,a)
+class  A
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+    func  foo()  throws: 
+      println(c Add 1,a)
+  LocalClasses: 
+  LocalInterfaces: 
+

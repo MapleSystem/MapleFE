@@ -1,4 +1,14 @@
-Matched 5 tokens.
+Matched 15 tokens.
 ============= Module ===========
 == Sub Tree ==
-println(c)
+class  A
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+    func  foo()  throws: 
+      println(c)
+  LocalClasses: 
+  LocalInterfaces: 
+
