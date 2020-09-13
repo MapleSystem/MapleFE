@@ -1,5 +1,19 @@
-Matched 3 tokens.
+Matched 32 tokens.
 ============= Module ===========
 == Sub Tree ==
-  iInc
+class  A
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+    func  foo()  throws: 
+      for ( )
+                  kInc
+
+                  iInc
+
+
+  LocalClasses: 
+  LocalInterfaces: 
 

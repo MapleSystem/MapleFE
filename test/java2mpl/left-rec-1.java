@@ -23,5 +23,9 @@
 //
 // All other expressions are not taken into account.
 //
-//if ((k = System.in.read()) >= 0)
-System.out.println(k);
+class A{
+  void foo() {
+    if ((k = System.in.read()) >= 0)
+      System.out.println(k);
+  }
+}

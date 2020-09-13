@@ -1,4 +1,14 @@
-Matched 5 tokens.
+Matched 15 tokens.
 ============= Module ===========
 == Sub Tree ==
-var:a=273
+class  A
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+    func  foo()  throws: 
+      var:a=273
+  LocalClasses: 
+  LocalInterfaces: 
+
