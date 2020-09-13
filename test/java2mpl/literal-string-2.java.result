@@ -1,7 +1,15 @@
-Matched 5 tokens.
-Matched 10 tokens.
+Matched 20 tokens.
 ============= Module ===========
 == Sub Tree ==
-write("doesn't")
-== Sub Tree ==
-write("doesn't")
+class  A
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+    func  foo()  throws: 
+      write("doesn't")
+      write("doesn't")
+  LocalClasses: 
+  LocalInterfaces: 
+

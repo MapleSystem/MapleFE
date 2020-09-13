@@ -1,5 +1,15 @@
-Matched 5 tokens.
+Matched 15 tokens.
 ============= Module ===========
 == Sub Tree ==
-write("test
+class  A
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+    func  foo()  throws: 
+      write("test
 ")
+  LocalClasses: 
+  LocalInterfaces: 
+

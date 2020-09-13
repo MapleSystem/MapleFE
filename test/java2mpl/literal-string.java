@@ -12,4 +12,8 @@
 //FIT FOR A PARTICULAR PURPOSE.
 //See the Mulan PSL v2 for more details.
 //
-write("test\n");
+class A {
+  void foo() {
+    write("test\n");
+  }
+}

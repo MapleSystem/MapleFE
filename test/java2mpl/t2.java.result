@@ -1,7 +1,14 @@
-Matched 5 tokens.
-Matched 9 tokens.
+Matched 14 tokens.
 ============= Module ===========
 == Sub Tree ==
-var:a,b
-== Sub Tree ==
-a Assign 0
+class  Point
+  Fields: 
+    a    b    a=0
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+Field Decl Duplication! Identifier:a is duplicated with Identifier:a
+Field Decl Duplication! Identifier:a is duplicated with Identifier:a

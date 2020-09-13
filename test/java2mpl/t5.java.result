@@ -1,19 +1,18 @@
-Matched 5 tokens.
-Matched 8 tokens.
-Matched 14 tokens.
+Matched 41 tokens.
 Convert unary --> binary
-Matched 22 tokens.
 Convert unary --> binary
-Matched 30 tokens.
 Convert unary --> binary
 ============= Module ===========
 == Sub Tree ==
-var:a,b
-== Sub Tree ==
-var:c
-== Sub Tree ==
-c Assign a Add b
-== Sub Tree ==
-a Assign (a Add b)
-== Sub Tree ==
-a Assign (a Add b)
+class  A
+  Fields: 
+    a    b    c    d=a Add b
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+    func  foo()  throws: 
+      a Assign (a Add b)
+      a Assign (a Add b)
+  LocalClasses: 
+  LocalInterfaces: 
+

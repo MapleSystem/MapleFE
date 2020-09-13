@@ -12,5 +12,9 @@
 //FIT FOR A PARTICULAR PURPOSE.
 //See the Mulan PSL v2 for more details.
 //
-write("doesn't");
-write("doesn\'t");
+class A {
+  void foo() {
+    write("doesn't");
+    write("doesn\'t");
+  }
+}

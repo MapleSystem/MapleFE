@@ -1,8 +1,15 @@
-Matched 7 tokens.
-Matched 13 tokens.
+Matched 18 tokens.
 Convert unary --> binary
 ============= Module ===========
 == Sub Tree ==
-var:a,b,c
-== Sub Tree ==
-c Assign a Add b
+class  A
+  Fields: 
+    a    b    c    c=a Add b
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+Field Decl Duplication! Identifier:c is duplicated with Identifier:c
+Field Decl Duplication! Identifier:c is duplicated with Identifier:c
