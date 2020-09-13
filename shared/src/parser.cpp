@@ -2270,12 +2270,10 @@ void Parser::InitPredefinedTokens() {
 }
 
 // These should have the same order as those in RecDetector::SetupTopTables().
-// [TODO] Will remove TblStatement later.
 // Set up the top level rule tables.
 void Parser::SetupTopTables() {
   mTopTables.push_back(&TblPackageDeclaration);
   mTopTables.push_back(&TblImportDeclaration);
-  mTopTables.push_back(&TblStatement);
   mTopTables.push_back(&TblClassDeclaration);
   mTopTables.push_back(&TblInterfaceDeclaration);
 }
