@@ -1,8 +1,18 @@
-Matched 6 tokens.
+Matched 16 tokens.
 Convert unary --> binary
 ============= Module ===========
 == Sub Tree ==
-c Assign a Add b
+class  A
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+    func  foo()  throws: 
+      c Assign a Add b
+  LocalClasses: 
+  LocalInterfaces: 
+
 Identifier:c has no decl.
 Identifier:a has no decl.
 Identifier:b has no decl.
