@@ -184,54 +184,54 @@ public class ChatTest {
         }
 
     }
-//
-//    private static void waitForJoin(BufferedReader reader, String s) throws IOException {
-//        String joined;
-//        do {
-//            joined = readAvailableString(reader);
-//        } while (!(joined != null && joined.contains("Welcome " + s)));
-//    }
-//
-//    private static void performTestUsernameAndMessage() throws Exception {
-//        final CyclicBarrier barrier1 = new CyclicBarrier(2);
-//        final CyclicBarrier barrier2 = new CyclicBarrier(2);
-//        final CyclicBarrier barrier3 = new CyclicBarrier(2);
-//        final List<Exception> exceptions = Collections.synchronizedList(new ArrayList<Exception>());
-//
-//        ChatConnection chatConnection = new ChatConnection() {
-//            @Override
-//            public void run(Socket socket, BufferedReader reader, Writer writer) throws Exception {
-//                String string = readAvailableString(reader);
-//                assertEqual(exceptions, string, "Name: ");
-//                writer.write("testClient1\n");
-//                waitForJoin(reader, "testClient1");
-//                barrier1.await();
-//                barrier2.await();
-//                string = readAvailableString(reader);
-//                assertEqual(exceptions, string, "testClient2: Hello world!\n");
-//                barrier3.await();
-//            }
-//        };
-//
-//        Thread client2 = new Thread(new ChatConnection() {
-//            @Override
-//            public void run(Socket socket, BufferedReader reader, Writer writer) throws Exception {
-//                String string = readAvailableString(reader);
-//                assertEqual(exceptions, string, "Name: ");
-//                barrier1.await();
-//                writer.write("testClient2\nHello world!\n");
-//                barrier2.await();
-//                barrier3.await();
-//            }
-//        });
-//
-//        client2.start();
-//        chatConnection.run();
-//        if (!exceptions.isEmpty()) {
-//            throw exceptions.get(0);
-//        }
-//    }
-//
+
+    private static void waitForJoin(BufferedReader reader, String s) throws IOException {
+        String joined;
+        do {
+            joined = readAvailableString(reader);
+        } while (!(joined != null && joined.contains("Welcome " + s)));
+    }
+
+    private static void performTestUsernameAndMessage() throws Exception {
+        final CyclicBarrier barrier1 = new CyclicBarrier(2);
+        final CyclicBarrier barrier2 = new CyclicBarrier(2);
+        final CyclicBarrier barrier3 = new CyclicBarrier(2);
+        final List<Exception> exceptions = Collections.synchronizedList(new ArrayList<Exception>());
+
+        ChatConnection chatConnection = new ChatConnection() {
+            @Override
+            public void run(Socket socket, BufferedReader reader, Writer writer) throws Exception {
+                String string = readAvailableString(reader);
+                assertEqual(exceptions, string, "Name: ");
+                writer.write("testClient1\n");
+                waitForJoin(reader, "testClient1");
+                barrier1.await();
+                barrier2.await();
+                string = readAvailableString(reader);
+                assertEqual(exceptions, string, "testClient2: Hello world!\n");
+                barrier3.await();
+            }
+        };
+
+        Thread client2 = new Thread(new ChatConnection() {
+            @Override
+            public void run(Socket socket, BufferedReader reader, Writer writer) throws Exception {
+                String string = readAvailableString(reader);
+                assertEqual(exceptions, string, "Name: ");
+                barrier1.await();
+                writer.write("testClient2\nHello world!\n");
+                barrier2.await();
+                barrier3.await();
+            }
+        });
+
+        client2.start();
+        chatConnection.run();
+        if (!exceptions.isEmpty()) {
+            throw exceptions.get(0);
+        }
+    }
+
 //    private static void performTestConnectDisconnectConnect() throws Exception {
 //        final CyclicBarrier barrier1 = new CyclicBarrier(2);
 //        final CyclicBarrier barrier2 = new CyclicBarrier(2);

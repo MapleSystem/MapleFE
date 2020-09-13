@@ -47,8 +47,8 @@ rule Statement : ONEOF(
   LocalVariableDeclarationStatement,
   StatementWithoutTrailingSubstatement,
   LabeledStatement,
-  IfThenStatement,
   IfThenElseStatement,
+  IfThenStatement,
   WhileStatement,
   ForStatement)
 

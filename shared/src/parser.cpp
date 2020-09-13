@@ -16,6 +16,7 @@
 #include <string>
 #include <cstring>
 #include <stack>
+#include <sys/time.h>
 
 #include "parser.h"
 #include "massert.h"
@@ -487,12 +488,14 @@ bool Parser::ParseStmt() {
   //                             (2) Identifier Table won't be traversed any more since
   //                                 lex has got the token from source program and we only
   //                                 need check if the table is &TblIdentifier.
-  bool succ = TraverseStmt();
 
-  // After matching&SortOut there is a tree with each node being a AppealNode.
-  // Now we need build AST based on the AppealNode tree. This involves the rule Actions
-  // we are used to build AST. So far we haven't done the syntax checking yet. [TODO]
-  //
+  //struct timeval stop, start;
+  //gettimeofday(&start, NULL);
+  bool succ = TraverseStmt();
+  //gettimeofday(&stop, NULL);
+  //std::cout << "Time: " << (stop.tv_sec - start.tv_sec) * 1000000 + stop.tv_usec - start.tv_usec;
+  //std::cout << " us" << std::endl;
+
   // Each top level construct gets a AST tree.
   if (succ) {
     PatchWasSucc(mRootNode->mSortedChildren[0]);
@@ -1163,6 +1166,14 @@ bool Parser::TraverseOneof(RuleTable *rule_table, AppealNode *parent) {
 
   gSuccTokensNum = 0;
 
+  // In ONEOF rules, some may can only have one legal form. So it's better
+  // to speed up the parsing by stopping at the first one.
+  bool only_single = false;
+  if (rule_table == &TblStatement ||
+      rule_table == &TblStatementWithoutTrailingSubstatement ||
+      rule_table == &TblStatementNoShortIf)
+    only_single = true;
+
   for (unsigned i = 0; i < rule_table->mNum; i++) {
     TableData *data = rule_table->mData + i;
     bool temp_found = TraverseTableData(data, parent);
@@ -1186,6 +1197,9 @@ bool Parser::TraverseOneof(RuleTable *rule_table, AppealNode *parent) {
         new_mCurToken = mCurToken;
       // Restore the position of original mCurToken.
       mCurToken = old_mCurToken;
+
+      if (only_single)
+        break;
     }
   }
 

@@ -1,4 +1,5 @@
-Matched 751 tokens.
+Matched 1058 tokens.
+Convert unary --> binary
 Convert unary --> binary
 Convert unary --> binary
 Convert unary --> binary
@@ -89,6 +90,25 @@ class  ChatTest
       false branch :
 
     func  performDontReceiveMessageInNameState()  throws:     Exception
+      var:barrier1=new CyclicBarrier
+      var:barrier2=new CyclicBarrier
+      var:barrier3=new CyclicBarrier
+      var:exceptions=
+      var:chatConnection=new ChatConnection
+      var:client2=new Thread
+      client2.start()
+      chatConnection.run()
+      cond-branch cond:exceptions.isEmpty()
+      true branch :
+
+        (0)
+      false branch :
+
+    func  waitForJoin()  throws:     IOException
+      var:joined
+      do         joined Assign 
+while ()
+    func  performTestUsernameAndMessage()  throws:     Exception
       var:barrier1=new CyclicBarrier
       var:barrier2=new CyclicBarrier
       var:barrier3=new CyclicBarrier
