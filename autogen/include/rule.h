@@ -80,14 +80,18 @@ class RuleAttr {
 public:
   std::vector<RuleAction*> mValidity;
   std::vector<RuleAction*> mAction;
+  std::vector<std::string> mProperty; // I'm using a std::string for property
 
   RuleAttr(){}
   ~RuleAttr();
 
   void AddValidity(RuleAction *a) { mValidity.push_back(a); }
   void AddAction(RuleAction *a) { mValidity.push_back(a); }
+  void AddProperty(std::string s) { mProperty.push_back(s); }
 
-  bool Empty() { return mValidity.size() == 0 && mAction.size() == 0; }
+  bool Empty() { return mValidity.size() == 0 &&
+                        mAction.size() == 0 &&
+                        mProperty.size() == 0; }
 
   void DumpDataType(int i);
   void DumpTokenType(int i);
@@ -115,7 +119,7 @@ public:
                            // Here only put the base type: Rule
     char        mChar;
     const char *mString;   // Pending elem. string is NULL ended in string pool
-    TypeId    mTypeId;
+    TypeId      mTypeId;
   } mData;
 
   std::vector<RuleElem *> mSubElems;  // Sub elements. It's empty if mType

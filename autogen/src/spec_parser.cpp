@@ -514,6 +514,9 @@ bool SPECParser::ParseAttr() {
     case SPECTK_Validity:
       status = ParseAttrValidity();
       break;
+    case SPECTK_Property:
+      status = ParseAttrProperty();
+      break;
     case SPECTK_Action:
       status = ParseAttrAction();
       break;
@@ -554,6 +557,32 @@ bool SPECParser::ParseAttrTokentype() {
   std::string name = mLexer->GetTokenString();
 
   tk = mLexer->NextToken();
+  return true;
+}
+
+bool SPECParser::ParseAttrProperty() {
+  bool status = false;
+
+  SPECTokenKind tk = mLexer->GetToken();
+  if (tk != SPECTK_Property)
+    ParserError("expect token type but get ", mLexer->GetTokenString());
+
+  tk = mLexer->NextToken();
+  if (tk != SPECTK_Colon)
+    ParserError("expect ':' but get ", mLexer->GetTokenString());
+
+
+  RuleAttr *attr = &(mCurrrule->mAttr);
+
+  while (1) {
+    tk = mLexer->NextToken();
+    std::string name = mLexer->GetTokenString();
+    attr->AddProperty(name);
+    tk = mLexer->NextToken();
+    if (tk != SPECTK_Coma)
+      break;
+  }
+
   return true;
 }
 

@@ -74,6 +74,7 @@ public:
   bool ParseAttrDatatype();
   bool ParseAttrTokentype();
   bool ParseAttrValidity();
+  bool ParseAttrProperty();
   bool ParseAttrAction();
 
   void SetVerbose(int i) { mLexer->SetVerbose(i); }

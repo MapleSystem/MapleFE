@@ -135,6 +135,7 @@ _____________________
  *) attr.type
  *) attr.validity[.%n,%m] optional for specific elements #n, #m in ONEOF
  *) attr.action[.%n,%m]   optional for specific elements #n, #m in ONEOF
+ *) attr.property : XXX
 
  Note : all indexes start from 1
 
@@ -156,17 +157,26 @@ _____________________
 
  1. attr.xxx           must follow the rule which it attaches to.
  2. attr.type          tells the data type of the generated IR component of this rule.
- 3. attr.validity[.%n] tells the semantic limitation of each component, with optional
+ 3. attr.property      tells the properties this rule has. It could be a property having
+                       impact on the parsing result, or a property affect parsing efficiency.
+                       There will be a set of properties to support. Right now we only
+                       support one, ie. attr.property : Single
+                       This is applied to a ONEOF rule, telling the parser the first
+                       matching children rule is good. Don't need try all the children since
+                       there will be ONLY one single children is valid for a specific
+                       set of tokens.
+
+ 4. attr.validity[.%n] tells the semantic limitation of each component, with optional
                        specific element number.  The corresponding functions will be
                        called by language parser.
- 4. attr.action[.%n]   tells the action (or functions) to be invoked by language parser
+ 5. attr.action[.%n]   tells the action (or functions) to be invoked by language parser
                        when this rule is hit with optional specific element number.
                        Usually this tells the way to generate IR on target compiler.
- 5. The value must be system recognized value, such as a type value.
+ 6. The value must be system recognized value, such as a type value.
     Or, it can be a system supported functions.
     Please refer to Section 2 <Reserved or system supported items> and Appendix
     for <System Supported Functions>
- 6. Each term in rhs of the rule is given a number, starting from 1. It can
+ 7. Each term in rhs of the rule is given a number, starting from 1. It can
     be noted as %1, %2 and etc. In the above example, %1 stands for "Rule2 + '+' + Rule3".
 
 _________________________________________________

@@ -43,14 +43,15 @@ rule VariableInitializer : ONEOF(
 
 rule VariableInitializerList: VariableInitializer + ZEROORMORE(',' + VariableInitializer)
 
-rule Statement : ONEOF(
-  LocalVariableDeclarationStatement,
-  StatementWithoutTrailingSubstatement,
-  LabeledStatement,
-  IfThenElseStatement,
-  IfThenStatement,
-  WhileStatement,
-  ForStatement)
+rule Statement : ONEOF(LocalVariableDeclarationStatement,
+                       StatementWithoutTrailingSubstatement,
+                       LabeledStatement,
+                       IfThenElseStatement,
+                       IfThenStatement,
+                       WhileStatement,
+                       ForStatement)
+  attr.property: Single
+
 
 rule StatementNoShortIf : ONEOF(
   StatementWithoutTrailingSubstatement,
