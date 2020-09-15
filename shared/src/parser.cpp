@@ -1166,14 +1166,6 @@ bool Parser::TraverseOneof(RuleTable *rule_table, AppealNode *parent) {
 
   gSuccTokensNum = 0;
 
-  // In ONEOF rules, some may can only have one legal form. So it's better
-  // to speed up the parsing by stopping at the first one.
-  bool only_single = false;
-  if (rule_table == &TblStatement ||
-      rule_table == &TblStatementWithoutTrailingSubstatement ||
-      rule_table == &TblStatementNoShortIf)
-    only_single = true;
-
   for (unsigned i = 0; i < rule_table->mNum; i++) {
     TableData *data = rule_table->mData + i;
     bool temp_found = TraverseTableData(data, parent);
@@ -1198,7 +1190,8 @@ bool Parser::TraverseOneof(RuleTable *rule_table, AppealNode *parent) {
       // Restore the position of original mCurToken.
       mCurToken = old_mCurToken;
 
-      if (only_single)
+      // Some ONEOF rules can have only children matching current token seq.
+      if (rule_table->mProperties & RP_Single)
         break;
     }
   }

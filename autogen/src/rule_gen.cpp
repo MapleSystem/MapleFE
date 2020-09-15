@@ -84,6 +84,27 @@ std::string RuleGen::GetSubTblName() {
   return tn; 
 }
 
+std::string RuleGen::GetPropertyName(const Rule *rule) {
+  if (!rule)
+    return "RP_NA";
+
+  RuleAttr *attr = &(rule->mAttr);
+  unsigned size = attr->mProperty.size();
+  if (size == 0)
+    return "RP_NA";
+
+  std::string name;
+  for (unsigned i = 0; i < size; i++) {
+    std::string s = "RP_";
+    s += attr->mProperty[i];
+    if (i < size - 1)
+      s += "|";
+    name += s;
+  }
+
+  return name;
+}
+
 // Return the string name of an entry type
 // In Rule, it has two info <type,op> to decide an element's type
 // but in the generated rule table it has only one info, EntryType
@@ -315,10 +336,15 @@ void RuleGen::Gen4Table(const Rule *rule, const RuleElem *elem){
   rule_table += '{';
 
   // 3. Add the Entry, it contains a type and a set of data
-  //    EntryType, NumOfElem, TableData, NumAction, ActionTable
+  //    EntryType, Property, NumOfElem, TableData, NumAction, ActionTable
   std::string entrytype = GetEntryTypeName(elem->mType, elem->mData.mOp);
   entrytype = entrytype + ", ";
-  rule_table += entrytype + elemnum + ", " + rule_table_data_name;
+
+  std::string properties = GetPropertyName(rule);
+  properties += ", ";
+
+  rule_table += entrytype + properties + elemnum + ", " + rule_table_data_name;
+
   if (attr->mAction.size() > 0) {
     rule_table += ", ";
     rule_table += std::to_string(attr->mAction.size());

@@ -35,6 +35,7 @@ private:
   unsigned mSubTblNum;
 
   std::string GetTblName(const Rule*);
+  std::string GetPropertyName(const Rule*);
   std::string GetSubTblName();
   std::string GetEntryTypeName(ElemType, RuleOp);
 

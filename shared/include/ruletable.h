@@ -85,9 +85,15 @@ struct Action {
                                       // starts from 1. So 0 means nothing.
 };
 
+enum RuleProp {
+  RP_Single = 1,  // For a ONEOF rule, there is one and only one children valid.
+  RP_NA = 0
+};
+
 // Struct of the table entry
 struct RuleTable{
   EntryType   mType;
+  RuleProp    mProperties; // properties of the rule table.
   unsigned    mNum;        // Num of TableData entries
   TableData  *mData;
   unsigned    mNumAction;  // Num of actions

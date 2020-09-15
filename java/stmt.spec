@@ -53,26 +53,27 @@ rule Statement : ONEOF(LocalVariableDeclarationStatement,
   attr.property: Single
 
 
-rule StatementNoShortIf : ONEOF(
-  StatementWithoutTrailingSubstatement,
-  LabeledStatementNoShortIf,
-  IfThenElseStatementNoShortIf,
-  WhileStatementNoShortIf,
-  ForStatementNoShortIf)
+rule StatementNoShortIf : ONEOF( StatementWithoutTrailingSubstatement,
+                                 LabeledStatementNoShortIf,
+                                 IfThenElseStatementNoShortIf,
+                                 WhileStatementNoShortIf,
+                                 ForStatementNoShortIf)
+  attr.property: Single
 
 rule StatementWithoutTrailingSubstatement : ONEOF(
-  Block,
-  EmptyStatement,
-  ExpressionStatement,
-  AssertStatement,
-  SwitchStatement,
-  DoStatement,
-  BreakStatement,
-  ContinueStatement,
-  ReturnStatement,
-  SynchronizedStatement,
-  ThrowStatement,
-  TryStatement)
+         Block,
+         EmptyStatement,
+         ExpressionStatement,
+         AssertStatement,
+         SwitchStatement,
+         DoStatement,
+         BreakStatement,
+         ContinueStatement,
+         ReturnStatement,
+         SynchronizedStatement,
+         ThrowStatement,
+         TryStatement)
+  attr.property: Single
 
 rule IfThenStatement : "if" + '(' + Expression + ')' + Statement
   attr.action: BuildCondBranch(%3)
