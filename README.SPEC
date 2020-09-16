@@ -161,10 +161,11 @@ _____________________
                        impact on the parsing result, or a property affect parsing efficiency.
                        There will be a set of properties to support. Right now we only
                        support one, ie. attr.property : Single
+                       [Single]
                        This is applied to a ONEOF rule, telling the parser the first
                        matching children rule is good. Don't need try all the children since
                        there will be ONLY one single children is valid for a specific
-                       set of tokens.
+                       set of tokens. So it stops at the first child matching.
 
  4. attr.validity[.%n] tells the semantic limitation of each component, with optional
                        specific element number.  The corresponding functions will be

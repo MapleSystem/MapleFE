@@ -31,11 +31,11 @@ rule AmbiguousName  : ONEOF(Identifier, AmbiguousName + '.' + Identifier)
   attr.action.%2 : BuildField(%1, %3)
 
 rule Class : "class"
-rule ClassLiteral : ONEOF(
-  TypeName + ZEROORMORE('[' + ']') + '.' + Class,
-  NumericType + ZEROORMORE('[' + ']') + '.' + Class,
-  "boolean" + ZEROORMORE('[' + ']') + '.' + Class,
-  "void" + '.' + Class)
+rule ClassLiteral : ONEOF(TypeName + ZEROORMORE('[' + ']') + '.' + Class,
+                          NumericType + ZEROORMORE('[' + ']') + '.' + Class,
+                          "boolean" + ZEROORMORE('[' + ']') + '.' + Class,
+                          "void" + '.' + Class)
+  attr.property : Single
 
 rule PrimaryNoNewArray : ONEOF(
   Literal,

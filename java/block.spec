@@ -25,8 +25,8 @@ attr.action : AddClassBody(%7)
 attr.action : AddSuperClass(%5)
 attr.action : AddSuperInterface(%6)
 
-rule ClassAttr : ONEOF("public", "protected", "private", "abstract",
-                           "static", "final", "strictfp")
+rule ClassAttr : ONEOF("public", "protected", "private", "abstract", "static", "final", "strictfp")
+  attr.property : Single
 rule ClassModifier : ONEOF(Annotation, ClassAttr)
 
 # 1. Generic class
@@ -52,6 +52,8 @@ rule ClassBodyDeclaration   : ONEOF(ClassMemberDeclaration,
                                     InstanceInitializer,
                                     StaticInitializer,
                                     ConstructorDeclaration)
+  attr.property : Single
+
 rule InstanceInitializer    : Block
   attr.action: BuildInstInit(%1)
 rule StaticInitializer      : "static" + Block
@@ -63,6 +65,8 @@ rule ClassMemberDeclaration : ONEOF(FieldDeclaration,
                                     ClassDeclaration,
                                     InterfaceDeclaration,
                                     ';')
+  attr.property : Single
+
 rule FieldDeclaration  : ZEROORMORE(FieldModifier) + UnannType + VariableDeclaratorList + ';'
   attr.action: BuildDecl(%2, %3)
   attr.action: AddModifier(%1)
@@ -72,14 +76,17 @@ rule MethodDeclaration : ZEROORMORE(MethodModifier) + MethodHeader + MethodBody
   attr.action: AddFunctionBodyTo(%2, %3)
 
 rule MethodBody        : ONEOF(Block, ';')
+  attr.property : Single
 rule MethodHeader      : ONEOF(Result + MethodDeclarator + ZEROORONE(Throws),
                                TypeParameters + ZEROORMORE(Annotation) + Result + MethodDeclarator +
                                ZEROORONE(Throws))
   attr.action.%1: AddTypeTo(%2, %1)
   attr.action.%1: AddThrowsTo(%2, %3)
   attr.action.%2: AddThrowsTo(%4, %5)
+  attr.property : Single
 
 rule Result            : ONEOF(UnannType, "void")
+  attr.property : Single
 rule MethodDeclarator  : Identifier + '(' + ZEROORONE(FormalParameterList) + ')' + ZEROORONE(Dims)
   attr.action: BuildFunction(%1)
   attr.action: AddParams(%3)
@@ -93,7 +100,10 @@ rule ExceptionType     : ONEOF(ClassType, TypeVariable)
 
 rule MethodAttr : ONEOF("public", "protected", "private", "abstract", "static",
                         "final", "synchronized", "native", "strictfp")
+  attr.property : Single
+
 rule MethodModifier    : ONEOF(Annotation, MethodAttr)
+  attr.property : Single
 
 rule FormalParameterList : ONEOF(ReceiverParameter,
                                  FormalParameters + ',' + LastFormalParameter,
@@ -113,7 +123,9 @@ rule LastFormalParameter : ONEOF(ZEROORMORE(VariableModifier) + UnannType + ZERO
 
 
 rule FieldAttr : ONEOF("public", "protected", "private", "static", "final", "transient", "volatile")
+  attr.property : Single
 rule FieldModifier : ONEOF(Annotation, FieldAttr)
+  attr.property : Single
 
 ################################################################
 #                        Constructor                           #
