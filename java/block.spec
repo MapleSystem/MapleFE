@@ -16,6 +16,7 @@
 ###################################################################################
 
 rule ClassDeclaration : ONEOF(NormalClassDeclaration, EnumDeclaration)
+  attr.property : Single
 rule NormalClassDeclaration : ZEROORMORE(ClassModifier) + "class" + Identifier +
                               ZEROORONE(TypeParameters) + ZEROORONE(Superclass) +
                               ZEROORONE(Superinterfaces) + ClassBody
@@ -28,6 +29,7 @@ attr.action : AddSuperInterface(%6)
 rule ClassAttr : ONEOF("public", "protected", "private", "abstract", "static", "final", "strictfp")
   attr.property : Single
 rule ClassModifier : ONEOF(Annotation, ClassAttr)
+  attr.property : Single
 
 # 1. Generic class
 # 2. TypeParameter will be defined in type.spec
@@ -105,21 +107,27 @@ rule MethodAttr : ONEOF("public", "protected", "private", "abstract", "static",
 rule MethodModifier    : ONEOF(Annotation, MethodAttr)
   attr.property : Single
 
-rule FormalParameterList : ONEOF(ReceiverParameter,
-                                 FormalParameters + ',' + LastFormalParameter,
-                                 LastFormalParameter)
-  attr.action.%2: BuildVarList(%1, %3)
+rule FormalParameterListNoReceiver : ONEOF(FormalParameters + ',' + LastFormalParameter,
+                                           LastFormalParameter)
+  attr.action.%1: BuildVarList(%1, %3)
+
+rule FormalParameterList : ONEOF(FormalParameterListNoReceiver, ReceiverParameter)
+  attr.property : Single
+
 rule FormalParameters  : ONEOF(FormalParameter + ZEROORMORE(',' + FormalParameter),
                                ReceiverParameter + ZEROORMORE(',' + FormalParameter))
   attr.action.%1: BuildVarList(%1, %2)
+  attr.property : Single
 
 rule FormalParameter   : ZEROORMORE(VariableModifier) + UnannType + VariableDeclaratorId
   attr.action: BuildDecl(%2, %3)
   attr.action: AddModifier(%1)
 rule ReceiverParameter : ZEROORMORE(Annotation) + UnannType + ZEROORONE(Identifier + '.') + "this"
+
 rule LastFormalParameter : ONEOF(ZEROORMORE(VariableModifier) + UnannType + ZEROORMORE(Annotation) +
                                    "..." + VariableDeclaratorId,
                                  FormalParameter)
+  attr.property : Single
 
 
 rule FieldAttr : ONEOF("public", "protected", "private", "static", "final", "transient", "volatile")
@@ -135,7 +143,9 @@ rule ConstructorDeclaration : ZEROORMORE(ConstructorModifier) + ConstructorDecla
   attr.action : AddFunctionBodyTo(%2, %4)
 
 rule ConstructorAttr : ONEOF("public", "protected", "private")
+  attr.property : Single
 rule ConstructorModifier    : ONEOF(Annotation, ConstructorAttr)
+  attr.property : Single
 rule ConstructorDeclarator  : ZEROORONE(TypeParameters) + SimpleTypeName + '(' +
                               ZEROORONE(FormalParameterList) + ')'
   attr.action : BuildConstructor(%2)
@@ -144,11 +154,14 @@ rule ConstructorBody        : '{' + ZEROORONE(ExplicitConstructorInvocation) +
                               ZEROORONE(BlockStatements) + '}'
   attr.action : BuildBlock(%3)
 
+# Although ExpressionName and Primary are not excluding each other, given the rest
+# of the concatenate elements this is a 'Single' rule.
 rule ExplicitConstructorInvocation : ONEOF(
          ZEROORONE(TypeArguments) + "this" + '(' + ZEROORONE(ArgumentList) + ')' +  ';',
          ZEROORONE(TypeArguments) + "super" + '(' + ZEROORONE(ArgumentList) + ')' +  ';',
          ExpressionName + '.' + ZEROORONE(TypeArguments) + "super" + '(' + ZEROORONE(ArgumentList) + ')' +  ';',
          Primary + '.' + ZEROORONE(TypeArguments) + "super" + '(' + ZEROORONE(ArgumentList) + ')' +  ';')
+  attr.property : Single
 
 ################
 # A fake ones
@@ -157,9 +170,15 @@ rule EnumDeclaration        : "fakeenumdeclaration"
 ######################################################################
 #                        Block                                       #
 ######################################################################
+
+# 1st and 3rd children don't exclude each other. However, if both of them
+# match, they will match the same sequence of tokens, being a
+# LocalVariableDeclarationStatement. So don't need traverse 3rd any more.
 rule BlockStatement  : ONEOF(LocalVariableDeclarationStatement,
                              ClassDeclaration,
                              Statement)
+  attr.property : Single
+
 rule BlockStatements : BlockStatement + ZEROORMORE(BlockStatement)
 rule Block           : '{' + ZEROORONE(BlockStatements) + '}'
   attr.action: BuildBlock(%2)
