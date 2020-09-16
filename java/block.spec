@@ -188,26 +188,36 @@ rule Block           : '{' + ZEROORONE(BlockStatements) + '}'
 #                        Interface                                   #
 ######################################################################
 rule InterfaceDeclaration : ONEOF(NormalInterfaceDeclaration, AnnotationTypeDeclaration)
+  attr.property : Single
 rule NormalInterfaceDeclaration : ZEROORMORE(InterfaceModifier) + "interface" + Identifier +
                                   ZEROORONE(TypeParameters) + ZEROORONE(ExtendsInterfaces) + InterfaceBody
 rule InterfaceAttr : ONEOF("public", "protected", "private", "abstract", "static", "strictfp")
+  attr.property : Single
 rule InterfaceModifier : ONEOF(Annotation, InterfaceAttr)
+  attr.property : Single
 rule ExtendsInterfaces : "extends" + InterfaceTypeList
 rule InterfaceBody     : '{' + ZEROORMORE(InterfaceMemberDeclaration) + '}'
+
 rule InterfaceMemberDeclaration : ONEOF(ConstantDeclaration,
                                         InterfaceMethodDeclaration,
                                         ClassDeclaration,
                                         InterfaceDeclaration,
                                         ';')
+  attr.property : Single
+
 # constant decl is also called field decl. In interface, field must have a variable initializer
 # However, the rules below don't tell this limitation.
 rule ConstantDeclaration : ZEROORMORE(ConstantModifier) + UnannType + VariableDeclaratorList + ';'
 rule ConstantAttr : ONEOF("public", "static", "final")
+  attr.property : Single
 rule ConstantModifier : ONEOF(Annotation, ConstantAttr)
+  attr.property : Single
 
 rule InterfaceMethodDeclaration : ZEROORMORE(InterfaceMethodModifier) + MethodHeader + MethodBody
 rule InterfaceMethodAttr : ONEOF("public", "abstract", "default", "static", "strictfp")
+  attr.property : Single
 rule InterfaceMethodModifier : ONEOF(Annotation, InterfaceMethodAttr)
+  attr.property : Single
 
 ######################################################################
 #                        Annotation Type                             #
@@ -225,11 +235,14 @@ rule AnnotationTypeMemberDeclaration : ONEOF(AnnotationTypeElementDeclaration,
                                              ClassDeclaration,
                                              InterfaceDeclaration,
                                              ';')
+  attr.property : Single
 rule AnnotationTypeElementDeclaration : ZEROORMORE(AnnotationTypeElementModifier) + UnannType +
                                           Identifier + '(' +  ')' + ZEROORONE(Dims) +
                                           ZEROORONE(DefaultValue) + ';'
 rule AnnotationTypeElementAttr : ONEOF("public", "abstract")
+  attr.property : Single
 rule AnnotationTypeElementModifier : ONEOF(Annotation, AnnotationTypeElementAttr)
+  attr.property : Single
 rule DefaultValue : "default" + ElementValue
 
 ######################################################################
@@ -238,6 +251,7 @@ rule DefaultValue : "default" + ElementValue
 rule Annotation : ONEOF(NormalAnnotation,
                         MarkerAnnotation,
                         SingleElementAnnotation)
+  attr.property : Single
 
 rule NormalAnnotation : '@' + TypeName + '(' + ZEROORONE(ElementValuePairList) + ')'
   attr.action : BuildAnnotation(%2)
@@ -276,7 +290,3 @@ rule SingleStaticImportDeclaration: "import" + "static" + TypeName + '.' + Ident
   attr.action : BuildSingleStaticImport(%3, %4)
 rule StaticImportOnDemandDeclaration: "import" + "static" + TypeName + '.' + '*' + ';'
   attr.action : BuildAllStaticImport(%3)
-
-rule TypeDeclaration: ONEOF(ClassDeclaration,
-                            InterfaceDeclaration,
-                            ';')

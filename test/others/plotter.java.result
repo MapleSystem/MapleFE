@@ -1,6 +1,20 @@
 Matched 7 tokens.
 Matched 18 tokens.
 Matched 29 tokens.
+Matched 36 tokens.
+Matched 43 tokens.
+Matched 52 tokens.
+Matched 61 tokens.
+Matched 70 tokens.
+Matched 79 tokens.
+Matched 86 tokens.
+Matched 254 tokens.
+Convert unary --> binary
+Convert unary --> binary
+Convert unary --> binary
+Convert unary --> binary
+Convert unary --> binary
+Convert unary --> binary
 ============= Module ===========
 == Sub Tree ==
 package com.baeldung.bitset
@@ -8,3 +22,41 @@ package com.baeldung.bitset
 import org.openjdk.jol.info.ClassLayout
 == Sub Tree ==
 import org.openjdk.jol.info.GraphLayout
+== Sub Tree ==
+import java.io.BufferedWriter
+== Sub Tree ==
+import java.io.IOException
+== Sub Tree ==
+import java.nio.file.Files
+== Sub Tree ==
+import java.nio.file.Path
+== Sub Tree ==
+import java.nio.file.Paths
+== Sub Tree ==
+import java.nio.file.StandardOpenOption
+== Sub Tree ==
+import java.util.BitSet
+== Sub Tree ==
+class  Plotter
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+    func  main()  throws:     IOException
+      var:path=
+      BufferedWriter
+      stream
+      Files.newBufferedWriter(path,)
+      stream.write("bits,bool,bitset
+")
+      for ( )
+        System.out.println("Number of bits => " Add i)
+
+
+
+  LocalClasses: 
+  LocalInterfaces: 
+
+Identifier:BufferedWriter has no decl.
+Identifier:stream has no decl.
