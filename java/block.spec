@@ -173,9 +173,19 @@ rule ExplicitConstructorInvocation : ONEOF(
          Primary + '.' + ZEROORONE(TypeArguments) + "super" + '(' + ZEROORONE(ArgumentList) + ')' +  ';')
   attr.property : Single
 
-################
-# A fake ones
-rule EnumDeclaration        : "fakeenumdeclaration"
+######################################################################
+#                           Enum                                     #
+######################################################################
+rule EnumDeclaration: ZEROORMORE(ClassModifier) + "enum" + Identifier +
+                      ZEROORONE(Superinterfaces) + EnumBody
+rule EnumBody: '{' + ZEROORONE(EnumConstantList) + ZEROORONE(',') +
+               ZEROORONE(EnumBodyDeclarations) + '}'
+
+rule EnumConstantList: EnumConstant + ZEROORMORE(',' + EnumConstant)
+rule EnumConstant: ZEROORMORE(EnumConstantModifier) + Identifier +
+                   ZEROORONE('(' + ZEROORONE(ArgumentList) + ')') + ZEROORONE(ClassBody)
+rule EnumConstantModifier: Annotation
+rule EnumBodyDeclarations: ';' + ZEROORMORE(ClassBodyDeclaration)
 
 ######################################################################
 #                        Block                                       #
