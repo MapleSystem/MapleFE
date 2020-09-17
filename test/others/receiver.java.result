@@ -1,0 +1,34 @@
+Matched 65 tokens.
+============= Module ===========
+== Sub Tree ==
+class  Outer
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+    constructor  Outer()  throws: 
+  Methods: 
+    func  m()  throws: 
+  LocalClasses: 
+    class  Inner
+      Fields: 
+
+      Instance Initializer: 
+      Constructors: 
+        constructor  Inner()  throws: 
+      Methods: 
+        func  m()  throws: 
+      LocalClasses: 
+        class  B
+          Fields: 
+
+          Instance Initializer: 
+          Constructors: 
+            constructor  B()  throws: 
+          Methods: 
+            func  m()  throws: 
+          LocalClasses: 
+          LocalInterfaces: 
+      LocalInterfaces: 
+  LocalInterfaces: 
+

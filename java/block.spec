@@ -111,7 +111,17 @@ rule FormalParameterListNoReceiver : ONEOF(FormalParameters + ',' + LastFormalPa
                                            LastFormalParameter)
   attr.action.%1: BuildVarList(%1, %3)
 
-rule FormalParameterList : ONEOF(FormalParameterListNoReceiver, ReceiverParameter)
+# ReceiverParameter and FormalParameterListNoReceiver could match at the same
+# but with different num of tokens. Here is an example
+#   foo(T T.this)
+# The NoReceiver could match "T T", while Receiver match "T T.this".
+# Although later it figures out NoReceiver is wrong, but at this rule, both rule work.
+# If we put NoReceiver as the 1st child and set property 'Single',  we will miss
+# Receiver which is the correct one.
+#
+# So I move Receiver to be the 1st child, since NoReceiver is not correct matching
+# if Receiver works.
+rule FormalParameterList : ONEOF(ReceiverParameter, FormalParameterListNoReceiver)
   attr.property : Single
 
 rule FormalParameters  : ONEOF(FormalParameter + ZEROORMORE(',' + FormalParameter),
