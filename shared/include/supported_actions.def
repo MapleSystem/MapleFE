@@ -38,6 +38,7 @@ ACTION(BuildAllStaticImport)       // style like java ondemand static import
 ACTION(BuildAllImport)             // style like c/c++ include all in .h file
 
 ACTION(BuildBlock)
+ACTION(AddToBlock)
 
 ACTION(BuildCast)
 ACTION(BuildParenthesis)
@@ -64,6 +65,7 @@ ACTION(BuildExprList)
 
 // For class/inheritance
 ACTION(BuildClass)
+ACTION(SetClassIsJavaEnum)
 ACTION(AddSuperClass)
 ACTION(AddSuperInterface)
 ACTION(AddClassBody)

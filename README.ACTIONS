@@ -39,6 +39,10 @@ all modules are as below.
   Block is widely used in many scenarios, like function body, class body, or just a block.
   It only takes one parameter which is the root node of block tree.
 
+* AddToBlock
+  Format: AddToBlock(tree)
+  Assume mLastTreeNode is the BlockNode to be added to. Add 'tree' to BlockNode.
+
 * BuildParenthesis
   Format: BuildParenthesis(Expression)
   Returns mLastTreeNode.
@@ -152,6 +156,10 @@ all modules are as below.
 
 * BuildClass
   Format: BuildClass(classIdentifier)
+
+* SetClassIsJavaEnum
+  Format: SetClassIsJavaEnum()
+  This is specifically for Java Enum which is a special kind of class.
 
 * AddSuperClass
   Format: AddSuperClass(superclassIdentifier)

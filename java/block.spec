@@ -178,13 +178,31 @@ rule ExplicitConstructorInvocation : ONEOF(
 ######################################################################
 rule EnumDeclaration: ZEROORMORE(ClassModifier) + "enum" + Identifier +
                       ZEROORONE(Superinterfaces) + EnumBody
+  attr.action : BuildClass(%3)
+  attr.action : SetClassIsJavaEnum()
+  attr.action : AddModifier(%1)
+  attr.action : AddSuperInterface(%4)
+  attr.action : AddClassBody(%5)
+
+# This returns a PassNode with some ConstantNode and BlockNode. The
+# different between ConstantNode and LiteralNode can be found in their definition.
 rule EnumBody: '{' + ZEROORONE(EnumConstantList) + ZEROORONE(',') +
                ZEROORONE(EnumBodyDeclarations) + '}'
+  attr.action: BuildBlock(%2)
+  attr.action: AddToBlock(%4)
 
+# This returns a PassNode
 rule EnumConstantList: EnumConstant + ZEROORMORE(',' + EnumConstant)
+
+# AddInitTo() will handle this complicated JavaEnum style initial value of identifier
 rule EnumConstant: ZEROORMORE(EnumConstantModifier) + Identifier +
                    ZEROORONE('(' + ZEROORONE(ArgumentList) + ')') + ZEROORONE(ClassBody)
+  attr.action : AddInitTo(%2, %3)
+  attr.action : AddInitTo(%2, %4)
+
 rule EnumConstantModifier: Annotation
+
+# This returns a PassNode with a set of BlockNode
 rule EnumBodyDeclarations: ';' + ZEROORMORE(ClassBodyDeclaration)
 
 ######################################################################

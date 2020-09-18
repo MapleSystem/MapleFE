@@ -887,7 +887,7 @@ public:
 //                             &
 //                         ClassBody -->BlockNode
 // In reality there is no such thing as ClassBody, since this 'body' will
-// eventually become field and method of a class. However, during parsing
+// eventually become fields and methods of a class. However, during parsing
 // the children are processed before parents, which means we need to have
 // all fields and members ready before the class. So we come up with
 // this ClassBody to temporarily hold these subtrees, and let the class
@@ -907,6 +907,12 @@ public:
 
 class ClassNode : public TreeNode {
 private:
+  // Java Enum is defined in a similar way as class, with many restrictions
+  // and special semantic rules. We define JavaEnum here too. For other
+  // languages like C/C++ which have very simply Enum, we will have a
+  // dedicated EnumNode for them.
+  bool                         mJavaEnum;
+
   const char                  *mName;
   SmallVector<ClassNode*>      mSuperClasses;
   SmallVector<InterfaceNode*>  mSuperInterfaces;
@@ -921,11 +927,14 @@ private:
   SmallVector<InterfaceNode*>  mLocalInterfaces;
 
 public:
-  ClassNode(){mKind = NK_Class;}
+  ClassNode(){mKind = NK_Class; mJavaEnum = false; mName = NULL; mBody = NULL;}
   ~ClassNode() {Release();}
 
   void SetName(const char *n) {mName = n;}
   const char* GetName()       {return mName;}
+
+  bool IsJavaEnum() {return mJavaEnum;}
+  void SetJavaEnum(){mJavaEnum = true;}
 
   void AddSuperClass(ClassNode *n)         {mSuperClasses.PushBack(n);}
   void AddSuperInterface(InterfaceNode *n) {mSuperInterfaces.PushBack(n);}

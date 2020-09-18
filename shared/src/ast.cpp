@@ -765,7 +765,7 @@ void ClassNode::Construct() {
       MASSERT(block->IsInstInit() && "unnamed block in class is not inst init?");
       mInstInits.PushBack(tree_node);
     } else
-      MERROR("Unsupported tree node in class body.");
+      MASSERT("Unsupported tree node in class body.");
   }
 }
 
@@ -783,7 +783,10 @@ void ClassNode::Release() {
 
 void ClassNode::Dump(unsigned indent) {
   DumpIndentation(indent);
-  DUMP1_NORETURN("class ", mName);
+  if (IsJavaEnum())
+    DUMP1_NORETURN("class[JavaEnum] ", mName);
+  else
+    DUMP1_NORETURN("class ", mName);
   DUMP_RETURN();
 
   DumpIndentation(indent + 2);

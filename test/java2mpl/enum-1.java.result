@@ -1,4 +1,17 @@
 Matched 52 tokens.
 ============= Module ===========
 == Sub Tree ==
+class[JavaEnum]  Coin
+  Fields: 
+    value
+  Instance Initializer: 
+  Constructors: 
+    constructor  Coin()  throws: 
+      value Assign value
+  Methods: 
+    func  value()  throws: 
+      return value
+  LocalClasses: 
+  LocalInterfaces: 
 
+Field Decl Duplication! Identifier:value is duplicated with Function:value

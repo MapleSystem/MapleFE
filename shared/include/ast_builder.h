@@ -84,6 +84,7 @@ public:
   TreeNode* BuildAllImport();
 
   TreeNode* BuildBlock();
+  TreeNode* AddToBlock();
 
   TreeNode* BuildUnaryOperation();
   TreeNode* BuildPostfixOperation();
@@ -114,6 +115,7 @@ public:
   TreeNode* AddFunctionBodyTo();
 
   TreeNode* BuildClass();
+  TreeNode* SetClassIsJavaEnum();
   TreeNode* AddClassBody();
   TreeNode* AddSuperClass();
   TreeNode* AddSuperInterface();

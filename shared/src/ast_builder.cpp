@@ -972,6 +972,12 @@ TreeNode* ASTBuilder::BuildClass() {
   return mLastTreeNode;
 }
 
+TreeNode* ASTBuilder::SetClassIsJavaEnum() {
+  ClassNode *klass = (ClassNode*)mLastTreeNode;
+  klass->SetJavaEnum();
+  return mLastTreeNode;
+}
+
 // This takes just one argument which is the root of sub tree
 TreeNode* ASTBuilder::BuildBlock() {
   if (mTrace)
@@ -979,6 +985,35 @@ TreeNode* ASTBuilder::BuildBlock() {
 
   BlockNode *block = (BlockNode*)mTreePool->NewTreeNode(sizeof(BlockNode));
   new (block) BlockNode();
+
+  Param p_subtree = mParams[0];
+  if (!p_subtree.mIsEmpty) {
+    if (!p_subtree.mIsTreeNode)
+      MERROR("The subtree is not a treenode in BuildBlock()");
+
+    // If the subtree is PassNode, we need add all children to block
+    // If else, simply assign subtree as child.
+    TreeNode *subtree = p_subtree.mData.mTreeNode;
+    if (subtree->IsPass()) {
+      PassNode *pass_node = (PassNode*)subtree;
+      for (unsigned i = 0; i < pass_node->GetChildrenNum(); i++)
+        block->AddChild(pass_node->GetChild(i));
+    } else {
+      block->AddChild(subtree);
+    }
+  }
+
+  mLastTreeNode = block;
+  return mLastTreeNode;
+}
+
+// This takes just one argument which is the root of tree to be added.
+TreeNode* ASTBuilder::AddToBlock() {
+  if (mTrace)
+    std::cout << "In AddToBlock" << std::endl;
+
+  MASSERT(mLastTreeNode->IsBlock());
+  BlockNode *block = (BlockNode*)mLastTreeNode;
 
   Param p_subtree = mParams[0];
   if (!p_subtree.mIsEmpty) {
