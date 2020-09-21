@@ -24,9 +24,25 @@ OBJS :=$(foreach obj,$(OBJ), $(BUILD)/$(obj))
 LIBOBJS :=$(patsubst $(BUILD)/main.o,,$(OBJS))
 DEPS :=$(foreach dep,$(DEP), $(BUILD)/$(dep))
 
+MAPLEROOT=~/mapleall
+MAPLEALL=$(MAPLEROOT)/mapleall
+MAPLELIBPATH:=$(MAPLEROOT)/out/arm64-clang-debug/lib/64
+MAPLELIBS := $(MAPLELIBPATH)/libmplir.a \
+             $(MAPLELIBPATH)/liboption_parser.a \
+             $(MAPLELIBPATH)/liblibmpl2mpl.a \
+             $(MAPLELIBPATH)/libmplutil.a \
+             $(MAPLELIBPATH)/libmempool.a \
+             $(MAPLELIBPATH)/libHWSecureC.a
+
+HUAWEI_SECUEW_C_ROOT=$(MAPLEROOT)/huawei_secure_c
 INCLUDES := -I $(ROOTDIR)/shared/include \
             -I $(ROOTDIR)/$(LANG)/include \
-            -I .
+            -I . \
+            -I $(MAPLEALL)/maple_ir/include \
+            -I $(MAPLEALL)/mpl2mpl/include \
+            -I $(MAPLEALL)/mempool/include \
+            -I $(MAPLEALL)/maple_util/include \
+            -I $(HUAWEI_SECUEW_C_ROOT)/include
 
 SHAREDLIB = shared.a
 
@@ -49,7 +65,7 @@ $(BUILD)/%.d : %.cpp
 	@sed -e 's|.*:|$(BUILD)/$*.o:|' < $(BUILD)/$*.d.tmp > $(BUILD)/$*.d
 	@rm -f $(BUILD)/$*.d.tmp
 
-$(SHAREDLIB) : $(OBJS)
+$(SHAREDLIB) : $(OBJS) $(MAPLELIBS)
 	/usr/bin/ar rcs $(BUILD)/$(SHAREDLIB) $(LIBOBJS)
 
 clean:
