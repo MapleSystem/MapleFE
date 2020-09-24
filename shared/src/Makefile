@@ -66,7 +66,7 @@ $(BUILD)/%.d : %.cpp
 	@rm -f $(BUILD)/$*.d.tmp
 
 $(SHAREDLIB) : $(OBJS) $(MAPLELIBS)
-	/usr/bin/ar rcs $(BUILD)/$(SHAREDLIB) $(LIBOBJS)
+	/usr/bin/ar rcs $(BUILD)/$(SHAREDLIB) $(LIBOBJS) $(MAPLELIBS)
 
 clean:
 	rm -rf $(BUILD)
