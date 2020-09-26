@@ -54,9 +54,11 @@ rule PrimaryNoNewArray : ONEOF(
   MethodInvocation,
   MethodReference)
 
+# There was a child rule.
+#  ExpressionName + '.' + UnqualifiedClassInstanceCreationExpression,
+# But Primary contains ExpressionName. It's a duplication, so I removed it.
 rule ClassInstanceCreationExpression : ONEOF(
   UnqualifiedClassInstanceCreationExpression,
-  ExpressionName + '.' + UnqualifiedClassInstanceCreationExpression,
   Primary + '.' + UnqualifiedClassInstanceCreationExpression)
 
 rule UnqualifiedClassInstanceCreationExpression :
@@ -94,6 +96,8 @@ rule FieldAccess : ONEOF(
   "super" + '.' + Identifier,
   TypeName + '.' + "super" + '.' + Identifier)
 
+# It's possible MethodInvocation includes a MethodReference, like
+#  A::B(a,b)
 rule MethodInvocation : ONEOF(
   MethodName + '(' + ZEROORONE(ArgumentList) + ')',
   TypeName + '.' + ZEROORONE(TypeArguments) + Identifier + '(' + ZEROORONE(ArgumentList) + ')',

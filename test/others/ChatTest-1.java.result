@@ -1,0 +1,203 @@
+Matched 7 tokens.
+Matched 14 tokens.
+Matched 21 tokens.
+Matched 28 tokens.
+Matched 35 tokens.
+Matched 42 tokens.
+Matched 51 tokens.
+Matched 1451 tokens.
+Convert unary --> binary
+Convert unary --> binary
+Convert unary --> binary
+Convert unary --> binary
+Convert unary --> binary
+============= Module ===========
+== Sub Tree ==
+import java.io
+== Sub Tree ==
+import java.net.InetSocketAddress
+== Sub Tree ==
+import java.net.Socket
+== Sub Tree ==
+import java.util.ArrayList
+== Sub Tree ==
+import java.util.Collections
+== Sub Tree ==
+import java.util.List
+== Sub Tree ==
+import java.util.concurrent.CyclicBarrier
+== Sub Tree ==
+class  ChatTest
+  Fields: 
+    listeningPort=0
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+    func  main()  throws:     Throwable
+      testStartStop()
+      testPortOpen()
+      testAsksForName()
+      testUseName()
+      testConnectDisconnectConnect()
+      testUsernameAndMessage()
+      testDontReceiveMessageInNameState()
+    func  startServer()  throws:     IOException
+      var:server=new ChatServer
+      var:address=(InetSocketAddress)server.getSocketAddress()
+      listeningPort Assign address.getPort()
+      server.run()
+      return server
+    func  testStartStop()  throws:     Exception
+      var:server=startServer()
+      server.shutdown()
+    func  testPortOpen()  throws:     Exception
+      var:server=startServer()
+      var:socket=new Socket
+      cond-branch cond:socket.isConnected()
+      true branch :
+        new RuntimeException
+      false branch :
+
+
+      server.shutdown()
+
+    func  testAsksForName()  throws:     Exception
+      var:server=startServer()
+      var:socket=new Socket
+
+
+      server.shutdown()
+
+    func  testUseName()  throws:     Throwable
+      var:server=startServer()
+      performTestUseName()
+
+      server.shutdown()
+
+    func  testConnectDisconnectConnect()  throws:     Exception
+      var:server=startServer()
+      performTestConnectDisconnectConnect()
+
+      server.shutdown()
+
+    func  testUsernameAndMessage()  throws:     Exception
+      var:server=startServer()
+      performTestUsernameAndMessage()
+
+      server.shutdown()
+
+    func  testDontReceiveMessageInNameState()  throws:     Exception
+      var:server=startServer()
+      performDontReceiveMessageInNameState()
+
+      server.shutdown()
+
+    func  assertEqual()  throws: 
+      cond-branch cond:
+      true branch :
+        return 
+      false branch :
+
+      cond-branch cond:
+      true branch :
+        exception.add(new RuntimeException)
+        return 
+      false branch :
+
+      cond-branch cond:
+      true branch :
+        exception.add(new RuntimeException)
+        return 
+      false branch :
+
+    func  performDontReceiveMessageInNameState()  throws:     Exception
+      var:barrier1=new CyclicBarrier
+      var:barrier2=new CyclicBarrier
+      var:barrier3=new CyclicBarrier
+      var:exceptions=
+      var:chatConnection=new ChatConnection
+      var:client2=new Thread
+      client2.start()
+      chatConnection.run()
+      cond-branch cond:exceptions.isEmpty()
+      true branch :
+
+        (0)
+      false branch :
+
+    func  waitForJoin()  throws:     IOException
+      var:joined
+      do         joined Assign 
+while ()
+    func  performTestUsernameAndMessage()  throws:     Exception
+      var:barrier1=new CyclicBarrier
+      var:barrier2=new CyclicBarrier
+      var:barrier3=new CyclicBarrier
+      var:exceptions=
+      var:chatConnection=new ChatConnection
+      var:client2=new Thread
+      client2.start()
+      chatConnection.run()
+      cond-branch cond:exceptions.isEmpty()
+      true branch :
+
+        (0)
+      false branch :
+
+    func  readAvailableString()  throws:     IOException
+      return readAvailableString(reader,false)
+    func  readAvailableString()  throws:     IOException
+      var:builder=new StringBuilder
+      var:bytes
+      cond-branch cond:
+      true branch :
+        return null
+      false branch :
+
+      do         var:buf=
+
+while 
+      return builder.toString()
+  LocalClasses: 
+    class  ChatConnection
+      Fields: 
+        exception
+      Instance Initializer: 
+      Constructors: 
+      Methods: 
+        func  run()  throws: 
+          Socket
+          socket
+          new Socket
+
+          socket.setTcpNoDelay(true)
+          run(socket,reader,writer)
+
+
+        func  run()  throws:     Exception
+      LocalClasses: 
+      LocalInterfaces: 
+    class  FlushingWriter
+      Fields: 
+        delegate
+      Instance Initializer: 
+      Constructors: 
+        constructor  FlushingWriter()  throws: 
+          delegate Assign delegate
+      Methods: 
+        func  write()  throws:     IOException
+          delegate.write(cbuf,off,len)
+        func  flush()  throws:     IOException
+          delegate.flush()
+        func  close()  throws:     IOException
+          delegate.close()
+        func  write()  throws:     IOException
+          write
+          str
+          flush()
+      LocalClasses: 
+      LocalInterfaces: 
+  LocalInterfaces: 
+
+Function Decl Duplication! Function:readAvailableString is duplicated with Function:readAvailableString
+Function Decl Duplication! Function:readAvailableString is duplicated with Function:readAvailableString
