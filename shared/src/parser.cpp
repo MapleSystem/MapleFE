@@ -252,6 +252,7 @@ Parser::Parser(const char *name) : filename(name) {
   mTraceSecondTry = false;
   mTraceVisited = false;
   mTraceFailed = false;
+  mTraceTiming = false;
   mTraceSortOut = false;
   mTraceAstBuild = false;
   mTracePatchWasSucc = false;
@@ -489,12 +490,16 @@ bool Parser::ParseStmt() {
   //                                 lex has got the token from source program and we only
   //                                 need check if the table is &TblIdentifier.
 
-  //struct timeval stop, start;
-  //gettimeofday(&start, NULL);
+  struct timeval stop, start;
+  if (mTraceTiming) {
+    gettimeofday(&start, NULL);
+  }
   bool succ = TraverseStmt();
-  //gettimeofday(&stop, NULL);
-  //std::cout << "Time: " << (stop.tv_sec - start.tv_sec) * 1000000 + stop.tv_usec - start.tv_usec;
-  //std::cout << " us" << std::endl;
+  if (mTraceTiming) {
+    gettimeofday(&stop, NULL);
+    std::cout << "Time: " << (stop.tv_sec - start.tv_sec) * 1000000 + stop.tv_usec - start.tv_usec;
+    std::cout << " us" << std::endl;
+  }
 
   // Each top level construct gets a AST tree.
   if (succ) {

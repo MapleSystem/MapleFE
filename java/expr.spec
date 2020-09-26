@@ -37,18 +37,22 @@ rule ClassLiteral : ONEOF(TypeName + ZEROORMORE('[' + ']') + '.' + Class,
                           "void" + '.' + Class)
   attr.property : Single
 
-rule PrimaryNoNewArray : ONEOF(
+rule PrimaryNoNewArray_single : ONEOF(
   Literal,
   ClassLiteral,
   "this",
   TypeName + '.' + "this",
   '(' + Expression + ')',
-  ClassInstanceCreationExpression,
+  ClassInstanceCreationExpression)
+  attr.action.%5 : BuildParenthesis(%2)
+  attr.property : Single
+
+rule PrimaryNoNewArray : ONEOF(
+  PrimaryNoNewArray_single,
   FieldAccess,
   ArrayAccess,
   MethodInvocation,
   MethodReference)
-  attr.action.%5 : BuildParenthesis(%2)
 
 rule ClassInstanceCreationExpression : ONEOF(
   UnqualifiedClassInstanceCreationExpression,

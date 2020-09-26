@@ -263,6 +263,7 @@ public:
   bool mTraceAppeal;        // trace appealing
   bool mTraceSecondTry;     // trace second try in parser.
   bool mTraceFailed;        // trace mFailed
+  bool mTraceTiming;        // trace mFailed
   bool mTraceVisited;       // trace mVisitedStack
   bool mTraceSortOut;       // trace Sort out.
   bool mTraceAstBuild;      // trace AST build.

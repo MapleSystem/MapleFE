@@ -27,12 +27,12 @@ DEPS :=$(foreach dep,$(DEP), $(BUILD)/$(dep))
 MAPLEROOT=~/mapleall
 MAPLEALL=$(MAPLEROOT)/mapleall
 MAPLELIBPATH:=$(MAPLEROOT)/out/arm64-clang-debug/lib/64
-MAPLELIBS := $(MAPLELIBPATH)/libmplir.a \
-             $(MAPLELIBPATH)/liboption_parser.a \
-             $(MAPLELIBPATH)/liblibmpl2mpl.a \
-             $(MAPLELIBPATH)/libmplutil.a \
-             $(MAPLELIBPATH)/libmempool.a \
-             $(MAPLELIBPATH)/libHWSecureC.a
+#MAPLELIBS := $(MAPLELIBPATH)/libmplir.a \
+#             $(MAPLELIBPATH)/liboption_parser.a \
+#             $(MAPLELIBPATH)/liblibmpl2mpl.a \
+#             $(MAPLELIBPATH)/libmplutil.a \
+#             $(MAPLELIBPATH)/libmempool.a \
+#             $(MAPLELIBPATH)/libHWSecureC.a
 
 HUAWEI_SECUEW_C_ROOT=$(MAPLEROOT)/huawei_secure_c
 INCLUDES := -I $(ROOTDIR)/shared/include \

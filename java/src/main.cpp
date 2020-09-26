@@ -28,6 +28,7 @@ static void help() {
   std::cout << "   --trace-appeal    : Trace appeal process" << std::endl;
   std::cout << "   --trace-second-try: Trace parser second try." << std::endl;
   std::cout << "   --trace-failed    : Trace failed tokens of table" << std::endl;
+  std::cout << "   --trace-timing    : Trace parsing time" << std::endl;
   std::cout << "   --trace-stack     : Trace visited-token stack of table" << std::endl;
   std::cout << "   --trace-sortout   : Trace SortOut" << std::endl;
   std::cout << "   --trace-ast-build : Trace AST Builder" << std::endl;
@@ -59,6 +60,8 @@ int main (int argc, char *argv[]) {
       parser->mTraceVisited = true;
     } else if (!strncmp(argv[i], "--trace-failed", 14) && (strlen(argv[i]) == 14)) {
       parser->mTraceFailed = true;
+    } else if (!strncmp(argv[i], "--trace-timing", 14) && (strlen(argv[i]) == 14)) {
+      parser->mTraceTiming = true;
     } else if (!strncmp(argv[i], "--trace-sortout", 15) && (strlen(argv[i]) == 15)) {
       parser->mTraceSortOut = true;
     } else if (!strncmp(argv[i], "--trace-ast-build", 17) && (strlen(argv[i]) == 17)) {
