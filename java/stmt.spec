@@ -43,6 +43,8 @@ rule VariableInitializer : ONEOF(
 
 rule VariableInitializerList: VariableInitializer + ZEROORMORE(',' + VariableInitializer)
 
+# Statements are actually dis-ambiguous, and it's "top" level.
+# There should NOT be any two statements matching at the same start tokens.
 rule Statement : ONEOF(LocalVariableDeclarationStatement,
                        StatementWithoutTrailingSubstatement,
                        LabeledStatement,
@@ -53,6 +55,8 @@ rule Statement : ONEOF(LocalVariableDeclarationStatement,
   attr.property: Single
 
 
+# Statements are actually dis-ambiguous, and it's "top" level.
+# There should NOT be any two statements matching at the same start tokens.
 rule StatementNoShortIf : ONEOF( StatementWithoutTrailingSubstatement,
                                  LabeledStatementNoShortIf,
                                  IfThenElseStatementNoShortIf,
@@ -60,6 +64,8 @@ rule StatementNoShortIf : ONEOF( StatementWithoutTrailingSubstatement,
                                  ForStatementNoShortIf)
   attr.property: Single
 
+# Statements are actually dis-ambiguous, and it's "top" level.
+# There should NOT be any two statements matching at the same start tokens.
 rule StatementWithoutTrailingSubstatement : ONEOF(
          Block,
          EmptyStatement,

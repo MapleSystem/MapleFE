@@ -1,0 +1,42 @@
+Matched 64 tokens.
+============= Module ===========
+== Sub Tree ==
+class  Outer
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+    constructor  Outer()  throws: 
+      var:i=new Inner
+  Methods: 
+  LocalClasses: 
+    class  Inner
+      Fields: 
+
+      Instance Initializer: 
+      Constructors: 
+      Methods: 
+        func  foo()  throws: 
+          var:i=
+      LocalClasses: 
+        class  Inner2
+          Fields: 
+
+          Instance Initializer: 
+          Constructors: 
+          Methods: 
+          LocalClasses: 
+            class  Inner3
+              Fields: 
+
+              Instance Initializer: 
+              Constructors: 
+                constructor  Inner3()  throws: 
+                  var:i2=new Inner2
+              Methods: 
+              LocalClasses: 
+              LocalInterfaces: 
+          LocalInterfaces: 
+      LocalInterfaces: 
+  LocalInterfaces: 
+
