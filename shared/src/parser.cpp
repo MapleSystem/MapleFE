@@ -1069,15 +1069,15 @@ bool Parser::TraverseIdentifier(RuleTable *rule_table, AppealNode *appeal) {
 //   3. gSuccTokens and gSuccTokensNum are a little bit complicated. Since Zeroormore can match
 //      any number of tokens it can, the number of matchings will grow each time one instance
 //      is matched.
+//   4. We don't count the 'mCurToken' as a succ matching to return. It means catch 'zero'.
+//      Although 'zero' is a correct matching, it's left to the final parent which should be a
+//      Concatenate node. It's handled in TraverseConcatenate().
 bool Parser::TraverseZeroormore(RuleTable *rule_table, AppealNode *parent) {
   unsigned saved_mCurToken = mCurToken;
   gSuccTokensNum = 0;
 
   MASSERT((rule_table->mNum == 1) && "zeroormore node has more than one elements?");
   TableData *data = rule_table->mData;
-
-  unsigned final_succ_tokens_num = 0;
-  unsigned final_succ_tokens[MAX_SUCC_TOKENS];
 
   // prepare the prev_succ_tokens[_num] for the 1st iteration.
   unsigned prev_succ_tokens_num = 1;
@@ -1091,6 +1091,8 @@ bool Parser::TraverseZeroormore(RuleTable *rule_table, AppealNode *parent) {
   // could traverse the same mCurToken again, at least 'zero' is always duplicated. This will be
   // an endless loop.
   SmallVector<unsigned> visited;
+
+  SmallVector<unsigned> final_succ_tokens;
 
   while(1) {
     // A set of results of current instance
@@ -1113,14 +1115,15 @@ bool Parser::TraverseZeroormore(RuleTable *rule_table, AppealNode *parent) {
       }
     }
 
-    // It's possible that sub-table is in the end a ZEROORxxx, and is succ without
+    // It's possible that sub-table is also a ZEROORxxx, and is succ without
     // real matching. This will be considered as a STOP.
     if (found_subtable && (subtable_tokens_num > 0)) {
       // set final
-      for (unsigned id = 0; id < subtable_tokens_num; id++)
-        final_succ_tokens[final_succ_tokens_num + id] = subtable_succ_tokens[id];
-      final_succ_tokens_num += subtable_tokens_num;
-
+      for (unsigned id = 0; id < subtable_tokens_num; id++) {
+        unsigned token = subtable_succ_tokens[id];
+        if (!final_succ_tokens.Find(token))
+          final_succ_tokens.PushBack(token);
+      }
       // set prev
       prev_succ_tokens_num = 0;
       for (unsigned id = 0; id < subtable_tokens_num; id++) {
@@ -1133,12 +1136,12 @@ bool Parser::TraverseZeroormore(RuleTable *rule_table, AppealNode *parent) {
     }
   }
 
-  gSuccTokensNum = final_succ_tokens_num;
-  for (unsigned id = 0; id < final_succ_tokens_num; id++) {
-    unsigned token = final_succ_tokens[id];
+  gSuccTokensNum = final_succ_tokens.GetNum();
+  for (unsigned id = 0; id < final_succ_tokens.GetNum(); id++) {
+    unsigned token = final_succ_tokens.ValueAtIndex(id);
     gSuccTokens[id] = token;
-    // Actually we don't transfer mCurToken from one table to another.
-    // We are look into the succ info instead. However, we up mCurToken
+    // Actually we don't transfer mCurToken to the caller.
+    // We are look into the succ info instead. However, we update mCurToken
     // here for easy dump info.
     if (token + 1 > mCurToken)
       mCurToken = token + 1;
@@ -1263,21 +1266,26 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *parent) {
 
     // We will iterate on all previous succ matches.
     for (unsigned j = 0; j < prev_succ_tokens_num; j++) {
-      mCurToken = prev_succ_tokens[j] + 1;
+      unsigned prev = prev_succ_tokens[j];
+      mCurToken = prev + 1;
 
       bool temp_found = TraverseTableData(data, parent);
       found_subtable |= temp_found;
 
       if (temp_found) {
-        for (unsigned id = 0; id < gSuccTokensNum; id++)
+        bool duplicated_with_prev = false;
+        for (unsigned id = 0; id < gSuccTokensNum; id++) {
           subtable_succ_tokens[subtable_tokens_num + id] = gSuccTokens[id];
+          if (gSuccTokens[id] == prev)
+            duplicated_with_prev = true;
+        }
         subtable_tokens_num += gSuccTokensNum;
 
         // for Zeroorone/Zeroormore node it always returns true. NO matter how
         // many tokens it really matches, 'zero' is also a correct match. we
-        // need take it into account.
-        if (is_zeroxxx) {
-          subtable_succ_tokens[subtable_tokens_num] = prev_succ_tokens[j];
+        // need take it into account. [Except it's a duplication]
+        if (is_zeroxxx && !duplicated_with_prev) {
+          subtable_succ_tokens[subtable_tokens_num] = prev;
           subtable_tokens_num++;
         }
       }
