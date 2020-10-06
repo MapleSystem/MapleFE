@@ -53,6 +53,8 @@ LitData ProcessLiteral(LitId id, const char *str) {
     break;
   }
   case LT_FPLiteral: {
+    // Java spec doesn't define rules for double. Both float and double
+    // are covered by Float Point. But we need differentiate here.
     // Check if it's a float of double. Non-suffix means double.
     char suffix = value_text[value_text.length() - 1];
     if (suffix == 'f' || suffix == 'F') {
@@ -62,7 +64,7 @@ LitData ProcessLiteral(LitId id, const char *str) {
       data.mIsDouble = false;
     } else {
       double d = s2v.StringToDouble(value_text);
-      data.mType = LT_FPLiteral;  // we don't have doubleLiteral
+      data.mType = LT_DoubleLiteral;
       data.mData.mDouble = d;
       data.mIsDouble = true;
     }

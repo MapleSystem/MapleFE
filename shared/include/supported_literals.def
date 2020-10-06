@@ -18,6 +18,7 @@
 
 LITERAL(IntegerLiteral)
 LITERAL(FPLiteral)
+LITERAL(DoubleLiteral)
 LITERAL(BooleanLiteral)
 LITERAL(CharacterLiteral)
 LITERAL(StringLiteral)

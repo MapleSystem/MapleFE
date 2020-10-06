@@ -236,8 +236,6 @@ const char* Lexer::GetIdentifier() {
   }
 }
 
-// NOTE: Literal table is TblLiteral.
-//
 // Literal rules are special, an element of the rules may be a char, or a string, and they
 // are not followed by separators. They may be followed by another char or string. So we
 // don't check if the following is a separator or not.

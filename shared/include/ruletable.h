@@ -64,11 +64,11 @@ class Token;
 struct TableData {
   DataType mType;
   union {
-    RuleTable  *mEntry;  // sub-table
+    RuleTable  *mEntry;   // sub-table
     char        mChar;
     const char *mString;
     TypeId      mTypeId;
-    Token      *mToken;
+    unsigned    mTokenId; // index of a system token
   }mData;
 };
 

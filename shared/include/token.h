@@ -1,27 +1,25 @@
 /*
 * Copyright (C) [2020] Futurewei Technologies, Inc. All rights reverved.
 *
-* OpenArkFE is licensed under the Mulan PSL v1.
-* You can use this software according to the terms and conditions of the Mulan PSL v1.
-* You may obtain a copy of Mulan PSL v1 at:
+* OpenArkFE is licensed under the Mulan PSL v2.
+* You can use this software according to the terms and conditions of the Mulan PSL v2.
+* You may obtain a copy of Mulan PSL v2 at:
 *
-*  http://license.coscl.org.cn/MulanPSL
+*  http://license.coscl.org.cn/MulanPSL2
 *
 * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER
 * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR
 * FIT FOR A PARTICULAR PURPOSE.
-* See the Mulan PSL v1 for more details.
+* See the Mulan PSL v2 for more details.
 */
 ////////////////////////////////////////////////////////////////////////
-// The lexical translation of the characters creates a sequence of input
-// elements -----> white-space (whitespace is finally put into separator)
-//            |--> comments (finally treated as a token)
-//            |--> tokens |-->identifiers
-//                        |-->keywords
-//                        |-->literals
-//                        |-->separators (including whitespace)
-//                        |-->operators
-//                        |-->comment
+// The lexical translation of the characters creates a sequence of tokens.
+// tokens |-->identifiers
+//        |-->keywords
+//        |-->literals
+//        |-->separators (whitespace is skipped by lexer)
+//        |-->operators
+//        |-->comment
 //
 // This categorization is shared among all languages. [NOTE] If anything
 // in a new language is exceptional, please add to this.
@@ -33,14 +31,8 @@
 #define __Token_H__
 
 #include <vector>
-#include "element.h"
 #include "stringutil.h"
 #include "supported.h"
-
-// TokenText contains the text data of each token, no matter it's a
-// number or string. TokenText will be further processed by utility
-// functions before creating a real token.
-typedef std::vector<std::string> TokenText;
 
 typedef enum {
   TT_ID,    // Identifier
@@ -52,14 +44,30 @@ typedef enum {
   TT_NA     // N.A.
 }TK_Type;
 
-class Token : public Element {
-public:
-  TK_Type mTkType;
-public:
-  Token(TK_Type t) : mTkType(t), Element(ET_TK) {}
-  Token() : Element(ET_TK) {}
+// One of the concern here is we are using c++ type to store java
+// data which could mess the precision. Need look into it in the future.
+struct LitData {
+  LitId mType;
+  union {
+    int    mInt;
+    float  mFloat;
+    double mDouble;
+    bool   mBool;
+    char   mChar;
+    char  *mStr;     // the string is allocated in gStringPool
+  }mData;
 
-  void SetTkType(TK_Type t) { mTkType = t; }
+  //LitData(LitId t) : mType(t) {}
+};
+
+struct Token {
+  TK_Type mTkType;
+  union {
+    const char *mName; // Identifier, Keyword. In the gStringPool
+    LitData     mLitData;
+    SepId       mSepId;
+    OprId       mOprId;
+  }mData;
 
   bool IsSeparator()  { return mTkType == TT_SP; }
   bool IsOperator()   { return mTkType == TT_OP; }
@@ -68,124 +76,9 @@ public:
   bool IsKeyword()    { return mTkType == TT_KW; }
   bool IsComment()    { return mTkType == TT_CM; }
 
-  virtual const char* GetName(){return "null";}
-  virtual void Dump() {}
-};
-
-////////////////////////////////////////////////////////////////////////
-//                       IdentifierToken                              //
-////////////////////////////////////////////////////////////////////////
-class IdentifierToken : public Token {
-public:
-  const char *mName;       // It's put into the gStringPool
-public:
-  IdentifierToken(const char *s) : mName(s) {mTkType = TT_ID;}
-  IdentifierToken() : mName(NULL) {mTkType = TT_ID;}
-
-  const char* GetName() {return mName;}
-  void Dump();
-};
-
-////////////////////////////////////////////////////////////////////////
-//                            Keywod                                  //
-// Keywords fall into different categories:
-//   1. data type, including class and interface
-//   2. control flow
-//   3. attributes, for primitive and Object data
-////////////////////////////////////////////////////////////////////////
-//
-typedef enum {
-  KW_DT,     // data type, class, enum, interfaces, are all considered types
-  KW_FN,     // Intrinsic call, system call, ...
-  KW_CT,     // control flow keyword,
-  KW_DA,     // data attribute,
-  KW_FA,     // function attribute
-  KW_OA,     // object(class,enum) attribute
-  KW_SP,     // Language Sepcific
-  KW_UN      // Undefined
-}KW_Type;
-
-class KeywordToken : public Token {
-public:
-  const char *mName;   // The text name. During initialization it will be
-                       // put into string pool.
-public:
-  KeywordToken(const char *s) : Token(TT_KW), mName(s){}
-  
-  void SetName(const char *s){ mName = s; }
-  const char *GetName(){ return mName; }
-  void Dump();
-};
-
-////////////////////////////////////////////////////////////////////////
-//                       LiteralToken                                 //
-////////////////////////////////////////////////////////////////////////
-
-// One of the concern here is we are using c++ type to store java
-// data which could mess the precision. Need look into it in the future.
-
-struct LitData {
-  LitId mType;
-  bool  mIsDouble;   // Since LitId just has FPLiteral, it doesn't differentiate
-                     // float and double. So we make the difference here.
-  union {
-    int    mInt;
-    float  mFloat;
-    double mDouble;
-    bool   mBool;
-    char   mChar;
-    char  *mStr;     // the string is allocated in gStringPool
-  } mData;
-
-  LitData() {mIsDouble = false;}
-  LitData(LitId t) : mType(t) {}
-};
-
-class LiteralToken : public Token {
-private:
-  LitData  mData;
-public:
-  LiteralToken(LitData data) : Token(TT_LT), mData(data) {}
-
-  LitData GetLitData() {return mData;}
-  void Dump();
-};
-
-////////////////////////////////////////////////////////////////////////
-//                       SeparatorToken                               //
-////////////////////////////////////////////////////////////////////////
-
-class SeparatorToken : public Token {
-public:
-  SepId mSepId;
-public:
-  SeparatorToken(SepId si) {mTkType = TT_SP; mSepId = si;}
-  bool IsWhiteSpace() {return mSepId == SEP_Whitespace;}
-  const char* GetName();
-  void Dump();
-};
-
-////////////////////////////////////////////////////////////////////////
-//                              Operator                              //
-////////////////////////////////////////////////////////////////////////
-class OperatorToken : public Token {
-public:
-  OprId mOprId;
-public:
-  OperatorToken(OprId oi) {mTkType = TT_OP; mOprId = oi;}
-  const char* GetName();
-  void Dump();
-};
-
-////////////////////////////////////////////////////////////////////////
-//                              Comment                               //
-// we dont' want to put any additional information for comments.      //
-// The comment string is discarded.                                   //
-////////////////////////////////////////////////////////////////////////
-class CommentToken : public Token {
-public:
-  CommentToken() {mTkType = TT_CM;}
-  const char* GetName() {return "comment";}
+  const char* GetName()      {return mData.mName;}
+  LitData     GetLitData()   {return mData.mLitData;}
+  bool        IsWhiteSpace() {return mData.mSepId == SEP_Whitespace;}
   void Dump();
 };
 
