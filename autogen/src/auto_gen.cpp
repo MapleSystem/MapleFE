@@ -20,6 +20,7 @@
 #include "auto_gen.h"
 #include "base_gen.h"
 #include "massert.h"
+#include "token_table.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////
 //                       Debug functions during parsing
@@ -174,6 +175,12 @@ void AutoGen::Init() {
   mStmtGen  = new StmtGen("stmt.spec", hFile.c_str(), cppFile.c_str());
   mStmtGen->SetReserved(mReservedGen);
   mGenArray.push_back(mStmtGen);
+
+  hFile = lang_path_header + "gen_token.h";
+  cppFile = lang_path_cpp + "gen_token.cpp";
+  mTokenGen  = new TokenGen(hFile.c_str(), cppFile.c_str());
+  mTokenGen->SetReserved(mReservedGen);
+  mGenArray.push_back(mTokenGen);
 }
 
 AutoGen::~AutoGen() {
@@ -199,6 +206,8 @@ AutoGen::~AutoGen() {
     delete mExprGen;
   if (mStmtGen)
     delete mStmtGen;
+  if (mTokenGen)
+    delete mTokenGen;
   if (gDebugHFile)
     delete gDebugHFile;
   if (gDebugCppFile)
@@ -232,12 +241,23 @@ void AutoGen::Run() {
   mKeywordGen->Run(mParser);
   mExprGen->Run(mParser);
   mStmtGen->Run(mParser);
+  mTokenGen->Run(mParser);
 }
 
 void AutoGen::Gen() {
   Init();
   Run();
   BackPatch();
+
+  // Prepare the tokens in all rules, by replacing all keyword, operator,
+  // separators with tokens. All rules will contain index to the
+  // system token.
+  gTokenTable.mOperators = &(mOperatorGen->mOperators);
+  gTokenTable.mSeparators = &(mSeparatorGen->mSeparators);
+  gTokenTable.mKeywords = mKeywordGen->mKeywords;
+  gTokenTable.Prepare();
+
+  mTokenGen->Generate();
 
   mReservedGen->Generate();
   mIdenGen->Generate();
@@ -252,6 +272,6 @@ void AutoGen::Gen() {
   mExprGen->Generate();
   mStmtGen->Generate();
 
+
   FinishDebugCppFile();
 }
-
