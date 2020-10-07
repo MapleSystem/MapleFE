@@ -16,6 +16,7 @@
 #include "rule_gen.h"
 #include "buffer2write.h"
 #include "base_gen.h"
+#include "token_table.h"
 
 // Generate one initialization function for each rule. Below is the elaboration of most of
 // of rule case.
@@ -116,6 +117,7 @@ std::string RuleGen::GetEntryTypeName(ElemType type, RuleOp op) {
   case ET_String:
   case ET_Rule:
   case ET_Type:
+  case ET_Token:
     name = "ET_Data";
     break;
   case ET_Op: {
@@ -175,6 +177,13 @@ std::string RuleGen::Gen4RuleElem(const RuleElem *elem) {
     data += GetTypeString(elem->mData.mTypeId);
     data += "}";
     break;
+  case ET_Token: {
+    data += "DT_Token, {.mTokenId=";
+    std::string id_str = std::to_string(elem->mData.mTokenId);
+    data += id_str;
+    data += "}";
+    break;
+  }
   case ET_Rule:
     // Rule has its own table generated, so just need insert the table name.
     // Note: The table could be defined in other files. Need include them.
@@ -375,6 +384,76 @@ void RuleGen::Gen4Table(const Rule *rule, const RuleElem *elem){
 // We generate tables for rule and its sub-rules in depth first order.
 // 
 void RuleGen::Generate() {
+  bool need_patch = true;
+  if ((mRule->mName.compare("CHAR") == 0) ||
+      (mRule->mName.compare("DIGIT") == 0) ||
+      (mRule->mName.compare("ASCII") == 0) ||
+      (mRule->mName.compare("ESCAPE") == 0))
+    need_patch = false;
+
+  if (need_patch)
+    PatchToken();
+
   Gen4Table(mRule, NULL);
 }
 
+// Change the string or char elements to system token if they are.
+void RuleGen::PatchToken() {
+  if (mRule->mElement->mSubElems.size() == 0) {
+    PatchTokenOnElem(mRule->mElement);
+    return;
+  }
+
+  std::vector<RuleElem *>::iterator it = mRule->mElement->mSubElems.begin();
+  unsigned idx = 0;
+  for(; it != mRule->mElement->mSubElems.end(); it++, idx++) {
+    RuleElem *elem = *it;
+    PatchTokenOnElem(elem);
+  }
+}
+
+void RuleGen::PatchTokenOnElem(RuleElem *elem) {
+  switch(elem->mType) {
+  case ET_Char: {
+    unsigned id;
+    bool found = gTokenTable.FindCharTokenId(elem->mData.mChar, id);
+    if (found) {
+      elem->SetTokenId(id);
+    }
+    break;
+  }
+  case ET_String: {
+    unsigned id;
+    bool found = gTokenTable.FindStringTokenId(elem->mData.mString, id);
+    if (found) {
+      elem->SetTokenId(id);
+    }
+    break;
+  }
+  case ET_Rule:
+    // This is the reference of another rule. Don't need go into it
+    // since it will be patched by itself.
+    break;
+  case ET_Op: {
+    // An ET_Op has children elements. Need go into each of them.
+    std::vector<RuleElem *>::iterator it = elem->mSubElems.begin();
+    unsigned idx = 0;
+    for(; it != elem->mSubElems.end(); it++, idx++) {
+      RuleElem *elem = *it;
+      PatchTokenOnElem(elem);
+    }
+    break;
+  }
+  case ET_Token:
+    // It's possible we meet a element which is patched as token earlier.
+    // Eg. a string "static" appears in multiple places and is created
+    //     as a shared RuleElem.
+    break;
+  case ET_Type:
+    // So far there is no element of ET_Type.
+    break;
+  default:
+    MERROR("Unsupported ElemType");
+    break;
+  }
+}

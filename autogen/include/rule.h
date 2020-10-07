@@ -42,7 +42,7 @@ typedef enum {
   ET_Rule,       // It's rule
   ET_Op,         // It's an Op
   ET_Type,       // It's a AutoGen recoganized type
-  ET_Token,      // It's a source language Token, updated later
+  ET_Token,      // It's a sytem token including operators, separators, and keywords
   ET_Pending,    // It's a pending element, to be patched in BackPatch().
                  // pending elements are unknown rule names, constituted by
                  // the 26 regular letters.
@@ -120,6 +120,7 @@ public:
     char        mChar;
     const char *mString;   // Pending elem. string is NULL ended in string pool
     TypeId      mTypeId;
+    unsigned    mTokenId;  // index of system token.
   } mData;
 
   std::vector<RuleElem *> mSubElems;  // Sub elements. It's empty if mType
@@ -129,12 +130,13 @@ public:
   RuleElem(Rule *rule) : mType(ET_Rule) { mData.mRule = rule; }
   ~RuleElem();
 
-  void SetRuleOp(RuleOp op) {mType = ET_Op; mData.mOp = op;}
-  void SetRule(Rule *r) {mType = ET_Rule; mData.mRule = r;}
-  void SetChar(char c)      {mType = ET_Char; mData.mChar = c;}
+  void SetRuleOp(RuleOp op)     {mType = ET_Op; mData.mOp = op;}
+  void SetRule(Rule *r)         {mType = ET_Rule; mData.mRule = r;}
+  void SetChar(char c)          {mType = ET_Char; mData.mChar = c;}
   void SetString(const char *s) {mType = ET_String; mData.mString = s;}
-  void SetTypeId(TypeId t)  {mType = ET_Type; mData.mTypeId = t;}
-  void SetPending(const char *s) {mType = ET_Pending; mData.mString = s;}
+  void SetTypeId(TypeId t)      {mType = ET_Type; mData.mTypeId = t;}
+  void SetTokenId(unsigned t)   {mType = ET_Token; mData.mTokenId = t;}
+  void SetPending(const char *s){mType = ET_Pending; mData.mString = s;}
 
   const char *GetPendingName() {return mData.mString;}
   const char *GetElemTypeName();

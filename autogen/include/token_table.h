@@ -24,8 +24,9 @@ class TokenTable {
 public:
   std::vector<Token> mTokens;
 
-  // We will organize tokens in the order of:
-  // operators, separators and keywords.
+  // We will organize tokens in the order of: operators, separators and keywords.
+  // This order should be kept in (1) token table generation
+  //                              (2) token table searching
   unsigned mNumOperators;
   unsigned mNumSeparators;
   unsigned mNumKeywords;
@@ -43,6 +44,9 @@ public:
   void PrepareOperators();
   void PrepareSeparators();
   void PrepareKeywords();
+
+  bool FindCharTokenId(char c, unsigned&);
+  bool FindStringTokenId(const char *s, unsigned&);
 };
 
 extern TokenTable gTokenTable;

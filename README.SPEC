@@ -56,6 +56,12 @@ AutoGen reserves some keyword, and here they are.
  *) DIGIT
     A set. 0 - 9
 
+ *) ASCII
+    Ascii set.
+
+ *) ESCAPE
+    Escape set.
+
  *) System Supported data types
     Boolean, Byte, Short, Int, Long, Char, Float, Double, Null
     These can be used in the <attr.type> of a rule.

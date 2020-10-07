@@ -60,6 +60,8 @@ public:
     : mRule(r), mHeaderBuffer(hbuf), mCppBuffer(cbuf), mSubTblNum(0) {}
   ~RuleGen() {}
 
+  void PatchTokenOnElem(RuleElem*);
+  void PatchToken();
   void Generate(); 
 };
 

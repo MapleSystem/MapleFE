@@ -55,5 +55,65 @@ void TokenTable::PrepareKeywords() {
   }
 }
 
+// Returns true if found 'c' as a token, and set id to token id.
+bool TokenTable::FindCharTokenId(char c, unsigned &id) {
+  id = 0;
+  std::list<Operator>::iterator oit = mOperators->begin();
+  for (; oit != mOperators->end(); oit++, id++) {
+    Operator opr = *oit;
+    const char *syntax = opr.mText;
+    if ((strlen(syntax) == 1) && (*syntax == c))
+      return true;
+  }
+
+  std::list<Separator>::iterator sit = mSeparators->begin();
+  for (; sit != mSeparators->end(); sit++, id++) {
+    Separator sep = *sit;
+    const char *syntax = sep.mKeyword;
+    if ((strlen(syntax) == 1) && (*syntax == c))
+      return true;
+  }
+
+  std::vector<std::string>::iterator kit = mKeywords.begin();
+  for (; kit != mKeywords.end(); kit++, id++) {
+    std::string keyword = *kit;
+    if (keyword.size() == 1 && keyword[0] == c)
+      return true;
+  }
+
+  return false;
+}
+
+bool TokenTable::FindStringTokenId(const char *str, unsigned &id) {
+  id = 0;
+  std::list<Operator>::iterator oit = mOperators->begin();
+  for (; oit != mOperators->end(); oit++, id++) {
+    Operator opr = *oit;
+    const char *syntax = opr.mText;
+    if (strlen(syntax) == strlen(str) &&
+        strncmp(syntax, str, strlen(str)) == 0)
+      return true;
+  }
+
+  std::list<Separator>::iterator sit = mSeparators->begin();
+  for (; sit != mSeparators->end(); sit++, id++) {
+    Separator sep = *sit;
+    const char *syntax = sep.mKeyword;
+    if (strlen(syntax) == strlen(str) &&
+        strncmp(syntax, str, strlen(str)) == 0)
+      return true;
+  }
+
+  std::vector<std::string>::iterator kit = mKeywords.begin();
+  for (; kit != mKeywords.end(); kit++, id++) {
+    std::string keyword = *kit;
+    if (keyword.size() == strlen(str) &&
+        strncmp(keyword.c_str(), str, strlen(str)) == 0)
+      return true;
+  }
+
+  return false;
+}
+
 TokenTable gTokenTable;
 
