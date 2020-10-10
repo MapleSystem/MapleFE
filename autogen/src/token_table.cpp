@@ -19,6 +19,10 @@ void TokenTable::Prepare() {
   PrepareOperators();
   PrepareSeparators();
   PrepareKeywords();
+  // Need a comment token in the end
+  Token t;
+  t.mTkType = TT_CM;
+  mTokens.push_back(t);
 }
 
 void TokenTable::PrepareOperators() {

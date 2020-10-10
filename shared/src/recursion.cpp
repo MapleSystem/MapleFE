@@ -21,6 +21,7 @@
 
 #include "recursion.h"
 #include "gen_debug.h"
+#include "gen_token.h"
 #include "token.h"
 
 Rule2Recursion* GetRule2Recursion(RuleTable *rule_table){
@@ -69,7 +70,7 @@ FronNode RuleFindChildAtIndex(RuleTable *parent, unsigned index) {
       break;
     case DT_Token:
       node.mType = FNT_Token;
-      node.mData.mToken = data->mData.mToken;
+      node.mData.mToken = &gSystemTokens[data->mData.mTokenId];
       break;
     default:
       MERROR("Unkown type in table data");
@@ -91,7 +92,7 @@ FronNode RuleFindChildAtIndex(RuleTable *parent, unsigned index) {
       break;
     case DT_Token:
       node.mType = FNT_Token;
-      node.mData.mToken = data->mData.mToken;
+      node.mData.mToken = &gSystemTokens[data->mData.mTokenId];
       break;
     default:
       MERROR("Unkown type in table data");
@@ -256,7 +257,7 @@ void Recursion::FindLeadFronNodes() {
                          // mPos is useful only for FronNode of a circle where
                          // we need it to build the path on Appeal Tree.
         fnode.mType = FNT_Token;
-        fnode.mData.mToken = data->mData.mToken;
+        fnode.mData.mToken = &gSystemTokens[data->mData.mTokenId];
         mLeadFronNodes.PushBack(fnode);
       } else if (data->mType = DT_Subtable) {
         RuleTable *ruletable = data->mData.mEntry;
@@ -404,7 +405,7 @@ void Recursion::FindFronNodes(unsigned circle_index) {
         if (data->mType == DT_Token) {
           fnode.mPos = j;
           fnode.mType = FNT_Token;
-          fnode.mData.mToken = data->mData.mToken;
+          fnode.mData.mToken = &gSystemTokens[data->mData.mTokenId];
           fron_nodes->PushBack(fnode);
           //std::cout << "  Token " << data->mData.mToken->GetName() << std::endl;
         } else if (data->mType = DT_Subtable) {

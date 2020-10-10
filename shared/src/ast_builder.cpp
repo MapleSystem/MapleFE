@@ -46,35 +46,31 @@ TreeNode* ASTBuilder::Build() {
 TreeNode* ASTBuilder::CreateTokenTreeNode(const Token *token) {
   unsigned size = 0;
   if (token->IsIdentifier()) {
-    IdentifierToken *t = (IdentifierToken*)token;
     IdentifierNode *n = (IdentifierNode*)mTreePool->NewTreeNode(sizeof(IdentifierNode));
-    new (n) IdentifierNode(t->mName);
+    new (n) IdentifierNode(token->GetName());
     mLastTreeNode = n;
     return n;
   } else if (token->IsLiteral()) {
-    LiteralToken *lt = (LiteralToken*)token;
-    LitData data = lt->GetLitData();
+    LitData data = token->GetLitData();
     LiteralNode *n = (LiteralNode*)mTreePool->NewTreeNode(sizeof(LiteralNode));
     new (n) LiteralNode(data);
     mLastTreeNode = n;
     return n;
   } else if (token->IsKeyword()) {
-    KeywordToken *kt = (KeywordToken*)token;
-    const char *keyword = kt->GetName();
-
-    // Check if it's an attribute
+    const char *keyword = token->GetName();
+    // If it's an attribute
     AttrNode *n = gAttrPool.GetAttrNode(keyword);
     if (n) {
       mLastTreeNode = n;
       return n;
     }
-
-    // Check if it's a type
+    // If it's a type
     PrimTypeNode *type = gPrimTypePool.FindType(keyword);
     if (type) {
       mLastTreeNode = type;
       return type;
     }
+    // Otherwise, it doesn't create any tree node.
   }
 
   // Other tokens shouldn't be involved in the tree creation.
@@ -248,7 +244,7 @@ TreeNode* ASTBuilder::BuildUnaryOperation() {
 
   // create the sub tree
   UnaOperatorNode *n = (UnaOperatorNode*)mTreePool->NewTreeNode(sizeof(UnaOperatorNode));
-  new (n) UnaOperatorNode(((OperatorToken*)token)->mOprId);
+  new (n) UnaOperatorNode(token->GetOprId());
 
   // set 1st param
   if (p_b.mIsTreeNode)
@@ -289,7 +285,7 @@ TreeNode* ASTBuilder::BuildBinaryOperation() {
 
   // create the sub tree
   BinOperatorNode *n = (BinOperatorNode*)mTreePool->NewTreeNode(sizeof(BinOperatorNode));
-  new (n) BinOperatorNode(((OperatorToken*)token)->mOprId);
+  new (n) BinOperatorNode(token->GetOprId());
   mLastTreeNode = n;
 
   // set 1st param

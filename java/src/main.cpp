@@ -76,8 +76,6 @@ int main (int argc, char *argv[]) {
     }
   }
 
-  parser->InitPredefinedTokens();
-  parser->mLexer->PlantTokens();
   parser->SetupTopTables();
   parser->InitRecursion();
   parser->Parse();

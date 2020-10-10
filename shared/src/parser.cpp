@@ -24,6 +24,7 @@
 #include "common_header_autogen.h"
 #include "ruletable_util.h"
 #include "gen_debug.h"
+#include "gen_token.h"
 #include "ast.h"
 #include "ast_builder.h"
 #include "parser_rec.h"
@@ -349,8 +350,7 @@ unsigned Parser::LexOneLine() {
       if (t) {
         bool is_whitespace = false;
         if (t->IsSeparator()) {
-          SeparatorToken *sep = (SeparatorToken *)t;
-          if (sep->IsWhiteSpace())
+          if (t->IsWhiteSpace())
             is_whitespace = true;
         }
         // Put into the token storage, as Pending tokens.
@@ -1363,7 +1363,7 @@ bool Parser::TraverseTableData(TableData *data, AppealNode *parent) {
   // separator, operator, keywords are planted as DT_Token.
   // just need check the pointer of token
   case DT_Token:
-    found = TraverseToken(data->mData.mToken, parent);
+    found = TraverseToken(&gSystemTokens[data->mData.mTokenId], parent);
     break;
   case DT_Type:
     break;
@@ -2249,46 +2249,6 @@ ASTTree* Parser::BuildAST() {
   return tree;
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//             Initialized the predefined tokens.
-/////////////////////////////////////////////////////////////////////////////
-
-void Parser::InitPredefinedTokens() {
-  // 1. create separator Tokens.
-  for (unsigned i = 0; i < SEP_NA; i++) {
-    Token *t = (Token*)mLexer->mTokenPool.NewToken(sizeof(SeparatorToken));
-    new (t) SeparatorToken(i);
-    //std::cout << "init a pre token " << t << std::endl;
-    //t->Dump();
-  }
-  mLexer->mPredefinedTokenNum += SEP_NA;
-
-  // 2. create operator Tokens.
-  for (unsigned i = 0; i < OPR_NA; i++) {
-    Token *t = (Token*)mLexer->mTokenPool.NewToken(sizeof(OperatorToken));
-    new (t) OperatorToken(i);
-    //std::cout << "init a pre token " << t << std::endl;
-    //t->Dump();
-  }
-  mLexer->mPredefinedTokenNum += OPR_NA;
-
-  // 3. create keyword Tokens.
-  for (unsigned i = 0; i < KeywordTableSize; i++) {
-    Token *t = (Token*)mLexer->mTokenPool.NewToken(sizeof(KeywordToken));
-    char *s = gStringPool.FindString(KeywordTable[i].mText);
-    new (t) KeywordToken(s);
-    //std::cout << "init a pre token " << t << std::endl;
-    //t->Dump();
-  }
-  mLexer->mPredefinedTokenNum += KeywordTableSize;
-
-  // 4. Create a single comment token
-  //    This is the last predefined token, and we refer to it directly.
-  Token *t = (Token*)mLexer->mTokenPool.NewToken(sizeof(CommentToken));
-  new (t) CommentToken();
-  mLexer->mPredefinedTokenNum += 1;
-}
-
 // These should have the same order as those in RecDetector::SetupTopTables().
 // Set up the top level rule tables.
 void Parser::SetupTopTables() {
@@ -2560,7 +2520,7 @@ bool AppealNode::GetSortedChildIndex(AppealNode *child, unsigned &index) {
     TableData *data = rule_table->mData + i;
     switch (data->mType) {
     case DT_Token: {
-      Token *t = data->mData.mToken;
+      Token *t = &gSystemTokens[data->mData.mTokenId];
       if (child->IsToken() && child->GetToken() == t) {
         found = true;
         index = i+1;
@@ -2591,6 +2551,9 @@ bool AppealNode::GetSortedChildIndex(AppealNode *child, unsigned &index) {
       }
       break;
     }
+    case DT_String:
+    case DT_Char:
+      break;
     default:
       MASSERT(0 && "Unknown entry in TableData");
       break;
@@ -2633,7 +2596,7 @@ AppealNode* AppealNode::FindSpecChild(TableData *tdata, unsigned match) {
         break;
       }
       case DT_Token: {
-        Token *token = tdata->mData.mToken;
+        Token *token = &gSystemTokens[tdata->mData.mTokenId];
         if (child->IsToken() && child->GetToken() == token)
           ret_child = child;
         break;

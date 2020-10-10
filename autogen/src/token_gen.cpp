@@ -38,6 +38,9 @@ void TokenGen::GenHeaderFile() {
   mHeaderFile.WriteOneLine("#define __TOKEN_GEN_H__", 23);
   mHeaderFile.WriteOneLine("#include \"token.h\"", 18);
   mHeaderFile.WriteOneLine("extern unsigned gSystemTokensNum;", 33);
+  mHeaderFile.WriteOneLine("extern unsigned gOperatorTokensNum;", 35);
+  mHeaderFile.WriteOneLine("extern unsigned gSeparatorTokensNum;", 36);
+  mHeaderFile.WriteOneLine("extern unsigned gKeywordTokensNum;", 34);
   mHeaderFile.WriteOneLine("extern Token gSystemTokens[];", 29);
   mHeaderFile.WriteOneLine("#endif", 6);
 }
@@ -49,8 +52,29 @@ void TokenGen::GenCppFile() {
 
   // write:
   //   unsigned gSystemTokensNum=xxx;
+  //   unsigned gOperatorTokensNum=xxx;
+  //   unsigned gSeparatorTokensNum=xxx;
+  //   unsigned gKeywordTokensNum=xxx;
   std::string s = "unsigned gSystemTokensNum=";
   std::string num = std::to_string(gTokenTable.mTokens.size());
+  s += num;
+  s += ";";
+  mCppFile.WriteOneLine(s.c_str(), s.size());
+
+  s = "unsigned gOperatorTokensNum=";
+  num = std::to_string(gTokenTable.mNumOperators);
+  s += num;
+  s += ";";
+  mCppFile.WriteOneLine(s.c_str(), s.size());
+
+  s = "unsigned gSeparatorTokensNum=";
+  num = std::to_string(gTokenTable.mNumSeparators);
+  s += num;
+  s += ";";
+  mCppFile.WriteOneLine(s.c_str(), s.size());
+
+  s = "unsigned gKeywordTokensNum=";
+  num = std::to_string(gTokenTable.mNumKeywords);
   s += num;
   s += ";";
   mCppFile.WriteOneLine(s.c_str(), s.size());
@@ -91,13 +115,13 @@ void TokenGen::GenCppFile() {
     output += "\"";
     output += keyword;
     output += "\"";
-    if (index < kw_size - 1)
-      output += "}},";
-    else
-      output += "}}";
+    output += "}},";
     mCppFile.WriteOneLine(output.c_str(), output.size());
   }
 
+  // Write the comment token
+  std::string output = "  {.mTkType = TT_CM}";
+  mCppFile.WriteOneLine(output.c_str(), output.size());
   mCppFile.WriteOneLine("};", 2);
 }
 

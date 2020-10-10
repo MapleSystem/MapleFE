@@ -20,6 +20,7 @@
 #include "common_header_autogen.h"
 #include "ruletable_util.h"
 #include "gen_debug.h"
+#include "gen_token.h"
 #include "massert.h"
 #include <climits>
 #include <cstdlib>
@@ -73,7 +74,7 @@ Lexer::Lexer()
     _linenum(0) {
       seencomments.clear();
       mCheckSeparator = true;
-      mMatchToken = false;
+      mMatchToken = true;
       mLastLiteralId = LT_NullLiteral;
 }
 
@@ -101,39 +102,64 @@ void Lexer::PrepareForFile(const std::string filename) {
 }
 
 ///////////////////////////////////////////////////////////////////////////
-//                Utilities for finding predefined tokens
+//                Utilities for finding system tokens
+// Remember the order of tokens are operators, separators, and keywords.
 ///////////////////////////////////////////////////////////////////////////
 
-Token* Lexer::FindSeparatorToken(SepId id) {
-  for (unsigned i = 0; i < mPredefinedTokenNum; i++) {
-    Token *token = mTokenPool.mTokens[i];
-    if ((token->mTkType == TT_SP) && (((SeparatorToken*)token)->mSepId == id))
-      return token;
+Token* Lexer::FindOperatorToken(OprId id) {
+  Token *token = NULL;
+  bool found = false;
+  for (unsigned i = 0; i < gOperatorTokensNum; i++) {
+    token = &gSystemTokens[i];
+    MASSERT(token->mTkType == TT_OP);
+    if (token->GetOprId() == id) {
+      found = true;
+      break;
+    }
   }
+  MASSERT(found && token);
+  return token;
 }
 
-Token* Lexer::FindOperatorToken(OprId id) {
-  for (unsigned i = 0; i < mPredefinedTokenNum; i++) {
-    Token *token = mTokenPool.mTokens[i];
-    if ((token->mTkType == TT_OP) && (((OperatorToken*)token)->mOprId == id))
-      return token;
+Token* Lexer::FindSeparatorToken(SepId id) {
+  Token *token = NULL;
+  bool found = false;
+  for (unsigned i = gOperatorTokensNum; i < gOperatorTokensNum + gSeparatorTokensNum; i++) {
+    token = &gSystemTokens[i];
+    MASSERT(token->mTkType == TT_SP);
+    if (token->GetSepId() == id) {
+      found = true;
+      break;
+    }
   }
+  MASSERT(found && token);
+  return token;
 }
 
 // The caller of this function makes sure 'key' is already in the
 // string pool of Lexer.
 Token* Lexer::FindKeywordToken(char *key) {
-  for (unsigned i = 0; i < mPredefinedTokenNum; i++) {
-    Token *token = mTokenPool.mTokens[i];
-    if ((token->mTkType == TT_KW) && (((KeywordToken*)token)->mName == key))
-      return token;
+  Token *token = NULL;
+  bool found = false;
+  for (unsigned i = gOperatorTokensNum + gSeparatorTokensNum;
+       i < gOperatorTokensNum + gSeparatorTokensNum + gKeywordTokensNum;
+       i++) {
+    token = &gSystemTokens[i];
+    MASSERT(token->mTkType == TT_KW);
+    if (strlen(key) == strlen(token->GetName()) &&
+        !strncmp(key, token->GetName(), strlen(key))) {
+      found = true;
+      break;
+    }
   }
+  MASSERT(found && token);
+  return token;
 }
 
 // CommentToken is the last predefined token
 Token* Lexer::FindCommentToken() {
-  Token *token = mTokenPool.mTokens[mPredefinedTokenNum - 1];
-  MASSERT((token->mTkType == TT_CM) && "Last predefined token is not a comment token.");
+  Token *token = &gSystemTokens[gSystemTokensNum - 1];
+  MASSERT((token->mTkType == TT_CM) && "Last system token is not a comment token.");
   return token;
 }
 
@@ -158,17 +184,24 @@ Token* Lexer::LexTokenNoNewLine(void) {
     return t;
   }
 
-  SepId sep = GetSeparator();
-  if (sep != SEP_NA) {
-    Token *t = FindSeparatorToken(sep);
+  // We try to get system tokens in the order of operator, separtor, and keyword
+  // This is the same as token_gen.cpp in autogen. There is a reason behind this.
+  // Some languages could have one synatx belonging to both separator and operators.
+  // eg., ':' in Java 8, it's both a separator colon and operator select.
+  // So the order here must be consistent with autogen where it decides ':' a colon or
+  // select in a rule.
+
+  OprId opr = GetOperator();
+  if (opr != OPR_NA) {
+    Token *t = FindOperatorToken(opr);
     if (mTrace)
       t->Dump();
     return t;
   }
 
-  OprId opr = GetOperator();
-  if (opr != OPR_NA) {
-    Token *t = FindOperatorToken(opr);
+  SepId sep = GetSeparator();
+  if (sep != SEP_NA) {
+    Token *t = FindSeparatorToken(sep);
     if (mTrace)
       t->Dump();
     return t;
@@ -184,8 +217,8 @@ Token* Lexer::LexTokenNoNewLine(void) {
 
   const char *identifier = GetIdentifier();
   if (identifier != NULL) {
-    IdentifierToken *t = (IdentifierToken*)mTokenPool.NewToken(sizeof(IdentifierToken)); 
-    new (t) IdentifierToken(identifier);
+    Token *t = (Token*)mTokenPool.NewToken(sizeof(Token)); 
+    t->SetIdentifier(identifier);
     if (mTrace)
       t->Dump();
     return t;
@@ -193,8 +226,8 @@ Token* Lexer::LexTokenNoNewLine(void) {
 
   LitData ld = GetLiteral();
   if (ld.mType != LT_NA) {
-    LiteralToken *t = (LiteralToken*)mTokenPool.NewToken(sizeof(LiteralToken)); 
-    new (t) LiteralToken(ld);
+    Token *t = (Token*)mTokenPool.NewToken(sizeof(Token)); 
+    t->SetLiteral(ld);
     if (mTrace)
       t->Dump();
     return t;
@@ -242,10 +275,6 @@ const char* Lexer::GetIdentifier() {
 LitData Lexer::GetLiteral() {
   mCheckSeparator = false;
 
-  // The literal could be complicated and includes some tokens inside the rule, so
-  // we are gonna take care of it.
-  mMatchToken = true;
-
   unsigned old_pos = GetCuridx();
 
   LitData ld;
@@ -263,7 +292,6 @@ LitData Lexer::GetLiteral() {
   }
 
   mCheckSeparator = true;
-  mMatchToken = false;
 
   return ld;
 }
@@ -400,12 +428,11 @@ bool Lexer::TraverseTableData(TableData *data) {
   }
 
   // An example of this case is a rule of Decimal FP literal, like 12.5f.
-  // rule DecFPLiteral contains '.' which is a token.
+  // rule DecFPLiteral contains '.' which is a token. The tokens seen here
+  // are all system tokens.
   case DT_Token: {
-    if (mMatchToken) {
-      Token *token = data->mData.mToken;
-      found = MatchToken(token);
-    }
+    Token *token = &gSystemTokens[data->mData.mTokenId];
+    found = MatchToken(token);
     break;
   }
 
@@ -437,11 +464,10 @@ bool Lexer::MatchToken(Token *token) {
   switch (token->mTkType) {
   case TT_OP: {
     // Pick the longest matching operator.
-    OperatorToken *opr_token = (OperatorToken*)token;
     unsigned longest = 0;
     for (unsigned i = 0; i < OPR_NA; i++) {
       OprTableEntry e = OprTable[i];
-      if ((e.mId == opr_token->mOprId) &&
+      if ((e.mId == token->GetOprId()) &&
           !strncmp(line + curidx, e.mText, strlen(e.mText))) {
         found = true;
         unsigned len = strlen(e.mText);
@@ -456,11 +482,10 @@ bool Lexer::MatchToken(Token *token) {
 
   case TT_SP: {
     // Pick the longest matching separator.
-    SeparatorToken *sep_token = (SeparatorToken*)token;
     unsigned longest = 0;
     for (unsigned i = 0; i < SEP_NA; i++) {
       SepTableEntry e = SepTable[i];
-      if ((e.mId == sep_token->mSepId) &&
+      if ((e.mId == token->GetSepId()) &&
           !strncmp(line + curidx, e.mText, strlen(e.mText))) {
         found = true;
         unsigned len = strlen(e.mText);
@@ -804,140 +829,3 @@ const char* Lexer::TraverseKeywordTable() {
   }
   return NULL;
 }
-
-////////////////////////////////////////////////////////////////////////////////////
-//                       Plant Tokens in Rule Tables
-//
-// RuleTable's are generated by Autogen, at that time there is no Token.
-// However, during language parsing we are using tokens from lexer. So it's
-// more efficient if the rule tables can have tokens embeded during the traversing
-// and matching process.
-//
-// One point to notice is this Planting process is a traversal of rule tables. It's
-// better that we start from the root of the trees. Or there many be several roots.
-// This has to be compliant with the Parser::Parse().
-//
-// NOTE: Here and right now, we take TblStatement as the only root. This is subject
-//       to change.
-//
-////////////////////////////////////////////////////////////////////////////////////
-
-// All rules form many cycles. Don't want to visit them for the second time.
-static std::vector<RuleTable *> visited;
-static bool IsVisited(RuleTable *table) {
-  std::vector<RuleTable *>::iterator it;
-  for (it = visited.begin(); it != visited.end(); it++) {
-    if (table == *it)
-      return true;
-  }
-  return false;
-}
-
-void Lexer::PlantTraverseTableData(TableData *data) {
-  switch (data->mType) {
-  case DT_Char: {
-    unsigned len = 0;
-    // 1. Try separator.
-    SepId sid = FindSeparator(NULL, data->mData.mChar, len);
-    if (sid != SEP_NA) {
-      Token *token = FindSeparatorToken(sid);
-      data->mType = DT_Token;
-      data->mData.mToken = token;
-      //std::cout << "In Plant 1, plant token " << token << std::endl;
-      return;
-    }
-    // 2. Try operator.
-    OprId oid = FindOperator(NULL, data->mData.mChar, len);
-    if (oid != OPR_NA) {
-      Token *token = FindOperatorToken(oid);
-      data->mType = DT_Token;
-      data->mData.mToken = token;
-      //std::cout << "In Plant 2, plant token " << token << std::endl;
-      return;
-    }
-    // 3. Try keyword.
-    //    Don't need try keyword since there is no one-character keyword
-    break;
-  }
-
-  //
-  case DT_String: {
-    unsigned len = 0;
-    // 1. Try separator.
-    SepId sid = FindSeparator(data->mData.mString, 0, len);
-    if (sid != SEP_NA) {
-      Token *token = FindSeparatorToken(sid);
-      data->mType = DT_Token;
-      data->mData.mToken = token;
-      //std::cout << "In Plant 3, plant token " << token << std::endl;
-      return;
-    }
-    // 2. Try operator.
-    OprId oid = FindOperator(data->mData.mString, 0, len);
-    if (oid != OPR_NA) {
-      Token *token = FindOperatorToken(oid);
-      data->mType = DT_Token;
-      data->mData.mToken = token;
-      //std::cout << "In Plant 4, plant token " << token << std::endl;
-      return;
-    }
-    // 3. Try keyword.
-    //    Need to make sure string is put in gStringPool, a request of
-    //    FindKeywordToken(key);
-    char *key = FindKeyword(data->mData.mString, 0, len);
-    if (key) {
-      key = gStringPool.FindString(key);
-      Token *token = FindKeywordToken(key);
-      data->mType = DT_Token;
-      data->mData.mToken = token;
-      //std::cout << "In Plant 5, plant token " << token << std::endl;
-      return;
-    }
-    break;
-  }
-
-  case DT_Subtable: {
-    RuleTable *t = data->mData.mEntry;
-    PlantTraverseRuleTable(t);
-  }
-
-  case DT_Type:
-  case DT_Token:
-  case DT_Null:
-  default:
-    break;
-  }
-}
-
-// The traversal is very simple depth first.
-void Lexer::PlantTraverseRuleTable(RuleTable *table) {
-  if (IsVisited(table))
-    return;
-  else
-    visited.push_back(table);
-
-  switch (table->mType) {
-  case ET_Data:
-  case ET_Oneof:
-  case ET_Zeroormore:
-  case ET_Zeroorone:
-  case ET_Concatenate: {
-    for (unsigned i = 0; i < table->mNum; i++) {
-      TableData *data = table->mData + i;
-      PlantTraverseTableData(data);
-    }
-    break;
-  }
-  case ET_Null:
-  default:
-    break;
-  }
-}
-
-void Lexer::PlantTokens() {
-  PlantTraverseRuleTable(&TblImportDeclaration);
-  PlantTraverseRuleTable(&TblPackageDeclaration);
-  PlantTraverseRuleTable(&TblClassDeclaration);
-  PlantTraverseRuleTable(&TblInterfaceDeclaration);
-}
-

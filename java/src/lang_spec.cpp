@@ -61,12 +61,10 @@ LitData ProcessLiteral(LitId id, const char *str) {
       float f = s2v.StringToFloat(value_text);
       data.mType = LT_FPLiteral;
       data.mData.mFloat = f;
-      data.mIsDouble = false;
     } else {
       double d = s2v.StringToDouble(value_text);
       data.mType = LT_DoubleLiteral;
       data.mData.mDouble = d;
-      data.mIsDouble = true;
     }
     break;
   }

@@ -414,7 +414,6 @@ public:
 
   bool Parse();
   bool ParseStmt();
-  void InitPredefinedTokens();
   void SetupTopTables();  //Each language parser will implement this by itself. 
   void InitRecursion();
   unsigned LexOneLine();

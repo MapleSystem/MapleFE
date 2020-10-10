@@ -25,8 +25,8 @@ public:
   std::vector<Token> mTokens;
 
   // We will organize tokens in the order of: operators, separators and keywords.
-  // This order should be kept in (1) token table generation
-  //                              (2) token table searching
+  // This order should be kept in (1) token table generation in autogen
+  //                              (2) token table searching in Lexer/Parser
   unsigned mNumOperators;
   unsigned mNumSeparators;
   unsigned mNumKeywords;

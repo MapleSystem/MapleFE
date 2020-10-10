@@ -76,8 +76,13 @@ struct Token {
   bool IsKeyword()    { return mTkType == TT_KW; }
   bool IsComment()    { return mTkType == TT_CM; }
 
-  const char* GetName()      {return mData.mName;}
+  void SetIdentifier(const char *name) {mTkType = TT_ID; mData.mName = name;}
+  void SetLiteral(LitData data)        {mTkType = TT_LT; mData.mLitData = data;}
+
+  const char* GetName();
   LitData     GetLitData()   {return mData.mLitData;}
+  OprId       GetOprId()     {return mData.mOprId;}
+  SepId       GetSepId()     {return mData.mSepId;}
   bool        IsWhiteSpace() {return mData.mSepId == SEP_Whitespace;}
   void Dump();
 };

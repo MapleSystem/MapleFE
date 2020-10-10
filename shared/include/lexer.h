@@ -114,9 +114,9 @@ public:
   bool        GetComment();
 
   // replace keyword/opr/sep... with tokens
-  void PlantTokens();
-  void PlantTraverseRuleTable(RuleTable*);
-  void PlantTraverseTableData(TableData*);
+  //void PlantTokens();
+  //void PlantTraverseRuleTable(RuleTable*);
+  //void PlantTraverseTableData(TableData*);
 
   //
   Token* FindSeparatorToken(SepId id);

@@ -77,6 +77,17 @@ void LiteralTokenDump(LitData data) {
   }
 }
 
+const char* Token::GetName() {
+  if (mTkType == TT_KW || mTkType == TT_ID)
+    return mData.mName;
+  else if (mTkType == TT_SP)
+    return SeparatorTokenGetName(mData.mSepId);
+  else if (mTkType == TT_OP)
+    return OperatorTokenGetName(mData.mOprId);
+  else
+    return "[anonymous]";
+}
+
 void Token::Dump() {
   switch (mTkType) {
   case TT_SP:

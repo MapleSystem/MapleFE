@@ -553,11 +553,11 @@ void LiteralNode::Dump(unsigned indent) {
   case LT_IntegerLiteral:
     DUMP0_NORETURN(mData.mData.mInt);
     break;
+  case LT_DoubleLiteral:
+    DUMP0_NORETURN(mData.mData.mDouble);
+    break;
   case LT_FPLiteral:
-    if (mData.mIsDouble)
-      DUMP0_NORETURN(mData.mData.mDouble);
-    else
-      DUMP0_NORETURN(mData.mData.mFloat);
+    DUMP0_NORETURN(mData.mData.mFloat);
     break;
   case LT_StringLiteral:
     DUMP0_NORETURN(mData.mData.mStr);
