@@ -1,0 +1,25 @@
+#include "common_header_autogen.h"
+TableData TblCHAR_data[52] ={{DT_Char, {.mChar='a'}},{DT_Char, {.mChar='b'}},{DT_Char, {.mChar='c'}},{DT_Char, {.mChar='d'}},{DT_Char, {.mChar='e'}},{DT_Char, {.mChar='f'}},{DT_Char, {.mChar='g'}},{DT_Char, {.mChar='h'}},{DT_Char, {.mChar='i'}},{DT_Char, {.mChar='j'}},{DT_Char, {.mChar='k'}},{DT_Char, {.mChar='l'}},{DT_Char, {.mChar='m'}},{DT_Char, {.mChar='n'}},{DT_Char, {.mChar='o'}},{DT_Char, {.mChar='p'}},{DT_Char, {.mChar='q'}},{DT_Char, {.mChar='r'}},{DT_Char, {.mChar='s'}},{DT_Char, {.mChar='t'}},{DT_Char, {.mChar='u'}},{DT_Char, {.mChar='v'}},{DT_Char, {.mChar='w'}},{DT_Char, {.mChar='x'}},{DT_Char, {.mChar='y'}},{DT_Char, {.mChar='z'}},{DT_Char, {.mChar='A'}},{DT_Char, {.mChar='B'}},{DT_Char, {.mChar='C'}},{DT_Char, {.mChar='D'}},{DT_Char, {.mChar='E'}},{DT_Char, {.mChar='F'}},{DT_Char, {.mChar='G'}},{DT_Char, {.mChar='H'}},{DT_Char, {.mChar='I'}},{DT_Char, {.mChar='J'}},{DT_Char, {.mChar='K'}},{DT_Char, {.mChar='L'}},{DT_Char, {.mChar='M'}},{DT_Char, {.mChar='N'}},{DT_Char, {.mChar='O'}},{DT_Char, {.mChar='P'}},{DT_Char, {.mChar='Q'}},{DT_Char, {.mChar='R'}},{DT_Char, {.mChar='S'}},{DT_Char, {.mChar='T'}},{DT_Char, {.mChar='U'}},{DT_Char, {.mChar='V'}},{DT_Char, {.mChar='W'}},{DT_Char, {.mChar='X'}},{DT_Char, {.mChar='Y'}},{DT_Char, {.mChar='Z'}}};
+RuleTable TblCHAR ={ET_Oneof, RP_NA, 52, TblCHAR_data, 0, NULL};
+TableData TblDIGIT_data[10] ={{DT_Char, {.mChar='0'}},{DT_Char, {.mChar='1'}},{DT_Char, {.mChar='2'}},{DT_Char, {.mChar='3'}},{DT_Char, {.mChar='4'}},{DT_Char, {.mChar='5'}},{DT_Char, {.mChar='6'}},{DT_Char, {.mChar='7'}},{DT_Char, {.mChar='8'}},{DT_Char, {.mChar='9'}}};
+RuleTable TblDIGIT ={ET_Oneof, RP_NA, 10, TblDIGIT_data, 0, NULL};
+TableData TblASCII_data[33] ={{DT_Char, {.mChar=' '}},{DT_Char, {.mChar='!'}},{DT_Char, {.mChar='#'}},{DT_Char, {.mChar='$'}},{DT_Char, {.mChar='%'}},{DT_Char, {.mChar='\''}},{DT_Char, {.mChar='&'}},{DT_Char, {.mChar='('}},{DT_Char, {.mChar=')'}},{DT_Char, {.mChar='*'}},{DT_Char, {.mChar='+'}},{DT_Char, {.mChar=','}},{DT_Char, {.mChar='-'}},{DT_Char, {.mChar='.'}},{DT_Char, {.mChar='/'}},{DT_Char, {.mChar=':'}},{DT_Char, {.mChar=';'}},{DT_Char, {.mChar='<'}},{DT_Char, {.mChar='='}},{DT_Char, {.mChar='>'}},{DT_Char, {.mChar='?'}},{DT_Char, {.mChar='@'}},{DT_Char, {.mChar='['}},{DT_Char, {.mChar=']'}},{DT_Char, {.mChar='^'}},{DT_Char, {.mChar='_'}},{DT_Char, {.mChar='`'}},{DT_Char, {.mChar='{'}},{DT_Char, {.mChar='|'}},{DT_Char, {.mChar='}'}},{DT_Char, {.mChar='~'}},{DT_Subtable, &TblCHAR},{DT_Subtable, &TblDIGIT}};
+RuleTable TblASCII ={ET_Oneof, RP_NA, 33, TblASCII_data, 0, NULL};
+TableData TblESCAPE_sub1_data[2] ={{DT_Char, {.mChar='\\'}},{DT_Char, {.mChar='b'}}};
+RuleTable TblESCAPE_sub1 ={ET_Concatenate, RP_NA, 2, TblESCAPE_sub1_data, 0, NULL};
+TableData TblESCAPE_sub2_data[2] ={{DT_Char, {.mChar='\\'}},{DT_Char, {.mChar='t'}}};
+RuleTable TblESCAPE_sub2 ={ET_Concatenate, RP_NA, 2, TblESCAPE_sub2_data, 0, NULL};
+TableData TblESCAPE_sub3_data[2] ={{DT_Char, {.mChar='\\'}},{DT_Char, {.mChar='n'}}};
+RuleTable TblESCAPE_sub3 ={ET_Concatenate, RP_NA, 2, TblESCAPE_sub3_data, 0, NULL};
+TableData TblESCAPE_sub4_data[2] ={{DT_Char, {.mChar='\\'}},{DT_Char, {.mChar='f'}}};
+RuleTable TblESCAPE_sub4 ={ET_Concatenate, RP_NA, 2, TblESCAPE_sub4_data, 0, NULL};
+TableData TblESCAPE_sub5_data[2] ={{DT_Char, {.mChar='\\'}},{DT_Char, {.mChar='r'}}};
+RuleTable TblESCAPE_sub5 ={ET_Concatenate, RP_NA, 2, TblESCAPE_sub5_data, 0, NULL};
+TableData TblESCAPE_sub6_data[2] ={{DT_Char, {.mChar='\\'}},{DT_Char, {.mChar='"'}}};
+RuleTable TblESCAPE_sub6 ={ET_Concatenate, RP_NA, 2, TblESCAPE_sub6_data, 0, NULL};
+TableData TblESCAPE_sub7_data[2] ={{DT_Char, {.mChar='\\'}},{DT_Char, {.mChar='\''}}};
+RuleTable TblESCAPE_sub7 ={ET_Concatenate, RP_NA, 2, TblESCAPE_sub7_data, 0, NULL};
+TableData TblESCAPE_sub8_data[2] ={{DT_Char, {.mChar='\\'}},{DT_Char, {.mChar='\\'}}};
+RuleTable TblESCAPE_sub8 ={ET_Concatenate, RP_NA, 2, TblESCAPE_sub8_data, 0, NULL};
+TableData TblESCAPE_data[8] ={{DT_Subtable, &TblESCAPE_sub1},{DT_Subtable, &TblESCAPE_sub2},{DT_Subtable, &TblESCAPE_sub3},{DT_Subtable, &TblESCAPE_sub4},{DT_Subtable, &TblESCAPE_sub5},{DT_Subtable, &TblESCAPE_sub6},{DT_Subtable, &TblESCAPE_sub7},{DT_Subtable, &TblESCAPE_sub8}};
+RuleTable TblESCAPE ={ET_Oneof, RP_NA, 8, TblESCAPE_data, 0, NULL};

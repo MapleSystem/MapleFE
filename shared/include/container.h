@@ -871,6 +871,11 @@ public:
   }
   ~ContTree() {Release(); mRoot = NULL;}
 
+  void SetRoot(T t) { mRoot = NewNode(t, NULL); }
+  ContTreeNode<T>* GetRoot() {return mRoot;}
+
+  bool Empty() {return mRoot == NULL;}
+
   ContTreeNode<T>* NewNode(T data, ContTreeNode<T> *parent) {
     char *addr = mMemPool.AllocElem();
     ContTreeNode<T> *e = (ContTreeNode<T>*)addr;

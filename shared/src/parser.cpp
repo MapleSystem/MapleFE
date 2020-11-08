@@ -2249,7 +2249,9 @@ ASTTree* Parser::BuildAST() {
   return tree;
 }
 
-// These should have the same order as those in RecDetector::SetupTopTables().
+// These should have the same order as those in
+//  1. RecDetector::SetupTopTables()
+//  2. LADetector::SetupTopTables()
 // Set up the top level rule tables.
 void Parser::SetupTopTables() {
   mTopTables.push_back(&TblPackageDeclaration);

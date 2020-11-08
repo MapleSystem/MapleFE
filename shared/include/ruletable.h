@@ -90,6 +90,23 @@ enum RuleProp {
   RP_NA = 0
 };
 
+// A rule has a limited set of beginning tokens. These are called LookAhead.
+// During parsing we can check if it matches lookahead. If not, we skip traversal
+// so as to expedite the process.
+struct LookAhead {
+  DataType mType;   // the type of look ahead
+  union{
+    char        mChar;
+    const char *mString;
+    unsigned    mTokenId;
+  }mData;
+};
+
+struct LookAheadTable {
+  unsigned   mNum;
+  LookAhead *mData;
+};
+
 // Struct of the table entry
 struct RuleTable{
   EntryType   mType;

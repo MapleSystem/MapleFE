@@ -65,4 +65,7 @@ extern RuleTable* RuleFindChild(RuleTable *p, unsigned index);
 
 extern bool RuleReachable(RuleTable *from, RuleTable *to);
 
+// If two lookaheads are equal.
+extern bool LookAheadEqual(LookAhead, LookAhead);
+
 #endif

@@ -14,17 +14,21 @@
 
 include Makefile.in
 
-TARGS = autogen shared recdetect java2mpl
+TARGS = autogen shared recdetect ladetect java2mpl
 
 # create BUILDDIR first
 $(shell $(MKDIR_P) $(BUILDDIR))
 
-java2mpl: autogen recdetect shared
+java2mpl: autogen recdetect ladetect shared
 	$(MAKE) LANG=java -C java
 
 recdetect: autogen shared
 	(cd recdetect; ./build.sh java)
 	(cd $(BUILDDIR)/recdetect; ./recdetect)
+
+ladetect: autogen shared
+	(cd ladetect; ./build.sh java)
+	#(cd $(BUILDDIR)/ladetect; ./ladetect)
 
 shared: autogen
 	$(MAKE) LANG=java -C shared
