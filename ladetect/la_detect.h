@@ -110,6 +110,7 @@ public:
 
   void AddPending(RuleTable *pending, RuleTable *dependent);
   void AddRuleLookAhead(RuleTable *rt, LookAhead la);
+  void CopyRuleLookAhead(RuleTable *to, RuleTable *from);
 
   RuleLookAhead* GetRuleLookAhead(RuleTable*);
 

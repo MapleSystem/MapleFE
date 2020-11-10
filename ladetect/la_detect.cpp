@@ -130,22 +130,46 @@ void LADetector::AddPending(RuleTable *pending_rt, RuleTable *dependent_rt) {
   mPendings.PushBack(p);
 }
 
+RuleLookAhead* LADetector::GetRuleLookAhead(RuleTable *rule) {
+  RuleLookAhead *la = NULL;
+  for (unsigned i = 0; i < mRuleLookAheads.GetNum(); i++) {
+    RuleLookAhead *temp_la = mRuleLookAheads.ValueAtIndex(i);
+    if (temp_la->mRule == rule) {
+      la = temp_la;
+      break;
+    }
+  }
+  return la;
+}
+
 // Add a new lookahead to a rule.
 void LADetector::AddRuleLookAhead(RuleTable *rule, LookAhead la) {
-  RuleLookAhead *rule_la = NULL;
-  for (unsigned i = 0; i < mRuleLookAheads.GetNum(); i++) {
-    rule_la = mRuleLookAheads.ValueAtIndex(i);
-    if (rule_la->mRule == rule) {
-      if (!(rule_la->FindLookAhead(la)))
-        rule_la->AddLookAhead(la);
-      return;
-    }
+  std::cout << "AddRuleLookAhead " << GetRuleTableName(rule) << std::endl;
+  RuleLookAhead *rule_la = GetRuleLookAhead(rule);
+  if (rule_la) {
+    if (!(rule_la->FindLookAhead(la)))
+      rule_la->AddLookAhead(la);
+    return;
   }
 
   rule_la = (RuleLookAhead*)gMemPool.Alloc(sizeof(RuleLookAhead));
   new (rule_la) RuleLookAhead(rule);
   rule_la->AddLookAhead(la);
   mRuleLookAheads.PushBack(rule_la);
+}
+
+// Copy all LookAheads from 'from' to 'to'.
+void LADetector::CopyRuleLookAhead(RuleTable *to, RuleTable *from) {
+  RuleLookAhead *rule_la_from = GetRuleLookAhead(from);
+
+  // Some times 'from' is not done yet, like recursion LeadNode.
+  if(!rule_la_from)
+    return;
+
+  for (unsigned i = 0; i < rule_la_from->mLookAheads.GetNum(); i++) {
+    LookAhead temp_la = rule_la_from->mLookAheads.ValueAtIndex(i);
+    AddRuleLookAhead(to, temp_la);
+  }
 }
 
 TResult LADetector::DetectRuleTable(RuleTable *rt, ContTreeNode<RuleTable*> *p) {
@@ -223,6 +247,7 @@ TResult LADetector::DetectOneDataEntry(TableData *data,
   if (data->mType == DT_Subtable) {
     child = data->mData.mEntry;
     temp_res = DetectRuleTable(child, tree_node);
+    CopyRuleLookAhead(rule_table, child);
   } else if (data->mType == DT_String) {
     LookAhead la;
     la.mType = DT_String;
@@ -365,18 +390,6 @@ void LADetector::BackPatch() {
       working_list.PushBack(child_node);
     }
   }
-}
-
-RuleLookAhead* LADetector::GetRuleLookAhead(RuleTable *rule) {
-  RuleLookAhead *la = NULL;
-  for (unsigned i = 0; i < mRuleLookAheads.GetNum(); i++) {
-    RuleLookAhead *temp_la = mRuleLookAheads.ValueAtIndex(i);
-    if (temp_la->mRule == rule) {
-      la = temp_la;
-      break;
-    }
-  }
-  return la;
 }
 
 void LADetector::PatchPending(Pending *pending) {
