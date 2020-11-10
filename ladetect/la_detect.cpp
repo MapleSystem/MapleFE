@@ -173,6 +173,8 @@ void LADetector::CopyRuleLookAhead(RuleTable *to, RuleTable *from) {
 }
 
 TResult LADetector::DetectRuleTable(RuleTable *rt, ContTreeNode<RuleTable*> *p) {
+  TResult res = TRS_NA;
+
   if (IsDone(rt)) {
     if (IsMaybeZero(rt))
       return TRS_MaybeZero;
@@ -191,28 +193,38 @@ TResult LADetector::DetectRuleTable(RuleTable *rt, ContTreeNode<RuleTable*> *p) 
     mInProcess.PushBack(rt);
   }
 
-  // Create new tree node.
-  ContTreeNode<RuleTable*> *node = mTree.NewNode(rt, p);
-  EntryType type = rt->mType;
-  TResult res = TRS_NA;
-  switch(type) {
-  case ET_Oneof:
-    res = DetectOneof(rt, node);
-    break;
-  case ET_Data:
-    res = DetectData(rt, node);
-    break;
-  case ET_Zeroorone:
-  case ET_Zeroormore:
-    res = DetectZeroorXXX(rt, node);
-    break;
-  case ET_Concatenate:
-    res = DetectConcatenate(rt, node);
-    break;
-  case ET_Null:
-  default:
-    MASSERT(0 && "Unexpected EntryType of rule.");
-    break;
+  // For Identifier and literal, we stop going to children.
+  if (rt == &TblIdentifier) {
+    LookAhead la;
+    la.mType = LA_Identifier;
+    AddRuleLookAhead(rt, la);
+  } else if (rt == &TblLiteral) {
+    LookAhead la;
+    la.mType = LA_Literal;
+    AddRuleLookAhead(rt, la);
+  } else {
+    // Create new tree node.
+    ContTreeNode<RuleTable*> *node = mTree.NewNode(rt, p);
+    EntryType type = rt->mType;
+    switch(type) {
+    case ET_Oneof:
+      res = DetectOneof(rt, node);
+      break;
+    case ET_Data:
+      res = DetectData(rt, node);
+      break;
+    case ET_Zeroorone:
+    case ET_Zeroormore:
+      res = DetectZeroorXXX(rt, node);
+      break;
+    case ET_Concatenate:
+      res = DetectConcatenate(rt, node);
+      break;
+    case ET_Null:
+    default:
+      MASSERT(0 && "Unexpected EntryType of rule.");
+      break;
+    }
   }
 
   // Remove it from InProcess.
