@@ -221,16 +221,20 @@ bool RuleReachable(RuleTable *from, RuleTable *to) {
 }
 
 bool LookAheadEqual(LookAhead la_a, LookAhead la_b) {
-  if (la_a.mType == DT_Char && la_b.mType == DT_Char) {
+  if (la_a.mType == LA_Char && la_b.mType == LA_Char) {
     return (la_a.mData.mChar == la_b.mData.mChar);
-  } else if (la_a.mType == DT_Token && la_b.mType == DT_Token) {
+  } else if (la_a.mType == LA_Token && la_b.mType == LA_Token) {
     return (la_a.mData.mTokenId == la_b.mData.mTokenId);
-  } else if (la_a.mType == DT_String && la_b.mType == DT_String) {
+  } else if (la_a.mType == LA_String && la_b.mType == LA_String) {
     size_t len_a = strlen(la_a.mData.mString);
     size_t len_b = strlen(la_b.mData.mString);
     if (len_a != len_b)
       return false;
     return strncmp(la_a.mData.mString, la_b.mData.mString, len_a);
+  } else if (la_a.mType == LA_Identifier && la_b.mType == LA_Identifier) {
+    return true;
+  } else if (la_a.mType == LA_Literal && la_b.mType == LA_Literal) {
+    return true;
   } else
     return false;
 }

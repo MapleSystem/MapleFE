@@ -250,17 +250,17 @@ TResult LADetector::DetectOneDataEntry(TableData *data,
     CopyRuleLookAhead(rule_table, child);
   } else if (data->mType == DT_String) {
     LookAhead la;
-    la.mType = DT_String;
+    la.mType = LA_String;
     la.mData.mString = data->mData.mString;
     AddRuleLookAhead(rule_table, la);
   } else if (data->mType == DT_Char) {
     LookAhead la;
-    la.mType = DT_Char;
+    la.mType = LA_Char;
     la.mData.mChar = data->mData.mChar;
     AddRuleLookAhead(rule_table, la);
   } else if (data->mType == DT_Token) {
     LookAhead la;
-    la.mType = DT_Token;
+    la.mType = LA_Token;
     la.mData.mTokenId = data->mData.mTokenId;
     AddRuleLookAhead(rule_table, la);
   } else {
@@ -484,7 +484,7 @@ void LADetector::WriteCppFile() {
 
     if (found) {
       unsigned num = lookahead->mLookAheads.GetNum();
-      // LookAheadTable TblStatementLookAheadTable = {2, {{DT_Char, 'c'}, {DT_Char, 'd'}}};
+      // LookAheadTable TblStatementLookAheadTable = {2, {{LA_Char, 'c'}, {LA_Char, 'd'}}};
       std::string s = "LookAheadTable ";
       s += rule_table_name;
       s += "LookAheadTable = {";
@@ -514,19 +514,23 @@ void LADetector::WriteCppFile() {
   }
 }
 
-// {DT_Char, 'c'}
+// {LA_Char, 'c'}
 std::string LADetector::GetLookAheadString(LookAhead la) {
   std::string str = "{";
   switch (la.mType) {
-  case DT_Char:
-    str += "DT_Char, ";
+  case LA_Char:
+    str += "LA_Char, ";
     str += la.mData.mChar;
-  case DT_String:
-    str += "DT_String, ";
+  case LA_String:
+    str += "LA_String, ";
     str += la.mData.mString;
-  case DT_Token:
-    str += "DT_Token, ";
+  case LA_Token:
+    str += "LA_Token, ";
     str += std::to_string(la.mData.mTokenId);
+  case LA_Identifier:
+    str += "LA_Identifier, NULL";
+  case LA_Literal:
+    str += "LA_Literal, NULL";
   default:
     MASSERT(0 && "Unsupported lookahead type");
   }
