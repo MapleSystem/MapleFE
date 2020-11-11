@@ -175,6 +175,12 @@ RuleLookAhead* LADetector::GetRuleLookAhead(RuleTable *rule) {
   return la;
 }
 
+RuleLookAhead* LADetector::CreateRuleLookAhead(RuleTable *rule) {
+  RuleLookAhead *rule_la = (RuleLookAhead*)gMemPool.Alloc(sizeof(RuleLookAhead));
+  new (rule_la) RuleLookAhead(rule);
+  return rule_la;
+}
+
 // Add a new lookahead to a rule.
 void LADetector::AddRuleLookAhead(RuleTable *rule, LookAhead la) {
   RuleLookAhead *rule_la = GetRuleLookAhead(rule);
@@ -184,8 +190,7 @@ void LADetector::AddRuleLookAhead(RuleTable *rule, LookAhead la) {
     return;
   }
 
-  rule_la = (RuleLookAhead*)gMemPool.Alloc(sizeof(RuleLookAhead));
-  new (rule_la) RuleLookAhead(rule);
+  rule_la = CreateRuleLookAhead(rule);
   rule_la->AddLookAhead(la);
   mRuleLookAheads.PushBack(rule_la);
 }
@@ -444,7 +449,9 @@ void LADetector::PatchPending(Pending *pending) {
   for (unsigned i = 0; i < pending->mDependents.GetNum(); i++) {
     RuleTable *dep = pending->mDependents.ValueAtIndex(i);
     RuleLookAhead *la_dep = GetRuleLookAhead(dep);
-    MASSERT(la_dep);
+    if (!la_dep)
+      la_dep = CreateRuleLookAhead(dep);
+
     for (unsigned j = 0; j < la_rule->mLookAheads.GetNum(); j++) {
       LookAhead la = la_rule->mLookAheads.ValueAtIndex(j);
       la_dep->AddLookAhead(la);

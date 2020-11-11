@@ -113,6 +113,7 @@ public:
   void CopyRuleLookAhead(RuleTable *to, RuleTable *from);
 
   RuleLookAhead* GetRuleLookAhead(RuleTable*);
+  RuleLookAhead* CreateRuleLookAhead(RuleTable*);
 
 private:
   Write2File *mCppFile;

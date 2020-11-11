@@ -19,8 +19,8 @@
 #
 # eg. ./build.sh java
 
-rm -rf ../build64/ladetect
-rm -rf ../build64/ladetect/$1
+#rm -rf ../build64/ladetect
+#rm -rf ../build64/ladetect/$1
 
 rm -rf $1
 mkdir -p $1
