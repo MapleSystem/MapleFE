@@ -114,8 +114,6 @@ public:
 
   RuleLookAhead* GetRuleLookAhead(RuleTable*);
 
-  std::string GetLookAheadString(LookAhead);
-
 private:
   Write2File *mCppFile;
   Write2File *mHeaderFile;

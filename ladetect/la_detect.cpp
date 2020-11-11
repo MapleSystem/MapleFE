@@ -21,11 +21,44 @@
 
 MemPool gMemPool;
 
+// dump LookAhead like {LA_Char, 'c'}
+std::string GetLookAheadString(LookAhead la) {
+  std::string str = "{";
+  switch (la.mType) {
+  case LA_Char:
+    str += "LA_Char, ";
+    str += la.mData.mChar;
+    break;
+  case LA_String:
+    str += "LA_String, ";
+    str += la.mData.mString;
+    break;
+  case LA_Token:
+    str += "LA_Token, ";
+    str += std::to_string(la.mData.mTokenId);
+    break;
+  case LA_Identifier:
+    str += "LA_Identifier, NULL";
+    break;
+  case LA_Literal:
+    str += "LA_Literal, NULL";
+    break;
+  default:
+    MASSERT(0 && "Unsupported lookahead type");
+    break;
+  }
+  str += "}";
+  return str;
+}
+
 // Need to guarantee there is no duplicated lookahed
 void RuleLookAhead::AddLookAhead(LookAhead la) {
   bool found = FindLookAhead(la);
-  if (!found)
+  if (!found) {
     mLookAheads.PushBack(la);
+    std::cout << "AddLookAhead " << GetRuleTableName(mRule)
+            << GetLookAheadString(la) << std::endl;
+  }
 }
 
 bool RuleLookAhead::FindLookAhead(LookAhead la) {
@@ -144,7 +177,6 @@ RuleLookAhead* LADetector::GetRuleLookAhead(RuleTable *rule) {
 
 // Add a new lookahead to a rule.
 void LADetector::AddRuleLookAhead(RuleTable *rule, LookAhead la) {
-  std::cout << "AddRuleLookAhead " << GetRuleTableName(rule) << std::endl;
   RuleLookAhead *rule_la = GetRuleLookAhead(rule);
   if (rule_la) {
     if (!(rule_la->FindLookAhead(la)))
@@ -524,30 +556,6 @@ void LADetector::WriteCppFile() {
       mCppFile->WriteOneLine(s.c_str(), s.size());
     }
   }
-}
-
-// {LA_Char, 'c'}
-std::string LADetector::GetLookAheadString(LookAhead la) {
-  std::string str = "{";
-  switch (la.mType) {
-  case LA_Char:
-    str += "LA_Char, ";
-    str += la.mData.mChar;
-  case LA_String:
-    str += "LA_String, ";
-    str += la.mData.mString;
-  case LA_Token:
-    str += "LA_Token, ";
-    str += std::to_string(la.mData.mTokenId);
-  case LA_Identifier:
-    str += "LA_Identifier, NULL";
-  case LA_Literal:
-    str += "LA_Literal, NULL";
-  default:
-    MASSERT(0 && "Unsupported lookahead type");
-  }
-  str += "}";
-  return str;
 }
 
 // Write the recursion to java/gen_recursion.h and java/gen_recursion.cpp
