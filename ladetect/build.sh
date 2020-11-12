@@ -29,8 +29,10 @@ cp ../$1/include/gen_*.h $1/
 cp ../$1/src/gen_*.cpp $1/
 
 # The two generated files shouldn't be taken in.
-rm ../$1/include/gen_lookahead.h
-rm ../$1/src/gen_lookahead.cpp
+rm $1/gen_lookahead.h
+rm $1/gen_lookahead.cpp
+rm $1/gen_recursion.h
+rm $1/gen_recursion.cpp
 
 mkdir -p ../build64/ladetect
 mkdir -p ../build64/ladetect/$1

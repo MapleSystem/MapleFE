@@ -28,9 +28,11 @@ mkdir -p $1
 cp ../$1/include/gen_*.h $1/
 cp ../$1/src/gen_*.cpp $1/
 
-# The two generated files shouldn't be taken in.
-rm ../$1/include/gen_recursion.h
-rm ../$1/src/gen_recursion.cpp
+# The four generated files shouldn't be taken in.
+rm $1/gen_recursion.h
+rm $1/gen_recursion.cpp
+rm $1/gen_lookahead.h
+rm $1/gen_lookahead.cpp
 
 mkdir -p ../build64/recdetect
 mkdir -p ../build64/recdetect/$1

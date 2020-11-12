@@ -28,7 +28,7 @@ recdetect: autogen shared
 
 ladetect: autogen shared
 	(cd ladetect; ./build.sh java)
-	#(cd $(BUILDDIR)/ladetect; ./ladetect)
+	(cd $(BUILDDIR)/ladetect; ./ladetect)
 
 shared: autogen
 	$(MAKE) LANG=java -C shared

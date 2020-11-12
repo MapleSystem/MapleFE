@@ -30,8 +30,9 @@ std::string GetLookAheadString(LookAhead la) {
     str += la.mData.mChar;
     break;
   case LA_String:
-    str += "LA_String, ";
+    str += "LA_String, \"";
     str += la.mData.mString;
+    str += "\"";
     break;
   case LA_Token:
     str += "LA_Token, ";
@@ -465,13 +466,11 @@ void LADetector::Release() {
   for (unsigned i = 0; i < mRuleLookAheads.GetNum(); i++) {
     RuleLookAhead *la = mRuleLookAheads.ValueAtIndex(i);
     la->Release();
-    delete la;
   }
 
   for (unsigned i = 0; i < mPendings.GetNum(); i++) {
     Pending *pending = mPendings.ValueAtIndex(i);
     pending->Release();
-    delete pending;
   }
 
   mToDo.Release();
@@ -483,21 +482,28 @@ void LADetector::Release() {
 }
 
 // To write the external decl of all LookAheadTable of each rule.
-//   extern LookAheadTable *TblStatementLookAheadTable;
-//   extern LookAheadTable *TblExpressionLookAheadTable;
+//   
+//   extern LookAheadTable TblStatementLookAheadTable;
+//   extern LookAhead     *TblStatementLookAhead;
 //   ...
 //
 void LADetector::WriteHeaderFile() {
-  mHeaderFile->WriteOneLine("#ifndef __GEN_LOOKAHEAD_H__", 23);
-  mHeaderFile->WriteOneLine("#define __GEN_LOOKAHEAD_H__", 23);
+  mHeaderFile->WriteOneLine("#ifndef __GEN_LOOKAHEAD_H__", 27);
+  mHeaderFile->WriteOneLine("#define __GEN_LOOKAHEAD_H__", 27);
+  mHeaderFile->WriteOneLine("#include \"ruletable.h\"", 22);
 
   for (unsigned i = 0; i < RuleTableNum; i++) {
     RuleTableName rtn = gRuleTableNames[i];
     const RuleTable *rule_table = rtn.mAddr;
     const char *rule_table_name = rtn.mName;
-    std::string s = "extern LookAheadTable *";
+    std::string s = "extern LookAheadTable ";
     s += rule_table_name;
     s += "LookAheadTable;";
+    mHeaderFile->WriteOneLine(s.c_str(), s.size());
+
+    s = "extern LookAhead ";
+    s += rule_table_name;
+    s += "LookAhead[];";
     mHeaderFile->WriteOneLine(s.c_str(), s.size());
   }
 
@@ -535,14 +541,10 @@ void LADetector::WriteCppFile() {
 
     if (found) {
       unsigned num = lookahead->mLookAheads.GetNum();
-      // LookAheadTable TblStatementLookAheadTable = {2, {{LA_Char, 'c'}, {LA_Char, 'd'}}};
-      std::string s = "LookAheadTable ";
+      // LookAhead TblStatementLookAhead[] = {{LA_Char, 'c'}, {LA_Char, 'd'}};
+      std::string s = "LookAhead ";
       s += rule_table_name;
-      s += "LookAheadTable = {";
-      std::string num_str = std::to_string(num);
-      s += num_str;
-      s += ", {";
-
+      s += "LookAhead[] = {";
       // Write all lookaheads
       for (unsigned j = 0; j < num; j++) {
         LookAhead la = lookahead->mLookAheads.ValueAtIndex(j);
@@ -551,8 +553,18 @@ void LADetector::WriteCppFile() {
           la_str += ",";
         s += la_str;
       }
+      s += "};";
+      mCppFile->WriteOneLine(s.c_str(), s.size());
       
-      s += "}};";
+      // LookAheadTable TblStatementLookAheadTable = {2, TblStatementLookAhead};
+      s = "LookAheadTable ";
+      s += rule_table_name;
+      s += "LookAheadTable = {";
+      std::string num_str = std::to_string(num);
+      s += num_str;
+      s += ", ";
+      s += rule_table_name;
+      s += "LookAhead};";
       mCppFile->WriteOneLine(s.c_str(), s.size());
     } else {
       // write
