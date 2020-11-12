@@ -57,8 +57,6 @@ void RuleLookAhead::AddLookAhead(LookAhead la) {
   bool found = FindLookAhead(la);
   if (!found) {
     mLookAheads.PushBack(la);
-    std::cout << "AddLookAhead " << GetRuleTableName(mRule)
-            << GetLookAheadString(la) << std::endl;
   }
 }
 
