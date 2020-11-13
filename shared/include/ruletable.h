@@ -127,6 +127,8 @@ struct RuleTable{
   TableData  *mData;
   unsigned    mNumAction;  // Num of actions
   Action     *mActions;
+  unsigned    mIndex;      // a global index of rule table.
+                           // Many places use this index for arrays.
 };
 
 //////////////////////////////////////////////////////////////////////

@@ -323,6 +323,7 @@ void RuleGen::Gen4Table(const Rule *rule, const RuleElem *elem){
   
   Gen4RuleAttr(rule_table_name, attr);
   Gen4TableHeader(rule_table_name);
+  unsigned index = gRuleTableNum;
   GenDebug(rule_table_name);
 
   std::string rule_table_data_name = rule_table_name + "_data";
@@ -365,6 +366,10 @@ void RuleGen::Gen4Table(const Rule *rule, const RuleElem *elem){
   } else {
     rule_table += ", 0, NULL";
   }
+
+  // 4. Index
+  rule_table += ", ";
+  rule_table += std::to_string(index);
 
   rule_table += "};";
 
