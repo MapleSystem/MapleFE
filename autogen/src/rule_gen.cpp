@@ -245,7 +245,9 @@ void RuleGen::GenDebug(const std::string &rule_table_name) {
   addr_name_mapping += rule_table_name;
   addr_name_mapping += ", \"";
   addr_name_mapping += rule_table_name;
-  addr_name_mapping += "\"}\,";
+  addr_name_mapping += "\", ";
+  addr_name_mapping += std::to_string(gRuleTableNum);
+  addr_name_mapping += "}\,";
   gDebugCppFile->WriteOneLine(addr_name_mapping.c_str(), addr_name_mapping.size());
   gRuleTableNum++;
 }

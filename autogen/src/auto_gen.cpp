@@ -65,6 +65,7 @@ static void WriteDebugHFile() {
   gDebugHFile->WriteOneLine("typedef struct {", 16);
   gDebugHFile->WriteOneLine("  const RuleTable *mAddr;", 25);
   gDebugHFile->WriteOneLine("  const char      *mName;", 25);
+  gDebugHFile->WriteOneLine("  unsigned         mIndex;", 26);
   gDebugHFile->WriteOneLine("}RuleTableName;", 15);
   gDebugHFile->WriteOneLine("extern RuleTableName gRuleTableNames[];", 39);
   gDebugHFile->WriteOneLine("extern unsigned RuleTableNum;", 29);
