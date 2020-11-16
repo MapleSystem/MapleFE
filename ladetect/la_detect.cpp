@@ -491,7 +491,7 @@ void LADetector::WriteHeaderFile() {
   mHeaderFile->WriteOneLine("#include \"ruletable.h\"", 22);
 
   for (unsigned i = 0; i < RuleTableNum; i++) {
-    RuleTableName rtn = gRuleTableNames[i];
+    RuleTableSummary rtn = gRuleTableSummarys[i];
     const RuleTable *rule_table = rtn.mAddr;
     const char *rule_table_name = rtn.mName;
     std::string s = "extern LookAheadTable ";
@@ -521,7 +521,7 @@ void LADetector::WriteCppFile() {
   mCppFile->WriteOneLine("#include \"common_header_autogen.h\"", 34);
 
   for (unsigned i = 0; i < RuleTableNum; i++) {
-    RuleTableName rtn = gRuleTableNames[i];
+    RuleTableSummary rtn = gRuleTableSummarys[i];
     const RuleTable *rule_table = rtn.mAddr;
     const char *rule_table_name = rtn.mName;
 

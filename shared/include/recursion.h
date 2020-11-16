@@ -61,6 +61,8 @@ extern Rule2Recursion* GetRule2Recursion(RuleTable *);
 
 // Rule2Group mapping.
 // A rule table maps to a recursion group, or No group at all.
+// This is an array. The order of each ruletable's info follow the table
+// RuleTableSummary in gen_debug.h/cpp.
 
 struct Rule2Group {
   RuleTable *mRuleTable;

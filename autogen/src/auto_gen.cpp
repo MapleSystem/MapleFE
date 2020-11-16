@@ -40,15 +40,15 @@
 //      typedef struct {
 //        const RuleTable *mAddr;
 //        const char      *mName;
-//      }RuleTableName;
-//      extern RuleTableName gRuleTableNames[];
+//      }RuleTableSummary;
+//      extern RuleTableSummary gRuleTableSummarys[];
 //      extern unsigned RuleTableNum;
 //
 //    In Cpp file, we need
 //
 //    #include "gen_debug.h"
 //    unsigned RuleTableNum;
-//    RuleTableName gRuleTableNames[] = {
+//    RuleTableSummary gRuleTableSummarys[] = {
 //      {&TblLiteral, "TblLiteral"},
 //      ...
 //    };
@@ -66,8 +66,8 @@ static void WriteDebugHFile() {
   gDebugHFile->WriteOneLine("  const RuleTable *mAddr;", 25);
   gDebugHFile->WriteOneLine("  const char      *mName;", 25);
   gDebugHFile->WriteOneLine("  unsigned         mIndex;", 26);
-  gDebugHFile->WriteOneLine("}RuleTableName;", 15);
-  gDebugHFile->WriteOneLine("extern RuleTableName gRuleTableNames[];", 39);
+  gDebugHFile->WriteOneLine("}RuleTableSummary;", 18);
+  gDebugHFile->WriteOneLine("extern RuleTableSummary gRuleTableSummarys[];", 45);
   gDebugHFile->WriteOneLine("extern unsigned RuleTableNum;", 29);
   gDebugHFile->WriteOneLine("extern const char* GetRuleTableName(const RuleTable*);", 54);
   gDebugHFile->WriteOneLine("#endif", 6);
@@ -77,7 +77,7 @@ static void WriteDebugHFile() {
 static void PrepareDebugCppFile() {
   gDebugCppFile->WriteOneLine("#include \"gen_debug.h\"", 22);
   gDebugCppFile->WriteOneLine("#include \"common_header_autogen.h\"", 34);
-  gDebugCppFile->WriteOneLine("RuleTableName gRuleTableNames[] = {", 35);
+  gDebugCppFile->WriteOneLine("RuleTableSummary gRuleTableSummarys[] = {", 41);
 }
 
 // write the ending part of debug file
@@ -90,9 +90,9 @@ static void FinishDebugCppFile() {
   gDebugCppFile->WriteOneLine(num_line.c_str(), num_line.size());
   gDebugCppFile->WriteOneLine("const char* GetRuleTableName(const RuleTable* addr) {", 53);
   gDebugCppFile->WriteOneLine("  for (unsigned i = 0; i < RuleTableNum; i++) {", 47);
-  gDebugCppFile->WriteOneLine("    RuleTableName name = gRuleTableNames[i];", 44);
-  gDebugCppFile->WriteOneLine("    if (name.mAddr == addr)", 27);
-  gDebugCppFile->WriteOneLine("      return name.mName;", 24);
+  gDebugCppFile->WriteOneLine("    RuleTableSummary summary = gRuleTableSummarys[i];", 53);
+  gDebugCppFile->WriteOneLine("    if (summary.mAddr == addr)", 30);
+  gDebugCppFile->WriteOneLine("      return summary.mName;", 27);
   gDebugCppFile->WriteOneLine("  }", 3);
   gDebugCppFile->WriteOneLine("  return NULL;", 14);
   gDebugCppFile->WriteOneLine("}", 1);
