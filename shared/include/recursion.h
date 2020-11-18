@@ -63,14 +63,16 @@ extern Rule2Recursion* GetRule2Recursion(RuleTable *);
 // A rule table maps to a recursion group, or No group at all.
 // This is an array. The order of each ruletable's info follow the table
 // RuleTableSummary in gen_debug.h/cpp.
-
-struct Rule2Group {
-  RuleTable *mRuleTable;
-  unsigned   mGroupId;
-};
-extern unsigned gRule2GroupNum;
-extern Rule2Group *gRule2Group;
+extern int *gRule2Group;
 extern bool FindRecursionGroup(RuleTable *rt, unsigned &id); // find group id
+
+// Group2Rule Mapping
+// A recursion group have multiple rules.
+struct Group2Rule {
+  unsigned mNum;
+  RuleTable **mRuleTables;
+};
+extern Group2Rule *gGroup2Rule;
 
 // This struct is named 'FronNode' since its mainly usage is the FronNode
 // in LeftRecursion handling.

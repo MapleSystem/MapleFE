@@ -191,6 +191,7 @@ private:
   SmallVector<Rule2Group> mRule2Group;
   void AddRule2Group(RuleTable*, RecursionGroup*);
   void WriteRule2Group();
+  void WriteGroup2Rule();
 
 private:
   Write2File *mCppFile;

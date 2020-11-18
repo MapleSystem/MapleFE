@@ -1383,19 +1383,30 @@ bool Parser::TraverseTableData(TableData *data, AppealNode *parent) {
 }
 
 void Parser::SetIsDone(unsigned group_id, unsigned start_token) {
-  for (unsigned i = 0; i < gRule2GroupNum; i++) {
-    Rule2Group r2g = gRule2Group[i];
-    if (r2g.mGroupId == group_id) {
-      RuleTable *rt = r2g.mRuleTable;
-      SuccMatch *succ = FindSucc(rt);
-      // Some node in a recursion fails, like some children of a Oneof node
-      if (succ) {
-        bool found = succ->GetStartToken(start_token);
-        if(found)
-          succ->SetIsDone();
-      }
+//  for (unsigned i = 0; i < gRule2GroupNum; i++) {
+//    Rule2Group r2g = gRule2Group[i];
+//    if (r2g.mGroupId == group_id) {
+//      RuleTable *rt = r2g.mRuleTable;
+//      SuccMatch *succ = FindSucc(rt);
+//      // Some node in a recursion fails, like some children of a Oneof node
+//      if (succ) {
+//        bool found = succ->GetStartToken(start_token);
+//        if(found)
+//          succ->SetIsDone();
+//      }
+//    }
+//  }
+  Group2Rule g2r = gGroup2Rule[group_id];
+  for (unsigned i = 0; i < g2r.mNum; i++) {
+    RuleTable *rt = g2r.mRuleTables[i];
+    SuccMatch *succ = FindSucc(rt);
+    // Some node in a recursion fails, like some children of a Oneof node
+    if (succ) {
+      bool found = succ->GetStartToken(start_token);
+      if(found)
+        succ->SetIsDone();
     }
-  }
+  } 
 }
 
 void Parser::SetIsDone(RuleTable *rt, unsigned start_token) {
