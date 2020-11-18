@@ -648,7 +648,7 @@ void Parser::RemoveSuccNode(unsigned curr_token, AppealNode *node) {
 //
 // Returns true : if SuccMatch is done.
 
-bool Parser::TraverseRuleTablePre(AppealNode *appeal, AppealNode *parent) {
+bool Parser::TraverseRuleTablePre(AppealNode *appeal) {
   unsigned saved_mCurToken = mCurToken;
   bool is_done = false;
   RuleTable *rule_table = appeal->GetTable();
@@ -740,7 +740,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
     mInSecondTry = false;
   }
 
-  bool is_done = TraverseRuleTablePre(appeal, parent);
+  bool is_done = TraverseRuleTablePre(appeal);
 
   if (appeal->IsFail()) {
     mIndentation -= 2;

@@ -315,7 +315,7 @@ private:
   bool TraverseStmt();                                // success if all tokens are matched.
   bool TraverseRuleTable(RuleTable*, AppealNode*);    // success if all tokens are matched.
   bool TraverseRuleTableRegular(RuleTable*, AppealNode*);    // success if all tokens are matched.
-  bool TraverseRuleTablePre(AppealNode*, AppealNode*);
+  bool TraverseRuleTablePre(AppealNode*);
   bool TraverseTableData(TableData*, AppealNode*);    // success if all tokens are matched.
   bool TraverseConcatenate(RuleTable*, AppealNode*);
   bool TraverseOneof(RuleTable*, AppealNode*);
