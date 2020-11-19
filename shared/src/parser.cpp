@@ -598,6 +598,8 @@ void Parser::DumpExitTable(const char *table_name, unsigned indent, bool succ, A
       std::cout << " fail@ChildrenFailed" << "}" << std::endl;
     else if (reason == Fail2ndOf1st)
       std::cout << " fail@2ndOf1st" << "}" << std::endl;
+    else if (reason == FailLookAhead)
+      std::cout << " fail@LookAhead" << "}" << std::endl;
     else if (reason == AppealStatus_NA)
       std::cout << " fail@NA" << "}" << std::endl;
   }
@@ -1844,49 +1846,6 @@ void Parser::SortOutData(AppealNode *parent) {
   case DT_Null:
   default:
     break;
-  }
-}
-
-// This is for Concatenate node.
-// If there are any failed children node and they are failed second try, clean them.
-void Parser::CleanFailedSecondTry(AppealNode *parent) {
-  std::vector<AppealNode*>::iterator it = parent->mChildren.begin();
-  std::vector<AppealNode*> bad_children;
-
-  bool found = false;
-  AppealNode *prev_child = NULL;
-  for (; it != parent->mChildren.end(); it++) {
-    AppealNode *child = *it;
-    if (child->IsFail()) {
-      bad_children.push_back(child);
-      if (!found) {
-        found = true;
-      } else {
-        // Prev_child is also failed, they should share the same startindex, rule table
-        MASSERT( (child->GetStartIndex() == prev_child->GetStartIndex())
-                 && (child->GetTable() == prev_child->GetTable())
-                 && "Not the same startindex or ruletable in failed 2nd try?");
-      }
-    } else {
-      // For a succ second try, it may or may not have some prev children sharing same
-      // start index. (1) If it's a token, we don't create appeal node for failed token.
-      // So it have NO failed children. (2) for table, we are sure to have failed children.
-      if (found) {
-        MASSERT( (child->GetStartIndex() == prev_child->GetStartIndex())
-                 && (child->GetTable() == prev_child->GetTable())
-                 && "Not the same startindex or ruletable in failed 2nd try?");
-        MASSERT( child->mIsSecondTry && "Not a second try after a failed node?");
-        // clear the status, ending a session of second try.
-        found = false;
-      }
-    }
-    prev_child = child;
-  }
-
-  // remove the bad children AppealNode
-  std::vector<AppealNode*>::iterator badit = bad_children.begin();
-  for (; badit != bad_children.end(); badit++) {
-    parent->RemoveChild(*badit);
   }
 }
 

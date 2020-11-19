@@ -45,6 +45,7 @@ typedef enum {
   FailNotLiteral,
   FailChildrenFailed,
   Fail2ndOf1st,
+  FailLookAhead,
 
   // Succ :             Really does the matching, will be saved in SuccMatch
   // SuccWasSucc :      Was matched, not tried traversal for a second timewill,
@@ -370,7 +371,6 @@ private:
   void SortOutZeroorone(AppealNode*);
   void SortOutConcatenate(AppealNode*);
   void SortOutData(AppealNode*);
-  void CleanFailedSecondTry(AppealNode*);
 
   void SimplifySortedTree();
   AppealNode* SimplifyShrinkEdges(AppealNode*);
