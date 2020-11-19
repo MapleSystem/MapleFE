@@ -112,7 +112,6 @@ public:
 
 public:
   bool mIsTable;     // A AppealNode could relate to either rule table or token.
-  bool mIsSecondTry; // The node is created after second try. This flag is used during SortOut.
   unsigned int mSimplifiedIndex;  // After SimplifyShrinkEdges, a node could be moved to
                                   // connect to a new 'parent' node, replacing its ancestor.
                                   // To make AST building work, it needs to inherit ancestor's
@@ -140,7 +139,7 @@ public:
 
   AppealNode() {mData.mTable=NULL; mParent = NULL;
                 mAfter = AppealStatus_NA; mSimplifiedIndex = 0; mIsTable = true;
-                mIsSecondTry = false; mStartIndex = 0; mSorted = false; mFinalMatch = 0;
+                mStartIndex = 0; mSorted = false; mFinalMatch = 0;
                 mIsPseudo = false;}
   ~AppealNode(){mMatches.Release();}
 
@@ -262,7 +261,6 @@ public:
   bool mTraceTable;         // trace enter/exit rule tables
   bool mTraceLeftRec;       // trace enter/exit rule tables
   bool mTraceAppeal;        // trace appealing
-  bool mTraceSecondTry;     // trace second try in parser.
   bool mTraceFailed;        // trace mFailed
   bool mTraceTiming;        // trace mFailed
   bool mTraceVisited;       // trace mVisitedStack
@@ -290,8 +288,6 @@ private:
   unsigned              mCurToken;       // index in mActiveTokens, the next token to be matched.
   unsigned              mPending;        // index in mActiveTokens, the first pending token.
                                          // All tokens after it are pending.
-
-  bool                  mInSecondTry;    // A temporary flag to tell we are in second try.
 
   // I'm using two data structures to record the status of cycle reference.
   // See the detailed comments in the implementation of Parser::Parse().

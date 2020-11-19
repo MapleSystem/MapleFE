@@ -193,39 +193,6 @@
 //   * FailNotIdentifier
 //   * Succ
 //
-// 6. Second Try
-//
-// This is the same issue as the second try in lexer. Please refer ruletable_util.cpp
-// for details of lexer's second try.
-//
-// Look at the following example,
-//   rule FieldAccess: Primary + '.' + Identifier
-//   rule Primary : ONEOF(...
-//                        "this"
-//                        FieldAccess)
-//
-// Suppose we have a piece of code containing "this.member", and all three token can
-// be matched by Primary, or only the first one can be matched. In my first implementation
-// we always match as many tokens as possible. However, here is the problem. If Primary
-// taken all the tokens, FieldAccess will get failure. If Primary takes only one token,
-// it will be a match. We definitly want a match!
-//
-// This brings a design which need records all the possible number of tokens a rule can match.
-// And give the following rules a chance.
-//
-// However, this creats another issue. Let's use AppealNode to explain. All nodes form
-// a tree. During the traversal, if one node can have multiple possible matchings, the number
-// of possible matchings could explode. To limit this explosion we only allow this multiple
-// choice happen for temporary, and its parent node will decide the final number of tokens
-// immediately. This means the parent node will choose the right one. In this way, the final tree
-// has no multipe options at all.
-//
-// Also this happens when the child node is a ONEOF node and parent node is a Concatenate node.
-//
-// [NOTE] Second Try will brings in extra branches in the appealing tree. However, it seems doesn't
-//        create any serious problem.
-//
-//
 // 7. SortOut Process
 //
 // After traversing the rule tables and successfully matching all the tokens, we have created
@@ -250,7 +217,6 @@ Parser::Parser(const char *name) : filename(name) {
   mTraceTable = false;
   mTraceLeftRec = false;
   mTraceAppeal = false;
-  mTraceSecondTry = false;
   mTraceVisited = false;
   mTraceFailed = false;
   mTraceTiming = false;
@@ -260,7 +226,6 @@ Parser::Parser(const char *name) : filename(name) {
   mTraceWarning = false;
 
   mIndentation = -2;
-  mInSecondTry = false;
   mRoundsOfPatching = 0;
 }
 
@@ -736,12 +701,6 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
   parent->AddChild(appeal);
 
   unsigned saved_mCurToken = mCurToken;
-
-  if (mInSecondTry) {
-    appeal->mIsSecondTry = true;
-    mInSecondTry = false;
-  }
-
   bool is_done = TraverseRuleTablePre(appeal);
 
   if (appeal->IsFail()) {
@@ -972,10 +931,6 @@ bool Parser::TraverseToken(Token *token, AppealNode *parent) {
     appeal->SetStartIndex(mCurToken);
     appeal->AddMatch(mCurToken);
     appeal->SetParent(parent);
-    if (mInSecondTry) {
-      appeal->mIsSecondTry = true;
-      mInSecondTry = false;
-    }
 
     parent->AddChild(appeal);
 
