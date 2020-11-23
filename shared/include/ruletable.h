@@ -119,6 +119,10 @@ struct LookAheadTable {
   LookAhead *mData;
 };
 
+// This will be an array with NumOfRules elements.
+// Generated in gen_lookahead.cpp.
+extern LookAheadTable *gLookAheadTable;
+
 // Struct of the table entry
 struct RuleTable{
   EntryType   mType;

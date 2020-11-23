@@ -489,22 +489,6 @@ void LADetector::WriteHeaderFile() {
   mHeaderFile->WriteOneLine("#ifndef __GEN_LOOKAHEAD_H__", 27);
   mHeaderFile->WriteOneLine("#define __GEN_LOOKAHEAD_H__", 27);
   mHeaderFile->WriteOneLine("#include \"ruletable.h\"", 22);
-
-  for (unsigned i = 0; i < RuleTableNum; i++) {
-    RuleTableSummary rtn = gRuleTableSummarys[i];
-    const RuleTable *rule_table = rtn.mAddr;
-    const char *rule_table_name = rtn.mName;
-    std::string s = "extern LookAheadTable ";
-    s += rule_table_name;
-    s += "LookAheadTable;";
-    mHeaderFile->WriteOneLine(s.c_str(), s.size());
-
-    s = "extern LookAhead ";
-    s += rule_table_name;
-    s += "LookAhead[];";
-    mHeaderFile->WriteOneLine(s.c_str(), s.size());
-  }
-
   mHeaderFile->WriteOneLine("#endif", 6);
 }
 
@@ -520,6 +504,8 @@ void LADetector::WriteCppFile() {
   mCppFile->WriteOneLine("#include \"gen_lookahead.h\"", 26);
   mCppFile->WriteOneLine("#include \"common_header_autogen.h\"", 34);
 
+  // Step 1. Write all the necessary LookAhead info, like
+  //   LookAhead TblStatementLookAhead[] = {{LA_Char, 'c'}, {LA_Char, 'd'}};
   for (unsigned i = 0; i < RuleTableNum; i++) {
     RuleTableSummary rtn = gRuleTableSummarys[i];
     const RuleTable *rule_table = rtn.mAddr;
@@ -553,26 +539,52 @@ void LADetector::WriteCppFile() {
       }
       s += "};";
       mCppFile->WriteOneLine(s.c_str(), s.size());
-      
-      // LookAheadTable TblStatementLookAheadTable = {2, TblStatementLookAhead};
-      s = "LookAheadTable ";
-      s += rule_table_name;
-      s += "LookAheadTable = {";
+    }
+  }
+
+  // Step 2. Write the global array of lookahead of all rules.
+
+  // LookAheadTable *loalLookAheadTable;
+  std::string global = "LookAheadTable localLookAheadTable[] = {";
+  mCppFile->WriteOneLine(global.c_str(), global.size());
+
+  for (unsigned i = 0; i < RuleTableNum; i++) {
+    RuleTableSummary rtn = gRuleTableSummarys[i];
+    const RuleTable *rule_table = rtn.mAddr;
+    const char *rule_table_name = rtn.mName;
+
+    // see if it has data in mRuleLookAheads
+    bool found = false;
+    RuleLookAhead *lookahead = NULL;
+    for (unsigned j = 0; j < mRuleLookAheads.GetNum(); j++) {
+      lookahead = mRuleLookAheads.ValueAtIndex(j);
+      RuleTable *la_rule = lookahead->mRule;
+      if (la_rule == rule_table) {
+        found = true;
+        break;
+      }
+    }
+
+    if (found) {
+      unsigned num = lookahead->mLookAheads.GetNum();
+      std::string s = "  {";
       std::string num_str = std::to_string(num);
       s += num_str;
       s += ", ";
       s += rule_table_name;
-      s += "LookAhead};";
+      s += "LookAhead},";
       mCppFile->WriteOneLine(s.c_str(), s.size());
     } else {
-      // write
-      //   LookAheadTable TblXXXLookAheadTable = {0, NULL};
-      std::string s = "LookAheadTable ";
-      s += rule_table_name;
-      s += "LookAheadTable = {0, NULL};";
+      // write {0, NULL},
+      std::string s = "{0, NULL},";
       mCppFile->WriteOneLine(s.c_str(), s.size());
     }
   }
+
+  global = "};";
+  mCppFile->WriteOneLine(global.c_str(), global.size());
+  global = "LookAheadTable *gLookAheadTable = localLookAheadTable;";
+  mCppFile->WriteOneLine(global.c_str(), global.size());
 }
 
 // Write the recursion to java/gen_recursion.h and java/gen_recursion.cpp
