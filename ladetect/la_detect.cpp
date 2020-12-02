@@ -208,6 +208,9 @@ void LADetector::CopyRuleLookAhead(RuleTable *to, RuleTable *from) {
   }
 }
 
+// 'rt' is the rule table to be detected.
+// 'p' is the tree node of parent.
+// We are traversing an edge p->rt.
 TResult LADetector::DetectRuleTable(RuleTable *rt, ContTreeNode<RuleTable*> *p) {
   TResult res = TRS_NA;
 
@@ -219,11 +222,23 @@ TResult LADetector::DetectRuleTable(RuleTable *rt, ContTreeNode<RuleTable*> *p) 
   }
 
   if (IsInProcess(rt)) {
-    // It it 'p' is the same as 'rt', it's the back edge of a one-node recursion.
-    // This is not necessary to be a pending node. We just do nothing.
-    RuleTable *p_rt = p->GetData();
-    if (p_rt != rt)
-      AddPending(rt, p_rt);
+    // 1. If 'p' is the same as 'rt', it's the back edge of a one-node recursion.
+    //    This is not a pending node. We just do nothing.
+    //    We add Pending if they are >1 nodes recursion.
+    // 2. All ancestors of 'p' need be added as dependent on 'rt'.
+    //    It should always reach 'rt' since it's an ancestor. We stop there.
+    ContTreeNode<RuleTable*> *dep_tree_node = p;
+    bool met = false;
+    while (1) {
+      RuleTable *dep_rt = dep_tree_node->GetData();
+      if (dep_rt == rt) {
+        met = true;
+        break;
+      }
+      AddPending(rt, dep_rt);
+      dep_tree_node = dep_tree_node->GetParent();
+    }
+    MASSERT(met);
     return TRS_NA;
   } else {
     mInProcess.PushBack(rt);
@@ -440,21 +455,14 @@ void LADetector::BackPatch() {
   }
 }
 
+// Add lookaheads of pending to dependents.
 void LADetector::PatchPending(Pending *pending) {
   RuleTable *rule = pending->mRule;
   RuleLookAhead *la_rule = GetRuleLookAhead(rule);
   MASSERT(la_rule);
-
   for (unsigned i = 0; i < pending->mDependents.GetNum(); i++) {
     RuleTable *dep = pending->mDependents.ValueAtIndex(i);
-    RuleLookAhead *la_dep = GetRuleLookAhead(dep);
-    if (!la_dep)
-      la_dep = CreateRuleLookAhead(dep);
-
-    for (unsigned j = 0; j < la_rule->mLookAheads.GetNum(); j++) {
-      LookAhead la = la_rule->mLookAheads.ValueAtIndex(j);
-      la_dep->AddLookAhead(la);
-    }
+    CopyRuleLookAhead(dep, rule);
   }
 }
 

@@ -667,6 +667,48 @@ bool Parser::TraverseRuleTablePre(AppealNode *appeal) {
   return is_done;
 }
 
+bool Parser::LookAheadFail(RuleTable *rule_table, unsigned token) {
+  Token *curr_token = GetActiveToken(token);
+  LookAheadTable latable = gLookAheadTable[rule_table->mIndex];
+
+  bool found = false;
+  for (unsigned i = 0; i < latable.mNum; i++) {
+    LookAhead la = latable.mData[i];
+
+    switch(la.mType) {
+    case LA_Char:
+    case LA_String:
+      // We are not ready to handle non-literal or non-identifier Char/String
+      // which are not recoganized by lexer.
+      break;
+    case LA_Token:
+      if (curr_token == &gSystemTokens[la.mData.mTokenId])
+        found = true;
+      break;
+    case LA_Identifier:
+      if (curr_token->IsIdentifier())
+        found = true;
+      break;
+    case LA_Literal:
+      if (curr_token->IsLiteral())
+        found = true;
+      break;
+    case LA_NA:
+    default:
+      MASSERT(0 && "Unknown LookAhead Type.");
+      break;
+    }
+
+    if (found)
+      break;
+  }
+
+  if (found)
+    return false;
+  else
+    return true;
+}
+
 // return true : if the rule_table is matched
 //       false : if faled.
 //
@@ -704,6 +746,17 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
   bool is_done = TraverseRuleTablePre(appeal);
 
   if (appeal->IsFail()) {
+    mIndentation -= 2;
+    return false;
+  }
+
+  if (LookAheadFail(rule_table, saved_mCurToken) &&
+      (rule_table->mType != ET_Zeroormore) &&
+      (rule_table->mType != ET_Zeroorone)) {
+    appeal->mAfter = FailLookAhead;
+    AddFailed(rule_table, saved_mCurToken);
+    if (mTraceTable)
+      DumpExitTable(name, mIndentation, false, appeal->mAfter);
     mIndentation -= 2;
     return false;
   }
@@ -1317,7 +1370,7 @@ bool Parser::TraverseTableData(TableData *data, AppealNode *parent) {
     //TODO: Need compare literal. But so far looks like it's impossible to
     //      have a literal token able to match a string/char in rules.
     break;
-  // separator, operator, keywords are planted as DT_Token.
+  // separator, operator, keywords are generated as DT_Token.
   // just need check the pointer of token
   case DT_Token:
     found = TraverseToken(&gSystemTokens[data->mData.mTokenId], parent);

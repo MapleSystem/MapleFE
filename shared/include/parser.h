@@ -160,6 +160,7 @@ public:
                          (mAfter == FailNotIdentifier) ||
                          (mAfter == FailNotLiteral) ||
                          (mAfter == FailChildrenFailed) ||
+                         (mAfter == FailLookAhead) ||
                          (mAfter == Fail2ndOf1st);}
   bool IsNA() {return mAfter == AppealStatus_NA;}
 
@@ -339,6 +340,8 @@ private:
   void AddFailed(RuleTable*, unsigned);
   void ResetFailed(RuleTable*, unsigned);
   bool WasFailed(RuleTable*, unsigned);
+
+  bool LookAheadFail(RuleTable*, unsigned);
 
   bool MoveCurToken();             // move mCurToken one step.
   Token* GetActiveToken(unsigned); // Get an active token.
