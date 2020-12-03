@@ -584,7 +584,7 @@ void LADetector::WriteCppFile() {
       mCppFile->WriteOneLine(s.c_str(), s.size());
     } else {
       // write {0, NULL},
-      std::string s = "{0, NULL},";
+      std::string s = "  {0, NULL},";
       mCppFile->WriteOneLine(s.c_str(), s.size());
     }
   }
