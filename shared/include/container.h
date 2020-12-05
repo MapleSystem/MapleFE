@@ -250,14 +250,10 @@ public:
     return &(e->mData);
   }
 
+  // We are using LocateValue() to implement Find(). So the mPointer
+  // will be changed if value is found.
   bool Find(T t) {
-    Elem *temp = mHead;
-    while (temp) {
-      if (temp->mData == t)
-        return true;
-      temp = temp->mNext;
-    }
-    return false;
+    return LocateValue(t);
   }
 
   // The following three functions are used together, with a leading
@@ -265,15 +261,16 @@ public:
   // Keep in mind, the pointer always point to the one by Locate().
 
   // It's caller's duty to make sure 't' really exists.
-  void LocateValue(T t) {
+  bool LocateValue(T t) {
     Elem *temp = mHead;
     while (temp) {
       if (temp->mData == t) {
         mPointer = temp;
-        return;
+        return true;
       }
       temp = temp->mNext;
     }
+    return false;
   }
 
   void LocateIndex(unsigned idx) {
@@ -389,14 +386,8 @@ public:
   // Remove the first element having value of 't'. If not found
   // it exist quietly.
   void Remove(T t) {
-    Elem *temp = mHead;
-    while (temp) {
-      if (temp->mData == t) {
-        Remove(temp);
-        return;
-      }
-      temp = temp->mNext;
-    }
+    if (LocateValue(t))
+      Remove(mPointer);
   }
 
   // clear the data, but keep the memory, no free.
@@ -404,6 +395,7 @@ public:
     mNum = 0;
     mHead = NULL;
     mTail = NULL;
+    mPointer = NULL;
     mMemPool.Clear();
   }
 };
