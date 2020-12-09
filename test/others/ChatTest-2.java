@@ -42,6 +42,6 @@
 
 public class ChatTest {
     private static void performDontReceiveMessageInNameState() {
-        final List<Exception> exceptions = Collections.synchronizedList(new ArrayList<Exception>());
+        final List<Exception> exceptions = new ArrayList<Exception>();
     }
 }

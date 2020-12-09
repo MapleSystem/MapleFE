@@ -1,4 +1,4 @@
-Matched 33 tokens.
+Matched 28 tokens.
 ============= Module ===========
 == Sub Tree ==
 class  ChatTest
@@ -8,7 +8,7 @@ class  ChatTest
   Constructors: 
   Methods: 
     func  performDontReceiveMessageInNameState()  throws: 
-      var:exceptions=
+      var:exceptions=new ArrayList<Exception>
   LocalClasses: 
   LocalInterfaces: 
 

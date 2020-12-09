@@ -324,11 +324,11 @@ class IdentifierNode : public TreeNode {
 private:
   SmallVector<AttrId> mAttrs;
   const char    *mName; // In the gStringPool
-  TreeNode      *mType; // PrimTypeNode, or IdentifierNode
+  TreeNode      *mType; // PrimTypeNode or UserTypeNode
   TreeNode      *mInit; // Init value
   DimensionNode *mDims;
 public:
-  IdentifierNode(const char *s) : mName(s), mType(NULL), mInit(NULL), mDims(NULL) {
+  IdentifierNode(const char *s) : mName(s), mType(NULL), mInit(NULL), mDims(NULL){
     mKind = NK_Identifier; }
   IdentifierNode(const char *s, TreeNode *t) : mName(s), mType(t) {mKind = NK_Identifier;}
   ~IdentifierNode(){}

@@ -1,16 +1,16 @@
 /*
 * Copyright (C) [2020] Futurewei Technologies, Inc. All rights reverved.
 *
-* OpenArkFE is licensed under the Mulan PSL v1.
-* You can use this software according to the terms and conditions of the Mulan PSL v1.
-* You may obtain a copy of Mulan PSL v1 at:
+* OpenArkFE is licensed under the Mulan PSL v2.
+* You can use this software according to the terms and conditions of the Mulan PSL v2.
+* You may obtain a copy of Mulan PSL v2 at:
 *
-*  http://license.coscl.org.cn/MulanPSL
+*  http://license.coscl.org.cn/MulanPSL2
 *
 * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER
 * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR
 * FIT FOR A PARTICULAR PURPOSE.
-* See the Mulan PSL v1 for more details.
+* See the Mulan PSL v2 for more details.
 */
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -53,6 +53,37 @@
 #include "ast.h"
 #include "ast_mempool.h"
 
+///////////////////////////////////////////////////////////////////////////////
+//                          UserTypeNode
+///////////////////////////////////////////////////////////////////////////////
+
+class UserTypeNode : public TreeNode {
+private:
+  IdentifierNode *mId;
+  SmallVector<IdentifierNode*> mTypeArguments;
+public:
+  UserTypeNode() : mId(NULL) {mKind = NK_UserType;}
+  UserTypeNode(IdentifierNode *n) : mId(n) {mKind = NK_UserType;}
+  ~UserTypeNode(){Release();}
+
+  IdentifierNode* GetId() {return mId;}
+  void SetId(IdentifierNode *n) {mId = n;}
+
+  unsigned TypeArgsNum() {return mTypeArguments.GetNum();}
+  void     AddTypeArg(IdentifierNode *n) {mTypeArguments.PushBack(n);}
+  void     AddTypeArgs(TreeNode *n);
+
+  void Release() {mTypeArguments.Release();}
+  void Dump(unsigned);
+  const char* GetName() {return mId->GetName();}
+};
+
+///////////////////////////////////////////////////////////////////////////////
+//                          PrimTypeNode & PrimTypePool
+// The size of PrimTypeNode is fixed, so it's good to use container for the storage.
+// The PrimTypeNode pool is global, across all modules.
+///////////////////////////////////////////////////////////////////////////////
+
 class PrimTypeNode : public TreeNode {
 private:
   TypeId    mPrimType; // primitive type
@@ -66,12 +97,6 @@ public:
 
   void Dump(unsigned);
 };
-
-///////////////////////////////////////////////////////////////////////////////
-//                          PrimTypePool
-// The size of PrimTypeNode is fixed, so it's good to use container for the storage.
-// The PrimTypeNode pool is global, across all modules.
-///////////////////////////////////////////////////////////////////////////////
 
 class PrimTypePool {
 private:

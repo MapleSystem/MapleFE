@@ -8,8 +8,8 @@ class  A
   Constructors: 
   Methods: 
     func  foo()  throws: 
-      new Cyclic
+      new Cyclic<Cyclic>
   LocalClasses: 
   LocalInterfaces: 
 
-Identifier:Cyclic has no decl.
+UserType:Cyclic has no decl.

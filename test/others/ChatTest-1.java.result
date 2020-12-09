@@ -42,7 +42,7 @@ class  ChatTest
       testUsernameAndMessage()
       testDontReceiveMessageInNameState()
     func  startServer()  throws:     IOException
-      var:server=new ChatServer
+      var:server=new ChatServer<ChatServer>
       var:address=(InetSocketAddress)server.getSocketAddress()
       listeningPort Assign address.getPort()
       server.run()
@@ -52,10 +52,10 @@ class  ChatTest
       server.shutdown()
     func  testPortOpen()  throws:     Exception
       var:server=startServer()
-      var:socket=new Socket
+      var:socket=new Socket<Socket>
       cond-branch cond:socket.isConnected()
       true branch :
-        new RuntimeException
+        new RuntimeException<RuntimeException>
       false branch :
 
 
@@ -63,7 +63,7 @@ class  ChatTest
 
     func  testAsksForName()  throws:     Exception
       var:server=startServer()
-      var:socket=new Socket
+      var:socket=new Socket<Socket>
 
 
       server.shutdown()
@@ -100,23 +100,23 @@ class  ChatTest
 
       cond-branch cond:
       true branch :
-        exception.add(new RuntimeException)
+        exception.add(new RuntimeException<RuntimeException>)
         return 
       false branch :
 
       cond-branch cond:
       true branch :
-        exception.add(new RuntimeException)
+        exception.add(new RuntimeException<RuntimeException>)
         return 
       false branch :
 
     func  performDontReceiveMessageInNameState()  throws:     Exception
-      var:barrier1=new CyclicBarrier
-      var:barrier2=new CyclicBarrier
-      var:barrier3=new CyclicBarrier
+      var:barrier1=new CyclicBarrier<CyclicBarrier>
+      var:barrier2=new CyclicBarrier<CyclicBarrier>
+      var:barrier3=new CyclicBarrier<CyclicBarrier>
       var:exceptions=
-      var:chatConnection=new ChatConnection
-      var:client2=new Thread
+      var:chatConnection=new ChatConnection<ChatConnection>
+      var:client2=new Thread<Thread>
       client2.start()
       chatConnection.run()
       cond-branch cond:exceptions.isEmpty()
@@ -130,12 +130,12 @@ class  ChatTest
       do         joined Assign 
 while ()
     func  performTestUsernameAndMessage()  throws:     Exception
-      var:barrier1=new CyclicBarrier
-      var:barrier2=new CyclicBarrier
-      var:barrier3=new CyclicBarrier
+      var:barrier1=new CyclicBarrier<CyclicBarrier>
+      var:barrier2=new CyclicBarrier<CyclicBarrier>
+      var:barrier3=new CyclicBarrier<CyclicBarrier>
       var:exceptions=
-      var:chatConnection=new ChatConnection
-      var:client2=new Thread
+      var:chatConnection=new ChatConnection<ChatConnection>
+      var:client2=new Thread<Thread>
       client2.start()
       chatConnection.run()
       cond-branch cond:exceptions.isEmpty()
@@ -147,7 +147,7 @@ while ()
     func  readAvailableString()  throws:     IOException
       return readAvailableString(reader,false)
     func  readAvailableString()  throws:     IOException
-      var:builder=new StringBuilder
+      var:builder=new StringBuilder<StringBuilder>
       var:bytes
       cond-branch cond:
       true branch :
@@ -168,7 +168,7 @@ while
         func  run()  throws: 
           Socket
           socket
-          new Socket
+          new Socket<Socket>
 
           socket.setTcpNoDelay(true)
           run(socket,reader,writer)

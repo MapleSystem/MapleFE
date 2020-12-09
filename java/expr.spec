@@ -69,6 +69,8 @@ rule UnqualifiedClassInstanceCreationExpression :
 rule ClassOrInterfaceTypeToInstantiate :
   ZEROORMORE(Annotation) + Identifier + ZEROORMORE('.' + ZEROORMORE(Annotation) + Identifier) +
   ZEROORONE(TypeArgumentsOrDiamond)
+  attr.action : BuildUserType(%2)
+  attr.action : AddTypeArgument(%4)
 
 rule TypeArgumentsOrDiamond : ONEOF(
   TypeArguments,

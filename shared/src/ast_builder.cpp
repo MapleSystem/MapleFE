@@ -1610,3 +1610,43 @@ TreeNode* ASTBuilder::AddThrowsTo() {
   return mLastTreeNode;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+//                   User Type Functions
+////////////////////////////////////////////////////////////////////////////////
+
+TreeNode* ASTBuilder::BuildUserType() {
+  if (mTrace)
+    std::cout << "In BuildUserType" << std::endl;
+
+  Param p_id = mParams[0];
+  if (!p_id.mIsTreeNode)
+    MERROR("The Identifier of user type is not a treenode.");
+
+  TreeNode *node_id = p_id.mData.mTreeNode;
+  if (!node_id->IsIdentifier())
+    MERROR("The Identifier of user type is not an identifier.");
+
+  UserTypeNode *user_type = (UserTypeNode*)mTreePool->NewTreeNode(sizeof(UserTypeNode));
+  new (user_type) UserTypeNode(node_id);
+  mLastTreeNode = user_type;
+  return mLastTreeNode;
+}
+
+TreeNode* ASTBuilder::AddTypeArgument() {
+  if (mTrace)
+    std::cout << "In AddTypeArgument" << std::endl;
+
+  if (mParams.size() == 0)
+    return mLastTreeNode;
+
+  Param p_args = mParams[0];
+  if (!p_args.mIsTreeNode)
+    MERROR("The type arguments of user type is not a treenode.");
+  TreeNode *args = p_args.mData.mTreeNode;
+  MASSERT(args);
+
+  UserTypeNode *type_node = (UserTypeNode*)mLastTreeNode;
+  type_node->AddTypeArgs(args);
+
+  return mLastTreeNode;
+}

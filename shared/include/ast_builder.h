@@ -156,6 +156,10 @@ public:
   // Exception, throw
   TreeNode* BuildThrows();
   TreeNode* AddThrowsTo();
+
+  // User Type related
+  TreeNode* BuildUserType();
+  TreeNode* AddTypeArgument();
 };
 
 // A global builder is good enough.

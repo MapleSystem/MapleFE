@@ -24,6 +24,7 @@ NODEKIND(Field)
 NODEKIND(Dimension)
 NODEKIND(Attr)
 NODEKIND(PrimType)
+NODEKIND(UserType)
 
 NODEKIND(Cast)
 NODEKIND(Parenthesis)

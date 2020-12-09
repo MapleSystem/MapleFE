@@ -7,7 +7,7 @@ class  Outer
   Instance Initializer: 
   Constructors: 
     constructor  Outer()  throws: 
-      var:i=new Inner
+      var:i=new Inner<Inner>
   Methods: 
   LocalClasses: 
     class  Inner
@@ -32,7 +32,7 @@ class  Outer
               Instance Initializer: 
               Constructors: 
                 constructor  Inner3()  throws: 
-                  var:i2=new Inner2
+                  var:i2=new Inner2<Inner2>
               Methods: 
               LocalClasses: 
               LocalInterfaces: 

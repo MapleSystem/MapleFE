@@ -107,7 +107,10 @@ ACTION(BuildOneCase)
 ACTION(BuildAllCases)
 ACTION(BuildSwitch)
 
-
 // Exceptions, Throws
 ACTION(BuildThrows)
 ACTION(AddThrowsTo)
+
+// User Types
+ACTION(BuildUserType)
+ACTION(AddTypeArgument)

@@ -270,3 +270,11 @@ all modules are as below.
   It builds a list of thrown exceptions. It's actually a PassNode with >1 exception,
   or just a simple IdentifierNode with exception name. It returns the tree with
   throws attached.
+
+* BuildUserType
+  Format: BuildUserType(Identifier)
+
+* AddTypeArgument
+  Format: AddTypeArgument(TypeArguments)
+  Add list of type arguments to mLastTreeNode. The arguments could one single identifier
+  or a list of identifiers.

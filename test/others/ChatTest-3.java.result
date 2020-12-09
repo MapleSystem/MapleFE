@@ -1,4 +1,11 @@
-Matched 1058 tokens.
+Matched 7 tokens.
+Matched 14 tokens.
+Matched 21 tokens.
+Matched 28 tokens.
+Matched 35 tokens.
+Matched 42 tokens.
+Matched 51 tokens.
+Matched 1506 tokens.
 Convert unary --> binary
 Convert unary --> binary
 Convert unary --> binary
@@ -6,12 +13,31 @@ Convert unary --> binary
 Convert unary --> binary
 ============= Module ===========
 == Sub Tree ==
+import java.io
+== Sub Tree ==
+import java.net.InetSocketAddress
+== Sub Tree ==
+import java.net.Socket
+== Sub Tree ==
+import java.util.ArrayList
+== Sub Tree ==
+import java.util.Collections
+== Sub Tree ==
+import java.util.List
+== Sub Tree ==
+import java.util.concurrent.CyclicBarrier
+== Sub Tree ==
 class  ChatTest
   Fields: 
     listeningPort=0
   Instance Initializer: 
   Constructors: 
   Methods: 
+    func  performTestConnectDisconnectConnect()  throws:     Exception
+      var:barrier1=new CyclicBarrier<CyclicBarrier>
+      var:barrier2=new CyclicBarrier<CyclicBarrier>
+      var:barrier3=new CyclicBarrier<CyclicBarrier>
+      var:exceptions=new ArrayList<Exception>
     func  main()  throws:     Throwable
       testStartStop()
       testPortOpen()
@@ -123,6 +149,60 @@ while ()
         (0)
       false branch :
 
+    func  readAvailableString()  throws:     IOException
+      return readAvailableString(reader,false)
+    func  readAvailableString()  throws:     IOException
+      var:builder=new StringBuilder<StringBuilder>
+      var:bytes
+      cond-branch cond:
+      true branch :
+        return null
+      false branch :
+
+      do         var:buf=
+
+while 
+      return builder.toString()
   LocalClasses: 
+    class  ChatConnection
+      Fields: 
+        exception
+      Instance Initializer: 
+      Constructors: 
+      Methods: 
+        func  run()  throws: 
+          Socket
+          socket
+          new Socket<Socket>
+
+          socket.setTcpNoDelay(true)
+          run(socket,reader,writer)
+
+
+        func  run()  throws:     Exception
+      LocalClasses: 
+      LocalInterfaces: 
+    class  FlushingWriter
+      Fields: 
+        delegate
+      Instance Initializer: 
+      Constructors: 
+        constructor  FlushingWriter()  throws: 
+          delegate Assign delegate
+      Methods: 
+        func  write()  throws:     IOException
+          delegate.write(cbuf,off,len)
+        func  flush()  throws:     IOException
+          delegate.flush()
+        func  close()  throws:     IOException
+          delegate.close()
+        func  write()  throws:     IOException
+          write
+          str
+          flush()
+      LocalClasses: 
+      LocalInterfaces: 
   LocalInterfaces: 
 
+Function Decl Duplication! Function:readAvailableString is duplicated with Function:readAvailableString
+Function Decl Duplication! Function:readAvailableString is duplicated with Function:readAvailableString

@@ -369,7 +369,7 @@ void Verifier::VerifyType(IdentifierNode *inode) {
 void Verifier::VerifyNew(NewNode *new_node){
   TreeNode *tree = new_node->GetId();
   MASSERT(tree
-          && tree->IsIdentifier()
+          && (tree->IsIdentifier() || tree->IsUserType())
           && "We only support single identifier in NewNode right now");
   IdentifierNode *inode = (IdentifierNode*)tree;
 
@@ -429,5 +429,9 @@ void Verifier::VerifyPackage(PackageNode *tree){
 }
 
 void Verifier::VerifyImport(ImportNode *tree){
+  return;
+}
+
+void Verifier::VerifyUserType(UserTypeNode *tree){
   return;
 }

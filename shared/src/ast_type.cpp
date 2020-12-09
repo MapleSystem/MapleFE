@@ -22,6 +22,34 @@
 #include "massert.h"
 
 //////////////////////////////////////////////////////////////////////////
+//                           UserTypeNode                               //
+//////////////////////////////////////////////////////////////////////////
+
+void UserTypeNode::AddTypeArgs(TreeNode *args) {
+  if (args->IsIdentifier()) {
+    IdentifierNode *inode = (IdentifierNode*)args;
+    AddTypeArg(inode);
+  } else {
+    MERROR("Unsupported tree node in UserTypeNode::AddTypeArgs()");
+  }
+}
+
+void UserTypeNode::Dump(unsigned ind) {
+  mId->Dump(0);
+  unsigned size = mTypeArguments.GetNum();
+  if (size > 0) {
+    DUMP0_NORETURN('<');
+    for (unsigned i = 0; i < size; i++) {
+      IdentifierNode *inode = mTypeArguments.ValueAtIndex(i);
+      inode->Dump(0);
+      if (i < size - 1)
+        DUMP0_NORETURN(',');
+    }
+    DUMP0_NORETURN('>');
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////
 //                          Local functions                             //
 //////////////////////////////////////////////////////////////////////////
 

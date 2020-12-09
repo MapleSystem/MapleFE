@@ -22,7 +22,7 @@ class  Sizing
     func  main()  throws: 
       var:ba=
       System.out.println(,(ba)toPrintable)
-      var:bitSet=new BitSet
+      var:bitSet=new BitSet<BitSet>
       System.out.println(,(bitSet)toPrintable)
   LocalClasses: 
   LocalInterfaces: 
