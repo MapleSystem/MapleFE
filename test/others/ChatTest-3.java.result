@@ -5,7 +5,7 @@ Matched 28 tokens.
 Matched 35 tokens.
 Matched 42 tokens.
 Matched 51 tokens.
-Matched 1506 tokens.
+Matched 2146 tokens.
 Convert unary --> binary
 Convert unary --> binary
 Convert unary --> binary
@@ -149,6 +149,38 @@ while ()
         (0)
       false branch :
 
+    func  performTestConnectDisconnectConnect()  throws:     Exception
+      var:barrier1=new CyclicBarrier<CyclicBarrier>
+      var:barrier2=new CyclicBarrier<CyclicBarrier>
+      var:barrier3=new CyclicBarrier<CyclicBarrier>
+      var:exceptions=new ArrayList<Exception>
+      var:chatConnection=new ChatConnection<ChatConnection>
+      var:chatConnection2=new ChatConnection<ChatConnection>
+      var:client2=new Thread<Thread>
+      client2.start()
+      chatConnection.run()
+      chatConnection2.run()
+      cond-branch cond:exceptions.isEmpty()
+      true branch :
+
+        (0)
+      false branch :
+
+    func  performTestUseName()  throws:     Exception
+      var:barrier1=new CyclicBarrier<CyclicBarrier>
+      var:barrier2=new CyclicBarrier<CyclicBarrier>
+      var:barrier3=new CyclicBarrier<CyclicBarrier>
+      var:exceptions=new ArrayList<Exception>
+      var:chatConnection=new ChatConnection<ChatConnection>
+      var:client2=new Thread<Thread>
+      client2.start()
+      chatConnection.run()
+      cond-branch cond:exceptions.isEmpty()
+      true branch :
+
+        (0)
+      false branch :
+
     func  readAvailableString()  throws:     IOException
       return readAvailableString(reader,false)
     func  readAvailableString()  throws:     IOException
@@ -204,5 +236,7 @@ while
       LocalInterfaces: 
   LocalInterfaces: 
 
+Function Decl Duplication! Function:performTestConnectDisconnectConnect is duplicated with Function:performTestConnectDisconnectConnect
+Function Decl Duplication! Function:performTestConnectDisconnectConnect is duplicated with Function:performTestConnectDisconnectConnect
 Function Decl Duplication! Function:readAvailableString is duplicated with Function:readAvailableString
 Function Decl Duplication! Function:readAvailableString is duplicated with Function:readAvailableString

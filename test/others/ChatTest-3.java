@@ -239,107 +239,107 @@ public class ChatTest {
         }
     }
 
-//    private static void performTestConnectDisconnectConnect() throws Exception {
-//        final CyclicBarrier barrier1 = new CyclicBarrier(2);
-//        final CyclicBarrier barrier2 = new CyclicBarrier(2);
-//        final CyclicBarrier barrier3 = new CyclicBarrier(2);
-//        final List<Exception> exceptions = new ArrayList<Exception>();
-//
-//        ChatConnection chatConnection = new ChatConnection() {
-//            @Override
-//            public void run(Socket socket, BufferedReader reader, Writer writer) throws Exception {
-//                String string = readAvailableString(reader);
-//                assertEqual(exceptions, string, "Name: ");
-//                writer.write("testClient1\n");
-//            }
-//        };
-//
-//        ChatConnection chatConnection2 = new ChatConnection() {
-//            @Override
-//            public void run(Socket socket, BufferedReader reader, Writer writer) throws Exception {
-//                readAvailableString(reader);
-//                writer.write("testClient1\n");
-//                waitForJoin(reader, "testClient1");
-//                barrier1.await();
-//                writer.write("Good morning!\n");
-//                barrier2.await();
-//                String string = readAvailableString(reader);
-//                assertEqual(exceptions, string, "testClient2: Hello world!\n");
-//                barrier3.await();
-//            }
-//        };
-//
-//        Thread client2 = new Thread(new ChatConnection() {
-//            @Override
-//            public void run(Socket socket, BufferedReader reader, Writer writer) throws Exception {
-//                readAvailableString(reader);
-//                writer.write("testClient2\n");
-//                waitForJoin(reader, "testClient2");
-//                barrier1.await();
-//                writer.write("Hello world!\n");
-//                barrier2.await();
-//                String string = readAvailableString(reader);
-//                assertEqual(exceptions, string, "testClient1: Good morning!\n");
-//                barrier3.await();
-//            }
-//        });
-//
-//        client2.start();
-//        chatConnection.run();
-//        chatConnection2.run();
-//        if (!exceptions.isEmpty()) {
-//            throw exceptions.get(0);
-//        }
-//    }
-//
-//    private static void performTestUseName() throws Exception {
-//        final CyclicBarrier barrier1 = new CyclicBarrier(2);
-//        final CyclicBarrier barrier2 = new CyclicBarrier(2);
-//        final CyclicBarrier barrier3 = new CyclicBarrier(2);
-//        final List<Exception> exceptions = new ArrayList<Exception>();
-//
-//        ChatConnection chatConnection = new ChatConnection() {
-//            @Override
-//            public void run(Socket socket, BufferedReader reader, Writer writer) throws Exception {
-//                String string = readAvailableString(reader);
-//                if (!"Name: ".equals(string)) {
-//                    exceptions.add(new RuntimeException("Expected Name: "));
-//                }
-//                writer.write("testClient1\n");
-//                waitForJoin(reader, "testClient1");
-//                barrier1.await();
-//                barrier2.await();
-//                string = readAvailableString(reader);
-//                if (!"testClient2: Hello world!\n".equals(string)) {
-//                    exceptions.add(new RuntimeException("testClient2: Hello world!\n"));
-//                }
-//                barrier3.await();
-//            }
-//        };
-//
-//        Thread client2 = new Thread(new ChatConnection() {
-//            @Override
-//            public void run(Socket socket, BufferedReader reader, Writer writer) throws Exception {
-//                String string = readAvailableString(reader);
-//                if (!"Name: ".equals(string)) {
-//                    exceptions.add(new RuntimeException("Expected Name: "));
-//                }
-//                writer.write("testClient2\n");
-//                waitForJoin(reader, "testClient2");
-//                barrier1.await();
-//                writer.write("Hello world!\n");
-//                barrier2.await();
-//                barrier3.await();
-//            }
-//        });
-//
-//        client2.start();
-//        chatConnection.run();
-//        if (!exceptions.isEmpty()) {
-//            throw exceptions.get(0);
-//        }
-//    }
-//
+    private static void performTestConnectDisconnectConnect() throws Exception {
+        final CyclicBarrier barrier1 = new CyclicBarrier(2);
+        final CyclicBarrier barrier2 = new CyclicBarrier(2);
+        final CyclicBarrier barrier3 = new CyclicBarrier(2);
+        final List<Exception> exceptions = new ArrayList<Exception>();
+
+        ChatConnection chatConnection = new ChatConnection() {
+            @Override
+            public void run(Socket socket, BufferedReader reader, Writer writer) throws Exception {
+                String string = readAvailableString(reader);
+                assertEqual(exceptions, string, "Name: ");
+                writer.write("testClient1\n");
+            }
+        };
+
+        ChatConnection chatConnection2 = new ChatConnection() {
+            @Override
+            public void run(Socket socket, BufferedReader reader, Writer writer) throws Exception {
+                readAvailableString(reader);
+                writer.write("testClient1\n");
+                waitForJoin(reader, "testClient1");
+                barrier1.await();
+                writer.write("Good morning!\n");
+                barrier2.await();
+                String string = readAvailableString(reader);
+                assertEqual(exceptions, string, "testClient2: Hello world!\n");
+                barrier3.await();
+            }
+        };
+
+        Thread client2 = new Thread(new ChatConnection() {
+            @Override
+            public void run(Socket socket, BufferedReader reader, Writer writer) throws Exception {
+                readAvailableString(reader);
+                writer.write("testClient2\n");
+                waitForJoin(reader, "testClient2");
+                barrier1.await();
+                writer.write("Hello world!\n");
+                barrier2.await();
+                String string = readAvailableString(reader);
+                assertEqual(exceptions, string, "testClient1: Good morning!\n");
+                barrier3.await();
+            }
+        });
+
+        client2.start();
+        chatConnection.run();
+        chatConnection2.run();
+        if (!exceptions.isEmpty()) {
+            throw exceptions.get(0);
+        }
+    }
+
+    private static void performTestUseName() throws Exception {
+        final CyclicBarrier barrier1 = new CyclicBarrier(2);
+        final CyclicBarrier barrier2 = new CyclicBarrier(2);
+        final CyclicBarrier barrier3 = new CyclicBarrier(2);
+        final List<Exception> exceptions = new ArrayList<Exception>();
+
+        ChatConnection chatConnection = new ChatConnection() {
+            @Override
+            public void run(Socket socket, BufferedReader reader, Writer writer) throws Exception {
+                String string = readAvailableString(reader);
+                if (!"Name: ".equals(string)) {
+                    exceptions.add(new RuntimeException("Expected Name: "));
+                }
+                writer.write("testClient1\n");
+                waitForJoin(reader, "testClient1");
+                barrier1.await();
+                barrier2.await();
+                string = readAvailableString(reader);
+                if (!"testClient2: Hello world!\n".equals(string)) {
+                    exceptions.add(new RuntimeException("testClient2: Hello world!\n"));
+                }
+                barrier3.await();
+            }
+        };
+
+        Thread client2 = new Thread(new ChatConnection() {
+            @Override
+            public void run(Socket socket, BufferedReader reader, Writer writer) throws Exception {
+                String string = readAvailableString(reader);
+                if (!"Name: ".equals(string)) {
+                    exceptions.add(new RuntimeException("Expected Name: "));
+                }
+                writer.write("testClient2\n");
+                waitForJoin(reader, "testClient2");
+                barrier1.await();
+                writer.write("Hello world!\n");
+                barrier2.await();
+                barrier3.await();
+            }
+        });
+
+        client2.start();
+        chatConnection.run();
+        if (!exceptions.isEmpty()) {
+            throw exceptions.get(0);
+        }
+    }
+
     private static String readAvailableString(Reader reader) throws IOException {
         return readAvailableString(reader, false);
     }
