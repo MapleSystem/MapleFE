@@ -21,7 +21,7 @@
 #include "parser.h"
 #include "parser_rec.h"
 #include "ruletable_util.h"
-#include "gen_debug.h"
+#include "gen_summary.h"
 
 
 RecursionTraversal* Parser::FindRecStack(unsigned group_id, unsigned start_token) {

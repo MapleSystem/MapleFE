@@ -16,7 +16,7 @@
 #include "common_header_autogen.h"
 #include "ruletable_util.h"
 #include "rec_detect.h"
-#include "gen_debug.h"
+#include "gen_summary.h"
 
 ////////////////////////////////////////////////////////////////////////////////////
 // The idea of Rursion Dectect is through a Depth First Traversal in the tree.

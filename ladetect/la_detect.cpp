@@ -15,7 +15,7 @@
 
 #include "common_header_autogen.h"
 #include "ruletable_util.h"
-#include "gen_debug.h"
+#include "gen_summary.h"
 #include "la_detect.h"
 #include "container.h"
 
@@ -505,7 +505,7 @@ void LADetector::WriteHeaderFile() {
 // in LADetector::mRuleLookAheads.
 //
 // But we need dump all tables' LookAhead information no matter reachable
-// or not. So we need look into gen_debug.h/cpp for all rule tables. If they
+// or not. So we need look into gen_summary.h/cpp for all rule tables. If they
 // cannot be reached, their lookahead is just set to 0.
 
 void LADetector::WriteCppFile() {

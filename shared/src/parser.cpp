@@ -23,7 +23,7 @@
 #include "token.h"
 #include "common_header_autogen.h"
 #include "ruletable_util.h"
-#include "gen_debug.h"
+#include "gen_summary.h"
 #include "gen_token.h"
 #include "ast.h"
 #include "ast_builder.h"
