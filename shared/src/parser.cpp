@@ -122,7 +122,7 @@
 // origin of gFailed.
 //
 // Also, if a rule was successful for a token and it is trying to traverse it again, it
-// can be skipped by using a cached result. This is the origin of mSucc.
+// can be skipped by using a cached result. This is the origin of gSucc.
 //
 // 5. Appealing mechanism
 //
@@ -2218,36 +2218,30 @@ void Parser::InitRecursion() {
 ////////////////////////////////////////////////////////////////////////////
 
 void Parser::ClearSucc() {
-  // clear the map
-  mSucc.clear();
-  // clear the pool
+  bzero(gSucc, sizeof(SuccMatch*) * RuleTableNum);
+
   std::vector<SuccMatch*>::iterator it = mSuccPool.begin();
   for (; it != mSuccPool.end(); it++) {
     SuccMatch *m = *it;
     delete m;
   }
+  mSuccPool.clear();
 }
 
 // Find the succ info of 'table'.
 // Return NULL if not found.
 SuccMatch* Parser::FindSucc(RuleTable *table) {
-  std::map<RuleTable*, SuccMatch*>::iterator it = mSucc.find(table);
-  SuccMatch *succ = NULL;
-  if (it != mSucc.end())
-    succ = it->second;
-  return succ;
+  return gSucc[table->mIndex];
 }
 
 // Find the succ info of 'table'.
 // If not found, create one.
 SuccMatch* Parser::FindOrCreateSucc(RuleTable *table) {
-  std::map<RuleTable*, SuccMatch*>::iterator it = mSucc.find(table);
-  SuccMatch *succ = NULL;
-  if (it != mSucc.end())
-    succ = it->second;
-  else {
+  SuccMatch *succ = gSucc[table->mIndex];
+  if (!succ) {
     succ = new SuccMatch();
-    mSucc.insert(std::pair<RuleTable*, SuccMatch*>(table, succ));
+    gSucc[table->mIndex] = succ;
+    mSuccPool.push_back(succ);
   }
   return succ;
 }

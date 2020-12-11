@@ -78,6 +78,14 @@ static void WriteSummaryHFile() {
   s += "];";
   gSummaryHFile->WriteOneLine(s.c_str(), s.size());
 
+  s = "class SuccMatch;";
+  gSummaryHFile->WriteOneLine(s.c_str(), s.size());
+
+  s = "extern SuccMatch* gSucc[";
+  s += std::to_string(gRuleTableNum);
+  s += "];";
+  gSummaryHFile->WriteOneLine(s.c_str(), s.size());
+
   gSummaryHFile->WriteOneLine("#endif", 6);
 }
 
@@ -104,7 +112,16 @@ static void FinishSummaryCppFile() {
   gSummaryCppFile->WriteOneLine("  }", 3);
   gSummaryCppFile->WriteOneLine("  return NULL;", 14);
   gSummaryCppFile->WriteOneLine("}", 1);
-  gSummaryCppFile->WriteOneLine("std::vector<unsigned> gFailed[621];", 35);
+
+  std::string s = "std::vector<unsigned> gFailed[";
+  s += std::to_string(gRuleTableNum);
+  s += "];";
+  gSummaryCppFile->WriteOneLine(s.c_str(), s.size());
+
+  s = "SuccMatch* gSucc[";
+  s += std::to_string(gRuleTableNum);
+  s += "];";
+  gSummaryCppFile->WriteOneLine(s.c_str(), s.size());
 }
 
 void AutoGen::Init() {

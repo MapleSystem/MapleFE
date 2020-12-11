@@ -288,7 +288,6 @@ private:
                                          // All tokens after it are pending.
 
   // Using this map to record all the succ info of rules.
-  std::map<RuleTable*, SuccMatch*> mSucc;
   std::vector<SuccMatch*> mSuccPool;
   SuccMatch* FindSucc(RuleTable*);
   SuccMatch* FindOrCreateSucc(RuleTable*);
