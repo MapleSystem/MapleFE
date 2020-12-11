@@ -421,23 +421,32 @@ bool Parser::ParseStmt() {
   //                                 need check if the table is &TblIdentifier.
 
   struct timeval stop, start;
-  if (mTraceTiming) {
+  if (mTraceTiming)
     gettimeofday(&start, NULL);
-  }
+
   bool succ = TraverseStmt();
   if (mTraceTiming) {
     gettimeofday(&stop, NULL);
-    std::cout << "Time: " << (stop.tv_sec - start.tv_sec) * 1000000 + stop.tv_usec - start.tv_usec;
+    std::cout << "Parse Time: " << (stop.tv_sec - start.tv_sec) * 1000000 + stop.tv_usec - start.tv_usec;
     std::cout << " us" << std::endl;
   }
 
   // Each top level construct gets a AST tree.
   if (succ) {
+    if (mTraceTiming)
+      gettimeofday(&start, NULL);
+
     PatchWasSucc(mRootNode->mSortedChildren[0]);
     SimplifySortedTree();
     ASTTree *tree = BuildAST();
     if (tree) {
       gModule.AddTree(tree);
+    }
+
+    if (mTraceTiming) {
+      gettimeofday(&stop, NULL);
+      std::cout << "BuildAST Time: " << (stop.tv_sec - start.tv_sec) * 1000000 + stop.tv_usec - start.tv_usec;
+      std::cout << " us" << std::endl;
     }
   }
 
