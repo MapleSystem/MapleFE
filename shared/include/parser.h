@@ -1,21 +1,17 @@
 /*
 * Copyright (C) [2020] Futurewei Technologies, Inc. All rights reverved.
 *
-* OpenArkFE is licensed under the Mulan PSL v1.
-* You can use this software according to the terms and conditions of the Mulan PSL v1.
-* You may obtain a copy of Mulan PSL v1 at:
+* OpenArkFE is licensed under the Mulan PSL v2.
+* You can use this software according to the terms and conditions of the Mulan PSL v2.
+* You may obtain a copy of Mulan PSL v2 at:
 *
-*  http://license.coscl.org.cn/MulanPSL
+*  http://license.coscl.org.cn/MulanPSL2
 *
 * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER
 * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR
 * FIT FOR A PARTICULAR PURPOSE.
-* See the Mulan PSL v1 for more details.
+* See the Mulan PSL v2 for more details.
 */
-/////////////////////////////////////////////////////////////////////
-// This is the base functions of auto generation.                  //
-// Each individual part is supposed to inherit from this class.    //
-/////////////////////////////////////////////////////////////////////
 
 #ifndef __PARSER_H__
 #define __PARSER_H__
@@ -30,6 +26,7 @@
 #include "ast_module.h"
 #include "container.h"
 #include "recursion.h"
+#include "gen_summary.h"
 
 class Function;
 class Stmt;
@@ -262,8 +259,8 @@ public:
   bool mTraceTable;         // trace enter/exit rule tables
   bool mTraceLeftRec;       // trace enter/exit rule tables
   bool mTraceAppeal;        // trace appealing
-  bool mTraceFailed;        // trace mFailed
-  bool mTraceTiming;        // trace mFailed
+  bool mTraceFailed;        // trace gFailed
+  bool mTraceTiming;        // trace gFailed
   bool mTraceVisited;       // trace mVisitedStack
   bool mTraceSortOut;       // trace Sort out.
   bool mTraceAstBuild;      // trace AST build.
@@ -296,10 +293,6 @@ private:
   //   2. mVisitedStack tells the token position of each iteration in the loop
   std::map<RuleTable *, bool> mVisited;
   std::map<RuleTable *, std::vector<unsigned>> mVisitedStack;
-
-  // Using this map to record all the failed tokens for a rule.
-  // See the detailed comments in Parser::Parse().
-  std::map<RuleTable *, std::vector<unsigned>> mFailed;
 
   // Using this map to record all the succ info of rules.
   std::map<RuleTable*, SuccMatch*> mSucc;
@@ -336,7 +329,11 @@ private:
   void VisitedPush(RuleTable*);
   void VisitedPop(RuleTable*);
 
-  void ClearFailed() {mFailed.clear();}
+  void ClearFailed() {
+    for (unsigned i = 0; i < 621; i++)
+       gFailed[i].clear();
+  }
+
   void AddFailed(RuleTable*, unsigned);
   void ResetFailed(RuleTable*, unsigned);
   bool WasFailed(RuleTable*, unsigned);

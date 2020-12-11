@@ -43,6 +43,7 @@
 //      }RuleTableSummary;
 //      extern RuleTableSummary gRuleTableSummarys[];
 //      extern unsigned RuleTableNum;
+//      extern std::vector<unsigned> gFailed[621];
 //
 //    In Cpp file, we need
 //
@@ -62,6 +63,7 @@ static void WriteSummaryHFile() {
   gSummaryHFile->WriteOneLine("#ifndef __DEBUG_GEN_H__", 23);
   gSummaryHFile->WriteOneLine("#define __DEBUG_GEN_H__", 23);
   gSummaryHFile->WriteOneLine("#include \"ruletable.h\"", 22);
+  gSummaryHFile->WriteOneLine("#include <vector>", 17);
   gSummaryHFile->WriteOneLine("typedef struct {", 16);
   gSummaryHFile->WriteOneLine("  const RuleTable *mAddr;", 25);
   gSummaryHFile->WriteOneLine("  const char      *mName;", 25);
@@ -70,6 +72,12 @@ static void WriteSummaryHFile() {
   gSummaryHFile->WriteOneLine("extern RuleTableSummary gRuleTableSummarys[];", 45);
   gSummaryHFile->WriteOneLine("extern unsigned RuleTableNum;", 29);
   gSummaryHFile->WriteOneLine("extern const char* GetRuleTableName(const RuleTable*);", 54);
+
+  std::string s = "extern std::vector<unsigned> gFailed[";
+  s += std::to_string(gRuleTableNum);
+  s += "];";
+  gSummaryHFile->WriteOneLine(s.c_str(), s.size());
+
   gSummaryHFile->WriteOneLine("#endif", 6);
 }
 
@@ -96,6 +104,7 @@ static void FinishSummaryCppFile() {
   gSummaryCppFile->WriteOneLine("  }", 3);
   gSummaryCppFile->WriteOneLine("  return NULL;", 14);
   gSummaryCppFile->WriteOneLine("}", 1);
+  gSummaryCppFile->WriteOneLine("std::vector<unsigned> gFailed[621];", 35);
 }
 
 void AutoGen::Init() {
@@ -108,7 +117,6 @@ void AutoGen::Init() {
   gSummaryHFile = new FileWriter(summary_file_name);
   gRuleTableNum = 0;
 
-  WriteSummaryHFile();
   PrepareSummaryCppFile();
 
   std::string hFile = lang_path_header + "gen_reserved.h";
@@ -273,6 +281,6 @@ void AutoGen::Gen() {
   mExprGen->Generate();
   mStmtGen->Generate();
 
-
+  WriteSummaryHFile();
   FinishSummaryCppFile();
 }

@@ -119,7 +119,7 @@
 // The rules are referencing each other and could increase the parsing time extremely.
 // In order to save time, the first thing is avoiding entering a rule for the second
 // time with the same token position if that rule has failed before. This is the
-// origin of mFailed.
+// origin of gFailed.
 //
 // Also, if a rule was successful for a token and it is trying to traverse it again, it
 // can be skipped by using a cached result. This is the origin of mSucc.
@@ -273,24 +273,24 @@ void Parser::VisitedPop(RuleTable *table) {
 // Add one fail case for the table
 void Parser::AddFailed(RuleTable *table, unsigned token) {
   //std::cout << " push " << mCurToken << " from " << table;
-  mFailed[table].push_back(token);
+  gFailed[table->mIndex].push_back(token);
 }
 
 // Remove one fail case for the table
 void Parser::ResetFailed(RuleTable *table, unsigned token) {
-  std::vector<unsigned>::iterator it = mFailed[table].begin();;
-  for (; it != mFailed[table].end(); it++) {
+  std::vector<unsigned>::iterator it = gFailed[table->mIndex].begin();;
+  for (; it != gFailed[table->mIndex].end(); it++) {
     if (*it == token)
       break;
   }
 
-  if (it != mFailed[table].end())
-    mFailed[table].erase(it);
+  if (it != gFailed[table->mIndex].end())
+    gFailed[table->mIndex].erase(it);
 }
 
 bool Parser::WasFailed(RuleTable *table, unsigned token) {
-  std::vector<unsigned>::iterator it = mFailed[table].begin();
-  for (; it != mFailed[table].end(); it++) {
+  std::vector<unsigned>::iterator it = gFailed[table->mIndex].begin();
+  for (; it != gFailed[table->mIndex].end(); it++) {
     if (*it == token)
       return true;
   }
