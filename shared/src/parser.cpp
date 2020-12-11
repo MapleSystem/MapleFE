@@ -356,7 +356,7 @@ void Parser::ClearAppealNodes() {
 // of LeadNode traversal. We appeal all nodes from start up to root. We do backwards
 // traversal from 'start' upto 'root'.
 //
-// [NOTE] We will clear the Fail info from the mFaild map, so that it won't be
+// [NOTE] We will clear the Fail info, so that it won't be
 //        treated as WasFail during TraverseRuleTable(). However, the appeal tree
 //        should be remained as fail, because it IS a fail indeed for this sub-tree.
 void Parser::Appeal(AppealNode *start, AppealNode *root) {
@@ -1908,7 +1908,7 @@ static bool NodeIsDone(AppealNode *n) {
 static std::vector<AppealNode*> was_succ_list;
 
 // The SuccWasSucc node and its patching node is a one-one mapping.
-// We don't use a map to maintain this. We use to vectors to do this
+// We don't use a map to maintain this. We use vectors to do this
 // by adding the pair of nodes at the same time. Their index in the
 // vectors are the same.
 static std::vector<AppealNode*> was_succ_matched_list;
@@ -2154,10 +2154,7 @@ AppealNode* Parser::SimplifyShrinkEdges(AppealNode *node) {
 
 ASTTree* Parser::BuildAST() {
   done_nodes.clear();
-  mNodeTreeMap.clear();
-
   ASTTree *tree = new ASTTree();
-  tree->SetNodeTreeMap(&mNodeTreeMap);
 
   std::stack<AppealNode*> appeal_stack;
   appeal_stack.push(mRootNode->mSortedChildren[0]);
@@ -2179,11 +2176,10 @@ ASTTree* Parser::BuildAST() {
 
     if (children_done) {
       // Create tree node when there is a rule table, or meanful tokens.
-      // Only put in the mNodeTreeMap if tree node is really created, since some
-      // some tokens like separators don't need tree nodes.
+      MASSERT(!appeal_node->GetAstTreeNode());
       TreeNode *sub_tree = tree->NewTreeNode(appeal_node);
       if (sub_tree) {
-        mNodeTreeMap.insert(std::pair<AppealNode*, TreeNode*>(appeal_node, sub_tree));
+        appeal_node->SetAstTreeNode(sub_tree);
         // mRootNode is overwritten each time until the last one which is
         // the real root node.
         tree->mRootNode = sub_tree;

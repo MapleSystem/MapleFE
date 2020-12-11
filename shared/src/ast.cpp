@@ -121,15 +121,15 @@ TreeNode* ASTTree::NewTreeNode(AppealNode *appeal_node) {
       Param p;
       if (child) {
         p.mIsEmpty = false;
-        std::map<AppealNode*, TreeNode*>::iterator it = mNodeTreeMap->find(child);
-        if (it == mNodeTreeMap->end()) {
+        TreeNode *tree_node = child->GetAstTreeNode();
+        if (!tree_node) {
           // only token children could have NO tree node.
           MASSERT(child->IsToken() && "A RuleTable node has no tree node?");
           p.mIsTreeNode = false;
           p.mData.mToken = child->GetToken();
         } else {
           p.mIsTreeNode = true;
-          p.mData.mTreeNode = it->second;
+          p.mData.mTreeNode = tree_node;
         }
       } else {
         p.mIsEmpty = true;
@@ -160,10 +160,10 @@ TreeNode* ASTTree::Manipulate(AppealNode *appeal_node) {
   std::vector<TreeNode*> child_trees;
   std::vector<AppealNode*>::iterator cit = appeal_node->mSortedChildren.begin();
   for (; cit != appeal_node->mSortedChildren.end(); cit++) {
-    std::map<AppealNode*, TreeNode*>::iterator child_tree_it = mNodeTreeMap->find(*cit);
-    if (child_tree_it != mNodeTreeMap->end()) {
-      child_trees.push_back(child_tree_it->second);
-    }
+    AppealNode *a_node = *cit;
+    TreeNode *t_node = a_node->GetAstTreeNode();
+    if (t_node)
+      child_trees.push_back(t_node);
   }
 
   // If we have one and only one child's tree node, we take it.

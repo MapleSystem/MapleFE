@@ -20,7 +20,6 @@
 #include <fstream>
 #include <stack>
 #include <list>
-#include <map>
 
 #include "lexer.h"
 #include "ast_module.h"
@@ -80,6 +79,8 @@ private:
   unsigned     mFinalMatch;       // the final match after sort out.
   SmallVector<unsigned> mMatches; // all of the last matching token.
 
+  TreeNode    *mAstTreeNode;      // The AST tree node of this AppealNode.
+
 public:
   AppealNode* GetSecondParentsNum() {return mSecondParents.GetNum();}
   AppealNode* GetSecondParent(unsigned i) {return mSecondParents.ValueAtIndex(i);}
@@ -95,6 +96,9 @@ public:
   void SetIsPseudo(){mIsPseudo = true;}
   bool IsSorted()   {return mSorted;}
   void SetSorted()  {mSorted = true;}
+
+  TreeNode* GetAstTreeNode() {return mAstTreeNode;}
+  void      SetAstTreeNode(TreeNode *n) {mAstTreeNode = n;}
 
   unsigned GetFinalMatch()           {return mFinalMatch;}
   void     SetFinalMatch(unsigned m) {mFinalMatch = m; mSorted = true;}
@@ -137,7 +141,7 @@ public:
   AppealNode() {mData.mTable=NULL; mParent = NULL;
                 mAfter = AppealStatus_NA; mSimplifiedIndex = 0; mIsTable = true;
                 mStartIndex = 0; mSorted = false; mFinalMatch = 0;
-                mIsPseudo = false;}
+                mIsPseudo = false; mAstTreeNode = NULL;}
   ~AppealNode(){mMatches.Release();}
 
   void AddChild(AppealNode *n) { mChildren.push_back(n); }
@@ -287,7 +291,6 @@ private:
   unsigned              mPending;        // index in mActiveTokens, the first pending token.
                                          // All tokens after it are pending.
 
-  // Using this map to record all the succ info of rules.
   std::vector<SuccMatch*> mSuccPool;
   SuccMatch* FindSucc(RuleTable*);
   SuccMatch* FindOrCreateSucc(RuleTable*);
@@ -372,7 +375,6 @@ private:
 
   // Build AST, for each top level construct.
   ASTTree*  BuildAST();
-  std::map<AppealNode*, TreeNode*> mNodeTreeMap;
 
 
 //////////////////////////////////////////////////////////////

@@ -997,8 +997,6 @@ public:
   TreeNode   *mRootNode;
 
 private:
-  std::map<AppealNode*, TreeNode*> *mNodeTreeMap;
-
   // We need a set of functions to deal with some common manipulations of
   // most languages during AST Building. You can disable it if some functions
   // are not what you want.
@@ -1011,7 +1009,6 @@ public:
   ~ASTTree();
 
   TreeNode* NewTreeNode(AppealNode*);
-  void SetNodeTreeMap(std::map<AppealNode*, TreeNode*> *m) {mNodeTreeMap = m;}
 
   TreeNode* BuildBinaryOperation(TreeNode *, TreeNode *, OprId);
   TreeNode* BuildPassNode();
