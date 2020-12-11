@@ -287,13 +287,6 @@ private:
   unsigned              mPending;        // index in mActiveTokens, the first pending token.
                                          // All tokens after it are pending.
 
-  // I'm using two data structures to record the status of cycle reference.
-  // See the detailed comments in the implementation of Parser::Parse().
-  //   1. mVisited tells if we are in a loop.
-  //   2. mVisitedStack tells the token position of each iteration in the loop
-  std::map<RuleTable *, bool> mVisited;
-  std::map<RuleTable *, std::vector<unsigned>> mVisitedStack;
-
   // Using this map to record all the succ info of rules.
   std::map<RuleTable*, SuccMatch*> mSucc;
   std::vector<SuccMatch*> mSuccPool;

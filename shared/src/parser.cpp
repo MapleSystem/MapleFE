@@ -236,40 +236,6 @@ Parser::~Parser() {
 void Parser::Dump() {
 }
 
-
-// Utility function to handle visited rule tables.
-bool Parser::IsVisited(RuleTable *table) {
-  std::map<RuleTable*, bool>::iterator it;
-  it = mVisited.find(table);
-  if (it == mVisited.end())
-    return false;
-  if (it->second == false)
-    return false;
-  return true;
-}
-
-void Parser::SetVisited(RuleTable *table) {
-  //std::cout << " set visited " << table;
-  mVisited[table] = true;
-}
-
-void Parser::ClearVisited(RuleTable *table) {
-  //std::cout << " clear visited " << table;
-  mVisited[table] = false;
-}
-
-// Push the current position into stack, as we are entering the table again.
-void Parser::VisitedPush(RuleTable *table) {
-  //std::cout << " push " << mCurToken << " from " << table;
-  mVisitedStack[table].push_back(mCurToken);
-}
-
-// Pop the last position in stack, as we are leaving the table again.
-void Parser::VisitedPop(RuleTable *table) {
-  //std::cout << " pop " << " from " << table;
-  mVisitedStack[table].pop_back();
-}
-
 // Add one fail case for the table
 void Parser::AddFailed(RuleTable *table, unsigned token) {
   //std::cout << " push " << mCurToken << " from " << table;
@@ -424,7 +390,6 @@ void Parser::Appeal(AppealNode *start, AppealNode *root) {
 // level constructs in a compilation unit (aka Module).
 bool Parser::ParseStmt() {
   // clear status
-  mVisited.clear();
   ClearFailed();
   ClearSucc();
   mTokens.clear();
