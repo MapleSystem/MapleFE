@@ -278,3 +278,7 @@ all modules are as below.
   Format: AddTypeArgument(TypeArguments)
   Add list of type arguments to mLastTreeNode. The arguments could one single identifier
   or a list of identifiers.
+
+* BuildLambda
+  Format: BuildLambda(param-list, body)
+  It builds a lambda expression.

@@ -1650,3 +1650,26 @@ TreeNode* ASTBuilder::AddTypeArgument() {
 
   return mLastTreeNode;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+//                       Lambda Expression
+////////////////////////////////////////////////////////////////////////////////
+
+TreeNode* ASTBuilder::BuildLambda() {
+  if (mTrace)
+    std::cout << "In BuildLambda" << std::endl;
+
+  Param p_params = mParams[0];
+  if (!p_params.mIsTreeNode)
+    MERROR("Lambda params is not a tree node.");
+  TreeNode *params_node = p_params.mData.mTreeNode;
+
+  Param p_body = mParams[1];
+  if (!p_body.mIsTreeNode)
+    MERROR("Lambda Body is not a tree node.");
+
+  LambdaNode *lambda = (LambdaNode*)mTreePool->NewTreeNode(sizeof(LambdaNode));
+  new (lambda) LambdaNode();
+  mLastTreeNode = lambda;
+  return mLastTreeNode;
+}

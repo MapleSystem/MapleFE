@@ -236,6 +236,7 @@ rule LeftHandSide : ONEOF(
 rule AssignmentOperator : ONEOF('=', "*=", "/=", "%=", "+=", "-=", "<<=", ">>=", ">>>=", "&=", "^=", "|=")
 
 rule LambdaExpression : LambdaParameters + "->" + LambdaBody
+  attr.action : BuildLambda(%1, %3)
 
 rule LambdaParameters : ONEOF(
   '(' + ZEROORONE(LambdaParameterList) + ')',

@@ -91,6 +91,7 @@ public:
   TreeNode* BuildBinaryOperation();
   TreeNode* BuildCast();
   TreeNode* BuildParenthesis();
+  TreeNode* BuildLambda();
 
   TreeNode* BuildDecl();
   TreeNode* BuildField();

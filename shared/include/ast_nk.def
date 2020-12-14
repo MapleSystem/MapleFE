@@ -38,6 +38,7 @@ NODEKIND(Literal)
 NODEKIND(UnaOperator)
 NODEKIND(BinOperator)
 NODEKIND(TerOperator)
+NODEKIND(Lambda)
 
 NODEKIND(Block)
 NODEKIND(Function)

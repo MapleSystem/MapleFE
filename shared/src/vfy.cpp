@@ -435,3 +435,7 @@ void Verifier::VerifyImport(ImportNode *tree){
 void Verifier::VerifyUserType(UserTypeNode *tree){
   return;
 }
+
+void Verifier::VerifyLambda(LambdaNode *tree){
+  return;
+}
