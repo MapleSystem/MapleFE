@@ -117,22 +117,28 @@ TreeNode* ASTTree::NewTreeNode(AppealNode *appeal_node) {
       // find the appeal node child
       unsigned elem_idx = action->mElems[j];
       AppealNode *child = appeal_node->GetSortedChildByIndex(elem_idx);
-
       Param p;
+      p.mIsEmpty = true;
+      // There are 3 cases to handle.
+      // 1. child is token, we pass the token to param.
+      // 2. child is a sub appeal tree, but has no legal AST tree. For example,
+      //    a parameter list: '(' + param-lists + ')'.
+      //    if param-list is empty, it has no AST tree.
+      //    In this case, we sset mIsEmpty to true.
+      // 3. chidl is a sub appeal tree, and has a AST tree too.
       if (child) {
-        p.mIsEmpty = false;
         TreeNode *tree_node = child->GetAstTreeNode();
         if (!tree_node) {
-          // only token children could have NO tree node.
-          MASSERT(child->IsToken() && "A RuleTable node has no tree node?");
-          p.mIsTreeNode = false;
-          p.mData.mToken = child->GetToken();
+          if (child->IsToken()) {
+            p.mIsEmpty = false;
+            p.mIsTreeNode = false;
+            p.mData.mToken = child->GetToken();
+          }
         } else {
+          p.mIsEmpty = false;
           p.mIsTreeNode = true;
           p.mData.mTreeNode = tree_node;
         }
-      } else {
-        p.mIsEmpty = true;
       }
       gASTBuilder.AddParam(p);
     }
@@ -149,11 +155,14 @@ TreeNode* ASTTree::NewTreeNode(AppealNode *appeal_node) {
   // It's possible that the Rule has no action, meaning it cannot create tree node.
   // Now we have to do some manipulation. Please check if you need all of them.
   sub_tree = Manipulate(appeal_node);
-  MASSERT(sub_tree);
+
+  // It's possible that the sub tree is actually empty. For example, in a Parameter list
+  // ( params ). If 'params' is empty, it returns NULL.
 
   return sub_tree;
 }
 
+// It's possible that we get NULL tree.
 TreeNode* ASTTree::Manipulate(AppealNode *appeal_node) {
   TreeNode *sub_tree = NULL;
 
@@ -208,7 +217,8 @@ TreeNode* ASTTree::Manipulate(AppealNode *appeal_node) {
     return pass;
   }
 
-  MASSERT(0 && "We got a broken AST tree, not connected sub tree.");
+  // It's possible that we get a Null tree.
+  return sub_tree;
 }
 
 TreeNode* ASTTree::Manipulate2Cast(TreeNode *child_a, TreeNode *child_b) {

@@ -1660,13 +1660,22 @@ TreeNode* ASTBuilder::BuildLambda() {
     std::cout << "In BuildLambda" << std::endl;
 
   Param p_params = mParams[0];
-  if (!p_params.mIsTreeNode)
-    MERROR("Lambda params is not a tree node.");
-  TreeNode *params_node = p_params.mData.mTreeNode;
+  TreeNode *params_node = NULL;
+  if (!p_params.mIsEmpty) {
+    if (!p_params.mIsTreeNode)
+      MERROR("Lambda params is not a tree node.");
+    else
+      params_node = p_params.mData.mTreeNode;
+  }
 
   Param p_body = mParams[1];
-  if (!p_body.mIsTreeNode)
-    MERROR("Lambda Body is not a tree node.");
+  TreeNode *body_node = NULL;
+  if (!p_body.mIsEmpty) {
+    if (!p_body.mIsTreeNode)
+      MERROR("Lambda Body is not a tree node.");
+    else
+      body_node = p_body.mData.mTreeNode;
+  }
 
   LambdaNode *lambda = (LambdaNode*)mTreePool->NewTreeNode(sizeof(LambdaNode));
   new (lambda) LambdaNode();
