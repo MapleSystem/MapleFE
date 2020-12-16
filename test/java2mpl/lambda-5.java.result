@@ -1,0 +1,29 @@
+Matched 7 tokens.
+Matched 16 tokens.
+Matched 93 tokens.
+Convert unary --> binary
+============= Module ===========
+== Sub Tree ==
+import java.util.ArrayList
+== Sub Tree ==
+import java.util.function.Consumer
+== Sub Tree ==
+class  Point
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+    func  foo()  throws: 
+      var:m
+      m Assign () -> 
+      m Assign () -> 42
+      m Assign () -> null
+      m Assign () -> return 42
+
+      m Assign () -> system.gc()
+
+      m Assign () -> x Add y
+  LocalClasses: 
+  LocalInterfaces: 
+
