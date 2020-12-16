@@ -11,23 +11,26 @@ my $pwd = getcwd;
 
 if(!(defined $ARGV[0])) {
   print "------------------------------------------------\n";
-  print "usage: runtests.pl all or java2mpl or errtest or others\n";
+  print "usage: runtests.pl all or java2mpl or errtest or others or openjdk\n";
   print "------------------------------------------------\n";
   exit;
 }
 
 if ($ARGV[0] eq 'all') {
-  @dirname = qw(java2mpl errtest others);
-  print "Run java2mpl errtest\n";
+  @dirname = qw(java2mpl errtest others openjdk);
+  print "Run java2mpl errtest others openjdk\n";
 } elsif (($ARGV[0] eq 'java2mpl')) {
   @dirname = "$ARGV[0]";
-  print "Run $ARGV[0] test\n";
+  print "Run $ARGV[0]\n";
 } elsif (($ARGV[0] eq 'errtest')) {
   @dirname = "$ARGV[0]";
-  print "Run $ARGV[0] test\n";
+  print "Run $ARGV[0]\n";
 } elsif (($ARGV[0] eq 'others')) {
   @dirname = "$ARGV[0]";
-  print "Run $ARGV[0] test\n";
+  print "Run $ARGV[0]\n";
+} elsif (($ARGV[0] eq 'openjdk')) {
+  @dirname = "$ARGV[0]";
+  print "Run $ARGV[0]\n";
 } else {
   print "$ARGV[0] is an invalid option\n";
   exit;
@@ -102,6 +105,9 @@ foreach my $dir (@dirname) {
         if ($dir eq "others") {
           $res = system("cd $pwd/..; build64/java/java2mpl $outdir/$src_file > $outdir/$result_file");
         }
+        if ($dir eq "openjdk") {
+          $res = system("cd $pwd/..; build64/java/java2mpl $outdir/$src_file > $outdir/$result_file");
+        }
         
         if ($res > 0) {
 #print "over here1...\n";
@@ -112,6 +118,9 @@ foreach my $dir (@dirname) {
             print "$pwd/../build64/java/java2mpl $outdir/$src_file\n";
           }
           if ($dir eq "others") {
+            print "$pwd/../build64/java/java2mpl $outdir/$src_file\n";
+          }
+          if ($dir eq "openjdk") {
             print "$pwd/../build64/java/java2mpl $outdir/$src_file\n";
           }
           print " ==$dir===> $file\n";
@@ -171,7 +180,7 @@ foreach my $dir (@dirname) {
       chdir $pwd;
     }
   }
-  print("\n====================== END $dir test cases: $countsub ================\n");
+  print("====================== END $dir test cases: $countsub ================\n");
   $countsub = 0;
 }
 
