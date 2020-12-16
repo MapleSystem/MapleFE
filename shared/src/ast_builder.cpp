@@ -1679,6 +1679,14 @@ TreeNode* ASTBuilder::BuildLambda() {
 
   LambdaNode *lambda = (LambdaNode*)mTreePool->NewTreeNode(sizeof(LambdaNode));
   new (lambda) LambdaNode();
+
+  if (params_node) {
+    if (params_node->IsIdentifier())
+      lambda->AddParam(params_node);
+  }
+
+  lambda->SetBody(body_node);
+
   mLastTreeNode = lambda;
   return mLastTreeNode;
 }

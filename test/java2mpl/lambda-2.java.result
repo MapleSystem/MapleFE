@@ -1,0 +1,27 @@
+Matched 7 tokens.
+Matched 16 tokens.
+Matched 104 tokens.
+============= Module ===========
+== Sub Tree ==
+import java.util.ArrayList
+== Sub Tree ==
+import java.util.function.Consumer
+== Sub Tree ==
+class  Main
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+    func  main()  throws: 
+      var:numbers=new ArrayList<Integer>
+      numbers.add(5)
+      numbers.add(9)
+      numbers.add(8)
+      numbers.add(1)
+      var:method=(n) -> System.out.println(n)
+
+      numbers.forEach(method)
+  LocalClasses: 
+  LocalInterfaces: 
+

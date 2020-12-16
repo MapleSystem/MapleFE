@@ -996,7 +996,11 @@ public:
   LambdaNode() {mBody = NULL; mKind = NK_Lambda;}
   ~LambdaNode(){Release();}
 
+  void AddParam(IdentifierNode *n) {mParams.PushBack(n);}
+  void SetBody(TreeNode *n) {mBody = n;}
+
   void Release() {mParams.Release();}
+  void Dump(unsigned);
 };
 
 ////////////////////////////////////////////////////////////////////////////

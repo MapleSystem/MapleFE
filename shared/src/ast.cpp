@@ -944,3 +944,19 @@ void FunctionNode::Dump(unsigned indent) {
   if (GetBody())
     GetBody()->Dump(indent+2);
 }
+
+void LambdaNode::Dump(unsigned indent) {
+  DumpIndentation(indent);
+  std::string dump;
+  dump += "(";
+  for (unsigned i = 0; i < mParams.GetNum(); i++) {
+    IdentifierNode *in = mParams.ValueAtIndex(i);
+    dump += in->GetName();
+    if (i < mParams.GetNum() - 1)
+      dump += ",";
+  }
+  dump += ") -> ";
+  DUMP0_NORETURN(dump.c_str());
+  if (mBody)
+    mBody->Dump(0);
+}

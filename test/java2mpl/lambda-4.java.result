@@ -1,0 +1,25 @@
+Matched 11 tokens.
+Matched 96 tokens.
+Convert unary --> binary
+Convert unary --> binary
+============= Module ===========
+== Sub Tree ==
+
+== Sub Tree ==
+class  Main
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+    func  main()  throws: 
+      var:exclaim=(s) -> s Add "!"
+      var:ask=(s) -> s Add "?"
+      printFormatted("Hello",exclaim)
+      printFormatted("Hello",ask)
+    func  printFormatted()  throws: 
+      var:result=
+      System.out.println(result)
+  LocalClasses: 
+  LocalInterfaces: 
+
