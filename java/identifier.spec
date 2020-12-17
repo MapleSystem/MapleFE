@@ -17,5 +17,5 @@
 # TODO: So far we dont support unicode which are not major goal right now.
 
 rule JavaChar : ONEOF(CHAR, '_' , '$')
-rule CharOrDigit : ONEOF(CHAR, DIGIT)
+rule CharOrDigit : ONEOF(JavaChar, DIGIT)
 rule Identifier : JavaChar + ZEROORMORE(CharOrDigit)

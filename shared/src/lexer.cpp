@@ -818,7 +818,7 @@ const char* Lexer::TraverseKeywordTable() {
     // It's a keyword only if the following is a separator
     // End of current line is a separator too.
     curidx += len;
-    if ((current_line_size == len) || (TraverseSepTable() != SEP_NA)) {
+    if ((current_line_size == curidx) || (TraverseSepTable() != SEP_NA)) {
       // TraverseSepTable() moves 'curidx', need move it back to after keyword
       curidx = saved_curidx + len;
       addr = gStringPool.FindString(addr);
