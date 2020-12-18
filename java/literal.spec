@@ -114,10 +114,11 @@ rule BooleanLiteral : ONEOF ("true", "false")
 
 #########################################################################
 ##                           Character                                 ##
+## ESCAPE is a reserved rule in reserved.spec.                         ##
 #########################################################################
-
-### TODO: so far support simple character
-rule CharacterLiteral : ''' + CHAR + '''
+rule OctalEscape : ONEOF('\' + '0', '\' + '1')
+rule EscapeSequence : ONEOF(ESCAPE, OctalEscape)
+rule CharacterLiteral : ''' + ONEOF(CHAR, DIGIT, EscapeSequence) + '''
 
 #########################################################################
 ##                           String                                    ##
