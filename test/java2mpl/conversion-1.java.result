@@ -1,5 +1,4 @@
 Matched 65 tokens.
-Convert unary --> binary
 ============= Module ===========
 == Sub Tree ==
 class  Test
@@ -14,7 +13,7 @@ class  Test
       var:f=i
       System.out.print(f)
       f Assign 
-      var:d=
+      var:d=Math.sin(f)
   LocalClasses: 
   LocalInterfaces: 
 

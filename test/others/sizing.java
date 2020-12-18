@@ -10,7 +10,7 @@ import java.util.BitSet;
 public class Sizing {
 
     public static void main(String[] args) {
-        boolean[] ba = new boolean[10_000];
+        boolean[] ba = new boolean[10000];
         System.out.println(ClassLayout.parseInstance(ba).toPrintable());
 
         BitSet bitSet = new BitSet(10000);

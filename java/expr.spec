@@ -90,8 +90,8 @@ rule DimExprs : DimExpr + ZEROORMORE(DimExpr)
 rule DimExpr : ZEROORMORE(Annotation) + '[' + Expression + ']'
 
 rule ArrayAccess : ONEOF(
-  ExpressionName + ZEROORONE(Expression),
-  PrimaryNoNewArray + ZEROORONE(Expression))
+  ExpressionName + '[' + Expression + ']',
+  PrimaryNoNewArray + '[' + Expression + ']')
 
 rule FieldAccess : ONEOF(
   Primary + '.' + Identifier,

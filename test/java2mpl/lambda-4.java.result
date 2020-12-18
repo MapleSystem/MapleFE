@@ -1,7 +1,5 @@
 Matched 11 tokens.
 Matched 96 tokens.
-Convert unary --> binary
-Convert unary --> binary
 ============= Module ===========
 == Sub Tree ==
 
@@ -18,7 +16,7 @@ class  Main
       printFormatted("Hello",exclaim)
       printFormatted("Hello",ask)
     func  printFormatted()  throws: 
-      var:result=
+      var:result=format.run(str)
       System.out.println(result)
   LocalClasses: 
   LocalInterfaces: 

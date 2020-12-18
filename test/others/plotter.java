@@ -19,7 +19,7 @@ public class Plotter {
         try (BufferedWriter stream = Files.newBufferedWriter(path, StandardOpenOption.CREATE)) {
             stream.write("bits,bool,bitset\n");
 
-            for (int i = 0; i <= 10_000_000; i += 500) {
+            for (int i = 0; i <= 10000000; i += 500) {
                 System.out.println("Number of bits => " + i);
 
                 boolean[] ba = new boolean[i];
@@ -30,7 +30,7 @@ public class Plotter {
 
                 stream.write((i + "," + baSize + "," + bitSetSize + "\n"));
 
-                if (i % 10_000 == 0) {
+                if (i % 10000 == 0) {
                     stream.flush();
                 }
             }

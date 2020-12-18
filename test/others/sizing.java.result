@@ -2,7 +2,7 @@ Matched 7 tokens.
 Matched 18 tokens.
 Matched 29 tokens.
 Matched 36 tokens.
-Matched 110 tokens.
+Matched 109 tokens.
 ============= Module ===========
 == Sub Tree ==
 package com.baeldung.bitset
@@ -21,9 +21,9 @@ class  Sizing
   Methods: 
     func  main()  throws: 
       var:ba=
-      System.out.println(,(ba)toPrintable)
+      System.out.println(ClassLayout.parseInstance(ba),toPrintable)
       var:bitSet=new BitSet<BitSet>
-      System.out.println(,(bitSet)toPrintable)
+      System.out.println(GraphLayout.parseInstance(bitSet),toPrintable)
   LocalClasses: 
   LocalInterfaces: 
 

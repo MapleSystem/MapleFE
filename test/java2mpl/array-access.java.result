@@ -1,17 +1,14 @@
 Matched 16 tokens.
 ============= Module ===========
 == Sub Tree ==
-class  A
+class  AbstractStringBuilder
   Fields: 
 
   Instance Initializer: 
   Constructors: 
   Methods: 
-    func  foo()  throws: 
-      c Assign a Add b
+    func  charAt()  throws: 
+      return 
   LocalClasses: 
   LocalInterfaces: 
 
-Identifier:c has no decl.
-Identifier:a has no decl.
-Identifier:b has no decl.
