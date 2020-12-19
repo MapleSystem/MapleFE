@@ -236,6 +236,11 @@ Parser::~Parser() {
 void Parser::Dump() {
 }
 
+void Parser::ClearFailed() {
+  for (unsigned i = 0; i < RuleTableNum; i++)
+     gFailed[i].clear();
+}
+
 // Add one fail case for the table
 void Parser::AddFailed(RuleTable *table, unsigned token) {
   //std::cout << " push " << mCurToken << " from " << table;

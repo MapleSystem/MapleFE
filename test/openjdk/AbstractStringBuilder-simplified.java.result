@@ -1,0 +1,199 @@
+Matched 329 tokens.
+============= Module ===========
+== Sub Tree ==
+class  AbstractStringBuilder
+  Fields: 
+    value    count    MAX_ARRAY_SIZE=Integer.MAX_VALUE Sub 8
+  Instance Initializer: 
+  Constructors: 
+    constructor  AbstractStringBuilder()  throws: 
+    constructor  AbstractStringBuilder()  throws: 
+  Methods: 
+    func  length()  throws: 
+    func  capacity()  throws: 
+    func  ensureCapacity()  throws: 
+    func  ensureCapacityInternal()  throws: 
+    func  newCapacity()  throws: 
+    func  hugeCapacity()  throws: 
+    func  trimToSize()  throws: 
+    func  setLength()  throws: 
+    func  charAt()  throws: 
+    func  codePointAt()  throws: 
+    func  codePointBefore()  throws: 
+    func  codePointCount()  throws: 
+    func  offsetByCodePoints()  throws: 
+    func  getChars()  throws: 
+    func  setCharAt()  throws: 
+    func  append()  throws: 
+    func  append()  throws: 
+    func  append()  throws: 
+    func  append()  throws: 
+    func  append()  throws: 
+    func  appendNull()  throws: 
+    func  append()  throws: 
+    func  append()  throws: 
+    func  append()  throws: 
+    func  append()  throws: 
+    func  append()  throws: 
+    func  append()  throws: 
+    func  append()  throws: 
+    func  append()  throws: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append
+Function Decl Duplication! Function:append is duplicated with Function:append

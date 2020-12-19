@@ -324,11 +324,7 @@ private:
   void VisitedPush(RuleTable*);
   void VisitedPop(RuleTable*);
 
-  void ClearFailed() {
-    for (unsigned i = 0; i < 621; i++)
-       gFailed[i].clear();
-  }
-
+  void ClearFailed();
   void AddFailed(RuleTable*, unsigned);
   void ResetFailed(RuleTable*, unsigned);
   bool WasFailed(RuleTable*, unsigned);
@@ -409,7 +405,9 @@ public:
   unsigned LexOneLine();
 };
 
-#define MAX_SUCC_TOKENS 32
+// I put 256 as the biggest number. For all the code I've see it should be ok.
+// If someday someone has a 'stack smashing' error, please check this.
+#define MAX_SUCC_TOKENS 256
 extern unsigned gSuccTokensNum;
 extern unsigned gSuccTokens[MAX_SUCC_TOKENS];
 
