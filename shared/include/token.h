@@ -46,6 +46,9 @@ typedef enum {
 
 // One of the concern here is we are using c++ type to store java
 // data which could mess the precision. Need look into it in the future.
+// Possibly will keep the text string of literal and let compiler to decide.
+//
+// We also treat 'this' and NULL/null as a literal, see supported_literals.def
 struct LitData {
   LitId mType;
   union {

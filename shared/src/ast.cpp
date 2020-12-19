@@ -393,6 +393,11 @@ void FieldNode::Init() {
   mName = gStringPool.FindString(name);
 }
 
+void FieldNode::Dump(unsigned indent) {
+  DumpIndentation(indent);
+  DUMP0_NORETURN(mName);
+}
+
 //////////////////////////////////////////////////////////////////////////////////////
 //                           NewNode
 //////////////////////////////////////////////////////////////////////////////////////
@@ -558,6 +563,31 @@ void ExprListNode::Dump(unsigned indent) {
 //                          LiteralNode
 //////////////////////////////////////////////////////////////////////////////////////
 
+void LiteralNode::InitName() {
+  std::string s;
+  switch (mData.mType) {
+  case LT_NullLiteral:
+    s = "null";
+    mName = gStringPool.FindString(s);
+    break;
+  case LT_ThisLiteral:
+    s = "this";
+    mName = gStringPool.FindString(s);
+    break;
+  case LT_IntegerLiteral:
+  case LT_DoubleLiteral:
+  case LT_FPLiteral:
+  case LT_StringLiteral:
+  case LT_BooleanLiteral:
+  case LT_CharacterLiteral:
+  case LT_NA:
+  default:
+    s = "<NA>";
+    mName = gStringPool.FindString(s);
+    break;
+  }
+}
+
 void LiteralNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   switch (mData.mType) {
@@ -581,6 +611,9 @@ void LiteralNode::Dump(unsigned indent) {
     break;
   case LT_NullLiteral:
     DUMP0_NORETURN("null");
+    break;
+  case LT_ThisLiteral:
+    DUMP0_NORETURN("this");
     break;
   case LT_NA:
   default:

@@ -10,8 +10,8 @@ class  Point
   Methods: 
     func  foo()  throws: 
       var:pl=new PointList<PointList>
-       Assign 1
-      return 
+      pl.z Assign 1
+      return pl.z
   LocalClasses: 
   LocalInterfaces: 
 

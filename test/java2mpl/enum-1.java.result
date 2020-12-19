@@ -7,7 +7,7 @@ class[JavaEnum]  Coin
   Instance Initializer: 
   Constructors: 
     constructor  Coin()  throws: 
-      value Assign value
+      this.value Assign value
   Methods: 
     func  value()  throws: 
       return value

@@ -8,8 +8,8 @@ class  Point
   Instance Initializer: 
   Constructors: 
     constructor  Point()  throws: 
-      x Assign x
-      y Assign y
+      this.x Assign x
+      this.y Assign y
   Methods: 
   LocalClasses: 
   LocalInterfaces: 
@@ -22,7 +22,7 @@ class  ColoredPoint
   Constructors: 
     constructor  ColoredPoint()  throws: 
     constructor  ColoredPoint()  throws: 
-      color Assign color
+      this.color Assign color
   Methods: 
   LocalClasses: 
   LocalInterfaces: 

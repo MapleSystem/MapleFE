@@ -24,7 +24,7 @@ class  ColoredPoint
   Constructors: 
   Methods: 
     func  setColor()  throws: 
-      color Assign color
+      this.color Assign color
   LocalClasses: 
   LocalInterfaces: 
 

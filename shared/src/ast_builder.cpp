@@ -13,6 +13,8 @@
 * See the Mulan PSL v1 for more details.
 */
 
+#include <cstring>
+
 #include "token.h"
 #include "ruletable.h"
 #include "ast_builder.h"
@@ -20,7 +22,6 @@
 #include "ast_attr.h"
 #include "ast_type.h"
 #include "ast_module.h"
-
 #include "massert.h"
 
 ASTBuilder gASTBuilder;
@@ -69,6 +70,15 @@ TreeNode* ASTBuilder::CreateTokenTreeNode(const Token *token) {
     if (type) {
       mLastTreeNode = type;
       return type;
+    }
+    // We define special literal tree node for 'this'.
+    if ((strlen(token->GetName()) == 4) && !strncmp(token->GetName(), "this", 4)) {
+      LitData data;
+      data.mType = LT_ThisLiteral;
+      LiteralNode *n = (LiteralNode*)mTreePool->NewTreeNode(sizeof(LiteralNode));
+      new (n) LiteralNode(data);
+      mLastTreeNode = n;
+      return n;
     }
     // Otherwise, it doesn't create any tree node.
   }
@@ -327,7 +337,7 @@ TreeNode* ASTBuilder::BuildReturn() {
   Param p_result = mParams[0];
   if (!p_result.mIsEmpty) {
     if (!p_result.mIsTreeNode)
-      MERROR("The Function is not a tree node.");
+      MERROR("The return value is not a tree node.");
     TreeNode *result_value = p_result.mData.mTreeNode;
     result->SetResult(result_value);
   }

@@ -467,6 +467,7 @@ public:
   void SetField(IdentifierNode *f) {mField = f;}
 
   const char* GetName() {return mName;}
+  void Dump(unsigned);
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -518,12 +519,20 @@ public:
 //////////////////////////////////////////////////////////////////////////
 
 class LiteralNode : public TreeNode {
-public:
+private:
   LitData mData;
+  const char *mName;
+
+private:
+  void InitName();
+
 public:
-  LiteralNode(LitData d) : mData(d) {mKind = NK_Literal;}
+  LiteralNode(LitData d) : mData(d), mName(NULL) {
+    mKind = NK_Literal; InitName();
+  }
   ~LiteralNode(){}
 
+  const char* GetName() {return mName;}
   void Dump(unsigned);
 };
 

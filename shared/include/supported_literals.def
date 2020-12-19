@@ -16,6 +16,8 @@
 // Literal types defined here are also defined in shared/include/token.h.
 // See comments in shared/include/token.h
 
+// We support a few special literals: null, this.
+
 LITERAL(IntegerLiteral)
 LITERAL(FPLiteral)
 LITERAL(DoubleLiteral)
@@ -23,4 +25,5 @@ LITERAL(BooleanLiteral)
 LITERAL(CharacterLiteral)
 LITERAL(StringLiteral)
 LITERAL(NullLiteral)
+LITERAL(ThisLiteral)
 

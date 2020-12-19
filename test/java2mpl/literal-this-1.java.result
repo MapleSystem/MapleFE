@@ -1,14 +1,14 @@
-Matched 22 tokens.
+Matched 13 tokens.
 ============= Module ===========
 == Sub Tree ==
-class  Point
+class  A
   Fields: 
-    x    y
+
   Instance Initializer: 
   Constructors: 
-    constructor  Point()  throws: 
-      this.y Assign y
   Methods: 
+    func  append()  throws: 
+      return this
   LocalClasses: 
   LocalInterfaces: 
 

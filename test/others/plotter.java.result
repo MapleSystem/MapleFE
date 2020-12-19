@@ -41,7 +41,7 @@ class  Plotter
       var:path=Paths.get("footprint.csv")
       BufferedWriter
       stream
-      Files.newBufferedWriter(path,)
+      Files.newBufferedWriter(path,StandardOpenOption.CREATE)
       stream.write("bits,bool,bitset
 ")
       for ( )

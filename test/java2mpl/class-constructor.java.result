@@ -7,8 +7,8 @@ class  Point
   Instance Initializer: 
   Constructors: 
     constructor  Point()  throws: 
-      x Assign x
-      y Assign y
+      this.x Assign x
+      this.y Assign y
   Methods: 
   LocalClasses: 
   LocalInterfaces: 

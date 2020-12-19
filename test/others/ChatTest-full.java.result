@@ -211,7 +211,7 @@ while
       Instance Initializer: 
       Constructors: 
         constructor  FlushingWriter()  throws: 
-          delegate Assign delegate
+          this.delegate Assign delegate
       Methods: 
         func  write()  throws:     IOException
           delegate.write(cbuf,off,len)

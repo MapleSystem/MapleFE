@@ -97,6 +97,7 @@ rule FieldAccess : ONEOF(
   Primary + '.' + Identifier,
   "super" + '.' + Identifier,
   TypeName + '.' + "super" + '.' + Identifier)
+  attr.action.%1 : BuildField(%1, %3)
 
 # It's possible MethodInvocation includes a MethodReference, like
 #  A::B(a,b)
