@@ -1,0 +1,14 @@
+Matched 17 tokens.
+============= Module ===========
+== Sub Tree ==
+class  A
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+    func  replace()  throws: 
+      return count Add len Sub end
+  LocalClasses: 
+  LocalInterfaces: 
+

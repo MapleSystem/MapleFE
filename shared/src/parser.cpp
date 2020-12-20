@@ -724,7 +724,9 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
   unsigned saved_mCurToken = mCurToken;
   bool is_done = TraverseRuleTablePre(appeal);
 
-  if (appeal->IsFail()) {
+  // In a recursion, a rule could fail in the first a few instances,
+  // but could match in a later instance. So I need check is_done.
+  if (appeal->IsFail() && is_done) {
     mIndentation -= 2;
     return false;
   }
