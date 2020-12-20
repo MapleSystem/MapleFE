@@ -2230,14 +2230,11 @@ void Parser::InitRecursion() {
 ////////////////////////////////////////////////////////////////////////////
 
 void Parser::ClearSucc() {
-  bzero(gSucc, sizeof(SuccMatch*) * RuleTableNum);
-
-  std::vector<SuccMatch*>::iterator it = mSuccPool.begin();
-  for (; it != mSuccPool.end(); it++) {
-    SuccMatch *m = *it;
-    delete m;
+  for (unsigned i = 0; i < RuleTableNum; i++) {
+    SuccMatch *sm = gSucc[i];
+    if (sm)
+      sm->Clear();
   }
-  mSuccPool.clear();
 }
 
 // Find the succ info of 'table'.
@@ -2253,7 +2250,6 @@ SuccMatch* Parser::FindOrCreateSucc(RuleTable *table) {
   if (!succ) {
     succ = new SuccMatch();
     gSucc[table->mIndex] = succ;
-    mSuccPool.push_back(succ);
   }
   return succ;
 }

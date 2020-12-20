@@ -752,8 +752,15 @@ public:
   //                 Other functions
   /////////////////////////////////////////////////////////
 
-  void Release() {mMemPool.Release();
-                  mHeader = NULL; }
+  void Clear(){
+    mMemPool.Clear();
+    mHeader = NULL;
+  }
+
+  void Release(){
+    mMemPool.Release();
+    mHeader = NULL;
+  }
 };
 
 //////////////////////////////////////////////////////////////////////////////////////

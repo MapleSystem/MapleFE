@@ -202,6 +202,8 @@ public:
   SuccMatch(){}
   ~SuccMatch() {mNodes.Release(); mMatches.Release();}
 
+  void Clear() {mNodes.Clear(); mMatches.Clear();}
+
 public:
   // The following functions need be used together, as the first one set the start
   // token (aka the key), the second one add a matching AppealNode and also updates
