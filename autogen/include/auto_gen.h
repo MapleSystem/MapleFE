@@ -50,6 +50,7 @@ private:
   TokenGen     *mTokenGen;
 
   std::vector<BaseGen*> mGenArray;
+  std::vector<Rule*>    mTopRules;
   SPECParser   *mParser;
 
 public:
@@ -59,6 +60,7 @@ public:
   void Init();
   void Run();
   void BackPatch();
+  void CollectTopRules(){}
   void Gen();
 };
 

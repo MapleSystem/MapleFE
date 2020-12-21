@@ -125,6 +125,12 @@ static void FinishSummaryCppFile() {
   gSummaryCppFile->WriteOneLine(s.c_str(), s.size());
 }
 
+///////////////////////////////////////////////////////////////////////////////////////
+//
+//                The major implementation  of Autogen
+//
+///////////////////////////////////////////////////////////////////////////////////////
+
 void AutoGen::Init() {
   std::string lang_path_header("../../java/include/");
   std::string lang_path_cpp("../../java/src/");
@@ -211,30 +217,12 @@ void AutoGen::Init() {
 }
 
 AutoGen::~AutoGen() {
-  if (mReservedGen)
-    delete mReservedGen;
-  if (mIdenGen)
-    delete mIdenGen;
-  if (mLitGen)
-    delete mLitGen;
-  if (mTypeGen)
-    delete mTypeGen;
-  if (mAttrGen)
-    delete mAttrGen;
-  if (mBlockGen)
-    delete mBlockGen;
-  if (mSeparatorGen)
-    delete mSeparatorGen;
-  if (mOperatorGen)
-    delete mOperatorGen;
-  if (mKeywordGen)
-    delete mKeywordGen;
-  if (mExprGen)
-    delete mExprGen;
-  if (mStmtGen)
-    delete mStmtGen;
-  if (mTokenGen)
-    delete mTokenGen;
+  std::vector<BaseGen*>::iterator it = mGenArray.begin();
+  for (; it != mGenArray.end(); it++){
+    BaseGen *gen = *it;
+    delete gen;
+  }
+
   if (gSummaryHFile)
     delete gSummaryHFile;
   if (gSummaryCppFile)
@@ -248,7 +236,6 @@ AutoGen::~AutoGen() {
 // a traversal to solve one by one.
 void AutoGen::BackPatch() {
   std::vector<BaseGen*>::iterator it = mGenArray.begin();
-  //  std::cout << "mGenArray.size " << mGenArray.size() << std::endl;
   for (; it != mGenArray.end(); it++){
     BaseGen *gen = *it;
     gen->BackPatch(mGenArray);
@@ -256,19 +243,11 @@ void AutoGen::BackPatch() {
 }
 
 void AutoGen::Run() {
-  mReservedGen->Run(mParser);
-  mIdenGen->Run(mParser);
-  mLitGen->Run(mParser);
-  mTypeGen->Run(mParser);
-  mAttrGen->Run(mParser);
-
-  mBlockGen->Run(mParser);
-  mSeparatorGen->Run(mParser);
-  mOperatorGen->Run(mParser);
-  mKeywordGen->Run(mParser);
-  mExprGen->Run(mParser);
-  mStmtGen->Run(mParser);
-  mTokenGen->Run(mParser);
+  std::vector<BaseGen*>::iterator it = mGenArray.begin();
+  for (; it != mGenArray.end(); it++){
+    BaseGen *gen = *it;
+    gen->Run(mParser);
+  }
 }
 
 void AutoGen::Gen() {
@@ -284,20 +263,11 @@ void AutoGen::Gen() {
   gTokenTable.mKeywords = mKeywordGen->mKeywords;
   gTokenTable.Prepare();
 
-  mTokenGen->Generate();
-
-  mReservedGen->Generate();
-  mIdenGen->Generate();
-  mLitGen->Generate();
-  mTypeGen->Generate();
-  mAttrGen->Generate();
-
-  mBlockGen->Generate();
-  mSeparatorGen->Generate();
-  mOperatorGen->Generate();
-  mKeywordGen->Generate();
-  mExprGen->Generate();
-  mStmtGen->Generate();
+  std::vector<BaseGen*>::iterator it = mGenArray.begin();
+  for (; it != mGenArray.end(); it++){
+    BaseGen *gen = *it;
+    gen->Generate();
+  }
 
   WriteSummaryHFile();
   FinishSummaryCppFile();
