@@ -20,10 +20,7 @@
 char* TokenPool::NewToken(unsigned size) {
   char *addr = mMemPool.Alloc(size);
   MASSERT(addr && "MemPool failed to alloc a token.");
-
-  // Put into mTokens;
-  mTokens.push_back((Token*)addr);
-
+  mTokens.PushBack((Token*)addr);
   return addr;
 }
   

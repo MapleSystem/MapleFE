@@ -33,19 +33,18 @@
 #include <vector>
 
 #include "mempool.h"
+#include "container.h"
 
 class Token;
 
 class TokenPool {
 private:
   MemPool mMemPool;
-public:
-  std::vector<Token*>   mTokens;
+  SmallVector<Token*>   mTokens;
 
 public:
-  TokenPool() {}
+  TokenPool() {mTokens.SetBlockSize(1024);}
   ~TokenPool(){}   // memory is freed in destructor of mMP.
-
   char* NewToken(unsigned);
 };
 
