@@ -566,7 +566,7 @@ void Parser::DumpSuccTokens() {
 void Parser::UpdateSuccInfo(unsigned curr_token, AppealNode *node) {
   MASSERT(node->IsTable());
   RuleTable *rule_table = node->GetTable();
-  SuccMatch *succ_match = FindOrCreateSucc(rule_table);
+  SuccMatch *succ_match = &gSucc[rule_table->mIndex];
   succ_match->AddStartToken(curr_token);
   succ_match->AddSuccNode(node);
   for (unsigned i = 0; i < gSuccTokensNum; i++) {
@@ -579,7 +579,7 @@ void Parser::UpdateSuccInfo(unsigned curr_token, AppealNode *node) {
 void Parser::RemoveSuccNode(unsigned curr_token, AppealNode *node) {
   MASSERT(node->IsTable());
   RuleTable *rule_table = node->GetTable();
-  SuccMatch *succ_match = FindSucc(rule_table);
+  SuccMatch *succ_match = &gSucc[rule_table->mIndex];
   MASSERT(succ_match);
   succ_match->GetStartToken(curr_token);
   succ_match->RemoveNode(node);
@@ -604,7 +604,7 @@ bool Parser::TraverseRuleTablePre(AppealNode *appeal) {
 
   // Check if it was succ. Set the gSuccTokens/gSuccTokensNum appropriately
   // The longest matching is chosen for the next rule table to match.
-  SuccMatch *succ = FindSucc(rule_table);
+  SuccMatch *succ = &gSucc[rule_table->mIndex];
   if (succ) {
     bool was_succ = succ->GetStartToken(mCurToken);
     if (was_succ) {
@@ -1374,29 +1374,13 @@ bool Parser::TraverseTableData(TableData *data, AppealNode *parent) {
 }
 
 void Parser::SetIsDone(unsigned group_id, unsigned start_token) {
-//  for (unsigned i = 0; i < gRule2GroupNum; i++) {
-//    Rule2Group r2g = gRule2Group[i];
-//    if (r2g.mGroupId == group_id) {
-//      RuleTable *rt = r2g.mRuleTable;
-//      SuccMatch *succ = FindSucc(rt);
-//      // Some node in a recursion fails, like some children of a Oneof node
-//      if (succ) {
-//        bool found = succ->GetStartToken(start_token);
-//        if(found)
-//          succ->SetIsDone();
-//      }
-//    }
-//  }
   Group2Rule g2r = gGroup2Rule[group_id];
   for (unsigned i = 0; i < g2r.mNum; i++) {
     RuleTable *rt = g2r.mRuleTables[i];
-    SuccMatch *succ = FindSucc(rt);
-    // Some node in a recursion fails, like some children of a Oneof node
-    if (succ) {
-      bool found = succ->GetStartToken(start_token);
-      if(found)
-        succ->SetIsDone();
-    }
+    SuccMatch *succ = &gSucc[rt->mIndex];
+    bool found = succ->GetStartToken(start_token);
+    if(found)
+      succ->SetIsDone();
   } 
 }
 
@@ -1405,8 +1389,7 @@ void Parser::SetIsDone(RuleTable *rt, unsigned start_token) {
   if((rt == &TblLiteral) || (rt == &TblIdentifier))
     return;
 
-  SuccMatch *succ = FindSucc(rt);
-  MASSERT(succ);
+  SuccMatch *succ = &gSucc[rt->mIndex];
   bool found = succ->GetStartToken(start_token);
   MASSERT(found);
   succ->SetIsDone();
@@ -1457,7 +1440,7 @@ void Parser::SortOut() {
   // First sort the root.
   RuleTable *table = root->GetTable();
   MASSERT(table && "root is not a table?");
-  SuccMatch *succ = FindSucc(table);
+  SuccMatch *succ = &gSucc[table->mIndex];
   MASSERT(succ && "root has no SuccMatch?");
   bool found = succ->GetStartToken(root->GetStartIndex());
 
@@ -1954,7 +1937,7 @@ void Parser::FindPatchingNodes() {
     MASSERT(was_succ->IsSorted());
     unsigned final_match = was_succ->GetFinalMatch();
 
-    SuccMatch *succ_match = FindSucc(was_succ->GetTable());
+    SuccMatch *succ_match = &gSucc[was_succ->GetTable()->mIndex];
     MASSERT(succ_match && "WasSucc's rule has no SuccMatch?");
     bool found = succ_match->GetStartToken(was_succ->GetStartIndex());
     MASSERT(found && "WasSucc cannot find start index in SuccMatch?");
@@ -1993,7 +1976,7 @@ void Parser::SupplementalSortOut(AppealNode *root, AppealNode *reference) {
   MASSERT(reference->IsSorted() && "reference is not sorted?");
 
   // step 2. Set the root.
-  SuccMatch *succ = FindSucc(root->GetTable());
+  SuccMatch *succ = &gSucc[root->GetTable()->mIndex];
   MASSERT(succ && "root node has no SuccMatch?");
   root->SetFinalMatch(reference->GetFinalMatch());
   root->SetSorted();
@@ -2231,27 +2214,10 @@ void Parser::InitRecursion() {
 
 void Parser::ClearSucc() {
   for (unsigned i = 0; i < RuleTableNum; i++) {
-    SuccMatch *sm = gSucc[i];
+    SuccMatch *sm = &gSucc[i];
     if (sm)
       sm->Clear();
   }
-}
-
-// Find the succ info of 'table'.
-// Return NULL if not found.
-SuccMatch* Parser::FindSucc(RuleTable *table) {
-  return gSucc[table->mIndex];
-}
-
-// Find the succ info of 'table'.
-// If not found, create one.
-SuccMatch* Parser::FindOrCreateSucc(RuleTable *table) {
-  SuccMatch *succ = gSucc[table->mIndex];
-  if (!succ) {
-    succ = new SuccMatch();
-    gSucc[table->mIndex] = succ;
-  }
-  return succ;
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -2330,13 +2296,10 @@ bool SuccMatch::FindMatch(unsigned start, unsigned target) {
 
 void SuccMatch::SetIsDone() {
   mNodes.PairedSetKnobData(1);
-  mMatches.PairedSetKnobData(1);
 }
 
 bool SuccMatch::IsDone() {
   unsigned u1 = mNodes.PairedGetKnobData();
-  unsigned u2 = mMatches.PairedGetKnobData();
-  MASSERT(u1 == u2);
   return (bool)u1;
 }
 

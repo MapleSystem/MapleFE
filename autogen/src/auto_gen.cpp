@@ -63,6 +63,7 @@ static void WriteSummaryHFile() {
   gSummaryHFile->WriteOneLine("#ifndef __DEBUG_GEN_H__", 23);
   gSummaryHFile->WriteOneLine("#define __DEBUG_GEN_H__", 23);
   gSummaryHFile->WriteOneLine("#include \"ruletable.h\"", 22);
+  gSummaryHFile->WriteOneLine("#include \"succ_match.h\"", 23);
   gSummaryHFile->WriteOneLine("#include <vector>", 17);
   gSummaryHFile->WriteOneLine("typedef struct {", 16);
   gSummaryHFile->WriteOneLine("  const RuleTable *mAddr;", 25);
@@ -81,7 +82,7 @@ static void WriteSummaryHFile() {
   s = "class SuccMatch;";
   gSummaryHFile->WriteOneLine(s.c_str(), s.size());
 
-  s = "extern SuccMatch* gSucc[";
+  s = "extern SuccMatch gSucc[";
   s += std::to_string(gRuleTableNum);
   s += "];";
   gSummaryHFile->WriteOneLine(s.c_str(), s.size());
@@ -118,7 +119,7 @@ static void FinishSummaryCppFile() {
   s += "];";
   gSummaryCppFile->WriteOneLine(s.c_str(), s.size());
 
-  s = "SuccMatch* gSucc[";
+  s = "SuccMatch gSucc[";
   s += std::to_string(gRuleTableNum);
   s += "];";
   gSummaryCppFile->WriteOneLine(s.c_str(), s.size());
