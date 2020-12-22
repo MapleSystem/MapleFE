@@ -723,9 +723,13 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
   unsigned saved_mCurToken = mCurToken;
   bool is_done = TraverseRuleTablePre(appeal);
 
-  // In a recursion, a rule could fail in the first a few instances,
-  // but could match in a later instance. So I need check is_done.
-  if (appeal->IsFail() && is_done) {
+  unsigned group_id;
+  bool in_group = FindRecursionGroup(rule_table, group_id);
+
+  // 1. In a recursion, a rule could fail in the first a few instances,
+  //    but could match in a later instance. So I need check is_done.
+  // 2. For A not-in-group rule, a WasFailed is a real fail.
+  if (appeal->IsFail() && (!in_group || is_done)) {
     mIndentation -= 2;
     return false;
   }
@@ -740,9 +744,6 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
     mIndentation -= 2;
     return false;
   }
-
-  unsigned group_id;
-  bool in_group = FindRecursionGroup(rule_table, group_id);
 
   // If the rule is NOT in any recursion group, we simply return the result.
   // If the rule is done, we also simply return the result.
