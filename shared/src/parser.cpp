@@ -466,9 +466,8 @@ bool Parser::TraverseStmt() {
   bool succ = false;
 
   // Go through the top level construct, find the right one.
-  std::vector<RuleTable*>::iterator it = mTopTables.begin();
-  for (; it != mTopTables.end(); it++) {
-    RuleTable *t = *it;
+  for (unsigned i = 0; i < gTopRulesNum; i++){
+    RuleTable *t = gTopRules[i];
     mRootNode->ClearChildren();
     succ = TraverseRuleTable(t, mRootNode);
     if (succ) {
@@ -2185,17 +2184,6 @@ ASTTree* Parser::BuildAST() {
     MERROR("We got a statement failed to create AST!");
 
   return tree;
-}
-
-// These should have the same order as those in
-//  1. RecDetector::SetupTopTables()
-//  2. LADetector::SetupTopTables()
-// Set up the top level rule tables.
-void Parser::SetupTopTables() {
-  mTopTables.push_back(&TblPackageDeclaration);
-  mTopTables.push_back(&TblImportDeclaration);
-  mTopTables.push_back(&TblClassDeclaration);
-  mTopTables.push_back(&TblInterfaceDeclaration);
 }
 
 ////////////////////////////////////////////////////////////////////////////

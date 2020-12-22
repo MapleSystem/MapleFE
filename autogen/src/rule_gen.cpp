@@ -320,6 +320,21 @@ void RuleGen::Gen4Table(const Rule *rule, const RuleElem *elem){
     rule_table_name = GetSubTblName();
     attr = &(elem->mAttr);
   }
+
+  // Check if it's a top rule. We only check for 'rule', since
+  // 'elem' can NOT be a top rule.
+  if (rule) {
+    std::vector<std::string> properties = attr->mProperty;
+    std::vector<std::string>::iterator p_it = properties.begin();
+    for (; p_it != properties.end(); p_it++) {
+      std::string p = *p_it;
+      std::size_t found = p.find("Top");
+      if ((found!=std::string::npos) && (p.size() == 3)) {
+        gTopRules.push_back(rule_table_name);
+        break;
+      }
+    }
+  }
   
   Gen4RuleAttr(rule_table_name, attr);
   Gen4TableHeader(rule_table_name);

@@ -86,7 +86,8 @@ struct Action {
 };
 
 enum RuleProp {
-  RP_Single = 1,  // For a ONEOF rule, there is one and only one children valid.
+  RP_Single,  // For a ONEOF rule, there is one and only one children valid.
+  RP_Top,     // A top rule
   RP_NA = 0
 };
 

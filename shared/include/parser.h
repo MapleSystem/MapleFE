@@ -273,14 +273,6 @@ private:
   bool MoveCurToken();             // move mCurToken one step.
   Token* GetActiveToken(unsigned); // Get an active token.
 
-  // Every language has a fixed number of entry point to start parsing. Eg. in Java
-  // the top level language construct is class, so the entry point is ClassDeclaration.
-  // In C, the top level construct is either function or statement.
-  //
-  // In driver function of parser needs to set up these top level rule tables which
-  // the traversal will start with.
-  std::vector<RuleTable*> mTopTables;
-
   // Appealing System
   std::vector<AppealNode*> mAppealNodes;
   AppealNode *mRootNode;
@@ -339,7 +331,6 @@ public:
 
   bool Parse();
   bool ParseStmt();
-  void SetupTopTables();  //Each language parser will implement this by itself. 
   void InitRecursion();
   unsigned LexOneLine();
 };

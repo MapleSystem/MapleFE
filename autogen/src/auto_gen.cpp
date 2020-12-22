@@ -58,6 +58,7 @@
 FileWriter *gSummaryHFile;
 FileWriter *gSummaryCppFile;
 unsigned    gRuleTableNum;
+std::vector<std::string> gTopRules;
 
 static void WriteSummaryHFile() {
   gSummaryHFile->WriteOneLine("#ifndef __DEBUG_GEN_H__", 23);
@@ -79,11 +80,21 @@ static void WriteSummaryHFile() {
   s += "];";
   gSummaryHFile->WriteOneLine(s.c_str(), s.size());
 
+  // Write SuccMatch array
   s = "class SuccMatch;";
   gSummaryHFile->WriteOneLine(s.c_str(), s.size());
 
   s = "extern SuccMatch gSucc[";
   s += std::to_string(gRuleTableNum);
+  s += "];";
+  gSummaryHFile->WriteOneLine(s.c_str(), s.size());
+
+  // Write Top rules
+  s = "extern unsigned gTopRulesNum;";
+  gSummaryHFile->WriteOneLine(s.c_str(), s.size());
+
+  s = "extern RuleTable* gTopRules[";
+  s += std::to_string(gTopRules.size());
   s += "];";
   gSummaryHFile->WriteOneLine(s.c_str(), s.size());
 
@@ -122,6 +133,24 @@ static void FinishSummaryCppFile() {
   s = "SuccMatch gSucc[";
   s += std::to_string(gRuleTableNum);
   s += "];";
+  gSummaryCppFile->WriteOneLine(s.c_str(), s.size());
+
+  s = "unsigned gTopRulesNum = ";
+  s += std::to_string(gTopRules.size());
+  s += ";";
+  gSummaryCppFile->WriteOneLine(s.c_str(), s.size());
+
+  s = "RuleTable* gTopRules[";
+  s += std::to_string(gTopRules.size());
+  s += "] = {";
+  unsigned i = 0;
+  for (; i < gTopRules.size(); i++) {
+    s += "&";
+    s += gTopRules[i];
+    if (i < gTopRules.size() - 1)
+      s += ",";
+  }
+  s += "};";
   gSummaryCppFile->WriteOneLine(s.c_str(), s.size());
 }
 

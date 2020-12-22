@@ -77,10 +77,8 @@ bool RuleLookAhead::FindLookAhead(LookAhead la) {
 ////////////////////////////////////////////////////////////////////////////////////
 
 void LADetector::SetupTopTables() {
-  mToDo.PushBack(&TblPackageDeclaration);
-  mToDo.PushBack(&TblImportDeclaration);
-  mToDo.PushBack(&TblClassDeclaration);
-  mToDo.PushBack(&TblInterfaceDeclaration);
+  for (unsigned i = 0; i < gTopRulesNum; i++)
+    mToDo.PushBack(gTopRules[i]);
 }
 
 // A talbe is already been processed.

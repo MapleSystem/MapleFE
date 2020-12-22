@@ -73,7 +73,6 @@ int main (int argc, char *argv[]) {
     }
   }
 
-  parser->SetupTopTables();
   parser->InitRecursion();
   parser->Parse();
 

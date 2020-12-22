@@ -16,7 +16,7 @@
 ###################################################################################
 
 rule ClassDeclaration : ONEOF(NormalClassDeclaration, EnumDeclaration)
-  attr.property : Single
+  attr.property : Single, Top
 rule NormalClassDeclaration : ZEROORMORE(ClassModifier) + "class" + Identifier +
                               ZEROORONE(TypeParameters) + ZEROORONE(Superclass) +
                               ZEROORONE(Superinterfaces) + ClassBody
@@ -226,7 +226,7 @@ rule Block           : '{' + ZEROORONE(BlockStatements) + '}'
 #                        Interface                                   #
 ######################################################################
 rule InterfaceDeclaration : ONEOF(NormalInterfaceDeclaration, AnnotationTypeDeclaration)
-  attr.property : Single
+  attr.property : Single, Top
 rule NormalInterfaceDeclaration : ZEROORMORE(InterfaceModifier) + "interface" + Identifier +
                                   ZEROORONE(TypeParameters) + ZEROORONE(ExtendsInterfaces) + InterfaceBody
 rule InterfaceAttr : ONEOF("public", "protected", "private", "abstract", "static", "strictfp")
@@ -315,11 +315,14 @@ rule PackageModifier: Annotation
 rule PackageDeclaration: ZEROORMORE(PackageModifier) + "package" + Identifier + ZEROORMORE('.' + Identifier) + ';'
   attr.action : BuildField(%3, %4)
   attr.action : BuildPackageName()
+  attr.property : Top
 
 rule ImportDeclaration: ONEOF(SingleTypeImportDeclaration,
                               TypeImportOnDemandDeclaration,
                               SingleStaticImportDeclaration,
                               StaticImportOnDemandDeclaration)
+  attr.property : Top
+
 rule SingleTypeImportDeclaration: "import" + TypeName + ';'
   attr.action : BuildSingleTypeImport(%2)
 rule TypeImportOnDemandDeclaration: "import" + PackageOrTypeName + '.' + '*' + ';'

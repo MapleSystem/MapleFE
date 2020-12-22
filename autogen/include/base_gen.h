@@ -57,6 +57,7 @@ typedef enum {
 extern FileWriter *gSummaryHFile;    // summary functions
 extern FileWriter *gSummaryCppFile;  // summary functions
 extern unsigned    gRuleTableNum;  // rule table number
+extern std::vector<std::string> gTopRules; // top rule names.
 
 class BaseGen {
 public:
