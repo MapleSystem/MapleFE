@@ -1143,7 +1143,7 @@ TreeNode* ASTBuilder::BuildAnnotation() {
   Param p_name = mParams[0];
 
   if (!p_name.mIsTreeNode)
-    MERROR("The annotationtype name is not a treenode in BuildAnnotationtType()");
+    MERROR("The annotationtype name is not a treenode in BuildAnnotation()");
   TreeNode *node_name = p_name.mData.mTreeNode;
 
   if (!node_name->IsIdentifier())
@@ -1157,6 +1157,46 @@ TreeNode* ASTBuilder::BuildAnnotation() {
   // set last tree node and return it.
   mLastTreeNode = annot;
   return mLastTreeNode;
+}
+
+TreeNode* ASTBuilder::BuildInterface() {
+  if (mTrace)
+    std::cout << "In BuildInterface" << std::endl;
+  Param p_name = mParams[0];
+
+  if (!p_name.mIsTreeNode)
+    MERROR("The name is not a treenode in BuildInterface()");
+  TreeNode *node_name = p_name.mData.mTreeNode;
+
+  if (!node_name->IsIdentifier())
+    MERROR("The name is NOT an indentifier node.");
+  IdentifierNode *in = (IdentifierNode*)node_name;
+
+  InterfaceNode *interf = (InterfaceNode*)mTreePool->NewTreeNode(sizeof(InterfaceNode));
+  new (interf) InterfaceNode();
+  interf->SetName(in->GetName());
+
+  // set last tree node and return it.
+  mLastTreeNode = interf;
+  return mLastTreeNode;
+}
+
+// Takes one parameter which is the tree of interface body.
+TreeNode* ASTBuilder::AddInterfaceBody() {
+  if (mTrace)
+    std::cout << "In AddInterfaceBody" << std::endl;
+
+  Param p_body = mParams[0];
+  if (!p_body.mIsTreeNode)
+    MERROR("The interface body is not a tree node.");
+  TreeNode *tree_node = p_body.mData.mTreeNode;
+  MASSERT(tree_node->IsBlock() && "Interface body is not a BlockNode?");
+  BlockNode *block = (BlockNode*)tree_node;
+
+  MASSERT(mLastTreeNode->IsInterface() && "Interface is not a InterfaceNode?");
+  InterfaceNode *interf = (InterfaceNode*)mLastTreeNode;
+  interf->Construct(block);
+  return interf;
 }
 
 // This takes just one argument which is the length of this dimension

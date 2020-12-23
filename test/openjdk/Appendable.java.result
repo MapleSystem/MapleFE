@@ -1,0 +1,17 @@
+Matched 5 tokens.
+Matched 12 tokens.
+Matched 50 tokens.
+============= Module ===========
+== Sub Tree ==
+package java.lang
+== Sub Tree ==
+import java.io.IOException
+== Sub Tree ==
+interface  Appendable
+  Fields: 
+
+  Methods: 
+    func  append()  throws:     IOException
+    func  append()  throws:     IOException
+    func  append()  throws:     IOException
+

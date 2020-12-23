@@ -15,6 +15,11 @@ class  Point
   LocalInterfaces: 
 
 == Sub Tree ==
+interface  Colorable
+  Fields: 
+
+  Methods: 
+    func  setColor()  throws: 
 
 == Sub Tree ==
 class  ColoredPoint

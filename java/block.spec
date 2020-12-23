@@ -227,14 +227,19 @@ rule Block           : '{' + ZEROORONE(BlockStatements) + '}'
 ######################################################################
 rule InterfaceDeclaration : ONEOF(NormalInterfaceDeclaration, AnnotationTypeDeclaration)
   attr.property : Single, Top
+
 rule NormalInterfaceDeclaration : ZEROORMORE(InterfaceModifier) + "interface" + Identifier +
                                   ZEROORONE(TypeParameters) + ZEROORONE(ExtendsInterfaces) + InterfaceBody
+  attr.action : BuildInterface(%3)
+  attr.action : AddInterfaceBody(%6)
+
 rule InterfaceAttr : ONEOF("public", "protected", "private", "abstract", "static", "strictfp")
   attr.property : Single
 rule InterfaceModifier : ONEOF(Annotation, InterfaceAttr)
   attr.property : Single
 rule ExtendsInterfaces : "extends" + InterfaceTypeList
 rule InterfaceBody     : '{' + ZEROORMORE(InterfaceMemberDeclaration) + '}'
+  attr.action : BuildBlock(%2)
 
 rule InterfaceMemberDeclaration : ONEOF(ConstantDeclaration,
                                         InterfaceMethodDeclaration,

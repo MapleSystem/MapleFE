@@ -4,10 +4,26 @@ Matched 59 tokens.
 Matched 82 tokens.
 ============= Module ===========
 == Sub Tree ==
+interface  BaseColors
+  Fields: 
+    RED=1    GREEN=2    BLUE=4
+  Methods: 
 
 == Sub Tree ==
+interface  RainbowColors
+  Fields: 
+    YELLOW=3    ORANGE=5    INDIGO=6    VIOLET=7
+  Methods: 
 
 == Sub Tree ==
+interface  PrintColors
+  Fields: 
+    YELLOW=8    CYAN=16    MAGENTA=32
+  Methods: 
 
 == Sub Tree ==
+interface  LotsOfColors
+  Fields: 
+    FUCHSIA=17    VERMILION=43    CHARTREUSE=RED Add 90
+  Methods: 
 

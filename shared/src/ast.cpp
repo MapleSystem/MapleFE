@@ -978,6 +978,10 @@ void FunctionNode::Dump(unsigned indent) {
     GetBody()->Dump(indent+2);
 }
 
+//////////////////////////////////////////////////////////////////////////////////////
+//                              LambdaNode
+//////////////////////////////////////////////////////////////////////////////////////
+
 void LambdaNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   std::string dump;
@@ -992,4 +996,48 @@ void LambdaNode::Dump(unsigned indent) {
   DUMP0_NORETURN(dump.c_str());
   if (mBody)
     mBody->Dump(0);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////
+//                             InterfaceNode
+//////////////////////////////////////////////////////////////////////////////////////
+
+void InterfaceNode::Construct(BlockNode *block) {
+  for (unsigned i = 0; i < block->GetChildrenNum(); i++) {
+    TreeNode *tree_node = block->GetChildAtIndex(i);
+    if (tree_node->IsVarList()) {
+      VarListNode *vlnode = (VarListNode*)tree_node;
+      for (unsigned i = 0; i < vlnode->GetNum(); i++) {
+        IdentifierNode *inode = vlnode->VarAtIndex(i);
+        mFields.PushBack(inode);
+      }
+    } else if (tree_node->IsIdentifier())
+      mFields.PushBack(tree_node);
+    else if (tree_node->IsFunction()) {
+      FunctionNode *f = (FunctionNode*)tree_node;
+      mMethods.PushBack(tree_node);
+    } else
+      MASSERT("Unsupported tree node in interface body.");
+  }
+}
+
+void InterfaceNode::Dump(unsigned indent) {
+  DumpIndentation(indent);
+  DUMP1_NORETURN("interface ", mName);
+  DUMP_RETURN();
+  DumpIndentation(indent + 2);
+
+  DUMP0("Fields: ");
+  for (unsigned i = 0; i < mFields.GetNum(); i++) {
+    TreeNode *node = mFields.ValueAtIndex(i);
+    node->Dump(indent + 4);
+  }
+  DUMP_RETURN();
+
+  DumpIndentation(indent + 2);
+  DUMP0("Methods: ");
+  for (unsigned i = 0; i < mMethods.GetNum(); i++) {
+    TreeNode *node = mMethods.ValueAtIndex(i);
+    node->Dump(indent + 4);
+  }
 }

@@ -127,6 +127,10 @@ public:
   TreeNode* BuildAnnotation();
   TreeNode* AddAnnotationTypeBody();
 
+  // Interface related
+  TreeNode* BuildInterface();
+  TreeNode* AddInterfaceBody();
+
   // Dimension Related
   TreeNode* BuildDim();
   TreeNode* BuildDims();

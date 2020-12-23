@@ -77,10 +77,14 @@ ACTION(AddModifierTo)
 ACTION(AddInitTo)
 ACTION(AddTypeTo)
 
-// Annotation
+// Annotation.
 ACTION(BuildAnnotationType)
 ACTION(BuildAnnotation)
 ACTION(AddAnnotationTypeBody)
+
+// Interface
+ACTION(BuildInterface)
+ACTION(AddInterfaceBody)
 
 // Dimension
 ACTION(BuildDim)

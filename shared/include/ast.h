@@ -879,16 +879,26 @@ public:
 
 //////////////////////////////////////////////////////////////////////////
 //                         Interface Nodes
+// This is from Java originally. Java Annotation is also treated as an
+// InterfaceNode.
 //////////////////////////////////////////////////////////////////////////
 
 class InterfaceNode : public TreeNode {
-public:
+private:
   const char *mName;
+  bool        mIsAnnotation;
+  SmallVector<InterfaceNode*>  mSuperInterfaces;
+  SmallVector<IdentifierNode*> mFields;
+  SmallVector<FunctionNode*>   mMethods;
 public:
-  InterfaceNode() {mKind = NK_Interface;}
+  InterfaceNode() : mIsAnnotation(false) {mKind = NK_Interface;}
   ~InterfaceNode() {}
 
-  void Dump();
+  void SetName(const char *n) {mName = n;}
+  void SetIsAnnotation(bool b) {mIsAnnotation = b;}
+
+  void Construct(BlockNode *);
+  void Dump(unsigned);
 };
 
 //////////////////////////////////////////////////////////////////////////

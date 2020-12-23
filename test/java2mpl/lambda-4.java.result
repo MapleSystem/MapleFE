@@ -2,6 +2,11 @@ Matched 11 tokens.
 Matched 96 tokens.
 ============= Module ===========
 == Sub Tree ==
+interface  StringFunction
+  Fields: 
+
+  Methods: 
+    func  run()  throws: 
 
 == Sub Tree ==
 class  Main
