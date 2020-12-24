@@ -1,0 +1,12 @@
+Matched 5 tokens.
+Matched 17 tokens.
+============= Module ===========
+== Sub Tree ==
+package java.lang
+== Sub Tree ==
+interface  AutoCloseable
+  Fields: 
+
+  Methods: 
+    func  close()  throws:     Exception
+
