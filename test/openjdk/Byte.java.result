@@ -1,0 +1,107 @@
+Matched 5 tokens.
+Matched 909 tokens.
+============= Module ===========
+== Sub Tree ==
+package java.lang
+== Sub Tree ==
+class  Byte
+  Fields: 
+    MIN_VALUE=Sub
+  128    MAX_VALUE=127    TYPE=()    value    SIZE=8    BYTES=    serialVersionUID=Sub
+  296684260    DIGITS=    UPPER_CASE_DIGITS=
+  Instance Initializer: 
+  Constructors: 
+    constructor  Byte()  throws: 
+      this.value Assign value
+    constructor  Byte()  throws: 
+      this.value Assign parseByte(s,10)
+  Methods: 
+    func  toString()  throws: 
+      return Integer.toString((int)b,10)
+    func  valueOf()  throws: 
+      var:offset=128
+      return 
+    func  parseByte()  throws:     NumberFormatException
+      var:i=Integer.parseInt(s,radix)
+      cond-branch cond:
+      true branch :
+        new NumberFormatException<NumberFormatException>      false branch :
+
+      return (byte)i
+    func  parseByte()  throws:     NumberFormatException
+      return parseByte(s,10)
+    func  valueOf()  throws:     NumberFormatException
+      return valueOf(parseByte(s,radix))
+    func  valueOf()  throws:     NumberFormatException
+      return valueOf(s,10)
+    func  decode()  throws:     NumberFormatException
+      var:i=Integer.decode(nm)
+      cond-branch cond:
+      true branch :
+        new NumberFormatException<NumberFormatException>      false branch :
+
+      return valueOf((byte)i)
+    func  byteValue()  throws: 
+      return value
+    func  shortValue()  throws: 
+      return (short)value
+    func  intValue()  throws: 
+      return (int)value
+    func  longValue()  throws: 
+      return (long)value
+    func  floatValue()  throws: 
+      return (float)value
+    func  doubleValue()  throws: 
+      return (double)value
+    func  toString()  throws: 
+      return Integer.toString((int)value)
+    func  hashCode()  throws: 
+      return Byte.hashCode(value)
+    func  hashCode()  throws: 
+      return (int)value
+    func  equals()  throws: 
+      cond-branch cond:
+      true branch :
+        return 
+      false branch :
+
+      return false
+    func  compareTo()  throws: 
+      return compare(this.value,anotherByte.value)
+    func  compare()  throws: 
+      return x Sub y
+    func  toUnsignedInt()  throws: 
+      return ((int)x)255
+    func  toUnsignedLong()  throws: 
+      return ((long)x)4095
+    func  toHexString()  throws: 
+      var:digits=
+      var:buf=
+       Assign 
+       Assign 
+      return new String<String>
+  LocalClasses: 
+    class  ByteCache
+      Fields: 
+        cache=[]
+      Instance Initializer: 
+        InstInit- 0
+      Constructors: 
+        constructor  ByteCache()  throws: 
+      Methods: 
+      LocalClasses: 
+      LocalInterfaces: 
+  LocalInterfaces: 
+
+Function Decl Duplication! Function:toString is duplicated with Function:toString
+Function Decl Duplication! Function:valueOf is duplicated with Function:valueOf
+Function Decl Duplication! Function:valueOf is duplicated with Function:valueOf
+Function Decl Duplication! Function:parseByte is duplicated with Function:parseByte
+Function Decl Duplication! Function:parseByte is duplicated with Function:parseByte
+Function Decl Duplication! Function:valueOf is duplicated with Function:valueOf
+Function Decl Duplication! Function:valueOf is duplicated with Function:valueOf
+Function Decl Duplication! Function:valueOf is duplicated with Function:valueOf
+Function Decl Duplication! Function:valueOf is duplicated with Function:valueOf
+Function Decl Duplication! Function:toString is duplicated with Function:toString
+Function Decl Duplication! Function:hashCode is duplicated with Function:hashCode
+Function Decl Duplication! Function:hashCode is duplicated with Function:hashCode
