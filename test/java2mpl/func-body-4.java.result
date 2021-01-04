@@ -1,0 +1,18 @@
+Matched 31 tokens.
+============= Module ===========
+== Sub Tree ==
+class  A
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+    func  foo()  throws: 
+      return c Add b
+    func  foo()  throws: 
+      return c
+  LocalClasses: 
+  LocalInterfaces: 
+
+Function Decl Duplication! Function:foo is duplicated with Function:foo
+Function Decl Duplication! Function:foo is duplicated with Function:foo

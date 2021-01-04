@@ -38,3 +38,31 @@ void VerifierJava::VerifyGlobalScope() {
     VerifyTree(tree);
   }
 }
+
+void VerifierJava::VerifyClassMethods(ClassNode *klass) {
+  for (unsigned i = 0; i < klass->GetMethodsNum(); i++) {
+    FunctionNode *method = klass->GetMethod(i);
+    // step 1. verify the duplication
+    bool hit_self = false;
+    for (unsigned j = 0; j < mCurrScope->GetDeclNum(); j++) {
+      TreeNode *nb = mCurrScope->GetDecl(j);
+      // Fields have been checked. No need here.
+      if (nb->IsIdentifier())
+        continue;
+
+      if (method->GetName() == nb->GetName()) {
+        if (nb->IsFunction()) {
+          if (!hit_self)
+            hit_self = true;
+          else
+            mLog.Duplicate("Function Decl Duplication! ", method, nb);
+        } else {
+          mLog.Duplicate("Function Decl Duplication! ", method, nb);
+        }
+      }
+    }
+
+    // step 2. verify functioin.
+    VerifyFunction(method);
+  }
+}

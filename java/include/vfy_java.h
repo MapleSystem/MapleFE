@@ -28,6 +28,7 @@ public:
   ~VerifierJava(){}
 
   void VerifyGlobalScope();
+  void VerifyClassMethods(ClassNode *klass);
 };
 
 #endif

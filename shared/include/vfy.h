@@ -48,10 +48,9 @@ class ASTScope;
 class TreeNode;
 
 class Verifier {
-private:
+protected:
   VfyLog    mLog;
 
-protected:
   ASTScope *mCurrScope;
 
   // I need a temporary place to save the parent node when we

@@ -250,42 +250,9 @@ void Verifier::VerifyClassFields(ClassNode *klass) {
   }
 }
 
-// Several things to verify.
-// 1) Duplication decl. We dont check against field since they are already checked.
-// 2) Verify the function body, which is complicated.
-void Verifier::VerifyClassMethods(ClassNode *klass) {
-  for (unsigned i = 0; i < klass->GetMethodsNum(); i++) {
-    FunctionNode *method = klass->GetMethod(i);
-    // step 1. verify the duplication
-    bool hit_self = false;
-    for (unsigned j = 0; j < mCurrScope->GetDeclNum(); j++) {
-      TreeNode *nb = mCurrScope->GetDecl(j);
-      // Fields have been checked. No need here.
-      if (nb->IsIdentifier())
-        continue;
-
-      if (method->GetName() == nb->GetName()) {
-        if (nb->IsFunction()) {
-          if (!hit_self)
-            hit_self = true;
-          else
-            mLog.Duplicate("Function Decl Duplication! ", method, nb);
-        } else {
-          mLog.Duplicate("Function Decl Duplication! ", method, nb);
-        }
-      }
-    }
-
-    // step 2. verify functioin.
-    VerifyFunction(method);
-  }
-}
-
-void Verifier::VerifyClassSuperClasses(ClassNode *klass) {
-}
-
-void Verifier::VerifyClassSuperInterfaces(ClassNode *klass) {
-}
+void Verifier::VerifyClassMethods(ClassNode *klass) {}
+void Verifier::VerifyClassSuperClasses(ClassNode *klass) { }
+void Verifier::VerifyClassSuperInterfaces(ClassNode *klass) {}
 
 void Verifier::VerifyClass(ClassNode *klass){
   // Step 1. Create a new scope
