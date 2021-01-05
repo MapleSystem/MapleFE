@@ -69,13 +69,16 @@ public:
   IdentifierNode* GetId() {return mId;}
   void SetId(IdentifierNode *n) {mId = n;}
 
+  const char* GetName() {return mId->GetName();}
+
   unsigned TypeArgsNum() {return mTypeArguments.GetNum();}
   void     AddTypeArg(IdentifierNode *n) {mTypeArguments.PushBack(n);}
   void     AddTypeArgs(TreeNode *n);
 
+  bool TypeEquivalent(UserTypeNode *);
+
   void Release() {mTypeArguments.Release();}
   void Dump(unsigned);
-  const char* GetName() {return mId->GetName();}
 };
 
 ///////////////////////////////////////////////////////////////////////////////

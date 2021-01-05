@@ -14,6 +14,7 @@
 */
 
 #include "ast.h"
+#include "ast_type.h"
 #include "ast_builder.h"
 #include "parser.h"
 #include "container.h"
@@ -272,6 +273,23 @@ TreeNode* ASTTree::BuildPassNode() {
 //////////////////////////////////////////////////////////////////////////////////////
 //                               TreeNode
 //////////////////////////////////////////////////////////////////////////////////////
+
+// return true iff:
+//   both are type nodes, either UserTypeNode or PrimTypeNode, and
+//   they are type equal.
+bool TreeNode::TypeEquivalent(TreeNode *t) {
+  if (IsUserType() && t->IsUserType()) {
+    UserTypeNode *this_t = (UserTypeNode *)this;
+    UserTypeNode *that_t = (UserTypeNode *)t;
+    if (this_t->TypeEquivalent(that_t))
+      return true;
+  }
+
+  if (IsPrimType() && t->IsPrimType() && (this == t))
+    return true;
+
+  return false;
+}
 
 void TreeNode::DumpLabel(unsigned ind) {
   TreeNode *label = GetLabel();
@@ -891,8 +909,14 @@ FunctionNode::FunctionNode() {
   mIsConstructor = false;
 }
 
+// This is to tell if both FunctionNodes have same return type
+// and parameter types. So languages require Type Erasure at first, like Java.
+// Type erasure should be done earlier in language specific process.
+bool FunctionNode::OverrideEquivalent(FunctionNode *fun) {
+}
+
 // When BlockNode is added to the FunctionNode, we need further
-// cleanup, eg. clean up the PassNode.
+// cleanup, i.e. clean up the PassNode.
 void FunctionNode::CleanUp() {
   TreeNode *prev = NULL;
   TreeNode *next = NULL;

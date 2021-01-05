@@ -34,6 +34,16 @@ void UserTypeNode::AddTypeArgs(TreeNode *args) {
   }
 }
 
+// If the two UserTypeNodes are equivalent.
+bool UserTypeNode::TypeEquivalent(UserTypeNode *type) {
+  // For now, I just check the name. The name is in the global string pool,
+  // so two same names should be in the same address.
+  if (GetName() == type->GetName())
+    return true;
+  else
+    return false;
+}
+
 void UserTypeNode::Dump(unsigned ind) {
   mId->Dump(0);
   unsigned size = mTypeArguments.GetNum();

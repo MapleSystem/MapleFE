@@ -81,6 +81,7 @@ public:
 #include "ast_nk.def"
 
   bool IsScope() {return IsBlock() || IsClass() || IsFunction() || IsInterface();}
+  bool TypeEquivalent(TreeNode*);
 
   void SetParent(TreeNode *p) {mParent = p;}
   void SetLabel (TreeNode *p) {mLabel = p;}
@@ -817,9 +818,9 @@ private:
   const char                  *mName;
   SmallVector<AttrId>          mAttrs;
   SmallVector<AnnotationNode*> mAnnotations; //annotation or pragma
-  SmallVector<ExceptionNode*>  mThrows; // exceptions it can throw
-  TreeNode                    *mType;   // return type
-  SmallVector<TreeNode*>       mParams;  //
+  SmallVector<ExceptionNode*>  mThrows;      // exceptions it can throw
+  TreeNode                    *mType;        // return type
+  SmallVector<TreeNode*>       mParams;      //
   BlockNode                   *mBody;
   DimensionNode               *mDims;
   bool                         mIsConstructor;
@@ -869,6 +870,8 @@ public:
   unsigned GetNthNum(unsigned n) {return mDims->GetNthDim(n);} // 0 means unspecified.
   void     SetNthNum(unsigned n, unsigned i) {mDims->SetNthDim(n, i);}
 
+  // Override equivalent.
+  bool OverrideEquivalent(FunctionNode*);
 
   void Release() { mAttrs.Release();
                    mParams.Release();
