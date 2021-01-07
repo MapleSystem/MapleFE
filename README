@@ -35,15 +35,16 @@ Once you are done, please update the lib and include paths in MapleFE/shared/src
 
 [How to build]
 
-1. cd YOUR_PROJECT_DIR
-2. make
-3. If you are working at Java frontend, you will see build64/java/java2mpl. This is the executable
+1. source envsetup.sh
+2. make mapleall
+3. make
+4. If you are working at Java frontend, you will see build64/java/java2mpl. This is the executable
    frontend.
 
 [How to test]
 
-1. cd YOUR_PROJECT_DIR/test
+1. cd test
 2. ./runtests.pl all
 
-You can find all Java test cases in YOUR_PROJECT_DIR/test/java2mpl. Right now only java test cases
+You can find all Java test cases in test/java2mpl. Right now only java test cases
 are used.
