@@ -37,6 +37,9 @@ autogen:
 	$(MAKE) LANG=java -C autogen
 	(cd $(BUILDDIR)/autogen; ./autogen)
 
+mapleall:
+	./scripts/build_mapleall.sh
+
 test: autogen
 	$(MAKE) LANG=java -C test
 
