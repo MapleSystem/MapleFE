@@ -192,5 +192,3 @@ while
       LocalInterfaces: 
   LocalInterfaces: 
 
-Function Decl Duplication! Function:readAvailableString is duplicated with Function:readAvailableString
-Function Decl Duplication! Function:readAvailableString is duplicated with Function:readAvailableString

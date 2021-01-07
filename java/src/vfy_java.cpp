@@ -44,21 +44,12 @@ void VerifierJava::VerifyClassMethods(ClassNode *klass) {
     FunctionNode *method = klass->GetMethod(i);
     // step 1. verify the duplication
     bool hit_self = false;
-    for (unsigned j = 0; j < mCurrScope->GetDeclNum(); j++) {
-      TreeNode *nb = mCurrScope->GetDecl(j);
-      // Fields have been checked. No need here.
-      if (nb->IsIdentifier())
+    for (unsigned j = 0; j < klass->GetMethodsNum(); j++) {
+      if (j == i)
         continue;
-
-      if (method->GetName() == nb->GetName()) {
-        if (nb->IsFunction()) {
-          if (!hit_self)
-            hit_self = true;
-          else
-            mLog.Duplicate("Function Decl Duplication! ", method, nb);
-        } else {
-          mLog.Duplicate("Function Decl Duplication! ", method, nb);
-        }
+      FunctionNode *method_other = klass->GetMethod(j);
+      if (method->OverrideEquivalent(method_other)) {
+        mLog.Duplicate("ClassMethod Duplication! ", method, method_other);
       }
     }
 

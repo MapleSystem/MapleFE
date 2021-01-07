@@ -227,7 +227,5 @@ while
       LocalInterfaces: 
   LocalInterfaces: 
 
-Function Decl Duplication! Function:performTestConnectDisconnectConnect is duplicated with Function:performTestConnectDisconnectConnect
-Function Decl Duplication! Function:performTestConnectDisconnectConnect is duplicated with Function:performTestConnectDisconnectConnect
-Function Decl Duplication! Function:readAvailableString is duplicated with Function:readAvailableString
-Function Decl Duplication! Function:readAvailableString is duplicated with Function:readAvailableString
+ClassMethod Duplication! Function:performTestConnectDisconnectConnect is duplicated with Function:performTestConnectDisconnectConnect
+ClassMethod Duplication! Function:performTestConnectDisconnectConnect is duplicated with Function:performTestConnectDisconnectConnect

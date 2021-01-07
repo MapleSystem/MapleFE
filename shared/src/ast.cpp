@@ -913,6 +913,23 @@ FunctionNode::FunctionNode() {
 // and parameter types. So languages require Type Erasure at first, like Java.
 // Type erasure should be done earlier in language specific process.
 bool FunctionNode::OverrideEquivalent(FunctionNode *fun) {
+  if (!mType->TypeEquivalent(fun->GetType()))
+    return false;
+  if (GetName() != fun->GetName())
+    return false;
+  if (GetParamsNum() != fun->GetParamsNum())
+    return false;
+  for (unsigned i = 0; i < GetParamsNum(); i++) {
+    TreeNode *this_p = GetParam(i);
+    TreeNode *that_p = fun->GetParam(i);
+    MASSERT(this_p->IsIdentifier());
+    MASSERT(that_p->IsIdentifier());
+    TreeNode *this_ty = ((IdentifierNode*)this_p)->GetType();
+    TreeNode *that_ty = ((IdentifierNode*)that_p)->GetType();
+    if (!this_ty->TypeEquivalent(that_ty))
+      return false;
+  }
+  return true;
 }
 
 // When BlockNode is added to the FunctionNode, we need further

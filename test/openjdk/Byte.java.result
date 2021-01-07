@@ -93,15 +93,3 @@ class  Byte
       LocalInterfaces: 
   LocalInterfaces: 
 
-Function Decl Duplication! Function:toString is duplicated with Function:toString
-Function Decl Duplication! Function:valueOf is duplicated with Function:valueOf
-Function Decl Duplication! Function:valueOf is duplicated with Function:valueOf
-Function Decl Duplication! Function:parseByte is duplicated with Function:parseByte
-Function Decl Duplication! Function:parseByte is duplicated with Function:parseByte
-Function Decl Duplication! Function:valueOf is duplicated with Function:valueOf
-Function Decl Duplication! Function:valueOf is duplicated with Function:valueOf
-Function Decl Duplication! Function:valueOf is duplicated with Function:valueOf
-Function Decl Duplication! Function:valueOf is duplicated with Function:valueOf
-Function Decl Duplication! Function:toString is duplicated with Function:toString
-Function Decl Duplication! Function:hashCode is duplicated with Function:hashCode
-Function Decl Duplication! Function:hashCode is duplicated with Function:hashCode

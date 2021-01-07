@@ -862,6 +862,7 @@ public:
   void SetName(const char*s) {mName = s;}
 
   void SetType(TreeNode *t) {mType = t;}
+  TreeNode* GetType(){return mType;}
 
   void SetDims(DimensionNode *t) {mDims = t;}
   unsigned GetDimsNum()          {return mDims->GetDimsNum();}
