@@ -1,17 +1,16 @@
 #!/bin/bash
-#
 # Copyright (C) [2020] Futurewei Technologies, Inc. All rights reverved.
 #
-# Licensed under the Mulan Permissive Software License v2.
-# You can use this software according to the terms and conditions of the MulanPSL - 2.0.
-# You may obtain a copy of MulanPSL - 2.0 at:
+# OpenArkFE is licensed under the Mulan PSL v2.
+# You can use this software according to the terms and conditions of the Mulan PSL v2.
+# You may obtain a copy of Mulan PSL v2 at:
 #
-#   https://opensource.org/licenses/MulanPSL-2.0
+#  http://license.coscl.org.cn/MulanPSL2
 #
 # THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER
 # EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR
 # FIT FOR A PARTICULAR PURPOSE.
-# See the MulanPSL - 2.0 for more details.
+# See the Mulan PSL v2 for more details.
 #
 
 if [ ! -d $MAPLEALL_ROOT ]; then
