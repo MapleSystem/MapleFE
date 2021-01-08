@@ -43,7 +43,6 @@ void VerifierJava::VerifyClassMethods(ClassNode *klass) {
   for (unsigned i = 0; i < klass->GetMethodsNum(); i++) {
     FunctionNode *method = klass->GetMethod(i);
     // step 1. verify the duplication
-    bool hit_self = false;
     for (unsigned j = 0; j < klass->GetMethodsNum(); j++) {
       if (j == i)
         continue;
