@@ -624,9 +624,14 @@ void LiteralNode::Dump(unsigned indent) {
   case LT_BooleanLiteral:
     DUMP0_NORETURN(mData.mData.mBool);
     break;
-  case LT_CharacterLiteral:
-    DUMP0_NORETURN(mData.mData.mChar);
+  case LT_CharacterLiteral: {
+    Char the_char = mData.mData.mChar;
+    if (the_char.mIsUnicode)
+      DUMP0_NORETURN(the_char.mData.mUniValue);
+    else
+      DUMP0_NORETURN(the_char.mData.mChar);
     break;
+  }
   case LT_NullLiteral:
     DUMP0_NORETURN("null");
     break;

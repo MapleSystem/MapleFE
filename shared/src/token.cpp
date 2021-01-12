@@ -61,9 +61,14 @@ void LiteralTokenDump(LitData data) {
   case LT_BooleanLiteral:
     DUMP1("Boolean Literal Token:", data.mData.mBool);
     break;
-  case LT_CharacterLiteral:
-    DUMP1("Character Literal Token:", data.mData.mChar);
+  case LT_CharacterLiteral: {
+    Char the_char = data.mData.mChar;
+    if (the_char.mIsUnicode)
+      DUMP1("Char Literal Token(Unicode):", the_char.mData.mUniValue);
+    else
+      DUMP1("Char Literal Token:", the_char.mData.mChar);
     break;
+  }
   case LT_StringLiteral:
     DUMP1("String Literal Token:", data.mData.mStr);
     break;

@@ -132,10 +132,13 @@ bool StringToValue::StringToBool(std::string &str) {
   return b;
 }
 
-// Just take in the first char
-char StringToValue::StringToChar(std::string &str) {
-  const char *s = str.c_str();
-  return *s;
+// Just return 'c'.
+// This function should be overriden by the language implementation.
+Char StringToValue::StringToChar(std::string &str) {
+  Char ret;
+  ret.mIsUnicode = false;
+  ret.mData.mChar = 'c';
+  return ret;
 }
 
 // [NOTE] This is to handle escape character in different language.

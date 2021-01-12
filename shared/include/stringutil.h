@@ -22,6 +22,7 @@
 
 #include <string>
 #include <vector>
+#include "char.h"
 #include "massert.h"
 
 // String Hash function, borrowed from
@@ -89,7 +90,7 @@ public:
   float  StringToFloat(std::string &);
   double StringToDouble(std::string &);
   bool   StringToBool(std::string &);
-  char   StringToChar(std::string &);
+  Char   StringToChar(std::string &);
   const char*   StringToString(std::string &);
   bool   StringIsNull(std::string &);
 };

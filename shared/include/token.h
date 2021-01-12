@@ -31,6 +31,7 @@
 #define __Token_H__
 
 #include <vector>
+#include "char.h"
 #include "stringutil.h"
 #include "supported.h"
 
@@ -44,11 +45,15 @@ typedef enum {
   TT_NA     // N.A.
 }TK_Type;
 
-// One of the concern here is we are using c++ type to store java
-// data which could mess the precision. Need look into it in the future.
-// Possibly will keep the text string of literal and let compiler to decide.
+// There are quite a few concerns regarding literals.
 //
-// We also treat 'this' and NULL/null as a literal, see supported_literals.def
+// 1. One of the concern here is we are using c++ type to store java
+//    data which could mess the precision. Need look into it in the future.
+//    Possibly will keep the text string of literal and let compiler to decide.
+// 2. We also treat 'this' and NULL/null as a literal, see supported_literals.def
+// 3. About character literal. We separate unicode character literal from normal
+//    Raw Input character.
+
 struct LitData {
   LitId mType;
   union {
@@ -56,11 +61,9 @@ struct LitData {
     float  mFloat;
     double mDouble;
     bool   mBool;
-    char   mChar;
+    Char   mChar;
     char  *mStr;     // the string is allocated in gStringPool
   }mData;
-
-  //LitData(LitId t) : mType(t) {}
 };
 
 struct Token {

@@ -12,11 +12,9 @@
 # See the Mulan PSL v2 for more details.
 #
 
-# This file defines reserved rule elements.
-#
-# If a rule is without content, then it is like reserved keyword which
-# autogen understand.
-#
+##############################################################################
+#                 This file defines reserved rule elements.                  #
+##############################################################################
 
 # CHAR refers to the 26 letters in autogen
 rule CHAR  : ONEOF('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z', 'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z')
@@ -38,3 +36,5 @@ rule ASCII : ONEOF(' ', '!', '#', '$', '%', ''', '&', '(', ')', '*', '+', ',', '
 # About the handling of escape character in autogen, xx_gen.cpp/h, and stringutil.cpp
 # please refer to the comments in StringToValue::StringToString() in stringutil.cpp
 rule ESCAPE : ONEOF('\' + 'b', '\' + 't', '\' + 'n', '\' + 'f', '\' + 'r', '\' + '"', '\' + ''', '\' + '\')
+
+rule HEXDIGIT : ONEOF(DIGIT, 'a', 'b', 'c', 'd', 'e', 'f', 'A', 'B', 'C', 'D', 'E', 'F')

@@ -31,9 +31,67 @@ double StringToValueImpl::StringToDouble(std::string &s) {
 }
 
 bool   StringToValueImpl::StringToBool(std::string &s) {return false;}
-char   StringToValueImpl::StringToChar(std::string &s) {return 'c';}
 bool   StringToValueImpl::StringIsNull(std::string &s) {return false;}
 
+static char DeEscape(char c) {
+  switch(c) {
+  case 'b':
+    return '\b';
+  case 't':
+    return '\t';
+  case 'n':
+    return '\n';
+  case 'f':
+    return '\f';
+  case 'r':
+    return '\r';
+  case '"':
+    return '\"';
+  case '\'':
+    return '\'';
+  case '\\':
+    return '\\';
+  case '0':
+    return '\0';
+  default:
+    MERROR("Unsupported in DeEscape().");
+  }
+}
+
+static char2int(char c) {
+  if (c >= '0' && c <= '9')
+    return c - '0';
+  else if (c >= 'a' && c <= 'f')
+    return c - 'a' + 10;
+  else if (c >= 'A' && c <= 'F')
+    return c - 'A' + 10;
+  else
+    MERROR("Unsupported char in char2int().");
+}
+
+Char StringToValueImpl::StringToChar(std::string &s) {
+  Char ret_char;
+  ret_char.mIsUnicode = false;
+  MASSERT (s[0] == '\'');
+  if (s[1] == '\\') {
+    if (s[2] == 'u') {
+      ret_char.mIsUnicode = true;
+      int first = char2int(s[3]);
+      int second = char2int(s[4]);
+      int third = char2int(s[5]);
+      int forth = char2int(s[6]);
+      MASSERT(s[7] == '\'');
+      ret_char.mData.mUniValue = (first << 12) + (second << 8)
+                               + (third << 4) + forth;
+    } else {
+      ret_char.mData.mChar = DeEscape(s[2]);
+    }
+  } else {
+    MASSERT(s[2] == '\'');
+    ret_char.mData.mChar = s[1];
+  }
+  return ret_char;
+}
 
 // Each language has its own format of literal. So this function handles Java literals.
 // It translate a string into a literal.
@@ -74,7 +132,7 @@ LitData ProcessLiteral(LitId id, const char *str) {
     data.mData.mBool = b;
     break; }
   case LT_CharacterLiteral: {
-    char c = s2v.StringToChar(value_text);
+    Char c = s2v.StringToChar(value_text);
     data.mType = LT_CharacterLiteral;
     data.mData.mChar = c;
     break; }

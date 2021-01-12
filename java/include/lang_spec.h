@@ -27,7 +27,7 @@ public:
   float  StringToFloat(std::string &s);
   double StringToDouble(std::string &s);
   bool   StringToBool(std::string &s);
-  char   StringToChar(std::string &s);
+  Char   StringToChar(std::string &s);
   bool   StringIsNull(std::string &s);
 };
 

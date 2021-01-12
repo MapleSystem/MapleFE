@@ -116,15 +116,22 @@ rule BooleanLiteral : ONEOF ("true", "false")
 ##                           Character                                 ##
 ## ESCAPE is a reserved rule in reserved.spec.                         ##
 #########################################################################
+
+# I decided to simplify the unicode escape a little bit. I don't want to
+# handle all odd cases.
+rule UnicodeEscape: '\' + 'u' + HEXDIGIT + HEXDIGIT + HEXDIGIT + HEXDIGIT
+rule RawInputCharacter : ONEOF(ASCII, ESCAPE)
+rule SingleCharacter: ONEOF(UnicodeEscape, RawInputCharacter)
+
 rule OctalEscape : ONEOF('\' + '0', '\' + '1')
 rule EscapeSequence : ONEOF(ESCAPE, OctalEscape)
-rule CharacterLiteral : ''' + ONEOF(CHAR, DIGIT, EscapeSequence) + '''
+
+rule CharacterLiteral : ''' + ONEOF(SingleCharacter, EscapeSequence) + '''
 
 #########################################################################
 ##                           String                                    ##
 #########################################################################
-rule StringChar : ONEOF(ASCII, ESCAPE)
-rule StringLiteral : '"' + ZEROORMORE(StringChar) + '"'
+rule StringLiteral : '"' + ZEROORMORE(RawInputCharacter) + '"'
 
 #########################################################################
 ##                           Null                                      ##
