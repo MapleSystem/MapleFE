@@ -13,7 +13,7 @@
 # 
 
 include ../../Makefile.in
-BUILD=$(ROOTDIR)/$(BUILDDIR)/shared
+BUILD=$(BUILDDIR)/shared
 $(shell $(MKDIR_P) $(BUILD))
 
 SRC=$(wildcard *.cpp)
@@ -24,25 +24,17 @@ OBJS :=$(foreach obj,$(OBJ), $(BUILD)/$(obj))
 LIBOBJS :=$(patsubst $(BUILD)/main.o,,$(OBJS))
 DEPS :=$(foreach dep,$(DEP), $(BUILD)/$(dep))
 
-MAPLEROOT=~/mapleall
-MAPLEALL=$(MAPLEROOT)/mapleall
-MAPLELIBPATH:=$(MAPLEROOT)/out/arm64-clang-debug/lib/64
-#MAPLELIBS := $(MAPLELIBPATH)/libmplir.a \
-#             $(MAPLELIBPATH)/liboption_parser.a \
-#             $(MAPLELIBPATH)/liblibmpl2mpl.a \
-#             $(MAPLELIBPATH)/libmplutil.a \
-#             $(MAPLELIBPATH)/libmempool.a \
-#             $(MAPLELIBPATH)/libHWSecureC.a
+MAPLELIBPATH:=$(MAPLEALL_ROOT)/out/aarch64-clang-debug/lib/64
+MAPLELIBS := -L $(MAPLELIBPATH) -lmplir -loption_parser -lmpl2mpl -lmplutil -lmempool -lHWSecureC
 
-HUAWEI_SECUEW_C_ROOT=$(MAPLEROOT)/huawei_secure_c
-INCLUDES := -I $(ROOTDIR)/shared/include \
-            -I $(ROOTDIR)/$(LANG)/include \
+INCLUDES := -I $(MAPLEFE_ROOT)/shared/include \
+            -I $(MAPLEFE_ROOT)/$(LANG)/include \
             -I . \
-            -I $(MAPLEALL)/maple_ir/include \
-            -I $(MAPLEALL)/mpl2mpl/include \
-            -I $(MAPLEALL)/mempool/include \
-            -I $(MAPLEALL)/maple_util/include \
-            -I $(HUAWEI_SECUEW_C_ROOT)/include
+            -I $(MAPLEALL_SRC)/maple_ir/include \
+            -I $(MAPLEALL_SRC)/mpl2mpl/include \
+            -I $(MAPLEALL_SRC)/mempool/include \
+            -I $(MAPLEALL_SRC)/maple_util/include \
+            -I $(MAPLEALL_ROOT)/huawei_secure_c/include
 
 SHAREDLIB = shared.a
 
@@ -65,8 +57,8 @@ $(BUILD)/%.d : %.cpp
 	@sed -e 's|.*:|$(BUILD)/$*.o:|' < $(BUILD)/$*.d.tmp > $(BUILD)/$*.d
 	@rm -f $(BUILD)/$*.d.tmp
 
-$(SHAREDLIB) : $(OBJS) $(MAPLELIBS)
-	/usr/bin/ar rcs $(BUILD)/$(SHAREDLIB) $(LIBOBJS) $(MAPLELIBS)
+$(SHAREDLIB) : $(OBJS)
+	/usr/bin/ar rcs $(BUILD)/$(SHAREDLIB) $(LIBOBJS)
 
 clean:
 	rm -rf $(BUILD)

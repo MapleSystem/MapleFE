@@ -26,7 +26,7 @@ p:
 	$(MAKE) -C ../test p
 
 clean:
-	rm -rf $(ROOTDIR)/$(BUILDDIR)/autogen
+	rm -rf $(BUILDDIR)/autogen
 
 .PHONY: $(TARGS)
 

@@ -19,8 +19,8 @@
 #
 # eg. ./build.sh java
 
-rm -rf ../build64/recdetect
-rm -rf ../build64/recdetect/$1
+rm -rf $BUILDDIR/recdetect
+rm -rf $BUILDDIR/recdetect/$1
 
 rm -rf $1
 mkdir -p $1
@@ -34,6 +34,6 @@ rm $1/gen_recursion.cpp
 rm $1/gen_lookahead.h
 rm $1/gen_lookahead.cpp
 
-mkdir -p ../build64/recdetect
-mkdir -p ../build64/recdetect/$1
+mkdir -p $BUILDDIR/recdetect
+mkdir -p $BUILDDIR/recdetect/$1
 make LANG=$1

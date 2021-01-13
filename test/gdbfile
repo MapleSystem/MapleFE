@@ -1,4 +1,4 @@
-file ../build64java/java2mpl
+file $BUILDDIR/java/java2mpl
 set args t1.java
 b main
 r

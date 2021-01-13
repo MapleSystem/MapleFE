@@ -20,7 +20,7 @@ $(TARGS):
 	$(MAKE) -C src
 
 clean:
-	rm -rf $(ROOTDIR)/$(BUILDDIR)/java
+	rm -rf $(BUILDDIR)/java
 
 .PHONY: $(TARGS)
 

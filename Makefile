@@ -43,6 +43,9 @@ mapleall:
 test: autogen
 	$(MAKE) LANG=java -C test
 
+testall:
+	(cd test; ./runtests.pl all)
+
 clean:
 	rm -rf $(BUILDDIR)
 

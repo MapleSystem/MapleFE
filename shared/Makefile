@@ -4,7 +4,7 @@ all:
 	$(MAKE) -C src
 
 clean:
-	rm -rf $(ROOTDIR)/$(BUILDDIR)/shared
+	rm -rf $(MAPLEFE_ROOT)/$(BUILDDIR)/shared
 
 test:
 	$(MAKE) -C ../test p

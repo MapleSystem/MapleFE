@@ -1,7 +1,7 @@
 #! /bin/bash
 DIR=`pwd | sed "s/MapleFE.*/MapleFE/"`
 echo DIR=${DIR}
-cd ${DIR}/build64/autogen
+cd $BUILDDIR/autogen
 
 #test t.java
 echo testing ... t.java

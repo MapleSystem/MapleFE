@@ -97,31 +97,31 @@ foreach my $dir (@dirname) {
 #print "here15 dir $dir\n";
 #print "here16 src_file $src_file\n";
         if ($dir eq "java2mpl") {
-          $res = system("cd $pwd/..; build64/java/java2mpl $outdir/$src_file > $outdir/$result_file");
+          $res = system("cd $pwd/..; output/java/java2mpl $outdir/$src_file > $outdir/$result_file");
         }
         if ($dir eq "errtest") {
-          $res = system("cd $pwd/..; build64/java/java2mpl $outdir/$src_file > $outdir/$result_file");
+          $res = system("cd $pwd/..; output/java/java2mpl $outdir/$src_file > $outdir/$result_file");
         }
         if ($dir eq "others") {
-          $res = system("cd $pwd/..; build64/java/java2mpl $outdir/$src_file > $outdir/$result_file");
+          $res = system("cd $pwd/..; output/java/java2mpl $outdir/$src_file > $outdir/$result_file");
         }
         if ($dir eq "openjdk") {
-          $res = system("cd $pwd/..; build64/java/java2mpl $outdir/$src_file > $outdir/$result_file");
+          $res = system("cd $pwd/..; output/java/java2mpl $outdir/$src_file > $outdir/$result_file");
         }
         
         if ($res > 0) {
 #print "over here1...\n";
           if ($dir eq "java2mpl") { 
-            print "$pwd/../build64/java/java2mpl $outdir/$src_file\n";
+            print "$pwd/../output/java/java2mpl $outdir/$src_file\n";
           }
           if ($dir eq "errtest") { 
-            print "$pwd/../build64/java/java2mpl $outdir/$src_file\n";
+            print "$pwd/../output/java/java2mpl $outdir/$src_file\n";
           }
           if ($dir eq "others") {
-            print "$pwd/../build64/java/java2mpl $outdir/$src_file\n";
+            print "$pwd/../output/java/java2mpl $outdir/$src_file\n";
           }
           if ($dir eq "openjdk") {
-            print "$pwd/../build64/java/java2mpl $outdir/$src_file\n";
+            print "$pwd/../output/java/java2mpl $outdir/$src_file\n";
           }
           print " ==$dir===> $file\n";
           $countfailedjava ++;

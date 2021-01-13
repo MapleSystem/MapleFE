@@ -75,9 +75,9 @@ while( ($srcdir = readdir(DIR))){
 #print "here6 src_file $src_file\n";
 
       system("cp $src_file $outdir/$src_file");
-      $res = system("cd $pwd/..; build64/java/java2mpl $outdir/$src_file > $outdir/$java2mpl_result_file");
+      $res = system("cd $pwd/..; $BUILDDIR/java/java2mpl $outdir/$src_file > $outdir/$java2mpl_result_file");
       if ($res > 0) {
-        print "\ngdb --args ../build64/java/java2mpl $outdir/$src_file\n";
+        print "\ngdb --args $BUILDDIR/java/java2mpl $outdir/$src_file\n";
         print " ==java2mpl===> $file\n\n";
         $countJAVA2MPL ++;
         push(@failed_java2mpl_file, $file);

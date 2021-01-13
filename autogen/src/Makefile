@@ -1,7 +1,7 @@
 include ../../Makefile.in
 
 # create build first
-BUILD=$(ROOTDIR)/$(BUILDDIR)/autogen
+BUILD=$(BUILDDIR)/autogen
 $(shell $(MKDIR_P) $(BUILD))
 
 SHAREDSRC := token.cpp mempool.cpp stringmap.cpp stringpool.cpp write2file.cpp
@@ -13,7 +13,7 @@ OBJS := $(foreach obj, $(OBJ), $(BUILD)/$(obj))
 LIBOBJS :=$(patsubst $(BUILD)/main.o,,$(OBJS))
 DEPS := $(foreach dep, $(DEP), $(BUILD)/$(dep))
 
-INCLUDES := -I $(ROOTDIR)/autogen/include -I $(ROOTDIR)/shared/include -I $(ROOTDIR)/java/include
+INCLUDES := -I $(MAPLEFE_ROOT)/autogen/include -I $(MAPLEFE_ROOT)/shared/include -I $(MAPLEFE_ROOT)/java/include
 
 TARGET = autogen
 
@@ -25,17 +25,17 @@ all: $(TARGET)
 
 $(TARGET) : $(AUTOGENLIB)
 	$(LD) -o $(BUILD)/$(TARGET) $(BUILD)/main.o $(BUILD)/$(AUTOGENLIB)
-	@ln -sf $(ROOTDIR)/java/identifier.spec $(BUILD)/identifier.spec
-	@ln -sf $(ROOTDIR)/java/literal.spec $(BUILD)/literal.spec
-	@ln -sf $(ROOTDIR)/java/operator.spec $(BUILD)/operator.spec
-	@ln -sf $(ROOTDIR)/java/separator.spec $(BUILD)/separator.spec
-	@ln -sf $(ROOTDIR)/java/keyword.spec $(BUILD)/keyword.spec
-	@ln -sf $(ROOTDIR)/java/type.spec $(BUILD)/type.spec
-	@ln -sf $(ROOTDIR)/java/attr.spec $(BUILD)/attr.spec
-	@ln -sf $(ROOTDIR)/java/block.spec $(BUILD)/block.spec
-	@ln -sf $(ROOTDIR)/java/expr.spec $(BUILD)/expr.spec
-	@ln -sf $(ROOTDIR)/java/stmt.spec $(BUILD)/stmt.spec
-	@ln -sf $(ROOTDIR)/autogen/reserved.spec $(BUILD)/reserved.spec
+	@ln -sf $(MAPLEFE_ROOT)/java/identifier.spec $(BUILD)/identifier.spec
+	@ln -sf $(MAPLEFE_ROOT)/java/literal.spec $(BUILD)/literal.spec
+	@ln -sf $(MAPLEFE_ROOT)/java/operator.spec $(BUILD)/operator.spec
+	@ln -sf $(MAPLEFE_ROOT)/java/separator.spec $(BUILD)/separator.spec
+	@ln -sf $(MAPLEFE_ROOT)/java/keyword.spec $(BUILD)/keyword.spec
+	@ln -sf $(MAPLEFE_ROOT)/java/type.spec $(BUILD)/type.spec
+	@ln -sf $(MAPLEFE_ROOT)/java/attr.spec $(BUILD)/attr.spec
+	@ln -sf $(MAPLEFE_ROOT)/java/block.spec $(BUILD)/block.spec
+	@ln -sf $(MAPLEFE_ROOT)/java/expr.spec $(BUILD)/expr.spec
+	@ln -sf $(MAPLEFE_ROOT)/java/stmt.spec $(BUILD)/stmt.spec
+	@ln -sf $(MAPLEFE_ROOT)/autogen/reserved.spec $(BUILD)/reserved.spec
 
 $(AUTOGENLIB) : $(OBJS)
 	/usr/bin/ar rcs $(BUILD)/$(AUTOGENLIB) $(LIBOBJS)
@@ -43,7 +43,7 @@ $(AUTOGENLIB) : $(OBJS)
 -include $(DEPS)
 .PHONY: clean
 
-vpath %.cpp $(ROOTDIR)/shared/src
+vpath %.cpp $(MAPLEFE_ROOT)/shared/src
 vpath %.o $(BUILD)
 vpath %.d $(BUILD)
 

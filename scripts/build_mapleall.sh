@@ -19,6 +19,8 @@ if [ ! -d $MAPLEALL_ROOT ]; then
 fi
 
 cd $MAPLEALL_ROOT
+git pull
 source envsetup.sh arm debug
-(cd tools; ./setup_tools.sh)
-make && make install
+make setup
+make
+make install

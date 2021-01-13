@@ -13,7 +13,7 @@
 #
 
 include ../../Makefile.in
-BUILD=$(ROOTDIR)/$(BUILDDIR)/java
+BUILD=$(BUILDDIR)/java
 $(shell $(MKDIR_P) $(BUILD))
 
 SRC=$(wildcard *.cpp)
@@ -23,16 +23,16 @@ DEP :=$(patsubst %.cpp,%.d,$(SRC))
 OBJS :=$(foreach obj,$(OBJ), $(BUILD)/$(obj))
 DEPS :=$(foreach dep,$(DEP), $(BUILD)/$(dep))
 
-INCLUDES := -I $(ROOTDIR)/shared/include \
-            -I $(ROOTDIR)/java/include \
-            -I $(ROOTDIR)/autogen/include \
+INCLUDES := -I $(MAPLEFE_ROOT)/shared/include \
+            -I $(MAPLEFE_ROOT)/java/include \
+            -I $(MAPLEFE_ROOT)/autogen/include \
             -I .
 
 TARGET=java2mpl
 
-SHAREDLIB = $(ROOTDIR)/$(BUILDDIR)/shared/shared.a
+SHAREDLIB = $(BUILDDIR)/shared/shared.a
 
-.PHONY: all
+.PHONY: all $(TARGET)
 all: $(TARGET)
 
 -include $(DEPS)
@@ -52,9 +52,9 @@ $(BUILD)/%.d : %.cpp
 	@rm -f $(BUILD)/$*.d.tmp
 
 # TARGET depends on OBJS and shared OBJS from shared directory
-#
+# as well as mapleall libraries
 $(TARGET): $(OBJS) $(SHAREDLIB)
-	$(LD) -o $(BUILD)/$(TARGET) $(OBJS) $(SHAREDLIB)
+	$(LD) -o $(BUILD)/$(TARGET) $(OBJS) $(SHAREDLIB) $(MAPLELIBS)
 
 #.cpp.o:
 #	$(CXX) $(CXXFLAGS) -fpermissive $(INCLUDES) -w -c $*.cpp -o $(BUILD)/$*.o

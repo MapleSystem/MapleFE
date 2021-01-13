@@ -1,7 +1,7 @@
 include ../Makefile.in
 
 # create build first
-BUILD=$(ROOTDIR)/$(BUILDDIR)/recdetect
+BUILD=$(BUILDDIR)/recdetect
 $(shell $(MKDIR_P) $(BUILD))
 
 # TEMPVAR=$(shell rm -rf $(LANG))
@@ -19,10 +19,10 @@ DEP := $(patsubst %.cpp, %.d, $(SRC))
 OBJS := $(foreach obj, $(OBJ), $(BUILD)/$(obj))
 DEPS := $(foreach dep, $(DEP), $(BUILD)/$(dep))
 
-INCLUDES := -I $(ROOTDIR)/recdetect/include \
-            -I $(ROOTDIR)/recdetect/$(LANG) \
-            -I $(ROOTDIR)/shared/include
-SHAREDLIB = $(ROOTDIR)/$(BUILDDIR)/shared/shared.a
+INCLUDES := -I $(MAPLEFE_ROOT)/recdetect/include \
+            -I $(MAPLEFE_ROOT)/recdetect/$(LANG) \
+            -I $(MAPLEFE_ROOT)/shared/include
+SHAREDLIB = $(BUILDDIR)/shared/shared.a
 
 TARGET = recdetect
 
@@ -36,7 +36,7 @@ $(TARGET) : $(OBJS) $(SHAREDLIB)
 -include $(DEPS)
 .PHONY: clean
 
-vpath %.cpp $(ROOTDIR)/shared/src
+vpath %.cpp $(MAPLEFE_ROOT)/shared/src
 vpath %.o $(BUILD)
 vpath %.d $(BUILD)
 

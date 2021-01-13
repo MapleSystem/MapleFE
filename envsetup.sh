@@ -38,3 +38,6 @@ export MAPLEALL_ROOT=${MAPLE_ROOT}/mapleall
 
 unset MAPLEALL_SRC
 export MAPLEALL_SRC=${MAPLEALL_ROOT}/mapleall
+
+unset BUILDDIR
+export BUILDDIR=${MAPLEFE_ROOT}/output
