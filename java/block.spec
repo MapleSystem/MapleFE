@@ -257,6 +257,8 @@ rule ConstantModifier : ONEOF(Annotation, ConstantAttr)
   attr.property : Single
 
 rule InterfaceMethodDeclaration : ZEROORMORE(InterfaceMethodModifier) + MethodHeader + MethodBody
+  attr.action: AddModifierTo(%2, %1)
+  attr.action: AddFunctionBodyTo(%2, %3)
 rule InterfaceMethodAttr : ONEOF("public", "abstract", "default", "static", "strictfp")
   attr.property : Single
 rule InterfaceMethodModifier : ONEOF(Annotation, InterfaceMethodAttr)
