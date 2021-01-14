@@ -337,7 +337,7 @@ public:
 
 // I put 256 as the biggest number. For all the code I've see it should be ok.
 // If someday someone has a 'stack smashing' error, please check this.
-#define MAX_SUCC_TOKENS 256
+#define MAX_SUCC_TOKENS 1024
 extern unsigned gSuccTokensNum;
 extern unsigned gSuccTokens[MAX_SUCC_TOKENS];
 

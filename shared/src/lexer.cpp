@@ -324,7 +324,10 @@ bool Lexer::GetComment() {
     // the while loop stops only at either (1) end of file (2) finding */
     while (1) {
       if (curidx == current_line_size) {
-        if (ReadALine() < 0)
+        int len = ReadALine();
+        while (len == 0)
+          len = ReadALine();
+        if (len < 0)
           return true;
         _linenum++;  // a new line read.
       }
