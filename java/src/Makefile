@@ -26,7 +26,7 @@ DEPS :=$(foreach dep,$(DEP), $(BUILD)/$(dep))
 INCLUDES := -I $(MAPLEFE_ROOT)/shared/include \
             -I $(MAPLEFE_ROOT)/java/include \
             -I $(MAPLEFE_ROOT)/autogen/include \
-            -I .
+            -I . $(MAPLEALL_INC)
 
 TARGET=java2mpl
 

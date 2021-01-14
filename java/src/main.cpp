@@ -18,6 +18,7 @@
 #include "ruletable_util.h"
 #include "gen_summary.h"
 #include "vfy_java.h"
+#include "ast2mpl.h"
 
 static void help() {
   std::cout << "java2mpl sourcefile [options]:\n" << std::endl;
@@ -79,7 +80,13 @@ int main (int argc, char *argv[]) {
   VerifierJava vfy_java;
   vfy_java.Do();
 
+  A2M *a2m = new A2M(gModule.mFileName);
+  a2m->ProcessAST();
+
+  //a2m->mMirModule->OutputAsciiMpl("", ".mpl");
+
   delete parser;
+  delete a2m;
 
   return 0;
 }

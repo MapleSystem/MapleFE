@@ -8,3 +8,12 @@ CXXFLAGS = -O0 -g3 -Wall -std=c++11 -DDEBUG
 LFLAGS=-std=c++11
 
 MKDIR_P = mkdir -p
+
+MAPLELIBPATH:=$(MAPLEALL_ROOT)/out/aarch64-clang-debug/lib/64
+MAPLELIBS := -L $(MAPLELIBPATH) -lmplir -loption_parser -lmpl2mpl -lmplutil -lmempool -lHWSecureC
+
+MAPLEALL_INC = -I $(MAPLEALL_SRC)/maple_ir/include \
+							 -I $(MAPLEALL_SRC)/mpl2mpl/include \
+							 -I $(MAPLEALL_SRC)/mempool/include \
+							 -I $(MAPLEALL_SRC)/maple_util/include \
+							 -I $(MAPLEALL_ROOT)/huawei_secure_c/include

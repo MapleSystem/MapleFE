@@ -20,14 +20,19 @@
 #ifndef __AST2MPL_HEADER__
 #define __AST2MPL_HEADER__
 
-//#include "mir_builder.h"
-//
-//class A2M {
-//private:
-//  const char      *mFileName;
-//  maple::MIRModule mMirModule;
-//public:
-//  A2M() : mFileName
-//};
+#include "ast_module.h"
+#include "ast.h"
+
+#include "mir_module.h"
+#include "mir_builder.h"
+
+class A2M {
+private:
+  const char       *mFileName;
+public:
+  maple::MIRModule *mMirModule;
+  A2M(const char *filename);
+  void ProcessAST();
+};
 
 #endif

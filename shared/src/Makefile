@@ -24,17 +24,9 @@ OBJS :=$(foreach obj,$(OBJ), $(BUILD)/$(obj))
 LIBOBJS :=$(patsubst $(BUILD)/main.o,,$(OBJS))
 DEPS :=$(foreach dep,$(DEP), $(BUILD)/$(dep))
 
-MAPLELIBPATH:=$(MAPLEALL_ROOT)/out/aarch64-clang-debug/lib/64
-MAPLELIBS := -L $(MAPLELIBPATH) -lmplir -loption_parser -lmpl2mpl -lmplutil -lmempool -lHWSecureC
-
 INCLUDES := -I $(MAPLEFE_ROOT)/shared/include \
             -I $(MAPLEFE_ROOT)/$(LANG)/include \
-            -I . \
-            -I $(MAPLEALL_SRC)/maple_ir/include \
-            -I $(MAPLEALL_SRC)/mpl2mpl/include \
-            -I $(MAPLEALL_SRC)/mempool/include \
-            -I $(MAPLEALL_SRC)/maple_util/include \
-            -I $(MAPLEALL_ROOT)/huawei_secure_c/include
+            -I . $(MAPLEALL_INC)
 
 SHAREDLIB = shared.a
 
