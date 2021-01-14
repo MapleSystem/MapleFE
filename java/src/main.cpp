@@ -34,7 +34,7 @@ static void help() {
   std::cout << "   --trace-ast-build : Trace AST Builder" << std::endl;
   std::cout << "   --trace-patch-was-succ : Trace Patching of WasSucc nodes" << std::endl;
   std::cout << "   --trace-warning   : Print Warning" << std::endl;
-  std::cout << "   --verbose         : Verbose" << std::endl;
+  std::cout << "   --trace-a2m       : Trace MPL Builder" << std::endl;
 }
 
 int main (int argc, char *argv[]) {
@@ -45,7 +45,7 @@ int main (int argc, char *argv[]) {
 
   Parser *parser = new Parser(argv[1]);
 
-  bool verbose = false;
+  bool trace_a2m = false;
 
   // Parse the argument
   for (unsigned i = 2; i < argc; i++) {
@@ -71,8 +71,8 @@ int main (int argc, char *argv[]) {
       parser->mTracePatchWasSucc = true;
     } else if (!strncmp(argv[i], "--trace-warning", 15) && (strlen(argv[i]) == 15)) {
       parser->mTraceWarning = true;
-    } else if (!strncmp(argv[i], "--verbose", 9) && (strlen(argv[i]) == 9)) {
-      verbose = true;
+    } else if (!strncmp(argv[i], "--trace-a2m", 11) && (strlen(argv[i]) == 11)) {
+      trace_a2m = true;
     } else {
       std::cerr << "unknown option " << argv[i] << std::endl;
       exit(-1);
@@ -86,7 +86,7 @@ int main (int argc, char *argv[]) {
   vfy_java.Do();
 
   A2M *a2m = new A2M(gModule.mFileName);
-  a2m->ProcessAST(verbose);
+  a2m->ProcessAST(trace_a2m);
 
   //a2m->mMirModule->OutputAsciiMpl("", ".mpl");
 

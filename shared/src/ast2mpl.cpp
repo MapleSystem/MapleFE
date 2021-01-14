@@ -37,11 +37,11 @@ A2M::A2M(const char *filename) : mFileName(filename) {
   mMirModule = &mod;
 }
 
-void A2M::ProcessAST(bool verbose) {
-  mVerbose = verbose;
-  if (mVerbose) std::cout << "============= in ProcessAST ===========" << std::endl;
+void A2M::ProcessAST(bool trace_a2m) {
+  mTraceA2m = trace_a2m;
+  if (mTraceA2m) std::cout << "============= in ProcessAST ===========" << std::endl;
   for(auto it: gModule.mTrees) {
-    if (mVerbose) it->Dump(0);
+    if (mTraceA2m) it->Dump(0);
     TreeNode *tnode = it->mRootNode;
     switch (tnode->GetKind()) {
 #undef  NODEKIND

@@ -15,7 +15,7 @@
 
 #include "ast2mpl.h"
 
-#define NOTYETIMPL(K) { if (mVerbose) { MNYI(K); }}
+#define NOTYETIMPL(K) { if (mTraceA2m) { MNYI(K); }}
 
 void A2M::ProcessPackage(TreeNode *tnode) {
   NOTYETIMPL("ProcessPackage()");
