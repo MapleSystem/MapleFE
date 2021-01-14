@@ -14,15 +14,41 @@
 */
 
 #include "ast2mpl.h"
+#include "mir_function.h"
+#include "constant_fold.h"
 
-A2M::A2M(const char *filename) : mFileName(filename) {
-  // maple::MIRModule mod(mFileName);
-  // mMirModule = &mod;
+bool ConstantFoldModule(maple::MIRModule *module) {
+  maple::ConstantFold cf(module);
+  MapleVector<maple::MIRFunction *> &funcList = module->functionList;
+  for (MapleVector<maple::MIRFunction *>::iterator it = funcList.begin(); it != funcList.end(); it++) {
+    maple::MIRFunction *curfun = *it;
+    maple::BlockNode *block = curfun->body;
+    module->SetCurFunction(curfun);
+    if (!block) {
+      continue;
+    }
+    cf.Simplify(block);
+  }
+  return true;
 }
 
-void A2M::ProcessAST() {
-  //std::cout << "============= Dump AST in ProcessAST ===========" << std::endl;
+A2M::A2M(const char *filename) : mFileName(filename) {
+  maple::MIRModule mod(mFileName);
+  mMirModule = &mod;
+}
+
+void A2M::ProcessAST(bool verbose) {
+  mVerbose = verbose;
+  if (mVerbose) std::cout << "============= in ProcessAST ===========" << std::endl;
   for(auto it: gModule.mTrees) {
-  //  it->Dump(0);
+    if (mVerbose) it->Dump(0);
+    TreeNode *tnode = it->mRootNode;
+    switch (tnode->GetKind()) {
+#undef  NODEKIND
+#define NODEKIND(K) case NK_##K: Process##K(tnode); break;
+#include "ast_nk.def"
+      default:
+       break;
+    }
   }
 }

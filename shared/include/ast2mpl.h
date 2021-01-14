@@ -28,11 +28,17 @@
 
 class A2M {
 private:
-  const char       *mFileName;
+  const char *mFileName;
+  bool mVerbose;
 public:
   maple::MIRModule *mMirModule;
   A2M(const char *filename);
-  void ProcessAST();
+  void ProcessAST(bool verbose);
+
+#undef  NODEKIND
+#define NODEKIND(K) void Process##K(TreeNode *);
+#include "ast_nk.def"
+
 };
 
 #endif

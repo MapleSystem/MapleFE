@@ -83,6 +83,7 @@ public:
   bool IsScope() {return IsBlock() || IsClass() || IsFunction() || IsInterface();}
   bool TypeEquivalent(TreeNode*);
 
+  NodeKind GetKind() {return mKind;}
   void SetParent(TreeNode *p) {mParent = p;}
   void SetLabel (TreeNode *p) {mLabel = p;}
   TreeNode* GetParent() {return mParent;}
