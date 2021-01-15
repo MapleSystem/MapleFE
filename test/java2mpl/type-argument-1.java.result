@@ -1,0 +1,12 @@
+Matched 14 tokens.
+============= Module ===========
+== Sub Tree ==
+class  A
+  Fields: 
+    m=new HM
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
