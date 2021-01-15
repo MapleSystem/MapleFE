@@ -442,7 +442,23 @@ bool Parser::ParseStmt() {
       gettimeofday(&start, NULL);
 
     PatchWasSucc(mRootNode->mSortedChildren[0]);
+    if (mTraceTiming) {
+      gettimeofday(&stop, NULL);
+      std::cout << "PatchWasSucc Time: " << (stop.tv_sec - start.tv_sec) * 1000000 + stop.tv_usec - start.tv_usec;
+      std::cout << " us" << std::endl;
+    }
+
+    if (mTraceTiming)
+      gettimeofday(&start, NULL);
     SimplifySortedTree();
+    if (mTraceTiming) {
+      gettimeofday(&stop, NULL);
+      std::cout << "Simplify Time: " << (stop.tv_sec - start.tv_sec) * 1000000 + stop.tv_usec - start.tv_usec;
+      std::cout << " us" << std::endl;
+    }
+
+    if (mTraceTiming)
+      gettimeofday(&start, NULL);
     ASTTree *tree = BuildAST();
     if (tree) {
       gModule.AddTree(tree);
@@ -1885,15 +1901,6 @@ void Parser::DumpSortOutNode(AppealNode *n) {
 
 // A appealnode is popped out and create tree node if and only if all its
 // children have been generated a tree node for them.
-static std::vector<AppealNode*> done_nodes;
-static bool NodeIsDone(AppealNode *n) {
-  std::vector<AppealNode*>::const_iterator cit = done_nodes.begin();
-  for (; cit != done_nodes.end(); cit++) {
-    if (*cit == n)
-      return true;
-  }
-  return false;
-}
 
 static std::vector<AppealNode*> was_succ_list;
 
@@ -2143,7 +2150,6 @@ AppealNode* Parser::SimplifyShrinkEdges(AppealNode *node) {
 ////////////////////////////////////////////////////////////////////////////////////
 
 ASTTree* Parser::BuildAST() {
-  done_nodes.clear();
   ASTTree *tree = new ASTTree();
 
   std::stack<AppealNode*> appeal_stack;
@@ -2157,7 +2163,7 @@ ASTTree* Parser::BuildAST() {
     std::vector<AppealNode*>::iterator it = appeal_node->mSortedChildren.begin();
     for (; it != appeal_node->mSortedChildren.end(); it++) {
       AppealNode *child = *it;
-      if (!NodeIsDone(child)) {
+      if (!child->AstCreated()) {
         appeal_stack.push(child);
         children_done = false;
         break;
@@ -2176,8 +2182,8 @@ ASTTree* Parser::BuildAST() {
       }
 
       // pop out the 'appeal_node'
+      appeal_node->SetAstCreated();
       appeal_stack.pop();
-      done_nodes.push_back(appeal_node);
     }
   }
 

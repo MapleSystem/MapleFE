@@ -77,6 +77,9 @@ private:
   bool         mIsPseudo;         // A pseudo node, mainly used for sub trees connection
                                   // It has no real program meaning, but can be used
                                   // to transfer information among nodes.
+  bool         mAstCreated;       // If the AST is created for this node. People may ask if
+                                  // we can use mAstTreeNode to determine. The answer is no,
+                                  // because some nodes may have no Ast node.
   unsigned     mFinalMatch;       // the final match after sort out.
   SmallVector<unsigned> mMatches; // all of the last matching token.
 
@@ -97,6 +100,8 @@ public:
   void SetIsPseudo(){mIsPseudo = true;}
   bool IsSorted()   {return mSorted;}
   void SetSorted()  {mSorted = true;}
+  bool AstCreated() {return mAstCreated;}
+  void SetAstCreated() {mAstCreated = true;}
 
   TreeNode* GetAstTreeNode() {return mAstTreeNode;}
   void      SetAstTreeNode(TreeNode *n) {mAstTreeNode = n;}
@@ -142,7 +147,7 @@ public:
   AppealNode() {mData.mTable=NULL; mParent = NULL;
                 mAfter = AppealStatus_NA; mSimplifiedIndex = 0; mIsTable = true;
                 mStartIndex = 0; mSorted = false; mFinalMatch = 0;
-                mIsPseudo = false; mAstTreeNode = NULL;}
+                mIsPseudo = false; mAstTreeNode = NULL; mAstCreated = false;}
   ~AppealNode(){mMatches.Release();}
 
   void AddChild(AppealNode *n) { mChildren.push_back(n); }

@@ -20,7 +20,6 @@
 #ifndef __AST_MEMPOOL_H__
 #define __AST_MEMPOOL_H__
 
-#include <map>
 #include <vector>
 
 #include "mempool.h"
