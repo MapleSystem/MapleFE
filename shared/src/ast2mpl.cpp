@@ -17,21 +17,6 @@
 #include "mir_function.h"
 #include "constant_fold.h"
 
-bool ConstantFoldModule(maple::MIRModule *module) {
-  maple::ConstantFold cf(module);
-  MapleVector<maple::MIRFunction *> &funcList = module->functionList;
-  for (MapleVector<maple::MIRFunction *>::iterator it = funcList.begin(); it != funcList.end(); it++) {
-    maple::MIRFunction *curfun = *it;
-    maple::BlockNode *block = curfun->body;
-    module->SetCurFunction(curfun);
-    if (!block) {
-      continue;
-    }
-    cf.Simplify(block);
-  }
-  return true;
-}
-
 A2M::A2M(const char *filename) : mFileName(filename) {
   maple::MIRModule mod(mFileName);
   mMirModule = &mod;
