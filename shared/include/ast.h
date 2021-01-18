@@ -73,7 +73,7 @@ protected:
   TreeNode *mParent;
   TreeNode *mLabel;   // label of a statement, or expression.
 public:
-  TreeNode() {mKind = NK_Null; mLabel = NULL;}
+  TreeNode() {mKind = NK_Null; mLabel = NULL; mParent = NULL;}
   virtual ~TreeNode() {}
 
 #undef  NODEKIND

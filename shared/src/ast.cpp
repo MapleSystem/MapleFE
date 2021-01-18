@@ -809,6 +809,7 @@ void BlockNode::Dump(unsigned ind) {
 void ClassNode::Construct() {
   for (unsigned i = 0; i < mBody->GetChildrenNum(); i++) {
     TreeNode *tree_node = mBody->GetChildAtIndex(i);
+    tree_node->SetParent(this);
     if (tree_node->IsVarList()) {
       VarListNode *vlnode = (VarListNode*)tree_node;
       for (unsigned i = 0; i < vlnode->GetNum(); i++) {
@@ -1051,6 +1052,7 @@ void LambdaNode::Dump(unsigned indent) {
 void InterfaceNode::Construct(BlockNode *block) {
   for (unsigned i = 0; i < block->GetChildrenNum(); i++) {
     TreeNode *tree_node = block->GetChildAtIndex(i);
+    tree_node->SetParent(this);
     if (tree_node->IsVarList()) {
       VarListNode *vlnode = (VarListNode*)tree_node;
       for (unsigned i = 0; i < vlnode->GetNum(); i++) {
