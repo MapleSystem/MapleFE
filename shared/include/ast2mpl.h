@@ -22,6 +22,7 @@
 
 #include "ast_module.h"
 #include "ast.h"
+#include "ast_type.h"
 
 #include "mir_module.h"
 #include "mir_builder.h"
@@ -32,6 +33,8 @@ private:
   bool mTraceA2m;
 public:
   maple::MIRModule *mMirModule;
+  std::map<TreeNode*, MIRType *> mNodeTypeMap;
+
   A2M(const char *filename);
   void ProcessAST(bool trace_a2m);
 
@@ -39,6 +42,8 @@ public:
 #define NODEKIND(K) void Process##K(TreeNode *);
 #include "ast_nk.def"
 
+   MIRType *MapType(TreeNode *tnode);
+   void MapAttr(GenericAttrs &attr, const IdentifierNode *inode);
 };
 
 #endif

@@ -46,6 +46,12 @@ test: autogen
 testall:
 	(cd test; ./runtests.pl all)
 
+test1:
+	@cp test/java2mpl/t1.java .
+	@echo gdb --args ./output/java/java2mpl t1.java --trace-a2m
+	./output/java/java2mpl t1.java --trace-a2m
+	cat t1.mpl
+
 clean:
 	rm -rf $(BUILDDIR)
 

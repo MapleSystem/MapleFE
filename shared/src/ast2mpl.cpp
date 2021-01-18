@@ -18,8 +18,7 @@
 #include "constant_fold.h"
 
 A2M::A2M(const char *filename) : mFileName(filename) {
-  maple::MIRModule mod(mFileName);
-  mMirModule = &mod;
+  mMirModule = new maple::MIRModule(mFileName);
 }
 
 void A2M::ProcessAST(bool trace_a2m) {

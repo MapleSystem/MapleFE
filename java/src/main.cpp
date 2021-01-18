@@ -88,7 +88,7 @@ int main (int argc, char *argv[]) {
   A2M *a2m = new A2M(gModule.mFileName);
   a2m->ProcessAST(trace_a2m);
 
-  //a2m->mMirModule->OutputAsciiMpl("", ".mpl");
+  a2m->mMirModule->OutputAsciiMpl("", ".mpl");
 
   delete parser;
   delete a2m;

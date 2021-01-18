@@ -814,6 +814,7 @@ void ClassNode::Construct() {
       VarListNode *vlnode = (VarListNode*)tree_node;
       for (unsigned i = 0; i < vlnode->GetNum(); i++) {
         IdentifierNode *inode = vlnode->VarAtIndex(i);
+        inode->SetParent(this);
         mFields.PushBack(inode);
       }
     } else if (tree_node->IsIdentifier())
@@ -1057,6 +1058,7 @@ void InterfaceNode::Construct(BlockNode *block) {
       VarListNode *vlnode = (VarListNode*)tree_node;
       for (unsigned i = 0; i < vlnode->GetNum(); i++) {
         IdentifierNode *inode = vlnode->VarAtIndex(i);
+        inode->SetParent(this);
         mFields.PushBack(inode);
       }
     } else if (tree_node->IsIdentifier())
