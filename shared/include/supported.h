@@ -22,7 +22,7 @@
 // The list of all supported types. This covers all the languages.
 // NOTE: autogen also relies on this set of supported separators
 #undef  TYPE
-#define TYPE(T) TY_##T,
+#define TYPE(T,M) TY_##T,
 typedef enum {
 #include "supported_types.def"
 TY_NA

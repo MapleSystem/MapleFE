@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #undef  TYPE
-#define TYPE(T) {#T, TY_##T},
+#define TYPE(T,M) {#T, TY_##T},
 TypeMapping TypesSupported[TY_NA] = {
 #include "supported_types.def"
 };
@@ -34,7 +34,7 @@ TypeId FindTypeIdLangIndep(const std::string &s) {
 }
 
 #undef  TYPE
-#define TYPE(T) case TY_##T: return #T;
+#define TYPE(T,M) case TY_##T: return #T;
 char *GetTypeString(TypeId tid) {
   switch (tid) {
 #include "supported_types.def"

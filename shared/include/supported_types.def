@@ -16,14 +16,14 @@
 // This file defines the complete set of primitive types supported in Autogen
 // and the parser.
 
-TYPE(Boolean)
-TYPE(Byte)
-TYPE(Short)
-TYPE(Int)
-TYPE(Long)
-TYPE(Char)
-TYPE(Float)
-TYPE(Double)
-TYPE(Void)      // Although this is not a type, it does categorize the types.
-TYPE(Null)      // The Null type. It is a type.
+TYPE(Boolean, u1)
+TYPE(Byte, u8)
+TYPE(Short, i16)
+TYPE(Int, i32)
+TYPE(Long, i64)
+TYPE(Char, u16)
+TYPE(Float, f32)
+TYPE(Double, f64)
+TYPE(Void, void)      // Although this is not a type, it does categorize the types.
+TYPE(Null, void)      // The Null type. It is a type.
 

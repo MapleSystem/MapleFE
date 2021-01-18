@@ -36,3 +36,36 @@ void A2M::ProcessAST(bool trace_a2m) {
     }
   }
 }
+
+MIRType *A2M::MapType(TreeNode *type) {
+  if (mNodeTypeMap.find(type) != mNodeTypeMap.end()) {
+    return mNodeTypeMap[type];
+  }
+
+  MIRType *mir_type = nullptr;
+  if (type->IsPrimType()) {
+    PrimTypeNode *ptnode = static_cast<PrimTypeNode *>(type);
+    PrimType prim;
+    switch (ptnode->GetPrimType()) {
+#undef TYPE
+#define TYPE(T, M) case TY_##T: prim = PTY_##M; break;
+#include "supported_types.def"
+      default: MASSERT("Unsupported PrimType"); break;
+    }
+    TyIdx tid(prim);
+    mir_type = GlobalTables::GetTypeTable().GetTypeFromTyIdx(tid);
+    mNodeTypeMap[type] = mir_type;
+  }
+
+  if (type->IsPrimType()) {
+    MASSERT("type not set");
+  }
+  return mir_type;
+}
+
+void A2M::MapAttr(GenericAttrs &attr, const IdentifierNode *inode) {
+  unsigned anum = inode->GetAttrsNum();
+  for (int i = 0; i < anum; i++) {
+  }
+}
+

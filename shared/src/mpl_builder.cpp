@@ -17,42 +17,6 @@
 
 #define NOTYETIMPL(K) { if (mTraceA2m) { MNYI(K); }}
 
-MIRType *A2M::MapType(TreeNode *type) {
-  if (mNodeTypeMap.find(type) != mNodeTypeMap.end()) {
-    return mNodeTypeMap[type];
-  }
-
-  MIRType *mir_type = nullptr;
-  if (type->IsPrimType()) {
-    PrimTypeNode *ptnode = static_cast<PrimTypeNode *>(type);
-    PrimType prim;
-    switch (ptnode->GetPrimType()) {
-      case TY_Boolean: prim = PTY_u1; break;
-      case TY_Byte:    prim = PTY_u8; break;
-      case TY_Short:   prim = PTY_i16; break;
-      case TY_Int:     prim = PTY_i32; break;
-      case TY_Long:    prim = PTY_i64; break;
-      case TY_Char:    prim = PTY_i8; break;
-      case TY_Float:   prim = PTY_f32; break;
-      case TY_Double:  prim = PTY_f64; break;
-      case TY_Void:    prim = PTY_void; break;
-      case TY_Null:    prim = PTY_void; break;
-      default: MASSERT("Unsupported PrimType"); break;
-    }
-    TyIdx tid(prim);
-    mir_type = GlobalTables::GetTypeTable().GetTypeFromTyIdx(tid);
-    mNodeTypeMap[type] = mir_type;
-  }
-
-  if (type->IsPrimType()) {
-    MASSERT("type not set");
-  }
-  return mir_type;
-}
-
-void A2M::MapAttr(GenericAttrs &attr, const IdentifierNode *inode) {
-}
-
 void A2M::ProcessPackage(TreeNode *tnode) {
   NOTYETIMPL("ProcessPackage()");
   return;
@@ -86,15 +50,14 @@ void A2M::ProcessField(TreeNode *tnode) {
   // SmallVector<AttrId> mAttrs
   GenericAttrs genAttrs;
   MapAttr(genAttrs, inode);
-  //unsigned anum = inode->GetAttrsNum();
-  //for (int i = 0; i < anum; i++) {
-  //}
   
   GStrIdx stridx = GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(name);
   MIRType *basetype = MapType(type);
-  TyidxFieldAttrPair P0(basetype->tyIdx, genAttrs.ConvertToFieldAttrs());
-  FieldPair P1(stridx, P0);
-  stype->fields.push_back(P1);
+  if (basetype) {
+    TyidxFieldAttrPair P0(basetype->tyIdx, genAttrs.ConvertToFieldAttrs());
+    FieldPair P1(stridx, P0);
+    stype->fields.push_back(P1);
+  }
 
   return;
 }
