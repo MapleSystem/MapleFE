@@ -56,7 +56,7 @@ clean:
 	rm -rf $(BUILDDIR)
 
 clobber: clean
-	rm -rf java/include/gen_*.h java/src/gen_*.cpp
+	rm -rf java/include/gen_*.h java/src/gen_*.cpp ladetect/java recdetect/java
 
 rebuild:
 	make clobber
