@@ -15,13 +15,13 @@
 # for testing batch1/Arithmetic/Add.java:
 # make Add
 
-build = output
+build = ../output
 $(shell mkdir -p $(build))
 
-DIR0 = . $(wildcard * */* */*/*)
-DIR = $(subst $(build), ,$(DIR0))
+DIR = . $(wildcard * */* */*/*)
 
 vpath %.java $(DIR)
+vpath %.mpl $(DIR)
 vpath %.c $(DIR)
 vpath %.cpp $(DIR)
 
@@ -65,11 +65,10 @@ p:
 	@echo "\ngdb command:\n(cd $(BUILDDIR)/autogen/; gdb --args ./autogen -verbose=3 -p ../../test/test.spec)"
 
 % : %.java
-	cp $< $(build)
-	@echo "\ngdb command:\n(cd $(BUILDDIR)/autogen/; gdb -args ./sharedfe -verbose=3 ../../test/$(build)/$<)"
-	(cd $(BUILDDIR)/autogen; ./sharedfe -verbose=3 ../../test/$(build)/$<)
-	@echo "\ncommand:\n(cd $(BUILDDIR)/autogen/; ./sharedfe ../../test/$(build)/$<)"
-	@echo "\ngdb command:\n(cd $(BUILDDIR)/autogen/; gdb -args ./sharedfe -verbose=3 ../../test/$(build)/$<)"
+	@cp $< $(build)
+	@echo gdb --args ../output/java/java2mpl $(build)/$@.java --trace-a2m
+	../output/java/java2mpl $(build)/$@.java --trace-a2m
+	cat $(build)/$@.mpl
 
 % : %.c
 	cp $< $(build)

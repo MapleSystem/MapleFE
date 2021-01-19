@@ -48,5 +48,12 @@ Once you are done, please update the lib and include paths in MapleFE/shared/src
 1. cd test
 2. ./runtests.pl all
 
+or
+1. make testall
+
+run a single test, say t1.java:
+1. cd test
+2. make t1
+
 You can find all Java test cases in test/java2mpl. Right now only java test cases
 are used.
