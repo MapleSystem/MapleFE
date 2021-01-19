@@ -21,6 +21,11 @@ A2M::A2M(const char *filename) : mFileName(filename) {
   mMirModule = new maple::MIRModule(mFileName);
 }
 
+A2M::~A2M() {
+  delete mMirModule;
+  mNodeTypeMap.clear();
+}
+
 void A2M::ProcessAST(bool trace_a2m) {
   mTraceA2m = trace_a2m;
   if (mTraceA2m) std::cout << "============= in ProcessAST ===========" << std::endl;
@@ -45,25 +50,22 @@ MIRType *A2M::MapType(TreeNode *type) {
   MIRType *mir_type = nullptr;
   if (type->IsPrimType()) {
     PrimTypeNode *ptnode = static_cast<PrimTypeNode *>(type);
-    PrimType prim;
-    switch (ptnode->GetPrimType()) {
-#undef TYPE
-#define TYPE(T, M) case TY_##T: prim = PTY_##M; break;
-#include "supported_types.def"
-      default: MASSERT("Unsupported PrimType"); break;
-    }
-    TyIdx tid(prim);
-    mir_type = GlobalTables::GetTypeTable().GetTypeFromTyIdx(tid);
+    mir_type = MapPrimType(ptnode);
+
+    // update mNodeTypeMap
     mNodeTypeMap[type] = mir_type;
   }
 
-  if (type->IsPrimType()) {
+  if (type->IsUserType()) {
+    // DimensionNode *mDims
+    // unsigned dnum = inode->GetDimsNum();
     MASSERT("type not set");
   }
   return mir_type;
 }
 
 void A2M::MapAttr(GenericAttrs &attr, const IdentifierNode *inode) {
+  // SmallVector<AttrId> mAttrs
   unsigned anum = inode->GetAttrsNum();
   for (int i = 0; i < anum; i++) {
   }

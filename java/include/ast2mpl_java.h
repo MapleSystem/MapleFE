@@ -13,17 +13,21 @@
 * See the Mulan PSL v2 for more details.
 */
 
-// This file defines the complete set of primitive types supported in Autogen
-// and the parser.
+/////////////////////////////////////////////////////////////////////////////////
+//                   Java Specific AST2MPL                                     //
+/////////////////////////////////////////////////////////////////////////////////
 
-TYPE(Boolean)
-TYPE(Byte)
-TYPE(Short)
-TYPE(Int)
-TYPE(Long)
-TYPE(Char)
-TYPE(Float)
-TYPE(Double)
-TYPE(Void)      // Although this is not a type, it does categorize the types.
-TYPE(Null)      // The Null type. It is a type.
+#ifndef __AST2MPL_JAVA_H__
+#define __AST2MPL_JAVA_H__
 
+#include "ast2mpl.h"
+
+class A2MJava : public A2M {
+private:
+public:
+  A2MJava(const char *filename) : A2M(filename) { }
+
+  MIRType *MapPrimType(PrimTypeNode *ptnode);
+};
+
+#endif

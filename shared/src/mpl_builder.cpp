@@ -45,9 +45,7 @@ void A2M::ProcessField(TreeNode *tnode) {
   const char    *name = inode->GetName();
   TreeNode      *type = inode->GetType(); // PrimTypeNode or UserTypeNode
   TreeNode      *init = inode->GetInit(); // Init value
-  // DimensionNode *mDims
-  // unsigned dnum = inode->GetDimsNum();
-  // SmallVector<AttrId> mAttrs
+
   GenericAttrs genAttrs;
   MapAttr(genAttrs, inode);
   
@@ -140,12 +138,10 @@ void A2M::ProcessFunction(TreeNode *tnode) {
 void A2M::ProcessClass(TreeNode *tnode) {
   ClassNode *classnode = static_cast<ClassNode *>(tnode);
   const char *name = classnode->GetName();
-  GStrIdx stridx = GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(name);
   MIRType *type = GlobalTables::GetTypeTable().GetOrCreateClassType(name, mMirModule);
   mNodeTypeMap[tnode] = type;
 
   for (int i=0; i < classnode->GetMethodsNum(); i++) {
-    NOTYETIMPL("ProcessClass() - ProcessFunction");
     ProcessFunction(classnode->GetMethod(i));
   }
 
@@ -153,6 +149,7 @@ void A2M::ProcessClass(TreeNode *tnode) {
     ProcessField(classnode->GetField(i));
   }
 
+  // set kind to kTypeClass from kTypeClassIncomplete
   type->typeKind = maple::MIRTypeKind::kTypeClass;
   return;
 }

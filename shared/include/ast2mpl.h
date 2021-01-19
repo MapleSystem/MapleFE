@@ -36,11 +36,15 @@ public:
   std::map<TreeNode*, MIRType *> mNodeTypeMap;
 
   A2M(const char *filename);
+  ~A2M();
+
   void ProcessAST(bool trace_a2m);
 
 #undef  NODEKIND
 #define NODEKIND(K) void Process##K(TreeNode *);
 #include "ast_nk.def"
+
+   virtual MIRType *MapPrimType(PrimTypeNode *tnode)=0;
 
    MIRType *MapType(TreeNode *tnode);
    void MapAttr(GenericAttrs &attr, const IdentifierNode *inode);
