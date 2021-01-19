@@ -1080,6 +1080,9 @@ bool Parser::TraverseIdentifier(RuleTable *rule_table, AppealNode *appeal) {
 //      Although 'zero' is a correct matching, it's left to the final parent which should be a
 //      Concatenate node. It's handled in TraverseConcatenate().
 bool Parser::TraverseZeroormore(RuleTable *rule_table, AppealNode *parent) {
+  //if ((rule_table == &TblBlockStatements_sub1) || (rule_table == &TblClassBody_sub1))
+  //  return TraverseZeroormore_fast(rule_table, parent);
+
   unsigned saved_mCurToken = mCurToken;
   gSuccTokensNum = 0;
 
@@ -1156,6 +1159,54 @@ bool Parser::TraverseZeroormore(RuleTable *rule_table, AppealNode *parent) {
 
   if (!gSuccTokensNum)
     mCurToken = saved_mCurToken;
+
+  return true;
+}
+
+bool Parser::TraverseZeroormore_fast(RuleTable *rule_table, AppealNode *parent) {
+  unsigned saved_mCurToken = mCurToken;
+  gSuccTokensNum = 0;
+
+  MASSERT((rule_table->mNum == 1) && "zeroormore node has more than one elements?");
+  TableData *data = rule_table->mData;
+
+  unsigned prev_succ_token = mCurToken - 1;
+  unsigned final_succ_token;
+
+  bool found_real = false;
+
+  while(1) {
+    // A set of results of current instance
+    bool found_subtable = false;
+    bool go_on = false;
+    unsigned subtable_succ_token;
+
+    mCurToken = prev_succ_token + 1;
+    found_subtable = TraverseTableData(data, parent);
+
+    if (found_subtable) {
+      MASSERT((gSuccTokensNum == 1) || (gSuccTokensNum == 0));
+      if(gSuccTokensNum == 1) {
+        found_real = true;
+        go_on = true;
+        subtable_succ_token = gSuccTokens[0];
+        final_succ_token = subtable_succ_token;
+        prev_succ_token = subtable_succ_token;
+      }
+    }
+
+    if (!go_on)
+      break;
+  }
+
+  if (found_real) {
+    gSuccTokensNum = 1;
+    gSuccTokens[0] = final_succ_token;
+    mCurToken = final_succ_token + 1;
+  } else {
+    gSuccTokensNum = 0;
+    mCurToken = saved_mCurToken;
+  }
 
   return true;
 }

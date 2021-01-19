@@ -87,6 +87,7 @@ struct Action {
 
 enum RuleProp {
   RP_Single,  // For a ONEOF rule, there is one and only one children valid.
+  RP_No2ndTry,// For a concatenate rule, it doesn't need to do second try.
   RP_Top,     // A top rule
   RP_NA = 0
 };

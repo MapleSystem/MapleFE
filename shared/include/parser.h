@@ -250,6 +250,7 @@ private:
   bool TraverseConcatenate(RuleTable*, AppealNode*);
   bool TraverseOneof(RuleTable*, AppealNode*);
   bool TraverseZeroormore(RuleTable*, AppealNode*);
+  bool TraverseZeroormore_fast(RuleTable*, AppealNode*);
   bool TraverseZeroorone(RuleTable*, AppealNode*);
 
   // There are some special cases we can speed up the traversal.
