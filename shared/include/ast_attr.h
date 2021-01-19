@@ -34,6 +34,8 @@
 #include "ast.h"
 #include "supported.h"
 
+namespace maplefe {
+
 class AttrNode : public TreeNode {
 private:
   AttrId mId;
@@ -67,4 +69,5 @@ public:
 // A global pool for all AttrNodes.
 extern AttrPool gAttrPool;
 
+}
 #endif

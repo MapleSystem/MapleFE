@@ -15,6 +15,8 @@
 #include "token.h"
 #include "massert.h"
 
+namespace maplefe {
+
 #undef  SEPARATOR
 #define SEPARATOR(T) case SEP_##T: return #T;
 const char* SeparatorTokenGetName(SepId id) {
@@ -116,4 +118,5 @@ void Token::Dump() {
   default:
     break;
   }
+}
 }

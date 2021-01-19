@@ -34,6 +34,8 @@
 #include "attr_gen.h"
 #include "token_gen.h"
 
+namespace maplefe {
+
 class AutoGen {
 private:
   IdenGen      *mIdenGen;
@@ -61,5 +63,7 @@ public:
   void BackPatch();
   void Gen();
 };
+
+}
 
 #endif

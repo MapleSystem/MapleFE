@@ -32,6 +32,8 @@
 #include "base_gen.h"
 #include "supported.h"
 
+namespace maplefe {
+
 // For each operator, it has three parts involved in the generation.
 //   1. OprId: Used inside autogen, connection between LANGUAGE and
 //             shared/supported.h files
@@ -80,5 +82,7 @@ public:
   const void EnumBegin();
   const bool EnumEnd();
 };
+
+}
 
 #endif

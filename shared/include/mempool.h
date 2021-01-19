@@ -36,6 +36,8 @@
 
 #include <cstdlib>
 
+namespace maplefe {
+
 //  Each time when extra memory is needed, a fixed size BLOCK will be allocated.
 //  It's defined by mBlockSize. Anything above this size will not
 //  be supported.
@@ -69,4 +71,5 @@ public:
   void  Release(); // Allow users to free memory explicitly.
 };
 
+}
 #endif  // __MEMPOOL_H__

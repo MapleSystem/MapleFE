@@ -21,6 +21,8 @@
 
 #include "vfy.h"
 
+namespace maplefe {
+
 class VerifierJava : public Verifier {
 private:
 public:
@@ -31,4 +33,5 @@ public:
   void VerifyClassMethods(ClassNode *klass);
 };
 
+}
 #endif

@@ -25,6 +25,8 @@
 #include <vector>
 #include <string>
 
+namespace maplefe {
+
 //  Each time when extra memory is needed, a fixed size BLOCK will be allocated.
 //  It's defined by BLOCK_SIZE. Anything above this size will not
 //  be supported.
@@ -63,4 +65,5 @@ public:
 // StringPool for their symbols or necessary strings.
 extern StringPool gStringPool;
 
+}
 #endif  // __STRINGPOOL_H__

@@ -18,6 +18,8 @@
 #include "base_struct.h"
 #include "ruletable.h"  // need MAX_ACT_ELEM_NUM
 
+namespace maplefe {
+
 ////////////////////////////////////////////////////////////////////////////
 //                            RuleAction                                  //
 ////////////////////////////////////////////////////////////////////////////
@@ -298,4 +300,6 @@ void Rule::DumpAttr() {
     mElement->mSubElems[i]->mAttr.DumpAction(i+1);
   }
 }
+}
+
 

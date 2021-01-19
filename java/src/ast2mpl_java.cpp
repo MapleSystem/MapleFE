@@ -15,6 +15,8 @@
 
 #include "ast2mpl_java.h"
 
+namespace maplefe {
+
 MIRType *A2MJava::MapPrimType(PrimTypeNode *ptnode) {
   PrimType prim;
   switch (ptnode->GetPrimType()) {
@@ -33,4 +35,5 @@ MIRType *A2MJava::MapPrimType(PrimTypeNode *ptnode) {
 
   TyIdx tid(prim);
   return GlobalTables::GetTypeTable().GetTypeFromTyIdx(tid);
+}
 }

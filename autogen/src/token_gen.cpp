@@ -19,6 +19,8 @@
 #include "token_table.h"
 #include "massert.h"
 
+namespace maplefe {
+
 /////////////////////////////////////////////////////////////////////
 //                   Generate the output files                     //
 /////////////////////////////////////////////////////////////////////
@@ -37,11 +39,13 @@ void TokenGen::GenHeaderFile() {
   mHeaderFile.WriteOneLine("#ifndef __TOKEN_GEN_H__", 23);
   mHeaderFile.WriteOneLine("#define __TOKEN_GEN_H__", 23);
   mHeaderFile.WriteOneLine("#include \"token.h\"", 18);
+  mHeaderFile.WriteOneLine("namespace maplefe {", 19);
   mHeaderFile.WriteOneLine("extern unsigned gSystemTokensNum;", 33);
   mHeaderFile.WriteOneLine("extern unsigned gOperatorTokensNum;", 35);
   mHeaderFile.WriteOneLine("extern unsigned gSeparatorTokensNum;", 36);
   mHeaderFile.WriteOneLine("extern unsigned gKeywordTokensNum;", 34);
   mHeaderFile.WriteOneLine("extern Token gSystemTokens[];", 29);
+  mHeaderFile.WriteOneLine("}", 1);
   mHeaderFile.WriteOneLine("#endif", 6);
 }
 
@@ -49,6 +53,7 @@ extern std::string FindOperatorName(OprId id);
 
 void TokenGen::GenCppFile() {
   mCppFile.WriteOneLine("#include \"token.h\"", 18);
+  mCppFile.WriteOneLine("namespace maplefe {", 19);
 
   // write:
   //   unsigned gSystemTokensNum=xxx;
@@ -123,5 +128,8 @@ void TokenGen::GenCppFile() {
   std::string output = "  {.mTkType = TT_CM}";
   mCppFile.WriteOneLine(output.c_str(), output.size());
   mCppFile.WriteOneLine("};", 2);
+  mCppFile.WriteOneLine("}", 1);
 }
+}
+
 

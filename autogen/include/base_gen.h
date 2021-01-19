@@ -33,6 +33,8 @@
 #include "fileread.h"
 #include "stringpool.h"
 
+namespace maplefe {
+
 class MemPool;
 class RuleElemPool;
 class ReservedGen;
@@ -158,5 +160,7 @@ public:
   virtual const void EnumBegin() {}
   virtual const bool EnumEnd() {}
 };
+
+}
 
 #endif

@@ -25,6 +25,8 @@
 
 #include "all_supported.h"
 
+namespace maplefe {
+
 class Rule;
 class StructData;
 
@@ -168,5 +170,7 @@ public:
   void Dump();
   void DumpAttr();
 };
+
+}
 
 #endif

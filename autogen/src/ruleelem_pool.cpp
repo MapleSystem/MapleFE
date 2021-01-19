@@ -16,10 +16,14 @@
 #include "rule.h"
 #include "ruleelem_pool.h"
 
+namespace maplefe {
+
 // [NOTE]: size of all kinds of rule elements must be the same
 RuleElem* RuleElemPool::NewRuleElem() {
   unsigned elemSize = sizeof(RuleElem);
   char *addr = mMP->Alloc(elemSize);
   RuleElem *elem = new (addr) RuleElem();
   return elem;
+}
+
 }

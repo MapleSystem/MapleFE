@@ -27,6 +27,8 @@
 #include "base_gen.h"
 #include "all_supported.h"
 
+namespace maplefe {
+
 // The types in Autogen has no implication of physical representation.
 // It's just a virtual type with a NAME. Only MapleIR types have physical
 // representatioin.
@@ -59,5 +61,7 @@ public:
   const void EnumBegin();
   const bool EnumEnd();
 };
+
+}
 
 #endif

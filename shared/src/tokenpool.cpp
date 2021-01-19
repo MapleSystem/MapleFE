@@ -17,10 +17,12 @@
 #include "mempool.h"
 #include "massert.h"
 
+namespace maplefe {
+
 char* TokenPool::NewToken(unsigned size) {
   char *addr = mMemPool.Alloc(size);
   MASSERT(addr && "MemPool failed to alloc a token.");
   mTokens.PushBack((Token*)addr);
   return addr;
 }
-  
+}

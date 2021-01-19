@@ -16,6 +16,8 @@
 #include "ast_module.h"
 #include "ast.h"
 
+namespace maplefe {
+
 ASTModule gModule;
 
 ASTModule::ASTModule() {
@@ -56,4 +58,5 @@ void ASTModule::Dump() {
     ASTTree *tree = *tree_it;
     tree->Dump(0);
   }
+}
 }

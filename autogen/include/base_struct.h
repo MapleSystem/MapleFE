@@ -25,6 +25,8 @@
 #include <vector>
 #include <queue>
 
+namespace maplefe {
+
 class StringPool;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -114,5 +116,7 @@ public:
   void Dump();
   void Sort(unsigned i);  // sort by the length of i-th element which is astring 
 };
+
+}
 
 #endif

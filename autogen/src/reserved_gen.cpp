@@ -17,6 +17,8 @@
 #include "reserved_gen.h"
 #include "rule.h"
 
+namespace maplefe {
+
 // Add the reserved Ops and Elems
 ReservedGen::ReservedGen(const char *dfile, const char *hf, const char *cppf)
           : BaseGen(dfile, hf, cppf) {
@@ -50,12 +52,18 @@ void ReservedGen::GenHeaderFile() {
   mHeaderFile.WriteOneLine("#ifndef __RESERVED_GEN_H__", 26);
   mHeaderFile.WriteOneLine("#define __RESERVED_GEN_H__", 26);
   mHeaderFile.WriteOneLine("#include \"ruletable.h\"", 22);
+  mHeaderFile.WriteOneLine("namespace maplefe {", 19);
   mHeaderFile.WriteFormattedBuffer(&mRuleTableHeader);
+  mHeaderFile.WriteOneLine("}", 1);
   mHeaderFile.WriteOneLine("#endif", 6);
 }
 
 void ReservedGen::GenCppFile() {
   mCppFile.WriteOneLine("#include \"common_header_autogen.h\"", 34);
+  mCppFile.WriteOneLine("namespace maplefe {", 19);
   mCppFile.WriteFormattedBuffer(&mRuleTableCpp);
+  mCppFile.WriteOneLine("}", 1);
 }
+}
+
 

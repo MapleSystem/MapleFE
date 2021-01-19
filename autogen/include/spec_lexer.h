@@ -24,6 +24,8 @@
 #include <vector>
 #include <unordered_map>
 
+namespace maplefe {
+
 class SPECLexer {
  public:
   char thechar;
@@ -121,6 +123,8 @@ class SPECLexer {
 
 inline bool IsVarName(SPECTokenKind tk) {
   return tk == SPECTK_Name;
+}
+
 }
 
 #endif  // INCLUDE_LEXER_H

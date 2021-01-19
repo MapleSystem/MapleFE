@@ -17,6 +17,8 @@
 #include "stringutil.h"
 #include "stringpool.h"
 
+namespace maplefe {
+
 // Assume the 'l' or 'L' is removed by the caller.
 long StringToDecNumeral(std::string s) {
   return std::stol(s);
@@ -220,4 +222,5 @@ bool StringToValue::StringIsNull(std::string &str) {
   return b;
 }
 
+}
 

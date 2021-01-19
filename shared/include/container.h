@@ -35,6 +35,8 @@
 #include "mempool.h"
 #include "massert.h"
 
+namespace maplefe {
+
 // We define a ContainerMemPool, which is slightly different than the other MemPool.
 // There are two major differences.
 // (1) Size of each allocation will be the same.
@@ -914,4 +916,5 @@ public:
   }
 };
 
+}
 #endif

@@ -23,6 +23,8 @@
 #include "massert.h"
 #include "stringutil.h"
 
+namespace maplefe {
+
 // Won't take '-' into account
 static int NumDigits(int number)
 {
@@ -605,4 +607,6 @@ void TableBuffer::Generate(BaseGen *bg, const std::string decl){
   DecIndent();
   return;
 }
+}
+
 

@@ -27,6 +27,8 @@
 #include "mir_module.h"
 #include "mir_builder.h"
 
+namespace maplefe {
+
 class A2M {
 private:
   const char *mFileName;
@@ -50,4 +52,5 @@ public:
    void MapAttr(GenericAttrs &attr, const IdentifierNode *inode);
 };
 
+}
 #endif

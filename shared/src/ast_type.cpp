@@ -21,6 +21,8 @@
 #include "ast.h"
 #include "massert.h"
 
+namespace maplefe {
+
 //////////////////////////////////////////////////////////////////////////
 //                           UserTypeNode                               //
 //////////////////////////////////////////////////////////////////////////
@@ -135,4 +137,5 @@ PrimTypeNode* PrimTypePool::FindType(TypeId id) {
       return type;
   }
   MERROR("Cannot find the prim type of an TypeId.");
+}
 }

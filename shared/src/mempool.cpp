@@ -28,6 +28,8 @@
 #include "mempool.h"
 #include "massert.h"
 
+namespace maplefe {
+
 // Release the mBlocks
 MemPool::~MemPool() {
   Release();
@@ -136,5 +138,6 @@ void MemPool::Clear() {
     temp_block->used = 0;
     temp_block = temp_block->next;
   }
+}
 }
 

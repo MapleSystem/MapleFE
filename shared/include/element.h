@@ -31,6 +31,8 @@
 #ifndef __Element_H__
 #define __Element_H__
 
+namespace maplefe {
+
 typedef enum {
   ET_WS,    // White Space
   ET_CM,    // Comment
@@ -49,4 +51,5 @@ public:
   Element() {EType = ET_NA;}
 };
 
+}
 #endif

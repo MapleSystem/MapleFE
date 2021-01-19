@@ -53,6 +53,8 @@
 #include "ast.h"
 #include "ast_mempool.h"
 
+namespace maplefe {
+
 ///////////////////////////////////////////////////////////////////////////////
 //                          UserTypeNode
 ///////////////////////////////////////////////////////////////////////////////
@@ -119,4 +121,5 @@ public:
 // A global pool for Primitive TypeNodes.
 extern PrimTypePool gPrimTypePool;
 
+}
 #endif

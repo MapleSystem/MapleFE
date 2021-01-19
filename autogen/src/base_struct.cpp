@@ -17,6 +17,8 @@
 #include "base_struct.h"
 #include "stringpool.h"
 
+namespace maplefe {
+
 void StructData::SetString(std::string name, const StringPool *pool) {
   mKind = DK_String;
   char *str = pool->FindString(name);
@@ -109,4 +111,6 @@ void StructBase::Sort(unsigned idx) {
   for (; lit != templist.end(); lit++) {
     mStructElems.push_back(*lit);
   }
+}
+
 }

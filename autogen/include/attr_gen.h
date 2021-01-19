@@ -27,6 +27,8 @@
 #include "base_gen.h"
 #include "all_supported.h"
 
+namespace maplefe {
+
 struct Keyword2Attr {
   std::string mKeyword;
   AttrId    mId;
@@ -55,4 +57,5 @@ public:
   const bool EnumEnd();
 };
 
+}
 #endif

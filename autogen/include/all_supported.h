@@ -24,6 +24,8 @@
 #include <string>
 #include "supported.h"
 
+namespace maplefe {
+
 ///////////////////////////////////////////////////////////////////////////////////
 //                                  Type Info                                    //
 ///////////////////////////////////////////////////////////////////////////////////
@@ -69,5 +71,5 @@ struct LiteralSuppStruct {
 
 extern LitId       FindLiteralId(const std::string &s);
 extern std::string FindLiteralName(LitId id);
-
+}
 #endif

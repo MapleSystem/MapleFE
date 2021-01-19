@@ -18,6 +18,8 @@
 #include "write2file.h"
 #include "massert.h"
 
+namespace maplefe {
+
 ///////////////////////////////////////////////////////////////////////
 //                            Write2File                             //
 ///////////////////////////////////////////////////////////////////////
@@ -92,4 +94,5 @@ void Write2File::WriteBlock(const char *block) {
       continue;
     }
   }
+}
 }

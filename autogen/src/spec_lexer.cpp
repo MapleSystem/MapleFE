@@ -19,6 +19,8 @@
 #include <climits>
 #include <cstdlib>
 
+namespace maplefe {
+
 #define MAX_LINE_SIZE 4096
 
 /* Read (next) line from the input file, and return the readed
@@ -649,4 +651,6 @@ std::string SPECLexer::GetTokenString(SPECTokenKind thekind) {
 
 std::string SPECLexer::GetTokenString() {
   return GetTokenString(_thekind);
+}
+
 }

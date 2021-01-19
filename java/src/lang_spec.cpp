@@ -14,6 +14,8 @@
 */
 #include "lang_spec.h"
 
+namespace maplefe {
+
 // For all the string to value functions below, we assume the syntax of 's' is correct
 // for a literal in Java.
 
@@ -154,4 +156,4 @@ LitData ProcessLiteral(LitId id, const char *str) {
   return data;
 }
 
-
+}

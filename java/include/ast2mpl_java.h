@@ -22,6 +22,8 @@
 
 #include "ast2mpl.h"
 
+namespace maplefe {
+
 class A2MJava : public A2M {
 private:
 public:
@@ -30,4 +32,5 @@ public:
   MIRType *MapPrimType(PrimTypeNode *ptnode);
 };
 
+}
 #endif

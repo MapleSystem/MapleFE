@@ -22,6 +22,8 @@
 
 #include <vector>
 
+namespace maplefe {
+
 class DiagMessage {
 public:
   char     File[128];
@@ -42,5 +44,5 @@ public:
   void AddError(const char*, unsigned, unsigned, const char*);
 };
 
+}
 #endif
-

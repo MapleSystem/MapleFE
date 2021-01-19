@@ -21,6 +21,8 @@
 #include "ast_scope.h"
 #include "container.h"
 
+namespace maplefe {
+
 class ASTTree;
 class ASTScope;
 
@@ -58,4 +60,5 @@ public:
 // Assume currently only one global module is being processed.
 extern ASTModule gModule;
 
+}
 #endif

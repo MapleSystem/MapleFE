@@ -29,6 +29,8 @@
 #include "ast_builder.h"
 #include "parser_rec.h"
 
+namespace maplefe {
+
 //////////////////////////////////////////////////////////////////////////////////
 //                   Top Issues in Parsing System
 //
@@ -2568,4 +2570,5 @@ AppealNode* AppealNode::FindSpecChild(TableData *tdata, unsigned match) {
   }
 
   return ret_child;
+}
 }

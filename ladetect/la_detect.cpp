@@ -19,6 +19,8 @@
 #include "la_detect.h"
 #include "container.h"
 
+namespace maplefe {
+
 MemPool gMemPool;
 
 // dump LookAhead like {LA_Char, 'c'}
@@ -509,6 +511,7 @@ void LADetector::WriteHeaderFile() {
 void LADetector::WriteCppFile() {
   mCppFile->WriteOneLine("#include \"gen_lookahead.h\"", 26);
   mCppFile->WriteOneLine("#include \"common_header_autogen.h\"", 34);
+  mCppFile->WriteOneLine("namespace maplefe {", 19);
 
   // Step 1. Write all the necessary LookAhead info, like
   //   LookAhead TblStatementLookAhead[] = {{LA_Char, 'c'}, {LA_Char, 'd'}};
@@ -591,6 +594,7 @@ void LADetector::WriteCppFile() {
   mCppFile->WriteOneLine(global.c_str(), global.size());
   global = "LookAheadTable *gLookAheadTable = localLookAheadTable;";
   mCppFile->WriteOneLine(global.c_str(), global.size());
+  mCppFile->WriteOneLine("}", 1);
 }
 
 // Write the recursion to java/gen_recursion.h and java/gen_recursion.cpp
@@ -609,10 +613,11 @@ void LADetector::Write() {
   delete mCppFile;
   delete mHeaderFile;
 }
+}
 
 int main(int argc, char *argv[]) {
-  gMemPool.SetBlockSize(4096);
-  LADetector dtc;
+  maplefe::gMemPool.SetBlockSize(4096);
+  maplefe::LADetector dtc;
   dtc.Detect();
   dtc.Write();
   dtc.Release();

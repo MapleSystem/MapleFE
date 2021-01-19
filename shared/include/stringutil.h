@@ -25,6 +25,8 @@
 #include "char.h"
 #include "massert.h"
 
+namespace maplefe {
+
 // String Hash function, borrowed from
 // http://license.coscl.org.cn/MulanPSL2
 static inline unsigned HashString(const std::string &s) {
@@ -94,5 +96,6 @@ public:
   const char*   StringToString(std::string &);
   bool   StringIsNull(std::string &);
 };
+}
 #endif
 

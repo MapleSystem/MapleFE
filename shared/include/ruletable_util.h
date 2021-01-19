@@ -26,6 +26,8 @@
 #include "ruletable.h"
 #include "token.h"
 
+namespace maplefe {
+
 // This class contains all the functions that a language could use during parsing.
 // The mechansim behind this design has three major parts.
 //
@@ -68,4 +70,5 @@ extern bool RuleReachable(RuleTable *from, RuleTable *to);
 // If two lookaheads are equal.
 extern bool LookAheadEqual(LookAhead, LookAhead);
 
+}
 #endif

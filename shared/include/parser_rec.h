@@ -23,6 +23,8 @@
 
 #include "ruletable.h"
 
+namespace maplefe {
+
 // After we traverse successfully on a LeadFronNode or a Circle, we need record
 // the path which reach from LeadNode to the successful LeadFronNode or FronNode
 // of a circle.
@@ -132,4 +134,5 @@ public:
   bool ConnectPrevious(AppealNode*);
 };
 
+}
 #endif

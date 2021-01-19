@@ -21,6 +21,8 @@
 #include "common_header_autogen.h"
 #include "container.h"
 
+namespace maplefe {
+
 ////////////////////////////////////////////////////////////////////////////////////
 //                Utility Functions to walk tables
 ////////////////////////////////////////////////////////////////////////////////////
@@ -237,4 +239,5 @@ bool LookAheadEqual(LookAhead la_a, LookAhead la_b) {
     return true;
   } else
     return false;
+}
 }

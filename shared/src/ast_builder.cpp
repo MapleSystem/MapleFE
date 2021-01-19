@@ -24,6 +24,8 @@
 #include "ast_module.h"
 #include "massert.h"
 
+namespace maplefe {
+
 ASTBuilder gASTBuilder;
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -1743,4 +1745,5 @@ TreeNode* ASTBuilder::BuildLambda() {
 
   mLastTreeNode = lambda;
   return mLastTreeNode;
+}
 }

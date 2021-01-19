@@ -23,6 +23,8 @@
 #include <iostream>
 #include <fstream>
 
+namespace maplefe {
+
 #define LogInfo(msg)    { gLog << "Info: " << msg; }
 #define LogWarning(msg) { gLog << "Warning: " << msg; }
 #define LogFatal(msg)   { gLog << "Fatal: " << msg; }
@@ -55,4 +57,5 @@ public:
 
 extern Log gLog;
 
+}
 #endif // __LOG_H__

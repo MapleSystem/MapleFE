@@ -26,6 +26,8 @@
 #include "base_struct.h"
 #include "base_gen.h"
 
+namespace maplefe {
+
 // The class of SeparatorGen
 class KeywordGen : public BaseGen {
 public:
@@ -49,5 +51,7 @@ public:
   const void EnumBegin();
   const bool EnumEnd();
 };
+
+}
 
 #endif

@@ -24,6 +24,8 @@
 #include <cstdlib>
 #include "macros.h"
 
+namespace maplefe {
+
 #define EXIT_ERROR   1
 #define EXIT_SUCCESS 0
 
@@ -122,4 +124,5 @@
   std::cout << std::endl; \
 } while (0)
 
+}
 #endif /* __MASSERT_H__ */

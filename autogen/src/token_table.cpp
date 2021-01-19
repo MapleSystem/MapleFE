@@ -15,6 +15,8 @@
 
 #include "token_table.h"
 
+namespace maplefe {
+
 void TokenTable::Prepare() {
   PrepareOperators();
   PrepareSeparators();
@@ -120,4 +122,6 @@ bool TokenTable::FindStringTokenId(const char *str, unsigned &id) {
 }
 
 TokenTable gTokenTable;
+}
+
 

@@ -17,6 +17,8 @@
 #include "ast.h"
 #include "vfy_log.h"
 
+namespace maplefe {
+
 static const char* GetNodeTypeName(TreeNode *tree) {
 #undef  NODEKIND
 #define NODEKIND(K) if (tree->Is##K()) return #K;
@@ -57,4 +59,5 @@ void VfyLog::Dump() {
   for (unsigned i = 0; i < mEntries.GetNum(); i++) {
     std::cout << mEntries.ValueAtIndex(i) << std::endl;
   }
+}
 }

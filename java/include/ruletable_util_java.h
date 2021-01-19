@@ -24,6 +24,8 @@
 
 #include "ruletable_util.h"
 
+namespace maplefe {
+
 class JavaValidityCheck {
 public:
   bool IsPackageName(){return true;}
@@ -35,4 +37,5 @@ public:
   bool TypeArgWildcardContain(){return true;}
 };
 
+}
 #endif

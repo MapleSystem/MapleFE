@@ -25,6 +25,8 @@
 // is in .h file.                                                      //
 /////////////////////////////////////////////////////////////////////////
 
+namespace maplefe {
+
 class RuleGen {
 private:
   const Rule      *mRule;
@@ -64,5 +66,7 @@ public:
   void PatchToken();
   void Generate(); 
 };
+
+}
 
 #endif

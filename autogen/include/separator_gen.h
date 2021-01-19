@@ -40,6 +40,8 @@
 #include "base_gen.h"
 #include "supported.h"
 
+namespace maplefe {
+
 // For each separator, it has three parts involved in the generation.
 //   1. SepId:   Used inside autogen, connection between LANGUAGE and SUPPORTED
 //               .spec files
@@ -88,5 +90,7 @@ public:
   const void EnumBegin();
   const bool EnumEnd();
 };
+
+}
 
 #endif

@@ -22,6 +22,8 @@
 #include "container.h"
 #include "massert.h"
 
+namespace maplefe {
+
 char* ContainerMemPool::AddrOfIndex(unsigned index) {
   unsigned num_in_blk = mBlockSize / mElemSize;
   unsigned blk = index / num_in_blk;
@@ -34,4 +36,5 @@ char* ContainerMemPool::AddrOfIndex(unsigned index) {
 
   char *addr = block->addr + index_in_blk * mElemSize;
   return addr;
+}
 }

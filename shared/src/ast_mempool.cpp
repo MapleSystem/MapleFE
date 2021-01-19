@@ -15,6 +15,8 @@
 #include "ast_mempool.h"
 #include "ast.h"
 
+namespace maplefe {
+
 TreePool::~TreePool() {
   Release();
 }
@@ -37,4 +39,5 @@ void TreePool::Release() {
 
   // step 2. Release mMP
   mMP.Release();
+}
 }

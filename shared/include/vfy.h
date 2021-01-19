@@ -44,6 +44,8 @@
 #include "container.h"
 #include "vfy_log.h"
 
+namespace maplefe {
+
 class ASTScope;
 class TreeNode;
 
@@ -85,4 +87,5 @@ public:
 
 };
 
+}
 #endif

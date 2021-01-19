@@ -43,7 +43,7 @@ int main (int argc, char *argv[]) {
     exit(-1);
   }
 
-  Parser *parser = new Parser(argv[1]);
+  maplefe::Parser *parser = new maplefe::Parser(argv[1]);
 
   bool trace_a2m = false;
 
@@ -82,10 +82,10 @@ int main (int argc, char *argv[]) {
   parser->InitRecursion();
   parser->Parse();
 
-  VerifierJava vfy_java;
+  maplefe::VerifierJava vfy_java;
   vfy_java.Do();
 
-  A2MJava *a2m = new A2MJava(gModule.mFileName);
+  maplefe::A2MJava *a2m = new maplefe::A2MJava(maplefe::gModule.mFileName);
   a2m->ProcessAST(trace_a2m);
 
   a2m->mMirModule->OutputAsciiMpl("", ".mpl");

@@ -22,6 +22,8 @@
 #include "base_gen.h"
 #include "all_supported.h"
 
+namespace maplefe {
+
 class ExprGen : public BaseGen {
 public:
   ExprGen(const char *dfile, const char *hfile, const char *cfile)
@@ -32,5 +34,7 @@ public:
   void GenCppFile();
   void GenHeaderFile();
 };
+
+}
 
 #endif

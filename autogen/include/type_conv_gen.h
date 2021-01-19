@@ -20,4 +20,8 @@
 #ifndef __TYPE_CONV_GEN_H__
 #define __TYPE_CONV_GEN_H__
 
+namespace maplefe {
+
+}
+
 #endif

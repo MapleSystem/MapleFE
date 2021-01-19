@@ -34,6 +34,8 @@
 
 #include "element.h"
 
+namespace maplefe {
+
 typedef enum {
   COMM_EOL,   //End of Line, //
   COMM_TRA    //Traditional, /* ... */
@@ -49,4 +51,5 @@ public:
   bool IsTraditional() {return CommType == COMM_TRA;}
 };
 
+}
 #endif

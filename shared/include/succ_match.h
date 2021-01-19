@@ -23,6 +23,8 @@
 
 #include "container.h"
 
+namespace maplefe {
+
 // To save all the successful results of a rule, we use a container called Guamian, aka
 // Hanging Noodle. We save two types of information, one is the succ AppealNodes. The
 // other one is the last matching token index. The second info can be also found through
@@ -89,4 +91,5 @@ public:
   bool FindMatch(unsigned starttoken, unsigned target_match);
 };
 
+}
 #endif

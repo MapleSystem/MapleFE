@@ -17,6 +17,8 @@
 #include "mir_function.h"
 #include "constant_fold.h"
 
+namespace maplefe {
+
 A2M::A2M(const char *filename) : mFileName(filename) {
   mMirModule = new maple::MIRModule(mFileName);
 }
@@ -69,5 +71,6 @@ void A2M::MapAttr(GenericAttrs &attr, const IdentifierNode *inode) {
   unsigned anum = inode->GetAttrsNum();
   for (int i = 0; i < anum; i++) {
   }
+}
 }
 

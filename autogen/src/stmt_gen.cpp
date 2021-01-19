@@ -14,6 +14,8 @@
 */
 #include "stmt_gen.h"
 
+namespace maplefe {
+
 void StmtGen::Generate() {
   GenRuleTables();
   GenHeaderFile();
@@ -23,17 +25,23 @@ void StmtGen::Generate() {
 void StmtGen::GenHeaderFile() {
   mHeaderFile.WriteOneLine("#ifndef __STMT_GEN_H__", 22);
   mHeaderFile.WriteOneLine("#define __STMT_GEN_H__", 22);
+  mHeaderFile.WriteOneLine("namespace maplefe {", 19);
 
   // generate the rule tables
   mHeaderFile.WriteFormattedBuffer(&mRuleTableHeader);
 
+  mHeaderFile.WriteOneLine("}", 1);
   mHeaderFile.WriteOneLine("#endif", 6);
 }
 
 void StmtGen::GenCppFile() {
   mCppFile.WriteOneLine("#include \"common_header_autogen.h\"", 34);
+  mCppFile.WriteOneLine("namespace maplefe {", 19);
 
   // generate the rule tables
   mCppFile.WriteFormattedBuffer(&mRuleTableCpp);
+  mCppFile.WriteOneLine("}", 1);
 }
+}
+
 

@@ -22,6 +22,8 @@
 
 #include "supported.h"
 
+namespace maplefe {
+
 ///////////////////////////////////////////////////////////////////////////
 //                       Rule Table                                      //
 //
@@ -189,4 +191,5 @@ struct KeywordTableEntry {
   const char *mText;
 };
 
+}
 #endif

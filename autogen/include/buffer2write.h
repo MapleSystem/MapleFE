@@ -27,6 +27,8 @@
 #define MAX_LINE_LIMIT  100
 #define LINES_PER_BLOCK 4     // This must be 2^x
 
+namespace maplefe {
+
 class FormattedBuffer;
 class BaseGen;
 
@@ -351,5 +353,7 @@ public:
   // 1. decl is for the declaration of a table.
   void Generate(BaseGen *, const std::string decl);
 };
+
+}
 
 #endif

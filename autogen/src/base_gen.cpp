@@ -26,6 +26,8 @@
 #include "ruleelem_pool.h"
 #include "massert.h"
 
+namespace maplefe {
+
 // The delimiter when parsing rule elements, during identifier generation
 static const char *delimiter = " ()+,";
 
@@ -255,4 +257,6 @@ RuleElem *BaseGen::GetOrCreateRuleElemFromString(std::string str, bool getOnly) 
 
   return elem;
 }
+}
+
 

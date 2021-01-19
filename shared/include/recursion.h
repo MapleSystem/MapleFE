@@ -23,6 +23,8 @@
 #include "ruletable.h"
 #include "container.h"
 
+namespace maplefe {
+
 // For each rule it could have multiple left recursions. Each recursion is represented
 // as a 'circle'. A 'circle' is simply an integer array, with the first element being the
 // length of the array.
@@ -153,4 +155,5 @@ public:
   bool IsLeadNode(RuleTable*);
 };
 
+}
 #endif

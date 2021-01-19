@@ -27,6 +27,8 @@
 #include "ruletable.h"
 #include "write2file.h"
 
+namespace maplefe {
+
 // A mapping between Rule and the set of lookahead.
 class RuleLookAhead {
 public:
@@ -133,4 +135,5 @@ public:
 
 extern MemPool gMemPool;
 
+}
 #endif

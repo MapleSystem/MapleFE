@@ -27,6 +27,8 @@
 
 #include "ruletable_util.h"
 
+namespace maplefe {
+
 #define MAX_LINE_SIZE 4096
 
 /* Read (next) line from the input file, and return the readed
@@ -832,4 +834,5 @@ const char* Lexer::TraverseKeywordTable() {
     }
   }
   return NULL;
+}
 }

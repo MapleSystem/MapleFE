@@ -29,6 +29,8 @@
 #include <vector>
 #include <unordered_map>
 
+namespace maplefe {
+
 class Token;
 
 class Lexer {
@@ -155,4 +157,5 @@ public:
 
 extern LitData ProcessLiteral(LitId type, const char *str);
 
+}
 #endif  // INCLUDE_LEXER_H

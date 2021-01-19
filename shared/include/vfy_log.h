@@ -19,6 +19,8 @@
 #include "stringpool.h"
 #include "container.h"
 
+namespace maplefe {
+
 class TreeNode;
 
 // We allow the verification to be done through the whole module. So there could be
@@ -39,4 +41,5 @@ public:
   void Dump();
 };
 
+}
 #endif

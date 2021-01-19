@@ -20,6 +20,8 @@
 #include "operator_gen.h"
 #include "separator_gen.h"
 
+namespace maplefe {
+
 class TokenTable {
 public:
   std::vector<Token> mTokens;
@@ -50,4 +52,6 @@ public:
 };
 
 extern TokenTable gTokenTable;
+}
+
 #endif

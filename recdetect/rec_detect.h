@@ -24,6 +24,8 @@
 #include "ruletable.h"
 #include "write2file.h"
 
+namespace maplefe {
+
 // There are some observations that help build the recursion data structure.
 // 1. A path is composed of a list of positions. Each position tells which rule elem
 //    it goes into from current rule. So a list of unsigned integer make up the cirle.
@@ -214,4 +216,5 @@ public:
 // The pool will free all memory automatically.
 MemPool gMemPool;
 
+}
 #endif

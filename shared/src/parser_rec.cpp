@@ -23,6 +23,7 @@
 #include "ruletable_util.h"
 #include "gen_summary.h"
 
+namespace maplefe {
 
 RecursionTraversal* Parser::FindRecStack(unsigned group_id, unsigned start_token) {
   for (unsigned i = 0; i < mRecStack.GetNum(); i++) {
@@ -331,4 +332,5 @@ void RecursionTraversal::FinalConnection() {
 void RecursionTraversal::DumpIndentation() {
   for (unsigned i=0; i < mIndentation; i++)
     std::cout << " ";
+}
 }

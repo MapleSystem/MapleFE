@@ -25,6 +25,8 @@
 #include "rule.h"
 #include "base_gen.h"
 
+namespace maplefe {
+
 // ONEOF, ZEROORMORE, ZEROORONE, ...
 typedef struct {
   const char *mName;   // The reserved name in the .spec syntax
@@ -53,5 +55,7 @@ public:
   void GenCppFile();
   void GenHeaderFile();
 };
+
+}
 
 #endif

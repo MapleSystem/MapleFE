@@ -18,6 +18,8 @@
 #include "base_gen.h"
 #include "token_table.h"
 
+namespace maplefe {
+
 // Generate one initialization function for each rule. Below is the elaboration of most of
 // of rule case.
 //
@@ -478,4 +480,6 @@ void RuleGen::PatchTokenOnElem(RuleElem *elem) {
     MERROR("Unsupported ElemType");
     break;
   }
+}
+
 }

@@ -24,6 +24,8 @@
 
 #include "mempool.h"
 
+namespace maplefe {
+
 class TreeNode;
 
 // TreePool contains two types of dynamic memory.
@@ -52,4 +54,5 @@ public:
                     //     is out of the control of mMP.
 };
 
+}
 #endif

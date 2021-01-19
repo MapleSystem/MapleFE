@@ -24,6 +24,8 @@
 #include <vector>
 #include "rule.h"
 
+namespace maplefe {
+
 // RuleElemPool will request/release memory on the Block level.
 // So far it only request new Block and keep (re)using it. It won't release
 // any memory right now. It even doesn't let MemPool know a Block is free.
@@ -43,4 +45,6 @@ public:
   ~RuleElemPool(){}
   RuleElem* NewRuleElem();
 };
+}
+
 #endif

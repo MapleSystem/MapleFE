@@ -30,6 +30,8 @@
 
 #include "stringpool.h"
 
+namespace maplefe {
+
 class MemPool;
 class RuleElemPool;
 class ReservedGen;
@@ -85,5 +87,7 @@ public:
   void DumpStruct();
   void Dump() { DumpStruct(); DumpRules(); }
 };
+
+}
 
 #endif

@@ -18,6 +18,8 @@
 
 #include "massert.h"
 
+namespace maplefe {
+
 #define DEFAULT_BUCKETS_NUM 256
 
 StringMap::StringMap(unsigned BucketNum) {
@@ -106,5 +108,6 @@ void StringMap::InsertEntry(char *addr, unsigned bucket) {
 
   StringMapEntry *NewEnt = new StringMapEntry(addr);
   E->Next = NewEnt;
+}
 }
 

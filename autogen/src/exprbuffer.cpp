@@ -17,6 +17,8 @@
 #include "exprbuffer.h"
 #include "massert.h"
 
+namespace maplefe {
+
 // Note: This must be in the order as in 'enum OprCode', and this is the
 //       reason I duplicate OprCode here in order to make the code easy
 //       to maintain. 
@@ -220,4 +222,6 @@ void ExprBuffer::W2BRecursive(ExprNode *n){
       break;
     }
   }
+}
+
 }

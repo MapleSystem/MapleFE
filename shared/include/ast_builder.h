@@ -19,6 +19,8 @@
 #include "ast.h"
 #include "ast_mempool.h"
 
+namespace maplefe {
+
 ////////////////////////////////////////////////////////////////////////////
 //                  The AST Builder
 // ASTBuilder takes the action Id and parameter list, to create a sub tree.
@@ -169,4 +171,5 @@ public:
 
 // A global builder is good enough.
 extern ASTBuilder gASTBuilder;
+}
 #endif

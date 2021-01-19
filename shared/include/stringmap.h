@@ -30,6 +30,8 @@
 
 #include <string>
 
+namespace maplefe {
+
 class StringPool;
 
 // The StringMapEntry-s in the same bucket form a linked list
@@ -64,4 +66,5 @@ public:
   void     InsertEntry(char *, unsigned);
 };
 
+}
 #endif

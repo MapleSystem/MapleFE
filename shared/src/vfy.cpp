@@ -19,6 +19,8 @@
 #include "ast_scope.h"
 #include "massert.h"
 
+namespace maplefe {
+
 ///////////////////////////////////////////////////////////////////////////////
 // The verification is done in the following rules.
 // 1. Verifier works scope by scope.
@@ -405,4 +407,5 @@ void Verifier::VerifyUserType(UserTypeNode *tree){
 
 void Verifier::VerifyLambda(LambdaNode *tree){
   return;
+}
 }

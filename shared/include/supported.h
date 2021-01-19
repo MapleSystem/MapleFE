@@ -19,6 +19,8 @@
 #ifndef __SUPPORTED_H__
 #define __SUPPORTED_H__
 
+namespace maplefe {
+
 // The list of all supported types. This covers all the languages.
 // NOTE: autogen also relies on this set of supported separators
 #undef  TYPE
@@ -75,4 +77,5 @@ enum ActionId{
 ACT_NA
 };
 
+}
 #endif

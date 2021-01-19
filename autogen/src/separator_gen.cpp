@@ -19,6 +19,8 @@
 #include "massert.h"
 #include "all_supported.h"
 
+namespace maplefe {
+
 //////////////   Separators supported /////////////////
 #undef  SEPARATOR
 #define SEPARATOR(S) {#S, SEP_##S},
@@ -109,15 +111,21 @@ void SeparatorGen::Generate() {
 void SeparatorGen::GenHeaderFile() {
   mHeaderFile.WriteOneLine("#ifndef __SEPARATOR_GEN_H__", 27);
   mHeaderFile.WriteOneLine("#define __SEPARATOR_GEN_H__", 27);
+  mHeaderFile.WriteOneLine("namespace maplefe {", 19);
   mHeaderFile.WriteOneLine("extern SepTableEntry SepTable[SEP_NA];", 38);
+  mHeaderFile.WriteOneLine("}", 1);
   mHeaderFile.WriteOneLine("#endif", 6);
 }
 
 void SeparatorGen::GenCppFile() {
   mCppFile.WriteOneLine("#include \"ruletable.h\"", 22);
+  mCppFile.WriteOneLine("namespace maplefe {", 19);
   TableBuffer tb;
   tb.Generate(this, "SepTableEntry SepTable[SEP_NA] = {");
   mCppFile.WriteFormattedBuffer(&tb);
   mCppFile.WriteOneLine("};", 2);
+  mCppFile.WriteOneLine("}", 1);
 }
+}
+
 

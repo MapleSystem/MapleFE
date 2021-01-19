@@ -52,6 +52,8 @@
 #include "supported.h"
 #include "token.h"
 
+namespace maplefe {
+
 enum NodeKind {
 #undef  NODEKIND
 #define NODEKIND(K) NK_##K,
@@ -1060,4 +1062,5 @@ public:
 
 };
 
+}
 #endif

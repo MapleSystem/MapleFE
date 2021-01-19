@@ -21,6 +21,8 @@
 
 #include "base_gen.h"
 
+namespace maplefe {
+
 class IdenGen : public BaseGen {
 public:
   IdenGen(const char *dfile, const char *hfile, const char *cfile) :
@@ -31,5 +33,7 @@ public:
   void GenCppFile();
   void GenHeaderFile();
 };
+
+}
 
 #endif

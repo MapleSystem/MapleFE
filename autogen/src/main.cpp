@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
   // autogen -p test.spec
 
   // create a shared spec parser
-  SPECParser *parser = new SPECParser();
+  maplefe::SPECParser *parser = new maplefe::SPECParser();
 
   bool checkParserOnly = false;
   int verbose = 0;
@@ -49,16 +49,15 @@ int main(int argc, char *argv[]) {
 
   if (checkParserOnly) {
     // make the parser to process the given spec file
-    BaseGen *bg = new BaseGen(argv[fileIndex]);
+    maplefe::BaseGen *bg = new maplefe::BaseGen(argv[fileIndex]);
     bg->SetParser(parser);
     bg->Parse();
     delete bg;
     return 0;
   }
 
-  AutoGen ag(parser);
+  maplefe::AutoGen ag(parser);
   ag.Gen();
 
   return 0;
 }
-

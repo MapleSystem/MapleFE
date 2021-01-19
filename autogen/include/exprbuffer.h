@@ -26,6 +26,8 @@
 // The hard part of this buffer is how to dump the expression           //
 //////////////////////////////////////////////////////////////////////////
 
+namespace maplefe {
+
 #define EXPR_SIZE 256
 #define NAME_SIZE 128
 
@@ -131,5 +133,7 @@ public:
   unsigned BufferLength() {return mPos;}
   char *GetData() {return mData;}
 };
+
+}
 
 #endif

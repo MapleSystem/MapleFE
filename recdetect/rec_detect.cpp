@@ -18,6 +18,8 @@
 #include "rec_detect.h"
 #include "gen_summary.h"
 
+namespace maplefe {
+
 ////////////////////////////////////////////////////////////////////////////////////
 // The idea of Rursion Dectect is through a Depth First Traversal in the tree.
 // There are a few things we need make it clear.
@@ -914,6 +916,7 @@ void RecDetector::WriteHeaderFile() {
 void RecDetector::WriteCppFile() {
   mCppFile->WriteOneLine("#include \"gen_recursion.h\"", 26);
   mCppFile->WriteOneLine("#include \"common_header_autogen.h\"", 34);
+  mCppFile->WriteOneLine("namespace maplefe {", 19);
 
   //Step 1. Dump paths of a rule table's recursions.
   //  unsigned tablename_path_1[N]={1, 2, ...};
@@ -1060,6 +1063,7 @@ void RecDetector::WriteCppFile() {
   mCppFile->WriteOneLine(last_str.c_str(), last_str.size());
 
   WriteGroup2Rule();
+  mCppFile->WriteOneLine("}", 1);
 }
 
 // unsigned gRecursionGroupsNum = N;
@@ -1367,10 +1371,11 @@ void RecDetector::Write() {
   delete mCppFile;
   delete mHeaderFile;
 }
+}
 
 int main(int argc, char *argv[]) {
-  gMemPool.SetBlockSize(4096);
-  RecDetector dtc;
+  maplefe::gMemPool.SetBlockSize(4096);
+  maplefe::RecDetector dtc;
   dtc.Detect();
   dtc.DetectGroups();
   dtc.Write();

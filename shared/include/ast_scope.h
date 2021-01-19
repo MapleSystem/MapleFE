@@ -22,6 +22,8 @@
 #include "mempool.h"
 #include "container.h"
 
+namespace maplefe {
+
 ////////////////////////////////////////////////////////////////////////////
 //                         AST Scope
 // Scope in a file are arranged as a tree. The root of each tree
@@ -96,4 +98,5 @@ public:
   ASTScope* NewScope(ASTScope *parent);
 };
 
+}
 #endif

@@ -28,6 +28,8 @@
 #include "succ_match.h"
 #include "gen_summary.h"
 
+namespace maplefe {
+
 class Function;
 class Stmt;
 class Token;
@@ -347,4 +349,5 @@ public:
 extern unsigned gSuccTokensNum;
 extern unsigned gSuccTokens[MAX_SUCC_TOKENS];
 
+}
 #endif

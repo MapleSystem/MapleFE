@@ -24,6 +24,8 @@
 #include <string>
 #include <vector>
 
+namespace maplefe {
+
 #define MAX_LINE_LIMIT  100
 #define LINES_PER_BLOCK 4     // This must be 2^x
 
@@ -55,4 +57,5 @@ public:
   void WriteBlock(const char *);
 };
 
+}
 #endif

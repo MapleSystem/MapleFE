@@ -23,6 +23,8 @@
 
 #include "massert.h"
 
+namespace maplefe {
+
 //////////////////////////////////////////////////////////////////////////////////////
 //                          Utility    Functions
 //////////////////////////////////////////////////////////////////////////////////////
@@ -1090,4 +1092,5 @@ void InterfaceNode::Dump(unsigned indent) {
     TreeNode *node = mMethods.ValueAtIndex(i);
     node->Dump(indent + 4);
   }
+}
 }

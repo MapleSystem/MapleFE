@@ -24,6 +24,8 @@
 #include "gen_token.h"
 #include "token.h"
 
+namespace maplefe {
+
 Rule2Recursion* GetRule2Recursion(RuleTable *rule_table){
   for (unsigned i = 0; i < gRule2RecursionNum; i++) {
     Rule2Recursion *r2r = gRule2Recursion[i];
@@ -552,4 +554,5 @@ void RecursionAll::Dump() {
   }
   std::cout << "===================== End Recursions Dump ===============";
   std::cout << std::endl;
+}
 }

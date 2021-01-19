@@ -14,6 +14,8 @@
 */
 #include "block_gen.h"
 
+namespace maplefe {
+
 void BlockGen::Generate() {
   GenRuleTables();
   GenHeaderFile();
@@ -23,16 +25,22 @@ void BlockGen::Generate() {
 void BlockGen::GenHeaderFile() {
   mHeaderFile.WriteOneLine("#ifndef __BLOCK_GEN_H__", 23);
   mHeaderFile.WriteOneLine("#define __BLOCK_GEN_H__", 23);
+  mHeaderFile.WriteOneLine("namespace maplefe {", 19);
 
   // generate the rule tables
   mHeaderFile.WriteFormattedBuffer(&mRuleTableHeader);
 
+  mHeaderFile.WriteOneLine("}", 1);
   mHeaderFile.WriteOneLine("#endif", 6);
 }
 
 void BlockGen::GenCppFile() {
   mCppFile.WriteOneLine("#include \"common_header_autogen.h\"", 34);
+  mCppFile.WriteOneLine("namespace maplefe {", 19);
   // generate the rule tables
   mCppFile.WriteFormattedBuffer(&mRuleTableCpp);
+  mCppFile.WriteOneLine("}", 1);
 }
+}
+
 

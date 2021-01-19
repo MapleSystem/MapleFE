@@ -35,6 +35,8 @@
 #include "stringutil.h"
 #include "supported.h"
 
+namespace maplefe {
+
 typedef enum {
   TT_ID,    // Identifier
   TT_KW,    // Keyword
@@ -93,4 +95,5 @@ struct Token {
   void Dump();
 };
 
+}
 #endif

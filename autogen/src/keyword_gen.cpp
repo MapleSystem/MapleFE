@@ -16,6 +16,8 @@
 #include "keyword_gen.h"
 #include "massert.h"
 
+namespace maplefe {
+
 /////////////////////////////////////////////////////////////////////
 //                 Generate the Separator table                    //
 // The table in the cpp file:
@@ -65,6 +67,7 @@ void KeywordGen::Generate() {
 void KeywordGen::GenHeaderFile() {
   mHeaderFile.WriteOneLine("#ifndef __KEYWORD_GEN_H__", 25);
   mHeaderFile.WriteOneLine("#define __KEYWORD_GEN_H__", 25);
+  mHeaderFile.WriteOneLine("namespace maplefe {", 19);
 
   // table decl
   std::string s = "extern KeywordTableEntry KeywordTable[";
@@ -76,11 +79,13 @@ void KeywordGen::GenHeaderFile() {
   s = "extern unsigned KeywordTableSize;";
   mHeaderFile.WriteOneLine(s.c_str(), s.size());
 
+  mHeaderFile.WriteOneLine("}", 1);
   mHeaderFile.WriteOneLine("#endif", 6);
 }
 
 void KeywordGen::GenCppFile() {
   mCppFile.WriteOneLine("#include \"ruletable.h\"", 22);
+  mCppFile.WriteOneLine("namespace maplefe {", 19);
   TableBuffer tb;
   std::string s = "KeywordTableEntry KeywordTable[";
   s = s + std::to_string(mKeywords.size());
@@ -94,5 +99,8 @@ void KeywordGen::GenCppFile() {
   s = s + std::to_string(mKeywords.size());
   s = s + ";";
   mCppFile.WriteOneLine(s.c_str(), s.size());
+  mCppFile.WriteOneLine("}", 1);
 }
+}
+
 

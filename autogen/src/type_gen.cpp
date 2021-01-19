@@ -18,6 +18,8 @@
 #include "massert.h"
 #include "all_supported.h"
 
+namespace maplefe {
+
 // Fill Map
 void TypeGen::ProcessStructData() {
   for (auto it: mStructs) {
@@ -71,17 +73,20 @@ void TypeGen::Generate() {
 void TypeGen::GenHeaderFile() {
   mHeaderFile.WriteOneLine("#ifndef __TYPE_GEN_H__", 22);
   mHeaderFile.WriteOneLine("#define __TYPE_GEN_H__", 22);
+  mHeaderFile.WriteOneLine("namespace maplefe {", 19);
 
   // generate the keyword table
   mHeaderFile.WriteOneLine("extern TypeKeyword TypeKeywordTable[TY_NA];", 43);
 
   // generate the rule tables
   mHeaderFile.WriteFormattedBuffer(&mRuleTableHeader);
+  mHeaderFile.WriteOneLine("}", 1);
   mHeaderFile.WriteOneLine("#endif", 6);
 }
 
 void TypeGen::GenCppFile() {
   mCppFile.WriteOneLine("#include \"common_header_autogen.h\"", 34);
+  mCppFile.WriteOneLine("namespace maplefe {", 19);
 
   // generate the keyword table
   TableBuffer tb;
@@ -91,5 +96,7 @@ void TypeGen::GenCppFile() {
 
   // generate the rule tables
   mCppFile.WriteFormattedBuffer(&mRuleTableCpp);
+  mCppFile.WriteOneLine("}", 1);
 }
 
+}

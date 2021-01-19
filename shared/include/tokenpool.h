@@ -35,6 +35,8 @@
 #include "mempool.h"
 #include "container.h"
 
+namespace maplefe {
+
 class Token;
 
 class TokenPool {
@@ -48,4 +50,5 @@ public:
   char* NewToken(unsigned);
 };
 
+}
 #endif

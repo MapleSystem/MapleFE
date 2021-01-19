@@ -15,6 +15,8 @@
 
 #include "ast_scope.h"
 
+namespace maplefe {
+
 ASTScope::ASTScope(ASTScope *parent) {
   mParent = NULL;
   mTree = NULL;
@@ -114,4 +116,5 @@ ASTScope* ASTScopePool::NewScope(ASTScope *parent) {
     s = new (addr) ASTScope();
   mScopes.push_back(s);
   return s;
+}
 }

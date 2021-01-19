@@ -22,6 +22,8 @@
 #include "fileread.h"
 #include "massert.h"
 
+namespace maplefe {
+
 FileReader::FileReader(const std::string &s) {
   mName = s;
   mDefFile.open(s.c_str(), std::ifstream::in);
@@ -383,4 +385,5 @@ void FileReader::Assert(int exp, const char *message) {
     DumpCursor();
     exit(1);
   }
+}
 }

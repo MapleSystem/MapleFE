@@ -20,6 +20,8 @@
 #include "ast_module.h"
 #include "ast_scope.h"
 
+namespace maplefe {
+
 // Collect all types, decls of global scope all at once.
 void VerifierJava::VerifyGlobalScope() {
   mCurrScope = gModule.mRootScope;
@@ -55,4 +57,5 @@ void VerifierJava::VerifyClassMethods(ClassNode *klass) {
     // step 2. verify functioin.
     VerifyFunction(method);
   }
+}
 }

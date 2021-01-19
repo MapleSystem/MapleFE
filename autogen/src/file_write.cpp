@@ -18,6 +18,8 @@
 #include "file_write.h"
 #include "massert.h"
 
+namespace maplefe {
+
 ///////////////////////////////////////////////////////////////////////
 //                            FileWriter                             //
 ///////////////////////////////////////////////////////////////////////
@@ -81,6 +83,8 @@ void FileWriter::WriteScopedBuffer(const ScopedBuffer *scoped) {
 void FileWriter::WriteIfBuffer(const IfBuffer *ifbuf) {
   WriteFormattedBuffer(ifbuf->GetCondition());
   WriteFormattedBuffer(ifbuf->GetBody());
+}
+
 }
 
 

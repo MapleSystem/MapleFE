@@ -19,6 +19,8 @@
 #include "massert.h"
 #include "all_supported.h"
 
+namespace maplefe {
+
 // Fill Map
 void AttrGen::ProcessStructData() {
   for (auto it: mStructs) {
@@ -71,16 +73,22 @@ void AttrGen::Generate() {
 void AttrGen::GenHeaderFile() {
   mHeaderFile.WriteOneLine("#ifndef __ATTR_GEN_H__", 22);
   mHeaderFile.WriteOneLine("#define __ATTR_GEN_H__", 22);
+  mHeaderFile.WriteOneLine("namespace maplefe {", 19);
   mHeaderFile.WriteOneLine("extern AttrKeyword AttrKeywordTable[ATTR_NA];", 45);
+  mHeaderFile.WriteOneLine("}", 1);
   mHeaderFile.WriteOneLine("#endif", 6);
 }
 
 void AttrGen::GenCppFile() {
   mCppFile.WriteOneLine("#include \"common_header_autogen.h\"", 34);
+  mCppFile.WriteOneLine("namespace maplefe {", 19);
 
   TableBuffer tb;
   tb.Generate(this, "AttrKeyword AttrKeywordTable[ATTR_NA] = {");
   mCppFile.WriteFormattedBuffer(&tb);
   mCppFile.WriteOneLine("};", 2);
+  mCppFile.WriteOneLine("}", 1);
 }
+}
+
 

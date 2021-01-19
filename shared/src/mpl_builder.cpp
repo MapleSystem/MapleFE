@@ -15,6 +15,8 @@
 
 #include "ast2mpl.h"
 
+namespace maplefe {
+
 #define NOTYETIMPL(K) { if (mTraceA2m) { MNYI(K); }}
 
 void A2M::ProcessPackage(TreeNode *tnode) {
@@ -237,5 +239,6 @@ void A2M::ProcessSwitch(TreeNode *tnode) {
 void A2M::ProcessPass(TreeNode *tnode) {
   NOTYETIMPL("ProcessPass()");
   return;
+}
 }
 

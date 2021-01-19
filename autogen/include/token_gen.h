@@ -25,6 +25,8 @@
 #include "base_gen.h"
 #include "supported.h"
 
+namespace maplefe {
+
 class TokenGen : public BaseGen {
 public:
   TokenGen(const char *hfile, const char *cfile)
@@ -37,5 +39,7 @@ public:
 
   void Run(SPECParser *parser){return;}
 };
+
+}
 
 #endif

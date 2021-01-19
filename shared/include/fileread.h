@@ -24,6 +24,8 @@
 #include <string>
 #include <vector>
 
+namespace maplefe {
+
 class FileReader {
 public:
   std::string   mName;
@@ -79,4 +81,5 @@ public:
   void DumpCursor();
 };
 
+}
 #endif

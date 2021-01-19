@@ -22,6 +22,8 @@
 #include "massert.h"
 #include "token_table.h"
 
+namespace maplefe {
+
 ///////////////////////////////////////////////////////////////////////////////////////
 //                       Summary functions during parsing
 // During matching phase in the language parser, we often need to print the stack of
@@ -66,6 +68,7 @@ static void WriteSummaryHFile() {
   gSummaryHFile->WriteOneLine("#include \"ruletable.h\"", 22);
   gSummaryHFile->WriteOneLine("#include \"succ_match.h\"", 23);
   gSummaryHFile->WriteOneLine("#include <vector>", 17);
+  gSummaryHFile->WriteOneLine("namespace maplefe {", 19);
   gSummaryHFile->WriteOneLine("typedef struct {", 16);
   gSummaryHFile->WriteOneLine("  const RuleTable *mAddr;", 25);
   gSummaryHFile->WriteOneLine("  const char      *mName;", 25);
@@ -98,6 +101,7 @@ static void WriteSummaryHFile() {
   s += "];";
   gSummaryHFile->WriteOneLine(s.c_str(), s.size());
 
+  gSummaryHFile->WriteOneLine("}", 1);
   gSummaryHFile->WriteOneLine("#endif", 6);
 }
 
@@ -105,6 +109,7 @@ static void WriteSummaryHFile() {
 static void PrepareSummaryCppFile() {
   gSummaryCppFile->WriteOneLine("#include \"gen_summary.h\"", 24);
   gSummaryCppFile->WriteOneLine("#include \"common_header_autogen.h\"", 34);
+  gSummaryCppFile->WriteOneLine("namespace maplefe {", 19);
   gSummaryCppFile->WriteOneLine("RuleTableSummary gRuleTableSummarys[] = {", 41);
 }
 
@@ -152,6 +157,7 @@ static void FinishSummaryCppFile() {
   }
   s += "};";
   gSummaryCppFile->WriteOneLine(s.c_str(), s.size());
+  gSummaryCppFile->WriteOneLine("}", 1);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -300,4 +306,6 @@ void AutoGen::Gen() {
 
   WriteSummaryHFile();
   FinishSummaryCppFile();
+}
+
 }

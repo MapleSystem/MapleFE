@@ -14,6 +14,8 @@
 */
 #include "log.h"
 
+namespace maplefe {
+
 // The global Log
 Log gLog;
 
@@ -45,5 +47,6 @@ Log& Log::operator<<(const bool b) {
 Log& Log::operator<<(const char *s) {
   mFile << s;
   return *this;
+}
 }
 

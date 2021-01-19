@@ -21,6 +21,8 @@
 
 #include <iostream>
 
+namespace maplefe {
+
 #define NEWLINE do { \
   std::cout << std::endl;\
 } while (0)
@@ -33,4 +35,5 @@
   std::cout << "(" << __FILE__ << ":" << __LINE__ << ") " << std::endl;\
 } while (0)
 
+}
 #endif /* __MACROS_H__ */

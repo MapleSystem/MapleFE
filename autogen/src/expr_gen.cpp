@@ -14,6 +14,8 @@
 */
 #include "expr_gen.h"
 
+namespace maplefe {
+
 void ExprGen::Generate() {
   GenRuleTables();
   GenHeaderFile();
@@ -23,17 +25,23 @@ void ExprGen::Generate() {
 void ExprGen::GenHeaderFile() {
   mHeaderFile.WriteOneLine("#ifndef __EXPR_GEN_H__", 22);
   mHeaderFile.WriteOneLine("#define __EXPR_GEN_H__", 22);
+  mHeaderFile.WriteOneLine("namespace maplefe {", 19);
 
   // generate the rule tables
   mHeaderFile.WriteFormattedBuffer(&mRuleTableHeader);
 
+  mHeaderFile.WriteOneLine("}", 1);
   mHeaderFile.WriteOneLine("#endif", 6);
 }
 
 void ExprGen::GenCppFile() {
   mCppFile.WriteOneLine("#include \"common_header_autogen.h\"", 34);
+  mCppFile.WriteOneLine("namespace maplefe {", 19);
 
   // generate the rule tables
   mCppFile.WriteFormattedBuffer(&mRuleTableCpp);
+  mCppFile.WriteOneLine("}", 1);
 }
+}
+
 

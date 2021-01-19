@@ -27,6 +27,8 @@
 #include "massert.h"
 #include "all_supported.h"
 
+namespace maplefe {
+
 //////////////////////////////////////////////////////////////////////////////
 
 void SPECParser::ParserError(std::string msg, std::string str) { 
@@ -716,4 +718,6 @@ void SPECParser::DumpRules() {
     if (it->mElement)
       it->Dump();
   std::cout << "==================================" << std::endl;
+}
+
 }

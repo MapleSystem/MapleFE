@@ -16,6 +16,8 @@
 #ifndef __CHAR_H__
 #define __CHAR_H__
 
+namespace maplefe {
+
 // This file defines the Char we use in the parser and AST.
 // We separate unicode character literal from normal Raw Input character.
 
@@ -29,4 +31,5 @@ struct Char {
   }mData;
 };
 
+}
 #endif

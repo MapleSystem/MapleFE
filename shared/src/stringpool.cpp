@@ -25,6 +25,8 @@
 #include "stringmap.h"
 #include "massert.h"
 
+namespace maplefe {
+
 // The global string pool for lexing, parsing, ast building and ir building
 // for the symbols, etc.
 StringPool gStringPool;
@@ -130,5 +132,6 @@ char* StringPool::FindString(const char *str, size_t len) {
   std::string s;
   s.assign(str, len);
   return mMap->LookupAddrFor(s);
+}
 }
 

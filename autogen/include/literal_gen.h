@@ -23,6 +23,8 @@
 #include "base_gen.h"
 #include "rule.h"
 
+namespace maplefe {
+
 class LiteralGen : public BaseGen {
 public:
   LiteralGen(const char *dfile, const char *hfile, const char *cfile)
@@ -34,5 +36,7 @@ public:
   void GenCppFile();
   void GenHeaderFile();
 };
+
+}
 
 #endif

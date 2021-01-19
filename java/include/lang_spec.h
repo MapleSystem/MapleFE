@@ -22,6 +22,8 @@
 #include "stringutil.h"
 #include "token.h"
 
+namespace maplefe {
+
 class StringToValueImpl : public StringToValue {
 public:
   float  StringToFloat(std::string &s);
@@ -32,4 +34,5 @@ public:
 };
 
 extern LitData ProcessLiteral(LitId type, const char *str);
+}
 #endif

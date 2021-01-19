@@ -21,6 +21,8 @@
 #include "gen_attr.h"   // for language specific attr keyword
 #include "massert.h"
 
+namespace maplefe {
+
 // Inquiry function for language specific attr keyword
 static const char* FindAttrKeyword(AttrId id) {
   for (unsigned i = 0; i < ATTR_NA; i++) {
@@ -85,4 +87,5 @@ AttrNode* AttrPool::GetAttrNode(AttrId id) {
   }
 
   return NULL;
+}
 }

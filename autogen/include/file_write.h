@@ -27,6 +27,8 @@
 #include "write2file.h"
 #include "buffer2write.h"
 
+namespace maplefe {
+
 class FileWriter : public Write2File {
 public:
   FileWriter() {}
@@ -40,5 +42,7 @@ public:
   void WriteIfBuffer(const IfBuffer*);
   void WriteScopedBuffer(const ScopedBuffer*);
 };
+
+}
 
 #endif
