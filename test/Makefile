@@ -15,7 +15,7 @@
 # for testing batch1/Arithmetic/Add.java:
 # make Add
 
-build = ../output
+build = ../output/test
 $(shell mkdir -p $(build))
 
 DIR = . $(wildcard * */* */*/*)

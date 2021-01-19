@@ -45,18 +45,22 @@ my $countsub = 0;
 
 system("rm -Rf report.txt $pwd/output $pwd/diff $pwd/notexists");
 
+my $currdir = "$pwd";
+my $outroot = "$currdir/../output/test";
+if(!(-e "$outroot")) {
+  system("mkdir -p $outroot");
+}
+
 foreach my $dir (@dirname) {
 #  print "here2 dir $dir\n";
   $dirname1 = "./$dir";
 #  print "here3 dirname1 $dirname1\n";
   
-  my $outdir = "$pwd/output/$dir";
-  if(!(-e "$outdir")) {
-    system("mkdir -p $outdir");
-  }
+  system("cp -rp $dir $outroot/");
 
+  my $outdir = "$outroot/$dir";
   my $diffdir = "$pwd/diff/$dir";
-  my $notexistsdir = "$pwd/notexists/$dir";
+  my $notexistsdir = "$outroot/notexists/$dir";
 
   chdir $dirname1;
 #  print "here4 dirname1 $dirname1\n";
@@ -67,7 +71,7 @@ foreach my $dir (@dirname) {
   print("\n====================== BEGIN tests: $dir =====================\n");
 
   while( ($srcdir = readdir(DIR))){
-    if ( -d $srcdir and $srcdir ne ".." and $srcdir ne "output" and $srcdir ne "temp"  ) {
+    if ( -d $srcdir and $srcdir ne ".." and $srcdir ne "temp"  ) {
 #print "here13 srcdir $srcdir\n";
       my $predir = getcwd;
       chdir $srcdir;
@@ -93,20 +97,19 @@ foreach my $dir (@dirname) {
         my $err_file = $file.$dir.'.err';
         my $diff_file = $file.'.java.'.$dir.'.diff';
 
-        system("cp $src_file $outdir/$src_file");
 #print "here15 dir $dir\n";
 #print "here16 src_file $src_file\n";
         if ($dir eq "java2mpl") {
-          $res = system("cd $pwd/..; output/java/java2mpl $outdir/$src_file > $outdir/$result_file");
+          $res = system("$pwd/../output/java/java2mpl $outdir/$src_file > $outdir/$result_file");
         }
         if ($dir eq "errtest") {
-          $res = system("cd $pwd/..; output/java/java2mpl $outdir/$src_file > $outdir/$result_file");
+          $res = system("$pwd/../output/java/java2mpl $outdir/$src_file > $outdir/$result_file");
         }
         if ($dir eq "others") {
-          $res = system("cd $pwd/..; output/java/java2mpl $outdir/$src_file > $outdir/$result_file");
+          $res = system("$pwd/../output/java/java2mpl $outdir/$src_file > $outdir/$result_file");
         }
         if ($dir eq "openjdk") {
-          $res = system("cd $pwd/..; output/java/java2mpl $outdir/$src_file > $outdir/$result_file");
+          $res = system("$pwd/../output/java/java2mpl $outdir/$src_file > $outdir/$result_file");
         }
         
         if ($res > 0) {
@@ -190,7 +193,7 @@ chdir $pwd;
 my $countFailed = $countfailedjava ;
 my $countPassed = $count - $countFailed;
 
-my $reportFile = 'report.txt';
+my $reportFile = "$outroot/report.txt";
 open(my $fh, '>', $reportFile) or die "Could not open file '$reportFile' $!";
 if ($ARGV[0] eq "all") {
   print $fh "java2mpl and sharedfe report: \n";
