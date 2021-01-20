@@ -19,6 +19,16 @@ namespace maplefe {
 
 #define NOTYETIMPL(K) { if (mTraceA2m) { MNYI(K); }}
 
+void A2M::ProcessNode(TreeNode *tnode) {
+  switch (tnode->GetKind()) {
+#undef  NODEKIND
+#define NODEKIND(K) case NK_##K: Process##K(tnode); break;
+#include "ast_nk.def"
+    default:
+      break;
+  }
+}
+
 void A2M::ProcessPackage(TreeNode *tnode) {
   NOTYETIMPL("ProcessPackage()");
   return;
@@ -39,7 +49,7 @@ void A2M::ProcessField(TreeNode *tnode) {
   MASSERT(tnode->IsIdentifier() && "field is not an IdentifierNode");
   TreeNode *parent = tnode->GetParent();
   MASSERT((parent->IsClass() || parent->IsInterface()) && "Not class or interface");
-  MIRType *ptype = mNodeTypeMap[parent];
+  MIRType *ptype = mNodeTypeMap[parent->GetName()];
   MIRStructType *stype = static_cast<MIRStructType *>(ptype);
   MASSERT(stype && "struct type not valid");
 
@@ -141,7 +151,7 @@ void A2M::ProcessClass(TreeNode *tnode) {
   ClassNode *classnode = static_cast<ClassNode *>(tnode);
   const char *name = classnode->GetName();
   MIRType *type = GlobalTables::GetTypeTable().GetOrCreateClassType(name, mMirModule);
-  mNodeTypeMap[tnode] = type;
+  mNodeTypeMap[name] = type;
 
   for (int i=0; i < classnode->GetMethodsNum(); i++) {
     ProcessFunction(classnode->GetMethod(i));
