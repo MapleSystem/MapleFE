@@ -88,10 +88,10 @@ struct Action {
 };
 
 enum RuleProp {
-  RP_Single,  // For a ONEOF rule, there is one and only one children valid.
-  RP_No2ndTry,// For a concatenate rule, it doesn't need to do second try.
-  RP_Top,     // A top rule
-  RP_NA = 0
+  RP_NA = 0,
+  RP_Single = 1, // For a ONEOF rule, there is one and only one children valid.
+  RP_ZomFast= 2, // For a Zeroormore rule, it can be a fast parsing.
+  RP_Top    = 4  // A top rule
 };
 
 // A rule has a limited set of beginning tokens. These are called LookAhead.
@@ -130,7 +130,7 @@ extern LookAheadTable *gLookAheadTable;
 // Struct of the table entry
 struct RuleTable{
   EntryType   mType;
-  RuleProp    mProperties; // properties of the rule table.
+  unsigned    mProperties; // properties of the rule table.
   unsigned    mNum;        // Num of TableData entries
   TableData  *mData;
   unsigned    mNumAction;  // Num of actions

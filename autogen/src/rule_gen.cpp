@@ -87,11 +87,10 @@ std::string RuleGen::GetSubTblName() {
   return tn; 
 }
 
-std::string RuleGen::GetPropertyName(const Rule *rule) {
-  if (!rule)
+std::string RuleGen::GetPropertyName(const RuleAttr *attr) {
+  if (!attr)
     return "RP_NA";
 
-  RuleAttr *attr = &(rule->mAttr);
   unsigned size = attr->mProperty.size();
   if (size == 0)
     return "RP_NA";
@@ -369,7 +368,7 @@ void RuleGen::Gen4Table(const Rule *rule, const RuleElem *elem){
   std::string entrytype = GetEntryTypeName(elem->mType, elem->mData.mOp);
   entrytype = entrytype + ", ";
 
-  std::string properties = GetPropertyName(rule);
+  std::string properties = GetPropertyName(attr);
   properties += ", ";
 
   rule_table += entrytype + properties + elemnum + ", " + rule_table_data_name;

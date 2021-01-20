@@ -1259,8 +1259,9 @@ bool Parser::TraverseOneof(RuleTable *rule_table, AppealNode *parent) {
       mCurToken = old_mCurToken;
 
       // Some ONEOF rules can have only children matching current token seq.
-      if (rule_table->mProperties & RP_Single)
+      if (rule_table->mProperties & RP_Single) {
         break;
+      }
     }
   }
 

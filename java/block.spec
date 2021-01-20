@@ -48,7 +48,8 @@ rule InterfaceTypeList : InterfaceType + ZEROORMORE(',' + InterfaceType)
 
 # class body
 rule ClassBody              : "{" + ZEROORMORE(ClassBodyDeclaration) + "}"
-  attr.action: BuildBlock(%2)
+  attr.action:       BuildBlock(%2)
+  attr.property.%2 : ZomFast
 
 rule ClassBodyDeclaration   : ONEOF(ClassMemberDeclaration,
                                     InstanceInitializer,
@@ -296,7 +297,6 @@ rule DefaultValue : "default" + ElementValue
 rule Annotation : ONEOF(NormalAnnotation,
                         MarkerAnnotation,
                         SingleElementAnnotation)
-  attr.property : Single
 
 rule NormalAnnotation : '@' + TypeName + '(' + ZEROORONE(ElementValuePairList) + ')'
   attr.action : BuildAnnotation(%2)

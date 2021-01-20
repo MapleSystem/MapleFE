@@ -27,6 +27,8 @@
 
 namespace maplefe {
 
+class RuleAttr;
+
 class RuleGen {
 private:
   const Rule      *mRule;
@@ -37,7 +39,7 @@ private:
   unsigned mSubTblNum;
 
   std::string GetTblName(const Rule*);
-  std::string GetPropertyName(const Rule*);
+  std::string GetPropertyName(const RuleAttr*);
   std::string GetSubTblName();
   std::string GetEntryTypeName(ElemType, RuleOp);
 
