@@ -17,8 +17,6 @@
 
 namespace maplefe {
 
-#define NOTYETIMPL(K) { if (mTraceA2m) { MNYI(K); }}
-
 void A2M::ProcessNode(TreeNode *tnode) {
   switch (tnode->GetKind()) {
 #undef  NODEKIND
@@ -143,7 +141,85 @@ void A2M::ProcessBlock(TreeNode *tnode) {
 }
 
 void A2M::ProcessFunction(TreeNode *tnode) {
-  NOTYETIMPL("ProcessFunction()");
+  // NOTYETIMPL("ProcessFunction()");
+  MASSERT(tnode->IsFunction() && "it is not an FunctionNode");
+  FunctionNode *ast_func = static_cast<FunctionNode *>(tnode);
+  const char                  *ast_name = ast_func->GetName();
+  // SmallVector<AttrId>          mAttrs;
+  // SmallVector<AnnotationNode*> mAnnotations; //annotation or pragma
+  // SmallVector<ExceptionNode*>  mThrows;      // exceptions it can throw
+  TreeNode                    *ast_rettype = ast_func->GetType();        // return type
+  // SmallVector<TreeNode*>       mParams;      //
+  BlockNode                   *ast_body = ast_func->GetBody();
+  // DimensionNode               *mDims;
+  // bool                         mIsConstructor;
+
+  MIRType *rettype = MapType(ast_rettype);
+  TyIdx tyidx = rettype ? rettype->GetTypeIndex() : TyIdx(0);
+  MIRFunction *func = mMirBuilder->GetOrCreateFunction(ast_name, tyidx);
+
+  // init function fields
+  func->body = func->codeMemPool->New<maple::BlockNode>();
+
+  func->symTab = func->dataMemPool->New<maple::MIRSymbolTable>(&func->dataMPAllocator);
+  func->pregTab = func->dataMemPool->New<maple::MIRPregTable>(&func->dataMPAllocator);
+  func->typeNameTab = func->dataMemPool->New<maple::MIRTypeNameTable>(&func->dataMPAllocator);
+  func->labelTab = func->dataMemPool->New<maple::MIRLabelTable>(&func->dataMPAllocator);
+
+  // process function arguments for function type and formal parameters
+  std::vector<TyIdx> funcvectype;
+  std::vector<TypeAttrs> funcvecattr;
+  for (int i = 0; i < ast_func->GetParamsNum(); i++) {
+    TreeNode *param = ast_func->GetParam(i);
+    MIRType *type = mDefaultType;
+    if (param->IsIdentifier()) {
+      IdentifierNode *inode = static_cast<IdentifierNode *>(param);
+      type = MapType(inode->GetType());
+    } else {
+      NOTYETIMPL("ProcessFunction arg type()");
+    }
+
+    GStrIdx stridx = GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(param->GetName());
+    FormalDef formalDef(stridx, nullptr, type->tyIdx, TypeAttrs());
+    func->formalDefVec.push_back(formalDef);
+    funcvectype.push_back(type->tyIdx);
+    funcvecattr.push_back(TypeAttrs());
+  }
+
+  // create function type
+  MIRFuncType *functype = GlobalTables::GetTypeTable().GetOrCreateFunctionType(mMirModule, rettype->tyIdx, funcvectype, funcvecattr, /*isvarg*/ false, true);
+  func->funcType = functype;
+
+  // update function symbol's type
+  MIRSymbol *funcst = GlobalTables::GetGsymTable().GetSymbolFromStIdx(func->stIdx.Idx());
+  funcst->SetTyIdx(functype->tyIdx);
+
+  // set up function body
+  if (ast_body) {
+    // update mBlockNodeMap
+    mBlockNodeMap[ast_body] = func->body;
+
+    for (int i = 0; i < ast_body->GetChildrenNum(); i++) {
+      TreeNode *child = ast_body->GetChildAtIndex(i);
+      ProcessNode(child);
+    }
+  }
+
+  // insert into class/interface methods list
+  TreeNode *parent = tnode->GetParent();
+  if (parent->IsClass() || parent->IsInterface()) {
+    MIRType *ptype = mNodeTypeMap[parent->GetName()];
+    MIRStructType *stype = static_cast<MIRStructType *>(ptype);
+    MASSERT(stype && "struct type not valid");
+
+    StIdx stidx = func->stIdx;
+    MIRSymbol *fn_st = GlobalTables::GetGsymTable().GetSymbolFromStIdx(stidx.Idx());
+    FuncAttrs funcattrs(func->GetAttrs());
+    TyidxFuncAttrPair P0(fn_st->tyIdx, funcattrs);
+    MethodPair P1(stidx, P0);
+    stype->methods.push_back(P1);
+  }
+
   return;
 }
 

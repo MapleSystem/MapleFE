@@ -29,6 +29,8 @@
 
 namespace maplefe {
 
+#define NOTYETIMPL(K) { if (mTraceA2m) { MNYI(K); }}
+
 class A2M {
 private:
   const char *mFileName;
@@ -55,6 +57,8 @@ public:
 
    MIRType *MapType(TreeNode *tnode);
    void MapAttr(GenericAttrs &attr, const IdentifierNode *inode);
+   MIRSymbol *MapGlobalSymbol(TreeNode *inode);
+   MIRSymbol *MapLocalSymbol(TreeNode *tnode, maple::MIRFunction *func);
 };
 
 }

@@ -23,6 +23,7 @@ A2M::A2M(const char *filename) : mFileName(filename) {
   mMirModule = new maple::MIRModule(mFileName);
   mMirBuilder = mMirModule->mirBuilder;
   mDefaultType = GlobalTables::GetTypeTable().GetOrCreateClassType("DEFAULT_TYPE", mMirModule);
+  mDefaultType->typeKind = maple::MIRTypeKind::kTypeClass;
 }
 
 A2M::~A2M() {
@@ -57,14 +58,41 @@ MIRType *A2M::MapType(TreeNode *type) {
 
     // update mNodeTypeMap
     mNodeTypeMap[name] = mir_type;
-  }
-
-  if (type->IsUserType()) {
+  } else  if (type->IsUserType()) {
+    if (type->IsIdentifier()) {
+      IdentifierNode *inode = static_cast<IdentifierNode *>(type);
+      mir_type = MapType(inode->GetType());
+    } else if (type->IsLiteral()) {
+      NOTYETIMPL("MapType IsUserType IsLiteral");
+    } else {
+      NOTYETIMPL("MapType IsUserType");
+    }
     // DimensionNode *mDims
     // unsigned dnum = inode->GetDimsNum();
-    MASSERT("type not set");
+    mNodeTypeMap[name] = mir_type;
+  } else {
+    NOTYETIMPL("MapType Unknown");
   }
   return mir_type;
+}
+
+MIRSymbol *A2M::MapGlobalSymbol(TreeNode *tnode) {
+}
+
+MIRSymbol *A2M::MapLocalSymbol(TreeNode *tnode, maple::MIRFunction *func) {
+  const char *name = tnode->GetName();
+  MIRType *mir_type;
+
+  if (tnode->IsIdentifier()) {
+    IdentifierNode *inode = static_cast<IdentifierNode *>(tnode);
+    mir_type = MapType(inode->GetType());
+  } else if (tnode->IsLiteral()) {
+    NOTYETIMPL("MapLocalSymbol LiteralNode()");
+    mir_type = mDefaultType;
+  }
+
+  MIRSymbol *symbol = mMirBuilder->CreateLocalDecl(name, mir_type, func);
+  return symbol;
 }
 
 void A2M::MapAttr(GenericAttrs &attr, const IdentifierNode *inode) {
