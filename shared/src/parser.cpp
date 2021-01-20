@@ -920,7 +920,10 @@ bool Parser::TraverseRuleTableRegular(RuleTable *rule_table, AppealNode *parent)
     matched = TraverseOneof(rule_table, parent);
     break;
   case ET_Zeroormore:
-    matched = TraverseZeroormore(rule_table, parent);
+    if (rule_table->mProperties & RP_ZomFast)
+      matched = TraverseZeroormore_fast(rule_table, parent);
+    else
+      matched = TraverseZeroormore(rule_table, parent);
     break;
   case ET_Zeroorone:
     matched = TraverseZeroorone(rule_table, parent);
@@ -1082,9 +1085,6 @@ bool Parser::TraverseIdentifier(RuleTable *rule_table, AppealNode *appeal) {
 //      Although 'zero' is a correct matching, it's left to the final parent which should be a
 //      Concatenate node. It's handled in TraverseConcatenate().
 bool Parser::TraverseZeroormore(RuleTable *rule_table, AppealNode *parent) {
-  //if ((rule_table == &TblBlockStatements_sub1) || (rule_table == &TblClassBody_sub1))
-  //  return TraverseZeroormore_fast(rule_table, parent);
-
   unsigned saved_mCurToken = mCurToken;
   gSuccTokensNum = 0;
 
