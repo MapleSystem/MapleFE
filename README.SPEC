@@ -161,7 +161,8 @@ _____________________
       attr.validity.%2    : IsUnsigned(%2)
       attr.validity       : IsUnsigned(%1)
       attr.action.%1,%2   : GenerateBinaryExpr(%1, %2, %3)
-      attr.action         : GenerateUnaryExpr(%1)
+      attr.action         : GenerateUnaryExpr(%1), BuildXXXExpr(%1)
+      attr.property,%1,%2 : Single, Top
 
  1. attr.xxx           must follow the rule which it attaches to.
  2. attr.type          tells the data type of the generated IR component of this rule.

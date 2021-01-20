@@ -88,7 +88,7 @@ public:
   ~RuleAttr();
 
   void AddValidity(RuleAction *a) { mValidity.push_back(a); }
-  void AddAction(RuleAction *a) { mValidity.push_back(a); }
+  void AddAction(RuleAction *a) { mAction.push_back(a); }
   void AddProperty(std::string s) { mProperty.push_back(s); }
 
   bool Empty() { return mValidity.size() == 0 &&
