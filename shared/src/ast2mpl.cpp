@@ -21,6 +21,8 @@ namespace maplefe {
 
 A2M::A2M(const char *filename) : mFileName(filename) {
   mMirModule = new maple::MIRModule(mFileName);
+  mMirBuilder = mMirModule->mirBuilder;
+  mDefaultType = GlobalTables::GetTypeTable().GetOrCreateClassType("DEFAULT_TYPE", mMirModule);
 }
 
 A2M::~A2M() {
@@ -34,28 +36,27 @@ void A2M::ProcessAST(bool trace_a2m) {
   for(auto it: gModule.mTrees) {
     if (mTraceA2m) it->Dump(0);
     TreeNode *tnode = it->mRootNode;
-    switch (tnode->GetKind()) {
-#undef  NODEKIND
-#define NODEKIND(K) case NK_##K: Process##K(tnode); break;
-#include "ast_nk.def"
-      default:
-       break;
-    }
+    ProcessNode(tnode);
   }
 }
 
 MIRType *A2M::MapType(TreeNode *type) {
-  if (mNodeTypeMap.find(type) != mNodeTypeMap.end()) {
-    return mNodeTypeMap[type];
+  MIRType *mir_type = mDefaultType;
+  if (!type) {
+    return mir_type;
   }
 
-  MIRType *mir_type = nullptr;
+  char *name = type->GetName();
+  if (mNodeTypeMap.find(name) != mNodeTypeMap.end()) {
+    return mNodeTypeMap[name];
+  }
+
   if (type->IsPrimType()) {
     PrimTypeNode *ptnode = static_cast<PrimTypeNode *>(type);
     mir_type = MapPrimType(ptnode);
 
     // update mNodeTypeMap
-    mNodeTypeMap[type] = mir_type;
+    mNodeTypeMap[name] = mir_type;
   }
 
   if (type->IsUserType()) {

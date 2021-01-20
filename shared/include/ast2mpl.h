@@ -33,14 +33,19 @@ class A2M {
 private:
   const char *mFileName;
   bool mTraceA2m;
+  maple::MIRBuilder *mMirBuilder;
+  maple::MIRType *mDefaultType;
 public:
   maple::MIRModule *mMirModule;
-  std::map<TreeNode*, MIRType *> mNodeTypeMap;
+  // use type's uniq name as key
+  std::map<const char *, maple::MIRType*> mNodeTypeMap;
+  std::map<BlockNode*, maple::BlockNode*> mBlockNodeMap;
 
   A2M(const char *filename);
   ~A2M();
 
   void ProcessAST(bool trace_a2m);
+  void ProcessNode(TreeNode *tnode);
 
 #undef  NODEKIND
 #define NODEKIND(K) void Process##K(TreeNode *);
