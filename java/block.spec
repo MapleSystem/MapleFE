@@ -20,11 +20,12 @@ rule ClassDeclaration : ONEOF(NormalClassDeclaration, EnumDeclaration)
 rule NormalClassDeclaration : ZEROORMORE(ClassModifier) + "class" + Identifier +
                               ZEROORONE(TypeParameters) + ZEROORONE(Superclass) +
                               ZEROORONE(Superinterfaces) + ClassBody
-attr.action : BuildClass(%3)
-attr.action : AddModifier(%1)
-attr.action : AddClassBody(%7)
-attr.action : AddSuperClass(%5)
-attr.action : AddSuperInterface(%6)
+  attr.action : BuildClass(%3)
+  attr.action : AddModifier(%1)
+  attr.action : AddClassBody(%7)
+  attr.action : AddSuperClass(%5)
+  attr.action : AddSuperInterface(%6)
+  attr.property.%1,%4,%5,%6 : ZomFast
 
 rule ClassAttr : ONEOF("public", "protected", "private", "abstract", "static", "final", "strictfp")
   attr.property : Single
@@ -219,6 +220,7 @@ rule BlockStatement  : ONEOF(LocalVariableDeclarationStatement,
   attr.property : Single
 
 rule BlockStatements : BlockStatement + ZEROORMORE(BlockStatement)
+  attr.property.%2 : ZomFast
 rule Block           : '{' + ZEROORONE(BlockStatements) + '}'
   attr.action: BuildBlock(%2)
 
@@ -241,6 +243,7 @@ rule InterfaceModifier : ONEOF(Annotation, InterfaceAttr)
 rule ExtendsInterfaces : "extends" + InterfaceTypeList
 rule InterfaceBody     : '{' + ZEROORMORE(InterfaceMemberDeclaration) + '}'
   attr.action : BuildBlock(%2)
+  attr.property.%2 : ZomFast
 
 rule InterfaceMemberDeclaration : ONEOF(ConstantDeclaration,
                                         InterfaceMethodDeclaration,
@@ -323,6 +326,7 @@ rule PackageDeclaration: ZEROORMORE(PackageModifier) + "package" + Identifier + 
   attr.action : BuildField(%3, %4)
   attr.action : BuildPackageName()
   attr.property : Top
+  attr.property.%1,%4 : ZomFast
 
 rule ImportDeclaration: ONEOF(SingleTypeImportDeclaration,
                               TypeImportOnDemandDeclaration,

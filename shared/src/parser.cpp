@@ -1216,7 +1216,7 @@ bool Parser::TraverseZeroormore_fast(RuleTable *rule_table, AppealNode *parent) 
 // For Zeroorone node it's easier to handle gSuccTokens(Num). Just let the elements
 // handle themselves.
 bool Parser::TraverseZeroorone(RuleTable *rule_table, AppealNode *parent) {
-  MASSERT((rule_table->mNum == 1) && "zeroormore node has more than one elements?");
+  MASSERT((rule_table->mNum == 1) && "zeroorone node has more than one elements?");
   TableData *data = rule_table->mData;
   gSuccTokensNum = 0;
   bool found = TraverseTableData(data, parent);

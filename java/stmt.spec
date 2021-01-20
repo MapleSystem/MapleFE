@@ -17,6 +17,7 @@ rule LocalVariableDeclarationStatement : LocalVariableDeclaration + ';'
 rule LocalVariableDeclaration : ZEROORMORE(VariableModifier) + UnannType + VariableDeclaratorList
   attr.action: BuildDecl(%2, %3)
   attr.action: AddModifier(%1)
+  attr.property.%1 : ZomFast
 
 rule VariableModifier : ONEOF(
   Annotation,
