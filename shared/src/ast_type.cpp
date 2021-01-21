@@ -31,8 +31,14 @@ void UserTypeNode::AddTypeArgs(TreeNode *args) {
   if (args->IsIdentifier()) {
     IdentifierNode *inode = (IdentifierNode*)args;
     AddTypeArg(inode);
+  } else if (args->IsPass()) {
+    PassNode *p = (PassNode*)args;
+    for (unsigned i = 0; i < p->GetChildrenNum(); i++) {
+      TreeNode *a = p->GetChild(i);
+      AddTypeArgs(a);
+    }
   } else {
-    MERROR("Unsupported tree node in UserTypeNode::AddTypeArgs()");
+    MASSERT(0 && "Unsupported tree node in UserTypeNode::AddTypeArgs()");
   }
 }
 

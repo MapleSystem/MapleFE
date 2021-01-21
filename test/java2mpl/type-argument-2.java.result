@@ -1,0 +1,12 @@
+Matched 23 tokens.
+============= Module ===========
+== Sub Tree ==
+class  A
+  Fields: 
+    b=new B<T[]>
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+

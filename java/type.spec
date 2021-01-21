@@ -110,6 +110,7 @@ rule TypeVariable  : ZEROORMORE(Annotation) + Identifier
 rule ArrayType     : ONEOF( PrimitiveType + Dims,
                             ClassOrInterfaceType + Dims,
                             TypeVariable + Dims )
+  attr.action.%1,%2,%3 : AddDimsTo(%1, %2)
 rule ClassOrInterfaceType : ONEOF(ClassType, InterfaceType)
 rule ReferenceType        : ONEOF(ClassOrInterfaceType, TypeVariable, ArrayType)
 
@@ -131,6 +132,7 @@ rule UnannTypeVariable : Identifier
 rule UnannArrayType : ONEOF(UnannPrimitiveType + Dims,
                             UnannClassOrInterfaceType + Dims,
                             UnannTypeVariable + Dims)
+  attr.action.%1,%2,%3 : AddDimsTo(%1, %2)
 rule UnannReferenceType: ONEOF(UnannClassOrInterfaceType, UnannTypeVariable, UnannArrayType)
 
 rule UnannPrimitiveType: ONEOF(NumericType, BoolType)
