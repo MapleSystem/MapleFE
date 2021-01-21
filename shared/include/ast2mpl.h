@@ -31,6 +31,12 @@ namespace maplefe {
 
 #define NOTYETIMPL(K) { if (mTraceA2m) { MNYI(K); }}
 
+enum StmtExprKind {
+  SK_Null,
+  SK_Stmt,
+  SK_Expr
+};
+
 class A2M {
 private:
   const char *mFileName;
@@ -46,19 +52,23 @@ public:
   A2M(const char *filename);
   ~A2M();
 
-  void ProcessAST(bool trace_a2m);
-  void ProcessNode(TreeNode *tnode);
+  virtual MIRType *MapPrimType(PrimTypeNode *tnode)=0;
 
+  MIRType *MapType(TreeNode *tnode);
+  void MapAttr(GenericAttrs &attr, const IdentifierNode *inode);
+  MIRSymbol *MapGlobalSymbol(TreeNode *inode);
+  MIRSymbol *MapLocalSymbol(TreeNode *tnode, maple::MIRFunction *func);
+
+  void ProcessAST(bool trace_a2m);
+  maple::BaseNode *ProcessNode(StmtExprKind, TreeNode *tnode, maple::BlockNode *);
+
+  // Process different TreeNode kind while expecting StmtExprKind as stmt or expr
 #undef  NODEKIND
-#define NODEKIND(K) void Process##K(TreeNode *);
+#define NODEKIND(K) maple::BaseNode *Process##K(StmtExprKind, TreeNode *, maple::BlockNode *);
 #include "ast_nk.def"
 
-   virtual MIRType *MapPrimType(PrimTypeNode *tnode)=0;
 
-   MIRType *MapType(TreeNode *tnode);
-   void MapAttr(GenericAttrs &attr, const IdentifierNode *inode);
-   MIRSymbol *MapGlobalSymbol(TreeNode *inode);
-   MIRSymbol *MapLocalSymbol(TreeNode *tnode, maple::MIRFunction *func);
+
 };
 
 }

@@ -31,13 +31,14 @@ A2M::~A2M() {
   mNodeTypeMap.clear();
 }
 
+// starting point of AST to MPL process
 void A2M::ProcessAST(bool trace_a2m) {
   mTraceA2m = trace_a2m;
   if (mTraceA2m) std::cout << "============= in ProcessAST ===========" << std::endl;
   for(auto it: gModule.mTrees) {
     if (mTraceA2m) it->Dump(0);
     TreeNode *tnode = it->mRootNode;
-    ProcessNode(tnode);
+    ProcessNode(SK_Stmt, tnode, nullptr);
   }
 }
 
