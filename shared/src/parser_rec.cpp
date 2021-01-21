@@ -153,7 +153,7 @@ void RecursionTraversal::Work() {
   if (mSucc)
     FinalConnection();
   else
-    mSelf->mAfter = FailChildrenFailed;
+    mSelf->mResult = FailChildrenFailed;
 }
 
 // Connect curr_node to its counterpart in the prev instance.
@@ -172,7 +172,7 @@ bool RecursionTraversal::ConnectPrevious(AppealNode *curr_node) {
     if (prev_lead->GetTable() == curr_node->GetTable()) {
       // It could be a fail.
       if (prev_lead->IsFail()) {
-        curr_node->mAfter = FailChildrenFailed;
+        curr_node->mResult = FailChildrenFailed;
         break;
       }
 

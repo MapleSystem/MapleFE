@@ -144,10 +144,10 @@ public:
   // So we keep mChildren untouched and define a second vector for the SortOut-ed children.
   std::vector<AppealNode*> mSortedChildren;
 
-  AppealStatus mAfter;
+  AppealStatus mResult;
 
   AppealNode() {mData.mTable=NULL; mParent = NULL;
-                mAfter = AppealStatus_NA; mSimplifiedIndex = 0; mIsTable = true;
+                mResult = AppealStatus_NA; mSimplifiedIndex = 0; mIsTable = true;
                 mStartIndex = 0; mSorted = false; mFinalMatch = 0;
                 mIsPseudo = false; mAstTreeNode = NULL; mAstCreated = false;}
   ~AppealNode(){mMatches.Release();}
@@ -162,16 +162,16 @@ public:
   AppealNode* GetSortedChildByIndex(unsigned idx);
   AppealNode* FindSpecChild(TableData *tdata, unsigned match);
 
-  bool IsSucc() { return (mAfter == Succ) ||
-                         (mAfter == SuccWasSucc) ||
-                         (mAfter == SuccStillWasSucc); }
-  bool IsFail() { return (mAfter == FailWasFailed) ||
-                         (mAfter == FailNotIdentifier) ||
-                         (mAfter == FailNotLiteral) ||
-                         (mAfter == FailChildrenFailed) ||
-                         (mAfter == FailLookAhead) ||
-                         (mAfter == Fail2ndOf1st);}
-  bool IsNA() {return mAfter == AppealStatus_NA;}
+  bool IsSucc() { return (mResult == Succ) ||
+                         (mResult == SuccWasSucc) ||
+                         (mResult == SuccStillWasSucc); }
+  bool IsFail() { return (mResult == FailWasFailed) ||
+                         (mResult == FailNotIdentifier) ||
+                         (mResult == FailNotLiteral) ||
+                         (mResult == FailChildrenFailed) ||
+                         (mResult == FailLookAhead) ||
+                         (mResult == Fail2ndOf1st);}
+  bool IsNA() {return mResult == AppealStatus_NA;}
 
   bool IsTable(){ return mIsTable; }
   bool IsToken(){ return !mIsTable; }

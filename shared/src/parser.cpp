@@ -367,7 +367,7 @@ void Parser::ClearAppealNodes() {
 //        treated as WasFail during TraverseRuleTable(). However, the appeal tree
 //        should be remained as fail, because it IS a fail indeed for this sub-tree.
 void Parser::Appeal(AppealNode *start, AppealNode *root) {
-  MASSERT((root->IsSucc()) && "root->mAfter is not Succ.");
+  MASSERT((root->IsSucc()) && "root->mResult is not Succ.");
 
   // A recursion group could have >1 lead node. 'start' could be a different leadnode
   // than 'root'.
@@ -381,7 +381,7 @@ void Parser::Appeal(AppealNode *start, AppealNode *root) {
   //
   // So a check for 'node' Not Null is to handle separated trees.
   while(node && (node != root)) {
-    if ((node->mAfter == FailChildrenFailed)) {
+    if ((node->mResult == FailChildrenFailed)) {
       if (mTraceAppeal)
         DumpAppeal(node->GetTable(), node->GetStartIndex());
       ResetFailed(node->GetTable(), node->GetStartIndex());
@@ -502,7 +502,7 @@ bool Parser::TraverseStmt() {
       MASSERT(topnode->GetMatchNum() == 1);
       mCurToken = topnode->GetMatch(0) + 1;
 
-      mRootNode->mAfter = Succ;
+      mRootNode->mResult = Succ;
       SortOut();
       break;
     }
@@ -650,14 +650,14 @@ bool Parser::TraverseRuleTablePre(AppealNode *appeal) {
       if (gSuccTokensNum > 0)
         MoveCurToken();
 
-      appeal->mAfter = SuccWasSucc;
+      appeal->mResult = SuccWasSucc;
     }
   }
 
   if (WasFailed(rule_table, saved_mCurToken)) {
-    appeal->mAfter = FailWasFailed;
+    appeal->mResult = FailWasFailed;
     if (mTraceTable)
-      DumpExitTable(name, mIndentation, false, appeal->mAfter);
+      DumpExitTable(name, mIndentation, false, appeal->mResult);
   }
 
   return is_done;
@@ -755,10 +755,10 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
   if (LookAheadFail(rule_table, saved_mCurToken) &&
       (rule_table->mType != ET_Zeroormore) &&
       (rule_table->mType != ET_Zeroorone)) {
-    appeal->mAfter = FailLookAhead;
+    appeal->mResult = FailLookAhead;
     AddFailed(rule_table, saved_mCurToken);
     if (mTraceTable)
-      DumpExitTable(name, mIndentation, false, appeal->mAfter);
+      DumpExitTable(name, mIndentation, false, appeal->mResult);
     mIndentation -= 2;
     return false;
   }
@@ -768,7 +768,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
   if (appeal->IsSucc()) {
     if (!in_group || is_done) {
       if (mTraceTable)
-        DumpExitTable(name, mIndentation, true, appeal->mAfter);
+        DumpExitTable(name, mIndentation, true, appeal->mResult);
       mIndentation -= 2;
       return true;
     } else {
@@ -790,7 +790,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
   // If the rule is already traversed in this iteration(instance), we return the result.
   if (rec_tra && rec_tra->RecursionNodeVisited(rule_table)) {
     if (mTraceTable)
-      DumpExitTable(name, mIndentation, true, appeal->mAfter);
+      DumpExitTable(name, mIndentation, true, appeal->mResult);
     mIndentation -= 2;
     return true;
   }
@@ -820,7 +820,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
       // It will be connect to the previous instance, which have full appeal tree.
       // WasSucc node is used for succ node which has no full appeal tree. So better
       // change the status to Succ.
-      appeal->mAfter = Succ;
+      appeal->mResult = Succ;
       if (mTraceTable)
         DumpExitTable(name, mIndentation, true, Succ);
 
@@ -860,7 +860,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
   if (mRecursionAll.IsLeadNode(rule_table)) {
     bool found = TraverseLeadNode(appeal, parent);
     if (!found) {
-      appeal->mAfter = FailChildrenFailed;
+      appeal->mResult = FailChildrenFailed;
       gSuccTokensNum = 0;
     } else {
       gSuccTokensNum = appeal->GetMatchNum();
@@ -869,7 +869,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
     }
     if (mTraceTable) {
       const char *name = GetRuleTableName(rule_table);
-      DumpExitTable(name, mIndentation, found, appeal->mAfter);
+      DumpExitTable(name, mIndentation, found, appeal->mResult);
     }
     mIndentation -= 2;
     return found;
@@ -888,7 +888,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
     SetIsDone(rule_table, saved_mCurToken);
 
   if (mTraceTable)
-    DumpExitTable(name, mIndentation, matched, appeal->mAfter);
+    DumpExitTable(name, mIndentation, matched, appeal->mResult);
 
   mIndentation -= 2;
   return matched;
@@ -899,7 +899,7 @@ bool Parser::TraverseRuleTableRegular(RuleTable *rule_table, AppealNode *parent)
   unsigned old_pos = mCurToken;
   gSuccTokensNum = 0;
 
-  bool was_succ = (parent->mAfter == SuccWasSucc) || (parent->mAfter == SuccStillWasSucc);
+  bool was_succ = (parent->mResult == SuccWasSucc) || (parent->mResult == SuccStillWasSucc);
   unsigned match_num = parent->GetMatchNum();
   unsigned longest_match = 0;
   if (was_succ)
@@ -952,15 +952,15 @@ bool Parser::TraverseRuleTableRegular(RuleTable *rule_table, AppealNode *parent)
 
     if (!was_succ || (longest > longest_match)) {
       UpdateSuccInfo(old_pos, parent);
-      parent->mAfter = Succ;
+      parent->mResult = Succ;
     } else {
-      parent->mAfter = SuccStillWasSucc;
+      parent->mResult = SuccStillWasSucc;
     }
 
     ResetFailed(rule_table, old_pos);
     return true;
   } else {
-    parent->mAfter = FailChildrenFailed;
+    parent->mResult = FailChildrenFailed;
     mCurToken = old_pos;
     AddFailed(rule_table, mCurToken);
     return false;
@@ -981,7 +981,7 @@ bool Parser::TraverseToken(Token *token, AppealNode *parent) {
   if (token == curr_token) {
     AppealNode *appeal = new AppealNode();
     mAppealNodes.push_back(appeal);
-    appeal->mAfter = Succ;
+    appeal->mResult = Succ;
     appeal->SetToken(curr_token);
     appeal->SetStartIndex(mCurToken);
     appeal->AddMatch(mCurToken);
@@ -1016,7 +1016,7 @@ void Parser::TraverseSpecialTableSucc(RuleTable *rule_table, AppealNode *appeal)
   gSuccTokensNum = 1;
   gSuccTokens[0] = mCurToken;
 
-  appeal->mAfter = Succ;
+  appeal->mResult = Succ;
   appeal->SetToken(curr_token);
   appeal->SetStartIndex(mCurToken);
   appeal->AddMatch(mCurToken);
@@ -1031,7 +1031,7 @@ void Parser::TraverseSpecialTableFail(RuleTable *rule_table,
                                       AppealStatus status) {
   const char *name = GetRuleTableName(rule_table);
   AddFailed(rule_table, mCurToken);
-  appeal->mAfter = status;
+  appeal->mResult = status;
 }
 
 // We don't go into Literal table.
@@ -1546,16 +1546,16 @@ void Parser::SortOutNode(AppealNode *node) {
     return;
   }
 
-  // If node->mAfter is SuccWasSucc, it means we didn't traverse its children
+  // If node->mResult is SuccWasSucc, it means we didn't traverse its children
   // during matching. In SortOut, we simple return. However, when generating IR,
   // the children have to be created.
-  if (node->mAfter == SuccWasSucc) {
+  if (node->mResult == SuccWasSucc) {
     MASSERT(node->mChildren.size() == 0);
     return;
   }
 
   // The last instance of recursion traversal doesn't need SortOut.
-  if (node->mAfter == SuccStillWasSucc)
+  if (node->mResult == SuccStillWasSucc)
     return;
 
   RuleTable *rule_table = node->GetTable();
@@ -1930,7 +1930,7 @@ void Parser::DumpSortOutNode(AppealNode *n) {
     RuleTable *t = n->GetTable();
     std::cout << "Table " << GetRuleTableName(t) << "@" << n->GetStartIndex() << ": ";
 
-    if (n->mAfter == SuccWasSucc)
+    if (n->mResult == SuccWasSucc)
       std::cout << "WasSucc";
 
     std::vector<AppealNode*>::iterator it = n->mSortedChildren.begin();
@@ -1972,7 +1972,7 @@ void Parser::FindWasSucc(AppealNode *root) {
   while (!working_list.empty()) {
     AppealNode *node = working_list.front();
     working_list.pop_front();
-    if (node->mAfter == SuccWasSucc) {
+    if (node->mResult == SuccWasSucc) {
       was_succ_list.push_back(node);
       if (mTracePatchWasSucc)
         std::cout << "Find WasSucc " << node << std::endl;
@@ -2084,7 +2084,7 @@ void Parser::PatchWasSucc(AppealNode *root) {
       AppealNode *patch = patching_list[i];
       AppealNode *was_succ = was_succ_matched_list[i];
       SupplementalSortOut(patch, was_succ);
-      was_succ->mAfter = Succ;
+      was_succ->mResult = Succ;
 
       // We can copy only sorted nodes. The original mChildren cannot be copied since
       // it's the original tree. We don't want to mess it up. Think about it, if you
@@ -2391,7 +2391,7 @@ unsigned AppealNode::LongestMatch() {
 }
 
 // The existing match of 'this' is kept.
-// mAfter is changed only when it's changed from fail to succ.
+// mResult is changed only when it's changed from fail to succ.
 //
 // The node is not added to SuccMatch since we can use 'another'.
 void AppealNode::CopyMatch(AppealNode *another) {
@@ -2400,7 +2400,7 @@ void AppealNode::CopyMatch(AppealNode *another) {
     AddMatch(m);
   }
   if (IsFail() || IsNA())
-    mAfter = another->mAfter;
+    mResult = another->mResult;
 }
 
 // return true if 'parent' is a parent of this.
