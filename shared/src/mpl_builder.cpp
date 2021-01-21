@@ -45,7 +45,11 @@ maple::BaseNode *A2M::ProcessIdentifier(StmtExprKind skind, TreeNode *tnode, map
 }
 
 maple::BaseNode *A2M::ProcessField(StmtExprKind skind, TreeNode *tnode, maple::BlockNode *block) {
-  // NOTYETIMPL("ProcessField()");
+  if (skind == SK_Expr) {
+    NOTYETIMPL("ProcessField() SK_Expr");
+    return nullptr;
+  }
+
   MASSERT(tnode->IsIdentifier() && "field is not an IdentifierNode");
   TreeNode *parent = tnode->GetParent();
   MASSERT((parent->IsClass() || parent->IsInterface()) && "Not class or interface");
@@ -60,7 +64,7 @@ maple::BaseNode *A2M::ProcessField(StmtExprKind skind, TreeNode *tnode, maple::B
 
   GenericAttrs genAttrs;
   MapAttr(genAttrs, inode);
-  
+
   GStrIdx stridx = GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(name);
   MIRType *basetype = MapType(type);
   if (basetype) {
@@ -123,7 +127,74 @@ maple::BaseNode *A2M::ProcessUnaOperator(StmtExprKind skind, TreeNode *tnode, ma
 }
 
 maple::BaseNode *A2M::ProcessBinOperator(StmtExprKind skind, TreeNode *tnode, maple::BlockNode *block) {
-  NOTYETIMPL("ProcessBinOperator()");
+  BinOperatorNode *bon = static_cast<BinOperatorNode *>(tnode);
+  OprId ast_op = bon->mOprId;
+  TreeNode *ast_lhs = bon->mOpndA;
+  TreeNode *ast_rhs = bon->mOpndB;
+  maple::BaseNode *lhs = ProcessNode(SK_Expr, ast_lhs, block);
+  maple::BaseNode *rhs = ProcessNode(SK_Expr, ast_rhs, block);
+  maple::BaseNode *mpl_node = nullptr;
+  maple::Opcode op = maple::kOpUndef;
+
+  if (ast_op == OPR_Assign) {
+    mpl_node = ProcessBinOperatorMplAssign(skind, lhs, rhs, block);
+    return mpl_node;
+  }
+
+  if (ast_op == OPR_Arrow) {
+    mpl_node = ProcessBinOperatorMplArror(skind, lhs, rhs, block);
+    return mpl_node;
+  }
+
+  switch (ast_op) {
+    case OPR_Add: op = OP_add; break;
+    case OPR_Sub: op = OP_sub; break;
+    case OPR_Mul: op = OP_mul; break;
+    case OPR_Div: op = OP_div; break;
+    case OPR_Mod: op = OP_rem; break;
+    case OPR_EQ: op = OP_eq; break;
+    case OPR_NE: op = OP_ne; break;
+    case OPR_GT: op = OP_gt; break;
+    case OPR_LT: op = OP_lt; break;
+    case OPR_GE: op = OP_ge; break;
+    case OPR_LE: op = OP_le; break;
+    case OPR_Band: op = OP_band; break;
+    case OPR_Bor: op = OP_bior; break;
+    case OPR_Shl: op = OP_shl; break;
+    case OPR_Shr: op = OP_ashr; break;
+    case OPR_Zext: op = OP_zext; break;
+    case OPR_Land: op = OP_land; break;
+    case OPR_Lor: op = OP_lior; break;
+    default: break;
+  }
+
+  if (op != kOpUndef) {
+    mpl_node = ProcessBinOperatorMpl(skind, op, lhs, rhs, block);
+    return mpl_node;
+  }
+
+  switch (ast_op) {
+    case OPR_AddAssign: op = OP_add; break;
+    case OPR_SubAssign: op = OP_sub; break;
+    case OPR_MulAssign: op = OP_mul; break;
+    case OPR_DivAssign: op = OP_div; break;
+    case OPR_ModAssign: op = OP_rem; break;
+    case OPR_ShlAssign: op = OP_shl; break;
+    case OPR_ShrAssign: op = OP_ashr; break;
+    case OPR_BandAssign: op = OP_band; break;
+    case OPR_BorAssign: op = OP_bior; break;
+    case OPR_BxorAssign: op = OP_bxor; break;
+    case OPR_ZextAssign: op = OP_zext; break;
+    default:
+      break;
+  }
+
+  if (op != kOpUndef) {
+    mpl_node = ProcessBinOperatorMplComboAssign(skind, op, lhs, rhs, block);
+    return mpl_node;
+  }
+
+  return mpl_node;
 }
 
 maple::BaseNode *A2M::ProcessTerOperator(StmtExprKind skind, TreeNode *tnode, maple::BlockNode *block) {
@@ -327,5 +398,41 @@ maple::BaseNode *A2M::ProcessPass(StmtExprKind skind, TreeNode *tnode, maple::Bl
   NOTYETIMPL("ProcessPass()");
   return nullptr;
 }
+
+maple::BaseNode *A2M::ProcessBinOperatorMpl(StmtExprKind skind,
+                                       maple::Opcode op,
+                                       maple::BaseNode *lhs,
+                                       maple::BaseNode *rhs,
+                                       maple::BlockNode *block) {
+  NOTYETIMPL("ProcessBinOperatorMpl()");
+  return nullptr;
+}
+
+maple::BaseNode *A2M::ProcessBinOperatorMplAssign(StmtExprKind skind,
+                                             maple::BaseNode *lhs,
+                                             maple::BaseNode *rhs,
+                                             maple::BlockNode *block) {
+  NOTYETIMPL("ProcessBinOperatorMplAssign()");
+  return nullptr;
+}
+
+maple::BaseNode *A2M::ProcessBinOperatorMplComboAssign(StmtExprKind skind,
+                                                  maple::Opcode op,
+                                                  maple::BaseNode *lhs,
+                                                  maple::BaseNode *rhs,
+                                                  maple::BlockNode *block) {
+  NOTYETIMPL("ProcessBinOperatorMplComboAssign()");
+  return nullptr;
+}
+
+maple::BaseNode *A2M::ProcessBinOperatorMplArror(StmtExprKind skind,
+                                            maple::BaseNode *lhs,
+                                            maple::BaseNode *rhs,
+                                            maple::BlockNode *block) {
+  NOTYETIMPL("ProcessBinOperatorMplArror()");
+  return nullptr;
+}
+
+
 }
 

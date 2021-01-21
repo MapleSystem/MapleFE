@@ -67,7 +67,24 @@ public:
 #define NODEKIND(K) maple::BaseNode *Process##K(StmtExprKind, TreeNode *, maple::BlockNode *);
 #include "ast_nk.def"
 
-
+  maple::BaseNode *ProcessBinOperatorMpl(StmtExprKind skind,
+                                         maple::Opcode op,
+                                         maple::BaseNode *lhs,
+                                         maple::BaseNode *rhs,
+                                         maple::BlockNode *block);
+  maple::BaseNode *ProcessBinOperatorMplAssign(StmtExprKind skind,
+                                               maple::BaseNode *lhs,
+                                               maple::BaseNode *rhs,
+                                               maple::BlockNode *block);
+  maple::BaseNode *ProcessBinOperatorMplComboAssign(StmtExprKind skind,
+                                                    maple::Opcode op,
+                                                    maple::BaseNode *lhs,
+                                                    maple::BaseNode *rhs,
+                                                    maple::BlockNode *block);
+  maple::BaseNode *ProcessBinOperatorMplArror(StmtExprKind skind,
+                                              maple::BaseNode *lhs,
+                                              maple::BaseNode *rhs,
+                                              maple::BlockNode *block);
 
 };
 
