@@ -551,6 +551,8 @@ void Parser::DumpExitTable(const char *table_name, unsigned indent, bool succ, A
   } else {
     if (reason == FailWasFailed)
       std::cout << " fail@WasFailed" << "}" << std::endl;
+    else if (reason == FailNotRightToken)
+      std::cout << " fail@NotRightToken" << "}" << std::endl;
     else if (reason == FailNotIdentifier)
       std::cout << " fail@NotIdentifer" << "}" << std::endl;
     else if (reason == FailNotLiteral)
@@ -978,17 +980,17 @@ bool Parser::TraverseToken(Token *token, AppealNode *parent) {
     DumpEnterTable(name.c_str(), mIndentation);
   }
 
+  AppealNode *appeal = new AppealNode();
+  mAppealNodes.push_back(appeal);
+  appeal->mResult = FailNotRightToken;
+  appeal->SetToken(curr_token);
+  appeal->SetStartIndex(mCurToken);
+  appeal->SetParent(parent);
+  parent->AddChild(appeal);
+
   if (token == curr_token) {
-    AppealNode *appeal = new AppealNode();
-    mAppealNodes.push_back(appeal);
     appeal->mResult = Succ;
-    appeal->SetToken(curr_token);
-    appeal->SetStartIndex(mCurToken);
     appeal->AddMatch(mCurToken);
-    appeal->SetParent(parent);
-
-    parent->AddChild(appeal);
-
     found = true;
     gSuccTokensNum = 1;
     gSuccTokens[0] = mCurToken;

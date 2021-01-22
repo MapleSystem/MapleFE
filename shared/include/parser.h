@@ -40,6 +40,7 @@ class TreeNode;
 
 typedef enum {
   FailWasFailed,
+  FailNotRightToken,
   FailNotIdentifier,
   FailNotLiteral,
   FailChildrenFailed,
@@ -166,6 +167,7 @@ public:
                          (mResult == SuccWasSucc) ||
                          (mResult == SuccStillWasSucc); }
   bool IsFail() { return (mResult == FailWasFailed) ||
+                         (mResult == FailNotRightToken) ||
                          (mResult == FailNotIdentifier) ||
                          (mResult == FailNotLiteral) ||
                          (mResult == FailChildrenFailed) ||
