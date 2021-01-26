@@ -104,9 +104,6 @@ bool Parser::TraverseLeadNode(AppealNode *appeal, AppealNode *parent) {
     MoveCurToken();
   }
 
-  // The gSuccTokens/Num will be updated in the caller in parser.cpp
-  // We don't handle over here.
-
   if (mTraceLeftRec) {
     DumpIndentation();
     std::cout << "<LR>: Exit LeadNode " << GetRuleTableName(rt);

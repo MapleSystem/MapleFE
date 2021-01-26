@@ -85,6 +85,8 @@ private:
                                   // because some nodes may have no Ast node.
   unsigned     mFinalMatch;       // the final match after sort out.
   SmallVector<unsigned> mMatches; // all of the last matching token.
+                                  // mMatches could be empty even if mResult is succ, e.g.
+                                  // Zeroorxxx rules.
 
   TreeNode    *mAstTreeNode;      // The AST tree node of this AppealNode.
 
@@ -145,6 +147,8 @@ public:
   // So we keep mChildren untouched and define a second vector for the SortOut-ed children.
   std::vector<AppealNode*> mSortedChildren;
 
+  // A Succ mResult doesn't mean 'really' matching tokens. e.g. Zeroorxxx rules could
+  // match nothing, but it is succ.
   AppealStatus mResult;
 
   AppealNode() {mData.mTable=NULL; mParent = NULL;
@@ -225,10 +229,9 @@ public:
   void SetLexerTrace() {mLexer->SetTrace();}
   void DumpIndentation();
   void DumpEnterTable(const char *tablename, unsigned indent);
-  void DumpExitTable(const char *tablename, unsigned indent,
-                     bool succ, AppealStatus reason = Succ);
+  void DumpExitTable(const char *tablename, unsigned indent, AppealNode*);
   void DumpAppeal(RuleTable *table, unsigned token);
-  void DumpSuccTokens();
+  void DumpSuccTokens(AppealNode*);
   void DumpSortOut(AppealNode *root, const char * /*hint*/);
   void DumpSortOutNode(AppealNode*);
 
@@ -246,26 +249,24 @@ private:
   void ClearSucc();
   void UpdateSuccInfo(unsigned, AppealNode*);
 
-  bool TraverseStmt();                                // success if all tokens are matched.
-  bool TraverseRuleTable(RuleTable*, AppealNode*);    // success if all tokens are matched.
-  bool TraverseRuleTableRegular(RuleTable*, AppealNode*);    // success if all tokens are matched.
+  bool TraverseStmt();
+  bool TraverseRuleTable(RuleTable*, AppealNode*, AppealNode *&);
+  bool TraverseRuleTableRegular(RuleTable*, AppealNode*);
   bool TraverseRuleTablePre(AppealNode*);
-  bool TraverseTableData(TableData*, AppealNode*);    // success if all tokens are matched.
+  bool TraverseTableData(TableData*, AppealNode*, AppealNode *&);
   bool TraverseConcatenate(RuleTable*, AppealNode*);
   bool TraverseOneof(RuleTable*, AppealNode*);
   bool TraverseZeroormore(RuleTable*, AppealNode*);
-  bool TraverseZeroormore_fast(RuleTable*, AppealNode*);
   bool TraverseZeroorone(RuleTable*, AppealNode*);
 
   // There are some special cases we can speed up the traversal.
   // 1. If the target is a token, we just need compare mCurToken with it.
   // 2. If the target is a special rule table, like literal, identifier, we just
   //    need check the type of mCurToken.
-  bool TraverseToken(Token*, AppealNode*);
+  bool TraverseToken(Token*, AppealNode*, AppealNode *&);
   bool TraverseLiteral(RuleTable*, AppealNode*);
   bool TraverseIdentifier(RuleTable*, AppealNode*);
   void TraverseSpecialTableSucc(RuleTable*, AppealNode*);
-  void TraverseSpecialTableFail(RuleTable*, AppealNode*, AppealStatus);
 
   bool IsVisited(RuleTable*);
   void SetVisited(RuleTable*);
@@ -344,12 +345,6 @@ public:
   void InitRecursion();
   unsigned LexOneLine();
 };
-
-// I put 256 as the biggest number. For all the code I've see it should be ok.
-// If someday someone has a 'stack smashing' error, please check this.
-#define MAX_SUCC_TOKENS 1024
-extern unsigned gSuccTokensNum;
-extern unsigned gSuccTokens[MAX_SUCC_TOKENS];
 
 }
 #endif

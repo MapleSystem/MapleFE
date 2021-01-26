@@ -487,7 +487,9 @@ bool Parser::TraverseStmt() {
   for (unsigned i = 0; i < gTopRulesNum; i++){
     RuleTable *t = gTopRules[i];
     mRootNode->ClearChildren();
-    succ = TraverseRuleTable(t, mRootNode);
+    AppealNode *child = NULL;
+    succ = TraverseRuleTable(t, mRootNode, child);
+    mRootNode->CopyMatch(child);
     if (succ) {
       // Need adjust the mCurToken. A rule could try multiple possible
       // children rules, although there is one any only one valid child
@@ -534,10 +536,12 @@ void Parser::DumpEnterTable(const char *table_name, unsigned indent) {
   std::cout << "Enter " << table_name << "@" << mCurToken << "{" << std::endl;
 }
 
-void Parser::DumpExitTable(const char *table_name, unsigned indent, bool succ, AppealStatus reason) {
+void Parser::DumpExitTable(const char *table_name, unsigned indent, AppealNode *appeal) {
   for (unsigned i = 0; i < indent; i++)
     std::cout << " ";
   std::cout << "Exit  " << table_name << "@" << mCurToken;
+  bool succ = appeal->IsSucc();
+  AppealStatus reason = appeal->mResult;
   if (succ) {
     if (reason == SuccWasSucc)
       std::cout << " succ@WasSucc" << "}";
@@ -546,7 +550,7 @@ void Parser::DumpExitTable(const char *table_name, unsigned indent, bool succ, A
     else if (reason == Succ)
       std::cout << " succ" << "}";
 
-    DumpSuccTokens();
+    DumpSuccTokens(appeal);
     std::cout << std::endl;
   } else {
     if (reason == FailWasFailed)
@@ -568,30 +572,21 @@ void Parser::DumpExitTable(const char *table_name, unsigned indent, bool succ, A
   }
 }
 
-// Please read the comments point 6 at the beginning of this file.
-// We need prepare certain storage for multiple possible matchings. The successful token
-// number could be more than one. I'm using fixed array to save them. If needed to extend
-// in the future, just extend it.
-unsigned gSuccTokensNum;
-unsigned gSuccTokens[MAX_SUCC_TOKENS];
-
-void Parser::DumpSuccTokens() {
-  std::cout << " " << gSuccTokensNum << ": ";
-  for (unsigned i = 0; i < gSuccTokensNum; i++)
-    std::cout << gSuccTokens[i] << ",";
+void Parser::DumpSuccTokens(AppealNode *appeal) {
+  std::cout << " " << appeal->GetMatchNum() << ": ";
+  for (unsigned i = 0; i < appeal->GetMatchNum(); i++)
+    std::cout << appeal->GetMatch(i) << ",";
 }
 
-// Update gSuccTokens into 'node'.
+// Update SuccMatch using 'node'.
 void Parser::UpdateSuccInfo(unsigned curr_token, AppealNode *node) {
   MASSERT(node->IsTable());
   RuleTable *rule_table = node->GetTable();
   SuccMatch *succ_match = &gSucc[rule_table->mIndex];
   succ_match->AddStartToken(curr_token);
+
+  // AddSuccNode will update mMatches from 'node'.
   succ_match->AddSuccNode(node);
-  for (unsigned i = 0; i < gSuccTokensNum; i++) {
-    node->AddMatch(gSuccTokens[i]);
-    succ_match->AddMatch(gSuccTokens[i]);
-  }
 }
 
 // Remove 'node' from its SuccMatch
@@ -607,9 +602,11 @@ void Parser::RemoveSuccNode(unsigned curr_token, AppealNode *node) {
 // The PreProcessing of TraverseRuleTable().
 // Under the Wavefront algorithm of recursion group traversal, things are
 // are a little complicated.
-// 1. If a rule is already failed at some token, it's always failed.
+// 1. If a rule is failed at some token, it could be succ later. For example,
+//    the 2nd hit in 1st iteration of a recursion node, is failed@2ndof1st,
+//    but the rule could be succ match later.
 // 2. If a rule is succ at some token, it doesn't mean it's finished, and
-//    there could be more matchings. So 
+//    there could be more matchings.
 //
 // Returns true : if SuccMatch is done.
 
@@ -621,8 +618,7 @@ bool Parser::TraverseRuleTablePre(AppealNode *appeal) {
   if (mTraceTable)
     name = GetRuleTableName(rule_table);
 
-  // Check if it was succ. Set the gSuccTokens/gSuccTokensNum appropriately
-  // The longest matching is chosen for the next rule table to match.
+  // Check if it was succ. The longest matching is chosen for the next rule table to match.
   SuccMatch *succ = &gSucc[rule_table->mIndex];
   if (succ) {
     bool was_succ = succ->GetStartToken(mCurToken);
@@ -637,29 +633,28 @@ bool Parser::TraverseRuleTablePre(AppealNode *appeal) {
 
       is_done = succ->IsDone();
 
-      gSuccTokensNum = succ->GetMatchNum();
-      for (unsigned i = 0; i < gSuccTokensNum; i++) {
-        gSuccTokens[i] = succ->GetOneMatch(i);
+      unsigned num = succ->GetMatchNum();
+      for (unsigned i = 0; i < num; i++) {
+        unsigned match = succ->GetOneMatch(i);
         // WasSucc nodes need Match info, which will be used later
         // in the sort out.
-        appeal->AddMatch(gSuccTokens[i]);
-        if (gSuccTokens[i] > mCurToken)
-          mCurToken = gSuccTokens[i];
+        appeal->AddMatch(match);
+        if (match > mCurToken)
+          mCurToken = match;
       }
+      appeal->mResult = SuccWasSucc;
 
       // In ZeroorXXX cases, it was successful and has SuccMatch. However,
       // it could be a failure. In this case, we shouldn't move mCurToken.
-      if (gSuccTokensNum > 0)
+      if (num > 0)
         MoveCurToken();
-
-      appeal->mResult = SuccWasSucc;
     }
   }
 
   if (WasFailed(rule_table, saved_mCurToken)) {
     appeal->mResult = FailWasFailed;
     if (mTraceTable)
-      DumpExitTable(name, mIndentation, false, appeal->mResult);
+      DumpExitTable(name, mIndentation, appeal);
   }
 
   return is_done;
@@ -716,12 +711,14 @@ bool Parser::LookAheadFail(RuleTable *rule_table, unsigned token) {
 //           if they succeeded.
 //        3. TraverseOneof, TraverseZeroxxxx, TraverseConcatenate follow rule 1&2.
 //        4. TraverseRuleTablePre and TraverseLeadNode both exit early, so they
-//           need follow the rule 1&1 also.
+//           need follow the rule 1&2.
 //        3. TraverseRuleTablePre move mCurToken is succ, and actually it doesn't
 //           touch mCurToken when fail.
 //        4. TraverseLeadNode() also follows the rule 1&2. It moves mCurToken
 //           when succ and restore it when fail.
-bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
+//
+// 'child' is the AppealNode of 'rule_table'.
+bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent, AppealNode *&child) {
   if (mEndOfFile)
     return false;
 
@@ -739,6 +736,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
   appeal->SetStartIndex(mCurToken);
   appeal->SetParent(parent);
   parent->AddChild(appeal);
+  child = appeal;
 
   unsigned saved_mCurToken = mCurToken;
   bool is_done = TraverseRuleTablePre(appeal);
@@ -760,7 +758,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
     appeal->mResult = FailLookAhead;
     AddFailed(rule_table, saved_mCurToken);
     if (mTraceTable)
-      DumpExitTable(name, mIndentation, false, appeal->mResult);
+      DumpExitTable(name, mIndentation, appeal);
     mIndentation -= 2;
     return false;
   }
@@ -770,7 +768,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
   if (appeal->IsSucc()) {
     if (!in_group || is_done) {
       if (mTraceTable)
-        DumpExitTable(name, mIndentation, true, appeal->mResult);
+        DumpExitTable(name, mIndentation, appeal);
       mIndentation -= 2;
       return true;
     } else {
@@ -792,7 +790,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
   // If the rule is already traversed in this iteration(instance), we return the result.
   if (rec_tra && rec_tra->RecursionNodeVisited(rule_table)) {
     if (mTraceTable)
-      DumpExitTable(name, mIndentation, true, appeal->mResult);
+      DumpExitTable(name, mIndentation, appeal);
     mIndentation -= 2;
     return true;
   }
@@ -824,7 +822,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
       // change the status to Succ.
       appeal->mResult = Succ;
       if (mTraceTable)
-        DumpExitTable(name, mIndentation, true, Succ);
+        DumpExitTable(name, mIndentation, appeal);
 
       mIndentation -= 2;
       return rec_tra->ConnectPrevious(appeal);
@@ -840,8 +838,9 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
       rec_tra->GetInstance() == InstanceFirst &&
       rec_tra->LeadNodeVisited(rule_table)) {
     rec_tra->AddAppealPoint(appeal);
+    appeal->mResult = Fail2ndOf1st;
     if (mTraceTable)
-      DumpExitTable(name, mIndentation, false, Fail2ndOf1st);
+      DumpExitTable(name, mIndentation, appeal);
     mIndentation -= 2;
     return false;
   }
@@ -861,17 +860,9 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
 
   if (mRecursionAll.IsLeadNode(rule_table)) {
     bool found = TraverseLeadNode(appeal, parent);
-    if (!found) {
-      appeal->mResult = FailChildrenFailed;
-      gSuccTokensNum = 0;
-    } else {
-      gSuccTokensNum = appeal->GetMatchNum();
-      for (unsigned i = 0; i < gSuccTokensNum; i++)
-        gSuccTokens[i] = appeal->GetMatch(i);
-    }
     if (mTraceTable) {
       const char *name = GetRuleTableName(rule_table);
-      DumpExitTable(name, mIndentation, found, appeal->mResult);
+      DumpExitTable(name, mIndentation, appeal);
     }
     mIndentation -= 2;
     return found;
@@ -890,86 +881,92 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent) {
     SetIsDone(rule_table, saved_mCurToken);
 
   if (mTraceTable)
-    DumpExitTable(name, mIndentation, matched, appeal->mResult);
+    DumpExitTable(name, mIndentation, appeal);
 
   mIndentation -= 2;
   return matched;
 }
 
-bool Parser::TraverseRuleTableRegular(RuleTable *rule_table, AppealNode *parent) {
-  bool matched = false;
-  unsigned old_pos = mCurToken;
-  gSuccTokensNum = 0;
+// 'appeal' is the AppealNode of 'rule_table'.
+//
+// [NOTE] !!!!
+//
+// This is the most important note. The merge of children's succ match to parent's
+// is done inside :
+//   1. TraverseIdentifier, TraverseLiteral, TraverseOneof, TraverseZeroorXXx, etc
+//      since we konw the relation between parent and children
+//   2. Or TraverseTableData in this function, because we know the relation.
+//   3. Or when TraverseRuleTablePre is succ, also because we know the relation. We
+//      do it inside TraverseRuleTablePre.
+// These are the only places of colleting succ match for a parent node.
+//
 
-  bool was_succ = (parent->mResult == SuccWasSucc) || (parent->mResult == SuccStillWasSucc);
-  unsigned match_num = parent->GetMatchNum();
+bool Parser::TraverseRuleTableRegular(RuleTable *rule_table, AppealNode *appeal) {
+  bool matched = false;
+  unsigned saved_mCurToken = mCurToken;
+
+  bool was_succ = (appeal->mResult == SuccWasSucc) || (appeal->mResult == SuccStillWasSucc);
+  unsigned match_num = appeal->GetMatchNum();
   unsigned longest_match = 0;
   if (was_succ)
-    longest_match = parent->LongestMatch();
+    longest_match = appeal->LongestMatch();
 
-  // [NOTE] TblLiteral and TblIdentifier don't use the SuccMatch info,
-  //        since it's quite simple, we don't need SuccMatch to reduce
-  //        the traversal time.
+  // [NOTE] 1. TblLiteral and TblIdentifier don't use the SuccMatch info,
+  //           since it's quite simple, we don't need SuccMatch to reduce
+  //           the traversal time.
+  //        2. Actually TraverseIdentifier and TraverseLiteral don't create new AppealNode
+  //           since we don't go inside.
   if ((rule_table == &TblIdentifier))
-    return TraverseIdentifier(rule_table, parent);
+    return TraverseIdentifier(rule_table, appeal);
 
   if ((rule_table == &TblLiteral))
-    return TraverseLiteral(rule_table, parent);
+    return TraverseLiteral(rule_table, appeal);
 
   EntryType type = rule_table->mType;
   switch(type) {
   case ET_Oneof:
-    matched = TraverseOneof(rule_table, parent);
+    matched = TraverseOneof(rule_table, appeal);
     break;
   case ET_Zeroormore:
-    if (rule_table->mProperties & RP_ZomFast)
-      matched = TraverseZeroormore_fast(rule_table, parent);
-    else
-      matched = TraverseZeroormore(rule_table, parent);
+    matched = TraverseZeroormore(rule_table, appeal);
     break;
   case ET_Zeroorone:
-    matched = TraverseZeroorone(rule_table, parent);
+    matched = TraverseZeroorone(rule_table, appeal);
     break;
   case ET_Concatenate:
-    matched = TraverseConcatenate(rule_table, parent);
+    matched = TraverseConcatenate(rule_table, appeal);
     break;
-  case ET_Data:
-    matched = TraverseTableData(rule_table->mData, parent);
+  case ET_Data: {
+    // This is a rare case where a rule table contains only table, either a token
+    // or a single child rule. In this case, we need merge the child's match into
+    // parent. However, we cannot do the merge in TraverseTableData() since this
+    // function will be used in multiple places where we cannot merge.
+    AppealNode *child;
+    matched = TraverseTableData(rule_table->mData, appeal, child);
+    appeal->CopyMatch(child);
     break;
+  }
   case ET_Null:
   default:
     break;
   }
 
   if(matched) {
-
-    // If parent WasSucc before entering this function, and have the same
-    // or bigger longest match, it's StillWasSucc. Don't need update succinfo.
-
-    unsigned longest = 0;
-    for (unsigned i = 0; i < gSuccTokensNum; i++) {
-      unsigned m = gSuccTokens[i];
-      longest = m > longest ? m : longest;
-    }
-
-    if (!was_succ || (longest > longest_match)) {
-      UpdateSuccInfo(old_pos, parent);
-      parent->mResult = Succ;
-    } else {
-      parent->mResult = SuccStillWasSucc;
-    }
-
-    ResetFailed(rule_table, old_pos);
+    UpdateSuccInfo(saved_mCurToken, appeal);
+    appeal->mResult = Succ;
+    ResetFailed(rule_table, saved_mCurToken);
     return true;
   } else {
-    parent->mResult = FailChildrenFailed;
-    mCurToken = old_pos;
+    appeal->mResult = FailChildrenFailed;
+    mCurToken = saved_mCurToken;
     AddFailed(rule_table, mCurToken);
     return false;
   }
 }
 
-bool Parser::TraverseToken(Token *token, AppealNode *parent) {
+// Returns 1. true if succ.
+//         2. child_node which represents 'token'.
+bool Parser::TraverseToken(Token *token, AppealNode *parent, AppealNode *&child_node) {
   Token *curr_token = GetActiveToken(mCurToken);
   bool found = false;
   mIndentation += 2;
@@ -981,6 +978,7 @@ bool Parser::TraverseToken(Token *token, AppealNode *parent) {
   }
 
   AppealNode *appeal = new AppealNode();
+  child_node = appeal;
   mAppealNodes.push_back(appeal);
   appeal->mResult = FailNotRightToken;
   appeal->SetToken(curr_token);
@@ -992,18 +990,13 @@ bool Parser::TraverseToken(Token *token, AppealNode *parent) {
     appeal->mResult = Succ;
     appeal->AddMatch(mCurToken);
     found = true;
-    gSuccTokensNum = 1;
-    gSuccTokens[0] = mCurToken;
     MoveCurToken();
   }
 
   if (mTraceTable) {
     std::string name = "token:";
     name += token->GetName();
-    if (found)
-      DumpExitTable(name.c_str(), mIndentation, true, Succ);
-    else
-      DumpExitTable(name.c_str(), mIndentation, false, AppealStatus_NA);
+    DumpExitTable(name.c_str(), mIndentation, appeal);
   }
 
   mIndentation -= 2;
@@ -1013,27 +1006,13 @@ bool Parser::TraverseToken(Token *token, AppealNode *parent) {
 // Supplemental function invoked when TraverseSpecialToken succeeds.
 // It helps set all the data structures.
 void Parser::TraverseSpecialTableSucc(RuleTable *rule_table, AppealNode *appeal) {
-  const char *name = GetRuleTableName(rule_table);
   Token *curr_token = GetActiveToken(mCurToken);
-  gSuccTokensNum = 1;
-  gSuccTokens[0] = mCurToken;
-
   appeal->mResult = Succ;
   appeal->SetToken(curr_token);
   appeal->SetStartIndex(mCurToken);
   appeal->AddMatch(mCurToken);
 
   MoveCurToken();
-}
-
-// Supplemental function invoked when TraverseSpecialToken fails.
-// It helps set all the data structures.
-void Parser::TraverseSpecialTableFail(RuleTable *rule_table,
-                                      AppealNode *appeal,
-                                      AppealStatus status) {
-  const char *name = GetRuleTableName(rule_table);
-  AddFailed(rule_table, mCurToken);
-  appeal->mResult = status;
 }
 
 // We don't go into Literal table.
@@ -1043,60 +1022,53 @@ bool Parser::TraverseLiteral(RuleTable *rule_table, AppealNode *appeal) {
   Token *curr_token = GetActiveToken(mCurToken);
   const char *name = GetRuleTableName(rule_table);
   bool found = false;
-  gSuccTokensNum = 0;
 
   if (curr_token->IsLiteral()) {
     found = true;
     TraverseSpecialTableSucc(rule_table, appeal);
   } else {
-    TraverseSpecialTableFail(rule_table, appeal, FailNotLiteral);
+    appeal->mResult = FailNotLiteral;
+    AddFailed(rule_table, mCurToken);
   }
 
   return found;
 }
 
 // We don't go into Identifier table.
-// 'appeal' is the node for this rule table. In other TraverseXXX(),
-// 'appeal' is parent node.
+// 'appeal' is the node for this rule table.
 bool Parser::TraverseIdentifier(RuleTable *rule_table, AppealNode *appeal) {
   Token *curr_token = GetActiveToken(mCurToken);
   const char *name = GetRuleTableName(rule_table);
   bool found = false;
-  gSuccTokensNum = 0;
 
   if (curr_token->IsIdentifier()) {
     found = true;
     TraverseSpecialTableSucc(rule_table, appeal);
   } else {
-    TraverseSpecialTableFail(rule_table, appeal, FailNotIdentifier);
+    appeal->mResult = FailNotIdentifier;
+    AddFailed(rule_table, mCurToken);
   }
 
   return found;
 }
 
-
 // It always return true.
 // Moves until hit a NON-target data
 // [Note]
-//   1. Every iteration we go through all table data, and pick the one matching the most tokens.
-//   2. If noone of table data can match, it quit.
-//   3. gSuccTokens and gSuccTokensNum are a little bit complicated. Since Zeroormore can match
-//      any number of tokens it can, the number of matchings will grow each time one instance
-//      is matched.
-//   4. We don't count the 'mCurToken' as a succ matching to return. It means catch 'zero'.
-//      Although 'zero' is a correct matching, it's left to the final parent which should be a
-//      Concatenate node. It's handled in TraverseConcatenate().
-bool Parser::TraverseZeroormore(RuleTable *rule_table, AppealNode *parent) {
+//   We don't count the 'mCurToken' as a succ matching to return. It means catch 'zero'.
+//
+// 'appeal' is the node of 'rule_table'.
+
+bool Parser::TraverseZeroormore(RuleTable *rule_table, AppealNode *appeal) {
   unsigned saved_mCurToken = mCurToken;
-  gSuccTokensNum = 0;
+  bool found_real = false;
 
   MASSERT((rule_table->mNum == 1) && "zeroormore node has more than one elements?");
   TableData *data = rule_table->mData;
 
-  // prepare the prev_succ_tokens[_num] for the 1st iteration.
-  unsigned prev_succ_tokens_num = 1;
-  unsigned prev_succ_tokens[MAX_SUCC_TOKENS];
-  prev_succ_tokens[0] = mCurToken - 1;
+  // prepare the prev_succ_tokens] for the 1st iteration.
+  SmallVector<unsigned> prev_succ_tokens;
+  prev_succ_tokens.PushBack(mCurToken - 1);
 
   // Need to avoid duplicated mCurToken. Look at the rule
   // rule SwitchBlock : '{' + ZEROORMORE(ZEROORMORE(SwitchBlockStatementGroup) + ZEROORMORE(SwitchLabel)) + '}'
@@ -1106,158 +1078,88 @@ bool Parser::TraverseZeroormore(RuleTable *rule_table, AppealNode *parent) {
   // an endless loop.
   SmallVector<unsigned> visited;
 
-  SmallVector<unsigned> final_succ_tokens;
-
   while(1) {
     // A set of results of current instance
     bool found_subtable = false;
-    unsigned subtable_tokens_num = 0;
-    unsigned subtable_succ_tokens[MAX_SUCC_TOKENS];
+    SmallVector<unsigned> subtable_succ_tokens;
 
     // Like TraverseConcatenate, we will try all good matchings of previous instance.
-    for (unsigned j = 0; j < prev_succ_tokens_num; j++) {
-      mCurToken = prev_succ_tokens[j] + 1;
-      visited.PushBack(prev_succ_tokens[j]);
+    for (unsigned j = 0; j < prev_succ_tokens.GetNum(); j++) {
+      unsigned prev = prev_succ_tokens.ValueAtIndex(j);
+      mCurToken = prev + 1;
+      visited.PushBack(prev);
 
-      bool temp_found = TraverseTableData(data, parent);
+      AppealNode *child = NULL;
+      bool temp_found = TraverseTableData(data, appeal, child);
       found_subtable |= temp_found;
 
       if (temp_found) {
-        for (unsigned id = 0; id < gSuccTokensNum; id++)
-          subtable_succ_tokens[subtable_tokens_num + id] = gSuccTokens[id];
-        subtable_tokens_num += gSuccTokensNum;
+        unsigned match_num = child->GetMatchNum();
+        for (unsigned id = 0; id < match_num; id++) {
+          unsigned match = child->GetMatch(id);
+          subtable_succ_tokens.PushBack(match);
+          appeal->AddMatch(match);
+        }
       }
     }
 
+    prev_succ_tokens.Clear();
+
     // It's possible that sub-table is also a ZEROORxxx, and is succ without
     // real matching. This will be considered as a STOP.
-    if (found_subtable && (subtable_tokens_num > 0)) {
-      // set final
-      for (unsigned id = 0; id < subtable_tokens_num; id++) {
-        unsigned token = subtable_succ_tokens[id];
-        if (!final_succ_tokens.Find(token))
-          final_succ_tokens.PushBack(token);
-      }
+    unsigned subtable_tokens_num = subtable_succ_tokens.GetNum();
+    if (found_subtable && subtable_tokens_num > 0) {
+      found_real = true;
       // set prev
-      prev_succ_tokens_num = 0;
       for (unsigned id = 0; id < subtable_tokens_num; id++) {
-        unsigned t = subtable_succ_tokens[id];
+        unsigned t = subtable_succ_tokens.ValueAtIndex(id);
         if (!visited.Find(t))
-          prev_succ_tokens[prev_succ_tokens_num++] = t;
+          prev_succ_tokens.PushBack(t);
       }
     } else {
       break;
     }
   }
 
-  gSuccTokensNum = final_succ_tokens.GetNum();
-  for (unsigned id = 0; id < final_succ_tokens.GetNum(); id++) {
-    unsigned token = final_succ_tokens.ValueAtIndex(id);
-    gSuccTokens[id] = token;
-    // Actually we don't transfer mCurToken to the caller.
-    // We are look into the succ info instead. However, we update mCurToken
-    // here for easy dump info.
-    if (token + 1 > mCurToken)
-      mCurToken = token + 1;
-  }
-
-  if (!gSuccTokensNum)
-    mCurToken = saved_mCurToken;
+  mCurToken = saved_mCurToken;
+  appeal->mResult = Succ;
+  if (found_real && appeal->GetMatchNum() > 0)
+    mCurToken = appeal->LongestMatch() + 1;
 
   return true;
 }
 
-bool Parser::TraverseZeroormore_fast(RuleTable *rule_table, AppealNode *parent) {
-  unsigned saved_mCurToken = mCurToken;
-  gSuccTokensNum = 0;
-
-  MASSERT((rule_table->mNum == 1) && "zeroormore node has more than one elements?");
-  TableData *data = rule_table->mData;
-
-  unsigned prev_succ_token = mCurToken - 1;
-  unsigned final_succ_token;
-
-  bool found_real = false;
-
-  while(1) {
-    // A set of results of current instance
-    bool found_subtable = false;
-    bool go_on = false;
-    unsigned subtable_succ_token;
-
-    mCurToken = prev_succ_token + 1;
-    found_subtable = TraverseTableData(data, parent);
-
-    if (found_subtable) {
-      MASSERT((gSuccTokensNum == 1) || (gSuccTokensNum == 0));
-      if(gSuccTokensNum == 1) {
-        found_real = true;
-        go_on = true;
-        subtable_succ_token = gSuccTokens[0];
-        final_succ_token = subtable_succ_token;
-        prev_succ_token = subtable_succ_token;
-      }
-    }
-
-    if (!go_on)
-      break;
-  }
-
-  if (found_real) {
-    gSuccTokensNum = 1;
-    gSuccTokens[0] = final_succ_token;
-    mCurToken = final_succ_token + 1;
-  } else {
-    gSuccTokensNum = 0;
-    mCurToken = saved_mCurToken;
-  }
-
-  return true;
-}
-
-// For Zeroorone node it's easier to handle gSuccTokens(Num). Just let the elements
-// handle themselves.
-bool Parser::TraverseZeroorone(RuleTable *rule_table, AppealNode *parent) {
+// 'appeal' is the node of 'rule_table'.
+bool Parser::TraverseZeroorone(RuleTable *rule_table, AppealNode *appeal) {
   MASSERT((rule_table->mNum == 1) && "zeroorone node has more than one elements?");
   TableData *data = rule_table->mData;
-  gSuccTokensNum = 0;
-  bool found = TraverseTableData(data, parent);
+  AppealNode *child;
+  bool found = TraverseTableData(data, appeal, child);
+  appeal->CopyMatch(child);
   return true;
 }
 
 // 1. Save all the possible matchings from children.
 // 2. As return value we choose the longest matching.
-bool Parser::TraverseOneof(RuleTable *rule_table, AppealNode *parent) {
+//
+// 'appeal' is the node of 'rule_table'.
+bool Parser::TraverseOneof(RuleTable *rule_table, AppealNode *appeal) {
   bool found = false;
-  unsigned succ_tokens_num = 0;
-  unsigned succ_tokens[MAX_SUCC_TOKENS];
   unsigned new_mCurToken = mCurToken; // position after most tokens eaten
   unsigned old_mCurToken = mCurToken;
 
-  gSuccTokensNum = 0;
-
   for (unsigned i = 0; i < rule_table->mNum; i++) {
     TableData *data = rule_table->mData + i;
-    bool temp_found = TraverseTableData(data, parent);
+    AppealNode *child = NULL;
+    bool temp_found = TraverseTableData(data, appeal, child);
     found = found | temp_found;
     if (temp_found) {
-      // 1. Save the possilbe matchings
-      // 2. Remove be duplicated matchings
-      for (unsigned j = 0; j < gSuccTokensNum; j++) {
-        bool duplicated = false;
-        for (unsigned k = 0; k < succ_tokens_num; k++) {
-          if (succ_tokens[k] == gSuccTokens[j]) {
-            duplicated = true;
-            break;
-          }
-        }
-        if (!duplicated)
-          succ_tokens[succ_tokens_num++] = gSuccTokens[j];
-      }
-
+      MASSERT(child);
+      appeal->CopyMatch(child);
       if (mCurToken > new_mCurToken)
         new_mCurToken = mCurToken;
-      // Restore the position of original mCurToken.
+
+      // Restore the position of original mCurToken, for the next child traversal.
       mCurToken = old_mCurToken;
 
       // Some ONEOF rules can have only children matching current token seq.
@@ -1266,10 +1168,6 @@ bool Parser::TraverseOneof(RuleTable *rule_table, AppealNode *parent) {
       }
     }
   }
-
-  gSuccTokensNum = succ_tokens_num;
-  for (unsigned k = 0; k < succ_tokens_num; k++)
-    gSuccTokens[k] = succ_tokens[k];
 
   // move position according to the longest matching
   mCurToken = new_mCurToken;
@@ -1283,35 +1181,31 @@ bool Parser::TraverseOneof(RuleTable *rule_table, AppealNode *parent) {
 //           all the possible matches so that later nodes can still have opportunity.
 //        2. Each node will try all starting tokens which are the ending token of previous
 //           node.
-//        3. We need take care of the gSuccTokensNum and gSuccTokens carefully. Eg.
-//           The gSuccTokensNum/gSuccTokens need be taken care in a rule like below
+//        3. We need take care of the final_succ_tokens carefully.
+//           e.g. in a rule like below
 //              rule AA : BB + CC + ZEROORONE(xxx)
-//           If ZEROORONE(xxx) doesn't match anything, it sets gSuccTokensNum to 0. However
-//           rule AA matches multiple tokens. So gSuccTokensNum needs to be recalculated.
+//           If ZEROORONE(xxx) doesn't match anything, it sets subtable_succ_tokens to 0. However
+//           rule AA matches multiple tokens. So final_succ_tokens needs to be calculated carefully.
 //        4. We are going to take succ match info from SuccMatch, not from a specific
 //           AppealNode. SuccMatch has the complete info.
 //
-bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *parent) {
+// 'appeal' is the node of 'rule_table'.
+
+bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *appeal) {
   // Init found to true.
+  // 'found' is tricky. If all child rule tables are Zeroorxxx, it always returns true.
   bool found = true;
 
-  unsigned prev_succ_tokens_num = 0;
-  unsigned prev_succ_tokens[MAX_SUCC_TOKENS];
+  SmallVector<unsigned> prev_succ_tokens;
+  SmallVector<unsigned> subtable_succ_tokens;
+  SmallVector<unsigned> final_succ_tokens;
 
-  // Final status. It only saves the latest successful status.
-  unsigned final_succ_tokens_num = 0;
-  unsigned final_succ_tokens[MAX_SUCC_TOKENS];
-
-  // Make sure it's 0 when fail and restore mCurToken;
-  gSuccTokensNum = 0;
   unsigned saved_mCurToken = mCurToken;
 
-  // It's possible last_matched become -1.
   int last_matched = mCurToken - 1;
 
   // prepare the prev_succ_tokens[_num] for the 1st iteration.
-  prev_succ_tokens_num = 1;
-  prev_succ_tokens[0] = mCurToken - 1;
+  prev_succ_tokens.PushBack(mCurToken - 1);
 
   for (unsigned i = 0; i < rule_table->mNum; i++) {
     bool is_zeroxxx = false;
@@ -1322,99 +1216,99 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *parent) {
         is_zeroxxx = true;
     }
 
-    // A set of results of current subtable
+    SmallVector<unsigned> carry_on_prev;
     bool found_subtable = false;
-    unsigned subtable_tokens_num = 0;
-    unsigned subtable_succ_tokens[MAX_SUCC_TOKENS];
+
+    subtable_succ_tokens.Clear();
 
     // We will iterate on all previous succ matches.
-    for (unsigned j = 0; j < prev_succ_tokens_num; j++) {
-      unsigned prev = prev_succ_tokens[j];
+    for (unsigned j = 0; j < prev_succ_tokens.GetNum(); j++) {
+      unsigned prev = prev_succ_tokens.ValueAtIndex(j);
       mCurToken = prev + 1;
 
-      bool temp_found = TraverseTableData(data, parent);
+      AppealNode *child = NULL;
+      bool temp_found = TraverseTableData(data, appeal, child);
       found_subtable |= temp_found;
 
       if (temp_found) {
         bool duplicated_with_prev = false;
-        for (unsigned id = 0; id < gSuccTokensNum; id++) {
-          subtable_succ_tokens[subtable_tokens_num + id] = gSuccTokens[id];
-          if (gSuccTokens[id] == prev)
+        for (unsigned id = 0; id < child->GetMatchNum(); id++) {
+          unsigned match = child->GetMatch(id);
+          if (!subtable_succ_tokens.Find(match))
+            subtable_succ_tokens.PushBack(match);
+          if (match == prev)
             duplicated_with_prev = true;
         }
-        subtable_tokens_num += gSuccTokensNum;
 
         // for Zeroorone/Zeroormore node it always returns true. NO matter how
         // many tokens it really matches, 'zero' is also a correct match. we
-        // need take it into account. [Except it's a duplication]
-        if (is_zeroxxx && !duplicated_with_prev) {
-          subtable_succ_tokens[subtable_tokens_num] = prev;
-          subtable_tokens_num++;
-        }
+        // need take it into account so that the next rule table can try
+        // on it. [Except it's a duplication]
+        if (is_zeroxxx && !duplicated_with_prev)
+          carry_on_prev.PushBack(prev);
       }
     }
 
+    // Update the final_succ_tokens
+    // Please read comment 3 before this function.
+    if (!is_zeroxxx)
+      final_succ_tokens.Clear();
+
+    prev_succ_tokens.Clear();
+
     if (found_subtable) {
-      // ZEROORXXX subtable may match nothing. Although it doesn't move mCurToken,
-      // it does move the rule. It's still a good succ.
-      if (subtable_tokens_num > 0) {
-        // 1. set final
-        final_succ_tokens_num = subtable_tokens_num;
-        for (unsigned id = 0; id < subtable_tokens_num; id++)
-          final_succ_tokens[id] = subtable_succ_tokens[id];
-        // 2. set prev
-        prev_succ_tokens_num = subtable_tokens_num;
-        for (unsigned id = 0; id < subtable_tokens_num; id++)
-          prev_succ_tokens[id] = subtable_succ_tokens[id];
+      for (unsigned id = 0; id < subtable_succ_tokens.GetNum(); id++) {
+        unsigned token = subtable_succ_tokens.ValueAtIndex(id);
+        if (!prev_succ_tokens.Find(token))
+          prev_succ_tokens.PushBack(token);
+        if (!final_succ_tokens.Find(token))
+          final_succ_tokens.PushBack(token);
+      }
+      for (unsigned id = 0; id < carry_on_prev.GetNum(); id++) {
+        unsigned token = carry_on_prev.ValueAtIndex(id);
+        if (!prev_succ_tokens.Find(token))
+          prev_succ_tokens.PushBack(token);
       }
     } else {
+      // Once a single child rule fails, the 'appeal' fails.
       found = false;
       break;
     }
   }
 
-  // Look at this special case, where all children are ZEROORxxx
-  //   rule DimExpr : ZEROORMORE(Annotation) + ZEROORONE(Expression)
-  // It's possible it actually matches nothing, but we fake it as 1 matching
-  // with 'zero' token. This need be adjusted at the end of traversal.
-  if (final_succ_tokens_num == 1) {
-    int compare = final_succ_tokens[0];
-    if (compare == last_matched)
-      found = false;
-  }
+  mCurToken = saved_mCurToken;
 
   if (found) {
-     // mCurToken doesn't have much meaning in current algorithm when
-     // transfer to the next rule table, because the next rule will take
-     // the succ info and get all matching token of prev, and set them
-     // as the starting mCurToken.
-     //
-     // However, we do set mCurToken to the biggest matching.
-     gSuccTokensNum = final_succ_tokens_num;
-     for (unsigned id = 0; id < final_succ_tokens_num; id++) {
-       unsigned token = final_succ_tokens[id];
-       if (token + 1 > mCurToken)
-         mCurToken = token + 1;
-       gSuccTokens[id] = token;
-     }
-  } else {
-    // Need reset gSuccTokensNum and mCurToken;
-    gSuccTokensNum = 0;
-    mCurToken = saved_mCurToken;
+    for (unsigned id = 0; id < final_succ_tokens.GetNum(); id++) {
+      unsigned token = final_succ_tokens.ValueAtIndex(id);
+      appeal->AddMatch(token);
+    }
+    // mCurToken doesn't have much meaning in current algorithm when
+    // transfer to the next rule table, because the next rule will take
+    // the succ info and get all matching token of prev, and set them
+    // as the starting mCurToken.
+    //
+    // However, we do set mCurToken to the biggest matching.
+    appeal->mResult = Succ;
+    if (appeal->GetMatchNum() > 0)
+      mCurToken = appeal->LongestMatch() + 1;
   }
 
   return found;
 }
 
-// The mCurToken moves if found target, or restore the original location.
-bool Parser::TraverseTableData(TableData *data, AppealNode *parent) {
+// 1. Returns (1) true if found, (2) the child_node represents 'data'.
+// 2. We don't merge the succ matches to 'appeal' in this function. It will be handled by
+//    the TraverseXXX(), since we don't know what type of rule table of appeal. For example,
+//    Oneof and Zeroormore should be handled differently.
+// 3. The mCurToken moves if found target, or restore the original location.
+bool Parser::TraverseTableData(TableData *data, AppealNode *appeal, AppealNode *&child_node) {
   if (mEndOfFile)
     return false;
 
   unsigned old_pos = mCurToken;
   bool     found = false;
   Token   *curr_token = GetActiveToken(mCurToken);
-  gSuccTokensNum = 0;
 
   switch (data->mType) {
   case DT_Char:
@@ -1426,13 +1320,13 @@ bool Parser::TraverseTableData(TableData *data, AppealNode *parent) {
   // separator, operator, keywords are generated as DT_Token.
   // just need check the pointer of token
   case DT_Token:
-    found = TraverseToken(&gSystemTokens[data->mData.mTokenId], parent);
+    found = TraverseToken(&gSystemTokens[data->mData.mTokenId], appeal, child_node);
     break;
   case DT_Type:
     break;
   case DT_Subtable: {
     RuleTable *t = data->mData.mEntry;
-    found = TraverseRuleTable(t, parent);
+    found = TraverseRuleTable(t, appeal, child_node);
     if (!found)
       mCurToken = old_pos;
     break;
@@ -1503,7 +1397,7 @@ void Parser::SortOut() {
   std::vector<AppealNode*>::iterator it = mRootNode->mChildren.begin();
   for (; it != mRootNode->mChildren.end(); it++) {
     AppealNode *n = *it;
-    if (!n->IsFail())
+    if (!n->IsFail() && !n->IsNA())
       mRootNode->mSortedChildren.push_back(n);
   }
   MASSERT(mRootNode->mSortedChildren.size()==1);
@@ -1624,7 +1518,7 @@ void Parser::SortOutRecursionHead(AppealNode *parent) {
   std::vector<AppealNode*>::iterator it = parent->mChildren.begin();
   for (; it != parent->mChildren.end(); it++) {
     AppealNode *child = *it;
-    if (child->IsFail())
+    if (child->IsFail() || child->IsNA())
       continue;
     bool found = child->FindMatch(parent_match);
     if (found) {
@@ -1653,7 +1547,7 @@ void Parser::SortOutOneof(AppealNode *parent) {
   std::vector<AppealNode*>::iterator it = parent->mChildren.begin();
   for (; it != parent->mChildren.end(); it++) {
     AppealNode *child = *it;
-    if (child->IsFail())
+    if (child->IsFail() || child->IsNA())
       continue;
 
     // In OneOf node, A successful child node must have its last matching
@@ -1769,7 +1663,7 @@ void Parser::SortOutZeroorone(AppealNode *parent) {
   MASSERT((parent->mChildren.size() == 1) && "Zeroorone has >1 valid children?");
   AppealNode *child = parent->mChildren.front();
 
-  if (child->IsFail())
+  if (child->IsFail() || child->IsNA())
     return;
 
   unsigned parent_start = parent->GetStartIndex();
@@ -2281,6 +2175,7 @@ void SuccMatch::AddStartToken(unsigned t) {
 }
 
 // The container Guamian assures 'n' is not duplicated.
+// It also assures 'm' is not duplicated.
 void SuccMatch::AddSuccNode(AppealNode *n) {
   MASSERT(mNodes.PairedGetKnobKey() == n->GetStartIndex());
   MASSERT(mMatches.PairedGetKnobKey() == n->GetStartIndex());
@@ -2574,4 +2469,5 @@ AppealNode* AppealNode::FindSpecChild(TableData *tdata, unsigned match) {
 
   return ret_child;
 }
+
 }
