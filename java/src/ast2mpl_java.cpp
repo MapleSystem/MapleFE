@@ -36,4 +36,21 @@ MIRType *A2MJava::MapPrimType(PrimTypeNode *ptnode) {
   TyIdx tid(prim);
   return GlobalTables::GetTypeTable().GetTypeFromTyIdx(tid);
 }
+
+const char *A2MJava::Type2Label(const MIRType *type) {
+  PrimType pty = type->GetPrimType();
+  switch (pty) {
+    case PTY_u1:   return "Z";
+    case PTY_u8:   return "B";
+    case PTY_i16:  return "S";
+    case PTY_u16:  return "C";
+    case PTY_i32:  return "I";
+    case PTY_i64:  return "J";
+    case PTY_f32:  return "F";
+    case PTY_f64:  return "D";
+    case PTY_void: return "V";
+    default:       return "L";
+  }
+}
+
 }

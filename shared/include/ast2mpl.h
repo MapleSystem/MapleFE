@@ -52,12 +52,21 @@ public:
   A2M(const char *filename);
   ~A2M();
 
+  void UpdateFuncName(MIRFunction *func);
+
+  virtual const char *Type2Label(const MIRType *type);
+  const char *Type2Name(const MIRType *type);
+
   virtual MIRType *MapPrimType(PrimTypeNode *tnode)=0;
 
   MIRType *MapType(TreeNode *tnode);
   void MapAttr(GenericAttrs &attr, const IdentifierNode *inode);
+  MIRSymbol *GetSymbol(maple::BaseNode *bn, maple::BlockNode *block);
   MIRSymbol *MapGlobalSymbol(TreeNode *inode);
   MIRSymbol *MapLocalSymbol(TreeNode *tnode, maple::MIRFunction *func);
+
+  maple::Opcode MapOpcode(OprId);
+  maple::Opcode MapComboOpcode(OprId);
 
   void ProcessAST(bool trace_a2m);
   maple::BaseNode *ProcessNode(StmtExprKind, TreeNode *tnode, maple::BlockNode *);

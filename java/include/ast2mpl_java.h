@@ -29,6 +29,8 @@ private:
 public:
   A2MJava(const char *filename) : A2M(filename) { }
 
+  const char *Type2Label(const MIRType *type);
+
   MIRType *MapPrimType(PrimTypeNode *ptnode);
 };
 

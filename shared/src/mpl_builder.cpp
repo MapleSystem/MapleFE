@@ -68,7 +68,7 @@ maple::BaseNode *A2M::ProcessField(StmtExprKind skind, TreeNode *tnode, maple::B
   GStrIdx stridx = GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(name);
   MIRType *basetype = MapType(type);
   if (basetype) {
-    TyidxFieldAttrPair P0(basetype->tyIdx, genAttrs.ConvertToFieldAttrs());
+    TyidxFieldAttrPair P0(basetype->GetTypeIndex(), genAttrs.ConvertToFieldAttrs());
     FieldPair P1(stridx, P0);
     stype->fields.push_back(P1);
   }
@@ -136,61 +136,25 @@ maple::BaseNode *A2M::ProcessBinOperator(StmtExprKind skind, TreeNode *tnode, ma
   maple::BaseNode *mpl_node = nullptr;
   maple::Opcode op = maple::kOpUndef;
 
+  op = MapOpcode(ast_op);
+  if (op != kOpUndef) {
+    mpl_node = ProcessBinOperatorMpl(SK_Expr, op, lhs, rhs, block);
+    return mpl_node;
+  }
+
   if (ast_op == OPR_Assign) {
-    mpl_node = ProcessBinOperatorMplAssign(skind, lhs, rhs, block);
+    mpl_node = ProcessBinOperatorMplAssign(SK_Stmt, lhs, rhs, block);
+    return mpl_node;
+  }
+
+  op = MapComboOpcode(ast_op);
+  if (op != kOpUndef) {
+    mpl_node = ProcessBinOperatorMplComboAssign(SK_Stmt, op, lhs, rhs, block);
     return mpl_node;
   }
 
   if (ast_op == OPR_Arrow) {
-    mpl_node = ProcessBinOperatorMplArror(skind, lhs, rhs, block);
-    return mpl_node;
-  }
-
-  switch (ast_op) {
-    case OPR_Add: op = OP_add; break;
-    case OPR_Sub: op = OP_sub; break;
-    case OPR_Mul: op = OP_mul; break;
-    case OPR_Div: op = OP_div; break;
-    case OPR_Mod: op = OP_rem; break;
-    case OPR_EQ: op = OP_eq; break;
-    case OPR_NE: op = OP_ne; break;
-    case OPR_GT: op = OP_gt; break;
-    case OPR_LT: op = OP_lt; break;
-    case OPR_GE: op = OP_ge; break;
-    case OPR_LE: op = OP_le; break;
-    case OPR_Band: op = OP_band; break;
-    case OPR_Bor: op = OP_bior; break;
-    case OPR_Shl: op = OP_shl; break;
-    case OPR_Shr: op = OP_ashr; break;
-    case OPR_Zext: op = OP_zext; break;
-    case OPR_Land: op = OP_land; break;
-    case OPR_Lor: op = OP_lior; break;
-    default: break;
-  }
-
-  if (op != kOpUndef) {
-    mpl_node = ProcessBinOperatorMpl(skind, op, lhs, rhs, block);
-    return mpl_node;
-  }
-
-  switch (ast_op) {
-    case OPR_AddAssign: op = OP_add; break;
-    case OPR_SubAssign: op = OP_sub; break;
-    case OPR_MulAssign: op = OP_mul; break;
-    case OPR_DivAssign: op = OP_div; break;
-    case OPR_ModAssign: op = OP_rem; break;
-    case OPR_ShlAssign: op = OP_shl; break;
-    case OPR_ShrAssign: op = OP_ashr; break;
-    case OPR_BandAssign: op = OP_band; break;
-    case OPR_BorAssign: op = OP_bior; break;
-    case OPR_BxorAssign: op = OP_bxor; break;
-    case OPR_ZextAssign: op = OP_zext; break;
-    default:
-      break;
-  }
-
-  if (op != kOpUndef) {
-    mpl_node = ProcessBinOperatorMplComboAssign(skind, op, lhs, rhs, block);
+    mpl_node = ProcessBinOperatorMplArror(SK_Expr, lhs, rhs, block);
     return mpl_node;
   }
 
@@ -226,21 +190,46 @@ maple::BaseNode *A2M::ProcessFunction(StmtExprKind skind, TreeNode *tnode, maple
   // DimensionNode               *mDims;
   // bool                         mIsConstructor;
 
+  TreeNode *parent = tnode->GetParent();
+  MIRStructType *stype = nullptr;
+  if (parent->IsClass() || parent->IsInterface()) {
+    MIRType *ptype = mNodeTypeMap[parent->GetName()];
+    stype = static_cast<MIRStructType *>(ptype);
+    MASSERT(stype && "struct type not valid");
+  }
+
   MIRType *rettype = MapType(ast_rettype);
   TyIdx tyidx = rettype ? rettype->GetTypeIndex() : TyIdx(0);
   MIRFunction *func = mMirBuilder->GetOrCreateFunction(ast_name, tyidx);
 
   // init function fields
   func->body = func->codeMemPool->New<maple::BlockNode>();
-
   func->symTab = func->dataMemPool->New<maple::MIRSymbolTable>(&func->dataMPAllocator);
   func->pregTab = func->dataMemPool->New<maple::MIRPregTable>(&func->dataMPAllocator);
   func->typeNameTab = func->dataMemPool->New<maple::MIRTypeNameTable>(&func->dataMPAllocator);
   func->labelTab = func->dataMemPool->New<maple::MIRLabelTable>(&func->dataMPAllocator);
 
+  // set class/interface type
+  if (stype) {
+    func->SetClassTyIdx(stype->GetTypeIndex());
+  }
+
   // process function arguments for function type and formal parameters
   std::vector<TyIdx> funcvectype;
   std::vector<TypeAttrs> funcvecattr;
+
+  // insert this as first parameter
+  if (stype) {
+    GStrIdx stridx = GlobalTables::GetStrTable().GetOrCreateStrIdxFromName("this");
+    TypeAttrs attr = TypeAttrs();
+    MIRType *sptype = GlobalTables::GetTypeTable().GetOrCreatePointerType(stype);
+    FormalDef formalDef(stridx, nullptr, sptype->GetTypeIndex(), attr);
+    func->formalDefVec.push_back(formalDef);
+    funcvectype.push_back(sptype->GetTypeIndex());
+    funcvecattr.push_back(attr);
+  }
+
+  // process remaining parameters
   for (int i = 0; i < ast_func->GetParamsNum(); i++) {
     TreeNode *param = ast_func->GetParam(i);
     MIRType *type = mDefaultType;
@@ -252,19 +241,23 @@ maple::BaseNode *A2M::ProcessFunction(StmtExprKind skind, TreeNode *tnode, maple
     }
 
     GStrIdx stridx = GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(param->GetName());
-    FormalDef formalDef(stridx, nullptr, type->tyIdx, TypeAttrs());
+    TypeAttrs attr = TypeAttrs();
+    FormalDef formalDef(stridx, nullptr, type->GetTypeIndex(), attr);
     func->formalDefVec.push_back(formalDef);
-    funcvectype.push_back(type->tyIdx);
-    funcvecattr.push_back(TypeAttrs());
+    funcvectype.push_back(type->GetTypeIndex());
+    funcvecattr.push_back(attr);
   }
 
+  // use className|funcName|_argTypes_retType as function name
+  UpdateFuncName(func);
+
   // create function type
-  MIRFuncType *functype = GlobalTables::GetTypeTable().GetOrCreateFunctionType(mMirModule, rettype->tyIdx, funcvectype, funcvecattr, /*isvarg*/ false, true);
+  MIRFuncType *functype = GlobalTables::GetTypeTable().GetOrCreateFunctionType(mMirModule, rettype->GetTypeIndex(), funcvectype, funcvecattr, /*isvarg*/ false, true);
   func->funcType = functype;
 
   // update function symbol's type
   MIRSymbol *funcst = GlobalTables::GetGsymTable().GetSymbolFromStIdx(func->stIdx.Idx());
-  funcst->SetTyIdx(functype->tyIdx);
+  funcst->SetTyIdx(functype->GetTypeIndex());
 
   // set up function body
   if (ast_body) {
@@ -277,18 +270,12 @@ maple::BaseNode *A2M::ProcessFunction(StmtExprKind skind, TreeNode *tnode, maple
     }
   }
 
-  // insert into class/interface methods list
-  TreeNode *parent = tnode->GetParent();
-  if (parent->IsClass() || parent->IsInterface()) {
-    MIRType *ptype = mNodeTypeMap[parent->GetName()];
-    MIRStructType *stype = static_cast<MIRStructType *>(ptype);
-    MASSERT(stype && "struct type not valid");
-
-    StIdx stidx = func->stIdx;
-    MIRSymbol *fn_st = GlobalTables::GetGsymTable().GetSymbolFromStIdx(stidx.Idx());
+  // add method with updated funcname to parent stype
+  if (stype) {
+    StIdx stIdx = func->stIdx;
     FuncAttrs funcattrs(func->GetAttrs());
-    TyidxFuncAttrPair P0(fn_st->tyIdx, funcattrs);
-    MethodPair P1(stidx, P0);
+    TyidxFuncAttrPair P0(funcst->tyIdx, funcattrs);
+    MethodPair P1(stIdx, P0);
     stype->methods.push_back(P1);
   }
 
@@ -421,8 +408,10 @@ maple::BaseNode *A2M::ProcessBinOperatorMplComboAssign(StmtExprKind skind,
                                                   maple::BaseNode *lhs,
                                                   maple::BaseNode *rhs,
                                                   maple::BlockNode *block) {
-  NOTYETIMPL("ProcessBinOperatorMplComboAssign()");
-  return nullptr;
+  maple::MIRSymbol *symbol = GetSymbol(lhs, block);
+  maple::BaseNode *comb = ProcessBinOperatorMpl(SK_Expr, op, lhs, rhs, block);
+  maple::BaseNode *assign = ProcessBinOperatorMplAssign(SK_Stmt, lhs, comb, block);
+  return assign;
 }
 
 maple::BaseNode *A2M::ProcessBinOperatorMplArror(StmtExprKind skind,

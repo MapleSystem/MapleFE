@@ -45,24 +45,15 @@ clobber:
 rebuild:
 	make -C .. rebuild
 
+tt:
+	../output/java/java2mpl tt.java --trace-a2m; cat tt.mpl
+
 dbg:
-	(cd $(BUILDDIR)/autogen/; gdb -args ./sharedfe -verbose=3 ../../test/output/t.java)
+	gdb --args ../output/java/java2mpl tt.java --trace-a2m
 
 # only run autogen for now
-test: autogen
-	@echo "\ngdb command:\n(cd $(BUILDDIR)/autogen/; gdb ./autogen)\n"
-	(cd $(BUILDDIR)/autogen; ./autogen)
-	@echo "\ngdb command:\n(cd $(BUILDDIR)/autogen/; gdb ./autogen)"
-
-p0:
-	@echo "\ngdb command:\n(cd $(BUILDDIR)/autogen/; gdb --args ./autogen -p ../../test/test.spec)\n"
-	(cd $(BUILDDIR)/autogen; ./autogen -p ../../test/test.spec)
-	@echo "\ngdb command:\n(cd $(BUILDDIR)/autogen/; gdb --args ./autogen -p ../../test/test.spec)"
-
-p:
-	@echo "\ngdb command:\n(cd $(BUILDDIR)/autogen/; gdb --args ./autogen -verbose=3 -p ../../test/test.spec)\n"
-	(cd $(BUILDDIR)/autogen; ./autogen -verbose=3 -p ../../test/test.spec)
-	@echo "\ngdb command:\n(cd $(BUILDDIR)/autogen/; gdb --args ./autogen -verbose=3 -p ../../test/test.spec)"
+test:
+	./runtests.pl all
 
 % : %.java
 	@cp $< $(build)
