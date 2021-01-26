@@ -653,8 +653,6 @@ bool Parser::TraverseRuleTablePre(AppealNode *appeal) {
 
   if (WasFailed(rule_table, saved_mCurToken)) {
     appeal->mResult = FailWasFailed;
-    if (mTraceTable)
-      DumpExitTable(name, mIndentation, appeal);
   }
 
   return is_done;
@@ -748,6 +746,8 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent, Appeal
   //    but could match in a later instance. So I need check is_done.
   // 2. For A not-in-group rule, a WasFailed is a real fail.
   if (appeal->IsFail() && (!in_group || is_done)) {
+    if (mTraceTable)
+      DumpExitTable(name, mIndentation, appeal);
     mIndentation -= 2;
     return false;
   }
@@ -1870,8 +1870,13 @@ void Parser::FindWasSucc(AppealNode *root) {
     working_list.pop_front();
     if (node->mResult == SuccWasSucc) {
       was_succ_list.push_back(node);
-      if (mTracePatchWasSucc)
-        std::cout << "Find WasSucc " << node << std::endl;
+      if (mTracePatchWasSucc) {
+        std::cout << "Find WasSucc ";
+        if (node->IsTable())
+          std::cout << GetRuleTableName(node->GetTable()) << std::endl;
+        else
+          std::cout << "a token?" << std::endl;
+      }
     } else {
       std::vector<AppealNode*>::iterator it = node->mSortedChildren.begin();
       for (; it != node->mSortedChildren.end(); it++)
