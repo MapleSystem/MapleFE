@@ -48,6 +48,7 @@ public:
   // use type's uniq name as key
   std::map<const char *, maple::MIRType*> mNodeTypeMap;
   std::map<BlockNode*, maple::BlockNode*> mBlockNodeMap;
+  std::map<maple::BlockNode*, maple::MIRFunction*> mBlockFuncMap;
 
   A2M(const char *filename);
   ~A2M();
@@ -61,7 +62,7 @@ public:
 
   MIRType *MapType(TreeNode *tnode);
   void MapAttr(GenericAttrs &attr, const IdentifierNode *inode);
-  MIRSymbol *GetSymbol(maple::BaseNode *bn, maple::BlockNode *block);
+  MIRSymbol *GetSymbol(IdentifierNode *tnode, maple::BlockNode *block);
   MIRSymbol *MapGlobalSymbol(TreeNode *inode);
   MIRSymbol *MapLocalSymbol(TreeNode *tnode, maple::MIRFunction *func);
 

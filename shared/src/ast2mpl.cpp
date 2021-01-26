@@ -36,8 +36,8 @@ void A2M::ProcessAST(bool trace_a2m) {
   mTraceA2m = trace_a2m;
   if (mTraceA2m) std::cout << "============= in ProcessAST ===========" << std::endl;
   for(auto it: gModule.mTrees) {
-    if (mTraceA2m) it->Dump(0);
     TreeNode *tnode = it->mRootNode;
+    if (mTraceA2m) { tnode->Dump(0); fflush(0); }
     ProcessNode(SK_Stmt, tnode, nullptr);
   }
 }
@@ -189,10 +189,20 @@ void A2M::UpdateFuncName(MIRFunction *func) {
   funcst->SetNameStridx(stridx);
 }
 
-MIRSymbol *A2M::GetSymbol(maple::BaseNode *bn, maple::BlockNode *block) {
-}
-
 MIRSymbol *A2M::MapGlobalSymbol(TreeNode *tnode) {
+  const char *name = tnode->GetName();
+  MIRType *mir_type;
+
+  if (tnode->IsIdentifier()) {
+    IdentifierNode *inode = static_cast<IdentifierNode *>(tnode);
+    mir_type = MapType(inode->GetType());
+  } else if (tnode->IsLiteral()) {
+    NOTYETIMPL("MapLocalSymbol LiteralNode()");
+    mir_type = mDefaultType;
+  }
+
+  MIRSymbol *symbol = mMirBuilder->GetOrCreateGlobalDecl(name, mir_type);
+  return symbol;
 }
 
 MIRSymbol *A2M::MapLocalSymbol(TreeNode *tnode, maple::MIRFunction *func) {
@@ -207,7 +217,18 @@ MIRSymbol *A2M::MapLocalSymbol(TreeNode *tnode, maple::MIRFunction *func) {
     mir_type = mDefaultType;
   }
 
-  MIRSymbol *symbol = mMirBuilder->CreateLocalDecl(name, mir_type, func);
+  MIRSymbol *symbol = mMirBuilder->GetOrCreateLocalDecl(name, mir_type, func);
+  return symbol;
+}
+
+MIRSymbol *A2M::GetSymbol(IdentifierNode *tnode, maple::BlockNode *block) {
+  MIRSymbol *symbol;
+  if (block) {
+    maple::MIRFunction *func = mBlockFuncMap[block];
+    symbol = MapLocalSymbol(tnode, func);
+  } else {
+    symbol = MapGlobalSymbol(tnode);
+  }
   return symbol;
 }
 
