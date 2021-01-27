@@ -1887,10 +1887,8 @@ void Parser::FindWasSucc(AppealNode *root) {
 }
 
 // For each node in was_succ_list there are one or more patching subtree.
-// A succ parent node contains the matching of succ children nodes. But we
-// only want the real matching which comes from the children. So, we look into
-// those nodes and find the node being the youngest descendant, which has the
-// smallest sub-tree.
+// So far looks like every matching work. But we use the first one which
+// usually is the real complete matching.
 
 void Parser::FindPatchingNodes() {
   std::vector<AppealNode*>::iterator it = was_succ_list.begin();
@@ -1904,27 +1902,21 @@ void Parser::FindPatchingNodes() {
     bool found = succ_match->GetStartToken(was_succ->GetStartIndex());
     MASSERT(found && "WasSucc cannot find start index in SuccMatch?");
 
-    AppealNode *youngest = NULL;
+    AppealNode *patch = NULL;
     for (unsigned i = 0; i < succ_match->GetSuccNodesNum(); i++) {
       AppealNode *node = succ_match->GetSuccNode(i);
       if (node->FindMatch(final_match)) {
-        if (!youngest)
-          youngest = node;
-        else if (node->DescendantOf(youngest)) {
-          youngest = node;
-        } else {
-          // Any two nodes should be in a ancestor-descendant relationship.
-          MASSERT(youngest->DescendantOf(node));
-        }
+        patch = node;
+        break;
       }
     }
-    MASSERT(youngest && "succ matching node is missing?");
+    MASSERT(patch && "succ matching node is missing?");
 
     if (mTracePatchWasSucc)
-      std::cout << "Find one match " << youngest << std::endl;
+      std::cout << "Find one match " << patch << std::endl;
 
     was_succ_matched_list.push_back(was_succ);
-    patching_list.push_back(youngest);
+    patching_list.push_back(patch);
   }
 }
 
