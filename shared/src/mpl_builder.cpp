@@ -447,6 +447,10 @@ maple::BaseNode *A2M::ProcessBinOperatorMplAssign(StmtExprKind skind,
                                              maple::BaseNode *rhs,
                                              maple::BlockNode *block) {
   DreadNode *dr = static_cast<DreadNode *>(lhs);
+  if (!dr) {
+    NOTYETIMPL("ProcessBinOperatorMplAssign() null dr");
+    return nullptr;
+  }
   MIRFunction *func = mBlockFuncMap[block];
   MIRSymbol *symbol;
   if (func) {
