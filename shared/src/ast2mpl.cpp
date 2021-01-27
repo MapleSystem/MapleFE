@@ -22,8 +22,9 @@ namespace maplefe {
 A2M::A2M(const char *filename) : mFileName(filename) {
   mMirModule = new maple::MIRModule(mFileName);
   mMirBuilder = mMirModule->mirBuilder;
-  mDefaultType = GlobalTables::GetTypeTable().GetOrCreateClassType("DEFAULT_TYPE", mMirModule);
-  mDefaultType->typeKind = maple::MIRTypeKind::kTypeClass;
+  MIRType *type = GlobalTables::GetTypeTable().GetOrCreateClassType("DEFAULT_TYPE", mMirModule);
+  type->typeKind = maple::MIRTypeKind::kTypeClass;
+  mDefaultType = GlobalTables::GetTypeTable().GetOrCreatePointerType(type);
 }
 
 A2M::~A2M() {

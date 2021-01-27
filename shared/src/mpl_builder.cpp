@@ -200,6 +200,7 @@ maple::BaseNode *A2M::ProcessBlock(StmtExprKind skind, TreeNode *tnode, maple::B
     BaseNode *stmt = ProcessNode(skind, child, block);
     if (stmt) {
       block->AddStatement(stmt);
+      if (mTraceA2m) stmt->Dump(mMirModule, 0);
     }
   }
   return nullptr;
