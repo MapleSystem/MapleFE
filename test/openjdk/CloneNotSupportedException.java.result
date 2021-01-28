@@ -1,0 +1,17 @@
+Matched 5 tokens.
+Matched 43 tokens.
+============= Module ===========
+== Sub Tree ==
+package java.lang
+== Sub Tree ==
+class  CloneNotSupportedException
+  Fields: 
+    serialVersionUID=2005608955
+  Instance Initializer: 
+  Constructors: 
+    constructor  CloneNotSupportedException()  throws: 
+    constructor  CloneNotSupportedException()  throws: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
