@@ -1,0 +1,20 @@
+Matched 5 tokens.
+Matched 14 tokens.
+Matched 21 tokens.
+Matched 28 tokens.
+Matched 35 tokens.
+Matched 42 tokens.
+Illegal syntax detected!
+============= Module ===========
+== Sub Tree ==
+package java.lang
+== Sub Tree ==
+import dalvik.annotation.optimization.FastNative
+== Sub Tree ==
+import java.util.Arrays
+== Sub Tree ==
+import java.util.HashMap
+== Sub Tree ==
+import java.util.Locale
+== Sub Tree ==
+import java.util.Map
