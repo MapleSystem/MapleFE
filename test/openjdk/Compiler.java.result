@@ -1,0 +1,24 @@
+Matched 5 tokens.
+Matched 75 tokens.
+============= Module ===========
+== Sub Tree ==
+package java.lang
+== Sub Tree ==
+class  Compiler
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+    constructor  Compiler()  throws: 
+  Methods: 
+    func  compileClass()  throws: 
+      return false
+    func  compileClasses()  throws: 
+      return false
+    func  command()  throws: 
+      return null
+    func  enable()  throws: 
+    func  disable()  throws: 
+  LocalClasses: 
+  LocalInterfaces: 
+
