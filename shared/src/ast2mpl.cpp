@@ -15,16 +15,18 @@
 
 #include "ast2mpl.h"
 #include "mir_function.h"
+#include "maplefe_mir_builder.h"
 #include "constant_fold.h"
 
 namespace maplefe {
 
 A2M::A2M(const char *filename) : mFileName(filename) {
   mMirModule = new maple::MIRModule(mFileName);
-  mMirBuilder = mMirModule->mirBuilder;
+  mMirBuilder = new FEMIRBuilder(mMirModule);
   MIRType *type = GlobalTables::GetTypeTable().GetOrCreateClassType("DEFAULT_TYPE", mMirModule);
   type->typeKind = maple::MIRTypeKind::kTypeClass;
   mDefaultType = GlobalTables::GetTypeTable().GetOrCreatePointerType(type);
+  mFieldData = new FieldData();
 }
 
 A2M::~A2M() {
@@ -190,7 +192,49 @@ void A2M::UpdateFuncName(MIRFunction *func) {
   funcst->SetNameStridx(stridx);
 }
 
-MIRSymbol *A2M::MapGlobalSymbol(TreeNode *tnode) {
+BlockNode *A2M::GetSuperBlock(BlockNode *block) {
+  TreeNode *blk = block->GetParent();
+  while (blk && !blk->IsBlock()) {
+    blk = blk->GetParent();
+  }
+  return blk;
+}
+
+MIRSymbol *A2M::GetSymbol(TreeNode *tnode, BlockNode *block) {
+  const char *name = tnode->GetName();
+  MIRSymbol *symbol = nullptr;
+
+  // global symbol
+  if (!block) {
+    std::pair<const char *, BlockNode*> P(tnode->GetName(), block);
+    symbol = mNameBlockVarMap[P];
+    return symbol;
+  }
+
+  // trace block hirachy for defined symbol
+  BlockNode *blk = block;
+  do {
+    std::pair<const char *, BlockNode*> P(tnode->GetName(), blk);
+    symbol = mNameBlockVarMap[P];
+    if (symbol) {
+      return symbol;
+    }
+    blk = GetSuperBlock(blk);
+  } while (blk);
+
+  // check parameters
+  MIRFunction *func = mBlockFuncMap[block];
+  GStrIdx stridx = GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(name);
+  for (auto it: func->formalDefVec) {
+    if (it.formalStrIdx == stridx) {
+      return it.formalSym;
+    }
+  }
+  NOTYETIMPL("GetSymbol() symbol not found");
+  return symbol;
+}
+
+MIRSymbol *A2M::CreateSymbol(TreeNode *tnode, BlockNode *block) {
   const char *name = tnode->GetName();
   MIRType *mir_type;
 
@@ -198,38 +242,21 @@ MIRSymbol *A2M::MapGlobalSymbol(TreeNode *tnode) {
     IdentifierNode *inode = static_cast<IdentifierNode *>(tnode);
     mir_type = MapType(inode->GetType());
   } else if (tnode->IsLiteral()) {
-    NOTYETIMPL("MapLocalSymbol LiteralNode()");
+    NOTYETIMPL("CreateSymbol LiteralNode()");
     mir_type = mDefaultType;
   }
 
-  MIRSymbol *symbol = mMirBuilder->GetOrCreateGlobalDecl(name, mir_type);
-  return symbol;
-}
-
-MIRSymbol *A2M::MapLocalSymbol(TreeNode *tnode, maple::MIRFunction *func) {
-  const char *name = tnode->GetName();
-  MIRType *mir_type;
-
-  if (tnode->IsIdentifier()) {
-    IdentifierNode *inode = static_cast<IdentifierNode *>(tnode);
-    mir_type = MapType(inode->GetType());
-  } else if (tnode->IsLiteral()) {
-    NOTYETIMPL("MapLocalSymbol LiteralNode()");
-    mir_type = mDefaultType;
-  }
-
-  MIRSymbol *symbol = mMirBuilder->GetOrCreateLocalDecl(name, mir_type, func);
-  return symbol;
-}
-
-MIRSymbol *A2M::GetSymbol(IdentifierNode *tnode, maple::BlockNode *block) {
-  MIRSymbol *symbol;
+  MIRSymbol *symbol = nullptr;
   if (block) {
     maple::MIRFunction *func = mBlockFuncMap[block];
-    symbol = MapLocalSymbol(tnode, func);
+    symbol = mMirBuilder->GetOrCreateLocalDecl(name, mir_type, func);
   } else {
-    symbol = MapGlobalSymbol(tnode);
+    symbol = mMirBuilder->GetOrCreateGlobalDecl(name, mir_type);
   }
+
+  std::pair<const char *, BlockNode*> P(name, block);
+  mNameBlockVarMap[P] = symbol;
+
   return symbol;
 }
 

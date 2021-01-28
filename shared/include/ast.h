@@ -537,6 +537,7 @@ public:
   ~LiteralNode(){}
 
   const char* GetName() {return mName;}
+  LitData GetData() {return mData;}
   void Dump(unsigned);
 };
 

@@ -17,15 +17,13 @@
 //                This is the interface to translate AST to MapleIR.
 //////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __AST2MPL_HEADER__
-#define __AST2MPL_HEADER__
+#ifndef __MPL_BUILDER_H__
+#define __MPL_BUILDER_H__
 
-#include "ast_module.h"
-#include "ast.h"
-#include "ast_type.h"
+#include "ast2mpl.h"
 
 #include "mir_module.h"
-#include "maplefe_mir_builder.h"
+#include "mir_builder.h"
 
 namespace maplefe {
 
@@ -37,67 +35,45 @@ enum StmtExprKind {
   SK_Expr
 };
 
-class A2M {
+class MplBuilder {
 private:
   const char *mFileName;
   bool mTraceA2m;
-  FEMIRBuilder *mMirBuilder;
+  maple::MIRBuilder *mMirBuilder;
   maple::MIRType *mDefaultType;
-  FieldData *mFieldData;
 public:
   maple::MIRModule *mMirModule;
-  // use type's uniq name as key
-  std::map<const char *, maple::MIRType*> mNodeTypeMap;
-  std::map<BlockNode*, maple::BlockNode*> mBlockNodeMap;
-  std::map<BlockNode*, maple::MIRFunction*> mBlockFuncMap;
-  std::map<std::pair<const char *, BlockNode*>, maple::MIRSymbol*> mNameBlockVarMap;
+  maplefe::A2M *mA2M;
 
-  A2M(const char *filename);
-  ~A2M();
-
-  void UpdateFuncName(MIRFunction *func);
-
-  virtual const char *Type2Label(const MIRType *type);
-  const char *Type2Name(const MIRType *type);
-
-  BlockNode *GetSuperBlock(BlockNode *block);
-  MIRSymbol *GetSymbol(TreeNode *tnode, BlockNode *block);
-  MIRSymbol *CreateSymbol(TreeNode *tnode, BlockNode *block);
-
-  virtual MIRType *MapPrimType(PrimTypeNode *tnode)=0;
-
-  MIRType *MapType(TreeNode *tnode);
-  void MapAttr(GenericAttrs &attr, const IdentifierNode *inode);
-
-  maple::Opcode MapOpcode(OprId);
-  maple::Opcode MapComboOpcode(OprId);
+  MplBuilder(const char *filename);
+  ~MplBuilder();
 
   void ProcessAST(bool trace_a2m);
-  maple::BaseNode *ProcessNode(StmtExprKind, TreeNode *tnode, BlockNode *);
+  maple::BaseNode *ProcessNode(StmtExprKind, TreeNode *tnode, maple::BlockNode *);
 
   // Process different TreeNode kind while expecting StmtExprKind as stmt or expr
 #undef  NODEKIND
-#define NODEKIND(K) maple::BaseNode *Process##K(StmtExprKind, TreeNode*, BlockNode*);
+#define NODEKIND(K) maple::BaseNode *Process##K(StmtExprKind, TreeNode *, maple::BlockNode *);
 #include "ast_nk.def"
 
   maple::BaseNode *ProcessBinOperatorMpl(StmtExprKind skind,
                                          maple::Opcode op,
                                          maple::BaseNode *lhs,
                                          maple::BaseNode *rhs,
-                                         BlockNode *block);
+                                         maple::BlockNode *block);
   maple::BaseNode *ProcessBinOperatorMplAssign(StmtExprKind skind,
                                                maple::BaseNode *lhs,
                                                maple::BaseNode *rhs,
-                                               BlockNode *block);
+                                               maple::BlockNode *block);
   maple::BaseNode *ProcessBinOperatorMplComboAssign(StmtExprKind skind,
                                                     maple::Opcode op,
                                                     maple::BaseNode *lhs,
                                                     maple::BaseNode *rhs,
-                                                    BlockNode *block);
+                                                    maple::BlockNode *block);
   maple::BaseNode *ProcessBinOperatorMplArror(StmtExprKind skind,
                                               maple::BaseNode *lhs,
                                               maple::BaseNode *rhs,
-                                              BlockNode *block);
+                                              maple::BlockNode *block);
 
 };
 
