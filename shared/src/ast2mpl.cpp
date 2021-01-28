@@ -211,9 +211,14 @@ void A2M::UpdateFuncName(MIRFunction *func) {
   str.append(RARG);
   type = func->GetReturnType();
   Type2Name(str, type);
+
   MIRSymbol *funcst = GlobalTables::GetGsymTable().GetSymbolFromStIdx(func->stIdx.Idx());
+  // remove old entry in strIdxToStIdxMap
+  GlobalTables::GetGsymTable().RemoveFromStringSymbolMap(funcst);
   stridx = GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(str);
   funcst->SetNameStridx(stridx);
+  // add new entry in strIdxToStIdxMap
+  GlobalTables::GetGsymTable().AddToStringSymbolMap(funcst);
 }
 
 BlockNode *A2M::GetSuperBlock(BlockNode *block) {
