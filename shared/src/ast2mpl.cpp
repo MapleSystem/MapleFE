@@ -23,15 +23,38 @@ namespace maplefe {
 A2M::A2M(const char *filename) : mFileName(filename) {
   mMirModule = new maple::MIRModule(mFileName);
   mMirBuilder = new FEMIRBuilder(mMirModule);
-  MIRType *type = GlobalTables::GetTypeTable().GetOrCreateClassType("DEFAULT_TYPE", mMirModule);
-  type->typeKind = maple::MIRTypeKind::kTypeClass;
-  mDefaultType = GlobalTables::GetTypeTable().GetOrCreatePointerType(type);
   mFieldData = new FieldData();
+  Init();
 }
 
 A2M::~A2M() {
   delete mMirModule;
+  delete mMirBuilder;
+  delete mFieldData;
   mNodeTypeMap.clear();
+}
+
+void A2M::Init() {
+  // create mDefaultType
+  MIRType *type = GlobalTables::GetTypeTable().GetOrCreateClassType("DEFAULT_TYPE", mMirModule);
+  type->typeKind = maple::MIRTypeKind::kTypeClass;
+  mDefaultType = GlobalTables::GetTypeTable().GetOrCreatePointerType(type);
+
+  // setup flavor and srclang
+  mMirModule->flavor = maple::kFeProduced;
+  mMirModule->srcLang = maple::kSrcLangJava;
+
+  // setup INFO_filename
+  GStrIdx idx = GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(mFileName);
+  SET_INFO_PAIR(mMirModule->fileInfo, "INFO_filename", idx.GetIdx(), mMirModule->fileInfoIsString, true);
+
+  // add to java src file list
+  std::string str(mFileName);
+  size_t pos = str.rfind('/');
+  if (pos != std::string::npos) {
+    idx = GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(str.substr(pos+1));
+  }
+  mMirModule->srcFileInfo.push_back(MIRInfoPair(idx, 2));
 }
 
 // starting point of AST to MPL process
@@ -151,9 +174,8 @@ const char *A2M::Type2Label(const MIRType *type) {
 #define LARG     "_28" // '('
 #define RARG     "_29" // ')'
 
-const char *A2M::Type2Name(const MIRType *type) {
+void A2M::Type2Name(std::string &str, const MIRType *type) {
   PrimType pty = type->GetPrimType();
-  std::string str;
   const char *n = Type2Label(type);
   str.append(n);
   if (n[0] == 'L') {
@@ -164,7 +186,6 @@ const char *A2M::Type2Name(const MIRType *type) {
     str.append(type->GetName());
     str.append(CLASSEND);
   }
-  return str.c_str();
 }
 
 // update to use mangled name: className|funcName|(argTypes)retType
@@ -174,21 +195,24 @@ void A2M::UpdateFuncName(MIRFunction *func) {
   MIRType *type;
   if (tyIdx.GetIdx() != 0) {
     type = GlobalTables::GetTypeTable().GetTypeFromTyIdx(tyIdx);
-    str.append(Type2Name(type));
+    Type2Name(str, type);
     str.append(SEP);
   }
   str.append(func->GetName());
   str.append(SEP);
   str.append(LARG);
+  GStrIdx stridx = GlobalTables::GetStrTable().GetOrCreateStrIdxFromName("this");
   for (auto def: func->formalDefVec) {
+    // exclude type of extra "this" in the function name
+    if (stridx == def.formalStrIdx) continue;
     MIRType *type = GlobalTables::GetTypeTable().GetTypeFromTyIdx(def.formalTyIdx);
-    str.append(Type2Name(type));
+    Type2Name(str, type);
   }
   str.append(RARG);
   type = func->GetReturnType();
-  str.append(Type2Name(type));
+  Type2Name(str, type);
   MIRSymbol *funcst = GlobalTables::GetGsymTable().GetSymbolFromStIdx(func->stIdx.Idx());
-  GStrIdx stridx = GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(str);
+  stridx = GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(str);
   funcst->SetNameStridx(stridx);
 }
 

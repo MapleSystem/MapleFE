@@ -55,10 +55,12 @@ public:
   A2M(const char *filename);
   ~A2M();
 
+  void Init();
+
   void UpdateFuncName(MIRFunction *func);
 
   virtual const char *Type2Label(const MIRType *type);
-  const char *Type2Name(const MIRType *type);
+  void Type2Name(std::string &str, const MIRType *type);
 
   BlockNode *GetSuperBlock(BlockNode *block);
   MIRSymbol *GetSymbol(TreeNode *tnode, BlockNode *block);
