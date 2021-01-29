@@ -32,7 +32,7 @@ OPERATOR(LE, Binary)
 
 OPERATOR(Band, Binary)
 OPERATOR(Bor,  Binary)
-OPERATOR(Bxor, Unary)
+OPERATOR(Bxor, Binary)
 OPERATOR(Bcomp,Unary)
 
 OPERATOR(Shl, Binary)
