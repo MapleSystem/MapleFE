@@ -219,9 +219,25 @@ maple::BaseNode *A2M::ProcessLiteral(StmtExprKind skind, TreeNode *tnode, BlockN
 }
 
 maple::BaseNode *A2M::ProcessUnaOperator(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
-  NOTYETIMPL("ProcessUnaOperator()");
   UnaOperatorNode *node = static_cast<UnaOperatorNode *>(tnode);
-  return nullptr;
+  OprId ast_op = node->GetOprId();
+  TreeNode *ast_rhs = node->GetOpnd();
+  maple::BaseNode *bn = ProcessNode(SK_Expr, ast_rhs, block);
+  maple::BaseNode *mpl_node = nullptr;
+
+  if (!bn) {
+    NOTYETIMPL("ProcessUnaOperator() null bn");
+    return mpl_node;
+  }
+
+  maple::Opcode op = maple::kOpUndef;
+
+  op = MapUnaOpcode(ast_op);
+  if (op != kOpUndef) {
+    mpl_node = ProcessUnaOperatorMpl(skind, op, bn, block);
+  }
+
+  return mpl_node;
 }
 
 maple::BaseNode *A2M::ProcessBinOperator(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
@@ -234,13 +250,13 @@ maple::BaseNode *A2M::ProcessBinOperator(StmtExprKind skind, TreeNode *tnode, Bl
   maple::BaseNode *mpl_node = nullptr;
 
   if (!lhs || !rhs) {
-    NOTYETIMPL("ProcessUnaOperator() null lhs and/or rhs");
+    NOTYETIMPL("ProcessBinOperator() null lhs and/or rhs");
     return mpl_node;
   }
 
   maple::Opcode op = maple::kOpUndef;
 
-  op = MapOpcode(ast_op);
+  op = MapBinOpcode(ast_op);
   if (op != kOpUndef) {
     mpl_node = ProcessBinOperatorMpl(SK_Expr, op, lhs, rhs, block);
     return mpl_node;
@@ -251,7 +267,7 @@ maple::BaseNode *A2M::ProcessBinOperator(StmtExprKind skind, TreeNode *tnode, Bl
     return mpl_node;
   }
 
-  op = MapComboOpcode(ast_op);
+  op = MapComboBinOpcode(ast_op);
   if (op != kOpUndef) {
     mpl_node = ProcessBinOperatorMplComboAssign(SK_Stmt, op, lhs, rhs, block);
     return mpl_node;
@@ -526,6 +542,51 @@ maple::BaseNode *A2M::ProcessPass(StmtExprKind skind, TreeNode *tnode, BlockNode
   return nullptr;
 }
 
+maple::BaseNode *A2M::ProcessUnaOperatorMpl(StmtExprKind skind,
+                                       maple::Opcode op,
+                                       maple::BaseNode *bn,
+                                       BlockNode *block) {
+  maple::BaseNode *node = nullptr;
+  if (op == OP_incref || op == OP_decref) {
+    MIRType *typeI32 = GlobalTables::GetTypeTable().GetInt32();
+    MIRIntConst *cst = new MIRIntConst(1, typeI32);
+    BaseNode *one =  new maple::ConstvalNode(PTY_i32, cst); 
+    if (op == OP_incref) {
+      node = new BinaryNode(OP_add, bn->GetPrimType(), bn, one);
+    } else if (op == OP_decref) {
+      node = new BinaryNode(OP_sub, bn->GetPrimType(), bn, one);
+    }
+  } else {
+    node = new UnaryNode(op, bn->GetPrimType(), bn);
+  }
+
+  if (skind == SK_Expr) {
+     return node;
+  }
+
+  if (skind == SK_Stmt) {
+    if (op == OP_incref || op == OP_decref) {
+      switch (bn->op) {
+        case OP_iread: {
+          IreadNode *ir = static_cast<maple::IreadNode *>(bn);
+          node = new IassignNode(ir->tyIdx, ir->fieldID, ir->uOpnd, node);
+          break;
+        }
+        case OP_dread: {
+          DreadNode *dr = static_cast<maple::DreadNode *>(bn);
+          node = new DassignNode(dr->GetPrimType(), node, dr->stIdx, dr->fieldID);
+          break;
+        }
+        default:
+          NOTYETIMPL("ProcessUnaOperatorMplAssign() need to support opcode");
+          break;
+      }
+    }
+  }
+
+  return node;
+}
+
 maple::BaseNode *A2M::ProcessBinOperatorMpl(StmtExprKind skind,
                                        maple::Opcode op,
                                        maple::BaseNode *lhs,
@@ -569,7 +630,6 @@ maple::BaseNode *A2M::ProcessBinOperatorMplComboAssign(StmtExprKind skind,
                                                   maple::BaseNode *lhs,
                                                   maple::BaseNode *rhs,
                                                   BlockNode *block) {
-  NOTYETIMPL("ProcessBinOperatorMplComboAssign()");
   maple::BaseNode *comb = ProcessBinOperatorMpl(SK_Expr, op, lhs, rhs, block);
   maple::BaseNode *assign = ProcessBinOperatorMplAssign(SK_Stmt, lhs, comb, block);
   return assign;

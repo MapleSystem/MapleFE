@@ -103,7 +103,21 @@ MIRType *A2M::MapType(TreeNode *type) {
   return mir_type;
 }
 
-maple::Opcode A2M::MapOpcode(OprId ast_op) {
+maple::Opcode A2M::MapUnaOpcode(OprId ast_op) {
+  maple::Opcode op = maple::kOpUndef;
+  switch (ast_op) {
+    case OPR_Add: op = OP_add; break;
+    case OPR_Sub: op = OP_neg; break;
+    case OPR_Inc: op = OP_incref; break;
+    case OPR_Dec: op = OP_decref; break;
+    case OPR_Bcomp: op = OP_bnot; break;
+    case OPR_Not: op = OP_lnot; break;
+    default: break;
+  }
+  return op;
+}
+
+maple::Opcode A2M::MapBinOpcode(OprId ast_op) {
   maple::Opcode op = maple::kOpUndef;
   switch (ast_op) {
     case OPR_Add: op = OP_add; break;
@@ -119,6 +133,7 @@ maple::Opcode A2M::MapOpcode(OprId ast_op) {
     case OPR_LE: op = OP_le; break;
     case OPR_Band: op = OP_band; break;
     case OPR_Bor: op = OP_bior; break;
+    case OPR_Bxor: op = OP_bxor; break;
     case OPR_Shl: op = OP_shl; break;
     case OPR_Shr: op = OP_ashr; break;
     case OPR_Zext: op = OP_zext; break;
@@ -129,7 +144,7 @@ maple::Opcode A2M::MapOpcode(OprId ast_op) {
   return op;
 }
 
-maple::Opcode A2M::MapComboOpcode(OprId ast_op) {
+maple::Opcode A2M::MapComboBinOpcode(OprId ast_op) {
   maple::Opcode op = maple::kOpUndef;
   switch (ast_op) {
     case OPR_AddAssign: op = OP_add; break;

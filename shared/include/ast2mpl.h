@@ -74,8 +74,9 @@ public:
   MIRType *MapType(TreeNode *tnode);
   void MapAttr(GenericAttrs &attr, const IdentifierNode *inode);
 
-  maple::Opcode MapOpcode(OprId);
-  maple::Opcode MapComboOpcode(OprId);
+  maple::Opcode MapUnaOpcode(OprId);
+  maple::Opcode MapBinOpcode(OprId);
+  maple::Opcode MapComboBinOpcode(OprId);
 
   void ProcessAST(bool trace_a2m);
   maple::BaseNode *ProcessNode(StmtExprKind, TreeNode *tnode, BlockNode *);
@@ -85,6 +86,10 @@ public:
 #define NODEKIND(K) maple::BaseNode *Process##K(StmtExprKind, TreeNode*, BlockNode*);
 #include "ast_nk.def"
 
+  maple::BaseNode *ProcessUnaOperatorMpl(StmtExprKind skind,
+                                         maple::Opcode op,
+                                         maple::BaseNode *bn,
+                                         BlockNode *block);
   maple::BaseNode *ProcessBinOperatorMpl(StmtExprKind skind,
                                          maple::Opcode op,
                                          maple::BaseNode *lhs,
