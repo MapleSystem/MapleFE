@@ -439,7 +439,7 @@ maple::BaseNode *A2M::ProcessException(StmtExprKind skind, TreeNode *tnode, Bloc
 
 maple::BaseNode *A2M::ProcessReturn(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
   ReturnNode *node = static_cast<ReturnNode *>(tnode);
-  BaseNode *val = ProcessNode(skind, node->GetResult(), block);
+  BaseNode *val = ProcessNode(SK_Expr, node->GetResult(), block);
   NaryStmtNode *stmt = mMirBuilder->CreateStmtReturn(val);
   return stmt;
 }
