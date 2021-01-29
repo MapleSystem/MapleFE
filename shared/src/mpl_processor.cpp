@@ -69,7 +69,7 @@ maple::BaseNode *A2M::ProcessIdentifier(StmtExprKind skind, TreeNode *tnode, Blo
   // check class fields
   TyIdx tyidx = func->formalDefVec[0].formalTyIdx;
   MIRType *ctype = GlobalTables::GetTypeTable().GetTypeFromTyIdx(tyidx);
-  if (ctype->GetPrimType() == PTY_ptr) {
+  if (ctype->GetPrimType() == PTY_ptr || ctype->GetPrimType() == PTY_ref) {
     MIRPtrType *ptype = static_cast<MIRPtrType *>(ctype);
     ctype = ptype->GetPointedType();
   }
@@ -119,9 +119,14 @@ maple::BaseNode *A2M::ProcessField(StmtExprKind skind, TreeNode *tnode, BlockNod
   MapAttr(genAttrs, inode);
 
   GStrIdx stridx = GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(name);
-  MIRType *basetype = MapType(type);
-  if (basetype) {
-    TyidxFieldAttrPair P0(basetype->GetTypeIndex(), genAttrs.ConvertToFieldAttrs());
+  MIRType *mir_type = MapType(type);
+  // always use pointer type for classes, with PTY_ref
+  if (mir_type->typeKind == kTypeClass || mir_type->typeKind == kTypeClassIncomplete ||
+      mir_type->typeKind == kTypeInterface || mir_type->typeKind == kTypeInterfaceIncomplete) {
+    mir_type = GlobalTables::GetTypeTable().GetOrCreatePointerType(mir_type, PTY_ref);
+  }
+  if (mir_type) {
+    TyidxFieldAttrPair P0(mir_type->GetTypeIndex(), genAttrs.ConvertToFieldAttrs());
     FieldPair P1(stridx, P0);
     stype->fields.push_back(P1);
   }
@@ -328,7 +333,7 @@ maple::BaseNode *A2M::ProcessFunction(StmtExprKind skind, TreeNode *tnode, Block
   if (stype) {
     GStrIdx stridx = GlobalTables::GetStrTable().GetOrCreateStrIdxFromName("this");
     TypeAttrs attr = TypeAttrs();
-    MIRType *sptype = GlobalTables::GetTypeTable().GetOrCreatePointerType(stype);
+    MIRType *sptype = GlobalTables::GetTypeTable().GetOrCreatePointerType(stype, PTY_ref);
     MIRSymbol *sym = mMirBuilder->GetOrCreateLocalDecl("this", sptype, func);
     sym->SetStorageClass(kScFormal);
     FormalDef formalDef(stridx, sym, sptype->GetTypeIndex(), attr);

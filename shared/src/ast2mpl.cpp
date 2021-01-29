@@ -179,7 +179,7 @@ void A2M::Type2Name(std::string &str, const MIRType *type) {
   const char *n = Type2Label(type);
   str.append(n);
   if (n[0] == 'L') {
-    while (type->GetPrimType() == PTY_ptr) {
+    while (type->GetPrimType() == PTY_ptr || type->GetPrimType() == PTY_ref) {
       const MIRPtrType *ptype = static_cast<const MIRPtrType *>(type);
       type = ptype->GetPointedType();
     }
@@ -273,6 +273,12 @@ MIRSymbol *A2M::CreateSymbol(TreeNode *tnode, BlockNode *block) {
   } else if (tnode->IsLiteral()) {
     NOTYETIMPL("CreateSymbol LiteralNode()");
     mir_type = mDefaultType;
+  }
+
+  // always use pointer type for classes, with PTY_ref
+  if (mir_type->typeKind == kTypeClass || mir_type->typeKind == kTypeClassIncomplete ||
+      mir_type->typeKind == kTypeInterface || mir_type->typeKind == kTypeInterfaceIncomplete) {
+    mir_type = GlobalTables::GetTypeTable().GetOrCreatePointerType(mir_type, PTY_ref);
   }
 
   MIRSymbol *symbol = nullptr;
