@@ -60,6 +60,10 @@ namespace maplefe {
   std::cout << msg << " " << val << std::endl; \
 } while (0)
 
+#define MMSGNOLOC0(msg) do { \
+  std::cout << msg << std::endl; \
+} while (0)
+
 #define MMSGNOLOC(msg, val) do { \
   std::cout << msg << " " << val << std::endl; \
 } while (0)

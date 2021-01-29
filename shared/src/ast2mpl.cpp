@@ -215,6 +215,7 @@ void A2M::UpdateFuncName(MIRFunction *func) {
   MIRSymbol *funcst = GlobalTables::GetGsymTable().GetSymbolFromStIdx(func->stIdx.Idx());
   // remove old entry in strIdxToStIdxMap
   GlobalTables::GetGsymTable().RemoveFromStringSymbolMap(funcst);
+  AST2MPLMSG("UpdateFuncName()", str);
   stridx = GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(str);
   funcst->SetNameStridx(stridx);
   // add new entry in strIdxToStIdxMap
@@ -259,7 +260,6 @@ MIRSymbol *A2M::GetSymbol(TreeNode *tnode, BlockNode *block) {
       return it.formalSym;
     }
   }
-  NOTYETIMPL("GetSymbol() symbol not found");
   return symbol;
 }
 
