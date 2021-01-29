@@ -22,6 +22,8 @@ namespace maplefe {
 char* TokenPool::NewToken(unsigned size) {
   char *addr = mMemPool.Alloc(size);
   MASSERT(addr && "MemPool failed to alloc a token.");
+  Token *token = (Token*)addr;
+  token->mAltTokens = NULL;
   mTokens.PushBack((Token*)addr);
   return addr;
 }

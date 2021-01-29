@@ -68,6 +68,26 @@ struct LitData {
   }mData;
 };
 
+// This is about a complicated situation. In some languages, an operator
+// could be combination of some other operators. e.g., in Java, operator >>
+// can be two continous GT, greater than. It could also happen in other
+// types of tokens, like separator.
+//
+// However, lexer will always take the longest possible match, so >> is always
+// treated as ShiftRight, instead of two continuous GT. This causes problem
+// during parsing. e.g., List<Class<?>>, it actually is two continuous GT.
+//
+// To solve this problem, we add additional field in Token to indicate whether
+// it could be combinations of other smaller tokens.
+//
+// We now only handle the simplest case where alternative tokens are the SAME.
+// e.g., >> has alternative of two >
+//       >>> has alternative of three >
+struct AltTokens {
+  unsigned mNum;
+  unsigned mAltTokenId;
+};
+
 struct Token {
   TK_Type mTkType;
   union {
@@ -76,6 +96,8 @@ struct Token {
     SepId       mSepId;
     OprId       mOprId;
   }mData;
+
+  AltTokens    *mAltTokens;
 
   bool IsSeparator()  { return mTkType == TT_SP; }
   bool IsOperator()   { return mTkType == TT_OP; }
