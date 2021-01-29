@@ -19,6 +19,7 @@ namespace maplefe {
 
 maple::BaseNode *A2M::ProcessNode(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
   maple::BaseNode *mpl_node = nullptr;
+  if (mTraceA2m) { tnode->Dump(0); MMSGNOLOC0(" "); }
   switch (tnode->GetKind()) {
 #undef  NODEKIND
 #define NODEKIND(K) case NK_##K: mpl_node = Process##K(skind, tnode, block); break;
@@ -43,8 +44,10 @@ maple::BaseNode *A2M::ProcessImport(StmtExprKind skind, TreeNode *tnode, BlockNo
 
 maple::BaseNode *A2M::ProcessIdentifier(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
   IdentifierNode *node = static_cast<IdentifierNode *>(tnode);
+  const char *name = node->GetName();
 
   if (skind == SK_Stmt) {
+    AST2MPLMSG("ProcessIdentifier() is a decl", name);
     MIRSymbol *symbol = CreateSymbol(node, block);
     return nullptr;
   }
@@ -52,16 +55,17 @@ maple::BaseNode *A2M::ProcessIdentifier(StmtExprKind skind, TreeNode *tnode, Blo
   // check local var
   MIRSymbol *symbol = GetSymbol(node, block);
   if (symbol) {
+    AST2MPLMSG("ProcessIdentifier() found local symbol", name);
     return mMirBuilder->CreateExprDread(symbol);
   }
 
-  const char *name = node->GetName();
   GStrIdx stridx = GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(name);
   MIRFunction *func = mBlockFuncMap[block];
 
   // check parameters
   for (auto it: func->formalDefVec) {
     if (it.formalStrIdx == stridx) {
+      AST2MPLMSG("ProcessIdentifier() found parameter", name);
       return mMirBuilder->CreateExprDread(it.formalSym);
     }
   }
@@ -80,16 +84,18 @@ maple::BaseNode *A2M::ProcessIdentifier(StmtExprKind skind, TreeNode *tnode, Blo
     MIRSymbol *sym = func->formalDefVec[0].formalSym; // this
     maple::BaseNode *bn = mMirBuilder->CreateExprDread(sym);
     maple::MIRType *ftype = GlobalTables::GetTypeTable().GetTypeFromTyIdx(mFieldData->GetTyIdx());
+    AST2MPLMSG("ProcessIdentifier() found match field", name);
     return mMirBuilder->CreateExprIread(ftype, sym->GetType(), FieldID(fid), bn);
   }
 
   // check global var
   symbol = GetSymbol(node, nullptr);
   if (symbol) {
+    AST2MPLMSG("ProcessIdentifier() found global symbol", name);
     return mMirBuilder->CreateExprDread(symbol);
   }
 
-  NOTYETIMPL("ProcessIdentifier() unknown identifier");
+  AST2MPLMSG("ProcessIdentifier() unknown identifier", name);
   return nullptr;
 }
 
@@ -174,6 +180,7 @@ maple::BaseNode *A2M::ProcessVarList(StmtExprKind skind, TreeNode *tnode, BlockN
   for (int i = 0; i < node->GetNum(); i++) {
     TreeNode *n = node->VarAtIndex(i);
     IdentifierNode *idn = static_cast<IdentifierNode *>(n);
+    AST2MPLMSG("ProcessVarList() decl", idn->GetName());
     MIRSymbol *symbol = CreateSymbol(idn, block);
   }
   return nullptr;
@@ -288,7 +295,7 @@ maple::BaseNode *A2M::ProcessFunction(StmtExprKind skind, TreeNode *tnode, Block
   // NOTYETIMPL("ProcessFunction()");
   MASSERT(tnode->IsFunction() && "it is not an FunctionNode");
   FunctionNode *ast_func = static_cast<FunctionNode *>(tnode);
-  const char                  *ast_name = ast_func->GetName();
+  const char                     *name = ast_func->GetName();
   // SmallVector<AttrId>          mAttrs;
   // SmallVector<AnnotationNode*> mAnnotations; //annotation or pragma
   // SmallVector<ExceptionNode*>  mThrows;      // exceptions it can throw
@@ -297,6 +304,7 @@ maple::BaseNode *A2M::ProcessFunction(StmtExprKind skind, TreeNode *tnode, Block
   BlockNode                   *ast_body = ast_func->GetBody();
   // DimensionNode               *mDims;
   // bool                         mIsConstructor;
+  AST2MPLMSG("\n================== function ==================", name);
 
   TreeNode *parent = tnode->GetParent();
   MIRStructType *stype = nullptr;
@@ -308,7 +316,7 @@ maple::BaseNode *A2M::ProcessFunction(StmtExprKind skind, TreeNode *tnode, Block
 
   MIRType *rettype = MapType(ast_rettype);
   TyIdx tyidx = rettype ? rettype->GetTypeIndex() : TyIdx(0);
-  MIRFunction *func = mMirBuilder->GetOrCreateFunction(ast_name, tyidx);
+  MIRFunction *func = mMirBuilder->GetOrCreateFunction(name, tyidx);
 
   mMirModule->AddFunction(func);
   mMirModule->SetCurFunction(func);
@@ -391,6 +399,7 @@ maple::BaseNode *A2M::ProcessFunction(StmtExprKind skind, TreeNode *tnode, Block
     stype->methods.push_back(P1);
   }
 
+  AST2MPLMSG2("\n================ end function ================", name, func->GetName());
   return nullptr;
 }
 
@@ -399,6 +408,7 @@ maple::BaseNode *A2M::ProcessClass(StmtExprKind skind, TreeNode *tnode, BlockNod
   const char *name = classnode->GetName();
   MIRType *type = GlobalTables::GetTypeTable().GetOrCreateClassType(name, mMirModule);
   mNodeTypeMap[name] = type;
+  AST2MPLMSG("\n================== class =====================", name);
 
   for (int i=0; i < classnode->GetFieldsNum(); i++) {
     ProcessField(skind, classnode->GetField(i), block);
@@ -521,7 +531,7 @@ maple::BaseNode *A2M::ProcessBinOperatorMpl(StmtExprKind skind,
                                        maple::BaseNode *lhs,
                                        maple::BaseNode *rhs,
                                        BlockNode *block) {
-  maple::BaseNode *val = new BinaryNode(op, lhs->primType, lhs, rhs);
+  maple::BaseNode *val = new BinaryNode(op, lhs->GetPrimType(), lhs, rhs);
   return val;
 }
 
@@ -543,7 +553,7 @@ maple::BaseNode *A2M::ProcessBinOperatorMplAssign(StmtExprKind skind,
     }
     case OP_dread: {
       DreadNode *dr = static_cast<maple::DreadNode *>(lhs);
-      node = new DassignNode(dr->primType, rhs, dr->stIdx, dr->fieldID);
+      node = new DassignNode(dr->GetPrimType(), rhs, dr->stIdx, dr->fieldID);
       break;
     }
     default:

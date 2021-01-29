@@ -29,7 +29,10 @@
 
 namespace maplefe {
 
-#define NOTYETIMPL(K) { if (mTraceA2m) { MNYI(K); }}
+#define NOTYETIMPL(K)      { if (mTraceA2m) { MNYI(K);      }}
+#define AST2MPLMSG0(K)     { if (mTraceA2m) { MMSG0(K);     }}
+#define AST2MPLMSG(K,v)    { if (mTraceA2m) { MMSG(K,v);    }}
+#define AST2MPLMSG2(K,v,w) { if (mTraceA2m) { MMSG2(K,v,w); }}
 
 enum StmtExprKind {
   SK_Null,
