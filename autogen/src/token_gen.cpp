@@ -51,6 +51,16 @@ void TokenGen::GenHeaderFile() {
 
 extern std::string FindOperatorName(OprId id);
 
+struct AlternativeTokens {
+  const char *mName;
+  unsigned    mNum;  // num of alt tokens
+  const char *mAltName;
+};
+
+static AlternativeTokens alt_tokens[] = {
+#include "alt_tokens.spec"
+};
+
 void TokenGen::GenCppFile() {
   mCppFile.WriteOneLine("#include \"token.h\"", 18);
   mCppFile.WriteOneLine("namespace maplefe {", 19);
@@ -98,7 +108,7 @@ void TokenGen::GenCppFile() {
     std::string opr_name = "OPR_";
     opr_name += FindOperatorName(opr.mID);
     output += opr_name;
-    output += "}},";
+    output += "}, .mAltTokens = NULL},";
     mCppFile.WriteOneLine(output.c_str(), output.size());
   }
 
@@ -109,7 +119,7 @@ void TokenGen::GenCppFile() {
     std::string sep_name = "SEP_";
     sep_name += FindSeparatorName(sep.mID);
     output += sep_name;
-    output += "}},";
+    output += "}, .mAltTokens = NULL},";
     mCppFile.WriteOneLine(output.c_str(), output.size());
   }
 
@@ -120,12 +130,12 @@ void TokenGen::GenCppFile() {
     output += "\"";
     output += keyword;
     output += "\"";
-    output += "}},";
+    output += "}, .mAltTokens = NULL},";
     mCppFile.WriteOneLine(output.c_str(), output.size());
   }
 
   // Write the comment token
-  std::string output = "  {.mTkType = TT_CM}";
+  std::string output = "  {.mTkType = TT_CM, {.mName = NULL}, .mAltTokens = NULL}";
   mCppFile.WriteOneLine(output.c_str(), output.size());
   mCppFile.WriteOneLine("};", 2);
   mCppFile.WriteOneLine("}", 1);

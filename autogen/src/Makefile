@@ -13,7 +13,10 @@ OBJS := $(foreach obj, $(OBJ), $(BUILD)/$(obj))
 LIBOBJS :=$(patsubst $(BUILD)/main.o,,$(OBJS))
 DEPS := $(foreach dep, $(DEP), $(BUILD)/$(dep))
 
-INCLUDES := -I $(MAPLEFE_ROOT)/autogen/include -I $(MAPLEFE_ROOT)/shared/include -I $(MAPLEFE_ROOT)/java/include
+INCLUDES := -I $(MAPLEFE_ROOT)/autogen/include \
+            -I $(MAPLEFE_ROOT)/shared/include \
+            -I $(MAPLEFE_ROOT)/java/include \
+            -I $(MAPLEFE_ROOT)/java
 
 TARGET = autogen
 
