@@ -21,21 +21,21 @@
 #ifndef __TOKEN_GEN_H__
 #define __TOKEN_GEN_H__
 
+#include <vector>
 #include "base_struct.h"
 #include "base_gen.h"
 #include "supported.h"
-#include "container.h"
 
 namespace maplefe {
 
-struct AlternativeTokens {
+struct AlternativeToken {
   const char *mName;
   unsigned    mNum;  // num of alt tokens
   const char *mAltName;
 };
 
 // We need Alt Tokens with Id, instead of name.
-struct ProcessedAltTokens {
+struct ProcessedAltToken {
   unsigned mId;
   unsigned mNum;
   unsigned mAltId;
@@ -43,8 +43,7 @@ struct ProcessedAltTokens {
 
 class TokenGen : public BaseGen {
 public:
-  unsigned           mAltTokensNum;
-  SmallVector<ProcessedAltTokens> mAltTokens;
+  std::vector<ProcessedAltToken> mAltTokens;
 
 public:
   TokenGen(const char *hfile, const char *cfile)

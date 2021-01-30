@@ -83,7 +83,7 @@ struct LitData {
 // We now only handle the simplest case where alternative tokens are the SAME.
 // e.g., >> has alternative of two >
 //       >>> has alternative of three >
-struct AltTokens {
+struct AltToken {
   unsigned mNum;
   unsigned mAltTokenId;
 };
@@ -97,7 +97,7 @@ struct Token {
     OprId       mOprId;
   }mData;
 
-  AltTokens    *mAltTokens;
+  AltToken     *mAltTokens;
 
   bool IsSeparator()  { return mTkType == TT_SP; }
   bool IsOperator()   { return mTkType == TT_OP; }

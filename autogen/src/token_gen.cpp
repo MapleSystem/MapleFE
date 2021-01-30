@@ -46,22 +46,24 @@ void TokenGen::GenHeaderFile() {
   mHeaderFile.WriteOneLine("extern unsigned gSeparatorTokensNum;", 36);
   mHeaderFile.WriteOneLine("extern unsigned gKeywordTokensNum;", 34);
   mHeaderFile.WriteOneLine("extern Token gSystemTokens[];", 29);
+  mHeaderFile.WriteOneLine("extern unsigned gAltTokensNum;", 30);
+  mHeaderFile.WriteOneLine("extern AltToken gAltTokens[];", 29);
   mHeaderFile.WriteOneLine("}", 1);
   mHeaderFile.WriteOneLine("#endif", 6);
 }
 
 extern std::string FindOperatorName(OprId id);
 
-static AlternativeTokens alt_tokens[] = {
+static AlternativeToken alt_tokens[] = {
 #include "alt_tokens.spec"
 };
 
 // Replace the names in alt_tokens to index, and save them in
 // mAltTokens.
 void TokenGen::ProcessAltTokens() {
-  mAltTokensNum = sizeof(alt_tokens) / sizeof(AlternativeTokens);
+  unsigned mAltTokensNum = sizeof(alt_tokens) / sizeof(AlternativeToken);
   for (unsigned i = 0; i < mAltTokensNum; i++) {
-    AlternativeTokens at = alt_tokens[i];
+    AlternativeToken at = alt_tokens[i];
     unsigned orig_id;
     bool found = gTokenTable.FindStringTokenId(at.mName, orig_id);
     MASSERT(found);
@@ -69,11 +71,11 @@ void TokenGen::ProcessAltTokens() {
     found = gTokenTable.FindStringTokenId(at.mAltName, alt_id);
     MASSERT(found);
 
-    ProcessedAltTokens pat;
+    ProcessedAltToken pat;
     pat.mId = orig_id;
     pat.mNum = at.mNum;
     pat.mAltId = alt_id;
-    mAltTokens.PushBack(pat);
+    mAltTokens.push_back(pat);
   }
 }
 
@@ -81,13 +83,45 @@ void TokenGen::GenCppFile() {
   mCppFile.WriteOneLine("#include \"token.h\"", 18);
   mCppFile.WriteOneLine("namespace maplefe {", 19);
 
+  // Write alt tokens
+  //   unsigned gAltTokensNum=xxx;
+  //   AltToken gAltTokens[xxx] = {
+  //     {2, 40},
+  //     {...  },
+  //   };
+  std::string s = "unsigned gAltTokensNum=";
+  std::string num = std::to_string(mAltTokens.size());
+  s += num;
+  s += ";";
+  mCppFile.WriteOneLine(s.c_str(), s.size());
+
+  s = "AltToken gAltTokens[";
+  s += num;
+  s += "] = {";
+  mCppFile.WriteOneLine(s.c_str(), s.size());
+
+  for (unsigned i = 0; i < mAltTokens.size(); i++) {
+    ProcessedAltToken pat = mAltTokens[i];
+    s = "  {";
+    num = std::to_string(pat.mNum);
+    s += num;
+    s += ", ";
+    num = std::to_string(pat.mAltId);
+    s += num;
+    s += "},";
+    mCppFile.WriteOneLine(s.c_str(), s.size());
+  }
+
+  s = "};";
+  mCppFile.WriteOneLine(s.c_str(), s.size());
+
   // write:
   //   unsigned gSystemTokensNum=xxx;
   //   unsigned gOperatorTokensNum=xxx;
   //   unsigned gSeparatorTokensNum=xxx;
   //   unsigned gKeywordTokensNum=xxx;
-  std::string s = "unsigned gSystemTokensNum=";
-  std::string num = std::to_string(gTokenTable.mTokens.size());
+  s = "unsigned gSystemTokensNum=";
+  num = std::to_string(gTokenTable.mTokens.size());
   s += num;
   s += ";";
   mCppFile.WriteOneLine(s.c_str(), s.size());
