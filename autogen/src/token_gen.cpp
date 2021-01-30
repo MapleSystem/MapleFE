@@ -26,6 +26,7 @@ namespace maplefe {
 /////////////////////////////////////////////////////////////////////
 
 void TokenGen::Generate() {
+  ProcessAltTokens();
   GenHeaderFile();
   GenCppFile();
 }
@@ -51,15 +52,30 @@ void TokenGen::GenHeaderFile() {
 
 extern std::string FindOperatorName(OprId id);
 
-struct AlternativeTokens {
-  const char *mName;
-  unsigned    mNum;  // num of alt tokens
-  const char *mAltName;
-};
-
 static AlternativeTokens alt_tokens[] = {
 #include "alt_tokens.spec"
 };
+
+// Replace the names in alt_tokens to index, and save them in
+// mAltTokens.
+void TokenGen::ProcessAltTokens() {
+  mAltTokensNum = sizeof(alt_tokens) / sizeof(AlternativeTokens);
+  for (unsigned i = 0; i < mAltTokensNum; i++) {
+    AlternativeTokens at = alt_tokens[i];
+    unsigned orig_id;
+    bool found = gTokenTable.FindStringTokenId(at.mName, orig_id);
+    MASSERT(found);
+    unsigned alt_id;
+    found = gTokenTable.FindStringTokenId(at.mAltName, alt_id);
+    MASSERT(found);
+
+    ProcessedAltTokens pat;
+    pat.mId = orig_id;
+    pat.mNum = at.mNum;
+    pat.mAltId = alt_id;
+    mAltTokens.PushBack(pat);
+  }
+}
 
 void TokenGen::GenCppFile() {
   mCppFile.WriteOneLine("#include \"token.h\"", 18);

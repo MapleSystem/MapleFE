@@ -24,10 +24,28 @@
 #include "base_struct.h"
 #include "base_gen.h"
 #include "supported.h"
+#include "container.h"
 
 namespace maplefe {
 
+struct AlternativeTokens {
+  const char *mName;
+  unsigned    mNum;  // num of alt tokens
+  const char *mAltName;
+};
+
+// We need Alt Tokens with Id, instead of name.
+struct ProcessedAltTokens {
+  unsigned mId;
+  unsigned mNum;
+  unsigned mAltId;
+};
+
 class TokenGen : public BaseGen {
+public:
+  unsigned           mAltTokensNum;
+  SmallVector<ProcessedAltTokens> mAltTokens;
+
 public:
   TokenGen(const char *hfile, const char *cfile)
       : BaseGen("", hfile, cfile) {}
@@ -36,6 +54,7 @@ public:
   void Generate();
   void GenCppFile();
   void GenHeaderFile();
+  void ProcessAltTokens();
 
   void Run(SPECParser *parser){return;}
 };
