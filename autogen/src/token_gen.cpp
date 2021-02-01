@@ -151,36 +151,98 @@ void TokenGen::GenCppFile() {
 
   // write all tokens
 
+  unsigned overall_index = 0;
+
   std::list<Operator>::iterator oit = gTokenTable.mOperators->begin();
-  for (unsigned index = 0; oit != gTokenTable.mOperators->end(); oit++, index++) {
+  for (; oit != gTokenTable.mOperators->end(); oit++, overall_index++) {
     std::string output = "  {.mTkType = TT_OP, {.mOprId = ";
     Operator opr = *oit;
     std::string opr_name = "OPR_";
     opr_name += FindOperatorName(opr.mID);
     output += opr_name;
-    output += "}, .mAltTokens = NULL},";
+
+    // find the alt tokens
+    unsigned at_idx = 0;
+    bool found = false;
+    for (; at_idx < mAltTokens.size(); at_idx++) {
+      ProcessedAltToken pat = mAltTokens[at_idx];
+      if (overall_index == pat.mId) {
+        found = true;
+        break;
+      }
+    }
+
+    if (found) {
+      output += "}, .mAltTokens = &gAltTokens[";
+      std::string idx_str = std::to_string(at_idx);
+      output += idx_str;
+      output += "]},";
+    } else {
+      output += "}, .mAltTokens = NULL},";
+    }
+
     mCppFile.WriteOneLine(output.c_str(), output.size());
   }
 
   std::list<Separator>::iterator sit = gTokenTable.mSeparators->begin();
-  for (unsigned index = 0; sit != gTokenTable.mSeparators->end(); sit++, index++) {
+  for (; sit != gTokenTable.mSeparators->end(); sit++, overall_index++) {
     std::string output = "  {.mTkType = TT_SP, {.mSepId = ";
     Separator sep = *sit;
     std::string sep_name = "SEP_";
     sep_name += FindSeparatorName(sep.mID);
     output += sep_name;
-    output += "}, .mAltTokens = NULL},";
+
+    // find the alt tokens
+    unsigned at_idx = 0;
+    bool found = false;
+    for (; at_idx < mAltTokens.size(); at_idx++) {
+      ProcessedAltToken pat = mAltTokens[at_idx];
+      if (overall_index == pat.mId) {
+        found = true;
+        break;
+      }
+    }
+
+    if (found) {
+      output += "}, .mAltTokens = &gAltTokens[";
+      std::string idx_str = std::to_string(at_idx);
+      output += idx_str;
+      output += "]},";
+    } else {
+      output += "}, .mAltTokens = NULL},";
+    }
+
     mCppFile.WriteOneLine(output.c_str(), output.size());
   }
 
   unsigned kw_size = gTokenTable.mKeywords.size();
-  for (unsigned index = 0; index < kw_size; index++) {
+  for (unsigned index = 0; index < kw_size; index++, overall_index++) {
     std::string output = "  {.mTkType = TT_KW, {.mName = ";
     std::string keyword = gTokenTable.mKeywords[index];
     output += "\"";
     output += keyword;
     output += "\"";
-    output += "}, .mAltTokens = NULL},";
+
+    // find the alt tokens
+    unsigned at_idx = 0;
+    bool found = false;
+    for (; at_idx < mAltTokens.size(); at_idx++) {
+      ProcessedAltToken pat = mAltTokens[at_idx];
+      if (overall_index == pat.mId) {
+        found = true;
+        break;
+      }
+    }
+
+    if (found) {
+      output += "}, .mAltTokens = &gAltTokens[";
+      std::string idx_str = std::to_string(at_idx);
+      output += idx_str;
+      output += "]},";
+    } else {
+      output += "}, .mAltTokens = NULL},";
+    }
+
     mCppFile.WriteOneLine(output.c_str(), output.size());
   }
 
