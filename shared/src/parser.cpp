@@ -229,6 +229,9 @@ Parser::Parser(const char *name) : filename(name) {
 
   mIndentation = -2;
   mRoundsOfPatching = 0;
+
+  mInAltTokensMatching = false;
+  mNextAltTokenIndex = 0;
 }
 
 Parser::~Parser() {
@@ -986,15 +989,46 @@ bool Parser::TraverseToken(Token *token, AppealNode *parent, AppealNode *&child_
   appeal->SetParent(parent);
   parent->AddChild(appeal);
 
+  bool use_alt_token = false;
   if (token == curr_token) {
     appeal->mResult = Succ;
     appeal->AddMatch(mCurToken);
     found = true;
     MoveCurToken();
+  } else {
+    // TraverseToken handles system tokens which could have alternative tokens.
+    if (curr_token->mAltTokens) {
+      bool alt_found = false;
+      AltToken *pat = curr_token->mAltTokens;
+      if (token == &gSystemTokens[pat->mAltTokenId]) {
+        found = true;
+        alt_found = true;
+        if (!mInAltTokensMatching)
+          mInAltTokensMatching = true;
+        mNextAltTokenIndex++;
+
+        appeal->mResult = Succ;
+        appeal->AddMatch(mCurToken);
+        appeal->SetAltTokensMatched();
+        use_alt_token = true;
+
+        // when it's done with all alt tokens
+        if (mNextAltTokenIndex == pat->mNum) {
+          // We only move cursor when all alt-tokens are matched
+          MoveCurToken();
+          mInAltTokensMatching = false;
+          mNextAltTokenIndex = 0;
+        }
+      }
+    }
   }
 
   if (mTraceTable) {
-    std::string name = "token:";
+    std::string name;
+    if (use_alt_token)
+      name = "token (alttoken used):";
+    else
+      name = "token:";
     name += token->GetName();
     DumpExitTable(name.c_str(), mIndentation, appeal);
   }

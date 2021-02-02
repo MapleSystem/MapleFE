@@ -83,6 +83,8 @@ struct LitData {
 // We now only handle the simplest case where alternative tokens are the SAME.
 // e.g., >> has alternative of two >
 //       >>> has alternative of three >
+//
+// [NOTE] Alt tokens are system tokens.
 struct AltToken {
   unsigned mNum;
   unsigned mAltTokenId;

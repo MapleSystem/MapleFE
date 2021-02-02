@@ -83,6 +83,10 @@ private:
   bool         mAstCreated;       // If the AST is created for this node. People may ask if
                                   // we can use mAstTreeNode to determine. The answer is no,
                                   // because some nodes may have no Ast node.
+
+  bool         mAltTokensMatched; // See the definition of Alt Tokens in token.h.
+                                  // A node could match multiple alt tokens.
+
   unsigned     mFinalMatch;       // the final match after sort out.
   SmallVector<unsigned> mMatches; // all of the last matching token.
                                   // mMatches could be empty even if mResult is succ, e.g.
@@ -105,8 +109,10 @@ public:
   void SetIsPseudo(){mIsPseudo = true;}
   bool IsSorted()   {return mSorted;}
   void SetSorted()  {mSorted = true;}
-  bool AstCreated() {return mAstCreated;}
+  bool AstCreated()    {return mAstCreated;}
   void SetAstCreated() {mAstCreated = true;}
+  bool AltTokensMatched()    {return mAltTokensMatched;}
+  void SetAltTokensMatched() {mAltTokensMatched = true;}
 
   TreeNode* GetAstTreeNode() {return mAstTreeNode;}
   void      SetAstTreeNode(TreeNode *n) {mAstTreeNode = n;}
@@ -128,6 +134,7 @@ public:
                                   // connect to a new 'parent' node, replacing its ancestor.
                                   // To make AST building work, it needs to inherit ancestor's
                                   // index in the rule table.
+
 public:
   union {
     RuleTable *mTable;
@@ -154,6 +161,7 @@ public:
   AppealNode() {mData.mTable=NULL; mParent = NULL;
                 mResult = AppealStatus_NA; mSimplifiedIndex = 0; mIsTable = true;
                 mStartIndex = 0; mSorted = false; mFinalMatch = 0;
+                mAltTokensMatched = false;
                 mIsPseudo = false; mAstTreeNode = NULL; mAstCreated = false;}
   ~AppealNode(){mMatches.Release();}
 
@@ -208,6 +216,11 @@ struct RecStackEntry {
 class Parser {
 private:
   friend class RecursionTraversal;
+
+  // Matching on alternative tokens needs a state machine.
+  bool     mInAltTokensMatching;  // once it's true, mCurToken is frozen.
+  unsigned mNextAltTokenIndex;    // index of next alt token to be matched.
+
 public:
   Lexer *mLexer;
   const char *filename;
