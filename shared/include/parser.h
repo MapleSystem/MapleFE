@@ -84,9 +84,6 @@ private:
                                   // we can use mAstTreeNode to determine. The answer is no,
                                   // because some nodes may have no Ast node.
 
-  bool         mAltTokensMatched; // See the definition of Alt Tokens in token.h.
-                                  // A node could match multiple alt tokens.
-
   unsigned     mFinalMatch;       // the final match after sort out.
   SmallVector<unsigned> mMatches; // all of the last matching token.
                                   // mMatches could be empty even if mResult is succ, e.g.
@@ -111,8 +108,6 @@ public:
   void SetSorted()  {mSorted = true;}
   bool AstCreated()    {return mAstCreated;}
   void SetAstCreated() {mAstCreated = true;}
-  bool AltTokensMatched()    {return mAltTokensMatched;}
-  void SetAltTokensMatched() {mAltTokensMatched = true;}
 
   TreeNode* GetAstTreeNode() {return mAstTreeNode;}
   void      SetAstTreeNode(TreeNode *n) {mAstTreeNode = n;}
@@ -141,6 +136,13 @@ public:
     Token     *mToken;
   }mData;
 
+  bool         m1stAltTokenMatched;  // See the definition of Alt Tokens in token.h.
+                                     // A node could match multiple alt tokens.
+                                     // The node matching the first alt token is handled
+                                     // different during sortout
+
+  Token       *mAltToken;         // The alt token it matches.
+
   std::vector<AppealNode*> mChildren;
 
   // I use an additional vector for the sorted out children. Why do we have two duplicated
@@ -161,7 +163,7 @@ public:
   AppealNode() {mData.mTable=NULL; mParent = NULL;
                 mResult = AppealStatus_NA; mSimplifiedIndex = 0; mIsTable = true;
                 mStartIndex = 0; mSorted = false; mFinalMatch = 0;
-                mAltTokensMatched = false;
+                m1stAltTokenMatched = false; mAltToken = NULL;
                 mIsPseudo = false; mAstTreeNode = NULL; mAstCreated = false;}
   ~AppealNode(){mMatches.Release();}
 
@@ -220,6 +222,7 @@ private:
   // Matching on alternative tokens needs a state machine.
   bool     mInAltTokensMatching;  // once it's true, mCurToken is frozen.
   unsigned mNextAltTokenIndex;    // index of next alt token to be matched.
+  unsigned mATMToken;             // the current input token being processed.
 
 public:
   Lexer *mLexer;

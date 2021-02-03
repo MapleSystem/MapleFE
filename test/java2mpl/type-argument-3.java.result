@@ -1,0 +1,15 @@
+Matched 26 tokens.
+============= Module ===========
+== Sub Tree ==
+class  C
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+    func  getClasses()  throws: 
+      var:result=a
+      return result
+  LocalClasses: 
+  LocalInterfaces: 
+

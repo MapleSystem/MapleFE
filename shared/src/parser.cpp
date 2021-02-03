@@ -1003,13 +1003,16 @@ bool Parser::TraverseToken(Token *token, AppealNode *parent, AppealNode *&child_
       if (token == &gSystemTokens[pat->mAltTokenId]) {
         found = true;
         alt_found = true;
-        if (!mInAltTokensMatching)
+        mATMToken = mCurToken;
+        if (!mInAltTokensMatching) {
           mInAltTokensMatching = true;
+          appeal->m1stAltTokenMatched = true;
+        }
         mNextAltTokenIndex++;
 
         appeal->mResult = Succ;
         appeal->AddMatch(mCurToken);
-        appeal->SetAltTokensMatched();
+        appeal->mAltToken = token;
         use_alt_token = true;
 
         // when it's done with all alt tokens
@@ -1259,6 +1262,11 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *appeal) {
     for (unsigned j = 0; j < prev_succ_tokens.GetNum(); j++) {
       unsigned prev = prev_succ_tokens.ValueAtIndex(j);
       mCurToken = prev + 1;
+
+      // In ATM, we don't move mCurToken.
+      // Alt Token Matching only applies to that specific 'prev'.
+      if (mInAltTokensMatching && (prev == mATMToken))
+        mCurToken = mATMToken;
 
       AppealNode *child = NULL;
       bool temp_found = TraverseTableData(data, appeal, child);
@@ -1769,7 +1777,12 @@ void Parser::SortOutConcatenate(AppealNode *parent) {
       child->SetFinalMatch(last_match);
       child->SetParent(parent);
       child->SetSorted();
-      last_match = child->GetStartIndex() - 1;
+      // If 'child' is matching an alternative token and is NOT the first index
+      // we want to keep the last_match
+      if (child->mAltToken && !(child->m1stAltTokenMatched))
+        last_match = last_match;
+      else
+        last_match = child->GetStartIndex() - 1;
     }
   }
   MASSERT(last_match + 1 == parent->GetStartIndex());
@@ -2484,7 +2497,8 @@ AppealNode* AppealNode::FindSpecChild(TableData *tdata, unsigned match) {
       }
       case DT_Token: {
         Token *token = &gSystemTokens[tdata->mData.mTokenId];
-        if (child->IsToken() && child->GetToken() == token)
+        if ( child->IsToken() &&
+             ((child->GetToken() == token) || (child->mAltToken == token)))
           ret_child = child;
         break;
       }
