@@ -18,6 +18,10 @@
 namespace maplefe {
 
 maple::BaseNode *A2M::ProcessNode(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
+  if (!tnode) {
+    return nullptr;
+  }
+
   maple::BaseNode *mpl_node = nullptr;
   if (mTraceA2m) { tnode->Dump(0); MMSGNOLOC0(" "); }
   switch (tnode->GetKind()) {
@@ -60,7 +64,7 @@ maple::BaseNode *A2M::ProcessIdentifier(StmtExprKind skind, TreeNode *tnode, Blo
   }
 
   GStrIdx stridx = GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(name);
-  MIRFunction *func = mBlockFuncMap[block];
+  MIRFunction *func = GetFunc(block);
 
   // check parameters
   for (auto it: func->formalDefVec) {
@@ -96,7 +100,8 @@ maple::BaseNode *A2M::ProcessIdentifier(StmtExprKind skind, TreeNode *tnode, Blo
   }
 
   AST2MPLMSG("ProcessIdentifier() unknown identifier", name);
-  return nullptr;
+  symbol = mMirBuilder->GetOrCreateLocalDecl(name, mDefaultType, func);
+  return mMirBuilder->CreateExprDread(symbol);
 }
 
 maple::BaseNode *A2M::ProcessField(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
@@ -200,7 +205,7 @@ maple::BaseNode *A2M::ProcessLiteral(StmtExprKind skind, TreeNode *tnode, BlockN
   switch (data.mType) {
     case LT_IntegerLiteral: {
       MIRIntConst *cst = new MIRIntConst(data.mData.mInt, GlobalTables::GetTypeTable().GetInt32());
-      bn =  new maple::ConstvalNode(PTY_i32, cst); 
+      bn =  new maple::ConstvalNode(PTY_i32, cst);
       break;
     }
     case LT_FPLiteral:
@@ -471,9 +476,39 @@ maple::BaseNode *A2M::ProcessReturn(StmtExprKind skind, TreeNode *tnode, BlockNo
 }
 
 maple::BaseNode *A2M::ProcessCondBranch(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
-  NOTYETIMPL("ProcessCondBranch()");
   CondBranchNode *node = static_cast<CondBranchNode *>(tnode);
-  return nullptr;
+  maple::BaseNode *cond = ProcessNode(SK_Expr, node->GetCond(), block);
+  maple::BlockNode *thenBlock = nullptr;
+  maple::BlockNode *elseBlock = nullptr;
+  BlockNode *blk = node->GetTrueBranch();
+  if (blk) {
+    if (!blk->IsBlock()) {
+      blk = new BlockNode();
+      blk->AddChild(node->GetTrueBranch());
+    }
+    thenBlock = new maple::BlockNode();
+    mBlockNodeMap[blk] = thenBlock;
+    ProcessBlock(skind, blk, blk);
+  }
+  blk = node->GetFalseBranch();
+  if (blk) {
+    if (!blk->IsBlock()) {
+      blk = new BlockNode();
+      blk->AddChild(node->GetTrueBranch());
+    }
+    elseBlock = new maple::BlockNode();
+    mBlockNodeMap[blk] = elseBlock;
+    ProcessBlock(skind, blk, blk);
+  }
+  maple::IfStmtNode *ifnode = new maple::IfStmtNode();
+  if (!cond) {
+    NOTYETIMPL("CondBranchNode condition");
+    cond =  new maple::ConstvalNode(PTY_i32, new MIRIntConst(1, GlobalTables::GetTypeTable().GetInt32()));
+  }
+  ifnode->uOpnd = cond;
+  ifnode->thenPart = thenBlock;
+  ifnode->elsePart = elseBlock;
+  return ifnode;
 }
 
 maple::BaseNode *A2M::ProcessBreak(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
@@ -537,9 +572,20 @@ maple::BaseNode *A2M::ProcessSwitch(StmtExprKind skind, TreeNode *tnode, BlockNo
 }
 
 maple::BaseNode *A2M::ProcessPass(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
-  NOTYETIMPL("ProcessPass()");
   PassNode *node = static_cast<PassNode *>(tnode);
-  return nullptr;
+  maple::BlockNode *blk = mBlockNodeMap[block];
+  BaseNode *expr = nullptr;
+  for (int i = 0; i < node->GetChildrenNum(); i++) {
+    TreeNode *child = node->GetChild(i);
+    expr = ProcessNode(skind, child, block);
+    if (expr) {
+      if (mTraceA2m) expr->Dump(mMirModule, 0);
+    }
+
+    NOTYETIMPL("ProcessPass()");
+    return expr;
+  }
+  return expr;
 }
 
 maple::BaseNode *A2M::ProcessUnaOperatorMpl(StmtExprKind skind,
@@ -550,7 +596,7 @@ maple::BaseNode *A2M::ProcessUnaOperatorMpl(StmtExprKind skind,
   if (op == OP_incref || op == OP_decref) {
     MIRType *typeI32 = GlobalTables::GetTypeTable().GetInt32();
     MIRIntConst *cst = new MIRIntConst(1, typeI32);
-    BaseNode *one =  new maple::ConstvalNode(PTY_i32, cst); 
+    BaseNode *one =  new maple::ConstvalNode(PTY_i32, cst);
     if (op == OP_incref) {
       node = new BinaryNode(OP_add, bn->GetPrimType(), bn, one);
     } else if (op == OP_decref) {

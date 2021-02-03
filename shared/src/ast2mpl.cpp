@@ -268,7 +268,11 @@ MIRSymbol *A2M::GetSymbol(TreeNode *tnode, BlockNode *block) {
   } while (blk);
 
   // check parameters
-  MIRFunction *func = mBlockFuncMap[block];
+  MIRFunction *func = GetFunc(blk);
+  if (!func) {
+    NOTYETIMPL("Block parent hirachy");
+    return symbol;
+  }
   GStrIdx stridx = GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(name);
   for (auto it: func->formalDefVec) {
     if (it.formalStrIdx == stridx) {
@@ -298,7 +302,7 @@ MIRSymbol *A2M::CreateSymbol(TreeNode *tnode, BlockNode *block) {
 
   MIRSymbol *symbol = nullptr;
   if (block) {
-    maple::MIRFunction *func = mBlockFuncMap[block];
+    maple::MIRFunction *func = GetFunc(block);
     symbol = mMirBuilder->GetOrCreateLocalDecl(name, mir_type, func);
   } else {
     symbol = mMirBuilder->GetOrCreateGlobalDecl(name, mir_type);
@@ -308,6 +312,13 @@ MIRSymbol *A2M::CreateSymbol(TreeNode *tnode, BlockNode *block) {
   mNameBlockVarMap[P] = symbol;
 
   return symbol;
+}
+
+MIRFunction *A2M::GetFunc(BlockNode *block) {
+  MIRFunction *func = nullptr;
+  // func = mBlockFuncMap[block];
+  func = mMirModule->CurFunction();
+  return func;
 }
 
 void A2M::MapAttr(GenericAttrs &attr, const IdentifierNode *inode) {
