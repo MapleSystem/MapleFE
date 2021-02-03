@@ -1,0 +1,320 @@
+Matched 5 tokens.
+Matched 12 tokens.
+Matched 19 tokens.
+Matched 26 tokens.
+Matched 35 tokens.
+Matched 44 tokens.
+Matched 51 tokens.
+Matched 58 tokens.
+Matched 65 tokens.
+Matched 72 tokens.
+Matched 79 tokens.
+Matched 86 tokens.
+Matched 93 tokens.
+Matched 100 tokens.
+Matched 107 tokens.
+Matched 114 tokens.
+Matched 123 tokens.
+Matched 130 tokens.
+Matched 137 tokens.
+Matched 144 tokens.
+Matched 151 tokens.
+Matched 158 tokens.
+Matched 165 tokens.
+Matched 172 tokens.
+Matched 179 tokens.
+Matched 186 tokens.
+Matched 193 tokens.
+Matched 202 tokens.
+Matched 209 tokens.
+Matched 216 tokens.
+Matched 223 tokens.
+Matched 230 tokens.
+Matched 237 tokens.
+Matched 244 tokens.
+Matched 251 tokens.
+Matched 258 tokens.
+Matched 267 tokens.
+Matched 1522 tokens.
+Matched 1821 tokens.
+============= Module ===========
+== Sub Tree ==
+package java.lang
+== Sub Tree ==
+import java.io.InputStream
+== Sub Tree ==
+import java.io.IOException
+== Sub Tree ==
+import java.io.File
+== Sub Tree ==
+import java.lang.reflect.Constructor
+== Sub Tree ==
+import java.lang.reflect.InvocationTargetException
+== Sub Tree ==
+import java.net.MalformedURLException
+== Sub Tree ==
+import java.net.URL
+== Sub Tree ==
+import java.security.AccessController
+== Sub Tree ==
+import java.security.AccessControlContext
+== Sub Tree ==
+import java.security.CodeSource
+== Sub Tree ==
+import java.security.Policy
+== Sub Tree ==
+import java.security.PrivilegedAction
+== Sub Tree ==
+import java.security.PrivilegedActionException
+== Sub Tree ==
+import java.security.PrivilegedExceptionAction
+== Sub Tree ==
+import java.security.ProtectionDomain
+== Sub Tree ==
+import java.security.cert.Certificate
+== Sub Tree ==
+import java.util.Collections
+== Sub Tree ==
+import java.util.Enumeration
+== Sub Tree ==
+import java.util.HashMap
+== Sub Tree ==
+import java.util.HashSet
+== Sub Tree ==
+import java.util.Set
+== Sub Tree ==
+import java.util.Stack
+== Sub Tree ==
+import java.util.Map
+== Sub Tree ==
+import java.util.Vector
+== Sub Tree ==
+import java.util.Hashtable
+== Sub Tree ==
+import java.util.WeakHashMap
+== Sub Tree ==
+import java.util.concurrent.ConcurrentHashMap
+== Sub Tree ==
+import dalvik.system.PathClassLoader
+== Sub Tree ==
+import java.util.List
+== Sub Tree ==
+import sun.misc.CompoundEnumeration
+== Sub Tree ==
+import sun.misc.Resource
+== Sub Tree ==
+import sun.misc.URLClassPath
+== Sub Tree ==
+import sun.misc.VM
+== Sub Tree ==
+import sun.reflect.CallerSensitive
+== Sub Tree ==
+import sun.reflect.Reflection
+== Sub Tree ==
+import sun.security.util.SecurityConstants
+== Sub Tree ==
+class  ClassLoader
+  Fields: 
+    proxyCache=new HashMap<List,Class,Class>    parent    packages=new HashMap    allocator    classTable
+  Instance Initializer: 
+  Constructors: 
+    constructor  ClassLoader()  throws: 
+      this.parent Assign parent
+    constructor  ClassLoader()  throws: 
+    constructor  ClassLoader()  throws: 
+  Methods: 
+    func  createSystemClassLoader()  throws: 
+      var:classPath=System.getProperty("java.class.path",".")
+      var:librarySearchPath=System.getProperty("java.library.path","")
+      return new PathClassLoader<PathClassLoader>
+    func  checkCreateClassLoader()  throws: 
+      return null
+    func  loadClass()  throws:     ClassNotFoundException
+      return loadClass(name,false)
+    func  loadClass()  throws:     ClassNotFoundException
+      var:c=findLoadedClass(name)
+      cond-branch cond:
+      true branch :
+
+        cond-branch cond:
+        true branch :
+          c Assign findClass(name)
+        false branch :
+
+      false branch :
+
+      return c
+    func  findClass()  throws:     ClassNotFoundException
+      new ClassNotFoundException<ClassNotFoundException>
+    func  defineClass()  throws:     ClassFormatError
+      new UnsupportedOperationException<UnsupportedOperationException>
+    func  defineClass()  throws:     ClassFormatError
+      new UnsupportedOperationException<UnsupportedOperationException>
+    func  defineClass()  throws:     ClassFormatError
+      new UnsupportedOperationException<UnsupportedOperationException>
+    func  defineClass()  throws:     ClassFormatError
+      new UnsupportedOperationException<UnsupportedOperationException>
+    func  resolveClass()  throws: 
+    func  findSystemClass()  throws:     ClassNotFoundException
+      return Class.forName(name,false,getSystemClassLoader())
+    func  findBootstrapClassOrNull()  throws: 
+      return null
+    func  findLoadedClass()  throws: 
+      var:loader
+      cond-branch cond:
+      true branch :
+        loader Assign null      false branch :
+        loader Assign this
+      return VMClassLoader.findLoadedClass(loader,name)
+    func  setSigners()  throws: 
+    func  getResource()  throws: 
+      var:url
+      cond-branch cond:
+      true branch :
+        url Assign parent.getResource(name)
+      false branch :
+        url Assign getBootstrapResource(name)
+
+      cond-branch cond:
+      true branch :
+        url Assign findResource(name)
+      false branch :
+
+      return url
+    func  getResources()  throws:     IOException
+      var:tmp=()
+      cond-branch cond:
+      true branch :
+         Assign parent.getResources(name)
+      false branch :
+         Assign getBootstrapResources(name)
+
+       Assign findResources(name)
+      return new CompoundEnumeration
+    func  findResource()  throws: 
+      return null
+    func  findResources()  throws:     IOException
+      return java.util.Collections.emptyEnumeration()
+    func  registerAsParallelCapable()  throws: 
+      return true
+    func  getSystemResource()  throws: 
+      var:system=getSystemClassLoader()
+      cond-branch cond:
+      true branch :
+        return getBootstrapResource(name)
+      false branch :
+
+      return system.getResource(name)
+    func  getSystemResources()  throws:     IOException
+      var:system=getSystemClassLoader()
+      cond-branch cond:
+      true branch :
+        return getBootstrapResources(name)
+      false branch :
+
+      return system.getResources(name)
+    func  getBootstrapResource()  throws: 
+      return null
+    func  getBootstrapResources()  throws:     IOException
+      return null
+    func  getResourceAsStream()  throws: 
+      var:url=getResource(name)
+      return 
+
+
+    func  getSystemResourceAsStream()  throws: 
+      var:url=getSystemResource(name)
+      return 
+
+
+    func  getParent()  throws: 
+      return parent
+    func  getSystemClassLoader()  throws: 
+      return SystemClassLoader.loader
+    func  definePackage()  throws:     IllegalArgumentException
+      packages
+      var:pkg=packages.get(name)
+
+
+    func  getPackage()  throws: 
+      var:pkg
+      packages
+      pkg Assign packages.get(name)
+
+      return pkg
+    func  getPackages()  throws: 
+      var:map
+      packages
+      map Assign new HashMap
+
+      var:pkgs
+      return 
+    func  findLibrary()  throws: 
+      return null
+    func  setDefaultAssertionStatus()  throws: 
+    func  setPackageAssertionStatus()  throws: 
+    func  setClassAssertionStatus()  throws: 
+    func  clearAssertionStatus()  throws: 
+  LocalClasses: 
+    class  SystemClassLoader
+      Fields: 
+        loader=ClassLoader.createSystemClassLoader()
+      Instance Initializer: 
+      Constructors: 
+      Methods: 
+      LocalClasses: 
+      LocalInterfaces: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+class  BootClassLoader
+  Fields: 
+    instance
+  Instance Initializer: 
+  Constructors: 
+    constructor  BootClassLoader()  throws: 
+  Methods: 
+    func  getInstance()  throws: 
+      cond-branch cond:
+      true branch :
+        instance Assign new BootClassLoader<BootClassLoader>
+      false branch :
+
+      return instance
+    func  findClass()  throws:     ClassNotFoundException
+      return Class.classForName(name,false,null)
+    func  findResource()  throws: 
+      return VMClassLoader.getResource(name)
+    func  findResources()  throws:     IOException
+      return Collections.enumeration(VMClassLoader.getResources(resName))
+    func  getPackage()  throws: 
+      cond-branch cond:
+      true branch :
+        this
+        var:pack=
+
+
+      false branch :
+
+      return null
+    func  getResource()  throws: 
+      return findResource(resName)
+    func  loadClass()  throws:     ClassNotFoundException
+      var:clazz=findLoadedClass(className)
+      cond-branch cond:
+      true branch :
+        clazz Assign findClass(className)
+      false branch :
+
+      return clazz
+    func  getResources()  throws:     IOException
+      return findResources(resName)
+  LocalClasses: 
+  LocalInterfaces: 
+
+UserType:ClassNotFoundException has no decl.
+UserType:UnsupportedOperationException has no decl.
+UserType:UnsupportedOperationException has no decl.
+UserType:UnsupportedOperationException has no decl.
+UserType:UnsupportedOperationException has no decl.
+UserType:HashMap has no decl.
