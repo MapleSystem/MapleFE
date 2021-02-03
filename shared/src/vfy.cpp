@@ -131,8 +131,10 @@ void Verifier::VerifyIdentifier(IdentifierNode *inode) {
     // Sometimes inode and decl are the same, which happens for the declaration statement.
     // We will verify decl statement as the others, so its inode is the same as decl.
     if (inode != decl) {
-      mTempParent->ReplaceChild(inode, decl);
-      //std::cout << "Replace " << inode << " with " << decl << std::endl;
+      // TODO : There are many complicated cases which we will handle in the furture.
+      //        Right now I just put a simple check of mTempParent.
+      if (mTempParent)
+        mTempParent->ReplaceChild(inode, decl);
     }
   }
 }

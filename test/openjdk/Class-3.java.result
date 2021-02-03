@@ -1,0 +1,22 @@
+Matched 46 tokens.
+============= Module ===========
+== Sub Tree ==
+class  Class
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+    func  getDeclaredMethods()  throws: 
+      var:result=getDeclaredMethodsUnchecked(false)
+      Method
+      m
+      result
+      m.getParameterTypes()
+
+      return result
+  LocalClasses: 
+  LocalInterfaces: 
+
+Identifier:Method has no decl.
+Identifier:m has no decl.

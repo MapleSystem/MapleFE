@@ -86,6 +86,7 @@ rule MethodHeader      : ONEOF(Result + MethodDeclarator + ZEROORONE(Throws),
                                ZEROORONE(Throws))
   attr.action.%1: AddTypeTo(%2, %1)
   attr.action.%1: AddThrowsTo(%2, %3)
+  attr.action.%2: AddTypeTo(%4, %3)
   attr.action.%2: AddThrowsTo(%4, %5)
   attr.property : Single
 
