@@ -60,7 +60,7 @@ maple::BaseNode *A2M::ProcessIdentifier(StmtExprKind skind, TreeNode *tnode, Blo
   }
 
   GStrIdx stridx = GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(name);
-  MIRFunction *func = mBlockFuncMap[block];
+  MIRFunction *func = GetFunc(block);
 
   // check parameters
   for (auto it: func->formalDefVec) {
