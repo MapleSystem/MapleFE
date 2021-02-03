@@ -33,7 +33,7 @@ class  Character
       Instance Initializer: 
       Constructors: 
         constructor  Subset()  throws: 
-          cond-branch cond:
+          cond-branch cond:name EQ null
           true branch :
             new NullPointerException<NullPointerException>
           false branch :
@@ -41,7 +41,7 @@ class  Character
           this.name Assign name
       Methods: 
         func  equals()  throws: 
-          return ()
+          return (this EQ obj)
         func  hashCode()  throws: 
           return hashCode
         func  toString()  throws: 

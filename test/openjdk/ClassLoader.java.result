@@ -133,10 +133,10 @@ class  ClassLoader
       return loadClass(name,false)
     func  loadClass()  throws:     ClassNotFoundException
       var:c=findLoadedClass(name)
-      cond-branch cond:
+      cond-branch cond:c EQ null
       true branch :
 
-        cond-branch cond:
+        cond-branch cond:c EQ null
         true branch :
           c Assign findClass(name)
         false branch :
@@ -161,7 +161,7 @@ class  ClassLoader
       return null
     func  findLoadedClass()  throws: 
       var:loader
-      cond-branch cond:
+      cond-branch cond:this EQ BootClassLoader.getInstance()
       true branch :
         loader Assign null      false branch :
         loader Assign this
@@ -169,13 +169,13 @@ class  ClassLoader
     func  setSigners()  throws: 
     func  getResource()  throws: 
       var:url
-      cond-branch cond:
+      cond-branch cond:parent NE null
       true branch :
         url Assign parent.getResource(name)
       false branch :
         url Assign getBootstrapResource(name)
 
-      cond-branch cond:
+      cond-branch cond:url EQ null
       true branch :
         url Assign findResource(name)
       false branch :
@@ -183,7 +183,7 @@ class  ClassLoader
       return url
     func  getResources()  throws:     IOException
       var:tmp=()
-      cond-branch cond:
+      cond-branch cond:parent NE null
       true branch :
          Assign parent.getResources(name)
       false branch :
@@ -199,7 +199,7 @@ class  ClassLoader
       return true
     func  getSystemResource()  throws: 
       var:system=getSystemClassLoader()
-      cond-branch cond:
+      cond-branch cond:system EQ null
       true branch :
         return getBootstrapResource(name)
       false branch :
@@ -207,7 +207,7 @@ class  ClassLoader
       return system.getResource(name)
     func  getSystemResources()  throws:     IOException
       var:system=getSystemClassLoader()
-      cond-branch cond:
+      cond-branch cond:system EQ null
       true branch :
         return getBootstrapResources(name)
       false branch :
@@ -275,7 +275,7 @@ class  BootClassLoader
     constructor  BootClassLoader()  throws: 
   Methods: 
     func  getInstance()  throws: 
-      cond-branch cond:
+      cond-branch cond:instance EQ null
       true branch :
         instance Assign new BootClassLoader<BootClassLoader>
       false branch :
@@ -288,7 +288,7 @@ class  BootClassLoader
     func  findResources()  throws:     IOException
       return Collections.enumeration(VMClassLoader.getResources(resName))
     func  getPackage()  throws: 
-      cond-branch cond:
+      cond-branch cond:name NE null Land name.isEmpty()
       true branch :
         this
         var:pack=
@@ -301,7 +301,7 @@ class  BootClassLoader
       return findResource(resName)
     func  loadClass()  throws:     ClassNotFoundException
       var:clazz=findLoadedClass(className)
-      cond-branch cond:
+      cond-branch cond:clazz EQ null
       true branch :
         clazz Assign findClass(className)
       false branch :

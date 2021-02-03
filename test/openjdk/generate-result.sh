@@ -17,5 +17,5 @@ FILES=$(pwd)/*.java
 for f in $FILES
 do
   echo "Generating result for $f ..."
-  $BUILDDIR/java/java2mpl $f > $f.result
+  ../../output/java/java2mpl $f > $f.result
 done

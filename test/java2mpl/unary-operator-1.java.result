@@ -1,4 +1,4 @@
-Matched 42 tokens.
+Matched 21 tokens.
 ============= Module ===========
 == Sub Tree ==
 class  A
@@ -8,10 +8,9 @@ class  A
   Constructors: 
   Methods: 
     func  foo()  throws: 
-      var:k
-      cond-branch cond:v GT 0 Land (k Assign System.in.read()) GE 0
+      cond-branch cond:x NE 0
       true branch :
-        System.out.println(k)      false branch :
+        return 0      false branch :
 
   LocalClasses: 
   LocalInterfaces: 

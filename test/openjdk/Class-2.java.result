@@ -1,5 +1,4 @@
 Matched 3040 tokens.
-Convert unary --> binary
 ============= Module ===========
 == Sub Tree ==
 class  Class
@@ -30,7 +29,7 @@ class  Class
         return ""
       false branch :
 
-      cond-branch cond:
+      cond-branch cond:isMemberClass() Lor isLocalClass()
       true branch :
         return getInnerClassName()
       false branch :
@@ -57,7 +56,7 @@ class  Class
       cond-branch cond:isArray()
       true branch :
         var:canonicalName=
-        cond-branch cond:
+        cond-branch cond:canonicalName NE null
         true branch :
           return canonicalName Add "[]"        false branch :
           return null
@@ -68,7 +67,7 @@ class  Class
         return null      false branch :
 
       var:enclosingClass=getEnclosingClass()
-      cond-branch cond:
+      cond-branch cond:enclosingClass EQ null
       true branch :
         return getName()
       false branch :
@@ -77,11 +76,11 @@ class  Class
 
     func  isAnonymousClass()  throws: 
     func  isLocalClass()  throws: 
-      return ()isAnonymousClass()
+      return (getEnclosingMethod() NE null Lor getEnclosingConstructor() NE null) Land isAnonymousClass()
     func  isMemberClass()  throws: 
-      return 
+      return getDeclaringClass() NE null
     func  isLocalOrAnonymousClass()  throws: 
-      return 
+      return isLocalClass() Lor isAnonymousClass()
     func  getClasses()  throws: 
       var:result=new ArrayList<Class>
       for ( )
@@ -105,7 +104,7 @@ class  Class
         Collections.addAll(result,c.getPublicDeclaredFields())
 
       var:iftable=ifTable
-      cond-branch cond:
+      cond-branch cond:iftable NE null
       true branch :
         for ( )
           Collections.addAll(result,((Class))getPublicDeclaredFields)
@@ -127,7 +126,7 @@ class  Class
       false branch :
 
       var:iftable=ifTable
-      cond-branch cond:
+      cond-branch cond:iftable NE null
       true branch :
         for ( )
           var:ifc=(Class)
@@ -138,13 +137,13 @@ class  Class
     func  getConstructors()  throws:     SecurityException
       return getDeclaredConstructorsInternal(true)
     func  getField()  throws:     NoSuchFieldException
-      cond-branch cond:
+      cond-branch cond:name EQ null
       true branch :
         new NullPointerException<NullPointerException>
       false branch :
 
       var:result=getPublicFieldRecursive(name)
-      cond-branch cond:
+      cond-branch cond:result EQ null
       true branch :
         new NoSuchFieldException<NoSuchFieldException>
       false branch :
@@ -176,19 +175,19 @@ class  Class
     func  getDeclaredMethod()  throws:     NoSuchMethodException    SecurityException
       return getMethod(name,parameterTypes,false)
     func  getMethod()  throws:     NoSuchMethodException
-      cond-branch cond:
+      cond-branch cond:name EQ null
       true branch :
         new NullPointerException<NullPointerException>
       false branch :
 
-      cond-branch cond:
+      cond-branch cond:parameterTypes EQ null
       true branch :
         parameterTypes Assign EmptyArray.CLASS
       false branch :
 
 
       var:result=
-      cond-branch cond:
+      cond-branch cond:result EQ null Lor (recursivePublicMethods Land Modifier.isPublic(result.getAccessFlags()))
       true branch :
         new NoSuchMethodException<NoSuchMethodException>
       false branch :
@@ -197,7 +196,7 @@ class  Class
     func  getPublicMethodRecursive()  throws: 
       for ( )
         var:result=c.getDeclaredMethodInternal(name,parameterTypes)
-        cond-branch cond:
+        cond-branch cond:result NE null Land Modifier.isPublic(result.getAccessFlags())
         true branch :
           return result
         false branch :
@@ -207,7 +206,7 @@ class  Class
     func  getInstanceMethod()  throws:     NoSuchMethodException    IllegalAccessException
       for ( )
         var:result=c.getDeclaredMethodInternal(name,parameterTypes)
-        cond-branch cond:
+        cond-branch cond:result NE null Land Modifier.isStatic(result.getModifiers())
         true branch :
           return result
         false branch :
@@ -216,7 +215,7 @@ class  Class
       return findInterfaceMethod(name,parameterTypes)
     func  findInterfaceMethod()  throws: 
       var:iftable=ifTable
-      cond-branch cond:
+      cond-branch cond:iftable NE null
       true branch :
         for ( )
           var:ifc=(Class)
@@ -230,7 +229,7 @@ class  Class
     func  getResourceAsStream()  throws: 
       name Assign resolveName(name)
       var:cl=getClassLoader()
-      cond-branch cond:
+      cond-branch cond:cl EQ null
       true branch :
         return ClassLoader.getSystemResourceAsStream(name)
       false branch :
@@ -239,7 +238,7 @@ class  Class
     func  getResource()  throws: 
       name Assign resolveName(name)
       var:cl=getClassLoader()
-      cond-branch cond:
+      cond-branch cond:cl EQ null
       true branch :
         return ClassLoader.getSystemResource(name)
       false branch :
@@ -248,7 +247,7 @@ class  Class
     func  getProtectionDomain()  throws: 
       return null
     func  resolveName()  throws: 
-      cond-branch cond:
+      cond-branch cond:name EQ null
       true branch :
         return name
       false branch :
@@ -262,7 +261,7 @@ class  Class
 
       return name
     func  getConstructor0()  throws:     NoSuchMethodException
-      cond-branch cond:
+      cond-branch cond:parameterTypes EQ null
       true branch :
         parameterTypes Assign EmptyArray.CLASS
       false branch :
@@ -270,14 +269,14 @@ class  Class
       Class
       c
       parameterTypes
-      cond-branch cond:
+      cond-branch cond:c EQ null
       true branch :
         new NoSuchMethodException<NoSuchMethodException>
       false branch :
 
 
       var:result=getDeclaredConstructorInternal(parameterTypes)
-      cond-branch cond:
+      cond-branch cond:result EQ null Lor which EQ Member.PUBLIC Land Modifier.isPublic(result.getAccessFlags())
       true branch :
         new NoSuchMethodException<NoSuchMethodException>
       false branch :
@@ -289,7 +288,7 @@ class  Class
     func  getInnerClassName()  throws: 
     func  getInnerClassFlags()  throws: 
     func  isEnum()  throws: 
-      return 
+      return ( Band ENUM) NE 0 Land  EQ java.lang.Enum
     func  getEnumConstants()  throws: 
       var:values=getEnumConstantsShared()
       return 
@@ -300,7 +299,7 @@ class  Class
 
       return (T[])Enum.getSharedConstants((Class)this)
     func  cast()  throws: 
-      cond-branch cond:
+      cond-branch cond:obj NE null Land isInstance(obj)
       true branch :
         new ClassCastException<ClassCastException>      false branch :
 
@@ -315,7 +314,7 @@ class  Class
     func  getAnnotation()  throws: 
       Objects.requireNonNull(annotationClass)
       var:annotation=getDeclaredAnnotation(annotationClass)
-      cond-branch cond:
+      cond-branch cond:annotation NE null
       true branch :
         return annotation
       false branch :
@@ -324,7 +323,7 @@ class  Class
       true branch :
         for ( )
           annotation Assign sup.getDeclaredAnnotation(annotationClass)
-          cond-branch cond:
+          cond-branch cond:annotation NE null
           true branch :
             return annotation
           false branch :
@@ -334,7 +333,7 @@ class  Class
 
       return null
     func  isAnnotationPresent()  throws: 
-      cond-branch cond:
+      cond-branch cond:annotationClass EQ null
       true branch :
         new NullPointerException<NullPointerException>
       false branch :
@@ -358,7 +357,7 @@ class  Class
       return false
     func  getAnnotationsByType()  throws: 
       var:annotations=
-      cond-branch cond:
+      cond-branch cond:annotations.length NE 0
       true branch :
         return annotations
       false branch :
@@ -366,7 +365,7 @@ class  Class
       cond-branch cond:annotationClass.isDeclaredAnnotationPresent(Inherited)
       true branch :
         var:superClass=getSuperclass()
-        cond-branch cond:
+        cond-branch cond:superClass NE null
         true branch :
           return superClass.getAnnotationsByType(annotationClass)
         false branch :
@@ -386,7 +385,7 @@ class  Class
         declaredAnnotation
         sup.getDeclaredAnnotations()
         var:clazz=declaredAnnotation.annotationType()
-        cond-branch cond:
+        cond-branch cond:map.containsKey(clazz) Land clazz.isDeclaredAnnotationPresent(Inherited)
         true branch :
           map.put(clazz,declaredAnnotation)
         false branch :
@@ -400,7 +399,7 @@ class  Class
     func  isDeclaredAnnotationPresent()  throws: 
     func  getSignatureAttribute()  throws: 
       var:annotation=getSignatureAnnotation()
-      cond-branch cond:
+      cond-branch cond:annotation EQ null
       true branch :
         return null
       false branch :
@@ -410,7 +409,7 @@ class  Class
       return result.toString()
     func  getSignatureAnnotation()  throws: 
     func  isProxy()  throws: 
-      return ()0
+      return (accessFlags Band 262144) NE 0
     func  getAccessFlags()  throws: 
       return accessFlags
     func  getDeclaredMethodInternal()  throws: 

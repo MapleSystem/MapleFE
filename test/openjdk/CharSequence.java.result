@@ -57,7 +57,7 @@ interface  CharSequence
         LocalClasses: 
         LocalInterfaces: 
 
-      return StreamSupport.intStream(() -> Spliterators.spliterator(new CharIterator<CharIterator>,length(),Spliterator.ORDERED),Spliterator.SUBSIZED,Spliterator.SIZED,Spliterator.ORDERED,false)
+      return StreamSupport.intStream(() -> Spliterators.spliterator(new CharIterator<CharIterator>,length(),Spliterator.ORDERED),Spliterator.SUBSIZED Bor Spliterator.SIZED Bor Spliterator.ORDERED,false)
     func  codePoints()  throws: 
       class  CodePointIterator
         Fields: 
@@ -80,7 +80,7 @@ interface  CharSequence
 
             var:c1=charAt(  curInc
 )
-            cond-branch cond:
+            cond-branch cond:Character.isHighSurrogate(c1) Land cur LT length
             true branch :
               var:c2=charAt(cur)
               cond-branch cond:Character.isLowSurrogate(c2)

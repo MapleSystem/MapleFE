@@ -15,7 +15,7 @@ class  Boolean
     constructor  Boolean()  throws: 
   Methods: 
     func  parseBoolean()  throws: 
-      return (()s.equalsIgnoreCase("true"))
+      return ((s NE null) Land s.equalsIgnoreCase("true"))
     func  booleanValue()  throws: 
       return value
     func  valueOf()  throws: 
@@ -33,7 +33,7 @@ class  Boolean
     func  equals()  throws: 
       cond-branch cond:
       true branch :
-        return 
+        return value EQ ((Boolean)obj)booleanValue
       false branch :
 
       return false
@@ -48,11 +48,11 @@ class  Boolean
     func  compare()  throws: 
       return 
     func  logicalAnd()  throws: 
-      return 
+      return a Land b
     func  logicalOr()  throws: 
-      return 
+      return a Lor b
     func  logicalXor()  throws: 
-      return 
+      return a Bxor b
   LocalClasses: 
   LocalInterfaces: 
 

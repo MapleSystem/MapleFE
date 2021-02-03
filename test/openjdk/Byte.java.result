@@ -23,7 +23,7 @@ class  Byte
       return 
     func  parseByte()  throws:     NumberFormatException
       var:i=Integer.parseInt(s,radix)
-      cond-branch cond:
+      cond-branch cond:i LT MIN_VALUE Lor i GT MAX_VALUE
       true branch :
         new NumberFormatException<NumberFormatException>      false branch :
 
@@ -36,7 +36,7 @@ class  Byte
       return valueOf(s,10)
     func  decode()  throws:     NumberFormatException
       var:i=Integer.decode(nm)
-      cond-branch cond:
+      cond-branch cond:i LT MIN_VALUE Lor i GT MAX_VALUE
       true branch :
         new NumberFormatException<NumberFormatException>      false branch :
 
@@ -62,7 +62,7 @@ class  Byte
     func  equals()  throws: 
       cond-branch cond:
       true branch :
-        return 
+        return value EQ ((Byte)obj)byteValue
       false branch :
 
       return false
@@ -71,9 +71,9 @@ class  Byte
     func  compare()  throws: 
       return x Sub y
     func  toUnsignedInt()  throws: 
-      return ((int)x)255
+      return ((int)x) Band 255
     func  toUnsignedLong()  throws: 
-      return ((long)x)4095
+      return ((long)x) Band 4095
     func  toHexString()  throws: 
       var:digits=
       var:buf=

@@ -196,26 +196,32 @@ rule EqualityExpression : ONEOF(
   RelationalExpression,
   EqualityExpression + "==" + RelationalExpression,
   EqualityExpression + "!=" + RelationalExpression)
+  attr.action.%2,%3 : BuildBinaryOperation(%1, %2, %3)
 
 rule AndExpression : ONEOF(
   EqualityExpression,
   AndExpression + '&' + EqualityExpression)
+  attr.action.%2 : BuildBinaryOperation(%1, %2, %3)
 
 rule ExclusiveOrExpression : ONEOF(
   AndExpression,
   ExclusiveOrExpression + '^' + AndExpression)
+  attr.action.%2 : BuildBinaryOperation(%1, %2, %3)
 
 rule InclusiveOrExpression : ONEOF(
   ExclusiveOrExpression,
   InclusiveOrExpression + '|' + ExclusiveOrExpression)
+  attr.action.%2 : BuildBinaryOperation(%1, %2, %3)
 
 rule ConditionalAndExpression : ONEOF(
   InclusiveOrExpression,
   ConditionalAndExpression + "&&" + InclusiveOrExpression)
+  attr.action.%2 : BuildBinaryOperation(%1, %2, %3)
 
 rule ConditionalOrExpression : ONEOF(
   ConditionalAndExpression,
   ConditionalOrExpression + "||" + ConditionalAndExpression)
+  attr.action.%2 : BuildBinaryOperation(%1, %2, %3)
 
 rule ConditionalExpression : ONEOF(
   ConditionalOrExpression,
