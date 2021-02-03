@@ -125,12 +125,6 @@ maple::Opcode A2M::MapBinOpcode(OprId ast_op) {
     case OPR_Mul: op = OP_mul; break;
     case OPR_Div: op = OP_div; break;
     case OPR_Mod: op = OP_rem; break;
-    case OPR_EQ: op = OP_eq; break;
-    case OPR_NE: op = OP_ne; break;
-    case OPR_GT: op = OP_gt; break;
-    case OPR_LT: op = OP_lt; break;
-    case OPR_GE: op = OP_ge; break;
-    case OPR_LE: op = OP_le; break;
     case OPR_Band: op = OP_band; break;
     case OPR_Bor: op = OP_bior; break;
     case OPR_Bxor: op = OP_bxor; break;
@@ -144,7 +138,21 @@ maple::Opcode A2M::MapBinOpcode(OprId ast_op) {
   return op;
 }
 
-maple::Opcode A2M::MapComboBinOpcode(OprId ast_op) {
+maple::Opcode A2M::MapBinCmpOpcode(OprId ast_op) {
+  maple::Opcode op = maple::kOpUndef;
+  switch (ast_op) {
+    case OPR_EQ: op = OP_eq; break;
+    case OPR_NE: op = OP_ne; break;
+    case OPR_GT: op = OP_gt; break;
+    case OPR_LT: op = OP_lt; break;
+    case OPR_GE: op = OP_ge; break;
+    case OPR_LE: op = OP_le; break;
+    default: break;
+  }
+  return op;
+}
+
+maple::Opcode A2M::MapBinComboOpcode(OprId ast_op) {
   maple::Opcode op = maple::kOpUndef;
   switch (ast_op) {
     case OPR_AddAssign: op = OP_add; break;

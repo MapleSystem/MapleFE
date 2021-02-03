@@ -198,7 +198,6 @@ maple::BaseNode *A2M::ProcessExprList(StmtExprKind skind, TreeNode *tnode, Block
 }
 
 maple::BaseNode *A2M::ProcessLiteral(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
-  NOTYETIMPL("ProcessLiteral()");
   LiteralNode *node = static_cast<LiteralNode *>(tnode);
   LitData data = node->GetData();
   maple::BaseNode *bn = nullptr;
@@ -263,7 +262,13 @@ maple::BaseNode *A2M::ProcessBinOperator(StmtExprKind skind, TreeNode *tnode, Bl
 
   op = MapBinOpcode(ast_op);
   if (op != kOpUndef) {
-    mpl_node = ProcessBinOperatorMpl(SK_Expr, op, lhs, rhs, block);
+    mpl_node = new BinaryNode(op, lhs->GetPrimType(), lhs, rhs);
+    return mpl_node;
+  }
+
+  op = MapBinCmpOpcode(ast_op);
+  if (op != kOpUndef) {
+    mpl_node = new CompareNode(op, PTY_u1, lhs->GetPrimType(), lhs, rhs);
     return mpl_node;
   }
 
@@ -272,7 +277,7 @@ maple::BaseNode *A2M::ProcessBinOperator(StmtExprKind skind, TreeNode *tnode, Bl
     return mpl_node;
   }
 
-  op = MapComboBinOpcode(ast_op);
+  op = MapBinComboOpcode(ast_op);
   if (op != kOpUndef) {
     mpl_node = ProcessBinOperatorMplComboAssign(SK_Stmt, op, lhs, rhs, block);
     return mpl_node;
@@ -633,15 +638,6 @@ maple::BaseNode *A2M::ProcessUnaOperatorMpl(StmtExprKind skind,
   return node;
 }
 
-maple::BaseNode *A2M::ProcessBinOperatorMpl(StmtExprKind skind,
-                                       maple::Opcode op,
-                                       maple::BaseNode *lhs,
-                                       maple::BaseNode *rhs,
-                                       BlockNode *block) {
-  maple::BaseNode *val = new BinaryNode(op, lhs->GetPrimType(), lhs, rhs);
-  return val;
-}
-
 maple::BaseNode *A2M::ProcessBinOperatorMplAssign(StmtExprKind skind,
                                              maple::BaseNode *lhs,
                                              maple::BaseNode *rhs,
@@ -676,8 +672,8 @@ maple::BaseNode *A2M::ProcessBinOperatorMplComboAssign(StmtExprKind skind,
                                                   maple::BaseNode *lhs,
                                                   maple::BaseNode *rhs,
                                                   BlockNode *block) {
-  maple::BaseNode *comb = ProcessBinOperatorMpl(SK_Expr, op, lhs, rhs, block);
-  maple::BaseNode *assign = ProcessBinOperatorMplAssign(SK_Stmt, lhs, comb, block);
+  maple::BaseNode *result = new BinaryNode(op, lhs->GetPrimType(), lhs, rhs);
+  maple::BaseNode *assign = ProcessBinOperatorMplAssign(SK_Stmt, lhs, result, block);
   return assign;
 }
 

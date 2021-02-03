@@ -77,7 +77,8 @@ public:
 
   maple::Opcode MapUnaOpcode(OprId);
   maple::Opcode MapBinOpcode(OprId);
-  maple::Opcode MapComboBinOpcode(OprId);
+  maple::Opcode MapBinCmpOpcode(OprId);
+  maple::Opcode MapBinComboOpcode(OprId);
 
   void ProcessAST(bool trace_a2m);
   maple::BaseNode *ProcessNode(StmtExprKind, TreeNode *tnode, BlockNode *);
@@ -90,11 +91,6 @@ public:
   maple::BaseNode *ProcessUnaOperatorMpl(StmtExprKind skind,
                                          maple::Opcode op,
                                          maple::BaseNode *bn,
-                                         BlockNode *block);
-  maple::BaseNode *ProcessBinOperatorMpl(StmtExprKind skind,
-                                         maple::Opcode op,
-                                         maple::BaseNode *lhs,
-                                         maple::BaseNode *rhs,
                                          BlockNode *block);
   maple::BaseNode *ProcessBinOperatorMplAssign(StmtExprKind skind,
                                                maple::BaseNode *lhs,
