@@ -273,7 +273,7 @@ bool Parser::WasFailed(RuleTable *table, unsigned token) {
   return false;
 }
 
-// Lex all tokens in a line, save to mTokens.
+// Lex all tokens in a line, save to mActiveTokens.
 // If no valuable in current line, we continue to the next line.
 // Returns the number of valuable tokens read. Returns 0 if EOF.
 unsigned Parser::LexOneLine() {
@@ -402,7 +402,6 @@ bool Parser::ParseStmt() {
   // clear status
   ClearFailed();
   ClearSucc();
-  mTokens.clear();
   mStartingTokens.clear();
   ClearAppealNodes();
   mPending = 0;
@@ -977,6 +976,8 @@ bool Parser::TraverseToken(Token *token, AppealNode *parent, AppealNode *&child_
   if (mTraceTable) {
     std::string name = "token:";
     name += token->GetName();
+    name += " curr_token:";
+    name += curr_token->GetName();
     DumpEnterTable(name.c_str(), mIndentation);
   }
 

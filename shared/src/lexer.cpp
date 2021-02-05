@@ -286,6 +286,8 @@ LitData Lexer::GetLiteral() {
     unsigned len = GetCuridx() - old_pos;
     MASSERT(len > 0 && "found token has 0 data?");
     std::string s(GetLine() + old_pos, len);
+    if (mTrace)
+      std::cout << "text:" << s << std::endl;
     const char *addr = gStringPool.FindString(s);
     // We just support integer token right now. Value is put in LitData.mData.mStr
     ld = ProcessLiteral(mLastLiteralId, addr);
@@ -647,6 +649,7 @@ bool Lexer::TraverseSecondTry(const RuleTable *rule_table) {
 }
 
 bool Lexer::Traverse(const RuleTable *rule_table) {
+
   // CHAR, DIGIT are reserved rules. It should NOT be changed. We can
   // expediate the lexing.
   if (rule_table == &TblCHAR) {
@@ -684,6 +687,8 @@ bool Lexer::Traverse(const RuleTable *rule_table) {
     unsigned new_pos = curidx;
     for (unsigned i = 0; i < rule_table->mNum; i++) {
       TableData *data = rule_table->mData + i;
+      // Need restore curidx for the next try.
+      curidx = old_pos;
       bool temp_found = TraverseTableData(data);
       if (temp_found) {
         found = true;
@@ -706,10 +711,9 @@ bool Lexer::Traverse(const RuleTable *rule_table) {
               mLastLiteralId = LT_NullLiteral;
           }
         }
-        // Need restore curidx for the next try.
-        curidx = old_pos;
       }
     }
+
     curidx = new_pos;
     matched = found; 
     break;
@@ -721,13 +725,9 @@ bool Lexer::Traverse(const RuleTable *rule_table) {
     matched = true;
     while(1) {
       bool found = false;
-      for (unsigned i = 0; i < rule_table->mNum; i++) {
-        TableData *data = rule_table->mData + i;
-        found = found | TraverseTableData(data);
-        // The first element is hit, then we restart the loop.
-        if (found)
-          break;
-      }
+      MASSERT(rule_table->mNum == 1);
+      TableData *data = rule_table->mData;
+      found = TraverseTableData(data);
       if (!found)
         break;
     }
@@ -738,17 +738,12 @@ bool Lexer::Traverse(const RuleTable *rule_table) {
   case ET_Zeroorone: {
     matched = true;
     bool found = false;
-    for (unsigned i = 0; i < rule_table->mNum; i++) {
-      TableData *data = rule_table->mData + i;
-      found = TraverseTableData(data);
-      // The first element is hit, then stop.
-      if (found)
-        break;
-    }
+    MASSERT(rule_table->mNum == 1);
+    TableData *data = rule_table->mData;
+    found = TraverseTableData(data);
     break;
   }
 
-  // Lexer needs to find all elements, and in EXACTLY THE ORDER as defined.
   case ET_Concatenate: {
     bool found = false;
     for (unsigned i = 0; i < rule_table->mNum; i++) {

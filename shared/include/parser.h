@@ -252,8 +252,6 @@ public:
   void DumpSortOutNode(AppealNode*);
 
 private:
-  std::vector<Token*>   mTokens;         // Storage of all tokens, including active, discarded,
-                                         // and pending.
   std::vector<Token*>   mActiveTokens;   // vector for tokens during matching.
   std::vector<unsigned> mStartingTokens; // The starting token of each self-complete statement.
                                          // It's an index of mActiveTokens.
