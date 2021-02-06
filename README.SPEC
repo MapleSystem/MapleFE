@@ -184,6 +184,20 @@ _____________________
                        declaration are all top rules. If you forget to add this property,
                        parser won't handle the code of this rule.
 
+                       [Longest]
+                       This is mostly applied to Concatenate rule, where we match the longest
+                       possible input. This happens mostly in Lexer rules where we need
+                       find a literal. Most rules have a separator to define the border of
+                       a token, for example, char literal has ' to include it. string literal
+                       has " to include. However, for hex literal, 0x1001, it could be
+                       treated as 0x10 and 01, if there is no separator to include.
+                       But in reality, most the language spec doesn't define the separator
+                       for such a literal. All languages assume literals should be matched
+                       to the longest possible.
+                       The make the lexer work well, we request to put [Longest] property
+                       if the rule does expect the longest match. Please see examples
+                       in literal.spec of Java.
+
  4. attr.validity[.%n] tells the semantic limitation of each component, with optional
                        specific element number.  The corresponding functions will be
                        called by language parser.

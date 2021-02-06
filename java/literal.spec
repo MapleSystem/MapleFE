@@ -29,6 +29,7 @@ rule Digit          : ONEOF('0', NonZeroDigit)
 rule DigitOrUnderscore : ONEOF(Digit, '_')
 rule DigitsAndUnderscores : DigitOrUnderscore + ZEROORMORE(DigitOrUnderscore)
 rule Digits         : ONEOF(Digit, Digit + ZEROORONE(DigitsAndUnderscores) + Digit)
+  attr.property.%2 : Longest
 
 rule DecimalNumeral : ONEOF('0', NonZeroDigit + ZEROORONE(Digits),
                             NonZeroDigit + Underscores + Digits)
@@ -42,6 +43,7 @@ rule HexDigitOrUnderscore : ONEOF(HexDigit, '_')
 rule HexDigitsAndUnderscores:HexDigitOrUnderscore + ZEROORMORE(HexDigitOrUnderscore)
 rule HexDigits  : ONEOF(HexDigit,
                         HexDigit + ZEROORONE(HexDigitsAndUnderscores) + HexDigit)
+  attr.property.%2 : Longest
 rule HexNumeral : ONEOF("0x" + HexDigits, "0X" + HexDigits)
 
 ### Octal rules
@@ -51,6 +53,7 @@ rule OctalDigitOrUnderscore : ONEOF(OctalDigit, '_')
 rule OctalDigitsAndUnderscores:OctalDigitOrUnderscore + ZEROORMORE(OctalDigitOrUnderscore)
 rule OctalDigits  : ONEOF(OctalDigit,
                     OctalDigit + ZEROORONE(OctalDigitsAndUnderscores) + OctalDigit)
+  attr.property.%2 : Longest
 rule OctalNumeral : ONEOF('0' + OctalDigits, '0' + Underscores + OctalDigits)
 
 ### Binary rules
@@ -60,6 +63,7 @@ rule BinDigitOrUnderscore : ONEOF(BinDigit, '_')
 rule BinDigitsAndUnderscores:BinDigitOrUnderscore + ZEROORMORE(BinDigitOrUnderscore)
 rule BinDigits  : ONEOF(BinDigit,
                         BinDigit + ZEROORONE(BinDigitsAndUnderscores) + BinDigit)
+  attr.property.%2 : Longest
 rule BinNumeral : ONEOF("0b" + BinDigits, "0B" + BinDigits)
 
 ##########

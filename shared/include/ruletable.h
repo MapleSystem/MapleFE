@@ -89,9 +89,10 @@ struct Action {
 
 enum RuleProp {
   RP_NA = 0,
-  RP_Single = 1, // For a ONEOF rule, there is one and only one children valid.
-  RP_ZomFast= 2, // For a Zeroormore rule, it can be a fast parsing.
-  RP_Top    = 4  // A top rule
+  RP_Single  = 1, // For a ONEOF rule, there is one and only one children valid.
+  RP_ZomFast = 2, // For a Zeroormore rule, it can be a fast parsing.
+  RP_Top     = 4, // A top rule
+  RP_Longest = 8, // A usually lexer rule wanting just the longest possible match.
 };
 
 // A rule has a limited set of beginning tokens. These are called LookAhead.
