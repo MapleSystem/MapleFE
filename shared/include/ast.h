@@ -455,17 +455,13 @@ public:
 
 class FieldNode : public TreeNode {
 private:
-  TreeNode *mParent;      // A parent could be another field.
   IdentifierNode *mField;
   const char     *mName;  // Name, initialized by Init().
 public:
-  FieldNode() : mParent(NULL), mField(NULL), mName(NULL) {mKind = NK_Field;}
+  FieldNode() : TreeNode(), mField(NULL), mName(NULL) {mKind = NK_Field;}
   ~FieldNode(){}
 
   void Init();
-
-  TreeNode* GetParent() {return mParent;}
-  void SetParent(TreeNode *t) {mParent = t;}
 
   IdentifierNode* GetField() {return mField;}
   void SetField(IdentifierNode *f) {mField = f;}
@@ -802,7 +798,7 @@ public:
 
   unsigned  GetChildrenNum()            {return mChildren.GetNum();}
   TreeNode* GetChildAtIndex(unsigned i) {return mChildren.ValueAtIndex(i);}
-  void      AddChild(TreeNode *c)       {mChildren.PushBack(c);}
+  void      AddChild(TreeNode *c)       {mChildren.PushBack(c); c->SetParent(this);}
   void      ClearChildren()             {mChildren.Clear();}
 
   void Release() {mChildren.Release();}
@@ -838,14 +834,14 @@ public:
   void CleanUp();
 
   BlockNode* GetBody() {return mBody;}
-  void AddBody(BlockNode *b) {mBody = b; CleanUp();}
+  void AddBody(BlockNode *b) {mBody = b; mBody->SetParent(this); CleanUp();}
 
   bool IsConstructor()    {return mIsConstructor;}
   void SetIsConstructor() {mIsConstructor = true;}
 
   unsigned  GetParamsNum()        {return mParams.GetNum();}
   TreeNode* GetParam(unsigned i)  {return mParams.ValueAtIndex(i);}
-  void      AddParam(TreeNode *t) {mParams.PushBack(t);}
+  void      AddParam(TreeNode *t) {mParams.PushBack(t); t->SetParent(this);}
   
   // Attributes related
   unsigned GetAttrsNum()           {return mAttrs.GetNum();}
@@ -966,7 +962,7 @@ public:
   void AddSuperClass(ClassNode *n)         {mSuperClasses.PushBack(n);}
   void AddSuperInterface(InterfaceNode *n) {mSuperInterfaces.PushBack(n);}
   void AddAttr(AttrId a) {mAttributes.PushBack(a);}
-  void AddBody(BlockNode *b) {mBody = b;}
+  void AddBody(BlockNode *b) {mBody = b; mBody->SetParent(this);}
 
   unsigned GetFieldsNum()      {return mFields.GetNum();}
   unsigned GetMethodsNum()     {return mMethods.GetNum();}
@@ -1007,7 +1003,7 @@ public:
   TreeNode* GetChild(unsigned idx) {return mChildren.ValueAtIndex(idx);}
   void SetChild(unsigned idx, TreeNode *t) {*(mChildren.RefAtIndex(idx)) = t;}
 
-  void AddChild(TreeNode *c) {mChildren.PushBack(c);}
+  void AddChild(TreeNode *c) {mChildren.PushBack(c); c->SetParent(this);}
   void Release() {mChildren.Release();}
 };
 
