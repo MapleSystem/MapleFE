@@ -557,7 +557,7 @@ bool Lexer::TraverseSecondTry(const RuleTable *rule_table) {
   i = 0;
   bool found = false;
 
-  // step 2. Let the parts before the ending to finish.
+  // step 2. Let the parts before the two last sub-table to finish.
   //         If those fail, we don't need go on.
   for (; i < rule_table->mNum - 2; i++) {
     TableData *data = rule_table->mData + i;
@@ -608,8 +608,9 @@ bool Lexer::TraverseSecondTry(const RuleTable *rule_table) {
     //          Have to build a line for the lexer.
     unsigned len = w_yyy_start - w_zeroxxx_start;
     if (len) {
-      char *newline = (char*)malloc(len);
+      char *newline = (char*)malloc(len+1);
       strncpy(newline, line + w_zeroxxx_start, len);
+      newline[len] = '\0';
       line = newline;
       curidx = 0;
 

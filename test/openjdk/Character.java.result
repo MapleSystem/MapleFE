@@ -1,0 +1,688 @@
+Matched 5 tokens.
+Matched 14 tokens.
+Matched 21 tokens.
+Matched 28 tokens.
+Matched 35 tokens.
+Matched 42 tokens.
+Matched 11999 tokens.
+============= Module ===========
+== Sub Tree ==
+package java.lang
+== Sub Tree ==
+import dalvik.annotation.optimization.FastNative
+== Sub Tree ==
+import java.util.Arrays
+== Sub Tree ==
+import java.util.HashMap
+== Sub Tree ==
+import java.util.Locale
+== Sub Tree ==
+import java.util.Map
+== Sub Tree ==
+class  Character
+  Fields: 
+    MIN_RADIX=2    MAX_RADIX=36    MIN_VALUE=0    MAX_VALUE=65535    TYPE=()    UNASSIGNED=0    UPPERCASE_LETTER=1    LOWERCASE_LETTER=2    TITLECASE_LETTER=3    MODIFIER_LETTER=4    OTHER_LETTER=5    NON_SPACING_MARK=6    ENCLOSING_MARK=7    COMBINING_SPACING_MARK=8    DECIMAL_DIGIT_NUMBER=9    LETTER_NUMBER=10    OTHER_NUMBER=11    SPACE_SEPARATOR=12    LINE_SEPARATOR=13    PARAGRAPH_SEPARATOR=14    CONTROL=15    FORMAT=16    PRIVATE_USE=18    SURROGATE=19    DASH_PUNCTUATION=20    START_PUNCTUATION=21    END_PUNCTUATION=22    CONNECTOR_PUNCTUATION=23    OTHER_PUNCTUATION=24    MATH_SYMBOL=25    CURRENCY_SYMBOL=26    MODIFIER_SYMBOL=27    OTHER_SYMBOL=28    INITIAL_QUOTE_PUNCTUATION=29    FINAL_QUOTE_PUNCTUATION=30    ERROR=-1    DIRECTIONALITY_UNDEFINED=Sub
+  1    DIRECTIONALITY_LEFT_TO_RIGHT=0    DIRECTIONALITY_RIGHT_TO_LEFT=1    DIRECTIONALITY_RIGHT_TO_LEFT_ARABIC=2    DIRECTIONALITY_EUROPEAN_NUMBER=3    DIRECTIONALITY_EUROPEAN_NUMBER_SEPARATOR=4    DIRECTIONALITY_EUROPEAN_NUMBER_TERMINATOR=5    DIRECTIONALITY_ARABIC_NUMBER=6    DIRECTIONALITY_COMMON_NUMBER_SEPARATOR=7    DIRECTIONALITY_NONSPACING_MARK=8    DIRECTIONALITY_BOUNDARY_NEUTRAL=9    DIRECTIONALITY_PARAGRAPH_SEPARATOR=10    DIRECTIONALITY_SEGMENT_SEPARATOR=11    DIRECTIONALITY_WHITESPACE=12    DIRECTIONALITY_OTHER_NEUTRALS=13    DIRECTIONALITY_LEFT_TO_RIGHT_EMBEDDING=14    DIRECTIONALITY_LEFT_TO_RIGHT_OVERRIDE=15    DIRECTIONALITY_RIGHT_TO_LEFT_EMBEDDING=16    DIRECTIONALITY_RIGHT_TO_LEFT_OVERRIDE=17    DIRECTIONALITY_POP_DIRECTIONAL_FORMAT=18    MIN_HIGH_SURROGATE=55296    MAX_HIGH_SURROGATE=56319    MIN_LOW_SURROGATE=56320    MAX_LOW_SURROGATE=57343    MIN_SURROGATE=MIN_HIGH_SURROGATE    MAX_SURROGATE=MAX_LOW_SURROGATE    MIN_SUPPLEMENTARY_CODE_POINT=65536    MIN_CODE_POINT=0    MAX_CODE_POINT=1114111    DIRECTIONALITY=    value    serialVersionUID=1796875896    SIZE=16    BYTES=
+  Instance Initializer: 
+  Constructors: 
+    constructor  Character()  throws: 
+      this.value Assign value
+  Methods: 
+    func  valueOf()  throws: 
+      cond-branch cond:c LE 127
+      true branch :
+        return 
+      false branch :
+
+      return new Character<Character>
+    func  charValue()  throws: 
+      return value
+    func  hashCode()  throws: 
+      return Character.hashCode(value)
+    func  hashCode()  throws: 
+      return (int)value
+    func  equals()  throws: 
+      cond-branch cond:
+      true branch :
+        return value EQ ((Character)obj)charValue
+      false branch :
+
+      return false
+    func  toString()  throws: 
+      var:buf=value[]
+      return String.valueOf(buf)
+    func  toString()  throws: 
+      return String.valueOf(c)
+    func  isValidCodePoint()  throws: 
+      var:plane=codePoint Zext 16
+      return plane LT ((MAX_CODE_POINT Add 1) Zext 16)
+    func  isBmpCodePoint()  throws: 
+      return codePoint Zext 16 EQ 0
+    func  isSupplementaryCodePoint()  throws: 
+      return codePoint GE MIN_SUPPLEMENTARY_CODE_POINT Land codePoint LT MAX_CODE_POINT Add 1
+    func  isHighSurrogate()  throws: 
+      return ch GE MIN_HIGH_SURROGATE Land ch LT (MAX_HIGH_SURROGATE Add 1)
+    func  isLowSurrogate()  throws: 
+      return ch GE MIN_LOW_SURROGATE Land ch LT (MAX_LOW_SURROGATE Add 1)
+    func  isSurrogate()  throws: 
+      return ch GE MIN_SURROGATE Land ch LT (MAX_SURROGATE Add 1)
+    func  isSurrogatePair()  throws: 
+      return isHighSurrogate(high) Land isLowSurrogate(low)
+    func  charCount()  throws: 
+      return 
+    func  toCodePoint()  throws: 
+      return ((high Shl 10) Add low) Add (MIN_SUPPLEMENTARY_CODE_POINT Sub (MIN_HIGH_SURROGATE Shl 10) Sub MIN_LOW_SURROGATE)
+    func  codePointAt()  throws: 
+      var:c1=seq.charAt(index)
+      cond-branch cond:isHighSurrogate(c1) Land Inc
+  index LT seq.length()
+      true branch :
+        var:c2=seq.charAt(index)
+        cond-branch cond:isLowSurrogate(c2)
+        true branch :
+          return toCodePoint(c1,c2)
+        false branch :
+
+      false branch :
+
+      return c1
+    func  codePointAt()  throws: 
+      return codePointAtImpl(a,index,a.length)
+    func  codePointAt()  throws: 
+      cond-branch cond:index GE limit Lor limit LT 0 Lor limit GT a.length
+      true branch :
+        new IndexOutOfBoundsException<IndexOutOfBoundsException>
+      false branch :
+
+      return codePointAtImpl(a,index,limit)
+    func  codePointAtImpl()  throws: 
+      var:c1=
+      cond-branch cond:isHighSurrogate(c1) Land Inc
+  index LT limit
+      true branch :
+        var:c2=
+        cond-branch cond:isLowSurrogate(c2)
+        true branch :
+          return toCodePoint(c1,c2)
+        false branch :
+
+      false branch :
+
+      return c1
+    func  codePointBefore()  throws: 
+      var:c2=seq.charAt(Dec
+  index)
+      cond-branch cond:isLowSurrogate(c2) Land index GT 0
+      true branch :
+        var:c1=seq.charAt(Dec
+  index)
+        cond-branch cond:isHighSurrogate(c1)
+        true branch :
+          return toCodePoint(c1,c2)
+        false branch :
+
+      false branch :
+
+      return c2
+    func  codePointBefore()  throws: 
+      return codePointBeforeImpl(a,index,0)
+    func  codePointBefore()  throws: 
+      cond-branch cond:index LE start Lor start LT 0 Lor start GE a.length
+      true branch :
+        new IndexOutOfBoundsException<IndexOutOfBoundsException>
+      false branch :
+
+      return codePointBeforeImpl(a,index,start)
+    func  codePointBeforeImpl()  throws: 
+      var:c2=
+      cond-branch cond:isLowSurrogate(c2) Land index GT start
+      true branch :
+        var:c1=
+        cond-branch cond:isHighSurrogate(c1)
+        true branch :
+          return toCodePoint(c1,c2)
+        false branch :
+
+      false branch :
+
+      return c2
+    func  highSurrogate()  throws: 
+      return (char)((codePoint Zext 10) Add (MIN_HIGH_SURROGATE Sub (MIN_SUPPLEMENTARY_CODE_POINT Zext 10)))
+    func  lowSurrogate()  throws: 
+      return (char)((codePoint Band 1023) Add MIN_LOW_SURROGATE)
+    func  toChars()  throws: 
+      cond-branch cond:isBmpCodePoint(codePoint)
+      true branch :
+         Assign (char)codePoint
+        return 1
+      false branch :
+        cond-branch cond:isValidCodePoint(codePoint)
+        true branch :
+          toSurrogates(codePoint,dst,dstIndex)
+          return 2
+        false branch :
+          new IllegalArgumentException<IllegalArgumentException>
+
+    func  toChars()  throws: 
+      cond-branch cond:isBmpCodePoint(codePoint)
+      true branch :
+        return 
+      false branch :
+        cond-branch cond:isValidCodePoint(codePoint)
+        true branch :
+          var:result=
+
+        false branch :
+          new IllegalArgumentException<IllegalArgumentException>
+
+    func  toSurrogates()  throws: 
+       Assign lowSurrogate(codePoint)
+       Assign highSurrogate(codePoint)
+    func  codePointCount()  throws: 
+      var:length=seq.length()
+      cond-branch cond:beginIndex LT 0 Lor endIndex GT length Lor beginIndex GT endIndex
+      true branch :
+        new IndexOutOfBoundsException<IndexOutOfBoundsException>
+      false branch :
+
+      var:n=endIndex Sub beginIndex
+      for ( )
+        cond-branch cond:isHighSurrogate(seq.charAt(  iInc
+)) Land i LT endIndex Land isLowSurrogate(seq.charAt(i))
+        true branch :
+                      nDec
+
+                      iInc
+
+        false branch :
+
+
+      return n
+    func  codePointCount()  throws: 
+      cond-branch cond:count GT a.length Sub offset Lor offset LT 0 Lor count LT 0
+      true branch :
+        new IndexOutOfBoundsException<IndexOutOfBoundsException>
+      false branch :
+
+      return codePointCountImpl(a,offset,count)
+    func  codePointCountImpl()  throws: 
+      var:endIndex=offset Add count
+      var:n=count
+      for ( )
+        cond-branch cond:isHighSurrogate(a,  iInc
+) Land i LT endIndex Land isLowSurrogate(a,i)
+        true branch :
+                      nDec
+
+                      iInc
+
+        false branch :
+
+
+      return n
+    func  offsetByCodePoints()  throws: 
+      var:length=seq.length()
+      cond-branch cond:index LT 0 Lor index GT length
+      true branch :
+        new IndexOutOfBoundsException<IndexOutOfBoundsException>
+      false branch :
+
+      var:x=index
+      cond-branch cond:codePointOffset GE 0
+      true branch :
+        var:i
+
+      false branch :
+        var:i
+
+
+      return x
+    func  offsetByCodePoints()  throws: 
+      cond-branch cond:count GT a.length Sub start Lor start LT 0 Lor count LT 0 Lor index LT start Lor index GT start Add count
+      true branch :
+        new IndexOutOfBoundsException<IndexOutOfBoundsException>
+      false branch :
+
+      return offsetByCodePointsImpl(a,start,count,index,codePointOffset)
+    func  offsetByCodePointsImpl()  throws: 
+      var:x=index
+      cond-branch cond:codePointOffset GE 0
+      true branch :
+        var:limit=start Add count
+
+      false branch :
+        var:i
+
+
+      return x
+    func  isLowerCase()  throws: 
+      return isLowerCase((int)ch)
+    func  isLowerCase()  throws: 
+      return isLowerCaseImpl(codePoint)
+    func  isLowerCaseImpl()  throws: 
+    func  isUpperCase()  throws: 
+      return isUpperCase((int)ch)
+    func  isUpperCase()  throws: 
+      return isUpperCaseImpl(codePoint)
+    func  isUpperCaseImpl()  throws: 
+    func  isTitleCase()  throws: 
+      return isTitleCase((int)ch)
+    func  isTitleCase()  throws: 
+      return isTitleCaseImpl(codePoint)
+    func  isTitleCaseImpl()  throws: 
+    func  isDigit()  throws: 
+      return isDigit((int)ch)
+    func  isDigit()  throws: 
+      return isDigitImpl(codePoint)
+    func  isDigitImpl()  throws: 
+    func  isDefined()  throws: 
+      return isDefined((int)ch)
+    func  isDefined()  throws: 
+      return isDefinedImpl(codePoint)
+    func  isDefinedImpl()  throws: 
+    func  isLetter()  throws: 
+      return isLetter((int)ch)
+    func  isLetter()  throws: 
+      return isLetterImpl(codePoint)
+    func  isLetterImpl()  throws: 
+    func  isLetterOrDigit()  throws: 
+      return isLetterOrDigit((int)ch)
+    func  isLetterOrDigit()  throws: 
+      return isLetterOrDigitImpl(codePoint)
+    func  isLetterOrDigitImpl()  throws: 
+    func  isJavaLetter()  throws: 
+      return isJavaIdentifierStart(ch)
+    func  isJavaLetterOrDigit()  throws: 
+      return isJavaIdentifierPart(ch)
+    func  isAlphabetic()  throws: 
+      return isAlphabeticImpl(codePoint)
+    func  isAlphabeticImpl()  throws: 
+    func  isIdeographic()  throws: 
+      return isIdeographicImpl(codePoint)
+    func  isIdeographicImpl()  throws: 
+    func  isJavaIdentifierStart()  throws: 
+      return isJavaIdentifierStart((int)ch)
+    func  isJavaIdentifierStart()  throws: 
+      cond-branch cond:codePoint LT 64
+      true branch :
+        return (codePoint EQ $)
+      false branch :
+        cond-branch cond:codePoint LT 128
+        true branch :
+          return (2147483630 Band (1 Shl (codePoint Sub 64))) NE 0
+        false branch :
+
+      return ((1 Shl getType(codePoint)) Band ((1 Shl UPPERCASE_LETTER) Bor (1 Shl LOWERCASE_LETTER) Bor (1 Shl TITLECASE_LETTER) Bor (1 Shl MODIFIER_LETTER) Bor (1 Shl OTHER_LETTER) Bor (1 Shl CURRENCY_SYMBOL) Bor (1 Shl CONNECTOR_PUNCTUATION) Bor (1 Shl LETTER_NUMBER))) NE 0
+    func  isJavaIdentifierPart()  throws: 
+      return isJavaIdentifierPart((int)ch)
+    func  isJavaIdentifierPart()  throws: 
+      cond-branch cond:codePoint LT 64
+      true branch :
+        return (-253953 Band (1 Shl codePoint)) NE 0
+      false branch :
+        cond-branch cond:codePoint LT 128
+        true branch :
+          return (2147483630 Band (1 Shl (codePoint Sub 64))) NE 0
+        false branch :
+
+      return ((1 Shl getType(codePoint)) Band ((1 Shl UPPERCASE_LETTER) Bor (1 Shl LOWERCASE_LETTER) Bor (1 Shl TITLECASE_LETTER) Bor (1 Shl MODIFIER_LETTER) Bor (1 Shl OTHER_LETTER) Bor (1 Shl CURRENCY_SYMBOL) Bor (1 Shl CONNECTOR_PUNCTUATION) Bor (1 Shl DECIMAL_DIGIT_NUMBER) Bor (1 Shl LETTER_NUMBER) Bor (1 Shl FORMAT) Bor (1 Shl COMBINING_SPACING_MARK) Bor (1 Shl NON_SPACING_MARK))) NE 0 Lor (codePoint GE 0 Land codePoint LE 8) Lor (codePoint GE 14 Land codePoint LE 27) Lor (codePoint GE 127 Land codePoint LE 159)
+    func  isUnicodeIdentifierStart()  throws: 
+      return isUnicodeIdentifierStart((int)ch)
+    func  isUnicodeIdentifierStart()  throws: 
+      return isUnicodeIdentifierStartImpl(codePoint)
+    func  isUnicodeIdentifierStartImpl()  throws: 
+    func  isUnicodeIdentifierPart()  throws: 
+      return isUnicodeIdentifierPart((int)ch)
+    func  isUnicodeIdentifierPart()  throws: 
+      return isUnicodeIdentifierPartImpl(codePoint)
+    func  isUnicodeIdentifierPartImpl()  throws: 
+    func  isIdentifierIgnorable()  throws: 
+      return isIdentifierIgnorable((int)ch)
+    func  isIdentifierIgnorable()  throws: 
+      return isIdentifierIgnorableImpl(codePoint)
+    func  isIdentifierIgnorableImpl()  throws: 
+    func  toLowerCase()  throws: 
+      return (char)toLowerCase((int)ch)
+    func  toLowerCase()  throws: 
+      cond-branch cond:codePoint GE A Land codePoint LE Z
+      true branch :
+        return codePoint Add (a Sub A)
+      false branch :
+
+      cond-branch cond:codePoint LT 128
+      true branch :
+        return codePoint
+      false branch :
+
+      return toLowerCaseImpl(codePoint)
+    func  toLowerCaseImpl()  throws: 
+    func  toUpperCase()  throws: 
+      return (char)toUpperCase((int)ch)
+    func  toUpperCase()  throws: 
+      cond-branch cond:codePoint GE a Land codePoint LE z
+      true branch :
+        return codePoint Sub (a Sub A)
+      false branch :
+
+      cond-branch cond:codePoint LT 128
+      true branch :
+        return codePoint
+      false branch :
+
+      return toUpperCaseImpl(codePoint)
+    func  toUpperCaseImpl()  throws: 
+    func  toTitleCase()  throws: 
+      return (char)toTitleCase((int)ch)
+    func  toTitleCase()  throws: 
+      return toTitleCaseImpl(codePoint)
+    func  toTitleCaseImpl()  throws: 
+    func  digit()  throws: 
+      return digit((int)ch,radix)
+    func  digit()  throws: 
+      cond-branch cond:radix LT MIN_RADIX Lor radix GT MAX_RADIX
+      true branch :
+        return Sub
+  1
+      false branch :
+
+      cond-branch cond:codePoint LT 128
+      true branch :
+        var:result=Sub
+  1
+
+      false branch :
+
+      return digitImpl(codePoint,radix)
+    func  digitImpl()  throws: 
+    func  getNumericValue()  throws: 
+      return getNumericValue((int)ch)
+    func  getNumericValue()  throws: 
+      cond-branch cond:codePoint LT 128
+      true branch :
+        cond-branch cond:codePoint GE 0 Land codePoint LE 9
+        true branch :
+          return codePoint Sub 0
+        false branch :
+
+
+      false branch :
+
+      cond-branch cond:codePoint GE 65313 Land codePoint LE 65338
+      true branch :
+        return codePoint Sub 65303
+      false branch :
+
+      cond-branch cond:codePoint GE 65345 Land codePoint LE 65370
+      true branch :
+        return codePoint Sub 65335
+      false branch :
+
+      return getNumericValueImpl(codePoint)
+    func  getNumericValueImpl()  throws: 
+    func  isSpace()  throws: 
+      return (ch LE 32) Land (((((1 Shl 9) Bor (1 Shl 10) Bor (1 Shl 12) Bor (1 Shl 13) Bor (1 Shl 32)) Shr ch) Band 1) NE 0)
+    func  isSpaceChar()  throws: 
+      return isSpaceChar((int)ch)
+    func  isSpaceChar()  throws: 
+      cond-branch cond:codePoint EQ 32 Lor codePoint EQ 160
+      true branch :
+        return true
+      false branch :
+
+      cond-branch cond:codePoint LT 4096
+      true branch :
+        return false
+      false branch :
+
+      cond-branch cond:codePoint EQ 5760 Lor codePoint EQ 6158
+      true branch :
+        return true
+      false branch :
+
+      cond-branch cond:codePoint LT 8192
+      true branch :
+        return false
+      false branch :
+
+      cond-branch cond:codePoint LE 65535
+      true branch :
+        return codePoint LE 8202 Lor codePoint EQ 8232 Lor codePoint EQ 8233 Lor codePoint EQ 8239 Lor codePoint EQ 8287 Lor codePoint EQ 12288
+      false branch :
+
+      return isSpaceCharImpl(codePoint)
+    func  isSpaceCharImpl()  throws: 
+    func  isWhitespace()  throws: 
+      return isWhitespace((int)ch)
+    func  isWhitespace()  throws: 
+      cond-branch cond:(codePoint GE 28 Land codePoint LE 32) Lor (codePoint GE 9 Land codePoint LE 13)
+      true branch :
+        return true
+      false branch :
+
+      cond-branch cond:codePoint LT 4096
+      true branch :
+        return false
+      false branch :
+
+      cond-branch cond:codePoint EQ 5760 Lor codePoint EQ 6158
+      true branch :
+        return true
+      false branch :
+
+      cond-branch cond:codePoint LT 8192
+      true branch :
+        return false
+      false branch :
+
+      cond-branch cond:codePoint EQ 8199 Lor codePoint EQ 8239
+      true branch :
+        return false
+      false branch :
+
+      cond-branch cond:codePoint LE 65535
+      true branch :
+        return codePoint LE 8202 Lor codePoint EQ 8232 Lor codePoint EQ 8233 Lor codePoint EQ 8287 Lor codePoint EQ 12288
+      false branch :
+
+      return isWhitespaceImpl(codePoint)
+    func  isWhitespaceImpl()  throws: 
+    func  isISOControl()  throws: 
+      return isISOControl((int)ch)
+    func  isISOControl()  throws: 
+      return codePoint LE 159 Land (codePoint GE 127 Lor (codePoint Zext 5 EQ 0))
+    func  getType()  throws: 
+      return getType((int)ch)
+    func  getType()  throws: 
+      var:type=getTypeImpl(codePoint)
+      cond-branch cond:type LE Character.FORMAT
+      true branch :
+        return type
+      false branch :
+
+      return (type Add 1)
+    func  getTypeImpl()  throws: 
+    func  forDigit()  throws: 
+      cond-branch cond:(digit GE radix) Lor (digit LT 0)
+      true branch :
+        return  
+      false branch :
+
+      cond-branch cond:(radix LT Character.MIN_RADIX) Lor (radix GT Character.MAX_RADIX)
+      true branch :
+        return  
+      false branch :
+
+      cond-branch cond:digit LT 10
+      true branch :
+        return (char)(0 Add digit)
+      false branch :
+
+      return (char)(a Sub 10 Add digit)
+    func  getDirectionality()  throws: 
+      return getDirectionality((int)ch)
+    func  getDirectionality()  throws: 
+      cond-branch cond:getType(codePoint) EQ Character.UNASSIGNED
+      true branch :
+        return Character.DIRECTIONALITY_UNDEFINED
+      false branch :
+
+      var:directionality=getDirectionalityImpl(codePoint)
+      cond-branch cond:directionality GE 0 Land directionality LT DIRECTIONALITY.length
+      true branch :
+        return 
+      false branch :
+
+      return Character.DIRECTIONALITY_UNDEFINED
+    func  getDirectionalityImpl()  throws: 
+    func  isMirrored()  throws: 
+      return isMirrored((int)ch)
+    func  isMirrored()  throws: 
+      return isMirroredImpl(codePoint)
+    func  isMirroredImpl()  throws: 
+    func  compareTo()  throws: 
+      return compare(this.value,anotherCharacter.value)
+    func  compare()  throws: 
+      return x Sub y
+    func  reverseBytes()  throws: 
+      return (char)(((ch Band 65280) Shr 8) Bor (ch Shl 8))
+    func  getName()  throws: 
+      cond-branch cond:isValidCodePoint(codePoint)
+      true branch :
+        new IllegalArgumentException<IllegalArgumentException>
+      false branch :
+
+      var:name=getNameImpl(codePoint)
+      cond-branch cond:name NE null
+      true branch :
+        return name      false branch :
+
+      cond-branch cond:getType(codePoint) EQ UNASSIGNED
+      true branch :
+        return null      false branch :
+
+      var:block=UnicodeBlock.of(codePoint)
+      cond-branch cond:block NE null
+      true branch :
+        return  Add " " Add       false branch :
+
+      return 
+    func  getNameImpl()  throws: 
+  LocalClasses: 
+    class  Subset
+      Fields: 
+        name
+      Instance Initializer: 
+      Constructors: 
+        constructor  Subset()  throws: 
+          cond-branch cond:name EQ null
+          true branch :
+            new NullPointerException<NullPointerException>
+          false branch :
+
+          this.name Assign name
+      Methods: 
+        func  equals()  throws: 
+          return (this EQ obj)
+        func  hashCode()  throws: 
+          return hashCode
+        func  toString()  throws: 
+          return name
+      LocalClasses: 
+      LocalInterfaces: 
+    class  UnicodeBlock
+      Fields: 
+        map=new HashMap        BASIC_LATIN=new UnicodeBlock<UnicodeBlock>        LATIN_1_SUPPLEMENT=new UnicodeBlock<UnicodeBlock>        LATIN_EXTENDED_A=new UnicodeBlock<UnicodeBlock>        LATIN_EXTENDED_B=new UnicodeBlock<UnicodeBlock>        IPA_EXTENSIONS=new UnicodeBlock<UnicodeBlock>        SPACING_MODIFIER_LETTERS=new UnicodeBlock<UnicodeBlock>        COMBINING_DIACRITICAL_MARKS=new UnicodeBlock<UnicodeBlock>        GREEK=new UnicodeBlock<UnicodeBlock>        CYRILLIC=new UnicodeBlock<UnicodeBlock>        ARMENIAN=new UnicodeBlock<UnicodeBlock>        HEBREW=new UnicodeBlock<UnicodeBlock>        ARABIC=new UnicodeBlock<UnicodeBlock>        DEVANAGARI=new UnicodeBlock<UnicodeBlock>        BENGALI=new UnicodeBlock<UnicodeBlock>        GURMUKHI=new UnicodeBlock<UnicodeBlock>        GUJARATI=new UnicodeBlock<UnicodeBlock>        ORIYA=new UnicodeBlock<UnicodeBlock>        TAMIL=new UnicodeBlock<UnicodeBlock>        TELUGU=new UnicodeBlock<UnicodeBlock>        KANNADA=new UnicodeBlock<UnicodeBlock>        MALAYALAM=new UnicodeBlock<UnicodeBlock>        THAI=new UnicodeBlock<UnicodeBlock>        LAO=new UnicodeBlock<UnicodeBlock>        TIBETAN=new UnicodeBlock<UnicodeBlock>        GEORGIAN=new UnicodeBlock<UnicodeBlock>        HANGUL_JAMO=new UnicodeBlock<UnicodeBlock>        LATIN_EXTENDED_ADDITIONAL=new UnicodeBlock<UnicodeBlock>        GREEK_EXTENDED=new UnicodeBlock<UnicodeBlock>        GENERAL_PUNCTUATION=new UnicodeBlock<UnicodeBlock>        SUPERSCRIPTS_AND_SUBSCRIPTS=new UnicodeBlock<UnicodeBlock>        CURRENCY_SYMBOLS=new UnicodeBlock<UnicodeBlock>        COMBINING_MARKS_FOR_SYMBOLS=new UnicodeBlock<UnicodeBlock>        LETTERLIKE_SYMBOLS=new UnicodeBlock<UnicodeBlock>        NUMBER_FORMS=new UnicodeBlock<UnicodeBlock>        ARROWS=new UnicodeBlock<UnicodeBlock>        MATHEMATICAL_OPERATORS=new UnicodeBlock<UnicodeBlock>        MISCELLANEOUS_TECHNICAL=new UnicodeBlock<UnicodeBlock>        CONTROL_PICTURES=new UnicodeBlock<UnicodeBlock>        OPTICAL_CHARACTER_RECOGNITION=new UnicodeBlock<UnicodeBlock>        ENCLOSED_ALPHANUMERICS=new UnicodeBlock<UnicodeBlock>        BOX_DRAWING=new UnicodeBlock<UnicodeBlock>        BLOCK_ELEMENTS=new UnicodeBlock<UnicodeBlock>        GEOMETRIC_SHAPES=new UnicodeBlock<UnicodeBlock>        MISCELLANEOUS_SYMBOLS=new UnicodeBlock<UnicodeBlock>        DINGBATS=new UnicodeBlock<UnicodeBlock>        CJK_SYMBOLS_AND_PUNCTUATION=new UnicodeBlock<UnicodeBlock>        HIRAGANA=new UnicodeBlock<UnicodeBlock>        KATAKANA=new UnicodeBlock<UnicodeBlock>        BOPOMOFO=new UnicodeBlock<UnicodeBlock>        HANGUL_COMPATIBILITY_JAMO=new UnicodeBlock<UnicodeBlock>        KANBUN=new UnicodeBlock<UnicodeBlock>        ENCLOSED_CJK_LETTERS_AND_MONTHS=new UnicodeBlock<UnicodeBlock>        CJK_COMPATIBILITY=new UnicodeBlock<UnicodeBlock>        CJK_UNIFIED_IDEOGRAPHS=new UnicodeBlock<UnicodeBlock>        HANGUL_SYLLABLES=new UnicodeBlock<UnicodeBlock>        PRIVATE_USE_AREA=new UnicodeBlock<UnicodeBlock>        CJK_COMPATIBILITY_IDEOGRAPHS=new UnicodeBlock<UnicodeBlock>        ALPHABETIC_PRESENTATION_FORMS=new UnicodeBlock<UnicodeBlock>        ARABIC_PRESENTATION_FORMS_A=new UnicodeBlock<UnicodeBlock>        COMBINING_HALF_MARKS=new UnicodeBlock<UnicodeBlock>        CJK_COMPATIBILITY_FORMS=new UnicodeBlock<UnicodeBlock>        SMALL_FORM_VARIANTS=new UnicodeBlock<UnicodeBlock>        ARABIC_PRESENTATION_FORMS_B=new UnicodeBlock<UnicodeBlock>        HALFWIDTH_AND_FULLWIDTH_FORMS=new UnicodeBlock<UnicodeBlock>        SPECIALS=new UnicodeBlock<UnicodeBlock>        SURROGATES_AREA=new UnicodeBlock<UnicodeBlock>        SYRIAC=new UnicodeBlock<UnicodeBlock>        THAANA=new UnicodeBlock<UnicodeBlock>        SINHALA=new UnicodeBlock<UnicodeBlock>        MYANMAR=new UnicodeBlock<UnicodeBlock>        ETHIOPIC=new UnicodeBlock<UnicodeBlock>        CHEROKEE=new UnicodeBlock<UnicodeBlock>        UNIFIED_CANADIAN_ABORIGINAL_SYLLABICS=new UnicodeBlock<UnicodeBlock>        OGHAM=new UnicodeBlock<UnicodeBlock>        RUNIC=new UnicodeBlock<UnicodeBlock>        KHMER=new UnicodeBlock<UnicodeBlock>        MONGOLIAN=new UnicodeBlock<UnicodeBlock>        BRAILLE_PATTERNS=new UnicodeBlock<UnicodeBlock>        CJK_RADICALS_SUPPLEMENT=new UnicodeBlock<UnicodeBlock>        KANGXI_RADICALS=new UnicodeBlock<UnicodeBlock>        IDEOGRAPHIC_DESCRIPTION_CHARACTERS=new UnicodeBlock<UnicodeBlock>        BOPOMOFO_EXTENDED=new UnicodeBlock<UnicodeBlock>        CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A=new UnicodeBlock<UnicodeBlock>        YI_SYLLABLES=new UnicodeBlock<UnicodeBlock>        YI_RADICALS=new UnicodeBlock<UnicodeBlock>        CYRILLIC_SUPPLEMENTARY=new UnicodeBlock<UnicodeBlock>        TAGALOG=new UnicodeBlock<UnicodeBlock>        HANUNOO=new UnicodeBlock<UnicodeBlock>        BUHID=new UnicodeBlock<UnicodeBlock>        TAGBANWA=new UnicodeBlock<UnicodeBlock>        LIMBU=new UnicodeBlock<UnicodeBlock>        TAI_LE=new UnicodeBlock<UnicodeBlock>        KHMER_SYMBOLS=new UnicodeBlock<UnicodeBlock>        PHONETIC_EXTENSIONS=new UnicodeBlock<UnicodeBlock>        MISCELLANEOUS_MATHEMATICAL_SYMBOLS_A=new UnicodeBlock<UnicodeBlock>        SUPPLEMENTAL_ARROWS_A=new UnicodeBlock<UnicodeBlock>        SUPPLEMENTAL_ARROWS_B=new UnicodeBlock<UnicodeBlock>        MISCELLANEOUS_MATHEMATICAL_SYMBOLS_B=new UnicodeBlock<UnicodeBlock>        SUPPLEMENTAL_MATHEMATICAL_OPERATORS=new UnicodeBlock<UnicodeBlock>        MISCELLANEOUS_SYMBOLS_AND_ARROWS=new UnicodeBlock<UnicodeBlock>        KATAKANA_PHONETIC_EXTENSIONS=new UnicodeBlock<UnicodeBlock>        YIJING_HEXAGRAM_SYMBOLS=new UnicodeBlock<UnicodeBlock>        VARIATION_SELECTORS=new UnicodeBlock<UnicodeBlock>        LINEAR_B_SYLLABARY=new UnicodeBlock<UnicodeBlock>        LINEAR_B_IDEOGRAMS=new UnicodeBlock<UnicodeBlock>        AEGEAN_NUMBERS=new UnicodeBlock<UnicodeBlock>        OLD_ITALIC=new UnicodeBlock<UnicodeBlock>        GOTHIC=new UnicodeBlock<UnicodeBlock>        UGARITIC=new UnicodeBlock<UnicodeBlock>        DESERET=new UnicodeBlock<UnicodeBlock>        SHAVIAN=new UnicodeBlock<UnicodeBlock>        OSMANYA=new UnicodeBlock<UnicodeBlock>        CYPRIOT_SYLLABARY=new UnicodeBlock<UnicodeBlock>        BYZANTINE_MUSICAL_SYMBOLS=new UnicodeBlock<UnicodeBlock>        MUSICAL_SYMBOLS=new UnicodeBlock<UnicodeBlock>        TAI_XUAN_JING_SYMBOLS=new UnicodeBlock<UnicodeBlock>        MATHEMATICAL_ALPHANUMERIC_SYMBOLS=new UnicodeBlock<UnicodeBlock>        CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B=new UnicodeBlock<UnicodeBlock>        CJK_COMPATIBILITY_IDEOGRAPHS_SUPPLEMENT=new UnicodeBlock<UnicodeBlock>        TAGS=new UnicodeBlock<UnicodeBlock>        VARIATION_SELECTORS_SUPPLEMENT=new UnicodeBlock<UnicodeBlock>        SUPPLEMENTARY_PRIVATE_USE_AREA_A=new UnicodeBlock<UnicodeBlock>        SUPPLEMENTARY_PRIVATE_USE_AREA_B=new UnicodeBlock<UnicodeBlock>        HIGH_SURROGATES=new UnicodeBlock<UnicodeBlock>        HIGH_PRIVATE_USE_SURROGATES=new UnicodeBlock<UnicodeBlock>        LOW_SURROGATES=new UnicodeBlock<UnicodeBlock>        ARABIC_SUPPLEMENT=new UnicodeBlock<UnicodeBlock>        NKO=new UnicodeBlock<UnicodeBlock>        SAMARITAN=new UnicodeBlock<UnicodeBlock>        MANDAIC=new UnicodeBlock<UnicodeBlock>        ETHIOPIC_SUPPLEMENT=new UnicodeBlock<UnicodeBlock>        UNIFIED_CANADIAN_ABORIGINAL_SYLLABICS_EXTENDED=new UnicodeBlock<UnicodeBlock>        NEW_TAI_LUE=new UnicodeBlock<UnicodeBlock>        BUGINESE=new UnicodeBlock<UnicodeBlock>        TAI_THAM=new UnicodeBlock<UnicodeBlock>        BALINESE=new UnicodeBlock<UnicodeBlock>        SUNDANESE=new UnicodeBlock<UnicodeBlock>        BATAK=new UnicodeBlock<UnicodeBlock>        LEPCHA=new UnicodeBlock<UnicodeBlock>        OL_CHIKI=new UnicodeBlock<UnicodeBlock>        VEDIC_EXTENSIONS=new UnicodeBlock<UnicodeBlock>        PHONETIC_EXTENSIONS_SUPPLEMENT=new UnicodeBlock<UnicodeBlock>        COMBINING_DIACRITICAL_MARKS_SUPPLEMENT=new UnicodeBlock<UnicodeBlock>        GLAGOLITIC=new UnicodeBlock<UnicodeBlock>        LATIN_EXTENDED_C=new UnicodeBlock<UnicodeBlock>        COPTIC=new UnicodeBlock<UnicodeBlock>        GEORGIAN_SUPPLEMENT=new UnicodeBlock<UnicodeBlock>        TIFINAGH=new UnicodeBlock<UnicodeBlock>        ETHIOPIC_EXTENDED=new UnicodeBlock<UnicodeBlock>        CYRILLIC_EXTENDED_A=new UnicodeBlock<UnicodeBlock>        SUPPLEMENTAL_PUNCTUATION=new UnicodeBlock<UnicodeBlock>        CJK_STROKES=new UnicodeBlock<UnicodeBlock>        LISU=new UnicodeBlock<UnicodeBlock>        VAI=new UnicodeBlock<UnicodeBlock>        CYRILLIC_EXTENDED_B=new UnicodeBlock<UnicodeBlock>        BAMUM=new UnicodeBlock<UnicodeBlock>        MODIFIER_TONE_LETTERS=new UnicodeBlock<UnicodeBlock>        LATIN_EXTENDED_D=new UnicodeBlock<UnicodeBlock>        SYLOTI_NAGRI=new UnicodeBlock<UnicodeBlock>        COMMON_INDIC_NUMBER_FORMS=new UnicodeBlock<UnicodeBlock>        PHAGS_PA=new UnicodeBlock<UnicodeBlock>        SAURASHTRA=new UnicodeBlock<UnicodeBlock>        DEVANAGARI_EXTENDED=new UnicodeBlock<UnicodeBlock>        KAYAH_LI=new UnicodeBlock<UnicodeBlock>        REJANG=new UnicodeBlock<UnicodeBlock>        HANGUL_JAMO_EXTENDED_A=new UnicodeBlock<UnicodeBlock>        JAVANESE=new UnicodeBlock<UnicodeBlock>        CHAM=new UnicodeBlock<UnicodeBlock>        MYANMAR_EXTENDED_A=new UnicodeBlock<UnicodeBlock>        TAI_VIET=new UnicodeBlock<UnicodeBlock>        ETHIOPIC_EXTENDED_A=new UnicodeBlock<UnicodeBlock>        MEETEI_MAYEK=new UnicodeBlock<UnicodeBlock>        HANGUL_JAMO_EXTENDED_B=new UnicodeBlock<UnicodeBlock>        VERTICAL_FORMS=new UnicodeBlock<UnicodeBlock>        ANCIENT_GREEK_NUMBERS=new UnicodeBlock<UnicodeBlock>        ANCIENT_SYMBOLS=new UnicodeBlock<UnicodeBlock>        PHAISTOS_DISC=new UnicodeBlock<UnicodeBlock>        LYCIAN=new UnicodeBlock<UnicodeBlock>        CARIAN=new UnicodeBlock<UnicodeBlock>        OLD_PERSIAN=new UnicodeBlock<UnicodeBlock>        IMPERIAL_ARAMAIC=new UnicodeBlock<UnicodeBlock>        PHOENICIAN=new UnicodeBlock<UnicodeBlock>        LYDIAN=new UnicodeBlock<UnicodeBlock>        KHAROSHTHI=new UnicodeBlock<UnicodeBlock>        OLD_SOUTH_ARABIAN=new UnicodeBlock<UnicodeBlock>        AVESTAN=new UnicodeBlock<UnicodeBlock>        INSCRIPTIONAL_PARTHIAN=new UnicodeBlock<UnicodeBlock>        INSCRIPTIONAL_PAHLAVI=new UnicodeBlock<UnicodeBlock>        OLD_TURKIC=new UnicodeBlock<UnicodeBlock>        RUMI_NUMERAL_SYMBOLS=new UnicodeBlock<UnicodeBlock>        BRAHMI=new UnicodeBlock<UnicodeBlock>        KAITHI=new UnicodeBlock<UnicodeBlock>        CUNEIFORM=new UnicodeBlock<UnicodeBlock>        CUNEIFORM_NUMBERS_AND_PUNCTUATION=new UnicodeBlock<UnicodeBlock>        EGYPTIAN_HIEROGLYPHS=new UnicodeBlock<UnicodeBlock>        BAMUM_SUPPLEMENT=new UnicodeBlock<UnicodeBlock>        KANA_SUPPLEMENT=new UnicodeBlock<UnicodeBlock>        ANCIENT_GREEK_MUSICAL_NOTATION=new UnicodeBlock<UnicodeBlock>        COUNTING_ROD_NUMERALS=new UnicodeBlock<UnicodeBlock>        MAHJONG_TILES=new UnicodeBlock<UnicodeBlock>        DOMINO_TILES=new UnicodeBlock<UnicodeBlock>        PLAYING_CARDS=new UnicodeBlock<UnicodeBlock>        ENCLOSED_ALPHANUMERIC_SUPPLEMENT=new UnicodeBlock<UnicodeBlock>        ENCLOSED_IDEOGRAPHIC_SUPPLEMENT=new UnicodeBlock<UnicodeBlock>        MISCELLANEOUS_SYMBOLS_AND_PICTOGRAPHS=new UnicodeBlock<UnicodeBlock>        EMOTICONS=new UnicodeBlock<UnicodeBlock>        TRANSPORT_AND_MAP_SYMBOLS=new UnicodeBlock<UnicodeBlock>        ALCHEMICAL_SYMBOLS=new UnicodeBlock<UnicodeBlock>        CJK_UNIFIED_IDEOGRAPHS_EXTENSION_C=new UnicodeBlock<UnicodeBlock>        CJK_UNIFIED_IDEOGRAPHS_EXTENSION_D=new UnicodeBlock<UnicodeBlock>        ARABIC_EXTENDED_A=new UnicodeBlock<UnicodeBlock>        SUNDANESE_SUPPLEMENT=new UnicodeBlock<UnicodeBlock>        MEETEI_MAYEK_EXTENSIONS=new UnicodeBlock<UnicodeBlock>        MEROITIC_HIEROGLYPHS=new UnicodeBlock<UnicodeBlock>        MEROITIC_CURSIVE=new UnicodeBlock<UnicodeBlock>        SORA_SOMPENG=new UnicodeBlock<UnicodeBlock>        CHAKMA=new UnicodeBlock<UnicodeBlock>        SHARADA=new UnicodeBlock<UnicodeBlock>        TAKRI=new UnicodeBlock<UnicodeBlock>        MIAO=new UnicodeBlock<UnicodeBlock>        ARABIC_MATHEMATICAL_ALPHABETIC_SYMBOLS=new UnicodeBlock<UnicodeBlock>        blockStarts=[]        blocks=
+      Instance Initializer: 
+      Constructors: 
+        constructor  UnicodeBlock()  throws: 
+        constructor  UnicodeBlock()  throws: 
+          cond-branch cond:isMap
+          true branch :
+            map.put(idName,this)
+          false branch :
+
+        constructor  UnicodeBlock()  throws: 
+          map.put(alias,this)
+        constructor  UnicodeBlock()  throws: 
+          String
+          alias
+          aliases
+          map.put(alias,this)
+      Methods: 
+        func  of()  throws: 
+          return of((int)c)
+        func  of()  throws: 
+          cond-branch cond:isValidCodePoint(codePoint)
+          true branch :
+            new IllegalArgumentException<IllegalArgumentException>
+          false branch :
+
+          var:top,bottom,current
+          bottom Assign 0
+          top Assign blockStarts.length
+          current Assign 
+          while top Sub bottom GT 1            cond-branch cond:codePoint GE 
+            true branch :
+              bottom Assign current
+            false branch :
+              top Assign current
+
+            current Assign (top Add bottom)2
+
+          return 
+        func  forName()  throws: 
+          var:block=map.get(blockName.toUpperCase(Locale.US))
+          cond-branch cond:block EQ null
+          true branch :
+            new IllegalArgumentException<IllegalArgumentException>
+          false branch :
+
+          return block
+      LocalClasses: 
+      LocalInterfaces: 
+    class[JavaEnum]  UnicodeScript
+      Fields: 
+        COMMON        scriptStarts=        scripts=        aliases
+      Instance Initializer: 
+        InstInit- 0
+      Constructors: 
+      Methods: 
+        func  of()  throws: 
+          cond-branch cond:isValidCodePoint(codePoint)
+          true branch :
+            new IllegalArgumentException<IllegalArgumentException>          false branch :
+
+          var:type=getType(codePoint)
+          cond-branch cond:type EQ UNASSIGNED
+          true branch :
+            return UNKNOWN          false branch :
+
+          var:index=Arrays.binarySearch(scriptStarts,codePoint)
+          cond-branch cond:index LT 0
+          true branch :
+            index Assign Sub
+  index Sub 2          false branch :
+
+          return 
+        func  forName()  throws: 
+          scriptName Assign scriptName.toUpperCase(Locale.ENGLISH)
+          var:sc=aliases.get(scriptName)
+          cond-branch cond:sc NE null
+          true branch :
+            return sc          false branch :
+
+          return valueOf(scriptName)
+      LocalClasses: 
+      LocalInterfaces: 
+    class  CharacterCache
+      Fields: 
+        cache=[]
+      Instance Initializer: 
+        InstInit- 0
+      Constructors: 
+        constructor  CharacterCache()  throws: 
+      Methods: 
+      LocalClasses: 
+      LocalInterfaces: 
+  LocalInterfaces: 
+
