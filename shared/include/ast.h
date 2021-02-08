@@ -455,16 +455,20 @@ public:
 
 class FieldNode : public TreeNode {
 private:
+  TreeNode       *mUpper; // The upper enclosing structure
   IdentifierNode *mField;
   const char     *mName;  // Name, initialized by Init().
 public:
-  FieldNode() : TreeNode(), mField(NULL), mName(NULL) {mKind = NK_Field;}
+  FieldNode() : TreeNode(), mField(NULL), mName(NULL), mUpper(NULL) {mKind = NK_Field;}
   ~FieldNode(){}
 
   void Init();
 
   IdentifierNode* GetField() {return mField;}
   void SetField(IdentifierNode *f) {mField = f;}
+
+  TreeNode *GetUpper()       {return mUpper;}
+  void SetUpper(TreeNode *n) {mUpper = n;}
 
   const char* GetName() {return mName;}
   void Dump(unsigned);

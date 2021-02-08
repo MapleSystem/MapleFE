@@ -407,7 +407,7 @@ void UnaOperatorNode::Dump(unsigned indent) {
 
 // Right now it's major work is to init the name
 void FieldNode::Init() {
-  std::string name = mParent->GetName();
+  std::string name = mUpper->GetName();
   name += '.';
   name += mField->GetName();
   mName = gStringPool.FindString(name);

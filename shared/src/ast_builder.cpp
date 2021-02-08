@@ -752,7 +752,7 @@ TreeNode* ASTBuilder::BuildDecl() {
 }
 
 // BuildField takes two parameters,
-// 1) parent node, could be another field.
+// 1) upper enclosing node, could be another field.
 // 2) name of this field.
 TreeNode* ASTBuilder::BuildField() {
   if (mTrace)
@@ -782,7 +782,7 @@ TreeNode* ASTBuilder::BuildField() {
 
       field = (FieldNode*)mTreePool->NewTreeNode(sizeof(FieldNode));
       new (field) FieldNode();
-      field->SetParent(parent);
+      field->SetUpper(parent);
       field->SetField(child);
       field->Init();
 
@@ -792,7 +792,7 @@ TreeNode* ASTBuilder::BuildField() {
     MASSERT(node_b->IsIdentifier());
     field = (FieldNode*)mTreePool->NewTreeNode(sizeof(FieldNode));
     new (field) FieldNode();
-    field->SetParent(node_a);
+    field->SetUpper(node_a);
     field->SetField(node_b);
     field->Init();
   }
