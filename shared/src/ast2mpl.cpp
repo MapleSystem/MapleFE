@@ -329,6 +329,11 @@ MIRFunction *A2M::GetFunc(BlockNode *block) {
   return func;
 }
 
+MIRClassType *A2M::GetClass(BlockNode *block) {
+  TyIdx tyidx = GetFunc(block)->classTyIdx;
+  return GlobalTables::GetTypeTable().GetTypeFromTyIdx(tyidx);
+}
+
 void A2M::MapAttr(GenericAttrs &attr, const IdentifierNode *inode) {
   // SmallVector<AttrId> mAttrs
   unsigned anum = inode->GetAttrsNum();

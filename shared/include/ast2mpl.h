@@ -69,6 +69,7 @@ public:
   MIRSymbol *GetSymbol(TreeNode *tnode, BlockNode *block);
   MIRSymbol *CreateSymbol(TreeNode *tnode, BlockNode *block);
   MIRFunction *GetFunc(BlockNode *block);
+  MIRClassType *GetClass(BlockNode *block);
 
   virtual MIRType *MapPrimType(PrimTypeNode *tnode)=0;
 

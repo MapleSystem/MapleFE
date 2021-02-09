@@ -105,14 +105,48 @@ maple::BaseNode *A2M::ProcessIdentifier(StmtExprKind skind, TreeNode *tnode, Blo
 }
 
 maple::BaseNode *A2M::ProcessField(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
+  FieldNode *node = static_cast<FieldNode *>(tnode);
+  maple::BaseNode *bn = nullptr;
+
+  // this.x  a.x
   if (skind == SK_Expr) {
     NOTYETIMPL("ProcessField() SK_Expr");
-    return nullptr;
+    TreeNode *upper = node->GetUpper();
+    TreeNode *field = node->GetField();
+
+    MIRType *ctype = nullptr;
+    StIdx cstidx(0);
+    if (upper->IsLiteral()) {
+      LiteralNode *lt = static_cast<LiteralNode *>(upper);
+      if (lt->GetData().mType == LT_ThisLiteral) {
+        MIRFunction *func = GetFunc(block);
+        MIRSymbol *sym = func->formalDefVec[0].formalSym; // this
+        cstidx = sym->GetStIdx();
+        ctype = GetClass(block);
+      } else {
+        NOTYETIMPL("ProcessField() not this literal");
+      }
+    } else {
+      NOTYETIMPL("ProcessField() upper not literal");
+    }
+
+    if (!ctype) {
+      NOTYETIMPL("ProcessField() null class type");
+      return bn;
+    }
+
+    const char *fname = field->GetName();
+    GStrIdx stridx = GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(fname);
+    mFieldData->ResetStrIdx(stridx);
+    uint32 fid = 0;
+    bool status = mMirBuilder->TraverseToNamedField(ctype, fid, mFieldData);
+    bn = new DreadNode(OP_dread, ctype->GetPrimType(), cstidx, fid);
+    return bn;
   }
 
   if (!tnode->IsIdentifier()) {
     NOTYETIMPL("ProcessField() not Identifier");
-    return nullptr;
+    return bn;
   }
 
   TreeNode *parent = tnode->GetParent();
@@ -142,7 +176,7 @@ maple::BaseNode *A2M::ProcessField(StmtExprKind skind, TreeNode *tnode, BlockNod
     stype->fields.push_back(P1);
   }
 
-  return nullptr;
+  return bn;
 }
 
 maple::BaseNode *A2M::ProcessDimension(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
@@ -438,6 +472,10 @@ maple::BaseNode *A2M::ProcessClass(StmtExprKind skind, TreeNode *tnode, BlockNod
 
   for (int i=0; i < classnode->GetFieldsNum(); i++) {
     ProcessField(skind, classnode->GetField(i), block);
+  }
+
+  for (int i=0; i < classnode->GetConstructorNum(); i++) {
+    ProcessFunction(skind, classnode->GetConstructor(i), block);
   }
 
   for (int i=0; i < classnode->GetMethodsNum(); i++) {
