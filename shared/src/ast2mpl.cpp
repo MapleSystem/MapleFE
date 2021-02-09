@@ -20,10 +20,13 @@
 
 namespace maplefe {
 
+static unsigned mVarUniqNum;
+
 A2M::A2M(const char *filename) : mFileName(filename) {
   mMirModule = new maple::MIRModule(mFileName);
   mMirBuilder = new FEMIRBuilder(mMirModule);
   mFieldData = new FieldData();
+  mVarUniqNum = 1;
   Init();
 }
 
@@ -191,11 +194,20 @@ const char *A2M::Type2Label(const MIRType *type) {
   }
 }
 
+#define USE_SHORT 1
+
 // used to form mangled function name
-#define CLASSEND "_3B" // ';'
-#define SEP      "_7C" // '|'
-#define LARG     "_28" // '('
-#define RARG     "_29" // ')'
+#if USE_SHORT
+#define CLASSEND ";"
+#define SEP      "|"
+#define LARG     "_"   // "("
+#define RARG     "_"   // ")"
+#else
+#define CLASSEND "_3B" // ";"
+#define SEP      "_7C" // "|"
+#define LARG     "_28" // "("
+#define RARG     "_29" // ")"
+#endif
 
 void A2M::Type2Name(std::string &str, const MIRType *type) {
   PrimType pty = type->GetPrimType();
@@ -209,6 +221,14 @@ void A2M::Type2Name(std::string &str, const MIRType *type) {
     str.append(type->GetName());
     str.append(CLASSEND);
   }
+}
+
+// update to use uniq name: str --> str|mVarUniqNum
+void A2M::UpdateUniqName(std::string &str) {
+  str.append(SEP);
+  str.append(std::to_string(mVarUniqNum));
+  mVarUniqNum++;
+  return;
 }
 
 // update to use mangled name: className|funcName|(argTypes)retType
@@ -311,9 +331,21 @@ MIRSymbol *A2M::CreateSymbol(TreeNode *tnode, BlockNode *block) {
   MIRSymbol *symbol = nullptr;
   if (block) {
     maple::MIRFunction *func = GetFunc(block);
-    symbol = mMirBuilder->GetOrCreateLocalDecl(name, mir_type, func);
+    symbol = mMirBuilder->GetLocalDecl(name, func);
+    std::string str(name);
+    // symbol with same name already exist, use a uniq new name
+    if (symbol) {
+      UpdateUniqName(str);
+    }
+    symbol = mMirBuilder->CreateLocalDecl(str, mir_type, func);
   } else {
-    symbol = mMirBuilder->GetOrCreateGlobalDecl(name, mir_type);
+    symbol = mMirBuilder->GetGlobalDecl(name);
+    std::string str(name);
+    // symbol with same name already exist, use a uniq new name
+    if (symbol) {
+      UpdateUniqName(str);
+    }
+    symbol = mMirBuilder->CreateGlobalDecl(str, mir_type, kScGlobal);
   }
 
   std::pair<const char *, BlockNode*> P(name, block);

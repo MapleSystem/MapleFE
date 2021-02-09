@@ -108,44 +108,56 @@ maple::BaseNode *A2M::ProcessField(StmtExprKind skind, TreeNode *tnode, BlockNod
   FieldNode *node = static_cast<FieldNode *>(tnode);
   maple::BaseNode *bn = nullptr;
 
-  // this.x  a.x
-  if (skind == SK_Expr) {
-    NOTYETIMPL("ProcessField() SK_Expr");
-    TreeNode *upper = node->GetUpper();
-    TreeNode *field = node->GetField();
-
-    MIRType *ctype = nullptr;
-    StIdx cstidx(0);
-    if (upper->IsLiteral()) {
-      LiteralNode *lt = static_cast<LiteralNode *>(upper);
-      if (lt->GetData().mType == LT_ThisLiteral) {
-        MIRFunction *func = GetFunc(block);
-        MIRSymbol *sym = func->formalDefVec[0].formalSym; // this
-        cstidx = sym->GetStIdx();
-        ctype = GetClass(block);
-      } else {
-        NOTYETIMPL("ProcessField() not this literal");
-      }
-    } else {
-      NOTYETIMPL("ProcessField() upper not literal");
-    }
-
-    if (!ctype) {
-      NOTYETIMPL("ProcessField() null class type");
-      return bn;
-    }
-
-    const char *fname = field->GetName();
-    GStrIdx stridx = GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(fname);
-    mFieldData->ResetStrIdx(stridx);
-    uint32 fid = 0;
-    bool status = mMirBuilder->TraverseToNamedField(ctype, fid, mFieldData);
-    bn = new DreadNode(OP_dread, ctype->GetPrimType(), cstidx, fid);
+  if (skind != SK_Expr) {
+    NOTYETIMPL("ProcessField() not SK_Expr");
     return bn;
   }
 
+  // this.x  a.x
+  TreeNode *upper = node->GetUpper();
+  TreeNode *field = node->GetField();
+
+  MIRType *ctype = nullptr;
+  TyIdx cptyidx(0);
+  maple::BaseNode *dr = nullptr;
+  if (upper->IsLiteral()) {
+    LiteralNode *lt = static_cast<LiteralNode *>(upper);
+    if (lt->GetData().mType == LT_ThisLiteral) {
+      MIRFunction *func = GetFunc(block);
+      MIRSymbol *sym = func->formalDefVec[0].formalSym; // this
+      cptyidx = sym->GetTyIdx();
+      ctype = GetClass(block);
+      dr = new DreadNode(OP_dread, PTY_ptr, sym->GetStIdx(), 0);
+    } else {
+      NOTYETIMPL("ProcessField() not this literal");
+    }
+  } else {
+    NOTYETIMPL("ProcessField() upper not literal");
+  }
+
+  if (!ctype) {
+    NOTYETIMPL("ProcessField() null class type");
+    return bn;
+  }
+
+  const char *fname = field->GetName();
+  GStrIdx stridx = GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(fname);
+  mFieldData->ResetStrIdx(stridx);
+  uint32 fid = 0;
+  bool status = mMirBuilder->TraverseToNamedField(ctype, fid, mFieldData);
+  if (status) {
+    maple::MIRType *ftype = GlobalTables::GetTypeTable().GetTypeFromTyIdx(mFieldData->GetTyIdx());
+    bn = new IreadNode(OP_iread, ftype->GetPrimType(), cptyidx, fid, dr);
+  }
+  return bn;
+}
+
+maple::BaseNode *A2M::ProcessFieldSetup(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
+  FieldNode *node = static_cast<FieldNode *>(tnode);
+  maple::BaseNode *bn = nullptr;
+
   if (!tnode->IsIdentifier()) {
-    NOTYETIMPL("ProcessField() not Identifier");
+    NOTYETIMPL("ProcessFieldSetup() not Identifier");
     return bn;
   }
 
@@ -352,8 +364,13 @@ maple::BaseNode *A2M::ProcessBlock(StmtExprKind skind, TreeNode *tnode, BlockNod
 }
 
 maple::BaseNode *A2M::ProcessFunction(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
-  // NOTYETIMPL("ProcessFunction()");
   MASSERT(tnode->IsFunction() && "it is not an FunctionNode");
+  NOTYETIMPL("ProcessFunction()");
+  return nullptr;
+}
+
+maple::BaseNode *A2M::ProcessFuncSetup(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
+  // NOTYETIMPL("ProcessFuncSetup()");
   FunctionNode *ast_func = static_cast<FunctionNode *>(tnode);
   const char                     *name = ast_func->GetName();
   // SmallVector<AttrId>          mAttrs;
@@ -418,7 +435,7 @@ maple::BaseNode *A2M::ProcessFunction(StmtExprKind skind, TreeNode *tnode, Block
       IdentifierNode *inode = static_cast<IdentifierNode *>(param);
       type = MapType(inode->GetType());
     } else {
-      NOTYETIMPL("ProcessFunction arg type()");
+      NOTYETIMPL("ProcessFuncSetup arg type()");
     }
 
     GStrIdx stridx = GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(param->GetName());
@@ -471,15 +488,15 @@ maple::BaseNode *A2M::ProcessClass(StmtExprKind skind, TreeNode *tnode, BlockNod
   AST2MPLMSG("\n================== class =====================", name);
 
   for (int i=0; i < classnode->GetFieldsNum(); i++) {
-    ProcessField(skind, classnode->GetField(i), block);
+    ProcessFieldSetup(skind, classnode->GetField(i), block);
   }
 
   for (int i=0; i < classnode->GetConstructorNum(); i++) {
-    ProcessFunction(skind, classnode->GetConstructor(i), block);
+    ProcessFuncSetup(skind, classnode->GetConstructor(i), block);
   }
 
   for (int i=0; i < classnode->GetMethodsNum(); i++) {
-    ProcessFunction(skind, classnode->GetMethod(i), block);
+    ProcessFuncSetup(skind, classnode->GetMethod(i), block);
   }
 
   // set kind to kTypeClass from kTypeClassIncomplete

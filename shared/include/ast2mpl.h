@@ -70,6 +70,7 @@ public:
   MIRSymbol *CreateSymbol(TreeNode *tnode, BlockNode *block);
   MIRFunction *GetFunc(BlockNode *block);
   MIRClassType *GetClass(BlockNode *block);
+  void UpdateUniqName(std::string &str);
 
   virtual MIRType *MapPrimType(PrimTypeNode *tnode)=0;
 
@@ -88,6 +89,9 @@ public:
 #undef  NODEKIND
 #define NODEKIND(K) maple::BaseNode *Process##K(StmtExprKind, TreeNode*, BlockNode*);
 #include "ast_nk.def"
+
+  maple::BaseNode *ProcessFieldSetup(StmtExprKind, TreeNode*, BlockNode*);
+  maple::BaseNode *ProcessFuncSetup(StmtExprKind, TreeNode*, BlockNode*);
 
   maple::BaseNode *ProcessUnaOperatorMpl(StmtExprKind skind,
                                          maple::Opcode op,
