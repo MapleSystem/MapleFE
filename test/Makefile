@@ -71,6 +71,7 @@ test:
 	../../mapleall/bin/aarch64-clang-debug/irbuild $(build)/$@.mpl
 	../../mapleall/bin/aarch64-clang-debug/irbuild $(build)/$@.irb.mpl
 	diff -uwb $(build)/$@.irb.mpl $(build)/$@.irb.irb.mpl
+	@echo gdb --args ../output/java/java2mpl $(build)/$@.java --trace-a2m
 
 % : %.c
 	cp $< $(build)
