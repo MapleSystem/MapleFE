@@ -11,16 +11,16 @@ my $pwd = getcwd;
 
 if(!(defined $ARGV[0])) {
   print "------------------------------------------------\n";
-  print "usage: runtests.pl all or java2mpl or errtest or others or openjdk\n";
+  print "usage: runtests.pl all or java2mpl or errtest or others or openjdk or syntaxonly\n";
   print "------------------------------------------------\n";
   exit;
 }
 
 if ($ARGV[0] eq 'all') {
-  @dirname = qw(java2mpl others openjdk);
+  @dirname = qw(java2mpl others openjdk syntaxonly);
   print "Run java2mpl others openjdk\n";
 } elsif ($ARGV[0] eq 'allall') {
-  @dirname = qw(java2mpl errtest others openjdk);
+  @dirname = qw(java2mpl errtest others openjdk syntaxonly);
   print "Run java2mpl errtest others openjdk\n";
 } elsif (($ARGV[0] eq 'java2mpl')) {
   @dirname = "$ARGV[0]";
@@ -32,6 +32,9 @@ if ($ARGV[0] eq 'all') {
   @dirname = "$ARGV[0]";
   print "Run $ARGV[0]\n";
 } elsif (($ARGV[0] eq 'openjdk')) {
+  @dirname = "$ARGV[0]";
+  print "Run $ARGV[0]\n";
+} elsif (($ARGV[0] eq 'syntaxonly')) {
   @dirname = "$ARGV[0]";
   print "Run $ARGV[0]\n";
 } else {
@@ -114,6 +117,9 @@ foreach my $dir (@dirname) {
         if ($dir eq "openjdk") {
           $res = system("$pwd/../output/java/java2mpl $outdir/$src_file > $outdir/$result_file");
         }
+        if ($dir eq "syntaxonly") {
+          $res = system("$pwd/../output/java/java2mpl $outdir/$src_file > $outdir/$result_file");
+        }
         
         if ($res > 0) {
 #print "over here1...\n";
@@ -127,6 +133,9 @@ foreach my $dir (@dirname) {
             print "$pwd/../output/java/java2mpl $outdir/$src_file\n";
           }
           if ($dir eq "openjdk") {
+            print "$pwd/../output/java/java2mpl $outdir/$src_file\n";
+          }
+          if ($dir eq "syntaxonly") {
             print "$pwd/../output/java/java2mpl $outdir/$src_file\n";
           }
           print " ==$dir===> $file\n";
