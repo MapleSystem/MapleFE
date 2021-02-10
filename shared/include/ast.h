@@ -376,11 +376,13 @@ public:
 // Java annoation has unlimited number while pragmas are limited.
 //////////////////////////////////////////////////////////////////////////
 
+// AnnotationTypeNode defines a new Annotation
 class AnnotationTypeNode : public TreeNode {
 private:
   IdentifierNode *mName;
 public:
   void SetName(IdentifierNode *n) {mName = n;}
+  void Dump(unsigned);
 };
 
 // Annotation/Pragma is complicated, but everything starts from the

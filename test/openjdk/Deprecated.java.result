@@ -1,0 +1,13 @@
+Matched 5 tokens.
+Matched 14 tokens.
+Matched 26 tokens.
+Matched 62 tokens.
+============= Module ===========
+== Sub Tree ==
+package java.lang
+== Sub Tree ==
+import java.lang.annotation
+== Sub Tree ==
+import static java.lang.annotation.ElementType
+== Sub Tree ==
+annotation type : Deprecated

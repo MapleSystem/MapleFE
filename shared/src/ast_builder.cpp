@@ -191,6 +191,10 @@ TreeNode* ASTBuilder::BuildSingleStaticImport() {
 }
 
 TreeNode* ASTBuilder::BuildAllStaticImport() {
+  BuildAllTypeImport();
+  ImportNode *import = (ImportNode*)mLastTreeNode;
+  import->SetImportStatic();
+  return mLastTreeNode;
 }
 
 TreeNode* ASTBuilder::BuildAllImport() {
@@ -774,7 +778,7 @@ TreeNode* ASTBuilder::BuildField() {
   FieldNode *field = NULL;
 
   if (node_b->IsPass()) {
-    TreeNode *parent = node_a;
+    TreeNode *upper = node_a;
     PassNode *pass = (PassNode*)node_b;
     for (unsigned i = 0; i < pass->GetChildrenNum(); i++) {
       TreeNode *child = pass->GetChild(i);
@@ -782,11 +786,11 @@ TreeNode* ASTBuilder::BuildField() {
 
       field = (FieldNode*)mTreePool->NewTreeNode(sizeof(FieldNode));
       new (field) FieldNode();
-      field->SetUpper(parent);
+      field->SetUpper(upper);
       field->SetField(child);
       field->Init();
 
-      parent = field;
+      upper = field;
     }
   } else {
     MASSERT(node_b->IsIdentifier());

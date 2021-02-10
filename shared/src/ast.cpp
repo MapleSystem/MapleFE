@@ -328,6 +328,8 @@ void PackageNode::Dump(unsigned indent) {
 void ImportNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   DUMP0_NORETURN("import ");
+  if (IsImportStatic())
+    DUMP0_NORETURN("static ");
   DUMP0_NORETURN(mName);
 }
 
@@ -340,6 +342,16 @@ void ParenthesisNode::Dump(unsigned indent) {
   DUMP0_NORETURN('(');
   mExpr->Dump(0);
   DUMP0_NORETURN(')');
+}
+
+//////////////////////////////////////////////////////////////////////////////////////
+//                          AnnotationTypeNode
+//////////////////////////////////////////////////////////////////////////////////////
+
+void AnnotationTypeNode::Dump(unsigned indent) {
+  DumpIndentation(indent);
+  DUMP0_NORETURN("annotation type : ");
+  mName->Dump(0);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
