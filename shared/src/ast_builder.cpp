@@ -187,7 +187,18 @@ TreeNode* ASTBuilder::BuildAllTypeImport() {
   return mLastTreeNode;
 }
 
+// It takes the mLastTreeNode as parameter
 TreeNode* ASTBuilder::BuildSingleStaticImport() {
+  ImportNode *n = (ImportNode*)mTreePool->NewTreeNode(sizeof(ImportNode));
+  new (n) ImportNode();
+  n->SetImportSingle();
+  n->SetImportType();
+
+  MASSERT(mLastTreeNode->IsIdentifier() || mLastTreeNode->IsField());
+  n->SetName(mLastTreeNode->GetName());
+  n->SetImportStatic();
+  mLastTreeNode = n;
+  return mLastTreeNode;
 }
 
 TreeNode* ASTBuilder::BuildAllStaticImport() {
