@@ -200,7 +200,7 @@ public:
   ~UnaOperatorNode() {}
 
   void SetIsPost(bool b)    {mIsPost = b;}
-  void SetOpnd(TreeNode* t) {mOpnd = t;}
+  void SetOpnd(TreeNode* t) {mOpnd = t; t->SetParent(this);}
   void SetOprId(OprId o)    {mOprId = o;}
 
   bool      IsPost()  {return mIsPost;}
@@ -444,7 +444,7 @@ public:
   ~ParenthesisNode(){}
 
   TreeNode* GetExpr() {return mExpr;}
-  void SetExpr(TreeNode *t) {mExpr = t;}
+  void SetExpr(TreeNode *t) {mExpr = t; t->SetParent(this);}
 
   void Dump(unsigned);
 };
@@ -587,9 +587,9 @@ public:
   CondBranchNode();
   ~CondBranchNode(){}
 
-  void SetCond(TreeNode *t)       {mCond = t;}
-  void SetTrueBranch(TreeNode *t) {mTrueBranch = t;}
-  void SetFalseBranch(TreeNode *t){mFalseBranch = t;}
+  void SetCond(TreeNode *t)       {mCond = t; t->SetParent(this);}
+  void SetTrueBranch(TreeNode *t) {mTrueBranch = t; t->SetParent(this);}
+  void SetFalseBranch(TreeNode *t){mFalseBranch = t; t->SetParent(this);}
 
   TreeNode* GetCond()        {return mCond;}
   TreeNode* GetTrueBranch()  {return mTrueBranch;}
@@ -840,7 +840,7 @@ public:
   void CleanUp();
 
   BlockNode* GetBody() {return mBody;}
-  void AddBody(BlockNode *b) {mBody = b; mBody->SetParent(this); CleanUp();}
+  void AddBody(BlockNode *b) {mBody = b; b->SetParent(this); CleanUp();}
 
   bool IsConstructor()    {return mIsConstructor;}
   void SetIsConstructor() {mIsConstructor = true;}
@@ -968,7 +968,7 @@ public:
   void AddSuperClass(ClassNode *n)         {mSuperClasses.PushBack(n);}
   void AddSuperInterface(InterfaceNode *n) {mSuperInterfaces.PushBack(n);}
   void AddAttr(AttrId a) {mAttributes.PushBack(a);}
-  void AddBody(BlockNode *b) {mBody = b; mBody->SetParent(this);}
+  void AddBody(BlockNode *b) {mBody = b; b->SetParent(this);}
 
   unsigned GetFieldsNum()      {return mFields.GetNum();}
   unsigned GetMethodsNum()     {return mMethods.GetNum();}
@@ -1010,6 +1010,7 @@ public:
   void SetChild(unsigned idx, TreeNode *t) {*(mChildren.RefAtIndex(idx)) = t;}
 
   void AddChild(TreeNode *c) {mChildren.PushBack(c); c->SetParent(this);}
+  void Dump(unsigned);
   void Release() {mChildren.Release();}
 };
 
@@ -1025,8 +1026,8 @@ public:
   LambdaNode() {mBody = NULL; mKind = NK_Lambda;}
   ~LambdaNode(){Release();}
 
-  void AddParam(IdentifierNode *n) {mParams.PushBack(n);}
-  void SetBody(TreeNode *n) {mBody = n;}
+  void AddParam(IdentifierNode *n) {mParams.PushBack(n); n->SetParent(this);}
+  void SetBody(TreeNode *n) {mBody = n; n->SetParent(this);}
 
   void Release() {mParams.Release();}
   void Dump(unsigned);

@@ -38,7 +38,7 @@ static void help() {
 }
 
 int main (int argc, char *argv[]) {
-  if (!strncmp(argv[1], "--help", 6) && (strlen(argv[1]) == 6)) {
+  if (argc == 1 || (!strncmp(argv[1], "--help", 6) && (strlen(argv[1]) == 6))) {
     help();
     exit(-1);
   }
