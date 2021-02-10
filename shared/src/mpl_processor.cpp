@@ -230,9 +230,19 @@ maple::BaseNode *A2M::ProcessVarList(StmtExprKind skind, TreeNode *tnode, BlockN
   VarListNode *node = static_cast<VarListNode *>(tnode);
   for (int i = 0; i < node->GetNum(); i++) {
     TreeNode *n = node->VarAtIndex(i);
-    IdentifierNode *idn = static_cast<IdentifierNode *>(n);
-    AST2MPLMSG("ProcessVarList() decl", idn->GetName());
-    MIRSymbol *symbol = CreateSymbol(idn, block);
+    IdentifierNode *inode = static_cast<IdentifierNode *>(n);
+    AST2MPLMSG("ProcessVarList() decl", inode->GetName());
+    MIRSymbol *symbol = CreateSymbol(inode, block);
+    TreeNode *init = inode->GetInit(); // Init value
+    if (init) {
+      maple::BaseNode *bn = ProcessNode(SK_Expr, init, block);
+      MIRType *mir_type = MapType(inode->GetType());
+      bn = new DassignNode(mir_type->GetPrimType(), bn, symbol->stIdx, 0);
+      if (bn) {
+        maple::BlockNode *blk = mBlockNodeMap[block];
+        blk->AddStatement(bn);
+      }
+    }
   }
   return nullptr;
 }
@@ -631,21 +641,54 @@ maple::BaseNode *A2M::ProcessSwitch(StmtExprKind skind, TreeNode *tnode, BlockNo
   return nullptr;
 }
 
+bool A2M::IsStmt(TreeNode *tnode) {
+  bool status = true;
+  if (!tnode) return false;
+
+  switch (tnode->GetKind()) {
+    case NK_Literal:
+    case NK_Identifier:
+      status = false;
+      break;
+    case NK_Parenthesis: {
+      ParenthesisNode *node = static_cast<ParenthesisNode *>(tnode);
+      status = IsStmt(node->GetExpr());
+      break;
+    }
+    case NK_UnaOperator: {
+      UnaOperatorNode *node = static_cast<UnaOperatorNode *>(tnode);
+      OprId ast_op = node->GetOprId();
+      if (ast_op != OPR_Inc || ast_op != OPR_Dec) {
+        status = false;
+      }
+    }
+    case NK_BinOperator: {
+      BinOperatorNode *bon = static_cast<BinOperatorNode *>(tnode);
+      maple::Opcode op = MapBinComboOpcode(bon->mOprId);
+      if (bon->mOprId != OPR_Assign && op == kOpUndef) {
+        status = false;
+      }
+      break;
+    }
+    default:
+      break;
+  }
+  return status;
+}
+
 maple::BaseNode *A2M::ProcessPass(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
   PassNode *node = static_cast<PassNode *>(tnode);
   maple::BlockNode *blk = mBlockNodeMap[block];
-  BaseNode *expr = nullptr;
+  BaseNode *stmt = nullptr;
   for (int i = 0; i < node->GetChildrenNum(); i++) {
     TreeNode *child = node->GetChild(i);
-    expr = ProcessNode(skind, child, block);
-    if (expr) {
-      if (mTraceA2m) expr->Dump(mMirModule, 0);
+    stmt = ProcessNode(skind, child, block);
+    if (stmt && IsStmt(child)) {
+      blk->AddStatement(stmt);
+      if (mTraceA2m) stmt->Dump(mMirModule, 0);
     }
-
-    NOTYETIMPL("ProcessPass()");
-    return expr;
   }
-  return expr;
+  return nullptr;
 }
 
 maple::BaseNode *A2M::ProcessUnaOperatorMpl(StmtExprKind skind,

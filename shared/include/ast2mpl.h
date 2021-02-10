@@ -59,6 +59,7 @@ public:
   ~A2M();
 
   void Init();
+  bool IsStmt(TreeNode *tnode);
 
   void UpdateFuncName(MIRFunction *func);
 
