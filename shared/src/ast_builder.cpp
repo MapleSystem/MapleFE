@@ -1140,7 +1140,7 @@ TreeNode* ASTBuilder::BuildAnnotationType() {
 
   AnnotationTypeNode *annon_type = (AnnotationTypeNode*)mTreePool->NewTreeNode(sizeof(AnnotationTypeNode));
   new (annon_type) AnnotationTypeNode();
-  annon_type->SetName(node_name);
+  annon_type->SetId(node_name);
 
   // set last tree node and return it.
   mLastTreeNode = annon_type;
@@ -1161,15 +1161,14 @@ TreeNode* ASTBuilder::BuildAnnotation() {
 
   if (!p_name.mIsTreeNode)
     MERROR("The annotationtype name is not a treenode in BuildAnnotation()");
-  TreeNode *node_name = p_name.mData.mTreeNode;
+  TreeNode *iden = p_name.mData.mTreeNode;
 
-  if (!node_name->IsIdentifier())
+  if (!iden->IsIdentifier())
     MERROR("The annotation name is NOT an indentifier node.");
-  IdentifierNode *in = (IdentifierNode*)node_name;
 
   AnnotationNode *annot = (AnnotationNode*)mTreePool->NewTreeNode(sizeof(AnnotationNode));
   new (annot) AnnotationNode();
-  annot->SetName(node_name);
+  annot->SetId(iden);
 
   // set last tree node and return it.
   mLastTreeNode = annot;
@@ -1284,12 +1283,21 @@ TreeNode* ASTBuilder::AddDimsTo() {
   TreeNode *node_a = p_dims_a.mData.mTreeNode;
   TreeNode *node_b = p_dims_b.mIsEmpty ? NULL : p_dims_b.mData.mTreeNode;
   if (node_b) {
-    IdentifierNode *inode = (IdentifierNode*)node_a;
-    inode->SetDims(node_b);
+    if (node_a->IsIdentifier()) {
+      IdentifierNode *inode = (IdentifierNode*)node_a;
+      inode->SetDims(node_b);
+      mLastTreeNode = node_a;
+    } else if (node_a->IsPrimType()) {
+      PrimTypeNode *pt = (PrimTypeNode*)node_a;
+      PrimArrayTypeNode *pat = (PrimArrayTypeNode*)mTreePool->NewTreeNode(sizeof(PrimArrayTypeNode));
+      new (pat) PrimArrayTypeNode();
+      pat->SetPrim(pt);
+      pat->SetDims(node_b);
+      mLastTreeNode = pat;
+    }
   }
 
-  mLastTreeNode = node_a;
-  return node_a;
+  return mLastTreeNode;
 }
 
 // AddDims() takes one parameters, the dims.

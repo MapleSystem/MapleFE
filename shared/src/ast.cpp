@@ -351,7 +351,7 @@ void ParenthesisNode::Dump(unsigned indent) {
 void AnnotationTypeNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   DUMP0_NORETURN("annotation type : ");
-  mName->Dump(0);
+  mId->Dump(0);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////

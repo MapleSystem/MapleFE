@@ -209,6 +209,12 @@ maple::BaseNode *A2M::ProcessPrimType(StmtExprKind skind, TreeNode *tnode, Block
   return nullptr;
 }
 
+maple::BaseNode *A2M::ProcessPrimArrayType(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
+  NOTYETIMPL("ProcessPrimArrayType()");
+  PrimArrayTypeNode *node = static_cast<PrimArrayTypeNode *>(tnode);
+  return nullptr;
+}
+
 maple::BaseNode *A2M::ProcessUserType(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
   NOTYETIMPL("ProcessUserType()");
   UserTypeNode *node = static_cast<UserTypeNode *>(tnode);

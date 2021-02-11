@@ -152,6 +152,11 @@ void Verifier::VerifyPrimType(PrimTypeNode *tree){
   return;
 }
 
+// Nothing needed for PrimArrayType
+void Verifier::VerifyPrimArrayType(PrimArrayTypeNode *tree){
+  return;
+}
+
 void Verifier::VerifyVarList(VarListNode *vlnode){
   TreeNode *old_temp_parent = mTempParent;
   mTempParent = vlnode;

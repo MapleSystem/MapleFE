@@ -74,8 +74,9 @@ protected:
   NodeKind  mKind;
   TreeNode *mParent;
   TreeNode *mLabel;   // label of a statement, or expression.
+  const char *mName;
 public:
-  TreeNode() {mKind = NK_Null; mLabel = NULL; mParent = NULL;}
+  TreeNode() {mKind = NK_Null; mLabel = NULL; mParent = NULL; mName = NULL;}
   virtual ~TreeNode() {}
 
 #undef  NODEKIND
@@ -91,7 +92,8 @@ public:
   TreeNode* GetParent() {return mParent;}
   TreeNode* GetLabel()  {return mLabel;}
 
-  virtual const char* GetName() {return NULL;}
+  virtual const char* GetName() {return mName;}
+  virtual void SetName(const char *s) {mName = s;}
   virtual void ReplaceChild(TreeNode *oldchild, TreeNode *newchild){}
   virtual void AddAttr(AttrId) {}
   virtual void AddAnnotation(AnnotationNode *n){}
@@ -110,10 +112,9 @@ public:
 
 class PackageNode : public TreeNode {
 private:
-  const char *mName;   // name to include. In c/c++ it's file name
 public:
-  PackageNode() : mName(NULL) {mKind = NK_Package;}
-  PackageNode(const char *s) : mName(s) {mKind = NK_Package;}
+  PackageNode(){mKind = NK_Package;}
+  PackageNode(const char *s) {mKind = NK_Package; mName = s;}
   ~PackageNode() {}
 
   void SetName(const char *s) {mName = s;}
@@ -142,8 +143,6 @@ enum ImportProperty {
 
 class ImportNode : public TreeNode {
 private:
-  const char *mName;   // name to include. In c/c++ it's file name
-                       // In java, it's type or static member.
   unsigned    mProperty;
 public:
   ImportNode() {mName = NULL; mProperty = 0; mKind = NK_Import;}
@@ -327,17 +326,18 @@ public:
 class IdentifierNode : public TreeNode {
 private:
   SmallVector<AttrId> mAttrs;
-  const char    *mName; // In the gStringPool
   TreeNode      *mType; // PrimTypeNode or UserTypeNode
   TreeNode      *mInit; // Init value
   DimensionNode *mDims;
 public:
-  IdentifierNode(const char *s) : mName(s), mType(NULL), mInit(NULL), mDims(NULL){
-    mKind = NK_Identifier; }
-  IdentifierNode(const char *s, TreeNode *t) : mName(s), mType(t) {mKind = NK_Identifier;}
+  IdentifierNode(const char *s) : mType(NULL), mInit(NULL), mDims(NULL){
+    mKind = NK_Identifier;
+    SetName(s); }
+  IdentifierNode(const char *s, TreeNode *t) : mType(t), mInit(NULL), mDims(NULL) {
+    mKind = NK_Identifier;
+    SetName(s);}
   ~IdentifierNode(){}
 
-  const char* GetName() {return mName;}
   TreeNode*   GetType() {return mType;}
   TreeNode*   GetInit() {return mInit;}
 
@@ -379,9 +379,9 @@ public:
 // AnnotationTypeNode defines a new Annotation
 class AnnotationTypeNode : public TreeNode {
 private:
-  IdentifierNode *mName;
+  IdentifierNode *mId;
 public:
-  void SetName(IdentifierNode *n) {mName = n;}
+  void SetId(IdentifierNode *n) {mId = n;}
   void Dump(unsigned);
 };
 
@@ -391,15 +391,15 @@ public:
 // expression.
 class AnnotationNode : public TreeNode {
 private:
-  IdentifierNode     *mName;
+  IdentifierNode     *mId;
   AnnotationTypeNode *mType;
   TreeNode           *mExpr;
 public:
-  AnnotationNode() : mName(NULL), mType(NULL), mExpr(NULL) {
+  AnnotationNode() : mId(NULL), mType(NULL), mExpr(NULL) {
     mKind = NK_Annotation;}
   ~AnnotationNode(){}
 
-  void SetName(IdentifierNode *n) {mName = n;}
+  void SetId(IdentifierNode *n) {mId = n;}
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -411,9 +411,8 @@ class CastNode : public TreeNode {
 private:
   TreeNode *mDestType;
   TreeNode *mExpr;
-  const char *mName;
 public:
-  CastNode() : mDestType(NULL), mExpr(NULL), mName(NULL) {mKind = NK_Cast;}
+  CastNode() : mDestType(NULL), mExpr(NULL) {mKind = NK_Cast;}
   ~CastNode(){}
 
   TreeNode* GetDestType() {return mDestType;}
@@ -461,9 +460,8 @@ class FieldNode : public TreeNode {
 private:
   TreeNode       *mUpper; // The upper enclosing structure
   IdentifierNode *mField;
-  const char     *mName;  // Name, initialized by Init().
 public:
-  FieldNode() : TreeNode(), mField(NULL), mName(NULL), mUpper(NULL) {mKind = NK_Field;}
+  FieldNode() : TreeNode(), mField(NULL), mUpper(NULL) {mKind = NK_Field;}
   ~FieldNode(){}
 
   void Init();
@@ -481,7 +479,6 @@ public:
     mUpper = up;
   }
 
-  const char* GetName() {return mName;}
   void Dump(unsigned);
 };
 
@@ -536,18 +533,15 @@ public:
 class LiteralNode : public TreeNode {
 private:
   LitData mData;
-  const char *mName;
-
 private:
   void InitName();
 
 public:
-  LiteralNode(LitData d) : mData(d), mName(NULL) {
+  LiteralNode(LitData d) : mData(d) {
     mKind = NK_Literal; InitName();
   }
   ~LiteralNode(){}
 
-  const char* GetName() {return mName;}
   LitData GetData() {return mData;}
   void Dump(unsigned);
 };
@@ -755,9 +749,8 @@ class CallNode : public TreeNode {
 private:
   TreeNode    *mMethod;
   ExprListNode mArgs;
-  const char  *mName;
 public:
-  CallNode() : mMethod(NULL), mName(NULL) {mKind = NK_Call;}
+  CallNode() : mMethod(NULL){mKind = NK_Call;}
   ~CallNode(){}
 
   void Init();
@@ -830,7 +823,6 @@ class ASTScope;
 
 class FunctionNode : public TreeNode {
 private:
-  const char                  *mName;
   SmallVector<AttrId>          mAttrs;
   SmallVector<AnnotationNode*> mAnnotations; //annotation or pragma
   SmallVector<ExceptionNode*>  mThrows;      // exceptions it can throw
@@ -873,9 +865,6 @@ public:
   void           AddThrow(ExceptionNode *n){mThrows.PushBack(n);}
   ExceptionNode* ThrowAtIndex(unsigned i)  {return mThrows.ValueAtIndex(i);}
 
-  const char* GetName()      {return mName;}
-  void SetName(const char*s) {mName = s;}
-
   void SetType(TreeNode *t) {mType = t;}
   TreeNode* GetType(){return mType;}
 
@@ -904,7 +893,6 @@ public:
 
 class InterfaceNode : public TreeNode {
 private:
-  const char *mName;
   bool        mIsAnnotation;
   SmallVector<InterfaceNode*>  mSuperInterfaces;
   SmallVector<IdentifierNode*> mFields;
@@ -913,7 +901,6 @@ public:
   InterfaceNode() : mIsAnnotation(false) {mKind = NK_Interface;}
   ~InterfaceNode() {}
 
-  void SetName(const char *n) {mName = n;}
   void SetIsAnnotation(bool b) {mIsAnnotation = b;}
 
   void Construct(BlockNode *);
@@ -951,7 +938,6 @@ private:
   // dedicated EnumNode for them.
   bool                         mJavaEnum;
 
-  const char                  *mName;
   SmallVector<ClassNode*>      mSuperClasses;
   SmallVector<InterfaceNode*>  mSuperInterfaces;
   SmallVector<AttrId>          mAttributes;
@@ -965,11 +951,8 @@ private:
   SmallVector<InterfaceNode*>  mLocalInterfaces;
 
 public:
-  ClassNode(){mKind = NK_Class; mJavaEnum = false; mName = NULL; mBody = NULL;}
+  ClassNode(){mKind = NK_Class; mJavaEnum = false; mBody = NULL;}
   ~ClassNode() {Release();}
-
-  void SetName(const char *n) {mName = n;}
-  const char* GetName()       {return mName;}
 
   bool IsJavaEnum() {return mJavaEnum;}
   void SetJavaEnum(){mJavaEnum = true;}

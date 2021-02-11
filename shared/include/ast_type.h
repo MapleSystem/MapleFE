@@ -41,8 +41,16 @@
 // (IdentifierNode) at the beginning, but later we will do consolidation,
 // and it may be turned into a function, struct, etc. So a TreeNode is good here.
 //
-// So, we only need to handle the primitive types which are coming
-// from language keywords.  This file handles the primitive types.
+//
+// We define 3 different types.
+// 1. UserType
+//    It's an identifier which defines a class, interface, struct, etc.
+// 2. PrimType
+//    This is coming from language's type keyword which are primitive types.
+//    PrimType-s have limited number, and we pre-created AST nodes for them.
+//    All same prim type nodes are pointing to the same one.
+// 3. PrimArrayType
+//    This is a special case. e.g. int[]
 //////////////////////////////////////////////////////////////////////////
 
 #ifndef __AST_TYPE_H__
@@ -99,6 +107,22 @@ public:
   TypeId    GetPrimType()     {return mPrimType;}
   void SetPrimType(TypeId id) {mPrimType = id; }
   const char* GetName();  // type name
+
+  void Dump(unsigned);
+};
+
+class PrimArrayTypeNode : public TreeNode {
+private:
+  PrimTypeNode  *mPrim;
+  DimensionNode *mDims;
+public:
+  PrimArrayTypeNode() : mPrim(NULL), mDims(NULL) {mKind = NK_PrimArrayType;}
+  ~PrimArrayTypeNode(){}
+
+  void SetPrim(PrimTypeNode *p) {mPrim = p;}
+  void SetDims(DimensionNode *d) {mDims = d;}
+  PrimTypeNode*  GetPrim() {return mPrim;}
+  DimensionNode* GetDims(){return mDims;}
 
   void Dump(unsigned);
 };

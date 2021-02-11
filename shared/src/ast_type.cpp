@@ -68,6 +68,14 @@ void UserTypeNode::Dump(unsigned ind) {
 }
 
 //////////////////////////////////////////////////////////////////////////
+//                          PrimArrayTypeNode                           //
+//////////////////////////////////////////////////////////////////////////
+
+void PrimArrayTypeNode::Dump(unsigned ind) {
+  DUMP0_NORETURN("prim array-TBD");
+}
+
+//////////////////////////////////////////////////////////////////////////
 //                          Local functions                             //
 //////////////////////////////////////////////////////////////////////////
 
@@ -138,10 +146,11 @@ PrimTypeNode* PrimTypePool::FindType(const char *keyword) {
 
 PrimTypeNode* PrimTypePool::FindType(TypeId id) {
   for (unsigned i = 0; i < TY_NA; i++) {
+    PrimTypeNode *type_float = mTypes.ValueAtIndex(6);
     PrimTypeNode *type = mTypes.ValueAtIndex(i);
     if (type->GetPrimType() == id)
       return type;
   }
-  MERROR("Cannot find the prim type of an TypeId.");
+  MASSERT(0 && "Cannot find the prim type of an TypeId.");
 }
 }
