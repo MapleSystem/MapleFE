@@ -44,6 +44,7 @@ rule PrimaryNoNewArray_single : ONEOF(
   TypeName + '.' + "this",
   '(' + Expression + ')',
   ClassInstanceCreationExpression)
+  attr.action.%4 : BuildField(%1, %3)
   attr.action.%5 : BuildParenthesis(%2)
   attr.property : Single
 

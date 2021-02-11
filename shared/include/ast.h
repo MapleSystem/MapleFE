@@ -411,8 +411,9 @@ class CastNode : public TreeNode {
 private:
   TreeNode *mDestType;
   TreeNode *mExpr;
+  const char *mName;
 public:
-  CastNode() : mDestType(NULL), mExpr(NULL) {mKind = NK_Cast;}
+  CastNode() : mDestType(NULL), mExpr(NULL), mName(NULL) {mKind = NK_Cast;}
   ~CastNode(){}
 
   TreeNode* GetDestType() {return mDestType;}
@@ -421,6 +422,7 @@ public:
   TreeNode* GetExpr() {return mExpr;}
   void SetExpr(TreeNode *t) {mExpr = t;}
 
+  const char* GetName();
   void Dump(unsigned);
 };
 
@@ -470,7 +472,14 @@ public:
   void SetField(IdentifierNode *f) {mField = f;}
 
   TreeNode *GetUpper()       {return mUpper;}
-  void SetUpper(TreeNode *n) {mUpper = n;}
+  void SetUpper(TreeNode *n) {
+    TreeNode *up = n;
+    while (up->IsParenthesis()) {
+      ParenthesisNode *pn = (ParenthesisNode*)up;
+      up = pn->GetExpr();
+    }
+    mUpper = up;
+  }
 
   const char* GetName() {return mName;}
   void Dump(unsigned);

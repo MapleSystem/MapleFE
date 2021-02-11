@@ -358,6 +358,17 @@ void AnnotationTypeNode::Dump(unsigned indent) {
 //                          CastNode
 //////////////////////////////////////////////////////////////////////////////////////
 
+const char* CastNode::GetName() {
+  if (mName)
+    return mName;
+  std::string name = "(";
+  name += mDestType->GetName();
+  name += ")";
+  name += mExpr->GetName();
+  mName = gStringPool.FindString(name);
+  return mName;
+}
+
 void CastNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   DUMP0_NORETURN('(');
