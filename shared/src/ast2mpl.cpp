@@ -194,6 +194,41 @@ const char *A2M::Type2Label(const MIRType *type) {
   }
 }
 
+bool A2M::IsStmt(TreeNode *tnode) {
+  bool status = true;
+  if (!tnode) return false;
+
+  switch (tnode->GetKind()) {
+    case NK_Literal:
+    case NK_Identifier:
+      status = false;
+      break;
+    case NK_Parenthesis: {
+      ParenthesisNode *node = static_cast<ParenthesisNode *>(tnode);
+      status = IsStmt(node->GetExpr());
+      break;
+    }
+    case NK_UnaOperator: {
+      UnaOperatorNode *node = static_cast<UnaOperatorNode *>(tnode);
+      OprId ast_op = node->GetOprId();
+      if (ast_op != OPR_Inc && ast_op != OPR_Dec) {
+        status = false;
+      }
+    }
+    case NK_BinOperator: {
+      BinOperatorNode *bon = static_cast<BinOperatorNode *>(tnode);
+      maple::Opcode op = MapBinComboOpcode(bon->mOprId);
+      if (bon->mOprId != OPR_Assign && op == kOpUndef) {
+        status = false;
+      }
+      break;
+    }
+    default:
+      break;
+  }
+  return status;
+}
+
 #define USE_SHORT 1
 
 // used to form mangled function name
