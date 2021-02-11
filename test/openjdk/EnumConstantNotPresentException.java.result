@@ -1,0 +1,25 @@
+Matched 5 tokens.
+Matched 105 tokens.
+============= Module ===========
+== Sub Tree ==
+package java.lang
+== Sub Tree ==
+class  EnumConstantNotPresentException
+  Fields: 
+    serialVersionUID=Sub
+  180673940    enumType    constantName
+  Instance Initializer: 
+  Constructors: 
+    constructor  EnumConstantNotPresentException()  throws: 
+      this.enumType Assign enumType
+      this.constantName Assign constantName
+  Methods: 
+    func  enumType()  throws: 
+      return enumType
+    func  constantName()  throws: 
+      return constantName
+  LocalClasses: 
+  LocalInterfaces: 
+
+Field Decl Duplication! Identifier:enumType is duplicated with Function:enumType
+Field Decl Duplication! Identifier:constantName is duplicated with Function:constantName

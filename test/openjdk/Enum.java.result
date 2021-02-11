@@ -1,0 +1,108 @@
+Matched 5 tokens.
+Matched 12 tokens.
+Matched 19 tokens.
+Matched 26 tokens.
+Matched 33 tokens.
+Matched 40 tokens.
+Matched 49 tokens.
+Matched 58 tokens.
+Matched 65 tokens.
+Matched 72 tokens.
+Matched 730 tokens.
+============= Module ===========
+== Sub Tree ==
+package java.lang
+== Sub Tree ==
+import java.io.Serializable
+== Sub Tree ==
+import java.io.IOException
+== Sub Tree ==
+import java.io.InvalidObjectException
+== Sub Tree ==
+import java.io.ObjectInputStream
+== Sub Tree ==
+import java.io.ObjectStreamException
+== Sub Tree ==
+import java.lang.reflect.InvocationTargetException
+== Sub Tree ==
+import java.lang.reflect.Method
+== Sub Tree ==
+import libcore.util.BasicLruCache
+== Sub Tree ==
+import libcore.util.EmptyArray
+== Sub Tree ==
+class  Enum
+  Fields: 
+    name    ordinal    sharedConstantsCache=new BasicLruCache<Class,Enum,Object[]>
+  Instance Initializer: 
+  Constructors: 
+    constructor  Enum()  throws: 
+      this.name Assign name
+      this.ordinal Assign ordinal
+  Methods: 
+    func  name()  throws: 
+      return name
+    func  ordinal()  throws: 
+      return ordinal
+    func  toString()  throws: 
+      return name
+    func  equals()  throws: 
+      return this EQ other
+    func  hashCode()  throws: 
+      return hashCode
+    func  clone()  throws:     CloneNotSupportedException
+      new CloneNotSupportedException<CloneNotSupportedException>
+    func  compareTo()  throws: 
+      var:other=(Enum)o
+      var:self=this
+      cond-branch cond:self.getClass() NE other.getClass() Land self.getDeclaringClass() NE other.getDeclaringClass()
+      true branch :
+        new ClassCastException<ClassCastException>      false branch :
+
+      return self.ordinal Sub other.ordinal
+    func  getDeclaringClass()  throws: 
+      var:clazz=getClass()
+      var:zuper=clazz.getSuperclass()
+      return 
+    func  valueOf()  throws: 
+      cond-branch cond:enumType EQ null
+      true branch :
+        new NullPointerException<NullPointerException>
+      false branch :
+
+      cond-branch cond:name EQ null
+      true branch :
+        new NullPointerException<NullPointerException>
+      false branch :
+
+      var:values=getSharedConstants(enumType)
+      cond-branch cond:values EQ null
+      true branch :
+        new IllegalArgumentException<IllegalArgumentException>
+      false branch :
+
+      for ( )
+        var:value=
+        cond-branch cond:name.equals(value.name())
+        true branch :
+          return value
+        false branch :
+
+
+      new IllegalArgumentException<IllegalArgumentException>
+    func  getSharedConstants()  throws: 
+      return (T[])sharedConstantsCache.get(enumType)
+    func  finalize()  throws: 
+    func  readObject()  throws:     IOException    ClassNotFoundException
+      new InvalidObjectException<InvalidObjectException>
+    func  readObjectNoData()  throws:     ObjectStreamException
+      new InvalidObjectException<InvalidObjectException>
+  LocalClasses: 
+  LocalInterfaces: 
+
+Field Decl Duplication! Identifier:name is duplicated with Function:name
+Field Decl Duplication! Identifier:ordinal is duplicated with Function:ordinal
+UserType:CloneNotSupportedException has no decl.
+UserType:IllegalArgumentException has no decl.
+UserType:InvalidObjectException has no decl.
+UserType:InvalidObjectException has no decl.
