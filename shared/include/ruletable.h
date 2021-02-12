@@ -92,7 +92,11 @@ enum RuleProp {
   RP_Single  = 1, // For a ONEOF rule, there is one and only one children valid.
   RP_ZomFast = 2, // For a Zeroormore rule, it can be a fast parsing.
   RP_Top     = 4, // A top rule
-  RP_Longest = 8, // A usually lexer rule wanting just the longest possible match.
+  RP_SecondTry = 8, // A usually lexer rule wanting second try. This is specific
+                    // for lex rules. For most lexing rules we just want the longest
+                    // match, and it's ok. However, some concatenate rules do require
+                    // certain sub-rules NOT to match the longest so that the later
+                    // sub-rules can match, and so the whole rule.
 };
 
 // A rule has a limited set of beginning tokens. These are called LookAhead.

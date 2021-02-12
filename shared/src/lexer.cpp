@@ -757,7 +757,8 @@ bool Lexer::Traverse(const RuleTable *rule_table) {
 
     if (!found) {
       curidx = old_pos;
-      found = TraverseSecondTry(rule_table);
+      if (rule_table->mProperties & RP_SecondTry)
+        found = TraverseSecondTry(rule_table);
     }
 
     matched = found;

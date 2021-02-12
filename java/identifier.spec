@@ -19,4 +19,3 @@
 rule JavaChar : ONEOF(CHAR, '_' , '$')
 rule CharOrDigit : ONEOF(JavaChar, DIGIT)
 rule Identifier : JavaChar + ZEROORMORE(CharOrDigit)
-  attr.property.%2 : ZomFast, Longest
