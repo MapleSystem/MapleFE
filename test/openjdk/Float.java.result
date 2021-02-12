@@ -1,0 +1,107 @@
+Matched 5 tokens.
+Matched 12 tokens.
+Matched 19 tokens.
+Matched 26 tokens.
+Matched 848 tokens.
+============= Module ===========
+== Sub Tree ==
+package java.lang
+== Sub Tree ==
+import sun.misc.FloatingDecimal
+== Sub Tree ==
+import sun.misc.FloatConsts
+== Sub Tree ==
+import sun.misc.DoubleConsts
+== Sub Tree ==
+class  Float
+  Fields: 
+    POSITIVE_INFINITY=    NEGATIVE_INFINITY=    NaN=    MAX_VALUE=3.40282e+38    MIN_NORMAL=1.17549e-38    MIN_VALUE=1.4013e-45    MAX_EXPONENT=127    MIN_EXPONENT=Sub
+  126    SIZE=32    BYTES=    TYPE=()    value    serialVersionUID=Sub
+  616763156
+  Instance Initializer: 
+  Constructors: 
+    constructor  Float()  throws: 
+      this.value Assign value
+    constructor  Float()  throws: 
+      this.value Assign (float)value
+    constructor  Float()  throws: 
+      value Assign parseFloat(s)
+  Methods: 
+    func  toString()  throws: 
+      return FloatingDecimal.toJavaFormatString(f)
+    func  toHexString()  throws: 
+      cond-branch cond:Math.abs(f) LT FloatConsts.MIN_NORMAL Land f NE 0
+      true branch :
+        var:s=Double.toHexString(Math.scalb((double)f,DoubleConsts.MIN_EXPONENT Sub FloatConsts.MIN_EXPONENT))
+        return s.replaceFirst("p-1022$","p-126")
+      false branch :
+        return Double.toHexString(f)
+    func  valueOf()  throws:     NumberFormatException
+      return new Float<Float>
+    func  valueOf()  throws: 
+      return new Float<Float>
+    func  parseFloat()  throws:     NumberFormatException
+      return FloatingDecimal.parseFloat(s)
+    func  isNaN()  throws: 
+      return (v NE v)
+    func  isInfinite()  throws: 
+      return (v EQ POSITIVE_INFINITY) Lor (v EQ NEGATIVE_INFINITY)
+    func  isFinite()  throws: 
+      return Math.abs(f) LE FloatConsts.MAX_VALUE
+    func  isNaN()  throws: 
+      return isNaN(value)
+    func  isInfinite()  throws: 
+      return isInfinite(value)
+    func  toString()  throws: 
+      return Float.toString(value)
+    func  byteValue()  throws: 
+      return (byte)value
+    func  shortValue()  throws: 
+      return (short)value
+    func  intValue()  throws: 
+      return (int)value
+    func  longValue()  throws: 
+      return (long)value
+    func  floatValue()  throws: 
+      return value
+    func  doubleValue()  throws: 
+      return (double)value
+    func  hashCode()  throws: 
+      return Float.hashCode(value)
+    func  hashCode()  throws: 
+      return floatToIntBits(value)
+    func  equals()  throws: 
+      return () Land (floatToIntBits((Float)obj.value) EQ floatToIntBits(value))
+    func  floatToIntBits()  throws: 
+      var:result=floatToRawIntBits(value)
+      cond-branch cond:((result Band FloatConsts.EXP_BIT_MASK) EQ FloatConsts.EXP_BIT_MASK) Land (result Band FloatConsts.SIGNIF_BIT_MASK) NE 0
+      true branch :
+        result Assign 2143289344      false branch :
+
+      return result
+    func  floatToRawIntBits()  throws: 
+    func  intBitsToFloat()  throws: 
+    func  compareTo()  throws: 
+      return Float.compare(value,anotherFloat.value)
+    func  compare()  throws: 
+      cond-branch cond:f1 LT f2
+      true branch :
+        return Sub
+  1      false branch :
+
+      cond-branch cond:f1 GT f2
+      true branch :
+        return 1      false branch :
+
+      var:thisBits=Float.floatToIntBits(f1)
+      var:anotherBits=Float.floatToIntBits(f2)
+      return ()
+    func  sum()  throws: 
+      return a Add b
+    func  max()  throws: 
+      return Math.max(a,b)
+    func  min()  throws: 
+      return Math.min(a,b)
+  LocalClasses: 
+  LocalInterfaces: 
+

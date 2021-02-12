@@ -1,0 +1,10 @@
+Matched 5 tokens.
+Matched 14 tokens.
+Matched 36 tokens.
+============= Module ===========
+== Sub Tree ==
+package java.lang
+== Sub Tree ==
+import java.lang.annotation
+== Sub Tree ==
+annotation type : FunctionalInterface
