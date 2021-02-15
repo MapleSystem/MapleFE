@@ -163,6 +163,7 @@ class  Character
         false branch :
           new IllegalArgumentException<IllegalArgumentException>
 
+
     func  toChars()  throws: 
       cond-branch cond:isBmpCodePoint(codePoint)
       true branch :
@@ -174,6 +175,7 @@ class  Character
 
         false branch :
           new IllegalArgumentException<IllegalArgumentException>
+
 
     func  toSurrogates()  throws: 
        Assign lowSurrogate(codePoint)
@@ -312,6 +314,7 @@ class  Character
           return (2147483630 Band (1 Shl (codePoint Sub 64))) NE 0
         false branch :
 
+
       return ((1 Shl getType(codePoint)) Band ((1 Shl UPPERCASE_LETTER) Bor (1 Shl LOWERCASE_LETTER) Bor (1 Shl TITLECASE_LETTER) Bor (1 Shl MODIFIER_LETTER) Bor (1 Shl OTHER_LETTER) Bor (1 Shl CURRENCY_SYMBOL) Bor (1 Shl CONNECTOR_PUNCTUATION) Bor (1 Shl LETTER_NUMBER))) NE 0
     func  isJavaIdentifierPart()  throws: 
       return isJavaIdentifierPart((int)ch)
@@ -324,6 +327,7 @@ class  Character
         true branch :
           return (2147483630 Band (1 Shl (codePoint Sub 64))) NE 0
         false branch :
+
 
       return ((1 Shl getType(codePoint)) Band ((1 Shl UPPERCASE_LETTER) Bor (1 Shl LOWERCASE_LETTER) Bor (1 Shl TITLECASE_LETTER) Bor (1 Shl MODIFIER_LETTER) Bor (1 Shl OTHER_LETTER) Bor (1 Shl CURRENCY_SYMBOL) Bor (1 Shl CONNECTOR_PUNCTUATION) Bor (1 Shl DECIMAL_DIGIT_NUMBER) Bor (1 Shl LETTER_NUMBER) Bor (1 Shl FORMAT) Bor (1 Shl COMBINING_SPACING_MARK) Bor (1 Shl NON_SPACING_MARK))) NE 0 Lor (codePoint GE 0 Land codePoint LE 8) Lor (codePoint GE 14 Land codePoint LE 27) Lor (codePoint GE 127 Land codePoint LE 159)
     func  isUnicodeIdentifierStart()  throws: 
@@ -554,16 +558,19 @@ class  Character
       var:name=getNameImpl(codePoint)
       cond-branch cond:name NE null
       true branch :
-        return name      false branch :
+        return name
+      false branch :
 
       cond-branch cond:getType(codePoint) EQ UNASSIGNED
       true branch :
-        return null      false branch :
+        return null
+      false branch :
 
       var:block=UnicodeBlock.of(codePoint)
       cond-branch cond:block NE null
       true branch :
-        return  Add " " Add       false branch :
+        return  Add " " Add 
+      false branch :
 
       return 
     func  getNameImpl()  throws: 
@@ -650,18 +657,21 @@ class  Character
         func  of()  throws: 
           cond-branch cond:isValidCodePoint(codePoint)
           true branch :
-            new IllegalArgumentException<IllegalArgumentException>          false branch :
+            new IllegalArgumentException<IllegalArgumentException>
+          false branch :
 
           var:type=getType(codePoint)
           cond-branch cond:type EQ UNASSIGNED
           true branch :
-            return UNKNOWN          false branch :
+            return UNKNOWN
+          false branch :
 
           var:index=Arrays.binarySearch(scriptStarts,codePoint)
           cond-branch cond:index LT 0
           true branch :
             index Assign Sub
-  index Sub 2          false branch :
+  index Sub 2
+          false branch :
 
           return 
         func  forName()  throws: 
@@ -669,7 +679,8 @@ class  Character
           var:sc=aliases.get(scriptName)
           cond-branch cond:sc NE null
           true branch :
-            return sc          false branch :
+            return sc
+          false branch :
 
           return valueOf(scriptName)
       LocalClasses: 

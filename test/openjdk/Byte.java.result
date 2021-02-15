@@ -25,7 +25,8 @@ class  Byte
       var:i=Integer.parseInt(s,radix)
       cond-branch cond:i LT MIN_VALUE Lor i GT MAX_VALUE
       true branch :
-        new NumberFormatException<NumberFormatException>      false branch :
+        new NumberFormatException<NumberFormatException>
+      false branch :
 
       return (byte)i
     func  parseByte()  throws:     NumberFormatException
@@ -38,7 +39,8 @@ class  Byte
       var:i=Integer.decode(nm)
       cond-branch cond:i LT MIN_VALUE Lor i GT MAX_VALUE
       true branch :
-        new NumberFormatException<NumberFormatException>      false branch :
+        new NumberFormatException<NumberFormatException>
+      false branch :
 
       return valueOf((byte)i)
     func  byteValue()  throws: 

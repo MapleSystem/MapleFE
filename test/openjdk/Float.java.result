@@ -36,6 +36,7 @@ class  Float
         return s.replaceFirst("p-1022$","p-126")
       false branch :
         return Double.toHexString(f)
+
     func  valueOf()  throws:     NumberFormatException
       return new Float<Float>
     func  valueOf()  throws: 
@@ -76,7 +77,8 @@ class  Float
       var:result=floatToRawIntBits(value)
       cond-branch cond:((result Band FloatConsts.EXP_BIT_MASK) EQ FloatConsts.EXP_BIT_MASK) Land (result Band FloatConsts.SIGNIF_BIT_MASK) NE 0
       true branch :
-        result Assign 2143289344      false branch :
+        result Assign 2143289344
+      false branch :
 
       return result
     func  floatToRawIntBits()  throws: 
@@ -87,11 +89,13 @@ class  Float
       cond-branch cond:f1 LT f2
       true branch :
         return Sub
-  1      false branch :
+  1
+      false branch :
 
       cond-branch cond:f1 GT f2
       true branch :
-        return 1      false branch :
+        return 1
+      false branch :
 
       var:thisBits=Float.floatToIntBits(f1)
       var:anotherBits=Float.floatToIntBits(f2)

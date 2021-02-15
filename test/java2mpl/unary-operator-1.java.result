@@ -10,7 +10,8 @@ class  A
     func  foo()  throws: 
       cond-branch cond:x NE 0
       true branch :
-        return 0      false branch :
+        return 0
+      false branch :
 
   LocalClasses: 
   LocalInterfaces: 

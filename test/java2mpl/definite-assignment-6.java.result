@@ -11,7 +11,8 @@ class  A
       var:k
       cond-branch cond:v GT 0 Land (k Assign System.read()) GE 0
       true branch :
-        System.println(k)      false branch :
+        System.println(k)
+      false branch :
 
   LocalClasses: 
   LocalInterfaces: 

@@ -14,7 +14,8 @@ class  A
       false branch :
         cond-branch cond:b
         true branch :
-          return 3        false branch :
+          return 3
+        false branch :
 
         return 1
 

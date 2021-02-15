@@ -619,7 +619,7 @@ private:
   SmallVector<TreeNode *> mInit;
   TreeNode               *mCond;
   SmallVector<TreeNode *> mUpdate;
-  TreeNode               *mBody;   // This could be a single statement, or a block node
+  TreeNode               *mBody;   // This is a block node
 public:
   ForLoopNode() {mCond = NULL; mBody = NULL; mKind = NK_ForLoop;}
   ~ForLoopNode() {Release();}
@@ -643,7 +643,7 @@ public:
 class WhileLoopNode : public TreeNode {
 private:
   TreeNode *mCond;
-  TreeNode *mBody; // This could be a single statement, or a block node
+  TreeNode *mBody; // This is a block node
 public:
   WhileLoopNode() {mCond = NULL; mBody = NULL; mKind = NK_WhileLoop;}
   ~WhileLoopNode() {Release();}
@@ -660,7 +660,7 @@ public:
 class DoLoopNode : public TreeNode {
 private:
   TreeNode *mCond;
-  TreeNode *mBody; // This could be a single statement, or a block node
+  TreeNode *mBody; // This is a block node
 public:
   DoLoopNode() {mCond = NULL; mBody = NULL; mKind = NK_DoLoop;}
   ~DoLoopNode(){Release();}
@@ -1013,7 +1013,7 @@ public:
 class LambdaNode : public TreeNode {
 private:
   SmallVector<IdentifierNode*> mParams;
-  TreeNode *mBody;  // the body could be an expression, or block.
+  TreeNode *mBody;  // the body is block.
 public:
   LambdaNode() {mBody = NULL; mKind = NK_Lambda;}
   ~LambdaNode(){Release();}

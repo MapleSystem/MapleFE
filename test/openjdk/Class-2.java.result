@@ -22,7 +22,8 @@ class  Class
     func  getSimpleName()  throws: 
       cond-branch cond:isArray()
       true branch :
-        return  Add "[]"      false branch :
+        return  Add "[]"
+      false branch :
 
       cond-branch cond:isAnonymousClass()
       true branch :
@@ -58,13 +59,16 @@ class  Class
         var:canonicalName=
         cond-branch cond:canonicalName NE null
         true branch :
-          return canonicalName Add "[]"        false branch :
+          return canonicalName Add "[]"
+        false branch :
           return null
+
       false branch :
 
       cond-branch cond:isLocalOrAnonymousClass()
       true branch :
-        return null      false branch :
+        return null
+      false branch :
 
       var:enclosingClass=getEnclosingClass()
       cond-branch cond:enclosingClass EQ null
@@ -295,13 +299,15 @@ class  Class
     func  getEnumConstantsShared()  throws: 
       cond-branch cond:isEnum()
       true branch :
-        return null      false branch :
+        return null
+      false branch :
 
       return (T[])Enum.getSharedConstants((Class)this)
     func  cast()  throws: 
       cond-branch cond:obj NE null Land isInstance(obj)
       true branch :
-        new ClassCastException<ClassCastException>      false branch :
+        new ClassCastException<ClassCastException>
+      false branch :
 
       return (T)obj
     func  cannotCastMsg()  throws: 
@@ -309,8 +315,10 @@ class  Class
     func  asSubclass()  throws: 
       cond-branch cond:clazz.isAssignableFrom(this)
       true branch :
-        return ()this      false branch :
+        return ()this
+      false branch :
         new ClassCastException<ClassCastException>
+
     func  getAnnotation()  throws: 
       Objects.requireNonNull(annotationClass)
       var:annotation=getDeclaredAnnotation(annotationClass)

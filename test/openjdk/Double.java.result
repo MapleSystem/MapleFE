@@ -30,7 +30,8 @@ class  Double
     func  toHexString()  throws: 
       cond-branch cond:isFinite(d)
       true branch :
-        return Double.toString(d)      false branch :
+        return Double.toString(d)
+      false branch :
         var:answer=new StringBuilder<StringBuilder>
 
 
@@ -75,7 +76,8 @@ class  Double
       var:result=doubleToRawLongBits(value)
       cond-branch cond:((result Band DoubleConsts.EXP_BIT_MASK) EQ DoubleConsts.EXP_BIT_MASK) Land (result Band DoubleConsts.SIGNIF_BIT_MASK) NE 0
       true branch :
-        result Assign 0      false branch :
+        result Assign 0
+      false branch :
 
       return result
     func  doubleToRawLongBits()  throws: 
@@ -86,11 +88,13 @@ class  Double
       cond-branch cond:d1 LT d2
       true branch :
         return Sub
-  1      false branch :
+  1
+      false branch :
 
       cond-branch cond:d1 GT d2
       true branch :
-        return 1      false branch :
+        return 1
+      false branch :
 
       var:thisBits=Double.doubleToLongBits(d1)
       var:anotherBits=Double.doubleToLongBits(d2)

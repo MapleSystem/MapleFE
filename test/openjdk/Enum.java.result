@@ -57,7 +57,8 @@ class  Enum
       var:self=this
       cond-branch cond:self.getClass() NE other.getClass() Land self.getDeclaringClass() NE other.getDeclaringClass()
       true branch :
-        new ClassCastException<ClassCastException>      false branch :
+        new ClassCastException<ClassCastException>
+      false branch :
 
       return self.ordinal Sub other.ordinal
     func  getDeclaringClass()  throws: 

@@ -57,7 +57,8 @@ interface  CharSequence
         LocalClasses: 
         LocalInterfaces: 
 
-      return StreamSupport.intStream(() -> Spliterators.spliterator(new CharIterator<CharIterator>,length(),Spliterator.ORDERED),Spliterator.SUBSIZED Bor Spliterator.SIZED Bor Spliterator.ORDERED,false)
+      return StreamSupport.intStream(() -> Spliterators.spliterator(new CharIterator<CharIterator>,length(),Spliterator.ORDERED)
+,Spliterator.SUBSIZED Bor Spliterator.SIZED Bor Spliterator.ORDERED,false)
     func  codePoints()  throws: 
       class  CodePointIterator
         Fields: 
@@ -96,5 +97,6 @@ interface  CharSequence
         LocalClasses: 
         LocalInterfaces: 
 
-      return StreamSupport.intStream(() -> Spliterators.spliteratorUnknownSize(new CodePointIterator<CodePointIterator>,Spliterator.ORDERED),Spliterator.ORDERED,false)
+      return StreamSupport.intStream(() -> Spliterators.spliteratorUnknownSize(new CodePointIterator<CodePointIterator>,Spliterator.ORDERED)
+,Spliterator.ORDERED,false)
 

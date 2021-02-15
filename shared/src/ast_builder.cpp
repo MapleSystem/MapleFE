@@ -395,7 +395,7 @@ TreeNode* ASTBuilder::AddCondBranchTrueStatement() {
   if (!p_true.mIsEmpty) {
     if (!p_true.mIsTreeNode)
       MERROR("The condition expr is not a tree node.");
-    TreeNode *true_expr = p_true.mData.mTreeNode;
+    TreeNode *true_expr = CvtToBlock(p_true.mData.mTreeNode);
     cond_branch->SetTrueBranch(true_expr);
   }
 
@@ -412,7 +412,7 @@ TreeNode* ASTBuilder::AddCondBranchFalseStatement() {
   if (!p_false.mIsEmpty) {
     if (!p_false.mIsTreeNode)
       MERROR("The condition expr is not a tree node.");
-    TreeNode *false_expr = p_false.mData.mTreeNode;
+    TreeNode *false_expr = CvtToBlock(p_false.mData.mTreeNode);
     cond_branch->SetFalseBranch(false_expr);
   }
 
@@ -516,7 +516,7 @@ TreeNode* ASTBuilder::BuildForLoop() {
   Param p_body = mParams[3];
   if (!p_body.mIsEmpty) {
     MASSERT(p_body.mIsTreeNode && "ForLoop body is not a treenode.");
-    TreeNode *body = p_body.mData.mTreeNode;
+    TreeNode *body = CvtToBlock(p_body.mData.mTreeNode);
     for_loop->SetBody(body);
   }
 
@@ -543,7 +543,7 @@ TreeNode* ASTBuilder::BuildWhileLoop() {
   Param p_body = mParams[1];
   if (!p_body.mIsEmpty) {
     MASSERT(p_body.mIsTreeNode && "WhileLoop body is not a treenode.");
-    TreeNode *body = p_body.mData.mTreeNode;
+    TreeNode *body = CvtToBlock(p_body.mData.mTreeNode);
     while_loop->SetBody(body);
   }
 
@@ -570,7 +570,7 @@ TreeNode* ASTBuilder::BuildDoLoop() {
   Param p_body = mParams[1];
   if (!p_body.mIsEmpty) {
     MASSERT(p_body.mIsTreeNode && "DoLoop body is not a treenode.");
-    TreeNode *body = p_body.mData.mTreeNode;
+    TreeNode *body = CvtToBlock(p_body.mData.mTreeNode);
     do_loop->SetBody(body);
   }
 
@@ -1058,6 +1058,21 @@ TreeNode* ASTBuilder::AddToBlock() {
   // set last tree node
   mLastTreeNode = block;
   return mLastTreeNode;
+}
+
+// if tnode is not a BlockNode, wrap it into a BlockNode
+TreeNode* ASTBuilder::CvtToBlock(TreeNode *tnode) {
+  if (mTrace)
+    std::cout << "In CvtToBlock" << std::endl;
+
+  if (tnode->IsBlock()) {
+    return tnode;
+  }
+
+  BlockNode *block = (BlockNode*)mTreePool->NewTreeNode(sizeof(BlockNode));
+  new (block) BlockNode();
+  block->AddChild(tnode);
+  return block;
 }
 
 // This takes just one argument which either a block node, or the root of sub tree
@@ -1753,7 +1768,7 @@ TreeNode* ASTBuilder::BuildLambda() {
     if (!p_body.mIsTreeNode)
       MERROR("Lambda Body is not a tree node.");
     else
-      body_node = p_body.mData.mTreeNode;
+      body_node = CvtToBlock(p_body.mData.mTreeNode);
   }
 
   LambdaNode *lambda = (LambdaNode*)mTreePool->NewTreeNode(sizeof(LambdaNode));

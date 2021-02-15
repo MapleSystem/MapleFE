@@ -11,8 +11,10 @@ class  A
       var:k
       cond-branch cond:flag
       true branch :
-        k Assign 3      false branch :
+        k Assign 3
+      false branch :
         k Assign 4
+
       System.out.println(k)
   LocalClasses: 
   LocalInterfaces: 

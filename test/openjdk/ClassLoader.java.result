@@ -163,8 +163,10 @@ class  ClassLoader
       var:loader
       cond-branch cond:this EQ BootClassLoader.getInstance()
       true branch :
-        loader Assign null      false branch :
+        loader Assign null
+      false branch :
         loader Assign this
+
       return VMClassLoader.findLoadedClass(loader,name)
     func  setSigners()  throws: 
     func  getResource()  throws: 

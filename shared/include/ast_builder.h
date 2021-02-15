@@ -87,6 +87,7 @@ public:
 
   TreeNode* BuildBlock();
   TreeNode* AddToBlock();
+  TreeNode* CvtToBlock(TreeNode *tnode);
 
   TreeNode* BuildUnaryOperation();
   TreeNode* BuildPostfixOperation();

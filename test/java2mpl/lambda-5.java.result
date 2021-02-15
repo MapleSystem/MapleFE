@@ -17,12 +17,15 @@ class  Point
       var:m
       m Assign () -> 
       m Assign () -> 42
+
       m Assign () -> null
+
       m Assign () -> return 42
 
       m Assign () -> system.gc()
 
       m Assign () -> x Add y
+
   LocalClasses: 
   LocalInterfaces: 
 
