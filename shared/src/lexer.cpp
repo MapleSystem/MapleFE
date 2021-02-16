@@ -217,19 +217,19 @@ Token* Lexer::LexTokenNoNewLine(void) {
     return t;
   }
 
-  const char *identifier = GetIdentifier();
-  if (identifier != NULL) {
+  LitData ld = GetLiteral();
+  if (ld.mType != LT_NA) {
     Token *t = (Token*)mTokenPool.NewToken(sizeof(Token)); 
-    t->SetIdentifier(identifier);
+    t->SetLiteral(ld);
     if (mTrace)
       t->Dump();
     return t;
   }
 
-  LitData ld = GetLiteral();
-  if (ld.mType != LT_NA) {
+  const char *identifier = GetIdentifier();
+  if (identifier != NULL) {
     Token *t = (Token*)mTokenPool.NewToken(sizeof(Token)); 
-    t->SetLiteral(ld);
+    t->SetIdentifier(identifier);
     if (mTrace)
       t->Dump();
     return t;

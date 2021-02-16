@@ -32,8 +32,16 @@ double StringToValueImpl::StringToDouble(std::string &s) {
   return stod(str);
 }
 
-bool   StringToValueImpl::StringToBool(std::string &s) {return false;}
-bool   StringToValueImpl::StringIsNull(std::string &s) {return false;}
+bool StringToValueImpl::StringToBool(std::string &s) {
+  if ((s.size() == 4) && (s.compare("true") == 0))
+    return true;
+  else if ((s.size() == 5) && (s.compare("false") == 0))
+    return false;
+  else
+    MERROR("unknown bool literal");
+}
+
+bool StringToValueImpl::StringIsNull(std::string &s) {return false;}
 
 static char DeEscape(char c) {
   switch(c) {
