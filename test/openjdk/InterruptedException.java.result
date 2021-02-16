@@ -1,0 +1,17 @@
+Matched 5 tokens.
+Matched 43 tokens.
+============= Module ===========
+== Sub Tree ==
+package java.lang
+== Sub Tree ==
+class  InterruptedException
+  Fields: 
+    serialVersionUID=31373305
+  Instance Initializer: 
+  Constructors: 
+    constructor  InterruptedException()  throws: 
+    constructor  InterruptedException()  throws: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
