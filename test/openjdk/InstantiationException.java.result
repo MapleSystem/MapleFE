@@ -1,0 +1,18 @@
+Matched 5 tokens.
+Matched 44 tokens.
+============= Module ===========
+== Sub Tree ==
+package java.lang
+== Sub Tree ==
+class  InstantiationException
+  Fields: 
+    serialVersionUID=Sub
+  -1305838986
+  Instance Initializer: 
+  Constructors: 
+    constructor  InstantiationException()  throws: 
+    constructor  InstantiationException()  throws: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
