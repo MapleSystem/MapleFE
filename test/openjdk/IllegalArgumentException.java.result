@@ -1,0 +1,20 @@
+Matched 5 tokens.
+Matched 75 tokens.
+============= Module ===========
+== Sub Tree ==
+package java.lang
+== Sub Tree ==
+class  IllegalArgumentException
+  Fields: 
+    serialVersionUID=Sub
+  -2103873468
+  Instance Initializer: 
+  Constructors: 
+    constructor  IllegalArgumentException()  throws: 
+    constructor  IllegalArgumentException()  throws: 
+    constructor  IllegalArgumentException()  throws: 
+    constructor  IllegalArgumentException()  throws: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+

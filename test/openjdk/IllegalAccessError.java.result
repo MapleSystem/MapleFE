@@ -1,0 +1,18 @@
+Matched 5 tokens.
+Matched 44 tokens.
+============= Module ===========
+== Sub Tree ==
+package java.lang
+== Sub Tree ==
+class  IllegalAccessError
+  Fields: 
+    serialVersionUID=Sub
+  -2047083421
+  Instance Initializer: 
+  Constructors: 
+    constructor  IllegalAccessError()  throws: 
+    constructor  IllegalAccessError()  throws: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
