@@ -56,19 +56,6 @@ maple::BaseNode *A2M::ProcessIdentifier(StmtExprKind skind, TreeNode *tnode, Blo
     return nullptr;
   }
 
-  // true false
-  if (!strcmp(name, "true")) {
-    MIRType *typeU1 = GlobalTables::GetTypeTable().GetUInt1();
-    MIRIntConst *cst = new MIRIntConst(1, typeU1);
-    BaseNode *one =  new maple::ConstvalNode(PTY_u1, cst);
-    return one;
-  } else if (!strcmp(name, "false")) {
-    MIRType *typeU1 = GlobalTables::GetTypeTable().GetUInt1();
-    MIRIntConst *cst = new MIRIntConst(0, typeU1);
-    BaseNode *zero =  new maple::ConstvalNode(PTY_u1, cst);
-    return zero;
-  }
-
   // check local var
   MIRSymbol *symbol = GetSymbol(node, block);
   if (symbol) {
@@ -282,9 +269,13 @@ maple::BaseNode *A2M::ProcessLiteral(StmtExprKind skind, TreeNode *tnode, BlockN
       bn =  new maple::ConstvalNode(PTY_i32, cst);
       break;
     }
+    case LT_BooleanLiteral: {
+      int val = (data.mData.mBool == true) ? 1 : 0;
+      bn = new maple::ConstvalNode(PTY_u1, new MIRIntConst(val, GlobalTables::GetTypeTable().GetUInt1()));
+      break;
+    }
     case LT_FPLiteral:
     case LT_DoubleLiteral:
-    case LT_BooleanLiteral:
     case LT_CharacterLiteral:
     case LT_StringLiteral:
     case LT_NullLiteral:
@@ -568,7 +559,7 @@ maple::BaseNode *A2M::ProcessCondBranch(StmtExprKind skind, TreeNode *tnode, Blo
   maple::BaseNode *cond = ProcessNode(SK_Expr, node->GetCond(), block);
   if (!cond) {
     NOTYETIMPL("ProcessCondBranch() condition");
-    cond =  new maple::ConstvalNode(PTY_u1, new MIRIntConst(1, GlobalTables::GetTypeTable().GetUInt8()));
+    cond =  new maple::ConstvalNode(PTY_u1, new MIRIntConst(1, GlobalTables::GetTypeTable().GetUInt1()));
   }
   maple::BlockNode *thenBlock = nullptr;
   maple::BlockNode *elseBlock = nullptr;
@@ -603,7 +594,7 @@ maple::BaseNode *A2M::ProcessLoopCondBody(StmtExprKind skind, TreeNode *cond, Tr
   maple::BaseNode *mircond = ProcessNode(SK_Expr, cond, block);
   if (!mircond) {
     NOTYETIMPL("ProcessLoopCondBody() condition");
-    mircond =  new maple::ConstvalNode(PTY_u1, new MIRIntConst(1, GlobalTables::GetTypeTable().GetUInt8()));
+    mircond =  new maple::ConstvalNode(PTY_u1, new MIRIntConst(1, GlobalTables::GetTypeTable().GetUInt1()));
   }
 
   MASSERT(body && body->IsBlock() && "body is nullptr or not a block");
