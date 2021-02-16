@@ -112,6 +112,7 @@ public:
                                               maple::BaseNode *rhs,
                                               BlockNode *block);
 
+  maple::BaseNode *ProcessLoopCondBody(StmtExprKind skind, TreeNode *cond, TreeNode *body, BlockNode *block);
 };
 
 }

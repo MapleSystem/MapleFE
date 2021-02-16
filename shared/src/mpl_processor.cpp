@@ -56,6 +56,19 @@ maple::BaseNode *A2M::ProcessIdentifier(StmtExprKind skind, TreeNode *tnode, Blo
     return nullptr;
   }
 
+  // true false
+  if (!strcmp(name, "true")) {
+    MIRType *typeU1 = GlobalTables::GetTypeTable().GetUInt1();
+    MIRIntConst *cst = new MIRIntConst(1, typeU1);
+    BaseNode *one =  new maple::ConstvalNode(PTY_u1, cst);
+    return one;
+  } else if (!strcmp(name, "false")) {
+    MIRType *typeU1 = GlobalTables::GetTypeTable().GetUInt1();
+    MIRIntConst *cst = new MIRIntConst(0, typeU1);
+    BaseNode *zero =  new maple::ConstvalNode(PTY_u1, cst);
+    return zero;
+  }
+
   // check local var
   MIRSymbol *symbol = GetSymbol(node, block);
   if (symbol) {
@@ -554,33 +567,27 @@ maple::BaseNode *A2M::ProcessReturn(StmtExprKind skind, TreeNode *tnode, BlockNo
 maple::BaseNode *A2M::ProcessCondBranch(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
   CondBranchNode *node = static_cast<CondBranchNode *>(tnode);
   maple::BaseNode *cond = ProcessNode(SK_Expr, node->GetCond(), block);
+  if (!cond) {
+    NOTYETIMPL("ProcessCondBranch() condition");
+    cond =  new maple::ConstvalNode(PTY_u1, new MIRIntConst(1, GlobalTables::GetTypeTable().GetUInt8()));
+  }
   maple::BlockNode *thenBlock = nullptr;
   maple::BlockNode *elseBlock = nullptr;
   BlockNode *blk = node->GetTrueBranch();
   if (blk) {
-    if (!blk->IsBlock()) {
-      blk = new BlockNode();
-      blk->AddChild(node->GetTrueBranch());
-    }
+    MASSERT(blk->IsBlock() && "then body is not a block");
     thenBlock = new maple::BlockNode();
     mBlockNodeMap[blk] = thenBlock;
     ProcessBlock(skind, blk, blk);
   }
   blk = node->GetFalseBranch();
   if (blk) {
-    if (!blk->IsBlock()) {
-      blk = new BlockNode();
-      blk->AddChild(node->GetTrueBranch());
-    }
+    MASSERT(blk->IsBlock() && "else body is not a block");
     elseBlock = new maple::BlockNode();
     mBlockNodeMap[blk] = elseBlock;
     ProcessBlock(skind, blk, blk);
   }
   maple::IfStmtNode *ifnode = new maple::IfStmtNode();
-  if (!cond) {
-    NOTYETIMPL("CondBranchNode condition");
-    cond =  new maple::ConstvalNode(PTY_i32, new MIRIntConst(1, GlobalTables::GetTypeTable().GetInt32()));
-  }
   ifnode->uOpnd = cond;
   ifnode->thenPart = thenBlock;
   ifnode->elsePart = elseBlock;
@@ -593,22 +600,66 @@ maple::BaseNode *A2M::ProcessBreak(StmtExprKind skind, TreeNode *tnode, BlockNod
   return nullptr;
 }
 
+maple::BaseNode *A2M::ProcessLoopCondBody(StmtExprKind skind, TreeNode *cond, TreeNode *body, BlockNode *block) {
+  maple::BaseNode *mircond = ProcessNode(SK_Expr, cond, block);
+  if (!mircond) {
+    NOTYETIMPL("ProcessLoopCondBody() condition");
+    mircond =  new maple::ConstvalNode(PTY_u1, new MIRIntConst(1, GlobalTables::GetTypeTable().GetUInt8()));
+  }
+
+  MASSERT(body && body->IsBlock() && "body is nullptr or not a block");
+  maple::BlockNode *mbody = new maple::BlockNode();
+  BlockNode *blk = static_cast<BlockNode *>(body);
+  mBlockNodeMap[blk] = mbody;
+  ProcessBlock(skind, blk, blk);
+
+  WhileStmtNode *wsn = new WhileStmtNode(OP_while);
+  wsn->uOpnd = mircond;
+  wsn->body = mbody;
+  mBlockNodeMap[block] ->AddStatement(wsn);
+  return nullptr;
+}
+
 maple::BaseNode *A2M::ProcessForLoop(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
-  NOTYETIMPL("ProcessForLoop()");
   ForLoopNode *node = static_cast<ForLoopNode *>(tnode);
+  maple::BlockNode *mblock = mBlockNodeMap[block];
+  maple::BaseNode *bn = nullptr;
+
+  // init
+  for (int i = 0; i < node->GetInitNum(); i++) {
+    bn = ProcessNode(SK_Stmt, node->InitAtIndex(i), block);
+    if (bn) {
+      mblock->AddStatement(bn);
+      if (mTraceA2m) bn->Dump(mMirModule, 0);
+    }
+  }
+
+  // cond body
+  TreeNode *astbody = node->GetBody();
+  (void) ProcessLoopCondBody(skind, node->GetCond(), astbody, block);
+
+  maple::BlockNode *mbody = mBlockNodeMap[static_cast<BlockNode*>(astbody)];
+
+  // update stmts are added into loop mbody
+  for (int i = 0; i < node->GetUpdateNum(); i++) {
+    bn = ProcessNode(SK_Stmt, node->UpdateAtIndex(i), astbody);
+    if (bn) {
+      mbody->AddStatement(bn);
+      if (mTraceA2m) bn->Dump(mMirModule, 0);
+    }
+  }
+
   return nullptr;
 }
 
 maple::BaseNode *A2M::ProcessWhileLoop(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
-  NOTYETIMPL("ProcessWhileLoop()");
   WhileLoopNode *node = static_cast<WhileLoopNode *>(tnode);
-  return nullptr;
+  return ProcessLoopCondBody(skind, node->GetCond(), node->GetBody(), block);
 }
 
 maple::BaseNode *A2M::ProcessDoLoop(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
-  NOTYETIMPL("ProcessDoLoop()");
   DoLoopNode *node = static_cast<DoLoopNode *>(tnode);
-  return nullptr;
+  return ProcessLoopCondBody(skind, node->GetCond(), node->GetBody(), block);
 }
 
 maple::BaseNode *A2M::ProcessNew(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
