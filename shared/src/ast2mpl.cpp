@@ -72,10 +72,11 @@ void A2M::ProcessAST(bool trace_a2m) {
 }
 
 MIRType *A2M::MapType(TreeNode *type) {
-  MIRType *mir_type = mDefaultType;
   if (!type) {
-    return mir_type;
+    return GlobalTables::GetTypeTable().GetVoid();
   }
+
+  MIRType *mir_type = mDefaultType;
 
   char *name = type->GetName();
   if (mNodeTypeMap.find(name) != mNodeTypeMap.end()) {

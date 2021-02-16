@@ -421,8 +421,7 @@ maple::BaseNode *A2M::ProcessFuncSetup(StmtExprKind skind, TreeNode *tnode, Bloc
   }
 
   MIRType *rettype = MapType(ast_rettype);
-  TyIdx tyidx = rettype ? rettype->GetTypeIndex() : TyIdx(0);
-  MIRFunction *func = mMirBuilder->GetOrCreateFunction(name, tyidx);
+  MIRFunction *func = mMirBuilder->GetOrCreateFunction(name, rettype->GetTypeIndex());
 
   mMirModule->AddFunction(func);
   mMirModule->SetCurFunction(func);
