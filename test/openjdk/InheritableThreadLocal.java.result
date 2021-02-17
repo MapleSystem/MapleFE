@@ -1,0 +1,25 @@
+Matched 5 tokens.
+Matched 14 tokens.
+Matched 75 tokens.
+============= Module ===========
+== Sub Tree ==
+package java.lang
+== Sub Tree ==
+import java.lang.ref
+== Sub Tree ==
+class  InheritableThreadLocal
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+    func  childValue()  throws: 
+      return parentValue
+    func  getMap()  throws: 
+      return t.inheritableThreadLocals
+    func  createMap()  throws: 
+      t.inheritableThreadLocals Assign new ThreadLocalMap<ThreadLocalMap>
+  LocalClasses: 
+  LocalInterfaces: 
+
+UserType:ThreadLocalMap has no decl.

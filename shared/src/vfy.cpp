@@ -354,12 +354,14 @@ void Verifier::VerifyNew(NewNode *new_node){
 
   // verify class type
   VerifyType(inode);
-  // verify parameters
+  // verify parameters.
+  // A parameter could be any type. We have to verify type by type.
   for (unsigned i = 0; i < new_node->GetParamsNum(); i++) {
     TreeNode *p = new_node->GetParam(i);
-    MASSERT(p->IsIdentifier() && "Param is not an identifier.");
-    IdentifierNode *inode = (IdentifierNode*)p;
-    VerifyIdentifier(inode);
+    if(p->IsIdentifier()) {
+      IdentifierNode *inode = (IdentifierNode*)p;
+      VerifyIdentifier(inode);
+    }
   }
 
   mTempParent = old_temp_parent;
