@@ -30,5 +30,6 @@ STRUCT Attribute : (("abstract", abstract),
                     ("protected", protected),
                     ("public", public),
                     ("static", static),
-                    ("strictfp", strictfp))
+                    ("strictfp", strictfp),
+                    ("default", default))
 
