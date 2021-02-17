@@ -53,6 +53,7 @@ public:
   std::map<const char *, maple::MIRType*> mNodeTypeMap;
   std::map<BlockNode*, maple::BlockNode*> mBlockNodeMap;
   std::map<BlockNode*, maple::MIRFunction*> mBlockFuncMap;
+  std::map<TreeNode*, maple::MIRFunction*> mFuncMap;
   std::map<std::pair<const char *, BlockNode*>, maple::MIRSymbol*> mNameBlockVarMap;
 
   A2M(const char *filename);
@@ -84,6 +85,7 @@ public:
   maple::Opcode MapBinComboOpcode(OprId);
 
   void ProcessAST(bool trace_a2m);
+  maple::BaseNode *ProcessNodeDecl(StmtExprKind, TreeNode *tnode, BlockNode *);
   maple::BaseNode *ProcessNode(StmtExprKind, TreeNode *tnode, BlockNode *);
 
   // Process different TreeNode kind while expecting StmtExprKind as stmt or expr
@@ -91,7 +93,12 @@ public:
 #define NODEKIND(K) maple::BaseNode *Process##K(StmtExprKind, TreeNode*, BlockNode*);
 #include "ast_nk.def"
 
-  maple::BaseNode *ProcessFieldSetup(StmtExprKind, TreeNode*, BlockNode*);
+  maple::BaseNode *ProcessClassDecl(StmtExprKind, TreeNode*, BlockNode*);
+  maple::BaseNode *ProcessInterfaceDecl(StmtExprKind, TreeNode*, BlockNode*);
+  maple::BaseNode *ProcessFieldDecl(StmtExprKind, TreeNode*, BlockNode*);
+  maple::BaseNode *ProcessFuncDecl(StmtExprKind, TreeNode*, BlockNode*);
+  maple::BaseNode *ProcessBlockDecl(StmtExprKind, TreeNode*, BlockNode*);
+
   maple::BaseNode *ProcessFuncSetup(StmtExprKind, TreeNode*, BlockNode*);
 
   maple::BaseNode *ProcessUnaOperatorMpl(StmtExprKind skind,

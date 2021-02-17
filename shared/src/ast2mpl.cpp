@@ -64,6 +64,12 @@ void A2M::Init() {
 void A2M::ProcessAST(bool trace_a2m) {
   mTraceA2m = trace_a2m;
   if (mTraceA2m) std::cout << "============= in ProcessAST ===========" << std::endl;
+  // pass 1: collect class/interface/function decl
+  for(auto it: gModule.mTrees) {
+    TreeNode *tnode = it->mRootNode;
+    ProcessNodeDecl(SK_Stmt, tnode, nullptr);
+  }
+  // pass 2: handle function def
   for(auto it: gModule.mTrees) {
     TreeNode *tnode = it->mRootNode;
     if (mTraceA2m) { tnode->Dump(0); fflush(0); }
@@ -274,7 +280,7 @@ void A2M::UpdateFuncName(MIRFunction *func) {
   MIRType *type;
   if (tyIdx.GetIdx() != 0) {
     type = GlobalTables::GetTypeTable().GetTypeFromTyIdx(tyIdx);
-    Type2Name(str, type);
+    str.append(type->GetName());
     str.append(SEP);
   }
   str.append(func->GetName());
