@@ -598,7 +598,15 @@ bool Lexer::TraverseSecondTry(const RuleTable *rule_table) {
     line = old_line;
     curidx = w_yyy_start;
 
-    bool temp_found = TraverseTableData(yyy);
+    bool temp_found = false;
+    while(!temp_found && curidx < current_line_size) {
+      temp_found = TraverseTableData(yyy);
+      if (!temp_found) {
+        w_yyy_start++;
+        curidx = w_yyy_start;
+      }
+    }
+
     if (!temp_found)
       break;
     else
