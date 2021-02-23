@@ -548,11 +548,8 @@ bool Lexer::TraverseSecondTry(const RuleTable *rule_table) {
     if (IsZeroorxxxTableData(data))
       break;
   }
-  if (i == rule_table->mNum - 2)
-    need_try = true;
-
-  if (!need_try)
-    return false;
+  if (i != rule_table->mNum - 2)
+    MERROR("Unsupported lex rule of SecondTry!");
 
   i = 0;
   bool found = false;
