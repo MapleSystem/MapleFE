@@ -60,31 +60,6 @@ namespace maplefe {
 // During matching, pending tokens are moved to [[mActiveTokens]] per request. Tokens after
 // the last active are pending.
 //
-// 2. Discard Tokens
-//
-// Now here comes a question, how to identify tokens to be discarded? or when to discard
-// what tokens? To address these questions, we need the help of two types of token,
-// starting token and ending token.
-//   Ending   : Ending tokens are those represent the ending of a complete statement.
-//              It's always clearly defined in a language what token are the ending ones.
-//              For example, ';' in most languages, and NewLine in Kotlin where a statement
-//              doesn't cross multiple line.
-//   Starting : Starting tokens are those represent the start of a new complete statement.
-//              It's obvious that there are no special characteristics we can tell from
-//              a starting token. It could be any token, identifier, keyword, separtor,
-//              and anything.
-//              To find out the starting tokens, we actually rely on.
-//
-//              [TODO] Ending token should be configured in .spec file. Right now I'm
-//                     just hard coded in the main.cpp.
-//
-// Actually we just need recognize the ending token, since the one behind ending token is the
-// starting token of next statement. However, during matching, we need a stack to record the
-// the starting token index-es, [[mStartingTokens]]. Each time we hit an ending token, we
-// discard the tokens on the from the starting token (the one on the top of [[mStartingTokens]]
-// to the ending token.
-//
-//
 // 3. Left Recursion
 //
 // MapleFE is an LL parser, and left recursion has to be handled if we allow language
@@ -402,7 +377,6 @@ bool Parser::ParseStmt() {
   // clear status
   ClearFailed();
   ClearSucc();
-  mStartingTokens.clear();
   ClearAppealNodes();
   mPending = 0;
 

@@ -253,8 +253,6 @@ public:
 
 private:
   std::vector<Token*>   mActiveTokens;   // vector for tokens during matching.
-  std::vector<unsigned> mStartingTokens; // The starting token of each self-complete statement.
-                                         // It's an index of mActiveTokens.
   unsigned              mCurToken;       // index in mActiveTokens, the next token to be matched.
   unsigned              mPending;        // index in mActiveTokens, the first pending token.
                                          // All tokens after it are pending.
