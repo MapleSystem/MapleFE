@@ -94,6 +94,7 @@ ACTION(AddDimsTo)
 
 // statment, control flow
 ACTION(BuildAssignment)
+ACTION(BuildAssert)
 ACTION(BuildReturn)
 ACTION(BuildCondBranch)
 ACTION(AddCondBranchTrueStatement)

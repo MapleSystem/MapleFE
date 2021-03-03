@@ -390,6 +390,10 @@ void Verifier::VerifyCall(CallNode *tree){
   return;
 }
 
+void Verifier::VerifyAssert(AssertNode *tree){
+  return;
+}
+
 void Verifier::VerifyField(FieldNode *tree){
   return;
 }

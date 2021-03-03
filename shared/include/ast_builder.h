@@ -153,6 +153,7 @@ public:
   TreeNode* BuildDoLoop();
   TreeNode* BuildNewOperation();
   TreeNode* BuildDeleteOperation();
+  TreeNode* BuildAssert();
 
   SwitchCaseNode* SwitchLabelToCase(SwitchLabelNode*);
   TreeNode* BuildSwitchLabel();

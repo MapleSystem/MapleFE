@@ -118,6 +118,8 @@ rule StatementExpression : ONEOF(
 rule AssertStatement : ONEOF(
   "assert" + Expression + ';',
   "assert" + Expression + ':' + Expression + ';')
+  attr.action.%1 : BuildAssert(%2)
+  attr.action.%2 : BuildAssert(%2, %4)
 
 rule SwitchStatement : "switch" + '(' + Expression + ')' + SwitchBlock
   attr.action : BuildSwitch(%3, %5)

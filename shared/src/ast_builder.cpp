@@ -1420,6 +1420,43 @@ TreeNode* ASTBuilder::BuildDeleteOperation() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+//                    Building AssertNode related
+// The node could take two parameters, one expression and one message.
+// It also could take only one parameter, the expression.
+////////////////////////////////////////////////////////////////////////////////
+
+TreeNode* ASTBuilder::BuildAssert() {
+  if (mTrace)
+    std::cout << "In BuildAssert " << std::endl;
+
+  AssertNode *assert_node = (AssertNode*)mTreePool->NewTreeNode(sizeof(AssertNode));
+  new (assert_node) AssertNode();
+
+  MASSERT(mParams.size() >= 1 && "BuildAssert has NO expression?");
+  Param p_a, p_b;
+
+  p_a = mParams[0];
+  if (p_a.mIsEmpty)
+    MERROR("The expression in BuildAssert() is empty?");
+  MASSERT(p_a.mIsTreeNode && "Expression is not a tree?");
+  TreeNode *expr = p_a.mData.mTreeNode;
+  assert_node->SetExpr(expr);
+
+  if (mParams.size() == 2) {
+    p_b = mParams[1];
+    if (!p_b.mIsEmpty) {
+      MASSERT(p_b.mIsTreeNode && "Messge of assert is not a tree?");
+      TreeNode *node_b = p_b.mData.mTreeNode;
+      if (node_b)
+        assert_node->SetMsg(node_b);
+    }
+  }
+
+  mLastTreeNode = assert_node;
+  return assert_node;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 //                    CallSite related
 ////////////////////////////////////////////////////////////////////////////////
 

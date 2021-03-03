@@ -741,6 +741,28 @@ public:
   void Dump(unsigned);
 };
 
+// This is for an 'assert' statement in languages like Java.
+// It contains two parts, one evaluation expression, the other the detailed message.
+//
+// In languages like C, assert is defined as a normal function, and don't go
+// through this node.
+
+class AssertNode : public TreeNode {
+private:
+  TreeNode  *mExpr;
+  TreeNode  *mMsg;
+public:
+  AssertNode() : mExpr(NULL), mMsg(NULL) {mKind = NK_Assert;}
+  ~AssertNode(){}
+
+  TreeNode* GetExpr() {return mExpr;}
+  TreeNode* GetMsg() {return mMsg;}
+  void SetExpr(TreeNode *t) {mExpr = t;}
+  void SetMsg(TreeNode *t)  {mMsg = t;}
+
+  void Dump(unsigned);
+};
+
 // This is the node for a call site.
 // 1. The method could be class method, a global method, or ...
 // 2. The argument could be any expression even including another callsite.

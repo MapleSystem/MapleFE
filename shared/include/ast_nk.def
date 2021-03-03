@@ -68,6 +68,7 @@ NODEKIND(DoLoop)
 NODEKIND(New)
 NODEKIND(Delete)
 NODEKIND(Call)
+NODEKIND(Assert)
 
 NODEKIND(SwitchLabel)
 NODEKIND(SwitchCase)

@@ -222,6 +222,12 @@ maple::BaseNode *A2M::ProcessFieldDecl(StmtExprKind skind, TreeNode *tnode, Bloc
   return bn;
 }
 
+maple::BaseNode *A2M::ProcessAssert(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
+  NOTYETIMPL("ProcessAssert()");
+  AssertNode *node = static_cast<AssertNode *>(tnode);
+  return nullptr;
+}
+
 maple::BaseNode *A2M::ProcessDimension(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
   NOTYETIMPL("ProcessDimension()");
   DimensionNode *node = static_cast<DimensionNode *>(tnode);
