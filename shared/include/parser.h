@@ -252,7 +252,7 @@ public:
   void DumpSortOutNode(AppealNode*);
 
 private:
-  std::vector<Token*>   mActiveTokens;   // vector for tokens during matching.
+  SmallVector<Token*>   mActiveTokens;   // vector for tokens during matching.
   unsigned              mCurToken;       // index in mActiveTokens, the next token to be matched.
   unsigned              mPending;        // index in mActiveTokens, the first pending token.
                                          // All tokens after it are pending.

@@ -207,6 +207,8 @@ Parser::Parser(const char *name) : filename(name) {
 
   mInAltTokensMatching = false;
   mNextAltTokenIndex = 0;
+
+  mActiveTokens.SetBlockSize(1024*1024);
 }
 
 Parser::~Parser() {
@@ -256,8 +258,8 @@ unsigned Parser::LexOneLine() {
   Token *t = NULL;
 
   // Check if there are already pending tokens.
-  if (mCurToken < mActiveTokens.size())
-    return mActiveTokens.size() - mCurToken;
+  if (mCurToken < mActiveTokens.GetNum())
+    return mActiveTokens.GetNum() - mCurToken;
 
   while (!token_num) {
     // read untile end of line
@@ -271,7 +273,7 @@ unsigned Parser::LexOneLine() {
         }
         // Put into the token storage, as Pending tokens.
         if (!is_whitespace && !t->IsComment()) {
-          mActiveTokens.push_back(t);
+          mActiveTokens.PushBack(t);
           token_num++;
         }
       } else {
@@ -296,7 +298,7 @@ unsigned Parser::LexOneLine() {
 //       false : if no more valuable token read, or end of file
 bool Parser::MoveCurToken() {
   mCurToken++;
-  if (mCurToken == mActiveTokens.size()) {
+  if (mCurToken == mActiveTokens.GetNum()) {
     unsigned num = LexOneLine();
     if (!num) {
       mEndOfFile = true;
@@ -307,9 +309,9 @@ bool Parser::MoveCurToken() {
 }
 
 Token* Parser::GetActiveToken(unsigned i) {
-  if (i >= mActiveTokens.size())
+  if (i >= mActiveTokens.GetNum())
     MASSERT(0 && "mActiveTokens OutOfBound");
-  return mActiveTokens[i];
+  return mActiveTokens.ValueAtIndex(i);
 }
 
 bool Parser::Parse() {
@@ -1080,6 +1082,7 @@ bool Parser::TraverseZeroormore(RuleTable *rule_table, AppealNode *appeal) {
 
   // prepare the prev_succ_tokens] for the 1st iteration.
   SmallVector<unsigned> prev_succ_tokens;
+  prev_succ_tokens.SetBlockSize(1024);
   prev_succ_tokens.PushBack(mCurToken - 1);
 
   // Need to avoid duplicated mCurToken. Look at the rule
@@ -1089,11 +1092,13 @@ bool Parser::TraverseZeroormore(RuleTable *rule_table, AppealNode *appeal) {
   // could traverse the same mCurToken again, at least 'zero' is always duplicated. This will be
   // an endless loop.
   SmallVector<unsigned> visited;
+  visited.SetBlockSize(1024);
 
   while(1) {
     // A set of results of current instance
     bool found_subtable = false;
     SmallVector<unsigned> subtable_succ_tokens;
+    subtable_succ_tokens.SetBlockSize(1024);
 
     // Like TraverseConcatenate, we will try all good matchings of previous instance.
     for (unsigned j = 0; j < prev_succ_tokens.GetNum(); j++) {
