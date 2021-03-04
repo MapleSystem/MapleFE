@@ -41,7 +41,6 @@ maple::BaseNode *A2M::ProcessNodeDecl(StmtExprKind skind, TreeNode *tnode, Block
       break;
     }
     default: {
-      NOTYETIMPL("ProcessNodeDecl() other than class/interface/func/block");
       break;
     }
   }
@@ -514,6 +513,7 @@ maple::BaseNode *A2M::ProcessFuncDecl(StmtExprKind skind, TreeNode *tnode, Block
   // use className|funcName|_argTypes_retType as function name
   UpdateFuncName(func);
   mFuncMap[ast_func] = func;
+  mNameFuncMap[name].push_back(func);
 
   // create function type
   MIRFuncType *functype = GlobalTables::GetTypeTable().GetOrCreateFunctionType(mMirModule, rettype->GetTypeIndex(), funcvectype, funcvecattr, /*isvarg*/ false, true);
@@ -783,8 +783,52 @@ maple::BaseNode *A2M::ProcessDelete(StmtExprKind skind, TreeNode *tnode, BlockNo
 maple::BaseNode *A2M::ProcessCall(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
   NOTYETIMPL("ProcessCall()");
   CallNode *node = static_cast<CallNode *>(tnode);
+  MapleVector<BaseNode *> args(mMirModule->CurFuncCodeMemPoolAllocator()->Adapter());
+  MIRFunction *func = GetFunc(block);
+
+  // pass this
+  MIRSymbol *sym = func->formalDefVec[0].formalSym;
+  args.push_back(mMirBuilder->CreateExprDread(sym));
+  // pass arg
+  for (int i = 0; i < node->GetArgsNum(); i++) {
+    maple::BaseNode *arg = ProcessNode(SK_Expr, node->GetArg(i), block);
+    if (arg) {
+      args.push_back(arg);
+    } else {
+      NOTYETIMPL("ProcessCall() null arg");
+    }
+  }
+
   TreeNode *method = node->GetMethod();
-  return nullptr;
+  if (!method->IsIdentifier()) {
+    NOTYETIMPL("ProcessCall() method not an identifier");
+  }
+  IdentifierNode *imethod = static_cast<IdentifierNode *>(method);
+  func = SearchFunc(imethod->GetName(), args);
+  if (!func) {
+    NOTYETIMPL("ProcessCall() method not found");
+    return nullptr;
+  }
+  PUIdx puIdx = func->puIdx;
+
+  MIRType *returnType = func->GetReturnType();
+  MIRSymbol *rv = nullptr;
+  Opcode callop = OP_call;
+  if (returnType->GetPrimType() != PTY_void) {
+    NOTYETIMPL("ProcessCall() OP_callassigned");
+    // rv = CreateTempVar("retvar", returnType);
+    // callop = OP_callassigned;
+  }
+
+  StmtNode *stmt = mMirBuilder->CreateStmtCallAssigned(puIdx, args, rv, callop);
+
+  maple::BlockNode *blk = mBlockNodeMap[block];
+  blk->AddStatement(stmt);
+  if (rv) {
+    return mMirBuilder->CreateExprDread(rv);
+  } else {
+    return stmt;
+  }
 }
 
 maple::BaseNode *A2M::ProcessSwitchLabel(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {

@@ -51,6 +51,7 @@ public:
   maple::MIRModule *mMirModule;
   // use type's uniq name as key
   std::map<const char *, maple::MIRType*> mNodeTypeMap;
+  std::map<const char *, std::vector<maple::MIRFunction*>> mNameFuncMap;
   std::map<BlockNode*, maple::BlockNode*> mBlockNodeMap;
   std::map<BlockNode*, maple::MIRFunction*> mBlockFuncMap;
   std::map<TreeNode*, maple::MIRFunction*> mFuncMap;
@@ -70,7 +71,9 @@ public:
   BlockNode *GetSuperBlock(BlockNode *block);
   MIRSymbol *GetSymbol(TreeNode *tnode, BlockNode *block);
   MIRSymbol *CreateSymbol(TreeNode *tnode, BlockNode *block);
+  MIRSymbol *CreateTempVar(const char *prefix, MIRType *type);
   MIRFunction *GetFunc(BlockNode *block);
+  MIRFunction *SearchFunc(const char *name, const MapleVector<BaseNode *> &args);
   MIRClassType *GetClass(BlockNode *block);
   void UpdateUniqName(std::string &str);
 

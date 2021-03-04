@@ -352,6 +352,19 @@ MIRSymbol *A2M::GetSymbol(TreeNode *tnode, BlockNode *block) {
   return symbol;
 }
 
+MIRSymbol *A2M::CreateTempVar(const char *prefix, MIRType *type) {
+  if (!type) {
+    return nullptr;
+  }
+  std::string str(prefix);
+  str.append(SEP);
+  str.append(std::to_string(mVarUniqNum));
+  mVarUniqNum++;
+  maple::MIRFunction *func = mMirModule->CurFunction();
+  MIRSymbol *var = mMirBuilder->CreateLocalDecl(str, type, func);
+  return var;
+}
+
 MIRSymbol *A2M::CreateSymbol(TreeNode *tnode, BlockNode *block) {
   const char *name = tnode->GetName();
   MIRType *mir_type;
@@ -406,6 +419,31 @@ MIRFunction *A2M::GetFunc(BlockNode *block) {
 MIRClassType *A2M::GetClass(BlockNode *block) {
   TyIdx tyidx = GetFunc(block)->classTyIdx;
   return GlobalTables::GetTypeTable().GetTypeFromTyIdx(tyidx);
+}
+
+MIRFunction *A2M::SearchFunc(const char *name, const MapleVector<BaseNode *> &args) {
+  if (mNameFuncMap.find(name) == mNameFuncMap.end()) {
+    return nullptr;
+  }
+  for (auto it: mNameFuncMap[name]) {
+    if (it->formalDefVec.size() != args.size()) {
+      continue;
+    }
+    bool matched = true;
+    for (int i = 0; i < it->formalDefVec.size(); i++) {
+      // TODO: allow compatible types
+      MIRType *type = GlobalTables::GetTypeTable().GetTypeFromTyIdx(it->formalDefVec[i].formalTyIdx);
+      if (type->GetPrimType() != args[i]->GetPrimType()) {
+        matched = false;
+        break;
+      }
+    }
+    if (!matched) {
+      continue;
+    }
+    return it;
+  }
+  return nullptr;
 }
 
 void A2M::MapAttr(GenericAttrs &attr, const IdentifierNode *inode) {
