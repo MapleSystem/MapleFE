@@ -92,7 +92,7 @@ private:
   TreeNode    *mAstTreeNode;      // The AST tree node of this AppealNode.
 
 public:
-  AppealNode* GetSecondParentsNum() {return mSecondParents.GetNum();}
+  unsigned GetSecondParentsNum() {return mSecondParents.GetNum();}
   AppealNode* GetSecondParent(unsigned i) {return mSecondParents.ValueAtIndex(i);}
   void        ClearSecondParents() {mSecondParents.Clear();}
   AppealNode* GetParent()       {return mParent;}
@@ -205,7 +205,7 @@ public:
 class RecursionTraversal;
 struct RecStackEntry {
   RecursionTraversal *mRecTra;
-  unsigned *mGroupId;
+  unsigned  mGroupId;
   unsigned  mStartToken;
   // mRecTra and mLeadNode are 1-1 mapping, so the operator==
   // uses only one of them.

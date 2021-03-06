@@ -1910,7 +1910,7 @@ void Parser::FindWasSucc(AppealNode *root) {
         working_list.push_back(*it);
     }
   }
-  return NULL;
+  return;
 }
 
 // For each node in was_succ_list there are one or more patching subtree.

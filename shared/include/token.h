@@ -64,7 +64,7 @@ struct LitData {
     double mDouble;
     bool   mBool;
     Char   mChar;
-    char  *mStr;     // the string is allocated in gStringPool
+    const char  *mStr;     // the string is allocated in gStringPool
   }mData;
 };
 
@@ -101,21 +101,21 @@ struct Token {
 
   AltToken     *mAltTokens;
 
-  bool IsSeparator()  { return mTkType == TT_SP; }
-  bool IsOperator()   { return mTkType == TT_OP; }
-  bool IsIdentifier() { return mTkType == TT_ID; }
-  bool IsLiteral()    { return mTkType == TT_LT; }
-  bool IsKeyword()    { return mTkType == TT_KW; }
-  bool IsComment()    { return mTkType == TT_CM; }
+  bool IsSeparator()  const { return mTkType == TT_SP; }
+  bool IsOperator()   const { return mTkType == TT_OP; }
+  bool IsIdentifier() const { return mTkType == TT_ID; }
+  bool IsLiteral()    const { return mTkType == TT_LT; }
+  bool IsKeyword()    const { return mTkType == TT_KW; }
+  bool IsComment()    const { return mTkType == TT_CM; }
 
   void SetIdentifier(const char *name) {mTkType = TT_ID; mData.mName = name;}
   void SetLiteral(LitData data)        {mTkType = TT_LT; mData.mLitData = data;}
 
-  const char* GetName();
-  LitData     GetLitData()   {return mData.mLitData;}
-  OprId       GetOprId()     {return mData.mOprId;}
-  SepId       GetSepId()     {return mData.mSepId;}
-  bool        IsWhiteSpace() {return mData.mSepId == SEP_Whitespace;}
+  const char* GetName() const;
+  LitData     GetLitData()   const {return mData.mLitData;}
+  OprId       GetOprId()     const {return mData.mOprId;}
+  SepId       GetSepId()     const {return mData.mSepId;}
+  bool        IsWhiteSpace() const {return mData.mSepId == SEP_Whitespace;}
   void Dump();
 };
 

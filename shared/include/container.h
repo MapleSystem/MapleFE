@@ -87,7 +87,7 @@ public:
     mMemPool.Release(mMemPool.mElemSize);
   }
 
-  unsigned GetNum() {return mNum;}
+  unsigned GetNum() const {return mNum;}
 
   T ValueAtIndex(unsigned i) {
     char *addr = mMemPool.AddrOfIndex(i);

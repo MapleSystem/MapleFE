@@ -44,6 +44,8 @@ TreeNode* ASTBuilder::Build() {
   switch (mActionId) {
 #include "supported_actions.def"
   }
+
+  return tree_node;
 }
 
 TreeNode* ASTBuilder::CreateTokenTreeNode(const Token *token) {
@@ -673,7 +675,7 @@ TreeNode* ASTBuilder::BuildAllCases() {
     for (unsigned i = 0; i < pass->GetChildrenNum(); i++) {
       TreeNode *child = pass->GetChild(i);
       if (child->IsSwitchLabel()) {
-        SwitchCaseNode *newcase = SwitchLabelToCase(child);
+        SwitchCaseNode *newcase = SwitchLabelToCase((SwitchLabelNode*)child);
         pass->SetChild(i, newcase);
       }
     }
@@ -798,7 +800,7 @@ TreeNode* ASTBuilder::BuildField() {
       field = (FieldNode*)mTreePool->NewTreeNode(sizeof(FieldNode));
       new (field) FieldNode();
       field->SetUpper(upper);
-      field->SetField(child);
+      field->SetField((IdentifierNode*)child);
       field->Init();
 
       upper = field;
@@ -808,7 +810,7 @@ TreeNode* ASTBuilder::BuildField() {
     field = (FieldNode*)mTreePool->NewTreeNode(sizeof(FieldNode));
     new (field) FieldNode();
     field->SetUpper(node_a);
-    field->SetField(node_b);
+    field->SetField((IdentifierNode*)node_b);
     field->Init();
   }
 
@@ -1095,7 +1097,7 @@ TreeNode* ASTBuilder::BuildInstInit() {
   }
 
   if (!b) {
-    b = BuildBlock();
+    b = (BlockNode*)BuildBlock();
     b->SetIsInstInit();
   }
 
@@ -1155,7 +1157,7 @@ TreeNode* ASTBuilder::BuildAnnotationType() {
 
   AnnotationTypeNode *annon_type = (AnnotationTypeNode*)mTreePool->NewTreeNode(sizeof(AnnotationTypeNode));
   new (annon_type) AnnotationTypeNode();
-  annon_type->SetId(node_name);
+  annon_type->SetId(in);
 
   // set last tree node and return it.
   mLastTreeNode = annon_type;
@@ -1183,7 +1185,7 @@ TreeNode* ASTBuilder::BuildAnnotation() {
 
   AnnotationNode *annot = (AnnotationNode*)mTreePool->NewTreeNode(sizeof(AnnotationNode));
   new (annot) AnnotationNode();
-  annot->SetId(iden);
+  annot->SetId((IdentifierNode*)iden);
 
   // set last tree node and return it.
   mLastTreeNode = annot;
@@ -1297,17 +1299,20 @@ TreeNode* ASTBuilder::AddDimsTo() {
 
   TreeNode *node_a = p_dims_a.mData.mTreeNode;
   TreeNode *node_b = p_dims_b.mIsEmpty ? NULL : p_dims_b.mData.mTreeNode;
+
   if (node_b) {
+    MASSERT(node_b->IsDimension() && "Expected a DimensionNode.");
+    DimensionNode *dim = (DimensionNode*)node_b;
     if (node_a->IsIdentifier()) {
       IdentifierNode *inode = (IdentifierNode*)node_a;
-      inode->SetDims(node_b);
+      inode->SetDims(dim);
       mLastTreeNode = node_a;
     } else if (node_a->IsPrimType()) {
       PrimTypeNode *pt = (PrimTypeNode*)node_a;
       PrimArrayTypeNode *pat = (PrimArrayTypeNode*)mTreePool->NewTreeNode(sizeof(PrimArrayTypeNode));
       new (pat) PrimArrayTypeNode();
       pat->SetPrim(pt);
-      pat->SetDims(node_b);
+      pat->SetDims(dim);
       mLastTreeNode = pat;
     }
   }
@@ -1326,7 +1331,12 @@ TreeNode* ASTBuilder::AddDims() {
   if (p_dims.mIsEmpty)
     return mLastTreeNode;
 
-  TreeNode *dims = p_dims.mData.mTreeNode;
+  TreeNode *param_tree = p_dims.mData.mTreeNode;
+  DimensionNode *dims = NULL;
+  if (param_tree) {
+    MASSERT(param_tree->IsDimension() && "Expected a DimensionNode.");
+    dims = (DimensionNode*)param_tree;
+  }
 
   if (mLastTreeNode->IsIdentifier()) {
     IdentifierNode *node = (IdentifierNode*)mLastTreeNode;
@@ -1749,12 +1759,13 @@ TreeNode* ASTBuilder::BuildUserType() {
   if (!p_id.mIsTreeNode)
     MERROR("The Identifier of user type is not a treenode.");
 
-  TreeNode *node_id = p_id.mData.mTreeNode;
-  if (!node_id->IsIdentifier())
+  TreeNode *node = p_id.mData.mTreeNode;
+  if (!node->IsIdentifier())
     MERROR("The Identifier of user type is not an identifier.");
+  IdentifierNode *id = (IdentifierNode*)node;
 
   UserTypeNode *user_type = (UserTypeNode*)mTreePool->NewTreeNode(sizeof(UserTypeNode));
-  new (user_type) UserTypeNode(node_id);
+  new (user_type) UserTypeNode(id);
   mLastTreeNode = user_type;
   return mLastTreeNode;
 }
@@ -1813,7 +1824,7 @@ TreeNode* ASTBuilder::BuildLambda() {
 
   if (params_node) {
     if (params_node->IsIdentifier())
-      lambda->AddParam(params_node);
+      lambda->AddParam((IdentifierNode*)params_node);
   }
 
   lambda->SetBody(body_node);

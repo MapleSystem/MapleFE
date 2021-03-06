@@ -259,7 +259,7 @@ void RuleGen::GenDebug(const std::string &rule_table_name) {
 //
 // For the time being, I'll generate only actions. The validity will be done later
 
-void RuleGen::Gen4RuleAttr(std::string rule_table_name, RuleAttr *attr) {
+void RuleGen::Gen4RuleAttr(std::string rule_table_name, const RuleAttr *attr) {
   std::string attr_table;
 
   if (attr->mAction.size() == 0)
@@ -311,7 +311,7 @@ void RuleGen::Gen4RuleAttr(std::string rule_table_name, RuleAttr *attr) {
 //    and the table name has a suffix "_sub".
 void RuleGen::Gen4Table(const Rule *rule, const RuleElem *elem){
   std::string rule_table_name;
-  RuleAttr *attr;
+  const RuleAttr *attr;
 
   if(rule) {
     rule_table_name = GetTblName(rule);

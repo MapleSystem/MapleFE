@@ -56,9 +56,9 @@ public:
   ~StringPool();
 
   // If not found, add into StringPool
-  char* FindString(const std::string&);
-  char* FindString(const char*);
-  char* FindString(const char*, size_t);
+  const char* FindString(const std::string&);
+  const char* FindString(const char*);
+  const char* FindString(const char*, size_t);
 };
 
 // Lexing, Parsing, AST Building and IR Building all share one global

@@ -81,11 +81,12 @@ BaseGen::~BaseGen() {
 }
 
 Rule *BaseGen::AddLiteralRule(std::string rulename) {
-  if (FindRule(rulename)) {
-    return;
+  Rule *rule = NULL;
+  if (rule = FindRule(rulename)) {
+    return rule;
   }
 
-  Rule *rule = NewRule();
+  rule = NewRule();
   rule->SetName(rulename);
   mRules.push_back(rule);
 
@@ -251,7 +252,7 @@ RuleElem *BaseGen::GetOrCreateRuleElemFromString(std::string str, bool getOnly) 
   }
 
   RuleElem *elem = NewRuleElem();
-  char *newstr = mStringPool->FindString(str);
+  const char *newstr = mStringPool->FindString(str);
   elem->SetString(newstr);
   mElemString[str] = elem;
 

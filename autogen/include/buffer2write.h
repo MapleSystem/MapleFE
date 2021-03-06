@@ -264,8 +264,8 @@ private:
 public:
   // Indentation of mBody is two more spaces
   IfBuffer(unsigned ind) : mCondition(ind), mBody(ind+2) {}
-  FormattedBuffer* GetCondition() {return &mCondition;}
-  ScopedBuffer*    GetBody() {return &mBody;}
+  const FormattedBuffer* GetCondition() const {return &mCondition;}
+  const ScopedBuffer*    GetBody() const {return &mBody;}
 };
 
 //////////////////////////////////////////////////////////////////////////

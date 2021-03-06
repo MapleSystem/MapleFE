@@ -80,7 +80,7 @@ public:
   virtual ~TreeNode() {}
 
 #undef  NODEKIND
-#define NODEKIND(K) bool Is##K() {return mKind == NK_##K;}
+#define NODEKIND(K) bool Is##K() const {return mKind == NK_##K;}
 #include "ast_nk.def"
 
   bool IsScope() {return IsBlock() || IsClass() || IsFunction() || IsInterface();}
@@ -181,8 +181,10 @@ enum OperatorProperty {
 };
 
 struct OperatorDesc {
-  OprId             mOprId;
-  OperatorProperty  mDesc;
+  OprId     mOprId;
+  unsigned  mDesc;  // The type was defined as OperatorProperty, but clang complains
+                    // in the .cpp where Unary|Binary is treated as 'int'. Clang
+                    // doesn't allow 'int' converted to OperatorProperty
 };
 extern OperatorDesc gOperatorDesc[OPR_NA];
 extern unsigned GetOperatorProperty(OprId);
@@ -314,8 +316,8 @@ public:
     unsigned *addr = mDimensions.RefAtIndex(n);
     *addr = i;
   }
-  unsigned AddDim(unsigned i = 0) {mDimensions.PushBack(i);}
-  void     Merge(const TreeNode*);
+  void AddDim(unsigned i = 0) {mDimensions.PushBack(i);}
+  void Merge(const TreeNode*);
 
   void Release() {mDimensions.Release();}
   void Dump();
@@ -352,7 +354,7 @@ public:
   void     SetNthNum(unsigned n, unsigned i) {mDims->SetNthDim(n, i);}
 
   // Attributes related
-  unsigned GetAttrsNum()           {return mAttrs.GetNum();}
+  unsigned GetAttrsNum() const     {return mAttrs.GetNum();}
   void     AddAttr(AttrId a)       {mAttrs.PushBack(a);}
   AttrId   AttrAtIndex(unsigned i) {return mAttrs.ValueAtIndex(i);}
 

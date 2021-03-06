@@ -136,7 +136,6 @@ const char *RuleElem::GetRuleOpName() {
     case RO_Null:
     default:             return "";
   }
-  return;
 }
 
 bool RuleElem::IsLeaf() {

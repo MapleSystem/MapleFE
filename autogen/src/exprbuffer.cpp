@@ -159,7 +159,7 @@ void ExprBuffer::WriteLiteralNode(const ExprNode *n){
 
 void ExprBuffer::WriteOperatorNode(const ExprNode *n){
   int len = 0;
-  char *text = NULL;
+  const char *text = NULL;
   if (n->mOpc == OPC_Call) {
     text = n->mName;
   } else {

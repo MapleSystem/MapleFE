@@ -84,7 +84,7 @@ MIRType *A2M::MapType(TreeNode *type) {
 
   MIRType *mir_type = mDefaultType;
 
-  char *name = type->GetName();
+  const char *name = type->GetName();
   if (mNodeTypeMap.find(name) != mNodeTypeMap.end()) {
     return mNodeTypeMap[name];
   }
@@ -312,7 +312,7 @@ BlockNode *A2M::GetSuperBlock(BlockNode *block) {
   while (blk && !blk->IsBlock()) {
     blk = blk->GetParent();
   }
-  return blk;
+  return (BlockNode*)blk;
 }
 
 MIRSymbol *A2M::GetSymbol(TreeNode *tnode, BlockNode *block) {
@@ -418,7 +418,7 @@ MIRFunction *A2M::GetFunc(BlockNode *block) {
 
 MIRClassType *A2M::GetClass(BlockNode *block) {
   TyIdx tyidx = GetFunc(block)->classTyIdx;
-  return GlobalTables::GetTypeTable().GetTypeFromTyIdx(tyidx);
+  return (MIRClassType*)GlobalTables::GetTypeTable().GetTypeFromTyIdx(tyidx);
 }
 
 MIRFunction *A2M::SearchFunc(const char *name, const MapleVector<BaseNode *> &args) {

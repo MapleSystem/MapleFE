@@ -115,20 +115,20 @@ char* StringPool::AllocBlock() {
 
 // This is the public interface to find a string in the pool.
 // If not found, add it.
-char* StringPool::FindString(const std::string &s) {
+const char* StringPool::FindString(const std::string &s) {
   return mMap->LookupAddrFor(s);
 }
 
 // This is the public interface to find a string in the pool.
 // If not found, add it.
-char* StringPool::FindString(const char *str) {
+const char* StringPool::FindString(const char *str) {
   std::string s(str);
   return mMap->LookupAddrFor(s);
 }
 
 // This is the public interface to find a string in the pool.
 // If not found, add it.
-char* StringPool::FindString(const char *str, size_t len) {
+const char* StringPool::FindString(const char *str, size_t len) {
   std::string s;
   s.assign(str, len);
   return mMap->LookupAddrFor(s);

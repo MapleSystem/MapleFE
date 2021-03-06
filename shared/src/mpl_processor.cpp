@@ -113,7 +113,7 @@ maple::BaseNode *A2M::ProcessIdentifier(StmtExprKind skind, TreeNode *tnode, Blo
   }
   mFieldData->ResetStrIdx(stridx);
   uint32 fid = 0;
-  bool status = mMirBuilder->TraverseToNamedField(ctype, fid, mFieldData);
+  bool status = mMirBuilder->TraverseToNamedField((MIRStructType*)ctype, fid, mFieldData);
   if (status) {
     MIRSymbol *sym = func->formalDefVec[0].formalSym; // this
     maple::BaseNode *bn = mMirBuilder->CreateExprDread(sym);
@@ -174,7 +174,7 @@ maple::BaseNode *A2M::ProcessField(StmtExprKind skind, TreeNode *tnode, BlockNod
   GStrIdx stridx = GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(fname);
   mFieldData->ResetStrIdx(stridx);
   uint32 fid = 0;
-  bool status = mMirBuilder->TraverseToNamedField(ctype, fid, mFieldData);
+  bool status = mMirBuilder->TraverseToNamedField((MIRStructType*)ctype, fid, mFieldData);
   if (status) {
     maple::MIRType *ftype = GlobalTables::GetTypeTable().GetTypeFromTyIdx(mFieldData->GetTyIdx());
     bn = new IreadNode(OP_iread, ftype->GetPrimType(), cptyidx, fid, dr);
@@ -282,7 +282,7 @@ maple::BaseNode *A2M::ProcessVarList(StmtExprKind skind, TreeNode *tnode, BlockN
       bn = new DassignNode(mir_type->GetPrimType(), bn, symbol->stIdx, 0);
       if (bn) {
         maple::BlockNode *blk = mBlockNodeMap[block];
-        blk->AddStatement(bn);
+        blk->AddStatement((maple::StmtNode*)bn);
       }
     }
   }
@@ -422,7 +422,7 @@ maple::BaseNode *A2M::ProcessBlock(StmtExprKind skind, TreeNode *tnode, BlockNod
     TreeNode *child = ast_block->GetChildAtIndex(i);
     BaseNode *stmt = ProcessNode(skind, child, block);
     if (stmt) {
-      blk->AddStatement(stmt);
+      blk->AddStatement((StmtNode*)stmt);
       if (mTraceA2m) stmt->Dump(mMirModule, 0);
     }
   }
@@ -516,7 +516,7 @@ maple::BaseNode *A2M::ProcessFuncDecl(StmtExprKind skind, TreeNode *tnode, Block
   mNameFuncMap[name].push_back(func);
 
   // create function type
-  MIRFuncType *functype = GlobalTables::GetTypeTable().GetOrCreateFunctionType(mMirModule, rettype->GetTypeIndex(), funcvectype, funcvecattr, /*isvarg*/ false, true);
+  MIRFuncType *functype = (MIRFuncType*)GlobalTables::GetTypeTable().GetOrCreateFunctionType(mMirModule, rettype->GetTypeIndex(), funcvectype, funcvecattr, /*isvarg*/ false, true);
   func->funcType = functype;
 
   // update function symbol's type
@@ -679,14 +679,14 @@ maple::BaseNode *A2M::ProcessCondBranch(StmtExprKind skind, TreeNode *tnode, Blo
   }
   maple::BlockNode *thenBlock = nullptr;
   maple::BlockNode *elseBlock = nullptr;
-  BlockNode *blk = node->GetTrueBranch();
+  BlockNode *blk = (BlockNode*)node->GetTrueBranch();
   if (blk) {
     MASSERT(blk->IsBlock() && "then body is not a block");
     thenBlock = new maple::BlockNode();
     mBlockNodeMap[blk] = thenBlock;
     ProcessBlock(skind, blk, blk);
   }
-  blk = node->GetFalseBranch();
+  blk = (BlockNode*)node->GetFalseBranch();
   if (blk) {
     MASSERT(blk->IsBlock() && "else body is not a block");
     elseBlock = new maple::BlockNode();
@@ -735,7 +735,7 @@ maple::BaseNode *A2M::ProcessForLoop(StmtExprKind skind, TreeNode *tnode, BlockN
   for (int i = 0; i < node->GetInitNum(); i++) {
     bn = ProcessNode(SK_Stmt, node->InitAtIndex(i), block);
     if (bn) {
-      mblock->AddStatement(bn);
+      mblock->AddStatement((maple::StmtNode*)bn);
       if (mTraceA2m) bn->Dump(mMirModule, 0);
     }
   }
@@ -748,9 +748,9 @@ maple::BaseNode *A2M::ProcessForLoop(StmtExprKind skind, TreeNode *tnode, BlockN
 
   // update stmts are added into loop mbody
   for (int i = 0; i < node->GetUpdateNum(); i++) {
-    bn = ProcessNode(SK_Stmt, node->UpdateAtIndex(i), astbody);
+    bn = ProcessNode(SK_Stmt, node->UpdateAtIndex(i), (maplefe::BlockNode*)astbody);
     if (bn) {
-      mbody->AddStatement(bn);
+      mbody->AddStatement((maple::StmtNode*)bn);
       if (mTraceA2m) bn->Dump(mMirModule, 0);
     }
   }
@@ -857,7 +857,7 @@ maple::BaseNode *A2M::ProcessPass(StmtExprKind skind, TreeNode *tnode, BlockNode
     TreeNode *child = node->GetChild(i);
     stmt = ProcessNode(skind, child, block);
     if (stmt && IsStmt(child)) {
-      blk->AddStatement(stmt);
+      blk->AddStatement((maple::StmtNode*)stmt);
       if (mTraceA2m) stmt->Dump(mMirModule, 0);
     }
   }

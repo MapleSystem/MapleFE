@@ -68,7 +68,7 @@ static char DeEscape(char c) {
   }
 }
 
-static char2int(char c) {
+static int char2int(char c) {
   if (c >= '0' && c <= '9')
     return c - '0';
   else if (c >= 'a' && c <= 'f')

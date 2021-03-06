@@ -1163,7 +1163,7 @@ void RecDetector::WriteRule2Group() {
   groups += "] = {";
 
   for (unsigned rt_idx = 0; rt_idx < RuleTableNum; rt_idx++) {
-    RuleTable *rt_target = gRuleTableSummarys[rt_idx].mAddr;
+    const RuleTable *rt_target = gRuleTableSummarys[rt_idx].mAddr;
     bool found = false;
     RecursionGroup *group = NULL;
 

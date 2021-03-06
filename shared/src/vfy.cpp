@@ -71,7 +71,7 @@ void Verifier::VerifyGlobalScope() {
 
 void Verifier::VerifyTree(TreeNode *tree) {
 #undef  NODEKIND
-#define NODEKIND(K) if (tree->Is##K()) Verify##K(tree);
+#define NODEKIND(K) if (tree->Is##K()) Verify##K((K##Node *)tree);
 #include "ast_nk.def"
 }
 
@@ -119,7 +119,7 @@ void Verifier::VerifyIdentifier(IdentifierNode *inode) {
   ASTScope *scope = mCurrScope;
   IdentifierNode *decl = NULL;
   while (scope) {
-    if (decl = scope->FindDeclOf(inode))
+    if (decl = (IdentifierNode*) scope->FindDeclOf(inode))
       break;
     scope = scope->GetParent();
   }
@@ -211,7 +211,7 @@ void Verifier::VerifyFunction(FunctionNode *func){
   // nearest scope to the farest, so it will shadown the
   // decl with same name in the ancestors' scope.
   for (unsigned i = 0; i < func->GetParamsNum(); i++) {
-    IdentifierNode *inode = func->GetParam(i);
+    IdentifierNode *inode = (IdentifierNode*)func->GetParam(i);
     mCurrScope->TryAddDecl(inode);
   }
 

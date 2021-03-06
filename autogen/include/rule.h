@@ -72,7 +72,7 @@ public:
   void AddArg(uint8_t idx);
 
   const char* GetName() { return mName; }
-  const char* GetArg(uint8_t i) { return mArgs[i]; }
+  uint8_t GetArg(uint8_t i) { return mArgs[i]; }
 
   void Dump();
 };
@@ -157,7 +157,7 @@ public:
 // a rule can contain multiple elements with actions
 class Rule {
 public:
-  const std::string mName;
+  std::string mName;
   RuleElem         *mElement;
   RuleAttr          mAttr;
 public:

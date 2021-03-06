@@ -213,7 +213,7 @@ TreeNode* ASTTree::Manipulate(AppealNode *appeal_node) {
   // In the end, if we still have no suitable solution to create the tree,
   //  we will put subtrees into a PassNode to pass to parent.
   if (child_trees.size() > 0) {
-    PassNode *pass = BuildPassNode();
+    PassNode *pass = (PassNode*)BuildPassNode();
     std::vector<TreeNode*>::iterator child_it = child_trees.begin();
     for (; child_it != child_trees.end(); child_it++)
       pass->AddChild(*child_it);
@@ -782,7 +782,7 @@ void SwitchCaseNode::AddLabel(TreeNode *t) {
         working_list.push_back(labels->GetChild(i));
     } else {
       MASSERT(t->IsSwitchLabel());
-      mLabels.PushBack(t);
+      mLabels.PushBack((SwitchLabelNode*)t);
     }
   }
 }
@@ -818,7 +818,7 @@ void SwitchNode::AddCase(TreeNode *tree) {
         working_list.push_back(cases->GetChild(i));
     } else {
       MASSERT(t->IsSwitchCase());
-      mCases.PushBack(t);
+      mCases.PushBack((SwitchCaseNode*)t);
     }
   }
 }
@@ -873,21 +873,21 @@ void ClassNode::Construct() {
         mFields.PushBack(inode);
       }
     } else if (tree_node->IsIdentifier())
-      mFields.PushBack(tree_node);
+      mFields.PushBack((IdentifierNode*)tree_node);
     else if (tree_node->IsFunction()) {
       FunctionNode *f = (FunctionNode*)tree_node;
       if (f->IsConstructor())
-        mConstructors.PushBack(tree_node);
+        mConstructors.PushBack(f);
       else
-        mMethods.PushBack(tree_node);
+        mMethods.PushBack(f);
     } else if (tree_node->IsClass())
-      mLocalClasses.PushBack(tree_node);
+      mLocalClasses.PushBack((ClassNode*)tree_node);
     else if (tree_node->IsInterface())
-      mLocalInterfaces.PushBack(tree_node);
+      mLocalInterfaces.PushBack((InterfaceNode*)tree_node);
     else if (tree_node->IsBlock()) {
       BlockNode *block = (BlockNode*)tree_node;
       MASSERT(block->IsInstInit() && "unnamed block in class is not inst init?");
-      mInstInits.PushBack(tree_node);
+      mInstInits.PushBack(block);
     } else
       MASSERT("Unsupported tree node in class body.");
   }
@@ -1117,10 +1117,10 @@ void InterfaceNode::Construct(BlockNode *block) {
         mFields.PushBack(inode);
       }
     } else if (tree_node->IsIdentifier())
-      mFields.PushBack(tree_node);
+      mFields.PushBack((IdentifierNode*)tree_node);
     else if (tree_node->IsFunction()) {
       FunctionNode *f = (FunctionNode*)tree_node;
-      mMethods.PushBack(tree_node);
+      mMethods.PushBack(f);
     } else
       MASSERT("Unsupported tree node in interface body.");
   }

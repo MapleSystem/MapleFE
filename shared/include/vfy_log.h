@@ -30,7 +30,7 @@ class TreeNode;
 class VfyLog {
 private:
   StringPool         mPool;
-  SmallVector<char*> mEntries;
+  SmallVector<const char*> mEntries;
 public:
   VfyLog() {}
   ~VfyLog(){mEntries.Release();}

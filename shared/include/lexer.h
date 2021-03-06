@@ -123,7 +123,7 @@ public:
   //
   Token* FindSeparatorToken(SepId id);
   Token* FindOperatorToken(OprId id);
-  Token* FindKeywordToken(char *key);
+  Token* FindKeywordToken(const char *key);
   Token* FindCommentToken();
 
   // When we start walk a rule table to find a token, do we need check if

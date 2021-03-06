@@ -140,7 +140,7 @@ Token* Lexer::FindSeparatorToken(SepId id) {
 
 // The caller of this function makes sure 'key' is already in the
 // string pool of Lexer.
-Token* Lexer::FindKeywordToken(char *key) {
+Token* Lexer::FindKeywordToken(const char *key) {
   Token *token = NULL;
   bool found = false;
   for (unsigned i = gOperatorTokensNum + gSeparatorTokensNum;

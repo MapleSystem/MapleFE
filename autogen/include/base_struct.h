@@ -79,8 +79,8 @@ class StructData {
   void SetChar(char v)     { mKind = DK_Char; mValue.mChar = v; }
   void SetFloat(float v)   { mKind = DK_Float; mValue.mFloat = v; }
   void SetDouble(double v) { mKind = DK_Double; mValue.mDouble = v; }
-  void SetString(std::string name, const StringPool *pool);
-  void SetName(std::string name, const StringPool *pool);
+  void SetString(const std::string name, StringPool *pool);
+  void SetName(const std::string name, StringPool *pool);
 
   char GetChar() { return mValue.mChar; }
   int64_t GetInt() { return mValue.mInt; }
@@ -103,7 +103,7 @@ class StructBase {
 public:
   // A .spec file could define multiple STRUCT, and each XxxGen uses the
   // 'mName' to locate the appropriate one.
-  const std::string mName;
+  std::string mName;
   std::vector<StructElem *> mStructElems;
 
 public:

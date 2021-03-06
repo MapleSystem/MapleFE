@@ -134,7 +134,6 @@ public:
 public:
   bool IsRecursionNode(RuleTable*);
   void FindRecursionNodes();
-  void FindLeadFronNodes();
   void FindFronNodes();
   void FindFronNodes(unsigned circle_index);
 };

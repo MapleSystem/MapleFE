@@ -173,7 +173,7 @@ bool SPECParser::ParseElement(RuleElem *&elem, bool allowConcat) {
       } else if (t != TY_NA) {
         elem->SetTypeId(t);
       } else {
-        char *str = mBaseGen->mStringPool->FindString(name);
+        const char *str = mBaseGen->mStringPool->FindString(name);
         elem->SetPending(str);
         mBaseGen->mToBePatched.push_back(elem);
         if (GetVerbose() >= 3)

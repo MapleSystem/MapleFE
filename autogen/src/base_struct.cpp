@@ -19,15 +19,15 @@
 
 namespace maplefe {
 
-void StructData::SetString(std::string name, const StringPool *pool) {
+void StructData::SetString(const std::string name, StringPool *pool) {
   mKind = DK_String;
-  char *str = pool->FindString(name);
+  const char *str = pool->FindString(name);
   mValue.mString = str;
 }
 
-void StructData::SetName(std::string name, const StringPool *pool) {
+void StructData::SetName(const std::string name, StringPool *pool) {
   mKind = DK_Name;
-  char *str = pool->FindString(name);
+  const char *str = pool->FindString(name);
   mValue.mName = str;
 }
 

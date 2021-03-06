@@ -84,7 +84,7 @@ void LiteralTokenDump(LitData data) {
   }
 }
 
-const char* Token::GetName() {
+const char* Token::GetName() const {
   if (mTkType == TT_KW || mTkType == TT_ID)
     return mData.mName;
   else if (mTkType == TT_SP)
