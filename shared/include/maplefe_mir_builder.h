@@ -23,36 +23,36 @@ namespace maplefe {
 
 class FieldData {
  private:
-  GStrIdx strIdx;
-  TyIdx tyIdx;
-  FieldAttrs attr;
+   maple::GStrIdx strIdx;
+   maple::TyIdx tyIdx;
+   maple::FieldAttrs attr;
 
  public:
   FieldData() : strIdx(0), tyIdx(0), attr() {}
-  FieldData(GStrIdx idx) : strIdx(idx), tyIdx(0), attr() {}
+  FieldData(maple::GStrIdx idx) : strIdx(idx), tyIdx(0), attr() {}
   ~FieldData() {}
 
-  void SetStrIdx(GStrIdx s) {
+  void SetStrIdx(maple::GStrIdx s) {
     strIdx.SetIdx(s.GetIdx());
   }
 
-  void SetTyIdx(TyIdx t) {
+  void SetTyIdx(maple::TyIdx t) {
     tyIdx.SetIdx(t.GetIdx());
   }
 
-  void SetFieldAttrs(FieldAttrs a) {
+  void SetFieldAttrs(maple::FieldAttrs a) {
     attr = a;
   }
 
-  GStrIdx GetStrIdx() {
+  maple::GStrIdx GetStrIdx() {
     return strIdx;
   }
 
-  TyIdx GetTyIdx() {
+  maple::TyIdx GetTyIdx() {
     return tyIdx;
   }
 
-  FieldAttrs GetFieldAttrs() {
+  maple::FieldAttrs GetFieldAttrs() {
     return attr;
   }
 
@@ -62,20 +62,21 @@ class FieldData {
     attr.Clear();
   }
 
-  void ResetStrIdx(GStrIdx s) {
+  void ResetStrIdx(maple::GStrIdx s) {
     strIdx.SetIdx(s.GetIdx());
     tyIdx.SetIdx(0);
     attr.Clear();
   }
 };
 
-class FEMIRBuilder : public MIRBuilder {
+class FEMIRBuilder : public maple::MIRBuilder {
  private:
 
  public:
-  FEMIRBuilder(MIRModule *mod) : MIRBuilder(mod) {}
+  FEMIRBuilder(maple::MIRModule *mod) : maple::MIRBuilder(mod) {}
 
-  bool TraverseToNamedField(MIRStructType *structType, uint32 &fieldID, FieldData *fieldData);
+  bool TraverseToNamedField(maple::MIRStructType *structType, unsigned &fieldID, FieldData *fieldData);
+  maple::BaseNode *CreateExprDread(const maple::MIRSymbol *symbol, maple::FieldID fieldID = maple::FieldID(0));
 };
 
 }

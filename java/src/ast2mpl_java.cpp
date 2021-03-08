@@ -17,38 +17,38 @@
 
 namespace maplefe {
 
-MIRType *A2MJava::MapPrimType(PrimTypeNode *ptnode) {
-  PrimType prim;
+maple::MIRType *A2MJava::MapPrimType(PrimTypeNode *ptnode) {
+  maple::PrimType prim;
   switch (ptnode->GetPrimType()) {
-    case TY_Boolean: prim = PTY_u1; break;
-    case TY_Byte:    prim = PTY_u8; break;
-    case TY_Short:   prim = PTY_i16; break;
-    case TY_Int:     prim = PTY_i32; break;
-    case TY_Long:    prim = PTY_i64; break;
-    case TY_Char:    prim = PTY_u16; break;
-    case TY_Float:   prim = PTY_f32; break;
-    case TY_Double:  prim = PTY_f64; break;
-    case TY_Void:    prim = PTY_void; break;
-    case TY_Null:    prim = PTY_void; break;
+    case TY_Boolean: prim = maple::PTY_u1; break;
+    case TY_Byte:    prim = maple::PTY_u8; break;
+    case TY_Short:   prim = maple::PTY_i16; break;
+    case TY_Int:     prim = maple::PTY_i32; break;
+    case TY_Long:    prim = maple::PTY_i64; break;
+    case TY_Char:    prim = maple::PTY_u16; break;
+    case TY_Float:   prim = maple::PTY_f32; break;
+    case TY_Double:  prim = maple::PTY_f64; break;
+    case TY_Void:    prim = maple::PTY_void; break;
+    case TY_Null:    prim = maple::PTY_void; break;
     default: MASSERT("Unsupported PrimType"); break;
   }
 
-  TyIdx tid(prim);
-  return GlobalTables::GetTypeTable().GetTypeFromTyIdx(tid);
+  maple::TyIdx tid(prim);
+  return maple::GlobalTables::GetTypeTable().GetTypeFromTyIdx(tid);
 }
 
-const char *A2MJava::Type2Label(const MIRType *type) {
-  PrimType pty = type->GetPrimType();
+const char *A2MJava::Type2Label(const maple::MIRType *type) {
+  maple::PrimType pty = type->GetPrimType();
   switch (pty) {
-    case PTY_u1:   return "Z";
-    case PTY_u8:   return "B";
-    case PTY_i16:  return "S";
-    case PTY_u16:  return "C";
-    case PTY_i32:  return "I";
-    case PTY_i64:  return "J";
-    case PTY_f32:  return "F";
-    case PTY_f64:  return "D";
-    case PTY_void: return "V";
+    case maple::PTY_u1:   return "Z";
+    case maple::PTY_u8:   return "B";
+    case maple::PTY_i16:  return "S";
+    case maple::PTY_u16:  return "C";
+    case maple::PTY_i32:  return "I";
+    case maple::PTY_i64:  return "J";
+    case maple::PTY_f32:  return "F";
+    case maple::PTY_f64:  return "D";
+    case maple::PTY_void: return "V";
     default:       return "L";
   }
 }

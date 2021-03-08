@@ -16,7 +16,6 @@
 #include "ast2mpl.h"
 #include "mir_function.h"
 #include "maplefe_mir_builder.h"
-#include "constant_fold.h"
 
 namespace maplefe {
 
@@ -39,25 +38,25 @@ A2M::~A2M() {
 
 void A2M::Init() {
   // create mDefaultType
-  MIRType *type = GlobalTables::GetTypeTable().GetOrCreateClassType("DEFAULT_TYPE", mMirModule);
-  type->typeKind = maple::MIRTypeKind::kTypeClass;
-  mDefaultType = GlobalTables::GetTypeTable().GetOrCreatePointerType(type);
+  maple::MIRType *type = maple::GlobalTables::GetTypeTable().GetOrCreateClassType("DEFAULT_TYPE", *mMirModule);
+  type->SetMIRTypeKind(maple::kTypeClass);
+  mDefaultType = maple::GlobalTables::GetTypeTable().GetOrCreatePointerType(*type);
 
   // setup flavor and srclang
-  mMirModule->flavor = maple::kFeProduced;
-  mMirModule->srcLang = maple::kSrcLangJava;
+  mMirModule->SetFlavor(maple::kFeProduced);
+  mMirModule->SetSrcLang(maple::kSrcLangJava);
 
   // setup INFO_filename
-  GStrIdx idx = GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(mFileName);
-  SET_INFO_PAIR(mMirModule->fileInfo, "INFO_filename", idx.GetIdx(), mMirModule->fileInfoIsString, true);
+  maple::GStrIdx idx = maple::GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(mFileName);
+  SET_INFO_PAIR(mMirModule, "INFO_filename", idx.GetIdx(), true);
 
   // add to java src file list
   std::string str(mFileName);
   size_t pos = str.rfind('/');
   if (pos != std::string::npos) {
-    idx = GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(str.substr(pos+1));
+    idx = maple::GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(str.substr(pos+1));
   }
-  mMirModule->srcFileInfo.push_back(MIRInfoPair(idx, 2));
+  mMirModule->PushbackFileInfo(maple::MIRInfoPair(idx, 2));
 }
 
 // starting point of AST to MPL process
@@ -77,12 +76,12 @@ void A2M::ProcessAST(bool trace_a2m) {
   }
 }
 
-MIRType *A2M::MapType(TreeNode *type) {
+maple::MIRType *A2M::MapType(TreeNode *type) {
   if (!type) {
-    return GlobalTables::GetTypeTable().GetVoid();
+    return maple::GlobalTables::GetTypeTable().GetVoid();
   }
 
-  MIRType *mir_type = mDefaultType;
+  maple::MIRType *mir_type = mDefaultType;
 
   const char *name = type->GetName();
   if (mNodeTypeMap.find(name) != mNodeTypeMap.end()) {
@@ -114,89 +113,89 @@ MIRType *A2M::MapType(TreeNode *type) {
 }
 
 maple::Opcode A2M::MapUnaOpcode(OprId ast_op) {
-  maple::Opcode op = maple::kOpUndef;
+  maple::Opcode op = maple::OP_undef;
   switch (ast_op) {
-    case OPR_Add: op = OP_add; break;
-    case OPR_Sub: op = OP_neg; break;
-    case OPR_Inc: op = OP_incref; break;
-    case OPR_Dec: op = OP_decref; break;
-    case OPR_Bcomp: op = OP_bnot; break;
-    case OPR_Not: op = OP_lnot; break;
+    case OPR_Add: op = maple::OP_add; break;
+    case OPR_Sub: op = maple::OP_neg; break;
+    case OPR_Inc: op = maple::OP_incref; break;
+    case OPR_Dec: op = maple::OP_decref; break;
+    case OPR_Bcomp: op = maple::OP_bnot; break;
+    case OPR_Not: op = maple::OP_lnot; break;
     default: break;
   }
   return op;
 }
 
 maple::Opcode A2M::MapBinOpcode(OprId ast_op) {
-  maple::Opcode op = maple::kOpUndef;
+  maple::Opcode op = maple::OP_undef;
   switch (ast_op) {
-    case OPR_Add: op = OP_add; break;
-    case OPR_Sub: op = OP_sub; break;
-    case OPR_Mul: op = OP_mul; break;
-    case OPR_Div: op = OP_div; break;
-    case OPR_Mod: op = OP_rem; break;
-    case OPR_Band: op = OP_band; break;
-    case OPR_Bor: op = OP_bior; break;
-    case OPR_Bxor: op = OP_bxor; break;
-    case OPR_Shl: op = OP_shl; break;
-    case OPR_Shr: op = OP_ashr; break;
-    case OPR_Zext: op = OP_zext; break;
-    case OPR_Land: op = OP_land; break;
-    case OPR_Lor: op = OP_lior; break;
+    case OPR_Add: op = maple::OP_add; break;
+    case OPR_Sub: op = maple::OP_sub; break;
+    case OPR_Mul: op = maple::OP_mul; break;
+    case OPR_Div: op = maple::OP_div; break;
+    case OPR_Mod: op = maple::OP_rem; break;
+    case OPR_Band: op = maple::OP_band; break;
+    case OPR_Bor: op = maple::OP_bior; break;
+    case OPR_Bxor: op = maple::OP_bxor; break;
+    case OPR_Shl: op = maple::OP_shl; break;
+    case OPR_Shr: op = maple::OP_ashr; break;
+    case OPR_Zext: op = maple::OP_zext; break;
+    case OPR_Land: op = maple::OP_land; break;
+    case OPR_Lor: op = maple::OP_lior; break;
     default: break;
   }
   return op;
 }
 
 maple::Opcode A2M::MapBinCmpOpcode(OprId ast_op) {
-  maple::Opcode op = maple::kOpUndef;
+  maple::Opcode op = maple::OP_undef;
   switch (ast_op) {
-    case OPR_EQ: op = OP_eq; break;
-    case OPR_NE: op = OP_ne; break;
-    case OPR_GT: op = OP_gt; break;
-    case OPR_LT: op = OP_lt; break;
-    case OPR_GE: op = OP_ge; break;
-    case OPR_LE: op = OP_le; break;
+    case OPR_EQ: op = maple::OP_eq; break;
+    case OPR_NE: op = maple::OP_ne; break;
+    case OPR_GT: op = maple::OP_gt; break;
+    case OPR_LT: op = maple::OP_lt; break;
+    case OPR_GE: op = maple::OP_ge; break;
+    case OPR_LE: op = maple::OP_le; break;
     default: break;
   }
   return op;
 }
 
 maple::Opcode A2M::MapBinComboOpcode(OprId ast_op) {
-  maple::Opcode op = maple::kOpUndef;
+  maple::Opcode op = maple::OP_undef;
   switch (ast_op) {
-    case OPR_AddAssign: op = OP_add; break;
-    case OPR_SubAssign: op = OP_sub; break;
-    case OPR_MulAssign: op = OP_mul; break;
-    case OPR_DivAssign: op = OP_div; break;
-    case OPR_ModAssign: op = OP_rem; break;
-    case OPR_ShlAssign: op = OP_shl; break;
-    case OPR_ShrAssign: op = OP_ashr; break;
-    case OPR_BandAssign: op = OP_band; break;
-    case OPR_BorAssign: op = OP_bior; break;
-    case OPR_BxorAssign: op = OP_bxor; break;
-    case OPR_ZextAssign: op = OP_zext; break;
+    case OPR_AddAssign: op = maple::OP_add; break;
+    case OPR_SubAssign: op = maple::OP_sub; break;
+    case OPR_MulAssign: op = maple::OP_mul; break;
+    case OPR_DivAssign: op = maple::OP_div; break;
+    case OPR_ModAssign: op = maple::OP_rem; break;
+    case OPR_ShlAssign: op = maple::OP_shl; break;
+    case OPR_ShrAssign: op = maple::OP_ashr; break;
+    case OPR_BandAssign: op = maple::OP_band; break;
+    case OPR_BorAssign: op = maple::OP_bior; break;
+    case OPR_BxorAssign: op = maple::OP_bxor; break;
+    case OPR_ZextAssign: op = maple::OP_zext; break;
     default:
       break;
   }
   return op;
 }
 
-const char *A2M::Type2Label(const MIRType *type) {
-  PrimType pty = type->GetPrimType();
+const char *A2M::Type2Label(const maple::MIRType *type) {
+  maple::PrimType pty = type->GetPrimType();
   switch (pty) {
-    case PTY_u1:   return "Z";
-    case PTY_i8:   return "C";
-    case PTY_u8:   return "UC";
-    case PTY_i16:  return "S";
-    case PTY_u16:  return "US";
-    case PTY_i32:  return "I";
-    case PTY_u32:  return "UI";
-    case PTY_i64:  return "J";
-    case PTY_u64:  return "UJ";
-    case PTY_f32:  return "F";
-    case PTY_f64:  return "D";
-    case PTY_void: return "V";
+    case maple::PTY_u1:   return "Z";
+    case maple::PTY_i8:   return "C";
+    case maple::PTY_u8:   return "UC";
+    case maple::PTY_i16:  return "S";
+    case maple::PTY_u16:  return "US";
+    case maple::PTY_i32:  return "I";
+    case maple::PTY_u32:  return "UI";
+    case maple::PTY_i64:  return "J";
+    case maple::PTY_u64:  return "UJ";
+    case maple::PTY_f32:  return "F";
+    case maple::PTY_f64:  return "D";
+    case maple::PTY_void: return "V";
     default:       return "L";
   }
 }
@@ -225,7 +224,7 @@ bool A2M::IsStmt(TreeNode *tnode) {
     case NK_BinOperator: {
       BinOperatorNode *bon = static_cast<BinOperatorNode *>(tnode);
       maple::Opcode op = MapBinComboOpcode(bon->mOprId);
-      if (bon->mOprId != OPR_Assign && op == kOpUndef) {
+      if (bon->mOprId != OPR_Assign && op == maple::OP_undef) {
         status = false;
       }
       break;
@@ -251,13 +250,13 @@ bool A2M::IsStmt(TreeNode *tnode) {
 #define RARG     "_29" // ")"
 #endif
 
-void A2M::Type2Name(std::string &str, const MIRType *type) {
-  PrimType pty = type->GetPrimType();
+void A2M::Type2Name(std::string &str, const maple::MIRType *type) {
+  maple::PrimType pty = type->GetPrimType();
   const char *n = Type2Label(type);
   str.append(n);
   if (n[0] == 'L') {
-    while (type->GetPrimType() == PTY_ptr || type->GetPrimType() == PTY_ref) {
-      const MIRPtrType *ptype = static_cast<const MIRPtrType *>(type);
+    while (type->GetPrimType() == maple::PTY_ptr || type->GetPrimType() == maple::PTY_ref) {
+      const maple::MIRPtrType *ptype = static_cast<const maple::MIRPtrType *>(type);
       type = ptype->GetPointedType();
     }
     str.append(type->GetName());
@@ -274,37 +273,38 @@ void A2M::UpdateUniqName(std::string &str) {
 }
 
 // update to use mangled name: className|funcName|(argTypes)retType
-void A2M::UpdateFuncName(MIRFunction *func) {
+void A2M::UpdateFuncName(maple::MIRFunction *func) {
   std::string str;
-  TyIdx tyIdx = func->GetClassTyIdx();
-  MIRType *type;
+  maple::TyIdx tyIdx = func->GetClassTyIdx();
+  maple::MIRType *type;
   if (tyIdx.GetIdx() != 0) {
-    type = GlobalTables::GetTypeTable().GetTypeFromTyIdx(tyIdx);
+    type = maple::GlobalTables::GetTypeTable().GetTypeFromTyIdx(tyIdx);
     str.append(type->GetName());
     str.append(SEP);
   }
   str.append(func->GetName());
   str.append(SEP);
   str.append(LARG);
-  GStrIdx stridx = GlobalTables::GetStrTable().GetOrCreateStrIdxFromName("this");
-  for (auto def: func->formalDefVec) {
+  maple::GStrIdx stridx = maple::GlobalTables::GetStrTable().GetOrCreateStrIdxFromName("this");
+  for (size_t i = 0; i < func->GetFormalCount(); i++) {
+    maple::FormalDef def = func->GetFormalDefAt(i);
     // exclude type of extra "this" in the function name
     if (stridx == def.formalStrIdx) continue;
-    MIRType *type = GlobalTables::GetTypeTable().GetTypeFromTyIdx(def.formalTyIdx);
+    maple::MIRType *type = maple::GlobalTables::GetTypeTable().GetTypeFromTyIdx(def.formalTyIdx);
     Type2Name(str, type);
   }
   str.append(RARG);
   type = func->GetReturnType();
   Type2Name(str, type);
 
-  MIRSymbol *funcst = GlobalTables::GetGsymTable().GetSymbolFromStIdx(func->stIdx.Idx());
+  maple::MIRSymbol *funcst = maple::GlobalTables::GetGsymTable().GetSymbolFromStidx(func->GetStIdx().Idx());
   // remove old entry in strIdxToStIdxMap
-  GlobalTables::GetGsymTable().RemoveFromStringSymbolMap(funcst);
+  maple::GlobalTables::GetGsymTable().RemoveFromStringSymbolMap(*funcst);
   AST2MPLMSG("UpdateFuncName()", str);
-  stridx = GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(str);
-  funcst->SetNameStridx(stridx);
+  stridx = maple::GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(str);
+  funcst->SetNameStrIdx(stridx);
   // add new entry in strIdxToStIdxMap
-  GlobalTables::GetGsymTable().AddToStringSymbolMap(funcst);
+  maple::GlobalTables::GetGsymTable().AddToStringSymbolMap(*funcst);
 }
 
 BlockNode *A2M::GetSuperBlock(BlockNode *block) {
@@ -315,9 +315,9 @@ BlockNode *A2M::GetSuperBlock(BlockNode *block) {
   return (BlockNode*)blk;
 }
 
-MIRSymbol *A2M::GetSymbol(TreeNode *tnode, BlockNode *block) {
+maple::MIRSymbol *A2M::GetSymbol(TreeNode *tnode, BlockNode *block) {
   const char *name = tnode->GetName();
-  MIRSymbol *symbol = nullptr;
+  maple::MIRSymbol *symbol = nullptr;
 
   // global symbol
   if (!block) {
@@ -338,21 +338,20 @@ MIRSymbol *A2M::GetSymbol(TreeNode *tnode, BlockNode *block) {
   } while (blk);
 
   // check parameters
-  MIRFunction *func = GetFunc(blk);
+  maple::MIRFunction *func = GetFunc(blk);
   if (!func) {
     NOTYETIMPL("Block parent hirachy");
     return symbol;
   }
-  GStrIdx stridx = GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(name);
-  for (auto it: func->formalDefVec) {
-    if (it.formalStrIdx == stridx) {
-      return it.formalSym;
-    }
+  maple::GStrIdx stridx = maple::GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(name);
+  if (func->IsAFormalName(stridx)) {
+    maple::FormalDef def = func->GetFormalFromName(stridx);
+    return def.formalSym;
   }
   return symbol;
 }
 
-MIRSymbol *A2M::CreateTempVar(const char *prefix, MIRType *type) {
+maple::MIRSymbol *A2M::CreateTempVar(const char *prefix, maple::MIRType *type) {
   if (!type) {
     return nullptr;
   }
@@ -361,13 +360,13 @@ MIRSymbol *A2M::CreateTempVar(const char *prefix, MIRType *type) {
   str.append(std::to_string(mVarUniqNum));
   mVarUniqNum++;
   maple::MIRFunction *func = mMirModule->CurFunction();
-  MIRSymbol *var = mMirBuilder->CreateLocalDecl(str, type, func);
+  maple::MIRSymbol *var = mMirBuilder->CreateLocalDecl(str, *type);
   return var;
 }
 
-MIRSymbol *A2M::CreateSymbol(TreeNode *tnode, BlockNode *block) {
+maple::MIRSymbol *A2M::CreateSymbol(TreeNode *tnode, BlockNode *block) {
   const char *name = tnode->GetName();
-  MIRType *mir_type;
+  maple::MIRType *mir_type;
 
   if (tnode->IsIdentifier()) {
     IdentifierNode *inode = static_cast<IdentifierNode *>(tnode);
@@ -378,21 +377,22 @@ MIRSymbol *A2M::CreateSymbol(TreeNode *tnode, BlockNode *block) {
   }
 
   // always use pointer type for classes, with PTY_ref
-  if (mir_type->typeKind == kTypeClass || mir_type->typeKind == kTypeClassIncomplete ||
-      mir_type->typeKind == kTypeInterface || mir_type->typeKind == kTypeInterfaceIncomplete) {
-    mir_type = GlobalTables::GetTypeTable().GetOrCreatePointerType(mir_type, PTY_ref);
+  maple::MIRTypeKind kind = mir_type->GetKind();
+  if (kind == maple::kTypeClass || kind == maple::kTypeClassIncomplete ||
+      kind == maple::kTypeInterface || kind == maple::kTypeInterfaceIncomplete) {
+    mir_type = maple::GlobalTables::GetTypeTable().GetOrCreatePointerType(*mir_type, maple::PTY_ref);
   }
 
-  MIRSymbol *symbol = nullptr;
+  maple::MIRSymbol *symbol = nullptr;
   if (block) {
     maple::MIRFunction *func = GetFunc(block);
-    symbol = mMirBuilder->GetLocalDecl(name, func);
+    symbol = mMirBuilder->GetLocalDecl(name);
     std::string str(name);
     // symbol with same name already exist, use a uniq new name
     if (symbol) {
       UpdateUniqName(str);
     }
-    symbol = mMirBuilder->CreateLocalDecl(str, mir_type, func);
+    symbol = mMirBuilder->CreateLocalDecl(str, *mir_type);
   } else {
     symbol = mMirBuilder->GetGlobalDecl(name);
     std::string str(name);
@@ -400,7 +400,7 @@ MIRSymbol *A2M::CreateSymbol(TreeNode *tnode, BlockNode *block) {
     if (symbol) {
       UpdateUniqName(str);
     }
-    symbol = mMirBuilder->CreateGlobalDecl(str, mir_type, kScGlobal);
+    symbol = mMirBuilder->CreateGlobalDecl(str, *mir_type, maple::kScGlobal);
   }
 
   std::pair<const char *, BlockNode*> P(name, block);
@@ -409,30 +409,30 @@ MIRSymbol *A2M::CreateSymbol(TreeNode *tnode, BlockNode *block) {
   return symbol;
 }
 
-MIRFunction *A2M::GetFunc(BlockNode *block) {
-  MIRFunction *func = nullptr;
+maple::MIRFunction *A2M::GetFunc(BlockNode *block) {
+  maple::MIRFunction *func = nullptr;
   // func = mBlockFuncMap[block];
   func = mMirModule->CurFunction();
   return func;
 }
 
-MIRClassType *A2M::GetClass(BlockNode *block) {
-  TyIdx tyidx = GetFunc(block)->classTyIdx;
-  return (MIRClassType*)GlobalTables::GetTypeTable().GetTypeFromTyIdx(tyidx);
+maple::MIRClassType *A2M::GetClass(BlockNode *block) {
+  maple::TyIdx tyidx = GetFunc(block)->GetClassTyIdx();
+  return (maple::MIRClassType*)maple::GlobalTables::GetTypeTable().GetTypeFromTyIdx(tyidx);
 }
 
-MIRFunction *A2M::SearchFunc(const char *name, const MapleVector<BaseNode *> &args) {
+maple::MIRFunction *A2M::SearchFunc(const char *name, const maple::MapleVector<maple::BaseNode *> &args) {
   if (mNameFuncMap.find(name) == mNameFuncMap.end()) {
     return nullptr;
   }
   for (auto it: mNameFuncMap[name]) {
-    if (it->formalDefVec.size() != args.size()) {
+    if (it->GetFormalCount() != args.size()) {
       continue;
     }
     bool matched = true;
-    for (int i = 0; i < it->formalDefVec.size(); i++) {
+    for (int i = 0; i < it->GetFormalCount(); i++) {
       // TODO: allow compatible types
-      MIRType *type = GlobalTables::GetTypeTable().GetTypeFromTyIdx(it->formalDefVec[i].formalTyIdx);
+      maple::MIRType *type = maple::GlobalTables::GetTypeTable().GetTypeFromTyIdx(it->GetFormalDefAt(i).formalTyIdx);
       if (type->GetPrimType() != args[i]->GetPrimType()) {
         matched = false;
         break;
@@ -446,7 +446,7 @@ MIRFunction *A2M::SearchFunc(const char *name, const MapleVector<BaseNode *> &ar
   return nullptr;
 }
 
-void A2M::MapAttr(GenericAttrs &attr, const IdentifierNode *inode) {
+void A2M::MapAttr(maple::GenericAttrs &attr, const IdentifierNode *inode) {
   // SmallVector<AttrId> mAttrs
   unsigned anum = inode->GetAttrsNum();
   for (int i = 0; i < anum; i++) {

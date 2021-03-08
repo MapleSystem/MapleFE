@@ -15,12 +15,11 @@
 
 if [ ! -d $MAPLEALL_ROOT ]; then
   cd $MAPLE_ROOT
-  git clone https://gitee.com/openarkcompiler-incubator/mapleall.git
+  git clone https://gitee.com/openarkcompiler/OpenArkCompiler.git
 fi
 
 cd $MAPLEALL_ROOT
 git pull
-source envsetup.sh arm debug
+source build/envsetup.sh arm debug
 make setup
 make
-make install

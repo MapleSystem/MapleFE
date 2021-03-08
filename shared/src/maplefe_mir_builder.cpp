@@ -17,43 +17,50 @@
 
 namespace maplefe {
 
-bool FEMIRBuilder::TraverseToNamedField(MIRStructType *structType, uint32 &fieldID, FieldData *fieldData) {
+bool FEMIRBuilder::TraverseToNamedField(maple::MIRStructType *structType, unsigned &fieldID, FieldData *fieldData) {
   if (!structType) {
     return false;
   }
 
-  for (uint32 fieldidx = 0; fieldidx < structType->fields.size(); fieldidx++) {
+  for (unsigned fieldidx = 0; fieldidx < structType->GetFieldsSize(); fieldidx++) {
     fieldID++;
-    if (structType->fields[fieldidx].first == fieldData->GetStrIdx()) {
-      fieldData->SetTyIdx(structType->fields[fieldidx].second.first);
-      fieldData->SetFieldAttrs(structType->fields[fieldidx].second.second);
+    const maple::FieldPair fp = structType->GetFieldsElemt(fieldidx);
+    if (structType->GetFieldsElemt(fieldidx).first == fieldData->GetStrIdx()) {
+      fieldData->SetTyIdx(fp.second.first);
+      fieldData->SetFieldAttrs(fp.second.second);
       // for pointer type, check their pointed type
-      MIRType *type = GlobalTables::GetTypeTable().GetTypeFromTyIdx(fieldData->GetTyIdx());
-      MIRType *typeit = GlobalTables::GetTypeTable().GetTypeFromTyIdx(structType->fields[fieldidx].second.first);
-      if (IsOfSameType(type, typeit)) {
+      maple::MIRType *type = maple::GlobalTables::GetTypeTable().GetTypeFromTyIdx(fieldData->GetTyIdx());
+      maple::MIRType *typeit = maple::GlobalTables::GetTypeTable().GetTypeFromTyIdx(fp.second.first);
+      if (type->IsOfSameType(*typeit)) {
         return true;
       }
     }
 
-    MIRType *fieldtype = GlobalTables::GetTypeTable().GetTypeFromTyIdx(structType->fields[fieldidx].second.first);
-    if (fieldtype->typeKind == kTypeStruct || fieldtype->typeKind == kTypeStructIncomplete) {
-      MIRStructType *substructtype = static_cast<MIRStructType *>(fieldtype);
+    maple::MIRType *fieldtype = maple::GlobalTables::GetTypeTable().GetTypeFromTyIdx(fp.second.first);
+    maple::MIRTypeKind kind = fieldtype->GetKind();
+    if (kind == maple::kTypeStruct || kind == maple::kTypeStructIncomplete) {
+      maple::MIRStructType *substructtype = static_cast<maple::MIRStructType *>(fieldtype);
       if (TraverseToNamedField(substructtype, fieldID, fieldData)) {
         return true;
       }
-    } else if (fieldtype->typeKind == kTypeClass || fieldtype->typeKind == kTypeClassIncomplete) {
-      MIRClassType *subclasstype = static_cast<MIRClassType *>(fieldtype);
+    } else if (kind == maple::kTypeClass || kind == maple::kTypeClassIncomplete) {
+      maple::MIRClassType *subclasstype = static_cast<maple::MIRClassType *>(fieldtype);
       if (TraverseToNamedField(subclasstype, fieldID, fieldData)) {
         return true;
       }
-    } else if (fieldtype->typeKind == kTypeInterface || fieldtype->typeKind == kTypeInterfaceIncomplete) {
-      MIRInterfaceType *subinterfacetype = static_cast<MIRInterfaceType *>(fieldtype);
+    } else if (kind == maple::kTypeInterface || kind == maple::kTypeInterfaceIncomplete) {
+      maple::MIRInterfaceType *subinterfacetype = static_cast<maple::MIRInterfaceType *>(fieldtype);
       if (TraverseToNamedField(subinterfacetype, fieldID, fieldData)) {
         return true;
       }
     }
   }
   return false;
+}
+
+maple::BaseNode *FEMIRBuilder::CreateExprDread(const maple::MIRSymbol *symbol, maple::FieldID fieldID) {
+  maple::BaseNode *nd = new maple::AddrofNode(maple::OP_dread, maple::kPtyInvalid, symbol->GetStIdx(), fieldID);
+  return nd;
 }
 
 }

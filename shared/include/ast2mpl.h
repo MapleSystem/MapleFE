@@ -63,24 +63,24 @@ public:
   void Init();
   bool IsStmt(TreeNode *tnode);
 
-  void UpdateFuncName(MIRFunction *func);
+  void UpdateFuncName(maple::MIRFunction *func);
 
-  virtual const char *Type2Label(const MIRType *type);
-  void Type2Name(std::string &str, const MIRType *type);
+  virtual const char *Type2Label(const maple::MIRType *type);
+  void Type2Name(std::string &str, const maple::MIRType *type);
 
   BlockNode *GetSuperBlock(BlockNode *block);
-  MIRSymbol *GetSymbol(TreeNode *tnode, BlockNode *block);
-  MIRSymbol *CreateSymbol(TreeNode *tnode, BlockNode *block);
-  MIRSymbol *CreateTempVar(const char *prefix, MIRType *type);
-  MIRFunction *GetFunc(BlockNode *block);
-  MIRFunction *SearchFunc(const char *name, const MapleVector<BaseNode *> &args);
-  MIRClassType *GetClass(BlockNode *block);
+  maple::MIRSymbol *GetSymbol(TreeNode *tnode, BlockNode *block);
+  maple::MIRSymbol *CreateSymbol(TreeNode *tnode, BlockNode *block);
+  maple::MIRSymbol *CreateTempVar(const char *prefix, maple::MIRType *type);
+  maple::MIRFunction *GetFunc(BlockNode *block);
+  maple::MIRFunction *SearchFunc(const char *name, const maple::MapleVector<maple::BaseNode *> &args);
+  maple::MIRClassType *GetClass(BlockNode *block);
   void UpdateUniqName(std::string &str);
 
-  virtual MIRType *MapPrimType(PrimTypeNode *tnode)=0;
+  virtual maple::MIRType *MapPrimType(PrimTypeNode *tnode)=0;
 
-  MIRType *MapType(TreeNode *tnode);
-  void MapAttr(GenericAttrs &attr, const IdentifierNode *inode);
+  maple::MIRType *MapType(TreeNode *tnode);
+  void MapAttr(maple::GenericAttrs &attr, const IdentifierNode *inode);
 
   maple::Opcode MapUnaOpcode(OprId);
   maple::Opcode MapBinOpcode(OprId);
