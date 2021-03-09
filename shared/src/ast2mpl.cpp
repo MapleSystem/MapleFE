@@ -23,6 +23,7 @@ static unsigned mVarUniqNum;
 
 A2M::A2M(const char *filename) : mFileName(filename) {
   mMirModule = new maple::MIRModule(mFileName);
+  maple::theMIRModule = mMirModule;
   mMirBuilder = new FEMIRBuilder(mMirModule);
   mFieldData = new FieldData();
   mVarUniqNum = 1;

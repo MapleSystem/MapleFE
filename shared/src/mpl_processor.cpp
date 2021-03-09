@@ -515,7 +515,7 @@ maple::BaseNode *A2M::ProcessFuncDecl(StmtExprKind skind, TreeNode *tnode, Block
   mNameFuncMap[name].push_back(func);
 
   // create function type
-  maple::MIRFuncType *functype = (maple::MIRFuncType*)maple::GlobalTables::GetTypeTable().GetOrCreateFunctionType(*mMirModule, rettype->GetTypeIndex(), funcvectype, funcvecattr, /*isvarg*/ false, true);
+  maple::MIRFuncType *functype = (maple::MIRFuncType*)maple::GlobalTables::GetTypeTable().GetOrCreateFunctionType(*mMirModule, rettype->GetTypeIndex(), funcvectype, funcvecattr, /*isvarg*/ false, false);
   func->SetMIRFuncType(functype);
 
   // update function symbol's type
