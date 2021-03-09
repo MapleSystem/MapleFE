@@ -35,10 +35,10 @@ namespace maplefe {
   std::cout << "(" << __FILE__ << ":" << __LINE__ << ") " << std::endl;\
 } while (0)
 
-// SET_INFO_PAIR(module->fileInfo, "filename", strIdx, module_->fileInfoIsString, true);
-#define SET_INFO_PAIR(A, B, C, D, E)                                   \
-  A.push_back(MIRInfoPair(GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(B), C)); \
-  D.push_back(E)
+// SET_INFO_PAIR(module, "filename", strIdx, true);
+#define SET_INFO_PAIR(A, B, C, D)                                   \
+  A->PushFileInfoPair(maple::MIRInfoPair(maple::GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(B), C)); \
+  A->PushFileInfoIsString(D)
 
 }
 #endif /* __MACROS_H__ */

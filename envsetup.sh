@@ -34,10 +34,10 @@ unset MAPLEFE_ROOT
 export MAPLEFE_ROOT=${curdir}
 
 unset MAPLEALL_ROOT
-export MAPLEALL_ROOT=${MAPLE_ROOT}/mapleall
+export MAPLEALL_ROOT=${MAPLE_ROOT}/OpenArkCompiler
 
 unset MAPLEALL_SRC
-export MAPLEALL_SRC=${MAPLEALL_ROOT}/mapleall
+export MAPLEALL_SRC=${MAPLEALL_ROOT}/src/mapleall
 
 unset BUILDDIR
 export BUILDDIR=${MAPLEFE_ROOT}/output

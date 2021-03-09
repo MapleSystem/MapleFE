@@ -82,44 +82,43 @@ maple::BaseNode *A2M::ProcessIdentifier(StmtExprKind skind, TreeNode *tnode, Blo
 
   if (skind == SK_Stmt) {
     AST2MPLMSG("ProcessIdentifier() is a decl", name);
-    MIRSymbol *symbol = CreateSymbol(node, block);
+    maple::MIRSymbol *symbol = CreateSymbol(node, block);
     return nullptr;
   }
 
   // check local var
-  MIRSymbol *symbol = GetSymbol(node, block);
+  maple::MIRSymbol *symbol = GetSymbol(node, block);
   if (symbol) {
     AST2MPLMSG("ProcessIdentifier() found local symbol", name);
     return mMirBuilder->CreateExprDread(symbol);
   }
 
-  GStrIdx stridx = GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(name);
-  MIRFunction *func = GetFunc(block);
+  maple::GStrIdx stridx = maple::GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(name);
+  maple::MIRFunction *func = GetFunc(block);
 
   // check parameters
-  for (auto it: func->formalDefVec) {
-    if (it.formalStrIdx == stridx) {
-      AST2MPLMSG("ProcessIdentifier() found parameter", name);
-      return mMirBuilder->CreateExprDread(it.formalSym);
-    }
+  if (func->IsAFormalName(stridx)) {
+    maple::FormalDef def = func->GetFormalFromName(stridx);
+    AST2MPLMSG("ProcessIdentifier() found parameter", name);
+    return mMirBuilder->CreateExprDread(def.formalSym);
   }
 
   // check class fields
-  TyIdx tyidx = func->formalDefVec[0].formalTyIdx;
-  MIRType *ctype = GlobalTables::GetTypeTable().GetTypeFromTyIdx(tyidx);
-  if (ctype->GetPrimType() == PTY_ptr || ctype->GetPrimType() == PTY_ref) {
-    MIRPtrType *ptype = static_cast<MIRPtrType *>(ctype);
+  maple::TyIdx tyidx = func->GetFormalDefAt(0).formalTyIdx;
+  maple::MIRType *ctype = maple::GlobalTables::GetTypeTable().GetTypeFromTyIdx(tyidx);
+  if (ctype->GetPrimType() == maple::PTY_ptr || ctype->GetPrimType() == maple::PTY_ref) {
+    maple::MIRPtrType *ptype = static_cast<maple::MIRPtrType *>(ctype);
     ctype = ptype->GetPointedType();
   }
   mFieldData->ResetStrIdx(stridx);
-  uint32 fid = 0;
-  bool status = mMirBuilder->TraverseToNamedField((MIRStructType*)ctype, fid, mFieldData);
+  maple::uint32 fid = 0;
+  bool status = mMirBuilder->TraverseToNamedField((maple::MIRStructType*)ctype, fid, mFieldData);
   if (status) {
-    MIRSymbol *sym = func->formalDefVec[0].formalSym; // this
+    maple::MIRSymbol *sym = func->GetFormal(0); // this
     maple::BaseNode *bn = mMirBuilder->CreateExprDread(sym);
-    maple::MIRType *ftype = GlobalTables::GetTypeTable().GetTypeFromTyIdx(mFieldData->GetTyIdx());
+    maple::MIRType *ftype = maple::GlobalTables::GetTypeTable().GetTypeFromTyIdx(mFieldData->GetTyIdx());
     AST2MPLMSG("ProcessIdentifier() found match field", name);
-    return mMirBuilder->CreateExprIread(ftype, sym->GetType(), FieldID(fid), bn);
+    return new maple::IreadNode(maple::OP_iread, ftype->GetPrimType(), mFieldData->GetTyIdx(), maple::FieldID(fid), bn);
   }
 
   // check global var
@@ -130,7 +129,7 @@ maple::BaseNode *A2M::ProcessIdentifier(StmtExprKind skind, TreeNode *tnode, Blo
   }
 
   AST2MPLMSG("ProcessIdentifier() unknown identifier", name);
-  symbol = mMirBuilder->GetOrCreateLocalDecl(name, mDefaultType, func);
+  symbol = mMirBuilder->GetOrCreateLocalDecl(name, *mDefaultType);
   return mMirBuilder->CreateExprDread(symbol);
 }
 
@@ -147,17 +146,17 @@ maple::BaseNode *A2M::ProcessField(StmtExprKind skind, TreeNode *tnode, BlockNod
   TreeNode *upper = node->GetUpper();
   TreeNode *field = node->GetField();
 
-  MIRType *ctype = nullptr;
-  TyIdx cptyidx(0);
+  maple::MIRType *ctype = nullptr;
+  maple::TyIdx cptyidx(0);
   maple::BaseNode *dr = nullptr;
   if (upper->IsLiteral()) {
     LiteralNode *lt = static_cast<LiteralNode *>(upper);
     if (lt->GetData().mType == LT_ThisLiteral) {
-      MIRFunction *func = GetFunc(block);
-      MIRSymbol *sym = func->formalDefVec[0].formalSym; // this
+      maple::MIRFunction *func = GetFunc(block);
+      maple::MIRSymbol *sym = func->GetFormal(0); // this
       cptyidx = sym->GetTyIdx();
       ctype = GetClass(block);
-      dr = new DreadNode(OP_dread, PTY_ptr, sym->GetStIdx(), 0);
+      dr = new maple::DreadNode(maple::OP_dread, maple::PTY_ptr, sym->GetStIdx(), 0);
     } else {
       NOTYETIMPL("ProcessField() not this literal");
     }
@@ -171,13 +170,13 @@ maple::BaseNode *A2M::ProcessField(StmtExprKind skind, TreeNode *tnode, BlockNod
   }
 
   const char *fname = field->GetName();
-  GStrIdx stridx = GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(fname);
+  maple::GStrIdx stridx = maple::GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(fname);
   mFieldData->ResetStrIdx(stridx);
-  uint32 fid = 0;
-  bool status = mMirBuilder->TraverseToNamedField((MIRStructType*)ctype, fid, mFieldData);
+  maple::uint32 fid = 0;
+  bool status = mMirBuilder->TraverseToNamedField((maple::MIRStructType*)ctype, fid, mFieldData);
   if (status) {
-    maple::MIRType *ftype = GlobalTables::GetTypeTable().GetTypeFromTyIdx(mFieldData->GetTyIdx());
-    bn = new IreadNode(OP_iread, ftype->GetPrimType(), cptyidx, fid, dr);
+    maple::MIRType *ftype = maple::GlobalTables::GetTypeTable().GetTypeFromTyIdx(mFieldData->GetTyIdx());
+    bn = new maple::IreadNode(maple::OP_iread, ftype->GetPrimType(), cptyidx, fid, dr);
   }
   return bn;
 }
@@ -193,8 +192,8 @@ maple::BaseNode *A2M::ProcessFieldDecl(StmtExprKind skind, TreeNode *tnode, Bloc
 
   TreeNode *parent = tnode->GetParent();
   MASSERT((parent->IsClass() || parent->IsInterface()) && "Not class or interface");
-  MIRType *ptype = mNodeTypeMap[parent->GetName()];
-  MIRStructType *stype = static_cast<MIRStructType *>(ptype);
+  maple::MIRType *ptype = mNodeTypeMap[parent->GetName()];
+  maple::MIRStructType *stype = static_cast<maple::MIRStructType *>(ptype);
   MASSERT(stype && "struct type not valid");
 
   IdentifierNode *inode = static_cast<IdentifierNode *>(tnode);
@@ -202,20 +201,20 @@ maple::BaseNode *A2M::ProcessFieldDecl(StmtExprKind skind, TreeNode *tnode, Bloc
   TreeNode      *type = inode->GetType(); // PrimTypeNode or UserTypeNode
   TreeNode      *init = inode->GetInit(); // Init value
 
-  GenericAttrs genAttrs;
+  maple::GenericAttrs genAttrs;
   MapAttr(genAttrs, inode);
 
-  GStrIdx stridx = GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(name);
-  MIRType *mir_type = MapType(type);
+  maple::GStrIdx stridx = maple::GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(name);
+  maple::MIRType *mir_type = MapType(type);
   // always use pointer type for classes, with PTY_ref
-  if (mir_type->typeKind == kTypeClass || mir_type->typeKind == kTypeClassIncomplete ||
-      mir_type->typeKind == kTypeInterface || mir_type->typeKind == kTypeInterfaceIncomplete) {
-    mir_type = GlobalTables::GetTypeTable().GetOrCreatePointerType(mir_type, PTY_ref);
+  if (mir_type->GetKind() == maple::kTypeClass || mir_type->GetKind() == maple::kTypeClassIncomplete ||
+      mir_type->GetKind() == maple::kTypeInterface || mir_type->GetKind() == maple::kTypeInterfaceIncomplete) {
+    mir_type = maple::GlobalTables::GetTypeTable().GetOrCreatePointerType(*mir_type, maple::PTY_ref);
   }
   if (mir_type) {
-    TyidxFieldAttrPair P0(mir_type->GetTypeIndex(), genAttrs.ConvertToFieldAttrs());
-    FieldPair P1(stridx, P0);
-    stype->fields.push_back(P1);
+    maple::TyIdxFieldAttrPair P0(mir_type->GetTypeIndex(), genAttrs.ConvertToFieldAttrs());
+    maple::FieldPair P1(stridx, P0);
+    stype->GetFields().push_back(P1);
   }
 
   return bn;
@@ -274,12 +273,12 @@ maple::BaseNode *A2M::ProcessVarList(StmtExprKind skind, TreeNode *tnode, BlockN
     TreeNode *n = node->VarAtIndex(i);
     IdentifierNode *inode = static_cast<IdentifierNode *>(n);
     AST2MPLMSG("ProcessVarList() decl", inode->GetName());
-    MIRSymbol *symbol = CreateSymbol(inode, block);
+    maple::MIRSymbol *symbol = CreateSymbol(inode, block);
     TreeNode *init = inode->GetInit(); // Init value
     if (init) {
       maple::BaseNode *bn = ProcessNode(SK_Expr, init, block);
-      MIRType *mir_type = MapType(inode->GetType());
-      bn = new DassignNode(mir_type->GetPrimType(), bn, symbol->stIdx, 0);
+      maple::MIRType *mir_type = MapType(inode->GetType());
+      bn = new maple::DassignNode(mir_type->GetPrimType(), bn, symbol->GetStIdx(), 0);
       if (bn) {
         maple::BlockNode *blk = mBlockNodeMap[block];
         blk->AddStatement((maple::StmtNode*)bn);
@@ -301,13 +300,15 @@ maple::BaseNode *A2M::ProcessLiteral(StmtExprKind skind, TreeNode *tnode, BlockN
   maple::BaseNode *bn = nullptr;
   switch (data.mType) {
     case LT_IntegerLiteral: {
-      MIRIntConst *cst = new MIRIntConst(data.mData.mInt, GlobalTables::GetTypeTable().GetInt32());
-      bn =  new maple::ConstvalNode(PTY_i32, cst);
+      maple::MIRType *typeI32 = maple::GlobalTables::GetTypeTable().GetInt32();
+      maple::MIRIntConst *cst = new maple::MIRIntConst(data.mData.mInt, *typeI32);
+      bn =  new maple::ConstvalNode(maple::PTY_i32, cst);
       break;
     }
     case LT_BooleanLiteral: {
       int val = (data.mData.mBool == true) ? 1 : 0;
-      bn = new maple::ConstvalNode(PTY_u1, new MIRIntConst(val, GlobalTables::GetTypeTable().GetUInt1()));
+      maple::MIRType *typeU1 = maple::GlobalTables::GetTypeTable().GetUInt1();
+      bn = new maple::ConstvalNode(maple::PTY_u1, new maple::MIRIntConst(val, *typeU1));
       break;
     }
     case LT_FPLiteral:
@@ -336,10 +337,10 @@ maple::BaseNode *A2M::ProcessUnaOperator(StmtExprKind skind, TreeNode *tnode, Bl
     return mpl_node;
   }
 
-  maple::Opcode op = maple::kOpUndef;
+  maple::Opcode op = maple::OP_undef;
 
   op = MapUnaOpcode(ast_op);
-  if (op != kOpUndef) {
+  if (op != maple::OP_undef) {
     mpl_node = ProcessUnaOperatorMpl(skind, op, bn, block);
   }
 
@@ -360,17 +361,17 @@ maple::BaseNode *A2M::ProcessBinOperator(StmtExprKind skind, TreeNode *tnode, Bl
     return mpl_node;
   }
 
-  maple::Opcode op = maple::kOpUndef;
+  maple::Opcode op = maple::OP_undef;
 
   op = MapBinOpcode(ast_op);
-  if (op != kOpUndef) {
-    mpl_node = new BinaryNode(op, lhs->GetPrimType(), lhs, rhs);
+  if (op != maple::OP_undef) {
+    mpl_node = new maple::BinaryNode(op, lhs->GetPrimType(), lhs, rhs);
     return mpl_node;
   }
 
   op = MapBinCmpOpcode(ast_op);
-  if (op != kOpUndef) {
-    mpl_node = new CompareNode(op, PTY_u1, lhs->GetPrimType(), lhs, rhs);
+  if (op != maple::OP_undef) {
+    mpl_node = new maple::CompareNode(op, maple::PTY_u1, lhs->GetPrimType(), lhs, rhs);
     return mpl_node;
   }
 
@@ -380,7 +381,7 @@ maple::BaseNode *A2M::ProcessBinOperator(StmtExprKind skind, TreeNode *tnode, Bl
   }
 
   op = MapBinComboOpcode(ast_op);
-  if (op != kOpUndef) {
+  if (op != maple::OP_undef) {
     mpl_node = ProcessBinOperatorMplComboAssign(SK_Stmt, op, lhs, rhs, block);
     return mpl_node;
   }
@@ -410,7 +411,7 @@ maple::BaseNode *A2M::ProcessBlockDecl(StmtExprKind skind, TreeNode *tnode, Bloc
   maple::BlockNode *blk = mBlockNodeMap[block];
   for (int i = 0; i < ast_block->GetChildrenNum(); i++) {
     TreeNode *child = ast_block->GetChildAtIndex(i);
-    BaseNode *stmt = ProcessNodeDecl(skind, child, block);
+    maple::BaseNode *stmt = ProcessNodeDecl(skind, child, block);
   }
   return nullptr;
 }
@@ -420,10 +421,10 @@ maple::BaseNode *A2M::ProcessBlock(StmtExprKind skind, TreeNode *tnode, BlockNod
   maple::BlockNode *blk = mBlockNodeMap[block];
   for (int i = 0; i < ast_block->GetChildrenNum(); i++) {
     TreeNode *child = ast_block->GetChildAtIndex(i);
-    BaseNode *stmt = ProcessNode(skind, child, block);
+    maple::BaseNode *stmt = ProcessNode(skind, child, block);
     if (stmt) {
-      blk->AddStatement((StmtNode*)stmt);
-      if (mTraceA2m) stmt->Dump(mMirModule, 0);
+      blk->AddStatement((maple::StmtNode*)stmt);
+      if (mTraceA2m) stmt->Dump(0);
     }
   }
   return nullptr;
@@ -449,19 +450,19 @@ maple::BaseNode *A2M::ProcessFuncDecl(StmtExprKind skind, TreeNode *tnode, Block
   AST2MPLMSG("\n================== function ==================", name);
 
   TreeNode *parent = tnode->GetParent();
-  MIRStructType *stype = nullptr;
+  maple::MIRStructType *stype = nullptr;
   if (parent->IsClass() || parent->IsInterface()) {
-    MIRType *ptype = mNodeTypeMap[parent->GetName()];
-    stype = static_cast<MIRStructType *>(ptype);
+    maple::MIRType *ptype = mNodeTypeMap[parent->GetName()];
+    stype = static_cast<maple::MIRStructType *>(ptype);
     MASSERT(stype && "struct type not valid");
   }
 
-  MIRType *rettype = MapType(ast_rettype);
-  MIRFunction *func = mMirBuilder->GetOrCreateFunction(name, rettype->GetTypeIndex());
+  maple::MIRType *rettype = MapType(ast_rettype);
+  maple::MIRFunction *func = mMirBuilder->GetOrCreateFunction(name, rettype->GetTypeIndex());
 
   // init function fields
-  func->body = func->codeMemPool->New<maple::BlockNode>();
-  func->symTab = func->dataMemPool->New<maple::MIRSymbolTable>(&func->dataMPAllocator);
+  func->SetBody(func->GetCodeMemPool()->New<maple::BlockNode>());
+  func->AllocSymTab();
 
   mMirModule->AddFunction(func);
   mMirModule->SetCurFunction(func);
@@ -472,18 +473,17 @@ maple::BaseNode *A2M::ProcessFuncDecl(StmtExprKind skind, TreeNode *tnode, Block
   }
 
   // process function arguments for function type and formal parameters
-  std::vector<TyIdx> funcvectype;
-  std::vector<TypeAttrs> funcvecattr;
+  std::vector<maple::TyIdx> funcvectype;
+  std::vector<maple::TypeAttrs> funcvecattr;
 
   // insert this as first parameter
   if (stype) {
-    GStrIdx stridx = GlobalTables::GetStrTable().GetOrCreateStrIdxFromName("this");
-    TypeAttrs attr = TypeAttrs();
-    MIRType *sptype = GlobalTables::GetTypeTable().GetOrCreatePointerType(stype, PTY_ref);
-    MIRSymbol *sym = mMirBuilder->GetOrCreateLocalDecl("this", sptype, func);
-    sym->SetStorageClass(kScFormal);
-    FormalDef formalDef(stridx, sym, sptype->GetTypeIndex(), attr);
-    func->formalDefVec.push_back(formalDef);
+    maple::GStrIdx stridx = maple::GlobalTables::GetStrTable().GetOrCreateStrIdxFromName("this");
+    maple::TypeAttrs attr = maple::TypeAttrs();
+    maple::MIRType *sptype = maple::GlobalTables::GetTypeTable().GetOrCreatePointerType(*stype, maple::PTY_ref);
+    maple::MIRSymbol *sym = mMirBuilder->GetOrCreateLocalDecl("this", *sptype);
+    sym->SetStorageClass(maple::kScFormal);
+    func->AddArgument(sym);
     funcvectype.push_back(sptype->GetTypeIndex());
     funcvecattr.push_back(attr);
   }
@@ -491,7 +491,7 @@ maple::BaseNode *A2M::ProcessFuncDecl(StmtExprKind skind, TreeNode *tnode, Block
   // process remaining parameters
   for (int i = 0; i < ast_func->GetParamsNum(); i++) {
     TreeNode *param = ast_func->GetParam(i);
-    MIRType *type = mDefaultType;
+    maple::MIRType *type = mDefaultType;
     if (param->IsIdentifier()) {
       IdentifierNode *inode = static_cast<IdentifierNode *>(param);
       type = MapType(inode->GetType());
@@ -500,12 +500,11 @@ maple::BaseNode *A2M::ProcessFuncDecl(StmtExprKind skind, TreeNode *tnode, Block
       continue;
     }
 
-    GStrIdx stridx = GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(param->GetName());
-    TypeAttrs attr = TypeAttrs();
-    MIRSymbol *sym = mMirBuilder->GetOrCreateLocalDecl(param->GetName(), type, func);
-    sym->SetStorageClass(kScFormal);
-    FormalDef formalDef(stridx, sym, type->GetTypeIndex(), attr);
-    func->formalDefVec.push_back(formalDef);
+    maple::GStrIdx stridx = maple::GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(param->GetName());
+    maple::TypeAttrs attr = maple::TypeAttrs();
+    maple::MIRSymbol *sym = mMirBuilder->GetOrCreateLocalDecl(param->GetName(), *type);
+    sym->SetStorageClass(maple::kScFormal);
+    func->AddArgument(sym);
     funcvectype.push_back(type->GetTypeIndex());
     funcvecattr.push_back(attr);
   }
@@ -516,27 +515,27 @@ maple::BaseNode *A2M::ProcessFuncDecl(StmtExprKind skind, TreeNode *tnode, Block
   mNameFuncMap[name].push_back(func);
 
   // create function type
-  MIRFuncType *functype = (MIRFuncType*)GlobalTables::GetTypeTable().GetOrCreateFunctionType(mMirModule, rettype->GetTypeIndex(), funcvectype, funcvecattr, /*isvarg*/ false, true);
-  func->funcType = functype;
+  maple::MIRFuncType *functype = (maple::MIRFuncType*)maple::GlobalTables::GetTypeTable().GetOrCreateFunctionType(*mMirModule, rettype->GetTypeIndex(), funcvectype, funcvecattr, /*isvarg*/ false, false);
+  func->SetMIRFuncType(functype);
 
   // update function symbol's type
-  MIRSymbol *funcst = GlobalTables::GetGsymTable().GetSymbolFromStIdx(func->stIdx.Idx());
+  maple::MIRSymbol *funcst = maple::GlobalTables::GetGsymTable().GetSymbolFromStidx(func->GetStIdx().Idx());
   funcst->SetTyIdx(functype->GetTypeIndex());
 
   // add method with updated funcname to parent stype
   if (stype) {
-    StIdx stIdx = func->stIdx;
-    FuncAttrs funcattrs(func->GetAttrs());
-    TyidxFuncAttrPair P0(funcst->tyIdx, funcattrs);
-    MethodPair P1(stIdx, P0);
-    stype->methods.push_back(P1);
+    maple::StIdx stIdx = func->GetStIdx();
+    maple::FuncAttrs funcattrs(func->GetFuncAttrs());
+    maple::TyidxFuncAttrPair P0(func->GetMIRFuncType()->GetTypeIndex(), funcattrs);
+    maple::MethodPair P1(stIdx, P0);
+    stype->GetMethods().push_back(P1);
   }
 
   if (ast_func->GetBody()) {
     BlockNode *ast_block = static_cast<BlockNode *>(ast_func->GetBody());
     for (int i = 0; i < ast_block->GetChildrenNum(); i++) {
       TreeNode *child = ast_block->GetChildAtIndex(i);
-      BaseNode *stmt = ProcessNodeDecl(skind, child, block);
+      maple::BaseNode *stmt = ProcessNodeDecl(skind, child, block);
     }
   }
 
@@ -547,7 +546,7 @@ maple::BaseNode *A2M::ProcessFuncDecl(StmtExprKind skind, TreeNode *tnode, Block
 maple::BaseNode *A2M::ProcessFuncSetup(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
   FunctionNode *ast_func = static_cast<FunctionNode *>(tnode);
 
-  MIRFunction *func = mFuncMap[ast_func];
+  maple::MIRFunction *func = mFuncMap[ast_func];
   MASSERT(func && "func should have been declared");
 
   const std::string name = func->GetName();
@@ -556,15 +555,15 @@ maple::BaseNode *A2M::ProcessFuncSetup(StmtExprKind skind, TreeNode *tnode, Bloc
   mMirModule->SetCurFunction(func);
 
   // init function fields
-  func->pregTab = func->dataMemPool->New<maple::MIRPregTable>(&func->dataMPAllocator);
-  func->typeNameTab = func->dataMemPool->New<maple::MIRTypeNameTable>(&func->dataMPAllocator);
-  func->labelTab = func->dataMemPool->New<maple::MIRLabelTable>(&func->dataMPAllocator);
+  func->AllocPregTab();
+  func->AllocTypeNameTab();
+  func->AllocLabelTab();
 
   // set up function body
   BlockNode *ast_body = ast_func->GetBody();
   if (ast_body) {
     // update mBlockNodeMap
-    mBlockNodeMap[ast_body] = func->body;
+    mBlockNodeMap[ast_body] = func->GetBody();
     mBlockFuncMap[ast_body] = func;
     ProcessNode(skind, ast_body, ast_body);
   }
@@ -576,7 +575,7 @@ maple::BaseNode *A2M::ProcessFuncSetup(StmtExprKind skind, TreeNode *tnode, Bloc
 maple::BaseNode *A2M::ProcessClassDecl(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
   ClassNode *classnode = static_cast<ClassNode *>(tnode);
   const char *name = classnode->GetName();
-  MIRType *type = GlobalTables::GetTypeTable().GetOrCreateClassType(name, mMirModule);
+  maple::MIRType *type = maple::GlobalTables::GetTypeTable().GetOrCreateClassType(name, *mMirModule);
   mNodeTypeMap[name] = type;
   AST2MPLMSG("\n================== class =====================", name);
 
@@ -601,14 +600,14 @@ maple::BaseNode *A2M::ProcessClassDecl(StmtExprKind skind, TreeNode *tnode, Bloc
   }
 
   // set kind to kTypeClass from kTypeClassIncomplete
-  type->typeKind = maple::MIRTypeKind::kTypeClass;
+  type->SetMIRTypeKind(maple::kTypeClass);
   return nullptr;
 }
 
 maple::BaseNode *A2M::ProcessClass(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
   ClassNode *classnode = static_cast<ClassNode *>(tnode);
   const char *name = classnode->GetName();
-  MIRType *type = GlobalTables::GetTypeTable().GetOrCreateClassType(name, mMirModule);
+  maple::MIRType *type = maple::GlobalTables::GetTypeTable().GetOrCreateClassType(name, *mMirModule);
   mNodeTypeMap[name] = type;
   AST2MPLMSG("\n================== class =====================", name);
 
@@ -629,7 +628,7 @@ maple::BaseNode *A2M::ProcessClass(StmtExprKind skind, TreeNode *tnode, BlockNod
   }
 
   // set kind to kTypeClass from kTypeClassIncomplete
-  type->typeKind = maple::MIRTypeKind::kTypeClass;
+  type->SetMIRTypeKind(maple::kTypeClass);
   return nullptr;
 }
 
@@ -665,8 +664,8 @@ maple::BaseNode *A2M::ProcessException(StmtExprKind skind, TreeNode *tnode, Bloc
 
 maple::BaseNode *A2M::ProcessReturn(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
   ReturnNode *node = static_cast<ReturnNode *>(tnode);
-  BaseNode *val = ProcessNode(SK_Expr, node->GetResult(), block);
-  NaryStmtNode *stmt = mMirBuilder->CreateStmtReturn(val);
+  maple::BaseNode *val = ProcessNode(SK_Expr, node->GetResult(), block);
+  maple::NaryStmtNode *stmt = mMirBuilder->CreateStmtReturn(val);
   return stmt;
 }
 
@@ -675,7 +674,8 @@ maple::BaseNode *A2M::ProcessCondBranch(StmtExprKind skind, TreeNode *tnode, Blo
   maple::BaseNode *cond = ProcessNode(SK_Expr, node->GetCond(), block);
   if (!cond) {
     NOTYETIMPL("ProcessCondBranch() condition");
-    cond =  new maple::ConstvalNode(PTY_u1, new MIRIntConst(1, GlobalTables::GetTypeTable().GetUInt1()));
+    maple::MIRType *typeU1 = maple::GlobalTables::GetTypeTable().GetUInt1();
+    cond =  new maple::ConstvalNode(maple::PTY_u1, new maple::MIRIntConst(1, *typeU1));
   }
   maple::BlockNode *thenBlock = nullptr;
   maple::BlockNode *elseBlock = nullptr;
@@ -694,9 +694,9 @@ maple::BaseNode *A2M::ProcessCondBranch(StmtExprKind skind, TreeNode *tnode, Blo
     ProcessBlock(skind, blk, blk);
   }
   maple::IfStmtNode *ifnode = new maple::IfStmtNode();
-  ifnode->uOpnd = cond;
-  ifnode->thenPart = thenBlock;
-  ifnode->elsePart = elseBlock;
+  ifnode->SetOpnd(cond, 0);
+  ifnode->SetThenPart(thenBlock);
+  ifnode->SetElsePart(elseBlock);
   return ifnode;
 }
 
@@ -710,7 +710,8 @@ maple::BaseNode *A2M::ProcessLoopCondBody(StmtExprKind skind, TreeNode *cond, Tr
   maple::BaseNode *mircond = ProcessNode(SK_Expr, cond, block);
   if (!mircond) {
     NOTYETIMPL("ProcessLoopCondBody() condition");
-    mircond =  new maple::ConstvalNode(PTY_u1, new MIRIntConst(1, GlobalTables::GetTypeTable().GetUInt1()));
+    maple::MIRType *typeU1 = maple::GlobalTables::GetTypeTable().GetUInt1();
+    mircond =  new maple::ConstvalNode(maple::PTY_u1, new maple::MIRIntConst(1, *typeU1));
   }
 
   MASSERT(body && body->IsBlock() && "body is nullptr or not a block");
@@ -719,10 +720,10 @@ maple::BaseNode *A2M::ProcessLoopCondBody(StmtExprKind skind, TreeNode *cond, Tr
   mBlockNodeMap[blk] = mbody;
   ProcessBlock(skind, blk, blk);
 
-  WhileStmtNode *wsn = new WhileStmtNode(OP_while);
-  wsn->uOpnd = mircond;
-  wsn->body = mbody;
-  mBlockNodeMap[block] ->AddStatement(wsn);
+  maple::WhileStmtNode *wsn = new maple::WhileStmtNode(maple::OP_while);
+  wsn->SetOpnd(mircond, 0);
+  wsn->SetBody(mbody);
+  mBlockNodeMap[block]->AddStatement(wsn);
   return nullptr;
 }
 
@@ -736,7 +737,7 @@ maple::BaseNode *A2M::ProcessForLoop(StmtExprKind skind, TreeNode *tnode, BlockN
     bn = ProcessNode(SK_Stmt, node->InitAtIndex(i), block);
     if (bn) {
       mblock->AddStatement((maple::StmtNode*)bn);
-      if (mTraceA2m) bn->Dump(mMirModule, 0);
+      if (mTraceA2m) bn->Dump(0);
     }
   }
 
@@ -751,7 +752,7 @@ maple::BaseNode *A2M::ProcessForLoop(StmtExprKind skind, TreeNode *tnode, BlockN
     bn = ProcessNode(SK_Stmt, node->UpdateAtIndex(i), (maplefe::BlockNode*)astbody);
     if (bn) {
       mbody->AddStatement((maple::StmtNode*)bn);
-      if (mTraceA2m) bn->Dump(mMirModule, 0);
+      if (mTraceA2m) bn->Dump(0);
     }
   }
 
@@ -783,11 +784,11 @@ maple::BaseNode *A2M::ProcessDelete(StmtExprKind skind, TreeNode *tnode, BlockNo
 maple::BaseNode *A2M::ProcessCall(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
   NOTYETIMPL("ProcessCall()");
   CallNode *node = static_cast<CallNode *>(tnode);
-  MapleVector<BaseNode *> args(mMirModule->CurFuncCodeMemPoolAllocator()->Adapter());
-  MIRFunction *func = GetFunc(block);
+  maple::MapleVector<maple::BaseNode *> args(mMirModule->CurFuncCodeMemPoolAllocator()->Adapter());
+  maple::MIRFunction *func = GetFunc(block);
 
   // pass this
-  MIRSymbol *sym = func->formalDefVec[0].formalSym;
+  maple::MIRSymbol *sym = func->GetFormal(0);
   args.push_back(mMirBuilder->CreateExprDread(sym));
   // pass arg
   for (int i = 0; i < node->GetArgsNum(); i++) {
@@ -809,18 +810,18 @@ maple::BaseNode *A2M::ProcessCall(StmtExprKind skind, TreeNode *tnode, BlockNode
     NOTYETIMPL("ProcessCall() method not found");
     return nullptr;
   }
-  PUIdx puIdx = func->puIdx;
+  maple::PUIdx puIdx = func->GetPuidx();
 
-  MIRType *returnType = func->GetReturnType();
-  MIRSymbol *rv = nullptr;
-  Opcode callop = OP_call;
-  if (returnType->GetPrimType() != PTY_void) {
+  maple::MIRType *returnType = func->GetReturnType();
+  maple::MIRSymbol *rv = nullptr;
+  maple::Opcode callop = maple::OP_call;
+  if (returnType->GetPrimType() != maple::PTY_void) {
     NOTYETIMPL("ProcessCall() OP_callassigned");
     // rv = CreateTempVar("retvar", returnType);
-    // callop = OP_callassigned;
+    // callop = maple::OP_callassigned;
   }
 
-  StmtNode *stmt = mMirBuilder->CreateStmtCallAssigned(puIdx, args, rv, callop);
+  maple::StmtNode *stmt = mMirBuilder->CreateStmtCallAssigned(puIdx, args, rv, callop);
 
   maple::BlockNode *blk = mBlockNodeMap[block];
   blk->AddStatement(stmt);
@@ -852,13 +853,13 @@ maple::BaseNode *A2M::ProcessSwitch(StmtExprKind skind, TreeNode *tnode, BlockNo
 maple::BaseNode *A2M::ProcessPass(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
   PassNode *node = static_cast<PassNode *>(tnode);
   maple::BlockNode *blk = mBlockNodeMap[block];
-  BaseNode *stmt = nullptr;
+  maple::BaseNode *stmt = nullptr;
   for (int i = 0; i < node->GetChildrenNum(); i++) {
     TreeNode *child = node->GetChild(i);
     stmt = ProcessNode(skind, child, block);
     if (stmt && IsStmt(child)) {
       blk->AddStatement((maple::StmtNode*)stmt);
-      if (mTraceA2m) stmt->Dump(mMirModule, 0);
+      if (mTraceA2m) stmt->Dump(0);
     }
   }
   return nullptr;
@@ -869,17 +870,17 @@ maple::BaseNode *A2M::ProcessUnaOperatorMpl(StmtExprKind skind,
                                        maple::BaseNode *bn,
                                        BlockNode *block) {
   maple::BaseNode *node = nullptr;
-  if (op == OP_incref || op == OP_decref) {
-    MIRType *typeI32 = GlobalTables::GetTypeTable().GetInt32();
-    MIRIntConst *cst = new MIRIntConst(1, typeI32);
-    BaseNode *one =  new maple::ConstvalNode(PTY_i32, cst);
-    if (op == OP_incref) {
-      node = new BinaryNode(OP_add, bn->GetPrimType(), bn, one);
-    } else if (op == OP_decref) {
-      node = new BinaryNode(OP_sub, bn->GetPrimType(), bn, one);
+  if (op == maple::OP_incref || op == maple::OP_decref) {
+    maple::MIRType *typeI32 = maple::GlobalTables::GetTypeTable().GetInt32();
+    maple::MIRIntConst *cst = new maple::MIRIntConst(1, *typeI32);
+    maple::BaseNode *one =  new maple::ConstvalNode(maple::PTY_i32, cst);
+    if (op == maple::OP_incref) {
+      node = new maple::BinaryNode(maple::OP_add, bn->GetPrimType(), bn, one);
+    } else if (op == maple::OP_decref) {
+      node = new maple::BinaryNode(maple::OP_sub, bn->GetPrimType(), bn, one);
     }
   } else {
-    node = new UnaryNode(op, bn->GetPrimType(), bn);
+    node = new maple::UnaryNode(op, bn->GetPrimType(), bn);
   }
 
   if (skind == SK_Expr) {
@@ -887,16 +888,16 @@ maple::BaseNode *A2M::ProcessUnaOperatorMpl(StmtExprKind skind,
   }
 
   if (skind == SK_Stmt) {
-    if (op == OP_incref || op == OP_decref) {
+    if (op == maple::OP_incref || op == maple::OP_decref) {
       switch (bn->op) {
-        case OP_iread: {
-          IreadNode *ir = static_cast<maple::IreadNode *>(bn);
-          node = new IassignNode(ir->tyIdx, ir->fieldID, ir->uOpnd, node);
+        case maple::OP_iread: {
+          maple::IreadNode *ir = static_cast<maple::IreadNode *>(bn);
+          node = new maple::IassignNode(ir->GetTyIdx(), ir->GetFieldID(), ir->Opnd(0), node);
           break;
         }
-        case OP_dread: {
-          DreadNode *dr = static_cast<maple::DreadNode *>(bn);
-          node = new DassignNode(dr->GetPrimType(), node, dr->stIdx, dr->fieldID);
+        case maple::OP_dread: {
+          maple::DreadNode *dr = static_cast<maple::DreadNode *>(bn);
+          node = new maple::DassignNode(dr->GetPrimType(), node, dr->GetStIdx(), dr->GetFieldID());
           break;
         }
         default:
@@ -918,16 +919,16 @@ maple::BaseNode *A2M::ProcessBinOperatorMplAssign(StmtExprKind skind,
     return nullptr;
   }
 
-  BaseNode *node = nullptr;
+  maple::BaseNode *node = nullptr;
   switch (lhs->op) {
-    case OP_iread: {
-      IreadNode *ir = static_cast<maple::IreadNode *>(lhs);
-      node = new IassignNode(ir->tyIdx, ir->fieldID, ir->uOpnd, rhs);
+    case maple::OP_iread: {
+      maple::IreadNode *ir = static_cast<maple::IreadNode *>(lhs);
+      node = new maple::IassignNode(ir->GetTyIdx(), ir->GetFieldID(), ir->Opnd(0), rhs);
       break;
     }
-    case OP_dread: {
-      DreadNode *dr = static_cast<maple::DreadNode *>(lhs);
-      node = new DassignNode(dr->GetPrimType(), rhs, dr->stIdx, dr->fieldID);
+    case maple::OP_dread: {
+      maple::DreadNode *dr = static_cast<maple::DreadNode *>(lhs);
+      node = new maple::DassignNode(dr->GetPrimType(), rhs, dr->GetStIdx(), dr->GetFieldID());
       break;
     }
     default:
@@ -943,7 +944,7 @@ maple::BaseNode *A2M::ProcessBinOperatorMplComboAssign(StmtExprKind skind,
                                                   maple::BaseNode *lhs,
                                                   maple::BaseNode *rhs,
                                                   BlockNode *block) {
-  maple::BaseNode *result = new BinaryNode(op, lhs->GetPrimType(), lhs, rhs);
+  maple::BaseNode *result = new maple::BinaryNode(op, lhs->GetPrimType(), lhs, rhs);
   maple::BaseNode *assign = ProcessBinOperatorMplAssign(SK_Stmt, lhs, result, block);
   return assign;
 }
