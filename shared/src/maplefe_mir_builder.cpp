@@ -59,7 +59,8 @@ bool FEMIRBuilder::TraverseToNamedField(maple::MIRStructType *structType, unsign
 }
 
 maple::BaseNode *FEMIRBuilder::CreateExprDread(const maple::MIRSymbol *symbol, maple::FieldID fieldID) {
-  maple::BaseNode *nd = new maple::AddrofNode(maple::OP_dread, maple::kPtyInvalid, symbol->GetStIdx(), fieldID);
+  maple::PrimType prim = symbol->GetType()->GetPrimType();
+  maple::BaseNode *nd = new maple::AddrofNode(maple::OP_dread, prim, symbol->GetStIdx(), fieldID);
   return nd;
 }
 

@@ -118,7 +118,7 @@ maple::BaseNode *A2M::ProcessIdentifier(StmtExprKind skind, TreeNode *tnode, Blo
     maple::BaseNode *bn = mMirBuilder->CreateExprDread(sym);
     maple::MIRType *ftype = maple::GlobalTables::GetTypeTable().GetTypeFromTyIdx(mFieldData->GetTyIdx());
     AST2MPLMSG("ProcessIdentifier() found match field", name);
-    return new maple::IreadNode(maple::OP_iread, ftype->GetPrimType(), mFieldData->GetTyIdx(), maple::FieldID(fid), bn);
+    return new maple::IreadNode(maple::OP_iread, ftype->GetPrimType(), sym->GetTyIdx(), maple::FieldID(fid), bn);
   }
 
   // check global var
@@ -193,6 +193,10 @@ maple::BaseNode *A2M::ProcessFieldDecl(StmtExprKind skind, TreeNode *tnode, Bloc
   TreeNode *parent = tnode->GetParent();
   MASSERT((parent->IsClass() || parent->IsInterface()) && "Not class or interface");
   maple::MIRType *ptype = mNodeTypeMap[parent->GetName()];
+  if (ptype->IsMIRPtrType()) {
+    maple::MIRPtrType * ptrtype = static_cast<maple::MIRPtrType *>(ptype);
+    ptype = ptrtype->GetPointedType();
+  }
   maple::MIRStructType *stype = static_cast<maple::MIRStructType *>(ptype);
   MASSERT(stype && "struct type not valid");
 
@@ -206,11 +210,6 @@ maple::BaseNode *A2M::ProcessFieldDecl(StmtExprKind skind, TreeNode *tnode, Bloc
 
   maple::GStrIdx stridx = maple::GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(name);
   maple::MIRType *mir_type = MapType(type);
-  // always use pointer type for classes, with PTY_ref
-  if (mir_type->GetKind() == maple::kTypeClass || mir_type->GetKind() == maple::kTypeClassIncomplete ||
-      mir_type->GetKind() == maple::kTypeInterface || mir_type->GetKind() == maple::kTypeInterfaceIncomplete) {
-    mir_type = maple::GlobalTables::GetTypeTable().GetOrCreatePointerType(*mir_type, maple::PTY_ref);
-  }
   if (mir_type) {
     maple::TyIdxFieldAttrPair P0(mir_type->GetTypeIndex(), genAttrs.ConvertToFieldAttrs());
     maple::FieldPair P1(stridx, P0);
@@ -453,6 +452,10 @@ maple::BaseNode *A2M::ProcessFuncDecl(StmtExprKind skind, TreeNode *tnode, Block
   maple::MIRStructType *stype = nullptr;
   if (parent->IsClass() || parent->IsInterface()) {
     maple::MIRType *ptype = mNodeTypeMap[parent->GetName()];
+    if (ptype->IsMIRPtrType()) {
+      maple::MIRPtrType * ptrtype = static_cast<maple::MIRPtrType *>(ptype);
+      ptype = ptrtype->GetPointedType();
+    }
     stype = static_cast<maple::MIRStructType *>(ptype);
     MASSERT(stype && "struct type not valid");
   }
@@ -504,7 +507,11 @@ maple::BaseNode *A2M::ProcessFuncDecl(StmtExprKind skind, TreeNode *tnode, Block
     maple::TypeAttrs attr = maple::TypeAttrs();
     maple::MIRSymbol *sym = mMirBuilder->GetOrCreateLocalDecl(param->GetName(), *type);
     sym->SetStorageClass(maple::kScFormal);
-    func->AddArgument(sym);
+
+    // func->AddArgument(sym);
+    maple::FormalDef formalDef(sym->GetNameStrIdx(), sym, sym->GetTyIdx(), sym->GetAttrs());
+    func->AddFormalDef(formalDef);
+
     funcvectype.push_back(type->GetTypeIndex());
     funcvecattr.push_back(attr);
   }
@@ -576,6 +583,9 @@ maple::BaseNode *A2M::ProcessClassDecl(StmtExprKind skind, TreeNode *tnode, Bloc
   ClassNode *classnode = static_cast<ClassNode *>(tnode);
   const char *name = classnode->GetName();
   maple::MIRType *type = maple::GlobalTables::GetTypeTable().GetOrCreateClassType(name, *mMirModule);
+  type->SetMIRTypeKind(maple::kTypeClass);
+  // always use pointer type for classes, with PTY_ref
+  type = maple::GlobalTables::GetTypeTable().GetOrCreatePointerType(*type, maple::PTY_ref);
   mNodeTypeMap[name] = type;
   AST2MPLMSG("\n================== class =====================", name);
 
@@ -599,16 +609,13 @@ maple::BaseNode *A2M::ProcessClassDecl(StmtExprKind skind, TreeNode *tnode, Bloc
     ProcessFuncDecl(skind, classnode->GetMethod(i), block);
   }
 
-  // set kind to kTypeClass from kTypeClassIncomplete
-  type->SetMIRTypeKind(maple::kTypeClass);
   return nullptr;
 }
 
 maple::BaseNode *A2M::ProcessClass(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
   ClassNode *classnode = static_cast<ClassNode *>(tnode);
   const char *name = classnode->GetName();
-  maple::MIRType *type = maple::GlobalTables::GetTypeTable().GetOrCreateClassType(name, *mMirModule);
-  mNodeTypeMap[name] = type;
+  maple::MIRType *type = mNodeTypeMap[name];
   AST2MPLMSG("\n================== class =====================", name);
 
   for (int i=0; i < classnode->GetLocalClassesNum(); i++) {
@@ -627,8 +634,6 @@ maple::BaseNode *A2M::ProcessClass(StmtExprKind skind, TreeNode *tnode, BlockNod
     ProcessFuncSetup(skind, classnode->GetMethod(i), block);
   }
 
-  // set kind to kTypeClass from kTypeClassIncomplete
-  type->SetMIRTypeKind(maple::kTypeClass);
   return nullptr;
 }
 
@@ -817,8 +822,8 @@ maple::BaseNode *A2M::ProcessCall(StmtExprKind skind, TreeNode *tnode, BlockNode
   maple::Opcode callop = maple::OP_call;
   if (returnType->GetPrimType() != maple::PTY_void) {
     NOTYETIMPL("ProcessCall() OP_callassigned");
-    // rv = CreateTempVar("retvar", returnType);
-    // callop = maple::OP_callassigned;
+    rv = CreateTempVar("retvar", returnType);
+    callop = maple::OP_callassigned;
   }
 
   maple::StmtNode *stmt = mMirBuilder->CreateStmtCallAssigned(puIdx, args, rv, callop);
