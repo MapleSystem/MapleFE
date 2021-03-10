@@ -1215,14 +1215,12 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *appeal) {
 
   SmallVector<unsigned> prev_succ_tokens;
   SmallVector<unsigned> subtable_succ_tokens;
-  SmallVector<unsigned> final_succ_tokens;
 
   unsigned saved_mCurToken = mCurToken;
 
-  int last_matched = mCurToken - 1;
-
   // prepare the prev_succ_tokens[_num] for the 1st iteration.
-  prev_succ_tokens.PushBack(mCurToken - 1);
+  int last_matched = mCurToken - 1;
+  prev_succ_tokens.PushBack(last_matched);
 
   for (unsigned i = 0; i < rule_table->mNum; i++) {
     bool is_zeroxxx = false;
@@ -1261,11 +1259,6 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *appeal) {
       }
     }
 
-    // Update the final_succ_tokens
-    // Please read comment 3 before this function.
-    if (!is_zeroxxx)
-      final_succ_tokens.Clear();
-
     // for Zeroorone/Zeroormore node it always returns true. NO matter how
     // many tokens it really matches, 'zero' is also a correct match. we
     // need take it into account so that the next rule table can try
@@ -1278,8 +1271,6 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *appeal) {
         unsigned token = subtable_succ_tokens.ValueAtIndex(id);
         if (!prev_succ_tokens.Find(token))
           prev_succ_tokens.PushBack(token);
-        if (!final_succ_tokens.Find(token))
-          final_succ_tokens.PushBack(token);
       }
     } else {
       // Once a single child rule fails, the 'appeal' fails.
@@ -1291,9 +1282,10 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *appeal) {
   mCurToken = saved_mCurToken;
 
   if (found) {
-    for (unsigned id = 0; id < final_succ_tokens.GetNum(); id++) {
-      unsigned token = final_succ_tokens.ValueAtIndex(id);
-      appeal->AddMatch(token);
+    for (unsigned id = 0; id < prev_succ_tokens.GetNum(); id++) {
+      unsigned token = prev_succ_tokens.ValueAtIndex(id);
+      if (token != last_matched)
+        appeal->AddMatch(token);
     }
     // mCurToken doesn't have much meaning in current algorithm when
     // transfer to the next rule table, because the next rule will take
