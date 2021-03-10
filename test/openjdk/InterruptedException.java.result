@@ -10,7 +10,7 @@ class  InterruptedException
   Instance Initializer: 
   Constructors: 
     constructor  InterruptedException()  throws: 
-    constructor  InterruptedException()  throws: 
+    constructor  InterruptedException(s)  throws: 
   Methods: 
   LocalClasses: 
   LocalInterfaces: 

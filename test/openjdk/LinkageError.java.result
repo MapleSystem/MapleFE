@@ -10,8 +10,8 @@ class  LinkageError
   Instance Initializer: 
   Constructors: 
     constructor  LinkageError()  throws: 
-    constructor  LinkageError()  throws: 
-    constructor  LinkageError()  throws: 
+    constructor  LinkageError(s)  throws: 
+    constructor  LinkageError(s,cause)  throws: 
   Methods: 
   LocalClasses: 
   LocalInterfaces: 

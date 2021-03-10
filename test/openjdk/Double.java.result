@@ -20,9 +20,9 @@ class  Double
   -694942468
   Instance Initializer: 
   Constructors: 
-    constructor  Double()  throws: 
+    constructor  Double(value)  throws: 
       this.value Assign value
-    constructor  Double()  throws: 
+    constructor  Double(s)  throws: 
       value Assign parseDouble(s)
   Methods: 
     func  toString(d)  throws: 

@@ -11,7 +11,7 @@ class  IncompatibleClassChangeError
   Instance Initializer: 
   Constructors: 
     constructor  IncompatibleClassChangeError()  throws: 
-    constructor  IncompatibleClassChangeError()  throws: 
+    constructor  IncompatibleClassChangeError(s)  throws: 
   Methods: 
   LocalClasses: 
   LocalInterfaces: 

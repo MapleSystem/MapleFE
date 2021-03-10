@@ -15,7 +15,7 @@ class  Outer
 
       Instance Initializer: 
       Constructors: 
-        constructor  Inner()  throws: 
+        constructor  Inner(Outer,Outer,this)  throws: 
       Methods: 
         func  m(Inner,this)  throws: 
       LocalClasses: 
@@ -24,7 +24,7 @@ class  Outer
 
           Instance Initializer: 
           Constructors: 
-            constructor  B()  throws: 
+            constructor  B(,Inner,this)  throws: 
           Methods: 
             func  m(,this)  throws: 
           LocalClasses: 

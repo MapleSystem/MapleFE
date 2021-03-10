@@ -11,9 +11,9 @@ class  IllegalArgumentException
   Instance Initializer: 
   Constructors: 
     constructor  IllegalArgumentException()  throws: 
-    constructor  IllegalArgumentException()  throws: 
-    constructor  IllegalArgumentException()  throws: 
-    constructor  IllegalArgumentException()  throws: 
+    constructor  IllegalArgumentException(s)  throws: 
+    constructor  IllegalArgumentException(message,cause)  throws: 
+    constructor  IllegalArgumentException(cause)  throws: 
   Methods: 
   LocalClasses: 
   LocalInterfaces: 

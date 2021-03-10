@@ -10,7 +10,7 @@ class  IndexOutOfBoundsException
   Instance Initializer: 
   Constructors: 
     constructor  IndexOutOfBoundsException()  throws: 
-    constructor  IndexOutOfBoundsException()  throws: 
+    constructor  IndexOutOfBoundsException(s)  throws: 
   Methods: 
   LocalClasses: 
   LocalInterfaces: 

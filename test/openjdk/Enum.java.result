@@ -36,7 +36,7 @@ class  Enum
     name    ordinal    sharedConstantsCache=new BasicLruCache<Class,Enum,Object[]>
   Instance Initializer: 
   Constructors: 
-    constructor  Enum()  throws: 
+    constructor  Enum(name,ordinal)  throws: 
       this.name Assign name
       this.ordinal Assign ordinal
   Methods: 

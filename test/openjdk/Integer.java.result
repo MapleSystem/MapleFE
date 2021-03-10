@@ -14,9 +14,9 @@ class  Integer
     MIN_VALUE=-2147483648    MAX_VALUE=2147483647    TYPE=()    digits=    SMALL_NEG_VALUES=    SMALL_NONNEG_VALUES=    DigitTens=    DigitOnes=    sizeTable=    value    SIZE=32    BYTES=    serialVersionUID=-142506184
   Instance Initializer: 
   Constructors: 
-    constructor  Integer()  throws: 
+    constructor  Integer(value)  throws: 
       this.value Assign value
-    constructor  Integer()  throws: 
+    constructor  Integer(s)  throws: 
       this.value Assign parseInt(s,10)
   Methods: 
     func  toString(i,radix)  throws: 

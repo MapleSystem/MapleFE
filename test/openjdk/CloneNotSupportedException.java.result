@@ -10,7 +10,7 @@ class  CloneNotSupportedException
   Instance Initializer: 
   Constructors: 
     constructor  CloneNotSupportedException()  throws: 
-    constructor  CloneNotSupportedException()  throws: 
+    constructor  CloneNotSupportedException(s)  throws: 
   Methods: 
   LocalClasses: 
   LocalInterfaces: 

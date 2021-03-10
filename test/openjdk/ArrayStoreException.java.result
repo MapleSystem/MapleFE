@@ -11,7 +11,7 @@ class  ArrayStoreException
   Instance Initializer: 
   Constructors: 
     constructor  ArrayStoreException()  throws: 
-    constructor  ArrayStoreException()  throws: 
+    constructor  ArrayStoreException(s)  throws: 
   Methods: 
   LocalClasses: 
   LocalInterfaces: 

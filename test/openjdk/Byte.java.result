@@ -11,9 +11,9 @@ class  Byte
   296684260    DIGITS=    UPPER_CASE_DIGITS=
   Instance Initializer: 
   Constructors: 
-    constructor  Byte()  throws: 
+    constructor  Byte(value)  throws: 
       this.value Assign value
-    constructor  Byte()  throws: 
+    constructor  Byte(s)  throws: 
       this.value Assign parseByte(s,10)
   Methods: 
     func  toString(b)  throws: 

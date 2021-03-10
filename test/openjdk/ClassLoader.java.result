@@ -118,9 +118,9 @@ class  ClassLoader
     proxyCache=new HashMap<List,Class,Class>    parent    packages=new HashMap    allocator    classTable
   Instance Initializer: 
   Constructors: 
-    constructor  ClassLoader()  throws: 
+    constructor  ClassLoader(unused,parent)  throws: 
       this.parent Assign parent
-    constructor  ClassLoader()  throws: 
+    constructor  ClassLoader(parent)  throws: 
     constructor  ClassLoader()  throws: 
   Methods: 
     func  createSystemClassLoader()  throws: 

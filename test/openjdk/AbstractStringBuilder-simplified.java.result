@@ -7,7 +7,7 @@ class  AbstractStringBuilder
   Instance Initializer: 
   Constructors: 
     constructor  AbstractStringBuilder()  throws: 
-    constructor  AbstractStringBuilder()  throws: 
+    constructor  AbstractStringBuilder(capacity)  throws: 
   Methods: 
     func  length()  throws: 
     func  capacity()  throws: 

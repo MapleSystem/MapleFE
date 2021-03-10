@@ -11,7 +11,7 @@ class  ClassCastException
   Instance Initializer: 
   Constructors: 
     constructor  ClassCastException()  throws: 
-    constructor  ClassCastException()  throws: 
+    constructor  ClassCastException(s)  throws: 
   Methods: 
   LocalClasses: 
   LocalInterfaces: 

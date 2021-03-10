@@ -20,11 +20,11 @@ class  Float
   616763156
   Instance Initializer: 
   Constructors: 
-    constructor  Float()  throws: 
+    constructor  Float(value)  throws: 
       this.value Assign value
-    constructor  Float()  throws: 
+    constructor  Float(value)  throws: 
       this.value Assign (float)value
-    constructor  Float()  throws: 
+    constructor  Float(s)  throws: 
       value Assign parseFloat(s)
   Methods: 
     func  toString(f)  throws: 

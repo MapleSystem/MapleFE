@@ -7,7 +7,7 @@ class  Point
     x    y
   Instance Initializer: 
   Constructors: 
-    constructor  Point()  throws: 
+    constructor  Point(x,y)  throws: 
       this.x Assign x
       this.y Assign y
   Methods: 
@@ -20,8 +20,8 @@ class  ColoredPoint
     WHITE=0    color
   Instance Initializer: 
   Constructors: 
-    constructor  ColoredPoint()  throws: 
-    constructor  ColoredPoint()  throws: 
+    constructor  ColoredPoint(x,y)  throws: 
+    constructor  ColoredPoint(x,y,color)  throws: 
       this.color Assign color
   Methods: 
   LocalClasses: 

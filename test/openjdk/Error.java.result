@@ -10,10 +10,10 @@ class  Error
   Instance Initializer: 
   Constructors: 
     constructor  Error()  throws: 
-    constructor  Error()  throws: 
-    constructor  Error()  throws: 
-    constructor  Error()  throws: 
-    constructor  Error()  throws: 
+    constructor  Error(message)  throws: 
+    constructor  Error(message,cause)  throws: 
+    constructor  Error(cause)  throws: 
+    constructor  Error(message,cause,enableSuppression,writableStackTrace)  throws: 
   Methods: 
   LocalClasses: 
   LocalInterfaces: 

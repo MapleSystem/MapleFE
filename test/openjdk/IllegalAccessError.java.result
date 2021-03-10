@@ -11,7 +11,7 @@ class  IllegalAccessError
   Instance Initializer: 
   Constructors: 
     constructor  IllegalAccessError()  throws: 
-    constructor  IllegalAccessError()  throws: 
+    constructor  IllegalAccessError(s)  throws: 
   Methods: 
   LocalClasses: 
   LocalInterfaces: 

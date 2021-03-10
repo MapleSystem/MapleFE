@@ -162,6 +162,7 @@ rule ConstructorModifier    : ONEOF(Annotation, ConstructorAttr)
 rule ConstructorDeclarator  : ZEROORONE(TypeParameters) + SimpleTypeName + '(' +
                               ZEROORONE(FormalParameterList) + ')'
   attr.action : BuildConstructor(%2)
+  attr.action: AddParams(%4)
 rule SimpleTypeName         : Identifier
 rule ConstructorBody        : '{' + ZEROORONE(ExplicitConstructorInvocation) +
                               ZEROORONE(BlockStatements) + '}'

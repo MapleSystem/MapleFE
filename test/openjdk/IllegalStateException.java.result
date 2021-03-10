@@ -11,9 +11,9 @@ class  IllegalStateException
   Instance Initializer: 
   Constructors: 
     constructor  IllegalStateException()  throws: 
-    constructor  IllegalStateException()  throws: 
-    constructor  IllegalStateException()  throws: 
-    constructor  IllegalStateException()  throws: 
+    constructor  IllegalStateException(s)  throws: 
+    constructor  IllegalStateException(message,cause)  throws: 
+    constructor  IllegalStateException(cause)  throws: 
   Methods: 
   LocalClasses: 
   LocalInterfaces: 

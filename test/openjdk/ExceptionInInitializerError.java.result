@@ -11,10 +11,10 @@ class  ExceptionInInitializerError
   Constructors: 
     constructor  ExceptionInInitializerError()  throws: 
       initCause(null)
-    constructor  ExceptionInInitializerError()  throws: 
+    constructor  ExceptionInInitializerError(thrown)  throws: 
       initCause(null)
       this.exception Assign thrown
-    constructor  ExceptionInInitializerError()  throws: 
+    constructor  ExceptionInInitializerError(s)  throws: 
       initCause(null)
   Methods: 
     func  getException()  throws: 

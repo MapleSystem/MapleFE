@@ -10,7 +10,7 @@ class  ClassCircularityError
   Instance Initializer: 
   Constructors: 
     constructor  ClassCircularityError()  throws: 
-    constructor  ClassCircularityError()  throws: 
+    constructor  ClassCircularityError(s)  throws: 
   Methods: 
   LocalClasses: 
   LocalInterfaces: 

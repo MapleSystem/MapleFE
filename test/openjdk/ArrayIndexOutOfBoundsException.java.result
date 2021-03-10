@@ -11,10 +11,10 @@ class  ArrayIndexOutOfBoundsException
   Instance Initializer: 
   Constructors: 
     constructor  ArrayIndexOutOfBoundsException()  throws: 
-    constructor  ArrayIndexOutOfBoundsException()  throws: 
-    constructor  ArrayIndexOutOfBoundsException()  throws: 
-    constructor  ArrayIndexOutOfBoundsException()  throws: 
-    constructor  ArrayIndexOutOfBoundsException()  throws: 
+    constructor  ArrayIndexOutOfBoundsException(index)  throws: 
+    constructor  ArrayIndexOutOfBoundsException(s)  throws: 
+    constructor  ArrayIndexOutOfBoundsException(sourceLength,index)  throws: 
+    constructor  ArrayIndexOutOfBoundsException(sourceLength,offset,count)  throws: 
   Methods: 
   LocalClasses: 
   LocalInterfaces: 

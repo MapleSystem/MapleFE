@@ -10,8 +10,8 @@ class  ClassNotFoundException
   Instance Initializer: 
   Constructors: 
     constructor  ClassNotFoundException()  throws: 
-    constructor  ClassNotFoundException()  throws: 
-    constructor  ClassNotFoundException()  throws: 
+    constructor  ClassNotFoundException(s)  throws: 
+    constructor  ClassNotFoundException(s,ex)  throws: 
       this.ex Assign ex
   Methods: 
     func  getException()  throws: 

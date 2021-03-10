@@ -10,9 +10,9 @@ class  BootstrapMethodError
   Instance Initializer: 
   Constructors: 
     constructor  BootstrapMethodError()  throws: 
-    constructor  BootstrapMethodError()  throws: 
-    constructor  BootstrapMethodError()  throws: 
-    constructor  BootstrapMethodError()  throws: 
+    constructor  BootstrapMethodError(s)  throws: 
+    constructor  BootstrapMethodError(s,cause)  throws: 
+    constructor  BootstrapMethodError(cause)  throws: 
       initCause(cause)
   Methods: 
   LocalClasses: 

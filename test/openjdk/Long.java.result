@@ -15,9 +15,9 @@ class  Long
     MIN_VALUE=0    MAX_VALUE=-1    TYPE=()    value    SIZE=64    BYTES=    serialVersionUID=-863034401
   Instance Initializer: 
   Constructors: 
-    constructor  Long()  throws: 
+    constructor  Long(value)  throws: 
       this.value Assign value
-    constructor  Long()  throws: 
+    constructor  Long(s)  throws: 
       this.value Assign parseLong(s,10)
   Methods: 
     func  toString(i,radix)  throws: 

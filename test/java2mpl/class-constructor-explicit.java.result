@@ -6,7 +6,7 @@ class  Point
     x    y
   Instance Initializer: 
   Constructors: 
-    constructor  Point()  throws: 
+    constructor  Point(y)  throws: 
       this.y Assign y
   Methods: 
   LocalClasses: 

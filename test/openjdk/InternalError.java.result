@@ -11,9 +11,9 @@ class  InternalError
   Instance Initializer: 
   Constructors: 
     constructor  InternalError()  throws: 
-    constructor  InternalError()  throws: 
-    constructor  InternalError()  throws: 
-    constructor  InternalError()  throws: 
+    constructor  InternalError(message)  throws: 
+    constructor  InternalError(message,cause)  throws: 
+    constructor  InternalError(cause)  throws: 
   Methods: 
   LocalClasses: 
   LocalInterfaces: 

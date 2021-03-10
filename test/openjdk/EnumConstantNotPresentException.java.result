@@ -10,7 +10,7 @@ class  EnumConstantNotPresentException
   180673940    enumType    constantName
   Instance Initializer: 
   Constructors: 
-    constructor  EnumConstantNotPresentException()  throws: 
+    constructor  EnumConstantNotPresentException(enumType,constantName)  throws: 
       this.enumType Assign enumType
       this.constantName Assign constantName
   Methods: 

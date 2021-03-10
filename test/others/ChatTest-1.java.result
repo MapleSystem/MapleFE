@@ -175,7 +175,7 @@ while bytes EQ 256
         delegate
       Instance Initializer: 
       Constructors: 
-        constructor  FlushingWriter()  throws: 
+        constructor  FlushingWriter(delegate)  throws: 
           this.delegate Assign delegate
       Methods: 
         func  write(cbuf,off,len)  throws:     IOException

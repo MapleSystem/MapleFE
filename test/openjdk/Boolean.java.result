@@ -10,9 +10,9 @@ class  Boolean
   711132434
   Instance Initializer: 
   Constructors: 
-    constructor  Boolean()  throws: 
+    constructor  Boolean(value)  throws: 
       this.value Assign value
-    constructor  Boolean()  throws: 
+    constructor  Boolean(s)  throws: 
   Methods: 
     func  parseBoolean(s)  throws: 
       return ((s NE null) Land s.equalsIgnoreCase("true"))
