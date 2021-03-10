@@ -507,11 +507,7 @@ maple::BaseNode *A2M::ProcessFuncDecl(StmtExprKind skind, TreeNode *tnode, Block
     maple::TypeAttrs attr = maple::TypeAttrs();
     maple::MIRSymbol *sym = mMirBuilder->GetOrCreateLocalDecl(param->GetName(), *type);
     sym->SetStorageClass(maple::kScFormal);
-
-    // func->AddArgument(sym);
-    maple::FormalDef formalDef(sym->GetNameStrIdx(), sym, sym->GetTyIdx(), sym->GetAttrs());
-    func->AddFormalDef(formalDef);
-
+    func->AddArgument(sym);
     funcvectype.push_back(type->GetTypeIndex());
     funcvecattr.push_back(attr);
   }
