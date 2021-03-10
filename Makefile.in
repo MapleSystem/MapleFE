@@ -6,12 +6,12 @@ LD = clang++
 
 CXXFLAGS = -O0 -g3 -Wall -std=c++17 -DDEBUG
 LFLAGS=-std=c++17
+LANG=java
 
 MKDIR_P = mkdir -p
 
 MAPLELIBPATH:=$(MAPLE_ROOT)/OpenArkCompiler/output/aarch64-clang-debug/lib/64
-MAPLELIBPATH1:=$(MAPLE_ROOT)/OpenArkCompiler/output/aarch64-clang-debug/ar
-MAPLELIBS := -L $(MAPLELIBPATH) -L $(MAPLELIBPATH1) -lmplir -loption_parser -lmpl2mpl -lmplutil -lmempool -lHWSecureC -ldriver_option
+MAPLELIBS := -L $(MAPLELIBPATH) -lmplir -loption_parser -lmpl2mpl -lmplutil -lmempool -lHWSecureC -ldriver_option
 
 MAPLEALL_INC = -I $(MAPLEALL_SRC)/maple_ir/include \
 							 -I $(MAPLEALL_SRC)/mempool/include \

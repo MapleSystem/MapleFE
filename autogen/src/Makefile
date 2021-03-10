@@ -24,9 +24,9 @@ AUTOGENLIB = autogen.a
 
 .PHONY: all
 
-all: $(TARGET)
+all: $(BUILD)/$(TARGET)
 
-$(TARGET) : $(AUTOGENLIB)
+$(BUILD)/$(TARGET) : $(BUILD)/$(AUTOGENLIB)
 	$(LD) -o $(BUILD)/$(TARGET) $(BUILD)/main.o $(BUILD)/$(AUTOGENLIB)
 	@ln -sf $(MAPLEFE_ROOT)/java/identifier.spec $(BUILD)/identifier.spec
 	@ln -sf $(MAPLEFE_ROOT)/java/literal.spec $(BUILD)/literal.spec
@@ -40,7 +40,7 @@ $(TARGET) : $(AUTOGENLIB)
 	@ln -sf $(MAPLEFE_ROOT)/java/stmt.spec $(BUILD)/stmt.spec
 	@ln -sf $(MAPLEFE_ROOT)/autogen/reserved.spec $(BUILD)/reserved.spec
 
-$(AUTOGENLIB) : $(OBJS)
+$(BUILD)/$(AUTOGENLIB) : $(OBJS)
 	/usr/bin/ar rcs $(BUILD)/$(AUTOGENLIB) $(LIBOBJS)
 
 -include $(DEPS)
