@@ -1202,7 +1202,7 @@ bool Parser::TraverseOneof(RuleTable *rule_table, AppealNode *appeal) {
 //           e.g. in a rule like below
 //              rule AA : BB + CC + ZEROORONE(xxx)
 //           If ZEROORONE(xxx) doesn't match anything, it sets subtable_succ_tokens to 0. However
-//           rule AA matches multiple tokens. So final_succ_tokens needs to be calculated carefully.
+//           rule AA matches 'BB + CC'. So final_succ_tokens needs to be calculated carefully.
 //        4. We are going to take succ match info from SuccMatch, not from a specific
 //           AppealNode. SuccMatch has the complete info.
 //
@@ -1253,21 +1253,11 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *appeal) {
       found_subtable |= temp_found;
 
       if (temp_found) {
-        bool duplicated_with_prev = false;
         for (unsigned id = 0; id < child->GetMatchNum(); id++) {
           unsigned match = child->GetMatch(id);
           if (!subtable_succ_tokens.Find(match))
             subtable_succ_tokens.PushBack(match);
-          if (match == prev)
-            duplicated_with_prev = true;
         }
-
-        // for Zeroorone/Zeroormore node it always returns true. NO matter how
-        // many tokens it really matches, 'zero' is also a correct match. we
-        // need take it into account so that the next rule table can try
-        // on it. [Except it's a duplication]
-        if (is_zeroxxx && !duplicated_with_prev)
-          carry_on_prev.PushBack(prev);
       }
     }
 
@@ -1276,7 +1266,12 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *appeal) {
     if (!is_zeroxxx)
       final_succ_tokens.Clear();
 
-    prev_succ_tokens.Clear();
+    // for Zeroorone/Zeroormore node it always returns true. NO matter how
+    // many tokens it really matches, 'zero' is also a correct match. we
+    // need take it into account so that the next rule table can try
+    // on it.
+    if (!is_zeroxxx)
+      prev_succ_tokens.Clear();
 
     if (found_subtable) {
       for (unsigned id = 0; id < subtable_succ_tokens.GetNum(); id++) {
@@ -1285,11 +1280,6 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *appeal) {
           prev_succ_tokens.PushBack(token);
         if (!final_succ_tokens.Find(token))
           final_succ_tokens.PushBack(token);
-      }
-      for (unsigned id = 0; id < carry_on_prev.GetNum(); id++) {
-        unsigned token = carry_on_prev.ValueAtIndex(id);
-        if (!prev_succ_tokens.Find(token))
-          prev_succ_tokens.PushBack(token);
       }
     } else {
       // Once a single child rule fails, the 'appeal' fails.
