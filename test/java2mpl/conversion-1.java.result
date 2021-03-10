@@ -7,7 +7,7 @@ class  Test
   Instance Initializer: 
   Constructors: 
   Methods: 
-    func  main()  throws: 
+    func  main(args)  throws: 
       var:i=(int)12.5
       System.out.println("(int)12.5f==" Add i)
       var:f=i

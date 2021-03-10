@@ -28,28 +28,28 @@ class  Math
   Constructors: 
     constructor  Math()  throws: 
   Methods: 
-    func  sin()  throws: 
-    func  cos()  throws: 
-    func  tan()  throws: 
-    func  asin()  throws: 
-    func  acos()  throws: 
-    func  atan()  throws: 
-    func  toRadians()  throws: 
+    func  sin(a)  throws: 
+    func  cos(a)  throws: 
+    func  tan(a)  throws: 
+    func  asin(a)  throws: 
+    func  acos(a)  throws: 
+    func  atan(a)  throws: 
+    func  toRadians(angdeg)  throws: 
       return 
-    func  toDegrees()  throws: 
+    func  toDegrees(angrad)  throws: 
       return 
-    func  exp()  throws: 
-    func  log()  throws: 
-    func  log10()  throws: 
-    func  sqrt()  throws: 
-    func  cbrt()  throws: 
-    func  IEEEremainder()  throws: 
-    func  ceil()  throws: 
-    func  floor()  throws: 
-    func  rint()  throws: 
-    func  atan2()  throws: 
-    func  pow()  throws: 
-    func  round()  throws: 
+    func  exp(a)  throws: 
+    func  log(a)  throws: 
+    func  log10(a)  throws: 
+    func  sqrt(a)  throws: 
+    func  cbrt(a)  throws: 
+    func  IEEEremainder(f1,f2)  throws: 
+    func  ceil(a)  throws: 
+    func  floor(a)  throws: 
+    func  rint(a)  throws: 
+    func  atan2(y,x)  throws: 
+    func  pow(a,b)  throws: 
+    func  round(a)  throws: 
       var:intBits=Float.floatToRawIntBits(a)
       var:biasedExp=(intBits Band FloatConsts.EXP_BIT_MASK) Shr (FloatConsts.SIGNIFICAND_WIDTH Sub 1)
       var:shift=(FloatConsts.SIGNIFICAND_WIDTH Sub 2 Add FloatConsts.EXP_BIAS) Sub biasedExp
@@ -61,7 +61,7 @@ class  Math
       false branch :
         return (int)a
 
-    func  round()  throws: 
+    func  round(a)  throws: 
       var:longBits=Double.doubleToRawLongBits(a)
       var:biasedExp=(longBits Band DoubleConsts.EXP_BIT_MASK) Shr (DoubleConsts.SIGNIFICAND_WIDTH Sub 1)
       var:shift=(DoubleConsts.SIGNIFICAND_WIDTH Sub 2 Add DoubleConsts.EXP_BIAS) Sub biasedExp
@@ -75,13 +75,13 @@ class  Math
 
     func  random()  throws: 
       return RandomNumberGeneratorHolder.randomNumberGenerator.nextDouble()
-    func  setRandomSeedInternal()  throws: 
+    func  setRandomSeedInternal(seed)  throws: 
       RandomNumberGeneratorHolder.randomNumberGenerator.setSeed(seed)
     func  randomIntInternal()  throws: 
       return RandomNumberGeneratorHolder.randomNumberGenerator.nextInt()
     func  randomLongInternal()  throws: 
       return RandomNumberGeneratorHolder.randomNumberGenerator.nextLong()
-    func  addExact()  throws: 
+    func  addExact(x,y)  throws: 
       var:r=x Add y
       cond-branch cond:((x Bxor r) Band (y Bxor r)) LT 0
       true branch :
@@ -89,7 +89,7 @@ class  Math
       false branch :
 
       return r
-    func  addExact()  throws: 
+    func  addExact(x,y)  throws: 
       var:r=x Add y
       cond-branch cond:((x Bxor r) Band (y Bxor r)) LT 0
       true branch :
@@ -97,7 +97,7 @@ class  Math
       false branch :
 
       return r
-    func  subtractExact()  throws: 
+    func  subtractExact(x,y)  throws: 
       var:r=x Sub y
       cond-branch cond:((x Bxor y) Band (x Bxor r)) LT 0
       true branch :
@@ -105,7 +105,7 @@ class  Math
       false branch :
 
       return r
-    func  subtractExact()  throws: 
+    func  subtractExact(x,y)  throws: 
       var:r=x Sub y
       cond-branch cond:((x Bxor y) Band (x Bxor r)) LT 0
       true branch :
@@ -113,7 +113,7 @@ class  Math
       false branch :
 
       return r
-    func  multiplyExact()  throws: 
+    func  multiplyExact(x,y)  throws: 
       var:r=
       cond-branch cond:(int)r NE r
       true branch :
@@ -121,7 +121,7 @@ class  Math
       false branch :
 
       return (int)r
-    func  multiplyExact()  throws: 
+    func  multiplyExact(x,y)  throws: 
       var:r=
       var:ax=Math.abs(x)
       var:ay=Math.abs(y)
@@ -136,35 +136,35 @@ class  Math
       false branch :
 
       return r
-    func  incrementExact()  throws: 
+    func  incrementExact(a)  throws: 
       cond-branch cond:a EQ Integer.MAX_VALUE
       true branch :
         new ArithmeticException<ArithmeticException>
       false branch :
 
       return a Add 1
-    func  incrementExact()  throws: 
+    func  incrementExact(a)  throws: 
       cond-branch cond:a EQ Long.MAX_VALUE
       true branch :
         new ArithmeticException<ArithmeticException>
       false branch :
 
       return a Add 1
-    func  decrementExact()  throws: 
+    func  decrementExact(a)  throws: 
       cond-branch cond:a EQ Integer.MIN_VALUE
       true branch :
         new ArithmeticException<ArithmeticException>
       false branch :
 
       return a Sub 1
-    func  decrementExact()  throws: 
+    func  decrementExact(a)  throws: 
       cond-branch cond:a EQ Long.MIN_VALUE
       true branch :
         new ArithmeticException<ArithmeticException>
       false branch :
 
       return a Sub 1
-    func  negateExact()  throws: 
+    func  negateExact(a)  throws: 
       cond-branch cond:a EQ Integer.MIN_VALUE
       true branch :
         new ArithmeticException<ArithmeticException>
@@ -172,7 +172,7 @@ class  Math
 
       return Sub
   a
-    func  negateExact()  throws: 
+    func  negateExact(a)  throws: 
       cond-branch cond:a EQ Long.MIN_VALUE
       true branch :
         new ArithmeticException<ArithmeticException>
@@ -180,14 +180,14 @@ class  Math
 
       return Sub
   a
-    func  toIntExact()  throws: 
+    func  toIntExact(value)  throws: 
       cond-branch cond:(int)value NE value
       true branch :
         new ArithmeticException<ArithmeticException>
       false branch :
 
       return (int)value
-    func  floorDiv()  throws: 
+    func  floorDiv(x,y)  throws: 
       var:r=
       cond-branch cond:(x Bxor y) LT 0 Land ( NE x)
       true branch :
@@ -196,7 +196,7 @@ class  Math
       false branch :
 
       return r
-    func  floorDiv()  throws: 
+    func  floorDiv(x,y)  throws: 
       var:r=
       cond-branch cond:(x Bxor y) LT 0 Land ( NE x)
       true branch :
@@ -205,24 +205,24 @@ class  Math
       false branch :
 
       return r
-    func  floorMod()  throws: 
+    func  floorMod(x,y)  throws: 
       var:r=x Sub 
       return r
-    func  floorMod()  throws: 
+    func  floorMod(x,y)  throws: 
       return x Sub 
-    func  abs()  throws: 
+    func  abs(a)  throws: 
       return 
-    func  abs()  throws: 
+    func  abs(a)  throws: 
       return 
-    func  abs()  throws: 
+    func  abs(a)  throws: 
       return Float.intBitsToFloat(2147483647 Band Float.floatToRawIntBits(a))
-    func  abs()  throws: 
+    func  abs(a)  throws: 
       return Double.longBitsToDouble(-1 Band Double.doubleToRawLongBits(a))
-    func  max()  throws: 
+    func  max(a,b)  throws: 
       return 
-    func  max()  throws: 
+    func  max(a,b)  throws: 
       return 
-    func  max()  throws: 
+    func  max(a,b)  throws: 
       cond-branch cond:a NE a
       true branch :
         return a
@@ -234,7 +234,7 @@ class  Math
       false branch :
 
       return 
-    func  max()  throws: 
+    func  max(a,b)  throws: 
       cond-branch cond:a NE a
       true branch :
         return a
@@ -246,11 +246,11 @@ class  Math
       false branch :
 
       return 
-    func  min()  throws: 
+    func  min(a,b)  throws: 
       return 
-    func  min()  throws: 
+    func  min(a,b)  throws: 
       return 
-    func  min()  throws: 
+    func  min(a,b)  throws: 
       cond-branch cond:a NE a
       true branch :
         return a
@@ -262,7 +262,7 @@ class  Math
       false branch :
 
       return 
-    func  min()  throws: 
+    func  min(a,b)  throws: 
       cond-branch cond:a NE a
       true branch :
         return a
@@ -274,33 +274,33 @@ class  Math
       false branch :
 
       return 
-    func  ulp()  throws: 
+    func  ulp(d)  throws: 
       var:exp=getExponent(d)
       A switch
 
-    func  ulp()  throws: 
+    func  ulp(f)  throws: 
       var:exp=getExponent(f)
       A switch
 
-    func  signum()  throws: 
+    func  signum(d)  throws: 
       return 
-    func  signum()  throws: 
+    func  signum(f)  throws: 
       return 
-    func  sinh()  throws: 
-    func  cosh()  throws: 
-    func  tanh()  throws: 
-    func  hypot()  throws: 
-    func  expm1()  throws: 
-    func  log1p()  throws: 
-    func  copySign()  throws: 
+    func  sinh(x)  throws: 
+    func  cosh(x)  throws: 
+    func  tanh(x)  throws: 
+    func  hypot(x,y)  throws: 
+    func  expm1(x)  throws: 
+    func  log1p(x)  throws: 
+    func  copySign(magnitude,sign)  throws: 
       return Double.longBitsToDouble((Double.doubleToRawLongBits(sign) Band (DoubleConsts.SIGN_BIT_MASK)) Bor (Double.doubleToRawLongBits(magnitude) Band (DoubleConsts.EXP_BIT_MASK Bor DoubleConsts.SIGNIF_BIT_MASK)))
-    func  copySign()  throws: 
+    func  copySign(magnitude,sign)  throws: 
       return Float.intBitsToFloat((Float.floatToRawIntBits(sign) Band (FloatConsts.SIGN_BIT_MASK)) Bor (Float.floatToRawIntBits(magnitude) Band (FloatConsts.EXP_BIT_MASK Bor FloatConsts.SIGNIF_BIT_MASK)))
-    func  getExponent()  throws: 
+    func  getExponent(f)  throws: 
       return ((Float.floatToRawIntBits(f) Band FloatConsts.EXP_BIT_MASK) Shr (FloatConsts.SIGNIFICAND_WIDTH Sub 1)) Sub FloatConsts.EXP_BIAS
-    func  getExponent()  throws: 
+    func  getExponent(d)  throws: 
       return (int)(((Double.doubleToRawLongBits(d) Band DoubleConsts.EXP_BIT_MASK) Shr (DoubleConsts.SIGNIFICAND_WIDTH Sub 1)) Sub DoubleConsts.EXP_BIAS)
-    func  nextAfter()  throws: 
+    func  nextAfter(start,direction)  throws: 
       cond-branch cond:Double.isNaN(start) Lor Double.isNaN(direction)
       true branch :
         return start Add direction
@@ -313,7 +313,7 @@ class  Math
 
 
 
-    func  nextAfter()  throws: 
+    func  nextAfter(start,direction)  throws: 
       cond-branch cond:Float.isNaN(start) Lor Double.isNaN(direction)
       true branch :
         return start Add (float)direction
@@ -326,7 +326,7 @@ class  Math
 
 
 
-    func  nextUp()  throws: 
+    func  nextUp(d)  throws: 
       cond-branch cond:Double.isNaN(d) Lor d EQ Double.POSITIVE_INFINITY
       true branch :
         return d
@@ -334,7 +334,7 @@ class  Math
         d AddAssign 0
         return Double.longBitsToDouble(Double.doubleToRawLongBits(d) Add ())
 
-    func  nextUp()  throws: 
+    func  nextUp(f)  throws: 
       cond-branch cond:Float.isNaN(f) Lor f EQ FloatConsts.POSITIVE_INFINITY
       true branch :
         return f
@@ -342,7 +342,7 @@ class  Math
         f AddAssign 0
         return Float.intBitsToFloat(Float.floatToRawIntBits(f) Add ())
 
-    func  nextDown()  throws: 
+    func  nextDown(d)  throws: 
       cond-branch cond:Double.isNaN(d) Lor d EQ Double.NEGATIVE_INFINITY
       true branch :
         return d
@@ -355,7 +355,7 @@ class  Math
           return Double.longBitsToDouble(Double.doubleToRawLongBits(d) Add ())
 
 
-    func  nextDown()  throws: 
+    func  nextDown(f)  throws: 
       cond-branch cond:Float.isNaN(f) Lor f EQ Float.NEGATIVE_INFINITY
       true branch :
         return f
@@ -368,7 +368,7 @@ class  Math
           return Float.intBitsToFloat(Float.floatToRawIntBits(f) Add ())
 
 
-    func  scalb()  throws: 
+    func  scalb(d,scaleFactor)  throws: 
       var:MAX_SCALE=DoubleConsts.MAX_EXPONENT Add Sub
   DoubleConsts.MIN_EXPONENT Add DoubleConsts.SIGNIFICAND_WIDTH Add 1
       var:exp_adjust=0
@@ -390,15 +390,15 @@ class  Math
         scaleFactor SubAssign scale_increment
 
       return d
-    func  scalb()  throws: 
+    func  scalb(f,scaleFactor)  throws: 
       var:MAX_SCALE=FloatConsts.MAX_EXPONENT Add Sub
   FloatConsts.MIN_EXPONENT Add FloatConsts.SIGNIFICAND_WIDTH Add 1
       scaleFactor Assign Math.max(Math.min(scaleFactor,MAX_SCALE) Sub MAX_SCALE)
       return (float)()
-    func  powerOfTwoD()  throws: 
+    func  powerOfTwoD(n)  throws: 
       assert (n GE DoubleConsts.MIN_EXPONENT Land n LE DoubleConsts.MAX_EXPONENT) : 
       return Double.longBitsToDouble((((long)n Add (long)DoubleConsts.EXP_BIAS) Shl (DoubleConsts.SIGNIFICAND_WIDTH Sub 1)) Band DoubleConsts.EXP_BIT_MASK)
-    func  powerOfTwoF()  throws: 
+    func  powerOfTwoF(n)  throws: 
       assert (n GE FloatConsts.MIN_EXPONENT Land n LE FloatConsts.MAX_EXPONENT) : 
       return Float.intBitsToFloat(((n Add FloatConsts.EXP_BIAS) Shl (FloatConsts.SIGNIFICAND_WIDTH Sub 1)) Band FloatConsts.EXP_BIT_MASK)
   LocalClasses: 

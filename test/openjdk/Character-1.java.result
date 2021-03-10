@@ -40,7 +40,7 @@ class  Character
 
           this.name Assign name
       Methods: 
-        func  equals()  throws: 
+        func  equals(obj)  throws: 
           return (this EQ obj)
         func  hashCode()  throws: 
           return hashCode
@@ -68,9 +68,9 @@ class  Character
           aliases
           map.put(alias,this)
       Methods: 
-        func  of()  throws: 
+        func  of(c)  throws: 
           return of((int)c)
-        func  of()  throws: 
+        func  of(codePoint)  throws: 
           cond-branch cond:isValidCodePoint(codePoint)
           true branch :
             new IllegalArgumentException<IllegalArgumentException>

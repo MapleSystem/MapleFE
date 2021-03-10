@@ -11,7 +11,7 @@ interface  Appendable
   Fields: 
 
   Methods: 
-    func  append()  throws:     IOException
-    func  append()  throws:     IOException
-    func  append()  throws:     IOException
+    func  append(csq)  throws:     IOException
+    func  append(csq,start,end)  throws:     IOException
+    func  append(c)  throws:     IOException
 

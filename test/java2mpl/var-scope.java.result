@@ -7,7 +7,7 @@ class  A
   Instance Initializer: 
   Constructors: 
   Methods: 
-    func  foo()  throws: 
+    func  foo(x)  throws: 
       a Assign x
       cond-branch cond:a EQ 1
       true branch :

@@ -7,7 +7,7 @@ class  Double
   Instance Initializer: 
   Constructors: 
   Methods: 
-    func  equals()  throws: 
+    func  equals(obj)  throws: 
       return doubleToLongBits((Double)obj.value) EQ doubleToLongBits(value)
   LocalClasses: 
   LocalInterfaces: 

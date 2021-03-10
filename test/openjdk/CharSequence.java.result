@@ -30,8 +30,8 @@ interface  CharSequence
 
   Methods: 
     func  length()  throws: 
-    func  charAt()  throws: 
-    func  subSequence()  throws: 
+    func  charAt(index)  throws: 
+    func  subSequence(start,end)  throws: 
     func  toString()  throws: 
     func  chars()  throws: 
       class  CharIterator
@@ -50,7 +50,7 @@ interface  CharSequence
             false branch :
               new NoSuchElementException<NoSuchElementException>
 
-          func  forEachRemaining()  throws: 
+          func  forEachRemaining(block)  throws: 
             for ( )
               block.accept(charAt(cur))
 
@@ -66,7 +66,7 @@ interface  CharSequence
         Instance Initializer: 
         Constructors: 
         Methods: 
-          func  forEachRemaining()  throws: 
+          func  forEachRemaining(block)  throws: 
             var:length=length()
             var:i=cur
 

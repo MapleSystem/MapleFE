@@ -19,7 +19,7 @@ interface  Colorable
   Fields: 
 
   Methods: 
-    func  setColor()  throws: 
+    func  setColor(color)  throws: 
 
 == Sub Tree ==
 class  ColoredPoint
@@ -28,7 +28,7 @@ class  ColoredPoint
   Instance Initializer: 
   Constructors: 
   Methods: 
-    func  setColor()  throws: 
+    func  setColor(color)  throws: 
       this.color Assign color
   LocalClasses: 
   LocalInterfaces: 
@@ -50,7 +50,7 @@ class  Test
   Instance Initializer: 
   Constructors: 
   Methods: 
-    func  main()  throws: 
+    func  main(args)  throws: 
       var:p=new Point<Point>
       var:cp=new ColoredPoint<ColoredPoint>
       var:c

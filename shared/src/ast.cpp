@@ -1066,7 +1066,14 @@ void FunctionNode::Dump(unsigned indent) {
     DUMP1_NORETURN("func ", mName);
 
   // dump parameters
-  DUMP0_NORETURN("()");
+  DUMP0_NORETURN("(");
+  for (unsigned i = 0; i < GetParamsNum(); i++) {
+    TreeNode *param = GetParam(i);
+    param->Dump(0);
+    if (i < GetParamsNum() - 1)
+      DUMP0_NORETURN(",");
+  }
+  DUMP0_NORETURN(")");
 
   // dump throws
   DUMP0_NORETURN("  throws: ");

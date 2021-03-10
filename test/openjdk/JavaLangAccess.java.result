@@ -11,7 +11,7 @@ class  JavaLangAccess
   Constructors: 
     constructor  JavaLangAccess()  throws: 
   Methods: 
-    func  getEnumConstantsShared()  throws: 
+    func  getEnumConstantsShared(klass)  throws: 
       return klass.getEnumConstantsShared()
   LocalClasses: 
   LocalInterfaces: 

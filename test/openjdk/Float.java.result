@@ -27,9 +27,9 @@ class  Float
     constructor  Float()  throws: 
       value Assign parseFloat(s)
   Methods: 
-    func  toString()  throws: 
+    func  toString(f)  throws: 
       return FloatingDecimal.toJavaFormatString(f)
-    func  toHexString()  throws: 
+    func  toHexString(f)  throws: 
       cond-branch cond:Math.abs(f) LT FloatConsts.MIN_NORMAL Land f NE 0
       true branch :
         var:s=Double.toHexString(Math.scalb((double)f,DoubleConsts.MIN_EXPONENT Sub FloatConsts.MIN_EXPONENT))
@@ -37,17 +37,17 @@ class  Float
       false branch :
         return Double.toHexString(f)
 
-    func  valueOf()  throws:     NumberFormatException
+    func  valueOf(s)  throws:     NumberFormatException
       return new Float<Float>
-    func  valueOf()  throws: 
+    func  valueOf(f)  throws: 
       return new Float<Float>
-    func  parseFloat()  throws:     NumberFormatException
+    func  parseFloat(s)  throws:     NumberFormatException
       return FloatingDecimal.parseFloat(s)
-    func  isNaN()  throws: 
+    func  isNaN(v)  throws: 
       return (v NE v)
-    func  isInfinite()  throws: 
+    func  isInfinite(v)  throws: 
       return (v EQ POSITIVE_INFINITY) Lor (v EQ NEGATIVE_INFINITY)
-    func  isFinite()  throws: 
+    func  isFinite(f)  throws: 
       return Math.abs(f) LE FloatConsts.MAX_VALUE
     func  isNaN()  throws: 
       return isNaN(value)
@@ -69,11 +69,11 @@ class  Float
       return (double)value
     func  hashCode()  throws: 
       return Float.hashCode(value)
-    func  hashCode()  throws: 
+    func  hashCode(value)  throws: 
       return floatToIntBits(value)
-    func  equals()  throws: 
+    func  equals(obj)  throws: 
       return () Land (floatToIntBits((Float)obj.value) EQ floatToIntBits(value))
-    func  floatToIntBits()  throws: 
+    func  floatToIntBits(value)  throws: 
       var:result=floatToRawIntBits(value)
       cond-branch cond:((result Band FloatConsts.EXP_BIT_MASK) EQ FloatConsts.EXP_BIT_MASK) Land (result Band FloatConsts.SIGNIF_BIT_MASK) NE 0
       true branch :
@@ -81,11 +81,11 @@ class  Float
       false branch :
 
       return result
-    func  floatToRawIntBits()  throws: 
-    func  intBitsToFloat()  throws: 
-    func  compareTo()  throws: 
+    func  floatToRawIntBits(value)  throws: 
+    func  intBitsToFloat(bits)  throws: 
+    func  compareTo(anotherFloat)  throws: 
       return Float.compare(value,anotherFloat.value)
-    func  compare()  throws: 
+    func  compare(f1,f2)  throws: 
       cond-branch cond:f1 LT f2
       true branch :
         return Sub
@@ -100,11 +100,11 @@ class  Float
       var:thisBits=Float.floatToIntBits(f1)
       var:anotherBits=Float.floatToIntBits(f2)
       return ()
-    func  sum()  throws: 
+    func  sum(a,b)  throws: 
       return a Add b
-    func  max()  throws: 
+    func  max(a,b)  throws: 
       return Math.max(a,b)
-    func  min()  throws: 
+    func  min(a,b)  throws: 
       return Math.min(a,b)
   LocalClasses: 
   LocalInterfaces: 

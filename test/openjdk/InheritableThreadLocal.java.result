@@ -13,11 +13,11 @@ class  InheritableThreadLocal
   Instance Initializer: 
   Constructors: 
   Methods: 
-    func  childValue()  throws: 
+    func  childValue(parentValue)  throws: 
       return parentValue
-    func  getMap()  throws: 
+    func  getMap(t)  throws: 
       return t.inheritableThreadLocals
-    func  createMap()  throws: 
+    func  createMap(t,firstValue)  throws: 
       t.inheritableThreadLocals Assign new ThreadLocalMap<ThreadLocalMap>
   LocalClasses: 
   LocalInterfaces: 

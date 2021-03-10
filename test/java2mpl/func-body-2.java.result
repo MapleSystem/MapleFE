@@ -7,7 +7,7 @@ class  A
   Instance Initializer: 
   Constructors: 
   Methods: 
-    func  foo()  throws: 
+    func  foo(c,b)  throws: 
       c Assign 3
       return c Add b
   LocalClasses: 

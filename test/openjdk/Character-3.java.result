@@ -7,7 +7,7 @@ class  Character
   Instance Initializer: 
   Constructors: 
   Methods: 
-    func  isWhitespace()  throws: 
+    func  isWhitespace(codePoint)  throws: 
       cond-branch cond:(codePoint GE 28 Land codePoint LE 32) Lor (codePoint GE 9 Land codePoint LE 13)
       true branch :
         return true

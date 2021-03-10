@@ -20,7 +20,7 @@ class  Long
     constructor  Long()  throws: 
       this.value Assign parseLong(s,10)
   Methods: 
-    func  toString()  throws: 
+    func  toString(i,radix)  throws: 
       cond-branch cond:radix LT Character.MIN_RADIX Lor radix GT Character.MAX_RADIX
       true branch :
         radix Assign 10
@@ -51,7 +51,7 @@ class  Long
       false branch :
 
       return new String<String>
-    func  toUnsignedString()  throws: 
+    func  toUnsignedString(i,radix)  throws: 
       cond-branch cond:i GE 0
       true branch :
         return toString(i,radix)
@@ -59,7 +59,7 @@ class  Long
         A switch
 
 
-    func  toUnsignedBigInteger()  throws: 
+    func  toUnsignedBigInteger(i)  throws: 
       cond-branch cond:i GE 0
       true branch :
         return BigInteger.valueOf(i)
@@ -67,19 +67,19 @@ class  Long
         var:upper=(int)(i Zext 32)
 
 
-    func  toHexString()  throws: 
+    func  toHexString(i)  throws: 
       return toUnsignedString0(i,4)
-    func  toOctalString()  throws: 
+    func  toOctalString(i)  throws: 
       return toUnsignedString0(i,3)
-    func  toBinaryString()  throws: 
+    func  toBinaryString(i)  throws: 
       return toUnsignedString0(i,1)
-    func  toUnsignedString0()  throws: 
+    func  toUnsignedString0(val,shift)  throws: 
       var:mag=Long.SIZE Sub Long.numberOfLeadingZeros(val)
       var:chars=Math.max(((mag Add (shift Sub 1))shift)1)
       var:buf=
       formatUnsignedLong(val,shift,buf,0,chars)
       return new String<String>
-    func  formatUnsignedLong()  throws: 
+    func  formatUnsignedLong(val,shift,buf,offset,len)  throws: 
       var:charPos=len
       var:radix=1 Shl shift
       var:mask=radix Sub 1
@@ -87,7 +87,7 @@ class  Long
         val ZextAssign shift
 while val NE 0 Land charPos GT 0
       return charPos
-    func  toString()  throws: 
+    func  toString(i)  throws: 
       cond-branch cond:i EQ Long.MIN_VALUE
       true branch :
         return "-9223372036854775808"
@@ -97,9 +97,9 @@ while val NE 0 Land charPos GT 0
       var:buf=
       getChars(i,size,buf)
       return new String<String>
-    func  toUnsignedString()  throws: 
+    func  toUnsignedString(i)  throws: 
       return toUnsignedString(i,10)
-    func  getChars()  throws: 
+    func  getChars(i,index,buf)  throws: 
       var:q
       var:r
       var:charPos=index
@@ -128,7 +128,7 @@ while val NE 0 Land charPos GT 0
          Assign sign
       false branch :
 
-    func  stringSize()  throws: 
+    func  stringSize(x)  throws: 
       var:p=10
       for ( )
         cond-branch cond:x LT p
@@ -139,7 +139,7 @@ while val NE 0 Land charPos GT 0
         p Assign 
 
       return 19
-    func  parseLong()  throws:     NumberFormatException
+    func  parseLong(s,radix)  throws:     NumberFormatException
       cond-branch cond:s EQ null
       true branch :
         new NumberFormatException<NumberFormatException>
@@ -170,9 +170,9 @@ while val NE 0 Land charPos GT 0
         NumberFormatException.forInputString(s)
 
       return 
-    func  parseLong()  throws:     NumberFormatException
+    func  parseLong(s)  throws:     NumberFormatException
       return parseLong(s,10)
-    func  parseUnsignedLong()  throws:     NumberFormatException
+    func  parseUnsignedLong(s,radix)  throws:     NumberFormatException
       cond-branch cond:s EQ null
       true branch :
         new NumberFormatException<NumberFormatException>
@@ -196,13 +196,13 @@ while val NE 0 Land charPos GT 0
       false branch :
         NumberFormatException.forInputString(s)
 
-    func  parseUnsignedLong()  throws:     NumberFormatException
+    func  parseUnsignedLong(s)  throws:     NumberFormatException
       return parseUnsignedLong(s,10)
-    func  valueOf()  throws:     NumberFormatException
+    func  valueOf(s,radix)  throws:     NumberFormatException
       return Long.valueOf(parseLong(s,radix))
-    func  valueOf()  throws:     NumberFormatException
+    func  valueOf(s)  throws:     NumberFormatException
       return Long.valueOf(parseLong(s,10))
-    func  valueOf()  throws: 
+    func  valueOf(l)  throws: 
       var:offset=128
       cond-branch cond:l GE Sub
   128 Land l LE 127
@@ -211,7 +211,7 @@ while val NE 0 Land charPos GT 0
       false branch :
 
       return new Long<Long>
-    func  decode()  throws:     NumberFormatException
+    func  decode(nm)  throws:     NumberFormatException
       var:radix=10
       var:index=0
       var:negative=false
@@ -278,21 +278,21 @@ while val NE 0 Land charPos GT 0
       return toString(value)
     func  hashCode()  throws: 
       return Long.hashCode(value)
-    func  hashCode()  throws: 
+    func  hashCode(value)  throws: 
       return (int)(value Bxor (value Zext 32))
-    func  equals()  throws: 
+    func  equals(obj)  throws: 
       cond-branch cond:
       true branch :
         return value EQ ((Long)obj)longValue
       false branch :
 
       return false
-    func  getLong()  throws: 
+    func  getLong(nm)  throws: 
       return getLong(nm,null)
-    func  getLong()  throws: 
+    func  getLong(nm,val)  throws: 
       var:result=Long.getLong(nm,null)
       return 
-    func  getLong()  throws: 
+    func  getLong(nm,val)  throws: 
       var:v=null
       v Assign System.getProperty(nm)
 
@@ -305,13 +305,13 @@ while val NE 0 Land charPos GT 0
       false branch :
 
       return val
-    func  compareTo()  throws: 
+    func  compareTo(anotherLong)  throws: 
       return compare(this.value,anotherLong.value)
-    func  compare()  throws: 
+    func  compare(x,y)  throws: 
       return 
-    func  compareUnsigned()  throws: 
+    func  compareUnsigned(x,y)  throws: 
       return compare(x Add MIN_VALUE,y Add MIN_VALUE)
-    func  divideUnsigned()  throws: 
+    func  divideUnsigned(dividend,divisor)  throws: 
       cond-branch cond:divisor LT 0
       true branch :
         return 
@@ -323,7 +323,7 @@ while val NE 0 Land charPos GT 0
       false branch :
         return 
 
-    func  remainderUnsigned()  throws: 
+    func  remainderUnsigned(dividend,divisor)  throws: 
       cond-branch cond:dividend GT 0 Land divisor GT 0
       true branch :
         return 
@@ -335,7 +335,7 @@ while val NE 0 Land charPos GT 0
           return 
 
 
-    func  highestOneBit()  throws: 
+    func  highestOneBit(i)  throws: 
       i BorAssign (i Shr 1)
       i BorAssign (i Shr 2)
       i BorAssign (i Shr 4)
@@ -343,10 +343,10 @@ while val NE 0 Land charPos GT 0
       i BorAssign (i Shr 16)
       i BorAssign (i Shr 32)
       return i Sub (i Zext 1)
-    func  lowestOneBit()  throws: 
+    func  lowestOneBit(i)  throws: 
       return i Band Sub
   i
-    func  numberOfLeadingZeros()  throws: 
+    func  numberOfLeadingZeros(i)  throws: 
       cond-branch cond:i EQ 0
       true branch :
         return 64
@@ -386,7 +386,7 @@ while val NE 0 Land charPos GT 0
 
       n SubAssign x Zext 31
       return n
-    func  numberOfTrailingZeros()  throws: 
+    func  numberOfTrailingZeros(i)  throws: 
       var:x,y
       cond-branch cond:i EQ 0
       true branch :
@@ -431,7 +431,7 @@ while val NE 0 Land charPos GT 0
       false branch :
 
       return n Sub ((x Shl 1) Zext 31)
-    func  bitCount()  throws: 
+    func  bitCount(i)  throws: 
       i Assign i Sub ((i Zext 1) Band 1431655765)
       i Assign (i Band 858993459) Add ((i Zext 2) Band 858993459)
       i Assign (i Add (i Zext 4)) Band -252645121
@@ -439,30 +439,30 @@ while val NE 0 Land charPos GT 0
       i Assign i Add (i Zext 16)
       i Assign i Add (i Zext 32)
       return (int)i Band 127
-    func  rotateLeft()  throws: 
+    func  rotateLeft(i,distance)  throws: 
       return (i Shl distance) Bor (i Zext Sub
   distance)
-    func  rotateRight()  throws: 
+    func  rotateRight(i,distance)  throws: 
       return (i Zext distance) Bor (i Shl Sub
   distance)
-    func  reverse()  throws: 
+    func  reverse(i)  throws: 
       i Assign (i Band 1431655765) Shl 1 Bor (i Zext 1) Band 1431655765
       i Assign (i Band 858993459) Shl 2 Bor (i Zext 2) Band 858993459
       i Assign (i Band -252645121) Shl 4 Bor (i Zext 4) Band -252645121
       i Assign (i Band 267390975) Shl 8 Bor (i Zext 8) Band 267390975
       i Assign (i Shl 48) Bor ((i Band -1048576) Shl 16) Bor ((i Zext 16) Band -1048576) Bor (i Zext 48)
       return i
-    func  signum()  throws: 
+    func  signum(i)  throws: 
       return (int)((i Shr 63) Bor (Sub
   i Zext 63))
-    func  reverseBytes()  throws: 
+    func  reverseBytes(i)  throws: 
       i Assign (i Band 267390975) Shl 8 Bor (i Zext 8) Band 267390975
       return (i Shl 48) Bor ((i Band -1048576) Shl 16) Bor ((i Zext 16) Band -1048576) Bor (i Zext 48)
-    func  sum()  throws: 
+    func  sum(a,b)  throws: 
       return a Add b
-    func  max()  throws: 
+    func  max(a,b)  throws: 
       return Math.max(a,b)
-    func  min()  throws: 
+    func  min(a,b)  throws: 
       return Math.min(a,b)
   LocalClasses: 
     class  LongCache

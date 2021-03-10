@@ -16,12 +16,12 @@ class  Byte
     constructor  Byte()  throws: 
       this.value Assign parseByte(s,10)
   Methods: 
-    func  toString()  throws: 
+    func  toString(b)  throws: 
       return Integer.toString((int)b,10)
-    func  valueOf()  throws: 
+    func  valueOf(b)  throws: 
       var:offset=128
       return 
-    func  parseByte()  throws:     NumberFormatException
+    func  parseByte(s,radix)  throws:     NumberFormatException
       var:i=Integer.parseInt(s,radix)
       cond-branch cond:i LT MIN_VALUE Lor i GT MAX_VALUE
       true branch :
@@ -29,13 +29,13 @@ class  Byte
       false branch :
 
       return (byte)i
-    func  parseByte()  throws:     NumberFormatException
+    func  parseByte(s)  throws:     NumberFormatException
       return parseByte(s,10)
-    func  valueOf()  throws:     NumberFormatException
+    func  valueOf(s,radix)  throws:     NumberFormatException
       return valueOf(parseByte(s,radix))
-    func  valueOf()  throws:     NumberFormatException
+    func  valueOf(s)  throws:     NumberFormatException
       return valueOf(s,10)
-    func  decode()  throws:     NumberFormatException
+    func  decode(nm)  throws:     NumberFormatException
       var:i=Integer.decode(nm)
       cond-branch cond:i LT MIN_VALUE Lor i GT MAX_VALUE
       true branch :
@@ -59,24 +59,24 @@ class  Byte
       return Integer.toString((int)value)
     func  hashCode()  throws: 
       return Byte.hashCode(value)
-    func  hashCode()  throws: 
+    func  hashCode(value)  throws: 
       return (int)value
-    func  equals()  throws: 
+    func  equals(obj)  throws: 
       cond-branch cond:
       true branch :
         return value EQ ((Byte)obj)byteValue
       false branch :
 
       return false
-    func  compareTo()  throws: 
+    func  compareTo(anotherByte)  throws: 
       return compare(this.value,anotherByte.value)
-    func  compare()  throws: 
+    func  compare(x,y)  throws: 
       return x Sub y
-    func  toUnsignedInt()  throws: 
+    func  toUnsignedInt(x)  throws: 
       return ((int)x) Band 255
-    func  toUnsignedLong()  throws: 
+    func  toUnsignedLong(x)  throws: 
       return ((long)x) Band 4095
-    func  toHexString()  throws: 
+    func  toHexString(b,upperCase)  throws: 
       var:digits=
       var:buf=
        Assign 

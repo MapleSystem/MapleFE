@@ -24,7 +24,7 @@ interface  Iterable
 
   Methods: 
     func  iterator()  throws: 
-    func  forEach()  throws: 
+    func  forEach(action)  throws: 
       Objects.requireNonNull(action)
       T
       t

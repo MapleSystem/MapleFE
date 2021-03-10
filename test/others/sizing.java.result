@@ -19,7 +19,7 @@ class  Sizing
   Instance Initializer: 
   Constructors: 
   Methods: 
-    func  main()  throws: 
+    func  main(args)  throws: 
       var:ba=
       System.out.println(ClassLayout.parseInstance(ba),toPrintable)
       var:bitSet=new BitSet<BitSet>

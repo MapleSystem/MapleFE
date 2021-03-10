@@ -10,7 +10,7 @@ class  Main
   Instance Initializer: 
   Constructors: 
   Methods: 
-    func  main()  throws: 
+    func  main(args)  throws: 
       var:numbers=new ArrayList<Integer>
       numbers.add(5)
       numbers.add(9)

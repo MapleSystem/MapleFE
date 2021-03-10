@@ -7,7 +7,7 @@ class  C
   Instance Initializer: 
   Constructors: 
   Methods: 
-    func  getClasses()  throws: 
+    func  getClasses(a)  throws: 
       var:result=a
       return result
   LocalClasses: 

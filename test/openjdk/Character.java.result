@@ -28,7 +28,7 @@ class  Character
     constructor  Character()  throws: 
       this.value Assign value
   Methods: 
-    func  valueOf()  throws: 
+    func  valueOf(c)  throws: 
       cond-branch cond:c LE 127
       true branch :
         return 
@@ -39,9 +39,9 @@ class  Character
       return value
     func  hashCode()  throws: 
       return Character.hashCode(value)
-    func  hashCode()  throws: 
+    func  hashCode(value)  throws: 
       return (int)value
-    func  equals()  throws: 
+    func  equals(obj)  throws: 
       cond-branch cond:
       true branch :
         return value EQ ((Character)obj)charValue
@@ -51,28 +51,28 @@ class  Character
     func  toString()  throws: 
       var:buf=value[]
       return String.valueOf(buf)
-    func  toString()  throws: 
+    func  toString(c)  throws: 
       return String.valueOf(c)
-    func  isValidCodePoint()  throws: 
+    func  isValidCodePoint(codePoint)  throws: 
       var:plane=codePoint Zext 16
       return plane LT ((MAX_CODE_POINT Add 1) Zext 16)
-    func  isBmpCodePoint()  throws: 
+    func  isBmpCodePoint(codePoint)  throws: 
       return codePoint Zext 16 EQ 0
-    func  isSupplementaryCodePoint()  throws: 
+    func  isSupplementaryCodePoint(codePoint)  throws: 
       return codePoint GE MIN_SUPPLEMENTARY_CODE_POINT Land codePoint LT MAX_CODE_POINT Add 1
-    func  isHighSurrogate()  throws: 
+    func  isHighSurrogate(ch)  throws: 
       return ch GE MIN_HIGH_SURROGATE Land ch LT (MAX_HIGH_SURROGATE Add 1)
-    func  isLowSurrogate()  throws: 
+    func  isLowSurrogate(ch)  throws: 
       return ch GE MIN_LOW_SURROGATE Land ch LT (MAX_LOW_SURROGATE Add 1)
-    func  isSurrogate()  throws: 
+    func  isSurrogate(ch)  throws: 
       return ch GE MIN_SURROGATE Land ch LT (MAX_SURROGATE Add 1)
-    func  isSurrogatePair()  throws: 
+    func  isSurrogatePair(high,low)  throws: 
       return isHighSurrogate(high) Land isLowSurrogate(low)
-    func  charCount()  throws: 
+    func  charCount(codePoint)  throws: 
       return 
-    func  toCodePoint()  throws: 
+    func  toCodePoint(high,low)  throws: 
       return ((high Shl 10) Add low) Add (MIN_SUPPLEMENTARY_CODE_POINT Sub (MIN_HIGH_SURROGATE Shl 10) Sub MIN_LOW_SURROGATE)
-    func  codePointAt()  throws: 
+    func  codePointAt(seq,index)  throws: 
       var:c1=seq.charAt(index)
       cond-branch cond:isHighSurrogate(c1) Land Inc
   index LT seq.length()
@@ -86,16 +86,16 @@ class  Character
       false branch :
 
       return c1
-    func  codePointAt()  throws: 
+    func  codePointAt(a,index)  throws: 
       return codePointAtImpl(a,index,a.length)
-    func  codePointAt()  throws: 
+    func  codePointAt(a,index,limit)  throws: 
       cond-branch cond:index GE limit Lor limit LT 0 Lor limit GT a.length
       true branch :
         new IndexOutOfBoundsException<IndexOutOfBoundsException>
       false branch :
 
       return codePointAtImpl(a,index,limit)
-    func  codePointAtImpl()  throws: 
+    func  codePointAtImpl(a,index,limit)  throws: 
       var:c1=
       cond-branch cond:isHighSurrogate(c1) Land Inc
   index LT limit
@@ -109,7 +109,7 @@ class  Character
       false branch :
 
       return c1
-    func  codePointBefore()  throws: 
+    func  codePointBefore(seq,index)  throws: 
       var:c2=seq.charAt(Dec
   index)
       cond-branch cond:isLowSurrogate(c2) Land index GT 0
@@ -124,16 +124,16 @@ class  Character
       false branch :
 
       return c2
-    func  codePointBefore()  throws: 
+    func  codePointBefore(a,index)  throws: 
       return codePointBeforeImpl(a,index,0)
-    func  codePointBefore()  throws: 
+    func  codePointBefore(a,index,start)  throws: 
       cond-branch cond:index LE start Lor start LT 0 Lor start GE a.length
       true branch :
         new IndexOutOfBoundsException<IndexOutOfBoundsException>
       false branch :
 
       return codePointBeforeImpl(a,index,start)
-    func  codePointBeforeImpl()  throws: 
+    func  codePointBeforeImpl(a,index,start)  throws: 
       var:c2=
       cond-branch cond:isLowSurrogate(c2) Land index GT start
       true branch :
@@ -146,11 +146,11 @@ class  Character
       false branch :
 
       return c2
-    func  highSurrogate()  throws: 
+    func  highSurrogate(codePoint)  throws: 
       return (char)((codePoint Zext 10) Add (MIN_HIGH_SURROGATE Sub (MIN_SUPPLEMENTARY_CODE_POINT Zext 10)))
-    func  lowSurrogate()  throws: 
+    func  lowSurrogate(codePoint)  throws: 
       return (char)((codePoint Band 1023) Add MIN_LOW_SURROGATE)
-    func  toChars()  throws: 
+    func  toChars(codePoint,dst,dstIndex)  throws: 
       cond-branch cond:isBmpCodePoint(codePoint)
       true branch :
          Assign (char)codePoint
@@ -164,7 +164,7 @@ class  Character
           new IllegalArgumentException<IllegalArgumentException>
 
 
-    func  toChars()  throws: 
+    func  toChars(codePoint)  throws: 
       cond-branch cond:isBmpCodePoint(codePoint)
       true branch :
         return 
@@ -177,10 +177,10 @@ class  Character
           new IllegalArgumentException<IllegalArgumentException>
 
 
-    func  toSurrogates()  throws: 
+    func  toSurrogates(codePoint,dst,index)  throws: 
        Assign lowSurrogate(codePoint)
        Assign highSurrogate(codePoint)
-    func  codePointCount()  throws: 
+    func  codePointCount(seq,beginIndex,endIndex)  throws: 
       var:length=seq.length()
       cond-branch cond:beginIndex LT 0 Lor endIndex GT length Lor beginIndex GT endIndex
       true branch :
@@ -200,14 +200,14 @@ class  Character
 
 
       return n
-    func  codePointCount()  throws: 
+    func  codePointCount(a,offset,count)  throws: 
       cond-branch cond:count GT a.length Sub offset Lor offset LT 0 Lor count LT 0
       true branch :
         new IndexOutOfBoundsException<IndexOutOfBoundsException>
       false branch :
 
       return codePointCountImpl(a,offset,count)
-    func  codePointCountImpl()  throws: 
+    func  codePointCountImpl(a,offset,count)  throws: 
       var:endIndex=offset Add count
       var:n=count
       for ( )
@@ -222,7 +222,7 @@ class  Character
 
 
       return n
-    func  offsetByCodePoints()  throws: 
+    func  offsetByCodePoints(seq,index,codePointOffset)  throws: 
       var:length=seq.length()
       cond-branch cond:index LT 0 Lor index GT length
       true branch :
@@ -239,14 +239,14 @@ class  Character
 
 
       return x
-    func  offsetByCodePoints()  throws: 
+    func  offsetByCodePoints(a,start,count,index,codePointOffset)  throws: 
       cond-branch cond:count GT a.length Sub start Lor start LT 0 Lor count LT 0 Lor index LT start Lor index GT start Add count
       true branch :
         new IndexOutOfBoundsException<IndexOutOfBoundsException>
       false branch :
 
       return offsetByCodePointsImpl(a,start,count,index,codePointOffset)
-    func  offsetByCodePointsImpl()  throws: 
+    func  offsetByCodePointsImpl(a,start,count,index,codePointOffset)  throws: 
       var:x=index
       cond-branch cond:codePointOffset GE 0
       true branch :
@@ -257,54 +257,54 @@ class  Character
 
 
       return x
-    func  isLowerCase()  throws: 
+    func  isLowerCase(ch)  throws: 
       return isLowerCase((int)ch)
-    func  isLowerCase()  throws: 
+    func  isLowerCase(codePoint)  throws: 
       return isLowerCaseImpl(codePoint)
-    func  isLowerCaseImpl()  throws: 
-    func  isUpperCase()  throws: 
+    func  isLowerCaseImpl(codePoint)  throws: 
+    func  isUpperCase(ch)  throws: 
       return isUpperCase((int)ch)
-    func  isUpperCase()  throws: 
+    func  isUpperCase(codePoint)  throws: 
       return isUpperCaseImpl(codePoint)
-    func  isUpperCaseImpl()  throws: 
-    func  isTitleCase()  throws: 
+    func  isUpperCaseImpl(codePoint)  throws: 
+    func  isTitleCase(ch)  throws: 
       return isTitleCase((int)ch)
-    func  isTitleCase()  throws: 
+    func  isTitleCase(codePoint)  throws: 
       return isTitleCaseImpl(codePoint)
-    func  isTitleCaseImpl()  throws: 
-    func  isDigit()  throws: 
+    func  isTitleCaseImpl(codePoint)  throws: 
+    func  isDigit(ch)  throws: 
       return isDigit((int)ch)
-    func  isDigit()  throws: 
+    func  isDigit(codePoint)  throws: 
       return isDigitImpl(codePoint)
-    func  isDigitImpl()  throws: 
-    func  isDefined()  throws: 
+    func  isDigitImpl(codePoint)  throws: 
+    func  isDefined(ch)  throws: 
       return isDefined((int)ch)
-    func  isDefined()  throws: 
+    func  isDefined(codePoint)  throws: 
       return isDefinedImpl(codePoint)
-    func  isDefinedImpl()  throws: 
-    func  isLetter()  throws: 
+    func  isDefinedImpl(codePoint)  throws: 
+    func  isLetter(ch)  throws: 
       return isLetter((int)ch)
-    func  isLetter()  throws: 
+    func  isLetter(codePoint)  throws: 
       return isLetterImpl(codePoint)
-    func  isLetterImpl()  throws: 
-    func  isLetterOrDigit()  throws: 
+    func  isLetterImpl(codePoint)  throws: 
+    func  isLetterOrDigit(ch)  throws: 
       return isLetterOrDigit((int)ch)
-    func  isLetterOrDigit()  throws: 
+    func  isLetterOrDigit(codePoint)  throws: 
       return isLetterOrDigitImpl(codePoint)
-    func  isLetterOrDigitImpl()  throws: 
-    func  isJavaLetter()  throws: 
+    func  isLetterOrDigitImpl(codePoint)  throws: 
+    func  isJavaLetter(ch)  throws: 
       return isJavaIdentifierStart(ch)
-    func  isJavaLetterOrDigit()  throws: 
+    func  isJavaLetterOrDigit(ch)  throws: 
       return isJavaIdentifierPart(ch)
-    func  isAlphabetic()  throws: 
+    func  isAlphabetic(codePoint)  throws: 
       return isAlphabeticImpl(codePoint)
-    func  isAlphabeticImpl()  throws: 
-    func  isIdeographic()  throws: 
+    func  isAlphabeticImpl(codePoint)  throws: 
+    func  isIdeographic(codePoint)  throws: 
       return isIdeographicImpl(codePoint)
-    func  isIdeographicImpl()  throws: 
-    func  isJavaIdentifierStart()  throws: 
+    func  isIdeographicImpl(codePoint)  throws: 
+    func  isJavaIdentifierStart(ch)  throws: 
       return isJavaIdentifierStart((int)ch)
-    func  isJavaIdentifierStart()  throws: 
+    func  isJavaIdentifierStart(codePoint)  throws: 
       cond-branch cond:codePoint LT 64
       true branch :
         return (codePoint EQ $)
@@ -316,9 +316,9 @@ class  Character
 
 
       return ((1 Shl getType(codePoint)) Band ((1 Shl UPPERCASE_LETTER) Bor (1 Shl LOWERCASE_LETTER) Bor (1 Shl TITLECASE_LETTER) Bor (1 Shl MODIFIER_LETTER) Bor (1 Shl OTHER_LETTER) Bor (1 Shl CURRENCY_SYMBOL) Bor (1 Shl CONNECTOR_PUNCTUATION) Bor (1 Shl LETTER_NUMBER))) NE 0
-    func  isJavaIdentifierPart()  throws: 
+    func  isJavaIdentifierPart(ch)  throws: 
       return isJavaIdentifierPart((int)ch)
-    func  isJavaIdentifierPart()  throws: 
+    func  isJavaIdentifierPart(codePoint)  throws: 
       cond-branch cond:codePoint LT 64
       true branch :
         return (-253953 Band (1 Shl codePoint)) NE 0
@@ -330,24 +330,24 @@ class  Character
 
 
       return ((1 Shl getType(codePoint)) Band ((1 Shl UPPERCASE_LETTER) Bor (1 Shl LOWERCASE_LETTER) Bor (1 Shl TITLECASE_LETTER) Bor (1 Shl MODIFIER_LETTER) Bor (1 Shl OTHER_LETTER) Bor (1 Shl CURRENCY_SYMBOL) Bor (1 Shl CONNECTOR_PUNCTUATION) Bor (1 Shl DECIMAL_DIGIT_NUMBER) Bor (1 Shl LETTER_NUMBER) Bor (1 Shl FORMAT) Bor (1 Shl COMBINING_SPACING_MARK) Bor (1 Shl NON_SPACING_MARK))) NE 0 Lor (codePoint GE 0 Land codePoint LE 8) Lor (codePoint GE 14 Land codePoint LE 27) Lor (codePoint GE 127 Land codePoint LE 159)
-    func  isUnicodeIdentifierStart()  throws: 
+    func  isUnicodeIdentifierStart(ch)  throws: 
       return isUnicodeIdentifierStart((int)ch)
-    func  isUnicodeIdentifierStart()  throws: 
+    func  isUnicodeIdentifierStart(codePoint)  throws: 
       return isUnicodeIdentifierStartImpl(codePoint)
-    func  isUnicodeIdentifierStartImpl()  throws: 
-    func  isUnicodeIdentifierPart()  throws: 
+    func  isUnicodeIdentifierStartImpl(codePoint)  throws: 
+    func  isUnicodeIdentifierPart(ch)  throws: 
       return isUnicodeIdentifierPart((int)ch)
-    func  isUnicodeIdentifierPart()  throws: 
+    func  isUnicodeIdentifierPart(codePoint)  throws: 
       return isUnicodeIdentifierPartImpl(codePoint)
-    func  isUnicodeIdentifierPartImpl()  throws: 
-    func  isIdentifierIgnorable()  throws: 
+    func  isUnicodeIdentifierPartImpl(codePoint)  throws: 
+    func  isIdentifierIgnorable(ch)  throws: 
       return isIdentifierIgnorable((int)ch)
-    func  isIdentifierIgnorable()  throws: 
+    func  isIdentifierIgnorable(codePoint)  throws: 
       return isIdentifierIgnorableImpl(codePoint)
-    func  isIdentifierIgnorableImpl()  throws: 
-    func  toLowerCase()  throws: 
+    func  isIdentifierIgnorableImpl(codePoint)  throws: 
+    func  toLowerCase(ch)  throws: 
       return (char)toLowerCase((int)ch)
-    func  toLowerCase()  throws: 
+    func  toLowerCase(codePoint)  throws: 
       cond-branch cond:codePoint GE A Land codePoint LE Z
       true branch :
         return codePoint Add (a Sub A)
@@ -359,10 +359,10 @@ class  Character
       false branch :
 
       return toLowerCaseImpl(codePoint)
-    func  toLowerCaseImpl()  throws: 
-    func  toUpperCase()  throws: 
+    func  toLowerCaseImpl(codePoint)  throws: 
+    func  toUpperCase(ch)  throws: 
       return (char)toUpperCase((int)ch)
-    func  toUpperCase()  throws: 
+    func  toUpperCase(codePoint)  throws: 
       cond-branch cond:codePoint GE a Land codePoint LE z
       true branch :
         return codePoint Sub (a Sub A)
@@ -374,15 +374,15 @@ class  Character
       false branch :
 
       return toUpperCaseImpl(codePoint)
-    func  toUpperCaseImpl()  throws: 
-    func  toTitleCase()  throws: 
+    func  toUpperCaseImpl(codePoint)  throws: 
+    func  toTitleCase(ch)  throws: 
       return (char)toTitleCase((int)ch)
-    func  toTitleCase()  throws: 
+    func  toTitleCase(codePoint)  throws: 
       return toTitleCaseImpl(codePoint)
-    func  toTitleCaseImpl()  throws: 
-    func  digit()  throws: 
+    func  toTitleCaseImpl(codePoint)  throws: 
+    func  digit(ch,radix)  throws: 
       return digit((int)ch,radix)
-    func  digit()  throws: 
+    func  digit(codePoint,radix)  throws: 
       cond-branch cond:radix LT MIN_RADIX Lor radix GT MAX_RADIX
       true branch :
         return Sub
@@ -397,10 +397,10 @@ class  Character
       false branch :
 
       return digitImpl(codePoint,radix)
-    func  digitImpl()  throws: 
-    func  getNumericValue()  throws: 
+    func  digitImpl(codePoint,radix)  throws: 
+    func  getNumericValue(ch)  throws: 
       return getNumericValue((int)ch)
-    func  getNumericValue()  throws: 
+    func  getNumericValue(codePoint)  throws: 
       cond-branch cond:codePoint LT 128
       true branch :
         cond-branch cond:codePoint GE 0 Land codePoint LE 9
@@ -422,12 +422,12 @@ class  Character
       false branch :
 
       return getNumericValueImpl(codePoint)
-    func  getNumericValueImpl()  throws: 
-    func  isSpace()  throws: 
+    func  getNumericValueImpl(codePoint)  throws: 
+    func  isSpace(ch)  throws: 
       return (ch LE 32) Land (((((1 Shl 9) Bor (1 Shl 10) Bor (1 Shl 12) Bor (1 Shl 13) Bor (1 Shl 32)) Shr ch) Band 1) NE 0)
-    func  isSpaceChar()  throws: 
+    func  isSpaceChar(ch)  throws: 
       return isSpaceChar((int)ch)
-    func  isSpaceChar()  throws: 
+    func  isSpaceChar(codePoint)  throws: 
       cond-branch cond:codePoint EQ 32 Lor codePoint EQ 160
       true branch :
         return true
@@ -454,10 +454,10 @@ class  Character
       false branch :
 
       return isSpaceCharImpl(codePoint)
-    func  isSpaceCharImpl()  throws: 
-    func  isWhitespace()  throws: 
+    func  isSpaceCharImpl(codePoint)  throws: 
+    func  isWhitespace(ch)  throws: 
       return isWhitespace((int)ch)
-    func  isWhitespace()  throws: 
+    func  isWhitespace(codePoint)  throws: 
       cond-branch cond:(codePoint GE 28 Land codePoint LE 32) Lor (codePoint GE 9 Land codePoint LE 13)
       true branch :
         return true
@@ -489,14 +489,14 @@ class  Character
       false branch :
 
       return isWhitespaceImpl(codePoint)
-    func  isWhitespaceImpl()  throws: 
-    func  isISOControl()  throws: 
+    func  isWhitespaceImpl(codePoint)  throws: 
+    func  isISOControl(ch)  throws: 
       return isISOControl((int)ch)
-    func  isISOControl()  throws: 
+    func  isISOControl(codePoint)  throws: 
       return codePoint LE 159 Land (codePoint GE 127 Lor (codePoint Zext 5 EQ 0))
-    func  getType()  throws: 
+    func  getType(ch)  throws: 
       return getType((int)ch)
-    func  getType()  throws: 
+    func  getType(codePoint)  throws: 
       var:type=getTypeImpl(codePoint)
       cond-branch cond:type LE Character.FORMAT
       true branch :
@@ -504,8 +504,8 @@ class  Character
       false branch :
 
       return (type Add 1)
-    func  getTypeImpl()  throws: 
-    func  forDigit()  throws: 
+    func  getTypeImpl(codePoint)  throws: 
+    func  forDigit(digit,radix)  throws: 
       cond-branch cond:(digit GE radix) Lor (digit LT 0)
       true branch :
         return  
@@ -522,9 +522,9 @@ class  Character
       false branch :
 
       return (char)(a Sub 10 Add digit)
-    func  getDirectionality()  throws: 
+    func  getDirectionality(ch)  throws: 
       return getDirectionality((int)ch)
-    func  getDirectionality()  throws: 
+    func  getDirectionality(codePoint)  throws: 
       cond-branch cond:getType(codePoint) EQ Character.UNASSIGNED
       true branch :
         return Character.DIRECTIONALITY_UNDEFINED
@@ -537,19 +537,19 @@ class  Character
       false branch :
 
       return Character.DIRECTIONALITY_UNDEFINED
-    func  getDirectionalityImpl()  throws: 
-    func  isMirrored()  throws: 
+    func  getDirectionalityImpl(codePoint)  throws: 
+    func  isMirrored(ch)  throws: 
       return isMirrored((int)ch)
-    func  isMirrored()  throws: 
+    func  isMirrored(codePoint)  throws: 
       return isMirroredImpl(codePoint)
-    func  isMirroredImpl()  throws: 
-    func  compareTo()  throws: 
+    func  isMirroredImpl(codePoint)  throws: 
+    func  compareTo(anotherCharacter)  throws: 
       return compare(this.value,anotherCharacter.value)
-    func  compare()  throws: 
+    func  compare(x,y)  throws: 
       return x Sub y
-    func  reverseBytes()  throws: 
+    func  reverseBytes(ch)  throws: 
       return (char)(((ch Band 65280) Shr 8) Bor (ch Shl 8))
-    func  getName()  throws: 
+    func  getName(codePoint)  throws: 
       cond-branch cond:isValidCodePoint(codePoint)
       true branch :
         new IllegalArgumentException<IllegalArgumentException>
@@ -573,7 +573,7 @@ class  Character
       false branch :
 
       return 
-    func  getNameImpl()  throws: 
+    func  getNameImpl(codePoint)  throws: 
   LocalClasses: 
     class  Subset
       Fields: 
@@ -588,7 +588,7 @@ class  Character
 
           this.name Assign name
       Methods: 
-        func  equals()  throws: 
+        func  equals(obj)  throws: 
           return (this EQ obj)
         func  hashCode()  throws: 
           return hashCode
@@ -616,9 +616,9 @@ class  Character
           aliases
           map.put(alias,this)
       Methods: 
-        func  of()  throws: 
+        func  of(c)  throws: 
           return of((int)c)
-        func  of()  throws: 
+        func  of(codePoint)  throws: 
           cond-branch cond:isValidCodePoint(codePoint)
           true branch :
             new IllegalArgumentException<IllegalArgumentException>
@@ -637,7 +637,7 @@ class  Character
             current Assign (top Add bottom)2
 
           return 
-        func  forName()  throws: 
+        func  forName(blockName)  throws: 
           var:block=map.get(blockName.toUpperCase(Locale.US))
           cond-branch cond:block EQ null
           true branch :
@@ -654,7 +654,7 @@ class  Character
         InstInit- 0
       Constructors: 
       Methods: 
-        func  of()  throws: 
+        func  of(codePoint)  throws: 
           cond-branch cond:isValidCodePoint(codePoint)
           true branch :
             new IllegalArgumentException<IllegalArgumentException>
@@ -674,7 +674,7 @@ class  Character
           false branch :
 
           return 
-        func  forName()  throws: 
+        func  forName(scriptName)  throws: 
           scriptName Assign scriptName.toUpperCase(Locale.ENGLISH)
           var:sc=aliases.get(scriptName)
           cond-branch cond:sc NE null

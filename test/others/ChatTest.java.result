@@ -7,7 +7,7 @@ class  ChatTest
   Instance Initializer: 
   Constructors: 
   Methods: 
-    func  main()  throws:     Throwable
+    func  main(args)  throws:     Throwable
       testStartStop()
       testPortOpen()
       testAsksForName()
@@ -66,7 +66,7 @@ class  ChatTest
 
       server.shutdown()
 
-    func  assertEqual()  throws: 
+    func  assertEqual(exception,value,expected)  throws: 
       cond-branch cond:expected EQ value
       true branch :
         return 
@@ -98,7 +98,7 @@ class  ChatTest
         exceptions.get(0)
       false branch :
 
-    func  waitForJoin()  throws:     IOException
+    func  waitForJoin(reader,s)  throws:     IOException
       var:joined
       do         joined Assign readAvailableString(reader)
 while (joined NE null Land joined.contains("Welcome " Add s))

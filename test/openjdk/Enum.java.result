@@ -46,13 +46,13 @@ class  Enum
       return ordinal
     func  toString()  throws: 
       return name
-    func  equals()  throws: 
+    func  equals(other)  throws: 
       return this EQ other
     func  hashCode()  throws: 
       return hashCode
     func  clone()  throws:     CloneNotSupportedException
       new CloneNotSupportedException<CloneNotSupportedException>
-    func  compareTo()  throws: 
+    func  compareTo(o)  throws: 
       var:other=(Enum)o
       var:self=this
       cond-branch cond:self.getClass() NE other.getClass() Land self.getDeclaringClass() NE other.getDeclaringClass()
@@ -65,7 +65,7 @@ class  Enum
       var:clazz=getClass()
       var:zuper=clazz.getSuperclass()
       return 
-    func  valueOf()  throws: 
+    func  valueOf(enumType,name)  throws: 
       cond-branch cond:enumType EQ null
       true branch :
         new NullPointerException<NullPointerException>
@@ -91,10 +91,10 @@ class  Enum
 
 
       new IllegalArgumentException<IllegalArgumentException>
-    func  getSharedConstants()  throws: 
+    func  getSharedConstants(enumType)  throws: 
       return (T[])sharedConstantsCache.get(enumType)
     func  finalize()  throws: 
-    func  readObject()  throws:     IOException    ClassNotFoundException
+    func  readObject(in)  throws:     IOException    ClassNotFoundException
       new InvalidObjectException<InvalidObjectException>
     func  readObjectNoData()  throws:     ObjectStreamException
       new InvalidObjectException<InvalidObjectException>

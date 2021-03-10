@@ -14,44 +14,44 @@ class  Boolean
       this.value Assign value
     constructor  Boolean()  throws: 
   Methods: 
-    func  parseBoolean()  throws: 
+    func  parseBoolean(s)  throws: 
       return ((s NE null) Land s.equalsIgnoreCase("true"))
     func  booleanValue()  throws: 
       return value
-    func  valueOf()  throws: 
+    func  valueOf(b)  throws: 
       return ()
-    func  valueOf()  throws: 
+    func  valueOf(s)  throws: 
       return 
-    func  toString()  throws: 
+    func  toString(b)  throws: 
       return 
     func  toString()  throws: 
       return 
     func  hashCode()  throws: 
       return Boolean.hashCode(value)
-    func  hashCode()  throws: 
+    func  hashCode(value)  throws: 
       return 
-    func  equals()  throws: 
+    func  equals(obj)  throws: 
       cond-branch cond:
       true branch :
         return value EQ ((Boolean)obj)booleanValue
       false branch :
 
       return false
-    func  getBoolean()  throws: 
+    func  getBoolean(name)  throws: 
       var:result=false
       result Assign parseBoolean(System.getProperty(name))
 
 
       return result
-    func  compareTo()  throws: 
+    func  compareTo(b)  throws: 
       return compare(this.value,b.value)
-    func  compare()  throws: 
+    func  compare(x,y)  throws: 
       return 
-    func  logicalAnd()  throws: 
+    func  logicalAnd(a,b)  throws: 
       return a Land b
-    func  logicalOr()  throws: 
+    func  logicalOr(a,b)  throws: 
       return a Lor b
-    func  logicalXor()  throws: 
+    func  logicalXor(a,b)  throws: 
       return a Bxor b
   LocalClasses: 
   LocalInterfaces: 

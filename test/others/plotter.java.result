@@ -37,7 +37,7 @@ class  Plotter
   Instance Initializer: 
   Constructors: 
   Methods: 
-    func  main()  throws:     IOException
+    func  main(args)  throws:     IOException
       var:path=Paths.get("footprint.csv")
       BufferedWriter
       stream

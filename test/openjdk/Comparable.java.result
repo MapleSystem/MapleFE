@@ -11,5 +11,5 @@ interface  Comparable
   Fields: 
 
   Methods: 
-    func  compareTo()  throws: 
+    func  compareTo(o)  throws: 
 

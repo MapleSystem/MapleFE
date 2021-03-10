@@ -129,9 +129,9 @@ class  ClassLoader
       return new PathClassLoader<PathClassLoader>
     func  checkCreateClassLoader()  throws: 
       return null
-    func  loadClass()  throws:     ClassNotFoundException
+    func  loadClass(name)  throws:     ClassNotFoundException
       return loadClass(name,false)
-    func  loadClass()  throws:     ClassNotFoundException
+    func  loadClass(name,resolve)  throws:     ClassNotFoundException
       var:c=findLoadedClass(name)
       cond-branch cond:c EQ null
       true branch :
@@ -144,22 +144,22 @@ class  ClassLoader
       false branch :
 
       return c
-    func  findClass()  throws:     ClassNotFoundException
+    func  findClass(name)  throws:     ClassNotFoundException
       new ClassNotFoundException<ClassNotFoundException>
-    func  defineClass()  throws:     ClassFormatError
+    func  defineClass(b,off,len)  throws:     ClassFormatError
       new UnsupportedOperationException<UnsupportedOperationException>
-    func  defineClass()  throws:     ClassFormatError
+    func  defineClass(name,b,off,len)  throws:     ClassFormatError
       new UnsupportedOperationException<UnsupportedOperationException>
-    func  defineClass()  throws:     ClassFormatError
+    func  defineClass(name,b,off,len,protectionDomain)  throws:     ClassFormatError
       new UnsupportedOperationException<UnsupportedOperationException>
-    func  defineClass()  throws:     ClassFormatError
+    func  defineClass(name,b,protectionDomain)  throws:     ClassFormatError
       new UnsupportedOperationException<UnsupportedOperationException>
-    func  resolveClass()  throws: 
-    func  findSystemClass()  throws:     ClassNotFoundException
+    func  resolveClass(c)  throws: 
+    func  findSystemClass(name)  throws:     ClassNotFoundException
       return Class.forName(name,false,getSystemClassLoader())
-    func  findBootstrapClassOrNull()  throws: 
+    func  findBootstrapClassOrNull(name)  throws: 
       return null
-    func  findLoadedClass()  throws: 
+    func  findLoadedClass(name)  throws: 
       var:loader
       cond-branch cond:this EQ BootClassLoader.getInstance()
       true branch :
@@ -168,8 +168,8 @@ class  ClassLoader
         loader Assign this
 
       return VMClassLoader.findLoadedClass(loader,name)
-    func  setSigners()  throws: 
-    func  getResource()  throws: 
+    func  setSigners(c,signers)  throws: 
+    func  getResource(name)  throws: 
       var:url
       cond-branch cond:parent NE null
       true branch :
@@ -183,7 +183,7 @@ class  ClassLoader
       false branch :
 
       return url
-    func  getResources()  throws:     IOException
+    func  getResources(name)  throws:     IOException
       var:tmp=()
       cond-branch cond:parent NE null
       true branch :
@@ -193,13 +193,13 @@ class  ClassLoader
 
        Assign findResources(name)
       return new CompoundEnumeration
-    func  findResource()  throws: 
+    func  findResource(name)  throws: 
       return null
-    func  findResources()  throws:     IOException
+    func  findResources(name)  throws:     IOException
       return java.util.Collections.emptyEnumeration()
     func  registerAsParallelCapable()  throws: 
       return true
-    func  getSystemResource()  throws: 
+    func  getSystemResource(name)  throws: 
       var:system=getSystemClassLoader()
       cond-branch cond:system EQ null
       true branch :
@@ -207,7 +207,7 @@ class  ClassLoader
       false branch :
 
       return system.getResource(name)
-    func  getSystemResources()  throws:     IOException
+    func  getSystemResources(name)  throws:     IOException
       var:system=getSystemClassLoader()
       cond-branch cond:system EQ null
       true branch :
@@ -215,16 +215,16 @@ class  ClassLoader
       false branch :
 
       return system.getResources(name)
-    func  getBootstrapResource()  throws: 
+    func  getBootstrapResource(name)  throws: 
       return null
-    func  getBootstrapResources()  throws:     IOException
+    func  getBootstrapResources(name)  throws:     IOException
       return null
-    func  getResourceAsStream()  throws: 
+    func  getResourceAsStream(name)  throws: 
       var:url=getResource(name)
       return 
 
 
-    func  getSystemResourceAsStream()  throws: 
+    func  getSystemResourceAsStream(name)  throws: 
       var:url=getSystemResource(name)
       return 
 
@@ -233,12 +233,12 @@ class  ClassLoader
       return parent
     func  getSystemClassLoader()  throws: 
       return SystemClassLoader.loader
-    func  definePackage()  throws:     IllegalArgumentException
+    func  definePackage(name,specTitle,specVersion,specVendor,implTitle,implVersion,implVendor,sealBase)  throws:     IllegalArgumentException
       packages
       var:pkg=packages.get(name)
 
 
-    func  getPackage()  throws: 
+    func  getPackage(name)  throws: 
       var:pkg
       packages
       pkg Assign packages.get(name)
@@ -251,11 +251,11 @@ class  ClassLoader
 
       var:pkgs
       return 
-    func  findLibrary()  throws: 
+    func  findLibrary(libname)  throws: 
       return null
-    func  setDefaultAssertionStatus()  throws: 
-    func  setPackageAssertionStatus()  throws: 
-    func  setClassAssertionStatus()  throws: 
+    func  setDefaultAssertionStatus(enabled)  throws: 
+    func  setPackageAssertionStatus(packageName,enabled)  throws: 
+    func  setClassAssertionStatus(className,enabled)  throws: 
     func  clearAssertionStatus()  throws: 
   LocalClasses: 
     class  SystemClassLoader
@@ -283,13 +283,13 @@ class  BootClassLoader
       false branch :
 
       return instance
-    func  findClass()  throws:     ClassNotFoundException
+    func  findClass(name)  throws:     ClassNotFoundException
       return Class.classForName(name,false,null)
-    func  findResource()  throws: 
+    func  findResource(name)  throws: 
       return VMClassLoader.getResource(name)
-    func  findResources()  throws:     IOException
+    func  findResources(resName)  throws:     IOException
       return Collections.enumeration(VMClassLoader.getResources(resName))
-    func  getPackage()  throws: 
+    func  getPackage(name)  throws: 
       cond-branch cond:name NE null Land name.isEmpty()
       true branch :
         this
@@ -299,9 +299,9 @@ class  BootClassLoader
       false branch :
 
       return null
-    func  getResource()  throws: 
+    func  getResource(resName)  throws: 
       return findResource(resName)
-    func  loadClass()  throws:     ClassNotFoundException
+    func  loadClass(className,resolve)  throws:     ClassNotFoundException
       var:clazz=findLoadedClass(className)
       cond-branch cond:clazz EQ null
       true branch :
@@ -309,7 +309,7 @@ class  BootClassLoader
       false branch :
 
       return clazz
-    func  getResources()  throws:     IOException
+    func  getResources(resName)  throws:     IOException
       return findResources(resName)
   LocalClasses: 
   LocalInterfaces: 

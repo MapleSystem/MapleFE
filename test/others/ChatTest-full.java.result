@@ -33,7 +33,7 @@ class  ChatTest
       var:barrier2=new CyclicBarrier<CyclicBarrier>
       var:barrier3=new CyclicBarrier<CyclicBarrier>
       var:exceptions=new ArrayList<Exception>
-    func  main()  throws:     Throwable
+    func  main(args)  throws:     Throwable
       testStartStop()
       testPortOpen()
       testAsksForName()
@@ -92,7 +92,7 @@ class  ChatTest
 
       server.shutdown()
 
-    func  assertEqual()  throws: 
+    func  assertEqual(exception,value,expected)  throws: 
       cond-branch cond:expected EQ value
       true branch :
         return 
@@ -124,7 +124,7 @@ class  ChatTest
         exceptions.get(0)
       false branch :
 
-    func  waitForJoin()  throws:     IOException
+    func  waitForJoin(reader,s)  throws:     IOException
       var:joined
       do         joined Assign readAvailableString(reader)
 while (joined NE null Land joined.contains("Welcome " Add s))
@@ -172,9 +172,9 @@ while (joined NE null Land joined.contains("Welcome " Add s))
         exceptions.get(0)
       false branch :
 
-    func  readAvailableString()  throws:     IOException
+    func  readAvailableString(reader)  throws:     IOException
       return readAvailableString(reader,false)
-    func  readAvailableString()  throws:     IOException
+    func  readAvailableString(reader,now)  throws:     IOException
       var:builder=new StringBuilder<StringBuilder>
       var:bytes
       cond-branch cond:now Land reader.ready()
@@ -202,7 +202,7 @@ while bytes EQ 256
           run(socket,reader,writer)
 
 
-        func  run()  throws:     Exception
+        func  run(socket,reader,writer)  throws:     Exception
       LocalClasses: 
       LocalInterfaces: 
     class  FlushingWriter
@@ -213,13 +213,13 @@ while bytes EQ 256
         constructor  FlushingWriter()  throws: 
           this.delegate Assign delegate
       Methods: 
-        func  write()  throws:     IOException
+        func  write(cbuf,off,len)  throws:     IOException
           delegate.write(cbuf,off,len)
         func  flush()  throws:     IOException
           delegate.flush()
         func  close()  throws:     IOException
           delegate.close()
-        func  write()  throws:     IOException
+        func  write(str)  throws:     IOException
           write
           str
           flush()

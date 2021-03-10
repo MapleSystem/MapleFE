@@ -11,11 +11,11 @@ class  Compiler
   Constructors: 
     constructor  Compiler()  throws: 
   Methods: 
-    func  compileClass()  throws: 
+    func  compileClass(classToCompile)  throws: 
       return false
-    func  compileClasses()  throws: 
+    func  compileClasses(nameRoot)  throws: 
       return false
-    func  command()  throws: 
+    func  command(cmd)  throws: 
       return null
     func  enable()  throws: 
     func  disable()  throws: 

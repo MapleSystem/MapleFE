@@ -8,7 +8,7 @@ class  A
   Instance Initializer: 
   Constructors: 
   Methods: 
-    func  foo()  throws: 
+    func  foo(a)  throws: 
       new Cyclic<Cyclic>
   LocalClasses: 
   LocalInterfaces: 
