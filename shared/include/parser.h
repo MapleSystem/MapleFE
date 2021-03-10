@@ -68,12 +68,18 @@ typedef enum {
 
 class AppealNode{
 private:
-  // In theory a tree shouldn't merge. But we do allow merge in the recursion
-  // parsing. mParent is the first level parent. mSecondParents are second level, and
-  // they are used during manipulation at certain phases like connecting instances
-  // of recursion. However, after SortOut, only mParent is valid.
   AppealNode  *mParent;
-  SmallVector<AppealNode*> mSecondParents;
+
+  // We do allow the tree to merge in the recursion parsing.
+  // they are used during manipulation at certain phases like connecting instances
+  // of recursion, if a recursion have multiple cycles with one same leading node.
+  // The leading node will be connected multiple times. See ConnectPrevious().
+  //
+  // However, in sort out, we traverse from parent to child, and these 'secondary'
+  // parents are never used. So, I decided not to have dedicated data structure to
+  // record these 'second' parents.
+  //
+  // SmallVector<AppealNode*> mSecondParents;
 
   unsigned     mStartIndex;       // index of start matching token
   bool         mSorted;           // already sorted out?
@@ -92,9 +98,6 @@ private:
   TreeNode    *mAstTreeNode;      // The AST tree node of this AppealNode.
 
 public:
-  unsigned GetSecondParentsNum() {return mSecondParents.GetNum();}
-  AppealNode* GetSecondParent(unsigned i) {return mSecondParents.ValueAtIndex(i);}
-  void        ClearSecondParents() {mSecondParents.Clear();}
   AppealNode* GetParent()       {return mParent;}
   void        SetParent(AppealNode *n) {mParent = n;}
   void        AddParent(AppealNode *n);

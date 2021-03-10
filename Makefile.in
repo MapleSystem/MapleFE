@@ -1,5 +1,5 @@
 CXX = clang++
-CC = gcc
+CC = clang
 AR = ar rcs
 FLAVOR = gnu
 LD = clang++

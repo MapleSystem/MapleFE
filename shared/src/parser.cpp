@@ -2280,8 +2280,8 @@ bool SuccMatch::IsDone() {
 void AppealNode::AddParent(AppealNode *p) {
   if (!mParent || mParent->IsPseudo())
     mParent = p;
-  else
-    mSecondParents.PushBack(p);
+  //else
+  //  mSecondParents.PushBack(p);
   return;
 }
 
