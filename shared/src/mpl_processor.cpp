@@ -129,6 +129,7 @@ maple::BaseNode *A2M::ProcessIdentifier(StmtExprKind skind, TreeNode *tnode, Blo
   }
 
   AST2MPLMSG("ProcessIdentifier() unknown identifier", name);
+  // create a dummy var with name and mDefaultType
   symbol = mMirBuilder->GetOrCreateLocalDecl(name, *mDefaultType);
   return mMirBuilder->CreateExprDread(symbol);
 }
@@ -174,9 +175,18 @@ maple::BaseNode *A2M::ProcessField(StmtExprKind skind, TreeNode *tnode, BlockNod
   mFieldData->ResetStrIdx(stridx);
   maple::uint32 fid = 0;
   bool status = mMirBuilder->TraverseToNamedField((maple::MIRStructType*)ctype, fid, mFieldData);
+  maple::MIRType *ftype = maple::GlobalTables::GetTypeTable().GetTypeFromTyIdx(mFieldData->GetTyIdx());
   if (status) {
-    maple::MIRType *ftype = maple::GlobalTables::GetTypeTable().GetTypeFromTyIdx(mFieldData->GetTyIdx());
     bn = new maple::IreadNode(maple::OP_iread, ftype->GetPrimType(), cptyidx, fid, dr);
+  } else {
+    NOTYETIMPL("ProcessField() can not find field");
+    // insert a dummy field with fname and mDefaultType
+    const maple::FieldAttrs attr;
+    maple::TyIdxFieldAttrPair P0(mDefaultType->GetTypeIndex(), attr);
+    maple::FieldPair P1(stridx, P0);
+    maple::MIRStructType *stype = static_cast<maple::MIRStructType *>(ctype);
+    stype->GetFields().push_back(P1);
+    bn = new maple::IreadNode(maple::OP_iread, maple::PTY_begin, cptyidx, 888, dr);
   }
   return bn;
 }
