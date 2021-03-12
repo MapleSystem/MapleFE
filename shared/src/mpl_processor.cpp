@@ -476,6 +476,9 @@ maple::BaseNode *A2M::ProcessFuncDecl(StmtExprKind skind, TreeNode *tnode, Block
   // init function fields
   func->SetBody(func->GetCodeMemPool()->New<maple::BlockNode>());
   func->AllocSymTab();
+  if (ast_func->IsConstructor()) {
+    func->SetAttr(maple::FUNCATTR_constructor);
+  }
 
   mMirModule->AddFunction(func);
   mMirModule->SetCurFunction(func);
