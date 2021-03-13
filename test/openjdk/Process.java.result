@@ -1,0 +1,47 @@
+Matched 5 tokens.
+Matched 12 tokens.
+Matched 21 tokens.
+Matched 223 tokens.
+============= Module ===========
+== Sub Tree ==
+package java.lang
+== Sub Tree ==
+import java.io
+== Sub Tree ==
+import java.util.concurrent.TimeUnit
+== Sub Tree ==
+class  Process
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+    func  getOutputStream()  throws: 
+    func  getInputStream()  throws: 
+    func  getErrorStream()  throws: 
+    func  waitFor()  throws:     InterruptedException
+    func  waitFor(timeout,unit)  throws:     InterruptedException
+      var:startTime=System.nanoTime()
+      var:rem=unit.toNanos(timeout)
+      do 
+        rem Assign unit.toNanos(timeout) Sub (System.nanoTime() Sub startTime)
+while rem GT 0
+      return false
+    func  exitValue()  throws: 
+    func  destroy()  throws: 
+    func  destroyForcibly()  throws: 
+      destroy()
+      return this
+    func  isAlive()  throws: 
+      exitValue()
+      return false
+
+      IllegalThreadStateException
+      e
+      return true
+
+  LocalClasses: 
+  LocalInterfaces: 
+
+Identifier:IllegalThreadStateException has no decl.
+Identifier:e has no decl.
