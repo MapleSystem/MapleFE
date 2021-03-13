@@ -50,8 +50,8 @@ tt:
 	@echo "\n======================== tt.mpl ========================"
 	@cat tt.mpl
 	@echo "========================================================\n"
-	../../mapleall/bin/aarch64-clang-debug/irbuild tt.mpl
-	../../mapleall/bin/aarch64-clang-debug/irbuild tt.irb.mpl
+	$(MAPLEALL_ROOT)/output/aarch64-clang-debug/bin/irbuild tt.mpl
+	$(MAPLEALL_ROOT)/output/aarch64-clang-debug/bin/irbuild tt.irb.mpl
 	diff -uwb tt.irb.mpl tt.irb.irb.mpl
 
 dbg:
@@ -68,8 +68,8 @@ test:
 	@echo "\n======================= $@.mpl ========================="
 	@cat $(build)/$@.mpl
 	@echo "========================================================\n"
-	../../mapleall/bin/aarch64-clang-debug/irbuild $(build)/$@.mpl
-	../../mapleall/bin/aarch64-clang-debug/irbuild $(build)/$@.irb.mpl
+	$(MAPLEALL_ROOT)/output/aarch64-clang-debug/bin/irbuild $(build)/$@.mpl
+	$(MAPLEALL_ROOT)/output/aarch64-clang-debug/bin/irbuild $(build)/$@.irb.mpl
 	diff -uwb $(build)/$@.irb.mpl $(build)/$@.irb.irb.mpl
 	@echo gdb --args ../output/java/java2mpl $(build)/$@.java --trace-a2m
 
