@@ -2306,17 +2306,6 @@ void AppealNode::CopyMatch(AppealNode *another) {
     mResult = another->mResult;
 }
 
-// return true if 'parent' is a parent of this.
-bool AppealNode::DescendantOf(AppealNode *parent) {
-  AppealNode *node = mParent;
-  while (node) {
-    if (node == parent)
-      return true;
-    node = node->mParent;
-  }
-  return false;
-}
-
 // Returns true, if both nodes are successful and match the same tokens
 // with the same rule table
 bool AppealNode::SuccEqualTo(AppealNode *other) {

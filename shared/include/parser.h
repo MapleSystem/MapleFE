@@ -200,9 +200,6 @@ public:
   Token*     GetToken() { return mData.mToken; }
 
   bool SuccEqualTo(AppealNode*);
-
-  // If 'this' is a descendant of 'p'.
-  bool DescendantOf(AppealNode *p);
 };
 
 class RecursionTraversal;
