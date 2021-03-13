@@ -281,7 +281,6 @@ bool RecursionTraversal::FindRestInstance() {
   AppealNode *lead = new AppealNode();
   lead->SetStartIndex(mStartToken);
   lead->SetTable(mRuleTable);
-  mParser->mAppealNodes.push_back(lead);
 
   AddLeadNode(lead);
   AddVisitedLeadNode(mRuleTable);
