@@ -186,6 +186,7 @@ const char* StringToValue::StringToString(std::string &str) {
     if ((c == '\\') && (i < str.size() - 1)) {
       char c_next = str[i+1];
       char c_target = 0;
+      char c_target_next = 0;
       if (c_next == 'n')
         c_target = '\n';
       else if (c_next == '\\')
@@ -194,6 +195,11 @@ const char* StringToValue::StringToString(std::string &str) {
         c_target = '\'';
       else if (c_next == '\"')
         c_target = '\"';
+      else if (c_next == 'u') {
+        // Unicode character is preserved the same format.
+        c_target = '\\';
+        c_target_next = 'u';
+      }
       else if (c_next == 'b')
         c_target = '\b';
       else if (c_next == 'f')
@@ -203,6 +209,8 @@ const char* StringToValue::StringToString(std::string &str) {
 
       if (c_target) {
         target += c_target;
+        if (c_target_next)
+          target += c_target_next;
         i++;
       }
     } else {
