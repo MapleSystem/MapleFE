@@ -186,7 +186,7 @@ maple::BaseNode *A2M::ProcessField(StmtExprKind skind, TreeNode *tnode, BlockNod
     maple::FieldPair P1(stridx, P0);
     maple::MIRStructType *stype = static_cast<maple::MIRStructType *>(ctype);
     stype->GetFields().push_back(P1);
-    bn = new maple::IreadNode(maple::OP_iread, maple::PTY_begin, cptyidx, 888, dr);
+    bn = new maple::IreadNode(maple::OP_iread, maple::PTY_begin, cptyidx, fid+1, dr);
   }
   return bn;
 }

@@ -435,7 +435,7 @@ maple::MIRFunction *A2M::SearchFunc(const char *name, const maple::MapleVector<m
       // TODO: allow compatible types
       maple::MIRType *type = maple::GlobalTables::GetTypeTable().GetTypeFromTyIdx(it->GetFormalDefAt(i).formalTyIdx);
       if (type->GetPrimType() != args[i]->GetPrimType()) {
-        matched = false;
+        // matched = false;
         break;
       }
     }

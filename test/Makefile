@@ -48,7 +48,7 @@ rebuild:
 tt:
 	../output/java/java2mpl tt.java --trace-a2m
 	@echo "\n======================== tt.mpl ========================"
-	@cat tt.mpl
+	@cat -n tt.mpl
 	@echo "========================================================\n"
 	$(MAPLEALL_ROOT)/output/aarch64-clang-debug/bin/irbuild tt.mpl
 	$(MAPLEALL_ROOT)/output/aarch64-clang-debug/bin/irbuild tt.irb.mpl
@@ -65,8 +65,9 @@ test:
 	@cp $< $(build)
 	@echo gdb --args ../output/java/java2mpl $(build)/$@.java --trace-a2m
 	../output/java/java2mpl $(build)/$@.java --trace-a2m
+	@cat -n $(build)/$@.java
 	@echo "\n======================= $@.mpl ========================="
-	@cat $(build)/$@.mpl
+	@cat -n $(build)/$@.mpl
 	@echo "========================================================\n"
 	$(MAPLEALL_ROOT)/output/aarch64-clang-debug/bin/irbuild $(build)/$@.mpl
 	$(MAPLEALL_ROOT)/output/aarch64-clang-debug/bin/irbuild $(build)/$@.irb.mpl

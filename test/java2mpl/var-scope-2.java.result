@@ -1,0 +1,27 @@
+Matched 82 tokens.
+============= Module ===========
+== Sub Tree ==
+class  A
+  Fields: 
+    a
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+    func  foo(x)  throws: 
+      a Assign x
+      cond-branch cond:a EQ 1
+      true branch :
+        var:a=2
+
+      false branch :
+
+      var:a=4
+      a Assign x Add this.a
+      var:a=6
+      x Assign a
+
+      a Assign x Add this.a
+      return a Add 4
+  LocalClasses: 
+  LocalInterfaces: 
+
