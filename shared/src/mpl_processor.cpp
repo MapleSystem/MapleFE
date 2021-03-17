@@ -25,19 +25,19 @@ maple::BaseNode *A2M::ProcessNodeDecl(StmtExprKind skind, TreeNode *tnode, Block
   maple::BaseNode *mpl_node = nullptr;
   switch (tnode->GetKind()) {
     case NK_Class: {
-      mpl_node =ProcessClassDecl(SK_Stmt, tnode, nullptr);
+      mpl_node =ProcessClassDecl(SK_Stmt, tnode, block);
       break;
     }
     case NK_Interface: {
-      mpl_node = ProcessInterfaceDecl(SK_Stmt, tnode, nullptr);
+      mpl_node = ProcessInterfaceDecl(SK_Stmt, tnode, block);
       break;
     }
     case NK_Function: {
-      mpl_node = ProcessFuncDecl(SK_Stmt, tnode, nullptr);
+      mpl_node = ProcessFuncDecl(SK_Stmt, tnode, block);
       break;
     }
     case NK_Block: {
-      mpl_node = ProcessBlockDecl(SK_Stmt, tnode, nullptr);
+      mpl_node = ProcessBlockDecl(SK_Stmt, tnode, block);
       break;
     }
     default: {
@@ -417,20 +417,25 @@ maple::BaseNode *A2M::ProcessLambda(StmtExprKind skind, TreeNode *tnode, BlockNo
 
 maple::BaseNode *A2M::ProcessBlockDecl(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
   BlockNode *ast_block = static_cast<BlockNode *>(tnode);
-  maple::BlockNode *blk = mBlockNodeMap[block];
   for (int i = 0; i < ast_block->GetChildrenNum(); i++) {
     TreeNode *child = ast_block->GetChildAtIndex(i);
-    maple::BaseNode *stmt = ProcessNodeDecl(skind, child, block);
+    maple::BaseNode *stmt = ProcessNodeDecl(skind, child, ast_block);
   }
   return nullptr;
 }
 
 maple::BaseNode *A2M::ProcessBlock(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
   BlockNode *ast_block = static_cast<BlockNode *>(tnode);
-  maple::BlockNode *blk = mBlockNodeMap[block];
+  if (block) {
+    // promote statements to parent
+    mBlockNodeMap[ast_block] = mBlockNodeMap[block];
+  } else {
+    mBlockNodeMap[ast_block] = new maple::BlockNode();
+  }
+  maple::BlockNode *blk = mBlockNodeMap[ast_block];
   for (int i = 0; i < ast_block->GetChildrenNum(); i++) {
     TreeNode *child = ast_block->GetChildAtIndex(i);
-    maple::BaseNode *stmt = ProcessNode(skind, child, block);
+    maple::BaseNode *stmt = ProcessNode(skind, child, ast_block);
     if (stmt) {
       blk->AddStatement((maple::StmtNode*)stmt);
       if (mTraceA2m) stmt->Dump(0);
@@ -474,7 +479,8 @@ maple::BaseNode *A2M::ProcessFuncDecl(StmtExprKind skind, TreeNode *tnode, Block
   maple::MIRFunction *func = mMirBuilder->GetOrCreateFunction(name, rettype->GetTypeIndex());
 
   // init function fields
-  func->SetBody(func->GetCodeMemPool()->New<maple::BlockNode>());
+  maple::BlockNode *funcbody = func->GetCodeMemPool()->New<maple::BlockNode>();
+  func->SetBody(funcbody);
   func->AllocSymTab();
   if (ast_func->IsConstructor()) {
     func->SetAttr(maple::FUNCATTR_constructor);
@@ -547,11 +553,10 @@ maple::BaseNode *A2M::ProcessFuncDecl(StmtExprKind skind, TreeNode *tnode, Block
     stype->GetMethods().push_back(P1);
   }
 
-  if (ast_func->GetBody()) {
-    BlockNode *ast_block = static_cast<BlockNode *>(ast_func->GetBody());
-    for (int i = 0; i < ast_block->GetChildrenNum(); i++) {
-      TreeNode *child = ast_block->GetChildAtIndex(i);
-      maple::BaseNode *stmt = ProcessNodeDecl(skind, child, block);
+  if (ast_body) {
+    for (int i = 0; i < ast_body->GetChildrenNum(); i++) {
+      TreeNode *child = ast_body->GetChildAtIndex(i);
+      maple::BaseNode *stmt = ProcessNodeDecl(skind, child, ast_body);
     }
   }
 

@@ -19,18 +19,18 @@ class A {
   int foo(int x) {
     a = x;            // field a
     if (a == 1) {
-      int a = 2;      // local variable a #1
+      int a = 2;      // local variable a
       a = x + this.a;
       return a + 2;
     }
 
-    int a = 4;        // local variable a #2
+    int a = 4;        // local variable a|1
     a = x + this.a;
     {
-      int a = 6;
+      int a = 6;      // local variable a|2
       x = a;
     }
-    a = x + this.a;
+    a += x;           // local variable a|1
     return a + 4;
   }
 }

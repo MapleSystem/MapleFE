@@ -1,4 +1,4 @@
-Matched 82 tokens.
+Matched 78 tokens.
 ============= Module ===========
 == Sub Tree ==
 class  A
@@ -20,7 +20,7 @@ class  A
       var:a=6
       x Assign a
 
-      a Assign x Add this.a
+      a AddAssign x
       return a Add 4
   LocalClasses: 
   LocalInterfaces: 
