@@ -35,9 +35,9 @@ class  Math
     func  acos(a)  throws: 
     func  atan(a)  throws: 
     func  toRadians(angdeg)  throws: 
-      return 
+      return angdeg Div 180 Mul PI
     func  toDegrees(angrad)  throws: 
-      return 
+      return angrad Mul 180 Div PI
     func  exp(a)  throws: 
     func  log(a)  throws: 
     func  log10(a)  throws: 
@@ -114,7 +114,7 @@ class  Math
 
       return r
     func  multiplyExact(x,y)  throws: 
-      var:r=
+      var:r=(long)x Mul (long)y
       cond-branch cond:(int)r NE r
       true branch :
         new ArithmeticException<ArithmeticException>
@@ -122,12 +122,12 @@ class  Math
 
       return (int)r
     func  multiplyExact(x,y)  throws: 
-      var:r=
+      var:r=x Mul y
       var:ax=Math.abs(x)
       var:ay=Math.abs(y)
       cond-branch cond:((ax Bor ay) Zext 31 NE 0)
       true branch :
-        cond-branch cond:((y NE 0) Land ( NE x)) Lor (x EQ Long.MIN_VALUE Land y EQ Sub
+        cond-branch cond:((y NE 0) Land (r Div y NE x)) Lor (x EQ Long.MIN_VALUE Land y EQ Sub
   1)
         true branch :
           new ArithmeticException<ArithmeticException>
@@ -188,8 +188,8 @@ class  Math
 
       return (int)value
     func  floorDiv(x,y)  throws: 
-      var:r=
-      cond-branch cond:(x Bxor y) LT 0 Land ( NE x)
+      var:r=x Div y
+      cond-branch cond:(x Bxor y) LT 0 Land (r Mul y NE x)
       true branch :
                   rDec
 
@@ -197,8 +197,8 @@ class  Math
 
       return r
     func  floorDiv(x,y)  throws: 
-      var:r=
-      cond-branch cond:(x Bxor y) LT 0 Land ( NE x)
+      var:r=x Div y
+      cond-branch cond:(x Bxor y) LT 0 Land (r Mul y NE x)
       true branch :
                   rDec
 
@@ -206,10 +206,10 @@ class  Math
 
       return r
     func  floorMod(x,y)  throws: 
-      var:r=x Sub 
+      var:r=x Sub floorDiv(x,y) Mul y
       return r
     func  floorMod(x,y)  throws: 
-      return x Sub 
+      return x Sub floorDiv(x,y) Mul y
     func  abs(a)  throws: 
       return 
     func  abs(a)  throws: 
@@ -394,7 +394,7 @@ class  Math
       var:MAX_SCALE=FloatConsts.MAX_EXPONENT Add Sub
   FloatConsts.MIN_EXPONENT Add FloatConsts.SIGNIFICAND_WIDTH Add 1
       scaleFactor Assign Math.max(Math.min(scaleFactor,MAX_SCALE) Sub MAX_SCALE)
-      return (float)()
+      return (float)((double)f Mul powerOfTwoD(scaleFactor))
     func  powerOfTwoD(n)  throws: 
       assert (n GE DoubleConsts.MIN_EXPONENT Land n LE DoubleConsts.MAX_EXPONENT) : 
       return Double.longBitsToDouble((((long)n Add (long)DoubleConsts.EXP_BIAS) Shl (DoubleConsts.SIGNIFICAND_WIDTH Sub 1)) Band DoubleConsts.EXP_BIT_MASK)

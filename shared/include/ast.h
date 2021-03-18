@@ -112,10 +112,13 @@ public:
 
 class PackageNode : public TreeNode {
 private:
+  TreeNode *mPackage;
 public:
   PackageNode(){mKind = NK_Package;}
   PackageNode(const char *s) {mKind = NK_Package; mName = s;}
   ~PackageNode() {}
+
+  void SetPackage(TreeNode *t) {mPackage = t;}
 
   void SetName(const char *s) {mName = s;}
   void Dump(unsigned indent);
@@ -144,9 +147,13 @@ enum ImportProperty {
 class ImportNode : public TreeNode {
 private:
   unsigned    mProperty;
+  TreeNode   *mTarget;    // the imported target
 public:
   ImportNode() {mName = NULL; mProperty = 0; mKind = NK_Import;}
   ~ImportNode(){}
+
+  void SetTarget(TreeNode *t) {mTarget = t;}
+  TreeNode* GetTarget() {return mTarget;}
 
   void SetName(const char *s) {mName = s;}
   const char* GetName() {return mName;}
@@ -466,8 +473,6 @@ public:
   FieldNode() : TreeNode(), mField(NULL), mUpper(NULL) {mKind = NK_Field;}
   ~FieldNode(){}
 
-  void Init();
-
   IdentifierNode* GetField() {return mField;}
   void SetField(IdentifierNode *f) {mField = f;}
 
@@ -540,7 +545,7 @@ private:
 
 public:
   LiteralNode(LitData d) : mData(d) {
-    mKind = NK_Literal; InitName();
+    mKind = NK_Literal;
   }
   ~LiteralNode(){}
 

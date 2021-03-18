@@ -7,7 +7,7 @@ package java.lang
 class  Byte
   Fields: 
     MIN_VALUE=Sub
-  128    MAX_VALUE=127    TYPE=()    value    SIZE=8    BYTES=    serialVersionUID=Sub
+  128    MAX_VALUE=127    TYPE=()byte.getComponentType()    value    SIZE=8    BYTES=SIZE Div Byte.SIZE    serialVersionUID=Sub
   296684260    DIGITS=    UPPER_CASE_DIGITS=
   Instance Initializer: 
   Constructors: 
@@ -64,7 +64,7 @@ class  Byte
     func  equals(obj)  throws: 
       cond-branch cond:
       true branch :
-        return value EQ ((Byte)obj)byteValue
+        return value EQ (Byte)obj.byteValue()
       false branch :
 
       return false

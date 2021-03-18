@@ -12,7 +12,7 @@ class  Test
       System.out.println("(int)12.5f==" Add i)
       var:f=i
       System.out.print(f)
-      f Assign 
+      f Assign f Mul i
       var:d=Math.sin(f)
   LocalClasses: 
   LocalInterfaces: 

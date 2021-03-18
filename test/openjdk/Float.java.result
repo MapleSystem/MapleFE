@@ -15,8 +15,9 @@ import sun.misc.DoubleConsts
 == Sub Tree ==
 class  Float
   Fields: 
-    POSITIVE_INFINITY=    NEGATIVE_INFINITY=    NaN=    MAX_VALUE=3.40282e+38    MIN_NORMAL=1.17549e-38    MIN_VALUE=1.4013e-45    MAX_EXPONENT=127    MIN_EXPONENT=Sub
-  126    SIZE=32    BYTES=    TYPE=()    value    serialVersionUID=Sub
+    POSITIVE_INFINITY=1 Div 0    NEGATIVE_INFINITY=Sub
+  1 Div 0    NaN=0 Div 0    MAX_VALUE=3.40282e+38    MIN_NORMAL=1.17549e-38    MIN_VALUE=1.4013e-45    MAX_EXPONENT=127    MIN_EXPONENT=Sub
+  126    SIZE=32    BYTES=SIZE Div Byte.SIZE    TYPE=()float.getComponentType()    value    serialVersionUID=Sub
   616763156
   Instance Initializer: 
   Constructors: 

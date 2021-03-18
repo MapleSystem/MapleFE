@@ -318,7 +318,7 @@ void TreeNode::DumpIndentation(unsigned ind) {
 void PackageNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   DUMP0_NORETURN("package ");
-  DUMP0_NORETURN(mName);
+  mPackage->Dump(0);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -330,7 +330,7 @@ void ImportNode::Dump(unsigned indent) {
   DUMP0_NORETURN("import ");
   if (IsImportStatic())
     DUMP0_NORETURN("static ");
-  DUMP0_NORETURN(mName);
+  mTarget->Dump(0);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -441,17 +441,11 @@ void UnaOperatorNode::Dump(unsigned indent) {
 //                           FieldNode
 //////////////////////////////////////////////////////////////////////////////////////
 
-// Right now it's major work is to init the name
-void FieldNode::Init() {
-  std::string name = mUpper->GetName();
-  name += '.';
-  name += mField->GetName();
-  mName = gStringPool.FindString(name);
-}
-
 void FieldNode::Dump(unsigned indent) {
   DumpIndentation(indent);
-  DUMP0_NORETURN(mName);
+  mUpper->Dump(0);
+  DUMP0_NORETURN('.');
+  mField->Dump(0);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -483,22 +477,13 @@ void NewNode::Dump(unsigned indent) {
 //                          CallNode
 //////////////////////////////////////////////////////////////////////////////////////
 
-void CallNode::Init() {
-  // Init the mName;
-  if (mMethod->IsIdentifier() || mMethod->IsField()) {
-    mName = mMethod->GetName();
-  } else {
-    MASSERT(0 && "Unsupported method type in CallNode");
-  }
-}
-
 void CallNode::AddArg(TreeNode *arg) {
   mArgs.Merge(arg);
 }
 
 void CallNode::Dump(unsigned indent) {
   DumpIndentation(indent);
-  DUMP0_NORETURN(mName);
+  mMethod->Dump(0);
   DUMP0_NORETURN("(");
   mArgs.Dump(0);
   DUMP0_NORETURN(")");
@@ -678,6 +663,9 @@ void LiteralNode::Dump(unsigned indent) {
     break;
   case LT_ThisLiteral:
     DUMP0_NORETURN("this");
+    break;
+  case LT_SuperLiteral:
+    DUMP0_NORETURN("super");
     break;
   case LT_NA:
   default:

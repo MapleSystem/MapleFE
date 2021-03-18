@@ -75,10 +75,17 @@ TreeNode* ASTBuilder::CreateTokenTreeNode(const Token *token) {
       mLastTreeNode = type;
       return type;
     }
-    // We define special literal tree node for 'this'.
+    // We define special literal tree node for 'this', 'super'.
     if ((strlen(token->GetName()) == 4) && !strncmp(token->GetName(), "this", 4)) {
       LitData data;
       data.mType = LT_ThisLiteral;
+      LiteralNode *n = (LiteralNode*)mTreePool->NewTreeNode(sizeof(LiteralNode));
+      new (n) LiteralNode(data);
+      mLastTreeNode = n;
+      return n;
+    } else if ((strlen(token->GetName()) == 5) && !strncmp(token->GetName(), "super", 5)) {
+      LitData data;
+      data.mType = LT_SuperLiteral;
       LiteralNode *n = (LiteralNode*)mTreePool->NewTreeNode(sizeof(LiteralNode));
       new (n) LiteralNode(data);
       mLastTreeNode = n;
@@ -146,8 +153,7 @@ TreeNode* ASTBuilder::BuildPackageName() {
 
   PackageNode *n = (PackageNode*)mTreePool->NewTreeNode(sizeof(PackageNode));
   new (n) PackageNode();
-  const char *name = mLastTreeNode->GetName();
-  n->SetName(name);
+  n->SetPackage(mLastTreeNode);
 
   gModule.SetPackage(n);
 
@@ -167,7 +173,7 @@ TreeNode* ASTBuilder::BuildSingleTypeImport() {
   TreeNode *tree = p.mData.mTreeNode;
   MASSERT(tree->IsIdentifier() || tree->IsField());
 
-  n->SetName(tree->GetName());
+  n->SetTarget(tree);
   mLastTreeNode = n;
   return mLastTreeNode;
 }
@@ -184,7 +190,7 @@ TreeNode* ASTBuilder::BuildAllTypeImport() {
   TreeNode *tree = p.mData.mTreeNode;
   MASSERT(tree->IsIdentifier() || tree->IsField());
 
-  n->SetName(tree->GetName());
+  n->SetTarget(tree);
   mLastTreeNode = n;
   return mLastTreeNode;
 }
@@ -197,7 +203,7 @@ TreeNode* ASTBuilder::BuildSingleStaticImport() {
   n->SetImportType();
 
   MASSERT(mLastTreeNode->IsIdentifier() || mLastTreeNode->IsField());
-  n->SetName(mLastTreeNode->GetName());
+  n->SetTarget(mLastTreeNode);
   n->SetImportStatic();
   mLastTreeNode = n;
   return mLastTreeNode;
@@ -801,7 +807,6 @@ TreeNode* ASTBuilder::BuildField() {
       new (field) FieldNode();
       field->SetUpper(upper);
       field->SetField((IdentifierNode*)child);
-      field->Init();
 
       upper = field;
     }
@@ -811,7 +816,6 @@ TreeNode* ASTBuilder::BuildField() {
     new (field) FieldNode();
     field->SetUpper(node_a);
     field->SetField((IdentifierNode*)node_b);
-    field->Init();
   }
 
   mLastTreeNode = field;
@@ -1489,7 +1493,6 @@ TreeNode* ASTBuilder::BuildCall() {
   }
 
   call->SetMethod(method);
-  call->Init();
 
   mLastTreeNode = call;
   return mLastTreeNode;

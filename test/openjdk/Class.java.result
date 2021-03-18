@@ -272,12 +272,12 @@ class  Class
     func  getModifiers()  throws: 
       cond-branch cond:isArray()
       true branch :
-        var:componentModifiers=
+        var:componentModifiers=getComponentType().getModifiers()
 
       false branch :
 
       var:JAVA_FLAGS_MASK=65535
-      var:modifiers=
+      var:modifiers=this.getInnerClassFlags(accessFlags Band JAVA_FLAGS_MASK)
       return modifiers Band JAVA_FLAGS_MASK
     func  getSigners()  throws: 
       return null
@@ -298,13 +298,13 @@ class  Class
       return getEnclosingConstructorNative()
     func  getEnclosingConstructorNative()  throws: 
     func  classNameImpliesTopLevel()  throws: 
-      return 
+      return getName().contains("$")
     func  getDeclaringClass()  throws: 
     func  getEnclosingClass()  throws: 
     func  getSimpleName()  throws: 
       cond-branch cond:isArray()
       true branch :
-        return  Add "[]"
+        return getComponentType().getSimpleName() Add "[]"
       false branch :
 
       cond-branch cond:isAnonymousClass()
@@ -338,7 +338,7 @@ class  Class
     func  getCanonicalName()  throws: 
       cond-branch cond:isArray()
       true branch :
-        var:canonicalName=
+        var:canonicalName=getComponentType().getCanonicalName()
         cond-branch cond:canonicalName NE null
         true branch :
           return canonicalName Add "[]"
@@ -393,7 +393,7 @@ class  Class
       cond-branch cond:iftable NE null
       true branch :
         for ( )
-          Collections.addAll(result,((Class))getPublicDeclaredFields)
+          Collections.addAll(result,(Class).getPublicDeclaredFields())
 
       false branch :
 
@@ -574,7 +574,7 @@ class  Class
     func  getInnerClassName()  throws: 
     func  getInnerClassFlags(defaultValue)  throws: 
     func  isEnum()  throws: 
-      return ( Band ENUM) NE 0 Land  EQ java.lang.Enum
+      return (this.getModifiers() Band ENUM) NE 0 Land this.getSuperclass() EQ java.lang.Enum
     func  getEnumConstants()  throws: 
       var:values=getEnumConstantsShared()
       return 
@@ -593,7 +593,7 @@ class  Class
 
       return (T)obj
     func  cannotCastMsg(obj)  throws: 
-      return "Cannot cast " Add  Add " to " Add getName()
+      return "Cannot cast " Add obj.getClass().getName() Add " to " Add getName()
     func  asSubclass(clazz)  throws: 
       cond-branch cond:clazz.isAssignableFrom(this)
       true branch :

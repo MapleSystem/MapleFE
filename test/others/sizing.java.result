@@ -21,9 +21,9 @@ class  Sizing
   Methods: 
     func  main(args)  throws: 
       var:ba=
-      System.out.println(ClassLayout.parseInstance(ba),toPrintable)
+      System.out.println(ClassLayout.parseInstance(ba).toPrintable())
       var:bitSet=new BitSet<BitSet>
-      System.out.println(GraphLayout.parseInstance(bitSet),toPrintable)
+      System.out.println(GraphLayout.parseInstance(bitSet).toPrintable())
   LocalClasses: 
   LocalInterfaces: 
 

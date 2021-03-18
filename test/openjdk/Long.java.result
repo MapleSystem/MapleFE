@@ -12,7 +12,7 @@ import java.math
 == Sub Tree ==
 class  Long
   Fields: 
-    MIN_VALUE=0    MAX_VALUE=-1    TYPE=()    value    SIZE=64    BYTES=    serialVersionUID=-863034401
+    MIN_VALUE=0    MAX_VALUE=-1    TYPE=()long.getComponentType()    value    SIZE=64    BYTES=SIZE Div Byte.SIZE    serialVersionUID=-863034401
   Instance Initializer: 
   Constructors: 
     constructor  Long(value)  throws: 
@@ -42,7 +42,7 @@ class  Long
 
       while i LE Sub
   radix         Assign 
-        i Assign 
+        i Assign i Div radix
 
        Assign 
       cond-branch cond:negative
@@ -75,7 +75,7 @@ class  Long
       return toUnsignedString0(i,1)
     func  toUnsignedString0(val,shift)  throws: 
       var:mag=Long.SIZE Sub Long.numberOfLeadingZeros(val)
-      var:chars=Math.max(((mag Add (shift Sub 1))shift)1)
+      var:chars=Math.max(((mag Add (shift Sub 1)) Div shift)1)
       var:buf=
       formatUnsignedLong(val,shift,buf,0,chars)
       return new String<String>
@@ -111,16 +111,16 @@ while val NE 0 Land charPos GT 0
   i
       false branch :
 
-      while i GT Integer.MAX_VALUE        q Assign 
+      while i GT Integer.MAX_VALUE        q Assign i Div 100
 
 
       var:q2
       var:i2=(int)i
-      while i2 GE 65536        q2 Assign 
+      while i2 GE 65536        q2 Assign i2 Div 100
 
 
       for ( )
-        q2 Assign () Zext (16 Add 3)
+        q2 Assign (i2 Mul 52429) Zext (16 Add 3)
 
 
       cond-branch cond:sign NE 0
@@ -136,7 +136,7 @@ while val NE 0 Land charPos GT 0
           return i
         false branch :
 
-        p Assign 
+        p Assign 10 Mul p
 
       return 19
     func  parseLong(s,radix)  throws:     NumberFormatException
@@ -283,7 +283,7 @@ while val NE 0 Land charPos GT 0
     func  equals(obj)  throws: 
       cond-branch cond:
       true branch :
-        return value EQ ((Long)obj)longValue
+        return value EQ (Long)obj.longValue()
       false branch :
 
       return false
@@ -319,20 +319,20 @@ while val NE 0 Land charPos GT 0
 
       cond-branch cond:dividend GT 0
       true branch :
-        return 
+        return dividend Div divisor
       false branch :
-        return 
+        return toUnsignedBigInteger(dividend).divide(toUnsignedBigInteger(divisor)).longValue()
 
     func  remainderUnsigned(dividend,divisor)  throws: 
       cond-branch cond:dividend GT 0 Land divisor GT 0
       true branch :
-        return 
+        return dividend Mod divisor
       false branch :
         cond-branch cond:compareUnsigned(dividend,divisor) LT 0
         true branch :
           return dividend
         false branch :
-          return 
+          return toUnsignedBigInteger(dividend).remainder(toUnsignedBigInteger(divisor)).longValue()
 
 
     func  highestOneBit(i)  throws: 

@@ -49,7 +49,7 @@ class  Enum
     func  equals(other)  throws: 
       return this EQ other
     func  hashCode()  throws: 
-      return hashCode
+      return super.hashCode()
     func  clone()  throws:     CloneNotSupportedException
       new CloneNotSupportedException<CloneNotSupportedException>
     func  compareTo(o)  throws: 

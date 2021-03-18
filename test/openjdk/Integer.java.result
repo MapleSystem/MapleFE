@@ -11,7 +11,7 @@ import java.lang.annotation.Native
 == Sub Tree ==
 class  Integer
   Fields: 
-    MIN_VALUE=-2147483648    MAX_VALUE=2147483647    TYPE=()    digits=    SMALL_NEG_VALUES=    SMALL_NONNEG_VALUES=    DigitTens=    DigitOnes=    sizeTable=    value    SIZE=32    BYTES=    serialVersionUID=-142506184
+    MIN_VALUE=-2147483648    MAX_VALUE=2147483647    TYPE=()int.getComponentType()    digits=    SMALL_NEG_VALUES=    SMALL_NONNEG_VALUES=    DigitTens=    DigitOnes=    sizeTable=    value    SIZE=32    BYTES=SIZE Div Byte.SIZE    serialVersionUID=-142506184
   Instance Initializer: 
   Constructors: 
     constructor  Integer(value)  throws: 
@@ -40,8 +40,8 @@ class  Integer
       false branch :
 
       while i LE Sub
-  radix         Assign digits Sub ()
-        i Assign 
+  radix         Assign digits Sub (i Mod radix)
+        i Assign i Div radix
 
        Assign digits Sub i
       cond-branch cond:negative
@@ -60,7 +60,7 @@ class  Integer
       return toUnsignedString0(i,1)
     func  toUnsignedString0(val,shift)  throws: 
       var:mag=Integer.SIZE Sub Integer.numberOfLeadingZeros(val)
-      var:chars=Math.max(((mag Add (shift Sub 1))shift)1)
+      var:chars=Math.max(((mag Add (shift Sub 1)) Div shift)1)
       var:buf=
       formatUnsignedInt(val,shift,buf,0,chars)
       return new String<String>
@@ -103,11 +103,11 @@ while val NE 0 Land charPos GT 0
   i
       false branch :
 
-      while i GE 65536        q Assign 
+      while i GE 65536        q Assign i Div 100
 
 
       for ( )
-        q Assign () Zext (16 Add 3)
+        q Assign (i Mul 52429) Zext (16 Add 3)
 
 
       cond-branch cond:sign NE 0
@@ -220,7 +220,7 @@ while val NE 0 Land charPos GT 0
     func  equals(obj)  throws: 
       cond-branch cond:
       true branch :
-        return value EQ ((Integer)obj)intValue
+        return value EQ (Integer)obj.intValue()
       false branch :
 
       return false
@@ -302,9 +302,9 @@ while val NE 0 Land charPos GT 0
     func  toUnsignedLong(x)  throws: 
       return ((long)x) Band -1
     func  divideUnsigned(dividend,divisor)  throws: 
-      return (int)()
+      return (int)(toUnsignedLong(dividend) Div toUnsignedLong(divisor))
     func  remainderUnsigned(dividend,divisor)  throws: 
-      return (int)()
+      return (int)(toUnsignedLong(dividend) Mod toUnsignedLong(divisor))
     func  highestOneBit(i)  throws: 
       i BorAssign (i Shr 1)
       i BorAssign (i Shr 2)

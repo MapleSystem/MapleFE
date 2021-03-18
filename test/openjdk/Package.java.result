@@ -97,7 +97,7 @@ class  Package
       sealBase Assign sealbase
       this.loader Assign loader
     constructor  Package(name,man,url,loader)  throws: 
-      var:path=
+      var:path=name.replace(.,/).concat("/")
       var:sealed=null
       var:specTitle=null
       var:specVersion=null
@@ -124,7 +124,7 @@ class  Package
 
       false branch :
 
-      cond-branch cond:
+      cond-branch cond:"true".equalsIgnoreCase(sealed)
       true branch :
         sealBase Assign url
       false branch :
@@ -219,7 +219,7 @@ class  Package
     func  hashCode()  throws: 
       return pkgName.hashCode()
     func  toString()  throws: 
-      var:targetSdkVersion=
+      var:targetSdkVersion=VMRuntime.getRuntime().getTargetSdkVersion()
       cond-branch cond:targetSdkVersion GT 0 Land targetSdkVersion LE 24
       true branch :
         return "package " Add pkgName
@@ -250,19 +250,19 @@ class  Package
 
       return packageInfo
     func  getAnnotation(annotationClass)  throws: 
-      return 
+      return getPackageInfo().getAnnotation(annotationClass)
     func  isAnnotationPresent(annotationClass)  throws: 
       return 
     func  getAnnotationsByType(annotationClass)  throws: 
-      return 
+      return getPackageInfo().getAnnotationsByType(annotationClass)
     func  getAnnotations()  throws: 
-      return 
+      return getPackageInfo().getAnnotations()
     func  getDeclaredAnnotation(annotationClass)  throws: 
-      return 
+      return getPackageInfo().getDeclaredAnnotation(annotationClass)
     func  getDeclaredAnnotationsByType(annotationClass)  throws: 
-      return 
+      return getPackageInfo().getDeclaredAnnotationsByType(annotationClass)
     func  getDeclaredAnnotations()  throws: 
-      return 
+      return getPackageInfo().getDeclaredAnnotations()
     func  getSystemPackage(name)  throws: 
       pkgs
       var:pkg=pkgs.get(name)
@@ -274,7 +274,7 @@ class  Package
       for ( )
         defineSystemPackage(names,i,getSystemPackage0(names,i))
 
-      return 
+      return pkgs.values().toArray(Package,pkgs.size())
 
     func  defineSystemPackage(iname,fn)  throws: 
       return AccessController.doPrivileged(new PrivilegedAction<Package>)

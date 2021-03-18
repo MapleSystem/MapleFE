@@ -114,6 +114,9 @@ rule MethodInvocation : ONEOF(
   attr.action.%2 : BuildField(%1, %4)
   attr.action.%2 : BuildCall()
   attr.action.%2 : AddArguments(%6)
+  attr.action.%3,%4,%5 : BuildField(%1, %4)
+  attr.action.%3,%4,%5 : BuildCall()
+  attr.action.%3,%4,%5 : AddArguments(%6)
 
 rule ArgumentList : Expression + ZEROORMORE(',' + Expression)
   attr.action.%1: BuildExprList(%1, %2)
@@ -170,6 +173,7 @@ rule MultiplicativeExpression : ONEOF(
   MultiplicativeExpression + '*' + UnaryExpression,
   MultiplicativeExpression + '/' + UnaryExpression,
   MultiplicativeExpression + '%' + UnaryExpression)
+  attr.action.%2,%3,%4 : BuildBinaryOperation(%1, %2, %3)
 
 rule AdditiveExpression : ONEOF(
   MultiplicativeExpression,

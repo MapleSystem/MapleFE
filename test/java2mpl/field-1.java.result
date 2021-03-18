@@ -1,0 +1,15 @@
+Matched 25 tokens.
+============= Module ===========
+== Sub Tree ==
+class  A
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+    func  B()  throws: 
+      c Assign e.getValue().getBytes().length
+  LocalClasses: 
+  LocalInterfaces: 
+
+Identifier:c has no decl.

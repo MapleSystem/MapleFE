@@ -45,7 +45,7 @@ class  ProcessBuilder
       String
       arg
       command
-
+      this.command.add(arg)
   Methods: 
     func  command(command)  throws: 
       cond-branch cond:command EQ null
@@ -60,7 +60,7 @@ class  ProcessBuilder
       String
       arg
       command
-
+      this.command.add(arg)
       return this
     func  command()  throws: 
       return command
@@ -156,7 +156,7 @@ class  ProcessBuilder
 
       var:dir=
       for ( )
-        cond-branch cond: GE 0
+        cond-branch cond:.indexOf(0) GE 0
         true branch :
           new IOException<IOException>
         false branch :
@@ -234,18 +234,18 @@ class  ProcessBuilder
           false branch :
 
           var:r=(Redirect)obj
-          cond-branch cond:r.type() NE 
+          cond-branch cond:r.type() NE this.type()
           true branch :
             return false
           false branch :
 
-          assert  NE null : 
-          return 
+          assert this.file() NE null : 
+          return this.file().equals(r.file())
         func  hashCode()  throws: 
           var:file=file()
           cond-branch cond:file EQ null
           true branch :
-            return hashCode
+            return super.hashCode()
           false branch :
             return file.hashCode()
 

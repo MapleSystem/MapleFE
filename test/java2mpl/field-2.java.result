@@ -1,0 +1,14 @@
+Matched 23 tokens.
+============= Module ===========
+== Sub Tree ==
+class  Sizing
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+    func  main()  throws: 
+      println(parseInstance(bitSet).toPrintable())
+  LocalClasses: 
+  LocalInterfaces: 
+

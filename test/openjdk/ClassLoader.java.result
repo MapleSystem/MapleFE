@@ -250,7 +250,7 @@ class  ClassLoader
       map Assign new HashMap
 
       var:pkgs
-      return 
+      return map.values().toArray(Package,map.size())
     func  findLibrary(libname)  throws: 
       return null
     func  setDefaultAssertionStatus(enabled)  throws: 
@@ -293,7 +293,7 @@ class  BootClassLoader
       cond-branch cond:name NE null Land name.isEmpty()
       true branch :
         this
-        var:pack=
+        var:pack=super.getPackage(name)
 
 
       false branch :

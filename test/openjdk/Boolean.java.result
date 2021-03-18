@@ -6,7 +6,7 @@ package java.lang
 == Sub Tree ==
 class  Boolean
   Fields: 
-    TRUE=new Boolean<Boolean>    FALSE=new Boolean<Boolean>    TYPE=()    value    serialVersionUID=Sub
+    TRUE=new Boolean<Boolean>    FALSE=new Boolean<Boolean>    TYPE=()boolean.getComponentType()    value    serialVersionUID=Sub
   711132434
   Instance Initializer: 
   Constructors: 
@@ -33,7 +33,7 @@ class  Boolean
     func  equals(obj)  throws: 
       cond-branch cond:
       true branch :
-        return value EQ ((Boolean)obj)booleanValue
+        return value EQ (Boolean)obj.booleanValue()
       false branch :
 
       return false
