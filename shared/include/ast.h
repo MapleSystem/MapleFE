@@ -1055,6 +1055,26 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////
+//                  InstanceOf Expression
+// This is first created for Java's instanceof operation. It has the form of
+// left instanceof right.
+////////////////////////////////////////////////////////////////////////////
+
+class InstanceOfNode : public TreeNode {
+private:
+  TreeNode *mLeft;
+  TreeNode *mRight;
+public:
+  InstanceOfNode() {mLeft = NULL; mRight = NULL; mKind = NK_InstanceOf;}
+  ~InstanceOfNode(){Release();}
+
+  void SetLeft(TreeNode *n) {mLeft = n;}
+  void SetRight(TreeNode *n){mRight = n;}
+
+  void Dump(unsigned);
+};
+
+////////////////////////////////////////////////////////////////////////////
 //                  The AST Tree
 ////////////////////////////////////////////////////////////////////////////
 

@@ -89,7 +89,7 @@ class  ProcessEnvironment
         func  toString()  throws: 
           return str
         func  equals(o)  throws: 
-          return  Land arrayEquals(getBytes(),(ExternalData)o.getBytes())
+          return o instanceof ExternalData Land arrayEquals(getBytes(),(ExternalData)o.getBytes())
         func  hashCode()  throws: 
           return arrayHash(getBytes())
       LocalClasses: 
@@ -113,7 +113,7 @@ class  ProcessEnvironment
         func  compareTo(variable)  throws: 
           return arrayCompare(getBytes(),variable.getBytes())
         func  equals(o)  throws: 
-          return  Land super.equals(o)
+          return o instanceof Variable Land super.equals(o)
       LocalClasses: 
       LocalInterfaces: 
     class  Value
@@ -135,7 +135,7 @@ class  ProcessEnvironment
         func  compareTo(value)  throws: 
           return arrayCompare(getBytes(),value.getBytes())
         func  equals(o)  throws: 
-          return  Land super.equals(o)
+          return o instanceof Value Land super.equals(o)
       LocalClasses: 
       LocalInterfaces: 
     class  StringEnvironment
@@ -204,7 +204,7 @@ class  ProcessEnvironment
         func  toString()  throws: 
           return getKey() Add "=" Add getValue()
         func  equals(o)  throws: 
-          return  Land e.equals((StringEntry)o.e)
+          return o instanceof StringEntry Land e.equals((StringEntry)o.e)
         func  hashCode()  throws: 
           return e.hashCode()
       LocalClasses: 
@@ -226,7 +226,7 @@ class  ProcessEnvironment
         func  iterator()  throws: 
           return new Iterator<Map,Entry,String,String>
         func  vvEntry(o)  throws: 
-          cond-branch cond:
+          cond-branch cond:o instanceof StringEntry
           true branch :
             return (StringEntry)o.e
           false branch :
@@ -237,7 +237,7 @@ class  ProcessEnvironment
         func  remove(o)  throws: 
           return s.remove(vvEntry(o))
         func  equals(o)  throws: 
-          return  Land s.equals((StringEntrySet)o.s)
+          return o instanceof StringEntrySet Land s.equals((StringEntrySet)o.s)
         func  hashCode()  throws: 
           return s.hashCode()
       LocalClasses: 
@@ -263,7 +263,7 @@ class  ProcessEnvironment
         func  remove(o)  throws: 
           return c.remove(Value.valueOfQueryOnly(o))
         func  equals(o)  throws: 
-          return  Land c.equals((StringValues)o.c)
+          return o instanceof StringValues Land c.equals((StringValues)o.c)
         func  hashCode()  throws: 
           return c.hashCode()
       LocalClasses: 

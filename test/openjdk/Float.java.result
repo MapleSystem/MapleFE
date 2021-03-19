@@ -73,7 +73,7 @@ class  Float
     func  hashCode(value)  throws: 
       return floatToIntBits(value)
     func  equals(obj)  throws: 
-      return () Land (floatToIntBits((Float)obj.value) EQ floatToIntBits(value))
+      return (obj instanceof Float) Land (floatToIntBits((Float)obj.value) EQ floatToIntBits(value))
     func  floatToIntBits(value)  throws: 
       var:result=floatToRawIntBits(value)
       cond-branch cond:((result Band FloatConsts.EXP_BIT_MASK) EQ FloatConsts.EXP_BIT_MASK) Land (result Band FloatConsts.SIGNIF_BIT_MASK) NE 0

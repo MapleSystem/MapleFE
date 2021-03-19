@@ -95,6 +95,7 @@ public:
   TreeNode* BuildCast();
   TreeNode* BuildParenthesis();
   TreeNode* BuildLambda();
+  TreeNode* BuildInstanceOf();
 
   TreeNode* BuildDecl();
   TreeNode* BuildField();

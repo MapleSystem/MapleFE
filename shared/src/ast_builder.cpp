@@ -1835,4 +1835,32 @@ TreeNode* ASTBuilder::BuildLambda() {
   mLastTreeNode = lambda;
   return mLastTreeNode;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+//                       InstanceOf Expression
+////////////////////////////////////////////////////////////////////////////////
+
+TreeNode* ASTBuilder::BuildInstanceOf() {
+  if (mTrace)
+    std::cout << "In BuildInstanceOf" << std::endl;
+
+  Param l_param = mParams[0];
+  MASSERT(!l_param.mIsEmpty);
+  MASSERT(l_param.mIsTreeNode);
+  TreeNode *left = l_param.mData.mTreeNode;
+
+  Param r_param = mParams[1];
+  MASSERT(!r_param.mIsEmpty);
+  MASSERT(r_param.mIsTreeNode);
+  TreeNode *right = r_param.mData.mTreeNode;
+
+  InstanceOfNode *instanceof = (InstanceOfNode*)mTreePool->NewTreeNode(sizeof(InstanceOfNode));
+  new (instanceof) InstanceOfNode();
+
+  instanceof->SetLeft(left);
+  instanceof->SetRight(right);
+
+  mLastTreeNode = instanceof;
+  return mLastTreeNode;
+}
 }

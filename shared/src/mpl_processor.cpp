@@ -415,6 +415,12 @@ maple::BaseNode *A2M::ProcessLambda(StmtExprKind skind, TreeNode *tnode, BlockNo
   return nullptr;
 }
 
+maple::BaseNode *A2M::ProcessInstanceOf(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
+  NOTYETIMPL("ProcessInstanceOf()");
+  InstanceOfNode *node = static_cast<InstanceOfNode *>(tnode);
+  return nullptr;
+}
+
 maple::BaseNode *A2M::ProcessBlockDecl(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
   BlockNode *ast_block = static_cast<BlockNode *>(tnode);
   for (int i = 0; i < ast_block->GetChildrenNum(); i++) {

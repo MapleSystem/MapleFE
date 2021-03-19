@@ -40,6 +40,7 @@ NODEKIND(UnaOperator)
 NODEKIND(BinOperator)
 NODEKIND(TerOperator)
 NODEKIND(Lambda)
+NODEKIND(InstanceOf)
 
 NODEKIND(Block)
 NODEKIND(Function)

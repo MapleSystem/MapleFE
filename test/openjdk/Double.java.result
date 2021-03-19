@@ -72,7 +72,7 @@ class  Double
       var:bits=doubleToLongBits(value)
       return (int)(bits Bxor (bits Zext 32))
     func  equals(obj)  throws: 
-      return () Land (doubleToLongBits((Double)obj.value) EQ doubleToLongBits(value))
+      return (obj instanceof Double) Land (doubleToLongBits((Double)obj.value) EQ doubleToLongBits(value))
     func  doubleToLongBits(value)  throws: 
       var:result=doubleToRawLongBits(value)
       cond-branch cond:((result Band DoubleConsts.EXP_BIT_MASK) EQ DoubleConsts.EXP_BIT_MASK) Land (result Band DoubleConsts.SIGNIF_BIT_MASK) NE 0

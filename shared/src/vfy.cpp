@@ -421,4 +421,8 @@ void Verifier::VerifyUserType(UserTypeNode *tree){
 void Verifier::VerifyLambda(LambdaNode *tree){
   return;
 }
+
+void Verifier::VerifyInstanceOf(InstanceOfNode *tree){
+  return;
+}
 }

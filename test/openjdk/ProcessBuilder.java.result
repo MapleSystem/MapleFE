@@ -228,7 +228,7 @@ class  ProcessBuilder
             return true
           false branch :
 
-          cond-branch cond:()
+          cond-branch cond:(obj instanceof Redirect)
           true branch :
             return false
           false branch :

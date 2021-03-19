@@ -62,7 +62,7 @@ class  Byte
     func  hashCode(value)  throws: 
       return (int)value
     func  equals(obj)  throws: 
-      cond-branch cond:
+      cond-branch cond:obj instanceof Byte
       true branch :
         return value EQ (Byte)obj.byteValue()
       false branch :

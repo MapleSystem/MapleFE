@@ -46,6 +46,7 @@ ACTION(BuildBinaryOperation)
 ACTION(BuildUnaryOperation)
 ACTION(BuildPostfixOperation)
 ACTION(BuildLambda)
+ACTION(BuildInstanceOf)
 
 // For variable declaration, expression
 ACTION(BuildDecl)

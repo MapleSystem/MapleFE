@@ -32,7 +32,7 @@ class  Object
     func  equals(obj)  throws: 
       return (this EQ obj)
     func  clone()  throws:     CloneNotSupportedException
-      cond-branch cond:()
+      cond-branch cond:(this instanceof Cloneable)
       true branch :
         new CloneNotSupportedException<CloneNotSupportedException>
       false branch :

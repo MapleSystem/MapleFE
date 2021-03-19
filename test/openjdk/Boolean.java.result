@@ -31,7 +31,7 @@ class  Boolean
     func  hashCode(value)  throws: 
       return 
     func  equals(obj)  throws: 
-      cond-branch cond:
+      cond-branch cond:obj instanceof Boolean
       true branch :
         return value EQ (Boolean)obj.booleanValue()
       false branch :

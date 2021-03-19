@@ -42,7 +42,7 @@ class  Character
     func  hashCode(value)  throws: 
       return (int)value
     func  equals(obj)  throws: 
-      cond-branch cond:
+      cond-branch cond:obj instanceof Character
       true branch :
         return value EQ (Character)obj.charValue()
       false branch :

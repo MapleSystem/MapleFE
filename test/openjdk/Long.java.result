@@ -281,7 +281,7 @@ while val NE 0 Land charPos GT 0
     func  hashCode(value)  throws: 
       return (int)(value Bxor (value Zext 32))
     func  equals(obj)  throws: 
-      cond-branch cond:
+      cond-branch cond:obj instanceof Long
       true branch :
         return value EQ (Long)obj.longValue()
       false branch :

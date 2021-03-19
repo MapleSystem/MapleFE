@@ -218,7 +218,7 @@ while val NE 0 Land charPos GT 0
     func  hashCode(value)  throws: 
       return value
     func  equals(obj)  throws: 
-      cond-branch cond:
+      cond-branch cond:obj instanceof Integer
       true branch :
         return value EQ (Integer)obj.intValue()
       false branch :
