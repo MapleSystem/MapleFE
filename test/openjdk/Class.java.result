@@ -257,7 +257,6 @@ class  Class
     func  getInterfacesInternal()  throws: 
     func  getGenericInterfaces()  throws: 
       var:result
-      Caches.genericInterfaces
       result Assign Caches.genericInterfaces.get(this)
       cond-branch cond:result EQ null
       true branch :

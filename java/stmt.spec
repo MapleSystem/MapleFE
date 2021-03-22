@@ -187,6 +187,7 @@ rule ReturnStatement : "return" + ZEROORONE(Expression) + ';'
 rule ThrowStatement : "throw" + Expression + ';'
 
 rule SynchronizedStatement : "synchronized" + '(' + Expression + ')' + Block
+  attr.action : AddSyncToBlock(%3, %5)
 
 rule TryStatement : ONEOF(
   "try" + Block + Catches,

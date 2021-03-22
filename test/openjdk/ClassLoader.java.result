@@ -234,19 +234,16 @@ class  ClassLoader
     func  getSystemClassLoader()  throws: 
       return SystemClassLoader.loader
     func  definePackage(name,specTitle,specVersion,specVendor,implTitle,implVersion,implVendor,sealBase)  throws:     IllegalArgumentException
-      packages
       var:pkg=packages.get(name)
 
 
     func  getPackage(name)  throws: 
       var:pkg
-      packages
       pkg Assign packages.get(name)
 
       return pkg
     func  getPackages()  throws: 
       var:map
-      packages
       map Assign new HashMap
 
       var:pkgs
@@ -292,7 +289,6 @@ class  BootClassLoader
     func  getPackage(name)  throws: 
       cond-branch cond:name NE null Land name.isEmpty()
       true branch :
-        this
         var:pack=super.getPackage(name)
 
 

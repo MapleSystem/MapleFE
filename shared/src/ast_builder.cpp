@@ -786,9 +786,9 @@ TreeNode* ASTBuilder::BuildField() {
   Param p_var_b = mParams[1];
 
   // Both variable should have been created as tree node.
-  if (!p_var_a.mIsTreeNode || !p_var_b.mIsTreeNode) {
-    MERROR("The param in BuildField is not a treenode");
-  }
+  MASSERT(p_var_a.mIsTreeNode
+          && p_var_b.mIsTreeNode
+          && "Both nodes in BuildFiled should be tree node");
 
   // The second param should be an IdentifierNode
   TreeNode *node_a = p_var_a.mIsEmpty ? NULL : p_var_a.mData.mTreeNode;
@@ -1060,6 +1060,29 @@ TreeNode* ASTBuilder::AddToBlock() {
       block->AddChild(subtree);
     }
   }
+
+  // set last tree node
+  mLastTreeNode = block;
+  return mLastTreeNode;
+}
+
+// This takes just two arguments. First is the sync object, second the block
+// It returns the block with sync added.
+TreeNode* ASTBuilder::AddSyncToBlock() {
+  if (mTrace)
+    std::cout << "In AddSyncToBlock" << std::endl;
+
+  Param p_sync = mParams[0];
+  MASSERT(!p_sync.mIsEmpty && p_sync.mIsTreeNode);
+  TreeNode *sync_tree = p_sync.mData.mTreeNode;
+
+  Param p_block = mParams[1];
+  MASSERT(!p_block.mIsEmpty && p_block.mIsTreeNode);
+  TreeNode *b = p_block.mData.mTreeNode;
+  MASSERT(b->IsBlock());
+  BlockNode *block = (BlockNode*)b;
+
+  block->SetSync(sync_tree);
 
   // set last tree node
   mLastTreeNode = block;

@@ -264,13 +264,11 @@ class  Package
     func  getDeclaredAnnotations()  throws: 
       return getPackageInfo().getDeclaredAnnotations()
     func  getSystemPackage(name)  throws: 
-      pkgs
       var:pkg=pkgs.get(name)
 
 
     func  getSystemPackages()  throws: 
       var:names=getSystemPackages0()
-      pkgs
       for ( )
         defineSystemPackage(names,i,getSystemPackage0(names,i))
 

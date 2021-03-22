@@ -341,7 +341,7 @@ rule SingleTypeImportDeclaration: "import" + TypeName + ';'
 rule TypeImportOnDemandDeclaration: "import" + PackageOrTypeName + '.' + '*' + ';'
   attr.action : BuildAllTypeImport(%2)
 rule SingleStaticImportDeclaration: "import" + "static" + TypeName + '.' + Identifier + ';'
-  attr.action : BuildField(%3, %4)
+  attr.action : BuildField(%3, %5)
   attr.action : BuildSingleStaticImport()
 rule StaticImportOnDemandDeclaration: "import" + "static" + TypeName + '.' + '*' + ';'
   attr.action : BuildAllStaticImport(%3)
