@@ -251,9 +251,9 @@ bool RecursionTraversal::FindFirstInstance() {
 
   // Appealing of the mistaken Fail nodes.
   //
-  // This is for appealing those affected by the 1st appearance
-  // of 1st instance which returns false. 1stOf1st is not add to WasFail, but
-  // those affected will be added to WasFail.
+  // This is for appealing those affected by the 2nd appearance
+  // of 2nd instance which returns false. 2ndOf1st is not add to WasFail, but
+  // those affected will be AddFailed().
   //
   // I still keep an assertion in TraverseRuleTablePre() when it has SuccMatch,
   // asserting !WasFail. But I believe there are still WasFail at the same time.

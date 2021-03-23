@@ -815,6 +815,8 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent, Appeal
   // instance hasn't finished its traversal, so there is no previous succ or fail case.
   //
   // We need to simply return false, but we cannot add them to the Fail mapping.
+  // A rule is AddFailed() in TraverseRuleTableRegular() which is in the end of this function.
+
   if (rec_tra &&
       rec_tra->GetInstance() == InstanceFirst &&
       rec_tra->LeadNodeVisited(rule_table)) {

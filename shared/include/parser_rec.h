@@ -82,7 +82,7 @@ private:
   //
   // In each iteration, the first time a LeadNode is visited, it will be saved
   // in this vector. The second time it's visited, it should go to connect
-  // with the node in the previous instance.
+  // with the node in the previous instance or set as Failed2ndOf1st.
   SmallVector<RuleTable*> mVisitedLeadNodes;
 
   // Visited Recursion Node. This is a per-iteration data too.
