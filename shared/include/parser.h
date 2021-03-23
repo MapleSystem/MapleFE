@@ -246,6 +246,7 @@ public:
   void DumpIndentation();
   void DumpEnterTable(const char *tablename, unsigned indent);
   void DumpExitTable(const char *tablename, unsigned indent, AppealNode*);
+  void DumpExitTable(const char *tablename, unsigned indent, AppealStatus, AppealNode *n = NULL);
   void DumpAppeal(RuleTable *table, unsigned token);
   void DumpSuccTokens(AppealNode*);
   void DumpSortOut(AppealNode *root, const char * /*hint*/);

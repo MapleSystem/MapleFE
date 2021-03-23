@@ -515,39 +515,42 @@ void Parser::DumpEnterTable(const char *table_name, unsigned indent) {
 }
 
 void Parser::DumpExitTable(const char *table_name, unsigned indent, AppealNode *appeal) {
+  DumpExitTable(table_name, indent, appeal->mResult, appeal);
+}
+
+void Parser::DumpExitTable(const char *table_name, unsigned indent,
+                           AppealStatus reason, AppealNode *appeal) {
   for (unsigned i = 0; i < indent; i++)
     std::cout << " ";
   std::cout << "Exit  " << table_name << "@" << mCurToken;
-  bool succ = appeal->IsSucc();
-  AppealStatus reason = appeal->mResult;
-  if (succ) {
-    if (reason == SuccWasSucc)
-      std::cout << " succ@WasSucc" << "}";
-    else if (reason == SuccStillWasSucc)
-      std::cout << " succ@StillWasSucc" << "}";
-    else if (reason == Succ)
-      std::cout << " succ" << "}";
-
+  if (reason == SuccWasSucc) {
+    std::cout << " succ@WasSucc" << "}";
     DumpSuccTokens(appeal);
     std::cout << std::endl;
-  } else {
-    if (reason == FailWasFailed)
-      std::cout << " fail@WasFailed" << "}" << std::endl;
-    else if (reason == FailNotRightToken)
-      std::cout << " fail@NotRightToken" << "}" << std::endl;
-    else if (reason == FailNotIdentifier)
-      std::cout << " fail@NotIdentifer" << "}" << std::endl;
-    else if (reason == FailNotLiteral)
-      std::cout << " fail@NotLiteral" << "}" << std::endl;
-    else if (reason == FailChildrenFailed)
-      std::cout << " fail@ChildrenFailed" << "}" << std::endl;
-    else if (reason == Fail2ndOf1st)
-      std::cout << " fail@2ndOf1st" << "}" << std::endl;
-    else if (reason == FailLookAhead)
-      std::cout << " fail@LookAhead" << "}" << std::endl;
-    else if (reason == AppealStatus_NA)
-      std::cout << " fail@NA" << "}" << std::endl;
-  }
+  } else if (reason == SuccStillWasSucc) {
+    std::cout << " succ@StillWasSucc" << "}";
+    DumpSuccTokens(appeal);
+    std::cout << std::endl;
+  } else if (reason == Succ) {
+    std::cout << " succ" << "}";
+    DumpSuccTokens(appeal);
+    std::cout << std::endl;
+  } else if (reason == FailWasFailed)
+    std::cout << " fail@WasFailed" << "}" << std::endl;
+  else if (reason == FailNotRightToken)
+    std::cout << " fail@NotRightToken" << "}" << std::endl;
+  else if (reason == FailNotIdentifier)
+    std::cout << " fail@NotIdentifer" << "}" << std::endl;
+  else if (reason == FailNotLiteral)
+    std::cout << " fail@NotLiteral" << "}" << std::endl;
+  else if (reason == FailChildrenFailed)
+    std::cout << " fail@ChildrenFailed" << "}" << std::endl;
+  else if (reason == Fail2ndOf1st)
+    std::cout << " fail@2ndOf1st" << "}" << std::endl;
+  else if (reason == FailLookAhead)
+    std::cout << " fail@LookAhead" << "}" << std::endl;
+  else if (reason == AppealStatus_NA)
+    std::cout << " fail@NA" << "}" << std::endl;
 }
 
 void Parser::DumpSuccTokens(AppealNode *appeal) {
