@@ -467,8 +467,9 @@ bool Parser::TraverseStmt() {
     mRootNode->ClearChildren();
     AppealNode *child = NULL;
     succ = TraverseRuleTable(t, mRootNode, child);
-    mRootNode->CopyMatch(child);
     if (succ) {
+      MASSERT(child);
+      mRootNode->CopyMatch(child);
       // Need adjust the mCurToken. A rule could try multiple possible
       // children rules, although there is one any only one valid child
       // for a Top table. However, the mCurToken could deviate from
@@ -708,6 +709,16 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent, Appeal
     DumpEnterTable(name, mIndentation);
   }
 
+  // Lookahead fail is fast to check, even faster than check WasFailed.
+  if (LookAheadFail(rule_table, mCurToken) &&
+      (rule_table->mType != ET_Zeroormore) &&
+      (rule_table->mType != ET_Zeroorone)) {
+    if (mTraceTable)
+      DumpExitTable(name, mIndentation, FailLookAhead);
+    mIndentation -= 2;
+    return false;
+  }
+
   // set the apppeal node
   AppealNode *appeal = new AppealNode();
   mAppealNodes.push_back(appeal);
@@ -727,17 +738,6 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent, Appeal
   //    but could match in a later instance. So I need check is_done.
   // 2. For A not-in-group rule, a WasFailed is a real fail.
   if (appeal->IsFail() && (!in_group || is_done)) {
-    if (mTraceTable)
-      DumpExitTable(name, mIndentation, appeal);
-    mIndentation -= 2;
-    return false;
-  }
-
-  if (LookAheadFail(rule_table, saved_mCurToken) &&
-      (rule_table->mType != ET_Zeroormore) &&
-      (rule_table->mType != ET_Zeroorone)) {
-    appeal->mResult = FailLookAhead;
-    AddFailed(rule_table, saved_mCurToken);
     if (mTraceTable)
       DumpExitTable(name, mIndentation, appeal);
     mIndentation -= 2;
@@ -924,9 +924,10 @@ bool Parser::TraverseRuleTableRegular(RuleTable *rule_table, AppealNode *appeal)
     // or a single child rule. In this case, we need merge the child's match into
     // parent. However, we cannot do the merge in TraverseTableData() since this
     // function will be used in multiple places where we cannot merge.
-    AppealNode *child;
+    AppealNode *child = NULL;
     matched = TraverseTableData(rule_table->mData, appeal, child);
-    appeal->CopyMatch(child);
+    if (child)
+      appeal->CopyMatch(child);
     break;
   }
   case ET_Null:
@@ -1115,7 +1116,7 @@ bool Parser::TraverseZeroormore(RuleTable *rule_table, AppealNode *appeal) {
       bool temp_found = TraverseTableData(data, appeal, child);
       found_subtable |= temp_found;
 
-      if (temp_found) {
+      if (temp_found && child) {
         unsigned match_num = child->GetMatchNum();
         for (unsigned id = 0; id < match_num; id++) {
           unsigned match = child->GetMatch(id);
@@ -1155,9 +1156,10 @@ bool Parser::TraverseZeroormore(RuleTable *rule_table, AppealNode *appeal) {
 bool Parser::TraverseZeroorone(RuleTable *rule_table, AppealNode *appeal) {
   MASSERT((rule_table->mNum == 1) && "zeroorone node has more than one elements?");
   TableData *data = rule_table->mData;
-  AppealNode *child;
+  AppealNode *child = NULL;
   bool found = TraverseTableData(data, appeal, child);
-  appeal->CopyMatch(child);
+  if (child)
+    appeal->CopyMatch(child);
   return true;
 }
 
@@ -1176,8 +1178,8 @@ bool Parser::TraverseOneof(RuleTable *rule_table, AppealNode *appeal) {
     bool temp_found = TraverseTableData(data, appeal, child);
     found = found | temp_found;
     if (temp_found) {
-      MASSERT(child);
-      appeal->CopyMatch(child);
+      if (child)
+        appeal->CopyMatch(child);
       if (mCurToken > new_mCurToken)
         new_mCurToken = mCurToken;
 
@@ -1255,7 +1257,7 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *appeal) {
       bool temp_found = TraverseTableData(data, appeal, child);
       found_subtable |= temp_found;
 
-      if (temp_found) {
+      if (temp_found && child) {
         for (unsigned id = 0; id < child->GetMatchNum(); id++) {
           unsigned match = child->GetMatch(id);
           if (!subtable_succ_tokens.Find(match))
