@@ -206,10 +206,6 @@ bool A2M::IsStmt(TreeNode *tnode) {
   if (!tnode) return false;
 
   switch (tnode->GetKind()) {
-    case NK_Literal:
-    case NK_Identifier:
-      status = false;
-      break;
     case NK_Parenthesis: {
       ParenthesisNode *node = static_cast<ParenthesisNode *>(tnode);
       status = IsStmt(node->GetExpr());
@@ -230,7 +226,47 @@ bool A2M::IsStmt(TreeNode *tnode) {
       }
       break;
     }
+    case NK_Block:
+    case NK_Break:
+    case NK_Call:
+    case NK_CondBranch:
+    case NK_Delete:
+    case NK_DoLoop:
+    case NK_ExprList:
+    case NK_ForLoop:
+    case NK_Function:
+    case NK_Interface:
+    case NK_Lambda:
+    case NK_New:
+    case NK_Return:
+    case NK_Switch:
+    case NK_SwitchCase:
+    case NK_VarList:
+    case NK_WhileLoop:
+      status = true;
+      break;
+    case NK_Annotation:
+    case NK_AnnotationType:
+    case NK_Assert:
+    case NK_Attr:
+    case NK_Cast:
+    case NK_Class:
+    case NK_Dimension:
+    case NK_Exception:
+    case NK_Field:
+    case NK_Identifier:
+    case NK_Import:
+    case NK_InstanceOf:
+    case NK_Literal:
+    case NK_Package:
+    case NK_Pass:
+    case NK_PrimArrayType:
+    case NK_PrimType:
+    case NK_SwitchLabel:
+    case NK_TerOperator:
+    case NK_UserType:
     default:
+      status = false;
       break;
   }
   return status;

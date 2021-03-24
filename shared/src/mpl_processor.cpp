@@ -149,7 +149,8 @@ maple::BaseNode *A2M::ProcessField(StmtExprKind skind, TreeNode *tnode, BlockNod
 
   maple::MIRType *ctype = nullptr;
   maple::TyIdx cptyidx(0);
-  maple::BaseNode *dr = nullptr;
+  maple::BaseNode *nd = nullptr;
+  nd = ProcessNode(SK_Expr, upper, block);
   if (upper->IsLiteral()) {
     LiteralNode *lt = static_cast<LiteralNode *>(upper);
     if (lt->GetData().mType == LT_ThisLiteral) {
@@ -157,16 +158,47 @@ maple::BaseNode *A2M::ProcessField(StmtExprKind skind, TreeNode *tnode, BlockNod
       maple::MIRSymbol *sym = func->GetFormal(0); // this
       cptyidx = sym->GetTyIdx();
       ctype = GetClass(block);
-      dr = new maple::DreadNode(maple::OP_dread, maple::PTY_ptr, sym->GetStIdx(), 0);
+      nd = new maple::DreadNode(maple::OP_dread, maple::PTY_ptr, sym->GetStIdx(), 0);
     } else {
       NOTYETIMPL("ProcessField() not this literal");
     }
+  } else if (nd) {
+    maple::TyIdx tyidx(0);
+    switch (nd->GetOpCode()) {
+      case maple::OP_dread: {
+        maple::AddrofNode *dr = static_cast<maple::AddrofNode *>(nd);
+        maple::StIdx stidx = dr->GetStIdx();
+        maple::MIRSymbol *sym = nullptr;
+        if (stidx.Islocal()) {
+          sym = mMirModule->CurFunction()->GetSymTab()->GetSymbolFromStIdx(stidx.Idx());
+        } else {
+          sym = maple::GlobalTables::GetGsymTable().GetSymbolFromStidx(stidx.Idx());
+        }
+        tyidx = sym->GetTyIdx();
+        break;
+      }
+      case maple::OP_iread: {
+        maple::IreadNode *ir = static_cast<maple::IreadNode *>(nd);
+        tyidx = ir->GetTyIdx();
+        break;
+      }
+      default:
+        NOTYETIMPL("ProcessField() supper");
+        break;
+    }
+    maple::MIRType *type = maple::GlobalTables::GetTypeTable().GetTypeFromTyIdx(tyidx);
+    cptyidx = type->GetTypeIndex();
+    while (type->GetKind() == maple::kTypePointer) {
+      maple::MIRPtrType *ptype = static_cast<maple::MIRPtrType *>(type);
+      type = ptype->GetPointedType();
+    }
+    ctype = type;
   } else {
-    NOTYETIMPL("ProcessField() upper not literal");
+    NOTYETIMPL("ProcessField() nullptr nd");
   }
 
-  if (!ctype) {
-    NOTYETIMPL("ProcessField() null class type");
+  if (!(ctype && ctype->IsInstanceOfMIRStructType())) {
+    NOTYETIMPL("ProcessField() null or non structure/class/interface type");
     return bn;
   }
 
@@ -177,7 +209,7 @@ maple::BaseNode *A2M::ProcessField(StmtExprKind skind, TreeNode *tnode, BlockNod
   bool status = mMirBuilder->TraverseToNamedField((maple::MIRStructType*)ctype, fid, mFieldData);
   maple::MIRType *ftype = maple::GlobalTables::GetTypeTable().GetTypeFromTyIdx(mFieldData->GetTyIdx());
   if (status) {
-    bn = new maple::IreadNode(maple::OP_iread, ftype->GetPrimType(), cptyidx, fid, dr);
+    bn = new maple::IreadNode(maple::OP_iread, ftype->GetPrimType(), cptyidx, fid, nd);
   } else {
     NOTYETIMPL("ProcessField() can not find field");
     // insert a dummy field with fname and mDefaultType
@@ -186,7 +218,7 @@ maple::BaseNode *A2M::ProcessField(StmtExprKind skind, TreeNode *tnode, BlockNod
     maple::FieldPair P1(stridx, P0);
     maple::MIRStructType *stype = static_cast<maple::MIRStructType *>(ctype);
     stype->GetFields().push_back(P1);
-    bn = new maple::IreadNode(maple::OP_iread, maple::PTY_begin, cptyidx, fid+1, dr);
+    bn = new maple::IreadNode(maple::OP_iread, maple::PTY_begin, cptyidx, fid+1, nd);
   }
   return bn;
 }
@@ -442,7 +474,7 @@ maple::BaseNode *A2M::ProcessBlock(StmtExprKind skind, TreeNode *tnode, BlockNod
   for (int i = 0; i < ast_block->GetChildrenNum(); i++) {
     TreeNode *child = ast_block->GetChildAtIndex(i);
     maple::BaseNode *stmt = ProcessNode(skind, child, ast_block);
-    if (stmt) {
+    if (stmt && IsStmt(child)) {
       blk->AddStatement((maple::StmtNode*)stmt);
       if (mTraceA2m) stmt->Dump(0);
     }
