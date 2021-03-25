@@ -217,6 +217,7 @@ bool A2M::IsStmt(TreeNode *tnode) {
       if (ast_op != OPR_Inc && ast_op != OPR_Dec) {
         status = false;
       }
+      break;
     }
     case NK_BinOperator: {
       BinOperatorNode *bon = static_cast<BinOperatorNode *>(tnode);

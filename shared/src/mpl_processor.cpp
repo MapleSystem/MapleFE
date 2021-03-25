@@ -917,6 +917,9 @@ maple::BaseNode *A2M::ProcessPass(StmtExprKind skind, TreeNode *tnode, BlockNode
     if (stmt && IsStmt(child)) {
       blk->AddStatement((maple::StmtNode*)stmt);
       if (mTraceA2m) stmt->Dump(0);
+    } else {
+      NOTYETIMPL("ProcessPass() having unhandled stmt");
+      break;
     }
   }
   return nullptr;
