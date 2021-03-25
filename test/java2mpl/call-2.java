@@ -13,7 +13,8 @@
 //See the Mulan PSL v2 for more details.
 //
 class A {
+  void println(char c, int a) {}
   void foo() {
-    println(c, a);
+    println('a', 1);
   }
 }

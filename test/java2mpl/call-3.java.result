@@ -1,4 +1,4 @@
-Matched 19 tokens.
+Matched 33 tokens.
 ============= Module ===========
 == Sub Tree ==
 class  A
@@ -7,8 +7,9 @@ class  A
   Instance Initializer: 
   Constructors: 
   Methods: 
-    func  foo()  throws: 
-      println(c Add 1,a)
+    func  println(c,a)  throws: 
+    func  foo(c,a)  throws: 
+      println(c,a)
   LocalClasses: 
   LocalInterfaces: 
 

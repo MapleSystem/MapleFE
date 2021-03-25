@@ -12,9 +12,15 @@
 //FIT FOR A PARTICULAR PURPOSE.
 //See the Mulan PSL v2 for more details.
 //
+class B {
+  int bar(int c, int a) {
+    c += a;
+    return c;
+  }
+}
+
 class A {
-  void println(char c, int a) {}
-  void foo(char c, int a) {
-    println(c, a);
+  int foo(B b) {
+    return b.bar(3, 4);
   }
 }

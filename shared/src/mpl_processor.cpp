@@ -839,7 +839,6 @@ maple::BaseNode *A2M::ProcessDelete(StmtExprKind skind, TreeNode *tnode, BlockNo
 }
 
 maple::BaseNode *A2M::ProcessCall(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
-  NOTYETIMPL("ProcessCall()");
   CallNode *node = static_cast<CallNode *>(tnode);
   maple::MapleVector<maple::BaseNode *> args(mMirModule->CurFuncCodeMemPoolAllocator()->Adapter());
   maple::MIRFunction *func = GetFunc(block);
