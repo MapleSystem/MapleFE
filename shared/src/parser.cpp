@@ -955,17 +955,17 @@ bool Parser::TraverseToken(Token *token, AppealNode *parent, AppealNode *&child_
     DumpEnterTable(name.c_str(), mIndentation);
   }
 
-  AppealNode *appeal = new AppealNode();
-  child_node = appeal;
-  mAppealNodes.push_back(appeal);
-  appeal->mResult = FailNotRightToken;
-  appeal->SetToken(curr_token);
-  appeal->SetStartIndex(mCurToken);
-  appeal->SetParent(parent);
-  parent->AddChild(appeal);
-
   bool use_alt_token = false;
+  AppealNode *appeal = NULL;
+
   if (token == curr_token) {
+    appeal = new AppealNode();
+    child_node = appeal;
+    mAppealNodes.push_back(appeal);
+    appeal->SetToken(curr_token);
+    appeal->SetStartIndex(mCurToken);
+    appeal->SetParent(parent);
+    parent->AddChild(appeal);
     appeal->mResult = Succ;
     appeal->AddMatch(mCurToken);
     found = true;
@@ -976,6 +976,14 @@ bool Parser::TraverseToken(Token *token, AppealNode *parent, AppealNode *&child_
       bool alt_found = false;
       AltToken *pat = curr_token->mAltTokens;
       if (token == &gSystemTokens[pat->mAltTokenId]) {
+        appeal = new AppealNode();
+        child_node = appeal;
+        mAppealNodes.push_back(appeal);
+        appeal->SetToken(curr_token);
+        appeal->SetStartIndex(mCurToken);
+        appeal->SetParent(parent);
+        parent->AddChild(appeal);
+
         found = true;
         alt_found = true;
         mATMToken = mCurToken;
@@ -1008,7 +1016,10 @@ bool Parser::TraverseToken(Token *token, AppealNode *parent, AppealNode *&child_
     else
       name = "token:";
     name += token->GetName();
-    DumpExitTable(name.c_str(), mIndentation, appeal);
+    if (appeal)
+      DumpExitTable(name.c_str(), mIndentation, appeal);
+    else
+      DumpExitTable(name.c_str(), mIndentation, FailNotRightToken);
   }
 
   mIndentation -= 2;
