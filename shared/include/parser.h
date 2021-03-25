@@ -265,7 +265,6 @@ private:
   bool TraverseStmt();
   bool TraverseRuleTable(RuleTable*, AppealNode*, AppealNode *&);
   bool TraverseRuleTableRegular(RuleTable*, AppealNode*);
-  bool TraverseRuleTablePre(AppealNode*);
   bool TraverseTableData(TableData*, AppealNode*, AppealNode *&);
   bool TraverseConcatenate(RuleTable*, AppealNode*);
   bool TraverseOneof(RuleTable*, AppealNode*);

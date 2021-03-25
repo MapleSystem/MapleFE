@@ -349,10 +349,7 @@ void Parser::ClearAppealNodes() {
 void Parser::Appeal(AppealNode *start, AppealNode *root) {
   MASSERT((root->IsSucc()) && "root->mResult is not Succ.");
 
-  // A recursion group could have >1 lead node. 'start' could be a different leadnode
-  // than 'root'.
-
-  AppealNode *node = start->GetParent();
+  AppealNode *node = start;
 
   // It's possible that this sub-tree could be separated. For example, the last
   // instance of RecursionTraversal, which is a Fake Succ, and is separated
@@ -747,6 +744,30 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent, Appeal
     }
   }
 
+  RecursionTraversal *rec_tra = FindRecStack(group_id, saved_mCurToken);
+
+  // group_id is 0 which is the default value if rule_table is not in a group
+  // Need to reset rec_tra;
+  if (!in_group)
+    rec_tra = NULL;
+
+  // This part is to handle a special case: The second appearance in the first instance
+  // (wave) in the Wavefront algorithm. At this moment, the first appearance in this
+  // instance hasn't finished its traversal, so there is no previous succ or fail case.
+  //
+  // We need to simply return false, but we cannot add them to the Fail mapping.
+  // A rule is AddFailed() in TraverseRuleTableRegular() which is in the end of this function.
+
+  if (rec_tra &&
+      rec_tra->GetInstance() == InstanceFirst &&
+      rec_tra->LeadNodeVisited(rule_table)) {
+    rec_tra->AddAppealPoint(parent);
+    if (mTraceTable)
+      DumpExitTable(name, mIndentation, Fail2ndOf1st);
+    mIndentation -= 2;
+    return false;
+  }
+
   // We delay creation of AppealNode as much as possible.
   if (!appeal) {
     appeal = new AppealNode();
@@ -757,13 +778,6 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent, Appeal
     parent->AddChild(appeal);
     child = appeal;
   }
-
-  RecursionTraversal *rec_tra = FindRecStack(group_id, appeal->GetStartIndex());
-
-  // group_id is 0 which is the default value if rule_table is not in a group
-  // Need to reset rec_tra;
-  if (!in_group)
-    rec_tra = NULL;
 
   // If the rule is already traversed in this iteration(instance), we return the result.
   if (rec_tra && rec_tra->RecursionNodeVisited(rule_table)) {
@@ -805,24 +819,6 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent, Appeal
       mIndentation -= 2;
       return rec_tra->ConnectPrevious(appeal);
     }
-  }
-
-  // This part is to handle a special case: The second appearance in the first instance
-  // (wave) in the Wavefront algorithm. At this moment, the first appearance in this
-  // instance hasn't finished its traversal, so there is no previous succ or fail case.
-  //
-  // We need to simply return false, but we cannot add them to the Fail mapping.
-  // A rule is AddFailed() in TraverseRuleTableRegular() which is in the end of this function.
-
-  if (rec_tra &&
-      rec_tra->GetInstance() == InstanceFirst &&
-      rec_tra->LeadNodeVisited(rule_table)) {
-    rec_tra->AddAppealPoint(appeal);
-    appeal->mResult = Fail2ndOf1st;
-    if (mTraceTable)
-      DumpExitTable(name, mIndentation, appeal);
-    mIndentation -= 2;
-    return false;
   }
 
   // Restore the mCurToken since TraverseRuleTablePre() update the mCurToken
