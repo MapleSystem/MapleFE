@@ -581,65 +581,6 @@ void Parser::RemoveSuccNode(unsigned curr_token, AppealNode *node) {
   succ_match->RemoveNode(node);
 }
 
-// The PreProcessing of TraverseRuleTable().
-// Under the Wavefront algorithm of recursion group traversal, things are
-// are a little complicated.
-// 1. If a rule is failed at some token, it could be succ later. For example,
-//    the 2nd hit in 1st iteration of a recursion node, is failed@2ndof1st,
-//    but the rule could be succ match later.
-// 2. If a rule is succ at some token, it doesn't mean it's finished, and
-//    there could be more matchings.
-//
-// Returns true : if SuccMatch is done.
-
-bool Parser::TraverseRuleTablePre(AppealNode *appeal) {
-  unsigned saved_mCurToken = mCurToken;
-  bool is_done = false;
-  RuleTable *rule_table = appeal->GetTable();
-  const char *name = NULL;
-  if (mTraceTable)
-    name = GetRuleTableName(rule_table);
-
-  // Check if it was succ. The longest matching is chosen for the next rule table to match.
-  SuccMatch *succ = &gSucc[rule_table->mIndex];
-  if (succ) {
-    bool was_succ = succ->GetStartToken(mCurToken);
-    if (was_succ) {
-      // Those affected by the 1st appearance of 1st instance which returns false.
-      // 1stOf1st is not add to WasFail, but those affected will be added to WasFail.
-      // The affected can be succ later. So there is possibility both succ and fail
-      // exist at the same time.
-      //
-      // I still keep this assertion. We will see. Maybe we'll remove it.
-      MASSERT(!WasFailed(rule_table, mCurToken));
-
-      is_done = succ->IsDone();
-
-      unsigned num = succ->GetMatchNum();
-      for (unsigned i = 0; i < num; i++) {
-        unsigned match = succ->GetOneMatch(i);
-        // WasSucc nodes need Match info, which will be used later
-        // in the sort out.
-        appeal->AddMatch(match);
-        if (match > mCurToken)
-          mCurToken = match;
-      }
-      appeal->mResult = SuccWasSucc;
-
-      // In ZeroorXXX cases, it was successful and has SuccMatch. However,
-      // it could be a failure. In this case, we shouldn't move mCurToken.
-      if (num > 0)
-        MoveCurToken();
-    }
-  }
-
-  if (WasFailed(rule_table, saved_mCurToken)) {
-    appeal->mResult = FailWasFailed;
-  }
-
-  return is_done;
-}
-
 bool Parser::LookAheadFail(RuleTable *rule_table, unsigned token) {
   Token *curr_token = GetActiveToken(token);
   LookAheadTable latable = gLookAheadTable[rule_table->mIndex];
@@ -690,10 +631,7 @@ bool Parser::LookAheadFail(RuleTable *rule_table, unsigned token) {
 //        2. TraverseRuleTable will let the children's traverse to move mCurToken
 //           if they succeeded.
 //        3. TraverseOneof, TraverseZeroxxxx, TraverseConcatenate follow rule 1&2.
-//        4. TraverseRuleTablePre and TraverseLeadNode both exit early, so they
-//           need follow the rule 1&2.
-//        3. TraverseRuleTablePre move mCurToken is succ, and actually it doesn't
-//           touch mCurToken when fail.
+//        3. TraverseLeadNode exit early, so need follow the rule 1&2.
 //        4. TraverseLeadNode() also follows the rule 1&2. It moves mCurToken
 //           when succ and restore it when fail.
 //
@@ -719,34 +657,82 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent, Appeal
     return false;
   }
 
-  // set the apppeal node
-  AppealNode *appeal = new AppealNode();
-  mAppealNodes.push_back(appeal);
-  appeal->SetTable(rule_table);
-  appeal->SetStartIndex(mCurToken);
-  appeal->SetParent(parent);
-  parent->AddChild(appeal);
-  child = appeal;
-
+  AppealNode *appeal = NULL;
   unsigned saved_mCurToken = mCurToken;
-  bool is_done = TraverseRuleTablePre(appeal);
+  bool is_done = false;
+
+  // Check if it was succ. The longest matching is chosen for the next rule table to match.
+  SuccMatch *succ = &gSucc[rule_table->mIndex];
+  if (succ) {
+    bool was_succ = succ->GetStartToken(mCurToken);
+    if (was_succ) {
+      // Those affected by the 1st appearance of 1st instance which returns false.
+      // 1stOf1st is not add to WasFail, but those affected will be added to WasFail.
+      // The affected can be succ later. So there is possibility both succ and fail
+      // exist at the same time.
+      //
+      // I still keep this assertion. We will see. Maybe we'll remove it.
+      MASSERT(!WasFailed(rule_table, mCurToken));
+
+      // set the apppeal node
+      appeal = new AppealNode();
+      mAppealNodes.push_back(appeal);
+      appeal->SetTable(rule_table);
+      appeal->SetStartIndex(mCurToken);
+      appeal->SetParent(parent);
+      parent->AddChild(appeal);
+      child = appeal;
+
+      is_done = succ->IsDone();
+
+      unsigned num = succ->GetMatchNum();
+      for (unsigned i = 0; i < num; i++) {
+        unsigned match = succ->GetOneMatch(i);
+        // WasSucc nodes need Match info, which will be used later
+        // in the sort out.
+        appeal->AddMatch(match);
+        if (match > mCurToken)
+          mCurToken = match;
+      }
+      appeal->mResult = SuccWasSucc;
+
+      // In ZeroorXXX cases, it was successful and has SuccMatch. However,
+      // it could be a failure. In this case, we shouldn't move mCurToken.
+      if (num > 0)
+        MoveCurToken();
+    }
+  }
 
   unsigned group_id;
   bool in_group = FindRecursionGroup(rule_table, group_id);
 
   // 1. In a recursion, a rule could fail in the first a few instances,
   //    but could match in a later instance. So I need check is_done.
+  //    Here is an example. Node A is one of the circle node.
+  //    (a) In the first recursion instance, A is failed, but luckly it
+  //        gets appealed due to lead node is 2ndOf1st.
+  //    (b) In the second instance, it still fail because its children
+  //        failed. But the whole recursion actually matches tokens, and
+  //        those matching rule tables are not related to A.
+  //    (c) Finally, A matches because leading node goes forward and gives
+  //        A new opportunity.
   // 2. For A not-in-group rule, a WasFailed is a real fail.
-  if (appeal->IsFail() && (!in_group || is_done)) {
+
+  bool was_failed = WasFailed(rule_table, saved_mCurToken);
+  if (was_failed && (!in_group || is_done)) {
     if (mTraceTable)
-      DumpExitTable(name, mIndentation, appeal);
+      DumpExitTable(name, mIndentation, FailWasFailed);
     mIndentation -= 2;
     return false;
   }
 
   // If the rule is NOT in any recursion group, we simply return the result.
   // If the rule is done, we also simply return the result.
-  if (appeal->IsSucc()) {
+
+  // If a rule is succ at some token, it doesn't mean it's finished, and
+  // there could be more matchings.
+
+  if (appeal && appeal->IsSucc()) {
     if (!in_group || is_done) {
       if (mTraceTable)
         DumpExitTable(name, mIndentation, appeal);
@@ -755,10 +741,21 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent, Appeal
     } else {
       if (mTraceTable) {
         DumpIndentation();
-        std::cout << "Traverse-Pre WasSucc, mCurToken:" << mCurToken;
+        std::cout << "Traverse-Pre WasSucc, mCurToken:" << saved_mCurToken;
         std::cout << std::endl;
       }
     }
+  }
+
+  // We delay creation of AppealNode as much as possible.
+  if (!appeal) {
+    appeal = new AppealNode();
+    mAppealNodes.push_back(appeal);
+    appeal->SetTable(rule_table);
+    appeal->SetStartIndex(saved_mCurToken);
+    appeal->SetParent(parent);
+    parent->AddChild(appeal);
+    child = appeal;
   }
 
   RecursionTraversal *rec_tra = FindRecStack(group_id, appeal->GetStartIndex());
@@ -879,8 +876,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent, Appeal
 //   1. TraverseIdentifier, TraverseLiteral, TraverseOneof, TraverseZeroorXXx, etc
 //      since we konw the relation between parent and children
 //   2. Or TraverseTableData in this function, because we know the relation.
-//   3. Or when TraverseRuleTablePre is succ, also because we know the relation. We
-//      do it inside TraverseRuleTablePre.
+//   3. When TraverseRuleTable check was succ. Because we know the relation.
 // These are the only places of colleting succ match for a parent node.
 //
 
