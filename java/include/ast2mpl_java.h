@@ -31,6 +31,8 @@ public:
 
   const char *Type2Label(const maple::MIRType *type);
 
+  maple::PrimType MapPrim(TypeId id);
+  maple::MIRType *MapPrimType(TypeId id);
   maple::MIRType *MapPrimType(PrimTypeNode *ptnode);
 };
 

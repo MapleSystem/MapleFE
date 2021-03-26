@@ -258,6 +258,10 @@ maple::BaseNode *A2M::ProcessFieldDecl(StmtExprKind skind, TreeNode *tnode, Bloc
     stype->GetFields().push_back(P1);
   }
 
+  if (init) {
+    NOTYETIMPL("ProcessFieldSetup() Init");
+  }
+
   return bn;
 }
 
@@ -338,26 +342,65 @@ maple::BaseNode *A2M::ProcessExprList(StmtExprKind skind, TreeNode *tnode, Block
 maple::BaseNode *A2M::ProcessLiteral(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
   LiteralNode *node = static_cast<LiteralNode *>(tnode);
   LitData data = node->GetData();
+  maple::MIRType *type = nullptr;
+  maple::PrimType prim = maple::PTY_unknown;
   maple::BaseNode *bn = nullptr;
   switch (data.mType) {
     case LT_IntegerLiteral: {
-      maple::MIRType *typeI32 = maple::GlobalTables::GetTypeTable().GetInt32();
-      maple::MIRIntConst *cst = new maple::MIRIntConst(data.mData.mInt, *typeI32);
-      bn =  new maple::ConstvalNode(maple::PTY_i32, cst);
+      type = MapPrimType(TY_Int);
+      prim = MapPrim(TY_Int);
+      maple::MIRIntConst *cst = new maple::MIRIntConst(data.mData.mInt, *type);
+      bn = new maple::ConstvalNode(prim, cst);
       break;
     }
     case LT_BooleanLiteral: {
-      int val = (data.mData.mBool == true) ? 1 : 0;
-      maple::MIRType *typeU1 = maple::GlobalTables::GetTypeTable().GetUInt1();
-      bn = new maple::ConstvalNode(maple::PTY_u1, new maple::MIRIntConst(val, *typeU1));
+      type = MapPrimType(TY_Boolean);
+      prim = MapPrim(TY_Boolean);
+      maple::MIRIntConst *cst = new maple::MIRIntConst((data.mData.mBool == true) ? 1 : 0, *type);
+      bn = new maple::ConstvalNode(prim, cst);
       break;
     }
-    case LT_FPLiteral:
-    case LT_DoubleLiteral:
-    case LT_CharacterLiteral:
-    case LT_StringLiteral:
-    case LT_NullLiteral:
-    case LT_ThisLiteral:
+    case LT_CharacterLiteral: {
+      type = MapPrimType(TY_Char);
+      prim = MapPrim(TY_Char);
+      maple::MIRIntConst *cst = new maple::MIRIntConst((int)data.mData.mChar.mData.mChar, *type);
+      bn = new maple::ConstvalNode(prim, cst);
+      break;
+    }
+    case LT_FPLiteral: {
+      type = MapPrimType(TY_Float);
+      prim = MapPrim(TY_Float);
+      maple::MIRFloatConst *cst = new maple::MIRFloatConst(data.mData.mFloat, *type);
+      bn = new maple::ConstvalNode(prim, cst);
+      break;
+    }
+    case LT_DoubleLiteral: {
+      type = MapPrimType(TY_Double);
+      prim = MapPrim(TY_Double);
+      maple::MIRDoubleConst *cst = new maple::MIRDoubleConst(data.mData.mDouble, *type);
+      bn = new maple::ConstvalNode(prim, cst);
+      break;
+    }
+    case LT_StringLiteral: {
+      const std::string str(data.mData.mStr);
+      maple::UStrIdx strIdx = maple::GlobalTables::GetUStrTable().GetOrCreateStrIdxFromName(str);
+      bn = new maple::ConststrNode(strIdx);
+      bn->SetPrimType(maple::PTY_ptr);
+      break;
+    }
+    case LT_NullLiteral: {
+      type = MapPrimType(TY_Null);
+      prim = MapPrim(TY_Null);
+      maple::MIRIntConst *cst = new maple::MIRIntConst(0, *type);
+      bn = new maple::ConstvalNode(prim, cst);
+      break;
+    }
+    case LT_ThisLiteral: {
+      maple::MIRFunction *func = GetFunc(block);
+      maple::MIRSymbol *sym = func->GetFormal(0);
+      bn = mMirBuilder->CreateExprDread(sym);
+      break;
+    }
     default: {
       NOTYETIMPL("ProcessLiteral() need support");
       break;

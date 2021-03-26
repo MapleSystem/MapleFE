@@ -77,6 +77,8 @@ public:
   maple::MIRClassType *GetClass(BlockNode *block);
   void UpdateUniqName(std::string &str);
 
+  virtual maple::PrimType MapPrim(TypeId id)=0;
+  virtual maple::MIRType *MapPrimType(TypeId id)=0;
   virtual maple::MIRType *MapPrimType(PrimTypeNode *tnode)=0;
 
   maple::MIRType *MapType(TreeNode *tnode);

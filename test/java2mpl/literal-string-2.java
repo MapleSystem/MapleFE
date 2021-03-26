@@ -13,6 +13,7 @@
 //See the Mulan PSL v2 for more details.
 //
 class A {
+  void write(String s);
   void foo() {
     write("doesn't");
     write("doesn\'t");

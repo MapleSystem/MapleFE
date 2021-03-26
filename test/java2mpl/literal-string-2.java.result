@@ -1,4 +1,4 @@
-Matched 20 tokens.
+Matched 27 tokens.
 ============= Module ===========
 == Sub Tree ==
 class  A
@@ -7,6 +7,7 @@ class  A
   Instance Initializer: 
   Constructors: 
   Methods: 
+    func  write(s)  throws: 
     func  foo()  throws: 
       write("doesn't")
       write("doesn't")

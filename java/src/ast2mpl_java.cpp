@@ -17,9 +17,9 @@
 
 namespace maplefe {
 
-maple::MIRType *A2MJava::MapPrimType(PrimTypeNode *ptnode) {
+maple::PrimType A2MJava::MapPrim(TypeId id) {
   maple::PrimType prim;
-  switch (ptnode->GetPrimType()) {
+  switch (id) {
     case TY_Boolean: prim = maple::PTY_u1; break;
     case TY_Byte:    prim = maple::PTY_u8; break;
     case TY_Short:   prim = maple::PTY_i16; break;
@@ -32,9 +32,17 @@ maple::MIRType *A2MJava::MapPrimType(PrimTypeNode *ptnode) {
     case TY_Null:    prim = maple::PTY_void; break;
     default: MASSERT("Unsupported PrimType"); break;
   }
+  return prim;
+}
 
+maple::MIRType *A2MJava::MapPrimType(TypeId id) {
+  maple::PrimType prim = MapPrim(id);
   maple::TyIdx tid(prim);
   return maple::GlobalTables::GetTypeTable().GetTypeFromTyIdx(tid);
+}
+
+maple::MIRType *A2MJava::MapPrimType(PrimTypeNode *ptnode) {
+  return MapPrimType(ptnode->GetPrimType());
 }
 
 const char *A2MJava::Type2Label(const maple::MIRType *type) {
