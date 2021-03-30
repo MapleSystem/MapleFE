@@ -376,7 +376,7 @@ maple::MIRSymbol *A2M::GetSymbol(TreeNode *tnode, BlockNode *block) {
   } while (blk);
 
   // check parameters
-  maple::MIRFunction *func = GetFunc(blk);
+  maple::MIRFunction *func = GetCurrFunc(blk);
   if (!func) {
     NOTYETIMPL("Block parent hirachy");
     return symbol;
@@ -423,7 +423,7 @@ maple::MIRSymbol *A2M::CreateSymbol(TreeNode *tnode, BlockNode *block) {
 
   maple::MIRSymbol *symbol = nullptr;
   if (block) {
-    maple::MIRFunction *func = GetFunc(block);
+    maple::MIRFunction *func = GetCurrFunc(block);
     symbol = mMirBuilder->GetLocalDecl(name);
     std::string str(name);
     // symbol with same name already exist, use a uniq new name
@@ -447,7 +447,7 @@ maple::MIRSymbol *A2M::CreateSymbol(TreeNode *tnode, BlockNode *block) {
   return symbol;
 }
 
-maple::MIRFunction *A2M::GetFunc(BlockNode *block) {
+maple::MIRFunction *A2M::GetCurrFunc(BlockNode *block) {
   maple::MIRFunction *func = nullptr;
   // func = mBlockFuncMap[block];
   func = mMirModule->CurFunction();
@@ -455,11 +455,11 @@ maple::MIRFunction *A2M::GetFunc(BlockNode *block) {
 }
 
 maple::MIRClassType *A2M::GetClass(BlockNode *block) {
-  maple::TyIdx tyidx = GetFunc(block)->GetClassTyIdx();
+  maple::TyIdx tyidx = GetCurrFunc(block)->GetClassTyIdx();
   return (maple::MIRClassType*)maple::GlobalTables::GetTypeTable().GetTypeFromTyIdx(tyidx);
 }
 
-maple::MIRFunction *A2M::SearchFunc(const char *name, const maple::MapleVector<maple::BaseNode *> &args) {
+maple::MIRFunction *A2M::SearchFunc(const char *name, maple::MapleVector<maple::BaseNode *> &args) {
   if (mNameFuncMap.find(name) == mNameFuncMap.end()) {
     return nullptr;
   }
@@ -482,6 +482,35 @@ maple::MIRFunction *A2M::SearchFunc(const char *name, const maple::MapleVector<m
     return it;
   }
   return nullptr;
+}
+
+maple::MIRFunction *A2M::SearchFunc(TreeNode *method, maple::MapleVector<maple::BaseNode *> &args, BlockNode *block) {
+  maple::MIRFunction *func = nullptr;
+  switch (method->GetKind()) {
+    case NK_Identifier: {
+      IdentifierNode *imethod = static_cast<IdentifierNode *>(method);
+      func = SearchFunc(imethod->GetName(), args);
+      break;
+    }
+    case NK_Field: {
+      FieldNode *node = static_cast<FieldNode *>(method);
+      TreeNode *upper = node->GetUpper();
+      TreeNode *field = node->GetField();
+      if (field->IsIdentifier()) {
+        // pass upper as this
+        maple::BaseNode *bn = ProcessNode(SK_Expr, upper, block);
+        if (bn) {
+          args[0] = bn;
+        }
+      }
+      func = SearchFunc(field, args, block);
+      break;
+    }
+    default:
+      NOTYETIMPL("GetFuncName() method to be handled");
+  }
+
+  return func;
 }
 
 void A2M::MapAttr(maple::GenericAttrs &attr, const IdentifierNode *inode) {

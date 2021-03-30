@@ -94,7 +94,7 @@ maple::BaseNode *A2M::ProcessIdentifier(StmtExprKind skind, TreeNode *tnode, Blo
   }
 
   maple::GStrIdx stridx = maple::GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(name);
-  maple::MIRFunction *func = GetFunc(block);
+  maple::MIRFunction *func = GetCurrFunc(block);
 
   // check parameters
   if (func->IsAFormalName(stridx)) {
@@ -154,7 +154,7 @@ maple::BaseNode *A2M::ProcessField(StmtExprKind skind, TreeNode *tnode, BlockNod
   if (upper->IsLiteral()) {
     LiteralNode *lt = static_cast<LiteralNode *>(upper);
     if (lt->GetData().mType == LT_ThisLiteral) {
-      maple::MIRFunction *func = GetFunc(block);
+      maple::MIRFunction *func = GetCurrFunc(block);
       maple::MIRSymbol *sym = func->GetFormal(0); // this
       cptyidx = sym->GetTyIdx();
       ctype = GetClass(block);
@@ -396,7 +396,7 @@ maple::BaseNode *A2M::ProcessLiteral(StmtExprKind skind, TreeNode *tnode, BlockN
       break;
     }
     case LT_ThisLiteral: {
-      maple::MIRFunction *func = GetFunc(block);
+      maple::MIRFunction *func = GetCurrFunc(block);
       maple::MIRSymbol *sym = func->GetFormal(0);
       bn = mMirBuilder->CreateExprDread(sym);
       break;
@@ -884,7 +884,7 @@ maple::BaseNode *A2M::ProcessDelete(StmtExprKind skind, TreeNode *tnode, BlockNo
 maple::BaseNode *A2M::ProcessCall(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
   CallNode *node = static_cast<CallNode *>(tnode);
   maple::MapleVector<maple::BaseNode *> args(mMirModule->CurFuncCodeMemPoolAllocator()->Adapter());
-  maple::MIRFunction *func = GetFunc(block);
+  maple::MIRFunction *func = GetCurrFunc(block);
 
   // pass this
   maple::MIRSymbol *sym = func->GetFormal(0);
@@ -900,18 +900,14 @@ maple::BaseNode *A2M::ProcessCall(StmtExprKind skind, TreeNode *tnode, BlockNode
   }
 
   TreeNode *method = node->GetMethod();
-  if (!method->IsIdentifier()) {
-    NOTYETIMPL("ProcessCall() method not an identifier");
-  }
-  IdentifierNode *imethod = static_cast<IdentifierNode *>(method);
-  func = SearchFunc(imethod->GetName(), args);
-  if (!func) {
+  maple::MIRFunction *callfunc = SearchFunc(method, args, block);
+  if (!callfunc) {
     NOTYETIMPL("ProcessCall() method not found");
     return nullptr;
   }
-  maple::PUIdx puIdx = func->GetPuidx();
+  maple::PUIdx puIdx = callfunc->GetPuidx();
 
-  maple::MIRType *returnType = func->GetReturnType();
+  maple::MIRType *returnType = callfunc->GetReturnType();
   maple::MIRSymbol *rv = nullptr;
   maple::Opcode callop = maple::OP_call;
   if (returnType->GetPrimType() != maple::PTY_void) {

@@ -72,8 +72,9 @@ public:
   maple::MIRSymbol *GetSymbol(TreeNode *tnode, BlockNode *block);
   maple::MIRSymbol *CreateSymbol(TreeNode *tnode, BlockNode *block);
   maple::MIRSymbol *CreateTempVar(const char *prefix, maple::MIRType *type);
-  maple::MIRFunction *GetFunc(BlockNode *block);
-  maple::MIRFunction *SearchFunc(const char *name, const maple::MapleVector<maple::BaseNode *> &args);
+  maple::MIRFunction *GetCurrFunc(BlockNode *block);
+  maple::MIRFunction *SearchFunc(const char *name, maple::MapleVector<maple::BaseNode *> &args);
+  maple::MIRFunction *SearchFunc(TreeNode *method, maple::MapleVector<maple::BaseNode *> &args, BlockNode *block);
   maple::MIRClassType *GetClass(BlockNode *block);
   void UpdateUniqName(std::string &str);
 
