@@ -23,7 +23,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <cstdlib>
-
+#include <cstring>
 
 #include "mempool.h"
 #include "massert.h"
@@ -129,8 +129,7 @@ void MemPool::Release(unsigned num) {
     MERROR("Release of num bytes failed.");
 }
 
-// Removes all data in the memory pool. Reset everything to the beginning
-// of the pool. But we keep the memory.
+// free all blocks in the memory pool. But we keep the memory.
 void MemPool::Clear() {
   mCurrBlock = mBlocks;
   Block *temp_block = mCurrBlock;
@@ -139,5 +138,15 @@ void MemPool::Clear() {
     temp_block = temp_block->next;
   }
 }
+
+// Wipe off all data. Keep the blocks.
+void MemPool::WipeOff() {
+  Block *temp_block = mBlocks;
+  while(temp_block) {
+    memset((void*)temp_block->addr, 0, mBlockSize);
+    temp_block = temp_block->next;
+  }
+}
+
 }
 

@@ -916,5 +916,19 @@ public:
   }
 };
 
+/////////////////////////////////////////////////////////////////////////////
+//                         Bit Vector
+/////////////////////////////////////////////////////////////////////////////
+
+class BitVector : public MemPool {
+public:
+  BitVector();
+  ~BitVector(){}
+
+  void ClearAll() {WipeOff();}
+  void ClearBit(unsigned);
+  void SetBit(unsigned);
+};
+
 }
 #endif

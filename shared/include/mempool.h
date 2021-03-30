@@ -50,9 +50,6 @@ struct Block {
   Block *prev;       // prev block
 };
 
-// So far there is nothing like free list. Everything will be released when
-// StaticMemPool is destructed.
-//
 class MemPool{
 protected:
   Block    *mCurrBlock; // Currently available block
@@ -67,7 +64,8 @@ public:
   char* Alloc(unsigned);
   void  Release(unsigned i);  // release the last occupied i bytes.
 
-  void  Clear();   // remove all data, but keep memory.
+  void  WipeOff(); // wipe off all data
+  void  Clear();   // free up all block, dont wipe data, Keep memory.
   void  Release(); // Allow users to free memory explicitly.
 };
 
