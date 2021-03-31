@@ -921,6 +921,8 @@ public:
 /////////////////////////////////////////////////////////////////////////////
 
 class BitVector : public MemPool {
+private:
+  char* GetAddr(unsigned);  // return the address of bit
 public:
   BitVector();
   ~BitVector(){}
@@ -928,6 +930,7 @@ public:
   void ClearAll() {WipeOff();}
   void ClearBit(unsigned);
   void SetBit(unsigned);
+  bool GetBit(unsigned);
 };
 
 }

@@ -93,4 +93,38 @@ void BitVector::SetBit(unsigned idx) {
   *addr = (*addr) | (1 << bit_idx);
 }
 
+// return true if the bit is set, or else false.
+bool BitVector::GetBit(unsigned idx) {
+  unsigned byte_idx = idx / 8;
+  unsigned blk_idx = byte_idx / mBlockSize;
+  Block *block = mBlocks;
+  unsigned block_num = 0;
+  for (; block && (block_num < blk_idx); block_num++) {
+    block = block->next;
+  }
+
+  // Out of memory. Need to allocate.
+  // For each block allocated, the random data need be wiped off.
+  if (!block) {
+    unsigned blocks_to_alloc = blk_idx + 1 - block_num;
+    for (unsigned i = 0; i < blocks_to_alloc; i++) {
+      char *addr = AllocBlock();
+      memset((void*)addr, 0, mBlockSize);
+    }
+
+    // get the block again
+    block = mBlocks;
+    for (unsigned i = 0; i < blk_idx; i++)
+      block = block->next;
+  }
+
+  unsigned bit_idx = idx % 8;
+  char *addr = block->addr + byte_idx % mBlockSize;
+  unsigned data = (*addr) & (1 << bit_idx);
+  if (data != 0)
+    return true;
+  else
+    return false;
+}
+
 }
