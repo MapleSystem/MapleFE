@@ -618,7 +618,8 @@ maple::BaseNode *A2M::ProcessFuncDecl(StmtExprKind skind, TreeNode *tnode, Block
   mNameFuncMap[name].push_back(func);
 
   // create function type
-  maple::MIRFuncType *functype = (maple::MIRFuncType*)maple::GlobalTables::GetTypeTable().GetOrCreateFunctionType(*mMirModule, rettype->GetTypeIndex(), funcvectype, funcvecattr, /*isvarg*/ false, false);
+  maple::MIRFuncType *functype = (maple::MIRFuncType*)maple::GlobalTables::GetTypeTable().GetOrCreateFunctionType(
+      rettype->GetTypeIndex(), funcvectype, funcvecattr, /*isvarg*/ false);
   func->SetMIRFuncType(functype);
 
   // update function symbol's type
@@ -909,11 +910,11 @@ maple::BaseNode *A2M::ProcessCall(StmtExprKind skind, TreeNode *tnode, BlockNode
 
   maple::MIRType *returnType = callfunc->GetReturnType();
   maple::MIRSymbol *rv = nullptr;
-  maple::Opcode callop = maple::OP_call;
+  maple::Opcode callop = func->IsJava() ? maple::OP_virtualcall : maple::OP_call;
   if (returnType->GetPrimType() != maple::PTY_void) {
-    NOTYETIMPL("ProcessCall() OP_callassigned");
+    NOTYETIMPL("ProcessCall() OP_[virtual]callassigned");
     rv = CreateTempVar("retvar", returnType);
-    callop = maple::OP_callassigned;
+    callop = func->IsJava() ? maple::OP_virtualcallassigned : maple::OP_callassigned;
   }
 
   maple::StmtNode *stmt = mMirBuilder->CreateStmtCallAssigned(puIdx, args, rv, callop);
