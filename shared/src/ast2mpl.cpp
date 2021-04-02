@@ -459,27 +459,102 @@ maple::MIRClassType *A2M::GetClass(BlockNode *block) {
   return (maple::MIRClassType*)maple::GlobalTables::GetTypeTable().GetTypeFromTyIdx(tyidx);
 }
 
+bool3 A2M::IsCompatibleTo(maple::PrimType expected, maple::PrimType prim) {
+  if (expected == prim)
+    return true3;
+
+  maple::PrimitiveType type(prim);
+  bool3 comp = false3;
+  switch (expected) {
+    case maple::PTY_i8:
+    case maple::PTY_i16:
+    case maple::PTY_i32:
+    case maple::PTY_i64:
+    case maple::PTY_u8:
+    case maple::PTY_u16:
+    case maple::PTY_u32:
+    case maple::PTY_u64:
+    case maple::PTY_u1:
+      if (type.IsInteger()) {
+        comp = true3;
+      }
+      break;
+    case maple::PTY_ptr:
+    case maple::PTY_ref:
+      if (type.IsPointer()) {
+        comp = true3;
+      }
+      if (type.IsInteger()) {
+        comp = maybe3;
+      }
+      break;
+    case maple::PTY_a32:
+    case maple::PTY_a64:
+      if (type.IsAddress()) {
+        comp = true3;
+      }
+      break;
+    case maple::PTY_f32:
+    case maple::PTY_f64:
+    case maple::PTY_f128:
+      if (type.IsFloat()) {
+        comp = true3;
+      }
+      break;
+    case maple::PTY_c64:
+    case maple::PTY_c128:
+      if (type.IsInteger()) {
+        comp = true3;
+      }
+      break;
+    case maple::PTY_constStr:
+    case maple::PTY_gen:
+    case maple::PTY_agg:
+    case maple::PTY_unknown:
+    case maple::PTY_v2i64:
+    case maple::PTY_v4i32:
+    case maple::PTY_v8i16:
+    case maple::PTY_v16i8:
+    case maple::PTY_v2f64:
+    case maple::PTY_v4f32:
+    case maple::PTY_void:
+    default:
+      break;
+  }
+  return comp;
+}
+
 maple::MIRFunction *A2M::SearchFunc(const char *name, maple::MapleVector<maple::BaseNode *> &args) {
   if (mNameFuncMap.find(name) == mNameFuncMap.end()) {
     return nullptr;
   }
+  std::vector<maple::MIRFunction *> candidates;
   for (auto it: mNameFuncMap[name]) {
     if (it->GetFormalCount() != args.size()) {
       continue;
     }
     bool matched = true;
+    bool3 mightmatched = true3;
     for (int i = 0; i < it->GetFormalCount(); i++) {
-      // TODO: allow compatible types
       maple::MIRType *type = maple::GlobalTables::GetTypeTable().GetTypeFromTyIdx(it->GetFormalDefAt(i).formalTyIdx);
-      if (type->GetPrimType() != args[i]->GetPrimType()) {
-        // matched = false;
+      bool3 comp = IsCompatibleTo(type->GetPrimType(), args[i]->GetPrimType());
+      if (comp == false3) {
+        matched = false;
+        mightmatched = false3;
         break;
+      } else if (comp == maybe3) {
+        matched = false;
       }
     }
-    if (!matched) {
-      continue;
+    if (matched) {
+      return it;
     }
-    return it;
+    if (mightmatched != false3) {
+      candidates.push_back(it);
+    }
+  }
+  if (candidates.size()) {
+    return candidates[0];
   }
   return nullptr;
 }

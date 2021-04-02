@@ -40,6 +40,12 @@ enum StmtExprKind {
   SK_Expr
 };
 
+enum bool3 {
+  false3,
+  true3,
+  maybe3
+};
+
 class A2M {
 private:
   const char *mFileName;
@@ -62,6 +68,7 @@ public:
 
   void Init();
   bool IsStmt(TreeNode *tnode);
+  bool3 IsCompatibleTo(maple::PrimType expected, maple::PrimType prim);
 
   void UpdateFuncName(maple::MIRFunction *func);
 
