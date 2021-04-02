@@ -249,17 +249,39 @@ maple::BaseNode *A2M::ProcessFieldDecl(StmtExprKind skind, TreeNode *tnode, Bloc
 
   maple::GenericAttrs genAttrs;
   MapAttr(genAttrs, inode);
+  maple::FieldAttrs fAttrs = genAttrs.ConvertToFieldAttrs();
+  bool isStatic = fAttrs.GetAttr(maple::FLDATTR_static);
 
-  maple::GStrIdx stridx = maple::GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(name);
   maple::MIRType *mir_type = MapType(type);
-  if (mir_type) {
-    maple::TyIdxFieldAttrPair P0(mir_type->GetTypeIndex(), genAttrs.ConvertToFieldAttrs());
-    maple::FieldPair P1(stridx, P0);
+  if (!mir_type) {
+    NOTYETIMPL("ProcessFieldSetup() unknown field type");
+  }
+  maple::GStrIdx stridx = maple::GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(name);
+  maple::TyIdxFieldAttrPair P0(mir_type->GetTypeIndex(), fAttrs);
+  maple::FieldPair P1(stridx, P0);
+  maple::MIRSymbol *symbol = nullptr;
+  if (isStatic) {
+    stype->GetStaticFields().push_back(P1);
+    symbol = mMirBuilder->CreateGlobalDecl(name, *mir_type, maple::kScGlobal);
+    symbol->SetAttrs(genAttrs.ConvertToTypeAttrs());
+  } else {
     stype->GetFields().push_back(P1);
   }
 
   if (init) {
-    NOTYETIMPL("ProcessFieldSetup() Init");
+    if (isStatic) {
+      if (init->IsLiteral()) {
+        maple::BaseNode *val = ProcessLiteral(SK_Expr, init, nullptr);
+        if (val->op == maple::OP_constval) {
+          maple::ConstvalNode *cval = static_cast<maple::ConstvalNode *>(val);
+          symbol->SetKonst(cval->GetConstVal());
+        } else {
+          NOTYETIMPL("ProcessFieldSetup() not constval Init");
+        }
+      }
+    } else {
+      NOTYETIMPL("ProcessFieldSetup() non-static Init");
+    }
   }
 
   return bn;
@@ -319,6 +341,12 @@ maple::BaseNode *A2M::ProcessVarList(StmtExprKind skind, TreeNode *tnode, BlockN
     IdentifierNode *inode = static_cast<IdentifierNode *>(n);
     AST2MPLMSG("ProcessVarList() decl", inode->GetName());
     maple::MIRSymbol *symbol = CreateSymbol(inode, block);
+
+    maple::GenericAttrs genAttrs;
+    MapAttr(genAttrs, inode);
+    maple::TypeAttrs tAttrs = genAttrs.ConvertToTypeAttrs();
+    symbol->SetAttrs(tAttrs);
+
     TreeNode *init = inode->GetInit(); // Init value
     if (init) {
       maple::BaseNode *bn = ProcessNode(SK_Expr, init, block);

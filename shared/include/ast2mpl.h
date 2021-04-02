@@ -90,7 +90,9 @@ public:
   virtual maple::MIRType *MapPrimType(PrimTypeNode *tnode)=0;
 
   maple::MIRType *MapType(TreeNode *tnode);
-  void MapAttr(maple::GenericAttrs &attr, const IdentifierNode *inode);
+  void MapAttr(maple::GenericAttrs &attr, AttrId id);
+  void MapAttr(maple::GenericAttrs &attr, IdentifierNode *inode);
+  void MapAttr(maple::GenericAttrs &attr, FunctionNode *fnode);
 
   maple::Opcode MapUnaOpcode(OprId);
   maple::Opcode MapBinOpcode(OprId);

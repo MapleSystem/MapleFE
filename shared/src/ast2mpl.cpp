@@ -588,10 +588,45 @@ maple::MIRFunction *A2M::SearchFunc(TreeNode *method, maple::MapleVector<maple::
   return func;
 }
 
-void A2M::MapAttr(maple::GenericAttrs &attr, const IdentifierNode *inode) {
+void A2M::MapAttr(maple::GenericAttrs &attr, AttrId id) {
+  switch (id) {
+#undef ATTRIBUTE
+#define ATTRIBUTE(X) case ATTR_##X: attr.SetAttr(maple::GENATTR_##X); break;
+// #include "supported_attributes.def"
+ATTRIBUTE(abstract)
+ATTRIBUTE(const)
+ATTRIBUTE(volatile)
+ATTRIBUTE(final)
+ATTRIBUTE(native)
+ATTRIBUTE(private)
+ATTRIBUTE(protected)
+ATTRIBUTE(public)
+ATTRIBUTE(static)
+ATTRIBUTE(default)
+ATTRIBUTE(synchronized)
+
+// ATTRIBUTE(strictfp)
+    case ATTR_strictfp: attr.SetAttr(maple::GENATTR_strict); break;
+
+    default:
+      break;
+  }
+}
+
+void A2M::MapAttr(maple::GenericAttrs &attr, IdentifierNode *inode) {
   // SmallVector<AttrId> mAttrs
   unsigned anum = inode->GetAttrsNum();
   for (int i = 0; i < anum; i++) {
+    const AttrId ast_attr = inode->AttrAtIndex(i);
+    MapAttr(attr, ast_attr);
+  }
+}
+
+void A2M::MapAttr(maple::GenericAttrs &attr, FunctionNode *fnode) {
+  unsigned anum = fnode->GetAttrsNum();
+  for (int i = 0; i < anum; i++) {
+    const AttrId ast_attr = fnode->AttrAtIndex(i);
+    MapAttr(attr, ast_attr);
   }
 }
 }
