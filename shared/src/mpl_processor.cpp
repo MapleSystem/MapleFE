@@ -256,13 +256,21 @@ maple::BaseNode *A2M::ProcessFieldDecl(StmtExprKind skind, TreeNode *tnode, Bloc
   if (!mir_type) {
     NOTYETIMPL("ProcessFieldSetup() unknown field type");
   }
-  maple::GStrIdx stridx = maple::GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(name);
+
+  // use mangled name for static fields as they will be global
+  std::string str(name);
+  if (isStatic) {
+    str.insert(0, "|");
+    str.insert(0, parent->GetName());
+  }
+
+  maple::GStrIdx stridx = maple::GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(str);
   maple::TyIdxFieldAttrPair P0(mir_type->GetTypeIndex(), fAttrs);
   maple::FieldPair P1(stridx, P0);
   maple::MIRSymbol *symbol = nullptr;
   if (isStatic) {
     stype->GetStaticFields().push_back(P1);
-    symbol = mMirBuilder->CreateGlobalDecl(name, *mir_type, maple::kScGlobal);
+    symbol = mMirBuilder->CreateGlobalDecl(str, *mir_type, maple::kScGlobal);
     symbol->SetAttrs(genAttrs.ConvertToTypeAttrs());
   } else {
     stype->GetFields().push_back(P1);
