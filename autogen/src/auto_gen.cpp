@@ -78,7 +78,11 @@ static void WriteSummaryHFile() {
   gSummaryHFile->WriteOneLine("extern unsigned RuleTableNum;", 29);
   gSummaryHFile->WriteOneLine("extern const char* GetRuleTableName(const RuleTable*);", 54);
 
-  std::string s = "extern std::vector<unsigned> gFailed[";
+  // Write gFailed
+  std::string s = "class BitVector;";
+  gSummaryHFile->WriteOneLine(s.c_str(), s.size());
+
+  s = "extern BitVector gFailed[";
   s += std::to_string(gRuleTableNum);
   s += "];";
   gSummaryHFile->WriteOneLine(s.c_str(), s.size());
@@ -130,7 +134,7 @@ static void FinishSummaryCppFile() {
   gSummaryCppFile->WriteOneLine("  return NULL;", 14);
   gSummaryCppFile->WriteOneLine("}", 1);
 
-  std::string s = "std::vector<unsigned> gFailed[";
+  std::string s = "BitVector gFailed[";
   s += std::to_string(gRuleTableNum);
   s += "];";
   gSummaryCppFile->WriteOneLine(s.c_str(), s.size());

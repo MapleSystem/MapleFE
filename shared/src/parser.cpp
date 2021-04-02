@@ -220,34 +220,21 @@ void Parser::Dump() {
 
 void Parser::ClearFailed() {
   for (unsigned i = 0; i < RuleTableNum; i++)
-     gFailed[i].clear();
+     gFailed[i].ClearAll();
 }
 
 // Add one fail case for the table
 void Parser::AddFailed(RuleTable *table, unsigned token) {
-  //std::cout << " push " << mCurToken << " from " << table;
-  gFailed[table->mIndex].push_back(token);
+  gFailed[table->mIndex].SetBit(token);
 }
 
 // Remove one fail case for the table
 void Parser::ResetFailed(RuleTable *table, unsigned token) {
-  std::vector<unsigned>::iterator it = gFailed[table->mIndex].begin();;
-  for (; it != gFailed[table->mIndex].end(); it++) {
-    if (*it == token)
-      break;
-  }
-
-  if (it != gFailed[table->mIndex].end())
-    gFailed[table->mIndex].erase(it);
+  gFailed[table->mIndex].ClearBit(token);
 }
 
 bool Parser::WasFailed(RuleTable *table, unsigned token) {
-  std::vector<unsigned>::iterator it = gFailed[table->mIndex].begin();
-  for (; it != gFailed[table->mIndex].end(); it++) {
-    if (*it == token)
-      return true;
-  }
-  return false;
+  return gFailed[table->mIndex].GetBit(token);
 }
 
 // Lex all tokens in a line, save to mActiveTokens.
