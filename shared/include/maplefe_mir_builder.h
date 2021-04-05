@@ -77,6 +77,11 @@ class FEMIRBuilder : public maple::MIRBuilder {
 
   bool TraverseToNamedField(maple::MIRStructType *structType, unsigned &fieldID, FieldData *fieldData);
   maple::BaseNode *CreateExprDread(const maple::MIRSymbol *symbol, maple::FieldID fieldID = maple::FieldID(0));
+
+  // use maple::PTY_ref for pointer types
+  maple::MIRType *GetOrCreatePointerType(const maple::MIRType *pointTo) {
+    return maple::GlobalTables::GetTypeTable().GetOrCreatePointerType(*pointTo, maple::PTY_ref);
+  }
 };
 
 }

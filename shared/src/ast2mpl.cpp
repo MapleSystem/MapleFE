@@ -41,7 +41,7 @@ void A2M::Init() {
   // create mDefaultType
   maple::MIRType *type = maple::GlobalTables::GetTypeTable().GetOrCreateClassType("DEFAULT_TYPE", *mMirModule);
   type->SetMIRTypeKind(maple::kTypeClass);
-  mDefaultType = maple::GlobalTables::GetTypeTable().GetOrCreatePointerType(*type);
+  mDefaultType = mMirBuilder->GetOrCreatePointerType(type);
 
   // setup flavor and srclang
   mMirModule->SetFlavor(maple::kFeProduced);
@@ -107,8 +107,14 @@ maple::MIRType *A2M::MapType(TreeNode *type) {
     // DimensionNode *mDims
     // unsigned dnum = inode->GetDimsNum();
     mNodeTypeMap[name] = mir_type;
+  } else if (name) {
+    NOTYETIMPL("MapType add a class type by name");
+    mir_type = maple::GlobalTables::GetTypeTable().GetOrCreateClassType(name, *mMirModule);
+    mir_type->SetMIRTypeKind(maple::kTypeClass);
+    mir_type = mMirBuilder->GetOrCreatePointerType(mir_type);
+    mNodeTypeMap[name] = mir_type;
   } else {
-    NOTYETIMPL("MapType Unknown");
+    NOTYETIMPL("MapType unknown type");
   }
   return mir_type;
 }
@@ -418,7 +424,7 @@ maple::MIRSymbol *A2M::CreateSymbol(TreeNode *tnode, BlockNode *block) {
   maple::MIRTypeKind kind = mir_type->GetKind();
   if (kind == maple::kTypeClass || kind == maple::kTypeClassIncomplete ||
       kind == maple::kTypeInterface || kind == maple::kTypeInterfaceIncomplete) {
-    mir_type = maple::GlobalTables::GetTypeTable().GetOrCreatePointerType(*mir_type, maple::PTY_ref);
+    mir_type = mMirBuilder->GetOrCreatePointerType(mir_type);
   }
 
   maple::MIRSymbol *symbol = nullptr;

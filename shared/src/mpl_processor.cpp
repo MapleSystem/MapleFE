@@ -619,7 +619,7 @@ maple::BaseNode *A2M::ProcessFuncDecl(StmtExprKind skind, TreeNode *tnode, Block
   if (stype) {
     maple::GStrIdx stridx = maple::GlobalTables::GetStrTable().GetOrCreateStrIdxFromName("this");
     maple::TypeAttrs attr = maple::TypeAttrs();
-    maple::MIRType *sptype = maple::GlobalTables::GetTypeTable().GetOrCreatePointerType(*stype, maple::PTY_ref);
+    maple::MIRType *sptype = mMirBuilder->GetOrCreatePointerType(stype);
     maple::MIRSymbol *sym = mMirBuilder->GetOrCreateLocalDecl("this", *sptype);
     sym->SetStorageClass(maple::kScFormal);
     func->AddArgument(sym);
@@ -717,7 +717,7 @@ maple::BaseNode *A2M::ProcessClassDecl(StmtExprKind skind, TreeNode *tnode, Bloc
   maple::MIRType *type = maple::GlobalTables::GetTypeTable().GetOrCreateClassType(name, *mMirModule);
   type->SetMIRTypeKind(maple::kTypeClass);
   // always use pointer type for classes, with PTY_ref
-  type = maple::GlobalTables::GetTypeTable().GetOrCreatePointerType(*type, maple::PTY_ref);
+  type = mMirBuilder->GetOrCreatePointerType(type);
   mNodeTypeMap[name] = type;
   AST2MPLMSG("\n================== class =====================", name);
 
