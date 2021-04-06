@@ -108,7 +108,7 @@ maple::MIRType *A2M::MapType(TreeNode *type) {
     // unsigned dnum = inode->GetDimsNum();
     mNodeTypeMap[name] = mir_type;
   } else if (name) {
-    NOTYETIMPL("MapType add a class type by name");
+    AST2MPLMSG("MapType add a class type by name", name);
     mir_type = maple::GlobalTables::GetTypeTable().GetOrCreateClassType(name, *mMirModule);
     mir_type->SetMIRTypeKind(maple::kTypeClass);
     mir_type = mMirBuilder->GetOrCreatePointerType(mir_type);

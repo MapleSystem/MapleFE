@@ -948,7 +948,7 @@ maple::BaseNode *A2M::ProcessCall(StmtExprKind skind, TreeNode *tnode, BlockNode
   maple::MIRSymbol *rv = nullptr;
   maple::Opcode callop = func->IsJava() ? maple::OP_virtualcall : maple::OP_call;
   if (returnType->GetPrimType() != maple::PTY_void) {
-    NOTYETIMPL("ProcessCall() OP_[virtual]callassigned");
+    AST2MPLMSG0("ProcessCall() OP_[virtual]callassigned");
     rv = CreateTempVar("retvar", returnType);
     callop = func->IsJava() ? maple::OP_virtualcallassigned : maple::OP_callassigned;
   }

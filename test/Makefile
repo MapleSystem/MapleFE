@@ -69,10 +69,10 @@ test:
 	@echo "\n======================= $@.mpl ========================="
 	@cat -n $(build)/$@.mpl
 	@echo "========================================================\n"
+	@echo gdb --args ../output/java/java2mpl $(build)/$@.java --trace-a2m
 	$(MAPLEALL_ROOT)/output/aarch64-clang-debug/bin/irbuild $(build)/$@.mpl
 	$(MAPLEALL_ROOT)/output/aarch64-clang-debug/bin/irbuild $(build)/$@.irb.mpl
 	diff -uwb $(build)/$@.irb.mpl $(build)/$@.irb.irb.mpl
-	@echo gdb --args ../output/java/java2mpl $(build)/$@.java --trace-a2m
 
 % : %.c
 	cp $< $(build)

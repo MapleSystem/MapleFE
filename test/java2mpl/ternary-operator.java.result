@@ -1,0 +1,16 @@
+Matched 32 tokens.
+============= Module ===========
+== Sub Tree ==
+class  A
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+    func  Is3(s)  throws: 
+      var:b
+      b Assign ()
+      return b
+  LocalClasses: 
+  LocalInterfaces: 
+
