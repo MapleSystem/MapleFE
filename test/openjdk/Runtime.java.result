@@ -51,7 +51,7 @@ import static android.system.OsConstants._SC_NPROCESSORS_CONF
 == Sub Tree ==
 class  Runtime
   Fields: 
-    currentRuntime=new Runtime    shutdownHooks=new ArrayList    finalizeOnExit    shuttingDown    tracingMethods    mLibPaths=null
+    currentRuntime=new Runtime()    shutdownHooks=new ArrayList()    finalizeOnExit    shuttingDown    tracingMethods    mLibPaths=null
   Instance Initializer: 
   Constructors: 
     constructor  Runtime()  throws: 
@@ -70,22 +70,22 @@ class  Runtime
     func  addShutdownHook(hook)  throws: 
       cond-branch cond:hook EQ null
       true branch :
-        new NullPointerException
+        new NullPointerException("hook == null")
       false branch :
 
       cond-branch cond:shuttingDown
       true branch :
-        new IllegalStateException
+        new IllegalStateException("VM already shutting down")
       false branch :
 
       cond-branch cond:hook.started
       true branch :
-        new IllegalArgumentException
+        new IllegalArgumentException("Hook has already been started")
       false branch :
 
       cond-branch cond:shutdownHooks.contains(hook)
       true branch :
-        new IllegalArgumentException
+        new IllegalArgumentException("Hook already registered.")
       false branch :
 
       shutdownHooks.add(hook)
@@ -93,12 +93,12 @@ class  Runtime
     func  removeShutdownHook(hook)  throws: 
       cond-branch cond:hook EQ null
       true branch :
-        new NullPointerException
+        new NullPointerException("hook == null")
       false branch :
 
       cond-branch cond:shuttingDown
       true branch :
-        new IllegalStateException
+        new IllegalStateException("VM already shutting down")
       false branch :
 
       return shutdownHooks.remove(hook)
@@ -114,10 +114,10 @@ class  Runtime
     func  exec(command,envp,dir)  throws:     IOException
       cond-branch cond:command.length() EQ 0
       true branch :
-        new IllegalArgumentException
+        new IllegalArgumentException("Empty command")
       false branch :
 
-      var:st=new StringTokenizer
+      var:st=new StringTokenizer(command)
       var:cmdarray=
       for ( )
          Assign st.nextToken()
@@ -128,7 +128,7 @@ class  Runtime
     func  exec(cmdarray,envp)  throws:     IOException
       return exec(cmdarray,envp,null)
     func  exec(cmdarray,envp,dir)  throws:     IOException
-      return new ProcessBuilder.environment(envp).directory(dir).start()
+      return new ProcessBuilder(cmdarray).environment(envp).directory(dir).start()
     func  availableProcessors()  throws: 
       return (int)Libcore.os.sysconf(_SC_NPROCESSORS_CONF)
     func  freeMemory()  throws: 
@@ -157,7 +157,7 @@ class  Runtime
       var:targetSdkVersion=VMRuntime.getRuntime().getTargetSdkVersion()
       cond-branch cond:targetSdkVersion GT 24
       true branch :
-        new UnsupportedOperationException
+        new UnsupportedOperationException()
       false branch :
 
     func  load(absolutePath,loader)  throws: 
@@ -165,30 +165,30 @@ class  Runtime
       java.lang.System.logE("java.lang.Runtime#load(String, ClassLoader)" Add " is private and will be removed in a future Android release")
       cond-branch cond:absolutePath EQ null
       true branch :
-        new NullPointerException
+        new NullPointerException("absolutePath == null")
       false branch :
 
       var:error=doLoad(absolutePath,loader)
       cond-branch cond:error NE null
       true branch :
-        new UnsatisfiedLinkError
+        new UnsatisfiedLinkError(error)
       false branch :
 
     func  load0(fromClass,filename)  throws: 
-      cond-branch cond:(new File.isAbsolute())
+      cond-branch cond:(new File(filename).isAbsolute())
       true branch :
-        new UnsatisfiedLinkError
+        new UnsatisfiedLinkError()
       false branch :
 
       cond-branch cond:filename EQ null
       true branch :
-        new NullPointerException
+        new NullPointerException("filename == null")
       false branch :
 
       var:error=doLoad(filename,fromClass.getClassLoader())
       cond-branch cond:error NE null
       true branch :
-        new UnsatisfiedLinkError
+        new UnsatisfiedLinkError(error)
       false branch :
 
     func  loadLibrary(libname)  throws: 
@@ -201,7 +201,7 @@ class  Runtime
       cond-branch cond:libname.indexOf((int)File.separatorChar) NE Sub
   1
       true branch :
-        new UnsatisfiedLinkError
+        new UnsatisfiedLinkError()
       false branch :
 
       var:libraryName=libname
@@ -212,15 +212,15 @@ class  Runtime
       false branch :
 
       var:filename=System.mapLibraryName(libraryName)
-      var:candidates=new ArrayList
+      var:candidates=new ArrayList()
       var:lastError=null
 
       cond-branch cond:lastError NE null
       true branch :
-        new UnsatisfiedLinkError
+        new UnsatisfiedLinkError(lastError)
       false branch :
 
-      new UnsatisfiedLinkError
+      new UnsatisfiedLinkError()
     func  getLibPaths()  throws: 
       cond-branch cond:mLibPaths EQ null
       true branch :

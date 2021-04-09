@@ -8,7 +8,7 @@ class  Global
   Constructors: 
   Methods: 
     func  foo()  throws: 
-      new Cyclic
+      new Cyclic()
       class  Cyclic
         Fields: 
 

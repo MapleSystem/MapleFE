@@ -10,7 +10,7 @@ class  A
   Methods: 
     func  foo()  throws: 
       var:a
-      a Assign new A
+      a Assign new A(3)
   LocalClasses: 
   LocalInterfaces: 
 

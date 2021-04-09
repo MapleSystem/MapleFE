@@ -30,7 +30,7 @@ class  StackTraceElement
       return lineNumber EQ Sub
   2
     func  toString()  throws: 
-      var:result=new StringBuilder
+      var:result=new StringBuilder()
       result.append(getClassName()).append(".").append(methodName)
       cond-branch cond:isNativeMethod()
       true branch :

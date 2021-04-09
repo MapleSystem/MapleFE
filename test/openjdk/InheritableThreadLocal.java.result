@@ -18,7 +18,7 @@ class  InheritableThreadLocal
     func  getMap(t)  throws: 
       return t.inheritableThreadLocals
     func  createMap(t,firstValue)  throws: 
-      t.inheritableThreadLocals Assign new ThreadLocalMap
+      t.inheritableThreadLocals Assign new ThreadLocalMap(this,firstValue)
   LocalClasses: 
   LocalInterfaces: 
 

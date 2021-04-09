@@ -50,7 +50,7 @@ class  Long
          Assign -
       false branch :
 
-      return new String
+      return new String(buf,)
     func  toUnsignedString(i,radix)  throws: 
       cond-branch cond:i GE 0
       true branch :
@@ -78,7 +78,7 @@ class  Long
       var:chars=Math.max(((mag Add (shift Sub 1)) Div shift)1)
       var:buf=
       formatUnsignedLong(val,shift,buf,0,chars)
-      return new String
+      return new String(buf)
     func  formatUnsignedLong(val,shift,buf,offset,len)  throws: 
       var:charPos=len
       var:radix=1 Shl shift
@@ -96,7 +96,7 @@ while val NE 0 Land charPos GT 0
       var:size=
       var:buf=
       getChars(i,size,buf)
-      return new String
+      return new String(buf)
     func  toUnsignedString(i)  throws: 
       return toUnsignedString(i,10)
     func  getChars(i,index,buf)  throws: 
@@ -142,17 +142,17 @@ while val NE 0 Land charPos GT 0
     func  parseLong(s,radix)  throws:     NumberFormatException
       cond-branch cond:s EQ null
       true branch :
-        new NumberFormatException
+        new NumberFormatException("null")
       false branch :
 
       cond-branch cond:radix LT Character.MIN_RADIX
       true branch :
-        new NumberFormatException
+        new NumberFormatException()
       false branch :
 
       cond-branch cond:radix GT Character.MAX_RADIX
       true branch :
-        new NumberFormatException
+        new NumberFormatException()
       false branch :
 
       var:result=0
@@ -175,7 +175,7 @@ while val NE 0 Land charPos GT 0
     func  parseUnsignedLong(s,radix)  throws:     NumberFormatException
       cond-branch cond:s EQ null
       true branch :
-        new NumberFormatException
+        new NumberFormatException("null")
       false branch :
 
       var:len=s.length()
@@ -184,7 +184,7 @@ while val NE 0 Land charPos GT 0
         var:firstChar=s.charAt(0)
         cond-branch cond:firstChar EQ -
         true branch :
-          new NumberFormatException
+          new NumberFormatException()
         false branch :
           cond-branch cond:len LE 12 Lor (radix EQ 10 Land len LE 18)
           true branch :
@@ -210,7 +210,7 @@ while val NE 0 Land charPos GT 0
         return 
       false branch :
 
-      return new Long
+      return new Long(l)
     func  decode(nm)  throws:     NumberFormatException
       var:radix=10
       var:index=0
@@ -218,7 +218,7 @@ while val NE 0 Land charPos GT 0
       var:result
       cond-branch cond:nm.length() EQ 0
       true branch :
-        new NumberFormatException
+        new NumberFormatException("Zero length string")
       false branch :
 
       var:firstChar=nm.charAt(0)
@@ -257,7 +257,7 @@ while val NE 0 Land charPos GT 0
 
       cond-branch cond:nm.startsWith("-",index) Lor nm.startsWith("+",index)
       true branch :
-        new NumberFormatException
+        new NumberFormatException("Sign character in wrong position")
       false branch :
 
 

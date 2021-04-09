@@ -86,7 +86,7 @@ class  Class
     func  isLocalOrAnonymousClass()  throws: 
       return isLocalClass() Lor isAnonymousClass()
     func  getClasses()  throws: 
-      var:result=new ArrayList
+      var:result=new ArrayList()
       for ( )
         Class
         member
@@ -100,7 +100,7 @@ class  Class
 
       return result.toArray(Class,result.size())
     func  getFields()  throws:     SecurityException
-      var:fields=new ArrayList
+      var:fields=new ArrayList()
       getPublicFieldsRecursive(fields)
       return fields.toArray(Field,fields.size())
     func  getPublicFieldsRecursive(result)  throws: 
@@ -116,7 +116,7 @@ class  Class
       false branch :
 
     func  getMethods()  throws:     SecurityException
-      var:methods=new ArrayList
+      var:methods=new ArrayList()
       getPublicMethodsInternal(methods)
       CollectionUtils.removeDuplicates(methods,Method.ORDER_BY_SIGNATURE)
       return methods.toArray(Method,methods.size())
@@ -143,13 +143,13 @@ class  Class
     func  getField(name)  throws:     NoSuchFieldException
       cond-branch cond:name EQ null
       true branch :
-        new NullPointerException
+        new NullPointerException("name == null")
       false branch :
 
       var:result=getPublicFieldRecursive(name)
       cond-branch cond:result EQ null
       true branch :
-        new NoSuchFieldException
+        new NoSuchFieldException(name)
       false branch :
 
       return result
@@ -181,7 +181,7 @@ class  Class
     func  getMethod(name,parameterTypes,recursivePublicMethods)  throws:     NoSuchMethodException
       cond-branch cond:name EQ null
       true branch :
-        new NullPointerException
+        new NullPointerException("name == null")
       false branch :
 
       cond-branch cond:parameterTypes EQ null
@@ -193,7 +193,7 @@ class  Class
       var:result=
       cond-branch cond:result EQ null Lor (recursivePublicMethods Land Modifier.isPublic(result.getAccessFlags()))
       true branch :
-        new NoSuchMethodException
+        new NoSuchMethodException()
       false branch :
 
       return result
@@ -275,14 +275,14 @@ class  Class
       parameterTypes
       cond-branch cond:c EQ null
       true branch :
-        new NoSuchMethodException
+        new NoSuchMethodException("parameter type is null")
       false branch :
 
 
       var:result=getDeclaredConstructorInternal(parameterTypes)
       cond-branch cond:result EQ null Lor which EQ Member.PUBLIC Land Modifier.isPublic(result.getAccessFlags())
       true branch :
-        new NoSuchMethodException
+        new NoSuchMethodException()
       false branch :
 
       return result
@@ -306,7 +306,7 @@ class  Class
     func  cast(obj)  throws: 
       cond-branch cond:obj NE null Land isInstance(obj)
       true branch :
-        new ClassCastException
+        new ClassCastException()
       false branch :
 
       return (T)obj
@@ -317,7 +317,7 @@ class  Class
       true branch :
         return ()this
       false branch :
-        new ClassCastException
+        new ClassCastException()
 
     func  getAnnotation(annotationClass)  throws: 
       Objects.requireNonNull(annotationClass)
@@ -343,7 +343,7 @@ class  Class
     func  isAnnotationPresent(annotationClass)  throws: 
       cond-branch cond:annotationClass EQ null
       true branch :
-        new NullPointerException
+        new NullPointerException("annotationClass == null")
       false branch :
 
       cond-branch cond:isDeclaredAnnotationPresent(annotationClass)
@@ -382,7 +382,7 @@ class  Class
 
       return (A[])Array.newInstance(annotationClass,0)
     func  getAnnotations()  throws: 
-      var:map=new HashMap
+      var:map=new HashMap()
       Annotation
       declaredAnnotation
       getDeclaredAnnotations()
@@ -412,7 +412,7 @@ class  Class
         return null
       false branch :
 
-      var:result=new StringBuilder
+      var:result=new StringBuilder()
 
       return result.toString()
     func  getSignatureAnnotation()  throws: 
@@ -424,7 +424,7 @@ class  Class
   LocalClasses: 
     class  Caches
       Fields: 
-        genericInterfaces=new BasicLruCache
+        genericInterfaces=new BasicLruCache(8)
       Instance Initializer: 
       Constructors: 
       Methods: 

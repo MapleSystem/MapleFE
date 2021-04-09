@@ -115,7 +115,7 @@ import sun.security.util.SecurityConstants
 == Sub Tree ==
 class  ClassLoader
   Fields: 
-    proxyCache=new HashMap    parent    packages=new HashMap    allocator    classTable
+    proxyCache=new HashMap()    parent    packages=new HashMap()    allocator    classTable
   Instance Initializer: 
   Constructors: 
     constructor  ClassLoader(unused,parent)  throws: 
@@ -126,7 +126,7 @@ class  ClassLoader
     func  createSystemClassLoader()  throws: 
       var:classPath=System.getProperty("java.class.path",".")
       var:librarySearchPath=System.getProperty("java.library.path","")
-      return new PathClassLoader
+      return new PathClassLoader(classPath,)
     func  checkCreateClassLoader()  throws: 
       return null
     func  loadClass(name)  throws:     ClassNotFoundException
@@ -145,15 +145,15 @@ class  ClassLoader
 
       return c
     func  findClass(name)  throws:     ClassNotFoundException
-      new ClassNotFoundException
+      new ClassNotFoundException(name)
     func  defineClass(b,off,len)  throws:     ClassFormatError
-      new UnsupportedOperationException
+      new UnsupportedOperationException("can't load this type of class file")
     func  defineClass(name,b,off,len)  throws:     ClassFormatError
-      new UnsupportedOperationException
+      new UnsupportedOperationException("can't load this type of class file")
     func  defineClass(name,b,off,len,protectionDomain)  throws:     ClassFormatError
-      new UnsupportedOperationException
+      new UnsupportedOperationException("can't load this type of class file")
     func  defineClass(name,b,protectionDomain)  throws:     ClassFormatError
-      new UnsupportedOperationException
+      new UnsupportedOperationException("can't load this type of class file")
     func  resolveClass(c)  throws: 
     func  findSystemClass(name)  throws:     ClassNotFoundException
       return Class.forName(name,false,getSystemClassLoader())
@@ -192,7 +192,7 @@ class  ClassLoader
          Assign getBootstrapResources(name)
 
        Assign findResources(name)
-      return new CompoundEnumeration
+      return new CompoundEnumeration(tmp)
     func  findResource(name)  throws: 
       return null
     func  findResources(name)  throws:     IOException
@@ -244,7 +244,7 @@ class  ClassLoader
       return pkg
     func  getPackages()  throws: 
       var:map
-      map Assign new HashMap
+      map Assign new HashMap(packages)
 
       var:pkgs
       return map.values().toArray(Package,map.size())
@@ -276,7 +276,7 @@ class  BootClassLoader
     func  getInstance()  throws: 
       cond-branch cond:instance EQ null
       true branch :
-        instance Assign new BootClassLoader
+        instance Assign new BootClassLoader()
       false branch :
 
       return instance

@@ -83,7 +83,7 @@ import java.lang.annotation.Annotation
 == Sub Tree ==
 class  Package
   Fields: 
-    pkgs=new HashMap    urls=new HashMap    mans=new HashMap    pkgName    specTitle    specVersion    specVendor    implTitle    implVersion    implVendor    sealBase    loader    packageInfo
+    pkgs=new HashMap(31)    urls=new HashMap(10)    mans=new HashMap(10)    pkgName    specTitle    specVersion    specVendor    implTitle    implVersion    implVendor    sealBase    loader    packageInfo
   Instance Initializer: 
   Constructors: 
     constructor  Package(name,spectitle,specversion,specvendor,impltitle,implversion,implvendor,sealbase,loader)  throws: 
@@ -160,7 +160,7 @@ class  Package
     func  isCompatibleWith(desired)  throws:     NumberFormatException
       cond-branch cond:specVersion EQ null Lor specVersion.length() LT 1
       true branch :
-        new NumberFormatException
+        new NumberFormatException("Empty version string")
       false branch :
 
       var:sa=specVersion.split("\." Sub 1)
@@ -275,11 +275,11 @@ class  Package
       return pkgs.values().toArray(Package,pkgs.size())
 
     func  defineSystemPackage(iname,fn)  throws: 
-      return AccessController.doPrivileged(new PrivilegedAction)
+      return AccessController.doPrivileged(new PrivilegedAction())
     func  loadManifest(fn)  throws: 
       FileInputStream
       fis
-      new FileInputStream
+      new FileInputStream(fn)
 
       return jis.getManifest()
 

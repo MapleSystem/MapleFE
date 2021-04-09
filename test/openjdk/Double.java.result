@@ -33,13 +33,13 @@ class  Double
       true branch :
         return Double.toString(d)
       false branch :
-        var:answer=new StringBuilder
+        var:answer=new StringBuilder(24)
 
 
     func  valueOf(s)  throws:     NumberFormatException
-      return new Double
+      return new Double()
     func  valueOf(d)  throws: 
-      return new Double
+      return new Double(d)
     func  parseDouble(s)  throws:     NumberFormatException
       return FloatingDecimal.parseDouble(s)
     func  isNaN(v)  throws: 

@@ -167,7 +167,7 @@ class  StrictMath
   LocalClasses: 
     class  RandomNumberGeneratorHolder
       Fields: 
-        randomNumberGenerator=new Random
+        randomNumberGenerator=new Random()
       Instance Initializer: 
       Constructors: 
       Methods: 

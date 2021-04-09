@@ -48,7 +48,7 @@ interface  CharSequence
               return charAt(  curInc
 )
             false branch :
-              new NoSuchElementException
+              new NoSuchElementException()
 
           func  forEachRemaining(block)  throws: 
             for ( )
@@ -57,7 +57,7 @@ interface  CharSequence
         LocalClasses: 
         LocalInterfaces: 
 
-      return StreamSupport.intStream(() -> Spliterators.spliterator(new CharIterator,length(),Spliterator.ORDERED)
+      return StreamSupport.intStream(() -> Spliterators.spliterator(new CharIterator(),length(),Spliterator.ORDERED)
 ,Spliterator.SUBSIZED Bor Spliterator.SIZED Bor Spliterator.ORDERED,false)
     func  codePoints()  throws: 
       class  CodePointIterator
@@ -76,7 +76,7 @@ interface  CharSequence
             var:length=length()
             cond-branch cond:cur GE length
             true branch :
-              new NoSuchElementException
+              new NoSuchElementException()
             false branch :
 
             var:c1=charAt(  curInc
@@ -97,6 +97,6 @@ interface  CharSequence
         LocalClasses: 
         LocalInterfaces: 
 
-      return StreamSupport.intStream(() -> Spliterators.spliteratorUnknownSize(new CodePointIterator,Spliterator.ORDERED)
+      return StreamSupport.intStream(() -> Spliterators.spliteratorUnknownSize(new CodePointIterator(),Spliterator.ORDERED)
 ,Spliterator.ORDERED,false)
 

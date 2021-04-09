@@ -39,9 +39,9 @@ class  Float
         return Double.toHexString(f)
 
     func  valueOf(s)  throws:     NumberFormatException
-      return new Float
+      return new Float()
     func  valueOf(f)  throws: 
-      return new Float
+      return new Float(f)
     func  parseFloat(s)  throws:     NumberFormatException
       return FloatingDecimal.parseFloat(s)
     func  isNaN(v)  throws: 

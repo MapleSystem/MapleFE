@@ -34,7 +34,7 @@ class  Object
     func  clone()  throws:     CloneNotSupportedException
       cond-branch cond:(this instanceof Cloneable)
       true branch :
-        new CloneNotSupportedException
+        new CloneNotSupportedException()
       false branch :
 
       return internalClone()

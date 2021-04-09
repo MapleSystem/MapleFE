@@ -23,23 +23,23 @@ class  ProcessEnvironment
     func  getenv()  throws: 
       return theUnmodifiableEnvironment
     func  environment()  throws: 
-      return new StringEnvironment
+      return new StringEnvironment()
     func  emptyEnvironment(capacity)  throws: 
-      return new StringEnvironment
+      return new StringEnvironment()
     func  environ()  throws: 
     func  validateVariable(name)  throws: 
       cond-branch cond:name.indexOf(=) NE Sub
   1 Lor name.indexOf(0) NE Sub
   1
       true branch :
-        new IllegalArgumentException
+        new IllegalArgumentException()
       false branch :
 
     func  validateValue(value)  throws: 
       cond-branch cond:value.indexOf(0) NE Sub
   1
       true branch :
-        new IllegalArgumentException
+        new IllegalArgumentException()
       false branch :
 
     func  toEnvironmentBlock(map,envc)  throws: 
@@ -104,12 +104,12 @@ class  ProcessEnvironment
         func  valueOfQueryOnly(str)  throws: 
           return valueOfQueryOnly((String)str)
         func  valueOfQueryOnly(str)  throws: 
-          return new Variable
+          return new Variable(str,str.getBytes())
         func  valueOf(str)  throws: 
           validateVariable(str)
           return valueOfQueryOnly(str)
         func  valueOf(bytes)  throws: 
-          return new Variable
+          return new Variable(new String(bytes),bytes)
         func  compareTo(variable)  throws: 
           return arrayCompare(getBytes(),variable.getBytes())
         func  equals(o)  throws: 
@@ -126,12 +126,12 @@ class  ProcessEnvironment
         func  valueOfQueryOnly(str)  throws: 
           return valueOfQueryOnly((String)str)
         func  valueOfQueryOnly(str)  throws: 
-          return new Value
+          return new Value(str,str.getBytes())
         func  valueOf(str)  throws: 
           validateValue(str)
           return valueOfQueryOnly(str)
         func  valueOf(bytes)  throws: 
-          return new Value
+          return new Value(new String(bytes),bytes)
         func  compareTo(value)  throws: 
           return arrayCompare(getBytes(),value.getBytes())
         func  equals(o)  throws: 
@@ -165,11 +165,11 @@ class  ProcessEnvironment
         func  remove(key)  throws: 
           return toString(m.remove(Variable.valueOfQueryOnly(key)))
         func  keySet()  throws: 
-          return new StringKeySet
+          return new StringKeySet()
         func  entrySet()  throws: 
-          return new StringEntrySet
+          return new StringEntrySet()
         func  values()  throws: 
-          return new StringValues
+          return new StringValues()
         func  toEnvironmentBlock(envc)  throws: 
           var:count=m.size() Mul 2
           Map
@@ -224,14 +224,14 @@ class  ProcessEnvironment
         func  clear()  throws: 
           s.clear()
         func  iterator()  throws: 
-          return new Iterator
+          return new Iterator()
         func  vvEntry(o)  throws: 
           cond-branch cond:o instanceof StringEntry
           true branch :
             return (StringEntry)o.e
           false branch :
 
-          return new Map
+          return new Map()
         func  contains(o)  throws: 
           return s.contains(vvEntry(o))
         func  remove(o)  throws: 
@@ -257,7 +257,7 @@ class  ProcessEnvironment
         func  clear()  throws: 
           c.clear()
         func  iterator()  throws: 
-          return new Iterator
+          return new Iterator()
         func  contains(o)  throws: 
           return c.contains(Value.valueOfQueryOnly(o))
         func  remove(o)  throws: 
@@ -283,7 +283,7 @@ class  ProcessEnvironment
         func  clear()  throws: 
           s.clear()
         func  iterator()  throws: 
-          return new Iterator
+          return new Iterator()
         func  contains(o)  throws: 
           return s.contains(Variable.valueOfQueryOnly(o))
         func  remove(o)  throws: 

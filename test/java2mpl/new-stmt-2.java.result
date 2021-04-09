@@ -9,7 +9,7 @@ class  A
   Constructors: 
   Methods: 
     func  foo(a)  throws: 
-      new Cyclic
+      new Cyclic(a)
   LocalClasses: 
   LocalInterfaces: 
 
