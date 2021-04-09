@@ -25,12 +25,13 @@ vpath %.mpl $(DIR)
 vpath %.c $(DIR)
 vpath %.cpp $(DIR)
 
-all: test
+all:
+	./runtests.pl all
 
 autogen:
 	make -C ../autogen
 
-shared: autogen test
+shared: autogen
 	make -C ../shared
 
 full:
@@ -56,10 +57,6 @@ tt:
 
 dbg:
 	gdb --args ../output/java/java2mpl tt.java --trace-a2m
-
-# only run autogen for now
-test:
-	./runtests.pl all
 
 % : %.java
 	@cp $< $(build)
