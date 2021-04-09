@@ -351,7 +351,7 @@ public:
   TreeNode*   GetInit() {return mInit;}
 
   void SetType(TreeNode *t)      {mType = t;}
-  void SetInit(TreeNode *t)      {mInit = t;}
+  void SetInit(TreeNode *t)      {mInit = t; t->SetParent(this);}
   void SetDims(DimensionNode *t) {mDims = t;}
 
   unsigned GetDimsNum()          {return mDims->GetDimsNum();}
