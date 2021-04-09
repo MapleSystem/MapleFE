@@ -1,5 +1,5 @@
 Matched 18 tokens.
-Matched 22 tokens.
+Matched 29 tokens.
 ============= Module ===========
 == Sub Tree ==
 class  A
@@ -19,6 +19,7 @@ class  Cyclic
 
   Instance Initializer: 
   Constructors: 
+    constructor  Cyclic(i)  throws: 
   Methods: 
   LocalClasses: 
   LocalInterfaces: 

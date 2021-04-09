@@ -19,4 +19,5 @@ class A {
 }
 
 class Cyclic {
+  Cyclic(int i) {}
 }
