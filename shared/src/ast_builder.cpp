@@ -1383,13 +1383,12 @@ TreeNode* ASTBuilder::AddDims() {
 // This is a help function which adds parameters to a function decl.
 // It's the caller's duty to assure 'func' and 'params' are non null.
 void ASTBuilder::AddParams(TreeNode *func, TreeNode *params) {
-  if (params->IsIdentifier()) {
+  if (params->IsIdentifier() || params->IsLiteral()) {
     // one single parameter at call site
-    IdentifierNode *inode = (IdentifierNode*)params;
     if (func->IsFunction())
-      ((FunctionNode*)func)->AddParam(inode);
+      ((FunctionNode*)func)->AddParam(params);
     else if (func->IsNew())
-      ((NewNode*)func)->AddParam(inode);
+      ((NewNode*)func)->AddParam(params);
     else
       MERROR("Unsupported yet.");
   } else if (params->IsVarList()) {
