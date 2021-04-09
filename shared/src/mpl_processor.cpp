@@ -909,12 +909,6 @@ maple::BaseNode *A2M::ProcessDoLoop(StmtExprKind skind, TreeNode *tnode, BlockNo
 maple::BaseNode *A2M::ProcessNew(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
   NewNode *node = static_cast<NewNode *>(tnode);
   maple::BaseNode *bn = nullptr;
-  maple::BaseNode *obj = GetNewNodeLhs(node, block);
-
-  if (!obj) {
-    NOTYETIMPL("ProcessNew() null lhs");
-    return bn;
-  }
 
   // search for constructor to call
   TreeNode *id = node->GetId();
@@ -923,6 +917,7 @@ maple::BaseNode *A2M::ProcessNew(StmtExprKind skind, TreeNode *tnode, BlockNode 
     return bn;
   }
   ClassNode *classnode = static_cast<ClassNode *>(id);
+
   FunctionNode *func = nullptr;
   for (int i=0; i < classnode->GetConstructorNum(); i++) {
     func = classnode->GetConstructor(i);
@@ -932,6 +927,12 @@ maple::BaseNode *A2M::ProcessNew(StmtExprKind skind, TreeNode *tnode, BlockNode 
   }
   if (!func) {
     NOTYETIMPL("ProcessNew() null ast constructor");
+    return bn;
+  }
+
+  maple::BaseNode *obj = GetNewNodeLhs(node, block);
+  if (!obj) {
+    NOTYETIMPL("ProcessNew() null lhs");
     return bn;
   }
 
@@ -1177,6 +1178,12 @@ maple::BaseNode *A2M::GetNewNodeLhs(NewNode *node, BlockNode *block) {
       break;
   }
 
+  if (!obj) {
+    AST2MPLMSG0("ProcessNew() null lhs");
+    maple::MIRType *type = MapType(id);
+    maple::MIRSymbol *var = CreateTempVar("dummy_new", type);
+    obj = mMirBuilder->CreateExprDread(var);
+  }
   return obj;
 }
 
