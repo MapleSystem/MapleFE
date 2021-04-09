@@ -907,9 +907,57 @@ maple::BaseNode *A2M::ProcessDoLoop(StmtExprKind skind, TreeNode *tnode, BlockNo
 }
 
 maple::BaseNode *A2M::ProcessNew(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
-  NOTYETIMPL("ProcessNew()");
   NewNode *node = static_cast<NewNode *>(tnode);
-  return nullptr;
+  maple::BaseNode *bn = nullptr;
+  maple::BaseNode *obj = GetNewNodeLhs(node, block);
+
+  if (!obj) {
+    NOTYETIMPL("ProcessNew() null lhs");
+    return bn;
+  }
+
+  // search for constructor to call
+  TreeNode *id = node->GetId();
+  if (id->GetKind() != NK_Class) {
+    NOTYETIMPL("ProcessNew() mId not class");
+    return bn;
+  }
+  ClassNode *classnode = static_cast<ClassNode *>(id);
+  FunctionNode *func = nullptr;
+  for (int i=0; i < classnode->GetConstructorNum(); i++) {
+    func = classnode->GetConstructor(i);
+    if (func->GetParamsNum() == node->GetParamsNum()) {
+      break;
+    }
+  }
+  if (!func) {
+    NOTYETIMPL("ProcessNew() null ast constructor");
+    return bn;
+  }
+
+  maple::MapleVector<maple::BaseNode *> args(mMirModule->CurFuncCodeMemPoolAllocator()->Adapter());
+  args.push_back(obj);
+  // pass arg
+  for (int i = 0; i < node->GetParamsNum(); i++) {
+    maple::BaseNode *arg = ProcessNode(SK_Expr, node->GetParam(i), block);
+    if (arg) {
+      args.push_back(arg);
+    } else {
+      NOTYETIMPL("ProcessCall() null arg");
+    }
+  }
+
+  maple::MIRFunction *callfunc = SearchFunc(func, args, block);
+  if (!callfunc) {
+    NOTYETIMPL("ProcessNew() null maple constructor");
+    return bn;
+  }
+  maple::PUIdx puIdx = callfunc->GetPuidx();
+  maple::Opcode callop = maple::OP_virtualcall;
+  maple::StmtNode *stmt = mMirBuilder->CreateStmtCallAssigned(puIdx, args, nullptr, callop);
+  maple::BlockNode *blk = mBlockNodeMap[block];
+  blk->AddStatement(stmt);
+  return bn;
 }
 
 maple::BaseNode *A2M::ProcessDelete(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
@@ -1090,6 +1138,46 @@ maple::BaseNode *A2M::ProcessBinOperatorMplArror(StmtExprKind skind,
                                             BlockNode *block) {
   NOTYETIMPL("ProcessBinOperatorMplArror()");
   return nullptr;
+}
+
+// Lhs = new ...
+maple::BaseNode *A2M::GetNewNodeLhs(NewNode *node, BlockNode *block) {
+  maple::BaseNode *obj = nullptr;
+  TreeNode *id = node->GetId();
+
+  TreeNode *parent = node->GetParent();
+  if (!parent) {
+    NOTYETIMPL("GetNewNodeLhs() null parent");
+    return obj;
+  }
+  maple::BaseNode *bn = nullptr;
+  switch (parent->GetKind()) {
+    // Lhs = new ...
+    case NK_BinOperator: {
+      BinOperatorNode *biop = static_cast<BinOperatorNode *>(parent);
+      switch (biop->mOprId) {
+        case OPR_Assign: {
+          obj = ProcessNode(SK_Expr, biop->mOpndA, block);
+          break;
+        }
+        default: {
+          NOTYETIMPL("GetNewNodeLhs() not BinOperator");
+          break;
+        }
+      }
+      break;
+    }
+    // decl init: Type Lhs = new ...
+    case NK_Identifier: {
+      obj = ProcessNode(SK_Expr, parent, block);
+      break;
+    }
+    default:
+      NOTYETIMPL("GetNewNodeLhs() other kind");
+      break;
+  }
+
+  return obj;
 }
 
 }

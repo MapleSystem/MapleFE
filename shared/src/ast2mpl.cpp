@@ -568,6 +568,10 @@ maple::MIRFunction *A2M::SearchFunc(const char *name, maple::MapleVector<maple::
 maple::MIRFunction *A2M::SearchFunc(TreeNode *method, maple::MapleVector<maple::BaseNode *> &args, BlockNode *block) {
   maple::MIRFunction *func = nullptr;
   switch (method->GetKind()) {
+    case NK_Function: {
+      func = SearchFunc(method->GetName(), args);
+      break;
+    }
     case NK_Identifier: {
       IdentifierNode *imethod = static_cast<IdentifierNode *>(method);
       func = SearchFunc(imethod->GetName(), args);
