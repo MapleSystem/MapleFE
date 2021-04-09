@@ -14,7 +14,7 @@ class  NumberFormatException
     constructor  NumberFormatException(s)  throws: 
   Methods: 
     func  forInputString(s)  throws: 
-      return new NumberFormatException<NumberFormatException>
+      return new NumberFormatException
   LocalClasses: 
   LocalInterfaces: 
 

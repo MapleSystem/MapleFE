@@ -25,7 +25,7 @@ class  Byte
       var:i=Integer.parseInt(s,radix)
       cond-branch cond:i LT MIN_VALUE Lor i GT MAX_VALUE
       true branch :
-        new NumberFormatException<NumberFormatException>
+        new NumberFormatException
       false branch :
 
       return (byte)i
@@ -39,7 +39,7 @@ class  Byte
       var:i=Integer.decode(nm)
       cond-branch cond:i LT MIN_VALUE Lor i GT MAX_VALUE
       true branch :
-        new NumberFormatException<NumberFormatException>
+        new NumberFormatException
       false branch :
 
       return valueOf((byte)i)
@@ -81,7 +81,7 @@ class  Byte
       var:buf=
        Assign 
        Assign 
-      return new String<String>
+      return new String
   LocalClasses: 
     class  ByteCache
       Fields: 

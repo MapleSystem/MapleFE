@@ -6,7 +6,7 @@ package java.lang
 == Sub Tree ==
 class  Boolean
   Fields: 
-    TRUE=new Boolean<Boolean>    FALSE=new Boolean<Boolean>    TYPE=()boolean.getComponentType()    value    serialVersionUID=Sub
+    TRUE=new Boolean    FALSE=new Boolean    TYPE=()boolean.getComponentType()    value    serialVersionUID=Sub
   711132434
   Instance Initializer: 
   Constructors: 

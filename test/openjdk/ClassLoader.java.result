@@ -115,7 +115,7 @@ import sun.security.util.SecurityConstants
 == Sub Tree ==
 class  ClassLoader
   Fields: 
-    proxyCache=new HashMap<List,Class,Class>    parent    packages=new HashMap    allocator    classTable
+    proxyCache=new HashMap    parent    packages=new HashMap    allocator    classTable
   Instance Initializer: 
   Constructors: 
     constructor  ClassLoader(unused,parent)  throws: 
@@ -126,7 +126,7 @@ class  ClassLoader
     func  createSystemClassLoader()  throws: 
       var:classPath=System.getProperty("java.class.path",".")
       var:librarySearchPath=System.getProperty("java.library.path","")
-      return new PathClassLoader<PathClassLoader>
+      return new PathClassLoader
     func  checkCreateClassLoader()  throws: 
       return null
     func  loadClass(name)  throws:     ClassNotFoundException
@@ -145,15 +145,15 @@ class  ClassLoader
 
       return c
     func  findClass(name)  throws:     ClassNotFoundException
-      new ClassNotFoundException<ClassNotFoundException>
+      new ClassNotFoundException
     func  defineClass(b,off,len)  throws:     ClassFormatError
-      new UnsupportedOperationException<UnsupportedOperationException>
+      new UnsupportedOperationException
     func  defineClass(name,b,off,len)  throws:     ClassFormatError
-      new UnsupportedOperationException<UnsupportedOperationException>
+      new UnsupportedOperationException
     func  defineClass(name,b,off,len,protectionDomain)  throws:     ClassFormatError
-      new UnsupportedOperationException<UnsupportedOperationException>
+      new UnsupportedOperationException
     func  defineClass(name,b,protectionDomain)  throws:     ClassFormatError
-      new UnsupportedOperationException<UnsupportedOperationException>
+      new UnsupportedOperationException
     func  resolveClass(c)  throws: 
     func  findSystemClass(name)  throws:     ClassNotFoundException
       return Class.forName(name,false,getSystemClassLoader())
@@ -276,7 +276,7 @@ class  BootClassLoader
     func  getInstance()  throws: 
       cond-branch cond:instance EQ null
       true branch :
-        instance Assign new BootClassLoader<BootClassLoader>
+        instance Assign new BootClassLoader
       false branch :
 
       return instance

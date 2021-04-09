@@ -1,14 +1,16 @@
-Matched 55 tokens.
+Matched 28 tokens.
 ============= Module ===========
 == Sub Tree ==
-class  ChatTest
+class  A
   Fields: 
 
   Instance Initializer: 
   Constructors: 
+    constructor  A(x)  throws: 
   Methods: 
-    func  performDontReceiveMessageInNameState()  throws:     Exception
-      var:client2=new Thread
+    func  foo()  throws: 
+      var:a
+      a Assign new A
   LocalClasses: 
   LocalInterfaces: 
 

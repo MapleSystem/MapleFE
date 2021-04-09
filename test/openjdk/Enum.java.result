@@ -33,7 +33,7 @@ import libcore.util.EmptyArray
 == Sub Tree ==
 class  Enum
   Fields: 
-    name    ordinal    sharedConstantsCache=new BasicLruCache<Class,Enum,Object[]>
+    name    ordinal    sharedConstantsCache=new BasicLruCache
   Instance Initializer: 
   Constructors: 
     constructor  Enum(name,ordinal)  throws: 
@@ -51,13 +51,13 @@ class  Enum
     func  hashCode()  throws: 
       return super.hashCode()
     func  clone()  throws:     CloneNotSupportedException
-      new CloneNotSupportedException<CloneNotSupportedException>
+      new CloneNotSupportedException
     func  compareTo(o)  throws: 
       var:other=(Enum)o
       var:self=this
       cond-branch cond:self.getClass() NE other.getClass() Land self.getDeclaringClass() NE other.getDeclaringClass()
       true branch :
-        new ClassCastException<ClassCastException>
+        new ClassCastException
       false branch :
 
       return self.ordinal Sub other.ordinal
@@ -68,18 +68,18 @@ class  Enum
     func  valueOf(enumType,name)  throws: 
       cond-branch cond:enumType EQ null
       true branch :
-        new NullPointerException<NullPointerException>
+        new NullPointerException
       false branch :
 
       cond-branch cond:name EQ null
       true branch :
-        new NullPointerException<NullPointerException>
+        new NullPointerException
       false branch :
 
       var:values=getSharedConstants(enumType)
       cond-branch cond:values EQ null
       true branch :
-        new IllegalArgumentException<IllegalArgumentException>
+        new IllegalArgumentException
       false branch :
 
       for ( )
@@ -90,14 +90,14 @@ class  Enum
         false branch :
 
 
-      new IllegalArgumentException<IllegalArgumentException>
+      new IllegalArgumentException
     func  getSharedConstants(enumType)  throws: 
       return (T[])sharedConstantsCache.get(enumType)
     func  finalize()  throws: 
     func  readObject(in)  throws:     IOException    ClassNotFoundException
-      new InvalidObjectException<InvalidObjectException>
+      new InvalidObjectException
     func  readObjectNoData()  throws:     ObjectStreamException
-      new InvalidObjectException<InvalidObjectException>
+      new InvalidObjectException
   LocalClasses: 
   LocalInterfaces: 
 

@@ -111,7 +111,7 @@ class  Class
       true branch :
         return toString()
       false branch :
-        var:sb=new StringBuilder<StringBuilder>
+        var:sb=new StringBuilder
 
 
     func  forName(className)  throws:     ClassNotFoundException
@@ -203,7 +203,7 @@ class  Class
         return EmptyArray.TYPE_VARIABLE
       false branch :
 
-      var:parser=new GenericSignatureParser<GenericSignatureParser>
+      var:parser=new GenericSignatureParser
       parser.parseForClass(this,annotationSignature)
       return parser.formalTypeParameters
     func  getSuperclass()  throws: 
@@ -223,7 +223,7 @@ class  Class
       var:annotationSignature=getSignatureAttribute()
       cond-branch cond:annotationSignature NE null
       true branch :
-        var:parser=new GenericSignatureParser<GenericSignatureParser>
+        var:parser=new GenericSignatureParser
 
       false branch :
 
@@ -367,7 +367,7 @@ class  Class
     func  isLocalOrAnonymousClass()  throws: 
       return isLocalClass() Lor isAnonymousClass()
     func  getClasses()  throws: 
-      var:result=new ArrayList<Class>
+      var:result=new ArrayList
       for ( )
         Class
         member
@@ -381,7 +381,7 @@ class  Class
 
       return result.toArray(Class,result.size())
     func  getFields()  throws:     SecurityException
-      var:fields=new ArrayList<Field>
+      var:fields=new ArrayList
       getPublicFieldsRecursive(fields)
       return fields.toArray(Field,fields.size())
     func  getPublicFieldsRecursive(result)  throws: 
@@ -397,7 +397,7 @@ class  Class
       false branch :
 
     func  getMethods()  throws:     SecurityException
-      var:methods=new ArrayList<Method>
+      var:methods=new ArrayList
       getPublicMethodsInternal(methods)
       CollectionUtils.removeDuplicates(methods,Method.ORDER_BY_SIGNATURE)
       return methods.toArray(Method,methods.size())
@@ -424,13 +424,13 @@ class  Class
     func  getField(name)  throws:     NoSuchFieldException
       cond-branch cond:name EQ null
       true branch :
-        new NullPointerException<NullPointerException>
+        new NullPointerException
       false branch :
 
       var:result=getPublicFieldRecursive(name)
       cond-branch cond:result EQ null
       true branch :
-        new NoSuchFieldException<NoSuchFieldException>
+        new NoSuchFieldException
       false branch :
 
       return result
@@ -462,7 +462,7 @@ class  Class
     func  getMethod(name,parameterTypes,recursivePublicMethods)  throws:     NoSuchMethodException
       cond-branch cond:name EQ null
       true branch :
-        new NullPointerException<NullPointerException>
+        new NullPointerException
       false branch :
 
       cond-branch cond:parameterTypes EQ null
@@ -474,7 +474,7 @@ class  Class
       var:result=
       cond-branch cond:result EQ null Lor (recursivePublicMethods Land Modifier.isPublic(result.getAccessFlags()))
       true branch :
-        new NoSuchMethodException<NoSuchMethodException>
+        new NoSuchMethodException
       false branch :
 
       return result
@@ -556,14 +556,14 @@ class  Class
       parameterTypes
       cond-branch cond:c EQ null
       true branch :
-        new NoSuchMethodException<NoSuchMethodException>
+        new NoSuchMethodException
       false branch :
 
 
       var:result=getDeclaredConstructorInternal(parameterTypes)
       cond-branch cond:result EQ null Lor which EQ Member.PUBLIC Land Modifier.isPublic(result.getAccessFlags())
       true branch :
-        new NoSuchMethodException<NoSuchMethodException>
+        new NoSuchMethodException
       false branch :
 
       return result
@@ -587,7 +587,7 @@ class  Class
     func  cast(obj)  throws: 
       cond-branch cond:obj NE null Land isInstance(obj)
       true branch :
-        new ClassCastException<ClassCastException>
+        new ClassCastException
       false branch :
 
       return (T)obj
@@ -598,7 +598,7 @@ class  Class
       true branch :
         return ()this
       false branch :
-        new ClassCastException<ClassCastException>
+        new ClassCastException
 
     func  getAnnotation(annotationClass)  throws: 
       Objects.requireNonNull(annotationClass)
@@ -624,7 +624,7 @@ class  Class
     func  isAnnotationPresent(annotationClass)  throws: 
       cond-branch cond:annotationClass EQ null
       true branch :
-        new NullPointerException<NullPointerException>
+        new NullPointerException
       false branch :
 
       cond-branch cond:isDeclaredAnnotationPresent(annotationClass)
@@ -663,7 +663,7 @@ class  Class
 
       return (A[])Array.newInstance(annotationClass,0)
     func  getAnnotations()  throws: 
-      var:map=new HashMap<Class,Annotation>
+      var:map=new HashMap
       Annotation
       declaredAnnotation
       getDeclaredAnnotations()
@@ -693,7 +693,7 @@ class  Class
         return null
       false branch :
 
-      var:result=new StringBuilder<StringBuilder>
+      var:result=new StringBuilder
 
       return result.toString()
     func  getSignatureAnnotation()  throws: 
@@ -705,7 +705,7 @@ class  Class
   LocalClasses: 
     class  Caches
       Fields: 
-        genericInterfaces=new BasicLruCache<Class,Type[]>
+        genericInterfaces=new BasicLruCache
       Instance Initializer: 
       Constructors: 
       Methods: 

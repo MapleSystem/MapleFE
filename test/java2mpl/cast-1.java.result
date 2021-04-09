@@ -51,13 +51,13 @@ class  Test
   Constructors: 
   Methods: 
     func  main(args)  throws: 
-      var:p=new Point<Point>
-      var:cp=new ColoredPoint<ColoredPoint>
+      var:p=new Point
+      var:cp=new ColoredPoint
       var:c
       cp Assign (ColoredPoint)p
       c Assign (Colorable)p
       var:l=(Long)p
-      var:e=new EndPoint<EndPoint>
+      var:e=new EndPoint
       c Assign (Colorable)e
   LocalClasses: 
   LocalInterfaces: 

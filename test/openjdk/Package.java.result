@@ -160,7 +160,7 @@ class  Package
     func  isCompatibleWith(desired)  throws:     NumberFormatException
       cond-branch cond:specVersion EQ null Lor specVersion.length() LT 1
       true branch :
-        new NumberFormatException<NumberFormatException>
+        new NumberFormatException
       false branch :
 
       var:sa=specVersion.split("\." Sub 1)
@@ -275,11 +275,11 @@ class  Package
       return pkgs.values().toArray(Package,pkgs.size())
 
     func  defineSystemPackage(iname,fn)  throws: 
-      return AccessController.doPrivileged(new PrivilegedAction<Package>)
+      return AccessController.doPrivileged(new PrivilegedAction)
     func  loadManifest(fn)  throws: 
       FileInputStream
       fis
-      new FileInputStream<FileInputStream>
+      new FileInputStream
 
       return jis.getManifest()
 

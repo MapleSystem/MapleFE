@@ -8,7 +8,7 @@ class  ChatTest
   Constructors: 
   Methods: 
     func  performDontReceiveMessageInNameState()  throws: 
-      var:exceptions=new ArrayList<Exception>
+      var:exceptions=new ArrayList
   LocalClasses: 
   LocalInterfaces: 
 

@@ -14,7 +14,7 @@ class  Main
   Constructors: 
   Methods: 
     func  main(args)  throws: 
-      var:numbers=new ArrayList<Integer>
+      var:numbers=new ArrayList
       numbers.add(5)
       numbers.add(9)
       numbers.add(8)

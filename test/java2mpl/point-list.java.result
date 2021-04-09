@@ -9,7 +9,7 @@ class  Point
   Constructors: 
   Methods: 
     func  foo()  throws: 
-      var:pl=new PointList<PointList>
+      var:pl=new PointList
       pl.z Assign 1
       return pl.z
   LocalClasses: 

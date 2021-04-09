@@ -36,7 +36,7 @@ class  ProcessBuilder
     constructor  ProcessBuilder(command)  throws: 
       cond-branch cond:command EQ null
       true branch :
-        new NullPointerException<NullPointerException>
+        new NullPointerException
       false branch :
 
       this.command Assign command
@@ -50,7 +50,7 @@ class  ProcessBuilder
     func  command(command)  throws: 
       cond-branch cond:command EQ null
       true branch :
-        new NullPointerException<NullPointerException>
+        new NullPointerException
       false branch :
 
       this.command Assign command
@@ -68,7 +68,7 @@ class  ProcessBuilder
       var:security=System.getSecurityManager()
       cond-branch cond:security NE null
       true branch :
-        security.checkPermission(new RuntimePermission<RuntimePermission>)
+        security.checkPermission(new RuntimePermission)
       false branch :
 
       cond-branch cond:environment EQ null
@@ -102,7 +102,7 @@ class  ProcessBuilder
     func  redirectInput(source)  throws: 
       cond-branch cond:source.type() EQ Redirect.Type.WRITE Lor source.type() EQ Redirect.Type.APPEND
       true branch :
-        new IllegalArgumentException<IllegalArgumentException>
+        new IllegalArgumentException
       false branch :
 
        Assign source
@@ -110,7 +110,7 @@ class  ProcessBuilder
     func  redirectOutput(destination)  throws: 
       cond-branch cond:destination.type() EQ Redirect.Type.READ
       true branch :
-        new IllegalArgumentException<IllegalArgumentException>
+        new IllegalArgumentException
       false branch :
 
        Assign destination
@@ -118,7 +118,7 @@ class  ProcessBuilder
     func  redirectError(destination)  throws: 
       cond-branch cond:destination.type() EQ Redirect.Type.READ
       true branch :
-        new IllegalArgumentException<IllegalArgumentException>
+        new IllegalArgumentException
       false branch :
 
        Assign destination
@@ -158,7 +158,7 @@ class  ProcessBuilder
       for ( )
         cond-branch cond:.indexOf(0) GE 0
         true branch :
-          new IOException<IOException>
+          new IOException
         false branch :
 
 
@@ -166,7 +166,7 @@ class  ProcessBuilder
   LocalClasses: 
     class  NullInputStream
       Fields: 
-        INSTANCE=new NullInputStream<NullInputStream>
+        INSTANCE=new NullInputStream
       Instance Initializer: 
       Constructors: 
         constructor  NullInputStream()  throws: 
@@ -180,18 +180,18 @@ class  ProcessBuilder
       LocalInterfaces: 
     class  NullOutputStream
       Fields: 
-        INSTANCE=new NullOutputStream<NullOutputStream>
+        INSTANCE=new NullOutputStream
       Instance Initializer: 
       Constructors: 
         constructor  NullOutputStream()  throws: 
       Methods: 
         func  write(b)  throws:     IOException
-          new IOException<IOException>
+          new IOException
       LocalClasses: 
       LocalInterfaces: 
     class  Redirect
       Fields: 
-        PIPE=new Redirect<Redirect>        INHERIT=new Redirect<Redirect>
+        PIPE=new Redirect        INHERIT=new Redirect
       Instance Initializer: 
       Constructors: 
         constructor  Redirect()  throws: 
@@ -200,28 +200,28 @@ class  ProcessBuilder
         func  file()  throws: 
           return null
         func  append()  throws: 
-          new UnsupportedOperationException<UnsupportedOperationException>
+          new UnsupportedOperationException
         func  from(file)  throws: 
           cond-branch cond:file EQ null
           true branch :
-            new NullPointerException<NullPointerException>
+            new NullPointerException
           false branch :
 
-          return new Redirect<Redirect>
+          return new Redirect
         func  to(file)  throws: 
           cond-branch cond:file EQ null
           true branch :
-            new NullPointerException<NullPointerException>
+            new NullPointerException
           false branch :
 
-          return new Redirect<Redirect>
+          return new Redirect
         func  appendTo(file)  throws: 
           cond-branch cond:file EQ null
           true branch :
-            new NullPointerException<NullPointerException>
+            new NullPointerException
           false branch :
 
-          return new Redirect<Redirect>
+          return new Redirect
         func  equals(obj)  throws: 
           cond-branch cond:obj EQ this
           true branch :

@@ -3,7 +3,7 @@ Matched 23 tokens.
 == Sub Tree ==
 class  A
   Fields: 
-    b=new B<T[]>
+    b=new B
   Instance Initializer: 
   Constructors: 
   Methods: 

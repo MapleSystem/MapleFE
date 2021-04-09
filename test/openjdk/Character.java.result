@@ -34,7 +34,7 @@ class  Character
         return 
       false branch :
 
-      return new Character<Character>
+      return new Character
     func  charValue()  throws: 
       return value
     func  hashCode()  throws: 
@@ -91,7 +91,7 @@ class  Character
     func  codePointAt(a,index,limit)  throws: 
       cond-branch cond:index GE limit Lor limit LT 0 Lor limit GT a.length
       true branch :
-        new IndexOutOfBoundsException<IndexOutOfBoundsException>
+        new IndexOutOfBoundsException
       false branch :
 
       return codePointAtImpl(a,index,limit)
@@ -129,7 +129,7 @@ class  Character
     func  codePointBefore(a,index,start)  throws: 
       cond-branch cond:index LE start Lor start LT 0 Lor start GE a.length
       true branch :
-        new IndexOutOfBoundsException<IndexOutOfBoundsException>
+        new IndexOutOfBoundsException
       false branch :
 
       return codePointBeforeImpl(a,index,start)
@@ -161,7 +161,7 @@ class  Character
           toSurrogates(codePoint,dst,dstIndex)
           return 2
         false branch :
-          new IllegalArgumentException<IllegalArgumentException>
+          new IllegalArgumentException
 
 
     func  toChars(codePoint)  throws: 
@@ -174,7 +174,7 @@ class  Character
           var:result=
 
         false branch :
-          new IllegalArgumentException<IllegalArgumentException>
+          new IllegalArgumentException
 
 
     func  toSurrogates(codePoint,dst,index)  throws: 
@@ -184,7 +184,7 @@ class  Character
       var:length=seq.length()
       cond-branch cond:beginIndex LT 0 Lor endIndex GT length Lor beginIndex GT endIndex
       true branch :
-        new IndexOutOfBoundsException<IndexOutOfBoundsException>
+        new IndexOutOfBoundsException
       false branch :
 
       var:n=endIndex Sub beginIndex
@@ -203,7 +203,7 @@ class  Character
     func  codePointCount(a,offset,count)  throws: 
       cond-branch cond:count GT a.length Sub offset Lor offset LT 0 Lor count LT 0
       true branch :
-        new IndexOutOfBoundsException<IndexOutOfBoundsException>
+        new IndexOutOfBoundsException
       false branch :
 
       return codePointCountImpl(a,offset,count)
@@ -226,7 +226,7 @@ class  Character
       var:length=seq.length()
       cond-branch cond:index LT 0 Lor index GT length
       true branch :
-        new IndexOutOfBoundsException<IndexOutOfBoundsException>
+        new IndexOutOfBoundsException
       false branch :
 
       var:x=index
@@ -242,7 +242,7 @@ class  Character
     func  offsetByCodePoints(a,start,count,index,codePointOffset)  throws: 
       cond-branch cond:count GT a.length Sub start Lor start LT 0 Lor count LT 0 Lor index LT start Lor index GT start Add count
       true branch :
-        new IndexOutOfBoundsException<IndexOutOfBoundsException>
+        new IndexOutOfBoundsException
       false branch :
 
       return offsetByCodePointsImpl(a,start,count,index,codePointOffset)
@@ -552,7 +552,7 @@ class  Character
     func  getName(codePoint)  throws: 
       cond-branch cond:isValidCodePoint(codePoint)
       true branch :
-        new IllegalArgumentException<IllegalArgumentException>
+        new IllegalArgumentException
       false branch :
 
       var:name=getNameImpl(codePoint)
@@ -583,7 +583,7 @@ class  Character
         constructor  Subset(name)  throws: 
           cond-branch cond:name EQ null
           true branch :
-            new NullPointerException<NullPointerException>
+            new NullPointerException
           false branch :
 
           this.name Assign name
@@ -598,7 +598,7 @@ class  Character
       LocalInterfaces: 
     class  UnicodeBlock
       Fields: 
-        map=new HashMap        BASIC_LATIN=new UnicodeBlock<UnicodeBlock>        LATIN_1_SUPPLEMENT=new UnicodeBlock<UnicodeBlock>        LATIN_EXTENDED_A=new UnicodeBlock<UnicodeBlock>        LATIN_EXTENDED_B=new UnicodeBlock<UnicodeBlock>        IPA_EXTENSIONS=new UnicodeBlock<UnicodeBlock>        SPACING_MODIFIER_LETTERS=new UnicodeBlock<UnicodeBlock>        COMBINING_DIACRITICAL_MARKS=new UnicodeBlock<UnicodeBlock>        GREEK=new UnicodeBlock<UnicodeBlock>        CYRILLIC=new UnicodeBlock<UnicodeBlock>        ARMENIAN=new UnicodeBlock<UnicodeBlock>        HEBREW=new UnicodeBlock<UnicodeBlock>        ARABIC=new UnicodeBlock<UnicodeBlock>        DEVANAGARI=new UnicodeBlock<UnicodeBlock>        BENGALI=new UnicodeBlock<UnicodeBlock>        GURMUKHI=new UnicodeBlock<UnicodeBlock>        GUJARATI=new UnicodeBlock<UnicodeBlock>        ORIYA=new UnicodeBlock<UnicodeBlock>        TAMIL=new UnicodeBlock<UnicodeBlock>        TELUGU=new UnicodeBlock<UnicodeBlock>        KANNADA=new UnicodeBlock<UnicodeBlock>        MALAYALAM=new UnicodeBlock<UnicodeBlock>        THAI=new UnicodeBlock<UnicodeBlock>        LAO=new UnicodeBlock<UnicodeBlock>        TIBETAN=new UnicodeBlock<UnicodeBlock>        GEORGIAN=new UnicodeBlock<UnicodeBlock>        HANGUL_JAMO=new UnicodeBlock<UnicodeBlock>        LATIN_EXTENDED_ADDITIONAL=new UnicodeBlock<UnicodeBlock>        GREEK_EXTENDED=new UnicodeBlock<UnicodeBlock>        GENERAL_PUNCTUATION=new UnicodeBlock<UnicodeBlock>        SUPERSCRIPTS_AND_SUBSCRIPTS=new UnicodeBlock<UnicodeBlock>        CURRENCY_SYMBOLS=new UnicodeBlock<UnicodeBlock>        COMBINING_MARKS_FOR_SYMBOLS=new UnicodeBlock<UnicodeBlock>        LETTERLIKE_SYMBOLS=new UnicodeBlock<UnicodeBlock>        NUMBER_FORMS=new UnicodeBlock<UnicodeBlock>        ARROWS=new UnicodeBlock<UnicodeBlock>        MATHEMATICAL_OPERATORS=new UnicodeBlock<UnicodeBlock>        MISCELLANEOUS_TECHNICAL=new UnicodeBlock<UnicodeBlock>        CONTROL_PICTURES=new UnicodeBlock<UnicodeBlock>        OPTICAL_CHARACTER_RECOGNITION=new UnicodeBlock<UnicodeBlock>        ENCLOSED_ALPHANUMERICS=new UnicodeBlock<UnicodeBlock>        BOX_DRAWING=new UnicodeBlock<UnicodeBlock>        BLOCK_ELEMENTS=new UnicodeBlock<UnicodeBlock>        GEOMETRIC_SHAPES=new UnicodeBlock<UnicodeBlock>        MISCELLANEOUS_SYMBOLS=new UnicodeBlock<UnicodeBlock>        DINGBATS=new UnicodeBlock<UnicodeBlock>        CJK_SYMBOLS_AND_PUNCTUATION=new UnicodeBlock<UnicodeBlock>        HIRAGANA=new UnicodeBlock<UnicodeBlock>        KATAKANA=new UnicodeBlock<UnicodeBlock>        BOPOMOFO=new UnicodeBlock<UnicodeBlock>        HANGUL_COMPATIBILITY_JAMO=new UnicodeBlock<UnicodeBlock>        KANBUN=new UnicodeBlock<UnicodeBlock>        ENCLOSED_CJK_LETTERS_AND_MONTHS=new UnicodeBlock<UnicodeBlock>        CJK_COMPATIBILITY=new UnicodeBlock<UnicodeBlock>        CJK_UNIFIED_IDEOGRAPHS=new UnicodeBlock<UnicodeBlock>        HANGUL_SYLLABLES=new UnicodeBlock<UnicodeBlock>        PRIVATE_USE_AREA=new UnicodeBlock<UnicodeBlock>        CJK_COMPATIBILITY_IDEOGRAPHS=new UnicodeBlock<UnicodeBlock>        ALPHABETIC_PRESENTATION_FORMS=new UnicodeBlock<UnicodeBlock>        ARABIC_PRESENTATION_FORMS_A=new UnicodeBlock<UnicodeBlock>        COMBINING_HALF_MARKS=new UnicodeBlock<UnicodeBlock>        CJK_COMPATIBILITY_FORMS=new UnicodeBlock<UnicodeBlock>        SMALL_FORM_VARIANTS=new UnicodeBlock<UnicodeBlock>        ARABIC_PRESENTATION_FORMS_B=new UnicodeBlock<UnicodeBlock>        HALFWIDTH_AND_FULLWIDTH_FORMS=new UnicodeBlock<UnicodeBlock>        SPECIALS=new UnicodeBlock<UnicodeBlock>        SURROGATES_AREA=new UnicodeBlock<UnicodeBlock>        SYRIAC=new UnicodeBlock<UnicodeBlock>        THAANA=new UnicodeBlock<UnicodeBlock>        SINHALA=new UnicodeBlock<UnicodeBlock>        MYANMAR=new UnicodeBlock<UnicodeBlock>        ETHIOPIC=new UnicodeBlock<UnicodeBlock>        CHEROKEE=new UnicodeBlock<UnicodeBlock>        UNIFIED_CANADIAN_ABORIGINAL_SYLLABICS=new UnicodeBlock<UnicodeBlock>        OGHAM=new UnicodeBlock<UnicodeBlock>        RUNIC=new UnicodeBlock<UnicodeBlock>        KHMER=new UnicodeBlock<UnicodeBlock>        MONGOLIAN=new UnicodeBlock<UnicodeBlock>        BRAILLE_PATTERNS=new UnicodeBlock<UnicodeBlock>        CJK_RADICALS_SUPPLEMENT=new UnicodeBlock<UnicodeBlock>        KANGXI_RADICALS=new UnicodeBlock<UnicodeBlock>        IDEOGRAPHIC_DESCRIPTION_CHARACTERS=new UnicodeBlock<UnicodeBlock>        BOPOMOFO_EXTENDED=new UnicodeBlock<UnicodeBlock>        CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A=new UnicodeBlock<UnicodeBlock>        YI_SYLLABLES=new UnicodeBlock<UnicodeBlock>        YI_RADICALS=new UnicodeBlock<UnicodeBlock>        CYRILLIC_SUPPLEMENTARY=new UnicodeBlock<UnicodeBlock>        TAGALOG=new UnicodeBlock<UnicodeBlock>        HANUNOO=new UnicodeBlock<UnicodeBlock>        BUHID=new UnicodeBlock<UnicodeBlock>        TAGBANWA=new UnicodeBlock<UnicodeBlock>        LIMBU=new UnicodeBlock<UnicodeBlock>        TAI_LE=new UnicodeBlock<UnicodeBlock>        KHMER_SYMBOLS=new UnicodeBlock<UnicodeBlock>        PHONETIC_EXTENSIONS=new UnicodeBlock<UnicodeBlock>        MISCELLANEOUS_MATHEMATICAL_SYMBOLS_A=new UnicodeBlock<UnicodeBlock>        SUPPLEMENTAL_ARROWS_A=new UnicodeBlock<UnicodeBlock>        SUPPLEMENTAL_ARROWS_B=new UnicodeBlock<UnicodeBlock>        MISCELLANEOUS_MATHEMATICAL_SYMBOLS_B=new UnicodeBlock<UnicodeBlock>        SUPPLEMENTAL_MATHEMATICAL_OPERATORS=new UnicodeBlock<UnicodeBlock>        MISCELLANEOUS_SYMBOLS_AND_ARROWS=new UnicodeBlock<UnicodeBlock>        KATAKANA_PHONETIC_EXTENSIONS=new UnicodeBlock<UnicodeBlock>        YIJING_HEXAGRAM_SYMBOLS=new UnicodeBlock<UnicodeBlock>        VARIATION_SELECTORS=new UnicodeBlock<UnicodeBlock>        LINEAR_B_SYLLABARY=new UnicodeBlock<UnicodeBlock>        LINEAR_B_IDEOGRAMS=new UnicodeBlock<UnicodeBlock>        AEGEAN_NUMBERS=new UnicodeBlock<UnicodeBlock>        OLD_ITALIC=new UnicodeBlock<UnicodeBlock>        GOTHIC=new UnicodeBlock<UnicodeBlock>        UGARITIC=new UnicodeBlock<UnicodeBlock>        DESERET=new UnicodeBlock<UnicodeBlock>        SHAVIAN=new UnicodeBlock<UnicodeBlock>        OSMANYA=new UnicodeBlock<UnicodeBlock>        CYPRIOT_SYLLABARY=new UnicodeBlock<UnicodeBlock>        BYZANTINE_MUSICAL_SYMBOLS=new UnicodeBlock<UnicodeBlock>        MUSICAL_SYMBOLS=new UnicodeBlock<UnicodeBlock>        TAI_XUAN_JING_SYMBOLS=new UnicodeBlock<UnicodeBlock>        MATHEMATICAL_ALPHANUMERIC_SYMBOLS=new UnicodeBlock<UnicodeBlock>        CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B=new UnicodeBlock<UnicodeBlock>        CJK_COMPATIBILITY_IDEOGRAPHS_SUPPLEMENT=new UnicodeBlock<UnicodeBlock>        TAGS=new UnicodeBlock<UnicodeBlock>        VARIATION_SELECTORS_SUPPLEMENT=new UnicodeBlock<UnicodeBlock>        SUPPLEMENTARY_PRIVATE_USE_AREA_A=new UnicodeBlock<UnicodeBlock>        SUPPLEMENTARY_PRIVATE_USE_AREA_B=new UnicodeBlock<UnicodeBlock>        HIGH_SURROGATES=new UnicodeBlock<UnicodeBlock>        HIGH_PRIVATE_USE_SURROGATES=new UnicodeBlock<UnicodeBlock>        LOW_SURROGATES=new UnicodeBlock<UnicodeBlock>        ARABIC_SUPPLEMENT=new UnicodeBlock<UnicodeBlock>        NKO=new UnicodeBlock<UnicodeBlock>        SAMARITAN=new UnicodeBlock<UnicodeBlock>        MANDAIC=new UnicodeBlock<UnicodeBlock>        ETHIOPIC_SUPPLEMENT=new UnicodeBlock<UnicodeBlock>        UNIFIED_CANADIAN_ABORIGINAL_SYLLABICS_EXTENDED=new UnicodeBlock<UnicodeBlock>        NEW_TAI_LUE=new UnicodeBlock<UnicodeBlock>        BUGINESE=new UnicodeBlock<UnicodeBlock>        TAI_THAM=new UnicodeBlock<UnicodeBlock>        BALINESE=new UnicodeBlock<UnicodeBlock>        SUNDANESE=new UnicodeBlock<UnicodeBlock>        BATAK=new UnicodeBlock<UnicodeBlock>        LEPCHA=new UnicodeBlock<UnicodeBlock>        OL_CHIKI=new UnicodeBlock<UnicodeBlock>        VEDIC_EXTENSIONS=new UnicodeBlock<UnicodeBlock>        PHONETIC_EXTENSIONS_SUPPLEMENT=new UnicodeBlock<UnicodeBlock>        COMBINING_DIACRITICAL_MARKS_SUPPLEMENT=new UnicodeBlock<UnicodeBlock>        GLAGOLITIC=new UnicodeBlock<UnicodeBlock>        LATIN_EXTENDED_C=new UnicodeBlock<UnicodeBlock>        COPTIC=new UnicodeBlock<UnicodeBlock>        GEORGIAN_SUPPLEMENT=new UnicodeBlock<UnicodeBlock>        TIFINAGH=new UnicodeBlock<UnicodeBlock>        ETHIOPIC_EXTENDED=new UnicodeBlock<UnicodeBlock>        CYRILLIC_EXTENDED_A=new UnicodeBlock<UnicodeBlock>        SUPPLEMENTAL_PUNCTUATION=new UnicodeBlock<UnicodeBlock>        CJK_STROKES=new UnicodeBlock<UnicodeBlock>        LISU=new UnicodeBlock<UnicodeBlock>        VAI=new UnicodeBlock<UnicodeBlock>        CYRILLIC_EXTENDED_B=new UnicodeBlock<UnicodeBlock>        BAMUM=new UnicodeBlock<UnicodeBlock>        MODIFIER_TONE_LETTERS=new UnicodeBlock<UnicodeBlock>        LATIN_EXTENDED_D=new UnicodeBlock<UnicodeBlock>        SYLOTI_NAGRI=new UnicodeBlock<UnicodeBlock>        COMMON_INDIC_NUMBER_FORMS=new UnicodeBlock<UnicodeBlock>        PHAGS_PA=new UnicodeBlock<UnicodeBlock>        SAURASHTRA=new UnicodeBlock<UnicodeBlock>        DEVANAGARI_EXTENDED=new UnicodeBlock<UnicodeBlock>        KAYAH_LI=new UnicodeBlock<UnicodeBlock>        REJANG=new UnicodeBlock<UnicodeBlock>        HANGUL_JAMO_EXTENDED_A=new UnicodeBlock<UnicodeBlock>        JAVANESE=new UnicodeBlock<UnicodeBlock>        CHAM=new UnicodeBlock<UnicodeBlock>        MYANMAR_EXTENDED_A=new UnicodeBlock<UnicodeBlock>        TAI_VIET=new UnicodeBlock<UnicodeBlock>        ETHIOPIC_EXTENDED_A=new UnicodeBlock<UnicodeBlock>        MEETEI_MAYEK=new UnicodeBlock<UnicodeBlock>        HANGUL_JAMO_EXTENDED_B=new UnicodeBlock<UnicodeBlock>        VERTICAL_FORMS=new UnicodeBlock<UnicodeBlock>        ANCIENT_GREEK_NUMBERS=new UnicodeBlock<UnicodeBlock>        ANCIENT_SYMBOLS=new UnicodeBlock<UnicodeBlock>        PHAISTOS_DISC=new UnicodeBlock<UnicodeBlock>        LYCIAN=new UnicodeBlock<UnicodeBlock>        CARIAN=new UnicodeBlock<UnicodeBlock>        OLD_PERSIAN=new UnicodeBlock<UnicodeBlock>        IMPERIAL_ARAMAIC=new UnicodeBlock<UnicodeBlock>        PHOENICIAN=new UnicodeBlock<UnicodeBlock>        LYDIAN=new UnicodeBlock<UnicodeBlock>        KHAROSHTHI=new UnicodeBlock<UnicodeBlock>        OLD_SOUTH_ARABIAN=new UnicodeBlock<UnicodeBlock>        AVESTAN=new UnicodeBlock<UnicodeBlock>        INSCRIPTIONAL_PARTHIAN=new UnicodeBlock<UnicodeBlock>        INSCRIPTIONAL_PAHLAVI=new UnicodeBlock<UnicodeBlock>        OLD_TURKIC=new UnicodeBlock<UnicodeBlock>        RUMI_NUMERAL_SYMBOLS=new UnicodeBlock<UnicodeBlock>        BRAHMI=new UnicodeBlock<UnicodeBlock>        KAITHI=new UnicodeBlock<UnicodeBlock>        CUNEIFORM=new UnicodeBlock<UnicodeBlock>        CUNEIFORM_NUMBERS_AND_PUNCTUATION=new UnicodeBlock<UnicodeBlock>        EGYPTIAN_HIEROGLYPHS=new UnicodeBlock<UnicodeBlock>        BAMUM_SUPPLEMENT=new UnicodeBlock<UnicodeBlock>        KANA_SUPPLEMENT=new UnicodeBlock<UnicodeBlock>        ANCIENT_GREEK_MUSICAL_NOTATION=new UnicodeBlock<UnicodeBlock>        COUNTING_ROD_NUMERALS=new UnicodeBlock<UnicodeBlock>        MAHJONG_TILES=new UnicodeBlock<UnicodeBlock>        DOMINO_TILES=new UnicodeBlock<UnicodeBlock>        PLAYING_CARDS=new UnicodeBlock<UnicodeBlock>        ENCLOSED_ALPHANUMERIC_SUPPLEMENT=new UnicodeBlock<UnicodeBlock>        ENCLOSED_IDEOGRAPHIC_SUPPLEMENT=new UnicodeBlock<UnicodeBlock>        MISCELLANEOUS_SYMBOLS_AND_PICTOGRAPHS=new UnicodeBlock<UnicodeBlock>        EMOTICONS=new UnicodeBlock<UnicodeBlock>        TRANSPORT_AND_MAP_SYMBOLS=new UnicodeBlock<UnicodeBlock>        ALCHEMICAL_SYMBOLS=new UnicodeBlock<UnicodeBlock>        CJK_UNIFIED_IDEOGRAPHS_EXTENSION_C=new UnicodeBlock<UnicodeBlock>        CJK_UNIFIED_IDEOGRAPHS_EXTENSION_D=new UnicodeBlock<UnicodeBlock>        ARABIC_EXTENDED_A=new UnicodeBlock<UnicodeBlock>        SUNDANESE_SUPPLEMENT=new UnicodeBlock<UnicodeBlock>        MEETEI_MAYEK_EXTENSIONS=new UnicodeBlock<UnicodeBlock>        MEROITIC_HIEROGLYPHS=new UnicodeBlock<UnicodeBlock>        MEROITIC_CURSIVE=new UnicodeBlock<UnicodeBlock>        SORA_SOMPENG=new UnicodeBlock<UnicodeBlock>        CHAKMA=new UnicodeBlock<UnicodeBlock>        SHARADA=new UnicodeBlock<UnicodeBlock>        TAKRI=new UnicodeBlock<UnicodeBlock>        MIAO=new UnicodeBlock<UnicodeBlock>        ARABIC_MATHEMATICAL_ALPHABETIC_SYMBOLS=new UnicodeBlock<UnicodeBlock>        blockStarts=[]        blocks=
+        map=new HashMap        BASIC_LATIN=new UnicodeBlock        LATIN_1_SUPPLEMENT=new UnicodeBlock        LATIN_EXTENDED_A=new UnicodeBlock        LATIN_EXTENDED_B=new UnicodeBlock        IPA_EXTENSIONS=new UnicodeBlock        SPACING_MODIFIER_LETTERS=new UnicodeBlock        COMBINING_DIACRITICAL_MARKS=new UnicodeBlock        GREEK=new UnicodeBlock        CYRILLIC=new UnicodeBlock        ARMENIAN=new UnicodeBlock        HEBREW=new UnicodeBlock        ARABIC=new UnicodeBlock        DEVANAGARI=new UnicodeBlock        BENGALI=new UnicodeBlock        GURMUKHI=new UnicodeBlock        GUJARATI=new UnicodeBlock        ORIYA=new UnicodeBlock        TAMIL=new UnicodeBlock        TELUGU=new UnicodeBlock        KANNADA=new UnicodeBlock        MALAYALAM=new UnicodeBlock        THAI=new UnicodeBlock        LAO=new UnicodeBlock        TIBETAN=new UnicodeBlock        GEORGIAN=new UnicodeBlock        HANGUL_JAMO=new UnicodeBlock        LATIN_EXTENDED_ADDITIONAL=new UnicodeBlock        GREEK_EXTENDED=new UnicodeBlock        GENERAL_PUNCTUATION=new UnicodeBlock        SUPERSCRIPTS_AND_SUBSCRIPTS=new UnicodeBlock        CURRENCY_SYMBOLS=new UnicodeBlock        COMBINING_MARKS_FOR_SYMBOLS=new UnicodeBlock        LETTERLIKE_SYMBOLS=new UnicodeBlock        NUMBER_FORMS=new UnicodeBlock        ARROWS=new UnicodeBlock        MATHEMATICAL_OPERATORS=new UnicodeBlock        MISCELLANEOUS_TECHNICAL=new UnicodeBlock        CONTROL_PICTURES=new UnicodeBlock        OPTICAL_CHARACTER_RECOGNITION=new UnicodeBlock        ENCLOSED_ALPHANUMERICS=new UnicodeBlock        BOX_DRAWING=new UnicodeBlock        BLOCK_ELEMENTS=new UnicodeBlock        GEOMETRIC_SHAPES=new UnicodeBlock        MISCELLANEOUS_SYMBOLS=new UnicodeBlock        DINGBATS=new UnicodeBlock        CJK_SYMBOLS_AND_PUNCTUATION=new UnicodeBlock        HIRAGANA=new UnicodeBlock        KATAKANA=new UnicodeBlock        BOPOMOFO=new UnicodeBlock        HANGUL_COMPATIBILITY_JAMO=new UnicodeBlock        KANBUN=new UnicodeBlock        ENCLOSED_CJK_LETTERS_AND_MONTHS=new UnicodeBlock        CJK_COMPATIBILITY=new UnicodeBlock        CJK_UNIFIED_IDEOGRAPHS=new UnicodeBlock        HANGUL_SYLLABLES=new UnicodeBlock        PRIVATE_USE_AREA=new UnicodeBlock        CJK_COMPATIBILITY_IDEOGRAPHS=new UnicodeBlock        ALPHABETIC_PRESENTATION_FORMS=new UnicodeBlock        ARABIC_PRESENTATION_FORMS_A=new UnicodeBlock        COMBINING_HALF_MARKS=new UnicodeBlock        CJK_COMPATIBILITY_FORMS=new UnicodeBlock        SMALL_FORM_VARIANTS=new UnicodeBlock        ARABIC_PRESENTATION_FORMS_B=new UnicodeBlock        HALFWIDTH_AND_FULLWIDTH_FORMS=new UnicodeBlock        SPECIALS=new UnicodeBlock        SURROGATES_AREA=new UnicodeBlock        SYRIAC=new UnicodeBlock        THAANA=new UnicodeBlock        SINHALA=new UnicodeBlock        MYANMAR=new UnicodeBlock        ETHIOPIC=new UnicodeBlock        CHEROKEE=new UnicodeBlock        UNIFIED_CANADIAN_ABORIGINAL_SYLLABICS=new UnicodeBlock        OGHAM=new UnicodeBlock        RUNIC=new UnicodeBlock        KHMER=new UnicodeBlock        MONGOLIAN=new UnicodeBlock        BRAILLE_PATTERNS=new UnicodeBlock        CJK_RADICALS_SUPPLEMENT=new UnicodeBlock        KANGXI_RADICALS=new UnicodeBlock        IDEOGRAPHIC_DESCRIPTION_CHARACTERS=new UnicodeBlock        BOPOMOFO_EXTENDED=new UnicodeBlock        CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A=new UnicodeBlock        YI_SYLLABLES=new UnicodeBlock        YI_RADICALS=new UnicodeBlock        CYRILLIC_SUPPLEMENTARY=new UnicodeBlock        TAGALOG=new UnicodeBlock        HANUNOO=new UnicodeBlock        BUHID=new UnicodeBlock        TAGBANWA=new UnicodeBlock        LIMBU=new UnicodeBlock        TAI_LE=new UnicodeBlock        KHMER_SYMBOLS=new UnicodeBlock        PHONETIC_EXTENSIONS=new UnicodeBlock        MISCELLANEOUS_MATHEMATICAL_SYMBOLS_A=new UnicodeBlock        SUPPLEMENTAL_ARROWS_A=new UnicodeBlock        SUPPLEMENTAL_ARROWS_B=new UnicodeBlock        MISCELLANEOUS_MATHEMATICAL_SYMBOLS_B=new UnicodeBlock        SUPPLEMENTAL_MATHEMATICAL_OPERATORS=new UnicodeBlock        MISCELLANEOUS_SYMBOLS_AND_ARROWS=new UnicodeBlock        KATAKANA_PHONETIC_EXTENSIONS=new UnicodeBlock        YIJING_HEXAGRAM_SYMBOLS=new UnicodeBlock        VARIATION_SELECTORS=new UnicodeBlock        LINEAR_B_SYLLABARY=new UnicodeBlock        LINEAR_B_IDEOGRAMS=new UnicodeBlock        AEGEAN_NUMBERS=new UnicodeBlock        OLD_ITALIC=new UnicodeBlock        GOTHIC=new UnicodeBlock        UGARITIC=new UnicodeBlock        DESERET=new UnicodeBlock        SHAVIAN=new UnicodeBlock        OSMANYA=new UnicodeBlock        CYPRIOT_SYLLABARY=new UnicodeBlock        BYZANTINE_MUSICAL_SYMBOLS=new UnicodeBlock        MUSICAL_SYMBOLS=new UnicodeBlock        TAI_XUAN_JING_SYMBOLS=new UnicodeBlock        MATHEMATICAL_ALPHANUMERIC_SYMBOLS=new UnicodeBlock        CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B=new UnicodeBlock        CJK_COMPATIBILITY_IDEOGRAPHS_SUPPLEMENT=new UnicodeBlock        TAGS=new UnicodeBlock        VARIATION_SELECTORS_SUPPLEMENT=new UnicodeBlock        SUPPLEMENTARY_PRIVATE_USE_AREA_A=new UnicodeBlock        SUPPLEMENTARY_PRIVATE_USE_AREA_B=new UnicodeBlock        HIGH_SURROGATES=new UnicodeBlock        HIGH_PRIVATE_USE_SURROGATES=new UnicodeBlock        LOW_SURROGATES=new UnicodeBlock        ARABIC_SUPPLEMENT=new UnicodeBlock        NKO=new UnicodeBlock        SAMARITAN=new UnicodeBlock        MANDAIC=new UnicodeBlock        ETHIOPIC_SUPPLEMENT=new UnicodeBlock        UNIFIED_CANADIAN_ABORIGINAL_SYLLABICS_EXTENDED=new UnicodeBlock        NEW_TAI_LUE=new UnicodeBlock        BUGINESE=new UnicodeBlock        TAI_THAM=new UnicodeBlock        BALINESE=new UnicodeBlock        SUNDANESE=new UnicodeBlock        BATAK=new UnicodeBlock        LEPCHA=new UnicodeBlock        OL_CHIKI=new UnicodeBlock        VEDIC_EXTENSIONS=new UnicodeBlock        PHONETIC_EXTENSIONS_SUPPLEMENT=new UnicodeBlock        COMBINING_DIACRITICAL_MARKS_SUPPLEMENT=new UnicodeBlock        GLAGOLITIC=new UnicodeBlock        LATIN_EXTENDED_C=new UnicodeBlock        COPTIC=new UnicodeBlock        GEORGIAN_SUPPLEMENT=new UnicodeBlock        TIFINAGH=new UnicodeBlock        ETHIOPIC_EXTENDED=new UnicodeBlock        CYRILLIC_EXTENDED_A=new UnicodeBlock        SUPPLEMENTAL_PUNCTUATION=new UnicodeBlock        CJK_STROKES=new UnicodeBlock        LISU=new UnicodeBlock        VAI=new UnicodeBlock        CYRILLIC_EXTENDED_B=new UnicodeBlock        BAMUM=new UnicodeBlock        MODIFIER_TONE_LETTERS=new UnicodeBlock        LATIN_EXTENDED_D=new UnicodeBlock        SYLOTI_NAGRI=new UnicodeBlock        COMMON_INDIC_NUMBER_FORMS=new UnicodeBlock        PHAGS_PA=new UnicodeBlock        SAURASHTRA=new UnicodeBlock        DEVANAGARI_EXTENDED=new UnicodeBlock        KAYAH_LI=new UnicodeBlock        REJANG=new UnicodeBlock        HANGUL_JAMO_EXTENDED_A=new UnicodeBlock        JAVANESE=new UnicodeBlock        CHAM=new UnicodeBlock        MYANMAR_EXTENDED_A=new UnicodeBlock        TAI_VIET=new UnicodeBlock        ETHIOPIC_EXTENDED_A=new UnicodeBlock        MEETEI_MAYEK=new UnicodeBlock        HANGUL_JAMO_EXTENDED_B=new UnicodeBlock        VERTICAL_FORMS=new UnicodeBlock        ANCIENT_GREEK_NUMBERS=new UnicodeBlock        ANCIENT_SYMBOLS=new UnicodeBlock        PHAISTOS_DISC=new UnicodeBlock        LYCIAN=new UnicodeBlock        CARIAN=new UnicodeBlock        OLD_PERSIAN=new UnicodeBlock        IMPERIAL_ARAMAIC=new UnicodeBlock        PHOENICIAN=new UnicodeBlock        LYDIAN=new UnicodeBlock        KHAROSHTHI=new UnicodeBlock        OLD_SOUTH_ARABIAN=new UnicodeBlock        AVESTAN=new UnicodeBlock        INSCRIPTIONAL_PARTHIAN=new UnicodeBlock        INSCRIPTIONAL_PAHLAVI=new UnicodeBlock        OLD_TURKIC=new UnicodeBlock        RUMI_NUMERAL_SYMBOLS=new UnicodeBlock        BRAHMI=new UnicodeBlock        KAITHI=new UnicodeBlock        CUNEIFORM=new UnicodeBlock        CUNEIFORM_NUMBERS_AND_PUNCTUATION=new UnicodeBlock        EGYPTIAN_HIEROGLYPHS=new UnicodeBlock        BAMUM_SUPPLEMENT=new UnicodeBlock        KANA_SUPPLEMENT=new UnicodeBlock        ANCIENT_GREEK_MUSICAL_NOTATION=new UnicodeBlock        COUNTING_ROD_NUMERALS=new UnicodeBlock        MAHJONG_TILES=new UnicodeBlock        DOMINO_TILES=new UnicodeBlock        PLAYING_CARDS=new UnicodeBlock        ENCLOSED_ALPHANUMERIC_SUPPLEMENT=new UnicodeBlock        ENCLOSED_IDEOGRAPHIC_SUPPLEMENT=new UnicodeBlock        MISCELLANEOUS_SYMBOLS_AND_PICTOGRAPHS=new UnicodeBlock        EMOTICONS=new UnicodeBlock        TRANSPORT_AND_MAP_SYMBOLS=new UnicodeBlock        ALCHEMICAL_SYMBOLS=new UnicodeBlock        CJK_UNIFIED_IDEOGRAPHS_EXTENSION_C=new UnicodeBlock        CJK_UNIFIED_IDEOGRAPHS_EXTENSION_D=new UnicodeBlock        ARABIC_EXTENDED_A=new UnicodeBlock        SUNDANESE_SUPPLEMENT=new UnicodeBlock        MEETEI_MAYEK_EXTENSIONS=new UnicodeBlock        MEROITIC_HIEROGLYPHS=new UnicodeBlock        MEROITIC_CURSIVE=new UnicodeBlock        SORA_SOMPENG=new UnicodeBlock        CHAKMA=new UnicodeBlock        SHARADA=new UnicodeBlock        TAKRI=new UnicodeBlock        MIAO=new UnicodeBlock        ARABIC_MATHEMATICAL_ALPHABETIC_SYMBOLS=new UnicodeBlock        blockStarts=[]        blocks=
       Instance Initializer: 
       Constructors: 
         constructor  UnicodeBlock(idName)  throws: 
@@ -621,7 +621,7 @@ class  Character
         func  of(codePoint)  throws: 
           cond-branch cond:isValidCodePoint(codePoint)
           true branch :
-            new IllegalArgumentException<IllegalArgumentException>
+            new IllegalArgumentException
           false branch :
 
           var:top,bottom,current
@@ -641,7 +641,7 @@ class  Character
           var:block=map.get(blockName.toUpperCase(Locale.US))
           cond-branch cond:block EQ null
           true branch :
-            new IllegalArgumentException<IllegalArgumentException>
+            new IllegalArgumentException
           false branch :
 
           return block
@@ -657,7 +657,7 @@ class  Character
         func  of(codePoint)  throws: 
           cond-branch cond:isValidCodePoint(codePoint)
           true branch :
-            new IllegalArgumentException<IllegalArgumentException>
+            new IllegalArgumentException
           false branch :
 
           var:type=getType(codePoint)

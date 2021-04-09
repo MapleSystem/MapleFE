@@ -469,8 +469,8 @@ void NewNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   DUMP0_NORETURN("new ");
   TreeNode *id = GetId();
-  id->Dump(0);
-  //DUMP0_NORETURN(id->GetName());
+  //id->Dump(0);
+  DUMP0_NORETURN(id->GetName());
 }
 
 //////////////////////////////////////////////////////////////////////////////////////

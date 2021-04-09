@@ -85,7 +85,7 @@ class  Math
       var:r=x Add y
       cond-branch cond:((x Bxor r) Band (y Bxor r)) LT 0
       true branch :
-        new ArithmeticException<ArithmeticException>
+        new ArithmeticException
       false branch :
 
       return r
@@ -93,7 +93,7 @@ class  Math
       var:r=x Add y
       cond-branch cond:((x Bxor r) Band (y Bxor r)) LT 0
       true branch :
-        new ArithmeticException<ArithmeticException>
+        new ArithmeticException
       false branch :
 
       return r
@@ -101,7 +101,7 @@ class  Math
       var:r=x Sub y
       cond-branch cond:((x Bxor y) Band (x Bxor r)) LT 0
       true branch :
-        new ArithmeticException<ArithmeticException>
+        new ArithmeticException
       false branch :
 
       return r
@@ -109,7 +109,7 @@ class  Math
       var:r=x Sub y
       cond-branch cond:((x Bxor y) Band (x Bxor r)) LT 0
       true branch :
-        new ArithmeticException<ArithmeticException>
+        new ArithmeticException
       false branch :
 
       return r
@@ -117,7 +117,7 @@ class  Math
       var:r=(long)x Mul (long)y
       cond-branch cond:(int)r NE r
       true branch :
-        new ArithmeticException<ArithmeticException>
+        new ArithmeticException
       false branch :
 
       return (int)r
@@ -130,7 +130,7 @@ class  Math
         cond-branch cond:((y NE 0) Land (r Div y NE x)) Lor (x EQ Long.MIN_VALUE Land y EQ Sub
   1)
         true branch :
-          new ArithmeticException<ArithmeticException>
+          new ArithmeticException
         false branch :
 
       false branch :
@@ -139,35 +139,35 @@ class  Math
     func  incrementExact(a)  throws: 
       cond-branch cond:a EQ Integer.MAX_VALUE
       true branch :
-        new ArithmeticException<ArithmeticException>
+        new ArithmeticException
       false branch :
 
       return a Add 1
     func  incrementExact(a)  throws: 
       cond-branch cond:a EQ Long.MAX_VALUE
       true branch :
-        new ArithmeticException<ArithmeticException>
+        new ArithmeticException
       false branch :
 
       return a Add 1
     func  decrementExact(a)  throws: 
       cond-branch cond:a EQ Integer.MIN_VALUE
       true branch :
-        new ArithmeticException<ArithmeticException>
+        new ArithmeticException
       false branch :
 
       return a Sub 1
     func  decrementExact(a)  throws: 
       cond-branch cond:a EQ Long.MIN_VALUE
       true branch :
-        new ArithmeticException<ArithmeticException>
+        new ArithmeticException
       false branch :
 
       return a Sub 1
     func  negateExact(a)  throws: 
       cond-branch cond:a EQ Integer.MIN_VALUE
       true branch :
-        new ArithmeticException<ArithmeticException>
+        new ArithmeticException
       false branch :
 
       return Sub
@@ -175,7 +175,7 @@ class  Math
     func  negateExact(a)  throws: 
       cond-branch cond:a EQ Long.MIN_VALUE
       true branch :
-        new ArithmeticException<ArithmeticException>
+        new ArithmeticException
       false branch :
 
       return Sub
@@ -183,7 +183,7 @@ class  Math
     func  toIntExact(value)  throws: 
       cond-branch cond:(int)value NE value
       true branch :
-        new ArithmeticException<ArithmeticException>
+        new ArithmeticException
       false branch :
 
       return (int)value
@@ -404,7 +404,7 @@ class  Math
   LocalClasses: 
     class  RandomNumberGeneratorHolder
       Fields: 
-        randomNumberGenerator=new Random<Random>
+        randomNumberGenerator=new Random
       Instance Initializer: 
       Constructors: 
       Methods: 

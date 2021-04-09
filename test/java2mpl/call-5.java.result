@@ -8,7 +8,7 @@ class  A
   Constructors: 
   Methods: 
     func  foo()  throws: 
-      var:socket=new Socket<Socket>
+      var:socket=new Socket
   LocalClasses: 
   LocalInterfaces: 
 
