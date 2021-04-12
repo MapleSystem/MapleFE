@@ -26,7 +26,7 @@
 #include "container.h"
 #include "recursion.h"
 #include "succ_match.h"
-#include "gen_summary.h"
+#include "rule_summary.h"
 
 namespace maplefe {
 

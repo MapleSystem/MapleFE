@@ -62,56 +62,9 @@ FileWriter *gSummaryCppFile;
 unsigned    gRuleTableNum;
 std::vector<std::string> gTopRules;
 
-static void WriteSummaryHFile() {
-  gSummaryHFile->WriteOneLine("#ifndef __DEBUG_GEN_H__", 23);
-  gSummaryHFile->WriteOneLine("#define __DEBUG_GEN_H__", 23);
-  gSummaryHFile->WriteOneLine("#include \"ruletable.h\"", 22);
-  gSummaryHFile->WriteOneLine("#include \"succ_match.h\"", 23);
-  gSummaryHFile->WriteOneLine("#include <vector>", 17);
-  gSummaryHFile->WriteOneLine("namespace maplefe {", 19);
-  gSummaryHFile->WriteOneLine("typedef struct {", 16);
-  gSummaryHFile->WriteOneLine("  const RuleTable *mAddr;", 25);
-  gSummaryHFile->WriteOneLine("  const char      *mName;", 25);
-  gSummaryHFile->WriteOneLine("  unsigned         mIndex;", 26);
-  gSummaryHFile->WriteOneLine("}RuleTableSummary;", 18);
-  gSummaryHFile->WriteOneLine("extern RuleTableSummary gRuleTableSummarys[];", 45);
-  gSummaryHFile->WriteOneLine("extern unsigned RuleTableNum;", 29);
-  gSummaryHFile->WriteOneLine("extern const char* GetRuleTableName(const RuleTable*);", 54);
-
-  // Write gFailed
-  std::string s = "class BitVector;";
-  gSummaryHFile->WriteOneLine(s.c_str(), s.size());
-
-  s = "extern BitVector gFailed[";
-  s += std::to_string(gRuleTableNum);
-  s += "];";
-  gSummaryHFile->WriteOneLine(s.c_str(), s.size());
-
-  // Write SuccMatch array
-  s = "class SuccMatch;";
-  gSummaryHFile->WriteOneLine(s.c_str(), s.size());
-
-  s = "extern SuccMatch gSucc[";
-  s += std::to_string(gRuleTableNum);
-  s += "];";
-  gSummaryHFile->WriteOneLine(s.c_str(), s.size());
-
-  // Write Top rules
-  s = "extern unsigned gTopRulesNum;";
-  gSummaryHFile->WriteOneLine(s.c_str(), s.size());
-
-  s = "extern RuleTable* gTopRules[";
-  s += std::to_string(gTopRules.size());
-  s += "];";
-  gSummaryHFile->WriteOneLine(s.c_str(), s.size());
-
-  gSummaryHFile->WriteOneLine("}", 1);
-  gSummaryHFile->WriteOneLine("#endif", 6);
-}
-
 // write the beginning part of summary file
 static void PrepareSummaryCppFile() {
-  gSummaryCppFile->WriteOneLine("#include \"gen_summary.h\"", 24);
+  gSummaryCppFile->WriteOneLine("#include \"rule_summary.h\"", 25);
   gSummaryCppFile->WriteOneLine("#include \"common_header_autogen.h\"", 34);
   gSummaryCppFile->WriteOneLine("namespace maplefe {", 19);
   gSummaryCppFile->WriteOneLine("RuleTableSummary gRuleTableSummarys[] = {", 41);
@@ -308,7 +261,6 @@ void AutoGen::Gen() {
     gen->Generate();
   }
 
-  WriteSummaryHFile();
   FinishSummaryCppFile();
 }
 

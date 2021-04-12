@@ -16,7 +16,7 @@
 #include "common_header_autogen.h"
 #include "ruletable_util.h"
 #include "rec_detect.h"
-#include "gen_summary.h"
+#include "rule_summary.h"
 
 namespace maplefe {
 

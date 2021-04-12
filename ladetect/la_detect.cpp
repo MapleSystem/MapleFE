@@ -15,7 +15,7 @@
 
 #include "common_header_autogen.h"
 #include "ruletable_util.h"
-#include "gen_summary.h"
+#include "rule_summary.h"
 #include "la_detect.h"
 #include "container.h"
 

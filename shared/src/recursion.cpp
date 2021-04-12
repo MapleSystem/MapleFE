@@ -20,7 +20,7 @@
 /////////////////////////////////////////////////////////////////////////////////////
 
 #include "recursion.h"
-#include "gen_summary.h"
+#include "rule_summary.h"
 #include "gen_token.h"
 #include "token.h"
 
