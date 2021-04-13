@@ -163,6 +163,7 @@ struct AttrKeyword {
   const char *mText;
   AttrId      mId;
 };
+extern AttrKeyword AttrKeywordTable[ATTR_NA];
 
 //////////////////////////////////////////////////////////////////////
 //                    Separator Table                               //

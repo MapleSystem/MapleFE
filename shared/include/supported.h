@@ -64,7 +64,6 @@ enum AttrId {
 ATTR_NA
 };
 
-
 // TODO: The action id will come from both the shared part and language specific part.
 //       Some language may have its own special action to build AST.
 //       For now I just put everything together in order to expediate the overall

@@ -66,17 +66,7 @@ const std::string AttrGen::EnumNextElem(){
 /////////////////////////////////////////////////////////////////////
 
 void AttrGen::Generate() {
-  GenHeaderFile();
   GenCppFile();
-}
-
-void AttrGen::GenHeaderFile() {
-  mHeaderFile.WriteOneLine("#ifndef __ATTR_GEN_H__", 22);
-  mHeaderFile.WriteOneLine("#define __ATTR_GEN_H__", 22);
-  mHeaderFile.WriteOneLine("namespace maplefe {", 19);
-  mHeaderFile.WriteOneLine("extern AttrKeyword AttrKeywordTable[ATTR_NA];", 45);
-  mHeaderFile.WriteOneLine("}", 1);
-  mHeaderFile.WriteOneLine("#endif", 6);
 }
 
 void AttrGen::GenCppFile() {
