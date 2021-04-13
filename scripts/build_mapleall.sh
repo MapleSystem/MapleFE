@@ -22,4 +22,5 @@ cd $MAPLEALL_ROOT
 git pull
 source build/envsetup.sh arm debug
 make setup
-make
+make maple
+make irbuild
