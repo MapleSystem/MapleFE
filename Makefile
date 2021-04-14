@@ -34,7 +34,7 @@ shared: autogen
 	$(MAKE) -C shared
 
 autogen:
-	$(MAKE) LANG=java -C autogen
+	$(MAKE) -C autogen
 	(cd $(BUILDDIR)/autogen; ./autogen)
 
 mapleall:
