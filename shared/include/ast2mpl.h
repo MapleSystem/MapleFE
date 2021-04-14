@@ -53,6 +53,8 @@ private:
   FEMIRBuilder *mMirBuilder;
   maple::MIRType *mDefaultType;
   FieldData *mFieldData;
+  unsigned mUniqNum;
+
 public:
   maple::MIRModule *mMirModule;
   // use type's uniq name as key
@@ -75,6 +77,7 @@ public:
   virtual const char *Type2Label(const maple::MIRType *type);
   void Type2Name(std::string &str, const maple::MIRType *type);
 
+  ClassNode *GetSuperClass(ClassNode *klass);
   BlockNode *GetSuperBlock(BlockNode *block);
   maple::MIRSymbol *GetSymbol(TreeNode *tnode, BlockNode *block);
   maple::MIRSymbol *CreateSymbol(TreeNode *tnode, BlockNode *block);

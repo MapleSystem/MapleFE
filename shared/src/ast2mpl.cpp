@@ -19,14 +19,11 @@
 
 namespace maplefe {
 
-static unsigned mVarUniqNum;
-
 A2M::A2M(const char *filename) : mFileName(filename) {
   mMirModule = new maple::MIRModule(mFileName);
   maple::theMIRModule = mMirModule;
   mMirBuilder = new FEMIRBuilder(mMirModule);
   mFieldData = new FieldData();
-  mVarUniqNum = 1;
   Init();
 }
 
@@ -51,13 +48,16 @@ void A2M::Init() {
   maple::GStrIdx idx = maple::GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(mFileName);
   SET_INFO_PAIR(mMirModule, "INFO_filename", idx.GetIdx(), true);
 
-  // add to java src file list
+  // add to src file list
   std::string str(mFileName);
   size_t pos = str.rfind('/');
   if (pos != std::string::npos) {
     idx = maple::GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(str.substr(pos+1));
   }
   mMirModule->PushbackFileInfo(maple::MIRInfoPair(idx, 2));
+
+  // initialize unique serial number for temporary variables and inner classes
+  mUniqNum = 1;
 }
 
 // starting point of AST to MPL process
@@ -308,11 +308,10 @@ void A2M::Type2Name(std::string &str, const maple::MIRType *type) {
   }
 }
 
-// update to use uniq name: str --> str|mVarUniqNum
+// update to use uniq name: str --> str|mUniqNum
 void A2M::UpdateUniqName(std::string &str) {
   str.append(SEP);
-  str.append(std::to_string(mVarUniqNum));
-  mVarUniqNum++;
+  str.append(std::to_string(mUniqNum++));
   return;
 }
 
@@ -351,12 +350,20 @@ void A2M::UpdateFuncName(maple::MIRFunction *func) {
   maple::GlobalTables::GetGsymTable().AddToStringSymbolMap(*funcst);
 }
 
-BlockNode *A2M::GetSuperBlock(BlockNode *block) {
-  TreeNode *blk = block->GetParent();
-  while (blk && !blk->IsBlock()) {
-    blk = blk->GetParent();
+ClassNode *A2M::GetSuperClass(ClassNode *klass) {
+  TreeNode *tnode = klass->GetParent();
+  while (tnode && !tnode->IsClass()) {
+    tnode = tnode->GetParent();
   }
-  return (BlockNode*)blk;
+  return static_cast<ClassNode *>(tnode);
+}
+
+BlockNode *A2M::GetSuperBlock(BlockNode *block) {
+  TreeNode *tnode = block->GetParent();
+  while (tnode && !tnode->IsBlock()) {
+    tnode = tnode->GetParent();
+  }
+  return static_cast<BlockNode *>(tnode);
 }
 
 maple::MIRSymbol *A2M::GetSymbol(TreeNode *tnode, BlockNode *block) {
@@ -401,8 +408,7 @@ maple::MIRSymbol *A2M::CreateTempVar(const char *prefix, maple::MIRType *type) {
   }
   std::string str(prefix);
   str.append(SEP);
-  str.append(std::to_string(mVarUniqNum));
-  mVarUniqNum++;
+  str.append(std::to_string(mUniqNum++));
   maple::MIRFunction *func = mMirModule->CurFunction();
   maple::MIRSymbol *var = mMirBuilder->CreateLocalDecl(str, *type);
   return var;

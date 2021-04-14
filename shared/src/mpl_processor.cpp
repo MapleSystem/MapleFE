@@ -714,6 +714,18 @@ maple::BaseNode *A2M::ProcessFuncSetup(StmtExprKind skind, TreeNode *tnode, Bloc
 maple::BaseNode *A2M::ProcessClassDecl(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
   ClassNode *classnode = static_cast<ClassNode *>(tnode);
   const char *name = classnode->GetName();
+  TreeNode *parent = GetSuperClass(classnode);
+  // mangle the name for inner classes
+  if (parent) {
+    if (parent->GetKind() == NK_Class) {
+      std::string str = parent->GetName();
+      str.append("$");   // indicate inner class name
+      str.append(std::to_string(mUniqNum++));
+      str.append(name);
+      name = strdup(str.c_str());
+      classnode->SetName(name);
+    }
+  }
   maple::MIRType *type = maple::GlobalTables::GetTypeTable().GetOrCreateClassType(name, *mMirModule);
   type->SetMIRTypeKind(maple::kTypeClass);
   // always use pointer type for classes, with PTY_ref
