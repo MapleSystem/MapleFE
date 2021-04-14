@@ -21,7 +21,6 @@
 
 #include "recursion.h"
 #include "rule_summary.h"
-#include "gen_token.h"
 #include "token.h"
 
 namespace maplefe {

@@ -16,8 +16,8 @@
 #include <cstring>
 
 #include "ast_type.h"
-#include "gen_type.h"   // for language specific type keyword
 #include "ruletable.h"
+#include "rule_summary.h"
 #include "ast.h"
 #include "massert.h"
 

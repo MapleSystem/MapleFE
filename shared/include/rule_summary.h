@@ -2,6 +2,7 @@
 #define __RULE_SUMMARY_H__
 #include "ruletable.h"
 #include "succ_match.h"
+#include "token.h"
 namespace maplefe {
 typedef struct {
   const RuleTable *mAddr;
@@ -17,5 +18,32 @@ class SuccMatch;
 extern SuccMatch gSucc[];
 extern unsigned gTopRulesNum;
 extern RuleTable* gTopRules[];
+
+// The rule tables of autogen reserved rules.
+extern RuleTable TblCHAR;
+extern RuleTable TblDIGIT;
+extern RuleTable TblASCII;
+extern RuleTable TblESCAPE;
+extern RuleTable TblHEXDIGIT;
+
+//
+extern RuleTable TblIdentifier;
+extern RuleTable TblLiteral;
+extern RuleTable TblIntegerLiteral;
+extern RuleTable TblFPLiteral;
+extern RuleTable TblBooleanLiteral;
+extern RuleTable TblCharacterLiteral;
+extern RuleTable TblStringLiteral;
+extern RuleTable TblNullLiteral;
+
+// The tokens defined by system
+extern unsigned gSystemTokensNum;
+extern unsigned gOperatorTokensNum;
+extern unsigned gSeparatorTokensNum;
+extern unsigned gKeywordTokensNum;
+extern Token gSystemTokens[];
+extern unsigned gAltTokensNum;
+extern AltToken gAltTokens[];
+
 }
 #endif

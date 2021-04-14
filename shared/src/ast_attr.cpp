@@ -18,7 +18,6 @@
 #include "ast.h"
 #include "ruletable.h"
 #include "ast_attr.h"
-#include "gen_attr.h"   // for language specific attr keyword
 #include "massert.h"
 
 namespace maplefe {

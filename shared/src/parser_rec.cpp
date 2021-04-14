@@ -21,7 +21,7 @@
 #include "parser.h"
 #include "parser_rec.h"
 #include "ruletable_util.h"
-#include "gen_summary.h"
+#include "rule_summary.h"
 
 namespace maplefe {
 

@@ -31,7 +31,7 @@ ladetect: autogen shared
 	(cd $(BUILDDIR)/ladetect; ./ladetect)
 
 shared: autogen
-	$(MAKE) LANG=java -C shared
+	$(MAKE) -C shared
 
 autogen:
 	$(MAKE) LANG=java -C autogen

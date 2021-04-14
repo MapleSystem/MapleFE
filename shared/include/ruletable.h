@@ -153,6 +153,7 @@ struct TypeKeyword {
   const char *mText;
   TypeId      mId;
 };
+extern TypeKeyword TypeKeywordTable[TY_NA];
 
 //////////////////////////////////////////////////////////////////////
 //                     Attribute  Table                             //
@@ -175,6 +176,7 @@ struct SepTableEntry {
   const char *mText;
   SepId       mId;
 };
+extern SepTableEntry SepTable[SEP_NA];
 
 //////////////////////////////////////////////////////////////////////
 //                    Operator  Table                               //
@@ -186,6 +188,7 @@ struct OprTableEntry {
   const char *mText;
   OprId       mId;
 };
+extern OprTableEntry OprTable[OPR_NA];
 
 //////////////////////////////////////////////////////////////////////
 //                    Keyword   Table                               //
@@ -196,6 +199,8 @@ struct OprTableEntry {
 struct KeywordTableEntry {
   const char *mText;
 };
+extern KeywordTableEntry KeywordTable[];
+extern unsigned KeywordTableSize;
 
 }
 #endif

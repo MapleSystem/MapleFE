@@ -25,7 +25,6 @@ LIBOBJS :=$(patsubst $(BUILD)/main.o,,$(OBJS))
 DEPS :=$(foreach dep,$(DEP), $(BUILD)/$(dep))
 
 INCLUDES := -I $(MAPLEFE_ROOT)/shared/include \
-            -I $(MAPLEFE_ROOT)/$(LANG)/include \
             -I . $(MAPLEALL_INC)
 
 SHAREDLIB = shared.a

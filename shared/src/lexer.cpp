@@ -17,15 +17,11 @@
 #include "massert.h"
 #include "lexer.h"
 #include "token.h"
-#include "common_header_autogen.h"
 #include "ruletable_util.h"
-#include "gen_summary.h"
-#include "gen_token.h"
+#include "rule_summary.h"
 #include "massert.h"
 #include <climits>
 #include <cstdlib>
-
-#include "ruletable_util.h"
 
 namespace maplefe {
 

@@ -16,9 +16,8 @@
 
 #include "ruletable_util.h"
 #include "lexer.h"
-#include "lang_spec.h"
 #include "massert.h"
-#include "common_header_autogen.h"
+#include "rule_summary.h"
 #include "container.h"
 
 namespace maplefe {
