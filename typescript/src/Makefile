@@ -13,7 +13,7 @@
 #
 
 include ../../Makefile.in
-BUILD=$(BUILDDIR)/java
+BUILD=$(BUILDDIR)/typescript
 $(shell $(MKDIR_P) $(BUILD))
 
 SRC=$(wildcard *.cpp)
@@ -24,14 +24,14 @@ OBJS :=$(foreach obj,$(OBJ), $(BUILD)/$(obj))
 DEPS :=$(foreach dep,$(DEP), $(BUILD)/$(dep))
 
 INCLUDES := -I $(MAPLEFE_ROOT)/shared/include \
-            -I $(MAPLEFE_ROOT)/ast2mpl/include \
-            -I $(MAPLEFE_ROOT)/java/include \
+            -I $(MAPLEFE_ROOT)/ast2cpp/include \
+            -I $(MAPLEFE_ROOT)/typescript/include \
             -I $(MAPLEFE_ROOT)/autogen/include \
             -I . $(MAPLEALL_INC)
 
-TARGET=java2mpl
+TARGET=ts2cpp
 
-SHAREDLIB = $(BUILDDIR)/shared/shared.a $(BUILDDIR)/ast2mpl/ast2mpl.a
+SHAREDLIB = $(BUILDDIR)/shared/shared.a $(BUILDDIR)/ast2cpp/ast2cpp.a
 
 .PHONY: all $(TARGET)
 all: $(TARGET)
