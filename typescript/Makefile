@@ -14,7 +14,7 @@
 
 include ../Makefile.in
 
-TARGS = js2cpp
+TARGS = ts2cpp
 
 $(TARGS):
 	$(MAKE) -C src

@@ -17,6 +17,8 @@
 // This file will be included in token_gen.cpp.
 // This file defines the alternative tokens of some special tokens. Please refer
 // shared/include/token.h for the definition of alternative tokens.
+//
+// Right now this is language independent
 
   {">>", 2, ">"},
   {">>>", 3, ">"}

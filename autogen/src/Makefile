@@ -14,9 +14,8 @@ LIBOBJS :=$(patsubst $(BUILD)/main.o,,$(OBJS))
 DEPS := $(foreach dep, $(DEP), $(BUILD)/$(dep))
 
 INCLUDES := -I $(MAPLEFE_ROOT)/autogen/include \
-            -I $(MAPLEFE_ROOT)/shared/include \
-            -I $(MAPLEFE_ROOT)/java/include \
-            -I $(MAPLEFE_ROOT)/java
+            -I $(MAPLEFE_ROOT)/autogen \
+            -I $(MAPLEFE_ROOT)/shared/include
 
 TARGET = autogen
 
