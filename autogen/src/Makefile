@@ -15,9 +15,7 @@ DEPS := $(foreach dep, $(DEP), $(BUILD)/$(dep))
 
 INCLUDES := -I $(MAPLEFE_ROOT)/autogen/include \
             -I $(MAPLEFE_ROOT)/autogen \
-            -I $(MAPLEFE_ROOT)/shared/include \
-            -I $(MAPLEFE_ROOT)/$(LANG)/include \
-            -I $(MAPLEFE_ROOT)/$(LANG)
+            -I $(MAPLEFE_ROOT)/shared/include
 
 TARGET = autogen
 
