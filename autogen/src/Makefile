@@ -15,7 +15,9 @@ DEPS := $(foreach dep, $(DEP), $(BUILD)/$(dep))
 
 INCLUDES := -I $(MAPLEFE_ROOT)/autogen/include \
             -I $(MAPLEFE_ROOT)/autogen \
-            -I $(MAPLEFE_ROOT)/shared/include
+            -I $(MAPLEFE_ROOT)/shared/include \
+            -I $(MAPLEFE_ROOT)/$(LANG)/include \
+            -I $(MAPLEFE_ROOT)/$(LANG)
 
 TARGET = autogen
 
@@ -38,9 +40,7 @@ vpath %.cpp $(MAPLEFE_ROOT)/shared/src
 vpath %.o $(BUILD)
 vpath %.d $(BUILD)
 
-ifeq ($(LANG), java)
-CXXFLAGS := $(CXXFLAGS) -I ../java/
-endif
+CXXFLAGS := $(CXXFLAGS) -I $(MAPLEFE_ROOT)/$(LANG)
 
 #Pattern Rules
 $(BUILD)/%.o : %.cpp $(BUILD)/%.d

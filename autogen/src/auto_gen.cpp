@@ -124,11 +124,11 @@ static void FinishSummaryCppFile() {
 ///////////////////////////////////////////////////////////////////////////////////////
 
 void AutoGen::Init() {
-  std::string lang_path_header("../../");
+  std::string lang_path_header("../../../");
   lang_path_header += mLang;
   lang_path_header += "/include/";
 
-  std::string lang_path_cpp("../../");
+  std::string lang_path_cpp("../../../");
   lang_path_cpp += mLang;
   lang_path_cpp += "/src/";
 
@@ -142,13 +142,13 @@ void AutoGen::Init() {
 
   std::string hFile = lang_path_header + "gen_reserved.h";
   std::string cppFile = lang_path_cpp + "gen_reserved.cpp";
-  mReservedGen = new ReservedGen("../../autogen/reserved.spec", hFile.c_str(), cppFile.c_str());
+  mReservedGen = new ReservedGen("../../../autogen/reserved.spec", hFile.c_str(), cppFile.c_str());
   mReservedGen->SetReserved(mReservedGen);
   mGenArray.push_back(mReservedGen);
 
   hFile = lang_path_header + "gen_iden.h";
   cppFile = lang_path_cpp + "gen_iden.cpp";
-  std::string specFile = "../../";
+  std::string specFile = "../../../";
   specFile += mLang;
   specFile += "/identifier.spec";
   mIdenGen  = new IdenGen(specFile.c_str(), hFile.c_str(), cppFile.c_str());
@@ -157,7 +157,7 @@ void AutoGen::Init() {
 
   hFile = lang_path_header + "gen_literal.h";
   cppFile = lang_path_cpp + "gen_literal.cpp";
-  specFile = "../../";
+  specFile = "../../../";
   specFile += mLang;
   specFile += "/literal.spec";
   mLitGen  = new LiteralGen(specFile.c_str(), hFile.c_str(), cppFile.c_str());
@@ -166,7 +166,7 @@ void AutoGen::Init() {
 
   hFile = lang_path_header + "gen_type.h";
   cppFile = lang_path_cpp + "gen_type.cpp";
-  specFile = "../../";
+  specFile = "../../../";
   specFile += mLang;
   specFile += "/type.spec";
   mTypeGen  = new TypeGen(specFile.c_str(), hFile.c_str(), cppFile.c_str());
@@ -175,7 +175,7 @@ void AutoGen::Init() {
 
   hFile = lang_path_header + "gen_attr.h";
   cppFile = lang_path_cpp + "gen_attr.cpp";
-  specFile = "../../";
+  specFile = "../../../";
   specFile += mLang;
   specFile += "/attr.spec";
   mAttrGen  = new AttrGen(specFile.c_str(), hFile.c_str(), cppFile.c_str());
@@ -184,7 +184,7 @@ void AutoGen::Init() {
 
   hFile = lang_path_header + "gen_block.h";
   cppFile = lang_path_cpp + "gen_block.cpp";
-  specFile = "../../";
+  specFile = "../../../";
   specFile += mLang;
   specFile += "/block.spec";
   mBlockGen  = new BlockGen(specFile.c_str(), hFile.c_str(), cppFile.c_str());
@@ -193,7 +193,7 @@ void AutoGen::Init() {
 
   hFile = lang_path_header + "gen_separator.h";
   cppFile = lang_path_cpp + "gen_separator.cpp";
-  specFile = "../../";
+  specFile = "../../../";
   specFile += mLang;
   specFile += "/separator.spec";
   mSeparatorGen  = new SeparatorGen(specFile.c_str(), hFile.c_str(), cppFile.c_str());
@@ -202,7 +202,7 @@ void AutoGen::Init() {
 
   hFile = lang_path_header + "gen_operator.h";
   cppFile = lang_path_cpp + "gen_operator.cpp";
-  specFile = "../../";
+  specFile = "../../../";
   specFile += mLang;
   specFile += "/operator.spec";
   mOperatorGen  = new OperatorGen(specFile.c_str(), hFile.c_str(), cppFile.c_str());
@@ -211,7 +211,7 @@ void AutoGen::Init() {
 
   hFile = lang_path_header + "gen_keyword.h";
   cppFile = lang_path_cpp + "gen_keyword.cpp";
-  specFile = "../../";
+  specFile = "../../../";
   specFile += mLang;
   specFile += "/keyword.spec";
   mKeywordGen  = new KeywordGen(specFile.c_str(), hFile.c_str(), cppFile.c_str());
@@ -220,7 +220,7 @@ void AutoGen::Init() {
 
   hFile = lang_path_header + "gen_expr.h";
   cppFile = lang_path_cpp + "gen_expr.cpp";
-  specFile = "../../";
+  specFile = "../../../";
   specFile += mLang;
   specFile += "/expr.spec";
   mExprGen  = new ExprGen(specFile.c_str(), hFile.c_str(), cppFile.c_str());
@@ -229,7 +229,7 @@ void AutoGen::Init() {
 
   hFile = lang_path_header + "gen_stmt.h";
   cppFile = lang_path_cpp + "gen_stmt.cpp";
-  specFile = "../../";
+  specFile = "../../../";
   specFile += mLang;
   specFile += "/stmt.spec";
   mStmtGen  = new StmtGen(specFile.c_str(), hFile.c_str(), cppFile.c_str());

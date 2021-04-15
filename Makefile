@@ -14,23 +14,23 @@
 
 include Makefile.in
 
-TARGS = autogen shared recdetect ladetect java2mpl ast2mpl ast2cpp
+TARGS = autogen shared recdetect ladetect java2mpl ast2mpl ts2cpp ast2cpp
 
 # create BUILDDIR first
 $(shell $(MKDIR_P) $(BUILDDIR))
 
 java2mpl: autogen recdetect ladetect shared ast2mpl
-	$(MAKE) LANG=java -C java
+	$(MAKE) LANG=$(SRCLANG) -C $(SRCLANG)
 
 ts2cpp: autogen recdetect ladetect shared ast2cpp
-	$(MAKE) LANG=typescript -C typescript
+	$(MAKE) LANG=$(SRCLANG) -C $(SRCLANG)
 
 recdetect: autogen shared
-	(cd recdetect; ./build.sh java)
+	(cd recdetect; ./build.sh $(SRCLANG))
 	(cd $(BUILDDIR)/recdetect; ./recdetect)
 
 ladetect: autogen shared
-	(cd ladetect; ./build.sh java)
+	(cd ladetect; ./build.sh $(SRCLANG))
 	(cd $(BUILDDIR)/ladetect; ./ladetect)
 
 ast2mpl: shared
@@ -44,13 +44,13 @@ shared: autogen
 
 autogen:
 	$(MAKE) -C autogen
-	(cd $(BUILDDIR)/autogen; ./autogen java)
+	(cd $(BUILDDIR)/autogen; ./autogen $(SRCLANG))
 
 mapleall:
 	./scripts/build_mapleall.sh
 
 test: autogen
-	$(MAKE) LANG=java -C test
+	$(MAKE) LANG=$(SRCLANG) -C test
 
 testall:
 	(cd test; ./runtests.pl all)

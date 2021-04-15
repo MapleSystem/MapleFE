@@ -15,15 +15,24 @@
 
 function print_usage {
   echo " "
-  echo "usage: source envsetup.sh"
+  echo "usage: source envsetup.sh java/typescript"
   echo " "
 }
 
-if [ "$#" -ne 0 ]; then
+if [ "$#" -gt 1 ]; then
   echo $#
   print_usage
   return
 fi
+
+LANG=java
+if [ "$#" -eq 1 ]; then
+  if [ $1 = "typescript" ]; then
+    LANG=typescript
+  fi
+fi
+
+export SRCLANG=${LANG}
 
 pdir=$(cd ..; pwd)
 unset MAPLE_ROOT
@@ -40,4 +49,5 @@ unset MAPLEALL_SRC
 export MAPLEALL_SRC=${MAPLEALL_ROOT}/src/mapleall
 
 unset BUILDDIR
-export BUILDDIR=${MAPLEFE_ROOT}/output
+export BUILDDIR=${MAPLEFE_ROOT}/output/${SRCLANG}
+

@@ -52,7 +52,7 @@ my $countsub = 0;
 system("rm -Rf report.txt $pwd/output $pwd/diff $pwd/notexists");
 
 my $currdir = "$pwd";
-my $outroot = "$currdir/../output/test";
+my $outroot = "$currdir/../output/java/test";
 if(!(-e "$outroot")) {
   system("mkdir -p $outroot");
 }
@@ -106,37 +106,37 @@ foreach my $dir (@dirname) {
 #print "here15 dir $dir\n";
 #print "here16 src_file $src_file\n";
         if ($dir eq "java2mpl") {
-          $res = system("$pwd/../output/java/java2mpl $outdir/$src_file > $outdir/$result_file");
+          $res = system("$pwd/../output/java/java/java2mpl $outdir/$src_file > $outdir/$result_file");
         }
         if ($dir eq "errtest") {
-          $res = system("$pwd/../output/java/java2mpl $outdir/$src_file > $outdir/$result_file");
+          $res = system("$pwd/../output/java/java/java2mpl $outdir/$src_file > $outdir/$result_file");
         }
         if ($dir eq "others") {
-          $res = system("$pwd/../output/java/java2mpl $outdir/$src_file > $outdir/$result_file");
+          $res = system("$pwd/../output/java/java/java2mpl $outdir/$src_file > $outdir/$result_file");
         }
         if ($dir eq "openjdk") {
-          $res = system("$pwd/../output/java/java2mpl $outdir/$src_file > $outdir/$result_file");
+          $res = system("$pwd/../output/java/java/java2mpl $outdir/$src_file > $outdir/$result_file");
         }
         if ($dir eq "syntaxonly") {
-          $res = system("$pwd/../output/java/java2mpl $outdir/$src_file > $outdir/$result_file");
+          $res = system("$pwd/../output/java/java/java2mpl $outdir/$src_file > $outdir/$result_file");
         }
         
         if ($res > 0) {
 #print "over here1...\n";
           if ($dir eq "java2mpl") { 
-            print "$pwd/../output/java/java2mpl $outdir/$src_file\n";
+            print "$pwd/../output/java/java/java2mpl $outdir/$src_file\n";
           }
           if ($dir eq "errtest") { 
-            print "$pwd/../output/java/java2mpl $outdir/$src_file\n";
+            print "$pwd/../output/java/java/java2mpl $outdir/$src_file\n";
           }
           if ($dir eq "others") {
-            print "$pwd/../output/java/java2mpl $outdir/$src_file\n";
+            print "$pwd/../output/java/java/java2mpl $outdir/$src_file\n";
           }
           if ($dir eq "openjdk") {
-            print "$pwd/../output/java/java2mpl $outdir/$src_file\n";
+            print "$pwd/../output/java/java/java2mpl $outdir/$src_file\n";
           }
           if ($dir eq "syntaxonly") {
-            print "$pwd/../output/java/java2mpl $outdir/$src_file\n";
+            print "$pwd/../output/java/java/java2mpl $outdir/$src_file\n";
           }
           print " ==$dir===> $file\n";
           $countfailedjava ++;

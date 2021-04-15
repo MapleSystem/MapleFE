@@ -15,7 +15,7 @@
 # for testing batch1/Arithmetic/Add.java:
 # make Add
 
-build = ../output/test
+build = ../output/$(SRCLANG)/test
 $(shell mkdir -p $(build))
 
 DIR = . $(wildcard * */* */*/*)
@@ -46,27 +46,18 @@ clobber:
 rebuild:
 	make -C .. rebuild
 
-tt:
-	../output/java/java2mpl tt.java --trace-a2m
-	@echo "\n======================== tt.mpl ========================"
-	@cat -n tt.mpl
-	@echo "========================================================\n"
-	$(MAPLEALL_ROOT)/output/aarch64-clang-debug/bin/irbuild tt.mpl
-	$(MAPLEALL_ROOT)/output/aarch64-clang-debug/bin/irbuild tt.irb.mpl
-	diff -uwb tt.irb.mpl tt.irb.irb.mpl
-
 dbg:
-	gdb --args ../output/java/java2mpl tt.java --trace-a2m
+	gdb --args ../output/java/java/java2mpl test.java --trace-a2m
 
 % : %.java
 	@cp $< $(build)
-	@echo gdb --args ../output/java/java2mpl $(build)/$@.java --trace-a2m
-	../output/java/java2mpl $(build)/$@.java --trace-a2m
+	@echo gdb --args ../output/java/java/java2mpl $(build)/$@.java --trace-a2m
+	../output/java/java/java2mpl $(build)/$@.java --trace-a2m
 	@cat -n $(build)/$@.java
 	@echo "\n======================= $@.mpl ========================="
 	@cat -n $(build)/$@.mpl
 	@echo "========================================================\n"
-	@echo gdb --args ../output/java/java2mpl $(build)/$@.java --trace-a2m
+	@echo gdb --args ../output/java/java/java2mpl $(build)/$@.java --trace-a2m
 	$(MAPLEALL_ROOT)/output/aarch64-clang-debug/bin/irbuild $(build)/$@.mpl
 	$(MAPLEALL_ROOT)/output/aarch64-clang-debug/bin/irbuild $(build)/$@.irb.mpl
 	diff -uwb $(build)/$@.irb.mpl $(build)/$@.irb.irb.mpl
