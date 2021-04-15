@@ -67,7 +67,7 @@ public:
   FormattedBuffer mRuleTableCpp;
   FormattedBuffer mRuleTableHeader;
 
-  std::string mSpecFile;
+  std::string   mSpecFile;
   FileWriter    mHeaderFile;
   FileWriter    mCppFile;
   StringPool   *mStringPool;

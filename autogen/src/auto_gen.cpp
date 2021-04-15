@@ -124,8 +124,13 @@ static void FinishSummaryCppFile() {
 ///////////////////////////////////////////////////////////////////////////////////////
 
 void AutoGen::Init() {
-  std::string lang_path_header("../../java/include/");
-  std::string lang_path_cpp("../../java/src/");
+  std::string lang_path_header("../../");
+  lang_path_header += mLang;
+  lang_path_header += "/include/";
+
+  std::string lang_path_cpp("../../");
+  lang_path_cpp += mLang;
+  lang_path_cpp += "/src/";
 
   std::string summary_file_name = lang_path_cpp + "gen_summary.cpp";
   gSummaryCppFile = new FileWriter(summary_file_name);
@@ -137,67 +142,97 @@ void AutoGen::Init() {
 
   std::string hFile = lang_path_header + "gen_reserved.h";
   std::string cppFile = lang_path_cpp + "gen_reserved.cpp";
-  mReservedGen = new ReservedGen("reserved.spec", hFile.c_str(), cppFile.c_str());
+  mReservedGen = new ReservedGen("../../autogen/reserved.spec", hFile.c_str(), cppFile.c_str());
   mReservedGen->SetReserved(mReservedGen);
   mGenArray.push_back(mReservedGen);
 
   hFile = lang_path_header + "gen_iden.h";
   cppFile = lang_path_cpp + "gen_iden.cpp";
-  mIdenGen  = new IdenGen("identifier.spec", hFile.c_str(), cppFile.c_str());
+  std::string specFile = "../../";
+  specFile += mLang;
+  specFile += "/identifier.spec";
+  mIdenGen  = new IdenGen(specFile.c_str(), hFile.c_str(), cppFile.c_str());
   mIdenGen->SetReserved(mReservedGen);
   mGenArray.push_back(mIdenGen);
 
   hFile = lang_path_header + "gen_literal.h";
   cppFile = lang_path_cpp + "gen_literal.cpp";
-  mLitGen  = new LiteralGen("literal.spec", hFile.c_str(), cppFile.c_str());
+  specFile = "../../";
+  specFile += mLang;
+  specFile += "/literal.spec";
+  mLitGen  = new LiteralGen(specFile.c_str(), hFile.c_str(), cppFile.c_str());
   mLitGen->SetReserved(mReservedGen);
   mGenArray.push_back(mLitGen);
 
   hFile = lang_path_header + "gen_type.h";
   cppFile = lang_path_cpp + "gen_type.cpp";
-  mTypeGen  = new TypeGen("type.spec", hFile.c_str(), cppFile.c_str());
+  specFile = "../../";
+  specFile += mLang;
+  specFile += "/type.spec";
+  mTypeGen  = new TypeGen(specFile.c_str(), hFile.c_str(), cppFile.c_str());
   mTypeGen->SetReserved(mReservedGen);
   mGenArray.push_back(mTypeGen);
 
   hFile = lang_path_header + "gen_attr.h";
   cppFile = lang_path_cpp + "gen_attr.cpp";
-  mAttrGen  = new AttrGen("attr.spec", hFile.c_str(), cppFile.c_str());
+  specFile = "../../";
+  specFile += mLang;
+  specFile += "/attr.spec";
+  mAttrGen  = new AttrGen(specFile.c_str(), hFile.c_str(), cppFile.c_str());
   mAttrGen->SetReserved(mReservedGen);
   mGenArray.push_back(mAttrGen);
 
   hFile = lang_path_header + "gen_block.h";
   cppFile = lang_path_cpp + "gen_block.cpp";
-  mBlockGen  = new BlockGen("block.spec", hFile.c_str(), cppFile.c_str());
+  specFile = "../../";
+  specFile += mLang;
+  specFile += "/block.spec";
+  mBlockGen  = new BlockGen(specFile.c_str(), hFile.c_str(), cppFile.c_str());
   mBlockGen->SetReserved(mReservedGen);
   mGenArray.push_back(mBlockGen);
 
   hFile = lang_path_header + "gen_separator.h";
   cppFile = lang_path_cpp + "gen_separator.cpp";
-  mSeparatorGen  = new SeparatorGen("separator.spec", hFile.c_str(), cppFile.c_str());
+  specFile = "../../";
+  specFile += mLang;
+  specFile += "/separator.spec";
+  mSeparatorGen  = new SeparatorGen(specFile.c_str(), hFile.c_str(), cppFile.c_str());
   mSeparatorGen->SetReserved(mReservedGen);
   mGenArray.push_back(mSeparatorGen);
 
   hFile = lang_path_header + "gen_operator.h";
   cppFile = lang_path_cpp + "gen_operator.cpp";
-  mOperatorGen  = new OperatorGen("operator.spec", hFile.c_str(), cppFile.c_str());
+  specFile = "../../";
+  specFile += mLang;
+  specFile += "/operator.spec";
+  mOperatorGen  = new OperatorGen(specFile.c_str(), hFile.c_str(), cppFile.c_str());
   mOperatorGen->SetReserved(mReservedGen);
   mGenArray.push_back(mOperatorGen);
 
   hFile = lang_path_header + "gen_keyword.h";
   cppFile = lang_path_cpp + "gen_keyword.cpp";
-  mKeywordGen  = new KeywordGen("keyword.spec", hFile.c_str(), cppFile.c_str());
+  specFile = "../../";
+  specFile += mLang;
+  specFile += "/keyword.spec";
+  mKeywordGen  = new KeywordGen(specFile.c_str(), hFile.c_str(), cppFile.c_str());
   mKeywordGen->SetReserved(mReservedGen);
   mGenArray.push_back(mKeywordGen);
 
   hFile = lang_path_header + "gen_expr.h";
   cppFile = lang_path_cpp + "gen_expr.cpp";
-  mExprGen  = new ExprGen("expr.spec", hFile.c_str(), cppFile.c_str());
+  specFile = "../../";
+  specFile += mLang;
+  specFile += "/expr.spec";
+  mExprGen  = new ExprGen(specFile.c_str(), hFile.c_str(), cppFile.c_str());
   mExprGen->SetReserved(mReservedGen);
   mGenArray.push_back(mExprGen);
 
   hFile = lang_path_header + "gen_stmt.h";
   cppFile = lang_path_cpp + "gen_stmt.cpp";
-  mStmtGen  = new StmtGen("stmt.spec", hFile.c_str(), cppFile.c_str());
+  specFile = "../../";
+  specFile += mLang;
+  specFile += "/stmt.spec";
+  mStmtGen  = new StmtGen(specFile.c_str(), hFile.c_str(), cppFile.c_str());
   mStmtGen->SetReserved(mReservedGen);
   mGenArray.push_back(mStmtGen);
 

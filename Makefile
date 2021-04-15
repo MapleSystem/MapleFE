@@ -35,7 +35,7 @@ shared: autogen
 
 autogen:
 	$(MAKE) -C autogen
-	(cd $(BUILDDIR)/autogen; ./autogen)
+	(cd $(BUILDDIR)/autogen; ./autogen java)
 
 mapleall:
 	./scripts/build_mapleall.sh

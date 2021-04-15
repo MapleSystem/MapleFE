@@ -31,11 +31,17 @@ int main(int argc, char *argv[]) {
   int verbose = 0;
   int fileIndex = 2;
 
+  std::string lang;
+
   if (argc >=2) {
     for (int i = 1; i < argc; i++) {
       int len = strlen(argv[i]);
       if (!strncmp(argv[i], "-verbose=", 9)) {
         verbose = atoi(argv[i]+9);
+      } else if (!strncmp(argv[i], "java", 4)) {
+        lang = "java";
+      } else if (!strncmp(argv[i], "typescript", 10)) {
+        lang = "typescript";
       } else if (strcmp(argv[i], "-p") == 0) {
         checkParserOnly = true;
       } else {
@@ -57,6 +63,7 @@ int main(int argc, char *argv[]) {
   }
 
   maplefe::AutoGen ag(parser);
+  ag.SetLang(lang);
   ag.Gen();
 
   return 0;

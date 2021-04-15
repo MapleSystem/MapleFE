@@ -54,9 +54,13 @@ private:
   std::vector<BaseGen*> mGenArray;
   SPECParser   *mParser;
 
+  std::string   mLang;   // the language(i.e. directory)
+
 public:
   AutoGen(SPECParser *p) : mParser(p) {}
   ~AutoGen();
+
+  void SetLang(std::string s) {mLang = s;}
 
   void Init();
   void Run();
