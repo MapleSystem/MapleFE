@@ -1,4 +1,4 @@
-# Copyright (C) [2020] Futurewei Technologies, Inc. All rights reverved.
+# Copyright (C) [2020-2021] Futurewei Technologies, Inc. All rights reverved.
 #
 # OpenArkFE is licensed under the Mulan PSL v2.
 # You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -25,13 +25,11 @@ java2mpl: autogen recdetect ladetect shared ast2mpl
 ts2cpp: autogen recdetect ladetect shared ast2cpp
 	$(MAKE) LANG=$(SRCLANG) -C $(SRCLANG)
 
-recdetect: autogen shared
+recdetect: autogen shared ladetect
 	$(MAKE) LANG=$(SRCLANG) -C recdetect
-	(cd $(BUILDDIR)/recdetect; ./recdetect)
 
 ladetect: autogen shared
 	$(MAKE) LANG=$(SRCLANG) -C ladetect
-	(cd $(BUILDDIR)/ladetect; ./ladetect)
 
 ast2mpl: shared
 	$(MAKE) -C ast2mpl
@@ -44,7 +42,6 @@ shared: autogen
 
 autogen:
 	$(MAKE) -C autogen
-	(cd $(BUILDDIR)/autogen; ./autogen $(SRCLANG))
 
 mapleall:
 	./scripts/build_mapleall.sh
