@@ -26,11 +26,11 @@ ts2cpp: autogen recdetect ladetect shared ast2cpp
 	$(MAKE) LANG=$(SRCLANG) -C $(SRCLANG)
 
 recdetect: autogen shared
-	(cd recdetect; ./build.sh $(SRCLANG))
+	$(MAKE) LANG=$(SRCLANG) -C recdetect
 	(cd $(BUILDDIR)/recdetect; ./recdetect)
 
 ladetect: autogen shared
-	(cd ladetect; ./build.sh $(SRCLANG))
+	$(MAKE) LANG=$(SRCLANG) -C ladetect
 	(cd $(BUILDDIR)/ladetect; ./ladetect)
 
 ast2mpl: shared
@@ -64,8 +64,8 @@ test1:
 clean:
 	rm -rf $(BUILDDIR)
 
-clobber: clean
-	rm -rf java/include/gen_*.h java/src/gen_*.cpp ladetect/java recdetect/java
+clobber:
+	rm -rf output
 
 rebuild:
 	make clobber

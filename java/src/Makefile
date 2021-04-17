@@ -20,13 +20,18 @@ SRC=$(wildcard *.cpp)
 OBJ :=$(patsubst %.cpp,%.o,$(SRC))
 DEP :=$(patsubst %.cpp,%.d,$(SRC))
 
-OBJS :=$(foreach obj,$(OBJ), $(BUILD)/$(obj))
-DEPS :=$(foreach dep,$(DEP), $(BUILD)/$(dep))
+SRCG := $(wildcard $(BUILDDIR)/gen/gen*.cpp)
+OBJG := $(patsubst %.cpp, %.o, $(SRCG))
+DEPG := $(patsubst %.cpp, %.d, $(SRCG))
+
+OBJS :=$(foreach obj,$(OBJ), $(BUILD)/$(obj)) $(OBJG)
+DEPS :=$(foreach dep,$(DEP), $(BUILD)/$(dep)) $(DEPG)
 
 INCLUDES := -I $(MAPLEFE_ROOT)/shared/include \
             -I $(MAPLEFE_ROOT)/ast2mpl/include \
             -I $(MAPLEFE_ROOT)/java/include \
             -I $(MAPLEFE_ROOT)/autogen/include \
+            -I $(BUILDDIR)/gen \
             -I . $(MAPLEALL_INC)
 
 TARGET=java2mpl
@@ -44,7 +49,10 @@ vpath %.d $(BUILD)
 
 # Pattern Rules
 $(BUILD)/%.o : %.cpp
-	$(CXX) $(CXXFLAGS) -fpermissive $(INCLUDES) -w -c $< -o $@ 
+	$(CXX) $(CXXFLAGS) -fpermissive $(INCLUDES) -w -c $< -o $@
+
+$(BUILDDIR)/gen/%.o : $(BUILDDIR)/gen/%.cpp
+	$(CXX) $(CXXFLAGS) -fpermissive -I $(BUILDDIR)/gen -I $(MAPLEFE_ROOT)/shared/include -w -c $< -o $@
 
 $(BUILD)/%.d : %.cpp
 	@$(CXX) $(CXXFLAGS) -std=c++11 -MM $(INCLUDES) $< > $@
@@ -62,4 +70,4 @@ $(TARGET): $(OBJS) $(SHAREDLIB)
 #	$(CXX) $(CXXFLAGS) -std=c++11 -MM $(INCLUDES) $*.cpp > $(BUILD)/$*.d
 
 clean:
-	rm -rf $(BUILD)
+	rm -rf $(BUILD) $(OBJS) $(DEPS)

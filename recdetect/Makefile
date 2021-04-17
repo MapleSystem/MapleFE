@@ -4,24 +4,22 @@ include ../Makefile.in
 BUILD=$(BUILDDIR)/recdetect
 $(shell $(MKDIR_P) $(BUILD))
 
-# TEMPVAR=$(shell rm -rf $(LANG))
-# TEMPVAR=$(shell mkdir -p $(LANG))
-# TEMPVAR=$(shell cp ../$(LANG)/include/gen_*.h $(LANG)/)
-# TEMPVAR=$(shell cp ../$(LANG)/src/gen_*.cpp $(LANG)/)
-# TEMPVAR=$(shell mkdir -p $(BUILD))
-# TEMPVAR=$(shell mkdir -p $(BUILD)/$(LANG))
+SRCG := $(wildcard $(BUILDDIR)/gen/gen_*.cpp)
+OBJG := $(patsubst %.cpp, %.o, $(SRCG))
+DEPG := $(patsubst %.cpp, %.d, $(SRCG))
 
-LANGSRC=$(shell ls $(LANG)/*.cpp)
-SRC := $(LANGSRC) $(wildcard *.cpp)
+SRC := $(wildcard *.cpp)
 OBJ := $(patsubst %.cpp, %.o, $(SRC))
+OBJL := $(foreach obj, $(OBJ), $(BUILD)/$(obj))
 DEP := $(patsubst %.cpp, %.d, $(SRC))
+DEPL := $(foreach dep, $(DEP), $(BUILD)/$(dep))
 
-OBJS := $(foreach obj, $(OBJ), $(BUILD)/$(obj))
-DEPS := $(foreach dep, $(DEP), $(BUILD)/$(dep))
+OBJS := $(OBJG) $(OBJL)
+DEPS := $(DEPG) $(DEPL)
 
-INCLUDES := -I $(MAPLEFE_ROOT)/recdetect/include \
-            -I $(MAPLEFE_ROOT)/recdetect/$(LANG) \
-            -I $(MAPLEFE_ROOT)/shared/include
+INCLUDES := -I $(MAPLEFE_ROOT)/recdetect \
+            -I $(MAPLEFE_ROOT)/shared/include \
+            -I $(BUILDDIR)/gen
 SHAREDLIB = $(BUILDDIR)/shared/shared.a
 
 TARGET = recdetect
@@ -36,11 +34,20 @@ $(TARGET) : $(OBJS) $(SHAREDLIB)
 -include $(DEPS)
 .PHONY: clean
 
-vpath %.cpp $(MAPLEFE_ROOT)/shared/src
-vpath %.o $(BUILD)
-vpath %.d $(BUILD)
+vpath %.cpp $(BUILD) $(BUILDDIR)/gen
+vpath %.o $(BUILD) $(BUILDDIR)/gen
+vpath %.d $(BUILD) $(BUILDDIR)/gen
 
-CXXFLAGS := $(CXXFLAGS) -I ../$(LANG)/
+#CXXFLAGS := $(CXXFLAGS) -I $(BUILDDIR)/gen -I ../shared/include
+
+z:
+	echo $(SRCG)
+
+%.o : %.cpp %.d
+	$(CXX) $(CXXFLAGS) -fpermissive $(INCLUDES) -w -c $< -o $@
+
+%.d : %.cpp
+	@$(CXX) $(CXXFLAGS) -std=c++11 -MM $(INCLUDES) $< > $@
 
 #Pattern Rules
 $(BUILD)/%.o : %.cpp $(BUILD)/%.d
@@ -52,10 +59,5 @@ $(BUILD)/%.d : %.cpp
 	@sed -e 's|.*:|$(BUILD)/$*.o:|' < $(BUILD)/$*.d.tmp > $(BUILD)/$*.d
 	@rm -f $(BUILD)/$*.d.tmp
 
-
-#.cpp.o:
-#	$(CXX) $(CXXFLAGS) -fpermissive $(INCLUDES) -w -c $*.cpp -o $(BUILD)/$*.o
-#	$(CXX) $(CXXFLAGS) -std=c++11 -MM $(INCLUDES) $*.cpp > $(BUILD)/$*.d
-
 clean:
-	rm -rf $(BUILD)
+	rm -rf $(BUILD) $(OBJG) $(DEPG)

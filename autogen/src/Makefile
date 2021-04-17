@@ -2,7 +2,7 @@ include ../../Makefile.in
 
 # create build first
 BUILD=$(BUILDDIR)/autogen
-$(shell $(MKDIR_P) $(BUILD))
+$(shell $(MKDIR_P) $(BUILD) $(BUILDDIR)/$(LANG) $(BUILDDIR)/gen)
 
 SHAREDSRC := token.cpp mempool.cpp stringmap.cpp stringpool.cpp write2file.cpp
 SRC := $(wildcard *.cpp) $(SHAREDSRC)

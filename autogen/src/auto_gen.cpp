@@ -124,30 +124,24 @@ static void FinishSummaryCppFile() {
 ///////////////////////////////////////////////////////////////////////////////////////
 
 void AutoGen::Init() {
-  std::string lang_path_header("../../../");
-  lang_path_header += mLang;
-  lang_path_header += "/include/";
+  std::string lang_path("../gen/");
 
-  std::string lang_path_cpp("../../../");
-  lang_path_cpp += mLang;
-  lang_path_cpp += "/src/";
-
-  std::string summary_file_name = lang_path_cpp + "gen_summary.cpp";
+  std::string summary_file_name = lang_path + "gen_summary.cpp";
   gSummaryCppFile = new FileWriter(summary_file_name);
-  summary_file_name = lang_path_header + "gen_summary.h";
+  summary_file_name = lang_path + "gen_summary.h";
   gSummaryHFile = new FileWriter(summary_file_name);
   gRuleTableNum = 0;
 
   PrepareSummaryCppFile();
 
-  std::string hFile = lang_path_header + "gen_reserved.h";
-  std::string cppFile = lang_path_cpp + "gen_reserved.cpp";
+  std::string hFile = lang_path + "gen_reserved.h";
+  std::string cppFile = lang_path + "gen_reserved.cpp";
   mReservedGen = new ReservedGen("../../../autogen/reserved.spec", hFile.c_str(), cppFile.c_str());
   mReservedGen->SetReserved(mReservedGen);
   mGenArray.push_back(mReservedGen);
 
-  hFile = lang_path_header + "gen_iden.h";
-  cppFile = lang_path_cpp + "gen_iden.cpp";
+  hFile = lang_path + "gen_iden.h";
+  cppFile = lang_path + "gen_iden.cpp";
   std::string specFile = "../../../";
   specFile += mLang;
   specFile += "/identifier.spec";
@@ -155,8 +149,8 @@ void AutoGen::Init() {
   mIdenGen->SetReserved(mReservedGen);
   mGenArray.push_back(mIdenGen);
 
-  hFile = lang_path_header + "gen_literal.h";
-  cppFile = lang_path_cpp + "gen_literal.cpp";
+  hFile = lang_path + "gen_literal.h";
+  cppFile = lang_path + "gen_literal.cpp";
   specFile = "../../../";
   specFile += mLang;
   specFile += "/literal.spec";
@@ -164,8 +158,8 @@ void AutoGen::Init() {
   mLitGen->SetReserved(mReservedGen);
   mGenArray.push_back(mLitGen);
 
-  hFile = lang_path_header + "gen_type.h";
-  cppFile = lang_path_cpp + "gen_type.cpp";
+  hFile = lang_path + "gen_type.h";
+  cppFile = lang_path + "gen_type.cpp";
   specFile = "../../../";
   specFile += mLang;
   specFile += "/type.spec";
@@ -173,8 +167,8 @@ void AutoGen::Init() {
   mTypeGen->SetReserved(mReservedGen);
   mGenArray.push_back(mTypeGen);
 
-  hFile = lang_path_header + "gen_attr.h";
-  cppFile = lang_path_cpp + "gen_attr.cpp";
+  hFile = lang_path + "gen_attr.h";
+  cppFile = lang_path + "gen_attr.cpp";
   specFile = "../../../";
   specFile += mLang;
   specFile += "/attr.spec";
@@ -182,8 +176,8 @@ void AutoGen::Init() {
   mAttrGen->SetReserved(mReservedGen);
   mGenArray.push_back(mAttrGen);
 
-  hFile = lang_path_header + "gen_block.h";
-  cppFile = lang_path_cpp + "gen_block.cpp";
+  hFile = lang_path + "gen_block.h";
+  cppFile = lang_path + "gen_block.cpp";
   specFile = "../../../";
   specFile += mLang;
   specFile += "/block.spec";
@@ -191,8 +185,8 @@ void AutoGen::Init() {
   mBlockGen->SetReserved(mReservedGen);
   mGenArray.push_back(mBlockGen);
 
-  hFile = lang_path_header + "gen_separator.h";
-  cppFile = lang_path_cpp + "gen_separator.cpp";
+  hFile = lang_path + "gen_separator.h";
+  cppFile = lang_path + "gen_separator.cpp";
   specFile = "../../../";
   specFile += mLang;
   specFile += "/separator.spec";
@@ -200,8 +194,8 @@ void AutoGen::Init() {
   mSeparatorGen->SetReserved(mReservedGen);
   mGenArray.push_back(mSeparatorGen);
 
-  hFile = lang_path_header + "gen_operator.h";
-  cppFile = lang_path_cpp + "gen_operator.cpp";
+  hFile = lang_path + "gen_operator.h";
+  cppFile = lang_path + "gen_operator.cpp";
   specFile = "../../../";
   specFile += mLang;
   specFile += "/operator.spec";
@@ -209,8 +203,8 @@ void AutoGen::Init() {
   mOperatorGen->SetReserved(mReservedGen);
   mGenArray.push_back(mOperatorGen);
 
-  hFile = lang_path_header + "gen_keyword.h";
-  cppFile = lang_path_cpp + "gen_keyword.cpp";
+  hFile = lang_path + "gen_keyword.h";
+  cppFile = lang_path + "gen_keyword.cpp";
   specFile = "../../../";
   specFile += mLang;
   specFile += "/keyword.spec";
@@ -218,8 +212,8 @@ void AutoGen::Init() {
   mKeywordGen->SetReserved(mReservedGen);
   mGenArray.push_back(mKeywordGen);
 
-  hFile = lang_path_header + "gen_expr.h";
-  cppFile = lang_path_cpp + "gen_expr.cpp";
+  hFile = lang_path + "gen_expr.h";
+  cppFile = lang_path + "gen_expr.cpp";
   specFile = "../../../";
   specFile += mLang;
   specFile += "/expr.spec";
@@ -227,8 +221,8 @@ void AutoGen::Init() {
   mExprGen->SetReserved(mReservedGen);
   mGenArray.push_back(mExprGen);
 
-  hFile = lang_path_header + "gen_stmt.h";
-  cppFile = lang_path_cpp + "gen_stmt.cpp";
+  hFile = lang_path + "gen_stmt.h";
+  cppFile = lang_path + "gen_stmt.cpp";
   specFile = "../../../";
   specFile += mLang;
   specFile += "/stmt.spec";
@@ -236,8 +230,8 @@ void AutoGen::Init() {
   mStmtGen->SetReserved(mReservedGen);
   mGenArray.push_back(mStmtGen);
 
-  hFile = lang_path_header + "gen_token.h";
-  cppFile = lang_path_cpp + "gen_token.cpp";
+  hFile = lang_path + "gen_token.h";
+  cppFile = lang_path + "gen_token.cpp";
   mTokenGen  = new TokenGen(hFile.c_str(), cppFile.c_str());
   mTokenGen->SetReserved(mReservedGen);
   mGenArray.push_back(mTokenGen);

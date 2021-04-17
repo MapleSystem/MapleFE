@@ -1357,12 +1357,11 @@ void RecDetector::WriteRule2Recursion() {
 
 // Write the recursion to java/gen_recursion.h and java/gen_recursion.cpp
 void RecDetector::Write() {
-  std::string lang_path_header("../../../java/include/");
-  std::string lang_path_cpp("../../../java/src/");
+  std::string lang_path("../gen/");
 
-  std::string file_name = lang_path_cpp + "gen_recursion.cpp";
+  std::string file_name = lang_path + "genmore_recursion.cpp";
   mCppFile = new Write2File(file_name);
-  file_name = lang_path_header + "gen_recursion.h";
+  file_name = lang_path + "gen_recursion.h";
   mHeaderFile = new Write2File(file_name);
 
   WriteHeaderFile();

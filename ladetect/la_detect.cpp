@@ -597,14 +597,13 @@ void LADetector::WriteCppFile() {
   mCppFile->WriteOneLine("}", 1);
 }
 
-// Write the recursion to java/gen_recursion.h and java/gen_recursion.cpp
+// Write the recursion to gen/genmore_lookahead.h and gen/genmore_lookahead.cpp
 void LADetector::Write() {
-  std::string lang_path_header("../../../java/include/");
-  std::string lang_path_cpp("../../../java/src/");
+  std::string lang_path("../gen/");
 
-  std::string file_name = lang_path_cpp + "gen_lookahead.cpp";
+  std::string file_name = lang_path + "genmore_lookahead.cpp";
   mCppFile = new Write2File(file_name);
-  file_name = lang_path_header + "gen_lookahead.h";
+  file_name = lang_path + "gen_lookahead.h";
   mHeaderFile = new Write2File(file_name);
 
   WriteHeaderFile();
