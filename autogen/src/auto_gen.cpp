@@ -176,15 +176,6 @@ void AutoGen::Init() {
   mAttrGen->SetReserved(mReservedGen);
   mGenArray.push_back(mAttrGen);
 
-  hFile = lang_path + "gen_block.h";
-  cppFile = lang_path + "gen_block.cpp";
-  specFile = "../../../";
-  specFile += mLang;
-  specFile += "/block.spec";
-  mBlockGen  = new BlockGen(specFile.c_str(), hFile.c_str(), cppFile.c_str());
-  mBlockGen->SetReserved(mReservedGen);
-  mGenArray.push_back(mBlockGen);
-
   hFile = lang_path + "gen_separator.h";
   cppFile = lang_path + "gen_separator.cpp";
   specFile = "../../../";
