@@ -27,7 +27,6 @@
 #include "type_gen.h"
 #include "separator_gen.h"
 #include "operator_gen.h"
-#include "expr_gen.h"
 #include "stmt_gen.h"
 #include "keyword_gen.h"
 #include "attr_gen.h"
@@ -45,7 +44,6 @@ private:
   SeparatorGen *mSeparatorGen;
   OperatorGen  *mOperatorGen;
   KeywordGen   *mKeywordGen;
-  ExprGen      *mExprGen;
   StmtGen      *mStmtGen;
   TokenGen     *mTokenGen;
 

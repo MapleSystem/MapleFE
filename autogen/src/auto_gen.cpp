@@ -203,15 +203,6 @@ void AutoGen::Init() {
   mKeywordGen->SetReserved(mReservedGen);
   mGenArray.push_back(mKeywordGen);
 
-  hFile = lang_path + "gen_expr.h";
-  cppFile = lang_path + "gen_expr.cpp";
-  specFile = "../../../";
-  specFile += mLang;
-  specFile += "/expr.spec";
-  mExprGen  = new ExprGen(specFile.c_str(), hFile.c_str(), cppFile.c_str());
-  mExprGen->SetReserved(mReservedGen);
-  mGenArray.push_back(mExprGen);
-
   hFile = lang_path + "gen_stmt.h";
   cppFile = lang_path + "gen_stmt.cpp";
   specFile = "../../../";
