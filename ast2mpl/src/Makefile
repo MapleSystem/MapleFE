@@ -1,4 +1,4 @@
-# Copyright (C) [2020] Futurewei Technologies, Inc. All rights reverved.
+# Copyright (C) [2021] Futurewei Technologies, Inc. All rights reverved.
 # 
 # OpenArkFE is licensed under the Mulan PSL v2.
 # You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -26,12 +26,12 @@ DEPS :=$(foreach dep,$(DEP), $(BUILD)/$(dep))
 
 INCLUDES := -I $(MAPLEFE_ROOT)/shared/include \
             -I $(MAPLEFE_ROOT)/ast2mpl/include \
-            -I . $(MAPLEALL_INC)
+            $(MAPLEALL_INC)
 
 AST2MPLLIB = ast2mpl.a
 
 .PHONY: all
-all: $(AST2MPLLIB)
+all: $(BUILD)/$(AST2MPLLIB)
 
 -include $(DEPS)
 .PHONY: clean
@@ -49,7 +49,7 @@ $(BUILD)/%.d : %.cpp
 	@sed -e 's|.*:|$(BUILD)/$*.o:|' < $(BUILD)/$*.d.tmp > $(BUILD)/$*.d
 	@rm -f $(BUILD)/$*.d.tmp
 
-$(AST2MPLLIB) : $(OBJS)
+$(BUILD)/$(AST2MPLLIB) : $(OBJS)
 	/usr/bin/ar rcs $(BUILD)/$(AST2MPLLIB) $(LIBOBJS)
 
 clean:

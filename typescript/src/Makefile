@@ -1,4 +1,4 @@
-# Copyright (C) [2020] Futurewei Technologies, Inc. All rights reverved.
+# Copyright (C) [2021] Futurewei Technologies, Inc. All rights reverved.
 #
 # OpenArkFE is licensed under the Mulan PSL v2.
 # You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -14,27 +14,32 @@
 
 include ../../Makefile.in
 BUILD=$(BUILDDIR)/typescript
-$(shell $(MKDIR_P) $(BUILD))
+BUILDGEN=$(BUILDDIR)/gen
+$(shell $(MKDIR_P) $(BUILD) $(BUILDGEN))
 
 SRC=$(wildcard *.cpp)
 OBJ :=$(patsubst %.cpp,%.o,$(SRC))
 DEP :=$(patsubst %.cpp,%.d,$(SRC))
 
-OBJS :=$(foreach obj,$(OBJ), $(BUILD)/$(obj))
-DEPS :=$(foreach dep,$(DEP), $(BUILD)/$(dep))
+SRCG := $(wildcard $(BUILDGEN)/gen*.cpp)
+OBJG := $(patsubst %.cpp, %.o, $(SRCG))
+DEPG := $(patsubst %.cpp, %.d, $(SRCG))
+
+OBJS :=$(foreach obj,$(OBJ), $(BUILD)/$(obj)) $(OBJG)
+DEPS :=$(foreach dep,$(DEP), $(BUILD)/$(dep)) $(DEPG)
 
 INCLUDES := -I $(MAPLEFE_ROOT)/shared/include \
             -I $(MAPLEFE_ROOT)/ast2cpp/include \
             -I $(MAPLEFE_ROOT)/typescript/include \
             -I $(MAPLEFE_ROOT)/autogen/include \
-            -I . $(MAPLEALL_INC)
+            -I $(BUILDGEN) $(MAPLEALL_INC)
 
 TARGET=ts2cpp
 
 SHAREDLIB = $(BUILDDIR)/shared/shared.a $(BUILDDIR)/ast2cpp/ast2cpp.a
 
-.PHONY: all $(TARGET)
-all: $(TARGET)
+.PHONY: all
+all: $(BUILD)/$(TARGET)
 
 -include $(DEPS)
 .PHONY: clean
@@ -44,7 +49,7 @@ vpath %.d $(BUILD)
 
 # Pattern Rules
 $(BUILD)/%.o : %.cpp
-	$(CXX) $(CXXFLAGS) -fpermissive $(INCLUDES) -w -c $< -o $@ 
+	$(CXX) $(CXXFLAGS) -fpermissive $(INCLUDES) -w -c $< -o $@
 
 $(BUILD)/%.d : %.cpp
 	@$(CXX) $(CXXFLAGS) -std=c++11 -MM $(INCLUDES) $< > $@
@@ -52,14 +57,19 @@ $(BUILD)/%.d : %.cpp
 	@sed -e 's|.*:|$(BUILD)/$*.o:|' < $(BUILD)/$*.d.tmp > $(BUILD)/$*.d
 	@rm -f $(BUILD)/$*.d.tmp
 
+$(BUILDGEN)/%.o : $(BUILDGEN)/%.cpp $(BUILDGEN)/%.d
+	$(CXX) $(CXXFLAGS) -fpermissive -I $(BUILDGEN) -I $(MAPLEFE_ROOT)/shared/include -w -c $< -o $@
+
+$(BUILDGEN)/%.d : $(BUILDGEN)/%.cpp
+	@$(CXX) $(CXXFLAGS) -std=c++11 -MM $(INCLUDES) $< > $@
+	@mv -f $(BUILDGEN)/$*.d $(BUILDGEN)/$*.d.tmp
+	@sed -e 's|.*:|$(BUILDGEN)/$*.o:|' < $(BUILDGEN)/$*.d.tmp > $(BUILDGEN)/$*.d
+	@rm -f $(BUILDGEN)/$*.d.tmp
+
 # TARGET depends on OBJS and shared OBJS from shared directory
 # as well as mapleall libraries
-$(TARGET): $(OBJS) $(SHAREDLIB)
+$(BUILD)/$(TARGET): $(OBJS) $(SHAREDLIB)
 	$(LD) -o $(BUILD)/$(TARGET) $(OBJS) $(SHAREDLIB) $(MAPLELIBS)
-
-#.cpp.o:
-#	$(CXX) $(CXXFLAGS) -fpermissive $(INCLUDES) -w -c $*.cpp -o $(BUILD)/$*.o
-#	$(CXX) $(CXXFLAGS) -std=c++11 -MM $(INCLUDES) $*.cpp > $(BUILD)/$*.d
 
 clean:
 	rm -rf $(BUILD)

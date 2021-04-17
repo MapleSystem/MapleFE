@@ -1,4 +1,4 @@
-# Copyright (C) [2020] Futurewei Technologies, Inc. All rights reverved.
+# Copyright (C) [2020-2021] Futurewei Technologies, Inc. All rights reverved.
 # 
 # OpenArkFE is licensed under the Mulan PSL v2.
 # You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -24,13 +24,12 @@ OBJS :=$(foreach obj,$(OBJ), $(BUILD)/$(obj))
 LIBOBJS :=$(patsubst $(BUILD)/main.o,,$(OBJS))
 DEPS :=$(foreach dep,$(DEP), $(BUILD)/$(dep))
 
-INCLUDES := -I $(MAPLEFE_ROOT)/shared/include \
-            -I . $(MAPLEALL_INC)
+INCLUDES := -I $(MAPLEFE_ROOT)/shared/include
 
 SHAREDLIB = shared.a
 
 .PHONY: all
-all: $(SHAREDLIB)
+all: $(BUILD)/$(SHAREDLIB)
 
 -include $(DEPS)
 .PHONY: clean
@@ -48,7 +47,7 @@ $(BUILD)/%.d : %.cpp
 	@sed -e 's|.*:|$(BUILD)/$*.o:|' < $(BUILD)/$*.d.tmp > $(BUILD)/$*.d
 	@rm -f $(BUILD)/$*.d.tmp
 
-$(SHAREDLIB) : $(OBJS)
+$(BUILD)/$(SHAREDLIB) : $(LIBOBJS)
 	/usr/bin/ar rcs $(BUILD)/$(SHAREDLIB) $(LIBOBJS)
 
 clean:

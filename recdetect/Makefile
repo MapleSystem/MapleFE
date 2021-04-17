@@ -1,10 +1,25 @@
+# Copyright (C) [2020-2021] Futurewei Technologies, Inc. All rights reverved.
+# 
+# OpenArkFE is licensed under the Mulan PSL v2.
+# You can use this software according to the terms and conditions of the Mulan PSL v2.
+# You may obtain a copy of Mulan PSL v2 at:
+# 
+#  http://license.coscl.org.cn/MulanPSL2
+# 
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR
+# FIT FOR A PARTICULAR PURPOSE.
+# See the Mulan PSL v2 for more details.
+# 
+
 include ../Makefile.in
 
 # create build first
 BUILD=$(BUILDDIR)/recdetect
-$(shell $(MKDIR_P) $(BUILD))
+BUILDGEN=$(BUILDDIR)/gen
+$(shell $(MKDIR_P) $(BUILD) $(BUILDGEN)) 
 
-SRCG := $(wildcard $(BUILDDIR)/gen/gen_*.cpp)
+SRCG := $(wildcard $(BUILDGEN)/gen_*.cpp)
 OBJG := $(patsubst %.cpp, %.o, $(SRCG))
 DEPG := $(patsubst %.cpp, %.d, $(SRCG))
 
@@ -19,35 +34,34 @@ DEPS := $(DEPG) $(DEPL)
 
 INCLUDES := -I $(MAPLEFE_ROOT)/recdetect \
             -I $(MAPLEFE_ROOT)/shared/include \
-            -I $(BUILDDIR)/gen
+            -I $(BUILDGEN)
+
 SHAREDLIB = $(BUILDDIR)/shared/shared.a
 
 TARGET = recdetect
 
 .PHONY: all
 
-all: $(TARGET)
+all: $(BUILD)/$(TARGET)
 
-$(TARGET) : $(OBJS) $(SHAREDLIB)
+$(BUILD)/$(TARGET) : $(OBJS) $(SHAREDLIB)
 	$(LD) -o $(BUILD)/$(TARGET) $(OBJS) $(SHAREDLIB)
+	(cd $(BUILD); ./$(TARGET))
 
 -include $(DEPS)
 .PHONY: clean
 
-vpath %.cpp $(BUILD) $(BUILDDIR)/gen
-vpath %.o $(BUILD) $(BUILDDIR)/gen
-vpath %.d $(BUILD) $(BUILDDIR)/gen
+vpath %.o $(BUILD)
+vpath %.d $(BUILD)
 
-#CXXFLAGS := $(CXXFLAGS) -I $(BUILDDIR)/gen -I ../shared/include
-
-z:
-	echo $(SRCG)
-
-%.o : %.cpp %.d
+$(BUILDGEN)/%.o : $(BUILDGEN)/%.cpp $(BUILDGEN)/%.d
 	$(CXX) $(CXXFLAGS) -fpermissive $(INCLUDES) -w -c $< -o $@
 
-%.d : %.cpp
+$(BUILDGEN)/%.d : $(BUILDGEN)/%.cpp
 	@$(CXX) $(CXXFLAGS) -std=c++11 -MM $(INCLUDES) $< > $@
+	@mv -f $(BUILDGEN)/$*.d $(BUILDGEN)/$*.d.tmp
+	@sed -e 's|.*:|$(BUILDGEN)/$*.o:|' < $(BUILDGEN)/$*.d.tmp > $(BUILDGEN)/$*.d
+	@rm -f $(BUILDGEN)/$*.d.tmp
 
 #Pattern Rules
 $(BUILD)/%.o : %.cpp $(BUILD)/%.d
