@@ -80,7 +80,7 @@ void PrimArrayTypeNode::Dump(unsigned ind) {
 //////////////////////////////////////////////////////////////////////////
 
 static const char* FindPrimTypeName(TypeId id) {
-  for (unsigned i = 0; i < TY_NA; i++) {
+  for (unsigned i = 0; i < TypeKeywordTableSize; i++) {
     if (TypeKeywordTable[i].mId == id)
       return TypeKeywordTable[i].mText;
   }
@@ -88,7 +88,7 @@ static const char* FindPrimTypeName(TypeId id) {
 }
 
 static TypeId FindPrimTypeId(const char *keyword) {
-  for (unsigned i = 0; i < TY_NA; i++) {
+  for (unsigned i = 0; i < TypeKeywordTableSize; i++) {
     if (strncmp(TypeKeywordTable[i].mText, keyword, strlen(keyword)) == 0
         && strlen(keyword) == strlen(TypeKeywordTable[i].mText))
       return TypeKeywordTable[i].mId;
@@ -128,7 +128,7 @@ PrimTypePool::~PrimTypePool() {
 }
 
 void PrimTypePool::Init() {
-  for (unsigned i = 0; i < TY_NA; i++) {
+  for (unsigned i = 0; i < TypeKeywordTableSize; i++) {
     PrimTypeNode *n = (PrimTypeNode*)mTreePool.NewTreeNode(sizeof(PrimTypeNode));
     new (n) PrimTypeNode();
     n->SetPrimType((TypeId)i);
@@ -145,7 +145,7 @@ PrimTypeNode* PrimTypePool::FindType(const char *keyword) {
 }
 
 PrimTypeNode* PrimTypePool::FindType(TypeId id) {
-  for (unsigned i = 0; i < TY_NA; i++) {
+  for (unsigned i = 0; i < TypeKeywordTableSize; i++) {
     PrimTypeNode *type_float = mTypes.ValueAtIndex(6);
     PrimTypeNode *type = mTypes.ValueAtIndex(i);
     if (type->GetPrimType() == id)

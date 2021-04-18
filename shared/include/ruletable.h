@@ -153,7 +153,8 @@ struct TypeKeyword {
   const char *mText;
   TypeId      mId;
 };
-extern TypeKeyword TypeKeywordTable[TY_NA];
+extern TypeKeyword TypeKeywordTable[];
+extern unsigned TypeKeywordTableSize;
 
 //////////////////////////////////////////////////////////////////////
 //                     Attribute  Table                             //

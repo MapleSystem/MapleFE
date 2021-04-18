@@ -76,7 +76,7 @@ void TypeGen::GenHeaderFile() {
   mHeaderFile.WriteOneLine("namespace maplefe {", 19);
 
   // generate the keyword table
-  mHeaderFile.WriteOneLine("extern TypeKeyword TypeKeywordTable[TY_NA];", 43);
+  mHeaderFile.WriteOneLine("extern TypeKeyword TypeKeywordTable[];", 38);
 
   // generate the rule tables
   mHeaderFile.WriteFormattedBuffer(&mRuleTableHeader);
@@ -90,11 +90,20 @@ void TypeGen::GenCppFile() {
 
   // generate the keyword table
   TableBuffer tb;
-  tb.Generate(this, "TypeKeyword TypeKeywordTable[TY_NA] = {");
+  std::string s = "TypeKeyword TypeKeywordTable[";
+  std::string num = std::to_string(mTypes.size());
+  s += num;
+  s += "] = {";
+  tb.Generate(this, s);
   mCppFile.WriteFormattedBuffer(&tb);
   mCppFile.WriteOneLine("};", 2);
 
   // generate the rule tables
+  s = "unsigned TypeKeywordTableSize = ";
+  s += num;
+  s += ";";
+  mCppFile.WriteOneLine(s.c_str(), s.size());
+
   mCppFile.WriteFormattedBuffer(&mRuleTableCpp);
   mCppFile.WriteOneLine("}", 1);
 }
