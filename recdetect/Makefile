@@ -55,7 +55,7 @@ vpath %.o $(BUILD)
 vpath %.d $(BUILD)
 
 $(BUILDGEN)/%.o : $(BUILDGEN)/%.cpp $(BUILDGEN)/%.d
-	$(CXX) $(CXXFLAGS) -fpermissive $(INCLUDES) -w -c $< -o $@
+	$(CXX) $(CXXFLAGS) -fpermissive -I $(BUILDGEN) -w -c $< -o $@
 
 $(BUILDGEN)/%.d : $(BUILDGEN)/%.cpp
 	@$(CXX) $(CXXFLAGS) -std=c++11 -MM $(INCLUDES) $< > $@
