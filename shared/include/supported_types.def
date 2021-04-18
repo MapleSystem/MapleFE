@@ -28,6 +28,6 @@ TYPE(Void)      // Although this is not a type, it does categorize the types.
 TYPE(Null)      // The Null type. It is a type.
 TYPE(Undefined) // First come from JS
 TYPE(String)    // First come from JS
-TYPE(Symbol)    // First come from JS
+TYPE(Any)       // First come from JS
 
 
