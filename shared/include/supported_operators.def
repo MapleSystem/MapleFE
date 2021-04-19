@@ -68,3 +68,4 @@ OPERATOR(Diamond, Unary)
 // This part comes from JS
 OPERATOR(StEq, Binary)
 OPERATOR(StNe, Binary)
+OPERATOR(ArrowFunction, Binary)
