@@ -34,7 +34,10 @@ DEPS := $(DEPG) $(DEPL)
 
 INCLUDES := -I $(MAPLEFE_ROOT)/ladetect \
             -I $(MAPLEFE_ROOT)/shared/include \
+            -I $(MAPLEFE_ROOT)/$(SRCLANG)/include \
             -I $(BUILDGEN)
+
+INCLUDEGEN := -I $(BUILDGEN) -I $(MAPLEFE_ROOT)/shared/include
 
 SHAREDLIB = $(BUILDDIR)/shared/shared.a
 
@@ -55,10 +58,10 @@ vpath %.o $(BUILD)
 vpath %.d $(BUILD)
 
 $(BUILDGEN)/%.o : $(BUILDGEN)/%.cpp $(BUILDGEN)/%.d
-	$(CXX) $(CXXFLAGS) -fpermissive $(INCLUDES) -w -c $< -o $@
+	$(CXX) $(CXXFLAGS) -fpermissive $(INCLUDEGEN) -w -c $< -o $@
 
 $(BUILDGEN)/%.d : $(BUILDGEN)/%.cpp
-	@$(CXX) $(CXXFLAGS) -std=c++11 -MM $(INCLUDES) $< > $@
+	@$(CXX) $(CXXFLAGS) -std=c++11 -MM $(INCLUDEGEN) $< > $@
 	@mv -f $(BUILDGEN)/$*.d $(BUILDGEN)/$*.d.tmp
 	@sed -e 's|.*:|$(BUILDGEN)/$*.o:|' < $(BUILDGEN)/$*.d.tmp > $(BUILDGEN)/$*.d
 	@rm -f $(BUILDGEN)/$*.d.tmp

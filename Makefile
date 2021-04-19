@@ -19,6 +19,14 @@ TARGS = autogen shared recdetect ladetect java2mpl ast2mpl ts2cpp ast2cpp
 # create BUILDDIR first
 $(shell $(MKDIR_P) $(BUILDDIR))
 
+ifeq ($(SRCLANG),java)
+  TARGET := java2mpl
+else ifeq ($(SRCLANG),typescript)
+  TARGET := ts2cpp
+endif
+
+all: $(TARGET)
+
 java2mpl: autogen recdetect ladetect shared ast2mpl
 	$(MAKE) LANG=$(SRCLANG) -C $(SRCLANG)
 
