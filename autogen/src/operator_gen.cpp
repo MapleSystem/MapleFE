@@ -111,7 +111,7 @@ void OperatorGen::GenHeaderFile() {
   mHeaderFile.WriteOneLine("#ifndef __OPERATOR_GEN_H__", 26);
   mHeaderFile.WriteOneLine("#define __OPERATOR_GEN_H__", 26);
   mHeaderFile.WriteOneLine("namespace maplefe {", 19);
-  mHeaderFile.WriteOneLine("extern OprTableEntry OprTable[OPR_NA];", 38);
+  mHeaderFile.WriteOneLine("extern OprTableEntry OprTable[];", 32);
   mHeaderFile.WriteOneLine("}", 1);
   mHeaderFile.WriteOneLine("#endif", 6);
 }
@@ -120,9 +120,20 @@ void OperatorGen::GenCppFile() {
   mCppFile.WriteOneLine("#include \"ruletable.h\"", 22);
   mCppFile.WriteOneLine("namespace maplefe {", 19);
   TableBuffer tb;
-  tb.Generate(this, "OprTableEntry OprTable[] = {");
+  std::string s = "OprTableEntry OprTable[";
+  std::string num = std::to_string(mOperators.size());
+  s += num;
+  s += "] = {";
+  tb.Generate(this, s);
   mCppFile.WriteFormattedBuffer(&tb);
   mCppFile.WriteOneLine("};", 2);
+
+  // generate the table size
+  s = "unsigned OprTableSize = ";
+  s += num;
+  s += ";";
+  mCppFile.WriteOneLine(s.c_str(), s.size());
+
   mCppFile.WriteOneLine("}", 1);
 }
 }

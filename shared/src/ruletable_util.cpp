@@ -39,7 +39,7 @@ SepId FindSeparator(const char *str, const char c, unsigned &len) {
     text = c;
 
   unsigned i = 0;
-  for (; i < SEP_NA; i++) {
+  for (; i < SepTableSize; i++) {
     SepTableEntry e = SepTable[i];
     if (!strncmp(text.c_str(), e.mText, strlen(e.mText))) {
       len = strlen(e.mText);
@@ -62,7 +62,7 @@ OprId FindOperator(const char *str, const char c, unsigned &len) {
     text = c;
 
   unsigned i = 0;
-  for (; i < OPR_NA; i++) {
+  for (; i < OprTableSize; i++) {
     OprTableEntry e = OprTable[i];
     if (!strncmp(text.c_str(), e.mText, strlen(e.mText))) {
       len = strlen(e.mText);

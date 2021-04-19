@@ -24,7 +24,7 @@ namespace maplefe {
 
 // Inquiry function for language specific attr keyword
 static const char* FindAttrKeyword(AttrId id) {
-  for (unsigned i = 0; i < ATTR_NA; i++) {
+  for (unsigned i = 0; i < AttrKeywordTableSize; i++) {
     if (AttrKeywordTable[i].mId == id)
       return AttrKeywordTable[i].mText;
   }
@@ -33,7 +33,7 @@ static const char* FindAttrKeyword(AttrId id) {
 
 // Inquiry function for language specific attr keyword
 static AttrId FindAttrId(const char *keyword) {
-  for (unsigned i = 0; i < ATTR_NA; i++) {
+  for (unsigned i = 0; i < AttrKeywordTableSize; i++) {
     if (strncmp(AttrKeywordTable[i].mText, keyword, strlen(keyword)) == 0
         && strlen(keyword) == strlen(AttrKeywordTable[i].mText))
       return AttrKeywordTable[i].mId;

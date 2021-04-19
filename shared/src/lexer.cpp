@@ -468,7 +468,7 @@ bool Lexer::MatchToken(Token *token) {
   case TT_OP: {
     // Pick the longest matching operator.
     unsigned longest = 0;
-    for (unsigned i = 0; i < OPR_NA; i++) {
+    for (unsigned i = 0; i < OprTableSize; i++) {
       OprTableEntry e = OprTable[i];
       if ((e.mId == token->GetOprId()) &&
           !strncmp(line + curidx, e.mText, strlen(e.mText))) {
@@ -486,7 +486,7 @@ bool Lexer::MatchToken(Token *token) {
   case TT_SP: {
     // Pick the longest matching separator.
     unsigned longest = 0;
-    for (unsigned i = 0; i < SEP_NA; i++) {
+    for (unsigned i = 0; i < SepTableSize; i++) {
       SepTableEntry e = SepTable[i];
       if ((e.mId == token->GetSepId()) &&
           !strncmp(line + curidx, e.mText, strlen(e.mText))) {

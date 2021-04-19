@@ -30,3 +30,4 @@ SEPARATOR(Of)
 SEPARATOR(At)
 SEPARATOR(Pound)
 SEPARATOR(Whitespace)
+SEPARATOR(ArrowFunction)  // first coming from JS, =>

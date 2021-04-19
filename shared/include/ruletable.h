@@ -165,7 +165,8 @@ struct AttrKeyword {
   const char *mText;
   AttrId      mId;
 };
-extern AttrKeyword AttrKeywordTable[ATTR_NA];
+extern AttrKeyword AttrKeywordTable[];
+extern unsigned AttrKeywordTableSize;
 
 //////////////////////////////////////////////////////////////////////
 //                    Separator Table                               //
@@ -177,7 +178,8 @@ struct SepTableEntry {
   const char *mText;
   SepId       mId;
 };
-extern SepTableEntry SepTable[SEP_NA];
+extern SepTableEntry SepTable[];
+extern unsigned SepTableSize;
 
 //////////////////////////////////////////////////////////////////////
 //                    Operator  Table                               //
@@ -189,7 +191,8 @@ struct OprTableEntry {
   const char *mText;
   OprId       mId;
 };
-extern OprTableEntry OprTable[OPR_NA];
+extern OprTableEntry OprTable[];
+extern unsigned OprTableSize;
 
 //////////////////////////////////////////////////////////////////////
 //                    Keyword   Table                               //

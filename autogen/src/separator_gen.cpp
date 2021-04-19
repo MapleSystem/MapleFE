@@ -112,7 +112,7 @@ void SeparatorGen::GenHeaderFile() {
   mHeaderFile.WriteOneLine("#ifndef __SEPARATOR_GEN_H__", 27);
   mHeaderFile.WriteOneLine("#define __SEPARATOR_GEN_H__", 27);
   mHeaderFile.WriteOneLine("namespace maplefe {", 19);
-  mHeaderFile.WriteOneLine("extern SepTableEntry SepTable[SEP_NA];", 38);
+  mHeaderFile.WriteOneLine("extern SepTableEntry SepTable[];", 32);
   mHeaderFile.WriteOneLine("}", 1);
   mHeaderFile.WriteOneLine("#endif", 6);
 }
@@ -121,9 +121,20 @@ void SeparatorGen::GenCppFile() {
   mCppFile.WriteOneLine("#include \"ruletable.h\"", 22);
   mCppFile.WriteOneLine("namespace maplefe {", 19);
   TableBuffer tb;
-  tb.Generate(this, "SepTableEntry SepTable[SEP_NA] = {");
+  std::string s = "SepTableEntry SepTable[";
+  std::string num = std::to_string(mSeparators.size());
+  s += num;
+  s += "] = {";
+  tb.Generate(this, s);
   mCppFile.WriteFormattedBuffer(&tb);
   mCppFile.WriteOneLine("};", 2);
+
+  // generate the table size
+  s = "unsigned SepTableSize = ";
+  s += num;
+  s += ";";
+  mCppFile.WriteOneLine(s.c_str(), s.size());
+
   mCppFile.WriteOneLine("}", 1);
 }
 }

@@ -74,11 +74,20 @@ void AttrGen::GenCppFile() {
   mCppFile.WriteOneLine("namespace maplefe {", 19);
 
   TableBuffer tb;
-  tb.Generate(this, "AttrKeyword AttrKeywordTable[ATTR_NA] = {");
+  std::string s = "AttrKeyword AttrKeywordTable[";
+  std::string num = std::to_string(mAttrs.size());
+  s += num;
+  s += "] = {";
+  tb.Generate(this, s);
   mCppFile.WriteFormattedBuffer(&tb);
   mCppFile.WriteOneLine("};", 2);
+
+  // generate the table size
+  s = "unsigned AttrKeywordTableSize = ";
+  s += num;
+  s += ";";
+  mCppFile.WriteOneLine(s.c_str(), s.size());
+
   mCppFile.WriteOneLine("}", 1);
 }
 }
-
-

@@ -98,13 +98,15 @@ void TypeGen::GenCppFile() {
   mCppFile.WriteFormattedBuffer(&tb);
   mCppFile.WriteOneLine("};", 2);
 
-  // generate the rule tables
+  // generate the table size
   s = "unsigned TypeKeywordTableSize = ";
   s += num;
   s += ";";
   mCppFile.WriteOneLine(s.c_str(), s.size());
 
+  // generate the rule tables
   mCppFile.WriteFormattedBuffer(&mRuleTableCpp);
+
   mCppFile.WriteOneLine("}", 1);
 }
 

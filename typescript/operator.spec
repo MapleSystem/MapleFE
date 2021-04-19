@@ -36,6 +36,8 @@ STRUCT Operator : ONEOF(
                     ("<",    LT),
                     (">=",   GE),
                     ("<=",   LE),
+                    ("===",  StEq),
+                    ("!==",  StNe),
                     # Bitwise
                     ("&",    Band),
                     ("|",    Bor),
@@ -63,7 +65,7 @@ STRUCT Operator : ONEOF(
                     ("^=",   BxorAssign),
                     (">>>=", ZextAssign),
                     #
-                    ("->",   Arrow),
                     (":",    Select),
                     ("?",    Cond),
-                    ("<>",   Diamond))
+                    # arrow function
+                    ("=>",   ArrowFunc))
