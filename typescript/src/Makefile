@@ -34,6 +34,8 @@ INCLUDES := -I $(MAPLEFE_ROOT)/shared/include \
             -I $(MAPLEFE_ROOT)/autogen/include \
             -I $(BUILDGEN) $(MAPLEALL_INC)
 
+INCLUDEGEN := -I $(BUILDGEN) -I $(MAPLEFE_ROOT)/shared/include
+
 TARGET=ts2cpp
 
 SHAREDLIB = $(BUILDDIR)/shared/shared.a $(BUILDDIR)/ast2cpp/ast2cpp.a
@@ -58,10 +60,10 @@ $(BUILD)/%.d : %.cpp
 	@rm -f $(BUILD)/$*.d.tmp
 
 $(BUILDGEN)/%.o : $(BUILDGEN)/%.cpp $(BUILDGEN)/%.d
-	$(CXX) $(CXXFLAGS) -fpermissive -I $(BUILDGEN) -I $(MAPLEFE_ROOT)/shared/include -w -c $< -o $@
+	$(CXX) $(CXXFLAGS) -fpermissive $(INCLUDEGEN) -w -c $< -o $@
 
 $(BUILDGEN)/%.d : $(BUILDGEN)/%.cpp
-	@$(CXX) $(CXXFLAGS) -std=c++11 -MM $(INCLUDES) $< > $@
+	@$(CXX) $(CXXFLAGS) -std=c++11 -MM $(INCLUDEGEN) $< > $@
 	@mv -f $(BUILDGEN)/$*.d $(BUILDGEN)/$*.d.tmp
 	@sed -e 's|.*:|$(BUILDGEN)/$*.o:|' < $(BUILDGEN)/$*.d.tmp > $(BUILDGEN)/$*.d
 	@rm -f $(BUILDGEN)/$*.d.tmp
