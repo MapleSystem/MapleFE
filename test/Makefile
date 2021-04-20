@@ -18,18 +18,21 @@
 build = ../output/$(SRCLANG)/test
 $(shell mkdir -p $(build))
 
-DIR = . $(wildcard * */* */*/*)
+ifeq ($(SRCLANG),java)
+  TARGET := java
+	DIR := . $(wildcard java java/* java/*/* java/*/*/*)
+	FLAGS := --trace-a2m
+else ifeq ($(SRCLANG),typescript)
+  TARGET := ts
+	DIR := . $(wildcard typescript typescript/* typescript/*/* typescript/*/*/*)
+	FLAGS := --trace-lexer
+endif
 
 vpath %.java $(DIR)
 vpath %.mpl $(DIR)
 vpath %.c $(DIR)
 vpath %.cpp $(DIR)
-
-ifeq ($(SRCLANG),java)
-  TARGET := java
-else ifeq ($(SRCLANG),typescript)
-  TARGET := ts
-endif
+vpath %.ts $(DIR)
 
 .PHONY: $(TARGET)
 
@@ -62,20 +65,30 @@ rebuild:
 	make -C .. rebuild
 
 dbg:
-	gdb --args ../output/java/java/java2mpl test.java --trace-a2m
+	gdb --args ../output/java/java/java2mpl test.java $(FLAGS)
 
 % : %.java
 	@cp $< $(build)
-	@echo gdb --args ../output/java/java/java2mpl $(build)/$@.java --trace-a2m
-	../output/java/java/java2mpl $(build)/$@.java --trace-a2m
+	@echo gdb --args ../output/java/java/java2mpl $(build)/$@.java $(FLAGS)
+	../output/java/java/java2mpl $(build)/$@.java $(FLAGS)
 	@cat -n $(build)/$@.java
 	@echo "\n======================= $@.mpl ========================="
 	@cat -n $(build)/$@.mpl
 	@echo "========================================================\n"
-	@echo gdb --args ../output/java/java/java2mpl $(build)/$@.java --trace-a2m
+	@echo gdb --args ../output/java/java/java2mpl $(build)/$@.java $(FLAGS)
 	$(MAPLEALL_ROOT)/output/aarch64-clang-debug/bin/irbuild $(build)/$@.mpl
 	$(MAPLEALL_ROOT)/output/aarch64-clang-debug/bin/irbuild $(build)/$@.irb.mpl
 	diff -uwb $(build)/$@.irb.mpl $(build)/$@.irb.irb.mpl
+
+% : %.ts
+	@cp $< $(build)
+	@echo gdb --args ../output/typescript/typescript/ts2cpp $(build)/$@.ts $(FLAGS)
+	../output/typescript/typescript/ts2cpp $(build)/$@.ts $(FLAGS)
+	@cat -n $(build)/$@.ts
+	@echo "\n======================= $@.cpp ========================="
+	@cat -n $(build)/$@.cpp
+	@echo "========================================================\n"
+	@echo gdb --args ../output/typescript/typescript/ts2cpp $(build)/$@.ts $(FLAGS)
 
 % : %.c
 	cp $< $(build)
