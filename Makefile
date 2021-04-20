@@ -54,11 +54,10 @@ autogen:
 mapleall:
 	./scripts/build_mapleall.sh
 
-test: autogen
+test:
 	$(MAKE) LANG=$(SRCLANG) -C test
 
-testall:
-	(cd test; ./runtests.pl all)
+testall: test
 
 test1:
 	@cp test/java2mpl/t1.java .
@@ -76,5 +75,5 @@ rebuild:
 	make clobber
 	make -j8
 
-.PHONY: $(TARGS)
+.PHONY: $(TARGS) test
 

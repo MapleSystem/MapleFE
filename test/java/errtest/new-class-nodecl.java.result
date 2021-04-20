@@ -1,4 +1,4 @@
-Matched 27 tokens.
+Matched 15 tokens.
 ============= Module ===========
 == Sub Tree ==
 class  A
@@ -8,7 +8,8 @@ class  A
   Constructors: 
   Methods: 
     func  foo()  throws: 
-    func  foo()  throws: 
+      new Cyclic()
   LocalClasses: 
   LocalInterfaces: 
 
+UserType:Cyclic has no decl.

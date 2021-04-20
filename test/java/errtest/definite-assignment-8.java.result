@@ -3,16 +3,21 @@ Matched 41 tokens.
 == Sub Tree ==
 class  Point
   Fields: 
-    x
+
   Instance Initializer: 
   Constructors: 
   Methods: 
-    func  foo()  throws: 
+    func  flow(flag)  throws: 
       var:k
-      var:n=5
-      cond-branch cond:n GT 2
+      cond-branch cond:flag
       true branch :
-        k Assign 3      false branch :
+        k Assign 3
+      false branch :
+
+      cond-branch cond:flag
+      true branch :
+        k Assign 4
+      false branch :
 
       System.out.println(k)
   LocalClasses: 

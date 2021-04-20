@@ -25,8 +25,23 @@ vpath %.mpl $(DIR)
 vpath %.c $(DIR)
 vpath %.cpp $(DIR)
 
-all:
-	./runtests.pl all
+ifeq ($(SRCLANG),java)
+  TARGET := java
+else ifeq ($(SRCLANG),typescript)
+  TARGET := ts
+endif
+
+.PHONY: $(TARGET)
+
+all: $(TARGET)
+
+java:
+	./new_runtests.pl java
+
+typescript:
+	./new_runtests.pl typescript
+
+ts: typescript
 
 autogen:
 	make -C ../autogen

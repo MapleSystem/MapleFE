@@ -1,4 +1,4 @@
-Matched 15 tokens.
+Matched 27 tokens.
 ============= Module ===========
 == Sub Tree ==
 class  A
@@ -7,9 +7,8 @@ class  A
   Instance Initializer: 
   Constructors: 
   Methods: 
-    func  foo()  throws: 
-      new Cyclic<Cyclic>
+    func  foo(c,b)  throws: 
+    func  foo(i,b,c)  throws: 
   LocalClasses: 
   LocalInterfaces: 
 
-UserType:Cyclic has no decl.

@@ -19,6 +19,7 @@ if [ ! -d $MAPLEALL_ROOT ]; then
 fi
 
 cd $MAPLEALL_ROOT
+git checkout master
 git pull
 source build/envsetup.sh arm debug
 make setup
