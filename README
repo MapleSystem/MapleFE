@@ -45,11 +45,7 @@ Once you are done, please update the lib and include paths in MapleFE/shared/src
 
 [How to test]
 
-1. cd test
-2. ./runtests.pl all
-
-or
-1. make testall
+1. make test
 
 run a single test, say t1.java:
 1. cd test
