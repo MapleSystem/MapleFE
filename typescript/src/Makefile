@@ -32,7 +32,7 @@ INCLUDES := -I $(MAPLEFE_ROOT)/shared/include \
             -I $(MAPLEFE_ROOT)/ast2cpp/include \
             -I $(MAPLEFE_ROOT)/typescript/include \
             -I $(MAPLEFE_ROOT)/autogen/include \
-            -I $(BUILDGEN) $(MAPLEALL_INC)
+            -I $(BUILDGEN)
 
 INCLUDEGEN := -I $(BUILDGEN) -I $(MAPLEFE_ROOT)/shared/include
 
@@ -71,7 +71,7 @@ $(BUILDGEN)/%.d : $(BUILDGEN)/%.cpp
 # TARGET depends on OBJS and shared OBJS from shared directory
 # as well as mapleall libraries
 $(BUILD)/$(TARGET): $(OBJS) $(SHAREDLIB)
-	$(LD) -o $(BUILD)/$(TARGET) $(OBJS) $(SHAREDLIB) $(MAPLELIBS)
+	$(LD) -o $(BUILD)/$(TARGET) $(OBJS) $(SHAREDLIB)
 
 clean:
 	rm -rf $(BUILD)
