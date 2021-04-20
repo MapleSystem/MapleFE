@@ -11,14 +11,14 @@ use File::Find qw(find);
 
 if(!(defined $ARGV[0])) {
   print "------------------------------------------------\n";
-  print "usage: runtests.pl java/typescript/javascript\n";
+  print "usage: runtests.pl [ java | java/subdirectory | typescript | typescript/subdirectory ]\n";
   print "------------------------------------------------\n";
   exit;
 }
 
 my $pwd = getcwd;
 my $currdir = "$pwd";
-my $outroot = "$currdir/../output/test";
+my $outroot = "$currdir/../output/java/test";
 
 system("rm -Rf report.txt $pwd/output $pwd/diff $pwd/notexists");
 
@@ -34,8 +34,6 @@ my $counttotal = 0;
 my $countfailedjava = 0;
 my $countsub = 0;
 
-opendir (my $DIR, $ARGV[0]) || die "Error in opening $ARGV[0] directory\n";
-
 my $pjava = 'java';
 my $ptypescript = 'typescript';
 my $pinput = '';
@@ -43,11 +41,16 @@ my $cmnd = '';
 print "Running $ARGV[0]\n";
 if ($ARGV[0] =~ /\Q$pjava\E/) {
   $pinput = "JAVA";
-  $cmnd = "../output/java/java2mpl";
+  $cmnd = "../output/java/java/java2mpl";
 } elsif ($ARGV[0] =~ /\Q$ptypescript\E/) {
   $pinput = "TYPESCRIPT";
   $cmnd = "";
+} else {
+  print "$ARGV[0] is an invalid option\n";
+  exit;
 }
+
+opendir (my $DIR, $ARGV[0]) || die "Error in opening $ARGV[0] directory\n";
 
 sub listdirs {
   my @dirs = @_;
@@ -102,7 +105,7 @@ foreach my $file (@paths) {
         print "\nOriginal file $origresult does NOT exists!\n";
         system("mkdir -p $notexistsdir/$file && touch $notexistsdir/$file");
         $countfailedjava ++;
-        push(@failed_file, $pinput." file not exists: ".$file);
+        push(@failed_file, $pinput.": result file not exists: ".$origresult);
       } else {
         if ((!(-e "$outroot/$outresult")) || (-z "$outroot/$outresult")) {
 	  if(!(-e "$notexistsdir")) {
@@ -112,7 +115,7 @@ foreach my $file (@paths) {
           print "\n$outroot/$outresult either empty or not exists!\n";
           system("mkdir -p $notexistsdir/$file && touch $notexistsdir/$file");
           $countfailedjava ++;
-          push(@failed_file, $pinput." file empty or not exists: ".$file);
+          push(@failed_file, $pinput.": file empty or not exists: ".$file);
 	} else {
 	  my $res2 = system("diff $origresult $outroot/$outresult");
           if ($res2 > 0) {
@@ -123,7 +126,7 @@ foreach my $file (@paths) {
             print "\n$origresult $outroot/$outresult are different!!!\n";
             system("mkdir -p $diffdir/$diff_file && touch $diffdir/$diff_file");
             $countfailedjava ++;
-            push(@failed_file, $pinput." result files diff: ".$origresult);
+            push(@failed_file, $pinput.": result files diff: ".$origresult);
           } else {
 	    push(@successed_file, $file." ".$pinput);
 	  }
