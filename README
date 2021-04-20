@@ -28,10 +28,8 @@ have our own frontend, which could be easier to handle new languages.
 
 [Preparation]
 
-Before start building MapleFE, please download mapleall from the open ark compiler incubator,
-https://gitee.com/openarkcompiler-incubator/mapleall
-Follow the instruction of mapleall and build the necessary libraries.
-Once you are done, please update the lib and include paths in MapleFE/shared/src/Makefile accordingly.
+https://gitee.com/openarkcompiler/OpenArkCompiler/blob/master/doc/en/DevelopmentPreparation.md
+Follow the instruction in "Recommended Development Environment" section to get tools installed
 
 [How to build]
 
@@ -40,7 +38,7 @@ Once you are done, please update the lib and include paths in MapleFE/shared/src
    This step is to build mapleall (Maple IR related libraries). If you have done it once,
    you dont need do it again unless you changed the code in mapleall.
 3. make
-4. If you are working at Java frontend, you will see output/java/java2mpl. This is the executable
+4. If you are working at Java frontend, you will see output/java/java/java2mpl. This is the executable
    frontend.
 
 [How to test]
@@ -51,5 +49,4 @@ run a single test, say t1.java:
 1. cd test
 2. make t1
 
-You can find all Java test cases in test/java2mpl. Right now only java test cases
-are used.
+You can find all Java test cases in test/java.
