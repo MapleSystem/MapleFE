@@ -16,9 +16,10 @@ if(!(defined $ARGV[0])) {
   exit;
 }
 
+my $lang = $ARGV[0];
 my $pwd = getcwd;
 my $currdir = "$pwd";
-my $outroot = "$currdir/../output/java/test";
+my $outroot = "$currdir/../output/$lang/test";
 
 system("rm -Rf report.txt $pwd/output $pwd/diff $pwd/notexists");
 
@@ -38,34 +39,34 @@ my $pjava = 'java';
 my $ptypescript = 'typescript';
 my $pinput = '';
 my $cmnd = '';
-print "Running $ARGV[0]\n";
-if ($ARGV[0] =~ /\Q$pjava\E/) {
+print "Running $lang\n";
+if ($lang =~ /\Q$pjava\E/) {
   $pinput = "JAVA";
   $cmnd = "../output/java/java/java2mpl";
-} elsif ($ARGV[0] =~ /\Q$ptypescript\E/) {
+} elsif ($lang =~ /\Q$ptypescript\E/) {
   $pinput = "TYPESCRIPT";
-  $cmnd = "";
+  $cmnd = "../output/typescript/typescript/ts2cpp";
 } else {
-  print "$ARGV[0] is an invalid option\n";
+  print "$lang is an invalid option\n";
   exit;
 }
 
-opendir (my $DIR, $ARGV[0]) || die "Error in opening $ARGV[0] directory\n";
+opendir (my $DIR, $lang) || die "Error in opening $lang directory\n";
 
 sub listdirs {
   my @dirs = @_;
   my @files;
-  
+
   if ( $pinput eq "JAVA" ) {
     find({ wanted => sub { push @files, glob "\"$_/{*.java,*.java.result}\"" } , no_chdir => 1 }, @dirs);
   } else {
     find({ wanted => sub { push @files, $_ } , no_chdir => 1 }, @dirs);
   }
-  
+
   return @files;
 }
 
-my @paths = listdirs($ARGV[0]) ;
+my @paths = listdirs($lang) ;
 
 foreach my $file (@paths) {
   my ($filename) = ( $file =~ /([^\\\/]+)$/s ) ;
@@ -100,24 +101,24 @@ foreach my $file (@paths) {
 
       if (!(-e $origresult) ) {
         if(!(-e "$notexistsdir")) {
-	  system("mkdir -p $notexistsdir");
-	}
+          system("mkdir -p $notexistsdir");
+        }
         print "\nOriginal file $origresult does NOT exists!\n";
         system("mkdir -p $notexistsdir/$file && touch $notexistsdir/$file");
         $countfailedjava ++;
         push(@failed_file, $pinput.": result file not exists: ".$origresult);
       } else {
         if ((!(-e "$outroot/$outresult")) || (-z "$outroot/$outresult")) {
-	  if(!(-e "$notexistsdir")) {
+          if(!(-e "$notexistsdir")) {
             system("mkdir -p $notexistsdir");
-	  }
+          }
 
           print "\n$outroot/$outresult either empty or not exists!\n";
           system("mkdir -p $notexistsdir/$file && touch $notexistsdir/$file");
           $countfailedjava ++;
           push(@failed_file, $pinput.": file empty or not exists: ".$file);
-	} else {
-	  my $res2 = system("diff $origresult $outroot/$outresult");
+        } else {
+          my $res2 = system("diff $origresult $outroot/$outresult");
           if ($res2 > 0) {
             if(!(-e "$diffdir")) {
               system("mkdir -p $diffdir");
@@ -128,9 +129,9 @@ foreach my $file (@paths) {
             $countfailedjava ++;
             push(@failed_file, $pinput.": result files diff: ".$origresult);
           } else {
-	    push(@successed_file, $file." ".$pinput);
-	  }
-	}
+            push(@successed_file, $file." ".$pinput);
+          }
+        }
       }
     }
   } elsif ( $pinput eq "TYPESCRIPT" ) {
