@@ -1,8 +1,0 @@
-#! /bin/bash
-DIR=`pwd | sed "s/MapleFE.*/MapleFE/"`
-echo DIR=${DIR}
-cd $BUILDDIR/autogen
-
-#test t.java
-echo testing ... t.java
-./sharedfe ../../test/sharedfe/t.java
