@@ -19,9 +19,9 @@ build = ../output/$(SRCLANG)/test
 $(shell mkdir -p $(build))
 
 ifeq ($(SRCLANG),java)
-	FLAGS := --trace-a2m
+  FLAGS := --trace-a2m
 else ifeq ($(SRCLANG),typescript)
-	FLAGS := --trace-lexer
+  FLAGS := --trace-lexer --trace-a2c
 endif
 
 DIRS := . $(shell find $(SRCLANG) -type d)
