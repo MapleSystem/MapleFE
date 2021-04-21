@@ -27,10 +27,11 @@ A2C::~A2C() {
 void A2C::ProcessAST(bool trace_a2m) {
   mTraceA2C = trace_a2m;
   if (mTraceA2C) std::cout << "============= in ProcessAST ===========" << std::endl;
-  int count;
   for(auto it: gModule.mTrees) {
     TreeNode *tnode = it->mRootNode;
-    count++;
+    if (mTraceA2C) {
+      tnode->Dump(0);
+    }
   }
 }
 }

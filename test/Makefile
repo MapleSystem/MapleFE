@@ -55,6 +55,7 @@ dbg:
 	@cp $< $(build)
 	@echo gdb --args ../output/java/java/java2mpl $(build)/$@.java $(FLAGS)
 	../output/java/java/java2mpl $(build)/$@.java $(FLAGS)
+	@echo "\n======================= $@.java ========================="
 	@cat -n $(build)/$@.java
 	@echo "\n======================= $@.mpl ========================="
 	@cat -n $(build)/$@.mpl
@@ -68,6 +69,7 @@ dbg:
 	@cp $< $(build)
 	@echo gdb --args ../output/typescript/typescript/ts2cpp $(build)/$@.ts $(FLAGS)
 	../output/typescript/typescript/ts2cpp $(build)/$@.ts $(FLAGS)
+	@echo "\n======================= $@.ts ========================="
 	@cat -n $(build)/$@.ts
 	@echo "\n======================= $@.cpp ========================="
 	@cat -n $(build)/$@.cpp
