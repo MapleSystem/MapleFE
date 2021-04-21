@@ -1,4 +1,4 @@
-Matched 65 tokens.
+Matched 55 tokens.
 ============= Module ===========
 == Sub Tree ==
 class  Outer
@@ -8,25 +8,25 @@ class  Outer
   Constructors: 
     constructor  Outer()  throws: 
   Methods: 
-    func  m(Outer,this)  throws: 
+    func  m(Outer)  throws: 
   LocalClasses: 
     class  Inner
       Fields: 
 
       Instance Initializer: 
       Constructors: 
-        constructor  Inner(Outer,Outer,this)  throws: 
+        constructor  Inner(Outer)  throws: 
       Methods: 
-        func  m(Inner,this)  throws: 
+        func  m(Inner)  throws: 
       LocalClasses: 
         class  B
           Fields: 
 
           Instance Initializer: 
           Constructors: 
-            constructor  B(,Inner,this)  throws: 
+            constructor  B(Inner)  throws: 
           Methods: 
-            func  m(,this)  throws: 
+            func  m(Outer)  throws: 
           LocalClasses: 
           LocalInterfaces: 
       LocalInterfaces: 

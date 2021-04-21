@@ -53,8 +53,8 @@ class  Enum
     func  clone()  throws:     CloneNotSupportedException
       new CloneNotSupportedException()
     func  compareTo(o)  throws: 
-      var:other=(Enum)o
-      var:self=this
+      Decl: other=(Enum)o
+      Decl: self=this
       cond-branch cond:self.getClass() NE other.getClass() Land self.getDeclaringClass() NE other.getDeclaringClass()
       true branch :
         new ClassCastException()
@@ -62,8 +62,8 @@ class  Enum
 
       return self.ordinal Sub other.ordinal
     func  getDeclaringClass()  throws: 
-      var:clazz=getClass()
-      var:zuper=clazz.getSuperclass()
+      Decl: clazz=getClass()
+      Decl: zuper=clazz.getSuperclass()
       return 
     func  valueOf(enumType,name)  throws: 
       cond-branch cond:enumType EQ null
@@ -76,21 +76,21 @@ class  Enum
         new NullPointerException("name == null")
       false branch :
 
-      var:values=getSharedConstants(enumType)
+      Decl: values=getSharedConstants(enumType)
       cond-branch cond:values EQ null
       true branch :
-        new IllegalArgumentException()
+        new IllegalArgumentException(enumType.toString() Add " is not an enum type.")
       false branch :
 
       for ( )
-        var:value=
+        Decl: value=
         cond-branch cond:name.equals(value.name())
         true branch :
           return value
         false branch :
 
 
-      new IllegalArgumentException()
+      new IllegalArgumentException("No enum constant " Add enumType.getCanonicalName() Add "." Add name)
     func  getSharedConstants(enumType)  throws: 
       return (T[])sharedConstantsCache.get(enumType)
     func  finalize()  throws: 

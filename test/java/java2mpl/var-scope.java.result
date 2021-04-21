@@ -11,11 +11,11 @@ class  A
       a Assign x
       cond-branch cond:a EQ 1
       true branch :
-        var:a=2
+        Decl: a=2
 
       false branch :
 
-      var:a=4
+      Decl: a=4
       a Assign x Add this.a
       return a Add 4
   LocalClasses: 

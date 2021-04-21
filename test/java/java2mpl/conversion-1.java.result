@@ -8,12 +8,15 @@ class  Test
   Constructors: 
   Methods: 
     func  main(args)  throws: 
-      var:i=(int)12.5
+      Decl: i=(int)12.5
       System.out.println("(int)12.5f==" Add i)
-      var:f=i
+      Decl: f=i
       System.out.print(f)
       f Assign f Mul i
-      var:d=Math.sin(f)
+      Decl: d=Math.sin(f)
   LocalClasses: 
   LocalInterfaces: 
 
+Identifier:f has no decl.
+Identifier:f has no decl.
+Identifier:i has no decl.

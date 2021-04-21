@@ -16,14 +16,14 @@ class  Main
   Constructors: 
   Methods: 
     func  main(args)  throws: 
-      var:exclaim=(s) -> s Add "!"
+      Decl: exclaim=(s) -> s Add "!"
 
-      var:ask=(s) -> s Add "?"
+      Decl: ask=(s) -> s Add "?"
 
       printFormatted("Hello",exclaim)
       printFormatted("Hello",ask)
     func  printFormatted(str,format)  throws: 
-      var:result=format.run(str)
+      Decl: result=format.run(str)
       System.out.println(result)
   LocalClasses: 
   LocalInterfaces: 

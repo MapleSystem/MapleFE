@@ -62,7 +62,7 @@ class  Character
 
         constructor  UnicodeBlock(idName,alias)  throws: 
           map.put(alias,this)
-        constructor  UnicodeBlock(idName,String,aliases)  throws: 
+        constructor  UnicodeBlock(idName,aliases)  throws: 
           String
           alias
           aliases
@@ -76,7 +76,7 @@ class  Character
             new IllegalArgumentException()
           false branch :
 
-          var:top,bottom,current
+          Decl: top,bottom,current
           bottom Assign 0
           top Assign blockStarts.length
           current Assign top Div 2

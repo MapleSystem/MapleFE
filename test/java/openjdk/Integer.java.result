@@ -30,9 +30,9 @@ class  Integer
         return toString(i)
       false branch :
 
-      var:buf=[]
-      var:negative=(i LT 0)
-      var:charPos=32
+      Decl: buf=[]
+      Decl: negative=(i LT 0)
+      Decl: charPos=32
       cond-branch cond:negative
       true branch :
         i Assign Sub
@@ -59,15 +59,15 @@ class  Integer
     func  toBinaryString(i)  throws: 
       return toUnsignedString0(i,1)
     func  toUnsignedString0(val,shift)  throws: 
-      var:mag=Integer.SIZE Sub Integer.numberOfLeadingZeros(val)
-      var:chars=Math.max(((mag Add (shift Sub 1)) Div shift)1)
-      var:buf=
+      Decl: mag=Integer.SIZE Sub Integer.numberOfLeadingZeros(val)
+      Decl: chars=Math.max(((mag Add (shift Sub 1)) Div shift)1)
+      Decl: buf=
       formatUnsignedInt(val,shift,buf,0,chars)
       return new String(buf)
     func  formatUnsignedInt(val,shift,buf,offset,len)  throws: 
-      var:charPos=len
-      var:radix=1 Shl shift
-      var:mask=radix Sub 1
+      Decl: charPos=len
+      Decl: radix=1 Shl shift
+      Decl: mask=radix Sub 1
       do          Assign 
         val ZextAssign shift
 while val NE 0 Land charPos GT 0
@@ -78,24 +78,24 @@ while val NE 0 Land charPos GT 0
         return "-2147483648"
       false branch :
 
-      var:negative=i LT 0
-      var:small=
+      Decl: negative=i LT 0
+      Decl: small=
       cond-branch cond:small
       true branch :
-        var:smallValues=
+        Decl: smallValues=
 
       false branch :
 
-      var:size=
-      var:buf=
+      Decl: size=
+      Decl: buf=
       getChars(i,size,buf)
       return new String(buf)
     func  toUnsignedString(i)  throws: 
       return Long.toString(toUnsignedLong(i))
     func  getChars(i,index,buf)  throws: 
-      var:q,r
-      var:charPos=index
-      var:sign=0
+      Decl: q,r
+      Decl: charPos=index
+      Decl: sign=0
       cond-branch cond:i LT 0
       true branch :
         sign Assign -
@@ -131,24 +131,24 @@ while val NE 0 Land charPos GT 0
 
       cond-branch cond:radix LT Character.MIN_RADIX
       true branch :
-        new NumberFormatException()
+        new NumberFormatException("radix " Add radix Add " less than Character.MIN_RADIX")
       false branch :
 
       cond-branch cond:radix GT Character.MAX_RADIX
       true branch :
-        new NumberFormatException()
+        new NumberFormatException("radix " Add radix Add " greater than Character.MAX_RADIX")
       false branch :
 
-      var:result=0
-      var:negative=false
-      var:i=0,len=s.length()
-      var:limit=Sub
+      Decl: result=0
+      Decl: negative=false
+      Decl: i=0,len=s.length()
+      Decl: limit=Sub
   Integer.MAX_VALUE
-      var:multmin
-      var:digit
+      Decl: multmin
+      Decl: digit
       cond-branch cond:len GT 0
       true branch :
-        var:firstChar=s.charAt(0)
+        Decl: firstChar=s.charAt(0)
 
       false branch :
         NumberFormatException.forInputString(s)
@@ -162,24 +162,24 @@ while val NE 0 Land charPos GT 0
         new NumberFormatException("null")
       false branch :
 
-      var:len=s.length()
+      Decl: len=s.length()
       cond-branch cond:len GT 0
       true branch :
-        var:firstChar=s.charAt(0)
+        Decl: firstChar=s.charAt(0)
         cond-branch cond:firstChar EQ -
         true branch :
-          new NumberFormatException()
+          new NumberFormatException(String.format("Illegal leading minus sign " Add "on unsigned string %s.",s))
         false branch :
           cond-branch cond:len LE 5 Lor (radix EQ 10 Land len LE 9)
           true branch :
             return parseInt(s,radix)
           false branch :
-            var:ell=Long.parseLong(s,radix)
+            Decl: ell=Long.parseLong(s,radix)
             cond-branch cond:(ell Band 0) EQ 0
             true branch :
               return (int)ell
             false branch :
-              new NumberFormatException()
+              new NumberFormatException(String.format("String value %s exceeds " Add "range of unsigned int.",s))
 
 
 
@@ -227,10 +227,10 @@ while val NE 0 Land charPos GT 0
     func  getInteger(nm)  throws: 
       return getInteger(nm,null)
     func  getInteger(nm,val)  throws: 
-      var:result=getInteger(nm,null)
+      Decl: result=getInteger(nm,null)
       return 
     func  getInteger(nm,val)  throws: 
-      var:v=null
+      Decl: v=null
       v Assign System.getProperty(nm)
 
 
@@ -243,16 +243,16 @@ while val NE 0 Land charPos GT 0
 
       return val
     func  decode(nm)  throws:     NumberFormatException
-      var:radix=10
-      var:index=0
-      var:negative=false
-      var:result
+      Decl: radix=10
+      Decl: index=0
+      Decl: negative=false
+      Decl: result
       cond-branch cond:nm.length() EQ 0
       true branch :
         new NumberFormatException("Zero length string")
       false branch :
 
-      var:firstChar=nm.charAt(0)
+      Decl: firstChar=nm.charAt(0)
       cond-branch cond:firstChar EQ -
       true branch :
         negative Assign true
@@ -321,7 +321,7 @@ while val NE 0 Land charPos GT 0
         return 32
       false branch :
 
-      var:n=1
+      Decl: n=1
       cond-branch cond:i Zext 16 EQ 0
       true branch :
         n AddAssign 16
@@ -349,13 +349,13 @@ while val NE 0 Land charPos GT 0
       n SubAssign i Zext 31
       return n
     func  numberOfTrailingZeros(i)  throws: 
-      var:y
+      Decl: y
       cond-branch cond:i EQ 0
       true branch :
         return 32
       false branch :
 
-      var:n=31
+      Decl: n=31
       y Assign i Shl 16
       cond-branch cond:y NE 0
       true branch :
@@ -429,3 +429,9 @@ while val NE 0 Land charPos GT 0
       LocalInterfaces: 
   LocalInterfaces: 
 
+Identifier:v has no decl.
+Identifier:n has no decl.
+Identifier:y has no decl.
+Identifier:y has no decl.
+Identifier:y has no decl.
+Identifier:y has no decl.

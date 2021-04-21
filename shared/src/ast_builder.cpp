@@ -766,12 +766,15 @@ TreeNode* ASTBuilder::BuildDecl() {
 
   if (!p_name.mIsTreeNode)
     MERROR("The variable name should be a IdentifierNode already, but actually NOT?");
-  TreeNode *node = p_name.mData.mTreeNode;
+  TreeNode *var = p_name.mData.mTreeNode;
 
-  add_type_to(node, tree_type);
+  add_type_to(var, tree_type);
 
-  mLastTreeNode = node;
-  return node;
+  DeclNode *decl = decl = (DeclNode*)mTreePool->NewTreeNode(sizeof(DeclNode));
+  new (decl) DeclNode(var);
+
+  mLastTreeNode = decl;
+  return decl;
 }
 
 // BuildField takes two parameters,
@@ -1382,39 +1385,37 @@ TreeNode* ASTBuilder::AddDims() {
 
 // This is a help function which adds parameters to a function decl.
 // It's the caller's duty to assure 'func' and 'params' are non null.
-void ASTBuilder::AddParams(TreeNode *func, TreeNode *params) {
-  if (params->IsIdentifier() || params->IsLiteral()) {
-    // one single parameter at call site
-    if (func->IsFunction())
-      ((FunctionNode*)func)->AddParam(params);
-    else if (func->IsNew())
-      ((NewNode*)func)->AddParam(params);
-    else
-      MERROR("Unsupported yet.");
-  } else if (params->IsVarList()) {
-    // a list of decls at function declaration
-    VarListNode *vl = (VarListNode*)params;
-    for (unsigned i = 0; i < vl->GetNum(); i++) {
-      IdentifierNode *inode = vl->VarAtIndex(i);
+void ASTBuilder::AddParams(TreeNode *func, TreeNode *decl_params) {
+  if (decl_params->IsDecl()) {
+    DeclNode *decl = (DeclNode*)decl_params;
+    TreeNode *params = decl->GetVar();
+    if (params->IsIdentifier()) {
+      // one single parameter at call site
       if (func->IsFunction())
-        ((FunctionNode*)func)->AddParam(inode);
-      else if (func->IsNew())
-        ((NewNode*)func)->AddParam(inode);
+        ((FunctionNode*)func)->AddParam(params);
       else
         MERROR("Unsupported yet.");
+    } else if (params->IsVarList()) {
+      // a list of decls at function declaration
+      VarListNode *vl = (VarListNode*)params;
+      for (unsigned i = 0; i < vl->GetNum(); i++) {
+        IdentifierNode *inode = vl->VarAtIndex(i);
+        if (func->IsFunction())
+          ((FunctionNode*)func)->AddParam(inode);
+        else
+          MERROR("Unsupported yet.");
+      }
+    } else {
+      MERROR("Unsupported yet.");
     }
-  } else if (params->IsPass()) {
-    // a list of identifiers at call site.
-    PassNode *pass = (PassNode*)params;
+  } else if (decl_params->IsPass()) {
+    PassNode *pass = (PassNode*)decl_params;
     for (unsigned i = 0; i < pass->GetChildrenNum(); i++) {
       TreeNode *child = pass->GetChild(i);
-      if (func->IsFunction())
-        ((FunctionNode*)func)->AddParam(child);
-      else if (func->IsNew())
-        ((NewNode*)func)->AddParam(child);
-      else
-        MERROR("Unsupported yet.");
+      AddParams(func, child);
     }
+  } else {
+    MERROR("Unsupported yet.");
   }
 }
 
@@ -1439,7 +1440,7 @@ TreeNode* ASTBuilder::BuildNewOperation() {
   
   TreeNode *node_b = p_b.mIsEmpty ? NULL : p_b.mData.mTreeNode;
   if (node_b)
-    AddParams(new_node, node_b);
+    AddArguments(new_node, node_b);
 
   TreeNode *node_c = p_c.mIsEmpty ? NULL : p_c.mData.mTreeNode;
   if (node_c) {
@@ -1532,35 +1533,57 @@ TreeNode* ASTBuilder::AddArguments() {
     std::cout << "In AddArguments" << std::endl;
 
   Param p_params = mParams[0];
-  TreeNode *params = NULL;
+  TreeNode *args = NULL;
   if (!p_params.mIsEmpty) {
     if (!p_params.mIsTreeNode)
       MERROR("The parameters is not a treenode in AddArguments()");
-    params = p_params.mData.mTreeNode;
+    args = p_params.mData.mTreeNode;
   }
 
-  if (!params)
+  if (!args)
     return mLastTreeNode;
 
-  CallNode *call = (CallNode*)mLastTreeNode;
-
-  if (params->IsVarList()) {
-    VarListNode *vl = (VarListNode*)params;
-    for (unsigned i = 0; i < vl->GetNum(); i++) {
-      IdentifierNode *inode = vl->VarAtIndex(i);
-      call->AddArg(inode);
-    }
-  } else if (params->IsPass()) {
-    PassNode *pass = (PassNode*)params;
-    for (unsigned i = 0; i < pass->GetChildrenNum(); i++) {
-      TreeNode *child = pass->GetChild(i);
-      call->AddArg(child);
-    }
-  } else {
-    call->AddArg(params);
-  }
+  AddArguments(mLastTreeNode, args);
 
   return mLastTreeNode;
+}
+
+// 'call' could be a CallNode or NewNode.
+// 'args' could be identifier, literal, expr, etc.
+void ASTBuilder::AddArguments(TreeNode *call, TreeNode *args) {
+  CallNode *callnode = NULL;
+  NewNode *newnode = NULL;
+  if (call->IsCall())
+    callnode = (CallNode*)call;
+  else if (call->IsNew())
+    newnode = (NewNode*)call;
+  else
+    MERROR("Unsupported call node.");
+
+  if (args->IsVarList()) {
+    VarListNode *vl = (VarListNode*)args;
+    for (unsigned i = 0; i < vl->GetNum(); i++) {
+      IdentifierNode *inode = vl->VarAtIndex(i);
+      if (callnode)
+        callnode->AddArg(inode);
+      else
+        newnode->AddArg(inode);
+    }
+  } else if (args->IsPass()) {
+    PassNode *pass = (PassNode*)args;
+    for (unsigned i = 0; i < pass->GetChildrenNum(); i++) {
+      TreeNode *child = pass->GetChild(i);
+      if (callnode)
+        callnode->AddArg(child);
+      else
+        newnode->AddArg(child);
+    }
+  } else {
+    if (callnode)
+      callnode->AddArg(args);
+    else
+      newnode->AddArg(args);
+  }
 }
 
 // BuildVariableList takes two parameters, var 1 and var 2

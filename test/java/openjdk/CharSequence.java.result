@@ -67,23 +67,23 @@ interface  CharSequence
         Constructors: 
         Methods: 
           func  forEachRemaining(block)  throws: 
-            var:length=length()
-            var:i=cur
+            Decl: length=length()
+            Decl: i=cur
 
           func  hasNext()  throws: 
             return cur LT length()
           func  nextInt()  throws: 
-            var:length=length()
+            Decl: length=length()
             cond-branch cond:cur GE length
             true branch :
               new NoSuchElementException()
             false branch :
 
-            var:c1=charAt(  curInc
+            Decl: c1=charAt(  curInc
 )
             cond-branch cond:Character.isHighSurrogate(c1) Land cur LT length
             true branch :
-              var:c2=charAt(cur)
+              Decl: c2=charAt(cur)
               cond-branch cond:Character.isLowSurrogate(c2)
               true branch :
                                   curInc

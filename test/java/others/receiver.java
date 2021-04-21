@@ -19,11 +19,13 @@ class Outer {
   Outer() {}
   void m(Outer this) {}
   class Inner {
-    Inner(Outer Outer.this) {}
+    //Inner(Outer Outer.this) {}
+    Inner(Outer Outer) {}
     void m(Inner this) {}
     class B {
-      B(Outer.Inner Inner.this) {}
-      void m(Outer.Inner.B this) {}
+      //B(Outer.Inner Inner.this) {}
+      B(Inner Inner) {}
+      void m(Outer this) {}
     }
   }
 }

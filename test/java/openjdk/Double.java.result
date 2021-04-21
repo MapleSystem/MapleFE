@@ -33,11 +33,11 @@ class  Double
       true branch :
         return Double.toString(d)
       false branch :
-        var:answer=new StringBuilder(24)
+        Decl: answer=new StringBuilder(24)
 
 
     func  valueOf(s)  throws:     NumberFormatException
-      return new Double()
+      return new Double(parseDouble(s))
     func  valueOf(d)  throws: 
       return new Double(d)
     func  parseDouble(s)  throws:     NumberFormatException
@@ -69,12 +69,12 @@ class  Double
     func  hashCode()  throws: 
       return Double.hashCode(value)
     func  hashCode(value)  throws: 
-      var:bits=doubleToLongBits(value)
+      Decl: bits=doubleToLongBits(value)
       return (int)(bits Bxor (bits Zext 32))
     func  equals(obj)  throws: 
       return (obj instanceof Double) Land (doubleToLongBits((Double)obj.value) EQ doubleToLongBits(value))
     func  doubleToLongBits(value)  throws: 
-      var:result=doubleToRawLongBits(value)
+      Decl: result=doubleToRawLongBits(value)
       cond-branch cond:((result Band DoubleConsts.EXP_BIT_MASK) EQ DoubleConsts.EXP_BIT_MASK) Land (result Band DoubleConsts.SIGNIF_BIT_MASK) NE 0
       true branch :
         result Assign 0
@@ -97,8 +97,8 @@ class  Double
         return 1
       false branch :
 
-      var:thisBits=Double.doubleToLongBits(d1)
-      var:anotherBits=Double.doubleToLongBits(d2)
+      Decl: thisBits=Double.doubleToLongBits(d1)
+      Decl: anotherBits=Double.doubleToLongBits(d2)
       return ()
     func  sum(a,b)  throws: 
       return a Add b

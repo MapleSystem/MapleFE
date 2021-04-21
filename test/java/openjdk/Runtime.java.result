@@ -117,8 +117,8 @@ class  Runtime
         new IllegalArgumentException("Empty command")
       false branch :
 
-      var:st=new StringTokenizer(command)
-      var:cmdarray=
+      Decl: st=new StringTokenizer(command)
+      Decl: cmdarray=
       for ( )
          Assign st.nextToken()
 
@@ -154,10 +154,10 @@ class  Runtime
     func  load(filename)  throws: 
       load0(VMStack.getStackClass1(),filename)
     func  checkTargetSdkVersionForLoad(methodName)  throws: 
-      var:targetSdkVersion=VMRuntime.getRuntime().getTargetSdkVersion()
+      Decl: targetSdkVersion=VMRuntime.getRuntime().getTargetSdkVersion()
       cond-branch cond:targetSdkVersion GT 24
       true branch :
-        new UnsupportedOperationException()
+        new UnsupportedOperationException(methodName Add " is not supported on SDK " Add targetSdkVersion)
       false branch :
 
     func  load(absolutePath,loader)  throws: 
@@ -168,7 +168,7 @@ class  Runtime
         new NullPointerException("absolutePath == null")
       false branch :
 
-      var:error=doLoad(absolutePath,loader)
+      Decl: error=doLoad(absolutePath,loader)
       cond-branch cond:error NE null
       true branch :
         new UnsatisfiedLinkError(error)
@@ -177,7 +177,7 @@ class  Runtime
     func  load0(fromClass,filename)  throws: 
       cond-branch cond:(new File(filename).isAbsolute())
       true branch :
-        new UnsatisfiedLinkError()
+        new UnsatisfiedLinkError("Expecting an absolute path of the library: " Add filename)
       false branch :
 
       cond-branch cond:filename EQ null
@@ -185,7 +185,7 @@ class  Runtime
         new NullPointerException("filename == null")
       false branch :
 
-      var:error=doLoad(filename,fromClass.getClassLoader())
+      Decl: error=doLoad(filename,fromClass.getClassLoader())
       cond-branch cond:error NE null
       true branch :
         new UnsatisfiedLinkError(error)
@@ -201,26 +201,26 @@ class  Runtime
       cond-branch cond:libname.indexOf((int)File.separatorChar) NE Sub
   1
       true branch :
-        new UnsatisfiedLinkError()
+        new UnsatisfiedLinkError("Directory separator should not appear in library name: " Add libname)
       false branch :
 
-      var:libraryName=libname
+      Decl: libraryName=libname
       cond-branch cond:loader NE null
       true branch :
-        var:filename=loader.findLibrary(libraryName)
+        Decl: filename=loader.findLibrary(libraryName)
 
       false branch :
 
-      var:filename=System.mapLibraryName(libraryName)
-      var:candidates=new ArrayList()
-      var:lastError=null
+      Decl: filename=System.mapLibraryName(libraryName)
+      Decl: candidates=new ArrayList()
+      Decl: lastError=null
 
       cond-branch cond:lastError NE null
       true branch :
         new UnsatisfiedLinkError(lastError)
       false branch :
 
-      new UnsatisfiedLinkError()
+      new UnsatisfiedLinkError("Library " Add libraryName Add " not found; tried " Add candidates)
     func  getLibPaths()  throws: 
       cond-branch cond:mLibPaths EQ null
       true branch :
@@ -234,13 +234,13 @@ class  Runtime
 
       return mLibPaths
     func  initLibPaths()  throws: 
-      var:javaLibraryPath=System.getProperty("java.library.path")
+      Decl: javaLibraryPath=System.getProperty("java.library.path")
       cond-branch cond:javaLibraryPath EQ null
       true branch :
         return EmptyArray.STRING
       false branch :
 
-      var:paths=javaLibraryPath.split(":")
+      Decl: paths=javaLibraryPath.split(":")
       for ( )
         cond-branch cond:.endsWith("/")
         true branch :
@@ -250,10 +250,10 @@ class  Runtime
 
       return paths
     func  doLoad(name,loader)  throws: 
-      var:librarySearchPath=null
+      Decl: librarySearchPath=null
       cond-branch cond:loader NE null Land loader instanceof BaseDexClassLoader
       true branch :
-        var:dexClassLoader=(BaseDexClassLoader)loader
+        Decl: dexClassLoader=(BaseDexClassLoader)loader
         librarySearchPath Assign dexClassLoader.getLdLibraryPath()
       false branch :
 

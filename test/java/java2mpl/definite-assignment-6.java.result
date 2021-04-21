@@ -8,7 +8,7 @@ class  A
   Constructors: 
   Methods: 
     func  foo()  throws: 
-      var:k
+      Decl: k
       cond-branch cond:v GT 0 Land (k Assign System.read()) GE 0
       true branch :
         System.println(k)

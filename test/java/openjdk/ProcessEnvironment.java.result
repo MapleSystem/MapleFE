@@ -23,29 +23,29 @@ class  ProcessEnvironment
     func  getenv()  throws: 
       return theUnmodifiableEnvironment
     func  environment()  throws: 
-      return new StringEnvironment()
+      return new StringEnvironment(()(theEnvironment.clone()))
     func  emptyEnvironment(capacity)  throws: 
-      return new StringEnvironment()
+      return new StringEnvironment(new HashMap(capacity))
     func  environ()  throws: 
     func  validateVariable(name)  throws: 
       cond-branch cond:name.indexOf(=) NE Sub
   1 Lor name.indexOf(0) NE Sub
   1
       true branch :
-        new IllegalArgumentException()
+        new IllegalArgumentException("Invalid environment variable name: "" Add name Add """)
       false branch :
 
     func  validateValue(value)  throws: 
       cond-branch cond:value.indexOf(0) NE Sub
   1
       true branch :
-        new IllegalArgumentException()
+        new IllegalArgumentException("Invalid environment variable value: "" Add value Add """)
       false branch :
 
     func  toEnvironmentBlock(map,envc)  throws: 
       return 
     func  arrayCompare(x,y)  throws: 
-      var:min=
+      Decl: min=
       for ( )
         cond-branch cond: NE 
         true branch :
@@ -69,7 +69,7 @@ class  ProcessEnvironment
 
       return true
     func  arrayHash(x)  throws: 
-      var:hash=0
+      Decl: hash=0
       for ( )
         hash Assign 31 Mul hash Add 
 
@@ -165,13 +165,13 @@ class  ProcessEnvironment
         func  remove(key)  throws: 
           return toString(m.remove(Variable.valueOfQueryOnly(key)))
         func  keySet()  throws: 
-          return new StringKeySet()
+          return new StringKeySet(m.keySet())
         func  entrySet()  throws: 
-          return new StringEntrySet()
+          return new StringEntrySet(m.entrySet())
         func  values()  throws: 
-          return new StringValues()
+          return new StringValues(m.values())
         func  toEnvironmentBlock(envc)  throws: 
-          var:count=m.size() Mul 2
+          Decl: count=m.size() Mul 2
           Map
           Entry
 
@@ -180,8 +180,8 @@ class  ProcessEnvironment
           count AddAssign entry.getKey().getBytes().length
           count AddAssign entry.getValue().getBytes().length
 
-          var:block=
-          var:i=0
+          Decl: block=
+          Decl: i=0
 
            Assign m.size()
           return block

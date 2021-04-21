@@ -18,10 +18,10 @@ class  Object
     func  hashCode()  throws: 
       return identityHashCode(this)
     func  identityHashCode(obj)  throws: 
-      var:lockWord=obj.shadow$_monitor_
-      var:lockWordStateMask=-1073741824
-      var:lockWordStateHash=-2147483648
-      var:lockWordHashMask=268435455
+      Decl: lockWord=obj.shadow$_monitor_
+      Decl: lockWordStateMask=-1073741824
+      Decl: lockWordStateHash=-2147483648
+      Decl: lockWordHashMask=268435455
       cond-branch cond:(lockWord Band lockWordStateMask) EQ lockWordStateHash
       true branch :
         return lockWord Band lockWordHashMask
@@ -34,7 +34,7 @@ class  Object
     func  clone()  throws:     CloneNotSupportedException
       cond-branch cond:(this instanceof Cloneable)
       true branch :
-        new CloneNotSupportedException()
+        new CloneNotSupportedException("Class " Add getClass().getName() Add " doesn't implement Cloneable")
       false branch :
 
       return internalClone()

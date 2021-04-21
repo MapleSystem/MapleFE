@@ -97,16 +97,16 @@ class  Package
       sealBase Assign sealbase
       this.loader Assign loader
     constructor  Package(name,man,url,loader)  throws: 
-      var:path=name.replace(.,/).concat("/")
-      var:sealed=null
-      var:specTitle=null
-      var:specVersion=null
-      var:specVendor=null
-      var:implTitle=null
-      var:implVersion=null
-      var:implVendor=null
-      var:sealBase=null
-      var:attr=man.getAttributes(path)
+      Decl: path=name.replace(.,/).concat("/")
+      Decl: sealed=null
+      Decl: specTitle=null
+      Decl: specVersion=null
+      Decl: specVendor=null
+      Decl: implTitle=null
+      Decl: implVersion=null
+      Decl: implVendor=null
+      Decl: sealBase=null
+      Decl: attr=man.getAttributes(path)
       cond-branch cond:attr NE null
       true branch :
         specTitle Assign attr.getValue(Name.SPECIFICATION_TITLE)
@@ -163,8 +163,8 @@ class  Package
         new NumberFormatException("Empty version string")
       false branch :
 
-      var:sa=specVersion.split("\." Sub 1)
-      var:si=
+      Decl: sa=specVersion.split("\." Sub 1)
+      Decl: si=
       for ( )
          Assign Integer.parseInt(sa,i)
         cond-branch cond: LT 0
@@ -173,8 +173,8 @@ class  Package
         false branch :
 
 
-      var:da=desired.split("\." Sub 1)
-      var:di=
+      Decl: da=desired.split("\." Sub 1)
+      Decl: di=
       for ( )
          Assign Integer.parseInt(da,i)
         cond-branch cond: LT 0
@@ -183,14 +183,14 @@ class  Package
         false branch :
 
 
-      var:len=Math.max(di.length,si.length)
+      Decl: len=Math.max(di.length,si.length)
       for ( )
-        var:d=()
+        Decl: d=()
 
 
       return true
     func  getPackage(name)  throws: 
-      var:l=VMStack.getCallingClassLoader()
+      Decl: l=VMStack.getCallingClassLoader()
       cond-branch cond:l NE null
       true branch :
         return l.getPackage(name)
@@ -198,7 +198,7 @@ class  Package
         return getSystemPackage(name)
 
     func  getPackages()  throws: 
-      var:l=VMStack.getCallingClassLoader()
+      Decl: l=VMStack.getCallingClassLoader()
       cond-branch cond:l NE null
       true branch :
         return l.getPackages()
@@ -206,8 +206,8 @@ class  Package
         return getSystemPackages()
 
     func  getPackage(c)  throws: 
-      var:name=c.getName()
-      var:i=name.lastIndexOf(.)
+      Decl: name=c.getName()
+      Decl: i=name.lastIndexOf(.)
       cond-branch cond:i NE Sub
   1
       true branch :
@@ -219,14 +219,14 @@ class  Package
     func  hashCode()  throws: 
       return pkgName.hashCode()
     func  toString()  throws: 
-      var:targetSdkVersion=VMRuntime.getRuntime().getTargetSdkVersion()
+      Decl: targetSdkVersion=VMRuntime.getRuntime().getTargetSdkVersion()
       cond-branch cond:targetSdkVersion GT 0 Land targetSdkVersion LE 24
       true branch :
         return "package " Add pkgName
       false branch :
 
-      var:spec=specTitle
-      var:ver=specVersion
+      Decl: spec=specTitle
+      Decl: ver=specVersion
       cond-branch cond:spec NE null Land spec.length() GT 0
       true branch :
         spec Assign ", " Add spec
@@ -264,11 +264,11 @@ class  Package
     func  getDeclaredAnnotations()  throws: 
       return getPackageInfo().getDeclaredAnnotations()
     func  getSystemPackage(name)  throws: 
-      var:pkg=pkgs.get(name)
+      Decl: pkg=pkgs.get(name)
 
 
     func  getSystemPackages()  throws: 
-      var:names=getSystemPackages0()
+      Decl: names=getSystemPackages0()
       for ( )
         defineSystemPackage(names,i,getSystemPackage0(names,i))
 

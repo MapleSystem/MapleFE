@@ -8,9 +8,11 @@ class  Test
   Constructors: 
   Methods: 
     func  main()  throws: 
-      var:i=12
+      Decl: i=12
       i Assign 2
       i Assign 1
   LocalClasses: 
   LocalInterfaces: 
 
+Identifier:i has no decl.
+Identifier:i has no decl.

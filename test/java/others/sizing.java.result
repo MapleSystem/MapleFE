@@ -20,9 +20,9 @@ class  Sizing
   Constructors: 
   Methods: 
     func  main(args)  throws: 
-      var:ba=
+      Decl: ba=
       System.out.println(ClassLayout.parseInstance(ba).toPrintable())
-      var:bitSet=new BitSet(10000)
+      Decl: bitSet=new BitSet(10000)
       System.out.println(GraphLayout.parseInstance(bitSet).toPrintable())
   LocalClasses: 
   LocalInterfaces: 

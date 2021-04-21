@@ -8,7 +8,7 @@ class  Point
   Constructors: 
   Methods: 
     func  flow(flag)  throws: 
-      var:k
+      Decl: k
       cond-branch cond:flag
       true branch :
         k Assign 3

@@ -8,7 +8,7 @@ class  ChatTest
   Constructors: 
   Methods: 
     func  performDontReceiveMessageInNameState()  throws:     Exception
-      var:client2=new Thread()
+      Decl: client2=new Thread(new ChatConnection())
   LocalClasses: 
   LocalInterfaces: 
 

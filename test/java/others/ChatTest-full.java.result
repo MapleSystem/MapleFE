@@ -29,10 +29,10 @@ class  ChatTest
   Constructors: 
   Methods: 
     func  performTestConnectDisconnectConnect()  throws:     Exception
-      var:barrier1=new CyclicBarrier(2)
-      var:barrier2=new CyclicBarrier(2)
-      var:barrier3=new CyclicBarrier(2)
-      var:exceptions=new ArrayList()
+      Decl: barrier1=new CyclicBarrier(2)
+      Decl: barrier2=new CyclicBarrier(2)
+      Decl: barrier3=new CyclicBarrier(2)
+      Decl: exceptions=new ArrayList()
     func  main(args)  throws:     Throwable
       testStartStop()
       testPortOpen()
@@ -42,17 +42,17 @@ class  ChatTest
       testUsernameAndMessage()
       testDontReceiveMessageInNameState()
     func  startServer()  throws:     IOException
-      var:server=new ChatServer(0)
-      var:address=(InetSocketAddress)server.getSocketAddress()
+      Decl: server=new ChatServer(0)
+      Decl: address=(InetSocketAddress)server.getSocketAddress()
       listeningPort Assign address.getPort()
       server.run()
       return server
     func  testStartStop()  throws:     Exception
-      var:server=startServer()
+      Decl: server=startServer()
       server.shutdown()
     func  testPortOpen()  throws:     Exception
-      var:server=startServer()
-      var:socket=new Socket("localhost",listeningPort)
+      Decl: server=startServer()
+      Decl: socket=new Socket("localhost",listeningPort)
       cond-branch cond:socket.isConnected()
       true branch :
         new RuntimeException("Failed to connect to server: port not open")
@@ -62,32 +62,32 @@ class  ChatTest
       server.shutdown()
 
     func  testAsksForName()  throws:     Exception
-      var:server=startServer()
-      var:socket=new Socket("localhost",listeningPort)
+      Decl: server=startServer()
+      Decl: socket=new Socket("localhost",listeningPort)
 
 
       server.shutdown()
 
     func  testUseName()  throws:     Throwable
-      var:server=startServer()
+      Decl: server=startServer()
       performTestUseName()
 
       server.shutdown()
 
     func  testConnectDisconnectConnect()  throws:     Exception
-      var:server=startServer()
+      Decl: server=startServer()
       performTestConnectDisconnectConnect()
 
       server.shutdown()
 
     func  testUsernameAndMessage()  throws:     Exception
-      var:server=startServer()
+      Decl: server=startServer()
       performTestUsernameAndMessage()
 
       server.shutdown()
 
     func  testDontReceiveMessageInNameState()  throws:     Exception
-      var:server=startServer()
+      Decl: server=startServer()
       performDontReceiveMessageInNameState()
 
       server.shutdown()
@@ -100,23 +100,23 @@ class  ChatTest
 
       cond-branch cond:expected EQ null
       true branch :
-        exception.add(new RuntimeException())
+        exception.add(new RuntimeException("Expected null, but was: " Add value))
         return 
       false branch :
 
       cond-branch cond:expected.equals(value)
       true branch :
-        exception.add(new RuntimeException())
+        exception.add(new RuntimeException("Expected: " Add expected Add " but was: " Add value))
         return 
       false branch :
 
     func  performDontReceiveMessageInNameState()  throws:     Exception
-      var:barrier1=new CyclicBarrier(2)
-      var:barrier2=new CyclicBarrier(2)
-      var:barrier3=new CyclicBarrier(2)
-      var:exceptions=Collections.synchronizedList(new ArrayList())
-      var:chatConnection=new ChatConnection()
-      var:client2=new Thread()
+      Decl: barrier1=new CyclicBarrier(2)
+      Decl: barrier2=new CyclicBarrier(2)
+      Decl: barrier3=new CyclicBarrier(2)
+      Decl: exceptions=Collections.synchronizedList(new ArrayList())
+      Decl: chatConnection=new ChatConnection()
+      Decl: client2=new Thread(new ChatConnection())
       client2.start()
       chatConnection.run()
       cond-branch cond:exceptions.isEmpty()
@@ -125,16 +125,16 @@ class  ChatTest
       false branch :
 
     func  waitForJoin(reader,s)  throws:     IOException
-      var:joined
+      Decl: joined
       do         joined Assign readAvailableString(reader)
 while (joined NE null Land joined.contains("Welcome " Add s))
     func  performTestUsernameAndMessage()  throws:     Exception
-      var:barrier1=new CyclicBarrier(2)
-      var:barrier2=new CyclicBarrier(2)
-      var:barrier3=new CyclicBarrier(2)
-      var:exceptions=Collections.synchronizedList(new ArrayList())
-      var:chatConnection=new ChatConnection()
-      var:client2=new Thread()
+      Decl: barrier1=new CyclicBarrier(2)
+      Decl: barrier2=new CyclicBarrier(2)
+      Decl: barrier3=new CyclicBarrier(2)
+      Decl: exceptions=Collections.synchronizedList(new ArrayList())
+      Decl: chatConnection=new ChatConnection()
+      Decl: client2=new Thread(new ChatConnection())
       client2.start()
       chatConnection.run()
       cond-branch cond:exceptions.isEmpty()
@@ -143,13 +143,13 @@ while (joined NE null Land joined.contains("Welcome " Add s))
       false branch :
 
     func  performTestConnectDisconnectConnect()  throws:     Exception
-      var:barrier1=new CyclicBarrier(2)
-      var:barrier2=new CyclicBarrier(2)
-      var:barrier3=new CyclicBarrier(2)
-      var:exceptions=new ArrayList()
-      var:chatConnection=new ChatConnection()
-      var:chatConnection2=new ChatConnection()
-      var:client2=new Thread()
+      Decl: barrier1=new CyclicBarrier(2)
+      Decl: barrier2=new CyclicBarrier(2)
+      Decl: barrier3=new CyclicBarrier(2)
+      Decl: exceptions=new ArrayList()
+      Decl: chatConnection=new ChatConnection()
+      Decl: chatConnection2=new ChatConnection()
+      Decl: client2=new Thread(new ChatConnection())
       client2.start()
       chatConnection.run()
       chatConnection2.run()
@@ -159,12 +159,12 @@ while (joined NE null Land joined.contains("Welcome " Add s))
       false branch :
 
     func  performTestUseName()  throws:     Exception
-      var:barrier1=new CyclicBarrier(2)
-      var:barrier2=new CyclicBarrier(2)
-      var:barrier3=new CyclicBarrier(2)
-      var:exceptions=new ArrayList()
-      var:chatConnection=new ChatConnection()
-      var:client2=new Thread()
+      Decl: barrier1=new CyclicBarrier(2)
+      Decl: barrier2=new CyclicBarrier(2)
+      Decl: barrier3=new CyclicBarrier(2)
+      Decl: exceptions=new ArrayList()
+      Decl: chatConnection=new ChatConnection()
+      Decl: client2=new Thread(new ChatConnection())
       client2.start()
       chatConnection.run()
       cond-branch cond:exceptions.isEmpty()
@@ -175,14 +175,14 @@ while (joined NE null Land joined.contains("Welcome " Add s))
     func  readAvailableString(reader)  throws:     IOException
       return readAvailableString(reader,false)
     func  readAvailableString(reader,now)  throws:     IOException
-      var:builder=new StringBuilder()
-      var:bytes
+      Decl: builder=new StringBuilder()
+      Decl: bytes
       cond-branch cond:now Land reader.ready()
       true branch :
         return null
       false branch :
 
-      do         var:buf=
+      do         Decl: buf=
 
 while bytes EQ 256
       return builder.toString()

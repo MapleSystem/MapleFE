@@ -51,14 +51,17 @@ class  Test
   Constructors: 
   Methods: 
     func  main(args)  throws: 
-      var:p=new Point()
-      var:cp=new ColoredPoint()
-      var:c
+      Decl: p=new Point()
+      Decl: cp=new ColoredPoint()
+      Decl: c
       cp Assign (ColoredPoint)p
       c Assign (Colorable)p
-      var:l=(Long)p
-      var:e=new EndPoint()
+      Decl: l=(Long)p
+      Decl: e=new EndPoint()
       c Assign (Colorable)e
   LocalClasses: 
   LocalInterfaces: 
 
+Identifier:cp has no decl.
+Identifier:c has no decl.
+Identifier:c has no decl.

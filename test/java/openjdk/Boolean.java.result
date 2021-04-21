@@ -38,7 +38,7 @@ class  Boolean
 
       return false
     func  getBoolean(name)  throws: 
-      var:result=false
+      Decl: result=false
       result Assign parseBoolean(System.getProperty(name))
 
 
@@ -56,3 +56,4 @@ class  Boolean
   LocalClasses: 
   LocalInterfaces: 
 
+Identifier:result has no decl.

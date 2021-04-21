@@ -21,8 +21,8 @@ class  Process
     func  getErrorStream()  throws: 
     func  waitFor()  throws:     InterruptedException
     func  waitFor(timeout,unit)  throws:     InterruptedException
-      var:startTime=System.nanoTime()
-      var:rem=unit.toNanos(timeout)
+      Decl: startTime=System.nanoTime()
+      Decl: rem=unit.toNanos(timeout)
       do 
         rem Assign unit.toNanos(timeout) Sub (System.nanoTime() Sub startTime)
 while rem GT 0

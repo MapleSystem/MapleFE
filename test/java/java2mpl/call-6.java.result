@@ -10,8 +10,9 @@ class  A
     func  bar(c)  throws: 
       return 1
     func  foo(c)  throws: 
-      var:i
+      Decl: i
       i Assign bar(c)
   LocalClasses: 
   LocalInterfaces: 
 
+Identifier:i has no decl.

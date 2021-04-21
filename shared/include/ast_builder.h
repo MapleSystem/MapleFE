@@ -108,6 +108,7 @@ public:
   TreeNode* AddModifierTo();
 
   // Callsite
+  void AddArguments(TreeNode *call, TreeNode *args);
   TreeNode* AddArguments();
   TreeNode* BuildCall();
   TreeNode* BuildExprList();

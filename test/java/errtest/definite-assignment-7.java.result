@@ -8,8 +8,8 @@ class  Point
   Constructors: 
   Methods: 
     func  foo()  throws: 
-      var:k
-      var:n=5
+      Decl: k
+      Decl: n=5
       cond-branch cond:n GT 2
       true branch :
         k Assign 3

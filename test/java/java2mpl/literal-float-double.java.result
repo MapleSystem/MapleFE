@@ -8,8 +8,8 @@ class  A
   Constructors: 
   Methods: 
     func  foo()  throws: 
-      var:a=11.1
-      var:a=22.2
+      Decl: a=11.1
+      Decl: a=22.2
   LocalClasses: 
   LocalInterfaces: 
 

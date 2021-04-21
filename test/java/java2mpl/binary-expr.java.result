@@ -8,7 +8,7 @@ class  A
   Constructors: 
   Methods: 
     func  foo()  throws: 
-      var:a,b,c
+      Decl: a,b,c
       a Assign b Add c
       a Assign b Sub c
       a Assign b GT c
@@ -21,3 +21,30 @@ class  A
   LocalClasses: 
   LocalInterfaces: 
 
+Identifier:a has no decl.
+Identifier:b has no decl.
+Identifier:c has no decl.
+Identifier:a has no decl.
+Identifier:b has no decl.
+Identifier:c has no decl.
+Identifier:a has no decl.
+Identifier:b has no decl.
+Identifier:c has no decl.
+Identifier:a has no decl.
+Identifier:b has no decl.
+Identifier:c has no decl.
+Identifier:a has no decl.
+Identifier:b has no decl.
+Identifier:c has no decl.
+Identifier:a has no decl.
+Identifier:b has no decl.
+Identifier:c has no decl.
+Identifier:a has no decl.
+Identifier:b has no decl.
+Identifier:c has no decl.
+Identifier:a has no decl.
+Identifier:b has no decl.
+Identifier:c has no decl.
+Identifier:a has no decl.
+Identifier:b has no decl.
+Identifier:c has no decl.

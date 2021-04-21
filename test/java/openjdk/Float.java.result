@@ -33,13 +33,13 @@ class  Float
     func  toHexString(f)  throws: 
       cond-branch cond:Math.abs(f) LT FloatConsts.MIN_NORMAL Land f NE 0
       true branch :
-        var:s=Double.toHexString(Math.scalb((double)f,DoubleConsts.MIN_EXPONENT Sub FloatConsts.MIN_EXPONENT))
+        Decl: s=Double.toHexString(Math.scalb((double)f,DoubleConsts.MIN_EXPONENT Sub FloatConsts.MIN_EXPONENT))
         return s.replaceFirst("p-1022$","p-126")
       false branch :
         return Double.toHexString(f)
 
     func  valueOf(s)  throws:     NumberFormatException
-      return new Float()
+      return new Float(parseFloat(s))
     func  valueOf(f)  throws: 
       return new Float(f)
     func  parseFloat(s)  throws:     NumberFormatException
@@ -75,7 +75,7 @@ class  Float
     func  equals(obj)  throws: 
       return (obj instanceof Float) Land (floatToIntBits((Float)obj.value) EQ floatToIntBits(value))
     func  floatToIntBits(value)  throws: 
-      var:result=floatToRawIntBits(value)
+      Decl: result=floatToRawIntBits(value)
       cond-branch cond:((result Band FloatConsts.EXP_BIT_MASK) EQ FloatConsts.EXP_BIT_MASK) Land (result Band FloatConsts.SIGNIF_BIT_MASK) NE 0
       true branch :
         result Assign 2143289344
@@ -98,8 +98,8 @@ class  Float
         return 1
       false branch :
 
-      var:thisBits=Float.floatToIntBits(f1)
-      var:anotherBits=Float.floatToIntBits(f2)
+      Decl: thisBits=Float.floatToIntBits(f1)
+      Decl: anotherBits=Float.floatToIntBits(f2)
       return ()
     func  sum(a,b)  throws: 
       return a Add b

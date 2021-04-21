@@ -38,7 +38,7 @@ class  Plotter
   Constructors: 
   Methods: 
     func  main(args)  throws:     IOException
-      var:path=Paths.get("footprint.csv")
+      Decl: path=Paths.get("footprint.csv")
       BufferedWriter
       stream
       Files.newBufferedWriter(path,StandardOpenOption.CREATE)

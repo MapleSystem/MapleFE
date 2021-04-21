@@ -603,7 +603,6 @@ rule MethodModifier    : ONEOF(Annotation, MethodAttr)
 
 rule FormalParameterListNoReceiver : ONEOF(FormalParameters + ',' + LastFormalParameter,
                                            LastFormalParameter)
-  attr.action.%1: BuildVarList(%1, %3)
 
 # ReceiverParameter and FormalParameterListNoReceiver could match at the same
 # but with different num of tokens. Here is an example
@@ -618,19 +617,22 @@ rule FormalParameterListNoReceiver : ONEOF(FormalParameters + ',' + LastFormalPa
 rule FormalParameterList : ONEOF(ReceiverParameter, FormalParameterListNoReceiver)
   attr.property : Single
 
+# We don't do any action. Just let it pass a PassNode
 rule FormalParameters  : ONEOF(FormalParameter + ZEROORMORE(',' + FormalParameter),
                                ReceiverParameter + ZEROORMORE(',' + FormalParameter))
-  attr.action.%1: BuildVarList(%1, %2)
   attr.property : Single
 
 rule FormalParameter   : ZEROORMORE(VariableModifier) + UnannType + VariableDeclaratorId
   attr.action: BuildDecl(%2, %3)
   attr.action: AddModifier(%1)
 rule ReceiverParameter : ZEROORMORE(Annotation) + UnannType + ZEROORONE(Identifier + '.') + "this"
+  attr.action: BuildDecl(%2, %3)
 
 rule LastFormalParameter : ONEOF(ZEROORMORE(VariableModifier) + UnannType + ZEROORMORE(Annotation) +
                                    "..." + VariableDeclaratorId,
                                  FormalParameter)
+  attr.action.%1: BuildDecl(%2, %5)
+  attr.action.%1: AddModifier(%1)
   attr.property : Single
 
 

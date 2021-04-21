@@ -40,8 +40,8 @@ class  ProcessBuilder
       false branch :
 
       this.command Assign command
-    constructor  ProcessBuilder(String,command)  throws: 
-      this.command Assign new ArrayList()
+    constructor  ProcessBuilder(command)  throws: 
+      this.command Assign new ArrayList(command.length)
       String
       arg
       command
@@ -55,8 +55,8 @@ class  ProcessBuilder
 
       this.command Assign command
       return this
-    func  command(String,command)  throws: 
-      this.command Assign new ArrayList()
+    func  command(command)  throws: 
+      this.command Assign new ArrayList(command.length)
       String
       arg
       command
@@ -65,7 +65,7 @@ class  ProcessBuilder
     func  command()  throws: 
       return command
     func  environment()  throws: 
-      var:security=System.getSecurityManager()
+      Decl: security=System.getSecurityManager()
       cond-branch cond:security NE null
       true branch :
         security.checkPermission(new RuntimePermission("getenv.*"))
@@ -102,7 +102,7 @@ class  ProcessBuilder
     func  redirectInput(source)  throws: 
       cond-branch cond:source.type() EQ Redirect.Type.WRITE Lor source.type() EQ Redirect.Type.APPEND
       true branch :
-        new IllegalArgumentException()
+        new IllegalArgumentException("Redirect invalid for reading: " Add source)
       false branch :
 
        Assign source
@@ -110,7 +110,7 @@ class  ProcessBuilder
     func  redirectOutput(destination)  throws: 
       cond-branch cond:destination.type() EQ Redirect.Type.READ
       true branch :
-        new IllegalArgumentException()
+        new IllegalArgumentException("Redirect invalid for writing: " Add destination)
       false branch :
 
        Assign destination
@@ -118,7 +118,7 @@ class  ProcessBuilder
     func  redirectError(destination)  throws: 
       cond-branch cond:destination.type() EQ Redirect.Type.READ
       true branch :
-        new IllegalArgumentException()
+        new IllegalArgumentException("Redirect invalid for writing: " Add destination)
       false branch :
 
        Assign destination
@@ -144,17 +144,17 @@ class  ProcessBuilder
       this.redirectErrorStream Assign redirectErrorStream
       return this
     func  start()  throws:     IOException
-      var:cmdarray=command.toArray(String,command.size())
+      Decl: cmdarray=command.toArray(String,command.size())
       cmdarray Assign cmdarray.clone()
 
-      var:prog=
-      var:security=System.getSecurityManager()
+      Decl: prog=
+      Decl: security=System.getSecurityManager()
       cond-branch cond:security NE null
       true branch :
         security.checkExec(prog)
       false branch :
 
-      var:dir=
+      Decl: dir=
       for ( )
         cond-branch cond:.indexOf(0) GE 0
         true branch :
@@ -233,7 +233,7 @@ class  ProcessBuilder
             return false
           false branch :
 
-          var:r=(Redirect)obj
+          Decl: r=(Redirect)obj
           cond-branch cond:r.type() NE this.type()
           true branch :
             return false
@@ -242,7 +242,7 @@ class  ProcessBuilder
           assert this.file() NE null : 
           return this.file().equals(r.file())
         func  hashCode()  throws: 
-          var:file=file()
+          Decl: file=file()
           cond-branch cond:file EQ null
           true branch :
             return super.hashCode()
@@ -252,7 +252,7 @@ class  ProcessBuilder
       LocalClasses: 
         class[JavaEnum]  Type
           Fields: 
-            PIPE
+
           Instance Initializer: 
           Constructors: 
           Methods: 
@@ -274,3 +274,4 @@ Field Decl Duplication! Identifier:redirects is duplicated with Function:redirec
 UserType:ArrayList has no decl.
 Identifier:String has no decl.
 Identifier:arg has no decl.
+Identifier:cmdarray has no decl.

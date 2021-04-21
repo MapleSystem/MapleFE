@@ -458,9 +458,9 @@ void NewNode::ReplaceChild(TreeNode *old_child, TreeNode *new_child) {
     SetId(new_child);
     return;
   } else {
-    for (unsigned i = 0; i < GetParamsNum(); i++) {
-      if (GetParam(i) == old_child)
-        mParams.SetElem(i, new_child);
+    for (unsigned i = 0; i < GetArgsNum(); i++) {
+      if (GetArg(i) == old_child)
+        mArgs.SetElem(i, new_child);
     }
   }
 }
@@ -471,10 +471,10 @@ void NewNode::Dump(unsigned indent) {
   TreeNode *id = GetId();
   DUMP0_NORETURN(id->GetName());
   DUMP0_NORETURN("(");
-  for (unsigned i = 0; i < GetParamsNum(); i++) {
-    TreeNode *param = GetParam(i);
-    param->Dump(0);
-    if (i < GetParamsNum() - 1)
+  for (unsigned i = 0; i < GetArgsNum(); i++) {
+    TreeNode *arg = GetArg(i);
+    arg->Dump(0);
+    if (i < GetArgsNum() - 1)
       DUMP0_NORETURN(",");
   }
   DUMP0_NORETURN(")");
@@ -539,6 +539,16 @@ void IdentifierNode::Dump(unsigned indent) {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
+//                          DeclNode
+//////////////////////////////////////////////////////////////////////////////////////
+
+void DeclNode::Dump(unsigned indent) {
+  DumpIndentation(indent);
+  DUMP0_NORETURN("Decl: ");
+  mVar->Dump(0);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////
 //                          VarListNode
 //////////////////////////////////////////////////////////////////////////////////////
 
@@ -568,7 +578,6 @@ void VarListNode::Merge(TreeNode *n) {
 
 void VarListNode::Dump(unsigned indent) {
   DumpIndentation(indent);
-  DUMP0_NORETURN("var:");
   for (unsigned i = 0; i < mVars.GetNum(); i++) {
     //DUMP0_NORETURN(mVars.ValueAtIndex(i)->GetName());
     mVars.ValueAtIndex(i)->Dump(0);
@@ -860,26 +869,31 @@ void ClassNode::Construct() {
   for (unsigned i = 0; i < mBody->GetChildrenNum(); i++) {
     TreeNode *tree_node = mBody->GetChildAtIndex(i);
     tree_node->SetParent(this);
-    if (tree_node->IsVarList()) {
-      VarListNode *vlnode = (VarListNode*)tree_node;
-      for (unsigned i = 0; i < vlnode->GetNum(); i++) {
-        IdentifierNode *inode = vlnode->VarAtIndex(i);
-        inode->SetParent(this);
-        mFields.PushBack(inode);
-      }
-    } else if (tree_node->IsIdentifier())
-      mFields.PushBack((IdentifierNode*)tree_node);
-    else if (tree_node->IsFunction()) {
+    if (tree_node->IsDecl()) {
+      DeclNode *decl = (DeclNode*)tree_node;
+      TreeNode *var = decl->GetVar();
+      if (var->IsVarList()) {
+        VarListNode *vlnode = (VarListNode*)var;
+        for (unsigned i = 0; i < vlnode->GetNum(); i++) {
+          IdentifierNode *inode = vlnode->VarAtIndex(i);
+          inode->SetParent(this);
+          mFields.PushBack(inode);
+        }
+      } else if (var->IsIdentifier()) {
+        mFields.PushBack((IdentifierNode*)tree_node);
+      } else
+        MERROR("Unsupported class field.");
+    } else if (tree_node->IsFunction()) {
       FunctionNode *f = (FunctionNode*)tree_node;
       if (f->IsConstructor())
         mConstructors.PushBack(f);
       else
         mMethods.PushBack(f);
-    } else if (tree_node->IsClass())
+    } else if (tree_node->IsClass()) {
       mLocalClasses.PushBack((ClassNode*)tree_node);
-    else if (tree_node->IsInterface())
+    } else if (tree_node->IsInterface()) {
       mLocalInterfaces.PushBack((InterfaceNode*)tree_node);
-    else if (tree_node->IsBlock()) {
+    } else if (tree_node->IsBlock()) {
       BlockNode *block = (BlockNode*)tree_node;
       MASSERT(block->IsInstInit() && "unnamed block in class is not inst init?");
       mInstInits.PushBack(block);

@@ -8,9 +8,10 @@ class  A
   Constructors: 
   Methods: 
     func  Is3(s)  throws: 
-      var:b
+      Decl: b
       b Assign ()
       return b
   LocalClasses: 
   LocalInterfaces: 
 
+Identifier:b has no decl.

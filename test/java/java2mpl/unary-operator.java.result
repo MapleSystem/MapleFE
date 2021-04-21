@@ -8,7 +8,7 @@ class  A
   Constructors: 
   Methods: 
     func  foo(x)  throws: 
-      var:y,z
+      Decl: y,z
               xInc
 
       y AddAssign (x Add a Add b)
@@ -20,3 +20,6 @@ class  A
   LocalClasses: 
   LocalInterfaces: 
 
+Identifier:y has no decl.
+Identifier:z has no decl.
+Identifier:y has no decl.

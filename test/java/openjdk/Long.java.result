@@ -31,9 +31,9 @@ class  Long
         return toString(i)
       false branch :
 
-      var:buf=
-      var:charPos=64
-      var:negative=(i LT 0)
+      Decl: buf=
+      Decl: charPos=64
+      Decl: negative=(i LT 0)
       cond-branch cond:negative
       true branch :
         i Assign Sub
@@ -64,7 +64,7 @@ class  Long
       true branch :
         return BigInteger.valueOf(i)
       false branch :
-        var:upper=(int)(i Zext 32)
+        Decl: upper=(int)(i Zext 32)
 
 
     func  toHexString(i)  throws: 
@@ -74,15 +74,15 @@ class  Long
     func  toBinaryString(i)  throws: 
       return toUnsignedString0(i,1)
     func  toUnsignedString0(val,shift)  throws: 
-      var:mag=Long.SIZE Sub Long.numberOfLeadingZeros(val)
-      var:chars=Math.max(((mag Add (shift Sub 1)) Div shift)1)
-      var:buf=
+      Decl: mag=Long.SIZE Sub Long.numberOfLeadingZeros(val)
+      Decl: chars=Math.max(((mag Add (shift Sub 1)) Div shift)1)
+      Decl: buf=
       formatUnsignedLong(val,shift,buf,0,chars)
       return new String(buf)
     func  formatUnsignedLong(val,shift,buf,offset,len)  throws: 
-      var:charPos=len
-      var:radix=1 Shl shift
-      var:mask=radix Sub 1
+      Decl: charPos=len
+      Decl: radix=1 Shl shift
+      Decl: mask=radix Sub 1
       do          Assign 
         val ZextAssign shift
 while val NE 0 Land charPos GT 0
@@ -93,17 +93,17 @@ while val NE 0 Land charPos GT 0
         return "-9223372036854775808"
       false branch :
 
-      var:size=
-      var:buf=
+      Decl: size=
+      Decl: buf=
       getChars(i,size,buf)
       return new String(buf)
     func  toUnsignedString(i)  throws: 
       return toUnsignedString(i,10)
     func  getChars(i,index,buf)  throws: 
-      var:q
-      var:r
-      var:charPos=index
-      var:sign=0
+      Decl: q
+      Decl: r
+      Decl: charPos=index
+      Decl: sign=0
       cond-branch cond:i LT 0
       true branch :
         sign Assign -
@@ -114,8 +114,8 @@ while val NE 0 Land charPos GT 0
       while i GT Integer.MAX_VALUE        q Assign i Div 100
 
 
-      var:q2
-      var:i2=(int)i
+      Decl: q2
+      Decl: i2=(int)i
       while i2 GE 65536        q2 Assign i2 Div 100
 
 
@@ -129,7 +129,7 @@ while val NE 0 Land charPos GT 0
       false branch :
 
     func  stringSize(x)  throws: 
-      var:p=10
+      Decl: p=10
       for ( )
         cond-branch cond:x LT p
         true branch :
@@ -147,24 +147,24 @@ while val NE 0 Land charPos GT 0
 
       cond-branch cond:radix LT Character.MIN_RADIX
       true branch :
-        new NumberFormatException()
+        new NumberFormatException("radix " Add radix Add " less than Character.MIN_RADIX")
       false branch :
 
       cond-branch cond:radix GT Character.MAX_RADIX
       true branch :
-        new NumberFormatException()
+        new NumberFormatException("radix " Add radix Add " greater than Character.MAX_RADIX")
       false branch :
 
-      var:result=0
-      var:negative=false
-      var:i=0,len=s.length()
-      var:limit=Sub
+      Decl: result=0
+      Decl: negative=false
+      Decl: i=0,len=s.length()
+      Decl: limit=Sub
   Long.MAX_VALUE
-      var:multmin
-      var:digit
+      Decl: multmin
+      Decl: digit
       cond-branch cond:len GT 0
       true branch :
-        var:firstChar=s.charAt(0)
+        Decl: firstChar=s.charAt(0)
 
       false branch :
         NumberFormatException.forInputString(s)
@@ -178,13 +178,13 @@ while val NE 0 Land charPos GT 0
         new NumberFormatException("null")
       false branch :
 
-      var:len=s.length()
+      Decl: len=s.length()
       cond-branch cond:len GT 0
       true branch :
-        var:firstChar=s.charAt(0)
+        Decl: firstChar=s.charAt(0)
         cond-branch cond:firstChar EQ -
         true branch :
-          new NumberFormatException()
+          new NumberFormatException(String.format("Illegal leading minus sign " Add "on unsigned string %s.",s))
         false branch :
           cond-branch cond:len LE 12 Lor (radix EQ 10 Land len LE 18)
           true branch :
@@ -203,7 +203,7 @@ while val NE 0 Land charPos GT 0
     func  valueOf(s)  throws:     NumberFormatException
       return Long.valueOf(parseLong(s,10))
     func  valueOf(l)  throws: 
-      var:offset=128
+      Decl: offset=128
       cond-branch cond:l GE Sub
   128 Land l LE 127
       true branch :
@@ -212,16 +212,16 @@ while val NE 0 Land charPos GT 0
 
       return new Long(l)
     func  decode(nm)  throws:     NumberFormatException
-      var:radix=10
-      var:index=0
-      var:negative=false
-      var:result
+      Decl: radix=10
+      Decl: index=0
+      Decl: negative=false
+      Decl: result
       cond-branch cond:nm.length() EQ 0
       true branch :
         new NumberFormatException("Zero length string")
       false branch :
 
-      var:firstChar=nm.charAt(0)
+      Decl: firstChar=nm.charAt(0)
       cond-branch cond:firstChar EQ -
       true branch :
         negative Assign true
@@ -290,10 +290,10 @@ while val NE 0 Land charPos GT 0
     func  getLong(nm)  throws: 
       return getLong(nm,null)
     func  getLong(nm,val)  throws: 
-      var:result=Long.getLong(nm,null)
+      Decl: result=Long.getLong(nm,null)
       return 
     func  getLong(nm,val)  throws: 
-      var:v=null
+      Decl: v=null
       v Assign System.getProperty(nm)
 
 
@@ -352,8 +352,8 @@ while val NE 0 Land charPos GT 0
         return 64
       false branch :
 
-      var:n=1
-      var:x=(int)(i Zext 32)
+      Decl: n=1
+      Decl: x=(int)(i Zext 32)
       cond-branch cond:x EQ 0
       true branch :
         n AddAssign 32
@@ -387,13 +387,13 @@ while val NE 0 Land charPos GT 0
       n SubAssign x Zext 31
       return n
     func  numberOfTrailingZeros(i)  throws: 
-      var:x,y
+      Decl: x,y
       cond-branch cond:i EQ 0
       true branch :
         return 64
       false branch :
 
-      var:n=63
+      Decl: n=63
       y Assign (int)i
       cond-branch cond:y NE 0
       true branch :
@@ -477,3 +477,15 @@ while val NE 0 Land charPos GT 0
       LocalInterfaces: 
   LocalInterfaces: 
 
+Identifier:v has no decl.
+Identifier:n has no decl.
+Identifier:x has no decl.
+Identifier:y has no decl.
+Identifier:y has no decl.
+Identifier:x has no decl.
+Identifier:y has no decl.
+Identifier:x has no decl.
+Identifier:y has no decl.
+Identifier:x has no decl.
+Identifier:y has no decl.
+Identifier:x has no decl.

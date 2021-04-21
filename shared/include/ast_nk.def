@@ -19,6 +19,7 @@
 NODEKIND(Package)
 NODEKIND(Import)
 
+NODEKIND(Decl)
 NODEKIND(Identifier)
 NODEKIND(Field)
 NODEKIND(Dimension)

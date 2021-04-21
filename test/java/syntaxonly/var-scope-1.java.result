@@ -11,7 +11,7 @@ class  A
       a Assign x
       cond-branch cond:a EQ 2
       true branch :
-        var:a=2
+        Decl: a=2
 
       false branch :
 

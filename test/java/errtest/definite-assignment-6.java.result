@@ -8,7 +8,7 @@ class  Point
   Constructors: 
   Methods: 
     func  foo()  throws: 
-      var:k
+      Decl: k
       while n LT 4        k Assign n
 
 

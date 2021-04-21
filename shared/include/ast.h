@@ -262,21 +262,21 @@ private:
   TreeNode  *mId;                  // A name could be like Outer.Inner
                                    // Hard to give a const char* as name.
                                    // So give it an id.
-  SmallVector<TreeNode*> mParams;  //
+  SmallVector<TreeNode*> mArgs;    //
   BlockNode *mBody;                // When body is not empty, it's an
                                    // anonymous class.
 public:
   NewNode() : mId(NULL), mBody(NULL) {mKind = NK_New;}
-  ~NewNode() {mParams.Release();}
+  ~NewNode() {mArgs.Release();}
 
   TreeNode* GetId()          {return mId;}
   void SetId(TreeNode *n)    {mId = n;}
   BlockNode* GetBody()       {return mBody;}
   void SetBody(BlockNode *n) {mBody = n;}
 
-  unsigned  GetParamsNum()        {return mParams.GetNum();}
-  TreeNode* GetParam(unsigned i)  {return mParams.ValueAtIndex(i);}
-  void      AddParam(TreeNode *t) {mParams.PushBack(t);}
+  unsigned  GetArgsNum()        {return mArgs.GetNum();}
+  TreeNode* GetArg(unsigned i)  {return mArgs.ValueAtIndex(i);}
+  void      AddArg(TreeNode *t) {mArgs.PushBack(t);}
 
   void ReplaceChild(TreeNode *oldone, TreeNode *newone);
   void Dump(unsigned);
@@ -366,6 +366,24 @@ public:
   AttrId   AttrAtIndex(unsigned i) {return mAttrs.ValueAtIndex(i);}
 
   void Release() { if (mDims) mDims->Release();}
+  void Dump(unsigned);
+};
+
+//////////////////////////////////////////////////////////////////////////
+//                       DeclNode
+// A DeclNode defines one single variable or a VarList.
+// The type info and init expr are both inside the IdentifierNode.
+// DeclNode only tells this is a declaration.
+//////////////////////////////////////////////////////////////////////////
+class DeclNode : public TreeNode {
+private:
+  TreeNode *mVar;
+public:
+  DeclNode() : mVar(NULL) {mKind = NK_Decl;}
+  DeclNode(TreeNode *id) : mVar(id) {mKind = NK_Decl;}
+  ~DeclNode(){}
+
+  TreeNode* GetVar(){return mVar;}
   void Dump(unsigned);
 };
 

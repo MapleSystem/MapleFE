@@ -41,7 +41,7 @@ class  StrictMath
   1,0,Sub
   1)
     func  floorOrCeil(a,negativeBoundary,positiveBoundary,sign)  throws: 
-      var:exponent=Math.getExponent(a)
+      Decl: exponent=Math.getExponent(a)
       cond-branch cond:exponent LT 0
       true branch :
         return ()
@@ -53,18 +53,18 @@ class  StrictMath
 
 
       assert exponent GE 0 Land exponent LE 51 : 
-      var:doppel=Double.doubleToRawLongBits(a)
-      var:mask=DoubleConsts.SIGNIF_BIT_MASK Shr exponent
+      Decl: doppel=Double.doubleToRawLongBits(a)
+      Decl: mask=DoubleConsts.SIGNIF_BIT_MASK Shr exponent
       cond-branch cond:(mask Band doppel) EQ 0
       true branch :
         return a
       false branch :
-        var:result=Double.longBitsToDouble(doppel Band (mask))
+        Decl: result=Double.longBitsToDouble(doppel Band (mask))
 
 
     func  rint(a)  throws: 
-      var:twoToThe52=(double)(1 Shl 52)
-      var:sign=Math.copySign(1,a)
+      Decl: twoToThe52=(double)(1 Shl 52)
+      Decl: sign=Math.copySign(1,a)
       a Assign Math.abs(a)
       cond-branch cond:a LT twoToThe52
       true branch :

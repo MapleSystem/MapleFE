@@ -7,7 +7,7 @@ class  Outer
   Instance Initializer: 
   Constructors: 
     constructor  Outer()  throws: 
-      var:i=new Inner()
+      Decl: i=new Inner()
   Methods: 
   LocalClasses: 
     class  Inner
@@ -17,7 +17,7 @@ class  Outer
       Constructors: 
       Methods: 
         func  foo()  throws: 
-          var:i=
+          Decl: i=
       LocalClasses: 
         class  Inner2
           Fields: 
@@ -32,7 +32,7 @@ class  Outer
               Instance Initializer: 
               Constructors: 
                 constructor  Inner3()  throws: 
-                  var:i2=new Inner2()
+                  Decl: i2=new Inner2()
               Methods: 
               LocalClasses: 
               LocalInterfaces: 

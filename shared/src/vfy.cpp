@@ -139,6 +139,9 @@ void Verifier::VerifyIdentifier(IdentifierNode *inode) {
   }
 }
 
+void Verifier::VerifyDecl(DeclNode *tree){
+}
+
 void Verifier::VerifyDimension(DimensionNode *tree){
 }
 
@@ -356,8 +359,8 @@ void Verifier::VerifyNew(NewNode *new_node){
   VerifyType(inode);
   // verify parameters.
   // A parameter could be any type. We have to verify type by type.
-  for (unsigned i = 0; i < new_node->GetParamsNum(); i++) {
-    TreeNode *p = new_node->GetParam(i);
+  for (unsigned i = 0; i < new_node->GetArgsNum(); i++) {
+    TreeNode *p = new_node->GetArg(i);
     if(p->IsIdentifier()) {
       IdentifierNode *inode = (IdentifierNode*)p;
       VerifyIdentifier(inode);

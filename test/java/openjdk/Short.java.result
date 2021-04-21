@@ -21,14 +21,14 @@ class  Short
     func  compare(lhs,rhs)  throws: 
       return 
     func  decode(string)  throws:     NumberFormatException
-      var:intValue=Integer.decode(string).intValue()
-      var:result=(short)intValue
+      Decl: intValue=Integer.decode(string).intValue()
+      Decl: result=(short)intValue
       cond-branch cond:result EQ intValue
       true branch :
         return valueOf(result)
       false branch :
 
-      new NumberFormatException()
+      new NumberFormatException("Value out of range for short: "" Add string Add """)
     func  doubleValue()  throws: 
       return value
     func  equals(object)  throws: 
@@ -44,14 +44,14 @@ class  Short
     func  parseShort(string)  throws:     NumberFormatException
       return parseShort(string,10)
     func  parseShort(string,radix)  throws:     NumberFormatException
-      var:intValue=Integer.parseInt(string,radix)
-      var:result=(short)intValue
+      Decl: intValue=Integer.parseInt(string,radix)
+      Decl: result=(short)intValue
       cond-branch cond:result EQ intValue
       true branch :
         return result
       false branch :
 
-      new NumberFormatException()
+      new NumberFormatException("Value out of range for short: "" Add string Add """)
     func  shortValue()  throws: 
       return value
     func  toString()  throws: 

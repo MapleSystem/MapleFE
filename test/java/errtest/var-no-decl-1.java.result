@@ -8,9 +8,10 @@ class  A
   Constructors: 
   Methods: 
     func  foo()  throws: 
-      var:a
+      Decl: a
       a Assign b
   LocalClasses: 
   LocalInterfaces: 
 
+Identifier:a has no decl.
 Identifier:b has no decl.

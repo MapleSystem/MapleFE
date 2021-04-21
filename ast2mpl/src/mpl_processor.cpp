@@ -295,6 +295,12 @@ maple::BaseNode *A2M::ProcessFieldDecl(StmtExprKind skind, TreeNode *tnode, Bloc
   return bn;
 }
 
+maple::BaseNode *A2M::ProcessDecl(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
+  NOTYETIMPL("ProcessAssert()");
+  DeclNode *node = static_cast<DeclNode *>(tnode);
+  return nullptr;
+}
+
 maple::BaseNode *A2M::ProcessAssert(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
   NOTYETIMPL("ProcessAssert()");
   AssertNode *node = static_cast<AssertNode *>(tnode);
@@ -933,7 +939,7 @@ maple::BaseNode *A2M::ProcessNew(StmtExprKind skind, TreeNode *tnode, BlockNode 
   FunctionNode *func = nullptr;
   for (int i=0; i < classnode->GetConstructorNum(); i++) {
     func = classnode->GetConstructor(i);
-    if (func->GetParamsNum() == node->GetParamsNum()) {
+    if (func->GetParamsNum() == node->GetArgsNum()) {
       break;
     }
   }
@@ -951,8 +957,8 @@ maple::BaseNode *A2M::ProcessNew(StmtExprKind skind, TreeNode *tnode, BlockNode 
   maple::MapleVector<maple::BaseNode *> args(mMirModule->CurFuncCodeMemPoolAllocator()->Adapter());
   args.push_back(obj);
   // pass arg
-  for (int i = 0; i < node->GetParamsNum(); i++) {
-    maple::BaseNode *arg = ProcessNode(SK_Expr, node->GetParam(i), block);
+  for (int i = 0; i < node->GetArgsNum(); i++) {
+    maple::BaseNode *arg = ProcessNode(SK_Expr, node->GetArg(i), block);
     if (arg) {
       args.push_back(arg);
     } else {

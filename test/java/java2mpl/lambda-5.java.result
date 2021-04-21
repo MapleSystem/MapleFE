@@ -14,7 +14,7 @@ class  Point
   Constructors: 
   Methods: 
     func  foo()  throws: 
-      var:m
+      Decl: m
       m Assign () -> 
       m Assign () -> 42
 
@@ -29,3 +29,9 @@ class  Point
   LocalClasses: 
   LocalInterfaces: 
 
+Identifier:m has no decl.
+Identifier:m has no decl.
+Identifier:m has no decl.
+Identifier:m has no decl.
+Identifier:m has no decl.
+Identifier:m has no decl.

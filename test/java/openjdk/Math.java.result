@@ -50,25 +50,25 @@ class  Math
     func  atan2(y,x)  throws: 
     func  pow(a,b)  throws: 
     func  round(a)  throws: 
-      var:intBits=Float.floatToRawIntBits(a)
-      var:biasedExp=(intBits Band FloatConsts.EXP_BIT_MASK) Shr (FloatConsts.SIGNIFICAND_WIDTH Sub 1)
-      var:shift=(FloatConsts.SIGNIFICAND_WIDTH Sub 2 Add FloatConsts.EXP_BIAS) Sub biasedExp
+      Decl: intBits=Float.floatToRawIntBits(a)
+      Decl: biasedExp=(intBits Band FloatConsts.EXP_BIT_MASK) Shr (FloatConsts.SIGNIFICAND_WIDTH Sub 1)
+      Decl: shift=(FloatConsts.SIGNIFICAND_WIDTH Sub 2 Add FloatConsts.EXP_BIAS) Sub biasedExp
       cond-branch cond:(shift Band Sub
   32) EQ 0
       true branch :
-        var:r=((intBits Band FloatConsts.SIGNIF_BIT_MASK) Bor (FloatConsts.SIGNIF_BIT_MASK Add 1))
+        Decl: r=((intBits Band FloatConsts.SIGNIF_BIT_MASK) Bor (FloatConsts.SIGNIF_BIT_MASK Add 1))
 
       false branch :
         return (int)a
 
     func  round(a)  throws: 
-      var:longBits=Double.doubleToRawLongBits(a)
-      var:biasedExp=(longBits Band DoubleConsts.EXP_BIT_MASK) Shr (DoubleConsts.SIGNIFICAND_WIDTH Sub 1)
-      var:shift=(DoubleConsts.SIGNIFICAND_WIDTH Sub 2 Add DoubleConsts.EXP_BIAS) Sub biasedExp
+      Decl: longBits=Double.doubleToRawLongBits(a)
+      Decl: biasedExp=(longBits Band DoubleConsts.EXP_BIT_MASK) Shr (DoubleConsts.SIGNIFICAND_WIDTH Sub 1)
+      Decl: shift=(DoubleConsts.SIGNIFICAND_WIDTH Sub 2 Add DoubleConsts.EXP_BIAS) Sub biasedExp
       cond-branch cond:(shift Band Sub
   64) EQ 0
       true branch :
-        var:r=((longBits Band DoubleConsts.SIGNIF_BIT_MASK) Bor (DoubleConsts.SIGNIF_BIT_MASK Add 1))
+        Decl: r=((longBits Band DoubleConsts.SIGNIF_BIT_MASK) Bor (DoubleConsts.SIGNIF_BIT_MASK Add 1))
 
       false branch :
         return (long)a
@@ -82,7 +82,7 @@ class  Math
     func  randomLongInternal()  throws: 
       return RandomNumberGeneratorHolder.randomNumberGenerator.nextLong()
     func  addExact(x,y)  throws: 
-      var:r=x Add y
+      Decl: r=x Add y
       cond-branch cond:((x Bxor r) Band (y Bxor r)) LT 0
       true branch :
         new ArithmeticException("integer overflow")
@@ -90,7 +90,7 @@ class  Math
 
       return r
     func  addExact(x,y)  throws: 
-      var:r=x Add y
+      Decl: r=x Add y
       cond-branch cond:((x Bxor r) Band (y Bxor r)) LT 0
       true branch :
         new ArithmeticException("long overflow")
@@ -98,7 +98,7 @@ class  Math
 
       return r
     func  subtractExact(x,y)  throws: 
-      var:r=x Sub y
+      Decl: r=x Sub y
       cond-branch cond:((x Bxor y) Band (x Bxor r)) LT 0
       true branch :
         new ArithmeticException("integer overflow")
@@ -106,7 +106,7 @@ class  Math
 
       return r
     func  subtractExact(x,y)  throws: 
-      var:r=x Sub y
+      Decl: r=x Sub y
       cond-branch cond:((x Bxor y) Band (x Bxor r)) LT 0
       true branch :
         new ArithmeticException("long overflow")
@@ -114,7 +114,7 @@ class  Math
 
       return r
     func  multiplyExact(x,y)  throws: 
-      var:r=(long)x Mul (long)y
+      Decl: r=(long)x Mul (long)y
       cond-branch cond:(int)r NE r
       true branch :
         new ArithmeticException("integer overflow")
@@ -122,9 +122,9 @@ class  Math
 
       return (int)r
     func  multiplyExact(x,y)  throws: 
-      var:r=x Mul y
-      var:ax=Math.abs(x)
-      var:ay=Math.abs(y)
+      Decl: r=x Mul y
+      Decl: ax=Math.abs(x)
+      Decl: ay=Math.abs(y)
       cond-branch cond:((ax Bor ay) Zext 31 NE 0)
       true branch :
         cond-branch cond:((y NE 0) Land (r Div y NE x)) Lor (x EQ Long.MIN_VALUE Land y EQ Sub
@@ -188,7 +188,7 @@ class  Math
 
       return (int)value
     func  floorDiv(x,y)  throws: 
-      var:r=x Div y
+      Decl: r=x Div y
       cond-branch cond:(x Bxor y) LT 0 Land (r Mul y NE x)
       true branch :
                   rDec
@@ -197,7 +197,7 @@ class  Math
 
       return r
     func  floorDiv(x,y)  throws: 
-      var:r=x Div y
+      Decl: r=x Div y
       cond-branch cond:(x Bxor y) LT 0 Land (r Mul y NE x)
       true branch :
                   rDec
@@ -206,7 +206,7 @@ class  Math
 
       return r
     func  floorMod(x,y)  throws: 
-      var:r=x Sub floorDiv(x,y) Mul y
+      Decl: r=x Sub floorDiv(x,y) Mul y
       return r
     func  floorMod(x,y)  throws: 
       return x Sub floorDiv(x,y) Mul y
@@ -275,11 +275,11 @@ class  Math
 
       return 
     func  ulp(d)  throws: 
-      var:exp=getExponent(d)
+      Decl: exp=getExponent(d)
       A switch
 
     func  ulp(f)  throws: 
-      var:exp=getExponent(f)
+      Decl: exp=getExponent(f)
       A switch
 
     func  signum(d)  throws: 
@@ -309,7 +309,7 @@ class  Math
         true branch :
           return direction
         false branch :
-          var:transducer=Double.doubleToRawLongBits(start Add 0)
+          Decl: transducer=Double.doubleToRawLongBits(start Add 0)
 
 
 
@@ -322,7 +322,7 @@ class  Math
         true branch :
           return (float)direction
         false branch :
-          var:transducer=Float.floatToRawIntBits(start Add 0)
+          Decl: transducer=Float.floatToRawIntBits(start Add 0)
 
 
 
@@ -369,11 +369,11 @@ class  Math
 
 
     func  scalb(d,scaleFactor)  throws: 
-      var:MAX_SCALE=DoubleConsts.MAX_EXPONENT Add Sub
+      Decl: MAX_SCALE=DoubleConsts.MAX_EXPONENT Add Sub
   DoubleConsts.MIN_EXPONENT Add DoubleConsts.SIGNIFICAND_WIDTH Add 1
-      var:exp_adjust=0
-      var:scale_increment=0
-      var:exp_delta=Double.NaN
+      Decl: exp_adjust=0
+      Decl: scale_increment=0
+      Decl: exp_delta=Double.NaN
       cond-branch cond:scaleFactor LT 0
       true branch :
         scaleFactor Assign Math.max(scaleFactor Sub MAX_SCALE)
@@ -382,7 +382,7 @@ class  Math
         scaleFactor Assign Math.min(scaleFactor,MAX_SCALE)
 
 
-      var:t=(scaleFactor Shr 9 Sub 1) Zext 32 Sub 9
+      Decl: t=(scaleFactor Shr 9 Sub 1) Zext 32 Sub 9
       exp_adjust Assign ((scaleFactor Add t) Band (512 Sub 1)) Sub t
       d MulAssign powerOfTwoD(exp_adjust)
       scaleFactor SubAssign exp_adjust
@@ -391,7 +391,7 @@ class  Math
 
       return d
     func  scalb(f,scaleFactor)  throws: 
-      var:MAX_SCALE=FloatConsts.MAX_EXPONENT Add Sub
+      Decl: MAX_SCALE=FloatConsts.MAX_EXPONENT Add Sub
   FloatConsts.MIN_EXPONENT Add FloatConsts.SIGNIFICAND_WIDTH Add 1
       scaleFactor Assign Math.max(Math.min(scaleFactor,MAX_SCALE) Sub MAX_SCALE)
       return (float)((double)f Mul powerOfTwoD(scaleFactor))
@@ -412,3 +412,6 @@ class  Math
       LocalInterfaces: 
   LocalInterfaces: 
 
+Identifier:exp_adjust has no decl.
+Identifier:t has no decl.
+Identifier:exp_adjust has no decl.

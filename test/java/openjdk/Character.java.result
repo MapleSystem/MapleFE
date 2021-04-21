@@ -49,12 +49,12 @@ class  Character
 
       return false
     func  toString()  throws: 
-      var:buf=value[]
+      Decl: buf=value[]
       return String.valueOf(buf)
     func  toString(c)  throws: 
       return String.valueOf(c)
     func  isValidCodePoint(codePoint)  throws: 
-      var:plane=codePoint Zext 16
+      Decl: plane=codePoint Zext 16
       return plane LT ((MAX_CODE_POINT Add 1) Zext 16)
     func  isBmpCodePoint(codePoint)  throws: 
       return codePoint Zext 16 EQ 0
@@ -73,11 +73,11 @@ class  Character
     func  toCodePoint(high,low)  throws: 
       return ((high Shl 10) Add low) Add (MIN_SUPPLEMENTARY_CODE_POINT Sub (MIN_HIGH_SURROGATE Shl 10) Sub MIN_LOW_SURROGATE)
     func  codePointAt(seq,index)  throws: 
-      var:c1=seq.charAt(index)
+      Decl: c1=seq.charAt(index)
       cond-branch cond:isHighSurrogate(c1) Land Inc
   index LT seq.length()
       true branch :
-        var:c2=seq.charAt(index)
+        Decl: c2=seq.charAt(index)
         cond-branch cond:isLowSurrogate(c2)
         true branch :
           return toCodePoint(c1,c2)
@@ -96,11 +96,11 @@ class  Character
 
       return codePointAtImpl(a,index,limit)
     func  codePointAtImpl(a,index,limit)  throws: 
-      var:c1=
+      Decl: c1=
       cond-branch cond:isHighSurrogate(c1) Land Inc
   index LT limit
       true branch :
-        var:c2=
+        Decl: c2=
         cond-branch cond:isLowSurrogate(c2)
         true branch :
           return toCodePoint(c1,c2)
@@ -110,11 +110,11 @@ class  Character
 
       return c1
     func  codePointBefore(seq,index)  throws: 
-      var:c2=seq.charAt(Dec
+      Decl: c2=seq.charAt(Dec
   index)
       cond-branch cond:isLowSurrogate(c2) Land index GT 0
       true branch :
-        var:c1=seq.charAt(Dec
+        Decl: c1=seq.charAt(Dec
   index)
         cond-branch cond:isHighSurrogate(c1)
         true branch :
@@ -134,10 +134,10 @@ class  Character
 
       return codePointBeforeImpl(a,index,start)
     func  codePointBeforeImpl(a,index,start)  throws: 
-      var:c2=
+      Decl: c2=
       cond-branch cond:isLowSurrogate(c2) Land index GT start
       true branch :
-        var:c1=
+        Decl: c1=
         cond-branch cond:isHighSurrogate(c1)
         true branch :
           return toCodePoint(c1,c2)
@@ -171,7 +171,7 @@ class  Character
       false branch :
         cond-branch cond:isValidCodePoint(codePoint)
         true branch :
-          var:result=
+          Decl: result=
 
         false branch :
           new IllegalArgumentException()
@@ -181,13 +181,13 @@ class  Character
        Assign lowSurrogate(codePoint)
        Assign highSurrogate(codePoint)
     func  codePointCount(seq,beginIndex,endIndex)  throws: 
-      var:length=seq.length()
+      Decl: length=seq.length()
       cond-branch cond:beginIndex LT 0 Lor endIndex GT length Lor beginIndex GT endIndex
       true branch :
         new IndexOutOfBoundsException()
       false branch :
 
-      var:n=endIndex Sub beginIndex
+      Decl: n=endIndex Sub beginIndex
       for ( )
         cond-branch cond:isHighSurrogate(seq.charAt(  iInc
 )) Land i LT endIndex Land isLowSurrogate(seq.charAt(i))
@@ -208,8 +208,8 @@ class  Character
 
       return codePointCountImpl(a,offset,count)
     func  codePointCountImpl(a,offset,count)  throws: 
-      var:endIndex=offset Add count
-      var:n=count
+      Decl: endIndex=offset Add count
+      Decl: n=count
       for ( )
         cond-branch cond:isHighSurrogate(a,  iInc
 ) Land i LT endIndex Land isLowSurrogate(a,i)
@@ -223,19 +223,19 @@ class  Character
 
       return n
     func  offsetByCodePoints(seq,index,codePointOffset)  throws: 
-      var:length=seq.length()
+      Decl: length=seq.length()
       cond-branch cond:index LT 0 Lor index GT length
       true branch :
         new IndexOutOfBoundsException()
       false branch :
 
-      var:x=index
+      Decl: x=index
       cond-branch cond:codePointOffset GE 0
       true branch :
-        var:i
+        Decl: i
 
       false branch :
-        var:i
+        Decl: i
 
 
       return x
@@ -247,13 +247,13 @@ class  Character
 
       return offsetByCodePointsImpl(a,start,count,index,codePointOffset)
     func  offsetByCodePointsImpl(a,start,count,index,codePointOffset)  throws: 
-      var:x=index
+      Decl: x=index
       cond-branch cond:codePointOffset GE 0
       true branch :
-        var:limit=start Add count
+        Decl: limit=start Add count
 
       false branch :
-        var:i
+        Decl: i
 
 
       return x
@@ -391,7 +391,7 @@ class  Character
 
       cond-branch cond:codePoint LT 128
       true branch :
-        var:result=Sub
+        Decl: result=Sub
   1
 
       false branch :
@@ -497,7 +497,7 @@ class  Character
     func  getType(ch)  throws: 
       return getType((int)ch)
     func  getType(codePoint)  throws: 
-      var:type=getTypeImpl(codePoint)
+      Decl: type=getTypeImpl(codePoint)
       cond-branch cond:type LE Character.FORMAT
       true branch :
         return type
@@ -530,7 +530,7 @@ class  Character
         return Character.DIRECTIONALITY_UNDEFINED
       false branch :
 
-      var:directionality=getDirectionalityImpl(codePoint)
+      Decl: directionality=getDirectionalityImpl(codePoint)
       cond-branch cond:directionality GE 0 Land directionality LT DIRECTIONALITY.length
       true branch :
         return 
@@ -555,7 +555,7 @@ class  Character
         new IllegalArgumentException()
       false branch :
 
-      var:name=getNameImpl(codePoint)
+      Decl: name=getNameImpl(codePoint)
       cond-branch cond:name NE null
       true branch :
         return name
@@ -566,7 +566,7 @@ class  Character
         return null
       false branch :
 
-      var:block=UnicodeBlock.of(codePoint)
+      Decl: block=UnicodeBlock.of(codePoint)
       cond-branch cond:block NE null
       true branch :
         return block.toString().replace(_, ) Add " " Add Integer.toHexString(codePoint).toUpperCase(Locale.ENGLISH)
@@ -610,7 +610,7 @@ class  Character
 
         constructor  UnicodeBlock(idName,alias)  throws: 
           map.put(alias,this)
-        constructor  UnicodeBlock(idName,String,aliases)  throws: 
+        constructor  UnicodeBlock(idName,aliases)  throws: 
           String
           alias
           aliases
@@ -624,7 +624,7 @@ class  Character
             new IllegalArgumentException()
           false branch :
 
-          var:top,bottom,current
+          Decl: top,bottom,current
           bottom Assign 0
           top Assign blockStarts.length
           current Assign top Div 2
@@ -638,7 +638,7 @@ class  Character
 
           return 
         func  forName(blockName)  throws: 
-          var:block=map.get(blockName.toUpperCase(Locale.US))
+          Decl: block=map.get(blockName.toUpperCase(Locale.US))
           cond-branch cond:block EQ null
           true branch :
             new IllegalArgumentException()
@@ -649,7 +649,7 @@ class  Character
       LocalInterfaces: 
     class[JavaEnum]  UnicodeScript
       Fields: 
-        COMMON        scriptStarts=        scripts=        aliases
+        scriptStarts=        scripts=        aliases
       Instance Initializer: 
         InstInit- 0
       Constructors: 
@@ -660,13 +660,13 @@ class  Character
             new IllegalArgumentException()
           false branch :
 
-          var:type=getType(codePoint)
+          Decl: type=getType(codePoint)
           cond-branch cond:type EQ UNASSIGNED
           true branch :
             return UNKNOWN
           false branch :
 
-          var:index=Arrays.binarySearch(scriptStarts,codePoint)
+          Decl: index=Arrays.binarySearch(scriptStarts,codePoint)
           cond-branch cond:index LT 0
           true branch :
             index Assign Sub
@@ -676,7 +676,7 @@ class  Character
           return 
         func  forName(scriptName)  throws: 
           scriptName Assign scriptName.toUpperCase(Locale.ENGLISH)
-          var:sc=aliases.get(scriptName)
+          Decl: sc=aliases.get(scriptName)
           cond-branch cond:sc NE null
           true branch :
             return sc

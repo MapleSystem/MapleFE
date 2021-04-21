@@ -8,7 +8,7 @@ class  C
   Constructors: 
   Methods: 
     func  getClasses(a)  throws: 
-      var:result=a
+      Decl: result=a
       return result
   LocalClasses: 
   LocalInterfaces: 

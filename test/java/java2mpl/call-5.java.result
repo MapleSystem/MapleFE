@@ -8,7 +8,7 @@ class  A
   Constructors: 
   Methods: 
     func  foo()  throws: 
-      var:socket=new Socket("localhost",listeningPort)
+      Decl: socket=new Socket("localhost",listeningPort)
   LocalClasses: 
   LocalInterfaces: 
 

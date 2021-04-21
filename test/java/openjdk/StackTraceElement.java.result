@@ -30,7 +30,7 @@ class  StackTraceElement
       return lineNumber EQ Sub
   2
     func  toString()  throws: 
-      var:result=new StringBuilder()
+      Decl: result=new StringBuilder()
       result.append(getClassName()).append(".").append(methodName)
       cond-branch cond:isNativeMethod()
       true branch :
@@ -65,13 +65,17 @@ class  StackTraceElement
         return false
       false branch :
 
-      var:e=(StackTraceElement)obj
+      Decl: e=(StackTraceElement)obj
       return e.declaringClass.equals(declaringClass) Land e.lineNumber EQ lineNumber Land Objects.equals(methodName,e.methodName) Land Objects.equals(fileName,e.fileName)
     func  hashCode()  throws: 
-      var:result=31 Mul declaringClass.hashCode() Add methodName.hashCode()
+      Decl: result=31 Mul declaringClass.hashCode() Add methodName.hashCode()
       result Assign 31 Mul result Add Objects.hashCode(fileName)
       result Assign 31 Mul result Add lineNumber
       return result
   LocalClasses: 
   LocalInterfaces: 
 
+Identifier:result has no decl.
+Identifier:result has no decl.
+Identifier:result has no decl.
+Identifier:result has no decl.
