@@ -122,3 +122,6 @@ ACTION(AddThrowsTo)
 // User Types
 ACTION(BuildUserType)
 ACTION(AddTypeArgument)
+
+// This is a special action to pass a child to parent
+ACTION(PassChild)

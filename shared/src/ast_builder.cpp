@@ -1773,6 +1773,27 @@ TreeNode* ASTBuilder::AddThrowsTo() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+//                   Pass a Child
+// We only pass tree node. It should not be a token.
+////////////////////////////////////////////////////////////////////////////////
+
+TreeNode* ASTBuilder::PassChild() {
+  if (mTrace)
+    std::cout << "In PassChild" << std::endl;
+
+  TreeNode *node = NULL;
+  Param p = mParams[0];
+  if (!p.mIsEmpty) {
+    if (!p.mIsTreeNode)
+      MERROR("The child is not a treenode.");
+    node = p.mData.mTreeNode;
+  }
+
+  mLastTreeNode = node;
+  return mLastTreeNode;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 //                   User Type Functions
 ////////////////////////////////////////////////////////////////////////////////
 

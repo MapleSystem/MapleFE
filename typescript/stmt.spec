@@ -20,6 +20,11 @@
 #  Identifier
 #  [~Yield] yield
 #
+rule IdentifierReference : ONEOF(
+  Identifier,
+  "yield")
+
+#
 #rule BindingIdentifier[Yield] :
 #
 #rule Identifier
@@ -44,6 +49,20 @@
 #  RegularExpressionLiteral
 #  TemplateLiteral[?Yield]
 #  CoverParenthesizedExpressionAndArrowParameterList[?Yield]
+#
+rule PrimaryExpression : ONEOF(
+  "this",
+  IdentifierReference,
+  Literal)
+#  ArrayLiteral[?Yield]
+#  ObjectLiteral[?Yield]
+#  FunctionExpression
+#  ClassExpression[?Yield]
+#  GeneratorExpression
+#  RegularExpressionLiteral
+#  TemplateLiteral[?Yield]
+#  CoverParenthesizedExpressionAndArrowParameterList[?Yield]
+
 #
 #rule CoverParenthesizedExpressionAndArrowParameterList[Yield] :
 #  ( Expression[In, ?Yield] )
@@ -137,6 +156,16 @@
 #  MetaProperty
 #  new MemberExpression[?Yield] Arguments[?Yield]
 #
+rule MemberExpression : ONEOF(
+  PrimaryExpression,
+#  MemberExpression[?Yield] [ Expression[In, ?Yield] ]
+  MemberExpression + '.' + Identifier,
+#  MemberExpression[?Yield] TemplateLiteral[?Yield]
+#  SuperProperty[?Yield]
+#  MetaProperty
+  "new" + MemberExpression + Arguments)
+  attr.action.%2 : BuildField(%1, %3)
+
 #rule SuperProperty[Yield] :
 #  super [ Expression[In, ?Yield] ]
 #  super . IdentifierName
@@ -159,6 +188,17 @@
 #  CallExpression[?Yield] . IdentifierName
 #  CallExpression[?Yield] TemplateLiteral[?Yield]
 #
+
+rule CallExpression : ONEOF(
+  MemberExpression + Arguments,
+#  SuperCall[?Yield]
+  CallExpression + Arguments,
+#  CallExpression[?Yield] [ Expression[In, ?Yield] ]
+  CallExpression + '.' + Identifier)
+#  CallExpression[?Yield] TemplateLiteral[?Yield]
+  attr.action.%1,%2 : BuildCall(%1)
+  attr.action.%1,%2 : AddArguments(%2)
+
 #rule SuperCall[Yield] :
 #  super Arguments[?Yield]
 #
@@ -166,18 +206,36 @@
 #  ( )
 #  ( ArgumentList[?Yield] )
 #
+
+rule Arguments : ONEOF(
+  '(' + ')',
+  '(' + ArgumentList + ')')
+  attr.action.%2 : PassChild(%2)
+
 #rule ArgumentList[Yield] :
 #  AssignmentExpression[In, ?Yield]
 #  ... AssignmentExpression[In, ?Yield]
 #  ArgumentList[?Yield] , AssignmentExpression[In, ?Yield]
 #  ArgumentList[?Yield] , ... AssignmentExpression[In, ?Yield]
+# This is for tempoary use, to enable hello world ASAP.
+rule ArgumentList : ONEOF(Identifier, Literal)
+
 #
 #rule LeftHandSideExpression[Yield] :
 #  NewExpression[?Yield]
 #  CallExpression[?Yield]
 #
+rule LeftHandSideExpression : ONEOF(
+#  NewExpression[?Yield]
+  CallExpression)
+
+#
 #rule PostfixExpression[Yield] :
 #  LeftHandSideExpression[?Yield]
+#  LeftHandSideExpression[?Yield] [no LineTerminator here] ++
+#  LeftHandSideExpression[?Yield] [no LineTerminator here] --
+rule PostfixExpression : ONEOF(
+  LeftHandSideExpression)
 #  LeftHandSideExpression[?Yield] [no LineTerminator here] ++
 #  LeftHandSideExpression[?Yield] [no LineTerminator here] --
 #
@@ -192,9 +250,23 @@
 #  - UnaryExpression[?Yield]
 #  ~ UnaryExpression[?Yield]
 #  ! UnaryExpression[?Yield]
+rule UnaryExpression : ONEOF(
+  PostfixExpression)
+#  delete UnaryExpression[?Yield]
+#  void UnaryExpression[?Yield]
+#  typeof UnaryExpression[?Yield]
+#  ++ UnaryExpression[?Yield]
+#  -- UnaryExpression[?Yield]
+#  + UnaryExpression[?Yield]
+#  - UnaryExpression[?Yield]
+#  ~ UnaryExpression[?Yield]
+#  ! UnaryExpression[?Yield]
 #
 #rule MultiplicativeExpression[Yield] :
 #  UnaryExpression[?Yield]
+#  MultiplicativeExpression[?Yield] MultiplicativeOperator UnaryExpression[?Yield]
+rule MultiplicativeExpression : ONEOF(
+  UnaryExpression)
 #  MultiplicativeExpression[?Yield] MultiplicativeOperator UnaryExpression[?Yield]
 #
 #rule MultiplicativeOperator : one of
@@ -204,15 +276,32 @@
 #  MultiplicativeExpression[?Yield]
 #  AdditiveExpression[?Yield] + MultiplicativeExpression[?Yield]
 #  AdditiveExpression[?Yield] - MultiplicativeExpression[?Yield]
+rule AdditiveExpression : ONEOF(
+  MultiplicativeExpression)
+#  AdditiveExpression[?Yield] + MultiplicativeExpression[?Yield]
+#  AdditiveExpression[?Yield] - MultiplicativeExpression[?Yield]
 #
 #rule ShiftExpression[Yield] :
 #  AdditiveExpression[?Yield]
 #  ShiftExpression[?Yield] << AdditiveExpression[?Yield]
 #  ShiftExpression[?Yield] >> AdditiveExpression[?Yield]
 #  ShiftExpression[?Yield] >>> AdditiveExpression[?Yield]
+rule ShiftExpression : ONEOF(
+  AdditiveExpression)
+#  ShiftExpression[?Yield] << AdditiveExpression[?Yield]
+#  ShiftExpression[?Yield] >> AdditiveExpression[?Yield]
+#  ShiftExpression[?Yield] >>> AdditiveExpression[?Yield]
 #
 #rule RelationalExpression[In, Yield] :
 #  ShiftExpression[?Yield]
+#  RelationalExpression[?In, ?Yield] < ShiftExpression[?Yield]
+#  RelationalExpression[?In, ?Yield] > ShiftExpression[?Yield]
+#  RelationalExpression[?In, ?Yield] <= ShiftExpression[? Yield]
+#  RelationalExpression[?In, ?Yield] >= ShiftExpression[?Yield]
+#  RelationalExpression[?In, ?Yield] instanceof ShiftExpression[?Yield]
+#  [+In] RelationalExpression[In, ?Yield] in ShiftExpression[?Yield]
+rule RelationalExpression : ONEOF(
+  ShiftExpression)
 #  RelationalExpression[?In, ?Yield] < ShiftExpression[?Yield]
 #  RelationalExpression[?In, ?Yield] > ShiftExpression[?Yield]
 #  RelationalExpression[?In, ?Yield] <= ShiftExpression[? Yield]
@@ -226,29 +315,53 @@
 #  EqualityExpression[?In, ?Yield] != RelationalExpression[?In, ?Yield]
 #  EqualityExpression[?In, ?Yield] === RelationalExpression[?In, ?Yield]
 #  EqualityExpression[?In, ?Yield] !== RelationalExpression[?In, ?Yield]
+rule EqualityExpression : ONEOF(
+  RelationalExpression)
+#  EqualityExpression[?In, ?Yield] == RelationalExpression[?In, ?Yield]
+#  EqualityExpression[?In, ?Yield] != RelationalExpression[?In, ?Yield]
+#  EqualityExpression[?In, ?Yield] === RelationalExpression[?In, ?Yield]
+#  EqualityExpression[?In, ?Yield] !== RelationalExpression[?In, ?Yield]
 #
 #rule BitwiseANDExpression[In, Yield] :
 #  EqualityExpression[?In, ?Yield]
+#  BitwiseANDExpression[?In, ?Yield] & EqualityExpression[?In, ?Yield]
+rule BitwiseANDExpression : ONEOF(
+  EqualityExpression)
 #  BitwiseANDExpression[?In, ?Yield] & EqualityExpression[?In, ?Yield]
 #
 #rule BitwiseXORExpression[In, Yield] :
 #  BitwiseANDExpression[?In, ?Yield]
 #  BitwiseXORExpression[?In, ?Yield] ^ BitwiseANDExpression[?In, ?Yield]
+rule BitwiseXORExpression : ONEOF(
+  BitwiseANDExpression)
+#  BitwiseXORExpression[?In, ?Yield] ^ BitwiseANDExpression[?In, ?Yield]
 #
 #rule BitwiseORExpression[In, Yield] :
 #  BitwiseXORExpression[?In, ?Yield]
+#  BitwiseORExpression[?In, ?Yield] | BitwiseXORExpression[?In, ?Yield]
+rule BitwiseORExpression : ONEOF(
+  BitwiseXORExpression)
 #  BitwiseORExpression[?In, ?Yield] | BitwiseXORExpression[?In, ?Yield]
 #
 #rule LogicalANDExpression[In, Yield] :
 #  BitwiseORExpression[?In, ?Yield]
 #  LogicalANDExpression[?In, ?Yield] && BitwiseORExpression[?In, ?Yield]
+rule LogicalANDExpression : ONEOF(
+  BitwiseORExpression)
+#  LogicalANDExpression[?In, ?Yield] && BitwiseORExpression[?In, ?Yield]
 #
 #rule LogicalORExpression[In, Yield] :
 #  LogicalANDExpression[?In, ?Yield]
 #  LogicalORExpression[?In, ?Yield] || LogicalANDExpression[?In, ?Yield]
+rule LogicalORExpression : ONEOF(
+  LogicalANDExpression)
+#  LogicalORExpression[?In, ?Yield] || LogicalANDExpression[?In, ?Yield]
 #
 #rule ConditionalExpression[In, Yield] :
 #  LogicalORExpression[?In, ?Yield]
+#  LogicalORExpression[?In,?Yield] ? AssignmentExpression[In, ?Yield] : AssignmentExpression[?In, ?Yield]
+rule ConditionalExpression : ONEOF(
+  LogicalORExpression)
 #  LogicalORExpression[?In,?Yield] ? AssignmentExpression[In, ?Yield] : AssignmentExpression[?In, ?Yield]
 #
 #rule AssignmentExpression[In, Yield] :
@@ -257,12 +370,22 @@
 #  ArrowFunction[?In, ?Yield]
 #  LeftHandSideExpression[?Yield] = AssignmentExpression[?In, ?Yield]
 #  LeftHandSideExpression[?Yield] AssignmentOperator AssignmentExpression[?In, ?Yield]
+rule AssignmentExpression : ONEOF(
+  ConditionalExpression)
+#  [+Yield] YieldExpression[?In]
+#  ArrowFunction[?In, ?Yield]
+#  LeftHandSideExpression[?Yield] = AssignmentExpression[?In, ?Yield]
+#  LeftHandSideExpression[?Yield] AssignmentOperator AssignmentExpression[?In, ?Yield]
 #
 #rule AssignmentOperator : one of
 #  *= /= %= += -= <<= >>= >>>= &= ^= |=
 #
+
 #rule Expression[In, Yield] :
 #  AssignmentExpression[?In, ?Yield]
+#  Expression[?In, ?Yield] , AssignmentExpression[?In, ?Yield]
+rule Expression : ONEOF(
+  AssignmentExpression)
 #  Expression[?In, ?Yield] , AssignmentExpression[?In, ?Yield]
 #
 #-------------------------------------------------------------------------------
@@ -284,7 +407,24 @@
 #  ThrowStatement[?Yield]
 #  TryStatement[?Yield, ?Return]
 #  DebuggerStatement
-#
+
+rule Statement : ONEOF(
+#  BlockStatement[?Yield, ?Return]
+#  VariableStatement[?Yield]
+#  EmptyStatement
+  ExpressionStatement)
+#  IfStatement[?Yield, ?Return]
+#  BreakableStatement[?Yield, ?Return]
+#  ContinueStatement[?Yield]
+#  BreakStatement[?Yield]
+#  [+Return] ReturnStatement[?Yield]
+#  WithStatement[?Yield, ?Return]
+#  LabelledStatement[?Yield, ?Return]
+#  ThrowStatement[?Yield]
+#  TryStatement[?Yield, ?Return]
+#  DebuggerStatement
+  attr.property : Top
+
 #rule Declaration[Yield] :
 #  HoistableDeclaration[?Yield]
 #  ClassDeclaration[?Yield]
@@ -382,6 +522,8 @@
 #
 #rule ExpressionStatement[Yield] :
 #  [lookahead NotIn {{, function, class, let [}] Expression[In, ?Yield] ;
+#
+rule ExpressionStatement : Expression + ';'
 #
 #rule IfStatement[Yield, Return] :
 #  if ( Expression[In, ?Yield] ) Statement[?Yield, ?Return] else Statement[?Yield, ?Return]

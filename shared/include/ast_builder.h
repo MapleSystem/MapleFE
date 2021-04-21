@@ -171,6 +171,9 @@ public:
   // User Type related
   TreeNode* BuildUserType();
   TreeNode* AddTypeArgument();
+
+  // Pass a child
+  TreeNode* PassChild();
 };
 
 // A global builder is good enough.
