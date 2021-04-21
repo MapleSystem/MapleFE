@@ -62,3 +62,10 @@ STRUCT Keyword : (("boolean", Boolean),
                   ("string", String),
                   ("number", Number),
                   ("any", Any))
+
+rule BooleanType : "boolean"
+rule NumberType : "number"
+rule AnyType : "any"
+rule StringType : "string"
+
+rule TYPE : ONEOF(BooleanType, NumberType, AnyType, StringType)

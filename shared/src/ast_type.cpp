@@ -131,7 +131,7 @@ void PrimTypePool::Init() {
   for (unsigned i = 0; i < TypeKeywordTableSize; i++) {
     PrimTypeNode *n = (PrimTypeNode*)mTreePool.NewTreeNode(sizeof(PrimTypeNode));
     new (n) PrimTypeNode();
-    n->SetPrimType((TypeId)i);
+    n->SetPrimType((TypeId)TypeKeywordTable[i].mId);
     mTypes.PushBack(n);
   }
 }

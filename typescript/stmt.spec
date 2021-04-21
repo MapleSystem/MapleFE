@@ -27,10 +27,10 @@ rule IdentifierReference : ONEOF(
 
 ##-----------------------------------
 ##rule BindingIdentifier[Yield] :
-
-##-----------------------------------
-##rule Identifier
+##  Identifier
 ##  [~Yield] yield
+
+rule BindingIdentifier : ONEOF(Identifier, "yield")
 
 ##-----------------------------------
 ##rule LabelIdentifier[Yield] :
@@ -151,6 +151,7 @@ rule PrimaryExpression : ONEOF(
 ##-----------------------------------
 ##rule Initializer[In, Yield] :
 ##  = AssignmentExpression[?In, ?Yield]
+rule Initializer : '=' + AssignmentExpression
 
 ##-----------------------------------
 ##rule TemplateLiteral[Yield] :
@@ -204,6 +205,7 @@ rule MemberExpression : ONEOF(
 ##rule NewExpression[Yield] :
 ##  MemberExpression[?Yield]
 ##  new NewExpression[?Yield]
+rule NewExpression : ONEOF(MemberExpression, "new" + NewExpression)
 
 ##-----------------------------------
 ##rule CallExpression[Yield] :
@@ -253,9 +255,7 @@ rule ArgumentList : ONEOF(Identifier, Literal)
 ##  NewExpression[?Yield]
 ##  CallExpression[?Yield]
 
-rule LeftHandSideExpression : ONEOF(
-#  NewExpression[?Yield]
-  CallExpression)
+rule LeftHandSideExpression : ONEOF(NewExpression, CallExpression)
 
 ##-----------------------------------
 ##rule PostfixExpression[Yield] :
@@ -469,7 +469,7 @@ rule Expression : ONEOF(
 
 rule Statement : ONEOF(
 #  BlockStatement[?Yield, ?Return]
-#  VariableStatement[?Yield]
+  VariableStatement,
 #  EmptyStatement
   ExpressionStatement)
 #  IfStatement[?Yield, ?Return]
@@ -540,16 +540,24 @@ rule Statement : ONEOF(
 ##-----------------------------------
 ##rule VariableStatement[Yield] :
 ##  var VariableDeclarationList[In, ?Yield] ;
+rule VariableStatement : "var" + VariableDeclarationList + ';'
+  attr.action : PassChild(%2)
 
 ##-----------------------------------
 ##rule VariableDeclarationList[In, Yield] :
 ##  VariableDeclaration[?In, ?Yield]
 ##  VariableDeclarationList[?In, ?Yield] , VariableDeclaration[?In, ?Yield]
+rule VariableDeclarationList : ONEOF(
+  VariableDeclaration,
+  VariableDeclarationList + ',' + VariableDeclaration)
 
 ##-----------------------------------
 ##rule VariableDeclaration[In, Yield] :
 ##  BindingIdentifier[?Yield] Initializer[?In, ?Yield]opt
 ##  BindingPattern[?Yield] Initializer[?In, ?Yield]
+rule VariableDeclaration : BindingIdentifier + ':' + TYPE + ZEROORONE(Initializer)
+  attr.action : AddInitTo(%1, %4)
+  attr.action : BuildDecl(%3, %1)
 
 ##-----------------------------------
 ##rule BindingPattern[Yield] :

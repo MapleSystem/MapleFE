@@ -24,6 +24,7 @@
 STRUCT KeyWord : ((boolean),
                   (number),
                   (string),
+                  (any),
 
                   (break),
                   (do),
