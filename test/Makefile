@@ -19,50 +19,34 @@ build = ../output/$(SRCLANG)/test
 $(shell mkdir -p $(build))
 
 ifeq ($(SRCLANG),java)
-  TARGET := java
-	DIR := . $(wildcard java java/* java/*/* java/*/*/*)
 	FLAGS := --trace-a2m
 else ifeq ($(SRCLANG),typescript)
-  TARGET := ts
-	DIR := . $(wildcard typescript typescript/* typescript/*/* typescript/*/*/*)
 	FLAGS := --trace-lexer
 endif
 
-vpath %.java $(DIR)
-vpath %.mpl $(DIR)
-vpath %.c $(DIR)
-vpath %.cpp $(DIR)
-vpath %.ts $(DIR)
+DIRS := . $(shell find $(SRCLANG) -type d)
 
-.PHONY: $(TARGET)
+vpath %.java $(DIRS)
+vpath %.ts $(DIRS)
+vpath %.mpl $(DIRS)
+vpath %.c $(DIRS)
+vpath %.cpp $(DIRS)
 
-all: $(TARGET)
+.PHONY: $(SRCLANG)
 
-java:
-	./new_runtests.pl java
-
-typescript:
-	./new_runtests.pl typescript
-
-ts: typescript
-
-autogen:
-	make -C ../autogen
-
-shared: autogen
-	make -C ../shared
+$(SRCLANG):
+	./new_runtests.pl $(SRCLANG)
 
 full:
-	make -C ..
-
-clean:
-	make -C .. clean
-
-clobber:
-	make -C .. clobber
+	make -C .. -j8
 
 rebuild:
-	make -C .. rebuild
+	make -C .. rebuild -j8
+
+clean:
+	rm -rf $(build)
+
+clobber: clean
 
 dbg:
 	gdb --args ../output/java/java/java2mpl test.java $(FLAGS)
@@ -90,16 +74,3 @@ dbg:
 	@echo "========================================================\n"
 	@echo gdb --args ../output/typescript/typescript/ts2cpp $(build)/$@.ts $(FLAGS)
 
-% : %.c
-	cp $< $(build)
-	@echo "\ngdb command:\n(cd $(BUILDDIR)/autogen/; gdb -args ./sharedfe -verbose=3 ../../test/$(build)/$<)"
-	(cd $(BUILDDIR)/autogen; ./sharedfe -verbose=3 ../../test/$(build)/$<)
-	@echo "\ncommand:\n(cd $(BUILDDIR)/autogen/; ./sharedfe ../../test/$(build)/$<)"
-	@echo "\ngdb command:\n(cd $(BUILDDIR)/autogen/; gdb -args ./sharedfe -verbose=3 ../../test/$(build)/$<)"
-
-% : %.cpp
-	cp $< $(build)
-	@echo "\ngdb command:\n(cd $(BUILDDIR)/autogen/; gdb -args ./sharedfe -verbose=3 ../../test/$(build)/$<)"
-	(cd $(BUILDDIR)/autogen; ./sharedfe -verbose=3 ../../test/$(build)/$<)
-	@echo "\ncommand:\n(cd $(BUILDDIR)/autogen/; ./sharedfe ../../test/$(build)/$<)"
-	@echo "\ngdb command:\n(cd $(BUILDDIR)/autogen/; gdb -args ./sharedfe -verbose=3 ../../test/$(build)/$<)"
