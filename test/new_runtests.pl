@@ -8,7 +8,6 @@ use File::Basename;
 
 use File::Find qw(find);
 
-
 if(!(defined $ARGV[0])) {
   print "------------------------------------------------\n";
   print "usage: runtests.pl [ java | java/subdirectory | typescript | typescript/subdirectory ]\n";
@@ -19,36 +18,36 @@ if(!(defined $ARGV[0])) {
 my $lang = $ARGV[0];
 my $pwd = getcwd;
 my $currdir = "$pwd";
-my $outroot = "$currdir/../output/$lang/test";
-
-system("rm -Rf report.txt $pwd/output $pwd/diff $pwd/notexists");
-
-if(!(-e "$outroot")) {
-  system("mkdir -p $outroot");
-}
 
 my @failed_file;
 my @successed_file;
 
 my $count = 0;
 my $counttotal = 0;
-my $countfailedjava = 0;
+my $countfailedcases = 0;
 my $countsub = 0;
 
-my $pjava = 'java';
-my $ptypescript = 'typescript';
 my $pinput = '';
 my $cmnd = '';
+my $outroot = '';
 print "Running $lang\n";
-if ($lang =~ /\Q$pjava\E/) {
-  $pinput = "JAVA";
+if ($lang =~ /\Qjava\E/) {
+  $pinput = "java";
   $cmnd = "../output/java/java/java2mpl";
-} elsif ($lang =~ /\Q$ptypescript\E/) {
-  $pinput = "TYPESCRIPT";
+  $outroot = "$currdir/../output/$pinput/test";
+} elsif ($lang =~ /\Qtypescript\E/) {
+  $pinput = "ts";
   $cmnd = "../output/typescript/typescript/ts2cpp";
+  $outroot = "$currdir/../output/typescript/test";
 } else {
   print "$lang is an invalid option\n";
   exit;
+}
+
+system("rm -Rf $outroot/report.txt $outroot/diff $outroot/notexists");
+
+if(!(-e "$outroot")) {
+  system("mkdir -p $outroot");
 }
 
 opendir (my $DIR, $lang) || die "Error in opening $lang directory\n";
@@ -57,8 +56,8 @@ sub listdirs {
   my @dirs = @_;
   my @files;
 
-  if ( $pinput eq "JAVA" ) {
-    find({ wanted => sub { push @files, glob "\"$_/{*.java,*.java.result}\"" } , no_chdir => 1 }, @dirs);
+  if ( $pinput ~~ [qw( java ts )] ) {
+    find({ wanted => sub { push @files, glob "\"$_/{*.$pinput,*.$pinput.result}\"" } , no_chdir => 1 }, @dirs);
   } else {
     find({ wanted => sub { push @files, $_ } , no_chdir => 1 }, @dirs);
   }
@@ -72,12 +71,13 @@ foreach my $file (@paths) {
   my ($filename) = ( $file =~ /([^\\\/]+)$/s ) ;
   my ($pathname) = dirname($file);
 
-  if ( $pinput eq "JAVA" ) {
+  if ( $pinput ~~ [qw( java ts )] ) {
     system("cp -rp --parents $file $outroot/");
 
-    if ($filename =~ (/(.+)[.]java$/)) {
+    if ( ($filename =~ (/(.+)[.]java$/)) || ($filename =~ (/(.+)[.]ts$/)) ) {
+
       my $origresult = "$pwd/$file.result";
-      my $outresult = $file.'.result.java2mpl';
+      my $outresult = $file.'.result.'.$pinput;
       my $diff_file = $file.'.result.diff'; 
       my $notexistsdir = "$outroot/notexists";
       my $diffdir = "$outroot/diff";
@@ -93,7 +93,7 @@ foreach my $file (@paths) {
       if ($res > 0) {
         print "$pwd/$cmnd $outroot/$file\n";
         print " ==$pinput===> $file\n";
-        $countfailedjava ++;
+        $countfailedcases ++;
         push(@failed_file, $pinput.":  ".$file);
         #print "---------------------------\n";
         next;
@@ -105,7 +105,7 @@ foreach my $file (@paths) {
         }
         print "\nOriginal file $origresult does NOT exists!\n";
         system("mkdir -p $notexistsdir/$file && touch $notexistsdir/$file");
-        $countfailedjava ++;
+        $countfailedcases ++;
         push(@failed_file, $pinput.": result file not exists: ".$origresult);
       } else {
         if ((!(-e "$outroot/$outresult")) || (-z "$outroot/$outresult")) {
@@ -115,7 +115,7 @@ foreach my $file (@paths) {
 
           print "\n$outroot/$outresult either empty or not exists!\n";
           system("mkdir -p $notexistsdir/$file && touch $notexistsdir/$file");
-          $countfailedjava ++;
+          $countfailedcases ++;
           push(@failed_file, $pinput.": file empty or not exists: ".$file);
         } else {
           my $res2 = system("diff $origresult $outroot/$outresult");
@@ -126,21 +126,20 @@ foreach my $file (@paths) {
 
             print "\n$origresult $outroot/$outresult are different!!!\n";
             system("mkdir -p $diffdir/$diff_file && touch $diffdir/$diff_file");
-            $countfailedjava ++;
+            $countfailedcases ++;
             push(@failed_file, $pinput.": result files diff: ".$origresult);
           } else {
             push(@successed_file, $file." ".$pinput);
           }
         }
       }
-    }
-  } elsif ( $pinput eq "TYPESCRIPT" ) {
-    print "Run ts2cpp\n";
-  }
+    } # if #2
+
+  }  # if #1
 
 }
 
-my $countFailed = $countfailedjava;
+my $countFailed = $countfailedcases;
 my $countPassed = $count - $countFailed;
 
 my $reportFile = "$outroot/report.txt";
@@ -164,8 +163,8 @@ if ($countFailed eq 0) {
   }
   print "\n=========================\nfailed $countFailed tests:\n\n";
   if(scalar(@failed_file) > 0){
-    print("=== failed : $countfailedjava tests\n");
-    print $fh "$countfailedjava testcases failed\n";
+    print("=== failed : $countfailedcases tests\n");
+    print $fh "$countfailedcases testcases failed\n";
 
     foreach $failed (@failed_file) {
       print $failed."\n";
