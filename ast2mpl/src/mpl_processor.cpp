@@ -296,9 +296,9 @@ maple::BaseNode *A2M::ProcessFieldDecl(StmtExprKind skind, TreeNode *tnode, Bloc
 }
 
 maple::BaseNode *A2M::ProcessDecl(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
-  NOTYETIMPL("ProcessAssert()");
   DeclNode *node = static_cast<DeclNode *>(tnode);
-  return nullptr;
+  TreeNode *vars = node->GetVar();
+  return ProcessNode(skind, vars, block);
 }
 
 maple::BaseNode *A2M::ProcessAssert(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
