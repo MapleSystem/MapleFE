@@ -313,9 +313,10 @@ rule MultiplicativeExpression : ONEOF(
 ##  AdditiveExpression[?Yield] - MultiplicativeExpression[?Yield]
 
 rule AdditiveExpression : ONEOF(
-  MultiplicativeExpression)
-#  AdditiveExpression[?Yield] + MultiplicativeExpression[?Yield]
-#  AdditiveExpression[?Yield] - MultiplicativeExpression[?Yield]
+  MultiplicativeExpression,
+  AdditiveExpression + '+' + MultiplicativeExpression,
+  AdditiveExpression + '-' + MultiplicativeExpression)
+  attr.action.%2,%3 : BuildBinaryOperation(%1, %2, %3)
 
 ##-----------------------------------
 ##rule ShiftExpression[Yield] :
@@ -427,15 +428,14 @@ rule ConditionalExpression : ONEOF(
 ##  LeftHandSideExpression[?Yield] AssignmentOperator AssignmentExpression[?In, ?Yield]
 
 rule AssignmentExpression : ONEOF(
-  ConditionalExpression)
+  ConditionalExpression,
 #  [+Yield] YieldExpression[?In]
 #  ArrowFunction[?In, ?Yield]
-#  LeftHandSideExpression[?Yield] = AssignmentExpression[?In, ?Yield]
-#  LeftHandSideExpression[?Yield] AssignmentOperator AssignmentExpression[?In, ?Yield]
+  LeftHandSideExpression + '=' + AssignmentExpression,
+  LeftHandSideExpression + AssignmentOperator + AssignmentExpression)
+  attr.action.%2,%3 : BuildAssignment(%1, %2, %3)
 
-##-----------------------------------
-##rule AssignmentOperator : one of
-##  *= /= %= += -= <<= >>= >>>= &= ^= |=
+rule AssignmentOperator : ONEOF("*=", "/=", "%=", "+=", "-=", "<<=", ">>=", ">>>=", "&=", "^=", "|=")
 
 ##-----------------------------------
 ##rule Expression[In, Yield] :
