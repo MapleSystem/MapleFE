@@ -324,12 +324,11 @@ rule AdditiveExpression : ONEOF(
 ##  ShiftExpression[?Yield] << AdditiveExpression[?Yield]
 ##  ShiftExpression[?Yield] >> AdditiveExpression[?Yield]
 ##  ShiftExpression[?Yield] >>> AdditiveExpression[?Yield]
-
-rule ShiftExpression : ONEOF(
-  AdditiveExpression)
-#  ShiftExpression[?Yield] << AdditiveExpression[?Yield]
-#  ShiftExpression[?Yield] >> AdditiveExpression[?Yield]
-#  ShiftExpression[?Yield] >>> AdditiveExpression[?Yield]
+rule ShiftExpression : ONEOF(AdditiveExpression,
+                             ShiftExpression + "<<" + AdditiveExpression,
+                             ShiftExpression + ">>" + AdditiveExpression,
+                             ShiftExpression + ">>>" + AdditiveExpression)
+  attr.action.%2,%3,%4 : BuildBinaryOperation(%1, %2, %3)
 
 ##-----------------------------------
 ##rule RelationalExpression[In, Yield] :
@@ -341,14 +340,14 @@ rule ShiftExpression : ONEOF(
 ##  RelationalExpression[?In, ?Yield] instanceof ShiftExpression[?Yield]
 ##  [+In] RelationalExpression[In, ?Yield] in ShiftExpression[?Yield]
 
-rule RelationalExpression : ONEOF(
-  ShiftExpression)
-#  RelationalExpression[?In, ?Yield] < ShiftExpression[?Yield]
-#  RelationalExpression[?In, ?Yield] > ShiftExpression[?Yield]
-#  RelationalExpression[?In, ?Yield] <= ShiftExpression[? Yield]
-#  RelationalExpression[?In, ?Yield] >= ShiftExpression[?Yield]
-#  RelationalExpression[?In, ?Yield] instanceof ShiftExpression[?Yield]
+rule RelationalExpression : ONEOF(ShiftExpression,
+                                  RelationalExpression + '<' + ShiftExpression,
+                                  RelationalExpression + '>' + ShiftExpression,
+                                  RelationalExpression + "<=" + ShiftExpression,
+                                  RelationalExpression + ">=" + ShiftExpression,
+                                  RelationalExpression + "instanceof" + ShiftExpression)
 #  [+In] RelationalExpression[In, ?Yield] in ShiftExpression[?Yield]
+  attr.action.%2,%3,%4,%5,%6 : BuildBinaryOperation(%1, %2, %3)
 
 ##-----------------------------------
 ##rule EqualityExpression[In, Yield] :

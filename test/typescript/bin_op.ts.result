@@ -1,0 +1,34 @@
+Matched 7 tokens.
+Matched 14 tokens.
+Matched 19 tokens.
+Matched 25 tokens.
+Matched 31 tokens.
+Matched 37 tokens.
+Matched 43 tokens.
+Matched 49 tokens.
+Matched 54 tokens.
+Matched 60 tokens.
+Matched 66 tokens.
+============= Module ===========
+== Sub Tree ==
+Decl: a=1
+== Sub Tree ==
+Decl: b=1
+== Sub Tree ==
+Decl: c
+== Sub Tree ==
+c Assign a Add b
+== Sub Tree ==
+c Assign a Sub b
+== Sub Tree ==
+c Assign a Shr b
+== Sub Tree ==
+c Assign a Shl b
+== Sub Tree ==
+c Assign a Zext b
+== Sub Tree ==
+Decl: d
+== Sub Tree ==
+d Assign a LT b
+== Sub Tree ==
+d Assign a LE b
