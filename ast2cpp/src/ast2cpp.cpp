@@ -31,6 +31,7 @@ void A2C::ProcessAST(bool trace_a2m) {
     TreeNode *tnode = it->mRootNode;
     if (mTraceA2C) {
       tnode->Dump(0);
+      std::cout << std::endl;
     }
   }
 }
