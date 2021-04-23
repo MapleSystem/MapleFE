@@ -470,8 +470,8 @@ rule Statement : ONEOF(
 #  BlockStatement[?Yield, ?Return]
   VariableStatement,
 #  EmptyStatement
-  ExpressionStatement)
-#  IfStatement[?Yield, ?Return]
+  ExpressionStatement,
+  IfStatement)
 #  BreakableStatement[?Yield, ?Return]
 #  ContinueStatement[?Yield]
 #  BreakStatement[?Yield]
@@ -621,6 +621,14 @@ rule ExpressionStatement : Expression + ';'
 ##rule IfStatement[Yield, Return] :
 ##  if ( Expression[In, ?Yield] ) Statement[?Yield, ?Return] else Statement[?Yield, ?Return]
 ##  if ( Expression[In, ?Yield] ) Statement[?Yield, ?Return]
+rule IfStatement : ONEOF(
+  "if" + '(' + Expression + ')' + Statement + "else" + Statement,
+  "if" + '(' + Expression + ')' + Statement)
+  attr.action.%1,%2: BuildCondBranch(%3)
+  attr.action.%1,%2: AddCondBranchTrueStatement(%5)
+  attr.action.%1:    AddCondBranchFalseStatement(%7)
+
+## " // This line is to make my vim in right color
 
 ##-----------------------------------
 ##rule IterationStatement[Yield, Return] :
