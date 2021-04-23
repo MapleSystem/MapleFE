@@ -2354,7 +2354,7 @@ bool AppealNode::GetSortedChildIndex(AppealNode *child, unsigned &index) {
   MASSERT(IsTable() && "Parent node is not a RuleTable");
   RuleTable *rule_table = GetTable();
 
-  // In SimplifyShrinkEdge, the tree could be simplified and a node could be given an index
+  // In SimplifyShrinkEdges, the tree could be simplified and a node could be given an index
   // to his ancestor.
   if (child->mSimplifiedIndex != 0) {
     index = child->mSimplifiedIndex;

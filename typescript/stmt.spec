@@ -621,8 +621,9 @@ rule ExpressionStatement : Expression + ';'
 ##rule IfStatement[Yield, Return] :
 ##  if ( Expression[In, ?Yield] ) Statement[?Yield, ?Return] else Statement[?Yield, ?Return]
 ##  if ( Expression[In, ?Yield] ) Statement[?Yield, ?Return]
+rule TrueBranch : Statement
 rule IfStatement : ONEOF(
-  "if" + '(' + Expression + ')' + Statement + "else" + Statement,
+  "if" + '(' + Expression + ')' + TrueBranch + "else" + Statement,
   "if" + '(' + Expression + ')' + Statement)
   attr.action.%1,%2: BuildCondBranch(%3)
   attr.action.%1,%2: AddCondBranchTrueStatement(%5)
