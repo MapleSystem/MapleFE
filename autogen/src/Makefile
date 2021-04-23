@@ -31,6 +31,8 @@ INCLUDES := -I $(MAPLEFE_ROOT)/autogen/include \
             -I $(MAPLEFE_ROOT)/autogen \
             -I $(MAPLEFE_ROOT)/shared/include
 
+SPECS := $(wildcard $(MAPLEFE_ROOT)/$(SRCLANG)/*.spec)
+
 TARGET = autogen
 
 AUTOGENLIB = autogen.a
@@ -56,7 +58,7 @@ vpath %.d $(BUILD)
 $(BUILD)/%.o : %.cpp $(BUILD)/%.d
 	$(CXX) $(CXXFLAGS) -fpermissive $(INCLUDES) -w -c $< -o $@
 
-$(BUILD)/%.d : %.cpp
+$(BUILD)/%.d : %.cpp $(SPECS)
 	@$(CXX) $(CXXFLAGS) -std=c++11 -MM $(INCLUDES) $< > $@
 	@mv -f $(BUILD)/$*.d $(BUILD)/$*.d.tmp
 	@sed -e 's|.*:|$(BUILD)/$*.o:|' < $(BUILD)/$*.d.tmp > $(BUILD)/$*.d
