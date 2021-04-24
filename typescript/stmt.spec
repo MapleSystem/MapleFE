@@ -496,6 +496,7 @@ rule Statement : ONEOF(
 rule Declaration : ONEOF(HoistableDeclaration)
 ##  ClassDeclaration[?Yield]
 ##  LexicalDeclaration[In, ?Yield]
+  attr.property : Top
 
 ##-----------------------------------
 ##rule HoistableDeclaration[Yield, Default] :
