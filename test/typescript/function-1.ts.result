@@ -1,7 +1,10 @@
 Matched 18 tokens.
-Matched 25 tokens.
+Matched 28 tokens.
+Matched 35 tokens.
 ============= Module ===========
 == Sub Tree ==
 
+== Sub Tree ==
+Decl: c=add(1,2)
 == Sub Tree ==
 console.log(c)

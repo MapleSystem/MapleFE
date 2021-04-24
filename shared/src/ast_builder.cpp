@@ -751,24 +751,33 @@ TreeNode* ASTBuilder::AddTypeTo() {
   return node;
 }
 
-// BuildDecl takes two parameters, 1) type; 2) name
+// BuildDecl usually takes two parameters, 1) type; 2) name
+// It can also take only one parameter: name.
 TreeNode* ASTBuilder::BuildDecl() {
   if (mTrace)
     std::cout << "In BuildDecl" << std::endl;
 
-  MASSERT(mParams.size() == 2 && "BinaryDecl has NO 2 params?");
-  Param p_type = mParams[0];
-  Param p_name = mParams[1];
+  TreeNode *tree_type = NULL;
+  TreeNode *var = NULL;
 
-  MASSERT(!p_type.mIsEmpty && p_type.mIsTreeNode
-          && "Not appropriate type node in BuildDecl()");
-  TreeNode *tree_type = p_type.mData.mTreeNode;
+  if (mParams.size() == 2) {
+    Param p_type = mParams[0];
+    Param p_name = mParams[1];
+    MASSERT(!p_type.mIsEmpty && p_type.mIsTreeNode
+            && "Not appropriate type node in BuildDecl()");
+    tree_type = p_type.mData.mTreeNode;
 
-  if (!p_name.mIsTreeNode)
-    MERROR("The variable name should be a IdentifierNode already, but actually NOT?");
-  TreeNode *var = p_name.mData.mTreeNode;
+    if (!p_name.mIsTreeNode)
+      MERROR("The variable name should be a IdentifierNode already, but actually NOT?");
+    var = p_name.mData.mTreeNode;
+    add_type_to(var, tree_type);
 
-  add_type_to(var, tree_type);
+  } else {
+    Param p_name = mParams[0];
+    if (!p_name.mIsTreeNode)
+      MERROR("The variable name should be a IdentifierNode already, but actually NOT?");
+    var = p_name.mData.mTreeNode;
+  }
 
   DeclNode *decl = decl = (DeclNode*)mTreePool->NewTreeNode(sizeof(DeclNode));
   new (decl) DeclNode(var);

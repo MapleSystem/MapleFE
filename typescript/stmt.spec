@@ -570,9 +570,14 @@ rule VariableDeclarationList : ONEOF(
 ##rule VariableDeclaration[In, Yield] :
 ##  BindingIdentifier[?Yield] Initializer[?In, ?Yield]opt
 ##  BindingPattern[?Yield] Initializer[?In, ?Yield]
-rule VariableDeclaration : BindingIdentifier + ':' + TYPE + ZEROORONE(Initializer)
-  attr.action : AddInitTo(%1, %4)
-  attr.action : BuildDecl(%3, %1)
+
+# Typescript ask for explicit type. But it also allows implicit type if referrable.
+rule VariableDeclaration : ONEOF(BindingIdentifier + ':' + TYPE + ZEROORONE(Initializer),
+                                 BindingIdentifier + ZEROORONE(Initializer))
+  attr.action.%1 : AddInitTo(%1, %4)
+  attr.action.%1 : BuildDecl(%3, %1)
+  attr.action.%2 : AddInitTo(%1, %2)
+  attr.action.%2 : BuildDecl(%1)
 
 ##-----------------------------------
 ##rule BindingPattern[Yield] :
