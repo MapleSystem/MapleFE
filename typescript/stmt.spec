@@ -107,6 +107,9 @@ rule PrimaryExpression : ONEOF(
 ##  ,
 ##  Elision ,
 
+rule Elision : ONEOF(',',
+                     Elision + ',')
+
 ##-----------------------------------
 ##rule SpreadElement[Yield] :
 ##  ... AssignmentExpression[In, ?Yield]
@@ -246,9 +249,11 @@ rule Arguments : ONEOF(
 ##  ... AssignmentExpression[In, ?Yield]
 ##  ArgumentList[?Yield] , AssignmentExpression[In, ?Yield]
 ##  ArgumentList[?Yield] , ... AssignmentExpression[In, ?Yield]
-## This is for tempoary use, to enable hello world ASAP.
 
-rule ArgumentList : ONEOF(Identifier, Literal)
+rule ArgumentList : ONEOF(AssignmentExpression,
+                          "..." + AssignmentExpression,
+                          ArgumentList + ',' + AssignmentExpression,
+                          ArgumentList + ',' + "..." + AssignmentExpression)
 
 ##-----------------------------------
 ##rule LeftHandSideExpression[Yield] :
@@ -467,15 +472,15 @@ rule Expression : ONEOF(
 ##  DebuggerStatement
 
 rule Statement : ONEOF(
-#  BlockStatement[?Yield, ?Return]
+  BlockStatement,
   VariableStatement,
 #  EmptyStatement
   ExpressionStatement,
-  IfStatement)
+  IfStatement,
 #  BreakableStatement[?Yield, ?Return]
 #  ContinueStatement[?Yield]
 #  BreakStatement[?Yield]
-#  [+Return] ReturnStatement[?Yield]
+  ReturnStatement)
 #  WithStatement[?Yield, ?Return]
 #  LabelledStatement[?Yield, ?Return]
 #  ThrowStatement[?Yield]
@@ -488,10 +493,15 @@ rule Statement : ONEOF(
 ##  HoistableDeclaration[?Yield]
 ##  ClassDeclaration[?Yield]
 ##  LexicalDeclaration[In, ?Yield]
+rule Declaration : ONEOF(HoistableDeclaration)
+##  ClassDeclaration[?Yield]
+##  LexicalDeclaration[In, ?Yield]
 
 ##-----------------------------------
 ##rule HoistableDeclaration[Yield, Default] :
 ##  FunctionDeclaration[?Yield,?Default]
+##  GeneratorDeclaration[?Yield, ?Default]
+rule HoistableDeclaration : ONEOF(FunctionDeclaration)
 ##  GeneratorDeclaration[?Yield, ?Default]
 
 ##-----------------------------------
@@ -502,20 +512,25 @@ rule Statement : ONEOF(
 ##-----------------------------------
 ##rule BlockStatement[Yield, Return] :
 ##  Block[?Yield, ?Return]
+rule BlockStatement : Block
 
 ##-----------------------------------
 ##rule Block[Yield, Return] :
 ##  { StatementList[?Yield, ?Return]opt }
+rule Block : '{' + ZEROORONE(StatementList) + '}'
 
 ##-----------------------------------
 ##rule StatementList[Yield, Return] :
 ##  StatementListItem[?Yield, ?Return]
 ##  StatementList[?Yield, ?Return] StatementListItem[?Yield, ?Return]
+rule StatementList : ONEOF(StatementListItem,
+                           StatementList + StatementListItem)
 
 ##-----------------------------------
 ##rule StatementListItem[Yield, Return] :
 ##  Statement[?Yield, ?Return]
 ##  Declaration[?Yield]
+rule StatementListItem : ONEOF(Statement, Declaration)
 
 ##-----------------------------------
 ##rule LexicalDeclaration[In, Yield] :
@@ -602,14 +617,18 @@ rule ObjectBindingPattern : ONEOF('{' + '}')
 ##rule BindingElement[Yield] :
 ##  SingleNameBinding[?Yield]
 ##  BindingPattern[?Yield] Initializer[In, ?Yield]opt
+rule BindingElement : ONEOF(SingleNameBinding,
+                            BindingPattern + ZEROORONE(Initializer))
 
 ##-----------------------------------
 ##rule SingleNameBinding[Yield] :
 ##  BindingIdentifier[?Yield] Initializer[In, ?Yield]opt
+rule SingleNameBinding : BindingIdentifier + ZEROORONE(Initializer)
 
 ##-----------------------------------
 ##rule BindingRestElement[Yield] :
 ##  ... BindingIdentifier[?Yield]
+rule BindingRestElement : "..." + BindingIdentifier
 
 ##-----------------------------------
 ##rule EmptyStatement :
@@ -672,6 +691,8 @@ rule IfStatement : ONEOF(
 ##rule ReturnStatement[Yield] :
 ##  return ;
 ##  return [no LineTerminator here] Expression[In, ?Yield] ;
+rule ReturnStatement :ONEOF("return" + ';',
+                            "return" + Expression + ';')
 
 ##-----------------------------------
 ##rule WithStatement[Yield, Return] :
@@ -743,37 +764,64 @@ rule DebuggerStatement : "debugger" + ';'
 ## FunctionDeclaration[Yield, Default] :
 ## function BindingIdentifier[?Yield] ( FormalParameters ) { FunctionBody }
 ## [+Default] function ( FormalParameters ) { FunctionBody }
-## See 14.1
+rule FunctionDeclaration : ONEOF(
+  "function" + BindingIdentifier + '(' + FormalParameters + ')' + '{' + FunctionBody + '}',
+  "function" + '(' + FormalParameters + ')' + '{' + FunctionBody + '}')
+
+##
 ## FunctionExpression :
 ## function BindingIdentifieropt ( FormalParameters ) { FunctionBody }
-## See 14.1
+rule FunctionExpression : "function" + ZEROORONE(BindingIdentifier) + '(' + FormalParameters + ')' + '{' + FunctionBody + '}'
+
+##
 ## StrictFormalParameters[Yield] :
 ## FormalParameters[?Yield]
-## See 14.1
+rule StrictFormalParameters : FormalParameters
+
+##
 ## FormalParameters[Yield] :
 ## [empty]
 ## FormalParameterList[?Yield]
-## See 14.1
+rule FormalParameters : ZEROORONE(FormalParameterList)
+
+##
 ## FormalParameterList[Yield] :
 ## FunctionRestParameter[?Yield]
 ## FormalsList[?Yield]
 ## FormalsList[?Yield] , FunctionRestParameter[?Yield]
-## See 14.1
+rule FormalParameterList : ONEOF(FunctionRestParameter,
+                                 FormalsList,
+                                 FormalsList + ',' + FunctionRestParameter)
+
+##
 ## FormalsList[Yield] :
 ## FormalParameter[?Yield]
 ## FormalsList[?Yield] , FormalParameter[?Yield]
-## See 14.1
+rule FormalsList : ONEOF(FormalParameter,
+                         FormalsList + ',' + FormalParameter)
+
+##
 ## FunctionRestParameter[Yield] :
 ## BindingRestElement[?Yield]
-## See 14.1
+rule FunctionRestParameter : BindingRestElement
+
+##
 ## FormalParameter[Yield] :
 ## BindingElement[?Yield]
-## See 14.1
+
+## Typescript requires type. So this is different than JS spec.
+rule FormalParameter : BindingElement + ':' + TYPE
+
+##
 ## FunctionBody[Yield] :
 ## FunctionStatementList[?Yield]
-## See 14.1
+rule FunctionBody : FunctionStatementList
+
+##
 ## FunctionStatementList[Yield] :
 ## StatementList[?Yield, Return]opt
+rule FunctionStatementList : ZEROORONE(StatementList)
+
 ## See 14.2
 ## ArrowFunction[In, Yield] :
 ## ArrowParameters[?Yield] [no LineTerminator here] => ConciseBody[?In]
