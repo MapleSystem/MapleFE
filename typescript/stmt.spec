@@ -562,12 +562,16 @@ rule VariableDeclaration : BindingIdentifier + ':' + TYPE + ZEROORONE(Initialize
 ##rule BindingPattern[Yield] :
 ##  ObjectBindingPattern[?Yield]
 ##  ArrayBindingPattern[?Yield]
+rule BindingPattern : ONEOF(ObjectBindingPattern)
 
 ##-----------------------------------
 ##rule ObjectBindingPattern[Yield] :
 ##  { }
 ##  { BindingPropertyList[?Yield] }
 ##  { BindingPropertyList[?Yield] , }
+rule ObjectBindingPattern : ONEOF('{' + '}')
+#                                   '{' + BindingPropertyList + '}',
+#                                   '{' + BindingPropertyList + ',' + '}')
 
 ##-----------------------------------
 ##rule ArrayBindingPattern[Yield] :
@@ -726,7 +730,111 @@ rule IfStatement : ONEOF(
 ##rule CatchParameter[Yield] :
 ##  BindingIdentifier[?Yield]
 ##  BindingPattern[?Yield]
+rule CatchParameter : ONEOF(BindingIdentifier, BindingPattern)
 
 ##-----------------------------------
-##rule DebuggerStatement :
-##  debugger ;
+rule DebuggerStatement : "debugger" + ';'
+
+
+######################################################################
+##                      Function and Class
+######################################################################
+
+## FunctionDeclaration[Yield, Default] :
+## function BindingIdentifier[?Yield] ( FormalParameters ) { FunctionBody }
+## [+Default] function ( FormalParameters ) { FunctionBody }
+## See 14.1
+## FunctionExpression :
+## function BindingIdentifieropt ( FormalParameters ) { FunctionBody }
+## See 14.1
+## StrictFormalParameters[Yield] :
+## FormalParameters[?Yield]
+## See 14.1
+## FormalParameters[Yield] :
+## [empty]
+## FormalParameterList[?Yield]
+## See 14.1
+## FormalParameterList[Yield] :
+## FunctionRestParameter[?Yield]
+## FormalsList[?Yield]
+## FormalsList[?Yield] , FunctionRestParameter[?Yield]
+## See 14.1
+## FormalsList[Yield] :
+## FormalParameter[?Yield]
+## FormalsList[?Yield] , FormalParameter[?Yield]
+## See 14.1
+## FunctionRestParameter[Yield] :
+## BindingRestElement[?Yield]
+## See 14.1
+## FormalParameter[Yield] :
+## BindingElement[?Yield]
+## See 14.1
+## FunctionBody[Yield] :
+## FunctionStatementList[?Yield]
+## See 14.1
+## FunctionStatementList[Yield] :
+## StatementList[?Yield, Return]opt
+## See 14.2
+## ArrowFunction[In, Yield] :
+## ArrowParameters[?Yield] [no LineTerminator here] => ConciseBody[?In]
+## See 14.2
+## ArrowParameters[Yield] :
+## BindingIdentifier[?Yield]
+## CoverParenthesizedExpressionAndArrowParameterList[?Yield]
+## See 14.2
+## ConciseBody[In] :
+## [lookahead ≠ { ] AssignmentExpression[?In]
+## { FunctionBody }
+## 
+## See 14.3
+## MethodDefinition[Yield] :
+## PropertyName[?Yield] ( StrictFormalParameters ) { FunctionBody }
+## GeneratorMethod[?Yield]
+## get PropertyName[?Yield] ( ) { FunctionBody }
+## set PropertyName[?Yield] ( PropertySetParameterList ) { FunctionBody }
+## See 14.3
+## PropertySetParameterList :
+## FormalParameter
+## See 14.4
+## GeneratorMethod[Yield] :
+## * PropertyName[?Yield] ( StrictFormalParameters[Yield] ) { GeneratorBody }
+## See 14.4
+## GeneratorDeclaration[Yield, Default] :
+## function * BindingIdentifier[?Yield] ( FormalParameters[Yield] ) { GeneratorBody }
+## [+Default] function * ( FormalParameters[Yield] ) { GeneratorBody }
+## See 14.4
+## GeneratorExpression :
+## function * BindingIdentifier[Yield]opt ( FormalParameters[Yield] ) { GeneratorBody }
+## See 14.4
+## GeneratorBody :
+## FunctionBody[Yield]
+## See 14.4
+## YieldExpression[In] :
+## yield
+## yield [no LineTerminator here] AssignmentExpression[?In, Yield]
+## yield [no LineTerminator here] * AssignmentExpression[?In, Yield]
+## See 14.5
+## ClassDeclaration[Yield, Default] :
+## class BindingIdentifier[?Yield] ClassTail[?Yield]
+## [+Default] class ClassTail[?Yield]
+## See 14.5
+## ClassExpression[Yield] :
+## class BindingIdentifier[?Yield]opt ClassTail[?Yield]
+## See 14.5
+## ClassTail[Yield] :
+## ClassHeritage[?Yield]opt { ClassBody[?Yield]opt }
+## See 14.5
+## ClassHeritage[Yield] :
+## extends LeftHandSideExpression[?Yield]
+## See 14.5
+## ClassBody[Yield] :
+## ClassElementList[?Yield]
+## See 14.5
+## ClassElementList[Yield] :
+## ClassElement[?Yield]
+## ClassElementList[?Yield] ClassElement[?Yield]
+## See 14.5
+## ClassElement[Yield] :
+## MethodDefinition[?Yield]
+## static MethodDefinition[?Yield]
+## ;
