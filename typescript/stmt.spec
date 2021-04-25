@@ -775,6 +775,7 @@ rule FunctionDeclaration : ONEOF(
   "function" + '(' + FormalParameters + ')' + '{' + FunctionBody + '}')
   attr.action.%1 : BuildFunction(%2)
   attr.action.%1 : AddParams(%4)
+  attr.action.%1 : AddFunctionBody(%7)
 
 ##
 ## FunctionExpression :
@@ -825,6 +826,7 @@ rule FormalParameter : BindingElement + ':' + TYPE
 ## FunctionBody[Yield] :
 ## FunctionStatementList[?Yield]
 rule FunctionBody : FunctionStatementList
+  attr.action : BuildBlock(%1)
 
 ##
 ## FunctionStatementList[Yield] :
