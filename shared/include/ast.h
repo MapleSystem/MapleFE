@@ -375,15 +375,29 @@ public:
 // The type info and init expr are both inside the IdentifierNode.
 // DeclNode only tells this is a declaration.
 //////////////////////////////////////////////////////////////////////////
+
+// special property of Javascript
+enum DeclProp {
+  JS_Var,
+  JS_Let,
+  JS_Const,
+  DP_NA
+};
+
 class DeclNode : public TreeNode {
 private:
   TreeNode *mVar;
+  DeclProp  mProp;
 public:
-  DeclNode() : mVar(NULL) {mKind = NK_Decl;}
-  DeclNode(TreeNode *id) : mVar(id) {mKind = NK_Decl;}
+  DeclNode() : mVar(NULL), mProp(DP_NA) {mKind = NK_Decl;}
+  DeclNode(TreeNode *id) : mVar(id), mProp(DP_NA) {mKind = NK_Decl;}
   ~DeclNode(){}
 
   TreeNode* GetVar(){return mVar;}
+
+  DeclProp GetProp() {return mProp;}
+  void SetProp(DeclProp p) {mProp = p;}
+
   void Dump(unsigned);
 };
 

@@ -99,6 +99,9 @@ public:
   TreeNode* BuildInstanceOf();
 
   TreeNode* BuildDecl();
+  TreeNode* SetJSVar();
+  TreeNode* SetJSLet();
+  TreeNode* SetJSConst();
   TreeNode* BuildField();
   TreeNode* BuildVarList();
 

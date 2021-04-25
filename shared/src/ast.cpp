@@ -544,6 +544,19 @@ void IdentifierNode::Dump(unsigned indent) {
 
 void DeclNode::Dump(unsigned indent) {
   DumpIndentation(indent);
+  switch (mProp) {
+  case JS_Var:
+    DUMP0_NORETURN("js_var ");
+    break;
+  case JS_Let:
+    DUMP0_NORETURN("js_let ");
+    break;
+  case JS_Const:
+    DUMP0_NORETURN("js_const ");
+    break;
+  default:
+    break;
+  }
   DUMP0_NORETURN("Decl: ");
   mVar->Dump(0);
 }

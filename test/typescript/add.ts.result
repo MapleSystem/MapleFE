@@ -4,10 +4,10 @@ Matched 19 tokens.
 Matched 25 tokens.
 ============= Module ===========
 == Sub Tree ==
-Decl: a=1
+js_var Decl: a=1
 == Sub Tree ==
-Decl: b=1
+js_var Decl: b=1
 == Sub Tree ==
-Decl: c
+js_var Decl: c
 == Sub Tree ==
 c Assign a Add b

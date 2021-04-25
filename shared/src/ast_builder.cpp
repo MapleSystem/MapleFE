@@ -786,6 +786,27 @@ TreeNode* ASTBuilder::BuildDecl() {
   return decl;
 }
 
+TreeNode* ASTBuilder::SetJSVar() {
+  MASSERT(mLastTreeNode->IsDecl());
+  DeclNode *decl = (DeclNode*)mLastTreeNode;
+  decl->SetProp(JS_Var);
+  return mLastTreeNode;
+}
+
+TreeNode* ASTBuilder::SetJSLet() {
+  MASSERT(mLastTreeNode->IsDecl());
+  DeclNode *decl = (DeclNode*)mLastTreeNode;
+  decl->SetProp(JS_Let);
+  return mLastTreeNode;
+}
+
+TreeNode* ASTBuilder::SetJSConst() {
+  MASSERT(mLastTreeNode->IsDecl());
+  DeclNode *decl = (DeclNode*)mLastTreeNode;
+  decl->SetProp(JS_Const);
+  return mLastTreeNode;
+}
+
 // BuildField takes two parameters,
 // 1) upper enclosing node, could be another field.
 // 2) name of this field.

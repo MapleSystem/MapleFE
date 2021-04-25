@@ -51,6 +51,10 @@ ACTION(BuildInstanceOf)
 
 // For variable declaration, expression
 ACTION(BuildDecl)
+ACTION(SetJSVar)
+ACTION(SetJSLet)
+ACTION(SetJSConst)
+
 ACTION(BuildField)
 ACTION(BuildVarList)
 

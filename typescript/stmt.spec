@@ -539,6 +539,8 @@ rule StatementListItem : ONEOF(Statement, Declaration)
 rule LexicalDeclaration : ONEOF("let" + BindingList + ';',
                                 "const" + BindingList + ';')
   attr.action.%1,%2 : BuildDecl(%2)
+  attr.action.%1    : SetJSLet()
+  attr.action.%2    : SetJSConst()
 
 ##-----------------------------------
 ##rule LetOrConst :
@@ -589,8 +591,10 @@ rule VariableDeclaration : ONEOF(BindingIdentifier + ':' + TYPE + ZEROORONE(Init
                                  BindingIdentifier + ZEROORONE(Initializer))
   attr.action.%1 : AddInitTo(%1, %4)
   attr.action.%1 : BuildDecl(%3, %1)
+  attr.action.%1 : SetJSVar()
   attr.action.%2 : AddInitTo(%1, %2)
   attr.action.%2 : BuildDecl(%1)
+  attr.action.%2 : SetJSVar()
 
 ##-----------------------------------
 ##rule BindingPattern[Yield] :
