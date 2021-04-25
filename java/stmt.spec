@@ -575,9 +575,9 @@ rule MethodBody        : ONEOF(Block, ';')
 rule MethodHeader      : ONEOF(Result + MethodDeclarator + ZEROORONE(Throws),
                                TypeParameters + ZEROORMORE(Annotation) + Result + MethodDeclarator +
                                ZEROORONE(Throws))
-  attr.action.%1: AddTypeTo(%2, %1)
+  attr.action.%1: AddType(%2, %1)
   attr.action.%1: AddThrowsTo(%2, %3)
-  attr.action.%2: AddTypeTo(%4, %3)
+  attr.action.%2: AddType(%4, %3)
   attr.action.%2: AddThrowsTo(%4, %5)
   attr.property : Single
 

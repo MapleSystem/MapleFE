@@ -729,25 +729,37 @@ TreeNode* ASTBuilder::BuildSwitch() {
 //    We need have a list of pending declarations until the scope is created.
 ////////////////////////////////////////////////////////////////////////////////
 
-// AddTypeTo takes two parameters, 1) tree; 2) type
-TreeNode* ASTBuilder::AddTypeTo() {
+// AddType takes two parameters, 1) tree; 2) type
+// or takes one parameter, type
+
+TreeNode* ASTBuilder::AddType() {
   if (mTrace)
-    std::cout << "In AddTypeTo " << std::endl;
+    std::cout << "In AddType " << std::endl;
 
-  MASSERT(mParams.size() == 2 && "BinaryDecl has NO 2 params?");
-  Param p_type = mParams[1];
-  Param p_name = mParams[0];
+  TreeNode *node = NULL;
+  TreeNode *tree_type = NULL;
 
-  MASSERT(!p_type.mIsEmpty && p_type.mIsTreeNode
-          && "Not appropriate type node in AddTypeTo()");
-  TreeNode *tree_type = p_type.mData.mTreeNode;
+  if (mParams.size() == 2) {
+    Param p_type = mParams[1];
+    Param p_name = mParams[0];
 
-  if (!p_name.mIsTreeNode)
-    MERROR("The variable name should be a IdentifierNode already, but actually NOT?");
-  TreeNode *node = p_name.mData.mTreeNode;
+    MASSERT(!p_type.mIsEmpty && p_type.mIsTreeNode
+            && "Not appropriate type node in AddType()");
+    tree_type = p_type.mData.mTreeNode;
+
+    if (!p_name.mIsTreeNode)
+      MERROR("The variable name should be a IdentifierNode already, but actually NOT?");
+    node = p_name.mData.mTreeNode;
+
+  } else {
+    Param p_type = mParams[0];
+    MASSERT(!p_type.mIsEmpty && p_type.mIsTreeNode
+            && "Not appropriate type node in AddType()");
+    tree_type = p_type.mData.mTreeNode;
+    node = mLastTreeNode;
+  }
 
   add_type_to(node, tree_type);
-
   return node;
 }
 

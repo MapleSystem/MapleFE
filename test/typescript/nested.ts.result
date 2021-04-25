@@ -1,0 +1,16 @@
+Matched 7 tokens.
+Matched 43 tokens.
+Matched 53 tokens.
+============= Module ===========
+== Sub Tree ==
+js_let Decl: x=10
+== Sub Tree ==
+func  outer(y)  throws: 
+  js_let Decl: x=20
+  func  inner()  throws: 
+    return x Add y
+
+  return inner()
+
+== Sub Tree ==
+console.log(outer(100))

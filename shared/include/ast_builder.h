@@ -106,7 +106,7 @@ public:
   TreeNode* BuildVarList();
 
   TreeNode* AddInitTo();
-  TreeNode* AddTypeTo();
+  TreeNode* AddType();
   TreeNode* AddModifier();
   TreeNode* AddModifierTo();
 

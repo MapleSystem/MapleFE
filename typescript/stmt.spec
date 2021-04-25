@@ -565,7 +565,7 @@ rule LexicalBinding : ONEOF(BindingIdentifier + ZEROORONE(Initializer),
                             BindingPattern    + ":" + TYPE + ZEROORONE(Initializer))
   attr.action.%1,%3 : AddInitTo(%1, %2)
   attr.action.%2,%4 : AddInitTo(%1, %4)
-  attr.action.%2,%4 : AddTypeTo(%1, %3)
+  attr.action.%2,%4 : AddType(%1, %3)
 
 ##-----------------------------------
 ##rule VariableStatement[Yield] :
@@ -716,6 +716,7 @@ rule IfStatement : ONEOF(
 ##  return [no LineTerminator here] Expression[In, ?Yield] ;
 rule ReturnStatement :ONEOF("return" + ';',
                             "return" + Expression + ';')
+  attr.action.%2 : BuildReturn(%2)
 
 ##-----------------------------------
 ##rule WithStatement[Yield, Return] :
@@ -787,12 +788,17 @@ rule DebuggerStatement : "debugger" + ';'
 ## FunctionDeclaration[Yield, Default] :
 ## function BindingIdentifier[?Yield] ( FormalParameters ) { FunctionBody }
 ## [+Default] function ( FormalParameters ) { FunctionBody }
+
+## Typescript sometimes requires explicit type if it cannot be inferred.
 rule FunctionDeclaration : ONEOF(
   "function" + BindingIdentifier + '(' + FormalParameters + ')' + '{' + FunctionBody + '}',
+  "function" + BindingIdentifier + '(' + FormalParameters + ')' + ':' + TYPE + '{' + FunctionBody + '}',
   "function" + '(' + FormalParameters + ')' + '{' + FunctionBody + '}')
-  attr.action.%1 : BuildFunction(%2)
-  attr.action.%1 : AddParams(%4)
+  attr.action.%1,%2 : BuildFunction(%2)
+  attr.action.%1,%2 : AddParams(%4)
   attr.action.%1 : AddFunctionBody(%7)
+  attr.action.%2 : AddType(%7)
+  attr.action.%2 : AddFunctionBody(%9)
 
 ##
 ## FunctionExpression :

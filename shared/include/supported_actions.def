@@ -81,7 +81,7 @@ ACTION(BuildInstInit)
 ACTION(AddModifier)
 ACTION(AddModifierTo)
 ACTION(AddInitTo)
-ACTION(AddTypeTo)
+ACTION(AddType)
 
 // Annotation.
 ACTION(BuildAnnotationType)

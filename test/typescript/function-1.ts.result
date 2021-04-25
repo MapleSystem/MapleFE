@@ -4,7 +4,7 @@ Matched 35 tokens.
 ============= Module ===========
 == Sub Tree ==
 func  add(a,b)  throws: 
-  a Add b
+  return a Add b
 
 == Sub Tree ==
 js_var Decl: c=add(1,2)
