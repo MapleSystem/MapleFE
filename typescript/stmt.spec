@@ -493,9 +493,9 @@ rule Statement : ONEOF(
 ##  HoistableDeclaration[?Yield]
 ##  ClassDeclaration[?Yield]
 ##  LexicalDeclaration[In, ?Yield]
-rule Declaration : ONEOF(HoistableDeclaration)
+rule Declaration : ONEOF(HoistableDeclaration,
 ##  ClassDeclaration[?Yield]
-##  LexicalDeclaration[In, ?Yield]
+                         LexicalDeclaration)
   attr.property : Top
 
 ##-----------------------------------
@@ -536,21 +536,34 @@ rule StatementListItem : ONEOF(Statement, Declaration)
 ##-----------------------------------
 ##rule LexicalDeclaration[In, Yield] :
 ##  LetOrConst BindingList[?In, ?Yield] ;
+rule LexicalDeclaration : ONEOF("let" + BindingList + ';',
+                                "const" + BindingList + ';')
+  attr.action.%1,%2 : BuildDecl(%2)
 
 ##-----------------------------------
 ##rule LetOrConst :
 ##  let
 ##  const
+rule LetOrConst : ONEOF("let", "const")
 
 ##-----------------------------------
 ##rule BindingList[In, Yield] :
 ##  LexicalBinding[?In, ?Yield]
 ##  BindingList[?In, ?Yield] , LexicalBinding[?In, ?Yield]
+rule BindingList : ONEOF(LexicalBinding,
+                         BindingList + ',' + LexicalBinding)
 
 ##-----------------------------------
 ##rule LexicalBinding[In, Yield] :
 ##  BindingIdentifier[?Yield] Initializer[?In, ?Yield]opt
 ##  BindingPattern[?Yield] Initializer[?In, ?Yield]
+rule LexicalBinding : ONEOF(BindingIdentifier + ZEROORONE(Initializer),
+                            BindingIdentifier + ":" + TYPE + ZEROORONE(Initializer),
+                            BindingPattern    + ZEROORONE(Initializer),
+                            BindingPattern    + ":" + TYPE + ZEROORONE(Initializer))
+  attr.action.%1,%3 : AddInitTo(%1, %2)
+  attr.action.%2,%4 : AddInitTo(%1, %4)
+  attr.action.%2,%4 : AddTypeTo(%1, %3)
 
 ##-----------------------------------
 ##rule VariableStatement[Yield] :
