@@ -3,6 +3,7 @@ Matched 28 tokens.
 Matched 35 tokens.
 ============= Module ===========
 == Sub Tree ==
+func  add(a,b)  throws: 
 
 == Sub Tree ==
 Decl: c=add(1,2)

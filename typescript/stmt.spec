@@ -773,6 +773,8 @@ rule DebuggerStatement : "debugger" + ';'
 rule FunctionDeclaration : ONEOF(
   "function" + BindingIdentifier + '(' + FormalParameters + ')' + '{' + FunctionBody + '}',
   "function" + '(' + FormalParameters + ')' + '{' + FunctionBody + '}')
+  attr.action.%1 : BuildFunction(%2)
+  attr.action.%1 : AddParams(%4)
 
 ##
 ## FunctionExpression :
@@ -817,6 +819,7 @@ rule FunctionRestParameter : BindingRestElement
 
 ## Typescript requires type. So this is different than JS spec.
 rule FormalParameter : BindingElement + ':' + TYPE
+  attr.action : BuildDecl(%3, %1)
 
 ##
 ## FunctionBody[Yield] :
