@@ -493,8 +493,8 @@ public:
 
 //////////////////////////////////////////////////////////////////////////
 //                           FieldNode
-// This is used for field reference. It includes both member field and
-// member function.
+// This is used for field reference. The field could be a member field or
+// a member function.
 //////////////////////////////////////////////////////////////////////////
 
 class FieldNode : public TreeNode {
@@ -518,6 +518,39 @@ public:
     mUpper = up;
   }
 
+  void Dump(unsigned);
+};
+
+//////////////////////////////////////////////////////////////////////////
+//                           Struct Node
+// This is first coming from C struct. Typescript 'interface' has the
+// similar structure.
+//////////////////////////////////////////////////////////////////////////
+
+enum StructProp {
+  SProp_CStruct,
+  SProp_TSInterface,
+  SProp_NA
+};
+
+class StructNode : public TreeNode {
+private:
+  StructProp      mProp;
+  IdentifierNode *mName;
+  SmallVector<IdentifierNode*> mFields;
+public:
+  StructNode() {mKind = NK_Struct; mName = NULL; mProp = SProp_NA;}
+  StructNode(IdentifierNode *n) {mKind = NK_Struct; mName = n; mProp = SProp_NA;}
+  ~StructNode() {}
+
+  void SetName(IdentifierNode *n) {mName = n;}
+  void SetProp(StructProp p) {mProp = p;}
+
+  unsigned        FieldsNum() {return mFields.GetNum();}
+  IdentifierNode* GetField(unsigned i) {return mFields.ValueAtIndex(i);}
+  void            AddField(IdentifierNode *n) {mFields.PushBack(n);}
+
+  void Release() {mFields.Release();}
   void Dump(unsigned);
 };
 

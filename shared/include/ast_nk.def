@@ -31,6 +31,8 @@ NODEKIND(UserType)
 NODEKIND(Cast)
 NODEKIND(Parenthesis)
 
+NODEKIND(Struct)
+
 // VarList is for identifier list only.
 // ExprList is for all kinds of node.
 NODEKIND(VarList)

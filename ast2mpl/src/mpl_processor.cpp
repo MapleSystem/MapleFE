@@ -799,6 +799,12 @@ maple::BaseNode *A2M::ProcessInterface(StmtExprKind skind, TreeNode *tnode, Bloc
   return nullptr;
 }
 
+maple::BaseNode *A2M::ProcessStruct(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
+  NOTYETIMPL("ProcessStruct()");
+  StructNode *node = static_cast<StructNode *>(tnode);
+  return nullptr;
+}
+
 maple::BaseNode *A2M::ProcessAnnotationType(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
   NOTYETIMPL("ProcessAnnotationType()");
   AnnotationTypeNode *node = static_cast<AnnotationTypeNode *>(tnode);

@@ -98,6 +98,10 @@ public:
   TreeNode* BuildLambda();
   TreeNode* BuildInstanceOf();
 
+  TreeNode* BuildStruct();
+  TreeNode* SetTSInterface();
+  TreeNode* AddStructField();
+
   TreeNode* BuildDecl();
   TreeNode* SetJSVar();
   TreeNode* SetJSLet();

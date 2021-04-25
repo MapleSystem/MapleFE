@@ -819,6 +819,63 @@ TreeNode* ASTBuilder::SetJSConst() {
   return mLastTreeNode;
 }
 
+//////////////////////////////////////////////////////////////////////////////////
+//                         StructNode
+//////////////////////////////////////////////////////////////////////////////////
+
+// It takes only one parameter: name.
+TreeNode* ASTBuilder::BuildStruct() {
+  if (mTrace)
+    std::cout << "In BuildStruct" << std::endl;
+
+  Param p_name = mParams[0];
+  MASSERT(p_name.mIsTreeNode);
+  TreeNode *name = p_name.mData.mTreeNode;
+  MASSERT(name->IsIdentifier());
+
+  StructNode *struct_node = (StructNode*)mTreePool->NewTreeNode(sizeof(StructNode));
+  new (struct_node) StructNode((IdentifierNode*)name);
+
+  mLastTreeNode = struct_node;
+  return mLastTreeNode;
+}
+
+// It takes only one parameter: Field.
+TreeNode* ASTBuilder::AddStructField() {
+  if (mTrace)
+    std::cout << "In AddStructField" << std::endl;
+  Param p_field = mParams[0];
+  MASSERT(p_field.mIsTreeNode);
+  TreeNode *field = p_field.mData.mTreeNode;
+
+  MASSERT(mLastTreeNode->IsStruct());
+  StructNode *struct_node = (StructNode*)mLastTreeNode;
+
+  if (field->IsPass()) {
+    PassNode *pass = (PassNode*)field;
+    for (unsigned i = 0; i < pass->GetChildrenNum(); i++) {
+      TreeNode *child = pass->GetChild(i);
+      MASSERT(child->IsIdentifier());
+      struct_node->AddField((IdentifierNode*)child);
+    }
+  } else if (field->IsIdentifier()) {
+    struct_node->AddField((IdentifierNode*)field);
+  } else
+    MERROR("Unsupported struct field type.");
+
+  return mLastTreeNode;
+}
+
+TreeNode* ASTBuilder::SetTSInterface() {
+  MASSERT(mLastTreeNode->IsStruct());
+  StructNode *s = (StructNode*)mLastTreeNode;
+  s->SetProp(SProp_TSInterface);
+  return mLastTreeNode;
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////
+
 // BuildField takes two parameters,
 // 1) upper enclosing node, could be another field.
 // 2) name of this field.

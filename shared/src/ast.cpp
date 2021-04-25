@@ -562,6 +562,32 @@ void DeclNode::Dump(unsigned indent) {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
+//                          StructNode
+//////////////////////////////////////////////////////////////////////////////////////
+
+void StructNode::Dump(unsigned indent) {
+  DumpIndentation(indent);
+  switch (mProp) {
+  case SProp_CStruct:
+    DUMP0_NORETURN("struct: ");
+    break;
+  case SProp_TSInterface:
+    DUMP0_NORETURN("ts_interface: ");
+    break;
+  default:
+    break;
+  }
+  mName->Dump(0);
+  DUMP0_NORETURN(" {");
+  for (unsigned i = 0; i < mFields.GetNum(); i++) {
+    mFields.ValueAtIndex(i)->Dump(0);
+    if (i != mFields.GetNum()-1)
+      DUMP0_NORETURN(";");
+  }
+  DUMP0_NORETURN(" }");
+}
+
+//////////////////////////////////////////////////////////////////////////////////////
 //                          VarListNode
 //////////////////////////////////////////////////////////////////////////////////////
 

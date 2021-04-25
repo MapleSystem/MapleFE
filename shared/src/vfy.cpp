@@ -428,4 +428,8 @@ void Verifier::VerifyLambda(LambdaNode *tree){
 void Verifier::VerifyInstanceOf(InstanceOfNode *tree){
   return;
 }
+
+void Verifier::VerifyStruct(StructNode *tree){
+  return;
+}
 }

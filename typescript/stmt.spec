@@ -495,7 +495,8 @@ rule Statement : ONEOF(
 ##  LexicalDeclaration[In, ?Yield]
 rule Declaration : ONEOF(HoistableDeclaration,
 ##  ClassDeclaration[?Yield]
-                         LexicalDeclaration)
+                         LexicalDeclaration,
+                         InterfaceDeclaration)
   attr.property : Top
 
 ##-----------------------------------
@@ -920,3 +921,14 @@ rule FunctionStatementList : ZEROORONE(StatementList)
 ## MethodDefinition[?Yield]
 ## static MethodDefinition[?Yield]
 ## ;
+
+
+#############################################################################
+##                        Typescript specific
+#############################################################################
+rule ObjectField : BindingIdentifier + ':' + TYPE
+  attr.action : AddType(%1, %3)
+rule InterfaceDeclaration : "interface" + BindingIdentifier + '{' + ZEROORMORE(ObjectField + ';') + '}'
+  attr.action : BuildStruct(%2)
+  attr.action : SetTSInterface()
+  attr.action : AddStructField(%4)

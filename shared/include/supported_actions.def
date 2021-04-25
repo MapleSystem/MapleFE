@@ -58,6 +58,11 @@ ACTION(SetJSConst)
 ACTION(BuildField)
 ACTION(BuildVarList)
 
+// For struct
+ACTION(BuildStruct)
+ACTION(SetTSInterface)
+ACTION(AddStructField)
+
 // For function
 ACTION(AddParams)
 ACTION(BuildFunction)
