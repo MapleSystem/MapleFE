@@ -562,7 +562,7 @@ void DeclNode::Dump(unsigned indent) {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
-//                          StructNode
+//                          StructNode and StructLiteralNode
 //////////////////////////////////////////////////////////////////////////////////////
 
 void StructNode::Dump(unsigned indent) {
@@ -585,6 +585,20 @@ void StructNode::Dump(unsigned indent) {
       DUMP0_NORETURN(";");
   }
   DUMP0_NORETURN(" }");
+}
+
+void StructLiteralNode::Dump(unsigned indent) {
+  DumpIndentation(indent);
+  DUMP0_NORETURN(" {");
+  for (unsigned i = 0; i < mFields.GetNum(); i++) {
+    FieldLiteral fl = GetField(i);
+    fl.mFieldName->Dump(0);
+    DUMP0_NORETURN(":");
+    fl.mLiteral->Dump(0);
+    if (i != mFields.GetNum()-1)
+      DUMP0_NORETURN(", ");
+  }
+  DUMP0_NORETURN("}");
 }
 
 //////////////////////////////////////////////////////////////////////////////////////

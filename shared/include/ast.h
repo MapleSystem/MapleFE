@@ -541,7 +541,7 @@ private:
 public:
   StructNode() {mKind = NK_Struct; mName = NULL; mProp = SProp_NA;}
   StructNode(IdentifierNode *n) {mKind = NK_Struct; mName = n; mProp = SProp_NA;}
-  ~StructNode() {}
+  ~StructNode() {Release();}
 
   void SetName(IdentifierNode *n) {mName = n;}
   void SetProp(StructProp p) {mProp = p;}
@@ -551,6 +551,27 @@ public:
   void            AddField(IdentifierNode *n) {mFields.PushBack(n);}
 
   void Release() {mFields.Release();}
+  void Dump(unsigned);
+};
+
+// We define StructLiteral for C/C++ struct literal, TS/JS object literal.
+// It contains a list of duple <fieldname, value>
+struct FieldLiteral {
+  IdentifierNode *mFieldName;
+  TreeNode       *mLiteral;
+};
+
+class StructLiteralNode : public TreeNode {
+private:
+  SmallVector<FieldLiteral> mFields;
+public:
+  StructLiteralNode() {mKind = NK_StructLiteral;}
+  ~StructLiteralNode(){Release();}
+
+  unsigned     GetFieldsNum() {return mFields.GetNum();}
+  FieldLiteral GetField(unsigned i) {return mFields.ValueAtIndex(i);}
+  void         AddField(FieldLiteral d) {mFields.PushBack(d);}
+
   void Dump(unsigned);
 };
 
