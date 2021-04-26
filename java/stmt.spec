@@ -76,8 +76,6 @@ rule TypeArgumentsOrDiamond : ONEOF(
   TypeArguments,
   "<>")
 
-rule ArgumentList : Expression + ZEROORMORE(',' + Expression)
-
 rule ArrayInitializer : '{' + ZEROORONE(VariableInitializerList) + ZEROORONE(',') + '}'
 rule ArrayCreationExpression : ONEOF(
   "new" + PrimitiveType + DimExprs + ZEROORONE(Dims),
