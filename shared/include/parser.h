@@ -38,7 +38,7 @@ class TableData;
 class ASTTree;
 class TreeNode;
 
-typedef enum {
+typedef enum AppealStatus {
   FailWasFailed,
   FailNotRightToken,
   FailNotIdentifier,

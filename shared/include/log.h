@@ -13,7 +13,7 @@
 * See the Mulan PSL v2 for more details.
 */
 /////////////////////////////////////////////////////////////////////
-// Log file 
+// Log file
 //
 /////////////////////////////////////////////////////////////////////
 
@@ -34,7 +34,7 @@ private:
   std::ofstream mFile;
 
 public:
-  typedef enum {
+  typedef enum Level {
     LOG_NONE,
     LOG_DEBUG,
     LOG_INFO,
@@ -42,10 +42,10 @@ public:
     LOG_ERROR,
     LOG_FATAL
   }Level;
-  
+
   Log() {mFile.open("log");}
   ~Log(){mFile.close();}
-  
+
 
   Log& operator<<(float f);
   Log& operator<<(int i);

@@ -102,7 +102,7 @@ WriteStatus LineBuffer::AddInteger(int i) {
   unsigned digits = 0;
   if (i < 0) {
     digits = 1;
-  } 
+  }
 
   digits += NumDigits(i);
 
@@ -166,12 +166,12 @@ char* RectBuffer::GetNextAvailLine() {
 
   if (CurrentLineEmpty())
     return mCurrLine;
-  
+
   unsigned mask = (1 << LINES_PER_BLOCK) - 1;
   unsigned line = (mUsed & mask) + 1;
   unsigned log2line = (unsigned)log2(line);
   char *addr = mData + MAX_LINE_LIMIT * log2line;
-  mUsed = mUsed | line; 
+  mUsed = mUsed | line;
 
   mCurrLine = addr;
   mCurrLineSize = 0;
@@ -212,7 +212,7 @@ WriteStatus RectBuffer::AddInteger(int i) {
   // take '-' into account.
   if (i < 0) {
     digits = 1;
-  } 
+  }
 
   digits += NumDigits(i);
   left -= digits;
@@ -238,7 +238,7 @@ WriteStatus RectBuffer::AddString(const char *str){
   // std::string data(indentation);
   // data = data + str;
   // str = data.c_str();
-  
+
   char *pos = mCurrLine + mCurrLineSize;
   unsigned left = MAX_LINE_LIMIT - mCurrLineSize;
   unsigned len = strlen(str);
@@ -404,7 +404,7 @@ char* FormattedBuffer::NewLine() {
     // default constructor of OneBuffer will allocate a new RectBuffer
     ob = NewOneBuffer();
   }
-  return ob->GetNextAvailLine(); 
+  return ob->GetNextAvailLine();
 }
 
 // Open a new line for comment, return the addr of the line.
@@ -473,7 +473,7 @@ void FormattedBuffer::AddStringWholeLine(const char *str){
 void FormattedBuffer::AddNestedBuffer(FormattedBuffer *nested) {
   OneBuffer *ob = new OneBuffer(nested);
   mBuffers.push_back(ob);
-  return; 
+  return;
 }
 
 // wipe existing data, fill with whitespace.
@@ -490,7 +490,7 @@ void FormattedBuffer::ClearLine(char *line) {
 
 // the enum structure will have the following pattern. The following is
 // for Separator.
-//      typedef enum {
+//      typedef enum SepId {
 //        SEP_Xxx,
 //        ...
 //        SEP_Null
@@ -514,15 +514,15 @@ void EnumBuffer::Generate(BaseGen *bg, const char *last_item){
       else
         elem = elem + ",";
     AddString(elem);
-  } 
+  }
   NewLine();
   AddString(last_item);
- 
+
   DecIndent();
   const std::string name = bg->EnumName();
   std::string s = "}" + name + ";";
   NewOneBuffer(s.size(), true);  // a separate LineBuffer
-  AddString(s); 
+  AddString(s);
 
   return;
 }
@@ -602,7 +602,7 @@ void TableBuffer::Generate(BaseGen *bg, const std::string decl){
       else
         elem = elem + ",";
     AddString(elem);
-  } 
+  }
 
   DecIndent();
   return;

@@ -14,7 +14,7 @@
 */
 #ifndef SPERC_TOKENS_H
 #define SPERC_TOKENS_H
-typedef enum {
+typedef enum SPECTokenKind {
   SPECTK_Invalid,
   // keywords
   #define KEYWORD(S,T) SPECTK_##T,

@@ -25,7 +25,7 @@ namespace maplefe {
 // NOTE: autogen also relies on this set of supported separators
 #undef  TYPE
 #define TYPE(T) TY_##T,
-typedef enum {
+typedef enum TypeId {
 #include "supported_types.def"
 TY_NA
 }TypeId;
@@ -34,7 +34,7 @@ TY_NA
 // NOTE: autogen also relies on this set of supported separators
 #undef  SEPARATOR
 #define SEPARATOR(T) SEP_##T,
-typedef enum {
+typedef enum SepId {
 #include "supported_separators.def"
 SEP_NA
 }SepId;
@@ -43,16 +43,16 @@ SEP_NA
 // NOTE: autogen also relies on this set of supported operators.
 #undef  OPERATOR
 #define OPERATOR(T, D) OPR_##T,
-typedef enum {
+typedef enum OprId {
 #include "supported_operators.def"
 OPR_NA
 }OprId;
 
 #define LITERAL(T) LT_##T,
-typedef enum {
+typedef enum LitId {
 #include "supported_literals.def"
   LT_NA     // N/A, in java, Null is legal type with only one value 'null'
-            // reference, a literal. So LT_Null is actually legal. 
+            // reference, a literal. So LT_Null is actually legal.
             // So I put LT_NA for the illegal literal
 }LitId;
 

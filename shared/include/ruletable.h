@@ -14,7 +14,7 @@
 */
 //////////////////////////////////////////////////////////////////////////
 // This file contains all the information to describe the tables that
-// autogen creates. 
+// autogen creates.
 //////////////////////////////////////////////////////////////////////////
 
 #ifndef __RULE_TABLE_H__
@@ -36,11 +36,11 @@ namespace maplefe {
 //       keyword, separator, operator with tokens. This happens in memory.
 // The reason we need token is to save the time of matching a rule. Lexer
 // returns a set of tokens, so it's faster if parts of a rule are tokens
-// to compare. 
+// to compare.
 ///////////////////////////////////////////////////////////////////////////
 
 // The list of RuleTable Entry types
-typedef enum {
+typedef enum EntryType {
   ET_Oneof,      // one of (...)
   ET_Zeroormore, // zero or more of (...)
   ET_Zeroorone,  // zero or one ( ... )
@@ -50,7 +50,7 @@ typedef enum {
 }EntryType;
 
 // List of data types
-typedef enum {
+typedef enum DataType {
   DT_Char,       // It's a literal elements, char, 'c'.
   DT_String,     // It's a literal elements, string "abc".
   DT_Type,       // It's a type id

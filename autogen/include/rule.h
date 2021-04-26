@@ -30,7 +30,7 @@ namespace maplefe {
 class Rule;
 class StructData;
 
-typedef enum {
+typedef enum RuleOp {
   RO_Oneof,      // one of (...)
   RO_Zeroormore, // zero or more of (...)
   RO_Zeroorone,  // zero or one ( ... )
@@ -38,7 +38,7 @@ typedef enum {
   RO_Null
 } RuleOp;
 
-typedef enum {
+typedef enum ElemType {
   ET_Char,       // It's a literal elements, char, 'c'.
   ET_String,     // It's a literal elements, string "abc".
   ET_Rule,       // It's rule

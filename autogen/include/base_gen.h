@@ -50,7 +50,7 @@ class SPECParser;;
 // the current type of element being read. This helps to read ')' and '+'.
 //
 // Possibly new syntax in the future also need this help.
-typedef enum {
+typedef enum ST_status {
   ST_Set,         // in ( , , )
   ST_Concatenate, // in E + E + E
   ST_Null

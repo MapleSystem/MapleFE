@@ -53,12 +53,12 @@ class BaseGen;
 // default construction of buffers.                                     //
 //////////////////////////////////////////////////////////////////////////
 
-typedef enum {
+typedef enum WriteStatus {
   WR_GOOD,
   WR_OVERSIZE
 }WriteStatus;
 
-typedef enum {
+typedef enum SimpleBufferType {
   SB_Line,
   SB_Rect
 }SimpleBufferType;
@@ -86,7 +86,7 @@ public:
 
   virtual bool CurrentLineEmpty() = 0;
 };
- 
+
 // A single line buffer, over MAX_LINE_LIMIT. Theoritically the LineBuffer
 // can extend to unlimited length.
 class LineBuffer : public SimpleBuffer {
@@ -127,7 +127,7 @@ class RectBuffer : public SimpleBuffer {
 public:
   unsigned mUsed;  // a LINES_PER_BLOCK bitmap telling which lines are used.
   char     mData[MAX_LINE_LIMIT * LINES_PER_BLOCK];
-  char    *mCurrLine; 
+  char    *mCurrLine;
   unsigned mCurrLineSize;  // how many char-s in the line
 
 public:
@@ -161,7 +161,7 @@ public:
   union {
     SimpleBuffer    *mSimple;
     FormattedBuffer *mFormatted;
-  }mData; 
+  }mData;
   bool               mIsSimple;
 
 public:
@@ -194,10 +194,10 @@ public:
 /////////////////////////////////////////////////////////////////////////////
 // [FormattedBuffer]
 //
-// A formatted buffer is composed of a set of SimpleBuffer or nested 
+// A formatted buffer is composed of a set of SimpleBuffer or nested
 // formatted buffer. Its goal is to provide interface for buffer users.
 // The inside details of the OneBuffer is protected.
-// 
+//
 // The nested FormattedBuffer is never modified by the parent FormattedBuffer.
 // So the children should be fixed before added into the parent.
 
@@ -216,7 +216,7 @@ public:
   FormattedBuffer(unsigned ind = 0, bool iscomment = false);
   ~FormattedBuffer();
 
-public: 
+public:
   void  AddNestedBuffer(FormattedBuffer *);
 
   char* NewLine();
@@ -312,7 +312,7 @@ public:
 //                         FunctionBuffer                               //
 // A function has three buffers.                                        //
 //   1) Declaration in .h file                                          //
-//   2) Header in .cpp file                                             // 
+//   2) Header in .cpp file                                             //
 //   3) Body in .cpp file                                               //
 // Here is an example:                                                  //
 //     void foo (int a)             <-- Header                          //
@@ -332,7 +332,7 @@ public:
 
   void AddReturnType(const char*);
   void AddFunctionName(const char*);
-  void AddParameter(const char* type, const char *name, bool end = false); 
+  void AddParameter(const char* type, const char *name, bool end = false);
   ScopedBuffer* GetBody() { return &mBody; }
 };
 

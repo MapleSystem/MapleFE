@@ -37,7 +37,7 @@
 
 namespace maplefe {
 
-typedef enum {
+typedef enum TK_Type {
   TT_ID,    // Identifier
   TT_KW,    // Keyword
   TT_LT,    // Literal

@@ -33,7 +33,7 @@
 
 namespace maplefe {
 
-typedef enum {
+typedef enum ELMT_Type {
   ET_WS,    // White Space
   ET_CM,    // Comment
   ET_TK,    // Token
