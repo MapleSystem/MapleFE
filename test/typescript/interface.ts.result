@@ -1,4 +1,10 @@
 Matched 12 tokens.
+Matched 28 tokens.
+Matched 44 tokens.
 ============= Module ===========
 == Sub Tree ==
 ts_interface: Employee {firstName;lastName }
+== Sub Tree ==
+js_let Decl: john=
+== Sub Tree ==
+js_let Decl: jane=

@@ -58,9 +58,9 @@ rule BindingIdentifier : ONEOF(Identifier, "yield")
 rule PrimaryExpression : ONEOF(
   "this",
   IdentifierReference,
-  Literal)
+  Literal,
 #  ArrayLiteral[?Yield]
-#  ObjectLiteral[?Yield]
+  ObjectLiteral)
 #  FunctionExpression
 #  ClassExpression[?Yield]
 #  GeneratorExpression
@@ -119,11 +119,17 @@ rule Elision : ONEOF(',',
 ##  { }
 ##  { PropertyDefinitionList[?Yield] }
 ##  { PropertyDefinitionList[?Yield] , }
+rule ObjectLiteral : ONEOF('{' + '}',
+                           '{' + PropertyDefinitionList + '}',
+                           '{' + PropertyDefinitionList + ',' + '}')
 
 ##-----------------------------------
 ##rule PropertyDefinitionList[Yield] :
 ##  PropertyDefinition[?Yield]
 ##  PropertyDefinitionList[?Yield] , PropertyDefinition[?Yield]
+rule PropertyDefinitionList : ONEOF(
+  PropertyDefinition,
+  PropertyDefinitionList + ',' + PropertyDefinition)
 
 ##-----------------------------------
 ##rule PropertyDefinition[Yield] :
@@ -131,11 +137,18 @@ rule Elision : ONEOF(',',
 ##  CoverInitializedName[?Yield]
 ##  PropertyName[?Yield] : AssignmentExpression[In, ?Yield]
 ##  MethodDefinition[?Yield]
+rule PropertyDefinition : ONEOF(
+  IdentifierReference,
+#  CoverInitializedName[?Yield]
+  PropertyName + ':' + AssignmentExpression)
+#  MethodDefinition[?Yield]
 
 ##-----------------------------------
 ##rule PropertyName[Yield] :
 ##  LiteralPropertyName
 ##  ComputedPropertyName[?Yield]
+rule PropertyName : ONEOF(LiteralPropertyName,
+                          ComputedPropertyName)
 
 ##-----------------------------------
 ##rule LiteralPropertyName :
@@ -143,9 +156,20 @@ rule Elision : ONEOF(',',
 ##  StringLiteral
 ##  NumericLiteral
 
+# I used Identifier instead of IdentifierName because keywords
+# are processed before Identifier, and so Identifier is the same
+# as IdentifierName here.
+# I didn't add NumericLiteral and StringLiteral so far since it looks weird to me
+# as a property name. We will add it if needed.
+
+## NOTE, when adding StringLiteral, it make cause ladetect fail since it stops at
+## Literal which is a parent of StringLiteral. Need update there.
+rule LiteralPropertyName : ONEOF(Identifier)
+
 ##-----------------------------------
 ##rule ComputedPropertyName[Yield] :
 ##  [ AssignmentExpression[In, ?Yield] ]
+rule ComputedPropertyName : '[' + AssignmentExpression + ']'
 
 ##-----------------------------------
 ##rule CoverInitializedName[Yield] :
@@ -561,9 +585,9 @@ rule BindingList : ONEOF(LexicalBinding,
 ##  BindingIdentifier[?Yield] Initializer[?In, ?Yield]opt
 ##  BindingPattern[?Yield] Initializer[?In, ?Yield]
 rule LexicalBinding : ONEOF(BindingIdentifier + ZEROORONE(Initializer),
-                            BindingIdentifier + ":" + TYPE + ZEROORONE(Initializer),
+                            BindingIdentifier + ":" + Type + ZEROORONE(Initializer),
                             BindingPattern    + ZEROORONE(Initializer),
-                            BindingPattern    + ":" + TYPE + ZEROORONE(Initializer))
+                            BindingPattern    + ":" + Type + ZEROORONE(Initializer))
   attr.action.%1,%3 : AddInitTo(%1, %2)
   attr.action.%2,%4 : AddInitTo(%1, %4)
   attr.action.%2,%4 : AddType(%1, %3)
@@ -588,7 +612,7 @@ rule VariableDeclarationList : ONEOF(
 ##  BindingPattern[?Yield] Initializer[?In, ?Yield]
 
 # Typescript ask for explicit type. But it also allows implicit type if referrable.
-rule VariableDeclaration : ONEOF(BindingIdentifier + ':' + TYPE + ZEROORONE(Initializer),
+rule VariableDeclaration : ONEOF(BindingIdentifier + ':' + Type + ZEROORONE(Initializer),
                                  BindingIdentifier + ZEROORONE(Initializer))
   attr.action.%1 : AddInitTo(%1, %4)
   attr.action.%1 : BuildDecl(%3, %1)
@@ -793,7 +817,7 @@ rule DebuggerStatement : "debugger" + ';'
 ## Typescript sometimes requires explicit type if it cannot be inferred.
 rule FunctionDeclaration : ONEOF(
   "function" + BindingIdentifier + '(' + FormalParameters + ')' + '{' + FunctionBody + '}',
-  "function" + BindingIdentifier + '(' + FormalParameters + ')' + ':' + TYPE + '{' + FunctionBody + '}',
+  "function" + BindingIdentifier + '(' + FormalParameters + ')' + ':' + Type + '{' + FunctionBody + '}',
   "function" + '(' + FormalParameters + ')' + '{' + FunctionBody + '}')
   attr.action.%1,%2 : BuildFunction(%2)
   attr.action.%1,%2 : AddParams(%4)
@@ -843,7 +867,7 @@ rule FunctionRestParameter : BindingRestElement
 ## BindingElement[?Yield]
 
 ## Typescript requires type. So this is different than JS spec.
-rule FormalParameter : BindingElement + ':' + TYPE
+rule FormalParameter : BindingElement + ':' + Type
   attr.action : BuildDecl(%3, %1)
 
 ##
@@ -926,9 +950,81 @@ rule FunctionStatementList : ZEROORONE(StatementList)
 #############################################################################
 ##                        Typescript specific
 #############################################################################
-rule ObjectField : BindingIdentifier + ':' + TYPE
+rule ObjectField : BindingIdentifier + ':' + Type
   attr.action : AddType(%1, %3)
 rule InterfaceDeclaration : "interface" + BindingIdentifier + '{' + ZEROORMORE(ObjectField + ';') + '}'
   attr.action : BuildStruct(%2)
   attr.action : SetTSInterface()
   attr.action : AddStructField(%4)
+
+#############################################################################
+##                        Type section
+#############################################################################
+
+## rule TypeParameters: < TypeParameterList >
+## rule TypeParameterList: TypeParameter TypeParameterList , TypeParameter
+## rule TypeParameter: BindingIdentifier Constraintopt
+## rule Constraint: extends Type
+## rule TypeArguments: < TypeArgumentList >
+## rule TypeArgumentList: TypeArgument TypeArgumentList , TypeArgument
+## rule TypeArgument: Type
+
+#rule Type : ONEOF(UnionOrIntersectionOrPrimaryType,
+#                  FunctionType,
+#                  ConstructorType)
+rule Type : ONEOF(UnionOrIntersectionOrPrimaryType)
+
+#rule UnionOrIntersectionOrPrimaryType: ONEOF(UnionType,
+#                                             IntersectionOrPrimaryType)
+rule UnionOrIntersectionOrPrimaryType: ONEOF(IntersectionOrPrimaryType)
+
+#rule IntersectionOrPrimaryType : ONEOF(IntersectionType,
+#                                       PrimaryType)
+rule IntersectionOrPrimaryType : ONEOF(PrimaryType)
+
+## rule PrimaryType: ParenthesizedType PredefinedType TypeReference ObjectType ArrayType TupleType TypeQuery ThisType
+rule PrimaryType: ONEOF(TypeReference, PredefinedType)
+
+## rule ParenthesizedType: ( Type )
+
+## rule PredefinedType: any number boolean string symbol void
+rule PredefinedType: TYPE
+
+## rule TypeReference: TypeName [no LineTerminator here] TypeArgumentsopt
+rule TypeReference: TypeName
+
+## rule TypeName: IdentifierReference NamespaceName . IdentifierReference
+rule TypeName: IdentifierReference
+
+## rule NamespaceName: IdentifierReference NamespaceName . IdentifierReference
+## rule ObjectType: { TypeBodyopt }
+## rule TypeBody: TypeMemberList ;opt TypeMemberList ,opt
+## rule TypeMemberList: TypeMember TypeMemberList ; TypeMember TypeMemberList , TypeMember
+## rule TypeMember: PropertySignature CallSignature ConstructSignature IndexSignature MethodSignature
+## rule ArrayType: PrimaryType [no LineTerminator here] [ ]
+## rule TupleType: [ TupleElementTypes ]
+## rule TupleElementTypes: TupleElementType TupleElementTypes , TupleElementType
+## rule TupleElementType: Type
+## rule UnionType: UnionOrIntersectionOrPrimaryType | IntersectionOrPrimaryType
+## rule IntersectionType: IntersectionOrPrimaryType & PrimaryType
+## rule FunctionType: TypeParametersopt ( ParameterListopt ) => Type
+## rule ConstructorType: new TypeParametersopt ( ParameterListopt ) => Type
+## rule TypeQuery: typeof TypeQueryExpression
+## rule TypeQueryExpression: IdentifierReference TypeQueryExpression . IdentifierName
+## rule ThisType: this
+## rule PropertySignature: PropertyName ?opt TypeAnnotationopt
+## rule PropertyName: IdentifierName StringLiteral NumericLiteral
+## rule TypeAnnotation: : Type
+## rule CallSignature: TypeParametersopt ( ParameterListopt ) TypeAnnotationopt
+## rule ParameterList: RequiredParameterList OptionalParameterList RestParameter RequiredParameterList , OptionalParameterList RequiredParameterList , RestParameter OptionalParameterList , RestParameter RequiredParameterList , OptionalParameterList , RestParameter
+## rule RequiredParameterList: RequiredParameter RequiredParameterList , RequiredParameter
+## rule RequiredParameter: AccessibilityModifieropt BindingIdentifierOrPattern TypeAnnotationopt BindingIdentifier : StringLiteral
+## rule AccessibilityModifier: public private protected
+## rule BindingIdentifierOrPattern: BindingIdentifier BindingPattern
+## rule OptionalParameterList: OptionalParameter OptionalParameterList , OptionalParameter
+## rule OptionalParameter: AccessibilityModifieropt BindingIdentifierOrPattern ? TypeAnnotationopt AccessibilityModifieropt BindingIdentifierOrPattern TypeAnnotationopt Initializer BindingIdentifier ? : StringLiteral
+## rule RestParameter: ... BindingIdentifier TypeAnnotationopt
+## rule ConstructSignature: new TypeParametersopt ( ParameterListopt ) TypeAnnotationopt
+## rule IndexSignature: [ BindingIdentifier : string ] TypeAnnotation [ BindingIdentifier : number ] TypeAnnotation
+## rule MethodSignature: PropertyName ?opt CallSignature
+## rule TypeAliasDeclaration: type BindingIdentifier TypeParametersopt = Type ;
