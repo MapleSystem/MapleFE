@@ -6,9 +6,12 @@ Matched 31 tokens.
 Matched 37 tokens.
 Matched 43 tokens.
 Matched 49 tokens.
-Matched 54 tokens.
-Matched 60 tokens.
-Matched 66 tokens.
+Matched 55 tokens.
+Matched 61 tokens.
+Matched 67 tokens.
+Matched 72 tokens.
+Matched 78 tokens.
+Matched 84 tokens.
 ============= Module ===========
 == Sub Tree ==
 js_var Decl: a=1
@@ -20,6 +23,12 @@ js_var Decl: c
 c Assign a Add b
 == Sub Tree ==
 c Assign a Sub b
+== Sub Tree ==
+c Assign a Mul b
+== Sub Tree ==
+c Assign a Div b
+== Sub Tree ==
+c Assign a Mod b
 == Sub Tree ==
 c Assign a Shr b
 == Sub Tree ==
