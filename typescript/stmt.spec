@@ -311,16 +311,17 @@ rule PostfixExpression : ONEOF(
 ##  ! UnaryExpression[?Yield]
 
 rule UnaryExpression : ONEOF(
-  PostfixExpression)
-#  delete UnaryExpression[?Yield]
-#  void UnaryExpression[?Yield]
-#  typeof UnaryExpression[?Yield]
-#  ++ UnaryExpression[?Yield]
-#  -- UnaryExpression[?Yield]
-#  + UnaryExpression[?Yield]
-#  - UnaryExpression[?Yield]
-#  ~ UnaryExpression[?Yield]
-#  ! UnaryExpression[?Yield]
+  PostfixExpression,
+  "delete" + UnaryExpression,
+  "void" + UnaryExpression,
+  "typeof" + UnaryExpression,
+  "++" + UnaryExpression,
+   "--" + UnaryExpression,
+   '+' + UnaryExpression,
+   '-' + UnaryExpression,
+   '~' + UnaryExpression,
+   '!' + UnaryExpression)
+  attr.action.%3,%4 : BuildUnaryOperation(%1, %2)
 
 ##-----------------------------------
 ##rule MultiplicativeExpression[Yield] :
@@ -328,12 +329,15 @@ rule UnaryExpression : ONEOF(
 ##  MultiplicativeExpression[?Yield] MultiplicativeOperator UnaryExpression[?Yield]
 
 rule MultiplicativeExpression : ONEOF(
-  UnaryExpression)
-#  MultiplicativeExpression[?Yield] MultiplicativeOperator UnaryExpression[?Yield]
+  UnaryExpression,
+  MultiplicativeExpression + MultiplicativeOperator + UnaryExpression)
+  attr.action.%2 : BuildBinaryOperation(%1, %2, %3)
 
 ##-----------------------------------
 ##rule MultiplicativeOperator : one of
 ##  * / %
+
+rule MultiplicativeOperator : ONEOF( '*', '/', '%')
 
 ##-----------------------------------
 ##rule AdditiveExpression[Yield] :
