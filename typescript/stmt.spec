@@ -60,13 +60,13 @@ rule PrimaryExpression : ONEOF(
   IdentifierReference,
   Literal,
 #  ArrayLiteral[?Yield]
-  ObjectLiteral)
+  ObjectLiteral,
 #  FunctionExpression
 #  ClassExpression[?Yield]
 #  GeneratorExpression
 #  RegularExpressionLiteral
 #  TemplateLiteral[?Yield]
-#  CoverParenthesizedExpressionAndArrowParameterList[?Yield]
+  CoverParenthesizedExpressionAndArrowParameterList)
 
 ##-----------------------------------
 ##rule CoverParenthesizedExpressionAndArrowParameterList[Yield] :
@@ -77,6 +77,11 @@ rule PrimaryExpression : ONEOF(
 ##  When processing the production
 ##        PrimaryExpression[Yield] : CoverParenthesizedExpressionAndArrowParameterList[?Yield]
 ##  the interpretation of CoverParenthesizedExpressionAndArrowParameterList is refined using the following grammar:
+rule CoverParenthesizedExpressionAndArrowParameterList : ONEOF(
+  '(' + Expression + ')',
+  '(' + ')',
+  '(' + "..." + BindingIdentifier + ')',
+  '(' + Expression + ',' + "..." + BindingIdentifier + ')')
 
 ##-----------------------------------
 ##rule ParenthesizedExpression[Yield] :
@@ -88,6 +93,13 @@ rule PrimaryExpression : ONEOF(
 ##  BooleanLiteral
 ##  NumericLiteral
 ##  StringLiteral
+
+# Literal is handled in lexer as a token. Also we don't do any Lookahead detect or recursion detect
+# inside Literal. So it means parsing stops at Literal. This works for most languages.
+#
+# NullLiteral, BooleanLiteral, NumericLiteral, StringLiteral can be handled specifically in parser
+# to see if it's a string literal.
+rule FAKEStringLiteral : ONEOF("this_is_for_fake_rule") 
 
 ##-----------------------------------
 ##rule ArrayLiteral[Yield] :
@@ -161,12 +173,10 @@ rule PropertyName : ONEOF(LiteralPropertyName,
 # I used Identifier instead of IdentifierName because keywords
 # are processed before Identifier, and so Identifier is the same
 # as IdentifierName here.
-# I didn't add NumericLiteral and StringLiteral so far since it looks weird to me
+# I didn't add NumericLiteral so far since it looks weird to me
 # as a property name. We will add it if needed.
 
-## NOTE, when adding StringLiteral, it make cause ladetect fail since it stops at
-## Literal which is a parent of StringLiteral. Need update there.
-rule LiteralPropertyName : ONEOF(Identifier)
+rule LiteralPropertyName : ONEOF(Identifier, FAKEStringLiteral)
 
 ##-----------------------------------
 ##rule ComputedPropertyName[Yield] :

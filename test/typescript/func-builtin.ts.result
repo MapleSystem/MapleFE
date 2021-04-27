@@ -1,0 +1,57 @@
+Matched 12 tokens.
+Matched 28 tokens.
+Matched 44 tokens.
+Matched 47 tokens.
+Matched 50 tokens.
+Matched 71 tokens.
+Matched 80 tokens.
+Matched 89 tokens.
+Matched 98 tokens.
+Matched 107 tokens.
+Matched 116 tokens.
+Matched 125 tokens.
+Matched 134 tokens.
+Matched 143 tokens.
+Matched 152 tokens.
+Matched 163 tokens.
+Matched 172 tokens.
+Matched 183 tokens.
+============= Module ===========
+== Sub Tree ==
+ts_interface: Employee {firstName;lastName }
+== Sub Tree ==
+js_let Decl: john= {firstName:"John", lastName:"Smith"}
+== Sub Tree ==
+js_let Decl: jane= {firstName:"Jane", lastName:"Doe"}
+== Sub Tree ==
+js_var Decl: func
+== Sub Tree ==
+js_var Decl: res
+== Sub Tree ==
+func  fullName()  throws: 
+  return this.firstName Add " " Add this.lastName
+
+== Sub Tree ==
+res Assign fullName.call(john)
+== Sub Tree ==
+console.log("Name: " Add res)
+== Sub Tree ==
+res Assign fullName.call(jane)
+== Sub Tree ==
+console.log("Name: " Add res)
+== Sub Tree ==
+res Assign fullName.apply(john)
+== Sub Tree ==
+console.log("Name: " Add res)
+== Sub Tree ==
+res Assign fullName.apply(jane)
+== Sub Tree ==
+console.log("Name: " Add res)
+== Sub Tree ==
+func Assign fullName.bind(john)
+== Sub Tree ==
+console.log("Name: " Add func())
+== Sub Tree ==
+func Assign fullName.bind(jane)
+== Sub Tree ==
+console.log("Name: " Add func())
