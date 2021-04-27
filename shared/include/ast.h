@@ -563,7 +563,7 @@ public:
   void SetName(IdentifierNode *n) {mName = n;}
   void SetProp(StructProp p) {mProp = p;}
 
-  unsigned        FieldsNum() {return mFields.GetNum();}
+  unsigned        GetFieldsNum() {return mFields.GetNum();}
   IdentifierNode* GetField(unsigned i) {return mFields.ValueAtIndex(i);}
   void            AddField(IdentifierNode *n) {mFields.PushBack(n);}
 
