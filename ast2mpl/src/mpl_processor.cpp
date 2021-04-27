@@ -906,8 +906,8 @@ maple::BaseNode *A2M::ProcessForLoop(StmtExprKind skind, TreeNode *tnode, BlockN
   maple::BaseNode *bn = nullptr;
 
   // init
-  for (int i = 0; i < node->GetInitNum(); i++) {
-    bn = ProcessNode(SK_Stmt, node->InitAtIndex(i), block);
+  for (int i = 0; i < node->GetInitsNum(); i++) {
+    bn = ProcessNode(SK_Stmt, node->GetInitAtIndex(i), block);
     if (bn) {
       mblock->AddStatement((maple::StmtNode*)bn);
       if (mTraceA2m) bn->Dump(0);
@@ -921,8 +921,8 @@ maple::BaseNode *A2M::ProcessForLoop(StmtExprKind skind, TreeNode *tnode, BlockN
   maple::BlockNode *mbody = mBlockNodeMap[static_cast<BlockNode*>(astbody)];
 
   // update stmts are added into loop mbody
-  for (int i = 0; i < node->GetUpdateNum(); i++) {
-    bn = ProcessNode(SK_Stmt, node->UpdateAtIndex(i), (maplefe::BlockNode*)astbody);
+  for (int i = 0; i < node->GetUpdatesNum(); i++) {
+    bn = ProcessNode(SK_Stmt, node->GetUpdateAtIndex(i), (maplefe::BlockNode*)astbody);
     if (bn) {
       mbody->AddStatement((maple::StmtNode*)bn);
       if (mTraceA2m) bn->Dump(0);

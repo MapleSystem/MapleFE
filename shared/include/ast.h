@@ -733,27 +733,27 @@ public:
 
 class ForLoopNode : public TreeNode {
 private:
-  SmallVector<TreeNode *> mInit;
+  SmallVector<TreeNode *> mInits;
   TreeNode               *mCond;
-  SmallVector<TreeNode *> mUpdate;
+  SmallVector<TreeNode *> mUpdates;
   TreeNode               *mBody;   // This is a block node
 public:
   ForLoopNode() {mCond = NULL; mBody = NULL; mKind = NK_ForLoop;}
   ~ForLoopNode() {Release();}
 
-  void AddInit(TreeNode *t)   {mInit.PushBack(t);}
-  void AddUpdate(TreeNode *t) {mUpdate.PushBack(t);}
+  void AddInit(TreeNode *t)   {mInits.PushBack(t);}
+  void AddUpdate(TreeNode *t) {mUpdates.PushBack(t);}
   void SetCond(TreeNode *t)   {mCond = t;}
   void SetBody(TreeNode *t)   {mBody = t;}
 
-  unsigned GetInitNum()       {return mInit.GetNum();}
-  unsigned GetUpdateNum()     {return mUpdate.GetNum();}
-  TreeNode* InitAtIndex(unsigned i)   {return mInit.ValueAtIndex(i);}
-  TreeNode* UpdateAtIndex(unsigned i) {return mUpdate.ValueAtIndex(i);}
+  unsigned GetInitsNum()     {return mInits.GetNum();}
+  unsigned GetUpdatesNum()   {return mUpdates.GetNum();}
+  TreeNode* GetInitAtIndex(unsigned i)   {return mInits.ValueAtIndex(i);}
+  TreeNode* GetUpdateAtIndex(unsigned i) {return mUpdates.ValueAtIndex(i);}
   TreeNode* GetCond() {return mCond;}
   TreeNode* GetBody() {return mBody;}
 
-  void Release() {mInit.Release(); mUpdate.Release();}
+  void Release() {mInits.Release(); mUpdates.Release();}
   void Dump(unsigned);
 };
 
