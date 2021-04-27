@@ -62,6 +62,8 @@ ACTION(BuildVarList)
 ACTION(BuildStruct)
 ACTION(SetTSInterface)
 ACTION(AddStructField)
+ACTION(BuildFieldLiteral)
+ACTION(BuildStructLiteral)
 
 // For function
 ACTION(AddParams)

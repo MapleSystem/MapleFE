@@ -122,6 +122,7 @@ rule Elision : ONEOF(',',
 rule ObjectLiteral : ONEOF('{' + '}',
                            '{' + PropertyDefinitionList + '}',
                            '{' + PropertyDefinitionList + ',' + '}')
+  attr.action.%2,%3 : BuildStructLiteral(%2)
 
 ##-----------------------------------
 ##rule PropertyDefinitionList[Yield] :
@@ -142,6 +143,7 @@ rule PropertyDefinition : ONEOF(
 #  CoverInitializedName[?Yield]
   PropertyName + ':' + AssignmentExpression)
 #  MethodDefinition[?Yield]
+  attr.action.%2 : BuildFieldLiteral(%1, %3)
 
 ##-----------------------------------
 ##rule PropertyName[Yield] :

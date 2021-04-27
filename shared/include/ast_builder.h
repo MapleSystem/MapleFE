@@ -101,6 +101,8 @@ public:
   TreeNode* BuildStruct();
   TreeNode* SetTSInterface();
   TreeNode* AddStructField();
+  TreeNode* BuildFieldLiteral();
+  TreeNode* BuildStructLiteral();
 
   TreeNode* BuildDecl();
   TreeNode* SetJSVar();

@@ -591,10 +591,10 @@ void StructLiteralNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   DUMP0_NORETURN(" {");
   for (unsigned i = 0; i < mFields.GetNum(); i++) {
-    FieldLiteral fl = GetField(i);
-    fl.mFieldName->Dump(0);
+    FieldLiteralNode *fl = GetField(i);
+    fl->mFieldName->Dump(0);
     DUMP0_NORETURN(":");
-    fl.mLiteral->Dump(0);
+    fl->mLiteral->Dump(0);
     if (i != mFields.GetNum()-1)
       DUMP0_NORETURN(", ");
   }

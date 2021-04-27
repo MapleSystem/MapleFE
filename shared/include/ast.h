@@ -556,21 +556,28 @@ public:
 
 // We define StructLiteral for C/C++ struct literal, TS/JS object literal.
 // It contains a list of duple <fieldname, value>
-struct FieldLiteral {
+class FieldLiteralNode : public TreeNode{
+public:
   IdentifierNode *mFieldName;
   TreeNode       *mLiteral;
+
+  void SetFieldName(IdentifierNode *id) {mFieldName = id;}
+  void SetLiteral(TreeNode *id) {mLiteral = id;}
+
+  FieldLiteralNode() {mKind = NK_FieldLiteral;}
+  ~FieldLiteralNode(){}
 };
 
 class StructLiteralNode : public TreeNode {
 private:
-  SmallVector<FieldLiteral> mFields;
+  SmallVector<FieldLiteralNode*> mFields;
 public:
   StructLiteralNode() {mKind = NK_StructLiteral;}
   ~StructLiteralNode(){Release();}
 
-  unsigned     GetFieldsNum() {return mFields.GetNum();}
-  FieldLiteral GetField(unsigned i) {return mFields.ValueAtIndex(i);}
-  void         AddField(FieldLiteral d) {mFields.PushBack(d);}
+  unsigned          GetFieldsNum() {return mFields.GetNum();}
+  FieldLiteralNode* GetField(unsigned i) {return mFields.ValueAtIndex(i);}
+  void              AddField(FieldLiteralNode *d) {mFields.PushBack(d);}
 
   void Dump(unsigned);
 };

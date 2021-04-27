@@ -33,6 +33,7 @@ NODEKIND(Parenthesis)
 
 NODEKIND(Struct)
 NODEKIND(StructLiteral)
+NODEKIND(FieldLiteral)
 
 // VarList is for identifier list only.
 // ExprList is for all kinds of node.

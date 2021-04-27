@@ -436,4 +436,8 @@ void Verifier::VerifyStruct(StructNode *tree){
 void Verifier::VerifyStructLiteral(StructLiteralNode *tree){
   return;
 }
+
+void Verifier::VerifyFieldLiteral(FieldLiteralNode *tree){
+  return;
+}
 }

@@ -811,6 +811,12 @@ maple::BaseNode *A2M::ProcessStructLiteral(StmtExprKind skind, TreeNode *tnode, 
   return nullptr;
 }
 
+maple::BaseNode *A2M::ProcessFieldLiteral(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
+  NOTYETIMPL("ProcessFieldLiteral()");
+  FieldLiteralNode *node = static_cast<FieldLiteralNode *>(tnode);
+  return nullptr;
+}
+
 maple::BaseNode *A2M::ProcessAnnotationType(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
   NOTYETIMPL("ProcessAnnotationType()");
   AnnotationTypeNode *node = static_cast<AnnotationTypeNode *>(tnode);

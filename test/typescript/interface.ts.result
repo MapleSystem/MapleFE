@@ -5,6 +5,6 @@ Matched 44 tokens.
 == Sub Tree ==
 ts_interface: Employee {firstName;lastName }
 == Sub Tree ==
-js_let Decl: john=
+js_let Decl: john= {firstName:"John", lastName:"Smith"}
 == Sub Tree ==
-js_let Decl: jane=
+js_let Decl: jane= {firstName:"Jane", lastName:"Doe"}

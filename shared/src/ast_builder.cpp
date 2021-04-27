@@ -820,7 +820,7 @@ TreeNode* ASTBuilder::SetJSConst() {
 }
 
 //////////////////////////////////////////////////////////////////////////////////
-//                         StructNode
+//                         StructNode, StructLiteralNode, FieldLiteralNode
 //////////////////////////////////////////////////////////////////////////////////
 
 // It takes only one parameter: name.
@@ -870,6 +870,61 @@ TreeNode* ASTBuilder::SetTSInterface() {
   MASSERT(mLastTreeNode->IsStruct());
   StructNode *s = (StructNode*)mLastTreeNode;
   s->SetProp(SProp_TSInterface);
+  return mLastTreeNode;
+}
+
+// Build FieldLiteral
+// It takes two param, field name and field value (a literal).
+TreeNode* ASTBuilder::BuildFieldLiteral() {
+  if (mTrace)
+    std::cout << "In BuildFieldLiteral" << std::endl;
+
+  Param p_field = mParams[0];
+  MASSERT(p_field.mIsTreeNode);
+  TreeNode *field = p_field.mData.mTreeNode;
+  MASSERT(field->IsIdentifier());
+
+  Param p_value = mParams[1];
+  MASSERT(p_value.mIsTreeNode);
+  TreeNode *value = p_value.mData.mTreeNode;
+
+  FieldLiteralNode *field_literal = (FieldLiteralNode*)mTreePool->NewTreeNode(sizeof(FieldLiteralNode));
+  new (field_literal) FieldLiteralNode();
+  field_literal->SetFieldName((IdentifierNode*)field);
+  field_literal->SetLiteral(value);
+
+  mLastTreeNode = field_literal;
+  return mLastTreeNode;
+}
+
+// It takes one param. The param could a FieldLiteralNode or
+// a PassNode containing multiple FieldLiteralNode.
+TreeNode* ASTBuilder::BuildStructLiteral() {
+  if (mTrace)
+    std::cout << "In BuildStructLiteral" << std::endl;
+
+  Param p_literal = mParams[0];
+  MASSERT(p_literal.mIsTreeNode);
+  TreeNode *literal = p_literal.mData.mTreeNode;
+
+  StructLiteralNode *struct_literal = (StructLiteralNode*)mTreePool->NewTreeNode(sizeof(StructLiteralNode));
+  new (struct_literal) StructLiteralNode();
+
+  if (literal->IsFieldLiteral()) {
+    FieldLiteralNode *fl = (FieldLiteralNode*)literal;
+    struct_literal->AddField(fl);
+  } else if (literal->IsPass()) {
+    PassNode *pass = (PassNode*)literal;
+    for (unsigned i = 0; i < pass->GetChildrenNum(); i++) {
+      TreeNode *child = pass->GetChild(i);
+      MASSERT(child->IsFieldLiteral());
+      struct_literal->AddField((FieldLiteralNode*)child);
+    }
+  } else {
+    MERROR("Unsupported struct literal.");
+  }
+
+  mLastTreeNode = struct_literal;
   return mLastTreeNode;
 }
 
