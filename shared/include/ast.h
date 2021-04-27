@@ -134,6 +134,7 @@ public:
 //////////////////////////////////////////////////////////////////////////
 
 enum ImportProperty {
+  ImpNone = 0,
   ImpType = 1,        // Java like, import type
   ImpStatic = 1 << 1, // Java like, import static field.
                       // If we don't specify the data type of imported, it's
@@ -145,12 +146,20 @@ enum ImportProperty {
   ImpSystem = 1 << 5
 };
 
+inline ImportProperty& operator|=(ImportProperty& t, ImportProperty p) {
+    return t = static_cast<ImportProperty>(static_cast<unsigned>(t) | static_cast<unsigned>(p));
+}
+
+inline ImportProperty operator&(ImportProperty p, ImportProperty q) {
+    return static_cast<ImportProperty>(static_cast<unsigned>(p) & static_cast<unsigned>(q));
+}
+
 class ImportNode : public TreeNode {
 private:
-  unsigned    mProperty;
-  TreeNode   *mTarget;    // the imported target
+  ImportProperty  mProperty;
+  TreeNode       *mTarget;    // the imported target
 public:
-  ImportNode() {mName = NULL; mProperty = 0; mKind = NK_Import;}
+  ImportNode() {mName = NULL; mProperty = ImpNone; mKind = NK_Import;}
   ~ImportNode(){}
 
   void SetTarget(TreeNode *t) {mTarget = t;}
