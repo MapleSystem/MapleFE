@@ -16,7 +16,7 @@ let jane: Employee = {
 var func;
 var res;
 
-function fullName(this: Employee): string {
+function fullName(): string {
   return(this.firstName + " " + this.lastName);
 }
 
