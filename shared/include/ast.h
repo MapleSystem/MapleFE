@@ -372,9 +372,9 @@ public:
   void     SetNthNum(unsigned n, unsigned i) {mDims->SetNthDim(n, i);}
 
   // Attributes related
-  unsigned GetAttrsNum() const     {return mAttrs.GetNum();}
-  void     AddAttr(AttrId a)       {mAttrs.PushBack(a);}
-  AttrId   AttrAtIndex(unsigned i) {return mAttrs.ValueAtIndex(i);}
+  unsigned GetAttrsNum() const        {return mAttrs.GetNum();}
+  void     AddAttr(AttrId a)          {mAttrs.PushBack(a);}
+  AttrId   GetAttrAtIndex(unsigned i) {return mAttrs.ValueAtIndex(i);}
 
   void Release() { if (mDims) mDims->Release();}
   void Dump(unsigned);
@@ -941,9 +941,9 @@ public:
   // Instance Initializer and Attributes related
   bool IsInstInit()    {return mIsInstInit;}
   void SetIsInstInit() {mIsInstInit = true;}
-  unsigned GetAttrsNum()           {return mAttrs.GetNum();}
-  void     AddAttr(AttrId a)       {mAttrs.PushBack(a);}
-  AttrId   AttrAtIndex(unsigned i) {return mAttrs.ValueAtIndex(i);}
+  unsigned GetAttrsNum()              {return mAttrs.GetNum();}
+  void     AddAttr(AttrId a)          {mAttrs.PushBack(a);}
+  AttrId   GetAttrAtIndex(unsigned i) {return mAttrs.ValueAtIndex(i);}
 
   void  SetSync(const TreeNode *n) {mSync = n;}
   const TreeNode* GetSync() {return mSync;}
@@ -995,9 +995,9 @@ public:
   void      AddParam(TreeNode *t) {mParams.PushBack(t); t->SetParent(this);}
 
   // Attributes related
-  unsigned GetAttrsNum()           {return mAttrs.GetNum();}
-  void     AddAttr(AttrId a)       {mAttrs.PushBack(a);}
-  AttrId   AttrAtIndex(unsigned i) {return mAttrs.ValueAtIndex(i);}
+  unsigned GetAttrsNum()              {return mAttrs.GetNum();}
+  void     AddAttr(AttrId a)          {mAttrs.PushBack(a);}
+  AttrId   GetAttrAtIndex(unsigned i) {return mAttrs.ValueAtIndex(i);}
 
   // Annotation/Pragma related
   unsigned GetAnnotationsNum()           {return mAnnotations.GetNum();}

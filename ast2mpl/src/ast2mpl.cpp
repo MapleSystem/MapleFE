@@ -633,7 +633,7 @@ void A2M::MapAttr(maple::GenericAttrs &attr, IdentifierNode *inode) {
   // SmallVector<AttrId> mAttrs
   unsigned anum = inode->GetAttrsNum();
   for (int i = 0; i < anum; i++) {
-    const AttrId ast_attr = inode->AttrAtIndex(i);
+    const AttrId ast_attr = inode->GetAttrAtIndex(i);
     MapAttr(attr, ast_attr);
   }
 }
@@ -641,7 +641,7 @@ void A2M::MapAttr(maple::GenericAttrs &attr, IdentifierNode *inode) {
 void A2M::MapAttr(maple::GenericAttrs &attr, FunctionNode *fnode) {
   unsigned anum = fnode->GetAttrsNum();
   for (int i = 0; i < anum; i++) {
-    const AttrId ast_attr = fnode->AttrAtIndex(i);
+    const AttrId ast_attr = fnode->GetAttrAtIndex(i);
     MapAttr(attr, ast_attr);
   }
 }
