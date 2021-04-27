@@ -1045,6 +1045,18 @@ public:
   InterfaceNode() : mIsAnnotation(false) {mKind = NK_Interface;}
   ~InterfaceNode() {}
 
+  unsigned       GetSuperInterfacesNum()              {return mSuperInterfaces.GetNum();}
+  void           AddSuperInterface(InterfaceNode* a)  {mSuperInterfaces.PushBack(a);}
+  InterfaceNode* GetSuperInterfaceAtIndex(unsigned i) {return mSuperInterfaces.ValueAtIndex(i);}
+
+  unsigned        GetFieldsNum()              {return mFields.GetNum();}
+  void            AddField(IdentifierNode* a) {mFields.PushBack(a);}
+  IdentifierNode* GetFieldAtIndex(unsigned i) {return mFields.ValueAtIndex(i);}
+
+  unsigned      GetMethodsNum()              {return mMethods.GetNum();}
+  void          AddMethod(FunctionNode* a)   {mMethods.PushBack(a);}
+  FunctionNode* GetMethodAtIndex(unsigned i) {return mMethods.ValueAtIndex(i);}
+
   void SetIsAnnotation(bool b) {mIsAnnotation = b;}
 
   void Construct(BlockNode *);
