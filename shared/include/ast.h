@@ -1002,12 +1002,12 @@ public:
   // Annotation/Pragma related
   unsigned GetAnnotationsNum()           {return mAnnotations.GetNum();}
   void     AddAnnotation(AnnotationNode *n) {mAnnotations.PushBack(n);}
-  AnnotationNode* AnnotationAtIndex(unsigned i) {return mAnnotations.ValueAtIndex(i);}
+  AnnotationNode* GetAnnotationAtIndex(unsigned i) {return mAnnotations.ValueAtIndex(i);}
 
   // Exception/throw related
-  unsigned       GetThrowNum()             {return mThrows.GetNum();}
-  void           AddThrow(ExceptionNode *n){mThrows.PushBack(n);}
-  ExceptionNode* ThrowAtIndex(unsigned i)  {return mThrows.ValueAtIndex(i);}
+  unsigned       GetThrowsNum()               {return mThrows.GetNum();}
+  void           AddThrow(ExceptionNode *n)   {mThrows.PushBack(n);}
+  ExceptionNode* GetThrowAtIndex(unsigned i)  {return mThrows.ValueAtIndex(i);}
 
   void SetType(TreeNode *t) {mType = t;}
   TreeNode* GetType(){return mType;}
