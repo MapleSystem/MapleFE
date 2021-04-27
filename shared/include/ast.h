@@ -118,6 +118,7 @@ public:
   PackageNode(const char *s) {mKind = NK_Package; mName = s;}
   ~PackageNode() {}
 
+  TreeNode* GetPackage() {return mPackage;}
   void SetPackage(TreeNode *t) {mPackage = t;}
 
   void SetName(const char *s) {mName = s;}
@@ -349,6 +350,7 @@ public:
 
   TreeNode*   GetType() {return mType;}
   TreeNode*   GetInit() {return mInit;}
+  DimensionNode* GetDims() {return mDims;}
 
   void SetType(TreeNode *t)      {mType = t;}
   void SetInit(TreeNode *t)      {mInit = t; t->SetParent(this);}
@@ -422,6 +424,7 @@ class AnnotationTypeNode : public TreeNode {
 private:
   IdentifierNode *mId;
 public:
+  IdentifierNode* GetId() {return mId;}
   void SetId(IdentifierNode *n) {mId = n;}
   void Dump(unsigned);
 };
@@ -440,7 +443,12 @@ public:
     mKind = NK_Annotation;}
   ~AnnotationNode(){}
 
+  IdentifierNode* GetId() {return mId;}
   void SetId(IdentifierNode *n) {mId = n;}
+  AnnotationTypeNode* GetType() {return mType;}
+  void SetType(AnnotationTypeNode *n) {mType = n;}
+  TreeNode* GetExpr() {return mExpr;}
+  void SetExpr(TreeNode *n) {mExpr = n;}
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -976,7 +984,7 @@ public:
   unsigned  GetParamsNum()        {return mParams.GetNum();}
   TreeNode* GetParam(unsigned i)  {return mParams.ValueAtIndex(i);}
   void      AddParam(TreeNode *t) {mParams.PushBack(t); t->SetParent(this);}
-  
+
   // Attributes related
   unsigned GetAttrsNum()           {return mAttrs.GetNum();}
   void     AddAttr(AttrId a)       {mAttrs.PushBack(a);}
@@ -1101,6 +1109,7 @@ public:
   BlockNode* GetInstInit(unsigned i)       {return mInstInits.ValueAtIndex(i);}
   ClassNode* GetLocalClass(unsigned i)     {return mLocalClasses.ValueAtIndex(i);}
   InterfaceNode* GetLocalInterface(unsigned i)  {return mLocalInterfaces.ValueAtIndex(i);}
+  BlockNode* GetBody() {return mBody;}
 
   void Construct();
   void Release();
@@ -1146,6 +1155,7 @@ public:
   ~LambdaNode(){Release();}
 
   void AddParam(IdentifierNode *n) {mParams.PushBack(n); n->SetParent(this);}
+  TreeNode* Getbody() {return mBody;}
   void SetBody(TreeNode *n) {mBody = n; n->SetParent(this);}
 
   void Release() {mParams.Release();}
@@ -1166,7 +1176,9 @@ public:
   InstanceOfNode() {mLeft = NULL; mRight = NULL; mKind = NK_InstanceOf;}
   ~InstanceOfNode(){Release();}
 
+  TreeNode* GetLeft() {return mLeft;}
   void SetLeft(TreeNode *n) {mLeft = n;}
+  TreeNode* GetRight() {return mRight;}
   void SetRight(TreeNode *n){mRight = n;}
 
   void Dump(unsigned);
