@@ -816,20 +816,10 @@ rule DebuggerStatement : "debugger" + ';'
 ##                      Function and Class
 ######################################################################
 
+## NOTE: Replaced by TS 
 ## FunctionDeclaration[Yield, Default] :
 ## function BindingIdentifier[?Yield] ( FormalParameters ) { FunctionBody }
 ## [+Default] function ( FormalParameters ) { FunctionBody }
-
-## Typescript sometimes requires explicit type if it cannot be inferred.
-rule FunctionDeclaration : ONEOF(
-  "function" + BindingIdentifier + '(' + FormalParameters + ')' + '{' + FunctionBody + '}',
-  "function" + BindingIdentifier + '(' + FormalParameters + ')' + ':' + Type + '{' + FunctionBody + '}',
-  "function" + '(' + FormalParameters + ')' + '{' + FunctionBody + '}')
-  attr.action.%1,%2 : BuildFunction(%2)
-  attr.action.%1,%2 : AddParams(%4)
-  attr.action.%1 : AddFunctionBody(%7)
-  attr.action.%2 : AddType(%7)
-  attr.action.%2 : AddFunctionBody(%9)
 
 ##
 ## FunctionExpression :
@@ -954,7 +944,7 @@ rule FunctionStatementList : ZEROORONE(StatementList)
 
 
 #############################################################################
-##                        Typescript specific
+##                    Below is Typescript specific
 #############################################################################
 rule ObjectField : BindingIdentifier + ':' + Type
   attr.action : AddType(%1, %3)
@@ -964,13 +954,40 @@ rule InterfaceDeclaration : "interface" + BindingIdentifier + '{' + ZEROORMORE(O
   attr.action : AddStructField(%4)
 
 #############################################################################
+##                        Function
+## JS FunctionDeclaration is totally replaced by TS.
+#############################################################################
+
+## FunctionDeclaration: ( Modified )
+## function BindingIdentifieropt CallSignature { FunctionBody }
+## function BindingIdentifieropt CallSignature ;
+
+# Inline Call signature to make it easier to write action.
+# TODO: I temporary use JS's FormalParameterList instead of TS ParameterList
+rule FunctionDeclaration : ONEOF(
+  "function" + ZEROORONE(BindingIdentifier) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(FormalParameterList)  + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}',
+  "function" + ZEROORONE(BindingIdentifier) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(FormalParameterList)  + ')' + ZEROORONE(TypeAnnotation)  + ';')
+  attr.action.%1,%2 : BuildFunction(%2)
+  attr.action.%1,%2 : AddParams(%5)
+  attr.action.%1,%2 : AddType(%7)
+  attr.action.%1 :    AddFunctionBody(%9)
+
+#############################################################################
 ##                        Type section
 #############################################################################
 
 ## rule TypeParameters: < TypeParameterList >
-## rule TypeParameterList: TypeParameter TypeParameterList , TypeParameter
+rule TypeParameters: '<' + TypeParameterList + '>'
+
+rule TypeParameterList: ONEOF(TypeParameter,
+                              TypeParameterList + ',' + TypeParameter)
+
 ## rule TypeParameter: BindingIdentifier Constraintopt
+rule TypeParameter: BindingIdentifier + ZEROORONE(Constraint)
+
 ## rule Constraint: extends Type
+rule Constraint: "extends" + Type
+
 ## rule TypeArguments: < TypeArgumentList >
 ## rule TypeArgumentList: TypeArgument TypeArgumentList , TypeArgument
 ## rule TypeArgument: Type
@@ -1020,8 +1037,13 @@ rule TypeName: IdentifierReference
 ## rule ThisType: this
 ## rule PropertySignature: PropertyName ?opt TypeAnnotationopt
 ## rule PropertyName: IdentifierName StringLiteral NumericLiteral
+
 ## rule TypeAnnotation: : Type
+rule TypeAnnotation: ':' + Type
+
 ## rule CallSignature: TypeParametersopt ( ParameterListopt ) TypeAnnotationopt
+## rule CallSignature: ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation)
+
 ## rule ParameterList: RequiredParameterList OptionalParameterList RestParameter RequiredParameterList , OptionalParameterList RequiredParameterList , RestParameter OptionalParameterList , RestParameter RequiredParameterList , OptionalParameterList , RestParameter
 ## rule RequiredParameterList: RequiredParameter RequiredParameterList , RequiredParameter
 ## rule RequiredParameter: AccessibilityModifieropt BindingIdentifierOrPattern TypeAnnotationopt BindingIdentifier : StringLiteral

@@ -743,9 +743,8 @@ TreeNode* ASTBuilder::AddType() {
     Param p_type = mParams[1];
     Param p_name = mParams[0];
 
-    MASSERT(!p_type.mIsEmpty && p_type.mIsTreeNode
-            && "Not appropriate type node in AddType()");
-    tree_type = p_type.mData.mTreeNode;
+    if(!p_type.mIsEmpty && p_type.mIsTreeNode)
+      tree_type = p_type.mData.mTreeNode;
 
     if (!p_name.mIsTreeNode)
       MERROR("The variable name should be a IdentifierNode already, but actually NOT?");
@@ -753,14 +752,16 @@ TreeNode* ASTBuilder::AddType() {
 
   } else {
     Param p_type = mParams[0];
-    MASSERT(!p_type.mIsEmpty && p_type.mIsTreeNode
-            && "Not appropriate type node in AddType()");
-    tree_type = p_type.mData.mTreeNode;
+    if(!p_type.mIsEmpty && p_type.mIsTreeNode)
+      tree_type = p_type.mData.mTreeNode;
     node = mLastTreeNode;
   }
 
-  add_type_to(node, tree_type);
-  return node;
+  if (tree_type)
+    add_type_to(node, tree_type);
+
+  mLastTreeNode = node;
+  return mLastTreeNode;
 }
 
 // BuildDecl usually takes two parameters, 1) type; 2) name
@@ -1665,7 +1666,7 @@ TreeNode* ASTBuilder::BuildCall() {
   if (!ParamsEmpty()) {
     Param p_method = mParams[0];
     if (!p_method.mIsTreeNode)
-      MERROR("The function name is not a treenode in BuildFunction()");
+      MERROR("The function name is not a treenode in BuildCall()");
     method = p_method.mData.mTreeNode;
   }
 
@@ -1800,23 +1801,29 @@ TreeNode* ASTBuilder::AddParams() {
 }
 
 // This takes just one argument which is the function name.
+// The name could empty which is allowed in languages like JS.
 TreeNode* ASTBuilder::BuildFunction() {
   if (mTrace)
     std::cout << "In BuildFunction" << std::endl;
 
-  Param p_name = mParams[0];
+  TreeNode *node_name = NULL;
 
-  if (!p_name.mIsTreeNode)
-    MERROR("The function name is not a treenode in BuildFunction()");
-  TreeNode *node_name = p_name.mData.mTreeNode;
+  if (mParams.size() > 0) {
+    Param p_name = mParams[0];
+    if (!p_name.mIsTreeNode)
+      MERROR("The function name is not a treenode in BuildFunction()");
 
-  if (!node_name->IsIdentifier())
-    MERROR("The function name should be an indentifier node. Not?");
-  IdentifierNode *in = (IdentifierNode*)node_name;
+    node_name = p_name.mData.mTreeNode;
+    if (!node_name->IsIdentifier())
+      MERROR("The function name should be an indentifier node. Not?");
+    IdentifierNode *in = (IdentifierNode*)node_name;
+  }
 
   FunctionNode *function = (FunctionNode*)mTreePool->NewTreeNode(sizeof(FunctionNode));
   new (function) FunctionNode();
-  function->SetName(node_name->GetName());
+
+  if (node_name)
+    function->SetName(node_name->GetName());
 
   mLastTreeNode = function;
   return mLastTreeNode;
