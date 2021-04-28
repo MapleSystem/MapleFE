@@ -569,15 +569,17 @@ enum StructProp {
 class StructNode : public TreeNode {
 private:
   StructProp      mProp;
-  IdentifierNode *mName;
+  IdentifierNode *mStructId;
   SmallVector<IdentifierNode*> mFields;
 public:
   StructNode() {mKind = NK_Struct; mName = NULL; mProp = SProp_NA;}
-  StructNode(IdentifierNode *n) {mKind = NK_Struct; mName = n; mProp = SProp_NA;}
+  StructNode(IdentifierNode *n) {mKind = NK_Struct; mStructId = n; mProp = SProp_NA;}
   ~StructNode() {Release();}
 
-  void SetName(IdentifierNode *n) {mName = n;}
+  StructProp GetProp() {return mProp;}
+  IdentifierNode* GetStructId() {return mStructId;}
   void SetProp(StructProp p) {mProp = p;}
+  void SetStructId(IdentifierNode *n) {mStructId = n;}
 
   unsigned        GetFieldsNum() {return mFields.GetNum();}
   IdentifierNode* GetField(unsigned i) {return mFields.ValueAtIndex(i);}

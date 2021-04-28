@@ -577,7 +577,7 @@ void StructNode::Dump(unsigned indent) {
   default:
     break;
   }
-  mName->Dump(0);
+  mStructId->Dump(0);
   DUMP0_NORETURN(" {");
   for (unsigned i = 0; i < mFields.GetNum(); i++) {
     mFields.ValueAtIndex(i)->Dump(0);
@@ -1124,7 +1124,7 @@ void FunctionNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   if (mIsConstructor)
     DUMP1_NORETURN("constructor ", mName);
-  else 
+  else
     DUMP1_NORETURN("func ", mName);
 
   // dump parameters
