@@ -514,7 +514,7 @@ rule Expression : ONEOF(
 rule Statement : ONEOF(
   BlockStatement,
   VariableStatement,
-#  EmptyStatement
+  EmptyStatement,
   ExpressionStatement,
   IfStatement,
 #  BreakableStatement[?Yield, ?Return]
@@ -697,6 +697,7 @@ rule BindingRestElement : "..." + BindingIdentifier
 ##-----------------------------------
 ##rule EmptyStatement :
 ##  ;
+rule EmptyStatement : ';'
 
 ##-----------------------------------
 ##rule ExpressionStatement[Yield] :
@@ -1004,7 +1005,8 @@ rule Constraint: "extends" + Type
 #rule Type : ONEOF(UnionOrIntersectionOrPrimaryType,
 #                  FunctionType,
 #                  ConstructorType)
-rule Type : ONEOF(UnionOrIntersectionOrPrimaryType)
+rule Type : ONEOF(UnionOrIntersectionOrPrimaryType,
+                  FunctionType)
 
 #rule UnionOrIntersectionOrPrimaryType: ONEOF(UnionType,
 #                                             IntersectionOrPrimaryType)
@@ -1039,7 +1041,10 @@ rule TypeName: IdentifierReference
 ## rule TupleElementType: Type
 ## rule UnionType: UnionOrIntersectionOrPrimaryType | IntersectionOrPrimaryType
 ## rule IntersectionType: IntersectionOrPrimaryType & PrimaryType
+
 ## rule FunctionType: TypeParametersopt ( ParameterListopt ) => Type
+rule FunctionType: ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList) + ')' + "=>" + Type
+
 ## rule ConstructorType: new TypeParametersopt ( ParameterListopt ) => Type
 ## rule TypeQuery: typeof TypeQueryExpression
 ## rule TypeQueryExpression: IdentifierReference TypeQueryExpression . IdentifierName

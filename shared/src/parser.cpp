@@ -2138,8 +2138,11 @@ ASTTree* Parser::BuildAST() {
     }
   }
 
-  if (!tree->mRootNode)
-    MERROR("We got a statement failed to create AST!");
+  // It could be an empty statement like: ;
+  if (!tree->mRootNode) {
+    delete tree;
+    tree = NULL;
+  }
 
   return tree;
 }
