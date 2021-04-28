@@ -262,6 +262,15 @@ public:
   TerOperatorNode() {mKind = NK_TerOperator;}
   ~TerOperatorNode() {}
 
+  OprId     GetOprId() {return mOprId;}
+  TreeNode* GetOpndA() {return mOpndA;}
+  TreeNode* GetOpndB() {return mOpndB;}
+  TreeNode* GetOpndC() {return mOpndC;}
+  void SetOprId(OprId o)     {mOprId = o;}
+  void SetOpndA(TreeNode* t) {mOpndA = t; t->SetParent(this);}
+  void SetOpndB(TreeNode* t) {mOpndB = t; t->SetParent(this);}
+  void SetOpndC(TreeNode* t) {mOpndC = t; t->SetParent(this);}
+
   void Dump(unsigned);
 };
 
@@ -587,6 +596,9 @@ public:
 
   void SetFieldName(IdentifierNode *id) {mFieldName = id;}
   void SetLiteral(TreeNode *id) {mLiteral = id;}
+
+  IdentifierNode* GetFieldName() {return mFieldName;}
+  TreeNode* GetLiteral() {return mLiteral;}
 
   FieldLiteralNode() {mKind = NK_FieldLiteral;}
   ~FieldLiteralNode(){}
