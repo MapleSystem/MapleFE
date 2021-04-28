@@ -751,7 +751,7 @@ maple::BaseNode *A2M::ProcessClassDecl(StmtExprKind skind, TreeNode *tnode, Bloc
     ProcessFieldDecl(skind, classnode->GetField(i), block);
   }
 
-  for (int i=0; i < classnode->GetConstructorNum(); i++) {
+  for (int i=0; i < classnode->GetConstructorsNum(); i++) {
     ProcessFuncDecl(skind, classnode->GetConstructor(i), block);
   }
 
@@ -776,7 +776,7 @@ maple::BaseNode *A2M::ProcessClass(StmtExprKind skind, TreeNode *tnode, BlockNod
     ProcessInterface(skind, classnode->GetLocalInterface(i), block);
   }
 
-  for (int i=0; i < classnode->GetConstructorNum(); i++) {
+  for (int i=0; i < classnode->GetConstructorsNum(); i++) {
     ProcessFuncSetup(skind, classnode->GetConstructor(i), block);
   }
 
@@ -955,7 +955,7 @@ maple::BaseNode *A2M::ProcessNew(StmtExprKind skind, TreeNode *tnode, BlockNode 
   ClassNode *classnode = static_cast<ClassNode *>(id);
 
   FunctionNode *func = nullptr;
-  for (int i=0; i < classnode->GetConstructorNum(); i++) {
+  for (int i=0; i < classnode->GetConstructorsNum(); i++) {
     func = classnode->GetConstructor(i);
     if (func->GetParamsNum() == node->GetArgsNum()) {
       break;

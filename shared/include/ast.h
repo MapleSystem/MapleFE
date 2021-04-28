@@ -1142,7 +1142,7 @@ public:
   unsigned GetAttributesNum()      {return mAttributes.GetNum();}
   unsigned GetFieldsNum()          {return mFields.GetNum();}
   unsigned GetMethodsNum()         {return mMethods.GetNum();}
-  unsigned GetConstructorNum()     {return mConstructors.GetNum();}
+  unsigned GetConstructorsNum()     {return mConstructors.GetNum();}
   unsigned GetInstInitsNum()       {return mInstInits.GetNum();}
   unsigned GetLocalClassesNum()    {return mLocalClasses.GetNum();}
   unsigned GetLocalInterfacesNum() {return mLocalInterfaces.GetNum();}
