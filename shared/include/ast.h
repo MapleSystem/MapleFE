@@ -240,6 +240,13 @@ public:
   BinOperatorNode() {mKind = NK_BinOperator;}
   ~BinOperatorNode() {}
 
+  OprId     GetOprId() {return mOprId;}
+  TreeNode* GetOpndA() {return mOpndA;}
+  TreeNode* GetOpndB() {return mOpndB;}
+  void SetOprId(OprId o)     {mOprId = o;}
+  void SetOpndA(TreeNode* t) {mOpndA = t; t->SetParent(this);}
+  void SetOpndB(TreeNode* t) {mOpndB = t; t->SetParent(this);}
+
   void ReplaceChild(TreeNode*, TreeNode*);
   void Dump(unsigned);
 };
