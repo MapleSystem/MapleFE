@@ -1033,6 +1033,7 @@ public:
   void SetType(TreeNode *t) {mType = t;}
   TreeNode* GetType(){return mType;}
 
+  DimensionNode* GetDims()       {return mDims;}
   void SetDims(DimensionNode *t) {mDims = t;}
   unsigned GetDimsNum()          {return mDims->GetDimsNum();}
   bool     IsArray()             {return mDims && GetDimsNum() > 0;}
