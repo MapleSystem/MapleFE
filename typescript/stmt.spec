@@ -972,11 +972,10 @@ rule InterfaceDeclaration : "interface" + BindingIdentifier + '{' + ZEROORMORE(O
 ## function BindingIdentifieropt CallSignature { FunctionBody }
 ## function BindingIdentifieropt CallSignature ;
 
-# Inline Call signature to make it easier to write action.
-# TODO: I temporary use JS's FormalParameterList instead of TS ParameterList
+# NOTE: Inline Call signature to make it easier to write action.
 rule FunctionDeclaration : ONEOF(
-  "function" + ZEROORONE(BindingIdentifier) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(FormalParameterList)  + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}',
-  "function" + ZEROORONE(BindingIdentifier) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(FormalParameterList)  + ')' + ZEROORONE(TypeAnnotation)  + ';')
+  "function" + ZEROORONE(BindingIdentifier) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}',
+  "function" + ZEROORONE(BindingIdentifier) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation)  + ';')
   attr.action.%1,%2 : BuildFunction(%2)
   attr.action.%1,%2 : AddParams(%5)
   attr.action.%1,%2 : AddType(%7)
@@ -1055,13 +1054,42 @@ rule TypeAnnotation: ':' + Type
 ## rule CallSignature: ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation)
 
 ## rule ParameterList: RequiredParameterList OptionalParameterList RestParameter RequiredParameterList , OptionalParameterList RequiredParameterList , RestParameter OptionalParameterList , RestParameter RequiredParameterList , OptionalParameterList , RestParameter
+rule ParameterList: ONEOF(RequiredParameterList,
+                          OptionalParameterList,
+                          RestParameter,
+                          RequiredParameterList + ',' + OptionalParameterList,
+                          RequiredParameterList + ',' + RestParameter,
+                          OptionalParameterList + ',' + RestParameter,
+                          RequiredParameterList + ',' + OptionalParameterList + ',' + RestParameter)
+
 ## rule RequiredParameterList: RequiredParameter RequiredParameterList , RequiredParameter
+rule RequiredParameterList: ONEOF(RequiredParameter,
+                                  RequiredParameterList + ',' + RequiredParameter)
+
 ## rule RequiredParameter: AccessibilityModifieropt BindingIdentifierOrPattern TypeAnnotationopt BindingIdentifier : StringLiteral
+rule RequiredParameter: ONEOF(ZEROORONE(AccessibilityModifier) + BindingIdentifierOrPattern + ZEROORONE(TypeAnnotation),
+                              BindingIdentifier + ':' + FAKEStringLiteral)
+  attr.action.%1 : BuildDecl(%3, %2)
+
 ## rule AccessibilityModifier: public private protected
+rule AccessibilityModifier: ONEOF("public", "private", "protected")
+
 ## rule BindingIdentifierOrPattern: BindingIdentifier BindingPattern
+rule BindingIdentifierOrPattern: ONEOF(BindingIdentifier, BindingPattern)
+
 ## rule OptionalParameterList: OptionalParameter OptionalParameterList , OptionalParameter
+rule OptionalParameterList: ONEOF(OptionalParameter,
+                                  OptionalParameterList + ',' + OptionalParameter)
+
 ## rule OptionalParameter: AccessibilityModifieropt BindingIdentifierOrPattern ? TypeAnnotationopt AccessibilityModifieropt BindingIdentifierOrPattern TypeAnnotationopt Initializer BindingIdentifier ? : StringLiteral
+rule OptionalParameter: ONEOF(
+  ZEROORONE(AccessibilityModifier) + BindingIdentifierOrPattern + '?' + ZEROORONE(TypeAnnotation),
+  ZEROORONE(AccessibilityModifier) + BindingIdentifierOrPattern + ZEROORONE(TypeAnnotation) + Initializer,
+  BindingIdentifier + '?' + ':' + FAKEStringLiteral)
+
 ## rule RestParameter: ... BindingIdentifier TypeAnnotationopt
+rule RestParameter: "..." + BindingIdentifier + ZEROORONE(TypeAnnotation)
+
 ## rule ConstructSignature: new TypeParametersopt ( ParameterListopt ) TypeAnnotationopt
 ## rule IndexSignature: [ BindingIdentifier : string ] TypeAnnotation [ BindingIdentifier : number ] TypeAnnotation
 ## rule MethodSignature: PropertyName ?opt CallSignature

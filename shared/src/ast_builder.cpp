@@ -776,14 +776,15 @@ TreeNode* ASTBuilder::BuildDecl() {
   if (mParams.size() == 2) {
     Param p_type = mParams[0];
     Param p_name = mParams[1];
-    MASSERT(!p_type.mIsEmpty && p_type.mIsTreeNode
-            && "Not appropriate type node in BuildDecl()");
-    tree_type = p_type.mData.mTreeNode;
+    if(!p_type.mIsEmpty && p_type.mIsTreeNode)
+      tree_type = p_type.mData.mTreeNode;
 
     if (!p_name.mIsTreeNode)
       MERROR("The variable name should be a IdentifierNode already, but actually NOT?");
     var = p_name.mData.mTreeNode;
-    add_type_to(var, tree_type);
+
+    if (tree_type)
+      add_type_to(var, tree_type);
 
   } else {
     Param p_name = mParams[0];

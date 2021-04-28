@@ -1,0 +1,9 @@
+Matched 37 tokens.
+============= Module ===========
+== Sub Tree ==
+func  Person(first,last,age,eye)  throws: 
+  this.firstName Assign first
+  this.lastName Assign last
+  this.age Assign age
+  this.eyeColor Assign eye
+
