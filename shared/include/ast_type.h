@@ -81,7 +81,9 @@ public:
 
   const char* GetName() {return mId->GetName();}
 
-  unsigned TypeArgsNum() {return mTypeArguments.GetNum();}
+  unsigned GetTypeArgumentsNum() {return mTypeArguments.GetNum();}
+  IdentifierNode* GetTypeArgument(unsigned i) {return mTypeArguments.ValueAtIndex(i);}
+
   void     AddTypeArg(IdentifierNode *n) {mTypeArguments.PushBack(n);}
   void     AddTypeArgs(TreeNode *n);
 
