@@ -1201,8 +1201,11 @@ public:
   ~LambdaNode(){Release();}
 
   void AddParam(IdentifierNode *n) {mParams.PushBack(n); n->SetParent(this);}
-  TreeNode* Getbody() {return mBody;}
+  TreeNode* GetBody() {return mBody;}
   void SetBody(TreeNode *n) {mBody = n; n->SetParent(this);}
+
+  unsigned        GetParamsNum()        {return mParams.GetNum();}
+  IdentifierNode* GetParam(unsigned i)  {return mParams.ValueAtIndex(i);}
 
   void Release() {mParams.Release();}
   void Dump(unsigned);
