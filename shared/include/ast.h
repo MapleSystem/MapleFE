@@ -1118,15 +1118,21 @@ public:
   void AddAttr(AttrId a) {mAttributes.PushBack(a);}
   void AddBody(BlockNode *b) {mBody = b; b->SetParent(this);}
 
-  unsigned GetFieldsNum()      {return mFields.GetNum();}
-  unsigned GetMethodsNum()     {return mMethods.GetNum();}
-  unsigned GetConstructorNum() {return mConstructors.GetNum();}
-  unsigned GetInstInitsNum()   {return mInstInits.GetNum();}
-  unsigned GetLocalClassesNum()   {return mLocalClasses.GetNum();}
-  unsigned GetLocalInterfacesNum(){return mLocalInterfaces.GetNum();}
-  IdentifierNode* GetField(unsigned i)     {return mFields.ValueAtIndex(i);}
-  FunctionNode* GetMethod(unsigned i)      {return mMethods.ValueAtIndex(i);}
-  FunctionNode* GetConstructor(unsigned i) {return mConstructors.ValueAtIndex(i);}
+  unsigned GetSuperClassesNum()    {return mSuperClasses.GetNum();}
+  unsigned GetSuperInterfacesNum() {return mSuperInterfaces.GetNum();}
+  unsigned GetAttributesNum()      {return mAttributes.GetNum();}
+  unsigned GetFieldsNum()          {return mFields.GetNum();}
+  unsigned GetMethodsNum()         {return mMethods.GetNum();}
+  unsigned GetConstructorNum()     {return mConstructors.GetNum();}
+  unsigned GetInstInitsNum()       {return mInstInits.GetNum();}
+  unsigned GetLocalClassesNum()    {return mLocalClasses.GetNum();}
+  unsigned GetLocalInterfacesNum() {return mLocalInterfaces.GetNum();}
+  ClassNode* GetSuperClass(unsigned i)         {return mSuperClasses.ValueAtIndex(i);}
+  InterfaceNode* GetSuperInterface(unsigned i) {return mSuperInterfaces.ValueAtIndex(i);}
+  AttrId GetAttribute(unsigned i)              {return mAttributes.ValueAtIndex(i);}
+  IdentifierNode* GetField(unsigned i)         {return mFields.ValueAtIndex(i);}
+  FunctionNode* GetMethod(unsigned i)          {return mMethods.ValueAtIndex(i);}
+  FunctionNode* GetConstructor(unsigned i)     {return mConstructors.ValueAtIndex(i);}
   BlockNode* GetInstInit(unsigned i)       {return mInstInits.ValueAtIndex(i);}
   ClassNode* GetLocalClass(unsigned i)     {return mLocalClasses.ValueAtIndex(i);}
   InterfaceNode* GetLocalInterface(unsigned i)  {return mLocalInterfaces.ValueAtIndex(i);}
