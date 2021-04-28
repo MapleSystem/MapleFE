@@ -1,4 +1,4 @@
-//// Constructor function for Person objects
+// Constructor function for Person objects
 function Person(first, last, age, eye) {
   this.firstName = first;
   this.lastName = last;
@@ -7,5 +7,5 @@ function Person(first, last, age, eye) {
 }
 
 //// Create a Person object
-//var myFather = new Person("John", "Doe", 50, "blue");
-//console.log(myFather.age);
+var myFather = new Person("John", "Doe", 50, "blue");
+console.log(myFather.age);

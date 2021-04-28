@@ -1,4 +1,6 @@
 Matched 37 tokens.
+Matched 52 tokens.
+Matched 61 tokens.
 ============= Module ===========
 == Sub Tree ==
 func  Person(first,last,age,eye)  throws: 
@@ -7,3 +9,7 @@ func  Person(first,last,age,eye)  throws:
   this.age Assign age
   this.eyeColor Assign eye
 
+== Sub Tree ==
+js_var Decl: myFather=
+== Sub Tree ==
+console.log(myFather.age)
