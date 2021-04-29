@@ -275,8 +275,7 @@ def gen_handler_tree_node(dictionary):
         code.append("break;");
     code.append("default: ;  // Unexpected kind")
     code.append("}")
-    code.append("return node;")
-    code.append("}")
+    code.append(gen_func_definition_end(dictionary, "TreeNode"))
     append(src_file, code)
 
 # Handle each node which has TreeNode as its base
@@ -390,11 +389,14 @@ if False:
 
 ################################################################################
 
+def gen_func_declaration(dictionary, node_name):
+    return "void " + gen_args[2] + node_name + "(" + node_name + "* node);"
+
 def gen_func_definition(dictionary, node_name):
-    str = node_name + "* " + gen_args[1] + "::" + gen_args[2] + node_name + "(" + node_name + "* node) {" \
+    str = "void " + gen_args[1] + "::" + gen_args[2] + node_name + "(" + node_name + "* node) {" \
             + '\nif(node == nullptr) {\n' \
                  + 'dump("  ' + node_name + ': null");\n' \
-                 + 'return node;\n' \
+                 + 'return;\n' \
               + '}'
     if node_name != "TreeNode":
         str += '\ndump("  ' + node_name + ' {");\n' \
@@ -448,7 +450,10 @@ def gen_call_nth_subchild_value(dictionary, field_name, val_type, accessor):
     return str
 
 def gen_func_definition_end(dictionary, node_name):
-    return 'indent -= 4;\ndump("  }");\nreturn node;\n}'
+    str = 'return;\n}'
+    if node_name != "TreeNode":
+        str = 'indent -= 4;\ndump("  }");\n' + str
+    return str
 
 #
 # Generate a2c_astdump.h and a2c_ast.cpp
