@@ -14,6 +14,7 @@
 */
 
 #include "ast2cpp.h"
+#include "a2c_astdump.h"
 
 namespace maplefe {
 
@@ -33,6 +34,14 @@ void A2C::ProcessAST(bool trace_a2m) {
       tnode->Dump(0);
       std::cout << std::endl;
     }
+  }
+
+  if (mTraceA2C) {
+      std::cout << "============= A2C_AstDump ===========" << std::endl;
+      A2C_AstDump astdump;
+      for(auto it: gModule.mTrees)
+          astdump.dump(it->mRootNode);
+
   }
 }
 }
