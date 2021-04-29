@@ -1162,7 +1162,7 @@ TreeNode* ASTBuilder::BuildClass() {
 
 TreeNode* ASTBuilder::SetClassIsJavaEnum() {
   ClassNode *klass = (ClassNode*)mLastTreeNode;
-  klass->SetJavaEnum();
+  klass->SetIsJavaEnum();
   return mLastTreeNode;
 }
 
@@ -1593,7 +1593,7 @@ TreeNode* ASTBuilder::BuildNewOperation() {
   MASSERT(p_a.mIsTreeNode && "Name of new expression is not a tree?");
   TreeNode *name = p_a.mData.mTreeNode;
   new_node->SetId(name);
-  
+
   TreeNode *node_b = p_b.mIsEmpty ? NULL : p_b.mData.mTreeNode;
   if (node_b)
     AddArguments(new_node, node_b);

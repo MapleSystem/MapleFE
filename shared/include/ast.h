@@ -162,6 +162,8 @@ public:
   ImportNode() {mName = NULL; mProperty = ImpNone; mKind = NK_Import;}
   ~ImportNode(){}
 
+  void SetProperty(ImportProperty p) {mProperty = p;}
+  ImportProperty GetProperty() {return mProperty;}
   void SetTarget(TreeNode *t) {mTarget = t;}
   TreeNode* GetTarget() {return mTarget;}
 
@@ -1080,6 +1082,7 @@ public:
   FunctionNode* GetMethodAtIndex(unsigned i) {return mMethods.ValueAtIndex(i);}
 
   void SetIsAnnotation(bool b) {mIsAnnotation = b;}
+  bool IsAnnotation()          {return mIsAnnotation;}
 
   void Construct(BlockNode *);
   void Dump(unsigned);
@@ -1114,7 +1117,7 @@ private:
   // and special semantic rules. We define JavaEnum here too. For other
   // languages like C/C++ which have very simply Enum, we will have a
   // dedicated EnumNode for them.
-  bool                         mJavaEnum;
+  bool                         mIsJavaEnum;
 
   SmallVector<ClassNode*>      mSuperClasses;
   SmallVector<InterfaceNode*>  mSuperInterfaces;
@@ -1129,11 +1132,11 @@ private:
   SmallVector<InterfaceNode*>  mLocalInterfaces;
 
 public:
-  ClassNode(){mKind = NK_Class; mJavaEnum = false; mBody = NULL;}
+  ClassNode(){mKind = NK_Class; mIsJavaEnum = false; mBody = NULL;}
   ~ClassNode() {Release();}
 
-  bool IsJavaEnum() {return mJavaEnum;}
-  void SetJavaEnum(){mJavaEnum = true;}
+  bool IsJavaEnum() {return mIsJavaEnum;}
+  void SetIsJavaEnum(){mIsJavaEnum = true;}
 
   void AddSuperClass(ClassNode *n)         {mSuperClasses.PushBack(n);}
   void AddSuperInterface(InterfaceNode *n) {mSuperInterfaces.PushBack(n);}
