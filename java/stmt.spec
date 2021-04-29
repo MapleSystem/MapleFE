@@ -259,6 +259,7 @@ rule LambdaParameterList : ONEOF(
 rule LambdaParameter : ONEOF(
   ZEROORMORE(VariableModifier) + LambdaParameterType + VariableDeclaratorId,
   VariableArityParameter)
+  attr.action.%1: BuildDecl(%2, %3)
 
 rule LambdaParameterType : ONEOF(UnannType, "var")
 

@@ -24,7 +24,7 @@ class  Point
 
       m Assign () -> system.gc()
 
-      m Assign () -> x Add y
+      m Assign (x,y) -> x Add y
 
   LocalClasses: 
   LocalInterfaces: 

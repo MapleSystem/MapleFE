@@ -1044,8 +1044,14 @@ rule TypeName: IdentifierReference
 
 ## rule FunctionType: TypeParametersopt ( ParameterListopt ) => Type
 rule FunctionType: ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList) + ')' + "=>" + Type
+  attr.action : BuildLambda(%3)
+  attr.action : AddType(%6)
 
 ## rule ConstructorType: new TypeParametersopt ( ParameterListopt ) => Type
+rule ConstructorType: "new" + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList) + ')' + "=>" + Type
+  attr.action : BuildLambda(%4)
+  attr.action : AddType(%7)
+
 ## rule TypeQuery: typeof TypeQueryExpression
 ## rule TypeQueryExpression: IdentifierReference TypeQueryExpression . IdentifierName
 ## rule ThisType: this

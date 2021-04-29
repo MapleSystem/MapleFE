@@ -941,8 +941,8 @@ LambdaNode *A2C_AstDump::AstDumpLambdaNode(LambdaNode *node) {
   dump("mParams: SmallVector<class maplefe::IdentifierNode *>, size = " + std::to_string(node->GetParamsNum()) + " [");
   indent += 2;
   for (unsigned i = 0; i < node->GetParamsNum(); ++i) {
-    dump(std::to_string(i + 1) + ": IdentifierNode*");
-    AstDumpIdentifierNode(node->GetParam(i));
+    dump(std::to_string(i + 1) + ": TreeNode*");
+    AstDumpTreeNode(node->GetParam(i));
   }
   indent -= 2;
   dump(" ]");

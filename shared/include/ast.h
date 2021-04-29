@@ -427,6 +427,8 @@ public:
   DeclProp GetProp() {return mProp;}
   void SetProp(DeclProp p) {mProp = p;}
 
+  const char* GetName() {return mVar->GetName();}
+
   void Dump(unsigned);
 };
 
@@ -1196,22 +1198,43 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////
 //                  Lambda Expression
+// Java Lambda expression and JS arrow function have similar syntax.
+// Also in Typescript, FunctionType and Constructor Type have the similar syntax.
+// We put them in the same node.
 ////////////////////////////////////////////////////////////////////////////
+
+enum LambdaProperty {
+  LP_JavaLambda,
+  LP_JSArrowFunction,
+  LP_TSFunctionType,
+  LP_TSConstructorType,
+  LP_NA
+};
 
 class LambdaNode : public TreeNode {
 private:
-  SmallVector<IdentifierNode*> mParams;
-  TreeNode *mBody;  // the body is block.
+  LambdaProperty         mProperty;
+  TreeNode              *mType;         // The return type. NULL as Java Lambda.
+  SmallVector<TreeNode*> mParams;       // A param could be an IdentifierNode or DeclNode.
+  TreeNode              *mBody;         // the body is block.
+                                        // NULL as TS FunctionType and ConstructorType
 public:
-  LambdaNode() {mBody = NULL; mKind = NK_Lambda;}
+  LambdaNode() {mBody = NULL; mKind = NK_Lambda; mProperty = LP_JSArrowFunction; mType = NULL;}
   ~LambdaNode(){Release();}
 
-  void AddParam(IdentifierNode *n) {mParams.PushBack(n); n->SetParent(this);}
-  TreeNode* GetBody() {return mBody;}
-  void SetBody(TreeNode *n) {mBody = n; n->SetParent(this);}
 
-  unsigned        GetParamsNum()        {return mParams.GetNum();}
-  IdentifierNode* GetParam(unsigned i)  {return mParams.ValueAtIndex(i);}
+  TreeNode* GetBody()            {return mBody;}
+  void      SetBody(TreeNode *n) {mBody = n; n->SetParent(this);}
+
+  LambdaProperty  GetProperty()                 {return mProperty;}
+  void            SetProperty(LambdaProperty p) {mProperty = p;}
+
+  TreeNode* GetType()            {return mType;}
+  void      SetType(TreeNode* t) {mType = t;}
+
+  unsigned  GetParamsNum()        {return mParams.GetNum();}
+  TreeNode* GetParam(unsigned i)  {return mParams.ValueAtIndex(i);}
+  void      AddParam(TreeNode *n) {mParams.PushBack(n); n->SetParent(this);}
 
   void Release() {mParams.Release();}
   void Dump(unsigned);

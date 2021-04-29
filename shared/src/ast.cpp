@@ -1159,7 +1159,7 @@ void LambdaNode::Dump(unsigned indent) {
   std::string dump;
   dump += "(";
   for (unsigned i = 0; i < mParams.GetNum(); i++) {
-    IdentifierNode *in = mParams.ValueAtIndex(i);
+    TreeNode *in = mParams.ValueAtIndex(i);
     dump += in->GetName();
     if (i < mParams.GetNum() - 1)
       dump += ",";

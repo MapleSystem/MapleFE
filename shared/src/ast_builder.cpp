@@ -131,6 +131,9 @@ static void add_type_to(TreeNode *tree, TreeNode *type) {
   if (tree->IsIdentifier()) {
     IdentifierNode *in = (IdentifierNode*)tree;
     in->SetType(type);
+  } else if (tree->IsLambda()) {
+    LambdaNode *lam = (LambdaNode*)tree;
+    lam->SetType(type);
   } else if (tree->IsVarList()) {
     VarListNode *vl = (VarListNode*)tree;
     for (unsigned i = 0; i < vl->GetNum(); i++)
@@ -2025,15 +2028,22 @@ TreeNode* ASTBuilder::AddTypeArgument() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-//                       Lambda Expression
+//                       LambdaNode
+// As stated in the ast.h, LambdaNode could be different syntax construct in
+// different languages.
 ////////////////////////////////////////////////////////////////////////////////
 
+// It could take
+//   1) One parameter, which is the parameter list.
+//   2) two parameters, the parameter list and the body 
 TreeNode* ASTBuilder::BuildLambda() {
   if (mTrace)
     std::cout << "In BuildLambda" << std::endl;
 
-  Param p_params = mParams[0];
   TreeNode *params_node = NULL;
+  TreeNode *body_node = NULL;
+
+  Param p_params = mParams[0];
   if (!p_params.mIsEmpty) {
     if (!p_params.mIsTreeNode)
       MERROR("Lambda params is not a tree node.");
@@ -2041,24 +2051,34 @@ TreeNode* ASTBuilder::BuildLambda() {
       params_node = p_params.mData.mTreeNode;
   }
 
-  Param p_body = mParams[1];
-  TreeNode *body_node = NULL;
-  if (!p_body.mIsEmpty) {
-    if (!p_body.mIsTreeNode)
-      MERROR("Lambda Body is not a tree node.");
-    else
-      body_node = CvtToBlock(p_body.mData.mTreeNode);
+  if (mParams.size() == 2) {
+    Param p_body = mParams[1];
+    if (!p_body.mIsEmpty) {
+      if (!p_body.mIsTreeNode)
+        MERROR("Lambda Body is not a tree node.");
+      else
+        body_node = CvtToBlock(p_body.mData.mTreeNode);
+    }
   }
 
   LambdaNode *lambda = (LambdaNode*)mTreePool->NewTreeNode(sizeof(LambdaNode));
   new (lambda) LambdaNode();
 
   if (params_node) {
-    if (params_node->IsIdentifier())
+    if (params_node->IsIdentifier()) {
       lambda->AddParam((IdentifierNode*)params_node);
+    } else if (params_node->IsPass()) {
+      PassNode *pass_node = (PassNode*)params_node;
+      for (unsigned i = 0; i < pass_node->GetChildrenNum(); i++) {
+        TreeNode *param = pass_node->GetChild(i);
+        MASSERT(param->IsIdentifier() || param->IsDecl());
+        lambda->AddParam(param);
+      } 
+    }
   }
 
-  lambda->SetBody(body_node);
+  if (body_node)
+    lambda->SetBody(body_node);
 
   mLastTreeNode = lambda;
   return mLastTreeNode;
