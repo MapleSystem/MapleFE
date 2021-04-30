@@ -396,30 +396,29 @@ if False:
 def get_data_based_on_type(val_type, accessor):
     e = get_enum_type(val_type)
     if e != None:
-        str = e + ': " + GetEnum' + e + '(' + accessor + '));\n'
+        return e + ': " + GetEnum' + e + '(' + accessor + '));\n'
     elif val_type == "LitData":
-        str = 'LitData: LitId, " + GetEnumLitId(' + accessor + '.mType) + ", " + GetEnumLitData(' + accessor + '));\n'
+        return 'LitData: LitId, " + GetEnumLitId(' + accessor + '.mType) + ", " + GetEnumLitData(' + accessor + '));\n'
     elif val_type == "bool":
-        str = val_type + ', " + (' + accessor + ' ? "true" : "false"));\n'
+        return val_type + ', " + (' + accessor + ' ? "true" : "false"));\n'
     elif val_type == "unsigned int":
-        str = val_type + ', " + std::to_string(' + accessor + '));\n'
-    else:
-        str = val_type + ', ") ' + ' + "value"); // Warning: failed to get value\n'
-    return str
+        return val_type + ', " + std::to_string(' + accessor + '));\n'
+    return val_type + ', ") ' + ' + "value"); // Warning: failed to get value\n'
 
+# The follwoing gen_func_* and gen_call* functions are for AstDump
 def gen_func_declaration(dictionary, node_name):
     return "void " + gen_args[2] + node_name + "(" + node_name + "* node);"
 
 def gen_func_definition(dictionary, node_name):
     str = "void " + gen_args[1] + "::" + gen_args[2] + node_name + "(" + node_name + "* node) {" \
             + '\nif(node == nullptr) {\n' \
-                 + 'dump("  ' + node_name + ': null");\n' \
-                 + 'return;\n' \
-              + '}'
+            + 'dump("  ' + node_name + ': null");\n' \
+            + 'return;\n' \
+            + '}'
     if node_name != "TreeNode":
         str += '\ndump("  ' + node_name + ' {");\n' \
-                + 'indent += 4;\n' \
-                + 'base(node);'
+            + 'indent += 4;\n' \
+            + 'base(node);'
     return str
 
 def gen_call_child_node(dictionary, field_name, node_type, accessor):
@@ -427,29 +426,23 @@ def gen_call_child_node(dictionary, field_name, node_type, accessor):
     return str + gen_args[2] + node_type + "(" + accessor + ");"
 
 def gen_call_child_value(dictionary, field_name, val_type, accessor):
-    str = 'dump(std::string("' + field_name + ': ") + "' + get_data_based_on_type(val_type, accessor)
-    return str
+    return 'dump(std::string("' + field_name + ': ") + "' + get_data_based_on_type(val_type, accessor)
 
 def gen_call_children_node(dictionary, field_name, node_type, accessor):
-    str = 'dump("' + field_name + ': ' + node_type + ', size = " + std::to_string(' + accessor + ') + " [");\n'
-    return str + 'indent += 2;'
+    return 'dump("' + field_name + ': ' + node_type + ', size = " + std::to_string(' + accessor + ') + " [");\nindent += 2;'
 
 def gen_call_children_node_end(dictionary, field_name, node_type, accessor):
     return 'indent -= 2;\ndump(" ]");'
 
 def gen_call_nth_subchild_node(dictionary, field_name, node_type, accessor):
-    str = 'dump(std::to_string(i + 1) + ": ' + node_type + '*");\n'
-    return str + gen_args[2] + node_type + "(" + accessor + ");"
+    return 'dump(std::to_string(i + 1) + ": ' + node_type + '*");\n' + gen_args[2] + node_type + "(" + accessor + ");"
 
 def gen_call_nth_subchild_value(dictionary, field_name, val_type, accessor):
-    str = 'dump(std::to_string(i) + ". ' + get_data_based_on_type(val_type, accessor)
-    return str
+    return 'dump(std::to_string(i) + ". ' + get_data_based_on_type(val_type, accessor)
 
 def gen_func_definition_end(dictionary, node_name):
-    str = 'return;\n}'
-    if node_name != "TreeNode":
-        str = 'indent -= 4;\ndump("  }");\n' + str
-    return str
+    if node_name == "TreeNode": return 'return;\n}'
+    return 'indent -= 4;\ndump("  }");\nreturn;\n}'
 
 #
 # Generate source files for dumping AST
