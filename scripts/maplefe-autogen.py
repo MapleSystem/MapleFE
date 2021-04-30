@@ -13,6 +13,7 @@ root_dir = path.dirname(path.dirname(path.realpath(__file__))) + '/'
 builddir = os.environ.get('BUILDDIR')
 maplefe_dir = root_dir + 'shared/'
 output_dir = builddir + '/ast_doc/'
+# index_yaml = output_dir + 'maplefe/index.yaml' # For higher version of clang-doc
 index_yaml = output_dir + 'maplefe.yaml'
 
 license_notice = [
@@ -138,15 +139,15 @@ def get_enum_list(dictionary, enum_name):
                 return e["Members"]
     return []
 
-# Generate functions for enum types, e.g. "const char *getOprId(OprId k);" for enum OprId
+# Generate functions for enum types, e.g. "const char *GetEnumOprId(OprId k);" for enum OprId
 def gen_enum_func(dictionary):
     global include_file, src_file, gen_args
     hcode = ['']
     xcode = ['']
     for each in dictionary["ChildEnums"]:
         name = each["Name"]
-        hcode.append("const char* get" + name + "(" + name + " k);")
-        xcode.append("const char* " + gen_args[1] + "::get" + name + "(" + name + " k) {")
+        hcode.append("const char* GetEnum" + name + "(" + name + " k);")
+        xcode.append("const char* " + gen_args[1] + "::GetEnum" + name + "(" + name + " k) {")
         xcode.append("switch(k) {")
         for e in get_enum_list(dictionary, name):
             xcode.append("case " + e + ":")
@@ -415,9 +416,9 @@ def gen_call_child_value(dictionary, field_name, val_type, accessor):
     str = 'dump(std::string("' + field_name + ': '
     e = get_enum_type(val_type)
     if e != None:
-        str += e + ': ") + get' + e + '(' + accessor + '));\n'
+        str += e + ': ") + GetEnum' + e + '(' + accessor + '));\n'
     elif val_type == "LitData":
-        str += 'LitData: LitId, ") + getLitId(' + accessor + '.mType) + ", " + getLitData(' + accessor + '));\n'
+        str += 'LitData: LitId, ") + GetEnumLitId(' + accessor + '.mType) + ", " + GetEnumLitData(' + accessor + '));\n'
     elif val_type == "bool":
         str += val_type + ', ") + (' + accessor + ' ? "true" : "false"));\n'
     elif val_type == "unsigned int":
@@ -441,9 +442,9 @@ def gen_call_nth_subchild_value(dictionary, field_name, val_type, accessor):
     str = 'dump(std::to_string(i) + ". '
     e = get_enum_type(val_type)
     if e != None:
-        str += e + ': " + get' + e + '(' + accessor + '));\n'
+        str += e + ': " + GetEnum' + e + '(' + accessor + '));\n'
     elif val_type == "LitData":
-        str += 'LitData: LitId, " + getLitId(' + accessor + '.mType) + ", " + getLitData(' + accessor + '));\n'
+        str += 'LitData: LitId, " + GetEnumLitId(' + accessor + '.mType) + ", " + GetEnumLitData(' + accessor + '));\n'
     elif val_type == "bool":
         str += val_type + ', ") + (' + accessor + ' ? "true" : "false"));\n'
     elif val_type == "unsigned int":
@@ -484,7 +485,7 @@ astdump_init = [
         '}',
         '',
         'void base(TreeNode* node) {',
-        'dump(std::string(". mKind: NodeKind, ") + getNodeKind(node->GetKind()));',
+        'dump(std::string(". mKind: NodeKind, ") + GetEnumNodeKind(node->GetKind()));',
         'const char* name = node->GetName();',
         'if(name)',
         'dump(std::string(". mName: const char*, \\"") + node->GetName() + "\\"");',
@@ -495,8 +496,8 @@ astdump_init = [
         '}',
         '}',
         '',
-        'std::string getLitData(LitData lit) {',
-        'std::string str = getLitId(lit.mType);',
+        'std::string GetEnumLitData(LitData lit) {',
+        'std::string str = GetEnumLitId(lit.mType);',
         'switch (lit.mType) {',
         'case LT_IntegerLiteral:',
         'return std::to_string(lit.mData.mInt);',
