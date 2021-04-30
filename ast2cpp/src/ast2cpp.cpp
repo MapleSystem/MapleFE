@@ -40,7 +40,7 @@ void A2C::ProcessAST(bool trace_a2m) {
       std::cout << "============= AstDump ===========" << std::endl;
       AstDump astdump;
       for(auto it: gModule.mTrees)
-          astdump.dump(it->mRootNode);
+          astdump.Dump(it->mRootNode);
 
   }
 }

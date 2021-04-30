@@ -517,7 +517,7 @@ rule Statement : ONEOF(
   EmptyStatement,
   ExpressionStatement,
   IfStatement,
-#  BreakableStatement[?Yield, ?Return]
+  BreakableStatement,
 #  ContinueStatement[?Yield]
 #  BreakStatement[?Yield]
   ReturnStatement)
@@ -549,6 +549,8 @@ rule HoistableDeclaration : ONEOF(FunctionDeclaration)
 ##-----------------------------------
 ##rule BreakableStatement[Yield, Return] :
 ##  IterationStatement[?Yield, ?Return]
+##  SwitchStatement[?Yield, ?Return]
+rule BreakableStatement : ONEOF(IterationStatement)
 ##  SwitchStatement[?Yield, ?Return]
 
 ##-----------------------------------
@@ -732,6 +734,21 @@ rule IfStatement : ONEOF(
 ##  for ( [lookahead NotEq let ] LeftHandSideExpression[?Yield] of AssignmentExpression[In, ?Yield] ) Statement[?Yield, ?Return]
 ##  for ( var ForBinding[?Yield] of AssignmentExpression[In, ?Yield] ) Statement[?Yield, ?Return]
 ##  for ( ForDeclaration[?Yield] of AssignmentExpression[In, ?Yield] ) Statement[?Yield, ?Return]
+rule IterationStatement : ONEOF(
+##  do Statement[?Yield, ?Return] while ( Expression[In, ?Yield] ) ;
+##  while ( Expression[In, ?Yield] ) Statement[?Yield, ?Return]
+  "for" + '(' + ZEROORONE(Expression) + ';' + ZEROORONE(Expression) + ';' + ZEROORONE(Expression) + ')' + Statement,
+  "for" + '(' + "var" + VariableDeclarationList + ';' + ZEROORONE(Expression) + ';' + ZEROORONE(Expression) + ')' + Statement,
+##  for ( LexicalDeclaration[?Yield] Expression[In, ?Yield]opt ; Expression[In, ?Yield]opt ) Statement[?Yield, ?Return]
+##  for ( [lookahead NotIn {let [}] LeftHandSideExpression[?Yield] in Expression[In, ?Yield] ) Statement[?Yield, ?Return]
+##  for ( var ForBinding[?Yield] in Expression[In, ?Yield] ) Statement[?Yield, ?Return]
+##  for ( ForDeclaration[?Yield] in Expression[In, ?Yield] ) Statement[?Yield, ?Return]
+##  for ( [lookahead NotEq let ] LeftHandSideExpression[?Yield] of AssignmentExpression[In, ?Yield] ) Statement[?Yield, ?Return]
+##  for ( var ForBinding[?Yield] of AssignmentExpression[In, ?Yield] ) Statement[?Yield, ?Return]
+##  for ( ForDeclaration[?Yield] of AssignmentExpression[In, ?Yield] ) Statement[?Yield, ?Return]
+  )
+  attr.action.%1: BuildForLoop(%3, %5, %7, %9)
+  attr.action.%2: BuildForLoop(%4, %6, %8, %10)
 
 ##-----------------------------------
 ##rule ForDeclaration[Yield] :
@@ -874,7 +891,7 @@ rule FunctionRestParameter : BindingRestElement
 ## BindingElement[?Yield]
 
 ## Typescript requires type. So this is different than JS spec.
-rule FormalParameter : BindingElement + ':' + Type
+rule FormalParameter : BindingElement
   attr.action : BuildDecl(%3, %1)
 
 ##
@@ -1017,9 +1034,16 @@ rule UnionOrIntersectionOrPrimaryType: ONEOF(IntersectionOrPrimaryType)
 rule IntersectionOrPrimaryType : ONEOF(PrimaryType)
 
 ## rule PrimaryType: ParenthesizedType PredefinedType TypeReference ObjectType ArrayType TupleType TypeQuery ThisType
-rule PrimaryType: ONEOF(TypeReference, PredefinedType)
-
+rule PrimaryType: ONEOF(ParenthesizedType,
+                        PredefinedType,
+                        TypeReference,
+#                        ObjectType,
+                        ArrayType,
+#                        TupleType,
+#                        TypeQuery,
+                        ThisType)
 ## rule ParenthesizedType: ( Type )
+rule ParenthesizedType: '(' + Type + ')'
 
 ## rule PredefinedType: any number boolean string symbol void
 rule PredefinedType: TYPE
@@ -1035,7 +1059,10 @@ rule TypeName: IdentifierReference
 ## rule TypeBody: TypeMemberList ;opt TypeMemberList ,opt
 ## rule TypeMemberList: TypeMember TypeMemberList ; TypeMember TypeMemberList , TypeMember
 ## rule TypeMember: PropertySignature CallSignature ConstructSignature IndexSignature MethodSignature
+
 ## rule ArrayType: PrimaryType [no LineTerminator here] [ ]
+rule ArrayType: PrimaryType + '[' + ']'
+
 ## rule TupleType: [ TupleElementTypes ]
 ## rule TupleElementTypes: TupleElementType TupleElementTypes , TupleElementType
 ## rule TupleElementType: Type
@@ -1054,7 +1081,10 @@ rule ConstructorType: "new" + ZEROORONE(TypeParameters) + '(' + ZEROORONE(Parame
 
 ## rule TypeQuery: typeof TypeQueryExpression
 ## rule TypeQueryExpression: IdentifierReference TypeQueryExpression . IdentifierName
+
 ## rule ThisType: this
+rule ThisType: "this"
+
 ## rule PropertySignature: PropertyName ?opt TypeAnnotationopt
 ## rule PropertyName: IdentifierName StringLiteral NumericLiteral
 
@@ -1062,7 +1092,7 @@ rule ConstructorType: "new" + ZEROORONE(TypeParameters) + '(' + ZEROORONE(Parame
 rule TypeAnnotation: ':' + Type
 
 ## rule CallSignature: TypeParametersopt ( ParameterListopt ) TypeAnnotationopt
-## rule CallSignature: ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation)
+rule CallSignature: ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation)
 
 ## rule ParameterList: RequiredParameterList OptionalParameterList RestParameter RequiredParameterList , OptionalParameterList RequiredParameterList , RestParameter OptionalParameterList , RestParameter RequiredParameterList , OptionalParameterList , RestParameter
 rule ParameterList: ONEOF(RequiredParameterList,
@@ -1078,9 +1108,13 @@ rule RequiredParameterList: ONEOF(RequiredParameter,
                                   RequiredParameterList + ',' + RequiredParameter)
 
 ## rule RequiredParameter: AccessibilityModifieropt BindingIdentifierOrPattern TypeAnnotationopt BindingIdentifier : StringLiteral
-rule RequiredParameter: ONEOF(ZEROORONE(AccessibilityModifier) + BindingIdentifierOrPattern + ZEROORONE(TypeAnnotation),
-                              BindingIdentifier + ':' + FAKEStringLiteral)
-  attr.action.%1 : BuildDecl(%3, %2)
+##
+## NOTE: I Added initializer. I guess the spec missed this part.
+rule RequiredParameter: ONEOF(
+  ZEROORONE(AccessibilityModifier) + BindingIdentifierOrPattern + ZEROORONE(Initializer) + ZEROORONE(TypeAnnotation),
+  BindingIdentifier + ':' + FAKEStringLiteral)
+  attr.action.%1 : AddInitTo(%2, %3)
+  attr.action.%1 : BuildDecl(%4, %2)
 
 ## rule AccessibilityModifier: public private protected
 rule AccessibilityModifier: ONEOF("public", "private", "protected")
