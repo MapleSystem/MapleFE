@@ -393,6 +393,20 @@ if False:
 
 ################################################################################
 
+def get_data_based_on_type(val_type, accessor):
+    e = get_enum_type(val_type)
+    if e != None:
+        str = e + ': " + GetEnum' + e + '(' + accessor + '));\n'
+    elif val_type == "LitData":
+        str = 'LitData: LitId, " + GetEnumLitId(' + accessor + '.mType) + ", " + GetEnumLitData(' + accessor + '));\n'
+    elif val_type == "bool":
+        str = val_type + ', " + (' + accessor + ' ? "true" : "false"));\n'
+    elif val_type == "unsigned int":
+        str = val_type + ', " + std::to_string(' + accessor + '));\n'
+    else:
+        str = val_type + ', ") ' + ' + "value"); // Warning: failed to get value\n'
+    return str
+
 def gen_func_declaration(dictionary, node_name):
     return "void " + gen_args[2] + node_name + "(" + node_name + "* node);"
 
@@ -413,18 +427,7 @@ def gen_call_child_node(dictionary, field_name, node_type, accessor):
     return str + gen_args[2] + node_type + "(" + accessor + ");"
 
 def gen_call_child_value(dictionary, field_name, val_type, accessor):
-    str = 'dump(std::string("' + field_name + ': '
-    e = get_enum_type(val_type)
-    if e != None:
-        str += e + ': ") + GetEnum' + e + '(' + accessor + '));\n'
-    elif val_type == "LitData":
-        str += 'LitData: LitId, ") + GetEnumLitId(' + accessor + '.mType) + ", " + GetEnumLitData(' + accessor + '));\n'
-    elif val_type == "bool":
-        str += val_type + ', ") + (' + accessor + ' ? "true" : "false"));\n'
-    elif val_type == "unsigned int":
-        str += val_type + ', " + std::to_string(' + accessor + '));\n'
-    else:
-        str += val_type + ', ") + "value");\n'
+    str = 'dump(std::string("' + field_name + ': ") + "' + get_data_based_on_type(val_type, accessor)
     return str
 
 def gen_call_children_node(dictionary, field_name, node_type, accessor):
@@ -439,18 +442,7 @@ def gen_call_nth_subchild_node(dictionary, field_name, node_type, accessor):
     return str + gen_args[2] + node_type + "(" + accessor + ");"
 
 def gen_call_nth_subchild_value(dictionary, field_name, val_type, accessor):
-    str = 'dump(std::to_string(i) + ". '
-    e = get_enum_type(val_type)
-    if e != None:
-        str += e + ': " + GetEnum' + e + '(' + accessor + '));\n'
-    elif val_type == "LitData":
-        str += 'LitData: LitId, " + GetEnumLitId(' + accessor + '.mType) + ", " + GetEnumLitData(' + accessor + '));\n'
-    elif val_type == "bool":
-        str += val_type + ', ") + (' + accessor + ' ? "true" : "false"));\n'
-    elif val_type == "unsigned int":
-        str += val_type + ', " + std::to_string(' + accessor + '));\n'
-    else:
-        str = 'dump(std::string("' + field_name + ': ' + val_type + ', ") ' + ' + "value");\n'
+    str = 'dump(std::to_string(i) + ". ' + get_data_based_on_type(val_type, accessor)
     return str
 
 def gen_func_definition_end(dictionary, node_name):
