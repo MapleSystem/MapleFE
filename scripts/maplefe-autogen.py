@@ -411,38 +411,33 @@ def gen_func_declaration(dictionary, node_name):
 
 def gen_func_definition(dictionary, node_name):
     str = "void " + gen_args[1] + "::" + gen_args[2] + node_name + "(" + node_name + "* node) {" \
-            + '\nif(node == nullptr) {\n' \
-            + 'dump("  ' + node_name + ': null");\n' \
-            + 'return;\n' \
-            + '}'
+            + '\nif(node == nullptr) {\nDump("  ' + node_name + ': null");\nreturn;\n}'
     if node_name != "TreeNode":
-        str += '\ndump("  ' + node_name + ' {");\n' \
-            + 'indent += 4;\n' \
-            + 'base(node);'
+        str += '\nDumpFB("' + node_name + ' {");\nDumpBase(node);'
     return str
 
 def gen_call_child_node(dictionary, field_name, node_type, accessor):
-    str = 'dump("' + field_name + ': ' + node_type + '*");\n' if field_name != "" else ""
+    str = 'Dump("' + field_name + ': ' + node_type + '*");\n' if field_name != "" else ""
     return str + gen_args[2] + node_type + "(" + accessor + ");"
 
 def gen_call_child_value(dictionary, field_name, val_type, accessor):
-    return 'dump(std::string("' + field_name + ': ") + "' + get_data_based_on_type(val_type, accessor)
+    return 'Dump(std::string("' + field_name + ': ") + "' + get_data_based_on_type(val_type, accessor)
 
 def gen_call_children_node(dictionary, field_name, node_type, accessor):
-    return 'dump("' + field_name + ': ' + node_type + ', size = " + std::to_string(' + accessor + ') + " [");\nindent += 2;'
+    return 'DumpLB("' + field_name + ': ' + node_type + ', size = " + std::to_string(' + accessor + ') + " [");'
 
 def gen_call_children_node_end(dictionary, field_name, node_type, accessor):
-    return 'indent -= 2;\ndump(" ]");'
+    return 'DumpLE("]");'
 
 def gen_call_nth_subchild_node(dictionary, field_name, node_type, accessor):
-    return 'dump(std::to_string(i + 1) + ": ' + node_type + '*");\n' + gen_args[2] + node_type + "(" + accessor + ");"
+    return 'Dump(std::to_string(i + 1) + ": ' + node_type + '*");\n' + gen_args[2] + node_type + "(" + accessor + ");"
 
 def gen_call_nth_subchild_value(dictionary, field_name, val_type, accessor):
-    return 'dump(std::to_string(i) + ". ' + get_data_based_on_type(val_type, accessor)
+    return 'Dump(std::to_string(i) + ". ' + get_data_based_on_type(val_type, accessor)
 
 def gen_func_definition_end(dictionary, node_name):
     if node_name == "TreeNode": return 'return;\n}'
-    return 'indent -= 4;\ndump("  }");\nreturn;\n}'
+    return '\nDumpFE("}");\nreturn;\n}'
 
 #
 # Generate source files for dumping AST
@@ -460,23 +455,34 @@ astdump_init = [
         'public:',
         gen_args[1] + '() : indent(0) {}',
         '',
-        'void dump(TreeNode* node) {',
+        'void Dump(TreeNode* node) {',
         'AstDumpTreeNode(node);',
         '}',
         '',
         'private:',
-        'void dump(const std::string& msg) {',
+        'void Dump(const std::string& msg) {',
         'std::cout << std::string(indent, \' \') << msg << std::endl;',
         '}',
-        '',
-        'void base(TreeNode* node) {',
-        'dump(std::string(". mKind: NodeKind, ") + GetEnumNodeKind(node->GetKind()));',
+        'void DumpFB(const std::string& msg) {',
+        'std::cout << std::string(indent + 2, \' \') << msg << std::endl;', 'indent += 4;',
+        '}', '',
+        'void DumpFE(const std::string& msg) {',
+        'indent -= 4;', 'std::cout << std::string(indent + 2, \' \') << msg << std::endl;',
+        '}', '',
+        'void DumpLB(const std::string& msg) {',
+        'std::cout << std::string(indent, \' \') << msg << std::endl;', 'indent += 2;',
+        '}', '',
+        'void DumpLE(const std::string& msg) {',
+        'indent -= 2;', 'std::cout << std::string(indent + 1, \' \') << msg << std::endl;',
+        '}', '',
+        'void DumpBase(TreeNode* node) {',
+        'Dump(std::string(". mKind: NodeKind, ") + GetEnumNodeKind(node->GetKind()));',
         'const char* name = node->GetName();',
         'if(name)',
-        'dump(std::string(". mName: const char*, \\"") + node->GetName() + "\\"");',
+        'Dump(std::string(". mName: const char*, \\"") + node->GetName() + "\\"");',
         'TreeNode* label = node->GetLabel();',
         'if(label) {',
-        'dump(". mLabel: TreeNode*: ");',
+        'Dump(". mLabel: TreeNode*: ");',
         'AstDumpTreeNode(label);'
         '}',
         '}',

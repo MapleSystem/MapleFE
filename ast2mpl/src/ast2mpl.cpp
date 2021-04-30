@@ -75,7 +75,7 @@ void A2M::ProcessAST(bool trace_a2m) {
   // pass 2: handle function def
   for(auto it: gModule.mTrees) {
     TreeNode *tnode = it->mRootNode;
-    if (mTraceA2m) { astdump.dump(it->mRootNode); }
+    if (mTraceA2m) { astdump.Dump(it->mRootNode); }
     ProcessNode(SK_Stmt, tnode, nullptr);
   }
 }
