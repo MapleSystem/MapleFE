@@ -17,15 +17,15 @@
 
 namespace maplefe {
 
-AnnotationNode *A2C_AstDump::AstDumpAnnotationNode(AnnotationNode *node) {
+void A2C_AstDump::AstDumpAnnotationNode(AnnotationNode *node) {
   if (node == nullptr) {
     dump("  AnnotationNode: null");
-    return node;
+    return;
   }
   dump("  AnnotationNode {");
   indent += 4;
   base(node);
-  // Declared at shared/include/ast.h:463
+  // Declared at shared/include/ast.h:465
   dump("mId: IdentifierNode*");
   AstDumpIdentifierNode(node->GetId());
   dump("mType: AnnotationTypeNode*");
@@ -34,13 +34,13 @@ AnnotationNode *A2C_AstDump::AstDumpAnnotationNode(AnnotationNode *node) {
   AstDumpTreeNode(node->GetExpr());
   indent -= 4;
   dump("  }");
-  return node;
+  return;
 }
 
-PackageNode *A2C_AstDump::AstDumpPackageNode(PackageNode *node) {
+void A2C_AstDump::AstDumpPackageNode(PackageNode *node) {
   if (node == nullptr) {
     dump("  PackageNode: null");
-    return node;
+    return;
   }
   dump("  PackageNode {");
   indent += 4;
@@ -50,13 +50,13 @@ PackageNode *A2C_AstDump::AstDumpPackageNode(PackageNode *node) {
   AstDumpTreeNode(node->GetPackage());
   indent -= 4;
   dump("  }");
-  return node;
+  return;
 }
 
-ImportNode *A2C_AstDump::AstDumpImportNode(ImportNode *node) {
+void A2C_AstDump::AstDumpImportNode(ImportNode *node) {
   if (node == nullptr) {
     dump("  ImportNode: null");
-    return node;
+    return;
   }
   dump("  ImportNode {");
   indent += 4;
@@ -68,13 +68,13 @@ ImportNode *A2C_AstDump::AstDumpImportNode(ImportNode *node) {
   AstDumpTreeNode(node->GetTarget());
   indent -= 4;
   dump("  }");
-  return node;
+  return;
 }
 
-UnaOperatorNode *A2C_AstDump::AstDumpUnaOperatorNode(UnaOperatorNode *node) {
+void A2C_AstDump::AstDumpUnaOperatorNode(UnaOperatorNode *node) {
   if (node == nullptr) {
     dump("  UnaOperatorNode: null");
-    return node;
+    return;
   }
   dump("  UnaOperatorNode {");
   indent += 4;
@@ -88,13 +88,13 @@ UnaOperatorNode *A2C_AstDump::AstDumpUnaOperatorNode(UnaOperatorNode *node) {
   AstDumpTreeNode(node->GetOpnd());
   indent -= 4;
   dump("  }");
-  return node;
+  return;
 }
 
-BinOperatorNode *A2C_AstDump::AstDumpBinOperatorNode(BinOperatorNode *node) {
+void A2C_AstDump::AstDumpBinOperatorNode(BinOperatorNode *node) {
   if (node == nullptr) {
     dump("  BinOperatorNode: null");
-    return node;
+    return;
   }
   dump("  BinOperatorNode {");
   indent += 4;
@@ -108,13 +108,13 @@ BinOperatorNode *A2C_AstDump::AstDumpBinOperatorNode(BinOperatorNode *node) {
   AstDumpTreeNode(node->GetOpndB());
   indent -= 4;
   dump("  }");
-  return node;
+  return;
 }
 
-TerOperatorNode *A2C_AstDump::AstDumpTerOperatorNode(TerOperatorNode *node) {
+void A2C_AstDump::AstDumpTerOperatorNode(TerOperatorNode *node) {
   if (node == nullptr) {
     dump("  TerOperatorNode: null");
-    return node;
+    return;
   }
   dump("  TerOperatorNode {");
   indent += 4;
@@ -130,18 +130,18 @@ TerOperatorNode *A2C_AstDump::AstDumpTerOperatorNode(TerOperatorNode *node) {
   AstDumpTreeNode(node->GetOpndC());
   indent -= 4;
   dump("  }");
-  return node;
+  return;
 }
 
-BlockNode *A2C_AstDump::AstDumpBlockNode(BlockNode *node) {
+void A2C_AstDump::AstDumpBlockNode(BlockNode *node) {
   if (node == nullptr) {
     dump("  BlockNode: null");
-    return node;
+    return;
   }
   dump("  BlockNode {");
   indent += 4;
   base(node);
-  // Declared at shared/include/ast.h:949
+  // Declared at shared/include/ast.h:951
   dump("mChildren: SmallList<class maplefe::TreeNode *>, size = " + std::to_string(node->GetChildrenNum()) + " [");
   indent += 2;
   for (unsigned i = 0; i < node->GetChildrenNum(); ++i) {
@@ -163,13 +163,13 @@ BlockNode *A2C_AstDump::AstDumpBlockNode(BlockNode *node) {
   AstDumpTreeNode(const_cast<TreeNode *>(node->GetSync()));
   indent -= 4;
   dump("  }");
-  return node;
+  return;
 }
 
-NewNode *A2C_AstDump::AstDumpNewNode(NewNode *node) {
+void A2C_AstDump::AstDumpNewNode(NewNode *node) {
   if (node == nullptr) {
     dump("  NewNode: null");
-    return node;
+    return;
   }
   dump("  NewNode {");
   indent += 4;
@@ -189,26 +189,26 @@ NewNode *A2C_AstDump::AstDumpNewNode(NewNode *node) {
   AstDumpBlockNode(node->GetBody());
   indent -= 4;
   dump("  }");
-  return node;
+  return;
 }
 
-DeleteNode *A2C_AstDump::AstDumpDeleteNode(DeleteNode *node) {
+void A2C_AstDump::AstDumpDeleteNode(DeleteNode *node) {
   if (node == nullptr) {
     dump("  DeleteNode: null");
-    return node;
+    return;
   }
   dump("  DeleteNode {");
   indent += 4;
   base(node);
   indent -= 4;
   dump("  }");
-  return node;
+  return;
 }
 
-DimensionNode *A2C_AstDump::AstDumpDimensionNode(DimensionNode *node) {
+void A2C_AstDump::AstDumpDimensionNode(DimensionNode *node) {
   if (node == nullptr) {
     dump("  DimensionNode: null");
-    return node;
+    return;
   }
   dump("  DimensionNode {");
   indent += 4;
@@ -223,13 +223,13 @@ DimensionNode *A2C_AstDump::AstDumpDimensionNode(DimensionNode *node) {
   dump(" ]");
   indent -= 4;
   dump("  }");
-  return node;
+  return;
 }
 
-IdentifierNode *A2C_AstDump::AstDumpIdentifierNode(IdentifierNode *node) {
+void A2C_AstDump::AstDumpIdentifierNode(IdentifierNode *node) {
   if (node == nullptr) {
     dump("  IdentifierNode: null");
-    return node;
+    return;
   }
   dump("  IdentifierNode {");
   indent += 4;
@@ -250,13 +250,13 @@ IdentifierNode *A2C_AstDump::AstDumpIdentifierNode(IdentifierNode *node) {
   AstDumpDimensionNode(node->GetDims());
   indent -= 4;
   dump("  }");
-  return node;
+  return;
 }
 
-DeclNode *A2C_AstDump::AstDumpDeclNode(DeclNode *node) {
+void A2C_AstDump::AstDumpDeclNode(DeclNode *node) {
   if (node == nullptr) {
     dump("  DeclNode: null");
-    return node;
+    return;
   }
   dump("  DeclNode {");
   indent += 4;
@@ -268,86 +268,86 @@ DeclNode *A2C_AstDump::AstDumpDeclNode(DeclNode *node) {
 
   indent -= 4;
   dump("  }");
-  return node;
+  return;
 }
 
-AnnotationTypeNode *A2C_AstDump::AstDumpAnnotationTypeNode(AnnotationTypeNode *node) {
+void A2C_AstDump::AstDumpAnnotationTypeNode(AnnotationTypeNode *node) {
   if (node == nullptr) {
     dump("  AnnotationTypeNode: null");
-    return node;
+    return;
   }
   dump("  AnnotationTypeNode {");
   indent += 4;
   base(node);
-  // Declared at shared/include/ast.h:450
+  // Declared at shared/include/ast.h:452
   dump("mId: IdentifierNode*");
   AstDumpIdentifierNode(node->GetId());
   indent -= 4;
   dump("  }");
-  return node;
+  return;
 }
 
-CastNode *A2C_AstDump::AstDumpCastNode(CastNode *node) {
+void A2C_AstDump::AstDumpCastNode(CastNode *node) {
   if (node == nullptr) {
     dump("  CastNode: null");
-    return node;
+    return;
   }
   dump("  CastNode {");
   indent += 4;
   base(node);
-  // Declared at shared/include/ast.h:486
+  // Declared at shared/include/ast.h:488
   dump("mDestType: TreeNode*");
   AstDumpTreeNode(node->GetDestType());
   dump("mExpr: TreeNode*");
   AstDumpTreeNode(node->GetExpr());
   indent -= 4;
   dump("  }");
-  return node;
+  return;
 }
 
-ParenthesisNode *A2C_AstDump::AstDumpParenthesisNode(ParenthesisNode *node) {
+void A2C_AstDump::AstDumpParenthesisNode(ParenthesisNode *node) {
   if (node == nullptr) {
     dump("  ParenthesisNode: null");
-    return node;
+    return;
   }
   dump("  ParenthesisNode {");
   indent += 4;
   base(node);
-  // Declared at shared/include/ast.h:516
+  // Declared at shared/include/ast.h:518
   dump("mExpr: TreeNode*");
   AstDumpTreeNode(node->GetExpr());
   indent -= 4;
   dump("  }");
-  return node;
+  return;
 }
 
-FieldNode *A2C_AstDump::AstDumpFieldNode(FieldNode *node) {
+void A2C_AstDump::AstDumpFieldNode(FieldNode *node) {
   if (node == nullptr) {
     dump("  FieldNode: null");
-    return node;
+    return;
   }
   dump("  FieldNode {");
   indent += 4;
   base(node);
-  // Declared at shared/include/ast.h:535
+  // Declared at shared/include/ast.h:537
   dump("mUpper: TreeNode*");
   AstDumpTreeNode(node->GetUpper());
   dump("mField: IdentifierNode*");
   AstDumpIdentifierNode(node->GetField());
   indent -= 4;
   dump("  }");
-  return node;
+  return;
 }
 
-StructNode *A2C_AstDump::AstDumpStructNode(StructNode *node) {
+void A2C_AstDump::AstDumpStructNode(StructNode *node) {
   if (node == nullptr) {
     dump("  StructNode: null");
-    return node;
+    return;
   }
   dump("  StructNode {");
   indent += 4;
   base(node);
-  // Declared at shared/include/ast.h:571
+  // Declared at shared/include/ast.h:573
   dump(std::string("mProp: StructProp: ") + getStructProp(node->GetProp()));
 
   dump("mStructId: IdentifierNode*");
@@ -362,36 +362,36 @@ StructNode *A2C_AstDump::AstDumpStructNode(StructNode *node) {
   dump(" ]");
   indent -= 4;
   dump("  }");
-  return node;
+  return;
 }
 
-FieldLiteralNode *A2C_AstDump::AstDumpFieldLiteralNode(FieldLiteralNode *node) {
+void A2C_AstDump::AstDumpFieldLiteralNode(FieldLiteralNode *node) {
   if (node == nullptr) {
     dump("  FieldLiteralNode: null");
-    return node;
+    return;
   }
   dump("  FieldLiteralNode {");
   indent += 4;
   base(node);
-  // Declared at shared/include/ast.h:596
+  // Declared at shared/include/ast.h:598
   dump("mFieldName: IdentifierNode*");
   AstDumpIdentifierNode(node->GetFieldName());
   dump("mLiteral: TreeNode*");
   AstDumpTreeNode(node->GetLiteral());
   indent -= 4;
   dump("  }");
-  return node;
+  return;
 }
 
-StructLiteralNode *A2C_AstDump::AstDumpStructLiteralNode(StructLiteralNode *node) {
+void A2C_AstDump::AstDumpStructLiteralNode(StructLiteralNode *node) {
   if (node == nullptr) {
     dump("  StructLiteralNode: null");
-    return node;
+    return;
   }
   dump("  StructLiteralNode {");
   indent += 4;
   base(node);
-  // Declared at shared/include/ast.h:611
+  // Declared at shared/include/ast.h:613
   dump("mFields: SmallVector<class maplefe::FieldLiteralNode *>, size = " + std::to_string(node->GetFieldsNum()) +
        " [");
   indent += 2;
@@ -403,18 +403,18 @@ StructLiteralNode *A2C_AstDump::AstDumpStructLiteralNode(StructLiteralNode *node
   dump(" ]");
   indent -= 4;
   dump("  }");
-  return node;
+  return;
 }
 
-VarListNode *A2C_AstDump::AstDumpVarListNode(VarListNode *node) {
+void A2C_AstDump::AstDumpVarListNode(VarListNode *node) {
   if (node == nullptr) {
     dump("  VarListNode: null");
-    return node;
+    return;
   }
   dump("  VarListNode {");
   indent += 4;
   base(node);
-  // Declared at shared/include/ast.h:631
+  // Declared at shared/include/ast.h:633
   dump("mVars: SmallVector<class maplefe::IdentifierNode *>, size = " + std::to_string(node->GetNum()) + " [");
   indent += 2;
   for (unsigned i = 0; i < node->GetNum(); ++i) {
@@ -425,18 +425,18 @@ VarListNode *A2C_AstDump::AstDumpVarListNode(VarListNode *node) {
   dump(" ]");
   indent -= 4;
   dump("  }");
-  return node;
+  return;
 }
 
-ExprListNode *A2C_AstDump::AstDumpExprListNode(ExprListNode *node) {
+void A2C_AstDump::AstDumpExprListNode(ExprListNode *node) {
   if (node == nullptr) {
     dump("  ExprListNode: null");
-    return node;
+    return;
   }
   dump("  ExprListNode {");
   indent += 4;
   base(node);
-  // Declared at shared/include/ast.h:653
+  // Declared at shared/include/ast.h:655
   dump("mExprs: SmallVector<class maplefe::TreeNode *>, size = " + std::to_string(node->GetNum()) + " [");
   indent += 2;
   for (unsigned i = 0; i < node->GetNum(); ++i) {
@@ -447,66 +447,66 @@ ExprListNode *A2C_AstDump::AstDumpExprListNode(ExprListNode *node) {
   dump(" ]");
   indent -= 4;
   dump("  }");
-  return node;
+  return;
 }
 
-LiteralNode *A2C_AstDump::AstDumpLiteralNode(LiteralNode *node) {
+void A2C_AstDump::AstDumpLiteralNode(LiteralNode *node) {
   if (node == nullptr) {
     dump("  LiteralNode: null");
-    return node;
+    return;
   }
   dump("  LiteralNode {");
   indent += 4;
   base(node);
-  // Declared at shared/include/ast.h:673
+  // Declared at shared/include/ast.h:675
   dump(std::string("mData: LitData: LitId, ") + getLitId(node->GetData().mType) + ", " + getLitData(node->GetData()));
 
   indent -= 4;
   dump("  }");
-  return node;
+  return;
 }
 
-ExceptionNode *A2C_AstDump::AstDumpExceptionNode(ExceptionNode *node) {
+void A2C_AstDump::AstDumpExceptionNode(ExceptionNode *node) {
   if (node == nullptr) {
     dump("  ExceptionNode: null");
-    return node;
+    return;
   }
   dump("  ExceptionNode {");
   indent += 4;
   base(node);
-  // Declared at shared/include/ast.h:693
+  // Declared at shared/include/ast.h:695
   dump("mException: IdentifierNode*");
   AstDumpIdentifierNode(node->GetException());
   indent -= 4;
   dump("  }");
-  return node;
+  return;
 }
 
-ReturnNode *A2C_AstDump::AstDumpReturnNode(ReturnNode *node) {
+void A2C_AstDump::AstDumpReturnNode(ReturnNode *node) {
   if (node == nullptr) {
     dump("  ReturnNode: null");
-    return node;
+    return;
   }
   dump("  ReturnNode {");
   indent += 4;
   base(node);
-  // Declared at shared/include/ast.h:712
+  // Declared at shared/include/ast.h:714
   dump("mResult: TreeNode*");
   AstDumpTreeNode(node->GetResult());
   indent -= 4;
   dump("  }");
-  return node;
+  return;
 }
 
-CondBranchNode *A2C_AstDump::AstDumpCondBranchNode(CondBranchNode *node) {
+void A2C_AstDump::AstDumpCondBranchNode(CondBranchNode *node) {
   if (node == nullptr) {
     dump("  CondBranchNode: null");
-    return node;
+    return;
   }
   dump("  CondBranchNode {");
   indent += 4;
   base(node);
-  // Declared at shared/include/ast.h:724
+  // Declared at shared/include/ast.h:726
   dump("mCond: TreeNode*");
   AstDumpTreeNode(node->GetCond());
   dump("mTrueBranch: TreeNode*");
@@ -515,34 +515,34 @@ CondBranchNode *A2C_AstDump::AstDumpCondBranchNode(CondBranchNode *node) {
   AstDumpTreeNode(node->GetFalseBranch());
   indent -= 4;
   dump("  }");
-  return node;
+  return;
 }
 
-BreakNode *A2C_AstDump::AstDumpBreakNode(BreakNode *node) {
+void A2C_AstDump::AstDumpBreakNode(BreakNode *node) {
   if (node == nullptr) {
     dump("  BreakNode: null");
-    return node;
+    return;
   }
   dump("  BreakNode {");
   indent += 4;
   base(node);
-  // Declared at shared/include/ast.h:745
+  // Declared at shared/include/ast.h:747
   dump("mTarget: TreeNode*");
   AstDumpTreeNode(node->GetTarget());
   indent -= 4;
   dump("  }");
-  return node;
+  return;
 }
 
-ForLoopNode *A2C_AstDump::AstDumpForLoopNode(ForLoopNode *node) {
+void A2C_AstDump::AstDumpForLoopNode(ForLoopNode *node) {
   if (node == nullptr) {
     dump("  ForLoopNode: null");
-    return node;
+    return;
   }
   dump("  ForLoopNode {");
   indent += 4;
   base(node);
-  // Declared at shared/include/ast.h:757
+  // Declared at shared/include/ast.h:759
   dump("mInits: SmallVector<class maplefe::TreeNode *>, size = " + std::to_string(node->GetInitsNum()) + " [");
   indent += 2;
   for (unsigned i = 0; i < node->GetInitsNum(); ++i) {
@@ -565,72 +565,72 @@ ForLoopNode *A2C_AstDump::AstDumpForLoopNode(ForLoopNode *node) {
   AstDumpTreeNode(node->GetBody());
   indent -= 4;
   dump("  }");
-  return node;
+  return;
 }
 
-WhileLoopNode *A2C_AstDump::AstDumpWhileLoopNode(WhileLoopNode *node) {
+void A2C_AstDump::AstDumpWhileLoopNode(WhileLoopNode *node) {
   if (node == nullptr) {
     dump("  WhileLoopNode: null");
-    return node;
+    return;
   }
   dump("  WhileLoopNode {");
   indent += 4;
   base(node);
-  // Declared at shared/include/ast.h:783
+  // Declared at shared/include/ast.h:785
   dump("mCond: TreeNode*");
   AstDumpTreeNode(node->GetCond());
   dump("mBody: TreeNode*");
   AstDumpTreeNode(node->GetBody());
   indent -= 4;
   dump("  }");
-  return node;
+  return;
 }
 
-DoLoopNode *A2C_AstDump::AstDumpDoLoopNode(DoLoopNode *node) {
+void A2C_AstDump::AstDumpDoLoopNode(DoLoopNode *node) {
   if (node == nullptr) {
     dump("  DoLoopNode: null");
-    return node;
+    return;
   }
   dump("  DoLoopNode {");
   indent += 4;
   base(node);
-  // Declared at shared/include/ast.h:800
+  // Declared at shared/include/ast.h:802
   dump("mCond: TreeNode*");
   AstDumpTreeNode(node->GetCond());
   dump("mBody: TreeNode*");
   AstDumpTreeNode(node->GetBody());
   indent -= 4;
   dump("  }");
-  return node;
+  return;
 }
 
-SwitchLabelNode *A2C_AstDump::AstDumpSwitchLabelNode(SwitchLabelNode *node) {
+void A2C_AstDump::AstDumpSwitchLabelNode(SwitchLabelNode *node) {
   if (node == nullptr) {
     dump("  SwitchLabelNode: null");
-    return node;
+    return;
   }
   dump("  SwitchLabelNode {");
   indent += 4;
   base(node);
-  // Declared at shared/include/ast.h:825
+  // Declared at shared/include/ast.h:827
   dump(std::string("mIsDefault: bool, ") + (node->IsDefault() ? "true" : "false"));
 
   dump("mValue: TreeNode*");
   AstDumpTreeNode(node->GetValue());
   indent -= 4;
   dump("  }");
-  return node;
+  return;
 }
 
-SwitchCaseNode *A2C_AstDump::AstDumpSwitchCaseNode(SwitchCaseNode *node) {
+void A2C_AstDump::AstDumpSwitchCaseNode(SwitchCaseNode *node) {
   if (node == nullptr) {
     dump("  SwitchCaseNode: null");
-    return node;
+    return;
   }
   dump("  SwitchCaseNode {");
   indent += 4;
   base(node);
-  // Declared at shared/include/ast.h:844
+  // Declared at shared/include/ast.h:846
   dump("mLabels: SmallVector<class maplefe::TreeNode *>, size = " + std::to_string(node->GetLabelsNum()) + " [");
   indent += 2;
   for (unsigned i = 0; i < node->GetLabelsNum(); ++i) {
@@ -649,18 +649,18 @@ SwitchCaseNode *A2C_AstDump::AstDumpSwitchCaseNode(SwitchCaseNode *node) {
   dump(" ]");
   indent -= 4;
   dump("  }");
-  return node;
+  return;
 }
 
-SwitchNode *A2C_AstDump::AstDumpSwitchNode(SwitchNode *node) {
+void A2C_AstDump::AstDumpSwitchNode(SwitchNode *node) {
   if (node == nullptr) {
     dump("  SwitchNode: null");
-    return node;
+    return;
   }
   dump("  SwitchNode {");
   indent += 4;
   base(node);
-  // Declared at shared/include/ast.h:865
+  // Declared at shared/include/ast.h:867
   dump("mCond: TreeNode*");
   AstDumpTreeNode(node->GetCond());
   dump("mCases: SmallVector<class maplefe::TreeNode *>, size = " + std::to_string(node->GetCasesNum()) + " [");
@@ -673,36 +673,36 @@ SwitchNode *A2C_AstDump::AstDumpSwitchNode(SwitchNode *node) {
   dump(" ]");
   indent -= 4;
   dump("  }");
-  return node;
+  return;
 }
 
-AssertNode *A2C_AstDump::AstDumpAssertNode(AssertNode *node) {
+void A2C_AstDump::AstDumpAssertNode(AssertNode *node) {
   if (node == nullptr) {
     dump("  AssertNode: null");
-    return node;
+    return;
   }
   dump("  AssertNode {");
   indent += 4;
   base(node);
-  // Declared at shared/include/ast.h:890
+  // Declared at shared/include/ast.h:892
   dump("mExpr: TreeNode*");
   AstDumpTreeNode(node->GetExpr());
   dump("mMsg: TreeNode*");
   AstDumpTreeNode(node->GetMsg());
   indent -= 4;
   dump("  }");
-  return node;
+  return;
 }
 
-CallNode *A2C_AstDump::AstDumpCallNode(CallNode *node) {
+void A2C_AstDump::AstDumpCallNode(CallNode *node) {
   if (node == nullptr) {
     dump("  CallNode: null");
-    return node;
+    return;
   }
   dump("  CallNode {");
   indent += 4;
   base(node);
-  // Declared at shared/include/ast.h:910
+  // Declared at shared/include/ast.h:912
   dump("mMethod: TreeNode*");
   AstDumpTreeNode(node->GetMethod());
   dump("mArgs: ExprListNode<class maplefe::TreeNode *>, size = " + std::to_string(node->GetArgsNum()) + " [");
@@ -715,18 +715,18 @@ CallNode *A2C_AstDump::AstDumpCallNode(CallNode *node) {
   dump(" ]");
   indent -= 4;
   dump("  }");
-  return node;
+  return;
 }
 
-FunctionNode *A2C_AstDump::AstDumpFunctionNode(FunctionNode *node) {
+void A2C_AstDump::AstDumpFunctionNode(FunctionNode *node) {
   if (node == nullptr) {
     dump("  FunctionNode: null");
-    return node;
+    return;
   }
   dump("  FunctionNode {");
   indent += 4;
   base(node);
-  // Declared at shared/include/ast.h:991
+  // Declared at shared/include/ast.h:993
   dump("mAttrs: SmallVector<enum maplefe::AttrId>, size = " + std::to_string(node->GetAttrsNum()) + " [");
   indent += 2;
   for (unsigned i = 0; i < node->GetAttrsNum(); ++i) {
@@ -769,18 +769,18 @@ FunctionNode *A2C_AstDump::AstDumpFunctionNode(FunctionNode *node) {
 
   indent -= 4;
   dump("  }");
-  return node;
+  return;
 }
 
-InterfaceNode *A2C_AstDump::AstDumpInterfaceNode(InterfaceNode *node) {
+void A2C_AstDump::AstDumpInterfaceNode(InterfaceNode *node) {
   if (node == nullptr) {
     dump("  InterfaceNode: null");
-    return node;
+    return;
   }
   dump("  InterfaceNode {");
   indent += 4;
   base(node);
-  // Declared at shared/include/ast.h:1062
+  // Declared at shared/include/ast.h:1064
   dump(std::string("mIsAnnotation: bool, ") + (node->IsAnnotation() ? "true" : "false"));
 
   dump("mSuperInterfaces: SmallVector<class maplefe::InterfaceNode *>, size = " +
@@ -810,18 +810,18 @@ InterfaceNode *A2C_AstDump::AstDumpInterfaceNode(InterfaceNode *node) {
   dump(" ]");
   indent -= 4;
   dump("  }");
-  return node;
+  return;
 }
 
-ClassNode *A2C_AstDump::AstDumpClassNode(ClassNode *node) {
+void A2C_AstDump::AstDumpClassNode(ClassNode *node) {
   if (node == nullptr) {
     dump("  ClassNode: null");
-    return node;
+    return;
   }
   dump("  ClassNode {");
   indent += 4;
   base(node);
-  // Declared at shared/include/ast.h:1114
+  // Declared at shared/include/ast.h:1116
   dump(std::string("mIsJavaEnum: bool, ") + (node->IsJavaEnum() ? "true" : "false"));
 
   dump("mSuperClasses: SmallVector<class maplefe::ClassNode *>, size = " + std::to_string(node->GetSuperClassesNum()) +
@@ -904,18 +904,18 @@ ClassNode *A2C_AstDump::AstDumpClassNode(ClassNode *node) {
   dump(" ]");
   indent -= 4;
   dump("  }");
-  return node;
+  return;
 }
 
-PassNode *A2C_AstDump::AstDumpPassNode(PassNode *node) {
+void A2C_AstDump::AstDumpPassNode(PassNode *node) {
   if (node == nullptr) {
     dump("  PassNode: null");
-    return node;
+    return;
   }
   dump("  PassNode {");
   indent += 4;
   base(node);
-  // Declared at shared/include/ast.h:1181
+  // Declared at shared/include/ast.h:1183
   dump("mChildren: SmallVector<class maplefe::TreeNode *>, size = " + std::to_string(node->GetChildrenNum()) + " [");
   indent += 2;
   for (unsigned i = 0; i < node->GetChildrenNum(); ++i) {
@@ -926,19 +926,23 @@ PassNode *A2C_AstDump::AstDumpPassNode(PassNode *node) {
   dump(" ]");
   indent -= 4;
   dump("  }");
-  return node;
+  return;
 }
 
-LambdaNode *A2C_AstDump::AstDumpLambdaNode(LambdaNode *node) {
+void A2C_AstDump::AstDumpLambdaNode(LambdaNode *node) {
   if (node == nullptr) {
     dump("  LambdaNode: null");
-    return node;
+    return;
   }
   dump("  LambdaNode {");
   indent += 4;
   base(node);
-  // Declared at shared/include/ast.h:1201
-  dump("mParams: SmallVector<class maplefe::IdentifierNode *>, size = " + std::to_string(node->GetParamsNum()) + " [");
+  // Declared at shared/include/ast.h:1214
+  dump(std::string("mProperty: LambdaProperty: ") + getLambdaProperty(node->GetProperty()));
+
+  dump("mType: TreeNode*");
+  AstDumpTreeNode(node->GetType());
+  dump("mParams: SmallVector<class maplefe::TreeNode *>, size = " + std::to_string(node->GetParamsNum()) + " [");
   indent += 2;
   for (unsigned i = 0; i < node->GetParamsNum(); ++i) {
     dump(std::to_string(i + 1) + ": TreeNode*");
@@ -950,31 +954,31 @@ LambdaNode *A2C_AstDump::AstDumpLambdaNode(LambdaNode *node) {
   AstDumpTreeNode(node->GetBody());
   indent -= 4;
   dump("  }");
-  return node;
+  return;
 }
 
-InstanceOfNode *A2C_AstDump::AstDumpInstanceOfNode(InstanceOfNode *node) {
+void A2C_AstDump::AstDumpInstanceOfNode(InstanceOfNode *node) {
   if (node == nullptr) {
     dump("  InstanceOfNode: null");
-    return node;
+    return;
   }
   dump("  InstanceOfNode {");
   indent += 4;
   base(node);
-  // Declared at shared/include/ast.h:1226
+  // Declared at shared/include/ast.h:1249
   dump("mLeft: TreeNode*");
   AstDumpTreeNode(node->GetLeft());
   dump("mRight: TreeNode*");
   AstDumpTreeNode(node->GetRight());
   indent -= 4;
   dump("  }");
-  return node;
+  return;
 }
 
-AttrNode *A2C_AstDump::AstDumpAttrNode(AttrNode *node) {
+void A2C_AstDump::AstDumpAttrNode(AttrNode *node) {
   if (node == nullptr) {
     dump("  AttrNode: null");
-    return node;
+    return;
   }
   dump("  AttrNode {");
   indent += 4;
@@ -984,13 +988,13 @@ AttrNode *A2C_AstDump::AstDumpAttrNode(AttrNode *node) {
 
   indent -= 4;
   dump("  }");
-  return node;
+  return;
 }
 
-UserTypeNode *A2C_AstDump::AstDumpUserTypeNode(UserTypeNode *node) {
+void A2C_AstDump::AstDumpUserTypeNode(UserTypeNode *node) {
   if (node == nullptr) {
     dump("  UserTypeNode: null");
-    return node;
+    return;
   }
   dump("  UserTypeNode {");
   indent += 4;
@@ -1009,13 +1013,13 @@ UserTypeNode *A2C_AstDump::AstDumpUserTypeNode(UserTypeNode *node) {
   dump(" ]");
   indent -= 4;
   dump("  }");
-  return node;
+  return;
 }
 
-PrimTypeNode *A2C_AstDump::AstDumpPrimTypeNode(PrimTypeNode *node) {
+void A2C_AstDump::AstDumpPrimTypeNode(PrimTypeNode *node) {
   if (node == nullptr) {
     dump("  PrimTypeNode: null");
-    return node;
+    return;
   }
   dump("  PrimTypeNode {");
   indent += 4;
@@ -1025,13 +1029,13 @@ PrimTypeNode *A2C_AstDump::AstDumpPrimTypeNode(PrimTypeNode *node) {
 
   indent -= 4;
   dump("  }");
-  return node;
+  return;
 }
 
-PrimArrayTypeNode *A2C_AstDump::AstDumpPrimArrayTypeNode(PrimArrayTypeNode *node) {
+void A2C_AstDump::AstDumpPrimArrayTypeNode(PrimArrayTypeNode *node) {
   if (node == nullptr) {
     dump("  PrimArrayTypeNode: null");
-    return node;
+    return;
   }
   dump("  PrimArrayTypeNode {");
   indent += 4;
@@ -1043,13 +1047,13 @@ PrimArrayTypeNode *A2C_AstDump::AstDumpPrimArrayTypeNode(PrimArrayTypeNode *node
   AstDumpDimensionNode(node->GetDims());
   indent -= 4;
   dump("  }");
-  return node;
+  return;
 }
 
-TreeNode *A2C_AstDump::AstDumpTreeNode(TreeNode *node) {
+void A2C_AstDump::AstDumpTreeNode(TreeNode *node) {
   if (node == nullptr) {
     dump("  TreeNode: null");
-    return node;
+    return;
   }
   switch (node->GetKind()) {
   case NK_Package:
@@ -1189,7 +1193,7 @@ TreeNode *A2C_AstDump::AstDumpTreeNode(TreeNode *node) {
     break;
   default:; // Unexpected kind
   }
-  return node;
+  return;
 }
 
 const char *A2C_AstDump::getTypeId(TypeId k) {
@@ -1423,6 +1427,264 @@ const char *A2C_AstDump::getAttrId(AttrId k) {
   return "UNEXPECTED AttrId";
 }
 
+const char *A2C_AstDump::getActionId(ActionId k) {
+  switch (k) {
+  case ACT_BuildPackageName:
+    return "ACT_BuildPackageName";
+  case ACT_BuildSingleTypeImport:
+    return "ACT_BuildSingleTypeImport";
+  case ACT_BuildAllTypeImport:
+    return "ACT_BuildAllTypeImport";
+  case ACT_BuildSingleStaticImport:
+    return "ACT_BuildSingleStaticImport";
+  case ACT_BuildAllStaticImport:
+    return "ACT_BuildAllStaticImport";
+  case ACT_BuildAllImport:
+    return "ACT_BuildAllImport";
+  case ACT_BuildBlock:
+    return "ACT_BuildBlock";
+  case ACT_AddToBlock:
+    return "ACT_AddToBlock";
+  case ACT_AddSyncToBlock:
+    return "ACT_AddSyncToBlock";
+  case ACT_BuildCast:
+    return "ACT_BuildCast";
+  case ACT_BuildParenthesis:
+    return "ACT_BuildParenthesis";
+  case ACT_BuildBinaryOperation:
+    return "ACT_BuildBinaryOperation";
+  case ACT_BuildUnaryOperation:
+    return "ACT_BuildUnaryOperation";
+  case ACT_BuildPostfixOperation:
+    return "ACT_BuildPostfixOperation";
+  case ACT_BuildLambda:
+    return "ACT_BuildLambda";
+  case ACT_BuildInstanceOf:
+    return "ACT_BuildInstanceOf";
+  case ACT_BuildDecl:
+    return "ACT_BuildDecl";
+  case ACT_SetJSVar:
+    return "ACT_SetJSVar";
+  case ACT_SetJSLet:
+    return "ACT_SetJSLet";
+  case ACT_SetJSConst:
+    return "ACT_SetJSConst";
+  case ACT_BuildField:
+    return "ACT_BuildField";
+  case ACT_BuildVarList:
+    return "ACT_BuildVarList";
+  case ACT_BuildStruct:
+    return "ACT_BuildStruct";
+  case ACT_SetTSInterface:
+    return "ACT_SetTSInterface";
+  case ACT_AddStructField:
+    return "ACT_AddStructField";
+  case ACT_BuildFieldLiteral:
+    return "ACT_BuildFieldLiteral";
+  case ACT_BuildStructLiteral:
+    return "ACT_BuildStructLiteral";
+  case ACT_AddParams:
+    return "ACT_AddParams";
+  case ACT_BuildFunction:
+    return "ACT_BuildFunction";
+  case ACT_BuildConstructor:
+    return "ACT_BuildConstructor";
+  case ACT_AddFunctionBody:
+    return "ACT_AddFunctionBody";
+  case ACT_AddFunctionBodyTo:
+    return "ACT_AddFunctionBodyTo";
+  case ACT_BuildCall:
+    return "ACT_BuildCall";
+  case ACT_AddArguments:
+    return "ACT_AddArguments";
+  case ACT_BuildExprList:
+    return "ACT_BuildExprList";
+  case ACT_BuildClass:
+    return "ACT_BuildClass";
+  case ACT_SetClassIsJavaEnum:
+    return "ACT_SetClassIsJavaEnum";
+  case ACT_AddSuperClass:
+    return "ACT_AddSuperClass";
+  case ACT_AddSuperInterface:
+    return "ACT_AddSuperInterface";
+  case ACT_AddClassBody:
+    return "ACT_AddClassBody";
+  case ACT_BuildInstInit:
+    return "ACT_BuildInstInit";
+  case ACT_AddModifier:
+    return "ACT_AddModifier";
+  case ACT_AddModifierTo:
+    return "ACT_AddModifierTo";
+  case ACT_AddInitTo:
+    return "ACT_AddInitTo";
+  case ACT_AddType:
+    return "ACT_AddType";
+  case ACT_BuildAnnotationType:
+    return "ACT_BuildAnnotationType";
+  case ACT_BuildAnnotation:
+    return "ACT_BuildAnnotation";
+  case ACT_AddAnnotationTypeBody:
+    return "ACT_AddAnnotationTypeBody";
+  case ACT_BuildInterface:
+    return "ACT_BuildInterface";
+  case ACT_AddInterfaceBody:
+    return "ACT_AddInterfaceBody";
+  case ACT_BuildDim:
+    return "ACT_BuildDim";
+  case ACT_BuildDims:
+    return "ACT_BuildDims";
+  case ACT_AddDims:
+    return "ACT_AddDims";
+  case ACT_AddDimsTo:
+    return "ACT_AddDimsTo";
+  case ACT_BuildAssignment:
+    return "ACT_BuildAssignment";
+  case ACT_BuildAssert:
+    return "ACT_BuildAssert";
+  case ACT_BuildReturn:
+    return "ACT_BuildReturn";
+  case ACT_BuildCondBranch:
+    return "ACT_BuildCondBranch";
+  case ACT_AddCondBranchTrueStatement:
+    return "ACT_AddCondBranchTrueStatement";
+  case ACT_AddCondBranchFalseStatement:
+    return "ACT_AddCondBranchFalseStatement";
+  case ACT_AddLabel:
+    return "ACT_AddLabel";
+  case ACT_BuildBreak:
+    return "ACT_BuildBreak";
+  case ACT_BuildForLoop:
+    return "ACT_BuildForLoop";
+  case ACT_BuildWhileLoop:
+    return "ACT_BuildWhileLoop";
+  case ACT_BuildDoLoop:
+    return "ACT_BuildDoLoop";
+  case ACT_BuildNewOperation:
+    return "ACT_BuildNewOperation";
+  case ACT_BuildDeleteOperation:
+    return "ACT_BuildDeleteOperation";
+  case ACT_BuildSwitchLabel:
+    return "ACT_BuildSwitchLabel";
+  case ACT_BuildDefaultSwitchLabel:
+    return "ACT_BuildDefaultSwitchLabel";
+  case ACT_BuildOneCase:
+    return "ACT_BuildOneCase";
+  case ACT_BuildAllCases:
+    return "ACT_BuildAllCases";
+  case ACT_BuildSwitch:
+    return "ACT_BuildSwitch";
+  case ACT_BuildThrows:
+    return "ACT_BuildThrows";
+  case ACT_AddThrowsTo:
+    return "ACT_AddThrowsTo";
+  case ACT_BuildUserType:
+    return "ACT_BuildUserType";
+  case ACT_AddTypeArgument:
+    return "ACT_AddTypeArgument";
+  case ACT_PassChild:
+    return "ACT_PassChild";
+  case ACT_NA:
+    return "ACT_NA";
+  default:; // Unexpected kind
+  }
+  return "UNEXPECTED ActionId";
+}
+
+const char *A2C_AstDump::getTK_Type(TK_Type k) {
+  switch (k) {
+  case TT_ID:
+    return "TT_ID";
+  case TT_KW:
+    return "TT_KW";
+  case TT_LT:
+    return "TT_LT";
+  case TT_SP:
+    return "TT_SP";
+  case TT_OP:
+    return "TT_OP";
+  case TT_CM:
+    return "TT_CM";
+  case TT_NA:
+    return "TT_NA";
+  default:; // Unexpected kind
+  }
+  return "UNEXPECTED TK_Type";
+}
+
+const char *A2C_AstDump::getEntryType(EntryType k) {
+  switch (k) {
+  case ET_Oneof:
+    return "ET_Oneof";
+  case ET_Zeroormore:
+    return "ET_Zeroormore";
+  case ET_Zeroorone:
+    return "ET_Zeroorone";
+  case ET_Concatenate:
+    return "ET_Concatenate";
+  case ET_Data:
+    return "ET_Data";
+  case ET_Null:
+    return "ET_Null";
+  default:; // Unexpected kind
+  }
+  return "UNEXPECTED EntryType";
+}
+
+const char *A2C_AstDump::getDataType(DataType k) {
+  switch (k) {
+  case DT_Char:
+    return "DT_Char";
+  case DT_String:
+    return "DT_String";
+  case DT_Type:
+    return "DT_Type";
+  case DT_Token:
+    return "DT_Token";
+  case DT_Subtable:
+    return "DT_Subtable";
+  case DT_Null:
+    return "DT_Null";
+  default:; // Unexpected kind
+  }
+  return "UNEXPECTED DataType";
+}
+
+const char *A2C_AstDump::getRuleProp(RuleProp k) {
+  switch (k) {
+  case RP_NA:
+    return "RP_NA";
+  case RP_Single:
+    return "RP_Single";
+  case RP_ZomFast:
+    return "RP_ZomFast";
+  case RP_Top:
+    return "RP_Top";
+  case RP_SecondTry:
+    return "RP_SecondTry";
+  default:; // Unexpected kind
+  }
+  return "UNEXPECTED RuleProp";
+}
+
+const char *A2C_AstDump::getLAType(LAType k) {
+  switch (k) {
+  case LA_Char:
+    return "LA_Char";
+  case LA_String:
+    return "LA_String";
+  case LA_Token:
+    return "LA_Token";
+  case LA_Identifier:
+    return "LA_Identifier";
+  case LA_Literal:
+    return "LA_Literal";
+  case LA_NA:
+    return "LA_NA";
+  default:; // Unexpected kind
+  }
+  return "UNEXPECTED LAType";
+}
+
 const char *A2C_AstDump::getNodeKind(NodeKind k) {
   switch (k) {
   case NK_Package:
@@ -1586,6 +1848,23 @@ const char *A2C_AstDump::getStructProp(StructProp k) {
   default:; // Unexpected kind
   }
   return "UNEXPECTED StructProp";
+}
+
+const char *A2C_AstDump::getLambdaProperty(LambdaProperty k) {
+  switch (k) {
+  case LP_JavaLambda:
+    return "LP_JavaLambda";
+  case LP_JSArrowFunction:
+    return "LP_JSArrowFunction";
+  case LP_TSFunctionType:
+    return "LP_TSFunctionType";
+  case LP_TSConstructorType:
+    return "LP_TSConstructorType";
+  case LP_NA:
+    return "LP_NA";
+  default:; // Unexpected kind
+  }
+  return "UNEXPECTED LambdaProperty";
 }
 
 } // namespace maplefe
