@@ -137,11 +137,10 @@ def get_enum_list(dictionary, enum_name):
 # Generate functions for enum types, e.g. "const char *getOprId(OprId k);" for enum OprId
 def gen_enum_func(dictionary):
     global include_file, src_file, gen_args
-    enum_names = [ "TypeId", "SepId", "OprId", "LitId", "AttrId", "NodeKind", "ImportProperty", \
-            "OperatorProperty", "DeclProp", "StructProp" ]
     hcode = ['']
     xcode = ['']
-    for name in enum_names:
+    for each in dictionary["ChildEnums"]:
+        name = each["Name"]
         hcode.append("const char* get" + name + "(" + name + " k);")
         xcode.append("const char* " + gen_args[1] + "::get" + name + "(" + name + " k) {")
         xcode.append("switch(k) {")
