@@ -38,7 +38,7 @@ INCLUDEGEN := -I $(BUILDGEN) -I $(MAPLEFE_ROOT)/shared/include
 
 TARGET=java2mpl
 
-SHAREDLIB = $(BUILDDIR)/shared/shared.a $(BUILDDIR)/ast2mpl/ast2mpl.a
+SHAREDLIB =  $(BUILDDIR)/ast2mpl/ast2mpl.a $(BUILDDIR)/shared/shared.a
 
 .PHONY: all
 all: $(BUILD)/$(TARGET)

@@ -43,6 +43,7 @@ all: $(BUILD)/$(TARGET)
 $(BUILD)/$(TARGET) : $(BUILD)/$(AUTOGENLIB)
 	$(LD) -o $(BUILD)/$(TARGET) $(BUILD)/main.o $(BUILD)/$(AUTOGENLIB)
 	(cd $(BUILD); ./$(TARGET) $(SRCLANG))
+	(cd $(MAPLEFE_ROOT); ./scripts/maplefe-autogen.py)
 
 $(BUILD)/$(AUTOGENLIB) : $(OBJS)
 	/usr/bin/ar rcs $(BUILD)/$(AUTOGENLIB) $(LIBOBJS)

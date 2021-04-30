@@ -2,6 +2,7 @@
 from os import path
 import subprocess
 import ruamel.yaml as yaml
+import os
 
 #
 # Needs to install the following packages on Ubuntu 18.04 or 20.04
@@ -9,8 +10,9 @@ import ruamel.yaml as yaml
 #
 
 root_dir = path.dirname(path.dirname(path.realpath(__file__))) + '/'
+builddir = os.environ.get('BUILDDIR')
 maplefe_dir = root_dir + 'shared/'
-output_dir = root_dir + 'output/ast-doc/'
+output_dir = builddir + '/ast_doc/'
 index_yaml = output_dir + 'maplefe.yaml'
 
 license_notice = [
@@ -71,12 +73,12 @@ def finalize(filename, lines):
     exec_command('clang-format-10 -i --style="{ColumnLimit: 120}" ' + filename)
     print("Generated " + filename)
 
-exec_command('bash -c "mkdir -p ' + output_dir + 'ast2cpp/{src,include}"')
+exec_command('bash -c "mkdir -p ' + output_dir + 'shared"')
 create(output_dir + 'compile_commands.json', compile_commands)
 create(output_dir + 'ast.sh', bash_commands)
 exec_command('bash ' + output_dir + 'ast.sh')
 
-# Dump all content in a dictionary to ast-doc/yaml.log
+# Dump all content in a dictionary to ast_doc/yaml.log
 def log(dictionary, indent, msg = ""):
     global log_buf
     if indent == 0: log_buf = [msg]
@@ -305,8 +307,8 @@ Initialization = 1
 Finalization = 2
 def handle_src_include_files(phase):
     global include_file, src_file, gen_args
-    include_file = output_dir + "ast2cpp/include/" + gen_args[0] + ".h"
-    src_file = output_dir + "ast2cpp/src/" + gen_args[0] + ".cpp"
+    include_file = output_dir + "shared/" + gen_args[0] + ".h"
+    src_file = output_dir + "shared/" + gen_args[0] + ".cpp"
     include_start = [
             '#ifndef __' + gen_args[1].upper() + '_HEADER__',
             '#define __' + gen_args[1].upper() + '_HEADER__',
@@ -374,15 +376,15 @@ def gen_func_definition_end(dictionary, node_name):
     return "return node;\n}"
 
 #
-# Generate a2c_handler.h and a2c_handler.cpp
+# Generate gen_handler.h and gen_handler.cpp
 #
 gen_args = [
-        "a2c_handler", # filename
+        "gen_handler", # filename
         "A2C_Handler", # Class name
         "Handle",      # Prefix of function name
         ]
 
-# Example to extract code pieces starting from ast-doc/maplefe/index.yaml
+# Example to extract code pieces starting from ast_doc/maplefe/index.yaml
 if False:
     handle_src_include_files(Initialization)
     handle_yaml(index_yaml, gen_handler)
@@ -460,8 +462,8 @@ def gen_func_definition_end(dictionary, node_name):
 # Generate source files for dumping AST
 #
 gen_args = [
-        "a2c_astdump", # filename
-        "A2C_AstDump", # Class name
+        "gen_astdump", # filename
+        "AstDump", # Class name
         "AstDump",     # Prefix of function name
         ]
 

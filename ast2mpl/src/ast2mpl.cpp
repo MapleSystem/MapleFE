@@ -14,6 +14,7 @@
 */
 
 #include "ast2mpl.h"
+#include "gen_astdump.h"
 #include "mir_function.h"
 #include "maplefe_mir_builder.h"
 
@@ -63,6 +64,8 @@ void A2M::Init() {
 // starting point of AST to MPL process
 void A2M::ProcessAST(bool trace_a2m) {
   mTraceA2m = trace_a2m;
+  AstDump astdump;
+
   if (mTraceA2m) std::cout << "============= in ProcessAST ===========" << std::endl;
   // pass 1: collect class/interface/function decl
   for(auto it: gModule.mTrees) {
@@ -72,7 +75,7 @@ void A2M::ProcessAST(bool trace_a2m) {
   // pass 2: handle function def
   for(auto it: gModule.mTrees) {
     TreeNode *tnode = it->mRootNode;
-    if (mTraceA2m) { tnode->Dump(0); fflush(0); }
+    if (mTraceA2m) { astdump.dump(it->mRootNode); }
     ProcessNode(SK_Stmt, tnode, nullptr);
   }
 }

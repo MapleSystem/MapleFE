@@ -38,7 +38,7 @@ INCLUDEGEN := -I $(BUILDGEN) -I $(MAPLEFE_ROOT)/shared/include
 
 TARGET=ts2cpp
 
-SHAREDLIB = $(BUILDDIR)/shared/shared.a $(BUILDDIR)/ast2cpp/ast2cpp.a
+SHAREDLIB = $(BUILDDIR)/ast2cpp/ast2cpp.a $(BUILDDIR)/shared/shared.a
 
 .PHONY: all
 all: $(BUILD)/$(TARGET)

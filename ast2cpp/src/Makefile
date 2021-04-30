@@ -24,9 +24,11 @@ OBJS :=$(foreach obj,$(OBJ), $(BUILD)/$(obj))
 LIBOBJS :=$(patsubst $(BUILD)/main.o,,$(OBJS))
 DEPS :=$(foreach dep,$(DEP), $(BUILD)/$(dep))
 
+GENDIR:=${BUILDDIR}/ast_doc/shared
+
 INCLUDES := -I $(MAPLEFE_ROOT)/shared/include \
             -I $(MAPLEFE_ROOT)/ast2cpp/include \
-            $(MAPLEALL_INC)
+            $(MAPLEALL_INC) -I ${GENDIR}
 
 AST2MPLLIB = ast2cpp.a
 

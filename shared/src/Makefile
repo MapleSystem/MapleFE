@@ -20,32 +20,49 @@ SRC=$(wildcard *.cpp)
 OBJ :=$(patsubst %.cpp,%.o,$(SRC))
 DEP :=$(patsubst %.cpp,%.d,$(SRC))
 
-OBJS :=$(foreach obj,$(OBJ), $(BUILD)/$(obj))
-LIBOBJS :=$(patsubst $(BUILD)/main.o,,$(OBJS))
-DEPS :=$(foreach dep,$(DEP), $(BUILD)/$(dep))
+GENDIR:=${BUILDDIR}/ast_doc/shared
 
-INCLUDES := -I $(MAPLEFE_ROOT)/shared/include
+SRCG:=$(wildcard ${GENDIR}/*.cpp)
+OBJG:=$(patsubst %.cpp,%.o,$(SRCG))
+DEPG:=$(patsubst %.cpp,%.d,$(SRCG))
+
+OBJS :=$(foreach obj,$(OBJ), $(BUILD)/$(obj)) $(OBJG)
+LIBOBJS :=$(patsubst $(BUILD)/main.o,,$(OBJS)) $(OBJG)
+DEPS :=$(foreach dep,$(DEP), $(BUILD)/$(dep)) $(DEPG)
+
+INCLUDES := -I $(MAPLEFE_ROOT)/shared/include -I ${GENDIR}
 
 SHAREDLIB = shared.a
 
-.PHONY: all
+.PHONY: all gen_doc clean
+
 all: $(BUILD)/$(SHAREDLIB)
 
 -include $(DEPS)
-.PHONY: clean
 
 vpath %.o $(BUILD)
 vpath %.d $(BUILD)
 
 #Pattern Rules
 $(BUILD)/%.o : %.cpp
-	$(CXX) $(CXXFLAGS) -fpermissive $(INCLUDES) -w -c $< -o $@ 
+	$(CXX) $(CXXFLAGS) -fpermissive $(INCLUDES) -w -c $< -o $@
 
 $(BUILD)/%.d : %.cpp
 	@$(CXX) $(CXXFLAGS) -std=c++11 -MM $(INCLUDES) $< > $@
 	@mv -f $(BUILD)/$*.d $(BUILD)/$*.d.tmp
 	@sed -e 's|.*:|$(BUILD)/$*.o:|' < $(BUILD)/$*.d.tmp > $(BUILD)/$*.d
 	@rm -f $(BUILD)/$*.d.tmp
+
+$(GENDIR)/%.cpp : gendoc
+
+gen_doc:
+	(cd $(MAPLEFE_ROOT); ./scripts/maplefe-autogen.py)
+
+$(GENDIR)/%.o : $(GENDIR)/%.cpp
+	$(CXX) $(CXXFLAGS) -fpermissive $(INCLUDES) -w -c $< -o $@
+
+$(GENDIR)/%.d : $(GENDIR)/%.cpp
+	@$(CXX) $(CXXFLAGS) -std=c++11 -MM $(INCLUDES) $< > $@
 
 $(BUILD)/$(SHAREDLIB) : $(LIBOBJS)
 	/usr/bin/ar rcs $(BUILD)/$(SHAREDLIB) $(LIBOBJS)

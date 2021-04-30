@@ -24,9 +24,11 @@ OBJS :=$(foreach obj,$(OBJ), $(BUILD)/$(obj))
 LIBOBJS :=$(patsubst $(BUILD)/main.o,,$(OBJS))
 DEPS :=$(foreach dep,$(DEP), $(BUILD)/$(dep))
 
+GENDIR:=${BUILDDIR}/ast_doc/shared
+
 INCLUDES := -I $(MAPLEFE_ROOT)/shared/include \
             -I $(MAPLEFE_ROOT)/ast2mpl/include \
-            $(MAPLEALL_INC)
+            $(MAPLEALL_INC) -I ${GENDIR}
 
 AST2MPLLIB = ast2mpl.a
 
@@ -41,7 +43,7 @@ vpath %.d $(BUILD)
 
 #Pattern Rules
 $(BUILD)/%.o : %.cpp
-	$(CXX) $(CXXFLAGS) -fpermissive $(INCLUDES) -w -c $< -o $@ 
+	$(CXX) $(CXXFLAGS) -fpermissive $(INCLUDES) -w -c $< -o $@
 
 $(BUILD)/%.d : %.cpp
 	@$(CXX) $(CXXFLAGS) -std=c++11 -MM $(INCLUDES) $< > $@
