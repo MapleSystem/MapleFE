@@ -1,9 +1,10 @@
-function func(x) {
+function func(x): number | undefined {
     if (typeof x === "number")
         return x * x;
     return undefined;
 }
-var v = func("a");
+
+let v = func("a");
 console.log(v);
 v = func(3);
 console.log(v);
