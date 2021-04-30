@@ -13,8 +13,8 @@ root_dir = path.dirname(path.dirname(path.realpath(__file__))) + '/'
 builddir = os.environ.get('BUILDDIR')
 maplefe_dir = root_dir + 'shared/'
 output_dir = builddir + '/ast_doc/'
-# index_yaml = output_dir + 'maplefe/index.yaml' # For higher version of clang-doc
-index_yaml = output_dir + 'maplefe.yaml'
+# initial_yaml = output_dir + 'maplefe/index.yaml' # For higher version of clang-doc
+initial_yaml = output_dir + 'maplefe.yaml'         # For version 10
 
 license_notice = [
         '/*',
@@ -49,10 +49,10 @@ compile_commands = [
 bash_commands = [
         'cd ' + maplefe_dir + 'src || exit 1',
         'rm -f ' + output_dir + 'yaml.log',
-        '[ ast.cpp -nt ' + index_yaml + ' \\',
-        '  -o ast_builder.cpp -nt ' + index_yaml + ' \\',
-        '  -o ../include/ast.h -nt ' + index_yaml + ' \\',
-        '  -o ! -f ' + index_yaml + ' ] || exit 2',
+        '[ ast.cpp -nt ' + initial_yaml + ' \\',
+        '  -o ast_builder.cpp -nt ' + initial_yaml + ' \\',
+        '  -o ../include/ast.h -nt ' + initial_yaml + ' \\',
+        '  -o ! -f ' + initial_yaml + ' ] || exit 2',
         'clang-doc-10 ast_builder.cpp -p ' + output_dir + ' --format=yaml -output=' + output_dir,
         ]
 
@@ -385,10 +385,10 @@ gen_args = [
         "Handle",      # Prefix of function name
         ]
 
-# Example to extract code pieces starting from ast_doc/maplefe/index.yaml
+# Example to extract code pieces starting from initial_yaml
 if False:
     handle_src_include_files(Initialization)
-    handle_yaml(index_yaml, gen_handler)
+    handle_yaml(initial_yaml, gen_handler)
     handle_src_include_files(Finalization)
 
 ################################################################################
@@ -512,7 +512,7 @@ astdump_init = [
 
 handle_src_include_files(Initialization)
 append(include_file, astdump_init)
-handle_yaml(index_yaml, gen_handler)
-handle_yaml(index_yaml, gen_enum_func)
+handle_yaml(initial_yaml, gen_handler)
+handle_yaml(initial_yaml, gen_enum_func)
 handle_src_include_files(Finalization)
 
