@@ -11,8 +11,8 @@ import os
 
 root_dir = path.dirname(path.dirname(path.realpath(__file__))) + '/'
 builddir = os.environ.get('BUILDDIR')
+output_dir = builddir + '/ast_doc/' if builddir != None else root_dir + "output/typescript/ast_doc/"
 maplefe_dir = root_dir + 'shared/'
-output_dir = builddir + '/ast_doc/'
 # initial_yaml = output_dir + 'maplefe/index.yaml' # For higher version of clang-doc
 initial_yaml = output_dir + 'maplefe.yaml'         # For version 10
 
@@ -49,10 +49,6 @@ compile_commands = [
 bash_commands = [
         'cd ' + maplefe_dir + 'src || exit 1',
         'rm -f ' + output_dir + 'yaml.log',
-        '[ ast.cpp -nt ' + initial_yaml + ' \\',
-        '  -o ast_builder.cpp -nt ' + initial_yaml + ' \\',
-        '  -o ../include/ast.h -nt ' + initial_yaml + ' \\',
-        '  -o ! -f ' + initial_yaml + ' ] || exit 2',
         'clang-doc-10 ast_builder.cpp -p ' + output_dir + ' --format=yaml -output=' + output_dir,
         ]
 
