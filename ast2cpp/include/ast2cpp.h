@@ -38,8 +38,8 @@ private:
   unsigned mUniqNum;
 
 public:
-  A2C(const char *filename);
-  ~A2C();
+  explicit A2C(const char *filename) : mFileName(filename) {}
+  ~A2C() = default;
 
   void ProcessAST(bool trace_a2c);
 };

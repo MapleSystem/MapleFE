@@ -14,15 +14,10 @@
 */
 
 #include "ast2cpp.h"
+#include "a2c_cfg.h"
 #include "gen_astdump.h"
 
 namespace maplefe {
-
-A2C::A2C(const char *filename) : mFileName(filename) {
-}
-
-A2C::~A2C() {
-}
 
 // starting point of AST
 void A2C::ProcessAST(bool trace_a2c) {
@@ -41,8 +36,12 @@ void A2C::ProcessAST(bool trace_a2c) {
       AstDump astdump;
       for(auto it: gModule.mTrees)
           astdump.Dump(it->mRootNode);
-
   }
+
+  A2C_CFG cfg(&gModule, mTraceA2C);
+
+  cfg.BuildCFG();
+  cfg.Dump();
 }
 }
 
