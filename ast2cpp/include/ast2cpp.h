@@ -14,7 +14,7 @@
 */
 
 //////////////////////////////////////////////////////////////////////////////////////////////
-//                This is the interface to translate AST to MapleIR.
+//                This is the interface to translate AST to C++
 //////////////////////////////////////////////////////////////////////////////////////////////
 
 #ifndef __AST2CPP_HEADER__
@@ -41,7 +41,7 @@ public:
   A2C(const char *filename);
   ~A2C();
 
-  void ProcessAST(bool trace_a2m);
+  void ProcessAST(bool trace_a2c);
 };
 
 }

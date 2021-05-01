@@ -25,8 +25,8 @@ A2C::~A2C() {
 }
 
 // starting point of AST
-void A2C::ProcessAST(bool trace_a2m) {
-  mTraceA2C = trace_a2m;
+void A2C::ProcessAST(bool trace_a2c) {
+  mTraceA2C = trace_a2c;
   if (mTraceA2C) std::cout << "============= in ProcessAST ===========" << std::endl;
   for(auto it: gModule.mTrees) {
     TreeNode *tnode = it->mRootNode;
