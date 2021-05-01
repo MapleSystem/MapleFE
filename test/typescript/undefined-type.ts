@@ -1,4 +1,4 @@
-function func(x): number | undefined {
+function func(x: unknown): number | undefined {
     if (typeof x === "number")
         return x * x;
     return undefined;
