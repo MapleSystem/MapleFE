@@ -1262,7 +1262,16 @@ TreeNode* ASTBuilder::CvtToBlock(TreeNode *tnode) {
 
   BlockNode *block = (BlockNode*)mTreePool->NewTreeNode(sizeof(BlockNode));
   new (block) BlockNode();
-  block->AddChild(tnode);
+  if (tnode->IsPass()) {
+    PassNode *pass = (PassNode*)tnode;
+    for (unsigned i = 0; i < pass->GetChildrenNum(); i++) {
+      TreeNode *child = pass->GetChild(i);
+      block->AddChild(child);
+    }
+  } else {
+    block->AddChild(tnode);
+  }
+
   return block;
 }
 

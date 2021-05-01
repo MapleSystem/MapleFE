@@ -219,13 +219,13 @@ rule Initializer : '=' + AssignmentExpression
 
 rule MemberExpression : ONEOF(
   PrimaryExpression,
-#  MemberExpression[?Yield] [ Expression[In, ?Yield] ]
+  MemberExpression + '[' + Expression + ']',
   MemberExpression + '.' + Identifier,
 #  MemberExpression[?Yield] TemplateLiteral[?Yield]
 #  SuperProperty[?Yield]
 #  MetaProperty
   "new" + MemberExpression + Arguments)
-  attr.action.%2 : BuildField(%1, %3)
+  attr.action.%3 : BuildField(%1, %3)
 
 ##-----------------------------------
 ##rule SuperProperty[Yield] :

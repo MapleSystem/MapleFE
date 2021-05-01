@@ -22,7 +22,7 @@ function binarySearchEpsilon (array: number[], value: number, EPSILON = 1e-6) {
     let high = array.length - 1;
     let middle = high >>> 1;
     for (; low <= high; middle = (low + high) >>> 1) {
-//        const test = array[middle];
+        const test = array[middle];
         if (test > (value + EPSILON)) {
             high = middle - 1;
         } else if (test < (value - EPSILON)) {
