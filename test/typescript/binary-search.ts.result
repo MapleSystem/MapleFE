@@ -1,6 +1,7 @@
 Matched 25 tokens.
 Matched 139 tokens.
-Matched 151 tokens.
+Matched 160 tokens.
+Matched 172 tokens.
 ============= Module ===========
 == Sub Tree ==
 func  binarySearch(array,value)  throws: 
@@ -27,5 +28,7 @@ func  binarySearchEpsilon(array,value,EPSILON=1e-06)  throws:
 
   return low
 
+== Sub Tree ==
+js_var Decl: sequence=
 == Sub Tree ==
 console.log(binarySearch(sequence,144))

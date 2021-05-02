@@ -59,7 +59,7 @@ rule PrimaryExpression : ONEOF(
   "this",
   IdentifierReference,
   Literal,
-#  ArrayLiteral[?Yield]
+  ArrayLiteral,
   ObjectLiteral,
 #  FunctionExpression
 #  ClassExpression[?Yield]
@@ -106,6 +106,10 @@ rule FAKEStringLiteral : ONEOF("this_is_for_fake_rule")
 ##  [ Elisionopt ]
 ##  [ ElementList[?Yield] ]
 ##  [ ElementList[?Yield] , Elisionopt ]
+rule ArrayLiteral : ONEOF(
+  '[' + ZEROORONE(Elision) + ']'
+  '[' + ElementList + ']'
+  '[' + ElementList + ',' + ZEROORONE(Elision) + ']')
 
 ##-----------------------------------
 ##rule ElementList[Yield] :
@@ -113,6 +117,11 @@ rule FAKEStringLiteral : ONEOF("this_is_for_fake_rule")
 ##  Elisionopt SpreadElement[?Yield]
 ##  ElementList[?Yield] , Elisionopt AssignmentExpression[In, ?Yield]
 ##  ElementList[?Yield] , Elisionopt SpreadElement[?Yield]
+rule ElementList : ONEOF(
+  ZEROORONE(Elision) + AssignmentExpression,
+  ZEROORONE(Elision) + SpreadElement,
+  ElementList + ',' + ZEROORONE(Elision) + AssignmentExpression,
+  ElementList + ',' + ZEROORONE(Elision) + SpreadElement)
 
 ##-----------------------------------
 ##rule Elision :
@@ -125,6 +134,7 @@ rule Elision : ONEOF(',',
 ##-----------------------------------
 ##rule SpreadElement[Yield] :
 ##  ... AssignmentExpression[In, ?Yield]
+rule SpreadElement : "..." + AssignmentExpression
 
 ##-----------------------------------
 ##rule ObjectLiteral[Yield] :

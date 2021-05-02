@@ -34,5 +34,5 @@ function binarySearchEpsilon (array: number[], value: number, EPSILON = 1e-6) {
     return ~low;
 }
 
-//var sequence: number[] = [13, 21, 34, 55, 89, 144];
+var sequence: number[] = [13, 21, 34, 55, 89, 144];
 console.log(binarySearch(sequence, 144));
