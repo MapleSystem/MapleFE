@@ -31,9 +31,14 @@ NODEKIND(UserType)
 NODEKIND(Cast)
 NODEKIND(Parenthesis)
 
+// Struct
 NODEKIND(Struct)
 NODEKIND(StructLiteral)
 NODEKIND(FieldLiteral)
+
+// Array related
+NODEKIND(ArrayElement)
+NODEKIND(ArrayLiteral)
 
 // VarList is for identifier list only.
 // ExprList is for all kinds of node.

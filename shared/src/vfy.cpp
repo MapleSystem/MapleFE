@@ -429,6 +429,14 @@ void Verifier::VerifyInstanceOf(InstanceOfNode *tree){
   return;
 }
 
+void Verifier::VerifyArrayElement(ArrayElementNode *tree){
+  return;
+}
+
+void Verifier::VerifyArrayLiteral(ArrayLiteralNode *tree){
+  return;
+}
+
 void Verifier::VerifyStruct(StructNode *tree){
   return;
 }

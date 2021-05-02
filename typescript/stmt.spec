@@ -226,6 +226,7 @@ rule MemberExpression : ONEOF(
 #  MetaProperty
   "new" + MemberExpression + Arguments)
   attr.action.%3 : BuildField(%1, %3)
+  attr.action.%2 : BuildArrayElement(%1, %3)
 
 ##-----------------------------------
 ##rule SuperProperty[Yield] :

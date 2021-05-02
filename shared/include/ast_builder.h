@@ -104,6 +104,9 @@ public:
   TreeNode* BuildFieldLiteral();
   TreeNode* BuildStructLiteral();
 
+  // Array
+  TreeNode* BuildArrayElement();
+
   TreeNode* BuildDecl();
   TreeNode* SetJSVar();
   TreeNode* SetJSLet();

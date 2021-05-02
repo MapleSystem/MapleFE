@@ -65,6 +65,9 @@ ACTION(AddStructField)
 ACTION(BuildFieldLiteral)
 ACTION(BuildStructLiteral)
 
+// For Array
+ACTION(BuildArrayElement)
+
 // For function
 ACTION(AddParams)
 ACTION(BuildFunction)

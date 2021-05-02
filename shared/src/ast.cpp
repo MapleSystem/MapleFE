@@ -562,6 +562,26 @@ void DeclNode::Dump(unsigned indent) {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
+//                          ArrayElement and ArrayLiteral
+//////////////////////////////////////////////////////////////////////////////////////
+
+void ArrayElementNode::Dump(unsigned indent) {
+  DumpIndentation(indent);
+  mArray->Dump(0);
+  for (unsigned i = 0; i < mExprs.GetNum(); i++) {
+    DUMP0_NORETURN("[");
+    mExprs.ValueAtIndex(i)->Dump(0);
+    DUMP0_NORETURN("]");
+  }
+}
+
+void ArrayLiteralNode::Dump(unsigned indent) {
+  DumpIndentation(indent);
+  DUMP0_NORETURN("[");
+  DUMP0_NORETURN("]");
+}
+
+//////////////////////////////////////////////////////////////////////////////////////
 //                          StructNode and StructLiteralNode
 //////////////////////////////////////////////////////////////////////////////////////
 

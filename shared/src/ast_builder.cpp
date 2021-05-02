@@ -825,6 +825,43 @@ TreeNode* ASTBuilder::SetJSConst() {
 }
 
 //////////////////////////////////////////////////////////////////////////////////
+//                         ArrayElement, ArrayLiteral
+//////////////////////////////////////////////////////////////////////////////////
+
+// It takes two or more than two params.
+// The first is the array.
+// The second is the first dimension expression
+// So on so forth.
+
+TreeNode* ASTBuilder::BuildArrayElement() {
+  if (mTrace)
+    std::cout << "In BuildArrayElement" << std::endl;
+
+  MASSERT(mParams.size() >= 2);
+
+  Param p_array = mParams[0];
+  MASSERT(p_array.mIsTreeNode);
+  TreeNode *array = p_array.mData.mTreeNode;
+  MASSERT(array->IsIdentifier());
+
+  ArrayElementNode *array_element = (ArrayElementNode*)mTreePool->NewTreeNode(sizeof(ArrayElementNode));
+  new (array_element) ArrayElementNode();
+  array_element->SetArray((IdentifierNode*)array);
+
+  unsigned num = mParams.size() - 1;
+  for (unsigned i = 0; i < num; i++) {
+    Param p_index = mParams[i+1];
+    MASSERT(p_index.mIsTreeNode);
+    TreeNode *index = p_index.mData.mTreeNode;
+    array_element->AddExpr(index);
+  }
+
+  mLastTreeNode = array_element;
+  return mLastTreeNode;
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////
 //                         StructNode, StructLiteralNode, FieldLiteralNode
 //////////////////////////////////////////////////////////////////////////////////
 

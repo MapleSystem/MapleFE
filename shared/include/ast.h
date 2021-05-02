@@ -564,6 +564,49 @@ public:
 };
 
 //////////////////////////////////////////////////////////////////////////
+//                           Array Related Nodes
+// ArrayElementNode, ArrayLiteralNode.
+//////////////////////////////////////////////////////////////////////////
+
+// Array element is a[b][c].
+class ArrayElementNode : public TreeNode {
+private:
+  IdentifierNode        *mArray;
+  SmallVector<TreeNode*> mExprs;  // index expressions.
+public:
+  ArrayElementNode() {mKind = NK_ArrayElement; mArray = NULL;}
+  ~ArrayElementNode() {Release();}
+
+  IdentifierNode* GetArray()                  {return mArray;}
+  void            SetArray(IdentifierNode *n) {mArray = n;}
+
+  unsigned  GetNum()       {return mExprs.GetNum();}
+  TreeNode* ExprAtIndex(unsigned i) {return mExprs.ValueAtIndex(i);}
+  void      AddExpr(TreeNode *n){mExprs.PushBack(n);}
+
+  void Release() {mExprs.Release();}
+  void Dump(unsigned);
+};
+
+
+// Array literal is [1, 2 , 0, -4]. It's an arrya of literals.
+class ArrayLiteralNode : public TreeNode {
+private:
+  SmallVector<TreeNode*> mLiterals;
+public:
+  ArrayLiteralNode() {mKind = NK_ArrayLiteral;}
+  ~ArrayLiteralNode() {Release();}
+
+  unsigned  GetLiteralsNum()       {return mLiterals.GetNum();}
+  TreeNode* GetLiteral(unsigned i) {return mLiterals.ValueAtIndex(i);}
+  void      AddLiteral(TreeNode *n){mLiterals.PushBack(n);}
+
+  void Release() {mLiterals.Release();}
+  void Dump(unsigned);
+};
+
+
+//////////////////////////////////////////////////////////////////////////
 //                           Struct Node
 // This is first coming from C struct. Typescript 'interface' has the
 // similar structure.
