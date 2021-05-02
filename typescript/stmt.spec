@@ -898,7 +898,10 @@ rule FormalParameter : BindingElement
 ##
 ## FunctionBody[Yield] :
 ## FunctionStatementList[?Yield]
-rule FunctionBody : FunctionStatementList
+## NOTE. I used ZEROORONE(StatementList) directly in order to avoid
+##       an issue where FunctionStatementList fail when looking for
+##       its lookahead, if function body is empty.
+rule FunctionBody : ZEROORONE(StatementList)
   attr.action : BuildBlock(%1)
 
 ##
