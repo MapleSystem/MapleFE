@@ -507,8 +507,8 @@ void DimensionNode::Merge(const TreeNode *node) {
 
   if (node->IsDimension()) {
     DimensionNode *n = (DimensionNode *)node;
-    for (unsigned i = 0; i < n->GetDimsNum(); i++)
-      AddDim(n->GetNthDim(i));
+    for (unsigned i = 0; i < n->GetDimensionsNum(); i++)
+      AddDim(n->GetDimension(i));
   } else if (node->IsPass()) {
     PassNode *n = (PassNode*)node;
     for (unsigned i = 0; i < n->GetChildrenNum(); i++) {
@@ -668,8 +668,8 @@ void VarListNode::Dump(unsigned indent) {
 void ExprListNode::Merge(TreeNode *n) {
   if (n->IsExprList()) {
     ExprListNode *expr_list = (ExprListNode*)n;
-    for (unsigned i = 0; i < expr_list->GetNum(); i++)
-      AddExpr(expr_list->ExprAtIndex(i));
+    for (unsigned i = 0; i < expr_list->GetExprsNum(); i++)
+      AddExpr(expr_list->GetExprAtIndex(i));
   } else if (n->IsPass()) {
     PassNode *p = (PassNode*)n;
     for (unsigned i = 0; i < p->GetChildrenNum(); i++) {
@@ -947,8 +947,8 @@ void ClassNode::Construct() {
       TreeNode *var = decl->GetVar();
       if (var->IsVarList()) {
         VarListNode *vlnode = (VarListNode*)var;
-        for (unsigned i = 0; i < vlnode->GetNum(); i++) {
-          IdentifierNode *inode = vlnode->VarAtIndex(i);
+        for (unsigned i = 0; i < vlnode->GetVarsNum(); i++) {
+          IdentifierNode *inode = vlnode->GetVarAtIndex(i);
           inode->SetParent(this);
           mFields.PushBack(inode);
         }
@@ -1211,8 +1211,8 @@ void InterfaceNode::Construct(BlockNode *block) {
     tree_node->SetParent(this);
     if (tree_node->IsVarList()) {
       VarListNode *vlnode = (VarListNode*)tree_node;
-      for (unsigned i = 0; i < vlnode->GetNum(); i++) {
-        IdentifierNode *inode = vlnode->VarAtIndex(i);
+      for (unsigned i = 0; i < vlnode->GetVarsNum(); i++) {
+        IdentifierNode *inode = vlnode->GetVarAtIndex(i);
         inode->SetParent(this);
         mFields.PushBack(inode);
       }

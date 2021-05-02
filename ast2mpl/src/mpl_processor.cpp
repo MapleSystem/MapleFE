@@ -350,8 +350,8 @@ maple::BaseNode *A2M::ProcessParenthesis(StmtExprKind skind, TreeNode *tnode, Bl
 
 maple::BaseNode *A2M::ProcessVarList(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
   VarListNode *node = static_cast<VarListNode *>(tnode);
-  for (int i = 0; i < node->GetNum(); i++) {
-    TreeNode *n = node->VarAtIndex(i);
+  for (int i = 0; i < node->GetVarsNum(); i++) {
+    TreeNode *n = node->GetVarAtIndex(i);
     IdentifierNode *inode = static_cast<IdentifierNode *>(n);
     AST2MPLMSG("ProcessVarList() decl", inode->GetName());
     maple::MIRSymbol *symbol = CreateSymbol(inode, block);

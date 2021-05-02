@@ -163,8 +163,8 @@ void Verifier::VerifyPrimArrayType(PrimArrayTypeNode *tree){
 void Verifier::VerifyVarList(VarListNode *vlnode){
   TreeNode *old_temp_parent = mTempParent;
   mTempParent = vlnode;
-  for (unsigned i = 0; i < vlnode->GetNum(); i++) {
-    IdentifierNode *n = vlnode->VarAtIndex(i);
+  for (unsigned i = 0; i < vlnode->GetVarsNum(); i++) {
+    IdentifierNode *n = vlnode->GetVarAtIndex(i);
     VerifyIdentifier(n);
   }
   mTempParent = old_temp_parent;

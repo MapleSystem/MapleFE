@@ -350,9 +350,9 @@ public:
   DimensionNode() {mKind = NK_Dimension;}
   ~DimensionNode(){Release();}
 
-  unsigned GetDimsNum() {return mDimensions.GetNum();}
-  unsigned GetNthDim(unsigned n) {return mDimensions.ValueAtIndex(n);} // 0 means unspecified.
-  void     SetNthDim(unsigned n, unsigned i) {
+  unsigned GetDimensionsNum() {return mDimensions.GetNum();}
+  unsigned GetDimension(unsigned n) {return mDimensions.ValueAtIndex(n);} // 0 means unspecified.
+  void     SetDimension(unsigned n, unsigned i) {
     unsigned *addr = mDimensions.RefAtIndex(n);
     *addr = i;
   }
@@ -388,11 +388,12 @@ public:
   void SetInit(TreeNode *t)      {mInit = t; t->SetParent(this);}
   void SetDims(DimensionNode *t) {mDims = t;}
 
-  unsigned GetDimsNum()          {return mDims->GetDimsNum();}
+  unsigned GetDimsNum()          {return mDims->GetDimensionsNum();}
+  unsigned GetDim(unsigned n)    {return mDims->GetDimension(n);} // 0 means unspecified.
   bool     IsArray()             {return mDims && GetDimsNum() > 0;}
   unsigned AddDim(unsigned i = 0){mDims->AddDim(i);}           // 0 means unspecified
-  unsigned GetNthNum(unsigned n) {return mDims->GetNthDim(n);} // 0 means unspecified.
-  void     SetNthNum(unsigned n, unsigned i) {mDims->SetNthDim(n, i);}
+  unsigned GetNthNum(unsigned n) {return mDims->GetDimension(n);} // 0 means unspecified.
+  void     SetNthNum(unsigned n, unsigned i) {mDims->SetDimension(n, i);}
 
   // Attributes related
   unsigned GetAttrsNum() const        {return mAttrs.GetNum();}
@@ -580,8 +581,8 @@ public:
   IdentifierNode* GetArray()                  {return mArray;}
   void            SetArray(IdentifierNode *n) {mArray = n;}
 
-  unsigned  GetNum()       {return mExprs.GetNum();}
-  TreeNode* ExprAtIndex(unsigned i) {return mExprs.ValueAtIndex(i);}
+  unsigned  GetExprsNum()       {return mExprs.GetNum();}
+  TreeNode* GetExprAtIndex(unsigned i) {return mExprs.ValueAtIndex(i);}
   void      AddExpr(TreeNode *n){mExprs.PushBack(n);}
 
   void Release() {mExprs.Release();}
@@ -685,8 +686,8 @@ public:
   VarListNode() {mKind = NK_VarList;}
   ~VarListNode() {}
 
-  unsigned GetNum() {return mVars.GetNum();}
-  IdentifierNode* VarAtIndex(unsigned i) {return mVars.ValueAtIndex(i);}
+  unsigned GetVarsNum() {return mVars.GetNum();}
+  IdentifierNode* GetVarAtIndex(unsigned i) {return mVars.ValueAtIndex(i);}
 
   void AddVar(IdentifierNode *n);
   void Merge(TreeNode*);
@@ -707,8 +708,8 @@ public:
   ExprListNode() {mKind = NK_ExprList;}
   ~ExprListNode() {}
 
-  unsigned GetNum() {return mExprs.GetNum();}
-  TreeNode* ExprAtIndex(unsigned i) {return mExprs.ValueAtIndex(i);}
+  unsigned GetExprsNum() {return mExprs.GetNum();}
+  TreeNode* GetExprAtIndex(unsigned i) {return mExprs.ValueAtIndex(i);}
 
   void AddExpr(TreeNode *n) {mExprs.PushBack(n);}
   void Merge(TreeNode*);
@@ -971,8 +972,8 @@ public:
   void SetMethod(TreeNode *t) {mMethod = t;}
 
   void AddArg(TreeNode *t);
-  unsigned GetArgsNum() {return mArgs.GetNum();}
-  TreeNode* GetArg(unsigned index) {return mArgs.ExprAtIndex(index);}
+  unsigned GetArgsNum() {return mArgs.GetExprsNum();}
+  TreeNode* GetArg(unsigned index) {return mArgs.GetExprAtIndex(index);}
 
   void Release() {mArgs.Release();}
   void Dump(unsigned);
@@ -1087,11 +1088,11 @@ public:
 
   DimensionNode* GetDims()       {return mDims;}
   void SetDims(DimensionNode *t) {mDims = t;}
-  unsigned GetDimsNum()          {return mDims->GetDimsNum();}
-  bool     IsArray()             {return mDims && GetDimsNum() > 0;}
+  unsigned GetDimsNum()          {return mDims->GetDimensionsNum();}
+  bool     IsArray()             {return mDims->GetDimensionsNum() > 0;}
   unsigned AddDim(unsigned i = 0){mDims->AddDim(i);}           // 0 means unspecified
-  unsigned GetNthNum(unsigned n) {return mDims->GetNthDim(n);} // 0 means unspecified.
-  void     SetNthNum(unsigned n, unsigned i) {mDims->SetNthDim(n, i);}
+  unsigned GetNthNum(unsigned n) {return mDims->GetDimension(n);} // 0 means unspecified.
+  void     SetNthNum(unsigned n, unsigned i) {mDims->SetDimension(n, i);}
 
   // Override equivalent.
   bool OverrideEquivalent(FunctionNode*);

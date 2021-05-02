@@ -188,12 +188,6 @@ def gen_handler_derived(dictionary):
             if name == "mChildren":
                 plural = "Get" + name[1:]
                 singular = "GetChild"
-            elif name == "mDimensions":
-                plural = "GetDims"
-                singular = "GetNthDim"
-            elif name == "mVars" or name == "mExprs":
-                plural = "Get"
-                singular = name[1:-1]
             elif name[:3] == "mIs" and otype == "bool":
                 plural = name[1:]
                 singular = name[1:]

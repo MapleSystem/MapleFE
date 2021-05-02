@@ -78,8 +78,8 @@ void ASTScope::TryAddDecl(TreeNode *tree) {
       mDecls.PushBack(inode);
   } else if (tree->IsVarList()) {
     VarListNode *vl = (VarListNode*)tree;
-    for (unsigned i = 0; i < vl->GetNum(); i++) {
-      IdentifierNode *inode = vl->VarAtIndex(i);
+    for (unsigned i = 0; i < vl->GetVarsNum(); i++) {
+      IdentifierNode *inode = vl->GetVarAtIndex(i);
       if (inode->GetType())
         mDecls.PushBack(inode);
     }

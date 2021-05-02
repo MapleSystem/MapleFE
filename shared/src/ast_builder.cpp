@@ -108,8 +108,8 @@ static void add_attribute_to(TreeNode *tree, TreeNode *attr) {
   AttrId aid = attr_node->GetId();
   if (tree->IsVarList()) {
     VarListNode *vl = (VarListNode*)tree;
-    for (unsigned i = 0; i < vl->GetNum(); i++) {
-      IdentifierNode *inode = vl->VarAtIndex(i);
+    for (unsigned i = 0; i < vl->GetVarsNum(); i++) {
+      IdentifierNode *inode = vl->GetVarAtIndex(i);
       inode->AddAttr(aid);
     }
     return;
@@ -136,8 +136,8 @@ static void add_type_to(TreeNode *tree, TreeNode *type) {
     lam->SetType(type);
   } else if (tree->IsVarList()) {
     VarListNode *vl = (VarListNode*)tree;
-    for (unsigned i = 0; i < vl->GetNum(); i++)
-      vl->VarAtIndex(i)->SetType(type);
+    for (unsigned i = 0; i < vl->GetVarsNum(); i++)
+      vl->GetVarAtIndex(i)->SetType(type);
   } else if (tree->IsFunction()) {
     FunctionNode *func = (FunctionNode*)tree;
     func->SetType(type);
@@ -1603,8 +1603,8 @@ void ASTBuilder::AddParams(TreeNode *func, TreeNode *decl_params) {
     } else if (params->IsVarList()) {
       // a list of decls at function declaration
       VarListNode *vl = (VarListNode*)params;
-      for (unsigned i = 0; i < vl->GetNum(); i++) {
-        IdentifierNode *inode = vl->VarAtIndex(i);
+      for (unsigned i = 0; i < vl->GetVarsNum(); i++) {
+        IdentifierNode *inode = vl->GetVarAtIndex(i);
         if (func->IsFunction())
           ((FunctionNode*)func)->AddParam(inode);
         else
@@ -1767,8 +1767,8 @@ void ASTBuilder::AddArguments(TreeNode *call, TreeNode *args) {
 
   if (args->IsVarList()) {
     VarListNode *vl = (VarListNode*)args;
-    for (unsigned i = 0; i < vl->GetNum(); i++) {
-      IdentifierNode *inode = vl->VarAtIndex(i);
+    for (unsigned i = 0; i < vl->GetVarsNum(); i++) {
+      IdentifierNode *inode = vl->GetVarAtIndex(i);
       if (callnode)
         callnode->AddArg(inode);
       else
@@ -2081,7 +2081,7 @@ TreeNode* ASTBuilder::AddTypeArgument() {
 
 // It could take
 //   1) One parameter, which is the parameter list.
-//   2) two parameters, the parameter list and the body 
+//   2) two parameters, the parameter list and the body
 TreeNode* ASTBuilder::BuildLambda() {
   if (mTrace)
     std::cout << "In BuildLambda" << std::endl;
@@ -2119,7 +2119,7 @@ TreeNode* ASTBuilder::BuildLambda() {
         TreeNode *param = pass_node->GetChild(i);
         MASSERT(param->IsIdentifier() || param->IsDecl());
         lambda->AddParam(param);
-      } 
+      }
     }
   }
 
