@@ -72,11 +72,12 @@ class AnnotationNode;
 class TreeNode {
 protected:
   NodeKind  mKind;
+  unsigned  mNodeId;
   TreeNode *mParent;
   TreeNode *mLabel;   // label of a statement, or expression.
   const char *mName;
 public:
-  TreeNode() {mKind = NK_Null; mLabel = NULL; mParent = NULL; mName = NULL;}
+  TreeNode() : mKind(NK_Null), mNodeId(GetNextID()), mLabel(NULL), mParent(NULL), mName(NULL) {}
   virtual ~TreeNode() {}
 
 #undef  NODEKIND
@@ -87,8 +88,10 @@ public:
   bool TypeEquivalent(TreeNode*);
 
   NodeKind GetKind() {return mKind;}
+  void SetNodeId(unsigned id) {mNodeId = id;}
   void SetParent(TreeNode *p) {mParent = p;}
   void SetLabel (TreeNode *p) {mLabel = p;}
+  unsigned  GetNodeId() {return mNodeId;}
   TreeNode* GetParent() {return mParent;}
   TreeNode* GetLabel()  {return mLabel;}
 
@@ -104,6 +107,8 @@ public:
 
   // Release the dynamically allocated memory by this tree node.
   virtual void Release(){}
+private:
+  static unsigned GetNextID() {static unsigned id = 1; return id++; }
 };
 
 //////////////////////////////////////////////////////////////////////////
