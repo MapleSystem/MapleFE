@@ -110,6 +110,7 @@ rule ArrayLiteral : ONEOF(
   '[' + ZEROORONE(Elision) + ']'
   '[' + ElementList + ']'
   '[' + ElementList + ',' + ZEROORONE(Elision) + ']')
+  attr.action.%2,%3 : BuildArrayLiteral(%2)
 
 ##-----------------------------------
 ##rule ElementList[Yield] :
@@ -122,6 +123,8 @@ rule ElementList : ONEOF(
   ZEROORONE(Elision) + SpreadElement,
   ElementList + ',' + ZEROORONE(Elision) + AssignmentExpression,
   ElementList + ',' + ZEROORONE(Elision) + SpreadElement)
+  attr.action.%1,%2 : PassChild(%2)
+  attr.action.%3,%4 : BuildExprList(%1, %4)
 
 ##-----------------------------------
 ##rule Elision :

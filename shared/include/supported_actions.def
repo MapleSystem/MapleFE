@@ -67,6 +67,7 @@ ACTION(BuildStructLiteral)
 
 // For Array
 ACTION(BuildArrayElement)
+ACTION(BuildArrayLiteral)
 
 // For function
 ACTION(AddParams)

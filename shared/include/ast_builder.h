@@ -106,6 +106,7 @@ public:
 
   // Array
   TreeNode* BuildArrayElement();
+  TreeNode* BuildArrayLiteral();
 
   TreeNode* BuildDecl();
   TreeNode* SetJSVar();

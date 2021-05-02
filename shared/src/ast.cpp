@@ -578,6 +578,11 @@ void ArrayElementNode::Dump(unsigned indent) {
 void ArrayLiteralNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   DUMP0_NORETURN("[");
+  for (unsigned i = 0; i < GetLiteralsNum(); i++) {
+    GetLiteral(i)->Dump(0);
+    if (i < GetLiteralsNum() - 1)
+      DUMP0_NORETURN(",");
+  }
   DUMP0_NORETURN("]");
 }
 
