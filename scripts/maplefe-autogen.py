@@ -353,41 +353,27 @@ def get_data_based_on_type(val_type, accessor):
     return val_type + ', ") ' + ' + "value"); // Warning: failed to get value'
 
 # The follwoing gen_func_* and gen_call* functions are for AstDump
-def gen_call_handle_values():
-    return True
-
-def gen_func_declaration(dictionary, node_name):
-    return "void " + gen_args[2] + node_name + "(" + node_name + "* node);"
-
-def gen_func_definition(dictionary, node_name):
-    str = "void " + gen_args[1] + "::" + gen_args[2] + node_name + "(" + node_name + "* node) {" \
-            + '\nif(node == nullptr) {\nDump("  ' + node_name + ': null");\nreturn;\n}'
-    if node_name != "TreeNode":
-        str += '\nDumpFB("' + node_name + ' {");\nDumpBase(node);'
-    return str
-
-def gen_call_child_node(dictionary, field_name, node_type, accessor):
-    str = 'Dump("' + field_name + ': ' + node_type + '*");\n' if field_name != "" else ""
-    return str + gen_args[2] + node_type + "(" + accessor + ");"
-
-def gen_call_child_value(dictionary, field_name, val_type, accessor):
-    return 'Dump(std::string("' + field_name + ': ") + "' + get_data_based_on_type(val_type, accessor)
-
-def gen_call_children_node(dictionary, field_name, node_type, accessor):
-    return 'DumpLB("' + field_name + ': ' + node_type + ', size = " + std::to_string(' + accessor + ') + " [");'
-
-def gen_call_children_node_end(dictionary, field_name, node_type, accessor):
-    return 'DumpLE("]");'
-
-def gen_call_nth_subchild_node(dictionary, field_name, node_type, accessor):
-    return 'Dump(std::to_string(i + 1) + ": ' + node_type + '*");\n' + gen_args[2] + node_type + "(" + accessor + ");"
-
-def gen_call_nth_subchild_value(dictionary, field_name, val_type, accessor):
-    return 'Dump(std::to_string(i) + ". ' + get_data_based_on_type(val_type, accessor)
-
-def gen_func_definition_end(dictionary, node_name):
-    if node_name == "TreeNode": return 'return;\n}'
-    return '\nDumpFE("}");\nreturn;\n}'
+gen_call_handle_values = lambda: True
+gen_func_declaration = lambda dictionary, node_name: \
+        "void " + gen_args[2] + node_name + "(" + node_name + "* node);"
+gen_func_definition = lambda dictionary, node_name: \
+        "void " + gen_args[1] + "::" + gen_args[2] + node_name + "(" + node_name + "* node) {" \
+        + '\nif(node == nullptr) {\nDump("  ' + node_name + ': null");\nreturn;\n}' \
+        + ('\nDumpFB("' + node_name + ' {");\nDumpBase(node);' if node_name != "TreeNode" else '')
+gen_call_child_node = lambda dictionary, field_name, node_type, accessor: \
+        ('Dump("' + field_name + ': ' + node_type + '*");\n' if field_name != '' else '') \
+        + gen_args[2] + node_type + "(" + accessor + ");"
+gen_call_child_value = lambda dictionary, field_name, val_type, accessor: \
+        'Dump(std::string("' + field_name + ': ") + "' + get_data_based_on_type(val_type, accessor)
+gen_call_children_node = lambda dictionary, field_name, node_type, accessor: \
+        'DumpLB("' + field_name + ': ' + node_type + ', size = " + std::to_string(' + accessor + ') + " [");'
+gen_call_children_node_end = lambda dictionary, field_name, node_type, accessor: 'DumpLE("]");'
+gen_call_nth_subchild_node = lambda dictionary, field_name, node_type, accessor: \
+        'Dump(std::to_string(i + 1) + ": ' + node_type + '*");\n' + gen_args[2] + node_type + "(" + accessor + ");"
+gen_call_nth_subchild_value = lambda dictionary, field_name, val_type, accessor: \
+        'Dump(std::to_string(i) + ". ' + get_data_based_on_type(val_type, accessor)
+gen_func_definition_end = lambda dictionary, node_name: \
+        'return;\n}' if node_name == "TreeNode" else 'DumpFE("}");\nreturn;\n}'
 
 #
 # Generate source files for dumping AST
@@ -476,36 +462,22 @@ handle_src_include_files(Finalization)
 
 ################################################################################
 
-def get_accessor_based_on_type(val_type, accessor):
-    return get_data_based_on_type(val_type, accessor).replace(': " +',',').replace(');','').replace('" + ','')
+get_accessor_based_on_type = lambda val_type, accessor: \
+        get_data_based_on_type(val_type, accessor).replace(': " +',',').replace(');','').replace('" + ','')
 
 # The follwoing gen_func_* and gen_call* functions are for AstVisitor
-def gen_call_handle_values():
-    return False
-
-def gen_func_declaration(dictionary, node_name):
-    return 'virtual ' + node_name + '* ' + gen_args[2] + node_name + '(' + node_name + '* node);'
-
-def gen_func_definition(dictionary, node_name):
-    str = '\nif(mTrace) std::cout << "Visiting ' + node_name + ', id=" << node->GetNodeId() << "..." << std::endl;' \
-            if node_name != 'TreeNode' else ''
-    return node_name + '* ' + gen_args[1] + '::' + gen_args[2] + node_name + '(' + node_name + '* node) {' \
-            + '\nif(node != nullptr) {' + str
-
-def gen_call_child_node(dictionary, field_name, node_type, accessor):
-    return gen_args[2] + node_type + '(' + accessor + ');'
-
-def gen_call_children_node(dictionary, field_name, node_type, accessor):
-    return '// field: ' + field_name + ', type: ' + node_type
-
-def gen_call_children_node_end(dictionary, field_name, node_type, accessor):
-    return ''
-
-def gen_call_nth_subchild_node(dictionary, field_name, node_type, accessor):
-    return gen_args[2] + node_type + '(' + accessor + ');'
-
-def gen_func_definition_end(dictionary, node_name):
-    return '}\nreturn node;\n}'
+gen_call_handle_values = lambda: False
+gen_func_declaration = lambda dictionary, node_name: \
+        'virtual ' + node_name + '* ' + gen_args[2] + node_name + '(' + node_name + '* node);'
+gen_func_definition = lambda dictionary, node_name: \
+        node_name + '* ' + gen_args[1] + '::' + gen_args[2] + node_name + '(' + node_name + '* node) {\nif(node != nullptr) {' \
+        + ('\nif(mTrace) std::cout << "Visiting ' + node_name + ', id=" << node->GetNodeId() << "..." << std::endl;' \
+        if node_name != 'TreeNode' else '')
+gen_call_child_node = lambda dictionary, field_name, node_type, accessor: gen_args[2] + node_type + '(' + accessor + ');'
+gen_call_children_node = lambda dictionary, field_name, node_type, accessor: ''
+gen_call_children_node_end = lambda dictionary, field_name, node_type, accessor: ''
+gen_call_nth_subchild_node = lambda dictionary, field_name, node_type, accessor: gen_args[2] + node_type + '(' + accessor + ');'
+gen_func_definition_end = lambda dictionary, node_name: '}\nreturn node;\n}'
 
 #
 # Generate gen_handler.h and gen_handler.cpp
