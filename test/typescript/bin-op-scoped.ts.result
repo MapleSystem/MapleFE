@@ -1,0 +1,36 @@
+Matched 7 tokens.
+Matched 14 tokens.
+Matched 19 tokens.
+Matched 25 tokens.
+Matched 31 tokens.
+Matched 37 tokens.
+Matched 43 tokens.
+Matched 49 tokens.
+Matched 100 tokens.
+============= Module ===========
+== Sub Tree ==
+js_var Decl: a=1
+== Sub Tree ==
+js_var Decl: b=1
+== Sub Tree ==
+js_var Decl: c
+== Sub Tree ==
+c Assign a Add b
+== Sub Tree ==
+c Assign a Sub b
+== Sub Tree ==
+c Assign a Mul b
+== Sub Tree ==
+c Assign a Div b
+== Sub Tree ==
+c Assign a Mod b
+== Sub Tree ==
+js_let Decl: a=2
+js_let Decl: b=2
+js_let Decl: c
+c Assign a Add b
+c Assign a Sub b
+c Assign a Mul b
+c Assign a Div b
+c Assign a Mod b
+

@@ -576,6 +576,7 @@ rule BlockStatement : Block
 ##rule Block[Yield, Return] :
 ##  { StatementList[?Yield, ?Return]opt }
 rule Block : '{' + ZEROORONE(StatementList) + '}'
+  attr.action : BuildBlock(%2)
 
 ##-----------------------------------
 ##rule StatementList[Yield, Return] :
