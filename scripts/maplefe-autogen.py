@@ -213,21 +213,22 @@ def gen_handler_derived(dictionary):
                 func_name = singular if member_functions.get(singular) != None else singular + "AtIndex"
                 rtype = member_functions[func_name][2:]
                 if rtype == "_Bool": rtype = "bool"
-                # gen_call_children_node() for list or vector of nodes before entering the loop
-                code.append(gen_call_children_node(dictionary, name, otype + "<" + rtype + ">", "node->" + plural + "Num()"))
-                code.append("for(unsigned i = 0; i < node->" + plural + "Num(); ++i) {")
                 ntype = get_pointed(rtype)
-                if ntype != None:
-                    prefix = "const_cast<" + ntype + "*>(" if rtype[:6] == "const " else ''
-                    suffix = ")" if prefix != '' else ''
-                    # gen_call_nth_subchild_node() for the nth subchild node in the loop for the list or vector
-                    code.append(gen_call_nth_subchild_node(dictionary, name, ntype, prefix + "node->" + func_name + "(i)" + suffix))
-                else:
-                    # gen_call_nth_subchild_value() for the nth subchild value in the loop for the list or vector
-                    code.append(gen_call_nth_subchild_value(dictionary, name, rtype, "node->" + func_name + "(i)"))
-                code.append("}")
+                if ntype != None or gen_call_handle_values():
+                    # gen_call_children_node() for list or vector of nodes before entering the loop
+                    code.append(gen_call_children_node(dictionary, name, otype + "<" + rtype + ">", "node->" + plural + "Num()"))
+                    code.append("for(unsigned i = 0; i < node->" + plural + "Num(); ++i) {")
+                    if ntype != None:
+                        prefix = "const_cast<" + ntype + "*>(" if rtype[:6] == "const " else ''
+                        suffix = ")" if prefix != '' else ''
+                        # gen_call_nth_subchild_node() for the nth subchild node in the loop for the list or vector
+                        code.append(gen_call_nth_subchild_node(dictionary, name, ntype, prefix + "node->" + func_name + "(i)" + suffix))
+                    else:
+                        # gen_call_nth_subchild_value() for the nth subchild value in the loop for the list or vector
+                        code.append(gen_call_nth_subchild_value(dictionary, name, rtype, "node->" + func_name + "(i)"))
+                    code.append("}")
                 code.append(gen_call_children_node_end(dictionary, name, otype + "<" + rtype + ">", "node->" + plural + "Num()"))
-            else:
+            elif gen_call_handle_values():
                 if member_functions.get(plural) != None:
                     # gen_call_child_value() for child value in current function body
                     code.append(gen_call_child_value(dictionary, name, otype, "node->" + plural + "()"))
@@ -339,63 +340,22 @@ def handle_src_include_files(phase):
 
 ###################################################################################################
 
-def gen_func_declaration(dictionary, node_name):
-    return node_name + "* " + gen_args[2] + node_name + "(" + node_name + "* node);"
-
-def gen_func_definition(dictionary, node_name):
-    return node_name + "* " + gen_args[1] + "::" + gen_args[2] + node_name + "(" + node_name + "* node) {"
-
-def gen_call_child_node(dictionary, field_name, node_type, accessor):
-    return gen_args[2] + node_type + "(" + accessor + ");"
-
-def gen_call_child_value(dictionary, field_name, val_type, accessor):
-    return "// Value: " + gen_args[2] + " " + val_type + "(" + accessor + ");"
-
-def gen_call_children_node(dictionary, field_name, node_type, accessor):
-    return "// field: " + field_name + ", type: " + node_type
-
-def gen_call_children_node_end(dictionary, field_name, node_type, accessor):
-    return ""
-
-def gen_call_nth_subchild_node(dictionary, field_name, node_type, accessor):
-    return gen_args[2] + node_type + "(" + accessor + ");"
-
-def gen_call_nth_subchild_value(dictionary, field_name, val_type, accessor):
-    return "// Value: " + gen_args[2] + " " + val_type + "(" + accessor + ");"
-
-def gen_func_definition_end(dictionary, node_name):
-    return "return node;\n}"
-
-#
-# Generate gen_handler.h and gen_handler.cpp
-#
-gen_args = [
-        "gen_handler", # filename
-        "A2C_Handler", # Class name
-        "Handle",      # Prefix of function name
-        ]
-
-# Example to extract code pieces starting from initial_yaml
-if False:
-    handle_src_include_files(Initialization)
-    handle_yaml(initial_yaml, gen_handler)
-    handle_src_include_files(Finalization)
-
-################################################################################
-
 def get_data_based_on_type(val_type, accessor):
     e = get_enum_type(val_type)
     if e != None:
-        return e + ': " + GetEnum' + e + '(' + accessor + '));\n'
+        return e + ': " + GetEnum' + e + '(' + accessor + '));'
     elif val_type == "LitData":
-        return 'LitData: LitId, " + GetEnumLitId(' + accessor + '.mType) + ", " + GetEnumLitData(' + accessor + '));\n'
+        return 'LitData: LitId, " + GetEnumLitId(' + accessor + '.mType) + ", " + GetEnumLitData(' + accessor + '));'
     elif val_type == "bool":
-        return val_type + ', " + (' + accessor + ' ? "true" : "false"));\n'
+        return val_type + ', " + (' + accessor + ' ? "true" : "false"));'
     elif val_type == "unsigned int":
-        return val_type + ', " + std::to_string(' + accessor + '));\n'
-    return val_type + ', ") ' + ' + "value"); // Warning: failed to get value\n'
+        return val_type + ', " + std::to_string(' + accessor + '));'
+    return val_type + ', ") ' + ' + "value"); // Warning: failed to get value'
 
 # The follwoing gen_func_* and gen_call* functions are for AstDump
+def gen_call_handle_values():
+    return True
+
 def gen_func_declaration(dictionary, node_name):
     return "void " + gen_args[2] + node_name + "(" + node_name + "* node);"
 
@@ -514,3 +474,60 @@ handle_yaml(initial_yaml, gen_handler)
 handle_yaml(initial_yaml, gen_enum_func)
 handle_src_include_files(Finalization)
 
+################################################################################
+
+def get_accessor_based_on_type(val_type, accessor):
+    return get_data_based_on_type(val_type, accessor).replace(': " +',',').replace(');','').replace('" + ','')
+
+# The follwoing gen_func_* and gen_call* functions are for AstVisitor
+def gen_call_handle_values():
+    return False
+
+def gen_func_declaration(dictionary, node_name):
+    return 'virtual ' + node_name + '* ' + gen_args[2] + node_name + '(' + node_name + '* node);'
+
+def gen_func_definition(dictionary, node_name):
+    str = '\nif(mTrace) std::cout << "Visiting ' + node_name + ', id=" << node->GetNodeId() << "..." << std::endl;' \
+            if node_name != 'TreeNode' else ''
+    return node_name + '* ' + gen_args[1] + '::' + gen_args[2] + node_name + '(' + node_name + '* node) {' \
+            + '\nif(node != nullptr) {' + str
+
+def gen_call_child_node(dictionary, field_name, node_type, accessor):
+    return gen_args[2] + node_type + '(' + accessor + ');'
+
+def gen_call_children_node(dictionary, field_name, node_type, accessor):
+    return '// field: ' + field_name + ', type: ' + node_type
+
+def gen_call_children_node_end(dictionary, field_name, node_type, accessor):
+    return ''
+
+def gen_call_nth_subchild_node(dictionary, field_name, node_type, accessor):
+    return gen_args[2] + node_type + '(' + accessor + ');'
+
+def gen_func_definition_end(dictionary, node_name):
+    return '}\nreturn node;\n}'
+
+#
+# Generate gen_handler.h and gen_handler.cpp
+#
+gen_args = [
+        "gen_astvisitor", # filename
+        "AstVisitor",     # Class name
+        "Visit",          # Prefix of function name
+        ]
+
+astvisitor_init = [
+        'private:',
+        'bool mTrace;', '',
+        'public:',
+        gen_args[1] + '(bool t = false) : mTrace(t) {}', '',
+        'TreeNode* ' + gen_args[2] + '(TreeNode* node) {',
+        'return ' + gen_args[2] + 'TreeNode(node);',
+        '}', '',
+        ]
+
+# Example to extract code pieces starting from initial_yaml
+handle_src_include_files(Initialization)
+append(include_file, astvisitor_init)
+handle_yaml(initial_yaml, gen_handler)
+handle_src_include_files(Finalization)

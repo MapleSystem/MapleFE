@@ -17,11 +17,28 @@
 
 namespace maplefe {
 
+  FunctionNode *CfgVisitor::VisitFunctionNode(FunctionNode *node) {
+    if(mTrace)
+      std::cout << "CfgVisitor: enter FunctionNode, id=" << node->GetNodeId() << std::endl;
+
+    AstVisitor::VisitFunctionNode(node);
+
+    if(mTrace)
+      std::cout << "CfgVisitor: exit FunctionNode, id=" << node->GetNodeId() << std::endl;
+    return node;
+  }
+
+
+
   void A2C_CFG::BuildCFG() {
+    CfgVisitor visitor(mTraceCFG, true);
+    for(auto it: mModule->mTrees)
+          visitor.Visit(it->mRootNode);
   }
 
   void A2C_CFG::Dump() {
   }
+
 
 }
 

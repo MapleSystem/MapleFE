@@ -19,21 +19,35 @@
 #include "ast_module.h"
 #include "ast.h"
 #include "ast_type.h"
+#include "gen_astvisitor.h"
 
 namespace maplefe {
 
-class A2C_CFG {
-private:
-  ASTModule *mModule;
-  bool mTraceCFG;
+  class CfgVisitor : public AstVisitor {
+    private:
+      bool mTrace;
+    public:
 
-public:
-  explicit A2C_CFG(ASTModule *module, bool trace) : mModule(module), mTraceCFG(trace) {}
-  ~A2C_CFG() = default;
+      explicit CfgVisitor(bool t, bool base = false) : mTrace(t), AstVisitor(t && base) {}
+      ~CfgVisitor() = default;
 
-  void BuildCFG();
-  void Dump();
-};
+      FunctionNode *VisitFunctionNode(FunctionNode *node);
+  };
+
+  class A2C_CFG {
+    private:
+      ASTModule *mModule;
+      bool mTraceCFG;
+
+    public:
+      explicit A2C_CFG(ASTModule *module, bool trace) : mModule(module), mTraceCFG(trace) {}
+      ~A2C_CFG() = default;
+
+      void BuildCFG();
+      ASTModule* GetModule() { return mModule; }
+      bool GetTraceCFG() { return mTraceCFG; }
+      void Dump();
+  };
 
 }
 #endif
