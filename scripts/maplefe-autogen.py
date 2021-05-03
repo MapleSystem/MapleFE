@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-from os import path
+from os import path, environ
 import subprocess
 import ruamel.yaml as yaml
-import os
 
 #
 # Needs to install the following packages on Ubuntu 18.04 or 20.04
@@ -10,7 +9,7 @@ import os
 #
 
 root_dir = path.dirname(path.dirname(path.realpath(__file__))) + '/'
-builddir = os.environ.get('BUILDDIR')
+builddir = environ.get('BUILDDIR')
 output_dir = builddir + '/ast_doc/' if builddir != None else root_dir + "output/typescript/ast_doc/"
 maplefe_dir = root_dir + 'shared/'
 # initial_yaml = output_dir + 'maplefe/index.yaml' # For higher version of clang-doc
@@ -348,9 +347,10 @@ def get_data_based_on_type(val_type, accessor):
         return 'LitData: LitId, " + GetEnumLitId(' + accessor + '.mType) + ", " + GetEnumLitData(' + accessor + '));'
     elif val_type == "bool":
         return val_type + ', " + (' + accessor + ' ? "true" : "false"));'
-    elif val_type == "unsigned int":
+    elif val_type == 'unsigned int' or val_type == 'uint32_t' or val_type == 'uint64_t' \
+            or val_type == 'unsigned' or val_type == 'int' or val_type == 'int32_t' or val_type == 'int64_t' :
         return val_type + ', " + std::to_string(' + accessor + '));'
-    return val_type + ', ") ' + ' + "value"); // Warning: failed to get value'
+    return val_type + ', " + "value"); // Warning: failed to get value'
 
 # The follwoing gen_func_* and gen_call* functions are for AstDump
 gen_call_handle_values = lambda: True
