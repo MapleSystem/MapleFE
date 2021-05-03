@@ -4,5 +4,6 @@ output/
 *.bak
 *.swo
 *.swp
+*.mpl
 gdbfile
 

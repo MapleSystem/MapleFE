@@ -110,7 +110,12 @@ class  Package
       cond-branch cond:attr NE null
       true branch :
         specTitle Assign attr.getValue(Name.SPECIFICATION_TITLE)
-
+        specVersion Assign attr.getValue(Name.SPECIFICATION_VERSION)
+        specVendor Assign attr.getValue(Name.SPECIFICATION_VENDOR)
+        implTitle Assign attr.getValue(Name.IMPLEMENTATION_TITLE)
+        implVersion Assign attr.getValue(Name.IMPLEMENTATION_VERSION)
+        implVendor Assign attr.getValue(Name.IMPLEMENTATION_VENDOR)
+        sealed Assign attr.getValue(Name.SEALED)
       false branch :
 
       attr Assign man.getMainAttributes()
@@ -121,6 +126,35 @@ class  Package
           specTitle Assign attr.getValue(Name.SPECIFICATION_TITLE)
         false branch :
 
+        cond-branch cond:specVersion EQ null
+        true branch :
+          specVersion Assign attr.getValue(Name.SPECIFICATION_VERSION)
+        false branch :
+
+        cond-branch cond:specVendor EQ null
+        true branch :
+          specVendor Assign attr.getValue(Name.SPECIFICATION_VENDOR)
+        false branch :
+
+        cond-branch cond:implTitle EQ null
+        true branch :
+          implTitle Assign attr.getValue(Name.IMPLEMENTATION_TITLE)
+        false branch :
+
+        cond-branch cond:implVersion EQ null
+        true branch :
+          implVersion Assign attr.getValue(Name.IMPLEMENTATION_VERSION)
+        false branch :
+
+        cond-branch cond:implVendor EQ null
+        true branch :
+          implVendor Assign attr.getValue(Name.IMPLEMENTATION_VENDOR)
+        false branch :
+
+        cond-branch cond:sealed EQ null
+        true branch :
+          sealed Assign attr.getValue(Name.SEALED)
+        false branch :
 
       false branch :
 
@@ -186,6 +220,16 @@ class  Package
       Decl: len=Math.max(di.length,si.length)
       for ( )
         Decl: d=()
+        Decl: s=()
+        cond-branch cond:s LT d
+        true branch :
+          return false
+        false branch :
+
+        cond-branch cond:s GT d
+        true branch :
+          return true
+        false branch :
 
 
       return true
@@ -212,6 +256,12 @@ class  Package
   1
       true branch :
         name Assign name.substring(0,i)
+        Decl: cl=c.getClassLoader()
+        cond-branch cond:cl NE null
+        true branch :
+          return cl.getPackage(name)
+        false branch :
+          return getSystemPackage(name)
 
       false branch :
         return null
@@ -245,6 +295,18 @@ class  Package
       true branch :
         packageInfo Assign Class.forName(pkgName Add ".package-info",false,loader)
 
+        ClassNotFoundException
+        ex
+        class  PackageInfoProxy
+          Fields: 
+
+          Instance Initializer: 
+          Constructors: 
+          Methods: 
+          LocalClasses: 
+          LocalInterfaces: 
+
+        packageInfo Assign PackageInfoProxy
 
       false branch :
 
@@ -265,7 +327,18 @@ class  Package
       return getPackageInfo().getDeclaredAnnotations()
     func  getSystemPackage(name)  throws: 
       Decl: pkg=pkgs.get(name)
+      cond-branch cond:pkg EQ null
+      true branch :
+        name Assign name.replace(.,/).concat("/")
+        Decl: fn=getSystemPackage0(name)
+        cond-branch cond:fn NE null
+        true branch :
+          pkg Assign defineSystemPackage(name,fn)
+        false branch :
 
+      false branch :
+
+      return pkg
 
     func  getSystemPackages()  throws: 
       Decl: names=getSystemPackages0()
@@ -280,9 +353,14 @@ class  Package
       FileInputStream
       fis
       new FileInputStream(fn)
-
+      JarInputStream
+      jis
+      new JarInputStream(fis,false)
       return jis.getManifest()
 
+      IOException
+      e
+      return null
 
     func  getSystemPackage0(name)  throws: 
     func  getSystemPackages0()  throws: 
@@ -292,3 +370,9 @@ class  Package
 Identifier:FileInputStream has no decl.
 Identifier:fis has no decl.
 UserType:FileInputStream has no decl.
+Identifier:JarInputStream has no decl.
+Identifier:jis has no decl.
+UserType:JarInputStream has no decl.
+Identifier:fis has no decl.
+Identifier:IOException has no decl.
+Identifier:e has no decl.

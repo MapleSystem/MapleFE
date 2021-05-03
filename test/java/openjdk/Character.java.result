@@ -172,7 +172,8 @@ class  Character
         cond-branch cond:isValidCodePoint(codePoint)
         true branch :
           Decl: result=
-
+          toSurrogates(codePoint,result,0)
+          return result
         false branch :
           new IllegalArgumentException()
 
@@ -233,9 +234,35 @@ class  Character
       cond-branch cond:codePointOffset GE 0
       true branch :
         Decl: i
+        for ( )
+          cond-branch cond:isHighSurrogate(seq.charAt(  xInc
+)) Land x LT length Land isLowSurrogate(seq.charAt(x))
+          true branch :
+                          xInc
+
+          false branch :
+
+
+        cond-branch cond:i LT codePointOffset
+        true branch :
+          new IndexOutOfBoundsException()
+        false branch :
 
       false branch :
         Decl: i
+        for ( )
+          cond-branch cond:isLowSurrogate(seq.charAt(Dec
+  x)) Land x GT 0 Land isHighSurrogate(seq.charAt(x Sub 1))
+          true branch :
+                          xDec
+
+          false branch :
+
+
+        cond-branch cond:i LT 0
+        true branch :
+          new IndexOutOfBoundsException()
+        false branch :
 
 
       return x
@@ -251,9 +278,36 @@ class  Character
       cond-branch cond:codePointOffset GE 0
       true branch :
         Decl: limit=start Add count
+        Decl: i
+        for ( )
+          cond-branch cond:isHighSurrogate(a,  xInc
+) Land x LT limit Land isLowSurrogate(a,x)
+          true branch :
+                          xInc
+
+          false branch :
+
+
+        cond-branch cond:i LT codePointOffset
+        true branch :
+          new IndexOutOfBoundsException()
+        false branch :
 
       false branch :
         Decl: i
+        for ( )
+          cond-branch cond:isLowSurrogate(a,Dec
+  x) Land x GT start Land isHighSurrogate(a,x Sub 1)
+          true branch :
+                          xDec
+
+          false branch :
+
+
+        cond-branch cond:i LT 0
+        true branch :
+          new IndexOutOfBoundsException()
+        false branch :
 
 
       return x
@@ -393,7 +447,22 @@ class  Character
       true branch :
         Decl: result=Sub
   1
+        cond-branch cond:0 LE codePoint Land codePoint LE 9
+        true branch :
+          result Assign codePoint Sub 0
+        false branch :
+          cond-branch cond:a LE codePoint Land codePoint LE z
+          true branch :
+            result Assign 10 Add (codePoint Sub a)
+          false branch :
+            cond-branch cond:A LE codePoint Land codePoint LE Z
+            true branch :
+              result Assign 10 Add (codePoint Sub A)
+            false branch :
 
+
+
+        return 
       false branch :
 
       return digitImpl(codePoint,radix)
@@ -408,7 +477,18 @@ class  Character
           return codePoint Sub 0
         false branch :
 
+        cond-branch cond:codePoint GE a Land codePoint LE z
+        true branch :
+          return codePoint Sub (a Sub 10)
+        false branch :
 
+        cond-branch cond:codePoint GE A Land codePoint LE Z
+        true branch :
+          return codePoint Sub (A Sub 10)
+        false branch :
+
+        return Sub
+  1
       false branch :
 
       cond-branch cond:codePoint GE 65313 Land codePoint LE 65338

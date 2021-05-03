@@ -9,7 +9,7 @@ class  A
   Methods: 
     func  loseEdges()  throws: 
       search:
-      break search
+      break:search
 
 
   LocalClasses: 

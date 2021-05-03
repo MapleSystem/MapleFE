@@ -63,7 +63,30 @@ class  Runtime
       cond-branch cond:shuttingDown
       true branch :
         shuttingDown Assign true
+        Decl: hooks
+        hooks Assign 
+        shutdownHooks.toArray(hooks)
 
+        Thread
+        hook
+        hooks
+        hook.start()
+
+        Thread
+        hook
+        hooks
+        hook.join()
+
+        InterruptedException
+        ex
+
+
+        cond-branch cond:finalizeOnExit
+        true branch :
+          runFinalization()
+        false branch :
+
+        nativeExit(status)
       false branch :
 
 
@@ -208,12 +231,39 @@ class  Runtime
       cond-branch cond:loader NE null
       true branch :
         Decl: filename=loader.findLibrary(libraryName)
+        cond-branch cond:filename EQ null
+        true branch :
+          new UnsatisfiedLinkError(loader Add " couldn't find "" Add System.mapLibraryName(libraryName) Add """)
+        false branch :
 
+        Decl: error=doLoad(filename,loader)
+        cond-branch cond:error NE null
+        true branch :
+          new UnsatisfiedLinkError(error)
+        false branch :
+
+        return 
       false branch :
 
       Decl: filename=System.mapLibraryName(libraryName)
       Decl: candidates=new ArrayList()
       Decl: lastError=null
+      String
+      directory
+      getLibPaths()
+      Decl: candidate=directory Add filename
+      candidates.add(candidate)
+      cond-branch cond:IoUtils.canOpenReadOnly(candidate)
+      true branch :
+        Decl: error=doLoad(candidate,loader)
+        cond-branch cond:error EQ null
+        true branch :
+          return 
+        false branch :
+
+        lastError Assign error
+      false branch :
+
 
       cond-branch cond:lastError NE null
       true branch :
@@ -267,4 +317,6 @@ class  Runtime
   LocalClasses: 
   LocalInterfaces: 
 
+Identifier:String has no decl.
+Identifier:directory has no decl.
 UserType:UnsatisfiedLinkError has no decl.

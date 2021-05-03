@@ -47,8 +47,20 @@ class  Class
       cond-branch cond:isArray()
       true branch :
         Decl: cl=this
+        Decl: dimensions=0
+        while cl.isArray()                      dimensionsInc
 
+          cl Assign cl.getComponentType()
 
+        Decl: sb=new StringBuilder()
+        sb.append(cl.getName())
+        for ( )
+          sb.append("[]")
+
+        return sb.toString()
+
+        Throwable
+        e
 
       false branch :
 
@@ -76,7 +88,12 @@ class  Class
         return getName()
       false branch :
         Decl: enclosingName=enclosingClass.getCanonicalName()
+        cond-branch cond:enclosingName EQ null
+        true branch :
+          return null
+        false branch :
 
+        return enclosingName Add "." Add getSimpleName()
 
     func  isAnonymousClass()  throws: 
     func  isLocalClass()  throws: 
@@ -189,6 +206,14 @@ class  Class
         parameterTypes Assign EmptyArray.CLASS
       false branch :
 
+      Class
+      c
+      parameterTypes
+      cond-branch cond:c EQ null
+      true branch :
+        new NoSuchMethodException("parameter type is null")
+      false branch :
+
 
       Decl: result=
       cond-branch cond:result EQ null Lor (recursivePublicMethods Land Modifier.isPublic(result.getAccessFlags()))
@@ -223,6 +248,11 @@ class  Class
       true branch :
         for ( )
           Decl: ifc=(Class)
+          Decl: result=ifc.getPublicMethodRecursive(name,parameterTypes)
+          cond-branch cond:result NE null Land Modifier.isPublic(result.getAccessFlags())
+          true branch :
+            return result
+          false branch :
 
 
       false branch :
@@ -259,6 +289,15 @@ class  Class
       cond-branch cond:name.startsWith("/")
       true branch :
         Decl: c=this
+        while c.isArray()          c Assign c.getComponentType()
+
+        Decl: baseName=c.getName()
+        Decl: index=baseName.lastIndexOf(.)
+        cond-branch cond:index NE Sub
+  1
+        true branch :
+          name Assign baseName.substring(0,index).replace(.,/) Add "/" Add name
+        false branch :
 
       false branch :
         name Assign name.substring(1)
@@ -413,6 +452,10 @@ class  Class
       false branch :
 
       Decl: result=new StringBuilder()
+      String
+      s
+      annotation
+      result.append(s)
 
       return result.toString()
     func  getSignatureAnnotation()  throws: 
@@ -437,5 +480,10 @@ Identifier:m has no decl.
 Identifier:result has no decl.
 Identifier:Class has no decl.
 Identifier:c has no decl.
+Identifier:Class has no decl.
+Identifier:c has no decl.
 Identifier:Annotation has no decl.
 Identifier:declaredAnnotation has no decl.
+Identifier:String has no decl.
+Identifier:s has no decl.
+Identifier:annotation has no decl.

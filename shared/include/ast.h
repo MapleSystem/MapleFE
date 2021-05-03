@@ -1024,7 +1024,7 @@ public:
 
   unsigned  GetChildrenNum()            {return mChildren.GetNum();}
   TreeNode* GetChildAtIndex(unsigned i) {return mChildren.ValueAtIndex(i);}
-  void      AddChild(TreeNode *c)       {mChildren.PushBack(c); c->SetParent(this);}
+  void      AddChild(TreeNode *c);
   void      ClearChildren()             {mChildren.Clear();}
 
   void Release() {mChildren.Release();}

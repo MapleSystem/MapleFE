@@ -135,6 +135,15 @@ class  ClassLoader
       Decl: c=findLoadedClass(name)
       cond-branch cond:c EQ null
       true branch :
+        cond-branch cond:parent NE null
+        true branch :
+          c Assign parent.loadClass(name,false)
+        false branch :
+          c Assign findBootstrapClassOrNull(name)
+
+
+        ClassNotFoundException
+        e
 
         cond-branch cond:c EQ null
         true branch :
@@ -223,11 +232,17 @@ class  ClassLoader
       Decl: url=getResource(name)
       return 
 
+      IOException
+      e
+      return null
 
     func  getSystemResourceAsStream(name)  throws: 
       Decl: url=getSystemResource(name)
       return 
 
+      IOException
+      e
+      return null
 
     func  getParent()  throws: 
       return parent
@@ -235,7 +250,14 @@ class  ClassLoader
       return SystemClassLoader.loader
     func  definePackage(name,specTitle,specVersion,specVendor,implTitle,implVersion,implVendor,sealBase)  throws:     IllegalArgumentException
       Decl: pkg=packages.get(name)
+      cond-branch cond:pkg NE null
+      true branch :
+        new IllegalArgumentException(name)
+      false branch :
 
+      pkg Assign new Package(name,)
+      packages.put(name,pkg)
+      return pkg
 
     func  getPackage(name)  throws: 
       Decl: pkg
@@ -290,7 +312,12 @@ class  BootClassLoader
       cond-branch cond:name NE null Land name.isEmpty()
       true branch :
         Decl: pack=super.getPackage(name)
+        cond-branch cond:pack EQ null
+        true branch :
+          pack Assign definePackage(name,"Unknown","0.0","Unknown","Unknown","0.0","Unknown",null)
+        false branch :
 
+        return pack
 
       false branch :
 
@@ -315,6 +342,12 @@ UserType:UnsupportedOperationException has no decl.
 UserType:UnsupportedOperationException has no decl.
 UserType:UnsupportedOperationException has no decl.
 UserType:UnsupportedOperationException has no decl.
+Identifier:IOException has no decl.
+Identifier:e has no decl.
+Identifier:IOException has no decl.
+Identifier:e has no decl.
+Identifier:pkg has no decl.
+UserType:Package has no decl.
 Identifier:pkg has no decl.
 Identifier:map has no decl.
 UserType:HashMap has no decl.

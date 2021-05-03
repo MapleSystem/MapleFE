@@ -57,7 +57,13 @@ class  Math
   32) EQ 0
       true branch :
         Decl: r=((intBits Band FloatConsts.SIGNIF_BIT_MASK) Bor (FloatConsts.SIGNIF_BIT_MASK Add 1))
+        cond-branch cond:intBits LT 0
+        true branch :
+          r Assign Sub
+  r
+        false branch :
 
+        return ((r Shr shift) Add 1) Shr 1
       false branch :
         return (int)a
 
@@ -69,7 +75,13 @@ class  Math
   64) EQ 0
       true branch :
         Decl: r=((longBits Band DoubleConsts.SIGNIF_BIT_MASK) Bor (DoubleConsts.SIGNIF_BIT_MASK Add 1))
+        cond-branch cond:longBits LT 0
+        true branch :
+          r Assign Sub
+  r
+        false branch :
 
+        return ((r Shr shift) Add 1) Shr 1
       false branch :
         return (long)a
 
@@ -310,7 +322,26 @@ class  Math
           return direction
         false branch :
           Decl: transducer=Double.doubleToRawLongBits(start Add 0)
+          cond-branch cond:direction GT start
+          true branch :
+            transducer Assign transducer Add ()
+          false branch :
+            assert direction LT start : 
+            cond-branch cond:transducer GT 0
+            true branch :
+              Dec
+                transducer
+            false branch :
+              cond-branch cond:transducer LT 0
+              true branch :
+                Inc
+                  transducer
+              false branch :
+                transducer Assign DoubleConsts.SIGN_BIT_MASK Bor 1
 
+
+
+          return Double.longBitsToDouble(transducer)
 
 
     func  nextAfter(start,direction)  throws: 
@@ -323,7 +354,26 @@ class  Math
           return (float)direction
         false branch :
           Decl: transducer=Float.floatToRawIntBits(start Add 0)
+          cond-branch cond:direction GT start
+          true branch :
+            transducer Assign transducer Add ()
+          false branch :
+            assert direction LT start : 
+            cond-branch cond:transducer GT 0
+            true branch :
+              Dec
+                transducer
+            false branch :
+              cond-branch cond:transducer LT 0
+              true branch :
+                Inc
+                  transducer
+              false branch :
+                transducer Assign FloatConsts.SIGN_BIT_MASK Bor 1
 
+
+
+          return Float.intBitsToFloat(transducer)
 
 
     func  nextUp(d)  throws: 
@@ -377,10 +427,13 @@ class  Math
       cond-branch cond:scaleFactor LT 0
       true branch :
         scaleFactor Assign Math.max(scaleFactor Sub MAX_SCALE)
-
+        scale_increment Assign Sub
+  512
+        exp_delta Assign twoToTheDoubleScaleDown
       false branch :
         scaleFactor Assign Math.min(scaleFactor,MAX_SCALE)
-
+        scale_increment Assign 512
+        exp_delta Assign twoToTheDoubleScaleUp
 
       Decl: t=(scaleFactor Shr 9 Sub 1) Zext 32 Sub 9
       exp_adjust Assign ((scaleFactor Add t) Band (512 Sub 1)) Sub t

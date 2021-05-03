@@ -174,7 +174,8 @@ class  ProcessEnvironment
           Decl: count=m.size() Mul 2
           Map
           Entry
-
+          Variable
+          Value
           entry
           m.entrySet()
           count AddAssign entry.getKey().getBytes().length
@@ -182,6 +183,19 @@ class  ProcessEnvironment
 
           Decl: block=
           Decl: i=0
+          Map
+          Entry
+          Variable
+          Value
+          entry
+          m.entrySet()
+          Decl: key=entry.getKey().getBytes()
+          Decl: value=entry.getValue().getBytes()
+          System.arraycopy(key,0,block,i,key.length)
+          i AddAssign key.length
+           Assign (byte)=
+          System.arraycopy(value,0,block,i,value.length)
+          i AddAssign value.length Add 1
 
            Assign m.size()
           return block

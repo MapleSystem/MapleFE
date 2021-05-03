@@ -10,7 +10,13 @@ class  A
     func  foo()  throws: 
       Decl: k
       while true        k Assign n
+        cond-branch cond:k GE 5
+        true branch :
+          break:
 
+        false branch :
+
+        n Assign 6
 
       System.out.println(k)
   LocalClasses: 

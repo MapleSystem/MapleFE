@@ -83,6 +83,23 @@ class  ProcessBuilder
       cond-branch cond:envp NE null
       true branch :
         environment Assign ProcessEnvironment.emptyEnvironment(envp.length)
+        assert environment NE null : 
+        String
+        envstring
+        envp
+        cond-branch cond:envstring.indexOf((int)0) NE Sub
+  1
+        true branch :
+          envstring Assign envstring.replaceFirst("\u0000.*","")
+        false branch :
+
+        Decl: eqlsign=envstring.indexOf(=,ProcessEnvironment.MIN_NAME_LENGTH)
+        cond-branch cond:eqlsign NE Sub
+  1
+        true branch :
+          environment.put(envstring.substring(0,eqlsign),envstring.substring(eqlsign Add 1))
+        false branch :
+
 
       false branch :
 
@@ -146,6 +163,13 @@ class  ProcessBuilder
     func  start()  throws:     IOException
       Decl: cmdarray=command.toArray(String,command.size())
       cmdarray Assign cmdarray.clone()
+      String
+      arg
+      cmdarray
+      cond-branch cond:arg EQ null
+      true branch :
+        new NullPointerException()
+      false branch :
 
       Decl: prog=
       Decl: security=System.getSecurityManager()
@@ -162,6 +186,25 @@ class  ProcessBuilder
         false branch :
 
 
+      return ProcessImpl.start(cmdarray,environment,dir,redirects,redirectErrorStream)
+
+      IOException
+      IllegalArgumentException
+      e
+      Decl: exceptionInfo=": " Add e.getMessage()
+      Decl: cause=e
+      cond-branch cond:(e instanceof IOException) Land security NE null
+      true branch :
+        security.checkRead(prog)
+
+        SecurityException
+        se
+        exceptionInfo Assign ""
+        cause Assign se
+
+      false branch :
+
+      new IOException("Cannot run program "" Add prog Add """ Add () Add exceptionInfo,cause)
 
   LocalClasses: 
     class  NullInputStream
@@ -275,3 +318,11 @@ UserType:ArrayList has no decl.
 Identifier:String has no decl.
 Identifier:arg has no decl.
 Identifier:cmdarray has no decl.
+Identifier:String has no decl.
+Identifier:arg has no decl.
+Identifier:cmdarray has no decl.
+Identifier:IOException has no decl.
+Identifier:IllegalArgumentException has no decl.
+Identifier:e has no decl.
+UserType:IOException has no decl.
+Identifier:cause has no decl.

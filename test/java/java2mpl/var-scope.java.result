@@ -12,7 +12,8 @@ class  A
       cond-branch cond:a EQ 1
       true branch :
         Decl: a=2
-
+        a Assign x Add this.a
+        return a Add 2
       false branch :
 
       Decl: a=4

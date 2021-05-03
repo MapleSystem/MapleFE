@@ -83,7 +83,23 @@ while val NE 0 Land charPos GT 0
       cond-branch cond:small
       true branch :
         Decl: smallValues=
+        cond-branch cond:negative
+        true branch :
+          i Assign Sub
+  i
+          cond-branch cond: EQ null
+          true branch :
+             Assign 
+          false branch :
 
+        false branch :
+          cond-branch cond: EQ null
+          true branch :
+             Assign 
+          false branch :
+
+
+        return 
       false branch :
 
       Decl: size=
@@ -104,10 +120,21 @@ while val NE 0 Land charPos GT 0
       false branch :
 
       while i GE 65536        q Assign i Div 100
-
+        r Assign i Sub ((q Shl 6) Add (q Shl 5) Add (q Shl 2))
+        i Assign q
+         Assign 
+         Assign 
 
       for ( )
         q Assign (i Mul 52429) Zext (16 Add 3)
+        r Assign i Sub ((q Shl 3) Add (q Shl 1))
+         Assign 
+        i Assign q
+        cond-branch cond:i EQ 0
+        true branch :
+          break:
+
+        false branch :
 
 
       cond-branch cond:sign NE 0
@@ -149,6 +176,48 @@ while val NE 0 Land charPos GT 0
       cond-branch cond:len GT 0
       true branch :
         Decl: firstChar=s.charAt(0)
+        cond-branch cond:firstChar LT 0
+        true branch :
+          cond-branch cond:firstChar EQ -
+          true branch :
+            negative Assign true
+            limit Assign Integer.MIN_VALUE
+          false branch :
+            cond-branch cond:firstChar NE +
+            true branch :
+              NumberFormatException.forInputString(s)
+            false branch :
+
+
+          cond-branch cond:len EQ 1
+          true branch :
+            NumberFormatException.forInputString(s)
+          false branch :
+
+                      iInc
+
+        false branch :
+
+        multmin Assign limit Div radix
+        while i LT len          digit Assign Character.digit(s.charAt(  iInc
+),radix)
+          cond-branch cond:digit LT 0
+          true branch :
+            NumberFormatException.forInputString(s)
+          false branch :
+
+          cond-branch cond:result LT multmin
+          true branch :
+            NumberFormatException.forInputString(s)
+          false branch :
+
+          result MulAssign radix
+          cond-branch cond:result LT limit Add digit
+          true branch :
+            NumberFormatException.forInputString(s)
+          false branch :
+
+          result SubAssign digit
 
       false branch :
         NumberFormatException.forInputString(s)
@@ -233,11 +302,16 @@ while val NE 0 Land charPos GT 0
       Decl: v=null
       v Assign System.getProperty(nm)
 
+      IllegalArgumentException
+      NullPointerException
+      e
 
       cond-branch cond:v NE null
       true branch :
         return Integer.decode(v)
 
+        NumberFormatException
+        e
 
       false branch :
 
@@ -291,6 +365,13 @@ while val NE 0 Land charPos GT 0
         new NumberFormatException("Sign character in wrong position")
       false branch :
 
+      result Assign Integer.valueOf(nm.substring(index),radix)
+      result Assign 
+
+      NumberFormatException
+      e
+      Decl: constant=
+      result Assign Integer.valueOf(constant,radix)
 
       return result
     func  compareTo(anotherInteger)  throws: 
@@ -430,6 +511,14 @@ while val NE 0 Land charPos GT 0
   LocalInterfaces: 
 
 Identifier:v has no decl.
+Identifier:IllegalArgumentException has no decl.
+Identifier:NullPointerException has no decl.
+Identifier:e has no decl.
+Identifier:result has no decl.
+Identifier:result has no decl.
+Identifier:NumberFormatException has no decl.
+Identifier:e has no decl.
+Identifier:result has no decl.
 Identifier:n has no decl.
 Identifier:y has no decl.
 Identifier:y has no decl.

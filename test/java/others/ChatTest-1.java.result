@@ -59,6 +59,12 @@ class  ChatTest
     func  testAsksForName()  throws:     Exception
       Decl: server=startServer()
       Decl: socket=new Socket("localhost",listeningPort)
+      Decl: reader=new BufferedReader(new InputStreamReader(socket.getInputStream()))
+      Decl: string=readAvailableString(reader)
+      cond-branch cond:string.equals("Name: ")
+      true branch :
+        new RuntimeException("Server doesn't send Name: ")
+      false branch :
 
 
       server.shutdown()
@@ -148,7 +154,8 @@ while (joined NE null Land joined.contains("Welcome " Add s))
       false branch :
 
       do         Decl: buf=
-
+        bytes Assign reader.read(buf)
+        builder.append(buf,0,bytes)
 while bytes EQ 256
       return builder.toString()
   LocalClasses: 
@@ -162,10 +169,18 @@ while bytes EQ 256
           Socket
           socket
           new Socket("localhost",listeningPort)
-
+          BufferedReader
+          reader
+          new BufferedReader(new InputStreamReader(socket.getInputStream()))
+          Writer
+          writer
+          new FlushingWriter(new OutputStreamWriter(socket.getOutputStream()))
           socket.setTcpNoDelay(true)
           run(socket,reader,writer)
 
+          Exception
+          e
+          exception Assign e
 
         func  run(socket,reader,writer)  throws:     Exception
       LocalClasses: 

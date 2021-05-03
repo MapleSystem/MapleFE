@@ -38,6 +38,12 @@ class  ChatTest
     func  testAsksForName()  throws:     Exception
       Decl: server=startServer()
       Decl: socket=new Socket("localhost",listeningPort)
+      Decl: reader=new BufferedReader(new InputStreamReader(socket.getInputStream()))
+      Decl: string=readAvailableString(reader)
+      cond-branch cond:string.equals("Name: ")
+      true branch :
+        new RuntimeException("Server doesn't send Name: ")
+      false branch :
 
 
       server.shutdown()

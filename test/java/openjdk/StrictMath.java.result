@@ -60,7 +60,12 @@ class  StrictMath
         return a
       false branch :
         Decl: result=Double.longBitsToDouble(doppel Band (mask))
+        cond-branch cond:sign Mul a GT 0
+        true branch :
+          result Assign result Add sign
+        false branch :
 
+        return result
 
     func  rint(a)  throws: 
       Decl: twoToThe52=(double)(1 Shl 52)

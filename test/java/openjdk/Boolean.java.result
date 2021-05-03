@@ -41,6 +41,9 @@ class  Boolean
       Decl: result=false
       result Assign parseBoolean(System.getProperty(name))
 
+      IllegalArgumentException
+      NullPointerException
+      e
 
       return result
     func  compareTo(b)  throws: 
@@ -57,3 +60,6 @@ class  Boolean
   LocalInterfaces: 
 
 Identifier:result has no decl.
+Identifier:IllegalArgumentException has no decl.
+Identifier:NullPointerException has no decl.
+Identifier:e has no decl.

@@ -112,7 +112,51 @@ class  Class
         return toString()
       false branch :
         Decl: sb=new StringBuilder()
+        Decl: modifiers=getModifiers() Band Modifier.classModifiers()
+        cond-branch cond:modifiers NE 0
+        true branch :
+          sb.append(Modifier.toString(modifiers))
+          sb.append( )
+        false branch :
 
+        cond-branch cond:isAnnotation()
+        true branch :
+          sb.append(@)
+        false branch :
+
+        cond-branch cond:isInterface()
+        true branch :
+          sb.append("interface")
+        false branch :
+          cond-branch cond:isEnum()
+          true branch :
+            sb.append("enum")
+          false branch :
+            sb.append("class")
+
+
+        sb.append( )
+        sb.append(getName())
+        Decl: typeparms=getTypeParameters()
+        cond-branch cond:typeparms.length GT 0
+        true branch :
+          Decl: first=true
+          sb.append(<)
+          TypeVariable
+          typeparm
+          typeparms
+          cond-branch cond:first
+          true branch :
+            sb.append(,)
+          false branch :
+
+          sb.append(typeparm.getTypeName())
+          first Assign false
+
+          sb.append(>)
+        false branch :
+
+        return sb.toString()
 
     func  forName(className)  throws:     ClassNotFoundException
       return forName(className,true,VMStack.getCallingClassLoader())
@@ -123,6 +167,17 @@ class  Class
       false branch :
 
       Decl: result
+      result Assign classForName(name,initialize,loader)
+
+      ClassNotFoundException
+      e
+      Decl: cause=e.getCause()
+      cond-branch cond:cause instanceof LinkageError
+      true branch :
+        (LinkageError)cause
+      false branch :
+
+      e
 
       return result
     func  classForName(className,shouldInitialize,classLoader)  throws:     ClassNotFoundException
@@ -150,7 +205,18 @@ class  Class
             cond-branch cond:isInterface()
             true branch :
               Decl: iftable=cls.ifTable
+              cond-branch cond:iftable NE null
+              true branch :
+                for ( )
+                  cond-branch cond: EQ this
+                  true branch :
+                    return true
+                  false branch :
 
+
+              false branch :
+
+              return false
             false branch :
               cond-branch cond:cls.isInterface()
               true branch :
@@ -224,7 +290,8 @@ class  Class
       cond-branch cond:annotationSignature NE null
       true branch :
         Decl: parser=new GenericSignatureParser(getClassLoader())
-
+        parser.parseForClass(this,annotationSignature)
+        genericSuperclass Assign parser.superclassType
       false branch :
 
       return Types.getType(genericSuperclass)
@@ -261,7 +328,15 @@ class  Class
       cond-branch cond:result EQ null
       true branch :
         Decl: annotationSignature=getSignatureAttribute()
+        cond-branch cond:annotationSignature EQ null
+        true branch :
+          result Assign getInterfaces()
+        false branch :
+          Decl: parser=new GenericSignatureParser(getClassLoader())
+          parser.parseForClass(this,annotationSignature)
+          result Assign Types.getTypeArray(parser.interfaceTypes,false)
 
+        Caches.genericInterfaces.put(this,result)
       false branch :
 
 
@@ -272,7 +347,12 @@ class  Class
       cond-branch cond:isArray()
       true branch :
         Decl: componentModifiers=getComponentType().getModifiers()
+        cond-branch cond:(componentModifiers Band Modifier.INTERFACE) NE 0
+        true branch :
+          componentModifiers BandAssign (Modifier.INTERFACE Bor Modifier.STATIC)
+        false branch :
 
+        return Modifier.ABSTRACT Bor Modifier.FINAL Bor componentModifiers
       false branch :
 
       Decl: JAVA_FLAGS_MASK=65535
@@ -328,8 +408,20 @@ class  Class
       cond-branch cond:isArray()
       true branch :
         Decl: cl=this
+        Decl: dimensions=0
+        while cl.isArray()                      dimensionsInc
 
+          cl Assign cl.getComponentType()
 
+        Decl: sb=new StringBuilder()
+        sb.append(cl.getName())
+        for ( )
+          sb.append("[]")
+
+        return sb.toString()
+
+        Throwable
+        e
 
       false branch :
 
@@ -357,7 +449,12 @@ class  Class
         return getName()
       false branch :
         Decl: enclosingName=enclosingClass.getCanonicalName()
+        cond-branch cond:enclosingName EQ null
+        true branch :
+          return null
+        false branch :
 
+        return enclosingName Add "." Add getSimpleName()
 
     func  isAnonymousClass()  throws: 
     func  isLocalClass()  throws: 
@@ -470,6 +567,14 @@ class  Class
         parameterTypes Assign EmptyArray.CLASS
       false branch :
 
+      Class
+      c
+      parameterTypes
+      cond-branch cond:c EQ null
+      true branch :
+        new NoSuchMethodException("parameter type is null")
+      false branch :
+
 
       Decl: result=
       cond-branch cond:result EQ null Lor (recursivePublicMethods Land Modifier.isPublic(result.getAccessFlags()))
@@ -504,6 +609,11 @@ class  Class
       true branch :
         for ( )
           Decl: ifc=(Class)
+          Decl: result=ifc.getPublicMethodRecursive(name,parameterTypes)
+          cond-branch cond:result NE null Land Modifier.isPublic(result.getAccessFlags())
+          true branch :
+            return result
+          false branch :
 
 
       false branch :
@@ -540,6 +650,15 @@ class  Class
       cond-branch cond:name.startsWith("/")
       true branch :
         Decl: c=this
+        while c.isArray()          c Assign c.getComponentType()
+
+        Decl: baseName=c.getName()
+        Decl: index=baseName.lastIndexOf(.)
+        cond-branch cond:index NE Sub
+  1
+        true branch :
+          name Assign baseName.substring(0,index).replace(.,/) Add "/" Add name
+        false branch :
 
       false branch :
         name Assign name.substring(1)
@@ -694,6 +813,10 @@ class  Class
       false branch :
 
       Decl: result=new StringBuilder()
+      String
+      s
+      annotation
+      result.append(s)
 
       return result.toString()
     func  getSignatureAnnotation()  throws: 
@@ -714,10 +837,19 @@ class  Class
   LocalInterfaces: 
 
 Identifier:result has no decl.
+Identifier:ClassNotFoundException has no decl.
+Identifier:e has no decl.
+Identifier:e has no decl.
+Identifier:result has no decl.
 Identifier:Method has no decl.
 Identifier:m has no decl.
 Identifier:result has no decl.
 Identifier:Class has no decl.
 Identifier:c has no decl.
+Identifier:Class has no decl.
+Identifier:c has no decl.
 Identifier:Annotation has no decl.
 Identifier:declaredAnnotation has no decl.
+Identifier:String has no decl.
+Identifier:s has no decl.
+Identifier:annotation has no decl.

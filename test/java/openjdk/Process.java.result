@@ -23,7 +23,17 @@ class  Process
     func  waitFor(timeout,unit)  throws:     InterruptedException
       Decl: startTime=System.nanoTime()
       Decl: rem=unit.toNanos(timeout)
-      do 
+      do         exitValue()
+        return true
+
+        IllegalThreadStateException
+        ex
+        cond-branch cond:rem GT 0
+        true branch :
+          Thread.sleep(Math.min(TimeUnit.NANOSECONDS.toMillis(rem) Add 1,100))
+        false branch :
+
+
         rem Assign unit.toNanos(timeout) Sub (System.nanoTime() Sub startTime)
 while rem GT 0
       return false

@@ -10,7 +10,13 @@ class  Point
     func  foo()  throws: 
       Decl: k
       while n LT 4        k Assign n
+        cond-branch cond:k GE 5
+        true branch :
+          break:
 
+        false branch :
+
+        n Assign 6
 
       System.out.println(k)
   LocalClasses: 

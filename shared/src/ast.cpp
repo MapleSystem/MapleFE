@@ -814,8 +814,9 @@ void CondBranchNode::Dump(unsigned ind) {
 void BreakNode::Dump(unsigned ind) {
   DumpLabel(ind);
   DumpIndentation(ind);
-  DUMP0_NORETURN("break ");
-  GetTarget()->Dump(0);
+  DUMP0_NORETURN("break:");
+  if (GetTarget())
+    GetTarget()->Dump(0);
   DUMP_RETURN();
 }
 
@@ -913,6 +914,19 @@ void SwitchNode::Dump(unsigned ind) {
 //////////////////////////////////////////////////////////////////////////////////////
 //                          BlockNode
 //////////////////////////////////////////////////////////////////////////////////////
+
+void BlockNode::AddChild(TreeNode *tree) {
+  if (tree->IsPass()) {
+    PassNode *passnode = (PassNode*)tree;
+    for (unsigned j = 0; j < passnode->GetChildrenNum(); j++) {
+      TreeNode *child = passnode->GetChild(j);
+      AddChild(child);
+    }
+  } else {
+    mChildren.PushBack(tree);
+    tree->SetParent(this);
+  }
+}
 
 void BlockNode::Dump(unsigned ind) {
   DumpLabel(ind);

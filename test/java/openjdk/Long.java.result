@@ -65,7 +65,8 @@ class  Long
         return BigInteger.valueOf(i)
       false branch :
         Decl: upper=(int)(i Zext 32)
-
+        Decl: lower=(int)i
+        return BigInteger.valueOf(Integer.toUnsignedLong(upper)).shiftLeft(32).add(BigInteger.valueOf(Integer.toUnsignedLong(lower)))
 
     func  toHexString(i)  throws: 
       return toUnsignedString0(i,4)
@@ -112,15 +113,29 @@ while val NE 0 Land charPos GT 0
       false branch :
 
       while i GT Integer.MAX_VALUE        q Assign i Div 100
-
+        r Assign (int)(i Sub ((q Shl 6) Add (q Shl 5) Add (q Shl 2)))
+        i Assign q
+         Assign 
+         Assign 
 
       Decl: q2
       Decl: i2=(int)i
       while i2 GE 65536        q2 Assign i2 Div 100
-
+        r Assign i2 Sub ((q2 Shl 6) Add (q2 Shl 5) Add (q2 Shl 2))
+        i2 Assign q2
+         Assign 
+         Assign 
 
       for ( )
         q2 Assign (i2 Mul 52429) Zext (16 Add 3)
+        r Assign i2 Sub ((q2 Shl 3) Add (q2 Shl 1))
+         Assign 
+        i2 Assign q2
+        cond-branch cond:i2 EQ 0
+        true branch :
+          break:
+
+        false branch :
 
 
       cond-branch cond:sign NE 0
@@ -165,6 +180,48 @@ while val NE 0 Land charPos GT 0
       cond-branch cond:len GT 0
       true branch :
         Decl: firstChar=s.charAt(0)
+        cond-branch cond:firstChar LT 0
+        true branch :
+          cond-branch cond:firstChar EQ -
+          true branch :
+            negative Assign true
+            limit Assign Long.MIN_VALUE
+          false branch :
+            cond-branch cond:firstChar NE +
+            true branch :
+              NumberFormatException.forInputString(s)
+            false branch :
+
+
+          cond-branch cond:len EQ 1
+          true branch :
+            NumberFormatException.forInputString(s)
+          false branch :
+
+                      iInc
+
+        false branch :
+
+        multmin Assign limit Div radix
+        while i LT len          digit Assign Character.digit(s.charAt(  iInc
+),radix)
+          cond-branch cond:digit LT 0
+          true branch :
+            NumberFormatException.forInputString(s)
+          false branch :
+
+          cond-branch cond:result LT multmin
+          true branch :
+            NumberFormatException.forInputString(s)
+          false branch :
+
+          result MulAssign radix
+          cond-branch cond:result LT limit Add digit
+          true branch :
+            NumberFormatException.forInputString(s)
+          false branch :
+
+          result SubAssign digit
 
       false branch :
         NumberFormatException.forInputString(s)
@@ -191,7 +248,20 @@ while val NE 0 Land charPos GT 0
             return parseLong(s,radix)
           false branch :
 
+          Decl: first=parseLong(s.substring(0,len Sub 1),radix)
+          Decl: second=Character.digit(s.charAt(len Sub 1),radix)
+          cond-branch cond:second LT 0
+          true branch :
+            new NumberFormatException("Bad digit at end of " Add s)
+          false branch :
 
+          Decl: result=first Mul radix Add second
+          cond-branch cond:compareUnsigned(result,first) LT 0
+          true branch :
+            new NumberFormatException(String.format("String value %s exceeds " Add "range of unsigned long.",s))
+          false branch :
+
+          return result
 
       false branch :
         NumberFormatException.forInputString(s)
@@ -260,6 +330,13 @@ while val NE 0 Land charPos GT 0
         new NumberFormatException("Sign character in wrong position")
       false branch :
 
+      result Assign Long.valueOf(nm.substring(index),radix)
+      result Assign 
+
+      NumberFormatException
+      e
+      Decl: constant=
+      result Assign Long.valueOf(constant,radix)
 
       return result
     func  byteValue()  throws: 
@@ -296,11 +373,16 @@ while val NE 0 Land charPos GT 0
       Decl: v=null
       v Assign System.getProperty(nm)
 
+      IllegalArgumentException
+      NullPointerException
+      e
 
       cond-branch cond:v NE null
       true branch :
         return Long.decode(v)
 
+        NumberFormatException
+        e
 
       false branch :
 
@@ -477,7 +559,15 @@ while val NE 0 Land charPos GT 0
       LocalInterfaces: 
   LocalInterfaces: 
 
+Identifier:result has no decl.
+Identifier:result has no decl.
+Identifier:NumberFormatException has no decl.
+Identifier:e has no decl.
+Identifier:result has no decl.
 Identifier:v has no decl.
+Identifier:IllegalArgumentException has no decl.
+Identifier:NullPointerException has no decl.
+Identifier:e has no decl.
 Identifier:n has no decl.
 Identifier:x has no decl.
 Identifier:y has no decl.

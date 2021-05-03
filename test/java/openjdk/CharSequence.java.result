@@ -69,6 +69,25 @@ interface  CharSequence
           func  forEachRemaining(block)  throws: 
             Decl: length=length()
             Decl: i=cur
+            while i LT length              Decl: c1=charAt(  iInc
+)
+              cond-branch cond:Character.isHighSurrogate(c1) Lor i GE length
+              true branch :
+                block.accept(c1)
+              false branch :
+                Decl: c2=charAt(i)
+                cond-branch cond:Character.isLowSurrogate(c2)
+                true branch :
+                                      iInc
+
+                  block.accept(Character.toCodePoint(c1,c2))
+                false branch :
+                  block.accept(c1)
+
+
+
+
+            cur Assign i
 
           func  hasNext()  throws: 
             return cur LT length()
