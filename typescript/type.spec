@@ -58,14 +58,18 @@
 #
 # This STRUCT tells the primitive types
 
-STRUCT Keyword : (("boolean", Boolean),
-                  ("string", String),
-                  ("number", Number),
-                  ("any", Any))
+STRUCT Keyword : (("boolean",   Boolean),
+                  ("string",    String),
+                  ("number",    Number),
+                  ("any",       Any),
+                  ("unknown",   Unknown),
+                  ("undefined", Undefined))
 
 rule BooleanType : "boolean"
-rule NumberType : "number"
-rule AnyType : "any"
-rule StringType : "string"
+rule NumberType  : "number"
+rule AnyType     : "any"
+rule StringType  : "string"
+rule UnknownType : "unknown"
+rule UndefinedType : "undefined"
 
-rule TYPE : ONEOF(BooleanType, NumberType, AnyType, StringType)
+rule TYPE : ONEOF(BooleanType, NumberType, AnyType, StringType, UnknownType, UndefinedType)

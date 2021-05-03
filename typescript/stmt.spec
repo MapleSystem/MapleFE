@@ -417,11 +417,11 @@ rule RelationalExpression : ONEOF(ShiftExpression,
 ##  EqualityExpression[?In, ?Yield] !== RelationalExpression[?In, ?Yield]
 
 rule EqualityExpression : ONEOF(
-  RelationalExpression)
-#  EqualityExpression[?In, ?Yield] == RelationalExpression[?In, ?Yield]
-#  EqualityExpression[?In, ?Yield] != RelationalExpression[?In, ?Yield]
-#  EqualityExpression[?In, ?Yield] === RelationalExpression[?In, ?Yield]
-#  EqualityExpression[?In, ?Yield] !== RelationalExpression[?In, ?Yield]
+  RelationalExpression,
+  EqualityExpression + "==" + RelationalExpression,
+  EqualityExpression + "!=" + RelationalExpression,
+  EqualityExpression + "===" + RelationalExpression,
+  EqualityExpression + "!==" + RelationalExpression)
 
 ##-----------------------------------
 ##rule BitwiseANDExpression[In, Yield] :
@@ -500,9 +500,12 @@ rule AssignmentOperator : ONEOF("*=", "/=", "%=", "+=", "-=", "<<=", ">>=", ">>>
 ##  AssignmentExpression[?In, ?Yield]
 ##  Expression[?In, ?Yield] , AssignmentExpression[?In, ?Yield]
 
+## NOTE. I added "undefined" to expression because "undefined" is both a type and
+##       a value in Typescript. This is a weird rule.
 rule Expression : ONEOF(
-  AssignmentExpression)
-#  Expression[?In, ?Yield] , AssignmentExpression[?In, ?Yield]
+  AssignmentExpression,
+  Expression + ',' + AssignmentExpression,
+  "undefined")
 
 #-------------------------------------------------------------------------------
 #                                    Statements
@@ -1045,7 +1048,8 @@ rule Type : ONEOF(UnionOrIntersectionOrPrimaryType,
 
 #rule UnionOrIntersectionOrPrimaryType: ONEOF(UnionType,
 #                                             IntersectionOrPrimaryType)
-rule UnionOrIntersectionOrPrimaryType: ONEOF(IntersectionOrPrimaryType)
+rule UnionOrIntersectionOrPrimaryType: ONEOF(UnionType,
+                                             IntersectionOrPrimaryType)
 
 #rule IntersectionOrPrimaryType : ONEOF(IntersectionType,
 #                                       PrimaryType)
@@ -1084,7 +1088,10 @@ rule ArrayType: PrimaryType + '[' + ']'
 ## rule TupleType: [ TupleElementTypes ]
 ## rule TupleElementTypes: TupleElementType TupleElementTypes , TupleElementType
 ## rule TupleElementType: Type
+
 ## rule UnionType: UnionOrIntersectionOrPrimaryType | IntersectionOrPrimaryType
+rule UnionType: UnionOrIntersectionOrPrimaryType + '|' + IntersectionOrPrimaryType
+
 ## rule IntersectionType: IntersectionOrPrimaryType & PrimaryType
 
 ## rule FunctionType: TypeParametersopt ( ParameterListopt ) => Type
