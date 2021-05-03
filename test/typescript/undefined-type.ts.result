@@ -1,12 +1,16 @@
-Matched 21 tokens.
-Matched 29 tokens.
+Matched 28 tokens.
 Matched 36 tokens.
 Matched 43 tokens.
 Matched 50 tokens.
+Matched 57 tokens.
 ============= Module ===========
 == Sub Tree ==
 func  func(x)  throws: 
-  return x Mul x
+  cond-branch cond: typeof x StEq "number"
+  true branch :
+    return x Mul x
+  false branch :
+
   return undefined
 
 == Sub Tree ==

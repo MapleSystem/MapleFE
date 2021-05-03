@@ -1,5 +1,5 @@
 function func(x: unknown): number | undefined {
-//    if (typeof x === "number")
+    if (typeof x === "number")
         return x * x;
     return undefined;
 }

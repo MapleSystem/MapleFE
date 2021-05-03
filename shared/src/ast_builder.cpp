@@ -2188,4 +2188,26 @@ TreeNode* ASTBuilder::BuildInstanceOf() {
   mLastTreeNode = instanceof;
   return mLastTreeNode;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+//                       TypeOf Expression
+////////////////////////////////////////////////////////////////////////////////
+
+TreeNode* ASTBuilder::BuildTypeOf() {
+  if (mTrace)
+    std::cout << "In BuildTypeOf" << std::endl;
+
+  Param l_param = mParams[0];
+  MASSERT(!l_param.mIsEmpty);
+  MASSERT(l_param.mIsTreeNode);
+  TreeNode *expr = l_param.mData.mTreeNode;
+
+  TypeOfNode *typeof = (TypeOfNode*)mTreePool->NewTreeNode(sizeof(TypeOfNode));
+  new (typeof) TypeOfNode();
+
+  typeof->SetExpr(expr);
+
+  mLastTreeNode = typeof;
+  return mLastTreeNode;
+}
 }

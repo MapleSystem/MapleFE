@@ -97,6 +97,7 @@ public:
   TreeNode* BuildParenthesis();
   TreeNode* BuildLambda();
   TreeNode* BuildInstanceOf();
+  TreeNode* BuildTypeOf();
 
   TreeNode* BuildStruct();
   TreeNode* SetTSInterface();

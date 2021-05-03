@@ -347,6 +347,7 @@ rule UnaryExpression : ONEOF(
    '-' + UnaryExpression,
    '~' + UnaryExpression,
    '!' + UnaryExpression)
+  attr.action.%4 : BuildTypeOf(%2)
   attr.action.%5,%6,%7,%8,%9,%10 : BuildUnaryOperation(%1, %2)
 
 ##-----------------------------------
@@ -422,6 +423,7 @@ rule EqualityExpression : ONEOF(
   EqualityExpression + "!=" + RelationalExpression,
   EqualityExpression + "===" + RelationalExpression,
   EqualityExpression + "!==" + RelationalExpression)
+  attr.action.%2,%3,%4,%5 : BuildBinaryOperation(%1, %2, %3)
 
 ##-----------------------------------
 ##rule BitwiseANDExpression[In, Yield] :

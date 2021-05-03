@@ -538,6 +538,12 @@ maple::BaseNode *A2M::ProcessInstanceOf(StmtExprKind skind, TreeNode *tnode, Blo
   return nullptr;
 }
 
+maple::BaseNode *A2M::ProcessTypeOf(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
+  NOTYETIMPL("ProcessTypeOf()");
+  TypeOfNode *node = static_cast<TypeOfNode *>(tnode);
+  return nullptr;
+}
+
 maple::BaseNode *A2M::ProcessBlockDecl(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
   BlockNode *ast_block = static_cast<BlockNode *>(tnode);
   for (int i = 0; i < ast_block->GetChildrenNum(); i++) {

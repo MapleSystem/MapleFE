@@ -51,6 +51,7 @@ NODEKIND(BinOperator)
 NODEKIND(TerOperator)
 NODEKIND(Lambda)
 NODEKIND(InstanceOf)
+NODEKIND(TypeOf)
 
 NODEKIND(Block)
 NODEKIND(Function)
