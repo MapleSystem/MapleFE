@@ -51,6 +51,7 @@ clobber: clean
 dbg:
 	gdb --args ../output/java/java/java2mpl test.java $(FLAGS)
 
+ifeq ($(SRCLANG),java)
 % : %.java
 	@cp $< $(build)
 	@echo gdb --args ../output/java/java/java2mpl $(build)/$@.java $(FLAGS)
@@ -65,6 +66,7 @@ dbg:
 	$(MAPLEALL_ROOT)/output/aarch64-clang-debug/bin/irbuild $(build)/$@.irb.mpl
 	diff -uwb $(build)/$@.irb.mpl $(build)/$@.irb.irb.mpl
 
+else ifeq ($(SRCLANG),typescript)
 % : %.ts
 	@cp $< $(build)
 	@echo gdb --args ../output/typescript/typescript/ts2cpp $(build)/$@.ts $(FLAGS)
@@ -75,4 +77,4 @@ dbg:
 	@cat -n $(build)/$@.cpp
 	@echo "========================================================\n"
 	@echo gdb --args ../output/typescript/typescript/ts2cpp $(build)/$@.ts $(FLAGS)
-
+endif
