@@ -26,7 +26,8 @@ func  binarySearchEpsilon(array,value,EPSILON=1e-06)  throws:
 
 
 
-  return low
+  return Bcomp
+  low
 
 == Sub Tree ==
 js_var Decl: sequence=[13,21,34,55,89,144]

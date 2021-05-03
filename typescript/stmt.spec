@@ -347,7 +347,7 @@ rule UnaryExpression : ONEOF(
    '-' + UnaryExpression,
    '~' + UnaryExpression,
    '!' + UnaryExpression)
-  attr.action.%3,%4 : BuildUnaryOperation(%1, %2)
+  attr.action.%5,%6,%7,%8,%9,%10 : BuildUnaryOperation(%1, %2)
 
 ##-----------------------------------
 ##rule MultiplicativeExpression[Yield] :
