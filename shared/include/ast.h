@@ -77,7 +77,7 @@ protected:
   TreeNode *mLabel;   // label of a statement, or expression.
   const char *mName;
 public:
-  TreeNode() : mKind(NK_Null), mNodeId(GetNextID()), mLabel(NULL), mParent(NULL), mName(NULL) {}
+  TreeNode() : mKind(NK_Null), mNodeId(GetNextId()), mLabel(NULL), mParent(NULL), mName(NULL) {}
   virtual ~TreeNode() {}
 
 #undef  NODEKIND
@@ -108,7 +108,7 @@ public:
   // Release the dynamically allocated memory by this tree node.
   virtual void Release(){}
 private:
-  static unsigned GetNextID() {static unsigned id = 1; return id++; }
+  static unsigned GetNextId() {static unsigned id = 1; return id++; }
 };
 
 //////////////////////////////////////////////////////////////////////////
