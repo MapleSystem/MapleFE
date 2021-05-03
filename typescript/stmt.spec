@@ -431,8 +431,9 @@ rule EqualityExpression : ONEOF(
 ##  BitwiseANDExpression[?In, ?Yield] & EqualityExpression[?In, ?Yield]
 
 rule BitwiseANDExpression : ONEOF(
-  EqualityExpression)
-#  BitwiseANDExpression[?In, ?Yield] & EqualityExpression[?In, ?Yield]
+  EqualityExpression,
+  BitwiseANDExpression + '&' + EqualityExpression)
+  attr.action.%2 : BuildBinaryOperation(%1, %2, %3)
 
 ##-----------------------------------
 ##rule BitwiseXORExpression[In, Yield] :
@@ -440,8 +441,9 @@ rule BitwiseANDExpression : ONEOF(
 ##  BitwiseXORExpression[?In, ?Yield] ^ BitwiseANDExpression[?In, ?Yield]
 
 rule BitwiseXORExpression : ONEOF(
-  BitwiseANDExpression)
-#  BitwiseXORExpression[?In, ?Yield] ^ BitwiseANDExpression[?In, ?Yield]
+  BitwiseANDExpression,
+  BitwiseXORExpression + '^' + BitwiseANDExpression)
+  attr.action.%2 : BuildBinaryOperation(%1, %2, %3)
 
 ##-----------------------------------
 ##rule BitwiseORExpression[In, Yield] :
@@ -449,8 +451,9 @@ rule BitwiseXORExpression : ONEOF(
 ##  BitwiseORExpression[?In, ?Yield] | BitwiseXORExpression[?In, ?Yield]
 
 rule BitwiseORExpression : ONEOF(
-  BitwiseXORExpression)
-##  BitwiseORExpression[?In, ?Yield] | BitwiseXORExpression[?In, ?Yield]
+  BitwiseXORExpression,
+  BitwiseORExpression + '|' + BitwiseXORExpression)
+  attr.action.%2 : BuildBinaryOperation(%1, %2, %3)
 
 ##-----------------------------------
 ##rule LogicalANDExpression[In, Yield] :
@@ -458,8 +461,9 @@ rule BitwiseORExpression : ONEOF(
 ##  LogicalANDExpression[?In, ?Yield] && BitwiseORExpression[?In, ?Yield]
 
 rule LogicalANDExpression : ONEOF(
-  BitwiseORExpression)
-#  LogicalANDExpression[?In, ?Yield] && BitwiseORExpression[?In, ?Yield]
+  BitwiseORExpression,
+  LogicalANDExpression + "&&" + BitwiseORExpression)
+  attr.action.%2 : BuildBinaryOperation(%1, %2, %3)
 
 ##-----------------------------------
 ##rule LogicalORExpression[In, Yield] :
@@ -467,8 +471,9 @@ rule LogicalANDExpression : ONEOF(
 ##  LogicalORExpression[?In, ?Yield] || LogicalANDExpression[?In, ?Yield]
 
 rule LogicalORExpression : ONEOF(
-  LogicalANDExpression)
-#  LogicalORExpression[?In, ?Yield] || LogicalANDExpression[?In, ?Yield]
+  LogicalANDExpression,
+  LogicalORExpression + "||" + LogicalANDExpression)
+  attr.action.%2 : BuildBinaryOperation(%1, %2, %3)
 
 ##-----------------------------------
 ##rule ConditionalExpression[In, Yield] :
@@ -476,8 +481,8 @@ rule LogicalORExpression : ONEOF(
 ##  LogicalORExpression[?In,?Yield] ? AssignmentExpression[In, ?Yield] : AssignmentExpression[?In, ?Yield]
 
 rule ConditionalExpression : ONEOF(
-  LogicalORExpression)
-#  LogicalORExpression[?In,?Yield] ? AssignmentExpression[In, ?Yield] : AssignmentExpression[?In, ?Yield]
+  LogicalORExpression,
+  LogicalORExpression + '?' + AssignmentExpression + ':' + AssignmentExpression)
 
 ##-----------------------------------
 ##rule AssignmentExpression[In, Yield] :
@@ -552,10 +557,13 @@ rule Statement : ONEOF(
 ##  HoistableDeclaration[?Yield]
 ##  ClassDeclaration[?Yield]
 ##  LexicalDeclaration[In, ?Yield]
+
+## NOTE. Typescript added InterfaceDeclaration, TypeAliasDeclaration, EnumDeclaration
 rule Declaration : ONEOF(HoistableDeclaration,
-##  ClassDeclaration[?Yield]
+                         ##  ClassDeclaration[?Yield]
                          LexicalDeclaration,
-                         InterfaceDeclaration)
+                         InterfaceDeclaration,
+                         TypeAliasDeclaration)
   attr.property : Top
 
 ##-----------------------------------
@@ -1165,4 +1173,6 @@ rule RestParameter: "..." + BindingIdentifier + ZEROORONE(TypeAnnotation)
 ## rule ConstructSignature: new TypeParametersopt ( ParameterListopt ) TypeAnnotationopt
 ## rule IndexSignature: [ BindingIdentifier : string ] TypeAnnotation [ BindingIdentifier : number ] TypeAnnotation
 ## rule MethodSignature: PropertyName ?opt CallSignature
+
 ## rule TypeAliasDeclaration: type BindingIdentifier TypeParametersopt = Type ;
+rule TypeAliasDeclaration: "type" + BindingIdentifier + ZEROORONE(TypeParameters) + '=' + Type + ';'
