@@ -172,12 +172,14 @@ namespace maplefe {
 
   void A2C_Function::Dump() {
     unsigned num = GetNestedFunctionsNum();
-    std::cout << "Nested Functions: " << num << " {" << std::endl;
-    for(unsigned i = 0; i < num; ++i) {
-      std::cout << "Function: " << i << std::endl;
-      GetNestedFunctionAtIndex(i)->Dump();
+    if(num > 0) {
+      std::cout << "Nested Functions: " << num << " {" << std::endl;
+      for(unsigned i = 0; i < num; ++i) {
+        std::cout << "Function: " << i + 1 << std::endl;
+        GetNestedFunctionAtIndex(i)->Dump();
+      }
+      std::cout << "}" << std::endl;
     }
-    std::cout << "}" << std::endl;
     std::cout << "Basic blocks: {" << std::endl;
 
     std::stack<A2C_BB*> bb_stack;
@@ -188,6 +190,7 @@ namespace maplefe {
     std::set<A2C_BB*> visited;
     visited.insert(exit);
     visited.insert(entry);
+    std::string dot("---\ndigraph CFG {");
     while(!bb_stack.empty()) {
       A2C_BB *bb = bb_stack.top();
       bb_stack.pop();
@@ -196,6 +199,8 @@ namespace maplefe {
       for(unsigned i = 0; i < succ_num; ++i) {
         A2C_BB *curr = bb->GetSuccessorAtIndex(i);
         std::cout << "BB" << curr->GetId() << " ";
+        dot += "\nBB" + std::to_string(bb->GetId()) + " -> BB" + std::to_string(curr->GetId()) +
+          ( succ_num == 1 ? ";" : i ?" [color=darkred];": " [color=darkgreen];");
         if(visited.find(curr) == visited.end()) {
           bb_stack.push(curr);
           visited.insert(curr);
@@ -212,6 +217,8 @@ namespace maplefe {
           std::cout << "  " << i + 1 << ". NodeId: " << bb->GetStatementAtIndex(i)->GetNodeId() << std::endl;
     }
     std::cout << "}" << std::endl;
+    dot += "\n}";
+    std::cout << dot << std::endl;
   }
 
   void A2C_Module::BuildCFG() {
@@ -230,7 +237,7 @@ namespace maplefe {
   }
 
   void A2C_Module::Dump(char *msg) {
-    std::cout << msg << ":" << std::endl;
+    std::cout << std::endl << msg << ":" << std::endl;
     A2C_Function *func = GetFunction();
     func->Dump();
   }
