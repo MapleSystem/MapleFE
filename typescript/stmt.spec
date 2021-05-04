@@ -36,6 +36,9 @@ rule BindingIdentifier : ONEOF(Identifier, "yield")
 ##rule LabelIdentifier[Yield] :
 ##  Identifier
 ##  [~Yield] yield
+rule LabelIdentifier : ONEOF(
+  Identifier,
+  "yield")
 
 ##-----------------------------------
 ##rule Identifier :
@@ -544,7 +547,7 @@ rule Statement : ONEOF(
   IfStatement,
   BreakableStatement,
 #  ContinueStatement[?Yield]
-#  BreakStatement[?Yield]
+  BreakStatement,
   ReturnStatement)
 #  WithStatement[?Yield, ?Return]
 #  LabelledStatement[?Yield, ?Return]
@@ -578,8 +581,8 @@ rule HoistableDeclaration : ONEOF(FunctionDeclaration)
 ##rule BreakableStatement[Yield, Return] :
 ##  IterationStatement[?Yield, ?Return]
 ##  SwitchStatement[?Yield, ?Return]
-rule BreakableStatement : ONEOF(IterationStatement)
-##  SwitchStatement[?Yield, ?Return]
+rule BreakableStatement : ONEOF(IterationStatement,
+                                SwitchStatement)
 
 ##-----------------------------------
 ##rule BlockStatement[Yield, Return] :
@@ -797,6 +800,9 @@ rule IterationStatement : ONEOF(
 ##rule BreakStatement[Yield] :
 ##  break ;
 ##  break [no LineTerminator here] LabelIdentifier[?Yield] ;
+rule BreakStatement : ONEOF(
+  "break" + ';'
+  "break" + LabelIdentifier + ';')
 
 ##-----------------------------------
 ##rule ReturnStatement[Yield] :
@@ -813,24 +819,36 @@ rule ReturnStatement :ONEOF("return" + ';',
 ##-----------------------------------
 ##rule SwitchStatement[Yield, Return] :
 ##  switch ( Expression[In, ?Yield] ) CaseBlock[?Yield, ?Return]
+rule SwitchStatement :
+  "switch" + '(' + Expression + ')' + CaseBlock
 
 ##-----------------------------------
 ##rule CaseBlock[Yield, Return] :
 ##  { CaseClauses[?Yield, ?Return]opt }
 ##  { CaseClauses[?Yield, ?Return]opt DefaultClause[?Yield, ?Return] CaseClauses[?Yield, ?Return]opt }
+rule CaseBlock : ONEOF(
+  '{' + ZEROORONE(CaseClauses) + '}',
+  '{' + ZEROORONE(CaseClauses) + DefaultClause + ZEROORONE(CaseClauses) + '}')
 
 ##-----------------------------------
 ##rule CaseClauses[Yield, Return] :
 ##  CaseClause[?Yield, ?Return]
 ##  CaseClauses[?Yield, ?Return] CaseClause[?Yield, ?Return]
+rule CaseClauses : ONEOF(
+  CaseClause,
+  CaseClauses + CaseClause)
 
 ##-----------------------------------
 ##rule CaseClause[Yield, Return] :
 ##  case Expression[In, ?Yield] : StatementList[?Yield, ?Return]opt
+rule CaseClause :
+  "case" + Expression + ':' + ZEROORONE(StatementList)
 
 ##-----------------------------------
 ##rule DefaultClause[Yield, Return] :
 ##  default : StatementList[?Yield, ?Return]opt
+rule DefaultClause :
+  "default" + ':' + ZEROORONE(StatementList)
 
 ##-----------------------------------
 ##rule LabelledStatement[Yield, Return] :
