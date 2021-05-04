@@ -38,8 +38,8 @@ namespace maplefe {
   void ModuleVisitor::FinalizeVisitor() {
     // Add the exit BB as a successor of the entry BB of current function
     A2C_BB *exit = mCurrentFunction->GetExitBB();
-    A2C_BB *entry = mCurrentFunction->GetEntryBB();
-    entry->AddSuccessor(exit);
+    //A2C_BB *entry = mCurrentFunction->GetEntryBB();
+    //entry->AddSuccessor(exit);
     mCurrentBB->AddSuccessor(exit);
 
     mCurrentFunction = nullptr;
@@ -67,9 +67,9 @@ namespace maplefe {
     AstVisitor::VisitFunctionNode(node);
 
     // Add the exit BB as a successor of the entry BB of the new function
-    A2C_BB *exit = mCurrentFunction->GetExitBB();
-    A2C_BB *entry = mCurrentFunction->GetEntryBB();
-    entry->AddSuccessor(exit);
+    //A2C_BB *exit = mCurrentFunction->GetExitBB();
+    //A2C_BB *entry = mCurrentFunction->GetEntryBB();
+    //entry->AddSuccessor(exit);
 
     // Restore both mCurrentFunction and mCurrentBB
     mCurrentFunction = current_func;
@@ -238,6 +238,8 @@ namespace maplefe {
     visited.insert(exit);
     visited.insert(entry);
     std::string dot("---\ndigraph CFG {");
+    dot += "\nBB" + std::to_string(entry->GetId()) + " [shape=box];" +
+      "\nBB" + std::to_string(exit->GetId()) + " [shape=doublecircle];";
     const char* fake = " [style=dashed];";
     while(!bb_stack.empty()) {
       A2C_BB *bb = bb_stack.top();
