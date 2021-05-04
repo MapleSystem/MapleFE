@@ -87,7 +87,8 @@ namespace maplefe {
     mCurrentBB->SetKind(BK_Branch);
 
     TreeNode *cond = node->GetCond();
-    mCurrentBB->SetPredicate(cond);   // Set predicate of current BB
+    // Set predicate of current BB
+    mCurrentBB->SetPredicate(cond);
 
     // Save current BB
     A2C_BB *current_bb = mCurrentBB;
@@ -118,6 +119,43 @@ namespace maplefe {
 
     if(mTrace)
       std::cout << "ModuleVisitor: exit CondBranchNode, id=" << node->GetNodeId() << std::endl;
+    return node;
+  }
+
+  ForLoopNode *ModuleVisitor::VisitForLoopNode(ForLoopNode *node) {
+    // Visit all inits
+    for (unsigned i = 0; i < node->GetInitsNum(); ++i) {
+      VisitTreeNode(node->GetInitAtIndex(i));
+    }
+
+    A2C_BB *current_bb = mCurrentBB;
+    // Create a new BB for loop header
+    mCurrentBB = mModule->NewBB();
+    current_bb->AddSuccessor(mCurrentBB);
+    mCurrentBB->SetKind(BK_LoopHeader);
+    // Set current_bb to be loop header
+    current_bb = mCurrentBB;
+
+    TreeNode *cond = node->GetCond();
+    // Set predicate of current BB
+    mCurrentBB->SetPredicate(cond);
+    VisitTreeNode(node->GetCond());
+
+    // Create a BB for loop body
+    mCurrentBB = mModule->NewBB();
+    current_bb->AddSuccessor(mCurrentBB);
+
+    VisitTreeNode(node->GetBody());
+    for (unsigned i = 0; i < node->GetUpdatesNum(); ++i) {
+      VisitTreeNode(node->GetUpdateAtIndex(i));
+    }
+    // Add a back edge to loop header
+    mCurrentBB->AddSuccessor(current_bb);
+
+    // Create a new BB to get out of the loop
+    A2C_BB *loop_exit = mModule->NewBB();
+    current_bb->AddSuccessor(loop_exit);
+    mCurrentBB = loop_exit;
     return node;
   }
 

@@ -174,6 +174,7 @@ namespace maplefe {
       FunctionNode *VisitFunctionNode(FunctionNode *node);
       CondBranchNode *VisitCondBranchNode(CondBranchNode *node);
       BlockNode *VisitBlockNode(BlockNode *node);
+      ForLoopNode *VisitForLoopNode(ForLoopNode *node);
 
       DeclNode *VisitDeclNode(DeclNode *node);
       CallNode *VisitCallNode(CallNode *node);
