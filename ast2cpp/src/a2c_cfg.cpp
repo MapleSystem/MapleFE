@@ -122,25 +122,40 @@ namespace maplefe {
   }
 
   BlockNode *ModuleVisitor::VisitBlockNode(BlockNode *node) {
-    // Save current BB
-    A2C_BB *current_bb = mCurrentBB;
-    current_bb->SetKind(BK_Block);
-
-    // Create a new BB for true branch
-    mCurrentBB = mModule->NewBB();
-    current_bb->AddSuccessor(mCurrentBB);
-
-    // Visit all children nodes
-    for (unsigned i = 0; i < node->GetChildrenNum(); ++i) {
-      VisitTreeNode(node->GetChildAtIndex(i));
+    // Check if current block constains any JS_Let or JS_Const DeclNode
+    unsigned i, num = node->GetChildrenNum();
+    for (i = 0; i < num; ++i) {
+      TreeNode *child = node->GetChildAtIndex(i);
+      if(child->GetKind() != NK_Decl)
+        continue;
+      DeclNode *decl = static_cast<DeclNode *>(child);
+      if(decl->GetProp() == JS_Let || decl->GetProp() == JS_Const)
+        break;
     }
+    if(i <= num)
+      // Do not create BB for current block when no JS_Let or JS_Const DeclNode inside
+      AstVisitor::VisitBlockNode(node);
+    else {
+      // Needs BBs for current block
+      // Save current BB
+      A2C_BB *current_bb = mCurrentBB;
+      current_bb->SetKind(BK_Block);
 
-    // Create a BB for the join point
-    A2C_BB *join = mModule->NewBB();
-    mCurrentBB->AddSuccessor(join);
-    current_bb->AddSuccessor(join); // This edge is to determine the block range
+      // Create a new BB for current block node
+      mCurrentBB = mModule->NewBB();
+      current_bb->AddSuccessor(mCurrentBB);
 
-    mCurrentBB = join;
+      // Visit all children nodes
+      AstVisitor::VisitBlockNode(node);
+
+      // Create a BB for the join point
+      A2C_BB *join = mModule->NewBB();
+      mCurrentBB->AddSuccessor(join);
+      // This edge is to determine the block range for JS_Let or JS_Const DeclNode
+      current_bb->AddSuccessor(join);
+
+      mCurrentBB = join;
+    }
     return node;
   }
 
