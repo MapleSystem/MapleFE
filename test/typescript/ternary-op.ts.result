@@ -6,7 +6,7 @@ Matched 51 tokens.
 ============= Module ===========
 == Sub Tree ==
 func  func(x)  throws: 
-  return x GT 10 ? x GT 10 : x
+  return x GT 10 ? x : x Mul x
 
 == Sub Tree ==
 js_let Decl: r=func(12)

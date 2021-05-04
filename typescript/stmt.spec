@@ -479,9 +479,10 @@ rule LogicalORExpression : ONEOF(
 ##rule ConditionalExpression[In, Yield] :
 ##  LogicalORExpression[?In, ?Yield]
 ##  LogicalORExpression[?In,?Yield] ? AssignmentExpression[In, ?Yield] : AssignmentExpression[?In, ?Yield]
+rule ConditionalTrue : AssignmentExpression
 rule ConditionalExpression : ONEOF(
   LogicalORExpression,
-  LogicalORExpression + '?' + AssignmentExpression + ':' + AssignmentExpression)
+  LogicalORExpression + '?' + ConditionalTrue + ':' + AssignmentExpression)
   attr.action.%2 : BuildTernaryOperation(%1, %3, %5)
 
 ##-----------------------------------
