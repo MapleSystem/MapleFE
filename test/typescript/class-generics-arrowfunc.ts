@@ -14,12 +14,12 @@ class Foo<T> {
  }
 }
 
-// Create class with String type
-// - Create class with type String
+// Create class object with String type
+// - Create class object with type String
 // - Pass an arrow function (that returns a new String object) to the class constructor
-const FooStringClass: Foo<String> = new Foo<String>( () => new String("foo") );
+const FooString: Foo<String> = new Foo<String>( () => new String("foo") );
 
 // Optional check. 
-// - Call alloc() of new class to get a new object and 
+// - Call alloc() of new class object to get a new object and 
 // - call the object's builtin toString() method to display it.
-console.log(FooStringClass.alloc().toString());
+console.log(FooString.alloc().toString());
