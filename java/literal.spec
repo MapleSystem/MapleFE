@@ -124,7 +124,15 @@ rule BooleanLiteral : ONEOF ("true", "false")
 # I decided to simplify the unicode escape a little bit. I don't want to
 # handle all odd cases.
 rule UnicodeEscape: '\' + 'u' + HEXDIGIT + HEXDIGIT + HEXDIGIT + HEXDIGIT
-rule RawInputCharacter : ONEOF(ASCII, ESCAPE)
+
+# [NOTE] Becareful of ' over here. It's duplicated in ESCAPE as '\' + '''. There is a reason.
+#        When the lexer read a string "doesn't", which is wrong since Java request ' be escaped but
+#        many code does NOT escape, the string in memory is "doesn't" too. The system Reading function
+#        which is in C doesn't escape '. So I duplicate here to catch this case.
+#
+#        Please see test case java2mpl/literal-string-2.java for example.
+#
+rule RawInputCharacter : ONEOF(ASCII, ''', ESCAPE)
 rule SingleCharacter: ONEOF(UnicodeEscape, RawInputCharacter)
 
 rule OctalEscape : ONEOF('\' + '0', '\' + '1')

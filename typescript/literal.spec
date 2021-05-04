@@ -129,7 +129,6 @@ rule SingleCharacter: ONEOF(UnicodeEscape, RawInputCharacter)
 
 rule OctalEscape : ONEOF('\' + '0', '\' + '1')
 rule EscapeSequence : ONEOF(ESCAPE, OctalEscape)
-
 rule CharacterLiteral : ''' + ONEOF(SingleCharacter, EscapeSequence) + '''
 
 #########################################################################
@@ -138,7 +137,8 @@ rule CharacterLiteral : ''' + ONEOF(SingleCharacter, EscapeSequence) + '''
 # The UnicodeEscape is limited from \u0000 to \u00ff.
 rule StringUnicodeEscape: '\' + 'u' + '0' + '0' + HEXDIGIT + HEXDIGIT
 rule StringCharater: ONEOF(StringUnicodeEscape, RawInputCharacter)
-rule StringLiteral : '"' + ZEROORMORE(StringCharater) + '"'
+rule StringLiteral : ONEOF('"' + ZEROORMORE(StringCharater) + '"',
+                           ''' + ZEROORMORE(StringCharater) + ''')
 
 #########################################################################
 ##                           Null                                      ##
