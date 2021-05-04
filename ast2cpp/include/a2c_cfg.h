@@ -77,11 +77,16 @@ namespace maplefe {
       void      SetSwitchCaseExpr(TreeNode *node) {mSwitchCaseExpr = node;}
       TreeNode *GetSwitchCaseExpr()               {return mSwitchCaseExpr;}
 
-      void AddStatement(TreeNode *stmt)         {mStatements.PushBack(stmt);}
-      unsigned  GetStatementsNum()               {return mStatements.GetNum();}
+      void AddStatement(TreeNode *stmt)         {if(mKind != BK_Return) mStatements.PushBack(stmt);}
+      unsigned  GetStatementsNum()              {return mStatements.GetNum();}
       TreeNode* GetStatementAtIndex(unsigned i) {return mStatements.ValueAtIndex(i);}
 
-      void AddSuccessor(A2C_BB *succ)             {mSuccessors.PushBack(succ); succ->mPredecessors.PushBack(this);}
+      void AddSuccessor(A2C_BB *succ) {
+        if(mKind == BK_Return)
+          return;
+        mSuccessors.PushBack(succ);
+        succ->mPredecessors.PushBack(this);
+      }
       unsigned  GetSuccessorsNum()                {return mSuccessors.GetNum();}
       A2C_BB   *GetSuccessorAtIndex(unsigned i)   {return mSuccessors.ValueAtIndex(i);}
       unsigned  GetPredecessorsNum()              {return mPredecessors.GetNum();}

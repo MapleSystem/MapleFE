@@ -59,7 +59,7 @@ namespace maplefe {
     current_func->AddNestedFunction(mCurrentFunction);
 
     // Create both entry BB and exit BB of the new function
-    A2C_BB *mCurrentBB = mModule->NewBB();
+    mCurrentBB = mModule->NewBB();
     mCurrentFunction->SetEntryBB(mCurrentBB);
     mCurrentFunction->SetExitBB(mModule->NewBB());
 
@@ -83,16 +83,9 @@ namespace maplefe {
   ReturnNode *ModuleVisitor::VisitReturnNode(ReturnNode *node) {
     //AstVisitor::VisitReturnNode(node);
     mCurrentBB->AddStatement(node);
+    A2C_BB *exit = mCurrentFunction->GetExitBB();
+    mCurrentBB->AddSuccessor(exit);
     mCurrentBB->SetKind(BK_Return);
-
-    A2C_BB *current_bb = mCurrentBB;
-    //TODO
-    //A2C_BB *exit = mCurrentFunction->GetExitBB();
-    //mCurrentBB->AddSuccessor(exit);
-
-    // Create a new BB for the code following this return statement
-    mCurrentBB = mModule->NewBB();
-    current_bb->AddSuccessor(mCurrentBB);
     return node;
   }
 
