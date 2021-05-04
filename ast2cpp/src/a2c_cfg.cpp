@@ -13,30 +13,211 @@
 * See the Mulan PSL v2 for more details.
 */
 
+#include <stack>
+#include <set>
 #include "a2c_cfg.h"
 
 namespace maplefe {
 
-  FunctionNode *CfgVisitor::VisitFunctionNode(FunctionNode *node) {
-    if(mTrace)
-      std::cout << "CfgVisitor: enter FunctionNode, id=" << node->GetNodeId() << std::endl;
+  void ModuleVisitor::InitializeVisitor() {
+    // Create an artificial function for current module
+    A2C_Function *func = mModule->NewFunction();
+    mModule->SetFunction(func);
 
+    // Create the entry BB and exit BB of current function
+    A2C_BB *bb = mModule->NewBB();
+    func->SetEntryBB(bb);
+    func->SetExitBB(mModule->NewBB());
+
+    // Initialize the working function and BB
+    mCurrentFunction = func;
+    mCurrentBB = mModule->NewBB();
+    bb->AddSuccessor(mCurrentBB);
+  }
+
+  void ModuleVisitor::FinalizeVisitor() {
+    // Add the exit BB as a successor of the entry BB of current function
+    A2C_BB *exit = mCurrentFunction->GetExitBB();
+    A2C_BB *entry = mCurrentFunction->GetEntryBB();
+    entry->AddSuccessor(exit);
+    mCurrentBB->AddSuccessor(exit);
+
+    mCurrentFunction = nullptr;
+    mCurrentBB = nullptr;
+  }
+
+  FunctionNode *ModuleVisitor::VisitFunctionNode(FunctionNode *node) {
+    if(mTrace)
+      std::cout << "ModuleVisitor: enter FunctionNode, id=" << node->GetNodeId() << std::endl;
+
+    // Save both mCurrentFunction and mCurrentBB
+    A2C_Function *current_func = mCurrentFunction;
+    A2C_BB *current_bb = mCurrentBB;
+
+    // Create a new function and add it as a nested function to current function
+    mCurrentFunction = mModule->NewFunction();
+    current_func->AddNestedFunction(mCurrentFunction);
+
+    // Create both entry BB and exit BB of the new function
+    A2C_BB *mCurrentBB = mModule->NewBB();
+    mCurrentFunction->SetEntryBB(mCurrentBB);
+    mCurrentFunction->SetExitBB(mModule->NewBB());
+
+    // Visit the FunctionNode 'node'
     AstVisitor::VisitFunctionNode(node);
 
+    // Add the exit BB as a successor of the entry BB of the new function
+    A2C_BB *exit = mCurrentFunction->GetExitBB();
+    A2C_BB *entry = mCurrentFunction->GetEntryBB();
+    entry->AddSuccessor(exit);
+
+    // Restore both mCurrentFunction and mCurrentBB
+    mCurrentFunction = current_func;
+    mCurrentBB = current_bb;
+
     if(mTrace)
-      std::cout << "CfgVisitor: exit FunctionNode, id=" << node->GetNodeId() << std::endl;
+      std::cout << "ModuleVisitor: exit FunctionNode, id=" << node->GetNodeId() << std::endl;
     return node;
   }
 
+  CondBranchNode *ModuleVisitor::VisitCondBranchNode(CondBranchNode *node) {
+    if(mTrace)
+      std::cout << "ModuleVisitor: enter CondBranchNode, id=" << node->GetNodeId() << std::endl;
 
+    mCurrentBB->SetKind(BK_Branch);
 
-  void A2C_CFG::BuildCFG() {
-    CfgVisitor visitor(mTraceCFG, true);
-    for(auto it: mModule->mTrees)
-          visitor.Visit(it->mRootNode);
+    TreeNode *cond = node->GetCond();
+    mCurrentBB->SetPredicate(cond);   // Set predicate of current BB
+
+    // Save current BB
+    A2C_BB *current_bb = mCurrentBB;
+
+    // Create a new BB for true branch
+    mCurrentBB = mModule->NewBB();
+    current_bb->AddSuccessor(mCurrentBB);
+
+    // Visit true branch first
+    VisitTreeNode(node->GetTrueBranch());
+
+    // Create a BB for the join point
+    A2C_BB *join = mModule->NewBB();
+    mCurrentBB->AddSuccessor(join);
+
+    TreeNode *false_branch = node->GetFalseBranch();
+    if(false_branch == nullptr)
+      current_bb->AddSuccessor(join);
+    else {
+      mCurrentBB = mModule->NewBB();
+      current_bb->AddSuccessor(mCurrentBB);
+      VisitTreeNode(false_branch);
+      mCurrentBB->AddSuccessor(join);
+    }
+
+    // Keep going with the BB at the join point
+    mCurrentBB = join;
+
+    if(mTrace)
+      std::cout << "ModuleVisitor: exit CondBranchNode, id=" << node->GetNodeId() << std::endl;
+    return node;
   }
 
-  void A2C_CFG::Dump() {
+  BlockNode *ModuleVisitor::VisitBlockNode(BlockNode *node) {
+    // Save current BB
+    A2C_BB *current_bb = mCurrentBB;
+    current_bb->SetKind(BK_Block);
+
+    // Create a new BB for true branch
+    mCurrentBB = mModule->NewBB();
+    current_bb->AddSuccessor(mCurrentBB);
+
+    // Visit all children nodes
+    for (unsigned i = 0; i < node->GetChildrenNum(); ++i) {
+      VisitTreeNode(node->GetChildAtIndex(i));
+    }
+
+    // Create a BB for the join point
+    A2C_BB *join = mModule->NewBB();
+    mCurrentBB->AddSuccessor(join);
+    current_bb->AddSuccessor(join); // This edge is to determine the block range
+
+    mCurrentBB = join;
+    return node;
+  }
+
+  DeclNode *ModuleVisitor::VisitDeclNode(DeclNode *node) {
+    mCurrentBB->AddStatement(node);
+    // AstVisitor::VisitDeclNode(node);
+    return node;
+  }
+
+  CallNode *ModuleVisitor::VisitCallNode(CallNode *node) {
+    mCurrentBB->AddStatement(node);
+    return node;
+  }
+
+  void A2C_Function::Dump() {
+    unsigned num = GetNestedFunctionsNum();
+    std::cout << "Nested Functions: " << num << " {" << std::endl;
+    for(unsigned i = 0; i < num; ++i) {
+      std::cout << "Function: " << i << std::endl;
+      GetNestedFunctionAtIndex(i)->Dump();
+    }
+    std::cout << "}" << std::endl;
+    std::cout << "Basic blocks: {" << std::endl;
+
+    std::stack<A2C_BB*> bb_stack;
+    A2C_BB *entry = GetEntryBB();
+    A2C_BB *exit = GetExitBB();
+    bb_stack.push(exit);
+    bb_stack.push(entry);
+    std::set<A2C_BB*> visited;
+    visited.insert(exit);
+    visited.insert(entry);
+    while(!bb_stack.empty()) {
+      A2C_BB *bb = bb_stack.top();
+      bb_stack.pop();
+      unsigned succ_num = bb->GetSuccessorsNum();
+      std::cout << "BB" << bb->GetId() << (succ_num ? " ( succ: " : " ( Exit ");
+      for(unsigned i = 0; i < succ_num; ++i) {
+        A2C_BB *curr = bb->GetSuccessorAtIndex(i);
+        std::cout << "BB" << curr->GetId() << " ";
+        if(visited.find(curr) == visited.end()) {
+          bb_stack.push(curr);
+          visited.insert(curr);
+        }
+        if(bb->GetKind() == BK_Block) {
+          std::cout << "Block";
+          break; // Ignore the edge for block range
+        }
+      }
+      std::cout << ")" << std::endl;
+      unsigned num = bb->GetStatementsNum();
+      if(num)
+        for(unsigned i = 0; i < num; ++i)
+          std::cout << "  " << i + 1 << ". NodeId: " << bb->GetStatementAtIndex(i)->GetNodeId() << std::endl;
+    }
+    std::cout << "}" << std::endl;
+  }
+
+  void A2C_Module::BuildCFG() {
+    // Set the init function for current module
+    SetFunction(NewFunction());
+
+
+    ModuleVisitor visitor(this, mTraceModule, true);
+
+    visitor.InitializeVisitor();
+
+    for(auto it: mASTModule->mTrees)
+          visitor.Visit(it->mRootNode);
+
+    visitor.FinalizeVisitor();
+  }
+
+  void A2C_Module::Dump(char *msg) {
+    std::cout << msg << ":" << std::endl;
+    A2C_Function *func = GetFunction();
+    func->Dump();
   }
 
 

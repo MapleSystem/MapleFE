@@ -19,29 +19,30 @@
 
 namespace maplefe {
 
-// starting point of AST
-void A2C::ProcessAST(bool trace_a2c) {
-  mTraceA2C = trace_a2c;
-  if (mTraceA2C) std::cout << "============= in ProcessAST ===========" << std::endl;
-  for(auto it: gModule.mTrees) {
-    TreeNode *tnode = it->mRootNode;
-    if (mTraceA2C) {
-      tnode->Dump(0);
-      std::cout << std::endl;
+  // starting point of AST
+  void A2C::ProcessAST(bool trace_a2c) {
+    mTraceA2C = trace_a2c;
+    if (mTraceA2C) std::cout << "============= in ProcessAST ===========" << std::endl;
+    for(auto it: gModule.mTrees) {
+      TreeNode *tnode = it->mRootNode;
+      if (mTraceA2C) {
+        tnode->Dump(0);
+        std::cout << std::endl;
+      }
     }
-  }
 
-  if (mTraceA2C) {
+    if (mTraceA2C) {
       std::cout << "============= AstDump ===========" << std::endl;
       AstDump astdump;
       for(auto it: gModule.mTrees)
-          astdump.Dump(it->mRootNode);
+        astdump.Dump(it->mRootNode);
+    }
+
+    A2C_Module module(&gModule, mTraceA2C);
+
+    module.BuildCFG();
+    if (mTraceA2C)
+      module.Dump("After module.BuildCFG()");
   }
-
-  A2C_CFG cfg(&gModule, mTraceA2C);
-
-  cfg.BuildCFG();
-  cfg.Dump();
-}
 }
 
