@@ -93,6 +93,7 @@ public:
   TreeNode* BuildUnaryOperation();
   TreeNode* BuildPostfixOperation();
   TreeNode* BuildBinaryOperation();
+  TreeNode* BuildTernaryOperation();
   TreeNode* BuildCast();
   TreeNode* BuildParenthesis();
   TreeNode* BuildLambda();

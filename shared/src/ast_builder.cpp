@@ -347,6 +347,36 @@ TreeNode* ASTBuilder::BuildBinaryOperation() {
   return n;
 }
 
+// For second parameter has to be an operator.
+TreeNode* ASTBuilder::BuildTernaryOperation() {
+  if (mTrace)
+    std::cout << "In BuildTernaryOperation" << std::endl;
+
+  MASSERT(mParams.size() == 3 && "Ternary Operator has NO 3 params?");
+  Param p_a = mParams[0];
+  Param p_b = mParams[1];
+  Param p_c = mParams[2];
+
+  // create the sub tree
+  TerOperatorNode *n = (TerOperatorNode*)mTreePool->NewTreeNode(sizeof(TerOperatorNode));
+  new (n) TerOperatorNode();
+  mLastTreeNode = n;
+
+  MASSERT(p_a.mIsTreeNode);
+  n->SetOpndA(p_a.mData.mTreeNode);
+  n->GetOpndA()->SetParent(n);
+
+  MASSERT(p_b.mIsTreeNode);
+  n->SetOpndB(p_b.mData.mTreeNode);
+  n->GetOpndB()->SetParent(n);
+
+  MASSERT(p_c.mIsTreeNode);
+  n->SetOpndC(p_c.mData.mTreeNode);
+  n->GetOpndC()->SetParent(n);
+
+  return n;
+}
+
 // Assignment is actually a binary operator.
 TreeNode* ASTBuilder::BuildAssignment() {
   if (mTrace)

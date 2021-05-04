@@ -258,22 +258,20 @@ public:
   void Dump(unsigned);
 };
 
+// TerOperatorNode is for an expression like
+//   a > b ? c : d
 class TerOperatorNode : public TreeNode {
-public:
-  OprId     mOprId;
+private:
   TreeNode *mOpndA;
   TreeNode *mOpndB;
   TreeNode *mOpndC;
 public:
-  TerOperatorNode(OprId id) : mOprId(id) {mKind = NK_TerOperator;}
   TerOperatorNode() {mKind = NK_TerOperator;}
   ~TerOperatorNode() {}
 
-  OprId     GetOprId() {return mOprId;}
   TreeNode* GetOpndA() {return mOpndA;}
   TreeNode* GetOpndB() {return mOpndB;}
   TreeNode* GetOpndC() {return mOpndC;}
-  void SetOprId(OprId o)     {mOprId = o;}
   void SetOpndA(TreeNode* t) {mOpndA = t; t->SetParent(this);}
   void SetOpndB(TreeNode* t) {mOpndB = t; t->SetParent(this);}
   void SetOpndC(TreeNode* t) {mOpndC = t; t->SetParent(this);}
