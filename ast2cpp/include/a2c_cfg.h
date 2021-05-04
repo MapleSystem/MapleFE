@@ -172,6 +172,7 @@ namespace maplefe {
       void FinalizeVisitor();
 
       FunctionNode *VisitFunctionNode(FunctionNode *node);
+      ReturnNode *VisitReturnNode(ReturnNode *node);
       CondBranchNode *VisitCondBranchNode(CondBranchNode *node);
       BlockNode *VisitBlockNode(BlockNode *node);
       ForLoopNode *VisitForLoopNode(ForLoopNode *node);

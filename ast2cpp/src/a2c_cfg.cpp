@@ -80,6 +80,22 @@ namespace maplefe {
     return node;
   }
 
+  ReturnNode *ModuleVisitor::VisitReturnNode(ReturnNode *node) {
+    //AstVisitor::VisitReturnNode(node);
+    mCurrentBB->AddStatement(node);
+    mCurrentBB->SetKind(BK_Return);
+
+    A2C_BB *current_bb = mCurrentBB;
+    //TODO
+    //A2C_BB *exit = mCurrentFunction->GetExitBB();
+    //mCurrentBB->AddSuccessor(exit);
+
+    // Create a new BB for the code following this return statement
+    mCurrentBB = mModule->NewBB();
+    current_bb->AddSuccessor(mCurrentBB);
+    return node;
+  }
+
   CondBranchNode *ModuleVisitor::VisitCondBranchNode(CondBranchNode *node) {
     if(mTrace)
       std::cout << "ModuleVisitor: enter CondBranchNode, id=" << node->GetNodeId() << std::endl;
@@ -89,6 +105,7 @@ namespace maplefe {
     TreeNode *cond = node->GetCond();
     // Set predicate of current BB
     mCurrentBB->SetPredicate(cond);
+    //VisitTreeNode(cond);
 
     // Save current BB
     A2C_BB *current_bb = mCurrentBB;
@@ -139,7 +156,7 @@ namespace maplefe {
     TreeNode *cond = node->GetCond();
     // Set predicate of current BB
     mCurrentBB->SetPredicate(cond);
-    VisitTreeNode(node->GetCond());
+    //VisitTreeNode(node->GetCond());
 
     // Create a BB for loop body
     mCurrentBB = mModule->NewBB();
@@ -221,14 +238,14 @@ namespace maplefe {
     std::cout << "Basic blocks: {" << std::endl;
 
     std::stack<A2C_BB*> bb_stack;
-    A2C_BB *entry = GetEntryBB();
-    A2C_BB *exit = GetExitBB();
+    A2C_BB *entry = GetEntryBB(), *exit = GetExitBB();
     bb_stack.push(exit);
     bb_stack.push(entry);
     std::set<A2C_BB*> visited;
     visited.insert(exit);
     visited.insert(entry);
     std::string dot("---\ndigraph CFG {");
+    const char* fake = " [style=dashed];";
     while(!bb_stack.empty()) {
       A2C_BB *bb = bb_stack.top();
       bb_stack.pop();
@@ -237,22 +254,21 @@ namespace maplefe {
       for(unsigned i = 0; i < succ_num; ++i) {
         A2C_BB *curr = bb->GetSuccessorAtIndex(i);
         std::cout << "BB" << curr->GetId() << " ";
-        dot += "\nBB" + std::to_string(bb->GetId()) + " -> BB" + std::to_string(curr->GetId()) +
-          ( succ_num == 1 ? ";" : i ?" [color=darkred];": " [color=darkgreen];");
+        dot += "\nBB" + std::to_string(bb->GetId()) + " -> BB" + std::to_string(curr->GetId())
+          + (bb == entry ? (curr == exit ? fake : ";") :
+              succ_num == 1 ? ";" : i ? bb->GetKind() == BK_Block ? fake :
+              " [color=darkred];" : " [color=darkgreen];");
         if(visited.find(curr) == visited.end()) {
           bb_stack.push(curr);
           visited.insert(curr);
-        }
-        if(bb->GetKind() == BK_Block) {
-          std::cout << "Block";
-          break; // Ignore the edge for block range
         }
       }
       std::cout << ")" << std::endl;
       unsigned num = bb->GetStatementsNum();
       if(num)
         for(unsigned i = 0; i < num; ++i)
-          std::cout << "  " << i + 1 << ". NodeId: " << bb->GetStatementAtIndex(i)->GetNodeId() << std::endl;
+          std::cout << "  " << i + 1 << ". TreeNode: "
+            << bb->GetStatementAtIndex(i)->GetNodeId() << std::endl;
     }
     std::cout << "}" << std::endl;
     dot += "\n}";
