@@ -352,6 +352,9 @@ def get_data_based_on_type(val_type, accessor):
         return val_type + ', " + std::to_string(' + accessor + '));'
     return val_type + ', " + "value"); // Warning: failed to get value'
 
+def short_name(node_type):
+    return node_type.replace('class ', '').replace('maplefe::', '')
+
 # The follwoing gen_func_* and gen_call* functions are for AstDump
 gen_call_handle_values = lambda: True
 gen_func_declaration = lambda dictionary, node_name: \
@@ -361,15 +364,16 @@ gen_func_definition = lambda dictionary, node_name: \
         + ('if (node == nullptr) {\nDump("  TreeNode: null");\nreturn;\n}' if node_name == "TreeNode" else \
         '\nif(DumpFB("' + node_name + '", node)) {')
 gen_call_child_node = lambda dictionary, field_name, node_type, accessor: \
-        ('Dump("' + field_name + ': ' + node_type + '*");\n' if field_name != '' else '') \
-        + gen_args[2] + node_type + "(" + accessor + ");"
+        ('Dump("' + field_name + ': ' + short_name(node_type) + '*");\n' if field_name != '' else '') \
+        + gen_args[2] + short_name(node_type) + "(" + accessor + ");"
 gen_call_child_value = lambda dictionary, field_name, val_type, accessor: \
         'Dump(std::string("' + field_name + ': ") + "' + get_data_based_on_type(val_type, accessor)
 gen_call_children_node = lambda dictionary, field_name, node_type, accessor: \
-        'DumpLB("' + field_name + ': ' + node_type + ', size = " + std::to_string(' + accessor + ') + " [");'
+        'DumpLB("' + field_name + ': ' + short_name(node_type) + ', size = " + std::to_string(' + accessor + ') + " [");'
 gen_call_children_node_end = lambda dictionary, field_name, node_type, accessor: 'DumpLE("]");'
 gen_call_nth_subchild_node = lambda dictionary, field_name, node_type, accessor: \
-        'Dump(std::to_string(i + 1) + ": ' + node_type + '*");\n' + gen_args[2] + node_type + "(" + accessor + ");"
+        'Dump(std::to_string(i + 1) + ": ' + short_name(node_type) + '*");\n' + gen_args[2] \
+        + short_name(node_type) + "(" + accessor + ");"
 gen_call_nth_subchild_value = lambda dictionary, field_name, val_type, accessor: \
         'Dump(std::to_string(i) + ". ' + get_data_based_on_type(val_type, accessor)
 gen_func_definition_end = lambda dictionary, node_name: \
