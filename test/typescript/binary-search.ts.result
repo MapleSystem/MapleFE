@@ -1,28 +1,23 @@
-Matched 25 tokens.
-Matched 139 tokens.
-Matched 160 tokens.
-Matched 172 tokens.
+Matched 108 tokens.
+Matched 129 tokens.
+Matched 141 tokens.
 ============= Module ===========
 == Sub Tree ==
 func  binarySearch(array,value)  throws: 
-  return binarySearchEpsilon(array,value,0)
-
-== Sub Tree ==
-func  binarySearchEpsilon(array,value,EPSILON=1e-06)  throws: 
-  js_let Decl: low=0
-  js_let Decl: high=array.length Sub 1
-  js_let Decl: middle=high Zext 1
+  js_var Decl: low=0
+  js_var Decl: high=array.length Sub 1
+  js_var Decl: mid=high Zext 1
   for ( )
-    js_const Decl: test=array[middle]
-    cond-branch cond:test GT value Add EPSILON
+    js_const Decl: test=array[mid]
+    cond-branch cond:test GT value
     true branch :
-      high Assign middle Sub 1
+      high Assign mid Sub 1
     false branch :
-      cond-branch cond:test LT value Sub EPSILON
+      cond-branch cond:test LT value
       true branch :
-        low Assign middle Add 1
+        low Assign mid Add 1
       false branch :
-        return middle
+        return mid
 
 
 
