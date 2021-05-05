@@ -254,12 +254,21 @@ namespace maplefe {
 
       TreeNode *case_node = node->GetCaseAtIndex(i);
       bool is_default = false;
+      TreeNode *case_expr = nullptr;
       if(case_node->GetKind() == NK_SwitchCase) {
+        // Use the first label node of current SwitchCaseNode
         TreeNode *label_node = static_cast<SwitchCaseNode *>(case_node)->GetLabelAtIndex(0);
-        if(label_node->GetKind() == NK_SwitchLabel)
+        if(label_node->GetKind() == NK_SwitchLabel) {
           is_default = static_cast<SwitchLabelNode *>(label_node)->IsDefault();
+          case_expr = static_cast<SwitchLabelNode *>(label_node)->GetValue();
+        }
       }
 
+      // Set SwitchExpr and Predicate for current case BB
+      case_bb->SetSwitchExpr(switch_expr);
+      case_bb->SetPredicate(case_expr);
+
+      // Optimize for default case
       if(is_default)
         mCurrentBB = case_bb;
       else {
@@ -267,19 +276,19 @@ namespace maplefe {
         case_bb->AddSuccessor(mCurrentBB);
       }
 
+      // Add a fall-through edge if needed
       if(prev_block)
         prev_block->AddSuccessor(mCurrentBB);
 
-      case_bb->SetSwitchExpr(switch_expr);
-      case_bb->SetPredicate(case_node);
-
       VisitTreeNode(case_node);
 
+      // Prepare for next case
       prev_block = mCurrentBB;
       current_bb = case_bb;
     }
     mTargetBBs.pop();
 
+    // Connect to the exit BB of this switch statement
     prev_block->AddSuccessor(exit);
     if(prev_block != current_bb)
       current_bb->AddSuccessor(exit);
@@ -408,4 +417,3 @@ namespace maplefe {
   }
 
 }
-
