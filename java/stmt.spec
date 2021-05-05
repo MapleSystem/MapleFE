@@ -410,7 +410,6 @@ rule SwitchStatement : "switch" + '(' + Expression + ')' + SwitchBlock
   attr.action : BuildSwitch(%3, %5)
 
 rule SwitchBlock : '{' + ZEROORMORE(ZEROORMORE(SwitchBlockStatementGroup) + ZEROORMORE(SwitchLabel)) + '}'
-  attr.action : BuildAllCases(%2)
 
 rule SwitchBlockStatementGroup : SwitchLabels + BlockStatements
   attr.action : BuildOneCase(%1, %2)

@@ -896,14 +896,18 @@ void SwitchCaseNode::AddStmt(TreeNode *t) {
 void SwitchCaseNode::Dump(unsigned ind) {
 }
 
+extern ASTBuilder gASTBuilder;
+
 void SwitchNode::AddCase(TreeNode *t) {
   if (t->IsPass()) {
     PassNode *cases = (PassNode*)t;
     for (unsigned i = 0; i < cases->GetChildrenNum(); i++)
       AddCase(cases->GetChild(i));
-  } else {
-    MASSERT(t->IsSwitchCase());
+  } else if (t->IsSwitchCase()) {
     mCases.PushBack((SwitchCaseNode*)t);
+  } else if (t->IsSwitchLabel()) {
+    SwitchCaseNode *casenode = gASTBuilder.SwitchLabelToCase((SwitchLabelNode*)t);
+    mCases.PushBack(casenode);
   }
 }
 
