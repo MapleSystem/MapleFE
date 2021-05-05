@@ -913,14 +913,14 @@ public:
 
 class SwitchNode : public TreeNode {
 private:
-  TreeNode *mCond;
+  TreeNode *mExpr;
   SmallVector<SwitchCaseNode*> mCases;
 public:
-  SwitchNode() : mCond(NULL) {mKind = NK_Switch;}
+  SwitchNode() : mExpr(NULL) {mKind = NK_Switch;}
   ~SwitchNode() {Release();}
 
-  TreeNode* GetCond() {return mCond;}
-  void SetCond(TreeNode *c) {mCond = c;}
+  TreeNode* GetExpr() {return mExpr;}
+  void SetExpr(TreeNode *c) {mExpr = c;}
 
   unsigned  GetCasesNum() {return mCases.GetNum();}
   TreeNode* GetCaseAtIndex(unsigned i) {return mCases.ValueAtIndex(i);}

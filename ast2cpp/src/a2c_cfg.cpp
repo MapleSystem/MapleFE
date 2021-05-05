@@ -161,7 +161,7 @@ namespace maplefe {
 
   SwitchNode *ModuleVisitor::VisitSwitchNode(SwitchNode *node) {
     mCurrentBB->SetKind(BK_Switch);
-    TreeNode *switch_expr = node->GetCond();
+    TreeNode *switch_expr = node->GetExpr();
     // Set switch expression of current BB
     mCurrentBB->SetSwitchExpr(switch_expr);
     //VisitTreeNode(switch_expr);

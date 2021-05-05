@@ -652,7 +652,7 @@ TreeNode* ASTBuilder::BuildDefaultSwitchLabel() {
   return label;
 }
 
-// BuildOneCase takes 
+// BuildOneCase takes
 // 1. two arguments, the expression of a label and the statements under the label.
 // 2. One arguemnt, which is the statements. The label is mLastTreeNode.
 
@@ -711,11 +711,11 @@ TreeNode* ASTBuilder::BuildSwitch() {
 
   MASSERT(mParams.size() == 2 && "BuildSwitch has NO 1 params?");
 
-  Param p_cond = mParams[0];
-  MASSERT(!p_cond.mIsEmpty);
-  MASSERT(p_cond.mIsTreeNode && "Condition in BuildSwitch is not a tree.");
-  TreeNode *cond = p_cond.mData.mTreeNode;
-  switch_node->SetCond(cond);
+  Param p_expr = mParams[0];
+  MASSERT(!p_expr.mIsEmpty);
+  MASSERT(p_expr.mIsTreeNode && "Expression in BuildSwitch is not a tree.");
+  TreeNode *expr = p_expr.mData.mTreeNode;
+  switch_node->SetExpr(expr);
 
   Param p_cases = mParams[1];
   MASSERT(!p_cases.mIsEmpty);
