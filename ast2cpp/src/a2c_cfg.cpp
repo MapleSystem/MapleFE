@@ -19,29 +19,22 @@
 
 namespace maplefe {
 
-  void ModuleVisitor::InitializeVisitor() {
-    // Create an artificial function for current module
-    A2C_Function *func = mModule->NewFunction();
-    mModule->SetFunction(func);
-
+  void ModuleVisitor::InitializeFunction(A2C_Function *func) {
     // Create the entry BB and exit BB of current function
     A2C_BB *bb = mModule->NewBB();
     func->SetEntryBB(bb);
     func->SetExitBB(mModule->NewBB());
-
     // Initialize the working function and BB
     mCurrentFunction = func;
     mCurrentBB = mModule->NewBB();
     bb->AddSuccessor(mCurrentBB);
   }
 
-  void ModuleVisitor::FinalizeVisitor() {
-    // Add the exit BB as a successor of the entry BB of current function
+  void ModuleVisitor::FinalizeFunction() {
     A2C_BB *exit = mCurrentFunction->GetExitBB();
     //A2C_BB *entry = mCurrentFunction->GetEntryBB();
     //entry->AddSuccessor(exit);
     mCurrentBB->AddSuccessor(exit);
-
     mCurrentFunction = nullptr;
     mCurrentBB = nullptr;
   }
@@ -58,18 +51,10 @@ namespace maplefe {
     mCurrentFunction = mModule->NewFunction();
     current_func->AddNestedFunction(mCurrentFunction);
 
-    // Create both entry BB and exit BB of the new function
-    mCurrentBB = mModule->NewBB();
-    mCurrentFunction->SetEntryBB(mCurrentBB);
-    mCurrentFunction->SetExitBB(mModule->NewBB());
-
+    InitializeFunction(mCurrentFunction);
     // Visit the FunctionNode 'node'
     AstVisitor::VisitFunctionNode(node);
-
-    // Add the exit BB as a successor of the entry BB of the new function
-    //A2C_BB *exit = mCurrentFunction->GetExitBB();
-    //A2C_BB *entry = mCurrentFunction->GetEntryBB();
-    //entry->AddSuccessor(exit);
+    FinalizeFunction();
 
     // Restore both mCurrentFunction and mCurrentBB
     mCurrentFunction = current_func;
@@ -90,9 +75,6 @@ namespace maplefe {
   }
 
   CondBranchNode *ModuleVisitor::VisitCondBranchNode(CondBranchNode *node) {
-    if(mTrace)
-      std::cout << "ModuleVisitor: enter CondBranchNode, id=" << node->GetNodeId() << std::endl;
-
     mCurrentBB->SetKind(BK_Branch);
 
     TreeNode *cond = node->GetCond();
@@ -123,12 +105,8 @@ namespace maplefe {
       VisitTreeNode(false_branch);
       mCurrentBB->AddSuccessor(join);
     }
-
     // Keep going with the BB at the join point
     mCurrentBB = join;
-
-    if(mTrace)
-      std::cout << "ModuleVisitor: exit CondBranchNode, id=" << node->GetNodeId() << std::endl;
     return node;
   }
 
@@ -237,6 +215,7 @@ namespace maplefe {
     std::set<A2C_BB*> visited;
     visited.insert(exit);
     visited.insert(entry);
+    // Dump CFG in dot format
     std::string dot("---\ndigraph CFG {");
     dot += "\nBB" + std::to_string(entry->GetId()) + " [shape=box];" +
       "\nBB" + std::to_string(exit->GetId()) + " [shape=doublecircle];";
@@ -271,18 +250,15 @@ namespace maplefe {
   }
 
   void A2C_Module::BuildCFG() {
-    // Set the init function for current module
-    SetFunction(NewFunction());
-
-
     ModuleVisitor visitor(this, mTraceModule, true);
-
-    visitor.InitializeVisitor();
-
+    // Set the init function for current module
+    A2C_Function *func = NewFunction();
+    SetFunction(func);
+    // Start to build CFG for current module
+    visitor.InitializeFunction(func);
     for(auto it: mASTModule->mTrees)
           visitor.Visit(it->mRootNode);
-
-    visitor.FinalizeVisitor();
+    visitor.FinalizeFunction();
   }
 
   void A2C_Module::Dump(char *msg) {
@@ -290,7 +266,6 @@ namespace maplefe {
     A2C_Function *func = GetFunction();
     func->Dump();
   }
-
 
 }
 

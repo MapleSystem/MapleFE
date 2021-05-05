@@ -66,7 +66,7 @@ namespace maplefe {
       BBKind GetKind()         {return mKind;}
 
       void    SetAttr(BBAttribute a) {mAttr = a;}
-      BBIndex GetAttr()           {return mAttr;}
+      BBIndex GetAttr()              {return mAttr;}
 
       void    SetId(BBIndex id) {mId = id;}
       BBIndex GetId()           {return mId;}
@@ -77,7 +77,8 @@ namespace maplefe {
       void      SetSwitchCaseExpr(TreeNode *node) {mSwitchCaseExpr = node;}
       TreeNode *GetSwitchCaseExpr()               {return mSwitchCaseExpr;}
 
-      void AddStatement(TreeNode *stmt)         {if(mKind != BK_Return) mStatements.PushBack(stmt);}
+      void AddStatement(TreeNode *stmt) {if(mKind != BK_Return) mStatements.PushBack(stmt);}
+
       unsigned  GetStatementsNum()              {return mStatements.GetNum();}
       TreeNode* GetStatementAtIndex(unsigned i) {return mStatements.ValueAtIndex(i);}
 
@@ -100,11 +101,11 @@ namespace maplefe {
 
   class A2C_Function {
     private:
-      FunctionNode                *mFunction;        // nullptr if it is an init function
-      SmallList<A2C_Function *>    mNestedFunctions; // nested functions
-      A2C_Function                *mParent;
-      A2C_BB                      *mEntryBB;
-      A2C_BB                      *mExitBB;
+      FunctionNode              *mFunction;        // nullptr if it is an init function
+      SmallList<A2C_Function *>  mNestedFunctions; // nested functions
+      A2C_Function              *mParent;
+      A2C_BB                    *mEntryBB;
+      A2C_BB                    *mExitBB;
 
     public:
       explicit A2C_Function() : mParent(nullptr), mEntryBB(nullptr), mExitBB(nullptr), mFunction(nullptr) {}
@@ -120,11 +121,11 @@ namespace maplefe {
       void          SetParent(A2C_Function *func) {mParent = func;}
       A2C_Function *GetParent()                   {return mParent;}
 
-      void          SetEntryBB(A2C_BB *bb) {mEntryBB = bb; bb->SetKind(BK_Uncond); bb->SetAttr(AK_Entry);}
-      A2C_BB       *GetEntryBB()           {return mEntryBB;}
+      void     SetEntryBB(A2C_BB *bb) {mEntryBB = bb; bb->SetKind(BK_Uncond); bb->SetAttr(AK_Entry);}
+      A2C_BB  *GetEntryBB()           {return mEntryBB;}
 
-      void          SetExitBB(A2C_BB *bb)  {mExitBB = bb; bb->SetKind(BK_Uncond); bb->SetAttr(AK_Exit);}
-      A2C_BB       *GetExitBB()            {return mExitBB;}
+      void     SetExitBB(A2C_BB *bb)  {mExitBB = bb; bb->SetKind(BK_Uncond); bb->SetAttr(AK_Exit);}
+      A2C_BB  *GetExitBB()            {return mExitBB;}
 
       void Dump();
   };
@@ -133,8 +134,7 @@ namespace maplefe {
   class A2C_Module {
     private:
       MemPool       mMemPool;     // Memory pool for all A2C_Function and A2C_BB
-
-      ASTModule    *mASTModule;      // for an AST module
+      ASTModule    *mASTModule;   // for an AST module
       A2C_Function *mFunction;    // an init function for statements in module scope
       bool          mTraceModule;
 
@@ -169,12 +169,12 @@ namespace maplefe {
       A2C_BB       *mCurrentBB;
 
     public:
-
-      explicit ModuleVisitor(A2C_Module *m, bool t, bool base = false) : mModule(m), mTrace(t), AstVisitor(t && base) {}
+      explicit ModuleVisitor(A2C_Module *m, bool t, bool base = false)
+        : mModule(m), mTrace(t), AstVisitor(t && base) {}
       ~ModuleVisitor() = default;
 
-      void InitializeVisitor();
-      void FinalizeVisitor();
+      void InitializeFunction(A2C_Function *func);
+      void FinalizeFunction();
 
       FunctionNode *VisitFunctionNode(FunctionNode *node);
       ReturnNode *VisitReturnNode(ReturnNode *node);
@@ -184,8 +184,6 @@ namespace maplefe {
 
       DeclNode *VisitDeclNode(DeclNode *node);
       CallNode *VisitCallNode(CallNode *node);
-
   };
-
 }
 #endif
