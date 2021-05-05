@@ -358,8 +358,8 @@ gen_func_declaration = lambda dictionary, node_name: \
         "void " + gen_args[2] + node_name + "(" + node_name + "* node);"
 gen_func_definition = lambda dictionary, node_name: \
         "void " + gen_args[1] + "::" + gen_args[2] + node_name + "(" + node_name + "* node) {" \
-        + '\nif(node == nullptr) {\nDump("  ' + node_name + ': null");\nreturn;\n}' \
-        + ('\nDumpFB("' + node_name + ' {");\nDumpBase(node);' if node_name != "TreeNode" else '')
+        + ('if (node == nullptr) {\nDump("  TreeNode: null");\nreturn;\n}' if node_name == "TreeNode" else \
+        '\nif(DumpFB("' + node_name + '", node)) {')
 gen_call_child_node = lambda dictionary, field_name, node_type, accessor: \
         ('Dump("' + field_name + ': ' + node_type + '*");\n' if field_name != '' else '') \
         + gen_args[2] + node_type + "(" + accessor + ");"
@@ -373,7 +373,7 @@ gen_call_nth_subchild_node = lambda dictionary, field_name, node_type, accessor:
 gen_call_nth_subchild_value = lambda dictionary, field_name, val_type, accessor: \
         'Dump(std::to_string(i) + ". ' + get_data_based_on_type(val_type, accessor)
 gen_func_definition_end = lambda dictionary, node_name: \
-        'return;\n}' if node_name == "TreeNode" else 'DumpFE("}");\nreturn;\n}'
+        'return;\n}' if node_name == "TreeNode" else 'DumpFE();\n}\nreturn;\n}'
 
 #
 # Generate source files for dumping AST
@@ -402,11 +402,14 @@ astdump_init = [
         'void Dump(const std::string& msg) {',
         'std::cout << indstr.substr(0, indent) << msg << std::endl;',
         '}', '',
-        'void DumpFB(const std::string& msg) {',
-        'std::cout << indstr.substr(0, indent + 2) << msg << std::endl;', 'indent += 4;',
+        'TreeNode* DumpFB(const std::string& msg, TreeNode* node) {',
+        'std::cout << indstr.substr(0, indent + 2) << msg;',
+        'if (node == nullptr)', 'std::cout << ": null" << std::endl;',
+        'else {', 'indent += 4;', 'std::cout << " {" << std::endl;', 'DumpBase(node);', '}',
+        'return node;',
         '}', '',
-        'void DumpFE(const std::string& msg) {',
-        'indent -= 4;', 'std::cout << indstr.substr(0, indent + 2) << msg << std::endl;',
+        'void DumpFE() {',
+        'indent -= 4;', 'std::cout << indstr.substr(0, indent + 2) << "}" << std::endl;',
         '}', '',
         'void DumpLB(const std::string& msg) {',
         'std::cout << indstr.substr(0, indent) << msg << std::endl;', 'indent += 4;',
