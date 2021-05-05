@@ -177,7 +177,6 @@ public:
   TreeNode* BuildSwitchLabel();
   TreeNode* BuildDefaultSwitchLabel();
   TreeNode* BuildOneCase();
-  TreeNode* BuildAllCases();
   TreeNode* BuildSwitch();
 
   // Exception, throw

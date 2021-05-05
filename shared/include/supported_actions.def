@@ -129,7 +129,6 @@ ACTION(BuildDeleteOperation)
 ACTION(BuildSwitchLabel)
 ACTION(BuildDefaultSwitchLabel)
 ACTION(BuildOneCase)
-ACTION(BuildAllCases)
 ACTION(BuildSwitch)
 
 // Exceptions, Throws

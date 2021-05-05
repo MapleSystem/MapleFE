@@ -896,8 +896,6 @@ void SwitchCaseNode::AddStmt(TreeNode *t) {
 void SwitchCaseNode::Dump(unsigned ind) {
 }
 
-extern ASTBuilder gASTBuilder;
-
 void SwitchNode::AddCase(TreeNode *t) {
   if (t->IsPass()) {
     PassNode *cases = (PassNode*)t;

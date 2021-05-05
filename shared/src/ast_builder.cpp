@@ -701,43 +701,6 @@ SwitchCaseNode* ASTBuilder::SwitchLabelToCase(SwitchLabelNode *label) {
   return case_node;
 }
 
-// This takes one argument, which is all SwitchCaseNode-s. It could be
-// a PassNode. We don't handle it at all. We simply forward this tree node
-// up to the parent, which should be final Switch Node.
-TreeNode* ASTBuilder::BuildAllCases() {
-  if (mTrace)
-    std::cout << "In BuildAllCases " << std::endl;
-
-  MASSERT(mParams.size() == 1 && "BuildAllCases has NO 1 params?");
-  Param p_cases = mParams[0];
-  MASSERT(!p_cases.mIsEmpty);
-  MASSERT(p_cases.mIsTreeNode && "Cases in BuildAllCases is not a tree.");
-  TreeNode *cases = p_cases.mData.mTreeNode;
-
-  // We want to make sure every tree node after BuildAllCases() is
-  // a SwitchCaseNode. This will ease the handling in future AST process.
-  // So for those SwitchLabelNode which only have no statement, will be
-  // converted to a SwitchCaseNode.
-
-  if (cases->IsPass()) {
-    PassNode *pass = (PassNode*)cases;
-    for (unsigned i = 0; i < pass->GetChildrenNum(); i++) {
-      TreeNode *child = pass->GetChild(i);
-      if (child->IsSwitchLabel()) {
-        SwitchCaseNode *newcase = SwitchLabelToCase((SwitchLabelNode*)child);
-        pass->SetChild(i, newcase);
-      }
-    }
-  } else if (cases->IsSwitchLabel()) {
-    SwitchLabelNode *label = (SwitchLabelNode*)cases;
-    SwitchCaseNode *newcase = SwitchLabelToCase(label);
-    cases = newcase;
-  }
-
-  mLastTreeNode = cases;
-  return cases;
-}
-
 TreeNode* ASTBuilder::BuildSwitch() {
   if (mTrace)
     std::cout << "In BuildSwitch " << std::endl;
