@@ -70,7 +70,7 @@ namespace maplefe {
     mCurrentBB->AddStatement(node);
     A2C_BB *exit = mCurrentFunction->GetExitBB();
     mCurrentBB->AddSuccessor(exit);
-    mCurrentBB->SetKind(BK_Return);
+    mCurrentBB->SetKind(BK_Terminated);
     return node;
   }
 
@@ -132,18 +132,30 @@ namespace maplefe {
     // Create a BB for loop body
     mCurrentBB = mModule->NewBB();
     current_bb->AddSuccessor(mCurrentBB);
+    // Create a new BB for getting out of the loop
+    A2C_BB *loop_exit = mModule->NewBB();
 
+    // Push loop_exit and current_bb to mTargetBBs for 'break' and 'continue'
+    mTargetBBs.push(std::pair<A2C_BB*,A2C_BB*>{loop_exit, current_bb});
     VisitTreeNode(node->GetBody());
+    mTargetBBs.pop();
+
     for (unsigned i = 0; i < node->GetUpdatesNum(); ++i) {
       VisitTreeNode(node->GetUpdateAtIndex(i));
     }
     // Add a back edge to loop header
     mCurrentBB->AddSuccessor(current_bb);
-
-    // Create a new BB to get out of the loop
-    A2C_BB *loop_exit = mModule->NewBB();
     current_bb->AddSuccessor(loop_exit);
     mCurrentBB = loop_exit;
+    return node;
+  }
+
+  BreakNode *ModuleVisitor::VisitBreakNode(BreakNode *node) {
+    mCurrentBB->AddStatement(node);
+    // Get the target BB for a loop or switch statement
+    A2C_BB *exit = mTargetBBs.top().first;
+    mCurrentBB->AddSuccessor(exit);
+    mCurrentBB->SetKind(BK_Terminated);
     return node;
   }
 

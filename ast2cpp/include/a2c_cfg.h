@@ -16,6 +16,8 @@
 #ifndef __A2C_CFG_HEADER__
 #define __A2C_CFG_HEADER__
 
+#include <stack>
+#include <utility>
 #include "ast_module.h"
 #include "ast.h"
 #include "ast_type.h"
@@ -26,12 +28,12 @@ namespace maplefe {
   enum BBKind {
     BK_Unknown,     // Uninitialized
     BK_Uncond,      // BB for unconditional branch
-    BK_Block,       // BB for block/compound statement
+    BK_Block,       // BB for a block/compound statement
     BK_Branch,      // BB ends up with a predicate for true/false branches
-    BK_LoopHeader,  // BB for a loop header of for, for/in, for/of, while, do/while statements
+    BK_LoopHeader,  // BB for a loop header of a for, for/in, for/of, while, or do/while statement
     BK_Switch,      // BB for a switch statement
     BK_Yield,       // Yield BB eneded with a yield statement
-    BK_Return       // Return BB endded with a return statement
+    BK_Terminated   // Return BB endded with a return/break/continue statement
   };
 
   enum BBAttribute {
@@ -77,13 +79,13 @@ namespace maplefe {
       void      SetSwitchCaseExpr(TreeNode *node) {mSwitchCaseExpr = node;}
       TreeNode *GetSwitchCaseExpr()               {return mSwitchCaseExpr;}
 
-      void AddStatement(TreeNode *stmt) {if(mKind != BK_Return) mStatements.PushBack(stmt);}
+      void AddStatement(TreeNode *stmt) {if(mKind != BK_Terminated) mStatements.PushBack(stmt);}
 
       unsigned  GetStatementsNum()              {return mStatements.GetNum();}
       TreeNode* GetStatementAtIndex(unsigned i) {return mStatements.ValueAtIndex(i);}
 
       void AddSuccessor(A2C_BB *succ) {
-        if(mKind == BK_Return)
+        if(mKind == BK_Terminated)
           return;
         mSuccessors.PushBack(succ);
         succ->mPredecessors.PushBack(this);
@@ -160,6 +162,7 @@ namespace maplefe {
       void Dump(char *msg);
   };
 
+  using TargetBBStack = std::stack<std::pair<A2C_BB*,A2C_BB*>>;
   class ModuleVisitor : public AstVisitor {
     private:
       A2C_Module   *mModule;
@@ -167,6 +170,7 @@ namespace maplefe {
 
       A2C_Function *mCurrentFunction;
       A2C_BB       *mCurrentBB;
+      TargetBBStack mTargetBBs;
 
     public:
       explicit ModuleVisitor(A2C_Module *m, bool t, bool base = false)
@@ -181,6 +185,7 @@ namespace maplefe {
       CondBranchNode *VisitCondBranchNode(CondBranchNode *node);
       BlockNode *VisitBlockNode(BlockNode *node);
       ForLoopNode *VisitForLoopNode(ForLoopNode *node);
+      BreakNode *VisitBreakNode(BreakNode *node);
 
       DeclNode *VisitDeclNode(DeclNode *node);
       CallNode *VisitCallNode(CallNode *node);
