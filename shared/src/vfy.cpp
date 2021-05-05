@@ -308,6 +308,9 @@ void Verifier::VerifyCondBranch(CondBranchNode *tree){
 void Verifier::VerifyBreak(BreakNode *tree){
 }
 
+void Verifier::VerifyContinue(ContinueNode *tree){
+}
+
 void Verifier::VerifyForLoop(ForLoopNode *tree){
 }
 

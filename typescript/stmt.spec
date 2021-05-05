@@ -546,7 +546,7 @@ rule Statement : ONEOF(
   ExpressionStatement,
   IfStatement,
   BreakableStatement,
-#  ContinueStatement[?Yield]
+  ContinueStatement,
   BreakStatement,
   ReturnStatement)
 #  WithStatement[?Yield, ?Return]
@@ -795,6 +795,11 @@ rule IterationStatement : ONEOF(
 ##rule ContinueStatement[Yield] :
 ##  continue ;
 ##  continue [no LineTerminator here] LabelIdentifier[?Yield] ;
+rule ContinueStatement : ONEOF(
+  "continue" + ';'
+  "continue" + LabelIdentifier + ';')
+  attr.action.%1 : BuildContinue()
+  attr.action.%2 : BuildContinue(%2)
 
 ##-----------------------------------
 ##rule BreakStatement[Yield] :

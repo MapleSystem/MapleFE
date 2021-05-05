@@ -1,0 +1,19 @@
+Matched 54 tokens.
+============= Module ===========
+== Sub Tree ==
+for ( )
+  cond-branch cond:i LT 5
+  true branch :
+    console.log(i," is less than 5")
+    continue:
+
+  false branch :
+
+  cond-branch cond:i EQ 8
+  true branch :
+    break:
+
+  false branch :
+
+  console.log(i," is greater than 4")
+

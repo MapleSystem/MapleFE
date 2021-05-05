@@ -897,6 +897,12 @@ maple::BaseNode *A2M::ProcessBreak(StmtExprKind skind, TreeNode *tnode, BlockNod
   return nullptr;
 }
 
+maple::BaseNode *A2M::ProcessContinue(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
+  NOTYETIMPL("ProcessContinue()");
+  ContinueNode *node = static_cast<ContinueNode *>(tnode);
+  return nullptr;
+}
+
 maple::BaseNode *A2M::ProcessLoopCondBody(StmtExprKind skind, TreeNode *cond, TreeNode *body, BlockNode *block) {
   maple::BaseNode *mircond = ProcessNode(SK_Expr, cond, block);
   if (!mircond) {

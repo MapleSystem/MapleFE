@@ -511,6 +511,31 @@ TreeNode* ASTBuilder::BuildBreak() {
   return break_node;
 }
 
+// BuildContinue takes 1) one argument, an identifer node
+//                  2) empty
+TreeNode* ASTBuilder::BuildContinue() {
+  if (mTrace)
+    std::cout << "In BuildContinue " << std::endl;
+
+  ContinueNode *continue_node = (ContinueNode*)mTreePool->NewTreeNode(sizeof(ContinueNode));
+  new (continue_node) ContinueNode();
+
+  TreeNode *target = NULL;
+
+  if (mParams.size() == 1) {
+    Param p_target = mParams[0];
+    if (!p_target.mIsEmpty) {
+      MASSERT(p_target.mIsTreeNode && "Target in BuildContinue is not a tree.");
+      target = p_target.mData.mTreeNode;
+      MASSERT(target->IsIdentifier() && "Target in BuildContinue is not an identifier.");
+      continue_node->SetTarget(target);
+    }
+  }
+
+  mLastTreeNode = continue_node;
+  return continue_node;
+}
+
 // BuildForLoop takes four arguments.
 //  1. init statement, could be a list
 //  2. cond expression, should be a boolean expresion.

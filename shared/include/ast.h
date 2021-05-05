@@ -803,6 +803,20 @@ public:
   void      Dump(unsigned);
 };
 
+
+// Continue statement. Continue targets could be one identifier or empty.
+class ContinueNode : public TreeNode {
+private:
+  TreeNode* mTarget;
+public:
+  ContinueNode() {mKind = NK_Continue; mTarget = NULL;}
+  ~ContinueNode(){}
+
+  TreeNode* GetTarget()           {return mTarget;}
+  void      SetTarget(TreeNode* t){mTarget = t;}
+  void      Dump(unsigned);
+};
+
 class ForLoopNode : public TreeNode {
 private:
   SmallVector<TreeNode *> mInits;

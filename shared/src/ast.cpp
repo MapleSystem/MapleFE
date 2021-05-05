@@ -833,6 +833,15 @@ void BreakNode::Dump(unsigned ind) {
   DUMP_RETURN();
 }
 
+void ContinueNode::Dump(unsigned ind) {
+  DumpLabel(ind);
+  DumpIndentation(ind);
+  DUMP0_NORETURN("continue:");
+  if (GetTarget())
+    GetTarget()->Dump(0);
+  DUMP_RETURN();
+}
+
 void ForLoopNode::Dump(unsigned ind) {
   DumpLabel(ind);
   DumpIndentation(ind);

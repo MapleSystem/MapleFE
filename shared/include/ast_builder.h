@@ -166,6 +166,7 @@ public:
   TreeNode* AddCondBranchFalseStatement();
   TreeNode* AddLabel();
   TreeNode* BuildBreak();
+  TreeNode* BuildContinue();
   TreeNode* BuildForLoop();
   TreeNode* BuildWhileLoop();
   TreeNode* BuildDoLoop();
