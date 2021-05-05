@@ -803,6 +803,8 @@ rule IterationStatement : ONEOF(
 rule BreakStatement : ONEOF(
   "break" + ';'
   "break" + LabelIdentifier + ';')
+  attr.action.%1 : BuildBreak()
+  attr.action.%2 : BuildBreak(%2)
 
 ##-----------------------------------
 ##rule ReturnStatement[Yield] :

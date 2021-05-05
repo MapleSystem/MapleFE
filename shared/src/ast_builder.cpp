@@ -486,7 +486,8 @@ TreeNode* ASTBuilder::AddLabel() {
   return tree;
 }
 
-// BuildBreak takes one argument, an identifer node of empty.
+// BuildBreak takes 1) one argument, an identifer node
+//                  2) empty
 TreeNode* ASTBuilder::BuildBreak() {
   if (mTrace)
     std::cout << "In BuildBreak " << std::endl;
@@ -494,13 +495,16 @@ TreeNode* ASTBuilder::BuildBreak() {
   BreakNode *break_node = (BreakNode*)mTreePool->NewTreeNode(sizeof(BreakNode));
   new (break_node) BreakNode();
 
-  MASSERT(mParams.size() == 1 && "BuildBreak has NO 1 params?");
-  Param p_target = mParams[0];
-  if (!p_target.mIsEmpty) {
-    MASSERT(p_target.mIsTreeNode && "Target in BuildBreak is not a tree.");
-    TreeNode *target = p_target.mData.mTreeNode;
-    MASSERT(target->IsIdentifier() && "Target in BuildBreak is not an identifier.");
-    break_node->SetTarget(target);
+  TreeNode *target = NULL;
+
+  if (mParams.size() == 1) {
+    Param p_target = mParams[0];
+    if (!p_target.mIsEmpty) {
+      MASSERT(p_target.mIsTreeNode && "Target in BuildBreak is not a tree.");
+      target = p_target.mData.mTreeNode;
+      MASSERT(target->IsIdentifier() && "Target in BuildBreak is not an identifier.");
+      break_node->SetTarget(target);
+    }
   }
 
   mLastTreeNode = break_node;
