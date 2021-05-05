@@ -768,7 +768,7 @@ rule IfStatement : ONEOF(
 ##  for ( var ForBinding[?Yield] of AssignmentExpression[In, ?Yield] ) Statement[?Yield, ?Return]
 ##  for ( ForDeclaration[?Yield] of AssignmentExpression[In, ?Yield] ) Statement[?Yield, ?Return]
 rule IterationStatement : ONEOF(
-##  do Statement[?Yield, ?Return] while ( Expression[In, ?Yield] ) ;
+  "do" + Statement + "while" + '(' + Expression + ')' + ';',
   "while" + '(' + Expression + ')' + Statement,
   "for" + '(' + ZEROORONE(Expression) + ';' + ZEROORONE(Expression) + ';' + ZEROORONE(Expression) + ')' + Statement,
   "for" + '(' + "var" + VariableDeclarationList + ';' + ZEROORONE(Expression) + ';' + ZEROORONE(Expression) + ')' + Statement,
@@ -780,9 +780,10 @@ rule IterationStatement : ONEOF(
 ##  for ( var ForBinding[?Yield] of AssignmentExpression[In, ?Yield] ) Statement[?Yield, ?Return]
 ##  for ( ForDeclaration[?Yield] of AssignmentExpression[In, ?Yield] ) Statement[?Yield, ?Return]
   )
-  attr.action.%1 : BuildWhileLoop(%3, %5)
-  attr.action.%2 : BuildForLoop(%3, %5, %7, %9)
-  attr.action.%3 : BuildForLoop(%4, %6, %8, %10)
+  attr.action.%1 : BuildDoLoop(%5, %2)
+  attr.action.%2 : BuildWhileLoop(%3, %5)
+  attr.action.%3 : BuildForLoop(%3, %5, %7, %9)
+  attr.action.%4 : BuildForLoop(%4, %6, %8, %10)
 
 ##-----------------------------------
 ##rule ForDeclaration[Yield] :

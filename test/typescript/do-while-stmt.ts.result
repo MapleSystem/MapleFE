@@ -1,0 +1,10 @@
+Matched 7 tokens.
+Matched 27 tokens.
+============= Module ===========
+== Sub Tree ==
+js_var Decl: k=1
+== Sub Tree ==
+do   console.log(k)
+      kInc
+
+while k LT 10
