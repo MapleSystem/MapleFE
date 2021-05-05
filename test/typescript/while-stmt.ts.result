@@ -14,4 +14,3 @@ while k LT 10  console.log(k)
       kInc
 
 
-
