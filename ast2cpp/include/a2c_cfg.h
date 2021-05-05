@@ -183,9 +183,10 @@ namespace maplefe {
       FunctionNode *VisitFunctionNode(FunctionNode *node);
       ReturnNode *VisitReturnNode(ReturnNode *node);
       CondBranchNode *VisitCondBranchNode(CondBranchNode *node);
-      BlockNode *VisitBlockNode(BlockNode *node);
       ForLoopNode *VisitForLoopNode(ForLoopNode *node);
       BreakNode *VisitBreakNode(BreakNode *node);
+      SwitchNode *VisitSwitchNode(SwitchNode *node);
+      BlockNode *VisitBlockNode(BlockNode *node);
 
       DeclNode *VisitDeclNode(DeclNode *node);
       CallNode *VisitCallNode(CallNode *node);

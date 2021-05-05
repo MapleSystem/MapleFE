@@ -159,6 +159,47 @@ namespace maplefe {
     return node;
   }
 
+  SwitchNode *ModuleVisitor::VisitSwitchNode(SwitchNode *node) {
+    mCurrentBB->SetKind(BK_Switch);
+    TreeNode *cond = node->GetCond();
+    // Set switch expression of current BB
+    mCurrentBB->SetSwitchCaseExpr(cond);
+    //VisitTreeNode(cond);
+
+    // Save current BB
+    A2C_BB *current_bb = mCurrentBB;
+
+    // Create a new BB for getting out of the switch block
+    A2C_BB *exit = mModule->NewBB();
+    mTargetBBs.push(std::pair<A2C_BB*,A2C_BB*>{exit,
+        (mTargetBBs.empty() ? nullptr : mTargetBBs.top().second)});
+    A2C_BB *prev_block = nullptr;
+    for (unsigned i = 0; i < node->GetCasesNum(); ++i) {
+      A2C_BB *case_bb = mModule->NewBB();
+      current_bb->AddSuccessor(case_bb);
+
+      mCurrentBB = mModule->NewBB();
+      case_bb->AddSuccessor(mCurrentBB);
+      if(prev_block)
+        prev_block->AddSuccessor(mCurrentBB);
+
+      TreeNode *case_node = node->GetCaseAtIndex(i);
+
+      // case_bb->SetSwitchCaseExpr(case_node);
+
+      VisitTreeNode(case_node);
+
+      prev_block = mCurrentBB;
+      current_bb = case_bb;
+    }
+    mTargetBBs.pop();
+
+    prev_block->AddSuccessor(exit);
+    current_bb->AddSuccessor(exit);
+    mCurrentBB = exit;
+    return node;
+  }
+
   BlockNode *ModuleVisitor::VisitBlockNode(BlockNode *node) {
     // Check if current block constains any JS_Let or JS_Const DeclNode
     unsigned i, num = node->GetChildrenNum();
