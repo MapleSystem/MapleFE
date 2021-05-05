@@ -150,6 +150,38 @@ namespace maplefe {
     return node;
   }
 
+  WhileLoopNode *ModuleVisitor::VisitWhileLoopNode(WhileLoopNode *node) {
+    A2C_BB *current_bb = mCurrentBB;
+    // Create a new BB for loop header
+    mCurrentBB = mModule->NewBB();
+    current_bb->AddSuccessor(mCurrentBB);
+    mCurrentBB->SetKind(BK_LoopHeader);
+    // Set current_bb to be loop header
+    current_bb = mCurrentBB;
+
+    TreeNode *cond = node->GetCond();
+    // Set predicate of current BB
+    mCurrentBB->SetPredicate(cond);
+    //VisitTreeNode(node->GetCond());
+
+    // Create a BB for loop body
+    mCurrentBB = mModule->NewBB();
+    current_bb->AddSuccessor(mCurrentBB);
+    // Create a new BB for getting out of the loop
+    A2C_BB *loop_exit = mModule->NewBB();
+
+    // Push loop_exit and current_bb to mTargetBBs for 'break' and 'continue'
+    mTargetBBs.push(std::pair<A2C_BB*,A2C_BB*>{loop_exit, current_bb});
+    VisitTreeNode(node->GetBody());
+    mTargetBBs.pop();
+
+    // Add a back edge to loop header
+    mCurrentBB->AddSuccessor(current_bb);
+    current_bb->AddSuccessor(loop_exit);
+    mCurrentBB = loop_exit;
+    return node;
+  }
+
   ContinueNode *ModuleVisitor::VisitContinueNode(ContinueNode *node) {
     mCurrentBB->AddStatement(node);
     // Get the loop header
