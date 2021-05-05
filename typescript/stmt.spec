@@ -322,9 +322,10 @@ rule LeftHandSideExpression : ONEOF(NewExpression, CallExpression)
 ##  LeftHandSideExpression[?Yield] [no LineTerminator here] --
 
 rule PostfixExpression : ONEOF(
-  LeftHandSideExpression)
-#  LeftHandSideExpression[?Yield] [no LineTerminator here] ++
-#  LeftHandSideExpression[?Yield] [no LineTerminator here] --
+  LeftHandSideExpression,
+  LeftHandSideExpression + "++",
+  LeftHandSideExpression + "--")
+  attr.action.%2,%3 : BuildPostfixOperation(%2, %1)
 
 ##-----------------------------------
 ##rule UnaryExpression[Yield] :
@@ -768,7 +769,7 @@ rule IfStatement : ONEOF(
 ##  for ( ForDeclaration[?Yield] of AssignmentExpression[In, ?Yield] ) Statement[?Yield, ?Return]
 rule IterationStatement : ONEOF(
 ##  do Statement[?Yield, ?Return] while ( Expression[In, ?Yield] ) ;
-##  while ( Expression[In, ?Yield] ) Statement[?Yield, ?Return]
+  "while" + '(' + Expression + ')' + Statement,
   "for" + '(' + ZEROORONE(Expression) + ';' + ZEROORONE(Expression) + ';' + ZEROORONE(Expression) + ')' + Statement,
   "for" + '(' + "var" + VariableDeclarationList + ';' + ZEROORONE(Expression) + ';' + ZEROORONE(Expression) + ')' + Statement,
 ##  for ( LexicalDeclaration[?Yield] Expression[In, ?Yield]opt ; Expression[In, ?Yield]opt ) Statement[?Yield, ?Return]
@@ -779,8 +780,9 @@ rule IterationStatement : ONEOF(
 ##  for ( var ForBinding[?Yield] of AssignmentExpression[In, ?Yield] ) Statement[?Yield, ?Return]
 ##  for ( ForDeclaration[?Yield] of AssignmentExpression[In, ?Yield] ) Statement[?Yield, ?Return]
   )
-  attr.action.%1: BuildForLoop(%3, %5, %7, %9)
-  attr.action.%2: BuildForLoop(%4, %6, %8, %10)
+  attr.action.%1 : BuildWhileLoop(%3, %5)
+  attr.action.%2 : BuildForLoop(%3, %5, %7, %9)
+  attr.action.%3 : BuildForLoop(%4, %6, %8, %10)
 
 ##-----------------------------------
 ##rule ForDeclaration[Yield] :
