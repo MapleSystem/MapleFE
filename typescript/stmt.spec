@@ -821,6 +821,7 @@ rule ReturnStatement :ONEOF("return" + ';',
 ##  switch ( Expression[In, ?Yield] ) CaseBlock[?Yield, ?Return]
 rule SwitchStatement :
   "switch" + '(' + Expression + ')' + CaseBlock
+  attr.action : BuildSwitch(%3, %5)
 
 ##-----------------------------------
 ##rule CaseBlock[Yield, Return] :
@@ -843,12 +844,16 @@ rule CaseClauses : ONEOF(
 ##  case Expression[In, ?Yield] : StatementList[?Yield, ?Return]opt
 rule CaseClause :
   "case" + Expression + ':' + ZEROORONE(StatementList)
+  attr.action : BuildSwitchLabel(%2)
+  attr.action : BuildOneCase(%4)
 
 ##-----------------------------------
 ##rule DefaultClause[Yield, Return] :
 ##  default : StatementList[?Yield, ?Return]opt
 rule DefaultClause :
   "default" + ':' + ZEROORONE(StatementList)
+  attr.action : BuildDefaultSwitchLabel()
+  attr.action : BuildOneCase(%3)
 
 ##-----------------------------------
 ##rule LabelledStatement[Yield, Return] :

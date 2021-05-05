@@ -369,6 +369,8 @@ rule IfThenStatement : "if" + '(' + Expression + ')' + Statement
   attr.action: BuildCondBranch(%3)
   attr.action: AddCondBranchTrueStatement(%5)
 
+## " This line is to make my vim show right color for the below contents.
+
 rule IfThenElseStatement : "if" + '(' + Expression + ')' + StatementNoShortIf + "else" + Statement
   attr.action: BuildCondBranch(%3)
   attr.action: AddCondBranchTrueStatement(%5)

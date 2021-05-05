@@ -652,10 +652,9 @@ TreeNode* ASTBuilder::BuildDefaultSwitchLabel() {
   return label;
 }
 
-// BuildOneCase takes two arguments, the expression of a label and a
-// and the statements under the label. Both the label and the statements
-// could be a PassNode, and I need look into it. We don't want to carry
-// PassNode into the SwitchCaseNode.
+// BuildOneCase takes 
+// 1. two arguments, the expression of a label and the statements under the label.
+// 2. One arguemnt, which is the statements. The label is mLastTreeNode.
 
 TreeNode* ASTBuilder::BuildOneCase() {
   if (mTrace)
@@ -665,18 +664,29 @@ TreeNode* ASTBuilder::BuildOneCase() {
     (SwitchCaseNode*)mTreePool->NewTreeNode(sizeof(SwitchCaseNode));
   new (case_node) SwitchCaseNode();
 
-  MASSERT(mParams.size() == 2 && "BuildOneCase has NO 1 params?");
+  TreeNode *label = NULL;
+  TreeNode *stmt = NULL;
 
-  Param p_label = mParams[0];
-  MASSERT(!p_label.mIsEmpty);
-  MASSERT(p_label.mIsTreeNode && "Labels in BuildOneCase is not a tree.");
-  TreeNode *label = p_label.mData.mTreeNode;
+  if (mParams.size() == 2) {
+    Param p_label = mParams[0];
+    MASSERT(!p_label.mIsEmpty);
+    MASSERT(p_label.mIsTreeNode && "Labels in BuildOneCase is not a tree.");
+    label = p_label.mData.mTreeNode;
+
+    Param p_stmt = mParams[1];
+    MASSERT(!p_stmt.mIsEmpty);
+    MASSERT(p_stmt.mIsTreeNode && "Stmts in BuildOneCase is not a tree.");
+    stmt = p_stmt.mData.mTreeNode;
+  } else {
+    label = mLastTreeNode;
+
+    Param p_stmt = mParams[0];
+    MASSERT(!p_stmt.mIsEmpty);
+    MASSERT(p_stmt.mIsTreeNode && "Stmts in BuildOneCase is not a tree.");
+    stmt = p_stmt.mData.mTreeNode;
+  }
+
   case_node->AddLabel(label);
-
-  Param p_stmt = mParams[1];
-  MASSERT(!p_stmt.mIsEmpty);
-  MASSERT(p_stmt.mIsTreeNode && "Stmts in BuildOneCase is not a tree.");
-  TreeNode *stmt = p_stmt.mData.mTreeNode;
   case_node->AddStmt(stmt);
 
   mLastTreeNode = case_node;
@@ -748,6 +758,11 @@ TreeNode* ASTBuilder::BuildSwitch() {
   MASSERT(!p_cases.mIsEmpty);
   MASSERT(p_cases.mIsTreeNode && "Cases in BuildSwitch is not a tree.");
   TreeNode *cases = p_cases.mData.mTreeNode;
+
+  // in some case, it's just a label without statements. I created a SwitchCaseNode for it.
+  if (cases->IsSwitchLabel())
+    cases = SwitchLabelToCase((SwitchLabelNode*)cases);
+
   switch_node->AddCase(cases);
 
   mLastTreeNode = switch_node;
