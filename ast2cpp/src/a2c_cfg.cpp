@@ -252,12 +252,23 @@ namespace maplefe {
       case_bb->SetKind(BK_Case);
       current_bb->AddSuccessor(case_bb);
 
-      mCurrentBB = mModule->NewBB();
-      case_bb->AddSuccessor(mCurrentBB);
+      TreeNode *case_node = node->GetCaseAtIndex(i);
+      bool is_default = false;
+      if(case_node->GetKind() == NK_SwitchCase) {
+        TreeNode *label_node = static_cast<SwitchCaseNode *>(case_node)->GetLabelAtIndex(0);
+        if(label_node->GetKind() == NK_SwitchLabel)
+          is_default = static_cast<SwitchLabelNode *>(label_node)->IsDefault();
+      }
+
+      if(is_default)
+        mCurrentBB = case_bb;
+      else {
+        mCurrentBB = mModule->NewBB();
+        case_bb->AddSuccessor(mCurrentBB);
+      }
+
       if(prev_block)
         prev_block->AddSuccessor(mCurrentBB);
-
-      TreeNode *case_node = node->GetCaseAtIndex(i);
 
       case_bb->SetSwitchExpr(switch_expr);
       case_bb->SetPredicate(case_node);
@@ -270,7 +281,8 @@ namespace maplefe {
     mTargetBBs.pop();
 
     prev_block->AddSuccessor(exit);
-    current_bb->AddSuccessor(exit);
+    if(prev_block != current_bb)
+      current_bb->AddSuccessor(exit);
     mCurrentBB = exit;
     return node;
   }
