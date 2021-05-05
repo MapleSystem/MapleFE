@@ -185,6 +185,7 @@ namespace maplefe {
       ReturnNode *VisitReturnNode(ReturnNode *node);
       CondBranchNode *VisitCondBranchNode(CondBranchNode *node);
       ForLoopNode *VisitForLoopNode(ForLoopNode *node);
+      ContinueNode *VisitContinueNode(ContinueNode *node);
       BreakNode *VisitBreakNode(BreakNode *node);
       SwitchNode *VisitSwitchNode(SwitchNode *node);
       BlockNode *VisitBlockNode(BlockNode *node);

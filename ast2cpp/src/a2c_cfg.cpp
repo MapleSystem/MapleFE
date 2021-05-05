@@ -150,6 +150,15 @@ namespace maplefe {
     return node;
   }
 
+  ContinueNode *ModuleVisitor::VisitContinueNode(ContinueNode *node) {
+    mCurrentBB->AddStatement(node);
+    // Get the loop header
+    A2C_BB *loop_header = mTargetBBs.top().second;
+    mCurrentBB->AddSuccessor(loop_header);
+    mCurrentBB->SetKind(BK_Terminated);
+    return node;
+  }
+
   BreakNode *ModuleVisitor::VisitBreakNode(BreakNode *node) {
     mCurrentBB->AddStatement(node);
     // Get the target BB for a loop or switch statement
