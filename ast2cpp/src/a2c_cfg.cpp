@@ -161,10 +161,10 @@ namespace maplefe {
 
   SwitchNode *ModuleVisitor::VisitSwitchNode(SwitchNode *node) {
     mCurrentBB->SetKind(BK_Switch);
-    TreeNode *cond = node->GetCond();
+    TreeNode *switch_expr = node->GetCond();
     // Set switch expression of current BB
-    mCurrentBB->SetSwitchCaseExpr(cond);
-    //VisitTreeNode(cond);
+    mCurrentBB->SetSwitchExpr(switch_expr);
+    //VisitTreeNode(switch_expr);
 
     // Save current BB
     A2C_BB *current_bb = mCurrentBB;
@@ -176,6 +176,7 @@ namespace maplefe {
     A2C_BB *prev_block = nullptr;
     for (unsigned i = 0; i < node->GetCasesNum(); ++i) {
       A2C_BB *case_bb = mModule->NewBB();
+      case_bb->SetKind(BK_Case);
       current_bb->AddSuccessor(case_bb);
 
       mCurrentBB = mModule->NewBB();
@@ -185,7 +186,8 @@ namespace maplefe {
 
       TreeNode *case_node = node->GetCaseAtIndex(i);
 
-      // case_bb->SetSwitchCaseExpr(case_node);
+      case_bb->SetSwitchExpr(switch_expr);
+      case_bb->SetPredicate(case_node);
 
       VisitTreeNode(case_node);
 

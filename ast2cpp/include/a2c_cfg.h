@@ -32,6 +32,7 @@ namespace maplefe {
     BK_Branch,      // BB ends up with a predicate for true/false branches
     BK_LoopHeader,  // BB for a loop header of a for, for/in, for/of, while, or do/while statement
     BK_Switch,      // BB for a switch statement
+    BK_Case,        // BB for a case in switch statement
     BK_Yield,       // Yield BB eneded with a yield statement
     BK_Terminated   // Return BB endded with a return/break/continue statement
   };
@@ -55,7 +56,7 @@ namespace maplefe {
       BBAttribute              mAttr;
       BBIndex                  mId;             // unique BB id
       TreeNode                *mPredicate;      // a predicate for true/false branches
-      TreeNode                *mSwitchCaseExpr; // switch/case expression or nullptr
+      TreeNode                *mSwitchExpr;     // switch/case expression or nullptr
       SmallVector<TreeNode *>  mStatements;     // all statement nodes
       SmallList<A2C_BB *>      mSuccessors;     // for BK_Branch: [0] true branch, [1] false branch
       SmallList<A2C_BB *>      mPredecessors;
@@ -76,8 +77,8 @@ namespace maplefe {
       void      SetPredicate(TreeNode *node) {mPredicate = node;}
       TreeNode *GetPredicate()               {return mPredicate;}
 
-      void      SetSwitchCaseExpr(TreeNode *node) {mSwitchCaseExpr = node;}
-      TreeNode *GetSwitchCaseExpr()               {return mSwitchCaseExpr;}
+      void      SetSwitchExpr(TreeNode *node) {mSwitchExpr = node;}
+      TreeNode *GetSwitchExpr()               {return mSwitchExpr;}
 
       void AddStatement(TreeNode *stmt) {if(mKind != BK_Terminated) mStatements.PushBack(stmt);}
 
