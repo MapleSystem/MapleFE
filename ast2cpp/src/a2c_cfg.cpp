@@ -307,7 +307,7 @@ namespace maplefe {
       if(decl->GetProp() == JS_Let || decl->GetProp() == JS_Const)
         break;
     }
-    if(i <= num)
+    if(i >= num)
       // Do not create BB for current block when no JS_Let or JS_Const DeclNode inside
       AstVisitor::VisitBlockNode(node);
     else {
@@ -316,18 +316,19 @@ namespace maplefe {
       A2C_BB *current_bb = mCurrentBB;
       current_bb->SetKind(BK_Block);
 
+      // Create a BB for the join point
+      A2C_BB *join = mModule->NewBB(BK_Join);
+
       // Create a new BB for current block node
-      mCurrentBB = mModule->NewBB(BK_Block);
+      mCurrentBB = mModule->NewBB(BK_Uncond);
       current_bb->AddSuccessor(mCurrentBB);
 
       // Visit all children nodes
       AstVisitor::VisitBlockNode(node);
 
-      // Create a BB for the join point
-      A2C_BB *join = mModule->NewBB(BK_Join);
       mCurrentBB->AddSuccessor(join);
       // This edge is to determine the block range for JS_Let or JS_Const DeclNode
-      current_bb->AddSuccessor(join);
+      //current_bb->AddSuccessor(join);
 
       mCurrentBB = join;
     }
@@ -376,7 +377,7 @@ namespace maplefe {
     // Dump CFG in dot format
     std::string dot("---\ndigraph CFG {\n");
     dot += BBDotNode(entry, "box") + BBDotNode(exit, "doubleoctagon");
-    const char* fake = " [style=dashed];";
+    const char* scoped = " [style=dashed color=grey];";
     while(!bb_stack.empty()) {
       A2C_BB *bb = bb_stack.top();
       bb_stack.pop();
@@ -386,8 +387,8 @@ namespace maplefe {
         A2C_BB *curr = bb->GetSuccessorAtIndex(i);
         std::cout << "BB" << curr->GetId() << " ";
         dot += "BB" + std::to_string(bb->GetId()) + " -> BB" + std::to_string(curr->GetId())
-          + (bb == entry ? (curr == exit ? fake : ";") :
-              succ_num == 1 ? ";" : i ? bb->GetKind() == BK_Block ? fake :
+          + (bb == entry ? (curr == exit ? scoped : ";") :
+              succ_num == 1 ? ";" : i ? bb->GetKind() == BK_Block ? scoped :
               " [color=darkred];" : " [color=darkgreen];") + "\n";
         if(visited.find(curr) == visited.end()) {
           bb_stack.push(curr);
