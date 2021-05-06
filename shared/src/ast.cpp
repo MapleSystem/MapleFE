@@ -1174,9 +1174,12 @@ void FunctionNode::CleanUp() {
 void FunctionNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   if (mIsConstructor)
-    DUMP1_NORETURN("constructor ", mName);
+    DUMP0_NORETURN("constructor  ");
   else
-    DUMP1_NORETURN("func ", mName);
+    DUMP0_NORETURN("func  ");
+
+  if (mName)
+    DUMP0_NORETURN(mName);
 
   // dump parameters
   DUMP0_NORETURN("(");

@@ -64,7 +64,7 @@ rule PrimaryExpression : ONEOF(
   Literal,
   ArrayLiteral,
   ObjectLiteral,
-#  FunctionExpression
+  FunctionExpression,
 #  ClassExpression[?Yield]
 #  GeneratorExpression
 #  RegularExpressionLiteral
@@ -933,7 +933,6 @@ rule DebuggerStatement : "debugger" + ';'
 ##
 ## FunctionExpression :
 ## function BindingIdentifieropt ( FormalParameters ) { FunctionBody }
-rule FunctionExpression : "function" + ZEROORONE(BindingIdentifier) + '(' + FormalParameters + ')' + '{' + FunctionBody + '}'
 
 ##
 ## StrictFormalParameters[Yield] :
@@ -1058,23 +1057,6 @@ rule FunctionStatementList : ZEROORONE(StatementList)
 #############################################################################
 ##                    Below is Typescript specific
 #############################################################################
-#############################################################################
-##                        Function
-## JS FunctionDeclaration is totally replaced by TS.
-#############################################################################
-
-## FunctionDeclaration: ( Modified )
-## function BindingIdentifieropt CallSignature { FunctionBody }
-## function BindingIdentifieropt CallSignature ;
-
-# NOTE: Inline Call signature to make it easier to write action.
-rule FunctionDeclaration : ONEOF(
-  "function" + ZEROORONE(BindingIdentifier) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}',
-  "function" + ZEROORONE(BindingIdentifier) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation)  + ';')
-  attr.action.%1,%2 : BuildFunction(%2)
-  attr.action.%1,%2 : AddParams(%5)
-  attr.action.%1,%2 : AddType(%7)
-  attr.action.%1 :    AddFunctionBody(%9)
 
 #############################################################################
 ##                        A.1 Type section
@@ -1246,6 +1228,45 @@ rule RestParameter: "..." + BindingIdentifier + ZEROORONE(TypeAnnotation)
 ## rule TypeAliasDeclaration: type BindingIdentifier TypeParametersopt = Type ;
 rule TypeAliasDeclaration: "type" + BindingIdentifier + ZEROORONE(TypeParameters) + '=' + Type + ';'
 
+
+##############################################################################################
+##                              A.2 Expression
+##############################################################################################
+
+## PropertyDefinition: ( Modified ) IdentifierReference CoverInitializedName PropertyName : AssignmentExpression PropertyName CallSignature { FunctionBody } GetAccessor SetAccessor
+## GetAccessor: get PropertyName ( ) TypeAnnotationopt { FunctionBody }
+## SetAccessor: set PropertyName ( BindingIdentifierOrPattern TypeAnnotationopt ) { FunctionBody }
+
+## FunctionExpression: ( Modified ) function BindingIdentifieropt CallSignature { FunctionBody }
+## FunctionExpression has the same syntax as FunctionDeclaration. But it appears as an expression. We will build it
+## as a FunctionNode in AST.
+rule FunctionExpression :
+  "function" + ZEROORONE(BindingIdentifier) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}'
+  attr.action : BuildFunction(%2)
+  attr.action : AddParams(%5)
+  attr.action : AddType(%7)
+  attr.action : AddFunctionBody(%9)
+
+## ArrowFormalParameters: ( Modified ) CallSignature
+## Arguments: ( Modified ) TypeArgumentsopt ( ArgumentListopt )
+## UnaryExpression: ( Modified ) … < Type > UnaryExpression
+
+##############################################################################################
+##                              A.4 Functions
+##############################################################################################
+
+## FunctionDeclaration: ( Modified )
+## function BindingIdentifieropt CallSignature { FunctionBody }
+## function BindingIdentifieropt CallSignature ;
+
+# NOTE: Inline Call signature to make it easier to write action.
+rule FunctionDeclaration : ONEOF(
+  "function" + ZEROORONE(BindingIdentifier) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}',
+  "function" + ZEROORONE(BindingIdentifier) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation)  + ';')
+  attr.action.%1,%2 : BuildFunction(%2)
+  attr.action.%1,%2 : AddParams(%5)
+  attr.action.%1,%2 : AddType(%7)
+  attr.action.%1 :    AddFunctionBody(%9)
 
 ##############################################################################################
 ##                               A.5 Interface

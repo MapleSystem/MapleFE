@@ -1,0 +1,9 @@
+Matched 7 tokens.
+Matched 26 tokens.
+============= Module ===========
+== Sub Tree ==
+js_let Decl: x=3
+== Sub Tree ==
+func  ()  throws: 
+  console.log(x Mul x)
+()

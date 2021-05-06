@@ -2012,22 +2012,21 @@ TreeNode* ASTBuilder::BuildFunction() {
 
   if (mParams.size() > 0) {
     Param p_name = mParams[0];
-    if (!p_name.mIsTreeNode)
-      MERROR("The function name is not a treenode in BuildFunction()");
-
-    node_name = p_name.mData.mTreeNode;
-    if (!node_name->IsIdentifier())
-      MERROR("The function name should be an indentifier node. Not?");
-    IdentifierNode *in = (IdentifierNode*)node_name;
+    // In JS/TS the name could be empty.
+    if (!p_name.mIsEmpty && p_name.mIsTreeNode) {
+      node_name = p_name.mData.mTreeNode;
+      if (!node_name->IsIdentifier())
+        MERROR("The function name should be an indentifier node. Not?");
+    }
   }
 
-  FunctionNode *function = (FunctionNode*)mTreePool->NewTreeNode(sizeof(FunctionNode));
-  new (function) FunctionNode();
+  FunctionNode *f = (FunctionNode*)mTreePool->NewTreeNode(sizeof(FunctionNode));
+  new (f) FunctionNode();
 
   if (node_name)
-    function->SetName(node_name->GetName());
+    f->SetName(node_name->GetName());
 
-  mLastTreeNode = function;
+  mLastTreeNode = f;
   return mLastTreeNode;
 }
 
