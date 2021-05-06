@@ -108,6 +108,7 @@ namespace maplefe {
     return node;
   }
 
+  // ForLoopProp: FLP_Regular, FLP_JSIn, FLP_JSOf
   ForLoopNode *ModuleVisitor::VisitForLoopNode(ForLoopNode *node) {
     // Visit all inits
     for (unsigned i = 0; i < node->GetInitsNum(); ++i) {
@@ -121,10 +122,14 @@ namespace maplefe {
     // Set current_bb to be loop header
     current_bb = mCurrentBB;
 
-    TreeNode *cond = node->GetCond();
-    // Set predicate of current BB
-    mCurrentBB->SetPredicate(cond);
-    //VisitTreeNode(node->GetCond());
+    if(node->GetProp() == FLP_Regular) {
+      TreeNode *cond = node->GetCond();
+      // Set predicate of current BB
+      mCurrentBB->SetPredicate(cond);
+      //VisitTreeNode(node->GetCond());
+    } else
+      // Set predicate to be current ForLoopNode when it is FLP_JSIn or FLP_JSOf
+      mCurrentBB->SetPredicate(node);
 
     // Create a BB for loop body
     mCurrentBB = mModule->NewBB(BK_Uncond);
