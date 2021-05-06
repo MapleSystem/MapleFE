@@ -221,11 +221,11 @@ def gen_handler_derived(dictionary):
                     if ntype != None:
                         prefix = "const_cast<" + ntype + "*>(" if rtype[:6] == "const " else ''
                         suffix = ")" if prefix != '' else ''
-                        # gen_call_nth_subchild_node() for the nth subchild node in the loop for the list or vector
-                        code.append(gen_call_nth_subchild_node(dictionary, name, ntype, prefix + "node->" + func_name + "(i)" + suffix))
+                        # gen_call_nth_child_node() for the nth child node in the loop for the list or vector
+                        code.append(gen_call_nth_child_node(dictionary, name, ntype, prefix + "node->" + func_name + "(i)" + suffix))
                     else:
-                        # gen_call_nth_subchild_value() for the nth subchild value in the loop for the list or vector
-                        code.append(gen_call_nth_subchild_value(dictionary, name, rtype, "node->" + func_name + "(i)"))
+                        # gen_call_nth_child_value() for the nth child value in the loop for the list or vector
+                        code.append(gen_call_nth_child_value(dictionary, name, rtype, "node->" + func_name + "(i)"))
                     code.append("}")
                 code.append(gen_call_children_node_end(dictionary, name, otype + "<" + rtype + ">", "node->" + plural + "Num()"))
             elif gen_call_handle_values():
@@ -347,7 +347,7 @@ def get_data_based_on_type(val_type, accessor):
     elif val_type == "LitData":
         return 'LitData: LitId, " + GetEnumLitId(' + accessor + '.mType) + ", " + GetEnumLitData(' + accessor + '));'
     elif val_type == "bool":
-        return val_type + ', " + (' + accessor + ' ? "true" : "false"));'
+        return val_type + ', ", ' + accessor + ');'
     elif val_type == 'unsigned int' or val_type == 'uint32_t' or val_type == 'uint64_t' \
             or val_type == 'unsigned' or val_type == 'int' or val_type == 'int32_t' or val_type == 'int64_t' :
         return val_type + ', " + std::to_string(' + accessor + '));'
@@ -367,22 +367,20 @@ gen_func_declaration = lambda dictionary, node_name: \
         "void " + gen_args[2] + node_name + "(" + node_name + "* node);"
 gen_func_definition = lambda dictionary, node_name: \
         "void " + gen_args[1] + "::" + gen_args[2] + node_name + "(" + node_name + "* node) {" \
-        + ('if (node == nullptr) {\nDump("  TreeNode: null");\nreturn;\n}' if node_name == "TreeNode" else \
+        + ('if (node == nullptr) \nreturn;\n' if node_name == "TreeNode" else \
         '\nif(DumpFB("' + node_name + '", node)) {')
 gen_call_child_node = lambda dictionary, field_name, node_type, accessor: \
-        ('Dump("' + padding_name(field_name) + ': ' + short_name(node_type) + '*" + std::string(' + accessor \
-        + ' ? "" : ", null"));\n' if field_name != '' else '') \
-        + "if(" + accessor + ')\n' + gen_args[2] + short_name(node_type) + '(' + accessor + ');'
+        ('Dump("' + padding_name(field_name) + ': ' + short_name(node_type) + '*", ' + accessor  + ');\n' \
+        if field_name != '' else '') + gen_args[2] + short_name(node_type) + '(' + accessor + ');'
 gen_call_child_value = lambda dictionary, field_name, val_type, accessor: \
         'Dump(std::string("' + padding_name(field_name) + ': ") + "' + get_data_based_on_type(val_type, accessor)
 gen_call_children_node = lambda dictionary, field_name, node_type, accessor: \
-        'DumpLB("' + padding_name(field_name) + ': ' + short_name(node_type) + ', size = " + std::to_string(' \
-        + accessor + ') + " [");'
-gen_call_children_node_end = lambda dictionary, field_name, node_type, accessor: 'DumpLE("]");'
-gen_call_nth_subchild_node = lambda dictionary, field_name, node_type, accessor: \
-        'Dump(std::to_string(i + 1) + ": ' + short_name(node_type) + '*" + (' + accessor + ' ? "" : ", null"));\n' \
-        + 'if(' + accessor + ')\n' + gen_args[2] + short_name(node_type) + '(' + accessor + ');'
-gen_call_nth_subchild_value = lambda dictionary, field_name, val_type, accessor: \
+        'DumpLB("' + padding_name(field_name) + ': ' + short_name(node_type) + ', size=", ' + accessor+ ');'
+gen_call_children_node_end = lambda dictionary, field_name, node_type, accessor: 'DumpLE(' + accessor + ');'
+gen_call_nth_child_node = lambda dictionary, field_name, node_type, accessor: \
+        'Dump(std::to_string(i + 1) + ": ' + short_name(node_type) + '*", ' + accessor + ');\n' \
+        + gen_args[2] + short_name(node_type) + '(' + accessor + ');'
+gen_call_nth_child_value = lambda dictionary, field_name, val_type, accessor: \
         'Dump(std::to_string(i) + ". ' + get_data_based_on_type(val_type, accessor)
 gen_func_definition_end = lambda dictionary, node_name: \
         'return;\n}' if node_name == "TreeNode" else 'DumpFE();\n}\nreturn;\n}'
@@ -415,20 +413,27 @@ astdump_init = [
         'void Dump(const std::string& msg) {',
         'std::cout << indstr.substr(0, indent) << msg << std::endl;',
         '}', '',
+        'void Dump(const std::string& msg, TreeNode *node) {',
+        'std::cout << indstr.substr(0, indent) << msg << (node ? "" : ", null") << std::endl;',
+        '}', '',
+        'void Dump(const std::string& msg, bool val) {',
+        'std::cout << indstr.substr(0, indent) << msg << (val ? "true" : "false") << std::endl;',
+        '}', '',
         'TreeNode* DumpFB(const std::string& msg, TreeNode* node) {',
+        'if (node != nullptr) {',
         'std::cout << indstr.substr(0, indent + 2) << msg;',
-        'if (node == nullptr)', 'std::cout << ": null" << std::endl;',
-        'else {', 'indent += 4;', 'std::cout << " {" << std::endl;', 'DumpTreeNode(node);', '}',
-        'return node;',
+        'indent += 4;', 'std::cout << " {" << std::endl;', 'DumpTreeNode(node);',
+        '}', 'return node;',
         '}', '',
         'void DumpFE() {',
         'indent -= 4;', 'std::cout << indstr.substr(0, indent + 2) << "}" << std::endl;',
         '}', '',
-        'void DumpLB(const std::string& msg) {',
-        'std::cout << indstr.substr(0, indent) << msg << std::endl;', 'indent += 4;',
+        'void DumpLB(const std::string& msg, unsigned size) {',
+        'std::cout << indstr.substr(0, indent) << msg << size << (size ? " [" : "") << std::endl;', 'indent += 4;',
         '}', '',
-        'void DumpLE(const std::string& msg) {',
-        'indent -= 4;', 'std::cout << indstr.substr(0, indent + 2) << msg << std::endl;',
+        'void DumpLE(unsigned size) {',
+        'indent -= 4;',
+        'if(size)', 'std::cout << indstr.substr(0, indent + 2) << "]" << std::endl;',
         '}', '',
         'std::string GetEnumLitData(LitData lit) {',
         'std::string str = GetEnumLitId(lit.mType);',
@@ -487,7 +492,7 @@ gen_func_definition = lambda dictionary, node_name: \
 gen_call_child_node = lambda dictionary, field_name, node_type, accessor: gen_args[2] + node_type + '(' + accessor + ');'
 gen_call_children_node = lambda dictionary, field_name, node_type, accessor: ''
 gen_call_children_node_end = lambda dictionary, field_name, node_type, accessor: ''
-gen_call_nth_subchild_node = lambda dictionary, field_name, node_type, accessor: gen_args[2] + node_type + '(' + accessor + ');'
+gen_call_nth_child_node = lambda dictionary, field_name, node_type, accessor: gen_args[2] + node_type + '(' + accessor + ');'
 gen_func_definition_end = lambda dictionary, node_name: '}\nreturn node;\n}'
 
 #
