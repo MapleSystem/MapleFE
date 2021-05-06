@@ -156,7 +156,7 @@ def gen_enum_func(dictionary):
     append(include_file, hcode)
 
 # Generate code for class node which is derived from TreeNode
-def gen_handler_derived(dictionary):
+def gen_handler_ast_node(dictionary):
     global include_file, src_file, gen_args
     code = ['']
     node_name = dictionary["Name"];
@@ -245,7 +245,7 @@ def gen_handler_derived(dictionary):
     append(include_file, code)
 
 # Generate handler for TreeNode
-def gen_handler_tree_node(dictionary):
+def gen_handler_ast_TreeNode(dictionary):
     global include_file, src_file, gen_args
     code = ['']
     code.append(gen_func_declaration(dictionary, "TreeNode"))
@@ -274,12 +274,12 @@ def gen_handler_tree_node(dictionary):
     append(src_file, code)
 
 # Handle each node which has TreeNode as its base
-def gen_handler_node(dictionary):
+def gen_handler_ast_node_file(dictionary):
     base = dictionary.get("Bases")
     if base != None:
         basename = base[0].get("Name")
         if basename == "TreeNode":
-            gen_handler_derived(dictionary)
+            gen_handler_ast_node(dictionary)
 
 # Check each child records
 def gen_handler(dictionary):
@@ -288,9 +288,9 @@ def gen_handler(dictionary):
         value = child["Name"]
         filename = output_dir + 'maplefe/' + value + '.yaml'
         if path.exists(filename):
-            handle_yaml(filename, gen_handler_node)
+            handle_yaml(filename, gen_handler_ast_node_file)
     # Generate handler for TreeNode
-    gen_handler_tree_node(dictionary)
+    gen_handler_ast_TreeNode(dictionary)
 
 ###################################################################################################
 
@@ -473,7 +473,7 @@ gen_call_child_node = lambda dictionary, field_name, node_type, accessor: \
     ('Dump("' + padding_name(field_name) + ': ' + short_name(node_type) \
     + '*, " + (' + accessor + ' ? "NodeId=" + std::to_string(' + accessor \
     + '->GetNodeId()) : std::string("null")));\n' if field_name != '' else '')
-handle_yaml(treenode_yaml, gen_handler_derived)
+handle_yaml(treenode_yaml, gen_handler_ast_node)
 handle_src_include_files(Finalization)
 
 ################################################################################
