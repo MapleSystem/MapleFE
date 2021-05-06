@@ -14,7 +14,7 @@
 */
 
 #include "ast2cpp.h"
-#include "a2c_cfg.h"
+#include "ast_cfg.h"
 #include "gen_astdump.h"
 
 namespace maplefe {
@@ -38,7 +38,7 @@ namespace maplefe {
         astdump.Dump(it->mRootNode);
     }
 
-    A2C_Module module(&gModule, mTraceA2C);
+    AST_Module module(&gModule, mTraceA2C);
 
     module.BuildCFG();
     if (mTraceA2C)

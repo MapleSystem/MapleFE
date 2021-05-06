@@ -13,8 +13,8 @@
 * See the Mulan PSL v2 for more details.
 */
 
-#ifndef __A2C_CFG_HEADER__
-#define __A2C_CFG_HEADER__
+#ifndef __AST_CFG_HEADER__
+#define __AST_CFG_HEADER__
 
 #include <stack>
 #include <utility>
@@ -51,7 +51,7 @@ namespace maplefe {
 
   using BBIndex = unsigned;
 
-  class A2C_BB {
+  class AST_BB {
     private:
       BBKind                   mKind;
       BBAttribute              mAttr;
@@ -59,13 +59,13 @@ namespace maplefe {
       TreeNode                *mPredicate;      // a predicate for true/false branches
       TreeNode                *mSwitchExpr;     // switch/case expression or nullptr
       SmallVector<TreeNode *>  mStatements;     // all statement nodes
-      SmallList<A2C_BB *>      mSuccessors;     // for BK_Branch: [0] true branch, [1] false branch
-      SmallList<A2C_BB *>      mPredecessors;
+      SmallList<AST_BB *>      mSuccessors;     // for BK_Branch: [0] true branch, [1] false branch
+      SmallList<AST_BB *>      mPredecessors;
 
     public:
-      explicit A2C_BB() : mKind(BK_Unknown), mId(GetNextId()), mPredicate(nullptr) {}
-      explicit A2C_BB(BBKind k) : mKind(k), mId(GetNextId()), mPredicate(nullptr) {}
-      ~A2C_BB() {mStatements.Release(); mSuccessors.Release(); mPredecessors.Release();}
+      explicit AST_BB() : mKind(BK_Unknown), mId(GetNextId()), mPredicate(nullptr) {}
+      explicit AST_BB(BBKind k) : mKind(k), mId(GetNextId()), mPredicate(nullptr) {}
+      ~AST_BB() {mStatements.Release(); mSuccessors.Release(); mPredecessors.Release();}
 
       void   SetKind(BBKind k) {mKind = k;}
       BBKind GetKind()         {return mKind;}
@@ -87,16 +87,16 @@ namespace maplefe {
       unsigned  GetStatementsNum()              {return mStatements.GetNum();}
       TreeNode* GetStatementAtIndex(unsigned i) {return mStatements.ValueAtIndex(i);}
 
-      void AddSuccessor(A2C_BB *succ) {
+      void AddSuccessor(AST_BB *succ) {
         if(mKind == BK_Terminated)
           return;
         mSuccessors.PushBack(succ);
         succ->mPredecessors.PushBack(this);
       }
       unsigned  GetSuccessorsNum()                {return mSuccessors.GetNum();}
-      A2C_BB   *GetSuccessorAtIndex(unsigned i)   {return mSuccessors.ValueAtIndex(i);}
+      AST_BB   *GetSuccessorAtIndex(unsigned i)   {return mSuccessors.ValueAtIndex(i);}
       unsigned  GetPredecessorsNum()              {return mPredecessors.GetNum();}
-      A2C_BB   *GetPredecessorAtIndex(unsigned i) {return mPredecessors.ValueAtIndex(i);}
+      AST_BB   *GetPredecessorAtIndex(unsigned i) {return mPredecessors.ValueAtIndex(i);}
 
       void Dump();
 
@@ -104,83 +104,83 @@ namespace maplefe {
       static unsigned GetNextId() {static unsigned id = 1; return id++; }
   };
 
-  class A2C_Function {
+  class AST_Function {
     private:
       FunctionNode              *mFunction;        // nullptr if it is an init function
-      SmallList<A2C_Function *>  mNestedFunctions; // nested functions
-      A2C_Function              *mParent;
-      A2C_BB                    *mEntryBB;
-      A2C_BB                    *mExitBB;
+      SmallList<AST_Function *>  mNestedFunctions; // nested functions
+      AST_Function              *mParent;
+      AST_BB                    *mEntryBB;
+      AST_BB                    *mExitBB;
 
     public:
-      explicit A2C_Function() : mParent(nullptr), mEntryBB(nullptr), mExitBB(nullptr), mFunction(nullptr) {}
-      ~A2C_Function() {mNestedFunctions.Release();}
+      explicit AST_Function() : mParent(nullptr), mEntryBB(nullptr), mExitBB(nullptr), mFunction(nullptr) {}
+      ~AST_Function() {mNestedFunctions.Release();}
 
       void          SetFunction(FunctionNode *func) {mFunction = func;}
       FunctionNode *GetFunction()                   {return mFunction;}
 
-      void          AddNestedFunction(A2C_Function *func) {mNestedFunctions.PushBack(func);}
+      void          AddNestedFunction(AST_Function *func) {mNestedFunctions.PushBack(func);}
       unsigned      GetNestedFunctionsNum()               {return mNestedFunctions.GetNum();}
-      A2C_Function *GetNestedFunctionAtIndex(unsigned i)  {return mNestedFunctions.ValueAtIndex(i);}
+      AST_Function *GetNestedFunctionAtIndex(unsigned i)  {return mNestedFunctions.ValueAtIndex(i);}
 
-      void          SetParent(A2C_Function *func) {mParent = func;}
-      A2C_Function *GetParent()                   {return mParent;}
+      void          SetParent(AST_Function *func) {mParent = func;}
+      AST_Function *GetParent()                   {return mParent;}
 
-      void     SetEntryBB(A2C_BB *bb) {mEntryBB = bb; bb->SetAttr(AK_Entry);}
-      A2C_BB  *GetEntryBB()           {return mEntryBB;}
+      void     SetEntryBB(AST_BB *bb) {mEntryBB = bb; bb->SetAttr(AK_Entry);}
+      AST_BB  *GetEntryBB()           {return mEntryBB;}
 
-      void     SetExitBB(A2C_BB *bb)  {mExitBB = bb; bb->SetAttr(AK_Exit);}
-      A2C_BB  *GetExitBB()            {return mExitBB;}
+      void     SetExitBB(AST_BB *bb)  {mExitBB = bb; bb->SetAttr(AK_Exit);}
+      AST_BB  *GetExitBB()            {return mExitBB;}
 
       void Dump();
   };
 
   // Each TS source file is a module
-  class A2C_Module {
+  class AST_Module {
     private:
-      MemPool       mMemPool;     // Memory pool for all A2C_Function and A2C_BB
+      MemPool       mMemPool;     // Memory pool for all AST_Function and AST_BB
       ASTModule    *mASTModule;   // for an AST module
-      A2C_Function *mFunction;    // an init function for statements in module scope
+      AST_Function *mFunction;    // an init function for statements in module scope
       bool          mTraceModule;
 
     public:
-      explicit A2C_Module(ASTModule *module, bool trace) :
+      explicit AST_Module(ASTModule *module, bool trace) :
         mASTModule(module),
         mFunction(nullptr),
         mTraceModule(trace) {}
-      ~A2C_Module() {mMemPool.Release();}
+      ~AST_Module() {mMemPool.Release();}
 
       void BuildCFG();
 
       ASTModule* GetASTModule() {return mASTModule;}
 
-      void          SetFunction(A2C_Function *func) {mFunction = func;}
-      A2C_Function *GetFunction()                   {return mFunction;}
+      void          SetFunction(AST_Function *func) {mFunction = func;}
+      AST_Function *GetFunction()                   {return mFunction;}
 
       bool GetTraceModule() {return mTraceModule;}
 
-      A2C_Function *NewFunction()   {return new(mMemPool.Alloc(sizeof(A2C_Function))) A2C_Function;}
-      A2C_BB       *NewBB(BBKind k) {return new(mMemPool.Alloc(sizeof(A2C_BB))) A2C_BB(k);}
+      AST_Function *NewFunction()   {return new(mMemPool.Alloc(sizeof(AST_Function))) AST_Function;}
+      AST_BB       *NewBB(BBKind k) {return new(mMemPool.Alloc(sizeof(AST_BB))) AST_BB(k);}
 
       void Dump(char *msg);
   };
 
-  using TargetBBStack = std::stack<std::pair<A2C_BB*,A2C_BB*>>;
+  using TargetBBStack = std::stack<std::pair<AST_BB*,AST_BB*>>;
   class ModuleVisitor : public AstVisitor {
     private:
-      A2C_Module   *mModule;
+      AST_Module   *mModule;
       bool          mTrace;
 
-      A2C_Function *mCurrentFunction;
-      A2C_BB       *mCurrentBB;
+      AST_Function *mCurrentFunction;
+      AST_BB       *mCurrentBB;
       TargetBBStack mTargetBBs;
 
     public:
-      explicit ModuleVisitor(A2C_Module *m, bool t, bool base = false)
+      explicit ModuleVisitor(AST_Module *m, bool t, bool base = false)
         : mModule(m), mTrace(t), AstVisitor(t && base) {}
       ~ModuleVisitor() = default;
 
-      void InitializeFunction(A2C_Function *func);
+      void InitializeFunction(AST_Function *func);
       void FinalizeFunction();
 
       FunctionNode *VisitFunctionNode(FunctionNode *node);

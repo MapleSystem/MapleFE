@@ -15,13 +15,13 @@
 
 #include <stack>
 #include <set>
-#include "a2c_cfg.h"
+#include "ast_cfg.h"
 
 namespace maplefe {
 
-  void ModuleVisitor::InitializeFunction(A2C_Function *func) {
+  void ModuleVisitor::InitializeFunction(AST_Function *func) {
     // Create the entry BB and exit BB of current function
-    A2C_BB *bb = mModule->NewBB(BK_Uncond);
+    AST_BB *bb = mModule->NewBB(BK_Uncond);
     func->SetEntryBB(bb);
     func->SetExitBB(mModule->NewBB(BK_Join));
     // Initialize the working function and BB
@@ -31,7 +31,7 @@ namespace maplefe {
   }
 
   void ModuleVisitor::FinalizeFunction() {
-    A2C_BB *exit = mCurrentFunction->GetExitBB();
+    AST_BB *exit = mCurrentFunction->GetExitBB();
     mCurrentBB->AddSuccessor(exit);
     mCurrentFunction = nullptr;
     mCurrentBB = nullptr;
@@ -42,8 +42,8 @@ namespace maplefe {
       std::cout << "ModuleVisitor: enter FunctionNode, id=" << node->GetNodeId() << std::endl;
 
     // Save both mCurrentFunction and mCurrentBB
-    A2C_Function *current_func = mCurrentFunction;
-    A2C_BB *current_bb = mCurrentBB;
+    AST_Function *current_func = mCurrentFunction;
+    AST_BB *current_bb = mCurrentBB;
 
     // Create a new function and add it as a nested function to current function
     mCurrentFunction = mModule->NewFunction();
@@ -66,7 +66,7 @@ namespace maplefe {
   ReturnNode *ModuleVisitor::VisitReturnNode(ReturnNode *node) {
     //AstVisitor::VisitReturnNode(node);
     mCurrentBB->AddStatement(node);
-    A2C_BB *exit = mCurrentFunction->GetExitBB();
+    AST_BB *exit = mCurrentFunction->GetExitBB();
     mCurrentBB->AddSuccessor(exit);
     mCurrentBB->SetKind(BK_Terminated);
     return node;
@@ -81,7 +81,7 @@ namespace maplefe {
     //VisitTreeNode(cond);
 
     // Save current BB
-    A2C_BB *current_bb = mCurrentBB;
+    AST_BB *current_bb = mCurrentBB;
 
     // Create a new BB for true branch
     mCurrentBB = mModule->NewBB(BK_Uncond);
@@ -91,7 +91,7 @@ namespace maplefe {
     VisitTreeNode(node->GetTrueBranch());
 
     // Create a BB for the join point
-    A2C_BB *join = mModule->NewBB(BK_Join);
+    AST_BB *join = mModule->NewBB(BK_Join);
     mCurrentBB->AddSuccessor(join);
 
     TreeNode *false_branch = node->GetFalseBranch();
@@ -115,7 +115,7 @@ namespace maplefe {
       VisitTreeNode(node->GetInitAtIndex(i));
     }
 
-    A2C_BB *current_bb = mCurrentBB;
+    AST_BB *current_bb = mCurrentBB;
     // Create a new BB for loop header
     mCurrentBB = mModule->NewBB(BK_LoopHeader);
     current_bb->AddSuccessor(mCurrentBB);
@@ -135,10 +135,10 @@ namespace maplefe {
     mCurrentBB = mModule->NewBB(BK_Uncond);
     current_bb->AddSuccessor(mCurrentBB);
     // Create a new BB for getting out of the loop
-    A2C_BB *loop_exit = mModule->NewBB(BK_Join);
+    AST_BB *loop_exit = mModule->NewBB(BK_Join);
 
     // Push loop_exit and current_bb to mTargetBBs for 'break' and 'continue'
-    mTargetBBs.push(std::pair<A2C_BB*,A2C_BB*>{loop_exit, current_bb});
+    mTargetBBs.push(std::pair<AST_BB*,AST_BB*>{loop_exit, current_bb});
     VisitTreeNode(node->GetBody());
     mTargetBBs.pop();
 
@@ -153,7 +153,7 @@ namespace maplefe {
   }
 
   WhileLoopNode *ModuleVisitor::VisitWhileLoopNode(WhileLoopNode *node) {
-    A2C_BB *current_bb = mCurrentBB;
+    AST_BB *current_bb = mCurrentBB;
     // Create a new BB for loop header
     mCurrentBB = mModule->NewBB(BK_LoopHeader);
     current_bb->AddSuccessor(mCurrentBB);
@@ -169,10 +169,10 @@ namespace maplefe {
     mCurrentBB = mModule->NewBB(BK_Uncond);
     current_bb->AddSuccessor(mCurrentBB);
     // Create a new BB for getting out of the loop
-    A2C_BB *loop_exit = mModule->NewBB(BK_Join);
+    AST_BB *loop_exit = mModule->NewBB(BK_Join);
 
     // Push loop_exit and current_bb to mTargetBBs for 'break' and 'continue'
-    mTargetBBs.push(std::pair<A2C_BB*,A2C_BB*>{loop_exit, current_bb});
+    mTargetBBs.push(std::pair<AST_BB*,AST_BB*>{loop_exit, current_bb});
     VisitTreeNode(node->GetBody());
     mTargetBBs.pop();
 
@@ -184,7 +184,7 @@ namespace maplefe {
   }
 
   DoLoopNode *ModuleVisitor::VisitDoLoopNode(DoLoopNode *node) {
-    A2C_BB *current_bb = mCurrentBB;
+    AST_BB *current_bb = mCurrentBB;
     // Create a new BB for loop header
     mCurrentBB = mModule->NewBB(BK_LoopHeader);
     current_bb->AddSuccessor(mCurrentBB);
@@ -195,10 +195,10 @@ namespace maplefe {
     mCurrentBB = mModule->NewBB(BK_Uncond);
     current_bb->AddSuccessor(mCurrentBB);
     // Create a new BB for getting out of the loop
-    A2C_BB *loop_exit = mModule->NewBB(BK_Join);
+    AST_BB *loop_exit = mModule->NewBB(BK_Join);
 
     // Push loop_exit and current_bb to mTargetBBs for 'break' and 'continue'
-    mTargetBBs.push(std::pair<A2C_BB*,A2C_BB*>{loop_exit, current_bb});
+    mTargetBBs.push(std::pair<AST_BB*,AST_BB*>{loop_exit, current_bb});
     VisitTreeNode(node->GetBody());
     mTargetBBs.pop();
 
@@ -217,7 +217,7 @@ namespace maplefe {
   ContinueNode *ModuleVisitor::VisitContinueNode(ContinueNode *node) {
     mCurrentBB->AddStatement(node);
     // Get the loop header
-    A2C_BB *loop_header = mTargetBBs.top().second;
+    AST_BB *loop_header = mTargetBBs.top().second;
     mCurrentBB->AddSuccessor(loop_header);
     mCurrentBB->SetKind(BK_Terminated);
     return node;
@@ -226,7 +226,7 @@ namespace maplefe {
   BreakNode *ModuleVisitor::VisitBreakNode(BreakNode *node) {
     mCurrentBB->AddStatement(node);
     // Get the target BB for a loop or switch statement
-    A2C_BB *exit = mTargetBBs.top().first;
+    AST_BB *exit = mTargetBBs.top().first;
     mCurrentBB->AddSuccessor(exit);
     mCurrentBB->SetKind(BK_Terminated);
     return node;
@@ -240,15 +240,15 @@ namespace maplefe {
     //VisitTreeNode(switch_expr);
 
     // Save current BB
-    A2C_BB *current_bb = mCurrentBB;
+    AST_BB *current_bb = mCurrentBB;
 
     // Create a new BB for getting out of the switch block
-    A2C_BB *exit = mModule->NewBB(BK_Join);
-    mTargetBBs.push(std::pair<A2C_BB*,A2C_BB*>{exit,
+    AST_BB *exit = mModule->NewBB(BK_Join);
+    mTargetBBs.push(std::pair<AST_BB*,AST_BB*>{exit,
         (mTargetBBs.empty() ? nullptr : mTargetBBs.top().second)});
-    A2C_BB *prev_block = nullptr;
+    AST_BB *prev_block = nullptr;
     for (unsigned i = 0; i < node->GetCasesNum(); ++i) {
-      A2C_BB *case_bb = mModule->NewBB(BK_Case);
+      AST_BB *case_bb = mModule->NewBB(BK_Case);
       current_bb->AddSuccessor(case_bb);
 
       TreeNode *case_node = node->GetCaseAtIndex(i);
@@ -313,11 +313,11 @@ namespace maplefe {
     else {
       // Needs BBs for current block
       // Save current BB
-      A2C_BB *current_bb = mCurrentBB;
+      AST_BB *current_bb = mCurrentBB;
       current_bb->SetKind(BK_Block);
 
       // Create a BB for the join point
-      A2C_BB *join = mModule->NewBB(BK_Join);
+      AST_BB *join = mModule->NewBB(BK_Join);
 
       // Create a new BB for current block node
       mCurrentBB = mModule->NewBB(BK_Uncond);
@@ -346,7 +346,7 @@ namespace maplefe {
     return node;
   }
 
-  static std::string BBDotNode(A2C_BB *bb, const char *shape) {
+  static std::string BBDotNode(AST_BB *bb, const char *shape) {
     static const char* const kBBNames[] =
       { "unknown", "uncond", "block", "branch", "loop", "switch", "case", "yield", "term", "join" };
     std::string str("BB" + std::to_string(bb->GetId()));
@@ -355,7 +355,7 @@ namespace maplefe {
     return str;
   }
 
-  void A2C_Function::Dump() {
+  void AST_Function::Dump() {
     unsigned num = GetNestedFunctionsNum();
     if(num > 0) {
       std::cout << "Nested Functions: " << num << " {" << std::endl;
@@ -367,11 +367,11 @@ namespace maplefe {
     }
     std::cout << "Basic blocks: {" << std::endl;
 
-    std::stack<A2C_BB*> bb_stack;
-    A2C_BB *entry = GetEntryBB(), *exit = GetExitBB();
+    std::stack<AST_BB*> bb_stack;
+    AST_BB *entry = GetEntryBB(), *exit = GetExitBB();
     bb_stack.push(exit);
     bb_stack.push(entry);
-    std::set<A2C_BB*> visited;
+    std::set<AST_BB*> visited;
     visited.insert(exit);
     visited.insert(entry);
     // Dump CFG in dot format
@@ -379,12 +379,12 @@ namespace maplefe {
     dot += BBDotNode(entry, "box") + BBDotNode(exit, "doubleoctagon");
     const char* scoped = " [style=dashed color=grey];";
     while(!bb_stack.empty()) {
-      A2C_BB *bb = bb_stack.top();
+      AST_BB *bb = bb_stack.top();
       bb_stack.pop();
       unsigned succ_num = bb->GetSuccessorsNum();
       std::cout << "BB" << bb->GetId() << (succ_num ? " ( succ: " : " ( Exit ");
       for(unsigned i = 0; i < succ_num; ++i) {
-        A2C_BB *curr = bb->GetSuccessorAtIndex(i);
+        AST_BB *curr = bb->GetSuccessorAtIndex(i);
         std::cout << "BB" << curr->GetId() << " ";
         dot += "BB" + std::to_string(bb->GetId()) + " -> BB" + std::to_string(curr->GetId())
           + (bb == entry ? (curr == exit ? scoped : ";") :
@@ -407,10 +407,10 @@ namespace maplefe {
     std::cout << dot << "}" << std::endl;
   }
 
-  void A2C_Module::BuildCFG() {
+  void AST_Module::BuildCFG() {
     ModuleVisitor visitor(this, mTraceModule, true);
     // Set the init function for current module
-    A2C_Function *func = NewFunction();
+    AST_Function *func = NewFunction();
     SetFunction(func);
     // Start to build CFG for current module
     visitor.InitializeFunction(func);
@@ -419,9 +419,9 @@ namespace maplefe {
     visitor.FinalizeFunction();
   }
 
-  void A2C_Module::Dump(char *msg) {
+  void AST_Module::Dump(char *msg) {
     std::cout << std::endl << msg << ":" << std::endl;
-    A2C_Function *func = GetFunction();
+    AST_Function *func = GetFunction();
     func->Dump();
   }
 
