@@ -774,10 +774,10 @@ rule IterationStatement : ONEOF(
   "for" + '(' + "var" + VariableDeclarationList + ';' + ZEROORONE(Expression) + ';' + ZEROORONE(Expression) + ')' + Statement,
 ##  for ( LexicalDeclaration[?Yield] Expression[In, ?Yield]opt ; Expression[In, ?Yield]opt ) Statement[?Yield, ?Return]
 ##  for ( [lookahead NotIn {let [}] LeftHandSideExpression[?Yield] in Expression[In, ?Yield] ) Statement[?Yield, ?Return]
-##  for ( var ForBinding[?Yield] in Expression[In, ?Yield] ) Statement[?Yield, ?Return]
+  "for" + '(' + "var" + ForBinding + "in" + Expression + ')' + Statement,
 ##  for ( ForDeclaration[?Yield] in Expression[In, ?Yield] ) Statement[?Yield, ?Return]
 ##  for ( [lookahead NotEq let ] LeftHandSideExpression[?Yield] of AssignmentExpression[In, ?Yield] ) Statement[?Yield, ?Return]
-##  for ( var ForBinding[?Yield] of AssignmentExpression[In, ?Yield] ) Statement[?Yield, ?Return]
+  "for" + '(' + "var" + ForBinding + "of" + AssignmentExpression + ')' + Statement,
 ##  for ( ForDeclaration[?Yield] of AssignmentExpression[In, ?Yield] ) Statement[?Yield, ?Return]
   )
   attr.action.%1 : BuildDoLoop(%5, %2)
@@ -785,14 +785,26 @@ rule IterationStatement : ONEOF(
   attr.action.%3 : BuildForLoop(%3, %5, %7, %9)
   attr.action.%4 : BuildForLoop(%4, %6, %8, %10)
 
+  attr.action.%5,%6 : BuildDecl(%4)
+  attr.action.%5,%6 : SetJSVar()
+  attr.action.%5 : BuildForLoop_In(%6, %8)
+  attr.action.%6 : BuildForLoop_Of(%6, %8)
+
 ##-----------------------------------
 ##rule ForDeclaration[Yield] :
 ##  LetOrConst ForBinding[?Yield]
+rule ForDeclaration : ONEOF("let" + ForBinding,
+                            "const" + ForBinding)
+  attr.action.%1,%2 : BuildDecl(%2)
+  attr.action.%1    : SetJSLet()
+  attr.action.%2    : SetJSConst()
 
 ##-----------------------------------
 ##rule ForBinding[Yield] :
 ##  BindingIdentifier[?Yield]
 ##  BindingPattern[?Yield]
+rule ForBinding : ONEOF(BindingIdentifier,
+                        BindingPattern)
 
 ##-----------------------------------
 ##rule ContinueStatement[Yield] :

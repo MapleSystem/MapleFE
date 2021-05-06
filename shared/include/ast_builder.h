@@ -168,6 +168,8 @@ public:
   TreeNode* BuildBreak();
   TreeNode* BuildContinue();
   TreeNode* BuildForLoop();
+  TreeNode* BuildForLoop_In();
+  TreeNode* BuildForLoop_Of();
   TreeNode* BuildWhileLoop();
   TreeNode* BuildDoLoop();
   TreeNode* BuildNewOperation();

@@ -594,6 +594,74 @@ TreeNode* ASTBuilder::BuildForLoop() {
   return mLastTreeNode;
 }
 
+// BuildForLoop_In takes one implicit argument and two explicit arguments.
+//  1. The implicit arg, mLastTreeNode. This is a decl of variable.
+//  2. The first explicit arg. This is the set of data
+//  3. The body.
+TreeNode* ASTBuilder::BuildForLoop_In() {
+  if (mTrace)
+    std::cout << "In BuildForLoop_In " << std::endl;
+
+  ForLoopNode *for_loop = (ForLoopNode*)mTreePool->NewTreeNode(sizeof(ForLoopNode));
+  new (for_loop) ForLoopNode();
+
+  for_loop->SetProp(FLP_JSIn);
+  for_loop->SetVariable(mLastTreeNode);
+
+  MASSERT(mParams.size() == 2);
+
+  Param p_set = mParams[0];
+  if (!p_set.mIsEmpty) {
+    MASSERT(p_set.mIsTreeNode);
+    TreeNode *the_set = p_set.mData.mTreeNode;
+    for_loop->SetSet(the_set);
+  }
+
+  Param p_body = mParams[1];
+  if (!p_body.mIsEmpty) {
+    MASSERT(p_body.mIsTreeNode);
+    TreeNode *body = CvtToBlock(p_body.mData.mTreeNode);
+    for_loop->SetBody(body);
+  }
+
+  mLastTreeNode = for_loop;
+  return mLastTreeNode;
+}
+
+// BuildForLoop_Of takes one implicit argument and two explicit arguments.
+//  1. The implicit arg, mLastTreeNode. This is a decl of variable.
+//  2. The first explicit arg. This is the set of data
+//  3. The body.
+TreeNode* ASTBuilder::BuildForLoop_Of() {
+  if (mTrace)
+    std::cout << "In BuildForLoop_Of " << std::endl;
+
+  ForLoopNode *for_loop = (ForLoopNode*)mTreePool->NewTreeNode(sizeof(ForLoopNode));
+  new (for_loop) ForLoopNode();
+
+  for_loop->SetProp(FLP_JSOf);
+  for_loop->SetVariable(mLastTreeNode);
+
+  MASSERT(mParams.size() == 2);
+
+  Param p_set = mParams[0];
+  if (!p_set.mIsEmpty) {
+    MASSERT(p_set.mIsTreeNode);
+    TreeNode *the_set = p_set.mData.mTreeNode;
+    for_loop->SetSet(the_set);
+  }
+
+  Param p_body = mParams[1];
+  if (!p_body.mIsEmpty) {
+    MASSERT(p_body.mIsTreeNode);
+    TreeNode *body = CvtToBlock(p_body.mData.mTreeNode);
+    for_loop->SetBody(body);
+  }
+
+  mLastTreeNode = for_loop;
+  return mLastTreeNode;
+}
+
 TreeNode* ASTBuilder::BuildWhileLoop() {
   if (mTrace)
     std::cout << "In BuildWhileLoop " << std::endl;

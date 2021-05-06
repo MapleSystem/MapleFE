@@ -1,0 +1,9 @@
+Matched 13 tokens.
+Matched 34 tokens.
+============= Module ===========
+== Sub Tree ==
+js_var Decl: obj= {x:1, s:"123"}
+== Sub Tree ==
+for ( )
+  console.log(k,obj[k])
+

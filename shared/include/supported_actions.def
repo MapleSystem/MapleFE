@@ -122,6 +122,8 @@ ACTION(AddLabel)
 ACTION(BuildBreak)
 ACTION(BuildContinue)
 ACTION(BuildForLoop)
+ACTION(BuildForLoop_In)     //This is Javascript, for (.. in ..){}
+ACTION(BuildForLoop_Of)     //This is Javascript, for (.. of ..){}
 ACTION(BuildWhileLoop)
 ACTION(BuildDoLoop)
 ACTION(BuildNewOperation)

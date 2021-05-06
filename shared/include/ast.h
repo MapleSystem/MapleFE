@@ -817,14 +817,37 @@ public:
   void      Dump(unsigned);
 };
 
+// Javascript makes for loop complicated. It creates two special syntax as below
+//   for (var in set) {...}
+//   for (var of set) {...}
+// We use  FL_Prop to differentiate them with regular for loop.
+enum ForLoopProp {
+  FLP_Regular,  // this is the default property
+  FLP_JSIn,
+  FLP_JSOf,
+  FLP_NA
+};
+
 class ForLoopNode : public TreeNode {
 private:
+  ForLoopProp mProp;
+
+  // Regular for loop
   SmallVector<TreeNode *> mInits;
   TreeNode               *mCond;
   SmallVector<TreeNode *> mUpdates;
-  TreeNode               *mBody;   // This is a block node
+
+  // JS In or JS Of
+  TreeNode *mVariable;
+  TreeNode *mSet;
+
+  // shared by all kinds
+  TreeNode *mBody;   // This is a block node
+
 public:
-  ForLoopNode() {mCond = NULL; mBody = NULL; mKind = NK_ForLoop;}
+  ForLoopNode() {mCond = NULL; mBody = NULL;
+                 mVariable = NULL; mSet = NULL;
+                 mProp = FLP_Regular; mKind = NK_ForLoop;}
   ~ForLoopNode() {Release();}
 
   void AddInit(TreeNode *t)   {mInits.PushBack(t);}
@@ -838,6 +861,15 @@ public:
   TreeNode* GetUpdateAtIndex(unsigned i) {return mUpdates.ValueAtIndex(i);}
   TreeNode* GetCond() {return mCond;}
   TreeNode* GetBody() {return mBody;}
+
+  ForLoopProp GetProp() {return mProp;}
+  void SetProp(ForLoopProp p) {mProp = p;}
+
+  TreeNode* GetVariable() {return mVariable;}
+  void SetVariable(TreeNode *t) {mVariable = t;}
+
+  TreeNode* GetSet() {return mSet;}
+  void SetSet(TreeNode *t) {mSet = t;}
 
   void Release() {mInits.Release(); mUpdates.Release();}
   void Dump(unsigned);
