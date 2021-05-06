@@ -1058,13 +1058,6 @@ rule FunctionStatementList : ZEROORONE(StatementList)
 #############################################################################
 ##                    Below is Typescript specific
 #############################################################################
-rule ObjectField : BindingIdentifier + ':' + Type
-  attr.action : AddType(%1, %3)
-rule InterfaceDeclaration : "interface" + BindingIdentifier + '{' + ZEROORMORE(ObjectField + ';') + '}'
-  attr.action : BuildStruct(%2)
-  attr.action : SetTSInterface()
-  attr.action : AddStructField(%4)
-
 #############################################################################
 ##                        Function
 ## JS FunctionDeclaration is totally replaced by TS.
@@ -1084,7 +1077,7 @@ rule FunctionDeclaration : ONEOF(
   attr.action.%1 :    AddFunctionBody(%9)
 
 #############################################################################
-##                        Type section
+##                        A.1 Type section
 #############################################################################
 
 ## rule TypeParameters: < TypeParameterList >
@@ -1122,7 +1115,7 @@ rule IntersectionOrPrimaryType : ONEOF(PrimaryType)
 rule PrimaryType: ONEOF(ParenthesizedType,
                         PredefinedType,
                         TypeReference,
-#                        ObjectType,
+                        ObjectType,
                         ArrayType,
 #                        TupleType,
 #                        TypeQuery,
@@ -1140,10 +1133,26 @@ rule TypeReference: TypeName
 rule TypeName: IdentifierReference
 
 ## rule NamespaceName: IdentifierReference NamespaceName . IdentifierReference
+
 ## rule ObjectType: { TypeBodyopt }
+rule ObjectType : '{' + ZEROORONE(TypeBody) + '}'
+
 ## rule TypeBody: TypeMemberList ;opt TypeMemberList ,opt
+rule TypeBody : ONEOF(TypeMemberList + ZEROORONE(';'),
+                      TypeMemberList + ZEROORONE(','))
+
 ## rule TypeMemberList: TypeMember TypeMemberList ; TypeMember TypeMemberList , TypeMember
+rule TypeMemberList : ONEOF(TypeMember,
+                            TypeMemberList + ';' + TypeMember,
+                            TypeMemberList + ',' + TypeMember)
+
 ## rule TypeMember: PropertySignature CallSignature ConstructSignature IndexSignature MethodSignature
+rule TypeMember : ONEOF(PropertySignature,
+                        CallSignature,
+                        ## ConstructSignature,
+                        ## IndexSignature,
+                        ##MethodSignature
+                       )
 
 ## rule ArrayType: PrimaryType [no LineTerminator here] [ ]
 rule ArrayType: PrimaryType + '[' + ']'
@@ -1174,7 +1183,14 @@ rule ConstructorType: "new" + ZEROORONE(TypeParameters) + '(' + ZEROORONE(Parame
 rule ThisType: "this"
 
 ## rule PropertySignature: PropertyName ?opt TypeAnnotationopt
+rule PropertySignature: PropertyName + ZEROORONE('?') + ZEROORONE(TypeAnnotation)
+  attr.action : AddType(%1, %3)
+
 ## rule PropertyName: IdentifierName StringLiteral NumericLiteral
+rule PropertyName : ONEOF(Identifier,
+                          ##StringLiteral,
+                          ##NumericLiteral,
+                         )
 
 ## rule TypeAnnotation: : Type
 rule TypeAnnotation: ':' + Type
@@ -1229,3 +1245,29 @@ rule RestParameter: "..." + BindingIdentifier + ZEROORONE(TypeAnnotation)
 
 ## rule TypeAliasDeclaration: type BindingIdentifier TypeParametersopt = Type ;
 rule TypeAliasDeclaration: "type" + BindingIdentifier + ZEROORONE(TypeParameters) + '=' + Type + ';'
+
+
+##############################################################################################
+##                               A.5 Interface
+##############################################################################################
+
+##InterfaceDeclaration: interface BindingIdentifier TypeParametersopt InterfaceExtendsClauseopt ObjectType
+rule InterfaceDeclaration :
+  "interface" + BindingIdentifier + ZEROORONE(TypeParameters) + ZEROORONE(InterfaceExtendsClause) + ObjectType
+  attr.action : BuildStruct(%2)
+  attr.action : SetTSInterface()
+  attr.action : AddStructField(%5)
+
+##InterfaceExtendsClause: extends ClassOrInterfaceTypeList
+rule InterfaceExtendsClause: "extends" + ClassOrInterfaceTypeList
+
+##ClassOrInterfaceTypeList: ClassOrInterfaceType ClassOrInterfaceTypeList , ClassOrInterfaceType
+rule ClassOrInterfaceTypeList: ONEOF(ClassOrInterfaceType,
+                                     ClassOrInterfaceTypeList + ',' + ClassOrInterfaceType)
+
+##ClassOrInterfaceType: TypeReference
+rule ClassOrInterfaceType: TypeReference
+
+##############################################################################################
+##                             A.6 Class declaration
+##############################################################################################
