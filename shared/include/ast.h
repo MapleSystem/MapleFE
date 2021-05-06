@@ -99,7 +99,7 @@ public:
   TreeNode* GetParent() {return mParent;}
   TreeNode* GetLabel()  {return mLabel;}
 
-  bool GetIsStmt() {return mIsStmt;}
+  bool IsStmt()    {return mIsStmt;}
   void SetIsStmt() {mIsStmt = true;}
 
   virtual const char* GetName() {return mName;}
