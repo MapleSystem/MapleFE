@@ -28,12 +28,12 @@ namespace maplefe {
 
 class AST_DFA {
  private:
-  AST_Module   *mModule;
+  AST_Handler  *mHandler;
   bool          mTrace;
   SmallVector<BitVector>  mReachDefIn;     // reaching definition bit vector entering bb
 
  public:
-  explicit AST_DFA(AST_Module *m, bool t) : mModule(m), mTrace(t) {}
+  explicit AST_DFA(AST_Handler *h, bool t) : mHandler(h), mTrace(t) {}
   ~AST_DFA() {}
 
   void  Build();
@@ -47,15 +47,15 @@ class AST_DFA {
 
 class DeclSplitVisitor : public AstVisitor {
  private:
-  AST_Module   *mModule;
+  AST_Handler  *mHandler;
   bool          mTrace;
 
   AST_Function *mCurrentFunction;
   AST_BB       *mCurrentBB;
 
  public:
-  explicit DeclSplitVisitor(AST_Module *m, bool t, bool base = false)
-    : mModule(m), mTrace(t), AstVisitor(t && base) {}
+  explicit DeclSplitVisitor(AST_Handler *h, bool t, bool base = false)
+    : mHandler(h), mTrace(t), AstVisitor(t && base) {}
   ~DeclSplitVisitor() = default;
 
   void SetCurrentFunction(AST_Function *f) { mCurrentFunction = f; }
@@ -66,15 +66,15 @@ class DeclSplitVisitor : public AstVisitor {
 
 class ReachDefInVisitor : public AstVisitor {
  private:
-  AST_Module   *mModule;
+  AST_Handler  *mHandler;
   bool          mTrace;
 
   AST_Function *mCurrentFunction;
   AST_BB       *mCurrentBB;
 
  public:
-  explicit ReachDefInVisitor(AST_Module *m, bool t, bool base = false)
-    : mModule(m), mTrace(t), AstVisitor(t && base) {}
+  explicit ReachDefInVisitor(AST_Handler *h, bool t, bool base = false)
+    : mHandler(h), mTrace(t), AstVisitor(t && base) {}
   ~ReachDefInVisitor() = default;
 
   void SetCurrentFunction(AST_Function *f) { mCurrentFunction = f; }

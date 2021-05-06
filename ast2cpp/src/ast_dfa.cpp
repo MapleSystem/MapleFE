@@ -15,6 +15,8 @@
 
 #include <stack>
 #include <set>
+#include "ast_handler.h"
+#include "ast_cfg.h"
 #include "ast_dfa.h"
 
 namespace maplefe {
@@ -26,11 +28,11 @@ void AST_DFA::Build() {
 
 void AST_DFA::SplitDecl() {
   if (mTrace) std::cout << "============== SplitDecl ==============" << std::endl;
-  DeclSplitVisitor visitor(mModule, mTrace, true);
-  AST_Function *func = mModule->GetFunction();
-  visitor.SetCurrentFunction(mModule->GetFunction());
+  DeclSplitVisitor visitor(mHandler, mTrace, true);
+  AST_Function *func = mHandler->GetFunction();
+  visitor.SetCurrentFunction(mHandler->GetFunction());
   visitor.SetCurrentBB(func->GetEntryBB());
-  for(auto it: mModule->GetASTModule()->mTrees) {
+  for(auto it: mHandler->GetASTModule()->mTrees) {
     visitor.Visit(it->mRootNode);
   }
 }
@@ -43,11 +45,11 @@ DeclNode *DeclSplitVisitor::VisitDeclNode(DeclNode *node) {
 
 void AST_DFA::BuildReachDefIn() {
   if (mTrace) std::cout << "============== BuildReachDefIn ==============" << std::endl;
-  ReachDefInVisitor visitor(mModule, mTrace, true);
-  AST_Function *func = mModule->GetFunction();
-  visitor.SetCurrentFunction(mModule->GetFunction());
+  ReachDefInVisitor visitor(mHandler, mTrace, true);
+  AST_Function *func = mHandler->GetFunction();
+  visitor.SetCurrentFunction(mHandler->GetFunction());
   visitor.SetCurrentBB(func->GetEntryBB());
-  for(auto it: mModule->GetASTModule()->mTrees) {
+  for(auto it: mHandler->GetASTModule()->mTrees) {
     visitor.Visit(it->mRootNode);
   }
 }

@@ -14,7 +14,7 @@
 */
 
 #include "ast2cpp.h"
-#include "ast_cfg.h"
+#include "ast_handler.h"
 #include "gen_astdump.h"
 
 namespace maplefe {
@@ -38,15 +38,15 @@ namespace maplefe {
         astdump.Dump(it->mRootNode);
     }
 
-    AST_Module module(&gModule, mTraceA2C);
+    AST_Handler handler(&gModule, mTraceA2C);
 
-    module.BuildCFG();
+    handler.BuildCFG();
     if (mTraceA2C)
-      module.Dump("After module.BuildCFG()");
+      handler.Dump("After handler.BuildCFG()");
 
-    module.BuildDFA();
+    handler.BuildDFA();
     if (mTraceA2C)
-      module.Dump("After module.BuildDFA()");
+      handler.Dump("After handler.BuildDFA()");
   }
 }
 
