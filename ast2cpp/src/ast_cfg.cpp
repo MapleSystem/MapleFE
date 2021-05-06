@@ -119,6 +119,7 @@ ForLoopNode *CFGVisitor::VisitForLoopNode(ForLoopNode *node) {
   AST_BB *current_bb = mCurrentBB;
   // Create a new BB for loop header
   mCurrentBB = NewBB(BK_LoopHeader);
+  mCurrentBB->SetRootNode(node);
   current_bb->AddSuccessor(mCurrentBB);
   // Set current_bb to be loop header
   current_bb = mCurrentBB;
@@ -157,6 +158,7 @@ WhileLoopNode *CFGVisitor::VisitWhileLoopNode(WhileLoopNode *node) {
   AST_BB *current_bb = mCurrentBB;
   // Create a new BB for loop header
   mCurrentBB = NewBB(BK_LoopHeader);
+  mCurrentBB->SetRootNode(node);
   current_bb->AddSuccessor(mCurrentBB);
   // Set current_bb to be loop header
   current_bb = mCurrentBB;
@@ -188,6 +190,7 @@ DoLoopNode *CFGVisitor::VisitDoLoopNode(DoLoopNode *node) {
   AST_BB *current_bb = mCurrentBB;
   // Create a new BB for loop header
   mCurrentBB = NewBB(BK_LoopHeader);
+  mCurrentBB->SetRootNode(node);
   current_bb->AddSuccessor(mCurrentBB);
   // Set current_bb to be loop header
   current_bb = mCurrentBB;
@@ -235,10 +238,8 @@ BreakNode *CFGVisitor::VisitBreakNode(BreakNode *node) {
 
 SwitchNode *CFGVisitor::VisitSwitchNode(SwitchNode *node) {
   mCurrentBB->SetKind(BK_Switch);
-  TreeNode *switch_expr = node->GetExpr();
-  // Set switch expression of current BB
-  mCurrentBB->SetSwitchExpr(switch_expr);
-  //VisitTreeNode(switch_expr);
+  // Set the root node of current BB
+  mCurrentBB->SetRootNode(node);
 
   // Save current BB
   AST_BB *current_bb = mCurrentBB;
@@ -248,6 +249,7 @@ SwitchNode *CFGVisitor::VisitSwitchNode(SwitchNode *node) {
   mTargetBBs.push(std::pair<AST_BB*,AST_BB*>{exit,
       (mTargetBBs.empty() ? nullptr : mTargetBBs.top().second)});
   AST_BB *prev_block = nullptr;
+  TreeNode *switch_expr = node->GetExpr();
   for (unsigned i = 0; i < node->GetCasesNum(); ++i) {
     AST_BB *case_bb = NewBB(BK_Case);
     current_bb->AddSuccessor(case_bb);
@@ -264,9 +266,9 @@ SwitchNode *CFGVisitor::VisitSwitchNode(SwitchNode *node) {
       }
     }
 
-    // Set SwitchExpr and Predicate for current case BB
-    case_bb->SetSwitchExpr(switch_expr);
-    case_bb->SetPredicate(case_expr);
+    // Set the root node and predicate for current case BB
+    case_bb->SetRootNode(case_node);
+    case_bb->SetPredicate(switch_expr);
 
     // Optimize for default case
     if(is_default) {
@@ -320,6 +322,8 @@ BlockNode *CFGVisitor::VisitBlockNode(BlockNode *node) {
     // Save current BB
     AST_BB *current_bb = mCurrentBB;
     current_bb->SetKind(BK_Block);
+    // Set the root node of this BB
+    current_bb->SetRootNode(node);
 
     // Create a BB for the join point
     AST_BB *join = NewBB(BK_Join);

@@ -39,6 +39,7 @@ enum BBKind {
 };
 
 enum BBAttribute {
+  AK_Unknown  = 0,
   AK_Entry    = 1 << 0,
   AK_Exit     = 1 << 1,
   AK_Try      = 1 << 2,
@@ -58,14 +59,14 @@ class AST_BB {
   BBAttribute              mAttr;
   BBIndex                  mId;             // unique BB id
   TreeNode                *mPredicate;      // a predicate for true/false branches
-  TreeNode                *mSwitchExpr;     // switch/case expression or nullptr
+  TreeNode                *mRootNode;       // the root node of current BB
   SmallVector<TreeNode *>  mStatements;     // all statement nodes
   SmallList<AST_BB *>      mSuccessors;     // for BK_Branch: [0] true branch, [1] false branch
   SmallList<AST_BB *>      mPredecessors;
 
  public:
-  explicit AST_BB() : mKind(BK_Unknown), mId(GetNextId()), mPredicate(nullptr) {}
-  explicit AST_BB(BBKind k) : mKind(k), mId(GetNextId()), mPredicate(nullptr) {}
+  explicit AST_BB(BBKind k)
+    : mKind(k), mAttr(AK_Unknown), mId(GetNextId()), mPredicate(nullptr), mRootNode(nullptr) {}
   ~AST_BB() {mStatements.Release(); mSuccessors.Release(); mPredecessors.Release();}
 
   void   SetKind(BBKind k) {mKind = k;}
@@ -80,8 +81,8 @@ class AST_BB {
   void      SetPredicate(TreeNode *node) {mPredicate = node;}
   TreeNode *GetPredicate()               {return mPredicate;}
 
-  void      SetSwitchExpr(TreeNode *node) {mSwitchExpr = node;}
-  TreeNode *GetSwitchExpr()               {return mSwitchExpr;}
+  void      SetRootNode(TreeNode *node)  {mRootNode = node;}
+  TreeNode *GetRootNode()                {return mRootNode;}
 
   void AddStatement(TreeNode *stmt) {if(mKind != BK_Terminated) mStatements.PushBack(stmt);}
 
@@ -124,7 +125,7 @@ class AST_Function {
   void          SetFunction(FunctionNode *func) {mFunction = func;}
   FunctionNode *GetFunction()                   {return mFunction;}
 
-  void          AddNestedFunction(AST_Function *func) {mNestedFunctions.PushBack(func);}
+  void          AddNestedFunction(AST_Function *func) {mNestedFunctions.PushBack(func); func->SetParent(this);}
   unsigned      GetNestedFunctionsNum()               {return mNestedFunctions.GetNum();}
   AST_Function *GetNestedFunctionAtIndex(unsigned i)  {return mNestedFunctions.ValueAtIndex(i);}
 
