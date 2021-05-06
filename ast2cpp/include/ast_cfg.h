@@ -98,10 +98,12 @@ namespace maplefe {
       unsigned  GetPredecessorsNum()              {return mPredecessors.GetNum();}
       AST_BB   *GetPredecessorAtIndex(unsigned i) {return mPredecessors.ValueAtIndex(i);}
 
+      static BBIndex GetLastId() {return GetNextId(false);}
+
       void Dump();
 
     private:
-      static unsigned GetNextId() {static unsigned id = 1; return id++; }
+      static BBIndex GetNextId(bool inc = true) {static BBIndex id = 0; return inc ? ++id : id; }
   };
 
   class AST_Function {
@@ -111,6 +113,7 @@ namespace maplefe {
       AST_Function              *mParent;
       AST_BB                    *mEntryBB;
       AST_BB                    *mExitBB;
+      BBIndex                    mLastBBId;
 
     public:
       explicit AST_Function() : mParent(nullptr), mEntryBB(nullptr), mExitBB(nullptr), mFunction(nullptr) {}
@@ -131,6 +134,9 @@ namespace maplefe {
 
       void     SetExitBB(AST_BB *bb)  {mExitBB = bb; bb->SetAttr(AK_Exit);}
       AST_BB  *GetExitBB()            {return mExitBB;}
+
+      void    SetLastBBId(BBIndex id) {mLastBBId = id;}
+      BBIndex GetLastBBId()           {return mLastBBId;}
 
       void Dump();
   };

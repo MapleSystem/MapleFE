@@ -33,6 +33,7 @@ namespace maplefe {
   void ModuleVisitor::FinalizeFunction() {
     AST_BB *exit = mCurrentFunction->GetExitBB();
     mCurrentBB->AddSuccessor(exit);
+    mCurrentFunction->SetLastBBId(AST_BB::GetLastId());
     mCurrentFunction = nullptr;
     mCurrentBB = nullptr;
   }
@@ -356,16 +357,17 @@ namespace maplefe {
   }
 
   void AST_Function::Dump() {
+    std::cout << "Function {" << std::endl;
     unsigned num = GetNestedFunctionsNum();
     if(num > 0) {
-      std::cout << "Nested Functions: " << num << " {" << std::endl;
+      std::cout << "Nested Functions: " << num << " [" << std::endl;
       for(unsigned i = 0; i < num; ++i) {
         std::cout << "Function: " << i + 1 << std::endl;
         GetNestedFunctionAtIndex(i)->Dump();
       }
-      std::cout << "}" << std::endl;
+      std::cout << "] // Nested Functions" << std::endl;
     }
-    std::cout << "Basic blocks: {" << std::endl;
+    std::cout << "BBs: [" << std::endl;
 
     std::stack<AST_BB*> bb_stack;
     AST_BB *entry = GetEntryBB(), *exit = GetExitBB();
@@ -397,14 +399,15 @@ namespace maplefe {
         }
       }
       std::cout << ")" << std::endl;
-      unsigned num = bb->GetStatementsNum();
-      if(num)
-        for(unsigned i = 0; i < num; ++i)
+      unsigned stmt_num = bb->GetStatementsNum();
+      if(stmt_num)
+        for(unsigned i = 0; i < stmt_num; ++i)
           std::cout << "  " << i + 1 << ". TreeNode: "
             << bb->GetStatementAtIndex(i)->GetNodeId() << std::endl;
     }
-    std::cout << "}" << std::endl;
-    std::cout << dot << "}" << std::endl;
+    std::cout << dot << "} // CFG in dot format" << std::endl;
+    std::cout << "] // BBs\nLastBBId" << (num ? " (Including nested functions)" : "") << ": "
+      << GetLastBBId() << "\n} // Function" << std::endl;
   }
 
   void AST_Module::BuildCFG() {

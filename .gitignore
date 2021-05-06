@@ -6,5 +6,7 @@ output/
 *.swp
 *.mpl
 *.js
+*.dot
+*.png
 gdbfile
 
