@@ -9,4 +9,4 @@ function dump(obj: Derived) {
 }
 
 let o = { name: "John", age: 30 };
-dump(o)
+dump(o);
