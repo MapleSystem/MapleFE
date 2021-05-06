@@ -21,19 +21,17 @@ namespace maplefe {
 
   void ModuleVisitor::InitializeFunction(A2C_Function *func) {
     // Create the entry BB and exit BB of current function
-    A2C_BB *bb = mModule->NewBB();
+    A2C_BB *bb = mModule->NewBB(BK_Uncond);
     func->SetEntryBB(bb);
-    func->SetExitBB(mModule->NewBB());
+    func->SetExitBB(mModule->NewBB(BK_Join));
     // Initialize the working function and BB
     mCurrentFunction = func;
-    mCurrentBB = mModule->NewBB();
+    mCurrentBB = mModule->NewBB(BK_Uncond);
     bb->AddSuccessor(mCurrentBB);
   }
 
   void ModuleVisitor::FinalizeFunction() {
     A2C_BB *exit = mCurrentFunction->GetExitBB();
-    //A2C_BB *entry = mCurrentFunction->GetEntryBB();
-    //entry->AddSuccessor(exit);
     mCurrentBB->AddSuccessor(exit);
     mCurrentFunction = nullptr;
     mCurrentBB = nullptr;
@@ -86,21 +84,21 @@ namespace maplefe {
     A2C_BB *current_bb = mCurrentBB;
 
     // Create a new BB for true branch
-    mCurrentBB = mModule->NewBB();
+    mCurrentBB = mModule->NewBB(BK_Uncond);
     current_bb->AddSuccessor(mCurrentBB);
 
     // Visit true branch first
     VisitTreeNode(node->GetTrueBranch());
 
     // Create a BB for the join point
-    A2C_BB *join = mModule->NewBB();
+    A2C_BB *join = mModule->NewBB(BK_Join);
     mCurrentBB->AddSuccessor(join);
 
     TreeNode *false_branch = node->GetFalseBranch();
     if(false_branch == nullptr)
       current_bb->AddSuccessor(join);
     else {
-      mCurrentBB = mModule->NewBB();
+      mCurrentBB = mModule->NewBB(BK_Uncond);
       current_bb->AddSuccessor(mCurrentBB);
       VisitTreeNode(false_branch);
       mCurrentBB->AddSuccessor(join);
@@ -118,9 +116,8 @@ namespace maplefe {
 
     A2C_BB *current_bb = mCurrentBB;
     // Create a new BB for loop header
-    mCurrentBB = mModule->NewBB();
+    mCurrentBB = mModule->NewBB(BK_LoopHeader);
     current_bb->AddSuccessor(mCurrentBB);
-    mCurrentBB->SetKind(BK_LoopHeader);
     // Set current_bb to be loop header
     current_bb = mCurrentBB;
 
@@ -130,10 +127,10 @@ namespace maplefe {
     //VisitTreeNode(node->GetCond());
 
     // Create a BB for loop body
-    mCurrentBB = mModule->NewBB();
+    mCurrentBB = mModule->NewBB(BK_Uncond);
     current_bb->AddSuccessor(mCurrentBB);
     // Create a new BB for getting out of the loop
-    A2C_BB *loop_exit = mModule->NewBB();
+    A2C_BB *loop_exit = mModule->NewBB(BK_Join);
 
     // Push loop_exit and current_bb to mTargetBBs for 'break' and 'continue'
     mTargetBBs.push(std::pair<A2C_BB*,A2C_BB*>{loop_exit, current_bb});
@@ -153,9 +150,8 @@ namespace maplefe {
   WhileLoopNode *ModuleVisitor::VisitWhileLoopNode(WhileLoopNode *node) {
     A2C_BB *current_bb = mCurrentBB;
     // Create a new BB for loop header
-    mCurrentBB = mModule->NewBB();
+    mCurrentBB = mModule->NewBB(BK_LoopHeader);
     current_bb->AddSuccessor(mCurrentBB);
-    mCurrentBB->SetKind(BK_LoopHeader);
     // Set current_bb to be loop header
     current_bb = mCurrentBB;
 
@@ -165,10 +161,10 @@ namespace maplefe {
     //VisitTreeNode(node->GetCond());
 
     // Create a BB for loop body
-    mCurrentBB = mModule->NewBB();
+    mCurrentBB = mModule->NewBB(BK_Uncond);
     current_bb->AddSuccessor(mCurrentBB);
     // Create a new BB for getting out of the loop
-    A2C_BB *loop_exit = mModule->NewBB();
+    A2C_BB *loop_exit = mModule->NewBB(BK_Join);
 
     // Push loop_exit and current_bb to mTargetBBs for 'break' and 'continue'
     mTargetBBs.push(std::pair<A2C_BB*,A2C_BB*>{loop_exit, current_bb});
@@ -185,17 +181,16 @@ namespace maplefe {
   DoLoopNode *ModuleVisitor::VisitDoLoopNode(DoLoopNode *node) {
     A2C_BB *current_bb = mCurrentBB;
     // Create a new BB for loop header
-    mCurrentBB = mModule->NewBB();
+    mCurrentBB = mModule->NewBB(BK_LoopHeader);
     current_bb->AddSuccessor(mCurrentBB);
-    mCurrentBB->SetKind(BK_LoopHeader);
     // Set current_bb to be loop header
     current_bb = mCurrentBB;
 
     // Create a BB for loop body
-    mCurrentBB = mModule->NewBB();
+    mCurrentBB = mModule->NewBB(BK_Uncond);
     current_bb->AddSuccessor(mCurrentBB);
     // Create a new BB for getting out of the loop
-    A2C_BB *loop_exit = mModule->NewBB();
+    A2C_BB *loop_exit = mModule->NewBB(BK_Join);
 
     // Push loop_exit and current_bb to mTargetBBs for 'break' and 'continue'
     mTargetBBs.push(std::pair<A2C_BB*,A2C_BB*>{loop_exit, current_bb});
@@ -243,13 +238,12 @@ namespace maplefe {
     A2C_BB *current_bb = mCurrentBB;
 
     // Create a new BB for getting out of the switch block
-    A2C_BB *exit = mModule->NewBB();
+    A2C_BB *exit = mModule->NewBB(BK_Join);
     mTargetBBs.push(std::pair<A2C_BB*,A2C_BB*>{exit,
         (mTargetBBs.empty() ? nullptr : mTargetBBs.top().second)});
     A2C_BB *prev_block = nullptr;
     for (unsigned i = 0; i < node->GetCasesNum(); ++i) {
-      A2C_BB *case_bb = mModule->NewBB();
-      case_bb->SetKind(BK_Case);
+      A2C_BB *case_bb = mModule->NewBB(BK_Case);
       current_bb->AddSuccessor(case_bb);
 
       TreeNode *case_node = node->GetCaseAtIndex(i);
@@ -269,10 +263,11 @@ namespace maplefe {
       case_bb->SetPredicate(case_expr);
 
       // Optimize for default case
-      if(is_default)
+      if(is_default) {
         mCurrentBB = case_bb;
-      else {
-        mCurrentBB = mModule->NewBB();
+        case_bb->SetKind(BK_Uncond);
+      } else {
+        mCurrentBB = mModule->NewBB(BK_Uncond);
         case_bb->AddSuccessor(mCurrentBB);
       }
 
@@ -317,14 +312,14 @@ namespace maplefe {
       current_bb->SetKind(BK_Block);
 
       // Create a new BB for current block node
-      mCurrentBB = mModule->NewBB();
+      mCurrentBB = mModule->NewBB(BK_Block);
       current_bb->AddSuccessor(mCurrentBB);
 
       // Visit all children nodes
       AstVisitor::VisitBlockNode(node);
 
       // Create a BB for the join point
-      A2C_BB *join = mModule->NewBB();
+      A2C_BB *join = mModule->NewBB(BK_Join);
       mCurrentBB->AddSuccessor(join);
       // This edge is to determine the block range for JS_Let or JS_Const DeclNode
       current_bb->AddSuccessor(join);
@@ -343,6 +338,15 @@ namespace maplefe {
   CallNode *ModuleVisitor::VisitCallNode(CallNode *node) {
     mCurrentBB->AddStatement(node);
     return node;
+  }
+
+  static std::string BBDotNode(A2C_BB *bb, const char *shape) {
+    static const char* const kBBNames[] =
+      { "unknown", "uncond", "block", "branch", "loop", "switch", "case", "yield", "term", "join" };
+    std::string str("BB" + std::to_string(bb->GetId()));
+    str += " [label=\"" + str + (shape[0] == 'e' ? std::string("\\n") + kBBNames[bb->GetKind()] : "")
+      + "\", shape=" + shape + "];\n";
+    return str;
   }
 
   void A2C_Function::Dump() {
@@ -365,9 +369,8 @@ namespace maplefe {
     visited.insert(exit);
     visited.insert(entry);
     // Dump CFG in dot format
-    std::string dot("---\ndigraph CFG {");
-    dot += "\nBB" + std::to_string(entry->GetId()) + " [shape=box];" +
-      "\nBB" + std::to_string(exit->GetId()) + " [shape=doublecircle];";
+    std::string dot("---\ndigraph CFG {\n");
+    dot += BBDotNode(entry, "box") + BBDotNode(exit, "doubleoctagon");
     const char* fake = " [style=dashed];";
     while(!bb_stack.empty()) {
       A2C_BB *bb = bb_stack.top();
@@ -377,13 +380,14 @@ namespace maplefe {
       for(unsigned i = 0; i < succ_num; ++i) {
         A2C_BB *curr = bb->GetSuccessorAtIndex(i);
         std::cout << "BB" << curr->GetId() << " ";
-        dot += "\nBB" + std::to_string(bb->GetId()) + " -> BB" + std::to_string(curr->GetId())
+        dot += "BB" + std::to_string(bb->GetId()) + " -> BB" + std::to_string(curr->GetId())
           + (bb == entry ? (curr == exit ? fake : ";") :
               succ_num == 1 ? ";" : i ? bb->GetKind() == BK_Block ? fake :
-              " [color=darkred];" : " [color=darkgreen];");
+              " [color=darkred];" : " [color=darkgreen];") + "\n";
         if(visited.find(curr) == visited.end()) {
           bb_stack.push(curr);
           visited.insert(curr);
+          dot += BBDotNode(curr, "ellipse");
         }
       }
       std::cout << ")" << std::endl;
@@ -394,8 +398,7 @@ namespace maplefe {
             << bb->GetStatementAtIndex(i)->GetNodeId() << std::endl;
     }
     std::cout << "}" << std::endl;
-    dot += "\n}";
-    std::cout << dot << std::endl;
+    std::cout << dot << "}" << std::endl;
   }
 
   void A2C_Module::BuildCFG() {

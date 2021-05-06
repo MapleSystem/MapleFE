@@ -34,7 +34,8 @@ namespace maplefe {
     BK_Switch,      // BB for a switch statement
     BK_Case,        // BB for a case in switch statement
     BK_Yield,       // Yield BB eneded with a yield statement
-    BK_Terminated   // Return BB endded with a return/break/continue statement
+    BK_Terminated,  // Return BB endded with a return/break/continue statement
+    BK_Join         // BB at join point
   };
 
   enum BBAttribute {
@@ -63,6 +64,7 @@ namespace maplefe {
 
     public:
       explicit A2C_BB() : mKind(BK_Unknown), mId(GetNextId()), mPredicate(nullptr) {}
+      explicit A2C_BB(BBKind k) : mKind(k), mId(GetNextId()), mPredicate(nullptr) {}
       ~A2C_BB() {mStatements.Release(); mSuccessors.Release(); mPredecessors.Release();}
 
       void   SetKind(BBKind k) {mKind = k;}
@@ -124,10 +126,10 @@ namespace maplefe {
       void          SetParent(A2C_Function *func) {mParent = func;}
       A2C_Function *GetParent()                   {return mParent;}
 
-      void     SetEntryBB(A2C_BB *bb) {mEntryBB = bb; bb->SetKind(BK_Uncond); bb->SetAttr(AK_Entry);}
+      void     SetEntryBB(A2C_BB *bb) {mEntryBB = bb; bb->SetAttr(AK_Entry);}
       A2C_BB  *GetEntryBB()           {return mEntryBB;}
 
-      void     SetExitBB(A2C_BB *bb)  {mExitBB = bb; bb->SetKind(BK_Uncond); bb->SetAttr(AK_Exit);}
+      void     SetExitBB(A2C_BB *bb)  {mExitBB = bb; bb->SetAttr(AK_Exit);}
       A2C_BB  *GetExitBB()            {return mExitBB;}
 
       void Dump();
@@ -157,8 +159,8 @@ namespace maplefe {
 
       bool GetTraceModule() {return mTraceModule;}
 
-      A2C_Function *NewFunction() {return new(mMemPool.Alloc(sizeof(A2C_Function))) A2C_Function;}
-      A2C_BB       *NewBB()       {return new(mMemPool.Alloc(sizeof(A2C_BB))) A2C_BB;}
+      A2C_Function *NewFunction()   {return new(mMemPool.Alloc(sizeof(A2C_Function))) A2C_Function;}
+      A2C_BB       *NewBB(BBKind k) {return new(mMemPool.Alloc(sizeof(A2C_BB))) A2C_BB(k);}
 
       void Dump(char *msg);
   };
