@@ -28,6 +28,8 @@ namespace maplefe {
 
 class AST_BB;
 class AST_Function;
+class AST_CFG;;
+class AST_DFA;;
 
 // Each source file is a module
 class AST_Handler {
@@ -35,6 +37,8 @@ class AST_Handler {
   MemPool       mMemPool;     // Memory pool for all AST_Function and AST_BB
   ASTModule    *mASTModule;   // for an AST module
   AST_Function *mFunction;    // an init function for statements in module scope
+  AST_CFG      *mCFG;
+  AST_DFA      *mDFA;
   bool          mTrace;
 
  public:

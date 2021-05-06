@@ -22,13 +22,13 @@
 namespace maplefe {
 
 void AST_Handler::BuildCFG() {
-  AST_CFG cfg(this, mTrace);
-  cfg.Build();
+  mCFG = new(mMemPool.Alloc(sizeof(AST_CFG))) AST_CFG(this, mTrace);
+  mCFG->Build();
 }
 
 void AST_Handler::BuildDFA() {
-  AST_DFA dfa(this, mTrace);
-  dfa.Build();
+  mDFA = new(mMemPool.Alloc(sizeof(AST_DFA))) AST_DFA(this, mTrace);
+  mDFA->Build();
 }
 
 void AST_Handler::Dump(char *msg) {
