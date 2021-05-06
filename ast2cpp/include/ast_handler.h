@@ -51,15 +51,13 @@ class AST_Handler {
   void BuildCFG();
   void BuildDFA();
 
-  ASTModule* GetASTModule() {return mASTModule;}
+  ASTModule *GetASTModule() {return mASTModule;}
+  MemPool   *GetMemPool()   {return &mMemPool;}
 
   void          SetFunction(AST_Function *func) {mFunction = func;}
   AST_Function *GetFunction()                   {return mFunction;}
 
-  bool GetTraceModule() {return mTrace;}
-
-  AST_Function *NewFunction()   {return new(mMemPool.Alloc(sizeof(AST_Function))) AST_Function;}
-  AST_BB       *NewBB(BBKind k) {return new(mMemPool.Alloc(sizeof(AST_BB))) AST_BB(k);}
+  bool GetTrace() {return mTrace;}
 
   void Dump(char *msg);
 };

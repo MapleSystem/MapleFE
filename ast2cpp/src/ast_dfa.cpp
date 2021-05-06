@@ -38,8 +38,7 @@ void AST_DFA::SplitDecl() {
 }
 
 DeclNode *DeclSplitVisitor::VisitDeclNode(DeclNode *node) {
-  // AstVisitor::VisitDeclNode(node);
-  // node->Dump(0);
+  MASSERT(node->GetVar()->IsIdentifier() && "need to split VarList decl");
   return node;
 }
 

@@ -89,8 +89,9 @@ class AST_BB {
   TreeNode* GetStatementAtIndex(unsigned i) {return mStatements.ValueAtIndex(i);}
 
   void AddSuccessor(AST_BB *succ) {
-    if(mKind == BK_Terminated)
+    if(mKind == BK_Terminated) {
       return;
+    }
     mSuccessors.PushBack(succ);
     succ->mPredecessors.PushBack(this);
   }
@@ -170,6 +171,9 @@ class CFGVisitor : public AstVisitor {
   explicit CFGVisitor(AST_Handler *h, bool t, bool base = false)
     : mHandler(h), mTrace(t), AstVisitor(t && base) {}
   ~CFGVisitor() = default;
+
+  AST_Function *NewFunction();
+  AST_BB       *NewBB(BBKind k);
 
   void InitializeFunction(AST_Function *func);
   void FinalizeFunction();

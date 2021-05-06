@@ -23,12 +23,12 @@ namespace maplefe {
 
 void CFGVisitor::InitializeFunction(AST_Function *func) {
   // Create the entry BB and exit BB of current function
-  AST_BB *bb = mHandler->NewBB(BK_Uncond);
+  AST_BB *bb = NewBB(BK_Uncond);
   func->SetEntryBB(bb);
-  func->SetExitBB(mHandler->NewBB(BK_Join));
+  func->SetExitBB(NewBB(BK_Join));
   // Initialize the working function and BB
   mCurrentFunction = func;
-  mCurrentBB = mHandler->NewBB(BK_Uncond);
+  mCurrentBB = NewBB(BK_Uncond);
   bb->AddSuccessor(mCurrentBB);
 }
 
@@ -41,15 +41,14 @@ void CFGVisitor::FinalizeFunction() {
 }
 
 FunctionNode *CFGVisitor::VisitFunctionNode(FunctionNode *node) {
-  if(mTrace)
-    std::cout << "CFGVisitor: enter FunctionNode, id=" << node->GetNodeId() << std::endl;
+  if(mTrace) std::cout << "CFGVisitor: enter FunctionNode, id=" << node->GetNodeId() << std::endl;
 
   // Save both mCurrentFunction and mCurrentBB
   AST_Function *current_func = mCurrentFunction;
   AST_BB *current_bb = mCurrentBB;
 
   // Create a new function and add it as a nested function to current function
-  mCurrentFunction = mHandler->NewFunction();
+  mCurrentFunction = NewFunction();
   current_func->AddNestedFunction(mCurrentFunction);
 
   InitializeFunction(mCurrentFunction);
@@ -61,8 +60,7 @@ FunctionNode *CFGVisitor::VisitFunctionNode(FunctionNode *node) {
   mCurrentFunction = current_func;
   mCurrentBB = current_bb;
 
-  if(mTrace)
-    std::cout << "CFGVisitor: exit FunctionNode, id=" << node->GetNodeId() << std::endl;
+  if(mTrace) std::cout << "CFGVisitor: exit FunctionNode, id=" << node->GetNodeId() << std::endl;
   return node;
 }
 
@@ -87,21 +85,21 @@ CondBranchNode *CFGVisitor::VisitCondBranchNode(CondBranchNode *node) {
   AST_BB *current_bb = mCurrentBB;
 
   // Create a new BB for true branch
-  mCurrentBB = mHandler->NewBB(BK_Uncond);
+  mCurrentBB = NewBB(BK_Uncond);
   current_bb->AddSuccessor(mCurrentBB);
 
   // Visit true branch first
   VisitTreeNode(node->GetTrueBranch());
 
   // Create a BB for the join point
-  AST_BB *join = mHandler->NewBB(BK_Join);
+  AST_BB *join = NewBB(BK_Join);
   mCurrentBB->AddSuccessor(join);
 
   TreeNode *false_branch = node->GetFalseBranch();
-  if(false_branch == nullptr)
+  if(false_branch == nullptr) {
     current_bb->AddSuccessor(join);
-  else {
-    mCurrentBB = mHandler->NewBB(BK_Uncond);
+  } else {
+    mCurrentBB = NewBB(BK_Uncond);
     current_bb->AddSuccessor(mCurrentBB);
     VisitTreeNode(false_branch);
     mCurrentBB->AddSuccessor(join);
@@ -120,7 +118,7 @@ ForLoopNode *CFGVisitor::VisitForLoopNode(ForLoopNode *node) {
 
   AST_BB *current_bb = mCurrentBB;
   // Create a new BB for loop header
-  mCurrentBB = mHandler->NewBB(BK_LoopHeader);
+  mCurrentBB = NewBB(BK_LoopHeader);
   current_bb->AddSuccessor(mCurrentBB);
   // Set current_bb to be loop header
   current_bb = mCurrentBB;
@@ -135,10 +133,10 @@ ForLoopNode *CFGVisitor::VisitForLoopNode(ForLoopNode *node) {
     mCurrentBB->SetPredicate(node);
 
   // Create a BB for loop body
-  mCurrentBB = mHandler->NewBB(BK_Uncond);
+  mCurrentBB = NewBB(BK_Uncond);
   current_bb->AddSuccessor(mCurrentBB);
   // Create a new BB for getting out of the loop
-  AST_BB *loop_exit = mHandler->NewBB(BK_Join);
+  AST_BB *loop_exit = NewBB(BK_Join);
 
   // Push loop_exit and current_bb to mTargetBBs for 'break' and 'continue'
   mTargetBBs.push(std::pair<AST_BB*,AST_BB*>{loop_exit, current_bb});
@@ -158,7 +156,7 @@ ForLoopNode *CFGVisitor::VisitForLoopNode(ForLoopNode *node) {
 WhileLoopNode *CFGVisitor::VisitWhileLoopNode(WhileLoopNode *node) {
   AST_BB *current_bb = mCurrentBB;
   // Create a new BB for loop header
-  mCurrentBB = mHandler->NewBB(BK_LoopHeader);
+  mCurrentBB = NewBB(BK_LoopHeader);
   current_bb->AddSuccessor(mCurrentBB);
   // Set current_bb to be loop header
   current_bb = mCurrentBB;
@@ -169,10 +167,10 @@ WhileLoopNode *CFGVisitor::VisitWhileLoopNode(WhileLoopNode *node) {
   //VisitTreeNode(node->GetCond());
 
   // Create a BB for loop body
-  mCurrentBB = mHandler->NewBB(BK_Uncond);
+  mCurrentBB = NewBB(BK_Uncond);
   current_bb->AddSuccessor(mCurrentBB);
   // Create a new BB for getting out of the loop
-  AST_BB *loop_exit = mHandler->NewBB(BK_Join);
+  AST_BB *loop_exit = NewBB(BK_Join);
 
   // Push loop_exit and current_bb to mTargetBBs for 'break' and 'continue'
   mTargetBBs.push(std::pair<AST_BB*,AST_BB*>{loop_exit, current_bb});
@@ -189,16 +187,16 @@ WhileLoopNode *CFGVisitor::VisitWhileLoopNode(WhileLoopNode *node) {
 DoLoopNode *CFGVisitor::VisitDoLoopNode(DoLoopNode *node) {
   AST_BB *current_bb = mCurrentBB;
   // Create a new BB for loop header
-  mCurrentBB = mHandler->NewBB(BK_LoopHeader);
+  mCurrentBB = NewBB(BK_LoopHeader);
   current_bb->AddSuccessor(mCurrentBB);
   // Set current_bb to be loop header
   current_bb = mCurrentBB;
 
   // Create a BB for loop body
-  mCurrentBB = mHandler->NewBB(BK_Uncond);
+  mCurrentBB = NewBB(BK_Uncond);
   current_bb->AddSuccessor(mCurrentBB);
   // Create a new BB for getting out of the loop
-  AST_BB *loop_exit = mHandler->NewBB(BK_Join);
+  AST_BB *loop_exit = NewBB(BK_Join);
 
   // Push loop_exit and current_bb to mTargetBBs for 'break' and 'continue'
   mTargetBBs.push(std::pair<AST_BB*,AST_BB*>{loop_exit, current_bb});
@@ -246,12 +244,12 @@ SwitchNode *CFGVisitor::VisitSwitchNode(SwitchNode *node) {
   AST_BB *current_bb = mCurrentBB;
 
   // Create a new BB for getting out of the switch block
-  AST_BB *exit = mHandler->NewBB(BK_Join);
+  AST_BB *exit = NewBB(BK_Join);
   mTargetBBs.push(std::pair<AST_BB*,AST_BB*>{exit,
       (mTargetBBs.empty() ? nullptr : mTargetBBs.top().second)});
   AST_BB *prev_block = nullptr;
   for (unsigned i = 0; i < node->GetCasesNum(); ++i) {
-    AST_BB *case_bb = mHandler->NewBB(BK_Case);
+    AST_BB *case_bb = NewBB(BK_Case);
     current_bb->AddSuccessor(case_bb);
 
     TreeNode *case_node = node->GetCaseAtIndex(i);
@@ -275,13 +273,14 @@ SwitchNode *CFGVisitor::VisitSwitchNode(SwitchNode *node) {
       mCurrentBB = case_bb;
       case_bb->SetKind(BK_Uncond);
     } else {
-      mCurrentBB = mHandler->NewBB(BK_Uncond);
+      mCurrentBB = NewBB(BK_Uncond);
       case_bb->AddSuccessor(mCurrentBB);
     }
 
     // Add a fall-through edge if needed
-    if(prev_block)
+    if(prev_block) {
       prev_block->AddSuccessor(mCurrentBB);
+    }
 
     VisitTreeNode(case_node);
 
@@ -293,8 +292,9 @@ SwitchNode *CFGVisitor::VisitSwitchNode(SwitchNode *node) {
 
   // Connect to the exit BB of this switch statement
   prev_block->AddSuccessor(exit);
-  if(prev_block != current_bb)
+  if(prev_block != current_bb) {
     current_bb->AddSuccessor(exit);
+  }
   mCurrentBB = exit;
   return node;
 }
@@ -304,26 +304,28 @@ BlockNode *CFGVisitor::VisitBlockNode(BlockNode *node) {
   unsigned i, num = node->GetChildrenNum();
   for (i = 0; i < num; ++i) {
     TreeNode *child = node->GetChildAtIndex(i);
-    if(child->GetKind() != NK_Decl)
+    if(child->GetKind() != NK_Decl) {
       continue;
+    }
     DeclNode *decl = static_cast<DeclNode *>(child);
-    if(decl->GetProp() == JS_Let || decl->GetProp() == JS_Const)
+    if(decl->GetProp() == JS_Let || decl->GetProp() == JS_Const) {
       break;
+    }
   }
-  if(i >= num)
+  if(i >= num) {
     // Do not create BB for current block when no JS_Let or JS_Const DeclNode inside
     AstVisitor::VisitBlockNode(node);
-  else {
+  } else {
     // Needs BBs for current block
     // Save current BB
     AST_BB *current_bb = mCurrentBB;
     current_bb->SetKind(BK_Block);
 
     // Create a BB for the join point
-    AST_BB *join = mHandler->NewBB(BK_Join);
+    AST_BB *join = NewBB(BK_Join);
 
     // Create a new BB for current block node
-    mCurrentBB = mHandler->NewBB(BK_Uncond);
+    mCurrentBB = NewBB(BK_Uncond);
     current_bb->AddSuccessor(mCurrentBB);
 
     // Visit all children nodes
@@ -347,6 +349,14 @@ DeclNode *CFGVisitor::VisitDeclNode(DeclNode *node) {
 CallNode *CFGVisitor::VisitCallNode(CallNode *node) {
   mCurrentBB->AddStatement(node);
   return node;
+}
+
+AST_Function *CFGVisitor::NewFunction()   {
+  return new(mHandler->GetMemPool()->Alloc(sizeof(AST_Function))) AST_Function;
+}
+
+AST_BB *CFGVisitor::NewBB(BBKind k) {
+  return new(mHandler->GetMemPool()->Alloc(sizeof(AST_BB))) AST_BB(k);
 }
 
 static std::string BBDotNode(AST_BB *bb, const char *shape) {
@@ -402,10 +412,12 @@ void AST_Function::Dump() {
     }
     std::cout << ")" << std::endl;
     unsigned stmt_num = bb->GetStatementsNum();
-    if(stmt_num)
-      for(unsigned i = 0; i < stmt_num; ++i)
+    if(stmt_num) {
+      for(unsigned i = 0; i < stmt_num; ++i) {
         std::cout << "  " << i + 1 << ". TreeNode: "
           << bb->GetStatementAtIndex(i)->GetNodeId() << std::endl;
+      }
+    }
   }
   std::cout << dot << "} // CFG in dot format" << std::endl;
   std::cout << "] // BBs\nLastBBId" << (num ? " (Including nested functions)" : "") << ": "
@@ -420,12 +432,13 @@ void AST_CFG::BuildCFG() {
   if (mTrace) std::cout << "============== BuildCFG ==============" << std::endl;
   CFGVisitor visitor(mHandler, mTrace, true);
   // Set the init function for current module
-  AST_Function *func = mHandler->NewFunction();
+  AST_Function *func = visitor.NewFunction();
   mHandler->SetFunction(func);
   // Start to build CFG for current module
   visitor.InitializeFunction(func);
-  for(auto it: mHandler->GetASTModule()->mTrees)
+  for(auto it: mHandler->GetASTModule()->mTrees) {
     visitor.Visit(it->mRootNode);
+  }
   visitor.FinalizeFunction();
 }
 
