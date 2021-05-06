@@ -778,7 +778,9 @@ rule IterationStatement : ONEOF(
 ##  for ( ForDeclaration[?Yield] in Expression[In, ?Yield] ) Statement[?Yield, ?Return]
 ##  for ( [lookahead NotEq let ] LeftHandSideExpression[?Yield] of AssignmentExpression[In, ?Yield] ) Statement[?Yield, ?Return]
   "for" + '(' + "var" + ForBinding + "of" + AssignmentExpression + ')' + Statement,
-##  for ( ForDeclaration[?Yield] of AssignmentExpression[In, ?Yield] ) Statement[?Yield, ?Return]
+
+  "for" + '(' + "let" + ForBinding + "of" + AssignmentExpression + ')' + Statement,
+  "for" + '(' + "const" + ForBinding + "of" + AssignmentExpression + ')' + Statement,
   )
   attr.action.%1 : BuildDoLoop(%5, %2)
   attr.action.%2 : BuildWhileLoop(%3, %5)
@@ -789,6 +791,11 @@ rule IterationStatement : ONEOF(
   attr.action.%5,%6 : SetJSVar()
   attr.action.%5 : BuildForLoop_In(%6, %8)
   attr.action.%6 : BuildForLoop_Of(%6, %8)
+
+  attr.action.%7,%8 : BuildDecl(%4)
+  attr.action.%7 : SetJSLet()
+  attr.action.%8 : SetJSConst()
+  attr.action.%7,%8 : BuildForLoop_Of(%6, %8)
 
 ##-----------------------------------
 ##rule ForDeclaration[Yield] :
