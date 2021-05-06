@@ -352,11 +352,14 @@ def get_data_based_on_type(val_type, accessor):
             or val_type == 'unsigned' or val_type == 'int' or val_type == 'int32_t' or val_type == 'int64_t' :
         return val_type + ', " + std::to_string(' + accessor + '));'
     elif val_type == 'const char *':
-        return val_type + ', " + (' + accessor + ' ? std::string("\\"") + ' + accessor + ' + "\\"" : "null"));'
+        return 'const char*, " + (' + accessor + ' ? std::string("\\"") + ' + accessor + ' + "\\"" : "null"));'
     return val_type + ', " + "value"); // Warning: failed to get value'
 
 def short_name(node_type):
-    return node_type.replace('class ', '').replace('maplefe::', '')
+    return node_type.replace('class ', '').replace('maplefe::', '').replace(' *', '*')
+
+def padding_name(name):
+    return gen_args[3] + name.ljust(7)
 
 # The follwoing gen_func_* and gen_call* functions are for AstDump
 gen_call_handle_values = lambda: True
@@ -367,16 +370,18 @@ gen_func_definition = lambda dictionary, node_name: \
         + ('if (node == nullptr) {\nDump("  TreeNode: null");\nreturn;\n}' if node_name == "TreeNode" else \
         '\nif(DumpFB("' + node_name + '", node)) {')
 gen_call_child_node = lambda dictionary, field_name, node_type, accessor: \
-        ('Dump("' + gen_args[3] + field_name + ': ' + short_name(node_type) + '*");\n' if field_name != '' else '') \
-        + gen_args[2] + short_name(node_type) + "(" + accessor + ");"
+        ('Dump("' + padding_name(field_name) + ': ' + short_name(node_type) + '*" + std::string(' + accessor \
+        + ' ? "" : ", null"));\n' if field_name != '' else '') \
+        + "if(" + accessor + ')\n' + gen_args[2] + short_name(node_type) + '(' + accessor + ');'
 gen_call_child_value = lambda dictionary, field_name, val_type, accessor: \
-        'Dump(std::string("' + gen_args[3] + field_name + ': ") + "' + get_data_based_on_type(val_type, accessor)
+        'Dump(std::string("' + padding_name(field_name) + ': ") + "' + get_data_based_on_type(val_type, accessor)
 gen_call_children_node = lambda dictionary, field_name, node_type, accessor: \
-        'DumpLB("' + gen_args[3] + field_name + ': ' + short_name(node_type) + ', size = " + std::to_string(' + accessor + ') + " [");'
+        'DumpLB("' + padding_name(field_name) + ': ' + short_name(node_type) + ', size = " + std::to_string(' \
+        + accessor + ') + " [");'
 gen_call_children_node_end = lambda dictionary, field_name, node_type, accessor: 'DumpLE("]");'
 gen_call_nth_subchild_node = lambda dictionary, field_name, node_type, accessor: \
-        'Dump(std::to_string(i + 1) + ": ' + short_name(node_type) + '*");\n' + gen_args[2] \
-        + short_name(node_type) + "(" + accessor + ");"
+        'Dump(std::to_string(i + 1) + ": ' + short_name(node_type) + '*" + (' + accessor + ' ? "" : ", null"));\n' \
+        + 'if(' + accessor + ')\n' + gen_args[2] + short_name(node_type) + '(' + accessor + ');'
 gen_call_nth_subchild_value = lambda dictionary, field_name, val_type, accessor: \
         'Dump(std::to_string(i) + ". ' + get_data_based_on_type(val_type, accessor)
 gen_func_definition_end = lambda dictionary, node_name: \
@@ -460,7 +465,7 @@ handle_yaml(initial_yaml, gen_enum_func)
 gen_args[2] = "Dump"
 gen_args[3] = "^ "
 gen_call_child_node = lambda dictionary, field_name, node_type, accessor: \
-    ('Dump("' + gen_args[3] + field_name + ': ' + short_name(node_type) \
+    ('Dump("' + padding_name(field_name) + ': ' + short_name(node_type) \
     + '*, " + (' + accessor + ' ? "NodeId=" + std::to_string(' + accessor \
     + '->GetNodeId()) : std::string("null")));\n' if field_name != '' else '')
 handle_yaml(treenode_yaml, gen_handler_derived)
