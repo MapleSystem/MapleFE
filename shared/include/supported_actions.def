@@ -111,6 +111,9 @@ ACTION(BuildDims)
 ACTION(AddDims)
 ACTION(AddDimsTo)
 
+// Set a tree node as a statement
+ACTION(SetIsStmt)
+
 // statment, control flow
 ACTION(BuildAssignment)
 ACTION(BuildAssert)

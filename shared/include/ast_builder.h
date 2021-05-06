@@ -159,6 +159,7 @@ public:
   TreeNode* AddDimsTo();
 
   // Statements, Control Flow
+  TreeNode* SetIsStmt();
   TreeNode* BuildAssignment();
   TreeNode* BuildReturn();
   TreeNode* BuildCondBranch();

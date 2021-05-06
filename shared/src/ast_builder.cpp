@@ -377,6 +377,22 @@ TreeNode* ASTBuilder::BuildTernaryOperation() {
   return n;
 }
 
+// Takes one argument. Set the tree as a statement.
+// We still return the previous mLastTreeNode.
+TreeNode* ASTBuilder::SetIsStmt() {
+  if (mTrace)
+    std::cout << "In SetIsStmt" << std::endl;
+
+  Param p_tree = mParams[0];
+  if (!p_tree.mIsEmpty) {
+    MASSERT(p_tree.mIsTreeNode);
+    TreeNode *treenode = p_tree.mData.mTreeNode;
+    treenode->SetIsStmt();
+  }
+
+  return mLastTreeNode;
+}
+
 // Assignment is actually a binary operator.
 TreeNode* ASTBuilder::BuildAssignment() {
   if (mTrace)

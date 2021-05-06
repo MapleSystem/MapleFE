@@ -76,8 +76,12 @@ protected:
   TreeNode *mParent;
   TreeNode *mLabel;   // label of a statement, or expression.
   const char *mName;
+
+  bool      mIsStmt;  // if a node is a statement
+
 public:
-  TreeNode() : mKind(NK_Null), mNodeId(GetNextId()), mLabel(NULL), mParent(NULL), mName(NULL) {}
+  TreeNode() : mKind(NK_Null), mNodeId(GetNextId()), mLabel(NULL),
+               mParent(NULL), mName(NULL), mIsStmt(false) {}
   virtual ~TreeNode() {}
 
 #undef  NODEKIND
@@ -94,6 +98,9 @@ public:
   unsigned  GetNodeId() {return mNodeId;}
   TreeNode* GetParent() {return mParent;}
   TreeNode* GetLabel()  {return mLabel;}
+
+  bool GetIsStmt() {return mIsStmt;}
+  void SetIsStmt() {mIsStmt = true;}
 
   virtual const char* GetName() {return mName;}
   virtual void SetName(const char *s) {mName = s;}
