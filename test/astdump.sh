@@ -12,11 +12,10 @@ for ts; do
       grep -v ^-- | sed 'N;s/\n/ /' | sed -e 's/:digraph [^{]* { */,/' -e 's/:.*/p/g' |
       while read cmd; do
         echo --- "$ts"; cat "$ts"
-        tmp=$(mktemp -p .)
-        sed -n $cmd <<< "$out" > ./$tmp
-        dot -Tpng -o ./$tmp.png ./$tmp
-        viewnior ./$tmp.png
-        rm -f ./$tmp.png ./$tmp
+        sed -n $cmd <<< "$out" > "$ts".dot
+        dot -Tpng -o "$ts".png "$ts".dot
+        viewnior "$ts".png
+        rm -f "$ts".png "$ts".dot
       done
   fi
 done
