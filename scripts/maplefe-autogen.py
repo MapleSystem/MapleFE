@@ -14,6 +14,7 @@ output_dir = builddir + '/ast_doc/' if builddir != None else root_dir + "output/
 maplefe_dir = root_dir + 'shared/'
 # initial_yaml = output_dir + 'maplefe/index.yaml' # For higher version of clang-doc
 initial_yaml = output_dir + 'maplefe.yaml'         # For version 10
+treenode_yaml = output_dir + 'maplefe/TreeNode.yaml'
 
 license_notice = [
         '/*',
@@ -350,6 +351,8 @@ def get_data_based_on_type(val_type, accessor):
     elif val_type == 'unsigned int' or val_type == 'uint32_t' or val_type == 'uint64_t' \
             or val_type == 'unsigned' or val_type == 'int' or val_type == 'int32_t' or val_type == 'int64_t' :
         return val_type + ', " + std::to_string(' + accessor + '));'
+    elif val_type == 'const char *':
+        return val_type + ', " + (' + accessor + ' ? std::string("\\"") + ' + accessor + ' + "\\"" : "null"));'
     return val_type + ', " + "value"); // Warning: failed to get value'
 
 def short_name(node_type):
@@ -364,12 +367,12 @@ gen_func_definition = lambda dictionary, node_name: \
         + ('if (node == nullptr) {\nDump("  TreeNode: null");\nreturn;\n}' if node_name == "TreeNode" else \
         '\nif(DumpFB("' + node_name + '", node)) {')
 gen_call_child_node = lambda dictionary, field_name, node_type, accessor: \
-        ('Dump("' + field_name + ': ' + short_name(node_type) + '*");\n' if field_name != '' else '') \
+        ('Dump("' + gen_args[3] + field_name + ': ' + short_name(node_type) + '*");\n' if field_name != '' else '') \
         + gen_args[2] + short_name(node_type) + "(" + accessor + ");"
 gen_call_child_value = lambda dictionary, field_name, val_type, accessor: \
-        'Dump(std::string("' + field_name + ': ") + "' + get_data_based_on_type(val_type, accessor)
+        'Dump(std::string("' + gen_args[3] + field_name + ': ") + "' + get_data_based_on_type(val_type, accessor)
 gen_call_children_node = lambda dictionary, field_name, node_type, accessor: \
-        'DumpLB("' + field_name + ': ' + short_name(node_type) + ', size = " + std::to_string(' + accessor + ') + " [");'
+        'DumpLB("' + gen_args[3] + field_name + ': ' + short_name(node_type) + ', size = " + std::to_string(' + accessor + ') + " [");'
 gen_call_children_node_end = lambda dictionary, field_name, node_type, accessor: 'DumpLE("]");'
 gen_call_nth_subchild_node = lambda dictionary, field_name, node_type, accessor: \
         'Dump(std::to_string(i + 1) + ": ' + short_name(node_type) + '*");\n' + gen_args[2] \
@@ -384,8 +387,9 @@ gen_func_definition_end = lambda dictionary, node_name: \
 #
 gen_args = [
         "gen_astdump", # filename
-        "AstDump", # Class name
+        "AstDump",     # Class name
         "AstDump",     # Prefix of function name
+        "",            # Prefix of generated string literal for field name
         ]
 
 astdump_init = [
@@ -409,7 +413,7 @@ astdump_init = [
         'TreeNode* DumpFB(const std::string& msg, TreeNode* node) {',
         'std::cout << indstr.substr(0, indent + 2) << msg;',
         'if (node == nullptr)', 'std::cout << ": null" << std::endl;',
-        'else {', 'indent += 4;', 'std::cout << " {" << std::endl;', 'DumpBase(node);', '}',
+        'else {', 'indent += 4;', 'std::cout << " {" << std::endl;', 'DumpTreeNode(node);', '}',
         'return node;',
         '}', '',
         'void DumpFE() {',
@@ -420,18 +424,6 @@ astdump_init = [
         '}', '',
         'void DumpLE(const std::string& msg) {',
         'indent -= 4;', 'std::cout << indstr.substr(0, indent + 2) << msg << std::endl;',
-        '}', '',
-        'void DumpBase(TreeNode* node) {',
-        'Dump(std::string("^ mKind: NodeKind, ") + GetEnumNodeKind(node->GetKind()));',
-        'Dump(std::string("^ mNodeId: unsigned, ") + std::to_string(node->GetNodeId()));',
-        'const char* name = node->GetName();',
-        'if(name)',
-        'Dump(std::string("^ mName: const char*, \\"") + node->GetName() + "\\"");',
-        'TreeNode* label = node->GetLabel();',
-        'if(label) {',
-        'Dump("^ mLabel: TreeNode*: ");',
-        'AstDumpTreeNode(label);'
-        '}',
         '}', '',
         'std::string GetEnumLitData(LitData lit) {',
         'std::string str = GetEnumLitId(lit.mType);',
@@ -465,6 +457,13 @@ handle_src_include_files(Initialization)
 append(include_file, astdump_init)
 handle_yaml(initial_yaml, gen_handler)
 handle_yaml(initial_yaml, gen_enum_func)
+gen_args[2] = "Dump"
+gen_args[3] = "^ "
+gen_call_child_node = lambda dictionary, field_name, node_type, accessor: \
+    ('Dump("' + gen_args[3] + field_name + ': ' + short_name(node_type) \
+    + '*, " + (' + accessor + ' ? "NodeId=" + std::to_string(' + accessor \
+    + '->GetNodeId()) : std::string("null")));\n' if field_name != '' else '')
+handle_yaml(treenode_yaml, gen_handler_derived)
 handle_src_include_files(Finalization)
 
 ################################################################################
