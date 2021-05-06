@@ -11,6 +11,7 @@ for ts; do
     grep -n -e "^digraph [^{]* {" -e "^}" <<< "$out" | grep -A1 "digraph [^{]* {" |
       grep -v ^-- | sed 'N;s/\n/ /' | sed -e 's/:digraph [^{]* { */,/' -e 's/:.*/p/g' |
       while read cmd; do
+        echo --- "$ts"; cat "$ts"
         tmp=$(mktemp -p .)
         sed -n $cmd <<< "$out" > ./$tmp
         dot -Tpng -o ./$tmp.png ./$tmp
