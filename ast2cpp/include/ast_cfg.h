@@ -141,7 +141,7 @@ namespace maplefe {
       void Dump();
   };
 
-  // Each TS source file is a module
+  // Each source file is a module
   class AST_Module {
     private:
       MemPool       mMemPool;     // Memory pool for all AST_Function and AST_BB
@@ -157,6 +157,7 @@ namespace maplefe {
       ~AST_Module() {mMemPool.Release();}
 
       void BuildCFG();
+      void BuildDFA();
 
       ASTModule* GetASTModule() {return mASTModule;}
 

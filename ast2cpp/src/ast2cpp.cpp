@@ -43,6 +43,10 @@ namespace maplefe {
     module.BuildCFG();
     if (mTraceA2C)
       module.Dump("After module.BuildCFG()");
+
+    module.BuildDFA();
+    if (mTraceA2C)
+      module.Dump("After module.BuildDFA()");
   }
 }
 

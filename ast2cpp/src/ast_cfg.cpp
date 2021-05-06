@@ -16,6 +16,7 @@
 #include <stack>
 #include <set>
 #include "ast_cfg.h"
+#include "ast_dfa.h"
 
 namespace maplefe {
 
@@ -411,6 +412,7 @@ namespace maplefe {
   }
 
   void AST_Module::BuildCFG() {
+    if (mTraceModule) std::cout << "============== BuildCFG ==============" << std::endl;
     ModuleVisitor visitor(this, mTraceModule, true);
     // Set the init function for current module
     AST_Function *func = NewFunction();
@@ -418,8 +420,13 @@ namespace maplefe {
     // Start to build CFG for current module
     visitor.InitializeFunction(func);
     for(auto it: mASTModule->mTrees)
-          visitor.Visit(it->mRootNode);
+      visitor.Visit(it->mRootNode);
     visitor.FinalizeFunction();
+  }
+
+  void AST_Module::BuildDFA() {
+    AST_DFA dfa(this, mTraceModule);
+    dfa.Build();
   }
 
   void AST_Module::Dump(char *msg) {

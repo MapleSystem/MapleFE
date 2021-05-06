@@ -73,6 +73,8 @@ else ifeq ($(SRCLANG),typescript)
 	../output/typescript/typescript/ts2cpp $(build)/$@.ts $(FLAGS)
 	@echo "\n======================= $@.ts ========================="
 	@cat -n $(build)/$@.ts
+	@echo "========================================================\n"
+	@echo gdb --args ../output/typescript/typescript/ts2cpp $(build)/$@.ts $(FLAGS)
 	@echo "\n======================= $@.cpp ========================="
 	@cat -n $(build)/$@.cpp
 	@echo "========================================================\n"
