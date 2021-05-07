@@ -59,14 +59,14 @@ class AST_BB {
   BBAttribute              mAttr;
   BBIndex                  mId;             // unique BB id
   TreeNode                *mPredicate;      // a predicate for true/false branches
-  TreeNode                *mRootNode;       // the root node of current BB
+  TreeNode                *mAuxNode;        // the auxiliary node of current BB
   SmallVector<TreeNode *>  mStatements;     // all statement nodes
   SmallList<AST_BB *>      mSuccessors;     // for BK_Branch: [0] true branch, [1] false branch
   SmallList<AST_BB *>      mPredecessors;
 
  public:
   explicit AST_BB(BBKind k)
-    : mKind(k), mAttr(AK_Unknown), mId(GetNextId()), mPredicate(nullptr), mRootNode(nullptr) {}
+    : mKind(k), mAttr(AK_Unknown), mId(GetNextId()), mPredicate(nullptr), mAuxNode(nullptr) {}
   ~AST_BB() {mStatements.Release(); mSuccessors.Release(); mPredecessors.Release();}
 
   void   SetKind(BBKind k) {mKind = k;}
@@ -81,8 +81,8 @@ class AST_BB {
   void      SetPredicate(TreeNode *node) {mPredicate = node;}
   TreeNode *GetPredicate()               {return mPredicate;}
 
-  void      SetRootNode(TreeNode *node)  {mRootNode = node;}
-  TreeNode *GetRootNode()                {return mRootNode;}
+  void      SetAuxNode(TreeNode *node)  {mAuxNode = node;}
+  TreeNode *GetAuxNode()                {return mAuxNode;}
 
   void AddStatement(TreeNode *stmt) {if(mKind != BK_Terminated) mStatements.PushBack(stmt);}
 
@@ -179,7 +179,11 @@ class CFGVisitor : public AstVisitor {
   void InitializeFunction(AST_Function *func);
   void FinalizeFunction();
 
+  // For function and lambda
   FunctionNode *VisitFunctionNode(FunctionNode *node);
+  LambdaNode *VisitLambdaNode(LambdaNode *node);
+
+  // For statements of control flow
   ReturnNode *VisitReturnNode(ReturnNode *node);
   CondBranchNode *VisitCondBranchNode(CondBranchNode *node);
   ForLoopNode *VisitForLoopNode(ForLoopNode *node);
@@ -190,8 +194,26 @@ class CFGVisitor : public AstVisitor {
   SwitchNode *VisitSwitchNode(SwitchNode *node);
   BlockNode *VisitBlockNode(BlockNode *node);
 
+  // For statements of a BB
+  PassNode *VisitPassNode(PassNode *node);
+  ImportNode *VisitImportNode(ImportNode *node);
   DeclNode *VisitDeclNode(DeclNode *node);
+  ParenthesisNode *VisitParenthesisNode(ParenthesisNode *node);
+  CastNode *VisitCastNode(CastNode *node);
+  ArrayElementNode *VisitArrayElementNode(ArrayElementNode *node);
+  VarListNode *VisitVarListNode(VarListNode *node);
+  ExprListNode *VisitExprListNode(ExprListNode *node);
+  LiteralNode *VisitLiteralNode(LiteralNode *node);
+  UnaOperatorNode *VisitUnaOperatorNode(UnaOperatorNode *node);
+  BinOperatorNode *VisitBinOperatorNode(BinOperatorNode *node);
+  TerOperatorNode *VisitTerOperatorNode(TerOperatorNode *node);
+  InstanceOfNode *VisitInstanceOfNode(InstanceOfNode *node);
+  TypeOfNode *VisitTypeOfNode(TypeOfNode *node);
+  NewNode *VisitNewNode(NewNode *node);
+  DeleteNode *VisitDeleteNode(DeleteNode *node);
   CallNode *VisitCallNode(CallNode *node);
+  AssertNode *VisitAssertNode(AssertNode *node);
+
 };
 }
 #endif

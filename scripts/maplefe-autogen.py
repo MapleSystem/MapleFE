@@ -142,7 +142,7 @@ def gen_enum_func(dictionary):
     xcode = ['']
     for each in dictionary["ChildEnums"]:
         name = each["Name"]
-        hcode.append("const char* GetEnum" + name + "(" + name + " k);")
+        hcode.append("static const char* GetEnum" + name + "(" + name + " k);")
         xcode.append("const char* " + gen_args[1] + "::GetEnum" + name + "(" + name + " k) {")
         xcode.append("switch(k) {")
         for e in get_enum_list(dictionary, name):
@@ -466,6 +466,7 @@ astdump_init = [
 handle_src_include_files(Initialization)
 append(include_file, astdump_init)
 handle_yaml(initial_yaml, gen_handler)
+append(include_file, ['','public:'])
 handle_yaml(initial_yaml, gen_enum_func)
 gen_args[2] = "Dump"
 gen_args[3] = "^ "
