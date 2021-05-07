@@ -32,6 +32,7 @@
 #ifndef __CONTAINER_H__
 #define __CONTAINER_H__
 
+#include <type_traits>
 #include "mempool.h"
 #include "massert.h"
 
@@ -77,7 +78,10 @@ public:
 
   void PushBack(T t) {
     char *addr = mMemPool.AllocElem();
-    *(T*)addr = t;
+    if(std::is_class<T>::value)
+      new (addr) T(t);
+    else
+      *(T*)addr = t;
     mNum++;
   }
 
@@ -107,7 +111,10 @@ public:
   // It's the caller's duty to make sure ith element is valid.
   void SetElem(unsigned i, T t) {
     char *addr = mMemPool.AddrOfIndex(i);
-    *(T*)addr = t;
+    if(std::is_class<T>::value)
+      new (addr) T(t);
+    else
+      *(T*)addr = t;
   }
 
   bool Find(T t) {
