@@ -500,10 +500,10 @@ rule ConditionalExpression : ONEOF(
 rule AssignmentExpression : ONEOF(
   ConditionalExpression,
 #  [+Yield] YieldExpression[?In]
-#  ArrowFunction[?In, ?Yield]
+  ArrowFunction,
   LeftHandSideExpression + '=' + AssignmentExpression,
   LeftHandSideExpression + AssignmentOperator + AssignmentExpression)
-  attr.action.%2,%3 : BuildAssignment(%1, %2, %3)
+  attr.action.%3,%4 : BuildAssignment(%1, %2, %3)
 
 rule AssignmentOperator : ONEOF("*=", "/=", "%=", "+=", "-=", "<<=", ">>=", ">>>=", "&=", "^=", "|=")
 
@@ -991,14 +991,22 @@ rule FunctionStatementList : ZEROORONE(StatementList)
 ## See 14.2
 ## ArrowFunction[In, Yield] :
 ## ArrowParameters[?Yield] [no LineTerminator here] => ConciseBody[?In]
+rule ArrowFunction : ArrowParameters + "=>" + ConciseBody
+
 ## See 14.2
 ## ArrowParameters[Yield] :
 ## BindingIdentifier[?Yield]
 ## CoverParenthesizedExpressionAndArrowParameterList[?Yield]
+rule ArrowParameters : ONEOF(BindingIdentifier,
+                             CoverParenthesizedExpressionAndArrowParameterList)
+
 ## See 14.2
 ## ConciseBody[In] :
 ## [lookahead ≠ { ] AssignmentExpression[?In]
 ## { FunctionBody }
+rule ConciseBody : ONEOF(AssignmentExpression,
+                         '{' + FunctionBody + '}')
+
 ## 
 ## See 14.3
 ## MethodDefinition[Yield] :
@@ -1106,7 +1114,7 @@ rule PrimaryType: ONEOF(ParenthesizedType,
                         TypeReference,
                         ObjectType,
                         ArrayType,
-#                        TupleType,
+                        TupleType,
 #                        TypeQuery,
                         ThisType)
 ## rule ParenthesizedType: ( Type )
@@ -1147,8 +1155,14 @@ rule TypeMember : ONEOF(PropertySignature,
 rule ArrayType: PrimaryType + '[' + ']'
 
 ## rule TupleType: [ TupleElementTypes ]
+rule TupleType: '[' + TupleElementTypes + ']'
+
 ## rule TupleElementTypes: TupleElementType TupleElementTypes , TupleElementType
+rule TupleElementTypes: ONEOF(TupleElementType,
+                              TupleElementTypes + ',' + TupleElementType)
+
 ## rule TupleElementType: Type
+rule TupleElementType: Type
 
 ## rule UnionType: UnionOrIntersectionOrPrimaryType | IntersectionOrPrimaryType
 rule UnionType: UnionOrIntersectionOrPrimaryType + '|' + IntersectionOrPrimaryType

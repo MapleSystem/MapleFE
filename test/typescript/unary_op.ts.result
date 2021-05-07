@@ -31,7 +31,7 @@ js_var Decl: x
 == Sub Tree ==
 x.a
 == Sub Tree ==
-0
+
 == Sub Tree ==
  typeof 8
 == Sub Tree ==
