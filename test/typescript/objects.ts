@@ -4,7 +4,7 @@ function func(){};
 
 let funcObj = function(name: string) {
   this._name = name;
-}
+};
 
 class ObjClass {
   private _name: string;
