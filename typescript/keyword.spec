@@ -29,6 +29,11 @@ STRUCT KeyWord : ((boolean),
                   (undefined),
                   (type),
 
+                  (get),
+                  (set),
+
+                  (constructor),
+
                   (break),
                   (do),
                   (in),

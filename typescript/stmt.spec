@@ -565,7 +565,7 @@ rule Statement : ONEOF(
 
 ## NOTE. Typescript added InterfaceDeclaration, TypeAliasDeclaration, EnumDeclaration
 rule Declaration : ONEOF(HoistableDeclaration,
-                         ##  ClassDeclaration[?Yield]
+                         ClassDeclaration,
                          LexicalDeclaration,
                          InterfaceDeclaration,
                          TypeAliasDeclaration)
@@ -1309,8 +1309,9 @@ rule ClassOrInterfaceType: TypeReference
 ##############################################################################################
 
 ## ClassDeclaration: ( Modified ) class BindingIdentifieropt TypeParametersopt ClassHeritage { ClassBody }
+## NOTE. I inlined ClassHeritage to avoid 'lookahead fail'
 rule ClassDeclaration:
-  "class" + ZEROORONE(BindingIdentifier) + ZEROORONE(TypeParameters) + ClassHeritage + '{' + ClassBody + '}'
+  "class" + ZEROORONE(BindingIdentifier) + ZEROORONE(TypeParameters) + ZEROORONE(ClassExtendsClause) + ZEROORONE(ImplementsClause) + '{' + ClassBody + '}'
 
 ## ClassHeritage: ( Modified ) ClassExtendsClauseopt ImplementsClauseopt
 rule ClassHeritage: ZEROORONE(ClassExtendsClause) + ZEROORONE(ImplementsClause)

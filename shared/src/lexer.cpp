@@ -45,7 +45,16 @@ int Lexer::ReadALine() {
     line[0] = '\0';
     endoffile = true;
   } else {
-    if (line[current_line_size - 1] == '\n') {
+    // There could be \n\r or \r\n
+    // Handle the last escape
+    if ((line[current_line_size - 1] == '\n') ||
+        (line[current_line_size - 1] == '\r')) {
+      line[current_line_size - 1] = '\0';
+      current_line_size--;
+    }
+    // Handle the second last escape
+    if ((line[current_line_size - 1] == '\n') ||
+        (line[current_line_size - 1] == '\r')) {
       line[current_line_size - 1] = '\0';
       current_line_size--;
     }
