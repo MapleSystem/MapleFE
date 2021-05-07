@@ -23,6 +23,7 @@ ASTModule gModule;
 ASTModule::ASTModule() {
   mRootScope = mScopePool.NewScope(NULL);
   mPackage = NULL;
+  mSrcLang = SrcLangUnknown;
 }
 
 ASTModule::~ASTModule() {
@@ -42,6 +43,24 @@ ASTModule::~ASTModule() {
 void ASTModule::SetPackage(PackageNode *p) {
   MASSERT(!mPackage);
   mPackage = p;
+}
+
+void ASTModule::SetSrcLang(SrcLang l) {
+  mSrcLang = l;
+}
+
+SrcLang ASTModule::GetSrcLang() {
+  return mSrcLang;
+}
+
+std::string ASTModule::GetSrcLangString() {
+  switch (mSrcLang) {
+    case SrcLangJava: return "Java";
+    case SrcLangTypeScript: return "TypeScript";
+    case SrcLangJavaScript: return "JavaScript";
+    default: break;
+  }
+  return "Unknown";
 }
 
 // Return a new scope newly created.

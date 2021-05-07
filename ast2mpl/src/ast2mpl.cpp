@@ -66,7 +66,10 @@ void A2M::ProcessAST(bool trace_a2m) {
   mTraceA2m = trace_a2m;
   AstDump astdump;
 
-  if (mTraceA2m) std::cout << "============= in ProcessAST ===========" << std::endl;
+  if (mTraceA2m) {
+    std::cout << "============= in ProcessAST ===========" << std::endl;
+    std::cout << "srcLang : " << gModule.GetSrcLangString() << std::endl;
+  }
   // pass 1: collect class/interface/function decl
   for(auto it: gModule.mTrees) {
     TreeNode *tnode = it->mRootNode;

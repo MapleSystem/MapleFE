@@ -19,34 +19,40 @@
 
 namespace maplefe {
 
-  // starting point of AST
-  void A2C::ProcessAST(bool trace_a2c) {
-    mTraceA2C = trace_a2c;
-    if (mTraceA2C) std::cout << "============= in ProcessAST ===========" << std::endl;
-    for(auto it: gModule.mTrees) {
-      TreeNode *tnode = it->mRootNode;
-      if (mTraceA2C) {
-        tnode->Dump(0);
-        std::cout << std::endl;
-      }
-    }
-
-    AST_Handler handler(&gModule, mTraceA2C);
-
-    handler.BuildCFG();
-    if (mTraceA2C)
-      handler.Dump("After handler.BuildCFG()");
-
-    if (mTraceA2C) {
-      std::cout << "============= AstDump ===========" << std::endl;
-      AstDump astdump;
-      for(auto it: gModule.mTrees)
-        astdump.Dump(it->mRootNode);
-    }
-
-    handler.BuildDFA();
-    if (mTraceA2C)
-      handler.Dump("After handler.BuildDFA()");
+// starting point of AST
+void A2C::ProcessAST(bool trace_a2c) {
+  mTraceA2C = trace_a2c;
+  if (mTraceA2C) {
+    std::cout << "============= in ProcessAST ===========" << std::endl;
+    std::cout << "srcLang : " << gModule.GetSrcLangString() << std::endl;
   }
+  for(auto it: gModule.mTrees) {
+    TreeNode *tnode = it->mRootNode;
+    if (mTraceA2C) {
+      tnode->Dump(0);
+      std::cout << std::endl;
+    }
+  }
+
+  AST_Handler handler(&gModule, mTraceA2C);
+
+  handler.BuildCFG();
+  if (mTraceA2C) {
+    handler.Dump("After handler.BuildCFG()");
+  }
+
+  if (mTraceA2C) {
+    std::cout << "============= AstDump ===========" << std::endl;
+    AstDump astdump;
+    for(auto it: gModule.mTrees) {
+      astdump.Dump(it->mRootNode);
+    }
+  }
+
+  handler.BuildDFA();
+  if (mTraceA2C) {
+    handler.Dump("After handler.BuildDFA()");
+  }
+}
 }
 

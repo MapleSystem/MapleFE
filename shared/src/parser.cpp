@@ -184,6 +184,24 @@ Parser::Parser(const char *name) : filename(name) {
   const std::string file(name);
 
   gModule.SetFileName(name);
+
+  // get source language type
+  std::string::size_type lastDot = file.find_last_of('.');
+  if (lastDot == std::string::npos) {
+    std::cout << "used improper source file" << std::endl;
+    return;
+  }
+  std::string fileExt = file.substr(lastDot);
+  if (fileExt.compare(".java") == 0) {
+    gModule.mSrcLang = SrcLangJava;
+  } else if (fileExt.compare(".js") == 0) {
+    gModule.mSrcLang = SrcLangJavaScript;
+  } else if (fileExt.compare(".ts") == 0) {
+    gModule.mSrcLang = SrcLangTypeScript;
+  } else {
+    gModule.mSrcLang = SrcLangUnknown;
+  }
+
   mLexer->PrepareForFile(file);
   mCurToken = 0;
   mPending = 0;
