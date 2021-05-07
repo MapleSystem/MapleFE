@@ -21,4 +21,8 @@ for ts; do
       done
   fi
 done
-[ -z "$Failed" ] || { echo "Failed test case(s):" $Failed; exit 1; }
+echo
+[ -n "$Failed" ] || { echo "All test case(s) passed"; exit 0; }
+echo "Test case(s) failed:"
+echo $Failed | xargs -n1 | sort | nl
+exit 1
