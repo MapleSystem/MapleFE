@@ -1046,6 +1046,7 @@ rule FunctionStatementList : ZEROORONE(StatementList)
 ## ClassBody[Yield] :
 ## ClassElementList[?Yield]
 rule ClassBody : ClassElementList
+  attr.action: BuildBlock(%1)
 
 ## See 14.5
 ## ClassElementList[Yield] :
@@ -1312,6 +1313,10 @@ rule ClassOrInterfaceType: TypeReference
 ## NOTE. I inlined ClassHeritage to avoid 'lookahead fail'
 rule ClassDeclaration:
   "class" + ZEROORONE(BindingIdentifier) + ZEROORONE(TypeParameters) + ZEROORONE(ClassExtendsClause) + ZEROORONE(ImplementsClause) + '{' + ClassBody + '}'
+  attr.action : BuildClass(%2)
+  attr.action : AddSuperClass(%4)
+  attr.action : AddSuperInterface(%5)
+  attr.action : AddClassBody(%7)
 
 ## ClassHeritage: ( Modified ) ClassExtendsClauseopt ImplementsClauseopt
 rule ClassHeritage: ZEROORONE(ClassExtendsClause) + ZEROORONE(ImplementsClause)
@@ -1334,6 +1339,9 @@ rule ClassElement: ONEOF(ConstructorDeclaration,
 rule ConstructorDeclaration: ONEOF(
   ZEROORONE(AccessibilityModifier) + "constructor" + '(' + ZEROORONE(ParameterList) + ')' + '{' + FunctionBody + '}',
   ZEROORONE(AccessibilityModifier) + "constructor" + '(' + ZEROORONE(ParameterList) + ')' + ';')
+  attr.action.%1,%2 : BuildConstructor()
+  attr.action.%1,%2 : AddParams(%4)
+  attr.action.%1 : AddFunctionBody(%7)
 
 ## PropertyMemberDeclaration: MemberVariableDeclaration MemberFunctionDeclaration MemberAccessorDeclaration
 rule PropertyMemberDeclaration: ONEOF(MemberVariableDeclaration,
@@ -1343,6 +1351,10 @@ rule PropertyMemberDeclaration: ONEOF(MemberVariableDeclaration,
 ## MemberVariableDeclaration: AccessibilityModifieropt staticopt PropertyName TypeAnnotationopt Initializeropt ;
 rule MemberVariableDeclaration:
   ZEROORONE(AccessibilityModifier) + ZEROORONE("static") + PropertyName + ZEROORONE(TypeAnnotation) + ZEROORONE(Initializer) + ';'
+  attr.action: AddInitTo(%3, %5)
+  attr.action: BuildDecl(%4, %3)
+  attr.action: AddModifier(%1)
+
 
 ## MemberFunctionDeclaration: AccessibilityModifieropt staticopt PropertyName CallSignature { FunctionBody } AccessibilityModifieropt staticopt PropertyName CallSignature ;
 rule MemberFunctionDeclaration: ONEOF(
