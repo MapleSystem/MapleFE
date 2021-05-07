@@ -80,7 +80,7 @@ protected:
   bool      mIsStmt;  // if a node is a statement
 
 public:
-  TreeNode() : mKind(NK_Null), mNodeId(GetNextId()), mLabel(NULL),
+  TreeNode() : mKind(NK_Null), mNodeId(GetNextNodeId()), mLabel(NULL),
                mParent(NULL), mName(NULL), mIsStmt(false) {}
   virtual ~TreeNode() {}
 
@@ -115,7 +115,7 @@ public:
   // Release the dynamically allocated memory by this tree node.
   virtual void Release(){}
 private:
-  static unsigned GetNextId() {static unsigned id = 1; return id++; }
+  static unsigned GetNextNodeId() {static unsigned id = 1; return id++; }
 };
 
 //////////////////////////////////////////////////////////////////////////
