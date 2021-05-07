@@ -61,6 +61,12 @@ typedef enum AppealStatus {
   AppealStatus_NA
 }AppealStatus;
 
+typedef enum ParseStatus {
+  ParseSucc,
+  ParseFail,
+  ParseEOF
+};
+
 // As in Left Recursion scenario, a rule can have multiple matches on a start token.
 // Each AppealNode represents an instance in the recursion, and it matches different
 // number of tokens. However, truth is the parent nodes matches more than children
@@ -353,7 +359,7 @@ public:
   void Dump();
 
   bool Parse();
-  bool ParseStmt();
+  ParseStatus  ParseStmt();
   void InitRecursion();
   unsigned LexOneLine();
 };

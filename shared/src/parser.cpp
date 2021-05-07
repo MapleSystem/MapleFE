@@ -319,16 +319,15 @@ Token* Parser::GetActiveToken(unsigned i) {
 
 bool Parser::Parse() {
   gASTBuilder.SetTrace(mTraceAstBuild);
-  bool succ = false;
+  ParseStatus res;
   while (1) {
-    succ = ParseStmt();
-    if (!succ)
+    res = ParseStmt();
+    if (res == ParseFail || res == ParseEOF)
       break;
   }
 
   gModule.Dump();
-
-  return succ;
+  return (res==ParseFail)? false: true;
 }
 
 // Right now I didn't use mempool yet, will come back.
@@ -375,7 +374,7 @@ void Parser::Appeal(AppealNode *start, AppealNode *root) {
 // This is the parsing for highest level language constructs. It could be class
 // in Java/c++, or a function/statement in c/c++. In another word, it's the top
 // level constructs in a compilation unit (aka Module).
-bool Parser::ParseStmt() {
+ParseStatus Parser::ParseStmt() {
   // clear status
   ClearFailed();
   ClearSucc();
@@ -397,7 +396,7 @@ bool Parser::ParseStmt() {
   unsigned token_num = LexOneLine();
   // No more token, end of file
   if (!token_num)
-    return false;
+    return ParseEOF;
 
   // Match the tokens against the rule tables.
   // In a rule table there are : (1) separtaor, operator, keyword, are already in token
@@ -450,8 +449,7 @@ bool Parser::ParseStmt() {
       std::cout << " us" << std::endl;
     }
   }
-
-  return succ;
+  return succ? ParseSucc: ParseFail;
 }
 
 // return true : if all tokens in mActiveTokens are matched.

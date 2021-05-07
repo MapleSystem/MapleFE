@@ -45,6 +45,7 @@ int main (int argc, char *argv[]) {
   maplefe::Parser *parser = new maplefe::Parser(argv[1]);
 
   bool trace_a2c = false;
+  bool succ;
 
   // Parse the argument
   for (unsigned i = 2; i < argc; i++) {
@@ -79,7 +80,11 @@ int main (int argc, char *argv[]) {
   }
 
   parser->InitRecursion();
-  parser->Parse();
+  succ = parser->Parse();
+  if (!succ) {
+    delete parser;
+    return 1;
+  }
 
   maplefe::A2CTs *a2c = new maplefe::A2CTs(maplefe::gModule.mFileName);
   a2c->ProcessAST(trace_a2c);
