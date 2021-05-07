@@ -70,6 +70,7 @@ FunctionNode *CFGVisitor::VisitFunctionNode(FunctionNode *node) {
 
 // Handle a lambda
 LambdaNode *CFGVisitor::VisitLambdaNode(LambdaNode *node) {
+  return node;
 }
 
 // For control flow
