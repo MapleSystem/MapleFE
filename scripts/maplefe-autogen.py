@@ -490,10 +490,12 @@ gen_func_definition = lambda dictionary, node_name: \
         node_name + '* ' + gen_args[1] + '::' + gen_args[2] + node_name + '(' + node_name + '* node) {\nif(node != nullptr) {' \
         + ('\nif(mTrace) std::cout << "Visiting ' + node_name + ', id=" << node->GetNodeId() << "..." << std::endl;' \
         if node_name != 'TreeNode' else '')
-gen_call_child_node = lambda dictionary, field_name, node_type, accessor: gen_args[2] + node_type + '(' + accessor + ');'
+gen_call_child_node = lambda dictionary, field_name, node_type, accessor: \
+        '{' + node_type + ' *t = ' + accessor + '; if(t) ' + gen_args[2] + node_type + '(t);}'
 gen_call_children_node = lambda dictionary, field_name, node_type, accessor: ''
 gen_call_children_node_end = lambda dictionary, field_name, node_type, accessor: ''
-gen_call_nth_child_node = lambda dictionary, field_name, node_type, accessor: gen_args[2] + node_type + '(' + accessor + ');'
+gen_call_nth_child_node = lambda dictionary, field_name, node_type, accessor: \
+        '{' + node_type + ' *t = ' + accessor + '; if(t) ' + gen_args[2] + node_type + '(t);}'
 gen_func_definition_end = lambda dictionary, node_name: '}\nreturn node;\n}'
 
 #
