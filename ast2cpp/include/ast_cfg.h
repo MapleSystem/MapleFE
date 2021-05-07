@@ -84,7 +84,12 @@ class AST_BB {
   void      SetAuxNode(TreeNode *node)  {mAuxNode = node;}
   TreeNode *GetAuxNode()                {return mAuxNode;}
 
-  void AddStatement(TreeNode *stmt) {if(mKind != BK_Terminated) mStatements.PushBack(stmt);}
+  void AddStatement(TreeNode *stmt) {
+    if(mKind != BK_Terminated) {
+      mStatements.PushBack(stmt);
+      stmt->SetIsStmt();
+    }
+  }
 
   unsigned  GetStatementsNum()              {return mStatements.GetNum();}
   TreeNode* GetStatementAtIndex(unsigned i) {return mStatements.ValueAtIndex(i);}

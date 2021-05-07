@@ -31,18 +31,18 @@ namespace maplefe {
       }
     }
 
+    AST_Handler handler(&gModule, mTraceA2C);
+
+    handler.BuildCFG();
+    if (mTraceA2C)
+      handler.Dump("After handler.BuildCFG()");
+
     if (mTraceA2C) {
       std::cout << "============= AstDump ===========" << std::endl;
       AstDump astdump;
       for(auto it: gModule.mTrees)
         astdump.Dump(it->mRootNode);
     }
-
-    AST_Handler handler(&gModule, mTraceA2C);
-
-    handler.BuildCFG();
-    if (mTraceA2C)
-      handler.Dump("After handler.BuildCFG()");
 
     handler.BuildDFA();
     if (mTraceA2C)

@@ -333,6 +333,7 @@ SwitchNode *CFGVisitor::VisitSwitchNode(SwitchNode *node) {
 
 // For control flow
 BlockNode *CFGVisitor::VisitBlockNode(BlockNode *node) {
+  mCurrentBB->AddStatement(node);
   // Check if current block constains any JS_Let or JS_Const DeclNode
   unsigned i, num = node->GetChildrenNum();
   for (i = 0; i < num; ++i) {
@@ -350,16 +351,16 @@ BlockNode *CFGVisitor::VisitBlockNode(BlockNode *node) {
     // Visit all child nodes
     AstVisitor::VisitBlockNode(node);
   } else {
-    // Needs BBs for current block
-    // Save current BB
-    AST_BB *current_bb = mCurrentBB;
-    current_bb->SetKind(BK_Block);
-    // Set the root node of this BB
-    current_bb->SetAuxNode(node);
+    mCurrentBB->SetKind(BK_Block);
+    // Set the auxiliary node of this BB
+    mCurrentBB->SetAuxNode(node);
 
     // Create a BB for the join point
     AST_BB *join = NewBB(BK_Join);
 
+    // Needs BBs for current block
+    // Save current BB
+    AST_BB *current_bb = mCurrentBB;
     // Create a new BB for current block node
     mCurrentBB = NewBB(BK_Uncond);
     current_bb->AddSuccessor(mCurrentBB);
