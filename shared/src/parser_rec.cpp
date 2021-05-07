@@ -217,8 +217,12 @@ bool RecursionTraversal::FindInstances() {
     mVisitedRecursionNodes.Clear();
     mLeadNodes.Clear();
 
-    // Find the instance
+    // Find the instance.
+    // Remember to reset mEndOfFile since the prev instance could reach the end of file
+    // We need start from the beginning.
     mParser->mCurToken = saved_mCurToken;
+    if (mParser->mEndOfFile)
+      mParser->mEndOfFile = false;
     temp_found = FindRestInstance();
   }
 

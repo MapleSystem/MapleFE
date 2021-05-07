@@ -938,6 +938,8 @@ bool Parser::TraverseRuleTableRegular(RuleTable *rule_table, AppealNode *appeal)
   } else {
     appeal->mResult = FailChildrenFailed;
     mCurToken = saved_mCurToken;
+    if (mEndOfFile)
+      mEndOfFile = false;
     AddFailed(rule_table, mCurToken);
     return false;
   }
