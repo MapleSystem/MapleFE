@@ -367,8 +367,8 @@ gen_func_declaration = lambda dictionary, node_name: \
         "void " + gen_args[2] + node_name + "(" + node_name + "* node);"
 gen_func_definition = lambda dictionary, node_name: \
         "void " + gen_args[1] + "::" + gen_args[2] + node_name + "(" + node_name + "* node) {" \
-        + ('if (node == nullptr) \nreturn;\n' if node_name == "TreeNode" else \
-        '\nif(DumpFB("' + node_name + '", node)) {')
+        + ('if (node == nullptr) \nreturn;\n' if node_name == "TreeNode" else '\nif(DumpFB("' + node_name \
+        + '", node)) { MASSERT(node->GetKind() == NK_' + node_name.replace('Node', '') + ');')
 gen_call_child_node = lambda dictionary, field_name, node_type, accessor: \
         ('Dump("' + padding_name(field_name) + ': ' + short_name(node_type) + '*", ' + accessor  + ');\n' \
         if field_name != '' else '') + gen_args[2] + short_name(node_type) + '(' + accessor + ');'
