@@ -5,7 +5,7 @@ class A {
 var x : A;
 delete x.a;
 
-void 0
+void 0;
 
 typeof 8;
 
