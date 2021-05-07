@@ -1006,6 +1006,7 @@ rule FunctionStatementList : ZEROORONE(StatementList)
 ## GeneratorMethod[?Yield]
 ## get PropertyName[?Yield] ( ) { FunctionBody }
 ## set PropertyName[?Yield] ( PropertySetParameterList ) { FunctionBody }
+
 ## See 14.3
 ## PropertySetParameterList :
 ## FormalParameter
@@ -1040,19 +1041,24 @@ rule FunctionStatementList : ZEROORONE(StatementList)
 ## See 14.5
 ## ClassHeritage[Yield] :
 ## extends LeftHandSideExpression[?Yield]
+
 ## See 14.5
 ## ClassBody[Yield] :
 ## ClassElementList[?Yield]
+rule ClassBody : ClassElementList
+
 ## See 14.5
 ## ClassElementList[Yield] :
 ## ClassElement[?Yield]
 ## ClassElementList[?Yield] ClassElement[?Yield]
+rule ClassElementList : ONEOF(ClassElement,
+                              ClassElementList + ClassElement)
+
 ## See 14.5
 ## ClassElement[Yield] :
 ## MethodDefinition[?Yield]
 ## static MethodDefinition[?Yield]
 ## ;
-
 
 #############################################################################
 ##                    Below is Typescript specific
@@ -1132,7 +1138,7 @@ rule TypeMemberList : ONEOF(TypeMember,
 rule TypeMember : ONEOF(PropertySignature,
                         CallSignature,
                         ## ConstructSignature,
-                        ## IndexSignature,
+                        IndexSignature,
                         ##MethodSignature
                        )
 
@@ -1222,7 +1228,12 @@ rule OptionalParameter: ONEOF(
 rule RestParameter: "..." + BindingIdentifier + ZEROORONE(TypeAnnotation)
 
 ## rule ConstructSignature: new TypeParametersopt ( ParameterListopt ) TypeAnnotationopt
+
 ## rule IndexSignature: [ BindingIdentifier : string ] TypeAnnotation [ BindingIdentifier : number ] TypeAnnotation
+rule IndexSignature: ONEOF(
+  '[' + BindingIdentifier + ':' + "string" + ']' + TypeAnnotation,
+  '[' + BindingIdentifier + ':' + "number" + ']' + TypeAnnotation)
+
 ## rule MethodSignature: PropertyName ?opt CallSignature
 
 ## rule TypeAliasDeclaration: type BindingIdentifier TypeParametersopt = Type ;
@@ -1234,8 +1245,12 @@ rule TypeAliasDeclaration: "type" + BindingIdentifier + ZEROORONE(TypeParameters
 ##############################################################################################
 
 ## PropertyDefinition: ( Modified ) IdentifierReference CoverInitializedName PropertyName : AssignmentExpression PropertyName CallSignature { FunctionBody } GetAccessor SetAccessor
+
 ## GetAccessor: get PropertyName ( ) TypeAnnotationopt { FunctionBody }
+rule GetAccessor: "get" + PropertyName + '(' + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}'
+
 ## SetAccessor: set PropertyName ( BindingIdentifierOrPattern TypeAnnotationopt ) { FunctionBody }
+rule SetAccessor: "set" + PropertyName + '(' + BindingIdentifierOrPattern + ZEROORONE(TypeAnnotation) + ')' + '{' + FunctionBody + '}'
 
 ## FunctionExpression: ( Modified ) function BindingIdentifieropt CallSignature { FunctionBody }
 ## FunctionExpression has the same syntax as FunctionDeclaration. But it appears as an expression. We will build it
@@ -1292,3 +1307,51 @@ rule ClassOrInterfaceType: TypeReference
 ##############################################################################################
 ##                             A.6 Class declaration
 ##############################################################################################
+
+## ClassDeclaration: ( Modified ) class BindingIdentifieropt TypeParametersopt ClassHeritage { ClassBody }
+rule ClassDeclaration:
+  "class" + ZEROORONE(BindingIdentifier) + ZEROORONE(TypeParameters) + ClassHeritage + '{' + ClassBody + '}'
+
+## ClassHeritage: ( Modified ) ClassExtendsClauseopt ImplementsClauseopt
+rule ClassHeritage: ZEROORONE(ClassExtendsClause) + ZEROORONE(ImplementsClause)
+
+## ClassExtendsClause: extends ClassType
+rule ClassExtendsClause: "extends" + ClassType
+
+## ClassType: TypeReference
+rule ClassType: TypeReference
+
+## ImplementsClause: implements ClassOrInterfaceTypeList
+rule ImplementsClause: "implements" + ClassOrInterfaceTypeList
+
+## ClassElement: ( Modified ) ConstructorDeclaration PropertyMemberDeclaration IndexMemberDeclaration
+rule ClassElement: ONEOF(ConstructorDeclaration,
+                         PropertyMemberDeclaration,
+                         IndexMemberDeclaration)
+
+## ConstructorDeclaration: AccessibilityModifieropt constructor ( ParameterListopt ) { FunctionBody } AccessibilityModifieropt constructor ( ParameterListopt ) ;
+rule ConstructorDeclaration: ONEOF(
+  ZEROORONE(AccessibilityModifier) + "constructor" + '(' + ZEROORONE(ParameterList) + ')' + '{' + FunctionBody + '}',
+  ZEROORONE(AccessibilityModifier) + "constructor" + '(' + ZEROORONE(ParameterList) + ')' + ';')
+
+## PropertyMemberDeclaration: MemberVariableDeclaration MemberFunctionDeclaration MemberAccessorDeclaration
+rule PropertyMemberDeclaration: ONEOF(MemberVariableDeclaration,
+                                      MemberFunctionDeclaration,
+                                      MemberAccessorDeclaration)
+
+## MemberVariableDeclaration: AccessibilityModifieropt staticopt PropertyName TypeAnnotationopt Initializeropt ;
+rule MemberVariableDeclaration:
+  ZEROORONE(AccessibilityModifier) + ZEROORONE("static") + PropertyName + ZEROORONE(TypeAnnotation) + ZEROORONE(Initializer) + ';'
+
+## MemberFunctionDeclaration: AccessibilityModifieropt staticopt PropertyName CallSignature { FunctionBody } AccessibilityModifieropt staticopt PropertyName CallSignature ;
+rule MemberFunctionDeclaration: ONEOF(
+  ZEROORONE(AccessibilityModifier) + ZEROORONE("static") + PropertyName + CallSignature + '{' + FunctionBody + '}',
+  ZEROORONE(AccessibilityModifier) + ZEROORONE("static") + PropertyName + CallSignature + ';')
+
+## MemberAccessorDeclaration: AccessibilityModifieropt staticopt GetAccessor AccessibilityModifieropt staticopt SetAccessor
+rule MemberAccessorDeclaration: ONEOF(
+  ZEROORONE(AccessibilityModifier) + ZEROORONE("static") + GetAccessor,
+  ZEROORONE(AccessibilityModifier) + ZEROORONE("static") + SetAccessor)
+
+## IndexMemberDeclaration: IndexSignature ;
+rule IndexMemberDeclaration: IndexSignature + ';'
