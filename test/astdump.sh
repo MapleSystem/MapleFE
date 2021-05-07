@@ -3,9 +3,11 @@
 [ -z "$DOT" ] || [ -x /usr/bin/dot -a -x /usr/bin/viewnior ] || sudo apt install graphviz viewnior 
 CMD=$(dirname $0)/../output/typescript/typescript/ts2cpp
 [ -x "$CMD" ] || { echo Cannot execute $CMD; exit 1; }
+Failed=
 for ts; do
   echo "$CMD" "$ts" --trace-a2c
   out=$("$CMD" "$ts" --trace-a2c 2>&1)
+  [ $? -eq 0 ] || Failed="$Failed $ts"
   echo "$out"
   if [ -n "$DOT" ]; then
     grep -n -e "^digraph [^{]* {" -e "^}" <<< "$out" | grep -A1 "digraph [^{]* {" |
@@ -19,3 +21,4 @@ for ts; do
       done
   fi
 done
+[ -z "$Failed" ] || { echo "Failed test case(s):" $Failed; exit 1; }
