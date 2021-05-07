@@ -2050,7 +2050,7 @@ TreeNode* ASTBuilder::AddFunctionBody() {
   // It's possible that the func body is empty, such as in the
   // function header declaration. Usually it's just a token ';'.
   Param p_body = mParams[0];
-  if (p_body.mIsTreeNode) {
+  if (!p_body.mIsEmpty && p_body.mIsTreeNode) {
     TreeNode *tree_node = p_body.mData.mTreeNode;
     MASSERT(tree_node->IsBlock() && "Class body is not a BlockNode?");
     BlockNode *block = (BlockNode*)tree_node;
@@ -2078,7 +2078,7 @@ TreeNode* ASTBuilder::AddFunctionBodyTo() {
   // It's possible that the func body is empty, such as in the
   // function header declaration. Usually it's just a token ';'.
   Param p_body = mParams[1];
-  if (p_body.mIsTreeNode) {
+  if (!p_body.mIsEmpty && p_body.mIsTreeNode) {
     TreeNode *tree_node = p_body.mData.mTreeNode;
     MASSERT(tree_node->IsBlock() && "Class body is not a BlockNode?");
     BlockNode *block = (BlockNode*)tree_node;
