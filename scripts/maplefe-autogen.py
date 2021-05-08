@@ -574,7 +574,7 @@ astgraph_init = [
         'else if(n->GetKind() == NK_UnaOperator) *mOs << EnumVal(UnaOperatorNode, OprId, OprId, 4);',
         'else if(n->GetKind() == NK_Literal) { std::string s(' + astdumpclass + '::GetEnumLitData(static_cast<LiteralNode *>(n)->GetData()));',
         'std::replace(s.begin(), s.end(), \'"\', \':\');\n*mOs << s;\n}',
-        'if(n->IsStmt()) *mOs << NodeColor(lightblue);',
+        'if(n->IsStmt()) { if(n->GetKind() == NK_Call) *mOs << "\\",fontcolor=\\"red"; *mOs << NodeColor(lightblue); }',
         ' *mOs << "\\"];\\n";'
         '}', '}', '',
         'void PutEdge(TreeNode *from, TreeNode *to, const char *field) {',
