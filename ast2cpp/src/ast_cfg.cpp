@@ -509,7 +509,9 @@ static std::string BBLabelStr(AST_BB *bb, const char *shape = nullptr) {
 
 // Dump current AST_Function node
 void AST_Function::Dump() {
-  std::cout << "Function {" << std::endl;
+  FunctionNode *func = GetFunction();
+  const char *func_name = func ? (func->GetName() ? func->GetName() : "_anonymous_") : "_init_";
+  std::cout << "Function " << func_name  << " {" << std::endl;
   unsigned num = GetNestedFunctionsNum();
   if(num > 0) {
     std::cout << "Nested Functions: " << num << " [" << std::endl;
@@ -529,8 +531,8 @@ void AST_Function::Dump() {
   visited.insert(exit);
   visited.insert(entry);
   // Dump CFG in dot format
-  std::string dot("---\ndigraph CFG {\n");
-  dot += BBLabelStr(entry, "box") + BBLabelStr(exit, "doubleoctagon");
+  std::string dot("---\ndigraph CFG_");
+  dot = dot + func_name + " {\n" + BBLabelStr(entry, "box") + BBLabelStr(exit, "doubleoctagon");
   const char* scoped = " [style=dashed color=grey];";
   while(!bb_stack.empty()) {
     AST_BB *bb = bb_stack.top();
