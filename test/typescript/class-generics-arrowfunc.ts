@@ -17,7 +17,7 @@ class Foo<T> {
 // Create class object with String type
 // - Create class object with type String
 // - Pass an arrow function (that returns a new String object) to the class constructor
-const FooString: Foo<String> = new Foo<String>( () => new String("foo") );
+//const FooString: Foo<String> = new Foo<String>( () => new String("foo") );
 
 // Optional check. 
 // - Call alloc() of new class object to get a new object and 

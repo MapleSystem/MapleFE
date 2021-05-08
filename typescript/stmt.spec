@@ -274,17 +274,18 @@ rule NewExpression : ONEOF(MemberExpression, "new" + NewExpression)
 
 rule CallExpression : ONEOF(
   MemberExpression + Arguments,
-#  SuperCall[?Yield]
+  SuperCall,
   CallExpression + Arguments,
-#  CallExpression[?Yield] [ Expression[In, ?Yield] ]
+  CallExpression + '[' + Expression + ']',
   CallExpression + '.' + Identifier)
 #  CallExpression[?Yield] TemplateLiteral[?Yield]
-  attr.action.%1,%2 : BuildCall(%1)
-  attr.action.%1,%2 : AddArguments(%2)
+  attr.action.%1,%3 : BuildCall(%1)
+  attr.action.%1,%3 : AddArguments(%2)
 
 ##-----------------------------------
 ##rule SuperCall[Yield] :
 ##  super Arguments[?Yield]
+rule SuperCall : "super" + Arguments
 
 ##-----------------------------------
 ##rule Arguments[Yield] :
@@ -1371,9 +1372,15 @@ rule MemberVariableDeclaration:
 
 
 ## MemberFunctionDeclaration: AccessibilityModifieropt staticopt PropertyName CallSignature { FunctionBody } AccessibilityModifieropt staticopt PropertyName CallSignature ;
+#NOTE: I inlined CallSignature to make it easier for building function.
+#rule CallSignature: ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation)
 rule MemberFunctionDeclaration: ONEOF(
-  ZEROORONE(AccessibilityModifier) + ZEROORONE("static") + PropertyName + CallSignature + '{' + FunctionBody + '}',
-  ZEROORONE(AccessibilityModifier) + ZEROORONE("static") + PropertyName + CallSignature + ';')
+  ZEROORONE(AccessibilityModifier) + ZEROORONE("static") + PropertyName + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}',
+  ZEROORONE(AccessibilityModifier) + ZEROORONE("static") + PropertyName + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + ';')
+  attr.action.%1,%2 : BuildFunction(%3)
+  attr.action.%1,%2 : AddParams(%6)
+  attr.action.%1,%2 : AddType(%8)
+  attr.action.%1    : AddFunctionBody(%10)
 
 ## MemberAccessorDeclaration: AccessibilityModifieropt staticopt GetAccessor AccessibilityModifieropt staticopt SetAccessor
 rule MemberAccessorDeclaration: ONEOF(

@@ -1515,9 +1515,7 @@ TreeNode* ASTBuilder::AddClassBody() {
   Param p_body = mParams[0];
   if (!p_body.mIsTreeNode)
     MERROR("The class body is not a tree node.");
-  TreeNode *tree_node = p_body.mData.mTreeNode;
-  MASSERT(tree_node->IsBlock() && "Class body is not a BlockNode?");
-  BlockNode *block = (BlockNode*)tree_node;
+  BlockNode *block = (BlockNode*)CvtToBlock(p_body.mData.mTreeNode);
 
   MASSERT(mLastTreeNode->IsClass() && "Class is not a ClassNode?");
   ClassNode *klass = (ClassNode*)mLastTreeNode;

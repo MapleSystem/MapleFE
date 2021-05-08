@@ -1,0 +1,19 @@
+Matched 49 tokens.
+Matched 64 tokens.
+============= Module ===========
+== Sub Tree ==
+class  Foo
+  Fields: 
+    Decl: _ctor
+  Instance Initializer: 
+  Constructors: 
+    constructor  (ctor)  throws: 
+      this._ctor Assign ctor
+  Methods: 
+    func  alloc()  throws: 
+      return this._ctor()
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+console.log(())
