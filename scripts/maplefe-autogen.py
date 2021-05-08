@@ -148,7 +148,7 @@ def gen_enum_func(dictionary):
         for e in get_enum_list(dictionary, name):
             xcode.append("case " + e + ":")
             xcode.append('return "' + e + '";')
-        xcode.append("default: ;  // Unexpected kind")
+        xcode.append('default: MASSERT(0 && "Unexpected enumerator");')
         xcode.append("}")
         xcode.append('return "UNEXPECTED ' + name + '";')
         xcode.append("}\n")
@@ -268,7 +268,7 @@ def gen_handler_ast_TreeNode(dictionary):
             # it is an ERROR if the node kind is out of range
             code.append("Error!!! // " + gen_call_child_node(dictionary, "", node_name, "static_cast<" + node_name + "*>(node)"))
         code.append("break;");
-    code.append("default: ;  // Unexpected kind")
+    code.append('default: MASSERT(0 && "Unexpected node kind");')
     code.append("}")
     code.append(gen_func_definition_end(dictionary, "TreeNode"))
     append(src_file, code)
@@ -496,8 +496,6 @@ gen_call_nth_child_node = lambda dictionary, field_name, node_type, accessor: \
 gen_func_definition_end = lambda dictionary, node_name: '}\nreturn node;\n}'
 
 #
-# Generate gen_handler.h and gen_handler.cpp
-#
 gen_args = [
         "gen_astvisitor", # filename
         "AstVisitor",     # Class name
@@ -517,5 +515,47 @@ astvisitor_init = [
 # Example to extract code pieces starting from initial_yaml
 handle_src_include_files(Initialization)
 append(include_file, astvisitor_init)
+handle_yaml(initial_yaml, gen_handler)
+handle_src_include_files(Finalization)
+
+################################################################################
+
+# The follwoing gen_func_* and gen_call* functions are for AstVisitor
+gen_func_declaration = lambda dictionary, node_name: \
+        'void ' + gen_args[2] + node_name + '(' + node_name + '* node);'
+gen_func_definition = lambda dictionary, node_name: \
+        'void ' + gen_args[1] + '::' + gen_args[2] + node_name + '(' + node_name + '* node) {\nif(node != nullptr) {'
+gen_call_child_node = lambda dictionary, field_name, node_type, accessor: \
+        'if(auto t = ' + accessor + ') {' \
+        + ('PutEdge(node, t, "' + field_name + '");' if field_name != '' else '') + gen_args[2] + node_type + '(t);}'
+gen_call_nth_child_node = lambda dictionary, field_name, node_type, accessor: \
+        'if(auto t = ' + accessor + ') { PutEdge2(node, t, "' + field_name + '", i); ' + gen_args[2] + node_type + '(t);}'
+gen_func_definition_end = lambda dictionary, node_name: '}\n}'
+
+gen_args = [
+        "gen_astgraph", # filename
+        "AstGraph",     # Class name
+        "DumpGraph",    # Prefix of function name
+        ]
+
+astgraph_init = [
+        'void ' + gen_args[2] + '(TreeNode* node, const char *title, std::ostream *o) {',
+        'os = o;',
+        '*os << "digraph AST_" << title << " {\\n";',
+        gen_args[2] + 'TreeNode(node);',
+        '*os << "}\\n";',
+        '}', '',
+        'void PutEdge(TreeNode *from, TreeNode *to, const char *field) {',
+        'if(to) { *os << "N" << from->GetNodeId() << " -> " << "N" << to->GetNodeId() << "[label=" << field << "];\\n";',
+        '}', '}', '',
+        'void PutEdge2(TreeNode *from, TreeNode *to, const char *field, unsigned idx) {',
+        'if(to) { *os << "N" << from->GetNodeId() << " -> " << "N" << to->GetNodeId() << "[label=" << field << idx << "];\\n";',
+        '}', '}', '',
+        'private:',
+        'std::ostream *os;'
+        ]
+
+handle_src_include_files(Initialization)
+append(include_file, astgraph_init)
 handle_yaml(initial_yaml, gen_handler)
 handle_src_include_files(Finalization)
