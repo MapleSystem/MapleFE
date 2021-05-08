@@ -57,6 +57,9 @@ mapleall:
 test:
 	$(MAKE) LANG=$(SRCLANG) -C test
 
+testms:
+	$(MAKE) LANG=$(SRCLANG) -C test testms
+
 testall: test
 
 test1:
