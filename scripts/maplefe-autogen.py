@@ -309,6 +309,7 @@ def handle_src_include_files(phase):
             '#include "ast.h"',
             '#include "ast_type.h"',
             '#include "ast_attr.h"',
+            gen_args[3],
             '',
             'namespace maplefe {',
             '',
@@ -359,7 +360,7 @@ def short_name(node_type):
     return node_type.replace('class ', '').replace('maplefe::', '').replace(' *', '*')
 
 def padding_name(name):
-    return gen_args[3] + name.ljust(7)
+    return gen_args[4] + name.ljust(7)
 
 # The follwoing gen_func_* and gen_call* functions are for AstDump
 gen_call_handle_values = lambda: True
@@ -392,8 +393,11 @@ gen_args = [
         "gen_astdump", # filename
         "AstDump",     # Class name
         "AstDump",     # Prefix of function name
+        "",            # Extra include directives
         "",            # Prefix of generated string literal for field name
         ]
+astdump = gen_args[0]
+astdumpclass = gen_args[1]
 
 astdump_init = [
         'private:',
@@ -408,6 +412,32 @@ astdump_init = [
         '}', '',
         'void Dump(TreeNode* node) {',
         'AstDumpTreeNode(node);',
+        '}', '',
+        'static std::string GetEnumLitData(LitData lit) {',
+        'std::string str = GetEnumLitId(lit.mType);',
+        'switch (lit.mType) {',
+        'case LT_IntegerLiteral:',
+        'return std::to_string(lit.mData.mInt);',
+        'case LT_FPLiteral:',
+        'return std::to_string(lit.mData.mFloat);',
+        'case LT_DoubleLiteral:',
+        'return std::to_string(lit.mData.mDouble);',
+        'case LT_BooleanLiteral:',
+        'return std::to_string(lit.mData.mBool);',
+        'case LT_CharacterLiteral:',
+        'return std::string(1, lit.mData.mChar.mData.mChar); // TODO: Unicode support',
+        'case LT_StringLiteral:',
+        'return std::string(lit.mData.mStr);',
+        'case LT_NullLiteral:',
+        'return std::string("null");',
+        'case LT_ThisLiteral:',
+        'return std::string("this");',
+        'case LT_SuperLiteral:',
+        'return std::string("super");',
+        'case LT_NA:',
+        'return std::string("NA");',
+        'default:;',
+        '}',
         '}', '',
         'private:',
         'void Dump(const std::string& msg) {',
@@ -435,32 +465,6 @@ astdump_init = [
         'indent -= 4;',
         'if(size)', 'std::cout << indstr.substr(0, indent + 2) << "]" << std::endl;',
         '}', '',
-        'std::string GetEnumLitData(LitData lit) {',
-        'std::string str = GetEnumLitId(lit.mType);',
-        'switch (lit.mType) {',
-        'case LT_IntegerLiteral:',
-        'return std::to_string(lit.mData.mInt);',
-        'case LT_FPLiteral:',
-        'return std::to_string(lit.mData.mFloat);',
-        'case LT_DoubleLiteral:',
-        'return std::to_string(lit.mData.mDouble);',
-        'case LT_BooleanLiteral:',
-        'return std::to_string(lit.mData.mBool);',
-        'case LT_CharacterLiteral:',
-        'return std::string(1, lit.mData.mChar.mData.mChar); // TODO: Unicode support',
-        'case LT_StringLiteral:',
-        'return std::string(lit.mData.mStr);',
-        'case LT_NullLiteral:',
-        'return std::string("null");',
-        'case LT_ThisLiteral:',
-        'return std::string("this");',
-        'case LT_SuperLiteral:',
-        'return std::string("super");',
-        'case LT_NA:',
-        'return std::string("NA");',
-        'default:;',
-        '}',
-        '}', '',
         ]
 
 handle_src_include_files(Initialization)
@@ -469,7 +473,7 @@ handle_yaml(initial_yaml, gen_handler)
 append(include_file, ['','public:'])
 handle_yaml(initial_yaml, gen_enum_func)
 gen_args[2] = "Dump"
-gen_args[3] = "^ "
+gen_args[4] = "^ "
 gen_call_child_node = lambda dictionary, field_name, node_type, accessor: \
     ('Dump("' + padding_name(field_name) + ': ' + short_name(node_type) \
     + '*, " + (' + accessor + ' ? "NodeId=" + std::to_string(' + accessor \
@@ -495,11 +499,12 @@ gen_call_nth_child_node = lambda dictionary, field_name, node_type, accessor: \
         'if(auto t = ' + accessor + ') ' + gen_args[2] + node_type + '(t);'
 gen_func_definition_end = lambda dictionary, node_name: '}\nreturn node;\n}'
 
-#
+# -------------------------------------------------------
 gen_args = [
         "gen_astvisitor", # filename
         "AstVisitor",     # Class name
         "Visit",          # Prefix of function name
+        "",               # Extra include directives
         ]
 
 astvisitor_init = [
@@ -524,35 +529,64 @@ handle_src_include_files(Finalization)
 gen_func_declaration = lambda dictionary, node_name: \
         'void ' + gen_args[2] + node_name + '(' + node_name + '* node);'
 gen_func_definition = lambda dictionary, node_name: \
-        'void ' + gen_args[1] + '::' + gen_args[2] + node_name + '(' + node_name + '* node) {\nif(node != nullptr) {'
+        'void ' + gen_args[1] + '::' + gen_args[2] + node_name + '(' + node_name + '* node) {\nif(node != nullptr) {' \
+        + 'PutNode(node);'
 gen_call_child_node = lambda dictionary, field_name, node_type, accessor: \
         'if(auto t = ' + accessor + ') {' \
-        + ('PutEdge(node, t, "' + field_name + '");' if field_name != '' else '') + gen_args[2] + node_type + '(t);}'
+        + ('PutEdge(node, t, "' + field_name[1:] + '");' if field_name != '' else '') + gen_args[2] + node_type + '(t);}'
 gen_call_nth_child_node = lambda dictionary, field_name, node_type, accessor: \
-        'if(auto t = ' + accessor + ') { PutEdge2(node, t, "' + field_name + '", i); ' + gen_args[2] + node_type + '(t);}'
+        'if(auto t = ' + accessor + ') { PutChildEdge(node, t, "' + field_name[1:] + '", i); ' + gen_args[2] + node_type + '(t);}'
 gen_func_definition_end = lambda dictionary, node_name: '}\n}'
 
+# -------------------------------------------------------
 gen_args = [
         "gen_astgraph", # filename
         "AstGraph",     # Class name
         "DumpGraph",    # Prefix of function name
+        '#include "' + astdump + '.h"\n#include <algorithm>\n#include <set>', # Extra include directives
         ]
 
 astgraph_init = [
-        'void ' + gen_args[2] + '(TreeNode* node, const char *title, std::ostream *o) {',
-        'os = o;',
-        '*os << "digraph AST_" << title << " {\\n";',
-        gen_args[2] + 'TreeNode(node);',
-        '*os << "}\\n";',
+        gen_args[1] + '(ASTModule *m) : mASTModule(m) {}', '',
+        '#define NodeName(n,s) (' + astdumpclass + '::GetEnumNodeKind((n)->GetKind()) + 3) << s << n->GetNodeId()',
+        '#define EnumVal(t,e,m,o) (' + astdumpclass + '::GetEnum##e((static_cast<t *>(n))->Get##m()) + o)',
+        '#define NodeColor(c) "\\",style=filled,color=\\""#c', '',
+        'void ' + gen_args[2] + '(const char *title, std::ostream *os) {',
+        'mNodes.clear();',
+        'mOs = os;',
+        '*mOs << "digraph AST_" << title << " {\\nrankdir=LR;\\n" << title<< "[shape=box];\\n";',
+        'std::size_t idx = 1;',
+        'for(auto it: mASTModule->mTrees) {',
+        '*mOs << title << " -> " << NodeName(it->mRootNode,\'_\') << "[label=" << idx++ << "];\\n";',
+        gen_args[2] + 'TreeNode(it->mRootNode);',
+        '}',
+        '*mOs << "}\\n";',
         '}', '',
-        'void PutEdge(TreeNode *from, TreeNode *to, const char *field) {',
-        'if(to) { *os << "N" << from->GetNodeId() << " -> " << "N" << to->GetNodeId() << "[label=" << field << "];\\n";',
+        'void PutNode(TreeNode *n) {'
+        'if(n && mNodes.find(n) == mNodes.end()) { mNodes.insert(n);',
+        '*mOs << NodeName(n,\'_\') << " [label=\\"" << NodeName(n,\',\') << "\\\\n";',
+        'if(n->GetKind() == NK_Function) *mOs << NodeColor(lightcoral);',
+        'else if(n->GetKind() == NK_Lambda) *mOs << NodeColor(pink);',
+        'else if(n->GetKind() == NK_Call) *mOs << NodeColor(lightsalmon);',
+        'else if(n->GetKind() == NK_Identifier) *mOs << "\\\\\\"" << n->GetName() << "\\\\\\"";',
+        'else if(n->GetKind() == NK_Decl) *mOs << EnumVal(DeclNode, DeclProp, Prop, 0);',
+        'else if(n->GetKind() == NK_BinOperator) *mOs << EnumVal(BinOperatorNode, OprId, OprId, 4);',
+        'else if(n->GetKind() == NK_UnaOperator) *mOs << EnumVal(UnaOperatorNode, OprId, OprId, 4);',
+        'else if(n->GetKind() == NK_Literal) { std::string s(' + astdumpclass + '::GetEnumLitData(static_cast<LiteralNode *>(n)->GetData()));',
+        'std::replace(s.begin(), s.end(), \'"\', \':\');\n*mOs << s;\n}',
+        'if(n->IsStmt()) *mOs << NodeColor(lightblue);',
+        ' *mOs << "\\"];\\n";'
         '}', '}', '',
-        'void PutEdge2(TreeNode *from, TreeNode *to, const char *field, unsigned idx) {',
-        'if(to) { *os << "N" << from->GetNodeId() << " -> " << "N" << to->GetNodeId() << "[label=" << field << idx << "];\\n";',
+        'void PutEdge(TreeNode *from, TreeNode *to, const char *field) {',
+        'if(to) { *mOs << NodeName(from,\'_\') << " -> " << NodeName(to,\'_\') << "[label=" << field << "];\\n";',
+        '}', '}', '',
+        'void PutChildEdge(TreeNode *from, TreeNode *to, const char *field, unsigned idx) {',
+        'if(to) { *mOs << NodeName(from,\'_\') << " -> " << NodeName(to,\'_\') << "[label=\\"" << field << "[" << idx << "]\\"];\\n";',
         '}', '}', '',
         'private:',
-        'std::ostream *os;'
+        'ASTModule            *mASTModule;',
+        'std::ostream         *mOs;',
+        'std::set<TreeNode *>  mNodes;'
         ]
 
 handle_src_include_files(Initialization)

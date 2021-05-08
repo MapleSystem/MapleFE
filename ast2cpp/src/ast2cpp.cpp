@@ -16,6 +16,7 @@
 #include "ast2cpp.h"
 #include "ast_handler.h"
 #include "gen_astdump.h"
+#include "gen_astgraph.h"
 
 namespace maplefe {
 
@@ -47,6 +48,12 @@ void A2C::ProcessAST(bool trace_a2c) {
     for(auto it: gModule.mTrees) {
       astdump.Dump(it->mRootNode);
     }
+  }
+
+  if (mTraceA2C) {
+    std::cout << "============= AstGraph ===========" << std::endl;
+    AstGraph graph(&gModule);
+    graph.DumpGraph("After_Building_CFG", &std::cout);
   }
 
   handler.BuildDFA();
