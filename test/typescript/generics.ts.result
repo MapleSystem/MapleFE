@@ -1,0 +1,12 @@
+Matched 17 tokens.
+Matched 28 tokens.
+Matched 35 tokens.
+============= Module ===========
+== Sub Tree ==
+func  foo(arg)  throws: 
+  return arg
+
+== Sub Tree ==
+js_let Decl: output=foo LT string GT "abc"
+== Sub Tree ==
+console.log(output)
