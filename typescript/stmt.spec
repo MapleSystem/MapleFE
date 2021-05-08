@@ -1091,8 +1091,14 @@ rule TypeParameter: BindingIdentifier + ZEROORONE(Constraint)
 rule Constraint: "extends" + Type
 
 ## rule TypeArguments: < TypeArgumentList >
+rule TypeArguments: '<' + TypeArgumentList + '>'
+
 ## rule TypeArgumentList: TypeArgument TypeArgumentList , TypeArgument
+rule TypeArgumentList: ONEOF(TypeArgument,
+                             TypeArgumentList + ',' + TypeArgument)
+
 ## rule TypeArgument: Type
+rule TypeArgument: Type
 
 #rule Type : ONEOF(UnionOrIntersectionOrPrimaryType,
 #                  FunctionType,
@@ -1125,7 +1131,7 @@ rule ParenthesizedType: '(' + Type + ')'
 rule PredefinedType: TYPE
 
 ## rule TypeReference: TypeName [no LineTerminator here] TypeArgumentsopt
-rule TypeReference: TypeName
+rule TypeReference: TypeName + ZEROORONE(TypeArguments)
 
 ## rule TypeName: IdentifierReference NamespaceName . IdentifierReference
 rule TypeName: IdentifierReference

@@ -1,5 +1,6 @@
 Matched 49 tokens.
-Matched 64 tokens.
+Matched 73 tokens.
+Matched 88 tokens.
 ============= Module ===========
 == Sub Tree ==
 class  Foo
@@ -15,5 +16,7 @@ class  Foo
   LocalClasses: 
   LocalInterfaces: 
 
+== Sub Tree ==
+js_const Decl: FooString=Foo LT String GT 
 == Sub Tree ==
 console.log(())
