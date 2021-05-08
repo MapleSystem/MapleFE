@@ -44,10 +44,8 @@ void A2C::ProcessAST(bool trace_a2c) {
 
   if (mTraceA2C) {
     std::cout << "============= AstDump ===========" << std::endl;
-    AstDump astdump;
-    for(auto it: gModule.mTrees) {
-      astdump.Dump(it->mRootNode);
-    }
+    AstDump astdump(&gModule);
+    astdump.Dump("After_Building_CFG", &std::cout);
   }
 
   if (mTraceA2C) {
