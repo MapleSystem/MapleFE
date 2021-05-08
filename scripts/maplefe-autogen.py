@@ -479,9 +479,6 @@ handle_src_include_files(Finalization)
 
 ################################################################################
 
-get_accessor_based_on_type = lambda val_type, accessor: \
-        get_data_based_on_type(val_type, accessor).replace(': " +',',').replace(');','').replace('" + ','')
-
 # The follwoing gen_func_* and gen_call* functions are for AstVisitor
 gen_call_handle_values = lambda: False
 gen_func_declaration = lambda dictionary, node_name: \
