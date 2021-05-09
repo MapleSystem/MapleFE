@@ -19,7 +19,7 @@ Matched 68 tokens.
 == Sub Tree ==
 class  A
   Fields: 
-    Decl: a    Decl: b
+    a    b
   Instance Initializer: 
   Constructors: 
   Methods: 

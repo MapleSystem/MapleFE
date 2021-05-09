@@ -3,7 +3,7 @@ Matched 42 tokens.
 == Sub Tree ==
 class  Foo
   Fields: 
-    Decl: f1=0    Decl: f2=0
+    f1=0    f2=0
   Instance Initializer: 
   Constructors: 
     constructor  (a,b)  throws: 

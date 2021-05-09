@@ -5,7 +5,7 @@ Matched 88 tokens.
 == Sub Tree ==
 class  Foo
   Fields: 
-    Decl: _ctor
+    _ctor
   Instance Initializer: 
   Constructors: 
     constructor  (ctor)  throws: 

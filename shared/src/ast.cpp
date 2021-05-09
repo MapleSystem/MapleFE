@@ -984,7 +984,7 @@ void ClassNode::Construct() {
           mFields.PushBack(inode);
         }
       } else if (var->IsIdentifier()) {
-        mFields.PushBack((IdentifierNode*)tree_node);
+        mFields.PushBack((IdentifierNode*)var);
       } else
         MERROR("Unsupported class field.");
     } else if (tree_node->IsFunction()) {

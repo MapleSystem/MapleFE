@@ -19,7 +19,7 @@ js_let Decl: funcObj=func  (name)  throws:
 == Sub Tree ==
 class  ObjClass
   Fields: 
-    Decl: _name
+    _name
   Instance Initializer: 
   Constructors: 
     constructor  (name)  throws: 
