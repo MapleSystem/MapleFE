@@ -27,7 +27,7 @@ for ts in $LIST; do
         echo --- "$ts"; cat "$ts"
         sed -n $cmd <<< "$out" > "$ts".dot
         dot -Tpng -o "$ts".png "$ts".dot
-        viewnior "$ts".png
+        viewnior --fullscreen "$ts".png
         rm -f "$ts".png "$ts".dot
       done
   fi

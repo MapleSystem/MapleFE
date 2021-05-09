@@ -540,10 +540,13 @@ gen_func_definition = lambda dictionary, node_name: \
         'void ' + gen_args[1] + '::' + gen_args[2] + node_name + '(' + node_name + '* node) {' \
         + '\nif(node != nullptr' + (' && PutNode(node)) {' if node_name != "TreeNode" else ') {')
 gen_call_child_node = lambda dictionary, node_name, field_name, node_type, accessor: \
-        'if(auto t = ' + accessor + ') {' \
-        + ('PutEdge(node, t, "' + field_name[1:] + '");' if field_name != '' else '') + gen_args[2] + node_type + '(t);}'
+        'if(auto t = ' + accessor + ') {' + ('PutEdge(node, t, "' + field_name[1:] + \
+        '", NK_' + node_type.replace('Node', '').replace('Tree', 'Null') + ');' \
+        if field_name != '' else '') + gen_args[2] + node_type + '(t);}'
 gen_call_nth_child_node = lambda dictionary, node_name, field_name, node_type, accessor: \
-        'if(auto t = ' + accessor + ') { PutChildEdge(node, t, "' + field_name[1:] + '", i); ' + gen_args[2] + node_type + '(t);}'
+        'if(auto t = ' + accessor + ') { PutChildEdge(node, t, "' + field_name[1:] \
+        + '", i, NK_' + node_type.replace('Node', '').replace('Tree', 'Null') \
+        + '); ' + gen_args[2] + node_type + '(t);}'
 gen_func_definition_end = lambda dictionary, node_name: '}\n}'
 
 # -------------------------------------------------------
@@ -602,11 +605,12 @@ astgraph_init = [
         'if(n->IsStmt()) *mOs << "\\",penwidth=2,color=\\"tomato";',
         ' *mOs << "\\"];\\n";'
         'return true;}', 'return false;}', '',
-        'void PutEdge(TreeNode *from, TreeNode *to, const char *field) {',
+        'void PutEdge(TreeNode *from, TreeNode *to, const char *field, NodeKind k) {',
         'if(to) { *mOs << NodeName(from,\'_\') << " -> " << NodeName(to,\'_\') << "[label=" << field << "];\\n";',
         '}', '}', '',
-        'void PutChildEdge(TreeNode *from, TreeNode *to, const char *field, unsigned idx) {',
-        'if(to) { *mOs << NodeName(from,\'_\') << " -> " << NodeName(to,\'_\') << "[label=\\"" << field << "[" << idx << "]\\"];\\n";',
+        'void PutChildEdge(TreeNode *from, TreeNode *to, const char *field, unsigned idx, NodeKind k) {',
+        'if(to) { *mOs << NodeName(from,\'_\') << " -> " << NodeName(to,\'_\') << "[label=\\"" << field << "[" << idx << "]\\""' \
+                + ' << (to->GetKind() == k || k == NK_Null ? "" : ", style=bold, color=red") << "];\\n";',
         '}', '}', '',
         'private:',
         'ASTModule            *mASTModule;',
