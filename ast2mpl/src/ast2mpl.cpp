@@ -64,7 +64,7 @@ void A2M::Init() {
 // starting point of AST to MPL process
 void A2M::ProcessAST(bool trace_a2m) {
   mTraceA2m = trace_a2m;
-  AstDump astdump;
+  AstDump astdump(&gModule);
 
   if (mTraceA2m) {
     std::cout << "============= in ProcessAST ===========" << std::endl;
@@ -78,9 +78,9 @@ void A2M::ProcessAST(bool trace_a2m) {
   // pass 2: handle function def
   for(auto it: gModule.mTrees) {
     TreeNode *tnode = it->mRootNode;
-    if (mTraceA2m) { astdump.Dump(it->mRootNode); }
     ProcessNode(SK_Stmt, tnode, nullptr);
   }
+  if (mTraceA2m) { astdump.Dump("ProcessAST", &std::cout); }
 }
 
 maple::MIRType *A2M::MapType(TreeNode *type) {
