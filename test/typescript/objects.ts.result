@@ -35,10 +35,10 @@ js_let Decl: obj_b=Object.create()
 == Sub Tree ==
 js_let Decl: obj_c=Object.create(null)
 == Sub Tree ==
-js_let Decl: obj_d=Object
+js_let Decl: obj_d=new Object()
 == Sub Tree ==
-js_let Decl: obj_e=func
+js_let Decl: obj_e=new func()
 == Sub Tree ==
-js_let Decl: obj_f=
+js_let Decl: obj_f=new funcObj("John")
 == Sub Tree ==
-js_let Decl: obj_g=
+js_let Decl: obj_g=new ObjClass("John")

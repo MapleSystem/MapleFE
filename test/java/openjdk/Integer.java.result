@@ -49,7 +49,7 @@ class  Integer
          Assign -
       false branch :
 
-      return new String(buf,)
+      return new String(buf,charPos,(33 Sub charPos))
     func  toUnsignedString(i,radix)  throws: 
       return Long.toUnsignedString(toUnsignedLong(i),radix)
     func  toHexString(i)  throws: 

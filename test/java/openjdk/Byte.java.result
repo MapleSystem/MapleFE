@@ -81,7 +81,7 @@ class  Byte
       Decl: buf=
        Assign 
        Assign 
-      return new String(0,)
+      return new String(0,2,buf)
   LocalClasses: 
     class  ByteCache
       Fields: 

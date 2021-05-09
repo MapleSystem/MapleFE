@@ -50,7 +50,7 @@ class  Long
          Assign -
       false branch :
 
-      return new String(buf,)
+      return new String(buf,charPos,(65 Sub charPos))
     func  toUnsignedString(i,radix)  throws: 
       cond-branch cond:i GE 0
       true branch :

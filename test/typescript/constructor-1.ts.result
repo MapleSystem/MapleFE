@@ -10,6 +10,6 @@ func  Person(first,last,age,eye)  throws:
   this.eyeColor Assign eye
 
 == Sub Tree ==
-js_var Decl: myFather=
+js_var Decl: myFather=new Person("John","Doe",50,"blue")
 == Sub Tree ==
 console.log(myFather.age)

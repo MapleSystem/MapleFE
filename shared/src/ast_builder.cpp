@@ -1774,6 +1774,10 @@ void ASTBuilder::AddParams(TreeNode *func, TreeNode *decl_params) {
   }
 }
 
+// This function takes two or three arguments.
+// 1. The id of the class/interface/function/...
+// 2. The arguments, could be empty
+// 3. In some cases there is a third argument, for function body.
 TreeNode* ASTBuilder::BuildNewOperation() {
   if (mTrace)
     std::cout << "In BuildNewOperation " << std::endl;
@@ -1781,10 +1785,8 @@ TreeNode* ASTBuilder::BuildNewOperation() {
   NewNode *new_node = (NewNode*)mTreePool->NewTreeNode(sizeof(NewNode));
   new (new_node) NewNode();
 
-  MASSERT(mParams.size() == 3 && "BuildNewOperation has NO 3 params?");
   Param p_a = mParams[0];
   Param p_b = mParams[1];
-  Param p_c = mParams[2];
 
   // Name could not be empty
   if (p_a.mIsEmpty)
@@ -1797,11 +1799,14 @@ TreeNode* ASTBuilder::BuildNewOperation() {
   if (node_b)
     AddArguments(new_node, node_b);
 
-  TreeNode *node_c = p_c.mIsEmpty ? NULL : p_c.mData.mTreeNode;
-  if (node_c) {
-    MASSERT(node_c->IsBlock() && "ClassBody is not a block?");
-    BlockNode *b = (BlockNode*)node_c;
-    new_node->SetBody(b);
+  if (mParams.size() == 3) {
+    Param p_c = mParams[2];
+    TreeNode *node_c = p_c.mIsEmpty ? NULL : p_c.mData.mTreeNode;
+    if (node_c) {
+      MASSERT(node_c->IsBlock() && "ClassBody is not a block?");
+      BlockNode *b = (BlockNode*)node_c;
+      new_node->SetBody(b);
+    }
   }
 
   mLastTreeNode = new_node;
@@ -1928,10 +1933,7 @@ void ASTBuilder::AddArguments(TreeNode *call, TreeNode *args) {
     PassNode *pass = (PassNode*)args;
     for (unsigned i = 0; i < pass->GetChildrenNum(); i++) {
       TreeNode *child = pass->GetChild(i);
-      if (callnode)
-        callnode->AddArg(child);
-      else
-        newnode->AddArg(child);
+      AddArguments(call, child);
     }
   } else {
     if (callnode)
