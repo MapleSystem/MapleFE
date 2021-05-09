@@ -43,15 +43,15 @@ void A2C::ProcessAST(bool trace_a2c) {
   }
 
   if (mTraceA2C) {
-    std::cout << "============= AstDump ===========" << std::endl;
-    AstDump astdump(&gModule);
-    astdump.Dump("After BuildCFG()", &std::cout);
-  }
-
-  if (mTraceA2C) {
     std::cout << "============= AstGraph ===========" << std::endl;
     AstGraph graph(&gModule);
     graph.DumpGraph("After BuildCFG()", &std::cout);
+  }
+
+  if (mTraceA2C) {
+    std::cout << "============= AstDump ===========" << std::endl;
+    AstDump astdump(&gModule);
+    astdump.Dump("After BuildCFG()", &std::cout);
   }
 
   handler.BuildDFA();

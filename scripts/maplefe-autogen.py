@@ -203,10 +203,10 @@ def gen_handler_ast_node(dictionary):
                 suffix = ")" if prefix != '' else ''
                 if member_functions.get(plural) != None:
                     # gen_call_child_node() for child node in current function body
-                    code.append(gen_call_child_node(dictionary, name, ntype, prefix + "node->" + plural + "()" + suffix))
+                    code.append(gen_call_child_node(dictionary, node_name, name, ntype, prefix + "node->" + plural + "()" + suffix))
                 else:
                     # It is an ERROR if no member function for the child node
-                    code.append("Error!; // " + gen_call_child_node(dictionary, name, ntype, prefix + "node->" + plural + "()" + suffix))
+                    code.append("Error!; // " + gen_call_child_node(dictionary, node_name, name, ntype, prefix + "node->" + plural + "()" + suffix))
             elif ((otype == "SmallVector" or otype == "SmallList" or otype == "ExprListNode")
                     and member_functions.get(plural + "Num") != None
                     and (member_functions.get(singular) != None or member_functions.get(singular + "AtIndex") != None)):
@@ -216,25 +216,25 @@ def gen_handler_ast_node(dictionary):
                 ntype = get_pointed(rtype)
                 if ntype != None or gen_call_handle_values():
                     # gen_call_children_node() for list or vector of nodes before entering the loop
-                    code.append(gen_call_children_node(dictionary, name, otype + "<" + rtype + ">", "node->" + plural + "Num()"))
+                    code.append(gen_call_children_node(dictionary, node_name, name, otype + "<" + rtype + ">", "node->" + plural + "Num()"))
                     code.append("for(unsigned i = 0; i < node->" + plural + "Num(); ++i) {")
                     if ntype != None:
                         prefix = "const_cast<" + ntype + "*>(" if rtype[:6] == "const " else ''
                         suffix = ")" if prefix != '' else ''
                         # gen_call_nth_child_node() for the nth child node in the loop for the list or vector
-                        code.append(gen_call_nth_child_node(dictionary, name, ntype, prefix + "node->" + func_name + "(i)" + suffix))
+                        code.append(gen_call_nth_child_node(dictionary, node_name, name, ntype, prefix + "node->" + func_name + "(i)" + suffix))
                     else:
                         # gen_call_nth_child_value() for the nth child value in the loop for the list or vector
-                        code.append(gen_call_nth_child_value(dictionary, name, rtype, "node->" + func_name + "(i)"))
+                        code.append(gen_call_nth_child_value(dictionary, node_name, name, rtype, "node->" + func_name + "(i)"))
                     code.append("}")
-                code.append(gen_call_children_node_end(dictionary, name, otype + "<" + rtype + ">", "node->" + plural + "Num()"))
+                code.append(gen_call_children_node_end(dictionary, node_name, name, otype + "<" + rtype + ">", "node->" + plural + "Num()"))
             elif gen_call_handle_values():
                 if member_functions.get(plural) != None:
                     # gen_call_child_value() for child value in current function body
-                    code.append(gen_call_child_value(dictionary, name, otype, "node->" + plural + "()"))
+                    code.append(gen_call_child_value(dictionary, node_name, name, otype, "node->" + plural + "()"))
                 else:
                     # It is an ERROR if no member function for the child value
-                    code.append("Error!; // " + gen_call_child_value(dictionary, name, otype, "node->" + plural + "()"))
+                    code.append("Error!; // " + gen_call_child_value(dictionary, node_name, name, otype, "node->" + plural + "()"))
 
     # gen_func_definition_end() for the code at the end of current function body
     code.append(gen_func_definition_end(dictionary, node_name))
@@ -261,12 +261,12 @@ def gen_handler_ast_TreeNode(dictionary):
         filename = output_dir + 'maplefe/' + node_name + '.yaml'
         if path.exists(filename):
             # gen_call_child_node() for visiting child node
-            code.append(gen_call_child_node(dictionary, "", node_name, "static_cast<" + node_name + "*>(node)"))
+            code.append(gen_call_child_node(dictionary, node_name, "", node_name, "static_cast<" + node_name + "*>(node)"))
         elif node_name == "NullNode":
             code.append("// Ignore NullNode")
         else:
             # it is an ERROR if the node kind is out of range
-            code.append("Error!!! // " + gen_call_child_node(dictionary, "", node_name, "static_cast<" + node_name + "*>(node)"))
+            code.append("Error!!! // " + gen_call_child_node(dictionary, node_name, "", node_name, "static_cast<" + node_name + "*>(node)"))
         code.append("break;");
     code.append('default: MASSERT(0 && "Unexpected node kind");')
     code.append("}")
@@ -370,18 +370,18 @@ gen_func_definition = lambda dictionary, node_name: \
         "void " + gen_args[1] + "::" + gen_args[2] + node_name + "(" + node_name + "* node) {" \
         + ('if (node == nullptr) \nreturn;\n' if node_name == "TreeNode" else '\nif(DumpFB("' + node_name \
         + '", node)) { MASSERT(node->GetKind() == NK_' + node_name.replace('Node', '') + ');')
-gen_call_child_node = lambda dictionary, field_name, node_type, accessor: \
+gen_call_child_node = lambda dictionary, node_name, field_name, node_type, accessor: \
         ('Dump("' + padding_name(field_name) + ': ' + short_name(node_type) + '*", ' + accessor  + ');\n' \
         if field_name != '' else '') + gen_args[2] + short_name(node_type) + '(' + accessor + ');'
-gen_call_child_value = lambda dictionary, field_name, val_type, accessor: \
+gen_call_child_value = lambda dictionary, node_name, field_name, val_type, accessor: \
         'Dump(std::string("' + padding_name(field_name) + ': ") + "' + get_data_based_on_type(val_type, accessor)
-gen_call_children_node = lambda dictionary, field_name, node_type, accessor: \
+gen_call_children_node = lambda dictionary, node_name, field_name, node_type, accessor: \
         'DumpLB("' + padding_name(field_name) + ': ' + short_name(node_type) + ', size=", ' + accessor+ ');'
-gen_call_children_node_end = lambda dictionary, field_name, node_type, accessor: 'DumpLE(' + accessor + ');'
-gen_call_nth_child_node = lambda dictionary, field_name, node_type, accessor: \
+gen_call_children_node_end = lambda dictionary, node_name, field_name, node_type, accessor: 'DumpLE(' + accessor + ');'
+gen_call_nth_child_node = lambda dictionary, node_name, field_name, node_type, accessor: \
         'Dump(std::to_string(i + 1) + ": ' + short_name(node_type) + '*", ' + accessor + ');\n' \
         + gen_args[2] + short_name(node_type) + '(' + accessor + ');'
-gen_call_nth_child_value = lambda dictionary, field_name, val_type, accessor: \
+gen_call_nth_child_value = lambda dictionary, node_name, field_name, val_type, accessor: \
         'Dump(std::to_string(i) + ". ' + get_data_based_on_type(val_type, accessor)
 gen_func_definition_end = lambda dictionary, node_name: \
         'return;\n}' if node_name == "TreeNode" else 'DumpFE();\n}\nreturn;\n}'
@@ -480,7 +480,7 @@ append(include_file, ['','public:'])
 handle_yaml(initial_yaml, gen_enum_func)
 gen_args[2] = "Dump"
 gen_args[4] = "^ "
-gen_call_child_node = lambda dictionary, field_name, node_type, accessor: \
+gen_call_child_node = lambda dictionary, node_name, field_name, node_type, accessor: \
     ('Dump("' + padding_name(field_name) + ': ' + short_name(node_type) \
     + '*, " + (' + accessor + ' ? "NodeId=" + std::to_string(' + accessor \
     + '->GetNodeId()) : std::string("null")));\n' if field_name != '' else '')
@@ -497,11 +497,13 @@ gen_func_definition = lambda dictionary, node_name: \
         node_name + '* ' + gen_args[1] + '::' + gen_args[2] + node_name + '(' + node_name + '* node) {\nif(node != nullptr) {' \
         + ('\nif(mTrace) std::cout << "Visiting ' + node_name + ', id=" << node->GetNodeId() << "..." << std::endl;' \
         if node_name != 'TreeNode' else '')
-gen_call_child_node = lambda dictionary, field_name, node_type, accessor: \
-        'if(auto t = ' + accessor + ') ' + gen_args[2] + node_type + '(t);'
-gen_call_children_node = lambda dictionary, field_name, node_type, accessor: ''
-gen_call_children_node_end = lambda dictionary, field_name, node_type, accessor: ''
-gen_call_nth_child_node = lambda dictionary, field_name, node_type, accessor: \
+gen_call_child_node = lambda dictionary, node_name, field_name, node_type, accessor: \
+        'if(auto t = ' + accessor + ') ' + (gen_args[2] + node_type + '(t);' \
+        if node_name != "IdentifierNode" or field_name != "mType" else \
+        '{if(t->GetKind() != NK_Class)' + gen_args[2] + node_type + '(t);}')
+gen_call_children_node = lambda dictionary, node_name, field_name, node_type, accessor: ''
+gen_call_children_node_end = lambda dictionary, node_name, field_name, node_type, accessor: ''
+gen_call_nth_child_node = lambda dictionary, node_name, field_name, node_type, accessor: \
         'if(auto t = ' + accessor + ') ' + gen_args[2] + node_type + '(t);'
 gen_func_definition_end = lambda dictionary, node_name: '}\nreturn node;\n}'
 
@@ -531,16 +533,16 @@ handle_src_include_files(Finalization)
 
 ################################################################################
 
-# The follwoing gen_func_* and gen_call* functions are for AstVisitor
+# The follwoing gen_func_* and gen_call* functions are for AstGraph
 gen_func_declaration = lambda dictionary, node_name: \
         'void ' + gen_args[2] + node_name + '(' + node_name + '* node);'
 gen_func_definition = lambda dictionary, node_name: \
-        'void ' + gen_args[1] + '::' + gen_args[2] + node_name + '(' + node_name + '* node) {\nif(node != nullptr) {' \
-        + 'PutNode(node);'
-gen_call_child_node = lambda dictionary, field_name, node_type, accessor: \
+        'void ' + gen_args[1] + '::' + gen_args[2] + node_name + '(' + node_name + '* node) {' \
+        + '\nif(node != nullptr' + (' && PutNode(node)) {' if node_name != "TreeNode" else ') {')
+gen_call_child_node = lambda dictionary, node_name, field_name, node_type, accessor: \
         'if(auto t = ' + accessor + ') {' \
         + ('PutEdge(node, t, "' + field_name[1:] + '");' if field_name != '' else '') + gen_args[2] + node_type + '(t);}'
-gen_call_nth_child_node = lambda dictionary, field_name, node_type, accessor: \
+gen_call_nth_child_node = lambda dictionary, node_name, field_name, node_type, accessor: \
         'if(auto t = ' + accessor + ') { PutChildEdge(node, t, "' + field_name[1:] + '", i); ' + gen_args[2] + node_type + '(t);}'
 gen_func_definition_end = lambda dictionary, node_name: '}\n}'
 
@@ -568,7 +570,7 @@ astgraph_init = [
         '}',
         '*mOs << "}\\n";',
         '}', '',
-        'void PutNode(TreeNode *n) {'
+        'bool PutNode(TreeNode *n) {'
         'if(n && mNodes.find(n) == mNodes.end()) { mNodes.insert(n);',
         '*mOs << NodeName(n,\'_\') << " [label=\\"" << NodeName(n,\',\') << "\\\\n";',
         'if(n->GetKind() == NK_Function) { const char* s = n->GetName();',
@@ -599,7 +601,7 @@ astgraph_init = [
         '}',
         'if(n->IsStmt()) *mOs << "\\",penwidth=2,color=\\"tomato";',
         ' *mOs << "\\"];\\n";'
-        '}', '}', '',
+        'return true;}', 'return false;}', '',
         'void PutEdge(TreeNode *from, TreeNode *to, const char *field) {',
         'if(to) { *mOs << NodeName(from,\'_\') << " -> " << NodeName(to,\'_\') << "[label=" << field << "];\\n";',
         '}', '}', '',
