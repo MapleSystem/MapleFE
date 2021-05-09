@@ -106,27 +106,30 @@ static void add_attribute_to(TreeNode *tree, TreeNode *attr) {
   MASSERT(attr->IsAttr());
   AttrNode *attr_node = (AttrNode*)attr;
   AttrId aid = attr_node->GetId();
-  if (tree->IsIdentifier()) {
-    IdentifierNode *inode = (IdentifierNode*)tree;
-    inode->AddAttr(aid);
-  }else if (tree->IsVarList()) {
+
+  if (tree->IsPass()) {
+    PassNode *pass_node = (PassNode*)tree;
+    for (unsigned i = 0; i < pass_node->GetChildrenNum(); i++) {
+      TreeNode *child = pass_node->GetChild(i);
+      add_attribute_to(child, attr);
+    }
+  } else if (tree->IsVarList()) {
     VarListNode *vl = (VarListNode*)tree;
     for (unsigned i = 0; i < vl->GetVarsNum(); i++) {
       IdentifierNode *inode = vl->GetVarAtIndex(i);
       inode->AddAttr(aid);
     }
-    return;
-  } else if (tree->IsBlock()){
-    BlockNode *b = (BlockNode*)tree;
-    if (b->IsInstInit()) {
-      b->AddAttr(aid);
-      return;
+  } else if (tree->IsExprList()) {
+    ExprListNode *vl = (ExprListNode*)tree;
+    for (unsigned i = 0; i < vl->GetExprsNum(); i++) {
+      TreeNode *child = vl->GetExprAtIndex(i);
+      add_attribute_to(child, attr);
     }
   } else {
-    ClassNode *klass = (ClassNode*)tree;
-    klass->AddAttr(aid);
-    return;
+    // The basse TreeNode has a virtual AddAttr().
+    tree->AddAttr(aid);
   }
+  return;
 }
 
 // It's the caller to assure tree is valid, meaning something could carry type.
