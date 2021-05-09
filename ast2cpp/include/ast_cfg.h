@@ -38,8 +38,8 @@ enum BBKind {
   BK_Join         // BB at join point
 };
 
-enum BBAttribute {
-  AK_Unknown  = 0,
+enum BBAttribute : unsigned {
+  AK_None     = 0,
   AK_Entry    = 1 << 0,
   AK_Exit     = 1 << 1,
   AK_Try      = 1 << 2,
@@ -47,8 +47,16 @@ enum BBAttribute {
   AK_Throw    = 1 << 4,
   AK_Finally  = 1 << 5,
   AK_InLoop   = 1 << 6,
-  AK_HasCall  = 1 << 7
+  AK_HasCall  = 1 << 7,
+  AK_ALL      = 0xffffffff
 };
+
+inline BBAttribute operator|(BBAttribute x, BBAttribute y) {
+  return static_cast<BBAttribute>(static_cast<unsigned>(x) | static_cast<unsigned>(y));
+}
+inline BBAttribute operator&(BBAttribute x, BBAttribute y) {
+  return static_cast<BBAttribute>(static_cast<unsigned>(x) & static_cast<unsigned>(y));
+}
 
 using BBIndex = unsigned;
 class AST_Handler;
@@ -66,14 +74,15 @@ class AST_BB {
 
  public:
   explicit AST_BB(BBKind k)
-    : mKind(k), mAttr(AK_Unknown), mId(GetNextId()), mPredicate(nullptr), mAuxNode(nullptr) {}
+    : mKind(k), mAttr(AK_None), mId(GetNextId()), mPredicate(nullptr), mAuxNode(nullptr) {}
   ~AST_BB() {mStatements.Release(); mSuccessors.Release(); mPredecessors.Release();}
 
   void   SetKind(BBKind k) {mKind = k;}
   BBKind GetKind()         {return mKind;}
 
-  void    SetAttr(BBAttribute a) {mAttr = a;}
-  BBIndex GetAttr()              {return mAttr;}
+  void    SetAttr(BBAttribute a)  {mAttr = mAttr | a;}
+  BBIndex GetAttr()               {return mAttr;}
+  bool    TestAttr(BBAttribute a) {return mAttr & a;}
 
   void    SetId(BBIndex id) {mId = id;}
   BBIndex GetId()           {return mId;}

@@ -476,6 +476,7 @@ DeleteNode *CFGVisitor::VisitDeleteNode(DeleteNode *node) {
 // For statement of current BB
 CallNode *CFGVisitor::VisitCallNode(CallNode *node) {
   mCurrentBB->AddStatement(node);
+  mCurrentBB->SetAttr(AK_HasCall);
   return node;
 }
 
