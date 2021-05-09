@@ -426,12 +426,6 @@ ExprListNode *CFGVisitor::VisitExprListNode(ExprListNode *node) {
 }
 
 // For statement of current BB
-LiteralNode *CFGVisitor::VisitLiteralNode(LiteralNode *node) {
-  mCurrentBB->AddStatement(node);
-  return node;
-}
-
-// For statement of current BB
 UnaOperatorNode *CFGVisitor::VisitUnaOperatorNode(UnaOperatorNode *node) {
   mCurrentBB->AddStatement(node);
   return node;

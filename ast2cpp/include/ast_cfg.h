@@ -217,7 +217,6 @@ class CFGVisitor : public AstVisitor {
   ArrayElementNode *VisitArrayElementNode(ArrayElementNode *node);
   VarListNode *VisitVarListNode(VarListNode *node);
   ExprListNode *VisitExprListNode(ExprListNode *node);
-  LiteralNode *VisitLiteralNode(LiteralNode *node);
   UnaOperatorNode *VisitUnaOperatorNode(UnaOperatorNode *node);
   BinOperatorNode *VisitBinOperatorNode(BinOperatorNode *node);
   TerOperatorNode *VisitTerOperatorNode(TerOperatorNode *node);
