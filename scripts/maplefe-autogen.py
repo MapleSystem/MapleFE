@@ -583,6 +583,7 @@ astgraph_init = [
         'case NK_UnaOperator: *mOs << EnumVal(UnaOperatorNode, OprId, OprId); break;',
         'case NK_Literal: { std::string s(' + astdumpclass + '::GetEnumLitData(static_cast<LiteralNode *>(n)->GetData()));',
         'std::replace(s.begin(), s.end(), \'"\', \':\');\n*mOs << s; break;}',
+        'case NK_Pass:        *mOs << NodeColor(lightgrey); break;',
         '}',
         'if(n->IsStmt()) { if(n->GetKind() == NK_Call) *mOs << "\\",fontcolor=\\"red"; *mOs << NodeColor(lightblue); }',
         ' *mOs << "\\"];\\n";'
