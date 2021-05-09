@@ -1,12 +1,13 @@
 #!/bin/bash
-DOT= PRE= LIST=
+DOT= PRE= LIST= VIEWOP=
 while [ $# -gt 0 ]; do
     case $1 in
         -d|--dot) DOT=true;;
+        -f|--fullscreen) VIEWOP="--fullscreen";;
         -p|--pre) [ $# -ge 2 ] && { PRE="$2"; shift; } || { echo "$1 needs an argument"; exit 1; } ;;
         -a|--ast) PRE="AST" ; DOT=true ;;
         -c|--cfg) PRE="CFG" ; DOT=true ;;
-        -*)       echo "Usage: $0 [-dot] [-p <PREFIX>|--pre <PREFIX>] [-a|-ast] [-c|-cfg] <file1> [<file2> ...]" ;;
+        -*)       echo "Usage: $0 [-dot] [-f|--fullscreen] [-p <PREFIX>|--pre <PREFIX>] [-a|--ast] [-c|--cfg] <file1> [<file2> ...]" ;;
         *)        LIST="$LIST $1"
     esac
     shift
@@ -27,7 +28,7 @@ for ts in $LIST; do
         echo --- "$ts"; cat "$ts"
         sed -n $cmd <<< "$out" > "$ts".dot
         dot -Tpng -o "$ts".png "$ts".dot
-        viewnior --fullscreen "$ts".png
+        viewnior $VIEWOP "$ts".png
         rm -f "$ts".png "$ts".dot
       done
   fi
