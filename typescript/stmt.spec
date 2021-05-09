@@ -551,11 +551,11 @@ rule Statement : ONEOF(
   BreakableStatement,
   ContinueStatement,
   BreakStatement,
-  ReturnStatement)
+  ReturnStatement,
 #  WithStatement[?Yield, ?Return]
 #  LabelledStatement[?Yield, ?Return]
-#  ThrowStatement[?Yield]
-#  TryStatement[?Yield, ?Return]
+  ThrowStatement,
+  TryStatement)
 #  DebuggerStatement
   attr.property : Top
 
@@ -898,20 +898,27 @@ rule DefaultClause :
 ##-----------------------------------
 ##rule ThrowStatement[Yield] :
 ##  throw [no LineTerminator here] Expression[In, ?Yield] ;
+rule ThrowStatement : "throw" + Expression + ';'
 
 ##-----------------------------------
 ##rule TryStatement[Yield, Return] :
 ##  try Block[?Yield, ?Return] Catch[?Yield, ?Return]
 ##  try Block[?Yield, ?Return] Finally[?Yield, ?Return]
 ##  try Block[?Yield, ?Return] Catch[?Yield, ?Return] Finally[?Yield, ?Return]
+rule TryStatement : ONEOF(
+  "try" + Block + Catch,
+  "try" + Block + Finally,
+  "try" + Block + Catch + Finally)
 
 ##-----------------------------------
 ##rule Catch[Yield, Return] :
 ##  catch ( CatchParameter[?Yield] ) Block[?Yield, ?Return]
+rule Catch : "catch" + '(' + CatchParameter + ')' + Block
 
 ##-----------------------------------
 ##rule Finally[Yield, Return] :
 ##  finally Block[?Yield, ?Return]
+rule Finally : "finally" + Block
 
 ##-----------------------------------
 ##rule CatchParameter[Yield] :
