@@ -44,13 +44,19 @@ if ($lang =~ /\Qjava\E/) {
   exit;
 }
 
+my $testdir = $lang;
+# get specified directory to test if other than $lang
+if(defined $ARGV[1]) {
+  $testdir = $ARGV[1];
+}
+
 system("rm -Rf $outroot/report.txt $outroot/diff $outroot/notexists");
 
 if(!(-e "$outroot")) {
   system("mkdir -p $outroot");
 }
 
-opendir (my $DIR, $lang) || die "Error in opening $lang directory\n";
+opendir (my $DIR, $testdir) || die "Error in opening $testdir directory\n";
 
 sub listdirs {
   my @dirs = @_;
@@ -65,7 +71,7 @@ sub listdirs {
   return @files;
 }
 
-my @paths = listdirs($lang) ;
+my @paths = listdirs($testdir) ;
 
 foreach my $file (@paths) {
   my ($filename) = ( $file =~ /([^\\\/]+)$/s ) ;

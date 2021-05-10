@@ -38,7 +38,7 @@ $(SRCLANG):
 	./new_runtests.pl $(SRCLANG)
 
 testms:
-	./new_runtests.pl typescript/TypeScript/tests/cases/compiler
+	./new_runtests.pl typescript TypeScript/tests/cases/compiler
 
 full:
 	make -C .. -j8
