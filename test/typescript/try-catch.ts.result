@@ -8,5 +8,7 @@ for ( )
     false branch :
 
     console.log("try",3 Div i)
+  catch()    console.log("catch",err)
+  finally     console.log("finally",i)
 
 

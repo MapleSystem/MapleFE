@@ -801,6 +801,12 @@ void TryNode::Dump(unsigned indent) {
   DUMP0_NORETURN("try ");
   if (mBlock)
     mBlock->Dump(indent + 2);
+  for (unsigned i = 0; i < GetCatchesNum(); i++) {
+    CatchNode *c = GetCatchAtIndex(i);
+    c->Dump(indent);
+  }
+  if (mFinally)
+    mFinally->Dump(indent);
 }
 
 void CatchNode::AddParam(TreeNode *t) {
