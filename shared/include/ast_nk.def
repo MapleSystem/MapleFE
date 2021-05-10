@@ -67,6 +67,9 @@ NODEKIND(Interface)
 NODEKIND(AnnotationType)
 NODEKIND(Annotation)
 
+NODEKIND(Try)
+NODEKIND(Catch)
+NODEKIND(Finally)
 NODEKIND(Exception)
 
 // These are statement nodes, or control flow related nodes. They are

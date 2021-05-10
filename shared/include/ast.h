@@ -743,6 +743,67 @@ public:
 };
 
 //////////////////////////////////////////////////////////////////////////
+//                         Try, Catch, Finally
+// I can build one single TryNode to contain all the information. However,
+// I built all three types of nodes, since some language could have complex
+// syntax of catch or finally.
+//////////////////////////////////////////////////////////////////////////
+
+class CatchNode : public TreeNode {
+private:
+  SmallVector<TreeNode *> mParams;  // In Java, this sould be exception node.
+  BlockNode              *mBlock;
+public:
+  CatchNode() : mBlock(NULL) {mKind = NK_Catch;}
+  ~CatchNode(){}
+
+  BlockNode* GetBlock()       {return mBlock;}
+  void SetBlock(BlockNode *n) {mBlock = n;}
+
+  unsigned  GetParamsNum() {return mParams.GetNum();}
+  TreeNode* GetParamAtIndex(unsigned i) {return mParams.ValueAtIndex(i);}
+  void      AddParam(TreeNode *n) {mParams.PushBack(n);}
+
+  void Dump(unsigned);
+};
+
+class FinallyNode : public TreeNode {
+private:
+  BlockNode              *mBlock;
+public:
+  FinallyNode() : mBlock(NULL) {mKind = NK_Finally;}
+  ~FinallyNode(){}
+
+  BlockNode* GetBlock()       {return mBlock;}
+  void SetBlock(BlockNode *n) {mBlock = n;}
+
+  void Dump(unsigned);
+};
+
+class TryNode : public TreeNode {
+private:
+  BlockNode   *mBlock;
+  FinallyNode *mFinally;
+  SmallVector<CatchNode*> mCatches; // There could be >1 catches.
+
+public:
+  TryNode() : mBlock(NULL), mFinally(NULL) {mKind = NK_Try;}
+  ~TryNode(){}
+
+  BlockNode* GetBlock()       {return mBlock;}
+  void SetBlock(BlockNode *n) {mBlock = n;}
+
+  FinallyNode* GetFinally()       {return mFinally;}
+  void SetFinally(FinallyNode *n) {mFinally = n;}
+
+  unsigned   GetCatchesNum() {return mCatches.GetNum();}
+  CatchNode* GetCatchAtIndex(unsigned i) {return mCatches.ValueAtIndex(i);}
+  void       AddCatch(CatchNode *n) {mCatches.PushBack(n);}
+
+  void Dump(unsigned);
+};
+
+//////////////////////////////////////////////////////////////////////////
 //                         Exception Node
 //////////////////////////////////////////////////////////////////////////
 

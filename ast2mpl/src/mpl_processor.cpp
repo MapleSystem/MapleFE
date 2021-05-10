@@ -847,6 +847,24 @@ maple::BaseNode *A2M::ProcessAnnotation(StmtExprKind skind, TreeNode *tnode, Blo
   return nullptr;
 }
 
+maple::BaseNode *A2M::ProcessTry(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
+  NOTYETIMPL("ProcessTry()");
+  TryNode *node = static_cast<TryNode *>(tnode);
+  return nullptr;
+}
+
+maple::BaseNode *A2M::ProcessCatch(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
+  NOTYETIMPL("ProcessCatch()");
+  CatchNode *node = static_cast<CatchNode *>(tnode);
+  return nullptr;
+}
+
+maple::BaseNode *A2M::ProcessFinally(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
+  NOTYETIMPL("ProcessFinally()");
+  FinallyNode *node = static_cast<FinallyNode *>(tnode);
+  return nullptr;
+}
+
 maple::BaseNode *A2M::ProcessException(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
   NOTYETIMPL("ProcessException()");
   ExceptionNode *node = static_cast<ExceptionNode *>(tnode);
