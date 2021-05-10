@@ -909,16 +909,22 @@ rule TryStatement : ONEOF(
   "try" + Block + Catch,
   "try" + Block + Finally,
   "try" + Block + Catch + Finally)
+  attr.action.%1,%2,%3 : BuildTry(%2)
+  attr.action.%1,%3 : AddCatch(%3)
+  attr.action.%2 : AddFinally(%3)
+  attr.action.%3 : AddFinally(%4)
 
 ##-----------------------------------
 ##rule Catch[Yield, Return] :
 ##  catch ( CatchParameter[?Yield] ) Block[?Yield, ?Return]
 rule Catch : "catch" + '(' + CatchParameter + ')' + Block
+  attr.action : BuildCatch(%3, %5)
 
 ##-----------------------------------
 ##rule Finally[Yield, Return] :
 ##  finally Block[?Yield, ?Return]
 rule Finally : "finally" + Block
+  attr.action : BuildFinally(%2)
 
 ##-----------------------------------
 ##rule CatchParameter[Yield] :

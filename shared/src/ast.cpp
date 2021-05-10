@@ -782,6 +782,53 @@ void LiteralNode::Dump(unsigned indent) {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
+//                          Try, Catch, Finally nodes
+//////////////////////////////////////////////////////////////////////////////////////
+
+void TryNode::AddCatch(TreeNode *t) {
+  if (t->IsPass()) {
+    PassNode *pass_node = (PassNode*)t;
+    for (unsigned i = 0; i < pass_node->GetChildrenNum(); i++)
+      AddCatch(pass_node->GetChild(i));
+  } else {
+    MASSERT(t->IsCatch());
+    mCatches.PushBack((CatchNode*)t);
+  }
+}
+
+void TryNode::Dump(unsigned indent) {
+  DumpIndentation(indent);
+  DUMP0_NORETURN("try ");
+  if (mBlock)
+    mBlock->Dump(indent + 2);
+}
+
+void CatchNode::AddParam(TreeNode *t) {
+  if (t->IsPass()) {
+    PassNode *pass_node = (PassNode*)t;
+    for (unsigned i = 0; i < pass_node->GetChildrenNum(); i++)
+      AddParam(pass_node->GetChild(i));
+  } else {
+    mParams.PushBack(t);
+  }
+}
+
+void CatchNode::Dump(unsigned indent) {
+  DumpIndentation(indent);
+  DUMP0_NORETURN("catch(");
+  DUMP0_NORETURN(")");
+  if (mBlock)
+    mBlock->Dump(indent + 2);
+}
+
+void FinallyNode::Dump(unsigned indent) {
+  DumpIndentation(indent);
+  DUMP0_NORETURN("finally ");
+  if (mBlock)
+    mBlock->Dump(indent + 2);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////
 //                          ExceptionNode
 //////////////////////////////////////////////////////////////////////////////////////
 

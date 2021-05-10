@@ -767,7 +767,7 @@ public:
 
   unsigned  GetParamsNum() {return mParams.GetNum();}
   TreeNode* GetParamAtIndex(unsigned i) {return mParams.ValueAtIndex(i);}
-  void      AddParam(TreeNode *n) {mParams.PushBack(n);}
+  void      AddParam(TreeNode *n);
 
   void Dump(unsigned);
 };
@@ -803,7 +803,7 @@ public:
 
   unsigned   GetCatchesNum() {return mCatches.GetNum();}
   CatchNode* GetCatchAtIndex(unsigned i) {return mCatches.ValueAtIndex(i);}
-  void       AddCatch(CatchNode *n) {mCatches.PushBack(n);}
+  void       AddCatch(TreeNode *n);
 
   void Dump(unsigned);
 };

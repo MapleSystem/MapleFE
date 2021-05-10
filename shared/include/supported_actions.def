@@ -141,6 +141,13 @@ ACTION(BuildSwitch)
 ACTION(BuildThrows)
 ACTION(AddThrowsTo)
 
+// Try, Catch, Finally
+ACTION(BuildTry)
+ACTION(BuildCatch)
+ACTION(BuildFinally)
+ACTION(AddCatch)
+ACTION(AddFinally)
+
 // User Types
 ACTION(BuildUserType)
 ACTION(AddTypeArgument)

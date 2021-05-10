@@ -2095,7 +2095,105 @@ TreeNode* ASTBuilder::AddFunctionBodyTo() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-//                   Other Functions
+//                   Try, Catch, Throw
+////////////////////////////////////////////////////////////////////////////////
+
+// Takes one argument which is the block.
+TreeNode* ASTBuilder::BuildTry() {
+  if (mTrace)
+    std::cout << "In BuildTry" << std::endl;
+
+  Param p_block = mParams[0];
+
+  MASSERT(p_block.mIsTreeNode);
+  TreeNode *block = CvtToBlock(p_block.mData.mTreeNode);
+
+  TryNode *try_node = (TryNode*)mTreePool->NewTreeNode(sizeof(TryNode));
+  new (try_node) TryNode();
+  try_node->SetBlock((BlockNode*)block);
+
+  mLastTreeNode = try_node;
+  return mLastTreeNode;
+}
+
+// Takes one arguments, the catch clause
+// Add to mLastTreeNode which is a TryNode.
+TreeNode* ASTBuilder::AddCatch() {
+  if (mTrace)
+    std::cout << "In AddCatch " << std::endl;
+
+  Param p_catch = mParams[0];
+  MASSERT(p_catch.mIsTreeNode);
+  TreeNode *catch_node = p_catch.mData.mTreeNode;
+
+  TryNode *try_node = (TryNode*)mLastTreeNode;
+  try_node->AddCatch(catch_node);
+
+  return mLastTreeNode;
+}
+
+// Takes one arguments, the finally clause
+// Add to mLastTreeNode which is a TryNode.
+TreeNode* ASTBuilder::AddFinally() {
+  if (mTrace)
+    std::cout << "In AddFinally " << std::endl;
+
+  Param p_finally = mParams[0];
+  MASSERT(p_finally.mIsTreeNode);
+  TreeNode *finally_node = p_finally.mData.mTreeNode;
+  MASSERT(finally_node->IsFinally());
+
+  TryNode *try_node = (TryNode*)mLastTreeNode;
+  try_node->SetFinally((FinallyNode*)finally_node);
+
+  return mLastTreeNode;
+}
+
+// Takes one argument which is the block.
+TreeNode* ASTBuilder::BuildFinally() {
+  if (mTrace)
+    std::cout << "In BuildFinally" << std::endl;
+
+  Param p_block = mParams[0];
+
+  MASSERT(p_block.mIsTreeNode);
+  TreeNode *block = CvtToBlock(p_block.mData.mTreeNode);
+
+  FinallyNode *finally_node = (FinallyNode*)mTreePool->NewTreeNode(sizeof(FinallyNode));
+  new (finally_node) FinallyNode();
+  finally_node->SetBlock((BlockNode*)block);
+
+  mLastTreeNode = finally_node;
+  return mLastTreeNode;
+}
+
+// Takes two arguments, the parameters and the block
+TreeNode* ASTBuilder::BuildCatch() {
+  if (mTrace)
+    std::cout << "In BuildCatch" << std::endl;
+
+  Param p_params = mParams[0];
+  Param p_block = mParams[1];
+
+  MASSERT(p_params.mIsTreeNode);
+  TreeNode *params = p_params.mData.mTreeNode;
+
+  MASSERT(p_block.mIsTreeNode);
+  TreeNode *block = CvtToBlock(p_block.mData.mTreeNode);
+
+  CatchNode *catch_node = (CatchNode*)mTreePool->NewTreeNode(sizeof(CatchNode));
+  new (catch_node) CatchNode();
+
+  catch_node->AddParam(params);
+  catch_node->SetBlock((BlockNode*)block);
+
+  mLastTreeNode = catch_node;
+  return mLastTreeNode;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+//                   Throw Functions
 ////////////////////////////////////////////////////////////////////////////////
 
 // This takes just one argument which is the tree passed from the

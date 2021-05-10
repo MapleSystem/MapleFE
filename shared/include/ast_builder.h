@@ -187,6 +187,13 @@ public:
   TreeNode* BuildThrows();
   TreeNode* AddThrowsTo();
 
+  // Try, Catch, Finally
+  TreeNode* BuildTry();
+  TreeNode* BuildCatch();
+  TreeNode* BuildFinally();
+  TreeNode* AddCatch();
+  TreeNode* AddFinally();
+
   // User Type related
   TreeNode* BuildUserType();
   TreeNode* AddTypeArgument();
