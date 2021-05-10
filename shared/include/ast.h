@@ -391,6 +391,7 @@ public:
 
   void SetType(TreeNode *t)      {mType = t;}
   void SetInit(TreeNode *t)      {mInit = t; t->SetParent(this);}
+  void ClearInit()               {mInit = NULL;}
   void SetDims(DimensionNode *t) {mDims = t;}
 
   unsigned GetDimsNum()          {return mDims->GetDimensionsNum();}
@@ -427,13 +428,17 @@ enum DeclProp {
 class DeclNode : public TreeNode {
 private:
   TreeNode *mVar;
+  TreeNode *mInit; // Init value
   DeclProp  mProp;
 public:
   DeclNode() : mVar(NULL), mProp(DP_NA) {mKind = NK_Decl;}
   DeclNode(TreeNode *id) : mVar(id), mProp(DP_NA) {mKind = NK_Decl;}
   ~DeclNode(){}
 
-  TreeNode* GetVar(){return mVar;}
+  TreeNode* GetVar() {return mVar;}
+  TreeNode* GetInit() {return mInit;}
+
+  void SetInit(TreeNode *t) {mInit = t; t->SetParent(this);}
 
   DeclProp GetProp() {return mProp;}
   void SetProp(DeclProp p) {mProp = p;}

@@ -22,24 +22,7 @@
 namespace maplefe {
 
 void AST_DFA::Build() {
-  SplitDecl();
   BuildReachDefIn();
-}
-
-void AST_DFA::SplitDecl() {
-  if (mTrace) std::cout << "============== SplitDecl ==============" << std::endl;
-  DeclSplitVisitor visitor(mHandler, mTrace, true);
-  AST_Function *func = mHandler->GetFunction();
-  visitor.SetCurrentFunction(mHandler->GetFunction());
-  visitor.SetCurrentBB(func->GetEntryBB());
-  for(auto it: mHandler->GetASTModule()->mTrees) {
-    visitor.Visit(it->mRootNode);
-  }
-}
-
-DeclNode *DeclSplitVisitor::VisitDeclNode(DeclNode *node) {
-  MASSERT(node->GetVar()->IsIdentifier() && "need to split VarList decl");
-  return node;
 }
 
 void AST_DFA::BuildReachDefIn() {

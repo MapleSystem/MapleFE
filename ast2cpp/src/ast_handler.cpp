@@ -17,6 +17,7 @@
 #include <set>
 #include "ast_handler.h"
 #include "ast_cfg.h"
+#include "ast_ast.h"
 #include "ast_dfa.h"
 
 namespace maplefe {
@@ -24,6 +25,11 @@ namespace maplefe {
 void AST_Handler::BuildCFG() {
   mCFG = new(mMemPool.Alloc(sizeof(AST_CFG))) AST_CFG(this, mTrace);
   mCFG->Build();
+}
+
+void AST_Handler::AdjustAST() {
+  mAST = new(mMemPool.Alloc(sizeof(AST_AST))) AST_AST(this, mTrace);
+  mAST->Build();
 }
 
 void AST_Handler::BuildDFA() {

@@ -13,38 +13,33 @@
 * See the Mulan PSL v2 for more details.
 */
 
-#ifndef __AST_DFA_HEADER__
-#define __AST_DFA_HEADER__
+#ifndef __AST_AST_HEADER__
+#define __AST_AST_HEADER__
 
 #include <stack>
 #include <utility>
 #include "ast_module.h"
 #include "ast.h"
 #include "ast_type.h"
-#include "ast_cfg.h"
 #include "gen_astvisitor.h"
 
 namespace maplefe {
 
-class AST_DFA {
+class AST_AST {
  private:
   AST_Handler  *mHandler;
   bool          mTrace;
-  SmallVector<BitVector>  mReachDefIn;     // reaching definition bit vector entering bb
 
  public:
-  explicit AST_DFA(AST_Handler *h, bool t) : mHandler(h), mTrace(t) {}
-  ~AST_DFA() {}
+  explicit AST_AST(AST_Handler *h, bool t) : mHandler(h), mTrace(t) {}
+  ~AST_AST() {}
 
   void  Build();
-
-  void  BuildReachDefIn();
-  // unsigned GetDecl(VarNode *);
-
-  void DumpReachDefIn();
+  void  SplitDecl();
+  void  AdjustDeclInit();
 };
 
-class ReachDefInVisitor : public AstVisitor {
+class DeclSplitVisitor : public AstVisitor {
  private:
   AST_Handler  *mHandler;
   bool          mTrace;
@@ -53,14 +48,34 @@ class ReachDefInVisitor : public AstVisitor {
   AST_BB       *mCurrentBB;
 
  public:
-  explicit ReachDefInVisitor(AST_Handler *h, bool t, bool base = false)
+  explicit DeclSplitVisitor(AST_Handler *h, bool t, bool base = false)
     : mHandler(h), mTrace(t), AstVisitor(t && base) {}
-  ~ReachDefInVisitor() = default;
+  ~DeclSplitVisitor() = default;
 
   void SetCurrentFunction(AST_Function *f) { mCurrentFunction = f; }
   void SetCurrentBB(AST_BB *b) { mCurrentBB = b; }
 
   DeclNode *VisitDeclNode(DeclNode *node);
 };
+
+class DeclInitVisitor : public AstVisitor {
+ private:
+  AST_Handler  *mHandler;
+  bool          mTrace;
+
+  AST_Function *mCurrentFunction;
+  AST_BB       *mCurrentBB;
+
+ public:
+  explicit DeclInitVisitor(AST_Handler *h, bool t, bool base = false)
+    : mHandler(h), mTrace(t), AstVisitor(t && base) {}
+  ~DeclInitVisitor() = default;
+
+  void SetCurrentFunction(AST_Function *f) { mCurrentFunction = f; }
+  void SetCurrentBB(AST_BB *b) { mCurrentBB = b; }
+
+  DeclNode *VisitDeclNode(DeclNode *node);
+};
+
 }
 #endif

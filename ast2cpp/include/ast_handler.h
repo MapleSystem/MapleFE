@@ -28,8 +28,9 @@ namespace maplefe {
 
 class AST_BB;
 class AST_Function;
-class AST_CFG;;
-class AST_DFA;;
+class AST_CFG;
+class AST_AST;
+class AST_DFA;
 
 // Each source file is a module
 class AST_Handler {
@@ -38,6 +39,7 @@ class AST_Handler {
   ASTModule    *mASTModule;   // for an AST module
   AST_Function *mFunction;    // an init function for statements in module scope
   AST_CFG      *mCFG;
+  AST_AST      *mAST;
   AST_DFA      *mDFA;
   bool          mTrace;
 
@@ -49,6 +51,7 @@ class AST_Handler {
   ~AST_Handler() {mMemPool.Release();}
 
   void BuildCFG();
+  void AdjustAST();
   void BuildDFA();
 
   ASTModule *GetASTModule() {return mASTModule;}
