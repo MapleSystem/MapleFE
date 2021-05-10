@@ -589,16 +589,19 @@ gen_args = [
         "gen_astgraph", # filename
         "AstGraph",     # Class name
         "DumpGraph",    # Prefix of function name
-        '#include "' + astdump + '.h"\n#include <algorithm>\n#include <set>', # Extra include directives
+        """
+#include "{astdump}.h"
+#include <algorithm>
+#include <set>""".format(astdump = astdump)  # Extra include directives
         ]
 
 astgraph_init = [
 """
 {gen_args1}(ASTModule *m) : mASTModule(m), mOs(nullptr) {{}}
 
-#define NodeName(n,s) ({astdumpclass}::GetEnumNodeKind((n)->GetKind()) + 3) << s << n->GetNodeId()
+#define NodeName(n,s)  ({astdumpclass}::GetEnumNodeKind((n)->GetKind()) + 3) << s << n->GetNodeId()
 #define EnumVal(t,e,m) {astdumpclass}::GetEnum##e((static_cast<t *>(n))->Get##m())
-#define NodeColor(c) "\\",style=filled,color=white,fillcolor=\\""#c
+#define NodeColor(c)   "\\",style=filled,color=white,fillcolor=\\""#c
 
 void {gen_args2}(const char *title, std::ostream *os) {{
   mNodes.clear();
