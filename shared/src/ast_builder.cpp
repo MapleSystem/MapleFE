@@ -1525,8 +1525,7 @@ TreeNode* ASTBuilder::AddClassBody() {
 
   MASSERT(mLastTreeNode->IsClass() && "Class is not a ClassNode?");
   ClassNode *klass = (ClassNode*)mLastTreeNode;
-  klass->AddBody(block);
-  klass->Construct();
+  klass->Construct(block);
 
   return mLastTreeNode;
 }

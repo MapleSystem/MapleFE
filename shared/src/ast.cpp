@@ -969,9 +969,9 @@ void PassNode::Dump(unsigned ind) {
 
 // When the class body, a BlockNode, is added to the ClassNode, we need further
 // categorize the subtrees into members, methods, local classes, interfaces, etc.
-void ClassNode::Construct() {
-  for (unsigned i = 0; i < mBody->GetChildrenNum(); i++) {
-    TreeNode *tree_node = mBody->GetChildAtIndex(i);
+void ClassNode::Construct(BlockNode *block) {
+  for (unsigned i = 0; i < block->GetChildrenNum(); i++) {
+    TreeNode *tree_node = block->GetChildAtIndex(i);
     tree_node->SetParent(this);
     if (tree_node->IsDecl()) {
       DeclNode *decl = (DeclNode*)tree_node;

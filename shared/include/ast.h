@@ -1192,25 +1192,6 @@ public:
 
 //////////////////////////////////////////////////////////////////////////
 //                         Class Nodes
-//                             &
-//                         ClassBody -->BlockNode
-// In reality there is no such thing as ClassBody, since this 'body' will
-// eventually become fields and methods of a class. However, during parsing
-// the children are processed before parents, which means we need to have
-// all fields and members ready before the class. So we come up with
-// this ClassBody to temporarily hold these subtrees, and let the class
-// to interpret it in the future. Once the class is done, this ClassBody
-// is useless. In the real implementation, ClassBody is actually a BlockNode.
-//
-// NOTE. There is one important thing to know is This design is following
-//       the common rules of Java/C++, where a declaration of field or
-//       method has the scope of the whole class. This means it can be
-//       used before the declaratioin. There is no order of first decl then
-//       use. So we can do a Construct() which collect all Fields & Methods.
-//
-//       However, we still keep mBody, which actually tells the order of
-//       the original program. Any language requiring order could use mBody
-//       to implement.
 //////////////////////////////////////////////////////////////////////////
 
 class ClassNode : public TreeNode {
@@ -1224,7 +1205,6 @@ private:
   SmallVector<ClassNode*>      mSuperClasses;
   SmallVector<InterfaceNode*>  mSuperInterfaces;
   SmallVector<AttrId>          mAttributes;
-  BlockNode                   *mBody;
 
   SmallVector<IdentifierNode*> mFields;       // aka Field
   SmallVector<FunctionNode*>   mMethods;
@@ -1234,7 +1214,7 @@ private:
   SmallVector<InterfaceNode*>  mLocalInterfaces;
 
 public:
-  ClassNode(){mKind = NK_Class; mIsJavaEnum = false; mBody = NULL;}
+  ClassNode(){mKind = NK_Class; mIsJavaEnum = false;}
   ~ClassNode() {Release();}
 
   bool IsJavaEnum() {return mIsJavaEnum;}
@@ -1243,7 +1223,6 @@ public:
   void AddSuperClass(ClassNode *n)         {mSuperClasses.PushBack(n);}
   void AddSuperInterface(InterfaceNode *n) {mSuperInterfaces.PushBack(n);}
   void AddAttr(AttrId a) {mAttributes.PushBack(a);}
-  void AddBody(BlockNode *b) {mBody = b; b->SetParent(this);}
 
   unsigned GetSuperClassesNum()    {return mSuperClasses.GetNum();}
   unsigned GetSuperInterfacesNum() {return mSuperInterfaces.GetNum();}
@@ -1263,9 +1242,8 @@ public:
   BlockNode* GetInstInit(unsigned i)       {return mInstInits.ValueAtIndex(i);}
   ClassNode* GetLocalClass(unsigned i)     {return mLocalClasses.ValueAtIndex(i);}
   InterfaceNode* GetLocalInterface(unsigned i)  {return mLocalInterfaces.ValueAtIndex(i);}
-  BlockNode* GetBody() {return mBody;}
 
-  void Construct();
+  void Construct(BlockNode*);
   void Release();
   void Dump(unsigned);
 };
