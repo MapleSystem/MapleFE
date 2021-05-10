@@ -90,7 +90,7 @@ CondBranchNode *CFGVisitor::VisitCondBranchNode(CondBranchNode *node) {
   TreeNode *cond = node->GetCond();
   // Set predicate of current BB
   mCurrentBB->SetPredicate(cond);
-  //VisitTreeNode(cond);
+  mCurrentBB->AddStatement(cond);
 
   // Save current BB
   AST_BB *current_bb = mCurrentBB;
@@ -144,6 +144,7 @@ ForLoopNode *CFGVisitor::VisitForLoopNode(ForLoopNode *node) {
     TreeNode *cond = node->GetCond();
     // Set predicate of current BB
     mCurrentBB->SetPredicate(cond);
+    mCurrentBB->AddStatement(cond);
   } else
     // Set predicate to be current ForLoopNode when it is FLP_JSIn or FLP_JSOf
     mCurrentBB->SetPredicate(node);
@@ -186,7 +187,7 @@ WhileLoopNode *CFGVisitor::VisitWhileLoopNode(WhileLoopNode *node) {
   TreeNode *cond = node->GetCond();
   // Set predicate of current BB
   mCurrentBB->SetPredicate(cond);
-  //VisitTreeNode(node->GetCond());
+  mCurrentBB->AddStatement(cond);
 
   // Create a BB for loop body
   mCurrentBB = NewBB(BK_Uncond);
@@ -234,7 +235,7 @@ DoLoopNode *CFGVisitor::VisitDoLoopNode(DoLoopNode *node) {
   TreeNode *cond = node->GetCond();
   // Set predicate of current BB
   mCurrentBB->SetPredicate(cond);
-  //VisitTreeNode(node->GetCond());
+  mCurrentBB->AddStatement(cond);
 
   // Add a back edge to loop header
   mCurrentBB->AddSuccessor(current_bb);
@@ -338,7 +339,7 @@ BlockNode *CFGVisitor::VisitBlockNode(BlockNode *node) {
   unsigned i, num = node->GetChildrenNum();
   for (i = 0; i < num; ++i) {
     TreeNode *child = node->GetChildAtIndex(i);
-    if(child->GetKind() != NK_Decl) {
+    if(child == nullptr || child->GetKind() != NK_Decl) {
       continue;
     }
     DeclNode *decl = static_cast<DeclNode *>(child);

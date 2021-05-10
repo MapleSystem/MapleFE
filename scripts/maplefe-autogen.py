@@ -589,7 +589,7 @@ astgraph_init = [
         'case NK_SwitchCase:',
         'case NK_SwitchLabel:',
         'case NK_Switch:      *mOs << NodeColor(powderblue); break;',
-        'case NK_ForLoop:',
+        'case NK_ForLoop:     *mOs << EnumVal(ForLoopNode, ForLoopProp, Prop);',
         'case NK_WhileLoop:',
         'case NK_DoLoop:      *mOs << NodeColor(lightskyblue); break;',
         'case NK_Identifier:  *mOs << "\\\\\\"" << n->GetName() << "\\\\\\"" << NodeColor(wheat); break;',
