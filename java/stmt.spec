@@ -589,7 +589,7 @@ rule MethodDeclarator  : Identifier + '(' + ZEROORONE(FormalParameterList) + ')'
   attr.action: AddDims(%5)
 
 rule Throws            : "throws" + ExceptionTypeList
-  attr.action: BuildThrows(%2)
+  attr.action: PassChild(%2)
 
 rule ExceptionTypeList : ExceptionType + ZEROORMORE(',' + ExceptionType)
 rule ExceptionType     : ONEOF(ClassType, TypeVariable)
