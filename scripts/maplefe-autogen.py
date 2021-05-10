@@ -190,15 +190,23 @@ def gen_handler_ast_node(dictionary):
             if otype == "_Bool": otype = "bool"
 
             plural = "Get" + name[1:]
-            if name == "mChildren":
-                singular = "Get" + name[1:-3] # without 'ren'
-            elif name[-7:] == "Catches" or name[-7:] == "Classes":
-                singular = "Get" + name[1:-2] # without 'es'
+
+            # m*Children to GetChild*()
+            if name[-8:] == "Children":
+                singular = "Get" + name[1:-3]
+
+            # m*Catches to GetCatch*(), m*Classes to GetClass*()
+            elif name[-4:] == "ches" or name[-4:] == "shes" or name[-4:] == "sses" or name[-4:] == "xes" :
+                singular = "Get" + name[1:-2]
+
+            # mIs* to Is*() for boolean type
             elif name[:3] == "mIs" and otype == "bool":
                 plural = name[1:]
                 singular = name[1:]
+
+            # Default singular without the endding 's'
             else:
-                singular = "Get" + name[1:-1] # without 's'
+                singular = "Get" + name[1:-1]
 
             ntype = get_pointed(otype)
             access = m.get("Access")
