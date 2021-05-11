@@ -2196,9 +2196,7 @@ TreeNode* ASTBuilder::BuildCatch() {
 //                   Throw Functions
 ////////////////////////////////////////////////////////////////////////////////
 
-// This takes just one argument which is the tree passed from the
-// children. It could be single IdentifierNode, or a PassNode with
-// more than one tree nodes.
+// This takes just one argument which is the exception(s) thrown.
 TreeNode* ASTBuilder::BuildThrows() {
   if (mTrace)
     std::cout << "In BuildThrows" << std::endl;
@@ -2207,12 +2205,14 @@ TreeNode* ASTBuilder::BuildThrows() {
 
   if (!p_throws.mIsTreeNode)
     MERROR("The exceptions is not a treenode in BuildThrows()");
-  TreeNode *node_throws = p_throws.mData.mTreeNode;
+  TreeNode *exceptions = p_throws.mData.mTreeNode;
 
-  if (!node_throws->IsIdentifier() && !node_throws->IsPass())
-    MERROR("The throws should be an indentifier node or pass node. Not?");
+  ThrowNode *throw_node = (ThrowNode*)mTreePool->NewTreeNode(sizeof(ThrowNode));
+  new (throw_node) ThrowNode();
 
-  mLastTreeNode = node_throws;
+  throw_node->AddException(exceptions);
+
+  mLastTreeNode = throw_node;
   return mLastTreeNode;
 }
 

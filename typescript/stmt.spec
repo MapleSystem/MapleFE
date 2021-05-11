@@ -899,6 +899,7 @@ rule DefaultClause :
 ##rule ThrowStatement[Yield] :
 ##  throw [no LineTerminator here] Expression[In, ?Yield] ;
 rule ThrowStatement : "throw" + Expression + ';'
+  attr.action : BuildThrows(%2)
 
 ##-----------------------------------
 ##rule TryStatement[Yield, Return] :
