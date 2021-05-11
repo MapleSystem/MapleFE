@@ -329,6 +329,15 @@ SwitchNode *CFGVisitor::VisitSwitchNode(SwitchNode *node) {
       prev_block->AddSuccessor(mCurrentBB);
     }
 
+    // Visit all statements of current case
+    if(case_node->GetKind() == NK_SwitchCase) {
+      SwitchCaseNode *cnode = static_cast<SwitchCaseNode *>(case_node);
+      for (unsigned i = 0; i < cnode->GetStmtsNum(); ++i) {
+        if (auto t = cnode->GetStmtAtIndex(i))
+          VisitTreeNode(t);
+      }
+    }
+
     // Prepare for next case
     prev_block = mCurrentBB;
     current_bb = case_bb;
