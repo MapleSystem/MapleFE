@@ -1,0 +1,18 @@
+Matched 27 tokens.
+Matched 38 tokens.
+Matched 48 tokens.
+Matched 67 tokens.
+Matched 74 tokens.
+============= Module ===========
+== Sub Tree ==
+js_var Decl: arr=[7,4,5,9,2,8,1,6,3]
+== Sub Tree ==
+
+== Sub Tree ==
+
+== Sub Tree ==
+for ( )
+  sum AddAssign arr[i]
+
+== Sub Tree ==
+console.log(sum)

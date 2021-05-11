@@ -553,7 +553,7 @@ rule Statement : ONEOF(
   BreakStatement,
   ReturnStatement,
 #  WithStatement[?Yield, ?Return]
-#  LabelledStatement[?Yield, ?Return]
+  LabelledStatement,
   ThrowStatement,
   TryStatement)
 #  DebuggerStatement
@@ -889,11 +889,14 @@ rule DefaultClause :
 ##-----------------------------------
 ##rule LabelledStatement[Yield, Return] :
 ##  LabelIdentifier[?Yield] : LabelledItem[?Yield, ?Return]
+rule LabelledStatement :
+  LabelIdentifier + ':' + LabelledItem
 
 ##-----------------------------------
 ##rule LabelledItem[Yield, Return] :
 ##  Statement[?Yield, ?Return]
 ##  FunctionDeclaration[?Yield]
+rule LabelledItem : ONEOF(Statement, FunctionDeclaration)
 
 ##-----------------------------------
 ##rule ThrowStatement[Yield] :
