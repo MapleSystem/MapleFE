@@ -891,6 +891,7 @@ rule DefaultClause :
 ##  LabelIdentifier[?Yield] : LabelledItem[?Yield, ?Return]
 rule LabelledStatement :
   LabelIdentifier + ':' + LabelledItem
+  attr.action : AddLabel(%3, %1)
 
 ##-----------------------------------
 ##rule LabelledItem[Yield, Return] :

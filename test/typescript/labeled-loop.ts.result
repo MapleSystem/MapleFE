@@ -11,6 +11,24 @@ js_var Decl: len=arr.length
 == Sub Tree ==
 js_var Decl: sum=0
 == Sub Tree ==
+outer:
+for ( )
+  for ( )
+    sum AddAssign arr[i]
+    console.log(sum)
+    cond-branch cond:arr[j] GT 5
+    true branch :
+      continue:outer
+
+    false branch :
+
+    cond-branch cond:sum GE 60
+    true branch :
+      break:outer
+
+    false branch :
+
+
 
 == Sub Tree ==
 console.log(sum)
