@@ -1128,7 +1128,7 @@ rule UnionOrIntersectionOrPrimaryType: ONEOF(UnionType,
 
 #rule IntersectionOrPrimaryType : ONEOF(IntersectionType,
 #                                       PrimaryType)
-rule IntersectionOrPrimaryType : ONEOF(PrimaryType)
+rule IntersectionOrPrimaryType : ONEOF(IntersectionType, PrimaryType)
 
 ## rule PrimaryType: ParenthesizedType PredefinedType TypeReference ObjectType ArrayType TupleType TypeQuery ThisType
 rule PrimaryType: ONEOF(ParenthesizedType,
@@ -1190,6 +1190,7 @@ rule TupleElementType: Type
 rule UnionType: UnionOrIntersectionOrPrimaryType + '|' + IntersectionOrPrimaryType
 
 ## rule IntersectionType: IntersectionOrPrimaryType & PrimaryType
+rule IntersectionType: IntersectionOrPrimaryType + '&' + PrimaryType
 
 ## rule FunctionType: TypeParametersopt ( ParameterListopt ) => Type
 rule FunctionType: ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList) + ')' + "=>" + Type
