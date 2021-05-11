@@ -15,6 +15,7 @@
 
 #include <stack>
 #include <set>
+#include <cstring>
 #include "ast_cfg.h"
 #include "ast_dfa.h"
 #include "ast_handler.h"
@@ -29,7 +30,7 @@ void CFGVisitor::InitializeFunction(AST_Function *func) {
   func->SetEntryBB(entry);
   AST_BB *exit = NewBB(BK_Join);
   func->SetExitBB(exit);
-  mThrowBBs.push_back(TargetBB{exit, ""});
+  CFGVisitor::Push(mThrowBBs, exit, nullptr);
   // Initialize the working function and BB
   mCurrentFunction = func;
   mCurrentBB = NewBB(BK_Uncond);
@@ -38,12 +39,39 @@ void CFGVisitor::InitializeFunction(AST_Function *func) {
 
 // Finalize a AST_Function node
 void CFGVisitor::FinalizeFunction() {
-  mThrowBBs.pop_back();
+  CFGVisitor::Pop(mThrowBBs);
   AST_BB *exit = mCurrentFunction->GetExitBB();
   mCurrentBB->AddSuccessor(exit);
   mCurrentFunction->SetLastBBId(AST_BB::GetLastId());
   mCurrentFunction = nullptr;
   mCurrentBB = nullptr;
+}
+
+// Push a BB to target BB stack
+void CFGVisitor::Push(TargetBBStack &stack, AST_BB* bb, TreeNode *label) {
+  const char *name = nullptr;
+  if(label && label->GetKind() == NK_Identifier)
+    name = static_cast<IdentifierNode *>(label)->GetName();
+  stack.push_back(TargetBB{bb, name});
+}
+
+// Look up a target BB
+AST_BB *CFGVisitor::LookUp(TargetBBStack &stack, TreeNode *label) {
+  const char *name = nullptr;
+  if(label && label->GetKind() == NK_Identifier)
+    name = static_cast<IdentifierNode *>(label)->GetName();
+  if(name == nullptr)
+    return stack.back().first;
+  for(auto it = stack.rbegin(); it != stack.rend(); ++it)
+    if(it->second && std::strcmp(it->second, name) == 0)
+      return it->first;
+  MASSERT(0 && "Unexpected: Target not found.");
+  return nullptr;
+}
+
+// Pop from a target BB stack
+void CFGVisitor::Pop(TargetBBStack &stack) {
+  stack.pop_back();
 }
 
 // Handle a function
@@ -160,12 +188,12 @@ ForLoopNode *CFGVisitor::VisitForLoopNode(ForLoopNode *node) {
   AST_BB *loop_exit = NewBB(BK_Join);
 
   // Push loop_exit and current_bb to stacks for 'break' and 'continue'
-  mBreakBBs.push_back(TargetBB{loop_exit, ""});
-  mContinueBBs.push_back(TargetBB{current_bb, ""});
+  CFGVisitor::Push(mBreakBBs, loop_exit, node->GetLabel());
+  CFGVisitor::Push(mContinueBBs, current_bb, node->GetLabel());
   // Visit loop body
   VisitTreeNode(node->GetBody());
-  mContinueBBs.pop_back();
-  mBreakBBs.pop_back();
+  CFGVisitor::Pop(mContinueBBs);
+  CFGVisitor::Pop(mBreakBBs);
 
   // Visit all updates
   for (unsigned i = 0; i < node->GetUpdatesNum(); ++i) {
@@ -202,12 +230,12 @@ WhileLoopNode *CFGVisitor::VisitWhileLoopNode(WhileLoopNode *node) {
   AST_BB *loop_exit = NewBB(BK_Join);
 
   // Push loop_exit and current_bb to stacks for 'break' and 'continue'
-  mBreakBBs.push_back(TargetBB{loop_exit, ""});
-  mContinueBBs.push_back(TargetBB{current_bb, ""});
+  CFGVisitor::Push(mBreakBBs, loop_exit, node->GetLabel());
+  CFGVisitor::Push(mContinueBBs, current_bb, node->GetLabel());
   // Visit loop body
   VisitTreeNode(node->GetBody());
-  mContinueBBs.pop_back();
-  mBreakBBs.pop_back();
+  CFGVisitor::Pop(mContinueBBs);
+  CFGVisitor::Pop(mBreakBBs);
 
   // Add a back edge to loop header
   mCurrentBB->AddSuccessor(current_bb);
@@ -235,12 +263,12 @@ DoLoopNode *CFGVisitor::VisitDoLoopNode(DoLoopNode *node) {
   AST_BB *loop_exit = NewBB(BK_Join);
 
   // Push loop_exit and current_bb to stacks for 'break' and 'continue'
-  mBreakBBs.push_back(TargetBB{loop_exit, ""});
-  mContinueBBs.push_back(TargetBB{current_bb, ""});
+  CFGVisitor::Push(mBreakBBs, loop_exit, node->GetLabel());
+  CFGVisitor::Push(mContinueBBs, current_bb, node->GetLabel());
   // Visit loop body
   VisitTreeNode(node->GetBody());
-  mContinueBBs.pop_back();
-  mBreakBBs.pop_back();
+  CFGVisitor::Pop(mContinueBBs);
+  CFGVisitor::Pop(mBreakBBs);
 
   TreeNode *cond = node->GetCond();
   // Set predicate of current BB
@@ -258,7 +286,7 @@ DoLoopNode *CFGVisitor::VisitDoLoopNode(DoLoopNode *node) {
 ContinueNode *CFGVisitor::VisitContinueNode(ContinueNode *node) {
   mCurrentBB->AddStatement(node);
   // Get the loop header
-  AST_BB *loop_header = mContinueBBs.back().first;
+  AST_BB *loop_header = CFGVisitor::LookUp(mContinueBBs, node->GetTarget());
   // Add the loop header as a successor of current BB
   mCurrentBB->AddSuccessor(loop_header);
   mCurrentBB->SetKind(BK_Terminated);
@@ -270,7 +298,7 @@ ContinueNode *CFGVisitor::VisitContinueNode(ContinueNode *node) {
 BreakNode *CFGVisitor::VisitBreakNode(BreakNode *node) {
   mCurrentBB->AddStatement(node);
   // Get the target BB for a loop or switch statement
-  AST_BB *exit = mBreakBBs.back().first;
+  AST_BB *exit = CFGVisitor::LookUp(mBreakBBs, node->GetTarget());
   // Add the target as a successor of current BB
   mCurrentBB->AddSuccessor(exit);
   mCurrentBB->SetKind(BK_Terminated);
@@ -290,7 +318,7 @@ SwitchNode *CFGVisitor::VisitSwitchNode(SwitchNode *node) {
 
   // Create a new BB for getting out of the switch block
   AST_BB *exit = NewBB(BK_Join);
-  mBreakBBs.push_back(TargetBB{exit,""});
+  CFGVisitor::Push(mBreakBBs, exit, nullptr);
   AST_BB *prev_block = nullptr;
   TreeNode *switch_expr = node->GetExpr();
   for (unsigned i = 0; i < node->GetCasesNum(); ++i) {
@@ -342,7 +370,7 @@ SwitchNode *CFGVisitor::VisitSwitchNode(SwitchNode *node) {
     prev_block = mCurrentBB;
     current_bb = case_bb;
   }
-  mBreakBBs.pop_back();
+  CFGVisitor::Pop(mBreakBBs);
 
   // Connect to the exit BB of this switch statement
   prev_block->AddSuccessor(exit);
@@ -379,9 +407,9 @@ TryNode *CFGVisitor::VisitTryNode(TryNode *node) {
 
   // Visit try block
   if(num) {
-    mThrowBBs.push_back(TargetBB{catch_bb,""});
+    CFGVisitor::Push(mThrowBBs, catch_bb, nullptr);
     AstVisitor::VisitBlockNode(try_block_node);
-    mThrowBBs.pop_back();
+    CFGVisitor::Pop(mThrowBBs);
   } else
     AstVisitor::VisitBlockNode(try_block_node);
 
@@ -413,7 +441,7 @@ TryNode *CFGVisitor::VisitTryNode(TryNode *node) {
     curr_bb = NewBB(BK_Join);
     mCurrentBB->AddSuccessor(curr_bb);
     // Add an edge to recent catch BB or exit BB
-    mCurrentBB->AddSuccessor(mThrowBBs.back().first);
+    mCurrentBB->AddSuccessor(CFGVisitor::LookUp(mThrowBBs, nullptr));
     mCurrentBB = curr_bb;
   }
   return node;
@@ -423,7 +451,7 @@ TryNode *CFGVisitor::VisitTryNode(TryNode *node) {
 ThrowNode *CFGVisitor::VisitThrowNode(ThrowNode *node) {
   mCurrentBB->AddStatement(node);
   // Get the catch/exit bb for this throw statement
-  AST_BB *catch_bb = mThrowBBs.back().first;
+  AST_BB *catch_bb = CFGVisitor::LookUp(mThrowBBs, nullptr);
   // Add the loop header as a successor of current BB
   mCurrentBB->AddSuccessor(catch_bb);
   mCurrentBB->SetKind(BK_Terminated);

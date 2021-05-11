@@ -174,11 +174,12 @@ class AST_CFG {
   void BuildCFG();
 };
 
-using TargetLabel = std::string;
-using TargetBB = std::pair<AST_BB*,TargetLabel>;
-using TargetBBStack = std::vector<TargetBB>;
-
 class CFGVisitor : public AstVisitor {
+
+  using TargetLabel = const char *;
+  using TargetBB = std::pair<AST_BB*,TargetLabel>;
+  using TargetBBStack = std::vector<TargetBB>;
+
  private:
   AST_Handler  *mHandler;
   bool          mTrace;
@@ -197,6 +198,10 @@ class CFGVisitor : public AstVisitor {
 
   AST_Function *NewFunction();
   AST_BB       *NewBB(BBKind k);
+
+  static void    Push(TargetBBStack &stack, AST_BB* bb, TreeNode *label);
+  static AST_BB *LookUp(TargetBBStack &stack, TreeNode *label);
+  static void    Pop(TargetBBStack &stack);
 
   void InitializeFunction(AST_Function *func);
   void FinalizeFunction();
