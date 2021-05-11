@@ -475,9 +475,9 @@ maple::BaseNode *A2M::ProcessUnaOperator(StmtExprKind skind, TreeNode *tnode, Bl
 
 maple::BaseNode *A2M::ProcessBinOperator(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
   BinOperatorNode *bon = static_cast<BinOperatorNode *>(tnode);
-  OprId ast_op = bon->mOprId;
-  TreeNode *ast_lhs = bon->mOpndA;
-  TreeNode *ast_rhs = bon->mOpndB;
+  OprId ast_op = bon->GetOprId();
+  TreeNode *ast_lhs = bon->GetOpndA();
+  TreeNode *ast_rhs = bon->GetOpndB();
   maple::BaseNode *lhs = ProcessNode(SK_Expr, ast_lhs, block);
   maple::BaseNode *rhs = ProcessNode(SK_Expr, ast_rhs, block);
   maple::BaseNode *mpl_node = nullptr;
@@ -1240,9 +1240,9 @@ maple::BaseNode *A2M::GetNewNodeLhs(NewNode *node, BlockNode *block) {
     // Lhs = new ...
     case NK_BinOperator: {
       BinOperatorNode *biop = static_cast<BinOperatorNode *>(parent);
-      switch (biop->mOprId) {
+      switch (biop->GetOprId()) {
         case OPR_Assign: {
-          obj = ProcessNode(SK_Expr, biop->mOpndA, block);
+          obj = ProcessNode(SK_Expr, biop->GetOpndA(), block);
           break;
         }
         default: {

@@ -233,8 +233,8 @@ bool A2M::IsStmt(TreeNode *tnode) {
     }
     case NK_BinOperator: {
       BinOperatorNode *bon = static_cast<BinOperatorNode *>(tnode);
-      maple::Opcode op = MapBinComboOpcode(bon->mOprId);
-      if (bon->mOprId != OPR_Assign && op == maple::OP_undef) {
+      maple::Opcode op = MapBinComboOpcode(bon->GetOprId());
+      if (bon->GetOprId() != OPR_Assign && op == maple::OP_undef) {
         status = false;
       }
       break;
