@@ -635,7 +635,7 @@ bool PutNode(TreeNode *n) {{
                              break;
                            }}
       case NK_Lambda:      *mOs << NodeColor(pink); break;
-      case NK_Call:        *mOs << NodeColor(lightsalmon); break;
+      case NK_Call:        *mOs << NodeColor(burlywood); break;
       case NK_Block:       *mOs << NodeColor(lightcyan); break;
       case NK_CondBranch:  *mOs << NodeColor(lightblue); break;
       case NK_Return:      *mOs << NodeColor(tan); break;
@@ -660,6 +660,10 @@ bool PutNode(TreeNode *n) {{
                            }}
       case NK_Pass:        *mOs << NodeColor(lightgrey); break;
       case NK_New:         *mOs << NodeColor(khaki); break;
+      case NK_Try:         *mOs << NodeColor(plum); break;
+      case NK_Catch:       *mOs << NodeColor(thistle); break;
+      case NK_Finally:     *mOs << NodeColor(thistle); break;
+      case NK_Throw:       *mOs << NodeColor(plum); break;
     }}
     if(n->IsStmt())
        *mOs << "\\",penwidth=2,color=\\"tomato";
