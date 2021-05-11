@@ -421,6 +421,7 @@ gen_args = [
         ]
 astdump = gen_args[0]
 astdumpclass = gen_args[1]
+prefixfuncname = gen_args[2]
 
 astdump_init = [
 """
@@ -521,9 +522,11 @@ handle_yaml(initial_yaml, gen_enum_func)
 gen_args[2] = "Dump"
 gen_args[4] = "^ "
 gen_call_child_node = lambda dictionary, node_name, field_name, node_type, accessor: \
-    ('Dump("' + padding_name(field_name) + ': ' + short_name(node_type) \
+    (('Dump("' + padding_name(field_name) + ': ' + short_name(node_type) \
     + '*, " + (' + accessor + ' ? "NodeId=" + std::to_string(' + accessor \
-    + '->GetNodeId()) : std::string("null")));\n' if field_name != '' else '')
+    + '->GetNodeId()) : std::string("null")));\n' if field_name == "mParent" else \
+    'Dump("' + padding_name(field_name) + ': ' + short_name(node_type) + '*", ' + accessor + ');\n' \
+    + prefixfuncname + short_name(node_type) + '(' + accessor + ');') if field_name != '' else '')
 handle_yaml(treenode_yaml, gen_handler_ast_node)
 handle_src_include_files(Finalization)
 
@@ -582,7 +585,9 @@ gen_func_declaration = lambda dictionary, node_name: \
         'void ' + gen_args[2] + node_name + '(' + node_name + '* node);'
 gen_func_definition = lambda dictionary, node_name: \
         'void ' + gen_args[1] + '::' + gen_args[2] + node_name + '(' + node_name + '* node) {' \
-        + '\nif(node != nullptr' + (' && PutNode(node)) {' if node_name != "TreeNode" else ') {')
+        + '\nif(node != nullptr' + (' && PutNode(node)) {' \
+        + 'if(auto t = node->GetLabel()) { PutEdge(node, t, "Label", NK_Null); DumpGraphTreeNode(t);}' \
+        if node_name != "TreeNode" else ') {')
 gen_call_child_node = lambda dictionary, node_name, field_name, node_type, accessor: \
         'if(auto t = ' + accessor + ') {' + ('PutEdge(node, t, "' + field_name[1:] + \
         '", NK_' + node_type.replace('Node', '').replace('Tree', 'Null') + ');' \
