@@ -33,19 +33,22 @@ enum BBKind {
   BK_LoopHeader,  // BB for a loop header of a for, for/in, for/of, while, or do/while statement
   BK_Switch,      // BB for a switch statement
   BK_Case,        // BB for a case in switch statement
+  BK_Try,         // BB for a try block
+  BK_Catch,       // BB for a catch block
+  BK_Finally,     // BB for a finally block
   BK_Yield,       // Yield BB eneded with a yield statement
   BK_Terminated,  // Return BB endded with a return/break/continue statement
-  BK_Join         // BB at join point
+  BK_Join,        // BB at join point
 };
 
 enum BBAttribute : unsigned {
   AK_None     = 0,
   AK_Entry    = 1 << 0,
   AK_Exit     = 1 << 1,
-  AK_Try      = 1 << 2,
-  AK_Catch    = 1 << 3,
+  AK_Break    = 1 << 2,
+  AK_Return   = 1 << 3,
   AK_Throw    = 1 << 4,
-  AK_Finally  = 1 << 5,
+  AK_Cont     = 1 << 5,
   AK_InLoop   = 1 << 6,
   AK_HasCall  = 1 << 7,
   AK_ALL      = 0xffffffff
@@ -206,6 +209,7 @@ class CFGVisitor : public AstVisitor {
   ContinueNode *VisitContinueNode(ContinueNode *node);
   BreakNode *VisitBreakNode(BreakNode *node);
   SwitchNode *VisitSwitchNode(SwitchNode *node);
+  TryNode *VisitTryNode(TryNode *node);
   BlockNode *VisitBlockNode(BlockNode *node);
 
   // For statements of a BB

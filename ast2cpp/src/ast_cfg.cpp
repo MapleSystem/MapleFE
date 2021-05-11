@@ -79,6 +79,7 @@ ReturnNode *CFGVisitor::VisitReturnNode(ReturnNode *node) {
   AST_BB *exit = mCurrentFunction->GetExitBB();
   mCurrentBB->AddSuccessor(exit);
   mCurrentBB->SetKind(BK_Terminated);
+  mCurrentBB->SetAttr(AK_Return);
   return node;
 }
 
@@ -252,6 +253,7 @@ ContinueNode *CFGVisitor::VisitContinueNode(ContinueNode *node) {
   // Add the loop header as a successor of current BB
   mCurrentBB->AddSuccessor(loop_header);
   mCurrentBB->SetKind(BK_Terminated);
+  mCurrentBB->SetAttr(AK_Cont);
   return node;
 }
 
@@ -262,6 +264,7 @@ BreakNode *CFGVisitor::VisitBreakNode(BreakNode *node) {
   // Add the target as a successor of current BB
   mCurrentBB->AddSuccessor(exit);
   mCurrentBB->SetKind(BK_Terminated);
+  mCurrentBB->SetAttr(AK_Break);
   return node;
 }
 
@@ -329,6 +332,60 @@ SwitchNode *CFGVisitor::VisitSwitchNode(SwitchNode *node) {
     current_bb->AddSuccessor(exit);
   }
   mCurrentBB = exit;
+  return node;
+}
+
+// For control flow
+TryNode *CFGVisitor::VisitTryNode(TryNode *node) {
+  mCurrentBB->SetKind(BK_Try);
+  mCurrentBB->AddStatement(node);
+  auto try_block_node = node->GetBlock();
+  mCurrentBB->AddStatement(try_block_node);
+
+  unsigned num = node->GetCatchesNum();
+  auto finally_node = node->GetFinally();
+  // Create a BB for the join point
+  AST_BB *join = finally_node ? NewBB(BK_Finally) : NewBB(BK_Join);
+
+  if(num == 0)
+    mCurrentBB->AddSuccessor(join);
+
+  // Save current BB
+  AST_BB *current_bb = mCurrentBB;
+  // Create a new BB for current block node
+  mCurrentBB = NewBB(BK_Uncond);
+  current_bb->AddSuccessor(mCurrentBB);
+
+  // Visit try block
+  AstVisitor::VisitBlockNode(try_block_node);
+
+  // Add an edge to join point
+  mCurrentBB->AddSuccessor(join);
+
+  // JavaScript can have one catch block, or one finally block without catch block
+  // Other languages, such as C++ and Java, may have multiple catch blocks
+  AST_BB *curr_bb = mCurrentBB;
+  for (unsigned i = 0; i < num; ++i) {
+    AST_BB *catch_bb = NewBB(BK_Catch);
+    if(i == 0)
+      current_bb->AddSuccessor(catch_bb);
+    // Add an edge to catch bb
+    curr_bb->AddSuccessor(catch_bb);
+    mCurrentBB = catch_bb;
+    auto catch_node = node->GetCatchAtIndex(i);
+    catch_bb->AddStatement(catch_node);
+
+    AstVisitor::VisitCatchNode(catch_node);
+    mCurrentBB->AddSuccessor(join);
+    curr_bb = catch_bb;
+  }
+
+  mCurrentBB = join;
+  if(finally_node) {
+    // For finally block
+    mCurrentBB->AddStatement(finally_node);
+    AstVisitor::VisitTreeNode(finally_node);
+  }
   return node;
 }
 
@@ -494,7 +551,8 @@ AST_BB *CFGVisitor::NewBB(BBKind k) {
 // Helper for a node in dot graph
 static std::string BBLabelStr(AST_BB *bb, const char *shape = nullptr) {
   static const char* const kBBNames[] =
-  { "unknown", "uncond", "block", "branch", "loop", "switch", "case", "yield", "term", "join" };
+  { "unknown", "uncond", "block", "branch", "loop", "switch", "case", "try", "catch", "finally",
+    "yield", "term", "join" };
   if(shape == nullptr)
     return kBBNames[bb->GetKind()];
   std::string str("BB" + std::to_string(bb->GetId()));
