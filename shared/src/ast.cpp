@@ -259,8 +259,8 @@ void ASTTree::Dump(unsigned indent) {
 TreeNode* ASTTree::BuildBinaryOperation(TreeNode *childA, TreeNode *childB, OprId id) {
   BinOperatorNode *n = (BinOperatorNode*)mTreePool.NewTreeNode(sizeof(BinOperatorNode));
   new (n) BinOperatorNode(id);
-  n->mOpndA = childA;
-  n->mOpndB = childB;
+  n->SetOpndA(childA);
+  n->SetOpndB(childB);
   childA->SetParent(n);
   childB->SetParent(n);
   return n;

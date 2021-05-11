@@ -245,7 +245,7 @@ public:
 };
 
 class BinOperatorNode : public TreeNode {
-public:
+private:
   OprId     mOprId;
   TreeNode *mOpndA;
   TreeNode *mOpndB;

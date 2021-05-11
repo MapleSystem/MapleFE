@@ -58,7 +58,7 @@ DeclNode *DeclInitVisitor::VisitDeclNode(DeclNode *node) {
   IdentifierNode *inode = static_cast<IdentifierNode *>(var);
   TreeNode *init = inode->GetInit();
   if (init) {
-    node->SetInit(inode->GetInit());
+    node->SetInit(init);
     inode->ClearInit();
   }
   return node;

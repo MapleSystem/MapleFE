@@ -18,6 +18,9 @@
 
 #include <stack>
 #include <utility>
+#include <unordered_map>
+#include <unordered_set>
+
 #include "ast_module.h"
 #include "ast.h"
 #include "ast_type.h"
@@ -26,21 +29,30 @@
 
 namespace maplefe {
 
+typedef std::tuple<unsigned, const char *, unsigned, unsigned> PosDef;
+
 class AST_DFA {
  private:
   AST_Handler  *mHandler;
   bool          mTrace;
-  SmallVector<BitVector>  mReachDefIn;     // reaching definition bit vector entering bb
+  SmallVector<BitVector> mReachDefIn;                  // reaching definition bit vector entering bb
+  std::unordered_map<unsigned, unsigned> mVar2DeclMap; // var to decl, both NodeId
+  std::unordered_map<unsigned, TreeNode*> mNodeId2NodeMap;
+  SmallVector<PosDef> mDefVec;
 
  public:
   explicit AST_DFA(AST_Handler *h, bool t) : mHandler(h), mTrace(t) {}
   ~AST_DFA() {}
 
-  void  Build();
+  void Build();
 
-  void  BuildReachDefIn();
+  void CollectDefNodes();
+  void BuildReachDefIn();
+  void AddDef(TreeNode *node, unsigned &bitnum, unsigned bbid);
   // unsigned GetDecl(VarNode *);
 
+  void DumpPosDef(PosDef pos);
+  void DumpPosDefVec();
   void DumpReachDefIn();
 };
 
