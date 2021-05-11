@@ -25,17 +25,20 @@ namespace maplefe {
 // Initialize a AST_Function node
 void CFGVisitor::InitializeFunction(AST_Function *func) {
   // Create the entry BB and exit BB of current function
-  AST_BB *bb = NewBB(BK_Uncond);
-  func->SetEntryBB(bb);
-  func->SetExitBB(NewBB(BK_Join));
+  AST_BB *entry = NewBB(BK_Uncond);
+  func->SetEntryBB(entry);
+  AST_BB *exit = NewBB(BK_Join);
+  func->SetExitBB(exit);
+  mThrowBBs.push_back(TargetBB{exit, ""});
   // Initialize the working function and BB
   mCurrentFunction = func;
   mCurrentBB = NewBB(BK_Uncond);
-  bb->AddSuccessor(mCurrentBB);
+  entry->AddSuccessor(mCurrentBB);
 }
 
 // Finalize a AST_Function node
 void CFGVisitor::FinalizeFunction() {
+  mThrowBBs.pop_back();
   AST_BB *exit = mCurrentFunction->GetExitBB();
   mCurrentBB->AddSuccessor(exit);
   mCurrentFunction->SetLastBBId(AST_BB::GetLastId());
@@ -156,11 +159,13 @@ ForLoopNode *CFGVisitor::VisitForLoopNode(ForLoopNode *node) {
   // Create a new BB for getting out of the loop
   AST_BB *loop_exit = NewBB(BK_Join);
 
-  // Push loop_exit and current_bb to mTargetBBs for 'break' and 'continue'
-  mTargetBBs.push(std::pair<AST_BB*,AST_BB*>{loop_exit, current_bb});
+  // Push loop_exit and current_bb to stacks for 'break' and 'continue'
+  mBreakBBs.push_back(TargetBB{loop_exit, ""});
+  mContinueBBs.push_back(TargetBB{current_bb, ""});
   // Visit loop body
   VisitTreeNode(node->GetBody());
-  mTargetBBs.pop();
+  mContinueBBs.pop_back();
+  mBreakBBs.pop_back();
 
   // Visit all updates
   for (unsigned i = 0; i < node->GetUpdatesNum(); ++i) {
@@ -196,11 +201,13 @@ WhileLoopNode *CFGVisitor::VisitWhileLoopNode(WhileLoopNode *node) {
   // Create a new BB for getting out of the loop
   AST_BB *loop_exit = NewBB(BK_Join);
 
-  // Push loop_exit and current_bb to mTargetBBs for 'break' and 'continue'
-  mTargetBBs.push(std::pair<AST_BB*,AST_BB*>{loop_exit, current_bb});
+  // Push loop_exit and current_bb to stacks for 'break' and 'continue'
+  mBreakBBs.push_back(TargetBB{loop_exit, ""});
+  mContinueBBs.push_back(TargetBB{current_bb, ""});
   // Visit loop body
   VisitTreeNode(node->GetBody());
-  mTargetBBs.pop();
+  mContinueBBs.pop_back();
+  mBreakBBs.pop_back();
 
   // Add a back edge to loop header
   mCurrentBB->AddSuccessor(current_bb);
@@ -227,11 +234,13 @@ DoLoopNode *CFGVisitor::VisitDoLoopNode(DoLoopNode *node) {
   // Create a new BB for getting out of the loop
   AST_BB *loop_exit = NewBB(BK_Join);
 
-  // Push loop_exit and current_bb to mTargetBBs for 'break' and 'continue'
-  mTargetBBs.push(std::pair<AST_BB*,AST_BB*>{loop_exit, current_bb});
+  // Push loop_exit and current_bb to stacks for 'break' and 'continue'
+  mBreakBBs.push_back(TargetBB{loop_exit, ""});
+  mContinueBBs.push_back(TargetBB{current_bb, ""});
   // Visit loop body
   VisitTreeNode(node->GetBody());
-  mTargetBBs.pop();
+  mContinueBBs.pop_back();
+  mBreakBBs.pop_back();
 
   TreeNode *cond = node->GetCond();
   // Set predicate of current BB
@@ -249,7 +258,7 @@ DoLoopNode *CFGVisitor::VisitDoLoopNode(DoLoopNode *node) {
 ContinueNode *CFGVisitor::VisitContinueNode(ContinueNode *node) {
   mCurrentBB->AddStatement(node);
   // Get the loop header
-  AST_BB *loop_header = mTargetBBs.top().second;
+  AST_BB *loop_header = mContinueBBs.back().first;
   // Add the loop header as a successor of current BB
   mCurrentBB->AddSuccessor(loop_header);
   mCurrentBB->SetKind(BK_Terminated);
@@ -257,10 +266,11 @@ ContinueNode *CFGVisitor::VisitContinueNode(ContinueNode *node) {
   return node;
 }
 
+// For control flow
 BreakNode *CFGVisitor::VisitBreakNode(BreakNode *node) {
   mCurrentBB->AddStatement(node);
   // Get the target BB for a loop or switch statement
-  AST_BB *exit = mTargetBBs.top().first;
+  AST_BB *exit = mBreakBBs.back().first;
   // Add the target as a successor of current BB
   mCurrentBB->AddSuccessor(exit);
   mCurrentBB->SetKind(BK_Terminated);
@@ -280,8 +290,7 @@ SwitchNode *CFGVisitor::VisitSwitchNode(SwitchNode *node) {
 
   // Create a new BB for getting out of the switch block
   AST_BB *exit = NewBB(BK_Join);
-  mTargetBBs.push(std::pair<AST_BB*,AST_BB*>{exit,
-      (mTargetBBs.empty() ? nullptr : mTargetBBs.top().second)});
+  mBreakBBs.push_back(TargetBB{exit,""});
   AST_BB *prev_block = nullptr;
   TreeNode *switch_expr = node->GetExpr();
   for (unsigned i = 0; i < node->GetCasesNum(); ++i) {
@@ -324,7 +333,7 @@ SwitchNode *CFGVisitor::VisitSwitchNode(SwitchNode *node) {
     prev_block = mCurrentBB;
     current_bb = case_bb;
   }
-  mTargetBBs.pop();
+  mBreakBBs.pop_back();
 
   // Connect to the exit BB of this switch statement
   prev_block->AddSuccessor(exit);
@@ -343,12 +352,12 @@ TryNode *CFGVisitor::VisitTryNode(TryNode *node) {
   mCurrentBB->AddStatement(try_block_node);
 
   unsigned num = node->GetCatchesNum();
+  AST_BB *catch_bb = num ? NewBB(BK_Catch) : nullptr;
+
   auto finally_node = node->GetFinally();
   // Create a BB for the join point
   AST_BB *join = finally_node ? NewBB(BK_Finally) : NewBB(BK_Join);
 
-  if(num == 0)
-    mCurrentBB->AddSuccessor(join);
 
   // Save current BB
   AST_BB *current_bb = mCurrentBB;
@@ -356,8 +365,16 @@ TryNode *CFGVisitor::VisitTryNode(TryNode *node) {
   mCurrentBB = NewBB(BK_Uncond);
   current_bb->AddSuccessor(mCurrentBB);
 
+  // Add an edge for exception
+  current_bb->AddSuccessor(num ? catch_bb : join);
+
   // Visit try block
-  AstVisitor::VisitBlockNode(try_block_node);
+  if(num) {
+    mThrowBBs.push_back(TargetBB{catch_bb,""});
+    AstVisitor::VisitBlockNode(try_block_node);
+    mThrowBBs.pop_back();
+  } else
+    AstVisitor::VisitBlockNode(try_block_node);
 
   // Add an edge to join point
   mCurrentBB->AddSuccessor(join);
@@ -366,9 +383,8 @@ TryNode *CFGVisitor::VisitTryNode(TryNode *node) {
   // Other languages, such as C++ and Java, may have multiple catch blocks
   AST_BB *curr_bb = mCurrentBB;
   for (unsigned i = 0; i < num; ++i) {
-    AST_BB *catch_bb = NewBB(BK_Catch);
-    if(i == 0)
-      current_bb->AddSuccessor(catch_bb);
+    if(i > 0)
+      catch_bb = NewBB(BK_Catch);
     // Add an edge to catch bb
     curr_bb->AddSuccessor(catch_bb);
     mCurrentBB = catch_bb;
@@ -385,7 +401,24 @@ TryNode *CFGVisitor::VisitTryNode(TryNode *node) {
     // For finally block
     mCurrentBB->AddStatement(finally_node);
     AstVisitor::VisitTreeNode(finally_node);
+    curr_bb = NewBB(BK_Join);
+    mCurrentBB->AddSuccessor(curr_bb);
+    // Add an edge to recent catch BB or exit BB
+    mCurrentBB->AddSuccessor(mThrowBBs.back().first);
+    mCurrentBB = curr_bb;
   }
+  return node;
+}
+
+// For control flow
+ThrowNode *CFGVisitor::VisitThrowNode(ThrowNode *node) {
+  mCurrentBB->AddStatement(node);
+  // Get the catch/exit bb for this throw statement
+  AST_BB *catch_bb = mThrowBBs.back().first;
+  // Add the loop header as a successor of current BB
+  mCurrentBB->AddSuccessor(catch_bb);
+  mCurrentBB->SetKind(BK_Terminated);
+  mCurrentBB->SetAttr(AK_Throw);
   return node;
 }
 

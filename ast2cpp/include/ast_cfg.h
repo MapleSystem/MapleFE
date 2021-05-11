@@ -16,7 +16,6 @@
 #ifndef __AST_CFG_HEADER__
 #define __AST_CFG_HEADER__
 
-#include <stack>
 #include <utility>
 #include "ast_module.h"
 #include "ast.h"
@@ -175,7 +174,10 @@ class AST_CFG {
   void BuildCFG();
 };
 
-using TargetBBStack = std::stack<std::pair<AST_BB*,AST_BB*>>;
+using TargetLabel = std::string;
+using TargetBB = std::pair<AST_BB*,TargetLabel>;
+using TargetBBStack = std::vector<TargetBB>;
+
 class CFGVisitor : public AstVisitor {
  private:
   AST_Handler  *mHandler;
@@ -183,7 +185,10 @@ class CFGVisitor : public AstVisitor {
 
   AST_Function *mCurrentFunction;
   AST_BB       *mCurrentBB;
-  TargetBBStack mTargetBBs;
+
+  TargetBBStack mBreakBBs;
+  TargetBBStack mContinueBBs;
+  TargetBBStack mThrowBBs;
 
  public:
   explicit CFGVisitor(AST_Handler *h, bool t, bool base = false)
@@ -210,6 +215,7 @@ class CFGVisitor : public AstVisitor {
   BreakNode *VisitBreakNode(BreakNode *node);
   SwitchNode *VisitSwitchNode(SwitchNode *node);
   TryNode *VisitTryNode(TryNode *node);
+  ThrowNode *VisitThrowNode(ThrowNode *node);
   BlockNode *VisitBlockNode(BlockNode *node);
 
   // For statements of a BB
