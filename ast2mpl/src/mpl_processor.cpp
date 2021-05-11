@@ -865,6 +865,12 @@ maple::BaseNode *A2M::ProcessFinally(StmtExprKind skind, TreeNode *tnode, BlockN
   return nullptr;
 }
 
+maple::BaseNode *A2M::ProcessThrow(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
+  NOTYETIMPL("ProcessThrow()");
+  ThrowNode *node = static_cast<ThrowNode *>(tnode);
+  return nullptr;
+}
+
 maple::BaseNode *A2M::ProcessException(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
   NOTYETIMPL("ProcessException()");
   ExceptionNode *node = static_cast<ExceptionNode *>(tnode);

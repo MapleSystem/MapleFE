@@ -782,6 +782,32 @@ void LiteralNode::Dump(unsigned indent) {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
+//                          ThrowNode
+//////////////////////////////////////////////////////////////////////////////////////
+
+void ThrowNode::AddException(TreeNode *t) {
+  if (t->IsPass()) {
+    PassNode *pass_node = (PassNode*)t;
+    for (unsigned i = 0; i < pass_node->GetChildrenNum(); i++)
+      AddException(pass_node->GetChild(i));
+  } else {
+    mExceptions.PushBack(t);
+  }
+}
+
+void ThrowNode::Dump(unsigned indent) {
+  DumpIndentation(indent);
+  DUMP0_NORETURN("throw ");
+  for (unsigned i = 0; i < GetExceptionsNum(); i++) {
+    TreeNode *t = GetExceptionAtIndex(i);
+    t->Dump(0);
+    if (i < GetExceptionsNum() - 1)
+      DUMP0_NORETURN(", ");
+  }
+  DUMP_RETURN();
+}
+
+//////////////////////////////////////////////////////////////////////////////////////
 //                          Try, Catch, Finally nodes
 //////////////////////////////////////////////////////////////////////////////////////
 

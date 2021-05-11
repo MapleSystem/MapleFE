@@ -296,6 +296,9 @@ void Verifier::VerifyAnnotationType(AnnotationTypeNode *tree){
 void Verifier::VerifyAnnotation(AnnotationNode *tree){
 }
 
+void Verifier::VerifyThrow(ThrowNode *tree){
+}
+
 void Verifier::VerifyTry(TryNode *tree){
 }
 

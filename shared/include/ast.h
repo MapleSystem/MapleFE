@@ -748,6 +748,27 @@ public:
 };
 
 //////////////////////////////////////////////////////////////////////////
+//                         ThrowNode
+// This is the throw statement.
+// In Java some functions throw exception in declaration, and they are
+// saved in FunctionNode::mThrows.
+//////////////////////////////////////////////////////////////////////////
+
+class ThrowNode : public TreeNode {
+private:
+  SmallVector<TreeNode *> mExceptions;
+public:
+  ThrowNode() {mKind = NK_Throw;}
+  ~ThrowNode(){}
+
+  unsigned  GetExceptionsNum() {return mExceptions.GetNum();}
+  TreeNode* GetExceptionAtIndex(unsigned i) {return mExceptions.ValueAtIndex(i);}
+  void      AddException(TreeNode *n);
+
+  void Dump(unsigned);
+};
+
+//////////////////////////////////////////////////////////////////////////
 //                         Try, Catch, Finally
 // I can build one single TryNode to contain all the information. However,
 // I built all three types of nodes, since some language could have complex
