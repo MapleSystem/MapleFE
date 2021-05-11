@@ -334,21 +334,21 @@ TreeNode* ASTBuilder::BuildBinaryOperation() {
 
   // set 1st param
   if (p_a.mIsTreeNode)
-    n->mOpndA = p_a.mData.mTreeNode;
+    n->SetOpndA(p_a.mData.mTreeNode);
   else {
     TreeNode *tn = CreateTokenTreeNode(p_a.mData.mToken);
-    n->mOpndA = tn;
+    n->SetOpndA(tn);
   }
-  n->mOpndA->SetParent(n);
+  n->GetOpndA()->SetParent(n);
 
   // set 2nd param
   if (p_c.mIsTreeNode)
-    n->mOpndB = p_c.mData.mTreeNode;
+    n->SetOpndB(p_c.mData.mTreeNode);
   else {
     TreeNode *tn = CreateTokenTreeNode(p_c.mData.mToken);
-    n->mOpndB = tn;
+    n->SetOpndB(tn);
   }
-  n->mOpndB->SetParent(n);
+  n->GetOpndB()->SetParent(n);
 
   return n;
 }

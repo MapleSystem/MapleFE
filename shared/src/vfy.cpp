@@ -181,8 +181,8 @@ void Verifier::VerifyUnaOperator(UnaOperatorNode *tree){
 void Verifier::VerifyBinOperator(BinOperatorNode *binop){
   TreeNode *old_temp_parent = mTempParent;
   mTempParent = binop;
-  VerifyTree(binop->mOpndA);
-  VerifyTree(binop->mOpndB);
+  VerifyTree(binop->GetOpndA());
+  VerifyTree(binop->GetOpndB());
   mTempParent = old_temp_parent;
 }
 
