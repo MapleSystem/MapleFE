@@ -30,7 +30,7 @@ namespace maplefe {
 void UserTypeNode::AddTypeArgs(TreeNode *args) {
   if (args->IsIdentifier()) {
     IdentifierNode *inode = (IdentifierNode*)args;
-    AddTypeArg(inode);
+    mTypeArguments.PushBack(inode);
   } else if (args->IsPass()) {
     PassNode *p = (PassNode*)args;
     for (unsigned i = 0; i < p->GetChildrenNum(); i++) {
@@ -53,7 +53,13 @@ bool UserTypeNode::TypeEquivalent(UserTypeNode *type) {
 }
 
 void UserTypeNode::Dump(unsigned ind) {
-  mId->Dump(0);
+  if (mType == UT_Union)
+    DUMP0_NORETURN("union ");
+  else if (mType == UT_Inter)
+    DUMP0_NORETURN("intersect ");
+
+  if (mId)
+    mId->Dump(0);
   unsigned size = mTypeArguments.GetNum();
   if (size > 0) {
     DUMP0_NORETURN('<');
@@ -65,6 +71,17 @@ void UserTypeNode::Dump(unsigned ind) {
     }
     DUMP0_NORETURN('>');
   }
+
+  if (mChildA)
+    mChildA->Dump(0);
+
+  if (mType == UT_Union)
+    DUMP0_NORETURN(" | ");
+  else if (mType == UT_Inter)
+    DUMP0_NORETURN(" & ");
+
+  if (mChildB)
+    mChildB->Dump(0);
 }
 
 //////////////////////////////////////////////////////////////////////////

@@ -65,15 +65,29 @@ namespace maplefe {
 
 ///////////////////////////////////////////////////////////////////////////////
 //                          UserTypeNode
+// User type is complicated in Typescript. It could a union or intersection
+// of other types.
 ///////////////////////////////////////////////////////////////////////////////
+
+enum UT_Type {
+  UT_Regular, // the normal user type, it could be just a name.
+  UT_Union,   // Union of two other types.
+  UT_Inter,   // Intersection of two other types.
+};
 
 class UserTypeNode : public TreeNode {
 private:
-  IdentifierNode *mId;
+  IdentifierNode *mId;  // A regular UT always has an Id (or name)
+                        // A union or intersection UT may or may not have an ID.
+  UT_Type   mType;
+  TreeNode *mChildA; // first child type.
+  TreeNode *mChildB; // seconf child type.
+
   SmallVector<IdentifierNode*> mTypeArguments;
+
 public:
-  UserTypeNode() : mId(NULL) {mKind = NK_UserType;}
-  UserTypeNode(IdentifierNode *n) : mId(n) {mKind = NK_UserType;}
+  UserTypeNode() : mId(NULL), mChildA(NULL), mChildB(NULL), mType(UT_Regular) {mKind = NK_UserType;}
+  UserTypeNode(IdentifierNode *n) : mId(n), mChildA(NULL), mChildB(NULL), mType(UT_Regular) {mKind = NK_UserType;}
   ~UserTypeNode(){Release();}
 
   IdentifierNode* GetId() {return mId;}
@@ -83,9 +97,15 @@ public:
 
   unsigned GetTypeArgumentsNum() {return mTypeArguments.GetNum();}
   IdentifierNode* GetTypeArgument(unsigned i) {return mTypeArguments.ValueAtIndex(i);}
-
-  void     AddTypeArg(IdentifierNode *n) {mTypeArguments.PushBack(n);}
   void     AddTypeArgs(TreeNode *n);
+
+  UT_Type GetType() {return mType;}
+  void SetType(UT_Type t) {mType = t;}
+
+  TreeNode* GetChildA() {return mChildA;}
+  TreeNode* GetChildB() {return mChildB;}
+  void SetChildA(TreeNode *t) {mChildA = t;}
+  void SetChildB(TreeNode *t) {mChildB = t;}
 
   bool TypeEquivalent(UserTypeNode *);
 
