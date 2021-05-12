@@ -46,6 +46,7 @@ StringPool::~StringPool() {
     char *addr = block.Addr;
     free(addr);
   }
+  mStringTable.clear();
   
   // Release the StringMap
   delete mMap;
