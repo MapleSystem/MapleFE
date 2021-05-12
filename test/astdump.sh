@@ -1,17 +1,33 @@
 #!/bin/bash
+function usage {
+cat << EOF
+
+Usage: astdump.sh [-dot] [-f|--fullscreen] [-p <PREFIX>|--pre <PREFIX>] [-a|--ast] [-c|--cfg] <file1> [<file2> ...]
+
+  -d | --dot             Use Graphviz dot to generate the graph and view it with viewnior
+  -f | --fullscreen      View the generated graph in fullscreen mode. It implies option -dot
+  -p | --pre <PREFIX>    Filter graphs with the specified <PREFIX>, e.g. -p "CFG_<function-name>"
+  -a | --ast             Show AST graph. It is equivalent to options "-dot -p AST"
+  -c | --cfg             Show CFG graph. It is equivalent to options "-dot -p CFG"
+  <file1> [<file2> ...]  Specify one or more TypeScript files to be processed
+EOF
+exit 1
+}
+
 DOT= PRE= LIST= VIEWOP=
 while [ $# -gt 0 ]; do
     case $1 in
-        -d|--dot) DOT=true;;
-        -f|--fullscreen) VIEWOP="--fullscreen";;
-        -p|--pre) [ $# -ge 2 ] && { PRE="$2"; shift; } || { echo "$1 needs an argument"; exit 1; } ;;
-        -a|--ast) PRE="AST" ; DOT=true ;;
-        -c|--cfg) PRE="CFG" ; DOT=true ;;
-        -*)       echo "Usage: $0 [-dot] [-f|--fullscreen] [-p <PREFIX>|--pre <PREFIX>] [-a|--ast] [-c|--cfg] <file1> [<file2> ...]" ;;
-        *)        LIST="$LIST $1"
+        -d|-dot|--dot)   DOT=true;;
+        -f|--fullscreen) VIEWOP="--fullscreen"; DOT=true;;
+        -p|-pre|--pre)   [ $# -ge 2 ] && { PRE="$2"; shift; } || { echo "$1 needs an argument"; exit 1; } ;;
+        -a|-ast|--ast)   PRE="AST" ; DOT=true ;;
+        -c|-cfg|--cfg)   PRE="CFG" ; DOT=true ;;
+        -*)              usage;;
+        *)               LIST="$LIST $1"
     esac
     shift
 done
+[ -n "$LIST" ] || { echo Please specify one or more TypeScript files.; usage; }
 [ -z "$DOT" ] || [ -x /usr/bin/dot -a -x /usr/bin/viewnior ] || sudo apt install graphviz viewnior 
 CMD=$(dirname $0)/../output/typescript/typescript/ts2cpp
 [ -x "$CMD" ] || { echo Cannot execute $CMD; exit 1; }

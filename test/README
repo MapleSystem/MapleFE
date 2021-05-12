@@ -1,10 +1,31 @@
 This directory contains the test framework and test cases.
-The test cases are in 3 directories.
-1. java2mpl
-   This is for the Java test cases. They are correct code.
-2. errtest
-   This is for the Java test cases. They are incorrect code.
-3. others
-   This is for the Java test cases. They are taken from 3rd party open source projects,
-   in order to have a complete coverage of the testing. If you want to reuse the code
-   please read the LICENSE carefully.
+
+Directories:
+./java
+./java/syntaxonly        Test cases for syntax check
+./java/others            Other Java test cases from third-party open source projects. Included the LICENSE for them.
+./java/java2mpl          Java test cases for java2mpl
+./java/openjdk           Java test cases
+./java/errtest           Negative test cases
+
+./typescript
+./typescript/ms_tests    TypeScript official test cases. Included the LICENSE for them.
+./typescript/unit_tests  Unit test cases
+
+
+Tool to dump AST and CFG of a TypeScript test case:
+
+ Usage: astdump.sh [-dot] [-f|--fullscreen] [-p <PREFIX>|--pre <PREFIX>] [-a|--ast] [-c|--cfg] <file1> [<file2> ...]
+
+  -d | --dot             Use Graphviz dot to generate the graph and view it with viewnior
+  -f | --fullscreen      View the generated graph in fullscreen mode. It implies option -dot
+  -p | --pre <PREFIX>    Filter graphs with the specified <PREFIX>, e.g. -p "CFG_<function-name>"
+  -a | --ast             Show AST graph. It is equivalent to options "-dot -p AST"
+  -c | --cfg             Show CFG graph. It is equivalent to options "-dot -p CFG"
+  -h | --help            Display usage information
+  <file1> [<file2> ...]  Specify one or more TypeScript files to be processed
+
+Examples:
+  cd MapleFE/test/typescript/unit_tests
+  ../../astdump.sh -a binary-search.ts   # Show AST graph
+  ../../astdump.sh binary-search.ts -c   # Show CFG graph
