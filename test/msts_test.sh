@@ -7,7 +7,7 @@ if [ ! -d ${MAPLEFE_ROOT}/test/TypeScript ]; then
 fi
 
 if [ -f ${MAPLEFE_ROOT}/test/msts_testlist ]; then
-  cat msts_testlist | xargs -n1 -I % sh -c '{ if [ ! -f % ]; then ln -sf TypeScript/tests/cases/compiler/% .; fi }'
+  cat msts_testlist | xargs -n1 -I % sh -c '{ if [ ! -f % ]; then ln -sf ../TypeScript/tests/cases/compiler/% typescript/; fi }'
 fi
 
 # export is for sh -c in xargs
