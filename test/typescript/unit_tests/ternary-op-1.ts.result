@@ -1,0 +1,18 @@
+Matched 32 tokens.
+Matched 40 tokens.
+Matched 47 tokens.
+Matched 54 tokens.
+Matched 61 tokens.
+============= Module ===========
+== Sub Tree ==
+func  func(x)  throws: 
+  return x GT 10 ? x : x Mul x ? x Mul 2 : x Mul 3
+
+== Sub Tree ==
+js_let Decl: r=func(12)
+== Sub Tree ==
+console.log(r)
+== Sub Tree ==
+r Assign func(3)
+== Sub Tree ==
+console.log(r)

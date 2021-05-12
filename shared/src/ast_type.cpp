@@ -87,6 +87,11 @@ void UserTypeNode::Dump(unsigned ind) {
 
   if (mChildB)
     mChildB->Dump(0);
+
+  if (mDims) {
+    for (unsigned i = 0; i < GetDimsNum(); i++)
+      DUMP0_NORETURN("[]");
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////

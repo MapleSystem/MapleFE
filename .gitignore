@@ -9,4 +9,8 @@ output/
 *.dot
 *.png
 gdbfile
+test/TypeScript/
+test/msts_failed.txt
+test/msts_passed.txt
+test/typescript/ms_tests/*.ts
 

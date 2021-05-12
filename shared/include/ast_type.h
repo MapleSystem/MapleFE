@@ -45,12 +45,17 @@
 // We define 3 different types.
 // 1. UserType
 //    It's an identifier which defines a class, interface, struct, etc.
+//    It also includes DimensionNode to tell if it's array.
 // 2. PrimType
 //    This is coming from language's type keyword which are primitive types.
 //    PrimType-s have limited number, and we pre-created AST nodes for them.
 //    All same prim type nodes are pointing to the same one.
 // 3. PrimArrayType
 //    This is a special case. e.g. int[]
+//
+// The reason we split primary types into PrimType and PrimArrayType is to
+// share the same PrimType since they can be predefined in the Prim Pool.
+//
 //////////////////////////////////////////////////////////////////////////
 
 #ifndef __AST_TYPE_H__
@@ -81,15 +86,21 @@ private:
   IdentifierNode *mId;  // A regular UT always has an Id (or name)
                         // A union or intersection UT may or may not have an ID.
   UT_Type   mType;
-  TreeNode *mChildA; // first child type in UT_Union or UT_Inter.
-                     // or it's the orig type in UT_Alias.
-  TreeNode *mChildB; // seconf child type.
+  TreeNode *mChildA;    // first child type in UT_Union or UT_Inter.
+                        // or it's the orig type in UT_Alias.
+  TreeNode *mChildB;    // seconf child type.
+
+  DimensionNode *mDims;
 
   SmallVector<IdentifierNode*> mTypeArguments;
 
 public:
-  UserTypeNode() : mId(NULL), mChildA(NULL), mChildB(NULL), mType(UT_Regular) {mKind = NK_UserType;}
-  UserTypeNode(IdentifierNode *n) : mId(n), mChildA(NULL), mChildB(NULL), mType(UT_Regular) {mKind = NK_UserType;}
+  UserTypeNode() : mId(NULL), mChildA(NULL), mChildB(NULL), mType(UT_Regular), mDims(NULL) {
+    mKind = NK_UserType;
+  }
+  UserTypeNode(IdentifierNode *n) : mId(n), mChildA(NULL), mChildB(NULL), mType(UT_Regular), mDims(NULL) {
+    mKind = NK_UserType;
+  }
   ~UserTypeNode(){Release();}
 
   IdentifierNode* GetId() {return mId;}
@@ -110,6 +121,15 @@ public:
   void SetChildB(TreeNode *t) {mChildB = t;}
 
   void SetAlias(TreeNode *t) {mChildA = t; mType = UT_Alias;}
+
+  DimensionNode* GetDims()       {return mDims;}
+  void SetDims(DimensionNode *d) {mDims = d;}
+
+  unsigned GetDimsNum()          {return mDims->GetDimensionsNum();}
+  bool     IsArray()             {return mDims && GetDimsNum() > 0;}
+  unsigned AddDim(unsigned i = 0){mDims->AddDim(i);}           // 0 means unspecified
+  unsigned GetNthNum(unsigned n) {return mDims->GetDimension(n);} // 0 means unspecified.
+  void     SetNthNum(unsigned n, unsigned i) {mDims->SetDimension(n, i);}
 
   bool TypeEquivalent(UserTypeNode *);
 
