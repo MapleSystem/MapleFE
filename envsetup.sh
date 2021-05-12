@@ -51,3 +51,14 @@ export MAPLEALL_SRC=${MAPLEALL_ROOT}/src/mapleall
 unset BUILDDIR
 export BUILDDIR=${MAPLEFE_ROOT}/output/${SRCLANG}
 
+if [ ${LANG} = "typescript" ]; then
+  if [ ! -d ${MAPLEFE_ROOT}/test/TypeScript ]; then
+    git clone -b release-1.8 https://github.com/microsoft/TypeScript.git ${MAPLEFE_ROOT}/test/TypeScript
+  fi
+  if [ -f ${MAPLEFE_ROOT}/test/msts_testlist ]; then
+    cd ${MAPLEFE_ROOT}/test/typescript
+    cat ../msts_testlist | xargs -n1 -I % sh -c '{ if [ ! -f % ]; then ln -sf ../TypeScript/tests/cases/compiler/% .; fi }'
+    cd - > /dev/null
+  fi
+fi
+
