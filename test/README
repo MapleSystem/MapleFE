@@ -23,6 +23,7 @@ Tool to dump AST and CFG of a TypeScript test case:
   -a | --ast             Show AST graph. It is equivalent to options "-dot -p AST"
   -c | --cfg             Show CFG graph. It is equivalent to options "-dot -p CFG"
   -h | --help            Display usage information
+  -s | --syntax          Syntax highlighting the generated TypeScript code
   <file1> [<file2> ...]  Specify one or more TypeScript files to be processed
 
 Examples:
