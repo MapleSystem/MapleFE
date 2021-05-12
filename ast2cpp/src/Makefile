@@ -46,7 +46,7 @@ $(BUILD)/%.o : %.cpp
 	$(CXX) $(CXXFLAGS) -fpermissive $(INCLUDES) -w -c $< -o $@ 
 
 $(BUILD)/%.d : %.cpp
-	@$(CXX) $(CXXFLAGS) -std=c++11 -MM $(INCLUDES) $< > $@
+	@$(CXX) $(CXXFLAGS) -MM $(INCLUDES) $< > $@
 	@mv -f $(BUILD)/$*.d $(BUILD)/$*.d.tmp
 	@sed -e 's|.*:|$(BUILD)/$*.o:|' < $(BUILD)/$*.d.tmp > $(BUILD)/$*.d
 	@rm -f $(BUILD)/$*.d.tmp
