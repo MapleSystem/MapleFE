@@ -1142,8 +1142,9 @@ rule PrimaryType: ONEOF(ParenthesizedType,
                         ObjectType,
                         ArrayType,
                         TupleType,
-#                        TypeQuery,
+                        TypeQuery,
                         ThisType)
+
 ## rule ParenthesizedType: ( Type )
 rule ParenthesizedType: '(' + Type + ')'
 
@@ -1211,7 +1212,13 @@ rule ConstructorType: "new" + ZEROORONE(TypeParameters) + '(' + ZEROORONE(Parame
   attr.action : AddType(%7)
 
 ## rule TypeQuery: typeof TypeQueryExpression
+rule TypeQuery: "typeof" + TypeQueryExpression
+  attr.action : BuildTypeOf(%2)
+
 ## rule TypeQueryExpression: IdentifierReference TypeQueryExpression . IdentifierName
+rule TypeQueryExpression: ONEOF(IdentifierReference,
+                                TypeQueryExpression + '.' + Identifier)
+  attr.action.%2 : BuildField(%1, %3)
 
 ## rule ThisType: this
 rule ThisType: "this"
