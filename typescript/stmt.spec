@@ -413,7 +413,8 @@ rule RelationalExpression : ONEOF(ShiftExpression,
                                   RelationalExpression + ">=" + ShiftExpression,
                                   RelationalExpression + "instanceof" + ShiftExpression)
 #  [+In] RelationalExpression[In, ?Yield] in ShiftExpression[?Yield]
-  attr.action.%2,%3,%4,%5,%6 : BuildBinaryOperation(%1, %2, %3)
+  attr.action.%2,%3,%4,%5 : BuildBinaryOperation(%1, %2, %3)
+  attr.action.%6 : BuildInstanceOf(%1, %3)
 
 ##-----------------------------------
 ##rule EqualityExpression[In, Yield] :
