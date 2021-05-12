@@ -23,5 +23,6 @@ git checkout master
 git pull
 source build/envsetup.sh arm debug
 make setup
+make clobber
 make maple
 make irbuild
