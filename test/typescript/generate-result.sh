@@ -13,9 +13,9 @@
 # 
 
 #!/bin/bash
-FILES=$(pwd)/*.ts
+FILES=`find . -name "*.ts"`
 for f in $FILES
 do
   echo "Generating result for $f ..."
-  ../../output/typescript/typescript/ts2cpp $f > $f.result
+  $MAPLEFE_ROOT/output/typescript/typescript/ts2cpp $f > $f.result
 done
