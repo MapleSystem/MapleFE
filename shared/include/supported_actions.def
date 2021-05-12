@@ -153,6 +153,10 @@ ACTION(BuildUserType)
 ACTION(AddTypeArgument)
 ACTION(BuildUnionUserType)  // build union type
 ACTION(BuildInterUserType)  // build intersect type
+ACTION(BuildArrayType)      // From Spec point of view,
+                            // In languages like TS, dimension info is attached to type.
+                            // In C/C++, dimension info is attached to identifier.
+                            // However, the AST design is up to each implementation.
 ACTION(BuildTypeAlias)
 
 // This is a special action to pass a child to parent

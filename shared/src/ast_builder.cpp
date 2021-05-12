@@ -2292,11 +2292,7 @@ TreeNode* ASTBuilder::BuildUserType() {
   Param p_id = mParams[0];
   if (!p_id.mIsTreeNode)
     MERROR("The Identifier of user type is not a treenode.");
-
-  TreeNode *node = p_id.mData.mTreeNode;
-  if (!node->IsIdentifier())
-    MERROR("The Identifier of user type is not an identifier.");
-  IdentifierNode *id = (IdentifierNode*)node;
+  TreeNode *id = p_id.mData.mTreeNode;
 
   UserTypeNode *user_type = (UserTypeNode*)mTreePool->NewTreeNode(sizeof(UserTypeNode));
   new (user_type) UserTypeNode(id);
@@ -2401,7 +2397,7 @@ TreeNode* ASTBuilder::BuildTypeAlias() {
     UserTypeNode *u_o = (UserTypeNode*)orig;
     if ((u_o->GetType() == UT_Union || u_o->GetType() == UT_Inter) &&
         (u_o->GetId() == NULL)) {
-      u_o->SetId((IdentifierNode*)name);
+      u_o->SetId(name);
       u_o->SetType(UT_Alias);
 
       mLastTreeNode = u_o;
@@ -2414,6 +2410,64 @@ TreeNode* ASTBuilder::BuildTypeAlias() {
   user_type->SetAlias(orig);
 
   mLastTreeNode = user_type;
+  return mLastTreeNode;
+}
+
+// It takes at least one argument, the basic type.
+// The rest argument represent the dimensions.
+//
+// [NOTE] For each dimension, we are using a trick. If the size of a dimension is unknown,
+//        we use the same tree node of 'basic type'.
+
+TreeNode* ASTBuilder::BuildArrayType() {
+  if (mTrace)
+    std::cout << "In BuildArrayType" << std::endl;
+
+  Param p_basic = mParams[0];
+  MASSERT (p_basic.mIsTreeNode);
+  TreeNode *basic = p_basic.mData.mTreeNode;
+
+  UserTypeNode *user_type = NULL;       // we return either user_type
+  PrimTypeNode *prim_type = NULL;       //
+  PrimArrayTypeNode *prim_array_type = NULL; // or prim_array_type
+
+  if (basic->IsUserType()) {
+    user_type = (UserTypeNode*)basic;
+    MASSERT(!user_type->GetDims());
+  } else if (basic->IsPrimType()) {
+    prim_type = (PrimTypeNode*)basic;
+    prim_array_type = (PrimArrayTypeNode*)mTreePool->NewTreeNode(sizeof(PrimArrayTypeNode));
+    new (prim_array_type) PrimArrayTypeNode();
+    prim_array_type->SetPrim(prim_type);
+  } else {
+    user_type = (UserTypeNode*)mTreePool->NewTreeNode(sizeof(UserTypeNode));
+    new (user_type) UserTypeNode();
+    user_type->SetId(basic);
+  }
+ 
+  DimensionNode *dims = (DimensionNode*)mTreePool->NewTreeNode(sizeof(DimensionNode));
+  new (dims) DimensionNode();
+
+  for (unsigned i = 1; i < mParams.size(); i++) {
+    Param p_dim = mParams[i];
+    MASSERT (p_dim.mIsTreeNode);
+    TreeNode *dim = p_dim.mData.mTreeNode;
+    // Right now we just add all 0 to dim.
+    if (dim == basic)
+      dims->AddDim(0);
+    else
+      dims->AddDim(0);
+  }
+
+  if (user_type) {
+    user_type->SetDims(dims);
+    mLastTreeNode = user_type;
+  } else {
+    MASSERT(prim_array_type);
+    prim_array_type->SetDims(dims);
+    mLastTreeNode = prim_array_type;
+  }
+
   return mLastTreeNode;
 }
 

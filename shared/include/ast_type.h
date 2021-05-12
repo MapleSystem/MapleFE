@@ -83,8 +83,8 @@ enum UT_Type {
 
 class UserTypeNode : public TreeNode {
 private:
-  IdentifierNode *mId;  // A regular UT always has an Id (or name)
-                        // A union or intersection UT may or may not have an ID.
+  TreeNode *mId;  // A regular UT always has an Id (or name), or lambda, etc.
+                  // A union or intersection UT may or may not have an ID.
   UT_Type   mType;
   TreeNode *mChildA;    // first child type in UT_Union or UT_Inter.
                         // or it's the orig type in UT_Alias.
@@ -98,13 +98,13 @@ public:
   UserTypeNode() : mId(NULL), mChildA(NULL), mChildB(NULL), mType(UT_Regular), mDims(NULL) {
     mKind = NK_UserType;
   }
-  UserTypeNode(IdentifierNode *n) : mId(n), mChildA(NULL), mChildB(NULL), mType(UT_Regular), mDims(NULL) {
+  UserTypeNode(TreeNode *n) : mId(n), mChildA(NULL), mChildB(NULL), mType(UT_Regular), mDims(NULL) {
     mKind = NK_UserType;
   }
   ~UserTypeNode(){Release();}
 
-  IdentifierNode* GetId() {return mId;}
-  void SetId(IdentifierNode *n) {mId = n;}
+  TreeNode* GetId() {return mId;}
+  void SetId(TreeNode *n) {mId = n;}
 
   const char* GetName() {return mId->GetName();}
 

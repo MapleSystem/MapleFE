@@ -1179,6 +1179,7 @@ rule TypeMember : ONEOF(PropertySignature,
 
 ## rule ArrayType: PrimaryType [no LineTerminator here] [ ]
 rule ArrayType: PrimaryType + '[' + ']'
+  attr.action : BuildArrayType(%1, %1)
 
 ## rule TupleType: [ TupleElementTypes ]
 rule TupleType: '[' + TupleElementTypes + ']'
