@@ -2327,6 +2327,96 @@ TreeNode* ASTBuilder::AddTypeArgument() {
   return mLastTreeNode;
 }
 
+// It takes two arguments to build a union type, child-a and child-b
+// A child could be a prim type or user type.
+TreeNode* ASTBuilder::BuildUnionUserType() {
+  if (mTrace)
+    std::cout << "In BuildUnionUserType" << std::endl;
+
+  Param p_a = mParams[0];
+  MASSERT (p_a.mIsTreeNode);
+  TreeNode *child_a = p_a.mData.mTreeNode;
+
+  Param p_b = mParams[1];
+  MASSERT (p_b.mIsTreeNode);
+  TreeNode *child_b = p_b.mData.mTreeNode;
+
+  UserTypeNode *user_type = (UserTypeNode*)mTreePool->NewTreeNode(sizeof(UserTypeNode));
+  new (user_type) UserTypeNode();
+
+  user_type->SetChildA(child_a);
+  user_type->SetChildB(child_b);
+  user_type->SetType(UT_Union);
+
+  mLastTreeNode = user_type;
+  return mLastTreeNode;
+}
+
+// It takes two arguments to build a intersection type, child-a and child-b
+// A child could be a prim type or user type.
+TreeNode* ASTBuilder::BuildInterUserType() {
+  if (mTrace)
+    std::cout << "In BuildInterUserType" << std::endl;
+
+  Param p_a = mParams[0];
+  MASSERT (p_a.mIsTreeNode);
+  TreeNode *child_a = p_a.mData.mTreeNode;
+
+  Param p_b = mParams[1];
+  MASSERT (p_b.mIsTreeNode);
+  TreeNode *child_b = p_b.mData.mTreeNode;
+
+  UserTypeNode *user_type = (UserTypeNode*)mTreePool->NewTreeNode(sizeof(UserTypeNode));
+  new (user_type) UserTypeNode();
+
+  user_type->SetChildA(child_a);
+  user_type->SetChildB(child_b);
+  user_type->SetType(UT_Inter);
+
+  mLastTreeNode = user_type;
+  return mLastTreeNode;
+}
+
+// This is a bit complicated.
+//
+// It takes two arguments. The alias name, and they orig type.
+// 1. If the original type has no ID, and it's just a union/inter type created on the fly,
+//    we will reuse the orig and simply apply the name to it.
+// 2. For everything else, we create a new UserType
+
+TreeNode* ASTBuilder::BuildTypeAlias() {
+  if (mTrace)
+    std::cout << "In BuildTypeAlias" << std::endl;
+
+  Param p_name = mParams[0];
+  MASSERT (p_name.mIsTreeNode);
+  TreeNode *name = p_name.mData.mTreeNode;
+  MASSERT(name->IsIdentifier());
+
+  Param p_orig = mParams[1];
+  MASSERT (p_orig.mIsTreeNode);
+  TreeNode *orig = p_orig.mData.mTreeNode;
+
+  if (orig->IsUserType()) {
+    UserTypeNode *u_o = (UserTypeNode*)orig;
+    if ((u_o->GetType() == UT_Union || u_o->GetType() == UT_Inter) &&
+        (u_o->GetId() == NULL)) {
+      u_o->SetId((IdentifierNode*)name);
+      u_o->SetType(UT_Alias);
+
+      mLastTreeNode = u_o;
+      return mLastTreeNode;
+    }
+  }
+
+  UserTypeNode *user_type = (UserTypeNode*)mTreePool->NewTreeNode(sizeof(UserTypeNode));
+  new (user_type) UserTypeNode();
+  user_type->SetAlias(orig);
+
+  mLastTreeNode = user_type;
+  return mLastTreeNode;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 //                       LambdaNode
 // As stated in the ast.h, LambdaNode could be different syntax construct in

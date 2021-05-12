@@ -197,6 +197,9 @@ public:
   // User Type related
   TreeNode* BuildUserType();
   TreeNode* AddTypeArgument();
+  TreeNode* BuildUnionUserType();
+  TreeNode* BuildInterUserType();
+  TreeNode* BuildTypeAlias();
 
   // Pass a child
   TreeNode* PassChild();

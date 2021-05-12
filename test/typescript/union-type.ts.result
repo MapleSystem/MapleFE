@@ -4,7 +4,7 @@ Matched 65 tokens.
 Matched 77 tokens.
 ============= Module ===========
 == Sub Tree ==
-
+alias UnionType=numberstring
 == Sub Tree ==
 func  add(x,y)  throws: 
   cond-branch cond: typeof x StEq 'number' Land  typeof y EQ 'number'

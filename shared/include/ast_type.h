@@ -73,6 +73,7 @@ enum UT_Type {
   UT_Regular, // the normal user type, it could be just a name.
   UT_Union,   // Union of two other types.
   UT_Inter,   // Intersection of two other types.
+  UT_Alias,   // Intersection of two other types.
 };
 
 class UserTypeNode : public TreeNode {
@@ -80,7 +81,8 @@ private:
   IdentifierNode *mId;  // A regular UT always has an Id (or name)
                         // A union or intersection UT may or may not have an ID.
   UT_Type   mType;
-  TreeNode *mChildA; // first child type.
+  TreeNode *mChildA; // first child type in UT_Union or UT_Inter.
+                     // or it's the orig type in UT_Alias.
   TreeNode *mChildB; // seconf child type.
 
   SmallVector<IdentifierNode*> mTypeArguments;
@@ -106,6 +108,8 @@ public:
   TreeNode* GetChildB() {return mChildB;}
   void SetChildA(TreeNode *t) {mChildA = t;}
   void SetChildB(TreeNode *t) {mChildB = t;}
+
+  void SetAlias(TreeNode *t) {mChildA = t; mType = UT_Alias;}
 
   bool TypeEquivalent(UserTypeNode *);
 

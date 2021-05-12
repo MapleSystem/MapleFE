@@ -1192,9 +1192,11 @@ rule TupleElementType: Type
 
 ## rule UnionType: UnionOrIntersectionOrPrimaryType | IntersectionOrPrimaryType
 rule UnionType: UnionOrIntersectionOrPrimaryType + '|' + IntersectionOrPrimaryType
+  attr.action : BuildUnionUserType(%1, %3)
 
 ## rule IntersectionType: IntersectionOrPrimaryType & PrimaryType
 rule IntersectionType: IntersectionOrPrimaryType + '&' + PrimaryType
+  attr.action : BuildInterUserType(%1, %3)
 
 ## rule FunctionType: TypeParametersopt ( ParameterListopt ) => Type
 rule FunctionType: ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList) + ')' + "=>" + Type
@@ -1280,6 +1282,7 @@ rule IndexSignature: ONEOF(
 
 ## rule TypeAliasDeclaration: type BindingIdentifier TypeParametersopt = Type ;
 rule TypeAliasDeclaration: "type" + BindingIdentifier + ZEROORONE(TypeParameters) + '=' + Type + ';'
+  attr.action : BuildTypeAlias(%2, %5)
 
 
 ##############################################################################################

@@ -151,6 +151,9 @@ ACTION(AddFinally)
 // User Types
 ACTION(BuildUserType)
 ACTION(AddTypeArgument)
+ACTION(BuildUnionUserType)  // build union type
+ACTION(BuildInterUserType)  // build intersect type
+ACTION(BuildTypeAlias)
 
 // This is a special action to pass a child to parent
 ACTION(PassChild)

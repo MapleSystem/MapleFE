@@ -57,9 +57,12 @@ void UserTypeNode::Dump(unsigned ind) {
     DUMP0_NORETURN("union ");
   else if (mType == UT_Inter)
     DUMP0_NORETURN("intersect ");
+  else if (mType == UT_Alias)
+    DUMP0_NORETURN("alias ");
 
   if (mId)
     mId->Dump(0);
+
   unsigned size = mTypeArguments.GetNum();
   if (size > 0) {
     DUMP0_NORETURN('<');
@@ -72,8 +75,10 @@ void UserTypeNode::Dump(unsigned ind) {
     DUMP0_NORETURN('>');
   }
 
-  if (mChildA)
+  if (mChildA) {
+    DUMP0_NORETURN("=");
     mChildA->Dump(0);
+  }
 
   if (mType == UT_Union)
     DUMP0_NORETURN(" | ");
