@@ -38,6 +38,9 @@ $(SRCLANG):
 	./new_runtests.pl $(SRCLANG)
 
 testms:
+	./msts_test.sh
+
+testmslocal:
 	./new_runtests.pl typescript TypeScript/tests/cases/compiler
 
 full:

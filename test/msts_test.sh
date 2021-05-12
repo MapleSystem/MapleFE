@@ -1,5 +1,15 @@
 #!/bin/bash
 
+cd ${MAPLEFE_ROOT}/test
+
+if [ ! -d ${MAPLEFE_ROOT}/test/TypeScript ]; then
+  git clone -b release-1.8 https://github.com/microsoft/TypeScript.git
+fi
+
+if [ -f ${MAPLEFE_ROOT}/test/msts_testlist ]; then
+  cat msts_testlist | xargs -n1 -I % sh -c '{ if [ ! -f % ]; then ln -sf TypeScript/tests/cases/compiler/% .; fi }'
+fi
+
 # export is for sh -c in xargs
 export TS2CPP=$MAPLEFE_ROOT/output/typescript/typescript/ts2cpp 
 export PASS_LIST=msts_passed.txt
