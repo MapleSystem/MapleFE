@@ -24,6 +24,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include "massert.h"
 
 namespace maplefe {
 
@@ -44,21 +45,31 @@ private:
   StringMap            *mMap;
   std::vector<SPBlock>  mBlocks;
   int                   mFirstAvail; // -1 means no available.
-
-public:
-  char* AllocBlock();
-  char* Alloc(const size_t);
-  char* Alloc(const std::string&);
-  char* Alloc(const char*);
+  std::vector<std::string> mStringTable;
+  friend class StringMap;
 
 public:
   StringPool();
   ~StringPool();
 
+  char* AllocBlock();
+  char* Alloc(const size_t);
+  char* Alloc(const std::string&);
+  char* Alloc(const char*);
+
   // If not found, add into StringPool
   const char* FindString(const std::string&);
   const char* FindString(const char*);
   const char* FindString(const char*, size_t);
+
+  unsigned GetStrIdx(const std::string&);
+  unsigned GetStrIdx(const char*);
+  unsigned GetStrIdx(const char*, size_t);
+
+  const std::string GetStringFromStrIdx(unsigned idx) {
+    MASSERT(idx < mStringTable.size() && "string index out of range");
+    return mStringTable[idx];
+  }
 };
 
 // Lexing, Parsing, AST Building and IR Building all share one global

@@ -38,13 +38,17 @@ class StringPool;
 class StringMapEntry {
 public:
   char           *Addr;   // Addr in the string pool
+  unsigned        StrIdx; // String index
   StringMapEntry *Next; 
 public:
-  StringMapEntry() { Addr = NULL; Next = NULL; }
-  StringMapEntry(char *A) { Addr = A; Next = NULL; }
-  StringMapEntry(char *A, StringMapEntry *E) { Addr = A; Next = E; }
+  StringMapEntry() { Addr = NULL; StrIdx = 0; Next = NULL; }
+  StringMapEntry(char *A, unsigned idx) { Addr = A; StrIdx = idx; Next = NULL; }
+  StringMapEntry(char *A, unsigned idx, StringMapEntry *E) { Addr = A; StrIdx = idx; Next = E; }
 
   ~StringMapEntry() {}
+
+  char *GetAddr() { return Addr; }
+  unsigned GetStrIdx() { return StrIdx; }
 };
 
 class StringMap {
@@ -62,8 +66,8 @@ public:
   void     SetPool(StringPool *p) {mPool = p;}
 
   unsigned BucketNoFor(const std::string &s);
-  char*    LookupAddrFor(const std::string &s);
-  void     InsertEntry(char *, unsigned);
+  StringMapEntry *LookupEntryFor(const std::string &s);
+  StringMapEntry *InsertEntry(char *, unsigned, unsigned);
 };
 
 }

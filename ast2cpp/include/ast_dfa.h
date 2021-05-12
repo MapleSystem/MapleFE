@@ -21,6 +21,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
+#include "stringpool.h"
 #include "ast_module.h"
 #include "ast.h"
 #include "ast_type.h"
@@ -29,7 +30,7 @@
 
 namespace maplefe {
 
-typedef std::tuple<unsigned, const char *, unsigned, unsigned> PosDef;
+typedef std::tuple<unsigned, unsigned, unsigned, unsigned> PosDef;
 
 class AST_DFA {
  private:
@@ -39,6 +40,7 @@ class AST_DFA {
   std::unordered_map<unsigned, unsigned> mVar2DeclMap; // var to decl, both NodeId
   std::unordered_map<unsigned, TreeNode*> mNodeId2NodeMap;
   SmallVector<PosDef> mDefVec;
+  StringPool mStringPool;
 
  public:
   explicit AST_DFA(AST_Handler *h, bool t) : mHandler(h), mTrace(t) {}

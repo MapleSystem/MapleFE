@@ -23,7 +23,6 @@
 
 #include "stringpool.h"
 #include "stringmap.h"
-#include "massert.h"
 
 namespace maplefe {
 
@@ -35,6 +34,8 @@ StringPool::StringPool() {
   mMap = new StringMap();
   mMap->SetPool(this);
   mFirstAvail = -1;
+  // make string idx starting from 1
+  mStringTable.push_back("");
 }
 
 StringPool::~StringPool() {
@@ -116,14 +117,14 @@ char* StringPool::AllocBlock() {
 // This is the public interface to find a string in the pool.
 // If not found, add it.
 const char* StringPool::FindString(const std::string &s) {
-  return mMap->LookupAddrFor(s);
+  return mMap->LookupEntryFor(s)->GetAddr();
 }
 
 // This is the public interface to find a string in the pool.
 // If not found, add it.
 const char* StringPool::FindString(const char *str) {
   std::string s(str);
-  return mMap->LookupAddrFor(s);
+  return mMap->LookupEntryFor(s)->GetAddr();
 }
 
 // This is the public interface to find a string in the pool.
@@ -131,7 +132,28 @@ const char* StringPool::FindString(const char *str) {
 const char* StringPool::FindString(const char *str, size_t len) {
   std::string s;
   s.assign(str, len);
-  return mMap->LookupAddrFor(s);
+  return mMap->LookupEntryFor(s)->GetAddr();
+}
+
+// This is the public interface to find a string in the pool.
+// If not found, add it.
+unsigned StringPool::GetStrIdx(const std::string &s) {
+  return mMap->LookupEntryFor(s)->GetStrIdx();
+}
+
+// This is the public interface to find a string in the pool.
+// If not found, add it.
+unsigned StringPool::GetStrIdx(const char *str) {
+  std::string s(str);
+  return mMap->LookupEntryFor(s)->GetStrIdx();
+}
+
+// This is the public interface to find a string in the pool.
+// If not found, add it.
+unsigned StringPool::GetStrIdx(const char *str, size_t len) {
+  std::string s;
+  s.assign(str, len);
+  return mMap->LookupEntryFor(s)->GetStrIdx();
 }
 }
 

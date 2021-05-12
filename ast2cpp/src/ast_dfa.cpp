@@ -16,6 +16,7 @@
 #include <stack>
 #include <set>
 #include <tuple>
+#include "stringpool.h"
 #include "ast_handler.h"
 #include "ast_cfg.h"
 #include "ast_dfa.h"
@@ -46,7 +47,7 @@ DeclNode *ReachDefInVisitor::VisitDeclNode(DeclNode *node) {
 
 void AST_DFA::DumpPosDef(PosDef pos) {
   std::cout << "BitPos: " << std::get<0>(pos) << std::endl;
-  std::cout << "  name: " << std::get<1>(pos) << std::endl;
+  std::cout << "stridx: " << std::get<1>(pos) << std::endl;
   std::cout << "   nid: " << std::get<2>(pos) << std::endl;
   std::cout << "  bbid: " << std::get<3>(pos) << std::endl;
   std::cout << std::endl;
@@ -60,12 +61,14 @@ void AST_DFA::DumpPosDefVec() {
 }
 
 void AST_DFA::AddDef(TreeNode *node, unsigned &bitnum, unsigned bbid) {
+  const char *name = NULL;
+  unsigned nid = 0;
   switch (node->GetKind()) {
     case NK_Decl: {
       DeclNode *decl = static_cast<DeclNode *>(node);
       if (decl->GetInit()) {
-        PosDef pos(bitnum++, decl->GetName(), decl->GetNodeId(), bbid);
-        mDefVec.PushBack(pos);
+        name = decl->GetName();
+        nid = decl->GetNodeId();
       }
       break;
     }
@@ -86,8 +89,8 @@ void AST_DFA::AddDef(TreeNode *node, unsigned &bitnum, unsigned bbid) {
         case OPR_BxorAssign:
         case OPR_ZextAssign: {
           TreeNode *lhs = bon->GetOpndA();
-          PosDef pos(bitnum++, lhs->GetName(), lhs->GetNodeId(), bbid);
-          mDefVec.PushBack(pos);
+          name = lhs->GetName();
+          nid = lhs->GetNodeId();
           break;
         }
         default:
@@ -100,13 +103,20 @@ void AST_DFA::AddDef(TreeNode *node, unsigned &bitnum, unsigned bbid) {
       OprId op = uon->GetOprId();
       if (op == OPR_Inc || op == OPR_Dec) {
         TreeNode *lhs = uon->GetOpnd();
-        PosDef pos(bitnum++, lhs->GetName(), lhs->GetNodeId(), bbid);
-        mDefVec.PushBack(pos);
+        name = lhs->GetName();
+        nid = lhs->GetNodeId();
       }
       break;
     }
     default:
       break;
+  }
+
+  // update mDefVec
+  if (name) {
+    unsigned idx = mStringPool.GetStrIdx(name);
+    PosDef pos(bitnum++, idx, nid, bbid);
+    mDefVec.PushBack(pos);
   }
 }
 
@@ -146,8 +156,7 @@ void AST_DFA::CollectDefNodes() {
     working_list.pop_front();
   }
 
-  // DumpPosDefVec();
+  if (mTrace) DumpPosDefVec();
 
 }
-
 }

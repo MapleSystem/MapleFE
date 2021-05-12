@@ -73,7 +73,7 @@ unsigned StringMap::BucketNoFor(const std::string &S) {
 
 // Look up to find the address in the string pool of 'S'.
 // If 'S' is not in the string pool, insert it.
-char* StringMap::LookupAddrFor(const std::string &S) { 
+StringMapEntry *StringMap::LookupEntryFor(const std::string &S) {
   unsigned BucketNo = BucketNoFor(S);
   StringMapEntry *E = &mBuckets[BucketNo];
 
@@ -82,32 +82,37 @@ char* StringMap::LookupAddrFor(const std::string &S) {
   if (E && !E->Addr && !E->Next) {
     char *addr = mPool->Alloc(S);
     E->Addr = addr;
-    return addr;
+    E->StrIdx = mPool->mStringTable.size();
+    mPool->mStringTable.push_back(S);
+    return E;
   }
   
   while (E && E->Addr) {
-    if (S.compare(E->Addr) == 0)
-      return E->Addr;
+    if (S.compare(E->Addr) == 0) {
+      return E;
+    }
     E = E->Next;
   }
    
   // We cannot find an existing string for 'S'. Need to allocate
   char *Addr = mPool->Alloc(S);
-  InsertEntry(Addr, BucketNo);
-
-  return Addr;
+  unsigned idx = mPool->mStringTable.size();
+  mPool->mStringTable.push_back(S);
+  E = InsertEntry(Addr, idx, BucketNo);
+  return E;
 } 
 
 // Add a new entry in 'bucket'.
 // 'addr' is the address in the string pool
-void StringMap::InsertEntry(char *addr, unsigned bucket) {
+StringMapEntry *StringMap::InsertEntry(char *addr, unsigned idx, unsigned bucket) {
   StringMapEntry *E = &mBuckets[bucket];
   while (E->Next) {
     E = E->Next;
   }
 
-  StringMapEntry *NewEnt = new StringMapEntry(addr);
+  StringMapEntry *NewEnt = new StringMapEntry(addr, idx);
   E->Next = NewEnt;
+  return NewEnt;
 }
 }
 
