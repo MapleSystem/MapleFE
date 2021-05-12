@@ -17,6 +17,7 @@
 #include "ast_handler.h"
 #include "gen_astdump.h"
 #include "gen_astgraph.h"
+#include "ast_emitter.h"
 
 namespace maplefe {
 
@@ -65,6 +66,12 @@ void A2C::ProcessAST(bool trace_a2c) {
   handler.BuildDFA();
   if (mTraceA2C) {
     handler.Dump("After handler.BuildDFA()");
+  }
+
+  if (mTraceA2C) {
+    std::cout << "============= AstEmitter ===========" << std::endl;
+    AstEmitter emitter(&gModule);
+    emitter.AstEmit("Convert AST to TypeScript code", &std::cout);
   }
 }
 }
