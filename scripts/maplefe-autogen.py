@@ -700,3 +700,87 @@ handle_src_include_files(Initialization)
 append(include_file, astgraph_init)
 handle_yaml(initial_yaml, gen_handler)
 handle_src_include_files(Finalization)
+
+###################################################################################################
+
+def get_data_based_on_type(val_type, accessor):
+    e = get_enum_type(val_type)
+    if e != None:
+        return astdumpclass + '::GetEnum' + e + '(' + accessor + ')'
+    elif val_type == "LitData":
+        return astdumpclass + '::GetEnumLitData(' + accessor + ')'
+    elif val_type == "bool":
+        return 'std::to_string(' + accessor + ')'
+    elif val_type == 'unsigned int' or val_type == 'uint32_t' or val_type == 'uint64_t' \
+            or val_type == 'unsigned' or val_type == 'int' or val_type == 'int32_t' or val_type == 'int64_t' :
+        return 'std::to_string(' + accessor + ')'
+    elif val_type == 'const char *':
+        return 'std::to_string(' + accessor + ' ? std::string("\\"") + ' + accessor + ' + "\\"" : "null")'
+    return 'Warning: failed to get value with ' + val_type + ", " + accessor
+
+def short_name(node_type):
+    return node_type.replace('class ', '').replace('maplefe::', '').replace(' *', '*')
+
+# The follwoing gen_func_* and gen_call* functions are for AstDump
+gen_call_handle_values = lambda: True
+gen_func_declaration = lambda dictionary, node_name: \
+        "std::string " + gen_args[2] + node_name + "(" + node_name + "* node);"
+gen_func_definition = lambda dictionary, node_name: \
+        "std::string " + gen_args[1] + "::" + gen_args[2] + node_name + "(" + node_name + "* node) {" \
+        + 'if (node == nullptr) \nreturn std::string();' \
+        + ('' if node_name == "TreeNode" else \
+        'std::string str;')
+gen_call_child_node = lambda dictionary, node_name, field_name, node_type, accessor: \
+        'if(auto n = ' + accessor + ') {str += " "s + ' + gen_args[2] + short_name(node_type) + '(n);}' \
+        if field_name != '' else \
+        'return ' + gen_args[2] + short_name(node_type) + '(' + accessor + ');'
+gen_call_child_value = lambda dictionary, node_name, field_name, val_type, accessor: \
+        'str += " "s + ' + get_data_based_on_type(val_type, accessor) + ';'
+gen_call_nth_child_node = lambda dictionary, node_name, field_name, node_type, accessor: \
+        'if(auto n = ' + accessor + ') {str += " "s + ' + gen_args[2] + short_name(node_type) + '(n);}'
+gen_call_nth_child_value = lambda dictionary, node_name, field_name, val_type, accessor: \
+        'str += " "s + ' + get_data_based_on_type(val_type, accessor) + ';'
+gen_func_definition_end = lambda dictionary, node_name: \
+        'mPrecedence = 0; if(node->IsStmt()) str += ";\\n"s;' \
+        + 'return str;}' if node_name != "TreeNode" else 'return std::string();}'
+
+#
+gen_args = [
+        "gen_astemitter", # filename
+        "AstEmitter",     # Class name
+        "AstEmit",        # Prefix of function name
+        """
+#include "{astdump}.h"
+""".format(astdump = astdump),  # Extra include directives
+        ""
+        ]
+
+astemit_init = [
+"""
+using Precedence = signed char;
+
+private:
+ASTModule    *mASTModule;
+std::ostream *mOs;
+Precedence    mPrecedence;
+
+public:
+{gen_args1}(ASTModule *m) : mASTModule(m), mOs(nullptr) {{}}
+
+void {gen_args2}(const char *title, std::ostream *os) {{
+  mOs = os;
+  *mOs << "// {gen_args1}: " << title << "\\n// Filename: " << mASTModule->mFileName << "\\n";
+  for(auto it: mASTModule->mTrees)
+    *mOs << {gen_args2}TreeNode(it->mRootNode);
+}}
+
+""".format(gen_args1=gen_args[1], gen_args2=gen_args[2], astdumpclass=astdumpclass)
+] # astemit_init
+
+if False:
+    handle_src_include_files(Initialization)
+    append(src_file, ['using namespace std::string_literals;'])
+    append(include_file, astemit_init)
+    handle_yaml(initial_yaml, gen_handler)
+    handle_src_include_files(Finalization)
+
