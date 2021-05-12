@@ -741,7 +741,7 @@ gen_call_nth_child_node = lambda dictionary, node_name, field_name, node_type, a
 gen_call_nth_child_value = lambda dictionary, node_name, field_name, val_type, accessor: \
         'str += " "s + ' + get_data_based_on_type(val_type, accessor) + ';'
 gen_func_definition_end = lambda dictionary, node_name: \
-        'mPrecedence = 0; if(node->IsStmt()) str += ";\\n"s;' \
+        'mPrecedence = \'\\030\'; if(node->IsStmt()) str += ";\\n"s;' \
         + 'return str;}' if node_name != "TreeNode" else 'return std::string();}'
 
 #
