@@ -78,7 +78,7 @@ foreach my $file (@paths) {
   my ($pathname) = dirname($file);
 
   if ( $pinput ~~ [qw( java ts )] ) {
-    system("cp -rp --parents $file $outroot/");
+    system("rm -rf $outroot/$file; cp -rp --parents $file $outroot/");
 
     if ( ($filename =~ (/(.+)[.]java$/)) || ($filename =~ (/(.+)[.]ts$/)) ) {
 
