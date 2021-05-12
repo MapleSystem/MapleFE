@@ -43,6 +43,12 @@ testms:
 testmslocal:
 	./new_runtests.pl typescript TypeScript/tests/cases/compiler
 
+unit:
+	./new_runtests.pl typescript typescript/unit_tests
+
+ms:
+	./new_runtests.pl typescript typescript/ms_tests
+
 full:
 	make -C .. -j8
 
