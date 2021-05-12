@@ -456,7 +456,7 @@ static std::string GetEnumLitData(LitData lit) {{
     case LT_DoubleLiteral:
       return std::to_string(lit.mData.mDouble);
     case LT_BooleanLiteral:
-      return std::to_string(lit.mData.mBool);
+      return std::string(lit.mData.mBool ? "true" : "false");
     case LT_CharacterLiteral:
       return std::string(1, lit.mData.mChar.mData.mChar); // TODO: Unicode support
     case LT_StringLiteral:
@@ -737,7 +737,7 @@ gen_call_child_node = lambda dictionary, node_name, field_name, node_type, acces
 gen_call_child_value = lambda dictionary, node_name, field_name, val_type, accessor: \
         'str += " "s + ' + get_data_based_on_type(val_type, accessor) + ';'
 gen_call_nth_child_node = lambda dictionary, node_name, field_name, node_type, accessor: \
-        'if(auto n = ' + accessor + ') {str += " "s + ' + gen_args[2] + short_name(node_type) + '(n);}'
+        'if(i)str+= ", "s; if(auto n = ' + accessor + ') {str += " "s + ' + gen_args[2] + short_name(node_type) + '(n);}'
 gen_call_nth_child_value = lambda dictionary, node_name, field_name, val_type, accessor: \
         'str += " "s + ' + get_data_based_on_type(val_type, accessor) + ';'
 gen_func_definition_end = lambda dictionary, node_name: \
