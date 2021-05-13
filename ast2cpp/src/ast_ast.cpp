@@ -21,13 +21,12 @@
 namespace maplefe {
 
 void AST_AST::Build() {
-  SplitDecl();
-  AdjustDeclInit();
+  AdjustAST();
 }
 
-void AST_AST::SplitDecl() {
-  if (mTrace) std::cout << "============== SplitDecl ==============" << std::endl;
-  DeclSplitVisitor visitor(mHandler, mTrace, true);
+void AST_AST::AdjustAST() {
+  if (mTrace) std::cout << "============== AdjustAST ==============" << std::endl;
+  AdjustASTVisitor visitor(mHandler, mTrace, true);
   AST_Function *func = mHandler->GetFunction();
   visitor.SetCurrentFunction(mHandler->GetFunction());
   visitor.SetCurrentBB(func->GetEntryBB());
@@ -36,25 +35,13 @@ void AST_AST::SplitDecl() {
   }
 }
 
-DeclNode *DeclSplitVisitor::VisitDeclNode(DeclNode *node) {
-  MASSERT(node->GetVar()->IsIdentifier() && "need to split VarList decl");
-  return node;
-}
-
-void AST_AST::AdjustDeclInit() {
-  if (mTrace) std::cout << "============== AdjustDeclInit ==============" << std::endl;
-  DeclInitVisitor visitor(mHandler, mTrace, true);
-  AST_Function *func = mHandler->GetFunction();
-  visitor.SetCurrentFunction(mHandler->GetFunction());
-  visitor.SetCurrentBB(func->GetEntryBB());
-  for(auto it: mHandler->GetASTModule()->mTrees) {
-    visitor.Visit(it->mRootNode);
-  }
-}
-
-DeclNode *DeclInitVisitor::VisitDeclNode(DeclNode *node) {
+DeclNode *AdjustASTVisitor::VisitDeclNode(DeclNode *node) {
   TreeNode *var = node->GetVar();
+
+  // Check if need to split Decl
   MASSERT(var->IsIdentifier() && "var not Identifier");
+
+  // move Init on Identifier to Decl
   IdentifierNode *inode = static_cast<IdentifierNode *>(var);
   TreeNode *init = inode->GetInit();
   if (init) {

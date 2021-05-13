@@ -35,11 +35,10 @@ class AST_AST {
   ~AST_AST() {}
 
   void  Build();
-  void  SplitDecl();
-  void  AdjustDeclInit();
+  void  AdjustAST();
 };
 
-class DeclSplitVisitor : public AstVisitor {
+class AdjustASTVisitor : public AstVisitor {
  private:
   AST_Handler  *mHandler;
   bool          mTrace;
@@ -48,28 +47,9 @@ class DeclSplitVisitor : public AstVisitor {
   AST_BB       *mCurrentBB;
 
  public:
-  explicit DeclSplitVisitor(AST_Handler *h, bool t, bool base = false)
+  explicit AdjustASTVisitor(AST_Handler *h, bool t, bool base = false)
     : mHandler(h), mTrace(t), AstVisitor(t && base) {}
-  ~DeclSplitVisitor() = default;
-
-  void SetCurrentFunction(AST_Function *f) { mCurrentFunction = f; }
-  void SetCurrentBB(AST_BB *b) { mCurrentBB = b; }
-
-  DeclNode *VisitDeclNode(DeclNode *node);
-};
-
-class DeclInitVisitor : public AstVisitor {
- private:
-  AST_Handler  *mHandler;
-  bool          mTrace;
-
-  AST_Function *mCurrentFunction;
-  AST_BB       *mCurrentBB;
-
- public:
-  explicit DeclInitVisitor(AST_Handler *h, bool t, bool base = false)
-    : mHandler(h), mTrace(t), AstVisitor(t && base) {}
-  ~DeclInitVisitor() = default;
+  ~AdjustASTVisitor() = default;
 
   void SetCurrentFunction(AST_Function *f) { mCurrentFunction = f; }
   void SetCurrentBB(AST_BB *b) { mCurrentBB = b; }
