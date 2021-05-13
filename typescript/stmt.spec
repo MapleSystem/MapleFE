@@ -1092,7 +1092,154 @@ rule ClassElementList : ONEOF(ClassElement,
 ## ;
 
 #############################################################################
+##                   A.5 Scripts and Modules
+#############################################################################
+
+## See 15.1
+## Script : ## ScriptBodyopt
+rule Script : ZEROORONE(ScriptBody)
+
+## See 15.1
+## ScriptBody : ## StatementList
+rule ScriptBody : StatementList
+
+## Module : ModuleBodyopt
+rule Module : ZEROORONE(ModuleBody)
+
+## ModuleBody : ModuleItemList
+rule ModuleBody : ModuleItemList
+
+## ModuleItemList :
+## ModuleItem
+## ModuleItemList ModuleItem
+rule ModuleItemList : ONEOF(ModuleItem,
+                            ModuleItemList + ModuleItem)
+
+## ModuleItem :
+## ImportDeclaration
+## ExportDeclaration
+## StatementListItem
+rule ModuleItem : ONEOF(ImportDeclaration,
+                        ExportDeclaration,
+                        StatementListItem)
+
+## ImportDeclaration :
+## import ImportClause FromClause ;
+## import ModuleSpecifier ;
+rule ImportDeclaration : ONEOF("import" + ImportClause + FromClause + ';',
+                               "import" + ModuleSpecifier + ';')
+  attr.property : Top
+
+## ImportClause :
+## ImportedDefaultBinding
+## NameSpaceImport
+## NamedImports
+## ImportedDefaultBinding , NameSpaceImport
+## ImportedDefaultBinding , NamedImports
+rule ImportClause : ONEOF(ImportedDefaultBinding,
+                          NameSpaceImport,
+                          NamedImports,
+                          ImportedDefaultBinding + ',' + NameSpaceImport,
+                          ImportedDefaultBinding + ',' + NamedImports)
+
+## See 15.2.2
+## ImportedDefaultBinding :
+## ImportedBinding
+rule ImportedDefaultBinding : ImportedBinding
+
+## See 15.2.2
+## NameSpaceImport :
+## * as ImportedBinding
+rule NameSpaceImport : '*' + "as" + ImportedBinding
+
+## See 15.2.2
+## NamedImports :
+## { }
+## { ImportsList }
+## { ImportsList , }
+rule NamedImports : ONEOF('{' + '}',
+                          '{' + ImportsList + '}',
+                          '{' + ImportsList + ',' + '}')
+
+## See 15.2.2
+## FromClause :
+## from ModuleSpecifier
+rule FromClause : "from" + ModuleSpecifier
+
+## See 15.2.2
+## ImportsList :
+## ImportSpecifier
+## ImportsList , ImportSpecifier
+rule ImportsList : ONEOF(ImportSpecifier,
+                         ImportsList + ',' + ImportSpecifier)
+
+## See 15.2.2
+## ImportSpecifier :
+## ImportedBinding
+## IdentifierName as ImportedBinding
+rule ImportSpecifier : ONEOF(ImportedBinding,
+                             Identifier + "as" + ImportedBinding)
+
+## See 15.2.2
+## ModuleSpecifier :
+## StringLiteral
+## NOTE. I loose StringLiteral to Literal to ease parser. 'tsc' will make sure
+##       it's a string literal.
+rule ModuleSpecifier : Literal
+
+## See 15.2.2
+## ImportedBinding :
+## BindingIdentifier
+rule ImportedBinding : BindingIdentifier
+
+## See 15.2.3
+## ExportDeclaration :
+## export * FromClause ;
+## export ExportClause FromClause ;
+## export ExportClause ;
+## export VariableStatement
+## export Declaration
+## export default HoistableDeclaration[Default]
+## export default ClassDeclaration[Default]
+## export default [lookahead ∉ {function, class}] AssignmentExpression[In] ;
+rule ExportDeclaration : ONEOF("export" + '*' + FromClause + ';',
+                               "export" + ExportClause + FromClause + ';',
+                               "export" + ExportClause + ';',
+                               "export" + VariableStatement,
+                               "export" + Declaration,
+                               "export" + "default" + HoistableDeclaration,
+                               "export" + "default" + ClassDeclaration,
+                               "export" + "default" + AssignmentExpression + ';')
+  attr.property : Top
+
+## See 15.2.3
+## ExportClause :
+## { }
+## { ExportsList }
+## { ExportsList , }
+rule ExportClause : ONEOF('{' + '}',
+                          '{' + ExportsList + '}',
+                          '{' + ExportsList + ',' + '}')
+
+## ExportsList :
+## ExportSpecifier
+## ExportsList , ExportSpecifier
+rule ExportsList : ONEOF(ExportSpecifier,
+                         ExportsList + ',' + ExportSpecifier)
+
+## See 15.2.3
+## ExportSpecifier :
+## IdentifierName
+## IdentifierName as IdentifierName
+rule ExportSpecifier : ONEOF(Identifier,
+                             Identifier + "as" + Identifier)
+
+#############################################################################
+#############################################################################
+#############################################################################
 ##                    Below is Typescript specific
+#############################################################################
+#############################################################################
 #############################################################################
 
 #############################################################################

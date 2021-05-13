@@ -1,3 +1,3 @@
-import { add } from "./module-b"
+import { add } from "./module-b";
 var x: number = 20;
 console.log(add(x));

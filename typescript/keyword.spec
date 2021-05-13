@@ -31,7 +31,8 @@ STRUCT KeyWord : ((boolean),
 
                   (get),
                   (set),
-
+                  (as),
+                  (from),
                   (constructor),
 
                   (break),
