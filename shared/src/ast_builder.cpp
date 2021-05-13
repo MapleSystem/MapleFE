@@ -2059,7 +2059,7 @@ TreeNode* ASTBuilder::AddFunctionBody() {
     TreeNode *tree_node = p_body.mData.mTreeNode;
     MASSERT(tree_node->IsBlock() && "Class body is not a BlockNode?");
     BlockNode *block = (BlockNode*)tree_node;
-    func->AddBody(block);
+    func->SetBody(block);
   }
 
   mLastTreeNode = func;
@@ -2087,7 +2087,7 @@ TreeNode* ASTBuilder::AddFunctionBodyTo() {
     TreeNode *tree_node = p_body.mData.mTreeNode;
     MASSERT(tree_node->IsBlock() && "Class body is not a BlockNode?");
     BlockNode *block = (BlockNode*)tree_node;
-    func->AddBody(block);
+    func->SetBody(block);
   }
 
   mLastTreeNode = func;
@@ -2444,7 +2444,7 @@ TreeNode* ASTBuilder::BuildArrayType() {
     new (user_type) UserTypeNode();
     user_type->SetId(basic);
   }
- 
+
   DimensionNode *dims = (DimensionNode*)mTreePool->NewTreeNode(sizeof(DimensionNode));
   new (dims) DimensionNode();
 

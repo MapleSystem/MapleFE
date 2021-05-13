@@ -438,6 +438,7 @@ public:
   TreeNode* GetVar() {return mVar;}
   TreeNode* GetInit() {return mInit;}
 
+  void SetVar(TreeNode *t) {mVar = t; t->SetParent(this);}
   void SetInit(TreeNode *t) {mInit = t; t->SetParent(this);}
 
   DeclProp GetProp() {return mProp;}
@@ -1197,7 +1198,7 @@ public:
   void CleanUp();
 
   BlockNode* GetBody() {return mBody;}
-  void AddBody(BlockNode *b) {mBody = b; b->SetParent(this); CleanUp();}
+  void SetBody(BlockNode *b) {mBody = b; b->SetParent(this); CleanUp();}
 
   bool IsConstructor()    {return mIsConstructor;}
   void SetIsConstructor() {mIsConstructor = true;}
