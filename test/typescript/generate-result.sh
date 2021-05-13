@@ -1,3 +1,4 @@
+#!/bin/bash
 # Copyright (C) [2020] Futurewei Technologies, Inc. All rights reverved.
 # 
 # OpenArkFE is licensed under the Mulan PSL v2.
@@ -12,7 +13,6 @@
 # See the Mulan PSL v2 for more details.
 # 
 
-#!/bin/bash
 FILES=`find . -name "*.ts"`
 for f in $FILES
 do
