@@ -41,7 +41,14 @@ for ts in $LIST; do
   echo "$out"
   cmd=$(grep -n -e "^// .Beginning of AstEmitter:" -e "^// End of AstEmitter.$" <<< "$out" |
     tail -2 | sed 's/:.*//' | xargs | sed 's/\([^ ]*\) \(.*\)/sed -n \1,$((\2+1))p/')
-  [ -n "$cmd" ] && { echo -e "\n====== Reformated ======\n"; eval $cmd <<<"$out" | clang-format-10 | $HIGHLIGHT; }
+  if [ -n "$cmd" ]; then
+    eval $cmd <<<"$out" > "#tmp~.ts"
+    clang-format-10 -i --style="{ColumnLimit: 120}" "#tmp~.ts"
+    echo -e "\n====== Reformated ======\n"
+    $HIGHLIGHT "#tmp~.ts"
+    tsc --target es2015 "#tmp~.ts" >& /dev/null || Failed="$Failed (tsc)$ts"
+    rm -f "#tmp~.ts" "#tmp~.js"
+  fi
   grep -n -e "^digraph $PRE[^{]* {" -e "^}" <<< "$out" | grep -A1 "digraph [^{]* {" |
   if [ -n "$DOT" ]; then
     grep -n -e "^digraph $PRE[^{]* {" -e "^}" <<< "$out" | grep -A1 "digraph [^{]* {" |
@@ -58,5 +65,5 @@ done
 echo
 [ -n "$Failed" ] || exit 0
 echo "Test case(s) failed:"
-echo $Failed | xargs -n1 | sort | nl
+echo $Failed | xargs -n1 | env LC_ALL=C sort | nl
 exit 1
