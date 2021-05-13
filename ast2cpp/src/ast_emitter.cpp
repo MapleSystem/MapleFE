@@ -882,7 +882,7 @@ std::string AstEmitter::AstEmitClassNode(ClassNode *node) {
     return std::string();
   std::string str = "class {"s;
   // Declared at shared/include/ast.h:1284
-  str += " "s + std::to_string(node->IsJavaEnum());
+  //str += " "s + std::to_string(node->IsJavaEnum());
 
   for (unsigned i = 0; i < node->GetSuperClassesNum(); ++i) {
     if (auto n = node->GetSuperClass(i)) {
@@ -902,7 +902,7 @@ std::string AstEmitter::AstEmitClassNode(ClassNode *node) {
 
   for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
     if (auto n = node->GetField(i)) {
-      str += " "s + AstEmitIdentifierNode(n);
+      str += " "s + AstEmitIdentifierNode(n) + ";\n"s;
     }
   }
 
