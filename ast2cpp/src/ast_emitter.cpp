@@ -179,18 +179,16 @@ std::string AstEmitter::AstEmitNewNode(NewNode *node) {
   if (auto n = node->GetId()) {
     str += " "s + AstEmitTreeNode(n);
   }
+  str += "("s;
   auto num = node->GetArgsNum();
-  if(num) {
-    str += "("s;
-    for (unsigned i = 0; i < num; ++i) {
-      if (i)
-        str += ", "s;
-      if (auto n = node->GetArg(i)) {
-        str += AstEmitTreeNode(n);
-      }
+  for (unsigned i = 0; i < num; ++i) {
+    if (i)
+      str += ", "s;
+    if (auto n = node->GetArg(i)) {
+      str += AstEmitTreeNode(n);
     }
-    str += ")"s;
   }
+  str += ")"s;
   if (auto n = node->GetBody()) {
     str += " "s + AstEmitBlockNode(n);
   }
@@ -836,8 +834,13 @@ std::string AstEmitter::AstEmitFunctionNode(FunctionNode *node) {
   }
 
   if (auto n = node->GetBody()) {
-    str += AstEmitBlockNode(n);
-  }
+    auto s = AstEmitBlockNode(n);
+    if(s.empty() || s.front() != '{')
+      str += "{"s + s + "}\n"s;
+    else
+      str += s;
+  } else
+    str += "{}\n"s;
   /*
   if (auto n = node->GetDims()) {
     str += " "s + AstEmitDimensionNode(n);
