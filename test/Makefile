@@ -33,10 +33,10 @@ vpath %.c $(DIRS)
 vpath %.cpp $(DIRS)
 
 .PHONY: $(SRCLANG)
+.PHONY: mssetup
 
-$(SRCLANG):
+$(SRCLANG): mssetup
 	./new_runtests.pl $(SRCLANG)
-
 
 full:
 	make -C .. -j8
@@ -53,6 +53,9 @@ dbg:
 	gdb --args ../output/java/java/java2mpl test.java $(FLAGS)
 
 ifeq ($(SRCLANG),java)
+
+mssetup:
+
 % : %.java
 	@cp $< $(build)
 	@echo gdb --args ../output/java/java/java2mpl $(build)/$@.java $(FLAGS)
@@ -68,13 +71,9 @@ ifeq ($(SRCLANG),java)
 	diff -uwb $(build)/$@.irb.mpl $(build)/$@.irb.irb.mpl
 
 else ifeq ($(SRCLANG),typescript)
-.PHONY: mssetup
 
 mssetup:
 	./msts_test.sh setup
-
-$(SRCLANG): mssetup
-	./new_runtests.pl $(SRCLANG)
 
 testms:
 	./msts_test.sh
