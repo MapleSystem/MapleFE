@@ -1145,7 +1145,7 @@ public:
   bool                mIsInstInit; // Instance Initializer
   SmallVector<AttrId> mAttrs;
 
-  const TreeNode     *mSync;       // Java allows a sync object on a Block.
+  TreeNode           *mSync;       // Java allows a sync object on a Block.
 
 public:
   BlockNode(){mKind = NK_Block; mIsInstInit = false; mSync = NULL;}
@@ -1158,8 +1158,8 @@ public:
   void     AddAttr(AttrId a)          {mAttrs.PushBack(a);}
   AttrId   GetAttrAtIndex(unsigned i) {return mAttrs.ValueAtIndex(i);}
 
-  void  SetSync(const TreeNode *n) {mSync = n;}
-  const TreeNode* GetSync() {return mSync;}
+  void  SetSync(TreeNode *n) {mSync = n;}
+  TreeNode* GetSync() {return mSync;}
 
   unsigned  GetChildrenNum()            {return mChildren.GetNum();}
   TreeNode* GetChildAtIndex(unsigned i) {return mChildren.ValueAtIndex(i);}
