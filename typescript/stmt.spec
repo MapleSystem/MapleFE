@@ -571,7 +571,8 @@ rule Declaration : ONEOF(HoistableDeclaration,
                          ClassDeclaration,
                          LexicalDeclaration,
                          InterfaceDeclaration,
-                         TypeAliasDeclaration)
+                         TypeAliasDeclaration,
+                         EnumDeclaration)
   attr.property : Top
 
 ##-----------------------------------
@@ -1427,3 +1428,25 @@ rule MemberAccessorDeclaration: ONEOF(
 
 ## IndexMemberDeclaration: IndexSignature ;
 rule IndexMemberDeclaration: IndexSignature + ';'
+
+#################################################################################################
+#                                          A.7 Enums
+#################################################################################################
+## EnumDeclaration: constopt enum BindingIdentifier { EnumBodyopt }
+rule EnumDeclaration:
+  ZEROORONE("const") + "enum" + BindingIdentifier + '{' + ZEROORONE(EnumBody) + '}'
+
+## EnumBody: EnumMemberList ,opt
+rule EnumBody: EnumMemberList + ZEROORONE(',')
+
+## EnumMemberList: EnumMember EnumMemberList , EnumMember
+rule EnumMemberList: ONEOF(EnumMember,
+                           EnumMemberList + ',' + EnumMember)
+
+## EnumMember: PropertyName PropertyName = EnumValue
+rule EnumMember: ONEOF(PropertyName,
+                       PropertyName + '=' + EnumValue)
+
+## EnumValue: AssignmentExpression
+rule EnumValue: AssignmentExpression
+
