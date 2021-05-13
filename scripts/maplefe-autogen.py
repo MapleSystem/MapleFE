@@ -387,7 +387,7 @@ gen_func_declaration = lambda dictionary, node_name: \
         "void " + gen_args[2] + node_name + "(" + node_name + "* node);"
 gen_func_definition = lambda dictionary, node_name: \
         "void " + gen_args[1] + "::" + gen_args[2] + node_name + "(" + node_name + "* node) {" \
-        + ('if (node == nullptr) \nreturn;\n' if node_name == "TreeNode" else '\nif(DumpFB("' + node_name \
+        + ('if (node == nullptr){return;}' if node_name == "TreeNode" else '\nif(DumpFB("' + node_name \
         + '", node)) { MASSERT(node->GetKind() == NK_' + node_name.replace('Node', '') + ');')
 gen_call_child_node = lambda dictionary, node_name, field_name, node_type, accessor: \
         ('Dump("' + padding_name(field_name) + ': ' + short_name(node_type) + '*", ' + accessor  + ');\n' \
@@ -537,18 +537,20 @@ gen_func_declaration = lambda dictionary, node_name: \
         'virtual ' + node_name + '* ' + gen_args[2] + node_name + '(' + node_name + '* node);'
 gen_func_definition = lambda dictionary, node_name: \
         node_name + '* ' + gen_args[1] + '::' + gen_args[2] + node_name + '(' + node_name + '* node) {\nif(node != nullptr) {' \
-        + ('\nif(mTrace) std::cout << "Visiting ' + node_name + ', id=" << node->GetNodeId() << "..." << std::endl;' \
+        + ('\nif(mTrace){std::cout << "Visiting ' + node_name + ', id=" << node->GetNodeId() << "..." << std::endl;}' \
         if node_name != 'TreeNode' else '')
 gen_call_child_node = lambda dictionary, node_name, field_name, node_type, accessor: \
-        'if(auto t = ' + accessor + ')' + ('{ auto n = ' + gen_args[2] + node_type + '(t);' \
+        ('if(auto t = ' + accessor + ') {' + ('auto n = ' + gen_args[2] + node_type + '(t);' \
+        + 'if(n != t){' + gen_setter(accessor) + ';}' \
         if node_name != "IdentifierNode" or field_name != "mType" else \
-        'if(t->GetKind() != NK_Class) { auto n = ' + gen_args[2] + node_type + '(t);') \
-        + 'if(n != t) ' + gen_setter(accessor) + '; }'
+        'if(t->GetKind() != NK_Class) { auto n = ' + gen_args[2] + node_type + '(t);' \
+        + 'if(n != t){' + gen_setter(accessor) + ';}}') +'}') if field_name != '' else \
+        'return ' + gen_args[2] + node_type + '(' + accessor + ');\n'
 gen_call_children_node = lambda dictionary, node_name, field_name, node_type, accessor: ''
 gen_call_children_node_end = lambda dictionary, node_name, field_name, node_type, accessor: ''
 gen_call_nth_child_node = lambda dictionary, node_name, field_name, node_type, accessor: \
         'if(auto t = ' + accessor + ') { auto n = ' + gen_args[2] + node_type + '(t);' \
-        + 'if(n != t) ' + gen_setter(accessor) + ';}'
+        + 'if(n != t) {' + gen_setter(accessor) + ';}}'
 gen_func_definition_end = lambda dictionary, node_name: '}\nreturn node;\n}'
 
 # -------------------------------------------------------
