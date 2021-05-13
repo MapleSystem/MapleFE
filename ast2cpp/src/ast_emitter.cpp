@@ -851,7 +851,7 @@ std::string AstEmitter::AstEmitFunctionNode(FunctionNode *node) {
 std::string AstEmitter::AstEmitInterfaceNode(InterfaceNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str = "interface {"s;
+  std::string str = "interface "s + node->GetName() + " {"s;
   // Declared at shared/include/ast.h:1251
   str += std::to_string(node->IsAnnotation());
 
@@ -880,7 +880,7 @@ std::string AstEmitter::AstEmitInterfaceNode(InterfaceNode *node) {
 std::string AstEmitter::AstEmitClassNode(ClassNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str = "class {"s;
+  std::string str = "class "s + node->GetName() + " {"s;
   // Declared at shared/include/ast.h:1284
   //str += " "s + std::to_string(node->IsJavaEnum());
 
