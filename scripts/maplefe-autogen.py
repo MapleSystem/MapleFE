@@ -548,7 +548,7 @@ gen_call_children_node = lambda dictionary, node_name, field_name, node_type, ac
 gen_call_children_node_end = lambda dictionary, node_name, field_name, node_type, accessor: ''
 gen_call_nth_child_node = lambda dictionary, node_name, field_name, node_type, accessor: \
         'if(auto t = ' + accessor + ') { auto n = ' + gen_args[2] + node_type + '(t);' \
-        + ' /* if(n != t) ' + gen_setter(accessor) + '; */ }'
+        + 'if(n != t) ' + gen_setter(accessor) + ';}'
 gen_func_definition_end = lambda dictionary, node_name: '}\nreturn node;\n}'
 
 # -------------------------------------------------------

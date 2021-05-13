@@ -109,8 +109,9 @@ public:
   const char* GetName() {return mId->GetName();}
 
   unsigned GetTypeArgumentsNum() {return mTypeArguments.GetNum();}
-  IdentifierNode* GetTypeArgument(unsigned i) {return mTypeArguments.ValueAtIndex(i);}
   void     AddTypeArgs(TreeNode *n);
+  IdentifierNode* GetTypeArgument(unsigned i) {return mTypeArguments.ValueAtIndex(i);}
+  void            SetTypeArgument(unsigned i, IdentifierNode* n) {*(mTypeArguments.RefAtIndex(i)) = n;}
 
   UT_Type GetType() {return mType;}
   void SetType(UT_Type t) {mType = t;}

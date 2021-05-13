@@ -314,6 +314,7 @@ public:
 
   unsigned  GetArgsNum()        {return mArgs.GetNum();}
   TreeNode* GetArg(unsigned i)  {return mArgs.ValueAtIndex(i);}
+  void      SetArg(unsigned i, TreeNode* n) {*(mArgs.RefAtIndex(i)) = n;}
   void      AddArg(TreeNode *t) {mArgs.PushBack(t);}
 
   void ReplaceChild(TreeNode *oldone, TreeNode *newone);
@@ -356,11 +357,8 @@ public:
   ~DimensionNode(){Release();}
 
   unsigned GetDimensionsNum() {return mDimensions.GetNum();}
-  unsigned GetDimension(unsigned n) {return mDimensions.ValueAtIndex(n);} // 0 means unspecified.
-  void     SetDimension(unsigned n, unsigned i) {
-    unsigned *addr = mDimensions.RefAtIndex(n);
-    *addr = i;
-  }
+  unsigned GetDimension(unsigned i) {return mDimensions.ValueAtIndex(i);} // 0 means unspecified.
+  void     SetDimension(unsigned i, unsigned n) {*(mDimensions.RefAtIndex(i)) = n;}
   void AddDim(unsigned i = 0) {mDimensions.PushBack(i);}
   void Merge(const TreeNode*);
 
@@ -405,6 +403,7 @@ public:
   unsigned GetAttrsNum() const        {return mAttrs.GetNum();}
   void     AddAttr(AttrId a)          {mAttrs.PushBack(a);}
   AttrId   GetAttrAtIndex(unsigned i) {return mAttrs.ValueAtIndex(i);}
+  void     SetAttrAtIndex(unsigned i, AttrId n) {*(mAttrs.RefAtIndex(i)) = n;}
 
   void Release() { if (mDims) mDims->Release();}
   void Dump(unsigned);
@@ -594,6 +593,7 @@ public:
 
   unsigned  GetExprsNum()       {return mExprs.GetNum();}
   TreeNode* GetExprAtIndex(unsigned i) {return mExprs.ValueAtIndex(i);}
+  void      SetExprAtIndex(unsigned i, TreeNode* n) {*(mExprs.RefAtIndex(i)) = n;}
   void      AddExpr(TreeNode *n){mExprs.PushBack(n);}
 
   void Release() {mExprs.Release();}
@@ -611,6 +611,7 @@ public:
 
   unsigned  GetLiteralsNum()       {return mLiterals.GetNum();}
   TreeNode* GetLiteral(unsigned i) {return mLiterals.ValueAtIndex(i);}
+  void      SetLiteral(unsigned i, TreeNode* n) {*(mLiterals.RefAtIndex(i)) = n;}
   void      AddLiteral(TreeNode *n){mLiterals.PushBack(n);}
 
   void Release() {mLiterals.Release();}
@@ -647,6 +648,7 @@ public:
 
   unsigned        GetFieldsNum() {return mFields.GetNum();}
   IdentifierNode* GetField(unsigned i) {return mFields.ValueAtIndex(i);}
+  void            SetField(unsigned i, IdentifierNode* n) {*(mFields.RefAtIndex(i)) = n;}
   void            AddField(IdentifierNode *n) {mFields.PushBack(n);}
 
   void Release() {mFields.Release();}
@@ -679,6 +681,7 @@ public:
 
   unsigned          GetFieldsNum() {return mFields.GetNum();}
   FieldLiteralNode* GetField(unsigned i) {return mFields.ValueAtIndex(i);}
+  void              SetField(unsigned i, FieldLiteralNode* n) {*(mFields.RefAtIndex(i)) = n;}
   void              AddField(FieldLiteralNode *d) {mFields.PushBack(d);}
 
   void Dump(unsigned);
@@ -699,6 +702,7 @@ public:
 
   unsigned GetVarsNum() {return mVars.GetNum();}
   IdentifierNode* GetVarAtIndex(unsigned i) {return mVars.ValueAtIndex(i);}
+  void            SetVarAtIndex(unsigned i, IdentifierNode* n) {*(mVars.RefAtIndex(i)) = n;}
 
   void AddVar(IdentifierNode *n);
   void Merge(TreeNode*);
@@ -721,6 +725,7 @@ public:
 
   unsigned GetExprsNum() {return mExprs.GetNum();}
   TreeNode* GetExprAtIndex(unsigned i) {return mExprs.ValueAtIndex(i);}
+  void      SetExprAtIndex(unsigned i, TreeNode* n) {*(mExprs.RefAtIndex(i)) = n;}
 
   void AddExpr(TreeNode *n) {mExprs.PushBack(n);}
   void Merge(TreeNode*);
@@ -764,6 +769,7 @@ public:
 
   unsigned  GetExceptionsNum() {return mExceptions.GetNum();}
   TreeNode* GetExceptionAtIndex(unsigned i) {return mExceptions.ValueAtIndex(i);}
+  void      SetExceptionAtIndex(unsigned i, TreeNode* n) {*(mExceptions.RefAtIndex(i)) = n;}
   void      AddException(TreeNode *n);
 
   void Dump(unsigned);
@@ -789,6 +795,7 @@ public:
 
   unsigned  GetParamsNum() {return mParams.GetNum();}
   TreeNode* GetParamAtIndex(unsigned i) {return mParams.ValueAtIndex(i);}
+  void      SetParamAtIndex(unsigned i, TreeNode* n) {*(mParams.RefAtIndex(i)) = n;}
   void      AddParam(TreeNode *n);
 
   void Dump(unsigned);
@@ -825,6 +832,7 @@ public:
 
   unsigned   GetCatchesNum() {return mCatches.GetNum();}
   CatchNode* GetCatchAtIndex(unsigned i) {return mCatches.ValueAtIndex(i);}
+  void       SetCatchAtIndex(unsigned i, CatchNode* n) {*(mCatches.RefAtIndex(i)) = n;}
   void       AddCatch(TreeNode *n);
 
   void Dump(unsigned);
@@ -953,7 +961,9 @@ public:
   unsigned GetInitsNum()     {return mInits.GetNum();}
   unsigned GetUpdatesNum()   {return mUpdates.GetNum();}
   TreeNode* GetInitAtIndex(unsigned i)   {return mInits.ValueAtIndex(i);}
+  void      SetInitAtIndex(unsigned i, TreeNode* n) {*(mInits.RefAtIndex(i)) = n;}
   TreeNode* GetUpdateAtIndex(unsigned i) {return mUpdates.ValueAtIndex(i);}
+  void      SetUpdateAtIndex(unsigned i, TreeNode* n) {*(mUpdates.RefAtIndex(i)) = n;}
   TreeNode* GetCond() {return mCond;}
   TreeNode* GetBody() {return mBody;}
 
@@ -1041,11 +1051,13 @@ public:
   ~SwitchCaseNode() {Release();}
 
   unsigned  GetLabelsNum()            {return mLabels.GetNum();}
-  TreeNode* GetLabelAtIndex(unsigned i) {return mLabels.ValueAtIndex(i);}
   void      AddLabel(TreeNode*);
+  SwitchLabelNode* GetLabelAtIndex(unsigned i) {return mLabels.ValueAtIndex(i);}
+  void             SetLabelAtIndex(unsigned i, SwitchLabelNode* n) {*(mLabels.RefAtIndex(i)) = n;}
 
   unsigned  GetStmtsNum()            {return mStmts.GetNum();}
   TreeNode* GetStmtAtIndex(unsigned i) {return mStmts.ValueAtIndex(i);}
+  void      SetStmtAtIndex(unsigned i, TreeNode* n) {*(mStmts.RefAtIndex(i)) = n;}
   void      AddStmt(TreeNode*);
 
   void Release() {mStmts.Release(); mLabels.Release();}
@@ -1064,8 +1076,9 @@ public:
   void SetExpr(TreeNode *c) {mExpr = c;}
 
   unsigned  GetCasesNum() {return mCases.GetNum();}
-  TreeNode* GetCaseAtIndex(unsigned i) {return mCases.ValueAtIndex(i);}
   void      AddCase(TreeNode *c);
+  SwitchCaseNode* GetCaseAtIndex(unsigned i) {return mCases.ValueAtIndex(i);}
+  void            SetCaseAtIndex(unsigned i, SwitchCaseNode* n) {*(mCases.RefAtIndex(i)) = n;}
 
   void Release() {mCases.Release();}
   void Dump(unsigned);
@@ -1113,6 +1126,7 @@ public:
   void AddArg(TreeNode *t);
   unsigned GetArgsNum() {return mArgs.GetExprsNum();}
   TreeNode* GetArg(unsigned index) {return mArgs.GetExprAtIndex(index);}
+  void      SetArg(unsigned i, TreeNode* n) {mArgs.SetExprAtIndex(i, n);}
 
   void Release() {mArgs.Release();}
   void Dump(unsigned);
@@ -1157,12 +1171,14 @@ public:
   unsigned GetAttrsNum()              {return mAttrs.GetNum();}
   void     AddAttr(AttrId a)          {mAttrs.PushBack(a);}
   AttrId   GetAttrAtIndex(unsigned i) {return mAttrs.ValueAtIndex(i);}
+  void     SetAttrAtIndex(unsigned i, AttrId n) {*(mAttrs.RefAtIndex(i)) = n;}
 
   void  SetSync(TreeNode *n) {mSync = n;}
   TreeNode* GetSync() {return mSync;}
 
   unsigned  GetChildrenNum()            {return mChildren.GetNum();}
   TreeNode* GetChildAtIndex(unsigned i) {return mChildren.ValueAtIndex(i);}
+  void      SetChildAtIndex(unsigned i, TreeNode* n) {*(mChildren.RefAtIndex(i)) = n;}
   void      AddChild(TreeNode *c);
   void      ClearChildren()             {mChildren.Clear();}
 
@@ -1205,22 +1221,26 @@ public:
 
   unsigned  GetParamsNum()        {return mParams.GetNum();}
   TreeNode* GetParam(unsigned i)  {return mParams.ValueAtIndex(i);}
+  void      SetParam(unsigned i, TreeNode* n) {*(mParams.RefAtIndex(i)) = n;}
   void      AddParam(TreeNode *t) {mParams.PushBack(t); t->SetParent(this);}
 
   // Attributes related
   unsigned GetAttrsNum()              {return mAttrs.GetNum();}
   void     AddAttr(AttrId a)          {mAttrs.PushBack(a);}
   AttrId   GetAttrAtIndex(unsigned i) {return mAttrs.ValueAtIndex(i);}
+  void     SetAttrAtIndex(unsigned i, AttrId n) {*(mAttrs.RefAtIndex(i)) = n;}
 
   // Annotation/Pragma related
   unsigned GetAnnotationsNum()           {return mAnnotations.GetNum();}
   void     AddAnnotation(AnnotationNode *n) {mAnnotations.PushBack(n);}
   AnnotationNode* GetAnnotationAtIndex(unsigned i) {return mAnnotations.ValueAtIndex(i);}
+  void            SetAnnotationAtIndex(unsigned i, AnnotationNode* n) {*(mAnnotations.RefAtIndex(i)) = n;}
 
   // Exception/throw related
   unsigned       GetThrowsNum()               {return mThrows.GetNum();}
   void           AddThrow(ExceptionNode *n)   {mThrows.PushBack(n);}
   ExceptionNode* GetThrowAtIndex(unsigned i)  {return mThrows.ValueAtIndex(i);}
+  void           SetThrowAtIndex(unsigned i, ExceptionNode* n) {*(mThrows.RefAtIndex(i)) = n;}
 
   void SetType(TreeNode *t) {mType = t;}
   TreeNode* GetType(){return mType;}
@@ -1262,14 +1282,17 @@ public:
   unsigned       GetSuperInterfacesNum()              {return mSuperInterfaces.GetNum();}
   void           AddSuperInterface(InterfaceNode* a)  {mSuperInterfaces.PushBack(a);}
   InterfaceNode* GetSuperInterfaceAtIndex(unsigned i) {return mSuperInterfaces.ValueAtIndex(i);}
+  void           SetSuperInterfaceAtIndex(unsigned i, InterfaceNode* n) {*(mSuperInterfaces.RefAtIndex(i)) = n;}
 
   unsigned        GetFieldsNum()              {return mFields.GetNum();}
   void            AddField(IdentifierNode* a) {mFields.PushBack(a);}
   IdentifierNode* GetFieldAtIndex(unsigned i) {return mFields.ValueAtIndex(i);}
+  void            SetFieldAtIndex(unsigned i, IdentifierNode* n) {*(mFields.RefAtIndex(i)) = n;}
 
   unsigned      GetMethodsNum()              {return mMethods.GetNum();}
   void          AddMethod(FunctionNode* a)   {mMethods.PushBack(a);}
   FunctionNode* GetMethodAtIndex(unsigned i) {return mMethods.ValueAtIndex(i);}
+  void          SetMethodAtIndex(unsigned i, FunctionNode* n) {*(mMethods.RefAtIndex(i)) = n;}
 
   void SetIsAnnotation(bool b) {mIsAnnotation = b;}
   bool IsAnnotation()          {return mIsAnnotation;}
@@ -1322,14 +1345,23 @@ public:
   unsigned GetLocalClassesNum()    {return mLocalClasses.GetNum();}
   unsigned GetLocalInterfacesNum() {return mLocalInterfaces.GetNum();}
   ClassNode* GetSuperClass(unsigned i)         {return mSuperClasses.ValueAtIndex(i);}
+  void       SetSuperClass(unsigned i, ClassNode* n) {*(mSuperClasses.RefAtIndex(i)) = n;}
   InterfaceNode* GetSuperInterface(unsigned i) {return mSuperInterfaces.ValueAtIndex(i);}
+  void           SetSuperInterface(unsigned i, InterfaceNode* n) {*(mSuperInterfaces.RefAtIndex(i)) = n;}
   AttrId GetAttribute(unsigned i)              {return mAttributes.ValueAtIndex(i);}
+  void   SetAttribute(unsigned i, AttrId n) {*(mAttributes.RefAtIndex(i)) = n;}
   IdentifierNode* GetField(unsigned i)         {return mFields.ValueAtIndex(i);}
+  void            SetField(unsigned i, IdentifierNode* n) {*(mFields.RefAtIndex(i)) = n;}
   FunctionNode* GetMethod(unsigned i)          {return mMethods.ValueAtIndex(i);}
+  void          SetMethod(unsigned i, FunctionNode* n) {*(mMethods.RefAtIndex(i)) = n;}
   FunctionNode* GetConstructor(unsigned i)     {return mConstructors.ValueAtIndex(i);}
+  void          SetConstructor(unsigned i, FunctionNode* n) {*(mConstructors.RefAtIndex(i)) = n;}
   BlockNode* GetInstInit(unsigned i)       {return mInstInits.ValueAtIndex(i);}
+  void       SetInstInit(unsigned i, BlockNode* n) {*(mInstInits.RefAtIndex(i)) = n;}
   ClassNode* GetLocalClass(unsigned i)     {return mLocalClasses.ValueAtIndex(i);}
+  void       SetLocalClass(unsigned i, ClassNode* n) {*(mLocalClasses.RefAtIndex(i)) = n;}
   InterfaceNode* GetLocalInterface(unsigned i)  {return mLocalInterfaces.ValueAtIndex(i);}
+  void           SetLocalInterface(unsigned i, InterfaceNode* n) {*(mLocalInterfaces.RefAtIndex(i)) = n;}
 
   void Construct(BlockNode*);
   void Release();
@@ -1354,8 +1386,8 @@ public:
   ~PassNode() {Release();}
 
   unsigned  GetChildrenNum() {return mChildren.GetNum();}
-  TreeNode* GetChild(unsigned idx) {return mChildren.ValueAtIndex(idx);}
-  void SetChild(unsigned idx, TreeNode *t) {*(mChildren.RefAtIndex(idx)) = t;}
+  TreeNode* GetChild(unsigned i) {return mChildren.ValueAtIndex(i);}
+  void      SetChild(unsigned i, TreeNode* n) {*(mChildren.RefAtIndex(i)) = n;}
 
   void AddChild(TreeNode *c) {mChildren.PushBack(c); c->SetParent(this);}
   void Dump(unsigned);
@@ -1400,6 +1432,7 @@ public:
 
   unsigned  GetParamsNum()        {return mParams.GetNum();}
   TreeNode* GetParam(unsigned i)  {return mParams.ValueAtIndex(i);}
+  void      SetParam(unsigned i, TreeNode* n) {*(mParams.RefAtIndex(i)) = n;}
   void      AddParam(TreeNode *n) {mParams.PushBack(n); n->SetParent(this);}
 
   void Release() {mParams.Release();}
