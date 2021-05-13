@@ -212,14 +212,12 @@ def gen_handler_ast_node(dictionary):
             access = m.get("Access")
             accessstr = access if access != None else ""
             if ntype != None:
-                prefix = "const_cast<" + ntype + "*>(" if otype[:6] == "const " else ''
-                suffix = ")" if prefix != '' else ''
                 if member_functions.get(plural) != None:
                     # gen_call_child_node() for child node in current function body
-                    code.append(gen_call_child_node(dictionary, node_name, name, ntype, prefix + "node->" + plural + "()" + suffix))
+                    code.append(gen_call_child_node(dictionary, node_name, name, ntype, "node->" + plural + "()"))
                 else:
                     # It is an ERROR if no member function for the child node
-                    code.append("Error!; // " + gen_call_child_node(dictionary, node_name, name, ntype, prefix + "node->" + plural + "()" + suffix))
+                    code.append("Error!; // " + gen_call_child_node(dictionary, node_name, name, ntype, "node->" + plural + "()"))
             elif ((otype == "SmallVector" or otype == "SmallList" or otype == "ExprListNode")
                     and member_functions.get(plural + "Num") != None
                     and (member_functions.get(singular) != None or member_functions.get(singular + "AtIndex") != None)):
@@ -232,10 +230,8 @@ def gen_handler_ast_node(dictionary):
                     code.append(gen_call_children_node(dictionary, node_name, name, otype + "<" + rtype + ">", "node->" + plural + "Num()"))
                     code.append("for(unsigned i = 0; i < node->" + plural + "Num(); ++i) {")
                     if ntype != None:
-                        prefix = "const_cast<" + ntype + "*>(" if rtype[:6] == "const " else ''
-                        suffix = ")" if prefix != '' else ''
                         # gen_call_nth_child_node() for the nth child node in the loop for the list or vector
-                        code.append(gen_call_nth_child_node(dictionary, node_name, name, ntype, prefix + "node->" + func_name + "(i)" + suffix))
+                        code.append(gen_call_nth_child_node(dictionary, node_name, name, ntype, "node->" + func_name + "(i)"))
                     else:
                         # gen_call_nth_child_value() for the nth child value in the loop for the list or vector
                         code.append(gen_call_nth_child_value(dictionary, node_name, name, rtype, "node->" + func_name + "(i)"))
