@@ -12,6 +12,17 @@ Directories:
 ./typescript/ms_tests    TypeScript official test cases. Included the LICENSE for them.
 ./typescript/unit_tests  Unit test cases
 
+To run TypeScript tests:
+  1. source envsetup typescript; cd $MAPLEFE_ROOT/test
+  2. Run both unit_tests and ms_tests:
+       make
+     Run just unit_tests
+       make unit
+     Run just ms_tests
+       make ms
+     Run specific typescript test
+       make <testcase name>
+     * Tests should be run using make instead of using the .pl scripts directly.
 
 Tool to dump AST and CFG of a TypeScript test case:
 

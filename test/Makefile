@@ -37,17 +37,6 @@ vpath %.cpp $(DIRS)
 $(SRCLANG):
 	./new_runtests.pl $(SRCLANG)
 
-testms:
-	./msts_test.sh
-
-testmslocal:
-	./new_runtests.pl typescript TypeScript/tests/cases/compiler
-
-unit:
-	./new_runtests.pl typescript typescript/unit_tests
-
-ms:
-	./new_runtests.pl typescript typescript/ms_tests
 
 full:
 	make -C .. -j8
@@ -79,6 +68,26 @@ ifeq ($(SRCLANG),java)
 	diff -uwb $(build)/$@.irb.mpl $(build)/$@.irb.irb.mpl
 
 else ifeq ($(SRCLANG),typescript)
+.PHONY: mssetup
+
+mssetup:
+	./msts_test.sh setup
+
+$(SRCLANG): mssetup
+	./new_runtests.pl $(SRCLANG)
+
+testms:
+	./msts_test.sh
+
+testmslocal: mssetup
+	./new_runtests.pl typescript TypeScript/tests/cases/compiler
+
+unit:
+	./new_runtests.pl typescript typescript/unit_tests
+
+ms: mssetup
+	./new_runtests.pl typescript typescript/ms_tests
+
 % : %.ts
 	@cp $< $(build)
 	@echo gdb --args ../output/typescript/typescript/ts2cpp $(build)/$@.ts $(FLAGS)

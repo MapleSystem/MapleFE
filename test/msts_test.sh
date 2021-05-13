@@ -1,5 +1,6 @@
 #!/bin/bash
 
+[ -n "$MAPLEFE_ROOT" ] || { echo MAPLE_ROOT not set. Please source envsetup.sh.; exit 1; }
 cd ${MAPLEFE_ROOT}/test
 
 if [ ! -d ${MAPLEFE_ROOT}/test/TypeScript ]; then
@@ -7,7 +8,12 @@ if [ ! -d ${MAPLEFE_ROOT}/test/TypeScript ]; then
 fi
 
 if [ -f ${MAPLEFE_ROOT}/test/msts_testlist ]; then
-  cat msts_testlist | xargs -n1 -I % sh -c '{ if [ ! -f % ]; then rm typescript/ms_tests/%; cp TypeScript/tests/cases/compiler/% typescript/ms_tests/; fi }'
+  cat msts_testlist | xargs -n1 -I % sh -c '{ rm -f typescript/ms_tests/%; cp -f TypeScript/tests/cases/compiler/% typescript/ms_tests/; cp -f TypeScript/LICENSE.txt typescript/ms_tests/; }'
+fi
+
+# setup files only. do not run test
+if [ "x$1" = "xsetup" ]; then
+  exit 0
 fi
 
 # export is for sh -c in xargs
