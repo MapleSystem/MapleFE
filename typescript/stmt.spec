@@ -1156,9 +1156,12 @@ rule PredefinedType: TYPE
 rule TypeReference: TypeName + ZEROORONE(TypeArguments)
 
 ## rule TypeName: IdentifierReference NamespaceName . IdentifierReference
-rule TypeName: IdentifierReference
+rule TypeName: ONEOF(IdentifierReference,
+                     NamespaceName + '.' + IdentifierReference)
 
 ## rule NamespaceName: IdentifierReference NamespaceName . IdentifierReference
+rule NamespaceName: ONEOF(IdentifierReference,
+                          NamespaceName + '.' + IdentifierReference)
 
 ## rule ObjectType: { TypeBodyopt }
 rule ObjectType : '{' + ZEROORONE(TypeBody) + '}'
@@ -1450,3 +1453,54 @@ rule EnumMember: ONEOF(PropertyName,
 ## EnumValue: AssignmentExpression
 rule EnumValue: AssignmentExpression
 
+#################################################################################################
+##                                  A.8 Namespaces
+#################################################################################################
+
+##NamespaceDeclaration: namespace IdentifierPath { NamespaceBody }
+rule NamespaceDeclaration: "namespace" + IdentifierPath + '{' + NamespaceBody + '}'
+
+##IdentifierPath: BindingIdentifier IdentifierPath . BindingIdentifier
+rule IdentifierPath: ONEOF(BindingIdentifier,
+                           IdentifierPath + '.' + BindingIdentifier)
+
+##NamespaceBody: NamespaceElementsopt
+rule NamespaceBody: ZEROORONE(NamespaceElements)
+
+##NamespaceElements: NamespaceElement NamespaceElements NamespaceElement
+rule NamespaceElements: ONEOF(NamespaceElement,
+                              NamespaceElements + NamespaceElement)
+
+##NamespaceElement: Statement LexicalDeclaration FunctionDeclaration GeneratorDeclaration ClassDeclaration InterfaceDeclaration TypeAliasDeclaration EnumDeclaration NamespaceDeclaration AmbientDeclaration ImportAliasDeclaration ExportNamespaceElement
+rule NamespaceElement: ONEOF(Statement,
+                             LexicalDeclaration,
+                             FunctionDeclaration,
+                             #GeneratorDeclaration,
+                             ClassDeclaration,
+                             InterfaceDeclaration,
+                             TypeAliasDeclaration,
+                             EnumDeclaration,
+                             NamespaceDeclaration,
+                             #AmbientDeclaration,
+                             ImportAliasDeclaration,
+                             ExportNamespaceElement)
+
+##ExportNamespaceElement: export VariableStatement export LexicalDeclaration export FunctionDeclaration export GeneratorDeclaration export ClassDeclaration export InterfaceDeclaration export TypeAliasDeclaration export EnumDeclaration export NamespaceDeclaration export AmbientDeclaration export ImportAliasDeclaration
+rule ExportNamespaceElement: ONEOF("export" + VariableStatement,
+                                   "export" + LexicalDeclaration
+                                   "export" + FunctionDeclaration,
+#                                   "export" + GeneratorDeclaration,
+                                   "export" + ClassDeclaration,
+                                   "export" + InterfaceDeclaration,
+                                   "export" + TypeAliasDeclaration,
+                                   "export" + EnumDeclaration,
+                                   "export" + NamespaceDeclaration,
+#                                   "export" + AmbientDeclaration,
+                                   "export" + ImportAliasDeclaration)
+
+##ImportAliasDeclaration: import BindingIdentifier = EntityName ;
+rule ImportAliasDeclaration: "import" + BindingIdentifier + '=' + EntityName + ';'
+
+##EntityName: NamespaceName NamespaceName . IdentifierReference
+rule EntityName: ONEOF(NamespaceName,
+                       NamespaceName + '.' + IdentifierReference)
