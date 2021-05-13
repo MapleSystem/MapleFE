@@ -528,6 +528,9 @@ handle_src_include_files(Finalization)
 
 ################################################################################
 
+def gen_setter(accessor):
+    return accessor.replace("Get", "Set").replace("()", "(n)").replace("(i)", "(i,n)")
+
 # The follwoing gen_func_* and gen_call* functions are for AstVisitor
 gen_call_handle_values = lambda: False
 gen_func_declaration = lambda dictionary, node_name: \
@@ -537,13 +540,15 @@ gen_func_definition = lambda dictionary, node_name: \
         + ('\nif(mTrace) std::cout << "Visiting ' + node_name + ', id=" << node->GetNodeId() << "..." << std::endl;' \
         if node_name != 'TreeNode' else '')
 gen_call_child_node = lambda dictionary, node_name, field_name, node_type, accessor: \
-        'if(auto t = ' + accessor + ') ' + (gen_args[2] + node_type + '(t);' \
+        'if(auto t = ' + accessor + ')' + ('{ auto n = ' + gen_args[2] + node_type + '(t);' \
         if node_name != "IdentifierNode" or field_name != "mType" else \
-        '{if(t->GetKind() != NK_Class)' + gen_args[2] + node_type + '(t);}')
+        'if(t->GetKind() != NK_Class) { auto n = ' + gen_args[2] + node_type + '(t);') \
+        + 'if(n != t) ' + gen_setter(accessor) + '; }'
 gen_call_children_node = lambda dictionary, node_name, field_name, node_type, accessor: ''
 gen_call_children_node_end = lambda dictionary, node_name, field_name, node_type, accessor: ''
 gen_call_nth_child_node = lambda dictionary, node_name, field_name, node_type, accessor: \
-        'if(auto t = ' + accessor + ') ' + gen_args[2] + node_type + '(t);'
+        'if(auto t = ' + accessor + ') { auto n = ' + gen_args[2] + node_type + '(t);' \
+        + ' /* if(n != t) ' + gen_setter(accessor) + '; */ }'
 gen_func_definition_end = lambda dictionary, node_name: '}\nreturn node;\n}'
 
 # -------------------------------------------------------
@@ -780,4 +785,3 @@ if False:
     append(include_file, astemit_init)
     handle_yaml(initial_yaml, gen_handler)
     handle_src_include_files(Finalization)
-
