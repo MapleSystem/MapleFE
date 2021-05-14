@@ -1,7 +1,7 @@
 ## Overview
 The Python script `maplefe-autogen.py` is a tool to generate the code for class `AstVisitor`, `AstDump`, `AstGraph`, etc.
 
-## How does it works?
+## How does it work?
 
 It makes use of `clang-doc-10` to parse source file `ast_builder.cpp` and get its documentation files in YAML format.
 These YAML files are fed into `maplefe-autogen.py` to generate C++ header and source files as described below.
@@ -66,7 +66,7 @@ the C++ header file.
 gen_func_definition = lambda dictionary, node_name: ...
 ```
 Function `gen_func_definition` returns a string for the definition of a function for an AST node `node_name`. The result will be in
-the C++ source file. Any code occurs at the beginning of its function body can be placed here. 
+the C++ source file. Any code which occurs at the beginning of its function body can be placed here.
 
 
 ```python
@@ -93,9 +93,9 @@ SmallVector or SmallList node `field_name`. It returns an empty string for `AstV
 ```python
 gen_func_definition_end = lambda dictionary, node_name: '}\nreturn node;\n}'
 ```
-Function `gen_func_definition_end` return a string with the statements at the end of the function body.
+Function `gen_func_definition_end` returns a string with the statements at the end of the function body.
 
-Since it does not need to handle any non-AST-node values, so some functions for values are missing for `AstVisitor`.
+Since it does not need to handle any non-AST-node values, therefore some functions for values are missing for `AstVisitor`.
 
 ### 4. Generate the code in C++ header and source files 
 
@@ -107,23 +107,17 @@ handle_yaml(initial_yaml, gen_handler)
 handle_src_include_files(Finalization)
 ```
 
-The `initialization` and `finalization` have to be called at the beginning and end of the block above.
-```python
-handle_src_include_files(Initialization)
-... ...
-handle_src_include_files(Finalization)
-```
+It has to call `handle_src_include_files(Initialization)` and `handle_src_include_files(Finalization)` at the beginning and end of the block as shown above.
 
-This part is to append the code in list `astvisitor_init` to the C++ header file. 
 ```python
 append(include_file, astvisitor_init)
 ```
+This is to append the code in list `astvisitor_init` to the C++ header file. 
 
-This part is the major one which calls the `gen_func_*` and `gen_call_*` callback functions defined at step 3 and generate
-the code in C++ header and source files with them.
 ```python
 handle_yaml(initial_yaml, gen_handler)
 ```
+This function call `handle_yaml(initial_yaml, gen_handler)` is to handle all related YAML file, call the `gen_func_*` and `gen_call_*` callback functions defined at step 3, and generate the code in C++ header and source files with them.
 
 ## Where are the generated files located?
 
