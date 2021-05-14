@@ -33,11 +33,11 @@ cd MapleFE/test/typescript/unit_tests
 
 This is the CFG graph of function `binarySearch`.
 
-<img src="https://images.gitee.com/uploads/images/2021/0514/151722_a7245ff7_5583371.png" height="640">
+<img src="https://images.gitee.com/uploads/images/2021/0514/151722_a7245ff7_5583371.png" height="480">
 
 ### 3. TypeScript code converted from the corresponding AST
 
 This is the TypeScript code generated from AST.
 
-![TypeScript code generated from AST](https://images.gitee.com/uploads/images/2021/0514/152039_16636b7d_5583371.png "binary-search.ts.PNG")
+<img src="https://images.gitee.com/uploads/images/2021/0514/152039_16636b7d_5583371.png" height="480">
 
