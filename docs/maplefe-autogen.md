@@ -1,5 +1,10 @@
 ## Overview
-The Python script `maplefe-autogen.py` is a tool to generate the code for class `AstVisitor`, `AstDump`, `AstGraph`, etc.
+The Python script `maplefe-autogen.py` is a tool to generate the code for class `AstVisitor`, `AstDump`, `AstGraph`,
+etc. for AST tree.
+
+Whenever a new kind of AST tree node is introduced for a new language feature in the future, or any changes are made
+to the existing AST tree node, these classes will be updated automatically. It reduces the maintenance effort and
+ensures the consistency and completeness of these classes.
 
 ## How does it work?
 
