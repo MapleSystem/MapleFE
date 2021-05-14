@@ -138,6 +138,74 @@ public:
 };
 
 //////////////////////////////////////////////////////////////////////////
+//                     XXportAsPair Node
+// In JS, the import or export support: xxport {x as y}
+// Its kind of like a mapping of internal name to extern name.
+//
+// Some special case.
+//
+// 1. Export may export a declaration like:
+//      export function(xxx) {...}
+//    In this case only mBefore is used to point to the function or other
+//    declarations.
+// 2. Export/Import everything '*' as 'xxx'.
+//    In this case, mIsEverything is set, mAfter is pointing to 'xxx'.
+// 3. so on.
+//////////////////////////////////////////////////////////////////////////
+
+class XXportAsPairNode : public TreeNode {
+private:
+  bool      mIsDefault;     // import or export 'default'
+  bool      mIsEverything;  // import or export '*', which is everything
+  TreeNode *mBefore;      // name before 'as'
+  TreeNode *mAfter;       // name after 'as'
+
+public:
+  XXportAsPairNode() : mIsDefault(false), mIsEverything(false),
+                       mBefore(NULL), mAfter(NULL) {mKind = NK_XXportAsPair;}
+  ~XXportAsPairNode() {}
+
+  bool IsDefault()       {return mIsDefault;}
+  void SetIsDefault(bool b) {mIsDefault = b;}
+
+  bool IsEverything()       {return mIsEverything;}
+  void SetIsEverything(bool b) {mIsEverything = b;}
+
+  TreeNode* GetBefore() {return mBefore;}
+  void SetBefore(TreeNode *t) {mBefore = t;}
+
+  TreeNode* GetAfter() {return mAfter;}
+  void SetAfter(TreeNode *t) {mAfter = t;}
+
+  void Dump(unsigned indent);
+};
+
+//////////////////////////////////////////////////////////////////////////
+//                         Export Nodes
+// export first comes from Javascript.
+//////////////////////////////////////////////////////////////////////////
+
+class ExportNode : public TreeNode {
+private:
+  TreeNode       *mTarget;    // the exported package in Java or module in JS
+  SmallVector<XXportAsPairNode*> mPairs;
+public:
+  ExportNode() : mTarget(NULL) {mKind = NK_Export;}
+  ~ExportNode(){}
+
+  void SetTarget(TreeNode *t) {mTarget = t;}
+  TreeNode* GetTarget() {return mTarget;}
+
+  unsigned GetPairsNum() {return mPairs.GetNum();}
+  XXportAsPairNode* GetPair(unsigned i) {return mPairs.ValueAtIndex(i);}
+  void SetPair(unsigned i, XXportAsPairNode* n) {*(mPairs.RefAtIndex(i)) = n;}
+  void AddPair(XXportAsPairNode *p) {mPairs.PushBack(p);}
+
+  void Dump(unsigned indent);
+};
+
+
+//////////////////////////////////////////////////////////////////////////
 //                     Import Node
 // Java import, c/c++ include, are the same scenarios. We just save the
 // original string and let the language's verifier to check. We do borrow
@@ -145,6 +213,7 @@ public:
 // We also borrow the idea of system directory vs. local directory from c/c++.
 //////////////////////////////////////////////////////////////////////////
 
+// The property is useful in Java right now. Javascript use the XXportAsPair.
 enum ImportProperty {
   ImpNone = 0,
   ImpType = 1,        // Java like, import type
@@ -168,11 +237,18 @@ inline ImportProperty operator&(ImportProperty p, ImportProperty q) {
 
 class ImportNode : public TreeNode {
 private:
-  ImportProperty  mProperty;
-  TreeNode       *mTarget;    // the imported target
+  // Solely for Java.
+  ImportProperty  mProperty;  // This is solely for Java.
+
+  // Solely for javascript right now.
+  SmallVector<XXportAsPairNode*> mPairs;
+
+  // the imported target, a package in Java, or a module in JS
+  TreeNode       *mTarget;
+
 public:
   ImportNode() {mName = NULL; mProperty = ImpNone; mKind = NK_Import;}
-  ~ImportNode(){}
+  ~ImportNode(){mPairs.Release();}
 
   void SetProperty(ImportProperty p) {mProperty = p;}
   ImportProperty GetProperty() {return mProperty;}
@@ -194,6 +270,11 @@ public:
   bool IsImportAll()    {return mProperty & ImpAll;}
   bool IsImportLocal()  {return mProperty & ImpLocal;}
   bool IsImportSystem() {return mProperty & ImpSystem;}
+
+  unsigned GetPairsNum() {return mPairs.GetNum();}
+  XXportAsPairNode* GetPair(unsigned i) {return mPairs.ValueAtIndex(i);}
+  void SetPair(unsigned i, XXportAsPairNode* n) {*(mPairs.RefAtIndex(i)) = n;}
+  void AddPair(XXportAsPairNode *p) {mPairs.PushBack(p);}
 
   void Dump(unsigned indent);
 };

@@ -432,6 +432,14 @@ void Verifier::VerifyImport(ImportNode *tree){
   return;
 }
 
+void Verifier::VerifyExport(ExportNode *tree){
+  return;
+}
+
+void Verifier::VerifyXXportAsPair(XXportAsPairNode *tree){
+  return;
+}
+
 void Verifier::VerifyUserType(UserTypeNode *tree){
   return;
 }

@@ -76,6 +76,18 @@ maple::BaseNode *A2M::ProcessImport(StmtExprKind skind, TreeNode *tnode, BlockNo
   return nullptr;
 }
 
+maple::BaseNode *A2M::ProcessExport(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
+  NOTYETIMPL("ProcessExport()");
+  ExportNode *node = static_cast<ExportNode *>(tnode);
+  return nullptr;
+}
+
+maple::BaseNode *A2M::ProcessXXportAsPair(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
+  NOTYETIMPL("ProcessXXportAsPair()");
+  XXportAsPairNode *node = static_cast<XXportAsPairNode *>(tnode);
+  return nullptr;
+}
+
 maple::BaseNode *A2M::ProcessIdentifier(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
   IdentifierNode *node = static_cast<IdentifierNode *>(tnode);
   const char *name = node->GetName();
