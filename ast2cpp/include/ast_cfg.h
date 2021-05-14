@@ -196,7 +196,7 @@ class CFGVisitor : public AstVisitor {
     : mHandler(h), mTrace(t), AstVisitor(t && base) {}
   ~CFGVisitor() = default;
 
-  AST_Function *NewFunction();
+  AST_Function *NewFunction(FunctionNode *);
   AST_BB       *NewBB(BBKind k);
 
   static void    Push(TargetBBStack &stack, AST_BB* bb, TreeNode *label);

@@ -83,7 +83,7 @@ FunctionNode *CFGVisitor::VisitFunctionNode(FunctionNode *node) {
   AST_BB *current_bb = mCurrentBB;
 
   // Create a new function and add it as a nested function to current function
-  mCurrentFunction = NewFunction();
+  mCurrentFunction = NewFunction(node);
   current_func->AddNestedFunction(mCurrentFunction);
 
   InitializeFunction(mCurrentFunction);
@@ -609,8 +609,10 @@ AssertNode *CFGVisitor::VisitAssertNode(AssertNode *node) {
 }
 
 // Allocate a new AST_Function node
-AST_Function *CFGVisitor::NewFunction()   {
-  return new(mHandler->GetMemPool()->Alloc(sizeof(AST_Function))) AST_Function;
+AST_Function *CFGVisitor::NewFunction(FunctionNode *node)   {
+  AST_Function *func = new(mHandler->GetMemPool()->Alloc(sizeof(AST_Function))) AST_Function;
+  func->SetFunction(node);
+  return func;
 }
 
 // Allocate a new AST_BB node
@@ -699,7 +701,7 @@ void AST_CFG::BuildCFG() {
   if (mTrace) std::cout << "============== BuildCFG ==============" << std::endl;
   CFGVisitor visitor(mHandler, mTrace, true);
   // Set the init function for current module
-  AST_Function *func = visitor.NewFunction();
+  AST_Function *func = visitor.NewFunction(nullptr);
   mHandler->SetFunction(func);
   // Start to build CFG for current module
   visitor.InitializeFunction(func);
