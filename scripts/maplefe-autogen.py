@@ -409,7 +409,7 @@ gen_func_definition_end = lambda dictionary, node_name: \
 # Generate source files for dumping AST
 #
 gen_args = [
-        "gen_astdump", # filename
+        "gen_astdump", # Filename
         "AstDump",     # Class name
         "AstDump",     # Prefix of function name
         "",            # Extra include directives
@@ -555,7 +555,7 @@ gen_func_definition_end = lambda dictionary, node_name: '}\nreturn node;\n}'
 
 # -------------------------------------------------------
 gen_args = [
-        "gen_astvisitor", # filename
+        "gen_astvisitor", # Filename
         "AstVisitor",     # Class name
         "Visit",          # Prefix of function name
         "",               # Extra include directives
@@ -603,7 +603,7 @@ gen_func_definition_end = lambda dictionary, node_name: '}\n}'
 
 # -------------------------------------------------------
 gen_args = [
-        "gen_astgraph", # filename
+        "gen_astgraph", # Filename
         "AstGraph",     # Class name
         "DumpGraph",    # Prefix of function name
         """
@@ -750,7 +750,7 @@ gen_func_definition_end = lambda dictionary, node_name: \
 
 #
 gen_args = [
-        "gen_astemitter", # filename
+        "gen_astemitter", # Filename
         "AstEmitter",     # Class name
         "AstEmit",        # Prefix of function name
         """
