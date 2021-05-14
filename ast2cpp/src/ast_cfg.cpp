@@ -642,8 +642,11 @@ void AST_Function::Dump() {
   if(num > 0) {
     std::cout << "Nested Functions: " << num << " [" << std::endl;
     for(unsigned i = 0; i < num; ++i) {
-      std::cout << "Function: " << i + 1 << std::endl;
-      GetNestedFunctionAtIndex(i)->Dump();
+      AST_Function *afunc = GetNestedFunctionAtIndex(i);
+      FunctionNode *fnode = afunc->mFunction;
+      const char *fname = fnode ? (fnode->GetName() ? fnode->GetName() : "_anonymous_") : "_init_";
+      std::cout << "Function: " << i + 1 << " " << fname << std::endl;
+      afunc->Dump();
     }
     std::cout << "] // Nested Functions" << std::endl;
   }
