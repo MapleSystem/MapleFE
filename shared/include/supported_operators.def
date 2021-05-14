@@ -15,6 +15,12 @@
 
 // This file defines the operators supported by AutoGen and MapleFE
 
+// NOTE
+// 1. Add/Sub will be used as binary only after AST building.
+//    Plus/Minus will be the unary
+// 2. Inc/Dec will be used as post after AST building.
+//    PreInc/PreDec will be pre operators.
+
 OPERATOR(Add, Binary|Unary)
 OPERATOR(Sub, Binary|Unary)
 OPERATOR(Mul, Binary)
@@ -22,6 +28,11 @@ OPERATOR(Div, Binary)
 OPERATOR(Mod, Binary)
 OPERATOR(Inc, Pre|Post)
 OPERATOR(Dec, Pre|Post)
+
+OPERATOR(Plus,   Unary)
+OPERATOR(Minus,  Unary)
+OPERATOR(PreInc, Pre)
+OPERATOR(PreDec, Pre)
 
 OPERATOR(EQ, Binary)
 OPERATOR(NE, Binary)
@@ -70,8 +81,3 @@ OPERATOR(StEq, Binary)
 OPERATOR(StNe, Binary)
 OPERATOR(ArrowFunction, Binary)
 
-// Extra operators
-OPERATOR(Plus, Unary)
-OPERATOR(Minus, Unary)
-OPERATOR(PreInc, Binary)
-OPERATOR(PreDec, Binary)
