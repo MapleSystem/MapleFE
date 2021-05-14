@@ -165,11 +165,11 @@ public:
                        mBefore(NULL), mAfter(NULL) {mKind = NK_XXportAsPair;}
   ~XXportAsPairNode() {}
 
-  bool IsDefault()       {return mIsDefault;}
-  void SetIsDefault(bool b) {mIsDefault = b;}
+  bool IsDefault()    {return mIsDefault;}
+  void SetIsDefault() {mIsDefault = true;}
 
-  bool IsEverything()       {return mIsEverything;}
-  void SetIsEverything(bool b) {mIsEverything = b;}
+  bool IsEverything()    {return mIsEverything;}
+  void SetIsEverything() {mIsEverything = true;}
 
   TreeNode* GetBefore() {return mBefore;}
   void SetBefore(TreeNode *t) {mBefore = t;}
@@ -183,6 +183,9 @@ public:
 //////////////////////////////////////////////////////////////////////////
 //                         Export Nodes
 // export first comes from Javascript.
+//
+// If Export only exports a decl or a statement, it will be saved in
+// mPairs as the only pair. This is the same in ImportNode.
 //////////////////////////////////////////////////////////////////////////
 
 class ExportNode : public TreeNode {
@@ -199,7 +202,7 @@ public:
   unsigned GetPairsNum() {return mPairs.GetNum();}
   XXportAsPairNode* GetPair(unsigned i) {return mPairs.ValueAtIndex(i);}
   void SetPair(unsigned i, XXportAsPairNode* n) {*(mPairs.RefAtIndex(i)) = n;}
-  void AddPair(XXportAsPairNode *p) {mPairs.PushBack(p);}
+  void AddPairs(TreeNode *p);
 
   void Dump(unsigned indent);
 };
@@ -274,7 +277,7 @@ public:
   unsigned GetPairsNum() {return mPairs.GetNum();}
   XXportAsPairNode* GetPair(unsigned i) {return mPairs.ValueAtIndex(i);}
   void SetPair(unsigned i, XXportAsPairNode* n) {*(mPairs.RefAtIndex(i)) = n;}
-  void AddPair(XXportAsPairNode *p) {mPairs.PushBack(p);}
+  void AddPairs(TreeNode *p);
 
   void Dump(unsigned indent);
 };

@@ -3,7 +3,7 @@ Matched 14 tokens.
 Matched 24 tokens.
 ============= Module ===========
 == Sub Tree ==
-
+import {add} "./module-b"
 == Sub Tree ==
 js_var Decl: x=20
 == Sub Tree ==

@@ -153,7 +153,7 @@ static void add_type_to(TreeNode *tree, TreeNode *type) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
-//                      Major Functions to build the tree
+//                      Interfaces for Java style package  and import
 ////////////////////////////////////////////////////////////////////////////////////////
 
 TreeNode* ASTBuilder::BuildPackageName() {
@@ -227,6 +227,200 @@ TreeNode* ASTBuilder::BuildAllStaticImport() {
 
 TreeNode* ASTBuilder::BuildAllImport() {
 }
+
+////////////////////////////////////////////////////////////////////////////////////////
+//                      Interfaces for Javascript style export and import
+////////////////////////////////////////////////////////////////////////////////////////
+
+// Takes no argument.
+TreeNode* ASTBuilder::BuildImport() {
+  ImportNode *n = (ImportNode*)mTreePool->NewTreeNode(sizeof(ImportNode));
+  new (n) ImportNode();
+
+  mLastTreeNode = n;
+  return mLastTreeNode;
+}
+
+// Takes no argument.
+TreeNode* ASTBuilder::BuildExport() {
+  ExportNode *n = (ExportNode*)mTreePool->NewTreeNode(sizeof(ExportNode));
+  new (n) ExportNode();
+
+  mLastTreeNode = n;
+  return mLastTreeNode;
+}
+
+// It takes one argument, the pairs.
+// The pairs could be complicated in Javascript. We will let ImportNode or
+// ExportNode to handle by themselves.
+TreeNode* ASTBuilder::SetPairs() {
+  TreeNode *pairs = NULL;
+  Param p = mParams[0];
+  if (!p.mIsEmpty && p.mIsTreeNode) {
+    pairs = p.mData.mTreeNode;
+    if (mLastTreeNode->IsImport()) {
+      ImportNode *inode = (ImportNode*)mLastTreeNode;
+      inode->AddPairs(pairs);
+    } else if (mLastTreeNode->IsExport()) {
+      ExportNode *enode = (ExportNode*)mLastTreeNode;
+      enode->AddPairs(pairs);
+    }
+  }
+
+  return mLastTreeNode;
+}
+
+// Takes one argument, the 'from' module
+TreeNode* ASTBuilder::SetFromModule() {
+  Param p = mParams[0];
+  if (!p.mIsEmpty && p.mIsTreeNode) {
+    TreeNode *t = p.mData.mTreeNode;
+    if (mLastTreeNode->IsImport()) {
+      ImportNode *inode = (ImportNode*)mLastTreeNode;
+      inode->SetTarget(t);
+    } else if (mLastTreeNode->IsExport()) {
+      ExportNode *enode = (ExportNode*)mLastTreeNode;
+      enode->SetTarget(t);
+    }
+  }
+  return mLastTreeNode;
+}
+
+// Take no argument, or one argument.
+// (1) If no argument, it applies to all pairs of import/export.
+//     And actually there is NO pair at all in most cases.
+// (2) If one argument, it's the new name of '*' (aka the Everything),
+//     and is saved in mAfter of the pair.
+//
+// In either case, we need create a new and the only pair for XXport node.
+TreeNode* ASTBuilder::SetIsEverything() {
+  XXportAsPairNode *n = (XXportAsPairNode*)mTreePool->NewTreeNode(sizeof(XXportAsPairNode));
+  new (n) XXportAsPairNode();
+  n->SetIsEverything();
+
+  if (mParams.size() == 1) {
+    Param p = mParams[0];
+    if (!p.mIsEmpty && p.mIsTreeNode) {
+      TreeNode *expr = p.mData.mTreeNode;
+      n->SetAfter(expr);
+    }
+  }
+
+  if (mLastTreeNode->IsImport()) {
+    ImportNode *inode = (ImportNode*)mLastTreeNode;
+    MASSERT(!inode->GetPairsNum());
+    inode->AddPairs(n);
+  } else if (mLastTreeNode->IsExport()) {
+    ExportNode *enode = (ExportNode*)mLastTreeNode;
+    MASSERT(!enode->GetPairsNum());
+    enode->AddPairs(n);
+  }
+
+  return mLastTreeNode;
+}
+
+// Similar as SetIsEverything.
+TreeNode* ASTBuilder::SetIsDefault() {
+  XXportAsPairNode *n = (XXportAsPairNode*)mTreePool->NewTreeNode(sizeof(XXportAsPairNode));
+  new (n) XXportAsPairNode();
+  n->SetIsDefault();
+
+  if (mParams.size() == 1) {
+    Param p = mParams[0];
+    if (!p.mIsEmpty && p.mIsTreeNode) {
+      TreeNode *expr = p.mData.mTreeNode;
+      n->SetAfter(expr);
+    }
+  }
+
+  if (mLastTreeNode->IsImport()) {
+    ImportNode *inode = (ImportNode*)mLastTreeNode;
+    MASSERT(!inode->GetPairsNum());
+    inode->AddPairs(n);
+  } else if (mLastTreeNode->IsExport()) {
+    ExportNode *enode = (ExportNode*)mLastTreeNode;
+    MASSERT(!enode->GetPairsNum());
+    enode->AddPairs(n);
+  }
+
+  return mLastTreeNode;
+}
+
+// It takes two arguments, before and after.
+TreeNode* ASTBuilder::BuildXXportAsPair() {
+  MASSERT(mParams.size() == 2);
+
+  TreeNode *before = NULL;
+  TreeNode *after = NULL;
+
+  Param p = mParams[0];
+  if (!p.mIsEmpty && p.mIsTreeNode) {
+    before = p.mData.mTreeNode;
+  }
+
+  p = mParams[1];
+  if (!p.mIsEmpty && p.mIsTreeNode) {
+    after = p.mData.mTreeNode;
+  }
+
+  XXportAsPairNode *n = (XXportAsPairNode*)mTreePool->NewTreeNode(sizeof(XXportAsPairNode));
+  new (n) XXportAsPairNode();
+
+  if (before)
+    n->SetBefore(before);
+  if (after)
+    n->SetAfter(after);
+
+  mLastTreeNode = n;
+  return mLastTreeNode;
+}
+
+// It takes one arguments, the name after 'as'.
+TreeNode* ASTBuilder::BuildXXportAsPairEverything() {
+  MASSERT(mParams.size() == 1);
+
+  TreeNode *after = NULL;
+
+  Param p = mParams[0];
+  if (!p.mIsEmpty && p.mIsTreeNode) {
+    after = p.mData.mTreeNode;
+  }
+
+  XXportAsPairNode *n = (XXportAsPairNode*)mTreePool->NewTreeNode(sizeof(XXportAsPairNode));
+  new (n) XXportAsPairNode();
+  n->SetIsEverything();
+
+  if (after)
+    n->SetAfter(after);
+
+  mLastTreeNode = n;
+  return mLastTreeNode;
+}
+
+// It takes one arguments, the name after 'as'.
+TreeNode* ASTBuilder::BuildXXportAsPairDefault() {
+  MASSERT(mParams.size() == 1);
+
+  TreeNode *after = NULL;
+
+  Param p = mParams[0];
+  if (!p.mIsEmpty && p.mIsTreeNode) {
+    after = p.mData.mTreeNode;
+  }
+
+  XXportAsPairNode *n = (XXportAsPairNode*)mTreePool->NewTreeNode(sizeof(XXportAsPairNode));
+  new (n) XXportAsPairNode();
+  n->SetIsDefault();
+
+  if (after)
+    n->SetAfter(after);
+
+  mLastTreeNode = n;
+  return mLastTreeNode;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
 
 // Takes one argument, the expression of the parenthesis
 TreeNode* ASTBuilder::BuildParenthesis() {

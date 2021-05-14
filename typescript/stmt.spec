@@ -1129,6 +1129,10 @@ rule ModuleItem : ONEOF(ImportDeclaration,
 rule ImportDeclaration : ONEOF("import" + ImportClause + FromClause + ';',
                                "import" + ModuleSpecifier + ';')
   attr.property : Top
+  attr.action.%1,%2 : BuildImport()
+  attr.action.%1 :    SetPairs(%2)
+  attr.action.%1 :    SetFromModule(%3)
+  attr.action.%2 :    SetFromModule(%2)
 
 ## ImportClause :
 ## ImportedDefaultBinding
@@ -1151,6 +1155,7 @@ rule ImportedDefaultBinding : ImportedBinding
 ## NameSpaceImport :
 ## * as ImportedBinding
 rule NameSpaceImport : '*' + "as" + ImportedBinding
+  attr.action : BuildXXportAsPairEverything(%3)
 
 ## See 15.2.2
 ## NamedImports :
@@ -1179,11 +1184,12 @@ rule ImportsList : ONEOF(ImportSpecifier,
 ## IdentifierName as ImportedBinding
 rule ImportSpecifier : ONEOF(ImportedBinding,
                              Identifier + "as" + ImportedBinding)
+  attr.action.%2 : BuildXXportAsPair(%1, %3)
 
 ## See 15.2.2
 ## ModuleSpecifier :
 ## StringLiteral
-## NOTE. I loose StringLiteral to Literal to ease parser. 'tsc' will make sure
+## NOTE. I extend StringLiteral to Literal to ease parser. 'tsc' will make sure
 ##       it's a string literal.
 rule ModuleSpecifier : Literal
 
@@ -1211,6 +1217,12 @@ rule ExportDeclaration : ONEOF("export" + '*' + FromClause + ';',
                                "export" + "default" + ClassDeclaration,
                                "export" + "default" + AssignmentExpression + ';')
   attr.property : Top
+  attr.action.%1,%2,%3,%4,%5,%6,%7,%8 : BuildExport()
+  attr.action.%1       :    SetIsEverything()
+  attr.action.%2,%3,%4,%5 : SetPairs(%2)
+  attr.action.%6,%7,%8 :    SetPairs(%3)
+  attr.action.%6,%7,%8 :    SetIsDefault()
+  attr.action.%1,%2 :       SetFromModule(%3)
 
 ## See 15.2.3
 ## ExportClause :
@@ -1233,6 +1245,7 @@ rule ExportsList : ONEOF(ExportSpecifier,
 ## IdentifierName as IdentifierName
 rule ExportSpecifier : ONEOF(Identifier,
                              Identifier + "as" + Identifier)
+  attr.action.%2 : BuildXXportAsPair(%1, %3)
 
 #############################################################################
 #############################################################################

@@ -2,6 +2,6 @@ Matched 7 tokens.
 Matched 19 tokens.
 ============= Module ===========
 == Sub Tree ==
-
+import { * as x} "./module-b"
 == Sub Tree ==
 console.log(x.add(100))

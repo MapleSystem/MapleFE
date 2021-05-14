@@ -325,12 +325,103 @@ void PackageNode::Dump(unsigned indent) {
 //                          ImportNode
 //////////////////////////////////////////////////////////////////////////////////////
 
+void ImportNode::AddPairs(TreeNode *t) {
+  if (t->IsPass()) {
+    PassNode *n = (PassNode*)t;
+    for (unsigned i = 0; i < n->GetChildrenNum(); i++) {
+      TreeNode *child = n->GetChild(i);
+      AddPairs(child);
+    }
+  } else if (t->IsXXportAsPair()) {
+    mPairs.PushBack((XXportAsPairNode*)t);
+  } else {
+    // We create a new pair to save 't'.
+    XXportAsPairNode *n = (XXportAsPairNode*)gASTBuilder.mTreePool->NewTreeNode(sizeof(XXportAsPairNode));
+    new (n) XXportAsPairNode();
+    n->SetBefore(t);
+    mPairs.PushBack(n);
+  }
+}
+
 void ImportNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   DUMP0_NORETURN("import ");
   if (IsImportStatic())
     DUMP0_NORETURN("static ");
-  mTarget->Dump(0);
+
+  if (mPairs.GetNum() > 0) {
+    DUMP0_NORETURN('{');
+    for (unsigned i = 0; i < mPairs.GetNum(); i++) {
+      XXportAsPairNode *p = GetPair(i);
+      p->Dump(0); 
+      if (i < mPairs.GetNum() - 1)
+        DUMP0_NORETURN(',');
+    } 
+    DUMP0_NORETURN("} ");
+  }
+
+  if (mTarget)
+    mTarget->Dump(0);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////
+//                          ExportNode
+//////////////////////////////////////////////////////////////////////////////////////
+
+void ExportNode::AddPairs(TreeNode *t) {
+  if (t->IsPass()) {
+    PassNode *n = (PassNode*)t;
+    for (unsigned i = 0; i < n->GetChildrenNum(); i++) {
+      TreeNode *child = n->GetChild(i);
+      AddPairs(child);
+    }
+  } else if (t->IsXXportAsPair()) {
+    mPairs.PushBack((XXportAsPairNode*)t);
+  } else {
+    // We create a new pair to save 't'.
+    XXportAsPairNode *n = (XXportAsPairNode*)gASTBuilder.mTreePool->NewTreeNode(sizeof(XXportAsPairNode));
+    new (n) XXportAsPairNode();
+    n->SetBefore(t);
+    mPairs.PushBack(n);
+  }
+}
+
+void ExportNode::Dump(unsigned indent) {
+  DumpIndentation(indent);
+  DUMP0_NORETURN("export ");
+
+  if (mPairs.GetNum() > 0) {
+    DUMP0_NORETURN('{');
+    for (unsigned i = 0; i < mPairs.GetNum(); i++) {
+      XXportAsPairNode *p = GetPair(i);
+      p->Dump(0); 
+      if (i < mPairs.GetNum() - 1)
+        DUMP0_NORETURN(',');
+    } 
+    DUMP0_NORETURN("} ");
+  }
+
+  if (mTarget)
+    mTarget->Dump(0);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////
+//                          XXportAsPair
+//////////////////////////////////////////////////////////////////////////////////////
+
+void XXportAsPairNode::Dump(unsigned indent) {
+  DumpIndentation(indent);
+  if (IsEverything())
+    DUMP0_NORETURN(" *");
+  else if (IsDefault())
+    DUMP0_NORETURN(" default");
+  else if (mBefore)
+    mBefore->Dump(0);
+
+  if (mAfter) {
+    DUMP0_NORETURN(" as ");
+    mAfter->Dump(0);
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////////////////

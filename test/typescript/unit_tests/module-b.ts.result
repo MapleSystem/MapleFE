@@ -4,6 +4,6 @@ Matched 20 tokens.
 == Sub Tree ==
 js_var Decl: x=10
 == Sub Tree ==
-func  add(y)  throws: 
+export {func  add(y)  throws: 
   return x Add y
-
+} 

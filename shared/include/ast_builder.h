@@ -85,6 +85,18 @@ public:
   TreeNode* BuildAllStaticImport();
   TreeNode* BuildAllImport();
 
+  TreeNode* BuildImport();
+  TreeNode* BuildExport();
+  TreeNode* SetPairs();
+  TreeNode* SetFromModule();
+  TreeNode* SetIsDefault();
+  TreeNode* SetIsEverything();
+
+  TreeNode* BuildXXportAsPair();
+  TreeNode* BuildXXportAsPairEverything();
+  TreeNode* BuildXXportAsPairDefault();
+
+
   TreeNode* BuildBlock();
   TreeNode* AddToBlock();
   TreeNode* AddSyncToBlock();

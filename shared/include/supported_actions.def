@@ -37,6 +37,19 @@ ACTION(BuildSingleStaticImport)    // style like java single static import
 ACTION(BuildAllStaticImport)       // style like java ondemand static import
 ACTION(BuildAllImport)             // style like c/c++ include all in .h file
 
+// Special actions for JS import/export
+ACTION(BuildImport)
+ACTION(BuildExport)
+ACTION(SetPairs)
+ACTION(SetFromModule)
+ACTION(SetIsDefault)      // Apply to all pairs in import/export
+ACTION(SetIsEverything)   // Apply to all pairs in import/export
+
+ACTION(BuildXXportAsPair)             // normal pair
+ACTION(BuildXXportAsPairEverything)   // '*'
+ACTION(BuildXXportAsPairDefault)      // 'default'
+
+
 ACTION(BuildBlock)
 ACTION(AddToBlock)
 ACTION(AddSyncToBlock)             // Java allows a sync obj to block
