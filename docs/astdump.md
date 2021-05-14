@@ -1,7 +1,7 @@
 ## Overview
 
 The `astdump.sh` tool is a bash script which executes the `ts2cpp` binary executable with option
-`--trace-a2c` to dump the AST and CFG graphs of a TypeScript prgram.
+`--trace-a2c` to dump the AST and CFG graphs of a TypeScript program.
 
 It also dump the TypeScript code converted from the corresponding AST with AST emitter. 
 
@@ -33,7 +33,7 @@ cd MapleFE/test/typescript/unit_tests
 
 This is the CFG graph of function `binarySearch`.
 
-![CFG graph of function binarySearch](https://images.gitee.com/uploads/images/2021/0514/151722_a7245ff7_5583371.png "binary-search.cfg.png")
+<img src="https://images.gitee.com/uploads/images/2021/0514/151722_a7245ff7_5583371.png" height="640">
 
 ### 3. TypeScript code converted from the corresponding AST
 
