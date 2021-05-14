@@ -39,5 +39,5 @@ This is the CFG graph of function `binarySearch`.
 
 This is the TypeScript code generated from AST.
 
-<img src="https://images.gitee.com/uploads/images/2021/0514/152039_16636b7d_5583371.png" height="480">
+<img src="https://images.gitee.com/uploads/images/2021/0514/152039_16636b7d_5583371.png" height="360">
 
