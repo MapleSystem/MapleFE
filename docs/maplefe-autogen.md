@@ -10,7 +10,7 @@ These YAML files are fed into `maplefe-autogen.py` to generate C++ header and so
 
 Let's use `AstVisitor` as an example to explain it.
 
-### 1. Set filename, class name, prefix of function name and extr include directives
+### 1. Set filename, class name, prefix of function name and extra include directives
 
 ```python
 gen_args = [
@@ -20,7 +20,7 @@ gen_args = [
         "",               # Extra include directives
         ]
 ```
-The list `gen_args` contains the filename, class name, prefix of function name and extr include directives for
+The list `gen_args` contains the filename, class name, prefix of function name and extra include directives for
 generating C++ header and source files. You have to use the list name `gen_args` for them.
 
 ### 2. Define the specific content in header file
@@ -58,42 +58,42 @@ If this function returns false, all non-AST-node values will be ignored.
 ```python
 gen_func_declaration = lambda dictionary, node_name: ...
 ```
-This function returns a string for the declaration of a function for an AST node `node_name`. The result will be in
+Function `gen_func_declaration` returns a string for the declaration of a function for an AST node `node_name`. The result will be in
 the C++ header file.
 
 
 ```python
 gen_func_definition = lambda dictionary, node_name: ...
 ```
-This function returns a string for the definition of a function for an AST node `node_name`. The result will be in
+Function `gen_func_definition` returns a string for the definition of a function for an AST node `node_name`. The result will be in
 the C++ source file. Any code occurs at the beginning of its function body can be placed here. 
 
 
 ```python
 gen_call_child_node = lambda dictionary, node_name, field_name, node_type, accessor: ...
 ```
-This function returns a string with the statements to handle a child AST node `field_name`. The child node has
+Function `gen_call_child_node` returns a string with the statements to handle a child AST node `field_name`. The child node has
 `node_type` and you can use `accessor` to get its pointer value. 
 
 
 ```python
 gen_call_children_node = lambda dictionary, node_name, field_name, node_type, accessor: ''
 ```
-This function returns a string with the statements to handle a SmallVector or SmallList node `field_name` with
+Function `gen_call_children_node` returns a string with the statements to handle a SmallVector or SmallList node `field_name` with
 `node_type`. The `accessor` can be used to get its pointer value. It returns an empty string for `AstVisitor`.
 
 
 ```python
 gen_call_children_node_end = lambda dictionary, node_name, field_name, node_type, accessor: ''
 ```
-This function returns a string with the statements following the for-loop for each value stored in the
+Function `gen_call_children_node_end` returns a string with the statements following the for-loop for each value stored in the
 SmallVector or SmallList node `field_name`. It returns an empty string for `AstVisitor`. 
 
 
 ```python
 gen_func_definition_end = lambda dictionary, node_name: '}\nreturn node;\n}'
 ```
-This function return a string with the statements at the end of the function body. 
+Function `gen_func_definition_end` return a string with the statements at the end of the function body.
 
 Since it does not need to handle any non-AST-node values, so some functions for values are missing for `AstVisitor`.
 
@@ -119,7 +119,7 @@ This part is to append the code in list `astvisitor_init` to the C++ header file
 append(include_file, astvisitor_init)
 ```
 
-This part is the major one which calls the `gen_call_*` and `gen_func_*` callback functions defined at step 3 and generate
+This part is the major one which calls the `gen_func_*` and `gen_call_*` callback functions defined at step 3 and generate
 the code in C++ header and source files with them.
 ```python
 handle_yaml(initial_yaml, gen_handler)
