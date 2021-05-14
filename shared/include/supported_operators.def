@@ -69,3 +69,9 @@ OPERATOR(Diamond, Unary)
 OPERATOR(StEq, Binary)
 OPERATOR(StNe, Binary)
 OPERATOR(ArrowFunction, Binary)
+
+// Extra operators
+OPERATOR(Plus, Unary)
+OPERATOR(Minus, Unary)
+OPERATOR(PreInc, Binary)
+OPERATOR(PreDec, Binary)
