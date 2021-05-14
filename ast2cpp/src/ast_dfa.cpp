@@ -25,6 +25,7 @@ namespace maplefe {
 
 void AST_DFA::Build() {
   CollectDefNodes();
+  BuildBitVectors();
   BuildReachDefIn();
 }
 
@@ -54,13 +55,18 @@ void AST_DFA::DumpPosDef(PosDef pos) {
 }
 
 void AST_DFA::DumpPosDefVec() {
-  for (unsigned i = 0; i < mDefVec.GetNum(); i++) {
+  for (unsigned i = 0; i < mDefVecSize; i++) {
     PosDef pos = mDefVec.ValueAtIndex(i);
     DumpPosDef(pos);
   }
 }
 
-void AST_DFA::AddDef(TreeNode *node, unsigned &bitnum, unsigned bbid) {
+bool AST_DFA::IsDef(TreeNode *node) {
+  unsigned n;
+  return AddDef(node, n, 0xffffffff);
+}
+
+bool AST_DFA::AddDef(TreeNode *node, unsigned &bitnum, unsigned bbid) {
   const char *name = NULL;
   unsigned nid = 0;
   switch (node->GetKind()) {
@@ -113,24 +119,87 @@ void AST_DFA::AddDef(TreeNode *node, unsigned &bitnum, unsigned bbid) {
   }
 
   // update mDefVec
-  if (name) {
+  if (name && bbid != 0xffffffff) {
     unsigned idx = mStringPool.GetStrIdx(name);
     PosDef pos(bitnum++, idx, nid, bbid);
     mDefVec.PushBack(pos);
   }
+
+  return name != NULL;
 }
 
+// this calcuates mDefVec mDefVecSize mBbIdSet
 void AST_DFA::CollectDefNodes() {
   if (mTrace) std::cout << "============== CollectDefNodes ==============" << std::endl;
   AST_Function *func = mHandler->GetFunction();
   MASSERT(func && "null func");
-  std::set<unsigned> worklist;;
-  std::unordered_set<unsigned> doneBbID;
   std::deque<AST_BB *> working_list;
 
   working_list.push_back(func->GetEntryBB());
 
   unsigned bitnum = 0;
+
+  while(working_list.size()) {
+    AST_BB *bb = working_list.front();
+    MASSERT(bb && "null BB");
+    unsigned bbid = bb->GetId();
+
+    // skip bb already visited
+    if (mBbIdSet.find(bbid) != mBbIdSet.end()) {
+      working_list.pop_front();
+      continue;
+    }
+
+    for (int i = 0; i < bb->GetSuccessorsNum(); i++) {
+      working_list.push_back(bb->GetSuccessorAtIndex(i));
+    }
+
+    for (int i = 0; i < bb->GetStatementsNum(); i++) {
+      TreeNode *node = bb->GetStatementAtIndex(i);
+      mNodeId2NodeMap[node->GetNodeId()] = node;
+      AddDef(node, bitnum, bbid);
+    }
+
+    mBbIdSet.insert(bbid);
+    working_list.pop_front();
+  }
+
+  mDefVecSize = mDefVec.GetNum();
+  if (mTrace) DumpPosDefVec();
+
+}
+
+void AST_DFA::BuildBitVectors() {
+  if (mTrace) std::cout << "============== BuildBitVectors ==============" << std::endl;
+  AST_Function *func = mHandler->GetFunction();
+  MASSERT(func && "null func");
+  std::unordered_set<unsigned> doneBbID;
+  std::deque<AST_BB *> working_list;
+
+  // init bit vectors
+  for (int i = 0; i < mDefVecSize; i++) {
+    BitVector bv1;
+    bv1.Alloc(mDefVecSize);
+    bv1.WipeOff(0);
+    mPrsvMap[i] = bv1;
+
+    BitVector bv2;
+    bv2.Alloc(mDefVecSize);
+    bv2.WipeOff(0xff);      // init with bit 1
+    mGenMap[i] = bv2;
+
+    BitVector bv3;
+    bv3.Alloc(mDefVecSize);
+    bv3.WipeOff(0);
+    mRchOutMap[i] = bv3;
+
+    BitVector bv4;
+    bv4.Alloc(mDefVecSize);
+    bv4.WipeOff(0);
+    mRchInMap[i] = bv4;
+  }
+
+  working_list.push_back(func->GetEntryBB());
 
   while(working_list.size()) {
     AST_BB *bb = working_list.front();
@@ -150,13 +219,13 @@ void AST_DFA::CollectDefNodes() {
     for (int i = 0; i < bb->GetStatementsNum(); i++) {
       TreeNode *node = bb->GetStatementAtIndex(i);
       mNodeId2NodeMap[node->GetNodeId()] = node;
-      AddDef(node, bitnum, bbid);
+      bool isdef = IsDef(node);
+      if (isdef) {
+      }
     }
+
     doneBbID.insert(bbid);
     working_list.pop_front();
   }
-
-  if (mTrace) DumpPosDefVec();
-
 }
 }

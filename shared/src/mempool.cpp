@@ -140,10 +140,10 @@ void MemPool::Clear() {
 }
 
 // Wipe off all data. Keep the blocks.
-void MemPool::WipeOff() {
+void MemPool::WipeOff(int c) {
   Block *temp_block = mBlocks;
   while(temp_block) {
-    memset((void*)temp_block->addr, 0, mBlockSize);
+    memset((void*)temp_block->addr, c, mBlockSize);
     temp_block = temp_block->next;
   }
 }

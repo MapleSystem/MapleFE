@@ -64,7 +64,7 @@ public:
   char* Alloc(unsigned);
   void  Release(unsigned i);  // release the last occupied i bytes.
 
-  void  WipeOff(); // wipe off all data
+  void  WipeOff(int c = 0);   // wipe off all data with c
   void  Clear();   // free up all block, dont wipe data, Keep memory.
   void  Release(); // Allow users to free memory explicitly.
 };

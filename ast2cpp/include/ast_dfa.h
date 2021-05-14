@@ -36,11 +36,20 @@ class AST_DFA {
  private:
   AST_Handler  *mHandler;
   bool          mTrace;
-  SmallVector<BitVector> mReachDefIn;                  // reaching definition bit vector entering bb
   std::unordered_map<unsigned, unsigned> mVar2DeclMap; // var to decl, both NodeId
   std::unordered_map<unsigned, TreeNode*> mNodeId2NodeMap;
   SmallVector<PosDef> mDefVec;
+  unsigned mDefVecSize;
   StringPool mStringPool;
+
+  // followint maps with key BB id
+  std::unordered_map<unsigned, BitVector> mPrsvMap;
+  std::unordered_map<unsigned, BitVector> mGenMap;
+  std::unordered_map<unsigned, BitVector> mRchOutMap;
+  std::unordered_map<unsigned, BitVector> mRchInMap; // reaching definition bit vector entering bb
+
+  std::unordered_set<unsigned> mBbIdSet;           // bb ids in the function
+  std::unordered_map<unsigned, AST_BB *> mBbId2BbMap;
 
  public:
   explicit AST_DFA(AST_Handler *h, bool t) : mHandler(h), mTrace(t) {}
@@ -49,10 +58,14 @@ class AST_DFA {
   void Build();
 
   void CollectDefNodes();
+  void BuildBitVectors();
   void BuildReachDefIn();
-  void AddDef(TreeNode *node, unsigned &bitnum, unsigned bbid);
+
+  bool IsDef(TreeNode *node);
+  bool AddDef(TreeNode *node, unsigned &bitnum, unsigned bbid);
   // unsigned GetDecl(VarNode *);
 
+  unsigned GetDefVecSize() { return mDefVecSize; }
   void DumpPosDef(PosDef pos);
   void DumpPosDefVec();
   void DumpReachDefIn();
