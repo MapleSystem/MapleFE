@@ -621,7 +621,7 @@ AST_BB *CFGVisitor::NewBB(BBKind k) {
 }
 
 // Helper for a node in dot graph
-static std::string BBLabelStr(AST_BB *bb, const char *shape = nullptr) {
+static std::string BBLabelStr(AST_BB *bb, const char *shape = nullptr, const char *fn = nullptr) {
   static const char* const kBBNames[] =
   { "unknown", "uncond", "block", "branch", "loop", "switch", "case", "try", "catch", "finally",
     "yield", "term", "join" };
@@ -629,7 +629,7 @@ static std::string BBLabelStr(AST_BB *bb, const char *shape = nullptr) {
     return kBBNames[bb->GetKind()];
   std::string str("BB" + std::to_string(bb->GetId()));
   str += " [label=\"" + str + (shape[0] == 'e' ? std::string("\\n") + kBBNames[bb->GetKind()] : "")
-    + "\", shape=" + shape + "];\n";
+    + (fn ? std::string("\\n\\\"") + fn + "\\\"" : "") + "\", shape=" + shape + "];\n";
   return str;
 }
 
@@ -661,7 +661,7 @@ void AST_Function::Dump() {
   visited.insert(entry);
   // Dump CFG in dot format
   std::string dot("---\ndigraph CFG_");
-  dot = dot + func_name + " {\n" + BBLabelStr(entry, "box") + BBLabelStr(exit, "doubleoctagon");
+  dot = dot + func_name + " {\n" + BBLabelStr(entry, "box", func_name) + BBLabelStr(exit, "doubleoctagon");
   const char* scoped = " [style=dashed color=grey];";
   while(!bb_stack.empty()) {
     AST_BB *bb = bb_stack.top();
