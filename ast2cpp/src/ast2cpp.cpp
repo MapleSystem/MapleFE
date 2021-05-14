@@ -45,7 +45,7 @@ void A2C::ProcessAST(bool trace_a2c) {
 
   handler.AdjustAST();
   if (mTraceA2C) {
-    handler.Dump("After handler.AdjustAST()");
+    // handler.Dump("After handler.AdjustAST()");
   }
 
   // rebuild CFG if necessary
@@ -65,7 +65,7 @@ void A2C::ProcessAST(bool trace_a2c) {
 
   handler.BuildDFA();
   if (mTraceA2C) {
-    handler.Dump("After handler.BuildDFA()");
+    // handler.Dump("After handler.BuildDFA()");
   }
 
   if (mTraceA2C) {
