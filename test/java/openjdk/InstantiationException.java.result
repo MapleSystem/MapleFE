@@ -6,7 +6,7 @@ package java.lang
 == Sub Tree ==
 class  InstantiationException
   Fields: 
-    serialVersionUID=Sub
+    serialVersionUID=Minus
   -1305838986
   Instance Initializer: 
   Constructors: 

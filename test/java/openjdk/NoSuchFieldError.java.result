@@ -6,7 +6,7 @@ package java.lang
 == Sub Tree ==
 class  NoSuchFieldError
   Fields: 
-    serialVersionUID=Sub
+    serialVersionUID=Minus
   1085931403
   Instance Initializer: 
   Constructors: 

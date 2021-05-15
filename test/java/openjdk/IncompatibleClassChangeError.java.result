@@ -6,7 +6,7 @@ package java.lang
 == Sub Tree ==
 class  IncompatibleClassChangeError
   Fields: 
-    serialVersionUID=Sub
+    serialVersionUID=Minus
   241186759
   Instance Initializer: 
   Constructors: 

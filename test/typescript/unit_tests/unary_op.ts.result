@@ -37,22 +37,22 @@ x.a
 == Sub Tree ==
 js_var Decl: a=8
 == Sub Tree ==
-Inc
+PreInc
   a
 == Sub Tree ==
-Dec
+PreDec
   a
 == Sub Tree ==
-Add
+Plus
   8
 == Sub Tree ==
-Add
+Plus
   "-8"
 == Sub Tree ==
-Sub
+Minus
   "8"
 == Sub Tree ==
-Sub
+Minus
   a
 == Sub Tree ==
 Bcomp

@@ -36,11 +36,11 @@ class  Long
       Decl: negative=(i LT 0)
       cond-branch cond:negative
       true branch :
-        i Assign Sub
+        i Assign Minus
   i
       false branch :
 
-      while i LE Sub
+      while i LE Minus
   radix         Assign 
         i Assign i Div radix
 
@@ -108,7 +108,7 @@ while val NE 0 Land charPos GT 0
       cond-branch cond:i LT 0
       true branch :
         sign Assign -
-        i Assign Sub
+        i Assign Minus
   i
       false branch :
 
@@ -274,7 +274,7 @@ while val NE 0 Land charPos GT 0
       return Long.valueOf(parseLong(s,10))
     func  valueOf(l)  throws: 
       Decl: offset=128
-      cond-branch cond:l GE Sub
+      cond-branch cond:l GE Minus
   128 Land l LE 127
       true branch :
         return 
@@ -426,7 +426,7 @@ while val NE 0 Land charPos GT 0
       i BorAssign (i Shr 32)
       return i Sub (i Zext 1)
     func  lowestOneBit(i)  throws: 
-      return i Band Sub
+      return i Band Minus
   i
     func  numberOfLeadingZeros(i)  throws: 
       cond-branch cond:i EQ 0
@@ -522,10 +522,10 @@ while val NE 0 Land charPos GT 0
       i Assign i Add (i Zext 32)
       return (int)i Band 127
     func  rotateLeft(i,distance)  throws: 
-      return (i Shl distance) Bor (i Zext Sub
+      return (i Shl distance) Bor (i Zext Minus
   distance)
     func  rotateRight(i,distance)  throws: 
-      return (i Zext distance) Bor (i Shl Sub
+      return (i Zext distance) Bor (i Shl Minus
   distance)
     func  reverse(i)  throws: 
       i Assign (i Band 1431655765) Shl 1 Bor (i Zext 1) Band 1431655765
@@ -535,7 +535,7 @@ while val NE 0 Land charPos GT 0
       i Assign (i Shl 48) Bor ((i Band -1048576) Shl 16) Bor ((i Zext 16) Band -1048576) Bor (i Zext 48)
       return i
     func  signum(i)  throws: 
-      return (int)((i Shr 63) Bor (Sub
+      return (int)((i Shr 63) Bor (Minus
   i Zext 63))
     func  reverseBytes(i)  throws: 
       i Assign (i Band 267390975) Shl 8 Bor (i Zext 8) Band 267390975

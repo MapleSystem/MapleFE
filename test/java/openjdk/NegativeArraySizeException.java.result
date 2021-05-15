@@ -6,7 +6,7 @@ package java.lang
 == Sub Tree ==
 class  NegativeArraySizeException
   Fields: 
-    serialVersionUID=Sub
+    serialVersionUID=Minus
   -868449419
   Instance Initializer: 
   Constructors: 

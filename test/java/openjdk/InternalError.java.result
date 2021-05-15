@@ -6,7 +6,7 @@ package java.lang
 == Sub Tree ==
 class  InternalError
   Fields: 
-    serialVersionUID=Sub
+    serialVersionUID=Minus
   1073036797
   Instance Initializer: 
   Constructors: 

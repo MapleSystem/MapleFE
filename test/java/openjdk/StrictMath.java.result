@@ -34,11 +34,11 @@ class  StrictMath
     func  cbrt(a)  throws: 
     func  IEEEremainder(f1,f2)  throws: 
     func  ceil(a)  throws: 
-      return floorOrCeil(a,Sub
+      return floorOrCeil(a,Minus
   0,1,1)
     func  floor(a)  throws: 
-      return floorOrCeil(a,Sub
-  1,0,Sub
+      return floorOrCeil(a,Minus
+  1,0,Minus
   1)
     func  floorOrCeil(a,negativeBoundary,positiveBoundary,sign)  throws: 
       Decl: exponent=Math.getExponent(a)

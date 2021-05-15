@@ -6,7 +6,7 @@ package java.lang
 == Sub Tree ==
 class  IllegalArgumentException
   Fields: 
-    serialVersionUID=Sub
+    serialVersionUID=Minus
   -2103873468
   Instance Initializer: 
   Constructors: 

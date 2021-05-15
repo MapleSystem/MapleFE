@@ -252,7 +252,7 @@ class  Package
     func  getPackage(c)  throws: 
       Decl: name=c.getName()
       Decl: i=name.lastIndexOf(.)
-      cond-branch cond:i NE Sub
+      cond-branch cond:i NE Minus
   1
       true branch :
         name Assign name.substring(0,i)

@@ -6,7 +6,7 @@ package java.lang
 == Sub Tree ==
 class  EnumConstantNotPresentException
   Fields: 
-    serialVersionUID=Sub
+    serialVersionUID=Minus
   180673940    enumType    constantName
   Instance Initializer: 
   Constructors: 

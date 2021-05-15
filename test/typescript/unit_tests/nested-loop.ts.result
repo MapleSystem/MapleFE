@@ -12,7 +12,7 @@ for ( )
   js_var Decl: j=i Sub 1
   js_var Decl: n=arr[i]
   while n LT arr[j] Land j GE 0    arr[j Add 1] Assign arr[j]
-    Dec
+    PreDec
       j
 
   arr[j Add 1] Assign n

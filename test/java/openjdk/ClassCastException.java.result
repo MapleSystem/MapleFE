@@ -6,7 +6,7 @@ package java.lang
 == Sub Tree ==
 class  ClassCastException
   Fields: 
-    serialVersionUID=Sub
+    serialVersionUID=Minus
   832051876
   Instance Initializer: 
   Constructors: 

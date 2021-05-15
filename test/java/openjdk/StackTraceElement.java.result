@@ -27,7 +27,7 @@ class  StackTraceElement
     func  getMethodName()  throws: 
       return methodName
     func  isNativeMethod()  throws: 
-      return lineNumber EQ Sub
+      return lineNumber EQ Minus
   2
     func  toString()  throws: 
       Decl: result=new StringBuilder()

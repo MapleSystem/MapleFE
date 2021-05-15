@@ -9,7 +9,7 @@ class  A
   Methods: 
     func  foo()  throws: 
       for ( )
-        Inc
+        PreInc
           k
                   iInc
 

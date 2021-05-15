@@ -57,12 +57,12 @@ class  SecurityManager
     func  currentClassLoader()  throws: 
       return null
     func  classLoaderDepth()  throws: 
-      return Sub
+      return Minus
   1
     func  currentLoadedClass()  throws: 
       return null
     func  classDepth(name)  throws: 
-      return Sub
+      return Minus
   1
     func  inClass(name)  throws: 
       return false
