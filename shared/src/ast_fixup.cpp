@@ -50,6 +50,11 @@ namespace maplefe {
   }
 
   UserTypeNode *FixUpVisitor::VisitUserTypeNode(UserTypeNode *node) {
+    if(auto id = node->GetId()) {
+      if(auto n = id->GetName()) {
+        node->SetName(n);
+      }
+    }
     return node;
   }
 

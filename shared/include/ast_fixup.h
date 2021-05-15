@@ -41,6 +41,9 @@ namespace maplefe {
       //
       UnaOperatorNode *VisitUnaOperatorNode(UnaOperatorNode *node);
 
+      // Fix up mName of UserTypeNode instead of overriding its GetName() as shown below
+      //    const char* GetName() {return mId->GetName();}
+      //
       UserTypeNode *VisitUserTypeNode(UserTypeNode *node);
       PrimTypeNode *VisitPrimTypeNode(PrimTypeNode *node);
   };

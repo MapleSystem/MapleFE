@@ -106,8 +106,6 @@ public:
   TreeNode* GetId() {return mId;}
   void SetId(TreeNode *n) {mId = n;}
 
-  const char* GetName() {return mId->GetName();}
-
   unsigned GetTypeArgumentsNum() {return mTypeArguments.GetNum();}
   void     AddTypeArgs(TreeNode *n);
   IdentifierNode* GetTypeArgument(unsigned i) {return mTypeArguments.ValueAtIndex(i);}
