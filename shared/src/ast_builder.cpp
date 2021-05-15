@@ -2013,6 +2013,20 @@ TreeNode* ASTBuilder::BuildNewOperation() {
 }
 
 TreeNode* ASTBuilder::BuildDeleteOperation() {
+  if (mTrace)
+    std::cout << "In BuildDelete" << std::endl;
+
+  Param l_param = mParams[0];
+  MASSERT(!l_param.mIsEmpty);
+  MASSERT(l_param.mIsTreeNode);
+  TreeNode *expr = l_param.mData.mTreeNode;
+
+  DeleteNode *d_node = (DeleteNode*)gTreePool.NewTreeNode(sizeof(DeleteNode));
+  new (d_node) DeleteNode();
+  d_node->SetExpr(expr);
+
+  mLastTreeNode = d_node;
+  return mLastTreeNode;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

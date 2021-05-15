@@ -353,6 +353,7 @@ rule UnaryExpression : ONEOF(
    '-' + UnaryExpression,
    '~' + UnaryExpression,
    '!' + UnaryExpression)
+  attr.action.%2 : BuildDeleteOperation(%2)
   attr.action.%4 : BuildTypeOf(%2)
   attr.action.%5,%6,%7,%8,%9,%10 : BuildUnaryOperation(%1, %2)
 

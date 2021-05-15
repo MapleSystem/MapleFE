@@ -403,6 +403,16 @@ public:
 };
 
 class DeleteNode : public TreeNode {
+private:
+  TreeNode *mExpr;
+public:
+  DeleteNode() {mExpr = NULL; mKind = NK_Delete;}
+  ~DeleteNode(){}
+
+  TreeNode* GetExpr()            {return mExpr;}
+  void      SetExpr(TreeNode *n) {mExpr = n;}
+
+  void Dump(unsigned);
 };
 
 //////////////////////////////////////////////////////////////////////////

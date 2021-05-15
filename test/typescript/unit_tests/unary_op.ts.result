@@ -29,7 +29,7 @@ class  A
 == Sub Tree ==
 js_var Decl: x
 == Sub Tree ==
-x.a
+ delete x.a
 == Sub Tree ==
 
 == Sub Tree ==
