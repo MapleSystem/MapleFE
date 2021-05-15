@@ -127,21 +127,21 @@ static TypeId FindPrimTypeId(const char *keyword) {
 //                             PrimTypeNode                             //
 //////////////////////////////////////////////////////////////////////////
 
-const char* PrimTypeNode::GetName() {
+const char* PrimTypeNode::GetTypeName() {
   const char *name = FindPrimTypeName(GetPrimType());
   return name;
 }
 
 void PrimTypeNode::Dump(unsigned indent) {
   DumpIndentation(indent);
-  DUMP0_NORETURN(GetName());
+  DUMP0_NORETURN(GetTypeName());
 }
 
 //////////////////////////////////////////////////////////////////////////
 //                           PrimTypePool                               //
 //////////////////////////////////////////////////////////////////////////
 
-// The global Pool for 
+// The global Pool for
 PrimTypePool gPrimTypePool;
 
 PrimTypePool::PrimTypePool() {}

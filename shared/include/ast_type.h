@@ -151,7 +151,7 @@ public:
 
   TypeId    GetPrimType()     {return mPrimType;}
   void SetPrimType(TypeId id) {mPrimType = id; }
-  const char* GetName();  // type name
+  const char* GetTypeName();  // type name
 
   void Dump(unsigned);
 };

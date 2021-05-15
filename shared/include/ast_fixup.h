@@ -45,7 +45,6 @@ namespace maplefe {
       //    const char* GetName() {return mId->GetName();}
       //
       UserTypeNode *VisitUserTypeNode(UserTypeNode *node);
-      PrimTypeNode *VisitPrimTypeNode(PrimTypeNode *node);
   };
 
 }

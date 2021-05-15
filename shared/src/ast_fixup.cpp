@@ -49,16 +49,13 @@ namespace maplefe {
     return node;
   }
 
+  // Fix up mName of UserTypeNode
   UserTypeNode *FixUpVisitor::VisitUserTypeNode(UserTypeNode *node) {
     if(auto id = node->GetId()) {
       if(auto n = id->GetName()) {
         node->SetName(n);
       }
     }
-    return node;
-  }
-
-  PrimTypeNode *FixUpVisitor::VisitPrimTypeNode(PrimTypeNode *node) {
     return node;
   }
 
