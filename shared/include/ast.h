@@ -75,13 +75,13 @@ protected:
   unsigned  mNodeId;
   TreeNode *mParent;
   TreeNode *mLabel;   // label of a statement, or expression.
-  const char *mOrigName;
+  const char *mName;
 
   bool      mIsStmt;  // if a node is a statement
 
 public:
   TreeNode() : mKind(NK_Null), mLabel(NULL),
-               mParent(NULL), mOrigName(NULL), mIsStmt(false) {}
+               mParent(NULL), mName(NULL), mIsStmt(false) {}
   virtual ~TreeNode() {}
 
 #undef  NODEKIND
@@ -102,13 +102,8 @@ public:
   bool IsStmt()    {return mIsStmt;}
   void SetIsStmt() {mIsStmt = true;}
 
-  // GetName() and SetName are virtual and can be customized
-  virtual const char* GetName() {return mOrigName;}
-  virtual void SetName(const char *s) {mOrigName = s;}
-  // GetOrigName() and SetOrigName() are non-virtual
-  const char* GetOrigName() {return mOrigName;}
-  void SetOrigName(const char *s) {mOrigName = s;}
-
+  virtual const char* GetName() {return mName;}
+  virtual void SetName(const char *s) {mName = s;}
   virtual void ReplaceChild(TreeNode *oldchild, TreeNode *newchild){}
   virtual void AddAttr(AttrId) {}
   virtual void AddAnnotation(AnnotationNode *n){}
@@ -132,12 +127,13 @@ private:
   TreeNode *mPackage;
 public:
   PackageNode(){mKind = NK_Package;}
-  PackageNode(const char *s) {mKind = NK_Package; mOrigName = s;}
+  PackageNode(const char *s) {mKind = NK_Package; mName = s;}
   ~PackageNode() {}
 
   TreeNode* GetPackage() {return mPackage;}
   void SetPackage(TreeNode *t) {mPackage = t;}
 
+  void SetName(const char *s) {mName = s;}
   void Dump(unsigned indent);
 };
 
@@ -254,7 +250,7 @@ private:
   TreeNode       *mTarget;
 
 public:
-  ImportNode() {mProperty = ImpNone; mKind = NK_Import;}
+  ImportNode() {mName = NULL; mProperty = ImpNone; mKind = NK_Import;}
   ~ImportNode(){mPairs.Release();}
 
   void SetProperty(ImportProperty p) {mProperty = p;}
@@ -722,7 +718,7 @@ private:
   IdentifierNode *mStructId;
   SmallVector<IdentifierNode*> mFields;
 public:
-  StructNode() {mKind = NK_Struct; mProp = SProp_NA;}
+  StructNode() {mKind = NK_Struct; mName = NULL; mProp = SProp_NA;}
   StructNode(IdentifierNode *n) {mKind = NK_Struct; mStructId = n; mProp = SProp_NA;}
   ~StructNode() {Release();}
 
