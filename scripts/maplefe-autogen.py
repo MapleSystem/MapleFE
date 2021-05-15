@@ -544,7 +544,7 @@ gen_call_child_node = lambda dictionary, node_name, field_name, node_type, acces
         ('if(auto t = ' + accessor + ') {' + ('auto n = ' + gen_args[2] + node_type + '(t);' \
         + 'if(n != t){' + gen_setter(accessor) + ';}' \
         if node_name != "IdentifierNode" or field_name != "mType" else \
-        'if(t->GetKind() != NK_Class) { auto n = ' + gen_args[2] + node_type + '(t);' \
+        'if(t != node && t->GetKind() != NK_Class) { auto n = ' + gen_args[2] + node_type + '(t);' \
         + 'if(n != t){' + gen_setter(accessor) + ';}}') +'}') if field_name != '' else \
         'return ' + gen_args[2] + node_type + '(' + accessor + ');\n'
 gen_call_children_node = lambda dictionary, node_name, field_name, node_type, accessor: ''
