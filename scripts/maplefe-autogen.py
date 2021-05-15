@@ -178,7 +178,7 @@ def gen_handler_ast_node(dictionary):
     members = dictionary.get("Members")
     if members != None:
         declloc = dictionary.get("DefLocation")
-        if declloc != None and isinstance(declloc, dict):
+        if gen_func_decl_location() and declloc != None and isinstance(declloc, dict):
             fname = declloc.get("Filename")
             floc = fname.find("shared/")
             code.append("// Declared at " + fname[floc:] + ":" + str(declloc.get("LineNumber")))
@@ -382,6 +382,7 @@ def padding_name(name):
     return gen_args[4] + name.ljust(7)
 
 # The follwoing gen_func_* and gen_call* functions are for AstDump
+gen_func_decl_location = lambda: True
 gen_call_handle_values = lambda: True
 gen_func_declaration = lambda dictionary, node_name: \
         "void " + gen_args[2] + node_name + "(" + node_name + "* node);"
@@ -725,7 +726,8 @@ def get_data_based_on_type(val_type, accessor):
 def short_name(node_type):
     return node_type.replace('class ', '').replace('maplefe::', '').replace(' *', '*')
 
-# The follwoing gen_func_* and gen_call* functions are for AstDump
+# The follwoing gen_func_* and gen_call* functions are for AstEmitter
+gen_func_decl_location = lambda: False
 gen_call_handle_values = lambda: True
 gen_func_declaration = lambda dictionary, node_name: \
         "std::string " + gen_args[2] + node_name + "(" + node_name + "* node);"
@@ -761,7 +763,7 @@ gen_args = [
 
 astemit_init = [
 """
-using Precedence = signed char;
+using Precedence = char;
 
 private:
 ASTModule    *mASTModule;
@@ -773,10 +775,18 @@ public:
 
 void {gen_args2}(const char *title, std::ostream *os) {{
   mOs = os;
-  *mOs << "// {gen_args1}: " << title << "\\n// Filename: " << mASTModule->mFileName << "\\n";
+  *mOs << "// [Beginning of {gen_args1}: " << title << "\\n// Filename: " << mASTModule->mFileName << "\\n";
   for(auto it: mASTModule->mTrees)
     *mOs << {gen_args2}TreeNode(it->mRootNode);
-}}
+    *mOs << "// End of AstEmitter]\\n";
+  }}
+
+  std::string Clean(std::string &s) {{
+    auto len = s.length();
+    if(len >= 2 && s.substr(len - 2) == ";\\n")
+      return s.erase(len - 2);
+    return s;
+  }}
 
 """.format(gen_args1=gen_args[1], gen_args2=gen_args[2], astdumpclass=astdumpclass)
 ] # astemit_init

@@ -23,7 +23,6 @@ std::string AstEmitter::AstEmitAnnotationNode(AnnotationNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
-  // Declared at shared/include/ast.h:481
   if (auto n = node->GetId()) {
     str += " "s + AstEmitIdentifierNode(n);
   }
@@ -50,11 +49,50 @@ std::string AstEmitter::AstEmitPackageNode(PackageNode *node) {
   return str;
 }
 
+std::string AstEmitter::AstEmitXXportAsPairNode(XXportAsPairNode *node) {
+  if (node == nullptr)
+    return std::string();
+  std::string str;
+  str += " "s + std::to_string(node->IsDefault());
+  str += " "s + std::to_string(node->IsEverything());
+  if (auto n = node->GetBefore()) {
+    str += " "s + AstEmitTreeNode(n);
+  }
+  if (auto n = node->GetAfter()) {
+    str += " "s + AstEmitTreeNode(n);
+  }
+  mPrecedence = '\030';
+  if (node->IsStmt())
+    str += ";\n"s;
+  return str;
+}
+
+std::string AstEmitter::AstEmitExportNode(ExportNode *node) {
+  if (node == nullptr)
+    return std::string();
+  std::string str;
+  if (auto n = node->GetTarget()) {
+    str += " "s + AstEmitTreeNode(n);
+  }
+
+  for (unsigned i = 0; i < node->GetPairsNum(); ++i) {
+    if (i)
+      str += ", "s;
+    if (auto n = node->GetPair(i)) {
+      str += " "s + AstEmitXXportAsPairNode(n);
+    }
+  }
+
+  mPrecedence = '\030';
+  if (node->IsStmt())
+    str += ";\n"s;
+  return str;
+}
+
 std::string AstEmitter::AstEmitImportNode(ImportNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
-  // Declared at shared/include/ast.h:169
   str += " "s + AstDump::GetEnumImportProperty(node->GetProperty());
   if (auto n = node->GetTarget()) {
     str += " "s + AstEmitTreeNode(n);
@@ -264,7 +302,6 @@ std::string AstEmitter::AstEmitAnnotationTypeNode(AnnotationTypeNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
-  // Declared at shared/include/ast.h:468
   if (auto n = node->GetId()) {
     str += " "s + AstEmitIdentifierNode(n);
   }
@@ -392,7 +429,6 @@ std::string AstEmitter::AstEmitFieldLiteralNode(FieldLiteralNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
-  // Declared at shared/include/ast.h:657
   if (auto n = node->GetFieldName()) {
     str = AstEmitIdentifierNode(n);
   }
@@ -424,7 +460,6 @@ std::string AstEmitter::AstEmitVarListNode(VarListNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
-  // Declared at shared/include/ast.h:692
 
   for (unsigned i = 0; i < node->GetVarsNum(); ++i) {
     if (auto n = node->GetVarAtIndex(i)) {
@@ -442,7 +477,6 @@ std::string AstEmitter::AstEmitExprListNode(ExprListNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
-  // Declared at shared/include/ast.h:714
 
   for (unsigned i = 0; i < node->GetExprsNum(); ++i) {
     if (auto n = node->GetExprAtIndex(i)) {
@@ -501,7 +535,6 @@ std::string AstEmitter::AstEmitFinallyNode(FinallyNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str = "finally "s;
-  // Declared at shared/include/ast.h:796
   if (auto n = node->GetBlock()) {
     str += AstEmitBlockNode(n);
   }
@@ -514,7 +547,6 @@ std::string AstEmitter::AstEmitTryNode(TryNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str = "try "s;
-  // Declared at shared/include/ast.h:809
   if (auto n = node->GetBlock()) {
     str += AstEmitBlockNode(n);
   }
@@ -533,7 +565,6 @@ std::string AstEmitter::AstEmitExceptionNode(ExceptionNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
-  // Declared at shared/include/ast.h:836
   if (auto n = node->GetException()) {
     str += " "s + AstEmitIdentifierNode(n);
   }
@@ -547,7 +578,6 @@ std::string AstEmitter::AstEmitReturnNode(ReturnNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str = "return"s;
-  // Declared at shared/include/ast.h:855
   if (auto n = node->GetResult()) {
     str += " "s + AstEmitTreeNode(n);
   }
@@ -559,7 +589,6 @@ std::string AstEmitter::AstEmitCondBranchNode(CondBranchNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str = "if("s;
-  // Declared at shared/include/ast.h:867
   if (auto n = node->GetCond()) {
     auto cond = AstEmitTreeNode(n);
     str += Clean(cond);
@@ -578,7 +607,6 @@ std::string AstEmitter::AstEmitBreakNode(BreakNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str = "break"s;
-  // Declared at shared/include/ast.h:888
   if (auto n = node->GetTarget()) {
     str += " "s + AstEmitTreeNode(n);
   }
@@ -753,7 +781,6 @@ std::string AstEmitter::AstEmitAssertNode(AssertNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
-  // Declared at shared/include/ast.h:1079
   if (auto n = node->GetExpr()) {
     str += " "s + AstEmitTreeNode(n);
   }
@@ -771,7 +798,6 @@ std::string AstEmitter::AstEmitCallNode(CallNode *node) {
     return std::string();
   // Function call: left-to-right, precedence = 20
   std::string str;
-  // Declared at shared/include/ast.h:1099
   if (auto n = node->GetMethod()) {
     auto s = AstEmitTreeNode(n);
     if(n->GetKind() == NK_Function)
@@ -855,7 +881,6 @@ std::string AstEmitter::AstEmitInterfaceNode(InterfaceNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str = "interface "s + node->GetName() + " {"s;
-  // Declared at shared/include/ast.h:1251
   str += std::to_string(node->IsAnnotation());
 
   for (unsigned i = 0; i < node->GetSuperInterfacesNum(); ++i) {
@@ -884,7 +909,6 @@ std::string AstEmitter::AstEmitClassNode(ClassNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str = "class "s + node->GetName() + " {"s;
-  // Declared at shared/include/ast.h:1284
   //str += " "s + std::to_string(node->IsJavaEnum());
 
   for (unsigned i = 0; i < node->GetSuperClassesNum(); ++i) {
@@ -965,7 +989,6 @@ std::string AstEmitter::AstEmitLambdaNode(LambdaNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
-  // Declared at shared/include/ast.h:1379
   str += " "s + AstDump::GetEnumLambdaProperty(node->GetProperty());
   if (auto n = node->GetType()) {
     str += " "s + AstEmitTreeNode(n);
@@ -1028,11 +1051,27 @@ std::string AstEmitter::AstEmitTypeOfNode(TypeOfNode *node) {
   return str;
 }
 
+std::string AstEmitter::AstEmitInNode(InNode *node) {
+  if (node == nullptr)
+    return std::string();
+  std::string str;
+  if (auto n = node->GetLeft()) {
+    str += AstEmitTreeNode(n);
+  }
+  str += " in "s;
+  if (auto n = node->GetRight()) {
+    str += AstEmitTreeNode(n);
+  }
+  mPrecedence = '\014';
+  if (node->IsStmt())
+    str += ";\n"s;
+  return str;
+}
+
 std::string AstEmitter::AstEmitAttrNode(AttrNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
-  // Declared at shared/include/ast_attr.h:39
   str += " "s + AstDump::GetEnumAttrId(node->GetId());
   if (node->IsStmt())
     str += ";\n"s;
@@ -1112,8 +1151,14 @@ std::string AstEmitter::AstEmitTreeNode(TreeNode *node) {
   case NK_Package:
     return AstEmitPackageNode(static_cast<PackageNode *>(node));
     break;
+  case NK_XXportAsPair:
+    return AstEmitXXportAsPairNode(static_cast<XXportAsPairNode *>(node));
+    break;
   case NK_Import:
     return AstEmitImportNode(static_cast<ImportNode *>(node));
+    break;
+  case NK_Export:
+    return AstEmitExportNode(static_cast<ExportNode *>(node));
     break;
   case NK_Decl:
     return AstEmitDeclNode(static_cast<DeclNode *>(node));
@@ -1186,6 +1231,9 @@ std::string AstEmitter::AstEmitTreeNode(TreeNode *node) {
     break;
   case NK_TypeOf:
     return AstEmitTypeOfNode(static_cast<TypeOfNode *>(node));
+    break;
+  case NK_In:
+    return AstEmitInNode(static_cast<InNode *>(node));
     break;
   case NK_Block:
     return AstEmitBlockNode(static_cast<BlockNode *>(node));

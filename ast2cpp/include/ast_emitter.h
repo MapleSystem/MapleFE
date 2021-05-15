@@ -47,13 +47,15 @@ public:
 
   std::string Clean(std::string &s) {
     auto len = s.length();
-    if(len >= 2 && s.substr(len - 2) == ";\n")
+    if (len >= 2 && s.substr(len - 2) == ";\n")
       return s.erase(len - 2);
     return s;
   }
 
   std::string AstEmitAnnotationNode(AnnotationNode *node);
   std::string AstEmitPackageNode(PackageNode *node);
+  std::string AstEmitXXportAsPairNode(XXportAsPairNode *node);
+  std::string AstEmitExportNode(ExportNode *node);
   std::string AstEmitImportNode(ImportNode *node);
   std::string AstEmitUnaOperatorNode(UnaOperatorNode *node);
   std::string AstEmitBinOperatorNode(BinOperatorNode *node);
@@ -100,6 +102,7 @@ public:
   std::string AstEmitLambdaNode(LambdaNode *node);
   std::string AstEmitInstanceOfNode(InstanceOfNode *node);
   std::string AstEmitTypeOfNode(TypeOfNode *node);
+  std::string AstEmitInNode(InNode *node);
   std::string AstEmitAttrNode(AttrNode *node);
   std::string AstEmitUserTypeNode(UserTypeNode *node);
   std::string AstEmitPrimTypeNode(PrimTypeNode *node);
