@@ -28,6 +28,7 @@
 #include "ast_mempool.h"
 #include "ast_type.h"
 #include "parser_rec.h"
+#include "ast_fixup.h"
 
 namespace maplefe {
 
@@ -328,6 +329,9 @@ bool Parser::Parse() {
     if (res == ParseFail || res == ParseEOF)
       break;
   }
+
+  FixUpVisitor worker(&gModule);
+  worker.FixUp();
 
   gModule.Dump();
   return (res==ParseFail)? false: true;
@@ -806,7 +810,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent, Appeal
     // wave (instance) of the Wavefront traversal, the 1st is not visited, the
     // 2nd is visited.
 
-    if (rec_tra->LeadNodeVisited(rule_table)) {  
+    if (rec_tra->LeadNodeVisited(rule_table)) {
       if (mTraceLeftRec) {
         DumpIndentation();
         std::cout << "<LR>: ConnectPrevious " << GetRuleTableName(rule_table)
@@ -1367,7 +1371,7 @@ void Parser::SetIsDone(unsigned group_id, unsigned start_token) {
     bool found = succ->GetStartToken(start_token);
     if(found)
       succ->SetIsDone();
-  } 
+  }
 }
 
 void Parser::SetIsDone(RuleTable *rt, unsigned start_token) {

@@ -112,7 +112,7 @@ public:
 
   static const char *GetEnumTypeId(TypeId k);
   //static const char *GetEnumSepId(SepId k);
-  static const char *GetEnumOprId(OprId k, bool isUna, bool isPost);
+  static const char *GetEnumOprId(OprId k);
   //static const char *GetEnumLitId(LitId k);
   //static const char *GetEnumAttrId(AttrId k);
   //static const char *GetEnumImportProperty(ImportProperty k);

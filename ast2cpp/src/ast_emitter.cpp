@@ -106,13 +106,13 @@ std::string AstEmitter::AstEmitUnaOperatorNode(UnaOperatorNode *node) {
   if (node == nullptr)
     return std::string();
   bool isPost = node->IsPost();
-  const char *op = AstEmitter::GetEnumOprId(node->GetOprId(), true, isPost);
+  const char *op = AstEmitter::GetEnumOprId(node->GetOprId());
   const Precedence precd = *op & 0x1f;
   const bool rl_assoc = *op >> 6; // false: left-to-right, true: right-to-left
   std::string opr;
   if (auto n = node->GetOpnd()) {
     opr = AstEmitTreeNode(n);
-    if(precd > mPrecedence || (precd == mPrecedence &&(rl_assoc && isPost || !rl_assoc && !isPost)))
+    if(precd > mPrecedence || (precd == mPrecedence && (rl_assoc && isPost || !rl_assoc && !isPost)))
       opr = "("s + opr + ")"s;
   }
   else
@@ -131,7 +131,7 @@ std::string AstEmitter::AstEmitUnaOperatorNode(UnaOperatorNode *node) {
 std::string AstEmitter::AstEmitBinOperatorNode(BinOperatorNode *node) {
   if (node == nullptr)
     return std::string();
-  const char *op = AstEmitter::GetEnumOprId(node->GetOprId(), false, false);
+  const char *op = AstEmitter::GetEnumOprId(node->GetOprId());
   const Precedence precd = *op & 0x1f;
   const bool rl_assoc = *op >> 6; // false: left-to-right, true: right-to-left
   std::string lhs, rhs;
@@ -1379,7 +1379,7 @@ const char *AstEmitter::GetEnumDeclProp(DeclProp k) {
   return "UNEXPECTED DeclProp";
 }
 
-const char *AstEmitter::GetEnumOprId(OprId k, bool isUna, bool isPost) {
+const char *AstEmitter::GetEnumOprId(OprId k) {
   // The first char in the returned string includes operator precedence and associativity info
   //
   // bits   7   6   5   4   3   2   1   0
@@ -1389,20 +1389,28 @@ const char *AstEmitter::GetEnumOprId(OprId k, bool isUna, bool isPost) {
   //            |__ associativity, 0: left-to-right, 1: right-to-left
   //
   switch (k) {
+  case OPR_Plus:
+    return          "\121+";
   case OPR_Add:
-    return  isUna ? "\121+" : "\016+";
+    return          "\016+";
+  case OPR_Minus:
+    return          "\121-";
   case OPR_Sub:
-    return  isUna ? "\121-" : "\016-";
+    return          "\016-";
   case OPR_Mul:
     return          "\017*";
   case OPR_Div:
     return          "\017/";
   case OPR_Mod:
     return          "\017%";
+  case OPR_PreInc:
+    return          "\121++";
   case OPR_Inc:
-    return isPost ? "\022++" : "\021++";
+    return          "\022++";
+  case OPR_PreDec:
+    return          "\121--";
   case OPR_Dec:
-    return isPost ? "\022--" : "\021--";
+    return          "\022--";
   case OPR_EQ:
     return          "\013==";
   case OPR_NE:
