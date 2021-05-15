@@ -419,7 +419,7 @@ class  Math
 
 
     func  scalb(d,scaleFactor)  throws: 
-      Decl: MAX_SCALE=DoubleConsts.MAX_EXPONENT Add Sub
+      Decl: MAX_SCALE=DoubleConsts.MAX_EXPONENT Add Minus
   DoubleConsts.MIN_EXPONENT Add DoubleConsts.SIGNIFICAND_WIDTH Add 1
       Decl: exp_adjust=0
       Decl: scale_increment=0
@@ -444,7 +444,7 @@ class  Math
 
       return d
     func  scalb(f,scaleFactor)  throws: 
-      Decl: MAX_SCALE=FloatConsts.MAX_EXPONENT Add Sub
+      Decl: MAX_SCALE=FloatConsts.MAX_EXPONENT Add Minus
   FloatConsts.MIN_EXPONENT Add FloatConsts.SIGNIFICAND_WIDTH Add 1
       scaleFactor Assign Math.max(Math.min(scaleFactor,MAX_SCALE) Sub MAX_SCALE)
       return (float)((double)f Mul powerOfTwoD(scaleFactor))

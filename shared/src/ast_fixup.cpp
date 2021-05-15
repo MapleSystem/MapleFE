@@ -23,7 +23,29 @@ namespace maplefe {
     return mUpdated;
   }
 
-  DeclNode *FixUpVisitor::VisitDeclNode(DeclNode *node) {
+  // Fix up mOprId of a UnaOperatorNode
+  UnaOperatorNode *FixUpVisitor::VisitUnaOperatorNode(UnaOperatorNode *node) {
+    switch(node->GetOprId()) {
+      case OPR_Add:
+        node->SetOprId(OPR_Plus);
+        mUpdated = true;
+        break;
+      case OPR_Sub:
+        node->SetOprId(OPR_Minus);
+        mUpdated = true;
+        break;
+      case OPR_Inc:
+        if(!node->IsPost()) {
+          node->SetOprId(OPR_PreInc);
+          mUpdated = true;
+        }
+        break;
+      case OPR_Dec:
+        if(!node->IsPost()) {
+          node->SetOprId(OPR_PreDec);
+          mUpdated = true;
+        }
+    }
     return node;
   }
 
@@ -35,22 +57,4 @@ namespace maplefe {
     return node;
   }
 
-  UnaOperatorNode *FixUpVisitor::VisitUnaOperatorNode(UnaOperatorNode *node) {
-    switch(node->GetOprId()) {
-      case OPR_Add:
-        node->SetOprId(OPR_Plus);
-        break;
-      case OPR_Sub:
-        node->SetOprId(OPR_Minus);
-        break;
-      case OPR_Inc:
-        if(!node->IsPost())
-          node->SetOprId(OPR_PreInc);
-        break;
-      case OPR_Dec:
-        if(!node->IsPost())
-          node->SetOprId(OPR_PreDec);
-    }
-    return node;
-  }
 }

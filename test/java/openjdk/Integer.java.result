@@ -169,7 +169,7 @@ while val NE 0 Land charPos GT 0
       Decl: result=0
       Decl: negative=false
       Decl: i=0,len=s.length()
-      Decl: limit=Sub
+      Decl: limit=Minus
   Integer.MAX_VALUE
       Decl: multmin
       Decl: digit

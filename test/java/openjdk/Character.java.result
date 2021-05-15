@@ -110,11 +110,11 @@ class  Character
 
       return c1
     func  codePointBefore(seq,index)  throws: 
-      Decl: c2=seq.charAt(Dec
+      Decl: c2=seq.charAt(PreDec
   index)
       cond-branch cond:isLowSurrogate(c2) Land index GT 0
       true branch :
-        Decl: c1=seq.charAt(Dec
+        Decl: c1=seq.charAt(PreDec
   index)
         cond-branch cond:isHighSurrogate(c1)
         true branch :
@@ -445,7 +445,7 @@ class  Character
 
       cond-branch cond:codePoint LT 128
       true branch :
-        Decl: result=Sub
+        Decl: result=Minus
   1
         cond-branch cond:0 LE codePoint Land codePoint LE 9
         true branch :

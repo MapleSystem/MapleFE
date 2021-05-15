@@ -21,15 +21,8 @@
 #include "gen_astvisitor.h"
 
 namespace maplefe {
-  // FixUpVisitor is to fix up some tree nodes after the AST is created
-  //
-  // For UnaOperatorNode, update its OprId:
-  //   OPR_Add              --> OPR_Plus
-  //   OPR_Sub              --> OPR_Minus
-  //   OPR_Inc && !IsPost() --> OPR_PreInc
-  //   OPR_Dec && !IsPost() --> OPR_DecInc
-  //
 
+  // FixUpVisitor is to fix up some tree nodes after the AST is created
   class FixUpVisitor : public AstVisitor {
     private:
       ASTModule *mASTModule;
@@ -40,10 +33,16 @@ namespace maplefe {
 
       bool FixUp();
 
-      DeclNode *VisitDeclNode(DeclNode *node);
+      // Fix up OprId of a UnaOperatorNode
+      //   OPR_Add              --> OPR_Plus
+      //   OPR_Sub              --> OPR_Minus
+      //   OPR_Inc && !IsPost() --> OPR_PreInc
+      //   OPR_Dec && !IsPost() --> OPR_DecInc
+      //
+      UnaOperatorNode *VisitUnaOperatorNode(UnaOperatorNode *node);
+
       UserTypeNode *VisitUserTypeNode(UserTypeNode *node);
       PrimTypeNode *VisitPrimTypeNode(PrimTypeNode *node);
-      UnaOperatorNode *VisitUnaOperatorNode(UnaOperatorNode *node);
   };
 
 }
