@@ -449,14 +449,11 @@ void AnnotationTypeNode::Dump(unsigned indent) {
 //////////////////////////////////////////////////////////////////////////////////////
 
 const char* CastNode::GetDumpName() {
-  if (mName)
-    return mName;
   std::string name = "(";
   name += mDestType->GetName();
   name += ")";
   name += mExpr->GetName();
-  mName = gStringPool.FindString(name);
-  return mName;
+  return gStringPool.FindString(name);
 }
 
 void CastNode::Dump(unsigned indent) {
