@@ -75,146 +75,14 @@ public:
 
   TreeNode* Build();
 
-  TreeNode* BuildPackageName();
+#undef  ACTION
+#define ACTION(K) TreeNode* K();
+#include "supported_actions.def"
 
-  TreeNode* BuildSingleTypeImport();
-  TreeNode* BuildAllTypeImport();
-  TreeNode* BuildSingleStaticImport();
-  TreeNode* BuildAllStaticImport();
-  TreeNode* BuildAllImport();
-
-  TreeNode* BuildImport();
-  TreeNode* BuildExport();
-  TreeNode* SetPairs();
-  TreeNode* SetFromModule();
-  TreeNode* SetIsDefault();
-  TreeNode* SetIsEverything();
-
-  TreeNode* BuildXXportAsPair();
-  TreeNode* BuildXXportAsPairEverything();
-  TreeNode* BuildXXportAsPairDefault();
-
-
-  TreeNode* BuildBlock();
-  TreeNode* AddToBlock();
-  TreeNode* AddSyncToBlock();
   TreeNode* CvtToBlock(TreeNode *tnode);
-
-  TreeNode* BuildUnaryOperation();
-  TreeNode* BuildPostfixOperation();
-  TreeNode* BuildBinaryOperation();
-  TreeNode* BuildTernaryOperation();
-  TreeNode* BuildCast();
-  TreeNode* BuildParenthesis();
-  TreeNode* BuildLambda();
-  TreeNode* BuildInstanceOf();
-  TreeNode* BuildIn();
-  TreeNode* BuildTypeOf();
-
-  TreeNode* BuildStruct();
-  TreeNode* SetTSInterface();
-  TreeNode* AddStructField();
-  TreeNode* BuildFieldLiteral();
-  TreeNode* BuildStructLiteral();
-
-  // Array
-  TreeNode* BuildArrayElement();
-  TreeNode* BuildArrayLiteral();
-
-  TreeNode* BuildDecl();
-  TreeNode* SetJSVar();
-  TreeNode* SetJSLet();
-  TreeNode* SetJSConst();
-  TreeNode* BuildField();
-  TreeNode* BuildVarList();
-
-  TreeNode* AddInitTo();
-  TreeNode* AddType();
-  TreeNode* AddModifier();
-  TreeNode* AddModifierTo();
-
-  // Callsite
   void AddArguments(TreeNode *call, TreeNode *args);
-  TreeNode* AddArguments();
-  TreeNode* BuildCall();
-  TreeNode* BuildExprList();
-
-  // Function related
   void AddParams(TreeNode *func, TreeNode *params);
-  TreeNode* AddParams();
-  TreeNode* BuildFunction();
-  TreeNode* BuildConstructor();
-  TreeNode* AddFunctionBody();
-  TreeNode* AddFunctionBodyTo();
-
-  TreeNode* BuildClass();
-  TreeNode* SetClassIsJavaEnum();
-  TreeNode* AddClassBody();
-  TreeNode* AddSuperClass();
-  TreeNode* AddSuperInterface();
-  TreeNode* BuildInstInit();
-
-  // Annotation related
-  TreeNode* BuildAnnotationType();
-  TreeNode* BuildAnnotation();
-  TreeNode* AddAnnotationTypeBody();
-
-  // Interface related
-  TreeNode* BuildInterface();
-  TreeNode* AddInterfaceBody();
-
-  // Dimension Related
-  TreeNode* BuildDim();
-  TreeNode* BuildDims();
-  TreeNode* AddDims();
-  TreeNode* AddDimsTo();
-
-  // Statements, Control Flow
-  TreeNode* SetIsStmt();
-  TreeNode* BuildAssignment();
-  TreeNode* BuildReturn();
-  TreeNode* BuildCondBranch();
-  TreeNode* AddCondBranchTrueStatement();
-  TreeNode* AddCondBranchFalseStatement();
-  TreeNode* AddLabel();
-  TreeNode* BuildBreak();
-  TreeNode* BuildContinue();
-  TreeNode* BuildForLoop();
-  TreeNode* BuildForLoop_In();
-  TreeNode* BuildForLoop_Of();
-  TreeNode* BuildWhileLoop();
-  TreeNode* BuildDoLoop();
-  TreeNode* BuildNewOperation();
-  TreeNode* BuildDeleteOperation();
-  TreeNode* BuildAssert();
-
   SwitchCaseNode* SwitchLabelToCase(SwitchLabelNode*);
-  TreeNode* BuildSwitchLabel();
-  TreeNode* BuildDefaultSwitchLabel();
-  TreeNode* BuildOneCase();
-  TreeNode* BuildSwitch();
-
-  // Exception, throw
-  TreeNode* BuildThrows();
-  TreeNode* AddThrowsTo();
-
-  // Try, Catch, Finally
-  TreeNode* BuildTry();
-  TreeNode* BuildCatch();
-  TreeNode* BuildFinally();
-  TreeNode* AddCatch();
-  TreeNode* AddFinally();
-
-  // User Type related
-  TreeNode* BuildUserType();
-  TreeNode* AddTypeArgument();
-  TreeNode* BuildUnionUserType();
-  TreeNode* BuildInterUserType();
-  TreeNode* BuildArrayType();
-  TreeNode* BuildTypeAlias();
-
-  // Pass a child
-  TreeNode* PassChild();
 };
 
 // A global builder is good enough.
