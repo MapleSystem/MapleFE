@@ -25,6 +25,8 @@
 #include "rule_summary.h"
 #include "ast.h"
 #include "ast_builder.h"
+#include "ast_mempool.h"
+#include "ast_type.h"
 #include "parser_rec.h"
 
 namespace maplefe {
@@ -184,6 +186,7 @@ Parser::Parser(const char *name) : filename(name) {
   const std::string file(name);
 
   gModule.SetFileName(name);
+  gPrimTypePool.Init();
 
   // get source language type
   std::string::size_type lastDot = file.find_last_of('.');

@@ -59,14 +59,12 @@ public:
   // information for a single action
   unsigned                mActionId;
   std::vector<Param>      mParams;
-  TreePool               *mTreePool;
 
 public:
-  ASTBuilder() : mTreePool(NULL), mTrace(false) {}
+  ASTBuilder() : mTrace(false) {}
   ~ASTBuilder() {}
 
   void SetTrace(bool b) {mTrace = b;}
-  void SetTreePool(TreePool *p) {mTreePool = p;}
 
   void AddParam(Param p) {mParams.push_back(p);}
   void ClearParams() {mParams.clear();}

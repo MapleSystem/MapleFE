@@ -59,7 +59,6 @@ static const char* GetOperatorName(OprId opr) {
 
 ASTTree::ASTTree() {
   mRootNode = NULL;
-  gASTBuilder.SetTreePool(&mTreePool);
 }
 
 ASTTree::~ASTTree() {
@@ -227,7 +226,7 @@ TreeNode* ASTTree::Manipulate(AppealNode *appeal_node) {
 TreeNode* ASTTree::Manipulate2Cast(TreeNode *child_a, TreeNode *child_b) {
   if (child_a->IsParenthesis()) {
     ParenthesisNode *type = (ParenthesisNode*)child_a;
-    CastNode *n = (CastNode*)mTreePool.NewTreeNode(sizeof(CastNode));
+    CastNode *n = (CastNode*)gTreePool.NewTreeNode(sizeof(CastNode));
     new (n) CastNode();
     n->SetDestType(type->GetExpr());
     n->SetExpr(child_b);
@@ -257,7 +256,7 @@ void ASTTree::Dump(unsigned indent) {
 }
 
 TreeNode* ASTTree::BuildBinaryOperation(TreeNode *childA, TreeNode *childB, OprId id) {
-  BinOperatorNode *n = (BinOperatorNode*)mTreePool.NewTreeNode(sizeof(BinOperatorNode));
+  BinOperatorNode *n = (BinOperatorNode*)gTreePool.NewTreeNode(sizeof(BinOperatorNode));
   new (n) BinOperatorNode(id);
   n->SetOpndA(childA);
   n->SetOpndB(childB);
@@ -267,7 +266,7 @@ TreeNode* ASTTree::BuildBinaryOperation(TreeNode *childA, TreeNode *childB, OprI
 }
 
 TreeNode* ASTTree::BuildPassNode() {
-  PassNode *n = (PassNode*)mTreePool.NewTreeNode(sizeof(PassNode));
+  PassNode *n = (PassNode*)gTreePool.NewTreeNode(sizeof(PassNode));
   new (n) PassNode();
   return n;
 }
@@ -336,7 +335,7 @@ void ImportNode::AddPairs(TreeNode *t) {
     mPairs.PushBack((XXportAsPairNode*)t);
   } else {
     // We create a new pair to save 't'.
-    XXportAsPairNode *n = (XXportAsPairNode*)gASTBuilder.mTreePool->NewTreeNode(sizeof(XXportAsPairNode));
+    XXportAsPairNode *n = (XXportAsPairNode*)gTreePool.NewTreeNode(sizeof(XXportAsPairNode));
     new (n) XXportAsPairNode();
     n->SetBefore(t);
     mPairs.PushBack(n);
@@ -379,7 +378,7 @@ void ExportNode::AddPairs(TreeNode *t) {
     mPairs.PushBack((XXportAsPairNode*)t);
   } else {
     // We create a new pair to save 't'.
-    XXportAsPairNode *n = (XXportAsPairNode*)gASTBuilder.mTreePool->NewTreeNode(sizeof(XXportAsPairNode));
+    XXportAsPairNode *n = (XXportAsPairNode*)gTreePool.NewTreeNode(sizeof(XXportAsPairNode));
     new (n) XXportAsPairNode();
     n->SetBefore(t);
     mPairs.PushBack(n);

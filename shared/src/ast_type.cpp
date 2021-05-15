@@ -144,11 +144,7 @@ void PrimTypeNode::Dump(unsigned indent) {
 // The global Pool for 
 PrimTypePool gPrimTypePool;
 
-PrimTypePool::PrimTypePool() {
-  // 1024 per block could be better.
-  mTreePool.SetBlockSize(1024);
-  Init();
-}
+PrimTypePool::PrimTypePool() {}
 
 PrimTypePool::~PrimTypePool() {
   mTypes.Release();
@@ -156,7 +152,7 @@ PrimTypePool::~PrimTypePool() {
 
 void PrimTypePool::Init() {
   for (unsigned i = 0; i < TypeKeywordTableSize; i++) {
-    PrimTypeNode *n = (PrimTypeNode*)mTreePool.NewTreeNode(sizeof(PrimTypeNode));
+    PrimTypeNode *n = (PrimTypeNode*)gTreePool.NewTreeNode(sizeof(PrimTypeNode));
     new (n) PrimTypeNode();
     n->SetPrimType((TypeId)TypeKeywordTable[i].mId);
     mTypes.PushBack(n);

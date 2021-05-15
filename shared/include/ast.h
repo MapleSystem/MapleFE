@@ -1595,7 +1595,6 @@ class ASTBuilder;
 
 class ASTTree {
 public:
-  TreePool    mTreePool;
   TreeNode   *mRootNode;
 
 private:

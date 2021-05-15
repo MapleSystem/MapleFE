@@ -54,5 +54,6 @@ public:
                     //     is out of the control of mMP.
 };
 
+extern TreePool gTreePool;
 }
 #endif

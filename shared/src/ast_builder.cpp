@@ -51,13 +51,13 @@ TreeNode* ASTBuilder::Build() {
 TreeNode* ASTBuilder::CreateTokenTreeNode(const Token *token) {
   unsigned size = 0;
   if (token->IsIdentifier()) {
-    IdentifierNode *n = (IdentifierNode*)mTreePool->NewTreeNode(sizeof(IdentifierNode));
+    IdentifierNode *n = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
     new (n) IdentifierNode(token->GetName());
     mLastTreeNode = n;
     return n;
   } else if (token->IsLiteral()) {
     LitData data = token->GetLitData();
-    LiteralNode *n = (LiteralNode*)mTreePool->NewTreeNode(sizeof(LiteralNode));
+    LiteralNode *n = (LiteralNode*)gTreePool.NewTreeNode(sizeof(LiteralNode));
     new (n) LiteralNode(data);
     mLastTreeNode = n;
     return n;
@@ -79,14 +79,14 @@ TreeNode* ASTBuilder::CreateTokenTreeNode(const Token *token) {
     if ((strlen(token->GetName()) == 4) && !strncmp(token->GetName(), "this", 4)) {
       LitData data;
       data.mType = LT_ThisLiteral;
-      LiteralNode *n = (LiteralNode*)mTreePool->NewTreeNode(sizeof(LiteralNode));
+      LiteralNode *n = (LiteralNode*)gTreePool.NewTreeNode(sizeof(LiteralNode));
       new (n) LiteralNode(data);
       mLastTreeNode = n;
       return n;
     } else if ((strlen(token->GetName()) == 5) && !strncmp(token->GetName(), "super", 5)) {
       LitData data;
       data.mType = LT_SuperLiteral;
-      LiteralNode *n = (LiteralNode*)mTreePool->NewTreeNode(sizeof(LiteralNode));
+      LiteralNode *n = (LiteralNode*)gTreePool.NewTreeNode(sizeof(LiteralNode));
       new (n) LiteralNode(data);
       mLastTreeNode = n;
       return n;
@@ -160,7 +160,7 @@ TreeNode* ASTBuilder::BuildPackageName() {
   MASSERT(!gModule.mPackage);
   MASSERT(mLastTreeNode->IsField() || mLastTreeNode->IsIdentifier());
 
-  PackageNode *n = (PackageNode*)mTreePool->NewTreeNode(sizeof(PackageNode));
+  PackageNode *n = (PackageNode*)gTreePool.NewTreeNode(sizeof(PackageNode));
   new (n) PackageNode();
   n->SetPackage(mLastTreeNode);
 
@@ -171,7 +171,7 @@ TreeNode* ASTBuilder::BuildPackageName() {
 }
 
 TreeNode* ASTBuilder::BuildSingleTypeImport() {
-  ImportNode *n = (ImportNode*)mTreePool->NewTreeNode(sizeof(ImportNode));
+  ImportNode *n = (ImportNode*)gTreePool.NewTreeNode(sizeof(ImportNode));
   new (n) ImportNode();
   n->SetImportSingle();
   n->SetImportType();
@@ -188,7 +188,7 @@ TreeNode* ASTBuilder::BuildSingleTypeImport() {
 }
 
 TreeNode* ASTBuilder::BuildAllTypeImport() {
-  ImportNode *n = (ImportNode*)mTreePool->NewTreeNode(sizeof(ImportNode));
+  ImportNode *n = (ImportNode*)gTreePool.NewTreeNode(sizeof(ImportNode));
   new (n) ImportNode();
   n->SetImportAll();
   n->SetImportType();
@@ -206,7 +206,7 @@ TreeNode* ASTBuilder::BuildAllTypeImport() {
 
 // It takes the mLastTreeNode as parameter
 TreeNode* ASTBuilder::BuildSingleStaticImport() {
-  ImportNode *n = (ImportNode*)mTreePool->NewTreeNode(sizeof(ImportNode));
+  ImportNode *n = (ImportNode*)gTreePool.NewTreeNode(sizeof(ImportNode));
   new (n) ImportNode();
   n->SetImportSingle();
   n->SetImportType();
@@ -234,7 +234,7 @@ TreeNode* ASTBuilder::BuildAllImport() {
 
 // Takes no argument.
 TreeNode* ASTBuilder::BuildImport() {
-  ImportNode *n = (ImportNode*)mTreePool->NewTreeNode(sizeof(ImportNode));
+  ImportNode *n = (ImportNode*)gTreePool.NewTreeNode(sizeof(ImportNode));
   new (n) ImportNode();
 
   mLastTreeNode = n;
@@ -243,7 +243,7 @@ TreeNode* ASTBuilder::BuildImport() {
 
 // Takes no argument.
 TreeNode* ASTBuilder::BuildExport() {
-  ExportNode *n = (ExportNode*)mTreePool->NewTreeNode(sizeof(ExportNode));
+  ExportNode *n = (ExportNode*)gTreePool.NewTreeNode(sizeof(ExportNode));
   new (n) ExportNode();
 
   mLastTreeNode = n;
@@ -294,7 +294,7 @@ TreeNode* ASTBuilder::SetFromModule() {
 //
 // In either case, we need create a new and the only pair for XXport node.
 TreeNode* ASTBuilder::SetIsEverything() {
-  XXportAsPairNode *n = (XXportAsPairNode*)mTreePool->NewTreeNode(sizeof(XXportAsPairNode));
+  XXportAsPairNode *n = (XXportAsPairNode*)gTreePool.NewTreeNode(sizeof(XXportAsPairNode));
   new (n) XXportAsPairNode();
   n->SetIsEverything();
 
@@ -321,7 +321,7 @@ TreeNode* ASTBuilder::SetIsEverything() {
 
 // Similar as SetIsEverything.
 TreeNode* ASTBuilder::SetIsDefault() {
-  XXportAsPairNode *n = (XXportAsPairNode*)mTreePool->NewTreeNode(sizeof(XXportAsPairNode));
+  XXportAsPairNode *n = (XXportAsPairNode*)gTreePool.NewTreeNode(sizeof(XXportAsPairNode));
   new (n) XXportAsPairNode();
   n->SetIsDefault();
 
@@ -363,7 +363,7 @@ TreeNode* ASTBuilder::BuildXXportAsPair() {
     after = p.mData.mTreeNode;
   }
 
-  XXportAsPairNode *n = (XXportAsPairNode*)mTreePool->NewTreeNode(sizeof(XXportAsPairNode));
+  XXportAsPairNode *n = (XXportAsPairNode*)gTreePool.NewTreeNode(sizeof(XXportAsPairNode));
   new (n) XXportAsPairNode();
 
   if (before)
@@ -386,7 +386,7 @@ TreeNode* ASTBuilder::BuildXXportAsPairEverything() {
     after = p.mData.mTreeNode;
   }
 
-  XXportAsPairNode *n = (XXportAsPairNode*)mTreePool->NewTreeNode(sizeof(XXportAsPairNode));
+  XXportAsPairNode *n = (XXportAsPairNode*)gTreePool.NewTreeNode(sizeof(XXportAsPairNode));
   new (n) XXportAsPairNode();
   n->SetIsEverything();
 
@@ -408,7 +408,7 @@ TreeNode* ASTBuilder::BuildXXportAsPairDefault() {
     after = p.mData.mTreeNode;
   }
 
-  XXportAsPairNode *n = (XXportAsPairNode*)mTreePool->NewTreeNode(sizeof(XXportAsPairNode));
+  XXportAsPairNode *n = (XXportAsPairNode*)gTreePool.NewTreeNode(sizeof(XXportAsPairNode));
   new (n) XXportAsPairNode();
   n->SetIsDefault();
 
@@ -434,7 +434,7 @@ TreeNode* ASTBuilder::BuildParenthesis() {
   MASSERT(!p.mIsEmpty && p.mIsTreeNode);
   expr = p.mData.mTreeNode;
 
-  ParenthesisNode *n = (ParenthesisNode*)mTreePool->NewTreeNode(sizeof(ParenthesisNode));
+  ParenthesisNode *n = (ParenthesisNode*)gTreePool.NewTreeNode(sizeof(ParenthesisNode));
   new (n) ParenthesisNode();
   n->SetExpr(expr);
 
@@ -456,7 +456,7 @@ TreeNode* ASTBuilder::BuildCast() {
   TreeNode *desttype = p_a.mData.mTreeNode;
   TreeNode *expr = p_b.mData.mTreeNode;
 
-  CastNode *n = (CastNode*)mTreePool->NewTreeNode(sizeof(CastNode));
+  CastNode *n = (CastNode*)gTreePool.NewTreeNode(sizeof(CastNode));
   new (n) CastNode();
 
   n->SetDestType(desttype);
@@ -481,7 +481,7 @@ TreeNode* ASTBuilder::BuildUnaryOperation() {
   MASSERT(token->IsOperator() && "First param of Unary Operator is not an operator token?");
 
   // create the sub tree
-  UnaOperatorNode *n = (UnaOperatorNode*)mTreePool->NewTreeNode(sizeof(UnaOperatorNode));
+  UnaOperatorNode *n = (UnaOperatorNode*)gTreePool.NewTreeNode(sizeof(UnaOperatorNode));
   new (n) UnaOperatorNode(token->GetOprId());
 
   // set 1st param
@@ -522,7 +522,7 @@ TreeNode* ASTBuilder::BuildBinaryOperation() {
   MASSERT(token->IsOperator() && "Second param of Binary Operator is not an operator token?");
 
   // create the sub tree
-  BinOperatorNode *n = (BinOperatorNode*)mTreePool->NewTreeNode(sizeof(BinOperatorNode));
+  BinOperatorNode *n = (BinOperatorNode*)gTreePool.NewTreeNode(sizeof(BinOperatorNode));
   new (n) BinOperatorNode(token->GetOprId());
   mLastTreeNode = n;
 
@@ -558,7 +558,7 @@ TreeNode* ASTBuilder::BuildTernaryOperation() {
   Param p_c = mParams[2];
 
   // create the sub tree
-  TerOperatorNode *n = (TerOperatorNode*)mTreePool->NewTreeNode(sizeof(TerOperatorNode));
+  TerOperatorNode *n = (TerOperatorNode*)gTreePool.NewTreeNode(sizeof(TerOperatorNode));
   new (n) TerOperatorNode();
   mLastTreeNode = n;
 
@@ -605,7 +605,7 @@ TreeNode* ASTBuilder::BuildReturn() {
   if (mTrace)
     std::cout << "In BuildReturn" << std::endl;
 
-  ReturnNode *result = (ReturnNode*)mTreePool->NewTreeNode(sizeof(ReturnNode));
+  ReturnNode *result = (ReturnNode*)gTreePool.NewTreeNode(sizeof(ReturnNode));
   new (result) ReturnNode();
 
   Param p_result = mParams[0];
@@ -625,7 +625,7 @@ TreeNode* ASTBuilder::BuildCondBranch() {
   if (mTrace)
     std::cout << "In BuildCondBranch" << std::endl;
 
-  CondBranchNode *cond_branch = (CondBranchNode*)mTreePool->NewTreeNode(sizeof(CondBranchNode));
+  CondBranchNode *cond_branch = (CondBranchNode*)gTreePool.NewTreeNode(sizeof(CondBranchNode));
   new (cond_branch) CondBranchNode();
 
   Param p_cond = mParams[0];
@@ -708,7 +708,7 @@ TreeNode* ASTBuilder::BuildBreak() {
   if (mTrace)
     std::cout << "In BuildBreak " << std::endl;
 
-  BreakNode *break_node = (BreakNode*)mTreePool->NewTreeNode(sizeof(BreakNode));
+  BreakNode *break_node = (BreakNode*)gTreePool.NewTreeNode(sizeof(BreakNode));
   new (break_node) BreakNode();
 
   TreeNode *target = NULL;
@@ -733,7 +733,7 @@ TreeNode* ASTBuilder::BuildContinue() {
   if (mTrace)
     std::cout << "In BuildContinue " << std::endl;
 
-  ContinueNode *continue_node = (ContinueNode*)mTreePool->NewTreeNode(sizeof(ContinueNode));
+  ContinueNode *continue_node = (ContinueNode*)gTreePool.NewTreeNode(sizeof(ContinueNode));
   new (continue_node) ContinueNode();
 
   TreeNode *target = NULL;
@@ -761,7 +761,7 @@ TreeNode* ASTBuilder::BuildForLoop() {
   if (mTrace)
     std::cout << "In BuildForLoop " << std::endl;
 
-  ForLoopNode *for_loop = (ForLoopNode*)mTreePool->NewTreeNode(sizeof(ForLoopNode));
+  ForLoopNode *for_loop = (ForLoopNode*)gTreePool.NewTreeNode(sizeof(ForLoopNode));
   new (for_loop) ForLoopNode();
 
   MASSERT(mParams.size() == 4 && "BuildForLoop has NO 4 params?");
@@ -818,7 +818,7 @@ TreeNode* ASTBuilder::BuildForLoop_In() {
   if (mTrace)
     std::cout << "In BuildForLoop_In " << std::endl;
 
-  ForLoopNode *for_loop = (ForLoopNode*)mTreePool->NewTreeNode(sizeof(ForLoopNode));
+  ForLoopNode *for_loop = (ForLoopNode*)gTreePool.NewTreeNode(sizeof(ForLoopNode));
   new (for_loop) ForLoopNode();
 
   for_loop->SetProp(FLP_JSIn);
@@ -852,7 +852,7 @@ TreeNode* ASTBuilder::BuildForLoop_Of() {
   if (mTrace)
     std::cout << "In BuildForLoop_Of " << std::endl;
 
-  ForLoopNode *for_loop = (ForLoopNode*)mTreePool->NewTreeNode(sizeof(ForLoopNode));
+  ForLoopNode *for_loop = (ForLoopNode*)gTreePool.NewTreeNode(sizeof(ForLoopNode));
   new (for_loop) ForLoopNode();
 
   for_loop->SetProp(FLP_JSOf);
@@ -882,7 +882,7 @@ TreeNode* ASTBuilder::BuildWhileLoop() {
   if (mTrace)
     std::cout << "In BuildWhileLoop " << std::endl;
 
-  WhileLoopNode *while_loop = (WhileLoopNode*)mTreePool->NewTreeNode(sizeof(WhileLoopNode));
+  WhileLoopNode *while_loop = (WhileLoopNode*)gTreePool.NewTreeNode(sizeof(WhileLoopNode));
   new (while_loop) WhileLoopNode();
 
   MASSERT(mParams.size() == 2 && "BuildWhileLoop has NO 2 params?");
@@ -909,7 +909,7 @@ TreeNode* ASTBuilder::BuildDoLoop() {
   if (mTrace)
     std::cout << "In BuildDoLoop " << std::endl;
 
-  DoLoopNode *do_loop = (DoLoopNode*)mTreePool->NewTreeNode(sizeof(DoLoopNode));
+  DoLoopNode *do_loop = (DoLoopNode*)gTreePool.NewTreeNode(sizeof(DoLoopNode));
   new (do_loop) DoLoopNode();
 
   MASSERT(mParams.size() == 2 && "BuildDoLoop has NO 2 params?");
@@ -938,7 +938,7 @@ TreeNode* ASTBuilder::BuildSwitchLabel() {
     std::cout << "In BuildSwitchLabel " << std::endl;
 
   SwitchLabelNode *label =
-    (SwitchLabelNode*)mTreePool->NewTreeNode(sizeof(SwitchLabelNode));
+    (SwitchLabelNode*)gTreePool.NewTreeNode(sizeof(SwitchLabelNode));
   new (label) SwitchLabelNode();
 
   MASSERT(mParams.size() == 1 && "BuildSwitchLabel has NO 1 params?");
@@ -958,7 +958,7 @@ TreeNode* ASTBuilder::BuildDefaultSwitchLabel() {
   if (mTrace)
     std::cout << "In BuildDefaultSwitchLabel " << std::endl;
   SwitchLabelNode *label =
-    (SwitchLabelNode*)mTreePool->NewTreeNode(sizeof(SwitchLabelNode));
+    (SwitchLabelNode*)gTreePool.NewTreeNode(sizeof(SwitchLabelNode));
   new (label) SwitchLabelNode();
   label->SetIsDefault(true);
   mLastTreeNode = label;
@@ -974,7 +974,7 @@ TreeNode* ASTBuilder::BuildOneCase() {
     std::cout << "In BuildOneCase " << std::endl;
 
   SwitchCaseNode *case_node =
-    (SwitchCaseNode*)mTreePool->NewTreeNode(sizeof(SwitchCaseNode));
+    (SwitchCaseNode*)gTreePool.NewTreeNode(sizeof(SwitchCaseNode));
   new (case_node) SwitchCaseNode();
 
   TreeNode *label = NULL;
@@ -1008,7 +1008,7 @@ TreeNode* ASTBuilder::BuildOneCase() {
 
 SwitchCaseNode* ASTBuilder::SwitchLabelToCase(SwitchLabelNode *label) {
   SwitchCaseNode *case_node =
-    (SwitchCaseNode*)mTreePool->NewTreeNode(sizeof(SwitchCaseNode));
+    (SwitchCaseNode*)gTreePool.NewTreeNode(sizeof(SwitchCaseNode));
   new (case_node) SwitchCaseNode();
   case_node->AddLabel(label);
   return case_node;
@@ -1019,7 +1019,7 @@ TreeNode* ASTBuilder::BuildSwitch() {
     std::cout << "In BuildSwitch " << std::endl;
 
   SwitchNode *switch_node =
-    (SwitchNode*)mTreePool->NewTreeNode(sizeof(SwitchNode));
+    (SwitchNode*)gTreePool.NewTreeNode(sizeof(SwitchNode));
   new (switch_node) SwitchNode();
 
   MASSERT(mParams.size() == 2 && "BuildSwitch has NO 1 params?");
@@ -1117,7 +1117,7 @@ TreeNode* ASTBuilder::BuildDecl() {
     var = p_name.mData.mTreeNode;
   }
 
-  DeclNode *decl = decl = (DeclNode*)mTreePool->NewTreeNode(sizeof(DeclNode));
+  DeclNode *decl = decl = (DeclNode*)gTreePool.NewTreeNode(sizeof(DeclNode));
   new (decl) DeclNode(var);
 
   mLastTreeNode = decl;
@@ -1165,7 +1165,7 @@ TreeNode* ASTBuilder::BuildArrayElement() {
   TreeNode *array = p_array.mData.mTreeNode;
   MASSERT(array->IsIdentifier());
 
-  ArrayElementNode *array_element = (ArrayElementNode*)mTreePool->NewTreeNode(sizeof(ArrayElementNode));
+  ArrayElementNode *array_element = (ArrayElementNode*)gTreePool.NewTreeNode(sizeof(ArrayElementNode));
   new (array_element) ArrayElementNode();
   array_element->SetArray((IdentifierNode*)array);
 
@@ -1195,7 +1195,7 @@ TreeNode* ASTBuilder::BuildArrayLiteral() {
   TreeNode *literals = p_literals.mData.mTreeNode;
   MASSERT(literals->IsLiteral() || literals->IsExprList());
 
-  ArrayLiteralNode *array_literal = (ArrayLiteralNode*)mTreePool->NewTreeNode(sizeof(ArrayLiteralNode));
+  ArrayLiteralNode *array_literal = (ArrayLiteralNode*)gTreePool.NewTreeNode(sizeof(ArrayLiteralNode));
   new (array_literal) ArrayLiteralNode();
 
   if (literals->IsLiteral()) {
@@ -1227,7 +1227,7 @@ TreeNode* ASTBuilder::BuildStruct() {
   TreeNode *name = p_name.mData.mTreeNode;
   MASSERT(name->IsIdentifier());
 
-  StructNode *struct_node = (StructNode*)mTreePool->NewTreeNode(sizeof(StructNode));
+  StructNode *struct_node = (StructNode*)gTreePool.NewTreeNode(sizeof(StructNode));
   new (struct_node) StructNode((IdentifierNode*)name);
 
   mLastTreeNode = struct_node;
@@ -1282,7 +1282,7 @@ TreeNode* ASTBuilder::BuildFieldLiteral() {
   MASSERT(p_value.mIsTreeNode);
   TreeNode *value = p_value.mData.mTreeNode;
 
-  FieldLiteralNode *field_literal = (FieldLiteralNode*)mTreePool->NewTreeNode(sizeof(FieldLiteralNode));
+  FieldLiteralNode *field_literal = (FieldLiteralNode*)gTreePool.NewTreeNode(sizeof(FieldLiteralNode));
   new (field_literal) FieldLiteralNode();
   field_literal->SetFieldName((IdentifierNode*)field);
   field_literal->SetLiteral(value);
@@ -1301,7 +1301,7 @@ TreeNode* ASTBuilder::BuildStructLiteral() {
   MASSERT(p_literal.mIsTreeNode);
   TreeNode *literal = p_literal.mData.mTreeNode;
 
-  StructLiteralNode *struct_literal = (StructLiteralNode*)mTreePool->NewTreeNode(sizeof(StructLiteralNode));
+  StructLiteralNode *struct_literal = (StructLiteralNode*)gTreePool.NewTreeNode(sizeof(StructLiteralNode));
   new (struct_literal) StructLiteralNode();
 
   if (literal->IsFieldLiteral()) {
@@ -1354,7 +1354,7 @@ TreeNode* ASTBuilder::BuildField() {
       TreeNode *child = pass->GetChild(i);
       MASSERT(child->IsIdentifier());
 
-      field = (FieldNode*)mTreePool->NewTreeNode(sizeof(FieldNode));
+      field = (FieldNode*)gTreePool.NewTreeNode(sizeof(FieldNode));
       new (field) FieldNode();
       field->SetUpper(upper);
       field->SetField((IdentifierNode*)child);
@@ -1363,7 +1363,7 @@ TreeNode* ASTBuilder::BuildField() {
     }
   } else {
     MASSERT(node_b->IsIdentifier());
-    field = (FieldNode*)mTreePool->NewTreeNode(sizeof(FieldNode));
+    field = (FieldNode*)gTreePool.NewTreeNode(sizeof(FieldNode));
     new (field) FieldNode();
     field->SetUpper(node_a);
     field->SetField((IdentifierNode*)node_b);
@@ -1406,7 +1406,7 @@ TreeNode* ASTBuilder::BuildVarList() {
     node_ret->Merge(node_a);
   } else {
     // both nodes are not VarListNode
-    node_ret = (VarListNode*)mTreePool->NewTreeNode(sizeof(VarListNode));
+    node_ret = (VarListNode*)gTreePool.NewTreeNode(sizeof(VarListNode));
     new (node_ret) VarListNode();
     if (node_a)
       node_ret->Merge(node_a);
@@ -1544,7 +1544,7 @@ TreeNode* ASTBuilder::BuildClass() {
     MERROR("The class name should be an indentifier node. Not?");
   IdentifierNode *in = (IdentifierNode*)node_name;
 
-  ClassNode *node_class = (ClassNode*)mTreePool->NewTreeNode(sizeof(ClassNode));
+  ClassNode *node_class = (ClassNode*)gTreePool.NewTreeNode(sizeof(ClassNode));
   new (node_class) ClassNode();
   node_class->SetName(in->GetName());
 
@@ -1563,7 +1563,7 @@ TreeNode* ASTBuilder::BuildBlock() {
   if (mTrace)
     std::cout << "In BuildBlock" << std::endl;
 
-  BlockNode *block = (BlockNode*)mTreePool->NewTreeNode(sizeof(BlockNode));
+  BlockNode *block = (BlockNode*)gTreePool.NewTreeNode(sizeof(BlockNode));
   new (block) BlockNode();
 
   Param p_subtree = mParams[0];
@@ -1649,7 +1649,7 @@ TreeNode* ASTBuilder::CvtToBlock(TreeNode *tnode) {
     return tnode;
   }
 
-  BlockNode *block = (BlockNode*)mTreePool->NewTreeNode(sizeof(BlockNode));
+  BlockNode *block = (BlockNode*)gTreePool.NewTreeNode(sizeof(BlockNode));
   new (block) BlockNode();
   if (tnode->IsPass()) {
     PassNode *pass = (PassNode*)tnode;
@@ -1739,7 +1739,7 @@ TreeNode* ASTBuilder::BuildAnnotationType() {
     MERROR("The annotation type name should be an indentifier node. Not?");
   IdentifierNode *in = (IdentifierNode*)node_name;
 
-  AnnotationTypeNode *annon_type = (AnnotationTypeNode*)mTreePool->NewTreeNode(sizeof(AnnotationTypeNode));
+  AnnotationTypeNode *annon_type = (AnnotationTypeNode*)gTreePool.NewTreeNode(sizeof(AnnotationTypeNode));
   new (annon_type) AnnotationTypeNode();
   annon_type->SetId(in);
 
@@ -1767,7 +1767,7 @@ TreeNode* ASTBuilder::BuildAnnotation() {
   if (!iden->IsIdentifier())
     MERROR("The annotation name is NOT an indentifier node.");
 
-  AnnotationNode *annot = (AnnotationNode*)mTreePool->NewTreeNode(sizeof(AnnotationNode));
+  AnnotationNode *annot = (AnnotationNode*)gTreePool.NewTreeNode(sizeof(AnnotationNode));
   new (annot) AnnotationNode();
   annot->SetId((IdentifierNode*)iden);
 
@@ -1789,7 +1789,7 @@ TreeNode* ASTBuilder::BuildInterface() {
     MERROR("The name is NOT an indentifier node.");
   IdentifierNode *in = (IdentifierNode*)node_name;
 
-  InterfaceNode *interf = (InterfaceNode*)mTreePool->NewTreeNode(sizeof(InterfaceNode));
+  InterfaceNode *interf = (InterfaceNode*)gTreePool.NewTreeNode(sizeof(InterfaceNode));
   new (interf) InterfaceNode();
   interf->SetName(in->GetName());
 
@@ -1822,7 +1822,7 @@ TreeNode* ASTBuilder::BuildDim() {
   if (mTrace)
     std::cout << "In BuildDim" << std::endl;
 
-  DimensionNode *dim = (DimensionNode*)mTreePool->NewTreeNode(sizeof(DimensionNode));
+  DimensionNode *dim = (DimensionNode*)gTreePool.NewTreeNode(sizeof(DimensionNode));
   new (dim) DimensionNode();
   dim->AddDim();
 
@@ -1893,7 +1893,7 @@ TreeNode* ASTBuilder::AddDimsTo() {
       mLastTreeNode = node_a;
     } else if (node_a->IsPrimType()) {
       PrimTypeNode *pt = (PrimTypeNode*)node_a;
-      PrimArrayTypeNode *pat = (PrimArrayTypeNode*)mTreePool->NewTreeNode(sizeof(PrimArrayTypeNode));
+      PrimArrayTypeNode *pat = (PrimArrayTypeNode*)gTreePool.NewTreeNode(sizeof(PrimArrayTypeNode));
       new (pat) PrimArrayTypeNode();
       pat->SetPrim(pt);
       pat->SetDims(dim);
@@ -1981,7 +1981,7 @@ TreeNode* ASTBuilder::BuildNewOperation() {
   if (mTrace)
     std::cout << "In BuildNewOperation " << std::endl;
 
-  NewNode *new_node = (NewNode*)mTreePool->NewTreeNode(sizeof(NewNode));
+  NewNode *new_node = (NewNode*)gTreePool.NewTreeNode(sizeof(NewNode));
   new (new_node) NewNode();
 
   Param p_a = mParams[0];
@@ -2025,7 +2025,7 @@ TreeNode* ASTBuilder::BuildAssert() {
   if (mTrace)
     std::cout << "In BuildAssert " << std::endl;
 
-  AssertNode *assert_node = (AssertNode*)mTreePool->NewTreeNode(sizeof(AssertNode));
+  AssertNode *assert_node = (AssertNode*)gTreePool.NewTreeNode(sizeof(AssertNode));
   new (assert_node) AssertNode();
 
   MASSERT(mParams.size() >= 1 && "BuildAssert has NO expression?");
@@ -2061,7 +2061,7 @@ TreeNode* ASTBuilder::BuildCall() {
   if (mTrace)
     std::cout << "In BuildCall" << std::endl;
 
-  CallNode *call = (CallNode*)mTreePool->NewTreeNode(sizeof(CallNode));
+  CallNode *call = (CallNode*)gTreePool.NewTreeNode(sizeof(CallNode));
   new (call) CallNode();
 
   // The default is having no param.
@@ -2168,7 +2168,7 @@ TreeNode* ASTBuilder::BuildExprList() {
     node_ret->Merge(node_a);
   } else {
     // both nodes are not ExprListNode
-    node_ret = (ExprListNode*)mTreePool->NewTreeNode(sizeof(ExprListNode));
+    node_ret = (ExprListNode*)gTreePool.NewTreeNode(sizeof(ExprListNode));
     new (node_ret) ExprListNode();
     if (node_a)
       node_ret->Merge(node_a);
@@ -2219,7 +2219,7 @@ TreeNode* ASTBuilder::BuildFunction() {
     }
   }
 
-  FunctionNode *f = (FunctionNode*)mTreePool->NewTreeNode(sizeof(FunctionNode));
+  FunctionNode *f = (FunctionNode*)gTreePool.NewTreeNode(sizeof(FunctionNode));
   new (f) FunctionNode();
 
   if (node_name)
@@ -2302,7 +2302,7 @@ TreeNode* ASTBuilder::BuildTry() {
   MASSERT(p_block.mIsTreeNode);
   TreeNode *block = CvtToBlock(p_block.mData.mTreeNode);
 
-  TryNode *try_node = (TryNode*)mTreePool->NewTreeNode(sizeof(TryNode));
+  TryNode *try_node = (TryNode*)gTreePool.NewTreeNode(sizeof(TryNode));
   new (try_node) TryNode();
   try_node->SetBlock((BlockNode*)block);
 
@@ -2353,7 +2353,7 @@ TreeNode* ASTBuilder::BuildFinally() {
   MASSERT(p_block.mIsTreeNode);
   TreeNode *block = CvtToBlock(p_block.mData.mTreeNode);
 
-  FinallyNode *finally_node = (FinallyNode*)mTreePool->NewTreeNode(sizeof(FinallyNode));
+  FinallyNode *finally_node = (FinallyNode*)gTreePool.NewTreeNode(sizeof(FinallyNode));
   new (finally_node) FinallyNode();
   finally_node->SetBlock((BlockNode*)block);
 
@@ -2375,7 +2375,7 @@ TreeNode* ASTBuilder::BuildCatch() {
   MASSERT(p_block.mIsTreeNode);
   TreeNode *block = CvtToBlock(p_block.mData.mTreeNode);
 
-  CatchNode *catch_node = (CatchNode*)mTreePool->NewTreeNode(sizeof(CatchNode));
+  CatchNode *catch_node = (CatchNode*)gTreePool.NewTreeNode(sizeof(CatchNode));
   new (catch_node) CatchNode();
 
   catch_node->AddParam(params);
@@ -2401,7 +2401,7 @@ TreeNode* ASTBuilder::BuildThrows() {
     MERROR("The exceptions is not a treenode in BuildThrows()");
   TreeNode *exceptions = p_throws.mData.mTreeNode;
 
-  ThrowNode *throw_node = (ThrowNode*)mTreePool->NewTreeNode(sizeof(ThrowNode));
+  ThrowNode *throw_node = (ThrowNode*)gTreePool.NewTreeNode(sizeof(ThrowNode));
   new (throw_node) ThrowNode();
 
   throw_node->AddException(exceptions);
@@ -2431,7 +2431,7 @@ TreeNode* ASTBuilder::AddThrowsTo() {
     TreeNode *tree_node = p_body.mData.mTreeNode;
     if (tree_node->IsIdentifier()) {
       IdentifierNode *id = (IdentifierNode*)tree_node;
-      ExceptionNode *exception = (ExceptionNode*)mTreePool->NewTreeNode(sizeof(ExceptionNode));
+      ExceptionNode *exception = (ExceptionNode*)gTreePool.NewTreeNode(sizeof(ExceptionNode));
       new (exception) ExceptionNode(id);
       func->AddThrow(exception);
     } else if (tree_node->IsPass()) {
@@ -2440,7 +2440,7 @@ TreeNode* ASTBuilder::AddThrowsTo() {
         TreeNode *child = pass->GetChild(i);
         if (child->IsIdentifier()) {
           IdentifierNode *id = (IdentifierNode*)child;
-          ExceptionNode *exception = (ExceptionNode*)mTreePool->NewTreeNode(sizeof(ExceptionNode));
+          ExceptionNode *exception = (ExceptionNode*)gTreePool.NewTreeNode(sizeof(ExceptionNode));
           new (exception) ExceptionNode(id);
           func->AddThrow(exception);
         } else {
@@ -2488,7 +2488,7 @@ TreeNode* ASTBuilder::BuildUserType() {
     MERROR("The Identifier of user type is not a treenode.");
   TreeNode *id = p_id.mData.mTreeNode;
 
-  UserTypeNode *user_type = (UserTypeNode*)mTreePool->NewTreeNode(sizeof(UserTypeNode));
+  UserTypeNode *user_type = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
   new (user_type) UserTypeNode(id);
   mLastTreeNode = user_type;
   return mLastTreeNode;
@@ -2531,7 +2531,7 @@ TreeNode* ASTBuilder::BuildUnionUserType() {
   MASSERT (p_b.mIsTreeNode);
   TreeNode *child_b = p_b.mData.mTreeNode;
 
-  UserTypeNode *user_type = (UserTypeNode*)mTreePool->NewTreeNode(sizeof(UserTypeNode));
+  UserTypeNode *user_type = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
   new (user_type) UserTypeNode();
 
   user_type->SetChildA(child_a);
@@ -2556,7 +2556,7 @@ TreeNode* ASTBuilder::BuildInterUserType() {
   MASSERT (p_b.mIsTreeNode);
   TreeNode *child_b = p_b.mData.mTreeNode;
 
-  UserTypeNode *user_type = (UserTypeNode*)mTreePool->NewTreeNode(sizeof(UserTypeNode));
+  UserTypeNode *user_type = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
   new (user_type) UserTypeNode();
 
   user_type->SetChildA(child_a);
@@ -2599,7 +2599,7 @@ TreeNode* ASTBuilder::BuildTypeAlias() {
     }
   }
 
-  UserTypeNode *user_type = (UserTypeNode*)mTreePool->NewTreeNode(sizeof(UserTypeNode));
+  UserTypeNode *user_type = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
   new (user_type) UserTypeNode();
   user_type->SetAlias(orig);
 
@@ -2630,16 +2630,16 @@ TreeNode* ASTBuilder::BuildArrayType() {
     MASSERT(!user_type->GetDims());
   } else if (basic->IsPrimType()) {
     prim_type = (PrimTypeNode*)basic;
-    prim_array_type = (PrimArrayTypeNode*)mTreePool->NewTreeNode(sizeof(PrimArrayTypeNode));
+    prim_array_type = (PrimArrayTypeNode*)gTreePool.NewTreeNode(sizeof(PrimArrayTypeNode));
     new (prim_array_type) PrimArrayTypeNode();
     prim_array_type->SetPrim(prim_type);
   } else {
-    user_type = (UserTypeNode*)mTreePool->NewTreeNode(sizeof(UserTypeNode));
+    user_type = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
     new (user_type) UserTypeNode();
     user_type->SetId(basic);
   }
 
-  DimensionNode *dims = (DimensionNode*)mTreePool->NewTreeNode(sizeof(DimensionNode));
+  DimensionNode *dims = (DimensionNode*)gTreePool.NewTreeNode(sizeof(DimensionNode));
   new (dims) DimensionNode();
 
   for (unsigned i = 1; i < mParams.size(); i++) {
@@ -2699,7 +2699,7 @@ TreeNode* ASTBuilder::BuildLambda() {
     }
   }
 
-  LambdaNode *lambda = (LambdaNode*)mTreePool->NewTreeNode(sizeof(LambdaNode));
+  LambdaNode *lambda = (LambdaNode*)gTreePool.NewTreeNode(sizeof(LambdaNode));
   new (lambda) LambdaNode();
 
   if (params_node) {
@@ -2740,7 +2740,7 @@ TreeNode* ASTBuilder::BuildInstanceOf() {
   MASSERT(r_param.mIsTreeNode);
   TreeNode *right = r_param.mData.mTreeNode;
 
-  InstanceOfNode *instanceof = (InstanceOfNode*)mTreePool->NewTreeNode(sizeof(InstanceOfNode));
+  InstanceOfNode *instanceof = (InstanceOfNode*)gTreePool.NewTreeNode(sizeof(InstanceOfNode));
   new (instanceof) InstanceOfNode();
 
   instanceof->SetLeft(left);
@@ -2768,7 +2768,7 @@ TreeNode* ASTBuilder::BuildIn() {
   MASSERT(r_param.mIsTreeNode);
   TreeNode *right = r_param.mData.mTreeNode;
 
-  InNode *innode = (InNode*)mTreePool->NewTreeNode(sizeof(InNode));
+  InNode *innode = (InNode*)gTreePool.NewTreeNode(sizeof(InNode));
   new (innode) InNode();
 
   innode->SetLeft(left);
@@ -2791,7 +2791,7 @@ TreeNode* ASTBuilder::BuildTypeOf() {
   MASSERT(l_param.mIsTreeNode);
   TreeNode *expr = l_param.mData.mTreeNode;
 
-  TypeOfNode *typeof = (TypeOfNode*)mTreePool->NewTreeNode(sizeof(TypeOfNode));
+  TypeOfNode *typeof = (TypeOfNode*)gTreePool.NewTreeNode(sizeof(TypeOfNode));
   new (typeof) TypeOfNode();
 
   typeof->SetExpr(expr);

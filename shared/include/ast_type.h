@@ -176,15 +176,12 @@ public:
 
 class PrimTypePool {
 private:
-  TreePool                   mTreePool;
   SmallVector<PrimTypeNode*> mTypes;
-
-  void Init();
-
 public:
   PrimTypePool();
   ~PrimTypePool();
 
+  void Init();
   PrimTypeNode* FindType(const char *keyword);
   PrimTypeNode* FindType(TypeId id);
 };

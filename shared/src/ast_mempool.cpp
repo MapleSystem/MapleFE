@@ -17,6 +17,8 @@
 
 namespace maplefe {
 
+TreePool gTreePool;
+
 TreePool::~TreePool() {
   Release();
 }
