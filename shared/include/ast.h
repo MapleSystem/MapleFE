@@ -258,9 +258,6 @@ public:
   void SetTarget(TreeNode *t) {mTarget = t;}
   TreeNode* GetTarget() {return mTarget;}
 
-  void SetName(const char *s) {mName = s;}
-  const char* GetName() {return mName;}
-
   void SetImportType()   {mProperty |= ImpType;}
   void SetImportStatic() {mProperty |= ImpStatic;}
   void SetImportSingle() {mProperty |= ImpSingle;}
