@@ -39,9 +39,9 @@ for ts in $LIST; do
   out=$("$CMD" "$ts" --trace-a2c 2>&1)
   [ $? -eq 0 ] || Failed="$Failed $ts"
   echo "$out"
-  cmd=$(grep -n -e "^// .Beginning of AstEmitter:" -e "^// End of AstEmitter.$" <<< "$out" |
+  cmd=$(grep -n -e "^// .Beginning of AstEmitter:" -e "// End of AstEmitter.$" <<< "$out" |
     tail -2 | sed 's/:.*//' | xargs | sed 's/\([^ ]*\) \(.*\)/sed -n \1,$((\2+1))p/')
-  if [ -n "$cmd" ]; then
+  if [ "x${cmd:0:4}" = "xsed " ]; then
     eval $cmd <<<"$out" > "#tmp~.ts"
     clang-format-10 -i --style="{ColumnLimit: 120}" "#tmp~.ts"
     echo -e "\n====== Reformated ======\n"

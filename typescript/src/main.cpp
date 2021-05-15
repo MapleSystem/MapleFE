@@ -86,7 +86,7 @@ int main (int argc, char *argv[]) {
     return 1;
   }
 
-  maplefe::A2CTs *a2c = new maplefe::A2CTs(maplefe::gModule.mFileName);
+  maplefe::A2CTs *a2c = new maplefe::A2CTs(maplefe::gModule.GetFileName());
   a2c->ProcessAST(trace_a2c);
 
   delete parser;

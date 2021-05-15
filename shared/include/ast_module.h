@@ -48,16 +48,21 @@ public:
   ASTScope              *mRootScope; // the scope corresponding to a module. All other scopes
                                      // are children of mRootScope.
   ASTScopePool           mScopePool; // All the scopes are store in this pool. It also contains
-                                     // a vector of ASTScope pointer for traversal. 
+                                     // a vector of ASTScope pointer for traversal.
   SrcLang                mSrcLang;
 public:
   ASTModule();
   ~ASTModule();
 
-  void SetFileName(const char *f) {mFileName = f;}
-  void SetPackage(PackageNode *p);
-  void SetSrcLang(SrcLang l);
+  void        SetFileName(const char *f) {mFileName = f;}
+  const char *GetFileName() {return mFileName;}
+
+  void         SetPackage(PackageNode *p);
+  PackageNode *GetPackage() {return mPackage;};
+
+  void    SetSrcLang(SrcLang l);
   SrcLang GetSrcLang();
+
   std::string GetSrcLangString();
   void AddImport(ImportNode *imp) {mImports.PushBack(imp);}
 

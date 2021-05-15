@@ -39,7 +39,7 @@ public:
 
   void AstEmit(const char *title, std::ostream *os) {
     mOs = os;
-    *mOs << "// [Beginning of AstEmitter: " << title << "\n// Filename: " << mASTModule->mFileName << "\n";
+    *mOs << "// [Beginning of AstEmitter: " << title << "\n// Filename: " << mASTModule->GetFileName() << "\n";
     for (auto it : mASTModule->mTrees)
       *mOs << AstEmitTreeNode(it->mRootNode);
     *mOs << "// End of AstEmitter]\n";

@@ -610,7 +610,8 @@ gen_args = [
         """
 #include "{astdump}.h"
 #include <algorithm>
-#include <set>""".format(astdump = astdump)  # Extra include directives
+#include <set>
+#include <cstring>""".format(astdump = astdump)  # Extra include directives
         ]
 
 astgraph_init = [
@@ -624,7 +625,9 @@ astgraph_init = [
 void {gen_args2}(const char *title, std::ostream *os) {{
   mNodes.clear();
   mOs = os;
-  *mOs << "digraph AST_Module {{\\nrankdir=LR;\\nModule [label=\\"Module\\\\n" << title << "\\",shape=box];\\n";
+  auto fn = mASTModule->GetFileName();
+  if(auto p = std::strrchr(fn, '/')) fn = p;
+  *mOs << "digraph AST_Module {{\\nrankdir=LR;\\nModule [label=\\"Module\\\\n" << fn << "\\\\n" << title << "\\",shape=box];\\n";
   std::size_t idx = 1;
   for(auto it: mASTModule->mTrees) {{
     *mOs << "Module -> " << NodeName(it->mRootNode,\'_\') << "[label=" << idx++ << "];\\n";
@@ -775,7 +778,7 @@ public:
 
 void {gen_args2}(const char *title, std::ostream *os) {{
   mOs = os;
-  *mOs << "// [Beginning of {gen_args1}: " << title << "\\n// Filename: " << mASTModule->mFileName << "\\n";
+  *mOs << "// [Beginning of {gen_args1}: " << title << "\\n// Filename: " << mASTModule->GetFileName() << "\\n";
   for(auto it: mASTModule->mTrees)
     *mOs << {gen_args2}TreeNode(it->mRootNode);
     *mOs << "// End of AstEmitter]\\n";
