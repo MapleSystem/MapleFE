@@ -25,6 +25,9 @@ TreePool::~TreePool() {
 
 char* TreePool::NewTreeNode(unsigned size) {
   char *addr = mMP.Alloc(size);
+  unsigned id = mTreeNodes.size();
+  TreeNode *tree = (TreeNode*)addr;
+  tree->SetNodeId(id);
   mTreeNodes.push_back((TreeNode*)addr);
   return addr;
 }

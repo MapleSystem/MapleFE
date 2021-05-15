@@ -80,7 +80,7 @@ protected:
   bool      mIsStmt;  // if a node is a statement
 
 public:
-  TreeNode() : mKind(NK_Null), mNodeId(GetNextNodeId()), mLabel(NULL),
+  TreeNode() : mKind(NK_Null), mLabel(NULL),
                mParent(NULL), mName(NULL), mIsStmt(false) {}
   virtual ~TreeNode() {}
 
