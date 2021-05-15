@@ -70,7 +70,7 @@ class AST_BB {
   BBIndex                  mId;             // unique BB id
   TreeNode                *mPredicate;      // a predicate for true/false branches
   TreeNode                *mAuxNode;        // the auxiliary node of current BB
-  SmallVector<TreeNode *>  mStatements;     // all statement nodes
+  SmallList<TreeNode *>    mStatements;     // all statement nodes
   SmallList<AST_BB *>      mSuccessors;     // for BK_Branch: [0] true branch, [1] false branch
   SmallList<AST_BB *>      mPredecessors;
 
