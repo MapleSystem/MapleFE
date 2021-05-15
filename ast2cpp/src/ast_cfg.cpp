@@ -87,8 +87,8 @@ FunctionNode *CFGVisitor::VisitFunctionNode(FunctionNode *node) {
   current_func->AddNestedFunction(mCurrentFunction);
 
   InitializeFunction(mCurrentFunction);
-  // Visit the FunctionNode 'node'
-  AstVisitor::VisitFunctionNode(node);
+  // Visit function body
+  AstVisitor::VisitTreeNode(node->GetBody());
   FinalizeFunction();
 
   // Restore both mCurrentFunction and mCurrentBB
