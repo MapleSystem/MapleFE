@@ -594,7 +594,7 @@ public:
   TreeNode* GetExpr() {return mExpr;}
   void SetExpr(TreeNode *t) {mExpr = t;}
 
-  const char* GetName();
+  const char* GetDumpName();
   void Dump(unsigned);
 };
 

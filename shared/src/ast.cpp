@@ -448,7 +448,7 @@ void AnnotationTypeNode::Dump(unsigned indent) {
 //                          CastNode
 //////////////////////////////////////////////////////////////////////////////////////
 
-const char* CastNode::GetName() {
+const char* CastNode::GetDumpName() {
   if (mName)
     return mName;
   std::string name = "(";
