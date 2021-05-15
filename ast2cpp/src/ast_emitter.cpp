@@ -1051,11 +1051,8 @@ static std::string GetTypeOp(UserTypeNode *node) {
       if(auto t = node->GetChildA()) {
         if(t->GetKind() == NK_UserType)
           return GetTypeOp(static_cast<UserTypeNode *>(t));
-        else
-          return " UT_Alias "s;
       }
-      else
-        return " UT_Alias "s;
+      return " | "s;
     default:
       MASSERT(0 && "Unexpected enumerator");
   }
