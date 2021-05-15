@@ -352,10 +352,10 @@ void ImportNode::Dump(unsigned indent) {
     DUMP0_NORETURN('{');
     for (unsigned i = 0; i < mPairs.GetNum(); i++) {
       XXportAsPairNode *p = GetPair(i);
-      p->Dump(0); 
+      p->Dump(0);
       if (i < mPairs.GetNum() - 1)
         DUMP0_NORETURN(',');
-    } 
+    }
     DUMP0_NORETURN("} ");
   }
 
@@ -393,10 +393,10 @@ void ExportNode::Dump(unsigned indent) {
     DUMP0_NORETURN('{');
     for (unsigned i = 0; i < mPairs.GetNum(); i++) {
       XXportAsPairNode *p = GetPair(i);
-      p->Dump(0); 
+      p->Dump(0);
       if (i < mPairs.GetNum() - 1)
         DUMP0_NORETURN(',');
-    } 
+    }
     DUMP0_NORETURN("} ");
   }
 
@@ -1383,7 +1383,10 @@ void LambdaNode::Dump(unsigned indent) {
   dump += "(";
   for (unsigned i = 0; i < mParams.GetNum(); i++) {
     TreeNode *in = mParams.ValueAtIndex(i);
-    dump += in->GetName();
+    if(in->GetKind() == NK_Decl)
+      dump += static_cast<DeclNode*>(in)->GetVar()->GetName();
+    else
+      dump += in->GetName();
     if (i < mParams.GetNum() - 1)
       dump += ",";
   }

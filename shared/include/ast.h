@@ -524,8 +524,6 @@ public:
   DeclProp GetProp() {return mProp;}
   void SetProp(DeclProp p) {mProp = p;}
 
-  const char* GetName() {return mVar->GetName();}
-
   void Dump(unsigned);
 };
 
