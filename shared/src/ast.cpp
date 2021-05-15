@@ -352,10 +352,10 @@ void ImportNode::Dump(unsigned indent) {
     DUMP0_NORETURN('{');
     for (unsigned i = 0; i < mPairs.GetNum(); i++) {
       XXportAsPairNode *p = GetPair(i);
-      p->Dump(0); 
+      p->Dump(0);
       if (i < mPairs.GetNum() - 1)
         DUMP0_NORETURN(',');
-    } 
+    }
     DUMP0_NORETURN("} ");
   }
 
@@ -393,10 +393,10 @@ void ExportNode::Dump(unsigned indent) {
     DUMP0_NORETURN('{');
     for (unsigned i = 0; i < mPairs.GetNum(); i++) {
       XXportAsPairNode *p = GetPair(i);
-      p->Dump(0); 
+      p->Dump(0);
       if (i < mPairs.GetNum() - 1)
         DUMP0_NORETURN(',');
-    } 
+    }
     DUMP0_NORETURN("} ");
   }
 
@@ -449,14 +449,14 @@ void AnnotationTypeNode::Dump(unsigned indent) {
 //////////////////////////////////////////////////////////////////////////////////////
 
 const char* CastNode::GetName() {
-  if (mName)
-    return mName;
+  if (GetName())
+    return GetName();
   std::string name = "(";
   name += mDestType->GetName();
   name += ")";
   name += mExpr->GetName();
-  mName = gStringPool.FindString(name);
-  return mName;
+  SetName(gStringPool.FindString(name));
+  return GetName();
 }
 
 void CastNode::Dump(unsigned indent) {
@@ -629,7 +629,7 @@ void DimensionNode::Merge(const TreeNode *node) {
 
 void IdentifierNode::Dump(unsigned indent) {
   DumpIndentation(indent);
-  DUMP0_NORETURN(mName);
+  DUMP0_NORETURN(GetName());
   if (mInit) {
     DUMP0_NORETURN('=');
     mInit->Dump(0);
@@ -806,11 +806,11 @@ void LiteralNode::InitName() {
   switch (mData.mType) {
   case LT_NullLiteral:
     s = "null";
-    mName = gStringPool.FindString(s);
+    SetName(gStringPool.FindString(s));
     break;
   case LT_ThisLiteral:
     s = "this";
-    mName = gStringPool.FindString(s);
+    SetName(gStringPool.FindString(s));
     break;
   case LT_IntegerLiteral:
   case LT_DoubleLiteral:
@@ -821,7 +821,7 @@ void LiteralNode::InitName() {
   case LT_NA:
   default:
     s = "<NA>";
-    mName = gStringPool.FindString(s);
+    SetName(gStringPool.FindString(s));
     break;
   }
 }
@@ -1190,9 +1190,9 @@ void ClassNode::Release() {
 void ClassNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   if (IsJavaEnum())
-    DUMP1_NORETURN("class[JavaEnum] ", mName);
+    DUMP1_NORETURN("class[JavaEnum] ", GetName());
   else
-    DUMP1_NORETURN("class ", mName);
+    DUMP1_NORETURN("class ", GetName());
   DUMP_RETURN();
 
   DumpIndentation(indent + 2);
@@ -1246,7 +1246,7 @@ void ClassNode::Dump(unsigned indent) {
 
 FunctionNode::FunctionNode() {
   mKind = NK_Function;
-  mName = NULL;
+  SetName(NULL);
   mType = NULL;
   mBody = NULL;
   mDims = NULL;
@@ -1347,8 +1347,8 @@ void FunctionNode::Dump(unsigned indent) {
   else
     DUMP0_NORETURN("func  ");
 
-  if (mName)
-    DUMP0_NORETURN(mName);
+  if (GetName())
+    DUMP0_NORETURN(GetName());
 
   // dump parameters
   DUMP0_NORETURN("(");
@@ -1452,7 +1452,7 @@ void InterfaceNode::Construct(BlockNode *block) {
 
 void InterfaceNode::Dump(unsigned indent) {
   DumpIndentation(indent);
-  DUMP1_NORETURN("interface ", mName);
+  DUMP1_NORETURN("interface ", GetName());
   DUMP_RETURN();
   DumpIndentation(indent + 2);
 
