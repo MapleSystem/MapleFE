@@ -241,6 +241,7 @@ class CFGVisitor : public AstVisitor {
   DeleteNode *VisitDeleteNode(DeleteNode *node);
   CallNode *VisitCallNode(CallNode *node);
   AssertNode *VisitAssertNode(AssertNode *node);
+  UserTypeNode *VisitUserTypeNode(UserTypeNode *node);
 
 };
 }

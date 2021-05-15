@@ -608,6 +608,11 @@ AssertNode *CFGVisitor::VisitAssertNode(AssertNode *node) {
   return node;
 }
 
+UserTypeNode *CFGVisitor::VisitUserTypeNode(UserTypeNode *node) {
+  mCurrentBB->AddStatement(node);
+  return node;
+}
+
 // Allocate a new AST_Function node
 AST_Function *CFGVisitor::NewFunction(FunctionNode *node)   {
   AST_Function *func = new(mHandler->GetMemPool()->Alloc(sizeof(AST_Function))) AST_Function;

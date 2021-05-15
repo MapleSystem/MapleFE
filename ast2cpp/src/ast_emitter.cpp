@@ -1017,9 +1017,9 @@ std::string AstEmitter::AstEmitTypeOfNode(TypeOfNode *node) {
   const Precedence precd = '\014';
   std::string str("typeof "s), rhs;
   if (auto n = node->GetExpr()) {
-    auto s = AstEmitTreeNode(n);
+    rhs = AstEmitTreeNode(n);
     if(precd > mPrecedence) // right-to-left
-      rhs = "("s + s + ")"s;
+      rhs = "("s + rhs + ")"s;
   }
   else
     rhs = " (NIL)"s;
@@ -1039,14 +1039,41 @@ std::string AstEmitter::AstEmitAttrNode(AttrNode *node) {
   return str;
 }
 
+static std::string GetTypeOp(UserTypeNode *node) {
+  switch(node->GetType()) {
+    case UT_Regular:
+      return " UT_Regular "s;
+    case UT_Union:
+      return " | "s;
+    case UT_Inter:
+      return " & "s;
+    case UT_Alias:
+      if(auto t = node->GetChildA()) {
+        if(t->GetKind() == NK_UserType)
+          return GetTypeOp(static_cast<UserTypeNode *>(t));
+        else
+          return " UT_Alias "s;
+      }
+      else
+        return " UT_Alias "s;
+    default:
+      MASSERT(0 && "Unexpected enumerator");
+  }
+
+  return "UNEXPECTED UT_Type"s;
+}
+
 std::string AstEmitter::AstEmitUserTypeNode(UserTypeNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str = "type "s;
+  std::string str;
   if (auto n = node->GetId()) {
-    str += AstEmitTreeNode(n);
+    str += "type "s + AstEmitTreeNode(n) + " = "s;
   }
-  str += " = "s;
+  str += AstEmitTreeNode(node->GetChildA());
+  str += GetTypeOp(node);
+  str += AstEmitTreeNode(node->GetChildB());
+  /*
   for (unsigned i = 0; i < node->GetTypeArgumentsNum(); ++i) {
     if (i)
       str += " | "s;
@@ -1054,7 +1081,7 @@ std::string AstEmitter::AstEmitUserTypeNode(UserTypeNode *node) {
       str += AstEmitIdentifierNode(n);
     }
   }
-  mPrecedence = '\030';
+  */
   if (node->IsStmt())
     str += ";\n"s;
   return str;
