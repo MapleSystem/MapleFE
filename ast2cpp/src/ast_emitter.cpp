@@ -1031,6 +1031,8 @@ std::string AstEmitter::AstEmitInstanceOfNode(InstanceOfNode *node) {
     rhs = " (NIL)"s;
   std::string str(lhs + " instanceof "s + rhs);
   mPrecedence = precd;
+  if (node->IsStmt())
+    str += ";\n"s;
   return str;
 }
 
@@ -1048,6 +1050,8 @@ std::string AstEmitter::AstEmitTypeOfNode(TypeOfNode *node) {
     rhs = " (NIL)"s;
   str += rhs;
   mPrecedence = precd;
+  if (node->IsStmt())
+    str += ";\n"s;
   return str;
 }
 
@@ -1095,7 +1099,6 @@ static std::string GetTypeOp(UserTypeNode *node) {
     default:
       MASSERT(0 && "Unexpected enumerator");
   }
-
   return "UNEXPECTED UT_Type"s;
 }
 
