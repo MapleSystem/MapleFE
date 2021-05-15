@@ -55,6 +55,7 @@ NODEKIND(TerOperator)
 NODEKIND(Lambda)
 NODEKIND(InstanceOf)
 NODEKIND(TypeOf)
+NODEKIND(In)
 
 NODEKIND(Block)
 NODEKIND(Function)

@@ -62,6 +62,7 @@ ACTION(BuildTernaryOperation)
 ACTION(BuildPostfixOperation)
 ACTION(BuildLambda)
 ACTION(BuildInstanceOf)
+ACTION(BuildIn)
 ACTION(BuildTypeOf)
 
 // For variable declaration, expression

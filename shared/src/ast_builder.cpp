@@ -2751,6 +2751,34 @@ TreeNode* ASTBuilder::BuildInstanceOf() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+//                       In Expression
+////////////////////////////////////////////////////////////////////////////////
+
+TreeNode* ASTBuilder::BuildIn() {
+  if (mTrace)
+    std::cout << "In BuildIn" << std::endl;
+
+  Param l_param = mParams[0];
+  MASSERT(!l_param.mIsEmpty);
+  MASSERT(l_param.mIsTreeNode);
+  TreeNode *left = l_param.mData.mTreeNode;
+
+  Param r_param = mParams[1];
+  MASSERT(!r_param.mIsEmpty);
+  MASSERT(r_param.mIsTreeNode);
+  TreeNode *right = r_param.mData.mTreeNode;
+
+  InNode *innode = (InNode*)mTreePool->NewTreeNode(sizeof(InNode));
+  new (innode) InNode();
+
+  innode->SetLeft(left);
+  innode->SetRight(right);
+
+  mLastTreeNode = innode;
+  return mLastTreeNode;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 //                       TypeOf Expression
 ////////////////////////////////////////////////////////////////////////////////
 

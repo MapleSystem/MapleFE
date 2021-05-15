@@ -452,6 +452,10 @@ void Verifier::VerifyInstanceOf(InstanceOfNode *tree){
   return;
 }
 
+void Verifier::VerifyIn(InNode *tree){
+  return;
+}
+
 void Verifier::VerifyTypeOf(TypeOfNode *tree){
   return;
 }

@@ -411,10 +411,13 @@ rule RelationalExpression : ONEOF(ShiftExpression,
                                   RelationalExpression + '>' + ShiftExpression,
                                   RelationalExpression + "<=" + ShiftExpression,
                                   RelationalExpression + ">=" + ShiftExpression,
-                                  RelationalExpression + "instanceof" + ShiftExpression)
-#  [+In] RelationalExpression[In, ?Yield] in ShiftExpression[?Yield]
+                                  RelationalExpression + "instanceof" + ShiftExpression,
+                                  RelationalExpression + "in" + ShiftExpression)
+## " This line is to make my vim works well colofully.
   attr.action.%2,%3,%4,%5 : BuildBinaryOperation(%1, %2, %3)
   attr.action.%6 : BuildInstanceOf(%1, %3)
+  attr.action.%7 : BuildIn(%1, %3)
+
 
 ##-----------------------------------
 ##rule EqualityExpression[In, Yield] :

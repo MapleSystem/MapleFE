@@ -110,6 +110,7 @@ public:
   TreeNode* BuildParenthesis();
   TreeNode* BuildLambda();
   TreeNode* BuildInstanceOf();
+  TreeNode* BuildIn();
   TreeNode* BuildTypeOf();
 
   TreeNode* BuildStruct();

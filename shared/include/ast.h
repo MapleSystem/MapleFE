@@ -1564,6 +1564,29 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////
+//                  In Expression
+// First coming from Javascript. It's like
+// A is IN B.
+// B is a set of properties. A is one of the properties.
+////////////////////////////////////////////////////////////////////////////
+
+class InNode : public TreeNode {
+private:
+  TreeNode *mLeft;
+  TreeNode *mRight;
+public:
+  InNode() {mLeft = NULL; mRight = NULL; mKind = NK_In;}
+  ~InNode(){Release();}
+
+  TreeNode* GetLeft() {return mLeft;}
+  void SetLeft(TreeNode *n) {mLeft = n;}
+  TreeNode* GetRight() {return mRight;}
+  void SetRight(TreeNode *n){mRight = n;}
+
+  void Dump(unsigned);
+};
+
+////////////////////////////////////////////////////////////////////////////
 //                  The AST Tree
 ////////////////////////////////////////////////////////////////////////////
 
