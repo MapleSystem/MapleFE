@@ -31,3 +31,7 @@ rule ASCII : ONEOF(' ', '!', '#', '$', '%', '&', '(', ')', '*', '+', ',', '-', '
 rule ESCAPE : ONEOF('\' + 'b', '\' + 't', '\' + 'n', '\' + 'f', '\' + 'r', '\' + '"', '\' + ''', '\' + '\')
 
 rule HEXDIGIT : ONEOF(DIGIT, 'a', 'b', 'c', 'd', 'e', 'f', 'A', 'B', 'C', 'D', 'E', 'F')
+
+# This is a special rule to be handled in lexer source code. Since it'll be in lexer code, it means
+# it's a shared rule of all languages. It has to be in reserved.spec.
+rule TemplateLiteral : "this_is_for_fake_rule"

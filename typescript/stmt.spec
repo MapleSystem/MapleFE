@@ -252,7 +252,7 @@ rule Initializer : '=' + AssignmentExpression
 ##  TemplateHead Expression[In, ?Yield] TemplateSpans[?Yield]
 ##
 ## NOTE: TemplateLiteral will be handled specifically in lexer code.
-rule TemplateLiteral : "this_is_for_fake_rule"
+## rule TemplateLiteral : "this_is_for_fake_rule" is defined in reserved.spec
 
 ##-----------------------------------
 ##rule TemplateSpans[Yield] :
