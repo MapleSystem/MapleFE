@@ -44,6 +44,7 @@ typedef enum TK_Type {
   TT_SP,    // separator
   TT_OP,    // operator
   TT_CM,    // comment
+  TT_TL,    // template literal. coming from Javascript first.
   TT_NA     // N.A.
 }TK_Type;
 
@@ -90,6 +91,9 @@ struct AltToken {
   unsigned mAltTokenId;
 };
 
+// class TempLit is defined in parser.h
+class TempLit;
+
 struct Token {
   TK_Type mTkType;
   union {
@@ -97,6 +101,7 @@ struct Token {
     LitData     mLitData;
     SepId       mSepId;
     OprId       mOprId;
+    TempLit    *mTempLit;
   }mData;
 
   AltToken     *mAltTokens;
@@ -107,14 +112,17 @@ struct Token {
   bool IsLiteral()    const { return mTkType == TT_LT; }
   bool IsKeyword()    const { return mTkType == TT_KW; }
   bool IsComment()    const { return mTkType == TT_CM; }
+  bool IsTempLit()    const { return mTkType == TT_TL; }
 
   void SetIdentifier(const char *name) {mTkType = TT_ID; mData.mName = name;}
   void SetLiteral(LitData data)        {mTkType = TT_LT; mData.mLitData = data;}
+  void SetTempLit(TempLit *data)       {mTkType = TT_TL; mData.mTempLit = data;}
 
   const char* GetName() const;
   LitData     GetLitData()   const {return mData.mLitData;}
   OprId       GetOprId()     const {return mData.mOprId;}
   SepId       GetSepId()     const {return mData.mSepId;}
+  TempLit*    GetTempLit()   const {return mData.mTempLit;}
   bool        IsWhiteSpace() const {return mData.mSepId == SEP_Whitespace;}
   void Dump();
 };

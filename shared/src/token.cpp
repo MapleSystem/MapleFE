@@ -112,6 +112,9 @@ void Token::Dump() {
   case TT_CM:
     DUMP0("Comment Token: ");
     break;
+  case TT_TL:
+    DUMP0("TemplateLiteral Token: ");
+    break;
   case TT_LT:
     LiteralTokenDump(mData.mLitData);
     break;

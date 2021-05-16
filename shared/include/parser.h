@@ -221,6 +221,27 @@ struct RecStackEntry {
   }
 };
 
+////////////////////////////////////////////////////////////////////////////
+//                            Template Literal
+// This is an extremely complicated syntax for a rule-based autogen parser.
+// It mixed lexical and syntatic handling at the same time. Need be handled
+// carefully and specially.
+////////////////////////////////////////////////////////////////////////////
+
+class TempLit {
+private:
+  SmallVector<const char*> mStrings;
+  SmallVector<const char*> mTreeStrings;
+  SmallVector<TreeNode*>   mTrees;
+public:
+  TempLit() {}
+  ~TempLit(){mStrings.Release(); mTreeStrings.Release(); mTrees.Release();}
+};
+
+////////////////////////////////////////////////////////////////////////////
+//
+////////////////////////////////////////////////////////////////////////////
+
 class Parser {
 private:
   friend class RecursionTraversal;
