@@ -1,6 +1,6 @@
 Matched 8 tokens.
-Matched 16 tokens.
-Matched 21 tokens.
+Matched 18 tokens.
+Matched 23 tokens.
 ============= Module ===========
 == Sub Tree ==
 class  A
@@ -13,6 +13,6 @@ class  A
   LocalInterfaces: 
 
 == Sub Tree ==
-js_var Decl: x=A
+js_var Decl: x=new A()
 == Sub Tree ==
  delete x.a
