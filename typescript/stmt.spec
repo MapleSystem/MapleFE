@@ -13,7 +13,45 @@
 #
 
 #-------------------------------------------------------------------------------
-#                                    Expressions
+#                                    A.1 Lexical Grammar
+#-------------------------------------------------------------------------------
+
+####   Template and TemplateLiteral are too complicated to be described
+####   in rules. We handle them specifically in the source code of lexer.
+
+##Template ::
+##NoSubstitutionTemplate
+##TemplateHead
+
+##NoSubstitutionTemplate ::
+##` TemplateCharactersopt `
+
+##TemplateHead ::
+##` TemplateCharactersopt ${
+
+##See 11.8.6
+##TemplateSubstitutionTail ::
+##TemplateMiddle
+##TemplateTail
+##See 11.8.6
+##TemplateMiddle ::
+##} TemplateCharactersopt ${
+##See 11.8.6
+##TemplateTail ::
+##} TemplateCharactersopt `
+
+##TemplateCharacters ::
+##TemplateCharacter TemplateCharactersopt
+
+##TemplateCharacter ::
+##$ [lookahead ≠ { ]
+##\ EscapeSequence
+##LineContinuation
+##LineTerminatorSequence
+##SourceCharacter but not one of ` or \ or $ or LineTerminator
+
+#-------------------------------------------------------------------------------
+#                                    A.2 Expressions
 #-------------------------------------------------------------------------------
 
 ##-----------------------------------
@@ -68,7 +106,7 @@ rule PrimaryExpression : ONEOF(
 #  ClassExpression[?Yield]
 #  GeneratorExpression
 #  RegularExpressionLiteral
-#  TemplateLiteral[?Yield]
+  TemplateLiteral,
   CoverParenthesizedExpressionAndArrowParameterList)
 
 ##-----------------------------------
@@ -102,7 +140,6 @@ rule CoverParenthesizedExpressionAndArrowParameterList : ONEOF(
 #
 # NullLiteral, BooleanLiteral, NumericLiteral, StringLiteral can be handled specifically in parser
 # to see if it's a string literal.
-rule FAKEStringLiteral : ONEOF("this_is_for_fake_rule") 
 
 ##-----------------------------------
 ##rule ArrayLiteral[Yield] :
@@ -189,10 +226,11 @@ rule PropertyName : ONEOF(LiteralPropertyName,
 # I used Identifier instead of IdentifierName because keywords
 # are processed before Identifier, and so Identifier is the same
 # as IdentifierName here.
-# I didn't add NumericLiteral so far since it looks weird to me
-# as a property name. We will add it if needed.
+#
+# I extend StringLiteral/NumericLiteral to Literal. 'tsc' will
+# make sure it's legal and I don't need worry about it.
 
-rule LiteralPropertyName : ONEOF(Identifier, FAKEStringLiteral)
+rule LiteralPropertyName : ONEOF(Identifier, Literal)
 
 ##-----------------------------------
 ##rule ComputedPropertyName[Yield] :
@@ -212,6 +250,9 @@ rule Initializer : '=' + AssignmentExpression
 ##rule TemplateLiteral[Yield] :
 ##  NoSubstitutionTemplate
 ##  TemplateHead Expression[In, ?Yield] TemplateSpans[?Yield]
+##
+## NOTE: TemplateLiteral will be handled specifically in lexer code.
+rule TemplateLiteral : "this_is_for_fake_rule"
 
 ##-----------------------------------
 ##rule TemplateSpans[Yield] :
@@ -237,13 +278,13 @@ rule MemberExpression : ONEOF(
   PrimaryExpression,
   MemberExpression + '[' + Expression + ']',
   MemberExpression + '.' + Identifier,
-#  MemberExpression[?Yield] TemplateLiteral[?Yield]
+  MemberExpression + TemplateLiteral,
 #  SuperProperty[?Yield]
 #  MetaProperty
   "new" + MemberExpression + Arguments)
   attr.action.%2 : BuildArrayElement(%1, %3)
   attr.action.%3 : BuildField(%1, %3)
-  attr.action.%4 : BuildNewOperation(%2, %3)
+  attr.action.%5 : BuildNewOperation(%2, %3)
 
 ##-----------------------------------
 ##rule SuperProperty[Yield] :
@@ -278,8 +319,8 @@ rule CallExpression : ONEOF(
   SuperCall,
   CallExpression + Arguments,
   CallExpression + '[' + Expression + ']',
-  CallExpression + '.' + Identifier)
-#  CallExpression[?Yield] TemplateLiteral[?Yield]
+  CallExpression + '.' + Identifier,
+  CallExpression + TemplateLiteral)
   attr.action.%1,%3 : BuildCall(%1)
   attr.action.%1,%3 : AddArguments(%2)
 
@@ -1421,11 +1462,11 @@ rule RequiredParameterList: ONEOF(RequiredParameter,
                                   RequiredParameterList + ',' + RequiredParameter)
 
 ## rule RequiredParameter: AccessibilityModifieropt BindingIdentifierOrPattern TypeAnnotationopt BindingIdentifier : StringLiteral
-##
+## NOTE: I extend StringLiteral to Literal.
 ## NOTE: I Added initializer. I guess the spec missed this part.
 rule RequiredParameter: ONEOF(
   ZEROORONE(AccessibilityModifier) + BindingIdentifierOrPattern + ZEROORONE(Initializer) + ZEROORONE(TypeAnnotation),
-  BindingIdentifier + ':' + FAKEStringLiteral)
+  BindingIdentifier + ':' + Literal)
   attr.action.%1 : AddInitTo(%2, %3)
   attr.action.%1 : BuildDecl(%4, %2)
 
@@ -1443,7 +1484,7 @@ rule OptionalParameterList: ONEOF(OptionalParameter,
 rule OptionalParameter: ONEOF(
   ZEROORONE(AccessibilityModifier) + BindingIdentifierOrPattern + '?' + ZEROORONE(TypeAnnotation),
   ZEROORONE(AccessibilityModifier) + BindingIdentifierOrPattern + ZEROORONE(TypeAnnotation) + Initializer,
-  BindingIdentifier + '?' + ':' + FAKEStringLiteral)
+  BindingIdentifier + '?' + ':' + Literal)
 
 ## rule RestParameter: ... BindingIdentifier TypeAnnotationopt
 rule RestParameter: "..." + BindingIdentifier + ZEROORONE(TypeAnnotation)
