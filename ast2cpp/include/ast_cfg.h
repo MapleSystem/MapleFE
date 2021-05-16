@@ -226,6 +226,7 @@ class CFGVisitor : public AstVisitor {
   // For statements of a BB
   PassNode *VisitPassNode(PassNode *node);
   ImportNode *VisitImportNode(ImportNode *node);
+  ExportNode *VisitExportNode(ExportNode *node);
   DeclNode *VisitDeclNode(DeclNode *node);
   ParenthesisNode *VisitParenthesisNode(ParenthesisNode *node);
   CastNode *VisitCastNode(CastNode *node);

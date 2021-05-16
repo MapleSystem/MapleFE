@@ -518,6 +518,13 @@ ImportNode *CFGVisitor::VisitImportNode(ImportNode *node) {
 }
 
 // For statement of current BB
+ExportNode *CFGVisitor::VisitExportNode(ExportNode *node) {
+  mCurrentBB->AddStatement(node);
+  AstVisitor::VisitExportNode(node);
+  return node;
+}
+
+// For statement of current BB
 DeclNode *CFGVisitor::VisitDeclNode(DeclNode *node) {
   mCurrentBB->AddStatement(node);
   return node;

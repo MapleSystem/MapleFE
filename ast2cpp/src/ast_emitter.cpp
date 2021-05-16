@@ -75,17 +75,16 @@ std::string AstEmitter::AstEmitXXportAsPairNode(XXportAsPairNode *node) {
 std::string AstEmitter::AstEmitExportNode(ExportNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str;
-  if (auto n = node->GetTarget()) {
-    str += " "s + AstEmitTreeNode(n);
-  }
-
+  std::string str = "export "s;
+  auto num = node->GetPairsNum();
   for (unsigned i = 0; i < node->GetPairsNum(); ++i) {
     if (i)
       str += ", "s;
-    if (auto n = node->GetPair(i)) {
-      str += " "s + AstEmitXXportAsPairNode(n);
-    }
+    if (auto n = node->GetPair(i))
+      str += AstEmitXXportAsPairNode(n);
+  }
+  if (auto n = node->GetTarget()) {
+    str += " from "s + AstEmitTreeNode(n);
   }
 
   mPrecedence = '\030';
@@ -97,7 +96,7 @@ std::string AstEmitter::AstEmitExportNode(ExportNode *node) {
 std::string AstEmitter::AstEmitImportNode(ImportNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str = "import"s;
+  std::string str = "import "s;
   /*
   switch (node->GetProperty()) {
     case ImpNone:
