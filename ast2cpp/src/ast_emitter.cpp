@@ -60,12 +60,15 @@ std::string AstEmitter::AstEmitXXportAsPairNode(XXportAsPairNode *node) {
     if (auto n = node->GetAfter())
       str += " * as "s + AstEmitTreeNode(n);
   } else {
-    str += "{ "s;
-    if (auto n = node->GetBefore())
+    if (auto n = node->GetBefore()) {
+      if (n->GetKind() == NK_Identifier)
+        str += "{ "s;
       str += AstEmitTreeNode(n);
-    if (auto n = node->GetAfter())
-      str += " as "s + AstEmitTreeNode(n);
-    str += " }"s;
+      if (auto n = node->GetAfter())
+        str += " as "s + AstEmitTreeNode(n);
+      if (n->GetKind() == NK_Identifier)
+        str += " }"s;
+    }
   }
   if (node->IsStmt())
     str += ";\n"s;
