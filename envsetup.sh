@@ -12,6 +12,10 @@
 # FIT FOR A PARTICULAR PURPOSE.
 # See the Mulan PSL v2 for more details.
 #
+if [ "${BASH_SOURCE[0]}" -ef "$0" ]; then
+    echo "This script should be sourced in a bash shell, not executed directly"
+    exit 1
+fi
 
 function print_usage {
   echo " "
@@ -34,13 +38,8 @@ fi
 
 export SRCLANG=${LANG}
 
-pdir=$(cd ..; pwd)
-unset MAPLE_ROOT
-export MAPLE_ROOT=${pdir}
-
-curdir=$(pwd)
-unset MAPLEFE_ROOT
-export MAPLEFE_ROOT=${curdir}
+export MAPLEFE_ROOT=$(cd $(dirname ${BASH_SOURCE[0]}); pwd)
+export MAPLE_ROOT=$(dirname ${MAPLEFE_ROOT})
 
 unset MAPLEALL_ROOT
 export MAPLEALL_ROOT=${MAPLE_ROOT}/OpenArkCompiler
