@@ -2,7 +2,7 @@
 function usage {
 cat << EOF
 
-Usage: astdump.sh [-dot] [-f|--fullscreen] [-p <PREFIX>|--pre <PREFIX>] [-a|--ast] [-c|--cfg] <file1> [<file2> ...]
+Usage: astdump.sh [-dot] [-f|--fullscreen] [-p <PREFIX>|--pre <PREFIX>] [-a|--ast] [-c|--cfg] [-C|--clean] <file1> [<file2> ...]
 
   -d | --dot             Use Graphviz dot to generate the graph and view it with viewnior
   -f | --fullscreen      View the generated graph in fullscreen mode. It implies option -dot
@@ -10,12 +10,13 @@ Usage: astdump.sh [-dot] [-f|--fullscreen] [-p <PREFIX>|--pre <PREFIX>] [-a|--as
   -a | --ast             Show AST graph. It is equivalent to options "-dot -p AST"
   -c | --cfg             Show CFG graph. It is equivalent to options "-dot -p CFG"
   -s | --syntax          Syntax highlighting the generated TypeScript code
+  -C | --clean           Clean up generated files (*.ts-[0-9]*.out.ts)
   <file1> [<file2> ...]  Specify one or more TypeScript files to be processed
 EOF
 exit 1
 }
 
-DOT= PRE= LIST= VIEWOP= HIGHLIGHT="cat" TSCERR=
+DOT= PRE= LIST= VIEWOP= HIGHLIGHT="cat" TSCERR= CLEAN=
 while [ $# -gt 0 ]; do
     case $1 in
         -d|-dot|--dot)   DOT=true;;
@@ -25,11 +26,13 @@ while [ $# -gt 0 ]; do
         -c|-cfg|--cfg)   PRE="CFG" ; DOT=true ; TSCERR=">& /dev/null" ;;
         -s|--syntax)     HIGHLIGHT="highlight -O xterm256 --syntax ts" ;;
         -e|--tscerror)   TSCERR= ;;
+        -C|--clean)      CLEAN=true ;;
         -*)              usage;;
         *)               LIST="$LIST $1"
     esac
     shift
 done
+[ -z "$CLEAN" ] || { echo Cleaning up generated files...; find -maxdepth 1 -regex '.*\.ts-[0-9]+\.out.ts' -exec rm '{}' \;; echo Done.; }
 [ -n "$LIST" ] || { echo Please specify one or more TypeScript files.; usage; }
 [ -z "$DOT" ] || [ -x /usr/bin/dot -a -x /usr/bin/viewnior -x /usr/bin/highlight ] || sudo apt install graphviz viewnior highlight
 CMD=$(dirname $0)/../output/typescript/typescript/ts2cpp
