@@ -15,15 +15,16 @@ EOF
 exit 1
 }
 
-DOT= PRE= LIST= VIEWOP= HIGHLIGHT="cat"
+DOT= PRE= LIST= VIEWOP= HIGHLIGHT="cat" TSCERR=
 while [ $# -gt 0 ]; do
     case $1 in
         -d|-dot|--dot)   DOT=true;;
         -f|--fullscreen) VIEWOP="--fullscreen"; DOT=true;;
         -p|-pre|--pre)   [ $# -ge 2 ] && { PRE="$2"; shift; } || { echo "$1 needs an argument"; exit 1; } ;;
-        -a|-ast|--ast)   PRE="AST" ; DOT=true ;;
-        -c|-cfg|--cfg)   PRE="CFG" ; DOT=true ;;
+        -a|-ast|--ast)   PRE="AST" ; DOT=true ; TSCERR=">& /dev/null" ;;
+        -c|-cfg|--cfg)   PRE="CFG" ; DOT=true ; TSCERR=">& /dev/null" ;;
         -s|--syntax)     HIGHLIGHT="highlight -O xterm256 --syntax ts" ;;
+        -e|--tscerror)   TSCERR= ;;
         -*)              usage;;
         *)               LIST="$LIST $1"
     esac
@@ -42,17 +43,20 @@ for ts in $LIST; do
   cmd=$(grep -n -e "^// .Beginning of AstEmitter:" -e "// End of AstEmitter.$" <<< "$out" |
     tail -2 | sed 's/:.*//' | xargs | sed 's/\([^ ]*\) \(.*\)/sed -n \1,$((\2+1))p/')
   if [ "x${cmd:0:4}" = "xsed " ]; then
-    eval $cmd <<< "$out" > "#tmp~.ts"
-    clang-format-10 -i --style="{ColumnLimit: 120}" "#tmp~.ts"
+    T=$ts-$$.out.ts
+    eval $cmd <<< "$out" > "$T"
+    clang-format-10 -i --style="{ColumnLimit: 120}" "$T"
     echo -e "\n====== Reformated ======\n"
-    $HIGHLIGHT "#tmp~.ts"
-    tsc --target es2015 "#tmp~.ts" >& /dev/null
+    $HIGHLIGHT "$T"
+    eval tsc --noEmit --target es2015 "$T" $TSCERR
     if [ $? -ne 0 ]; then
       E="tsc"
       grep -qm1 "^PassNode {" <<< "$out" && E="$E,PassNode"
       Failed="$Failed ($E)$ts"
+      echo Failed to compile "$T" with tsc
+    else
+      rm -f "$T"
     fi
-    rm -f "#tmp~.ts" "#tmp~.js"
   fi
   grep -n -e "^digraph $PRE[^{]* {" -e "^}" <<< "$out" | grep -A1 "digraph [^{]* {" |
   if [ -n "$DOT" ]; then
