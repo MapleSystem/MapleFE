@@ -230,7 +230,7 @@ std::string AstEmitter::AstEmitNewNode(NewNode *node) {
   if (auto n = node->GetBody()) {
     str += " "s + AstEmitBlockNode(n);
   }
-  mPrecedence = num ? '\024' : '\023';
+  mPrecedence = '\024';
   if (node->IsStmt())
     str += ";\n"s;
   return str;
@@ -239,7 +239,10 @@ std::string AstEmitter::AstEmitNewNode(NewNode *node) {
 std::string AstEmitter::AstEmitDeleteNode(DeleteNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str;
+  std::string str("delete "s);
+  if (auto n = node->GetExpr()) {
+    str += AstEmitTreeNode(n);
+  }
   mPrecedence = '\030';
   if (node->IsStmt())
     str += ";\n"s;
