@@ -42,11 +42,16 @@ for ts in $LIST; do
   cmd=$(grep -n -e "^// .Beginning of AstEmitter:" -e "// End of AstEmitter.$" <<< "$out" |
     tail -2 | sed 's/:.*//' | xargs | sed 's/\([^ ]*\) \(.*\)/sed -n \1,$((\2+1))p/')
   if [ "x${cmd:0:4}" = "xsed " ]; then
-    eval $cmd <<<"$out" > "#tmp~.ts"
+    eval $cmd <<< "$out" > "#tmp~.ts"
     clang-format-10 -i --style="{ColumnLimit: 120}" "#tmp~.ts"
     echo -e "\n====== Reformated ======\n"
     $HIGHLIGHT "#tmp~.ts"
-    tsc --target es2015 "#tmp~.ts" >& /dev/null || Failed="$Failed (tsc)$ts"
+    tsc --target es2015 "#tmp~.ts" >& /dev/null
+    if [ $? -ne 0 ]; then
+      E="tsc"
+      grep -qm1 "^PassNode {" <<< "$out" && E="$E,PassNode"
+      Failed="$Failed ($E)$ts"
+    fi
     rm -f "#tmp~.ts" "#tmp~.js"
   fi
   grep -n -e "^digraph $PRE[^{]* {" -e "^}" <<< "$out" | grep -A1 "digraph [^{]* {" |
