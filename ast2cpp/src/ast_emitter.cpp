@@ -53,15 +53,20 @@ std::string AstEmitter::AstEmitXXportAsPairNode(XXportAsPairNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
-  str += " "s + std::to_string(node->IsDefault());
-  str += " "s + std::to_string(node->IsEverything());
-  if (auto n = node->GetBefore()) {
-    str += " "s + AstEmitTreeNode(n);
+  if (node->IsDefault()) {
+    if (auto n = node->GetBefore())
+      str += " "s + AstEmitTreeNode(n);
+  } else if (node->IsEverything()) {
+    if (auto n = node->GetAfter())
+      str += " * as "s + AstEmitTreeNode(n);
+  } else {
+    str += "{ "s;
+    if (auto n = node->GetBefore())
+      str += AstEmitTreeNode(n);
+    if (auto n = node->GetAfter())
+      str += " as "s + AstEmitTreeNode(n);
+    str += " }"s;
   }
-  if (auto n = node->GetAfter()) {
-    str += " "s + AstEmitTreeNode(n);
-  }
-  mPrecedence = '\030';
   if (node->IsStmt())
     str += ";\n"s;
   return str;
@@ -92,10 +97,36 @@ std::string AstEmitter::AstEmitExportNode(ExportNode *node) {
 std::string AstEmitter::AstEmitImportNode(ImportNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str;
-  str += " "s + AstDump::GetEnumImportProperty(node->GetProperty());
+  std::string str = "import"s;
+  /*
+  switch (node->GetProperty()) {
+    case ImpNone:
+      break;
+    case ImpType:
+      break;
+    case ImpStatic:
+      break;
+    case ImpSingle:
+      break;
+    case ImpAll:
+      break;
+    case ImpLocal:
+      break;
+    case ImpSystem:
+      break;
+    default:
+      MASSERT(0 && "Unexpected enumerator");
+  }
+  */
+  auto num = node->GetPairsNum();
+  for (unsigned i = 0; i < node->GetPairsNum(); ++i) {
+    if (i)
+      str += ", "s;
+    if (auto n = node->GetPair(i))
+      str += AstEmitXXportAsPairNode(n);
+  }
   if (auto n = node->GetTarget()) {
-    str += " "s + AstEmitTreeNode(n);
+    str += " from "s + AstEmitTreeNode(n);
   }
   if (node->IsStmt())
     str += ";\n"s;
