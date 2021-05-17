@@ -1277,6 +1277,9 @@ std::string AstEmitter::AstEmitTreeNode(TreeNode *node) {
   case NK_ExprList:
     return AstEmitExprListNode(static_cast<ExprListNode *>(node));
     break;
+  case NK_TemplateLiteral:
+    return AstEmitTemplateLiteralNode(static_cast<TemplateLiteralNode *>(node));
+    break;
   case NK_Literal:
     return AstEmitLiteralNode(static_cast<LiteralNode *>(node));
     break;
