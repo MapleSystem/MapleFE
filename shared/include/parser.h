@@ -269,6 +269,8 @@ public:
   bool mTracePatchWasSucc;  // trace patching was succ node.
   bool mTraceWarning;       // print the warning.
 
+  bool mLineMode;
+
   void SetLexerTrace() {mLexer->SetTrace();}
   void DumpIndentation();
   void DumpEnterTable(const char *tablename, unsigned indent);
@@ -354,6 +356,8 @@ private:
   // Build AST, for each top level construct.
   ASTTree*  BuildAST();
 
+  // Handle TemplateLiteralNodes
+  void ParseTemplateLiterals();
 
 //////////////////////////////////////////////////////////////
 // The following section is all about left recursion parsing

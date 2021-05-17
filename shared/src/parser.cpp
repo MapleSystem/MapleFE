@@ -213,6 +213,8 @@ Parser::Parser(const char *name) : filename(name) {
   mPending = 0;
   mEndOfFile = false;
 
+  mLineMode = false;
+
   mTraceTable = false;
   mTraceLeftRec = false;
   mTraceAppeal = false;
@@ -334,18 +336,28 @@ bool Parser::Parse() {
       break;
   }
 
-  if (gTemplateLiteralNodes.GetNum() > 0) {
-    mLexer->SetLineMode();
-    for (unsigned i = 0; i < gTemplateLiteralNodes.GetNum(); i++) {
-      //std::cout << "got one temp lit" << std::endl;
-    }
-  }
+  if (gTemplateLiteralNodes.GetNum() > 0)
+    ParseTemplateLiterals();
 
   FixUpVisitor worker(&gModule);
   worker.FixUp();
 
   gModule.Dump();
   return (res==ParseFail)? false: true;
+}
+
+void Parser::ParseTemplateLiterals() {
+  mLineMode = true;
+  mLexer->SetLineMode();
+  for (unsigned i = 0; i < gTemplateLiteralNodes.GetNum(); i++) {
+    TemplateLiteralNode *tl = gTemplateLiteralNodes.ValueAtIndex(i);
+    for (unsigned j = 0; j < tl->GetPlaceHoldersNum(); j++) {
+      const char *ph_str = tl->GetPlaceHolderAtIndex(j);
+      mLexer->PrepareForString(ph_str);
+    }
+  }
+  mLineMode = false;
+  mLexer->ResetLineMode();
 }
 
 // Right now I didn't use mempool yet, will come back.
