@@ -512,6 +512,12 @@ PassNode *CFGVisitor::VisitPassNode(PassNode *node) {
 }
 
 // For statement of current BB
+TemplateLiteralNode *CFGVisitor::VisitTemplateLiteralNode(TemplateLiteralNode *node) {
+  mCurrentBB->AddStatement(node);
+  return node;
+}
+
+// For statement of current BB
 ImportNode *CFGVisitor::VisitImportNode(ImportNode *node) {
   mCurrentBB->AddStatement(node);
   return node;
