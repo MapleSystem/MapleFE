@@ -78,6 +78,7 @@ Lexer::Lexer()
     endoffile(false),
     mPredefinedTokenNum(0),
     mTrace(false),
+    mLineMode(false),
     _linenum(0) {
       seencomments.clear();
       mCheckSeparator = true;
@@ -106,6 +107,14 @@ void Lexer::PrepareForFile(const std::string filename) {
   } else {
     _linenum = 1;
   }
+}
+
+void Lexer::PrepareForString(const char *str) {
+  current_line_size = strlen(str);
+  strncpy(line, str, current_line_size);
+  line[current_line_size] == '\0';
+  curidx = 0;
+  _linenum = 1;
 }
 
 ///////////////////////////////////////////////////////////////////////////

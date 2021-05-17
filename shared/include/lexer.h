@@ -46,6 +46,7 @@ public:
   TokenPool  mTokenPool;
   unsigned   mPredefinedTokenNum;   // number of predefined tokens.
   bool       mTrace;
+  bool       mLineMode;             // Lex just one line
 
 public:
   FILE *srcfile;
@@ -73,7 +74,10 @@ public:
     }
   }
 
-  void SetTrace() {mTrace = true;}
+  void SetTrace()     {mTrace = true;}
+
+  void SetLineMode()  {mLineMode = true;}
+  void ResetLineMode(){mLineMode = false;}
 
   bool EndOfLine() { return curidx == current_line_size; }
   bool EndOfFile() { return endoffile; }
@@ -81,7 +85,7 @@ public:
   void ResetPos();
 
   void PrepareForFile(const std::string filename);
-  void PrepareForString(const std::string &src);
+  void PrepareForString(const char *);
 
   int GetCuridx() const { return curidx; }
   void SetCuridx(int i) { curidx = i; }

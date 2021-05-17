@@ -334,6 +334,13 @@ bool Parser::Parse() {
       break;
   }
 
+  if (gTemplateLiteralNodes.GetNum() > 0) {
+    mLexer->SetLineMode();
+    for (unsigned i = 0; i < gTemplateLiteralNodes.GetNum(); i++) {
+      //std::cout << "got one temp lit" << std::endl;
+    }
+  }
+
   FixUpVisitor worker(&gModule);
   worker.FixUp();
 
