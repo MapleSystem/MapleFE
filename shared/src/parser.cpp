@@ -589,6 +589,7 @@ void Parser::RemoveSuccNode(unsigned curr_token, AppealNode *node) {
 
 bool Parser::LookAheadFail(RuleTable *rule_table, unsigned token) {
   Token *curr_token = GetActiveToken(token);
+
   LookAheadTable latable = gLookAheadTable[rule_table->mIndex];
 
   bool found = false;
@@ -604,6 +605,14 @@ bool Parser::LookAheadFail(RuleTable *rule_table, unsigned token) {
     case LA_Token:
       if (curr_token == &gSystemTokens[la.mData.mTokenId])
         found = true;
+      // TemplateLiteral is treated as a special keyword.
+      {
+        Token *t = &gSystemTokens[la.mData.mTokenId];
+        if (t->IsKeyword() && !strncmp(t->GetName(), "this_is_for_fake_rule", 21)) {
+          if (curr_token->IsTempLit())
+            found = true;
+        } 
+      }
       break;
     case LA_Identifier:
       if (curr_token->IsIdentifier())
@@ -906,6 +915,9 @@ bool Parser::TraverseRuleTableRegular(RuleTable *rule_table, AppealNode *appeal)
   if ((rule_table == &TblLiteral))
     return TraverseLiteral(rule_table, appeal);
 
+  if ((rule_table == &TblTemplateLiteral))
+    return TraverseTemplateLiteral(rule_table, appeal);
+
   EntryType type = rule_table->mType;
   switch(type) {
   case ET_Oneof:
@@ -1058,6 +1070,25 @@ bool Parser::TraverseLiteral(RuleTable *rule_table, AppealNode *appeal) {
   bool found = false;
 
   if (curr_token->IsLiteral()) {
+    found = true;
+    TraverseSpecialTableSucc(rule_table, appeal);
+  } else {
+    appeal->mResult = FailNotLiteral;
+    AddFailed(rule_table, mCurToken);
+  }
+
+  return found;
+}
+
+// We don't go into TemplateLiteral table.
+// 'appeal' is the node for this rule table. This is different than TraverseOneof
+// or the others where 'appeal' is actually a parent node.
+bool Parser::TraverseTemplateLiteral(RuleTable *rule_table, AppealNode *appeal) {
+  Token *curr_token = GetActiveToken(mCurToken);
+  const char *name = GetRuleTableName(rule_table);
+  bool found = false;
+
+  if (curr_token->IsTempLit()) {
     found = true;
     TraverseSpecialTableSucc(rule_table, appeal);
   } else {
@@ -1377,7 +1408,7 @@ void Parser::SetIsDone(unsigned group_id, unsigned start_token) {
 
 void Parser::SetIsDone(RuleTable *rt, unsigned start_token) {
   // We don't save SuccMatch for TblLiteral and TblIdentifier
-  if((rt == &TblLiteral) || (rt == &TblIdentifier))
+  if((rt == &TblLiteral) || (rt == &TblIdentifier) || (rt == &TblTemplateLiteral))
     return;
 
   SuccMatch *succ = &gSucc[rt->mIndex];
@@ -1482,7 +1513,7 @@ void Parser::SortOutNode(AppealNode *node) {
   RuleTable *rule_table = node->GetTable();
 
   // Table Identifier and Literal don't need sort.
-  if (rule_table == &TblIdentifier || rule_table == &TblLiteral)
+  if (rule_table == &TblIdentifier || rule_table == &TblLiteral || rule_table == &TblTemplateLiteral)
     return;
 
   // The lead node of a traversal group need special solution, if they are
@@ -2420,6 +2451,14 @@ bool AppealNode::GetSortedChildIndex(AppealNode *child, unsigned &index) {
             index = i+1;
           }
         }
+      } else if (t == &TblTemplateLiteral) {
+        if (child->IsToken()) {
+          Token *token = child->GetToken();
+          if (token->IsTempLit()) {
+            found = true;
+            index = i+1;
+          }
+        }
       } else if (child->IsTable() && child->GetTable() == t) {
         found = true;
         index = i+1;
@@ -2466,7 +2505,8 @@ AppealNode* AppealNode::FindSpecChild(TableData *tdata, unsigned match) {
         if (child->IsTable() && child->GetTable() == child_rule)
           ret_child = child;
         // Literal and Identifier are treated as token.
-        if (child->IsToken() && (child_rule == &TblLiteral || child_rule == &TblIdentifier))
+        if (child->IsToken() &&
+            (child_rule == &TblLiteral || child_rule == &TblIdentifier || child_rule == &TblTemplateLiteral))
           ret_child = child;
         break;
       }

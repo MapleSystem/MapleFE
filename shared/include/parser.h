@@ -305,6 +305,7 @@ private:
   bool TraverseToken(Token*, AppealNode*, AppealNode *&);
   bool TraverseLiteral(RuleTable*, AppealNode*);
   bool TraverseIdentifier(RuleTable*, AppealNode*);
+  bool TraverseTemplateLiteral(RuleTable*, AppealNode*);
   void TraverseSpecialTableSucc(RuleTable*, AppealNode*);
 
   bool IsVisited(RuleTable*);

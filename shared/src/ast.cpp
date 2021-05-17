@@ -806,6 +806,26 @@ void ExprListNode::Dump(unsigned indent) {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
+//                          TemplateLiteralNode
+//////////////////////////////////////////////////////////////////////////////////////
+
+void TemplateLiteralNode::Dump(unsigned indent) {
+  DumpIndentation(indent);
+  DUMP0_NORETURN(" template-literal  strings: ");
+  for (unsigned i = 0; i < mStrings.GetNum(); i++) {
+    DUMP0_NORETURN(mStrings.ValueAtIndex(i));
+    if (i < mStrings.GetNum() - 1)
+      DUMP0_NORETURN(",");
+  }
+  DUMP0_NORETURN(" patterns: ");
+  for (unsigned i = 0; i < mPatterns.GetNum(); i++) {
+    DUMP0_NORETURN(mPatterns.ValueAtIndex(i));
+    if (i < mPatterns.GetNum() - 1)
+      DUMP0_NORETURN(",");
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////
 //                          LiteralNode
 //////////////////////////////////////////////////////////////////////////////////////
 

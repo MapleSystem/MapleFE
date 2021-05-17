@@ -858,7 +858,7 @@ public:
   void        SetTreeAtIndex(unsigned i, TreeNode *n) {*(mTrees.RefAtIndex(i)) = n;}
   void        AddTree(TreeNode *n) {mTrees.PushBack(n);}
 
-  void Dump(unsigned){}
+  void Dump(unsigned);
 };
 
 //////////////////////////////////////////////////////////////////////////
