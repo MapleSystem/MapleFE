@@ -818,9 +818,9 @@ void TemplateLiteralNode::Dump(unsigned indent) {
       DUMP0_NORETURN(",");
   }
   DUMP0_NORETURN(" patterns: ");
-  for (unsigned i = 0; i < mPatterns.GetNum(); i++) {
-    DUMP0_NORETURN(mPatterns.ValueAtIndex(i));
-    if (i < mPatterns.GetNum() - 1)
+  for (unsigned i = 0; i < mPlaceHolders.GetNum(); i++) {
+    DUMP0_NORETURN(mPlaceHolders.ValueAtIndex(i));
+    if (i < mPlaceHolders.GetNum() - 1)
       DUMP0_NORETURN(",");
   }
 }

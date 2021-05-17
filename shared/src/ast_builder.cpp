@@ -65,15 +65,15 @@ TreeNode* ASTBuilder::CreateTokenTreeNode(const Token *token) {
     TemplateLiteralNode *n = (TemplateLiteralNode*)gTreePool.NewTreeNode(sizeof(TemplateLiteralNode));
     new (n) TemplateLiteralNode();
 
-    // copy mStrings&mPatterns to n
+    // copy mStrings&mPlaceHolders to n
     TempLitData *tld = token->GetTempLitData();
     for (unsigned i = 0; i < tld->mStrings.GetNum(); i++) {
       const char *s = tld->mStrings.ValueAtIndex(i);
       n->AddString(s);
     }
-    for (unsigned i = 0; i < tld->mPatterns.GetNum(); i++) {
-      const char *s = tld->mPatterns.ValueAtIndex(i);
-      n->AddPattern(s);
+    for (unsigned i = 0; i < tld->mPlaceHolders.GetNum(); i++) {
+      const char *s = tld->mPlaceHolders.ValueAtIndex(i);
+      n->AddPlaceHolder(s);
     }
 
     mLastTreeNode = n;

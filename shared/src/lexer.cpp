@@ -282,14 +282,14 @@ TempLitData* Lexer::GetTempLit() {
       }
       // Try pattern
       end_idx = 0;
-      bool p_found = FindNextTLPattern(start_idx, end_idx);
+      bool p_found = FindNextTLPlaceHolder(start_idx, end_idx);
       if (p_found) {
         unsigned p_s = start_idx + 2;
         unsigned len = end_idx - p_s + 1;
         MASSERT(len > 0 && "found token has 0 data?");
         std::string s(GetLine() + p_s, len);
         const char *addr = gStringPool.FindString(s);
-        tld->mPatterns.PushBack(addr);
+        tld->mPlaceHolders.PushBack(addr);
         // We need skip the ending '}' of a pattern.
         start_idx = end_idx + 2;
       }
@@ -328,7 +328,7 @@ bool Lexer::FindNextTLString(unsigned start_idx, unsigned& end_idx) {
 
 // Find the pattern string of a template literal.
 // Set end_idx as the last char of string.
-bool Lexer::FindNextTLPattern(unsigned start_idx, unsigned& end_idx) {
+bool Lexer::FindNextTLPlaceHolder(unsigned start_idx, unsigned& end_idx) {
   unsigned working_idx = start_idx;
   if (line[working_idx] != '$' || line[working_idx+1] != '{')
     return false;

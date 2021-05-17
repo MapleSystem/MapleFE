@@ -531,8 +531,8 @@ std::string AstEmitter::AstEmitTemplateLiteralNode(TemplateLiteralNode *node) {
     return std::string();
   std::string str = "`"s;
 
-  for (unsigned i = 0; i < node->GetPatternsNum(); ++i) {
-    if(auto s = node->GetPatternAtIndex(i))
+  for (unsigned i = 0; i < node->GetPlaceHoldersNum(); ++i) {
+    if(auto s = node->GetPlaceHolderAtIndex(i))
       str += "${"s + s + "}"s;
   }
 

@@ -96,7 +96,7 @@ struct AltToken {
 // It contains the pure strings after lexing.
 struct TempLitData {
   SmallVector<const char*> mStrings;
-  SmallVector<const char*> mPatterns;
+  SmallVector<const char*> mPlaceHolders;
 };
 
 struct Token {
