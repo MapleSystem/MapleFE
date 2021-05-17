@@ -32,6 +32,8 @@
 
 namespace maplefe {
 
+SmallVector<TemplateLiteralNode*> gTemplateLiteralNodes;
+
 //////////////////////////////////////////////////////////////////////////////////
 //                   Top Issues in Parsing System
 //
@@ -323,6 +325,7 @@ Token* Parser::GetActiveToken(unsigned i) {
 }
 
 bool Parser::Parse() {
+  gTemplateLiteralNodes.Clear();
   gASTBuilder.SetTrace(mTraceAstBuild);
   ParseStatus res;
   while (1) {

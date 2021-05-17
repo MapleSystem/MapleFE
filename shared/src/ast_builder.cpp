@@ -76,8 +76,10 @@ TreeNode* ASTBuilder::CreateTokenTreeNode(const Token *token) {
       n->AddPlaceHolder(s);
     }
 
+    gTemplateLiteralNodes.PushBack(n);
     mLastTreeNode = n;
     return n;
+
   } else if (token->IsKeyword()) {
     const char *keyword = token->GetName();
     // If it's an attribute

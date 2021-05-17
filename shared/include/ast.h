@@ -861,6 +861,9 @@ public:
   void Dump(unsigned);
 };
 
+// We define a global vector for TemplateLiteralNode created after all parsing.
+extern SmallVector<TemplateLiteralNode*> gTemplateLiteralNodes;
+
 //////////////////////////////////////////////////////////////////////////
 //                         Literal Nodes
 //////////////////////////////////////////////////////////////////////////
