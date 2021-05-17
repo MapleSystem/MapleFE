@@ -1,13 +1,19 @@
 Matched 27 tokens.
-Matched 38 tokens.
-Matched 48 tokens.
-Matched 67 tokens.
-Matched 74 tokens.
+Matched 34 tokens.
+Matched 37 tokens.
+Matched 40 tokens.
+Matched 50 tokens.
+Matched 69 tokens.
+Matched 76 tokens.
 ============= Module ===========
 == Sub Tree ==
 js_var Decl: arr=[7,4,5,9,2,8,1,6,3]
 == Sub Tree ==
-
+js_var Decl: sum=0
+== Sub Tree ==
+js_var Decl: i
+== Sub Tree ==
+js_var Decl: len
 == Sub Tree ==
 
 == Sub Tree ==
