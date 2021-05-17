@@ -29,14 +29,13 @@ if [ "$#" -gt 1 ]; then
   return
 fi
 
-LANG=java
+LANGSRC=java
 if [ "$#" -eq 1 ]; then
   if [ $1 = "typescript" ]; then
-    LANG=typescript
+    LANGSRC=typescript
   fi
 fi
-
-export SRCLANG=${LANG}
+export SRCLANG=$LANGSRC
 
 export MAPLEFE_ROOT=$(cd $(dirname ${BASH_SOURCE[0]}); pwd)
 export MAPLE_ROOT=$(dirname ${MAPLEFE_ROOT})
