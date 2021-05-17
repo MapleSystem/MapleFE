@@ -48,6 +48,9 @@ NODEKIND(ArrayLiteral)
 NODEKIND(VarList)
 NODEKIND(ExprList)
 
+// Template Literal
+NODEKIND(TemplateLiteral)
+
 NODEKIND(Literal)
 NODEKIND(UnaOperator)
 NODEKIND(BinOperator)

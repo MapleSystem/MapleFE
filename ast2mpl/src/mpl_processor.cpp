@@ -550,6 +550,12 @@ maple::BaseNode *A2M::ProcessInstanceOf(StmtExprKind skind, TreeNode *tnode, Blo
   return nullptr;
 }
 
+maple::BaseNode *A2M::ProcessTemplateLiteral(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
+  NOTYETIMPL("ProcessTemplateLiteral()");
+  TemplateLiteralNode *node = static_cast<TemplateLiteralNode *>(tnode);
+  return nullptr;
+}
+
 maple::BaseNode *A2M::ProcessIn(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
   NOTYETIMPL("ProcessIn()");
   InNode *node = static_cast<InNode *>(tnode);

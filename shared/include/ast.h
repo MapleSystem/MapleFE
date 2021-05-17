@@ -823,6 +823,45 @@ public:
 };
 
 //////////////////////////////////////////////////////////////////////////
+//                         TemplateLiteral Nodes
+// TemplateLiteral node is created from the corresponding TempLit Token,
+// copying the raw mStrings&mPatterns from token.
+// Later on, call parser special API to create AST nodes for the patterns.
+// After that, only mStrings and mTrees are used.
+//////////////////////////////////////////////////////////////////////////
+
+class TemplateLiteralNode : public TreeNode {
+private:
+  // These two are copied from the token.
+  SmallVector<const char*> mStrings;
+  SmallVector<const char*> mPatterns;
+
+  // created by special parser API from mPatterns.
+  SmallVector<TreeNode*> mTrees;
+
+public:
+  TemplateLiteralNode() {mKind = NK_TemplateLiteral;}
+  ~TemplateLiteralNode(){}
+
+  unsigned    GetStrings() {return mStrings.GetNum();}
+  const char* GetStringAtIndex(unsigned i) {return mStrings.ValueAtIndex(i);}
+  void        SetStringAtIndex(unsigned i, const char* n) {*(mStrings.RefAtIndex(i)) = n;}
+  void        AddString(const char *n) {mStrings.PushBack(n);}
+
+  unsigned    GetPatterns() {return mPatterns.GetNum();}
+  const char* GetPatternAtIndex(unsigned i) {return mPatterns.ValueAtIndex(i);}
+  void        SetPatternAtIndex(unsigned i, const char* n) {*(mPatterns.RefAtIndex(i)) = n;}
+  void        AddPattern(const char *n) {mPatterns.PushBack(n);}
+
+  unsigned    GetTrees() {return mTrees.GetNum();}
+  TreeNode*   GetTreeAtIndex(unsigned i) {return mTrees.ValueAtIndex(i);}
+  void        SetTreeAtIndex(unsigned i, TreeNode *n) {*(mTrees.RefAtIndex(i)) = n;}
+  void        AddTree(TreeNode *n) {mTrees.PushBack(n);}
+
+  void Dump(unsigned){}
+};
+
+//////////////////////////////////////////////////////////////////////////
 //                         Literal Nodes
 //////////////////////////////////////////////////////////////////////////
 
