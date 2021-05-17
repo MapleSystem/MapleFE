@@ -526,6 +526,33 @@ std::string AstEmitter::AstEmitExprListNode(ExprListNode *node) {
   return str;
 }
 
+std::string AstEmitter::AstEmitTemplateLiteralNode(TemplateLiteralNode *node) {
+  if (node == nullptr)
+    return std::string();
+  std::string str = "`"s;
+
+  for (unsigned i = 0; i < node->GetStringsNum(); ++i) {
+    if(auto s = node->GetStringAtIndex(i))
+      str += s;
+  }
+
+  for (unsigned i = 0; i < node->GetPatternsNum(); ++i) {
+    if(auto s = node->GetPatternAtIndex(i))
+      str += s;
+  }
+
+  for (unsigned i = 0; i < node->GetTreesNum(); ++i) {
+    if (auto n = node->GetTreeAtIndex(i)) {
+      str += "${"s + AstEmitTreeNode(n) + "}"s;
+    }
+  }
+  str += "`"s;
+  mPrecedence = '\030';
+  if (node->IsStmt())
+    str += ";\n"s;
+  return str;
+}
+
 std::string AstEmitter::AstEmitLiteralNode(LiteralNode *node) {
   if (node == nullptr)
     return std::string();

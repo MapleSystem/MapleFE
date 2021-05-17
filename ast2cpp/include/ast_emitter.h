@@ -77,6 +77,7 @@ public:
   std::string AstEmitStructLiteralNode(StructLiteralNode *node);
   std::string AstEmitVarListNode(VarListNode *node);
   std::string AstEmitExprListNode(ExprListNode *node);
+  std::string AstEmitTemplateLiteralNode(TemplateLiteralNode *node);
   std::string AstEmitLiteralNode(LiteralNode *node);
   std::string AstEmitThrowNode(ThrowNode *node);
   std::string AstEmitCatchNode(CatchNode *node);
