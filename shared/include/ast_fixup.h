@@ -22,30 +22,30 @@
 
 namespace maplefe {
 
-  // FixUpVisitor is to fix up some tree nodes after the AST is created
-  class FixUpVisitor : public AstVisitor {
-    private:
-      ASTModule *mASTModule;
-      bool       mUpdated;
+// FixUpVisitor is to fix up some tree nodes after the AST is created
+class FixUpVisitor : public AstVisitor {
+  private:
+    ASTModule *mASTModule;
+    bool       mUpdated;
 
-    public:
-      FixUpVisitor(ASTModule *m) : mASTModule(m), mUpdated(false) {}
+  public:
+    FixUpVisitor(ASTModule *m) : mASTModule(m), mUpdated(false) {}
 
-      bool FixUp();
+    bool FixUp();
 
-      // Fix up OprId of a UnaOperatorNode
-      //   OPR_Add              --> OPR_Plus
-      //   OPR_Sub              --> OPR_Minus
-      //   OPR_Inc && !IsPost() --> OPR_PreInc
-      //   OPR_Dec && !IsPost() --> OPR_DecInc
-      //
-      UnaOperatorNode *VisitUnaOperatorNode(UnaOperatorNode *node);
+    // Fix up OprId of a UnaOperatorNode
+    //   OPR_Add              --> OPR_Plus
+    //   OPR_Sub              --> OPR_Minus
+    //   OPR_Inc && !IsPost() --> OPR_PreInc
+    //   OPR_Dec && !IsPost() --> OPR_DecInc
+    //
+    UnaOperatorNode *VisitUnaOperatorNode(UnaOperatorNode *node);
 
-      // Fix up mName of UserTypeNode instead of overriding its GetName() as shown below
-      //    const char* GetName() {return mId->GetName();}
-      //
-      UserTypeNode *VisitUserTypeNode(UserTypeNode *node);
-  };
+    // Fix up mName of UserTypeNode instead of overriding its GetName() as shown below
+    //    const char* GetName() {return mId->GetName();}
+    //
+    UserTypeNode *VisitUserTypeNode(UserTypeNode *node);
+};
 
 }
 #endif

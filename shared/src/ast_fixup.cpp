@@ -17,46 +17,46 @@
 
 namespace maplefe {
 
-  bool FixUpVisitor::FixUp() {
-    for (auto it : mASTModule->mTrees)
-      VisitTreeNode(it->mRootNode);
-    return mUpdated;
-  }
+bool FixUpVisitor::FixUp() {
+  for (auto it : mASTModule->mTrees)
+    VisitTreeNode(it->mRootNode);
+  return mUpdated;
+}
 
-  // Fix up mOprId of a UnaOperatorNode
-  UnaOperatorNode *FixUpVisitor::VisitUnaOperatorNode(UnaOperatorNode *node) {
-    switch(node->GetOprId()) {
-      case OPR_Add:
-        node->SetOprId(OPR_Plus);
+// Fix up mOprId of a UnaOperatorNode
+UnaOperatorNode *FixUpVisitor::VisitUnaOperatorNode(UnaOperatorNode *node) {
+  switch(node->GetOprId()) {
+    case OPR_Add:
+      node->SetOprId(OPR_Plus);
+      mUpdated = true;
+      break;
+    case OPR_Sub:
+      node->SetOprId(OPR_Minus);
+      mUpdated = true;
+      break;
+    case OPR_Inc:
+      if(!node->IsPost()) {
+        node->SetOprId(OPR_PreInc);
         mUpdated = true;
-        break;
-      case OPR_Sub:
-        node->SetOprId(OPR_Minus);
-        mUpdated = true;
-        break;
-      case OPR_Inc:
-        if(!node->IsPost()) {
-          node->SetOprId(OPR_PreInc);
-          mUpdated = true;
-        }
-        break;
-      case OPR_Dec:
-        if(!node->IsPost()) {
-          node->SetOprId(OPR_PreDec);
-          mUpdated = true;
-        }
-    }
-    return node;
-  }
-
-  // Fix up mName of UserTypeNode
-  UserTypeNode *FixUpVisitor::VisitUserTypeNode(UserTypeNode *node) {
-    if(auto id = node->GetId()) {
-      if(auto n = id->GetName()) {
-        node->SetName(n);
       }
-    }
-    return node;
+      break;
+    case OPR_Dec:
+      if(!node->IsPost()) {
+        node->SetOprId(OPR_PreDec);
+        mUpdated = true;
+      }
   }
+  return node;
+}
+
+// Fix up mName of UserTypeNode
+UserTypeNode *FixUpVisitor::VisitUserTypeNode(UserTypeNode *node) {
+  if(auto id = node->GetId()) {
+    if(auto n = id->GetName()) {
+      node->SetName(n);
+    }
+  }
+  return node;
+}
 
 }
