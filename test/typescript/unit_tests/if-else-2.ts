@@ -1,4 +1,5 @@
-var a, b;
+var a;
+var b;
 if (1)
   a + b;
 else

@@ -1,4 +1,6 @@
-var x: number = 1, a: number = 2, b: number = 3;
+var x: number = 1;
+var a: number = 2;
+var b: number = 3;
 if (x)
   a + b;
 else if(x)

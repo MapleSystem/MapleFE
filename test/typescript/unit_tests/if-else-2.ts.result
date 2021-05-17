@@ -1,8 +1,11 @@
-Matched 5 tokens.
-Matched 18 tokens.
+Matched 3 tokens.
+Matched 6 tokens.
+Matched 19 tokens.
 ============= Module ===========
 == Sub Tree ==
-
+js_var Decl: a
+== Sub Tree ==
+js_var Decl: b
 == Sub Tree ==
 cond-branch cond:1
 true branch :
