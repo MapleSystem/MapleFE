@@ -108,12 +108,16 @@ public:
   //           They won't move 'curidx' if target is not hit.
   ///////////////////////////////////////////////////////////////////////////////////
 
-  SepId       GetSeparator();
-  OprId       GetOperator();
-  LitData     GetLiteral();
-  const char* GetKeyword();
-  const char* GetIdentifier();
-  bool        GetComment();
+  SepId        GetSeparator();
+  OprId        GetOperator();
+  LitData      GetLiteral();
+  const char*  GetKeyword();
+  const char*  GetIdentifier();
+  bool         GetComment();
+
+  TempLitData* GetTempLit();
+  bool     FindNextTLString(unsigned /*start*/, unsigned& /*end*/);
+  bool     FindNextTLPattern(unsigned /*start*/, unsigned& /*end*/);
 
   // replace keyword/opr/sep... with tokens
   //void PlantTokens();

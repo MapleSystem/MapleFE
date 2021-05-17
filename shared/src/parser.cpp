@@ -269,7 +269,8 @@ unsigned Parser::LexOneLine() {
     return mActiveTokens.GetNum() - mCurToken;
 
   while (!token_num) {
-    // read untile end of line
+    // read until end of line
+    // NOTE: mLexer could cross the line if it's a template literal in Javascript.
     while (!mLexer->EndOfLine() && !mLexer->EndOfFile()) {
       t = mLexer->LexToken();
       if (t) {

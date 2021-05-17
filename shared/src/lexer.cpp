@@ -233,14 +233,116 @@ Token* Lexer::LexTokenNoNewLine(void) {
 
   const char *identifier = GetIdentifier();
   if (identifier != NULL) {
-    Token *t = (Token*)mTokenPool.NewToken(sizeof(Token)); 
+    Token *t = (Token*)mTokenPool.NewToken(sizeof(Token));
     t->SetIdentifier(identifier);
     if (mTrace)
       t->Dump();
     return t;
   }
 
+  TempLitData* tldata = GetTempLit();
+  if (tldata != NULL) {
+    Token *t = (Token*)mTokenPool.NewToken(sizeof(Token)); 
+    t->SetTempLit(tldata);
+    if (mTrace)
+      t->Dump();
+    return t;
+  }
+
   return NULL;
+}
+
+// NOTE: right now we rely on 'tsc' to assure the input is legal,
+//       so I'll make many things easier and will skip many lexical
+//       checks. Just make it easy for now.
+//       Also, I assume we don't handle multiple line template literal
+//       for the time being.
+TempLitData* Lexer::GetTempLit() {
+  TempLitData *tld = NULL;
+  unsigned old_cur_idx = curidx;
+
+  if (line[curidx] == '`') {
+    // It's certain that this is a template literal because tsc assures it.
+    tld = new TempLitData;
+
+    unsigned start_idx;
+    unsigned end_idx;
+    start_idx = curidx + 1;
+    while(1) {
+      // Try string
+      end_idx = 0;
+      bool s_found = FindNextTLString(start_idx, end_idx);
+      if (s_found) {
+        unsigned len = end_idx - start_idx + 1;
+        MASSERT(len > 0 && "found token has 0 data?");
+        std::string s(GetLine() + start_idx, len);
+        const char *addr = gStringPool.FindString(s);
+        tld->mStrings.PushBack(addr);
+        start_idx = end_idx + 1;
+      }
+      // Try pattern
+      end_idx = 0;
+      bool p_found = FindNextTLPattern(start_idx, end_idx);
+      if (p_found) {
+        unsigned p_s = start_idx + 2;
+        unsigned len = end_idx - p_s + 1;
+        MASSERT(len > 0 && "found token has 0 data?");
+        std::string s(GetLine() + p_s, len);
+        const char *addr = gStringPool.FindString(s);
+        tld->mPatterns.PushBack(addr);
+        // We need skip the ending '}' of a pattern.
+        start_idx = end_idx + 2;
+      }
+
+      // If both string and pattern failed to be found
+      if (!s_found && !p_found)
+        break;
+    }
+
+    // It's for sure that this is the ending '`'.
+    MASSERT(line[start_idx] == '`');
+    curidx = start_idx + 1;
+  }
+
+  return tld;
+}
+
+// Find the pure string of a template literal.
+// Set end_idx as the last char of string.
+bool Lexer::FindNextTLString(unsigned start_idx, unsigned& end_idx) {
+  unsigned working_idx = start_idx;
+  while(1) {
+    if ((line[working_idx] == '$' && line[working_idx+1] == '{')
+        || line[working_idx] == '`' ){
+      end_idx = working_idx - 1;
+      break;
+    }
+    working_idx++;
+  }
+
+  if (end_idx >= start_idx && end_idx <= 0xFFFFFF)
+    return true;
+  else
+    return false;
+}
+
+// Find the pattern string of a template literal.
+// Set end_idx as the last char of string.
+bool Lexer::FindNextTLPattern(unsigned start_idx, unsigned& end_idx) {
+  unsigned working_idx = start_idx;
+  if (line[working_idx] != '$' || line[working_idx+1] != '{')
+    return false;
+
+  working_idx = start_idx + 2;
+  while(1) {
+    if (line[working_idx] == '}') {
+      break;
+    }
+    working_idx++;
+  }
+
+  end_idx = working_idx - 1;
+  return true;
 }
 
 // Returen the separator ID, if it's. Or SEP_NA.

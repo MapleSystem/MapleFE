@@ -34,6 +34,7 @@
 #include "char.h"
 #include "stringutil.h"
 #include "supported.h"
+#include "container.h"
 
 namespace maplefe {
 
@@ -91,8 +92,12 @@ struct AltToken {
   unsigned mAltTokenId;
 };
 
-// class TempLit is defined in parser.h
-class TempLit;
+// We define the data of template literal token.
+// It contains the pure strings after lexing.
+struct TempLitData {
+  SmallVector<const char*> mStrings;
+  SmallVector<const char*> mPatterns;
+};
 
 struct Token {
   TK_Type mTkType;
@@ -101,7 +106,7 @@ struct Token {
     LitData     mLitData;
     SepId       mSepId;
     OprId       mOprId;
-    TempLit    *mTempLit;
+    TempLitData *mTempLitData;
   }mData;
 
   AltToken     *mAltTokens;
@@ -116,14 +121,15 @@ struct Token {
 
   void SetIdentifier(const char *name) {mTkType = TT_ID; mData.mName = name;}
   void SetLiteral(LitData data)        {mTkType = TT_LT; mData.mLitData = data;}
-  void SetTempLit(TempLit *data)       {mTkType = TT_TL; mData.mTempLit = data;}
+  void SetTempLit(TempLitData *data)   {mTkType = TT_TL; mData.mTempLitData = data;}
 
-  const char* GetName() const;
-  LitData     GetLitData()   const {return mData.mLitData;}
-  OprId       GetOprId()     const {return mData.mOprId;}
-  SepId       GetSepId()     const {return mData.mSepId;}
-  TempLit*    GetTempLit()   const {return mData.mTempLit;}
-  bool        IsWhiteSpace() const {return mData.mSepId == SEP_Whitespace;}
+  const char*  GetName() const;
+  LitData      GetLitData()   const {return mData.mLitData;}
+  OprId        GetOprId()     const {return mData.mOprId;}
+  SepId        GetSepId()     const {return mData.mSepId;}
+  bool         IsWhiteSpace() const {return mData.mSepId == SEP_Whitespace;}
+  TempLitData* GetTempLitData()   const {return mData.mTempLitData;}
+
   void Dump();
 };
 
