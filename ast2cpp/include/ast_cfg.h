@@ -95,6 +95,9 @@ class AST_BB {
   void      SetAuxNode(TreeNode *node)  {mAuxNode = node;}
   TreeNode *GetAuxNode()                {return mAuxNode;}
 
+  unsigned  GetStatementsNum()              {return mStatements.GetNum();}
+  TreeNode* GetStatementAtIndex(unsigned i) {return mStatements.ValueAtIndex(i);}
+
   void AddStatement(TreeNode *stmt) {
     if(mKind != BK_Terminated) {
       mStatements.PushBack(stmt);
@@ -102,8 +105,15 @@ class AST_BB {
     }
   }
 
-  unsigned  GetStatementsNum()              {return mStatements.GetNum();}
-  TreeNode* GetStatementAtIndex(unsigned i) {return mStatements.ValueAtIndex(i);}
+  void InsertStmtAfter(TreeNode *new_stmt, TreeNode *exist_stmt) {
+    mStatements.LocateValue(exist_stmt);
+    mStatements.InsertAfter(new_stmt);
+  }
+
+  void InsertStmtBefore(TreeNode *new_stmt, TreeNode *exist_stmt) {
+    mStatements.LocateValue(exist_stmt);
+    mStatements.InsertBefore(new_stmt);
+  }
 
   void AddSuccessor(AST_BB *succ) {
     if(mKind == BK_Terminated) {

@@ -18,6 +18,8 @@
 
 #include <stack>
 #include <utility>
+#include <unordered_map>
+#include <unordered_set>
 #include "ast_module.h"
 #include "ast.h"
 #include "ast_cfg.h"
@@ -42,6 +44,9 @@ class AST_Handler {
   AST_AST      *mAST;
   AST_DFA      *mDFA;
   bool          mTrace;
+  std::unordered_map<unsigned, AST_BB *> mNodeId2BbMap;
+
+  friend class AST_BB;;
 
  public:
   explicit AST_Handler(ASTModule *module, bool trace) :
@@ -59,6 +64,9 @@ class AST_Handler {
 
   void          SetFunction(AST_Function *func) {mFunction = func;}
   AST_Function *GetFunction()                   {return mFunction;}
+
+  void SetBbFromNodeId(unsigned nodeId, AST_BB *bb) { mNodeId2BbMap[nodeId] = bb; }
+  AST_BB *GetBbFromNodeId(unsigned nodeId) { return mNodeId2BbMap[nodeId]; }
 
   bool GetTrace() {return mTrace;}
 

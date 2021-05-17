@@ -1137,6 +1137,16 @@ void BlockNode::AddChild(TreeNode *tree) {
   }
 }
 
+void BlockNode::InsertStmtAfter(TreeNode *new_stmt, TreeNode *exist_stmt) {
+  mChildren.LocateValue(exist_stmt);
+  mChildren.InsertAfter(new_stmt);
+}
+
+void BlockNode::InsertStmtBefore(TreeNode *new_stmt, TreeNode *exist_stmt) {
+  mChildren.LocateValue(exist_stmt);
+  mChildren.InsertBefore(new_stmt);
+}
+
 void BlockNode::Dump(unsigned ind) {
   DumpLabel(ind);
   for (unsigned i = 0; i < GetChildrenNum(); i++) {

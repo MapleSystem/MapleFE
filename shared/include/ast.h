@@ -1313,6 +1313,9 @@ public:
   void      AddChild(TreeNode *c);
   void      ClearChildren()             {mChildren.Clear();}
 
+  void InsertStmtAfter(TreeNode *new_stmt, TreeNode *exist_stmt);
+  void InsertStmtBefore(TreeNode *new_stmt, TreeNode *exist_stmt);
+
   void Release() {mChildren.Release();}
   void Dump(unsigned);
 };

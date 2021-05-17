@@ -35,6 +35,7 @@ class AST_AST {
   ~AST_AST() {}
 
   void  Build();
+  void  CollectASTInfo();
   void  AdjustAST();
 };
 
@@ -55,6 +56,7 @@ class AdjustASTVisitor : public AstVisitor {
   void SetCurrentBB(AST_BB *b) { mCurrentBB = b; }
 
   DeclNode *VisitDeclNode(DeclNode *node);
+  ExportNode *VisitExportNode(ExportNode *node);
 };
 
 }
