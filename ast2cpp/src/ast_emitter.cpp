@@ -531,19 +531,19 @@ std::string AstEmitter::AstEmitTemplateLiteralNode(TemplateLiteralNode *node) {
     return std::string();
   std::string str = "`"s;
 
+  for (unsigned i = 0; i < node->GetPatternsNum(); ++i) {
+    if(auto s = node->GetPatternAtIndex(i))
+      str += "${"s + s + "}"s;
+  }
+
   for (unsigned i = 0; i < node->GetStringsNum(); ++i) {
     if(auto s = node->GetStringAtIndex(i))
       str += s;
   }
 
-  for (unsigned i = 0; i < node->GetPatternsNum(); ++i) {
-    if(auto s = node->GetPatternAtIndex(i))
-      str += s;
-  }
-
   for (unsigned i = 0; i < node->GetTreesNum(); ++i) {
     if (auto n = node->GetTreeAtIndex(i)) {
-      str += "${"s + AstEmitTreeNode(n) + "}"s;
+      str += " "s + AstEmitTreeNode(n);
     }
   }
   str += "`"s;
@@ -1052,19 +1052,33 @@ std::string AstEmitter::AstEmitLambdaNode(LambdaNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
-  str += " "s + AstDump::GetEnumLambdaProperty(node->GetProperty());
-  if (auto n = node->GetType()) {
-    str += " "s + AstEmitTreeNode(n);
+  switch (node->GetProperty()) {
+    case LP_JSArrowFunction:
+    case LP_TSFunctionType:
+    case LP_TSConstructorType:
+      break;
+    case LP_JavaLambda:
+    case LP_NA:
+    default:
+      MASSERT(0 && "Unexpected enumerator");
   }
 
+  str += "("s;
   for (unsigned i = 0; i < node->GetParamsNum(); ++i) {
+    if (i)
+      str += ", "s;
     if (auto n = node->GetParam(i)) {
-      str += " "s + AstEmitTreeNode(n);
+      str += AstEmitTreeNode(n);
     }
+  }
+  str += ") => "s;
+
+  if (auto n = node->GetType()) {
+    str += AstEmitTreeNode(n);
   }
 
   if (auto n = node->GetBody()) {
-    str += " "s + AstEmitTreeNode(n);
+    str += AstEmitTreeNode(n);
   }
   mPrecedence = '\030';
   if (node->IsStmt())
