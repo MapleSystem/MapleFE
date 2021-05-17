@@ -71,7 +71,7 @@ for ts in $LIST; do
         echo --- "$ts"; cat "$ts"
         sed -n $cmd <<< "$out" > "$ts".dot
         dot -Tpng -o "$ts".png "$ts".dot
-        viewnior $VIEWOP "$ts".png
+        env LC_ALL=C viewnior $VIEWOP "$ts".png
         rm -f "$ts".png "$ts".dot
       done
   fi

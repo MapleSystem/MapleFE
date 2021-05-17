@@ -626,7 +626,7 @@ void {gen_args2}(const char *title, std::ostream *os) {{
   mNodes.clear();
   mOs = os;
   auto fn = mASTModule->GetFileName();
-  if(auto p = std::strrchr(fn, '/')) fn = p;
+  if(auto p = std::strrchr(fn, '/')) fn = p + 1;
   *mOs << "digraph AST_Module {{\\nrankdir=LR;\\nModule [label=\\"Module\\\\n" << fn << "\\\\n" << title << "\\",shape=box];\\n";
   std::size_t idx = 1;
   for(auto it: mASTModule->mTrees) {{
