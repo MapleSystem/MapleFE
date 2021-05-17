@@ -8,7 +8,7 @@ It also dump the TypeScript code converted from the corresponding AST with AST e
 ## Usage to astdump.sh
 
 ```bash
-Usage: astdump.sh [-dot] [-f|--fullscreen] [-p <PREFIX>|--pre <PREFIX>] [-a|--ast] [-c|--cfg] [-C|--clean] <file1> [<file2> ...]
+Usage: astdump.sh [-dot] [-f|--fullscreen] [-p <PREFIX>|--pre <PREFIX>] [-a|--ast] [-c|--cfg] [-A|--all] [-C|--clean] <file1> [<file2> ...]
 
   -d | --dot             Use Graphviz dot to generate the graph and view it with viewnior
   -f | --fullscreen      View the generated graph in fullscreen mode. It implies option -dot
@@ -16,6 +16,7 @@ Usage: astdump.sh [-dot] [-f|--fullscreen] [-p <PREFIX>|--pre <PREFIX>] [-a|--as
   -a | --ast             Show AST graph. It is equivalent to options "-dot -p AST"
   -c | --cfg             Show CFG graph. It is equivalent to options "-dot -p CFG"
   -s | --syntax          Syntax highlighting the generated TypeScript code
+  -A | --all             Process all .ts files in current directory excluding *.ts-[0-9]*.out.ts
   -C | --clean           Clean up generated files (*.ts-[0-9]*.out.ts)
   <file1> [<file2> ...]  Specify one or more TypeScript files to be processed
 ```
