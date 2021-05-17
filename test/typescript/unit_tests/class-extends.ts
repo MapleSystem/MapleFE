@@ -9,7 +9,7 @@ class Car {
 }
 
 class Model extends Car {
-  private _model: string
+  private _model: string;
   constructor(make: string, model: string) {
     super(make);
     this._model = model;
