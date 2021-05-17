@@ -57,7 +57,7 @@ for ts in $LIST; do
     eval tsc --noEmit --target es2015 "$T" $TSCERR
     if [ $? -ne 0 ]; then
       E="tsc"
-      grep -qm1 "^PassNode {" <<< "$out" && E="$E,PassNode"
+      grep -qm1 "PassNode *{" <<< "$out" && E="$E,PassNode"
       Failed="$Failed ($E)$ts"
       echo Failed to compile "$T" with tsc
     else
