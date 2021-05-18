@@ -36,6 +36,8 @@ StringPool::StringPool() {
   mFirstAvail = -1;
   // make string idx starting from 1
   mStringTable.push_back("");
+  // empty string idx is 1
+  mStringTable.push_back("");
 }
 
 StringPool::~StringPool() {
@@ -139,12 +141,14 @@ const char* StringPool::FindString(const char *str, size_t len) {
 // This is the public interface to find a string in the pool.
 // If not found, add it.
 unsigned StringPool::GetStrIdx(const std::string &s) {
+  if (s.empty()) return 1;
   return mMap->LookupEntryFor(s)->GetStrIdx();
 }
 
 // This is the public interface to find a string in the pool.
 // If not found, add it.
 unsigned StringPool::GetStrIdx(const char *str) {
+  if (strlen(str) == 0) return 1;
   std::string s(str);
   return mMap->LookupEntryFor(s)->GetStrIdx();
 }
@@ -152,6 +156,7 @@ unsigned StringPool::GetStrIdx(const char *str) {
 // This is the public interface to find a string in the pool.
 // If not found, add it.
 unsigned StringPool::GetStrIdx(const char *str, size_t len) {
+  if (len == 0) return 1;
   std::string s;
   s.assign(str, len);
   return mMap->LookupEntryFor(s)->GetStrIdx();
