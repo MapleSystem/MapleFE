@@ -112,9 +112,10 @@ void Lexer::PrepareForFile(const std::string filename) {
 void Lexer::PrepareForString(const char *str) {
   current_line_size = strlen(str);
   strncpy(line, str, current_line_size);
-  line[current_line_size] == '\0';
+  line[current_line_size] = '\0';
   curidx = 0;
   _linenum = 1;
+  endoffile = false;
 }
 
 ///////////////////////////////////////////////////////////////////////////

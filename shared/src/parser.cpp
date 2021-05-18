@@ -294,7 +294,7 @@ unsigned Parser::LexOneLine() {
       }
     }
     // Read in the next line.
-    if (!token_num) {
+    if (!token_num && !mLineMode) {
       if(!mLexer->EndOfFile())
         mLexer->ReadALine();
       else
@@ -354,6 +354,7 @@ void Parser::ParseTemplateLiterals() {
     for (unsigned j = 0; j < tl->GetPlaceHoldersNum(); j++) {
       const char *ph_str = tl->GetPlaceHolderAtIndex(j);
       mLexer->PrepareForString(ph_str);
+      ParseStmt();
     }
   }
   mLineMode = false;
