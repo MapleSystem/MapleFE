@@ -7,6 +7,6 @@ func  func(msg)  throws:
   return "MSG: " Add msg
 
 == Sub Tree ==
-console.log( template-literal  strings: Status:  patterns: func("OK"))
+console.log( template-literal  strings: Status: ,func("OK"))
 == Sub Tree ==
 func("OK")

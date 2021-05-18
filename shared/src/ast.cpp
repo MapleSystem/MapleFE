@@ -813,14 +813,12 @@ void TemplateLiteralNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   DUMP0_NORETURN(" template-literal  strings: ");
   for (unsigned i = 0; i < mStrings.GetNum(); i++) {
-    DUMP0_NORETURN(mStrings.ValueAtIndex(i));
+    const char *s = mStrings.ValueAtIndex(i);
+    if (s)
+      DUMP0_NORETURN(s);
+    else
+      DUMP0_NORETURN("NULL");
     if (i < mStrings.GetNum() - 1)
-      DUMP0_NORETURN(",");
-  }
-  DUMP0_NORETURN(" patterns: ");
-  for (unsigned i = 0; i < mPlaceHolders.GetNum(); i++) {
-    DUMP0_NORETURN(mPlaceHolders.ValueAtIndex(i));
-    if (i < mPlaceHolders.GetNum() - 1)
       DUMP0_NORETURN(",");
   }
 }

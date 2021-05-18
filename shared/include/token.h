@@ -93,10 +93,11 @@ struct AltToken {
 };
 
 // We define the data of template literal token.
-// It contains the pure strings after lexing.
+// TemplateLiteral data contains: formate and placeholder.
+// They are saved as pair <format, placeholder>. If either is missing, NULL
+// is saved in its position.
 struct TempLitData {
   SmallVector<const char*> mStrings;
-  SmallVector<const char*> mPlaceHolders;
 };
 
 struct Token {

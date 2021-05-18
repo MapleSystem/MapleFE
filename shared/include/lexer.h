@@ -120,7 +120,7 @@ public:
   bool         GetComment();
 
   TempLitData* GetTempLit();
-  bool     FindNextTLString(unsigned /*start*/, unsigned& /*end*/);
+  bool     FindNextTLFormat(unsigned /*start*/, unsigned& /*end*/);
   bool     FindNextTLPlaceHolder(unsigned /*start*/, unsigned& /*end*/);
 
   // replace keyword/opr/sep... with tokens

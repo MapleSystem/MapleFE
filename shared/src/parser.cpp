@@ -357,12 +357,14 @@ void Parser::ParseTemplateLiterals() {
   mLexer->SetLineMode();
   for (unsigned i = 0; i < gTemplateLiteralNodes.GetNum(); i++) {
     TemplateLiteralNode *tl = gTemplateLiteralNodes.ValueAtIndex(i);
-    for (unsigned j = 0; j < tl->GetPlaceHoldersNum(); j++) {
-      const char *ph_str = tl->GetPlaceHolderAtIndex(j);
-      mLexer->PrepareForString(ph_str);
-      // Clear some status
-      mEndOfFile = false;
-      ParseStmt();
+    for (unsigned j = 1; j < tl->GetStringsNum(); j += 2) {
+      const char *ph_str = tl->GetStringAtIndex(j);
+      if (ph_str) {
+        mLexer->PrepareForString(ph_str);
+        // Clear some status
+        mEndOfFile = false;
+        ParseStmt();
+      }
     }
   }
   mLineMode = false;

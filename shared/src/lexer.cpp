@@ -281,32 +281,37 @@ TempLitData* Lexer::GetTempLit() {
     while(1) {
       // Try string
       end_idx = 0;
-      bool s_found = FindNextTLString(start_idx, end_idx);
+      bool s_found = FindNextTLFormat(start_idx, end_idx);
+      const char *addr = NULL;
       if (s_found) {
         unsigned len = end_idx - start_idx + 1;
         MASSERT(len > 0 && "found token has 0 data?");
         std::string s(GetLine() + start_idx, len);
-        const char *addr = gStringPool.FindString(s);
-        tld->mStrings.PushBack(addr);
+        addr = gStringPool.FindString(s);
         start_idx = end_idx + 1;
       }
+
       // Try pattern
       end_idx = 0;
+      const char *addr_ph = NULL;
       bool p_found = FindNextTLPlaceHolder(start_idx, end_idx);
       if (p_found) {
         unsigned p_s = start_idx + 2;
         unsigned len = end_idx - p_s + 1;
         MASSERT(len > 0 && "found token has 0 data?");
         std::string s(GetLine() + p_s, len);
-        const char *addr = gStringPool.FindString(s);
-        tld->mPlaceHolders.PushBack(addr);
+        addr_ph = gStringPool.FindString(s);
         // We need skip the ending '}' of a pattern.
         start_idx = end_idx + 2;
       }
 
       // If both string and pattern failed to be found
-      if (!s_found && !p_found)
+      if (!s_found && !p_found) {
         break;
+      } else {
+        tld->mStrings.PushBack(addr);
+        tld->mStrings.PushBack(addr_ph);
+      }
     }
 
     // It's for sure that this is the ending '`'.
@@ -319,7 +324,7 @@ TempLitData* Lexer::GetTempLit() {
 
 // Find the pure string of a template literal.
 // Set end_idx as the last char of string.
-bool Lexer::FindNextTLString(unsigned start_idx, unsigned& end_idx) {
+bool Lexer::FindNextTLFormat(unsigned start_idx, unsigned& end_idx) {
   unsigned working_idx = start_idx;
   while(1) {
     if ((line[working_idx] == '$' && line[working_idx+1] == '{')

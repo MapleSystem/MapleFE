@@ -5,6 +5,6 @@ Matched 13 tokens.
 == Sub Tree ==
 js_var Decl: x=20
 == Sub Tree ==
-js_let Decl: Left= template-literal  strings: px patterns: x
+js_let Decl: Left= template-literal  strings: NULL,x,px,NULL
 == Sub Tree ==
 x

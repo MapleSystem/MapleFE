@@ -73,10 +73,10 @@ TreeNode* ASTBuilder::CreateTokenTreeNode(const Token *token) {
       const char *s = tld->mStrings.ValueAtIndex(i);
       n->AddString(s);
     }
-    for (unsigned i = 0; i < tld->mPlaceHolders.GetNum(); i++) {
-      const char *s = tld->mPlaceHolders.ValueAtIndex(i);
-      n->AddPlaceHolder(s);
-    }
+
+    // release memeory of SmallVector of mStrings.
+    tld->mStrings.Release();
+    delete tld;
 
     gTemplateLiteralNodes.PushBack(n);
     mLastTreeNode = n;

@@ -828,18 +828,20 @@ public:
 //////////////////////////////////////////////////////////////////////////
 //                         TemplateLiteral Nodes
 // TemplateLiteral node is created from the corresponding TempLit Token,
-// copying the raw mStrings&mPlaceHolders from token.
+// copying the raw mStrings from token.
 // Later on, call parser special API to create AST nodes for the patterns.
 // After that, only mStrings and mTrees are used.
 //////////////////////////////////////////////////////////////////////////
 
 class TemplateLiteralNode : public TreeNode {
 private:
-  // These two are copied from the token.
+  // mStrings save <format, placeholder> pairs.
   SmallVector<const char*> mStrings;
-  SmallVector<const char*> mPlaceHolders;
 
-  // created by special parser API from mPlaceHolders.
+  // It's tree nodes of pairs of <format, placeholder>. So it would be pairs
+  // of <TreeNode*, TreeNode*>, For any missing element, a NULL is saved
+  // in its position.
+  // Even index elements are for formats, Odd index elements are for placeholder.
   SmallVector<TreeNode*> mTrees;
 
 public:
@@ -850,11 +852,6 @@ public:
   const char* GetStringAtIndex(unsigned i) {return mStrings.ValueAtIndex(i);}
   void        SetStringAtIndex(unsigned i, const char* n) {*(mStrings.RefAtIndex(i)) = n;}
   void        AddString(const char *n) {mStrings.PushBack(n);}
-
-  unsigned    GetPlaceHoldersNum() {return mPlaceHolders.GetNum();}
-  const char* GetPlaceHolderAtIndex(unsigned i) {return mPlaceHolders.ValueAtIndex(i);}
-  void        SetPlaceHolderAtIndex(unsigned i, const char* n) {*(mPlaceHolders.RefAtIndex(i)) = n;}
-  void        AddPlaceHolder(const char *n) {mPlaceHolders.PushBack(n);}
 
   unsigned    GetTreesNum() {return mTrees.GetNum();}
   TreeNode*   GetTreeAtIndex(unsigned i) {return mTrees.ValueAtIndex(i);}

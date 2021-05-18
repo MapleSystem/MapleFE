@@ -13,7 +13,7 @@ js_var Decl: y=4
 == Sub Tree ==
 js_var Decl: z=6
 == Sub Tree ==
-js_let Decl: px= template-literal  strings: px and ,px patterns: x + y, z ? x + z : y + z
+js_let Decl: px= template-literal  strings: NULL,x + y,px and , z ? x + z : y + z,px,NULL
 == Sub Tree ==
 console.log(px)
 == Sub Tree ==
