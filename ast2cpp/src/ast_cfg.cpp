@@ -621,7 +621,20 @@ AssertNode *CFGVisitor::VisitAssertNode(AssertNode *node) {
   return node;
 }
 
+// For statement of current BB
 UserTypeNode *CFGVisitor::VisitUserTypeNode(UserTypeNode *node) {
+  mCurrentBB->AddStatement(node);
+  return node;
+}
+
+// For statement of current BB
+IdentifierNode *CFGVisitor::VisitIdentifierNode(IdentifierNode *node) {
+  mCurrentBB->AddStatement(node);
+  return node;
+}
+
+// For statement of current BB
+LiteralNode *CFGVisitor::VisitLiteralNode(LiteralNode *node) {
   mCurrentBB->AddStatement(node);
   return node;
 }

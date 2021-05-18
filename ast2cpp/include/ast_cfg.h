@@ -254,6 +254,8 @@ class CFGVisitor : public AstVisitor {
   CallNode *VisitCallNode(CallNode *node);
   AssertNode *VisitAssertNode(AssertNode *node);
   UserTypeNode *VisitUserTypeNode(UserTypeNode *node);
+  IdentifierNode *VisitIdentifierNode(IdentifierNode *node);
+  LiteralNode *VisitLiteralNode(LiteralNode *node);
 
 };
 }
