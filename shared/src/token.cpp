@@ -13,6 +13,7 @@
 * See the Mulan PSL v2 for more details.
 */
 #include "token.h"
+#include "stringpool.h"
 #include "massert.h"
 
 namespace maplefe {
@@ -72,7 +73,7 @@ void LiteralTokenDump(LitData data) {
     break;
   }
   case LT_StringLiteral:
-    DUMP1("String Literal Token:", data.mData.mStr);
+    DUMP1("String Literal Token:", gStringPool.GetStringFromStrIdx(data.mData.mStrIdx));
     break;
   case LT_NullLiteral:
     DUMP0("Null Literal Token:");

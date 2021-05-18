@@ -66,7 +66,7 @@ struct LitData {
     double mDouble;
     bool   mBool;
     Char   mChar;
-    const char  *mStr;     // the string is allocated in gStringPool
+    unsigned mStrIdx;     // the string is allocated in gStringPool
   }mData;
 };
 

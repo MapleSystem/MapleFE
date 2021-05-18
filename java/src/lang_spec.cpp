@@ -13,6 +13,7 @@
 * See the Mulan PSL v2 for more details.
 */
 #include "lang_spec.h"
+#include "stringpool.h"
 
 namespace maplefe {
 
@@ -149,7 +150,7 @@ LitData ProcessLiteral(LitId id, const char *str) {
   case LT_StringLiteral: {
     const char *s = s2v.StringToString(value_text);
     data.mType = LT_StringLiteral;
-    data.mData.mStr = s;
+    data.mData.mStrIdx = gStringPool.GetStrIdx(s);
     break; }
   case LT_NullLiteral: {
     // Just need set the id

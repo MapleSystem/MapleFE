@@ -14,6 +14,7 @@
 */
 
 #include "ast2mpl.h"
+#include "stringpool.h"
 
 namespace maplefe {
 
@@ -436,7 +437,7 @@ maple::BaseNode *A2M::ProcessLiteral(StmtExprKind skind, TreeNode *tnode, BlockN
       break;
     }
     case LT_StringLiteral: {
-      const std::string str(data.mData.mStr);
+      const std::string str(gStringPool.GetStringFromStrIdx(data.mData.mStrIdx));
       maple::UStrIdx strIdx = maple::GlobalTables::GetUStrTable().GetOrCreateStrIdxFromName(str);
       bn = new maple::ConststrNode(strIdx);
       bn->SetPrimType(maple::PTY_ptr);

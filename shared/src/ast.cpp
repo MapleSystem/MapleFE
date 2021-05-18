@@ -865,7 +865,7 @@ void LiteralNode::Dump(unsigned indent) {
     DUMP0_NORETURN(mData.mData.mFloat);
     break;
   case LT_StringLiteral:
-    DUMP0_NORETURN(mData.mData.mStr);
+    DUMP0_NORETURN(gStringPool.GetStringFromStrIdx(mData.mData.mStrIdx));
     break;
   case LT_BooleanLiteral:
     if(mData.mData.mBool == true)

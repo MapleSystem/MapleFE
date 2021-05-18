@@ -457,7 +457,7 @@ static std::string GetEnumLitData(LitData lit) {{
     case LT_CharacterLiteral:
       return std::string(1, lit.mData.mChar.mData.mChar); // TODO: Unicode support
     case LT_StringLiteral:
-      return std::string(lit.mData.mStr);
+      return std::string(gStringPool.GetStringFromStrIdx(lit.mData.mStrIdx));
     case LT_NullLiteral:
       return std::string("null");
     case LT_ThisLiteral:
