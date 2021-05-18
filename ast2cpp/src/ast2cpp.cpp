@@ -36,6 +36,12 @@ void A2C::ProcessAST(bool trace_a2c) {
     }
   }
 
+  if (mTraceA2C) {
+    std::cout << "============= AstGraph ===========" << std::endl;
+    AstGraph graph(&gModule);
+    graph.DumpGraph("Initial AST", &std::cout);
+  }
+
   AST_Handler handler(&gModule, mTraceA2C);
 
   handler.BuildCFG();

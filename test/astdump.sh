@@ -2,14 +2,16 @@
 function usage {
 cat << EOF
 
-Usage: astdump.sh [-dot] [-f|--fullscreen] [-p <PREFIX>|--pre <PREFIX>] [-a|--ast] [-c|--cfg] [-A|--all] [-C|--clean] <file1> [<file2> ...]
+Usage: astdump.sh [-d] [-f] [-p <PREFIX>] [-a] [-c] [-k] [-A] [-C] <file1> [<file2> ...]
 
+Short/long options:
   -d | --dot             Use Graphviz dot to generate the graph and view it with viewnior
   -f | --fullscreen      View the generated graph in fullscreen mode. It implies option -dot
   -p | --pre <PREFIX>    Filter graphs with the specified <PREFIX>, e.g. -p "CFG_<function-name>"
-  -a | --ast             Show AST graph. It is equivalent to options "-dot -p AST"
-  -c | --cfg             Show CFG graph. It is equivalent to options "-dot -p CFG"
+  -a | --ast             Show AST graph. It is equivalent to options "-d -p AST"
+  -c | --cfg             Show CFG graph. It is equivalent to options "-d -p CFG"
   -s | --syntax          Syntax highlighting the generated TypeScript code
+  -k | --keep            Keep generated files *.ts-[0-9]*.out.ts which fail to compile with tsc
   -A | --all             Process all .ts files in current directory excluding *.ts-[0-9]*.out.ts
   -C | --clean           Clean up generated files (*.ts-[0-9]*.out.ts)
   <file1> [<file2> ...]  Specify one or more TypeScript files to be processed
@@ -17,17 +19,18 @@ EOF
 exit 1
 }
 
-DOT= PRE= LIST= VIEWOP= HIGHLIGHT="cat" TSCERR= CLEAN=
+DOT= PRE= LIST= VIEWOP= HIGHLIGHT="cat" TSCERR= KEEP= CLEAN=
 while [ $# -gt 0 ]; do
     case $1 in
-        -d|--dot)        DOT=true;;
-        -f|--fullscreen) VIEWOP="--fullscreen"; DOT=true;;
+        -d|--dot)        DOT=dot;;
+        -f|--fullscreen) VIEWOP="--fullscreen"; DOT=fullscreen;;
         -p|--pre)        [ $# -ge 2 ] && { PRE="$2"; shift; } || { echo "$1 needs an argument"; exit 1; } ;;
-        -a|--ast)        PRE="AST" ; DOT=true ; TSCERR=">& /dev/null" ;;
-        -c|--cfg)        PRE="CFG" ; DOT=true ; TSCERR=">& /dev/null" ;;
+        -a|--ast)        PRE="AST" ; DOT=ast ; TSCERR=">& /dev/null" ;;
+        -c|--cfg)        PRE="CFG" ; DOT=cfg ; TSCERR=">& /dev/null" ;;
         -s|--syntax)     HIGHLIGHT="highlight -O xterm256 --syntax ts" ;;
         -e|--tscerror)   TSCERR= ;;
-        -C|--clean)      CLEAN=true ;;
+        -k|--keep)       KEEP=keep ;;
+        -C|--clean)      CLEAN=clean ;;
         -A|--all)        LIST="$LIST $(find -maxdepth 1 -name '*.ts' | grep -v '\.ts-[0-9][0-9]*\.out.ts')" ;;
         -*)              usage;;
         *)               LIST="$LIST $1"
@@ -60,20 +63,24 @@ for ts in $LIST; do
       grep -qm1 "PassNode *{" <<< "$out" && E="$E,PassNode"
       Failed="$Failed ($E)$ts"
       echo Failed to compile "$T" with tsc
+      [ -n "$KEEP" ] || rm -f "$T"
     else
       rm -f "$T"
     fi
   fi
   if [ -n "$DOT" ]; then
+    echo --- "$ts"; cat "$ts"
+    idx=0
     grep -n -e "^digraph $PRE[^{]* {" -e "^}" <<< "$out" | grep -A1 "digraph [^{]* {" |
       grep -v ^-- | sed 'N;s/\n/ /' | sed -e 's/:digraph [^{]* { */,/' -e 's/:.*/p/g' |
-      while read cmd; do
-        echo --- "$ts"; cat "$ts"
-        sed -n $cmd <<< "$out" > "$ts".dot
-        dot -Tpng -o "$ts".png "$ts".dot
-        env LC_ALL=C viewnior $VIEWOP "$ts".png
-        rm -f "$ts".png "$ts".dot
+      { while read cmd; do
+        idx=$((idx+1))
+        sed -n $cmd <<< "$out" > "$ts"-$idx.dot
+        dot -Tpng -o "$ts"-$idx.png "$ts"-$idx.dot
+        env LC_ALL=C viewnior $VIEWOP "$ts"-$idx.png &
       done
+      wait
+      rm -f "$ts"-[0-9]*.png "$ts"-[0-9]*.dot; }
   fi
 done
 echo
