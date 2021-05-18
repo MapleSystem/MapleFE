@@ -269,7 +269,9 @@ public:
   bool mTracePatchWasSucc;  // trace patching was succ node.
   bool mTraceWarning;       // print the warning.
 
-  bool mLineMode;
+  bool mLineMode;           // LineMode is for parsing a single line of source code.
+                            // It could be from a string in memory, or read from URL.
+                            // It's common in dynamic loading of code in web application.
 
   void SetLexerTrace() {mLexer->SetTrace();}
   void DumpIndentation();

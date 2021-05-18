@@ -516,10 +516,6 @@ bool Parser::TraverseExpression() {
     AppealNode *topnode = mRootNode->mChildren[0];
     MASSERT(topnode->IsSucc());
 
-    // Assume it has only one match. We will see if it's correct.
-    MASSERT(topnode->GetMatchNum() == 1);
-    mCurToken = topnode->GetMatch(0) + 1;
-
     mRootNode->mResult = Succ;
     SortOut();
   }
@@ -1538,12 +1534,22 @@ void Parser::SortOut() {
   MASSERT(succ && "root has no SuccMatch?");
   bool found = succ->GetStartToken(root->GetStartIndex());
 
-  // Top level tree can have only one match, otherwise, the language
+  // In regular parsing, Top level tree can have only one match, otherwise, the language
   // is ambiguous.
+  // In LineMode parsing, we are parsing an expression, and it could be multiple matching
+  // with some partial matchings. We pick the longest matching and it should be the same
+  // as mActiveTokens.GetNum() meaning it matches all token so far.
   unsigned match_num = succ->GetMatchNum();
-  MASSERT(match_num == 1 && "Top level tree has >1 matches?");
-  unsigned match = succ->GetOneMatch(0);
+  unsigned match = 0;
+  if (mLineMode) {
+    match = root->LongestMatch();
+    MASSERT(match + 1 == mActiveTokens.GetNum());
+  } else {
+    MASSERT(match_num == 1 && "Top level tree has >1 matches?");
+    match = succ->GetOneMatch(0);
+  }
   root->SetFinalMatch(match);
+
   root->SetSorted();
 
   to_be_sorted.clear();

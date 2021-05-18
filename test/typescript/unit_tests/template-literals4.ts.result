@@ -1,0 +1,22 @@
+Matched 7 tokens.
+Matched 14 tokens.
+Matched 21 tokens.
+Matched 26 tokens.
+Matched 33 tokens.
+Matched 36 tokens.
+Matched 45 tokens.
+============= Module ===========
+== Sub Tree ==
+js_var Decl: x=2
+== Sub Tree ==
+js_var Decl: y=4
+== Sub Tree ==
+js_var Decl: z=6
+== Sub Tree ==
+js_let Decl: px= template-literal  strings: px and ,px patterns: x + y, z ? x + z : y + z
+== Sub Tree ==
+console.log(px)
+== Sub Tree ==
+x Add y
+== Sub Tree ==
+z ? x Add z : y Add z
