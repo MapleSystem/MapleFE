@@ -428,7 +428,10 @@ TryNode *CFGVisitor::VisitTryNode(TryNode *node) {
     auto catch_node = node->GetCatchAtIndex(i);
     catch_bb->AddStatement(catch_node);
 
-    AstVisitor::VisitCatchNode(catch_node);
+    auto catch_block = catch_node->GetBlock();
+    catch_bb->AddStatement(catch_block);
+    AstVisitor::VisitBlockNode(catch_block);
+
     mCurrentBB->AddSuccessor(join);
     curr_bb = catch_bb;
   }
