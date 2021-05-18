@@ -46,6 +46,7 @@
 //    A Function node have its arguments as children node. The return value is not counted.
 //
 
+#include "stringpool.h"
 #include "ast_mempool.h"
 #include "container.h"
 
@@ -75,13 +76,13 @@ protected:
   unsigned  mNodeId;
   TreeNode *mParent;
   TreeNode *mLabel;   // label of a statement, or expression.
-  const char *mName;
+  unsigned  mStrIdx;
 
   bool      mIsStmt;  // if a node is a statement
 
 public:
   TreeNode() : mKind(NK_Null), mLabel(NULL),
-               mParent(NULL), mName(NULL), mIsStmt(false) {}
+               mParent(NULL), mStrIdx(0), mIsStmt(false) {}
   virtual ~TreeNode() {}
 
 #undef  NODEKIND
@@ -102,8 +103,10 @@ public:
   bool IsStmt()    {return mIsStmt;}
   void SetIsStmt() {mIsStmt = true;}
 
-  virtual const char* GetName() {return mName;}
-  virtual void SetName(const char *s) {mName = s;}
+  virtual unsigned GetStrIdx() {return mStrIdx;}
+  virtual void SetStrIdx(unsigned id) {mStrIdx = id;}
+  virtual std::string GetString() {return gStringPool.GetStringFromStrIdx(mStrIdx);}
+  virtual void SetStrIdx(std::string str) {mStrIdx = gStringPool.GetStrIdx(str);}
   virtual void ReplaceChild(TreeNode *oldchild, TreeNode *newchild){}
   virtual void AddAttr(AttrId) {}
   virtual void AddAnnotation(AnnotationNode *n){}
@@ -127,13 +130,13 @@ private:
   TreeNode *mPackage;
 public:
   PackageNode(){mKind = NK_Package;}
-  PackageNode(const char *s) {mKind = NK_Package; mName = s;}
+  PackageNode(unsigned id) {mKind = NK_Package; mStrIdx = id;}
   ~PackageNode() {}
 
   TreeNode* GetPackage() {return mPackage;}
   void SetPackage(TreeNode *t) {mPackage = t;}
 
-  void SetName(const char *s) {mName = s;}
+  void SetName(unsigned id) {mStrIdx = id;}
   void Dump(unsigned indent);
 };
 
@@ -250,7 +253,7 @@ private:
   TreeNode       *mTarget;
 
 public:
-  ImportNode() {mName = NULL; mProperty = ImpNone; mKind = NK_Import;}
+  ImportNode() {mStrIdx = 0; mProperty = ImpNone; mKind = NK_Import;}
   ~ImportNode(){mPairs.Release();}
 
   void SetProperty(ImportProperty p) {mProperty = p;}
@@ -466,12 +469,12 @@ private:
   TreeNode      *mInit; // Init value
   DimensionNode *mDims;
 public:
-  IdentifierNode(const char *s) : mType(NULL), mInit(NULL), mDims(NULL){
+  IdentifierNode(unsigned id) : mType(NULL), mInit(NULL), mDims(NULL){
     mKind = NK_Identifier;
-    SetName(s); }
-  IdentifierNode(const char *s, TreeNode *t) : mType(t), mInit(NULL), mDims(NULL) {
+    SetStrIdx(id); }
+  IdentifierNode(unsigned id, TreeNode *t) : mType(t), mInit(NULL), mDims(NULL) {
     mKind = NK_Identifier;
-    SetName(s);}
+    SetStrIdx(id); }
   ~IdentifierNode(){}
 
   TreeNode*   GetType() {return mType;}
@@ -726,7 +729,7 @@ private:
   IdentifierNode *mStructId;
   SmallVector<IdentifierNode*> mFields;
 public:
-  StructNode() {mKind = NK_Struct; mName = NULL; mProp = SProp_NA;}
+  StructNode() {mKind = NK_Struct; mStrIdx = 0; mProp = SProp_NA;}
   StructNode(IdentifierNode *n) {mKind = NK_Struct; mStructId = n; mProp = SProp_NA;}
   ~StructNode() {Release();}
 

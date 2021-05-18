@@ -67,13 +67,13 @@ bool AST_DFA::IsDef(TreeNode *node) {
 }
 
 bool AST_DFA::AddDef(TreeNode *node, unsigned &bitnum, unsigned bbid) {
-  const char *name = NULL;
+  unsigned idx = 0;
   unsigned nid = 0;
   switch (node->GetKind()) {
     case NK_Decl: {
       DeclNode *decl = static_cast<DeclNode *>(node);
       if (decl->GetInit()) {
-        name = decl->GetName();
+        idx = decl->GetStrIdx();
         nid = decl->GetNodeId();
       }
       break;
@@ -95,7 +95,7 @@ bool AST_DFA::AddDef(TreeNode *node, unsigned &bitnum, unsigned bbid) {
         case OPR_BxorAssign:
         case OPR_ZextAssign: {
           TreeNode *lhs = bon->GetOpndA();
-          name = lhs->GetName();
+          idx = lhs->GetStrIdx();
           nid = lhs->GetNodeId();
           break;
         }
@@ -109,7 +109,7 @@ bool AST_DFA::AddDef(TreeNode *node, unsigned &bitnum, unsigned bbid) {
       OprId op = uon->GetOprId();
       if (op == OPR_Inc || op == OPR_Dec) {
         TreeNode *lhs = uon->GetOpnd();
-        name = lhs->GetName();
+        idx = lhs->GetStrIdx();
         nid = lhs->GetNodeId();
       }
       break;
@@ -119,13 +119,12 @@ bool AST_DFA::AddDef(TreeNode *node, unsigned &bitnum, unsigned bbid) {
   }
 
   // update mDefVec
-  if (name && bbid != 0xffffffff) {
-    unsigned idx = mStringPool.GetStrIdx(name);
+  if (idx && bbid != 0xffffffff) {
     PosDef pos(bitnum++, idx, nid, bbid);
     mDefVec.PushBack(pos);
   }
 
-  return name != NULL;
+  return idx != 0;
 }
 
 // this calcuates mDefVec mDefVecSize mBbIdSet

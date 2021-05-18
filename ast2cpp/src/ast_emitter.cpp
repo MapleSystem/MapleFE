@@ -297,7 +297,7 @@ std::string AstEmitter::AstEmitDimensionNode(DimensionNode *node) {
 std::string AstEmitter::AstEmitIdentifierNode(IdentifierNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str(node->GetName());
+  std::string str(node->GetString());
 
   //for (unsigned i = 0; i < node->GetAttrsNum(); ++i) {
   //  str += " "s + AstDump::GetEnumAttrId(node->GetAttrAtIndex(i));
@@ -887,8 +887,8 @@ std::string AstEmitter::AstEmitFunctionNode(FunctionNode *node) {
     return std::string();
   std::string str = "function "s;
 
-  if(const char *name = node->GetName())
-    str += name;
+  if(node->GetStrIdx())
+    str += node->GetString();
 
   /*
   for (unsigned i = 0; i < node->GetAttrsNum(); ++i) {
@@ -943,7 +943,7 @@ std::string AstEmitter::AstEmitFunctionNode(FunctionNode *node) {
 std::string AstEmitter::AstEmitInterfaceNode(InterfaceNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str = "interface "s + node->GetName() + " {"s;
+  std::string str = "interface "s + node->GetString() + " {"s;
   str += std::to_string(node->IsAnnotation());
 
   for (unsigned i = 0; i < node->GetSuperInterfacesNum(); ++i) {
@@ -971,7 +971,7 @@ std::string AstEmitter::AstEmitInterfaceNode(InterfaceNode *node) {
 std::string AstEmitter::AstEmitClassNode(ClassNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str = "class "s + node->GetName() + " {"s;
+  std::string str = "class "s + node->GetString() + " {"s;
   //str += " "s + std::to_string(node->IsJavaEnum());
 
   for (unsigned i = 0; i < node->GetSuperClassesNum(); ++i) {

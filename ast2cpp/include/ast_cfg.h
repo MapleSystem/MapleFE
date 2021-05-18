@@ -186,8 +186,8 @@ class AST_CFG {
 
 class CFGVisitor : public AstVisitor {
 
-  using TargetLabel = const char *;
-  using TargetBB = std::pair<AST_BB*,TargetLabel>;
+  using TargetLabel = unsigned;
+  using TargetBB = std::pair<AST_BB*, unsigned>;
   using TargetBBStack = std::vector<TargetBB>;
 
  private:

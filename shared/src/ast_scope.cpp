@@ -44,7 +44,7 @@ TreeNode* ASTScope::FindDeclOf(IdentifierNode *inode) {
       IdentifierNode *id = (IdentifierNode*)tree;
       MASSERT(id->GetType() && "Identifier has no type?");
     }
-    if (tree->GetName() == inode->GetName())
+    if (tree->GetStrIdx() == inode->GetStrIdx())
       return tree;
   }
   return NULL;
@@ -57,7 +57,7 @@ TreeNode* ASTScope::FindDeclOf(IdentifierNode *inode) {
 TreeNode* ASTScope::FindTypeOf(IdentifierNode *inode) {
   for (unsigned i = 0; i < GetTypeNum(); i++) {
     TreeNode *tree = GetType(i);
-    if (tree->GetName() == inode->GetName())
+    if (tree->GetStrIdx() == inode->GetStrIdx())
       return tree;
   }
   return NULL;

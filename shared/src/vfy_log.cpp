@@ -28,11 +28,11 @@ static const char* GetNodeTypeName(TreeNode *tree) {
 void VfyLog::Duplicate(const char *desc, TreeNode *na, TreeNode *nb) {
   std::string name_a = GetNodeTypeName(na);
   name_a += ":";
-  name_a += na->GetName();
+  name_a += na->GetString();
 
   std::string name_b = GetNodeTypeName(nb);
   name_b += ":";
-  name_b += nb->GetName();
+  name_b += nb->GetString();
 
   std::string result(desc);
   result += name_a;
@@ -46,7 +46,7 @@ void VfyLog::Duplicate(const char *desc, TreeNode *na, TreeNode *nb) {
 void VfyLog::MissDecl(TreeNode *na) {
   std::string name_a = GetNodeTypeName(na);
   name_a += ":";
-  name_a += na->GetName();
+  name_a += na->GetString();
 
   std::string result(name_a);
   result += " has no decl.";

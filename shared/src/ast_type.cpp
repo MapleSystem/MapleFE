@@ -46,7 +46,7 @@ void UserTypeNode::AddTypeArgs(TreeNode *args) {
 bool UserTypeNode::TypeEquivalent(UserTypeNode *type) {
   // For now, I just check the name. The name is in the global string pool,
   // so two same names should be in the same address.
-  if (GetName() == type->GetName())
+  if (GetStrIdx() == type->GetStrIdx())
     return true;
   else
     return false;

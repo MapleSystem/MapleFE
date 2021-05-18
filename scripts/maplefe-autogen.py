@@ -608,6 +608,7 @@ gen_args = [
         "AstGraph",     # Class name
         "DumpGraph",    # Prefix of function name
         """
+#include "stringpool.h"
 #include "{astdump}.h"
 #include <algorithm>
 #include <set>
@@ -642,8 +643,8 @@ bool PutNode(TreeNode *n) {{
     *mOs << NodeName(n,\'_\') << " [label=\\"" << NodeName(n,',') << "\\\\n";
     switch(n->GetKind()) {{
       case NK_Function:    {{
-                             const char* s = n->GetName();
-                             *mOs << (s ? s : "_anonymous_") << NodeColor(lightcoral);
+                             std::string s = n->GetString();
+                             *mOs << (n->GetStrIdx() ? s : "_anonymous_") << NodeColor(lightcoral);
                              break;
                            }}
       case NK_Lambda:      *mOs << NodeColor(pink); break;
@@ -659,7 +660,7 @@ bool PutNode(TreeNode *n) {{
       case NK_ForLoop:     *mOs << EnumVal(ForLoopNode, ForLoopProp, Prop);
       case NK_WhileLoop:
       case NK_DoLoop:      *mOs << NodeColor(lightskyblue); break;
-      case NK_Identifier:  *mOs << "\\\\\\"" << n->GetName() << "\\\\\\"" << NodeColor(wheat); break;
+      case NK_Identifier:  *mOs << "\\\\\\"" << n->GetString() << "\\\\\\"" << NodeColor(wheat); break;
       case NK_Decl:        *mOs << EnumVal(DeclNode, DeclProp, Prop) << NodeColor(palegoldenrod); break;
       case NK_PrimType:    *mOs << EnumVal(PrimTypeNode, TypeId, PrimType) << NodeColor(lemonchiffon); break;
       case NK_BinOperator: *mOs << EnumVal(BinOperatorNode, OprId, OprId) << NodeColor(palegreen); break;

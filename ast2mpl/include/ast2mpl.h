@@ -58,12 +58,12 @@ private:
 public:
   maple::MIRModule *mMirModule;
   // use type's uniq name as key
-  std::map<const char *, maple::MIRType*> mNodeTypeMap;
-  std::map<const char *, std::vector<maple::MIRFunction*>> mNameFuncMap;
+  std::map<unsigned, maple::MIRType*> mNodeTypeMap;
+  std::map<unsigned, std::vector<maple::MIRFunction*>> mNameFuncMap;
   std::map<BlockNode*, maple::BlockNode*> mBlockNodeMap;
   std::map<BlockNode*, maple::MIRFunction*> mBlockFuncMap;
   std::map<TreeNode*, maple::MIRFunction*> mFuncMap;
-  std::map<std::pair<const char *, BlockNode*>, maple::MIRSymbol*> mNameBlockVarMap;
+  std::map<std::pair<unsigned, BlockNode*>, maple::MIRSymbol*> mNameBlockVarMap;
 
   A2M(const char *filename);
   ~A2M();
@@ -83,7 +83,7 @@ public:
   maple::MIRSymbol *CreateSymbol(TreeNode *tnode, BlockNode *block);
   maple::MIRSymbol *CreateTempVar(const char *prefix, maple::MIRType *type);
   maple::MIRFunction *GetCurrFunc(BlockNode *block);
-  maple::MIRFunction *SearchFunc(const char *name, maple::MapleVector<maple::BaseNode *> &args);
+  maple::MIRFunction *SearchFunc(unsigned idx, maple::MapleVector<maple::BaseNode *> &args);
   maple::MIRFunction *SearchFunc(TreeNode *method, maple::MapleVector<maple::BaseNode *> &args, BlockNode *block);
   maple::MIRClassType *GetClass(BlockNode *block);
   void UpdateUniqName(std::string &str);

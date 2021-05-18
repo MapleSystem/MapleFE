@@ -252,7 +252,7 @@ void Verifier::VerifyClassFields(ClassNode *klass) {
     bool hit_self = false;
     for (unsigned j = 0; j < mCurrScope->GetDeclNum(); j++) {
       TreeNode *nb = mCurrScope->GetDecl(j);
-      if (na->GetName() == nb->GetName()) {
+      if (na->GetStrIdx() == nb->GetStrIdx()) {
         if (nb->IsIdentifier()) {
           if (!hit_self)
             hit_self = true;

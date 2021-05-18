@@ -49,21 +49,21 @@ void CFGVisitor::FinalizeFunction() {
 
 // Push a BB to target BB stack
 void CFGVisitor::Push(TargetBBStack &stack, AST_BB* bb, TreeNode *label) {
-  const char *name = nullptr;
+  unsigned idx = 0;
   if(label && label->GetKind() == NK_Identifier)
-    name = static_cast<IdentifierNode *>(label)->GetName();
-  stack.push_back(TargetBB{bb, name});
+    idx = static_cast<IdentifierNode *>(label)->GetStrIdx();
+  stack.push_back(TargetBB{bb, idx});
 }
 
 // Look up a target BB
 AST_BB *CFGVisitor::LookUp(TargetBBStack &stack, TreeNode *label) {
-  const char *name = nullptr;
+  unsigned idx = 0;
   if(label && label->GetKind() == NK_Identifier)
-    name = static_cast<IdentifierNode *>(label)->GetName();
-  if(name == nullptr)
+    idx = static_cast<IdentifierNode *>(label)->GetStrIdx();
+  if(idx == 0)
     return stack.back().first;
   for(auto it = stack.rbegin(); it != stack.rend(); ++it)
-    if(it->second && std::strcmp(it->second, name) == 0)
+    if(it->second && it->second == idx)
       return it->first;
   MASSERT(0 && "Unexpected: Target not found.");
   return nullptr;
@@ -654,7 +654,7 @@ static std::string BBLabelStr(AST_BB *bb, const char *shape = nullptr, const cha
 // Dump current AST_Function node
 void AST_Function::Dump() {
   FunctionNode *func = GetFunction();
-  const char *func_name = func ? (func->GetName() ? func->GetName() : "_anonymous_") : "_init_";
+  const char *func_name = func ? (func->GetStrIdx() ? func->GetString().c_str() : "_anonymous_") : "_init_";
   std::cout << "Function " << func_name  << " {" << std::endl;
   unsigned num = GetNestedFunctionsNum();
   if(num > 0) {
@@ -662,7 +662,7 @@ void AST_Function::Dump() {
     for(unsigned i = 0; i < num; ++i) {
       AST_Function *afunc = GetNestedFunctionAtIndex(i);
       FunctionNode *fnode = afunc->mFunction;
-      const char *fname = fnode ? (fnode->GetName() ? fnode->GetName() : "_anonymous_") : "_init_";
+      const char *fname = fnode ? (fnode->GetStrIdx() ? fnode->GetString().c_str() : "_anonymous_") : "_init_";
       std::cout << "Function: " << i + 1 << " " << fname << std::endl;
       afunc->Dump();
     }

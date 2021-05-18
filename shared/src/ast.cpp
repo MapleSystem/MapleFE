@@ -299,7 +299,7 @@ void TreeNode::DumpLabel(unsigned ind) {
     IdentifierNode *inode = (IdentifierNode*)label;
     for (unsigned i = 0; i < ind; i++)
       DUMP0_NORETURN(' ');
-    DUMP0_NORETURN(inode->GetName());
+    DUMP0_NORETURN(inode->GetString());
     DUMP0_NORETURN(':');
     DUMP_RETURN();
   }
@@ -450,9 +450,9 @@ void AnnotationTypeNode::Dump(unsigned indent) {
 
 const char* CastNode::GetDumpName() {
   std::string name = "(";
-  name += mDestType->GetName();
+  name += mDestType->GetString();
   name += ")";
-  name += mExpr->GetName();
+  name += mExpr->GetString();
   return gStringPool.FindString(name);
 }
 
@@ -569,7 +569,7 @@ void NewNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   DUMP0_NORETURN("new ");
   TreeNode *id = GetId();
-  DUMP0_NORETURN(id->GetName());
+  DUMP0_NORETURN(id->GetString());
   DUMP0_NORETURN("(");
   for (unsigned i = 0; i < GetArgsNum(); i++) {
     TreeNode *arg = GetArg(i);
@@ -637,7 +637,7 @@ void DimensionNode::Merge(const TreeNode *node) {
 
 void IdentifierNode::Dump(unsigned indent) {
   DumpIndentation(indent);
-  DUMP0_NORETURN(mName);
+  DUMP0_NORETURN(GetString());
   if (mInit) {
     DUMP0_NORETURN('=');
     mInit->Dump(0);
@@ -768,7 +768,7 @@ void VarListNode::Merge(TreeNode *n) {
 void VarListNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   for (unsigned i = 0; i < mVars.GetNum(); i++) {
-    //DUMP0_NORETURN(mVars.ValueAtIndex(i)->GetName());
+    //DUMP0_NORETURN(mVars.ValueAtIndex(i)->GetString());
     mVars.ValueAtIndex(i)->Dump(0);
     if (i != mVars.GetNum()-1)
       DUMP0_NORETURN(",");
@@ -834,11 +834,11 @@ void LiteralNode::InitName() {
   switch (mData.mType) {
   case LT_NullLiteral:
     s = "null";
-    mName = gStringPool.FindString(s);
+    mStrIdx = gStringPool.GetStrIdx(s);
     break;
   case LT_ThisLiteral:
     s = "this";
-    mName = gStringPool.FindString(s);
+    mStrIdx = gStringPool.GetStrIdx(s);
     break;
   case LT_IntegerLiteral:
   case LT_DoubleLiteral:
@@ -849,7 +849,7 @@ void LiteralNode::InitName() {
   case LT_NA:
   default:
     s = "<NA>";
-    mName = gStringPool.FindString(s);
+    mStrIdx = gStringPool.GetStrIdx(s);
     break;
   }
 }
@@ -1228,9 +1228,9 @@ void ClassNode::Release() {
 void ClassNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   if (IsJavaEnum())
-    DUMP1_NORETURN("class[JavaEnum] ", mName);
+    DUMP1_NORETURN("class[JavaEnum] ", GetString());
   else
-    DUMP1_NORETURN("class ", mName);
+    DUMP1_NORETURN("class ", GetString());
   DUMP_RETURN();
 
   DumpIndentation(indent + 2);
@@ -1284,7 +1284,7 @@ void ClassNode::Dump(unsigned indent) {
 
 FunctionNode::FunctionNode() {
   mKind = NK_Function;
-  mName = NULL;
+  mStrIdx = 0;
   mType = NULL;
   mBody = NULL;
   mDims = NULL;
@@ -1297,7 +1297,7 @@ FunctionNode::FunctionNode() {
 bool FunctionNode::OverrideEquivalent(FunctionNode *fun) {
   if (!mType->TypeEquivalent(fun->GetType()))
     return false;
-  if (GetName() != fun->GetName())
+  if (GetStrIdx() != fun->GetStrIdx())
     return false;
   if (GetParamsNum() != fun->GetParamsNum())
     return false;
@@ -1385,8 +1385,8 @@ void FunctionNode::Dump(unsigned indent) {
   else
     DUMP0_NORETURN("func  ");
 
-  if (mName)
-    DUMP0_NORETURN(mName);
+  if (mStrIdx)
+    DUMP0_NORETURN(GetString());
 
   // dump parameters
   DUMP0_NORETURN("(");
@@ -1422,9 +1422,9 @@ void LambdaNode::Dump(unsigned indent) {
   for (unsigned i = 0; i < mParams.GetNum(); i++) {
     TreeNode *in = mParams.ValueAtIndex(i);
     if(in->GetKind() == NK_Decl)
-      dump += static_cast<DeclNode*>(in)->GetVar()->GetName();
+      dump += static_cast<DeclNode*>(in)->GetVar()->GetString();
     else
-      dump += in->GetName();
+      dump += in->GetString();
     if (i < mParams.GetNum() - 1)
       dump += ",";
   }
@@ -1493,7 +1493,7 @@ void InterfaceNode::Construct(BlockNode *block) {
 
 void InterfaceNode::Dump(unsigned indent) {
   DumpIndentation(indent);
-  DUMP1_NORETURN("interface ", mName);
+  DUMP1_NORETURN("interface ", GetString());
   DUMP_RETURN();
   DumpIndentation(indent + 2);
 

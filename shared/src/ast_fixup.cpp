@@ -52,8 +52,8 @@ UnaOperatorNode *FixUpVisitor::VisitUnaOperatorNode(UnaOperatorNode *node) {
 // Fix up mName of UserTypeNode
 UserTypeNode *FixUpVisitor::VisitUserTypeNode(UserTypeNode *node) {
   if(auto id = node->GetId()) {
-    if(auto n = id->GetName()) {
-      node->SetName(n);
+    if(auto n = id->GetStrIdx()) {
+      node->SetStrIdx(n);
     }
   }
   return node;

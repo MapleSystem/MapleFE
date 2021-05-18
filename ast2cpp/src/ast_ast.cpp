@@ -109,7 +109,7 @@ ExportNode *AdjustASTVisitor::VisitExportNode(ExportNode *node) {
         switch (before->GetKind()) {
           case NK_Function: {
             FunctionNode *func = static_cast<FunctionNode *>(before);
-            new (n) IdentifierNode(func->GetName());
+            new (n) IdentifierNode(func->GetStrIdx());
             // update p
             p->SetBefore(n);
             // insert before into BB

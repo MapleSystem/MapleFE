@@ -90,9 +90,9 @@ maple::MIRType *A2M::MapType(TreeNode *type) {
 
   maple::MIRType *mir_type = mDefaultType;
 
-  const char *name = type->GetName();
-  if (mNodeTypeMap.find(name) != mNodeTypeMap.end()) {
-    return mNodeTypeMap[name];
+  unsigned idx = type->GetStrIdx();
+  if (mNodeTypeMap.find(idx) != mNodeTypeMap.end()) {
+    return mNodeTypeMap[idx];
   }
 
   if (type->IsPrimType()) {
@@ -100,7 +100,7 @@ maple::MIRType *A2M::MapType(TreeNode *type) {
     mir_type = MapPrimType(ptnode);
 
     // update mNodeTypeMap
-    mNodeTypeMap[name] = mir_type;
+    mNodeTypeMap[idx] = mir_type;
   } else  if (type->IsUserType()) {
     if (type->IsIdentifier()) {
       IdentifierNode *inode = static_cast<IdentifierNode *>(type);
@@ -112,13 +112,13 @@ maple::MIRType *A2M::MapType(TreeNode *type) {
     }
     // DimensionNode *mDims
     // unsigned dnum = inode->GetDimsNum();
-    mNodeTypeMap[name] = mir_type;
-  } else if (name) {
-    AST2MPLMSG("MapType add a class type by name", name);
-    mir_type = maple::GlobalTables::GetTypeTable().GetOrCreateClassType(name, *mMirModule);
+    mNodeTypeMap[idx] = mir_type;
+  } else if (idx) {
+    AST2MPLMSG("MapType add a class type by idx", idx);
+    mir_type = maple::GlobalTables::GetTypeTable().GetOrCreateClassType(type->GetString(), *mMirModule);
     mir_type->SetMIRTypeKind(maple::kTypeClass);
     mir_type = mMirBuilder->GetOrCreatePointerType(mir_type);
-    mNodeTypeMap[name] = mir_type;
+    mNodeTypeMap[idx] = mir_type;
   } else {
     NOTYETIMPL("MapType unknown type");
   }
@@ -373,12 +373,12 @@ BlockNode *A2M::GetSuperBlock(BlockNode *block) {
 }
 
 maple::MIRSymbol *A2M::GetSymbol(TreeNode *tnode, BlockNode *block) {
-  const char *name = tnode->GetName();
+  unsigned idx = tnode->GetStrIdx();
   maple::MIRSymbol *symbol = nullptr;
 
   // global symbol
   if (!block) {
-    std::pair<const char *, BlockNode*> P(tnode->GetName(), block);
+    std::pair<unsigned, BlockNode*> P(idx, block);
     symbol = mNameBlockVarMap[P];
     return symbol;
   }
@@ -386,7 +386,7 @@ maple::MIRSymbol *A2M::GetSymbol(TreeNode *tnode, BlockNode *block) {
   // trace block hirachy for defined symbol
   BlockNode *blk = block;
   do {
-    std::pair<const char *, BlockNode*> P(tnode->GetName(), blk);
+    std::pair<unsigned, BlockNode*> P(idx, blk);
     symbol = mNameBlockVarMap[P];
     if (symbol) {
       return symbol;
@@ -400,7 +400,7 @@ maple::MIRSymbol *A2M::GetSymbol(TreeNode *tnode, BlockNode *block) {
     NOTYETIMPL("Block parent hirachy");
     return symbol;
   }
-  maple::GStrIdx stridx = maple::GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(name);
+  maple::GStrIdx stridx = maple::GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(tnode->GetString());
   if (func->IsAFormalName(stridx)) {
     maple::FormalDef def = func->GetFormalFromName(stridx);
     return def.formalSym;
@@ -421,7 +421,7 @@ maple::MIRSymbol *A2M::CreateTempVar(const char *prefix, maple::MIRType *type) {
 }
 
 maple::MIRSymbol *A2M::CreateSymbol(TreeNode *tnode, BlockNode *block) {
-  const char *name = tnode->GetName();
+  std::string name = tnode->GetString();
   maple::MIRType *mir_type;
 
   if (tnode->IsIdentifier()) {
@@ -459,7 +459,7 @@ maple::MIRSymbol *A2M::CreateSymbol(TreeNode *tnode, BlockNode *block) {
     symbol = mMirBuilder->CreateGlobalDecl(str, *mir_type, maple::kScGlobal);
   }
 
-  std::pair<const char *, BlockNode*> P(name, block);
+  std::pair<unsigned, BlockNode*> P(tnode->GetStrIdx(), block);
   mNameBlockVarMap[P] = symbol;
 
   return symbol;
@@ -542,12 +542,12 @@ bool3 A2M::IsCompatibleTo(maple::PrimType expected, maple::PrimType prim) {
   return comp;
 }
 
-maple::MIRFunction *A2M::SearchFunc(const char *name, maple::MapleVector<maple::BaseNode *> &args) {
-  if (mNameFuncMap.find(name) == mNameFuncMap.end()) {
+maple::MIRFunction *A2M::SearchFunc(unsigned idx, maple::MapleVector<maple::BaseNode *> &args) {
+  if (mNameFuncMap.find(idx) == mNameFuncMap.end()) {
     return nullptr;
   }
   std::vector<maple::MIRFunction *> candidates;
-  for (auto it: mNameFuncMap[name]) {
+  for (auto it: mNameFuncMap[idx]) {
     if (it->GetFormalCount() != args.size()) {
       continue;
     }
@@ -581,12 +581,12 @@ maple::MIRFunction *A2M::SearchFunc(TreeNode *method, maple::MapleVector<maple::
   maple::MIRFunction *func = nullptr;
   switch (method->GetKind()) {
     case NK_Function: {
-      func = SearchFunc(method->GetName(), args);
+      func = SearchFunc(method->GetStrIdx(), args);
       break;
     }
     case NK_Identifier: {
       IdentifierNode *imethod = static_cast<IdentifierNode *>(method);
-      func = SearchFunc(imethod->GetName(), args);
+      func = SearchFunc(imethod->GetStrIdx(), args);
       break;
     }
     case NK_Field: {

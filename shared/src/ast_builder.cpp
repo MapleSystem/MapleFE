@@ -17,6 +17,7 @@
 
 #include "token.h"
 #include "ruletable.h"
+#include "stringpool.h"
 #include "ast_builder.h"
 #include "ast_scope.h"
 #include "ast_attr.h"
@@ -52,7 +53,8 @@ TreeNode* ASTBuilder::CreateTokenTreeNode(const Token *token) {
   unsigned size = 0;
   if (token->IsIdentifier()) {
     IdentifierNode *n = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
-    new (n) IdentifierNode(token->GetName());
+    unsigned idx = gStringPool.GetStrIdx(token->GetName());
+    new (n) IdentifierNode(idx);
     mLastTreeNode = n;
     return n;
   } else if (token->IsLiteral()) {
@@ -1565,7 +1567,7 @@ TreeNode* ASTBuilder::BuildClass() {
 
   ClassNode *node_class = (ClassNode*)gTreePool.NewTreeNode(sizeof(ClassNode));
   new (node_class) ClassNode();
-  node_class->SetName(in->GetName());
+  node_class->SetStrIdx(in->GetStrIdx());
 
   mLastTreeNode = node_class;
   return mLastTreeNode;
@@ -1810,7 +1812,7 @@ TreeNode* ASTBuilder::BuildInterface() {
 
   InterfaceNode *interf = (InterfaceNode*)gTreePool.NewTreeNode(sizeof(InterfaceNode));
   new (interf) InterfaceNode();
-  interf->SetName(in->GetName());
+  interf->SetStrIdx(in->GetStrIdx());
 
   // set last tree node and return it.
   mLastTreeNode = interf;
@@ -2256,7 +2258,7 @@ TreeNode* ASTBuilder::BuildFunction() {
   new (f) FunctionNode();
 
   if (node_name)
-    f->SetName(node_name->GetName());
+    f->SetStrIdx(node_name->GetStrIdx());
 
   mLastTreeNode = f;
   return mLastTreeNode;
