@@ -102,7 +102,8 @@ ExportNode *AdjustASTVisitor::VisitExportNode(ExportNode *node) {
     XXportAsPairNode *p = node->GetPair(0);
     TreeNode *before = p->GetBefore();
     TreeNode *after = p->GetAfter();
-    if (before) {
+    // TODO:
+    if (0 && before) {
       if (!before->IsIdentifier()) {
         IdentifierNode *n = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
         switch (before->GetKind()) {
