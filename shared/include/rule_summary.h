@@ -25,7 +25,9 @@ extern RuleTable TblDIGIT;
 extern RuleTable TblASCII;
 extern RuleTable TblESCAPE;
 extern RuleTable TblHEXDIGIT;
+
 extern RuleTable TblTemplateLiteral;
+extern RuleTable TblExpression;
 
 //
 extern RuleTable TblIdentifier;

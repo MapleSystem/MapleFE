@@ -311,6 +311,11 @@ unsigned Parser::LexOneLine() {
 bool Parser::MoveCurToken() {
   mCurToken++;
   if (mCurToken == mActiveTokens.GetNum()) {
+    // In line mode, we won't read new line any more.
+    if (mLineMode) {
+      mEndOfFile = true;
+      return true;
+    }
     unsigned num = LexOneLine();
     if (!num) {
       mEndOfFile = true;
@@ -347,6 +352,7 @@ bool Parser::Parse() {
 }
 
 void Parser::ParseTemplateLiterals() {
+
   mLineMode = true;
   mLexer->SetLineMode();
   for (unsigned i = 0; i < gTemplateLiteralNodes.GetNum(); i++) {
@@ -354,6 +360,8 @@ void Parser::ParseTemplateLiterals() {
     for (unsigned j = 0; j < tl->GetPlaceHoldersNum(); j++) {
       const char *ph_str = tl->GetPlaceHolderAtIndex(j);
       mLexer->PrepareForString(ph_str);
+      // Clear some status
+      mEndOfFile = false;
       ParseStmt();
     }
   }
@@ -439,7 +447,12 @@ ParseStatus Parser::ParseStmt() {
   if (mTraceTiming)
     gettimeofday(&start, NULL);
 
-  bool succ = TraverseStmt();
+  bool succ = false;
+  if (mLineMode)
+    succ = TraverseExpression();
+  else
+    succ = TraverseStmt();
+
   if (mTraceTiming) {
     gettimeofday(&stop, NULL);
     std::cout << "Parse Time: " << (stop.tv_sec - start.tv_sec) * 1000000 + stop.tv_usec - start.tv_usec;
@@ -481,6 +494,42 @@ ParseStatus Parser::ParseStmt() {
     }
   }
   return succ? ParseSucc: ParseFail;
+}
+
+// return true : if all tokens in mActiveTokens are matched.
+//       false : if faled.
+bool Parser::TraverseExpression() {
+  bool succ = false;
+
+  RuleTable *t = &TblExpression;
+  mRootNode->ClearChildren();
+  AppealNode *child = NULL;
+  succ = TraverseRuleTable(t, mRootNode, child);
+  if (succ) {
+    MASSERT(child);
+    mRootNode->CopyMatch(child);
+    // Need adjust the mCurToken. A rule could try multiple possible
+    // children rules, although there is one any only one valid child
+    // for a Top table. However, the mCurToken could deviate from
+    // the valid children and reflect the invalid children.
+    MASSERT(mRootNode->mChildren.size() == 1);
+    AppealNode *topnode = mRootNode->mChildren[0];
+    MASSERT(topnode->IsSucc());
+
+    // Assume it has only one match. We will see if it's correct.
+    MASSERT(topnode->GetMatchNum() == 1);
+    mCurToken = topnode->GetMatch(0) + 1;
+
+    mRootNode->mResult = Succ;
+    SortOut();
+  }
+
+  if (!succ)
+    std::cout << "Illegal syntax detected!" << std::endl;
+  else
+    std::cout << "Matched " << mCurToken << " tokens." << std::endl;
+
+  return succ;
 }
 
 // return true : if all tokens in mActiveTokens are matched.

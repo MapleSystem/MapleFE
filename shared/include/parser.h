@@ -292,6 +292,7 @@ private:
   void UpdateSuccInfo(unsigned, AppealNode*);
 
   bool TraverseStmt();
+  bool TraverseExpression();
   bool TraverseRuleTable(RuleTable*, AppealNode*, AppealNode *&);
   bool TraverseRuleTableRegular(RuleTable*, AppealNode*);
   bool TraverseTableData(TableData*, AppealNode*, AppealNode *&);
