@@ -256,6 +256,7 @@ class CFGVisitor : public AstVisitor {
   UserTypeNode *VisitUserTypeNode(UserTypeNode *node);
   IdentifierNode *VisitIdentifierNode(IdentifierNode *node);
   LiteralNode *VisitLiteralNode(LiteralNode *node);
+  StructNode *VisitStructNode(StructNode *node);
 
 };
 }
