@@ -18,8 +18,10 @@
 namespace maplefe {
 
 bool FixUpVisitor::FixUp() {
-  for (auto it : mASTModule->mTrees)
+  for (unsigned i = 0; i < mASTModule->GetTreesNum(); i++ ) {
+    TreeNode *it = mASTModule->GetTree(i);
     Visit(it);
+  }
   return mUpdated;
 }
 

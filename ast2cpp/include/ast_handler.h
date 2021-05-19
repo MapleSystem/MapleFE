@@ -38,7 +38,7 @@ class AST_DFA;
 class AST_Handler {
  private:
   MemPool       mMemPool;     // Memory pool for all AST_Function and AST_BB
-  ASTModule    *mASTModule;   // for an AST module
+  ModuleNode    *mASTModule;   // for an AST module
   AST_Function *mFunction;    // an init function for statements in module scope
   AST_CFG      *mCFG;
   AST_AST      *mAST;
@@ -49,7 +49,7 @@ class AST_Handler {
   friend class AST_BB;;
 
  public:
-  explicit AST_Handler(ASTModule *module, bool trace) :
+  explicit AST_Handler(ModuleNode *module, bool trace) :
     mASTModule(module),
     mFunction(nullptr),
     mTrace(trace) {}
@@ -59,7 +59,7 @@ class AST_Handler {
   void AdjustAST();
   void BuildDFA();
 
-  ASTModule *GetASTModule() {return mASTModule;}
+  ModuleNode *GetASTModule() {return mASTModule;}
   MemPool   *GetMemPool()   {return &mMemPool;}
 
   void          SetFunction(AST_Function *func) {mFunction = func;}

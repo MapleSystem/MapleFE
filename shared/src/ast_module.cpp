@@ -18,34 +18,34 @@
 
 namespace maplefe {
 
-ASTModule gModule;
+ModuleNode gModule;
 
-ASTModule::ASTModule() {
+ModuleNode::ModuleNode() {
   mRootScope = mScopePool.NewScope(NULL);
   mPackage = NULL;
   mSrcLang = SrcLangUnknown;
 }
 
-ASTModule::~ASTModule() {
-  mTrees.clear();
+ModuleNode::~ModuleNode() {
+  mTrees.Release();
   mImports.Release();
 }
 
 // AFAIK, all languages allow only one package name if it allows.
-void ASTModule::SetPackage(PackageNode *p) {
+void ModuleNode::SetPackage(PackageNode *p) {
   MASSERT(!mPackage);
   mPackage = p;
 }
 
-void ASTModule::SetSrcLang(SrcLang l) {
+void ModuleNode::SetSrcLang(SrcLang l) {
   mSrcLang = l;
 }
 
-SrcLang ASTModule::GetSrcLang() {
+SrcLang ModuleNode::GetSrcLang() {
   return mSrcLang;
 }
 
-std::string ASTModule::GetSrcLangString() {
+std::string ModuleNode::GetSrcLangString() {
   switch (mSrcLang) {
     case SrcLangJava: return "Java";
     case SrcLangTypeScript: return "TypeScript";
@@ -54,20 +54,18 @@ std::string ASTModule::GetSrcLangString() {
   }
   return "Unknown";
 }
-
 // Return a new scope newly created.
 // Set the parent<->child relation between it and p.
-ASTScope* ASTModule::NewScope(ASTScope *p) {
+ASTScope* ModuleNode::NewScope(ASTScope *p) {
   ASTScope *newscope = mScopePool.NewScope(p);
   return newscope;
 }
 
-void ASTModule::Dump() {
+void ModuleNode::Dump() {
   std::cout << "============= Module ===========" << std::endl;
-  std::vector<TreeNode*>::iterator tree_it = mTrees.begin();
-  for (; tree_it != mTrees.end(); tree_it++) {
+  for (unsigned i = 0; i < mTrees.GetNum(); i++) {
+    TreeNode *tree = GetTree(i);
     DUMP0("== Sub Tree ==");
-    TreeNode *tree = *tree_it;
     tree->Dump(0);
     DUMP_RETURN();
   }

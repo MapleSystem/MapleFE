@@ -41,6 +41,7 @@
 #include "ast.h"
 #include "ast_attr.h"
 #include "ast_type.h"
+#include "ast_module.h"
 #include "container.h"
 #include "vfy_log.h"
 

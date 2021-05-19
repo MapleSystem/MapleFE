@@ -53,9 +53,8 @@ void Verifier::Do() {
 
 void Verifier::VerifyGlobalScope() {
   mCurrScope = gModule.mRootScope;
-  std::vector<TreeNode*>::iterator tree_it = gModule.mTrees.begin();
-  for (; tree_it != gModule.mTrees.end(); tree_it++) {
-    TreeNode *tree = *tree_it;
+  for (unsigned i = 0; i < gModule.GetTreesNum(); i++) {
+    TreeNode *tree = gModule.GetTree(i);
     // Step 1. Try to add decl.
     mCurrScope->TryAddDecl(tree);
     // Step 2. Try to add type.
@@ -424,6 +423,10 @@ void Verifier::VerifyCast(CastNode *tree){
 }
 
 void Verifier::VerifyParenthesis(ParenthesisNode *tree){
+  return;
+}
+
+void Verifier::VerifyModule(ModuleNode *tree){
   return;
 }
 

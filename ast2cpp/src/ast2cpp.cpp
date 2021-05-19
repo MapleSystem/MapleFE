@@ -29,8 +29,8 @@ void A2C::ProcessAST(bool trace_a2c) {
     std::cout << "============= in ProcessAST ===========" << std::endl;
     std::cout << "srcLang : " << gModule.GetSrcLangString() << std::endl;
   }
-  for(auto it: gModule.mTrees) {
-    TreeNode *tnode = it;
+  for(unsigned i = 0; i < gModule.GetTreesNum(); i++) {
+    TreeNode *tnode = gModule.GetTree(i);
     if (mTraceA2C) {
       tnode->Dump(0);
       std::cout << std::endl;

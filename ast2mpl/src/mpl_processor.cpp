@@ -65,6 +65,12 @@ maple::BaseNode *A2M::ProcessNode(StmtExprKind skind, TreeNode *tnode, BlockNode
   return mpl_node;
 }
 
+maple::BaseNode *A2M::ProcessModule(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
+  NOTYETIMPL("ProcessModule()");
+  ModuleNode *node = static_cast<ModuleNode *>(tnode);
+  return nullptr;
+}
+
 maple::BaseNode *A2M::ProcessPackage(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
   NOTYETIMPL("ProcessPackage()");
   PackageNode *node = static_cast<PackageNode *>(tnode);

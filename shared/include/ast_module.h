@@ -30,25 +30,22 @@ enum SrcLang {
   SrcLangTypeScript
 };
 
-class ASTTree;
-class ASTScope;
-
 // The module is a member of class Parser.
-class ASTModule {
+class ModuleNode : public TreeNode {
 public:
   const char              *mFileName;
   PackageNode             *mPackage;
   SmallVector<ImportNode*> mImports;
 public:
-  std::vector<TreeNode*>  mTrees;    // All trees in the module.
+  SmallVector<TreeNode*> mTrees;    // All trees in the module.
   ASTScope              *mRootScope; // the scope corresponding to a module. All other scopes
                                      // are children of mRootScope.
   ASTScopePool           mScopePool; // All the scopes are store in this pool. It also contains
                                      // a vector of ASTScope pointer for traversal.
   SrcLang                mSrcLang;
 public:
-  ASTModule();
-  ~ASTModule();
+  ModuleNode();
+  ~ModuleNode();
 
   void        SetFileName(const char *f) {mFileName = f;}
   const char *GetFileName() {return mFileName;}
@@ -58,11 +55,23 @@ public:
 
   void    SetSrcLang(SrcLang l);
   SrcLang GetSrcLang();
-
   std::string GetSrcLangString();
-  void AddImport(ImportNode *imp) {mImports.PushBack(imp);}
 
-  void AddTree(TreeNode* t) { mTrees.push_back(t); }
+  unsigned    GetImportsNum()       {return mImports.GetNum();}
+  ImportNode* GetImport(unsigned i) {return mImports.ValueAtIndex(i);}
+  void        SetImport(unsigned i, ImportNode* n) {*(mImports.RefAtIndex(i)) = n;}
+  void        AddImport(ImportNode *imp)           {mImports.PushBack(imp);}
+
+  unsigned  GetTreesNum()       {return mTrees.GetNum();}
+  TreeNode* GetTree(unsigned i) {return mTrees.ValueAtIndex(i);}
+  void SetTree(unsigned i, TreeNode* t)  {*(mTrees.RefAtIndex(i)) = t;}
+  void AddTree(TreeNode* t)     {mTrees.PushBack(t); }
+
+  ASTScope* GetRootScope()            {return mRootScope;}
+  void      SetRootScope(ASTScope *s) {mRootScope = s;}
+
+  ASTScopePool& GetScopePool()        {return mScopePool;}
+  void          SetScopePool(ASTScopePool &s) {mScopePool = s;}
 
   ASTScope* NewScope(ASTScope *p);
 
@@ -70,7 +79,7 @@ public:
 };
 
 // Assume currently only one global module is being processed.
-extern ASTModule gModule;
+extern ModuleNode gModule;
 
 }
 #endif

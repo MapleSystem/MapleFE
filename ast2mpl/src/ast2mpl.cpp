@@ -71,13 +71,13 @@ void A2M::ProcessAST(bool trace_a2m) {
     std::cout << "srcLang : " << gModule.GetSrcLangString() << std::endl;
   }
   // pass 1: collect class/interface/function decl
-  for(auto it: gModule.mTrees) {
-    TreeNode *tnode = it;
+  for (unsigned i = 0; i < gModule.GetTreesNum(); i++) {
+    TreeNode *tnode = gModule.GetTree(i);
     ProcessNodeDecl(SK_Stmt, tnode, nullptr);
   }
   // pass 2: handle function def
-  for(auto it: gModule.mTrees) {
-    TreeNode *tnode = it;
+  for (unsigned i = 0; i < gModule.GetTreesNum(); i++) {
+    TreeNode *tnode = gModule.GetTree(i);
     ProcessNode(SK_Stmt, tnode, nullptr);
   }
   if (mTraceA2m) { astdump.Dump("ProcessAST", &std::cout); }

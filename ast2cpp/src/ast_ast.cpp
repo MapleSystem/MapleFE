@@ -25,7 +25,8 @@ void AST_AST::Build() {
   AdjustAST();
 
   if (mTrace) {
-    for(auto it: gModule.mTrees) {
+    for(unsigned i = 0; i < gModule.GetTreesNum(); i++) {
+      TreeNode *it = gModule.GetTree(i);
       it->Dump(0);
       std::cout << std::endl;
     }
@@ -75,7 +76,8 @@ void AST_AST::AdjustAST() {
   AST_Function *func = mHandler->GetFunction();
   visitor.SetCurrentFunction(mHandler->GetFunction());
   visitor.SetCurrentBB(func->GetEntryBB());
-  for(auto it: mHandler->GetASTModule()->mTrees) {
+  for(unsigned i = 0; i < mHandler->GetASTModule()->GetTreesNum(); i++) {
+    TreeNode *it = mHandler->GetASTModule()->GetTree(i);
     visitor.Visit(it);
   }
 }

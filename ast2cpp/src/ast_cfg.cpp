@@ -748,8 +748,8 @@ void AST_CFG::BuildCFG() {
   mHandler->SetFunction(func);
   // Start to build CFG for current module
   visitor.InitializeFunction(func);
-  for(auto it: mHandler->GetASTModule()->mTrees) {
-    visitor.Visit(it);
+  for(unsigned i = 0; i < mHandler->GetASTModule()->GetTreesNum(); i++) {
+    visitor.Visit(mHandler->GetASTModule()->GetTree(i));
   }
   visitor.FinalizeFunction();
 }

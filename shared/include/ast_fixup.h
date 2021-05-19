@@ -25,11 +25,11 @@ namespace maplefe {
 // FixUpVisitor is to fix up some tree nodes after the AST is created
 class FixUpVisitor : public AstVisitor {
   private:
-    ASTModule *mASTModule;
+    ModuleNode *mASTModule;
     bool       mUpdated;
 
   public:
-    FixUpVisitor(ASTModule *m) : mASTModule(m), mUpdated(false) {}
+    FixUpVisitor(ModuleNode *m) : mASTModule(m), mUpdated(false) {}
 
     bool FixUp();
 

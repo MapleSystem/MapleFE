@@ -362,7 +362,9 @@ namespace maplefe {{
 
 def get_data_based_on_type(val_type, accessor):
     e = get_enum_type(val_type)
-    if e != None:
+    if e == "ASTScope *":
+        return e + ': " + "' + accessor + '");'
+    elif e != None:
         return e + ': " + GetEnum' + e + '(' + accessor + '));'
     elif val_type == "LitData":
         return 'LitData: LitId, " + GetEnumLitId(' + accessor + '.mType) + ", " + GetEnumLitData(' + accessor + '));'
@@ -424,13 +426,13 @@ prefixfuncname = gen_args[2]
 astdump_init = [
 """
 private:
-ASTModule    *mASTModule;
+ModuleNode    *mASTModule;
 std::ostream *mOs;
 int           indent;
 std::string   indstr;
 
 public:
-{gen_args1}(ASTModule *m) : mASTModule(m), mOs(nullptr), indent(0) {{
+{gen_args1}(ModuleNode *m) : mASTModule(m), mOs(nullptr), indent(0) {{
 indstr = std::string(256, \' \');
 for(int i = 2; i < 256; i += 4)
 indstr.at(i) = \'.\';
@@ -439,8 +441,9 @@ indstr.at(i) = \'.\';
 void Dump(const char *title, std::ostream *os) {{
   mOs = os;
   *mOs << "{gen_args1}: " << title << " {{\\n";
-  for(auto it: mASTModule->mTrees)
-    {gen_args2}TreeNode(it);
+  for(unsigned i = 0; i < mASTModule->GetTreesNum(); i++) {{
+    {gen_args2}TreeNode(mASTModule->GetTree(i));
+  }}
   *mOs << "}}\\n";
 }}
 
@@ -629,7 +632,7 @@ gen_args = [
 
 astgraph_init = [
 """
-{gen_args1}(ASTModule *m) : mASTModule(m), mOs(nullptr) {{}}
+{gen_args1}(ModuleNode *m) : mASTModule(m), mOs(nullptr) {{}}
 
 #define NodeName(n,s)  ({astdumpclass}::GetEnumNodeKind((n)->GetKind()) + 3) << s << n->GetNodeId()
 #define EnumVal(t,e,m) {astdumpclass}::GetEnum##e((static_cast<t *>(n))->Get##m())
@@ -642,9 +645,9 @@ void {gen_args2}(const char *title, std::ostream *os) {{
   if(auto p = std::strrchr(fn, '/')) fn = p + 1;
   *mOs << "digraph AST_Module {{\\nrankdir=LR;\\nModule [label=\\"Module\\\\n" << fn << "\\\\n" << title << "\\",shape=box];\\n";
   std::size_t idx = 1;
-  for(auto it: mASTModule->mTrees) {{
-    *mOs << "Module -> " << NodeName(it,\'_\') << "[label=" << idx++ << "];\\n";
-    {gen_args2}TreeNode(it);
+  for(unsigned i = 0; i < mASTModule->GetTreesNum(); i++) {{
+    *mOs << "Module -> " << NodeName(mASTModule->GetTree(i),\'_\') << "[label=" << idx++ << "];\\n";
+    {gen_args2}TreeNode(mASTModule->GetTree(i));
   }}
   *mOs << "}}\\n";
 }}
@@ -711,7 +714,7 @@ void PutChildEdge(TreeNode *from, TreeNode *to, const char *field, unsigned idx,
 }}
 
 private:
-ASTModule            *mASTModule;
+ModuleNode            *mASTModule;
 std::ostream         *mOs;
 std::set<TreeNode *>  mNodes;
 """.format(gen_args1=gen_args[1], gen_args2=gen_args[2], astdumpclass=astdumpclass)
@@ -783,18 +786,18 @@ astemit_init = [
 using Precedence = char;
 
 private:
-ASTModule    *mASTModule;
+ModuleNode    *mASTModule;
 std::ostream *mOs;
 Precedence    mPrecedence;
 
 public:
-{gen_args1}(ASTModule *m) : mASTModule(m), mOs(nullptr) {{}}
+{gen_args1}(ModuleNode *m) : mASTModule(m), mOs(nullptr) {{}}
 
 void {gen_args2}(const char *title, std::ostream *os) {{
   mOs = os;
   *mOs << "// [Beginning of {gen_args1}: " << title << "\\n// Filename: " << mASTModule->GetFileName() << "\\n";
-  for(auto it: mASTModule->mTrees)
-    *mOs << {gen_args2}TreeNode(it);
+  for(unsigned i = 0; i < mASTModule->GetTreesNum(); i++) {{
+    *mOs << {gen_args2}TreeNode(mASTModule->GetTree(i));
     *mOs << "// End of AstEmitter]\\n";
   }}
 
@@ -879,20 +882,25 @@ using AstNodeVec = std::vector<TreeNode*>;
 astemit_init = [
 """
 private:
-ASTModule  *mASTModule;
+ModuleNode  *mASTModule;
 AstBuffer   mAstBuf {{'M', 'P', 'L', 'A', 'S', 'T'}};
 BitVector   mVisited;
 
 public:
-{gen_args1}(ASTModule *m) : mASTModule(m) {{}}
+{gen_args1}(ModuleNode *m) : mASTModule(m) {{}}
 
 const std::vector<uint8_t>& GetAstBuf() const {{return mAstBuf;}}
 
 void {gen_args2}InAstBuf() {{
   mAstBuf.erase(mAstBuf.begin()+6, mAstBuf.end());
+<<<<<<< HEAD
   mAstBuf.reserve(65536);
   for(auto it: mASTModule->mTrees)
     VisitTreeNode(it);
+=======
+  for(unsigned i = 0; i < mASTModule->GetTreesNum(); i++)
+    VisitTreeNode(mASTModule->GetTree(i));
+>>>>>>> Replace ASTModule with ModuleNode.
 }}
 
 bool IsVisited(TreeNode* node) {{

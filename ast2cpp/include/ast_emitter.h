@@ -30,18 +30,18 @@ public:
   using Precedence = char;
 
 private:
-  ASTModule *mASTModule;
+  ModuleNode *mASTModule;
   std::ostream *mOs;
   Precedence mPrecedence;
 
 public:
-  AstEmitter(ASTModule *m) : mASTModule(m), mOs(nullptr) {}
+  AstEmitter(ModuleNode *m) : mASTModule(m), mOs(nullptr) {}
 
   void AstEmit(const char *title, std::ostream *os) {
     mOs = os;
     *mOs << "// [Beginning of AstEmitter: " << title << "\n// Filename: " << mASTModule->GetFileName() << "\n";
-    for (auto it : mASTModule->mTrees)
-      *mOs << AstEmitTreeNode(it);
+    for (unsigned i = 0; i < mASTModule->GetTreesNum(); i++)
+      *mOs << AstEmitTreeNode(mASTModule->GetTree(i));
     *mOs << "// End of AstEmitter]\n";
   }
 
