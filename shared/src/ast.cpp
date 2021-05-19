@@ -811,11 +811,11 @@ void ExprListNode::Dump(unsigned indent) {
 
 void TemplateLiteralNode::Dump(unsigned indent) {
   DumpIndentation(indent);
-  DUMP0_NORETURN(" template-literal  strings: ");
-  for (unsigned i = 0; i < mStrings.GetNum(); i++) {
-    const char *s = mStrings.ValueAtIndex(i);
-    if (s)
-      DUMP0_NORETURN(s);
+  DUMP0_NORETURN(" template-literal: ");
+  for (unsigned i = 0; i < mTrees.GetNum(); i++) {
+    TreeNode *n = mTrees.ValueAtIndex(i);
+    if (n)
+      n->Dump(0);
     else
       DUMP0_NORETURN("NULL");
     if (i < mStrings.GetNum() - 1)

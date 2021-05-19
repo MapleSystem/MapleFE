@@ -213,6 +213,7 @@ Parser::Parser(const char *name) : filename(name) {
   mPending = 0;
   mEndOfFile = false;
 
+  mLineModeRoot = NULL;
   mLineMode = false;
 
   mTraceTable = false;
@@ -358,12 +359,31 @@ void Parser::ParseTemplateLiterals() {
   for (unsigned i = 0; i < gTemplateLiteralNodes.GetNum(); i++) {
     TemplateLiteralNode *tl = gTemplateLiteralNodes.ValueAtIndex(i);
     for (unsigned j = 1; j < tl->GetStringsNum(); j += 2) {
+      // Create tree node for format
+      const char *fmt_str = tl->GetStringAtIndex(j-1);
+      if (fmt_str) {
+        //Create a string literal node
+        LitData litdata;
+        litdata.mType = LT_StringLiteral;
+        litdata.mData.mStrIdx = gStringPool.GetStrIdx(fmt_str);
+        LiteralNode *n = (LiteralNode*)gTreePool.NewTreeNode(sizeof(LiteralNode));
+        new (n) LiteralNode(litdata);
+        tl->AddTree(n);
+      } else {
+        tl->AddTree(NULL);
+      }
+
       const char *ph_str = tl->GetStringAtIndex(j);
       if (ph_str) {
         mLexer->PrepareForString(ph_str);
         // Clear some status
         mEndOfFile = false;
-        ParseStmt();
+        ParseStatus result = ParseStmt();
+        MASSERT(result == ParseSucc);
+        MASSERT(mLineModeRoot);
+        tl->AddTree(mLineModeRoot);
+      } else {
+        tl->AddTree(NULL);
       }
     }
   }
@@ -2238,6 +2258,7 @@ AppealNode* Parser::SimplifyShrinkEdges(AppealNode *node) {
 ////////////////////////////////////////////////////////////////////////////////////
 
 ASTTree* Parser::BuildAST() {
+  mLineModeRoot = NULL;
   ASTTree *tree = new ASTTree();
 
   std::stack<AppealNode*> appeal_stack;
@@ -2279,6 +2300,8 @@ ASTTree* Parser::BuildAST() {
   if (!tree->mRootNode) {
     delete tree;
     tree = NULL;
+  } else {
+    mLineModeRoot = tree->mRootNode;
   }
 
   return tree;

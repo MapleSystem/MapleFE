@@ -222,23 +222,6 @@ struct RecStackEntry {
 };
 
 ////////////////////////////////////////////////////////////////////////////
-//                            Template Literal
-// This is an extremely complicated syntax for a rule-based autogen parser.
-// It mixed lexical and syntatic handling at the same time. Need be handled
-// carefully and specially.
-////////////////////////////////////////////////////////////////////////////
-
-class TempLit {
-private:
-  SmallVector<const char*> mStrings;
-  SmallVector<const char*> mTreeStrings;
-  SmallVector<TreeNode*>   mTrees;
-public:
-  TempLit() {}
-  ~TempLit(){mStrings.Release(); mTreeStrings.Release(); mTrees.Release();}
-};
-
-////////////////////////////////////////////////////////////////////////////
 //
 ////////////////////////////////////////////////////////////////////////////
 
@@ -269,6 +252,7 @@ public:
   bool mTracePatchWasSucc;  // trace patching was succ node.
   bool mTraceWarning;       // print the warning.
 
+  TreeNode *mLineModeRoot;  // For LineMode, the root node after Parse.
   bool mLineMode;           // LineMode is for parsing a single line of source code.
                             // It could be from a string in memory, or read from URL.
                             // It's common in dynamic loading of code in web application.

@@ -14,13 +14,13 @@ js_let Decl: x=10
 == Sub Tree ==
 js_let Decl: y=20
 == Sub Tree ==
-js_let Decl: Left= template-literal  strings: NULL,x,px,NULL
+js_let Decl: Left= template-literal: NULL,x,px,NULL
 == Sub Tree ==
-js_let Decl: Right= template-literal  strings: NULL,x,px,NULL
+js_let Decl: Right= template-literal: NULL,x,px,NULL
 == Sub Tree ==
-js_let Decl: Top= template-literal  strings: NULL,y,px,NULL
+js_let Decl: Top= template-literal: NULL,y,px,NULL
 == Sub Tree ==
-js_let Decl: Bottom= template-literal  strings: NULL,y,px,NULL
+js_let Decl: Bottom= template-literal: NULL,y,px,NULL
 == Sub Tree ==
 x
 == Sub Tree ==
