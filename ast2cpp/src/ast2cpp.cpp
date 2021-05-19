@@ -17,6 +17,7 @@
 #include "ast_handler.h"
 #include "gen_astdump.h"
 #include "gen_astgraph.h"
+#include "gen_aststore.h"
 #include "ast_emitter.h"
 
 namespace maplefe {
@@ -72,6 +73,12 @@ void A2C::ProcessAST(bool trace_a2c) {
   handler.BuildDFA();
   if (mTraceA2C) {
     // handler.Dump("After handler.BuildDFA()");
+  }
+
+  if (mTraceA2C) {
+    std::cout << "============= AstStore ===========" << std::endl;
+    AstStore saveAst(&gModule);
+    saveAst.StoreInAstBuf();
   }
 
   if (mTraceA2C) {

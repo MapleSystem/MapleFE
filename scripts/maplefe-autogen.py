@@ -324,9 +324,9 @@ def handle_src_include_files(phase):
 
 namespace maplefe {{
 
-class {gen_args1} {{
+class {gen_args1} {gen_args4} {{
 public:
-""".format(gen_args1upper=gen_args[1].upper(), gen_args1=gen_args[1], gen_args3=gen_args[3])
+""".format(gen_args1upper=gen_args[1].upper(), gen_args1=gen_args[1], gen_args3=gen_args[3], gen_args4=gen_args[4])
 ] # include_start
 
     include_end = [
@@ -378,8 +378,9 @@ def get_data_based_on_type(val_type, accessor):
 def short_name(node_type):
     return node_type.replace('class ', '').replace('maplefe::', '').replace(' *', '*')
 
+gen_padding = ''
 def padding_name(name):
-    return gen_args[4] + name.ljust(7)
+    return gen_padding + name.ljust(7)
 
 # The follwoing gen_func_* and gen_call* functions are for AstDump
 gen_func_decl_location = lambda: True
@@ -414,7 +415,7 @@ gen_args = [
         "AstDump",     # Class name
         "AstDump",     # Prefix of function name
         "",            # Extra include directives
-        "",            # Prefix of generated string literal for field name
+        "",            # Base class
         ]
 astdump = gen_args[0]
 astdumpclass = gen_args[1]
@@ -517,7 +518,7 @@ handle_yaml(initial_yaml, gen_handler)
 append(include_file, ['','public:'])
 handle_yaml(initial_yaml, gen_enum_func)
 gen_args[2] = "Dump"
-gen_args[4] = "^ "
+gen_padding = "^ "
 gen_call_child_node = lambda dictionary, node_name, field_name, node_type, accessor: \
     (('Dump("' + padding_name(field_name) + ': ' + short_name(node_type) \
     + '*, " + (' + accessor + ' ? "NodeId=" + std::to_string(' + accessor \
@@ -558,7 +559,10 @@ gen_args = [
         "AstVisitor",     # Class name
         "Visit",          # Prefix of function name
         "",               # Extra include directives
+        "",               # Base class
         ]
+astvisitor = gen_args[0]
+astvisitorclass = gen_args[1]
 
 astvisitor_init = [
 """
@@ -619,7 +623,8 @@ gen_args = [
 #include "{astdump}.h"
 #include <algorithm>
 #include <set>
-#include <cstring>""".format(astdump = astdump)  # Extra include directives
+#include <cstring>""".format(astdump = astdump),  # Extra include directives
+        "",            # Base class
         ]
 
 astgraph_init = [
@@ -770,6 +775,7 @@ gen_args = [
 #include "{astdump}.h"
 """.format(astdump = astdump),  # Extra include directives
         ""
+        "",            # Base class
         ]
 
 astemit_init = [
@@ -803,6 +809,123 @@ void {gen_args2}(const char *title, std::ostream *os) {{
 ] # astemit_init
 
 if False:
+    handle_src_include_files(Initialization)
+    append(src_file, ['using namespace std::string_literals;'])
+    append(include_file, astemit_init)
+    handle_yaml(initial_yaml, gen_handler)
+    handle_src_include_files(Finalization)
+
+################################################################################
+
+def get_data_based_on_type(val_type, accessor):
+    e = get_enum_type(val_type)
+    if e != None:
+        return astdumpclass + '::GetEnum' + e + '(' + accessor + ')'
+    elif val_type == "LitData":
+        return astdumpclass + '::GetEnumLitData(' + accessor + ')'
+    elif val_type == "bool":
+        return 'std::to_string(' + accessor + ')'
+    elif val_type == 'unsigned int' or val_type == 'uint32_t' or val_type == 'uint64_t' \
+            or val_type == 'unsigned' or val_type == 'int' or val_type == 'int32_t' or val_type == 'int64_t' :
+        return 'std::to_string(' + accessor + ')'
+    elif val_type == 'const char *':
+        return 'std::to_string(' + accessor + ' ? std::string("\\"") + ' + accessor + ' + "\\"" : "null")'
+    return 'Warning: failed to get value with ' + val_type + ", " + accessor
+
+def short_name(node_type):
+    return node_type.replace('class ', '').replace('maplefe::', '').replace(' *', '*')
+
+# The follwoing gen_func_* and gen_call* functions are for AstStore
+#
+gen_func_decl_location = lambda: False
+gen_call_handle_values = lambda: True
+gen_func_declaration = lambda dictionary, node_name: \
+        "void " + gen_args[2] + node_name + "(" + node_name + "* node);"
+gen_func_definition = lambda dictionary, node_name: \
+        "void " + gen_args[1] + "::" + gen_args[2] + node_name + "(" + node_name + "* node) {" \
+        + ('' if node_name == "TreeNode" else 'WriteNum(\'N\', static_cast<int64_t>(node->GetKind()));')
+gen_call_child_node = lambda dictionary, node_name, field_name, node_type, accessor: \
+        'WriteNode(' + accessor + ');' if field_name != '' else \
+        gen_args[2] + short_name(node_type) + '(' + accessor + ');'
+gen_call_child_value = lambda dictionary, node_name, field_name, val_type, accessor: \
+        '//WriteNum(\'V\', ' + get_data_based_on_type(val_type, accessor) + ');'
+gen_call_children_node = lambda dictionary, node_name, field_name, node_type, accessor: \
+        'WriteNum(\'L\', ' + accessor + ');'
+gen_call_nth_child_node = lambda dictionary, node_name, field_name, node_type, accessor: \
+        'WriteNode(' + accessor + ');';
+gen_call_nth_child_value = lambda dictionary, node_name, field_name, val_type, accessor: \
+        '//WriteNum(\'V\', ' + get_data_based_on_type(val_type, accessor) + ');'
+gen_func_definition_end = lambda dictionary, node_name: \
+        astvisitorclass + '::Visit' + node_name + '(node);}' if node_name != "TreeNode" else '}'
+#
+gen_args = [
+        "gen_aststore", # Filename
+        "AstStore",     # Class name
+        "Store",        # Prefix of function name
+        """
+#include "{astvisitor}.h"
+#include <cstdint>
+namespace maplefe {{
+using AstBuffer  = std::vector<uint8_t>;
+using AstNodeVec = std::vector<TreeNode*>;
+}}
+""".format(astvisitor=astvisitor),
+        ": public " + astvisitorclass,            # Base class
+        ]
+
+astemit_init = [
+"""
+private:
+ASTModule  *mASTModule;
+AstBuffer   mAstBuf {{'M', 'P', 'L', 'A', 'S', 'T'}};
+BitVector   mVisited;
+
+public:
+{gen_args1}(ASTModule *m) : mASTModule(m) {{}}
+
+const std::vector<uint8_t>& GetAstBuf() const {{return mAstBuf;}}
+
+void {gen_args2}InAstBuf() {{
+  mAstBuf.erase(mAstBuf.begin()+6, mAstBuf.end());
+  for(auto it: mASTModule->mTrees)
+    VisitTreeNode(it->mRootNode);
+}}
+
+bool IsVisited(TreeNode* node) {{
+  if({astvisitorclass}::IsVisited(node))
+    return true;
+  {gen_args2}TreeNode(node);
+  return false;
+}}
+
+// Flags:
+//   'N': Beginning of a tree node
+//   'A': address of a child tree node
+//   'V': value of a field in a tree node
+//   'L': list/vector of chrildren in a tree node
+// The initial version will keep all flags, and some of them can be optimized out
+
+// LEB128, same as for MapleIR
+void WriteNum(uint8_t flag, int64_t x) {{
+  mAstBuf.push_back(flag);
+  while (x < -0x40 || x >= 0x40) {{
+    mAstBuf.push_back(static_cast<uint8_t>((static_cast<uint64_t>(x) & 0x7F) + 0x80));
+    x = x >> 7;
+  }}
+  mAstBuf.push_back(static_cast<uint8_t>(static_cast<uint64_t>(x) & 0x7F));
+}}
+
+void WriteNode(TreeNode *node) {{
+  if(node)
+    WriteNum('A', static_cast<int64_t>(node->GetNodeId()));
+  else
+    WriteNum('A', 0);
+}}
+
+""".format(gen_args1=gen_args[1], gen_args2=gen_args[2], astvisitorclass=astvisitorclass)
+] # astemit_init
+
+if True:
     handle_src_include_files(Initialization)
     append(src_file, ['using namespace std::string_literals;'])
     append(include_file, astemit_init)
