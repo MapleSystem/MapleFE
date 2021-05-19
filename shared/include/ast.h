@@ -524,8 +524,8 @@ private:
   TreeNode *mInit; // Init value
   DeclProp  mProp;
 public:
-  DeclNode() : mVar(NULL), mProp(DP_NA) {mKind = NK_Decl;}
-  DeclNode(TreeNode *id) : mVar(id), mProp(DP_NA) {mKind = NK_Decl;}
+  DeclNode() : mVar(NULL), mInit(nullptr), mProp(DP_NA) {mKind = NK_Decl;}
+  DeclNode(TreeNode *id) : mVar(id), mInit(nullptr), mProp(DP_NA) {mKind = NK_Decl;}
   ~DeclNode(){}
 
   TreeNode* GetVar() {return mVar;}
