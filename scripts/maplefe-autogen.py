@@ -729,7 +729,9 @@ handle_src_include_files(Finalization)
 
 def get_data_based_on_type(val_type, accessor):
     e = get_enum_type(val_type)
-    if e != None:
+    if e == "ASTScope *":
+        return e + ': " + "' + accessor + '");'
+    elif e != None:
         return astdumpclass + '::GetEnum' + e + '(' + accessor + ')'
     elif val_type == "LitData":
         return astdumpclass + '::GetEnumLitData(' + accessor + ')'
@@ -822,7 +824,9 @@ if False:
 
 def get_data_based_on_type(val_type, accessor):
     e = get_enum_type(val_type)
-    if e != None:
+    if e == "ASTScope *":
+        return '0 /* Error: Should not hit ASTScope. ' + e + ': ' + accessor + ' */'
+    elif e != None:
         return 'static_cast<int64_t>(' + accessor + ')'
     elif val_type == "LitData":
         return '0 /* Error: Should not hit LitData */'
@@ -893,14 +897,9 @@ const std::vector<uint8_t>& GetAstBuf() const {{return mAstBuf;}}
 
 void {gen_args2}InAstBuf() {{
   mAstBuf.erase(mAstBuf.begin()+6, mAstBuf.end());
-<<<<<<< HEAD
   mAstBuf.reserve(65536);
-  for(auto it: mASTModule->mTrees)
-    VisitTreeNode(it);
-=======
   for(unsigned i = 0; i < mASTModule->GetTreesNum(); i++)
     VisitTreeNode(mASTModule->GetTree(i));
->>>>>>> Replace ASTModule with ModuleNode.
 }}
 
 bool IsVisited(TreeNode* node) {{
