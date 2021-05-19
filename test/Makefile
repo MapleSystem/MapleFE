@@ -36,7 +36,7 @@ vpath %.cpp $(DIRS)
 .PHONY: mssetup
 
 $(SRCLANG): mssetup
-	./new_runtests.pl $(SRCLANG)
+	env LANG=en_US.UTF-8 ./new_runtests.pl $(SRCLANG)
 
 full:
 	make -C .. -j8
@@ -79,13 +79,13 @@ testms:
 	./msts_test.sh
 
 testmslocal: mssetup
-	./new_runtests.pl typescript TypeScript/tests/cases/compiler
+	env LANG=en_US.UTF-8 ./new_runtests.pl typescript TypeScript/tests/cases/compiler
 
 unit:
-	./new_runtests.pl typescript typescript/unit_tests
+	env LANG=en_US.UTF-8 ./new_runtests.pl typescript typescript/unit_tests
 
 ms: mssetup
-	./new_runtests.pl typescript typescript/ms_tests
+	env LANG=en_US.UTF-8 ./new_runtests.pl typescript typescript/ms_tests
 
 % : %.ts
 	@cp $< $(build)
