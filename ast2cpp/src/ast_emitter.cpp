@@ -530,21 +530,15 @@ std::string AstEmitter::AstEmitTemplateLiteralNode(TemplateLiteralNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str = "`"s;
-
-  for (unsigned i = 1; i < node->GetStringsNum(); i+=2) {
-    if(auto s = node->GetStringAtIndex(i))
-      str += "${"s + s + "}"s;
-  }
-
-  for (unsigned i = 0; i < node->GetStringsNum(); i+=2) {
+  auto snum = node->GetStringsNum();
+  auto nnum = node->GetTreesNum();
+  //MASSERT(num == nnum());
+  for (unsigned i = 1; i < snum; i+=2) {
     if(auto s = node->GetStringAtIndex(i))
       str += s;
-  }
-
-  for (unsigned i = 0; i < node->GetTreesNum(); ++i) {
-    if (auto n = node->GetTreeAtIndex(i)) {
-      str += " "s + AstEmitTreeNode(n);
-    }
+    if(i < nnum)
+      if (auto n = node->GetTreeAtIndex(i))
+        str += "${"s + AstEmitTreeNode(n) + "}"s;
   }
   str += "`"s;
   mPrecedence = '\030';
