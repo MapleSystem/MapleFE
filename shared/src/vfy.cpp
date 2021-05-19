@@ -53,10 +53,9 @@ void Verifier::Do() {
 
 void Verifier::VerifyGlobalScope() {
   mCurrScope = gModule.mRootScope;
-  std::vector<ASTTree*>::iterator tree_it = gModule.mTrees.begin();
+  std::vector<TreeNode*>::iterator tree_it = gModule.mTrees.begin();
   for (; tree_it != gModule.mTrees.end(); tree_it++) {
-    ASTTree *asttree = *tree_it;
-    TreeNode *tree = asttree->mRootNode;
+    TreeNode *tree = *tree_it;
     // Step 1. Try to add decl.
     mCurrScope->TryAddDecl(tree);
     // Step 2. Try to add type.

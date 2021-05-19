@@ -26,8 +26,7 @@ void AST_AST::Build() {
 
   if (mTrace) {
     for(auto it: gModule.mTrees) {
-      TreeNode *tnode = it->mRootNode;
-      tnode->Dump(0);
+      it->Dump(0);
       std::cout << std::endl;
     }
   }
@@ -77,7 +76,7 @@ void AST_AST::AdjustAST() {
   visitor.SetCurrentFunction(mHandler->GetFunction());
   visitor.SetCurrentBB(func->GetEntryBB());
   for(auto it: mHandler->GetASTModule()->mTrees) {
-    visitor.Visit(it->mRootNode);
+    visitor.Visit(it);
   }
 }
 

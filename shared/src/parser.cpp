@@ -506,7 +506,7 @@ ParseStatus Parser::ParseStmt() {
       gettimeofday(&start, NULL);
     ASTTree *tree = BuildAST();
     if (tree) {
-      gModule.AddTree(tree);
+      gModule.AddTree(tree->mRootNode);
     }
 
     if (mTraceTiming) {

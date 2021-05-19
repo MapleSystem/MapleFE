@@ -749,7 +749,7 @@ void AST_CFG::BuildCFG() {
   // Start to build CFG for current module
   visitor.InitializeFunction(func);
   for(auto it: mHandler->GetASTModule()->mTrees) {
-    visitor.Visit(it->mRootNode);
+    visitor.Visit(it);
   }
   visitor.FinalizeFunction();
 }

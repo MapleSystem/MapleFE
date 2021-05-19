@@ -36,7 +36,7 @@ void AST_DFA::BuildReachDefIn() {
   visitor.SetCurrentFunction(mHandler->GetFunction());
   visitor.SetCurrentBB(func->GetEntryBB());
   for(auto it: mHandler->GetASTModule()->mTrees) {
-    visitor.Visit(it->mRootNode);
+    visitor.Visit(it);
   }
 }
 

@@ -41,7 +41,7 @@ public:
     mOs = os;
     *mOs << "// [Beginning of AstEmitter: " << title << "\n// Filename: " << mASTModule->GetFileName() << "\n";
     for (auto it : mASTModule->mTrees)
-      *mOs << AstEmitTreeNode(it->mRootNode);
+      *mOs << AstEmitTreeNode(it);
     *mOs << "// End of AstEmitter]\n";
   }
 

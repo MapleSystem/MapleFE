@@ -27,15 +27,7 @@ ASTModule::ASTModule() {
 }
 
 ASTModule::~ASTModule() {
-  // free trees
-  std::vector<ASTTree*>::iterator it = mTrees.begin();
-  for (; it != mTrees.end(); it++) {
-    ASTTree *tree = *it;
-    if (tree)
-      delete tree;
-  }
   mTrees.clear();
-
   mImports.Release();
 }
 
@@ -72,10 +64,12 @@ ASTScope* ASTModule::NewScope(ASTScope *p) {
 
 void ASTModule::Dump() {
   std::cout << "============= Module ===========" << std::endl;
-  std::vector<ASTTree*>::iterator tree_it = mTrees.begin();
+  std::vector<TreeNode*>::iterator tree_it = mTrees.begin();
   for (; tree_it != mTrees.end(); tree_it++) {
-    ASTTree *tree = *tree_it;
+    DUMP0("== Sub Tree ==");
+    TreeNode *tree = *tree_it;
     tree->Dump(0);
+    DUMP_RETURN();
   }
 }
 }

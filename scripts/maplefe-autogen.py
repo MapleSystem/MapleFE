@@ -440,7 +440,7 @@ void Dump(const char *title, std::ostream *os) {{
   mOs = os;
   *mOs << "{gen_args1}: " << title << " {{\\n";
   for(auto it: mASTModule->mTrees)
-    {gen_args2}TreeNode(it->mRootNode);
+    {gen_args2}TreeNode(it);
   *mOs << "}}\\n";
 }}
 
@@ -643,8 +643,8 @@ void {gen_args2}(const char *title, std::ostream *os) {{
   *mOs << "digraph AST_Module {{\\nrankdir=LR;\\nModule [label=\\"Module\\\\n" << fn << "\\\\n" << title << "\\",shape=box];\\n";
   std::size_t idx = 1;
   for(auto it: mASTModule->mTrees) {{
-    *mOs << "Module -> " << NodeName(it->mRootNode,\'_\') << "[label=" << idx++ << "];\\n";
-    {gen_args2}TreeNode(it->mRootNode);
+    *mOs << "Module -> " << NodeName(it,\'_\') << "[label=" << idx++ << "];\\n";
+    {gen_args2}TreeNode(it);
   }}
   *mOs << "}}\\n";
 }}
@@ -794,7 +794,7 @@ void {gen_args2}(const char *title, std::ostream *os) {{
   mOs = os;
   *mOs << "// [Beginning of {gen_args1}: " << title << "\\n// Filename: " << mASTModule->GetFileName() << "\\n";
   for(auto it: mASTModule->mTrees)
-    *mOs << {gen_args2}TreeNode(it->mRootNode);
+    *mOs << {gen_args2}TreeNode(it);
     *mOs << "// End of AstEmitter]\\n";
   }}
 
@@ -888,7 +888,7 @@ const std::vector<uint8_t>& GetAstBuf() const {{return mAstBuf;}}
 void {gen_args2}InAstBuf() {{
   mAstBuf.erase(mAstBuf.begin()+6, mAstBuf.end());
   for(auto it: mASTModule->mTrees)
-    VisitTreeNode(it->mRootNode);
+    VisitTreeNode(it);
 }}
 
 bool IsVisited(TreeNode* node) {{

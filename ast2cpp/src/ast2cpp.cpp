@@ -30,7 +30,7 @@ void A2C::ProcessAST(bool trace_a2c) {
     std::cout << "srcLang : " << gModule.GetSrcLangString() << std::endl;
   }
   for(auto it: gModule.mTrees) {
-    TreeNode *tnode = it->mRootNode;
+    TreeNode *tnode = it;
     if (mTraceA2C) {
       tnode->Dump(0);
       std::cout << std::endl;

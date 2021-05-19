@@ -72,12 +72,12 @@ void A2M::ProcessAST(bool trace_a2m) {
   }
   // pass 1: collect class/interface/function decl
   for(auto it: gModule.mTrees) {
-    TreeNode *tnode = it->mRootNode;
+    TreeNode *tnode = it;
     ProcessNodeDecl(SK_Stmt, tnode, nullptr);
   }
   // pass 2: handle function def
   for(auto it: gModule.mTrees) {
-    TreeNode *tnode = it->mRootNode;
+    TreeNode *tnode = it;
     ProcessNode(SK_Stmt, tnode, nullptr);
   }
   if (mTraceA2m) { astdump.Dump("ProcessAST", &std::cout); }

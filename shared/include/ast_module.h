@@ -40,11 +40,7 @@ public:
   PackageNode             *mPackage;
   SmallVector<ImportNode*> mImports;
 public:
-  std::vector<ASTTree*>  mTrees;  // All trees in the module. There is no root tree
-                                  // which covers all the others.
-                                  // Everything else will be treated as a TreeNode, not a tree,
-                                  // even if it's a local class.
-                                  // Memory is released in ~ASTModule();
+  std::vector<TreeNode*>  mTrees;    // All trees in the module.
   ASTScope              *mRootScope; // the scope corresponding to a module. All other scopes
                                      // are children of mRootScope.
   ASTScopePool           mScopePool; // All the scopes are store in this pool. It also contains
@@ -66,7 +62,7 @@ public:
   std::string GetSrcLangString();
   void AddImport(ImportNode *imp) {mImports.PushBack(imp);}
 
-  void AddTree(ASTTree* t) { mTrees.push_back(t); }
+  void AddTree(TreeNode* t) { mTrees.push_back(t); }
 
   ASTScope* NewScope(ASTScope *p);
 

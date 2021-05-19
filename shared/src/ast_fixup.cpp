@@ -19,7 +19,7 @@ namespace maplefe {
 
 bool FixUpVisitor::FixUp() {
   for (auto it : mASTModule->mTrees)
-    Visit(it->mRootNode);
+    Visit(it);
   return mUpdated;
 }
 
