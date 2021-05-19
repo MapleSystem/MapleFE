@@ -30,6 +30,7 @@
 #ifndef __Token_H__
 #define __Token_H__
 
+#include <cstdint>
 #include <vector>
 #include "char.h"
 #include "stringutil.h"
@@ -67,6 +68,7 @@ struct LitData {
     bool   mBool;
     Char   mChar;
     unsigned mStrIdx;     // the string is allocated in gStringPool
+    int64_t  mInt64;      // for serialization
   }mData;
 };
 

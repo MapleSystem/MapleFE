@@ -820,17 +820,17 @@ if False:
 def get_data_based_on_type(val_type, accessor):
     e = get_enum_type(val_type)
     if e != None:
-        return astdumpclass + '::GetEnum' + e + '(' + accessor + ')'
+        return 'static_cast<int64_t>(' + accessor + ')'
     elif val_type == "LitData":
-        return astdumpclass + '::GetEnumLitData(' + accessor + ')'
+        return '0 /* Error: Should not hit LitData */'
     elif val_type == "bool":
-        return 'std::to_string(' + accessor + ')'
+        return 'static_cast<int64_t>(' + accessor + ')'
     elif val_type == 'unsigned int' or val_type == 'uint32_t' or val_type == 'uint64_t' \
             or val_type == 'unsigned' or val_type == 'int' or val_type == 'int32_t' or val_type == 'int64_t' :
-        return 'std::to_string(' + accessor + ')'
+        return 'static_cast<int64_t>(' + accessor + ')'
     elif val_type == 'const char *':
-        return 'std::to_string(' + accessor + ' ? std::string("\\"") + ' + accessor + ' + "\\"" : "null")'
-    return 'Warning: failed to get value with ' + val_type + ", " + accessor
+        return '0 /* Error: Should change const char * to StrIdx */'
+    return '0 /* Warning: failed to get value with ' + val_type + ", " + accessor + ' */'
 
 def short_name(node_type):
     return node_type.replace('class ', '').replace('maplefe::', '').replace(' *', '*')
@@ -843,20 +843,23 @@ gen_func_declaration = lambda dictionary, node_name: \
         "void " + gen_args[2] + node_name + "(" + node_name + "* node);"
 gen_func_definition = lambda dictionary, node_name: \
         "void " + gen_args[1] + "::" + gen_args[2] + node_name + "(" + node_name + "* node) {" \
-        + ('' if node_name == "TreeNode" else 'WriteNum(\'N\', static_cast<int64_t>(node->GetKind()));')
+        + ('' if node_name == "TreeNode" else 'WriteNum(\'N\', static_cast<int64_t>(node->GetKind()));'
+                + 'WriteTreeNode(node); // Base')
 gen_call_child_node = lambda dictionary, node_name, field_name, node_type, accessor: \
-        'WriteNode(' + accessor + ');' if field_name != '' else \
+        'WriteNode(' + accessor + '); // ' + field_name + ': ' + node_type if field_name != '' else \
         gen_args[2] + short_name(node_type) + '(' + accessor + ');'
 gen_call_child_value = lambda dictionary, node_name, field_name, val_type, accessor: \
-        '//WriteNum(\'V\', ' + get_data_based_on_type(val_type, accessor) + ');'
+        ('WriteNum(\'V\', static_cast<int64_t>(' + accessor + '.mType));' \
+         + 'WriteNum(\'V\', ' + accessor + '.mData.mInt64);' if val_type == 'LitData' else \
+         'WriteNum(\'V\', ' + get_data_based_on_type(val_type, accessor) + ');') \
+         + ' // ' + field_name + ': ' + val_type
 gen_call_children_node = lambda dictionary, node_name, field_name, node_type, accessor: \
-        'WriteNum(\'L\', ' + accessor + ');'
+        'WriteNum(\'L\', ' + accessor + '); // ' + field_name + ': ' + node_type
 gen_call_nth_child_node = lambda dictionary, node_name, field_name, node_type, accessor: \
-        'WriteNode(' + accessor + ');';
+        'WriteNode(' + accessor + '); // '  + field_name + ': ' + node_type
 gen_call_nth_child_value = lambda dictionary, node_name, field_name, val_type, accessor: \
-        '//WriteNum(\'V\', ' + get_data_based_on_type(val_type, accessor) + ');'
-gen_func_definition_end = lambda dictionary, node_name: \
-        astvisitorclass + '::Visit' + node_name + '(node);}' if node_name != "TreeNode" else '}'
+        'WriteNum(\'V\', ' + get_data_based_on_type(val_type, accessor) + '); // ' + field_name + ': ' + val_type
+gen_func_definition_end = lambda dictionary, node_name: '}'
 #
 gen_args = [
         "gen_aststore", # Filename
@@ -887,6 +890,7 @@ const std::vector<uint8_t>& GetAstBuf() const {{return mAstBuf;}}
 
 void {gen_args2}InAstBuf() {{
   mAstBuf.erase(mAstBuf.begin()+6, mAstBuf.end());
+  mAstBuf.reserve(65536);
   for(auto it: mASTModule->mTrees)
     VisitTreeNode(it);
 }}
@@ -925,9 +929,10 @@ void WriteNode(TreeNode *node) {{
 """.format(gen_args1=gen_args[1], gen_args2=gen_args[2], astvisitorclass=astvisitorclass)
 ] # astemit_init
 
-if True:
-    handle_src_include_files(Initialization)
-    append(src_file, ['using namespace std::string_literals;'])
-    append(include_file, astemit_init)
-    handle_yaml(initial_yaml, gen_handler)
-    handle_src_include_files(Finalization)
+handle_src_include_files(Initialization)
+append(src_file, ['using namespace std::string_literals;'])
+append(include_file, astemit_init)
+handle_yaml(initial_yaml, gen_handler)
+gen_args[2] = "Write"
+handle_yaml(treenode_yaml, gen_handler_ast_node)
+handle_src_include_files(Finalization)
