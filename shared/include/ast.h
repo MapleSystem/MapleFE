@@ -846,7 +846,7 @@ private:
 
 public:
   TemplateLiteralNode() {mKind = NK_TemplateLiteral;}
-  ~TemplateLiteralNode(){}
+  ~TemplateLiteralNode(){mStrings.Release(); mTrees.Release();}
 
   unsigned    GetStringsNum() {return mStrings.GetNum();}
   const char* GetStringAtIndex(unsigned i) {return mStrings.ValueAtIndex(i);}
