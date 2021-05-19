@@ -83,7 +83,7 @@ StringMapEntry *StringMap::LookupEntryFor(const std::string &S) {
     char *addr = mPool->Alloc(S);
     E->Addr = addr;
     E->StrIdx = mPool->mStringTable.size();
-    mPool->mStringTable.push_back(S);
+    mPool->mStringTable.push_back(addr);
     return E;
   }
   
@@ -95,10 +95,10 @@ StringMapEntry *StringMap::LookupEntryFor(const std::string &S) {
   }
    
   // We cannot find an existing string for 'S'. Need to allocate
-  char *Addr = mPool->Alloc(S);
+  char *addr = mPool->Alloc(S);
   unsigned idx = mPool->mStringTable.size();
-  mPool->mStringTable.push_back(S);
-  E = InsertEntry(Addr, idx, BucketNo);
+  mPool->mStringTable.push_back(addr);
+  E = InsertEntry(addr, idx, BucketNo);
   return E;
 } 
 
