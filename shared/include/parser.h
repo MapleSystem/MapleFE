@@ -252,7 +252,9 @@ public:
   bool mTracePatchWasSucc;  // trace patching was succ node.
   bool mTraceWarning;       // print the warning.
 
-  TreeNode *mLineModeRoot;  // For LineMode, the root node after Parse.
+  TreeNode *mNormalModeRoot;// For NormalMode, the root node after BuildAST.
+
+  TreeNode *mLineModeRoot;  // For LineMode, the root node after BuildAST.
   bool mLineMode;           // LineMode is for parsing a single line of source code.
                             // It could be from a string in memory, or read from URL.
                             // It's common in dynamic loading of code in web application.
@@ -341,7 +343,16 @@ private:
   void SupplementalSortOut(AppealNode *root, AppealNode *target);
 
   // Build AST, for each top level construct.
-  ASTTree*  BuildAST();
+  TreeNode* BuildAST();
+  // We need a set of functions to deal with some common manipulations of
+  // most languages during AST Building. You can disable it if some functions
+  // are not what you want.
+  TreeNode* NewTreeNode(AppealNode*);
+  TreeNode* Manipulate(AppealNode*);
+  TreeNode* Manipulate2Binary(TreeNode*, TreeNode*);
+  TreeNode* Manipulate2Cast(TreeNode*, TreeNode*);
+  TreeNode* BuildBinaryOperation(TreeNode *, TreeNode *, OprId);
+  TreeNode* BuildPassNode();
 
   // Handle TemplateLiteralNodes
   void ParseTemplateLiterals();

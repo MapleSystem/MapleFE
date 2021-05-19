@@ -213,6 +213,7 @@ Parser::Parser(const char *name) : filename(name) {
   mPending = 0;
   mEndOfFile = false;
 
+  mNormalModeRoot = NULL;
   mLineModeRoot = NULL;
   mLineMode = false;
 
@@ -504,10 +505,9 @@ ParseStatus Parser::ParseStmt() {
 
     if (mTraceTiming)
       gettimeofday(&start, NULL);
-    ASTTree *tree = BuildAST();
-    if (tree) {
-      gModule.AddTree(tree->mRootNode);
-    }
+    TreeNode *tree = BuildAST();
+    if (tree)
+      gModule.AddTree(tree);
 
     if (mTraceTiming) {
       gettimeofday(&stop, NULL);
@@ -2257,9 +2257,9 @@ AppealNode* Parser::SimplifyShrinkEdges(AppealNode *node) {
 //                             Build the AST
 ////////////////////////////////////////////////////////////////////////////////////
 
-ASTTree* Parser::BuildAST() {
+TreeNode* Parser::BuildAST() {
   mLineModeRoot = NULL;
-  ASTTree *tree = new ASTTree();
+  mNormalModeRoot = NULL;
 
   std::stack<AppealNode*> appeal_stack;
   appeal_stack.push(mRootNode->mSortedChildren[0]);
@@ -2282,29 +2282,226 @@ ASTTree* Parser::BuildAST() {
     if (children_done) {
       // Create tree node when there is a rule table, or meanful tokens.
       MASSERT(!appeal_node->GetAstTreeNode());
-      TreeNode *sub_tree = tree->NewTreeNode(appeal_node);
+      TreeNode *sub_tree = NewTreeNode(appeal_node);
       if (sub_tree) {
         appeal_node->SetAstTreeNode(sub_tree);
-        // mRootNode is overwritten each time until the last one which is
+        // mNormalModeRoot is overwritten each time until the last one which is
         // the real root node.
-        tree->mRootNode = sub_tree;
+        mNormalModeRoot = sub_tree;
       }
-
       // pop out the 'appeal_node'
       appeal_node->SetAstCreated();
       appeal_stack.pop();
     }
   }
 
-  // It could be an empty statement like: ;
-  if (!tree->mRootNode) {
-    delete tree;
-    tree = NULL;
-  } else {
-    mLineModeRoot = tree->mRootNode;
+  // The tree could be an empty statement like: ;
+
+  if (mLineMode)
+    mLineModeRoot = mNormalModeRoot;
+
+  return mNormalModeRoot;
+}
+
+// Create tree node. Its children have been created tree nodes.
+// There are couple issueshere.
+//
+// 1. An sorted AppealNode could have NO tree node, because it may have NO RuleAction to
+//    create the sub tree. This happens if the RuleTable is just a temporary intermediate
+//    table created by Autogen, or its rule is just ONEOF without real syntax. Here
+//    is an example.
+//
+//       The AST after BuildAST() for a simple statment: c=a+b;
+//
+//       ======= Simplify Trees Dump SortOut =======
+//       [1] Table TblExpressionStatement@0: 2,3,
+//       [2:1] Table TblAssignment@0: 4,5,6,
+//       [3] Token
+//       [4:1] Token
+//       [5:2] Token
+//       [6:3] Table TblArrayAccess_sub1@2: 7,8,  <-- supposed to get a binary expression
+//       [7:1] Token                              <-- a
+//       [8:2] Table TblUnaryExpression_sub1@3: 9,10, <-- +b
+//       [9] Token
+//       [10:2] Token
+//
+//    Node [1] won't have a tree node at all since it has no Rule Action attached.
+//    Node [6] won't have a tree node either.
+//
+// 2. A binary operation like a+b could be parsed as (1) expression: a, and (2) a
+//    unary operation: +b. This is because we parse them in favor to ArrayAccess before
+//    Binary Operation. Usually to handle this issue, in some system like ANTLR,
+//    they require you to list the priority, by writing rules from higher priority to
+//    lower priority.
+//
+//    We are going to do a consolidation of the sub-trees, by converting smaller trees
+//    to a more compact bigger trees. However, to do this we want to set some rules.
+//    *) The parent AppealNode of these sub-trees has no tree node. So the conversion
+//       helps make the tree complete.
+
+TreeNode* Parser::NewTreeNode(AppealNode *appeal_node) {
+  TreeNode *sub_tree = NULL;
+
+  if (appeal_node->IsToken()) {
+    sub_tree = gASTBuilder.CreateTokenTreeNode(appeal_node->GetToken());
+    return sub_tree;
   }
 
-  return tree;
+  RuleTable *rule_table = appeal_node->GetTable();
+
+  for (unsigned i = 0; i < rule_table->mNumAction; i++) {
+    Action *action = rule_table->mActions + i;
+    gASTBuilder.mActionId = action->mId;
+    gASTBuilder.ClearParams();
+
+    for (unsigned j = 0; j < action->mNumElem; j++) {
+      // find the appeal node child
+      unsigned elem_idx = action->mElems[j];
+      AppealNode *child = appeal_node->GetSortedChildByIndex(elem_idx);
+      Param p;
+      p.mIsEmpty = true;
+      // There are 3 cases to handle.
+      // 1. child is token, we pass the token to param.
+      // 2. child is a sub appeal tree, but has no legal AST tree. For example,
+      //    a parameter list: '(' + param-lists + ')'.
+      //    if param-list is empty, it has no AST tree.
+      //    In this case, we sset mIsEmpty to true.
+      // 3. chidl is a sub appeal tree, and has a AST tree too.
+      if (child) {
+        TreeNode *tree_node = child->GetAstTreeNode();
+        if (!tree_node) {
+          if (child->IsToken()) {
+            p.mIsEmpty = false;
+            p.mIsTreeNode = false;
+            p.mData.mToken = child->GetToken();
+          }
+        } else {
+          p.mIsEmpty = false;
+          p.mIsTreeNode = true;
+          p.mData.mTreeNode = tree_node;
+        }
+      }
+      gASTBuilder.AddParam(p);
+    }
+
+    // For multiple actions of a rule, there should be only action which create tree.
+    // The others are just for adding attribute or else, and return the same tree
+    // with additional attributes.
+    sub_tree = gASTBuilder.Build();
+  }
+
+  if (sub_tree)
+    return sub_tree;
+
+  // It's possible that the Rule has no action, meaning it cannot create tree node.
+  // Now we have to do some manipulation. Please check if you need all of them.
+  sub_tree = Manipulate(appeal_node);
+
+  // It's possible that the sub tree is actually empty. For example, in a Parameter list
+  // ( params ). If 'params' is empty, it returns NULL.
+
+  return sub_tree;
+}
+
+// It's possible that we get NULL tree.
+TreeNode* Parser::Manipulate(AppealNode *appeal_node) {
+  TreeNode *sub_tree = NULL;
+
+  std::vector<TreeNode*> child_trees;
+  std::vector<AppealNode*>::iterator cit = appeal_node->mSortedChildren.begin();
+  for (; cit != appeal_node->mSortedChildren.end(); cit++) {
+    AppealNode *a_node = *cit;
+    TreeNode *t_node = a_node->GetAstTreeNode();
+    if (t_node)
+      child_trees.push_back(t_node);
+  }
+
+  // If we have one and only one child's tree node, we take it.
+  if (child_trees.size() == 1) {
+    sub_tree = child_trees[0];
+    if (sub_tree)
+      return sub_tree;
+    else
+      MERROR("We got a broken AST tree, not connected sub tree.");
+  }
+
+  // For the tree having two children, there are a few approaches to further
+  // manipulate them in order to obtain better AST.
+  //
+  // 1. There are cases like (type)value, but they are not recoganized as cast.
+  //    Insteand they are seperated into two nodes, one is (type), the other value.
+  //    So we define ParenthesisNode for (type), and build a CastNode over here.
+  //
+  // 2. There are cases like a+b could be parsed as "a" and "+b", a symbol and a
+  //    unary operation. However, we do prefer binary operation than unary. So a
+  //    combination is needed here, especially when the parent node is NULL.
+  if (child_trees.size() == 2) {
+    TreeNode *child_a = child_trees[0];
+    TreeNode *child_b = child_trees[1];
+
+    sub_tree = Manipulate2Cast(child_a, child_b);
+    if (sub_tree)
+      return sub_tree;
+
+    sub_tree = Manipulate2Binary(child_a, child_b);
+    if (sub_tree)
+      return sub_tree;
+  }
+
+  // In the end, if we still have no suitable solution to create the tree,
+  //  we will put subtrees into a PassNode to pass to parent.
+  if (child_trees.size() > 0) {
+    PassNode *pass = (PassNode*)BuildPassNode();
+    std::vector<TreeNode*>::iterator child_it = child_trees.begin();
+    for (; child_it != child_trees.end(); child_it++)
+      pass->AddChild(*child_it);
+    return pass;
+  }
+
+  // It's possible that we get a Null tree.
+  return sub_tree;
+}
+
+TreeNode* Parser::Manipulate2Cast(TreeNode *child_a, TreeNode *child_b) {
+  if (child_a->IsParenthesis()) {
+    ParenthesisNode *type = (ParenthesisNode*)child_a;
+    CastNode *n = (CastNode*)gTreePool.NewTreeNode(sizeof(CastNode));
+    new (n) CastNode();
+    n->SetDestType(type->GetExpr());
+    n->SetExpr(child_b);
+    return n;
+  }
+  return NULL;
+}
+
+TreeNode* Parser::Manipulate2Binary(TreeNode *child_a, TreeNode *child_b) {
+  if (child_b->IsUnaOperator()) {
+    UnaOperatorNode *unary = (UnaOperatorNode*)child_b;
+    unsigned property = GetOperatorProperty(unary->GetOprId());
+    if ((property & Binary) && (property & Unary)) {
+      std::cout << "Convert unary --> binary" << std::endl;
+      TreeNode *unary_sub = unary->GetOpnd();
+      TreeNode *binary = BuildBinaryOperation(child_a, unary_sub, unary->GetOprId());
+      return binary;
+    }
+  }
+  return NULL;
+}
+
+TreeNode* Parser::BuildBinaryOperation(TreeNode *childA, TreeNode *childB, OprId id) {
+  BinOperatorNode *n = (BinOperatorNode*)gTreePool.NewTreeNode(sizeof(BinOperatorNode));
+  new (n) BinOperatorNode(id);
+  n->SetOpndA(childA);
+  n->SetOpndB(childB);
+  childA->SetParent(n);
+  childB->SetParent(n);
+  return n;
+}
+
+TreeNode* Parser::BuildPassNode() {
+  PassNode *n = (PassNode*)gTreePool.NewTreeNode(sizeof(PassNode));
+  new (n) PassNode();
+  return n;
 }
 
 ////////////////////////////////////////////////////////////////////////////
