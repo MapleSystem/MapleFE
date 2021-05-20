@@ -43,8 +43,13 @@ char* ContainerMemPool::AddrOfIndex(unsigned index) {
 //                               Bit Vector
 ////////////////////////////////////////////////////////////////////////////////
 
-BitVector::BitVector() {
+BitVector::BitVector() : mBVSize(0) {
   SetBlockSize(1024);
+}
+
+BitVector::BitVector(unsigned n) : mBVSize(n) {
+  SetBlockSize(1024);
+  Alloc(n);
 }
 
 void BitVector::ClearBit(unsigned idx) {
@@ -127,4 +132,46 @@ bool BitVector::GetBit(unsigned idx) {
     return false;
 }
 
+// bit wise EQUAL
+bool BitVector::Equal(BitVector *bv) {
+  char *addr = mBlocks->addr;
+  char *bvaddr = bv->mBlocks->addr;
+  if (mBVSize != bv->mBVSize) {
+    return false;
+  }
+
+  MASSERT(mBVSize < 1024 && "NYI: BitVector length > 1024");
+
+  for (int i = 0; i < (mBVSize + 3)/4; i++) {
+    if (*(unsigned *)(addr + i*4) != *(unsigned*)(bvaddr + i*4)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+// bit wise AND
+void BitVector::And(BitVector *bv) {
+  char *addr = mBlocks->addr;
+  char *bvaddr = bv->mBlocks->addr;
+  MASSERT(mBVSize == bv->mBVSize && "BitVector length not equal");
+  MASSERT(mBVSize < 1024 && "NYI: BitVector length > 1024");
+
+  for (int i = 0; i < (mBVSize + 3)/4; i++) {
+    *(unsigned *)(addr + i*4) &= *(unsigned*)(bvaddr + i*4);
+  }
+}
+
+// bit wise OR
+void BitVector::Or(BitVector *bv) {
+  char *addr = mBlocks->addr;
+  char *bvaddr = bv->mBlocks->addr;
+  MASSERT(mBVSize == bv->mBVSize && "BitVector length not equal");
+  MASSERT(mBVSize < 1024 && "NYI: BitVector length > 1024");
+
+  for (int i = 0; i < (mBVSize + 3)/4; i++) {
+    *(unsigned *)(addr + i*4) |= *(unsigned*)(bvaddr + i*4);
+  }
+}
 }

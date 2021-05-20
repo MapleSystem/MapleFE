@@ -35,6 +35,7 @@
 #include <type_traits>
 #include "mempool.h"
 #include "massert.h"
+#include "macros.h"
 
 namespace maplefe {
 
@@ -929,15 +930,22 @@ public:
 
 class BitVector : public MemPool {
 private:
+  unsigned mBVSize;         // number of bits
   char* GetAddr(unsigned);  // return the address of bit
 public:
   BitVector();
+  BitVector(unsigned);
   ~BitVector(){}
 
   void ClearAll() {WipeOff();}
   void ClearBit(unsigned);
   void SetBit(unsigned);
   bool GetBit(unsigned);
+  void SetBVSize(unsigned i) {mBVSize = i;}
+  unsigned GetBVSize() {return mBVSize;}
+  bool Equal(BitVector *bv);
+  void And(BitVector *bv);
+  void Or(BitVector *bv);
 };
 
 }
