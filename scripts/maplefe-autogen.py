@@ -372,6 +372,9 @@ def get_data_based_on_type(val_type, accessor):
         return val_type + ', ", ' + accessor + ');'
     elif val_type == 'unsigned int' or val_type == 'uint32_t' or val_type == 'uint64_t' \
             or val_type == 'unsigned' or val_type == 'int' or val_type == 'int32_t' or val_type == 'int64_t' :
+        if accessor.find("GetStrIdx()") >= 0:
+            return val_type + ', " + std::to_string(' + accessor + ') + " => " + (' + accessor \
+                    + '? "\\"" + gStringPool.GetStringFromStrIdx(' + accessor + ') + "\\"": "null"));'
         return val_type + ', " + std::to_string(' + accessor + '));'
     elif val_type == 'const char *':
         return 'const char*, " + (' + accessor + ' ? std::string("\\"") + ' + accessor + ' + "\\"" : "null"));'
