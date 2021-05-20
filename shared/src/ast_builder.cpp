@@ -1184,11 +1184,16 @@ TreeNode* ASTBuilder::BuildArrayElement() {
   Param p_array = mParams[0];
   MASSERT(p_array.mIsTreeNode);
   TreeNode *array = p_array.mData.mTreeNode;
-  MASSERT(array->IsIdentifier());
+  MASSERT(array->IsIdentifier() || array->IsArrayElement());
 
-  ArrayElementNode *array_element = (ArrayElementNode*)gTreePool.NewTreeNode(sizeof(ArrayElementNode));
-  new (array_element) ArrayElementNode();
-  array_element->SetArray((IdentifierNode*)array);
+  ArrayElementNode *array_element = NULL;
+  if (array->IsIdentifier()) {
+    array_element = (ArrayElementNode*)gTreePool.NewTreeNode(sizeof(ArrayElementNode));
+    new (array_element) ArrayElementNode();
+    array_element->SetArray((IdentifierNode*)array);
+  } else {
+    array_element = (ArrayElementNode*)array;
+  }
 
   unsigned num = mParams.size() - 1;
   for (unsigned i = 0; i < num; i++) {
@@ -1225,7 +1230,7 @@ TreeNode* ASTBuilder::BuildArrayLiteral() {
     ExprListNode *el = (ExprListNode*)literals;
     for (unsigned i = 0; i < el->GetExprsNum(); i++) {
       TreeNode *expr = el->GetExprAtIndex(i);
-      MASSERT(expr->IsLiteral());
+      MASSERT(expr->IsLiteral() || expr->IsArrayLiteral());
       array_literal->AddLiteral(expr);
     }
   }

@@ -695,6 +695,7 @@ public:
 
 
 // Array literal is [1, 2 , 0, -4]. It's an arrya of literals.
+// It could also be multi-dim array literal like [[1,2],[2,3]]
 class ArrayLiteralNode : public TreeNode {
 private:
   SmallVector<TreeNode*> mLiterals;
