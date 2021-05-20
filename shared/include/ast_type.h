@@ -95,12 +95,9 @@ private:
   SmallVector<IdentifierNode*> mTypeArguments;
 
 public:
-  UserTypeNode() : mId(NULL), mChildA(NULL), mChildB(NULL), mType(UT_Regular), mDims(NULL) {
-    mKind = NK_UserType;
-  }
-  UserTypeNode(TreeNode *n) : mId(n), mChildA(NULL), mChildB(NULL), mType(UT_Regular), mDims(NULL) {
-    mKind = NK_UserType;
-  }
+  UserTypeNode(TreeNode *n) : TreeNode(NK_UserType),
+    mId(n), mChildA(NULL), mChildB(NULL), mType(UT_Regular), mDims(NULL) {}
+  UserTypeNode() : UserTypeNode(NULL) {}
   ~UserTypeNode(){Release();}
 
   TreeNode* GetId() {return mId;}
@@ -146,7 +143,7 @@ class PrimTypeNode : public TreeNode {
 private:
   TypeId    mPrimType; // primitive type
 public:
-  PrimTypeNode() {mKind = NK_PrimType;}
+  PrimTypeNode() : TreeNode(NK_PrimType) {}
   ~PrimTypeNode(){}
 
   TypeId    GetPrimType()     {return mPrimType;}
@@ -161,7 +158,7 @@ private:
   PrimTypeNode  *mPrim;
   DimensionNode *mDims;
 public:
-  PrimArrayTypeNode() : mPrim(NULL), mDims(NULL) {mKind = NK_PrimArrayType;}
+  PrimArrayTypeNode() : TreeNode(NK_PrimArrayType), mPrim(NULL), mDims(NULL) {}
   ~PrimArrayTypeNode(){}
 
   void SetPrim(PrimTypeNode *p) {mPrim = p;}

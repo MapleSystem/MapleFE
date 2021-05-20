@@ -361,10 +361,10 @@ namespace maplefe {{
 ###################################################################################################
 
 def get_data_based_on_type(val_type, accessor):
+    if val_type[-10:] == "ASTScope *" or val_type[-12:] == "ASTScopePool":
+        return val_type + ': skipped");'
     e = get_enum_type(val_type)
-    if e == "ASTScope *":
-        return e + ': " + "' + accessor + '");'
-    elif e != None:
+    if e != None:
         return e + ': " + GetEnum' + e + '(' + accessor + '));'
     elif val_type == "LitData":
         return 'LitData: LitId, " + GetEnumLitId(' + accessor + '.mType) + ", " + GetEnumLitData(' + accessor + '));'
@@ -441,9 +441,7 @@ indstr.at(i) = \'.\';
 void Dump(const char *title, std::ostream *os) {{
   mOs = os;
   *mOs << "{gen_args1}: " << title << " {{\\n";
-  for(unsigned i = 0; i < mASTModule->GetTreesNum(); i++) {{
-    {gen_args2}TreeNode(mASTModule->GetTree(i));
-  }}
+  {gen_args2}TreeNode(mASTModule);
   *mOs << "}}\\n";
 }}
 

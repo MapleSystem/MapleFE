@@ -81,8 +81,10 @@ protected:
   bool      mIsStmt;  // if a node is a statement
 
 public:
-  TreeNode() : mKind(NK_Null), mLabel(NULL),
-               mParent(NULL), mStrIdx(0), mIsStmt(false) {}
+  TreeNode(NodeKind k, unsigned i)
+    : mKind(k), mLabel(NULL), mParent(NULL), mStrIdx(i), mIsStmt(false) {}
+  TreeNode(NodeKind k) : TreeNode(k, 0) {}
+  //TreeNode() : TreeNode(NK_Null, 0) {}
   virtual ~TreeNode() {}
 
 #undef  NODEKIND
@@ -129,8 +131,8 @@ class PackageNode : public TreeNode {
 private:
   TreeNode *mPackage;
 public:
-  PackageNode(){mKind = NK_Package;}
-  PackageNode(unsigned id) {mKind = NK_Package; mStrIdx = id;}
+  PackageNode() : TreeNode(NK_Package) {}
+  PackageNode(unsigned id) : TreeNode(NK_Package, id) {}
   ~PackageNode() {}
 
   TreeNode* GetPackage() {return mPackage;}
@@ -164,8 +166,8 @@ private:
   TreeNode *mAfter;       // name after 'as'
 
 public:
-  XXportAsPairNode() : mIsDefault(false), mIsEverything(false),
-                       mBefore(NULL), mAfter(NULL) {mKind = NK_XXportAsPair;}
+  XXportAsPairNode() : TreeNode(NK_XXportAsPair),
+    mIsDefault(false), mIsEverything(false), mBefore(NULL), mAfter(NULL) {}
   ~XXportAsPairNode() {}
 
   bool IsDefault()    {return mIsDefault;}
@@ -196,7 +198,7 @@ private:
   TreeNode       *mTarget;    // the exported package in Java or module in JS
   SmallVector<XXportAsPairNode*> mPairs;
 public:
-  ExportNode() : mTarget(NULL) {mKind = NK_Export;}
+  ExportNode() : TreeNode(NK_Export), mTarget(NULL) {}
   ~ExportNode(){}
 
   void SetTarget(TreeNode *t) {mTarget = t;}
@@ -253,7 +255,7 @@ private:
   TreeNode       *mTarget;
 
 public:
-  ImportNode() {mStrIdx = 0; mProperty = ImpNone; mKind = NK_Import;}
+  ImportNode() : TreeNode(NK_Import), mProperty(ImpNone) {}
   ~ImportNode(){mPairs.Release();}
 
   void SetProperty(ImportProperty p) {mProperty = p;}
@@ -310,9 +312,9 @@ private:
   OprId     mOprId;
   TreeNode *mOpnd;
 public:
-  UnaOperatorNode(OprId id) : mOprId(id), mOpnd(NULL), mIsPost(false)
-    {mKind = NK_UnaOperator;}
-  UnaOperatorNode() : mOpnd(NULL), mIsPost(false) {mKind = NK_UnaOperator;}
+  UnaOperatorNode(OprId id) : TreeNode(NK_UnaOperator),
+    mOprId(id), mOpnd(NULL), mIsPost(false) {}
+  UnaOperatorNode() : UnaOperatorNode(OPR_NA) {}
   ~UnaOperatorNode() {}
 
   void SetIsPost(bool b)    {mIsPost = b;}
@@ -334,8 +336,8 @@ private:
   TreeNode *mOpndA;
   TreeNode *mOpndB;
 public:
-  BinOperatorNode(OprId id) : mOprId(id) {mKind = NK_BinOperator;}
-  BinOperatorNode() {mKind = NK_BinOperator;}
+  BinOperatorNode(OprId id) : TreeNode(NK_BinOperator), mOprId(id) {}
+  BinOperatorNode() : BinOperatorNode(OPR_NA) {}
   ~BinOperatorNode() {}
 
   OprId     GetOprId() {return mOprId;}
@@ -357,7 +359,7 @@ private:
   TreeNode *mOpndB;
   TreeNode *mOpndC;
 public:
-  TerOperatorNode() {mKind = NK_TerOperator;}
+  TerOperatorNode() : TreeNode(NK_TerOperator) {}
   ~TerOperatorNode() {}
 
   TreeNode* GetOpndA() {return mOpndA;}
@@ -388,7 +390,7 @@ private:
   BlockNode *mBody;                // When body is not empty, it's an
                                    // anonymous class.
 public:
-  NewNode() : mId(NULL), mBody(NULL) {mKind = NK_New;}
+  NewNode() : TreeNode(NK_New), mId(NULL), mBody(NULL) {}
   ~NewNode() {mArgs.Release();}
 
   TreeNode* GetId()          {return mId;}
@@ -409,7 +411,7 @@ class DeleteNode : public TreeNode {
 private:
   TreeNode *mExpr;
 public:
-  DeleteNode() {mExpr = NULL; mKind = NK_Delete;}
+  DeleteNode() : TreeNode(NK_Delete), mExpr(NULL) {}
   ~DeleteNode(){}
 
   TreeNode* GetExpr()            {return mExpr;}
@@ -447,7 +449,7 @@ class DimensionNode : public TreeNode {
 private:
   SmallVector<unsigned> mDimensions;
 public:
-  DimensionNode() {mKind = NK_Dimension;}
+  DimensionNode() : TreeNode(NK_Dimension) {}
   ~DimensionNode(){Release();}
 
   unsigned GetDimensionsNum() {return mDimensions.GetNum();}
@@ -469,12 +471,9 @@ private:
   TreeNode      *mInit; // Init value
   DimensionNode *mDims;
 public:
-  IdentifierNode(unsigned id) : mType(NULL), mInit(NULL), mDims(NULL){
-    mKind = NK_Identifier;
-    SetStrIdx(id); }
-  IdentifierNode(unsigned id, TreeNode *t) : mType(t), mInit(NULL), mDims(NULL) {
-    mKind = NK_Identifier;
-    SetStrIdx(id); }
+  IdentifierNode(unsigned id, TreeNode *t) : TreeNode(NK_Identifier, id),
+    mType(t), mInit(NULL), mDims(NULL) {}
+  IdentifierNode(unsigned id) : IdentifierNode(id, NULL) {}
   ~IdentifierNode(){}
 
   TreeNode*   GetType() {return mType;}
@@ -524,8 +523,9 @@ private:
   TreeNode *mInit; // Init value
   DeclProp  mProp;
 public:
-  DeclNode() : mVar(NULL), mInit(nullptr), mProp(DP_NA) {mKind = NK_Decl;}
-  DeclNode(TreeNode *id) : mVar(id), mInit(nullptr), mProp(DP_NA) {mKind = NK_Decl;}
+  DeclNode(TreeNode *id) : TreeNode(NK_Decl),
+    mVar(id), mInit(nullptr), mProp(DP_NA) {}
+  DeclNode() : DeclNode(NULL) {}
   ~DeclNode(){}
 
   TreeNode* GetVar() {return mVar;}
@@ -561,6 +561,8 @@ class AnnotationTypeNode : public TreeNode {
 private:
   IdentifierNode *mId;
 public:
+  AnnotationTypeNode() : TreeNode(NK_AnnotationType) {}
+  ~AnnotationTypeNode() {}
   IdentifierNode* GetId() {return mId;}
   void SetId(IdentifierNode *n) {mId = n;}
   void Dump(unsigned);
@@ -576,8 +578,7 @@ private:
   AnnotationTypeNode *mType;
   TreeNode           *mExpr;
 public:
-  AnnotationNode() : mId(NULL), mType(NULL), mExpr(NULL) {
-    mKind = NK_Annotation;}
+  AnnotationNode() : TreeNode(NK_Annotation), mId(NULL), mType(NULL), mExpr(NULL) {}
   ~AnnotationNode(){}
 
   IdentifierNode* GetId() {return mId;}
@@ -598,7 +599,7 @@ private:
   TreeNode *mDestType;
   TreeNode *mExpr;
 public:
-  CastNode() : mDestType(NULL), mExpr(NULL) {mKind = NK_Cast;}
+  CastNode() : TreeNode(NK_Cast), mDestType(NULL), mExpr(NULL) {}
   ~CastNode(){}
 
   TreeNode* GetDestType() {return mDestType;}
@@ -627,7 +628,7 @@ class ParenthesisNode : public TreeNode {
 private:
   TreeNode *mExpr;
 public:
-  ParenthesisNode() : mExpr(NULL) {mKind = NK_Parenthesis;}
+  ParenthesisNode() : TreeNode(NK_Parenthesis), mExpr(NULL) {}
   ~ParenthesisNode(){}
 
   TreeNode* GetExpr() {return mExpr;}
@@ -647,7 +648,7 @@ private:
   TreeNode       *mUpper; // The upper enclosing structure
   IdentifierNode *mField;
 public:
-  FieldNode() : TreeNode(), mField(NULL), mUpper(NULL) {mKind = NK_Field;}
+  FieldNode() : TreeNode(NK_Field), mField(NULL), mUpper(NULL) {}
   ~FieldNode(){}
 
   IdentifierNode* GetField() {return mField;}
@@ -677,7 +678,7 @@ private:
   IdentifierNode        *mArray;
   SmallVector<TreeNode*> mExprs;  // index expressions.
 public:
-  ArrayElementNode() {mKind = NK_ArrayElement; mArray = NULL;}
+  ArrayElementNode() : TreeNode(NK_ArrayElement), mArray(NULL) {}
   ~ArrayElementNode() {Release();}
 
   IdentifierNode* GetArray()                  {return mArray;}
@@ -698,7 +699,7 @@ class ArrayLiteralNode : public TreeNode {
 private:
   SmallVector<TreeNode*> mLiterals;
 public:
-  ArrayLiteralNode() {mKind = NK_ArrayLiteral;}
+  ArrayLiteralNode() : TreeNode(NK_ArrayLiteral) {}
   ~ArrayLiteralNode() {Release();}
 
   unsigned  GetLiteralsNum()       {return mLiterals.GetNum();}
@@ -729,8 +730,8 @@ private:
   IdentifierNode *mStructId;
   SmallVector<IdentifierNode*> mFields;
 public:
-  StructNode() {mKind = NK_Struct; mStrIdx = 0; mProp = SProp_NA;}
-  StructNode(IdentifierNode *n) {mKind = NK_Struct; mStructId = n; mProp = SProp_NA;}
+  StructNode(IdentifierNode *n) : TreeNode(NK_Struct), mStructId(n), mProp(SProp_NA) {}
+  StructNode() : StructNode(NULL) {}
   ~StructNode() {Release();}
 
   StructProp GetProp() {return mProp;}
@@ -760,7 +761,7 @@ public:
   IdentifierNode* GetFieldName() {return mFieldName;}
   TreeNode* GetLiteral() {return mLiteral;}
 
-  FieldLiteralNode() {mKind = NK_FieldLiteral;}
+  FieldLiteralNode() : TreeNode(NK_FieldLiteral) {}
   ~FieldLiteralNode(){}
 };
 
@@ -768,7 +769,7 @@ class StructLiteralNode : public TreeNode {
 private:
   SmallVector<FieldLiteralNode*> mFields;
 public:
-  StructLiteralNode() {mKind = NK_StructLiteral;}
+  StructLiteralNode() : TreeNode(NK_StructLiteral) {}
   ~StructLiteralNode(){Release();}
 
   unsigned          GetFieldsNum() {return mFields.GetNum();}
@@ -789,7 +790,7 @@ class VarListNode : public TreeNode {
 private:
   SmallVector<IdentifierNode*> mVars;
 public:
-  VarListNode() {mKind = NK_VarList;}
+  VarListNode() : TreeNode(NK_VarList) {}
   ~VarListNode() {}
 
   unsigned GetVarsNum() {return mVars.GetNum();}
@@ -812,7 +813,7 @@ class ExprListNode : public TreeNode {
 private:
   SmallVector<TreeNode*> mExprs;
 public:
-  ExprListNode() {mKind = NK_ExprList;}
+  ExprListNode() : TreeNode(NK_ExprList) {}
   ~ExprListNode() {}
 
   unsigned GetExprsNum() {return mExprs.GetNum();}
@@ -845,7 +846,7 @@ private:
   SmallVector<TreeNode*> mTrees;
 
 public:
-  TemplateLiteralNode() {mKind = NK_TemplateLiteral;}
+  TemplateLiteralNode() : TreeNode(NK_TemplateLiteral) {}
   ~TemplateLiteralNode(){mStrings.Release(); mTrees.Release();}
 
   unsigned    GetStringsNum() {return mStrings.GetNum();}
@@ -875,9 +876,7 @@ private:
   void InitName();
 
 public:
-  LiteralNode(LitData d) : mData(d) {
-    mKind = NK_Literal;
-  }
+  LiteralNode(LitData d) : TreeNode(NK_Literal), mData(d) {}
   ~LiteralNode(){}
 
   LitData GetData() {return mData;}
@@ -895,7 +894,7 @@ class ThrowNode : public TreeNode {
 private:
   SmallVector<TreeNode *> mExceptions;
 public:
-  ThrowNode() {mKind = NK_Throw;}
+  ThrowNode() : TreeNode(NK_Throw) {}
   ~ThrowNode(){}
 
   unsigned  GetExceptionsNum() {return mExceptions.GetNum();}
@@ -918,7 +917,7 @@ private:
   SmallVector<TreeNode *> mParams;  // In Java, this sould be exception node.
   BlockNode              *mBlock;
 public:
-  CatchNode() : mBlock(NULL) {mKind = NK_Catch;}
+  CatchNode() : TreeNode(NK_Catch), mBlock(NULL) {}
   ~CatchNode(){}
 
   BlockNode* GetBlock()       {return mBlock;}
@@ -936,7 +935,7 @@ class FinallyNode : public TreeNode {
 private:
   BlockNode              *mBlock;
 public:
-  FinallyNode() : mBlock(NULL) {mKind = NK_Finally;}
+  FinallyNode() : TreeNode(NK_Finally), mBlock(NULL) {}
   ~FinallyNode(){}
 
   BlockNode* GetBlock()       {return mBlock;}
@@ -952,7 +951,7 @@ private:
   SmallVector<CatchNode*> mCatches; // There could be >1 catches.
 
 public:
-  TryNode() : mBlock(NULL), mFinally(NULL) {mKind = NK_Try;}
+  TryNode() : TreeNode(NK_Try), mBlock(NULL), mFinally(NULL) {}
   ~TryNode(){}
 
   BlockNode* GetBlock()       {return mBlock;}
@@ -978,8 +977,8 @@ private:
   // right now I only put a name for it. It could have more properties.
   IdentifierNode *mException;
 public:
-  ExceptionNode() : mException(NULL) {mKind = NK_Exception;}
-  ExceptionNode(IdentifierNode *inode) : mException(inode) {mKind = NK_Exception;}
+  ExceptionNode(IdentifierNode *inode) : TreeNode(NK_Exception), mException(inode) {}
+  ExceptionNode() : ExceptionNode(NULL) {}
   ~ExceptionNode(){}
 
   IdentifierNode* GetException()       {return mException;}
@@ -996,7 +995,7 @@ class ReturnNode : public TreeNode {
 private:
   TreeNode *mResult;
 public:
-  ReturnNode() : mResult(NULL) {mKind = NK_Return;}
+  ReturnNode() : TreeNode(NK_Return), mResult(NULL) {}
   ~ReturnNode(){}
 
   void SetResult(TreeNode *t) {mResult = t;}
@@ -1029,7 +1028,7 @@ class BreakNode : public TreeNode {
 private:
   TreeNode* mTarget;
 public:
-  BreakNode() {mKind = NK_Break; mTarget = NULL;}
+  BreakNode() : TreeNode(NK_Break), mTarget(NULL) {}
   ~BreakNode(){}
 
   TreeNode* GetTarget()           {return mTarget;}
@@ -1043,7 +1042,7 @@ class ContinueNode : public TreeNode {
 private:
   TreeNode* mTarget;
 public:
-  ContinueNode() {mKind = NK_Continue; mTarget = NULL;}
+  ContinueNode() : TreeNode(NK_Continue), mTarget(NULL) {}
   ~ContinueNode(){}
 
   TreeNode* GetTarget()           {return mTarget;}
@@ -1079,9 +1078,8 @@ private:
   TreeNode *mBody;   // This is a block node
 
 public:
-  ForLoopNode() {mCond = NULL; mBody = NULL;
-                 mVariable = NULL; mSet = NULL;
-                 mProp = FLP_Regular; mKind = NK_ForLoop;}
+  ForLoopNode() : TreeNode(NK_ForLoop),
+    mCond(NULL), mBody(NULL), mVariable(NULL), mSet(NULL), mProp(FLP_Regular) {}
   ~ForLoopNode() {Release();}
 
   void AddInit(TreeNode *t)   {mInits.PushBack(t);}
@@ -1116,7 +1114,7 @@ private:
   TreeNode *mCond;
   TreeNode *mBody; // This is a block node
 public:
-  WhileLoopNode() {mCond = NULL; mBody = NULL; mKind = NK_WhileLoop;}
+  WhileLoopNode() : TreeNode(NK_WhileLoop), mCond(NULL), mBody(NULL) {}
   ~WhileLoopNode() {Release();}
 
   void SetCond(TreeNode *t) {mCond = t;}
@@ -1133,7 +1131,7 @@ private:
   TreeNode *mCond;
   TreeNode *mBody; // This is a block node
 public:
-  DoLoopNode() {mCond = NULL; mBody = NULL; mKind = NK_DoLoop;}
+  DoLoopNode() : TreeNode(NK_DoLoop), mCond(NULL), mBody(NULL) {}
   ~DoLoopNode(){Release();}
 
   void SetCond(TreeNode *t) {mCond = t;}
@@ -1158,7 +1156,7 @@ private:
   bool      mIsDefault; // default lable
   TreeNode *mValue;     // the constant expression
 public:
-  SwitchLabelNode() : mIsDefault(false), mValue(NULL) {mKind = NK_SwitchLabel;}
+  SwitchLabelNode() : TreeNode(NK_SwitchLabel), mIsDefault(false), mValue(NULL) {}
   ~SwitchLabelNode(){}
 
   void SetIsDefault(bool b) {mIsDefault = b;}
@@ -1178,7 +1176,7 @@ private:
   SmallVector<TreeNode*>    mStmts;
 
 public:
-  SwitchCaseNode() {mKind = NK_SwitchCase;}
+  SwitchCaseNode() :TreeNode(NK_SwitchCase) {}
   ~SwitchCaseNode() {Release();}
 
   unsigned  GetLabelsNum()            {return mLabels.GetNum();}
@@ -1200,7 +1198,7 @@ private:
   TreeNode *mExpr;
   SmallVector<SwitchCaseNode*> mCases;
 public:
-  SwitchNode() : mExpr(NULL) {mKind = NK_Switch;}
+  SwitchNode() : TreeNode(NK_Switch), mExpr(NULL) {}
   ~SwitchNode() {Release();}
 
   TreeNode* GetExpr() {return mExpr;}
@@ -1226,7 +1224,7 @@ private:
   TreeNode  *mExpr;
   TreeNode  *mMsg;
 public:
-  AssertNode() : mExpr(NULL), mMsg(NULL) {mKind = NK_Assert;}
+  AssertNode() : TreeNode(NK_Assert), mExpr(NULL), mMsg(NULL) {}
   ~AssertNode(){}
 
   TreeNode* GetExpr() {return mExpr;}
@@ -1246,7 +1244,7 @@ private:
   TreeNode    *mMethod;
   ExprListNode mArgs;
 public:
-  CallNode() : mMethod(NULL){mKind = NK_Call;}
+  CallNode() : TreeNode(NK_Call), mMethod(NULL) {}
   ~CallNode(){}
 
   void Init();
@@ -1293,7 +1291,7 @@ public:
   TreeNode           *mSync;       // Java allows a sync object on a Block.
 
 public:
-  BlockNode(){mKind = NK_Block; mIsInstInit = false; mSync = NULL;}
+  BlockNode() : TreeNode(NK_Block), mIsInstInit(false), mSync(NULL) {}
   ~BlockNode() {Release();}
 
   // Instance Initializer and Attributes related
@@ -1410,7 +1408,7 @@ private:
   SmallVector<IdentifierNode*> mFields;
   SmallVector<FunctionNode*>   mMethods;
 public:
-  InterfaceNode() : mIsAnnotation(false) {mKind = NK_Interface;}
+  InterfaceNode() : TreeNode(NK_Interface), mIsAnnotation(false) {}
   ~InterfaceNode() {}
 
   unsigned       GetSuperInterfacesNum()              {return mSuperInterfaces.GetNum();}
@@ -1459,7 +1457,7 @@ private:
   SmallVector<InterfaceNode*>  mLocalInterfaces;
 
 public:
-  ClassNode(){mKind = NK_Class; mIsJavaEnum = false;}
+  ClassNode() : TreeNode(NK_Class), mIsJavaEnum(false) {}
   ~ClassNode() {Release();}
 
   bool IsJavaEnum() {return mIsJavaEnum;}
@@ -1516,7 +1514,7 @@ class PassNode : public TreeNode {
 private:
   SmallVector<TreeNode*> mChildren;
 public:
-  PassNode() {mKind = NK_Pass;}
+  PassNode() : TreeNode(NK_Pass) {}
   ~PassNode() {Release();}
 
   unsigned  GetChildrenNum() {return mChildren.GetNum();}
@@ -1551,7 +1549,8 @@ private:
   TreeNode              *mBody;         // the body is block.
                                         // NULL as TS FunctionType and ConstructorType
 public:
-  LambdaNode() {mBody = NULL; mKind = NK_Lambda; mProperty = LP_JSArrowFunction; mType = NULL;}
+  LambdaNode() : TreeNode(NK_Lambda),
+    mBody(NULL), mProperty(LP_JSArrowFunction), mType(NULL) {}
   ~LambdaNode(){Release();}
 
 
@@ -1584,7 +1583,7 @@ private:
   TreeNode *mLeft;
   TreeNode *mRight;
 public:
-  InstanceOfNode() {mLeft = NULL; mRight = NULL; mKind = NK_InstanceOf;}
+  InstanceOfNode() : TreeNode(NK_InstanceOf), mLeft(NULL), mRight(NULL) {}
   ~InstanceOfNode(){Release();}
 
   TreeNode* GetLeft() {return mLeft;}
@@ -1604,7 +1603,7 @@ class TypeOfNode : public TreeNode {
 private:
   TreeNode *mExpr;
 public:
-  TypeOfNode() {mExpr = NULL; mKind = NK_TypeOf;}
+  TypeOfNode() : TreeNode(NK_TypeOf), mExpr(NULL) {}
   ~TypeOfNode(){Release();}
 
   TreeNode* GetExpr()            {return mExpr;}
@@ -1625,7 +1624,7 @@ private:
   TreeNode *mLeft;
   TreeNode *mRight;
 public:
-  InNode() {mLeft = NULL; mRight = NULL; mKind = NK_In;}
+  InNode() : TreeNode(NK_In), mLeft(NULL), mRight(NULL) {}
   ~InNode(){Release();}
 
   TreeNode* GetLeft() {return mLeft;}

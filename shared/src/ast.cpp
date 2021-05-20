@@ -778,12 +778,8 @@ void ReturnNode::Dump(unsigned ind) {
     GetResult()->Dump(0);
 }
 
-CondBranchNode::CondBranchNode() {
-  mKind = NK_CondBranch;
-  mCond = NULL;
-  mTrueBranch = NULL;
-  mFalseBranch = NULL;
-}
+CondBranchNode::CondBranchNode() : TreeNode(NK_CondBranch),
+  mCond(NULL), mTrueBranch(NULL), mFalseBranch(NULL) {}
 
 void CondBranchNode::Dump(unsigned ind) {
   DumpLabel(ind);
@@ -1062,14 +1058,8 @@ void ClassNode::Dump(unsigned indent) {
 //                          FunctionNode
 //////////////////////////////////////////////////////////////////////////////////////
 
-FunctionNode::FunctionNode() {
-  mKind = NK_Function;
-  mStrIdx = 0;
-  mType = NULL;
-  mBody = NULL;
-  mDims = NULL;
-  mIsConstructor = false;
-}
+FunctionNode::FunctionNode() : TreeNode(NK_Function),
+  mType(NULL), mBody(NULL), mDims(), mIsConstructor(false) {}
 
 // This is to tell if both FunctionNodes have same return type
 // and parameter types. So languages require Type Erasure at first, like Java.

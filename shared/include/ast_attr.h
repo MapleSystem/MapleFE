@@ -40,7 +40,7 @@ class AttrNode : public TreeNode {
 private:
   AttrId mId;
 public:
-  AttrNode() {mKind = NK_Attr; mId = ATTR_NA;}
+  AttrNode() : TreeNode(NK_Attr), mId(ATTR_NA) {}
   ~AttrNode(){}
 
   AttrId GetId()          {return mId;}
