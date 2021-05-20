@@ -506,8 +506,10 @@ ParseStatus Parser::ParseStmt() {
     if (mTraceTiming)
       gettimeofday(&start, NULL);
     TreeNode *tree = BuildAST();
-    if (tree)
-      gModule.AddTree(tree);
+    if (tree) {
+      if (!mLineMode)
+        gModule.AddTree(tree);
+    }
 
     if (mTraceTiming) {
       gettimeofday(&stop, NULL);

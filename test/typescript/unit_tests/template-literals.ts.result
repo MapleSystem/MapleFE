@@ -21,11 +21,3 @@ js_let Decl: Right= template-literal: NULL,x,px,NULL
 js_let Decl: Top= template-literal: NULL,y,px,NULL
 == Sub Tree ==
 js_let Decl: Bottom= template-literal: NULL,y,px,NULL
-== Sub Tree ==
-x
-== Sub Tree ==
-x
-== Sub Tree ==
-y
-== Sub Tree ==
-y

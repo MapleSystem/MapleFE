@@ -8,5 +8,3 @@ func  func(msg)  throws:
 
 == Sub Tree ==
 console.log( template-literal: Status: ,func("OK"))
-== Sub Tree ==
-func("OK")

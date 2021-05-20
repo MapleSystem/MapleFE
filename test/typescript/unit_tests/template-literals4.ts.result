@@ -16,7 +16,3 @@ js_var Decl: z=6
 js_let Decl: px= template-literal: NULL,x Add y,px and ,z ? x Add z : y Add z,px,NULL
 == Sub Tree ==
 console.log(px)
-== Sub Tree ==
-x Add y
-== Sub Tree ==
-z ? x Add z : y Add z

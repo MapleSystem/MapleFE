@@ -6,5 +6,3 @@ Matched 13 tokens.
 js_var Decl: x=20
 == Sub Tree ==
 js_let Decl: Left= template-literal: NULL,x,px,NULL
-== Sub Tree ==
-x
