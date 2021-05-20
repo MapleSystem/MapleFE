@@ -827,21 +827,24 @@ if False:
 ################################################################################
 
 def get_data_based_on_type(val_type, accessor):
+    if val_type[-10:] == "ASTScope *" or val_type[-12:] == "ASTScopePool":
+        return '; // Skip ' + val_type
     e = get_enum_type(val_type)
-    if e == "ASTScope *":
-        return '0 /* Error: Should not hit ASTScope. ' + e + ': ' + accessor + ' */'
-    elif e != None:
-        return 'static_cast<int64_t>(' + accessor + ')'
-    elif val_type == "LitData":
-        return '0 /* Error: Should not hit LitData */'
+    if e != None:
+        return 'WriteValue(static_cast<int64_t>(' + accessor + '));'
     elif val_type == "bool":
-        return 'static_cast<int64_t>(' + accessor + ')'
+        return 'WriteValue(static_cast<int64_t>(' + accessor + '));'
     elif val_type == 'unsigned int' or val_type == 'uint32_t' or val_type == 'uint64_t' \
             or val_type == 'unsigned' or val_type == 'int' or val_type == 'int32_t' or val_type == 'int64_t' :
-        return 'static_cast<int64_t>(' + accessor + ')'
+        return ('AddStrIdx(' + accessor + ');' if accessor.find("GetStrIdx()") >= 0 else '') \
+                + 'WriteValue(static_cast<int64_t>(' + accessor + '));'
+    elif val_type == "LitData":
+        return 'if(' + accessor + '.mType == LT_StringLiteral) AddStrIdx(' + accessor + '.mData.mStrIdx);' \
+                + 'WriteValue(static_cast<int64_t>(' + accessor + '.mType));' \
+                + 'WriteValue(' + accessor + '.mData.mInt64);'
     elif val_type == 'const char *':
-        return '0 /* Error: Should change const char * to StrIdx */'
-    return '0 /* Warning: failed to get value with ' + val_type + ", " + accessor + ' */'
+        return 'WriteString(' + accessor + ');'
+    return 'Failed to get value with ' + val_type + ", " + accessor + ';'
 
 def short_name(node_type):
     return node_type.replace('class ', '').replace('maplefe::', '').replace(' *', '*')
@@ -854,22 +857,18 @@ gen_func_declaration = lambda dictionary, node_name: \
         "void " + gen_args[2] + node_name + "(" + node_name + "* node);"
 gen_func_definition = lambda dictionary, node_name: \
         "void " + gen_args[1] + "::" + gen_args[2] + node_name + "(" + node_name + "* node) {" \
-        + ('' if node_name == "TreeNode" else 'WriteNum(\'N\', static_cast<int64_t>(node->GetKind()));'
-                + 'WriteTreeNode(node); // Base')
+        + ('' if node_name == "TreeNode" else 'WriteNode(node);')
 gen_call_child_node = lambda dictionary, node_name, field_name, node_type, accessor: \
-        'WriteNode(' + accessor + '); // ' + field_name + ': ' + node_type if field_name != '' else \
+        'WriteAddress(' + accessor + '); // ' + field_name + ': ' + node_type if field_name != '' else \
         gen_args[2] + short_name(node_type) + '(' + accessor + ');'
 gen_call_child_value = lambda dictionary, node_name, field_name, val_type, accessor: \
-        ('WriteNum(\'V\', static_cast<int64_t>(' + accessor + '.mType));' \
-         + 'WriteNum(\'V\', ' + accessor + '.mData.mInt64);' if val_type == 'LitData' else \
-         'WriteNum(\'V\', ' + get_data_based_on_type(val_type, accessor) + ');') \
-         + ' // ' + field_name + ': ' + val_type
+        get_data_based_on_type(val_type, accessor) + ' // ' + field_name + ': ' + val_type
 gen_call_children_node = lambda dictionary, node_name, field_name, node_type, accessor: \
         'WriteNum(\'L\', ' + accessor + '); // ' + field_name + ': ' + node_type
 gen_call_nth_child_node = lambda dictionary, node_name, field_name, node_type, accessor: \
-        'WriteNode(' + accessor + '); // '  + field_name + ': ' + node_type
+        'WriteAddress(' + accessor + '); // '  + field_name + ': ' + node_type
 gen_call_nth_child_value = lambda dictionary, node_name, field_name, val_type, accessor: \
-        'WriteNum(\'V\', ' + get_data_based_on_type(val_type, accessor) + '); // ' + field_name + ': ' + val_type
+        get_data_based_on_type(val_type, accessor) + ' // ' + field_name + ': ' + val_type
 gen_func_definition_end = lambda dictionary, node_name: '}'
 #
 gen_args = [
@@ -877,8 +876,11 @@ gen_args = [
         "AstStore",     # Class name
         "Store",        # Prefix of function name
         """
+#include "stringpool.h"
 #include "{astvisitor}.h"
+#include <cstring>
 #include <cstdint>
+#include <set>
 namespace maplefe {{
 using AstBuffer  = std::vector<uint8_t>;
 using AstNodeVec = std::vector<TreeNode*>;
@@ -890,9 +892,10 @@ using AstNodeVec = std::vector<TreeNode*>;
 astemit_init = [
 """
 private:
-ModuleNode  *mASTModule;
-AstBuffer   mAstBuf {{'M', 'P', 'L', 'A', 'S', 'T'}};
-BitVector   mVisited;
+ModuleNode         *mASTModule;
+AstBuffer           mAstBuf {{'M', 'P', 'L', 'A', 'S', 'T'}};
+BitVector           mVisited;
+std::set<unsigned>  mStrIdxSet;
 
 public:
 {gen_args1}(ModuleNode *m) : mASTModule(m) {{}}
@@ -900,10 +903,11 @@ public:
 const std::vector<uint8_t>& GetAstBuf() const {{return mAstBuf;}}
 
 void {gen_args2}InAstBuf() {{
+  mStrIdxSet.clear();
   mAstBuf.erase(mAstBuf.begin()+6, mAstBuf.end());
-  mAstBuf.reserve(65536);
-  for(unsigned i = 0; i < mASTModule->GetTreesNum(); i++)
-    VisitTreeNode(mASTModule->GetTree(i));
+  mAstBuf.reserve(65536); // For performance
+  VisitTreeNode(mASTModule);
+  WriteStrIdxTable();
 }}
 
 bool IsVisited(TreeNode* node) {{
@@ -916,8 +920,10 @@ bool IsVisited(TreeNode* node) {{
 // Flags:
 //   'N': Beginning of a tree node
 //   'A': address of a child tree node
+//   'S': char string of a field in a tree node
 //   'V': value of a field in a tree node
 //   'L': list/vector of chrildren in a tree node
+//   'T': StrIdx Table
 // The initial version will keep all flags, and some of them can be optimized out
 
 // LEB128, same as for MapleIR
@@ -931,10 +937,42 @@ void WriteNum(uint8_t flag, int64_t x) {{
 }}
 
 void WriteNode(TreeNode *node) {{
+  WriteNum('N', static_cast<int64_t>(node->GetKind()));
+  WriteTreeNode(node); // Base TreeNode
+}}
+
+void WriteAddress(TreeNode *node) {{
   if(node)
     WriteNum('A', static_cast<int64_t>(node->GetNodeId()));
   else
     WriteNum('A', 0);
+}}
+
+void WriteValue(int64_t v) {{
+  WriteNum('V', v);
+}}
+
+void WriteString(const char *str) {{
+  if(const char *p = str) {{
+    WriteNum('S', static_cast<int64_t>(std::strlen(p) + 1));
+    do {{
+      mAstBuf.push_back(static_cast<uint8_t>(*p));
+    }} while(*p++);
+  }} else
+    WriteNum('S', 0);
+}}
+
+void WriteStrIdxTable() {{
+  WriteNum('T', static_cast<int64_t>(mStrIdxSet.size()));
+  for(auto s: mStrIdxSet) {{
+    WriteValue(s);
+    WriteString(gStringPool.GetStringFromStrIdx(s).c_str());
+  }}
+}}
+
+void AddStrIdx(unsigned idx) {{
+  if(idx)
+    mStrIdxSet.insert(idx);
 }}
 
 """.format(gen_args1=gen_args[1], gen_args2=gen_args[2], astvisitorclass=astvisitorclass)
