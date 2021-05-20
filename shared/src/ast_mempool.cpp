@@ -25,13 +25,13 @@ TreePool::~TreePool() {
 
 char* TreePool::NewTreeNode(unsigned size) {
   char *addr = mMP.Alloc(size);
-  unsigned id = mTreeNodes.size();
   TreeNode *tree = (TreeNode*)addr;
+  mTreeNodes.push_back(tree);
+  unsigned id = mTreeNodes.size();
   tree->SetNodeId(id);
-  mTreeNodes.push_back((TreeNode*)addr);
   return addr;
 }
-  
+
 void TreePool::Release() {
   // step 1. Release the containers in each tree node.
   std::vector<TreeNode*>::iterator it = mTreeNodes.begin();
