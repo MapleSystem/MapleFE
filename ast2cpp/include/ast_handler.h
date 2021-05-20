@@ -38,7 +38,7 @@ class AST_DFA;
 class AST_Handler {
  private:
   MemPool       mMemPool;     // Memory pool for all AST_Function and AST_BB
-  ModuleNode    *mASTModule;   // for an AST module
+  ModuleNode    *mASTModule;  // for an AST module
   AST_Function *mFunction;    // an init function for statements in module scope
   AST_CFG      *mCFG;
   AST_AST      *mAST;
@@ -46,7 +46,9 @@ class AST_Handler {
   bool          mTrace;
   std::unordered_map<unsigned, AST_BB *> mNodeId2BbMap;
 
-  friend class AST_BB;;
+ public:
+  // only reachable BBs
+  std::unordered_map<unsigned, AST_BB *> mBbId2BbMap;
 
  public:
   explicit AST_Handler(ModuleNode *module, bool trace) :
@@ -65,8 +67,11 @@ class AST_Handler {
   void          SetFunction(AST_Function *func) {mFunction = func;}
   AST_Function *GetFunction()                   {return mFunction;}
 
-  void SetBbFromNodeId(unsigned nodeId, AST_BB *bb) { mNodeId2BbMap[nodeId] = bb; }
-  AST_BB *GetBbFromNodeId(unsigned nodeId) { return mNodeId2BbMap[nodeId]; }
+  void SetBbFromNodeId(unsigned id, AST_BB *bb) { mNodeId2BbMap[id] = bb; }
+  AST_BB *GetBbFromNodeId(unsigned id) { return mNodeId2BbMap[id]; }
+
+  void SetBbFromBbId(unsigned id, AST_BB *bb) { mBbId2BbMap[id] = bb; }
+  AST_BB *GetBbFromBbId(unsigned id) { return mBbId2BbMap[id]; }
 
   bool GetTrace() {return mTrace;}
 

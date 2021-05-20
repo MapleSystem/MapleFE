@@ -62,6 +62,7 @@ inline BBAttribute operator&(BBAttribute x, BBAttribute y) {
 
 using BBIndex = unsigned;
 class AST_Handler;
+class AST_AST;
 
 class AST_BB {
  private:
@@ -73,6 +74,8 @@ class AST_BB {
   SmallList<TreeNode *>    mStatements;     // all statement nodes
   SmallList<AST_BB *>      mSuccessors;     // for BK_Branch: [0] true branch, [1] false branch
   SmallList<AST_BB *>      mPredecessors;
+
+  friend class AST_AST;
 
  public:
   explicit AST_BB(BBKind k)

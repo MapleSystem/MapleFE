@@ -269,7 +269,10 @@ void AST_DFA::BuildBitVectors() {
 
   bool changed = true;
   working_list.clear();
-  working_list.push_back(func->GetEntryBB());
+  // initialize work list with all reachable BB
+  for (auto it: mHandler->mBbId2BbMap) {
+    working_list.push_back(it.second);
+  }
 
   BitVector *old_bv = new BitVector(mDefPositionVecSize);
   BitVector *tmp_bv = new BitVector(mDefPositionVecSize);
@@ -280,6 +283,7 @@ void AST_DFA::BuildBitVectors() {
     tmp_bv->WipeOff(0);
     old_bv->WipeOff(0);
     old_bv->Or(mRchInMap[bbid]);
+    mRchInMap[bbid]->WipeOff(0);
     for (int i = 0; i < bb->GetPredecessorsNum(); i++){
       AST_BB *pred = bb->GetPredecessorAtIndex(i);
       unsigned pid = pred->GetId();
@@ -287,7 +291,6 @@ void AST_DFA::BuildBitVectors() {
       tmp_bv->Or(mRchInMap[pid]); 
       tmp_bv->And(mPrsvMap[pid]); 
       tmp_bv->Or(mGenMap[pid]);
-      mRchInMap[bbid]->WipeOff(0);
       mRchInMap[bbid]->Or(tmp_bv);
     }
 
@@ -317,8 +320,6 @@ void AST_DFA::DumpAllBVMaps() {
   DumpBVMap(mPrsvMap);
   std::cout << "=== mGenMap ===" << std::endl;
   DumpBVMap(mGenMap);
-  std::cout << "=== mRchOutMap ===" << std::endl;
-  DumpBVMap(mRchOutMap);
   std::cout << "=== mRchInMap ===" << std::endl;
   DumpBVMap(mRchInMap);
 }
@@ -334,7 +335,6 @@ void AST_DFA::DumpBVMap(BVMap &map) {
 }
 
 void AST_DFA::DumpBV(BitVector *bv) {
-  std::cout << "mDefPositionVecSize = " << mDefPositionVecSize << std::endl;
   std::cout << "BitVector: ";
   for (int i = 0; i < mDefPositionVecSize; i++) {
     std::cout << bv->GetBit(i);

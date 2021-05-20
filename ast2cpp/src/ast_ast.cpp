@@ -22,6 +22,7 @@ namespace maplefe {
 
 void AST_AST::Build() {
   CollectASTInfo();
+  RemoveDeadBlocks();
   AdjustAST();
 
   if (mTrace) {
@@ -65,9 +66,34 @@ void AST_AST::CollectASTInfo() {
       mHandler->SetBbFromNodeId(node->GetNodeId(), bb);
     }
 
+    mHandler->SetBbFromBbId(bbid, bb);
+
     done_list.insert(bbid);
     working_list.pop_front();
   }
+}
+
+void AST_AST::RemoveDeadBlocks() {
+  std::set<AST_BB *> deadBb;
+  for (auto it: mHandler->mBbId2BbMap) {
+    for (int i = 0; i < it.second->GetPredecessorsNum(); i++) {
+      AST_BB *pred = it.second->GetPredecessorAtIndex(i);
+      unsigned pid = pred->GetId();
+      if (mHandler->mBbId2BbMap.find(pid) == mHandler->mBbId2BbMap.end()) {
+        deadBb.insert(pred);
+      }
+    }
+  }
+  for (auto it: deadBb) {
+    if (mTrace) std::cout << "deleted BB :";
+    for (int i = 0; i < it->GetSuccessorsNum(); i++) {
+      AST_BB *bb = it->GetSuccessorAtIndex(i);
+      bb->mPredecessors.Remove(it);
+    }
+    if (mTrace) std::cout << " BB" << it->GetId();
+    it->~AST_BB();
+  }
+  if (mTrace) std::cout << std::endl;
 }
 
 void AST_AST::AdjustAST() {

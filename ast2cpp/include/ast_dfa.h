@@ -49,7 +49,8 @@ class AST_DFA {
   BVMap mRchInMap; // reaching definition bit vector entering bb
   BVMap mRchOutMap;
 
-  std::unordered_set<unsigned> mBbIdSet;             // bb ids in the function
+  std::unordered_set<unsigned> mBbIdSet;              // bb ids in the function
+  std::unordered_map<unsigned, AST_BB *> mBbId2BBMap; // bb id to bb map
 
  public:
   explicit AST_DFA(AST_Handler *h, bool t) : mHandler(h), mTrace(t) {}
