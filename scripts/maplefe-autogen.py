@@ -864,7 +864,7 @@ gen_call_child_node = lambda dictionary, node_name, field_name, node_type, acces
 gen_call_child_value = lambda dictionary, node_name, field_name, val_type, accessor: \
         get_data_based_on_type(val_type, accessor) + ' // ' + field_name + ': ' + val_type
 gen_call_children_node = lambda dictionary, node_name, field_name, node_type, accessor: \
-        'WriteNum(\'L\', ' + accessor + '); // ' + field_name + ': ' + node_type
+        'WriteLength(' + accessor + '); // ' + field_name + ': ' + node_type
 gen_call_nth_child_node = lambda dictionary, node_name, field_name, node_type, accessor: \
         'WriteAddress(' + accessor + '); // '  + field_name + ': ' + node_type
 gen_call_nth_child_value = lambda dictionary, node_name, field_name, val_type, accessor: \
@@ -920,9 +920,9 @@ bool IsVisited(TreeNode* node) {{
 // Flags:
 //   'N': Beginning of a tree node
 //   'A': address of a child tree node
-//   'S': char string of a field in a tree node
 //   'V': value of a field in a tree node
 //   'L': list/vector of chrildren in a tree node
+//   'S': char string of a field in a tree node
 //   'T': StrIdx Table
 // The initial version will keep all flags, and some of them can be optimized out
 
@@ -948,8 +948,12 @@ void WriteAddress(TreeNode *node) {{
     WriteNum('A', 0);
 }}
 
-void WriteValue(int64_t v) {{
-  WriteNum('V', v);
+void WriteValue(int64_t val) {{
+  WriteNum('V', val);
+}}
+
+void WriteLength(unsigned len) {{
+  WriteNum('L', static_cast<int64_t>(len));
 }}
 
 void WriteString(const char *str) {{
