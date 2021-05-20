@@ -1058,7 +1058,16 @@ rule FunctionStatementList : ZEROORONE(StatementList)
 ## See 14.2
 ## ArrowFunction[In, Yield] :
 ## ArrowParameters[?Yield] [no LineTerminator here] => ConciseBody[?In]
-rule ArrowFunction : ArrowParameters + "=>" + ConciseBody
+
+# (1) I inline ArrowParameters
+# (2) In CoverParent.... is replaced by ArrowFormalParameters which in turn is changed
+#     to CallSignature in Typescript. I inline CallSignature here.
+rule ArrowFunction : ONEOF(
+  BindingIdentifier + "=>" + ConciseBody,
+  ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + "=>" + ConciseBody)
+  attr.action.%1 : BuildLambda(%1, %3)
+  attr.action.%2 : BuildLambda(%3, %7)
+  attr.action.%2 : AddType(%5)
 
 ## See 14.2
 ## ArrowParameters[Yield] :
@@ -1530,7 +1539,11 @@ rule FunctionExpression :
   attr.action : AddType(%7)
   attr.action : AddFunctionBody(%9)
 
+# ArrowFormalParameter is used in ArrowFunction, and Typescript modified
+# it to be CallSignature. As usual, I'd like to inline CallSignature in
+# those rules.
 ## ArrowFormalParameters: ( Modified ) CallSignature
+
 ## Arguments: ( Modified ) TypeArgumentsopt ( ArgumentListopt )
 ## UnaryExpression: ( Modified ) … < Type > UnaryExpression
 

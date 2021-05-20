@@ -10,7 +10,8 @@ func  initialize()  throws:
   js_var Decl: msgs=["Hello","World"]
   for ( )
     js_let Decl: msg=msgs[i]
-    funcs[i] Assign console.log(msg)
+    funcs[i] Assign () -> console.log(msg)
+
 
 
 == Sub Tree ==
