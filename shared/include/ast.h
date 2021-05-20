@@ -103,7 +103,7 @@ public:
   TreeNode* GetLabel()  {return mLabel;}
 
   bool IsStmt()    {return mIsStmt;}
-  void SetIsStmt() {mIsStmt = true;}
+  void SetIsStmt(bool b = true) {mIsStmt = b;}
 
   virtual unsigned GetStrIdx() {return mStrIdx;}
   virtual void SetStrIdx(unsigned id) {mStrIdx = id;}
@@ -171,10 +171,10 @@ public:
   ~XXportAsPairNode() {}
 
   bool IsDefault()    {return mIsDefault;}
-  void SetIsDefault() {mIsDefault = true;}
+  void SetIsDefault(bool b = true) {mIsDefault = b;}
 
   bool IsEverything()    {return mIsEverything;}
-  void SetIsEverything() {mIsEverything = true;}
+  void SetIsEverything(bool b = true) {mIsEverything = b;}
 
   TreeNode* GetBefore() {return mBefore;}
   void SetBefore(TreeNode *t) {mBefore = t;}
@@ -475,6 +475,7 @@ public:
   IdentifierNode(unsigned id, TreeNode *t) : TreeNode(NK_Identifier, id),
     mType(t), mInit(NULL), mDims(NULL), mOptionalParam(false) {}
   IdentifierNode(unsigned id) : IdentifierNode(id, NULL) {}
+  IdentifierNode() : IdentifierNode(0, NULL) {}
   ~IdentifierNode(){}
 
   TreeNode*   GetType() {return mType;}
@@ -1302,7 +1303,7 @@ public:
 
   // Instance Initializer and Attributes related
   bool IsInstInit()    {return mIsInstInit;}
-  void SetIsInstInit() {mIsInstInit = true;}
+  void SetIsInstInit(bool b = true) {mIsInstInit = b;}
   unsigned GetAttrsNum()              {return mAttrs.GetNum();}
   void     AddAttr(AttrId a)          {mAttrs.PushBack(a);}
   AttrId   GetAttrAtIndex(unsigned i) {return mAttrs.ValueAtIndex(i);}
@@ -1355,7 +1356,7 @@ public:
   void SetBody(BlockNode *b) {mBody = b; b->SetParent(this); CleanUp();}
 
   bool IsConstructor()    {return mIsConstructor;}
-  void SetIsConstructor() {mIsConstructor = true;}
+  void SetIsConstructor(bool b = true) {mIsConstructor = b;}
 
   unsigned  GetParamsNum()        {return mParams.GetNum();}
   TreeNode* GetParam(unsigned i)  {return mParams.ValueAtIndex(i);}
@@ -1467,7 +1468,7 @@ public:
   ~ClassNode() {Release();}
 
   bool IsJavaEnum() {return mIsJavaEnum;}
-  void SetIsJavaEnum(){mIsJavaEnum = true;}
+  void SetIsJavaEnum(bool b = true){mIsJavaEnum = b;}
 
   void AddSuperClass(ClassNode *n)         {mSuperClasses.PushBack(n);}
   void AddSuperInterface(InterfaceNode *n) {mSuperInterfaces.PushBack(n);}
