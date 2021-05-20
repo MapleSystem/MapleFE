@@ -17,64 +17,86 @@
 #include <set>
 #include <tuple>
 #include "stringpool.h"
-#include "ast_handler.h"
 #include "ast_cfg.h"
 #include "ast_dfa.h"
 
 namespace maplefe {
 
+AST_DFA::~AST_DFA() {
+  mVar2DeclMap.clear();
+  for (auto it: mNodeId2NodeMap) {
+    free(it.second);
+  }
+  mNodeId2NodeMap.clear();
+  for (auto it: mPrsvMap) {
+    free(it.second);
+  }
+  for (auto it: mGenMap) {
+    free(it.second);
+  }
+  for (auto it: mRchInMap) {
+    free(it.second);
+  }
+  for (auto it: mRchOutMap) {
+    free(it.second);
+  }
+  mBbIdSet.clear();
+}
+
+void AST_DFA::TestBV() {
+  unsigned size = 300;
+  BitVector *bv1 = new BitVector(size);
+  bv1->WipeOff(0xab);                // init with all 1
+
+  BitVector *bv2 = new BitVector(size);
+  bv2->WipeOff(0x12);
+
+  DumpBV(bv1);
+  DumpBV(bv2);
+
+  bv1->Or(bv2);
+  DumpBV(bv1);
+
+  bv1->And(bv2);
+  DumpBV(bv1);
+}
+
 void AST_DFA::Build() {
+  // TestBV();
   CollectDefNodes();
   BuildBitVectors();
-  BuildReachDefIn();
 }
 
-void AST_DFA::BuildReachDefIn() {
-  if (mTrace) std::cout << "============== BuildReachDefIn ==============" << std::endl;
-  ReachDefInVisitor visitor(mHandler, mTrace, true);
-  AST_Function *func = mHandler->GetFunction();
-  visitor.SetCurrentFunction(mHandler->GetFunction());
-  visitor.SetCurrentBB(func->GetEntryBB());
-  for(unsigned i = 0; i < mHandler->GetASTModule()->GetTreesNum(); i++) {
-    visitor.Visit(mHandler->GetASTModule()->GetTree(i));
-  }
-}
-
-DeclNode *ReachDefInVisitor::VisitDeclNode(DeclNode *node) {
-  // AstVisitor::VisitDeclNode(node);
-  // node->Dump(0);
-  return node;
-}
-
-void AST_DFA::DumpPosDef(PosDef pos) {
-  std::cout << "BitPos: " << std::get<0>(pos) << std::endl;
-  std::cout << "stridx: " << std::get<1>(pos) << std::endl;
-  std::cout << "   nid: " << std::get<2>(pos) << std::endl;
-  std::cout << "  bbid: " << std::get<3>(pos) << std::endl;
+void AST_DFA::DumpDefPosition(DefPosition pos) {
+  std::cout << "stridx: " << std::get<0>(pos) << std::endl;
+  std::cout << "nodeid: " << std::get<1>(pos) << std::endl;
+  std::cout << "  bbid: " << std::get<2>(pos) << std::endl;
   std::cout << std::endl;
 }
 
-void AST_DFA::DumpPosDefVec() {
-  for (unsigned i = 0; i < mDefVecSize; i++) {
-    PosDef pos = mDefVec.ValueAtIndex(i);
-    DumpPosDef(pos);
+void AST_DFA::DumpDefPositionVec() {
+  for (unsigned i = 0; i < mDefPositionVecSize; i++) {
+    DefPosition pos = mDefPositionVec.ValueAtIndex(i);
+    std::cout << "BitPos: " << i << std::endl;
+    DumpDefPosition(pos);
   }
 }
 
-bool AST_DFA::IsDef(TreeNode *node) {
-  unsigned n;
-  return AddDef(node, n, 0xffffffff);
+unsigned AST_DFA::GetDefStrIdx(TreeNode *node) {
+  unsigned stridx = 0;
+  AddDef(node, stridx, 0xffffffff);
+  return stridx;
 }
 
-bool AST_DFA::AddDef(TreeNode *node, unsigned &bitnum, unsigned bbid) {
-  unsigned idx = 0;
-  unsigned nid = 0;
+DefPosition *AST_DFA::AddDef(TreeNode *node, unsigned &bitnum, unsigned bbid) {
+  unsigned stridx = 0;
+  unsigned nodeid = 0;
   switch (node->GetKind()) {
     case NK_Decl: {
       DeclNode *decl = static_cast<DeclNode *>(node);
       if (decl->GetInit()) {
-        idx = decl->GetStrIdx();
-        nid = decl->GetNodeId();
+        stridx = decl->GetStrIdx();
+        nodeid = decl->GetNodeId();
       }
       break;
     }
@@ -95,8 +117,8 @@ bool AST_DFA::AddDef(TreeNode *node, unsigned &bitnum, unsigned bbid) {
         case OPR_BxorAssign:
         case OPR_ZextAssign: {
           TreeNode *lhs = bon->GetOpndA();
-          idx = lhs->GetStrIdx();
-          nid = lhs->GetNodeId();
+          stridx = lhs->GetStrIdx();
+          nodeid = lhs->GetNodeId();
           break;
         }
         default:
@@ -109,8 +131,8 @@ bool AST_DFA::AddDef(TreeNode *node, unsigned &bitnum, unsigned bbid) {
       OprId op = uon->GetOprId();
       if (op == OPR_Inc || op == OPR_Dec) {
         TreeNode *lhs = uon->GetOpnd();
-        idx = lhs->GetStrIdx();
-        nid = lhs->GetNodeId();
+        stridx = lhs->GetStrIdx();
+        nodeid = lhs->GetNodeId();
       }
       break;
     }
@@ -118,16 +140,23 @@ bool AST_DFA::AddDef(TreeNode *node, unsigned &bitnum, unsigned bbid) {
       break;
   }
 
-  // update mDefVec
-  if (idx && bbid != 0xffffffff) {
-    PosDef pos(bitnum++, idx, nid, bbid);
-    mDefVec.PushBack(pos);
+  // update mDefPositionVec
+  if (stridx) {
+    if (bbid != 0xffffffff) {
+      DefPosition pos(stridx, nodeid, bbid);
+      bitnum++;
+      mDefPositionVec.PushBack(pos);
+      return &pos;
+    } else {
+      // special usage for GetDefStrIdx(): use bitnum as a return value
+      bitnum = stridx;
+    }
   }
 
-  return idx != 0;
+  return NULL;
 }
 
-// this calcuates mDefVec mDefVecSize mBbIdSet
+// this calcuates mDefPositionVec mDefPositionVecSize mBbIdSet
 void AST_DFA::CollectDefNodes() {
   if (mTrace) std::cout << "============== CollectDefNodes ==============" << std::endl;
   AST_Function *func = mHandler->GetFunction();
@@ -163,8 +192,8 @@ void AST_DFA::CollectDefNodes() {
     working_list.pop_front();
   }
 
-  mDefVecSize = mDefVec.GetNum();
-  if (mTrace) DumpPosDefVec();
+  mDefPositionVecSize = mDefPositionVec.GetNum();
+  if (mTrace) DumpDefPositionVec();
 
 }
 
@@ -172,30 +201,18 @@ void AST_DFA::BuildBitVectors() {
   if (mTrace) std::cout << "============== BuildBitVectors ==============" << std::endl;
   AST_Function *func = mHandler->GetFunction();
   MASSERT(func && "null func");
-  std::unordered_set<unsigned> doneBbID;
+  std::unordered_set<unsigned> done_list;
   std::deque<AST_BB *> working_list;
 
   // init bit vectors
-  for (int i = 0; i < mDefVecSize; i++) {
-    BitVector bv1;
-    bv1.Alloc(mDefVecSize);
-    bv1.WipeOff(0);
-    mPrsvMap[i] = bv1;
+  for (auto bbid: mBbIdSet) {
+    BitVector *bv1 = new BitVector(mDefPositionVecSize);
+    bv1->WipeOff(0xff);                // init with all 1
+    mPrsvMap[bbid] = bv1;
 
-    BitVector bv2;
-    bv2.Alloc(mDefVecSize);
-    bv2.WipeOff(0xff);      // init with bit 1
-    mGenMap[i] = bv2;
-
-    BitVector bv3;
-    bv3.Alloc(mDefVecSize);
-    bv3.WipeOff(0);
-    mRchOutMap[i] = bv3;
-
-    BitVector bv4;
-    bv4.Alloc(mDefVecSize);
-    bv4.WipeOff(0);
-    mRchInMap[i] = bv4;
+    BitVector *bv2 = new BitVector(mDefPositionVecSize);
+    bv2->WipeOff(0);
+    mGenMap[bbid] = bv2;
   }
 
   working_list.push_back(func->GetEntryBB());
@@ -206,25 +223,127 @@ void AST_DFA::BuildBitVectors() {
     unsigned bbid = bb->GetId();
 
     // skip bb already visited
-    if (doneBbID.find(bbid) != doneBbID.end()) {
+    if (done_list.find(bbid) != done_list.end()) {
       working_list.pop_front();
       continue;
     }
 
-    for (int i = 0; i < bb->GetSuccessorsNum(); i++) {
-      working_list.push_back(bb->GetSuccessorAtIndex(i));
+    for (int it = 0; it < bb->GetSuccessorsNum(); it++) {
+      working_list.push_back(bb->GetSuccessorAtIndex(it));
     }
 
-    for (int i = 0; i < bb->GetStatementsNum(); i++) {
-      TreeNode *node = bb->GetStatementAtIndex(i);
-      mNodeId2NodeMap[node->GetNodeId()] = node;
-      bool isdef = IsDef(node);
-      if (isdef) {
+    for (int it = 0; it < bb->GetStatementsNum(); it++) {
+      TreeNode *node = bb->GetStatementAtIndex(it);
+      unsigned stridx = GetDefStrIdx(node);
+      if (stridx != 0) {
+        // now loop through all the definition positions
+        // mPrsvMap
+        for (int i = 0; i < mDefPositionVec.GetNum(); i++) {
+          // clear bits for matching stridx
+          if (std::get<0>(mDefPositionVec.ValueAtIndex(i)) == stridx) {
+            mPrsvMap[bbid]->ClearBit(i);
+          }
+        }
+
+        // mGenMap
+        for (int i = 0; i < mDefPositionVec.GetNum(); i++) {
+          // set bits for matching bbid
+          if (std::get<2>(mDefPositionVec.ValueAtIndex(i)) == bbid) {
+            mGenMap[bbid]->SetBit(i);
+          }
+        }
       }
     }
 
-    doneBbID.insert(bbid);
+    done_list.insert(bbid);
     working_list.pop_front();
   }
+
+  // mRchInMap
+  for (auto bbid: mBbIdSet) {
+    BitVector *bv = new BitVector(mDefPositionVecSize);
+    bv->Alloc(mDefPositionVecSize);
+    bv->WipeOff(0);
+    mRchInMap[bbid] = bv;
+  }
+
+  bool changed = true;
+  working_list.clear();
+  working_list.push_back(func->GetEntryBB());
+
+  BitVector *old_bv = new BitVector(mDefPositionVecSize);
+  BitVector *tmp_bv = new BitVector(mDefPositionVecSize);
+  while (working_list.size()) {
+    AST_BB *bb = working_list.front();
+    unsigned bbid = bb->GetId();
+
+    tmp_bv->WipeOff(0);
+    old_bv->WipeOff(0);
+    old_bv->Or(mRchInMap[bbid]);
+    for (int i = 0; i < bb->GetPredecessorsNum(); i++){
+      AST_BB *pred = bb->GetPredecessorAtIndex(i);
+      unsigned pid = pred->GetId();
+      tmp_bv->WipeOff(0);
+      tmp_bv->Or(mRchInMap[pid]); 
+      tmp_bv->And(mPrsvMap[pid]); 
+      tmp_bv->Or(mGenMap[pid]);
+      mRchInMap[bbid]->WipeOff(0);
+      mRchInMap[bbid]->Or(tmp_bv);
+    }
+
+    working_list.pop_front();
+    if (!mRchInMap[bbid]->Equal(old_bv)) {
+      for (int i = 0; i < bb->GetSuccessorsNum(); i++) {
+        working_list.push_back(bb->GetSuccessorAtIndex(i));
+      }
+    }
+  }
+
+  bool buildOutMap = false;
+  if (buildOutMap) {
+    for (auto bbid: mBbIdSet) {
+      BitVector *bv = new BitVector(mDefPositionVecSize);
+      bv->Alloc(mDefPositionVecSize);
+      bv->WipeOff(0);
+      mRchOutMap[bbid] = bv;
+    }
+  }
+
+  if (mTrace) DumpAllBVMaps();
+}
+
+void AST_DFA::DumpAllBVMaps() {
+  std::cout << "=== mPrsvMap ===" << std::endl;
+  DumpBVMap(mPrsvMap);
+  std::cout << "=== mGenMap ===" << std::endl;
+  DumpBVMap(mGenMap);
+  std::cout << "=== mRchOutMap ===" << std::endl;
+  DumpBVMap(mRchOutMap);
+  std::cout << "=== mRchInMap ===" << std::endl;
+  DumpBVMap(mRchInMap);
+}
+
+void AST_DFA::DumpBVMap(BVMap &map) {
+  if (!map.size()) { return; }
+  std::set<unsigned> ordered(mBbIdSet.begin(), mBbIdSet.end());
+  for (auto bbid: ordered) {
+    std::cout << "BB" << bbid << " : ";
+    DumpBV(map[bbid]);
+  }
+  std::cout << std::endl;
+}
+
+void AST_DFA::DumpBV(BitVector *bv) {
+  std::cout << "mDefPositionVecSize = " << mDefPositionVecSize << std::endl;
+  std::cout << "BitVector: ";
+  for (int i = 0; i < mDefPositionVecSize; i++) {
+    std::cout << bv->GetBit(i);
+    if (i%8 == 7) std::cout << " ";
+    if (i%64 == 63) {
+      std::cout << std::endl;
+      std::cout << "           ";
+    }
+  }
+  std::cout << std::endl;
 }
 }

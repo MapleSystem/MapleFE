@@ -88,8 +88,12 @@ DeclNode *AdjustASTVisitor::VisitDeclNode(DeclNode *node) {
   // Check if need to split Decl
   MASSERT(var->IsIdentifier() && "var not Identifier");
 
-  // move Init on Identifier to Decl
   IdentifierNode *inode = static_cast<IdentifierNode *>(var);
+
+  // copy StrIdx from Identifier to Decl
+  node->SetStrIdx(inode->GetStrIdx());
+
+  // move Init from Identifier to Decl
   TreeNode *init = inode->GetInit();
   if (init) {
     node->SetInit(init);

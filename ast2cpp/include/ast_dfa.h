@@ -18,19 +18,20 @@
 
 #include <stack>
 #include <utility>
-#include <unordered_map>
-#include <unordered_set>
 
 #include "stringpool.h"
 #include "ast_module.h"
 #include "ast.h"
 #include "ast_type.h"
-#include "ast_cfg.h"
+#include "ast_handler.h"
 #include "gen_astvisitor.h"
 
 namespace maplefe {
 
-typedef std::tuple<unsigned, unsigned, unsigned, unsigned> PosDef;
+// Position of Definition: <stridx, nodeid, bbid>
+typedef std::tuple<unsigned, unsigned, unsigned> DefPosition;
+// map <bbid, BitVector>
+typedef std::unordered_map<unsigned, BitVector*> BVMap;
 
 class AST_DFA {
  private:
@@ -38,56 +39,41 @@ class AST_DFA {
   bool          mTrace;
   std::unordered_map<unsigned, unsigned> mVar2DeclMap; // var to decl, both NodeId
   std::unordered_map<unsigned, TreeNode*> mNodeId2NodeMap;
-  SmallVector<PosDef> mDefVec;
-  unsigned mDefVecSize;
+  SmallVector<DefPosition> mDefPositionVec;
+  unsigned mDefPositionVecSize;
   StringPool mStringPool;
 
   // followint maps with key BB id
-  std::unordered_map<unsigned, BitVector> mPrsvMap;
-  std::unordered_map<unsigned, BitVector> mGenMap;
-  std::unordered_map<unsigned, BitVector> mRchOutMap;
-  std::unordered_map<unsigned, BitVector> mRchInMap; // reaching definition bit vector entering bb
+  BVMap mPrsvMap;
+  BVMap mGenMap;
+  BVMap mRchInMap; // reaching definition bit vector entering bb
+  BVMap mRchOutMap;
 
-  std::unordered_set<unsigned> mBbIdSet;           // bb ids in the function
-  std::unordered_map<unsigned, AST_BB *> mBbId2BbMap;
+  std::unordered_set<unsigned> mBbIdSet;             // bb ids in the function
 
  public:
   explicit AST_DFA(AST_Handler *h, bool t) : mHandler(h), mTrace(t) {}
-  ~AST_DFA() {}
+  ~AST_DFA();
 
   void Build();
 
   void CollectDefNodes();
   void BuildBitVectors();
-  void BuildReachDefIn();
 
-  bool IsDef(TreeNode *node);
-  bool AddDef(TreeNode *node, unsigned &bitnum, unsigned bbid);
+  unsigned GetDefStrIdx(TreeNode *node);
+  DefPosition *AddDef(TreeNode *node, unsigned &bitnum, unsigned bbid);
   // unsigned GetDecl(VarNode *);
 
-  unsigned GetDefVecSize() { return mDefVecSize; }
-  void DumpPosDef(PosDef pos);
-  void DumpPosDefVec();
+  unsigned GetDefPositionVecSize() { return mDefPositionVecSize; }
+  void DumpDefPosition(DefPosition pos);
+  void DumpDefPositionVec();
   void DumpReachDefIn();
+
+  void DumpBV(BitVector *bv);
+  void DumpBVMap(BVMap &bvmap);
+  void DumpAllBVMaps();
+  void TestBV();
 };
 
-class ReachDefInVisitor : public AstVisitor {
- private:
-  AST_Handler  *mHandler;
-  bool          mTrace;
-
-  AST_Function *mCurrentFunction;
-  AST_BB       *mCurrentBB;
-
- public:
-  explicit ReachDefInVisitor(AST_Handler *h, bool t, bool base = false)
-    : mHandler(h), mTrace(t), AstVisitor(t && base) {}
-  ~ReachDefInVisitor() = default;
-
-  void SetCurrentFunction(AST_Function *f) { mCurrentFunction = f; }
-  void SetCurrentBB(AST_BB *b) { mCurrentBB = b; }
-
-  DeclNode *VisitDeclNode(DeclNode *node);
-};
 }
 #endif
