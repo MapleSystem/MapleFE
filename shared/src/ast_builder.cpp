@@ -1959,10 +1959,6 @@ TreeNode* ASTBuilder::AddDims() {
   return mLastTreeNode;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-//                    New & Delete operation related
-////////////////////////////////////////////////////////////////////////////////
-
 // This is a help function which adds parameters to a function decl.
 // It's the caller's duty to assure 'func' and 'params' are non null.
 void ASTBuilder::AddParams(TreeNode *func, TreeNode *decl_params) {
@@ -1998,6 +1994,10 @@ void ASTBuilder::AddParams(TreeNode *func, TreeNode *decl_params) {
     MERROR("Unsupported yet.");
   }
 }
+
+////////////////////////////////////////////////////////////////////////////////
+//                    New & Delete operation related
+////////////////////////////////////////////////////////////////////////////////
 
 // This function takes two or three arguments.
 // 1. The id of the class/interface/function/...
@@ -2238,6 +2238,23 @@ TreeNode* ASTBuilder::AddParams() {
     AddParams(mLastTreeNode, params);
   }
 
+  return mLastTreeNode;
+}
+
+// Takes one argument, set it as optional param.
+TreeNode* ASTBuilder::SetOptionalParam() {
+  if (mTrace)
+    std::cout << "In SetOptionalParam" << std::endl;
+
+  MASSERT(mParams.size() == 1);
+  Param p_param = mParams[0];
+  MASSERT(!p_param.mIsEmpty && p_param.mIsTreeNode);
+  TreeNode *param = p_param.mData.mTreeNode;
+  MASSERT(param->IsIdentifier());
+  IdentifierNode *id = (IdentifierNode*)param;
+  id->SetOptionalParam(true);
+
+  mLastTreeNode = id;
   return mLastTreeNode;
 }
 

@@ -470,9 +470,10 @@ private:
   TreeNode      *mType; // PrimTypeNode or UserTypeNode
   TreeNode      *mInit; // Init value
   DimensionNode *mDims;
+  bool           mOptionalParam; // A optional parameter.
 public:
   IdentifierNode(unsigned id, TreeNode *t) : TreeNode(NK_Identifier, id),
-    mType(t), mInit(NULL), mDims(NULL) {}
+    mType(t), mInit(NULL), mDims(NULL), mOptionalParam(false) {}
   IdentifierNode(unsigned id) : IdentifierNode(id, NULL) {}
   ~IdentifierNode(){}
 
@@ -484,6 +485,10 @@ public:
   void SetInit(TreeNode *t)      {mInit = t; t->SetParent(this);}
   void ClearInit()               {mInit = NULL;}
   void SetDims(DimensionNode *t) {mDims = t;}
+
+  bool IsOptionalParam()       {return mOptionalParam;}
+  bool GetOptionalParam()      {return mOptionalParam;}
+  void SetOptionalParam(bool b){mOptionalParam = b;}
 
   unsigned GetDimsNum()          {return mDims->GetDimensionsNum();}
   unsigned GetDim(unsigned n)    {return mDims->GetDimension(n);} // 0 means unspecified.

@@ -1485,6 +1485,11 @@ rule OptionalParameter: ONEOF(
   ZEROORONE(AccessibilityModifier) + BindingIdentifierOrPattern + '?' + ZEROORONE(TypeAnnotation),
   ZEROORONE(AccessibilityModifier) + BindingIdentifierOrPattern + ZEROORONE(TypeAnnotation) + Initializer,
   BindingIdentifier + '?' + ':' + Literal)
+  attr.action.%1 : SetOptionalParam(%2)
+  attr.action.%1 : BuildDecl(%4, %2)
+  attr.action.%2 : AddInitTo(%2, %4)
+  attr.action.%2 : BuildDecl(%3, %2)
+  attr.action.%3 : SetOptionalParam(%1)
 
 ## rule RestParameter: ... BindingIdentifier TypeAnnotationopt
 rule RestParameter: "..." + BindingIdentifier + ZEROORONE(TypeAnnotation)
