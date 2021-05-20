@@ -27,10 +27,10 @@ void A2C::ProcessAST(bool trace_a2c) {
   mTraceA2C = trace_a2c;
   if (mTraceA2C) {
     std::cout << "============= in ProcessAST ===========" << std::endl;
-    std::cout << "srcLang : " << gModule.GetSrcLangString() << std::endl;
+    std::cout << "srcLang : " << gModule->GetSrcLangString() << std::endl;
   }
-  for(unsigned i = 0; i < gModule.GetTreesNum(); i++) {
-    TreeNode *tnode = gModule.GetTree(i);
+  for(unsigned i = 0; i < gModule->GetTreesNum(); i++) {
+    TreeNode *tnode = gModule->GetTree(i);
     if (mTraceA2C) {
       tnode->Dump(0);
       std::cout << std::endl;
@@ -39,11 +39,11 @@ void A2C::ProcessAST(bool trace_a2c) {
 
   if (mTraceA2C) {
     std::cout << "============= AstGraph ===========" << std::endl;
-    AstGraph graph(&gModule);
+    AstGraph graph(gModule);
     graph.DumpGraph("Initial AST", &std::cout);
   }
 
-  AST_Handler handler(&gModule, mTraceA2C);
+  AST_Handler handler(gModule, mTraceA2C);
 
   handler.BuildCFG();
   if (mTraceA2C) {
@@ -60,13 +60,13 @@ void A2C::ProcessAST(bool trace_a2c) {
 
   if (mTraceA2C) {
     std::cout << "============= AstGraph ===========" << std::endl;
-    AstGraph graph(&gModule);
+    AstGraph graph(gModule);
     graph.DumpGraph("After BuildCFG()", &std::cout);
   }
 
   if (mTraceA2C) {
     std::cout << "============= AstDump ===========" << std::endl;
-    AstDump astdump(&gModule);
+    AstDump astdump(gModule);
     astdump.Dump("After BuildCFG()", &std::cout);
   }
 
@@ -77,13 +77,13 @@ void A2C::ProcessAST(bool trace_a2c) {
 
   if (mTraceA2C) {
     std::cout << "============= AstStore ===========" << std::endl;
-    AstStore saveAst(&gModule);
+    AstStore saveAst(gModule);
     saveAst.StoreInAstBuf();
   }
 
   if (mTraceA2C) {
     std::cout << "============= AstEmitter ===========" << std::endl;
-    AstEmitter emitter(&gModule);
+    AstEmitter emitter(gModule);
     emitter.AstEmit("Convert AST to TypeScript code", &std::cout);
   }
 }

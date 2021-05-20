@@ -64,20 +64,20 @@ void A2M::Init() {
 // starting point of AST to MPL process
 void A2M::ProcessAST(bool trace_a2m) {
   mTraceA2m = trace_a2m;
-  AstDump astdump(&gModule);
+  AstDump astdump(gModule);
 
   if (mTraceA2m) {
     std::cout << "============= in ProcessAST ===========" << std::endl;
-    std::cout << "srcLang : " << gModule.GetSrcLangString() << std::endl;
+    std::cout << "srcLang : " << gModule->GetSrcLangString() << std::endl;
   }
   // pass 1: collect class/interface/function decl
-  for (unsigned i = 0; i < gModule.GetTreesNum(); i++) {
-    TreeNode *tnode = gModule.GetTree(i);
+  for (unsigned i = 0; i < gModule->GetTreesNum(); i++) {
+    TreeNode *tnode = gModule->GetTree(i);
     ProcessNodeDecl(SK_Stmt, tnode, nullptr);
   }
   // pass 2: handle function def
-  for (unsigned i = 0; i < gModule.GetTreesNum(); i++) {
-    TreeNode *tnode = gModule.GetTree(i);
+  for (unsigned i = 0; i < gModule->GetTreesNum(); i++) {
+    TreeNode *tnode = gModule->GetTree(i);
     ProcessNode(SK_Stmt, tnode, nullptr);
   }
   if (mTraceA2m) { astdump.Dump("ProcessAST", &std::cout); }

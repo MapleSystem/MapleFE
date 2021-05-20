@@ -52,9 +52,9 @@ void Verifier::Do() {
 // see java/vfy_java.cpp.
 
 void Verifier::VerifyGlobalScope() {
-  mCurrScope = gModule.mRootScope;
-  for (unsigned i = 0; i < gModule.GetTreesNum(); i++) {
-    TreeNode *tree = gModule.GetTree(i);
+  mCurrScope = gModule->mRootScope;
+  for (unsigned i = 0; i < gModule->GetTreesNum(); i++) {
+    TreeNode *tree = gModule->GetTree(i);
     // Step 1. Try to add decl.
     mCurrScope->TryAddDecl(tree);
     // Step 2. Try to add type.
@@ -192,7 +192,7 @@ void Verifier::VerifyTerOperator(TerOperatorNode *tree){
 }
 
 void Verifier::VerifyBlock(BlockNode *block){
-  mCurrScope = gModule.NewScope(mCurrScope);
+  mCurrScope = gModule->NewScope(mCurrScope);
   mCurrScope->SetTree(block);
 
   for (unsigned i = 0; i < block->GetChildrenNum(); i++) {
@@ -209,7 +209,7 @@ void Verifier::VerifyBlock(BlockNode *block){
 // Function body's block is different than a pure BlockNode.
 void Verifier::VerifyFunction(FunctionNode *func){
   ASTScope *old_scope = mCurrScope;
-  mCurrScope = gModule.NewScope(mCurrScope);
+  mCurrScope = gModule->NewScope(mCurrScope);
   mCurrScope->SetTree(func);
 
   // Add the parameters to the decl. Since we search for the decl of a var from
@@ -270,7 +270,7 @@ void Verifier::VerifyClassSuperInterfaces(ClassNode *klass) {}
 
 void Verifier::VerifyClass(ClassNode *klass){
   // Step 1. Create a new scope
-  ASTScope *scope = gModule.NewScope(mCurrScope);
+  ASTScope *scope = gModule->NewScope(mCurrScope);
   mCurrScope = scope;
   scope->SetTree(klass);
 

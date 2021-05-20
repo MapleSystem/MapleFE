@@ -24,15 +24,15 @@ namespace maplefe {
 
 // Collect all types, decls of global scope all at once.
 void VerifierJava::VerifyGlobalScope() {
-  mCurrScope = gModule.mRootScope;
-  for (unsigned i = 0; i < gModule.GetTreesNum(); i++) {
-    TreeNode *tree = gModule.GetTree(i);
+  mCurrScope = gModule->mRootScope;
+  for (unsigned i = 0; i < gModule->GetTreesNum(); i++) {
+    TreeNode *tree = gModule->GetTree(i);
     mCurrScope->TryAddDecl(tree);
     mCurrScope->TryAddType(tree);
-  } 
+  }
 
-  for (unsigned i = 0; i < gModule.GetTreesNum(); i++) {
-    TreeNode *tree = gModule.GetTree(i);
+  for (unsigned i = 0; i < gModule->GetTreesNum(); i++) {
+    TreeNode *tree = gModule->GetTree(i);
     VerifyTree(tree);
   }
 }

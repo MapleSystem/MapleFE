@@ -85,7 +85,7 @@ int main (int argc, char *argv[]) {
   maplefe::VerifierJava vfy_java;
   vfy_java.Do();
 
-  maplefe::A2MJava *a2m = new maplefe::A2MJava(maplefe::gModule.GetFileName());
+  maplefe::A2MJava *a2m = new maplefe::A2MJava(maplefe::gModule->GetFileName());
   a2m->ProcessAST(trace_a2m);
 
   a2m->mMirModule->OutputAsciiMpl("", ".mpl");

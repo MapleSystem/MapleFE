@@ -178,14 +178,14 @@ static void add_type_to(TreeNode *tree, TreeNode *type) {
 ////////////////////////////////////////////////////////////////////////////////////////
 
 TreeNode* ASTBuilder::BuildPackageName() {
-  MASSERT(!gModule.mPackage);
+  MASSERT(!gModule->mPackage);
   MASSERT(mLastTreeNode->IsField() || mLastTreeNode->IsIdentifier());
 
   PackageNode *n = (PackageNode*)gTreePool.NewTreeNode(sizeof(PackageNode));
   new (n) PackageNode();
   n->SetPackage(mLastTreeNode);
 
-  gModule.SetPackage(n);
+  gModule->SetPackage(n);
 
   mLastTreeNode = n;
   return mLastTreeNode;

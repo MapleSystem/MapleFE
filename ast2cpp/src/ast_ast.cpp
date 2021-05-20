@@ -25,8 +25,8 @@ void AST_AST::Build() {
   AdjustAST();
 
   if (mTrace) {
-    for(unsigned i = 0; i < gModule.GetTreesNum(); i++) {
-      TreeNode *it = gModule.GetTree(i);
+    for(unsigned i = 0; i < gModule->GetTreesNum(); i++) {
+      TreeNode *it = gModule->GetTree(i);
       it->Dump(0);
       std::cout << std::endl;
     }

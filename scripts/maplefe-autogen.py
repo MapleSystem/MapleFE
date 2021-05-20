@@ -886,7 +886,7 @@ using AstBuffer  = std::vector<uint8_t>;
 using AstNodeVec = std::vector<TreeNode*>;
 }}
 """.format(astvisitor=astvisitor),
-        ": public " + astvisitorclass,            # Base class
+        ": public " + astvisitorclass, # Base class
         ]
 
 astemit_init = [

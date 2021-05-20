@@ -79,7 +79,7 @@ public:
 };
 
 // Assume currently only one global module is being processed.
-extern ModuleNode gModule;
+extern ModuleNode *gModule;
 
 }
 #endif

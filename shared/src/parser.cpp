@@ -188,7 +188,8 @@ Parser::Parser(const char *name) : filename(name) {
   mLexer = new Lexer();
   const std::string file(name);
 
-  gModule.SetFileName(name);
+  gModule = new (gTreePool.NewTreeNode(sizeof(ModuleNode))) ModuleNode();
+  gModule->SetFileName(name);
   gPrimTypePool.Init();
 
   // get source language type
@@ -199,13 +200,13 @@ Parser::Parser(const char *name) : filename(name) {
   }
   std::string fileExt = file.substr(lastDot);
   if (fileExt.compare(".java") == 0) {
-    gModule.mSrcLang = SrcLangJava;
+    gModule->mSrcLang = SrcLangJava;
   } else if (fileExt.compare(".js") == 0) {
-    gModule.mSrcLang = SrcLangJavaScript;
+    gModule->mSrcLang = SrcLangJavaScript;
   } else if (fileExt.compare(".ts") == 0) {
-    gModule.mSrcLang = SrcLangTypeScript;
+    gModule->mSrcLang = SrcLangTypeScript;
   } else {
-    gModule.mSrcLang = SrcLangUnknown;
+    gModule->mSrcLang = SrcLangUnknown;
   }
 
   mLexer->PrepareForFile(file);
@@ -346,10 +347,10 @@ bool Parser::Parse() {
   if (gTemplateLiteralNodes.GetNum() > 0)
     ParseTemplateLiterals();
 
-  FixUpVisitor worker(&gModule);
+  FixUpVisitor worker(gModule);
   worker.FixUp();
 
-  gModule.Dump();
+  gModule->Dump();
   return (res==ParseFail)? false: true;
 }
 
@@ -508,7 +509,7 @@ ParseStatus Parser::ParseStmt() {
     TreeNode *tree = BuildAST();
     if (tree) {
       if (!mLineMode)
-        gModule.AddTree(tree);
+        gModule->AddTree(tree);
     }
 
     if (mTraceTiming) {
@@ -703,7 +704,7 @@ bool Parser::LookAheadFail(RuleTable *rule_table, unsigned token) {
         if (t->IsKeyword() && !strncmp(t->GetName(), "this_is_for_fake_rule", 21)) {
           if (curr_token->IsTempLit())
             found = true;
-        } 
+        }
       }
       break;
     case LA_Identifier:
