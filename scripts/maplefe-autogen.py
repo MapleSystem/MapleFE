@@ -676,8 +676,11 @@ bool PutNode(TreeNode *n) {{
       case NK_Identifier:  *mOs << "\\\\\\"" << n->GetString() << "\\\\\\"" << NodeColor(wheat); break;
       case NK_Decl:        *mOs << EnumVal(DeclNode, DeclProp, Prop) << NodeColor(palegoldenrod); break;
       case NK_PrimType:    *mOs << EnumVal(PrimTypeNode, TypeId, PrimType) << NodeColor(lemonchiffon); break;
-      case NK_BinOperator: *mOs << EnumVal(BinOperatorNode, OprId, OprId) << NodeColor(palegreen); break;
+      case NK_BinOperator: *mOs << EnumVal(BinOperatorNode, OprId, OprId);
+      case NK_TerOperator:
+                           *mOs << NodeColor(palegreen); break;
       case NK_UnaOperator: *mOs << EnumVal(UnaOperatorNode, OprId, OprId);
+      case NK_InstanceOf:
       case NK_TypeOf:      *mOs << NodeColor(lightgreen); break;
       case NK_Literal:     {{
                              std::string s({astdumpclass}::GetEnumLitData(static_cast<LiteralNode *>(n)->GetData()));

@@ -22,7 +22,7 @@ ModuleNode gModule;
 
 ModuleNode::ModuleNode() : TreeNode(NK_Module), mPackage(NULL), mSrcLang(SrcLangUnknown) {
     mRootScope = mScopePool.NewScope(NULL);
-  }
+}
 
 ModuleNode::~ModuleNode() {
   mTrees.Release();
