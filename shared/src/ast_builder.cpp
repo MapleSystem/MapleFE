@@ -2766,13 +2766,8 @@ TreeNode* ASTBuilder::BuildLambda() {
   if (params_node) {
     if (params_node->IsIdentifier()) {
       lambda->AddParam((IdentifierNode*)params_node);
-    } else if (params_node->IsPass()) {
-      PassNode *pass_node = (PassNode*)params_node;
-      for (unsigned i = 0; i < pass_node->GetChildrenNum(); i++) {
-        TreeNode *param = pass_node->GetChild(i);
-        MASSERT(param->IsIdentifier() || param->IsDecl());
-        lambda->AddParam(param);
-      }
+    } else {
+      AddParams(lambda, params_node);
     }
   }
 
