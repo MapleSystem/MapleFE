@@ -29,6 +29,7 @@ STRUCT Operator : ONEOF(
                     ("%",    Mod),
                     ("++",   Inc),
                     ("--",   Dec),
+                    ("**",   Exp),
                     # Relation
                     ("==",   EQ),
                     ("!=",   NE),

@@ -398,14 +398,41 @@ rule UnaryExpression : ONEOF(
   attr.action.%4 : BuildTypeOf(%2)
   attr.action.%5,%6,%7,%8,%9,%10 : BuildUnaryOperation(%1, %2)
 
+## UpdateExpression[Yield]:
+## LeftHandSideExpression[?Yield]
+## LeftHandSideExpression[?Yield][no LineTerminator here]++
+## LeftHandSideExpression[?Yield][no LineTerminator here]--
+## ++UnaryExpression[?Yield]
+## --UnaryExpression[?Yield]
+rule UpdateExpression : ONEOF(LeftHandSideExpression,
+                              LeftHandSideExpression + "++",
+                              LeftHandSideExpression + "--",
+                              "++" + UnaryExpression,
+                              "--" + UnaryExpression)
+  attr.action.%2,%3 : BuildPostfixOperation(%2, %1)
+  attr.action.%4,%5: BuildUnaryOperation(%1, %2)
+
+
+## Added in 2016
+## ExponentiationExpression[Yield]:
+## UnaryExpression[?Yield]
+## UpdateExpression[?Yield]**ExponentiationExpression[?Yield]
+rule ExponentiationExpression : ONEOF(UnaryExpression,
+                                      UpdateExpression + "**" + ExponentiationExpression)
+  attr.action.%2 : BuildBinaryOperation(%1, %2, %3)
+
 ##-----------------------------------
 ##rule MultiplicativeExpression[Yield] :
 ##  UnaryExpression[?Yield]
 ##  MultiplicativeExpression[?Yield] MultiplicativeOperator UnaryExpression[?Yield]
+## 2016
+## MultiplicativeExpression[Yield]:
+## ExponentiationExpression[?Yield]
+## MultiplicativeExpression[?Yield]MultiplicativeOperatorExponentiationExpression[?Yield]
 
 rule MultiplicativeExpression : ONEOF(
-  UnaryExpression,
-  MultiplicativeExpression + MultiplicativeOperator + UnaryExpression)
+  ExponentiationExpression,
+  MultiplicativeExpression + MultiplicativeOperator + ExponentiationExpression)
   attr.action.%2 : BuildBinaryOperation(%1, %2, %3)
 
 ##-----------------------------------

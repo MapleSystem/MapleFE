@@ -29,6 +29,8 @@ OPERATOR(Mod, Binary)
 OPERATOR(Inc, Pre|Post)
 OPERATOR(Dec, Pre|Post)
 
+OPERATOR(Exp, Binary)
+
 OPERATOR(Plus,   Unary)
 OPERATOR(Minus,  Unary)
 OPERATOR(PreInc, Pre)
