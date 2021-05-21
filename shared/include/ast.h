@@ -95,6 +95,7 @@ public:
   bool TypeEquivalent(TreeNode*);
 
   NodeKind GetKind() {return mKind;}
+  void SetKind(NodeKind k) {} // Not allowed to change its kind
   void SetNodeId(unsigned id) {mNodeId = id;}
   void SetParent(TreeNode *p) {mParent = p;}
   void SetLabel (TreeNode *p) {mLabel = p;}
@@ -884,9 +885,11 @@ private:
 
 public:
   LiteralNode(LitData d) : TreeNode(NK_Literal), mData(d) {}
+  LiteralNode() : LiteralNode({.mType = LT_NA, .mData.mInt = 0}) {}
   ~LiteralNode(){}
 
   LitData GetData() {return mData;}
+  void SetData(LitData d) {mData = d;}
   void Dump(unsigned);
 };
 

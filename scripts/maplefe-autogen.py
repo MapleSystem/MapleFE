@@ -228,7 +228,7 @@ def gen_handler_ast_node(dictionary):
                 if ntype != None or gen_call_handle_values():
                     # gen_call_children_node() for list or vector of nodes before entering the loop
                     code.append(gen_call_children_node(dictionary, node_name, name, otype + "<" + rtype + ">", "node->" + plural + "Num()"))
-                    code.append("for(unsigned i = 0; i < node->" + plural + "Num(); ++i) {")
+                    code.append("for(unsigned i = 0; i < " + gen_children_num(plural) + "; ++i) {")
                     if ntype != None:
                         # gen_call_nth_child_node() for the nth child node in the loop for the list or vector
                         code.append(gen_call_nth_child_node(dictionary, node_name, name, ntype, "node->" + func_name + "(i)"))
@@ -388,6 +388,7 @@ def padding_name(name):
     return gen_padding + name.ljust(7)
 
 # The follwoing gen_func_* and gen_call* functions are for AstDump
+gen_children_num = lambda pl: 'node->' + pl + 'Num()'
 gen_func_decl_location = lambda: True
 gen_call_handle_values = lambda: True
 gen_func_declaration = lambda dictionary, node_name: \
@@ -987,5 +988,188 @@ append(src_file, ['using namespace std::string_literals;'])
 append(include_file, astemit_init)
 handle_yaml(initial_yaml, gen_handler)
 gen_args[2] = "Write"
+handle_yaml(treenode_yaml, gen_handler_ast_node)
+handle_src_include_files(Finalization)
+
+################################################################################
+
+def gen_setter(accessor):
+    return accessor.replace("Get", "Set").replace("()", "(n)").replace("(i)", "(i,n)").replace("Is", "SetIs")
+
+def short_name(node_type):
+    return node_type.replace('class ', '').replace('maplefe::', '').replace(' *', '*')
+
+def set_data_based_on_type(val_type, accessor):
+    if val_type[-10:] == "ASTScope *" or val_type[-12:] == "ASTScopePool":
+        return '; /* Skip ' + val_type + ' */'
+    e = get_enum_type(val_type)
+    if e != None:
+        return e + ' n = static_cast<' + e + '>(ReadValue());' + gen_setter(accessor) + ';'
+    elif val_type == "bool":
+        return val_type + ' n = static_cast<' + val_type + '>(ReadValue());' + gen_setter(accessor) + ';'
+    elif val_type == 'unsigned int' or val_type == 'uint32_t' or val_type == 'uint64_t' \
+            or val_type == 'unsigned' or val_type == 'int' or val_type == 'int32_t' or val_type == 'int64_t' :
+        return ('AddStrIdx(' + accessor + ');' if accessor.find("GetStrIdx()") >= 0 else '') \
+                + val_type + ' n = static_cast<' + val_type + '>(ReadValue()); ' + gen_setter(accessor) + ';'
+    elif val_type == "LitData":
+        return val_type + ' n; n.mType = static_cast<LitId>(ReadValue()); n.mData.mInt64 = ReadValue();' \
+               + gen_setter(accessor) + '; if(n.mType == LT_StringLiteral) ;'
+    elif val_type == 'const char *':
+        return val_type + ' n = ReadString();' + gen_setter(accessor) + ';'
+    return 'Failed to get value with ' + val_type + ", " + accessor + ';'
+
+# The follwoing gen_func_* and gen_call* functions are for AstLoad
+#
+gen_children_num = lambda pl: 'num'
+gen_func_decl_location = lambda: False
+gen_call_handle_values = lambda: True
+gen_func_declaration = lambda dictionary, node_name: \
+        node_name + "* " + gen_args[2] + node_name + "(NodeKind k);"
+gen_func_definition = lambda dictionary, node_name: \
+        node_name + "* " + gen_args[1] + "::" + gen_args[2] + node_name + "(NodeKind k) {\n" \
+        + (node_name + ' *node;' if node_name == "TreeNode" else \
+        node_name + ' *node = new (gTreePool.NewTreeNode(sizeof(' + node_name + '))) ' + node_name + '();' \
+        + 'MASSERT(k == node->GetKind()); InitTreeNode(node);')
+gen_call_child_node = lambda dictionary, node_name, field_name, node_type, accessor: \
+        '{' + node_type + '* n = static_cast<' + node_type + '*>(ReadAddress()); ' + gen_setter(accessor) \
+        + '; } // ' + field_name + ': ' + node_type \
+        if field_name != '' else 'node = ' + gen_args[2] + short_name(node_type) + '(k);'
+gen_call_child_value = lambda dictionary, node_name, field_name, val_type, accessor: \
+        '{' + set_data_based_on_type(val_type, accessor) + '} // ' + field_name + ': ' + val_type
+gen_call_children_node = lambda dictionary, node_name, field_name, node_type, accessor: \
+        '{unsigned num = ReadLength(); // ' + field_name + ': ' + node_type
+gen_call_nth_child_node = lambda dictionary, node_name, field_name, node_type, accessor: \
+        node_type + '* n = static_cast<' + node_type + '*>(ReadAddress()); ' + gen_setter(accessor) \
+        + '; // ' + field_name + ': ' + node_type
+gen_call_nth_child_value = lambda dictionary, node_name, field_name, val_type, accessor: \
+        '{' + set_data_based_on_type(val_type, accessor) + '} // ' + field_name + ': ' + val_type
+gen_call_children_node_end = lambda dictionary, node_name, field_name, node_type, accessor: '}'
+gen_func_definition_end = lambda dictionary, node_name: 'return node;}'
+#
+gen_args = [
+        "gen_astload", # Filename
+        "AstLoad",     # Class name
+        "Load",        # Prefix of function name
+        """
+#include "stringpool.h"
+#include "ast_mempool.h"
+#include "{astvisitor}.h"
+#include <cstring>
+#include <cstdint>
+#include <set>
+namespace maplefe {{
+using AstBuffer  = std::vector<uint8_t>;
+using AstBufIter = std::vector<uint8_t>::iterator;
+using AstNodeVec = std::vector<TreeNode*>;
+}}
+""".format(astvisitor=astvisitor),
+        ": public " + astvisitorclass, # Base class
+        ]
+
+astemit_init = [
+"""
+private:
+AstBufIter          it;
+std::set<unsigned>  mStrIdxSet;
+
+public:
+
+ModuleNode *{gen_args2}FromAstBuf(AstBuffer &buf) {{
+  mStrIdxSet.clear();
+  it = buf.begin();
+  bool check = *it++ == 'M';
+  check &= *it++ == 'P';
+  check &= *it++ == 'L';
+  check &= *it++ == 'A';
+  check &= *it++ == 'S';
+  check &= *it++ == 'T';
+  MASSERT(check);
+  ModuleNode *module = static_cast<ModuleNode *>(ReadNode());
+  while(*it != 'T')
+    ReadNode();
+  ReadStrIdxTable();
+  // fixup
+  return module;
+}}
+
+bool IsVisited(TreeNode* node) {{
+  if({astvisitorclass}::IsVisited(node))
+    return true;
+  //{gen_args2}TreeNode(node);
+  return false;
+}}
+
+// LEB128, same as for MapleIR
+int64_t ReadNum(uint8_t flag) {{
+  bool check = flag == *it++;
+  MASSERT(check);
+  uint64_t n = 0;
+  int64_t y = 0;
+  uint64_t b = static_cast<uint64_t>(*it++);
+  while (b >= 0x80) {{
+    y += ((b - 0x80) << n);
+    n += 7;
+    b = static_cast<uint64_t>(*it++);
+  }}
+  b = (b & 0x3F) - (b & 0x40);
+  return y + (b << n);
+}}
+
+TreeNode * ReadNode() {{
+  NodeKind k = static_cast<NodeKind>(ReadNum('N'));
+  return LoadTreeNode(k);
+}}
+
+TreeNode *ReadAddress() {{
+  int64_t n = ReadNum('A');
+  return n ? reinterpret_cast<TreeNode *>(n) : nullptr;
+}}
+
+int64_t ReadValue() {{
+  return ReadNum('V');
+}}
+
+int64_t ReadLength() {{
+  return ReadNum('L');
+}}
+
+const char *ReadString() {{
+  bool check = 'S' == *it++;
+  MASSERT(check);
+  int64_t len = ReadNum('S');
+  if(len) {{
+    const char *res = reinterpret_cast<const char *>(&(*it));
+    it += len;
+    return res;
+  }} else
+    return nullptr;
+}}
+
+void ReadStrIdxTable() {{
+  int64_t num = ReadNum('T');
+  for(int64_t i; i < num; ++i) {{
+    unsigned id = static_cast<unsigned>(ReadValue());
+    ReadString();
+  }}
+}}
+
+void AddStrIdx(unsigned idx) {{
+  if(idx)
+    mStrIdxSet.insert(idx);
+}}
+
+""".format(gen_args1=gen_args[1], gen_args2=gen_args[2], astvisitorclass=astvisitorclass)
+] # astemit_init
+
+handle_src_include_files(Initialization)
+append(src_file, ['using namespace std::string_literals;'])
+append(include_file, astemit_init)
+handle_yaml(initial_yaml, gen_handler)
+gen_args[2] = "Init"
+gen_func_declaration = lambda dictionary, node_name: \
+        'void ' + gen_args[2] + node_name + '(TreeNode *node);'
+gen_func_definition = lambda dictionary, node_name: \
+        'void ' + gen_args[1] + "::" + gen_args[2] + node_name + '(TreeNode *node) {'
+gen_func_definition_end = lambda dictionary, node_name: '}'
 handle_yaml(treenode_yaml, gen_handler_ast_node)
 handle_src_include_files(Finalization)
