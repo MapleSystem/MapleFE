@@ -1026,7 +1026,8 @@ def set_data_based_on_type(val_type, accessor, setter):
     elif val_type == 'unsigned int' or val_type == 'uint32_t' or val_type == 'uint64_t' \
             or val_type == 'unsigned' or val_type == 'int' or val_type == 'int32_t' or val_type == 'int64_t' :
         return (val_type + ' n = static_cast<' + val_type + '>(ReadValue());' if accessor.find("GetStrIdx()") < 0 \
-           else val_type + ' n = static_cast<' + val_type + '>(mStrMap[ReadValue()]);') + setter(accessor) + ';'
+           else val_type + ' n = static_cast<' + val_type + '>(mStrMap[ReadValue()]);') \
+           + (setter(accessor) + ';' if accessor.find("GetNodeId()") < 0 else '/* ' + setter(accessor) + '; */')
     elif val_type == "LitData":
         return val_type + ' n; n.mType = static_cast<LitId>(ReadValue());if(n.mType == LT_StringLiteral)' \
            + 'n.mData.mInt64 = mStrMap[ReadValue()]; else n.mData.mInt64 = ReadValue();' + setter(accessor) + ';'
