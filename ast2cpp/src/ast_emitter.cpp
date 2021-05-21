@@ -1062,15 +1062,20 @@ std::string AstEmitter::AstEmitLambdaNode(LambdaNode *node) {
       str += AstEmitTreeNode(n);
     }
   }
-  str += ") => "s;
-
-  if (auto n = node->GetType()) {
-    str += AstEmitTreeNode(n);
-  }
+  str += ")"s;
 
   if (auto n = node->GetBody()) {
-    str += AstEmitTreeNode(n);
+    if (auto t = node->GetType()) {
+      str += ": "s + AstEmitTreeNode(t);
+    }
+    str += " => "s + AstEmitTreeNode(n);
   }
+  else {
+    if (auto t = node->GetType()) {
+      str += " => "s + AstEmitTreeNode(t);
+    }
+  }
+
   mPrecedence = '\030';
   if (node->IsStmt())
     str += ";\n"s;
