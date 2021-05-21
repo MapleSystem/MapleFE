@@ -59,6 +59,9 @@ void AST_DFA::TestBV() {
 
   bv1->And(bv2);
   DumpBV(bv1);
+
+  free(bv1);
+  free(bv2);
 }
 
 void AST_DFA::Build() {
@@ -312,6 +315,8 @@ void AST_DFA::BuildBitVectors() {
     }
   }
 
+  free(old_bv);
+  free(tmp_bv);
   if (mTrace) DumpAllBVMaps();
 }
 
