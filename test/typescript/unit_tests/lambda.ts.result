@@ -1,0 +1,8 @@
+Matched 23 tokens.
+Matched 35 tokens.
+============= Module ===========
+== Sub Tree ==
+js_var Decl: add=(x,y,x,y) -> return x Add y
+
+== Sub Tree ==
+console.log(add(2,3))
