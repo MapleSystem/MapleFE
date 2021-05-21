@@ -198,17 +198,12 @@ rule PropertyDefinitionList : ONEOF(
   PropertyDefinitionList + ',' + PropertyDefinition)
 
 ##-----------------------------------
+# modified in 2016
 ##rule PropertyDefinition[Yield] :
 ##  IdentifierReference[?Yield]
 ##  CoverInitializedName[?Yield]
 ##  PropertyName[?Yield] : AssignmentExpression[In, ?Yield]
 ##  MethodDefinition[?Yield]
-rule PropertyDefinition : ONEOF(
-  IdentifierReference,
-#  CoverInitializedName[?Yield]
-  PropertyName + ':' + AssignmentExpression)
-#  MethodDefinition[?Yield]
-  attr.action.%2 : BuildFieldLiteral(%1, %3)
 
 ##-----------------------------------
 ##rule PropertyName[Yield] :
@@ -240,6 +235,7 @@ rule ComputedPropertyName : '[' + AssignmentExpression + ']'
 ##-----------------------------------
 ##rule CoverInitializedName[Yield] :
 ##  IdentifierReference[?Yield] Initializer[In, ?Yield]
+rule CoverInitializedName : IdentifierReference + Initializer
 
 ##-----------------------------------
 ##rule Initializer[In, Yield] :
@@ -1553,6 +1549,13 @@ rule TypeAliasDeclaration: "type" + BindingIdentifier + ZEROORONE(TypeParameters
 ##############################################################################################
 
 ## PropertyDefinition: ( Modified ) IdentifierReference CoverInitializedName PropertyName : AssignmentExpression PropertyName CallSignature { FunctionBody } GetAccessor SetAccessor
+rule PropertyDefinition: ONEOF(IdentifierReference,
+                               CoverInitializedName,
+                               PropertyName + ':' + AssignmentExpression,
+                               PropertyName + CallSignature + '{' + FunctionBody + '}',
+                               GetAccessor,
+                               SetAccessor)
+  attr.action.%3 : BuildFieldLiteral(%1, %3)
 
 ## GetAccessor: get PropertyName ( ) TypeAnnotationopt { FunctionBody }
 rule GetAccessor: "get" + PropertyName + '(' + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}'

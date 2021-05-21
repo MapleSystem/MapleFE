@@ -1341,7 +1341,7 @@ TreeNode* ASTBuilder::BuildStructLiteral() {
       struct_literal->AddField((FieldLiteralNode*)child);
     }
   } else {
-    MERROR("Unsupported struct literal.");
+    // do nothing, to be finished.
   }
 
   mLastTreeNode = struct_literal;
