@@ -676,7 +676,7 @@ static std::string BBLabelStr(AST_BB *bb, const char *shape = nullptr, const cha
 // Dump current AST_Function node
 void AST_Function::Dump() {
   FunctionNode *func = GetFunction();
-  const char *func_name = func ? (func->GetStrIdx() ? func->GetString().c_str() : "_anonymous_") : "_init_";
+  const char *func_name = func ? (func->GetStrIdx() ? func->GetName() : "_anonymous_") : "_init_";
   std::cout << "Function " << func_name  << " {" << std::endl;
   unsigned num = GetNestedFunctionsNum();
   if(num > 0) {
@@ -684,7 +684,7 @@ void AST_Function::Dump() {
     for(unsigned i = 0; i < num; ++i) {
       AST_Function *afunc = GetNestedFunctionAtIndex(i);
       FunctionNode *fnode = afunc->mFunction;
-      const char *fname = fnode ? (fnode->GetStrIdx() ? fnode->GetString().c_str() : "_anonymous_") : "_init_";
+      const char *fname = fnode ? (fnode->GetStrIdx() ? fnode->GetName() : "_anonymous_") : "_init_";
       std::cout << "Function: " << i + 1 << " " << fname << std::endl;
       afunc->Dump();
     }

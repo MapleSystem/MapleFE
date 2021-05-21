@@ -81,7 +81,7 @@ void TreeNode::DumpLabel(unsigned ind) {
     IdentifierNode *inode = (IdentifierNode*)label;
     for (unsigned i = 0; i < ind; i++)
       DUMP0_NORETURN(' ');
-    DUMP0_NORETURN(inode->GetString());
+    DUMP0_NORETURN(inode->GetName());
     DUMP0_NORETURN(':');
     DUMP_RETURN();
   }
@@ -232,9 +232,9 @@ void AnnotationTypeNode::Dump(unsigned indent) {
 
 const char* CastNode::GetDumpName() {
   std::string name = "(";
-  name += mDestType->GetString();
+  name += mDestType->GetName();
   name += ")";
-  name += mExpr->GetString();
+  name += mExpr->GetName();
   return gStringPool.FindString(name);
 }
 
@@ -351,7 +351,7 @@ void NewNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   DUMP0_NORETURN("new ");
   TreeNode *id = GetId();
-  DUMP0_NORETURN(id->GetString());
+  DUMP0_NORETURN(id->GetName());
   DUMP0_NORETURN("(");
   for (unsigned i = 0; i < GetArgsNum(); i++) {
     TreeNode *arg = GetArg(i);
@@ -419,7 +419,7 @@ void DimensionNode::Merge(const TreeNode *node) {
 
 void IdentifierNode::Dump(unsigned indent) {
   DumpIndentation(indent);
-  DUMP0_NORETURN(GetString());
+  DUMP0_NORETURN(GetName());
   if (mOptionalParam)
     DUMP0_NORETURN('?');
   if (mInit) {
@@ -552,7 +552,7 @@ void VarListNode::Merge(TreeNode *n) {
 void VarListNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   for (unsigned i = 0; i < mVars.GetNum(); i++) {
-    //DUMP0_NORETURN(mVars.ValueAtIndex(i)->GetString());
+    //DUMP0_NORETURN(mVars.ValueAtIndex(i)->GetName());
     mVars.ValueAtIndex(i)->Dump(0);
     if (i != mVars.GetNum()-1)
       DUMP0_NORETURN(",");
@@ -1006,9 +1006,9 @@ void ClassNode::Release() {
 void ClassNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   if (IsJavaEnum())
-    DUMP1_NORETURN("class[JavaEnum] ", GetString());
+    DUMP1_NORETURN("class[JavaEnum] ", GetName());
   else
-    DUMP1_NORETURN("class ", GetString());
+    DUMP1_NORETURN("class ", GetName());
   DUMP_RETURN();
 
   DumpIndentation(indent + 2);
@@ -1158,7 +1158,7 @@ void FunctionNode::Dump(unsigned indent) {
     DUMP0_NORETURN("func  ");
 
   if (mStrIdx)
-    DUMP0_NORETURN(GetString());
+    DUMP0_NORETURN(GetName());
 
   // dump parameters
   DUMP0_NORETURN("(");
@@ -1194,9 +1194,9 @@ void LambdaNode::Dump(unsigned indent) {
   for (unsigned i = 0; i < mParams.GetNum(); i++) {
     TreeNode *in = mParams.ValueAtIndex(i);
     if(in->GetKind() == NK_Decl)
-      dump += static_cast<DeclNode*>(in)->GetVar()->GetString();
+      dump += static_cast<DeclNode*>(in)->GetVar()->GetName();
     else
-      dump += in->GetString();
+      dump += in->GetName();
     if (i < mParams.GetNum() - 1)
       dump += ",";
   }
@@ -1265,7 +1265,7 @@ void InterfaceNode::Construct(BlockNode *block) {
 
 void InterfaceNode::Dump(unsigned indent) {
   DumpIndentation(indent);
-  DUMP1_NORETURN("interface ", GetString());
+  DUMP1_NORETURN("interface ", GetName());
   DUMP_RETURN();
   DumpIndentation(indent + 2);
 

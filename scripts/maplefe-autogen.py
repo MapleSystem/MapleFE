@@ -374,7 +374,7 @@ def get_data_based_on_type(val_type, accessor):
             or val_type == 'unsigned' or val_type == 'int' or val_type == 'int32_t' or val_type == 'int64_t' :
         if accessor.find("GetStrIdx()") >= 0:
             return val_type + ', " + std::to_string(' + accessor + ') + " => " + (' + accessor \
-                    + '? "\\"" + gStringPool.GetStringFromStrIdx(' + accessor + ') + "\\"": "null"));'
+                    + '? "\\"" + std::string(gStringPool.GetStringFromStrIdx(' + accessor + ')) + "\\"": "null"));'
         return val_type + ', " + std::to_string(' + accessor + '));'
     elif val_type == 'const char *':
         return 'const char*, " + (' + accessor + ' ? std::string("\\"") + ' + accessor + ' + "\\"" : "null"));'
@@ -661,7 +661,7 @@ bool PutNode(TreeNode *n) {{
     *mOs << NodeName(n,\'_\') << " [label=\\"" << NodeName(n,',') << "\\\\n";
     switch(n->GetKind()) {{
       case NK_Function:    {{
-                             std::string s = n->GetString();
+                             std::string s = n->GetName();
                              *mOs << (n->GetStrIdx() ? s : "_anonymous_") << NodeColor(lightcoral);
                              break;
                            }}
@@ -678,7 +678,7 @@ bool PutNode(TreeNode *n) {{
       case NK_ForLoop:     *mOs << EnumVal(ForLoopNode, ForLoopProp, Prop);
       case NK_WhileLoop:
       case NK_DoLoop:      *mOs << NodeColor(lightskyblue); break;
-      case NK_Identifier:  *mOs << "\\\\\\"" << n->GetString() << "\\\\\\"" << NodeColor(wheat); break;
+      case NK_Identifier:  *mOs << "\\\\\\"" << n->GetName() << "\\\\\\"" << NodeColor(wheat); break;
       case NK_Decl:        *mOs << EnumVal(DeclNode, DeclProp, Prop) << NodeColor(palegoldenrod); break;
       case NK_PrimType:    *mOs << EnumVal(PrimTypeNode, TypeId, PrimType) << NodeColor(lemonchiffon); break;
       case NK_BinOperator: *mOs << EnumVal(BinOperatorNode, OprId, OprId);
@@ -983,7 +983,7 @@ void WriteStrIdxTable() {{
   WriteNum('T', static_cast<int64_t>(mStrIdxSet.size()));
   for(auto s: mStrIdxSet) {{
     WriteValue(s);
-    WriteString(gStringPool.GetStringFromStrIdx(s).c_str());
+    WriteString(gStringPool.GetStringFromStrIdx(s));
   }}
 }}
 

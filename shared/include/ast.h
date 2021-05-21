@@ -108,7 +108,7 @@ public:
 
   virtual unsigned GetStrIdx() {return mStrIdx;}
   virtual void SetStrIdx(unsigned id) {mStrIdx = id;}
-  virtual std::string GetString() {return gStringPool.GetStringFromStrIdx(mStrIdx);}
+  virtual const char *GetName() {return gStringPool.GetStringFromStrIdx(mStrIdx);}
   virtual void SetStrIdx(std::string str) {mStrIdx = gStringPool.GetStrIdx(str);}
   virtual void ReplaceChild(TreeNode *oldchild, TreeNode *newchild){}
   virtual void AddAttr(AttrId) {}

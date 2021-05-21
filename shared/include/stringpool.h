@@ -66,7 +66,7 @@ public:
   unsigned GetStrIdx(const char*);
   unsigned GetStrIdx(const char*, size_t);
 
-  const std::string GetStringFromStrIdx(unsigned idx) {
+  const char *GetStringFromStrIdx(unsigned idx) {
     MASSERT(idx < mStringTable.size() && "string index out of range");
     return mStringTable[idx];
   }

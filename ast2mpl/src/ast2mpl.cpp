@@ -115,7 +115,7 @@ maple::MIRType *A2M::MapType(TreeNode *type) {
     mNodeTypeMap[idx] = mir_type;
   } else if (idx) {
     AST2MPLMSG("MapType add a class type by idx", idx);
-    mir_type = maple::GlobalTables::GetTypeTable().GetOrCreateClassType(type->GetString(), *mMirModule);
+    mir_type = maple::GlobalTables::GetTypeTable().GetOrCreateClassType(type->GetName(), *mMirModule);
     mir_type->SetMIRTypeKind(maple::kTypeClass);
     mir_type = mMirBuilder->GetOrCreatePointerType(mir_type);
     mNodeTypeMap[idx] = mir_type;
@@ -400,7 +400,7 @@ maple::MIRSymbol *A2M::GetSymbol(TreeNode *tnode, BlockNode *block) {
     NOTYETIMPL("Block parent hirachy");
     return symbol;
   }
-  maple::GStrIdx stridx = maple::GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(tnode->GetString());
+  maple::GStrIdx stridx = maple::GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(tnode->GetName());
   if (func->IsAFormalName(stridx)) {
     maple::FormalDef def = func->GetFormalFromName(stridx);
     return def.formalSym;
@@ -421,7 +421,7 @@ maple::MIRSymbol *A2M::CreateTempVar(const char *prefix, maple::MIRType *type) {
 }
 
 maple::MIRSymbol *A2M::CreateSymbol(TreeNode *tnode, BlockNode *block) {
-  std::string name = tnode->GetString();
+  std::string name = tnode->GetName();
   maple::MIRType *mir_type;
 
   if (tnode->IsIdentifier()) {
