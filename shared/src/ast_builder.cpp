@@ -1969,6 +1969,8 @@ void ASTBuilder::AddParams(TreeNode *func, TreeNode *decl_params) {
       // one single parameter at call site
       if (func->IsFunction())
         ((FunctionNode*)func)->AddParam(params);
+      else if (func->IsLambda())
+        ((LambdaNode*)func)->AddParam(params);
       else
         MERROR("Unsupported yet.");
     } else if (params->IsVarList()) {
@@ -1978,6 +1980,8 @@ void ASTBuilder::AddParams(TreeNode *func, TreeNode *decl_params) {
         IdentifierNode *inode = vl->GetVarAtIndex(i);
         if (func->IsFunction())
           ((FunctionNode*)func)->AddParam(inode);
+        else if (func->IsLambda())
+          ((LambdaNode*)func)->AddParam(inode);
         else
           MERROR("Unsupported yet.");
       }
