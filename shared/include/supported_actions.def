@@ -60,10 +60,15 @@ ACTION(BuildBinaryOperation)
 ACTION(BuildUnaryOperation)
 ACTION(BuildTernaryOperation)
 ACTION(BuildPostfixOperation)
-ACTION(BuildLambda)
 ACTION(BuildInstanceOf)
 ACTION(BuildIn)
 ACTION(BuildTypeOf)
+
+ACTION(BuildLambda)
+ACTION(SetJavaLambda)       // java lambda
+ACTION(SetArrowFunction)    // JS arrow function
+ACTION(SetFunctionType)     // TS function type
+ACTION(SetConstructorType)  // TS constructor type
 
 // For variable declaration, expression
 ACTION(BuildDecl)

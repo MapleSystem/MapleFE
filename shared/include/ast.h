@@ -1540,6 +1540,7 @@ public:
 // We put them in the same node.
 ////////////////////////////////////////////////////////////////////////////
 
+// This property tells categories of LambdaNode
 enum LambdaProperty {
   LP_JavaLambda,
   LP_JSArrowFunction,

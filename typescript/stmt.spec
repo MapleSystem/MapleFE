@@ -1068,6 +1068,7 @@ rule ArrowFunction : ONEOF(
   attr.action.%1 : BuildLambda(%1, %3)
   attr.action.%2 : BuildLambda(%3, %7)
   attr.action.%2 : AddType(%5)
+  attr.action.%1,%2 : SetArrowFunction()
 
 ## See 14.2
 ## ArrowParameters[Yield] :
@@ -1423,11 +1424,13 @@ rule IntersectionType: IntersectionOrPrimaryType + '&' + PrimaryType
 rule FunctionType: ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList) + ')' + "=>" + Type
   attr.action : BuildLambda(%3)
   attr.action : AddType(%6)
+  attr.action : SetFunctionType()
 
 ## rule ConstructorType: new TypeParametersopt ( ParameterListopt ) => Type
 rule ConstructorType: "new" + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList) + ')' + "=>" + Type
   attr.action : BuildLambda(%4)
   attr.action : AddType(%7)
+  attr.action : SetConstructorType()
 
 ## rule TypeQuery: typeof TypeQueryExpression
 rule TypeQuery: "typeof" + TypeQueryExpression
