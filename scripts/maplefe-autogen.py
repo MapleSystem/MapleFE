@@ -897,7 +897,6 @@ private:
 ModuleNode         *mASTModule;
 AstBuffer           mAstBuf {{'M', 'P', 'L', 'A', 'S', 'T'}};
 AstBuffer          *mBufPtr;
-BitVector           mVisited;
 std::set<unsigned>  mStrIdxSet;
 
 public:
@@ -908,7 +907,6 @@ AstBuffer& GetAstBuf() {{return mAstBuf;}}
 bool {gen_args2}InAstBuf() {{
   AstBuffer node_buf;
   mBufPtr = &node_buf;
-  mStrIdxSet.clear();
   mAstBuf.erase(mAstBuf.begin()+6, mAstBuf.end());
   mAstBuf.reserve(32768); // For performance
   node_buf.reserve(32768);
@@ -916,6 +914,7 @@ bool {gen_args2}InAstBuf() {{
   mBufPtr = &mAstBuf;
   WriteStrIdxTable();
   mAstBuf.insert(mAstBuf.end(), node_buf.begin(), node_buf.end());
+  mStrIdxSet.clear();
   return true;
 }}
 
@@ -1080,7 +1079,7 @@ using AstNodeMap = std::map<unsigned, TreeNode*>;
 using AstStrMap  = std::map<unsigned, unsigned>;
 }}
 """.format(astvisitor=astvisitor),
-        ": public " + astvisitorclass, # Base class
+        ""             # Base class
         ]
 
 astemit_init = [
@@ -1092,8 +1091,6 @@ AstNodeMap  mNodeMap; // key: previous node id, val: TreeNode*
 
 public:
 ModuleNode *{gen_args2}FromAstBuf(AstBuffer &buf) {{
-  mStrMap.clear();
-  mNodeMap.clear();
   it = buf.begin();
   bool check = *it++ == 'M';
   check &= *it++ == 'P';
@@ -1109,6 +1106,8 @@ ModuleNode *{gen_args2}FromAstBuf(AstBuffer &buf) {{
   ReadStrIdxTable();
   for(auto iter = node_vec.begin(); iter != node_vec.end(); ++iter)
     ReadNode(*iter);
+  mStrMap.clear();
+  mNodeMap.clear();
   return module;
 }}
 
@@ -1118,13 +1117,6 @@ TreeNode *CreateNode() {{
   TreeNode *node = CreateTreeNode(k);
   mNodeMap[id] = node;
   return node;
-}}
-
-bool IsVisited(TreeNode* node) {{
-  if({astvisitorclass}::IsVisited(node))
-    return true;
-  //{gen_args2}TreeNode(node);
-  return false;
 }}
 
 // LEB128, same as for MapleIR
@@ -1167,7 +1159,7 @@ const char *ReadString() {{
   MASSERT(check);
   int64_t len = ReadNum('S');
   if(len) {{
-    const char *res = reinterpret_cast<const char *>(&(*it));
+    const char *res = gStringPool.FindString(reinterpret_cast<const char *>(&(*it)));
     it += len;
     return res;
   }} else

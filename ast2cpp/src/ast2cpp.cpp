@@ -82,7 +82,9 @@ void A2C::ProcessAST(bool trace_a2c) {
     saveAst.StoreInAstBuf();
     AstBuffer &ast_buf = saveAst.GetAstBuf();
     AstLoad loadAst;
-    //ModuleNode *module = loadAst.LoadFromAstBuf(ast_buf);
+    ModuleNode *module = loadAst.LoadFromAstBuf(ast_buf);
+    AstGraph graph(module);
+    graph.DumpGraph("After LoadFromAstBuf()", &std::cout);
   }
 
   if (mTraceA2C) {
