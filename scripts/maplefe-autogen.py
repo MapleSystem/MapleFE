@@ -225,7 +225,7 @@ def gen_handler_ast_node(dictionary):
                 rtype = member_functions[func_name][2:]
                 if rtype == "_Bool": rtype = "bool"
                 ntype = get_pointed(rtype)
-                if ntype != None or gen_call_handle_values():
+                if (ntype != None or gen_call_handle_values()) and gen_children_num(plural) != None:
                     # gen_call_children_node() for list or vector of nodes before entering the loop
                     code.append(gen_call_children_node(dictionary, node_name, name, otype + "<" + rtype + ">", "node->" + plural + "Num()"))
                     code.append("for(unsigned i = 0; i < " + gen_children_num(plural) + "; ++i) {")
@@ -263,7 +263,7 @@ def gen_handler_ast_TreeNode(dictionary):
     code = ['']
     code.append(gen_func_definition(dictionary, "TreeNode"))
 
-    code.append("switch(node->GetKind()) {")
+    code.append("switch(" + gen_switch_expr() + ") {")
     for flag in get_enum_list(dictionary, "NodeKind"):
         code.append("case " + flag + ":");
         node_name = flag[3:] + "Node"
@@ -389,6 +389,7 @@ def padding_name(name):
 
 # The follwoing gen_func_* and gen_call* functions are for AstDump
 gen_children_num = lambda pl: 'node->' + pl + 'Num()'
+gen_switch_expr = lambda: 'node->GetKind()'
 gen_func_decl_location = lambda: True
 gen_call_handle_values = lambda: True
 gen_func_declaration = lambda dictionary, node_name: \
@@ -895,20 +896,27 @@ astemit_init = [
 private:
 ModuleNode         *mASTModule;
 AstBuffer           mAstBuf {{'M', 'P', 'L', 'A', 'S', 'T'}};
+AstBuffer          *mBufPtr;
 BitVector           mVisited;
 std::set<unsigned>  mStrIdxSet;
 
 public:
 {gen_args1}(ModuleNode *m) : mASTModule(m) {{}}
 
-const std::vector<uint8_t>& GetAstBuf() const {{return mAstBuf;}}
+AstBuffer& GetAstBuf() {{return mAstBuf;}}
 
-void {gen_args2}InAstBuf() {{
+bool {gen_args2}InAstBuf() {{
+  AstBuffer node_buf;
+  mBufPtr = &node_buf;
   mStrIdxSet.clear();
   mAstBuf.erase(mAstBuf.begin()+6, mAstBuf.end());
-  mAstBuf.reserve(65536); // For performance
+  mAstBuf.reserve(32768); // For performance
+  node_buf.reserve(32768);
   VisitTreeNode(mASTModule);
+  mBufPtr = &mAstBuf;
   WriteStrIdxTable();
+  mAstBuf.insert(mAstBuf.end(), node_buf.begin(), node_buf.end());
+  return true;
 }}
 
 bool IsVisited(TreeNode* node) {{
@@ -929,15 +937,20 @@ bool IsVisited(TreeNode* node) {{
 
 // LEB128, same as for MapleIR
 void WriteNum(uint8_t flag, int64_t x) {{
-  mAstBuf.push_back(flag);
+  mBufPtr->push_back(flag);
   while (x < -0x40 || x >= 0x40) {{
-    mAstBuf.push_back(static_cast<uint8_t>((static_cast<uint64_t>(x) & 0x7F) + 0x80));
+    mBufPtr->push_back(static_cast<uint8_t>((static_cast<uint64_t>(x) & 0x7F) + 0x80));
     x = x >> 7;
   }}
-  mAstBuf.push_back(static_cast<uint8_t>(static_cast<uint64_t>(x) & 0x7F));
+  mBufPtr->push_back(static_cast<uint8_t>(static_cast<uint64_t>(x) & 0x7F));
 }}
 
 void WriteNode(TreeNode *node) {{
+  AstBuffer *tmp = mBufPtr;
+  mBufPtr = &mAstBuf;
+  WriteNum('N', static_cast<int64_t>(node->GetKind()));
+  WriteNum('V', static_cast<int64_t>(node->GetNodeId()));
+  mBufPtr = tmp;
   WriteNum('N', static_cast<int64_t>(node->GetKind()));
   WriteTreeNode(node); // Base TreeNode
 }}
@@ -961,7 +974,7 @@ void WriteString(const char *str) {{
   if(const char *p = str) {{
     WriteNum('S', static_cast<int64_t>(std::strlen(p) + 1));
     do {{
-      mAstBuf.push_back(static_cast<uint8_t>(*p));
+      mBufPtr->push_back(static_cast<uint8_t>(*p));
     }} while(*p++);
   }} else
     WriteNum('S', 0);
@@ -1024,16 +1037,14 @@ gen_children_num = lambda pl: 'num'
 gen_func_decl_location = lambda: False
 gen_call_handle_values = lambda: True
 gen_func_declaration = lambda dictionary, node_name: \
-        node_name + "* " + gen_args[2] + node_name + "(NodeKind k);"
+        "void " + gen_args[2] + node_name + '(' + node_name + ' *node);'
 gen_func_definition = lambda dictionary, node_name: \
-        node_name + "* " + gen_args[1] + "::" + gen_args[2] + node_name + "(NodeKind k) {\n" \
-        + (node_name + ' *node;' if node_name == "TreeNode" else \
-        node_name + ' *node = new (gTreePool.NewTreeNode(sizeof(' + node_name + '))) ' + node_name + '();' \
-        + 'MASSERT(k == node->GetKind()); InitTreeNode(node);')
+        "void " + gen_args[1] + "::" + gen_args[2] + node_name + '(' + node_name + ' *node) {\n' \
+        + ('' if node_name == "TreeNode" else 'InitTreeNode(node);')
 gen_call_child_node = lambda dictionary, node_name, field_name, node_type, accessor: \
         '{' + node_type + '* n = static_cast<' + node_type + '*>(ReadAddress()); ' + gen_setter(accessor) \
         + '; } // ' + field_name + ': ' + node_type \
-        if field_name != '' else 'node = ' + gen_args[2] + short_name(node_type) + '(k);'
+        if field_name != '' else gen_args[2] + short_name(node_type) + '(static_cast<' + short_name(node_name) + '*>(node));'
 gen_call_child_value = lambda dictionary, node_name, field_name, val_type, accessor: \
         '{' + set_data_based_on_type(val_type, accessor) + '} // ' + field_name + ': ' + val_type
 gen_call_children_node = lambda dictionary, node_name, field_name, node_type, accessor: \
@@ -1044,7 +1055,7 @@ gen_call_nth_child_node = lambda dictionary, node_name, field_name, node_type, a
 gen_call_nth_child_value = lambda dictionary, node_name, field_name, val_type, accessor: \
         '{' + set_data_based_on_type(val_type, accessor) + '} // ' + field_name + ': ' + val_type
 gen_call_children_node_end = lambda dictionary, node_name, field_name, node_type, accessor: '}'
-gen_func_definition_end = lambda dictionary, node_name: 'return node;}'
+gen_func_definition_end = lambda dictionary, node_name: 'return;}'
 #
 gen_args = [
         "gen_astload", # Filename
@@ -1084,12 +1095,21 @@ ModuleNode *{gen_args2}FromAstBuf(AstBuffer &buf) {{
   check &= *it++ == 'S';
   check &= *it++ == 'T';
   MASSERT(check);
-  ModuleNode *module = static_cast<ModuleNode *>(ReadNode());
+  std::vector<TreeNode *> nodes;
   while(*it != 'T')
-    ReadNode();
+    nodes.push_back(CreateNode());
+  ModuleNode *module = static_cast<ModuleNode *>(nodes.front());
   ReadStrIdxTable();
-  // fixup
+  for(auto iter = nodes.begin(); iter != nodes.end(); ++iter)
+    ReadNode(*iter);
   return module;
+}}
+
+TreeNode *CreateNode() {{
+  NodeKind k = static_cast<NodeKind>(ReadNum('N'));
+  unsigned id = static_cast<unsigned>(ReadNum('V'));
+  TreeNode *node = CreateTreeNode(k);
+  return node;
 }}
 
 bool IsVisited(TreeNode* node) {{
@@ -1115,9 +1135,10 @@ int64_t ReadNum(uint8_t flag) {{
   return y + (b << n);
 }}
 
-TreeNode * ReadNode() {{
+TreeNode * ReadNode(TreeNode *node) {{
   NodeKind k = static_cast<NodeKind>(ReadNum('N'));
-  return LoadTreeNode(k);
+  MASSERT(k == node->GetKind());
+  LoadTreeNode(node);
 }}
 
 TreeNode *ReadAddress() {{
@@ -1134,7 +1155,7 @@ int64_t ReadLength() {{
 }}
 
 const char *ReadString() {{
-  bool check = 'S' == *it++;
+  bool check = 'S' == *it;
   MASSERT(check);
   int64_t len = ReadNum('S');
   if(len) {{
@@ -1147,7 +1168,7 @@ const char *ReadString() {{
 
 void ReadStrIdxTable() {{
   int64_t num = ReadNum('T');
-  for(int64_t i; i < num; ++i) {{
+  for(int64_t i = 0; i < num; ++i) {{
     unsigned id = static_cast<unsigned>(ReadValue());
     ReadString();
   }}
@@ -1172,4 +1193,21 @@ gen_func_definition = lambda dictionary, node_name: \
         'void ' + gen_args[1] + "::" + gen_args[2] + node_name + '(TreeNode *node) {'
 gen_func_definition_end = lambda dictionary, node_name: '}'
 handle_yaml(treenode_yaml, gen_handler_ast_node)
+gen_args[2] = "Create"
+gen_switch_expr = lambda: 'k'
+gen_children_num = lambda pl: None
+gen_call_handle_values = lambda: False
+gen_func_declaration = lambda dictionary, node_name: \
+        node_name + "* " + gen_args[2] + node_name + "(NodeKind k);"
+gen_func_definition = lambda dictionary, node_name: \
+        node_name + "* " + gen_args[1] + "::" + gen_args[2] + node_name + "(NodeKind k) {\n" \
+        + (node_name + ' *node;' if node_name == "TreeNode" else \
+        node_name + ' *node = new (gTreePool.NewTreeNode(sizeof(' + node_name + '))) ' + node_name + '();')
+gen_call_child_node = lambda dictionary, node_name, field_name, node_type, accessor: \
+        '' if field_name != '' else 'node = ' + gen_args[2] + short_name(node_type) + '(k);'
+gen_call_children_node = lambda dictionary, node_name, field_name, node_type, accessor: ''
+gen_call_nth_child_node = lambda dictionary, node_name, field_name, node_type, accessor: ''
+gen_call_children_node_end = lambda dictionary, node_name, field_name, node_type, accessor: ''
+gen_func_definition_end = lambda dictionary, node_name: 'return node;}'
+handle_yaml(initial_yaml, gen_handler)
 handle_src_include_files(Finalization)

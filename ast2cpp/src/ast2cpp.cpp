@@ -18,6 +18,7 @@
 #include "gen_astdump.h"
 #include "gen_astgraph.h"
 #include "gen_aststore.h"
+#include "gen_astload.h"
 #include "ast_emitter.h"
 
 namespace maplefe {
@@ -79,6 +80,9 @@ void A2C::ProcessAST(bool trace_a2c) {
     std::cout << "============= AstStore ===========" << std::endl;
     AstStore saveAst(gModule);
     saveAst.StoreInAstBuf();
+    AstBuffer &ast_buf = saveAst.GetAstBuf();
+    AstLoad loadAst;
+    //ModuleNode *module = loadAst.LoadFromAstBuf(ast_buf);
   }
 
   if (mTraceA2C) {
