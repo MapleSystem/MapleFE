@@ -154,6 +154,8 @@ class AST_Function {
   void          SetFunction(FunctionNode *func) {mFunction = func;}
   FunctionNode *GetFunction()                   {return mFunction;}
 
+  const char *GetName() {return mFunction ? (mFunction->GetStrIdx() ? mFunction->GetName() : "_anonymous_") : "_init_"; }
+
   void          AddNestedFunction(AST_Function *func) {mNestedFunctions.PushBack(func); func->SetParent(this);}
   unsigned      GetNestedFunctionsNum()               {return mNestedFunctions.GetNum();}
   AST_Function *GetNestedFunctionAtIndex(unsigned i)  {return mNestedFunctions.ValueAtIndex(i);}

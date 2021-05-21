@@ -76,7 +76,7 @@ void CFGVisitor::Pop(TargetBBStack &stack) {
 
 // Handle a function
 FunctionNode *CFGVisitor::VisitFunctionNode(FunctionNode *node) {
-  if(mTrace) std::cout << "CFGVisitor: enter FunctionNode, id=" << node->GetNodeId() << std::endl;
+  if(mTrace) std::cout << "CFGVisitor: enter function " << node->GetName() << " : FunctionNode, id=" << node->GetNodeId() << std::endl;
 
   // Save both mCurrentFunction and mCurrentBB
   AST_Function *current_func = mCurrentFunction;
@@ -95,7 +95,7 @@ FunctionNode *CFGVisitor::VisitFunctionNode(FunctionNode *node) {
   mCurrentFunction = current_func;
   mCurrentBB = current_bb;
 
-  if(mTrace) std::cout << "CFGVisitor: exit FunctionNode, id=" << node->GetNodeId() << std::endl;
+  if(mTrace) std::cout << "CFGVisitor: exit function " << node->GetName() << " : FunctionNode, id=" << node->GetNodeId() << std::endl;
   return node;
 }
 
