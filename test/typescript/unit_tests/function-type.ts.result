@@ -1,0 +1,11 @@
+Matched 11 tokens.
+Matched 25 tokens.
+Matched 35 tokens.
+============= Module ===========
+== Sub Tree ==
+js_let Decl: f
+== Sub Tree ==
+f Assign (x) -> x Div 3
+
+== Sub Tree ==
+console.log(f(6))
