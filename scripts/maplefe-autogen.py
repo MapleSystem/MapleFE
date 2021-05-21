@@ -362,23 +362,23 @@ namespace maplefe {{
 
 def get_data_based_on_type(val_type, accessor):
     if val_type[-10:] == "ASTScope *" or val_type[-12:] == "ASTScopePool":
-        return val_type + ': skipped");'
+        return val_type + ': skipped"'
     e = get_enum_type(val_type)
     if e != None:
-        return e + ': " + GetEnum' + e + '(' + accessor + '));'
+        return e + ': " + GetEnum' + e + '(' + accessor + ')'
     elif val_type == "LitData":
-        return 'LitData: LitId, " + GetEnumLitId(' + accessor + '.mType) + ", " + GetEnumLitData(' + accessor + '));'
+        return 'LitData: LitId, " + GetEnumLitId(' + accessor + '.mType) + ", " + GetEnumLitData(' + accessor + ')'
     elif val_type == "bool":
-        return val_type + ', ", ' + accessor + ');'
+        return val_type + ', ", ' + accessor
     elif val_type == 'unsigned int' or val_type == 'uint32_t' or val_type == 'uint64_t' \
             or val_type == 'unsigned' or val_type == 'int' or val_type == 'int32_t' or val_type == 'int64_t' :
         if accessor.find("GetStrIdx()") >= 0:
             return val_type + ', " + std::to_string(' + accessor + ') + " => " + (' + accessor \
-                    + '? "\\"" + std::string(gStringPool.GetStringFromStrIdx(' + accessor + ')) + "\\"": "null"));'
-        return val_type + ', " + std::to_string(' + accessor + '));'
+                    + '? "\\"" + std::string(gStringPool.GetStringFromStrIdx(' + accessor + ')) + "\\"": "null")'
+        return val_type + ', " + std::to_string(' + accessor + ')'
     elif val_type == 'const char *':
-        return 'const char*, " + (' + accessor + ' ? std::string("\\"") + ' + accessor + ' + "\\"" : "null"));'
-    return val_type + ', " + "value"); // Warning: failed to get value'
+        return 'const char*, " + (' + accessor + ' ? std::string("\\"") + ' + accessor + ' + "\\"" : "null")'
+    return val_type + ', " + "value" /* Warning: failed to get value */'
 
 def short_name(node_type):
     return node_type.replace('class ', '').replace('maplefe::', '').replace(' *', '*')
@@ -402,7 +402,7 @@ gen_call_child_node = lambda dictionary, node_name, field_name, node_type, acces
         ('Dump("' + padding_name(field_name) + ': ' + short_name(node_type) + '*", ' + accessor  + ');\n' \
         if field_name != '' else '') + gen_args[2] + short_name(node_type) + '(' + accessor + ');'
 gen_call_child_value = lambda dictionary, node_name, field_name, val_type, accessor: \
-        'Dump(std::string("' + padding_name(field_name) + ': ") + "' + get_data_based_on_type(val_type, accessor)
+        'Dump(std::string("' + padding_name(field_name) + ': ") + "' + get_data_based_on_type(val_type, accessor) + ');'
 gen_call_children_node = lambda dictionary, node_name, field_name, node_type, accessor: \
         'DumpLB("' + padding_name(field_name) + ': ' + short_name(node_type) + ', size=", ' + accessor+ ');'
 gen_call_children_node_end = lambda dictionary, node_name, field_name, node_type, accessor: 'DumpLE(' + accessor + ');'
@@ -410,7 +410,7 @@ gen_call_nth_child_node = lambda dictionary, node_name, field_name, node_type, a
         'Dump(std::to_string(i + 1) + ": ' + short_name(node_type) + '*", ' + accessor + ');\n' \
         + gen_args[2] + short_name(node_type) + '(' + accessor + ');'
 gen_call_nth_child_value = lambda dictionary, node_name, field_name, val_type, accessor: \
-        'Dump(std::to_string(i) + ". ' + get_data_based_on_type(val_type, accessor)
+        'Dump(std::to_string(i) + ". ' + get_data_based_on_type(val_type, accessor) + ');'
 gen_func_definition_end = lambda dictionary, node_name: \
         'return;\n}' if node_name == "TreeNode" else 'DumpFE();\n}\nreturn;\n}'
 
