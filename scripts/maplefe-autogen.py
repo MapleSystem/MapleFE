@@ -1009,26 +1009,29 @@ handle_src_include_files(Finalization)
 def gen_setter(accessor):
     return accessor.replace("Get", "Set").replace("()", "(n)").replace("(i)", "(i,n)").replace("Is", "SetIs")
 
+def gen_add_setter(accessor):
+    return accessor.replace("Get", "Add").replace("AtIndex", "").replace("(i)", "(n)")
+
 def short_name(node_type):
     return node_type.replace('class ', '').replace('maplefe::', '').replace(' *', '*')
 
-def set_data_based_on_type(val_type, accessor):
+def set_data_based_on_type(val_type, accessor, setter):
     if val_type[-10:] == "ASTScope *" or val_type[-12:] == "ASTScopePool":
         return '; /* Skip ' + val_type + ' */'
     e = get_enum_type(val_type)
     if e != None:
-        return e + ' n = static_cast<' + e + '>(ReadValue());' + gen_setter(accessor) + ';'
+        return e + ' n = static_cast<' + e + '>(ReadValue());' + setter(accessor) + ';'
     elif val_type == "bool":
-        return val_type + ' n = static_cast<' + val_type + '>(ReadValue());' + gen_setter(accessor) + ';'
+        return val_type + ' n = static_cast<' + val_type + '>(ReadValue());' + setter(accessor) + ';'
     elif val_type == 'unsigned int' or val_type == 'uint32_t' or val_type == 'uint64_t' \
             or val_type == 'unsigned' or val_type == 'int' or val_type == 'int32_t' or val_type == 'int64_t' :
-        return ('AddStrIdx(' + accessor + ');' if accessor.find("GetStrIdx()") >= 0 else '') \
-                + val_type + ' n = static_cast<' + val_type + '>(ReadValue()); ' + gen_setter(accessor) + ';'
+        return (val_type + ' n = static_cast<' + val_type + '>(ReadValue());' if accessor.find("GetStrIdx()") < 0 \
+           else val_type + ' n = static_cast<' + val_type + '>(mStrMap[ReadValue()]);') + setter(accessor) + ';'
     elif val_type == "LitData":
-        return val_type + ' n; n.mType = static_cast<LitId>(ReadValue()); n.mData.mInt64 = ReadValue();' \
-               + gen_setter(accessor) + '; if(n.mType == LT_StringLiteral) ;'
+        return val_type + ' n; n.mType = static_cast<LitId>(ReadValue());if(n.mType == LT_StringLiteral)' \
+           + 'n.mData.mInt64 = mStrMap[ReadValue()]; else n.mData.mInt64 = ReadValue();' + setter(accessor) + ';'
     elif val_type == 'const char *':
-        return val_type + ' n = ReadString();' + gen_setter(accessor) + ';'
+        return val_type + ' n = ReadString();' + setter(accessor) + ';'
     return 'Failed to get value with ' + val_type + ", " + accessor + ';'
 
 # The follwoing gen_func_* and gen_call* functions are for AstLoad
@@ -1046,14 +1049,14 @@ gen_call_child_node = lambda dictionary, node_name, field_name, node_type, acces
         + '; } // ' + field_name + ': ' + node_type \
         if field_name != '' else gen_args[2] + short_name(node_type) + '(static_cast<' + short_name(node_name) + '*>(node));'
 gen_call_child_value = lambda dictionary, node_name, field_name, val_type, accessor: \
-        '{' + set_data_based_on_type(val_type, accessor) + '} // ' + field_name + ': ' + val_type
+        '{' + set_data_based_on_type(val_type, accessor, gen_setter) + '} // ' + field_name + ': ' + val_type
 gen_call_children_node = lambda dictionary, node_name, field_name, node_type, accessor: \
         '{unsigned num = ReadLength(); // ' + field_name + ': ' + node_type
 gen_call_nth_child_node = lambda dictionary, node_name, field_name, node_type, accessor: \
-        node_type + '* n = static_cast<' + node_type + '*>(ReadAddress()); ' + gen_setter(accessor) \
+        node_type + '* n = static_cast<' + node_type + '*>(ReadAddress()); ' + gen_add_setter(accessor) \
         + '; // ' + field_name + ': ' + node_type
 gen_call_nth_child_value = lambda dictionary, node_name, field_name, val_type, accessor: \
-        '{' + set_data_based_on_type(val_type, accessor) + '} // ' + field_name + ': ' + val_type
+        '{' + set_data_based_on_type(val_type, accessor, gen_add_setter) + '} // ' + field_name + ': ' + val_type
 gen_call_children_node_end = lambda dictionary, node_name, field_name, node_type, accessor: '}'
 gen_func_definition_end = lambda dictionary, node_name: 'return;}'
 #
@@ -1072,6 +1075,8 @@ namespace maplefe {{
 using AstBuffer  = std::vector<uint8_t>;
 using AstBufIter = std::vector<uint8_t>::iterator;
 using AstNodeVec = std::vector<TreeNode*>;
+using AstNodeMap = std::map<unsigned, TreeNode*>;
+using AstStrMap  = std::map<unsigned, unsigned>;
 }}
 """.format(astvisitor=astvisitor),
         ": public " + astvisitorclass, # Base class
@@ -1080,13 +1085,14 @@ using AstNodeVec = std::vector<TreeNode*>;
 astemit_init = [
 """
 private:
-AstBufIter          it;
-std::set<unsigned>  mStrIdxSet;
+AstBufIter  it;
+AstStrMap   mStrMap;  // key: previous str id,  val: new str id
+AstNodeMap  mNodeMap; // key: previous node id, val: TreeNode*
 
 public:
-
 ModuleNode *{gen_args2}FromAstBuf(AstBuffer &buf) {{
-  mStrIdxSet.clear();
+  mStrMap.clear();
+  mNodeMap.clear();
   it = buf.begin();
   bool check = *it++ == 'M';
   check &= *it++ == 'P';
@@ -1095,12 +1101,12 @@ ModuleNode *{gen_args2}FromAstBuf(AstBuffer &buf) {{
   check &= *it++ == 'S';
   check &= *it++ == 'T';
   MASSERT(check);
-  std::vector<TreeNode *> nodes;
+  AstNodeVec node_vec;
   while(*it != 'T')
-    nodes.push_back(CreateNode());
-  ModuleNode *module = static_cast<ModuleNode *>(nodes.front());
+    node_vec.push_back(CreateNode());
+  ModuleNode *module = static_cast<ModuleNode *>(node_vec.front());
   ReadStrIdxTable();
-  for(auto iter = nodes.begin(); iter != nodes.end(); ++iter)
+  for(auto iter = node_vec.begin(); iter != node_vec.end(); ++iter)
     ReadNode(*iter);
   return module;
 }}
@@ -1109,6 +1115,7 @@ TreeNode *CreateNode() {{
   NodeKind k = static_cast<NodeKind>(ReadNum('N'));
   unsigned id = static_cast<unsigned>(ReadNum('V'));
   TreeNode *node = CreateTreeNode(k);
+  mNodeMap[id] = node;
   return node;
 }}
 
@@ -1135,7 +1142,7 @@ int64_t ReadNum(uint8_t flag) {{
   return y + (b << n);
 }}
 
-TreeNode * ReadNode(TreeNode *node) {{
+void ReadNode(TreeNode *node) {{
   NodeKind k = static_cast<NodeKind>(ReadNum('N'));
   MASSERT(k == node->GetKind());
   LoadTreeNode(node);
@@ -1143,7 +1150,7 @@ TreeNode * ReadNode(TreeNode *node) {{
 
 TreeNode *ReadAddress() {{
   int64_t n = ReadNum('A');
-  return n ? reinterpret_cast<TreeNode *>(n) : nullptr;
+  return mNodeMap[static_cast<unsigned>(n)];
 }}
 
 int64_t ReadValue() {{
@@ -1170,13 +1177,10 @@ void ReadStrIdxTable() {{
   int64_t num = ReadNum('T');
   for(int64_t i = 0; i < num; ++i) {{
     unsigned id = static_cast<unsigned>(ReadValue());
-    ReadString();
+    const char *s = ReadString();
+    unsigned nid = gStringPool.GetStrIdx(s);
+    mStrMap[id] = nid;
   }}
-}}
-
-void AddStrIdx(unsigned idx) {{
-  if(idx)
-    mStrIdxSet.insert(idx);
 }}
 
 """.format(gen_args1=gen_args[1], gen_args2=gen_args[2], astvisitorclass=astvisitorclass)
