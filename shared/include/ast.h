@@ -319,7 +319,7 @@ public:
   ~UnaOperatorNode() {}
 
   void SetIsPost(bool b)    {mIsPost = b;}
-  void SetOpnd(TreeNode* t) {mOpnd = t; t->SetParent(this);}
+  void SetOpnd(TreeNode* t) {mOpnd = t; if(t) t->SetParent(this);}
   void SetOprId(OprId o)    {mOprId = o;}
 
   bool      IsPost()  {return mIsPost;}
@@ -345,8 +345,8 @@ public:
   TreeNode* GetOpndA() {return mOpndA;}
   TreeNode* GetOpndB() {return mOpndB;}
   void SetOprId(OprId o)     {mOprId = o;}
-  void SetOpndA(TreeNode* t) {mOpndA = t; t->SetParent(this);}
-  void SetOpndB(TreeNode* t) {mOpndB = t; t->SetParent(this);}
+  void SetOpndA(TreeNode* t) {mOpndA = t; if(t) t->SetParent(this);}
+  void SetOpndB(TreeNode* t) {mOpndB = t; if(t) t->SetParent(this);}
 
   void ReplaceChild(TreeNode*, TreeNode*);
   void Dump(unsigned);
@@ -366,9 +366,9 @@ public:
   TreeNode* GetOpndA() {return mOpndA;}
   TreeNode* GetOpndB() {return mOpndB;}
   TreeNode* GetOpndC() {return mOpndC;}
-  void SetOpndA(TreeNode* t) {mOpndA = t; t->SetParent(this);}
-  void SetOpndB(TreeNode* t) {mOpndB = t; t->SetParent(this);}
-  void SetOpndC(TreeNode* t) {mOpndC = t; t->SetParent(this);}
+  void SetOpndA(TreeNode* t) {mOpndA = t; if(t) t->SetParent(this);}
+  void SetOpndB(TreeNode* t) {mOpndB = t; if(t) t->SetParent(this);}
+  void SetOpndC(TreeNode* t) {mOpndC = t; if(t) t->SetParent(this);}
 
   void Dump(unsigned);
 };
@@ -538,8 +538,8 @@ public:
   TreeNode* GetVar() {return mVar;}
   TreeNode* GetInit() {return mInit;}
 
-  void SetVar(TreeNode *t) {mVar = t; t->SetParent(this);}
-  void SetInit(TreeNode *t) {mInit = t; t->SetParent(this);}
+  void SetVar(TreeNode *t) {mVar = t; if(t) t->SetParent(this);}
+  void SetInit(TreeNode *t) {mInit = t; if(t) t->SetParent(this);}
 
   DeclProp GetProp() {return mProp;}
   void SetProp(DeclProp p) {mProp = p;}
@@ -639,7 +639,7 @@ public:
   ~ParenthesisNode(){}
 
   TreeNode* GetExpr() {return mExpr;}
-  void SetExpr(TreeNode *t) {mExpr = t; t->SetParent(this);}
+  void SetExpr(TreeNode *t) {mExpr = t; if(t) t->SetParent(this);}
 
   void Dump(unsigned);
 };
@@ -1022,9 +1022,9 @@ public:
   CondBranchNode();
   ~CondBranchNode(){}
 
-  void SetCond(TreeNode *t)       {mCond = t; t->SetParent(this);}
-  void SetTrueBranch(TreeNode *t) {mTrueBranch = t; t->SetParent(this);}
-  void SetFalseBranch(TreeNode *t){mFalseBranch = t; t->SetParent(this);}
+  void SetCond(TreeNode *t)       {mCond = t; if(t) t->SetParent(this);}
+  void SetTrueBranch(TreeNode *t) {mTrueBranch = t; if(t) t->SetParent(this);}
+  void SetFalseBranch(TreeNode *t){mFalseBranch = t; if(t) t->SetParent(this);}
 
   TreeNode* GetCond()        {return mCond;}
   TreeNode* GetTrueBranch()  {return mTrueBranch;}
@@ -1356,7 +1356,7 @@ public:
   void CleanUp();
 
   BlockNode* GetBody() {return mBody;}
-  void SetBody(BlockNode *b) {mBody = b; b->SetParent(this); CleanUp();}
+  void SetBody(BlockNode *b) {mBody = b; if(b) b->SetParent(this); CleanUp();}
 
   bool IsConstructor()    {return mIsConstructor;}
   void SetIsConstructor(bool b = true) {mIsConstructor = b;}
@@ -1537,7 +1537,7 @@ public:
   TreeNode* GetChild(unsigned i) {return mChildren.ValueAtIndex(i);}
   void      SetChild(unsigned i, TreeNode* n) {*(mChildren.RefAtIndex(i)) = n;}
 
-  void AddChild(TreeNode *c) {mChildren.PushBack(c); c->SetParent(this);}
+  void AddChild(TreeNode *c) {mChildren.PushBack(c); if(c) c->SetParent(this);}
   void Dump(unsigned);
   void Release() {mChildren.Release();}
 };
@@ -1572,7 +1572,7 @@ public:
 
 
   TreeNode* GetBody()            {return mBody;}
-  void      SetBody(TreeNode *n) {mBody = n; n->SetParent(this);}
+  void      SetBody(TreeNode *n) {mBody = n; if(n) n->SetParent(this);}
 
   LambdaProperty  GetProperty()                 {return mProperty;}
   void            SetProperty(LambdaProperty p) {mProperty = p;}
@@ -1583,7 +1583,7 @@ public:
   unsigned  GetParamsNum()        {return mParams.GetNum();}
   TreeNode* GetParam(unsigned i)  {return mParams.ValueAtIndex(i);}
   void      SetParam(unsigned i, TreeNode* n) {*(mParams.RefAtIndex(i)) = n;}
-  void      AddParam(TreeNode *n) {mParams.PushBack(n); n->SetParent(this);}
+  void      AddParam(TreeNode *n) {mParams.PushBack(n); if(n) n->SetParent(this);}
 
   void Release() {mParams.Release();}
   void Dump(unsigned);
