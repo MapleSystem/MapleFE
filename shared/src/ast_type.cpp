@@ -27,7 +27,7 @@ namespace maplefe {
 //                           UserTypeNode                               //
 //////////////////////////////////////////////////////////////////////////
 
-void UserTypeNode::AddTypeArgs(TreeNode *args) {
+void UserTypeNode::AddTypeArgument(TreeNode *args) {
   if (args->IsIdentifier()) {
     IdentifierNode *inode = (IdentifierNode*)args;
     mTypeArguments.PushBack(inode);
@@ -35,7 +35,7 @@ void UserTypeNode::AddTypeArgs(TreeNode *args) {
     PassNode *p = (PassNode*)args;
     for (unsigned i = 0; i < p->GetChildrenNum(); i++) {
       TreeNode *a = p->GetChild(i);
-      AddTypeArgs(a);
+      AddTypeArgument(a);
     }
   } else {
     MASSERT(0 && "Unsupported tree node in UserTypeNode::AddTypeArgs()");

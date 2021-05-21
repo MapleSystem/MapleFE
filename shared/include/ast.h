@@ -208,7 +208,7 @@ public:
   unsigned GetPairsNum() {return mPairs.GetNum();}
   XXportAsPairNode* GetPair(unsigned i) {return mPairs.ValueAtIndex(i);}
   void SetPair(unsigned i, XXportAsPairNode* n) {*(mPairs.RefAtIndex(i)) = n;}
-  void AddPairs(TreeNode *p);
+  void AddPair(TreeNode *p);
 
   void Dump(unsigned indent);
 };
@@ -280,7 +280,7 @@ public:
   unsigned GetPairsNum() {return mPairs.GetNum();}
   XXportAsPairNode* GetPair(unsigned i) {return mPairs.ValueAtIndex(i);}
   void SetPair(unsigned i, XXportAsPairNode* n) {*(mPairs.RefAtIndex(i)) = n;}
-  void AddPairs(TreeNode *p);
+  void AddPair(TreeNode *p);
 
   void Dump(unsigned indent);
 };
@@ -456,7 +456,7 @@ public:
   unsigned GetDimensionsNum() {return mDimensions.GetNum();}
   unsigned GetDimension(unsigned i) {return mDimensions.ValueAtIndex(i);} // 0 means unspecified.
   void     SetDimension(unsigned i, unsigned n) {*(mDimensions.RefAtIndex(i)) = n;}
-  void AddDim(unsigned i = 0) {mDimensions.PushBack(i);}
+  void AddDimension(unsigned i = 0) {mDimensions.PushBack(i);}
   void Merge(const TreeNode*);
 
   void Release() {mDimensions.Release();}
@@ -484,7 +484,7 @@ public:
   DimensionNode* GetDims() {return mDims;}
 
   void SetType(TreeNode *t)      {mType = t;}
-  void SetInit(TreeNode *t)      {mInit = t; t->SetParent(this);}
+  void SetInit(TreeNode *t)      {mInit = t; if(t) t->SetParent(this);}
   void ClearInit()               {mInit = NULL;}
   void SetDims(DimensionNode *t) {mDims = t;}
 
@@ -495,7 +495,7 @@ public:
   unsigned GetDimsNum()          {return mDims->GetDimensionsNum();}
   unsigned GetDim(unsigned n)    {return mDims->GetDimension(n);} // 0 means unspecified.
   bool     IsArray()             {return mDims && GetDimsNum() > 0;}
-  unsigned AddDim(unsigned i = 0){mDims->AddDim(i);}           // 0 means unspecified
+  unsigned AddDim(unsigned i = 0){mDims->AddDimension(i);}        // 0 means unspecified
   unsigned GetNthNum(unsigned n) {return mDims->GetDimension(n);} // 0 means unspecified.
   void     SetNthNum(unsigned n, unsigned i) {mDims->SetDimension(n, i);}
 
@@ -1391,9 +1391,9 @@ public:
   void SetDims(DimensionNode *t) {mDims = t;}
   unsigned GetDimsNum()          {return mDims->GetDimensionsNum();}
   bool     IsArray()             {return mDims->GetDimensionsNum() > 0;}
-  unsigned AddDim(unsigned i = 0){mDims->AddDim(i);}           // 0 means unspecified
-  unsigned GetNthNum(unsigned n) {return mDims->GetDimension(n);} // 0 means unspecified.
-  void     SetNthNum(unsigned n, unsigned i) {mDims->SetDimension(n, i);}
+  unsigned AddDim(unsigned i = 0){mDims->AddDimension(i);}        // 0 means unspecified
+  unsigned GetNthDim(unsigned n) {return mDims->GetDimension(n);} // 0 means unspecified.
+  void     SetNthDim(unsigned n, unsigned i) {mDims->SetDimension(n, i);}
 
   // Override equivalent.
   bool OverrideEquivalent(FunctionNode*);
@@ -1475,7 +1475,13 @@ public:
 
   void AddSuperClass(ClassNode *n)         {mSuperClasses.PushBack(n);}
   void AddSuperInterface(InterfaceNode *n) {mSuperInterfaces.PushBack(n);}
-  void AddAttr(AttrId a) {mAttributes.PushBack(a);}
+  void AddAttribute(AttrId a) {mAttributes.PushBack(a);}
+  void AddField(IdentifierNode *n) {mFields.PushBack(n);}
+  void AddMethod(FunctionNode *n) {mMethods.PushBack(n);}
+  void AddConstructor(FunctionNode *n) {mConstructors.PushBack(n);}
+  void AddInstInit(BlockNode *n) {mInstInits.PushBack(n);}
+  void AddLocalClass(ClassNode *n) {mLocalClasses.PushBack(n);}
+  void AddLocalInterface(InterfaceNode *n) {mLocalInterfaces.PushBack(n);}
 
   unsigned GetSuperClassesNum()    {return mSuperClasses.GetNum();}
   unsigned GetSuperInterfacesNum() {return mSuperInterfaces.GetNum();}

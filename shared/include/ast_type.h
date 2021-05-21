@@ -104,7 +104,7 @@ public:
   void SetId(TreeNode *n) {mId = n;}
 
   unsigned GetTypeArgumentsNum() {return mTypeArguments.GetNum();}
-  void     AddTypeArgs(TreeNode *n);
+  void     AddTypeArgument(TreeNode *n);
   IdentifierNode* GetTypeArgument(unsigned i) {return mTypeArguments.ValueAtIndex(i);}
   void            SetTypeArgument(unsigned i, IdentifierNode* n) {*(mTypeArguments.RefAtIndex(i)) = n;}
 
@@ -123,7 +123,7 @@ public:
 
   unsigned GetDimsNum()          {return mDims->GetDimensionsNum();}
   bool     IsArray()             {return mDims && GetDimsNum() > 0;}
-  unsigned AddDim(unsigned i = 0){mDims->AddDim(i);}           // 0 means unspecified
+  unsigned AddDim(unsigned i = 0){mDims->AddDimension(i);}        // 0 means unspecified
   unsigned GetNthNum(unsigned n) {return mDims->GetDimension(n);} // 0 means unspecified.
   void     SetNthNum(unsigned n, unsigned i) {mDims->SetDimension(n, i);}
 

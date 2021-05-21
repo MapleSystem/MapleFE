@@ -281,10 +281,10 @@ TreeNode* ASTBuilder::SetPairs() {
     pairs = p.mData.mTreeNode;
     if (mLastTreeNode->IsImport()) {
       ImportNode *inode = (ImportNode*)mLastTreeNode;
-      inode->AddPairs(pairs);
+      inode->AddPair(pairs);
     } else if (mLastTreeNode->IsExport()) {
       ExportNode *enode = (ExportNode*)mLastTreeNode;
-      enode->AddPairs(pairs);
+      enode->AddPair(pairs);
     }
   }
 
@@ -330,11 +330,11 @@ TreeNode* ASTBuilder::SetIsEverything() {
   if (mLastTreeNode->IsImport()) {
     ImportNode *inode = (ImportNode*)mLastTreeNode;
     MASSERT(!inode->GetPairsNum());
-    inode->AddPairs(n);
+    inode->AddPair(n);
   } else if (mLastTreeNode->IsExport()) {
     ExportNode *enode = (ExportNode*)mLastTreeNode;
     MASSERT(!enode->GetPairsNum());
-    enode->AddPairs(n);
+    enode->AddPair(n);
   }
 
   return mLastTreeNode;
@@ -357,11 +357,11 @@ TreeNode* ASTBuilder::SetIsDefault() {
   if (mLastTreeNode->IsImport()) {
     ImportNode *inode = (ImportNode*)mLastTreeNode;
     MASSERT(!inode->GetPairsNum());
-    inode->AddPairs(n);
+    inode->AddPair(n);
   } else if (mLastTreeNode->IsExport()) {
     ExportNode *enode = (ExportNode*)mLastTreeNode;
     MASSERT(!enode->GetPairsNum());
-    enode->AddPairs(n);
+    enode->AddPair(n);
   }
 
   return mLastTreeNode;
@@ -1850,7 +1850,7 @@ TreeNode* ASTBuilder::BuildDim() {
 
   DimensionNode *dim = (DimensionNode*)gTreePool.NewTreeNode(sizeof(DimensionNode));
   new (dim) DimensionNode();
-  dim->AddDim();
+  dim->AddDimension();
 
   // set last tree node and return it.
   mLastTreeNode = dim;
@@ -2573,7 +2573,7 @@ TreeNode* ASTBuilder::AddTypeArgument() {
   MASSERT(args);
 
   UserTypeNode *type_node = (UserTypeNode*)mLastTreeNode;
-  type_node->AddTypeArgs(args);
+  type_node->AddTypeArgument(args);
 
   return mLastTreeNode;
 }
@@ -2709,9 +2709,9 @@ TreeNode* ASTBuilder::BuildArrayType() {
     TreeNode *dim = p_dim.mData.mTreeNode;
     // Right now we just add all 0 to dim.
     if (dim == basic)
-      dims->AddDim(0);
+      dims->AddDimension(0);
     else
-      dims->AddDim(0);
+      dims->AddDimension(0);
   }
 
   if (user_type) {

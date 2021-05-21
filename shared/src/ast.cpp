@@ -106,12 +106,12 @@ void PackageNode::Dump(unsigned indent) {
 //                          ImportNode
 //////////////////////////////////////////////////////////////////////////////////////
 
-void ImportNode::AddPairs(TreeNode *t) {
+void ImportNode::AddPair(TreeNode *t) {
   if (t->IsPass()) {
     PassNode *n = (PassNode*)t;
     for (unsigned i = 0; i < n->GetChildrenNum(); i++) {
       TreeNode *child = n->GetChild(i);
-      AddPairs(child);
+      AddPair(child);
     }
   } else if (t->IsXXportAsPair()) {
     mPairs.PushBack((XXportAsPairNode*)t);
@@ -149,12 +149,12 @@ void ImportNode::Dump(unsigned indent) {
 //                          ExportNode
 //////////////////////////////////////////////////////////////////////////////////////
 
-void ExportNode::AddPairs(TreeNode *t) {
+void ExportNode::AddPair(TreeNode *t) {
   if (t->IsPass()) {
     PassNode *n = (PassNode*)t;
     for (unsigned i = 0; i < n->GetChildrenNum(); i++) {
       TreeNode *child = n->GetChild(i);
-      AddPairs(child);
+      AddPair(child);
     }
   } else if (t->IsXXportAsPair()) {
     mPairs.PushBack((XXportAsPairNode*)t);
@@ -401,7 +401,7 @@ void DimensionNode::Merge(const TreeNode *node) {
   if (node->IsDimension()) {
     DimensionNode *n = (DimensionNode *)node;
     for (unsigned i = 0; i < n->GetDimensionsNum(); i++)
-      AddDim(n->GetDimension(i));
+      AddDimension(n->GetDimension(i));
   } else if (node->IsPass()) {
     PassNode *n = (PassNode*)node;
     for (unsigned i = 0; i < n->GetChildrenNum(); i++) {
