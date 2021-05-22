@@ -1,0 +1,20 @@
+Matched 27 tokens.
+Matched 36 tokens.
+Matched 48 tokens.
+============= Module ===========
+== Sub Tree ==
+class  Foo
+  Fields: 
+    x=1
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+    func  inc(y)  throws: 
+      return this.x Add y
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+console.log(Foo.x)
+== Sub Tree ==
+console.log(Foo.inc(10))

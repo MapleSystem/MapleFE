@@ -1686,6 +1686,7 @@ rule MemberFunctionDeclaration: ONEOF(
   ZEROORONE(AccessibilityModifier) + ZEROORONE("static") + PropertyName + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}',
   ZEROORONE(AccessibilityModifier) + ZEROORONE("static") + PropertyName + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + ';')
   attr.action.%1,%2 : BuildFunction(%3)
+  attr.action.%1,%2 : AddModifier(%2)
   attr.action.%1,%2 : AddParams(%6)
   attr.action.%1,%2 : AddType(%8)
   attr.action.%1    : AddFunctionBody(%10)
