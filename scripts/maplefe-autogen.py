@@ -804,17 +804,17 @@ public:
 void {gen_args2}(const char *title, std::ostream *os) {{
   mOs = os;
   *mOs << "// [Beginning of {gen_args1}: " << title << "\\n// Filename: " << mASTModule->GetFileName() << "\\n";
-  for(unsigned i = 0; i < mASTModule->GetTreesNum(); i++) {{
+  for(unsigned i = 0; i < mASTModule->GetTreesNum(); i++)
     *mOs << {gen_args2}TreeNode(mASTModule->GetTree(i));
-    *mOs << "// End of AstEmitter]\\n";
-  }}
+  *mOs << "// End of AstEmitter]\\n";
+}}
 
-  std::string Clean(std::string &s) {{
-    auto len = s.length();
-    if(len >= 2 && s.substr(len - 2) == ";\\n")
-      return s.erase(len - 2);
-    return s;
-  }}
+std::string Clean(std::string &s) {{
+  auto len = s.length();
+  if(len >= 2 && s.substr(len - 2) == ";\\n")
+    return s.erase(len - 2);
+  return s;
+}}
 
 """.format(gen_args1=gen_args[1], gen_args2=gen_args[2], astdumpclass=astdumpclass)
 ] # astemit_init
