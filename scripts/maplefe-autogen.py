@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from os import path, environ
 import subprocess
+import hashlib
 import ruamel.yaml as yaml
 
 #
@@ -300,7 +301,33 @@ def gen_handler(dictionary):
             handle_yaml(filename, gen_handler_ast_node_file)
     # Generate handler for TreeNode
     gen_handler_ast_TreeNode(dictionary)
+###################################################################################################
+# Signature of TreeNodes
+def gen_signature_of_ast_node(dictionary):
+    global tn_signature
+    tn_signature += '\n^' + dictionary["Name"];
+    members = dictionary.get("Members")
+    if members != None:
+        for m in members:
+            tn_signature += '\n' + m.get("Name") + ':' + m.get("Type").get("Name")
 
+def gen_signature_of_ast_nodes(dictionary):
+    base = dictionary.get("Bases")
+    basename = base[0].get("Name") if base != None else ''
+    if basename == "TreeNode":
+        gen_signature_of_ast_node(dictionary)
+
+def gen_signature(dictionary):
+    for child in dictionary["ChildRecords"]:
+        filename = output_dir + 'maplefe/' + child["Name"] + '.yaml'
+        if path.exists(filename):
+            handle_yaml(filename, gen_signature_of_ast_nodes)
+
+tn_signature = 'Signature:'
+handle_yaml(initial_yaml, gen_signature)
+handle_yaml(treenode_yaml, gen_signature_of_ast_node)
+signature = int(hashlib.sha256(tn_signature.encode('utf-8')).hexdigest()[-15:], 16)
+append(output_dir + 'yaml.log', [tn_signature, str(signature)])
 ###################################################################################################
 
 # Initialize/finalize include_file and src_file with gen_args
@@ -895,7 +922,7 @@ astemit_init = [
 """
 private:
 ModuleNode         *mASTModule;
-AstBuffer           mAstBuf {{'M', 'P', 'L', 'A', 'S', 'T'}};
+AstBuffer           mAstBuf {{'M', 'P'}};
 AstBuffer          *mBufPtr;
 std::set<unsigned>  mStrIdxSet;
 
@@ -906,10 +933,12 @@ AstBuffer& GetAstBuf() {{return mAstBuf;}}
 
 bool {gen_args2}InAstBuf() {{
   AstBuffer node_buf;
-  mBufPtr = &node_buf;
-  mAstBuf.erase(mAstBuf.begin()+6, mAstBuf.end());
+  mAstBuf.erase(mAstBuf.begin() + 2, mAstBuf.end());
+  mBufPtr = &mAstBuf;
+  WriteNum('L', {signature}LL);
   mAstBuf.reserve(32768); // For performance
   node_buf.reserve(32768);
+  mBufPtr = &node_buf;
   VisitTreeNode(mASTModule);
   mBufPtr = &mAstBuf;
   WriteStrIdxTable();
@@ -992,7 +1021,7 @@ void AddStrIdx(unsigned idx) {{
     mStrIdxSet.insert(idx);
 }}
 
-""".format(gen_args1=gen_args[1], gen_args2=gen_args[2], astvisitorclass=astvisitorclass)
+""".format(signature=signature, gen_args1=gen_args[1], gen_args2=gen_args[2], astvisitorclass=astvisitorclass)
 ] # astemit_init
 
 handle_src_include_files(Initialization)
@@ -1094,11 +1123,9 @@ ModuleNode *{gen_args2}FromAstBuf(AstBuffer &buf) {{
   it = buf.begin();
   bool check = *it++ == 'M';
   check &= *it++ == 'P';
-  check &= *it++ == 'L';
-  check &= *it++ == 'A';
-  check &= *it++ == 'S';
-  check &= *it++ == 'T';
   MASSERT(check);
+  if(ReadNum('L') != {signature}LL)
+    return nullptr;
   AstNodeVec node_vec;
   while(*it != 'T')
     node_vec.push_back(CreateNode());
@@ -1183,7 +1210,7 @@ void ReadStrIdxTable() {{
   }}
 }}
 
-""".format(gen_args1=gen_args[1], gen_args2=gen_args[2], astvisitorclass=astvisitorclass)
+""".format(signature=signature, gen_args1=gen_args[1], gen_args2=gen_args[2], astvisitorclass=astvisitorclass)
 ] # astemit_init
 
 handle_src_include_files(Initialization)
