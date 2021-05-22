@@ -1559,9 +1559,18 @@ rule PropertyDefinition: ONEOF(IdentifierReference,
 
 ## GetAccessor: get PropertyName ( ) TypeAnnotationopt { FunctionBody }
 rule GetAccessor: "get" + PropertyName + '(' + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}'
+  attr.action : BuildFunction(%2)
+  attr.action : AddType(%5)
+  attr.action : AddFunctionBody(%7)
+  attr.action : AddModifier(%1)
 
 ## SetAccessor: set PropertyName ( BindingIdentifierOrPattern TypeAnnotationopt ) { FunctionBody }
 rule SetAccessor: "set" + PropertyName + '(' + BindingIdentifierOrPattern + ZEROORONE(TypeAnnotation) + ')' + '{' + FunctionBody + '}'
+  attr.action : AddType(%4, %5)
+  attr.action : BuildFunction(%2)
+  attr.action : AddParams(%4)
+  attr.action : AddFunctionBody(%8)
+  attr.action : AddModifier(%1)
 
 ## FunctionExpression: ( Modified ) function BindingIdentifieropt CallSignature { FunctionBody }
 ## FunctionExpression has the same syntax as FunctionDeclaration. But it appears as an expression. We will build it

@@ -1075,7 +1075,7 @@ TreeNode* ASTBuilder::BuildSwitch() {
 ////////////////////////////////////////////////////////////////////////////////
 
 // AddType takes two parameters, 1) tree; 2) type
-// or takes one parameter, type
+// or takes one parameter, type, and apply it to mLastTreeNode
 
 TreeNode* ASTBuilder::AddType() {
   if (mTrace)
@@ -1319,6 +1319,10 @@ TreeNode* ASTBuilder::BuildFieldLiteral() {
 
 // It takes one param. The param could a FieldLiteralNode or
 // a PassNode containing multiple FieldLiteralNode.
+//
+// The param could also be a GetAccessor/SetAccessor in Javascript,
+// which is a function node. We take the name of function as field name,
+// the FunctionNode as the value.
 TreeNode* ASTBuilder::BuildStructLiteral() {
   if (mTrace)
     std::cout << "In BuildStructLiteral" << std::endl;
@@ -1329,20 +1333,7 @@ TreeNode* ASTBuilder::BuildStructLiteral() {
 
   StructLiteralNode *struct_literal = (StructLiteralNode*)gTreePool.NewTreeNode(sizeof(StructLiteralNode));
   new (struct_literal) StructLiteralNode();
-
-  if (literal->IsFieldLiteral()) {
-    FieldLiteralNode *fl = (FieldLiteralNode*)literal;
-    struct_literal->AddField(fl);
-  } else if (literal->IsPass()) {
-    PassNode *pass = (PassNode*)literal;
-    for (unsigned i = 0; i < pass->GetChildrenNum(); i++) {
-      TreeNode *child = pass->GetChild(i);
-      MASSERT(child->IsFieldLiteral());
-      struct_literal->AddField((FieldLiteralNode*)child);
-    }
-  } else {
-    // do nothing, to be finished.
-  }
+  struct_literal->AddField(literal);
 
   mLastTreeNode = struct_literal;
   return mLastTreeNode;
@@ -1994,6 +1985,15 @@ void ASTBuilder::AddParams(TreeNode *func, TreeNode *decl_params) {
       TreeNode *child = pass->GetChild(i);
       AddParams(func, child);
     }
+  } else if (decl_params->IsIdentifier()) {
+    // sometimes, the parameter is just an identifier in Javascript.
+    // Like the SetAccessor
+    if (func->IsFunction())
+      ((FunctionNode*)func)->AddParam(decl_params);
+    else if (func->IsLambda())
+      ((LambdaNode*)func)->AddParam(decl_params);
+    else
+      MERROR("Unsupported yet.");
   } else {
     MERROR("Unsupported yet.");
   }
@@ -2128,8 +2128,6 @@ TreeNode* ASTBuilder::BuildCall() {
 // identifier, call, or any valid expression.
 //
 // This AddArguments can be used for CallNode, NewNode, etc.
-// Right now I just support CallNode. NewNode will be moved from AddParams()
-// to here.
 
 TreeNode* ASTBuilder::AddArguments() {
   if (mTrace)
@@ -2230,6 +2228,7 @@ TreeNode* ASTBuilder::BuildExprList() {
 //                    FunctionNode related
 ////////////////////////////////////////////////////////////////////////////////
 
+// Takes only one argument, the params, and add it to mLastTreeNode
 TreeNode* ASTBuilder::AddParams() {
   if (mTrace)
     std::cout << "In AddParams" << std::endl;
@@ -2283,8 +2282,10 @@ TreeNode* ASTBuilder::BuildFunction() {
   FunctionNode *f = (FunctionNode*)gTreePool.NewTreeNode(sizeof(FunctionNode));
   new (f) FunctionNode();
 
-  if (node_name)
+  if (node_name) {
+    f->SetFuncName(node_name);
     f->SetStrIdx(node_name->GetStrIdx());
+  }
 
   mLastTreeNode = f;
   return mLastTreeNode;

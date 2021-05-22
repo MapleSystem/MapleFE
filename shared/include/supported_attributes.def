@@ -28,3 +28,5 @@ ATTRIBUTE(static)
 ATTRIBUTE(strictfp)
 ATTRIBUTE(default)
 ATTRIBUTE(synchronized)
+ATTRIBUTE(getter)             // Javascript getter function
+ATTRIBUTE(setter)             // Javascript setter function

@@ -758,6 +758,10 @@ public:
 
 // We define StructLiteral for C/C++ struct literal, TS/JS object literal.
 // It contains a list of duple <fieldname, value>
+//
+// In Javascript, the GetAccessor/SetAccessor makes it complicated.
+// We save the XetAccessor as a field literal with fieldname being func
+// name and literal being function node itself.
 class FieldLiteralNode : public TreeNode{
 public:
   IdentifierNode *mFieldName;
@@ -783,7 +787,7 @@ public:
   unsigned          GetFieldsNum() {return mFields.GetNum();}
   FieldLiteralNode* GetField(unsigned i) {return mFields.ValueAtIndex(i);}
   void              SetField(unsigned i, FieldLiteralNode* n) {*(mFields.RefAtIndex(i)) = n;}
-  void              AddField(FieldLiteralNode *d) {mFields.PushBack(d);}
+  void              AddField(TreeNode *d);
 
   void Dump(unsigned);
 };
@@ -1341,6 +1345,7 @@ private:
   SmallVector<AttrId>          mAttrs;
   SmallVector<AnnotationNode*> mAnnotations; //annotation or pragma
   SmallVector<ExceptionNode*>  mThrows;      // exceptions it can throw
+  TreeNode                    *mFuncName;    // function name, usually an identifier
   TreeNode                    *mType;        // return type
   SmallVector<TreeNode*>       mParams;      //
   BlockNode                   *mBody;
@@ -1354,6 +1359,9 @@ public:
   // After function body is added, we need some clean up work, eg. cleaning
   // the PassNode in the tree.
   void CleanUp();
+
+  TreeNode* GetFuncName() {return mFuncName;}
+  void SetFuncName(TreeNode *n) {mFuncName = n;}
 
   BlockNode* GetBody() {return mBody;}
   void SetBody(BlockNode *b) {mBody = b; if(b) b->SetParent(this); CleanUp();}

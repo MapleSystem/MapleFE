@@ -1,0 +1,17 @@
+Matched 39 tokens.
+Matched 48 tokens.
+Matched 54 tokens.
+Matched 63 tokens.
+============= Module ===========
+== Sub Tree ==
+js_const Decl: obj= {prop:'foo', getProp:func  getProp()  throws: 
+  return this.prop
+, setProp:func  setProp(newVal)  throws: 
+  this.prop Assign newVal
+}
+== Sub Tree ==
+console.log(obj.getProp)
+== Sub Tree ==
+obj.setProp Assign 'bar'
+== Sub Tree ==
+console.log(obj.getProp)

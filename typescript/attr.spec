@@ -32,5 +32,7 @@ STRUCT Attribute : (("abstract", abstract),
                     ("static", static),
                     ("strictfp", strictfp),
                     ("default", default),
+                    ("get", getter),
+                    ("set", setter),
                     ("synchronized", synchronized))
 

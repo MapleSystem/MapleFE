@@ -507,6 +507,29 @@ void StructNode::Dump(unsigned indent) {
   DUMP0_NORETURN(" }");
 }
 
+void StructLiteralNode::AddField(TreeNode *tree) {
+  if (tree->IsFieldLiteral()) {
+    FieldLiteralNode *fl = (FieldLiteralNode*)tree;
+    mFields.PushBack(fl);
+  } else if (tree->IsFunction()) {
+    FunctionNode *node = (FunctionNode*)tree;
+    FieldLiteralNode *func_lit = (FieldLiteralNode*)gTreePool.NewTreeNode(sizeof(FieldLiteralNode));
+    new (func_lit) FieldLiteralNode();
+    MASSERT(node->GetFuncName()->IsIdentifier());
+    func_lit->SetFieldName((IdentifierNode*)(node->GetFuncName()));
+    func_lit->SetLiteral(node);
+    mFields.PushBack(func_lit);
+  } else if (tree->IsPass()) {
+    PassNode *pass = (PassNode*)tree;
+    for (unsigned i = 0; i < pass->GetChildrenNum(); i++) {
+      TreeNode *child = pass->GetChild(i);
+      AddField(child);
+    }
+  } else {
+    MASSERT(0 && "unsupported.");
+  }
+}
+
 void StructLiteralNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   DUMP0_NORETURN(" {");
