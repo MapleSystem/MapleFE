@@ -24,7 +24,7 @@ OBJS :=$(foreach obj,$(OBJ), $(BUILD)/$(obj))
 LIBOBJS :=$(patsubst $(BUILD)/main.o,,$(OBJS))
 DEPS :=$(foreach dep,$(DEP), $(BUILD)/$(dep))
 
-GENDIR:=${BUILDDIR}/ast_doc/shared
+GENDIR:=${BUILDDIR}/ast_gen/shared
 
 INCLUDES := -I $(MAPLEFE_ROOT)/shared/include \
             -I $(MAPLEFE_ROOT)/ast2mpl/include \

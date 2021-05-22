@@ -20,7 +20,7 @@ SRC=$(wildcard *.cpp)
 OBJ :=$(patsubst %.cpp,%.o,$(SRC))
 DEP :=$(patsubst %.cpp,%.d,$(SRC))
 
-GENDIR:=${BUILDDIR}/ast_doc/shared
+GENDIR:=${BUILDDIR}/ast_gen/shared
 
 SRCG:=$(wildcard ${GENDIR}/*.cpp)
 OBJG:=$(patsubst %.cpp,%.o,$(SRCG))

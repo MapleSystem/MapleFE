@@ -126,10 +126,10 @@ This function call `handle_yaml(initial_yaml, gen_handler)` is to handle all rel
 
 ## Where are the generated files located?
 
-They can be found under directory `MapleFE/output/typescript/ast_doc/shared/`.
+They can be found under directory `MapleFE/output/typescript/ast_gen/shared/`.
 ```bash
-MapleFE/output/typescript/ast_doc/shared/gen_astvisitor.h
-MapleFE/output/typescript/ast_doc/shared/gen_astvisitor.cpp
+MapleFE/output/typescript/ast_gen/shared/gen_astvisitor.h
+MapleFE/output/typescript/ast_gen/shared/gen_astvisitor.cpp
 ```
 
 ## Format of the generated C++ header and source files

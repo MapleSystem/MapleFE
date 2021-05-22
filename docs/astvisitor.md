@@ -53,7 +53,7 @@ transform a subtree into a new subtree when needed.
 
 ## How does the replacement work?
 
-The `AstVisitor` class is declared and defined in `MapleFE/output/typescript/ast_doc/shared/gen_astvisitor.{h,cpp}`.
+The `AstVisitor` class is declared and defined in `MapleFE/output/typescript/ast_gen/shared/gen_astvisitor.{h,cpp}`.
 
 ```c
 BlockNode *AstVisitor::VisitBlockNode(BlockNode *node) {

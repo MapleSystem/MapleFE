@@ -11,7 +11,7 @@ import ruamel.yaml as yaml
 
 root_dir = path.dirname(path.dirname(path.realpath(__file__))) + '/'
 builddir = environ.get('BUILDDIR')
-output_dir = builddir + '/ast_doc/' if builddir != None else root_dir + "output/typescript/ast_doc/"
+output_dir = builddir + '/ast_gen/' if builddir != None else root_dir + "output/typescript/ast_gen/"
 maplefe_dir = root_dir + 'shared/'
 # initial_yaml = output_dir + 'maplefe/index.yaml' # For higher version of clang-doc
 initial_yaml = output_dir + 'maplefe.yaml'         # For version 10
@@ -80,7 +80,7 @@ create(output_dir + 'compile_commands.json', compile_commands)
 create(output_dir + 'ast.sh', bash_commands)
 exec_command('bash ' + output_dir + 'ast.sh')
 
-# Dump all content in a dictionary to ast_doc/yaml.log
+# Dump all content in a dictionary to ast_gen/yaml.log
 def log(dictionary, indent, msg = ""):
     global log_buf
     if indent == 0: log_buf = [msg]
