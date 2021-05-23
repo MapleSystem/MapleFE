@@ -1112,7 +1112,7 @@ std::string AstEmitter::AstEmitInstanceOfNode(InstanceOfNode *node) {
 std::string AstEmitter::AstEmitTypeOfNode(TypeOfNode *node) {
   if (node == nullptr)
     return std::string();
-  const Precedence precd = '\014';
+  const Precedence precd = '\121';
   std::string str("typeof "s), rhs;
   if (auto n = node->GetExpr()) {
     rhs = AstEmitTreeNode(n);
