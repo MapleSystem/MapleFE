@@ -39,7 +39,7 @@ while [ $# -gt 0 ]; do
 done
 [ -z "$CLEAN" ] || { echo Cleaning up generated files...; find -maxdepth 1 -regex '.*\.ts-[0-9]+\.out.ts' -exec rm '{}' \;; echo Done.; }
 [ -n "$LIST" ] || { echo Please specify one or more TypeScript files.; usage; }
-[ -z "$DOT" ] || [ -x /usr/bin/dot -a -x /usr/bin/viewnior -x /usr/bin/highlight ] || sudo apt install graphviz viewnior highlight
+[ -z "$DOT" ] || [ -x /usr/bin/dot -a -x /usr/bin/viewnior -a -x /usr/bin/highlight ] || sudo apt install graphviz viewnior highlight
 CMD=$(cd $(dirname $0)/../; pwd)/output/typescript/typescript/ts2cpp
 [ -x "$CMD" ] || { echo Cannot execute $CMD; exit 1; }
 Failed=
