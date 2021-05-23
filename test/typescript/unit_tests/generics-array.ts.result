@@ -1,9 +1,11 @@
 Matched 67 tokens.
 Matched 90 tokens.
-Matched 97 tokens.
+Matched 101 tokens.
 Matched 108 tokens.
 Matched 119 tokens.
-Matched 132 tokens.
+Matched 130 tokens.
+Matched 141 tokens.
+Matched 154 tokens.
 ============= Module ===========
 == Sub Tree ==
 class  Pool
@@ -34,9 +36,13 @@ class  Foo
   LocalInterfaces: 
 
 == Sub Tree ==
+js_const Decl: primPool=new ()
+== Sub Tree ==
 primPool.put(10)
 == Sub Tree ==
 console.log(primPool.get())
+== Sub Tree ==
+js_const Decl: objPool=new ()
 == Sub Tree ==
 objPool.put(new Foo(100))
 == Sub Tree ==

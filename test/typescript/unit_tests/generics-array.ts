@@ -22,11 +22,11 @@ class Foo {
 }
 
 // Create array of primary type values
-//const primPool = new Pool<number>();
+const primPool = new Pool<number>();
 primPool.put(10);
 console.log(primPool.get());
 
 // Create array of objects
-//const objPool = new Pool<Foo>();
+const objPool = new Pool<Foo>();
 objPool.put(new Foo(100));
 console.log(objPool.get()._id);

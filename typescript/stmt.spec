@@ -295,10 +295,13 @@ rule MemberExpression : ONEOF(
   MemberExpression + TemplateLiteral,
 #  SuperProperty[?Yield]
 #  MetaProperty
-  "new" + MemberExpression + Arguments)
+  "new" + MemberExpression + Arguments,
+# NOTE: I created this rule. Typescript extended Type system and allow 'new'
+#       on a TypeReference
+  "new" + TypeReference + Arguments)
   attr.action.%2 : BuildArrayElement(%1, %3)
   attr.action.%3 : BuildField(%1, %3)
-  attr.action.%5 : BuildNewOperation(%2, %3)
+  attr.action.%5,%6 : BuildNewOperation(%2, %3)
 
 ##-----------------------------------
 ##rule SuperProperty[Yield] :
