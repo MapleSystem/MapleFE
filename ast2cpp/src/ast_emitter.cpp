@@ -140,7 +140,7 @@ std::string AstEmitter::AstEmitUnaOperatorNode(UnaOperatorNode *node) {
     return std::string();
   bool isPost = node->IsPost();
   const char *op = AstEmitter::GetEnumOprId(node->GetOprId());
-  const Precedence precd = *op & 0x1f;
+  const Precedence precd = *op & 0x3f;
   const bool rl_assoc = *op >> 6; // false: left-to-right, true: right-to-left
   std::string opr;
   if (auto n = node->GetOpnd()) {
@@ -165,7 +165,7 @@ std::string AstEmitter::AstEmitBinOperatorNode(BinOperatorNode *node) {
   if (node == nullptr)
     return std::string();
   const char *op = AstEmitter::GetEnumOprId(node->GetOprId());
-  const Precedence precd = *op & 0x1f;
+  const Precedence precd = *op & 0x3f;
   const bool rl_assoc = *op >> 6; // false: left-to-right, true: right-to-left
   std::string lhs, rhs;
   if (auto n = node->GetOpndA()) {
@@ -1112,7 +1112,7 @@ std::string AstEmitter::AstEmitInstanceOfNode(InstanceOfNode *node) {
 std::string AstEmitter::AstEmitTypeOfNode(TypeOfNode *node) {
   if (node == nullptr)
     return std::string();
-  const Precedence precd = '\121';
+  const Precedence precd = '\121' & 0x3f;
   std::string str("typeof "s), rhs;
   if (auto n = node->GetExpr()) {
     rhs = AstEmitTreeNode(n);
