@@ -47,6 +47,9 @@ public:
   void   SetId(AttrId id) {mId = id;}
 };
 
+extern const char* FindAttrKeyword(AttrId id);
+extern AttrId FindAttrId(const char *keyword);
+
 ///////////////////////////////////////////////////////////////////////////////
 //                      AttrPool
 // The size of AttrNode is fixed, so it's good to use MemPool for the storage.

@@ -174,6 +174,29 @@ static void add_type_to(TreeNode *tree, TreeNode *type) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
+//                          BuildIdentifier
+////////////////////////////////////////////////////////////////////////////////////////
+
+// Take on argument, the mLastTreeNode.
+// It could be a token or tree.
+TreeNode* ASTBuilder::BuildIdentifier() {
+  if (mLastTreeNode->IsIdentifier()) {
+    return mLastTreeNode;
+  } else if (mLastTreeNode->IsAttr()) {
+    AttrNode *an = (AttrNode*)mLastTreeNode;
+    AttrId aid = an->GetId();
+
+    IdentifierNode *n = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
+    unsigned idx = gStringPool.GetStrIdx(FindAttrKeyword(aid));
+    new (n) IdentifierNode(idx);
+    mLastTreeNode = n;
+    return n;
+  } else {
+    MERROR("Unsupported node type in BuildIdentifier()");
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
 //                      Interfaces for Java style package  and import
 ////////////////////////////////////////////////////////////////////////////////////////
 

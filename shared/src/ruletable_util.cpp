@@ -99,9 +99,15 @@ const char* FindKeyword(const char *str, const char c, unsigned &len) {
 
 // Returns true : The rule actions in 'table' involves i-th element
 // [NOTE] i starts from 1.
+//
+// If there is an action which has no elem as its argument. It could
+// take all element, or any number of element. In this case, we think
+// it HasElem.
 bool RuleActionHasElem(RuleTable *table, unsigned target_idx) {
   for (unsigned i = 0; i < table->mNumAction; i++) {
     Action *act = table->mActions + i;
+    if (act->mNumElem == 0)
+      return true;
     for (unsigned j = 0; j < act->mNumElem; j++) {
       unsigned index = act->mElems[j];
       if (index = target_idx)

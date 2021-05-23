@@ -1,0 +1,43 @@
+Matched 67 tokens.
+Matched 90 tokens.
+Matched 97 tokens.
+Matched 108 tokens.
+Matched 119 tokens.
+Matched 132 tokens.
+============= Module ===========
+== Sub Tree ==
+class  Pool
+  Fields: 
+    _pool
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+    func  put(element)  throws: 
+      this._pool.push(element)
+    func  get()  throws: 
+      return this._pool.pop()
+    func  size()  throws: 
+      return this._pool.length
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+class  Foo
+  Fields: 
+    _id
+  Instance Initializer: 
+  Constructors: 
+    constructor  (id)  throws: 
+      this._id Assign id
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+primPool.put(10)
+== Sub Tree ==
+console.log(primPool.get())
+== Sub Tree ==
+objPool.put(new Foo(100))
+== Sub Tree ==
+console.log(objPool.get(),_id)

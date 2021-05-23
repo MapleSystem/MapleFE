@@ -54,7 +54,10 @@
 #                                    A.2 Expressions
 #-------------------------------------------------------------------------------
 
-rule JSIdentifier: Identifier
+rule JSIdentifier: ONEOF(Identifier,
+                         "get",
+                         "set")
+  attr.action : BuildIdentifier()
 
 ##-----------------------------------
 ##rule IdentifierReference[Yield] :
