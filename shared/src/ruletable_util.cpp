@@ -102,7 +102,9 @@ const char* FindKeyword(const char *str, const char c, unsigned &len) {
 //
 // If there is an action which has no elem as its argument. It could
 // take all element, or any number of element. In this case, we think
-// it HasElem.
+// it HasElem.  Please look at typescript's stmt.spec.
+//   rule JSIdentifier: is a good example.
+//
 bool RuleActionHasElem(RuleTable *table, unsigned target_idx) {
   for (unsigned i = 0; i < table->mNumAction; i++) {
     Action *act = table->mActions + i;

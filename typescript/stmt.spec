@@ -121,7 +121,7 @@ rule PrimaryExpression : ONEOF(
 #  GeneratorExpression
 #  RegularExpressionLiteral
   TemplateLiteral,
-  CoverParenthesizedExpressionAndArrowParameterList)
+  ParenthesizedExpression)
 
 ##-----------------------------------
 ##rule CoverParenthesizedExpressionAndArrowParameterList[Yield] :
@@ -132,15 +132,19 @@ rule PrimaryExpression : ONEOF(
 ##  When processing the production
 ##        PrimaryExpression[Yield] : CoverParenthesizedExpressionAndArrowParameterList[?Yield]
 ##  the interpretation of CoverParenthesizedExpressionAndArrowParameterList is refined using the following grammar:
+##  ParenthesizedExpression[Yield] :
+##  ( Expression[In, ?Yield] )
+rule ParenthesizedExpression : '(' + Expression + ')'
+
 rule CoverParenthesizedExpressionAndArrowParameterList : ONEOF(
   '(' + Expression + ')',
   '(' + ')',
   '(' + "..." + BindingIdentifier + ')',
-  '(' + Expression + ',' + "..." + BindingIdentifier + ')')
+  '(' + "..." + BindingPattern + ')',
+  '(' + Expression + ',' + "..." + BindingIdentifier + ')',
+  '(' + Expression + ',' + "..." + BindingPattern + ')')
 
 ##-----------------------------------
-##rule ParenthesizedExpression[Yield] :
-##  ( Expression[In, ?Yield] )
 
 ##-----------------------------------
 ##rule Literal :
@@ -1112,8 +1116,14 @@ rule ArrowFunction : ONEOF(
 ## ArrowParameters[Yield] :
 ## BindingIdentifier[?Yield]
 ## CoverParenthesizedExpressionAndArrowParameterList[?Yield]
+## When the production ArrowParameters:CoverParenthesizedExpressionAndArrowParameterList is recognized the following
+## grammar is used to refine the interpretation of CoverParenthesizedExpressionAndArrowParameterList:
+##ArrowFormalParameters[Yield]:
+##(StrictFormalParameters[?Yield])
 rule ArrowParameters : ONEOF(BindingIdentifier,
-                             CoverParenthesizedExpressionAndArrowParameterList)
+                             ArrowFormalParameters)
+
+rule ArrowFormalParameters : '(' + StrictFormalParameters + ')'
 
 ## See 14.2
 ## ConciseBody[In] :
@@ -1431,7 +1441,7 @@ rule TypeMemberList : ONEOF(TypeMember,
 ## rule TypeMember: PropertySignature CallSignature ConstructSignature IndexSignature MethodSignature
 rule TypeMember : ONEOF(PropertySignature,
                         CallSignature,
-                        ## ConstructSignature,
+                        ConstructSignature,
                         IndexSignature,
                         ##MethodSignature
                        )
@@ -1545,6 +1555,8 @@ rule OptionalParameter: ONEOF(
 rule RestParameter: "..." + BindingIdentifier + ZEROORONE(TypeAnnotation)
 
 ## rule ConstructSignature: new TypeParametersopt ( ParameterListopt ) TypeAnnotationopt
+rule ConstructSignature :
+  "new" + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList) + ')' + ZEROORONE(TypeAnnotation)
 
 ## rule IndexSignature: [ BindingIdentifier : string ] TypeAnnotation [ BindingIdentifier : number ] TypeAnnotation
 rule IndexSignature: ONEOF(
