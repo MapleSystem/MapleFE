@@ -122,7 +122,6 @@ CondBranchNode *CFGVisitor::VisitCondBranchNode(CondBranchNode *node) {
   TreeNode *cond = node->GetCond();
   // Set predicate of current BB
   mCurrentBB->SetPredicate(cond);
-  mCurrentBB->AddStatement(cond);
 
   // Save current BB
   AST_BB *current_bb = mCurrentBB;
@@ -176,7 +175,6 @@ ForLoopNode *CFGVisitor::VisitForLoopNode(ForLoopNode *node) {
     TreeNode *cond = node->GetCond();
     // Set predicate of current BB
     mCurrentBB->SetPredicate(cond);
-    mCurrentBB->AddStatement(cond);
   } else
     // Set predicate to be current ForLoopNode when it is FLP_JSIn or FLP_JSOf
     mCurrentBB->SetPredicate(node);
@@ -221,7 +219,6 @@ WhileLoopNode *CFGVisitor::VisitWhileLoopNode(WhileLoopNode *node) {
   TreeNode *cond = node->GetCond();
   // Set predicate of current BB
   mCurrentBB->SetPredicate(cond);
-  mCurrentBB->AddStatement(cond);
 
   // Create a BB for loop body
   mCurrentBB = NewBB(BK_Uncond);
@@ -273,7 +270,6 @@ DoLoopNode *CFGVisitor::VisitDoLoopNode(DoLoopNode *node) {
   TreeNode *cond = node->GetCond();
   // Set predicate of current BB
   mCurrentBB->SetPredicate(cond);
-  mCurrentBB->AddStatement(cond);
 
   // Add a back edge to loop header
   mCurrentBB->AddSuccessor(current_bb);
@@ -326,8 +322,6 @@ SwitchNode *CFGVisitor::VisitSwitchNode(SwitchNode *node) {
     current_bb->AddSuccessor(case_bb);
 
     TreeNode *case_node = node->GetCaseAtIndex(i);
-    // Add current case node to current case BB
-    case_bb->AddStatement(case_node);
     // Set the auxiliary node and predicate for current case BB
     case_bb->SetAuxNode(case_node);
     case_bb->SetPredicate(switch_expr);
