@@ -54,13 +54,15 @@
 #                                    A.2 Expressions
 #-------------------------------------------------------------------------------
 
+rule JSIdentifier: Identifier
+
 ##-----------------------------------
 ##rule IdentifierReference[Yield] :
 ##  Identifier
 ##  [~Yield] yield
 
 rule IdentifierReference : ONEOF(
-  Identifier,
+  JSIdentifier,
   "yield")
 
 ##-----------------------------------
@@ -68,19 +70,28 @@ rule IdentifierReference : ONEOF(
 ##  Identifier
 ##  [~Yield] yield
 
-rule BindingIdentifier : ONEOF(Identifier, "yield")
+rule BindingIdentifier : ONEOF(JSIdentifier, "yield")
 
 ##-----------------------------------
 ##rule LabelIdentifier[Yield] :
 ##  Identifier
 ##  [~Yield] yield
 rule LabelIdentifier : ONEOF(
-  Identifier,
+  JSIdentifier,
   "yield")
 
 ##-----------------------------------
 ##rule Identifier :
 ##  IdentifierName but not ReservedWord
+##
+## Identifier and IdentifierName are tricky in Javascript.
+## (1) Some 'keywords' like 'get', 'set', should be keyword and reserved,
+##     however, they are allowed as identifiers.
+## (2) Identifier is a reserved rule in 'autogen', we won't define it
+##     in this spec.
+##
+## I decided to use JSIdentifier instead of Identifier and then I
+## can include 'get', 'set' in the JSIdentifier.
 
 ##-----------------------------------
 ##rule PrimaryExpression[Yield] :
@@ -225,7 +236,7 @@ rule PropertyName : ONEOF(LiteralPropertyName,
 # I extend StringLiteral/NumericLiteral to Literal. 'tsc' will
 # make sure it's legal and I don't need worry about it.
 
-rule LiteralPropertyName : ONEOF(Identifier, Literal)
+rule LiteralPropertyName : ONEOF(JSIdentifier, Literal)
 
 ##-----------------------------------
 ##rule ComputedPropertyName[Yield] :
@@ -273,7 +284,7 @@ rule Initializer : '=' + AssignmentExpression
 rule MemberExpression : ONEOF(
   PrimaryExpression,
   MemberExpression + '[' + Expression + ']',
-  MemberExpression + '.' + Identifier,
+  MemberExpression + '.' + JSIdentifier,
   MemberExpression + TemplateLiteral,
 #  SuperProperty[?Yield]
 #  MetaProperty
@@ -315,7 +326,7 @@ rule CallExpression : ONEOF(
   SuperCall,
   CallExpression + Arguments,
   CallExpression + '[' + Expression + ']',
-  CallExpression + '.' + Identifier,
+  CallExpression + '.' + JSIdentifier,
   CallExpression + TemplateLiteral)
   attr.action.%1,%3 : BuildCall(%1)
   attr.action.%1,%3 : AddArguments(%2)
@@ -1262,7 +1273,7 @@ rule ImportsList : ONEOF(ImportSpecifier,
 ## ImportedBinding
 ## IdentifierName as ImportedBinding
 rule ImportSpecifier : ONEOF(ImportedBinding,
-                             Identifier + "as" + ImportedBinding)
+                             JSIdentifier + "as" + ImportedBinding)
   attr.action.%2 : BuildXXportAsPair(%1, %3)
 
 ## See 15.2.2
@@ -1322,8 +1333,8 @@ rule ExportsList : ONEOF(ExportSpecifier,
 ## ExportSpecifier :
 ## IdentifierName
 ## IdentifierName as IdentifierName
-rule ExportSpecifier : ONEOF(Identifier,
-                             Identifier + "as" + Identifier)
+rule ExportSpecifier : ONEOF(JSIdentifier,
+                             JSIdentifier + "as" + JSIdentifier)
   attr.action.%2 : BuildXXportAsPair(%1, %3)
 
 #############################################################################
@@ -1462,7 +1473,7 @@ rule TypeQuery: "typeof" + TypeQueryExpression
 
 ## rule TypeQueryExpression: IdentifierReference TypeQueryExpression . IdentifierName
 rule TypeQueryExpression: ONEOF(IdentifierReference,
-                                TypeQueryExpression + '.' + Identifier)
+                                TypeQueryExpression + '.' + JSIdentifier)
   attr.action.%2 : BuildField(%1, %3)
 
 ## rule ThisType: this
@@ -1473,7 +1484,7 @@ rule PropertySignature: PropertyName + ZEROORONE('?') + ZEROORONE(TypeAnnotation
   attr.action : AddType(%1, %3)
 
 ## rule PropertyName: IdentifierName StringLiteral NumericLiteral
-rule PropertyName : ONEOF(Identifier,
+rule PropertyName : ONEOF(JSIdentifier,
                           ##StringLiteral,
                           ##NumericLiteral,
                          )
