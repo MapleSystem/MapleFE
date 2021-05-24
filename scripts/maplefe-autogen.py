@@ -1181,13 +1181,6 @@ ModuleNode *{gen_args2}FromAstBuf(AstBuffer &buf) {{
   return module;
 }}
 
-ModuleNode *{gen_args2}FromCharBuf(const char *buf, unsigned len) {{
-  AstBuffer astBuf;
-  for(unsigned i = 0; i < len; ++i)
-    astBuf.push_back(static_cast<uint8_t>(*(buf + i)));
-  return {gen_args2}FromAstBuf(astBuf);
-}}
- 
 TreeNode *CreateNode() {{
   NodeKind k = static_cast<NodeKind>(ReadNum('N'));
   unsigned id = static_cast<unsigned>(ReadNum('V'));
