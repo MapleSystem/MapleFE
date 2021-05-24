@@ -8,8 +8,7 @@ class  Point
   Constructors: 
   Methods: 
     func  foo()  throws: 
-      bar(() -> 42
-)
+      bar(() -> 42)
   LocalClasses: 
   LocalInterfaces: 
 

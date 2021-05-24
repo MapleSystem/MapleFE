@@ -6,6 +6,5 @@ Matched 35 tokens.
 js_let Decl: f
 == Sub Tree ==
 f Assign (x) -> x Div 3
-
 == Sub Tree ==
 console.log(f(6))

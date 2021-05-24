@@ -17,7 +17,6 @@ class  Foo
   LocalInterfaces: 
 
 == Sub Tree ==
-js_const Decl: FooString=new (() -> new String("foo")
-)
+js_const Decl: FooString=new (() -> new String("foo"))
 == Sub Tree ==
 console.log(())

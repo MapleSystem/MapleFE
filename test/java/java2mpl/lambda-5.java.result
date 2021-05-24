@@ -17,15 +17,12 @@ class  Point
       Decl: m
       m Assign () -> 
       m Assign () -> 42
-
       m Assign () -> null
-
       m Assign () -> return 42
 
       m Assign () -> system.gc()
 
       m Assign (x,y) -> x Add y
-
   LocalClasses: 
   LocalInterfaces: 
 

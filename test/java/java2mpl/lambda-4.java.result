@@ -17,9 +17,7 @@ class  Main
   Methods: 
     func  main(args)  throws: 
       Decl: exclaim=(s) -> s Add "!"
-
       Decl: ask=(s) -> s Add "?"
-
       printFormatted("Hello",exclaim)
       printFormatted("Hello",ask)
     func  printFormatted(str,format)  throws: 

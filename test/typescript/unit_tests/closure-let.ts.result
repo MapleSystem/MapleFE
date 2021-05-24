@@ -13,7 +13,6 @@ func  initialize()  throws:
     funcs[i] Assign () -> console.log(msg)
 
 
-
 == Sub Tree ==
 initialize()
 == Sub Tree ==

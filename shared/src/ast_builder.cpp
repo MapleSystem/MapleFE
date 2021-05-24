@@ -2780,7 +2780,7 @@ TreeNode* ASTBuilder::BuildLambda() {
       if (!p_body.mIsTreeNode)
         MERROR("Lambda Body is not a tree node.");
       else
-        body_node = CvtToBlock(p_body.mData.mTreeNode);
+        body_node = p_body.mData.mTreeNode;
     }
   }
 

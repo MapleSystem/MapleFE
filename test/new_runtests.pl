@@ -146,6 +146,7 @@ foreach my $file (@paths) {
             }
 
             print "\n$origresult $outroot/$outresult are different!!!\n";
+            print "\ncp $outroot/$outresult $origresult\n";
             system("mkdir -p $diffdir/$diff_file && touch $diffdir/$diff_file");
             $countfailedcases ++;
             push(@failed_file, $pinput.": result files diff: ".$origresult);

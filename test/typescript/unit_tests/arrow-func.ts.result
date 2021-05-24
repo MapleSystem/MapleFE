@@ -7,6 +7,5 @@ js_let Decl: f1=(x) -> return x Div 3
 
 == Sub Tree ==
 js_let Decl: f2=(x) -> x Div 3
-
 == Sub Tree ==
 console.log(f1(6),f2(9))

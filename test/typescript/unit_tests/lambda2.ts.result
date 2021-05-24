@@ -3,6 +3,5 @@ Matched 29 tokens.
 ============= Module ===========
 == Sub Tree ==
 js_var Decl: sqare=(x) -> x Mul x
-
 == Sub Tree ==
 console.log(sqare(2))
