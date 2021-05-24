@@ -32,7 +32,9 @@ fi
 cd $MAPLEFE_ROOT/test
 rm -f $PASS_LIST
 find $MSTEST_DIR -name "*.ts" | xargs -n1 -P$N_JOBS -I % sh -c '{ $TS2AST %; exitcode=$?; if [ $exitcode -eq 0 ]; then basename % >> $PASS_LIST; fi }'
-ls $MSTEST_DIR | grep -v -x -f $PASS_LIST /dev/stdin  > $FAIL_LIST
+cd $MSTEST_DIR
+ls *.ts | grep -v -x -f $MAPLEFE_ROOT/test/$PASS_LIST /dev/stdin  > $MAPLEFE_ROOT/test/$FAIL_LIST
+cd -
 sort -o $PASS_LIST $PASS_LIST
 echo
 echo "Microsoft Typescript compiler testcases: Passed: " `wc -l < $PASS_LIST` " Failed: " `wc -l < $FAIL_LIST`
