@@ -15,7 +15,7 @@
 include ../../Makefile.in
 BUILD=$(BUILDDIR)/ast2cpp
 BUILDGEN=$(BUILDDIR)/gen
-BUILDASTGEN=$(BUILDDIR)/ast_doc/shared
+BUILDASTGEN=$(BUILDDIR)/ast_gen/shared
 $(shell $(MKDIR_P) $(BUILD))
 
 SRC=$(wildcard *.cpp)

@@ -15,7 +15,7 @@
 include ../../Makefile.in
 BUILD=$(BUILDDIR)/java
 BUILDGEN=$(BUILDDIR)/gen
-BUILDASTGEN=$(BUILDDIR)/ast_doc/shared
+BUILDASTGEN=$(BUILDDIR)/ast_gen/shared
 $(shell $(MKDIR_P) $(BUILD) $(BUILDGEN))
 
 SRC=$(wildcard *.cpp)
@@ -33,7 +33,7 @@ INCLUDES := -I $(MAPLEFE_ROOT)/shared/include \
             -I $(MAPLEFE_ROOT)/ast2mpl/include \
             -I $(MAPLEFE_ROOT)/java/include \
             -I $(MAPLEFE_ROOT)/autogen/include \
-						-I ${BUILDDIR}/ast_doc/shared \
+						-I ${BUILDDIR}/ast_gen/shared \
             -I $(BUILDGEN) $(MAPLEALL_INC)
 
 INCLUDEGEN := -I $(BUILDGEN) -I $(MAPLEFE_ROOT)/shared/include

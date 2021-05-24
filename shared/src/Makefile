@@ -30,7 +30,7 @@ SRCG:=$(wildcard ${GENDIR}/gen_*.cpp)
 OBJG:=$(patsubst %.cpp,%.o,$(SRCG))
 DEPG:=$(patsubst %.cpp,%.d,$(SRCG))
 
-GENASTDIR:=${BUILDDIR}/ast_doc/shared
+GENASTDIR:=${BUILDDIR}/ast_gen/shared
 
 ASTSRCG:=$(wildcard ${GENASTDIR}/*.cpp)
 ASTOBJG:=$(patsubst %.cpp,%.o,$(ASTSRCG))
