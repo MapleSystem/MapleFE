@@ -17,7 +17,7 @@ if [ "x$1" = "xsetup" ]; then
 fi
 
 # export is for sh -c in xargs
-export TS2CPP=$MAPLEFE_ROOT/output/typescript/typescript/ts2cpp 
+export TS2AST=$MAPLEFE_ROOT/output/typescript/typescript/ts2ast
 export PASS_LIST=msts_passed.txt
 FAIL_LIST=msts_failed.txt
 MSTEST_DIR=$MAPLEFE_ROOT/test/TypeScript/tests/cases/compiler
@@ -31,7 +31,7 @@ fi
 
 cd $MAPLEFE_ROOT/test
 rm -f $PASS_LIST
-find $MSTEST_DIR -name "*.ts" | xargs -n1 -P$N_JOBS -I % sh -c '{ $TS2CPP %; exitcode=$?; if [ $exitcode -eq 0 ]; then basename % >> $PASS_LIST; fi }'
+find $MSTEST_DIR -name "*.ts" | xargs -n1 -P$N_JOBS -I % sh -c '{ $TS2AST %; exitcode=$?; if [ $exitcode -eq 0 ]; then basename % >> $PASS_LIST; fi }'
 ls $MSTEST_DIR | grep -v -x -f $PASS_LIST /dev/stdin  > $FAIL_LIST
 sort -o $PASS_LIST $PASS_LIST
 echo
