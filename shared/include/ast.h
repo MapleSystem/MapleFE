@@ -1257,9 +1257,10 @@ class CallNode : public TreeNode {
 private:
   TreeNode    *mMethod;
   ExprListNode mArgs;
+  SmallVector<TreeNode*> mTypeArguments;
 public:
   CallNode() : TreeNode(NK_Call), mMethod(NULL) {}
-  ~CallNode(){}
+  ~CallNode(){Release();}
 
   void Init();
 
@@ -1271,7 +1272,12 @@ public:
   TreeNode* GetArg(unsigned index) {return mArgs.GetExprAtIndex(index);}
   void      SetArg(unsigned i, TreeNode* n) {mArgs.SetExprAtIndex(i, n);}
 
-  void Release() {mArgs.Release();}
+  unsigned  GetTypeArgumentsNum()            {return mTypeArguments.GetNum();}
+  TreeNode* GetTypeArgumentAtIndex(unsigned i) {return mTypeArguments.ValueAtIndex(i);}
+  void      SetTypeArgumentAtIndex(unsigned i, TreeNode* n) {*(mTypeArguments.RefAtIndex(i)) = n;}
+  void      AddTypeArgument(TreeNode *);
+
+  void Release() {mArgs.Release(); mTypeArguments.Release();}
   void Dump(unsigned);
 };
 

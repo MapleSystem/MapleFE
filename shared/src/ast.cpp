@@ -381,9 +381,32 @@ void CallNode::AddArg(TreeNode *arg) {
   mArgs.Merge(arg);
 }
 
+void CallNode::AddTypeArgument(TreeNode *arg) {
+  if (arg->IsPass()) {
+    PassNode *n = (PassNode*)arg;
+    for (unsigned i = 0; i < n->GetChildrenNum(); i++) {
+      TreeNode *child = n->GetChild(i);
+      AddTypeArgument(child);
+    }
+  } else {
+    mTypeArguments.PushBack(arg);
+  }
+}
+
 void CallNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   mMethod->Dump(0);
+  if (GetTypeArgumentsNum() > 0) {
+    DUMP0_NORETURN("<");
+    for (unsigned i = 0; i < GetTypeArgumentsNum(); i++) {
+      TreeNode *arg = GetTypeArgumentAtIndex(i);
+      arg->Dump(0);
+      if (i < GetTypeArgumentsNum() - 1)
+        DUMP0_NORETURN(",");
+    }
+    DUMP0_NORETURN(">");
+  }
+
   DUMP0_NORETURN("(");
   mArgs.Dump(0);
   DUMP0_NORETURN(")");
