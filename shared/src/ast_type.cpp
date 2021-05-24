@@ -28,9 +28,8 @@ namespace maplefe {
 //////////////////////////////////////////////////////////////////////////
 
 void UserTypeNode::AddTypeArgument(TreeNode *args) {
-  if (args->IsIdentifier()) {
-    IdentifierNode *inode = (IdentifierNode*)args;
-    mTypeArguments.PushBack(inode);
+  if (args->IsIdentifier() || args->IsPrimType() || args->IsUserType()) {
+    mTypeArguments.PushBack(args);
   } else if (args->IsPass()) {
     PassNode *p = (PassNode*)args;
     for (unsigned i = 0; i < p->GetChildrenNum(); i++) {
@@ -67,7 +66,7 @@ void UserTypeNode::Dump(unsigned ind) {
   if (size > 0) {
     DUMP0_NORETURN('<');
     for (unsigned i = 0; i < size; i++) {
-      IdentifierNode *inode = mTypeArguments.ValueAtIndex(i);
+      TreeNode *inode = mTypeArguments.ValueAtIndex(i);
       inode->Dump(0);
       if (i < size - 1)
         DUMP0_NORETURN(',');

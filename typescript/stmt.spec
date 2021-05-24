@@ -1420,6 +1420,8 @@ rule PredefinedType: TYPE
 
 ## rule TypeReference: TypeName [no LineTerminator here] TypeArgumentsopt
 rule TypeReference: TypeName + ZEROORONE(TypeArguments)
+  attr.action : BuildUserType(%1)
+  attr.action : AddTypeArgument(%2)
 
 ## rule TypeName: IdentifierReference NamespaceName . IdentifierReference
 rule TypeName: ONEOF(IdentifierReference,

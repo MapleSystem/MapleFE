@@ -944,7 +944,7 @@ const char* Lexer::TraverseKeywordTable() {
   if (addr) {
     unsigned saved_curidx = curidx;
 
-    // It's a keyword only if the following is a separator
+    // It's a keyword if the following is a separator
     // End of current line is a separator too.
     curidx += len;
     if ((current_line_size == curidx) || (TraverseSepTable() != SEP_NA)) {
@@ -952,10 +952,18 @@ const char* Lexer::TraverseKeywordTable() {
       curidx = saved_curidx + len;
       addr = gStringPool.FindString(addr);
       return addr;
-    } else {
-      // failed, restore curidx
-      curidx = saved_curidx;
     }
+
+    // It's a keyword if the following is a operator
+    curidx = saved_curidx + len;
+    if ((TraverseOprTable() != OPR_NA)) {
+      curidx = saved_curidx + len;
+      addr = gStringPool.FindString(addr);
+      return addr;
+    }
+
+    // failed, restore curidx
+    curidx = saved_curidx;
   }
   return NULL;
 }

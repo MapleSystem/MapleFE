@@ -2587,6 +2587,8 @@ TreeNode* ASTBuilder::AddTypeArgument() {
     return mLastTreeNode;
 
   Param p_args = mParams[0];
+  if (p_args.mIsEmpty)
+    return mLastTreeNode;
 
   // Some language allows special syntax as type arguments, like <> in Java.
   // It's just a token.

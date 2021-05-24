@@ -92,7 +92,7 @@ private:
 
   DimensionNode *mDims;
 
-  SmallVector<IdentifierNode*> mTypeArguments;
+  SmallVector<TreeNode*> mTypeArguments;
 
 public:
   UserTypeNode(TreeNode *n) : TreeNode(NK_UserType),
@@ -105,8 +105,8 @@ public:
 
   unsigned GetTypeArgumentsNum() {return mTypeArguments.GetNum();}
   void     AddTypeArgument(TreeNode *n);
-  IdentifierNode* GetTypeArgument(unsigned i) {return mTypeArguments.ValueAtIndex(i);}
-  void            SetTypeArgument(unsigned i, IdentifierNode* n) {*(mTypeArguments.RefAtIndex(i)) = n;}
+  TreeNode* GetTypeArgument(unsigned i) {return mTypeArguments.ValueAtIndex(i);}
+  void      SetTypeArgument(unsigned i, TreeNode* n) {*(mTypeArguments.RefAtIndex(i)) = n;}
 
   UT_Type GetType() {return mType;}
   void SetType(UT_Type t) {mType = t;}

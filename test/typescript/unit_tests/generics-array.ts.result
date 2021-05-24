@@ -36,13 +36,13 @@ class  Foo
   LocalInterfaces: 
 
 == Sub Tree ==
-js_const Decl: primPool=new ()
+js_const Decl: primPool=new Pool()
 == Sub Tree ==
 primPool.put(10)
 == Sub Tree ==
 console.log(primPool.get())
 == Sub Tree ==
-js_const Decl: objPool=new ()
+js_const Decl: objPool=new Pool()
 == Sub Tree ==
 objPool.put(new Foo(100))
 == Sub Tree ==
