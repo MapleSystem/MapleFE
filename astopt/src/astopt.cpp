@@ -13,7 +13,7 @@
 * See the Mulan PSL v2 for more details.
 */
 
-#include "ast_opt.h"
+#include "astopt.h"
 #include "ast_handler.h"
 #include "gen_astdump.h"
 #include "gen_astgraph.h"

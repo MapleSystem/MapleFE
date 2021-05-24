@@ -20,7 +20,7 @@
 #ifndef __AST2CPP_HEADER__
 #define __AST2CPP_HEADER__
 
-#include "ast_opt.h"
+#include "astopt.h"
 
 namespace maplefe {
 
