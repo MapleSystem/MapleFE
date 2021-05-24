@@ -1017,7 +1017,7 @@ void WriteNode(TreeNode *node) {{
   WriteNum('N', static_cast<int64_t>(node->GetKind()));
   WriteNum('V', static_cast<int64_t>(node->GetNodeId()));
   mBufPtr = tmp;
-  WriteNum('N', static_cast<int64_t>(node->GetKind()));
+  //WriteNum('N', static_cast<int64_t>(node->GetKind()));
   WriteTreeNode(node); // Base TreeNode
 }}
 
@@ -1215,8 +1215,8 @@ int64_t ReadNum(uint8_t tag) {{
 }}
 
 void ReadNode(TreeNode *node) {{
-  NodeKind k = static_cast<NodeKind>(ReadNum('N'));
-  MASSERT(k == node->GetKind());
+  //NodeKind k = static_cast<NodeKind>(ReadNum('N'));
+  //MASSERT(k == node->GetKind());
   LoadTreeNode(node);
 }}
 
