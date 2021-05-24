@@ -2585,8 +2585,15 @@ TreeNode* ASTBuilder::AddTypeArgument() {
   TreeNode *args = p_args.mData.mTreeNode;
   MASSERT(args);
 
-  UserTypeNode *type_node = (UserTypeNode*)mLastTreeNode;
-  type_node->AddTypeArgument(args);
+  if (mLastTreeNode->IsUserType()) {
+    UserTypeNode *type_node = (UserTypeNode*)mLastTreeNode;
+    type_node->AddTypeArgument(args);
+  } else if (mLastTreeNode->IsCall()) {
+    CallNode *call = (CallNode*)mLastTreeNode;
+    call->AddTypeArgument(args);
+  } else {
+    MERROR("Unsupported node in AddTypeArgument()");
+  }
 
   return mLastTreeNode;
 }

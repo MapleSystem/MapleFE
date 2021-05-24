@@ -7,6 +7,6 @@ func  foo(arg)  throws:
   return arg
 
 == Sub Tree ==
-js_let Decl: output=foo LT string GT "abc"
+js_let Decl: output=foo<string>("abc")
 == Sub Tree ==
 console.log(output)
