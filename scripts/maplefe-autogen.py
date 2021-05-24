@@ -80,6 +80,12 @@ create(output_dir + 'compile_commands.json', compile_commands)
 create(output_dir + 'ast.sh', bash_commands)
 exec_command('bash ' + output_dir + 'ast.sh')
 
+################################################################################
+#                                                                              #
+#                   Common code to handle YAML files                           #
+#                                                                              #
+################################################################################
+
 # Dump all content in a dictionary to ast_gen/yaml.log
 def log(dictionary, indent, msg = ""):
     global log_buf
@@ -117,8 +123,6 @@ def handle_yaml(filename, callback, saved_yaml = {}):
     else:
         yaml_data = saved_yaml[filename]
     callback(yaml_data)
-
-#################################################################
 
 # Get the pointed-to type, e.g. FunctionNode of "class maplefe::FunctionNode *"
 def get_pointed(mtype):
@@ -301,8 +305,13 @@ def gen_handler(dictionary):
             handle_yaml(filename, gen_handler_ast_node_file)
     # Generate handler for TreeNode
     gen_handler_ast_TreeNode(dictionary)
-###################################################################################################
-# Signature of TreeNodes
+
+################################################################################
+#                                                                              #
+#                           Signature of TreeNodes                             #
+#                                                                              #
+################################################################################
+
 def gen_signature_of_ast_node(dictionary):
     global tn_signature
     tn_signature += '\n^' + dictionary["Name"];
@@ -328,9 +337,13 @@ handle_yaml(initial_yaml, gen_signature)
 handle_yaml(treenode_yaml, gen_signature_of_ast_node)
 signature = int(hashlib.sha256(tn_signature.encode('utf-8')).hexdigest()[-15:], 16)
 append(output_dir + 'yaml.log', [tn_signature, str(signature)])
-###################################################################################################
 
-# Initialize/finalize include_file and src_file with gen_args
+################################################################################
+#                                                                              #
+#           Initialize/finalize include_file and src_file with gen_args        #
+#                                                                              #
+################################################################################
+
 Initialization = 1
 Finalization = 2
 def handle_src_include_files(phase):
@@ -385,7 +398,11 @@ namespace maplefe {{
         finalize(include_file, include_end)
         finalize(src_file, src_end)
 
-###################################################################################################
+################################################################################
+#                                                                              #
+#                                AstDump                                       #
+#                                                                              #
+################################################################################
 
 def get_data_based_on_type(val_type, accessor):
     if val_type[-10:] == "ASTScope *" or val_type[-12:] == "ASTScopePool":
@@ -562,6 +579,10 @@ handle_yaml(treenode_yaml, gen_handler_ast_node)
 handle_src_include_files(Finalization)
 
 ################################################################################
+#                                                                              #
+#                                AstVisitor                                    #
+#                                                                              #
+################################################################################
 
 def gen_setter(accessor):
     return accessor.replace("Get", "Set").replace("()", "(n)").replace("(i)", "(i,n)")
@@ -626,6 +647,10 @@ append(include_file, astvisitor_init)
 handle_yaml(initial_yaml, gen_handler)
 handle_src_include_files(Finalization)
 
+################################################################################
+#                                                                              #
+#                                AstGraph                                      #
+#                                                                              #
 ################################################################################
 
 # The follwoing gen_func_* and gen_call* functions are for AstGraph
@@ -758,7 +783,12 @@ append(include_file, astgraph_init)
 handle_yaml(initial_yaml, gen_handler)
 handle_src_include_files(Finalization)
 
-###################################################################################################
+################################################################################
+#                                                                              #
+#                                AstEmitter                                    #
+#                                                                              #
+################################################################################
+
 
 def get_data_based_on_type(val_type, accessor):
     e = get_enum_type(val_type)
@@ -854,6 +884,10 @@ if False:
     handle_src_include_files(Finalization)
 
 ################################################################################
+#                                                                              #
+#                                AstStore                                      #
+#                                                                              #
+################################################################################
 
 def get_data_based_on_type(val_type, accessor):
     if val_type[-10:] == "ASTScope *" or val_type[-12:] == "ASTScopePool":
@@ -918,6 +952,9 @@ using AstNodeVec = std::vector<TreeNode*>;
         ": public " + astvisitorclass, # Base class
         ]
 
+#tag_control = 'true'
+tag_control = "tag != 'A' && tag != 'V'"
+
 aststore_init = [
 """
 private:
@@ -954,18 +991,19 @@ bool IsVisited(TreeNode* node) {{
   return false;
 }}
 
-// Flags:
+// Tags:
 //   'N': Beginning of a tree node
 //   'A': address of a child tree node
 //   'V': value of a field in a tree node
 //   'L': list/vector of chrildren in a tree node
 //   'S': char string of a field in a tree node
 //   'T': StrIdx Table
-// The initial version will keep all flags, and some of them can be optimized out
+// The initial version will keep all tags, and some of them can be optimized out
 
 // LEB128, same as for MapleIR
-void WriteNum(uint8_t flag, int64_t x) {{
-  mBufPtr->push_back(flag);
+void WriteNum(uint8_t tag, int64_t x) {{
+  if({tag_control})
+    mBufPtr->push_back(tag);
   while (x < -0x40 || x >= 0x40) {{
     mBufPtr->push_back(static_cast<uint8_t>((static_cast<uint64_t>(x) & 0x7F) + 0x80));
     x = x >> 7;
@@ -1021,7 +1059,8 @@ void AddStrIdx(unsigned idx) {{
     mStrIdxSet.insert(idx);
 }}
 
-""".format(signature=signature, gen_args1=gen_args[1], gen_args2=gen_args[2], astvisitorclass=astvisitorclass)
+""".format(signature=signature, gen_args1=gen_args[1], gen_args2=gen_args[2], \
+        astvisitorclass=astvisitorclass, tag_control=tag_control)
 ] # aststore_init
 
 handle_src_include_files(Initialization)
@@ -1032,6 +1071,10 @@ gen_args[2] = "Write"
 handle_yaml(treenode_yaml, gen_handler_ast_node)
 handle_src_include_files(Finalization)
 
+################################################################################
+#                                                                              #
+#                                AstLoad                                       #
+#                                                                              #
 ################################################################################
 
 def gen_setter(accessor):
@@ -1154,9 +1197,11 @@ TreeNode *CreateNode() {{
 }}
 
 // LEB128, same as for MapleIR
-int64_t ReadNum(uint8_t flag) {{
-  bool check = flag == *it++;
-  MASSERT(check);
+int64_t ReadNum(uint8_t tag) {{
+  if({tag_control}) {{
+    bool check = tag == *it++;
+    MASSERT(check);
+  }}
   uint64_t n = 0;
   int64_t y = 0;
   uint64_t b = static_cast<uint64_t>(*it++);
@@ -1208,7 +1253,8 @@ void ReadStrIdxTable() {{
   }}
 }}
 
-""".format(signature=signature, gen_args1=gen_args[1], gen_args2=gen_args[2], astvisitorclass=astvisitorclass)
+""".format(signature=signature, gen_args1=gen_args[1], gen_args2=gen_args[2], \
+        astvisitorclass=astvisitorclass, tag_control=tag_control)
 ] # astload_init
 
 handle_src_include_files(Initialization)
