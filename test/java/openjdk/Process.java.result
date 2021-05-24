@@ -30,8 +30,7 @@ class  Process
         ex
         cond-branch cond:rem GT 0
         true branch :
-          Thread.sleep(Math.min(TimeUnit.NANOSECONDS.toMillis(rem) Add 1,100))
-        false branch :
+          Thread.sleep(Math.min(TimeUnit.NANOSECONDS.toMillis(rem) Add 1,100))        false branch :
 
 
         rem Assign unit.toNanos(timeout) Sub (System.nanoTime() Sub startTime)

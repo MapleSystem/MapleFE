@@ -17,6 +17,7 @@
 #include "gen_astdump.h"
 #include "mir_function.h"
 #include "maplefe_mir_builder.h"
+#include "cvt_block.h"
 
 namespace maplefe {
 
@@ -70,6 +71,10 @@ void A2M::ProcessAST(bool trace_a2m) {
     std::cout << "============= in ProcessAST ===========" << std::endl;
     std::cout << "srcLang : " << gModule->GetSrcLangString() << std::endl;
   }
+  // pass 0: convert to use BlockNode for if-then-else and loop bodies
+  CvtToBlockVisitor visitor(gModule);
+  visitor.CvtToBlock();
+
   // pass 1: collect class/interface/function decl
   for (unsigned i = 0; i < gModule->GetTreesNum(); i++) {
     TreeNode *tnode = gModule->GetTree(i);

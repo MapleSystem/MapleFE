@@ -13,7 +13,6 @@ class  Point
         cond-branch cond:k GE 5
         true branch :
           break:
-
         false branch :
 
         n Assign 6

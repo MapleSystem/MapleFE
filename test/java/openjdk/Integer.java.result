@@ -22,8 +22,7 @@ class  Integer
     func  toString(i,radix)  throws: 
       cond-branch cond:radix LT Character.MIN_RADIX Lor radix GT Character.MAX_RADIX
       true branch :
-        radix Assign 10
-      false branch :
+        radix Assign 10      false branch :
 
       cond-branch cond:radix EQ 10
       true branch :
@@ -75,8 +74,7 @@ while val NE 0 Land charPos GT 0
     func  toString(i)  throws: 
       cond-branch cond:i EQ Integer.MIN_VALUE
       true branch :
-        return "-2147483648"
-      false branch :
+        return "-2147483648"      false branch :
 
       Decl: negative=i LT 0
       Decl: small=
@@ -133,7 +131,6 @@ while val NE 0 Land charPos GT 0
         cond-branch cond:i EQ 0
         true branch :
           break:
-
         false branch :
 
 
@@ -146,9 +143,7 @@ while val NE 0 Land charPos GT 0
       for ( )
         cond-branch cond:x LE 
         true branch :
-          return i Add 1
-        false branch :
-
+          return i Add 1        false branch :
 
     func  parseInt(s,radix)  throws:     NumberFormatException
       cond-branch cond:s EQ null
@@ -185,14 +180,11 @@ while val NE 0 Land charPos GT 0
           false branch :
             cond-branch cond:firstChar NE +
             true branch :
-              NumberFormatException.forInputString(s)
-            false branch :
-
+              NumberFormatException.forInputString(s)            false branch :
 
           cond-branch cond:len EQ 1
           true branch :
-            NumberFormatException.forInputString(s)
-          false branch :
+            NumberFormatException.forInputString(s)          false branch :
 
                       iInc
 
@@ -264,8 +256,7 @@ while val NE 0 Land charPos GT 0
     func  valueOf(i)  throws: 
       cond-branch cond:i GE IntegerCache.low Land i LE IntegerCache.high
       true branch :
-        return 
-      false branch :
+        return       false branch :
 
       return new Integer(i)
     func  byteValue()  throws: 
@@ -323,8 +314,7 @@ while val NE 0 Land charPos GT 0
       Decl: result
       cond-branch cond:nm.length() EQ 0
       true branch :
-        new NumberFormatException("Zero length string")
-      false branch :
+        new NumberFormatException("Zero length string")      false branch :
 
       Decl: firstChar=nm.charAt(0)
       cond-branch cond:firstChar EQ -
@@ -336,9 +326,7 @@ while val NE 0 Land charPos GT 0
         cond-branch cond:firstChar EQ +
         true branch :
                       indexInc
-
         false branch :
-
 
       cond-branch cond:nm.startsWith("0x",index) Lor nm.startsWith("0X",index)
       true branch :
@@ -358,12 +346,9 @@ while val NE 0 Land charPos GT 0
             radix Assign 8
           false branch :
 
-
-
       cond-branch cond:nm.startsWith("-",index) Lor nm.startsWith("+",index)
       true branch :
-        new NumberFormatException("Sign character in wrong position")
-      false branch :
+        new NumberFormatException("Sign character in wrong position")      false branch :
 
       result Assign Integer.valueOf(nm.substring(index),radix)
       result Assign 
@@ -399,8 +384,7 @@ while val NE 0 Land charPos GT 0
     func  numberOfLeadingZeros(i)  throws: 
       cond-branch cond:i EQ 0
       true branch :
-        return 32
-      false branch :
+        return 32      false branch :
 
       Decl: n=1
       cond-branch cond:i Zext 16 EQ 0
@@ -433,8 +417,7 @@ while val NE 0 Land charPos GT 0
       Decl: y
       cond-branch cond:i EQ 0
       true branch :
-        return 32
-      false branch :
+        return 32      false branch :
 
       Decl: n=31
       y Assign i Shl 16

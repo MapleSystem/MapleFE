@@ -9,7 +9,5 @@ js_var Decl: b
 == Sub Tree ==
 cond-branch cond:1
 true branch :
-  a Add b
-false branch :
+  a Add bfalse branch :
   a Sub b
-

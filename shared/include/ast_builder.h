@@ -79,7 +79,6 @@ public:
 #define ACTION(K) TreeNode* K();
 #include "supported_actions.def"
 
-  TreeNode* CvtToBlock(TreeNode *tnode);
   void AddArguments(TreeNode *call, TreeNode *args);
   void AddParams(TreeNode *func, TreeNode *params);
   SwitchCaseNode* SwitchLabelToCase(SwitchLabelNode*);

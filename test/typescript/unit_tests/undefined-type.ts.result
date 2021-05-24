@@ -8,8 +8,7 @@ Matched 57 tokens.
 func  func(x)  throws: 
   cond-branch cond: typeof x StEq "number"
   true branch :
-    return x Mul x
-  false branch :
+    return x Mul x  false branch :
 
   return undefined
 

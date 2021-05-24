@@ -36,8 +36,7 @@ class  ProcessBuilder
     constructor  ProcessBuilder(command)  throws: 
       cond-branch cond:command EQ null
       true branch :
-        new NullPointerException()
-      false branch :
+        new NullPointerException()      false branch :
 
       this.command Assign command
     constructor  ProcessBuilder(command)  throws: 
@@ -50,8 +49,7 @@ class  ProcessBuilder
     func  command(command)  throws: 
       cond-branch cond:command EQ null
       true branch :
-        new NullPointerException()
-      false branch :
+        new NullPointerException()      false branch :
 
       this.command Assign command
       return this
@@ -68,13 +66,11 @@ class  ProcessBuilder
       Decl: security=System.getSecurityManager()
       cond-branch cond:security NE null
       true branch :
-        security.checkPermission(new RuntimePermission("getenv.*"))
-      false branch :
+        security.checkPermission(new RuntimePermission("getenv.*"))      false branch :
 
       cond-branch cond:environment EQ null
       true branch :
-        environment Assign ProcessEnvironment.environment()
-      false branch :
+        environment Assign ProcessEnvironment.environment()      false branch :
 
       assert environment NE null : 
       return environment
@@ -90,15 +86,13 @@ class  ProcessBuilder
         cond-branch cond:envstring.indexOf((int)0) NE Minus
   1
         true branch :
-          envstring Assign envstring.replaceFirst("\u0000.*","")
-        false branch :
+          envstring Assign envstring.replaceFirst("\u0000.*","")        false branch :
 
         Decl: eqlsign=envstring.indexOf(=,ProcessEnvironment.MIN_NAME_LENGTH)
         cond-branch cond:eqlsign NE Minus
   1
         true branch :
-          environment.put(envstring.substring(0,eqlsign),envstring.substring(eqlsign Add 1))
-        false branch :
+          environment.put(envstring.substring(0,eqlsign),envstring.substring(eqlsign Add 1))        false branch :
 
 
       false branch :
@@ -112,31 +106,27 @@ class  ProcessBuilder
     func  redirects()  throws: 
       cond-branch cond:redirects EQ null
       true branch :
-        redirects Assign 
-      false branch :
+        redirects Assign       false branch :
 
       return redirects
     func  redirectInput(source)  throws: 
       cond-branch cond:source.type() EQ Redirect.Type.WRITE Lor source.type() EQ Redirect.Type.APPEND
       true branch :
-        new IllegalArgumentException("Redirect invalid for reading: " Add source)
-      false branch :
+        new IllegalArgumentException("Redirect invalid for reading: " Add source)      false branch :
 
        Assign source
       return this
     func  redirectOutput(destination)  throws: 
       cond-branch cond:destination.type() EQ Redirect.Type.READ
       true branch :
-        new IllegalArgumentException("Redirect invalid for writing: " Add destination)
-      false branch :
+        new IllegalArgumentException("Redirect invalid for writing: " Add destination)      false branch :
 
        Assign destination
       return this
     func  redirectError(destination)  throws: 
       cond-branch cond:destination.type() EQ Redirect.Type.READ
       true branch :
-        new IllegalArgumentException("Redirect invalid for writing: " Add destination)
-      false branch :
+        new IllegalArgumentException("Redirect invalid for writing: " Add destination)      false branch :
 
        Assign destination
       return this
@@ -168,15 +158,13 @@ class  ProcessBuilder
       cmdarray
       cond-branch cond:arg EQ null
       true branch :
-        new NullPointerException()
-      false branch :
+        new NullPointerException()      false branch :
 
       Decl: prog=
       Decl: security=System.getSecurityManager()
       cond-branch cond:security NE null
       true branch :
-        security.checkExec(prog)
-      false branch :
+        security.checkExec(prog)      false branch :
 
       Decl: dir=
       for ( )
@@ -247,40 +235,34 @@ class  ProcessBuilder
         func  from(file)  throws: 
           cond-branch cond:file EQ null
           true branch :
-            new NullPointerException()
-          false branch :
+            new NullPointerException()          false branch :
 
           return new Redirect()
         func  to(file)  throws: 
           cond-branch cond:file EQ null
           true branch :
-            new NullPointerException()
-          false branch :
+            new NullPointerException()          false branch :
 
           return new Redirect()
         func  appendTo(file)  throws: 
           cond-branch cond:file EQ null
           true branch :
-            new NullPointerException()
-          false branch :
+            new NullPointerException()          false branch :
 
           return new Redirect()
         func  equals(obj)  throws: 
           cond-branch cond:obj EQ this
           true branch :
-            return true
-          false branch :
+            return true          false branch :
 
           cond-branch cond:(obj instanceof Redirect)
           true branch :
-            return false
-          false branch :
+            return false          false branch :
 
           Decl: r=(Redirect)obj
           cond-branch cond:r.type() NE this.type()
           true branch :
-            return false
-          false branch :
+            return false          false branch :
 
           assert this.file() NE null : 
           return this.file().equals(r.file())
@@ -288,10 +270,8 @@ class  ProcessBuilder
           Decl: file=file()
           cond-branch cond:file EQ null
           true branch :
-            return super.hashCode()
-          false branch :
+            return super.hashCode()          false branch :
             return file.hashCode()
-
       LocalClasses: 
         class[JavaEnum]  Type
           Fields: 

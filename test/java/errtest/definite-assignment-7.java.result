@@ -12,8 +12,7 @@ class  Point
       Decl: n=5
       cond-branch cond:n GT 2
       true branch :
-        k Assign 3
-      false branch :
+        k Assign 3      false branch :
 
       System.out.println(k)
   LocalClasses: 

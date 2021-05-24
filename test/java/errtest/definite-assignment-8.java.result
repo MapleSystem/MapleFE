@@ -11,13 +11,11 @@ class  Point
       Decl: k
       cond-branch cond:flag
       true branch :
-        k Assign 3
-      false branch :
+        k Assign 3      false branch :
 
       cond-branch cond:flag
       true branch :
-        k Assign 4
-      false branch :
+        k Assign 4      false branch :
 
       System.out.println(k)
   LocalClasses: 

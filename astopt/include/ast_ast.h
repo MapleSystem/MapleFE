@@ -44,6 +44,7 @@ class AdjustASTVisitor : public AstVisitor {
  private:
   AST_Handler  *mHandler;
   bool          mTrace;
+  bool          mUpdated;
 
   AST_Function *mCurrentFunction;
   AST_BB       *mCurrentBB;
@@ -58,6 +59,8 @@ class AdjustASTVisitor : public AstVisitor {
 
   DeclNode *VisitDeclNode(DeclNode *node);
   ExportNode *VisitExportNode(ExportNode *node);
+  CondBranchNode *VisitCondBranchNode(CondBranchNode *node);
+  ForLoopNode *VisitForLoopNode(ForLoopNode *node);
 };
 
 }

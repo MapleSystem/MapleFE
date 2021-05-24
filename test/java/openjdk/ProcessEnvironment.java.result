@@ -32,15 +32,13 @@ class  ProcessEnvironment
   1 Lor name.indexOf(0) NE Minus
   1
       true branch :
-        new IllegalArgumentException("Invalid environment variable name: "" Add name Add """)
-      false branch :
+        new IllegalArgumentException("Invalid environment variable name: "" Add name Add """)      false branch :
 
     func  validateValue(value)  throws: 
       cond-branch cond:value.indexOf(0) NE Minus
   1
       true branch :
-        new IllegalArgumentException("Invalid environment variable value: "" Add value Add """)
-      false branch :
+        new IllegalArgumentException("Invalid environment variable value: "" Add value Add """)      false branch :
 
     func  toEnvironmentBlock(map,envc)  throws: 
       return 
@@ -49,30 +47,24 @@ class  ProcessEnvironment
       for ( )
         cond-branch cond: NE 
         true branch :
-          return  Sub 
-        false branch :
-
+          return  Sub         false branch :
 
       return x.length Sub y.length
     func  arrayEquals(x,y)  throws: 
       cond-branch cond:x.length NE y.length
       true branch :
-        return false
-      false branch :
+        return false      false branch :
 
       for ( )
         cond-branch cond: NE 
         true branch :
-          return false
-        false branch :
-
+          return false        false branch :
 
       return true
     func  arrayHash(x)  throws: 
       Decl: hash=0
       for ( )
         hash Assign 31 Mul hash Add 
-
       return hash
   LocalClasses: 
     class  ExternalData
@@ -242,8 +234,7 @@ class  ProcessEnvironment
         func  vvEntry(o)  throws: 
           cond-branch cond:o instanceof StringEntry
           true branch :
-            return (StringEntry)o.e
-          false branch :
+            return (StringEntry)o.e          false branch :
 
           return new Map()
         func  contains(o)  throws: 

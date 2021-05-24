@@ -45,18 +45,15 @@ void AstOpt::ProcessAST(bool trace_a2c) {
 
   AST_Handler handler(gModule, mTraceAstOpt);
 
+  handler.AdjustAST();
+  if (mTraceAstOpt) {
+    handler.Dump("After handler.AdjustAST()");
+  }
+
   handler.BuildCFG();
   if (mTraceAstOpt) {
     handler.Dump("After handler.BuildCFG()");
   }
-
-  handler.AdjustAST();
-  if (mTraceAstOpt) {
-    // handler.Dump("After handler.AdjustAST()");
-  }
-
-  // rebuild CFG if necessary
-  // handler.BuildCFG();
 
   if (mTraceAstOpt) {
     std::cout << "============= AstGraph ===========" << std::endl;

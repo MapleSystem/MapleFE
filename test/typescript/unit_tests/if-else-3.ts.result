@@ -12,17 +12,11 @@ js_var Decl: b=3
 == Sub Tree ==
 cond-branch cond:x
 true branch :
-  a Add b
-false branch :
+  a Add bfalse branch :
   cond-branch cond:x
   true branch :
-    a Sub b
-  false branch :
+    a Sub b  false branch :
     cond-branch cond:x
     true branch :
-      a Mul b
-    false branch :
+      a Mul b    false branch :
       a Div b
-
-
-

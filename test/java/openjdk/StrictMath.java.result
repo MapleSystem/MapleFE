@@ -51,19 +51,16 @@ class  StrictMath
           return a
         false branch :
 
-
       assert exponent GE 0 Land exponent LE 51 : 
       Decl: doppel=Double.doubleToRawLongBits(a)
       Decl: mask=DoubleConsts.SIGNIF_BIT_MASK Shr exponent
       cond-branch cond:(mask Band doppel) EQ 0
       true branch :
-        return a
-      false branch :
+        return a      false branch :
         Decl: result=Double.longBitsToDouble(doppel Band (mask))
         cond-branch cond:sign Mul a GT 0
         true branch :
-          result Assign result Add sign
-        false branch :
+          result Assign result Add sign        false branch :
 
         return result
 

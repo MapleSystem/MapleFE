@@ -10,8 +10,7 @@ class  A
     func  foo()  throws: 
       cond-branch cond:(k Assign System.in.read()) GE 0
       true branch :
-        System.out.println(k)
-      false branch :
+        System.out.println(k)      false branch :
 
   LocalClasses: 
   LocalInterfaces: 

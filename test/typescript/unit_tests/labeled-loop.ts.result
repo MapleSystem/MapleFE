@@ -19,13 +19,11 @@ for ( )
     cond-branch cond:arr[j] GT 5
     true branch :
       continue:outer
-
     false branch :
 
     cond-branch cond:sum GE 60
     true branch :
       break:outer
-
     false branch :
 
 

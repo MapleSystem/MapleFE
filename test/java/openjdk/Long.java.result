@@ -23,13 +23,11 @@ class  Long
     func  toString(i,radix)  throws: 
       cond-branch cond:radix LT Character.MIN_RADIX Lor radix GT Character.MAX_RADIX
       true branch :
-        radix Assign 10
-      false branch :
+        radix Assign 10      false branch :
 
       cond-branch cond:radix EQ 10
       true branch :
-        return toString(i)
-      false branch :
+        return toString(i)      false branch :
 
       Decl: buf=
       Decl: charPos=64
@@ -54,16 +52,14 @@ class  Long
     func  toUnsignedString(i,radix)  throws: 
       cond-branch cond:i GE 0
       true branch :
-        return toString(i,radix)
-      false branch :
+        return toString(i,radix)      false branch :
         A switch
 
 
     func  toUnsignedBigInteger(i)  throws: 
       cond-branch cond:i GE 0
       true branch :
-        return BigInteger.valueOf(i)
-      false branch :
+        return BigInteger.valueOf(i)      false branch :
         Decl: upper=(int)(i Zext 32)
         Decl: lower=(int)i
         return BigInteger.valueOf(Integer.toUnsignedLong(upper)).shiftLeft(32).add(BigInteger.valueOf(Integer.toUnsignedLong(lower)))
@@ -91,8 +87,7 @@ while val NE 0 Land charPos GT 0
     func  toString(i)  throws: 
       cond-branch cond:i EQ Long.MIN_VALUE
       true branch :
-        return "-9223372036854775808"
-      false branch :
+        return "-9223372036854775808"      false branch :
 
       Decl: size=
       Decl: buf=
@@ -134,7 +129,6 @@ while val NE 0 Land charPos GT 0
         cond-branch cond:i2 EQ 0
         true branch :
           break:
-
         false branch :
 
 
@@ -148,8 +142,7 @@ while val NE 0 Land charPos GT 0
       for ( )
         cond-branch cond:x LT p
         true branch :
-          return i
-        false branch :
+          return i        false branch :
 
         p Assign 10 Mul p
 
@@ -189,14 +182,11 @@ while val NE 0 Land charPos GT 0
           false branch :
             cond-branch cond:firstChar NE +
             true branch :
-              NumberFormatException.forInputString(s)
-            false branch :
-
+              NumberFormatException.forInputString(s)            false branch :
 
           cond-branch cond:len EQ 1
           true branch :
-            NumberFormatException.forInputString(s)
-          false branch :
+            NumberFormatException.forInputString(s)          false branch :
 
                       iInc
 
@@ -288,8 +278,7 @@ while val NE 0 Land charPos GT 0
       Decl: result
       cond-branch cond:nm.length() EQ 0
       true branch :
-        new NumberFormatException("Zero length string")
-      false branch :
+        new NumberFormatException("Zero length string")      false branch :
 
       Decl: firstChar=nm.charAt(0)
       cond-branch cond:firstChar EQ -
@@ -301,9 +290,7 @@ while val NE 0 Land charPos GT 0
         cond-branch cond:firstChar EQ +
         true branch :
                       indexInc
-
         false branch :
-
 
       cond-branch cond:nm.startsWith("0x",index) Lor nm.startsWith("0X",index)
       true branch :
@@ -323,12 +310,9 @@ while val NE 0 Land charPos GT 0
             radix Assign 8
           false branch :
 
-
-
       cond-branch cond:nm.startsWith("-",index) Lor nm.startsWith("+",index)
       true branch :
-        new NumberFormatException("Sign character in wrong position")
-      false branch :
+        new NumberFormatException("Sign character in wrong position")      false branch :
 
       result Assign Long.valueOf(nm.substring(index),radix)
       result Assign 
@@ -401,8 +385,7 @@ while val NE 0 Land charPos GT 0
 
       cond-branch cond:dividend GT 0
       true branch :
-        return dividend Div divisor
-      false branch :
+        return dividend Div divisor      false branch :
         return toUnsignedBigInteger(dividend).divide(toUnsignedBigInteger(divisor)).longValue()
 
     func  remainderUnsigned(dividend,divisor)  throws: 
@@ -412,10 +395,8 @@ while val NE 0 Land charPos GT 0
       false branch :
         cond-branch cond:compareUnsigned(dividend,divisor) LT 0
         true branch :
-          return dividend
-        false branch :
+          return dividend        false branch :
           return toUnsignedBigInteger(dividend).remainder(toUnsignedBigInteger(divisor)).longValue()
-
 
     func  highestOneBit(i)  throws: 
       i BorAssign (i Shr 1)
@@ -431,8 +412,7 @@ while val NE 0 Land charPos GT 0
     func  numberOfLeadingZeros(i)  throws: 
       cond-branch cond:i EQ 0
       true branch :
-        return 64
-      false branch :
+        return 64      false branch :
 
       Decl: n=1
       Decl: x=(int)(i Zext 32)
@@ -472,8 +452,7 @@ while val NE 0 Land charPos GT 0
       Decl: x,y
       cond-branch cond:i EQ 0
       true branch :
-        return 64
-      false branch :
+        return 64      false branch :
 
       Decl: n=63
       y Assign (int)i
@@ -483,7 +462,6 @@ while val NE 0 Land charPos GT 0
         x Assign y
       false branch :
         x Assign (int)(i Zext 32)
-
       y Assign x Shl 16
       cond-branch cond:y NE 0
       true branch :

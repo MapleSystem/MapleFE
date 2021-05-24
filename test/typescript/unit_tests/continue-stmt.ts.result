@@ -12,7 +12,6 @@ for ( )
   cond-branch cond:i EQ 8
   true branch :
     break:
-
   false branch :
 
   console.log(i," is greater than 4")

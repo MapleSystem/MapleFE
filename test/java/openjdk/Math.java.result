@@ -237,8 +237,7 @@ class  Math
     func  max(a,b)  throws: 
       cond-branch cond:a NE a
       true branch :
-        return a
-      false branch :
+        return a      false branch :
 
       cond-branch cond:(a EQ 0) Land (b EQ 0) Land (Float.floatToRawIntBits(a) EQ negativeZeroFloatBits)
       true branch :
@@ -249,8 +248,7 @@ class  Math
     func  max(a,b)  throws: 
       cond-branch cond:a NE a
       true branch :
-        return a
-      false branch :
+        return a      false branch :
 
       cond-branch cond:(a EQ 0) Land (b EQ 0) Land (Double.doubleToRawLongBits(a) EQ negativeZeroDoubleBits)
       true branch :
@@ -265,8 +263,7 @@ class  Math
     func  min(a,b)  throws: 
       cond-branch cond:a NE a
       true branch :
-        return a
-      false branch :
+        return a      false branch :
 
       cond-branch cond:(a EQ 0) Land (b EQ 0) Land (Float.floatToRawIntBits(b) EQ negativeZeroFloatBits)
       true branch :
@@ -277,8 +274,7 @@ class  Math
     func  min(a,b)  throws: 
       cond-branch cond:a NE a
       true branch :
-        return a
-      false branch :
+        return a      false branch :
 
       cond-branch cond:(a EQ 0) Land (b EQ 0) Land (Double.doubleToRawLongBits(b) EQ negativeZeroDoubleBits)
       true branch :
@@ -330,19 +326,14 @@ class  Math
             cond-branch cond:transducer GT 0
             true branch :
               PreDec
-                transducer
-            false branch :
+                transducer            false branch :
               cond-branch cond:transducer LT 0
               true branch :
                 PreInc
-                  transducer
-              false branch :
+                  transducer              false branch :
                 transducer Assign DoubleConsts.SIGN_BIT_MASK Bor 1
 
-
-
           return Double.longBitsToDouble(transducer)
-
 
     func  nextAfter(start,direction)  throws: 
       cond-branch cond:Float.isNaN(start) Lor Double.isNaN(direction)
@@ -362,61 +353,48 @@ class  Math
             cond-branch cond:transducer GT 0
             true branch :
               PreDec
-                transducer
-            false branch :
+                transducer            false branch :
               cond-branch cond:transducer LT 0
               true branch :
                 PreInc
-                  transducer
-              false branch :
+                  transducer              false branch :
                 transducer Assign FloatConsts.SIGN_BIT_MASK Bor 1
 
-
-
           return Float.intBitsToFloat(transducer)
-
 
     func  nextUp(d)  throws: 
       cond-branch cond:Double.isNaN(d) Lor d EQ Double.POSITIVE_INFINITY
       true branch :
-        return d
-      false branch :
+        return d      false branch :
         d AddAssign 0
         return Double.longBitsToDouble(Double.doubleToRawLongBits(d) Add ())
 
     func  nextUp(f)  throws: 
       cond-branch cond:Float.isNaN(f) Lor f EQ FloatConsts.POSITIVE_INFINITY
       true branch :
-        return f
-      false branch :
+        return f      false branch :
         f AddAssign 0
         return Float.intBitsToFloat(Float.floatToRawIntBits(f) Add ())
 
     func  nextDown(d)  throws: 
       cond-branch cond:Double.isNaN(d) Lor d EQ Double.NEGATIVE_INFINITY
       true branch :
-        return d
-      false branch :
+        return d      false branch :
         cond-branch cond:d EQ 0
         true branch :
           return Minus
-  Double.MIN_VALUE
-        false branch :
+  Double.MIN_VALUE        false branch :
           return Double.longBitsToDouble(Double.doubleToRawLongBits(d) Add ())
-
 
     func  nextDown(f)  throws: 
       cond-branch cond:Float.isNaN(f) Lor f EQ Float.NEGATIVE_INFINITY
       true branch :
-        return f
-      false branch :
+        return f      false branch :
         cond-branch cond:f EQ 0
         true branch :
           return Minus
-  Float.MIN_VALUE
-        false branch :
+  Float.MIN_VALUE        false branch :
           return Float.intBitsToFloat(Float.floatToRawIntBits(f) Add ())
-
 
     func  scalb(d,scaleFactor)  throws: 
       Decl: MAX_SCALE=DoubleConsts.MAX_EXPONENT Add Minus

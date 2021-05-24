@@ -203,8 +203,7 @@ class  Package
          Assign Integer.parseInt(sa,i)
         cond-branch cond: LT 0
         true branch :
-          NumberFormatException.forInputString("" Add )
-        false branch :
+          NumberFormatException.forInputString("" Add )        false branch :
 
 
       Decl: da=desired.split("\." Sub 1)
@@ -213,8 +212,7 @@ class  Package
          Assign Integer.parseInt(da,i)
         cond-branch cond: LT 0
         true branch :
-          NumberFormatException.forInputString("" Add )
-        false branch :
+          NumberFormatException.forInputString("" Add )        false branch :
 
 
       Decl: len=Math.max(di.length,si.length)
@@ -223,13 +221,11 @@ class  Package
         Decl: s=()
         cond-branch cond:s LT d
         true branch :
-          return false
-        false branch :
+          return false        false branch :
 
         cond-branch cond:s GT d
         true branch :
-          return true
-        false branch :
+          return true        false branch :
 
 
       return true
@@ -279,16 +275,12 @@ class  Package
       Decl: ver=specVersion
       cond-branch cond:spec NE null Land spec.length() GT 0
       true branch :
-        spec Assign ", " Add spec
-      false branch :
+        spec Assign ", " Add spec      false branch :
         spec Assign ""
-
       cond-branch cond:ver NE null Land ver.length() GT 0
       true branch :
-        ver Assign ", version " Add ver
-      false branch :
+        ver Assign ", version " Add ver      false branch :
         ver Assign ""
-
       return "package " Add pkgName Add spec Add ver
     func  getPackageInfo()  throws: 
       cond-branch cond:packageInfo EQ null

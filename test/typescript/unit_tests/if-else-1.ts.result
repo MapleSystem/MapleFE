@@ -9,7 +9,5 @@ js_var Decl: b=2
 == Sub Tree ==
 cond-branch cond:a GT b
 true branch :
-  console.log("bigger")
-false branch :
+  console.log("bigger")false branch :
   console.log("smaller")
-

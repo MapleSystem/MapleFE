@@ -9,10 +9,8 @@ alias UnionType=numberstring
 func  add(x,y)  throws: 
   cond-branch cond: typeof x StEq 'number' Land  typeof y EQ 'number'
   true branch :
-    return x Add y
-  false branch :
+    return x Add y  false branch :
     return x.toString() Add y.toString()
-
 
 == Sub Tree ==
 console.log(add(1,2))

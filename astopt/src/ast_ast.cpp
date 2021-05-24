@@ -117,13 +117,17 @@ DeclNode *AdjustASTVisitor::VisitDeclNode(DeclNode *node) {
   IdentifierNode *inode = static_cast<IdentifierNode *>(var);
 
   // copy StrIdx from Identifier to Decl
-  node->SetStrIdx(inode->GetStrIdx());
+  if (node->GetStrIdx()) {
+    node->SetStrIdx(inode->GetStrIdx());
+    mUpdated = true;
+  }
 
   // move Init from Identifier to Decl
   TreeNode *init = inode->GetInit();
   if (init) {
     node->SetInit(init);
     inode->ClearInit();
+    mUpdated = true;
   }
   return node;
 }
@@ -143,6 +147,7 @@ ExportNode *AdjustASTVisitor::VisitExportNode(ExportNode *node) {
             new (n) IdentifierNode(func->GetStrIdx());
             // update p
             p->SetBefore(n);
+            mUpdated = true;
             // insert before into BB
             AST_BB *bb = mHandler->GetBbFromNodeId(node->GetNodeId());
             bb->InsertStmtAfter(before, node);
@@ -168,4 +173,37 @@ ExportNode *AdjustASTVisitor::VisitExportNode(ExportNode *node) {
   return node;
 }
 
+// if-then-else
+CondBranchNode *AdjustASTVisitor::VisitCondBranchNode(CondBranchNode *node) {
+  TreeNode *tn = VisitTreeNode(node->GetTrueBranch());
+  if (tn && !tn->IsBlock()) {
+    BlockNode *blk = (BlockNode*)gTreePool.NewTreeNode(sizeof(BlockNode));
+    new (blk) BlockNode();
+    blk->AddChild(tn);
+    node->SetTrueBranch(blk);
+    mUpdated = true;
+  }
+  tn = VisitTreeNode(node->GetFalseBranch());
+  if (tn && !tn->IsBlock()) {
+    BlockNode *blk = (BlockNode*)gTreePool.NewTreeNode(sizeof(BlockNode));
+    new (blk) BlockNode();
+    blk->AddChild(tn);
+    node->SetFalseBranch(blk);
+    mUpdated = true;
+  }
+  return node;
+}
+
+// for
+ForLoopNode *AdjustASTVisitor::VisitForLoopNode(ForLoopNode *node) {
+  TreeNode *tn = VisitTreeNode(node->GetBody());
+  if (tn && !tn->IsBlock()) {
+    BlockNode *blk = (BlockNode*)gTreePool.NewTreeNode(sizeof(BlockNode));
+    new (blk) BlockNode();
+    blk->AddChild(tn);
+    node->SetBody(blk);
+    mUpdated = true;
+  }
+  return node;
+}
 }

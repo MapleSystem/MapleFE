@@ -52,18 +52,15 @@ class  StackTraceElement
             result.append("(Unknown Source)")
 
 
-
       return result.toString()
     func  equals(obj)  throws: 
       cond-branch cond:obj EQ this
       true branch :
-        return true
-      false branch :
+        return true      false branch :
 
       cond-branch cond:(obj instanceof StackTraceElement)
       true branch :
-        return false
-      false branch :
+        return false      false branch :
 
       Decl: e=(StackTraceElement)obj
       return e.declaringClass.equals(declaringClass) Land e.lineNumber EQ lineNumber Land Objects.equals(methodName,e.methodName) Land Objects.equals(fileName,e.fileName)

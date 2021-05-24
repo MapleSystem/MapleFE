@@ -137,14 +137,12 @@ class  Runtime
     func  exec(command,envp,dir)  throws:     IOException
       cond-branch cond:command.length() EQ 0
       true branch :
-        new IllegalArgumentException("Empty command")
-      false branch :
+        new IllegalArgumentException("Empty command")      false branch :
 
       Decl: st=new StringTokenizer(command)
       Decl: cmdarray=
       for ( )
          Assign st.nextToken()
-
       return exec(cmdarray,envp,dir)
     func  exec(cmdarray[])  throws:     IOException
       return exec(cmdarray,null,null)

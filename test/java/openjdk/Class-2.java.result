@@ -22,8 +22,7 @@ class  Class
     func  getSimpleName()  throws: 
       cond-branch cond:isArray()
       true branch :
-        return getComponentType().getSimpleName() Add "[]"
-      false branch :
+        return getComponentType().getSimpleName() Add "[]"      false branch :
 
       cond-branch cond:isAnonymousClass()
       true branch :
@@ -71,16 +70,13 @@ class  Class
         Decl: canonicalName=getComponentType().getCanonicalName()
         cond-branch cond:canonicalName NE null
         true branch :
-          return canonicalName Add "[]"
-        false branch :
+          return canonicalName Add "[]"        false branch :
           return null
-
       false branch :
 
       cond-branch cond:isLocalOrAnonymousClass()
       true branch :
-        return null
-      false branch :
+        return null      false branch :
 
       Decl: enclosingClass=getEnclosingClass()
       cond-branch cond:enclosingClass EQ null
@@ -90,8 +86,7 @@ class  Class
         Decl: enclosingName=enclosingClass.getCanonicalName()
         cond-branch cond:enclosingName EQ null
         true branch :
-          return null
-        false branch :
+          return null        false branch :
 
         return enclosingName Add "." Add getSimpleName()
 
@@ -338,15 +333,13 @@ class  Class
     func  getEnumConstantsShared()  throws: 
       cond-branch cond:isEnum()
       true branch :
-        return null
-      false branch :
+        return null      false branch :
 
       return (T[])Enum.getSharedConstants((Class)this)
     func  cast(obj)  throws: 
       cond-branch cond:obj NE null Land isInstance(obj)
       true branch :
-        new ClassCastException(cannotCastMsg(obj))
-      false branch :
+        new ClassCastException(cannotCastMsg(obj))      false branch :
 
       return (T)obj
     func  cannotCastMsg(obj)  throws: 
@@ -354,10 +347,8 @@ class  Class
     func  asSubclass(clazz)  throws: 
       cond-branch cond:clazz.isAssignableFrom(this)
       true branch :
-        return ()this
-      false branch :
+        return ()this      false branch :
         new ClassCastException(this.toString() Add " cannot be cast to " Add clazz.getName())
-
     func  getAnnotation(annotationClass)  throws: 
       Objects.requireNonNull(annotationClass)
       Decl: annotation=getDeclaredAnnotation(annotationClass)

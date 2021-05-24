@@ -696,7 +696,7 @@ TreeNode* ASTBuilder::AddCondBranchTrueStatement() {
   if (!p_true.mIsEmpty) {
     if (!p_true.mIsTreeNode)
       MERROR("The condition expr is not a tree node.");
-    TreeNode *true_expr = CvtToBlock(p_true.mData.mTreeNode);
+    TreeNode *true_expr = p_true.mData.mTreeNode;
     cond_branch->SetTrueBranch(true_expr);
   }
 
@@ -713,7 +713,7 @@ TreeNode* ASTBuilder::AddCondBranchFalseStatement() {
   if (!p_false.mIsEmpty) {
     if (!p_false.mIsTreeNode)
       MERROR("The condition expr is not a tree node.");
-    TreeNode *false_expr = CvtToBlock(p_false.mData.mTreeNode);
+    TreeNode *false_expr = p_false.mData.mTreeNode;
     cond_branch->SetFalseBranch(false_expr);
   }
 
@@ -846,7 +846,7 @@ TreeNode* ASTBuilder::BuildForLoop() {
   Param p_body = mParams[3];
   if (!p_body.mIsEmpty) {
     MASSERT(p_body.mIsTreeNode && "ForLoop body is not a treenode.");
-    TreeNode *body = CvtToBlock(p_body.mData.mTreeNode);
+    TreeNode *body = p_body.mData.mTreeNode;
     for_loop->SetBody(body);
   }
 
@@ -880,7 +880,7 @@ TreeNode* ASTBuilder::BuildForLoop_In() {
   Param p_body = mParams[1];
   if (!p_body.mIsEmpty) {
     MASSERT(p_body.mIsTreeNode);
-    TreeNode *body = CvtToBlock(p_body.mData.mTreeNode);
+    TreeNode *body = p_body.mData.mTreeNode;
     for_loop->SetBody(body);
   }
 
@@ -914,7 +914,7 @@ TreeNode* ASTBuilder::BuildForLoop_Of() {
   Param p_body = mParams[1];
   if (!p_body.mIsEmpty) {
     MASSERT(p_body.mIsTreeNode);
-    TreeNode *body = CvtToBlock(p_body.mData.mTreeNode);
+    TreeNode *body = p_body.mData.mTreeNode;
     for_loop->SetBody(body);
   }
 
@@ -941,7 +941,7 @@ TreeNode* ASTBuilder::BuildWhileLoop() {
   Param p_body = mParams[1];
   if (!p_body.mIsEmpty) {
     MASSERT(p_body.mIsTreeNode && "WhileLoop body is not a treenode.");
-    TreeNode *body = CvtToBlock(p_body.mData.mTreeNode);
+    TreeNode *body = p_body.mData.mTreeNode;
     while_loop->SetBody(body);
   }
 
@@ -968,7 +968,7 @@ TreeNode* ASTBuilder::BuildDoLoop() {
   Param p_body = mParams[1];
   if (!p_body.mIsEmpty) {
     MASSERT(p_body.mIsTreeNode && "DoLoop body is not a treenode.");
-    TreeNode *body = CvtToBlock(p_body.mData.mTreeNode);
+    TreeNode *body = p_body.mData.mTreeNode;
     do_loop->SetBody(body);
   }
 
@@ -1683,30 +1683,6 @@ TreeNode* ASTBuilder::AddSyncToBlock() {
   return mLastTreeNode;
 }
 
-// if tnode is not a BlockNode, wrap it into a BlockNode
-TreeNode* ASTBuilder::CvtToBlock(TreeNode *tnode) {
-  if (mTrace)
-    std::cout << "In CvtToBlock" << std::endl;
-
-  if (tnode->IsBlock()) {
-    return tnode;
-  }
-
-  BlockNode *block = (BlockNode*)gTreePool.NewTreeNode(sizeof(BlockNode));
-  new (block) BlockNode();
-  if (tnode->IsPass()) {
-    PassNode *pass = (PassNode*)tnode;
-    for (unsigned i = 0; i < pass->GetChildrenNum(); i++) {
-      TreeNode *child = pass->GetChild(i);
-      block->AddChild(child);
-    }
-  } else {
-    block->AddChild(tnode);
-  }
-
-  return block;
-}
-
 // This takes just one argument which either a block node, or the root of sub tree
 TreeNode* ASTBuilder::BuildInstInit() {
   if (mTrace)
@@ -1758,7 +1734,15 @@ TreeNode* ASTBuilder::AddClassBody() {
   Param p_body = mParams[0];
   if (!p_body.mIsTreeNode)
     MERROR("The class body is not a tree node.");
-  BlockNode *block = (BlockNode*)CvtToBlock(p_body.mData.mTreeNode);
+
+  TreeNode *tn = p_body.mData.mTreeNode;
+  if (!tn->IsBlock()) {
+    BlockNode *block = (BlockNode*)gTreePool.NewTreeNode(sizeof(BlockNode));
+    new (block) BlockNode();
+    block->AddChild(tn);
+    tn = block;
+  }
+  BlockNode *block = (BlockNode*)(tn);
 
   MASSERT(mLastTreeNode->IsClass() && "Class is not a ClassNode?");
   ClassNode *klass = (ClassNode*)mLastTreeNode;
@@ -2388,7 +2372,7 @@ TreeNode* ASTBuilder::BuildTry() {
   Param p_block = mParams[0];
 
   MASSERT(p_block.mIsTreeNode);
-  TreeNode *block = CvtToBlock(p_block.mData.mTreeNode);
+  TreeNode *block = p_block.mData.mTreeNode;
 
   TryNode *try_node = (TryNode*)gTreePool.NewTreeNode(sizeof(TryNode));
   new (try_node) TryNode();
@@ -2439,7 +2423,7 @@ TreeNode* ASTBuilder::BuildFinally() {
   Param p_block = mParams[0];
 
   MASSERT(p_block.mIsTreeNode);
-  TreeNode *block = CvtToBlock(p_block.mData.mTreeNode);
+  TreeNode *block = p_block.mData.mTreeNode;
 
   FinallyNode *finally_node = (FinallyNode*)gTreePool.NewTreeNode(sizeof(FinallyNode));
   new (finally_node) FinallyNode();
@@ -2461,7 +2445,7 @@ TreeNode* ASTBuilder::BuildCatch() {
   TreeNode *params = p_params.mData.mTreeNode;
 
   MASSERT(p_block.mIsTreeNode);
-  TreeNode *block = CvtToBlock(p_block.mData.mTreeNode);
+  TreeNode *block = p_block.mData.mTreeNode;
 
   CatchNode *catch_node = (CatchNode*)gTreePool.NewTreeNode(sizeof(CatchNode));
   new (catch_node) CatchNode();

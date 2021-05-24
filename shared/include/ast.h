@@ -1089,7 +1089,7 @@ private:
   TreeNode *mSet;
 
   // shared by all kinds
-  TreeNode *mBody;   // This is a block node
+  TreeNode *mBody;   // This could be a single statement, or a block node
 
 public:
   ForLoopNode() : TreeNode(NK_ForLoop),
@@ -1126,7 +1126,7 @@ public:
 class WhileLoopNode : public TreeNode {
 private:
   TreeNode *mCond;
-  TreeNode *mBody; // This is a block node
+  TreeNode *mBody; // This could be a single statement, or a block node
 public:
   WhileLoopNode() : TreeNode(NK_WhileLoop), mCond(NULL), mBody(NULL) {}
   ~WhileLoopNode() {Release();}
@@ -1143,7 +1143,7 @@ public:
 class DoLoopNode : public TreeNode {
 private:
   TreeNode *mCond;
-  TreeNode *mBody; // This is a block node
+  TreeNode *mBody; // This could be a single statement, or a block node
 public:
   DoLoopNode() : TreeNode(NK_DoLoop), mCond(NULL), mBody(NULL) {}
   ~DoLoopNode(){Release();}
@@ -1571,7 +1571,7 @@ private:
   LambdaProperty         mProperty;
   TreeNode              *mType;         // The return type. NULL as Java Lambda.
   SmallVector<TreeNode*> mParams;       // A param could be an IdentifierNode or DeclNode.
-  TreeNode              *mBody;         // the body is block.
+  TreeNode              *mBody;         // the body could be an expression, or block.
                                         // NULL as TS FunctionType and ConstructorType
 public:
   LambdaNode() : TreeNode(NK_Lambda),

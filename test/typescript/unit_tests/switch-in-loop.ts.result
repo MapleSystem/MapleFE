@@ -5,7 +5,6 @@ for ( )
   cond-branch cond:i LT 5
   true branch :
     A switch
-
   false branch :
     console.log(i,", else branch")
     break:
