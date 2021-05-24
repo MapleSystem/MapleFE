@@ -24,13 +24,13 @@
 namespace maplefe {
 
 // Initialize a AST_Function node
-void CFGVisitor::InitializeFunction(AST_Function *func) {
+void CfgBuilder::InitializeFunction(AST_Function *func) {
   // Create the entry BB and exit BB of current function
   AST_BB *entry = NewBB(BK_Uncond);
   func->SetEntryBB(entry);
   AST_BB *exit = NewBB(BK_Join);
   func->SetExitBB(exit);
-  CFGVisitor::Push(mThrowBBs, exit, nullptr);
+  CfgBuilder::Push(mThrowBBs, exit, nullptr);
   // Initialize the working function and BB
   mCurrentFunction = func;
   mCurrentBB = NewBB(BK_Uncond);
@@ -38,8 +38,8 @@ void CFGVisitor::InitializeFunction(AST_Function *func) {
 }
 
 // Finalize a AST_Function node
-void CFGVisitor::FinalizeFunction() {
-  CFGVisitor::Pop(mThrowBBs);
+void CfgBuilder::FinalizeFunction() {
+  CfgBuilder::Pop(mThrowBBs);
   AST_BB *exit = mCurrentFunction->GetExitBB();
   mCurrentBB->AddSuccessor(exit);
   mCurrentFunction->SetLastBBId(AST_BB::GetLastId());
@@ -48,7 +48,7 @@ void CFGVisitor::FinalizeFunction() {
 }
 
 // Push a BB to target BB stack
-void CFGVisitor::Push(TargetBBStack &stack, AST_BB* bb, TreeNode *label) {
+void CfgBuilder::Push(TargetBBStack &stack, AST_BB* bb, TreeNode *label) {
   unsigned idx = 0;
   if(label && label->GetKind() == NK_Identifier)
     idx = static_cast<IdentifierNode *>(label)->GetStrIdx();
@@ -56,7 +56,7 @@ void CFGVisitor::Push(TargetBBStack &stack, AST_BB* bb, TreeNode *label) {
 }
 
 // Look up a target BB
-AST_BB *CFGVisitor::LookUp(TargetBBStack &stack, TreeNode *label) {
+AST_BB *CfgBuilder::LookUp(TargetBBStack &stack, TreeNode *label) {
   unsigned idx = 0;
   if(label && label->GetKind() == NK_Identifier)
     idx = static_cast<IdentifierNode *>(label)->GetStrIdx();
@@ -70,13 +70,13 @@ AST_BB *CFGVisitor::LookUp(TargetBBStack &stack, TreeNode *label) {
 }
 
 // Pop from a target BB stack
-void CFGVisitor::Pop(TargetBBStack &stack) {
+void CfgBuilder::Pop(TargetBBStack &stack) {
   stack.pop_back();
 }
 
 // Handle a function
-FunctionNode *CFGVisitor::VisitFunctionNode(FunctionNode *node) {
-  if(mTrace) std::cout << "CFGVisitor: enter function " << node->GetName() << " : FunctionNode, id=" << node->GetNodeId() << std::endl;
+FunctionNode *CfgBuilder::VisitFunctionNode(FunctionNode *node) {
+  if(mTrace) std::cout << "CfgBuilder: enter function " << node->GetName() << " : FunctionNode, id=" << node->GetNodeId() << std::endl;
 
   // Save both mCurrentFunction and mCurrentBB
   AST_Function *current_func = mCurrentFunction;
@@ -95,17 +95,17 @@ FunctionNode *CFGVisitor::VisitFunctionNode(FunctionNode *node) {
   mCurrentFunction = current_func;
   mCurrentBB = current_bb;
 
-  if(mTrace) std::cout << "CFGVisitor: exit function " << node->GetName() << " : FunctionNode, id=" << node->GetNodeId() << std::endl;
+  if(mTrace) std::cout << "CfgBuilder: exit function " << node->GetName() << " : FunctionNode, id=" << node->GetNodeId() << std::endl;
   return node;
 }
 
 // Handle a lambda
-LambdaNode *CFGVisitor::VisitLambdaNode(LambdaNode *node) {
+LambdaNode *CfgBuilder::VisitLambdaNode(LambdaNode *node) {
   return node;
 }
 
 // For control flow
-ReturnNode *CFGVisitor::VisitReturnNode(ReturnNode *node) {
+ReturnNode *CfgBuilder::VisitReturnNode(ReturnNode *node) {
   mCurrentBB->AddStatement(node);
   AST_BB *exit = mCurrentFunction->GetExitBB();
   mCurrentBB->AddSuccessor(exit);
@@ -115,7 +115,7 @@ ReturnNode *CFGVisitor::VisitReturnNode(ReturnNode *node) {
 }
 
 // For control flow
-CondBranchNode *CFGVisitor::VisitCondBranchNode(CondBranchNode *node) {
+CondBranchNode *CfgBuilder::VisitCondBranchNode(CondBranchNode *node) {
   mCurrentBB->SetKind(BK_Branch);
   mCurrentBB->AddStatement(node);
 
@@ -154,7 +154,7 @@ CondBranchNode *CFGVisitor::VisitCondBranchNode(CondBranchNode *node) {
 
 // For control flow
 // ForLoopProp: FLP_Regular, FLP_JSIn, FLP_JSOf
-ForLoopNode *CFGVisitor::VisitForLoopNode(ForLoopNode *node) {
+ForLoopNode *CfgBuilder::VisitForLoopNode(ForLoopNode *node) {
   // Visit all inits
   for (unsigned i = 0; i < node->GetInitsNum(); ++i) {
     VisitTreeNode(node->GetInitAtIndex(i));
@@ -186,12 +186,12 @@ ForLoopNode *CFGVisitor::VisitForLoopNode(ForLoopNode *node) {
   AST_BB *loop_exit = NewBB(BK_Join);
 
   // Push loop_exit and current_bb to stacks for 'break' and 'continue'
-  CFGVisitor::Push(mBreakBBs, loop_exit, node->GetLabel());
-  CFGVisitor::Push(mContinueBBs, current_bb, node->GetLabel());
+  CfgBuilder::Push(mBreakBBs, loop_exit, node->GetLabel());
+  CfgBuilder::Push(mContinueBBs, current_bb, node->GetLabel());
   // Visit loop body
   VisitTreeNode(node->GetBody());
-  CFGVisitor::Pop(mContinueBBs);
-  CFGVisitor::Pop(mBreakBBs);
+  CfgBuilder::Pop(mContinueBBs);
+  CfgBuilder::Pop(mBreakBBs);
 
   // Visit all updates
   for (unsigned i = 0; i < node->GetUpdatesNum(); ++i) {
@@ -205,7 +205,7 @@ ForLoopNode *CFGVisitor::VisitForLoopNode(ForLoopNode *node) {
 }
 
 // For control flow
-WhileLoopNode *CFGVisitor::VisitWhileLoopNode(WhileLoopNode *node) {
+WhileLoopNode *CfgBuilder::VisitWhileLoopNode(WhileLoopNode *node) {
   AST_BB *current_bb = mCurrentBB;
   // Create a new BB for loop header
   mCurrentBB = NewBB(BK_LoopHeader);
@@ -227,12 +227,12 @@ WhileLoopNode *CFGVisitor::VisitWhileLoopNode(WhileLoopNode *node) {
   AST_BB *loop_exit = NewBB(BK_Join);
 
   // Push loop_exit and current_bb to stacks for 'break' and 'continue'
-  CFGVisitor::Push(mBreakBBs, loop_exit, node->GetLabel());
-  CFGVisitor::Push(mContinueBBs, current_bb, node->GetLabel());
+  CfgBuilder::Push(mBreakBBs, loop_exit, node->GetLabel());
+  CfgBuilder::Push(mContinueBBs, current_bb, node->GetLabel());
   // Visit loop body
   VisitTreeNode(node->GetBody());
-  CFGVisitor::Pop(mContinueBBs);
-  CFGVisitor::Pop(mBreakBBs);
+  CfgBuilder::Pop(mContinueBBs);
+  CfgBuilder::Pop(mBreakBBs);
 
   // Add a back edge to loop header
   mCurrentBB->AddSuccessor(current_bb);
@@ -242,7 +242,7 @@ WhileLoopNode *CFGVisitor::VisitWhileLoopNode(WhileLoopNode *node) {
 }
 
 // For control flow
-DoLoopNode *CFGVisitor::VisitDoLoopNode(DoLoopNode *node) {
+DoLoopNode *CfgBuilder::VisitDoLoopNode(DoLoopNode *node) {
   AST_BB *current_bb = mCurrentBB;
   // Create a new BB for loop header
   mCurrentBB = NewBB(BK_LoopHeader);
@@ -260,12 +260,12 @@ DoLoopNode *CFGVisitor::VisitDoLoopNode(DoLoopNode *node) {
   AST_BB *loop_exit = NewBB(BK_Join);
 
   // Push loop_exit and current_bb to stacks for 'break' and 'continue'
-  CFGVisitor::Push(mBreakBBs, loop_exit, node->GetLabel());
-  CFGVisitor::Push(mContinueBBs, current_bb, node->GetLabel());
+  CfgBuilder::Push(mBreakBBs, loop_exit, node->GetLabel());
+  CfgBuilder::Push(mContinueBBs, current_bb, node->GetLabel());
   // Visit loop body
   VisitTreeNode(node->GetBody());
-  CFGVisitor::Pop(mContinueBBs);
-  CFGVisitor::Pop(mBreakBBs);
+  CfgBuilder::Pop(mContinueBBs);
+  CfgBuilder::Pop(mBreakBBs);
 
   TreeNode *cond = node->GetCond();
   // Set predicate of current BB
@@ -279,10 +279,10 @@ DoLoopNode *CFGVisitor::VisitDoLoopNode(DoLoopNode *node) {
 }
 
 // For control flow
-ContinueNode *CFGVisitor::VisitContinueNode(ContinueNode *node) {
+ContinueNode *CfgBuilder::VisitContinueNode(ContinueNode *node) {
   mCurrentBB->AddStatement(node);
   // Get the loop header
-  AST_BB *loop_header = CFGVisitor::LookUp(mContinueBBs, node->GetTarget());
+  AST_BB *loop_header = CfgBuilder::LookUp(mContinueBBs, node->GetTarget());
   // Add the loop header as a successor of current BB
   mCurrentBB->AddSuccessor(loop_header);
   mCurrentBB->SetKind(BK_Terminated);
@@ -291,10 +291,10 @@ ContinueNode *CFGVisitor::VisitContinueNode(ContinueNode *node) {
 }
 
 // For control flow
-BreakNode *CFGVisitor::VisitBreakNode(BreakNode *node) {
+BreakNode *CfgBuilder::VisitBreakNode(BreakNode *node) {
   mCurrentBB->AddStatement(node);
   // Get the target BB for a loop or switch statement
-  AST_BB *exit = CFGVisitor::LookUp(mBreakBBs, node->GetTarget());
+  AST_BB *exit = CfgBuilder::LookUp(mBreakBBs, node->GetTarget());
   // Add the target as a successor of current BB
   mCurrentBB->AddSuccessor(exit);
   mCurrentBB->SetKind(BK_Terminated);
@@ -303,7 +303,7 @@ BreakNode *CFGVisitor::VisitBreakNode(BreakNode *node) {
 }
 
 // For control flow
-SwitchNode *CFGVisitor::VisitSwitchNode(SwitchNode *node) {
+SwitchNode *CfgBuilder::VisitSwitchNode(SwitchNode *node) {
   mCurrentBB->SetKind(BK_Switch);
   mCurrentBB->AddStatement(node);
   // Set the root node of current BB
@@ -314,7 +314,7 @@ SwitchNode *CFGVisitor::VisitSwitchNode(SwitchNode *node) {
 
   // Create a new BB for getting out of the switch block
   AST_BB *exit = NewBB(BK_Join);
-  CFGVisitor::Push(mBreakBBs, exit, nullptr);
+  CfgBuilder::Push(mBreakBBs, exit, nullptr);
   AST_BB *prev_block = nullptr;
   TreeNode *switch_expr = node->GetExpr();
   for (unsigned i = 0; i < node->GetCasesNum(); ++i) {
@@ -364,7 +364,7 @@ SwitchNode *CFGVisitor::VisitSwitchNode(SwitchNode *node) {
     prev_block = mCurrentBB;
     current_bb = case_bb;
   }
-  CFGVisitor::Pop(mBreakBBs);
+  CfgBuilder::Pop(mBreakBBs);
 
   // Connect to the exit BB of this switch statement
   prev_block->AddSuccessor(exit);
@@ -376,7 +376,7 @@ SwitchNode *CFGVisitor::VisitSwitchNode(SwitchNode *node) {
 }
 
 // For control flow
-TryNode *CFGVisitor::VisitTryNode(TryNode *node) {
+TryNode *CfgBuilder::VisitTryNode(TryNode *node) {
   mCurrentBB->SetKind(BK_Try);
   mCurrentBB->AddStatement(node);
   auto try_block_node = node->GetBlock();
@@ -401,9 +401,9 @@ TryNode *CFGVisitor::VisitTryNode(TryNode *node) {
 
   // Visit try block
   if(num) {
-    CFGVisitor::Push(mThrowBBs, catch_bb, nullptr);
+    CfgBuilder::Push(mThrowBBs, catch_bb, nullptr);
     AstVisitor::VisitBlockNode(try_block_node);
-    CFGVisitor::Pop(mThrowBBs);
+    CfgBuilder::Pop(mThrowBBs);
   } else
     AstVisitor::VisitBlockNode(try_block_node);
 
@@ -438,17 +438,17 @@ TryNode *CFGVisitor::VisitTryNode(TryNode *node) {
     curr_bb = NewBB(BK_Join);
     mCurrentBB->AddSuccessor(curr_bb);
     // Add an edge to recent catch BB or exit BB
-    mCurrentBB->AddSuccessor(CFGVisitor::LookUp(mThrowBBs, nullptr));
+    mCurrentBB->AddSuccessor(CfgBuilder::LookUp(mThrowBBs, nullptr));
     mCurrentBB = curr_bb;
   }
   return node;
 }
 
 // For control flow
-ThrowNode *CFGVisitor::VisitThrowNode(ThrowNode *node) {
+ThrowNode *CfgBuilder::VisitThrowNode(ThrowNode *node) {
   mCurrentBB->AddStatement(node);
   // Get the catch/exit bb for this throw statement
-  AST_BB *catch_bb = CFGVisitor::LookUp(mThrowBBs, nullptr);
+  AST_BB *catch_bb = CfgBuilder::LookUp(mThrowBBs, nullptr);
   // Add the loop header as a successor of current BB
   mCurrentBB->AddSuccessor(catch_bb);
   mCurrentBB->SetKind(BK_Terminated);
@@ -457,7 +457,7 @@ ThrowNode *CFGVisitor::VisitThrowNode(ThrowNode *node) {
 }
 
 // For control flow
-BlockNode *CFGVisitor::VisitBlockNode(BlockNode *node) {
+BlockNode *CfgBuilder::VisitBlockNode(BlockNode *node) {
   mCurrentBB->AddStatement(node);
   // Check if current block constains any JS_Let or JS_Const DeclNode
   unsigned i, num = node->GetChildrenNum();
@@ -503,154 +503,154 @@ BlockNode *CFGVisitor::VisitBlockNode(BlockNode *node) {
 }
 
 // For PassNode
-PassNode *CFGVisitor::VisitPassNode(PassNode *node) {
+PassNode *CfgBuilder::VisitPassNode(PassNode *node) {
   mCurrentBB->AddStatement(node);
   return node;
 }
 
 // For statement of current BB
-TemplateLiteralNode *CFGVisitor::VisitTemplateLiteralNode(TemplateLiteralNode *node) {
+TemplateLiteralNode *CfgBuilder::VisitTemplateLiteralNode(TemplateLiteralNode *node) {
   mCurrentBB->AddStatement(node);
   return node;
 }
 
 // For statement of current BB
-ImportNode *CFGVisitor::VisitImportNode(ImportNode *node) {
+ImportNode *CfgBuilder::VisitImportNode(ImportNode *node) {
   mCurrentBB->AddStatement(node);
   return node;
 }
 
 // For statement of current BB
-ExportNode *CFGVisitor::VisitExportNode(ExportNode *node) {
+ExportNode *CfgBuilder::VisitExportNode(ExportNode *node) {
   mCurrentBB->AddStatement(node);
   AstVisitor::VisitExportNode(node);
   return node;
 }
 
 // For statement of current BB
-DeclNode *CFGVisitor::VisitDeclNode(DeclNode *node) {
+DeclNode *CfgBuilder::VisitDeclNode(DeclNode *node) {
   mCurrentBB->AddStatement(node);
   return node;
 }
 
 // For statement of current BB
-ParenthesisNode *CFGVisitor::VisitParenthesisNode(ParenthesisNode *node) {
+ParenthesisNode *CfgBuilder::VisitParenthesisNode(ParenthesisNode *node) {
   mCurrentBB->AddStatement(node);
   return node;
 }
 
 // For statement of current BB
-CastNode *CFGVisitor::VisitCastNode(CastNode *node) {
+CastNode *CfgBuilder::VisitCastNode(CastNode *node) {
   mCurrentBB->AddStatement(node);
   return node;
 }
 
 // For statement of current BB
-ArrayElementNode *CFGVisitor::VisitArrayElementNode(ArrayElementNode *node) {
+ArrayElementNode *CfgBuilder::VisitArrayElementNode(ArrayElementNode *node) {
   mCurrentBB->AddStatement(node);
   return node;
 }
 
 // For statement of current BB
-VarListNode *CFGVisitor::VisitVarListNode(VarListNode *node) {
+VarListNode *CfgBuilder::VisitVarListNode(VarListNode *node) {
   mCurrentBB->AddStatement(node);
   return node;
 }
 
 // For statement of current BB
-ExprListNode *CFGVisitor::VisitExprListNode(ExprListNode *node) {
+ExprListNode *CfgBuilder::VisitExprListNode(ExprListNode *node) {
   mCurrentBB->AddStatement(node);
   return node;
 }
 
 // For statement of current BB
-UnaOperatorNode *CFGVisitor::VisitUnaOperatorNode(UnaOperatorNode *node) {
+UnaOperatorNode *CfgBuilder::VisitUnaOperatorNode(UnaOperatorNode *node) {
   mCurrentBB->AddStatement(node);
   return node;
 }
 
 // For statement of current BB
-BinOperatorNode *CFGVisitor::VisitBinOperatorNode(BinOperatorNode *node) {
+BinOperatorNode *CfgBuilder::VisitBinOperatorNode(BinOperatorNode *node) {
   mCurrentBB->AddStatement(node);
   return node;
 }
 
 // For statement of current BB
-TerOperatorNode *CFGVisitor::VisitTerOperatorNode(TerOperatorNode *node) {
+TerOperatorNode *CfgBuilder::VisitTerOperatorNode(TerOperatorNode *node) {
   mCurrentBB->AddStatement(node);
   return node;
 }
 
 // For statement of current BB
-InstanceOfNode *CFGVisitor::VisitInstanceOfNode(InstanceOfNode *node) {
+InstanceOfNode *CfgBuilder::VisitInstanceOfNode(InstanceOfNode *node) {
   mCurrentBB->AddStatement(node);
   return node;
 }
 
 // For statement of current BB
-TypeOfNode *CFGVisitor::VisitTypeOfNode(TypeOfNode *node) {
+TypeOfNode *CfgBuilder::VisitTypeOfNode(TypeOfNode *node) {
   mCurrentBB->AddStatement(node);
   return node;
 }
 
 // For statement of current BB
-NewNode *CFGVisitor::VisitNewNode(NewNode *node) {
+NewNode *CfgBuilder::VisitNewNode(NewNode *node) {
   mCurrentBB->AddStatement(node);
   return node;
 }
 
 // For statement of current BB
-DeleteNode *CFGVisitor::VisitDeleteNode(DeleteNode *node) {
+DeleteNode *CfgBuilder::VisitDeleteNode(DeleteNode *node) {
   mCurrentBB->AddStatement(node);
   return node;
 }
 
 // For statement of current BB
-CallNode *CFGVisitor::VisitCallNode(CallNode *node) {
+CallNode *CfgBuilder::VisitCallNode(CallNode *node) {
   mCurrentBB->AddStatement(node);
   mCurrentBB->SetAttr(AK_HasCall);
   return node;
 }
 
 // For statement of current BB
-AssertNode *CFGVisitor::VisitAssertNode(AssertNode *node) {
+AssertNode *CfgBuilder::VisitAssertNode(AssertNode *node) {
   mCurrentBB->AddStatement(node);
   return node;
 }
 
 // For statement of current BB
-UserTypeNode *CFGVisitor::VisitUserTypeNode(UserTypeNode *node) {
+UserTypeNode *CfgBuilder::VisitUserTypeNode(UserTypeNode *node) {
   mCurrentBB->AddStatement(node);
   return node;
 }
 
 // For statement of current BB
-IdentifierNode *CFGVisitor::VisitIdentifierNode(IdentifierNode *node) {
+IdentifierNode *CfgBuilder::VisitIdentifierNode(IdentifierNode *node) {
   mCurrentBB->AddStatement(node);
   return node;
 }
 
 // For statement of current BB
-LiteralNode *CFGVisitor::VisitLiteralNode(LiteralNode *node) {
+LiteralNode *CfgBuilder::VisitLiteralNode(LiteralNode *node) {
   mCurrentBB->AddStatement(node);
   return node;
 }
 
 // For statement of current BB
-StructNode *CFGVisitor::VisitStructNode(StructNode *node) {
+StructNode *CfgBuilder::VisitStructNode(StructNode *node) {
   mCurrentBB->AddStatement(node);
   return node;
 }
 
 // Allocate a new AST_Function node
-AST_Function *CFGVisitor::NewFunction(FunctionNode *node)   {
+AST_Function *CfgBuilder::NewFunction(FunctionNode *node)   {
   AST_Function *func = new(mHandler->GetMemPool()->Alloc(sizeof(AST_Function))) AST_Function;
   func->SetFunction(node);
   return func;
 }
 
 // Allocate a new AST_BB node
-AST_BB *CFGVisitor::NewBB(BBKind k) {
+AST_BB *CfgBuilder::NewBB(BBKind k) {
   return new(mHandler->GetMemPool()->Alloc(sizeof(AST_BB))) AST_BB(k);
 }
 
@@ -731,12 +731,8 @@ void AST_Function::Dump() {
 }
 
 void AST_CFG::Build() {
-  BuildCFG();
-}
-
-void AST_CFG::BuildCFG() {
   if (mTrace) std::cout << "============== BuildCFG ==============" << std::endl;
-  CFGVisitor visitor(mHandler, mTrace, true);
+  CfgBuilder visitor(mHandler, mTrace, true);
   // Set the init function for current module
   AST_Function *func = visitor.NewFunction(nullptr);
   mHandler->SetFunction(func);

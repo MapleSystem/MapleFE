@@ -186,10 +186,9 @@ class AST_CFG {
   ~AST_CFG() {}
 
   void Build();
-  void BuildCFG();
 };
 
-class CFGVisitor : public AstVisitor {
+class CfgBuilder : public AstVisitor {
 
   using TargetLabel = unsigned;
   using TargetBB = std::pair<AST_BB*, unsigned>;
@@ -207,9 +206,9 @@ class CFGVisitor : public AstVisitor {
   TargetBBStack mThrowBBs;
 
  public:
-  explicit CFGVisitor(AST_Handler *h, bool t, bool base = false)
+  explicit CfgBuilder(AST_Handler *h, bool t, bool base = false)
     : mHandler(h), mTrace(t), AstVisitor(t && base) {}
-  ~CFGVisitor() = default;
+  ~CfgBuilder() = default;
 
   AST_Function *NewFunction(FunctionNode *);
   AST_BB       *NewBB(BBKind k);
