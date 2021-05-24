@@ -1179,12 +1179,18 @@ std::string AstEmitter::AstEmitUserTypeNode(UserTypeNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
+  auto ca = node->GetChildA();
+  auto cb = node->GetChildB();
   if (auto n = node->GetId()) {
-    str += "type "s + AstEmitTreeNode(n) + " = "s;
+    if(ca || cb)
+      str = "type "s + AstEmitTreeNode(n) + " = "s;
+    else
+      str = AstEmitTreeNode(n);
   }
-  str += AstEmitTreeNode(node->GetChildA());
-  str += GetTypeOp(node);
-  str += AstEmitTreeNode(node->GetChildB());
+  if(ca)
+    str += AstEmitTreeNode(node->GetChildA());
+  if(cb)
+    str += GetTypeOp(node) + AstEmitTreeNode(node->GetChildB());
   /*
   for (unsigned i = 0; i < node->GetTypeArgumentsNum(); ++i) {
     if (i)
