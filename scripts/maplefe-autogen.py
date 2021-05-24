@@ -1189,8 +1189,6 @@ int64_t ReadLength() {{
 }}
 
 const char *ReadString() {{
-  bool check = 'S' == *it;
-  MASSERT(check);
   int64_t len = ReadNum('S');
   if(len) {{
     const char *res = gStringPool.FindString(reinterpret_cast<const char *>(&(*it)));

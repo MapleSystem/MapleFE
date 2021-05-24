@@ -94,7 +94,7 @@ int main (int argc, char *argv[]) {
   std::ofstream ofs;
   std::string fname(maplefe::gModule->GetFileName());
   fname += ".ast";
-  ofs.open(fname, std::ofstream::out | std::ofstream::app);
+  ofs.open(fname, std::ofstream::out);
   const char *addr = (const char *)(&(ast_buf[0]));
   ofs.write(addr, ast_buf.size());
   ofs.close();
