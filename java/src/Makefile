@@ -15,6 +15,7 @@
 include ../../Makefile.in
 BUILD=$(BUILDDIR)/java
 BUILDGEN=$(BUILDDIR)/gen
+BUILDASTGEN=$(BUILDDIR)/ast_doc/shared
 $(shell $(MKDIR_P) $(BUILD) $(BUILDGEN))
 
 SRC=$(wildcard *.cpp)
@@ -32,13 +33,14 @@ INCLUDES := -I $(MAPLEFE_ROOT)/shared/include \
             -I $(MAPLEFE_ROOT)/ast2mpl/include \
             -I $(MAPLEFE_ROOT)/java/include \
             -I $(MAPLEFE_ROOT)/autogen/include \
+						-I ${BUILDDIR}/ast_doc/shared \
             -I $(BUILDGEN) $(MAPLEALL_INC)
 
 INCLUDEGEN := -I $(BUILDGEN) -I $(MAPLEFE_ROOT)/shared/include
 
 TARGET=java2mpl
 
-SHAREDLIB =  $(BUILDDIR)/ast2mpl/ast2mpl.a $(BUILDDIR)/shared/shared.a
+SHAREDLIB =  $(BUILDDIR)/ast2mpl/ast2mpl.a $(BUILDDIR)/shared/shared.a $(BUILDASTGEN)/genast.a
 
 .PHONY: all
 all: $(BUILD)/$(TARGET)

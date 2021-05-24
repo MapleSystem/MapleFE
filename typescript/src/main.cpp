@@ -12,15 +12,17 @@
 * FIT FOR A PARTICULAR PURPOSE.
 * See the Mulan PSL v2 for more details.
 */
+
+#include <fstream>      // std::ofstream
 #include "parser.h"
 #include "token.h"
 #include "common_header_autogen.h"
 #include "ruletable_util.h"
 #include "gen_summary.h"
-#include "ast2cpp_ts.h"
+#include "gen_aststore.h"
 
 static void help() {
-  std::cout << "ts2cpp sourcefile [options]:\n" << std::endl;
+  std::cout << "ts2ast sourcefile [options]:\n" << std::endl;
   std::cout << "   --help            : print this help" << std::endl;
   std::cout << "   --trace-lexer     : Trace lexing" << std::endl;
   std::cout << "   --trace-table     : Trace rule table when entering and exiting" << std::endl;
@@ -33,7 +35,6 @@ static void help() {
   std::cout << "   --trace-ast-build : Trace AST Builder" << std::endl;
   std::cout << "   --trace-patch-was-succ : Trace Patching of WasSucc nodes" << std::endl;
   std::cout << "   --trace-warning   : Print Warning" << std::endl;
-  std::cout << "   --trace-a2c       : Trace MPL Builder" << std::endl;
 }
 
 int main (int argc, char *argv[]) {
@@ -86,8 +87,17 @@ int main (int argc, char *argv[]) {
     return 1;
   }
 
-  maplefe::A2CTs *a2c = new maplefe::A2CTs(maplefe::gModule->GetFileName());
-  a2c->ProcessAST(trace_a2c);
+  maplefe::AstStore saveAst(maplefe::gModule);
+  saveAst.StoreInAstBuf();
+  maplefe::AstBuffer &ast_buf = saveAst.GetAstBuf();
+
+  std::ofstream ofs;
+  std::string fname(maplefe::gModule->GetFileName());
+  fname += ".ast";
+  ofs.open(fname, std::ofstream::out | std::ofstream::app);
+  const char *addr = (const char *)(&(ast_buf[0]));
+  ofs.write(addr, ast_buf.size());
+  ofs.close();
 
   delete parser;
   return 0;

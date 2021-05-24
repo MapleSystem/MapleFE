@@ -20,23 +20,31 @@ SRC=$(wildcard *.cpp)
 OBJ :=$(patsubst %.cpp,%.o,$(SRC))
 DEP :=$(patsubst %.cpp,%.d,$(SRC))
 
-GENDIR:=${BUILDDIR}/ast_gen/shared
+OBJS :=$(foreach obj,$(OBJ), $(BUILD)/$(obj))
+LIBOBJS :=$(patsubst $(BUILD)/main.o,,$(OBJS))
+DEPS :=$(foreach dep,$(DEP), $(BUILD)/$(dep))
 
-SRCG:=$(wildcard ${GENDIR}/*.cpp)
+GENDIR:=${BUILDDIR}/gen
+
+SRCG:=$(wildcard ${GENDIR}/gen_*.cpp)
 OBJG:=$(patsubst %.cpp,%.o,$(SRCG))
 DEPG:=$(patsubst %.cpp,%.d,$(SRCG))
 
-OBJS :=$(foreach obj,$(OBJ), $(BUILD)/$(obj)) $(OBJG)
-LIBOBJS :=$(patsubst $(BUILD)/main.o,,$(OBJS)) $(OBJG)
-DEPS :=$(foreach dep,$(DEP), $(BUILD)/$(dep)) $(DEPG)
+GENASTDIR:=${BUILDDIR}/ast_doc/shared
 
-INCLUDES := -I $(MAPLEFE_ROOT)/shared/include -I ${GENDIR}
+ASTSRCG:=$(wildcard ${GENASTDIR}/*.cpp)
+ASTOBJG:=$(patsubst %.cpp,%.o,$(ASTSRCG))
+ASTDEPG:=$(patsubst %.cpp,%.d,$(ASTSRCG))
 
-SHAREDLIB = shared.a
+INCLUDES := -I $(MAPLEFE_ROOT)/shared/include -I ${GENASTDIR} -I ${GENDIR}
+
+SHAREDLIB := shared.a
+GENASTLIB := genast.a
+GENLIB    := gen.a
 
 .PHONY: all gen_doc clean
 
-all: $(BUILD)/$(SHAREDLIB)
+all: $(BUILD)/$(SHAREDLIB) $(GENASTDIR)/$(GENASTLIB) $(GENDIR)/$(GENLIB)
 
 -include $(DEPS)
 
@@ -53,10 +61,16 @@ $(BUILD)/%.d : %.cpp
 	@sed -e 's|.*:|$(BUILD)/$*.o:|' < $(BUILD)/$*.d.tmp > $(BUILD)/$*.d
 	@rm -f $(BUILD)/$*.d.tmp
 
-$(GENDIR)/%.cpp : gendoc
+$(GENASTDIR)/%.cpp : gendoc
 
 gen_doc:
 	(cd $(MAPLEFE_ROOT); ./scripts/maplefe-autogen.py)
+
+$(GENASTDIR)/%.o : $(GENASTDIR)/%.cpp
+	$(CXX) $(CXXFLAGS) -fpermissive $(INCLUDES) -w -c $< -o $@
+
+$(GENASTDIR)/%.d : $(GENASTDIR)/%.cpp
+	@$(CXX) $(CXXFLAGS) -std=c++11 -MM $(INCLUDES) $< > $@
 
 $(GENDIR)/%.o : $(GENDIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -fpermissive $(INCLUDES) -w -c $< -o $@
@@ -66,6 +80,12 @@ $(GENDIR)/%.d : $(GENDIR)/%.cpp
 
 $(BUILD)/$(SHAREDLIB) : $(LIBOBJS)
 	/usr/bin/ar rcs $(BUILD)/$(SHAREDLIB) $(LIBOBJS)
+
+$(GENASTDIR)/$(GENASTLIB) : $(ASTOBJG)
+	/usr/bin/ar rcs $(GENASTDIR)/$(GENASTLIB) $(ASTOBJG)
+
+$(GENDIR)/$(GENLIB) : $(OBJG)
+	/usr/bin/ar rcs $(GENDIR)/$(GENLIB) $(OBJG)
 
 clean:
 	rm -rf $(BUILD)

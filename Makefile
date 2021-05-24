@@ -14,7 +14,7 @@
 
 include Makefile.in
 
-TARGS = autogen shared recdetect ladetect java2mpl ast2mpl ts2cpp ast2cpp
+TARGS = autogen shared recdetect ladetect java2mpl ast2mpl ts2ast ast2cpp
 
 # create BUILDDIR first
 $(shell $(MKDIR_P) $(BUILDDIR))
@@ -22,7 +22,7 @@ $(shell $(MKDIR_P) $(BUILDDIR))
 ifeq ($(SRCLANG),java)
   TARGET := java2mpl
 else ifeq ($(SRCLANG),typescript)
-  TARGET := ts2cpp
+  TARGET := ts2ast ast2cpp
 endif
 
 all: $(TARGET)
@@ -30,7 +30,7 @@ all: $(TARGET)
 java2mpl: autogen recdetect ladetect shared ast2mpl
 	$(MAKE) LANG=$(SRCLANG) -C $(SRCLANG)
 
-ts2cpp: autogen recdetect ladetect shared ast2cpp
+ts2ast: autogen recdetect ladetect shared
 	$(MAKE) LANG=$(SRCLANG) -C $(SRCLANG)
 
 recdetect: autogen shared ladetect
@@ -42,7 +42,7 @@ ladetect: autogen shared
 ast2mpl: shared
 	$(MAKE) -C ast2mpl
 
-ast2cpp: shared
+ast2cpp: shared recdetect ladetect
 	$(MAKE) -C ast2cpp
 
 shared: autogen

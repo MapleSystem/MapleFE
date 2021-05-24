@@ -15,6 +15,7 @@
 include ../../Makefile.in
 BUILD=$(BUILDDIR)/typescript
 BUILDGEN=$(BUILDDIR)/gen
+BUILDASTGEN=$(BUILDDIR)/ast_doc/shared
 $(shell $(MKDIR_P) $(BUILD) $(BUILDGEN))
 
 SRC=$(wildcard *.cpp)
@@ -32,13 +33,14 @@ INCLUDES := -I $(MAPLEFE_ROOT)/shared/include \
             -I $(MAPLEFE_ROOT)/ast2cpp/include \
             -I $(MAPLEFE_ROOT)/typescript/include \
             -I $(MAPLEFE_ROOT)/autogen/include \
+						-I ${BUILDDIR}/ast_doc/shared \
             -I $(BUILDGEN)
 
 INCLUDEGEN := -I $(BUILDGEN) -I $(MAPLEFE_ROOT)/shared/include
 
-TARGET=ts2cpp
+TARGET=ts2ast
 
-SHAREDLIB = $(BUILDDIR)/ast2cpp/ast2cpp.a $(BUILDDIR)/shared/shared.a
+SHAREDLIB = $(BUILDDIR)/shared/shared.a $(BUILDASTGEN)/genast.a
 
 .PHONY: all
 all: $(BUILD)/$(TARGET)

@@ -34,10 +34,12 @@ print "Running $lang\n";
 if ($lang =~ /\Qjava\E/) {
   $pinput = "java";
   $cmnd = "../output/java/java/java2mpl";
+  $cmnd1 = "echo";
   $outroot = "$currdir/../output/$pinput/test";
 } elsif ($lang =~ /\Qtypescript\E/) {
   $pinput = "ts";
-  $cmnd = "../output/typescript/typescript/ts2cpp";
+  $cmnd = "../output/typescript/typescript/ts2ast";
+  $cmnd1 = "../output/typescript/ast2cpp/ast2cpp";
   $outroot = "$currdir/../output/typescript/test";
 } else {
   print "$lang is an invalid option\n";
@@ -94,6 +96,8 @@ foreach my $file (@paths) {
         print " $count\n";
       }
 
+      #my $res = system("$pwd/$cmnd $outroot/$file > $outroot/$outresult");
+      #my $res = system('$pwd/$cmnd $outroot/$file; $pwd/$cmnd1 $outroot/$file.ast > $outroot/$outresult');
       my $res = system("$pwd/$cmnd $outroot/$file > $outroot/$outresult");
 
       if ($res > 0) {
@@ -103,6 +107,17 @@ foreach my $file (@paths) {
         push(@failed_file, $pinput.":  ".$file);
         #print "---------------------------\n";
         next;
+      } else {
+        my $res1 = system("echo $pwd/$cmnd1 $outroot/$file.ast > $outroot/$outresult.1");
+
+        if ($res1 > 0) {
+          print "$pwd/$cmnd1 $outroot/$file.ast\n";
+          print " ==$pinput===> $file\n";
+          $countfailedcases ++;
+          push(@failed_file, $pinput.":  ".$file);
+          #print "---------------------------\n";
+          next;
+        }
       }
 
       if (!(-e $origresult) ) {

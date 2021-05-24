@@ -14,26 +14,39 @@
 
 include ../../Makefile.in
 BUILD=$(BUILDDIR)/ast2cpp
+BUILDGEN=$(BUILDDIR)/gen
+BUILDASTGEN=$(BUILDDIR)/ast_doc/shared
 $(shell $(MKDIR_P) $(BUILD))
 
 SRC=$(wildcard *.cpp)
 OBJ :=$(patsubst %.cpp,%.o,$(SRC))
 DEP :=$(patsubst %.cpp,%.d,$(SRC))
 
-OBJS :=$(foreach obj,$(OBJ), $(BUILD)/$(obj))
+SRCG := $(wildcard $(BUILDGEN)/gen*.cpp)
+OBJG := $(patsubst %.cpp, %.o, $(SRCG))
+DEPG := $(patsubst %.cpp, %.d, $(SRCG))
+
+OBJS :=$(foreach obj,$(OBJ), $(BUILD)/$(obj)) $(OBJG)
+DEPS :=$(foreach dep,$(DEP), $(BUILD)/$(dep)) $(DEPG)
+
 LIBOBJS :=$(patsubst $(BUILD)/main.o,,$(OBJS))
-DEPS :=$(foreach dep,$(DEP), $(BUILD)/$(dep))
 
 GENDIR:=${BUILDDIR}/ast_gen/shared
 
 INCLUDES := -I $(MAPLEFE_ROOT)/shared/include \
             -I $(MAPLEFE_ROOT)/ast2cpp/include \
+            -I $(MAPLEFE_ROOT)/autogen/include \
+            -I $(MAPLEFE_ROOT)/shared/include \
+            -I $(MAPLEFE_ROOT)/typescript/include \
             $(MAPLEALL_INC) -I ${GENDIR}
 
-AST2MPLLIB = ast2cpp.a
+INCLUDEGEN := -I $(MAPLEFE_ROOT)/shared/include -I $(BUILDDIR)/gen -I $(BUILDASTGEN)
+
+TARGET=ast2cpp
+SHAREDLIB = $(BUILDASTGEN)/genast.a $(BUILDDIR)/shared/shared.a
 
 .PHONY: all
-all: $(BUILD)/$(AST2MPLLIB)
+all: $(BUILD)/$(TARGET)
 
 -include $(DEPS)
 .PHONY: clean
@@ -43,7 +56,7 @@ vpath %.d $(BUILD)
 
 #Pattern Rules
 $(BUILD)/%.o : %.cpp
-	$(CXX) $(CXXFLAGS) -fpermissive $(INCLUDES) -w -c $< -o $@ 
+	$(CXX) $(CXXFLAGS) -fpermissive $(INCLUDES) -w -c $< -o $@
 
 $(BUILD)/%.d : %.cpp
 	@$(CXX) $(CXXFLAGS) -MM $(INCLUDES) $< > $@
@@ -51,8 +64,19 @@ $(BUILD)/%.d : %.cpp
 	@sed -e 's|.*:|$(BUILD)/$*.o:|' < $(BUILD)/$*.d.tmp > $(BUILD)/$*.d
 	@rm -f $(BUILD)/$*.d.tmp
 
-$(BUILD)/$(AST2MPLLIB) : $(OBJS)
-	/usr/bin/ar rcs $(BUILD)/$(AST2MPLLIB) $(LIBOBJS)
+$(BUILDGEN)/%.o : $(BUILDGEN)/%.cpp $(BUILDGEN)/%.d
+	$(CXX) $(CXXFLAGS) -fpermissive $(INCLUDEGEN) -w -c $< -o $@
+
+$(BUILDGEN)/%.d : $(BUILDGEN)/%.cpp
+	@$(CXX) $(CXXFLAGS) -std=c++11 -MM $(INCLUDEGEN) $< > $@
+	@mv -f $(BUILDGEN)/$*.d $(BUILDGEN)/$*.d.tmp
+	@sed -e 's|.*:|$(BUILDGEN)/$*.o:|' < $(BUILDGEN)/$*.d.tmp > $(BUILDGEN)/$*.d
+	@rm -f $(BUILDGEN)/$*.d.tmp
+
+# TARGET depends on OBJS and shared OBJS from shared directory
+# as well as mapleall libraries
+$(BUILD)/$(TARGET): $(OBJS) $(SHAREDLIB)
+	$(LD) -o $(BUILD)/$(TARGET) $(OBJS) $(SHAREDLIB)
 
 clean:
 	rm -rf $(BUILD)
