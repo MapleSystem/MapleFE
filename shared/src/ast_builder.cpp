@@ -1238,23 +1238,26 @@ TreeNode* ASTBuilder::BuildArrayLiteral() {
 
   MASSERT(mParams.size() == 1);
 
-  Param p_literals = mParams[0];
-  MASSERT(p_literals.mIsTreeNode);
-
-  TreeNode *literals = p_literals.mData.mTreeNode;
-  MASSERT(literals->IsLiteral() || literals->IsExprList());
-
+  // The parameter could be empty, meaning the literal is like: [].
+  // But it still is a array literal, and we create one for it with 0 expressions.
   ArrayLiteralNode *array_literal = (ArrayLiteralNode*)gTreePool.NewTreeNode(sizeof(ArrayLiteralNode));
   new (array_literal) ArrayLiteralNode();
 
-  if (literals->IsLiteral()) {
-    array_literal->AddLiteral(literals);
-  } else if (literals->IsExprList()) {
-    ExprListNode *el = (ExprListNode*)literals;
-    for (unsigned i = 0; i < el->GetExprsNum(); i++) {
-      TreeNode *expr = el->GetExprAtIndex(i);
-      MASSERT(expr->IsLiteral() || expr->IsArrayLiteral());
-      array_literal->AddLiteral(expr);
+  Param p_literals = mParams[0];
+  if (!p_literals.mIsEmpty) {
+    MASSERT(p_literals.mIsTreeNode);
+    TreeNode *literals = p_literals.mData.mTreeNode;
+    MASSERT(literals->IsLiteral() || literals->IsExprList());
+
+    if (literals->IsLiteral()) {
+      array_literal->AddLiteral(literals);
+    } else if (literals->IsExprList()) {
+      ExprListNode *el = (ExprListNode*)literals;
+      for (unsigned i = 0; i < el->GetExprsNum(); i++) {
+        TreeNode *expr = el->GetExprAtIndex(i);
+        MASSERT(expr->IsLiteral() || expr->IsArrayLiteral());
+        array_literal->AddLiteral(expr);
+      }
     }
   }
 

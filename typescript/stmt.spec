@@ -168,7 +168,7 @@ rule ArrayLiteral : ONEOF(
   '[' + ZEROORONE(Elision) + ']'
   '[' + ElementList + ']'
   '[' + ElementList + ',' + ZEROORONE(Elision) + ']')
-  attr.action.%2,%3 : BuildArrayLiteral(%2)
+  attr.action.%1,%2,%3 : BuildArrayLiteral(%2)
 
 ##-----------------------------------
 ##rule ElementList[Yield] :

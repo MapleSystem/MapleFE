@@ -4,7 +4,7 @@ Matched 83 tokens.
 Matched 108 tokens.
 ============= Module ===========
 == Sub Tree ==
-js_let Decl: funcs
+js_let Decl: funcs=[]
 == Sub Tree ==
 func  initialize()  throws: 
   js_var Decl: msgs=["Hello","World"]

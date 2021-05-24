@@ -10,7 +10,7 @@ Matched 154 tokens.
 == Sub Tree ==
 class  Pool
   Fields: 
-    _pool
+    _pool=[]
   Instance Initializer: 
   Constructors: 
   Methods: 
