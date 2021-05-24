@@ -17,22 +17,31 @@
 //                This is the interface to translate AST to C++
 //////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __AST2CPP_HEADER__
-#define __AST2CPP_HEADER__
+#ifndef __AST_OPT_HEADER__
+#define __AST_OPT_HEADER__
 
-#include "ast_opt.h"
+#include "ast_module.h"
+#include "ast.h"
+#include "ast_type.h"
 
 namespace maplefe {
 
-class A2C : public AstOpt {
+#define NOTYETIMPL(K)      { if (mTraceA2c) { MNYI(K);      }}
+#define AST2CPPMSG0(K)     { if (mTraceA2c) { MMSG0(K);     }}
+#define AST2CPPMSG(K,v)    { if (mTraceA2c) { MMSG(K,v);    }}
+#define AST2CPPMSG2(K,v,w) { if (mTraceA2c) { MMSG2(K,v,w); }}
+
+class AstOpt {
 private:
-  bool mTraceA2C;
+  const char *mFileName;
+  bool mTraceAstOpt;
+  unsigned mUniqNum;
 
 public:
-  explicit A2C(const char *filename) : AstOpt(filename) {}
-  ~A2C() = default;
+  explicit AstOpt(const char *filename) : mFileName(filename) {}
+  ~AstOpt() = default;
 
-  void ProcessAST(bool trace_a2c);
+  void ProcessAST(bool trace_opt);
 };
 
 }

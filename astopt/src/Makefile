@@ -13,38 +13,24 @@
 # 
 
 include ../../Makefile.in
-BUILD=$(BUILDDIR)/ast2cpp
-BUILDGEN=$(BUILDDIR)/gen
-BUILDASTGEN=$(BUILDDIR)/ast_gen/shared
+BUILD=$(BUILDDIR)/astopt
 $(shell $(MKDIR_P) $(BUILD))
 
 SRC=$(wildcard *.cpp)
 OBJ :=$(patsubst %.cpp,%.o,$(SRC))
 DEP :=$(patsubst %.cpp,%.d,$(SRC))
 
-SRCG := $(wildcard $(BUILDGEN)/gen*.cpp)
-OBJG := $(patsubst %.cpp, %.o, $(SRCG))
-DEPG := $(patsubst %.cpp, %.d, $(SRCG))
-
-OBJS :=$(foreach obj,$(OBJ), $(BUILD)/$(obj)) $(OBJG)
-DEPS :=$(foreach dep,$(DEP), $(BUILD)/$(dep)) $(DEPG)
+OBJS :=$(foreach obj,$(OBJ), $(BUILD)/$(obj))
+DEPS :=$(foreach dep,$(DEP), $(BUILD)/$(dep))
 
 LIBOBJS :=$(patsubst $(BUILD)/main.o,,$(OBJS))
 
-GENDIR:=${BUILDDIR}/ast_gen/shared
 
 INCLUDES := -I $(MAPLEFE_ROOT)/shared/include \
             -I $(MAPLEFE_ROOT)/astopt/include \
-            -I $(MAPLEFE_ROOT)/ast2cpp/include \
-            -I $(MAPLEFE_ROOT)/autogen/include \
-            -I $(MAPLEFE_ROOT)/shared/include \
-            -I $(MAPLEFE_ROOT)/typescript/include \
-            $(MAPLEALL_INC) -I ${GENDIR}
+            -I ${BUILDDIR}/ast_gen/shared
 
-INCLUDEGEN := -I $(MAPLEFE_ROOT)/shared/include -I $(BUILDDIR)/gen -I $(BUILDASTGEN)
-
-TARGET=ast2cpp
-SHAREDLIB = $(BUILDASTGEN)/genast.a $(BUILDDIR)/astopt/astopt.a $(BUILDDIR)/shared/shared.a
+TARGET=astopt.a
 
 .PHONY: all
 all: $(BUILD)/$(TARGET)
@@ -65,19 +51,10 @@ $(BUILD)/%.d : %.cpp
 	@sed -e 's|.*:|$(BUILD)/$*.o:|' < $(BUILD)/$*.d.tmp > $(BUILD)/$*.d
 	@rm -f $(BUILD)/$*.d.tmp
 
-$(BUILDGEN)/%.o : $(BUILDGEN)/%.cpp $(BUILDGEN)/%.d
-	$(CXX) $(CXXFLAGS) -fpermissive $(INCLUDEGEN) -w -c $< -o $@
-
-$(BUILDGEN)/%.d : $(BUILDGEN)/%.cpp
-	@$(CXX) $(CXXFLAGS) -std=c++11 -MM $(INCLUDEGEN) $< > $@
-	@mv -f $(BUILDGEN)/$*.d $(BUILDGEN)/$*.d.tmp
-	@sed -e 's|.*:|$(BUILDGEN)/$*.o:|' < $(BUILDGEN)/$*.d.tmp > $(BUILDGEN)/$*.d
-	@rm -f $(BUILDGEN)/$*.d.tmp
-
 # TARGET depends on OBJS and shared OBJS from shared directory
 # as well as mapleall libraries
-$(BUILD)/$(TARGET): $(OBJS) $(SHAREDLIB)
-	$(LD) -o $(BUILD)/$(TARGET) $(OBJS) $(SHAREDLIB)
+$(BUILD)/$(TARGET): $(OBJS)
+	/usr/bin/ar rcs $(BUILD)/$(TARGET) $(OBJS)
 
 clean:
 	rm -rf $(BUILD)

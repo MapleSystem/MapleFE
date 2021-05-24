@@ -14,7 +14,7 @@
 
 include Makefile.in
 
-TARGS = autogen shared recdetect ladetect java2mpl ast2mpl ts2ast ast2cpp
+TARGS = autogen shared recdetect ladetect astopt java2mpl ast2mpl ts2ast ast2cpp
 
 # create BUILDDIR first
 $(shell $(MKDIR_P) $(BUILDDIR))
@@ -42,7 +42,10 @@ ladetect: autogen shared
 ast2mpl: shared
 	$(MAKE) -C ast2mpl
 
-ast2cpp: shared recdetect ladetect
+astopt: shared recdetect ladetect
+	$(MAKE) -C astopt
+
+ast2cpp: astopt
 	$(MAKE) -C ast2cpp
 
 shared: autogen
