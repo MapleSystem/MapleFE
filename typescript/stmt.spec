@@ -865,7 +865,7 @@ rule IterationStatement : ONEOF(
   "while" + '(' + Expression + ')' + Statement,
   "for" + '(' + ZEROORONE(Expression) + ';' + ZEROORONE(Expression) + ';' + ZEROORONE(Expression) + ')' + Statement,
   "for" + '(' + "var" + VariableDeclarationList + ';' + ZEROORONE(Expression) + ';' + ZEROORONE(Expression) + ')' + Statement,
-##  for ( LexicalDeclaration[?Yield] Expression[In, ?Yield]opt ; Expression[In, ?Yield]opt ) Statement[?Yield, ?Return]
+  "for" + '(' + LexicalDeclaration + ZEROORONE(Expression) + ';' + ZEROORONE(Expression) + ')' + Statement,
 ##  for ( [lookahead NotIn {let [}] LeftHandSideExpression[?Yield] in Expression[In, ?Yield] ) Statement[?Yield, ?Return]
   "for" + '(' + "var" + ForBinding + "in" + Expression + ')' + Statement,
 ##  for ( ForDeclaration[?Yield] in Expression[In, ?Yield] ) Statement[?Yield, ?Return]
@@ -879,16 +879,17 @@ rule IterationStatement : ONEOF(
   attr.action.%2 : BuildWhileLoop(%3, %5)
   attr.action.%3 : BuildForLoop(%3, %5, %7, %9)
   attr.action.%4 : BuildForLoop(%4, %6, %8, %10)
+  attr.action.%5 : BuildForLoop(%3, %4, %6, %8)
 
-  attr.action.%5,%6 : BuildDecl(%4)
-  attr.action.%5,%6 : SetJSVar()
-  attr.action.%5 : BuildForLoop_In(%6, %8)
-  attr.action.%6 : BuildForLoop_Of(%6, %8)
+  attr.action.%6,%7 : BuildDecl(%4)
+  attr.action.%6,%7 : SetJSVar()
+  attr.action.%6 : BuildForLoop_In(%6, %8)
+  attr.action.%7 : BuildForLoop_Of(%6, %8)
 
-  attr.action.%7,%8 : BuildDecl(%4)
-  attr.action.%7 : SetJSLet()
-  attr.action.%8 : SetJSConst()
-  attr.action.%7,%8 : BuildForLoop_Of(%6, %8)
+  attr.action.%8,%9 : BuildDecl(%4)
+  attr.action.%8 : SetJSLet()
+  attr.action.%9 : SetJSConst()
+  attr.action.%8,%9 : BuildForLoop_Of(%6, %8)
 
 ##-----------------------------------
 ##rule ForDeclaration[Yield] :
