@@ -9,6 +9,7 @@ output/
 *.dot
 *.png
 *.out.ts
+*.ts.ast
 gdbfile
 test/TypeScript/
 test/msts_failed.txt

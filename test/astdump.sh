@@ -48,12 +48,15 @@ AST2CPP=$TSOUT/ast2cpp/ast2cpp
 Failed=
 for ts in $LIST; do
   echo ---------
-  echo "$TS2AST" "$ts" --trace-timing
-  "$TS2AST" "$ts" --trace-timing
-  [ $? -eq 0 ] || Failed="$Failed $ts"
-  echo "$AST2CPP" "$ts".ast --trace-a2c
-  out=$("$AST2CPP" "$ts".ast --trace-a2c 2>&1)
-  [ $? -eq 0 ] || Failed="$Failed $ts.ast"
+  echo "$TS2AST" "$ts"
+  out=$("$TS2AST" "$ts")
+  if [ $? -ne 0 ]; then
+    Failed="$Failed $ts"
+  else
+    echo "$AST2CPP" "$ts".ast --trace-a2c
+    out=$("$AST2CPP" "$ts".ast --trace-a2c 2>&1)
+    [ $? -eq 0 ] || Failed="$Failed $ts.ast"
+  fi
   echo "$out"
   cmd=$(grep -n -e "^// .Beginning of AstEmitter:" -e "// End of AstEmitter.$" <<< "$out" |
     tail -2 | sed 's/:.*//' | xargs | sed 's/\([^ ]*\) \(.*\)/sed -n \1,$((\2+1))p/')

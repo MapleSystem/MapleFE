@@ -918,7 +918,7 @@ using AstNodeVec = std::vector<TreeNode*>;
         ": public " + astvisitorclass, # Base class
         ]
 
-astemit_init = [
+aststore_init = [
 """
 private:
 ModuleNode         *mASTModule;
@@ -1022,11 +1022,11 @@ void AddStrIdx(unsigned idx) {{
 }}
 
 """.format(signature=signature, gen_args1=gen_args[1], gen_args2=gen_args[2], astvisitorclass=astvisitorclass)
-] # astemit_init
+] # aststore_init
 
 handle_src_include_files(Initialization)
 append(src_file, ['using namespace std::string_literals;'])
-append(include_file, astemit_init)
+append(include_file, aststore_init)
 handle_yaml(initial_yaml, gen_handler)
 gen_args[2] = "Write"
 handle_yaml(treenode_yaml, gen_handler_ast_node)
@@ -1111,7 +1111,7 @@ using AstStrMap  = std::map<unsigned, unsigned>;
         ""             # Base class
         ]
 
-astemit_init = [
+astload_init = [
 """
 private:
 AstBufIter  it;
@@ -1209,11 +1209,11 @@ void ReadStrIdxTable() {{
 }}
 
 """.format(signature=signature, gen_args1=gen_args[1], gen_args2=gen_args[2], astvisitorclass=astvisitorclass)
-] # astemit_init
+] # astload_init
 
 handle_src_include_files(Initialization)
 append(src_file, ['using namespace std::string_literals;'])
-append(include_file, astemit_init)
+append(include_file, astload_init)
 handle_yaml(initial_yaml, gen_handler)
 gen_args[2] = "Init"
 gen_func_declaration = lambda dictionary, node_name: \
