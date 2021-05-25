@@ -140,7 +140,7 @@ class AST_BB {
 
 class AST_Function {
  private:
-  FunctionNode              *mFunction;        // nullptr if it is an init function
+  TreeNode                  *mFunction;        // ModuleNode, FunctionNode or LambdaNode
   SmallList<AST_Function *>  mNestedFunctions; // nested functions
   AST_Function              *mParent;
   AST_BB                    *mEntryBB;
@@ -151,10 +151,11 @@ class AST_Function {
   explicit AST_Function() : mParent(nullptr), mEntryBB(nullptr), mExitBB(nullptr), mFunction(nullptr) {}
   ~AST_Function() {mNestedFunctions.Release();}
 
-  void          SetFunction(FunctionNode *func) {mFunction = func;}
-  FunctionNode *GetFunction()                   {return mFunction;}
+  void      SetFunction(TreeNode *func) {mFunction = func;}
+  TreeNode *GetFunction()               {return mFunction;}
 
-  const char *GetName() {return mFunction ? (mFunction->GetStrIdx() ? mFunction->GetName() : "_anonymous_") : "_init_"; }
+  const char *GetName() {return mFunction->GetKind() == NK_Module ?
+    "_init_" : (mFunction->GetStrIdx() ? mFunction->GetName() : "_anonymous_"); }
 
   void          AddNestedFunction(AST_Function *func) {mNestedFunctions.PushBack(func); func->SetParent(this);}
   unsigned      GetNestedFunctionsNum()               {return mNestedFunctions.GetNum();}
@@ -210,7 +211,10 @@ class CfgBuilder : public AstVisitor {
     : mHandler(h), mTrace(t), AstVisitor(t && base) {}
   ~CfgBuilder() = default;
 
-  AST_Function *NewFunction(FunctionNode *);
+  // Create AST_Function nodes for a module
+  AST_Function *InitAstFunctions(ModuleNode *module);
+
+  AST_Function *NewFunction(TreeNode *);
   AST_BB       *NewBB(BBKind k);
 
   static void    Push(TargetBBStack &stack, AST_BB* bb, TreeNode *label);

@@ -23,6 +23,13 @@
 
 namespace maplefe {
 
+
+// Create AST_Function nodes for a module
+AST_Function *CfgBuilder::InitAstFunctions(ModuleNode *module) {
+
+  return NewFunction(module);
+}
+
 // Initialize a AST_Function node
 void CfgBuilder::InitializeFunction(AST_Function *func) {
   // Create the entry BB and exit BB of current function
@@ -643,7 +650,7 @@ StructNode *CfgBuilder::VisitStructNode(StructNode *node) {
 }
 
 // Allocate a new AST_Function node
-AST_Function *CfgBuilder::NewFunction(FunctionNode *node)   {
+AST_Function *CfgBuilder::NewFunction(TreeNode *node)   {
   AST_Function *func = new(mHandler->GetMemPool()->Alloc(sizeof(AST_Function))) AST_Function;
   func->SetFunction(node);
   return func;
@@ -669,16 +676,14 @@ static std::string BBLabelStr(AST_BB *bb, const char *shape = nullptr, const cha
 
 // Dump current AST_Function node
 void AST_Function::Dump() {
-  FunctionNode *func = GetFunction();
-  const char *func_name = func ? (func->GetStrIdx() ? func->GetName() : "_anonymous_") : "_init_";
+  const char *func_name = GetName();
   std::cout << "Function " << func_name  << " {" << std::endl;
   unsigned num = GetNestedFunctionsNum();
   if(num > 0) {
     std::cout << "Nested Functions: " << num << " [" << std::endl;
     for(unsigned i = 0; i < num; ++i) {
       AST_Function *afunc = GetNestedFunctionAtIndex(i);
-      FunctionNode *fnode = afunc->mFunction;
-      const char *fname = fnode ? (fnode->GetStrIdx() ? fnode->GetName() : "_anonymous_") : "_init_";
+      const char *fname = afunc->GetName();
       std::cout << "Function: " << i + 1 << " " << fname << std::endl;
       afunc->Dump();
     }
@@ -732,16 +737,21 @@ void AST_Function::Dump() {
 
 void AST_CFG::Build() {
   if (mTrace) std::cout << "============== BuildCFG ==============" << std::endl;
-  CfgBuilder visitor(mHandler, mTrace, true);
+  CfgBuilder builder(mHandler, mTrace, true);
+
+  ModuleNode *module = mHandler->GetASTModule();
+
   // Set the init function for current module
-  AST_Function *func = visitor.NewFunction(nullptr);
+  AST_Function *func = builder.InitAstFunctions(module);
+
   mHandler->SetFunction(func);
+
   // Start to build CFG for current module
-  visitor.InitializeFunction(func);
+  builder.InitializeFunction(func);
   for(unsigned i = 0; i < mHandler->GetASTModule()->GetTreesNum(); i++) {
-    visitor.Visit(mHandler->GetASTModule()->GetTree(i));
+    builder.Visit(mHandler->GetASTModule()->GetTree(i));
   }
-  visitor.FinalizeFunction();
+  builder.FinalizeFunction();
 }
 
 }
