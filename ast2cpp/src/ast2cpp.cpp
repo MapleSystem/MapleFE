@@ -53,12 +53,24 @@ void A2C::ProcessAST(bool trace_a2c) {
 
   handler.AdjustAST();
   if (mTraceA2C) {
-    handler.Dump("After handler.AdjustAST()");
+    std::cout << "============= After AdjustAST ===========" << std::endl;
+    for(unsigned i = 0; i < gModule->GetTreesNum(); i++) {
+      TreeNode *tnode = gModule->GetTree(i);
+      if (mTraceA2C) {
+        tnode->Dump(0);
+        std::cout << std::endl;
+      }
+    }
   }
 
   handler.BuildCFG();
   if (mTraceA2C) {
     handler.Dump("After handler.BuildCFG()");
+  }
+
+  handler.ASTCollectAndDBRemoval();
+  if (mTraceA2C) {
+    handler.Dump("After handler.ASTCollectAndDBRemoval()");
   }
 
   if (mTraceA2C) {

@@ -37,9 +37,9 @@ class AST_DFA;
 // Each source file is a module
 class AST_Handler {
  private:
-  MemPool       mMemPool;     // Memory pool for all AST_Function and AST_BB
-  ModuleNode    *mASTModule;  // for an AST module
-  AST_Function *mFunction;    // an init function for statements in module scope
+  MemPool       mMemPool;    // Memory pool for all AST_Function and AST_BB
+  ModuleNode   *mASTModule;  // for an AST module
+  AST_Function *mFunction;   // an init function for statements in module scope
   AST_CFG      *mCFG;
   AST_AST      *mAST;
   AST_DFA      *mDFA;
@@ -54,11 +54,15 @@ class AST_Handler {
   explicit AST_Handler(ModuleNode *module, bool trace) :
     mASTModule(module),
     mFunction(nullptr),
+    mCFG(nullptr),
+    mAST(nullptr),
+    mDFA(nullptr),
     mTrace(trace) {}
   ~AST_Handler() {mMemPool.Release();}
 
-  void BuildCFG();
   void AdjustAST();
+  void BuildCFG();
+  void ASTCollectAndDBRemoval();
   void BuildDFA();
 
   ModuleNode *GetASTModule() {return mASTModule;}

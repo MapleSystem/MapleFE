@@ -34,7 +34,7 @@ class AST_AST {
   explicit AST_AST(AST_Handler *h, bool t) : mHandler(h), mTrace(t) {}
   ~AST_AST() {}
 
-  void Build();
+  void ASTCollectAndDBRemoval();
   void CollectASTInfo();
   void RemoveDeadBlocks();
   void AdjustAST();
@@ -61,6 +61,7 @@ class AdjustASTVisitor : public AstVisitor {
   ExportNode *VisitExportNode(ExportNode *node);
   CondBranchNode *VisitCondBranchNode(CondBranchNode *node);
   ForLoopNode *VisitForLoopNode(ForLoopNode *node);
+  LambdaNode *VisitLambdaNode(LambdaNode *node);
 };
 
 }

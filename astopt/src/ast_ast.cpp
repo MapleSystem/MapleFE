@@ -20,10 +20,9 @@
 
 namespace maplefe {
 
-void AST_AST::Build() {
+void AST_AST::ASTCollectAndDBRemoval() {
   CollectASTInfo();
   RemoveDeadBlocks();
-  AdjustAST();
 
   if (mTrace) {
     for(unsigned i = 0; i < gModule->GetTreesNum(); i++) {
@@ -99,9 +98,6 @@ void AST_AST::RemoveDeadBlocks() {
 void AST_AST::AdjustAST() {
   if (mTrace) std::cout << "============== AdjustAST ==============" << std::endl;
   AdjustASTVisitor visitor(mHandler, mTrace, true);
-  AST_Function *func = mHandler->GetFunction();
-  visitor.SetCurrentFunction(mHandler->GetFunction());
-  visitor.SetCurrentBB(func->GetEntryBB());
   for(unsigned i = 0; i < mHandler->GetASTModule()->GetTreesNum(); i++) {
     TreeNode *it = mHandler->GetASTModule()->GetTree(i);
     visitor.Visit(it);
@@ -118,8 +114,7 @@ DeclNode *AdjustASTVisitor::VisitDeclNode(DeclNode *node) {
 
   // copy StrIdx from Identifier to Decl
   if (node->GetStrIdx()) {
-    node->SetStrIdx(inode->GetStrIdx());
-    mUpdated = true;
+    node->SetStrIdx(inode->GetStrIdx()); mUpdated = true;
   }
 
   // move Init from Identifier to Decl
@@ -132,34 +127,31 @@ DeclNode *AdjustASTVisitor::VisitDeclNode(DeclNode *node) {
   return node;
 }
 
+// split export decl and body
+// export {func add(y)}  ==> export {add}; func add(y)
 ExportNode *AdjustASTVisitor::VisitExportNode(ExportNode *node) {
   if (node->GetPairsNum() == 1) {
     XXportAsPairNode *p = node->GetPair(0);
-    TreeNode *before = p->GetBefore();
+    TreeNode *bfnode = p->GetBefore();
     TreeNode *after = p->GetAfter();
-    // TODO:
-    if (0 && before) {
-      if (!before->IsIdentifier()) {
+    if (bfnode) {
+      if (!bfnode->IsIdentifier()) {
         IdentifierNode *n = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
-        switch (before->GetKind()) {
+        switch (bfnode->GetKind()) {
           case NK_Function: {
-            FunctionNode *func = static_cast<FunctionNode *>(before);
+            FunctionNode *func = static_cast<FunctionNode *>(bfnode);
             new (n) IdentifierNode(func->GetStrIdx());
             // update p
             p->SetBefore(n);
             mUpdated = true;
-            // insert before into BB
-            AST_BB *bb = mHandler->GetBbFromNodeId(node->GetNodeId());
-            bb->InsertStmtAfter(before, node);
-            // insert before into AST
+            // insert bfnode into AST after node
             TreeNode *parent = node->GetParent();
             if (parent) {
               if (parent->IsBlock()) {
-                BlockNode *blk = static_cast<BlockNode *>(parent);
-                blk->InsertStmtAfter(before, node);
+                static_cast<BlockNode *>(parent)->InsertStmtAfter(bfnode, node);
+              } else if (parent->IsModule()) {
+                static_cast<ModuleNode *>(parent)->InsertAfter(bfnode, node);
               }
-            } else {
-              // module
             }
             break;
           }
@@ -173,7 +165,7 @@ ExportNode *AdjustASTVisitor::VisitExportNode(ExportNode *node) {
   return node;
 }
 
-// if-then-else
+// if-then-else : use BlockNode for then and else bodies
 CondBranchNode *AdjustASTVisitor::VisitCondBranchNode(CondBranchNode *node) {
   TreeNode *tn = VisitTreeNode(node->GetTrueBranch());
   if (tn && !tn->IsBlock()) {
@@ -194,7 +186,7 @@ CondBranchNode *AdjustASTVisitor::VisitCondBranchNode(CondBranchNode *node) {
   return node;
 }
 
-// for
+// for : use BlockNode for body
 ForLoopNode *AdjustASTVisitor::VisitForLoopNode(ForLoopNode *node) {
   TreeNode *tn = VisitTreeNode(node->GetBody());
   if (tn && !tn->IsBlock()) {
@@ -206,4 +198,23 @@ ForLoopNode *AdjustASTVisitor::VisitForLoopNode(ForLoopNode *node) {
   }
   return node;
 }
+
+// lamda : use BlockNode for body, add a ReturnNode
+LambdaNode *AdjustASTVisitor::VisitLambdaNode(LambdaNode *node) {
+  TreeNode *tn = VisitTreeNode(node->GetBody());
+  if (tn && !tn->IsBlock()) {
+    BlockNode *blk = (BlockNode*)gTreePool.NewTreeNode(sizeof(BlockNode));
+    new (blk) BlockNode();
+    blk->AddChild(tn);
+
+    ReturnNode *ret = (ReturnNode*)gTreePool.NewTreeNode(sizeof(ReturnNode));
+    new (ret) ReturnNode();
+    blk->AddChild(ret);
+
+    node->SetBody(blk);
+    mUpdated = true;
+  }
+  return node;
+}
+
 }

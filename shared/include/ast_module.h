@@ -37,7 +37,7 @@ public:
   PackageNode             *mPackage;
   SmallVector<ImportNode*> mImports;
 public:
-  SmallVector<TreeNode*> mTrees;    // All trees in the module.
+  SmallList<TreeNode*>   mTrees;     // All trees in the module.
   ASTScope              *mRootScope; // the scope corresponding to a module. All other scopes
                                      // are children of mRootScope.
   ASTScopePool           mScopePool; // All the scopes are store in this pool. It also contains
@@ -60,12 +60,21 @@ public:
   unsigned    GetImportsNum()       {return mImports.GetNum();}
   ImportNode* GetImport(unsigned i) {return mImports.ValueAtIndex(i);}
   void        SetImport(unsigned i, ImportNode* n) {*(mImports.RefAtIndex(i)) = n;}
-  void        AddImport(ImportNode *imp)           {mImports.PushBack(imp);}
+  void        AddImport(ImportNode *imp) {mImports.PushBack(imp); if(imp) imp->SetParent(this);}
 
   unsigned  GetTreesNum()       {return mTrees.GetNum();}
   TreeNode* GetTree(unsigned i) {return mTrees.ValueAtIndex(i);}
   void SetTree(unsigned i, TreeNode* t)  {*(mTrees.RefAtIndex(i)) = t;}
-  void AddTree(TreeNode* t)     {mTrees.PushBack(t); }
+  void AddTree(TreeNode* t)     {mTrees.PushBack(t); if(t) t->SetParent(this);}
+
+  void InsertAfter(TreeNode *new_stmt, TreeNode *exist_stmt) {
+    mTrees.LocateValue(exist_stmt);
+    mTrees.InsertAfter(new_stmt);
+  }
+  void InsertBefore(TreeNode *new_stmt, TreeNode *exist_stmt) {
+    mTrees.LocateValue(exist_stmt);
+    mTrees.InsertBefore(new_stmt);
+  }
 
   ASTScope* GetRootScope()            {return mRootScope;}
   void      SetRootScope(ASTScope *s) {mRootScope = s;}

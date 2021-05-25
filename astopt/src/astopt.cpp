@@ -55,6 +55,11 @@ void AstOpt::ProcessAST(bool trace_a2c) {
     handler.Dump("After handler.BuildCFG()");
   }
 
+  handler.ASTCollectAndDBRemoval();
+  if (mTraceAstOpt) {
+    handler.Dump("After handler.ASTCollectAndDBRemoval()");
+  }
+
   if (mTraceAstOpt) {
     std::cout << "============= AstGraph ===========" << std::endl;
     AstGraph graph(gModule);

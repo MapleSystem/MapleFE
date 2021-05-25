@@ -23,17 +23,30 @@
 namespace maplefe {
 
 void AST_Handler::BuildCFG() {
-  mCFG = new(mMemPool.Alloc(sizeof(AST_CFG))) AST_CFG(this, mTrace);
+  if (!mCFG) {
+    mCFG = new(mMemPool.Alloc(sizeof(AST_CFG))) AST_CFG(this, mTrace);
+  }
   mCFG->Build();
 }
 
 void AST_Handler::AdjustAST() {
-  mAST = new(mMemPool.Alloc(sizeof(AST_AST))) AST_AST(this, mTrace);
-  mAST->Build();
+  if (!mAST) {
+    mAST = new(mMemPool.Alloc(sizeof(AST_AST))) AST_AST(this, mTrace);
+  }
+  mAST->AdjustAST();
+}
+
+void AST_Handler::ASTCollectAndDBRemoval() {
+  if (!mAST) {
+    mAST = new(mMemPool.Alloc(sizeof(AST_AST))) AST_AST(this, mTrace);
+  }
+  mAST->ASTCollectAndDBRemoval();
 }
 
 void AST_Handler::BuildDFA() {
-  mDFA = new(mMemPool.Alloc(sizeof(AST_DFA))) AST_DFA(this, mTrace);
+  if (!mDFA) {
+    mDFA = new(mMemPool.Alloc(sizeof(AST_DFA))) AST_DFA(this, mTrace);
+  }
   mDFA->Build();
 }
 
