@@ -113,8 +113,9 @@ DeclNode *AdjustASTVisitor::VisitDeclNode(DeclNode *node) {
   IdentifierNode *inode = static_cast<IdentifierNode *>(var);
 
   // copy StrIdx from Identifier to Decl
-  if (node->GetStrIdx()) {
-    node->SetStrIdx(inode->GetStrIdx()); mUpdated = true;
+  if (inode->GetStrIdx()) {
+    node->SetStrIdx(inode->GetStrIdx());
+    mUpdated = true;
   }
 
   // move Init from Identifier to Decl

@@ -71,7 +71,7 @@ void AST_DFA::Build() {
 }
 
 void AST_DFA::DumpDefPosition(DefPosition pos) {
-  std::cout << "stridx: " << std::get<0>(pos) << std::endl;
+  std::cout << "stridx: " << std::get<0>(pos) << " " << gStringPool.GetStringFromStrIdx(std::get<0>(pos)) << std::endl;
   std::cout << "nodeid: " << std::get<1>(pos) << std::endl;
   std::cout << "  bbid: " << std::get<2>(pos) << std::endl;
   std::cout << std::endl;
