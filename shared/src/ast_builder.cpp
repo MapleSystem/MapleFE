@@ -1340,6 +1340,10 @@ TreeNode* ASTBuilder::AddStructField() {
     }
   } else if (field->IsIdentifier()) {
     struct_node->AddField((IdentifierNode*)field);
+  } else if (field->IsNumIndexSig()) {
+    struct_node->SetNumIndexSig((NumIndexSigNode*)field);
+  } else if (field->IsStrIndexSig()) {
+    struct_node->SetStrIndexSig((StrIndexSigNode*)field);
   } else
     MERROR("Unsupported struct field type.");
 

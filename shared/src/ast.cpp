@@ -508,6 +508,18 @@ void ArrayLiteralNode::Dump(unsigned indent) {
 //                          StructNode and StructLiteralNode
 //////////////////////////////////////////////////////////////////////////////////////
 
+void NumIndexSigNode::Dump(unsigned indent) {
+  DumpIndentation(indent);
+  if (mDataType)
+    mDataType->Dump(0);
+}
+
+void StrIndexSigNode::Dump(unsigned indent) {
+  DumpIndentation(indent);
+  if (mDataType)
+    mDataType->Dump(0);
+}
+
 void StructNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   switch (mProp) {
@@ -521,6 +533,7 @@ void StructNode::Dump(unsigned indent) {
     break;
   }
   mStructId->Dump(0);
+  DUMP0_NORETURN(" {");
 
   if (mNumIndexSig) {
     DUMP0_NORETURN("numeric index type: ");
@@ -532,7 +545,6 @@ void StructNode::Dump(unsigned indent) {
     mStrIndexSig->Dump(0);
   }
 
-  DUMP0_NORETURN(" {");
   for (unsigned i = 0; i < mFields.GetNum(); i++) {
     mFields.ValueAtIndex(i)->Dump(0);
     if (i != mFields.GetNum()-1)

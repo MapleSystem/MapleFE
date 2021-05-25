@@ -750,6 +750,7 @@ public:
 
   NumIndexSigNode() : TreeNode(NK_NumIndexSig), mDataType(NULL) {}
   ~NumIndexSigNode(){}
+  void Dump(unsigned);
 };
 
 class StrIndexSigNode : public TreeNode{
@@ -761,6 +762,7 @@ public:
 
   StrIndexSigNode() : TreeNode(NK_StrIndexSig), mDataType(NULL) {}
   ~StrIndexSigNode(){}
+  void Dump(unsigned);
 };
 
 class StructNode : public TreeNode {
