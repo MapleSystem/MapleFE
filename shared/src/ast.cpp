@@ -521,6 +521,17 @@ void StructNode::Dump(unsigned indent) {
     break;
   }
   mStructId->Dump(0);
+
+  if (mNumIndexType) {
+    DUMP0_NORETURN("numeric index type: ");
+    mNumIndexType->Dump(0);
+  }
+
+  if (mStrIndexType) {
+    DUMP0_NORETURN("string index type: ");
+    mStrIndexType->Dump(0);
+  }
+
   DUMP0_NORETURN(" {");
   for (unsigned i = 0; i < mFields.GetNum(); i++) {
     mFields.ValueAtIndex(i)->Dump(0);

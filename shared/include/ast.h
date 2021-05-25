@@ -724,6 +724,15 @@ public:
 //                           Struct Node
 // This is first coming from C struct. Typescript 'interface' has the
 // similar structure.
+//
+// Index signature of Typescript make it complicated. Here is an example.
+//  interface Foo{
+//    [key: string]: number;
+//  }
+//
+//  let bar: Foo = {};
+//  bar['key1'] = 1;
+//
 //////////////////////////////////////////////////////////////////////////
 
 enum StructProp {
@@ -737,8 +746,14 @@ private:
   StructProp      mProp;
   IdentifierNode *mStructId;
   SmallVector<IdentifierNode*> mFields;
+
+  // These are for 'number' or 'string' index data type
+  TreeNode       *mNumIndexType;
+  TreeNode       *mStrIndexType;
+
 public:
-  StructNode(IdentifierNode *n) : TreeNode(NK_Struct), mStructId(n), mProp(SProp_NA) {}
+  StructNode(IdentifierNode *n) : TreeNode(NK_Struct), mStructId(n), mProp(SProp_NA),
+                                  mNumIndexType(NULL), mStrIndexType(NULL) {}
   StructNode() : StructNode(NULL) {}
   ~StructNode() {Release();}
 
@@ -746,6 +761,11 @@ public:
   IdentifierNode* GetStructId() {return mStructId;}
   void SetProp(StructProp p) {mProp = p;}
   void SetStructId(IdentifierNode *n) {mStructId = n;}
+
+  TreeNode* GetNumIndexType() {return mNumIndexType;}
+  TreeNode* GetStrIndexType() {return mStrIndexType;}
+  void SetNumIndexType(TreeNode *t) {mNumIndexType = t;}
+  void SetStrIndexType(TreeNode *t) {mStrIndexType = t;}
 
   unsigned        GetFieldsNum() {return mFields.GetNum();}
   IdentifierNode* GetField(unsigned i) {return mFields.ValueAtIndex(i);}
