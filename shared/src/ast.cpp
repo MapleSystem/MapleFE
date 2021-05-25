@@ -522,14 +522,14 @@ void StructNode::Dump(unsigned indent) {
   }
   mStructId->Dump(0);
 
-  if (mNumIndexType) {
+  if (mNumIndexSig) {
     DUMP0_NORETURN("numeric index type: ");
-    mNumIndexType->Dump(0);
+    mNumIndexSig->Dump(0);
   }
 
-  if (mStrIndexType) {
+  if (mStrIndexSig) {
     DUMP0_NORETURN("string index type: ");
-    mStrIndexType->Dump(0);
+    mStrIndexSig->Dump(0);
   }
 
   DUMP0_NORETURN(" {");

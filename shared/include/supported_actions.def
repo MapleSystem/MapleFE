@@ -90,6 +90,9 @@ ACTION(AddStructField)
 ACTION(BuildFieldLiteral)
 ACTION(BuildStructLiteral)
 
+ACTION(BuildStrIndexSig)
+ACTION(BuildNumIndexSig)
+
 // For Array
 ACTION(BuildArrayElement)
 ACTION(BuildArrayLiteral)

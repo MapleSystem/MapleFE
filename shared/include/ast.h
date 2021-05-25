@@ -741,6 +741,28 @@ enum StructProp {
   SProp_NA
 };
 
+class NumIndexSigNode : public TreeNode{
+public:
+  TreeNode *mDataType;
+
+  void      SetDataType(TreeNode *t) {mDataType = t;}
+  TreeNode* GetDataType()            {return mDataType;}
+
+  NumIndexSigNode() : TreeNode(NK_NumIndexSig), mDataType(NULL) {}
+  ~NumIndexSigNode(){}
+};
+
+class StrIndexSigNode : public TreeNode{
+public:
+  TreeNode *mDataType;
+
+  void      SetDataType(TreeNode *t) {mDataType = t;}
+  TreeNode* GetDataType()            {return mDataType;}
+
+  StrIndexSigNode() : TreeNode(NK_StrIndexSig), mDataType(NULL) {}
+  ~StrIndexSigNode(){}
+};
+
 class StructNode : public TreeNode {
 private:
   StructProp      mProp;
@@ -748,12 +770,12 @@ private:
   SmallVector<IdentifierNode*> mFields;
 
   // These are for 'number' or 'string' index data type
-  TreeNode       *mNumIndexType;
-  TreeNode       *mStrIndexType;
+  NumIndexSigNode *mNumIndexSig;
+  StrIndexSigNode *mStrIndexSig;
 
 public:
   StructNode(IdentifierNode *n) : TreeNode(NK_Struct), mStructId(n), mProp(SProp_NA),
-                                  mNumIndexType(NULL), mStrIndexType(NULL) {}
+                                  mNumIndexSig(NULL), mStrIndexSig(NULL) {}
   StructNode() : StructNode(NULL) {}
   ~StructNode() {Release();}
 
@@ -762,10 +784,10 @@ public:
   void SetProp(StructProp p) {mProp = p;}
   void SetStructId(IdentifierNode *n) {mStructId = n;}
 
-  TreeNode* GetNumIndexType() {return mNumIndexType;}
-  TreeNode* GetStrIndexType() {return mStrIndexType;}
-  void SetNumIndexType(TreeNode *t) {mNumIndexType = t;}
-  void SetStrIndexType(TreeNode *t) {mStrIndexType = t;}
+  NumIndexSigNode* GetNumIndexSig() {return mNumIndexSig;}
+  StrIndexSigNode* GetStrIndexSig() {return mStrIndexSig;}
+  void SetNumIndexSig(NumIndexSigNode *t) {mNumIndexSig = t;}
+  void SetStrIndexSig(StrIndexSigNode *t) {mStrIndexSig = t;}
 
   unsigned        GetFieldsNum() {return mFields.GetNum();}
   IdentifierNode* GetField(unsigned i) {return mFields.ValueAtIndex(i);}

@@ -474,6 +474,14 @@ void Verifier::VerifyArrayLiteral(ArrayLiteralNode *tree){
   return;
 }
 
+void Verifier::VerifyNumIndexSig(NumIndexSigNode *tree){
+  return;
+}
+
+void Verifier::VerifyStrIndexSig(StrIndexSigNode *tree){
+  return;
+}
+
 void Verifier::VerifyStruct(StructNode *tree){
   return;
 }

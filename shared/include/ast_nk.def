@@ -40,6 +40,10 @@ NODEKIND(Struct)
 NODEKIND(StructLiteral)
 NODEKIND(FieldLiteral)
 
+// define two spcial nodes for typescript index signature
+NODEKIND(NumIndexSig)
+NODEKIND(StrIndexSig)
+
 // Array related
 NODEKIND(ArrayElement)
 NODEKIND(ArrayLiteral)

@@ -1570,6 +1570,8 @@ rule ConstructSignature :
 rule IndexSignature: ONEOF(
   '[' + BindingIdentifier + ':' + "string" + ']' + TypeAnnotation,
   '[' + BindingIdentifier + ':' + "number" + ']' + TypeAnnotation)
+  attr.action.%1 : BuildStrIndexSig(%6)
+  attr.action.%2 : BuildNumIndexSig(%6)
 
 ## rule MethodSignature: PropertyName ?opt CallSignature
 

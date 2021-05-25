@@ -849,6 +849,14 @@ maple::BaseNode *A2M::ProcessArrayLiteral(StmtExprKind skind, TreeNode *tnode, B
   return nullptr;
 }
 
+maple::BaseNode *A2M::ProcessNumIndexSig(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
+  return nullptr;
+}
+
+maple::BaseNode *A2M::ProcessStrIndexSig(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
+  return nullptr;
+}
+
 maple::BaseNode *A2M::ProcessStruct(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
   NOTYETIMPL("ProcessStruct()");
   StructNode *node = static_cast<StructNode *>(tnode);

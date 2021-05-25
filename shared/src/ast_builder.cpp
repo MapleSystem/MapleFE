@@ -1269,6 +1269,40 @@ TreeNode* ASTBuilder::BuildArrayLiteral() {
 //                         StructNode, StructLiteralNode, FieldLiteralNode
 //////////////////////////////////////////////////////////////////////////////////
 
+// It takes only one parameter: the data type.
+TreeNode* ASTBuilder::BuildNumIndexSig() {
+  if (mTrace)
+    std::cout << "In BuildNumIndexSig" << std::endl;
+
+  Param p_data = mParams[0];
+  MASSERT(p_data.mIsTreeNode);
+  TreeNode *data = p_data.mData.mTreeNode;
+
+  NumIndexSigNode *sig = (NumIndexSigNode*)gTreePool.NewTreeNode(sizeof(NumIndexSigNode));
+  new (sig) NumIndexSigNode();
+  sig->SetDataType(data);
+
+  mLastTreeNode = sig;
+  return mLastTreeNode;
+}
+
+// It takes only one parameter: the data type.
+TreeNode* ASTBuilder::BuildStrIndexSig() {
+  if (mTrace)
+    std::cout << "In BuildStrIndexSig" << std::endl;
+
+  Param p_data = mParams[0];
+  MASSERT(p_data.mIsTreeNode);
+  TreeNode *data = p_data.mData.mTreeNode;
+
+  StrIndexSigNode *sig = (StrIndexSigNode*)gTreePool.NewTreeNode(sizeof(StrIndexSigNode));
+  new (sig) StrIndexSigNode();
+  sig->SetDataType(data);
+
+  mLastTreeNode = sig;
+  return mLastTreeNode;
+}
+
 // It takes only one parameter: name.
 TreeNode* ASTBuilder::BuildStruct() {
   if (mTrace)
