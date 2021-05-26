@@ -45,7 +45,7 @@ ast2mpl: shared
 astopt: shared recdetect ladetect
 	$(MAKE) -C astopt
 
-ast2cpp: astopt
+ast2cpp: astopt ts2ast
 	$(MAKE) -C ast2cpp
 
 shared: autogen

@@ -30,10 +30,9 @@ OBJS :=$(foreach obj,$(OBJ), $(BUILD)/$(obj)) $(OBJG)
 DEPS :=$(foreach dep,$(DEP), $(BUILD)/$(dep)) $(DEPG)
 
 INCLUDES := -I $(MAPLEFE_ROOT)/shared/include \
-            -I $(MAPLEFE_ROOT)/ast2cpp/include \
             -I $(MAPLEFE_ROOT)/typescript/include \
             -I $(MAPLEFE_ROOT)/autogen/include \
-						-I ${BUILDDIR}/ast_gen/shared \
+	    -I ${BUILDDIR}/ast_gen/shared \
             -I $(BUILDGEN)
 
 INCLUDEGEN := -I $(BUILDGEN) -I $(MAPLEFE_ROOT)/shared/include

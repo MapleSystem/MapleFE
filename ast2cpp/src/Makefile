@@ -45,6 +45,7 @@ INCLUDEGEN := -I $(MAPLEFE_ROOT)/shared/include -I $(BUILDDIR)/gen -I $(BUILDAST
 
 TARGET=ast2cpp
 SHAREDLIB = $(BUILDASTGEN)/genast.a $(BUILDDIR)/astopt/astopt.a $(BUILDDIR)/shared/shared.a
+LANGSPEC=$(BUILDDIR)/typescript/lang_spec.o
 
 .PHONY: all
 all: $(BUILD)/$(TARGET)
@@ -77,7 +78,7 @@ $(BUILDGEN)/%.d : $(BUILDGEN)/%.cpp
 # TARGET depends on OBJS and shared OBJS from shared directory
 # as well as mapleall libraries
 $(BUILD)/$(TARGET): $(OBJS) $(SHAREDLIB)
-	$(LD) -o $(BUILD)/$(TARGET) $(OBJS) $(SHAREDLIB)
+	$(LD) -o $(BUILD)/$(TARGET) $(OBJS) $(LANGSPEC) $(SHAREDLIB)
 
 clean:
 	rm -rf $(BUILD)

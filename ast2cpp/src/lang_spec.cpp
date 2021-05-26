@@ -1,1 +1,0 @@
-../../typescript/src/lang_spec.cpp
