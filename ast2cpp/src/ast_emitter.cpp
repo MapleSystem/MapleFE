@@ -19,7 +19,7 @@ namespace maplefe {
 
 using namespace std::string_literals;
 
-static const char *GetEnumAttrId(AttrId k) {
+const char *AstEmitter::GetEnumAttrId(AttrId k) {
   switch (k) {
     case ATTR_abstract:
       return "abstract ";
@@ -462,6 +462,32 @@ std::string AstEmitter::AstEmitArrayLiteralNode(ArrayLiteralNode *node) {
     }
   }
   str += "]"s;
+  mPrecedence = '\030';
+  if (node->IsStmt())
+    str += ";\n"s;
+  return str;
+}
+
+std::string AstEmitter::AstEmitNumIndexSigNode(NumIndexSigNode *node) {
+  if (node == nullptr)
+    return std::string();
+  std::string str;
+  if (auto n = node->GetDataType()) {
+    str += " "s + AstEmitTreeNode(n);
+  }
+  mPrecedence = '\030';
+  if (node->IsStmt())
+    str += ";\n"s;
+  return str;
+}
+
+std::string AstEmitter::AstEmitStrIndexSigNode(StrIndexSigNode *node) {
+  if (node == nullptr)
+    return std::string();
+  std::string str;
+  if (auto n = node->GetDataType()) {
+    str += " "s + AstEmitTreeNode(n);
+  }
   mPrecedence = '\030';
   if (node->IsStmt())
     str += ";\n"s;

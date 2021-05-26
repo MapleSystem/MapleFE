@@ -72,6 +72,8 @@ public:
   std::string AstEmitFieldNode(FieldNode *node);
   std::string AstEmitArrayElementNode(ArrayElementNode *node);
   std::string AstEmitArrayLiteralNode(ArrayLiteralNode *node);
+  std::string AstEmitNumIndexSigNode(NumIndexSigNode *node);
+  std::string AstEmitStrIndexSigNode(StrIndexSigNode *node);
   std::string AstEmitStructNode(StructNode *node);
   std::string AstEmitFieldLiteralNode(FieldLiteralNode *node);
   std::string AstEmitStructLiteralNode(StructLiteralNode *node);
@@ -115,7 +117,7 @@ public:
   //static const char *GetEnumSepId(SepId k);
   static const char *GetEnumOprId(OprId k);
   //static const char *GetEnumLitId(LitId k);
-  //static const char *GetEnumAttrId(AttrId k);
+  static const char *GetEnumAttrId(AttrId k);
   //static const char *GetEnumImportProperty(ImportProperty k);
   //static const char *GetEnumOperatorProperty(OperatorProperty k);
   static const char *GetEnumDeclProp(DeclProp k);
