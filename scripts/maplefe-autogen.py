@@ -687,7 +687,7 @@ gen_args = [
 
 astgraph_init = [
 """
-{gen_args1}(ModuleNode *m) : mASTModule(m), mOs(nullptr) {{}}
+{gen_args1}(TreeNode *m) : mRoot(m), mOs(nullptr) {{}}
 
 #define NodeName(n,s)  ({astdumpclass}::GetEnumNodeKind((n)->GetKind()) + 3) << s << n->GetNodeId()
 #define EnumVal(t,e,m) {astdumpclass}::GetEnum##e((static_cast<t *>(n))->Get##m())
@@ -696,14 +696,8 @@ astgraph_init = [
 void {gen_args2}(const char *title, std::ostream *os) {{
   mNodes.clear();
   mOs = os;
-  auto fn = mASTModule->GetFileName();
-  if(auto p = std::strrchr(fn, '/')) fn = p + 1;
-  *mOs << "digraph AST_Module {{\\nrankdir=LR;\\nModule [label=\\"Module\\\\n" << fn << "\\\\n" << title << "\\",shape=box];\\n";
-  std::size_t idx = 1;
-  for(unsigned i = 0; i < mASTModule->GetTreesNum(); i++) {{
-    *mOs << "Module -> " << NodeName(mASTModule->GetTree(i),\'_\') << "[label=" << idx++ << "];\\n";
-    {gen_args2}TreeNode(mASTModule->GetTree(i));
-  }}
+  *mOs << "digraph AST_Module {{\\nrankdir=LR;\\n";
+  {gen_args2}TreeNode(mRoot);
   *mOs << "}}\\n";
 }}
 
@@ -712,11 +706,13 @@ bool PutNode(TreeNode *n) {{
     mNodes.insert(n);
     *mOs << NodeName(n,\'_\') << " [label=\\"" << NodeName(n,',') << "\\\\n";
     switch(n->GetKind()) {{
-      case NK_Function:    {{
-                             std::string s = n->GetName();
-                             *mOs << (n->GetStrIdx() ? s : "_anonymous_") << NodeColor(lightcoral);
-                             break;
-                           }}
+      case NK_Module:    {{
+                           auto fn = static_cast<ModuleNode *>(n)->GetFileName();
+                           if(auto p = std::strrchr(fn, '/'))
+                             fn = p + 1;
+                           *mOs << fn << "\\",shape=\\"box"; break;
+                         }}
+      case NK_Function:    *mOs << (n->GetStrIdx() ? n->GetName() : "_anonymous_") << NodeColor(lightcoral); break;
       case NK_Lambda:      *mOs << NodeColor(pink); break;
       case NK_Call:        *mOs << NodeColor(burlywood); break;
       case NK_Block:       *mOs << NodeColor(lightcyan); break;
@@ -772,7 +768,7 @@ void PutChildEdge(TreeNode *from, TreeNode *to, const char *field, unsigned idx,
 }}
 
 private:
-ModuleNode            *mASTModule;
+TreeNode             *mRoot;
 std::ostream         *mOs;
 std::set<TreeNode *>  mNodes;
 """.format(gen_args1=gen_args[1], gen_args2=gen_args[2], astdumpclass=astdumpclass)
