@@ -1,0 +1,29 @@
+Matched 5 tokens.
+Matched 10 tokens.
+Matched 15 tokens.
+Matched 18 tokens.
+Matched 21 tokens.
+Matched 67 tokens.
+============= Module ===========
+== Sub Tree ==
+js_var Decl: m=5
+== Sub Tree ==
+js_var Decl: f0=0
+== Sub Tree ==
+js_var Decl: f1=1
+== Sub Tree ==
+js_var Decl: f2
+== Sub Tree ==
+js_var Decl: i
+== Sub Tree ==
+cond-branch cond:m LE 1
+true branch :
+  return m
+false branch :
+  for ( )
+    f2 Assign f0 Add f1
+    f0 Assign f1
+    f1 Assign f2
+
+  return f2
+

@@ -17,5 +17,5 @@ FILES=`find . -name "*.ts"`
 for f in $FILES
 do
   echo "Generating result for $f ..."
-  $MAPLEFE_ROOT/output/typescript/typescript/ts2cpp $f > $f.result
+  $MAPLEFE_ROOT/output/typescript/typescript/ts2ast $f > $f.result
 done
