@@ -130,6 +130,7 @@ CondBranchNode *CfgBuilder::VisitCondBranchNode(CondBranchNode *node) {
   TreeNode *cond = node->GetCond();
   // Set predicate of current BB
   mCurrentBB->SetPredicate(cond);
+  mCurrentBB->AddStatement(cond);
 
   // Save current BB
   AST_BB *current_bb = mCurrentBB;
@@ -183,6 +184,7 @@ ForLoopNode *CfgBuilder::VisitForLoopNode(ForLoopNode *node) {
     TreeNode *cond = node->GetCond();
     // Set predicate of current BB
     mCurrentBB->SetPredicate(cond);
+    mCurrentBB->AddStatement(cond);
   } else
     // Set predicate to be current ForLoopNode when it is FLP_JSIn or FLP_JSOf
     mCurrentBB->SetPredicate(node);
@@ -227,6 +229,7 @@ WhileLoopNode *CfgBuilder::VisitWhileLoopNode(WhileLoopNode *node) {
   TreeNode *cond = node->GetCond();
   // Set predicate of current BB
   mCurrentBB->SetPredicate(cond);
+  mCurrentBB->AddStatement(cond);
 
   // Create a BB for loop body
   mCurrentBB = NewBB(BK_Uncond);
@@ -278,6 +281,7 @@ DoLoopNode *CfgBuilder::VisitDoLoopNode(DoLoopNode *node) {
   TreeNode *cond = node->GetCond();
   // Set predicate of current BB
   mCurrentBB->SetPredicate(cond);
+  mCurrentBB->AddStatement(cond);
 
   // Add a back edge to loop header
   mCurrentBB->AddSuccessor(current_bb);
@@ -333,6 +337,7 @@ SwitchNode *CfgBuilder::VisitSwitchNode(SwitchNode *node) {
     // Set the auxiliary node and predicate for current case BB
     case_bb->SetAuxNode(case_node);
     case_bb->SetPredicate(switch_expr);
+    mCurrentBB->AddStatement(switch_expr);
 
     bool is_default = false;
     TreeNode *case_expr = nullptr;
