@@ -1081,6 +1081,19 @@ public:
   void Dump(unsigned);
 };
 
+class BrNode : public TreeNode {
+private:
+  TreeNode *mCond;
+public:
+  BrNode() : TreeNode(NK_Br), mCond(NULL) {}
+  ~BrNode(){}
+
+  void SetCond(TreeNode *t) {mCond = t; if(t) t->SetParent(this);}
+
+  TreeNode* GetCond() {return mCond;}
+  void Dump(unsigned);
+};
+
 // Break statement. Break targets could be one identifier or empty.
 class BreakNode : public TreeNode {
 private:

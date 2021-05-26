@@ -868,6 +868,12 @@ void CondBranchNode::Dump(unsigned ind) {
     mFalseBranch->Dump(ind+2);
 }
 
+void BrNode::Dump(unsigned ind) {
+  DumpLabel(ind);
+  DumpIndentation(ind);
+  mCond->Dump(0);
+}
+
 void BreakNode::Dump(unsigned ind) {
   DumpLabel(ind);
   DumpIndentation(ind);

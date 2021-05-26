@@ -106,3 +106,6 @@ NODEKIND(SwitchCase)
 NODEKIND(Switch)
 
 NODEKIND(Pass)
+
+// intruduced for for CFG
+NODEKIND(Br)
