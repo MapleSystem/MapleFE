@@ -17,8 +17,8 @@
 //                This is the interface to translate AST to C++
 //////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __AST_OPT_HEADER__
-#define __AST_OPT_HEADER__
+#ifndef __ASTOPT_HEADER__
+#define __ASTOPT_HEADER__
 
 #include "ast_module.h"
 #include "ast.h"

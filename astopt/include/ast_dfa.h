@@ -28,8 +28,10 @@
 
 namespace maplefe {
 
-// Position of Definition: <stridx, nodeid, bbid>
-typedef std::tuple<unsigned, unsigned, unsigned> DefPosition;
+// Position of Def: <stridx, stmtid, nodeid, bbid>
+typedef std::tuple<unsigned, unsigned, unsigned, unsigned> DefPosition;
+// Position of Use: <stmtidx, nodeid, bbid>
+typedef std::tuple<unsigned, unsigned, unsigned> UsePosition;
 // map <bbid, BitVector>
 typedef std::unordered_map<unsigned, BitVector*> BVMap;
 
@@ -41,6 +43,7 @@ class AST_DFA {
   std::unordered_map<unsigned, TreeNode*> mNodeId2NodeMap;
   SmallVector<DefPosition> mDefPositionVec;
   unsigned mDefPositionVecSize;
+  std::unordered_map<unsigned, std::set<UsePosition>> mUsePositionMap;;
   StringPool mStringPool;
 
   // followint maps with key BB id
@@ -49,8 +52,12 @@ class AST_DFA {
   BVMap mRchInMap; // reaching definition bit vector entering bb
   BVMap mRchOutMap;
 
-  std::unordered_set<unsigned> mBbIdSet;              // bb ids in the function
+  std::vector<unsigned> mBbIdVec;                     // bb ids in the function, depth first order
   std::unordered_map<unsigned, AST_BB *> mBbId2BBMap; // bb id to bb map
+  std::unordered_set<unsigned> mDefSet;               // def stridx set
+  std::unordered_set<unsigned, std::set<UsePosition>> mDefUseMap; // def-use : key is DefPositionVec idx
+
+  friend class CollectUseVisitor;
 
  public:
   explicit AST_DFA(AST_Handler *h, bool t) : mHandler(h), mTrace(t) {}
@@ -58,12 +65,13 @@ class AST_DFA {
 
   void Build();
 
+  void CollectUseNodes();
   void CollectDefNodes();
   void BuildBitVectors();
+  void BuildDefUseChain();
 
   unsigned GetDefStrIdx(TreeNode *node);
   DefPosition *AddDef(TreeNode *node, unsigned &bitnum, unsigned bbid);
-  // unsigned GetDecl(VarNode *);
 
   unsigned GetDefPositionVecSize() { return mDefPositionVecSize; }
   void DumpDefPosition(DefPosition pos);
@@ -73,7 +81,32 @@ class AST_DFA {
   void DumpBV(BitVector *bv);
   void DumpBVMap(BVMap &bvmap);
   void DumpAllBVMaps();
+  void DumpUse();
   void TestBV();
+};
+
+class CollectUseVisitor : public AstVisitor {
+ private:
+  AST_Handler  *mHandler;
+  bool          mTrace;
+  unsigned      mStmtIdx;
+  unsigned      mStrIdx;
+  unsigned      mNodeIdx;
+  unsigned      mBbId;
+  bool          mFound;
+
+ public:
+  explicit CollectUseVisitor(AST_Handler *h, bool t, bool base = false)
+    : mHandler(h), mTrace(t), mStrIdx(0), mNodeIdx(0), mFound(false), AstVisitor(t && base) {}
+  ~CollectUseVisitor() = default;
+
+  void SetStmtIdx(unsigned id) { mStmtIdx = id; }
+  void SetStrIdx(unsigned id)  { mStrIdx  = id; }
+  void SetNodeIdx(unsigned id) { mNodeIdx = id; }
+  void SetBbId(unsigned id)    { mBbId    = id; }
+  void SetFound(bool b)        { mFound   = b; }
+
+  IdentifierNode *VisitIdentifierNode(IdentifierNode *node);
 };
 
 }

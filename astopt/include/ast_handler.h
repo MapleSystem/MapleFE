@@ -78,6 +78,12 @@ class AST_Handler {
   AST_BB *GetBbFromBbId(unsigned id) { return mBbId2BbMap[id]; }
 
   bool GetTrace() {return mTrace;}
+  AST_CFG *GetCFG() {return mCFG;}
+  AST_AST *GetAST() {return mAST;}
+  AST_DFA *GetDFA() {return mDFA;}
+  void SetCFG(AST_CFG *p) {mCFG = p;}
+  void SetAST(AST_AST *p) {mAST = p;}
+  void SetDFA(AST_DFA *p) {mDFA = p;}
 
   void Dump(char *msg);
 };

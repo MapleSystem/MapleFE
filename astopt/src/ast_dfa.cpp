@@ -25,28 +25,31 @@ namespace maplefe {
 AST_DFA::~AST_DFA() {
   mVar2DeclMap.clear();
   for (auto it: mNodeId2NodeMap) {
-    free(it.second);
+    delete it.second;
   }
   mNodeId2NodeMap.clear();
   for (auto it: mPrsvMap) {
-    free(it.second);
+    delete it.second;
   }
+  mPrsvMap.clear();
   for (auto it: mGenMap) {
-    free(it.second);
+    delete it.second;
   }
+  mGenMap.clear();
   for (auto it: mRchInMap) {
-    free(it.second);
+    delete it.second;
   }
+  mRchInMap.clear();
   for (auto it: mRchOutMap) {
-    free(it.second);
+    delete it.second;
   }
-  mBbIdSet.clear();
+  mBbIdVec.clear();
 }
 
 void AST_DFA::TestBV() {
   unsigned size = 300;
   BitVector *bv1 = new BitVector(size);
-  bv1->WipeOff(0xab);                // init with all 1
+  bv1->WipeOff(0xab);
 
   BitVector *bv2 = new BitVector(size);
   bv2->WipeOff(0x12);
@@ -68,12 +71,15 @@ void AST_DFA::Build() {
   // TestBV();
   CollectDefNodes();
   BuildBitVectors();
+  CollectUseNodes();
+  DumpUse();
 }
 
 void AST_DFA::DumpDefPosition(DefPosition pos) {
   std::cout << "stridx: " << std::get<0>(pos) << " " << gStringPool.GetStringFromStrIdx(std::get<0>(pos)) << std::endl;
-  std::cout << "nodeid: " << std::get<1>(pos) << std::endl;
-  std::cout << "  bbid: " << std::get<2>(pos) << std::endl;
+  std::cout << "stmtid: " << std::get<1>(pos) << std::endl;
+  std::cout << "nodeid: " << std::get<2>(pos) << std::endl;
+  std::cout << "  bbid: " << std::get<3>(pos) << std::endl;
   std::cout << std::endl;
 }
 
@@ -146,9 +152,10 @@ DefPosition *AST_DFA::AddDef(TreeNode *node, unsigned &bitnum, unsigned bbid) {
   // update mDefPositionVec
   if (stridx) {
     if (bbid != 0xffffffff) {
-      DefPosition pos(stridx, nodeid, bbid);
+      DefPosition pos(stridx, node->GetNodeId(), nodeid, bbid);
       bitnum++;
       mDefPositionVec.PushBack(pos);
+      mDefSet.insert(stridx);
       return &pos;
     } else {
       // special usage for GetDefStrIdx(): use bitnum as a return value
@@ -159,39 +166,45 @@ DefPosition *AST_DFA::AddDef(TreeNode *node, unsigned &bitnum, unsigned bbid) {
   return NULL;
 }
 
-// this calcuates mDefPositionVec mDefPositionVecSize mBbIdSet
+// this calcuates mDefPositionVec mDefPositionVecSize mBbIdVec
 void AST_DFA::CollectDefNodes() {
   if (mTrace) std::cout << "============== CollectDefNodes ==============" << std::endl;
   AST_Function *func = mHandler->GetFunction();
   MASSERT(func && "null func");
+  std::unordered_set<unsigned> done_list;
   std::deque<AST_BB *> working_list;
 
-  working_list.push_back(func->GetEntryBB());
+  AST_BB *bb = func->GetEntryBB();
+  MASSERT(bb && "null BB");
+  unsigned bbid = bb->GetId();
+
+  working_list.push_back(bb);
 
   unsigned bitnum = 0;
 
   while(working_list.size()) {
-    AST_BB *bb = working_list.front();
+    bb = working_list.front();
     MASSERT(bb && "null BB");
-    unsigned bbid = bb->GetId();
+    bbid = bb->GetId();
 
-    // skip bb already visited
-    if (mBbIdSet.find(bbid) != mBbIdSet.end()) {
-      working_list.pop_front();
-      continue;
+    // process bb not visited
+    if (done_list.find(bbid) == done_list.end()) {
+      std::cout << "working_list work " << bbid << std::endl;
+      for (int i = 0; i < bb->GetStatementsNum(); i++) {
+        TreeNode *node = bb->GetStatementAtIndex(i);
+        mNodeId2NodeMap[node->GetNodeId()] = node;
+        AddDef(node, bitnum, bbid);
+      }
+
+      for (int i = 0; i < bb->GetSuccessorsNum(); i++) {
+        working_list.push_back(bb->GetSuccessorAtIndex(i));
+      }
+
+      done_list.insert(bbid);
+      mBbIdVec.push_back(bbid);
+      mBbId2BBMap[bbid] = bb;
     }
 
-    for (int i = 0; i < bb->GetSuccessorsNum(); i++) {
-      working_list.push_back(bb->GetSuccessorAtIndex(i));
-    }
-
-    for (int i = 0; i < bb->GetStatementsNum(); i++) {
-      TreeNode *node = bb->GetStatementAtIndex(i);
-      mNodeId2NodeMap[node->GetNodeId()] = node;
-      AddDef(node, bitnum, bbid);
-    }
-
-    mBbIdSet.insert(bbid);
     working_list.pop_front();
   }
 
@@ -208,7 +221,7 @@ void AST_DFA::BuildBitVectors() {
   std::deque<AST_BB *> working_list;
 
   // init bit vectors
-  for (auto bbid: mBbIdSet) {
+  for (auto bbid: mBbIdVec) {
     BitVector *bv1 = new BitVector(mDefPositionVecSize);
     bv1->WipeOff(0xff);                // init with all 1
     mPrsvMap[bbid] = bv1;
@@ -263,7 +276,7 @@ void AST_DFA::BuildBitVectors() {
   }
 
   // mRchInMap
-  for (auto bbid: mBbIdSet) {
+  for (auto bbid: mBbIdVec) {
     BitVector *bv = new BitVector(mDefPositionVecSize);
     bv->Alloc(mDefPositionVecSize);
     bv->WipeOff(0);
@@ -291,8 +304,8 @@ void AST_DFA::BuildBitVectors() {
       AST_BB *pred = bb->GetPredecessorAtIndex(i);
       unsigned pid = pred->GetId();
       tmp_bv->WipeOff(0);
-      tmp_bv->Or(mRchInMap[pid]); 
-      tmp_bv->And(mPrsvMap[pid]); 
+      tmp_bv->Or(mRchInMap[pid]);
+      tmp_bv->And(mPrsvMap[pid]);
       tmp_bv->Or(mGenMap[pid]);
       mRchInMap[bbid]->Or(tmp_bv);
     }
@@ -307,7 +320,7 @@ void AST_DFA::BuildBitVectors() {
 
   bool buildOutMap = false;
   if (buildOutMap) {
-    for (auto bbid: mBbIdSet) {
+    for (auto bbid: mBbIdVec) {
       BitVector *bv = new BitVector(mDefPositionVecSize);
       bv->Alloc(mDefPositionVecSize);
       bv->WipeOff(0);
@@ -315,8 +328,8 @@ void AST_DFA::BuildBitVectors() {
     }
   }
 
-  free(old_bv);
-  free(tmp_bv);
+  delete old_bv;
+  delete tmp_bv;
   if (mTrace) DumpAllBVMaps();
 }
 
@@ -331,7 +344,7 @@ void AST_DFA::DumpAllBVMaps() {
 
 void AST_DFA::DumpBVMap(BVMap &map) {
   if (!map.size()) { return; }
-  std::set<unsigned> ordered(mBbIdSet.begin(), mBbIdSet.end());
+  std::set<unsigned> ordered(mBbIdVec.begin(), mBbIdVec.end());
   for (auto bbid: ordered) {
     std::cout << "BB" << bbid << " : ";
     DumpBV(map[bbid]);
@@ -351,4 +364,43 @@ void AST_DFA::DumpBV(BitVector *bv) {
   }
   std::cout << std::endl;
 }
+
+void AST_DFA::DumpUse() {
+  for (auto stridx: mDefSet) {
+    std::cout << "stridx: " << stridx << " " << gStringPool.GetStringFromStrIdx(stridx) << std::endl;
+    for (auto pos: mUsePositionMap[stridx]) {
+      std::cout << "stmtid: " << std::get<0>(pos) << "\t";
+      std::cout << "nodeid: " << std::get<1>(pos) << "\t";
+      std::cout << "  bbid: " << std::get<2>(pos) << "\t";
+      std::cout << std::endl;
+    }
+    std::cout << std::endl;
+  }
+}
+
+void AST_DFA::CollectUseNodes() {
+  if (mTrace) std::cout << "============== CollectUseNodes ==============" << std::endl;
+  CollectUseVisitor visitor(mHandler, mTrace, true);
+  for (auto bbid: mBbIdVec) {
+    visitor.SetBbId(bbid);
+    std::cout << " == CollectUseNodes: bbid " << bbid << std::endl;
+    AST_BB *bb = mBbId2BBMap[bbid];
+    for (int i = 0; i < bb->GetStatementsNum(); i++) {
+      TreeNode *node = bb->GetStatementAtIndex(i);
+      visitor.SetStmtIdx(node->GetNodeId());
+      visitor.Visit(node);
+    }
+  }
+}
+
+void AST_DFA::BuildDefUseChain() {
+}
+
+IdentifierNode *CollectUseVisitor::VisitIdentifierNode(IdentifierNode *node) {
+  unsigned stridx = node->GetStrIdx();
+  UsePosition pos(mStmtIdx, node->GetNodeId(), mBbId);
+  mHandler->GetDFA()->mUsePositionMap[stridx].insert(pos);
+  return node;
+}
+
 }

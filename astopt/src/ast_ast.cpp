@@ -104,6 +104,8 @@ void AST_AST::AdjustAST() {
   }
 }
 
+// move init from identifier to decl
+// copy stridx to decl
 DeclNode *AdjustASTVisitor::VisitDeclNode(DeclNode *node) {
   TreeNode *var = node->GetVar();
 
@@ -112,13 +114,14 @@ DeclNode *AdjustASTVisitor::VisitDeclNode(DeclNode *node) {
 
   IdentifierNode *inode = static_cast<IdentifierNode *>(var);
 
-  // copy StrIdx from Identifier to Decl
-  if (inode->GetStrIdx()) {
-    node->SetStrIdx(inode->GetStrIdx());
+  // copy stridx from Identifier to Decl
+  unsigned stridx = inode->GetStrIdx();
+  if (stridx) {
+    node->SetStrIdx(stridx);
     mUpdated = true;
   }
 
-  // move Init from Identifier to Decl
+  // move init from Identifier to Decl
   TreeNode *init = inode->GetInit();
   if (init) {
     node->SetInit(init);
