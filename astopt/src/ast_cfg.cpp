@@ -124,7 +124,8 @@ ReturnNode *CfgBuilder::VisitReturnNode(ReturnNode *node) {
 // For control flow
 CondBranchNode *CfgBuilder::VisitCondBranchNode(CondBranchNode *node) {
   mCurrentBB->SetKind(BK_Branch);
-  mCurrentBB->AddStatement(node);
+  //mCurrentBB->AddStatement(node);
+  mCurrentBB->SetAuxNode(node);
 
   TreeNode *cond = node->GetCond();
   // Set predicate of current BB
@@ -172,7 +173,7 @@ ForLoopNode *CfgBuilder::VisitForLoopNode(ForLoopNode *node) {
   mCurrentBB = NewBB(BK_LoopHeader);
 
   // Add current node to the loop header BB
-  mCurrentBB->AddStatement(node);
+  //mCurrentBB->AddStatement(node);
   mCurrentBB->SetAuxNode(node);
   current_bb->AddSuccessor(mCurrentBB);
   // Set current_bb to be loop header
@@ -217,7 +218,7 @@ WhileLoopNode *CfgBuilder::VisitWhileLoopNode(WhileLoopNode *node) {
   // Create a new BB for loop header
   mCurrentBB = NewBB(BK_LoopHeader);
   // Add current node to the loop header BB
-  mCurrentBB->AddStatement(node);
+  //mCurrentBB->AddStatement(node);
   mCurrentBB->SetAuxNode(node);
   current_bb->AddSuccessor(mCurrentBB);
   // Set current_bb to be loop header
@@ -254,7 +255,7 @@ DoLoopNode *CfgBuilder::VisitDoLoopNode(DoLoopNode *node) {
   // Create a new BB for loop header
   mCurrentBB = NewBB(BK_LoopHeader);
   // Add current node to the loop header BB
-  mCurrentBB->AddStatement(node);
+  //mCurrentBB->AddStatement(node);
   mCurrentBB->SetAuxNode(node);
   current_bb->AddSuccessor(mCurrentBB);
   // Set current_bb to be loop header
@@ -385,9 +386,11 @@ SwitchNode *CfgBuilder::VisitSwitchNode(SwitchNode *node) {
 // For control flow
 TryNode *CfgBuilder::VisitTryNode(TryNode *node) {
   mCurrentBB->SetKind(BK_Try);
-  mCurrentBB->AddStatement(node);
+  //mCurrentBB->AddStatement(node);
+  mCurrentBB->SetAuxNode(node);
+
   auto try_block_node = node->GetBlock();
-  mCurrentBB->AddStatement(try_block_node);
+  //mCurrentBB->AddStatement(try_block_node);
 
   unsigned num = node->GetCatchesNum();
   AST_BB *catch_bb = num ? NewBB(BK_Catch) : nullptr;
@@ -395,7 +398,6 @@ TryNode *CfgBuilder::VisitTryNode(TryNode *node) {
   auto finally_node = node->GetFinally();
   // Create a BB for the join point
   AST_BB *join = finally_node ? NewBB(BK_Finally) : NewBB(BK_Join);
-
 
   // Save current BB
   AST_BB *current_bb = mCurrentBB;
@@ -440,7 +442,8 @@ TryNode *CfgBuilder::VisitTryNode(TryNode *node) {
   mCurrentBB = join;
   if(finally_node) {
     // For finally block
-    mCurrentBB->AddStatement(finally_node);
+    //mCurrentBB->AddStatement(finally_node);
+    mCurrentBB->SetAuxNode(finally_node);
     AstVisitor::VisitTreeNode(finally_node);
     curr_bb = NewBB(BK_Join);
     mCurrentBB->AddSuccessor(curr_bb);
@@ -465,7 +468,8 @@ ThrowNode *CfgBuilder::VisitThrowNode(ThrowNode *node) {
 
 // For control flow
 BlockNode *CfgBuilder::VisitBlockNode(BlockNode *node) {
-  mCurrentBB->AddStatement(node);
+  //mCurrentBB->AddStatement(node);
+  mCurrentBB->SetAuxNode(node);
   // Check if current block constains any JS_Let or JS_Const DeclNode
   unsigned i, num = node->GetChildrenNum();
   for (i = 0; i < num; ++i) {
