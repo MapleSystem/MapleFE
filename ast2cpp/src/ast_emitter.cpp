@@ -19,6 +19,44 @@ namespace maplefe {
 
 using namespace std::string_literals;
 
+static const char *GetEnumAttrId(AttrId k) {
+  switch (k) {
+    case ATTR_abstract:
+      return "abstract ";
+    case ATTR_const:
+      return "const ";
+    case ATTR_volatile:
+      return "volatile ";
+    case ATTR_final:
+      return "final ";
+    case ATTR_native:
+      return "native ";
+    case ATTR_private:
+      return "private ";
+    case ATTR_protected:
+      return "protected ";
+    case ATTR_public:
+      return "public ";
+    case ATTR_static:
+      return "static ";
+    case ATTR_strictfp:
+      return "strictfp ";
+    case ATTR_default:
+      return "default ";
+    case ATTR_synchronized:
+      return "synchronized ";
+    case ATTR_getter:
+      return "get ";
+    case ATTR_setter:
+      return "set ";
+    case ATTR_NA:
+      return "ATTR_NA ";
+    default:
+      MASSERT(0 && "Unexpected enumerator");
+  }
+  return "UNEXPECTED AttrId";
+}
+
 std::string AstEmitter::AstEmitAnnotationNode(AnnotationNode *node) {
   if (node == nullptr)
     return std::string();
@@ -297,11 +335,11 @@ std::string AstEmitter::AstEmitDimensionNode(DimensionNode *node) {
 std::string AstEmitter::AstEmitIdentifierNode(IdentifierNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str(node->GetName());
-
-  //for (unsigned i = 0; i < node->GetAttrsNum(); ++i) {
-  //  str += " "s + AstDump::GetEnumAttrId(node->GetAttrAtIndex(i));
-  //}
+  std::string str;
+  for (unsigned i = 0; i < node->GetAttrsNum(); ++i) {
+    str += GetEnumAttrId(node->GetAttrAtIndex(i));
+  }
+  str += node->GetName();
   //if (auto n = node->GetDims()) {
   //  str += " "s + AstEmitDimensionNode(n);
   //}
@@ -465,12 +503,17 @@ std::string AstEmitter::AstEmitFieldLiteralNode(FieldLiteralNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
-  if (auto n = node->GetFieldName()) {
-    str = AstEmitIdentifierNode(n);
-  }
-  str += ": "s;
-  if (auto n = node->GetLiteral()) {
-    str += AstEmitTreeNode(n);
+  auto lit = node->GetLiteral();
+  if(lit && lit->GetKind() == NK_Function) {
+    str = AstEmitTreeNode(lit);
+  } else {
+    if (auto n = node->GetFieldName()) {
+      str = AstEmitIdentifierNode(n);
+    }
+    str += ": "s;
+    if(lit) {
+      str += AstEmitTreeNode(lit);
+    }
   }
   mPrecedence = '\030';
   return str;
@@ -876,16 +919,17 @@ std::string AstEmitter::AstEmitCallNode(CallNode *node) {
 std::string AstEmitter::AstEmitFunctionNode(FunctionNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str = "function "s;
+  std::string str;
+  for (unsigned i = 0; i < node->GetAttrsNum(); ++i) {
+    str += GetEnumAttrId(node->GetAttrAtIndex(i));
+  }
+  if(str.empty())
+    str = "function "s + str;
 
   if(node->GetStrIdx())
     str += node->GetName();
 
   /*
-  for (unsigned i = 0; i < node->GetAttrsNum(); ++i) {
-    str += " "s + AstDump::GetEnumAttrId(node->GetAttrAtIndex(i));
-  }
-
   for (unsigned i = 0; i < node->GetAnnotationsNum(); ++i) {
     if (auto n = node->GetAnnotationAtIndex(i)) {
       str += " "s + AstEmitAnnotationNode(n);
