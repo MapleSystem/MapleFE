@@ -15,6 +15,7 @@
 
 #include <stack>
 #include <set>
+#include <queue>
 #include <cstring>
 #include "ast_cfg.h"
 #include "ast_dfa.h"
@@ -23,11 +24,41 @@
 
 namespace maplefe {
 
+class CollectNestedFuncs : public AstVisitor {
+  private:
+    CfgBuilder   *mBuilder;
+    AST_Function *mFunc;
+
+  public:
+    CollectNestedFuncs(CfgBuilder *b, AST_Function *f) : mBuilder(b), mFunc(f) {}
+
+    FunctionNode *VisitFunctionNode(FunctionNode *node) {
+      if(TreeNode *body = node->GetBody())
+        HandleNestedFunction(node, body);
+      return node;
+    }
+
+    LambdaNode *VisitLambdaNode(LambdaNode *node) {
+      if(TreeNode *body = node->GetBody())
+        HandleNestedFunction(node, body);
+      return node;
+    }
+
+    void HandleNestedFunction(TreeNode *func, TreeNode *body) {
+        AST_Function *current = mFunc;
+        mFunc = mBuilder->NewFunction(func);
+        current->AddNestedFunction(mFunc);
+        AstVisitor::VisitTreeNode(body);
+        mFunc = current;
+    }
+};
 
 // Create AST_Function nodes for a module
 AST_Function *CfgBuilder::InitAstFunctions(ModuleNode *module) {
-
-  return NewFunction(module);
+  AST_Function *module_func = NewFunction(module);
+  CollectNestedFuncs collector(this, module_func);
+  collector.Visit(module);
+  return module_func;
 }
 
 // Initialize a AST_Function node
@@ -83,31 +114,13 @@ void CfgBuilder::Pop(TargetBBStack &stack) {
 
 // Handle a function
 FunctionNode *CfgBuilder::VisitFunctionNode(FunctionNode *node) {
-  if(mTrace) std::cout << "CfgBuilder: enter function " << node->GetName() << " : FunctionNode, id=" << node->GetNodeId() << std::endl;
-
-  // Save both mCurrentFunction and mCurrentBB
-  AST_Function *current_func = mCurrentFunction;
-  AST_BB *current_bb = mCurrentBB;
-
-  // Create a new function and add it as a nested function to current function
-  mCurrentFunction = NewFunction(node);
-  current_func->AddNestedFunction(mCurrentFunction);
-
-  InitializeFunction(mCurrentFunction);
-  // Visit function body
-  AstVisitor::VisitTreeNode(node->GetBody());
-  FinalizeFunction();
-
-  // Restore both mCurrentFunction and mCurrentBB
-  mCurrentFunction = current_func;
-  mCurrentBB = current_bb;
-
-  if(mTrace) std::cout << "CfgBuilder: exit function " << node->GetName() << " : FunctionNode, id=" << node->GetNodeId() << std::endl;
+  mCurrentBB->AddStatement(node);
   return node;
 }
 
 // Handle a lambda
 LambdaNode *CfgBuilder::VisitLambdaNode(LambdaNode *node) {
+  mCurrentBB->AddStatement(node);
   return node;
 }
 
@@ -777,12 +790,28 @@ void AST_CFG::Build() {
 
   mHandler->SetFunction(func);
 
-  // Start to build CFG for current module
-  builder.InitializeFunction(func);
-  for(unsigned i = 0; i < mHandler->GetASTModule()->GetTreesNum(); i++) {
-    builder.Visit(mHandler->GetASTModule()->GetTree(i));
+  std::queue<AST_Function*> funcQueue;
+  funcQueue.push(func);
+  while(!funcQueue.empty()) {
+    func = funcQueue.front();
+    funcQueue.pop();
+    // Start to build CFG for current function
+    builder.InitializeFunction(func);
+    TreeNode *node = func->GetFunction();
+    switch(node->GetKind()) {
+      case NK_Function:
+        builder.Visit(static_cast<FunctionNode*>(node)->GetBody());;
+        break;
+      case NK_Lambda:
+        builder.Visit(static_cast<LambdaNode*>(node)->GetBody());;
+        break;
+      default:
+        builder.Visit(node);
+    }
+    builder.FinalizeFunction();
+    for(unsigned i = 0; i < func->GetNestedFunctionsNum(); ++i)
+      funcQueue.push(func->GetNestedFunctionAtIndex(i));
   }
-  builder.FinalizeFunction();
 }
 
 }
