@@ -696,6 +696,7 @@ astgraph_init = [
 void {gen_args2}(const char *title, std::ostream *os) {{
   mNodes.clear();
   mOs = os;
+  mTitle = title;
   *mOs << "digraph AST_Module {{\\nrankdir=LR;\\n";
   {gen_args2}TreeNode(mRoot);
   *mOs << "}}\\n";
@@ -710,7 +711,7 @@ bool PutNode(TreeNode *n) {{
                            auto fn = static_cast<ModuleNode *>(n)->GetFileName();
                            if(auto p = std::strrchr(fn, '/'))
                              fn = p + 1;
-                           *mOs << fn << "\\",shape=\\"box"; break;
+                           *mOs << fn << "\\\\n" << mTitle << "\\",shape=\\"box"; break;
                          }}
       case NK_Function:    *mOs << (n->GetStrIdx() ? n->GetName() : "_anonymous_") << NodeColor(lightcoral); break;
       case NK_Lambda:      *mOs << NodeColor(pink); break;
@@ -771,6 +772,7 @@ private:
 TreeNode             *mRoot;
 std::ostream         *mOs;
 std::set<TreeNode *>  mNodes;
+const char           *mTitle;
 """.format(gen_args1=gen_args[1], gen_args2=gen_args[2], astdumpclass=astdumpclass)
 ] # astgraph_init
 
