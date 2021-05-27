@@ -158,6 +158,9 @@ static void add_type_to(TreeNode *tree, TreeNode *type) {
   if (tree->IsIdentifier()) {
     IdentifierNode *in = (IdentifierNode*)tree;
     in->SetType(type);
+  } else if (tree->IsLiteral()) {
+    LiteralNode *lit = (LiteralNode*)tree;
+    lit->SetType(type);
   } else if (tree->IsLambda()) {
     LambdaNode *lam = (LambdaNode*)tree;
     lam->SetType(type);
@@ -2004,7 +2007,8 @@ void ASTBuilder::AddParams(TreeNode *func, TreeNode *decl_params) {
   if (decl_params->IsDecl()) {
     DeclNode *decl = (DeclNode*)decl_params;
     TreeNode *params = decl->GetVar();
-    if (params->IsIdentifier()) {
+    // a param could be a 'this' literal
+    if (params->IsIdentifier() || params->IsLiteral()) {
       // one single parameter at call site
       if (func->IsFunction())
         ((FunctionNode*)func)->AddParam(params);

@@ -1534,9 +1534,11 @@ rule RequiredParameterList: ONEOF(RequiredParameter,
 ## NOTE: I Added initializer. I guess the spec missed this part.
 rule RequiredParameter: ONEOF(
   ZEROORONE(AccessibilityModifier) + BindingIdentifierOrPattern + ZEROORONE(Initializer) + ZEROORONE(TypeAnnotation),
+  "this" + TypeAnnotation,
   BindingIdentifier + ':' + Literal)
   attr.action.%1 : AddInitTo(%2, %3)
   attr.action.%1 : BuildDecl(%4, %2)
+  attr.action.%2 : BuildDecl(%2, %1)
 
 ## rule AccessibilityModifier: public private protected
 rule AccessibilityModifier: ONEOF("public", "private", "protected")
