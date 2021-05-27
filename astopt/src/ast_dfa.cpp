@@ -73,13 +73,18 @@ void AST_DFA::Build() {
   BuildBitVectors();
   CollectUseNodes();
   DumpUse();
+  BuildDefUseChain();
 }
 
 void AST_DFA::DumpDefPosition(DefPosition pos) {
-  std::cout << "stridx: " << std::get<0>(pos) << " " << gStringPool.GetStringFromStrIdx(std::get<0>(pos)) << std::endl;
-  std::cout << "stmtid: " << std::get<1>(pos) << std::endl;
-  std::cout << "nodeid: " << std::get<2>(pos) << std::endl;
-  std::cout << "  bbid: " << std::get<3>(pos) << std::endl;
+  unsigned stridx = pos.first;
+  std::cout << "stridx: " << stridx << " " << gStringPool.GetStringFromStrIdx(stridx) << std::endl;
+  unsigned nid = pos.second;
+  std::cout << "nodeid: " << nid << "\t";
+  unsigned sid = GetStmtIdFromNodeId(nid);
+  std::cout << "stmtid: " << sid << "\t";
+  unsigned bbid = GetBbIdFromStmtId(sid);
+  std::cout << "  bbid: " << bbid << "\t";
   std::cout << std::endl;
 }
 
@@ -158,10 +163,10 @@ DefPosition *AST_DFA::AddDef(TreeNode *node, unsigned &bitnum, unsigned bbid) {
       // special usage for GetDefStrIdx(): use bitnum to return stridx
       bitnum = stridx;
     } else {
-      DefPosition pos(stridx, node->GetNodeId(), nodeid, bbid);
+      DefPosition pos(stridx, nodeid);
       bitnum++;
       mDefPositionVec.PushBack(pos);
-      mDefSet.insert(stridx);
+      mDefStrIdxSet.insert(stridx);
       return &pos;
     }
   }
@@ -194,11 +199,17 @@ void AST_DFA::CollectDefNodes() {
     if (done_list.find(bbid) == done_list.end()) {
       std::cout << "working_list work " << bbid << std::endl;
       for (int i = 0; i < bb->GetStatementsNum(); i++) {
-        TreeNode *node = bb->GetStatementAtIndex(i);
-        unsigned nid = node->GetNodeId();
-        mStmtIdVec.PushBack(nid);
-        mStmtId2StmtMap[nid] = node;
-        (void) AddDef(node, bitnum, bbid);
+        TreeNode *stmt = bb->GetStatementAtIndex(i);
+        unsigned sid = stmt->GetNodeId();
+        mStmtIdVec.PushBack(sid);
+        mStmtId2StmtMap[sid] = stmt;
+        mStmtId2BbIdMap[sid] = bbid;
+        DefPosition *pos = AddDef(stmt, bitnum, bbid);
+        if (pos) {
+          unsigned nid = pos->second;
+          mDefVec.insert(nid);
+          mNodeId2StmtIdMap[nid] = sid;
+        }
       }
 
       for (int i = 0; i < bb->GetSuccessorsNum(); i++) {
@@ -261,7 +272,7 @@ void AST_DFA::BuildBitVectors() {
         // mPrsvMap
         for (int i = 0; i < mDefPositionVec.GetNum(); i++) {
           // clear bits for matching stridx
-          if (std::get<0>(mDefPositionVec.ValueAtIndex(i)) == stridx) {
+          if (mDefPositionVec.ValueAtIndex(i).first == stridx) {
             mPrsvMap[bbid]->ClearBit(i);
           }
         }
@@ -269,7 +280,10 @@ void AST_DFA::BuildBitVectors() {
         // mGenMap
         for (int i = 0; i < mDefPositionVec.GetNum(); i++) {
           // set bits for matching bbid
-          if (std::get<3>(mDefPositionVec.ValueAtIndex(i)) == bbid) {
+          unsigned nid = mDefPositionVec.ValueAtIndex(i).second;
+          unsigned sid = GetStmtIdFromNodeId(nid);
+          unsigned bid = GetBbIdFromStmtId(sid);
+          if (bid == bbid) {
             mGenMap[bbid]->SetBit(i);
           }
         }
@@ -371,12 +385,15 @@ void AST_DFA::DumpBV(BitVector *bv) {
 }
 
 void AST_DFA::DumpUse() {
-  for (auto stridx: mDefSet) {
+  if (mTrace) std::cout << "============== Dump Use ==============" << std::endl;
+  for (auto stridx: mDefStrIdxSet) {
     std::cout << "stridx: " << stridx << " " << gStringPool.GetStringFromStrIdx(stridx) << std::endl;
-    for (auto pos: mUsePositionMap[stridx]) {
-      std::cout << "stmtid: " << std::get<0>(pos) << "\t";
-      std::cout << "nodeid: " << std::get<1>(pos) << "\t";
-      std::cout << "  bbid: " << std::get<2>(pos) << "\t";
+    for (auto nid: mUsePositionMap[stridx]) {
+      std::cout << "nodeid: " << nid << "\t";
+      unsigned sid = GetStmtIdFromNodeId(nid);
+      std::cout << "stmtid: " << sid << "\t";
+      unsigned bbid = GetBbIdFromStmtId(sid);
+      std::cout << "  bbid: " << bbid << "\t";
       std::cout << std::endl;
     }
     std::cout << std::endl;
@@ -399,12 +416,20 @@ void AST_DFA::CollectUseNodes() {
 }
 
 void AST_DFA::BuildDefUseChain() {
+  for (int i = 0; i < mDefPositionVec.GetNum(); i++) {
+    DefPosition pos = mDefPositionVec.ValueAtIndex(i);
+  }
 }
 
 IdentifierNode *CollectUseVisitor::VisitIdentifierNode(IdentifierNode *node) {
-  unsigned stridx = node->GetStrIdx();
-  UsePosition pos(mStmtIdx, node->GetNodeId(), mBbId);
-  mHandler->GetDFA()->mUsePositionMap[stridx].insert(pos);
+  unsigned nid = node->GetNodeId();
+  // exclude def
+  MASSERT(node->GetParent() && "null node->GetParent()");
+  if (!mHandler->GetDFA()->IsDef(nid) && !node->GetParent()->IsDecl()) {
+    unsigned stridx = node->GetStrIdx();
+    mHandler->GetDFA()->mUsePositionMap[stridx].insert(nid);
+    mHandler->GetDFA()->mNodeId2StmtIdMap[nid] = mStmtIdx;
+  }
   return node;
 }
 
