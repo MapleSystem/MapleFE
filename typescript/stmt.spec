@@ -778,9 +778,9 @@ rule BindingPattern : ONEOF(ObjectBindingPattern)
 ##  { }
 ##  { BindingPropertyList[?Yield] }
 ##  { BindingPropertyList[?Yield] , }
-rule ObjectBindingPattern : ONEOF('{' + '}')
-#                                   '{' + BindingPropertyList + '}',
-#                                   '{' + BindingPropertyList + ',' + '}')
+rule ObjectBindingPattern : ONEOF('{' + '}',
+                                  '{' + BindingPropertyList + '}',
+                                  '{' + BindingPropertyList + ',' + '}')
 
 ##-----------------------------------
 ##rule ArrayBindingPattern[Yield] :
@@ -792,6 +792,8 @@ rule ObjectBindingPattern : ONEOF('{' + '}')
 ##rule BindingPropertyList[Yield] :
 ##  BindingProperty[?Yield]
 ##  BindingPropertyList[?Yield] , BindingProperty[?Yield]
+rule BindingPropertyList : ONEOF(BindingProperty,
+                                 BindingPropertyList + ',' + BindingProperty)
 
 ##-----------------------------------
 ##rule BindingElementList[Yield] :
@@ -806,6 +808,8 @@ rule ObjectBindingPattern : ONEOF('{' + '}')
 ##rule BindingProperty[Yield] :
 ##  SingleNameBinding[?Yield]
 ##  PropertyName[?Yield] : BindingElement[?Yield]
+rule BindingProperty : ONEOF(SingleNameBinding,
+                             PropertyName + ':' + BindingElement)
 
 ##-----------------------------------
 ##rule BindingElement[Yield] :
