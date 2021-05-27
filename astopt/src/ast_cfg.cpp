@@ -27,46 +27,46 @@ namespace maplefe {
 class CollectNestedFuncs : public AstVisitor {
   private:
     CfgBuilder   *mBuilder;
-    AST_Function *mFunc;
+    AstFunction *mFunc;
 
   public:
-    CollectNestedFuncs(CfgBuilder *b, AST_Function *f) : mBuilder(b), mFunc(f) {}
+    CollectNestedFuncs(CfgBuilder *b, AstFunction *f) : mBuilder(b), mFunc(f) {}
 
     FunctionNode *VisitFunctionNode(FunctionNode *node) {
       if(TreeNode *body = node->GetBody())
-        HandleNestedFunction(node, body);
+        HandleNestedFunc(node, body);
       return node;
     }
 
     LambdaNode *VisitLambdaNode(LambdaNode *node) {
       if(TreeNode *body = node->GetBody())
-        HandleNestedFunction(node, body);
+        HandleNestedFunc(node, body);
       return node;
     }
 
-    void HandleNestedFunction(TreeNode *func, TreeNode *body) {
-        AST_Function *current = mFunc;
+    void HandleNestedFunc(TreeNode *func, TreeNode *body) {
+        AstFunction *current = mFunc;
         mFunc = mBuilder->NewFunction(func);
-        current->AddNestedFunction(mFunc);
+        current->AddNestedFunc(mFunc);
         AstVisitor::VisitTreeNode(body);
         mFunc = current;
     }
 };
 
-// Create AST_Function nodes for a module
-AST_Function *CfgBuilder::InitAstFunctions(ModuleNode *module) {
-  AST_Function *module_func = NewFunction(module);
+// Create AstFunction nodes for a module
+AstFunction *CfgBuilder::InitAstFunctions(ModuleNode *module) {
+  AstFunction *module_func = NewFunction(module);
   CollectNestedFuncs collector(this, module_func);
   collector.Visit(module);
   return module_func;
 }
 
-// Initialize a AST_Function node
-void CfgBuilder::InitializeFunction(AST_Function *func) {
+// Initialize a AstFunction node
+void CfgBuilder::InitializeFunction(AstFunction *func) {
   // Create the entry BB and exit BB of current function
-  AST_BB *entry = NewBB(BK_Uncond);
+  AstBasicBlock *entry = NewBB(BK_Uncond);
   func->SetEntryBB(entry);
-  AST_BB *exit = NewBB(BK_Join);
+  AstBasicBlock *exit = NewBB(BK_Join);
   func->SetExitBB(exit);
   CfgBuilder::Push(mThrowBBs, exit, nullptr);
   // Initialize the working function and BB
@@ -75,18 +75,18 @@ void CfgBuilder::InitializeFunction(AST_Function *func) {
   entry->AddSuccessor(mCurrentBB);
 }
 
-// Finalize a AST_Function node
+// Finalize a AstFunction node
 void CfgBuilder::FinalizeFunction() {
   CfgBuilder::Pop(mThrowBBs);
-  AST_BB *exit = mCurrentFunction->GetExitBB();
+  AstBasicBlock *exit = mCurrentFunction->GetExitBB();
   mCurrentBB->AddSuccessor(exit);
-  mCurrentFunction->SetLastBBId(AST_BB::GetLastId());
+  mCurrentFunction->SetLastBBId(AstBasicBlock::GetLastId());
   mCurrentFunction = nullptr;
   mCurrentBB = nullptr;
 }
 
 // Push a BB to target BB stack
-void CfgBuilder::Push(TargetBBStack &stack, AST_BB* bb, TreeNode *label) {
+void CfgBuilder::Push(TargetBBStack &stack, AstBasicBlock* bb, TreeNode *label) {
   unsigned idx = 0;
   if(label && label->GetKind() == NK_Identifier)
     idx = static_cast<IdentifierNode *>(label)->GetStrIdx();
@@ -94,7 +94,7 @@ void CfgBuilder::Push(TargetBBStack &stack, AST_BB* bb, TreeNode *label) {
 }
 
 // Look up a target BB
-AST_BB *CfgBuilder::LookUp(TargetBBStack &stack, TreeNode *label) {
+AstBasicBlock *CfgBuilder::LookUp(TargetBBStack &stack, TreeNode *label) {
   unsigned idx = 0;
   if(label && label->GetKind() == NK_Identifier)
     idx = static_cast<IdentifierNode *>(label)->GetStrIdx();
@@ -127,7 +127,7 @@ LambdaNode *CfgBuilder::VisitLambdaNode(LambdaNode *node) {
 // For control flow
 ReturnNode *CfgBuilder::VisitReturnNode(ReturnNode *node) {
   mCurrentBB->AddStatement(node);
-  AST_BB *exit = mCurrentFunction->GetExitBB();
+  AstBasicBlock *exit = mCurrentFunction->GetExitBB();
   mCurrentBB->AddSuccessor(exit);
   mCurrentBB->SetKind(BK_Terminated);
   mCurrentBB->SetAttr(AK_Return);
@@ -150,7 +150,7 @@ CondBranchNode *CfgBuilder::VisitCondBranchNode(CondBranchNode *node) {
   mCurrentBB->AddStatement(brn);
 
   // Save current BB
-  AST_BB *current_bb = mCurrentBB;
+  AstBasicBlock *current_bb = mCurrentBB;
 
   // Create a new BB for true branch
   mCurrentBB = NewBB(BK_Uncond);
@@ -160,7 +160,7 @@ CondBranchNode *CfgBuilder::VisitCondBranchNode(CondBranchNode *node) {
   VisitTreeNode(node->GetTrueBranch());
 
   // Create a BB for the join point
-  AST_BB *join = NewBB(BK_Join);
+  AstBasicBlock *join = NewBB(BK_Join);
   mCurrentBB->AddSuccessor(join);
 
   TreeNode *false_branch = node->GetFalseBranch();
@@ -186,7 +186,7 @@ ForLoopNode *CfgBuilder::VisitForLoopNode(ForLoopNode *node) {
     VisitTreeNode(node->GetInitAtIndex(i));
   }
 
-  AST_BB *current_bb = mCurrentBB;
+  AstBasicBlock *current_bb = mCurrentBB;
   // Create a new BB for loop header
   mCurrentBB = NewBB(BK_LoopHeader);
 
@@ -214,7 +214,7 @@ ForLoopNode *CfgBuilder::VisitForLoopNode(ForLoopNode *node) {
   mCurrentBB = NewBB(BK_Uncond);
   current_bb->AddSuccessor(mCurrentBB);
   // Create a new BB for getting out of the loop
-  AST_BB *loop_exit = NewBB(BK_Join);
+  AstBasicBlock *loop_exit = NewBB(BK_Join);
 
   // Push loop_exit and current_bb to stacks for 'break' and 'continue'
   CfgBuilder::Push(mBreakBBs, loop_exit, node->GetLabel());
@@ -237,7 +237,7 @@ ForLoopNode *CfgBuilder::VisitForLoopNode(ForLoopNode *node) {
 
 // For control flow
 WhileLoopNode *CfgBuilder::VisitWhileLoopNode(WhileLoopNode *node) {
-  AST_BB *current_bb = mCurrentBB;
+  AstBasicBlock *current_bb = mCurrentBB;
   // Create a new BB for loop header
   mCurrentBB = NewBB(BK_LoopHeader);
   // Add current node to the loop header BB
@@ -260,7 +260,7 @@ WhileLoopNode *CfgBuilder::VisitWhileLoopNode(WhileLoopNode *node) {
   mCurrentBB = NewBB(BK_Uncond);
   current_bb->AddSuccessor(mCurrentBB);
   // Create a new BB for getting out of the loop
-  AST_BB *loop_exit = NewBB(BK_Join);
+  AstBasicBlock *loop_exit = NewBB(BK_Join);
 
   // Push loop_exit and current_bb to stacks for 'break' and 'continue'
   CfgBuilder::Push(mBreakBBs, loop_exit, node->GetLabel());
@@ -279,7 +279,7 @@ WhileLoopNode *CfgBuilder::VisitWhileLoopNode(WhileLoopNode *node) {
 
 // For control flow
 DoLoopNode *CfgBuilder::VisitDoLoopNode(DoLoopNode *node) {
-  AST_BB *current_bb = mCurrentBB;
+  AstBasicBlock *current_bb = mCurrentBB;
   // Create a new BB for loop header
   mCurrentBB = NewBB(BK_LoopHeader);
   // Add current node to the loop header BB
@@ -293,7 +293,7 @@ DoLoopNode *CfgBuilder::VisitDoLoopNode(DoLoopNode *node) {
   mCurrentBB = NewBB(BK_Uncond);
   current_bb->AddSuccessor(mCurrentBB);
   // Create a new BB for getting out of the loop
-  AST_BB *loop_exit = NewBB(BK_Join);
+  AstBasicBlock *loop_exit = NewBB(BK_Join);
 
   // Push loop_exit and current_bb to stacks for 'break' and 'continue'
   CfgBuilder::Push(mBreakBBs, loop_exit, node->GetLabel());
@@ -323,7 +323,7 @@ DoLoopNode *CfgBuilder::VisitDoLoopNode(DoLoopNode *node) {
 ContinueNode *CfgBuilder::VisitContinueNode(ContinueNode *node) {
   mCurrentBB->AddStatement(node);
   // Get the loop header
-  AST_BB *loop_header = CfgBuilder::LookUp(mContinueBBs, node->GetTarget());
+  AstBasicBlock *loop_header = CfgBuilder::LookUp(mContinueBBs, node->GetTarget());
   // Add the loop header as a successor of current BB
   mCurrentBB->AddSuccessor(loop_header);
   mCurrentBB->SetKind(BK_Terminated);
@@ -335,7 +335,7 @@ ContinueNode *CfgBuilder::VisitContinueNode(ContinueNode *node) {
 BreakNode *CfgBuilder::VisitBreakNode(BreakNode *node) {
   mCurrentBB->AddStatement(node);
   // Get the target BB for a loop or switch statement
-  AST_BB *exit = CfgBuilder::LookUp(mBreakBBs, node->GetTarget());
+  AstBasicBlock *exit = CfgBuilder::LookUp(mBreakBBs, node->GetTarget());
   // Add the target as a successor of current BB
   mCurrentBB->AddSuccessor(exit);
   mCurrentBB->SetKind(BK_Terminated);
@@ -351,15 +351,15 @@ SwitchNode *CfgBuilder::VisitSwitchNode(SwitchNode *node) {
   mCurrentBB->SetAuxNode(node);
 
   // Save current BB
-  AST_BB *current_bb = mCurrentBB;
+  AstBasicBlock *current_bb = mCurrentBB;
 
   // Create a new BB for getting out of the switch block
-  AST_BB *exit = NewBB(BK_Join);
+  AstBasicBlock *exit = NewBB(BK_Join);
   CfgBuilder::Push(mBreakBBs, exit, nullptr);
-  AST_BB *prev_block = nullptr;
+  AstBasicBlock *prev_block = nullptr;
   TreeNode *switch_expr = node->GetExpr();
   for (unsigned i = 0; i < node->GetCasesNum(); ++i) {
-    AST_BB *case_bb = NewBB(BK_Case);
+    AstBasicBlock *case_bb = NewBB(BK_Case);
     current_bb->AddSuccessor(case_bb);
 
     TreeNode *case_node = node->GetCaseAtIndex(i);
@@ -431,14 +431,14 @@ TryNode *CfgBuilder::VisitTryNode(TryNode *node) {
   //mCurrentBB->AddStatement(try_block_node);
 
   unsigned num = node->GetCatchesNum();
-  AST_BB *catch_bb = num ? NewBB(BK_Catch) : nullptr;
+  AstBasicBlock *catch_bb = num ? NewBB(BK_Catch) : nullptr;
 
   auto finally_node = node->GetFinally();
   // Create a BB for the join point
-  AST_BB *join = finally_node ? NewBB(BK_Finally) : NewBB(BK_Join);
+  AstBasicBlock *join = finally_node ? NewBB(BK_Finally) : NewBB(BK_Join);
 
   // Save current BB
-  AST_BB *current_bb = mCurrentBB;
+  AstBasicBlock *current_bb = mCurrentBB;
   // Create a new BB for current block node
   mCurrentBB = NewBB(BK_Uncond);
   current_bb->AddSuccessor(mCurrentBB);
@@ -459,7 +459,7 @@ TryNode *CfgBuilder::VisitTryNode(TryNode *node) {
 
   // JavaScript can have one catch block, or one finally block without catch block
   // Other languages, such as C++ and Java, may have multiple catch blocks
-  AST_BB *curr_bb = mCurrentBB;
+  AstBasicBlock *curr_bb = mCurrentBB;
   for (unsigned i = 0; i < num; ++i) {
     if(i > 0)
       catch_bb = NewBB(BK_Catch);
@@ -496,7 +496,7 @@ TryNode *CfgBuilder::VisitTryNode(TryNode *node) {
 ThrowNode *CfgBuilder::VisitThrowNode(ThrowNode *node) {
   mCurrentBB->AddStatement(node);
   // Get the catch/exit bb for this throw statement
-  AST_BB *catch_bb = CfgBuilder::LookUp(mThrowBBs, nullptr);
+  AstBasicBlock *catch_bb = CfgBuilder::LookUp(mThrowBBs, nullptr);
   // Add the loop header as a successor of current BB
   mCurrentBB->AddSuccessor(catch_bb);
   mCurrentBB->SetKind(BK_Terminated);
@@ -530,11 +530,11 @@ BlockNode *CfgBuilder::VisitBlockNode(BlockNode *node) {
     mCurrentBB->SetAuxNode(node);
 
     // Create a BB for the join point
-    AST_BB *join = NewBB(BK_Join);
+    AstBasicBlock *join = NewBB(BK_Join);
 
     // Needs BBs for current block
     // Save current BB
-    AST_BB *current_bb = mCurrentBB;
+    AstBasicBlock *current_bb = mCurrentBB;
     // Create a new BB for current block node
     mCurrentBB = NewBB(BK_Uncond);
     current_bb->AddSuccessor(mCurrentBB);
@@ -691,20 +691,20 @@ StructNode *CfgBuilder::VisitStructNode(StructNode *node) {
   return node;
 }
 
-// Allocate a new AST_Function node
-AST_Function *CfgBuilder::NewFunction(TreeNode *node)   {
-  AST_Function *func = new(mHandler->GetMemPool()->Alloc(sizeof(AST_Function))) AST_Function;
+// Allocate a new AstFunction node
+AstFunction *CfgBuilder::NewFunction(TreeNode *node)   {
+  AstFunction *func = new(mHandler->GetMemPool()->Alloc(sizeof(AstFunction))) AstFunction;
   func->SetFunction(node);
   return func;
 }
 
-// Allocate a new AST_BB node
-AST_BB *CfgBuilder::NewBB(BBKind k) {
-  return new(mHandler->GetMemPool()->Alloc(sizeof(AST_BB))) AST_BB(k);
+// Allocate a new AstBasicBlock node
+AstBasicBlock *CfgBuilder::NewBB(BBKind k) {
+  return new(mHandler->GetMemPool()->Alloc(sizeof(AstBasicBlock))) AstBasicBlock(k);
 }
 
 // Helper for a node in dot graph
-static std::string BBLabelStr(AST_BB *bb, const char *shape = nullptr, const char *fn = nullptr) {
+static std::string BBLabelStr(AstBasicBlock *bb, const char *shape = nullptr, const char *fn = nullptr) {
   static const char* const kBBNames[] =
   { "unknown", "uncond", "block", "branch", "loop", "switch", "case", "try", "catch", "finally",
     "yield", "term", "join" };
@@ -716,15 +716,15 @@ static std::string BBLabelStr(AST_BB *bb, const char *shape = nullptr, const cha
   return str;
 }
 
-// Dump current AST_Function node
-void AST_Function::Dump() {
+// Dump current AstFunction node
+void AstFunction::Dump() {
   const char *func_name = GetName();
   std::cout << "Function " << func_name  << " {" << std::endl;
-  unsigned num = GetNestedFunctionsNum();
+  unsigned num = GetNestedFuncsNum();
   if(num > 0) {
     std::cout << "Nested Functions: " << num << " [" << std::endl;
     for(unsigned i = 0; i < num; ++i) {
-      AST_Function *afunc = GetNestedFunctionAtIndex(i);
+      AstFunction *afunc = GetNestedFuncAtIndex(i);
       const char *fname = afunc->GetName();
       std::cout << "Function: " << i + 1 << " " << fname << std::endl;
       afunc->Dump();
@@ -733,11 +733,11 @@ void AST_Function::Dump() {
   }
   std::cout << "BBs: [" << std::endl;
 
-  std::stack<AST_BB*> bb_stack;
-  AST_BB *entry = GetEntryBB(), *exit = GetExitBB();
+  std::stack<AstBasicBlock*> bb_stack;
+  AstBasicBlock *entry = GetEntryBB(), *exit = GetExitBB();
   bb_stack.push(exit);
   bb_stack.push(entry);
-  std::set<AST_BB*> visited;
+  std::set<AstBasicBlock*> visited;
   visited.insert(exit);
   visited.insert(entry);
   // Dump CFG in dot format
@@ -745,12 +745,12 @@ void AST_Function::Dump() {
   dot = dot + func_name + " {\n" + BBLabelStr(entry, "box", func_name) + BBLabelStr(exit, "doubleoctagon");
   const char* scoped = " [style=dashed color=grey];";
   while(!bb_stack.empty()) {
-    AST_BB *bb = bb_stack.top();
+    AstBasicBlock *bb = bb_stack.top();
     bb_stack.pop();
     unsigned succ_num = bb->GetSuccessorsNum();
     std::cout << "BB" << bb->GetId() << ", " << BBLabelStr(bb) << (succ_num ? " ( succ: " : " ( Exit ");
     for(unsigned i = 0; i < succ_num; ++i) {
-      AST_BB *curr = bb->GetSuccessorAtIndex(i);
+      AstBasicBlock *curr = bb->GetSuccessorAtIndex(i);
       std::cout << "BB" << curr->GetId() << " ";
       dot += "BB" + std::to_string(bb->GetId()) + " -> BB" + std::to_string(curr->GetId())
         + (bb == entry ? (curr == exit ? scoped : ";") :
@@ -786,11 +786,11 @@ void AST_CFG::Build() {
   ModuleNode *module = mHandler->GetASTModule();
 
   // Set the init function for current module
-  AST_Function *func = builder.InitAstFunctions(module);
+  AstFunction *func = builder.InitAstFunctions(module);
 
   mHandler->SetFunction(func);
 
-  std::queue<AST_Function*> funcQueue;
+  std::queue<AstFunction*> funcQueue;
   funcQueue.push(func);
   while(!funcQueue.empty()) {
     func = funcQueue.front();
@@ -809,8 +809,8 @@ void AST_CFG::Build() {
         builder.Visit(node);
     }
     builder.FinalizeFunction();
-    for(unsigned i = 0; i < func->GetNestedFunctionsNum(); ++i)
-      funcQueue.push(func->GetNestedFunctionAtIndex(i));
+    for(unsigned i = 0; i < func->GetNestedFuncsNum(); ++i)
+      funcQueue.push(func->GetNestedFuncAtIndex(i));
   }
 }
 

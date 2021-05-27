@@ -28,8 +28,8 @@
 
 namespace maplefe {
 
-class AST_BB;
-class AST_Function;
+class AstBasicBlock;
+class AstFunction;
 class AST_CFG;
 class AST_AST;
 class AST_DFA;
@@ -37,18 +37,18 @@ class AST_DFA;
 // Each source file is a module
 class AST_Handler {
  private:
-  MemPool       mMemPool;    // Memory pool for all AST_Function and AST_BB
+  MemPool       mMemPool;    // Memory pool for all AstFunction and AstBasicBlock
   ModuleNode   *mASTModule;  // for an AST module
-  AST_Function *mFunction;   // an init function for statements in module scope
+  AstFunction *mFunction;   // an init function for statements in module scope
   AST_CFG      *mCFG;
   AST_AST      *mAST;
   AST_DFA      *mDFA;
   bool          mTrace;
-  std::unordered_map<unsigned, AST_BB *> mNodeId2BbMap;
+  std::unordered_map<unsigned, AstBasicBlock *> mNodeId2BbMap;
 
  public:
   // only reachable BBs
-  std::unordered_map<unsigned, AST_BB *> mBbId2BbMap;
+  std::unordered_map<unsigned, AstBasicBlock *> mBbId2BbMap;
 
  public:
   explicit AST_Handler(ModuleNode *module, bool trace) :
@@ -68,14 +68,14 @@ class AST_Handler {
   ModuleNode *GetASTModule() {return mASTModule;}
   MemPool   *GetMemPool()   {return &mMemPool;}
 
-  void          SetFunction(AST_Function *func) {mFunction = func;}
-  AST_Function *GetFunction()                   {return mFunction;}
+  void          SetFunction(AstFunction *func) {mFunction = func;}
+  AstFunction *GetFunction()                   {return mFunction;}
 
-  void SetBbFromNodeId(unsigned id, AST_BB *bb) { mNodeId2BbMap[id] = bb; }
-  AST_BB *GetBbFromNodeId(unsigned id) { return mNodeId2BbMap[id]; }
+  void SetBbFromNodeId(unsigned id, AstBasicBlock *bb) { mNodeId2BbMap[id] = bb; }
+  AstBasicBlock *GetBbFromNodeId(unsigned id) { return mNodeId2BbMap[id]; }
 
-  void SetBbFromBbId(unsigned id, AST_BB *bb) { mBbId2BbMap[id] = bb; }
-  AST_BB *GetBbFromBbId(unsigned id) { return mBbId2BbMap[id]; }
+  void SetBbFromBbId(unsigned id, AstBasicBlock *bb) { mBbId2BbMap[id] = bb; }
+  AstBasicBlock *GetBbFromBbId(unsigned id) { return mBbId2BbMap[id]; }
 
   bool GetTrace() {return mTrace;}
   AST_CFG *GetCFG() {return mCFG;}

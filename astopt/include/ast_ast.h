@@ -46,16 +46,16 @@ class AdjustASTVisitor : public AstVisitor {
   bool          mTrace;
   bool          mUpdated;
 
-  AST_Function *mCurrentFunction;
-  AST_BB       *mCurrentBB;
+  AstFunction   *mCurrentFunction;
+  AstBasicBlock *mCurrentBB;
 
  public:
   explicit AdjustASTVisitor(AST_Handler *h, bool t, bool base = false)
     : mHandler(h), mTrace(t), AstVisitor(t && base) {}
   ~AdjustASTVisitor() = default;
 
-  void SetCurrentFunction(AST_Function *f) { mCurrentFunction = f; }
-  void SetCurrentBB(AST_BB *b) { mCurrentBB = b; }
+  void SetCurrentFunction(AstFunction *f) { mCurrentFunction = f; }
+  void SetCurrentBB(AstBasicBlock *b) { mCurrentBB = b; }
 
   DeclNode *VisitDeclNode(DeclNode *node);
   ExportNode *VisitExportNode(ExportNode *node);

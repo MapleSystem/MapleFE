@@ -52,7 +52,7 @@ void AST_Handler::BuildDFA() {
 
 void AST_Handler::Dump(char *msg) {
   std::cout << std::endl << msg << ":" << std::endl;
-  AST_Function *func = GetFunction();
+  AstFunction *func = GetFunction();
   func->Dump();
 }
 

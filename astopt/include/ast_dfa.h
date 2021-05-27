@@ -53,7 +53,7 @@ class AST_DFA {
   BVMap mRchOutMap;
 
   std::vector<unsigned> mBbIdVec;                     // bb ids in the function, depth first order
-  std::unordered_map<unsigned, AST_BB *> mBbId2BBMap; // bb id to bb map
+  std::unordered_map<unsigned, AstBasicBlock *> mBbId2BBMap; // bb id to bb map
   std::unordered_set<unsigned> mDefSet;               // def stridx set
   std::unordered_set<unsigned, std::set<UsePosition>> mDefUseMap; // def-use : key is DefPositionVec idx
 

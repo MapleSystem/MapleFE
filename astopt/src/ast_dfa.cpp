@@ -169,12 +169,12 @@ DefPosition *AST_DFA::AddDef(TreeNode *node, unsigned &bitnum, unsigned bbid) {
 // this calcuates mDefPositionVec mDefPositionVecSize mBbIdVec
 void AST_DFA::CollectDefNodes() {
   if (mTrace) std::cout << "============== CollectDefNodes ==============" << std::endl;
-  AST_Function *func = mHandler->GetFunction();
+  AstFunction *func = mHandler->GetFunction();
   MASSERT(func && "null func");
   std::unordered_set<unsigned> done_list;
-  std::deque<AST_BB *> working_list;
+  std::deque<AstBasicBlock *> working_list;
 
-  AST_BB *bb = func->GetEntryBB();
+  AstBasicBlock *bb = func->GetEntryBB();
   MASSERT(bb && "null BB");
   unsigned bbid = bb->GetId();
 
@@ -215,10 +215,10 @@ void AST_DFA::CollectDefNodes() {
 
 void AST_DFA::BuildBitVectors() {
   if (mTrace) std::cout << "============== BuildBitVectors ==============" << std::endl;
-  AST_Function *func = mHandler->GetFunction();
+  AstFunction *func = mHandler->GetFunction();
   MASSERT(func && "null func");
   std::unordered_set<unsigned> done_list;
-  std::deque<AST_BB *> working_list;
+  std::deque<AstBasicBlock *> working_list;
 
   // init bit vectors
   for (auto bbid: mBbIdVec) {
@@ -234,7 +234,7 @@ void AST_DFA::BuildBitVectors() {
   working_list.push_back(func->GetEntryBB());
 
   while(working_list.size()) {
-    AST_BB *bb = working_list.front();
+    AstBasicBlock *bb = working_list.front();
     MASSERT(bb && "null BB");
     unsigned bbid = bb->GetId();
 
@@ -293,7 +293,7 @@ void AST_DFA::BuildBitVectors() {
   BitVector *old_bv = new BitVector(mDefPositionVecSize);
   BitVector *tmp_bv = new BitVector(mDefPositionVecSize);
   while (working_list.size()) {
-    AST_BB *bb = working_list.front();
+    AstBasicBlock *bb = working_list.front();
     unsigned bbid = bb->GetId();
 
     tmp_bv->WipeOff(0);
@@ -301,7 +301,7 @@ void AST_DFA::BuildBitVectors() {
     old_bv->Or(mRchInMap[bbid]);
     mRchInMap[bbid]->WipeOff(0);
     for (int i = 0; i < bb->GetPredecessorsNum(); i++){
-      AST_BB *pred = bb->GetPredecessorAtIndex(i);
+      AstBasicBlock *pred = bb->GetPredecessorAtIndex(i);
       unsigned pid = pred->GetId();
       tmp_bv->WipeOff(0);
       tmp_bv->Or(mRchInMap[pid]);
@@ -384,7 +384,7 @@ void AST_DFA::CollectUseNodes() {
   for (auto bbid: mBbIdVec) {
     visitor.SetBbId(bbid);
     std::cout << " == CollectUseNodes: bbid " << bbid << std::endl;
-    AST_BB *bb = mBbId2BBMap[bbid];
+    AstBasicBlock *bb = mBbId2BBMap[bbid];
     for (int i = 0; i < bb->GetStatementsNum(); i++) {
       TreeNode *node = bb->GetStatementAtIndex(i);
       visitor.SetStmtIdx(node->GetNodeId());

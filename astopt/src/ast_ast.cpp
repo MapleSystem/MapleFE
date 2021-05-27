@@ -36,9 +36,9 @@ void AST_AST::ASTCollectAndDBRemoval() {
 // this calcuates mNodeId2BbMap
 void AST_AST::CollectASTInfo() {
   if (mTrace) std::cout << "============== CollectASTInfo ==============" << std::endl;
-  AST_Function *func = mHandler->GetFunction();
+  AstFunction *func = mHandler->GetFunction();
   MASSERT(func && "null func");
-  std::deque<AST_BB *> working_list;
+  std::deque<AstBasicBlock *> working_list;
   std::unordered_set<unsigned> done_list;
 
   working_list.push_back(func->GetEntryBB());
@@ -46,7 +46,7 @@ void AST_AST::CollectASTInfo() {
   unsigned bitnum = 0;
 
   while(working_list.size()) {
-    AST_BB *bb = working_list.front();
+    AstBasicBlock *bb = working_list.front();
     MASSERT(bb && "null BB");
     unsigned bbid = bb->GetId();
 
@@ -73,10 +73,10 @@ void AST_AST::CollectASTInfo() {
 }
 
 void AST_AST::RemoveDeadBlocks() {
-  std::set<AST_BB *> deadBb;
+  std::set<AstBasicBlock *> deadBb;
   for (auto it: mHandler->mBbId2BbMap) {
     for (int i = 0; i < it.second->GetPredecessorsNum(); i++) {
-      AST_BB *pred = it.second->GetPredecessorAtIndex(i);
+      AstBasicBlock *pred = it.second->GetPredecessorAtIndex(i);
       unsigned pid = pred->GetId();
       if (mHandler->mBbId2BbMap.find(pid) == mHandler->mBbId2BbMap.end()) {
         deadBb.insert(pred);
@@ -86,11 +86,11 @@ void AST_AST::RemoveDeadBlocks() {
   for (auto it: deadBb) {
     if (mTrace) std::cout << "deleted BB :";
     for (int i = 0; i < it->GetSuccessorsNum(); i++) {
-      AST_BB *bb = it->GetSuccessorAtIndex(i);
+      AstBasicBlock *bb = it->GetSuccessorAtIndex(i);
       bb->mPredecessors.Remove(it);
     }
     if (mTrace) std::cout << " BB" << it->GetId();
-    it->~AST_BB();
+    it->~AstBasicBlock();
   }
   if (mTrace) std::cout << std::endl;
 }
