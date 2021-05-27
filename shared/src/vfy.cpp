@@ -319,6 +319,9 @@ void Verifier::VerifyReturn(ReturnNode *tree){
 void Verifier::VerifyCondBranch(CondBranchNode *tree){
 }
 
+void Verifier::VerifyBr(BrNode *tree){
+}
+
 void Verifier::VerifyBreak(BreakNode *tree){
 }
 
