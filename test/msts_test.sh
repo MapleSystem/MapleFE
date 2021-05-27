@@ -17,7 +17,7 @@ if [ "x$1" = "xsetup" ]; then
 fi
 
 # export is for sh -c in xargs
-export TS2AST=$MAPLEFE_ROOT/output/typescript/typescript/ts2ast
+export TS2AST=$MAPLEFE_ROOT/output/typescript/bin/ts2ast
 export PASS_LIST=msts_passed.txt
 FAIL_LIST=msts_failed.txt
 MSTEST_DIR=$MAPLEFE_ROOT/test/TypeScript/tests/cases/compiler

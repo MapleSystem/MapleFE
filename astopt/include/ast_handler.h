@@ -39,7 +39,7 @@ class AST_Handler {
  private:
   MemPool       mMemPool;    // Memory pool for all AstFunction and AstBasicBlock
   ModuleNode   *mASTModule;  // for an AST module
-  AstFunction *mFunction;   // an init function for statements in module scope
+  AstFunction  *mFunction;   // an init function for statements in module scope
   AST_CFG      *mCFG;
   AST_AST      *mAST;
   AST_DFA      *mDFA;

@@ -13,6 +13,7 @@
 #
 
 include ../../Makefile.in
+BUILDBIN=$(BUILDDIR)/bin
 BUILD=$(BUILDDIR)/typescript
 BUILDGEN=$(BUILDDIR)/gen
 BUILDASTGEN=$(BUILDDIR)/ast_gen/shared
@@ -42,7 +43,7 @@ TARGET=ts2ast
 SHAREDLIB = $(BUILDDIR)/shared/shared.a $(BUILDASTGEN)/genast.a
 
 .PHONY: all
-all: $(BUILD)/$(TARGET)
+all: $(BUILDBIN)/$(TARGET)
 
 -include $(DEPS)
 .PHONY: clean
@@ -71,8 +72,9 @@ $(BUILDGEN)/%.d : $(BUILDGEN)/%.cpp
 
 # TARGET depends on OBJS and shared OBJS from shared directory
 # as well as mapleall libraries
-$(BUILD)/$(TARGET): $(OBJS) $(SHAREDLIB)
-	$(LD) -o $(BUILD)/$(TARGET) $(OBJS) $(SHAREDLIB)
+$(BUILDBIN)/$(TARGET): $(OBJS) $(SHAREDLIB)
+	@mkdir -p $(BUILDBIN)
+	$(LD) -o $(BUILDBIN)/$(TARGET) $(OBJS) $(SHAREDLIB)
 
 clean:
 	rm -rf $(BUILD)

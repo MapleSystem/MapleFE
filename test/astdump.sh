@@ -41,8 +41,8 @@ done
 [ -n "$LIST" ] || { echo Please specify one or more TypeScript files.; usage; }
 [ -z "$DOT" ] || [ -x /usr/bin/dot -a -x /usr/bin/viewnior -a -x /usr/bin/highlight ] || sudo apt install graphviz viewnior highlight
 TSOUT=$(cd $(dirname $0)/../; pwd)/output/typescript
-TS2AST=$TSOUT/typescript/ts2ast
-AST2CPP=$TSOUT/ast2cpp/ast2cpp
+TS2AST=$TSOUT/bin/ts2ast
+AST2CPP=$TSOUT/bin/ast2cpp
 [ -x "$TS2AST" ] || { echo Cannot execute $TS2AST; exit 1; }
 [ -x "$AST2CPP" ] || { echo Cannot execute $AST2CPP; exit 1; }
 Failed=

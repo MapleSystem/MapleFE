@@ -38,8 +38,8 @@ if ($lang =~ /\Qjava\E/) {
   $outroot = "$currdir/../output/$pinput/test";
 } elsif ($lang =~ /\Qtypescript\E/) {
   $pinput = "ts";
-  $cmnd = "../output/typescript/typescript/ts2ast";
-  $cmnd1 = "../output/typescript/ast2cpp/ast2cpp";
+  $cmnd = "../output/typescript/bin/ts2ast";
+  $cmnd1 = "../output/typescript/bin/ast2cpp";
   $outroot = "$currdir/../output/typescript/test";
 } else {
   print "$lang is an invalid option\n";
