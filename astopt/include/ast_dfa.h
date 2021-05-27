@@ -40,11 +40,14 @@ class AST_DFA {
   AST_Handler  *mHandler;
   bool          mTrace;
   std::unordered_map<unsigned, unsigned> mVar2DeclMap; // var to decl, both NodeId
-  std::unordered_map<unsigned, TreeNode*> mNodeId2NodeMap;
+
+  // stmt id
+  SmallVector<unsigned> mStmtIdVec;
+  std::unordered_map<unsigned, TreeNode*> mStmtId2StmtMap;
+
+  // def use positions
   SmallVector<DefPosition> mDefPositionVec;
-  unsigned mDefPositionVecSize;
   std::unordered_map<unsigned, std::set<UsePosition>> mUsePositionMap;;
-  StringPool mStringPool;
 
   // followint maps with key BB id
   BVMap mPrsvMap;
@@ -73,7 +76,6 @@ class AST_DFA {
   unsigned GetDefStrIdx(TreeNode *node);
   DefPosition *AddDef(TreeNode *node, unsigned &bitnum, unsigned bbid);
 
-  unsigned GetDefPositionVecSize() { return mDefPositionVecSize; }
   void DumpDefPosition(DefPosition pos);
   void DumpDefPositionVec();
   void DumpReachDefIn();

@@ -24,10 +24,10 @@ namespace maplefe {
 
 AST_DFA::~AST_DFA() {
   mVar2DeclMap.clear();
-  for (auto it: mNodeId2NodeMap) {
+  for (auto it: mStmtId2StmtMap) {
     delete it.second;
   }
-  mNodeId2NodeMap.clear();
+  mStmtId2StmtMap.clear();
   for (auto it: mPrsvMap) {
     delete it.second;
   }
@@ -84,16 +84,19 @@ void AST_DFA::DumpDefPosition(DefPosition pos) {
 }
 
 void AST_DFA::DumpDefPositionVec() {
-  for (unsigned i = 0; i < mDefPositionVecSize; i++) {
+  for (unsigned i = 0; i < mDefPositionVec.GetNum(); i++) {
     DefPosition pos = mDefPositionVec.ValueAtIndex(i);
     std::cout << "BitPos: " << i << std::endl;
     DumpDefPosition(pos);
   }
 }
 
+#define DUMMY_BBID 0xffffffff
+
 unsigned AST_DFA::GetDefStrIdx(TreeNode *node) {
   unsigned stridx = 0;
-  AddDef(node, stridx, 0xffffffff);
+  // pass DUMMY_BBID to indicate to get stridx only
+  AddDef(node, stridx, DUMMY_BBID);
   return stridx;
 }
 
@@ -151,22 +154,22 @@ DefPosition *AST_DFA::AddDef(TreeNode *node, unsigned &bitnum, unsigned bbid) {
 
   // update mDefPositionVec
   if (stridx) {
-    if (bbid != 0xffffffff) {
+    if (bbid == DUMMY_BBID) {
+      // special usage for GetDefStrIdx(): use bitnum to return stridx
+      bitnum = stridx;
+    } else {
       DefPosition pos(stridx, node->GetNodeId(), nodeid, bbid);
       bitnum++;
       mDefPositionVec.PushBack(pos);
       mDefSet.insert(stridx);
       return &pos;
-    } else {
-      // special usage for GetDefStrIdx(): use bitnum as a return value
-      bitnum = stridx;
     }
   }
 
   return NULL;
 }
 
-// this calcuates mDefPositionVec mDefPositionVecSize mBbIdVec
+// this calcuates mDefPositionVec mBbIdVec
 void AST_DFA::CollectDefNodes() {
   if (mTrace) std::cout << "============== CollectDefNodes ==============" << std::endl;
   AstFunction *func = mHandler->GetFunction();
@@ -192,8 +195,10 @@ void AST_DFA::CollectDefNodes() {
       std::cout << "working_list work " << bbid << std::endl;
       for (int i = 0; i < bb->GetStatementsNum(); i++) {
         TreeNode *node = bb->GetStatementAtIndex(i);
-        mNodeId2NodeMap[node->GetNodeId()] = node;
-        AddDef(node, bitnum, bbid);
+        unsigned nid = node->GetNodeId();
+        mStmtIdVec.PushBack(nid);
+        mStmtId2StmtMap[nid] = node;
+        (void) AddDef(node, bitnum, bbid);
       }
 
       for (int i = 0; i < bb->GetSuccessorsNum(); i++) {
@@ -208,7 +213,6 @@ void AST_DFA::CollectDefNodes() {
     working_list.pop_front();
   }
 
-  mDefPositionVecSize = mDefPositionVec.GetNum();
   if (mTrace) DumpDefPositionVec();
 
 }
@@ -221,12 +225,13 @@ void AST_DFA::BuildBitVectors() {
   std::deque<AstBasicBlock *> working_list;
 
   // init bit vectors
+  unsigned bvsize = mDefPositionVec.GetNum();
   for (auto bbid: mBbIdVec) {
-    BitVector *bv1 = new BitVector(mDefPositionVecSize);
+    BitVector *bv1 = new BitVector(bvsize);
     bv1->WipeOff(0xff);                // init with all 1
     mPrsvMap[bbid] = bv1;
 
-    BitVector *bv2 = new BitVector(mDefPositionVecSize);
+    BitVector *bv2 = new BitVector(bvsize);
     bv2->WipeOff(0);
     mGenMap[bbid] = bv2;
   }
@@ -264,7 +269,7 @@ void AST_DFA::BuildBitVectors() {
         // mGenMap
         for (int i = 0; i < mDefPositionVec.GetNum(); i++) {
           // set bits for matching bbid
-          if (std::get<2>(mDefPositionVec.ValueAtIndex(i)) == bbid) {
+          if (std::get<3>(mDefPositionVec.ValueAtIndex(i)) == bbid) {
             mGenMap[bbid]->SetBit(i);
           }
         }
@@ -277,8 +282,8 @@ void AST_DFA::BuildBitVectors() {
 
   // mRchInMap
   for (auto bbid: mBbIdVec) {
-    BitVector *bv = new BitVector(mDefPositionVecSize);
-    bv->Alloc(mDefPositionVecSize);
+    BitVector *bv = new BitVector(bvsize);
+    bv->Alloc(bvsize);
     bv->WipeOff(0);
     mRchInMap[bbid] = bv;
   }
@@ -290,8 +295,8 @@ void AST_DFA::BuildBitVectors() {
     working_list.push_back(it.second);
   }
 
-  BitVector *old_bv = new BitVector(mDefPositionVecSize);
-  BitVector *tmp_bv = new BitVector(mDefPositionVecSize);
+  BitVector *old_bv = new BitVector(bvsize);
+  BitVector *tmp_bv = new BitVector(bvsize);
   while (working_list.size()) {
     AstBasicBlock *bb = working_list.front();
     unsigned bbid = bb->GetId();
@@ -321,8 +326,8 @@ void AST_DFA::BuildBitVectors() {
   bool buildOutMap = false;
   if (buildOutMap) {
     for (auto bbid: mBbIdVec) {
-      BitVector *bv = new BitVector(mDefPositionVecSize);
-      bv->Alloc(mDefPositionVecSize);
+      BitVector *bv = new BitVector(bvsize);
+      bv->Alloc(bvsize);
       bv->WipeOff(0);
       mRchOutMap[bbid] = bv;
     }
@@ -354,7 +359,7 @@ void AST_DFA::DumpBVMap(BVMap &map) {
 
 void AST_DFA::DumpBV(BitVector *bv) {
   std::cout << "BitVector: ";
-  for (int i = 0; i < mDefPositionVecSize; i++) {
+  for (int i = 0; i < mDefPositionVec.GetNum(); i++) {
     std::cout << bv->GetBit(i);
     if (i%8 == 7) std::cout << " ";
     if (i%64 == 63) {
