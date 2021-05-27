@@ -12,7 +12,7 @@ class MyClass {
 
 MyClass.prototype.calc = function (this: MyClass, x: number) {
   return this.operand + x;
-}
+};
 
 var myObj = new MyClass(1);
 

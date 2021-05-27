@@ -927,17 +927,27 @@ extern SmallVector<TemplateLiteralNode*> gTemplateLiteralNodes;
 
 class LiteralNode : public TreeNode {
 private:
-  LitData mData;
+  LitData   mData;
+
+  // The regular type information is stored in LitData which is common practice.
+  // However, in languages like Typescript, it does allow special literals like 'this'
+  // to have a dedicated type. So here comes 'mType'.
+  TreeNode *mType;
+
 private:
   void InitName();
 
 public:
-  LiteralNode(LitData d) : TreeNode(NK_Literal), mData(d) {}
+  LiteralNode(LitData d) : TreeNode(NK_Literal), mData(d), mType(NULL) {}
   LiteralNode() : LiteralNode({.mType = LT_NA, .mData.mInt = 0}) {}
   ~LiteralNode(){}
 
   LitData GetData() {return mData;}
   void SetData(LitData d) {mData = d;}
+
+  TreeNode* GetType()            {return mType;}
+  void      SetType(TreeNode *t) {mType = t;}
+
   void Dump(unsigned);
 };
 
