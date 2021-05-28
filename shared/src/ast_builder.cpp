@@ -171,6 +171,9 @@ static void add_type_to(TreeNode *tree, TreeNode *type) {
   } else if (tree->IsFunction()) {
     FunctionNode *func = (FunctionNode*)tree;
     func->SetType(type);
+  } else if (tree->IsBindingPattern()) {
+    BindingPatternNode *bp = (BindingPatternNode*)tree;
+    bp->SetType(type);
   } else {
     MERROR("Unsupported tree node in add_type_to()");
   }
@@ -1269,6 +1272,107 @@ TreeNode* ASTBuilder::BuildArrayLiteral() {
 }
 
 //////////////////////////////////////////////////////////////////////////////////
+//                         BindingElement and BindingPattern
+//////////////////////////////////////////////////////////////////////////////////
+
+// It could take:
+// 1) Two arguments, 'variable' name and 'element' to bind
+// 2) one argument,  the 'element'
+TreeNode* ASTBuilder::BuildBindingElement() {
+  if (mTrace)
+    std::cout << "In BuildBindingElement" << std::endl;
+
+  BindingElementNode *be_node = NULL;
+
+  if (mParams.size() == 2) {
+    Param p_variable = mParams[0];
+    MASSERT(p_variable.mIsTreeNode);
+    TreeNode *variable = p_variable.mData.mTreeNode;
+
+    Param p_element = mParams[1];
+    MASSERT(p_element.mIsTreeNode);
+    TreeNode *element = p_element.mData.mTreeNode;
+
+    // There are a few cases.
+    // 1. If element is an existing binding element, we just add the 'variable'.
+    // 2. If element is a binding pattern, we need create new binding element.
+    // 3. If element is anything else, we need create new binding element.
+    if (element->IsBindingElement()) {
+      be_node = (BindingElementNode*)element;
+      be_node->SetVariable(variable);
+    } else {
+      be_node = (BindingElementNode*)gTreePool.NewTreeNode(sizeof(BindingElementNode));
+      new (be_node) BindingElementNode();
+      be_node->SetVariable(variable);
+      be_node->SetElement(element);
+    }
+  } else if (mParams.size() == 1) {
+    Param p_element = mParams[0];
+    MASSERT(p_element.mIsTreeNode);
+    TreeNode *element = p_element.mData.mTreeNode;
+
+    be_node = (BindingElementNode*)gTreePool.NewTreeNode(sizeof(BindingElementNode));
+    new (be_node) BindingElementNode();
+    be_node->SetElement(element);
+  } else {
+    MASSERT(0 && "unsupported number of arguments in BuildBindingElemnt.");
+  }
+
+  mLastTreeNode = be_node;
+  return mLastTreeNode;
+}
+
+// It take one argument,  the 'element'
+TreeNode* ASTBuilder::BuildBindingRestElement() {
+  if (mTrace)
+    std::cout << "In BuildBindingRestElement" << std::endl;
+
+  BindingElementNode *be_node = NULL;
+  MASSERT(mParams.size() == 1);
+
+  Param p_element = mParams[0];
+  MASSERT(p_element.mIsTreeNode);
+  TreeNode *element = p_element.mData.mTreeNode;
+
+  be_node = (BindingElementNode*)gTreePool.NewTreeNode(sizeof(BindingElementNode));
+  new (be_node) BindingElementNode();
+  be_node->SetElement(element);
+  be_node->SetIsRest(true);
+
+  mLastTreeNode = be_node;
+  return mLastTreeNode;
+}
+
+// It could take:
+// 1) zero arguments. it is an empty binding pattern.
+// 2) one argument, the 'element' or passnode containing list of elements.
+TreeNode* ASTBuilder::BuildBindingPattern() {
+  if (mTrace)
+    std::cout << "In BuildBindingPattern" << std::endl;
+
+  BindingPatternNode *bp = NULL;
+
+  if (mParams.size() == 1) {
+    Param p_element = mParams[0];
+    MASSERT(p_element.mIsTreeNode);
+    TreeNode *element = p_element.mData.mTreeNode;
+
+    bp = (BindingPatternNode*)gTreePool.NewTreeNode(sizeof(BindingPatternNode));
+    new (bp) BindingPatternNode();
+    bp->AddElement(element);
+  } else if (mParams.size() == 0) {
+    // an empty binding pattern
+    bp = (BindingPatternNode*)gTreePool.NewTreeNode(sizeof(BindingPatternNode));
+    new (bp) BindingPatternNode();
+  } else {
+    MASSERT(0 && "unsupported number of arguments in BuildBindingElemnt.");
+  }
+
+  mLastTreeNode = bp;
+  return mLastTreeNode;
+}
+
+//////////////////////////////////////////////////////////////////////////////////
 //                         StructNode, StructLiteralNode, FieldLiteralNode
 //////////////////////////////////////////////////////////////////////////////////
 
@@ -1603,13 +1707,17 @@ TreeNode* ASTBuilder::AddInitTo() {
   TreeNode *node_decl = p_decl.mData.mTreeNode;
   TreeNode *node_init = p_init.mData.mTreeNode;
 
-  if (!node_decl->IsIdentifier())
-    MERROR("The target of AddInitTo should be an indentifier node. Not?");
-
-  IdentifierNode *in = (IdentifierNode*)node_decl;
-  in->SetInit(node_init);
-
-  return in;
+  if (node_decl->IsIdentifier()) {
+    IdentifierNode *in = (IdentifierNode*)node_decl;
+    in->SetInit(node_init);
+    return in;
+  } else if (node_decl->IsBindingPattern()) {
+    BindingPatternNode *in = (BindingPatternNode*)node_decl;
+    in->SetInit(node_init);
+    return in;
+  } else {
+    MERROR("The target of AddInitTo is unsupported.");
+  }
 }
 
 
@@ -2007,8 +2115,8 @@ void ASTBuilder::AddParams(TreeNode *func, TreeNode *decl_params) {
   if (decl_params->IsDecl()) {
     DeclNode *decl = (DeclNode*)decl_params;
     TreeNode *params = decl->GetVar();
-    // a param could be a 'this' literal
-    if (params->IsIdentifier() || params->IsLiteral()) {
+    // a param could be a 'this' literal, binding pattern, etc
+    if (params->IsIdentifier() || params->IsLiteral() || params->IsBindingPattern()) {
       // one single parameter at call site
       if (func->IsFunction())
         ((FunctionNode*)func)->AddParam(params);

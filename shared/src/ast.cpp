@@ -510,6 +510,11 @@ void ArrayLiteralNode::Dump(unsigned indent) {
 
 void BindingElementNode::Dump(unsigned indent) {
   DumpIndentation(indent);
+  if (mVariable)
+    mVariable->Dump(0);
+  DUMP0_NORETURN(":");
+  if (mElement)
+    mElement->Dump(0);
 }
 
 void BindingPatternNode::AddElement(TreeNode *tree) {
@@ -528,6 +533,14 @@ void BindingPatternNode::AddElement(TreeNode *tree) {
 
 void BindingPatternNode::Dump(unsigned indent) {
   DumpIndentation(indent);
+  DUMP0_NORETURN("{");
+  for (unsigned i = 0; i < mElements.GetNum(); i++) {
+    TreeNode *elem = GetElement(i);
+    elem->Dump(0);
+    if (i != mElements.GetNum()-1)
+      DUMP0_NORETURN(", ");
+  }
+  DUMP0_NORETURN("}");
 }
 
 //////////////////////////////////////////////////////////////////////////////////////

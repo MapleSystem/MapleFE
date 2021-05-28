@@ -781,6 +781,8 @@ rule BindingPattern : ONEOF(ObjectBindingPattern)
 rule ObjectBindingPattern : ONEOF('{' + '}',
                                   '{' + BindingPropertyList + '}',
                                   '{' + BindingPropertyList + ',' + '}')
+  attr.action.%1 :    BuildBindingPattern()
+  attr.action.%2,%3 : BuildBindingPattern(%2)
 
 ##-----------------------------------
 ##rule ArrayBindingPattern[Yield] :
@@ -810,6 +812,7 @@ rule BindingPropertyList : ONEOF(BindingProperty,
 ##  PropertyName[?Yield] : BindingElement[?Yield]
 rule BindingProperty : ONEOF(SingleNameBinding,
                              PropertyName + ':' + BindingElement)
+  attr.action.%2 : BuildBindingElement(%1, %3)
 
 ##-----------------------------------
 ##rule BindingElement[Yield] :
@@ -817,16 +820,20 @@ rule BindingProperty : ONEOF(SingleNameBinding,
 ##  BindingPattern[?Yield] Initializer[In, ?Yield]opt
 rule BindingElement : ONEOF(SingleNameBinding,
                             BindingPattern + ZEROORONE(Initializer))
+  attr.action.%2 : AddInitTo(%1, %2)
 
 ##-----------------------------------
 ##rule SingleNameBinding[Yield] :
 ##  BindingIdentifier[?Yield] Initializer[In, ?Yield]opt
 rule SingleNameBinding : BindingIdentifier + ZEROORONE(Initializer)
+  attr.action : AddInitTo(%1, %2)
+  attr.action : BuildBindingElement(%1)
 
 ##-----------------------------------
 ##rule BindingRestElement[Yield] :
 ##  ... BindingIdentifier[?Yield]
 rule BindingRestElement : "..." + BindingIdentifier
+  attr.action : BuildBindingRestElement(%2)
 
 ##-----------------------------------
 ##rule EmptyStatement :

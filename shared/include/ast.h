@@ -751,14 +751,21 @@ public:
 class BindingPatternNode : public TreeNode {
 private:
   SmallVector<TreeNode*> mElements;
+  TreeNode              *mType;        // The type
+  TreeNode              *mInit;        // An initializer
 public:
-  BindingPatternNode() : TreeNode(NK_BindingPattern) {}
+  BindingPatternNode() : TreeNode(NK_BindingPattern), mInit(NULL) {}
   ~BindingPatternNode() {Release();}
 
   unsigned  GetElementsNum()       {return mElements.GetNum();}
   TreeNode* GetElement(unsigned i) {return mElements.ValueAtIndex(i);}
   void      SetElement(unsigned i, TreeNode* n) {*(mElements.RefAtIndex(i)) = n;}
   void      AddElement(TreeNode *n);
+
+  TreeNode* GetType()             {return mType;}
+  void      SetType(TreeNode* n)  {mType = n;}
+  TreeNode* GetInit()             {return mInit;}
+  void      SetInit(TreeNode* n)  {mInit = n;}
 
   void Release() {mElements.Release();}
   void Dump(unsigned);

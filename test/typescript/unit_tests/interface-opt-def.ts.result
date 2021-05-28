@@ -1,0 +1,15 @@
+Matched 13 tokens.
+Matched 35 tokens.
+Matched 49 tokens.
+Matched 67 tokens.
+============= Module ===========
+== Sub Tree ==
+ts_interface: I {a;b }
+== Sub Tree ==
+func  f({:a, :b=1})  throws: 
+  return a Add b
+
+== Sub Tree ==
+console.log(f( {a:1}))
+== Sub Tree ==
+console.log(f( {a:1, b:2}))

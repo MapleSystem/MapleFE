@@ -83,6 +83,10 @@ ACTION(SetJSConst)
 ACTION(BuildField)
 ACTION(BuildVarList)
 
+ACTION(BuildBindingElement)
+ACTION(BuildBindingRestElement)
+ACTION(BuildBindingPattern)
+
 // For struct
 ACTION(BuildStruct)
 ACTION(SetTSInterface)
