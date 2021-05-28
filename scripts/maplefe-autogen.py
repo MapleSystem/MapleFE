@@ -762,13 +762,14 @@ bool PutNode(TreeNode *n) {{
 
 void PutEdge(TreeNode *from, TreeNode *to, const char *field, NodeKind k) {{
   if(to)
-    *mOs << NodeName(from,\'_\') << " -> " << NodeName(to,\'_\') << "[label=" << field << "];\\n";
+    *mOs << NodeName(from,\'_\') << " -> " << NodeName(to,\'_\') << "[label=" << field
+      << (to->GetParent() == from ? ",arrowhead=diamond" : "") << "];\\n";
 }}
 
 void PutChildEdge(TreeNode *from, TreeNode *to, const char *field, unsigned idx, NodeKind k) {{
   if(to)
-    *mOs << NodeName(from,\'_\') << " -> " << NodeName(to,\'_\') << "[label=\\"" << field << "[" << idx << "]\\""
-      << (to->GetKind() == k || k == NK_Null ? "" : ", style=bold, color=red") << "];\\n";
+    *mOs << NodeName(from,\'_\') << " -> " << NodeName(to,\'_\') << "[label=\\"" << field
+      << "[" << idx << "]\\"" << (to->GetParent() == from ? ",arrowhead=diamond" : "") << "];\\n";
 }}
 
 private:
