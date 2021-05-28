@@ -1,0 +1,10 @@
+Matched 23 tokens.
+Matched 34 tokens.
+Matched 41 tokens.
+============= Module ===========
+== Sub Tree ==
+
+== Sub Tree ==
+console.log(ns_a.foo())
+== Sub Tree ==
+export { as ns_a} 

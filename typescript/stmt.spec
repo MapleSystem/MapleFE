@@ -663,7 +663,8 @@ rule Declaration : ONEOF(HoistableDeclaration,
                          LexicalDeclaration,
                          InterfaceDeclaration,
                          TypeAliasDeclaration,
-                         EnumDeclaration)
+                         EnumDeclaration,
+                         NamespaceDeclaration)
   attr.property : Top
 
 ##-----------------------------------
