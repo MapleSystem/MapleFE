@@ -424,6 +424,8 @@ void AST_DFA::BuildDefUseChain() {
 IdentifierNode *CollectUseVisitor::VisitIdentifierNode(IdentifierNode *node) {
   unsigned nid = node->GetNodeId();
   // exclude def
+  if(node->GetParent() == nullptr)
+    return node;
   MASSERT(node->GetParent() && "null node->GetParent()");
   if (!mHandler->GetDFA()->IsDef(nid) && !node->GetParent()->IsDecl()) {
     unsigned stridx = node->GetStrIdx();
