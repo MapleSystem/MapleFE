@@ -889,7 +889,8 @@ std::string AstEmitter::AstEmitSwitchNode(SwitchNode *node) {
     return std::string();
   std::string str = "switch("s;
   if (auto n = node->GetExpr()) {
-    str += AstEmitTreeNode(n);
+    auto expr = AstEmitTreeNode(n);
+    str += Clean(expr);
   }
   str += "){\n"s;
   for (unsigned i = 0; i < node->GetCasesNum(); ++i) {
