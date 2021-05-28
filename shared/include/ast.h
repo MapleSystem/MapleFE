@@ -1469,7 +1469,7 @@ public:
   void SetFuncName(TreeNode *n) {mFuncName = n; if(n) n->SetParent(this);}
 
   BlockNode* GetBody() {return mBody;}
-  void SetBody(BlockNode *b) {mBody = b; if(b) b->SetParent(this); CleanUp();}
+  void SetBody(BlockNode *b) {mBody = b; if(b) {b->SetParent(this); CleanUp();}}
 
   bool IsConstructor()    {return mIsConstructor;}
   void SetIsConstructor(bool b = true) {mIsConstructor = b;}
