@@ -595,15 +595,15 @@ gen_func_definition = lambda dictionary, node_name: \
         node_name + '* ' + gen_args[1] + '::' + gen_args[2] + node_name + '(' + node_name \
         + '* node) {\nif(node != nullptr' + (' && !IsVisited(node)) {' \
         + '\nif(mTrace){std::cout << "Visiting ' + node_name + ', id=" << node->GetNodeId() << "..." << std::endl;}' \
-        if node_name != 'TreeNode' else ') {')
+        + '\nBaseTreeNode(node);' if node_name != 'TreeNode' else ') {')
 gen_call_child_node = lambda dictionary, node_name, field_name, node_type, accessor: \
-        'if(auto t = ' + accessor + ') {' + 'auto n = ' + gen_args[2] + node_type + '(t);' \
+        'if(auto t = ' + accessor + ') {' + 'auto n = ' + gen_args[5] + node_type + '(t);' \
         + 'if(n != t){' + gen_setter(accessor) + ';}}' if field_name != '' else \
-        'return ' + gen_args[2] + node_type + '(' + accessor + ');\n'
+        'return ' + gen_args[5] + node_type + '(' + accessor + ');\n'
 gen_call_children_node = lambda dictionary, node_name, field_name, node_type, accessor: ''
 gen_call_children_node_end = lambda dictionary, node_name, field_name, node_type, accessor: ''
 gen_call_nth_child_node = lambda dictionary, node_name, field_name, node_type, accessor: \
-        'if(auto t = ' + accessor + ') { auto n = ' + gen_args[2] + node_type + '(t);' \
+        'if(auto t = ' + accessor + ') { auto n = ' + gen_args[5] + node_type + '(t);' \
         + 'if(n != t) {' + gen_setter(accessor) + ';}}'
 gen_func_definition_end = lambda dictionary, node_name: '}\nreturn node;\n}'
 
@@ -614,6 +614,7 @@ gen_args = [
         "Visit",          # Prefix of function name
         "",               # Extra include directives
         "",               # Base class
+        "Visit",          # In body
         ]
 astvisitor = gen_args[0]
 astvisitorclass = gen_args[1]
@@ -645,6 +646,8 @@ virtual bool IsVisited(TreeNode* node) {{
 handle_src_include_files(Initialization)
 append(include_file, astvisitor_init)
 handle_yaml(initial_yaml, gen_handler)
+gen_args[2] = "Base"
+handle_yaml(treenode_yaml, gen_handler_ast_node)
 handle_src_include_files(Finalization)
 
 ################################################################################
