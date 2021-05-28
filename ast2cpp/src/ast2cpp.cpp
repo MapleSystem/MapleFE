@@ -61,6 +61,8 @@ void A2C::ProcessAST(bool trace_a2c) {
         std::cout << std::endl;
       }
     }
+    AstGraph graph(gModule);
+    graph.DumpGraph("After AdjustAST()", &std::cout);
   }
 
   handler.BuildCFG();
