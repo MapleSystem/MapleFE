@@ -552,7 +552,6 @@ ImportNode *CfgBuilder::VisitImportNode(ImportNode *node) {
 // For statement of current BB
 ExportNode *CfgBuilder::VisitExportNode(ExportNode *node) {
   mCurrentBB->AddStatement(node);
-  AstVisitor::VisitExportNode(node);
   return node;
 }
 
