@@ -486,6 +486,14 @@ void Verifier::VerifyStruct(StructNode *tree){
   return;
 }
 
+void Verifier::VerifyBindingElement(BindingElementNode *tree){
+  return;
+}
+
+void Verifier::VerifyBindingPattern(BindingPatternNode *tree){
+  return;
+}
+
 void Verifier::VerifyStructLiteral(StructLiteralNode *tree){
   return;
 }

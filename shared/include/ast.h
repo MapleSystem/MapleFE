@@ -719,6 +719,51 @@ public:
   void Dump(unsigned);
 };
 
+//////////////////////////////////////////////////////////////////////////
+//                           BindingPattern
+// It's used in Destructuring scenarios. It comes from Javascript.
+// It takes out elements from structs or arrays and form a new one.
+// It may bind elements to some new variables. I believe this is the reason
+// it's called BindingXXX
+//////////////////////////////////////////////////////////////////////////
+
+class BindingElementNode : public TreeNode {
+private:
+  TreeNode *mVariable;  // The new variable to bind element to
+  TreeNode *mElement;   // the elements in the source struct or array
+  bool      mIsRest;    // In array binding, 'rest' is a syntax sugar for the rest
+                        // elements.
+public:
+  BindingElementNode() : TreeNode(NK_BindingElement),
+                         mVariable(NULL), mElement(NULL), mIsRest(false) {}
+  ~BindingElementNode() {}
+
+  TreeNode* GetVariable()            {return mVariable;}
+  void      SetVariable(TreeNode* n) {mVariable = n;}
+  TreeNode* GetElement()             {return mElement;}
+  void      SetElement(TreeNode* n)  {mElement = n;}
+  bool IsRest()          {return mIsRest;}
+  void SetIsRest(bool b) {mIsRest = b;}
+
+  void Dump(unsigned);
+};
+
+class BindingPatternNode : public TreeNode {
+private:
+  SmallVector<TreeNode*> mElements;
+public:
+  BindingPatternNode() : TreeNode(NK_BindingPattern) {}
+  ~BindingPatternNode() {Release();}
+
+  unsigned  GetElementsNum()       {return mElements.GetNum();}
+  TreeNode* GetElement(unsigned i) {return mElements.ValueAtIndex(i);}
+  void      SetElement(unsigned i, TreeNode* n) {*(mElements.RefAtIndex(i)) = n;}
+  void      AddElement(TreeNode *n);
+
+  void Release() {mElements.Release();}
+  void Dump(unsigned);
+};
+
 
 //////////////////////////////////////////////////////////////////////////
 //                           Struct Node

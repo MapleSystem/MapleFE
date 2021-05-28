@@ -35,6 +35,10 @@ NODEKIND(UserType)
 NODEKIND(Cast)
 NODEKIND(Parenthesis)
 
+// For de-structuring syntax, first in JS
+NODEKIND(BindingElement)
+NODEKIND(BindingPattern)
+
 // Struct
 NODEKIND(Struct)
 NODEKIND(StructLiteral)

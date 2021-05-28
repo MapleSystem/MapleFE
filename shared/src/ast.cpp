@@ -505,6 +505,32 @@ void ArrayLiteralNode::Dump(unsigned indent) {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
+//                          BindingElement and BindingPattern
+//////////////////////////////////////////////////////////////////////////////////////
+
+void BindingElementNode::Dump(unsigned indent) {
+  DumpIndentation(indent);
+}
+
+void BindingPatternNode::AddElement(TreeNode *tree) {
+  if (tree->IsBindingElement()) {
+    mElements.PushBack(tree);
+  } else if (tree->IsPass()) {
+    PassNode *pass = (PassNode*)tree;
+    for (unsigned i = 0; i < pass->GetChildrenNum(); i++) {
+      TreeNode *child = pass->GetChild(i);
+      AddElement(child);
+    }
+  } else {
+    MERROR("Unsupported element of binding pattern.");
+  }
+}
+
+void BindingPatternNode::Dump(unsigned indent) {
+  DumpIndentation(indent);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////
 //                          StructNode and StructLiteralNode
 //////////////////////////////////////////////////////////////////////////////////////
 
