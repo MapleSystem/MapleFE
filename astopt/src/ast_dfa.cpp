@@ -105,7 +105,9 @@ unsigned AST_DFA::GetDefStrIdx(TreeNode *node) {
   return stridx;
 }
 
-DefPosition *AST_DFA::AddDef(TreeNode *node, unsigned &bitnum, unsigned bbid) {
+// return def-node id defined in node
+// return 0 if node has no def
+unsigned AST_DFA::AddDef(TreeNode *node, unsigned &bitnum, unsigned bbid) {
   unsigned stridx = 0;
   unsigned nodeid = 0;
   switch (node->GetKind()) {
@@ -165,13 +167,14 @@ DefPosition *AST_DFA::AddDef(TreeNode *node, unsigned &bitnum, unsigned bbid) {
     } else {
       DefPosition pos(stridx, nodeid);
       bitnum++;
-      mDefPositionVec.PushBack(pos);
       mDefStrIdxSet.insert(stridx);
-      return &pos;
+      mDefNodeIdSet.insert(nodeid);
+      mDefPositionVec.PushBack(pos);
+      return nodeid;
     }
   }
 
-  return NULL;
+  return nodeid;
 }
 
 // this calcuates mDefPositionVec mBbIdVec
@@ -204,10 +207,8 @@ void AST_DFA::CollectDefNodes() {
         mStmtIdVec.PushBack(sid);
         mStmtId2StmtMap[sid] = stmt;
         mStmtId2BbIdMap[sid] = bbid;
-        DefPosition *pos = AddDef(stmt, bitnum, bbid);
-        if (pos) {
-          unsigned nid = pos->second;
-          mDefVec.insert(nid);
+        unsigned nid = AddDef(stmt, bitnum, bbid);
+        if (nid) {
           mNodeId2StmtIdMap[nid] = sid;
         }
       }
@@ -422,16 +423,28 @@ void AST_DFA::BuildDefUseChain() {
 }
 
 IdentifierNode *CollectUseVisitor::VisitIdentifierNode(IdentifierNode *node) {
-  unsigned nid = node->GetNodeId();
-  // exclude def
-  if(node->GetParent() == nullptr)
+  unsigned stridx = node->GetStrIdx();
+  // only collect use with def in the function
+  if (mDFA->mDefStrIdxSet.find(stridx) == mDFA->mDefStrIdxSet.end()) {
     return node;
-  MASSERT(node->GetParent() && "null node->GetParent()");
-  if (!mHandler->GetDFA()->IsDef(nid) && !node->GetParent()->IsDecl()) {
-    unsigned stridx = node->GetStrIdx();
-    mHandler->GetDFA()->mUsePositionMap[stridx].insert(nid);
-    mHandler->GetDFA()->mNodeId2StmtIdMap[nid] = mStmtIdx;
   }
+
+  // exclude def
+  unsigned nid = node->GetNodeId();
+  if (mHandler->GetDFA()->IsDef(nid))
+    return node;
+
+  // exclude its own decl
+  TreeNode *p = node->GetParent();
+  if (p && p->IsDecl()) {
+    DeclNode *dn = static_cast<DeclNode *>(p);
+    if (dn->GetVar() == node) {
+      return node;
+    }
+  }
+
+  mDFA->mUsePositionMap[stridx].insert(nid);
+  mDFA->mNodeId2StmtIdMap[nid] = mStmtIdx;
   return node;
 }
 

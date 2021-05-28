@@ -44,7 +44,7 @@ class AST_DFA {
   std::unordered_map<unsigned, TreeNode*> mStmtId2StmtMap;
 
   // def node id set
-  std::unordered_set<unsigned> mDefVec;
+  std::unordered_set<unsigned> mDefNodeIdSet;
   // def use positions, def index
   SmallVector<DefPosition> mDefPositionVec;
   // use stridx to set of node id
@@ -83,9 +83,11 @@ class AST_DFA {
   void BuildBitVectors();
   void BuildDefUseChain();
 
-  bool IsDef(unsigned nid) { return mDefVec.find(nid) != mDefVec.end();}
+  bool IsDef(unsigned nid) { return mDefNodeIdSet.find(nid) != mDefNodeIdSet.end();}
+  // return def stridx, return 0 if no def
   unsigned GetDefStrIdx(TreeNode *node);
-  DefPosition *AddDef(TreeNode *node, unsigned &bitnum, unsigned bbid);
+  // return def nodeId, return 0 if no def
+  unsigned AddDef(TreeNode *node, unsigned &bitnum, unsigned bbid);
 
   unsigned GetStmtIdFromNodeId(unsigned id) { return mNodeId2StmtIdMap[id]; }
   unsigned GetBbIdFromStmtId(unsigned id) { return mStmtId2BbIdMap[id]; }
@@ -106,23 +108,18 @@ class AST_DFA {
 class CollectUseVisitor : public AstVisitor {
  private:
   AST_Handler  *mHandler;
+  AST_DFA      *mDFA;
   bool          mTrace;
   unsigned      mStmtIdx;
-  unsigned      mStrIdx;
-  unsigned      mNodeIdx;
   unsigned      mBbId;
-  bool          mFound;
 
  public:
   explicit CollectUseVisitor(AST_Handler *h, bool t, bool base = false)
-    : mHandler(h), mTrace(t), mStrIdx(0), mNodeIdx(0), mFound(false), AstVisitor(t && base) {}
+    : mHandler(h), mDFA(h->GetDFA()), mTrace(t), AstVisitor(t && base) {}
   ~CollectUseVisitor() = default;
 
   void SetStmtIdx(unsigned id) { mStmtIdx = id; }
-  void SetStrIdx(unsigned id)  { mStrIdx  = id; }
-  void SetNodeIdx(unsigned id) { mNodeIdx = id; }
   void SetBbId(unsigned id)    { mBbId    = id; }
-  void SetFound(bool b)        { mFound   = b; }
 
   IdentifierNode *VisitIdentifierNode(IdentifierNode *node);
 };
