@@ -45,6 +45,7 @@ TS2AST=$TSOUT/bin/ts2ast
 AST2CPP=$TSOUT/bin/ast2cpp
 [ -x "$TS2AST" ] || { echo Cannot execute $TS2AST; exit 1; }
 [ -x "$AST2CPP" ] || { echo Cannot execute $AST2CPP; exit 1; }
+Passed=
 Failed=
 for ts in $LIST; do
   echo ---------
@@ -74,6 +75,7 @@ for ts in $LIST; do
       echo Failed to compile "$T" with tsc
       [ -n "$KEEP" ] || rm -f "$T"
     else
+      Passed="$Passed $ts"
       rm -f "$T"
     fi
   fi
@@ -92,6 +94,9 @@ for ts in $LIST; do
       rm -f "$ts"-[0-9]*.png "$ts"-[0-9]*.dot; }
   fi
 done
+echo
+echo "Test case(s) passed:"
+echo $Passed | xargs -n1 | env LC_ALL=C sort | nl
 echo
 [ -n "$Failed" ] || exit 0
 echo "Test case(s) failed:"
