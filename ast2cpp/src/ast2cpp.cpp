@@ -46,7 +46,7 @@ void A2C::ProcessAST(bool trace_a2c) {
   if (mTraceA2C) {
     std::cout << "============= AstGraph ===========" << std::endl;
     AstGraph graph(gModule);
-    graph.DumpGraph("Initial AST", &std::cout);
+    graph.DumpGraph("After LoadFromAstBuf()", &std::cout);
   }
 
   AST_Handler handler(gModule, mTraceA2C);
@@ -94,11 +94,7 @@ void A2C::ProcessAST(bool trace_a2c) {
     std::cout << "============= AstStore ===========" << std::endl;
     AstStore saveAst(gModule);
     saveAst.StoreInAstBuf();
-    AstBuffer &ast_buf = saveAst.GetAstBuf();
-    AstLoad loadAst;
-    ModuleNode *module = loadAst.LoadFromAstBuf(ast_buf);
-    AstGraph graph(module);
-    graph.DumpGraph("After LoadFromAstBuf()", &std::cout);
+    //AstBuffer &ast_buf = saveAst.GetAstBuf();
   }
 
   if (mTraceA2C) {
