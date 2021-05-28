@@ -108,7 +108,7 @@ foreach my $file (@paths) {
         #print "---------------------------\n";
         next;
       } else {
-        my $res1 = system("echo $pwd/$cmnd1 $outroot/$file.ast > $outroot/$outresult.1");
+        my $res1 = system("$pwd/$cmnd1 $outroot/$file.ast > $outroot/$outresult.1");
 
         if ($res1 > 0) {
           print "$pwd/$cmnd1 $outroot/$file.ast\n";
