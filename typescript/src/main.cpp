@@ -21,6 +21,7 @@
 #include "gen_summary.h"
 #include "gen_aststore.h"
 #include "gen_astdump.h"
+#include "gen_astgraph.h"
 
 static void help() {
   std::cout << "ts2ast sourcefile [options]:\n" << std::endl;
@@ -37,6 +38,7 @@ static void help() {
   std::cout << "   --trace-patch-was-succ : Trace Patching of WasSucc nodes" << std::endl;
   std::cout << "   --trace-warning   : Print Warning" << std::endl;
   std::cout << "   --dump-ast        : Dump AST in text format" << std::endl;
+  std::cout << "   --dump-dot        : Dump AST in dot format" << std::endl;
 }
 
 int main (int argc, char *argv[]) {
@@ -48,6 +50,7 @@ int main (int argc, char *argv[]) {
   maplefe::Parser *parser = new maplefe::Parser(argv[1]);
 
   bool dump_ast = false;
+  bool dump_dot = false;
   bool succ;
 
   // Parse the argument
@@ -76,6 +79,8 @@ int main (int argc, char *argv[]) {
       parser->mTraceWarning = true;
     } else if (!strncmp(argv[i], "--dump-ast", 10) && (strlen(argv[i]) == 10)) {
       dump_ast = true;
+    } else if (!strncmp(argv[i], "--dump-dot", 10) && (strlen(argv[i]) == 10)) {
+      dump_dot = true;
     } else {
       std::cerr << "unknown option " << argv[i] << std::endl;
       exit(-1);
@@ -91,7 +96,12 @@ int main (int argc, char *argv[]) {
 
   if(dump_ast) {
     maplefe::AstDump astdump(maplefe::gModule);
-    astdump.Dump("Initial AST", &std::cout);
+    astdump.Dump("ts2ast: Initial AST", &std::cout);
+  }
+
+  if(dump_dot) {
+    maplefe::AstGraph graph(maplefe::gModule);
+    graph.DumpGraph("ts2ast: Initial AST", &std::cout);
   }
 
   maplefe::AstStore saveAst(maplefe::gModule);
