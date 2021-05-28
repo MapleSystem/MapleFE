@@ -1165,8 +1165,11 @@ ModuleNode *{gen_args2}FromAstBuf(AstBuffer &buf) {{
   bool check = *it++ == 'M';
   check &= *it++ == 'P';
   MASSERT(check);
-  if(ReadNum('L') != {signature}LL)
+  int64_t sig = ReadNum('L');
+  if(sig != {signature}LL) {{
+    std::cerr << "Error: Unknown signature " << sig << ". Expected {signature}." << std::endl;
     return nullptr;
+  }}
   AstNodeVec node_vec;
   while(*it != 'T')
     node_vec.push_back(CreateNode());

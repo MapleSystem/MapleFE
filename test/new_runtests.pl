@@ -108,10 +108,10 @@ foreach my $file (@paths) {
         #print "---------------------------\n";
         next;
       } else {
-        my $res1 = system("echo $pwd/$cmnd1 $outroot/$file.ast > $outroot/$outresult.1");
+        my $res1 = system("$cmnd1 $outroot/$file.ast > $outroot/$outresult.1");
 
         if ($res1 > 0) {
-          print "$pwd/$cmnd1 $outroot/$file.ast\n";
+          print "$cmnd1 $outroot/$file.ast\n";
           print " ==$pinput===> $file\n";
           $countfailedcases ++;
           push(@failed_file, $pinput.":  ".$file);

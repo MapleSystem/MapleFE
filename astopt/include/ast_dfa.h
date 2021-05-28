@@ -28,10 +28,8 @@
 
 namespace maplefe {
 
-// Position of Def: <stridx, stmtid, nodeid, bbid>
-typedef std::tuple<unsigned, unsigned, unsigned, unsigned> DefPosition;
-// Position of Use: <stmtidx, nodeid, bbid>
-typedef std::tuple<unsigned, unsigned, unsigned> UsePosition;
+// DefPosition of Def: <stridx, nodeid>
+typedef std::pair<unsigned, unsigned> DefPosition;
 // map <bbid, BitVector>
 typedef std::unordered_map<unsigned, BitVector*> BVMap;
 
@@ -45,9 +43,12 @@ class AST_DFA {
   SmallVector<unsigned> mStmtIdVec;
   std::unordered_map<unsigned, TreeNode*> mStmtId2StmtMap;
 
-  // def use positions
+  // def node id set
+  std::unordered_set<unsigned> mDefVec;
+  // def use positions, def index
   SmallVector<DefPosition> mDefPositionVec;
-  std::unordered_map<unsigned, std::set<UsePosition>> mUsePositionMap;;
+  // use stridx to set of node id
+  std::unordered_map<unsigned, std::set<unsigned>> mUsePositionMap;
 
   // followint maps with key BB id
   BVMap mPrsvMap;
@@ -55,10 +56,19 @@ class AST_DFA {
   BVMap mRchInMap; // reaching definition bit vector entering bb
   BVMap mRchOutMap;
 
-  std::vector<unsigned> mBbIdVec;                     // bb ids in the function, depth first order
-  std::unordered_map<unsigned, AstBasicBlock *> mBbId2BBMap; // bb id to bb map
-  std::unordered_set<unsigned> mDefSet;               // def stridx set
-  std::unordered_set<unsigned, std::set<UsePosition>> mDefUseMap; // def-use : key is DefPositionVec idx
+  // def/use nid --> stmtid
+  std::unordered_map<unsigned, unsigned> mNodeId2StmtIdMap;
+  // stmtid --> bbid
+  std::unordered_map<unsigned, unsigned> mStmtId2BbIdMap;
+  // bbid --> bb
+  std::unordered_map<unsigned, AstBasicBlock *> mBbId2BBMap;
+  // bbid vec
+  std::vector<unsigned> mBbIdVec;
+
+  // def stridx set
+  std::unordered_set<unsigned> mDefStrIdxSet;
+  // def-use : key is def node id to a set of use node id
+  std::unordered_set<unsigned, std::set<unsigned>> mDefUseMap;
 
   friend class CollectUseVisitor;
 
@@ -73,8 +83,14 @@ class AST_DFA {
   void BuildBitVectors();
   void BuildDefUseChain();
 
+  bool IsDef(unsigned nid) { return mDefVec.find(nid) != mDefVec.end();}
   unsigned GetDefStrIdx(TreeNode *node);
   DefPosition *AddDef(TreeNode *node, unsigned &bitnum, unsigned bbid);
+
+  unsigned GetStmtIdFromNodeId(unsigned id) { return mNodeId2StmtIdMap[id]; }
+  unsigned GetBbIdFromStmtId(unsigned id) { return mStmtId2BbIdMap[id]; }
+  TreeNode *GetStmtFromStmtId(unsigned id) { return mStmtId2StmtMap[id]; }
+  AstBasicBlock *GetBbFromBbId(unsigned id) { return mBbId2BBMap[id]; }
 
   void DumpDefPosition(DefPosition pos);
   void DumpDefPositionVec();
