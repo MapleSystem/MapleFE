@@ -1077,7 +1077,9 @@ void ClassNode::Construct(BlockNode *block) {
           mFields.PushBack(inode);
         }
       } else if (var->IsIdentifier()) {
-        mFields.PushBack((IdentifierNode*)var);
+        IdentifierNode *inode = (IdentifierNode*)var;
+        mFields.PushBack(inode);
+        inode->SetParent(this);
       } else
         MERROR("Unsupported class field.");
     } else if (tree_node->IsFunction()) {
@@ -1086,14 +1088,18 @@ void ClassNode::Construct(BlockNode *block) {
         mConstructors.PushBack(f);
       else
         mMethods.PushBack(f);
+      f->SetParent(this);
     } else if (tree_node->IsClass()) {
       mLocalClasses.PushBack((ClassNode*)tree_node);
+      tree_node->SetParent(this);
     } else if (tree_node->IsInterface()) {
       mLocalInterfaces.PushBack((InterfaceNode*)tree_node);
+      tree_node->SetParent(this);
     } else if (tree_node->IsBlock()) {
       BlockNode *block = (BlockNode*)tree_node;
       MASSERT(block->IsInstInit() && "unnamed block in class is not inst init?");
       mInstInits.PushBack(block);
+      tree_node->SetParent(this);
     } else
       MASSERT("Unsupported tree node in class body.");
   }
