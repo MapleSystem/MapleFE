@@ -152,15 +152,14 @@ def gen_enum_func(dictionary):
     for each in dictionary["ChildEnums"]:
         name = each["Name"]
         hcode.append("static const char* GetEnum" + name + "(" + name + " k);")
-        xcode.append("const char* " + gen_args[1] + "::GetEnum" + name + "(" + name + " k) {")
-        xcode.append("switch(k) {")
+        xcode.extend(["const char* " + gen_args[1] + "::GetEnum" + name + "(" + name + " k) {",
+                      "switch(k) {"])
         for e in get_enum_list(dictionary, name):
-            xcode.append("case " + e + ":")
-            xcode.append('return "' + e + '";')
-        xcode.append('default: MASSERT(0 && "Unexpected enumerator");')
-        xcode.append("}")
-        xcode.append('return "UNEXPECTED ' + name + '";')
-        xcode.append("}\n")
+            xcode.append('case ' + e + ': return "' + e + '";')
+        xcode.extend(['default: MASSERT(0 && "Unexpected enumerator");',
+                      '}',
+                      'return "UNEXPECTED ' + name + '";',
+                      '}\n'])
     append(src_file, xcode)
     append(include_file, hcode)
 
@@ -365,7 +364,6 @@ def handle_src_include_files(phase):
 namespace maplefe {{
 
 class {gen_args1} {gen_args4} {{
-public:
 """.format(gen_args1upper=gen_args[1].upper(), gen_args1=gen_args[1], gen_args3=gen_args[3], gen_args4=gen_args[4])
 ] # include_start
 
@@ -690,6 +688,7 @@ gen_args = [
 
 astgraph_init = [
 """
+public:
 {gen_args1}(TreeNode *m) : mRoot(m), mOs(nullptr) {{}}
 
 #define NodeName(n,s)  ({astdumpclass}::GetEnumNodeKind((n)->GetKind()) + 3) << s << n->GetNodeId()
