@@ -862,9 +862,8 @@ public:
 
 void {gen_args2}(const char *title, std::ostream *os) {{
   mOs = os;
-  *mOs << "// [Beginning of {gen_args1}: " << title << "\\n// Filename: " << mASTModule->GetFileName() << "\\n";
-  for(unsigned i = 0; i < mASTModule->GetTreesNum(); i++)
-    *mOs << {gen_args2}TreeNode(mASTModule->GetTree(i));
+  *mOs << "// [Beginning of {gen_args1}: " << title << "\\n";
+  *mOs << AstEmitTreeNode(mASTModule);
   *mOs << "// End of AstEmitter]\\n";
 }}
 

@@ -39,9 +39,8 @@ public:
 
   void AstEmit(const char *title, std::ostream *os) {
     mOs = os;
-    *mOs << "// [Beginning of AstEmitter: " << title << "\n// Filename: " << mASTModule->GetFileName() << "\n";
-    for (unsigned i = 0; i < mASTModule->GetTreesNum(); i++)
-      *mOs << AstEmitTreeNode(mASTModule->GetTree(i));
+    *mOs << "// [Beginning of AstEmitter: " << title << "\n";
+    *mOs << AstEmitTreeNode(mASTModule);
     *mOs << "// End of AstEmitter]\n";
   }
 
@@ -72,6 +71,8 @@ public:
   std::string AstEmitFieldNode(FieldNode *node);
   std::string AstEmitArrayElementNode(ArrayElementNode *node);
   std::string AstEmitArrayLiteralNode(ArrayLiteralNode *node);
+  std::string AstEmitBindingElementNode(BindingElementNode *node);
+  std::string AstEmitBindingPatternNode(BindingPatternNode *node);
   std::string AstEmitNumIndexSigNode(NumIndexSigNode *node);
   std::string AstEmitStrIndexSigNode(StrIndexSigNode *node);
   std::string AstEmitStructNode(StructNode *node);
@@ -110,6 +111,7 @@ public:
   std::string AstEmitUserTypeNode(UserTypeNode *node);
   std::string AstEmitPrimTypeNode(PrimTypeNode *node);
   std::string AstEmitPrimArrayTypeNode(PrimArrayTypeNode *node);
+  std::string AstEmitModuleNode(ModuleNode *node);
 
   std::string AstEmitTreeNode(TreeNode *node);
 
