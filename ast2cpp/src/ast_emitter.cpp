@@ -341,6 +341,8 @@ std::string AstEmitter::AstEmitIdentifierNode(IdentifierNode *node) {
     str += GetEnumAttrId(node->GetAttrAtIndex(i));
   }
   str += node->GetName();
+  if(node->IsOptionalParam())
+    str += "?"s;
   //if (auto n = node->GetDims()) {
   //  str += " "s + AstEmitDimensionNode(n);
   //}
@@ -473,13 +475,14 @@ std::string AstEmitter::AstEmitBindingElementNode(BindingElementNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
+  if(node->IsRest())
+    str += "..."s;
   if (auto n = node->GetVariable()) {
     str += " "s + AstEmitTreeNode(n);
   }
   if (auto n = node->GetElement()) {
-    str += " "s + AstEmitTreeNode(n);
+    str += AstEmitTreeNode(n);
   }
-  str += " "s + std::to_string(node->IsRest());
   mPrecedence = '\030';
   if (node->IsStmt())
     str += ";\n"s;
@@ -489,21 +492,22 @@ std::string AstEmitter::AstEmitBindingElementNode(BindingElementNode *node) {
 std::string AstEmitter::AstEmitBindingPatternNode(BindingPatternNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str;
+  std::string str = "{"s;
 
   for (unsigned i = 0; i < node->GetElementsNum(); ++i) {
     if (i)
       str += ", "s;
     if (auto n = node->GetElement(i)) {
-      str += " "s + AstEmitTreeNode(n);
+      str += AstEmitTreeNode(n);
     }
   }
+  str += "}"s;
 
   if (auto n = node->GetType()) {
-    str += " "s + AstEmitTreeNode(n);
+    str += ": "s + AstEmitTreeNode(n);
   }
   if (auto n = node->GetInit()) {
-    str += " "s + AstEmitTreeNode(n);
+    str += "= "s + AstEmitTreeNode(n);
   }
   mPrecedence = '\030';
   if (node->IsStmt())
