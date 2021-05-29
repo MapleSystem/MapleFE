@@ -568,11 +568,11 @@ handle_yaml(initial_yaml, gen_enum_func)
 gen_args[2] = "Dump"
 gen_padding = "^ "
 gen_call_child_node = lambda dictionary, node_name, field_name, node_type, accessor: \
-    (('Dump("' + padding_name(field_name) + ': ' + short_name(node_type) \
+    ('Dump("' + padding_name(field_name) + ': ' + short_name(node_type) \
     + '*, " + (' + accessor + ' ? "NodeId=" + std::to_string(' + accessor \
     + '->GetNodeId()) : std::string("null")));\n' if field_name == "mParent" else \
     'Dump("' + padding_name(field_name) + ': ' + short_name(node_type) + '*", ' + accessor + ');\n' \
-    + prefixfuncname + short_name(node_type) + '(' + accessor + ');') if field_name != '' else '')
+    + prefixfuncname + short_name(node_type) + '(' + accessor + ');') if field_name != '' else ''
 handle_yaml(treenode_yaml, gen_handler_ast_node)
 handle_src_include_files(Finalization)
 
@@ -595,9 +595,9 @@ gen_func_definition = lambda dictionary, node_name: \
         + '\nif(mTrace){std::cout << "Visiting ' + node_name + ', id=" << node->GetNodeId() << "..." << std::endl;}' \
         + '\nBaseTreeNode(node);' if node_name != 'TreeNode' else ') {')
 gen_call_child_node = lambda dictionary, node_name, field_name, node_type, accessor: \
-        'if(auto t = ' + accessor + ') {' + 'auto n = ' + gen_args[5] + node_type + '(t);' \
-        + 'if(n != t){' + gen_setter(accessor) + ';}}' if field_name != '' else \
-        'return ' + gen_args[5] + node_type + '(' + accessor + ');\n'
+        ('if(auto t = ' + accessor + ') {' + 'auto n = ' + gen_args[5] + node_type + '(t);' \
+        + 'if(n != t){' + gen_setter(accessor) + ';}}' if field_name != "mParent" else '') \
+        if field_name != '' else 'return ' + gen_args[5] + node_type + '(' + accessor + ');\n'
 gen_call_children_node = lambda dictionary, node_name, field_name, node_type, accessor: ''
 gen_call_children_node_end = lambda dictionary, node_name, field_name, node_type, accessor: ''
 gen_call_nth_child_node = lambda dictionary, node_name, field_name, node_type, accessor: \
