@@ -13,13 +13,13 @@
  * See the Mulan PSL v2 for more details.
  */
 
-#include "ast_emitter.h"
+#include "ts_emitter.h"
 
 namespace maplefe {
 
 using namespace std::string_literals;
 
-const char *AstEmitter::GetEnumAttrId(AttrId k) {
+const char *TsEmitter::GetEnumAttrId(AttrId k) {
   switch (k) {
     case ATTR_abstract:
       return "abstract ";
@@ -57,53 +57,53 @@ const char *AstEmitter::GetEnumAttrId(AttrId k) {
   return "UNEXPECTED AttrId";
 }
 
-std::string AstEmitter::AstEmitAnnotationNode(AnnotationNode *node) {
+std::string TsEmitter::TsEmitAnnotationNode(AnnotationNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
   if (auto n = node->GetId()) {
-    str += " "s + AstEmitIdentifierNode(n);
+    str += " "s + TsEmitIdentifierNode(n);
   }
   if (auto n = node->GetType()) {
-    str += " "s + AstEmitAnnotationTypeNode(n);
+    str += " "s + TsEmitAnnotationTypeNode(n);
   }
   if (auto n = node->GetExpr()) {
-    str += " "s + AstEmitTreeNode(n);
+    str += " "s + TsEmitTreeNode(n);
   }
   if (node->IsStmt())
     str += ";\n"s;
   return str;
 }
 
-std::string AstEmitter::AstEmitPackageNode(PackageNode *node) {
+std::string TsEmitter::TsEmitPackageNode(PackageNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str = "package";
   if (auto n = node->GetPackage()) {
-    str += " "s + AstEmitTreeNode(n);
+    str += " "s + TsEmitTreeNode(n);
   }
   if (node->IsStmt())
     str += ";\n"s;
   return str;
 }
 
-std::string AstEmitter::AstEmitXXportAsPairNode(XXportAsPairNode *node) {
+std::string TsEmitter::TsEmitXXportAsPairNode(XXportAsPairNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
   if (node->IsDefault()) {
     if (auto n = node->GetBefore())
-      str += " "s + AstEmitTreeNode(n);
+      str += " "s + TsEmitTreeNode(n);
   } else if (node->IsEverything()) {
     if (auto n = node->GetAfter())
-      str += " * as "s + AstEmitTreeNode(n);
+      str += " * as "s + TsEmitTreeNode(n);
   } else {
     if (auto n = node->GetBefore()) {
       if (n->GetKind() == NK_Identifier)
         str += "{ "s;
-      str += AstEmitTreeNode(n);
+      str += TsEmitTreeNode(n);
       if (auto n = node->GetAfter())
-        str += " as "s + AstEmitTreeNode(n);
+        str += " as "s + TsEmitTreeNode(n);
       if (n->GetKind() == NK_Identifier)
         str += " }"s;
     }
@@ -113,7 +113,7 @@ std::string AstEmitter::AstEmitXXportAsPairNode(XXportAsPairNode *node) {
   return str;
 }
 
-std::string AstEmitter::AstEmitExportNode(ExportNode *node) {
+std::string TsEmitter::TsEmitExportNode(ExportNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str = "export "s;
@@ -122,10 +122,10 @@ std::string AstEmitter::AstEmitExportNode(ExportNode *node) {
     if (i)
       str += ", "s;
     if (auto n = node->GetPair(i))
-      str += AstEmitXXportAsPairNode(n);
+      str += TsEmitXXportAsPairNode(n);
   }
   if (auto n = node->GetTarget()) {
-    str += " from "s + AstEmitTreeNode(n);
+    str += " from "s + TsEmitTreeNode(n);
   }
 
   mPrecedence = '\030';
@@ -134,7 +134,7 @@ std::string AstEmitter::AstEmitExportNode(ExportNode *node) {
   return str;
 }
 
-std::string AstEmitter::AstEmitImportNode(ImportNode *node) {
+std::string TsEmitter::TsEmitImportNode(ImportNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str = "import "s;
@@ -163,27 +163,27 @@ std::string AstEmitter::AstEmitImportNode(ImportNode *node) {
     if (i)
       str += ", "s;
     if (auto n = node->GetPair(i)) {
-      str += AstEmitXXportAsPairNode(n);
+      str += TsEmitXXportAsPairNode(n);
     }
   }
   if (auto n = node->GetTarget()) {
-    str += " from "s + AstEmitTreeNode(n);
+    str += " from "s + TsEmitTreeNode(n);
   }
   if (node->IsStmt())
     str += ";\n"s;
   return str;
 }
 
-std::string AstEmitter::AstEmitUnaOperatorNode(UnaOperatorNode *node) {
+std::string TsEmitter::TsEmitUnaOperatorNode(UnaOperatorNode *node) {
   if (node == nullptr)
     return std::string();
   bool isPost = node->IsPost();
-  const char *op = AstEmitter::GetEnumOprId(node->GetOprId());
+  const char *op = TsEmitter::GetEnumOprId(node->GetOprId());
   const Precedence precd = *op & 0x3f;
   const bool rl_assoc = *op >> 6; // false: left-to-right, true: right-to-left
   std::string opr;
   if (auto n = node->GetOpnd()) {
-    opr = AstEmitTreeNode(n);
+    opr = TsEmitTreeNode(n);
     if(precd > mPrecedence || (precd == mPrecedence && (rl_assoc && isPost || !rl_assoc && !isPost)))
       opr = "("s + opr + ")"s;
   }
@@ -200,22 +200,22 @@ std::string AstEmitter::AstEmitUnaOperatorNode(UnaOperatorNode *node) {
   return str;
 }
 
-std::string AstEmitter::AstEmitBinOperatorNode(BinOperatorNode *node) {
+std::string TsEmitter::TsEmitBinOperatorNode(BinOperatorNode *node) {
   if (node == nullptr)
     return std::string();
-  const char *op = AstEmitter::GetEnumOprId(node->GetOprId());
+  const char *op = TsEmitter::GetEnumOprId(node->GetOprId());
   const Precedence precd = *op & 0x3f;
   const bool rl_assoc = *op >> 6; // false: left-to-right, true: right-to-left
   std::string lhs, rhs;
   if (auto n = node->GetOpndA()) {
-    lhs = AstEmitTreeNode(n);
+    lhs = TsEmitTreeNode(n);
     if(precd > mPrecedence || (precd == mPrecedence && rl_assoc))
       lhs = "("s + lhs + ")"s;
   }
   else
     lhs = "(NIL) "s;
   if (auto n = node->GetOpndB()) {
-    rhs = AstEmitTreeNode(n);
+    rhs = TsEmitTreeNode(n);
     if(precd > mPrecedence || (precd == mPrecedence && !rl_assoc))
       rhs = "("s + rhs + ")"s;
   }
@@ -228,24 +228,24 @@ std::string AstEmitter::AstEmitBinOperatorNode(BinOperatorNode *node) {
   return str;
 }
 
-std::string AstEmitter::AstEmitTerOperatorNode(TerOperatorNode *node) {
+std::string TsEmitter::TsEmitTerOperatorNode(TerOperatorNode *node) {
   if (node == nullptr)
     return std::string();
   const Precedence precd = '\004';
   const bool rl_assoc = true; // true: right-to-left
   std::string str;
   if (auto n = node->GetOpndA()) {
-    str = AstEmitTreeNode(n);
+    str = TsEmitTreeNode(n);
     if(precd > mPrecedence || (precd == mPrecedence && rl_assoc))
       str = "("s + str + ")"s;
   }
   str += " ? "s;
   if (auto n = node->GetOpndB()) {
-    str += AstEmitTreeNode(n);
+    str += TsEmitTreeNode(n);
   }
   str += " : "s;
   if (auto n = node->GetOpndC()) {
-    auto s = AstEmitTreeNode(n);
+    auto s = TsEmitTreeNode(n);
     if(precd > mPrecedence)
       s = "("s + s + ")"s;
     str += s;
@@ -256,13 +256,13 @@ std::string AstEmitter::AstEmitTerOperatorNode(TerOperatorNode *node) {
   return str;
 }
 
-std::string AstEmitter::AstEmitBlockNode(BlockNode *node) {
+std::string TsEmitter::TsEmitBlockNode(BlockNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str = "{\n"s;
   for (unsigned i = 0; i < node->GetChildrenNum(); ++i) {
     if (auto n = node->GetChildAtIndex(i)) {
-      str += AstEmitTreeNode(n);
+      str += TsEmitTreeNode(n);
     }
   }
   str += "}\n"s;
@@ -275,19 +275,19 @@ std::string AstEmitter::AstEmitBlockNode(BlockNode *node) {
   }
 
   if (auto n = const_cast<TreeNode *>(node->GetSync())) {
-    str += " "s + AstEmitTreeNode(n);
+    str += " "s + TsEmitTreeNode(n);
   }
   */
   mPrecedence = '\030';
   return str;
 }
 
-std::string AstEmitter::AstEmitNewNode(NewNode *node) {
+std::string TsEmitter::TsEmitNewNode(NewNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str = "new "s;
   if (auto n = node->GetId()) {
-    str += " "s + AstEmitTreeNode(n);
+    str += " "s + TsEmitTreeNode(n);
   }
   str += "("s;
   auto num = node->GetArgsNum();
@@ -295,12 +295,12 @@ std::string AstEmitter::AstEmitNewNode(NewNode *node) {
     if (i)
       str += ", "s;
     if (auto n = node->GetArg(i)) {
-      str += AstEmitTreeNode(n);
+      str += TsEmitTreeNode(n);
     }
   }
   str += ")"s;
   if (auto n = node->GetBody()) {
-    str += " "s + AstEmitBlockNode(n);
+    str += " "s + TsEmitBlockNode(n);
   }
   mPrecedence = '\024';
   if (node->IsStmt())
@@ -308,12 +308,12 @@ std::string AstEmitter::AstEmitNewNode(NewNode *node) {
   return str;
 }
 
-std::string AstEmitter::AstEmitDeleteNode(DeleteNode *node) {
+std::string TsEmitter::TsEmitDeleteNode(DeleteNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str("delete "s);
   if (auto n = node->GetExpr()) {
-    str += AstEmitTreeNode(n);
+    str += TsEmitTreeNode(n);
   }
   mPrecedence = '\030';
   if (node->IsStmt())
@@ -321,7 +321,7 @@ std::string AstEmitter::AstEmitDeleteNode(DeleteNode *node) {
   return str;
 }
 
-std::string AstEmitter::AstEmitDimensionNode(DimensionNode *node) {
+std::string TsEmitter::TsEmitDimensionNode(DimensionNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
@@ -333,7 +333,7 @@ std::string AstEmitter::AstEmitDimensionNode(DimensionNode *node) {
   return str;
 }
 
-std::string AstEmitter::AstEmitIdentifierNode(IdentifierNode *node) {
+std::string TsEmitter::TsEmitIdentifierNode(IdentifierNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
@@ -344,14 +344,14 @@ std::string AstEmitter::AstEmitIdentifierNode(IdentifierNode *node) {
   if(node->IsOptionalParam())
     str += "?"s;
   //if (auto n = node->GetDims()) {
-  //  str += " "s + AstEmitDimensionNode(n);
+  //  str += " "s + TsEmitDimensionNode(n);
   //}
 
   if (auto n = node->GetType()) {
-    str += ": "s + AstEmitTreeNode(n);
+    str += ": "s + TsEmitTreeNode(n);
   }
   if (auto n = node->GetInit()) {
-    str += " = "s + AstEmitTreeNode(n);
+    str += " = "s + TsEmitTreeNode(n);
   }
   mPrecedence = '\030';
   if (node->IsStmt())
@@ -359,15 +359,15 @@ std::string AstEmitter::AstEmitIdentifierNode(IdentifierNode *node) {
   return str;
 }
 
-std::string AstEmitter::AstEmitDeclNode(DeclNode *node) {
+std::string TsEmitter::TsEmitDeclNode(DeclNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str(AstEmitter::GetEnumDeclProp(node->GetProp()));
+  std::string str(TsEmitter::GetEnumDeclProp(node->GetProp()));
   if (auto n = node->GetVar()) {
-    str += " "s + AstEmitTreeNode(n);
+    str += " "s + TsEmitTreeNode(n);
   }
   if (auto n = node->GetInit()) {
-    str += " = "s + AstEmitTreeNode(n);
+    str += " = "s + TsEmitTreeNode(n);
   }
   mPrecedence = '\030';
   if (node->IsStmt())
@@ -375,12 +375,12 @@ std::string AstEmitter::AstEmitDeclNode(DeclNode *node) {
   return str;
 }
 
-std::string AstEmitter::AstEmitAnnotationTypeNode(AnnotationTypeNode *node) {
+std::string TsEmitter::TsEmitAnnotationTypeNode(AnnotationTypeNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
   if (auto n = node->GetId()) {
-    str += " "s + AstEmitIdentifierNode(n);
+    str += " "s + TsEmitIdentifierNode(n);
   }
   mPrecedence = '\030';
   if (node->IsStmt())
@@ -388,15 +388,15 @@ std::string AstEmitter::AstEmitAnnotationTypeNode(AnnotationTypeNode *node) {
   return str;
 }
 
-std::string AstEmitter::AstEmitCastNode(CastNode *node) {
+std::string TsEmitter::TsEmitCastNode(CastNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
   if (auto n = node->GetDestType()) {
-    str += "("s + AstEmitTreeNode(n) + ")";
+    str += "("s + TsEmitTreeNode(n) + ")";
   }
   if (auto n = node->GetExpr()) {
-    str += AstEmitTreeNode(n);
+    str += TsEmitTreeNode(n);
   }
   mPrecedence = '\021';
   if (node->IsStmt())
@@ -404,12 +404,12 @@ std::string AstEmitter::AstEmitCastNode(CastNode *node) {
   return str;
 }
 
-std::string AstEmitter::AstEmitParenthesisNode(ParenthesisNode *node) {
+std::string TsEmitter::TsEmitParenthesisNode(ParenthesisNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
   if (auto n = node->GetExpr()) {
-    str += "("s + AstEmitTreeNode(n) + ")"s;
+    str += "("s + TsEmitTreeNode(n) + ")"s;
   }
   mPrecedence = '\025';
   if (node->IsStmt())
@@ -417,15 +417,15 @@ std::string AstEmitter::AstEmitParenthesisNode(ParenthesisNode *node) {
   return str;
 }
 
-std::string AstEmitter::AstEmitFieldNode(FieldNode *node) {
+std::string TsEmitter::TsEmitFieldNode(FieldNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
   if (auto n = node->GetUpper()) {
-    str += AstEmitTreeNode(n);
+    str += TsEmitTreeNode(n);
   }
   if (auto n = node->GetField()) {
-    str += "."s + AstEmitIdentifierNode(n);
+    str += "."s + TsEmitIdentifierNode(n);
   }
   mPrecedence = '\024';
   if (node->IsStmt())
@@ -433,17 +433,17 @@ std::string AstEmitter::AstEmitFieldNode(FieldNode *node) {
   return str;
 }
 
-std::string AstEmitter::AstEmitArrayElementNode(ArrayElementNode *node) {
+std::string TsEmitter::TsEmitArrayElementNode(ArrayElementNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
   if (auto n = node->GetArray()) {
-    str = AstEmitIdentifierNode(n);
+    str = TsEmitIdentifierNode(n);
   }
 
   for (unsigned i = 0; i < node->GetExprsNum(); ++i) {
     if (auto n = node->GetExprAtIndex(i)) {
-      str += "["s + AstEmitTreeNode(n) + "]"s;
+      str += "["s + TsEmitTreeNode(n) + "]"s;
     }
   }
 
@@ -453,7 +453,7 @@ std::string AstEmitter::AstEmitArrayElementNode(ArrayElementNode *node) {
   return str;
 }
 
-std::string AstEmitter::AstEmitArrayLiteralNode(ArrayLiteralNode *node) {
+std::string TsEmitter::TsEmitArrayLiteralNode(ArrayLiteralNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str("["s);
@@ -461,7 +461,7 @@ std::string AstEmitter::AstEmitArrayLiteralNode(ArrayLiteralNode *node) {
     if (i)
       str += ", "s;
     if (auto n = node->GetLiteral(i)) {
-      str += AstEmitTreeNode(n);
+      str += TsEmitTreeNode(n);
     }
   }
   str += "]"s;
@@ -471,17 +471,17 @@ std::string AstEmitter::AstEmitArrayLiteralNode(ArrayLiteralNode *node) {
   return str;
 }
 
-std::string AstEmitter::AstEmitBindingElementNode(BindingElementNode *node) {
+std::string TsEmitter::TsEmitBindingElementNode(BindingElementNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
   if(node->IsRest())
     str += "..."s;
   if (auto n = node->GetVariable()) {
-    str += " "s + AstEmitTreeNode(n);
+    str += " "s + TsEmitTreeNode(n);
   }
   if (auto n = node->GetElement()) {
-    str += AstEmitTreeNode(n);
+    str += TsEmitTreeNode(n);
   }
   mPrecedence = '\030';
   if (node->IsStmt())
@@ -489,7 +489,7 @@ std::string AstEmitter::AstEmitBindingElementNode(BindingElementNode *node) {
   return str;
 }
 
-std::string AstEmitter::AstEmitBindingPatternNode(BindingPatternNode *node) {
+std::string TsEmitter::TsEmitBindingPatternNode(BindingPatternNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str = "{"s;
@@ -498,16 +498,16 @@ std::string AstEmitter::AstEmitBindingPatternNode(BindingPatternNode *node) {
     if (i)
       str += ", "s;
     if (auto n = node->GetElement(i)) {
-      str += AstEmitTreeNode(n);
+      str += TsEmitTreeNode(n);
     }
   }
   str += "}"s;
 
   if (auto n = node->GetType()) {
-    str += ": "s + AstEmitTreeNode(n);
+    str += ": "s + TsEmitTreeNode(n);
   }
   if (auto n = node->GetInit()) {
-    str += "= "s + AstEmitTreeNode(n);
+    str += "= "s + TsEmitTreeNode(n);
   }
   mPrecedence = '\030';
   if (node->IsStmt())
@@ -515,12 +515,12 @@ std::string AstEmitter::AstEmitBindingPatternNode(BindingPatternNode *node) {
   return str;
 }
 
-std::string AstEmitter::AstEmitNumIndexSigNode(NumIndexSigNode *node) {
+std::string TsEmitter::TsEmitNumIndexSigNode(NumIndexSigNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
   if (auto n = node->GetDataType()) {
-    str += " "s + AstEmitTreeNode(n);
+    str += " "s + TsEmitTreeNode(n);
   }
   mPrecedence = '\030';
   if (node->IsStmt())
@@ -528,12 +528,12 @@ std::string AstEmitter::AstEmitNumIndexSigNode(NumIndexSigNode *node) {
   return str;
 }
 
-std::string AstEmitter::AstEmitStrIndexSigNode(StrIndexSigNode *node) {
+std::string TsEmitter::TsEmitStrIndexSigNode(StrIndexSigNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
   if (auto n = node->GetDataType()) {
-    str += " "s + AstEmitTreeNode(n);
+    str += " "s + TsEmitTreeNode(n);
   }
   mPrecedence = '\030';
   if (node->IsStmt())
@@ -541,7 +541,7 @@ std::string AstEmitter::AstEmitStrIndexSigNode(StrIndexSigNode *node) {
   return str;
 }
 
-std::string AstEmitter::AstEmitStructNode(StructNode *node) {
+std::string TsEmitter::TsEmitStructNode(StructNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
@@ -560,39 +560,39 @@ std::string AstEmitter::AstEmitStructNode(StructNode *node) {
   }
 
   if (auto n = node->GetStructId()) {
-    str += AstEmitIdentifierNode(n);
+    str += TsEmitIdentifierNode(n);
   }
   str += "{\n"s;
   for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
     if (auto n = node->GetField(i)) {
-      str += AstEmitIdentifierNode(n) + ";\n"s;
+      str += TsEmitIdentifierNode(n) + ";\n"s;
     }
   }
   str += "}\n"s;
   return str;
 }
 
-std::string AstEmitter::AstEmitFieldLiteralNode(FieldLiteralNode *node) {
+std::string TsEmitter::TsEmitFieldLiteralNode(FieldLiteralNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
   auto lit = node->GetLiteral();
   if(lit && lit->GetKind() == NK_Function) {
-    str = AstEmitTreeNode(lit);
+    str = TsEmitTreeNode(lit);
   } else {
     if (auto n = node->GetFieldName()) {
-      str = AstEmitIdentifierNode(n);
+      str = TsEmitIdentifierNode(n);
     }
     str += ": "s;
     if(lit) {
-      str += AstEmitTreeNode(lit);
+      str += TsEmitTreeNode(lit);
     }
   }
   mPrecedence = '\030';
   return str;
 }
 
-std::string AstEmitter::AstEmitStructLiteralNode(StructLiteralNode *node) {
+std::string TsEmitter::TsEmitStructLiteralNode(StructLiteralNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str = "{"s;
@@ -600,7 +600,7 @@ std::string AstEmitter::AstEmitStructLiteralNode(StructLiteralNode *node) {
     if (i)
       str += ", "s;
     if (auto n = node->GetField(i)) {
-      str += AstEmitFieldLiteralNode(n);
+      str += TsEmitFieldLiteralNode(n);
     }
   }
   str += "}"s;
@@ -608,14 +608,14 @@ std::string AstEmitter::AstEmitStructLiteralNode(StructLiteralNode *node) {
   return str;
 }
 
-std::string AstEmitter::AstEmitVarListNode(VarListNode *node) {
+std::string TsEmitter::TsEmitVarListNode(VarListNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
 
   for (unsigned i = 0; i < node->GetVarsNum(); ++i) {
     if (auto n = node->GetVarAtIndex(i)) {
-      str += " "s + AstEmitIdentifierNode(n);
+      str += " "s + TsEmitIdentifierNode(n);
     }
   }
 
@@ -625,14 +625,14 @@ std::string AstEmitter::AstEmitVarListNode(VarListNode *node) {
   return str;
 }
 
-std::string AstEmitter::AstEmitExprListNode(ExprListNode *node) {
+std::string TsEmitter::TsEmitExprListNode(ExprListNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
 
   for (unsigned i = 0; i < node->GetExprsNum(); ++i) {
     if (auto n = node->GetExprAtIndex(i)) {
-      str += " "s + AstEmitTreeNode(n);
+      str += " "s + TsEmitTreeNode(n);
     }
   }
 
@@ -642,14 +642,14 @@ std::string AstEmitter::AstEmitExprListNode(ExprListNode *node) {
   return str;
 }
 
-std::string AstEmitter::AstEmitTemplateLiteralNode(TemplateLiteralNode *node) {
+std::string TsEmitter::TsEmitTemplateLiteralNode(TemplateLiteralNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str = "`"s;
   auto num = node->GetTreesNum();
   for (unsigned i = 0; i < num; ++i) {
     if (auto n = node->GetTreeAtIndex(i)) {
-      std::string s(AstEmitTreeNode(n));
+      std::string s(TsEmitTreeNode(n));
       str += i & 0x1 ? "${"s + s+ "}"s : s;
     }
   }
@@ -660,7 +660,7 @@ std::string AstEmitter::AstEmitTemplateLiteralNode(TemplateLiteralNode *node) {
   return str;
 }
 
-std::string AstEmitter::AstEmitLiteralNode(LiteralNode *node) {
+std::string TsEmitter::TsEmitLiteralNode(LiteralNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str(AstDump::GetEnumLitData(node->GetData()));
@@ -670,20 +670,20 @@ std::string AstEmitter::AstEmitLiteralNode(LiteralNode *node) {
   return str;
 }
 
-std::string AstEmitter::AstEmitThrowNode(ThrowNode *node) {
+std::string TsEmitter::TsEmitThrowNode(ThrowNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str = "throw "s;
   for (unsigned i = 0; i < node->GetExceptionsNum(); ++i) {
     if (auto n = node->GetExceptionAtIndex(i)) {
-      str += AstEmitTreeNode(n);
+      str += TsEmitTreeNode(n);
     }
   }
   str += ";\n"s;
   return str;
 }
 
-std::string AstEmitter::AstEmitCatchNode(CatchNode *node) {
+std::string TsEmitter::TsEmitCatchNode(CatchNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str = "catch("s;
@@ -691,52 +691,52 @@ std::string AstEmitter::AstEmitCatchNode(CatchNode *node) {
     if (i)
       str += ", "s;
     if (auto n = node->GetParamAtIndex(i)) {
-      str += AstEmitTreeNode(n);
+      str += TsEmitTreeNode(n);
     }
   }
   str += ")"s;
   if (auto n = node->GetBlock()) {
-    str += AstEmitBlockNode(n);
+    str += TsEmitBlockNode(n);
   }
   return str;
 }
 
-std::string AstEmitter::AstEmitFinallyNode(FinallyNode *node) {
+std::string TsEmitter::TsEmitFinallyNode(FinallyNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str = "finally "s;
   if (auto n = node->GetBlock()) {
-    str += AstEmitBlockNode(n);
+    str += TsEmitBlockNode(n);
   }
   else
     str += "{}\n"s;
   return str;
 }
 
-std::string AstEmitter::AstEmitTryNode(TryNode *node) {
+std::string TsEmitter::TsEmitTryNode(TryNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str = "try "s;
   if (auto n = node->GetBlock()) {
-    str += AstEmitBlockNode(n);
+    str += TsEmitBlockNode(n);
   }
   for (unsigned i = 0; i < node->GetCatchesNum(); ++i) {
     if (auto n = node->GetCatchAtIndex(i)) {
-      str += AstEmitCatchNode(n);
+      str += TsEmitCatchNode(n);
     }
   }
   if (auto n = node->GetFinally()) {
-    str += AstEmitFinallyNode(n);
+    str += TsEmitFinallyNode(n);
   }
   return str;
 }
 
-std::string AstEmitter::AstEmitExceptionNode(ExceptionNode *node) {
+std::string TsEmitter::TsEmitExceptionNode(ExceptionNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
   if (auto n = node->GetException()) {
-    str += " "s + AstEmitIdentifierNode(n);
+    str += " "s + TsEmitIdentifierNode(n);
   }
   mPrecedence = '\030';
   if (node->IsStmt())
@@ -744,63 +744,63 @@ std::string AstEmitter::AstEmitExceptionNode(ExceptionNode *node) {
   return str;
 }
 
-std::string AstEmitter::AstEmitReturnNode(ReturnNode *node) {
+std::string TsEmitter::TsEmitReturnNode(ReturnNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str = "return"s;
   if (auto n = node->GetResult()) {
-    str += " "s + AstEmitTreeNode(n);
+    str += " "s + TsEmitTreeNode(n);
   }
   str += ";\n"s;
   return str;
 }
 
-std::string AstEmitter::AstEmitCondBranchNode(CondBranchNode *node) {
+std::string TsEmitter::TsEmitCondBranchNode(CondBranchNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str = "if("s;
   if (auto n = node->GetCond()) {
-    auto cond = AstEmitTreeNode(n);
+    auto cond = TsEmitTreeNode(n);
     str += Clean(cond);
   }
   str += ")"s;
   if (auto n = node->GetTrueBranch()) {
-    str += AstEmitTreeNode(n);
+    str += TsEmitTreeNode(n);
   }
   if (auto n = node->GetFalseBranch()) {
-    str += "else"s + AstEmitTreeNode(n);
+    str += "else"s + TsEmitTreeNode(n);
   }
   return str;
 }
 
-std::string AstEmitter::AstEmitBreakNode(BreakNode *node) {
+std::string TsEmitter::TsEmitBreakNode(BreakNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str = "break"s;
   if (auto n = node->GetTarget()) {
-    str += " "s + AstEmitTreeNode(n);
+    str += " "s + TsEmitTreeNode(n);
   }
   str += ";\n"s;
   return str;
 }
 
-std::string AstEmitter::AstEmitContinueNode(ContinueNode *node) {
+std::string TsEmitter::TsEmitContinueNode(ContinueNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str = "continue"s;
   if (auto n = node->GetTarget()) {
-    str += " "s + AstEmitTreeNode(n);
+    str += " "s + TsEmitTreeNode(n);
   }
   str += ";\n"s;
   return str;
 }
 
-std::string AstEmitter::AstEmitForLoopNode(ForLoopNode *node) {
+std::string TsEmitter::TsEmitForLoopNode(ForLoopNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
   if(auto n = node->GetLabel()) {
-    str = AstEmitTreeNode(n) + ":\n"s;
+    str = TsEmitTreeNode(n) + ":\n"s;
   }
   str += "for("s;
   switch(node->GetProp()) {
@@ -808,20 +808,20 @@ std::string AstEmitter::AstEmitForLoopNode(ForLoopNode *node) {
       {
         for (unsigned i = 0; i < node->GetInitsNum(); ++i)
           if (auto n = node->GetInitAtIndex(i)) {
-            auto init = AstEmitTreeNode(n);
+            auto init = TsEmitTreeNode(n);
             if (i)
               str += ", "s;
             str += Clean(init);
           }
         str += "; "s;
         if (auto n = node->GetCond()) {
-          auto cond = AstEmitTreeNode(n);
+          auto cond = TsEmitTreeNode(n);
           str += Clean(cond);
         }
         str += "; "s;
         for (unsigned i = 0; i < node->GetUpdatesNum(); ++i)
           if (auto n = node->GetUpdateAtIndex(i)) {
-            auto update = AstEmitTreeNode(n);
+            auto update = TsEmitTreeNode(n);
             if (i)
               str += ", "s;
             str += Clean(update);
@@ -831,22 +831,22 @@ std::string AstEmitter::AstEmitForLoopNode(ForLoopNode *node) {
     case FLP_JSIn:
       {
         if (auto n = node->GetVariable()) {
-          str += AstEmitTreeNode(n);
+          str += TsEmitTreeNode(n);
         }
         str += " in "s;
         if (auto n = node->GetSet()) {
-          str += AstEmitTreeNode(n);
+          str += TsEmitTreeNode(n);
         }
         break;
       }
     case FLP_JSOf:
       {
         if (auto n = node->GetVariable()) {
-          str += AstEmitTreeNode(n);
+          str += TsEmitTreeNode(n);
         }
         str += " of "s;
         if (auto n = node->GetSet()) {
-          str += AstEmitTreeNode(n);
+          str += TsEmitTreeNode(n);
         }
         break;
       }
@@ -858,105 +858,105 @@ std::string AstEmitter::AstEmitForLoopNode(ForLoopNode *node) {
   str += ")"s;
 
   if (auto n = node->GetBody()) {
-    str += AstEmitTreeNode(n);
+    str += TsEmitTreeNode(n);
   }
   return str;
 }
 
-std::string AstEmitter::AstEmitWhileLoopNode(WhileLoopNode *node) {
+std::string TsEmitter::TsEmitWhileLoopNode(WhileLoopNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
   if(auto n = node->GetLabel()) {
-    str = AstEmitTreeNode(n) + ":\n"s;
+    str = TsEmitTreeNode(n) + ":\n"s;
   }
   str += "while("s;
   if (auto n = node->GetCond()) {
-    auto s = AstEmitTreeNode(n);
+    auto s = TsEmitTreeNode(n);
     str += Clean(s);
   }
   str += ")"s;
   if (auto n = node->GetBody()) {
-    str += AstEmitTreeNode(n);
+    str += TsEmitTreeNode(n);
   }
   return str;
 }
 
-std::string AstEmitter::AstEmitDoLoopNode(DoLoopNode *node) {
+std::string TsEmitter::TsEmitDoLoopNode(DoLoopNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
   if(auto n = node->GetLabel()) {
-    str = AstEmitTreeNode(n) + ":\n"s;
+    str = TsEmitTreeNode(n) + ":\n"s;
   }
   str += "do "s;
   if (auto n = node->GetBody()) {
-    str += AstEmitTreeNode(n);
+    str += TsEmitTreeNode(n);
   }
   str += "while("s;
   if (auto n = node->GetCond()) {
-    auto s = AstEmitTreeNode(n);
+    auto s = TsEmitTreeNode(n);
     str += Clean(s);
   }
   str += ");\n"s;
   return str;
 }
 
-std::string AstEmitter::AstEmitSwitchLabelNode(SwitchLabelNode *node) {
+std::string TsEmitter::TsEmitSwitchLabelNode(SwitchLabelNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
   if(node->IsDefault())
     str += "default:\n"s;
   if(auto n = node->GetValue()) {
-    auto ce = AstEmitTreeNode(n);
+    auto ce = TsEmitTreeNode(n);
     str += "case "s + Clean(ce) + ":\n";
   }
   return str;
 }
 
-std::string AstEmitter::AstEmitSwitchCaseNode(SwitchCaseNode *node) {
+std::string TsEmitter::TsEmitSwitchCaseNode(SwitchCaseNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
   for (unsigned i = 0; i < node->GetLabelsNum(); ++i) {
     if (auto n = node->GetLabelAtIndex(i)) {
-      str += AstEmitTreeNode(n);
+      str += TsEmitTreeNode(n);
     }
   }
   for (unsigned i = 0; i < node->GetStmtsNum(); ++i) {
     if (auto t = node->GetStmtAtIndex(i))
-      str += AstEmitTreeNode(t);
+      str += TsEmitTreeNode(t);
   }
   return str;
 }
 
-std::string AstEmitter::AstEmitSwitchNode(SwitchNode *node) {
+std::string TsEmitter::TsEmitSwitchNode(SwitchNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str = "switch("s;
   if (auto n = node->GetExpr()) {
-    auto expr = AstEmitTreeNode(n);
+    auto expr = TsEmitTreeNode(n);
     str += Clean(expr);
   }
   str += "){\n"s;
   for (unsigned i = 0; i < node->GetCasesNum(); ++i) {
     if(auto n = node->GetCaseAtIndex(i))
-      str += AstEmitTreeNode(n);
+      str += TsEmitTreeNode(n);
   }
   str += "}\n"s;
   return str;
 }
 
-std::string AstEmitter::AstEmitAssertNode(AssertNode *node) {
+std::string TsEmitter::TsEmitAssertNode(AssertNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
   if (auto n = node->GetExpr()) {
-    str += " "s + AstEmitTreeNode(n);
+    str += " "s + TsEmitTreeNode(n);
   }
   if (auto n = node->GetMsg()) {
-    str += " "s + AstEmitTreeNode(n);
+    str += " "s + TsEmitTreeNode(n);
   }
   mPrecedence = '\030';
   if (node->IsStmt())
@@ -964,13 +964,13 @@ std::string AstEmitter::AstEmitAssertNode(AssertNode *node) {
   return str;
 }
 
-std::string AstEmitter::AstEmitCallNode(CallNode *node) {
+std::string TsEmitter::TsEmitCallNode(CallNode *node) {
   if (node == nullptr)
     return std::string();
   // Function call: left-to-right, precedence = 20
   std::string str;
   if (auto n = node->GetMethod()) {
-    auto s = AstEmitTreeNode(n);
+    auto s = TsEmitTreeNode(n);
     if(n->GetKind() == NK_Function)
       str += "("s + s + ")"s;
     else
@@ -981,7 +981,7 @@ std::string AstEmitter::AstEmitCallNode(CallNode *node) {
     if (i)
       str += ", "s;
     if (auto n = node->GetArg(i))
-      str += AstEmitTreeNode(n);
+      str += TsEmitTreeNode(n);
   }
   str += ")"s;
   mPrecedence = '\024';
@@ -990,7 +990,7 @@ std::string AstEmitter::AstEmitCallNode(CallNode *node) {
   return str;
 }
 
-std::string AstEmitter::AstEmitFunctionNode(FunctionNode *node) {
+std::string TsEmitter::TsEmitFunctionNode(FunctionNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
@@ -1006,13 +1006,13 @@ std::string AstEmitter::AstEmitFunctionNode(FunctionNode *node) {
   /*
   for (unsigned i = 0; i < node->GetAnnotationsNum(); ++i) {
     if (auto n = node->GetAnnotationAtIndex(i)) {
-      str += " "s + AstEmitAnnotationNode(n);
+      str += " "s + TsEmitAnnotationNode(n);
     }
   }
 
   for (unsigned i = 0; i < node->GetThrowsNum(); ++i) {
     if (auto n = node->GetThrowAtIndex(i)) {
-      str += " "s + AstEmitExceptionNode(n);
+      str += " "s + TsEmitExceptionNode(n);
     }
   }
   */
@@ -1022,17 +1022,17 @@ std::string AstEmitter::AstEmitFunctionNode(FunctionNode *node) {
     if (i)
       str += ", "s;
     if (auto n = node->GetParam(i)) {
-      str += AstEmitTreeNode(n);
+      str += TsEmitTreeNode(n);
     }
   }
   str += ")"s;
 
   if (auto n = node->GetType()) {
-    str += " : "s + AstEmitTreeNode(n);
+    str += " : "s + TsEmitTreeNode(n);
   }
 
   if (auto n = node->GetBody()) {
-    auto s = AstEmitBlockNode(n);
+    auto s = TsEmitBlockNode(n);
     if(s.empty() || s.front() != '{')
       str += "{"s + s + "}\n"s;
     else
@@ -1041,7 +1041,7 @@ std::string AstEmitter::AstEmitFunctionNode(FunctionNode *node) {
     str += "{}\n"s;
   /*
   if (auto n = node->GetDims()) {
-    str += " "s + AstEmitDimensionNode(n);
+    str += " "s + TsEmitDimensionNode(n);
   }
   str += " "s + std::to_string(node->IsConstructor());
   */
@@ -1049,7 +1049,7 @@ std::string AstEmitter::AstEmitFunctionNode(FunctionNode *node) {
   return str;
 }
 
-std::string AstEmitter::AstEmitInterfaceNode(InterfaceNode *node) {
+std::string TsEmitter::TsEmitInterfaceNode(InterfaceNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str = "interface "s + node->GetName() + " {"s;
@@ -1057,19 +1057,19 @@ std::string AstEmitter::AstEmitInterfaceNode(InterfaceNode *node) {
 
   for (unsigned i = 0; i < node->GetSuperInterfacesNum(); ++i) {
     if (auto n = node->GetSuperInterfaceAtIndex(i)) {
-      str += " "s + AstEmitInterfaceNode(n);
+      str += " "s + TsEmitInterfaceNode(n);
     }
   }
 
   for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
     if (auto n = node->GetFieldAtIndex(i)) {
-      str += " "s + AstEmitIdentifierNode(n);
+      str += " "s + TsEmitIdentifierNode(n);
     }
   }
 
   for (unsigned i = 0; i < node->GetMethodsNum(); ++i) {
     if (auto n = node->GetMethodAtIndex(i)) {
-      str += " "s + AstEmitFunctionNode(n);
+      str += " "s + TsEmitFunctionNode(n);
     }
   }
 
@@ -1077,7 +1077,7 @@ std::string AstEmitter::AstEmitInterfaceNode(InterfaceNode *node) {
   return str;
 }
 
-std::string AstEmitter::AstEmitClassNode(ClassNode *node) {
+std::string TsEmitter::TsEmitClassNode(ClassNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str = "class "s + node->GetName() + " {"s;
@@ -1085,13 +1085,13 @@ std::string AstEmitter::AstEmitClassNode(ClassNode *node) {
 
   for (unsigned i = 0; i < node->GetSuperClassesNum(); ++i) {
     if (auto n = node->GetSuperClass(i)) {
-      str += " "s + AstEmitClassNode(n);
+      str += " "s + TsEmitClassNode(n);
     }
   }
 
   for (unsigned i = 0; i < node->GetSuperInterfacesNum(); ++i) {
     if (auto n = node->GetSuperInterface(i)) {
-      str += " "s + AstEmitInterfaceNode(n);
+      str += " "s + TsEmitInterfaceNode(n);
     }
   }
 
@@ -1101,37 +1101,37 @@ std::string AstEmitter::AstEmitClassNode(ClassNode *node) {
 
   for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
     if (auto n = node->GetField(i)) {
-      str += " "s + AstEmitIdentifierNode(n) + ";\n"s;
+      str += " "s + TsEmitIdentifierNode(n) + ";\n"s;
     }
   }
 
   for (unsigned i = 0; i < node->GetMethodsNum(); ++i) {
     if (auto n = node->GetMethod(i)) {
-      str += " "s + AstEmitFunctionNode(n);
+      str += " "s + TsEmitFunctionNode(n);
     }
   }
 
   for (unsigned i = 0; i < node->GetConstructorsNum(); ++i) {
     if (auto n = node->GetConstructor(i)) {
-      str += " "s + AstEmitFunctionNode(n);
+      str += " "s + TsEmitFunctionNode(n);
     }
   }
 
   for (unsigned i = 0; i < node->GetInstInitsNum(); ++i) {
     if (auto n = node->GetInstInit(i)) {
-      str += " "s + AstEmitBlockNode(n);
+      str += " "s + TsEmitBlockNode(n);
     }
   }
 
   for (unsigned i = 0; i < node->GetLocalClassesNum(); ++i) {
     if (auto n = node->GetLocalClass(i)) {
-      str += " "s + AstEmitClassNode(n);
+      str += " "s + TsEmitClassNode(n);
     }
   }
 
   for (unsigned i = 0; i < node->GetLocalInterfacesNum(); ++i) {
     if (auto n = node->GetLocalInterface(i)) {
-      str += " "s + AstEmitInterfaceNode(n);
+      str += " "s + TsEmitInterfaceNode(n);
     }
   }
 
@@ -1139,14 +1139,14 @@ std::string AstEmitter::AstEmitClassNode(ClassNode *node) {
   return str;
 }
 
-std::string AstEmitter::AstEmitPassNode(PassNode *node) {
+std::string TsEmitter::TsEmitPassNode(PassNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str = "PassNode {"s;
 
   for (unsigned i = 0; i < node->GetChildrenNum(); ++i) {
     if (auto n = node->GetChild(i)) {
-      str += " "s + AstEmitTreeNode(n);
+      str += " "s + TsEmitTreeNode(n);
     }
   }
 
@@ -1157,7 +1157,7 @@ std::string AstEmitter::AstEmitPassNode(PassNode *node) {
   return str;
 }
 
-std::string AstEmitter::AstEmitLambdaNode(LambdaNode *node) {
+std::string TsEmitter::TsEmitLambdaNode(LambdaNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
@@ -1177,20 +1177,20 @@ std::string AstEmitter::AstEmitLambdaNode(LambdaNode *node) {
     if (i)
       str += ", "s;
     if (auto n = node->GetParam(i)) {
-      str += AstEmitTreeNode(n);
+      str += TsEmitTreeNode(n);
     }
   }
   str += ")"s;
 
   if (auto n = node->GetBody()) {
     if (auto t = node->GetType()) {
-      str += ": "s + AstEmitTreeNode(t);
+      str += ": "s + TsEmitTreeNode(t);
     }
-    str += " => "s + AstEmitTreeNode(n);
+    str += " => "s + TsEmitTreeNode(n);
   }
   else {
     if (auto t = node->GetType()) {
-      str += " => "s + AstEmitTreeNode(t);
+      str += " => "s + TsEmitTreeNode(t);
     }
   }
 
@@ -1200,21 +1200,21 @@ std::string AstEmitter::AstEmitLambdaNode(LambdaNode *node) {
   return str;
 }
 
-std::string AstEmitter::AstEmitInstanceOfNode(InstanceOfNode *node) {
+std::string TsEmitter::TsEmitInstanceOfNode(InstanceOfNode *node) {
   if (node == nullptr)
     return std::string();
   const Precedence precd = '\014';
   const bool rl_assoc = false;         // false: left-to-right
   std::string lhs, rhs;
   if (auto n = node->GetLeft()) {
-    lhs = AstEmitTreeNode(n);
+    lhs = TsEmitTreeNode(n);
     if(precd > mPrecedence)
       lhs = "("s + lhs + ")"s;
   }
   else
     lhs = "(NIL) "s;
   if (auto n = node->GetRight()) {
-    rhs = AstEmitTreeNode(n);
+    rhs = TsEmitTreeNode(n);
     if(precd > mPrecedence || (precd == mPrecedence && !rl_assoc))
       rhs = "("s + rhs + ")"s;
   }
@@ -1227,13 +1227,13 @@ std::string AstEmitter::AstEmitInstanceOfNode(InstanceOfNode *node) {
   return str;
 }
 
-std::string AstEmitter::AstEmitTypeOfNode(TypeOfNode *node) {
+std::string TsEmitter::TsEmitTypeOfNode(TypeOfNode *node) {
   if (node == nullptr)
     return std::string();
   const Precedence precd = '\121' & 0x3f;
   std::string str("typeof "s), rhs;
   if (auto n = node->GetExpr()) {
-    rhs = AstEmitTreeNode(n);
+    rhs = TsEmitTreeNode(n);
     if(precd > mPrecedence) // right-to-left
       rhs = "("s + rhs + ")"s;
   }
@@ -1246,16 +1246,16 @@ std::string AstEmitter::AstEmitTypeOfNode(TypeOfNode *node) {
   return str;
 }
 
-std::string AstEmitter::AstEmitInNode(InNode *node) {
+std::string TsEmitter::TsEmitInNode(InNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
   if (auto n = node->GetLeft()) {
-    str += AstEmitTreeNode(n);
+    str += TsEmitTreeNode(n);
   }
   str += " in "s;
   if (auto n = node->GetRight()) {
-    str += AstEmitTreeNode(n);
+    str += TsEmitTreeNode(n);
   }
   mPrecedence = '\014';
   if (node->IsStmt())
@@ -1263,7 +1263,7 @@ std::string AstEmitter::AstEmitInNode(InNode *node) {
   return str;
 }
 
-std::string AstEmitter::AstEmitAttrNode(AttrNode *node) {
+std::string TsEmitter::TsEmitAttrNode(AttrNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
@@ -1293,7 +1293,7 @@ static std::string GetTypeOp(UserTypeNode *node) {
   return "UNEXPECTED UT_Type"s;
 }
 
-std::string AstEmitter::AstEmitUserTypeNode(UserTypeNode *node) {
+std::string TsEmitter::TsEmitUserTypeNode(UserTypeNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
@@ -1301,20 +1301,20 @@ std::string AstEmitter::AstEmitUserTypeNode(UserTypeNode *node) {
   auto cb = node->GetChildB();
   if (auto n = node->GetId()) {
     if(ca || cb)
-      str = "type "s + AstEmitTreeNode(n) + " = "s;
+      str = "type "s + TsEmitTreeNode(n) + " = "s;
     else
-      str = AstEmitTreeNode(n);
+      str = TsEmitTreeNode(n);
   }
   if(ca)
-    str += AstEmitTreeNode(node->GetChildA());
+    str += TsEmitTreeNode(node->GetChildA());
   if(cb)
-    str += GetTypeOp(node) + AstEmitTreeNode(node->GetChildB());
+    str += GetTypeOp(node) + TsEmitTreeNode(node->GetChildB());
   /*
   for (unsigned i = 0; i < node->GetTypeArgumentsNum(); ++i) {
     if (i)
       str += " | "s;
     if (auto n = node->GetTypeArgument(i)) {
-      str += AstEmitIdentifierNode(n);
+      str += TsEmitIdentifierNode(n);
     }
   }
   */
@@ -1323,28 +1323,28 @@ std::string AstEmitter::AstEmitUserTypeNode(UserTypeNode *node) {
   return str;
 }
 
-std::string AstEmitter::AstEmitPrimTypeNode(PrimTypeNode *node) {
+std::string TsEmitter::TsEmitPrimTypeNode(PrimTypeNode *node) {
   if (node == nullptr)
     return std::string();
-  return AstEmitter::GetEnumTypeId(node->GetPrimType());
+  return TsEmitter::GetEnumTypeId(node->GetPrimType());
 }
 
-std::string AstEmitter::AstEmitPrimArrayTypeNode(PrimArrayTypeNode *node) {
+std::string TsEmitter::TsEmitPrimArrayTypeNode(PrimArrayTypeNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
   if (auto n = node->GetPrim()) {
-    str += AstEmitPrimTypeNode(n);
+    str += TsEmitPrimTypeNode(n);
   }
   if (auto n = node->GetDims()) {
-    str += AstEmitDimensionNode(n);
+    str += TsEmitDimensionNode(n);
   }
   if (node->IsStmt())
     str += ";\n"s;
   return str;
 }
 
-std::string AstEmitter::AstEmitModuleNode(ModuleNode *node) {
+std::string TsEmitter::TsEmitModuleNode(ModuleNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str("// Filename: "s);
@@ -1352,211 +1352,211 @@ std::string AstEmitter::AstEmitModuleNode(ModuleNode *node) {
   //str += AstDump::GetEnumSrcLang(node->GetSrcLang());
   /*
   if (auto n = node->GetPackage()) {
-    str += " "s + AstEmitPackageNode(n);
+    str += " "s + TsEmitPackageNode(n);
   }
 
   for (unsigned i = 0; i < node->GetImportsNum(); ++i) {
     if (i)
       str += ", "s;
     if (auto n = node->GetImport(i)) {
-      str += " "s + AstEmitImportNode(n);
+      str += " "s + TsEmitImportNode(n);
     }
   }
   */
   for (unsigned i = 0; i < node->GetTreesNum(); ++i) {
     if (auto n = node->GetTree(i)) {
-      str += AstEmitTreeNode(n);
+      str += TsEmitTreeNode(n);
     }
   }
   return str;
 }
 
-std::string AstEmitter::AstEmitTreeNode(TreeNode *node) {
+std::string TsEmitter::TsEmitTreeNode(TreeNode *node) {
   if (node == nullptr)
     return std::string();
   switch (node->GetKind()) {
   case NK_Module:
-    return AstEmitModuleNode(static_cast<ModuleNode *>(node));
+    return TsEmitModuleNode(static_cast<ModuleNode *>(node));
     break;
   case NK_Package:
-    return AstEmitPackageNode(static_cast<PackageNode *>(node));
+    return TsEmitPackageNode(static_cast<PackageNode *>(node));
     break;
   case NK_XXportAsPair:
-    return AstEmitXXportAsPairNode(static_cast<XXportAsPairNode *>(node));
+    return TsEmitXXportAsPairNode(static_cast<XXportAsPairNode *>(node));
     break;
   case NK_Import:
-    return AstEmitImportNode(static_cast<ImportNode *>(node));
+    return TsEmitImportNode(static_cast<ImportNode *>(node));
     break;
   case NK_Export:
-    return AstEmitExportNode(static_cast<ExportNode *>(node));
+    return TsEmitExportNode(static_cast<ExportNode *>(node));
     break;
   case NK_Decl:
-    return AstEmitDeclNode(static_cast<DeclNode *>(node));
+    return TsEmitDeclNode(static_cast<DeclNode *>(node));
     break;
   case NK_Identifier:
-    return AstEmitIdentifierNode(static_cast<IdentifierNode *>(node));
+    return TsEmitIdentifierNode(static_cast<IdentifierNode *>(node));
     break;
   case NK_Field:
-    return AstEmitFieldNode(static_cast<FieldNode *>(node));
+    return TsEmitFieldNode(static_cast<FieldNode *>(node));
     break;
   case NK_Dimension:
-    return AstEmitDimensionNode(static_cast<DimensionNode *>(node));
+    return TsEmitDimensionNode(static_cast<DimensionNode *>(node));
     break;
   case NK_Attr:
-    return AstEmitAttrNode(static_cast<AttrNode *>(node));
+    return TsEmitAttrNode(static_cast<AttrNode *>(node));
     break;
   case NK_PrimType:
-    return AstEmitPrimTypeNode(static_cast<PrimTypeNode *>(node));
+    return TsEmitPrimTypeNode(static_cast<PrimTypeNode *>(node));
     break;
   case NK_PrimArrayType:
-    return AstEmitPrimArrayTypeNode(static_cast<PrimArrayTypeNode *>(node));
+    return TsEmitPrimArrayTypeNode(static_cast<PrimArrayTypeNode *>(node));
     break;
   case NK_UserType:
-    return AstEmitUserTypeNode(static_cast<UserTypeNode *>(node));
+    return TsEmitUserTypeNode(static_cast<UserTypeNode *>(node));
     break;
   case NK_Cast:
-    return AstEmitCastNode(static_cast<CastNode *>(node));
+    return TsEmitCastNode(static_cast<CastNode *>(node));
     break;
   case NK_Parenthesis:
-    return AstEmitParenthesisNode(static_cast<ParenthesisNode *>(node));
+    return TsEmitParenthesisNode(static_cast<ParenthesisNode *>(node));
     break;
   case NK_BindingElement:
-    return AstEmitBindingElementNode(static_cast<BindingElementNode *>(node));
+    return TsEmitBindingElementNode(static_cast<BindingElementNode *>(node));
     break;
   case NK_BindingPattern:
-    return AstEmitBindingPatternNode(static_cast<BindingPatternNode *>(node));
+    return TsEmitBindingPatternNode(static_cast<BindingPatternNode *>(node));
     break;
   case NK_Struct:
-    return AstEmitStructNode(static_cast<StructNode *>(node));
+    return TsEmitStructNode(static_cast<StructNode *>(node));
     break;
   case NK_StructLiteral:
-    return AstEmitStructLiteralNode(static_cast<StructLiteralNode *>(node));
+    return TsEmitStructLiteralNode(static_cast<StructLiteralNode *>(node));
     break;
   case NK_FieldLiteral:
-    return AstEmitFieldLiteralNode(static_cast<FieldLiteralNode *>(node));
+    return TsEmitFieldLiteralNode(static_cast<FieldLiteralNode *>(node));
     break;
   case NK_NumIndexSig:
-    return AstEmitNumIndexSigNode(static_cast<NumIndexSigNode *>(node));
+    return TsEmitNumIndexSigNode(static_cast<NumIndexSigNode *>(node));
     break;
   case NK_StrIndexSig:
-    return AstEmitStrIndexSigNode(static_cast<StrIndexSigNode *>(node));
+    return TsEmitStrIndexSigNode(static_cast<StrIndexSigNode *>(node));
     break;
   case NK_ArrayElement:
-    return AstEmitArrayElementNode(static_cast<ArrayElementNode *>(node));
+    return TsEmitArrayElementNode(static_cast<ArrayElementNode *>(node));
     break;
   case NK_ArrayLiteral:
-    return AstEmitArrayLiteralNode(static_cast<ArrayLiteralNode *>(node));
+    return TsEmitArrayLiteralNode(static_cast<ArrayLiteralNode *>(node));
     break;
   case NK_VarList:
-    return AstEmitVarListNode(static_cast<VarListNode *>(node));
+    return TsEmitVarListNode(static_cast<VarListNode *>(node));
     break;
   case NK_ExprList:
-    return AstEmitExprListNode(static_cast<ExprListNode *>(node));
+    return TsEmitExprListNode(static_cast<ExprListNode *>(node));
     break;
   case NK_TemplateLiteral:
-    return AstEmitTemplateLiteralNode(static_cast<TemplateLiteralNode *>(node));
+    return TsEmitTemplateLiteralNode(static_cast<TemplateLiteralNode *>(node));
     break;
   case NK_Literal:
-    return AstEmitLiteralNode(static_cast<LiteralNode *>(node));
+    return TsEmitLiteralNode(static_cast<LiteralNode *>(node));
     break;
   case NK_UnaOperator:
-    return AstEmitUnaOperatorNode(static_cast<UnaOperatorNode *>(node));
+    return TsEmitUnaOperatorNode(static_cast<UnaOperatorNode *>(node));
     break;
   case NK_BinOperator:
-    return AstEmitBinOperatorNode(static_cast<BinOperatorNode *>(node));
+    return TsEmitBinOperatorNode(static_cast<BinOperatorNode *>(node));
     break;
   case NK_TerOperator:
-    return AstEmitTerOperatorNode(static_cast<TerOperatorNode *>(node));
+    return TsEmitTerOperatorNode(static_cast<TerOperatorNode *>(node));
     break;
   case NK_Lambda:
-    return AstEmitLambdaNode(static_cast<LambdaNode *>(node));
+    return TsEmitLambdaNode(static_cast<LambdaNode *>(node));
     break;
   case NK_InstanceOf:
-    return AstEmitInstanceOfNode(static_cast<InstanceOfNode *>(node));
+    return TsEmitInstanceOfNode(static_cast<InstanceOfNode *>(node));
     break;
   case NK_TypeOf:
-    return AstEmitTypeOfNode(static_cast<TypeOfNode *>(node));
+    return TsEmitTypeOfNode(static_cast<TypeOfNode *>(node));
     break;
   case NK_In:
-    return AstEmitInNode(static_cast<InNode *>(node));
+    return TsEmitInNode(static_cast<InNode *>(node));
     break;
   case NK_Block:
-    return AstEmitBlockNode(static_cast<BlockNode *>(node));
+    return TsEmitBlockNode(static_cast<BlockNode *>(node));
     break;
   case NK_Function:
-    return AstEmitFunctionNode(static_cast<FunctionNode *>(node));
+    return TsEmitFunctionNode(static_cast<FunctionNode *>(node));
     break;
   case NK_Class:
-    return AstEmitClassNode(static_cast<ClassNode *>(node));
+    return TsEmitClassNode(static_cast<ClassNode *>(node));
     break;
   case NK_Interface:
-    return AstEmitInterfaceNode(static_cast<InterfaceNode *>(node));
+    return TsEmitInterfaceNode(static_cast<InterfaceNode *>(node));
     break;
   case NK_AnnotationType:
-    return AstEmitAnnotationTypeNode(static_cast<AnnotationTypeNode *>(node));
+    return TsEmitAnnotationTypeNode(static_cast<AnnotationTypeNode *>(node));
     break;
   case NK_Annotation:
-    return AstEmitAnnotationNode(static_cast<AnnotationNode *>(node));
+    return TsEmitAnnotationNode(static_cast<AnnotationNode *>(node));
     break;
   case NK_Try:
-    return AstEmitTryNode(static_cast<TryNode *>(node));
+    return TsEmitTryNode(static_cast<TryNode *>(node));
     break;
   case NK_Catch:
-    return AstEmitCatchNode(static_cast<CatchNode *>(node));
+    return TsEmitCatchNode(static_cast<CatchNode *>(node));
     break;
   case NK_Finally:
-    return AstEmitFinallyNode(static_cast<FinallyNode *>(node));
+    return TsEmitFinallyNode(static_cast<FinallyNode *>(node));
     break;
   case NK_Exception:
-    return AstEmitExceptionNode(static_cast<ExceptionNode *>(node));
+    return TsEmitExceptionNode(static_cast<ExceptionNode *>(node));
     break;
   case NK_Throw:
-    return AstEmitThrowNode(static_cast<ThrowNode *>(node));
+    return TsEmitThrowNode(static_cast<ThrowNode *>(node));
     break;
   case NK_Return:
-    return AstEmitReturnNode(static_cast<ReturnNode *>(node));
+    return TsEmitReturnNode(static_cast<ReturnNode *>(node));
     break;
   case NK_CondBranch:
-    return AstEmitCondBranchNode(static_cast<CondBranchNode *>(node));
+    return TsEmitCondBranchNode(static_cast<CondBranchNode *>(node));
     break;
   case NK_Break:
-    return AstEmitBreakNode(static_cast<BreakNode *>(node));
+    return TsEmitBreakNode(static_cast<BreakNode *>(node));
     break;
   case NK_Continue:
-    return AstEmitContinueNode(static_cast<ContinueNode *>(node));
+    return TsEmitContinueNode(static_cast<ContinueNode *>(node));
     break;
   case NK_ForLoop:
-    return AstEmitForLoopNode(static_cast<ForLoopNode *>(node));
+    return TsEmitForLoopNode(static_cast<ForLoopNode *>(node));
     break;
   case NK_WhileLoop:
-    return AstEmitWhileLoopNode(static_cast<WhileLoopNode *>(node));
+    return TsEmitWhileLoopNode(static_cast<WhileLoopNode *>(node));
     break;
   case NK_DoLoop:
-    return AstEmitDoLoopNode(static_cast<DoLoopNode *>(node));
+    return TsEmitDoLoopNode(static_cast<DoLoopNode *>(node));
     break;
   case NK_New:
-    return AstEmitNewNode(static_cast<NewNode *>(node));
+    return TsEmitNewNode(static_cast<NewNode *>(node));
     break;
   case NK_Delete:
-    return AstEmitDeleteNode(static_cast<DeleteNode *>(node));
+    return TsEmitDeleteNode(static_cast<DeleteNode *>(node));
     break;
   case NK_Call:
-    return AstEmitCallNode(static_cast<CallNode *>(node));
+    return TsEmitCallNode(static_cast<CallNode *>(node));
     break;
   case NK_Assert:
-    return AstEmitAssertNode(static_cast<AssertNode *>(node));
+    return TsEmitAssertNode(static_cast<AssertNode *>(node));
     break;
   case NK_SwitchLabel:
-    return AstEmitSwitchLabelNode(static_cast<SwitchLabelNode *>(node));
+    return TsEmitSwitchLabelNode(static_cast<SwitchLabelNode *>(node));
     break;
   case NK_SwitchCase:
-    return AstEmitSwitchCaseNode(static_cast<SwitchCaseNode *>(node));
+    return TsEmitSwitchCaseNode(static_cast<SwitchCaseNode *>(node));
     break;
   case NK_Switch:
-    return AstEmitSwitchNode(static_cast<SwitchNode *>(node));
+    return TsEmitSwitchNode(static_cast<SwitchNode *>(node));
     break;
   case NK_Pass:
-    return AstEmitPassNode(static_cast<PassNode *>(node));
+    return TsEmitPassNode(static_cast<PassNode *>(node));
     break;
   case NK_Null:
     // Ignore NullNode
@@ -1568,7 +1568,7 @@ std::string AstEmitter::AstEmitTreeNode(TreeNode *node) {
 }
 
 
-const char *AstEmitter::GetEnumTypeId(TypeId k) {
+const char *TsEmitter::GetEnumTypeId(TypeId k) {
   switch (k) {
     case TY_Boolean:
       return "boolean";
@@ -1608,7 +1608,7 @@ const char *AstEmitter::GetEnumTypeId(TypeId k) {
   return "UNEXPECTED TypeId";
 }
 
-const char *AstEmitter::GetEnumDeclProp(DeclProp k) {
+const char *TsEmitter::GetEnumDeclProp(DeclProp k) {
   switch (k) {
   case JS_Var:
     return "var";
@@ -1624,7 +1624,7 @@ const char *AstEmitter::GetEnumDeclProp(DeclProp k) {
   return "UNEXPECTED DeclProp";
 }
 
-const char *AstEmitter::GetEnumOprId(OprId k) {
+const char *TsEmitter::GetEnumOprId(OprId k) {
   // The first char in the returned string includes operator precedence and associativity info
   //
   // bits   7   6   5   4   3   2   1   0

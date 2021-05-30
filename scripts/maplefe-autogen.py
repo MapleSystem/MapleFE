@@ -786,7 +786,7 @@ handle_src_include_files(Finalization)
 
 ################################################################################
 #                                                                              #
-#                                AstEmitter                                    #
+#                                TsEmitter                                    #
 #                                                                              #
 ################################################################################
 
@@ -811,7 +811,7 @@ def get_data_based_on_type(val_type, accessor):
 def short_name(node_type):
     return node_type.replace('class ', '').replace('maplefe::', '').replace(' *', '*')
 
-# The follwoing gen_func_* and gen_call* functions are for AstEmitter
+# The follwoing gen_func_* and gen_call* functions are for TsEmitter
 gen_func_decl_location = lambda: False
 gen_call_handle_values = lambda: True
 gen_func_declaration = lambda dictionary, node_name: \
@@ -837,9 +837,9 @@ gen_func_definition_end = lambda dictionary, node_name: \
 
 #
 gen_args = [
-        "gen_astemitter", # Filename
-        "AstEmitter",     # Class name
-        "AstEmit",        # Prefix of function name
+        "gen_tsemitter", # Filename
+        "TsEmitter",     # Class name
+        "TsEmit",        # Prefix of function name
         """
 #include "{astdump}.h"
 """.format(astdump = astdump),  # Extra include directives
@@ -852,7 +852,7 @@ astemit_init = [
 using Precedence = char;
 
 private:
-ModuleNode    *mASTModule;
+ModuleNode   *mASTModule;
 std::ostream *mOs;
 Precedence    mPrecedence;
 
@@ -862,8 +862,8 @@ public:
 void {gen_args2}(const char *title, std::ostream *os) {{
   mOs = os;
   *mOs << "// [Beginning of {gen_args1}: " << title << "\\n";
-  *mOs << AstEmitTreeNode(mASTModule);
-  *mOs << "// End of AstEmitter]\\n";
+  *mOs << TsEmitTreeNode(mASTModule);
+  *mOs << "// End of TsEmitter]\\n";
 }}
 
 std::string Clean(std::string &s) {{

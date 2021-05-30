@@ -19,7 +19,7 @@
 #include "gen_astgraph.h"
 #include "gen_aststore.h"
 #include "gen_astload.h"
-#include "ast_emitter.h"
+#include "ts_emitter.h"
 
 namespace maplefe {
 
@@ -100,9 +100,9 @@ void A2C::ProcessAST(bool trace_a2c) {
   }
 
   if (mTraceA2C) {
-    std::cout << "============= AstEmitter ===========" << std::endl;
-    AstEmitter emitter(gModule);
-    emitter.AstEmit("Convert AST to TypeScript code", &std::cout);
+    std::cout << "============= TsEmitter ===========" << std::endl;
+    TsEmitter emitter(gModule);
+    emitter.TsEmit("Convert AST to TypeScript code", &std::cout);
   }
 }
 }

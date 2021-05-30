@@ -59,7 +59,7 @@ for ts in $LIST; do
     [ $? -eq 0 ] || Failed="$Failed $ts.ast"
   fi
   echo "$out"
-  cmd=$(grep -n -e "^// .Beginning of AstEmitter:" -e "// End of AstEmitter.$" <<< "$out" |
+  cmd=$(grep -n -e "^// .Beginning of TsEmitter:" -e "// End of TsEmitter.$" <<< "$out" |
     tail -2 | sed 's/:.*//' | xargs | sed 's/\([^ ]*\) \(.*\)/sed -n \1,$((\2+1))p/')
   if [ "x${cmd:0:4}" = "xsed " ]; then
     T=$ts-$$.out.ts
