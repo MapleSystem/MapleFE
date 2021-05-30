@@ -1575,6 +1575,10 @@ private:
   // dedicated EnumNode for them.
   bool                         mIsJavaEnum;
 
+  // Typescript namespace is similar as class, with many restrictions
+  // and special semantic rules.
+  bool                         mIsTSNamespace;
+
   SmallVector<ClassNode*>      mSuperClasses;
   SmallVector<InterfaceNode*>  mSuperInterfaces;
   SmallVector<AttrId>          mAttributes;
@@ -1589,11 +1593,13 @@ private:
   SmallVector<ExportNode*>     mExports;
 
 public:
-  ClassNode() : TreeNode(NK_Class), mIsJavaEnum(false) {}
+  ClassNode() : TreeNode(NK_Class), mIsJavaEnum(false), mIsTSNamespace(false) {}
   ~ClassNode() {Release();}
 
-  bool IsJavaEnum() {return mIsJavaEnum;}
+  bool IsJavaEnum()                {return mIsJavaEnum;}
   void SetIsJavaEnum(bool b = true){mIsJavaEnum = b;}
+  bool IsTSNamespace()                {return mIsTSNamespace;}
+  void SetIsTSNamespace(bool b = true){mIsTSNamespace = b;}
 
   void AddSuperClass(ClassNode *n)         {mSuperClasses.PushBack(n);}
   void AddSuperInterface(InterfaceNode *n) {mSuperInterfaces.PushBack(n);}

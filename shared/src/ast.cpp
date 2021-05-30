@@ -1123,6 +1123,8 @@ void ClassNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   if (IsJavaEnum())
     DUMP1_NORETURN("class[JavaEnum] ", GetName());
+  else if (IsTSNamespace())
+    DUMP1_NORETURN("class[TSNamespace] ", GetName());
   else
     DUMP1_NORETURN("class ", GetName());
   DUMP_RETURN();
