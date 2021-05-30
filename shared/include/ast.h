@@ -1585,6 +1585,8 @@ private:
   SmallVector<BlockNode*>      mInstInits;     // instance initializer
   SmallVector<ClassNode*>      mLocalClasses;
   SmallVector<InterfaceNode*>  mLocalInterfaces;
+  SmallVector<ImportNode*>     mImports;
+  SmallVector<ExportNode*>     mExports;
 
 public:
   ClassNode() : TreeNode(NK_Class), mIsJavaEnum(false) {}
@@ -1602,16 +1604,21 @@ public:
   void AddInstInit(BlockNode *n) {mInstInits.PushBack(n);}
   void AddLocalClass(ClassNode *n) {mLocalClasses.PushBack(n);}
   void AddLocalInterface(InterfaceNode *n) {mLocalInterfaces.PushBack(n);}
+  void AddImport(ImportNode *n) {mImports.PushBack(n);}
+  void AddExport(ExportNode *n) {mExports.PushBack(n);}
 
   unsigned GetSuperClassesNum()    {return mSuperClasses.GetNum();}
   unsigned GetSuperInterfacesNum() {return mSuperInterfaces.GetNum();}
   unsigned GetAttributesNum()      {return mAttributes.GetNum();}
   unsigned GetFieldsNum()          {return mFields.GetNum();}
   unsigned GetMethodsNum()         {return mMethods.GetNum();}
-  unsigned GetConstructorsNum()     {return mConstructors.GetNum();}
+  unsigned GetConstructorsNum()    {return mConstructors.GetNum();}
   unsigned GetInstInitsNum()       {return mInstInits.GetNum();}
   unsigned GetLocalClassesNum()    {return mLocalClasses.GetNum();}
   unsigned GetLocalInterfacesNum() {return mLocalInterfaces.GetNum();}
+  unsigned GetImportsNum()         {return mImports.GetNum();}
+  unsigned GetExportsNum()         {return mExports.GetNum();}
+
   ClassNode* GetSuperClass(unsigned i)         {return mSuperClasses.ValueAtIndex(i);}
   void       SetSuperClass(unsigned i, ClassNode* n) {*(mSuperClasses.RefAtIndex(i)) = n;}
   InterfaceNode* GetSuperInterface(unsigned i) {return mSuperInterfaces.ValueAtIndex(i);}
@@ -1628,8 +1635,12 @@ public:
   void       SetInstInit(unsigned i, BlockNode* n) {*(mInstInits.RefAtIndex(i)) = n;}
   ClassNode* GetLocalClass(unsigned i)     {return mLocalClasses.ValueAtIndex(i);}
   void       SetLocalClass(unsigned i, ClassNode* n) {*(mLocalClasses.RefAtIndex(i)) = n;}
-  InterfaceNode* GetLocalInterface(unsigned i)  {return mLocalInterfaces.ValueAtIndex(i);}
+  InterfaceNode* GetLocalInterface(unsigned i)                   {return mLocalInterfaces.ValueAtIndex(i);}
   void           SetLocalInterface(unsigned i, InterfaceNode* n) {*(mLocalInterfaces.RefAtIndex(i)) = n;}
+  ImportNode* GetImport(unsigned i)                {return mImports.ValueAtIndex(i);}
+  void        SetImport(unsigned i, ImportNode* n) {*(mImports.RefAtIndex(i)) = n;}
+  ExportNode* GetExport(unsigned i)                {return mExports.ValueAtIndex(i);}
+  void        SetExport(unsigned i, ExportNode* n) {*(mExports.RefAtIndex(i)) = n;}
 
   void Construct(BlockNode*);
   void Release();
