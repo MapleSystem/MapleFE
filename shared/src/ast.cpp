@@ -1100,6 +1100,12 @@ void ClassNode::Construct(BlockNode *block) {
       MASSERT(block->IsInstInit() && "unnamed block in class is not inst init?");
       mInstInits.PushBack(block);
       tree_node->SetParent(this);
+    } else if (tree_node->IsImport()) {
+      mImports.PushBack((ImportNode*)tree_node);
+      tree_node->SetParent(this);
+    } else if (tree_node->IsExport()) {
+      mExports.PushBack((ExportNode*)tree_node);
+      tree_node->SetParent(this);
     } else
       MASSERT("Unsupported tree node in class body.");
   }
@@ -1170,6 +1176,24 @@ void ClassNode::Dump(unsigned indent) {
   DUMP0("LocalInterfaces: ");
   for (unsigned i = 0; i < mLocalInterfaces.GetNum(); i++) {
     TreeNode *node = mLocalInterfaces.ValueAtIndex(i);
+    node->Dump(indent + 4);
+  }
+
+  if (mImports.GetNum() > 0) {
+    DumpIndentation(indent + 2);
+    DUMP0("Imports: ");
+  }
+  for (unsigned i = 0; i < mImports.GetNum(); i++) {
+    TreeNode *node = mImports.ValueAtIndex(i);
+    node->Dump(indent + 4);
+  }
+
+  if (mExports.GetNum() > 0) {
+    DumpIndentation(indent + 2);
+    DUMP0("Exports: ");
+  }
+  for (unsigned i = 0; i < mExports.GetNum(); i++) {
+    TreeNode *node = mExports.ValueAtIndex(i);
     node->Dump(indent + 4);
   }
 }

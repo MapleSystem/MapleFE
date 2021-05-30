@@ -1776,10 +1776,14 @@ rule EnumValue: AssignmentExpression
 
 ##NamespaceDeclaration: namespace IdentifierPath { NamespaceBody }
 rule NamespaceDeclaration: "namespace" + IdentifierPath + '{' + NamespaceBody + '}'
+  attr.action : BuildClass(%2)
+  attr.action : SetClassIsTSNamespace()
+  attr.action : AddClassBody(%4)
 
 ##IdentifierPath: BindingIdentifier IdentifierPath . BindingIdentifier
 rule IdentifierPath: ONEOF(BindingIdentifier,
                            IdentifierPath + '.' + BindingIdentifier)
+  attr.action.%2 : BuildField(%1, %3)
 
 ##NamespaceBody: NamespaceElementsopt
 rule NamespaceBody: ZEROORONE(NamespaceElements)
@@ -1814,10 +1818,18 @@ rule ExportNamespaceElement: ONEOF("export" + VariableStatement,
                                    "export" + NamespaceDeclaration,
 #                                   "export" + AmbientDeclaration,
                                    "export" + ImportAliasDeclaration)
+  attr.action.%1,%2,%3,%4,%5,%6,%7,%8,%9 : BuildExport()
+  attr.action.%1,%2,%3,%4,%5,%6,%7,%8,%9 : SetPairs(%2)
 
 ##ImportAliasDeclaration: import BindingIdentifier = EntityName ;
-rule ImportAliasDeclaration: "import" + BindingIdentifier + '=' + EntityName + ';'
+rule NamespaceImportPair: BindingIdentifier + '=' + EntityName
+  attr.action : BuildXXportAsPair(%3, %1)
+
+rule ImportAliasDeclaration: "import" + NamespaceImportPair + ';'
+  attr.action : BuildImport()
+  attr.action : SetPairs(%2)
 
 ##EntityName: NamespaceName NamespaceName . IdentifierReference
 rule EntityName: ONEOF(NamespaceName,
                        NamespaceName + '.' + IdentifierReference)
+  attr.action.%2 : BuildField(%1, %3)
