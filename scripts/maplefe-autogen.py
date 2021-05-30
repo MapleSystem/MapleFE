@@ -786,7 +786,7 @@ handle_src_include_files(Finalization)
 
 ################################################################################
 #                                                                              #
-#                                TsEmitter                                    #
+#                                TsEmitter                                     #
 #                                                                              #
 ################################################################################
 
@@ -844,7 +844,7 @@ gen_args = [
 #include "{astdump}.h"
 """.format(astdump = astdump),  # Extra include directives
         ""
-        "",            # Base class
+        "",             # Base class
         ]
 
 astemit_init = [

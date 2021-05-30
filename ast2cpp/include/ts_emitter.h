@@ -26,6 +26,7 @@
 namespace maplefe {
 
 class TsEmitter {
+
   using Precedence = char;
 
 private:

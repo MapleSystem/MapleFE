@@ -577,16 +577,17 @@ std::string TsEmitter::TsEmitFieldLiteralNode(FieldLiteralNode *node) {
     return std::string();
   std::string str;
   auto lit = node->GetLiteral();
-  if(lit && lit->GetKind() == NK_Function) {
-    str = TsEmitTreeNode(lit);
-  } else {
-    if (auto n = node->GetFieldName()) {
-      str = TsEmitIdentifierNode(n);
-    }
-    str += ": "s;
-    if(lit) {
-      str += TsEmitTreeNode(lit);
-    }
+  if (auto n = node->GetFieldName()) {
+    str = TsEmitIdentifierNode(n);
+    if(lit)
+      str += ": "s;
+  }
+  if(lit) {
+    auto s = TsEmitTreeNode(lit);
+    if(s.size() > 4 && (s[0] == 's' || s[0] == 'g') && !s.compare(1, 3, "et "))
+      str = s;
+    else
+      str += s;
   }
   mPrecedence = '\030';
   return str;
