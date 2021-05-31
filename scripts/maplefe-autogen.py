@@ -718,6 +718,7 @@ bool PutNode(TreeNode *n) {{
       case NK_Function:    *mOs << (n->GetStrIdx() ? n->GetName() : "_anonymous_") << NodeColor(lightcoral); break;
       case NK_Lambda:      *mOs << NodeColor(pink); break;
       case NK_Call:        *mOs << NodeColor(burlywood); break;
+      case NK_Class:       *mOs << (n->GetStrIdx() ? n->GetName() : ""); break;
       case NK_Block:       *mOs << NodeColor(lightcyan); break;
       case NK_CondBranch:  *mOs << NodeColor(lightblue); break;
       case NK_Return:      *mOs << NodeColor(tan); break;
