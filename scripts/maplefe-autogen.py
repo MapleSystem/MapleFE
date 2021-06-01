@@ -2,12 +2,11 @@
 from os import path, environ
 import subprocess
 import hashlib
-#import ruamel.yaml as yaml
 import yaml
 
 #
 # Needs to install the following packages on Ubuntu 18.04 or 20.04
-#   sudo apt install -y clang-tools-10 clang-format-10 python3-ruamel.yaml
+#   sudo apt install -y clang-tools-10 clang-format-10 libyaml-cpp-dev
 #
 
 root_dir = path.dirname(path.dirname(path.realpath(__file__))) + '/'
@@ -118,7 +117,8 @@ def handle_yaml(filename, callback, saved_yaml = {}):
     if filename not in saved_yaml:
         print(str(len(saved_yaml) + 1) + ": Processing " + filename + " ...")
         with open(filename) as stream:
-            yaml_data = yaml.safe_load(stream)
+            loader = yaml.cyaml.CLoader if hasattr(yaml, "cyaml") else yaml.Loader
+            yaml_data = yaml.load(stream, Loader=loader)
         saved_yaml[filename] = yaml_data
         log(yaml_data, 0, "YAML file: " + filename)
     else:
