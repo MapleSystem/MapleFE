@@ -856,6 +856,7 @@ using Precedence = char;
 
 private:
 ModuleNode   *mASTModule;
+protected:
 Precedence    mPrecedence;
 
 public:

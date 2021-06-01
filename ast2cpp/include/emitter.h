@@ -32,6 +32,8 @@ class Emitter {
 
 private:
   ModuleNode *mASTModule;
+
+protected:
   Precedence mPrecedence;
 
 public:

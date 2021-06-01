@@ -25,8 +25,11 @@
 
 namespace maplefe {
 
-class CppEmitter : public Emitter {
+enum Phase { PK_DECL, PK_CODE };
 
+class CppEmitter : public Emitter {
+private:
+  Phase mPhase;
 public:
   CppEmitter(ModuleNode *m) : Emitter(m) {}
 
@@ -39,6 +42,10 @@ public:
   }
 
   std::string EmitModuleNode(ModuleNode *node);
+  std::string EmitDeclNode(DeclNode *node);
+  std::string EmitCallNode(CallNode *node);
+  std::string EmitIdentifierNode(IdentifierNode *node);
+  std::string EmitPrimTypeNode(PrimTypeNode *node);
 };
 
 } // namespace maplefe
