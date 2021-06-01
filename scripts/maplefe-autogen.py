@@ -788,7 +788,7 @@ handle_src_include_files(Finalization)
 
 ################################################################################
 #                                                                              #
-#                                TsEmitter                                     #
+#                                  Emitter                                     #
 #                                                                              #
 ################################################################################
 
@@ -813,11 +813,11 @@ def get_data_based_on_type(val_type, accessor):
 def short_name(node_type):
     return node_type.replace('class ', '').replace('maplefe::', '').replace(' *', '*')
 
-# The follwoing gen_func_* and gen_call* functions are for TsEmitter
+# The follwoing gen_func_* and gen_call* functions are for Emitter
 gen_func_decl_location = lambda: False
 gen_call_handle_values = lambda: True
 gen_func_declaration = lambda dictionary, node_name: \
-        "std::string " + gen_args[2] + node_name + "(" + node_name + "* node);"
+        "virtual std::string " + gen_args[2] + node_name + "(" + node_name + "* node);"
 gen_func_definition = lambda dictionary, node_name: \
         "std::string " + gen_args[1] + "::" + gen_args[2] + node_name + "(" + node_name + "* node) {" \
         + 'if (node == nullptr) \nreturn std::string();' \
@@ -839,9 +839,9 @@ gen_func_definition_end = lambda dictionary, node_name: \
 
 #
 gen_args = [
-        "gen_tsemitter", # Filename
-        "TsEmitter",     # Class name
-        "TsEmit",        # Prefix of function name
+        "gen_emitter",   # Filename
+        "Emitter",       # Class name
+        "Emit",          # Prefix of function name
         """
 #include "{astdump}.h"
 """.format(astdump = astdump),  # Extra include directives
@@ -864,8 +864,8 @@ public:
 void {gen_args2}(const char *title, std::ostream *os) {{
   mOs = os;
   *mOs << "// [Beginning of {gen_args1}: " << title << "\\n";
-  *mOs << TsEmitTreeNode(mASTModule);
-  *mOs << "// End of TsEmitter]\\n";
+  *mOs << EmitTreeNode(mASTModule);
+  *mOs << "// End of Emitter]\\n";
 }}
 
 std::string Clean(std::string &s) {{
