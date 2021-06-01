@@ -27,18 +27,15 @@ namespace maplefe {
 
 class CppEmitter : public Emitter {
 
-private:
-  ModuleNode *mASTModule;
-  std::ostream *mOs;
-
 public:
-  CppEmitter(ModuleNode *m) : Emitter(m), mASTModule(m), mOs(nullptr) {}
+  CppEmitter(ModuleNode *m) : Emitter(m) {}
 
-  void Emit(const char *title, std::ostream *os) {
-    mOs = os;
-    *mOs << "// [Beginning of Emitter: " << title << "\n";
-    *mOs << EmitTreeNode(mASTModule);
-    *mOs << "// End of Emitter]\n";
+  std::string Emit(const char *title) {
+    std::string code;
+    code = "// [Beginning of CppEmitter: "s + title + "\n"s;
+    code += EmitTreeNode(GetASTModule());
+    code += "// End of CppEmitter]\n"s;
+    return code;
   }
 
   std::string EmitModuleNode(ModuleNode *node);

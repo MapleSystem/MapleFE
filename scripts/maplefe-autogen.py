@@ -844,6 +844,7 @@ gen_args = [
         "Emit",          # Prefix of function name
         """
 #include "{astdump}.h"
+using namespace std::string_literals;
 """.format(astdump = astdump),  # Extra include directives
         ""
         "",             # Base class
@@ -855,18 +856,20 @@ using Precedence = char;
 
 private:
 ModuleNode   *mASTModule;
-std::ostream *mOs;
 Precedence    mPrecedence;
 
 public:
-{gen_args1}(ModuleNode *m) : mASTModule(m), mOs(nullptr) {{}}
+{gen_args1}(ModuleNode *m) : mASTModule(m) {{}}
 
-void {gen_args2}(const char *title, std::ostream *os) {{
-  mOs = os;
-  *mOs << "// [Beginning of {gen_args1}: " << title << "\\n";
-  *mOs << EmitTreeNode(mASTModule);
-  *mOs << "// End of Emitter]\\n";
+std::string {gen_args2}(const char *title) {{
+  std::string code;
+  code = "// [Beginning of Emitter: "s + title + "\\n"s;
+  code += EmitTreeNode(mASTModule);
+  code += "// End of Emitter]\\n"s;
+  return code;
 }}
+
+ModuleNode *GetASTModule() {{ return mASTModule; }}
 
 std::string Clean(std::string &s) {{
   auto len = s.length();

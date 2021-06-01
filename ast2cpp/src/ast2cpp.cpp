@@ -20,6 +20,7 @@
 #include "gen_aststore.h"
 #include "gen_astload.h"
 #include "emitter.h"
+#include "cpp_emitter.h"
 
 namespace maplefe {
 
@@ -100,10 +101,15 @@ void A2C::ProcessAST(bool trace_a2c) {
   }
 
   if (mTraceA2C) {
-    std::cout << "============= TsEmitter ===========" << std::endl;
+    std::cout << "============= Emitter ===========" << std::endl;
     Emitter emitter(gModule);
-    emitter.Emit("Convert AST to TypeScript code", &std::cout);
+    std::string code = emitter.Emit("Convert AST to TypeScript code");
+    std::cout << code;
   }
+
+  CppEmitter cppemitter(gModule);
+  std::string cppcode = cppemitter.Emit("Convert AST to C++ code");
+  std::cout << cppcode;
 }
 }
 

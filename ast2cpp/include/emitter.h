@@ -22,6 +22,7 @@
 #include "ast_type.h"
 
 #include "gen_astdump.h"
+using namespace std::string_literals;
 
 namespace maplefe {
 
@@ -31,18 +32,20 @@ class Emitter {
 
 private:
   ModuleNode *mASTModule;
-  std::ostream *mOs;
   Precedence mPrecedence;
 
 public:
-  Emitter(ModuleNode *m) : mASTModule(m), mOs(nullptr) {}
+  Emitter(ModuleNode *m) : mASTModule(m) {}
 
-  void Emit(const char *title, std::ostream *os) {
-    mOs = os;
-    *mOs << "// [Beginning of Emitter: " << title << "\n";
-    *mOs << EmitTreeNode(mASTModule);
-    *mOs << "// End of Emitter]\n";
+  std::string Emit(const char *title) {
+    std::string code;
+    code = "// [Beginning of Emitter: "s + title + "\n"s;
+    code += EmitTreeNode(mASTModule);
+    code += "// End of Emitter]\n"s;
+    return code;
   }
+
+  ModuleNode *GetASTModule() { return mASTModule; }
 
   std::string Clean(std::string &s) {
     auto len = s.length();

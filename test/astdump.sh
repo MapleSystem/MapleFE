@@ -60,7 +60,7 @@ for ts in $LIST; do
   fi
   echo "$out"
   cmd=$(grep -n -e "^// .Beginning of Emitter:" -e "// End of Emitter.$" <<< "$out" |
-    tail -2 | sed 's/:.*//' | xargs | sed 's/\([^ ]*\) \(.*\)/sed -n \1,$((\2+1))p/')
+    tail -2 | sed 's/:.*//' | xargs | sed 's/\([^ ]*\) \(.*\)/sed -n \1,$((\2))p/')
   if [ "x${cmd:0:4}" = "xsed " ]; then
     T=$ts-$$.out.ts
     eval $cmd <<< "$out" > "$T"

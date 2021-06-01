@@ -17,8 +17,6 @@
 
 namespace maplefe {
 
-using namespace std::string_literals;
-
 const char *Emitter::GetEnumAttrId(AttrId k) {
   switch (k) {
     case ATTR_abstract:
