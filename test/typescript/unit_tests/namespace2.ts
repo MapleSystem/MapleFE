@@ -4,10 +4,8 @@ namespace ns_a {
  export function foo() : string {
    return hello;
  }
+ for(var i = 0; i < x; ++i)
+   console.log(i);
 }
 console.log(ns_a.foo());
-namespace ns_a {
-  for(var i = 0; i < 10; ++i)
-    console.log(i);
-}
 export {ns_a as ns_1};
