@@ -38,7 +38,7 @@ license_notice = [
 ] # license_notice
 
 compile_commands = [
-"""
+f"""
 [
   {{ "directory": "{maplefe_dir}src"
     "command":   "clang++ -std=c++17 -DDEBUG -fpermissive -I {maplefe_dir}include -w -c ast_builder.cpp",
@@ -46,15 +46,15 @@ compile_commands = [
     "output":    "{output_dir}"
   }}
 ]
-""".format(maplefe_dir=maplefe_dir, output_dir=output_dir)
+"""
 ] # compile_commands
 
 bash_commands = [
-"""
+f"""
 cd {maplefe_dir}src || exit 1
 rm -f {output_dir}yaml.log
 clang-doc-10 ast_builder.cpp -p {output_dir} --format=yaml -output={output_dir}
-""".format(maplefe_dir=maplefe_dir, output_dir=output_dir)
+"""
 ] # bash_commands
 
 def exec_command(cmd):
