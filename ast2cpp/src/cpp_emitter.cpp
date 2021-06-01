@@ -74,7 +74,15 @@ std::string CppEmitter::EmitFunctionNode(FunctionNode *node) {
 std::string CppEmitter::EmitBinOperatorNode(BinOperatorNode *node) {
   if (node == nullptr || mPhase == PK_DECL)
     return std::string();
-  return Emitter::EmitBinOperatorNode(node);
+  std::string str = Emitter::EmitBinOperatorNode(node);
+  size_t index = 0;
+  while (true) {
+    index = str.find(">>>", index);
+    if (index == std::string::npos) break;
+    str.replace(index, 3, ">>");
+    index += 2;
+  }
+  return str;
 }
 
 std::string CppEmitter::EmitIdentifierNode(IdentifierNode *node) {
@@ -102,9 +110,13 @@ std::string CppEmitter::EmitIdentifierNode(IdentifierNode *node) {
 std::string CppEmitter::EmitPrimTypeNode(PrimTypeNode *node) {
   if (node == nullptr && mPhase != PK_DECL)
     return std::string();
-  if(node->GetPrimType() == TY_Number)
-    return "long "s; // Use long for number for now
-    //return "double "s;
+  switch(node->GetPrimType()) {
+    case TY_Number:
+      return "long "s; // Use long for number for now
+      //return "double "s;
+    case TY_Boolean:
+      return "bool "s;
+  }
   return Emitter::GetEnumTypeId(node->GetPrimType());
 }
 
