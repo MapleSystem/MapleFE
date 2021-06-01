@@ -65,6 +65,12 @@ int main(int argc, char **argv) {
 }
 
 
+std::string CppEmitter::EmitFunctionNode(FunctionNode *node) {
+  if (node == nullptr || mPhase == PK_CODE)
+    return std::string();
+  return Emitter::EmitFunctionNode(node);
+}
+
 std::string CppEmitter::EmitIdentifierNode(IdentifierNode *node) {
   if (node == nullptr)
     return std::string();
