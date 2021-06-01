@@ -43,6 +43,7 @@ public:
 
   std::string EmitModuleNode(ModuleNode *node);
   std::string EmitFunctionNode(FunctionNode *node);
+  std::string EmitBinOperatorNode(BinOperatorNode *node);
   std::string EmitDeclNode(DeclNode *node);
   std::string EmitCallNode(CallNode *node);
   std::string EmitIdentifierNode(IdentifierNode *node);
