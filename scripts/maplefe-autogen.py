@@ -2,7 +2,8 @@
 from os import path, environ
 import subprocess
 import hashlib
-import ruamel.yaml as yaml
+#import ruamel.yaml as yaml
+import yaml
 
 #
 # Needs to install the following packages on Ubuntu 18.04 or 20.04
