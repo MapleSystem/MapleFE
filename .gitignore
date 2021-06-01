@@ -9,6 +9,7 @@ output/
 *.dot
 *.png
 *.out.ts
+*.out.cpp
 *.ts.ast
 gdbfile
 test/TypeScript/

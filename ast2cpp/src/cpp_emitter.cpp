@@ -26,7 +26,7 @@ std::string CppEmitter::EmitModuleNode(ModuleNode *node) {
 #include <iostream>
 
 class Module_1 {
-public:
+public: // all top level variables in the module
 )""";
   mPhase = PK_DECL;
   for (unsigned i = 0; i < node->GetTreesNum(); ++i) {
@@ -37,8 +37,8 @@ public:
 
   str += R"""(
 
-public:
-void __init_func__() {
+public: // all top level functions in the module
+void __init_func__() { // bind "this" to current module
 )""";
 
   mPhase = PK_CODE;
@@ -49,12 +49,15 @@ void __init_func__() {
   }
 
   str += R"""(}
+
+  // export table here
 };
 
 Module_1 module_1;
 
+// If the program starts from this module, generate the main function
 int main(int argc, char **argv) {
-  module_1.__init_func__();
+  module_1.__init_func__(); // only call to its __init_func__()
   return 0;
 }
 )""";

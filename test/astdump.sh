@@ -37,7 +37,7 @@ while [ $# -gt 0 ]; do
     esac
     shift
 done
-[ -z "$CLEAN" ] || { echo Cleaning up generated files...; find -maxdepth 1 -regex '.*\.ts-[0-9]+\.out.ts' -exec rm '{}' \;; echo Done.; }
+[ -z "$CLEAN" ] || { echo Cleaning up generated files...; find -maxdepth 1 -regex '.*\.ts-[0-9]+\.out.[ct][ps]p*' -exec rm '{}' \;; echo Done.; }
 [ -n "$LIST" ] || { echo Please specify one or more TypeScript files.; usage; }
 [ -z "$DOT" ] || [ -x /usr/bin/dot -a -x /usr/bin/viewnior -a -x /usr/bin/highlight ] || sudo apt install graphviz viewnior highlight
 TSOUT=$(cd $(dirname $0)/../; pwd)/output/typescript
@@ -65,7 +65,7 @@ for ts in $LIST; do
     T=$ts-$$.out.ts
     eval $cmd <<< "$out" > "$T"
     clang-format-10 -i --style="{ColumnLimit: 120}" "$T"
-    echo -e "\n====== Reformated ======\n"
+    echo -e "\n====== TS Reformated ======\n"
     $HIGHLIGHT "$T"
     eval tsc --noEmit --target es2015 "$T" $TSCERR
     if [ $? -ne 0 ]; then
@@ -78,6 +78,15 @@ for ts in $LIST; do
       Passed="$Passed $ts"
       rm -f "$T"
     fi
+  fi
+  cmd=$(grep -n -e "^// .Beginning of CppEmitter:" -e "// End of CppEmitter.$" <<< "$out" |
+    tail -2 | sed 's/:.*//' | xargs | sed 's/\([^ ]*\) \(.*\)/sed -n \1,$((\2))p/')
+  if [ "x${cmd:0:4}" = "xsed " ]; then
+    T=$ts-$$.out.cpp
+    eval $cmd <<< "$out" > "$T"
+    clang-format-10 -i --style="{ColumnLimit: 120}" "$T"
+    echo -e "\n====== C++ Reformated ======\n"
+    $HIGHLIGHT "$T"
   fi
   if [ -n "$DOT" ]; then
     echo --- "$ts"; cat "$ts"
