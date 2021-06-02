@@ -1,0 +1,10 @@
+Matched 11 tokens.
+Matched 18 tokens.
+Matched 25 tokens.
+============= Module ===========
+== Sub Tree ==
+
+== Sub Tree ==
+js_let Decl: et=ET.TOP
+== Sub Tree ==
+console.log(et)
