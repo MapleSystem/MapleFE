@@ -192,16 +192,25 @@ void ExportNode::Dump(unsigned indent) {
 
 void XXportAsPairNode::Dump(unsigned indent) {
   DumpIndentation(indent);
-  if (IsEverything())
+  if (IsEverything()) {
     DUMP0_NORETURN(" *");
-  else if (IsDefault())
+    if (mBefore) {
+      DUMP0_NORETURN(" as ");
+      mBefore->Dump(0);
+    }
+  } else if (IsDefault()) {
     DUMP0_NORETURN(" default");
-  else if (mBefore)
+    if (mBefore) {
+      DUMP0_NORETURN(" as ");
+      mBefore->Dump(0);
+    }
+  } else {
+    MASSERT(mBefore);
     mBefore->Dump(0);
-
-  if (mAfter) {
-    DUMP0_NORETURN(" as ");
-    mAfter->Dump(0);
+    if (mAfter) {
+      DUMP0_NORETURN(" as ");
+      mAfter->Dump(0);
+    }
   }
 }
 

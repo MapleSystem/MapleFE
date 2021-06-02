@@ -148,23 +148,24 @@ public:
 // In JS, the import or export support: xxport {x as y}
 // Its kind of like a mapping of internal name to extern name.
 //
-// Some special case.
-//
-// 1. Export may export a declaration like:
-//      export function(xxx) {...}
-//    In this case only mBefore is used to point to the function or other
-//    declarations.
-// 2. Export/Import everything '*' as 'xxx'.
-//    In this case, mIsEverything is set, mAfter is pointing to 'xxx'.
-// 3. so on.
+// Regarding 'default' and 'everything' (*), there are some rules of saving
+// in the XXportAsPairNode. First, let's look at the variaties of combinations
+// of default and *.
+//   1) import * as x
+//   2) import default as x
+//   3) export x as default
+//   4) export *
+//   5) export default declaration
+// For all these cases, we set mIsDefault or mIsEverything, and save the
+// possible 'x' to mBefore.
 //////////////////////////////////////////////////////////////////////////
 
 class XXportAsPairNode : public TreeNode {
 private:
   bool      mIsDefault;     // import or export 'default'
   bool      mIsEverything;  // import or export '*', which is everything
-  TreeNode *mBefore;      // name before 'as'
-  TreeNode *mAfter;       // name after 'as'
+  TreeNode *mBefore;        // In usual cases, name before 'as'
+  TreeNode *mAfter;         // In usual cases, name after 'as'
 
 public:
   XXportAsPairNode() : TreeNode(NK_XXportAsPair),

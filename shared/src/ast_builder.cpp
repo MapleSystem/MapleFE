@@ -338,7 +338,8 @@ TreeNode* ASTBuilder::SetFromModule() {
 
 // Take no argument, or one argument.
 // (1) If no argument, it applies to all pairs of import/export.
-//     And actually there is NO pair at all in most cases.
+//     This happens right after BuildImport or BuildExport, and there is no existing
+//     pairs. In this case, we create a new pair and sets it to *.
 // (2) If one argument, it's the new name of '*' (aka the Everything),
 //     and is saved in mAfter of the pair.
 //
@@ -352,7 +353,7 @@ TreeNode* ASTBuilder::SetIsEverything() {
     Param p = mParams[0];
     if (!p.mIsEmpty && p.mIsTreeNode) {
       TreeNode *expr = p.mData.mTreeNode;
-      n->SetAfter(expr);
+      n->SetBefore(expr);
     }
   }
 
@@ -379,7 +380,7 @@ TreeNode* ASTBuilder::SetIsDefault() {
     Param p = mParams[0];
     if (!p.mIsEmpty && p.mIsTreeNode) {
       TreeNode *expr = p.mData.mTreeNode;
-      n->SetAfter(expr);
+      n->SetBefore(expr);
     }
   }
 
@@ -425,23 +426,23 @@ TreeNode* ASTBuilder::BuildXXportAsPair() {
   return mLastTreeNode;
 }
 
-// It takes one arguments, the name after 'as'.
+// It takes one arguments, the 'x' in the '* as x'.
 TreeNode* ASTBuilder::BuildXXportAsPairEverything() {
   MASSERT(mParams.size() == 1);
 
-  TreeNode *after = NULL;
+  TreeNode *tree = NULL;
 
   Param p = mParams[0];
   if (!p.mIsEmpty && p.mIsTreeNode) {
-    after = p.mData.mTreeNode;
+    tree = p.mData.mTreeNode;
   }
 
   XXportAsPairNode *n = (XXportAsPairNode*)gTreePool.NewTreeNode(sizeof(XXportAsPairNode));
   new (n) XXportAsPairNode();
   n->SetIsEverything();
 
-  if (after)
-    n->SetAfter(after);
+  if (tree)
+    n->SetBefore(tree);
 
   mLastTreeNode = n;
   return mLastTreeNode;
@@ -451,19 +452,19 @@ TreeNode* ASTBuilder::BuildXXportAsPairEverything() {
 TreeNode* ASTBuilder::BuildXXportAsPairDefault() {
   MASSERT(mParams.size() == 1);
 
-  TreeNode *after = NULL;
+  TreeNode *tree = NULL;
 
   Param p = mParams[0];
   if (!p.mIsEmpty && p.mIsTreeNode) {
-    after = p.mData.mTreeNode;
+    tree = p.mData.mTreeNode;
   }
 
   XXportAsPairNode *n = (XXportAsPairNode*)gTreePool.NewTreeNode(sizeof(XXportAsPairNode));
   new (n) XXportAsPairNode();
   n->SetIsDefault();
 
-  if (after)
-    n->SetAfter(after);
+  if (tree)
+    n->SetBefore(tree);
 
   mLastTreeNode = n;
   return mLastTreeNode;
