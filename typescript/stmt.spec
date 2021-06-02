@@ -1365,8 +1365,10 @@ rule ExportsList : ONEOF(ExportSpecifier,
 ## IdentifierName
 ## IdentifierName as IdentifierName
 rule ExportSpecifier : ONEOF(JSIdentifier,
-                             JSIdentifier + "as" + JSIdentifier)
+                             JSIdentifier + "as" + BindingIdentifier,
+                             JSIdentifier + "as" + "default")
   attr.action.%2 : BuildXXportAsPair(%1, %3)
+  attr.action.%3 : BuildXXportAsPairDefault(%1)
 
 #############################################################################
 #############################################################################
