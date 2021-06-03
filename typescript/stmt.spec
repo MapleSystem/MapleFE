@@ -1577,6 +1577,8 @@ rule OptionalParameter: ONEOF(
 
 ## rule RestParameter: ... BindingIdentifier TypeAnnotationopt
 rule RestParameter: "..." + BindingIdentifier + ZEROORONE(TypeAnnotation)
+  attr.action : AddType(%2, %3)
+  attr.action : SetRestParam(%2)
 
 ## rule ConstructSignature: new TypeParametersopt ( ParameterListopt ) TypeAnnotationopt
 rule ConstructSignature :

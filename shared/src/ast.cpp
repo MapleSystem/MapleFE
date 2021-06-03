@@ -451,6 +451,8 @@ void DimensionNode::Merge(const TreeNode *node) {
 
 void IdentifierNode::Dump(unsigned indent) {
   DumpIndentation(indent);
+  if (mRestParam)
+    DUMP0_NORETURN("...");
   DUMP0_NORETURN(GetName());
   if (mOptionalParam)
     DUMP0_NORETURN('?');

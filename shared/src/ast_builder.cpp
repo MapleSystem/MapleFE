@@ -2435,6 +2435,23 @@ TreeNode* ASTBuilder::SetOptionalParam() {
   return mLastTreeNode;
 }
 
+// Takes one argument, set it as optional param.
+TreeNode* ASTBuilder::SetRestParam() {
+  if (mTrace)
+    std::cout << "In SetRestParam" << std::endl;
+
+  MASSERT(mParams.size() == 1);
+  Param p_param = mParams[0];
+  MASSERT(!p_param.mIsEmpty && p_param.mIsTreeNode);
+  TreeNode *param = p_param.mData.mTreeNode;
+  MASSERT(param->IsIdentifier());
+  IdentifierNode *id = (IdentifierNode*)param;
+  id->SetRestParam(true);
+
+  mLastTreeNode = id;
+  return mLastTreeNode;
+}
+
 // This takes just one argument which is the function name.
 // The name could empty which is allowed in languages like JS.
 TreeNode* ASTBuilder::BuildFunction() {

@@ -78,7 +78,7 @@ protected:
   TreeNode *mLabel;   // label of a statement, or expression.
   unsigned  mStrIdx;
 
-  bool      mIsStmt;  // if a node is a statement
+  bool      mIsStmt;      // if a node is a statement
 
 public:
   TreeNode(NodeKind k, unsigned i)
@@ -103,8 +103,8 @@ public:
   TreeNode* GetParent() {return mParent;}
   TreeNode* GetLabel()  {return mLabel;}
 
-  bool IsStmt()    {return mIsStmt;}
-  void SetIsStmt(bool b = true) {mIsStmt = b;}
+  bool IsStmt()          {return mIsStmt;}
+  void SetIsStmt(bool b = true)      {mIsStmt = b;}
 
   virtual unsigned GetStrIdx() {return mStrIdx;}
   virtual void SetStrIdx(unsigned id) {mStrIdx = id;}
@@ -473,9 +473,11 @@ private:
   TreeNode      *mInit; // Init value
   DimensionNode *mDims;
   bool           mOptionalParam; // A optional parameter.
+  bool           mRestParam;     // A rest parameter.
 public:
   IdentifierNode(unsigned id, TreeNode *t) : TreeNode(NK_Identifier, id),
-    mType(t), mInit(NULL), mDims(NULL), mOptionalParam(false) {}
+    mType(t), mInit(NULL), mDims(NULL),
+    mOptionalParam(false), mRestParam(false) {}
   IdentifierNode(unsigned id) : IdentifierNode(id, NULL) {}
   IdentifierNode() : IdentifierNode(0, NULL) {}
   ~IdentifierNode(){}
@@ -492,6 +494,9 @@ public:
   bool IsOptionalParam()       {return mOptionalParam;}
   bool GetOptionalParam()      {return mOptionalParam;}
   void SetOptionalParam(bool b){mOptionalParam = b;}
+  bool IsRestParam()       {return mRestParam;}
+  bool GetRestParam()      {return mRestParam;}
+  void SetRestParam(bool b){mRestParam = b;}
 
   unsigned GetDimsNum()          {return mDims->GetDimensionsNum();}
   unsigned GetDim(unsigned n)    {return mDims->GetDimension(n);} // 0 means unspecified.

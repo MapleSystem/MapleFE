@@ -1,0 +1,9 @@
+Matched 25 tokens.
+Matched 40 tokens.
+============= Module ===========
+== Sub Tree ==
+func  func(msg,...params)  throws: 
+  console.log(msg,params)
+
+== Sub Tree ==
+func("Rest: ",1,2,3,"abc","def")
