@@ -31,16 +31,22 @@ namespace maplefe {
 #define AST2CPPMSG(K,v)    { if (mTraceA2c) { MMSG(K,v);    }}
 #define AST2CPPMSG2(K,v,w) { if (mTraceA2c) { MMSG2(K,v,w); }}
 
+class AST_Handler;
+
 class AstOpt {
 private:
-  const char *mFileName;
-  bool mTraceAstOpt;
-  unsigned mUniqNum;
+  AST_Handler *mASTHandler;
+  ModuleNode  *mModule;
+  bool         mTraceAstOpt;
+  unsigned     mUniqNum;
 
 public:
-  explicit AstOpt(const char *filename) : mFileName(filename) {}
+  explicit AstOpt(AST_Handler *h, bool trace) :
+    mASTHandler(h), mModule(NULL), mTraceAstOpt(trace) {}
   ~AstOpt() = default;
 
+  AST_Handler *GetASTHandler() {return mASTHandler;}
+  void SetModule(ModuleNode *mod) { mModule = mod; }
   void ProcessAST(bool trace_opt);
 };
 

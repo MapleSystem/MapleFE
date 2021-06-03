@@ -43,16 +43,17 @@ class AST_Handler {
   AST_CFG      *mCFG;
   AST_AST      *mAST;
   AST_DFA      *mDFA;
+  const char   *mOutputFileName;
   bool          mTrace;
   std::unordered_map<unsigned, AstBasicBlock *> mNodeId2BbMap;
 
  public:
+  SmallVector<ModuleNode *> mASTModules;  // vector of all AST modules
   // only reachable BBs
   std::unordered_map<unsigned, AstBasicBlock *> mBbId2BbMap;
 
  public:
-  explicit AST_Handler(ModuleNode *module, bool trace) :
-    mASTModule(module),
+  explicit AST_Handler(bool trace) :
     mFunction(nullptr),
     mCFG(nullptr),
     mAST(nullptr),
@@ -65,8 +66,14 @@ class AST_Handler {
   void ASTCollectAndDBRemoval();
   void BuildDFA();
 
+  const char *GetOutputFileName() {return mOutputFileName;}
+  void SetOutputFileName(const char *name) {mOutputFileName = name;}
+  void SetASTModule(ModuleNode *mod) {mASTModule = mod;}
   ModuleNode *GetASTModule() {return mASTModule;}
-  MemPool   *GetMemPool()   {return &mMemPool;}
+
+  void AddModule(ModuleNode *mod) {mASTModules.PushBack(mod);}
+
+  MemPool *GetMemPool() {return &mMemPool;}
 
   void          SetFunction(AstFunction *func) {mFunction = func;}
   AstFunction *GetFunction()                   {return mFunction;}

@@ -30,31 +30,19 @@ namespace maplefe {
 #define AST2CPPMSG2(K,v,w) { if (mTraceA2C) { MMSG2(K,v,w); }}
 
 // starting point of AST
-void A2C::ProcessAST(bool trace_a2c) {
-  mTraceA2C = trace_a2c;
-  if (mTraceA2C) {
-    std::cout << "============= in ProcessAST ===========" << std::endl;
-    std::cout << "srcLang : " << gModule->GetSrcLangString() << std::endl;
-  }
-  for(unsigned i = 0; i < gModule->GetTreesNum(); i++) {
-    TreeNode *tnode = gModule->GetTree(i);
+void A2C::ProcessAST() {
+  // loop through modules
+  unsigned size = mASTHandler->mASTModules.GetNum();
+  for (int i = 0; i < size; i++) {
+    // set gModule
+    gModule = mASTHandler->mASTModules.ValueAtIndex(i);
+    mASTHandler->SetASTModule(gModule);
+
     if (mTraceA2C) {
-      tnode->Dump(0);
-      std::cout << std::endl;
+      std::cout << "============= in ProcessAST ===========" << std::endl;
+      std::cout << "srcLang : " << gModule->GetSrcLangString() << std::endl;
     }
-  }
 
-  if (mTraceA2C) {
-    std::cout << "============= AstGraph ===========" << std::endl;
-    AstGraph graph(gModule);
-    graph.DumpGraph("After LoadFromAstBuf()", &std::cout);
-  }
-
-  AST_Handler handler(gModule, mTraceA2C);
-
-  handler.AdjustAST();
-  if (mTraceA2C) {
-    std::cout << "============= After AdjustAST ===========" << std::endl;
     for(unsigned i = 0; i < gModule->GetTreesNum(); i++) {
       TreeNode *tnode = gModule->GetTree(i);
       if (mTraceA2C) {
@@ -62,54 +50,61 @@ void A2C::ProcessAST(bool trace_a2c) {
         std::cout << std::endl;
       }
     }
-    AstGraph graph(gModule);
-    graph.DumpGraph("After AdjustAST()", &std::cout);
-  }
 
-  handler.BuildCFG();
-  if (mTraceA2C) {
-    handler.Dump("After handler.BuildCFG()");
-  }
+    if (mTraceA2C) {
+      std::cout << "============= AstGraph ===========" << std::endl;
+      AstGraph graph(gModule);
+      graph.DumpGraph("After LoadFromAstBuf()", &std::cout);
+    }
 
-  handler.ASTCollectAndDBRemoval();
-  if (mTraceA2C) {
-    handler.Dump("After handler.ASTCollectAndDBRemoval()");
-  }
+    mASTHandler->AdjustAST();
+    if (mTraceA2C) {
+      std::cout << "============= After AdjustAST ===========" << std::endl;
+      for(unsigned i = 0; i < gModule->GetTreesNum(); i++) {
+        TreeNode *tnode = gModule->GetTree(i);
+        if (mTraceA2C) {
+          tnode->Dump(0);
+          std::cout << std::endl;
+        }
+      }
+      AstGraph graph(gModule);
+      graph.DumpGraph("After AdjustAST()", &std::cout);
+    }
 
-  if (mTraceA2C) {
-    std::cout << "============= AstGraph ===========" << std::endl;
-    AstGraph graph(gModule);
-    graph.DumpGraph("After BuildCFG()", &std::cout);
-  }
+    mASTHandler->BuildCFG();
+    if (mTraceA2C) {
+      mASTHandler->Dump("After mASTHandler->BuildCFG()");
+    }
 
-  if (mTraceA2C) {
-    std::cout << "============= AstDump ===========" << std::endl;
-    AstDump astdump(gModule);
-    astdump.Dump("After BuildCFG()", &std::cout);
-  }
+    mASTHandler->ASTCollectAndDBRemoval();
+    if (mTraceA2C) {
+      mASTHandler->Dump("After mASTHandler->ASTCollectAndDBRemoval()");
+    }
 
-  handler.BuildDFA();
-  if (mTraceA2C) {
-    // handler.Dump("After handler.BuildDFA()");
-  }
+    if (mTraceA2C) {
+      std::cout << "============= AstGraph ===========" << std::endl;
+      AstGraph graph(gModule);
+      graph.DumpGraph("After BuildCFG()", &std::cout);
+    }
 
-  if (mTraceA2C) {
-    std::cout << "============= AstStore ===========" << std::endl;
-    AstStore saveAst(gModule);
-    saveAst.StoreInAstBuf();
-    //AstBuffer &ast_buf = saveAst.GetAstBuf();
-  }
+    if (mTraceA2C) {
+      std::cout << "============= AstDump ===========" << std::endl;
+      AstDump astdump(gModule);
+      astdump.Dump("After BuildCFG()", &std::cout);
+    }
 
-  if (mTraceA2C) {
-    std::cout << "============= Emitter ===========" << std::endl;
-    Emitter emitter(gModule);
-    std::string code = emitter.Emit("Convert AST to TypeScript code");
-    std::cout << code;
-  }
+    mASTHandler->BuildDFA();
+    if (mTraceA2C) {
+      // mASTHandler->Dump("After mASTHandler->BuildDFA()");
+    }
 
-  CppEmitter cppemitter(gModule);
-  std::string cppcode = cppemitter.Emit("Convert AST to C++ code");
-  std::cout << cppcode;
+    if (mTraceA2C) {
+      std::cout << "============= AstStore ===========" << std::endl;
+      AstStore saveAst(gModule);
+      saveAst.StoreInAstBuf();
+      //AstBuffer &ast_buf = saveAst.GetAstBuf();
+    }
+  }
 }
 }
 

@@ -91,17 +91,17 @@ ms: mssetup
 % : %.ts
 	@cp $< $(build)
 	@echo gdb --args ../output/typescript/bin/ts2ast $(build)/$@.ts $(FLAGS1)
-	@echo gdb --args ../output/typescript/bin/ast2cpp $(build)/$@.ts.ast $(FLAGS2)
+	@echo gdb --args ../output/typescript/bin/ast2cpp --in=$(build)/$@.ts.ast --out=$(build)/$@.ts.cpp $(FLAGS2)
 	../output/typescript/bin/ts2ast $(build)/$@.ts $(FLAGS1)
-	../output/typescript/bin/ast2cpp $(build)/$@.ts.ast $(FLAGS2)
+	../output/typescript/bin/ast2cpp --in=$(build)/$@.ts.ast --out=$(build)/$@.ts.cpp $(FLAGS2)
 	@echo "\n======================= $@.ts ========================="
 	@cat -n $(build)/$@.ts
 	@echo "========================================================\n"
 	@echo gdb --args ../output/typescript/bin/ts2ast $(build)/$@.ts $(FLAGS1)
-	@echo gdb --args ../output/typescript/bin/ast2cpp $(build)/$@.ts.ast $(FLAGS2)
-	@echo "\n======================= $@.cpp ========================="
-	@cat -n $(build)/$@.cpp
+	@echo gdb --args ../output/typescript/bin/ast2cpp --in=$(build)/$@.ts.ast --out=$(build)/$@.ts.cpp $(FLAGS2)
+	@echo "\n======================= $@.ts.cpp ========================="
+	@cat -n $(build)/$@.ts.cpp
 	@echo "========================================================\n"
 	@echo gdb --args ../output/typescript/bin/ts2ast $(build)/$@.ts $(FLAGS1)
-	@echo gdb --args ../output/typescript/bin/ast2cpp $(build)/$@.ts.ast $(FLAGS2)
+	@echo gdb --args ../output/typescript/bin/ast2cpp --in=$(build)/$@.ts.ast --out=$(build)/$@.ts.cpp $(FLAGS2)
 endif

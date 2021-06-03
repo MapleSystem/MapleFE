@@ -19,6 +19,7 @@
 #include "ast.h"
 #include "ast_attr.h"
 #include "ast_module.h"
+#include "ast_handler.h"
 #include "ast_type.h"
 
 #include "gen_astdump.h"
@@ -31,23 +32,29 @@ class Emitter {
   using Precedence = char;
 
 private:
-  ModuleNode *mASTModule;
+  AST_Handler *mASTHandler;
+  ModuleNode  *mASTModule;
 
 protected:
   Precedence mPrecedence;
 
 public:
-  Emitter(ModuleNode *m) : mASTModule(m) {}
+  Emitter(AST_Handler *h) : mASTHandler(h) {}
 
   std::string Emit(const char *title) {
     std::string code;
     code = "// [Beginning of Emitter: "s + title + "\n"s;
-    code += EmitTreeNode(mASTModule);
+    unsigned size = mASTHandler->mASTModules.GetNum();
+    for (int i = 0; i < size; i++) {
+      ModuleNode *mod = mASTHandler->mASTModules.ValueAtIndex(i);
+      code += EmitTreeNode(mod);
+    }
     code += "// End of Emitter]\n"s;
     return code;
   }
 
   ModuleNode *GetASTModule() { return mASTModule; }
+  void SetASTModule(ModuleNode *m) { mASTModule = m; }
 
   std::string Clean(std::string &s) {
     auto len = s.length();

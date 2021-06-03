@@ -43,21 +43,21 @@ void AstOpt::ProcessAST(bool trace_a2c) {
     graph.DumpGraph("Initial AST", &std::cout);
   }
 
-  AST_Handler handler(gModule, mTraceAstOpt);
+  AST_Handler handler(mTraceAstOpt);
 
-  handler.AdjustAST();
+  mASTHandler->AdjustAST();
   if (mTraceAstOpt) {
-    handler.Dump("After handler.AdjustAST()");
+    mASTHandler->Dump("After mASTHandler->AdjustAST()");
   }
 
-  handler.BuildCFG();
+  mASTHandler->BuildCFG();
   if (mTraceAstOpt) {
-    handler.Dump("After handler.BuildCFG()");
+    mASTHandler->Dump("After mASTHandler->BuildCFG()");
   }
 
-  handler.ASTCollectAndDBRemoval();
+  mASTHandler->ASTCollectAndDBRemoval();
   if (mTraceAstOpt) {
-    handler.Dump("After handler.ASTCollectAndDBRemoval()");
+    mASTHandler->Dump("After mASTHandler->ASTCollectAndDBRemoval()");
   }
 
   if (mTraceAstOpt) {
@@ -72,9 +72,9 @@ void AstOpt::ProcessAST(bool trace_a2c) {
     astdump.Dump("After BuildCFG()", &std::cout);
   }
 
-  handler.BuildDFA();
+  mASTHandler->BuildDFA();
   if (mTraceAstOpt) {
-    // handler.Dump("After handler.BuildDFA()");
+    // mASTHandler->Dump("After mASTHandler->BuildDFA()");
   }
 }
 }

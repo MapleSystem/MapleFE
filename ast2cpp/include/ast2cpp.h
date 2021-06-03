@@ -26,13 +26,15 @@ namespace maplefe {
 
 class A2C : public AstOpt {
 private:
-  bool mTraceA2C;
+  AST_Handler *mASTHandler;
+  bool         mTraceA2C;
 
 public:
-  explicit A2C(const char *filename) : AstOpt(filename) {}
+  explicit A2C(AST_Handler *h, bool trace) : AstOpt(h, trace), mASTHandler(h), mTraceA2C(trace) {}
   ~A2C() = default;
 
-  void ProcessAST(bool trace_a2c);
+  void SetTraceA2C(bool t) { mTraceA2C = t; }
+  void ProcessAST();
 };
 
 }
