@@ -90,6 +90,7 @@ ACTION(BuildBindingPattern)
 // For struct
 ACTION(BuildStruct)
 ACTION(SetTSInterface)
+ACTION(SetTSEnum)
 ACTION(AddStructField)
 ACTION(BuildFieldLiteral)
 ACTION(BuildStructLiteral)

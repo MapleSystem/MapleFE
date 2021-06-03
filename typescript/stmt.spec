@@ -1757,6 +1757,9 @@ rule IndexMemberDeclaration: IndexSignature + ';'
 ## EnumDeclaration: constopt enum BindingIdentifier { EnumBodyopt }
 rule EnumDeclaration:
   ZEROORONE("const") + "enum" + BindingIdentifier + '{' + ZEROORONE(EnumBody) + '}'
+  attr.action : BuildStruct(%3)
+  attr.action : SetTSEnum()
+  attr.action : AddStructField(%5)
 
 ## EnumBody: EnumMemberList ,opt
 rule EnumBody: EnumMemberList + ZEROORONE(',')
@@ -1768,6 +1771,7 @@ rule EnumMemberList: ONEOF(EnumMember,
 ## EnumMember: PropertyName PropertyName = EnumValue
 rule EnumMember: ONEOF(PropertyName,
                        PropertyName + '=' + EnumValue)
+  attr.action.%2 : AddInitTo(%1, %3)
 
 ## EnumValue: AssignmentExpression
 rule EnumValue: AssignmentExpression

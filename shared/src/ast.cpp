@@ -577,6 +577,9 @@ void StructNode::Dump(unsigned indent) {
   case SProp_TSInterface:
     DUMP0_NORETURN("ts_interface: ");
     break;
+  case SProp_TSEnum:
+    DUMP0_NORETURN("ts_enum: ");
+    break;
   default:
     break;
   }

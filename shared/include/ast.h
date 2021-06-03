@@ -791,6 +791,7 @@ public:
 enum StructProp {
   SProp_CStruct,
   SProp_TSInterface,
+  SProp_TSEnum,
   SProp_NA
 };
 

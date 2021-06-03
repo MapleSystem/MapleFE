@@ -3,7 +3,7 @@ Matched 18 tokens.
 Matched 25 tokens.
 ============= Module ===========
 == Sub Tree ==
-
+ts_enum: ET {TOP="top";BOTTOM="bottom" }
 == Sub Tree ==
 js_let Decl: et=ET.TOP
 == Sub Tree ==

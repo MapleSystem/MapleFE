@@ -1465,6 +1465,13 @@ TreeNode* ASTBuilder::SetTSInterface() {
   return mLastTreeNode;
 }
 
+TreeNode* ASTBuilder::SetTSEnum() {
+  MASSERT(mLastTreeNode->IsStruct());
+  StructNode *s = (StructNode*)mLastTreeNode;
+  s->SetProp(SProp_TSEnum);
+  return mLastTreeNode;
+}
+
 // Build FieldLiteral
 // It takes two param, field name and field value (a literal).
 TreeNode* ASTBuilder::BuildFieldLiteral() {
