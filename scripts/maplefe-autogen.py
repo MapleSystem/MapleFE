@@ -17,6 +17,9 @@ maplefe_dir = root_dir + 'shared/'
 initial_yaml = output_dir + 'maplefe.yaml'         # For version 10
 treenode_yaml = output_dir + 'maplefe/TreeNode.yaml'
 
+if not hasattr(yaml, "cyaml"):
+    print("Note: You may install package 'libyaml-cpp-dev' to speed up YAML parsing.")
+
 license_notice = [
 """/*
 * Copyright (C) [2021] Futurewei Technologies, Inc. All rights reverved.
