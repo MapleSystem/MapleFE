@@ -21,12 +21,11 @@
 #include "ast2cpp.h"
 
 static void help() {
-  std::cout << "ast2cpp [options]:" << std::endl;
-  std::cout << "   --in=a.ast,b.ast : ast input files" << std::endl;
+  std::cout << "ast2cpp a.ast[,b.ast] [options]:" << std::endl;
   std::cout << "   --out=x.cpp      : cpp output file" << std::endl;
   std::cout << "   --help           : print this help" << std::endl;
   std::cout << "   --trace-a2c      : Trace MPL Builder" << std::endl;
-  std::cout << "default out name is the first input name + .cpp" << std::endl;
+  std::cout << "default out name uses the first input name: a.cpp" << std::endl;
 }
 
 int main (int argc, char *argv[]) {
@@ -37,12 +36,12 @@ int main (int argc, char *argv[]) {
 
   bool trace_a2c = false;
   // one or more input .ast files separated by ','
-  const char *inputname = nullptr;
+  const char *inputname = argv[1];
   // output .cpp file
   const char *outputname = nullptr;
 
   // Parse the argument
-  for (unsigned i = 1; i < argc; i++) {
+  for (unsigned i = 2; i < argc; i++) {
     if (!strncmp(argv[i], "--trace-a2c", 11) && (strlen(argv[i]) == 11)) {
       trace_a2c = true;
     } else if (!strncmp(argv[i], "--in=", 5)) {
