@@ -205,6 +205,7 @@ rule SpreadElement : "..." + AssignmentExpression
 rule ObjectLiteral : ONEOF('{' + '}',
                            '{' + PropertyDefinitionList + '}',
                            '{' + PropertyDefinitionList + ',' + '}')
+  attr.action.%1    : BuildStructLiteral()
   attr.action.%2,%3 : BuildStructLiteral(%2)
 
 ##-----------------------------------

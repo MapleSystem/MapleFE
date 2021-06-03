@@ -1496,8 +1496,9 @@ TreeNode* ASTBuilder::BuildFieldLiteral() {
   return mLastTreeNode;
 }
 
-// It takes one param. The param could a FieldLiteralNode or
-// a PassNode containing multiple FieldLiteralNode.
+// 1) It takes no param. We create an empty struct litreal.
+// 2) It takes one param. The param could a FieldLiteralNode or
+//    a PassNode containing multiple FieldLiteralNode.
 //
 // The param could also be a GetAccessor/SetAccessor in Javascript,
 // which is a function node. We take the name of function as field name,
@@ -1506,13 +1507,19 @@ TreeNode* ASTBuilder::BuildStructLiteral() {
   if (mTrace)
     std::cout << "In BuildStructLiteral" << std::endl;
 
-  Param p_literal = mParams[0];
-  MASSERT(p_literal.mIsTreeNode);
-  TreeNode *literal = p_literal.mData.mTreeNode;
+  TreeNode *literal = NULL;
+
+  if (mParams.size() == 1) {
+    Param p_literal = mParams[0];
+    MASSERT(p_literal.mIsTreeNode);
+    literal = p_literal.mData.mTreeNode;
+  }
 
   StructLiteralNode *struct_literal = (StructLiteralNode*)gTreePool.NewTreeNode(sizeof(StructLiteralNode));
   new (struct_literal) StructLiteralNode();
-  struct_literal->AddField(literal);
+
+  if (literal)
+    struct_literal->AddField(literal);
 
   mLastTreeNode = struct_literal;
   return mLastTreeNode;
