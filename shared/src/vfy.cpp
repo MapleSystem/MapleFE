@@ -466,6 +466,10 @@ void Verifier::VerifyTypeOf(TypeOfNode *tree){
   return;
 }
 
+void Verifier::VerifyKeyOf(KeyOfNode *tree){
+  return;
+}
+
 void Verifier::VerifyArrayElement(ArrayElementNode *tree){
   return;
 }

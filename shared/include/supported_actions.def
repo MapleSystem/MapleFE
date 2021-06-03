@@ -63,6 +63,7 @@ ACTION(BuildPostfixOperation)
 ACTION(BuildInstanceOf)
 ACTION(BuildIn)
 ACTION(BuildTypeOf)
+ACTION(BuildKeyOf)
 
 ACTION(BuildLambda)
 ACTION(SetJavaLambda)       // java lambda

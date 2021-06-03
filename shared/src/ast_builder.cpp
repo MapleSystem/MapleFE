@@ -3099,4 +3099,27 @@ TreeNode* ASTBuilder::BuildTypeOf() {
   mLastTreeNode = typeof;
   return mLastTreeNode;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+//                       KeyOf Expression
+////////////////////////////////////////////////////////////////////////////////
+
+TreeNode* ASTBuilder::BuildKeyOf() {
+  if (mTrace)
+    std::cout << "In BuildKeyOf" << std::endl;
+
+  Param l_param = mParams[0];
+  MASSERT(!l_param.mIsEmpty);
+  MASSERT(l_param.mIsTreeNode);
+  TreeNode *expr = l_param.mData.mTreeNode;
+
+  KeyOfNode *keyof = (KeyOfNode*)gTreePool.NewTreeNode(sizeof(KeyOfNode));
+  new (keyof) KeyOfNode();
+
+  keyof->SetExpr(expr);
+
+  mLastTreeNode = keyof;
+  return mLastTreeNode;
+}
+
 }

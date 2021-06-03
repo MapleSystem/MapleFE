@@ -1784,6 +1784,24 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////
+//                  KeyOf Expression
+// First coming from typescript.
+////////////////////////////////////////////////////////////////////////////
+
+class KeyOfNode : public TreeNode {
+private:
+  TreeNode *mExpr;
+public:
+  KeyOfNode() : TreeNode(NK_KeyOf), mExpr(NULL) {}
+  ~KeyOfNode(){Release();}
+
+  TreeNode* GetExpr()            {return mExpr;}
+  void      SetExpr(TreeNode *n) {mExpr = n;}
+
+  void Dump(unsigned);
+};
+
+////////////////////////////////////////////////////////////////////////////
 //                  In Expression
 // First coming from Javascript. It's like
 // A is IN B.

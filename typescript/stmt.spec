@@ -1408,7 +1408,9 @@ rule TypeArgument: Type
 #                  FunctionType,
 #                  ConstructorType)
 rule Type : ONEOF(UnionOrIntersectionOrPrimaryType,
-                  FunctionType)
+                  FunctionType,
+                  "keyof" + Identifier)
+  attr.action.%3 : BuildKeyOf(%2)
 
 #rule UnionOrIntersectionOrPrimaryType: ONEOF(UnionType,
 #                                             IntersectionOrPrimaryType)
