@@ -29,9 +29,9 @@ class  ObjClass
   LocalInterfaces: 
 
 == Sub Tree ==
-js_let Decl: obj_a
+js_let Decl: obj_a= {}
 == Sub Tree ==
-js_let Decl: obj_b=Object.create()
+js_let Decl: obj_b=Object.create( {})
 == Sub Tree ==
 js_let Decl: obj_c=Object.create(null)
 == Sub Tree ==
