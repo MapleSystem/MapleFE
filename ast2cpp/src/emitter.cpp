@@ -1248,6 +1248,20 @@ std::string Emitter::EmitTypeOfNode(TypeOfNode *node) {
   return str;
 }
 
+std::string Emitter::EmitKeyOfNode(KeyOfNode *node) {
+  if (node == nullptr)
+    return std::string();
+  std::string str;
+  if (auto n = node->GetExpr()) {
+    str += " keyof "s + EmitTreeNode(n);
+  }
+  mPrecedence = '\030';
+  if (node->IsStmt())
+    str += ";\n"s;
+  return str;
+}
+
+
 std::string Emitter::EmitInNode(InNode *node) {
   if (node == nullptr)
     return std::string();
@@ -1478,6 +1492,9 @@ std::string Emitter::EmitTreeNode(TreeNode *node) {
     break;
   case NK_TypeOf:
     return EmitTypeOfNode(static_cast<TypeOfNode *>(node));
+    break;
+  case NK_KeyOf:
+    return EmitKeyOfNode(static_cast<KeyOfNode *>(node));
     break;
   case NK_In:
     return EmitInNode(static_cast<InNode *>(node));

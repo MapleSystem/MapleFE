@@ -846,6 +846,7 @@ gen_args = [
         "Emitter",       # Class name
         "Emit",          # Prefix of function name
         """
+#include "ast_handler.h"
 #include "{astdump}.h"
 using namespace std::string_literals;
 """.format(astdump = astdump),  # Extra include directives
@@ -858,22 +859,28 @@ astemit_init = [
 using Precedence = char;
 
 private:
+AST_Handler  *mASTHandler;
 ModuleNode   *mASTModule;
 protected:
 Precedence    mPrecedence;
 
 public:
-{gen_args1}(ModuleNode *m) : mASTModule(m) {{}}
+{gen_args1}(AST_Handler *h) : mASTHandler(h) {{}}
 
 std::string {gen_args2}(const char *title) {{
   std::string code;
   code = "// [Beginning of Emitter: "s + title + "\\n"s;
-  code += EmitTreeNode(mASTModule);
+  unsigned size = mASTHandler->mASTModules.GetNum();
+  for (int i = 0; i < size; i++) {{
+    ModuleNode *mod = mASTHandler->mASTModules.ValueAtIndex(i);
+    code += EmitTreeNode(mod);
+  }}
   code += "// End of Emitter]\\n"s;
   return code;
 }}
 
 ModuleNode *GetASTModule() {{ return mASTModule; }}
+void SetASTModule(ModuleNode *m) {{ mASTModule = m; }}
 
 std::string Clean(std::string &s) {{
   auto len = s.length();

@@ -19,9 +19,9 @@
 #include "ast.h"
 #include "ast_attr.h"
 #include "ast_module.h"
-#include "ast_handler.h"
 #include "ast_type.h"
 
+#include "ast_handler.h"
 #include "gen_astdump.h"
 using namespace std::string_literals;
 
@@ -33,7 +33,7 @@ class Emitter {
 
 private:
   AST_Handler *mASTHandler;
-  ModuleNode  *mASTModule;
+  ModuleNode *mASTModule;
 
 protected:
   Precedence mPrecedence;
@@ -118,6 +118,7 @@ public:
   virtual std::string EmitLambdaNode(LambdaNode *node);
   virtual std::string EmitInstanceOfNode(InstanceOfNode *node);
   virtual std::string EmitTypeOfNode(TypeOfNode *node);
+  virtual std::string EmitKeyOfNode(KeyOfNode *node);
   virtual std::string EmitInNode(InNode *node);
   virtual std::string EmitAttrNode(AttrNode *node);
   virtual std::string EmitUserTypeNode(UserTypeNode *node);
