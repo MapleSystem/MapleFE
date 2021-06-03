@@ -1696,8 +1696,9 @@ rule ClassDeclaration:
   attr.action : AddSuperInterface(%6)
   attr.action : AddClassBody(%8)
 
-rule Annotation : '@' + Identifier
+rule Annotation : '@' + Identifier + ZEROORONE(Arguments)
   attr.action : BuildAnnotation(%2)
+  attr.action : AddArguments(%3)
 
 ## ClassHeritage: ( Modified ) ClassExtendsClauseopt ImplementsClauseopt
 rule ClassHeritage: ZEROORONE(ClassExtendsClause) + ZEROORONE(ImplementsClause)

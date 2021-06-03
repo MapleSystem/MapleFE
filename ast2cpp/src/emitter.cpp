@@ -65,9 +65,9 @@ std::string Emitter::EmitAnnotationNode(AnnotationNode *node) {
   if (auto n = node->GetType()) {
     str += " "s + EmitAnnotationTypeNode(n);
   }
-  if (auto n = node->GetExpr()) {
-    str += " "s + EmitTreeNode(n);
-  }
+  //if (auto n = node->GetExpr()) {
+  //  str += " "s + EmitTreeNode(n);
+  //}
   if (node->IsStmt())
     str += ";\n"s;
   return str;

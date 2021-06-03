@@ -589,17 +589,20 @@ class AnnotationNode : public TreeNode {
 private:
   IdentifierNode     *mId;
   AnnotationTypeNode *mType;
-  TreeNode           *mExpr;
+  SmallVector<TreeNode*> mArgs;
 public:
-  AnnotationNode() : TreeNode(NK_Annotation), mId(NULL), mType(NULL), mExpr(NULL) {}
-  ~AnnotationNode(){}
+  AnnotationNode() : TreeNode(NK_Annotation), mId(NULL), mType(NULL) {}
+  ~AnnotationNode(){mArgs.Release();}
 
   IdentifierNode* GetId() {return mId;}
   void SetId(IdentifierNode *n) {mId = n;}
   AnnotationTypeNode* GetType() {return mType;}
   void SetType(AnnotationTypeNode *n) {mType = n;}
-  TreeNode* GetExpr() {return mExpr;}
-  void SetExpr(TreeNode *n) {mExpr = n;}
+
+  unsigned  GetArgsNum()       {return mArgs.GetNum();}
+  TreeNode* GetArgAtIndex(unsigned i) {return mArgs.ValueAtIndex(i);}
+  void      SetArgAtIndex(unsigned i, TreeNode* n) {*(mArgs.RefAtIndex(i)) = n;}
+  void      AddArg(TreeNode *n){mArgs.PushBack(n);}
 };
 
 //////////////////////////////////////////////////////////////////////////

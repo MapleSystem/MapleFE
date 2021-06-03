@@ -1,0 +1,23 @@
+Matched 38 tokens.
+Matched 47 tokens.
+Matched 55 tokens.
+============= Module ===========
+== Sub Tree ==
+func  class_deco(name)  throws: 
+  func  deco(ctor)  throws: 
+    console.log("Class constructor is :",ctor,", Name is: ",name)
+
+  return deco
+
+== Sub Tree ==
+class  Klass
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+js_var Decl: o=new Klass()

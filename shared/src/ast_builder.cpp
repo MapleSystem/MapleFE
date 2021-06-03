@@ -2328,10 +2328,13 @@ TreeNode* ASTBuilder::AddArguments() {
 void ASTBuilder::AddArguments(TreeNode *call, TreeNode *args) {
   CallNode *callnode = NULL;
   NewNode *newnode = NULL;
+  AnnotationNode *annotation = NULL;
   if (call->IsCall())
     callnode = (CallNode*)call;
   else if (call->IsNew())
     newnode = (NewNode*)call;
+  else if (call->IsAnnotation())
+    annotation = (AnnotationNode*)call;
   else
     MERROR("Unsupported call node.");
 
@@ -2341,8 +2344,10 @@ void ASTBuilder::AddArguments(TreeNode *call, TreeNode *args) {
       IdentifierNode *inode = vl->GetVarAtIndex(i);
       if (callnode)
         callnode->AddArg(inode);
-      else
+      else if (newnode)
         newnode->AddArg(inode);
+      else if (annotation)
+        annotation->AddArg(inode);
     }
   } else if (args->IsPass()) {
     PassNode *pass = (PassNode*)args;
@@ -2353,8 +2358,10 @@ void ASTBuilder::AddArguments(TreeNode *call, TreeNode *args) {
   } else {
     if (callnode)
       callnode->AddArg(args);
-    else
+    else if (newnode)
       newnode->AddArg(args);
+    else if (annotation)
+      annotation->AddArg(args);
   }
 }
 
