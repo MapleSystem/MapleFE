@@ -1589,6 +1589,7 @@ private:
   SmallVector<ClassNode*>      mSuperClasses;
   SmallVector<InterfaceNode*>  mSuperInterfaces;
   SmallVector<AttrId>          mAttributes;
+  SmallVector<AnnotationNode*> mAnnotations; //annotation or pragma
 
   SmallVector<IdentifierNode*> mFields;       // aka Field
   SmallVector<FunctionNode*>   mMethods;
@@ -1607,6 +1608,12 @@ public:
   void SetIsJavaEnum(bool b = true){mIsJavaEnum = b;}
   bool IsTSNamespace()                {return mIsTSNamespace;}
   void SetIsTSNamespace(bool b = true){mIsTSNamespace = b;}
+
+  // Annotation/Pragma related
+  unsigned GetAnnotationsNum()           {return mAnnotations.GetNum();}
+  void     AddAnnotation(AnnotationNode *n) {mAnnotations.PushBack(n);}
+  AnnotationNode* GetAnnotationAtIndex(unsigned i) {return mAnnotations.ValueAtIndex(i);}
+  void            SetAnnotationAtIndex(unsigned i, AnnotationNode* n) {*(mAnnotations.RefAtIndex(i)) = n;}
 
   void AddSuperClass(ClassNode *n)         {mSuperClasses.PushBack(n);}
   void AddSuperInterface(InterfaceNode *n) {mSuperInterfaces.PushBack(n);}

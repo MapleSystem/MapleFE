@@ -1131,6 +1131,7 @@ void ClassNode::Release() {
   mSuperClasses.Release();
   mSuperInterfaces.Release();
   mAttributes.Release();
+  mAnnotations.Release();
   mFields.Release();
   mMethods.Release();
   mLocalClasses.Release();

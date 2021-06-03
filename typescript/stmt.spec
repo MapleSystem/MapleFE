@@ -1689,11 +1689,15 @@ rule ClassOrInterfaceType: TypeReference
 ## ClassDeclaration: ( Modified ) class BindingIdentifieropt TypeParametersopt ClassHeritage { ClassBody }
 ## NOTE. I inlined ClassHeritage to avoid 'lookahead fail'
 rule ClassDeclaration:
-  "class" + ZEROORONE(BindingIdentifier) + ZEROORONE(TypeParameters) + ZEROORONE(ClassExtendsClause) + ZEROORONE(ImplementsClause) + '{' + ZEROORONE(ClassBody) + '}'
-  attr.action : BuildClass(%2)
-  attr.action : AddSuperClass(%4)
-  attr.action : AddSuperInterface(%5)
-  attr.action : AddClassBody(%7)
+  ZEROORMORE(Annotation) + "class" + ZEROORONE(BindingIdentifier) + ZEROORONE(TypeParameters) + ZEROORONE(ClassExtendsClause) + ZEROORONE(ImplementsClause) + '{' + ZEROORONE(ClassBody) + '}'
+  attr.action : BuildClass(%3)
+  attr.action : AddModifier(%1)
+  attr.action : AddSuperClass(%5)
+  attr.action : AddSuperInterface(%6)
+  attr.action : AddClassBody(%8)
+
+rule Annotation : '@' + Identifier
+  attr.action : BuildAnnotation(%2)
 
 ## ClassHeritage: ( Modified ) ClassExtendsClauseopt ImplementsClauseopt
 rule ClassHeritage: ZEROORONE(ClassExtendsClause) + ZEROORONE(ImplementsClause)
