@@ -1251,11 +1251,17 @@ std::string Emitter::EmitTypeOfNode(TypeOfNode *node) {
 std::string Emitter::EmitKeyOfNode(KeyOfNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str;
+  const Precedence precd = '\121' & 0x3f;
+  std::string str("keyof "s), rhs;
   if (auto n = node->GetExpr()) {
-    str += " keyof "s + EmitTreeNode(n);
+    rhs = EmitTreeNode(n);
+    if(precd > mPrecedence)
+      rhs = "("s + rhs + ")"s;
   }
-  mPrecedence = '\030';
+  else
+    rhs = " (NIL)"s;
+  str += rhs;
+  mPrecedence = precd;
   if (node->IsStmt())
     str += ";\n"s;
   return str;
