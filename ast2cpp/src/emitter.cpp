@@ -550,6 +550,9 @@ std::string Emitter::EmitStructNode(StructNode *node) {
     case SProp_TSInterface:
       str = "interface "s;
       break;
+    case SProp_TSEnum:
+      str = "enum "s;
+      break;
     case SProp_NA:
       str = "SProp_NA "s;
       break;
