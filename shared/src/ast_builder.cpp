@@ -1765,12 +1765,6 @@ TreeNode* ASTBuilder::SetClassIsJavaEnum() {
   return mLastTreeNode;
 }
 
-TreeNode* ASTBuilder::SetClassIsTSNamespace() {
-  ClassNode *klass = (ClassNode*)mLastTreeNode;
-  klass->SetIsTSNamespace();
-  return mLastTreeNode;
-}
-
 // This takes just one argument which is the root of sub tree
 TreeNode* ASTBuilder::BuildBlock() {
   if (mTrace)

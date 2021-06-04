@@ -120,7 +120,6 @@ ACTION(BuildExprList)
 // For class/inheritance
 ACTION(BuildClass)
 ACTION(SetClassIsJavaEnum)
-ACTION(SetClassIsTSNamespace)
 ACTION(AddSuperClass)
 ACTION(AddSuperInterface)
 ACTION(AddClassBody)
