@@ -406,6 +406,10 @@ void Verifier::VerifyExprList(ExprListNode *tree){
   return;
 }
 
+void Verifier::VerifyNamespace(NamespaceNode *tree){
+  return;
+}
+
 void Verifier::VerifyCall(CallNode *tree){
   return;
 }

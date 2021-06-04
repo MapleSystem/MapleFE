@@ -400,6 +400,10 @@ maple::BaseNode *A2M::ProcessExprList(StmtExprKind skind, TreeNode *tnode, Block
   return nullptr;
 }
 
+maple::BaseNode *A2M::ProcessNamespace(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
+  return nullptr;
+}
+
 maple::BaseNode *A2M::ProcessLiteral(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
   LiteralNode *node = static_cast<LiteralNode *>(tnode);
   LitData data = node->GetData();

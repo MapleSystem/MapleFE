@@ -74,6 +74,7 @@ NODEKIND(Block)
 NODEKIND(Function)
 NODEKIND(Class)
 NODEKIND(Interface)
+NODEKIND(Namespace)  // First come from Typescript namespace.
 
 // Annotation, Pragma in c/c++, has no effects for execution, but has meanings
 // for compiler or runtime.

@@ -899,6 +899,31 @@ public:
 };
 
 //////////////////////////////////////////////////////////////////////////
+//                           Namespace Node
+// Typescript namespace has only a list of children which could be any
+// kind of declaration or statement. So I simply keep their original
+// nodes.
+//////////////////////////////////////////////////////////////////////////
+
+class NamespaceNode : public TreeNode {
+private:
+  SmallVector<TreeNode*> mElements;
+public:
+  NamespaceNode() : TreeNode(NK_VarList) {}
+  ~NamespaceNode() {Release();}
+
+  unsigned  GetElementsNum()              {return mElements.GetNum();}
+  TreeNode* GetElementAtIndex(unsigned i) {return mElements.ValueAtIndex(i);}
+  void      SetElementAtIndex(unsigned i, TreeNode* n) {*(mElements.RefAtIndex(i)) = n;}
+  void      AddElement(TreeNode* n);
+
+  void Construct();
+
+  void Release() {mElements.Release();}
+  void Dump(unsigned);
+};
+
+//////////////////////////////////////////////////////////////////////////
 //                           VarList Node
 // Why do we need a VarListNode? Often in the program we have multiple
 // variables like parameters in function, or varable list in declaration.
@@ -909,7 +934,7 @@ private:
   SmallVector<IdentifierNode*> mVars;
 public:
   VarListNode() : TreeNode(NK_VarList) {}
-  ~VarListNode() {}
+  ~VarListNode() {Release();}
 
   unsigned GetVarsNum() {return mVars.GetNum();}
   IdentifierNode* GetVarAtIndex(unsigned i) {return mVars.ValueAtIndex(i);}
