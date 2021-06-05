@@ -1792,8 +1792,8 @@ rule EnumValue: AssignmentExpression
 
 ##NamespaceDeclaration: namespace IdentifierPath { NamespaceBody }
 rule NamespaceDeclaration: "namespace" + IdentifierPath + '{' + NamespaceBody + '}'
-  attr.action : BuildClass(%2)
-  attr.action : AddClassBody(%4)
+  attr.action : BuildNamespace(%2)
+  attr.action : AddNamespaceBody(%4)
 
 ##IdentifierPath: BindingIdentifier IdentifierPath . BindingIdentifier
 rule IdentifierPath: ONEOF(BindingIdentifier,

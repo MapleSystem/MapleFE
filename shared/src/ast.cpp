@@ -685,18 +685,26 @@ void VarListNode::Dump(unsigned indent) {
 //                          NamespaceNode
 //////////////////////////////////////////////////////////////////////////////////////
 
-void NamespaceNode::Construct() {
-}
-
-void NamespaceNode::AddElement(TreeNode *tree) {
+void NamespaceNode::AddBody(TreeNode *tree) {
+  if (tree->IsPass()) {
+    PassNode *p = (PassNode*)tree;
+    for (unsigned i = 0; i < p->GetChildrenNum(); i++) {
+      TreeNode *child = p->GetChild(i);
+      AddBody(child);
+    }
+  } else {
+    AddElement(tree);
+  }
 }
 
 void NamespaceNode::Dump(unsigned indent) {
   DumpIndentation(indent);
+  DUMP1_NORETURN("namespace ", GetName());
+  DUMP_RETURN();
   for (unsigned i = 0; i < mElements.GetNum(); i++) {
+    DumpIndentation(indent + 2);
     mElements.ValueAtIndex(i)->Dump(0);
-    if (i != mElements.GetNum()-1)
-      DUMP0_NORETURN(",");
+    DUMP_RETURN();
   }
 }
 

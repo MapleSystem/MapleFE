@@ -909,15 +909,15 @@ class NamespaceNode : public TreeNode {
 private:
   SmallVector<TreeNode*> mElements;
 public:
-  NamespaceNode() : TreeNode(NK_VarList) {}
+  NamespaceNode() : TreeNode(NK_Namespace) {}
   ~NamespaceNode() {Release();}
 
   unsigned  GetElementsNum()              {return mElements.GetNum();}
   TreeNode* GetElementAtIndex(unsigned i) {return mElements.ValueAtIndex(i);}
   void      SetElementAtIndex(unsigned i, TreeNode* n) {*(mElements.RefAtIndex(i)) = n;}
-  void      AddElement(TreeNode* n);
+  void      AddElement(TreeNode* n) {mElements.PushBack(n);}
 
-  void Construct();
+  void AddBody(TreeNode *);
 
   void Release() {mElements.Release();}
   void Dump(unsigned);

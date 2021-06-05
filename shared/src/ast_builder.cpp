@@ -1735,6 +1735,43 @@ TreeNode* ASTBuilder::AddInitTo() {
   }
 }
 
+// This takes just one argument which is the namespace name.
+TreeNode* ASTBuilder::BuildNamespace() {
+  if (mTrace)
+    std::cout << "In BuildNamespace" << std::endl;
+
+  Param p_name = mParams[0];
+  MASSERT(p_name.mIsTreeNode);
+  TreeNode *node_name = p_name.mData.mTreeNode;
+
+  if (!node_name->IsIdentifier())
+    MERROR("The namespace name should be an indentifier node. Not?");
+  IdentifierNode *in = (IdentifierNode*)node_name;
+
+  NamespaceNode *ns = (NamespaceNode*)gTreePool.NewTreeNode(sizeof(NamespaceNode));
+  new (ns) NamespaceNode();
+  ns->SetStrIdx(in->GetStrIdx());
+
+  mLastTreeNode = ns;
+  return mLastTreeNode;
+}
+
+// Takes one parameter which is the tree of namespace body.
+TreeNode* ASTBuilder::AddNamespaceBody() {
+  if (mTrace)
+    std::cout << "In AddNamespaceBody" << std::endl;
+
+  Param p_body = mParams[0];
+  if (!p_body.mIsTreeNode)
+    MERROR("The namespace body is not a tree node.");
+  TreeNode *tree = p_body.mData.mTreeNode;
+
+  MASSERT(mLastTreeNode->IsNamespace());
+  NamespaceNode *ns = (NamespaceNode*)mLastTreeNode;
+  ns->AddBody(tree);
+
+  return mLastTreeNode;
+}
 
 // This takes just one argument which is the class name.
 TreeNode* ASTBuilder::BuildClass() {
