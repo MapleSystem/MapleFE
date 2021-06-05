@@ -610,6 +610,19 @@ std::string Emitter::EmitStructLiteralNode(StructLiteralNode *node) {
   return str;
 }
 
+std::string Emitter::EmitNamespaceNode(NamespaceNode *node) {
+  if (node == nullptr)
+    return std::string();
+  std::string str = "namespace "s + node->GetName() + " {"s;
+  for (unsigned i = 0; i < node->GetElementsNum(); ++i) {
+    if (auto n = node->GetElementAtIndex(i)) {
+      str += EmitTreeNode(n);
+    }
+  }
+  str += "}\n"s;
+  return str;
+}
+
 std::string Emitter::EmitVarListNode(VarListNode *node) {
   if (node == nullptr)
     return std::string();
@@ -1516,6 +1529,9 @@ std::string Emitter::EmitTreeNode(TreeNode *node) {
     break;
   case NK_Interface:
     return EmitInterfaceNode(static_cast<InterfaceNode *>(node));
+    break;
+  case NK_Namespace:
+    return EmitNamespaceNode(static_cast<NamespaceNode *>(node));
     break;
   case NK_AnnotationType:
     return EmitAnnotationTypeNode(static_cast<AnnotationTypeNode *>(node));

@@ -90,6 +90,7 @@ public:
   virtual std::string EmitStructNode(StructNode *node);
   virtual std::string EmitFieldLiteralNode(FieldLiteralNode *node);
   virtual std::string EmitStructLiteralNode(StructLiteralNode *node);
+  virtual std::string EmitNamespaceNode(NamespaceNode *node);
   virtual std::string EmitVarListNode(VarListNode *node);
   virtual std::string EmitExprListNode(ExprListNode *node);
   virtual std::string EmitTemplateLiteralNode(TemplateLiteralNode *node);
