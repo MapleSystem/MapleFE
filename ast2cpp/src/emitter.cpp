@@ -111,6 +111,18 @@ std::string Emitter::EmitXXportAsPairNode(XXportAsPairNode *node) {
   return str;
 }
 
+std::string Emitter::EmitDeclareNode(DeclareNode *node) {
+  if (node == nullptr)
+    return std::string();
+  std::string str;
+  if (auto n = node->GetDecl()) {
+    str += "declare "s + EmitTreeNode(n);
+  }
+  if (node->IsStmt())
+    str += ";\n"s;
+  return str;
+}
+
 std::string Emitter::EmitExportNode(ExportNode *node) {
   if (node == nullptr)
     return std::string();
@@ -1424,6 +1436,9 @@ std::string Emitter::EmitTreeNode(TreeNode *node) {
     break;
   case NK_Export:
     return EmitExportNode(static_cast<ExportNode *>(node));
+    break;
+  case NK_Declare:
+    return EmitDeclareNode(static_cast<DeclareNode *>(node));
     break;
   case NK_Decl:
     return EmitDeclNode(static_cast<DeclNode *>(node));

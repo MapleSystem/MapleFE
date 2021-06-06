@@ -10,6 +10,7 @@ output/
 *.png
 *.out.ts
 *.out.cpp
+*.ts.cpp
 *.ts.ast
 gdbfile
 test/TypeScript/

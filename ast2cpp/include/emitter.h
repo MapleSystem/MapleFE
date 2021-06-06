@@ -66,6 +66,7 @@ public:
   virtual std::string EmitAnnotationNode(AnnotationNode *node);
   virtual std::string EmitPackageNode(PackageNode *node);
   virtual std::string EmitXXportAsPairNode(XXportAsPairNode *node);
+  virtual std::string EmitDeclareNode(DeclareNode *node);
   virtual std::string EmitExportNode(ExportNode *node);
   virtual std::string EmitImportNode(ImportNode *node);
   virtual std::string EmitUnaOperatorNode(UnaOperatorNode *node);
