@@ -471,6 +471,31 @@ TreeNode* ASTBuilder::BuildXXportAsPairDefault() {
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
+//          BuildExternalDeclaration
+/////////////////////////////////////////////////////////////////////////////////////////
+
+// It takes one arguments
+TreeNode* ASTBuilder::BuildExternalDeclaration() {
+  MASSERT(mParams.size() == 1);
+
+  TreeNode *tree = NULL;
+
+  Param p = mParams[0];
+  if (!p.mIsEmpty && p.mIsTreeNode) {
+    tree = p.mData.mTreeNode;
+  }
+
+  DeclareNode *n = (DeclareNode*)gTreePool.NewTreeNode(sizeof(DeclareNode));
+  new (n) DeclareNode();
+
+  if (tree)
+    n->SetDecl(tree);
+
+  mLastTreeNode = n;
+  return mLastTreeNode;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////
 
 // Takes one argument, the expression of the parenthesis

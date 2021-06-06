@@ -665,7 +665,8 @@ rule Declaration : ONEOF(HoistableDeclaration,
                          InterfaceDeclaration,
                          TypeAliasDeclaration,
                          EnumDeclaration,
-                         NamespaceDeclaration)
+                         NamespaceDeclaration,
+                         ExternalDeclaration)
   attr.property : Top
 
 ##-----------------------------------
@@ -1848,3 +1849,13 @@ rule ImportAliasDeclaration: "import" + NamespaceImportPair + ';'
 rule EntityName: ONEOF(NamespaceName,
                        NamespaceName + '.' + IdentifierReference)
   attr.action.%2 : BuildField(%1, %3)
+
+#################################################################################################
+#################################################################################################
+##                      Many syntax are not in the typescript spec.
+##                      They are specified below
+#################################################################################################
+#################################################################################################
+
+rule ExternalDeclaration : ONEOF("declare" + NamespaceDeclaration)
+  attr.action.%1 : BuildExternalDeclaration(%2)

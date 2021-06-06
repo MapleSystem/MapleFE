@@ -1,0 +1,11 @@
+Matched 20 tokens.
+Matched 36 tokens.
+============= Module ===========
+== Sub Tree ==
+export {func  func(opt?)  throws: 
+  opt Assign opt Lor  {}
+} 
+== Sub Tree ==
+export {declare namespace  func
+  export {ts_interface: Opts {debug }} 
+} 
