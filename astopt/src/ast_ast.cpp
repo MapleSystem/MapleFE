@@ -140,10 +140,10 @@ ExportNode *AdjustASTVisitor::VisitExportNode(ExportNode *node) {
     TreeNode *after = p->GetAfter();
     if (bfnode) {
       if (!bfnode->IsIdentifier()) {
-        IdentifierNode *n = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
         switch (bfnode->GetKind()) {
           case NK_Function: {
             FunctionNode *func = static_cast<FunctionNode *>(bfnode);
+            IdentifierNode *n = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
             new (n) IdentifierNode(func->GetStrIdx());
             // update p
             p->SetBefore(n);
