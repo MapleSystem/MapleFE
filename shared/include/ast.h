@@ -188,6 +188,25 @@ public:
 };
 
 //////////////////////////////////////////////////////////////////////////
+//                         Declare Nodes
+// C/C++ extern decl,
+// Typescript declare.
+//////////////////////////////////////////////////////////////////////////
+
+class DeclareNode : public TreeNode {
+private:
+  TreeNode *mDecl;    // the exported package in Java or module in JS
+public:
+  DeclareNode() : TreeNode(NK_Declare), mDecl(NULL) {}
+  ~DeclareNode(){}
+
+  void SetDecl(TreeNode *t) {mDecl = t;}
+  TreeNode* GetDecl() {return mDecl;}
+
+  void Dump(unsigned indent);
+};
+
+//////////////////////////////////////////////////////////////////////////
 //                         Export Nodes
 // export first comes from Javascript.
 //

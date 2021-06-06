@@ -438,6 +438,10 @@ void Verifier::VerifyPackage(PackageNode *tree){
   return;
 }
 
+void Verifier::VerifyDeclare(DeclareNode *tree){
+  return;
+}
+
 void Verifier::VerifyImport(ImportNode *tree){
   return;
 }

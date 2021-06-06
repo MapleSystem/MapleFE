@@ -77,6 +77,10 @@ maple::BaseNode *A2M::ProcessPackage(StmtExprKind skind, TreeNode *tnode, BlockN
   return nullptr;
 }
 
+maple::BaseNode *A2M::ProcessDeclare(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
+  return nullptr;
+}
+
 maple::BaseNode *A2M::ProcessImport(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
   NOTYETIMPL("ProcessImport()");
   ImportNode *node = static_cast<ImportNode *>(tnode);
