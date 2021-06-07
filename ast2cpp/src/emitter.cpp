@@ -117,7 +117,7 @@ std::string Emitter::EmitXXportAsPairNode(XXportAsPairNode *node) {
     if (auto n = node->GetBefore())
       str += " "s + EmitTreeNode(n);
   } else if (node->IsEverything()) {
-    if (auto n = node->GetAfter())
+    if (auto n = node->GetBefore())
       str += " * as "s + EmitTreeNode(n);
   } else {
     if (auto n = node->GetBefore()) {
