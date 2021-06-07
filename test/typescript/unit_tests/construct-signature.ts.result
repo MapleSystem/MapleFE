@@ -1,0 +1,13 @@
+Matched 12 tokens.
+Matched 29 tokens.
+Matched 37 tokens.
+Matched 45 tokens.
+============= Module ===========
+== Sub Tree ==
+alias =() -> 
+== Sub Tree ==
+ts_interface: I_Class {__vals__ }
+== Sub Tree ==
+alias =T_Ctor<Object>
+== Sub Tree ==
+alias =I_Class<Object>
