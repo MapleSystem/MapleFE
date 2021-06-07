@@ -28,11 +28,14 @@ namespace maplefe {
 class AST_AST {
  private:
   AST_Handler  *mHandler;
+  AstFunction  *mCurrentFunction;
   bool          mTrace;
 
  public:
-  explicit AST_AST(AST_Handler *h, bool t) : mHandler(h), mTrace(t) {}
+  explicit AST_AST(AST_Handler *h, bool t) : mHandler(h), mCurrentFunction(nullptr), mTrace(t) {}
   ~AST_AST() {}
+
+  void SetCurrentFunction(AstFunction *f) { mCurrentFunction = f; }
 
   void ASTCollectAndDBRemoval();
   void CollectASTInfo();

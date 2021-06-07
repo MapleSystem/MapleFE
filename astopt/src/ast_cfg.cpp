@@ -766,6 +766,7 @@ void AST_CFG::Build() {
 
   // Set the init function for current module
   AstFunction *func = builder.InitAstFunctions(module);
+  mHandler->mModuleFuncsMap[module->GetNodeId()].push_back(func);
 
   mHandler->SetFunction(func);
 
@@ -788,8 +789,11 @@ void AST_CFG::Build() {
         builder.Visit(node);
     }
     builder.FinalizeFunction();
-    for(unsigned i = 0; i < func->GetNestedFuncsNum(); ++i)
-      funcQueue.push(func->GetNestedFuncAtIndex(i));
+    for(unsigned i = 0; i < func->GetNestedFuncsNum(); ++i) {
+      AstFunction *f = func->GetNestedFuncAtIndex(i);
+      funcQueue.push(f);
+      mHandler->mModuleFuncsMap[module->GetNodeId()].push_back(f);
+    }
   }
 }
 

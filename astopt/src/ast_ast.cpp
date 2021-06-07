@@ -21,14 +21,19 @@
 namespace maplefe {
 
 void AST_AST::ASTCollectAndDBRemoval() {
-  CollectASTInfo();
-  RemoveDeadBlocks();
+  ModuleNode *mod = mHandler->GetASTModule();
+  for (auto func: mHandler->mModuleFuncsMap[mod->GetNodeId()]) {
+    SetCurrentFunction(func);
 
-  if (mTrace) {
-    for(unsigned i = 0; i < gModule->GetTreesNum(); i++) {
-      TreeNode *it = gModule->GetTree(i);
-      it->Dump(0);
-      std::cout << std::endl;
+    CollectASTInfo();
+    RemoveDeadBlocks();
+
+    if (mTrace) {
+      for(unsigned i = 0; i < mod->GetTreesNum(); i++) {
+        TreeNode *it = mod->GetTree(i);
+        it->Dump(0);
+        std::cout << std::endl;
+      }
     }
   }
 }
@@ -36,12 +41,10 @@ void AST_AST::ASTCollectAndDBRemoval() {
 // this calcuates mNodeId2BbMap
 void AST_AST::CollectASTInfo() {
   if (mTrace) std::cout << "============== CollectASTInfo ==============" << std::endl;
-  AstFunction *func = mHandler->GetFunction();
-  MASSERT(func && "null func");
   std::deque<AstBasicBlock *> working_list;
   std::unordered_set<unsigned> done_list;
 
-  working_list.push_back(func->GetEntryBB());
+  working_list.push_back(mCurrentFunction->GetEntryBB());
 
   unsigned bitnum = 0;
 

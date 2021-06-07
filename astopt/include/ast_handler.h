@@ -48,7 +48,10 @@ class AST_Handler {
   std::unordered_map<unsigned, AstBasicBlock *> mNodeId2BbMap;
 
  public:
-  SmallVector<ModuleNode *> mASTModules;  // vector of all AST modules
+  // vector of all AST modules
+  SmallVector<ModuleNode *> mASTModules;
+  // module node id to its ast function vector
+  std::unordered_map<unsigned, std::vector<AstFunction *>> mModuleFuncsMap;
   // only reachable BBs
   std::unordered_map<unsigned, AstBasicBlock *> mBbId2BbMap;
 
@@ -75,7 +78,7 @@ class AST_Handler {
 
   MemPool *GetMemPool() {return &mMemPool;}
 
-  void          SetFunction(AstFunction *func) {mFunction = func;}
+  void         SetFunction(AstFunction *func)  {mFunction = func;}
   AstFunction *GetFunction()                   {return mFunction;}
 
   void SetBbFromNodeId(unsigned id, AstBasicBlock *bb) { mNodeId2BbMap[id] = bb; }

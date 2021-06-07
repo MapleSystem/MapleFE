@@ -68,12 +68,55 @@ void AST_DFA::TestBV() {
 }
 
 void AST_DFA::Build() {
-  // TestBV();
-  CollectDefNodes();
-  BuildBitVectors();
-  CollectUseNodes();
-  DumpUse();
-  BuildDefUseChain();
+  ModuleNode *mod = mHandler->GetASTModule();
+  for (auto func: mHandler->mModuleFuncsMap[mod->GetNodeId()]) {
+    SetCurrentFunction(func);
+
+    Clear();
+    // TestBV();
+    CollectDefNodes();
+    BuildBitVectors();
+    CollectUseNodes();
+    DumpUse();
+    BuildDefUseChain();
+  }
+}
+
+void AST_DFA::Clear() {
+  mVar2DeclMap.clear();
+  mStmtIdVec.Clear();
+  mStmtId2StmtMap.clear();
+  mDefNodeIdSet.clear();
+  mDefPositionVec.Clear();
+  mUsePositionMap.clear();
+  for (auto it: mStmtId2StmtMap) {
+    delete it.second;
+  }
+  mStmtId2StmtMap.clear();
+  for (auto it: mPrsvMap) {
+    delete it.second;
+  }
+  mPrsvMap.clear();
+  for (auto it: mGenMap) {
+    delete it.second;
+  }
+  mGenMap.clear();
+  for (auto it: mRchInMap) {
+    delete it.second;
+  }
+  mRchInMap.clear();
+  for (auto it: mRchOutMap) {
+    delete it.second;
+  }
+  mBbIdVec.clear();
+  for (auto it: mPrsvMap) {
+    delete it.second;
+  }
+  mNodeId2StmtIdMap.clear();
+  mStmtId2BbIdMap.clear();
+  mBbId2BBMap.clear();
+  mDefStrIdxSet.clear();
+  mDefUseMap.clear();
 }
 
 void AST_DFA::DumpDefPosition(DefPosition pos) {
@@ -180,12 +223,10 @@ unsigned AST_DFA::AddDef(TreeNode *node, unsigned &bitnum, unsigned bbid) {
 // this calcuates mDefPositionVec mBbIdVec
 void AST_DFA::CollectDefNodes() {
   if (mTrace) std::cout << "============== CollectDefNodes ==============" << std::endl;
-  AstFunction *func = mHandler->GetFunction();
-  MASSERT(func && "null func");
   std::unordered_set<unsigned> done_list;
   std::deque<AstBasicBlock *> working_list;
 
-  AstBasicBlock *bb = func->GetEntryBB();
+  AstBasicBlock *bb = mCurrentFunction->GetEntryBB();
   MASSERT(bb && "null BB");
   unsigned bbid = bb->GetId();
 
@@ -231,8 +272,6 @@ void AST_DFA::CollectDefNodes() {
 
 void AST_DFA::BuildBitVectors() {
   if (mTrace) std::cout << "============== BuildBitVectors ==============" << std::endl;
-  AstFunction *func = mHandler->GetFunction();
-  MASSERT(func && "null func");
   std::unordered_set<unsigned> done_list;
   std::deque<AstBasicBlock *> working_list;
 
@@ -248,7 +287,7 @@ void AST_DFA::BuildBitVectors() {
     mGenMap[bbid] = bv2;
   }
 
-  working_list.push_back(func->GetEntryBB());
+  working_list.push_back(mCurrentFunction->GetEntryBB());
 
   while(working_list.size()) {
     AstBasicBlock *bb = working_list.front();
@@ -306,8 +345,9 @@ void AST_DFA::BuildBitVectors() {
   bool changed = true;
   working_list.clear();
   // initialize work list with all reachable BB
-  for (auto it: mHandler->mBbId2BbMap) {
-    working_list.push_back(it.second);
+  for (auto it: done_list) {
+    AstBasicBlock *bb = mHandler->mBbId2BbMap[it];
+    working_list.push_back(bb);
   }
 
   BitVector *old_bv = new BitVector(bvsize);
