@@ -6,8 +6,7 @@ package java.lang
 == Sub Tree ==
 class  NumberFormatException
   Fields: 
-    serialVersionUID=Minus
-  74651118
+    serialVersionUID=Minus 74651118
   Instance Initializer: 
   Constructors: 
     constructor  NumberFormatException()  throws: 

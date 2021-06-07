@@ -6,8 +6,7 @@ package java.lang
 == Sub Tree ==
 class  ClassFormatError
   Fields: 
-    serialVersionUID=Minus
-  -344126837
+    serialVersionUID=Minus -344126837
   Instance Initializer: 
   Constructors: 
     constructor  ClassFormatError()  throws: 

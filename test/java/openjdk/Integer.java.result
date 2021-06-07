@@ -34,12 +34,10 @@ class  Integer
       Decl: charPos=32
       cond-branch cond:negative
       true branch :
-        i Assign Minus
-  i
+        i Assign Minus i
       false branch :
 
-      while i LE Minus
-  radix         Assign digits Sub (i Mod radix)
+      while i LE Minus radix         Assign digits Sub (i Mod radix)
         i Assign i Div radix
 
        Assign digits Sub i
@@ -83,8 +81,7 @@ while val NE 0 Land charPos GT 0
         Decl: smallValues=
         cond-branch cond:negative
         true branch :
-          i Assign Minus
-  i
+          i Assign Minus i
           cond-branch cond: EQ null
           true branch :
              Assign 
@@ -113,8 +110,7 @@ while val NE 0 Land charPos GT 0
       cond-branch cond:i LT 0
       true branch :
         sign Assign -
-        i Assign Minus
-  i
+        i Assign Minus i
       false branch :
 
       while i GE 65536        q Assign i Div 100
@@ -164,8 +160,7 @@ while val NE 0 Land charPos GT 0
       Decl: result=0
       Decl: negative=false
       Decl: i=0,len=s.length()
-      Decl: limit=Minus
-  Integer.MAX_VALUE
+      Decl: limit=Minus Integer.MAX_VALUE
       Decl: multmin
       Decl: digit
       cond-branch cond:len GT 0
@@ -186,12 +181,12 @@ while val NE 0 Land charPos GT 0
           true branch :
             NumberFormatException.forInputString(s)          false branch :
 
-                      iInc
+          i Inc
 
         false branch :
 
         multmin Assign limit Div radix
-        while i LT len          digit Assign Character.digit(s.charAt(  iInc
+        while i LT len          digit Assign Character.digit(s.charAt(i Inc
 ),radix)
           cond-branch cond:digit LT 0
           true branch :
@@ -320,12 +315,12 @@ while val NE 0 Land charPos GT 0
       cond-branch cond:firstChar EQ -
       true branch :
         negative Assign true
-                  indexInc
+        index Inc
 
       false branch :
         cond-branch cond:firstChar EQ +
         true branch :
-                      indexInc
+          index Inc
         false branch :
 
       cond-branch cond:nm.startsWith("0x",index) Lor nm.startsWith("0X",index)
@@ -335,13 +330,13 @@ while val NE 0 Land charPos GT 0
       false branch :
         cond-branch cond:nm.startsWith("#",index)
         true branch :
-                      indexInc
+          index Inc
 
           radix Assign 16
         false branch :
           cond-branch cond:nm.startsWith("0",index) Land nm.length() GT 1 Add index
           true branch :
-                          indexInc
+            index Inc
 
             radix Assign 8
           false branch :
@@ -379,8 +374,7 @@ while val NE 0 Land charPos GT 0
       i BorAssign (i Shr 16)
       return i Sub (i Zext 1)
     func  lowestOneBit(i)  throws: 
-      return i Band Minus
-  i
+      return i Band Minus i
     func  numberOfLeadingZeros(i)  throws: 
       cond-branch cond:i EQ 0
       true branch :
@@ -457,11 +451,9 @@ while val NE 0 Land charPos GT 0
       i Assign i Add (i Zext 16)
       return i Band 63
     func  rotateLeft(i,distance)  throws: 
-      return (i Shl distance) Bor (i Zext Minus
-  distance)
+      return (i Shl distance) Bor (i Zext Minus distance)
     func  rotateRight(i,distance)  throws: 
-      return (i Zext distance) Bor (i Shl Minus
-  distance)
+      return (i Zext distance) Bor (i Shl Minus distance)
     func  reverse(i)  throws: 
       i Assign (i Band 1431655765) Shl 1 Bor (i Zext 1) Band 1431655765
       i Assign (i Band 858993459) Shl 2 Bor (i Zext 2) Band 858993459
@@ -469,8 +461,7 @@ while val NE 0 Land charPos GT 0
       i Assign (i Shl 24) Bor ((i Band 65280) Shl 8) Bor ((i Zext 8) Band 65280) Bor (i Zext 24)
       return i
     func  signum(i)  throws: 
-      return (i Shr 31) Bor (Minus
-  i Zext 31)
+      return (i Shr 31) Bor (Minus i Zext 31)
     func  reverseBytes(i)  throws: 
       return ((i Zext 24)) Bor ((i Shr 8) Band 65280) Bor ((i Shl 8) Band 16711680) Bor ((i Shl 24))
     func  sum(a,b)  throws: 
@@ -482,8 +473,7 @@ while val NE 0 Land charPos GT 0
   LocalClasses: 
     class  IntegerCache
       Fields: 
-        low=Minus
-  128        high        cache[]
+        low=Minus 128        high        cache[]
       Instance Initializer: 
         InstInit- 0
       Constructors: 

@@ -15,10 +15,7 @@ import sun.misc.DoubleConsts
 == Sub Tree ==
 class  Float
   Fields: 
-    POSITIVE_INFINITY=1 Div 0    NEGATIVE_INFINITY=Minus
-  1 Div 0    NaN=0 Div 0    MAX_VALUE=3.40282e+38    MIN_NORMAL=1.17549e-38    MIN_VALUE=1.4013e-45    MAX_EXPONENT=127    MIN_EXPONENT=Minus
-  126    SIZE=32    BYTES=SIZE Div Byte.SIZE    TYPE=()float.getComponentType()    value    serialVersionUID=Minus
-  616763156
+    POSITIVE_INFINITY=1 Div 0    NEGATIVE_INFINITY=Minus 1 Div 0    NaN=0 Div 0    MAX_VALUE=3.40282e+38    MIN_NORMAL=1.17549e-38    MIN_VALUE=1.4013e-45    MAX_EXPONENT=127    MIN_EXPONENT=Minus 126    SIZE=32    BYTES=SIZE Div Byte.SIZE    TYPE=()float.getComponentType()    value    serialVersionUID=Minus 616763156
   Instance Initializer: 
   Constructors: 
     constructor  Float(value)  throws: 
@@ -87,8 +84,7 @@ class  Float
     func  compare(f1,f2)  throws: 
       cond-branch cond:f1 LT f2
       true branch :
-        return Minus
-  1      false branch :
+        return Minus 1      false branch :
 
       cond-branch cond:f1 GT f2
       true branch :

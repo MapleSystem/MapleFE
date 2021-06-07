@@ -20,10 +20,7 @@ import sun.misc.DoubleConsts
 == Sub Tree ==
 class  Math
   Fields: 
-    E=2.71828    PI=3.14159    negativeZeroFloatBits=Float.floatToRawIntBits(Minus
-  0)    negativeZeroDoubleBits=Double.doubleToRawLongBits(Minus
-  0)    twoToTheDoubleScaleUp=powerOfTwoD(512)    twoToTheDoubleScaleDown=powerOfTwoD(Minus
-  512)
+    E=2.71828    PI=3.14159    negativeZeroFloatBits=Float.floatToRawIntBits(Minus 0)    negativeZeroDoubleBits=Double.doubleToRawLongBits(Minus 0)    twoToTheDoubleScaleUp=powerOfTwoD(512)    twoToTheDoubleScaleDown=powerOfTwoD(Minus 512)
   Instance Initializer: 
   Constructors: 
     constructor  Math()  throws: 
@@ -53,14 +50,12 @@ class  Math
       Decl: intBits=Float.floatToRawIntBits(a)
       Decl: biasedExp=(intBits Band FloatConsts.EXP_BIT_MASK) Shr (FloatConsts.SIGNIFICAND_WIDTH Sub 1)
       Decl: shift=(FloatConsts.SIGNIFICAND_WIDTH Sub 2 Add FloatConsts.EXP_BIAS) Sub biasedExp
-      cond-branch cond:(shift Band Minus
-  32) EQ 0
+      cond-branch cond:(shift Band Minus 32) EQ 0
       true branch :
         Decl: r=((intBits Band FloatConsts.SIGNIF_BIT_MASK) Bor (FloatConsts.SIGNIF_BIT_MASK Add 1))
         cond-branch cond:intBits LT 0
         true branch :
-          r Assign Minus
-  r
+          r Assign Minus r
         false branch :
 
         return ((r Shr shift) Add 1) Shr 1
@@ -71,14 +66,12 @@ class  Math
       Decl: longBits=Double.doubleToRawLongBits(a)
       Decl: biasedExp=(longBits Band DoubleConsts.EXP_BIT_MASK) Shr (DoubleConsts.SIGNIFICAND_WIDTH Sub 1)
       Decl: shift=(DoubleConsts.SIGNIFICAND_WIDTH Sub 2 Add DoubleConsts.EXP_BIAS) Sub biasedExp
-      cond-branch cond:(shift Band Minus
-  64) EQ 0
+      cond-branch cond:(shift Band Minus 64) EQ 0
       true branch :
         Decl: r=((longBits Band DoubleConsts.SIGNIF_BIT_MASK) Bor (DoubleConsts.SIGNIF_BIT_MASK Add 1))
         cond-branch cond:longBits LT 0
         true branch :
-          r Assign Minus
-  r
+          r Assign Minus r
         false branch :
 
         return ((r Shr shift) Add 1) Shr 1
@@ -139,8 +132,7 @@ class  Math
       Decl: ay=Math.abs(y)
       cond-branch cond:((ax Bor ay) Zext 31 NE 0)
       true branch :
-        cond-branch cond:((y NE 0) Land (r Div y NE x)) Lor (x EQ Long.MIN_VALUE Land y EQ Minus
-  1)
+        cond-branch cond:((y NE 0) Land (r Div y NE x)) Lor (x EQ Long.MIN_VALUE Land y EQ Minus 1)
         true branch :
           new ArithmeticException("long overflow")
         false branch :
@@ -182,16 +174,14 @@ class  Math
         new ArithmeticException("integer overflow")
       false branch :
 
-      return Minus
-  a
+      return Minus a
     func  negateExact(a)  throws: 
       cond-branch cond:a EQ Long.MIN_VALUE
       true branch :
         new ArithmeticException("long overflow")
       false branch :
 
-      return Minus
-  a
+      return Minus a
     func  toIntExact(value)  throws: 
       cond-branch cond:(int)value NE value
       true branch :
@@ -203,7 +193,7 @@ class  Math
       Decl: r=x Div y
       cond-branch cond:(x Bxor y) LT 0 Land (r Mul y NE x)
       true branch :
-                  rDec
+        r Dec
 
       false branch :
 
@@ -212,7 +202,7 @@ class  Math
       Decl: r=x Div y
       cond-branch cond:(x Bxor y) LT 0 Land (r Mul y NE x)
       true branch :
-                  rDec
+        r Dec
 
       false branch :
 
@@ -325,12 +315,10 @@ class  Math
             assert direction LT start : 
             cond-branch cond:transducer GT 0
             true branch :
-              PreDec
-                transducer            false branch :
+              PreDec transducer            false branch :
               cond-branch cond:transducer LT 0
               true branch :
-                PreInc
-                  transducer              false branch :
+                PreInc transducer              false branch :
                 transducer Assign DoubleConsts.SIGN_BIT_MASK Bor 1
 
           return Double.longBitsToDouble(transducer)
@@ -352,12 +340,10 @@ class  Math
             assert direction LT start : 
             cond-branch cond:transducer GT 0
             true branch :
-              PreDec
-                transducer            false branch :
+              PreDec transducer            false branch :
               cond-branch cond:transducer LT 0
               true branch :
-                PreInc
-                  transducer              false branch :
+                PreInc transducer              false branch :
                 transducer Assign FloatConsts.SIGN_BIT_MASK Bor 1
 
           return Float.intBitsToFloat(transducer)
@@ -382,8 +368,7 @@ class  Math
         return d      false branch :
         cond-branch cond:d EQ 0
         true branch :
-          return Minus
-  Double.MIN_VALUE        false branch :
+          return Minus Double.MIN_VALUE        false branch :
           return Double.longBitsToDouble(Double.doubleToRawLongBits(d) Add ())
 
     func  nextDown(f)  throws: 
@@ -392,21 +377,18 @@ class  Math
         return f      false branch :
         cond-branch cond:f EQ 0
         true branch :
-          return Minus
-  Float.MIN_VALUE        false branch :
+          return Minus Float.MIN_VALUE        false branch :
           return Float.intBitsToFloat(Float.floatToRawIntBits(f) Add ())
 
     func  scalb(d,scaleFactor)  throws: 
-      Decl: MAX_SCALE=DoubleConsts.MAX_EXPONENT Add Minus
-  DoubleConsts.MIN_EXPONENT Add DoubleConsts.SIGNIFICAND_WIDTH Add 1
+      Decl: MAX_SCALE=DoubleConsts.MAX_EXPONENT Add Minus DoubleConsts.MIN_EXPONENT Add DoubleConsts.SIGNIFICAND_WIDTH Add 1
       Decl: exp_adjust=0
       Decl: scale_increment=0
       Decl: exp_delta=Double.NaN
       cond-branch cond:scaleFactor LT 0
       true branch :
         scaleFactor Assign Math.max(scaleFactor Sub MAX_SCALE)
-        scale_increment Assign Minus
-  512
+        scale_increment Assign Minus 512
         exp_delta Assign twoToTheDoubleScaleDown
       false branch :
         scaleFactor Assign Math.min(scaleFactor,MAX_SCALE)
@@ -422,8 +404,7 @@ class  Math
 
       return d
     func  scalb(f,scaleFactor)  throws: 
-      Decl: MAX_SCALE=FloatConsts.MAX_EXPONENT Add Minus
-  FloatConsts.MIN_EXPONENT Add FloatConsts.SIGNIFICAND_WIDTH Add 1
+      Decl: MAX_SCALE=FloatConsts.MAX_EXPONENT Add Minus FloatConsts.MIN_EXPONENT Add FloatConsts.SIGNIFICAND_WIDTH Add 1
       scaleFactor Assign Math.max(Math.min(scaleFactor,MAX_SCALE) Sub MAX_SCALE)
       return (float)((double)f Mul powerOfTwoD(scaleFactor))
     func  powerOfTwoD(n)  throws: 

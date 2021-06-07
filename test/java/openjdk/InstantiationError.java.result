@@ -6,8 +6,7 @@ package java.lang
 == Sub Tree ==
 class  InstantiationError
   Fields: 
-    serialVersionUID=Minus
-  522274964
+    serialVersionUID=Minus 522274964
   Instance Initializer: 
   Constructors: 
     constructor  InstantiationError()  throws: 

@@ -6,8 +6,7 @@ package java.lang
 == Sub Tree ==
 class  Number
   Fields: 
-    serialVersionUID=Minus
-  -194306187
+    serialVersionUID=Minus -194306187
   Instance Initializer: 
   Constructors: 
   Methods: 

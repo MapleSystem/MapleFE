@@ -9,9 +9,9 @@ class  A
   Methods: 
     func  foo()  throws: 
       for ( )
-                  kInc
+        k Inc
 
-                  iInc
+        i Inc
 
 
   LocalClasses: 

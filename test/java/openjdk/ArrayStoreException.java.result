@@ -6,8 +6,7 @@ package java.lang
 == Sub Tree ==
 class  ArrayStoreException
   Fields: 
-    serialVersionUID=Minus
-  1085227297
+    serialVersionUID=Minus 1085227297
   Instance Initializer: 
   Constructors: 
     constructor  ArrayStoreException()  throws: 

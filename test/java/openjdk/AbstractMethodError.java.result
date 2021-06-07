@@ -6,8 +6,7 @@ package java.lang
 == Sub Tree ==
 class  AbstractMethodError
   Fields: 
-    serialVersionUID=Minus
-  -1256039074
+    serialVersionUID=Minus -1256039074
   Instance Initializer: 
   Constructors: 
     constructor  AbstractMethodError()  throws: 

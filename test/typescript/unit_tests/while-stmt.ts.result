@@ -10,6 +10,6 @@ while k LT 10  console.log(k)
     break:
   false branch :
 
-      kInc
+  k Inc
 
 

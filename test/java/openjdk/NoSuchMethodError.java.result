@@ -6,8 +6,7 @@ package java.lang
 == Sub Tree ==
 class  NoSuchMethodError
   Fields: 
-    serialVersionUID=Minus
-  515885159
+    serialVersionUID=Minus 515885159
   Instance Initializer: 
   Constructors: 
     constructor  NoSuchMethodError()  throws: 

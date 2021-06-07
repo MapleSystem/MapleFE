@@ -47,7 +47,7 @@ class  Class
       true branch :
         Decl: cl=this
         Decl: dimensions=0
-        while cl.isArray()                      dimensionsInc
+        while cl.isArray()          dimensions Inc
 
           cl Assign cl.getComponentType()
 
@@ -288,8 +288,7 @@ class  Class
 
         Decl: baseName=c.getName()
         Decl: index=baseName.lastIndexOf(.)
-        cond-branch cond:index NE Minus
-  1
+        cond-branch cond:index NE Minus 1
         true branch :
           name Assign baseName.substring(0,index).replace(.,/) Add "/" Add name
         false branch :

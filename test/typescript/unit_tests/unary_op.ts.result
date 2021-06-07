@@ -37,35 +37,24 @@ js_var Decl: x
 == Sub Tree ==
 js_var Decl: a=8
 == Sub Tree ==
-PreInc
-  a
+PreInc a
 == Sub Tree ==
-PreDec
-  a
+PreDec a
 == Sub Tree ==
-Plus
-  8
+Plus 8
 == Sub Tree ==
-Plus
-  "-8"
+Plus "-8"
 == Sub Tree ==
-Minus
-  "8"
+Minus "8"
 == Sub Tree ==
-Minus
-  a
+Minus a
 == Sub Tree ==
-Bcomp
-  8
+Bcomp 8
 == Sub Tree ==
-Bcomp
-  "8"
+Bcomp "8"
 == Sub Tree ==
-Bcomp
-  a
+Bcomp a
 == Sub Tree ==
-Not
-  false
+Not false
 == Sub Tree ==
-Not
-  true
+Not true

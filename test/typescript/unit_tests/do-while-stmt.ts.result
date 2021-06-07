@@ -5,6 +5,6 @@ Matched 27 tokens.
 js_var Decl: k=1
 == Sub Tree ==
 do   console.log(k)
-      kInc
+  k Inc
 
 while k LT 10

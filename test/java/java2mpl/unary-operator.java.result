@@ -9,10 +9,10 @@ class  A
   Methods: 
     func  foo(x)  throws: 
       Decl: y,z
-              xInc
+      x Inc
 
       y AddAssign (x Add a Add b)
-              aDec
+      a Dec
 
       b BxorAssign a
       z MulAssign y Add 4

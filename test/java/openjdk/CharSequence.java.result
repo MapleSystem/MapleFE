@@ -45,7 +45,7 @@ interface  CharSequence
           func  nextInt()  throws: 
             cond-branch cond:hasNext()
             true branch :
-              return charAt(  curInc
+              return charAt(cur Inc
 )
             false branch :
               new NoSuchElementException()
@@ -68,7 +68,7 @@ interface  CharSequence
           func  forEachRemaining(block)  throws: 
             Decl: length=length()
             Decl: i=cur
-            while i LT length              Decl: c1=charAt(  iInc
+            while i LT length              Decl: c1=charAt(i Inc
 )
               cond-branch cond:Character.isHighSurrogate(c1) Lor i GE length
               true branch :
@@ -77,7 +77,7 @@ interface  CharSequence
                 Decl: c2=charAt(i)
                 cond-branch cond:Character.isLowSurrogate(c2)
                 true branch :
-                                      iInc
+                  i Inc
 
                   block.accept(Character.toCodePoint(c1,c2))
                 false branch :
@@ -97,14 +97,14 @@ interface  CharSequence
               new NoSuchElementException()
             false branch :
 
-            Decl: c1=charAt(  curInc
+            Decl: c1=charAt(cur Inc
 )
             cond-branch cond:Character.isHighSurrogate(c1) Land cur LT length
             true branch :
               Decl: c2=charAt(cur)
               cond-branch cond:Character.isLowSurrogate(c2)
               true branch :
-                                  curInc
+                cur Inc
 
                 return Character.toCodePoint(c1,c2)
               false branch :

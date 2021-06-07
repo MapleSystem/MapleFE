@@ -20,8 +20,7 @@ func  binarySearch(array,value)  throws:
         return mid
 
 
-  return Bcomp
-  low
+  return Bcomp low
 
 == Sub Tree ==
 js_var Decl: sequence=[13,21,34,55,89,144]

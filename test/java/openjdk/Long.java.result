@@ -34,12 +34,10 @@ class  Long
       Decl: negative=(i LT 0)
       cond-branch cond:negative
       true branch :
-        i Assign Minus
-  i
+        i Assign Minus i
       false branch :
 
-      while i LE Minus
-  radix         Assign 
+      while i LE Minus radix         Assign 
         i Assign i Div radix
 
        Assign 
@@ -103,8 +101,7 @@ while val NE 0 Land charPos GT 0
       cond-branch cond:i LT 0
       true branch :
         sign Assign -
-        i Assign Minus
-  i
+        i Assign Minus i
       false branch :
 
       while i GT Integer.MAX_VALUE        q Assign i Div 100
@@ -166,8 +163,7 @@ while val NE 0 Land charPos GT 0
       Decl: result=0
       Decl: negative=false
       Decl: i=0,len=s.length()
-      Decl: limit=Minus
-  Long.MAX_VALUE
+      Decl: limit=Minus Long.MAX_VALUE
       Decl: multmin
       Decl: digit
       cond-branch cond:len GT 0
@@ -188,12 +184,12 @@ while val NE 0 Land charPos GT 0
           true branch :
             NumberFormatException.forInputString(s)          false branch :
 
-                      iInc
+          i Inc
 
         false branch :
 
         multmin Assign limit Div radix
-        while i LT len          digit Assign Character.digit(s.charAt(  iInc
+        while i LT len          digit Assign Character.digit(s.charAt(i Inc
 ),radix)
           cond-branch cond:digit LT 0
           true branch :
@@ -264,8 +260,7 @@ while val NE 0 Land charPos GT 0
       return Long.valueOf(parseLong(s,10))
     func  valueOf(l)  throws: 
       Decl: offset=128
-      cond-branch cond:l GE Minus
-  128 Land l LE 127
+      cond-branch cond:l GE Minus 128 Land l LE 127
       true branch :
         return 
       false branch :
@@ -284,12 +279,12 @@ while val NE 0 Land charPos GT 0
       cond-branch cond:firstChar EQ -
       true branch :
         negative Assign true
-                  indexInc
+        index Inc
 
       false branch :
         cond-branch cond:firstChar EQ +
         true branch :
-                      indexInc
+          index Inc
         false branch :
 
       cond-branch cond:nm.startsWith("0x",index) Lor nm.startsWith("0X",index)
@@ -299,13 +294,13 @@ while val NE 0 Land charPos GT 0
       false branch :
         cond-branch cond:nm.startsWith("#",index)
         true branch :
-                      indexInc
+          index Inc
 
           radix Assign 16
         false branch :
           cond-branch cond:nm.startsWith("0",index) Land nm.length() GT 1 Add index
           true branch :
-                          indexInc
+            index Inc
 
             radix Assign 8
           false branch :
@@ -407,8 +402,7 @@ while val NE 0 Land charPos GT 0
       i BorAssign (i Shr 32)
       return i Sub (i Zext 1)
     func  lowestOneBit(i)  throws: 
-      return i Band Minus
-  i
+      return i Band Minus i
     func  numberOfLeadingZeros(i)  throws: 
       cond-branch cond:i EQ 0
       true branch :
@@ -500,11 +494,9 @@ while val NE 0 Land charPos GT 0
       i Assign i Add (i Zext 32)
       return (int)i Band 127
     func  rotateLeft(i,distance)  throws: 
-      return (i Shl distance) Bor (i Zext Minus
-  distance)
+      return (i Shl distance) Bor (i Zext Minus distance)
     func  rotateRight(i,distance)  throws: 
-      return (i Zext distance) Bor (i Shl Minus
-  distance)
+      return (i Zext distance) Bor (i Shl Minus distance)
     func  reverse(i)  throws: 
       i Assign (i Band 1431655765) Shl 1 Bor (i Zext 1) Band 1431655765
       i Assign (i Band 858993459) Shl 2 Bor (i Zext 2) Band 858993459
@@ -513,8 +505,7 @@ while val NE 0 Land charPos GT 0
       i Assign (i Shl 48) Bor ((i Band -1048576) Shl 16) Bor ((i Zext 16) Band -1048576) Bor (i Zext 48)
       return i
     func  signum(i)  throws: 
-      return (int)((i Shr 63) Bor (Minus
-  i Zext 63))
+      return (int)((i Shr 63) Bor (Minus i Zext 63))
     func  reverseBytes(i)  throws: 
       i Assign (i Band 267390975) Shl 8 Bor (i Zext 8) Band 267390975
       return (i Shl 48) Bor ((i Band -1048576) Shl 16) Bor ((i Zext 16) Band -1048576) Bor (i Zext 48)

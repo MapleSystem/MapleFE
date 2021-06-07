@@ -6,8 +6,7 @@ package java.lang
 == Sub Tree ==
 class  IllegalAccessError
   Fields: 
-    serialVersionUID=Minus
-  -2047083421
+    serialVersionUID=Minus -2047083421
   Instance Initializer: 
   Constructors: 
     constructor  IllegalAccessError()  throws: 

@@ -332,11 +332,13 @@ void UnaOperatorNode::Dump(unsigned indent) {
   const char *name = GetOperatorName(mOprId);
   DumpIndentation(indent);
   if (IsPost()) {
-    mOpnd->Dump(indent + 2);
+    mOpnd->Dump(0);
+    DUMP0_NORETURN(' ');
     DUMP0(name);
   } else {
-    DUMP0(name);
-    mOpnd->Dump(indent + 2);
+    DUMP0_NORETURN(name);
+    DUMP0_NORETURN(' ');
+    mOpnd->Dump(0);
   }
 }
 

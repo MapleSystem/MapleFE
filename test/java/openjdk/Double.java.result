@@ -15,10 +15,7 @@ import sun.misc.DoubleConsts
 == Sub Tree ==
 class  Double
   Fields: 
-    POSITIVE_INFINITY=1 Div 0    NEGATIVE_INFINITY=Minus
-  1 Div 0    NaN=0 Div 0    MAX_VALUE=1.79769e+308    MIN_NORMAL=2.22507e-308    MIN_VALUE=4.94066e-324    MAX_EXPONENT=1023    MIN_EXPONENT=Minus
-  1022    SIZE=64    BYTES=SIZE Div Byte.SIZE    TYPE=()double.getComponentType()    value    serialVersionUID=Minus
-  -694942468
+    POSITIVE_INFINITY=1 Div 0    NEGATIVE_INFINITY=Minus 1 Div 0    NaN=0 Div 0    MAX_VALUE=1.79769e+308    MIN_NORMAL=2.22507e-308    MIN_VALUE=4.94066e-324    MAX_EXPONENT=1023    MIN_EXPONENT=Minus 1022    SIZE=64    BYTES=SIZE Div Byte.SIZE    TYPE=()double.getComponentType()    value    serialVersionUID=Minus -694942468
   Instance Initializer: 
   Constructors: 
     constructor  Double(value)  throws: 
@@ -33,8 +30,7 @@ class  Double
       true branch :
         return Double.toString(d)      false branch :
         Decl: answer=new StringBuilder(24)
-        cond-branch cond:Math.copySign(1,d) EQ Minus
-  1
+        cond-branch cond:Math.copySign(1,d) EQ Minus 1
         true branch :
           answer.append("-")        false branch :
 
@@ -105,8 +101,7 @@ class  Double
     func  compare(d1,d2)  throws: 
       cond-branch cond:d1 LT d2
       true branch :
-        return Minus
-  1      false branch :
+        return Minus 1      false branch :
 
       cond-branch cond:d1 GT d2
       true branch :
