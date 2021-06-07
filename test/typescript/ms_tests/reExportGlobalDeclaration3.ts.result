@@ -1,0 +1,23 @@
+Matched 11 tokens.
+Matched 22 tokens.
+Matched 31 tokens.
+Matched 40 tokens.
+Matched 47 tokens.
+Matched 54 tokens.
+============= Module ===========
+== Sub Tree ==
+declare namespace  NS1
+  export {js_var Decl: foo} 
+
+== Sub Tree ==
+declare namespace  NS2
+  export {js_var Decl: foo} 
+
+== Sub Tree ==
+export {NS1,NS1 as NNS1} 
+== Sub Tree ==
+export {NS2,NS2 as NNS2} 
+== Sub Tree ==
+export {NS1 as NNNS1} 
+== Sub Tree ==
+export {NS2 as NNNS2} 
