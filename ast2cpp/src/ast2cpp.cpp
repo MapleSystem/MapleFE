@@ -104,6 +104,20 @@ void A2C::ProcessAST() {
       saveAst.StoreInAstBuf();
       //AstBuffer &ast_buf = saveAst.GetAstBuf();
     }
+
+    if (mTraceA2C) {
+      std::cout << "============= Emitter ===========" << std::endl;
+      unsigned size = mASTHandler->mASTModules.GetNum();
+      for (int i = 0; i < size; i++) {
+        ModuleNode *module = mASTHandler->mASTModules.ValueAtIndex(i);
+        maplefe::Emitter emitter(module);
+        std::string code = emitter.Emit("Convert AST to TypeScript code");
+        std::cout << code;
+      }
+    }
+
+    maplefe::CppEmitter cppemitter(mASTHandler);
+    std::cout << cppemitter.Emit("Convert AST to C++ code");
   }
 }
 }

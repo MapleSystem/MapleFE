@@ -13,38 +13,20 @@
  * See the Mulan PSL v2 for more details.
  */
 
-#ifndef __CPPEMITTER_HEADER__
-#define __CPPEMITTER_HEADER__
-
-#include "ast.h"
-#include "ast_attr.h"
-#include "ast_module.h"
-#include "ast_handler.h"
-#include "ast_type.h"
+#ifndef __CPPDECL_HEADER__
+#define __CPPDECL_HEADER__
 
 #include "emitter.h"
 
 namespace maplefe {
 
-enum Phase { PK_DECL, PK_CODE };
-
-class CppEmitter : public Emitter {
-private:
-  AST_Handler *mASTHandler;
-  Phase mPhase;
+class CppDecl : public Emitter {
 public:
-  CppEmitter(AST_Handler *h) : mASTHandler(h), Emitter(h->mASTModules.ValueAtIndex(0)) {}
+  CppDecl(ModuleNode *m) : Emitter(m) {}
 
-  std::string Emit(const char *title) {
+  std::string Emit() {
     std::string code;
-    code = "// [Beginning of CppEmitter: "s + title + "\n"s;
-    unsigned size = mASTHandler->mASTModules.GetNum();
-    for (int i = 0; i < size; i++) {
-      ModuleNode *m = mASTHandler->mASTModules.ValueAtIndex(i);
-      SetASTModule(m);
-      code += EmitTreeNode(m);
-    }
-    code += "// End of CppEmitter]\n"s;
+    code += EmitTreeNode(GetASTModule());
     return code;
   }
 

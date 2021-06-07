@@ -26,25 +26,15 @@
 
 namespace maplefe {
 
-enum Phase { PK_DECL, PK_CODE };
-
-class CppEmitter : public Emitter {
-private:
-  AST_Handler *mASTHandler;
-  Phase mPhase;
+class CppDef : public Emitter {
 public:
-  CppEmitter(AST_Handler *h) : mASTHandler(h), Emitter(h->mASTModules.ValueAtIndex(0)) {}
+  CppDef(ModuleNode *m) : Emitter(m) {}
 
-  std::string Emit(const char *title) {
+  std::string Emit() {
     std::string code;
-    code = "// [Beginning of CppEmitter: "s + title + "\n"s;
-    unsigned size = mASTHandler->mASTModules.GetNum();
-    for (int i = 0; i < size; i++) {
-      ModuleNode *m = mASTHandler->mASTModules.ValueAtIndex(i);
-      SetASTModule(m);
-      code += EmitTreeNode(m);
-    }
-    code += "// End of CppEmitter]\n"s;
+    code = "// [Beginning of CppDef:\n"s;
+    code += EmitTreeNode(GetASTModule());
+    code += "// End of CppDef]\n"s;
     return code;
   }
 

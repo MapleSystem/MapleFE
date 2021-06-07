@@ -17,7 +17,6 @@
 #include <fstream>
 #include "gen_astload.h"
 #include "ast_handler.h"
-#include "cpp_emitter.h"
 #include "ast2cpp.h"
 
 static void help() {
@@ -97,21 +96,6 @@ int main (int argc, char *argv[]) {
 
   maplefe::A2C *a2c = new maplefe::A2C(&handler, trace_a2c);
   a2c->ProcessAST();
-
-  if (trace_a2c) {
-    std::cout << "============= Emitter ===========" << std::endl;
-    maplefe::Emitter emitter(&handler);
-    std::string code = emitter.Emit("Convert AST to TypeScript code");
-    std::cout << code;
-  }
-
-  maplefe::CppEmitter cppemitter(&handler);
-  std::string cppcode = cppemitter.Emit("Convert AST to C++ code");
-  std::cout << cppcode;
-
-  std::ofstream out(outputname);
-  out << cppcode;
-  out.close();
 
   return 0;
 }
