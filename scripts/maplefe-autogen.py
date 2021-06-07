@@ -1182,7 +1182,10 @@ ModuleNode *{gen_args2}FromAstBuf(AstBuffer &buf) {{
   it = buf.begin();
   bool check = *it++ == 'M';
   check &= *it++ == 'P';
-  MASSERT(check);
+  if(!check) {{
+    std::cerr << "Error: Unknown file type." << std::endl;
+    return nullptr;
+  }}
   int64_t sig = ReadNum('L');
   if(sig != {signature}LL) {{
     std::cerr << "Error: Unknown signature " << sig << ". Expected {signature}." << std::endl;
