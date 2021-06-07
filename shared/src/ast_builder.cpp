@@ -1463,22 +1463,7 @@ TreeNode* ASTBuilder::AddStructField() {
 
   MASSERT(mLastTreeNode->IsStruct());
   StructNode *struct_node = (StructNode*)mLastTreeNode;
-
-  if (field->IsPass()) {
-    PassNode *pass = (PassNode*)field;
-    for (unsigned i = 0; i < pass->GetChildrenNum(); i++) {
-      TreeNode *child = pass->GetChild(i);
-      MASSERT(child->IsIdentifier());
-      struct_node->AddField((IdentifierNode*)child);
-    }
-  } else if (field->IsIdentifier()) {
-    struct_node->AddField((IdentifierNode*)field);
-  } else if (field->IsNumIndexSig()) {
-    struct_node->SetNumIndexSig((NumIndexSigNode*)field);
-  } else if (field->IsStrIndexSig()) {
-    struct_node->SetStrIndexSig((StrIndexSigNode*)field);
-  } else
-    MERROR("Unsupported struct field type.");
+  struct_node->AddChild(field);
 
   return mLastTreeNode;
 }

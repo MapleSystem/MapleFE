@@ -567,8 +567,26 @@ void BindingPatternNode::Dump(unsigned indent) {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
-//                          StructNode and StructLiteralNode
+//                          StructNode
 //////////////////////////////////////////////////////////////////////////////////////
+
+// Child could be a field or index signature.
+void StructNode::AddChild(TreeNode *field) {
+  if (field->IsPass()) {
+    PassNode *pass = (PassNode*)field;
+    for (unsigned i = 0; i < pass->GetChildrenNum(); i++) {
+      TreeNode *child = pass->GetChild(i);
+      AddChild(child);
+    }
+  } else if (field->IsIdentifier()) {
+    AddField((IdentifierNode*)field);
+  } else if (field->IsNumIndexSig()) {
+    SetNumIndexSig((NumIndexSigNode*)field);
+  } else if (field->IsStrIndexSig()) {
+    SetStrIndexSig((StrIndexSigNode*)field);
+  } else
+    MERROR("Unsupported struct field type.");
+}
 
 void NumIndexSigNode::Dump(unsigned indent) {
   DumpIndentation(indent);
@@ -617,6 +635,10 @@ void StructNode::Dump(unsigned indent) {
   }
   DUMP0_NORETURN(" }");
 }
+
+//////////////////////////////////////////////////////////////////////////////////////
+//                          StructLiteralNode
+//////////////////////////////////////////////////////////////////////////////////////
 
 void StructLiteralNode::AddField(TreeNode *tree) {
   if (tree->IsFieldLiteral()) {

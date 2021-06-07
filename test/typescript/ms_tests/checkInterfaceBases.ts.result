@@ -1,0 +1,10 @@
+Matched 16 tokens.
+Matched 24 tokens.
+Matched 32 tokens.
+============= Module ===========
+== Sub Tree ==
+ts_interface: JQueryEventObjectTest {data;which;metaKey }
+== Sub Tree ==
+ts_interface: SecondEvent {data }
+== Sub Tree ==
+ts_interface: Third {Third }

@@ -877,6 +877,8 @@ public:
   void            SetField(unsigned i, IdentifierNode* n) {*(mFields.RefAtIndex(i)) = n;}
   void            AddField(IdentifierNode *n) {mFields.PushBack(n);}
 
+  void AddChild(TreeNode *);
+
   void Release() {mFields.Release();}
   void Dump(unsigned);
 };
