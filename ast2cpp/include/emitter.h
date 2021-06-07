@@ -130,6 +130,7 @@ public:
 
   virtual std::string EmitTreeNode(TreeNode *node);
 
+  static void Replace(std::string &str, const char *o, const char *n, int cnt = 0);
   static const char *GetEnumTypeId(TypeId k);
   //static const char *GetEnumSepId(SepId k);
   static const char *GetEnumOprId(OprId k);

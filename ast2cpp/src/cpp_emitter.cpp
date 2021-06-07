@@ -75,13 +75,7 @@ std::string CppEmitter::EmitBinOperatorNode(BinOperatorNode *node) {
   if (node == nullptr || mPhase == PK_DECL)
     return std::string();
   std::string str = Emitter::EmitBinOperatorNode(node);
-  size_t index = 0;
-  while (true) {
-    index = str.find(">>>", index);
-    if (index == std::string::npos) break;
-    str.replace(index, 3, ">>");
-    index += 2;
-  }
+  Emitter::Replace(str, ">>>", ">>");
   return str;
 }
 

@@ -14,6 +14,8 @@
  */
 
 #include "emitter.h"
+#include <cstring>
+#include <limits>
 
 namespace maplefe {
 
@@ -53,6 +55,28 @@ const char *Emitter::GetEnumAttrId(AttrId k) {
       MASSERT(0 && "Unexpected enumerator");
   }
   return "UNEXPECTED AttrId";
+}
+
+void Emitter::Replace(std::string &str, const char *o, const char *n, int cnt) {
+  size_t len = std::strlen(o);
+  if(cnt > 0) {
+    size_t index = 0;
+    int num = cnt;
+    do {
+      index = str.find(o, index);
+      if (index == std::string::npos) break;
+      str.replace(index, len, n);
+      index += len;
+    } while(--num && index < str.size());
+  } else {
+    size_t index = std::string::npos;
+    int num = cnt ? -cnt : std::numeric_limits<int>::max();
+    do {
+      index = str.rfind(o, index);
+      if (index == std::string::npos) break;
+      str.replace(index, len, n);
+    } while(--num);
+  }
 }
 
 std::string Emitter::EmitAnnotationNode(AnnotationNode *node) {
@@ -555,6 +579,7 @@ std::string Emitter::EmitStructNode(StructNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
+  const char *suffix = ";\n";
   switch(node->GetProp()) {
     case SProp_CStruct:
       str = "struct "s;
@@ -564,6 +589,7 @@ std::string Emitter::EmitStructNode(StructNode *node) {
       break;
     case SProp_TSEnum:
       str = "enum "s;
+      suffix = ",\n";
       break;
     case SProp_NA:
       str = "SProp_NA "s;
@@ -578,7 +604,7 @@ std::string Emitter::EmitStructNode(StructNode *node) {
   str += "{\n"s;
   for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
     if (auto n = node->GetField(i)) {
-      str += EmitIdentifierNode(n) + ";\n"s;
+      str += EmitIdentifierNode(n) + suffix;
     }
   }
   str += "}\n"s;
