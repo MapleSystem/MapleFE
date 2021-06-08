@@ -21,7 +21,12 @@ std::string CppDecl::EmitModuleNode(ModuleNode *node) {
   if (node == nullptr)
     return std::string();
   std::string name = GetModuleName();
+  std::string header("__");
+  for(auto &c : name)
+    header += std::toupper(c);
+  header += "__HEADER__\n";
   std::string str("// Filename: "s + node->GetFileName() + "\n"s);
+  str += "#ifndef "s + header + "#define "s + header;
   str += R"""(
 #include <iostream>
 //#include "ts2cpp.h"
@@ -45,7 +50,7 @@ void __init_func__();
   // export table here
 };
 
-extern )""" + name + " _"s + name + ";\n";
+extern )""" + name + " _"s + name + ";\n#endif\n"s;
   return str;
 }
 

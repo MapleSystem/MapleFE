@@ -47,9 +47,9 @@ std::string Emitter::GetModuleName(const char *p) {
   std::string str = p ? p : GetBaseFileName();
   size_t pos = str.rfind("/", std::string::npos);
   str = pos == std::string::npos ? str : str.substr(pos);
-  for (auto it = str.begin(); it != str.end(); ++it)
-    if(std::ispunct(*it))
-        *it = '_';
+  for (auto &c : str)
+    if(std::ispunct(c))
+        c = '_';
   return "M_"s + str;
 }
 
