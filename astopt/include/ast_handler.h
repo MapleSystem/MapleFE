@@ -66,8 +66,8 @@ class AST_Handler {
 
   void AdjustAST();
   void BuildCFG();
-  void ASTCollectAndDBRemoval();
-  void BuildDFA();
+  void ASTCollectAndDBRemoval(AstFunction *func);
+  void BuildDFA(AstFunction *func);
 
   const char *GetOutputFileName() {return mOutputFileName;}
   void SetOutputFileName(const char *name) {mOutputFileName = name;}

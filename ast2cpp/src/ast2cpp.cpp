@@ -76,11 +76,6 @@ void A2C::ProcessAST() {
       mASTHandler->Dump("After mASTHandler->BuildCFG()");
     }
 
-    mASTHandler->ASTCollectAndDBRemoval();
-    if (mTraceA2C) {
-      mASTHandler->Dump("After mASTHandler->ASTCollectAndDBRemoval()");
-    }
-
     if (mTraceA2C) {
       std::cout << "============= AstGraph ===========" << std::endl;
       AstGraph graph(gModule);
@@ -93,9 +88,17 @@ void A2C::ProcessAST() {
       astdump.Dump("After BuildCFG()", &std::cout);
     }
 
-    mASTHandler->BuildDFA();
-    if (mTraceA2C) {
-      // mASTHandler->Dump("After mASTHandler->BuildDFA()");
+    // loop through functions in the module
+    for (auto func: mASTHandler->mModuleFuncsMap[gModule->GetNodeId()]) {
+      mASTHandler->ASTCollectAndDBRemoval(func);
+      if (mTraceA2C) {
+        mASTHandler->Dump("After mASTHandler->ASTCollectAndDBRemoval()");
+      }
+
+      mASTHandler->BuildDFA(func);
+      if (mTraceA2C) {
+        // mASTHandler->Dump("After mASTHandler->BuildDFA()");
+      }
     }
 
     if (mTraceA2C) {

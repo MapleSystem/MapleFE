@@ -28,19 +28,18 @@ namespace maplefe {
 class AST_AST {
  private:
   AST_Handler  *mHandler;
-  AstFunction  *mCurrentFunction;
   bool          mTrace;
+  std::unordered_set<unsigned> mReachableBbIdx;;
 
  public:
-  explicit AST_AST(AST_Handler *h, bool t) : mHandler(h), mCurrentFunction(nullptr), mTrace(t) {}
+  explicit AST_AST(AST_Handler *h, bool t) : mHandler(h), mTrace(t) {}
   ~AST_AST() {}
 
-  void SetCurrentFunction(AstFunction *f) { mCurrentFunction = f; }
-
-  void ASTCollectAndDBRemoval();
-  void CollectASTInfo();
-  void RemoveDeadBlocks();
   void AdjustAST();
+
+  void CollectASTInfo(AstFunction *func);
+  void RemoveDeadBlocks(AstFunction *func);
+  void ASTCollectAndDBRemoval(AstFunction *func);
 };
 
 class AdjustASTVisitor : public AstVisitor {
@@ -49,7 +48,6 @@ class AdjustASTVisitor : public AstVisitor {
   bool          mTrace;
   bool          mUpdated;
 
-  AstFunction   *mCurrentFunction;
   AstBasicBlock *mCurrentBB;
 
  public:
@@ -57,7 +55,6 @@ class AdjustASTVisitor : public AstVisitor {
     : mHandler(h), mTrace(t), AstVisitor(t && base) {}
   ~AdjustASTVisitor() = default;
 
-  void SetCurrentFunction(AstFunction *f) { mCurrentFunction = f; }
   void SetCurrentBB(AstBasicBlock *b) { mCurrentBB = b; }
 
   DeclNode *VisitDeclNode(DeclNode *node);

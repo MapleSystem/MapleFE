@@ -67,19 +67,14 @@ void AST_DFA::TestBV() {
   free(bv2);
 }
 
-void AST_DFA::Build() {
-  ModuleNode *mod = mHandler->GetASTModule();
-  for (auto func: mHandler->mModuleFuncsMap[mod->GetNodeId()]) {
-    SetCurrentFunction(func);
-
-    Clear();
-    // TestBV();
-    CollectDefNodes();
-    BuildBitVectors();
-    CollectUseNodes();
-    DumpUse();
-    BuildDefUseChain();
-  }
+void AST_DFA::Build(AstFunction *func) {
+  Clear();
+  // TestBV();
+  CollectDefNodes(func);
+  BuildBitVectors();
+  CollectUseNodes();
+  DumpUse();
+  BuildDefUseChain();
 }
 
 void AST_DFA::Clear() {
@@ -221,12 +216,12 @@ unsigned AST_DFA::AddDef(TreeNode *node, unsigned &bitnum, unsigned bbid) {
 }
 
 // this calcuates mDefPositionVec mBbIdVec
-void AST_DFA::CollectDefNodes() {
+void AST_DFA::CollectDefNodes(AstFunction *func) {
   if (mTrace) std::cout << "============== CollectDefNodes ==============" << std::endl;
   std::unordered_set<unsigned> done_list;
   std::deque<AstBasicBlock *> working_list;
 
-  AstBasicBlock *bb = mCurrentFunction->GetEntryBB();
+  AstBasicBlock *bb = func->GetEntryBB();
   MASSERT(bb && "null BB");
   unsigned bbid = bb->GetId();
 
@@ -285,9 +280,9 @@ void AST_DFA::BuildBitVectors() {
     BitVector *bv2 = new BitVector(bvsize);
     bv2->WipeOff(0);
     mGenMap[bbid] = bv2;
-  }
 
-  working_list.push_back(mCurrentFunction->GetEntryBB());
+    working_list.push_back(mHandler->mBbId2BbMap[bbid]);
+  }
 
   while(working_list.size()) {
     AstBasicBlock *bb = working_list.front();

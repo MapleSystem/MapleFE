@@ -36,18 +36,18 @@ void AST_Handler::AdjustAST() {
   mAST->AdjustAST();
 }
 
-void AST_Handler::ASTCollectAndDBRemoval() {
+void AST_Handler::ASTCollectAndDBRemoval(AstFunction *func) {
   if (!mAST) {
     mAST = new(mMemPool.Alloc(sizeof(AST_AST))) AST_AST(this, mTrace);
   }
-  mAST->ASTCollectAndDBRemoval();
+  mAST->ASTCollectAndDBRemoval(func);
 }
 
-void AST_Handler::BuildDFA() {
+void AST_Handler::BuildDFA(AstFunction *func) {
   if (!mDFA) {
     mDFA = new(mMemPool.Alloc(sizeof(AST_DFA))) AST_DFA(this, mTrace);
   }
-  mDFA->Build();
+  mDFA->Build(func);
 }
 
 void AST_Handler::Dump(char *msg) {
