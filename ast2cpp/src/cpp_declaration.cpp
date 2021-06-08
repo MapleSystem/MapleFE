@@ -28,7 +28,6 @@ std::string CppDecl::EmitModuleNode(ModuleNode *node) {
   std::string str("// Filename: "s + node->GetFileName() + "\n"s);
   str += "#ifndef "s + header + "#define "s + header;
   str += R"""(
-#include <iostream>
 //#include "ts2cpp.h"
 
 class )""" + name + R"""( {
