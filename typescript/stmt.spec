@@ -1523,11 +1523,12 @@ rule ThisType: "this"
 rule PropertySignature: PropertyName + ZEROORONE('?') + ZEROORONE(TypeAnnotation)
   attr.action : AddType(%1, %3)
 
+## JS ECMA has more definition than this Typescript one. I use ECMA one.
 ## rule PropertyName: IdentifierName StringLiteral NumericLiteral
-rule PropertyName : ONEOF(JSIdentifier,
+##rule PropertyName : ONEOF(JSIdentifier,
                           ##StringLiteral,
                           ##NumericLiteral,
-                         )
+##                         )
 
 ## rule TypeAnnotation: : Type
 rule TypeAnnotation: ':' + Type

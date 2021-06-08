@@ -891,13 +891,14 @@ public:
 // name and literal being function node itself.
 class FieldLiteralNode : public TreeNode{
 public:
-  IdentifierNode *mFieldName;
-  TreeNode       *mLiteral;
+  TreeNode *mFieldName;  // Generally a field is an identifier. However, in JS/TS
+                         // it could be a literal string or numeric.
+  TreeNode *mLiteral;
 
-  void SetFieldName(IdentifierNode *id) {mFieldName = id;}
+  void SetFieldName(TreeNode *id) {mFieldName = id;}
   void SetLiteral(TreeNode *id) {mLiteral = id;}
 
-  IdentifierNode* GetFieldName() {return mFieldName;}
+  TreeNode* GetFieldName() {return mFieldName;}
   TreeNode* GetLiteral() {return mLiteral;}
 
   FieldLiteralNode() : TreeNode(NK_FieldLiteral) {}

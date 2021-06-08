@@ -617,7 +617,7 @@ std::string Emitter::EmitFieldLiteralNode(FieldLiteralNode *node) {
   std::string str;
   auto lit = node->GetLiteral();
   if (auto n = node->GetFieldName()) {
-    str = EmitIdentifierNode(n);
+    str = EmitTreeNode(n);
     if(lit)
       str += ": "s;
   }

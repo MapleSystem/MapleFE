@@ -1279,15 +1279,17 @@ TreeNode* ASTBuilder::BuildArrayLiteral() {
   if (!p_literals.mIsEmpty) {
     MASSERT(p_literals.mIsTreeNode);
     TreeNode *literals = p_literals.mData.mTreeNode;
-    MASSERT(literals->IsLiteral() || literals->IsExprList());
+    MASSERT(literals->IsLiteral() || literals->IsExprList() || literals->IsFieldLiteral());
 
     if (literals->IsLiteral()) {
+      array_literal->AddLiteral(literals);
+    } else if (literals->IsFieldLiteral()) {
       array_literal->AddLiteral(literals);
     } else if (literals->IsExprList()) {
       ExprListNode *el = (ExprListNode*)literals;
       for (unsigned i = 0; i < el->GetExprsNum(); i++) {
         TreeNode *expr = el->GetExprAtIndex(i);
-        MASSERT(expr->IsLiteral() || expr->IsArrayLiteral());
+        MASSERT(expr->IsLiteral() || expr->IsArrayLiteral() || expr->IsFieldLiteral() || expr->IsStructLiteral());
         array_literal->AddLiteral(expr);
       }
     }
@@ -1491,7 +1493,6 @@ TreeNode* ASTBuilder::BuildFieldLiteral() {
   Param p_field = mParams[0];
   MASSERT(p_field.mIsTreeNode);
   TreeNode *field = p_field.mData.mTreeNode;
-  MASSERT(field->IsIdentifier());
 
   Param p_value = mParams[1];
   MASSERT(p_value.mIsTreeNode);
@@ -1499,7 +1500,7 @@ TreeNode* ASTBuilder::BuildFieldLiteral() {
 
   FieldLiteralNode *field_literal = (FieldLiteralNode*)gTreePool.NewTreeNode(sizeof(FieldLiteralNode));
   new (field_literal) FieldLiteralNode();
-  field_literal->SetFieldName((IdentifierNode*)field);
+  field_literal->SetFieldName(field);
   field_literal->SetLiteral(value);
 
   mLastTreeNode = field_literal;
