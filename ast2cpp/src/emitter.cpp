@@ -43,8 +43,8 @@ std::string Emitter::GetBaseFileName() {
   return str;
 }
 
-std::string Emitter::GetModuleName() {
-  std::string str = GetBaseFileName();
+std::string Emitter::GetModuleName(const char *p) {
+  std::string str = p ? p : GetBaseFileName();
   size_t pos = str.rfind("/", std::string::npos);
   str = pos == std::string::npos ? str : str.substr(pos);
   for (auto it = str.begin(); it != str.end(); ++it)

@@ -22,8 +22,7 @@ std::string CppDef::EmitModuleNode(ModuleNode *node) {
     return std::string();
   std::string name = GetModuleName();
   std::string str("// TypeScript filename: "s + node->GetFileName() + "\n"s);
-  str += "#include \""s + GetBaseFileName() + ".h\""s + R"""(
-#include <iostream>
+  str += "#include <iostream>\n#include \""s + GetBaseFileName() + ".h\""s + R"""(
 
 void )""" + name + R"""(::__init_func__() { // bind "this" to current module
 )""";

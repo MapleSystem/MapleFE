@@ -23,8 +23,8 @@ std::string CppDecl::EmitModuleNode(ModuleNode *node) {
   std::string name = GetModuleName();
   std::string str("// Filename: "s + node->GetFileName() + "\n"s);
   str += R"""(
-//#include "ts2cpp.h"
 #include <iostream>
+//#include "ts2cpp.h"
 
 class )""" + name + R"""( {
 public: // all top level variables in the module
