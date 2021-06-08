@@ -25,7 +25,7 @@ std::string CppDecl::EmitModuleNode(ModuleNode *node) {
   for(auto &c : name)
     header += std::toupper(c);
   header += "__HEADER__\n";
-  std::string str("// Filename: "s + node->GetFileName() + "\n"s);
+  std::string str("// TypeScript filename: "s + node->GetFileName() + "\n"s);
   str += "#ifndef "s + header + "#define "s + header;
   str += R"""(
 //#include "ts2cpp.h"
