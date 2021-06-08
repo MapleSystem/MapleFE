@@ -9,10 +9,10 @@ output/
 *.dot
 *.png
 *.out.ts
-*.out.cpp
-*.ts.cpp
 *.ts.ast
 gdbfile
+test/typescript/**/*.cpp
+test/typescript/**/*.h
 test/TypeScript/
 test/msts_failed.txt
 test/msts_passed.txt

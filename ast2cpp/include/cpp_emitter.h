@@ -35,6 +35,8 @@ private:
 public:
   CppEmitter(AST_Handler *h) : mASTHandler(h), Emitter(h->mASTModules.ValueAtIndex(0)) {}
 
+  bool EmitCxxFiles();
+
   std::string Emit(const char *title) {
     std::string code;
     code = "// [Beginning of CppEmitter: "s + title + "\n"s;

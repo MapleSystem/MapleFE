@@ -19,6 +19,29 @@
 
 namespace maplefe {
 
+std::string Emitter::Emit(const char *title) {
+  std::string code;
+  code = "// [Beginning of Emitter: "s + title + "\n"s;
+  code += EmitTreeNode(mASTModule);
+  code += "// End of Emitter]\n"s;
+  return code;
+}
+
+std::string Emitter::Clean(std::string &s) {
+  auto len = s.length();
+  if(len >= 2 && s.substr(len - 2) == ";\n")
+    return s.erase(len - 2);
+  return s;
+}
+
+std::string Emitter::GetBaseFileName() {
+  std::string str(mASTModule->GetFileName());
+  auto len = str.length();
+  if(len >= 3 && str.substr(len - 3) == ".ts")
+    return str.erase(len - 3);
+  return str;
+}
+
 const char *Emitter::GetEnumAttrId(AttrId k) {
   switch (k) {
     case ATTR_abstract:

@@ -13,8 +13,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
-#ifndef __CPPEMITTER_HEADER__
-#define __CPPEMITTER_HEADER__
+#ifndef __CPPDEFINITIONEMITTER_HEADER__
+#define __CPPDEFINITIONEMITTER_HEADER__
 
 #include "ast.h"
 #include "ast_attr.h"

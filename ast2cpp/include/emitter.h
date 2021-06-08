@@ -39,23 +39,12 @@ protected:
 public:
   Emitter(ModuleNode *m) : mASTModule(m) {}
 
-  std::string Emit(const char *title) {
-    std::string code;
-    code = "// [Beginning of Emitter: "s + title + "\n"s;
-    code += EmitTreeNode(mASTModule);
-    code += "// End of Emitter]\n"s;
-    return code;
-  }
+  std::string Emit(const char *title);
+  std::string Clean(std::string &s);
+  std::string GetBaseFileName();
 
   ModuleNode *GetASTModule() { return mASTModule; }
   void SetASTModule(ModuleNode *m) { mASTModule = m; }
-
-  std::string Clean(std::string &s) {
-    auto len = s.length();
-    if (len >= 2 && s.substr(len - 2) == ";\n")
-      return s.erase(len - 2);
-    return s;
-  }
 
   virtual std::string EmitAnnotationNode(AnnotationNode *node);
   virtual std::string EmitPackageNode(PackageNode *node);

@@ -91,6 +91,7 @@ for ts in $LIST; do
     clang-format-10 -i --style="{ColumnLimit: 120}" "$T"
     echo -e "\n====== C++ Reformated ======\n"
     $HIGHLIGHT "$T"
+    [ -n "$KEEP" ] || rm -f "$T"
   fi
   if [ -n "$DOT" ]; then
     echo --- "$ts"; cat "$ts"
