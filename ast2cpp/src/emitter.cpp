@@ -16,6 +16,7 @@
 #include "emitter.h"
 #include <cstring>
 #include <limits>
+#include <cctype>
 
 namespace maplefe {
 
@@ -40,6 +41,16 @@ std::string Emitter::GetBaseFileName() {
   if(len >= 3 && str.substr(len - 3) == ".ts")
     return str.erase(len - 3);
   return str;
+}
+
+std::string Emitter::GetModuleName() {
+  std::string str = GetBaseFileName();
+  size_t pos = str.rfind("/", std::string::npos);
+  str = pos == std::string::npos ? str : str.substr(pos);
+  for (auto it = str.begin(); it != str.end(); ++it)
+    if(std::ispunct(*it))
+        *it = '_';
+  return "M_"s + str;
 }
 
 const char *Emitter::GetEnumAttrId(AttrId k) {

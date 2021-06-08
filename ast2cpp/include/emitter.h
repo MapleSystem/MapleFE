@@ -42,6 +42,7 @@ public:
   std::string Emit(const char *title);
   std::string Clean(std::string &s);
   std::string GetBaseFileName();
+  std::string GetModuleName();
 
   ModuleNode *GetASTModule() { return mASTModule; }
   void SetASTModule(ModuleNode *m) { mASTModule = m; }

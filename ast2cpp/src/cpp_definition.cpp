@@ -20,13 +20,12 @@ namespace maplefe {
 std::string CppDef::EmitModuleNode(ModuleNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str("// TypeScript filename: "s);
-  str += node->GetFileName() + "\n"s;
-  str += "#include \""s + GetBaseFileName() + ".h\""s;
-  str += R"""(
+  std::string name = GetModuleName();
+  std::string str("// TypeScript filename: "s + node->GetFileName() + "\n"s);
+  str += "#include \""s + GetBaseFileName() + ".h\""s + R"""(
 #include <iostream>
 
-void Module_1::__init_func__() { // bind "this" to current module
+void )""" + name + R"""(::__init_func__() { // bind "this" to current module
 )""";
   for (unsigned i = 0; i < node->GetTreesNum(); ++i) {
     if (auto n = node->GetTree(i)) {
@@ -35,11 +34,11 @@ void Module_1::__init_func__() { // bind "this" to current module
   }
   str += R"""(}
 
-Module_1 module_1;
+)""" + name + " _"s + name + R"""(;
 
 // If the program starts from this module, generate the main function
 int main(int argc, char **argv) {
-  module_1.__init_func__(); // only call to its __init_func__()
+)""" + "  _"s + name + R"""(.__init_func__(); // only call to its __init_func__()
   return 0;
 }
 )""";

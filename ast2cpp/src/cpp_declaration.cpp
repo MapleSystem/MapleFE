@@ -20,13 +20,13 @@ namespace maplefe {
 std::string CppDecl::EmitModuleNode(ModuleNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str("// Filename: "s);
-  str += node->GetFileName() + "\n"s;
+  std::string name = GetModuleName();
+  std::string str("// Filename: "s + node->GetFileName() + "\n"s);
   str += R"""(
 //#include "ts2cpp.h"
 #include <iostream>
 
-class Module_1 {
+class )""" + name + R"""( {
 public: // all top level variables in the module
 )""";
   for (unsigned i = 0; i < node->GetTreesNum(); ++i) {
@@ -45,8 +45,7 @@ void __init_func__();
   // export table here
 };
 
-extern Module_1 module_1;
-)""";
+extern )""" + name + " _"s + name + ";\n";
   return str;
 }
 
