@@ -83,16 +83,6 @@ for ts in $LIST; do
       rm -f "$T"
     fi
   fi
-  cmd=$(grep -n -e "^// .Beginning of CppEmitter:" -e "// End of CppEmitter.$" <<< "$out" |
-    tail -2 | sed 's/:.*//' | xargs | sed 's/\([^ ]*\) \(.*\)/sed -n \1,$((\2))p/')
-  if [ "x${cmd:0:4}" = "xsed " ]; then
-    T=$ts-$$.out.cpp
-    eval $cmd <<< "$out" > "$T"
-    clang-format-10 -i --style="{ColumnLimit: 120}" "$T"
-    echo -e "\n====== C++ Reformated ======\n"
-    $HIGHLIGHT "$T"
-    [ -n "$KEEP" ] || rm -f "$T"
-  fi
   if [ -n "$DOT" ]; then
     echo --- "$ts"; cat "$ts"
     idx=0

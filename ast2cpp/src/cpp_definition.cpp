@@ -20,14 +20,13 @@ namespace maplefe {
 std::string CppDef::EmitModuleNode(ModuleNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string header = "header.h";
-  std::string str("// Filename: "s);
+  std::string str("// TypeScript filename: "s);
   str += node->GetFileName() + "\n"s;
-  str += "#include \""s + header + "\""s;
+  str += "#include \""s + GetBaseFileName() + ".h\""s;
   str += R"""(
 #include <iostream>
 
-void __init_func__() { // bind "this" to current module
+void Module_1::__init_func__() { // bind "this" to current module
 )""";
   for (unsigned i = 0; i < node->GetTreesNum(); ++i) {
     if (auto n = node->GetTree(i)) {

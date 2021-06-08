@@ -16,47 +16,17 @@
 #ifndef __CPPEMITTER_HEADER__
 #define __CPPEMITTER_HEADER__
 
-#include "ast.h"
-#include "ast_attr.h"
 #include "ast_module.h"
-#include "ast_handler.h"
-#include "ast_type.h"
-
-#include "emitter.h"
 
 namespace maplefe {
 
-enum Phase { PK_DECL, PK_CODE };
-
-class CppEmitter : public Emitter {
+class CppEmitter {
 private:
   AST_Handler *mASTHandler;
-  Phase mPhase;
+
 public:
-  CppEmitter(AST_Handler *h) : mASTHandler(h), Emitter(h->mASTModules.ValueAtIndex(0)) {}
-
+  CppEmitter(AST_Handler *h) : mASTHandler(h) {}
   bool EmitCxxFiles();
-
-  std::string Emit(const char *title) {
-    std::string code;
-    code = "// [Beginning of CppEmitter: "s + title + "\n"s;
-    unsigned size = mASTHandler->mASTModules.GetNum();
-    for (int i = 0; i < size; i++) {
-      ModuleNode *m = mASTHandler->mASTModules.ValueAtIndex(i);
-      SetASTModule(m);
-      code += EmitTreeNode(m);
-    }
-    code += "// End of CppEmitter]\n"s;
-    return code;
-  }
-
-  std::string EmitModuleNode(ModuleNode *node);
-  std::string EmitFunctionNode(FunctionNode *node);
-  std::string EmitBinOperatorNode(BinOperatorNode *node);
-  std::string EmitDeclNode(DeclNode *node);
-  std::string EmitCallNode(CallNode *node);
-  std::string EmitIdentifierNode(IdentifierNode *node);
-  std::string EmitPrimTypeNode(PrimTypeNode *node);
 };
 
 } // namespace maplefe

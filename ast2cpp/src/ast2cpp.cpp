@@ -120,7 +120,6 @@ void A2C::ProcessAST() {
     }
 
     maplefe::CppEmitter cppemitter(mASTHandler);
-    std::cout << cppemitter.Emit("Convert AST to C++ code");
     cppemitter.EmitCxxFiles();
   }
 }
