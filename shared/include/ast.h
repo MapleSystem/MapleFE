@@ -491,6 +491,9 @@ private:
   TreeNode      *mType; // PrimTypeNode or UserTypeNode
   TreeNode      *mInit; // Init value
   DimensionNode *mDims;
+
+  SmallVector<AnnotationNode*> mAnnotations; //annotation or pragma
+
   bool           mOptionalParam; // A optional parameter.
   bool           mRestParam;     // A rest parameter.
 public:
@@ -499,7 +502,7 @@ public:
     mOptionalParam(false), mRestParam(false) {}
   IdentifierNode(unsigned id) : IdentifierNode(id, NULL) {}
   IdentifierNode() : IdentifierNode(0, NULL) {}
-  ~IdentifierNode(){}
+  ~IdentifierNode(){Release();}
 
   TreeNode*   GetType() {return mType;}
   TreeNode*   GetInit() {return mInit;}
@@ -530,7 +533,13 @@ public:
   AttrId   GetAttrAtIndex(unsigned i) {return mAttrs.ValueAtIndex(i);}
   void     SetAttrAtIndex(unsigned i, AttrId n) {*(mAttrs.RefAtIndex(i)) = n;}
 
-  void Release() { if (mDims) mDims->Release();}
+  // Annotation/Pragma related
+  unsigned GetAnnotationsNum()           {return mAnnotations.GetNum();}
+  void     AddAnnotation(AnnotationNode *n) {mAnnotations.PushBack(n);}
+  AnnotationNode* GetAnnotationAtIndex(unsigned i) {return mAnnotations.ValueAtIndex(i);}
+  void            SetAnnotationAtIndex(unsigned i, AnnotationNode* n) {*(mAnnotations.RefAtIndex(i)) = n;}
+
+  void Release();
   void Dump(unsigned);
 };
 

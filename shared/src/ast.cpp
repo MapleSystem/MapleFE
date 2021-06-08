@@ -463,6 +463,13 @@ void DimensionNode::Merge(const TreeNode *node) {
 //                          IdentifierNode
 //////////////////////////////////////////////////////////////////////////////////////
 
+void IdentifierNode::Release() {
+  if (mDims)
+     mDims->Release();
+  mAttrs.Release();
+  mAnnotations.Release();
+}
+
 void IdentifierNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   if (mRestParam)
