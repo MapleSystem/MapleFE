@@ -897,7 +897,12 @@ TreeNode* ASTBuilder::BuildForLoop() {
   return mLastTreeNode;
 }
 
-// BuildForLoop_In takes one implicit argument and two explicit arguments.
+// BuildForLoop_In takes 3 or 2 arguments.
+// If 3 arguments
+//  1. The decl of variable.
+//  2. The first explicit arg. This is the set of data
+//  3. The body.
+// If 2 arguments
 //  1. The implicit arg, mLastTreeNode. This is a decl of variable.
 //  2. The first explicit arg. This is the set of data
 //  3. The body.
@@ -907,25 +912,51 @@ TreeNode* ASTBuilder::BuildForLoop_In() {
 
   ForLoopNode *for_loop = (ForLoopNode*)gTreePool.NewTreeNode(sizeof(ForLoopNode));
   new (for_loop) ForLoopNode();
-
   for_loop->SetProp(FLP_JSIn);
-  for_loop->SetVariable(mLastTreeNode);
 
-  MASSERT(mParams.size() == 2);
+  TreeNode *the_var = NULL;
+  TreeNode *the_set = NULL;
+  TreeNode *the_body = NULL;
 
-  Param p_set = mParams[0];
-  if (!p_set.mIsEmpty) {
-    MASSERT(p_set.mIsTreeNode);
-    TreeNode *the_set = p_set.mData.mTreeNode;
-    for_loop->SetSet(the_set);
+  if (mParams.size() == 3) {
+    Param p_var = mParams[0];
+    if (!p_var.mIsEmpty) {
+      MASSERT(p_var.mIsTreeNode);
+      the_var = p_var.mData.mTreeNode;
+    }
+
+    Param p_set = mParams[1];
+    if (!p_set.mIsEmpty) {
+      MASSERT(p_set.mIsTreeNode);
+      the_set = p_set.mData.mTreeNode;
+    }
+
+    Param p_body = mParams[2];
+    if (!p_body.mIsEmpty) {
+      MASSERT(p_body.mIsTreeNode);
+      the_body = p_body.mData.mTreeNode;
+    }
+  } else {
+    MASSERT(mParams.size() == 2);
+
+    the_var = mLastTreeNode;
+
+    Param p_set = mParams[0];
+    if (!p_set.mIsEmpty) {
+      MASSERT(p_set.mIsTreeNode);
+      the_set = p_set.mData.mTreeNode;
+    }
+
+    Param p_body = mParams[1];
+    if (!p_body.mIsEmpty) {
+      MASSERT(p_body.mIsTreeNode);
+      the_body = p_body.mData.mTreeNode;
+    }
   }
 
-  Param p_body = mParams[1];
-  if (!p_body.mIsEmpty) {
-    MASSERT(p_body.mIsTreeNode);
-    TreeNode *body = p_body.mData.mTreeNode;
-    for_loop->SetBody(body);
-  }
+  for_loop->SetVariable(the_var);
+  for_loop->SetSet(the_set);
+  for_loop->SetBody(the_body);
 
   mLastTreeNode = for_loop;
   return mLastTreeNode;
