@@ -31,11 +31,7 @@ public:
   CppDef(ModuleNode *m) : Emitter(m) {}
 
   std::string Emit() {
-    std::string code;
-    code = "// [Beginning of CppDef:\n"s;
-    code += EmitTreeNode(GetASTModule());
-    code += "// End of CppDef]\n"s;
-    return code;
+    return EmitTreeNode(GetASTModule());
   }
 
   std::string EmitModuleNode(ModuleNode *node);
