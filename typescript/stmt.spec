@@ -54,10 +54,12 @@
 #                                    A.2 Expressions
 #-------------------------------------------------------------------------------
 
-rule JSIdentifier: ONEOF(Identifier,
-                         "get",
-                         "set")
+rule KeywordIdentifier : ONEOF("get",
+                               "set",
+                               "constructor")
   attr.action : BuildIdentifier()
+
+rule JSIdentifier: ONEOF(Identifier, KeywordIdentifier)
 
 ##-----------------------------------
 ##rule IdentifierReference[Yield] :

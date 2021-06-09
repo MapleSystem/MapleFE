@@ -53,7 +53,12 @@ private:
 
   // The last created node. It will be referenced by the
   // following AddModifier() or other functions.
-  TreeNode               *mLastTreeNode;
+  TreeNode   *mLastTreeNode;
+
+  // Sometimes we call BuildIdentifier() to build an identifier node
+  // from keywords or any reserved words. This is allowed in Typescript.
+  // We save the Name of the keyword for BuildIdentifier().
+  const char *mNameForBuildIdentifier;
 
 public:
   // information for a single action
@@ -61,7 +66,7 @@ public:
   std::vector<Param>      mParams;
 
 public:
-  ASTBuilder() : mTrace(false) {}
+  ASTBuilder() : mTrace(false), mLastTreeNode(NULL), mNameForBuildIdentifier(NULL) {}
   ~ASTBuilder() {}
 
   void SetTrace(bool b) {mTrace = b;}

@@ -1,0 +1,20 @@
+Matched 6 tokens.
+Matched 14 tokens.
+Matched 23 tokens.
+Matched 31 tokens.
+Matched 56 tokens.
+Matched 65 tokens.
+============= Module ===========
+== Sub Tree ==
+func  func()  throws: 
+
+== Sub Tree ==
+js_let Decl: f=new func()
+== Sub Tree ==
+console.log(f.constructor)
+== Sub Tree ==
+f.constructor.prop1 Assign 1
+== Sub Tree ==
+Object.defineProperty(f.constructor,'prop2', {value:2, writable:true, enumerable:true})
+== Sub Tree ==
+console.log(f.constructor)

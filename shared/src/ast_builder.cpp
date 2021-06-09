@@ -83,6 +83,7 @@ TreeNode* ASTBuilder::CreateTokenTreeNode(const Token *token) {
     return n;
 
   } else if (token->IsKeyword()) {
+    mNameForBuildIdentifier = NULL;
     const char *keyword = token->GetName();
     // If it's an attribute
     AttrNode *n = gAttrPool.GetAttrNode(keyword);
@@ -112,7 +113,10 @@ TreeNode* ASTBuilder::CreateTokenTreeNode(const Token *token) {
       mLastTreeNode = n;
       return n;
     }
+
     // Otherwise, it doesn't create any tree node.
+    // But we pass the keyword name to future possible BuildIdentifier.
+    mNameForBuildIdentifier = keyword;
   }
 
   // Other tokens shouldn't be involved in the tree creation.
@@ -186,7 +190,14 @@ static void add_type_to(TreeNode *tree, TreeNode *type) {
 // Take on argument, the mLastTreeNode.
 // It could be a token or tree.
 TreeNode* ASTBuilder::BuildIdentifier() {
-  if (mLastTreeNode->IsIdentifier()) {
+  if (mNameForBuildIdentifier) {
+    IdentifierNode *n = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
+    unsigned idx = gStringPool.GetStrIdx(mNameForBuildIdentifier);
+    new (n) IdentifierNode(idx);
+    mLastTreeNode = n;
+    mNameForBuildIdentifier = NULL;
+    return n;
+  } else if (mLastTreeNode->IsIdentifier()) {
     return mLastTreeNode;
   } else if (mLastTreeNode->IsAttr()) {
     AttrNode *an = (AttrNode*)mLastTreeNode;
