@@ -25,9 +25,7 @@ public:
   CppDecl(ModuleNode *m) : Emitter(m) {}
 
   std::string Emit() {
-    std::string code;
-    code += EmitTreeNode(GetASTModule());
-    return code;
+    return EmitTreeNode(GetASTModule());
   }
 
   std::string EmitModuleNode(ModuleNode *node);
