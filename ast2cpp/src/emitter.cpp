@@ -1200,7 +1200,9 @@ std::string Emitter::EmitClassNode(ClassNode *node) {
 
   for (unsigned i = 0; i < node->GetConstructorsNum(); ++i) {
     if (auto n = node->GetConstructor(i)) {
-      str += " "s + EmitFunctionNode(n);
+      std::string func = EmitFunctionNode(n);
+      Replace(func, "function", "constructor", 1);
+      str += " "s + func;
     }
   }
 
