@@ -1832,10 +1832,6 @@ const char *Emitter::GetEnumOprId(OprId k) {
     return          "\103>>>=";
   case OPR_Arrow:
     return          "\030 OPR_Arrow";
-  case OPR_Select:
-    return          "\030 OPR_Select";
-  case OPR_Cond:
-    return          "\030 OPR_Cond";
   case OPR_Diamond:
     return          "\030 OPR_Diamond";
   case OPR_StEq:

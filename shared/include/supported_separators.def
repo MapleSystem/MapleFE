@@ -25,9 +25,11 @@ SEPARATOR(Semicolon)
 SEPARATOR(Comma)
 SEPARATOR(Dot)
 SEPARATOR(Dotdotdot)
-SEPARATOR(Colon)
+SEPARATOR(Select)         // ?
+SEPARATOR(Colon)          // :
 SEPARATOR(Of)
 SEPARATOR(At)
 SEPARATOR(Pound)
 SEPARATOR(Whitespace)
 SEPARATOR(ArrowFunction)  // first coming from JS, =>
+SEPARATOR(Optional)       // first coming from JS, ?.

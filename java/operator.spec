@@ -64,6 +64,4 @@ STRUCT Operator : ONEOF(
                     (">>>=", ZextAssign),
                     #
                     ("->",   Arrow),
-                    (":",    Select),
-                    ("?",    Cond),
                     ("<>",   Diamond))

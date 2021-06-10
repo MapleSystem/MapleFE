@@ -31,4 +31,6 @@ STRUCT Separator : ((" ", Whitespace),
                     (".", Dot),
                     ("...", Dotdotdot),
                     (":", Colon),
+                    ("?", Select),
+                    ("?.",Optional),
                     ("@", At))

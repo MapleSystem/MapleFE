@@ -65,9 +65,5 @@ STRUCT Operator : ONEOF(
                     ("|=",   BorAssign),
                     ("^=",   BxorAssign),
                     (">>>=", ZextAssign),
-                    #
-                    (":",    Select),
-                    ("?",    Cond),
-                    ("?.",   OptionalChain),
                     # arrow function
                     ("=>",   ArrowFunction))
