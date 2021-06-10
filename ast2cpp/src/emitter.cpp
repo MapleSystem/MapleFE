@@ -149,10 +149,11 @@ std::string Emitter::EmitXXportAsPairNode(XXportAsPairNode *node) {
   std::string str;
   if (node->IsDefault()) {
     if (auto n = node->GetBefore())
-      str += " "s + EmitTreeNode(n);
+      str += "{ "s + EmitTreeNode(n) + " as default }"s;
   } else if (node->IsEverything()) {
+    str += " * "s;
     if (auto n = node->GetBefore())
-      str += " * as "s + EmitTreeNode(n);
+      str += "as "s + EmitTreeNode(n);
   } else {
     if (auto n = node->GetBefore()) {
       if (n->GetKind() == NK_Identifier)
