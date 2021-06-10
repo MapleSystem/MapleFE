@@ -398,6 +398,27 @@ public:
 };
 
 //////////////////////////////////////////////////////////////////////////
+//                      TypeParameter
+//////////////////////////////////////////////////////////////////////////
+
+class TypeParameterNode : public TreeNode {
+private:
+  TreeNode *mId;      // The name of the type parameter
+  TreeNode *mDefault; // The default value of this type parameter.
+                      // some languages support default value.
+public:
+  TypeParameterNode() : TreeNode(NK_TypeParameter), mId(NULL), mDefault(NULL) {}
+  ~TypeParameterNode() {}
+
+  TreeNode* GetId()       {return mId;}
+  TreeNode* GetDefault()  {return mDefault;}
+  void SetId(TreeNode* t)      {mId = t; if(t) t->SetParent(this);}
+  void SetDefault(TreeNode* t) {mDefault = t; if(t) t->SetParent(this);}
+
+  void Dump(unsigned);
+};
+
+//////////////////////////////////////////////////////////////////////////
 //                      New and Delete operation
 // Java and C++ have new operation, with different syntax and semantics.
 // C++ also has delete operation. The tree nodes below contains most of

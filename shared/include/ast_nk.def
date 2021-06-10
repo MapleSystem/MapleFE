@@ -29,10 +29,14 @@ NODEKIND(Identifier)
 NODEKIND(Field)
 NODEKIND(Dimension)
 NODEKIND(Attr)
+
+// Type related
 NODEKIND(PrimType)
 NODEKIND(PrimArrayType)
 NODEKIND(UserType)
+NODEKIND(TypeParameter)
 
+//
 NODEKIND(Cast)
 NODEKIND(Parenthesis)
 
