@@ -20,6 +20,11 @@
 #  2. The rule part, defining the language restrictions of each operator.
 ##########################################################################
 
+# NOTE
+# Some languages could have one synatx belonging to both separator and operators.
+# eg., ':' in Java 8, it's both a separator colon and operator select.
+# We need avoid such duplication in .spec files.
+
 STRUCT Operator : ONEOF(
                     # Arithmetic
                     ("+",    Add),

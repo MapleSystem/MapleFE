@@ -1,0 +1,22 @@
+Matched 6 tokens.
+Matched 14 tokens.
+Matched 22 tokens.
+Matched 30 tokens.
+Matched 39 tokens.
+Matched 48 tokens.
+Matched 57 tokens.
+============= Module ===========
+== Sub Tree ==
+Object.prototype.constructor
+== Sub Tree ==
+Object.prototype.toString()
+== Sub Tree ==
+Object.prototype.toLocaleString()
+== Sub Tree ==
+Object.prototype.valueOf()
+== Sub Tree ==
+Object.prototype.hasOwnProperty("string")
+== Sub Tree ==
+Object.prototype.isPrototypeOf(Object)
+== Sub Tree ==
+Object.prototype.propertyIsEnumerable("string")

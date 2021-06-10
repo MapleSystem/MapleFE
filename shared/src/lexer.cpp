@@ -201,13 +201,6 @@ Token* Lexer::LexTokenNoNewLine(void) {
     return t;
   }
 
-  // We try to get system tokens in the order of operator, separtor, and keyword
-  // This is the same as token_gen.cpp in autogen. There is a reason behind this.
-  // Some languages could have one synatx belonging to both separator and operators.
-  // eg., ':' in Java 8, it's both a separator colon and operator select.
-  // So the order here must be consistent with autogen where it decides ':' a colon or
-  // select in a rule.
-
   OprId opr = GetOperator();
   if (opr != OPR_NA) {
     Token *t = FindOperatorToken(opr);
