@@ -71,12 +71,6 @@ std::string CppDef::EmitIdentifierNode(IdentifierNode *node) {
   return str;
 }
 
-
-std::string CppDef::EmitPrimTypeNode(PrimTypeNode *node) {
-  return std::string();
-}
-
-
 std::string CppDef::EmitDeclNode(DeclNode *node) {
   if (node == nullptr)
     return std::string();
@@ -132,6 +126,10 @@ std::string CppDef::EmitCallNode(CallNode *node) {
   if (node->IsStmt())
     str += ";\n"s;
   return str;
+}
+
+std::string CppDef::EmitPrimTypeNode(PrimTypeNode *node) {
+  return std::string();
 }
 
 } // namespace maplefe
