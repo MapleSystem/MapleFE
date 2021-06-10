@@ -2,4 +2,5 @@
 // used in cocos director.ts
 function processEntity(e?: any) {
   let s = e!.name; // Assert that e is non-null and access name
+  let t = e.name!;
 }
