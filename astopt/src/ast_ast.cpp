@@ -211,10 +211,10 @@ LambdaNode *AdjustASTVisitor::VisitLambdaNode(LambdaNode *node) {
   if (tn && !tn->IsBlock()) {
     BlockNode *blk = (BlockNode*)gTreePool.NewTreeNode(sizeof(BlockNode));
     new (blk) BlockNode();
-    blk->AddChild(tn);
 
     ReturnNode *ret = (ReturnNode*)gTreePool.NewTreeNode(sizeof(ReturnNode));
     new (ret) ReturnNode();
+    ret->SetResult(tn);
     blk->AddChild(ret);
 
     node->SetBody(blk);
