@@ -31,4 +31,3 @@ SEPARATOR(At)
 SEPARATOR(Pound)
 SEPARATOR(Whitespace)
 SEPARATOR(ArrowFunction)  // first coming from JS, =>
-SEPARATOR(OptionalChain)  // first coming from JS, ?.

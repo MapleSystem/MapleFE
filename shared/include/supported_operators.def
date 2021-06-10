@@ -73,6 +73,7 @@ OPERATOR(Arrow, Binary)
 OPERATOR(Select, Ternary)
 OPERATOR(Cond, Ternary)
 
+OPERATOR(OptionalChain, Binary)
 
 // In Java, there is a special type argument, <>, meaning no arguments.
 // It could appear in other languages. So I define Diamond.

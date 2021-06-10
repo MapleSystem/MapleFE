@@ -68,5 +68,6 @@ STRUCT Operator : ONEOF(
                     #
                     (":",    Select),
                     ("?",    Cond),
+                    ("?.",   OptionalChain),
                     # arrow function
-                    ("=>",   ArrowFunc))
+                    ("=>",   ArrowFunction))

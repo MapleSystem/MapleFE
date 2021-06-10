@@ -1,0 +1,13 @@
+Matched 6 tokens.
+Matched 9 tokens.
+Matched 21 tokens.
+Matched 33 tokens.
+============= Module ===========
+== Sub Tree ==
+js_let Decl: obj1= {}
+== Sub Tree ==
+js_let Decl: obj2
+== Sub Tree ==
+console.log(obj1.hasOwnProperty('prop1'))
+== Sub Tree ==
+console.log(obj2.hasOwnProperty('prop1'))

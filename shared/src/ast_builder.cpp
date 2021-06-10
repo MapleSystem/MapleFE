@@ -680,6 +680,22 @@ TreeNode* ASTBuilder::SetIsStmt() {
   return mLastTreeNode;
 }
 
+// Takes one argument. Set the tree as an optional node.
+// We still return the previous mLastTreeNode.
+TreeNode* ASTBuilder::SetIsOptional() {
+  if (mTrace)
+    std::cout << "In SetIsOptional" << std::endl;
+
+  Param p_tree = mParams[0];
+  if (!p_tree.mIsEmpty) {
+    MASSERT(p_tree.mIsTreeNode);
+    TreeNode *treenode = p_tree.mData.mTreeNode;
+    treenode->SetIsOptional();
+  }
+
+  return mLastTreeNode;
+}
+
 // Assignment is actually a binary operator.
 TreeNode* ASTBuilder::BuildAssignment() {
   if (mTrace)

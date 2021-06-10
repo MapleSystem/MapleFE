@@ -31,7 +31,8 @@ OperatorId OprsSupported[OPR_NA] = {
 // return the OprId
 OprId FindOperatorId(const std::string &s) {
   for (unsigned u = 0; u < OPR_NA; u++) {
-    if (!OprsSupported[u].mName.compare(0, s.length(), s))
+    if (!OprsSupported[u].mName.compare(0, s.length(), s) &&
+        s.length() == OprsSupported[u].mName.size())
       return OprsSupported[u].mOprId;
   }
   return OPR_NA;

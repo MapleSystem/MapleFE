@@ -79,6 +79,8 @@ protected:
   unsigned  mStrIdx;
 
   bool      mIsStmt;      // if a node is a statement
+  bool      mIsOptional;  // if a node is optionally existing during runtime.
+                          // This design is first coming from Javascript.
 
 public:
   TreeNode(NodeKind k, unsigned i)
@@ -103,8 +105,10 @@ public:
   TreeNode* GetParent() {return mParent;}
   TreeNode* GetLabel()  {return mLabel;}
 
-  bool IsStmt()          {return mIsStmt;}
-  void SetIsStmt(bool b = true)      {mIsStmt = b;}
+  bool IsStmt()                 {return mIsStmt;}
+  void SetIsStmt(bool b = true) {mIsStmt = b;}
+  bool IsOptional()                 {return mIsOptional;}
+  void SetIsOptional(bool b = true) {mIsOptional = b;}
 
   virtual unsigned GetStrIdx() {return mStrIdx;}
   virtual void SetStrIdx(unsigned id) {mStrIdx = id;}

@@ -150,8 +150,9 @@ ACTION(BuildDims)
 ACTION(AddDims)
 ACTION(AddDimsTo)
 
-// Set a tree node as a statement
+// Set a tree node as a statement, optional
 ACTION(SetIsStmt)
+ACTION(SetIsOptional)
 
 // statment, control flow
 ACTION(BuildAssignment)
