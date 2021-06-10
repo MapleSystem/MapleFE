@@ -474,6 +474,10 @@ void Verifier::VerifyTypeOf(TypeOfNode *tree){
   return;
 }
 
+void Verifier::VerifyTypeParameter(TypeParameterNode *tree){
+  return;
+}
+
 void Verifier::VerifyKeyOf(KeyOfNode *tree){
   return;
 }
