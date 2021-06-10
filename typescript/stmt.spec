@@ -1398,7 +1398,10 @@ rule TypeParameterList: ONEOF(TypeParameter,
                               TypeParameterList + ',' + TypeParameter)
 
 ## rule TypeParameter: BindingIdentifier Constraintopt
-rule TypeParameter: BindingIdentifier + ZEROORONE(Constraint)
+## It supports default type value of type parameter now.
+rule TypeParameter: BindingIdentifier + ZEROORONE(Constraint) + ZEROORONE(TypeInitializer)
+
+rule TypeInitializer : '=' + Type
 
 ## rule Constraint: extends Type
 rule Constraint: "extends" + Type
