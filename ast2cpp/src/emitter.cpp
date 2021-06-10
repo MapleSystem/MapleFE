@@ -408,6 +408,8 @@ std::string Emitter::EmitIdentifierNode(IdentifierNode *node) {
   for (unsigned i = 0; i < node->GetAttrsNum(); ++i) {
     str += GetEnumAttrId(node->GetAttrAtIndex(i));
   }
+  if(node->IsRestParam())
+    str += "..."s;
   str += node->GetName();
   if(node->IsOptionalParam())
     str += "?"s;
