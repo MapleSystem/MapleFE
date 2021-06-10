@@ -46,4 +46,4 @@ js_const Decl: objPool=new Pool()
 == Sub Tree ==
 objPool.put(new Foo(100))
 == Sub Tree ==
-console.log(objPool.get(),_id)
+console.log(objPool.get()._id)

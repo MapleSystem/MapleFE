@@ -19,4 +19,4 @@ class  Foo
 == Sub Tree ==
 js_const Decl: FooString=new Foo(() -> new String("foo"))
 == Sub Tree ==
-console.log(())
+console.log(FooString.alloc().toString())

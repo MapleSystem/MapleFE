@@ -348,6 +348,7 @@ rule CallExpression : ONEOF(
   attr.action.%1 : AddTypeArgument(%2)
   attr.action.%1 : AddArguments(%3)
   attr.action.%3 : AddArguments(%2)
+  attr.action.%5 : BuildField(%1, %3)
 
 ##-----------------------------------
 ##rule SuperCall[Yield] :
@@ -953,8 +954,8 @@ rule BreakStatement : ONEOF(
 ##rule ReturnStatement[Yield] :
 ##  return ;
 ##  return [no LineTerminator here] Expression[In, ?Yield] ;
-rule ReturnStatement :ONEOF("return" + ';',
-                            "return" + Expression + ';')
+rule ReturnStatement :ONEOF("return" + ZEROORONE(';'),
+                            "return" + Expression + ZEROORONE(';'))
   attr.action.%2 : BuildReturn(%2)
 
 ##-----------------------------------
