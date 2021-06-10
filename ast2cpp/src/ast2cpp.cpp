@@ -100,28 +100,21 @@ void A2C::ProcessAST() {
         // mASTHandler->Dump("After mASTHandler->BuildDFA()");
       }
     }
-
-    if (mTraceA2C) {
-      std::cout << "============= AstStore ===========" << std::endl;
-      AstStore saveAst(gModule);
-      saveAst.StoreInAstBuf();
-      //AstBuffer &ast_buf = saveAst.GetAstBuf();
-    }
-
-    if (mTraceA2C) {
-      std::cout << "============= Emitter ===========" << std::endl;
-      unsigned size = mASTHandler->mASTModules.GetNum();
-      for (int i = 0; i < size; i++) {
-        ModuleNode *module = mASTHandler->mASTModules.ValueAtIndex(i);
-        maplefe::Emitter emitter(module);
-        std::string code = emitter.Emit("Convert AST to TypeScript code");
-        std::cout << code;
-      }
-    }
-
-    maplefe::CppEmitter cppemitter(mASTHandler);
-    cppemitter.EmitCxxFiles();
   }
+
+  if (mTraceA2C) {
+    std::cout << "============= Emitter ===========" << std::endl;
+    unsigned size = mASTHandler->mASTModules.GetNum();
+    for (int i = 0; i < size; i++) {
+      ModuleNode *module = mASTHandler->mASTModules.ValueAtIndex(i);
+      maplefe::Emitter emitter(module);
+      std::string code = emitter.Emit("Convert AST to TypeScript code");
+      std::cout << code;
+    }
+  }
+
+  maplefe::CppEmitter cppemitter(mASTHandler);
+  cppemitter.EmitCxxFiles();
 }
 }
 

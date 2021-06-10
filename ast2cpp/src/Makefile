@@ -45,7 +45,7 @@ INCLUDES := -I $(MAPLEFE_ROOT)/shared/include \
 INCLUDEGEN := -I $(MAPLEFE_ROOT)/shared/include -I $(BUILDDIR)/gen -I $(BUILDASTGEN)
 
 TARGET=ast2cpp
-SHAREDLIB = $(BUILDASTGEN)/genast.a $(BUILDDIR)/astopt/astopt.a $(BUILDDIR)/shared/shared.a
+SHAREDLIB = $(BUILDDIR)/astopt/astopt.a $(BUILDDIR)/shared/shared.a $(BUILDASTGEN)/genast.a
 LANGSPEC=$(BUILDDIR)/typescript/lang_spec.o
 
 .PHONY: all
