@@ -950,7 +950,7 @@ public:
   unsigned  GetElementsNum()              {return mElements.GetNum();}
   TreeNode* GetElementAtIndex(unsigned i) {return mElements.ValueAtIndex(i);}
   void      SetElementAtIndex(unsigned i, TreeNode* n) {*(mElements.RefAtIndex(i)) = n;}
-  void      AddElement(TreeNode* n) {mElements.PushBack(n);}
+  void      AddElement(TreeNode* n) {mElements.PushBack(n); if(n) n->SetParent(this);}
 
   void AddBody(TreeNode *);
 

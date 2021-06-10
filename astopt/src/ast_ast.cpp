@@ -134,6 +134,11 @@ DeclNode *AdjustASTVisitor::VisitDeclNode(DeclNode *node) {
 // split export decl and body
 // export {func add(y)}  ==> export {add}; func add(y)
 ExportNode *AdjustASTVisitor::VisitExportNode(ExportNode *node) {
+  TreeNode *parent = node->GetParent();
+  if (parent->IsNamespace()) {
+    // Export declarations are not permitted in a namespace
+    return node;
+  }
   if (node->GetPairsNum() == 1) {
     XXportAsPairNode *p = node->GetPair(0);
     TreeNode *bfnode = p->GetBefore();
@@ -149,7 +154,6 @@ ExportNode *AdjustASTVisitor::VisitExportNode(ExportNode *node) {
             p->SetBefore(n);
             mUpdated = true;
             // insert bfnode into AST after node
-            TreeNode *parent = node->GetParent();
             if (parent) {
               if (parent->IsBlock()) {
                 static_cast<BlockNode *>(parent)->InsertStmtAfter(bfnode, node);
