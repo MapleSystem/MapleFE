@@ -1400,6 +1400,8 @@ rule TypeParameterList: ONEOF(TypeParameter,
 ## rule TypeParameter: BindingIdentifier Constraintopt
 ## It supports default type value of type parameter now.
 rule TypeParameter: BindingIdentifier + ZEROORONE(Constraint) + ZEROORONE(TypeInitializer)
+  attr.action : BuildTypeParameter(%1)
+  attr.action : AddInit(%3)
 
 rule TypeInitializer : '=' + Type
 
@@ -1612,6 +1614,7 @@ rule IndexSignature: ONEOF(
 ## rule TypeAliasDeclaration: type BindingIdentifier TypeParametersopt = Type ;
 rule TypeAliasDeclaration: "type" + BindingIdentifier + ZEROORONE(TypeParameters) + '=' + Type + ';'
   attr.action : BuildTypeAlias(%2, %5)
+  attr.action : AddTypeGenerics(%3)
 
 
 ##############################################################################################

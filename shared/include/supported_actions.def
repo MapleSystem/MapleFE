@@ -132,6 +132,7 @@ ACTION(AddNamespaceBody)
 
 ACTION(AddModifier)
 ACTION(AddModifierTo)
+ACTION(AddInit)
 ACTION(AddInitTo)
 ACTION(AddType)
 
@@ -197,7 +198,9 @@ ACTION(BuildArrayType)      // From Spec point of view,
                             // In languages like TS, dimension info is attached to type.
                             // In C/C++, dimension info is attached to identifier.
                             // However, the AST design is up to each implementation.
+
 ACTION(BuildTypeAlias)
+ACTION(BuildTypeParameter)
 
 // This is a special action to pass a child to parent
 ACTION(PassChild)

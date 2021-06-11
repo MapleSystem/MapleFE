@@ -1802,6 +1802,41 @@ TreeNode* ASTBuilder::AddModifierTo() {
   return tree;
 }
 
+// It takes one argument, the init.
+// Apply init to mLastTreeNode
+TreeNode* ASTBuilder::AddInit() {
+  if (mTrace)
+    std::cout << "In AddInit" << std::endl;
+
+  MASSERT(mParams.size() == 1);
+
+  Param p_init = mParams[0];
+  if (p_init.mIsEmpty)
+    return NULL;
+
+  if (!p_init.mIsTreeNode)
+    MERROR("The init is not a treenode in AddInit()");
+
+  TreeNode *node_init = p_init.mData.mTreeNode;
+
+  if (mLastTreeNode->IsIdentifier()) {
+    IdentifierNode *in = (IdentifierNode*)mLastTreeNode;
+    in->SetInit(node_init);
+    return in;
+  } else if (mLastTreeNode->IsBindingPattern()) {
+    BindingPatternNode *in = (BindingPatternNode*)mLastTreeNode;
+    in->SetInit(node_init);
+    return in;
+  } else if (mLastTreeNode->IsTypeParameter()) {
+    TypeParameterNode *in = (TypeParameterNode*)mLastTreeNode;
+    in->SetDefault(node_init);
+    return in;
+  } else {
+    MERROR("The target of AddInit is unsupported.");
+  }
+}
+
+// It takes two arguments
 TreeNode* ASTBuilder::AddInitTo() {
   if (mTrace)
     std::cout << "In AddInitTo" << std::endl;
@@ -2893,6 +2928,24 @@ TreeNode* ASTBuilder::BuildUserType() {
   return mLastTreeNode;
 }
 
+TreeNode* ASTBuilder::BuildTypeParameter() {
+  if (mTrace)
+    std::cout << "In BuildTypeParameter" << std::endl;
+
+  Param p_id = mParams[0];
+  if (!p_id.mIsTreeNode)
+    MERROR("The Identifier of type parameter is not a treenode.");
+  TreeNode *id = p_id.mData.mTreeNode;
+
+  TypeParameterNode *tp = (TypeParameterNode*)gTreePool.NewTreeNode(sizeof(TypeParameterNode));
+  new (tp) TypeParameterNode();
+  tp->SetId(id);
+
+  mLastTreeNode = tp;
+  return mLastTreeNode;
+}
+
+
 TreeNode* ASTBuilder::AddTypeGenerics() {
   if (mTrace)
     std::cout << "In AddTypeGenerics" << std::endl;
@@ -3009,6 +3062,7 @@ TreeNode* ASTBuilder::BuildTypeAlias() {
 
   UserTypeNode *user_type = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
   new (user_type) UserTypeNode();
+  user_type->SetId(name);
   user_type->SetAlias(orig);
 
   mLastTreeNode = user_type;

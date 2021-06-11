@@ -4,10 +4,10 @@ Matched 37 tokens.
 Matched 45 tokens.
 ============= Module ===========
 == Sub Tree ==
-alias =() -> 
+alias T_Ctor<T>=() -> 
 == Sub Tree ==
 ts_interface: I_Class {__vals__ }
 == Sub Tree ==
-alias =T_Ctor<Object>
+alias AnyCtor=T_Ctor<Object>
 == Sub Tree ==
-alias =I_Class<Object>
+alias AnyClass=I_Class<Object>
