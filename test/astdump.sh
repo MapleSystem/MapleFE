@@ -71,7 +71,8 @@ for ts in $LIST; do
     clang-format-10 -i --style="{ColumnLimit: 120}" "$T"
     echo -e "\n====== TS Reformated ======\n"
     $HIGHLIGHT "$T"
-    eval tsc --noEmit --target es2015 "$T" $TSCERR
+    eval tsc -t es6 --lib es2015,es2017,dom -m commonjs --experimentalDecorators "$T" $TSCERR
+    # --strict  --downlevelIteration --esModuleInterop --noImplicitAny --isolatedModules "$T" $TSCERR
     if [ $? -ne 0 ]; then
       E="tsc"
       grep -qm1 "PassNode *{" <<< "$out" && E="$E,PassNode"
