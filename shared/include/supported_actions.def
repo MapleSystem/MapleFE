@@ -190,7 +190,7 @@ ACTION(AddFinally)
 
 // User Types
 ACTION(BuildUserType)
-ACTION(AddTypeArgument)
+ACTION(AddTypeGenerics)      // add type arguments or type parameters or type generics
 ACTION(BuildUnionUserType)  // build union type
 ACTION(BuildInterUserType)  // build intersect type
 ACTION(BuildArrayType)      // From Spec point of view,

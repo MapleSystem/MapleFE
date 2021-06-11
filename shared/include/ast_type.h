@@ -36,12 +36,6 @@
 // Right now, I just let each instance represent a separate type, and will
 // come back to this.
 //
-// So we a TreeNode of the type identifier can be a type, and we don't have
-// to give any special data struct for it. A user type is created as a treenode
-// (IdentifierNode) at the beginning, but later we will do consolidation,
-// and it may be turned into a function, struct, etc. So a TreeNode is good here.
-//
-//
 // We define 3 different types.
 // 1. UserType
 //    It's an identifier which defines a class, interface, struct, etc.
@@ -83,16 +77,21 @@ enum UT_Type {
 
 class UserTypeNode : public TreeNode {
 private:
-  TreeNode *mId;  // A regular UT always has an Id (or name), or lambda, etc.
-                  // A union or intersection UT may or may not have an ID.
+  // A regular UT always has an Id (or name), or lambda, etc.
+  // A union or intersection UT may or may not have an ID.
+  TreeNode *mId;
+
   UT_Type   mType;
   TreeNode *mChildA;    // first child type in UT_Union or UT_Inter.
                         // or it's the orig type in UT_Alias.
-  TreeNode *mChildB;    // seconf child type.
+  TreeNode *mChildB;    // second child type.
 
   DimensionNode *mDims;
 
-  SmallVector<TreeNode*> mTypeArguments;
+  // There are two scenarios type generic info are used.
+  // 1. It's a type argument
+  // 2. It's a type parameter. Type parameter may have default value.
+  SmallVector<TreeNode*> mTypeGenerics;
 
 public:
   UserTypeNode(TreeNode *n) : TreeNode(NK_UserType),
@@ -103,10 +102,10 @@ public:
   TreeNode* GetId() {return mId;}
   void SetId(TreeNode *n) {mId = n;}
 
-  unsigned GetTypeArgumentsNum() {return mTypeArguments.GetNum();}
-  void     AddTypeArgument(TreeNode *n);
-  TreeNode* GetTypeArgument(unsigned i) {return mTypeArguments.ValueAtIndex(i);}
-  void      SetTypeArgument(unsigned i, TreeNode* n) {*(mTypeArguments.RefAtIndex(i)) = n;}
+  unsigned  GetTypeGenericsNum()                    {return mTypeGenerics.GetNum();}
+  void      AddTypeGeneric(TreeNode *n);
+  TreeNode* GetTypeGeneric(unsigned i)              {return mTypeGenerics.ValueAtIndex(i);}
+  void      SetTypeGeneric(unsigned i, TreeNode* n) {*(mTypeGenerics.RefAtIndex(i)) = n;}
 
   UT_Type GetType() {return mType;}
   void SetType(UT_Type t) {mType = t;}
@@ -129,7 +128,7 @@ public:
 
   bool TypeEquivalent(UserTypeNode *);
 
-  void Release() {mTypeArguments.Release();}
+  void Release() {mTypeGenerics.Release();}
   void Dump(unsigned);
 };
 

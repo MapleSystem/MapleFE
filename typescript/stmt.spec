@@ -345,7 +345,7 @@ rule CallExpression : ONEOF(
   CallExpression + '.' + JSIdentifier,
   CallExpression + TemplateLiteral)
   attr.action.%1,%3 : BuildCall(%1)
-  attr.action.%1 : AddTypeArgument(%2)
+  attr.action.%1 : AddTypeGenerics(%2)
   attr.action.%1 : AddArguments(%3)
   attr.action.%3 : AddArguments(%2)
   attr.action.%5 : BuildField(%1, %3)
@@ -1453,7 +1453,7 @@ rule PredefinedType: TYPE
 ## rule TypeReference: TypeName [no LineTerminator here] TypeArgumentsopt
 rule TypeReference: TypeName + ZEROORONE(TypeArguments)
   attr.action : BuildUserType(%1)
-  attr.action : AddTypeArgument(%2)
+  attr.action : AddTypeGenerics(%2)
 
 ## rule TypeName: IdentifierReference NamespaceName . IdentifierReference
 rule TypeName: ONEOF(IdentifierReference,

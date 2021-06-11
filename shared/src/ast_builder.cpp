@@ -2893,9 +2893,9 @@ TreeNode* ASTBuilder::BuildUserType() {
   return mLastTreeNode;
 }
 
-TreeNode* ASTBuilder::AddTypeArgument() {
+TreeNode* ASTBuilder::AddTypeGenerics() {
   if (mTrace)
-    std::cout << "In AddTypeArgument" << std::endl;
+    std::cout << "In AddTypeGenerics" << std::endl;
 
   if (mParams.size() == 0)
     return mLastTreeNode;
@@ -2914,12 +2914,12 @@ TreeNode* ASTBuilder::AddTypeArgument() {
 
   if (mLastTreeNode->IsUserType()) {
     UserTypeNode *type_node = (UserTypeNode*)mLastTreeNode;
-    type_node->AddTypeArgument(args);
+    type_node->AddTypeGeneric(args);
   } else if (mLastTreeNode->IsCall()) {
     CallNode *call = (CallNode*)mLastTreeNode;
     call->AddTypeArgument(args);
   } else {
-    MERROR("Unsupported node in AddTypeArgument()");
+    MERROR("Unsupported node in AddTypeGenerics()");
   }
 
   return mLastTreeNode;
