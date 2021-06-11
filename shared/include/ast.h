@@ -398,6 +398,25 @@ public:
 };
 
 //////////////////////////////////////////////////////////////////////////
+//                      AstType
+// The syntax is like: variable as type-a as type-b ...
+// It tells what type is the 'variable'
+//////////////////////////////////////////////////////////////////////////
+
+class AsTypeNode : public TreeNode {
+private:
+  TreeNode *mType;
+public:
+  AsTypeNode() : TreeNode(NK_AsType), mType(NULL) {}
+  ~AsTypeNode() {}
+
+  TreeNode* GetType() {return mType;}
+  void SetType(TreeNode *t) {mType = t;}
+
+  void Dump(unsigned indent);
+};
+
+//////////////////////////////////////////////////////////////////////////
 //                      TypeParameter
 //////////////////////////////////////////////////////////////////////////
 

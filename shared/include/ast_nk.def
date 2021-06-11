@@ -35,6 +35,7 @@ NODEKIND(PrimType)
 NODEKIND(PrimArrayType)
 NODEKIND(UserType)
 NODEKIND(TypeParameter)
+NODEKIND(AsType)
 
 //
 NODEKIND(Cast)
