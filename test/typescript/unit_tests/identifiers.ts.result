@@ -1,0 +1,9 @@
+Matched 9 tokens.
+Matched 18 tokens.
+============= Module ===========
+== Sub Tree ==
+func  type()  throws: 
+  return "type"
+
+== Sub Tree ==
+console.log(type())

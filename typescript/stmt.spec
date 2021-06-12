@@ -56,6 +56,7 @@
 
 rule KeywordIdentifier : ONEOF("get",
                                "set",
+                               "type",
                                "constructor")
   attr.action : BuildIdentifier()
 
