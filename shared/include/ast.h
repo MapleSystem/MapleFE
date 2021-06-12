@@ -538,6 +538,8 @@ private:
 
   SmallVector<AnnotationNode*> mAnnotations; //annotation or pragma
 
+  SmallVector<AsTypeNode*> mAsTypes;
+
   bool           mOptionalParam; // A optional parameter.
   bool           mRestParam;     // A rest parameter.
 public:
@@ -582,6 +584,13 @@ public:
   void     AddAnnotation(AnnotationNode *n) {mAnnotations.PushBack(n);}
   AnnotationNode* GetAnnotationAtIndex(unsigned i) {return mAnnotations.ValueAtIndex(i);}
   void            SetAnnotationAtIndex(unsigned i, AnnotationNode* n) {*(mAnnotations.RefAtIndex(i)) = n;}
+
+  // AsType related
+  unsigned GetAsTypesNum()           {return mAsTypes.GetNum();}
+  void     AddAsType(AsTypeNode *n)  {mAsTypes.PushBack(n);}
+  void     AddAsTypes(TreeNode *n);
+  AsTypeNode* GetAsTypeAtIndex(unsigned i) {return mAsTypes.ValueAtIndex(i);}
+  void        SetAsTypeAtIndex(unsigned i, AsTypeNode* n) {*(mAsTypes.RefAtIndex(i)) = n;}
 
   void Release();
   void Dump(unsigned);

@@ -1221,7 +1221,6 @@ TreeNode* ASTBuilder::BuildSwitch() {
 
 // AddType takes two parameters, 1) tree; 2) type
 // or takes one parameter, type, and apply it to mLastTreeNode
-
 TreeNode* ASTBuilder::AddType() {
   if (mTrace)
     std::cout << "In AddType " << std::endl;
@@ -1251,6 +1250,48 @@ TreeNode* ASTBuilder::AddType() {
     add_type_to(node, tree_type);
 
   mLastTreeNode = node;
+  return mLastTreeNode;
+}
+
+// AddType takes two parameters, 1) tree; 2) type
+// or takes one parameter, type, and apply it to mLastTreeNode
+TreeNode* ASTBuilder::AddAsType() {
+  if (mTrace)
+    std::cout << "In AddAsType " << std::endl;
+
+  TreeNode *node = NULL;
+  TreeNode *tree_type = NULL;
+
+  if (mParams.size() == 2) {
+    Param p_type = mParams[1];
+    Param p_name = mParams[0];
+
+    if(!p_type.mIsEmpty && p_type.mIsTreeNode)
+      tree_type = p_type.mData.mTreeNode;
+
+    if (!p_name.mIsTreeNode)
+      MERROR("The variable name should be a IdentifierNode already, but actually NOT?");
+    node = p_name.mData.mTreeNode;
+
+  } else {
+    Param p_type = mParams[0];
+    if(!p_type.mIsEmpty && p_type.mIsTreeNode)
+      tree_type = p_type.mData.mTreeNode;
+    node = mLastTreeNode;
+  }
+
+  if (tree_type) {
+    MASSERT(node->IsIdentifier() || node->IsUserType());
+    if (node->IsIdentifier()) {
+      IdentifierNode *id = (IdentifierNode*)node;
+      id->AddAsTypes(tree_type);
+    } else if (node->IsUserType()) {
+      UserTypeNode *id = (UserTypeNode*)node;
+      id->AddAsTypes(tree_type);
+    }
+    mLastTreeNode = node;
+  }
+
   return mLastTreeNode;
 }
 
@@ -2940,6 +2981,24 @@ TreeNode* ASTBuilder::BuildTypeParameter() {
   TypeParameterNode *tp = (TypeParameterNode*)gTreePool.NewTreeNode(sizeof(TypeParameterNode));
   new (tp) TypeParameterNode();
   tp->SetId(id);
+
+  mLastTreeNode = tp;
+  return mLastTreeNode;
+}
+
+// Takes one argument, the as 'type'.
+TreeNode* ASTBuilder::BuildAsType() {
+  if (mTrace)
+    std::cout << "In BuildAsType" << std::endl;
+
+  Param p_id = mParams[0];
+  if (!p_id.mIsTreeNode)
+    MERROR("The Identifier of type parameter is not a treenode.");
+  TreeNode *id = p_id.mData.mTreeNode;
+
+  AsTypeNode *tp = (AsTypeNode*)gTreePool.NewTreeNode(sizeof(AsTypeNode));
+  new (tp) AsTypeNode();
+  tp->SetType(id);
 
   mLastTreeNode = tp;
   return mLastTreeNode;

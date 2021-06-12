@@ -61,6 +61,9 @@ rule KeywordIdentifier : ONEOF("get",
 
 rule JSIdentifier: ONEOF(Identifier, KeywordIdentifier)
 
+rule AsType : "as" + PrimaryType
+  attr.action : BuildAsType(%2)
+
 ##-----------------------------------
 ##rule IdentifierReference[Yield] :
 ##  Identifier
@@ -292,7 +295,7 @@ rule Initializer : '=' + AssignmentExpression
 ##  new MemberExpression[?Yield] Arguments[?Yield]
 
 rule MemberExpression : ONEOF(
-  PrimaryExpression,
+  PrimaryExpression + ZEROORMORE(AsType),
   MemberExpression + '[' + Expression + ']',
   MemberExpression + '.' + JSIdentifier,
   MemberExpression + "?." + JSIdentifier,
@@ -303,6 +306,7 @@ rule MemberExpression : ONEOF(
 # NOTE: I created this rule. Typescript extended Type system and allow 'new'
 #       on a TypeReference
   "new" + TypeReference + Arguments)
+  attr.action.%1 : AddAsType(%1, %2)
   attr.action.%2 : BuildArrayElement(%1, %3)
   attr.action.%3 : BuildField(%1, %3)
   attr.action.%4 : SetIsOptional(%1)
@@ -1453,9 +1457,10 @@ rule ParenthesizedType: '(' + Type + ')'
 rule PredefinedType: TYPE
 
 ## rule TypeReference: TypeName [no LineTerminator here] TypeArgumentsopt
-rule TypeReference: TypeName + ZEROORONE(TypeArguments)
+rule TypeReference: TypeName + ZEROORONE(TypeArguments) + ZEROORMORE(AsType)
   attr.action : BuildUserType(%1)
   attr.action : AddTypeGenerics(%2)
+  attr.action : AddAsType(%3)
 
 ## rule TypeName: IdentifierReference NamespaceName . IdentifierReference
 rule TypeName: ONEOF(IdentifierReference,
@@ -1723,7 +1728,8 @@ rule Annotation : '@' + Identifier + ZEROORONE(Arguments)
 rule ClassHeritage: ZEROORONE(ClassExtendsClause) + ZEROORONE(ImplementsClause)
 
 ## ClassExtendsClause: extends ClassType
-rule ClassExtendsClause: "extends" + ClassType
+rule ClassExtendsClause: ONEOF("extends" + ZEROORONE('(') + ClassType + ZEROORONE(')'),
+                               "extends" + CallExpression)
 
 ## ClassType: TypeReference
 rule ClassType: TypeReference

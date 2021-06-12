@@ -1,0 +1,43 @@
+Matched 21 tokens.
+Matched 25 tokens.
+Matched 66 tokens.
+Matched 70 tokens.
+Matched 79 tokens.
+============= Module ===========
+== Sub Tree ==
+alias Constructor<T>=(args) -> 
+== Sub Tree ==
+ts_interface: someStandardInterface {someStandardInterface }
+== Sub Tree ==
+func  ClassFactory(base)  throws: 
+  class  GeneratedClass
+    Fields: 
+
+    Instance Initializer: 
+    Constructors: 
+    Methods: 
+    LocalClasses: 
+    LocalInterfaces: 
+
+  return GeneratedClass
+
+== Sub Tree ==
+class  someBaseClass
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+class  newClassWithStandardInterface
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+

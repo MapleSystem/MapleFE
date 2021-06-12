@@ -93,6 +93,8 @@ private:
   // 2. It's a type parameter. Type parameter may have default value.
   SmallVector<TreeNode*> mTypeGenerics;
 
+  SmallVector<AsTypeNode*> mAsTypes;
+
 public:
   UserTypeNode(TreeNode *n) : TreeNode(NK_UserType),
     mId(n), mChildA(NULL), mChildB(NULL), mType(UT_Regular), mDims(NULL) {}
@@ -125,6 +127,13 @@ public:
   unsigned AddDim(unsigned i = 0){mDims->AddDimension(i);}        // 0 means unspecified
   unsigned GetNthNum(unsigned n) {return mDims->GetDimension(n);} // 0 means unspecified.
   void     SetNthNum(unsigned n, unsigned i) {mDims->SetDimension(n, i);}
+
+  // AsType related
+  unsigned GetAsTypesNum()           {return mAsTypes.GetNum();}
+  void     AddAsType(AsTypeNode *n)  {mAsTypes.PushBack(n);}
+  void     AddAsTypes(TreeNode *n);
+  AsTypeNode* GetAsTypeAtIndex(unsigned i) {return mAsTypes.ValueAtIndex(i);}
+  void        SetAsTypeAtIndex(unsigned i, AsTypeNode* n) {*(mAsTypes.RefAtIndex(i)) = n;}
 
   bool TypeEquivalent(UserTypeNode *);
 

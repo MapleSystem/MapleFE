@@ -1302,6 +1302,8 @@ bool Parser::TraverseZeroorone(RuleTable *rule_table, AppealNode *appeal) {
 }
 
 // 1. Save all the possible matchings from children.
+//    There is one exception. If the rule-table is a top rule it should
+//    get the longest match.
 // 2. As return value we choose the longest matching.
 //
 // 'appeal' is the node of 'rule_table'.
@@ -1331,6 +1333,12 @@ bool Parser::TraverseOneof(RuleTable *rule_table, AppealNode *appeal) {
     }
   }
 
+  if (found && (rule_table->mProperties & RP_Top)) {
+    unsigned longest = appeal->LongestMatch();
+    appeal->ClearMatch();
+    appeal->AddMatch(longest);
+  }
+    
   // move position according to the longest matching
   mCurToken = new_mCurToken;
   return found;

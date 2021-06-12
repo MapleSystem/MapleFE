@@ -126,6 +126,7 @@ public:
 
   unsigned GetMatchNum()        {return mMatches.GetNum();}
   unsigned GetMatch(unsigned i) {return mMatches.ValueAtIndex(i);}
+  void     ClearMatch()         {mMatches.Clear();}
   void     AddMatch(unsigned i);
   unsigned LongestMatch();        // find the longest match.
   bool     FindMatch(unsigned m); // if 'm' exists?

@@ -135,6 +135,7 @@ ACTION(AddModifierTo)
 ACTION(AddInit)
 ACTION(AddInitTo)
 ACTION(AddType)
+ACTION(AddAsType)
 
 // Annotation.
 ACTION(BuildAnnotationType)
@@ -201,6 +202,7 @@ ACTION(BuildArrayType)      // From Spec point of view,
 
 ACTION(BuildTypeAlias)
 ACTION(BuildTypeParameter)
+ACTION(BuildAsType)
 
 // This is a special action to pass a child to parent
 ACTION(PassChild)

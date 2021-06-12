@@ -488,11 +488,28 @@ void DimensionNode::Merge(const TreeNode *node) {
 //                          IdentifierNode
 //////////////////////////////////////////////////////////////////////////////////////
 
+void IdentifierNode::AddAsTypes(TreeNode *type) {
+  if (!type)
+    return;
+
+  if (type->IsPass()) {
+    PassNode *pass_node = (PassNode*)type;
+    for (unsigned i = 0; i < pass_node->GetChildrenNum(); i++)
+      SetType(pass_node->GetChild(i));
+  } else if (type->IsAsType()) {
+    AsTypeNode *asn = (AsTypeNode*)type;
+    AddAsType(asn);
+  } else {
+    MERROR("unsupported as-type in AddAsType.");
+  }
+}
+
 void IdentifierNode::Release() {
   if (mDims)
      mDims->Release();
   mAttrs.Release();
   mAnnotations.Release();
+  mAsTypes.Release();
 }
 
 void IdentifierNode::Dump(unsigned indent) {
