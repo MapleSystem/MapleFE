@@ -1419,7 +1419,12 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *appeal) {
     if (!is_zeroxxx)
       prev_succ_tokens.Clear();
 
-    if (found_subtable) {
+    // is_zeroxxx seems redundant because the traversal should always be true.
+    // However, it's not true. In mLineMode, mEndOfFile could be set before
+    // traversing this ZEROORXXX table. It will return false.
+    // Since we do treat this case as success, so is_zeroxxx is included in this
+    // condition expression.
+    if (found_subtable || is_zeroxxx) {
       for (unsigned id = 0; id < subtable_succ_tokens.GetNum(); id++) {
         unsigned token = subtable_succ_tokens.ValueAtIndex(id);
         if (!prev_succ_tokens.Find(token))
