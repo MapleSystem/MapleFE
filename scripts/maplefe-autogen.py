@@ -868,6 +868,7 @@ public:
 std::string {gen_args2}(const char *title);
 std::string Clean(std::string &s);
 std::string GetBaseFileName();
+std::string GetModuleName(const char *p = nullptr);
 
 ModuleNode *GetASTModule() {{ return mASTModule; }}
 void SetASTModule(ModuleNode *m) {{ mASTModule = m; }}

@@ -325,6 +325,35 @@ std::string Emitter::EmitTerOperatorNode(TerOperatorNode *node) {
   return str;
 }
 
+std::string Emitter::EmitAsTypeNode(AsTypeNode *node) {
+  if (node == nullptr)
+    return std::string();
+  std::string str;
+  if (auto n = node->GetType()) {
+    str += " as "s + EmitTreeNode(n);
+  }
+  mPrecedence = '\030';
+  if (node->IsStmt())
+    str += ";\n"s;
+  return str;
+}
+
+std::string Emitter::EmitTypeParameterNode(TypeParameterNode *node) {
+  if (node == nullptr)
+    return std::string();
+  std::string str;
+  if (auto n = node->GetId()) {
+    str += " "s + EmitTreeNode(n);
+  }
+  if (auto n = node->GetDefault()) {
+    str += " "s + EmitTreeNode(n);
+  }
+  mPrecedence = '\030';
+  if (node->IsStmt())
+    str += ";\n"s;
+  return str;
+}
+
 std::string Emitter::EmitBlockNode(BlockNode *node) {
   if (node == nullptr)
     return std::string();
@@ -423,6 +452,11 @@ std::string Emitter::EmitIdentifierNode(IdentifierNode *node) {
   }
   if (auto n = node->GetInit()) {
     str += " = "s + EmitTreeNode(n);
+  }
+  for (unsigned i = 0; i < node->GetAsTypesNum(); ++i) {
+    if (auto n = node->GetAsTypeAtIndex(i)) {
+      str += " "s + EmitAsTypeNode(n);
+    }
   }
   mPrecedence = '\030';
   if (node->IsStmt())
@@ -1528,6 +1562,12 @@ std::string Emitter::EmitTreeNode(TreeNode *node) {
     break;
   case NK_UserType:
     return EmitUserTypeNode(static_cast<UserTypeNode *>(node));
+    break;
+  case NK_TypeParameter:
+    return EmitTypeParameterNode(static_cast<TypeParameterNode *>(node));
+    break;
+  case NK_AsType:
+    return EmitAsTypeNode(static_cast<AsTypeNode *>(node));
     break;
   case NK_Cast:
     return EmitCastNode(static_cast<CastNode *>(node));
