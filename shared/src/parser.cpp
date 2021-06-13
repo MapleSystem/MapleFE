@@ -1032,9 +1032,10 @@ bool Parser::TraverseRuleTableRegular(RuleTable *rule_table, AppealNode *appeal)
     // function will be used in multiple places where we cannot merge.
     AppealNode *child = NULL;
     matched = TraverseTableData(rule_table->mData, appeal, child);
-    child->SetChildIndex(0);
-    if (child)
+    if (child) {
+      child->SetChildIndex(0);
       appeal->CopyMatch(child);
+    }
     break;
   }
   case ET_Null:
