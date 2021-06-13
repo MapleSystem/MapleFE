@@ -177,7 +177,8 @@ public:
                 mResult = AppealStatus_NA; mSimplifiedIndex = 0; mIsTable = true;
                 mStartIndex = 0; mSorted = false; mFinalMatch = 0;
                 m1stAltTokenMatched = false; mAltToken = NULL;
-                mIsPseudo = false; mAstTreeNode = NULL; mAstCreated = false;}
+                mIsPseudo = false; mAstTreeNode = NULL; mAstCreated = false;
+                mChildIndex = 0xFFFF;}
   ~AppealNode(){mMatches.Release();}
 
   void AddChild(AppealNode *n) { mChildren.push_back(n); }
