@@ -88,6 +88,7 @@ private:
   // SmallVector<AppealNode*> mSecondParents;
 
   unsigned     mStartIndex;       // index of start matching token
+  unsigned     mChildIndex;       // index as a child of parent rule table.
   bool         mSorted;           // already sorted out?
   bool         mIsPseudo;         // A pseudo node, mainly used for sub trees connection
                                   // It has no real program meaning, but can be used
@@ -108,8 +109,10 @@ public:
   void        SetParent(AppealNode *n) {mParent = n;}
   void        AddParent(AppealNode *n);
 
-  unsigned GetStartIndex()      {return mStartIndex;}
-  void SetStartIndex(unsigned i){mStartIndex = i;}
+  unsigned GetStartIndex()          {return mStartIndex;}
+  void     SetStartIndex(unsigned i){mStartIndex = i;}
+  unsigned GetChildIndex()          {return mChildIndex;}
+  void     SetChildIndex(unsigned i){mChildIndex = i;}
 
   bool IsPseudo()   {return mIsPseudo;}
   void SetIsPseudo(){mIsPseudo = true;}
@@ -185,7 +188,7 @@ public:
   void AddSortedChild(AppealNode *n) { mSortedChildren.push_back(n); }
   bool GetSortedChildIndex(AppealNode*, unsigned &);
   AppealNode* GetSortedChildByIndex(unsigned idx);
-  AppealNode* FindSpecChild(TableData *tdata, unsigned match);
+  AppealNode* FindIndexedChild(unsigned match, unsigned index);
 
   bool IsSucc() { return (mResult == Succ) ||
                          (mResult == SuccWasSucc) ||

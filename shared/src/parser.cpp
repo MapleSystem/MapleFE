@@ -983,7 +983,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent, Appeal
 //   1. TraverseIdentifier, TraverseLiteral, TraverseOneof, TraverseZeroorXXx, etc
 //      since we konw the relation between parent and children
 //   2. Or TraverseTableData in this function, because we know the relation.
-//   3. When TraverseRuleTable check was succ. Because we know the relation.
+//   3. When TraverseRuleTable pre-check was succ. Because we know the relation.
 // These are the only places of colleting succ match for a parent node.
 //
 
@@ -1032,6 +1032,7 @@ bool Parser::TraverseRuleTableRegular(RuleTable *rule_table, AppealNode *appeal)
     // function will be used in multiple places where we cannot merge.
     AppealNode *child = NULL;
     matched = TraverseTableData(rule_table->mData, appeal, child);
+    child->SetChildIndex(0);
     if (child)
       appeal->CopyMatch(child);
     break;
@@ -1401,6 +1402,8 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *appeal) {
 
       AppealNode *child = NULL;
       bool temp_found = TraverseTableData(data, appeal, child);
+      if (child)
+        child->SetChildIndex(i);
       found_subtable |= temp_found;
 
       if (temp_found && child) {
@@ -1892,7 +1895,7 @@ void Parser::SortOutConcatenate(AppealNode *parent) {
   SmallVector<AppealNode*> sorted_children;
   for (int i = rule_table->mNum - 1; i >= 0; i--) {
     TableData *data = rule_table->mData + i;
-    AppealNode *child = parent->FindSpecChild(data, last_match);
+    AppealNode *child = parent->FindIndexedChild(last_match, i);
     // It's possible that we find NO child if 'data' is a ZEROORxxx table
     bool good_child = false;
     if (!child) {
@@ -2806,43 +2809,19 @@ AppealNode* AppealNode::GetSortedChildByIndex(unsigned index) {
   return NULL;
 }
 
-// Look for a specific un-sorted child having the ruletable/token and match.
-// There could be multiple, but we return the first good one.
-AppealNode* AppealNode::FindSpecChild(TableData *tdata, unsigned match) {
+// Look for a specific un-sorted child having the child index and match.
+AppealNode* AppealNode::FindIndexedChild(unsigned match, unsigned index) {
   AppealNode *ret_child = NULL;
-
   std::vector<AppealNode*>::iterator it = mChildren.begin();
   for (; it != mChildren.end(); it++) {
     AppealNode *child = *it;
-    if (child->IsSucc() && child->FindMatch(match)) {
-      switch (tdata->mType) {
-      case DT_Subtable: {
-        RuleTable *child_rule = tdata->mData.mEntry;
-        if (child->IsTable() && child->GetTable() == child_rule)
-          ret_child = child;
-        // Literal and Identifier are treated as token.
-        if (child->IsToken() &&
-            (child_rule == &TblLiteral || child_rule == &TblIdentifier || child_rule == &TblTemplateLiteral))
-          ret_child = child;
-        break;
-      }
-      case DT_Token: {
-        Token *token = &gSystemTokens[tdata->mData.mTokenId];
-        if ( child->IsToken() &&
-             ((child->GetToken() == token) || (child->mAltToken == token)))
-          ret_child = child;
-        break;
-      }
-      case DT_Char:
-      case DT_String:
-      case DT_Type:
-      case DT_Null:
-      default:
-        break;
-      }
+    if (child->IsSucc() &&
+        child->FindMatch(match) &&
+        (index == child->GetChildIndex())) {
+      ret_child = child;
+      break;
     }
   }
-
   return ret_child;
 }
 
