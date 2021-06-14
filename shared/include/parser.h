@@ -88,7 +88,7 @@ private:
   // SmallVector<AppealNode*> mSecondParents;
 
   unsigned     mStartIndex;       // index of start matching token
-  unsigned     mChildIndex;       // index as a child of parent rule table.
+  unsigned     mChildIndex;       // index as a child in the parent rule table.
   bool         mSorted;           // already sorted out?
   bool         mIsPseudo;         // A pseudo node, mainly used for sub trees connection
                                   // It has no real program meaning, but can be used
@@ -142,6 +142,10 @@ public:
                                   // connect to a new 'parent' node, replacing its ancestor.
                                   // To make AST building work, it needs to inherit ancestor's
                                   // index in the rule table.
+                                  // [NOTE] This field starts to work in the AST building phase,
+                                  //        and this index is the one in the rule actions and
+                                  //        it starts from 1. So the initial value is set to 0
+                                  //        which means useless.
 
 public:
   union {

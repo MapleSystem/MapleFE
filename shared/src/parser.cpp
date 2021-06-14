@@ -2236,9 +2236,7 @@ AppealNode* Parser::SimplifyShrinkEdges(AppealNode *node) {
     bool skip = false;
     RuleTable *rt_p = node->GetTable();
     RuleTable *rt_c = child->GetTable();
-    if (rt_p == rt_c &&
-        mRecursionAll.IsLeadNode(rt_p) &&
-        child->GetChildIndex() == 0xFFFF)
+    if (rt_p == rt_c && mRecursionAll.IsLeadNode(rt_p))
       skip = true;
 
     unsigned child_index;
