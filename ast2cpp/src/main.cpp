@@ -67,7 +67,6 @@ int main (int argc, char *argv[]) {
   }
 
   maplefe::AST_Handler handler(trace_a2c);
-  const char *name0 = nullptr;
   for (auto astfile: inputfiles) {
     std::ifstream input(astfile, std::ifstream::binary);
     // get length of file:
@@ -82,17 +81,7 @@ int main (int argc, char *argv[]) {
     maplefe::ModuleNode *mod = loadAst.LoadFromAstBuf(vec);
     // add mod to the vector
     handler.AddModule(mod);
-    if (!name0) {
-      name0 = mod->GetFileName();
-    }
   }
-
-  if (!outputname) {
-    std::string str(name0);
-    str += ".cpp";
-    outputname = strdup(str.c_str());
-  }
-  handler.SetOutputFileName(outputname);
 
   maplefe::A2C *a2c = new maplefe::A2C(&handler, trace_a2c);
   a2c->ProcessAST();

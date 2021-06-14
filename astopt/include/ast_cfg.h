@@ -61,7 +61,7 @@ inline BBAttribute operator&(BBAttribute x, BBAttribute y) {
 }
 
 using BBIndex = unsigned;
-class AST_Handler;
+class Module_Handler;
 class AST_AST;
 
 class AstBasicBlock {
@@ -178,12 +178,12 @@ class AstFunction {
 
 class AST_CFG {
  private:
-  AST_Handler  *mHandler;
+  Module_Handler  *mHandler;
   bool          mTrace;
   unsigned      mBlockNum;
 
  public:
-  explicit AST_CFG(AST_Handler *h, bool t) : mHandler(h), mTrace(t) {}
+  explicit AST_CFG(Module_Handler *h, bool t) : mHandler(h), mTrace(t) {}
   ~AST_CFG() {}
 
   void Build();
@@ -196,7 +196,7 @@ class CfgBuilder : public AstVisitor {
   using TargetBBStack = std::vector<TargetBB>;
 
  private:
-  AST_Handler   *mHandler;
+  Module_Handler   *mHandler;
   bool           mTrace;
 
   AstFunction   *mCurrentFunction;
@@ -207,7 +207,7 @@ class CfgBuilder : public AstVisitor {
   TargetBBStack  mThrowBBs;
 
  public:
-  explicit CfgBuilder(AST_Handler *h, bool t, bool base = false)
+  explicit CfgBuilder(Module_Handler *h, bool t, bool base = false)
     : mHandler(h), mTrace(t), AstVisitor(t && base) {}
   ~CfgBuilder() = default;
 

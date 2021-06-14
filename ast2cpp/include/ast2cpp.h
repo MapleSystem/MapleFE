@@ -21,13 +21,14 @@
 #define __AST2CPP_HEADER__
 
 #include "astopt.h"
+#include "ast_handler.h"
 
 namespace maplefe {
 
 class A2C : public AstOpt {
 private:
   AST_Handler *mASTHandler;
-  bool         mTraceA2C;
+  bool            mTraceA2C;
 
 public:
   explicit A2C(AST_Handler *h, bool trace) : AstOpt(h, trace), mASTHandler(h), mTraceA2C(trace) {}

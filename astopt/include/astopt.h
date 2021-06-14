@@ -36,17 +36,15 @@ class AST_Handler;
 class AstOpt {
 private:
   AST_Handler *mASTHandler;
-  ModuleNode  *mModule;
   bool         mTraceAstOpt;
   unsigned     mUniqNum;
 
 public:
   explicit AstOpt(AST_Handler *h, bool trace) :
-    mASTHandler(h), mModule(NULL), mTraceAstOpt(trace) {}
+    mASTHandler(h), mTraceAstOpt(trace) {}
   ~AstOpt() = default;
 
   AST_Handler *GetASTHandler() {return mASTHandler;}
-  void SetModule(ModuleNode *mod) { mModule = mod; }
   void ProcessAST(bool trace_opt);
 };
 

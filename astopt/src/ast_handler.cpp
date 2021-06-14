@@ -22,35 +22,41 @@
 
 namespace maplefe {
 
-void AST_Handler::BuildCFG() {
+void AST_Handler::AddModule(ModuleNode *m) {
+  Module_Handler *handler = new(mMemPool.Alloc(sizeof(Module_Handler))) Module_Handler(mTrace);
+  handler->SetASTModule(m);
+  mModuleHandlers.PushBack(handler);
+}
+
+void Module_Handler::BuildCFG() {
   if (!mCFG) {
     mCFG = new(mMemPool.Alloc(sizeof(AST_CFG))) AST_CFG(this, mTrace);
   }
   mCFG->Build();
 }
 
-void AST_Handler::AdjustAST() {
+void Module_Handler::AdjustAST() {
   if (!mAST) {
     mAST = new(mMemPool.Alloc(sizeof(AST_AST))) AST_AST(this, mTrace);
   }
   mAST->AdjustAST();
 }
 
-void AST_Handler::ASTCollectAndDBRemoval(AstFunction *func) {
+void Module_Handler::ASTCollectAndDBRemoval(AstFunction *func) {
   if (!mAST) {
     mAST = new(mMemPool.Alloc(sizeof(AST_AST))) AST_AST(this, mTrace);
   }
   mAST->ASTCollectAndDBRemoval(func);
 }
 
-void AST_Handler::BuildDFA(AstFunction *func) {
+void Module_Handler::BuildDFA(AstFunction *func) {
   if (!mDFA) {
     mDFA = new(mMemPool.Alloc(sizeof(AST_DFA))) AST_DFA(this, mTrace);
   }
   mDFA->Build(func);
 }
 
-void AST_Handler::Dump(char *msg) {
+void Module_Handler::Dump(char *msg) {
   std::cout << std::endl << msg << ":" << std::endl;
   AstFunction *func = GetFunction();
   func->Dump();

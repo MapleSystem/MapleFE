@@ -35,7 +35,7 @@ class AST_AST;
 class AST_DFA;
 
 // Each source file is a module
-class AST_Handler {
+class Module_Handler {
  private:
   MemPool       mMemPool;    // Memory pool for all AstFunction and AstBasicBlock
   ModuleNode   *mASTModule;  // for an AST module
@@ -48,21 +48,19 @@ class AST_Handler {
   std::unordered_map<unsigned, AstBasicBlock *> mNodeId2BbMap;
 
  public:
-  // vector of all AST modules
-  SmallVector<ModuleNode *> mASTModules;
   // module node id to its ast function vector
   std::unordered_map<unsigned, std::vector<AstFunction *>> mModuleFuncsMap;
   // only reachable BBs
   std::unordered_map<unsigned, AstBasicBlock *> mBbId2BbMap;
 
  public:
-  explicit AST_Handler(bool trace) :
+  explicit Module_Handler(bool trace) :
     mFunction(nullptr),
     mCFG(nullptr),
     mAST(nullptr),
     mDFA(nullptr),
     mTrace(trace) {}
-  ~AST_Handler() {mMemPool.Release();}
+  ~Module_Handler() {mMemPool.Release();}
 
   void AdjustAST();
   void BuildCFG();
@@ -73,8 +71,6 @@ class AST_Handler {
   void SetOutputFileName(const char *name) {mOutputFileName = name;}
   void SetASTModule(ModuleNode *mod) {mASTModule = mod;}
   ModuleNode *GetASTModule() {return mASTModule;}
-
-  void AddModule(ModuleNode *mod) {mASTModules.PushBack(mod);}
 
   MemPool *GetMemPool() {return &mMemPool;}
 
@@ -97,5 +93,20 @@ class AST_Handler {
 
   void Dump(char *msg);
 };
+
+class AST_Handler {
+ private:
+  MemPool mMemPool;    // Memory pool for all AstFunction and AstBasicBlock
+  bool    mTrace;
+ public:
+  // vector of all AST modules
+  SmallVector<Module_Handler *> mModuleHandlers;
+
+  explicit AST_Handler(bool trace) : mTrace(trace) {}
+  ~AST_Handler() {mMemPool.Release();}
+  // Create an object of Module_Handler and set it for module m
+  void AddModule(ModuleNode *m);
+};
+
 }
 #endif

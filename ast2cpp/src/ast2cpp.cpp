@@ -32,11 +32,11 @@ namespace maplefe {
 // starting point of AST
 void A2C::ProcessAST() {
   // loop through modules
-  unsigned size = mASTHandler->mASTModules.GetNum();
+  unsigned size = mASTHandler->mModuleHandlers.GetNum();
   for (int i = 0; i < size; i++) {
-    // set gModule
-    gModule = mASTHandler->mASTModules.ValueAtIndex(i);
-    mASTHandler->SetASTModule(gModule);
+    // get gModule
+    Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
+    gModule = handler->GetASTModule();
 
     if (mTraceA2C) {
       std::cout << "============= in ProcessAST ===========" << std::endl;
@@ -57,7 +57,7 @@ void A2C::ProcessAST() {
       graph.DumpGraph("After LoadFromAstBuf()", &std::cout);
     }
 
-    mASTHandler->AdjustAST();
+    handler->AdjustAST();
     if (mTraceA2C) {
       std::cout << "============= After AdjustAST ===========" << std::endl;
       for(unsigned i = 0; i < gModule->GetTreesNum(); i++) {
@@ -71,9 +71,9 @@ void A2C::ProcessAST() {
       graph.DumpGraph("After AdjustAST()", &std::cout);
     }
 
-    mASTHandler->BuildCFG();
+    handler->BuildCFG();
     if (mTraceA2C) {
-      mASTHandler->Dump("After mASTHandler->BuildCFG()");
+      handler->Dump("After BuildCFG()");
     }
 
     if (mTraceA2C) {
@@ -89,24 +89,25 @@ void A2C::ProcessAST() {
     }
 
     // loop through functions in the module
-    for (auto func: mASTHandler->mModuleFuncsMap[gModule->GetNodeId()]) {
-      mASTHandler->ASTCollectAndDBRemoval(func);
+    for (auto func: handler->mModuleFuncsMap[gModule->GetNodeId()]) {
+      handler->ASTCollectAndDBRemoval(func);
       if (mTraceA2C) {
-        mASTHandler->Dump("After mASTHandler->ASTCollectAndDBRemoval()");
+        handler->Dump("After ASTCollectAndDBRemoval()");
       }
 
-      mASTHandler->BuildDFA(func);
+      handler->BuildDFA(func);
       if (mTraceA2C) {
-        // mASTHandler->Dump("After mASTHandler->BuildDFA()");
+        // handler->Dump("After BuildDFA()");
       }
     }
   }
 
   if (mTraceA2C) {
     std::cout << "============= Emitter ===========" << std::endl;
-    unsigned size = mASTHandler->mASTModules.GetNum();
+    unsigned size = mASTHandler->mModuleHandlers.GetNum();
     for (int i = 0; i < size; i++) {
-      ModuleNode *module = mASTHandler->mASTModules.ValueAtIndex(i);
+      Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
+      ModuleNode *module = handler->GetASTModule();
       maplefe::Emitter emitter(module);
       std::string code = emitter.Emit("Convert AST to TypeScript code");
       std::cout << code;

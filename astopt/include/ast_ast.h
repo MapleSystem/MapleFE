@@ -27,12 +27,12 @@ namespace maplefe {
 
 class AST_AST {
  private:
-  AST_Handler  *mHandler;
+  Module_Handler  *mHandler;
   bool          mTrace;
   std::unordered_set<unsigned> mReachableBbIdx;;
 
  public:
-  explicit AST_AST(AST_Handler *h, bool t) : mHandler(h), mTrace(t) {}
+  explicit AST_AST(Module_Handler *h, bool t) : mHandler(h), mTrace(t) {}
   ~AST_AST() {}
 
   void AdjustAST();
@@ -44,14 +44,14 @@ class AST_AST {
 
 class AdjustASTVisitor : public AstVisitor {
  private:
-  AST_Handler  *mHandler;
+  Module_Handler  *mHandler;
   bool          mTrace;
   bool          mUpdated;
 
   AstBasicBlock *mCurrentBB;
 
  public:
-  explicit AdjustASTVisitor(AST_Handler *h, bool t, bool base = false)
+  explicit AdjustASTVisitor(Module_Handler *h, bool t, bool base = false)
     : mHandler(h), mTrace(t), AstVisitor(t && base) {}
   ~AdjustASTVisitor() = default;
 

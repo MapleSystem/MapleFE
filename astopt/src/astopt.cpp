@@ -25,11 +25,12 @@ namespace maplefe {
 // starting point of AST
 void AstOpt::ProcessAST(bool trace_a2c) {
   // loop through modules
-  unsigned size = mASTHandler->mASTModules.GetNum();
+  unsigned size = mASTHandler->mModuleHandlers.GetNum();
   for (int i = 0; i < size; i++) {
     // set gModule
-    gModule = mASTHandler->mASTModules.ValueAtIndex(i);
-    mASTHandler->SetASTModule(gModule);
+    Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
+    gModule = handler->GetASTModule();
+    handler->SetASTModule(gModule);
 
     mTraceAstOpt = trace_a2c;
     if (mTraceAstOpt) {
@@ -45,16 +46,16 @@ void AstOpt::ProcessAST(bool trace_a2c) {
     }
 
     // adjust source code
-    mASTHandler->AdjustAST();
+    handler->AdjustAST();
 
     // build CFG
-    mASTHandler->BuildCFG();
+    handler->BuildCFG();
 
     // loop through functions in the module
-    for (auto func: mASTHandler->mModuleFuncsMap[gModule->GetNodeId()]) {
-      mASTHandler->ASTCollectAndDBRemoval(func);
+    for (auto func: handler->mModuleFuncsMap[gModule->GetNodeId()]) {
+      handler->ASTCollectAndDBRemoval(func);
 
-      mASTHandler->BuildDFA(func);
+      handler->BuildDFA(func);
     }
 
     AstStore saveAst(gModule);

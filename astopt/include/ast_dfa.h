@@ -35,7 +35,7 @@ typedef std::unordered_map<unsigned, BitVector*> BVMap;
 
 class AST_DFA {
  private:
-  AST_Handler  *mHandler;
+  Module_Handler  *mHandler;
   bool          mTrace;
   std::unordered_map<unsigned, unsigned> mVar2DeclMap; // var to decl, both NodeId
 
@@ -73,7 +73,7 @@ class AST_DFA {
   friend class CollectUseVisitor;
 
  public:
-  explicit AST_DFA(AST_Handler *h, bool t) : mHandler(h), mTrace(t) {}
+  explicit AST_DFA(Module_Handler *h, bool t) : mHandler(h), mTrace(t) {}
   ~AST_DFA();
 
   void Build(AstFunction *func);
@@ -108,14 +108,14 @@ class AST_DFA {
 
 class CollectUseVisitor : public AstVisitor {
  private:
-  AST_Handler  *mHandler;
+  Module_Handler  *mHandler;
   AST_DFA      *mDFA;
   bool          mTrace;
   unsigned      mStmtIdx;
   unsigned      mBbId;
 
  public:
-  explicit CollectUseVisitor(AST_Handler *h, bool t, bool base = false)
+  explicit CollectUseVisitor(Module_Handler *h, bool t, bool base = false)
     : mHandler(h), mDFA(h->GetDFA()), mTrace(t), AstVisitor(t && base) {}
   ~CollectUseVisitor() = default;
 
