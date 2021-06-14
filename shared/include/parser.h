@@ -178,7 +178,7 @@ public:
                 mStartIndex = 0; mSorted = false; mFinalMatch = 0;
                 m1stAltTokenMatched = false; mAltToken = NULL;
                 mIsPseudo = false; mAstTreeNode = NULL; mAstCreated = false;
-                mChildIndex = 0xFFFF;}
+                mChildIndex = 0;}
   ~AppealNode(){mMatches.Release();}
 
   void AddChild(AppealNode *n) { mChildren.push_back(n); }
