@@ -2741,60 +2741,8 @@ bool AppealNode::GetSortedChildIndex(AppealNode *child, unsigned &index) {
     return true;
   }
 
-  // If the edge is not shrinked, we just look into the rule tabls or tokens.
-  for (unsigned i = 0; i < rule_table->mNum; i++) {
-    TableData *data = rule_table->mData + i;
-    switch (data->mType) {
-    case DT_Token: {
-      Token *t = &gSystemTokens[data->mData.mTokenId];
-      if (child->IsToken() && child->GetToken() == t) {
-        found = true;
-        index = i+1;
-      }
-      break;
-    }
-    case DT_Subtable: {
-      RuleTable *t = data->mData.mEntry;
-      if (t == &TblIdentifier) {
-        if (child->IsToken()) {
-          Token *token = child->GetToken();
-          if (token->IsIdentifier()) {
-            found = true;
-            index = i+1;
-          }
-        }
-      } else if (t == &TblLiteral) {
-        if (child->IsToken()) {
-          Token *token = child->GetToken();
-          if (token->IsLiteral()) {
-            found = true;
-            index = i+1;
-          }
-        }
-      } else if (t == &TblTemplateLiteral) {
-        if (child->IsToken()) {
-          Token *token = child->GetToken();
-          if (token->IsTempLit()) {
-            found = true;
-            index = i+1;
-          }
-        }
-      } else if (child->IsTable() && child->GetTable() == t) {
-        found = true;
-        index = i+1;
-      }
-      break;
-    }
-    case DT_String:
-    case DT_Char:
-      break;
-    default:
-      MASSERT(0 && "Unknown entry in TableData");
-      break;
-    }
-  }
-
-  return found;
+  index = child->GetChildIndex() + 1;
+  return true;
 }
 
 AppealNode* AppealNode::GetSortedChildByIndex(unsigned index) {
