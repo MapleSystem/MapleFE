@@ -1997,12 +1997,9 @@ void Parser::DumpSortOutNode(AppealNode *n) {
   unsigned dump_id = to_be_dumped_id.front();
   to_be_dumped_id.pop_front();
 
-  if (n->mSimplifiedIndex > 0)
-    std::cout << "[" << dump_id << ":" << n->mSimplifiedIndex<< "] ";
-  else
-    std::cout << "[" << dump_id << "] ";
+  std::cout << "[" << dump_id << ":" << n->GetChildIndex() << "," << n->mSimplifiedIndex << "] ";
   if (n->IsToken()) {
-    std::cout << "Token" << std::endl;
+    n->mData.mToken->Dump();
   } else {
     RuleTable *t = n->GetTable();
     std::cout << "Table " << GetRuleTableName(t) << "@" << n->GetStartIndex() << ": ";
