@@ -60,7 +60,10 @@ rule KeywordIdentifier : ONEOF("get",
                                "constructor")
   attr.action : BuildIdentifier()
 
-rule JSIdentifier: ONEOF(Identifier, KeywordIdentifier)
+rule JSIdentifier: ONEOF(Identifier,
+                         KeywordIdentifier,
+                         Identifier + '!')
+  attr.action.%3 : SetIsNonNull(%1)
 
 rule AsType : "as" + PrimaryType
   attr.action : BuildAsType(%2)

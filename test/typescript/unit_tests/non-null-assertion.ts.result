@@ -1,0 +1,7 @@
+Matched 26 tokens.
+============= Module ===========
+== Sub Tree ==
+func  processEntity(e?)  throws: 
+  js_let Decl: s=e!.name
+  js_let Decl: t=e.name!
+

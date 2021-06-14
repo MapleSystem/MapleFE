@@ -696,6 +696,22 @@ TreeNode* ASTBuilder::SetIsOptional() {
   return mLastTreeNode;
 }
 
+// Takes one argument. Set the tree as a non null node.
+// We still return the previous mLastTreeNode.
+TreeNode* ASTBuilder::SetIsNonNull() {
+  if (mTrace)
+    std::cout << "In SetIsNonNull" << std::endl;
+
+  Param p_tree = mParams[0];
+  if (!p_tree.mIsEmpty) {
+    MASSERT(p_tree.mIsTreeNode);
+    TreeNode *treenode = p_tree.mData.mTreeNode;
+    treenode->SetIsNonNull();
+  }
+
+  return mLastTreeNode;
+}
+
 // Assignment is actually a binary operator.
 TreeNode* ASTBuilder::BuildAssignment() {
   if (mTrace)

@@ -155,6 +155,7 @@ ACTION(AddDimsTo)
 // Set a tree node as a statement, optional
 ACTION(SetIsStmt)
 ACTION(SetIsOptional)
+ACTION(SetIsNonNull)
 
 // statment, control flow
 ACTION(BuildAssignment)

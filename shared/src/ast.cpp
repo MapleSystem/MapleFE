@@ -519,6 +519,8 @@ void IdentifierNode::Dump(unsigned indent) {
   DUMP0_NORETURN(GetName());
   if (mOptionalParam)
     DUMP0_NORETURN('?');
+  if (IsNonNull())
+    DUMP0_NORETURN('!');
   if (mInit) {
     DUMP0_NORETURN('=');
     mInit->Dump(0);
