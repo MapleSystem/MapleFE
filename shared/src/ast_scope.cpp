@@ -14,6 +14,7 @@
 */
 
 #include "ast_scope.h"
+#include "gen_astdump.h"
 
 namespace maplefe {
 
@@ -117,4 +118,20 @@ ASTScope* ASTScopePool::NewScope(ASTScope *parent) {
   mScopes.push_back(s);
   return s;
 }
+
+void ASTScope::Dump(unsigned indent) {
+  mTree->DumpIndentation(indent);
+  std::cout << "name: " << AstDump::GetEnumNodeKind(mTree->GetKind()) << " " <<mTree->GetName() << std::endl;
+  for (unsigned i = 0; i < mDecls.GetNum(); i++) {
+    DeclNode *dn = static_cast<DeclNode *>(mDecls.ValueAtIndex(i));
+    dn->DumpIndentation(indent);
+    std::cout << "  decl: " << dn->GetName() << std::endl;
+  }
+
+  for (unsigned i = 0; i < mChildren.GetNum(); i++) {
+    ASTScope *scope = mChildren.ValueAtIndex(i);
+    scope->Dump(indent + 2);
+  }
+}
+
 }

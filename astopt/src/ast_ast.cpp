@@ -173,7 +173,8 @@ ExportNode *AdjustASTVisitor::VisitExportNode(ExportNode *node) {
 
 // if-then-else : use BlockNode for then and else bodies
 CondBranchNode *AdjustASTVisitor::VisitCondBranchNode(CondBranchNode *node) {
-  TreeNode *tn = VisitTreeNode(node->GetTrueBranch());
+  TreeNode *tn = VisitTreeNode(node->GetCond());
+  tn = VisitTreeNode(node->GetTrueBranch());
   if (tn && !tn->IsBlock()) {
     BlockNode *blk = (BlockNode*)gTreePool.NewTreeNode(sizeof(BlockNode));
     new (blk) BlockNode();
@@ -194,7 +195,12 @@ CondBranchNode *AdjustASTVisitor::VisitCondBranchNode(CondBranchNode *node) {
 
 // for : use BlockNode for body
 ForLoopNode *AdjustASTVisitor::VisitForLoopNode(ForLoopNode *node) {
-  TreeNode *tn = VisitTreeNode(node->GetBody());
+  TreeNode *tn = NULL;
+  for (int i = 0; i < node->GetInitsNum(); i++) {
+    tn = VisitTreeNode(node->GetInitAtIndex(i));
+  }
+  tn = VisitTreeNode(node->GetCond());
+  tn = VisitTreeNode(node->GetBody());
   if (tn && !tn->IsBlock()) {
     BlockNode *blk = (BlockNode*)gTreePool.NewTreeNode(sizeof(BlockNode));
     new (blk) BlockNode();

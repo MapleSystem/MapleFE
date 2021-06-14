@@ -76,6 +76,8 @@ void A2C::ProcessAST() {
       handler->Dump("After BuildCFG()");
     }
 
+    handler->BuildScope(gModule);
+
     if (mTraceA2C) {
       std::cout << "============= AstGraph ===========" << std::endl;
       AstGraph graph(gModule);
