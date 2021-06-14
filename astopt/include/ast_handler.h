@@ -52,6 +52,7 @@ class Module_Handler {
   std::unordered_map<unsigned, std::vector<AstFunction *>> mModuleFuncsMap;
   // only reachable BBs
   std::unordered_map<unsigned, AstBasicBlock *> mBbId2BbMap;
+  std::stack<ASTScope *> mScopeStack;
 
  public:
   explicit Module_Handler(bool trace) :
@@ -63,6 +64,7 @@ class Module_Handler {
   ~Module_Handler() {mMemPool.Release();}
 
   void AdjustAST();
+  void BuildScope(ModuleNode *mod);
   void BuildCFG();
   void ASTCollectAndDBRemoval(AstFunction *func);
   void BuildDFA(AstFunction *func);

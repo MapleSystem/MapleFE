@@ -56,6 +56,13 @@ void Module_Handler::BuildDFA(AstFunction *func) {
   mDFA->Build(func);
 }
 
+void Module_Handler::BuildScope(ModuleNode *mod) {
+  if (!mDFA) {
+    mDFA = new(mMemPool.Alloc(sizeof(AST_DFA))) AST_DFA(this, mTrace);
+  }
+  mDFA->BuildScope(mod);
+}
+
 void Module_Handler::Dump(char *msg) {
   std::cout << std::endl << msg << ":" << std::endl;
   AstFunction *func = GetFunction();

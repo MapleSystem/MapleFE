@@ -483,4 +483,98 @@ IdentifierNode *CollectUseVisitor::VisitIdentifierNode(IdentifierNode *node) {
   return node;
 }
 
+void AST_DFA::BuildScope(ModuleNode *mod) {
+  if (mTrace) std::cout << "============== BuildScope ==============" << std::endl;
+  BuildScopeVisitor visitor(mHandler, mTrace, true);
+  while(!mHandler->mScopeStack.empty()) {
+    mHandler->mScopeStack.pop();
+  }
+  mHandler->mScopeStack.push(mod->GetRootScope());
+
+  for(unsigned i = 0; i < mod->GetTreesNum(); i++) {
+    TreeNode *it = mod->GetTree(i);
+    visitor.Visit(it);
+  }
+
+  if (mTrace) std::cout << "============== Dump Scope ==============" << std::endl;
+  if (mTrace) mod->GetRootScope()->Dump(0);
+}
+
+BlockNode *BuildScopeVisitor::VisitBlockNode(BlockNode *node) {
+  ASTScope *parent = mHandler->mScopeStack.top();
+  ASTScope *scope = mModule->NewScope(parent);
+  scope->SetTree(node);
+  parent->AddChild(scope);
+
+  mHandler->mScopeStack.push(scope);
+
+  AstVisitor::VisitBlockNode(node);
+
+  mHandler->mScopeStack.pop();
+  return node;
+}
+
+FunctionNode *BuildScopeVisitor::VisitFunctionNode(FunctionNode *node) {
+  ASTScope *parent = mHandler->mScopeStack.top();
+  ASTScope *scope = mModule->NewScope(parent);
+  scope->SetTree(node);
+  parent->AddChild(scope);
+
+  mHandler->mScopeStack.push(scope);
+
+  AstVisitor::VisitFunctionNode(node);
+
+  mHandler->mScopeStack.pop();
+  return node;
+}
+
+LambdaNode *BuildScopeVisitor::VisitLambdaNode(LambdaNode *node) {
+  ASTScope *parent = mHandler->mScopeStack.top();
+  ASTScope *scope = mModule->NewScope(parent);
+  scope->SetTree(node);
+  parent->AddChild(scope);
+
+  mHandler->mScopeStack.push(scope);
+
+  AstVisitor::VisitLambdaNode(node);
+
+  mHandler->mScopeStack.pop();
+  return node;
+}
+
+ClassNode *BuildScopeVisitor::VisitClassNode(ClassNode *node) {
+  ASTScope *parent = mHandler->mScopeStack.top();
+  ASTScope *scope = mModule->NewScope(parent);
+  scope->SetTree(node);
+  parent->AddChild(scope);
+
+  mHandler->mScopeStack.push(scope);
+
+  AstVisitor::VisitClassNode(node);
+
+  mHandler->mScopeStack.pop();
+  return node;
+}
+
+InterfaceNode *BuildScopeVisitor::VisitInterfaceNode(InterfaceNode *node) {
+  ASTScope *parent = mHandler->mScopeStack.top();
+  ASTScope *scope = mModule->NewScope(parent);
+  scope->SetTree(node);
+  parent->AddChild(scope);
+
+  mHandler->mScopeStack.push(scope);
+
+  AstVisitor::VisitInterfaceNode(node);
+
+  mHandler->mScopeStack.pop();
+  return node;
+}
+
+DeclNode *BuildScopeVisitor::VisitDeclNode(DeclNode *node) {
+  ASTScope *parent = mHandler->mScopeStack.top();
+  AstVisitor::VisitDeclNode(node);
+  parent->AddDecl(node);
+  return node;
+}
+
 }

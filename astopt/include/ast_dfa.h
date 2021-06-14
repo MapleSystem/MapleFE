@@ -77,6 +77,7 @@ class AST_DFA {
   ~AST_DFA();
 
   void Build(AstFunction *func);
+  void BuildScope(ModuleNode *mod);
 
   void CollectDefNodes(AstFunction *func);
   void CollectUseNodes();
@@ -123,6 +124,27 @@ class CollectUseVisitor : public AstVisitor {
   void SetBbId(unsigned id)    { mBbId    = id; }
 
   IdentifierNode *VisitIdentifierNode(IdentifierNode *node);
+};
+
+class BuildScopeVisitor : public AstVisitor {
+ private:
+  Module_Handler  *mHandler;
+  ModuleNode   *mModule;
+  bool          mTrace;
+
+ public:
+  explicit BuildScopeVisitor(Module_Handler *h, bool t, bool base = false)
+    : mHandler(h), mTrace(t), AstVisitor(t && base) {
+      mModule = mHandler->GetASTModule();
+    }
+  ~BuildScopeVisitor() = default;
+
+  BlockNode *VisitBlockNode(BlockNode *node);
+  FunctionNode *VisitFunctionNode(FunctionNode *node);
+  LambdaNode *VisitLambdaNode(LambdaNode *node);
+  ClassNode *VisitClassNode(ClassNode *node);
+  InterfaceNode *VisitInterfaceNode(InterfaceNode *node);
+  DeclNode *VisitDeclNode(DeclNode *node);
 };
 
 }

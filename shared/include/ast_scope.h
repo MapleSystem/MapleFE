@@ -78,6 +78,8 @@ public:
   void TryAddDecl(TreeNode *n);
   void TryAddType(TreeNode *n);
 
+  void Dump(unsigned indent = 0);
+
   virtual void Release();
 };
 
