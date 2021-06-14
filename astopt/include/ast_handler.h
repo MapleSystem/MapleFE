@@ -33,11 +33,12 @@ class AstFunction;
 class AST_CFG;
 class AST_AST;
 class AST_DFA;
+class AST_Handler;
 
 // Each source file is a module
 class Module_Handler {
  private:
-  MemPool       mMemPool;    // Memory pool for all AstFunction and AstBasicBlock
+  AST_Handler  *mASTHandler;
   ModuleNode   *mASTModule;  // for an AST module
   AstFunction  *mFunction;   // an init function for statements in module scope
   AST_CFG      *mCFG;
@@ -61,7 +62,7 @@ class Module_Handler {
     mAST(nullptr),
     mDFA(nullptr),
     mTrace(trace) {}
-  ~Module_Handler() {mMemPool.Release();}
+  ~Module_Handler() {}
 
   void AdjustAST();
   void BuildScope(ModuleNode *mod);
@@ -71,10 +72,14 @@ class Module_Handler {
 
   const char *GetOutputFileName() {return mOutputFileName;}
   void SetOutputFileName(const char *name) {mOutputFileName = name;}
+
+  void SetASTHandler(AST_Handler *h) {mASTHandler = h;}
+  AST_Handler *GetASTHandler() {return mASTHandler;}
+
   void SetASTModule(ModuleNode *mod) {mASTModule = mod;}
   ModuleNode *GetASTModule() {return mASTModule;}
 
-  MemPool *GetMemPool() {return &mMemPool;}
+  MemPool *GetMemPool();
 
   void         SetFunction(AstFunction *func)  {mFunction = func;}
   AstFunction *GetFunction()                   {return mFunction;}
@@ -98,7 +103,7 @@ class Module_Handler {
 
 class AST_Handler {
  private:
-  MemPool mMemPool;    // Memory pool for all AstFunction and AstBasicBlock
+  MemPool mMemPool;    // Memory pool for all AstFunction, AstBasicBlock, etc.
   bool    mTrace;
  public:
   // vector of all AST modules
@@ -106,6 +111,8 @@ class AST_Handler {
 
   explicit AST_Handler(bool trace) : mTrace(trace) {}
   ~AST_Handler() {mMemPool.Release();}
+
+  MemPool *GetMemPool() {return &mMemPool;}
   // Create an object of Module_Handler and set it for module m
   void AddModule(ModuleNode *m);
 };

@@ -22,43 +22,48 @@
 
 namespace maplefe {
 
+MemPool *Module_Handler::GetMemPool() {
+  return mASTHandler->GetMemPool();
+}
+
 void AST_Handler::AddModule(ModuleNode *m) {
   Module_Handler *handler = new(mMemPool.Alloc(sizeof(Module_Handler))) Module_Handler(mTrace);
   handler->SetASTModule(m);
+  handler->SetASTHandler(this);
   mModuleHandlers.PushBack(handler);
 }
 
 void Module_Handler::BuildCFG() {
   if (!mCFG) {
-    mCFG = new(mMemPool.Alloc(sizeof(AST_CFG))) AST_CFG(this, mTrace);
+    mCFG = new(GetMemPool()->Alloc(sizeof(AST_CFG))) AST_CFG(this, mTrace);
   }
   mCFG->Build();
 }
 
 void Module_Handler::AdjustAST() {
   if (!mAST) {
-    mAST = new(mMemPool.Alloc(sizeof(AST_AST))) AST_AST(this, mTrace);
+    mAST = new(GetMemPool()->Alloc(sizeof(AST_AST))) AST_AST(this, mTrace);
   }
   mAST->AdjustAST();
 }
 
 void Module_Handler::ASTCollectAndDBRemoval(AstFunction *func) {
   if (!mAST) {
-    mAST = new(mMemPool.Alloc(sizeof(AST_AST))) AST_AST(this, mTrace);
+    mAST = new(GetMemPool()->Alloc(sizeof(AST_AST))) AST_AST(this, mTrace);
   }
   mAST->ASTCollectAndDBRemoval(func);
 }
 
 void Module_Handler::BuildDFA(AstFunction *func) {
   if (!mDFA) {
-    mDFA = new(mMemPool.Alloc(sizeof(AST_DFA))) AST_DFA(this, mTrace);
+    mDFA = new(GetMemPool()->Alloc(sizeof(AST_DFA))) AST_DFA(this, mTrace);
   }
   mDFA->Build(func);
 }
 
 void Module_Handler::BuildScope(ModuleNode *mod) {
   if (!mDFA) {
-    mDFA = new(mMemPool.Alloc(sizeof(AST_DFA))) AST_DFA(this, mTrace);
+    mDFA = new(GetMemPool()->Alloc(sizeof(AST_DFA))) AST_DFA(this, mTrace);
   }
   mDFA->BuildScope(mod);
 }
