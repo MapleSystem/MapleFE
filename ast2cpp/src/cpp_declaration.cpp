@@ -102,4 +102,24 @@ std::string CppDecl::EmitCallNode(CallNode *node) {
   return std::string();
 }
 
+std::string CppDecl::EmitCondBranchNode(CondBranchNode *node) {
+  return std::string();
+}
+
+std::string CppDecl::EmitForLoopNode(ForLoopNode *node) {
+  return std::string();
+}
+
+std::string CppDecl::EmitWhileLoopNode(WhileLoopNode *node) {
+  return std::string();
+}
+
+std::string CppDecl::EmitDoLoopNode(DoLoopNode *node) {
+  return std::string();
+}
+
+std::string CppDecl::EmitAssertNode(AssertNode *node) {
+  return std::string();
+}
+
 } // namespace maplefe

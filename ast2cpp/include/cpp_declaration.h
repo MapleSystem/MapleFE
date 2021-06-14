@@ -31,6 +31,11 @@ public:
   virtual std::string EmitBinOperatorNode(BinOperatorNode *node);
   virtual std::string EmitIdentifierNode(IdentifierNode *node);
   virtual std::string EmitDeclNode(DeclNode *node);
+  virtual std::string EmitCondBranchNode(CondBranchNode *node);
+  virtual std::string EmitForLoopNode(ForLoopNode *node);
+  virtual std::string EmitWhileLoopNode(WhileLoopNode *node);
+  virtual std::string EmitDoLoopNode(DoLoopNode *node);
+  virtual std::string EmitAssertNode(AssertNode *node);
   virtual std::string EmitCallNode(CallNode *node);
   virtual std::string EmitFunctionNode(FunctionNode *node);
   virtual std::string EmitPrimTypeNode(PrimTypeNode *node);
