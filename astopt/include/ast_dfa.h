@@ -133,6 +133,9 @@ class BuildScopeVisitor : public AstVisitor {
   bool          mTrace;
 
  public:
+  std::stack<ASTScope *> mScopeStack;
+
+ public:
   explicit BuildScopeVisitor(Module_Handler *h, bool t, bool base = false)
     : mHandler(h), mTrace(t), AstVisitor(t && base) {
       mModule = mHandler->GetASTModule();

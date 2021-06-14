@@ -36,30 +36,41 @@ void ASTScope::AddChild(ASTScope *s) {
   s->SetParent(this);
 }
 
-// We are using name address to decide if two names are equal, since we have a
-// string pool with any two equal strings will be at the same address.
+// This is to find the decl having the same name as 'inode'.
+// starting from local scope
 TreeNode* ASTScope::FindDeclOf(IdentifierNode *inode) {
-  for (unsigned i = 0; i < GetDeclNum(); i++) {
-    TreeNode *tree = GetDecl(i);
-    if (tree->IsIdentifier()) {
-      IdentifierNode *id = (IdentifierNode*)tree;
-      MASSERT(id->GetType() && "Identifier has no type?");
+  ASTScope *scope = this;
+  while (scope) {
+    for (unsigned i = 0; i < scope->GetDeclNum(); i++) {
+      TreeNode *tree = scope->GetDecl(i);
+      if (tree->IsIdentifier()) {
+        IdentifierNode *id = (IdentifierNode*)tree;
+        // MASSERT(id->GetType() && "Identifier has no type?");
+      }
+      if (tree->GetStrIdx() == inode->GetStrIdx()) {
+        return tree;
+      }
     }
-    if (tree->GetStrIdx() == inode->GetStrIdx())
-      return tree;
+    // search parent scope
+    scope = scope->mParent;
   }
   return NULL;
 }
 
 // This is to find the type having the same name as 'inode'.
 //
-// We are using name address to decide if two names are equal, since we have a
-// string pool with any two equal strings will be at the same address.
+// starting from local scope
 TreeNode* ASTScope::FindTypeOf(IdentifierNode *inode) {
-  for (unsigned i = 0; i < GetTypeNum(); i++) {
-    TreeNode *tree = GetType(i);
-    if (tree->GetStrIdx() == inode->GetStrIdx())
-      return tree;
+  ASTScope *scope = this;
+  while (scope) {
+    for (unsigned i = 0; i < GetTypeNum(); i++) {
+      TreeNode *tree = GetType(i);
+      if (tree->GetStrIdx() == inode->GetStrIdx()) {
+        return tree;
+      }
+    }
+    // search parent scope
+    scope = scope->mParent;
   }
   return NULL;
 }

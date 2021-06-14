@@ -102,6 +102,11 @@ void A2C::ProcessAST() {
         // handler->Dump("After BuildDFA()");
       }
     }
+
+    if (mTraceA2C) {
+      std::cout << "============== Dump Scope ==============" << std::endl;
+      gModule->GetRootScope()->Dump(0);
+    }
   }
 
   if (mTraceA2C) {

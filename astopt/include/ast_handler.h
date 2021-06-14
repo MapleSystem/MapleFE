@@ -53,7 +53,8 @@ class Module_Handler {
   std::unordered_map<unsigned, std::vector<AstFunction *>> mModuleFuncsMap;
   // only reachable BBs
   std::unordered_map<unsigned, AstBasicBlock *> mBbId2BbMap;
-  std::stack<ASTScope *> mScopeStack;
+  // scope node id to scope
+  std::unordered_map<unsigned, ASTScope *> mNodeId2Scope;
 
  public:
   explicit Module_Handler(bool trace) :
@@ -97,6 +98,9 @@ class Module_Handler {
   void SetCFG(AST_CFG *p) {mCFG = p;}
   void SetAST(AST_AST *p) {mAST = p;}
   void SetDFA(AST_DFA *p) {mDFA = p;}
+
+  TreeNode *FindDecl(IdentifierNode *inode);
+  TreeNode *FindFunc(IdentifierNode *inode);
 
   void Dump(char *msg);
 };
