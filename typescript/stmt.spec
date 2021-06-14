@@ -589,10 +589,9 @@ rule LogicalORExpression : ONEOF(
 ##rule ConditionalExpression[In, Yield] :
 ##  LogicalORExpression[?In, ?Yield]
 ##  LogicalORExpression[?In,?Yield] ? AssignmentExpression[In, ?Yield] : AssignmentExpression[?In, ?Yield]
-rule ConditionalTrue : AssignmentExpression
 rule ConditionalExpression : ONEOF(
   LogicalORExpression,
-  LogicalORExpression + '?' + ConditionalTrue + ':' + AssignmentExpression)
+  LogicalORExpression + '?' + AssignmentExpression + ':' + AssignmentExpression)
   attr.action.%2 : BuildTernaryOperation(%1, %3, %5)
 
 ##-----------------------------------
@@ -864,9 +863,8 @@ rule ExpressionStatement : Expression + ';'
 ##rule IfStatement[Yield, Return] :
 ##  if ( Expression[In, ?Yield] ) Statement[?Yield, ?Return] else Statement[?Yield, ?Return]
 ##  if ( Expression[In, ?Yield] ) Statement[?Yield, ?Return]
-rule TrueBranch : Statement
 rule IfStatement : ONEOF(
-  "if" + '(' + Expression + ')' + TrueBranch + "else" + Statement,
+  "if" + '(' + Expression + ')' + Statement + "else" + Statement,
   "if" + '(' + Expression + ')' + Statement)
   attr.action.%1,%2: BuildCondBranch(%3)
   attr.action.%1,%2: AddCondBranchTrueStatement(%5)
