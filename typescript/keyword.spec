@@ -83,6 +83,8 @@ STRUCT KeyWord : ((boolean),
                   (private),
                   (public),
 
+                  (readonly),
+
 #this part is for future reserved
                   (enum),
                   (await),
