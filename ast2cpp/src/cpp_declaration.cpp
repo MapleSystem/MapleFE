@@ -14,8 +14,34 @@
  */
 
 #include "cpp_declaration.h"
+#include "gen_astvisitor.h"
 
 namespace maplefe {
+
+class CollectDecls : public AstVisitor {
+  private:
+    CppDecl     *mCppDecl;
+    std::string  mDecls;
+
+  public:
+    CollectDecls(CppDecl *c) : mCppDecl(c) {}
+
+    FunctionNode *VisitFunctionNode(FunctionNode *node) {
+      return node;
+    }
+
+    LambdaNode *VisitLambdaNode(LambdaNode *node) {
+      return node;
+    }
+
+    DeclNode *VisitDeclNode(DeclNode *node) {
+      mDecls += mCppDecl->EmitTreeNode(node);
+      return node;
+    }
+
+    std::string GetDecls() { return mDecls; }
+};
+
 
 std::string CppDecl::EmitModuleNode(ModuleNode *node) {
   if (node == nullptr)
@@ -30,14 +56,13 @@ std::string CppDecl::EmitModuleNode(ModuleNode *node) {
   str += R"""(
 #include "ts2cpp.h"
 
-class )""" + name + R"""( {
+class )""" + name + R"""( : public t2crt::BaseObj {
 public: // all top level variables in the module
 )""";
-  for (unsigned i = 0; i < node->GetTreesNum(); ++i) {
-    if (auto n = node->GetTree(i)) {
-      str += EmitTreeNode(n);
-    }
-  }
+
+  CollectDecls decls(this);
+  decls.VisitTreeNode(node);
+  str += decls.GetDecls();
 
   str += R"""(
 
@@ -71,6 +96,8 @@ std::string CppDecl::EmitIdentifierNode(IdentifierNode *node) {
   if (auto n = node->GetType()) {
     str += EmitTreeNode(n);
   }
+  else
+    str += "double"s; // Needs type information here
   str += " "s + node->GetName();
   return str;
 }
@@ -107,6 +134,7 @@ std::string CppDecl::EmitCondBranchNode(CondBranchNode *node) {
 }
 
 std::string CppDecl::EmitForLoopNode(ForLoopNode *node) {
+
   return std::string();
 }
 

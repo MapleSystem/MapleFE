@@ -110,10 +110,17 @@ std::string CppDef::EmitCallNode(CallNode *node) {
   if(!log)
     str += "("s;
   for (unsigned i = 0; i < node->GetArgsNum(); ++i) {
-    if(log)
-      str += " << "s + EmitTreeNode(node->GetArg(i));
-    else {
-
+    if(log) {
+      std::string s = EmitTreeNode(node->GetArg(i));
+      if(s.front() == '"' && s.back() == '"') {
+        s = s.substr(1, s.length() - 2);
+        Emitter::Replace(s, "\"", "\\\"", 0);
+        s = "\"'" + s + "'\"";
+      }
+      if (i)
+        str += " << ' ' "s;
+      str += " << "s + s;
+    } else {
       if (i)
         str += ", "s;
       if (auto n = node->GetArg(i))
@@ -167,6 +174,97 @@ std::string CppDef::EmitFieldNode(FieldNode *node) {
   }
   if (node->IsStmt())
     str += ";\n"s;
+  return str;
+}
+
+std::string CppDef::EmitForLoopNode(ForLoopNode *node) {
+  if (node == nullptr)
+    return std::string();
+  std::string str;
+  str += "for("s;
+  switch(node->GetProp()) {
+    case FLP_Regular:
+      {
+        for (unsigned i = 0; i < node->GetInitsNum(); ++i)
+          if (auto n = node->GetInitAtIndex(i)) {
+            auto init = EmitTreeNode(n);
+            if (i)
+              str += ", "s;
+            str += Clean(init);
+          }
+        str += "; "s;
+        if (auto n = node->GetCond()) {
+          auto cond = EmitTreeNode(n);
+          str += Clean(cond);
+        }
+        str += "; "s;
+        for (unsigned i = 0; i < node->GetUpdatesNum(); ++i)
+          if (auto n = node->GetUpdateAtIndex(i)) {
+            auto update = EmitTreeNode(n);
+            if (i)
+              str += ", "s;
+            str += Clean(update);
+          }
+        break;
+      }
+    case FLP_JSIn:
+      {
+        if (auto n = node->GetVariable()) {
+          str += EmitTreeNode(n);
+        }
+        str += " in "s;
+        if (auto n = node->GetSet()) {
+          str += EmitTreeNode(n);
+        }
+        break;
+      }
+    case FLP_JSOf:
+      {
+        if (auto n = node->GetVariable()) {
+          str += EmitTreeNode(n);
+        }
+        str += " of "s;
+        if (auto n = node->GetSet()) {
+          str += EmitTreeNode(n);
+        }
+        break;
+      }
+    case FLP_NA:
+      return "FLP_NA"s;
+    default:
+      MASSERT(0 && "Unexpected enumerator");
+  }
+  str += ")"s;
+
+  auto label = node->GetLabel();
+  std::string lstr;
+  if(label) {
+    lstr = EmitTreeNode(label);
+    str += "{\n"s;
+  }
+  if (auto n = node->GetBody()) {
+    str += EmitTreeNode(n);
+  }
+  if(label)
+    str += "__label_cont_" + lstr + ":;\n}\n"s + "__label_break_" + lstr + ":;\n"s;
+  return str;
+}
+
+std::string CppDef::EmitBreakNode(BreakNode *node) {
+  if (node == nullptr)
+    return std::string();
+  auto target = node->GetTarget();
+  std::string str = target ? "goto __label_break_"s + EmitTreeNode(target) : "break"s;
+  str += ";\n"s;
+  return str;
+}
+
+std::string CppDef::EmitContinueNode(ContinueNode *node) {
+  if (node == nullptr)
+    return std::string();
+  auto target = node->GetTarget();
+  std::string str = target ? "goto __label_cont_"s + EmitTreeNode(target) : "continue"s;
+  str += ";\n"s;
   return str;
 }
 
