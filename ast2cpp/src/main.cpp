@@ -76,7 +76,10 @@ int main (int argc, char *argv[]) {
     maplefe::AstLoad loadAst;
     maplefe::ModuleNode *mod = loadAst.LoadFromAstBuf(vec);
     // add mod to the vector
-    handler.AddModule(mod);
+    while(mod) {
+      handler.AddModule(mod);
+      mod = loadAst.Next();
+    }
   }
 
   maplefe::A2C *a2c = new maplefe::A2C(&handler, trace_a2c);

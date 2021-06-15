@@ -1158,12 +1158,20 @@ astload_init = [
 """
 private:
 AstBufIter  it;
+AstBufIter  end;
 AstStrMap   mStrMap;  // key: previous str id,  val: new str id
 AstNodeMap  mNodeMap; // key: previous node id, val: TreeNode*
 
 public:
 ModuleNode *{gen_args2}FromAstBuf(AstBuffer &buf) {{
   it = buf.begin();
+  end = buf.end();
+  return Next();
+}}
+
+ModuleNode *Next() {{
+  if(it == end)
+    return nullptr;
   bool check = *it++ == 'M';
   check &= *it++ == 'P';
   if(!check) {{
