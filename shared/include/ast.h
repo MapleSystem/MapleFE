@@ -1496,6 +1496,7 @@ private:
   TreeNode    *mMethod;
   ExprListNode mArgs;
   SmallVector<TreeNode*> mTypeArguments;
+  SmallVector<AsTypeNode*> mAsTypes;
 public:
   CallNode() : TreeNode(NK_Call), mMethod(NULL) {}
   ~CallNode(){Release();}
@@ -1515,7 +1516,14 @@ public:
   void      SetTypeArgumentAtIndex(unsigned i, TreeNode* n) {*(mTypeArguments.RefAtIndex(i)) = n; if(n) n->SetParent(this);}
   void      AddTypeArgument(TreeNode *);
 
-  void Release() {mArgs.Release(); mTypeArguments.Release();}
+  // AsType related
+  unsigned GetAsTypesNum()           {return mAsTypes.GetNum();}
+  void     AddAsType(AsTypeNode *n)  {mAsTypes.PushBack(n);}
+  void     AddAsTypes(TreeNode *n);
+  AsTypeNode* GetAsTypeAtIndex(unsigned i) {return mAsTypes.ValueAtIndex(i);}
+  void        SetAsTypeAtIndex(unsigned i, AsTypeNode* n) {*(mAsTypes.RefAtIndex(i)) = n;}
+
+  void Release() {mArgs.Release(); mTypeArguments.Release(); mAsTypes.Release();}
   void Dump(unsigned);
 };
 

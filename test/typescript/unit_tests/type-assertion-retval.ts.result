@@ -1,0 +1,20 @@
+Matched 13 tokens.
+Matched 21 tokens.
+Matched 32 tokens.
+============= Module ===========
+== Sub Tree ==
+class  Foo
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+    func  func()  throws: 
+      return 10
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+js_let Decl: obj=new Foo()
+== Sub Tree ==
+js_let Decl: employeeCode=obj.func()

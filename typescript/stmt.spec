@@ -350,16 +350,18 @@ rule NewExpression : ONEOF(MemberExpression, "new" + NewExpression)
 ##  CallExpression[?Yield] TemplateLiteral[?Yield]
 
 rule CallExpression : ONEOF(
-  MemberExpression + ZEROORONE(TypeArguments) + Arguments,
+  MemberExpression + ZEROORONE(TypeArguments) + Arguments + ZEROORMORE(AsType),
   SuperCall,
-  CallExpression + Arguments,
+  CallExpression + Arguments + ZEROORMORE(AsType),
   CallExpression + '[' + Expression + ']',
   CallExpression + '.' + JSIdentifier,
   CallExpression + TemplateLiteral)
   attr.action.%1,%3 : BuildCall(%1)
+  attr.action.%1 : AddAsType(%4)
   attr.action.%1 : AddTypeGenerics(%2)
   attr.action.%1 : AddArguments(%3)
   attr.action.%3 : AddArguments(%2)
+  attr.action.%3 : AddAsType(%3)
   attr.action.%5 : BuildField(%1, %3)
 
 ##-----------------------------------

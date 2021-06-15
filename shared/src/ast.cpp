@@ -457,6 +457,22 @@ void CallNode::AddTypeArgument(TreeNode *arg) {
   }
 }
 
+void CallNode::AddAsTypes(TreeNode *type) {
+  if (!type)
+    return;
+
+  if (type->IsPass()) {
+    PassNode *pass_node = (PassNode*)type;
+    for (unsigned i = 0; i < pass_node->GetChildrenNum(); i++)
+      AddAsTypes(pass_node->GetChild(i));
+  } else if (type->IsAsType()) {
+    AsTypeNode *asn = (AsTypeNode*)type;
+    AddAsType(asn);
+  } else {
+    MERROR("unsupported as-type in AddAsType.");
+  }
+}
+
 void CallNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   mMethod->Dump(0);
