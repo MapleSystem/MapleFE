@@ -50,7 +50,7 @@ typedef enum JS_Type : uint8_t {
   RT_LAST
 } JS_Type;
 
-#define IsCompilerGen(type)  (type & 0x10)
+
 typedef union JS_Val {
   void*    field;      // used by compiler genareted fields only
   bool     val_bool;
@@ -78,6 +78,10 @@ typedef struct JS_Prop {
   }
 
 } JS_Prop;
+
+inline bool IsCompilerGenProp(JS_Prop* prop) {
+  return  (!prop->type & 0x10);
+}
 
 typedef std::map<std::string, JS_Prop*> JS_PropList;
 
