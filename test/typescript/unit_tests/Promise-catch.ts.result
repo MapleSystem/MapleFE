@@ -1,0 +1,10 @@
+Matched 19 tokens.
+Matched 38 tokens.
+============= Module ===========
+== Sub Tree ==
+js_const Decl: promise1=new Promise((resolve,reject) -> throw 'something happened'
+
+)
+== Sub Tree ==
+promise1.catch((error) -> console.log(error)
+)
