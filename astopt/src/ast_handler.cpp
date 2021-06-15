@@ -70,16 +70,18 @@ void Module_Handler::BuildScope(ModuleNode *mod) {
 
 // input an identifire ===> returen the decl node with same name
 TreeNode *Module_Handler::FindDecl(IdentifierNode *inode) {
+  TreeNode *decl = NULL;
   TreeNode *p = inode->GetParent();
   while (p) {
     if (p->IsScope()) {
       ASTScope *scope = mNodeId2Scope[p->GetNodeId()];
       // it will trace back to top level
-      return scope->FindDeclOf(inode);
+      decl = scope->FindDeclOf(inode);
+      break;
     }
     p = p->GetParent();
   }
-  return NULL;
+  return decl;
 }
 
 // input a decl node ==> return the function node contains it

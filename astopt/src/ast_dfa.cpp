@@ -490,6 +490,7 @@ void AST_DFA::BuildScope(ModuleNode *mod) {
     visitor.mScopeStack.pop();
   }
   visitor.mScopeStack.push(mod->GetRootScope());
+  mHandler->mNodeId2Scope[mod->GetNodeId()] = mod->GetRootScope();
 
   for(unsigned i = 0; i < mod->GetTreesNum(); i++) {
     TreeNode *it = mod->GetTree(i);

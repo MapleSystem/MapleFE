@@ -96,7 +96,7 @@ public:
 #define NODEKIND(K) bool Is##K() const {return mKind == NK_##K;}
 #include "ast_nk.def"
 
-  bool IsScope() {return IsBlock() || IsClass() || IsFunction() || IsInterface();}
+  bool IsScope() {return IsBlock() || IsClass() || IsFunction() || IsInterface() || IsModule();}
   bool TypeEquivalent(TreeNode*);
 
   NodeKind GetKind() {return mKind;}
