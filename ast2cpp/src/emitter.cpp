@@ -543,7 +543,7 @@ std::string Emitter::EmitArrayElementNode(ArrayElementNode *node) {
     return std::string();
   std::string str;
   if (auto n = node->GetArray()) {
-    str = EmitIdentifierNode(n);
+    str = EmitTreeNode(n);
   }
 
   for (unsigned i = 0; i < node->GetExprsNum(); ++i) {

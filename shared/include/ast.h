@@ -785,14 +785,14 @@ public:
 // Array element is a[b][c].
 class ArrayElementNode : public TreeNode {
 private:
-  IdentifierNode        *mArray;
+  TreeNode              *mArray;
   SmallVector<TreeNode*> mExprs;  // index expressions.
 public:
   ArrayElementNode() : TreeNode(NK_ArrayElement), mArray(NULL) {}
   ~ArrayElementNode() {Release();}
 
-  IdentifierNode* GetArray()                  {return mArray;}
-  void            SetArray(IdentifierNode *n) {mArray = n;}
+  TreeNode* GetArray()            {return mArray;}
+  void      SetArray(TreeNode *n) {mArray = n;}
 
   unsigned  GetExprsNum()       {return mExprs.GetNum();}
   TreeNode* GetExprAtIndex(unsigned i) {return mExprs.ValueAtIndex(i);}

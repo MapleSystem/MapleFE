@@ -1392,13 +1392,13 @@ TreeNode* ASTBuilder::BuildArrayElement() {
   Param p_array = mParams[0];
   MASSERT(p_array.mIsTreeNode);
   TreeNode *array = p_array.mData.mTreeNode;
-  MASSERT(array->IsIdentifier() || array->IsArrayElement());
+  MASSERT(array->IsIdentifier() || array->IsArrayElement() || array->IsField());
 
   ArrayElementNode *array_element = NULL;
-  if (array->IsIdentifier()) {
+  if (array->IsIdentifier() || array->IsField()) {
     array_element = (ArrayElementNode*)gTreePool.NewTreeNode(sizeof(ArrayElementNode));
     new (array_element) ArrayElementNode();
-    array_element->SetArray((IdentifierNode*)array);
+    array_element->SetArray(array);
   } else {
     array_element = (ArrayElementNode*)array;
   }

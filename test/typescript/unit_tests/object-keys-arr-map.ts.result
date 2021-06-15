@@ -1,0 +1,7 @@
+Matched 14 tokens.
+Matched 44 tokens.
+============= Module ===========
+== Sub Tree ==
+js_var Decl: objA= {objB: {objC: {}}}
+== Sub Tree ==
+js_const Decl: list=Object.keys(objA.objB.objC).map((x) -> objA.objB.objC[x])
