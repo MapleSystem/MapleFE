@@ -77,6 +77,7 @@ protected:
   TreeNode *mParent;
   TreeNode *mLabel;   // label of a statement, or expression.
   unsigned  mStrIdx;
+  TypeId    mTypeId;      // typeId of the node
 
   bool      mIsStmt;      // if a node is a statement
   bool      mIsOptional;  // if a node is optionally existing during runtime.
@@ -86,7 +87,7 @@ protected:
 
 public:
   TreeNode(NodeKind k, unsigned i)
-    : mKind(k), mLabel(NULL), mParent(NULL), mStrIdx(i), mIsStmt(false),
+    : mKind(k), mLabel(NULL), mParent(NULL), mStrIdx(i), mIsStmt(false), mTypeId(TY_Invalid),
       mIsOptional(false), mIsNonNull(false) {}
   TreeNode(NodeKind k) : TreeNode(k, 0) {}
   //TreeNode() : TreeNode(NK_Null, 0) {}
@@ -99,14 +100,17 @@ public:
   bool IsScope() {return IsBlock() || IsClass() || IsFunction() || IsInterface() || IsModule();}
   bool TypeEquivalent(TreeNode*);
 
-  NodeKind GetKind() {return mKind;}
   void SetKind(NodeKind k) {} // Not allowed to change its kind
   void SetNodeId(unsigned id) {mNodeId = id;}
   void SetParent(TreeNode *p) {mParent = p;}
   void SetLabel (TreeNode *p) {mLabel = p;}
-  unsigned  GetNodeId() {return mNodeId;}
+  void SetTypeId(TypeId id)   {mTypeId = id;}
+
+  NodeKind GetKind()    {return mKind;}
+  unsigned GetNodeId()  {return mNodeId;}
   TreeNode* GetParent() {return mParent;}
   TreeNode* GetLabel()  {return mLabel;}
+  TypeId GetTypeId()    {return mTypeId;}
 
   bool IsStmt()                    {return mIsStmt;}
   void SetIsStmt(bool b = true)    {mIsStmt = b;}

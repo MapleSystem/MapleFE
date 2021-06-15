@@ -34,6 +34,7 @@ class AST_CFG;
 class AST_AST;
 class AST_DFA;
 class AST_Handler;
+class TypeInfer;
 
 // Each source file is a module
 class Module_Handler {
@@ -44,6 +45,7 @@ class Module_Handler {
   AST_CFG      *mCFG;
   AST_AST      *mAST;
   AST_DFA      *mDFA;
+  TypeInfer    *mTI;
   const char   *mOutputFileName;
   bool          mTrace;
   std::unordered_map<unsigned, AstBasicBlock *> mNodeId2BbMap;
@@ -62,6 +64,7 @@ class Module_Handler {
     mCFG(nullptr),
     mAST(nullptr),
     mDFA(nullptr),
+    mTI(nullptr),
     mTrace(trace) {}
   ~Module_Handler() {}
 
@@ -70,6 +73,7 @@ class Module_Handler {
   void BuildCFG();
   void ASTCollectAndDBRemoval(AstFunction *func);
   void BuildDFA(AstFunction *func);
+  void TypeInference(AstFunction *func);
 
   const char *GetOutputFileName() {return mOutputFileName;}
   void SetOutputFileName(const char *name) {mOutputFileName = name;}
@@ -95,9 +99,13 @@ class Module_Handler {
   AST_CFG *GetCFG() {return mCFG;}
   AST_AST *GetAST() {return mAST;}
   AST_DFA *GetDFA() {return mDFA;}
+  TypeInfer *GetTI() {return mTI;}
   void SetCFG(AST_CFG *p) {mCFG = p;}
   void SetAST(AST_AST *p) {mAST = p;}
   void SetDFA(AST_DFA *p) {mDFA = p;}
+  void SetTI(TypeInfer *p) {mTI = p;}
+
+  DeclNode *GetDeclOf(IdentifierNode *inode);
 
   TreeNode *FindDecl(IdentifierNode *inode);
   TreeNode *FindFunc(IdentifierNode *inode);

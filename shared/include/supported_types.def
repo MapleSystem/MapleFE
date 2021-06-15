@@ -16,6 +16,7 @@
 // This file defines the complete set of primitive types supported in Autogen
 // and the parser.
 
+TYPE(Invalid)
 TYPE(Boolean)
 TYPE(Byte)
 TYPE(Short)

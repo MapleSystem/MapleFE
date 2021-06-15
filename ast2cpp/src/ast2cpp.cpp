@@ -101,6 +101,20 @@ void A2C::ProcessAST() {
       if (mTraceA2C) {
         // handler->Dump("After BuildDFA()");
       }
+
+      handler->TypeInference(func);
+    }
+
+    if (mTraceA2C) {
+      std::cout << "============= AstGraph 2 ===========" << std::endl;
+      AstGraph graph(gModule);
+      graph.DumpGraph("After BuildCFG()", &std::cout);
+    }
+
+    if (mTraceA2C) {
+      std::cout << "============= AstDump 2 ===========" << std::endl;
+      AstDump astdump(gModule);
+      astdump.Dump("After BuildCFG()", &std::cout);
     }
 
     if (mTraceA2C) {

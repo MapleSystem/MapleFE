@@ -19,6 +19,7 @@
 #include "ast_cfg.h"
 #include "ast_ast.h"
 #include "ast_dfa.h"
+#include "ast_ti.h"
 
 namespace maplefe {
 
@@ -94,6 +95,13 @@ TreeNode *Module_Handler::FindFunc(IdentifierNode *inode) {
     p = p->GetParent();
   }
   return NULL;
+}
+
+void Module_Handler::TypeInference(AstFunction *func) {
+  if (!mTI) {
+    mTI = new(GetMemPool()->Alloc(sizeof(TypeInfer))) TypeInfer(this, mTrace);
+  }
+  mTI->TypeInference(func);
 }
 
 void Module_Handler::Dump(char *msg) {
