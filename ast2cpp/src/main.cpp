@@ -15,6 +15,7 @@
 
 #include <sstream>
 #include <fstream>
+#include<iterator>
 #include "gen_astload.h"
 #include "ast_handler.h"
 #include "ast2cpp.h"
@@ -69,15 +70,10 @@ int main (int argc, char *argv[]) {
   maplefe::AST_Handler handler(trace_a2c);
   for (auto astfile: inputfiles) {
     std::ifstream input(astfile, std::ifstream::binary);
-    // get length of file:
-    input.seekg(0, input.end);
-    int length = input.tellg();
-    input.seekg(0, input.beg);
-    char *buf = (char*)calloc(length, 1);
-    input.read(buf, length);
-
+    input >> std::noskipws;
+    std::istream_iterator<uint8_t> s(input), e;
+    maplefe::AstBuffer vec(s, e);
     maplefe::AstLoad loadAst;
-    maplefe::AstBuffer vec(buf, buf + length);
     maplefe::ModuleNode *mod = loadAst.LoadFromAstBuf(vec);
     // add mod to the vector
     handler.AddModule(mod);
