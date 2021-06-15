@@ -1346,7 +1346,7 @@ void ClassNode::Dump(unsigned indent) {
 //////////////////////////////////////////////////////////////////////////////////////
 
 FunctionNode::FunctionNode() : TreeNode(NK_Function),
-  mType(NULL), mBody(NULL), mDims(), mIsConstructor(false) {}
+  mFuncName(NULL), mType(NULL), mBody(NULL), mDims(NULL), mIsConstructor(false) {}
 
 // This is to tell if both FunctionNodes have same return type
 // and parameter types. So languages require Type Erasure at first, like Java.
