@@ -87,7 +87,7 @@ protected:
 
 public:
   TreeNode(NodeKind k, unsigned i)
-    : mKind(k), mLabel(NULL), mParent(NULL), mStrIdx(i), mIsStmt(false), mTypeId(TY_Invalid),
+    : mKind(k), mLabel(NULL), mParent(NULL), mStrIdx(i), mIsStmt(false), mTypeId(TY_None),
       mIsOptional(false), mIsNonNull(false) {}
   TreeNode(NodeKind k) : TreeNode(k, 0) {}
   //TreeNode() : TreeNode(NK_Null, 0) {}

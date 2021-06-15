@@ -107,9 +107,9 @@ IdentifierNode *TypeInferVisitor::VisitIdentifierNode(IdentifierNode *node) {
 TypeId TypeInferVisitor::MergeTypeId(TypeId tia,  TypeId tib) {
   if (tia == tib) {
     return tia;
-  } else if (tib == TY_Invalid) {
+  } else if (tib == TY_None) {
     return tia;
-  } else if (tia == TY_Invalid) {
+  } else if (tia == TY_None) {
     return tib;
   } else if ((tia == TY_Int && tib == TY_Long) ||
              (tib == TY_Int && tia == TY_Long)) {
@@ -122,7 +122,7 @@ TypeId TypeInferVisitor::MergeTypeId(TypeId tia,  TypeId tib) {
     return TY_Double;
   }
   NOTYETIMPL("MergeTypeId()");
-  return TY_Invalid;
+  return TY_None;
 }
 
 BinOperatorNode *TypeInferVisitor::VisitBinOperatorNode(BinOperatorNode *node) {
@@ -140,10 +140,10 @@ BinOperatorNode *TypeInferVisitor::VisitBinOperatorNode(BinOperatorNode *node) {
     case OPR_LT:
     case OPR_GE:
     case OPR_LE: {
-      if (tia != TY_Invalid && tib == TY_Invalid) {
+      if (tia != TY_None && tib == TY_None) {
         tb->SetTypeId(tia);
         mod = tb;
-      } else if (tia == TY_Invalid && tib != TY_Invalid) {
+      } else if (tia == TY_None && tib != TY_None) {
         ta->SetTypeId(tib);
         mod = ta;
       }
@@ -179,10 +179,10 @@ BinOperatorNode *TypeInferVisitor::VisitBinOperatorNode(BinOperatorNode *node) {
     case OPR_Zext:
     case OPR_Land:
     case OPR_Lor: {
-      if (tia != TY_Invalid && tib == TY_Invalid) {
+      if (tia != TY_None && tib == TY_None) {
         tb->SetTypeId(tia);
         mod = tb;
-      } else if (tia == TY_Invalid && tib != TY_Invalid) {
+      } else if (tia == TY_None && tib != TY_None) {
         ta->SetTypeId(tib);
         mod = ta;
       }
