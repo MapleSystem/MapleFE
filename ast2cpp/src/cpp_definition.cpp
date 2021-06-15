@@ -77,14 +77,16 @@ std::string CppDef::EmitDeclNode(DeclNode *node) {
   std::string str;
   //std::string str(Emitter::GetEnumDeclProp(node->GetProp()));
   if (auto n = node->GetVar()) {
-    str += " "s + EmitTreeNode(n);
+    str += EmitTreeNode(n);
   }
   if (auto n = node->GetInit()) {
-    str += " = "s + EmitTreeNode(n);
+    if(n->GetKind() == NK_ArrayLiteral)
+      str += ".clear();\n"s + str + ".insert("s + str + ".end(), "s
+        + EmitTreeNode(n) + ")"s;
+    else
+      str += " = "s + EmitTreeNode(n);
   }
-  mPrecedence = '\030';
-  if (node->IsStmt())
-    str += ";\n"s;
+  str += ";\n"s;
   return str;
 }
 
@@ -130,6 +132,42 @@ std::string CppDef::EmitCallNode(CallNode *node) {
 
 std::string CppDef::EmitPrimTypeNode(PrimTypeNode *node) {
   return std::string();
+}
+
+std::string CppDef::EmitPrimArrayTypeNode(PrimArrayTypeNode *node) {
+  return std::string();
+}
+
+std::string CppDef::EmitArrayLiteralNode(ArrayLiteralNode *node) {
+  if (node == nullptr)
+    return std::string();
+  std::string str("{"s);
+  for (unsigned i = 0; i < node->GetLiteralsNum(); ++i) {
+    if (i)
+      str += ", "s;
+    if (auto n = node->GetLiteral(i)) {
+      str += EmitTreeNode(n);
+    }
+  }
+  str += "}"s;
+  return str;
+}
+
+std::string CppDef::EmitFieldNode(FieldNode *node) {
+  if (node == nullptr)
+    return std::string();
+  std::string str;
+  if (auto n = node->GetUpper()) {
+    str += EmitTreeNode(n);
+  }
+  if (auto n = node->GetField()) {
+    std::string field = EmitIdentifierNode(n);
+    Emitter::Replace(field, "length", "size()");
+    str += "."s + field;
+  }
+  if (node->IsStmt())
+    str += ";\n"s;
+  return str;
 }
 
 } // namespace maplefe

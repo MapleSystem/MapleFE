@@ -28,7 +28,7 @@ std::string CppDecl::EmitModuleNode(ModuleNode *node) {
   std::string str("// TypeScript filename: "s + node->GetFileName() + "\n"s);
   str += "#ifndef "s + header + "#define "s + header;
   str += R"""(
-//#include "ts2cpp.h"
+#include "ts2cpp.h"
 
 class )""" + name + R"""( {
 public: // all top level variables in the module
@@ -93,7 +93,7 @@ std::string CppDecl::EmitDeclNode(DeclNode *node) {
     return std::string();
   std::string str;
   if (auto n = node->GetVar()) {
-    str += " "s + EmitTreeNode(n) + ";"s;
+    str += " "s + EmitTreeNode(n) + ";\n"s;
   }
   return str;
 }
@@ -119,6 +119,29 @@ std::string CppDecl::EmitDoLoopNode(DoLoopNode *node) {
 }
 
 std::string CppDecl::EmitAssertNode(AssertNode *node) {
+  return std::string();
+}
+
+std::string CppDecl::EmitArrayLiteralNode(ArrayLiteralNode *node) {
+  return std::string();
+}
+
+std::string CppDecl::EmitPrimArrayTypeNode(PrimArrayTypeNode *node) {
+  if (node == nullptr)
+    return std::string();
+  std::string str;
+  if (auto n = node->GetPrim()) {
+    str += "std::vector<"s + EmitPrimTypeNode(n) + "> "s;;
+  }
+  /*
+  if (auto n = node->GetDims()) {
+    str += EmitDimensionNode(n);
+  }
+  */
+  return str;
+}
+
+std::string CppDecl::EmitFieldNode(FieldNode *node) {
   return std::string();
 }
 

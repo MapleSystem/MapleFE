@@ -16,6 +16,7 @@
 #ifndef __TS2CPP_RT_HEADER__
 #define __TS2CPP_RT_HEADER__
 
+#include <vector>
 #include <string>
 #include <map>
 
