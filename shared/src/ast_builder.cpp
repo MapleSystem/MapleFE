@@ -1297,12 +1297,15 @@ TreeNode* ASTBuilder::AddAsType() {
   }
 
   if (tree_type) {
-    MASSERT(node->IsIdentifier() || node->IsUserType());
+    MASSERT(node->IsIdentifier() || node->IsUserType() || node->IsField());
     if (node->IsIdentifier()) {
       IdentifierNode *id = (IdentifierNode*)node;
       id->AddAsTypes(tree_type);
     } else if (node->IsUserType()) {
       UserTypeNode *id = (UserTypeNode*)node;
+      id->AddAsTypes(tree_type);
+    } else if (node->IsField()) {
+      FieldNode *id = (FieldNode*)node;
       id->AddAsTypes(tree_type);
     }
     mLastTreeNode = node;

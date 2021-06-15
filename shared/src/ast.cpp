@@ -346,6 +346,22 @@ void UnaOperatorNode::Dump(unsigned indent) {
 //                           FieldNode
 //////////////////////////////////////////////////////////////////////////////////////
 
+void FieldNode::AddAsTypes(TreeNode *type) {
+  if (!type)
+    return;
+
+  if (type->IsPass()) {
+    PassNode *pass_node = (PassNode*)type;
+    for (unsigned i = 0; i < pass_node->GetChildrenNum(); i++)
+      AddAsTypes(pass_node->GetChild(i));
+  } else if (type->IsAsType()) {
+    AsTypeNode *asn = (AsTypeNode*)type;
+    AddAsType(asn);
+  } else {
+    MERROR("unsupported as-type in AddAsType.");
+  }
+}
+
 void FieldNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   mUpper->Dump(0);
@@ -495,7 +511,7 @@ void IdentifierNode::AddAsTypes(TreeNode *type) {
   if (type->IsPass()) {
     PassNode *pass_node = (PassNode*)type;
     for (unsigned i = 0; i < pass_node->GetChildrenNum(); i++)
-      SetType(pass_node->GetChild(i));
+      AddAsTypes(pass_node->GetChild(i));
   } else if (type->IsAsType()) {
     AsTypeNode *asn = (AsTypeNode*)type;
     AddAsType(asn);

@@ -301,9 +301,9 @@ rule Initializer : '=' + AssignmentExpression
 
 rule MemberExpression : ONEOF(
   PrimaryExpression + ZEROORMORE(AsType),
-  MemberExpression + '[' + Expression + ']',
-  MemberExpression + '.' + JSIdentifier,
-  MemberExpression + "?." + JSIdentifier,
+  MemberExpression + '[' + Expression + ']' + ZEROORMORE(AsType),
+  MemberExpression + '.' + JSIdentifier + ZEROORMORE(AsType),
+  MemberExpression + "?." + JSIdentifier + ZEROORMORE(AsType),
   MemberExpression + TemplateLiteral,
 #  SuperProperty[?Yield]
 #  MetaProperty
@@ -313,9 +313,12 @@ rule MemberExpression : ONEOF(
   "new" + TypeReference + Arguments)
   attr.action.%1 : AddAsType(%1, %2)
   attr.action.%2 : BuildArrayElement(%1, %3)
+  attr.action.%2 : AddAsType(%5)
   attr.action.%3 : BuildField(%1, %3)
+  attr.action.%3 : AddAsType(%4)
   attr.action.%4 : SetIsOptional(%1)
   attr.action.%4 : BuildField(%1, %3)
+  attr.action.%4 : AddAsType(%4)
   attr.action.%6,%7 : BuildNewOperation(%2, %3)
 
 ##-----------------------------------

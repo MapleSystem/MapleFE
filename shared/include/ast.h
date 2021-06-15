@@ -749,12 +749,20 @@ class FieldNode : public TreeNode {
 private:
   TreeNode       *mUpper; // The upper enclosing structure
   IdentifierNode *mField;
+  SmallVector<AsTypeNode*> mAsTypes;
 public:
   FieldNode() : TreeNode(NK_Field), mField(NULL), mUpper(NULL) {}
-  ~FieldNode(){}
+  ~FieldNode(){mAsTypes.Release();}
 
   IdentifierNode* GetField() {return mField;}
   void SetField(IdentifierNode *f) {mField = f;}
+
+  // AsType related
+  unsigned GetAsTypesNum()           {return mAsTypes.GetNum();}
+  void     AddAsType(AsTypeNode *n)  {mAsTypes.PushBack(n);}
+  void     AddAsTypes(TreeNode *n);
+  AsTypeNode* GetAsTypeAtIndex(unsigned i) {return mAsTypes.ValueAtIndex(i);}
+  void        SetAsTypeAtIndex(unsigned i, AsTypeNode* n) {*(mAsTypes.RefAtIndex(i)) = n;}
 
   TreeNode *GetUpper()       {return mUpper;}
   void SetUpper(TreeNode *n) {
