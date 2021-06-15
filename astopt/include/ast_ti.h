@@ -60,6 +60,11 @@ class TypeInferVisitor : public AstVisitor {
   IdentifierNode *VisitIdentifierNode(IdentifierNode *node);
   BinOperatorNode *VisitBinOperatorNode(BinOperatorNode *node);
   UnaOperatorNode *VisitUnaOperatorNode(UnaOperatorNode *node);
+  FunctionNode *VisitFunctionNode(FunctionNode *node);
+  LambdaNode *VisitLambdaNode(LambdaNode *node);
+  ClassNode *VisitClassNode(ClassNode *node);
+  InterfaceNode *VisitInterfaceNode(InterfaceNode *node);
+  ReturnNode *VisitReturnNode(ReturnNode *node);
 };
 
 }

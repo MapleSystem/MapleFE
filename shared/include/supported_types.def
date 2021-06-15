@@ -18,6 +18,9 @@
 
 TYPE(None)
 TYPE(Object)
+TYPE(Function)  // function/lambda decl
+TYPE(Class)     // class/interface decl
+
 TYPE(Boolean)
 TYPE(Byte)
 TYPE(Short)

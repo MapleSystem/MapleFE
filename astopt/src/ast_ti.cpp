@@ -61,6 +61,31 @@ void TypeInfer::TypeInference(AstFunction *func) {
   }
 }
 
+TypeId TypeInferVisitor::MergeTypeId(TypeId tia,  TypeId tib) {
+  if (tia == tib) {
+    return tia;
+  } else if (tib == TY_None) {
+    return tia;
+  } else if (tia == TY_None) {
+    return tib;
+  } else if (tib == TY_Object) {
+    return tib;
+  } else if (tia == TY_Object) {
+    return tia;
+  } else if ((tia == TY_Int && tib == TY_Long) ||
+             (tib == TY_Int && tia == TY_Long)) {
+    return TY_Long;
+  } else if ((tia == TY_Int && tib == TY_Float) ||
+             (tib == TY_Int && tia == TY_Float)) {
+    return TY_Float;
+  } else if ((tia == TY_Long && tib == TY_Float) ||
+             (tib == TY_Long && tia == TY_Float)) {
+    return TY_Double;
+  }
+  NOTYETIMPL("MergeTypeId()");
+  return TY_None;
+}
+
 DeclNode *TypeInferVisitor::VisitDeclNode(DeclNode *node) {
   (void) AstVisitor::VisitDeclNode(node);
   TreeNode *init = node->GetInit();
@@ -102,27 +127,6 @@ IdentifierNode *TypeInferVisitor::VisitIdentifierNode(IdentifierNode *node) {
     node->SetTypeId(decl->GetTypeId());
   }
   return node;
-}
-
-TypeId TypeInferVisitor::MergeTypeId(TypeId tia,  TypeId tib) {
-  if (tia == tib) {
-    return tia;
-  } else if (tib == TY_None) {
-    return tia;
-  } else if (tia == TY_None) {
-    return tib;
-  } else if ((tia == TY_Int && tib == TY_Long) ||
-             (tib == TY_Int && tia == TY_Long)) {
-    return TY_Long;
-  } else if ((tia == TY_Int && tib == TY_Float) ||
-             (tib == TY_Int && tia == TY_Float)) {
-    return TY_Float;
-  } else if ((tia == TY_Long && tib == TY_Float) ||
-             (tib == TY_Long && tia == TY_Float)) {
-    return TY_Double;
-  }
-  NOTYETIMPL("MergeTypeId()");
-  return TY_None;
 }
 
 BinOperatorNode *TypeInferVisitor::VisitBinOperatorNode(BinOperatorNode *node) {
@@ -231,6 +235,38 @@ UnaOperatorNode *TypeInferVisitor::VisitUnaOperatorNode(UnaOperatorNode *node) {
       NOTYETIMPL("VisitUnaOperatorNode()");
       break;
     }
+  }
+  return node;
+}
+
+FunctionNode *TypeInferVisitor::VisitFunctionNode(FunctionNode *node) {
+  node->SetTypeId(TY_Function);
+  (void) AstVisitor::VisitFunctionNode(node);
+  return node;
+}
+
+LambdaNode *TypeInferVisitor::VisitLambdaNode(LambdaNode *node) {
+  node->SetTypeId(TY_Function);
+  (void) AstVisitor::VisitLambdaNode(node);
+  return node;
+}
+
+ClassNode *TypeInferVisitor::VisitClassNode(ClassNode *node) {
+  node->SetTypeId(TY_Class);
+  (void) AstVisitor::VisitClassNode(node);
+  return node;
+}
+
+InterfaceNode *TypeInferVisitor::VisitInterfaceNode(InterfaceNode *node) {
+  node->SetTypeId(TY_Class);
+  (void) AstVisitor::VisitInterfaceNode(node);
+  return node;
+}
+
+ReturnNode *TypeInferVisitor::VisitReturnNode(ReturnNode *node) {
+  (void) AstVisitor::VisitReturnNode(node);
+  if (node->GetResult()) {
+    node->SetTypeId(node->GetResult()->GetTypeId());
   }
   return node;
 }
