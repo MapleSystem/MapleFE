@@ -1291,6 +1291,7 @@ rule ImportClause : ONEOF(ImportedDefaultBinding,
 ## ImportedDefaultBinding :
 ## ImportedBinding
 rule ImportedDefaultBinding : ImportedBinding
+  attr.action : BuildXXportAsPairDefault(%1)
 
 ## See 15.2.2
 ## NameSpaceImport :

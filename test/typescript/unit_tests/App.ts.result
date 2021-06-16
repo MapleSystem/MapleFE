@@ -4,7 +4,7 @@ Matched 29 tokens.
 Matched 42 tokens.
 ============= Module ===========
 == Sub Tree ==
-import {myX, * as M} "./M"
+import { default as myX, * as M} "./M"
 == Sub Tree ==
 console.log(myX,M.getx())
 == Sub Tree ==
