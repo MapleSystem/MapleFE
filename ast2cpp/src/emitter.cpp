@@ -1728,45 +1728,11 @@ std::string Emitter::EmitTreeNode(TreeNode *node) {
   return std::string();
 }
 
-
-const char *Emitter::GetEnumTypeId(TypeId k) {
-  switch (k) {
-    case TY_Boolean:
-      return "boolean";
-    case TY_Byte:
-      return "byte";
-    case TY_Short:
-      return "short";
-    case TY_Int:
-      return "int";
-    case TY_Long:
-      return "long";
-    case TY_Char:
-      return "char";
-    case TY_Float:
-      return "float";
-    case TY_Double:
-      return "double";
-    case TY_Void:
-      return "void";
-    case TY_Null:
-      return "null";
-    case TY_Unknown:
-      return "unknown";
-    case TY_Undefined:
-      return "undefined";
-    case TY_String:
-      return "string";
-    case TY_Number:
-      return "number";
-    case TY_Any:
-      return "any";
-    case TY_NA:
-      return "";
-    default:
-      MASSERT(0 && "Unexpected enumerator");
-  }
-  return "UNEXPECTED TypeId";
+std::string Emitter::GetEnumTypeId(TypeId k) {
+  std::string str(AstDump::GetEnumTypeId(k));
+  if (k != TY_Function && k != TY_Object)
+    str[3] = std::tolower(str[3]);
+  return str.substr(3);
 }
 
 const char *Emitter::GetEnumDeclProp(DeclProp k) {
