@@ -73,7 +73,7 @@ void AST_DFA::Build(AstFunction *func) {
   CollectDefNodes(func);
   BuildBitVectors();
   CollectUseNodes();
-  DumpUse();
+  // DumpUse();
   BuildDefUseChain();
 }
 
@@ -236,7 +236,7 @@ void AST_DFA::CollectDefNodes(AstFunction *func) {
 
     // process bb not visited
     if (done_list.find(bbid) == done_list.end()) {
-      std::cout << "working_list work " << bbid << std::endl;
+      if (mTrace) std::cout << "working_list work " << bbid << std::endl;
       for (int i = 0; i < bb->GetStatementsNum(); i++) {
         TreeNode *stmt = bb->GetStatementAtIndex(i);
         unsigned sid = stmt->GetNodeId();
@@ -262,7 +262,6 @@ void AST_DFA::CollectDefNodes(AstFunction *func) {
   }
 
   if (mTrace) DumpDefPositionVec();
-
 }
 
 void AST_DFA::BuildBitVectors() {
@@ -441,7 +440,7 @@ void AST_DFA::CollectUseNodes() {
   CollectUseVisitor visitor(mHandler, mTrace, true);
   for (auto bbid: mBbIdVec) {
     visitor.SetBbId(bbid);
-    std::cout << " == CollectUseNodes: bbid " << bbid << std::endl;
+    if (mTrace) std::cout << " == CollectUseNodes: bbid " << bbid << std::endl;
     AstBasicBlock *bb = mBbId2BBMap[bbid];
     for (int i = 0; i < bb->GetStatementsNum(); i++) {
       TreeNode *node = bb->GetStatementAtIndex(i);

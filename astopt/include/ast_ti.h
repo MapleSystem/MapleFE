@@ -53,7 +53,11 @@ class TypeInferVisitor : public AstVisitor {
     : mHandler(h), mTrace(t), AstVisitor(t && base) {}
   ~TypeInferVisitor() = default;
 
-  TypeId MergeTypeId(TypeId tia,  TypeId tib);
+  bool GetUpdated() {return mUpdated;}
+  void SetUpdated(bool b) {mUpdated = b;}
+  void UpdateTypeId(TreeNode *node, TypeId id);
+
+  TypeId MergeTypeId(TypeId tia, TypeId tib);
 
   DeclNode *VisitDeclNode(DeclNode *node);
   LiteralNode *VisitLiteralNode(LiteralNode *node);

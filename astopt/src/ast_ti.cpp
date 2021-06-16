@@ -25,7 +25,15 @@ namespace maplefe {
 void TypeInfer::TypeInference() {
   if (mTrace) std::cout << "============== TypeInfer ==============" << std::endl;
   TypeInferVisitor visitor(mHandler, mTrace, true);
-  visitor.Visit(mHandler->GetASTModule());
+  visitor.SetUpdated(true);
+  int count = 0;
+  while (visitor.GetUpdated()) {
+    count++;
+    visitor.SetUpdated(false);
+    visitor.Visit(mHandler->GetASTModule());
+    if (count > 10) break;
+  }
+  if (mTrace) std::cout << "\n>>>>>> TypeInference() iterated " << count << " times\n" << std::endl;
 }
 
 TypeId TypeInferVisitor::MergeTypeId(TypeId tia,  TypeId tib) {
@@ -53,15 +61,29 @@ TypeId TypeInferVisitor::MergeTypeId(TypeId tia,  TypeId tib) {
   return TY_None;
 }
 
+void TypeInferVisitor::UpdateTypeId(TreeNode *node, TypeId id) {
+  if (id == TY_None) {
+    return;
+  }
+  if (node->GetTypeId() != id) {
+    if (node->GetTypeId() != TY_None) {
+      if (mTrace) std::cout << "UpdateTypeId() new non TY_None: " << std::endl;
+      id = MergeTypeId(node->GetTypeId(), id);
+    }
+    node->SetTypeId(id);
+    mUpdated = true;
+  }
+}
+
 DeclNode *TypeInferVisitor::VisitDeclNode(DeclNode *node) {
   (void) AstVisitor::VisitDeclNode(node);
   TreeNode *init = node->GetInit();
   if (init) {
     VisitTreeNode(init);
-    node->SetTypeId(init->GetTypeId());
-    node->GetVar()->SetTypeId(init->GetTypeId());
+    UpdateTypeId(node, init->GetTypeId());
   }
-
+  TreeNode *var = node->GetVar();
+  UpdateTypeId(var, node->GetTypeId());
   return node;
 }
 
@@ -70,16 +92,16 @@ LiteralNode *TypeInferVisitor::VisitLiteralNode(LiteralNode *node) {
   LitId id = node->GetData().mType;
   switch (id) {
     case LT_IntegerLiteral:
-      node->SetTypeId(TY_Int);
+      UpdateTypeId(node, TY_Int);
       break;
     case LT_FPLiteral:
-      node->SetTypeId(TY_Float);
+      UpdateTypeId(node, TY_Float);
       break;
     case LT_DoubleLiteral:
-      node->SetTypeId(TY_Double);
+      UpdateTypeId(node, TY_Double);
       break;
     case LT_StringLiteral:
-      node->SetTypeId(TY_String);
+      UpdateTypeId(node, TY_String);
       break;
     default:
       break;
@@ -109,7 +131,7 @@ FieldNode *TypeInferVisitor::VisitFieldNode(FieldNode *node) {
     }
   }
   if (decl) {
-    node->SetTypeId(decl->GetTypeId());
+    UpdateTypeId(node, decl->GetTypeId());
   }
   return node;
 }
@@ -120,7 +142,7 @@ TreeNode *TypeInferVisitor::VisitClassField(TreeNode *node) {
     TreeNode *init = id->GetInit();
     if (init) {
       VisitTreeNode(init);
-      node->SetTypeId(init->GetTypeId());
+      UpdateTypeId(node, init->GetTypeId());
     }
   }
   return node;
@@ -130,7 +152,7 @@ IdentifierNode *TypeInferVisitor::VisitIdentifierNode(IdentifierNode *node) {
   (void) AstVisitor::VisitIdentifierNode(node);
   TreeNode *decl = mHandler->FindDecl(node);
   if (decl) {
-    node->SetTypeId(decl->GetTypeId());
+    UpdateTypeId(node, decl->GetTypeId());
   }
   return node;
 }
@@ -140,6 +162,7 @@ BinOperatorNode *TypeInferVisitor::VisitBinOperatorNode(BinOperatorNode *node) {
   OprId op = node->GetOprId();
   TreeNode *ta = node->GetOpndA();
   TreeNode *tb = node->GetOpndB();
+  // modified operand
   TreeNode *mod = NULL;
   TypeId tia = ta->GetTypeId();
   TypeId tib = tb->GetTypeId();
@@ -151,13 +174,13 @@ BinOperatorNode *TypeInferVisitor::VisitBinOperatorNode(BinOperatorNode *node) {
     case OPR_GE:
     case OPR_LE: {
       if (tia != TY_None && tib == TY_None) {
-        tb->SetTypeId(tia);
+        UpdateTypeId(tb, tia);
         mod = tb;
       } else if (tia == TY_None && tib != TY_None) {
-        ta->SetTypeId(tib);
+        UpdateTypeId(ta, tib);
         mod = ta;
       }
-      node->SetTypeId(TY_Boolean);
+      UpdateTypeId(node, TY_Boolean);
       break;
     }
     case OPR_Assign:
@@ -173,13 +196,13 @@ BinOperatorNode *TypeInferVisitor::VisitBinOperatorNode(BinOperatorNode *node) {
     case OPR_BxorAssign:
     case OPR_ZextAssign: {
       if (ta->GetTypeId() == TY_None) {
-        ta->SetTypeId(tb->GetTypeId());
+        UpdateTypeId(ta, tib);
         mod = ta;
       } else if (tb->GetTypeId() == TY_None) {
-        tb->SetTypeId(ta->GetTypeId());
+        UpdateTypeId(tb, tia);
         mod = tb;
       }
-      node->SetTypeId(tb->GetTypeId());
+      UpdateTypeId(node, tib);
       break;
     }
     case OPR_Add:
@@ -196,14 +219,14 @@ BinOperatorNode *TypeInferVisitor::VisitBinOperatorNode(BinOperatorNode *node) {
     case OPR_Land:
     case OPR_Lor: {
       if (tia != TY_None && tib == TY_None) {
-        tb->SetTypeId(tia);
+        UpdateTypeId(tb, tia);
         mod = tb;
       } else if (tia == TY_None && tib != TY_None) {
-        ta->SetTypeId(tib);
+        UpdateTypeId(ta, tib);
         mod = ta;
       }
       TypeId ti = MergeTypeId(tia, tib);
-      node->SetTypeId(ti);
+      UpdateTypeId(node, ti);
       break;
     }
     default: {
@@ -215,7 +238,7 @@ BinOperatorNode *TypeInferVisitor::VisitBinOperatorNode(BinOperatorNode *node) {
   if (mod && mod->IsIdentifier()) {
     TreeNode *decl = mHandler->FindDecl(static_cast<IdentifierNode *>(mod));
     if (decl) {
-      decl->SetTypeId(mod->GetTypeId());
+      UpdateTypeId(decl, mod->GetTypeId());
     }
   }
   return node;
@@ -228,20 +251,20 @@ UnaOperatorNode *TypeInferVisitor::VisitUnaOperatorNode(UnaOperatorNode *node) {
   switch (op) {
     case OPR_Add:
     case OPR_Sub:
-      node->SetTypeId(ta->GetTypeId());
+      UpdateTypeId(node, ta->GetTypeId());
       break;
     case OPR_Inc:
     case OPR_Dec:
-      ta->SetTypeId(TY_Int);
-      node->SetTypeId(TY_Int);
+      UpdateTypeId(ta, TY_Int);
+      UpdateTypeId(node, TY_Int);
       break;
     case OPR_Bcomp:
-      ta->SetTypeId(TY_Int);
-      node->SetTypeId(TY_Int);
+      UpdateTypeId(ta, TY_Int);
+      UpdateTypeId(node, TY_Int);
       break;
     case OPR_Not:
-      ta->SetTypeId(TY_Boolean);
-      node->SetTypeId(TY_Boolean);
+      UpdateTypeId(ta, TY_Boolean);
+      UpdateTypeId(node, TY_Boolean);
       break;
     default: {
       NOTYETIMPL("VisitUnaOperatorNode()");
@@ -252,19 +275,19 @@ UnaOperatorNode *TypeInferVisitor::VisitUnaOperatorNode(UnaOperatorNode *node) {
 }
 
 FunctionNode *TypeInferVisitor::VisitFunctionNode(FunctionNode *node) {
-  node->SetTypeId(TY_Function);
+  UpdateTypeId(node, TY_Function);
   (void) AstVisitor::VisitFunctionNode(node);
   return node;
 }
 
 LambdaNode *TypeInferVisitor::VisitLambdaNode(LambdaNode *node) {
-  node->SetTypeId(TY_Function);
+  UpdateTypeId(node, TY_Function);
   (void) AstVisitor::VisitLambdaNode(node);
   return node;
 }
 
 ClassNode *TypeInferVisitor::VisitClassNode(ClassNode *node) {
-  node->SetTypeId(TY_Class);
+  UpdateTypeId(node, TY_Class);
   for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
     TreeNode *t = node->GetField(i);
     (void) VisitClassField(t);
@@ -274,7 +297,7 @@ ClassNode *TypeInferVisitor::VisitClassNode(ClassNode *node) {
 }
 
 InterfaceNode *TypeInferVisitor::VisitInterfaceNode(InterfaceNode *node) {
-  node->SetTypeId(TY_Class);
+  UpdateTypeId(node, TY_Class);
   for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
     TreeNode *t = node->GetFieldAtIndex(i);
     (void) VisitClassField(t);
@@ -286,7 +309,7 @@ InterfaceNode *TypeInferVisitor::VisitInterfaceNode(InterfaceNode *node) {
 ReturnNode *TypeInferVisitor::VisitReturnNode(ReturnNode *node) {
   (void) AstVisitor::VisitReturnNode(node);
   if (node->GetResult()) {
-    node->SetTypeId(node->GetResult()->GetTypeId());
+    UpdateTypeId(node, node->GetResult()->GetTypeId());
   }
   return node;
 }

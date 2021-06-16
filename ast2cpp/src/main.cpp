@@ -61,8 +61,7 @@ int main (int argc, char *argv[]) {
     ss.str(inputname);
     std::string item;
     while (std::getline(ss, item, ',')) {
-      //*(result++) = item;
-      std::cout << "item " << item << " xxx"<< std::endl;
+      // std::cout << "item " << item << " xxx"<< std::endl;
       inputfiles.push_back(item);
     }
   }
