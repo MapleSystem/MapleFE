@@ -1586,7 +1586,7 @@ rule RequiredParameter: ONEOF(
   attr.action.%2 : BuildDecl(%2, %1)
 
 ## rule AccessibilityModifier: public private protected
-rule AccessibilityModifier: ONEOF("public", "private", "protected", "readonly")
+rule AccessibilityModifier: ONEOF("public", "private", "protected", "readonly", "static")
 
 ## rule BindingIdentifierOrPattern: BindingIdentifier BindingPattern
 rule BindingIdentifierOrPattern: ONEOF(BindingIdentifier, BindingPattern)
@@ -1770,11 +1770,11 @@ rule PropertyMemberDeclaration: ONEOF(MemberVariableDeclaration,
 
 ## MemberVariableDeclaration: AccessibilityModifieropt staticopt PropertyName TypeAnnotationopt Initializeropt ;
 rule MemberVariableDeclaration:
-  ZEROORONE(Annotation) + ZEROORONE(AccessibilityModifier) + ZEROORONE("static") + PropertyName + ZEROORONE(TypeAnnotation) + ZEROORONE(Initializer) + ';'
-  attr.action: AddInitTo(%4, %6)
-  attr.action: AddModifierTo(%4, %2)
-  attr.action: AddModifierTo(%4, %1)
-  attr.action: BuildDecl(%5, %4)
+  ZEROORONE(Annotation) + ZEROORMORE(AccessibilityModifier) + PropertyName + ZEROORONE(TypeAnnotation) + ZEROORONE(Initializer) + ';'
+  attr.action: AddInitTo(%3, %5)
+  attr.action: AddType(%3, %4)
+  attr.action: AddModifierTo(%3, %2)
+  attr.action: BuildDecl(%4, %3)
 
 
 ## MemberFunctionDeclaration: AccessibilityModifieropt staticopt PropertyName CallSignature { FunctionBody } AccessibilityModifieropt staticopt PropertyName CallSignature ;
