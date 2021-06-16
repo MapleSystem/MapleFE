@@ -25,9 +25,8 @@ bool CppEmitter::EmitCxxFiles() {
   unsigned size = mASTHandler->mModuleHandlers.GetNum();
   for (int i = 0; i < size; i++) {
     Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
-    ModuleNode *m = handler->GetASTModule();
     { // Emit C++ header file
-      CppDecl decl(m);
+      CppDecl decl(handler);
       std::string decl_code = decl.Emit();
       std::string fn = decl.GetBaseFileName() + ".h"s;
       std::ofstream out(fn.c_str(), std::ofstream::out);
@@ -37,7 +36,7 @@ bool CppEmitter::EmitCxxFiles() {
       std::system(cmd.c_str());
     }
     { // Emit C++ implementation file
-      CppDef def(m);
+      CppDef def(handler);
       std::string def_code = def.Emit();
       std::string fn = def.GetBaseFileName() + ".cpp"s;
       std::ofstream out(fn.c_str(), std::ofstream::out);

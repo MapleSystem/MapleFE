@@ -16,13 +16,16 @@
 #ifndef __CPPDECL_HEADER__
 #define __CPPDECL_HEADER__
 
+#include "ast_handler.h"
 #include "emitter.h"
 
 namespace maplefe {
 
 class CppDecl : public Emitter {
 public:
-  CppDecl(ModuleNode *m) : Emitter(m) {}
+  Module_Handler mHandler;
+
+  CppDecl(Module_Handler *h) : mHandler(h), Emitter(h->GetASTModule()) {}
 
   std::string Emit() {
     return EmitTreeNode(GetASTModule());

@@ -16,19 +16,16 @@
 #ifndef __CPPDEFINITIONEMITTER_HEADER__
 #define __CPPDEFINITIONEMITTER_HEADER__
 
-#include "ast.h"
-#include "ast_attr.h"
-#include "ast_module.h"
 #include "ast_handler.h"
-#include "ast_type.h"
-
 #include "emitter.h"
 
 namespace maplefe {
 
 class CppDef : public Emitter {
 public:
-  CppDef(ModuleNode *m) : Emitter(m) {}
+  Module_Handler mHandler;
+
+  CppDef(Module_Handler *h) : mHandler(h), Emitter(h->GetASTModule()) {}
 
   std::string Emit() {
     return EmitTreeNode(GetASTModule());
