@@ -1442,7 +1442,11 @@ TreeNode* ASTBuilder::BuildArrayLiteral() {
       ExprListNode *el = (ExprListNode*)literals;
       for (unsigned i = 0; i < el->GetExprsNum(); i++) {
         TreeNode *expr = el->GetExprAtIndex(i);
-        MASSERT(expr->IsLiteral() || expr->IsArrayLiteral() || expr->IsFieldLiteral() || expr->IsStructLiteral());
+        MASSERT(expr->IsLiteral() ||
+                expr->IsArrayLiteral() ||
+                expr->IsFieldLiteral() ||
+                expr->IsStructLiteral() ||
+                expr->IsIdentifier());
         array_literal->AddLiteral(expr);
       }
     }

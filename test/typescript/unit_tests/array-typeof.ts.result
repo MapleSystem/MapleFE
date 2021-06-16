@@ -1,0 +1,37 @@
+Matched 4 tokens.
+Matched 8 tokens.
+Matched 12 tokens.
+Matched 29 tokens.
+============= Module ===========
+== Sub Tree ==
+class  V2
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+class  V3
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+class  VType
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+js_const Decl: BuiltinVTypes=[V2,V3]
