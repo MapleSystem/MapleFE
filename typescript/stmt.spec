@@ -1578,7 +1578,7 @@ rule RequiredParameterList: ONEOF(RequiredParameter,
 ## NOTE: I extend StringLiteral to Literal.
 ## NOTE: I Added initializer. I guess the spec missed this part.
 rule RequiredParameter: ONEOF(
-  ZEROORONE(AccessibilityModifier) + BindingIdentifierOrPattern + ZEROORONE(Initializer) + ZEROORONE(TypeAnnotation),
+  ZEROORMORE(AccessibilityModifier) + BindingIdentifierOrPattern + ZEROORONE(Initializer) + ZEROORONE(TypeAnnotation),
   "this" + TypeAnnotation,
   BindingIdentifier + ':' + Literal)
   attr.action.%1 : AddInitTo(%2, %3)
@@ -1597,8 +1597,8 @@ rule OptionalParameterList: ONEOF(OptionalParameter,
 
 ## rule OptionalParameter: AccessibilityModifieropt BindingIdentifierOrPattern ? TypeAnnotationopt AccessibilityModifieropt BindingIdentifierOrPattern TypeAnnotationopt Initializer BindingIdentifier ? : StringLiteral
 rule OptionalParameter: ONEOF(
-  ZEROORONE(AccessibilityModifier) + BindingIdentifierOrPattern + '?' + ZEROORONE(TypeAnnotation),
-  ZEROORONE(AccessibilityModifier) + BindingIdentifierOrPattern + ZEROORONE(TypeAnnotation) + Initializer,
+  ZEROORMORE(AccessibilityModifier) + BindingIdentifierOrPattern + '?' + ZEROORONE(TypeAnnotation),
+  ZEROORMORE(AccessibilityModifier) + BindingIdentifierOrPattern + ZEROORONE(TypeAnnotation) + Initializer,
   BindingIdentifier + '?' + ':' + Literal)
   attr.action.%1 : SetOptionalParam(%2)
   attr.action.%1 : BuildDecl(%4, %2)
