@@ -31,20 +31,19 @@ namespace maplefe {
 
 // starting point of AST
 void A2C::ProcessAST() {
-  // loop through modules
+  // loop through module handlers
   unsigned size = mASTHandler->mModuleHandlers.GetNum();
   for (int i = 0; i < size; i++) {
-    // get gModule
     Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
-    gModule = handler->GetASTModule();
+    ModuleNode *module = handler->GetASTModule();
 
     if (mTraceA2C) {
       std::cout << "============= in ProcessAST ===========" << std::endl;
-      std::cout << "srcLang : " << gModule->GetSrcLangString() << std::endl;
+      std::cout << "srcLang : " << module->GetSrcLangString() << std::endl;
     }
 
-    for(unsigned i = 0; i < gModule->GetTreesNum(); i++) {
-      TreeNode *tnode = gModule->GetTree(i);
+    for(unsigned i = 0; i < module->GetTreesNum(); i++) {
+      TreeNode *tnode = module->GetTree(i);
       if (mTraceA2C) {
         tnode->Dump(0);
         std::cout << std::endl;
@@ -53,21 +52,21 @@ void A2C::ProcessAST() {
 
     if (mTraceA2C) {
       std::cout << "============= AstGraph ===========" << std::endl;
-      AstGraph graph(gModule);
+      AstGraph graph(module);
       graph.DumpGraph("After LoadFromAstBuf()", &std::cout);
     }
 
     handler->AdjustAST();
     if (mTraceA2C) {
       std::cout << "============= After AdjustAST ===========" << std::endl;
-      for(unsigned i = 0; i < gModule->GetTreesNum(); i++) {
-        TreeNode *tnode = gModule->GetTree(i);
+      for(unsigned i = 0; i < module->GetTreesNum(); i++) {
+        TreeNode *tnode = module->GetTree(i);
         if (mTraceA2C) {
           tnode->Dump(0);
           std::cout << std::endl;
         }
       }
-      AstGraph graph(gModule);
+      AstGraph graph(module);
       graph.DumpGraph("After AdjustAST()", &std::cout);
     }
 
@@ -76,22 +75,23 @@ void A2C::ProcessAST() {
       handler->Dump("After BuildCFG()");
     }
 
-    handler->BuildScope(gModule);
+    handler->BuildScope();
+    handler->TypeInference();
 
     if (mTraceA2C) {
       std::cout << "============= AstGraph ===========" << std::endl;
-      AstGraph graph(gModule);
+      AstGraph graph(module);
       graph.DumpGraph("After BuildCFG()", &std::cout);
     }
 
     if (mTraceA2C) {
       std::cout << "============= AstDump ===========" << std::endl;
-      AstDump astdump(gModule);
+      AstDump astdump(module);
       astdump.Dump("After BuildCFG()", &std::cout);
     }
 
     // loop through functions in the module
-    for (auto func: handler->mModuleFuncsMap[gModule->GetNodeId()]) {
+    for (auto func: handler->mModuleFuncsMap[module->GetNodeId()]) {
       handler->ASTCollectAndDBRemoval(func);
       if (mTraceA2C) {
         handler->Dump("After ASTCollectAndDBRemoval()");
@@ -101,25 +101,11 @@ void A2C::ProcessAST() {
       if (mTraceA2C) {
         // handler->Dump("After BuildDFA()");
       }
-
-      handler->TypeInference(func);
-    }
-
-    if (mTraceA2C) {
-      std::cout << "============= AstGraph 2 ===========" << std::endl;
-      AstGraph graph(gModule);
-      graph.DumpGraph("After BuildCFG()", &std::cout);
-    }
-
-    if (mTraceA2C) {
-      std::cout << "============= AstDump 2 ===========" << std::endl;
-      AstDump astdump(gModule);
-      astdump.Dump("After BuildCFG()", &std::cout);
     }
 
     if (mTraceA2C) {
       std::cout << "============== Dump Scope ==============" << std::endl;
-      gModule->GetRootScope()->Dump(0);
+      module->GetRootScope()->Dump(0);
     }
   }
 

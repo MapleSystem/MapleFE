@@ -24,9 +24,10 @@ void AST_AST::ASTCollectAndDBRemoval(AstFunction *func) {
   CollectASTInfo(func);
   RemoveDeadBlocks(func);
 
+  ModuleNode *module = mHandler->GetASTModule();
   if (mTrace) {
-    for(unsigned i = 0; i < gModule->GetTreesNum(); i++) {
-      TreeNode *it = gModule->GetTree(i);
+    for(unsigned i = 0; i < module->GetTreesNum(); i++) {
+      TreeNode *it = module->GetTree(i);
       it->Dump(0);
       std::cout << std::endl;
     }

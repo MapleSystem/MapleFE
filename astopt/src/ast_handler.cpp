@@ -62,11 +62,11 @@ void Module_Handler::BuildDFA(AstFunction *func) {
   mDFA->Build(func);
 }
 
-void Module_Handler::BuildScope(ModuleNode *mod) {
+void Module_Handler::BuildScope() {
   if (!mDFA) {
     mDFA = new(GetMemPool()->Alloc(sizeof(AST_DFA))) AST_DFA(this, mTrace);
   }
-  mDFA->BuildScope(mod);
+  mDFA->BuildScope();
 }
 
 // input an identifire ===> returen the decl node with same name
@@ -97,11 +97,11 @@ TreeNode *Module_Handler::FindFunc(IdentifierNode *inode) {
   return NULL;
 }
 
-void Module_Handler::TypeInference(AstFunction *func) {
+void Module_Handler::TypeInference() {
   if (!mTI) {
     mTI = new(GetMemPool()->Alloc(sizeof(TypeInfer))) TypeInfer(this, mTrace);
   }
-  mTI->TypeInference(func);
+  mTI->TypeInference();
 }
 
 void Module_Handler::Dump(char *msg) {

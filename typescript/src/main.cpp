@@ -94,22 +94,25 @@ int main (int argc, char *argv[]) {
     return 1;
   }
 
+  // the module from parser is gModule
+  maplefe::ModuleNode *module = maplefe::gModule;
+
   if(dump_ast) {
-    maplefe::AstDump astdump(maplefe::gModule);
+    maplefe::AstDump astdump(module);
     astdump.Dump("ts2ast: Initial AST", &std::cout);
   }
 
   if(dump_dot) {
-    maplefe::AstGraph graph(maplefe::gModule);
+    maplefe::AstGraph graph(module);
     graph.DumpGraph("ts2ast: Initial AST", &std::cout);
   }
 
-  maplefe::AstStore saveAst(maplefe::gModule);
+  maplefe::AstStore saveAst(module);
   saveAst.StoreInAstBuf();
   maplefe::AstBuffer &ast_buf = saveAst.GetAstBuf();
 
   std::ofstream ofs;
-  std::string fname(maplefe::gModule->GetFileName());
+  std::string fname(module->GetFileName());
   fname += ".ast";
   ofs.open(fname, std::ofstream::out);
   const char *addr = (const char *)(&(ast_buf[0]));

@@ -24,21 +24,19 @@ namespace maplefe {
 
 // starting point of AST
 void AstOpt::ProcessAST(bool trace_a2c) {
-  // loop through modules
+  // loop through module handlers
   unsigned size = mASTHandler->mModuleHandlers.GetNum();
   for (int i = 0; i < size; i++) {
-    // set gModule
     Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
-    gModule = handler->GetASTModule();
-    handler->SetASTModule(gModule);
+    ModuleNode *module = handler->GetASTModule();
 
     mTraceAstOpt = trace_a2c;
     if (mTraceAstOpt) {
       std::cout << "============= in ProcessAST ===========" << std::endl;
-      std::cout << "srcLang : " << gModule->GetSrcLangString() << std::endl;
+      std::cout << "srcLang : " << module->GetSrcLangString() << std::endl;
     }
-    for(unsigned i = 0; i < gModule->GetTreesNum(); i++) {
-      TreeNode *tnode = gModule->GetTree(i);
+    for(unsigned i = 0; i < module->GetTreesNum(); i++) {
+      TreeNode *tnode = module->GetTree(i);
       if (mTraceAstOpt) {
         tnode->Dump(0);
         std::cout << std::endl;
@@ -52,13 +50,13 @@ void AstOpt::ProcessAST(bool trace_a2c) {
     handler->BuildCFG();
 
     // loop through functions in the module
-    for (auto func: handler->mModuleFuncsMap[gModule->GetNodeId()]) {
+    for (auto func: handler->mModuleFuncsMap[module->GetNodeId()]) {
       handler->ASTCollectAndDBRemoval(func);
 
       handler->BuildDFA(func);
     }
 
-    AstStore saveAst(gModule);
+    AstStore saveAst(module);
     saveAst.StoreInAstBuf();
   }
 

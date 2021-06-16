@@ -36,7 +36,7 @@ class TypeInfer {
   explicit TypeInfer(Module_Handler *h, bool t) : mHandler(h), mTrace(t) {}
   ~TypeInfer() {}
 
-  void TypeInference(AstFunction *func);
+  void TypeInference();
 };
 
 class TypeInferVisitor : public AstVisitor {

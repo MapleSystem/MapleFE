@@ -22,43 +22,10 @@
 
 namespace maplefe {
 
-void TypeInfer::TypeInference(AstFunction *func) {
+void TypeInfer::TypeInference() {
   if (mTrace) std::cout << "============== TypeInfer ==============" << std::endl;
   TypeInferVisitor visitor(mHandler, mTrace, true);
-
-  std::unordered_set<unsigned> done_list;
-  std::deque<AstBasicBlock *> working_list;
-
-  AstBasicBlock *bb = func->GetEntryBB();
-  MASSERT(bb && "null BB");
-  unsigned bbid = bb->GetId();
-
-  working_list.push_back(bb);
-
-  unsigned bitnum = 0;
-
-  while(working_list.size()) {
-    bb = working_list.front();
-    MASSERT(bb && "null BB");
-    bbid = bb->GetId();
-
-    // process bb not visited
-    if (done_list.find(bbid) == done_list.end()) {
-      std::cout << "working_list work " << bbid << std::endl;
-      for (int i = 0; i < bb->GetStatementsNum(); i++) {
-        TreeNode *stmt = bb->GetStatementAtIndex(i);
-        visitor.Visit(stmt);
-      }
-
-      for (int i = 0; i < bb->GetSuccessorsNum(); i++) {
-        working_list.push_back(bb->GetSuccessorAtIndex(i));
-      }
-
-      done_list.insert(bbid);
-    }
-
-    working_list.pop_front();
-  }
+  visitor.Visit(mHandler->GetASTModule());
 }
 
 TypeId TypeInferVisitor::MergeTypeId(TypeId tia,  TypeId tib) {

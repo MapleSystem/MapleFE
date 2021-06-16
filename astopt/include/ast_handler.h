@@ -69,11 +69,11 @@ class Module_Handler {
   ~Module_Handler() {}
 
   void AdjustAST();
-  void BuildScope(ModuleNode *mod);
+  void BuildScope();
   void BuildCFG();
   void ASTCollectAndDBRemoval(AstFunction *func);
   void BuildDFA(AstFunction *func);
-  void TypeInference(AstFunction *func);
+  void TypeInference();
 
   const char *GetOutputFileName() {return mOutputFileName;}
   void SetOutputFileName(const char *name) {mOutputFileName = name;}

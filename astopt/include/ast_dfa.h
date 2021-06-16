@@ -77,7 +77,7 @@ class AST_DFA {
   ~AST_DFA();
 
   void Build(AstFunction *func);
-  void BuildScope(ModuleNode *mod);
+  void BuildScope();
 
   void CollectDefNodes(AstFunction *func);
   void CollectUseNodes();

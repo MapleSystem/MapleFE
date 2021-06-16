@@ -483,17 +483,18 @@ IdentifierNode *CollectUseVisitor::VisitIdentifierNode(IdentifierNode *node) {
   return node;
 }
 
-void AST_DFA::BuildScope(ModuleNode *mod) {
+void AST_DFA::BuildScope() {
   if (mTrace) std::cout << "============== BuildScope ==============" << std::endl;
   BuildScopeVisitor visitor(mHandler, mTrace, true);
   while(!visitor.mScopeStack.empty()) {
     visitor.mScopeStack.pop();
   }
-  visitor.mScopeStack.push(mod->GetRootScope());
-  mHandler->mNodeId2Scope[mod->GetNodeId()] = mod->GetRootScope();
+  ModuleNode *module = mHandler->GetASTModule();
+  visitor.mScopeStack.push(module->GetRootScope());
+  mHandler->mNodeId2Scope[module->GetNodeId()] = module->GetRootScope();
 
-  for(unsigned i = 0; i < mod->GetTreesNum(); i++) {
-    TreeNode *it = mod->GetTree(i);
+  for(unsigned i = 0; i < module->GetTreesNum(); i++) {
+    TreeNode *it = module->GetTree(i);
     visitor.Visit(it);
   }
 }
