@@ -686,6 +686,7 @@ gen_args = [
 #include "{astdump}.h"
 #include <algorithm>
 #include <set>
+#include <cctype>
 #include <cstring>""".format(astdump = astdump),  # Extra include directives
         "",            # Base class
         ]
@@ -712,6 +713,8 @@ bool PutNode(TreeNode *n) {{
   if(n && mNodes.find(n) == mNodes.end()) {{
     mNodes.insert(n);
     *mOs << NodeName(n,\'_\') << " [label=\\"" << NodeName(n,',') << "\\\\n";
+    std::string tid(EnumVal(TreeNode, TypeId, TypeId));
+    if(tid != "TY_None") *mOs << "<" << static_cast<char>(std::tolower(tid[3])) << tid.substr(4) << ">\\\\n";
     switch(n->GetKind()) {{
       case NK_Module:    {{
                            auto fn = static_cast<ModuleNode *>(n)->GetFileName();
