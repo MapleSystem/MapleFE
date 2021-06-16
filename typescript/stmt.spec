@@ -1146,7 +1146,6 @@ rule ArrowFunction : ONEOF(
   BindingIdentifier + "=>" + ConciseBody,
   ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + "=>" + ConciseBody)
   attr.action.%1 : BuildLambda(%1, %3)
-  attr.action.%1 : AddParams(%1)
   attr.action.%2 : BuildLambda(%3, %7)
   attr.action.%2 : AddType(%5)
   attr.action.%1,%2 : SetArrowFunction()
