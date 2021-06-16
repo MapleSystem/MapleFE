@@ -63,6 +63,8 @@ class TypeInferVisitor : public AstVisitor {
   FunctionNode *VisitFunctionNode(FunctionNode *node);
   LambdaNode *VisitLambdaNode(LambdaNode *node);
   ClassNode *VisitClassNode(ClassNode *node);
+  FieldNode *VisitFieldNode(FieldNode *node);
+  TreeNode *VisitClassField(TreeNode *node);
   InterfaceNode *VisitInterfaceNode(InterfaceNode *node);
   ReturnNode *VisitReturnNode(ReturnNode *node);
 };

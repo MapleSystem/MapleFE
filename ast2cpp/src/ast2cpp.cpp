@@ -75,6 +75,7 @@ void A2C::ProcessAST() {
       handler->Dump("After BuildCFG()");
     }
 
+    // module level information build
     handler->BuildScope();
     handler->TypeInference();
 

@@ -87,6 +87,45 @@ LiteralNode *TypeInferVisitor::VisitLiteralNode(LiteralNode *node) {
   return node;
 }
 
+FieldNode *TypeInferVisitor::VisitFieldNode(FieldNode *node) {
+  (void) AstVisitor::VisitFieldNode(node);
+  TreeNode *upper = node->GetUpper();
+  IdentifierNode *field = static_cast<IdentifierNode *>(node->GetField());
+  TreeNode *decl = NULL;
+  if (!upper) {
+    decl = mHandler->FindDecl(field);
+  } else {
+    switch (upper->GetKind()) {
+      case NK_Literal: {
+        LiteralNode *ln = static_cast<LiteralNode *>(upper);
+        // this.f
+        if (ln->GetData().mType == LT_ThisLiteral) {
+          decl = mHandler->FindDecl(field);
+        }
+        break;
+      }
+      default:
+        break;
+    }
+  }
+  if (decl) {
+    node->SetTypeId(decl->GetTypeId());
+  }
+  return node;
+}
+
+TreeNode *TypeInferVisitor::VisitClassField(TreeNode *node) {
+  if (node->IsIdentifier()) {
+    IdentifierNode *id = static_cast<IdentifierNode *>(node);
+    TreeNode *init = id->GetInit();
+    if (init) {
+      VisitTreeNode(init);
+      node->SetTypeId(init->GetTypeId());
+    }
+  }
+  return node;
+}
+
 IdentifierNode *TypeInferVisitor::VisitIdentifierNode(IdentifierNode *node) {
   (void) AstVisitor::VisitIdentifierNode(node);
   TreeNode *decl = mHandler->FindDecl(node);
@@ -132,11 +171,17 @@ BinOperatorNode *TypeInferVisitor::VisitBinOperatorNode(BinOperatorNode *node) {
     case OPR_BandAssign:
     case OPR_BorAssign:
     case OPR_BxorAssign:
-    case OPR_ZextAssign:
-      ta->SetTypeId(tb->GetTypeId());
+    case OPR_ZextAssign: {
+      if (ta->GetTypeId() == TY_None) {
+        ta->SetTypeId(tb->GetTypeId());
+        mod = ta;
+      } else if (tb->GetTypeId() == TY_None) {
+        tb->SetTypeId(ta->GetTypeId());
+        mod = tb;
+      }
       node->SetTypeId(tb->GetTypeId());
-      mod = ta;
       break;
+    }
     case OPR_Add:
     case OPR_Sub:
     case OPR_Mul:
@@ -220,12 +265,20 @@ LambdaNode *TypeInferVisitor::VisitLambdaNode(LambdaNode *node) {
 
 ClassNode *TypeInferVisitor::VisitClassNode(ClassNode *node) {
   node->SetTypeId(TY_Class);
+  for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
+    TreeNode *t = node->GetField(i);
+    (void) VisitClassField(t);
+  }
   (void) AstVisitor::VisitClassNode(node);
   return node;
 }
 
 InterfaceNode *TypeInferVisitor::VisitInterfaceNode(InterfaceNode *node) {
   node->SetTypeId(TY_Class);
+  for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
+    TreeNode *t = node->GetFieldAtIndex(i);
+    (void) VisitClassField(t);
+  }
   (void) AstVisitor::VisitInterfaceNode(node);
   return node;
 }
