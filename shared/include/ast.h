@@ -759,7 +759,7 @@ public:
   ~FieldNode(){mAsTypes.Release();}
 
   IdentifierNode* GetField() {return mField;}
-  void SetField(IdentifierNode *f) {mField = f;}
+  void SetField(IdentifierNode *f) {mField = f; if(f) f->SetParent(this);}
 
   // AsType related
   unsigned GetAsTypesNum()           {return mAsTypes.GetNum();}
@@ -776,6 +776,7 @@ public:
       up = pn->GetExpr();
     }
     mUpper = up;
+    up->SetParent(this);
   }
 
   void Dump(unsigned);
