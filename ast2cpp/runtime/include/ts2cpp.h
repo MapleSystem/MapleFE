@@ -86,7 +86,12 @@ typedef std::map<std::string, JS_Prop*> JS_PropList;
 class BaseObj {
   public:
     JS_PropList propList;
-    // JS_Prop* prototype;
+    JS_Prop* proto;
+    bool hasOwnProp(std::string key) {
+      JS_PropList::iterator it;
+      it = propList.find(key);
+      return (it != propList.end());
+    }
 };
 
 template <class T>
