@@ -97,7 +97,7 @@ std::string CppDecl::EmitIdentifierNode(IdentifierNode *node) {
     str += EmitTreeNode(n);
   }
   else
-    str += "double"s; // Needs type information here
+    str += CppDecl::GetEnumTypeId(node->GetTypeId());
   str += " "s + node->GetName();
   return str;
 }
@@ -171,6 +171,24 @@ std::string CppDecl::EmitPrimArrayTypeNode(PrimArrayTypeNode *node) {
 
 std::string CppDecl::EmitFieldNode(FieldNode *node) {
   return std::string();
+}
+
+std::string CppDecl::GetEnumTypeId(TypeId k) {
+  switch (k) {
+  case TY_Object:
+    return "t2crt::BaseObj*";
+  case TY_Function:
+    return "t2crt::BaseObj*";
+  case TY_Boolean:
+    return "bool";
+  case TY_Int:
+    return "long";
+  case TY_String:
+    return "std::string";
+  case TY_Number:
+    return "double";
+  }
+  return Emitter::GetEnumTypeId(k);
 }
 
 } // namespace maplefe
