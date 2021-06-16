@@ -1781,18 +1781,18 @@ rule MemberVariableDeclaration:
 #NOTE: I inlined CallSignature to make it easier for building function.
 #rule CallSignature: ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation)
 rule MemberFunctionDeclaration: ONEOF(
-  ZEROORONE(AccessibilityModifier) + ZEROORONE("static") + PropertyName + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}',
-  ZEROORONE(AccessibilityModifier) + ZEROORONE("static") + PropertyName + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + ';')
-  attr.action.%1,%2 : BuildFunction(%3)
-  attr.action.%1,%2 : AddModifier(%2)
-  attr.action.%1,%2 : AddParams(%6)
-  attr.action.%1,%2 : AddType(%8)
-  attr.action.%1    : AddFunctionBody(%10)
+  ZEROORMORE(AccessibilityModifier) + PropertyName + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}',
+  ZEROORMORE(AccessibilityModifier) + PropertyName + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + ';')
+  attr.action.%1,%2 : BuildFunction(%2)
+  attr.action.%1,%2 : AddModifier(%1)
+  attr.action.%1,%2 : AddParams(%5)
+  attr.action.%1,%2 : AddType(%7)
+  attr.action.%1    : AddFunctionBody(%9)
 
 ## MemberAccessorDeclaration: AccessibilityModifieropt staticopt GetAccessor AccessibilityModifieropt staticopt SetAccessor
 rule MemberAccessorDeclaration: ONEOF(
-  ZEROORONE(AccessibilityModifier) + ZEROORONE("static") + GetAccessor,
-  ZEROORONE(AccessibilityModifier) + ZEROORONE("static") + SetAccessor)
+  ZEROORMORE(AccessibilityModifier) + GetAccessor,
+  ZEROORMORE(AccessibilityModifier) + SetAccessor)
 
 ## IndexMemberDeclaration: IndexSignature ;
 rule IndexMemberDeclaration: IndexSignature + ';'
