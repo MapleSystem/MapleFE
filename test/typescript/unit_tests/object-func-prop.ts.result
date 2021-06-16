@@ -1,0 +1,9 @@
+Matched 22 tokens.
+Matched 29 tokens.
+============= Module ===========
+== Sub Tree ==
+js_const Decl: initializer= {foo:func  foo(data)  throws: 
+  console.log(data)
+}
+== Sub Tree ==
+initializer.foo("test")

@@ -1638,10 +1638,15 @@ rule TypeAliasDeclaration: "type" + BindingIdentifier + ZEROORONE(TypeParameters
 rule PropertyDefinition: ONEOF(IdentifierReference,
                                CoverInitializedName,
                                PropertyName + ':' + AssignmentExpression,
-                               PropertyName + CallSignature + '{' + FunctionBody + '}',
+                               PropertyName + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')'
+                                 + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}',
                                GetAccessor,
                                SetAccessor)
   attr.action.%3 : BuildFieldLiteral(%1, %3)
+  attr.action.%4 : BuildFunction(%1)
+  attr.action.%4 : AddType(%6)
+  attr.action.%4 : AddParams(%4)
+  attr.action.%4 : AddFunctionBody(%8)
 
 ## GetAccessor: get PropertyName ( ) TypeAnnotationopt { FunctionBody }
 rule GetAccessor: "get" + PropertyName + '(' + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}'
