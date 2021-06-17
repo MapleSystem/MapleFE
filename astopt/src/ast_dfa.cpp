@@ -186,7 +186,7 @@ unsigned AST_DFA::AddDef(TreeNode *node, unsigned &bitnum, unsigned bbid) {
     case NK_UnaOperator: {
       UnaOperatorNode *uon = static_cast<UnaOperatorNode *>(node);
       OprId op = uon->GetOprId();
-      if (op == OPR_Inc || op == OPR_Dec) {
+      if (op == OPR_Inc || op == OPR_Dec || op == OPR_PreInc || op == OPR_PreDec) {
         TreeNode *lhs = uon->GetOpnd();
         stridx = lhs->GetStrIdx();
         nodeid = lhs->GetNodeId();

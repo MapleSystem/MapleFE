@@ -37,28 +37,30 @@ void TypeInfer::TypeInference() {
 }
 
 TypeId TypeInferVisitor::MergeTypeId(TypeId tia,  TypeId tib) {
+  TypeId result = TY_None;
   if (tia == tib) {
-    return tia;
+    result = tia;
   } else if (tib == TY_None) {
-    return tia;
+    result = tia;
   } else if (tia == TY_None) {
-    return tib;
+    result = tib;
   } else if (tib == TY_Object) {
-    return tib;
+    result = tib;
   } else if (tia == TY_Object) {
-    return tia;
+    result = tia;
   } else if ((tia == TY_Int && tib == TY_Long) ||
              (tib == TY_Int && tia == TY_Long)) {
-    return TY_Long;
+    result = TY_Long;
   } else if ((tia == TY_Int && tib == TY_Float) ||
              (tib == TY_Int && tia == TY_Float)) {
-    return TY_Float;
+    result = TY_Float;
   } else if ((tia == TY_Long && tib == TY_Float) ||
              (tib == TY_Long && tia == TY_Float)) {
-    return TY_Double;
+    result = TY_Double;
+  } else {
+    NOTYETIMPL("MergeTypeId()");
   }
-  NOTYETIMPL("MergeTypeId()");
-  return TY_None;
+  return result;
 }
 
 void TypeInferVisitor::UpdateTypeId(TreeNode *node, TypeId id) {
@@ -75,67 +77,6 @@ void TypeInferVisitor::UpdateTypeId(TreeNode *node, TypeId id) {
   }
 }
 
-DeclNode *TypeInferVisitor::VisitDeclNode(DeclNode *node) {
-  (void) AstVisitor::VisitDeclNode(node);
-  TreeNode *init = node->GetInit();
-  if (init) {
-    VisitTreeNode(init);
-    UpdateTypeId(node, init->GetTypeId());
-  }
-  TreeNode *var = node->GetVar();
-  UpdateTypeId(var, node->GetTypeId());
-  return node;
-}
-
-LiteralNode *TypeInferVisitor::VisitLiteralNode(LiteralNode *node) {
-  (void) AstVisitor::VisitLiteralNode(node);
-  LitId id = node->GetData().mType;
-  switch (id) {
-    case LT_IntegerLiteral:
-      UpdateTypeId(node, TY_Int);
-      break;
-    case LT_FPLiteral:
-      UpdateTypeId(node, TY_Float);
-      break;
-    case LT_DoubleLiteral:
-      UpdateTypeId(node, TY_Double);
-      break;
-    case LT_StringLiteral:
-      UpdateTypeId(node, TY_String);
-      break;
-    default:
-      break;
-  }
-  return node;
-}
-
-FieldNode *TypeInferVisitor::VisitFieldNode(FieldNode *node) {
-  (void) AstVisitor::VisitFieldNode(node);
-  TreeNode *upper = node->GetUpper();
-  IdentifierNode *field = static_cast<IdentifierNode *>(node->GetField());
-  TreeNode *decl = NULL;
-  if (!upper) {
-    decl = mHandler->FindDecl(field);
-  } else {
-    switch (upper->GetKind()) {
-      case NK_Literal: {
-        LiteralNode *ln = static_cast<LiteralNode *>(upper);
-        // this.f
-        if (ln->GetData().mType == LT_ThisLiteral) {
-          decl = mHandler->FindDecl(field);
-        }
-        break;
-      }
-      default:
-        break;
-    }
-  }
-  if (decl) {
-    UpdateTypeId(node, decl->GetTypeId());
-  }
-  return node;
-}
-
 TreeNode *TypeInferVisitor::VisitClassField(TreeNode *node) {
   if (node->IsIdentifier()) {
     IdentifierNode *id = static_cast<IdentifierNode *>(node);
@@ -148,12 +89,48 @@ TreeNode *TypeInferVisitor::VisitClassField(TreeNode *node) {
   return node;
 }
 
-IdentifierNode *TypeInferVisitor::VisitIdentifierNode(IdentifierNode *node) {
-  (void) AstVisitor::VisitIdentifierNode(node);
-  TreeNode *decl = mHandler->FindDecl(node);
-  if (decl) {
-    UpdateTypeId(node, decl->GetTypeId());
-  }
+AnnotationNode *TypeInferVisitor::VisitAnnotationNode(AnnotationNode *node) {
+  (void) AstVisitor::VisitAnnotationNode(node);
+  return node;
+}
+
+AnnotationTypeNode *TypeInferVisitor::VisitAnnotationTypeNode(AnnotationTypeNode *node) {
+  (void) AstVisitor::VisitAnnotationTypeNode(node);
+  return node;
+}
+
+ArrayElementNode *TypeInferVisitor::VisitArrayElementNode(ArrayElementNode *node) {
+  (void) AstVisitor::VisitArrayElementNode(node);
+  return node;
+}
+
+ArrayLiteralNode *TypeInferVisitor::VisitArrayLiteralNode(ArrayLiteralNode *node) {
+  (void) AstVisitor::VisitArrayLiteralNode(node);
+  return node;
+}
+
+AssertNode *TypeInferVisitor::VisitAssertNode(AssertNode *node) {
+  (void) AstVisitor::VisitAssertNode(node);
+  return node;
+}
+
+AsTypeNode *TypeInferVisitor::VisitAsTypeNode(AsTypeNode *node) {
+  (void) AstVisitor::VisitAsTypeNode(node);
+  return node;
+}
+
+AttrNode *TypeInferVisitor::VisitAttrNode(AttrNode *node) {
+  (void) AstVisitor::VisitAttrNode(node);
+  return node;
+}
+
+BindingElementNode *TypeInferVisitor::VisitBindingElementNode(BindingElementNode *node) {
+  (void) AstVisitor::VisitBindingElementNode(node);
+  return node;
+}
+
+BindingPatternNode *TypeInferVisitor::VisitBindingPatternNode(BindingPatternNode *node) {
+  (void) AstVisitor::VisitBindingPatternNode(node);
   return node;
 }
 
@@ -244,6 +221,326 @@ BinOperatorNode *TypeInferVisitor::VisitBinOperatorNode(BinOperatorNode *node) {
   return node;
 }
 
+BlockNode *TypeInferVisitor::VisitBlockNode(BlockNode *node) {
+  (void) AstVisitor::VisitBlockNode(node);
+  return node;
+}
+
+BreakNode *TypeInferVisitor::VisitBreakNode(BreakNode *node) {
+  (void) AstVisitor::VisitBreakNode(node);
+  return node;
+}
+
+CallNode *TypeInferVisitor::VisitCallNode(CallNode *node) {
+  (void) AstVisitor::VisitCallNode(node);
+  return node;
+}
+
+CastNode *TypeInferVisitor::VisitCastNode(CastNode *node) {
+  (void) AstVisitor::VisitCastNode(node);
+  return node;
+}
+
+CatchNode *TypeInferVisitor::VisitCatchNode(CatchNode *node) {
+  (void) AstVisitor::VisitCatchNode(node);
+  return node;
+}
+
+ClassNode *TypeInferVisitor::VisitClassNode(ClassNode *node) {
+  UpdateTypeId(node, TY_Class);
+  for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
+    TreeNode *t = node->GetField(i);
+    (void) VisitClassField(t);
+  }
+  (void) AstVisitor::VisitClassNode(node);
+  return node;
+}
+
+CondBranchNode *TypeInferVisitor::VisitCondBranchNode(CondBranchNode *node) {
+  (void) AstVisitor::VisitCondBranchNode(node);
+  return node;
+}
+
+ContinueNode *TypeInferVisitor::VisitContinueNode(ContinueNode *node) {
+  (void) AstVisitor::VisitContinueNode(node);
+  return node;
+}
+
+DeclareNode *TypeInferVisitor::VisitDeclareNode(DeclareNode *node) {
+  (void) AstVisitor::VisitDeclareNode(node);
+  return node;
+}
+
+DeclNode *TypeInferVisitor::VisitDeclNode(DeclNode *node) {
+  (void) AstVisitor::VisitDeclNode(node);
+  TreeNode *init = node->GetInit();
+  if (init) {
+    VisitTreeNode(init);
+    UpdateTypeId(node, init->GetTypeId());
+  }
+  TreeNode *var = node->GetVar();
+  UpdateTypeId(var, node->GetTypeId());
+  return node;
+}
+
+DeleteNode *TypeInferVisitor::VisitDeleteNode(DeleteNode *node) {
+  (void) AstVisitor::VisitDeleteNode(node);
+  return node;
+}
+
+DimensionNode *TypeInferVisitor::VisitDimensionNode(DimensionNode *node) {
+  (void) AstVisitor::VisitDimensionNode(node);
+  return node;
+}
+
+DoLoopNode *TypeInferVisitor::VisitDoLoopNode(DoLoopNode *node) {
+  (void) AstVisitor::VisitDoLoopNode(node);
+  return node;
+}
+
+ExceptionNode *TypeInferVisitor::VisitExceptionNode(ExceptionNode *node) {
+  (void) AstVisitor::VisitExceptionNode(node);
+  return node;
+}
+
+ExportNode *TypeInferVisitor::VisitExportNode(ExportNode *node) {
+  (void) AstVisitor::VisitExportNode(node);
+  return node;
+}
+
+ExprListNode *TypeInferVisitor::VisitExprListNode(ExprListNode *node) {
+  (void) AstVisitor::VisitExprListNode(node);
+  return node;
+}
+
+FieldLiteralNode *TypeInferVisitor::VisitFieldLiteralNode(FieldLiteralNode *node) {
+  (void) AstVisitor::VisitFieldLiteralNode(node);
+  return node;
+}
+
+FieldNode *TypeInferVisitor::VisitFieldNode(FieldNode *node) {
+  (void) AstVisitor::VisitFieldNode(node);
+  TreeNode *upper = node->GetUpper();
+  IdentifierNode *field = static_cast<IdentifierNode *>(node->GetField());
+  TreeNode *decl = NULL;
+  if (!upper) {
+    decl = mHandler->FindDecl(field);
+  } else {
+    switch (upper->GetKind()) {
+      case NK_Literal: {
+        LiteralNode *ln = static_cast<LiteralNode *>(upper);
+        // this.f
+        if (ln->GetData().mType == LT_ThisLiteral) {
+          decl = mHandler->FindDecl(field);
+        }
+        break;
+      }
+      default:
+        break;
+    }
+  }
+  if (decl) {
+    UpdateTypeId(node, decl->GetTypeId());
+  }
+  return node;
+}
+
+FinallyNode *TypeInferVisitor::VisitFinallyNode(FinallyNode *node) {
+  (void) AstVisitor::VisitFinallyNode(node);
+  return node;
+}
+
+ForLoopNode *TypeInferVisitor::VisitForLoopNode(ForLoopNode *node) {
+  (void) AstVisitor::VisitForLoopNode(node);
+  return node;
+}
+
+FunctionNode *TypeInferVisitor::VisitFunctionNode(FunctionNode *node) {
+  UpdateTypeId(node, TY_Function);
+  (void) AstVisitor::VisitFunctionNode(node);
+  return node;
+}
+
+IdentifierNode *TypeInferVisitor::VisitIdentifierNode(IdentifierNode *node) {
+  (void) AstVisitor::VisitIdentifierNode(node);
+  TreeNode *decl = mHandler->FindDecl(node);
+  if (decl) {
+    UpdateTypeId(node, decl->GetTypeId());
+  }
+  return node;
+}
+
+ImportNode *TypeInferVisitor::VisitImportNode(ImportNode *node) {
+  (void) AstVisitor::VisitImportNode(node);
+  return node;
+}
+
+InNode *TypeInferVisitor::VisitInNode(InNode *node) {
+  (void) AstVisitor::VisitInNode(node);
+  return node;
+}
+
+InstanceOfNode *TypeInferVisitor::VisitInstanceOfNode(InstanceOfNode *node) {
+  (void) AstVisitor::VisitInstanceOfNode(node);
+  return node;
+}
+
+InterfaceNode *TypeInferVisitor::VisitInterfaceNode(InterfaceNode *node) {
+  UpdateTypeId(node, TY_Class);
+  for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
+    TreeNode *t = node->GetFieldAtIndex(i);
+    (void) VisitClassField(t);
+  }
+  (void) AstVisitor::VisitInterfaceNode(node);
+  return node;
+}
+
+KeyOfNode *TypeInferVisitor::VisitKeyOfNode(KeyOfNode *node) {
+  (void) AstVisitor::VisitKeyOfNode(node);
+  return node;
+}
+
+LambdaNode *TypeInferVisitor::VisitLambdaNode(LambdaNode *node) {
+  UpdateTypeId(node, TY_Function);
+  (void) AstVisitor::VisitLambdaNode(node);
+  return node;
+}
+
+LiteralNode *TypeInferVisitor::VisitLiteralNode(LiteralNode *node) {
+  (void) AstVisitor::VisitLiteralNode(node);
+  LitId id = node->GetData().mType;
+  switch (id) {
+    case LT_IntegerLiteral:
+      UpdateTypeId(node, TY_Int);
+      break;
+    case LT_FPLiteral:
+      UpdateTypeId(node, TY_Float);
+      break;
+    case LT_DoubleLiteral:
+      UpdateTypeId(node, TY_Double);
+      break;
+    case LT_StringLiteral:
+      UpdateTypeId(node, TY_String);
+      break;
+    default:
+      break;
+  }
+  return node;
+}
+
+ModuleNode *TypeInferVisitor::VisitModuleNode(ModuleNode *node) {
+  (void) AstVisitor::VisitModuleNode(node);
+  return node;
+}
+
+NamespaceNode *TypeInferVisitor::VisitNamespaceNode(NamespaceNode *node) {
+  (void) AstVisitor::VisitNamespaceNode(node);
+  return node;
+}
+
+NewNode *TypeInferVisitor::VisitNewNode(NewNode *node) {
+  (void) AstVisitor::VisitNewNode(node);
+  return node;
+}
+
+NumIndexSigNode *TypeInferVisitor::VisitNumIndexSigNode(NumIndexSigNode *node) {
+  (void) AstVisitor::VisitNumIndexSigNode(node);
+  return node;
+}
+
+PackageNode *TypeInferVisitor::VisitPackageNode(PackageNode *node) {
+  (void) AstVisitor::VisitPackageNode(node);
+  return node;
+}
+
+ParenthesisNode *TypeInferVisitor::VisitParenthesisNode(ParenthesisNode *node) {
+  (void) AstVisitor::VisitParenthesisNode(node);
+  return node;
+}
+
+PassNode *TypeInferVisitor::VisitPassNode(PassNode *node) {
+  (void) AstVisitor::VisitPassNode(node);
+  return node;
+}
+
+PrimArrayTypeNode *TypeInferVisitor::VisitPrimArrayTypeNode(PrimArrayTypeNode *node) {
+  (void) AstVisitor::VisitPrimArrayTypeNode(node);
+  return node;
+}
+
+PrimTypeNode *TypeInferVisitor::VisitPrimTypeNode(PrimTypeNode *node) {
+  (void) AstVisitor::VisitPrimTypeNode(node);
+  return node;
+}
+
+ReturnNode *TypeInferVisitor::VisitReturnNode(ReturnNode *node) {
+  (void) AstVisitor::VisitReturnNode(node);
+  if (node->GetResult()) {
+    UpdateTypeId(node, node->GetResult()->GetTypeId());
+  }
+  return node;
+}
+
+StrIndexSigNode *TypeInferVisitor::VisitStrIndexSigNode(StrIndexSigNode *node) {
+  (void) AstVisitor::VisitStrIndexSigNode(node);
+  return node;
+}
+
+StructLiteralNode *TypeInferVisitor::VisitStructLiteralNode(StructLiteralNode *node) {
+  (void) AstVisitor::VisitStructLiteralNode(node);
+  return node;
+}
+
+StructNode *TypeInferVisitor::VisitStructNode(StructNode *node) {
+  (void) AstVisitor::VisitStructNode(node);
+  return node;
+}
+
+SwitchCaseNode *TypeInferVisitor::VisitSwitchCaseNode(SwitchCaseNode *node) {
+  (void) AstVisitor::VisitSwitchCaseNode(node);
+  return node;
+}
+
+SwitchLabelNode *TypeInferVisitor::VisitSwitchLabelNode(SwitchLabelNode *node) {
+  (void) AstVisitor::VisitSwitchLabelNode(node);
+  return node;
+}
+
+SwitchNode *TypeInferVisitor::VisitSwitchNode(SwitchNode *node) {
+  (void) AstVisitor::VisitSwitchNode(node);
+  return node;
+}
+
+TemplateLiteralNode *TypeInferVisitor::VisitTemplateLiteralNode(TemplateLiteralNode *node) {
+  (void) AstVisitor::VisitTemplateLiteralNode(node);
+  return node;
+}
+
+TerOperatorNode *TypeInferVisitor::VisitTerOperatorNode(TerOperatorNode *node) {
+  (void) AstVisitor::VisitTerOperatorNode(node);
+  return node;
+}
+
+ThrowNode *TypeInferVisitor::VisitThrowNode(ThrowNode *node) {
+  (void) AstVisitor::VisitThrowNode(node);
+  return node;
+}
+
+TryNode *TypeInferVisitor::VisitTryNode(TryNode *node) {
+  (void) AstVisitor::VisitTryNode(node);
+  return node;
+}
+
+TypeOfNode *TypeInferVisitor::VisitTypeOfNode(TypeOfNode *node) {
+  (void) AstVisitor::VisitTypeOfNode(node);
+  return node;
+}
+
+TypeParameterNode *TypeInferVisitor::VisitTypeParameterNode(TypeParameterNode *node) {
+  (void) AstVisitor::VisitTypeParameterNode(node);
+  return node;
+}
+
 UnaOperatorNode *TypeInferVisitor::VisitUnaOperatorNode(UnaOperatorNode *node) {
   (void) AstVisitor::VisitUnaOperatorNode(node);
   OprId op = node->GetOprId();
@@ -253,7 +550,9 @@ UnaOperatorNode *TypeInferVisitor::VisitUnaOperatorNode(UnaOperatorNode *node) {
     case OPR_Sub:
       UpdateTypeId(node, ta->GetTypeId());
       break;
+    case OPR_PreInc:
     case OPR_Inc:
+    case OPR_PreDec:
     case OPR_Dec:
       UpdateTypeId(ta, TY_Int);
       UpdateTypeId(node, TY_Int);
@@ -274,43 +573,23 @@ UnaOperatorNode *TypeInferVisitor::VisitUnaOperatorNode(UnaOperatorNode *node) {
   return node;
 }
 
-FunctionNode *TypeInferVisitor::VisitFunctionNode(FunctionNode *node) {
-  UpdateTypeId(node, TY_Function);
-  (void) AstVisitor::VisitFunctionNode(node);
+UserTypeNode *TypeInferVisitor::VisitUserTypeNode(UserTypeNode *node) {
+  (void) AstVisitor::VisitUserTypeNode(node);
   return node;
 }
 
-LambdaNode *TypeInferVisitor::VisitLambdaNode(LambdaNode *node) {
-  UpdateTypeId(node, TY_Function);
-  (void) AstVisitor::VisitLambdaNode(node);
+VarListNode *TypeInferVisitor::VisitVarListNode(VarListNode *node) {
+  (void) AstVisitor::VisitVarListNode(node);
   return node;
 }
 
-ClassNode *TypeInferVisitor::VisitClassNode(ClassNode *node) {
-  UpdateTypeId(node, TY_Class);
-  for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
-    TreeNode *t = node->GetField(i);
-    (void) VisitClassField(t);
-  }
-  (void) AstVisitor::VisitClassNode(node);
+WhileLoopNode *TypeInferVisitor::VisitWhileLoopNode(WhileLoopNode *node) {
+  (void) AstVisitor::VisitWhileLoopNode(node);
   return node;
 }
 
-InterfaceNode *TypeInferVisitor::VisitInterfaceNode(InterfaceNode *node) {
-  UpdateTypeId(node, TY_Class);
-  for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
-    TreeNode *t = node->GetFieldAtIndex(i);
-    (void) VisitClassField(t);
-  }
-  (void) AstVisitor::VisitInterfaceNode(node);
-  return node;
-}
-
-ReturnNode *TypeInferVisitor::VisitReturnNode(ReturnNode *node) {
-  (void) AstVisitor::VisitReturnNode(node);
-  if (node->GetResult()) {
-    UpdateTypeId(node, node->GetResult()->GetTypeId());
-  }
+XXportAsPairNode *TypeInferVisitor::VisitXXportAsPairNode(XXportAsPairNode *node) {
+  (void) AstVisitor::VisitXXportAsPairNode(node);
   return node;
 }
 
