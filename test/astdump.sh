@@ -60,7 +60,7 @@ for ts in $LIST; do
   else
     echo "$AST2CPP" "$ts".ast --trace-a2c
     out=$("$AST2CPP" "$ts".ast --trace-a2c 2>&1)
-    [ $? -eq 0 ] || Failed="$Failed $ts.ast"
+    [ $? -eq 0 ] || Failed="$Failed $ts"
   fi
   echo "$out"
   cmd=$(grep -n -e "^// .Beginning of Emitter:" -e "// End of Emitter.$" <<< "$out" |
