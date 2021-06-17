@@ -1513,7 +1513,7 @@ public:
   TreeNode* GetMethod() {return mMethod;}
   void SetMethod(TreeNode *t) {mMethod = t; SETPARENT(t);}
 
-  void AddArg(TreeNode *t);
+  void AddArg(TreeNode *t) {mArgs.Merge(t); SETPARENT(t);}
   unsigned GetArgsNum() {return mArgs.GetExprsNum();}
   TreeNode* GetArg(unsigned index) {return mArgs.GetExprAtIndex(index);}
   void      SetArg(unsigned i, TreeNode* n) {mArgs.SetExprAtIndex(i, n); SETPARENT(n);}

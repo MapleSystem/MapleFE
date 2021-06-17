@@ -441,10 +441,6 @@ void DeleteNode::Dump(unsigned indent) {
 //                          CallNode
 //////////////////////////////////////////////////////////////////////////////////////
 
-void CallNode::AddArg(TreeNode *arg) {
-  mArgs.Merge(arg);
-}
-
 void CallNode::AddTypeArgument(TreeNode *arg) {
   if (arg->IsPass()) {
     PassNode *n = (PassNode*)arg;
