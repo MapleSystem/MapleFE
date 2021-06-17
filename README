@@ -31,6 +31,11 @@ have our own frontend, which could be easier to handle new languages.
 https://gitee.com/openarkcompiler/OpenArkCompiler/blob/master/doc/en/DevelopmentPreparation.md
 Follow the instruction in "Recommended Development Environment" section to get tools installed
 
+The following packages also need to be installed:
+```bash
+sudo apt install -y clang-tools-10 clang-format-10 python3 libyaml-cpp-dev
+```
+
 [How to build]
 
 1. source envsetup.sh [java|typescript]
