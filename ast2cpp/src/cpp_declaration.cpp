@@ -70,6 +70,15 @@ public: // all top level functions in the module
 void __init_func__();
 )""";
 
+  // declaration of all top-level functions
+  CfgFunc *module = mHandler->GetCfgFunc();
+  auto num = module->GetNestedFuncsNum();
+  for(unsigned i = 0; i < num; ++i) {
+    CfgFunc *func = module->GetNestedFuncAtIndex(i);
+    TreeNode *node = func->GetFuncNode();
+    str += EmitTreeNode(node);
+  }
+
   str += R"""(
   // export table here
 };
@@ -78,11 +87,27 @@ extern )""" + name + " _"s + name + ";\n#endif\n"s;
   return str;
 }
 
-
 std::string CppDecl::EmitFunctionNode(FunctionNode *node) {
   if (node == nullptr)
     return std::string();
-  return Emitter::EmitFunctionNode(node);
+  std::string str;
+  if (auto n = node->GetType()) {
+    str += EmitTreeNode(n) + " "s;
+  }
+  else
+    str += "void "s;
+  if(node->GetStrIdx())
+    str += node->GetName();
+  str += "("s;
+  for (unsigned i = 0; i < node->GetParamsNum(); ++i) {
+    if (i)
+      str += ", "s;
+    if (auto n = node->GetParam(i)) {
+      str += EmitTreeNode(n);
+    }
+  }
+  str += ");\n"s;
+  return str;
 }
 
 std::string CppDecl::EmitBinOperatorNode(BinOperatorNode *node) {

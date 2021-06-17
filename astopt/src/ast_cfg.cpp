@@ -673,7 +673,7 @@ StructNode *CfgBuilder::VisitStructNode(StructNode *node) {
 // Allocate a new CfgFunc node
 CfgFunc *CfgBuilder::NewFunction(TreeNode *node)   {
   CfgFunc *func = new(mHandler->GetMemPool()->Alloc(sizeof(CfgFunc))) CfgFunc;
-  func->SetFunction(node);
+  func->SetFuncNode(node);
   return func;
 }
 
@@ -776,7 +776,7 @@ void CfgBuilder::Build() {
     funcQueue.pop();
     // Start to build CFG for current function
     InitializeFunction(func);
-    TreeNode *node = func->GetFunction();
+    TreeNode *node = func->GetFuncNode();
     switch(node->GetKind()) {
       case NK_Function:
         Visit(static_cast<FunctionNode*>(node)->GetBody());;

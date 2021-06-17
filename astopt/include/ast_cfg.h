@@ -140,7 +140,7 @@ class CfgBB {
 
 class CfgFunc {
  private:
-  TreeNode             *mFuncNode;        // ModuleNode, FunctionNode or LambdaNode
+  TreeNode             *mFuncNode;    // ModuleNode, FunctionNode or LambdaNode
   SmallList<CfgFunc *>  mNestedFuncs; // nested functions
   CfgFunc              *mParent;
   CfgBB                *mEntryBB;
@@ -151,8 +151,8 @@ class CfgFunc {
   explicit CfgFunc() : mParent(nullptr), mEntryBB(nullptr), mExitBB(nullptr), mFuncNode(nullptr) {}
   ~CfgFunc() {mNestedFuncs.Release();}
 
-  void      SetFunction(TreeNode *func) {mFuncNode = func;}
-  TreeNode *GetFunction()               {return mFuncNode;}
+  void      SetFuncNode(TreeNode *func) {mFuncNode = func;}
+  TreeNode *GetFuncNode()               {return mFuncNode;}
 
   const char *GetName() {
     return mFuncNode->GetKind() == NK_Module ? "_init_" :
