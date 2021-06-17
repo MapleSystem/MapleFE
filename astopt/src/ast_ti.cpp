@@ -101,11 +101,13 @@ AnnotationTypeNode *TypeInferVisitor::VisitAnnotationTypeNode(AnnotationTypeNode
 
 ArrayElementNode *TypeInferVisitor::VisitArrayElementNode(ArrayElementNode *node) {
   (void) AstVisitor::VisitArrayElementNode(node);
+  VisitTreeNode(node->GetArray());
   return node;
 }
 
 ArrayLiteralNode *TypeInferVisitor::VisitArrayLiteralNode(ArrayLiteralNode *node) {
   (void) AstVisitor::VisitArrayLiteralNode(node);
+  UpdateTypeId(node, TY_Object);
   return node;
 }
 
