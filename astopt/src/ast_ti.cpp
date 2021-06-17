@@ -101,7 +101,9 @@ AnnotationTypeNode *TypeInferVisitor::VisitAnnotationTypeNode(AnnotationTypeNode
 
 ArrayElementNode *TypeInferVisitor::VisitArrayElementNode(ArrayElementNode *node) {
   (void) AstVisitor::VisitArrayElementNode(node);
-  VisitTreeNode(node->GetArray());
+  if (node->GetExprsNum()) {
+    UpdateTypeId(node, node->GetExprAtIndex(0)->GetTypeId());
+  }
   return node;
 }
 

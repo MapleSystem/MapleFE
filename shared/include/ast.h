@@ -804,7 +804,7 @@ public:
   unsigned  GetExprsNum()       {return mExprs.GetNum();}
   TreeNode* GetExprAtIndex(unsigned i) {return mExprs.ValueAtIndex(i);}
   void      SetExprAtIndex(unsigned i, TreeNode* n) {*(mExprs.RefAtIndex(i)) = n; SETPARENT(n);}
-  void      AddExpr(TreeNode *n){mExprs.PushBack(n);}
+  void      AddExpr(TreeNode *n){mExprs.PushBack(n); SETPARENT(n);}
 
   void Release() {mExprs.Release();}
   void Dump(unsigned);
