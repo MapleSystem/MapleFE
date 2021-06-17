@@ -136,9 +136,10 @@ rule CharacterLiteral : ''' + ONEOF(SingleCharacter, EscapeSequence) + '''
 #########################################################################
 # The UnicodeEscape is limited from \u0000 to \u00ff.
 rule StringUnicodeEscape: '\' + 'u' + '0' + '0' + HEXDIGIT + HEXDIGIT
-rule StringCharater: ONEOF(StringUnicodeEscape, RawInputCharacter)
-rule StringLiteral : ONEOF('"' + ZEROORMORE(StringCharater) + '"',
-                           ''' + ZEROORMORE(StringCharater) + ''')
+rule SingleStringCharater: ONEOF(StringUnicodeEscape, RawInputCharacter, '"')
+rule DoubleStringCharater: ONEOF(StringUnicodeEscape, RawInputCharacter, ''')
+rule StringLiteral : ONEOF('"' + ZEROORMORE(DoubleStringCharater) + '"',
+                           ''' + ZEROORMORE(SingleStringCharater) + ''')
 
 #########################################################################
 ##                           Null                                      ##
