@@ -53,42 +53,11 @@ std::string Emitter::GetModuleName(const char *p) {
   return "M_"s + str;
 }
 
-const char *Emitter::GetEnumAttrId(AttrId k) {
-  switch (k) {
-    case ATTR_abstract:
-      return "abstract ";
-    case ATTR_const:
-      return "const ";
-    case ATTR_volatile:
-      return "volatile ";
-    case ATTR_final:
-      return "final ";
-    case ATTR_native:
-      return "native ";
-    case ATTR_private:
-      return "private ";
-    case ATTR_protected:
-      return "protected ";
-    case ATTR_public:
-      return "public ";
-    case ATTR_static:
-      return "static ";
-    case ATTR_strictfp:
-      return "strictfp ";
-    case ATTR_default:
-      return "default ";
-    case ATTR_synchronized:
-      return "synchronized ";
-    case ATTR_getter:
-      return "get ";
-    case ATTR_setter:
-      return "set ";
-    case ATTR_NA:
-      return "ATTR_NA ";
-    default:
-      MASSERT(0 && "Unexpected enumerator");
-  }
-  return "UNEXPECTED AttrId";
+std::string Emitter::GetEnumAttrId(AttrId k) {
+  std::string str(AstDump::GetEnumAttrId(k) + 5);
+  Emitter::Replace(str, "etter", "et");
+  str += " "s;
+  return str;
 }
 
 void Emitter::Replace(std::string &str, const char *o, const char *n, int cnt) {
@@ -1729,10 +1698,10 @@ std::string Emitter::EmitTreeNode(TreeNode *node) {
 }
 
 std::string Emitter::GetEnumTypeId(TypeId k) {
-  std::string str(AstDump::GetEnumTypeId(k));
+  std::string str(AstDump::GetEnumTypeId(k) + 3);
   if (k != TY_Function && k != TY_Object)
-    str[3] = std::tolower(str[3]);
-  return str.substr(3);
+    str[0] = std::tolower(str[0]);
+  return str;
 }
 
 const char *Emitter::GetEnumDeclProp(DeclProp k) {
