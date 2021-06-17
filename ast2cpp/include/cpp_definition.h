@@ -23,7 +23,7 @@ namespace maplefe {
 
 class CppDef : public Emitter {
 public:
-  Module_Handler mHandler;
+  Module_Handler *mHandler;
 
   CppDef(Module_Handler *h) : mHandler(h), Emitter(h->GetASTModule()) {}
 
