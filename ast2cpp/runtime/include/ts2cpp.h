@@ -18,7 +18,7 @@
 
 #include <vector>
 #include <string>
-#include <map>
+#include <unordered_map>
 
 namespace t2crt {
 
@@ -77,11 +77,11 @@ typedef struct JS_Prop {
   }
 
   bool IsCompilerGenProp() { return !(type & 0x10); }
-  
+
 } JS_Prop;
 
 
-typedef std::map<std::string, JS_Prop*> JS_PropList;
+typedef std::unordered_map<std::string, JS_Prop*> JS_PropList;
 
 class BaseObj {
   public:

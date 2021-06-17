@@ -1146,12 +1146,13 @@ gen_args = [
 #include <cstring>
 #include <cstdint>
 #include <set>
+#include <unordered_map>
 namespace maplefe {{
 using AstBuffer  = std::vector<uint8_t>;
 using AstBufIter = std::vector<uint8_t>::iterator;
 using AstNodeVec = std::vector<TreeNode*>;
-using AstNodeMap = std::map<unsigned, TreeNode*>;
-using AstStrMap  = std::map<unsigned, unsigned>;
+using AstNodeMap = std::unordered_map<unsigned, TreeNode*>;
+using AstStrMap  = std::unordered_map<unsigned, unsigned>;
 }}
 """.format(astvisitor=astvisitor),
         ""             # Base class
