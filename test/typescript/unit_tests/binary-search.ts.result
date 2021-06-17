@@ -1,6 +1,6 @@
-Matched 108 tokens.
-Matched 129 tokens.
-Matched 141 tokens.
+Matched 110 tokens.
+Matched 131 tokens.
+Matched 143 tokens.
 ============= Module ===========
 == Sub Tree ==
 func  binarySearch(array,value)  throws: 
