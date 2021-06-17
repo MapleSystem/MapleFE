@@ -64,7 +64,7 @@ TypeId TypeInferVisitor::MergeTypeId(TypeId tia,  TypeId tib) {
 }
 
 void TypeInferVisitor::UpdateTypeId(TreeNode *node, TypeId id) {
-  if (id == TY_None) {
+  if (!node || id == TY_None) {
     return;
   }
   if (node->GetTypeId() != id) {
@@ -236,6 +236,8 @@ BreakNode *TypeInferVisitor::VisitBreakNode(BreakNode *node) {
 }
 
 CallNode *TypeInferVisitor::VisitCallNode(CallNode *node) {
+  TreeNode *method = node->GetMethod();
+  UpdateTypeId(method, TY_Function);
   (void) AstVisitor::VisitCallNode(node);
   return node;
 }
@@ -347,6 +349,7 @@ FieldNode *TypeInferVisitor::VisitFieldNode(FieldNode *node) {
   if (decl) {
     UpdateTypeId(node, decl->GetTypeId());
   }
+  UpdateTypeId(field, node->GetTypeId());
   return node;
 }
 
