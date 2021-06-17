@@ -778,7 +778,7 @@ public:
       up = pn->GetExpr();
     }
     mUpper = up;
-    ;
+    SETPARENT(up);
   }
 
   void Dump(unsigned);

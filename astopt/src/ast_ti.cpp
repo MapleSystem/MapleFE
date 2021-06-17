@@ -284,6 +284,7 @@ DeclNode *TypeInferVisitor::VisitDeclNode(DeclNode *node) {
   }
   TreeNode *var = node->GetVar();
   UpdateTypeId(var, node->GetTypeId());
+  UpdateTypeId(init, node->GetTypeId());
   return node;
 }
 
