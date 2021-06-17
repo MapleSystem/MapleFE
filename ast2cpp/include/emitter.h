@@ -124,7 +124,7 @@ public:
   static std::string GetEnumAttrId(AttrId k);
   //static const char *GetEnumImportProperty(ImportProperty k);
   //static const char *GetEnumOperatorProperty(OperatorProperty k);
-  static const char *GetEnumDeclProp(DeclProp k);
+  static std::string GetEnumDeclProp(DeclProp k);
   //static const char *GetEnumStructProp(StructProp k);
   //static const char *GetEnumForLoopProp(ForLoopProp k);
   //static const char *GetEnumLambdaProperty(LambdaProperty k);

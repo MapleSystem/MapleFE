@@ -1704,20 +1704,11 @@ std::string Emitter::GetEnumTypeId(TypeId k) {
   return str;
 }
 
-const char *Emitter::GetEnumDeclProp(DeclProp k) {
-  switch (k) {
-  case JS_Var:
-    return "var";
-  case JS_Let:
-    return "let";
-  case JS_Const:
-    return "const";
-  case DP_NA:
-    return "";
-  default:
-    MASSERT(0 && "Unexpected enumerator");
-  }
-  return "UNEXPECTED DeclProp";
+std::string Emitter::GetEnumDeclProp(DeclProp k) {
+  std::string str(AstDump::GetEnumDeclProp(k) + 3);
+  if(str != "NA")
+    str[0] = std::tolower(str[0]);
+  return str;
 }
 
 const char *Emitter::GetEnumOprId(OprId k) {
