@@ -28,9 +28,8 @@
 
 namespace maplefe {
 
-class AstBasicBlock;
-class AstFunction;
-class AST_CFG;
+class CfgBB;
+class CfgFunc;
 class AST_AST;
 class AST_DFA;
 class AST_Handler;
@@ -41,27 +40,25 @@ class Module_Handler {
  private:
   AST_Handler  *mASTHandler;
   ModuleNode   *mASTModule;  // for an AST module
-  AstFunction  *mFunction;   // an init function for statements in module scope
-  AST_CFG      *mCFG;
+  CfgFunc      *mCfgFunc;   // initial CfgFunc in module scope
   AST_AST      *mAST;
   AST_DFA      *mDFA;
   TypeInfer    *mTI;
   const char   *mOutputFileName;
   bool          mTrace;
-  std::unordered_map<unsigned, AstBasicBlock *> mNodeId2BbMap;
+  std::unordered_map<unsigned, CfgBB *> mNodeId2BbMap;
 
  public:
   // module node id to its ast function vector
-  std::unordered_map<unsigned, std::vector<AstFunction *>> mModuleFuncsMap;
+  std::unordered_map<unsigned, std::vector<CfgFunc *>> mModuleFuncsMap;
   // only reachable BBs
-  std::unordered_map<unsigned, AstBasicBlock *> mBbId2BbMap;
+  std::unordered_map<unsigned, CfgBB *> mBbId2BbMap;
   // scope node id to scope
   std::unordered_map<unsigned, ASTScope *> mNodeId2Scope;
 
  public:
   explicit Module_Handler(bool trace) :
-    mFunction(nullptr),
-    mCFG(nullptr),
+    mCfgFunc(nullptr),
     mAST(nullptr),
     mDFA(nullptr),
     mTI(nullptr),
@@ -71,36 +68,34 @@ class Module_Handler {
   void AdjustAST();
   void BuildScope();
   void BuildCFG();
-  void ASTCollectAndDBRemoval(AstFunction *func);
-  void BuildDFA(AstFunction *func);
+  void ASTCollectAndDBRemoval(CfgFunc *func);
+  void BuildDFA(CfgFunc *func);
   void TypeInference();
 
-  const char *GetOutputFileName() {return mOutputFileName;}
+  const char *GetOutputFileName()          {return mOutputFileName;}
   void SetOutputFileName(const char *name) {mOutputFileName = name;}
 
   void SetASTHandler(AST_Handler *h) {mASTHandler = h;}
-  AST_Handler *GetASTHandler() {return mASTHandler;}
+  AST_Handler *GetASTHandler()       {return mASTHandler;}
 
   void SetASTModule(ModuleNode *mod) {mASTModule = mod;}
-  ModuleNode *GetASTModule() {return mASTModule;}
+  ModuleNode *GetASTModule()         {return mASTModule;}
 
   MemPool *GetMemPool();
 
-  void         SetFunction(AstFunction *func)  {mFunction = func;}
-  AstFunction *GetFunction()                   {return mFunction;}
+  void     SetCfgFunc(CfgFunc *func)  {mCfgFunc = func;}
+  CfgFunc *GetCfgFunc()               {return mCfgFunc;}
 
-  void SetBbFromNodeId(unsigned id, AstBasicBlock *bb) { mNodeId2BbMap[id] = bb; }
-  AstBasicBlock *GetBbFromNodeId(unsigned id) { return mNodeId2BbMap[id]; }
+  void SetBbFromNodeId(unsigned id, CfgBB *bb) { mNodeId2BbMap[id] = bb; }
+  CfgBB *GetBbFromNodeId(unsigned id)          { return mNodeId2BbMap[id]; }
 
-  void SetBbFromBbId(unsigned id, AstBasicBlock *bb) { mBbId2BbMap[id] = bb; }
-  AstBasicBlock *GetBbFromBbId(unsigned id) { return mBbId2BbMap[id]; }
+  void SetBbFromBbId(unsigned id, CfgBB *bb) { mBbId2BbMap[id] = bb; }
+  CfgBB *GetBbFromBbId(unsigned id)          { return mBbId2BbMap[id]; }
 
   bool GetTrace() {return mTrace;}
-  AST_CFG *GetCFG() {return mCFG;}
   AST_AST *GetAST() {return mAST;}
   AST_DFA *GetDFA() {return mDFA;}
   TypeInfer *GetTI() {return mTI;}
-  void SetCFG(AST_CFG *p) {mCFG = p;}
   void SetAST(AST_AST *p) {mAST = p;}
   void SetDFA(AST_DFA *p) {mDFA = p;}
   void SetTI(TypeInfer *p) {mTI = p;}
@@ -115,7 +110,7 @@ class Module_Handler {
 
 class AST_Handler {
  private:
-  MemPool mMemPool;    // Memory pool for all AstFunction, AstBasicBlock, etc.
+  MemPool mMemPool;    // Memory pool for all CfgFunc, CfgBB, etc.
   bool    mTrace;
  public:
   // vector of all AST modules

@@ -20,7 +20,7 @@
 
 namespace maplefe {
 
-void AST_AST::ASTCollectAndDBRemoval(AstFunction *func) {
+void AST_AST::ASTCollectAndDBRemoval(CfgFunc *func) {
   CollectASTInfo(func);
   RemoveDeadBlocks(func);
 
@@ -35,17 +35,17 @@ void AST_AST::ASTCollectAndDBRemoval(AstFunction *func) {
 }
 
 // this calcuates mNodeId2BbMap
-void AST_AST::CollectASTInfo(AstFunction *func) {
+void AST_AST::CollectASTInfo(CfgFunc *func) {
   if (mTrace) std::cout << "============== CollectASTInfo ==============" << std::endl;
   mReachableBbIdx.clear();
-  std::deque<AstBasicBlock *> working_list;
+  std::deque<CfgBB *> working_list;
 
   working_list.push_back(func->GetEntryBB());
 
   unsigned bitnum = 0;
 
   while(working_list.size()) {
-    AstBasicBlock *bb = working_list.front();
+    CfgBB *bb = working_list.front();
     MASSERT(bb && "null BB");
     unsigned bbid = bb->GetId();
 
@@ -71,13 +71,13 @@ void AST_AST::CollectASTInfo(AstFunction *func) {
   }
 }
 
-void AST_AST::RemoveDeadBlocks(AstFunction *func) {
-  std::set<AstBasicBlock *> deadBb;
-  AstBasicBlock *bb = nullptr;
+void AST_AST::RemoveDeadBlocks(CfgFunc *func) {
+  std::set<CfgBB *> deadBb;
+  CfgBB *bb = nullptr;
   for (auto id: mReachableBbIdx) {
     bb = mHandler->mBbId2BbMap[id];
     for (int i = 0; i < bb->GetPredecessorsNum(); i++) {
-      AstBasicBlock *pred = bb->GetPredecessorAtIndex(i);
+      CfgBB *pred = bb->GetPredecessorAtIndex(i);
       unsigned pid = pred->GetId();
       if (mHandler->mBbId2BbMap.find(pid) == mHandler->mBbId2BbMap.end()) {
         deadBb.insert(pred);
@@ -91,7 +91,7 @@ void AST_AST::RemoveDeadBlocks(AstFunction *func) {
       bb->mPredecessors.Remove(it);
     }
     if (mTrace) std::cout << " BB" << it->GetId();
-    it->~AstBasicBlock();
+    it->~CfgBB();
   }
   if (mTrace) std::cout << std::endl;
 }

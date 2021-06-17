@@ -64,23 +64,23 @@ using BBIndex = unsigned;
 class Module_Handler;
 class AST_AST;
 
-class AstBasicBlock {
+class CfgBB {
  private:
-  BBKind                     mKind;
-  BBAttribute                mAttr;
-  BBIndex                    mId;             // unique BB id
-  TreeNode                  *mPredicate;      // a predicate for true/false branches
-  TreeNode                  *mAuxNode;        // the auxiliary node of current BB
-  SmallList<TreeNode *>      mStatements;     // all statement nodes
-  SmallList<AstBasicBlock *> mSuccessors;     // for BK_Branch: [0] true branch, [1] false branch
-  SmallList<AstBasicBlock *> mPredecessors;
+  BBKind                 mKind;
+  BBAttribute            mAttr;
+  BBIndex                mId;             // unique BB id
+  TreeNode              *mPredicate;      // a predicate for true/false branches
+  TreeNode              *mAuxNode;        // the auxiliary node of current BB
+  SmallList<TreeNode *>  mStatements;     // all statement nodes
+  SmallList<CfgBB *>     mSuccessors;     // for BK_Branch: [0] true branch, [1] false branch
+  SmallList<CfgBB *>     mPredecessors;
 
   friend class AST_AST;
 
  public:
-  explicit AstBasicBlock(BBKind k)
+  explicit CfgBB(BBKind k)
     : mKind(k), mAttr(AK_None), mId(GetNextId()), mPredicate(nullptr), mAuxNode(nullptr) {}
-  ~AstBasicBlock() {mStatements.Release(); mSuccessors.Release(); mPredecessors.Release();}
+  ~CfgBB() {mStatements.Release(); mSuccessors.Release(); mPredecessors.Release();}
 
   void   SetKind(BBKind k) {mKind = k;}
   BBKind GetKind()         {return mKind;}
@@ -118,7 +118,7 @@ class AstBasicBlock {
     mStatements.InsertBefore(new_stmt);
   }
 
-  void AddSuccessor(AstBasicBlock *succ) {
+  void AddSuccessor(CfgBB *succ) {
     if(mKind == BK_Terminated) {
       return;
     }
@@ -126,9 +126,9 @@ class AstBasicBlock {
     succ->mPredecessors.PushBack(this);
   }
   unsigned  GetSuccessorsNum()                     {return mSuccessors.GetNum();}
-  AstBasicBlock *GetSuccessorAtIndex(unsigned i)   {return mSuccessors.ValueAtIndex(i);}
+  CfgBB *GetSuccessorAtIndex(unsigned i)   {return mSuccessors.ValueAtIndex(i);}
   unsigned  GetPredecessorsNum()                   {return mPredecessors.GetNum();}
-  AstBasicBlock *GetPredecessorAtIndex(unsigned i) {return mPredecessors.ValueAtIndex(i);}
+  CfgBB *GetPredecessorAtIndex(unsigned i) {return mPredecessors.ValueAtIndex(i);}
 
   static BBIndex GetLastId() {return GetNextId(false);}
 
@@ -138,37 +138,39 @@ class AstBasicBlock {
   static BBIndex GetNextId(bool inc = true) {static BBIndex id = 0; return inc ? ++id : id; }
 };
 
-class AstFunction {
+class CfgFunc {
  private:
-  TreeNode                 *mFunction;        // ModuleNode, FunctionNode or LambdaNode
-  SmallList<AstFunction *>  mNestedFuncs; // nested functions
-  AstFunction              *mParent;
-  AstBasicBlock            *mEntryBB;
-  AstBasicBlock            *mExitBB;
-  BBIndex                   mLastBBId;
+  TreeNode             *mFuncNode;        // ModuleNode, FunctionNode or LambdaNode
+  SmallList<CfgFunc *>  mNestedFuncs; // nested functions
+  CfgFunc              *mParent;
+  CfgBB                *mEntryBB;
+  CfgBB                *mExitBB;
+  BBIndex               mLastBBId;
 
  public:
-  explicit AstFunction() : mParent(nullptr), mEntryBB(nullptr), mExitBB(nullptr), mFunction(nullptr) {}
-  ~AstFunction() {mNestedFuncs.Release();}
+  explicit CfgFunc() : mParent(nullptr), mEntryBB(nullptr), mExitBB(nullptr), mFuncNode(nullptr) {}
+  ~CfgFunc() {mNestedFuncs.Release();}
 
-  void      SetFunction(TreeNode *func) {mFunction = func;}
-  TreeNode *GetFunction()               {return mFunction;}
+  void      SetFunction(TreeNode *func) {mFuncNode = func;}
+  TreeNode *GetFunction()               {return mFuncNode;}
 
-  const char *GetName() {return mFunction->GetKind() == NK_Module ?
-    "_init_" : (mFunction->GetStrIdx() ? mFunction->GetName() : "_anonymous_"); }
+  const char *GetName() {
+    return mFuncNode->GetKind() == NK_Module ? "_init_" :
+      (mFuncNode->GetStrIdx() ? mFuncNode->GetName() : "_anonymous_");
+  }
 
-  void          AddNestedFunc(AstFunction *func) {mNestedFuncs.PushBack(func); func->SetParent(this);}
-  unsigned      GetNestedFuncsNum()              {return mNestedFuncs.GetNum();}
-  AstFunction *GetNestedFuncAtIndex(unsigned i)  {return mNestedFuncs.ValueAtIndex(i);}
+  void     AddNestedFunc(CfgFunc *func)     {mNestedFuncs.PushBack(func); func->SetParent(this);}
+  unsigned GetNestedFuncsNum()              {return mNestedFuncs.GetNum();}
+  CfgFunc *GetNestedFuncAtIndex(unsigned i) {return mNestedFuncs.ValueAtIndex(i);}
 
-  void          SetParent(AstFunction *func) {mParent = func;}
-  AstFunction *GetParent()                   {return mParent;}
+  void     SetParent(CfgFunc *func) {mParent = func;}
+  CfgFunc *GetParent()              {return mParent;}
 
-  void     SetEntryBB(AstBasicBlock *bb) {mEntryBB = bb; bb->SetAttr(AK_Entry);}
-  AstBasicBlock  *GetEntryBB()           {return mEntryBB;}
+  void   SetEntryBB(CfgBB *bb) {mEntryBB = bb; bb->SetAttr(AK_Entry);}
+  CfgBB *GetEntryBB()          {return mEntryBB;}
 
-  void     SetExitBB(AstBasicBlock *bb)  {mExitBB = bb; bb->SetAttr(AK_Exit);}
-  AstBasicBlock  *GetExitBB()            {return mExitBB;}
+  void   SetExitBB(CfgBB *bb)  {mExitBB = bb; bb->SetAttr(AK_Exit);}
+  CfgBB *GetExitBB()           {return mExitBB;}
 
   void    SetLastBBId(BBIndex id) {mLastBBId = id;}
   BBIndex GetLastBBId()           {return mLastBBId;}
@@ -176,52 +178,41 @@ class AstFunction {
   void Dump();
 };
 
-class AST_CFG {
- private:
-  Module_Handler  *mHandler;
-  bool          mTrace;
-  unsigned      mBlockNum;
-
- public:
-  explicit AST_CFG(Module_Handler *h, bool t) : mHandler(h), mTrace(t) {}
-  ~AST_CFG() {}
-
-  void Build();
-};
-
 class CfgBuilder : public AstVisitor {
 
   using TargetLabel = unsigned;
-  using TargetBB = std::pair<AstBasicBlock*, unsigned>;
+  using TargetBB = std::pair<CfgBB*, unsigned>;
   using TargetBBStack = std::vector<TargetBB>;
 
  private:
   Module_Handler   *mHandler;
   bool           mTrace;
 
-  AstFunction   *mCurrentFunction;
-  AstBasicBlock *mCurrentBB;
+  CfgFunc   *mCurrentFunction;
+  CfgBB *mCurrentBB;
 
   TargetBBStack  mBreakBBs;
   TargetBBStack  mContinueBBs;
   TargetBBStack  mThrowBBs;
 
  public:
-  explicit CfgBuilder(Module_Handler *h, bool t, bool base = false)
-    : mHandler(h), mTrace(t), AstVisitor(t && base) {}
+  explicit CfgBuilder(Module_Handler *h, bool trace)
+    : mHandler(h), mTrace(trace), AstVisitor(false) {}
   ~CfgBuilder() = default;
 
-  // Create AstFunction nodes for a module
-  AstFunction *InitAstFunctions(ModuleNode *module);
+  void Build();
 
-  AstFunction *NewFunction(TreeNode *);
-  AstBasicBlock       *NewBB(BBKind k);
+  // Create CfgFunc nodes for a module
+  CfgFunc *InitCfgFunc(ModuleNode *module);
 
-  static void Push(TargetBBStack &stack, AstBasicBlock* bb, TreeNode *label);
-  static AstBasicBlock *LookUp(TargetBBStack &stack, TreeNode *label);
+  CfgFunc *NewFunction(TreeNode *);
+  CfgBB   *NewBB(BBKind k);
+
+  static void Push(TargetBBStack &stack, CfgBB* bb, TreeNode *label);
+  static CfgBB *LookUp(TargetBBStack &stack, TreeNode *label);
   static void Pop(TargetBBStack &stack);
 
-  void InitializeFunction(AstFunction *func);
+  void InitializeFunction(CfgFunc *func);
   void FinalizeFunction();
 
   // For function and lambda

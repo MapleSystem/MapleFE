@@ -35,10 +35,8 @@ void AST_Handler::AddModule(ModuleNode *m) {
 }
 
 void Module_Handler::BuildCFG() {
-  if (!mCFG) {
-    mCFG = new(GetMemPool()->Alloc(sizeof(AST_CFG))) AST_CFG(this, mTrace);
-  }
-  mCFG->Build();
+  CfgBuilder builder(this, mTrace);
+  builder.Build();
 }
 
 void Module_Handler::AdjustAST() {
@@ -48,14 +46,14 @@ void Module_Handler::AdjustAST() {
   mAST->AdjustAST();
 }
 
-void Module_Handler::ASTCollectAndDBRemoval(AstFunction *func) {
+void Module_Handler::ASTCollectAndDBRemoval(CfgFunc *func) {
   if (!mAST) {
     mAST = new(GetMemPool()->Alloc(sizeof(AST_AST))) AST_AST(this, mTrace);
   }
   mAST->ASTCollectAndDBRemoval(func);
 }
 
-void Module_Handler::BuildDFA(AstFunction *func) {
+void Module_Handler::BuildDFA(CfgFunc *func) {
   if (!mDFA) {
     mDFA = new(GetMemPool()->Alloc(sizeof(AST_DFA))) AST_DFA(this, mTrace);
   }
@@ -106,7 +104,7 @@ void Module_Handler::TypeInference() {
 
 void Module_Handler::Dump(char *msg) {
   std::cout << std::endl << msg << ":" << std::endl;
-  AstFunction *func = GetFunction();
+  CfgFunc *func = GetCfgFunc();
   func->Dump();
 }
 

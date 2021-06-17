@@ -61,7 +61,7 @@ class AST_DFA {
   // stmtid --> bbid
   std::unordered_map<unsigned, unsigned> mStmtId2BbIdMap;
   // bbid --> bb
-  std::unordered_map<unsigned, AstBasicBlock *> mBbId2BBMap;
+  std::unordered_map<unsigned, CfgBB *> mBbId2BBMap;
   // bbid vec
   std::vector<unsigned> mBbIdVec;
 
@@ -76,10 +76,10 @@ class AST_DFA {
   explicit AST_DFA(Module_Handler *h, bool t) : mHandler(h), mTrace(t) {}
   ~AST_DFA();
 
-  void Build(AstFunction *func);
+  void Build(CfgFunc *func);
   void BuildScope();
 
-  void CollectDefNodes(AstFunction *func);
+  void CollectDefNodes(CfgFunc *func);
   void CollectUseNodes();
   void BuildBitVectors();
   void BuildDefUseChain();
@@ -93,7 +93,7 @@ class AST_DFA {
   unsigned GetStmtIdFromNodeId(unsigned id) { return mNodeId2StmtIdMap[id]; }
   unsigned GetBbIdFromStmtId(unsigned id) { return mStmtId2BbIdMap[id]; }
   TreeNode *GetStmtFromStmtId(unsigned id) { return mStmtId2StmtMap[id]; }
-  AstBasicBlock *GetBbFromBbId(unsigned id) { return mBbId2BBMap[id]; }
+  CfgBB *GetBbFromBbId(unsigned id) { return mBbId2BBMap[id]; }
 
   void DumpDefPosition(DefPosition pos);
   void DumpDefPositionVec();

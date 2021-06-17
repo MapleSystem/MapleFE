@@ -37,9 +37,9 @@ class AST_AST {
 
   void AdjustAST();
 
-  void CollectASTInfo(AstFunction *func);
-  void RemoveDeadBlocks(AstFunction *func);
-  void ASTCollectAndDBRemoval(AstFunction *func);
+  void CollectASTInfo(CfgFunc *func);
+  void RemoveDeadBlocks(CfgFunc *func);
+  void ASTCollectAndDBRemoval(CfgFunc *func);
 };
 
 class AdjustASTVisitor : public AstVisitor {
@@ -48,14 +48,14 @@ class AdjustASTVisitor : public AstVisitor {
   bool          mTrace;
   bool          mUpdated;
 
-  AstBasicBlock *mCurrentBB;
+  CfgBB *mCurrentBB;
 
  public:
   explicit AdjustASTVisitor(Module_Handler *h, bool t, bool base = false)
     : mHandler(h), mTrace(t), AstVisitor(t && base) {}
   ~AdjustASTVisitor() = default;
 
-  void SetCurrentBB(AstBasicBlock *b) { mCurrentBB = b; }
+  void SetCurrentBB(CfgBB *b) { mCurrentBB = b; }
 
   DeclNode *VisitDeclNode(DeclNode *node);
   ExportNode *VisitExportNode(ExportNode *node);

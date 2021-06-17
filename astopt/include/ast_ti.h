@@ -45,8 +45,8 @@ class TypeInferVisitor : public AstVisitor {
   bool          mTrace;
   bool          mUpdated;
 
-  AstFunction   *mCurrentFunction;
-  AstBasicBlock *mCurrentBB;
+  CfgFunc   *mCurrentFunction;
+  CfgBB *mCurrentBB;
 
  public:
   explicit TypeInferVisitor(Module_Handler *h, bool t, bool base = false)
