@@ -64,7 +64,7 @@ TypeId TypeInferVisitor::MergeTypeId(TypeId tia,  TypeId tib) {
 }
 
 void TypeInferVisitor::UpdateTypeId(TreeNode *node, TypeId id) {
-  if (id == TY_None) {
+  if (!node || id == TY_None) {
     return;
   }
   if (node->GetTypeId() != id) {
@@ -101,11 +101,15 @@ AnnotationTypeNode *TypeInferVisitor::VisitAnnotationTypeNode(AnnotationTypeNode
 
 ArrayElementNode *TypeInferVisitor::VisitArrayElementNode(ArrayElementNode *node) {
   (void) AstVisitor::VisitArrayElementNode(node);
+  if (node->GetExprsNum()) {
+    UpdateTypeId(node, node->GetExprAtIndex(0)->GetTypeId());
+  }
   return node;
 }
 
 ArrayLiteralNode *TypeInferVisitor::VisitArrayLiteralNode(ArrayLiteralNode *node) {
   (void) AstVisitor::VisitArrayLiteralNode(node);
+  UpdateTypeId(node, TY_Object);
   return node;
 }
 
@@ -232,6 +236,8 @@ BreakNode *TypeInferVisitor::VisitBreakNode(BreakNode *node) {
 }
 
 CallNode *TypeInferVisitor::VisitCallNode(CallNode *node) {
+  TreeNode *method = node->GetMethod();
+  UpdateTypeId(method, TY_Function);
   (void) AstVisitor::VisitCallNode(node);
   return node;
 }
@@ -280,6 +286,7 @@ DeclNode *TypeInferVisitor::VisitDeclNode(DeclNode *node) {
   }
   TreeNode *var = node->GetVar();
   UpdateTypeId(var, node->GetTypeId());
+  UpdateTypeId(init, node->GetTypeId());
   return node;
 }
 
@@ -342,6 +349,7 @@ FieldNode *TypeInferVisitor::VisitFieldNode(FieldNode *node) {
   if (decl) {
     UpdateTypeId(node, decl->GetTypeId());
   }
+  UpdateTypeId(field, node->GetTypeId());
   return node;
 }
 
