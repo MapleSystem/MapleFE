@@ -308,10 +308,10 @@ rule MemberExpression : ONEOF(
   MemberExpression + TemplateLiteral,
 #  SuperProperty[?Yield]
 #  MetaProperty
-  "new" + MemberExpression + Arguments,
+  "new" + MemberExpression + ZEROORONE(Arguments),
 # NOTE: I created this rule. Typescript extended Type system and allow 'new'
 #       on a TypeReference
-  "new" + TypeReference + Arguments)
+  "new" + TypeReference + ZEROORONE(Arguments))
   attr.action.%1 : AddAsType(%1, %2)
   attr.action.%2 : BuildArrayElement(%1, %3)
   attr.action.%2 : AddAsType(%5)
