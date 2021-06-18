@@ -95,7 +95,7 @@ int main (int argc, char *argv[]) {
   }
 
   // the module from parser
-  maplefe::ModuleNode *module =parser->GetModule();
+  maplefe::ModuleNode *module = parser->GetModule();
 
   if(dump_ast) {
     maplefe::AstDump astdump(module);

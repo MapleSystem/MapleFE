@@ -82,7 +82,7 @@ int main (int argc, char *argv[]) {
   parser->InitRecursion();
   parser->Parse();
 
-  maplefe::ModuleNode *module =parser->GetModule();
+  maplefe::ModuleNode *module = parser->GetModule();
 
   maplefe::VerifierJava vfy_java(module);
   vfy_java.Do();

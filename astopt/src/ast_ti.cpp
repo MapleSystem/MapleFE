@@ -101,9 +101,6 @@ AnnotationTypeNode *TypeInferVisitor::VisitAnnotationTypeNode(AnnotationTypeNode
 
 ArrayElementNode *TypeInferVisitor::VisitArrayElementNode(ArrayElementNode *node) {
   (void) AstVisitor::VisitArrayElementNode(node);
-  if (node->GetExprsNum()) {
-    UpdateTypeId(node, node->GetExprAtIndex(0)->GetTypeId());
-  }
   return node;
 }
 
@@ -280,13 +277,17 @@ DeclareNode *TypeInferVisitor::VisitDeclareNode(DeclareNode *node) {
 DeclNode *TypeInferVisitor::VisitDeclNode(DeclNode *node) {
   (void) AstVisitor::VisitDeclNode(node);
   TreeNode *init = node->GetInit();
-  if (init) {
-    VisitTreeNode(init);
-    UpdateTypeId(node, init->GetTypeId());
-  }
   TreeNode *var = node->GetVar();
-  UpdateTypeId(var, node->GetTypeId());
-  UpdateTypeId(init, node->GetTypeId());
+  TypeId merged = TY_None;
+  if (init) {
+    merged = MergeTypeId(node->GetTypeId(), init->GetTypeId());
+  }
+  if (var) {
+    merged = MergeTypeId(merged, var->GetTypeId());
+  }
+  UpdateTypeId(node, merged);
+  UpdateTypeId(init, merged);
+  UpdateTypeId(var, merged);
   return node;
 }
 
@@ -364,7 +365,7 @@ ForLoopNode *TypeInferVisitor::VisitForLoopNode(ForLoopNode *node) {
 }
 
 FunctionNode *TypeInferVisitor::VisitFunctionNode(FunctionNode *node) {
-  UpdateTypeId(node, TY_Function);
+  UpdateTypeId(node, node->IsArray() ? TY_Object : TY_Function);
   (void) AstVisitor::VisitFunctionNode(node);
   return node;
 }
@@ -495,6 +496,7 @@ StrIndexSigNode *TypeInferVisitor::VisitStrIndexSigNode(StrIndexSigNode *node) {
 }
 
 StructLiteralNode *TypeInferVisitor::VisitStructLiteralNode(StructLiteralNode *node) {
+  UpdateTypeId(node, TY_Object);
   (void) AstVisitor::VisitStructLiteralNode(node);
   return node;
 }
@@ -584,6 +586,10 @@ UnaOperatorNode *TypeInferVisitor::VisitUnaOperatorNode(UnaOperatorNode *node) {
 }
 
 UserTypeNode *TypeInferVisitor::VisitUserTypeNode(UserTypeNode *node) {
+  TreeNode *parent = node->GetParent();
+  if (parent) {
+    UpdateTypeId(parent, TY_Object);
+  }
   (void) AstVisitor::VisitUserTypeNode(node);
   return node;
 }

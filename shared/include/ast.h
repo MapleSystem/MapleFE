@@ -565,10 +565,10 @@ public:
   TreeNode*   GetInit() {return mInit;}
   DimensionNode* GetDims() {return mDims;}
 
-  void SetType(TreeNode *t)      {mType = t;}
+  void SetType(TreeNode *t)      {mType = t; SETPARENT(t);}
   void SetInit(TreeNode *t)      {mInit = t; SETPARENT(t);}
   void ClearInit()               {mInit = NULL;}
-  void SetDims(DimensionNode *t) {mDims = t;}
+  void SetDims(DimensionNode *t) {mDims = t; SETPARENT(t);}
 
   bool IsOptionalParam()       {return mOptionalParam;}
   bool GetOptionalParam()      {return mOptionalParam;}
@@ -1635,7 +1635,7 @@ public:
   unsigned  GetParamsNum()        {return mParams.GetNum();}
   TreeNode* GetParam(unsigned i)  {return mParams.ValueAtIndex(i);}
   void      SetParam(unsigned i, TreeNode* n) {*(mParams.RefAtIndex(i)) = n; SETPARENT(n);}
-  void      AddParam(TreeNode *t) {mParams.PushBack(t);;}
+  void      AddParam(TreeNode *t) {mParams.PushBack(t); SETPARENT(t);}
 
   // Attributes related
   unsigned GetAttrsNum()              {return mAttrs.GetNum();}
@@ -1666,7 +1666,7 @@ public:
   DimensionNode* GetDims()       {return mDims;}
   void SetDims(DimensionNode *t) {mDims = t;}
   unsigned GetDimsNum()          {return mDims->GetDimensionsNum();}
-  bool     IsArray()             {return mDims->GetDimensionsNum() > 0;}
+  bool     IsArray()             {return mDims && mDims->GetDimensionsNum() > 0;}
   unsigned AddDim(unsigned i = 0){mDims->AddDimension(i);}        // 0 means unspecified
   unsigned GetNthDim(unsigned n) {return mDims->GetDimension(n);} // 0 means unspecified.
   void     SetNthDim(unsigned n, unsigned i) {mDims->SetDimension(n, i);}
