@@ -56,7 +56,7 @@ typedef union JS_Val {
   long     val_long;
   double   val_double;
   long     val_bigint;
-  char*    val_string; // JavaScript string primitive (not String object)
+  std::string* val_string; // JS string primitive (not JS String object)
   BaseObj* val_obj;    // for function, object (incl. String objects)
 } JS_Val;
 
@@ -86,7 +86,6 @@ typedef std::unordered_map<std::string, JS_Prop*> JS_PropList;
 class BaseObj {
   public:
     JS_PropList propList;
-    BaseObj* prototype;    // prototype property of function constructors
     BaseObj* __proto__;    // link to prototype chain of object
   public:
     bool hasOwnProp(std::string key) {
@@ -94,6 +93,13 @@ class BaseObj {
       it = propList.find(key);
       return (it != propList.end());
     }
+};
+
+
+// JavaScript class/function constructor
+class CtorObj : public BaseObj {
+  public:
+    BaseObj* prototype;    // prototype property of constructor
 };
 
 template <class T>
@@ -113,6 +119,9 @@ class ClassFld {
     T     offset()       {return field.offset;}
     JS_Prop* newProp(JS_Type type) {return new JS_Prop(type, field.addr);}
 };
+
+extern CtorObj* Function;
+extern CtorObj* Object;
 
 } // namespace t2crt
 #endif
