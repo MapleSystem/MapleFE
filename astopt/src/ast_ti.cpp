@@ -108,8 +108,8 @@ ArrayElementNode *TypeInferVisitor::VisitArrayElementNode(ArrayElementNode *node
 }
 
 ArrayLiteralNode *TypeInferVisitor::VisitArrayLiteralNode(ArrayLiteralNode *node) {
-  (void) AstVisitor::VisitArrayLiteralNode(node);
   UpdateTypeId(node, TY_Object);
+  (void) AstVisitor::VisitArrayLiteralNode(node);
   return node;
 }
 
@@ -520,8 +520,8 @@ SwitchNode *TypeInferVisitor::VisitSwitchNode(SwitchNode *node) {
 }
 
 TemplateLiteralNode *TypeInferVisitor::VisitTemplateLiteralNode(TemplateLiteralNode *node) {
-  (void) AstVisitor::VisitTemplateLiteralNode(node);
   UpdateTypeId(node, TY_String);
+  (void) AstVisitor::VisitTemplateLiteralNode(node);
   return node;
 }
 
@@ -541,8 +541,8 @@ TryNode *TypeInferVisitor::VisitTryNode(TryNode *node) {
 }
 
 TypeOfNode *TypeInferVisitor::VisitTypeOfNode(TypeOfNode *node) {
-  (void) AstVisitor::VisitTypeOfNode(node);
   UpdateTypeId(node, TY_String);
+  (void) AstVisitor::VisitTypeOfNode(node);
   return node;
 }
 
