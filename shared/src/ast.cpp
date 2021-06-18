@@ -1115,19 +1115,13 @@ void SwitchLabelNode::Dump(unsigned ind) {
 }
 
 void SwitchCaseNode::AddLabel(TreeNode *t) {
-  std::list<TreeNode*> working_list;
-  working_list.push_back(t);
-  while (!working_list.empty()) {
-    TreeNode *t = working_list.front();
-    working_list.pop_front();
-    if (t->IsPass()) {
-      PassNode *labels = (PassNode*)t;
-      for (unsigned i = 0; i < labels->GetChildrenNum(); i++)
-        working_list.push_back(labels->GetChild(i));
-    } else {
-      MASSERT(t->IsSwitchLabel());
-      mLabels.PushBack((SwitchLabelNode*)t);
-    }
+  if (t->IsPass()) {
+    PassNode *pass = (PassNode*)t;
+    for (unsigned i = 0; i < pass->GetChildrenNum(); i++)
+      AddLabel(pass->GetChild(i));
+  } else {
+    MASSERT(t->IsSwitchLabel());
+    mLabels.PushBack((SwitchLabelNode*)t);
   }
 }
 
