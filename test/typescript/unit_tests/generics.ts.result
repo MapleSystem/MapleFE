@@ -3,7 +3,7 @@ Matched 28 tokens.
 Matched 35 tokens.
 ============= Module ===========
 == Sub Tree ==
-func  foo(arg)  throws: 
+func  foo<T>(arg)  throws: 
   return arg
 
 == Sub Tree ==

@@ -1347,6 +1347,18 @@ void ClassNode::Dump(unsigned indent) {
 FunctionNode::FunctionNode() : TreeNode(NK_Function),
   mFuncName(NULL), mType(NULL), mBody(NULL), mDims(NULL), mIsConstructor(false) {}
 
+void FunctionNode::AddTypeParam(TreeNode *param) {
+  if (param->IsPass()) {
+    PassNode *n = (PassNode*)param;
+    for (unsigned i = 0; i < n->GetChildrenNum(); i++) {
+      TreeNode *child = n->GetChild(i);
+      AddTypeParam(child);
+    }
+  } else {
+    mTypeParams.PushBack(param);
+  }
+}
+
 // This is to tell if both FunctionNodes have same return type
 // and parameter types. So languages require Type Erasure at first, like Java.
 // Type erasure should be done earlier in language specific process.
@@ -1443,6 +1455,17 @@ void FunctionNode::Dump(unsigned indent) {
 
   if (mStrIdx)
     DUMP0_NORETURN(GetName());
+
+  if (GetTypeParamsNum() > 0) {
+    DUMP0_NORETURN("<");
+    for (unsigned i = 0; i < GetTypeParamsNum(); i++) {
+      TreeNode *arg = GetTypeParamAtIndex(i);
+      arg->Dump(0);
+      if (i < GetTypeParamsNum() - 1)
+        DUMP0_NORETURN(",");
+    }
+    DUMP0_NORETURN(">");
+  }
 
   // dump parameters
   DUMP0_NORETURN("(");

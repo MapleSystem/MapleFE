@@ -9,7 +9,7 @@ alias Constructor<T>=(args) ->
 == Sub Tree ==
 ts_interface: someStandardInterface {someStandardInterface }
 == Sub Tree ==
-func  ClassFactory(base)  throws: 
+func  ClassFactory<TBase>(base)  throws: 
   class  GeneratedClass
     Fields: 
 

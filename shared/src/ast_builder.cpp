@@ -3080,6 +3080,9 @@ TreeNode* ASTBuilder::AddTypeGenerics() {
   } else if (mLastTreeNode->IsCall()) {
     CallNode *call = (CallNode*)mLastTreeNode;
     call->AddTypeArgument(args);
+  } else if (mLastTreeNode->IsFunction()) {
+    FunctionNode *func = (FunctionNode*)mLastTreeNode;
+    func->AddTypeParam(args);
   } else {
     MERROR("Unsupported node in AddTypeGenerics()");
   }

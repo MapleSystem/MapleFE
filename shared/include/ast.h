@@ -1607,6 +1607,7 @@ private:
   SmallVector<AttrId>          mAttrs;
   SmallVector<AnnotationNode*> mAnnotations; //annotation or pragma
   SmallVector<ExceptionNode*>  mThrows;      // exceptions it can throw
+  SmallVector<TreeNode*>       mTypeParams;
   TreeNode                    *mFuncName;    // function name, usually an identifier
   TreeNode                    *mType;        // return type
   SmallVector<TreeNode*>       mParams;      //
@@ -1653,6 +1654,11 @@ public:
   void           AddThrow(ExceptionNode *n)   {mThrows.PushBack(n);}
   ExceptionNode* GetThrowAtIndex(unsigned i)  {return mThrows.ValueAtIndex(i);}
   void           SetThrowAtIndex(unsigned i, ExceptionNode* n) {*(mThrows.RefAtIndex(i)) = n;}
+
+  unsigned  GetTypeParamsNum()            {return mTypeParams.GetNum();}
+  TreeNode* GetTypeParamAtIndex(unsigned i) {return mTypeParams.ValueAtIndex(i);}
+  void      SetTypeParamAtIndex(unsigned i, TreeNode* n) {*(mTypeParams.RefAtIndex(i)) = n; SETPARENT(n);}
+  void      AddTypeParam(TreeNode *);
 
   void SetType(TreeNode *t) {mType = t;}
   TreeNode* GetType(){return mType;}

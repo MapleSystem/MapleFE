@@ -1697,6 +1697,7 @@ rule FunctionDeclaration : ONEOF(
   attr.action.%1,%2 : BuildFunction(%2)
   attr.action.%1,%2 : AddParams(%5)
   attr.action.%1,%2 : AddType(%7)
+  attr.action.%1,%2 : AddTypeGenerics(%3)
   attr.action.%1 :    AddFunctionBody(%9)
 
 ##############################################################################################
