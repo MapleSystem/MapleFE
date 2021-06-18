@@ -118,11 +118,13 @@ std::string CppDecl::EmitIdentifierNode(IdentifierNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
-  if (auto n = node->GetType()) {
-    str += EmitTreeNode(n);
-  }
-  else
+  TypeId k = node->GetTypeId();
+  if(k != TY_None && k != TY_Object)
     str += CppDecl::GetEnumTypeId(node->GetTypeId());
+  else if (auto n = node->GetType())
+    str += EmitTreeNode(n);
+  else
+    str += "unknown"s;
   str += " "s + node->GetName();
   return str;
 }
