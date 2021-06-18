@@ -26,6 +26,7 @@ public:
   Module_Handler *mHandler;
 
   CppDecl(Module_Handler *h) : mHandler(h), Emitter(h->GetASTModule()) {}
+  CppDecl() : CppDecl(nullptr) {}
 
   std::string Emit() {
     return EmitTreeNode(GetASTModule());

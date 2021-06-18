@@ -26,12 +26,25 @@ std::string CppDef::EmitModuleNode(ModuleNode *node) {
 
 void )""" + name + R"""(::__init_func__() { // bind "this" to current module
 )""";
+  isInit = true;
   for (unsigned i = 0; i < node->GetTreesNum(); ++i) {
     if (auto n = node->GetTree(i)) {
       str += EmitTreeNode(n);
     }
   }
-  str += R"""(}
+  str += "}\n\n"s;
+
+  // definitions of all top-level functions
+  isInit = false;
+  CfgFunc *module = mHandler->GetCfgFunc();
+  auto num = module->GetNestedFuncsNum();
+  for(unsigned i = 0; i < num; ++i) {
+    CfgFunc *func = module->GetNestedFuncAtIndex(i);
+    TreeNode *node = func->GetFuncNode();
+    str += EmitTreeNode(node);
+  }
+
+  str += R"""(
 
 )""" + name + " _"s + name + R"""(;
 
@@ -44,16 +57,35 @@ int main(int argc, char **argv) {
   return str;
 }
 
-
 std::string CppDef::EmitFunctionNode(FunctionNode *node) {
-  return std::string();
-}
-
-std::string CppDef::EmitBinOperatorNode(BinOperatorNode *node) {
-  if (node == nullptr)
+  if (isInit || node == nullptr)
     return std::string();
-  std::string str = Emitter::EmitBinOperatorNode(node);
-  Emitter::Replace(str, ">>>", ">>");
+  std::string str;
+  if (auto n = node->GetType()) {
+    str += mCppDecl.EmitTreeNode(n) + " "s;
+  }
+  else
+    str += "void "s;
+  if(node->GetStrIdx())
+    str += GetModuleName() + "::"s + node->GetName();
+  str += "("s;
+
+  for (unsigned i = 0; i < node->GetParamsNum(); ++i) {
+    if (i)
+      str += ", "s;
+    if (auto n = node->GetParam(i)) {
+      str += mCppDecl.EmitTreeNode(n);
+    }
+  }
+  str += ")"s;
+  if (auto n = node->GetBody()) {
+    auto s = EmitBlockNode(n);
+    if(s.empty() || s.front() != '{')
+      str += "{"s + s + "}\n"s;
+    else
+      str += s;
+  } else
+    str += "{}\n"s;
   return str;
 }
 
@@ -77,7 +109,7 @@ std::string CppDef::EmitDeclNode(DeclNode *node) {
   std::string str;
   //std::string str(Emitter::GetEnumDeclProp(node->GetProp()));
   if (auto n = node->GetVar()) {
-    str += EmitTreeNode(n);
+    str += isInit ? EmitTreeNode(n) : mCppDecl.EmitTreeNode(n);
   }
   if (auto n = node->GetInit()) {
     if(n->GetKind() == NK_ArrayLiteral)
@@ -265,6 +297,75 @@ std::string CppDef::EmitContinueNode(ContinueNode *node) {
   auto target = node->GetTarget();
   std::string str = target ? "goto __label_cont_"s + EmitTreeNode(target) : "continue"s;
   str += ";\n"s;
+  return str;
+}
+
+std::string CppDef::EmitBinOperatorNode(BinOperatorNode *node) {
+  if (node == nullptr)
+    return std::string();
+  const char *op = Emitter::GetEnumOprId(node->GetOprId());
+  const Precedence precd = *op & 0x3f;
+  const bool rl_assoc = *op >> 6; // false: left-to-right, true: right-to-left
+  std::string lhs, rhs;
+  if (auto n = node->GetOpndA()) {
+    lhs = EmitTreeNode(n);
+    if(precd > mPrecedence || (precd == mPrecedence && rl_assoc))
+      lhs = "("s + lhs + ")"s;
+  }
+  else
+    lhs = "(NIL) "s;
+  if (auto n = node->GetOpndB()) {
+    rhs = EmitTreeNode(n);
+    if(precd > mPrecedence || (precd == mPrecedence && !rl_assoc))
+      rhs = "("s + rhs + ")"s;
+  }
+  else
+    rhs = " (NIL)"s;
+  switch(node->GetOprId()) {
+    case OPR_Band:
+    case OPR_Bor:
+    case OPR_Bxor:
+    case OPR_Shl:
+    case OPR_Shr:
+      lhs = "static_cast<int32_t>("s + lhs + ")"s;
+      break;
+    case OPR_Zext:
+      lhs = "static_cast<uint32_t>("s + lhs + ")"s;
+      op = "\015>>";
+      break;
+  }
+  std::string str(lhs + " "s + std::string(op + 1) + " "s + rhs);
+  mPrecedence = precd;
+  if (node->IsStmt())
+    str += ";\n"s;
+  return str;
+}
+
+std::string CppDef::EmitUnaOperatorNode(UnaOperatorNode *node) {
+  if (node == nullptr)
+    return std::string();
+  bool isPost = node->IsPost();
+  const char *op = Emitter::GetEnumOprId(node->GetOprId());
+  const Precedence precd = *op & 0x3f;
+  const bool rl_assoc = *op >> 6; // false: left-to-right, true: right-to-left
+  std::string opr;
+  if (auto n = node->GetOpnd()) {
+    opr = EmitTreeNode(n);
+    if(precd > mPrecedence || (precd == mPrecedence && (rl_assoc && isPost || !rl_assoc && !isPost)))
+      opr = "("s + opr + ")"s;
+  }
+  else
+      opr = "(NIL)"s;
+  if(node->GetOprId() == OPR_Bcomp)
+    opr = "static_cast<int32_t>("s + opr + ")"s;
+  std::string str;
+  if(node->IsPost())
+    str = opr + std::string(op + 1) + " "s;
+  else
+    str = " "s + std::string(op + 1) + opr;
+  mPrecedence = precd;
+  if (node->IsStmt())
+    str += ";\n"s;
   return str;
 }
 

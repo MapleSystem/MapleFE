@@ -28,13 +28,11 @@ namespace maplefe {
 
 class Emitter {
 
-  using Precedence = char;
-
-private:
-  ModuleNode *mASTModule;
-
 protected:
+  using Precedence = char;
   Precedence mPrecedence;
+
+  ModuleNode *mASTModule;
 
 public:
   Emitter(ModuleNode *m) : mASTModule(m) {}

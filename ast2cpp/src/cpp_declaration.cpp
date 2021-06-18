@@ -70,7 +70,7 @@ public: // all top level functions in the module
 void __init_func__();
 )""";
 
-  // declaration of all top-level functions
+  // declarations of all top-level functions
   CfgFunc *module = mHandler->GetCfgFunc();
   auto num = module->GetNestedFuncsNum();
   for(unsigned i = 0; i < num; ++i) {
@@ -136,6 +136,8 @@ std::string CppDecl::EmitPrimTypeNode(PrimTypeNode *node) {
       return "double "s;
     case TY_Boolean:
       return "bool "s;
+    case TY_None:
+      return "auto "s;
   }
   return Emitter::GetEnumTypeId(node->GetPrimType());
 }

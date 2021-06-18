@@ -18,19 +18,23 @@
 
 #include "ast_handler.h"
 #include "emitter.h"
+#include "cpp_declaration.h"
 
 namespace maplefe {
 
 class CppDef : public Emitter {
 public:
   Module_Handler *mHandler;
+  bool            isInit;
+  CppDecl        &mCppDecl;
 
-  CppDef(Module_Handler *h) : mHandler(h), Emitter(h->GetASTModule()) {}
+  CppDef(Module_Handler *h, CppDecl &d) : mHandler(h), mCppDecl(d), Emitter(h->GetASTModule()) {}
 
   std::string Emit() {
     return EmitTreeNode(GetASTModule());
   }
 
+  virtual std::string EmitUnaOperatorNode(UnaOperatorNode *node);
   virtual std::string EmitBinOperatorNode(BinOperatorNode *node);
   virtual std::string EmitIdentifierNode(IdentifierNode *node);
   virtual std::string EmitDeclNode(DeclNode *node);
