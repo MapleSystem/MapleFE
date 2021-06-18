@@ -10,4 +10,4 @@ js_let Decl: obj2
 == Sub Tree ==
 console.log(obj1.hasOwnProperty('prop1'))
 == Sub Tree ==
-console.log(obj2.hasOwnProperty('prop1'))
+console.log(obj2?.hasOwnProperty('prop1'))

@@ -7,5 +7,5 @@ export {func  func(opt?)  throws:
 } 
 == Sub Tree ==
 export {declare namespace  func
-  export {ts_interface: Opts {debug }} 
+  export {ts_interface: Opts {debug? }} 
 } 

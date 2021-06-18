@@ -4,7 +4,7 @@ Matched 49 tokens.
 Matched 67 tokens.
 ============= Module ===========
 == Sub Tree ==
-ts_interface: I {a;b }
+ts_interface: I {a;b? }
 == Sub Tree ==
 func  f({:a, :b=1})  throws: 
   return a Add b

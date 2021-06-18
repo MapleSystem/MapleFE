@@ -545,7 +545,7 @@ void IdentifierNode::Dump(unsigned indent) {
   if (mRestParam)
     DUMP0_NORETURN("...");
   DUMP0_NORETURN(GetName());
-  if (mOptionalParam)
+  if (mOptionalParam || mIsOptional)
     DUMP0_NORETURN('?');
   if (IsNonNull())
     DUMP0_NORETURN('!');
