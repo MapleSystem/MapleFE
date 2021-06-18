@@ -149,6 +149,8 @@ std::string CppDef::EmitCallNode(CallNode *node) {
         Emitter::Replace(s, "\"", "\\\"", 0);
         s = "\"'" + s + "'\"";
       }
+      else if(mPrecedence <= 13) // '\015'
+        s = "("s + s + ")"s;
       if (i)
         str += " << ' ' "s;
       str += " << "s + s;
