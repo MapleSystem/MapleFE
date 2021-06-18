@@ -206,6 +206,13 @@ TreeNode* ASTBuilder::BuildIdentifier() {
     new (n) IdentifierNode(idx);
     mLastTreeNode = n;
     return n;
+  } else if (mLastTreeNode->IsPrimType()) {
+    PrimTypeNode *prim_type = (PrimTypeNode*)mLastTreeNode;
+    IdentifierNode *n = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
+    unsigned idx = gStringPool.GetStrIdx(prim_type->GetTypeName());
+    new (n) IdentifierNode(idx);
+    mLastTreeNode = n;
+    return n;
   } else {
     MERROR("Unsupported node type in BuildIdentifier()");
   }
