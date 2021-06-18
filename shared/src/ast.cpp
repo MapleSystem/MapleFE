@@ -733,6 +733,11 @@ void StructLiteralNode::AddField(TreeNode *tree) {
     func_lit->SetFieldName((IdentifierNode*)(node->GetFuncName()));
     func_lit->SetLiteral(node);
     mFields.PushBack(func_lit);
+  } else if (tree->IsLiteral() || tree->IsIdentifier()) {
+    FieldLiteralNode *fln = (FieldLiteralNode*)gTreePool.NewTreeNode(sizeof(FieldLiteralNode));
+    new (fln) FieldLiteralNode();
+    fln->SetLiteral(tree);
+    mFields.PushBack(fln);
   } else if (tree->IsPass()) {
     PassNode *pass = (PassNode*)tree;
     for (unsigned i = 0; i < pass->GetChildrenNum(); i++) {
@@ -749,7 +754,8 @@ void StructLiteralNode::Dump(unsigned indent) {
   DUMP0_NORETURN(" {");
   for (unsigned i = 0; i < mFields.GetNum(); i++) {
     FieldLiteralNode *fl = GetField(i);
-    fl->mFieldName->Dump(0);
+    if (fl->mFieldName)
+      fl->mFieldName->Dump(0);
     DUMP0_NORETURN(":");
     fl->mLiteral->Dump(0);
     if (i != mFields.GetNum()-1)

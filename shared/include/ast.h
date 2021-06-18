@@ -971,6 +971,9 @@ public:
 // In Javascript, the GetAccessor/SetAccessor makes it complicated.
 // We save the XetAccessor as a field literal with fieldname being func
 // name and literal being function node itself.
+
+// mFieldName could be NULL, like {3, 4} or {a, b}, 3, 4, a and b are literals without
+// a name. but mLiteral may not be NULL.
 class FieldLiteralNode : public TreeNode{
 public:
   TreeNode *mFieldName;  // Generally a field is an identifier. However, in JS/TS
