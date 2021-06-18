@@ -1164,25 +1164,28 @@ TreeNode* ASTBuilder::BuildOneCase() {
 
   if (mParams.size() == 2) {
     Param p_label = mParams[0];
-    MASSERT(!p_label.mIsEmpty);
-    MASSERT(p_label.mIsTreeNode && "Labels in BuildOneCase is not a tree.");
-    label = p_label.mData.mTreeNode;
-
+    if (!p_label.mIsEmpty) {
+      MASSERT(p_label.mIsTreeNode && "Labels in BuildOneCase is not a tree.");
+      label = p_label.mData.mTreeNode;
+    }
     Param p_stmt = mParams[1];
-    MASSERT(!p_stmt.mIsEmpty);
-    MASSERT(p_stmt.mIsTreeNode && "Stmts in BuildOneCase is not a tree.");
-    stmt = p_stmt.mData.mTreeNode;
+    if (!p_stmt.mIsEmpty) {
+      MASSERT(p_stmt.mIsTreeNode && "Stmts in BuildOneCase is not a tree.");
+      stmt = p_stmt.mData.mTreeNode;
+    }
   } else {
     label = mLastTreeNode;
-
     Param p_stmt = mParams[0];
-    MASSERT(!p_stmt.mIsEmpty);
-    MASSERT(p_stmt.mIsTreeNode && "Stmts in BuildOneCase is not a tree.");
-    stmt = p_stmt.mData.mTreeNode;
+    if (!p_stmt.mIsEmpty) {
+      MASSERT(p_stmt.mIsTreeNode && "Stmts in BuildOneCase is not a tree.");
+      stmt = p_stmt.mData.mTreeNode;
+    }
   }
 
-  case_node->AddLabel(label);
-  case_node->AddStmt(stmt);
+  if (label)
+    case_node->AddLabel(label);
+  if (stmt)
+    case_node->AddStmt(stmt);
 
   mLastTreeNode = case_node;
   return case_node;
