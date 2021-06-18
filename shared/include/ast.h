@@ -1467,9 +1467,9 @@ public:
   void SetExpr(TreeNode *c) {mExpr = c; SETPARENT(c);}
 
   unsigned  GetCasesNum() {return mCases.GetNum();}
-  void      AddCase(TreeNode *c);
   SwitchCaseNode* GetCaseAtIndex(unsigned i) {return mCases.ValueAtIndex(i);}
   void            SetCaseAtIndex(unsigned i, SwitchCaseNode* n) {*(mCases.RefAtIndex(i)) = n;}
+  void AddCase(SwitchCaseNode* n) {mCases.PushBack(n); SETPARENT(n);}
 
   void Release() {mCases.Release();}
   void Dump(unsigned);

@@ -52,7 +52,8 @@ class TreeNode;
 
 class Verifier {
 protected:
-  VfyLog    mLog;
+  VfyLog      mLog;
+  ModuleNode *mASTModule;
 
   ASTScope *mCurrScope;
 
@@ -73,7 +74,7 @@ protected:
 
   virtual void VerifyType(IdentifierNode*);
 public:
-  Verifier();
+  Verifier(ModuleNode *m);
   ~Verifier();
 
   void Do();

@@ -27,8 +27,6 @@
 
 namespace maplefe {
 
-ASTBuilder gASTBuilder;
-
 ////////////////////////////////////////////////////////////////////////////////////////
 // For the time being, we simply use a big switch-case. Later on we could use a more
 // flexible solution.
@@ -218,14 +216,14 @@ TreeNode* ASTBuilder::BuildIdentifier() {
 ////////////////////////////////////////////////////////////////////////////////////////
 
 TreeNode* ASTBuilder::BuildPackageName() {
-  MASSERT(!gModule->mPackage);
+  MASSERT(!mASTModule->mPackage);
   MASSERT(mLastTreeNode->IsField() || mLastTreeNode->IsIdentifier());
 
   PackageNode *n = (PackageNode*)gTreePool.NewTreeNode(sizeof(PackageNode));
   new (n) PackageNode();
   n->SetPackage(mLastTreeNode);
 
-  gModule->SetPackage(n);
+  mASTModule->SetPackage(n);
 
   mLastTreeNode = n;
   return mLastTreeNode;
@@ -1199,6 +1197,22 @@ SwitchCaseNode* ASTBuilder::SwitchLabelToCase(SwitchLabelNode *label) {
   return case_node;
 }
 
+void ASTBuilder::AddSwitchCase(TreeNode *s, TreeNode *t) {
+  if (s->IsSwitch()) {
+    SwitchNode *sn = static_cast<SwitchNode *>(s);
+    if (t->IsPass()) {
+      PassNode *cases = (PassNode*)t;
+      for (unsigned i = 0; i < cases->GetChildrenNum(); i++)
+        AddSwitchCase(sn, cases->GetChild(i));
+    } else if (t->IsSwitchCase()) {
+      sn->AddCase((SwitchCaseNode*)t);
+    } else if (t->IsSwitchLabel()) {
+      SwitchCaseNode *casenode = SwitchLabelToCase((SwitchLabelNode*)t);
+      sn->AddCase(casenode);
+    }
+  }
+}
+
 TreeNode* ASTBuilder::BuildSwitch() {
   if (mTrace)
     std::cout << "In BuildSwitch " << std::endl;
@@ -1224,7 +1238,7 @@ TreeNode* ASTBuilder::BuildSwitch() {
   if (cases->IsSwitchLabel())
     cases = SwitchLabelToCase((SwitchLabelNode*)cases);
 
-  switch_node->AddCase(cases);
+  AddSwitchCase(switch_node, cases);
 
   mLastTreeNode = switch_node;
   return switch_node;

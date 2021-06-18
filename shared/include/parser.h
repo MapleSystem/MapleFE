@@ -23,6 +23,7 @@
 
 #include "lexer.h"
 #include "ast_module.h"
+#include "ast_builder.h"
 #include "container.h"
 #include "recursion.h"
 #include "succ_match.h"
@@ -239,9 +240,11 @@ private:
   friend class RecursionTraversal;
 
   // Matching on alternative tokens needs a state machine.
-  bool     mInAltTokensMatching;  // once it's true, mCurToken is frozen.
-  unsigned mNextAltTokenIndex;    // index of next alt token to be matched.
-  unsigned mATMToken;             // the current input token being processed.
+  bool        mInAltTokensMatching;  // once it's true, mCurToken is frozen.
+  unsigned    mNextAltTokenIndex;    // index of next alt token to be matched.
+  unsigned    mATMToken;             // the current input token being processed.
+  ModuleNode *mASTModule;            // the AST Module
+  ASTBuilder *mASTBuilder;           // the AST Builder
 
 public:
   Lexer *mLexer;
@@ -388,6 +391,8 @@ public:
 
   void SetVerbose(int i) { mLexer->SetVerbose(i); }
   int  GetVerbose() { mLexer->GetVerbose(); }
+
+  ModuleNode* GetModule() {return mASTModule;}
 
   void Dump();
 

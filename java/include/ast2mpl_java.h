@@ -27,7 +27,7 @@ namespace maplefe {
 class A2MJava : public A2M {
 private:
 public:
-  A2MJava(const char *filename) : A2M(filename) { }
+  A2MJava(ModuleNode *m) : A2M(m) { }
 
   const char *Type2Label(const maple::MIRType *type);
 

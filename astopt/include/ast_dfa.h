@@ -128,9 +128,9 @@ class CollectUseVisitor : public AstVisitor {
 
 class BuildScopeVisitor : public AstVisitor {
  private:
-  Module_Handler  *mHandler;
-  ModuleNode   *mModule;
-  bool          mTrace;
+  Module_Handler *mHandler;
+  ModuleNode     *mASTModule;
+  bool            mTrace;
 
  public:
   std::stack<ASTScope *> mScopeStack;
@@ -138,7 +138,7 @@ class BuildScopeVisitor : public AstVisitor {
  public:
   explicit BuildScopeVisitor(Module_Handler *h, bool t, bool base = false)
     : mHandler(h), mTrace(t), AstVisitor(t && base) {
-      mModule = mHandler->GetASTModule();
+      mASTModule = mHandler->GetASTModule();
     }
   ~BuildScopeVisitor() = default;
 

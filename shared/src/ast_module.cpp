@@ -18,8 +18,6 @@
 
 namespace maplefe {
 
-ModuleNode *gModule;
-
 ModuleNode::ModuleNode() : TreeNode(NK_Module), mPackage(NULL), mSrcLang(SrcLangUnknown) {
   mRootScope = mScopePool.NewScope(NULL);
   mRootScope->SetTree(this);

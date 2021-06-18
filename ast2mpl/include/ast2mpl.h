@@ -49,6 +49,7 @@ enum bool3 {
 class A2M {
 private:
   const char *mFileName;
+  ModuleNode *mASTModule;
   bool mTraceA2m;
   FEMIRBuilder *mMirBuilder;
   maple::MIRType *mDefaultType;
@@ -65,7 +66,7 @@ public:
   std::map<TreeNode*, maple::MIRFunction*> mFuncMap;
   std::map<std::pair<unsigned, BlockNode*>, maple::MIRSymbol*> mNameBlockVarMap;
 
-  A2M(const char *filename);
+  A2M(ModuleNode *m);
   ~A2M();
 
   void Init();

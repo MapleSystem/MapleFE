@@ -17,6 +17,7 @@
 #define __AST_BUILDER_HEADER__
 
 #include "ast.h"
+#include "ast_module.h"
 #include "ast_mempool.h"
 
 namespace maplefe {
@@ -49,7 +50,8 @@ class ASTScope;
 
 class ASTBuilder {
 private:
-  bool mTrace;
+  bool        mTrace;
+  ModuleNode *mASTModule;
 
   // The last created node. It will be referenced by the
   // following AddModifier() or other functions.
@@ -66,14 +68,18 @@ public:
   std::vector<Param>      mParams;
 
 public:
-  ASTBuilder() : mTrace(false), mLastTreeNode(NULL), mNameForBuildIdentifier(NULL) {}
+  ASTBuilder(ModuleNode *m) : mASTModule(m), mTrace(false), mLastTreeNode(NULL), mNameForBuildIdentifier(NULL) {}
   ~ASTBuilder() {}
 
   void SetTrace(bool b) {mTrace = b;}
+  void SetModule(ModuleNode *m) {mASTModule = m;}
 
   void AddParam(Param p) {mParams.push_back(p);}
   void ClearParams() {mParams.clear();}
   bool ParamsEmpty() {return mParams.empty();}
+
+  // add a case to switch
+  void AddSwitchCase(TreeNode *s, TreeNode *c);
 
   // Create Functions for Token
   TreeNode* CreateTokenTreeNode(const Token*);
@@ -89,7 +95,5 @@ public:
   SwitchCaseNode* SwitchLabelToCase(SwitchLabelNode*);
 };
 
-// A global builder is good enough.
-extern ASTBuilder gASTBuilder;
 }
 #endif

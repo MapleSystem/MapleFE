@@ -500,7 +500,7 @@ void AST_DFA::BuildScope() {
 
 BlockNode *BuildScopeVisitor::VisitBlockNode(BlockNode *node) {
   ASTScope *parent = mScopeStack.top();
-  ASTScope *scope = mModule->NewScope(parent);
+  ASTScope *scope = mASTModule->NewScope(parent);
   scope->SetTree(node);
   mHandler->mNodeId2Scope[node->GetNodeId()] = scope;
   parent->AddChild(scope);
@@ -517,7 +517,7 @@ FunctionNode *BuildScopeVisitor::VisitFunctionNode(FunctionNode *node) {
   ASTScope *parent = mScopeStack.top();
   // function is a decl
   parent->AddDecl(node);
-  ASTScope *scope = mModule->NewScope(parent);
+  ASTScope *scope = mASTModule->NewScope(parent);
   scope->SetTree(node);
   mHandler->mNodeId2Scope[node->GetNodeId()] = scope;
   parent->AddChild(scope);
@@ -538,7 +538,7 @@ FunctionNode *BuildScopeVisitor::VisitFunctionNode(FunctionNode *node) {
 
 LambdaNode *BuildScopeVisitor::VisitLambdaNode(LambdaNode *node) {
   ASTScope *parent = mScopeStack.top();
-  ASTScope *scope = mModule->NewScope(parent);
+  ASTScope *scope = mASTModule->NewScope(parent);
   scope->SetTree(node);
   mHandler->mNodeId2Scope[node->GetNodeId()] = scope;
   parent->AddChild(scope);
@@ -563,7 +563,7 @@ ClassNode *BuildScopeVisitor::VisitClassNode(ClassNode *node) {
   if (parent) {
     parent->AddDecl(node);
   }
-  ASTScope *scope = mModule->NewScope(parent);
+  ASTScope *scope = mASTModule->NewScope(parent);
   scope->SetTree(node);
   mHandler->mNodeId2Scope[node->GetNodeId()] = scope;
   parent->AddChild(scope);
@@ -590,7 +590,7 @@ InterfaceNode *BuildScopeVisitor::VisitInterfaceNode(InterfaceNode *node) {
     parent->AddDecl(node);
   }
 
-  ASTScope *scope = mModule->NewScope(parent);
+  ASTScope *scope = mASTModule->NewScope(parent);
   scope->SetTree(node);
   mHandler->mNodeId2Scope[node->GetNodeId()] = scope;
   parent->AddChild(scope);

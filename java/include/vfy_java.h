@@ -26,7 +26,7 @@ namespace maplefe {
 class VerifierJava : public Verifier {
 private:
 public:
-  VerifierJava(){}
+  VerifierJava(ModuleNode *m) : Verifier(m) {}
   ~VerifierJava(){}
 
   void VerifyGlobalScope();

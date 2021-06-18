@@ -82,10 +82,12 @@ int main (int argc, char *argv[]) {
   parser->InitRecursion();
   parser->Parse();
 
-  maplefe::VerifierJava vfy_java;
+  maplefe::ModuleNode *module =parser->GetModule();
+
+  maplefe::VerifierJava vfy_java(module);
   vfy_java.Do();
 
-  maplefe::A2MJava *a2m = new maplefe::A2MJava(maplefe::gModule->GetFileName());
+  maplefe::A2MJava *a2m = new maplefe::A2MJava(module);
   a2m->ProcessAST(trace_a2m);
 
   a2m->mMirModule->OutputAsciiMpl("", ".mpl");

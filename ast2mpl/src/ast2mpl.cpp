@@ -21,7 +21,8 @@
 
 namespace maplefe {
 
-A2M::A2M(const char *filename) : mFileName(filename) {
+A2M::A2M(ModuleNode *m) : mASTModule(m) {
+  mFileName = mASTModule->GetFileName();
   mMirModule = new maple::MIRModule(mFileName);
   maple::theMIRModule = mMirModule;
   mMirBuilder = new FEMIRBuilder(mMirModule);
@@ -65,24 +66,24 @@ void A2M::Init() {
 // starting point of AST to MPL process
 void A2M::ProcessAST(bool trace_a2m) {
   mTraceA2m = trace_a2m;
-  AstDump astdump(gModule);
+  AstDump astdump(mASTModule);
 
   if (mTraceA2m) {
     std::cout << "============= in ProcessAST ===========" << std::endl;
-    std::cout << "srcLang : " << gModule->GetSrcLangString() << std::endl;
+    std::cout << "srcLang : " << mASTModule->GetSrcLangString() << std::endl;
   }
   // pass 0: convert to use BlockNode for if-then-else and loop bodies
-  CvtToBlockVisitor visitor(gModule);
+  CvtToBlockVisitor visitor(mASTModule);
   visitor.CvtToBlock();
 
   // pass 1: collect class/interface/function decl
-  for (unsigned i = 0; i < gModule->GetTreesNum(); i++) {
-    TreeNode *tnode = gModule->GetTree(i);
+  for (unsigned i = 0; i < mASTModule->GetTreesNum(); i++) {
+    TreeNode *tnode = mASTModule->GetTree(i);
     ProcessNodeDecl(SK_Stmt, tnode, nullptr);
   }
   // pass 2: handle function def
-  for (unsigned i = 0; i < gModule->GetTreesNum(); i++) {
-    TreeNode *tnode = gModule->GetTree(i);
+  for (unsigned i = 0; i < mASTModule->GetTreesNum(); i++) {
+    TreeNode *tnode = mASTModule->GetTree(i);
     ProcessNode(SK_Stmt, tnode, nullptr);
   }
   if (mTraceA2m) { astdump.Dump("ProcessAST", &std::cout); }

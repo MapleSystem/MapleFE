@@ -188,8 +188,9 @@ Parser::Parser(const char *name) : filename(name) {
   mLexer = new Lexer();
   const std::string file(name);
 
-  gModule = new (gTreePool.NewTreeNode(sizeof(ModuleNode))) ModuleNode();
-  gModule->SetFileName(name);
+  mASTModule = new (gTreePool.NewTreeNode(sizeof(ModuleNode))) ModuleNode();
+  mASTModule->SetFileName(name);
+  mASTBuilder = new ASTBuilder(mASTModule);
   gPrimTypePool.Init();
 
   // get source language type
@@ -200,13 +201,13 @@ Parser::Parser(const char *name) : filename(name) {
   }
   std::string fileExt = file.substr(lastDot);
   if (fileExt.compare(".java") == 0) {
-    gModule->mSrcLang = SrcLangJava;
+    mASTModule->mSrcLang = SrcLangJava;
   } else if (fileExt.compare(".js") == 0) {
-    gModule->mSrcLang = SrcLangJavaScript;
+    mASTModule->mSrcLang = SrcLangJavaScript;
   } else if (fileExt.compare(".ts") == 0) {
-    gModule->mSrcLang = SrcLangTypeScript;
+    mASTModule->mSrcLang = SrcLangTypeScript;
   } else {
-    gModule->mSrcLang = SrcLangUnknown;
+    mASTModule->mSrcLang = SrcLangUnknown;
   }
 
   mLexer->PrepareForFile(file);
@@ -336,7 +337,7 @@ Token* Parser::GetActiveToken(unsigned i) {
 
 bool Parser::Parse() {
   gTemplateLiteralNodes.Clear();
-  gASTBuilder.SetTrace(mTraceAstBuild);
+  mASTBuilder->SetTrace(mTraceAstBuild);
   ParseStatus res;
   while (1) {
     res = ParseStmt();
@@ -347,10 +348,10 @@ bool Parser::Parse() {
   if (gTemplateLiteralNodes.GetNum() > 0)
     ParseTemplateLiterals();
 
-  FixUpVisitor worker(gModule);
+  FixUpVisitor worker(mASTModule);
   worker.FixUp();
 
-  gModule->Dump();
+  mASTModule->Dump();
   return (res==ParseFail)? false: true;
 }
 
@@ -509,7 +510,7 @@ ParseStatus Parser::ParseStmt() {
     TreeNode *tree = BuildAST();
     if (tree) {
       if (!mLineMode)
-        gModule->AddTree(tree);
+        mASTModule->AddTree(tree);
     }
 
     if (mTraceTiming) {
@@ -2361,7 +2362,7 @@ TreeNode* Parser::NewTreeNode(AppealNode *appeal_node) {
   TreeNode *sub_tree = NULL;
 
   if (appeal_node->IsToken()) {
-    sub_tree = gASTBuilder.CreateTokenTreeNode(appeal_node->GetToken());
+    sub_tree = mASTBuilder->CreateTokenTreeNode(appeal_node->GetToken());
     return sub_tree;
   }
 
@@ -2369,8 +2370,8 @@ TreeNode* Parser::NewTreeNode(AppealNode *appeal_node) {
 
   for (unsigned i = 0; i < rule_table->mNumAction; i++) {
     Action *action = rule_table->mActions + i;
-    gASTBuilder.mActionId = action->mId;
-    gASTBuilder.ClearParams();
+    mASTBuilder->mActionId = action->mId;
+    mASTBuilder->ClearParams();
 
     for (unsigned j = 0; j < action->mNumElem; j++) {
       // find the appeal node child
@@ -2399,13 +2400,13 @@ TreeNode* Parser::NewTreeNode(AppealNode *appeal_node) {
           p.mData.mTreeNode = tree_node;
         }
       }
-      gASTBuilder.AddParam(p);
+      mASTBuilder->AddParam(p);
     }
 
     // For multiple actions of a rule, there should be only action which create tree.
     // The others are just for adding attribute or else, and return the same tree
     // with additional attributes.
-    sub_tree = gASTBuilder.Build();
+    sub_tree = mASTBuilder->Build();
   }
 
   if (sub_tree)
