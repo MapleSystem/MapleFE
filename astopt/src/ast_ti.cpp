@@ -521,6 +521,7 @@ SwitchNode *TypeInferVisitor::VisitSwitchNode(SwitchNode *node) {
 
 TemplateLiteralNode *TypeInferVisitor::VisitTemplateLiteralNode(TemplateLiteralNode *node) {
   (void) AstVisitor::VisitTemplateLiteralNode(node);
+  UpdateTypeId(node, TY_String);
   return node;
 }
 
@@ -541,6 +542,7 @@ TryNode *TypeInferVisitor::VisitTryNode(TryNode *node) {
 
 TypeOfNode *TypeInferVisitor::VisitTypeOfNode(TypeOfNode *node) {
   (void) AstVisitor::VisitTypeOfNode(node);
+  UpdateTypeId(node, TY_String);
   return node;
 }
 
