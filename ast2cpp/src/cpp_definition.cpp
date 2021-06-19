@@ -122,6 +122,16 @@ std::string CppDef::EmitDeclNode(DeclNode *node) {
   return str;
 }
 
+static bool QuoteStringLiteral(std::string &s, bool quoted = false) {
+  if(!quoted && (s.front() != '"' || s.back() != '"'))
+    return false;
+  if(!quoted)
+    s = s.substr(1, s.length() - 2);
+  Emitter::Replace(s, "\"", "\\\"", 0);
+  s = "\"" + s + "\"";
+  return true;
+}
+
 std::string CppDef::EmitCallNode(CallNode *node) {
   if (node == nullptr)
     return std::string();
@@ -141,15 +151,14 @@ std::string CppDef::EmitCallNode(CallNode *node) {
   }
   if(!log)
     str += "("s;
-  for (unsigned i = 0; i < node->GetArgsNum(); ++i) {
+  unsigned num = node->GetArgsNum();
+  for (unsigned i = 0; i < num; ++i) {
     if(log) {
       std::string s = EmitTreeNode(node->GetArg(i));
-      if(s.front() == '"' && s.back() == '"') {
-        s = s.substr(1, s.length() - 2);
-        Emitter::Replace(s, "\"", "\\\"", 0);
-        s = "\"'" + s + "'\"";
-      }
-      else if(mPrecedence <= 13) // '\015'
+      if(QuoteStringLiteral(s)) {
+        if(num > 1)
+          s += "\"'"s + s + "'\""s;
+      } else if(mPrecedence <= 13) // '\015'
         s = "("s + s + ")"s;
       if (i)
         str += " << ' ' "s;
@@ -366,6 +375,30 @@ std::string CppDef::EmitUnaOperatorNode(UnaOperatorNode *node) {
   else
     str = " "s + std::string(op + 1) + opr;
   mPrecedence = precd;
+  if (node->IsStmt())
+    str += ";\n"s;
+  return str;
+}
+
+std::string CppDef::EmitTemplateLiteralNode(TemplateLiteralNode *node) {
+  if (node == nullptr)
+    return std::string();
+  auto num = node->GetTreesNum();
+  std::string str;
+  for (unsigned i = 0; i < num; ++i) {
+    if (auto n = node->GetTreeAtIndex(i)) {
+      if (!std::empty(str))
+        str += " + "s;
+      std::string s(EmitTreeNode(n));
+      if(i & 0x1)
+        str += "std::to_string("s + s+ ")"s;
+      else {
+        QuoteStringLiteral(s, true);
+        str += s;
+      }
+    }
+  }
+  mPrecedence = '\016';
   if (node->IsStmt())
     str += ";\n"s;
   return str;
