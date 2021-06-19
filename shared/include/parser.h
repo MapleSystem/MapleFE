@@ -214,8 +214,6 @@ public:
   void SetToken(Token *t)     { mIsTable = false; mData.mToken = t; }
   RuleTable* GetTable() { return mData.mTable; }
   Token*     GetToken() { return mData.mToken; }
-
-  bool SuccEqualTo(AppealNode*);
 };
 
 class RecursionTraversal;

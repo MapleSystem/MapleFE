@@ -2680,19 +2680,6 @@ void AppealNode::CopyMatch(AppealNode *another) {
     mResult = another->mResult;
 }
 
-// Returns true, if both nodes are successful and match the same tokens
-// with the same rule table
-bool AppealNode::SuccEqualTo(AppealNode *other) {
-  if (IsSucc() && other->IsSucc() && mStartIndex == other->GetStartIndex()) {
-    if (IsToken() && other->IsToken()) {
-      return GetToken() == other->GetToken();
-    } else if (IsTable() && other->IsTable()) {
-      return GetTable() == other->GetTable();
-    }
-  }
-  return false;
-}
-
 void AppealNode::RemoveChild(AppealNode *child) {
   std::vector<AppealNode*> temp_vector;
   std::vector<AppealNode*>::iterator it = mChildren.begin();
