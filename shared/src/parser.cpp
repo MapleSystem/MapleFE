@@ -1998,7 +1998,7 @@ void Parser::DumpSortOutNode(AppealNode *n) {
   unsigned dump_id = to_be_dumped_id.front();
   to_be_dumped_id.pop_front();
 
-  std::cout << "[" << dump_id << ":" << n->GetChildIndex() << "," << n->mSimplifiedIndex << "] ";
+  std::cout << "[" << dump_id << ":" << n->GetChildIndex() << "] ";
   if (n->IsToken()) {
     n->mData.mToken->Dump();
   } else {
@@ -2255,7 +2255,7 @@ AppealNode* Parser::SimplifyShrinkEdges(AppealNode *node) {
     AppealNode *parent = node->GetParent();
     parent->ReplaceSortedChild(node, child);
 
-    bool found = parent->GetSortedChildIndex(node, index);
+    index = node->GetChildIndex();
     child->SetChildIndex(index);
 
     // step 5. keep going
@@ -2701,31 +2701,11 @@ void AppealNode::ReplaceSortedChild(AppealNode *existing, AppealNode *replacemen
   replacement->SetParent(this);
 }
 
-// Returns true : if successfully found the index.
-// [NOTE] This is the index in the Rule Spec description, which are used in the
-//        building of AST. So remember it starts from 1.
-//
-// The AppealNode tree has many messy nodes generated during second try, or others.
-// It's not a good idea to find the index through the tree. The final real solution
-// is to go through the RuleTable and locate the child's index.
-bool AppealNode::GetSortedChildIndex(AppealNode *child, unsigned &index) {
-  bool found = false;
-  MASSERT(IsTable() && "Parent node is not a RuleTable");
-  RuleTable *rule_table = GetTable();
-
-  // In SimplifyShrinkEdges, the tree could be simplified and a node could be given an index
-  // to his ancestor.
-  index = child->GetChildIndex();
-  return true;
-}
-
 AppealNode* AppealNode::GetSortedChildByIndex(unsigned index) {
   std::vector<AppealNode*>::iterator it = mSortedChildren.begin();
   for (; it != mSortedChildren.end(); it++) {
     AppealNode *child = *it;
-    unsigned id = 0;
-    bool found = GetSortedChildIndex(child, id);
-    MASSERT(found && "sorted child has no index..");
+    unsigned id = child->GetChildIndex();
     if (id == index)
       return child;
   }

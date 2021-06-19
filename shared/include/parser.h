@@ -139,16 +139,6 @@ public:
 
 public:
   bool mIsTable;     // A AppealNode could relate to either rule table or token.
-  unsigned int mSimplifiedIndex;  // After SimplifyShrinkEdges, a node could be moved to
-                                  // connect to a new 'parent' node, replacing its ancestor.
-                                  // To make AST building work, it needs to inherit ancestor's
-                                  // index in the rule table.
-                                  // [NOTE] This field starts to work in the AST building phase,
-                                  //        and this index is the one in the rule actions and
-                                  //        it starts from 1. So the initial value is set to 0
-                                  //        which means useless.
-
-public:
   union {
     RuleTable *mTable;
     Token     *mToken;
@@ -179,7 +169,7 @@ public:
   AppealStatus mResult;
 
   AppealNode() {mData.mTable=NULL; mParent = NULL;
-                mResult = AppealStatus_NA; mSimplifiedIndex = 0; mIsTable = true;
+                mResult = AppealStatus_NA; mIsTable = true;
                 mStartIndex = 0; mSorted = false; mFinalMatch = 0;
                 m1stAltTokenMatched = false; mAltToken = NULL;
                 mIsPseudo = false; mAstTreeNode = NULL; mAstCreated = false;
@@ -192,7 +182,6 @@ public:
 
   void ReplaceSortedChild(AppealNode *existing, AppealNode *replacement);
   void AddSortedChild(AppealNode *n) { mSortedChildren.push_back(n); }
-  bool GetSortedChildIndex(AppealNode*, unsigned &);
   AppealNode* GetSortedChildByIndex(unsigned idx);
   AppealNode* FindIndexedChild(unsigned match, unsigned index);
 
