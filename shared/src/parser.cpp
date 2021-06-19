@@ -2240,13 +2240,12 @@ AppealNode* Parser::SimplifyShrinkEdges(AppealNode *node) {
     if (rt_p == rt_c && mRecursionAll.IsLeadNode(rt_p))
       skip = true;
 
-    unsigned child_index;
-    bool found = node->GetSortedChildIndex(child, child_index);
+    unsigned child_index = child->GetChildIndex();
     if (!skip) {
       // step 3. check condition (3)
       //         [NOTE] in RuleAction, element index starts from 1.
       RuleTable *rt = node->GetTable();
-      bool has_action = RuleActionHasElem(rt, child_index);
+      bool has_action = RuleActionHasElem(rt, child_index + 1);
       if (has_action)
         break;
     }
@@ -2256,14 +2255,8 @@ AppealNode* Parser::SimplifyShrinkEdges(AppealNode *node) {
     AppealNode *parent = node->GetParent();
     parent->ReplaceSortedChild(node, child);
 
-    // 1. mRootNode won't have RuleAction, so the index is never used.
-    // 2. 'index' just need be calculated once, at the first ancestor which is 'node'
-    //    transferred into this function.
-    if (parent != mRootNode && index == 0) {
-      found = parent->GetSortedChildIndex(node, index);
-      MASSERT(found && "Could not find child index?");
-    }
-    child->mSimplifiedIndex = index;
+    bool found = parent->GetSortedChildIndex(node, index);
+    child->SetChildIndex(index);
 
     // step 5. keep going
     node = child;
@@ -2376,7 +2369,7 @@ TreeNode* Parser::NewTreeNode(AppealNode *appeal_node) {
     for (unsigned j = 0; j < action->mNumElem; j++) {
       // find the appeal node child
       unsigned elem_idx = action->mElems[j];
-      AppealNode *child = appeal_node->GetSortedChildByIndex(elem_idx);
+      AppealNode *child = appeal_node->GetSortedChildByIndex(elem_idx - 1);
       Param p;
       p.mIsEmpty = true;
       // There are 3 cases to handle.
@@ -2722,12 +2715,7 @@ bool AppealNode::GetSortedChildIndex(AppealNode *child, unsigned &index) {
 
   // In SimplifyShrinkEdges, the tree could be simplified and a node could be given an index
   // to his ancestor.
-  if (child->mSimplifiedIndex != 0) {
-    index = child->mSimplifiedIndex;
-    return true;
-  }
-
-  index = child->GetChildIndex() + 1;
+  index = child->GetChildIndex();
   return true;
 }
 
