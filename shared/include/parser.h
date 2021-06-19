@@ -182,7 +182,7 @@ public:
 
   void ReplaceSortedChild(AppealNode *existing, AppealNode *replacement);
   void AddSortedChild(AppealNode *n) { mSortedChildren.push_back(n); }
-  AppealNode* GetSortedChildByIndex(unsigned idx);
+  AppealNode* GetSortedChild(unsigned idx);
   AppealNode* FindIndexedChild(unsigned match, unsigned index);
 
   bool IsSucc() { return (mResult == Succ) ||

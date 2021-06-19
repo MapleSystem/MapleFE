@@ -2369,7 +2369,7 @@ TreeNode* Parser::NewTreeNode(AppealNode *appeal_node) {
     for (unsigned j = 0; j < action->mNumElem; j++) {
       // find the appeal node child
       unsigned elem_idx = action->mElems[j];
-      AppealNode *child = appeal_node->GetSortedChildByIndex(elem_idx - 1);
+      AppealNode *child = appeal_node->GetSortedChild(elem_idx - 1);
       Param p;
       p.mIsEmpty = true;
       // There are 3 cases to handle.
@@ -2701,7 +2701,7 @@ void AppealNode::ReplaceSortedChild(AppealNode *existing, AppealNode *replacemen
   replacement->SetParent(this);
 }
 
-AppealNode* AppealNode::GetSortedChildByIndex(unsigned index) {
+AppealNode* AppealNode::GetSortedChild(unsigned index) {
   std::vector<AppealNode*>::iterator it = mSortedChildren.begin();
   for (; it != mSortedChildren.end(); it++) {
     AppealNode *child = *it;
