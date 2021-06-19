@@ -22,6 +22,10 @@
 
 namespace t2crt {
 
+// __JSVAL is set to be double for now
+// Should be a JS value type
+typedef double __JSVAL;
+
 class BaseObj;
 
 // JS types for props
