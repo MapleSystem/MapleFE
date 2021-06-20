@@ -327,20 +327,26 @@ std::string CppDef::EmitBinOperatorNode(BinOperatorNode *node) {
   }
   else
     rhs = " (NIL)"s;
-  switch(node->GetOprId()) {
-    case OPR_Band:
-    case OPR_Bor:
-    case OPR_Bxor:
-    case OPR_Shl:
-    case OPR_Shr:
-      lhs = "static_cast<int32_t>("s + lhs + ")"s;
-      break;
-    case OPR_Zext:
-      lhs = "static_cast<uint32_t>("s + lhs + ")"s;
-      op = "\015>>";
-      break;
+  OprId k = node->GetOprId();
+  std::string str;
+  if(k == OPR_Exp) {
+    str = "std::pow("s + lhs + ", "s + rhs + ")";
+  } else {
+    switch(k) {
+      case OPR_Band:
+      case OPR_Bor:
+      case OPR_Bxor:
+      case OPR_Shl:
+      case OPR_Shr:
+        lhs = "static_cast<int32_t>("s + lhs + ")"s;
+        break;
+      case OPR_Zext:
+        lhs = "static_cast<uint32_t>("s + lhs + ")"s;
+        op = "\015>>";
+        break;
+    }
+    str = lhs + " "s + std::string(op + 1) + " "s + rhs;
   }
-  std::string str(lhs + " "s + std::string(op + 1) + " "s + rhs);
   mPrecedence = precd;
   if (node->IsStmt())
     str += ";\n"s;
