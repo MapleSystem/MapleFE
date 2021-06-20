@@ -22,17 +22,7 @@ std::string CppDef::EmitModuleNode(ModuleNode *node) {
     return std::string();
   std::string name = GetModuleName();
   std::string str("// TypeScript filename: "s + node->GetFileName() + "\n"s);
-  str += "#include <iostream>\n#include \""s + GetBaseFileName() + ".h\""s + R"""(
-
-void )""" + name + R"""(::__init_func__() { // bind "this" to current module
-)""";
-  isInit = true;
-  for (unsigned i = 0; i < node->GetTreesNum(); ++i) {
-    if (auto n = node->GetTree(i)) {
-      str += EmitTreeNode(n);
-    }
-  }
-  str += "}\n\n"s;
+  str += "#include <iostream>\n#include \""s + GetBaseFileName() + ".h\"\n\n"s;
 
   // definitions of all top-level functions
   isInit = false;
@@ -44,9 +34,14 @@ void )""" + name + R"""(::__init_func__() { // bind "this" to current module
     str += EmitTreeNode(node);
   }
 
-  str += R"""(
-
-)""" + name + " _"s + name + R"""(;
+  str += "\n\n void "s + name + "::__init_func__() { // bind \"this\" to current module\n"s;
+  isInit = true;
+  for (unsigned i = 0; i < node->GetTreesNum(); ++i) {
+    if (auto n = node->GetTree(i)) {
+      str += EmitTreeNode(n);
+    }
+  }
+  str += "}\n\n"s + name + " _"s + name + R"""(;
 
 // If the program starts from this module, generate the main function
 int main(int argc, char **argv) {
@@ -65,7 +60,7 @@ std::string CppDef::EmitFunctionNode(FunctionNode *node) {
     str += mCppDecl.EmitTreeNode(n) + " "s;
   }
   else
-    str += "void "s;
+    str += "auto "s;
   if(node->GetStrIdx())
     str += GetModuleName() + "::"s + node->GetName();
   str += "("s;

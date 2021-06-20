@@ -95,7 +95,7 @@ std::string CppDecl::EmitFunctionNode(FunctionNode *node) {
     str += EmitTreeNode(n) + " "s;
   }
   else
-    str += "void "s;
+    str += "auto "s;
   if(node->GetStrIdx())
     str += node->GetName();
   str += "("s;
