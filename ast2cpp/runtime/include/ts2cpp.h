@@ -132,4 +132,20 @@ extern CtorObj* Function;
 extern CtorObj* Object;
 
 } // namespace t2crt
+
+template <typename T>
+std::ostream& operator<< (std::ostream& out, const std::vector<T>& v) {
+  if(v.empty())
+    out << "[]";
+  else {
+    out << "[ ";
+    auto i = v.begin(), e = v.end();
+    out << *i++;
+    for (; i != e; ++i)
+        std::cout << ", " << *i;
+    out << " ]";
+  }
+  return out;
+}
+
 #endif
