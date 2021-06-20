@@ -138,6 +138,8 @@ std::string CppDecl::EmitPrimTypeNode(PrimTypeNode *node) {
       return "double "s;
     case TY_Boolean:
       return "bool "s;
+    case TY_String:
+      return "std::string "s;
     case TY_None:
       return "auto "s;
   }

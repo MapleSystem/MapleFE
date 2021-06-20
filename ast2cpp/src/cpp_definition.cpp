@@ -391,7 +391,7 @@ std::string CppDef::EmitTemplateLiteralNode(TemplateLiteralNode *node) {
         str += " + "s;
       std::string s(EmitTreeNode(n));
       if(i & 0x1)
-        str += "std::to_string("s + s+ ")"s;
+        str += "t2crt::to_string("s + s+ ")"s;
       else {
         QuoteStringLiteral(s, true);
         str += s;

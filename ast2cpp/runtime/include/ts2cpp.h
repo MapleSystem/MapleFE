@@ -22,6 +22,9 @@
 
 namespace t2crt {
 
+using std::to_string;
+inline std::string to_string(std::string t) {return t;}
+
 // __JSVAL is set to be double for now
 // Should be a JS value type
 typedef double __JSVAL;
