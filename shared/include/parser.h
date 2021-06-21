@@ -28,6 +28,7 @@
 #include "recursion.h"
 #include "succ_match.h"
 #include "rule_summary.h"
+#include "appnode_pool.h"
 
 namespace maplefe {
 
@@ -232,6 +233,8 @@ private:
   unsigned    mATMToken;             // the current input token being processed.
   ModuleNode *mASTModule;            // the AST Module
   ASTBuilder *mASTBuilder;           // the AST Builder
+
+  AppealNodePool mAppealNodePool;
 
 public:
   Lexer *mLexer;
