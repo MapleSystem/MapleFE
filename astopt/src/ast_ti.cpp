@@ -542,8 +542,14 @@ PrimTypeNode *TypeInferVisitor::VisitPrimTypeNode(PrimTypeNode *node) {
 
 ReturnNode *TypeInferVisitor::VisitReturnNode(ReturnNode *node) {
   (void) AstVisitor::VisitReturnNode(node);
-  if (node->GetResult()) {
-    UpdateTypeId(node, node->GetResult()->GetTypeId());
+  TreeNode *res = node->GetResult();
+  if (res) {
+    UpdateTypeId(node, res->GetTypeId());
+  }
+  TreeNode *tn = mHandler->FindFunc(node);
+  if (tn) {
+    FunctionNode *func = static_cast<FunctionNode *>(tn);
+    UpdateTypeId(func->GetType(), node->GetTypeId());
   }
   return node;
 }
@@ -586,7 +592,14 @@ TemplateLiteralNode *TypeInferVisitor::VisitTemplateLiteralNode(TemplateLiteralN
 }
 
 TerOperatorNode *TypeInferVisitor::VisitTerOperatorNode(TerOperatorNode *node) {
-  (void) AstVisitor::VisitTerOperatorNode(node);
+  TreeNode *ta = node->GetOpndA();
+  TreeNode *tb = node->GetOpndB();
+  TreeNode *tc = node->GetOpndC();
+  (void) VisitTreeNode(ta);
+  (void) VisitTreeNode(tb);
+  (void) VisitTreeNode(tc);
+  UpdateTypeId(node, tb->GetTypeId());
+  UpdateTypeId(node, tc->GetTypeId());
   return node;
 }
 

@@ -83,9 +83,9 @@ TreeNode *Module_Handler::FindDecl(IdentifierNode *inode) {
   return decl;
 }
 
-// input a decl node ==> return the function node contains it
-TreeNode *Module_Handler::FindFunc(IdentifierNode *inode) {
-  TreeNode *p = inode->GetParent();
+// input a node ==> return the function node contains it
+TreeNode *Module_Handler::FindFunc(TreeNode *node) {
+  TreeNode *p = node->GetParent();
   while (p) {
     if (p->IsFunction()) {
       return p;

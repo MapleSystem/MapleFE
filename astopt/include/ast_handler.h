@@ -105,7 +105,7 @@ class Module_Handler {
   DeclNode *GetDeclOf(IdentifierNode *inode);
 
   TreeNode *FindDecl(IdentifierNode *inode);
-  TreeNode *FindFunc(IdentifierNode *inode);
+  TreeNode *FindFunc(TreeNode *inode);
 
   void Dump(char *msg);
 };

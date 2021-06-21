@@ -99,8 +99,8 @@ ms: mssetup
 	@echo "========================================================\n"
 	@echo gdb --args ../output/typescript/bin/ts2ast $(build)/$@.ts $(FLAGS1)
 	@echo gdb --args ../output/typescript/bin/ast2cpp $(build)/$@.ts.ast $(FLAGS2)
-	@echo "\n======================= $@.ts.cpp ========================="
-	@cat -n $(build)/$@.ts.cpp
+	@echo "\n======================= $@.cpp ========================="
+	@cat -n $(build)/$@.cpp
 	@echo "========================================================\n"
 	@echo gdb --args ../output/typescript/bin/ts2ast $(build)/$@.ts $(FLAGS1)
 	@echo gdb --args ../output/typescript/bin/ast2cpp $(build)/$@.ts.ast $(FLAGS2)
