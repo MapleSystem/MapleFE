@@ -29,8 +29,8 @@ class Module_Handler;
 
 class TypeInfer {
  private:
-  Module_Handler  *mHandler;
-  bool          mTrace;
+  Module_Handler *mHandler;
+  bool            mTrace;
 
  public:
   explicit TypeInfer(Module_Handler *h, bool t) : mHandler(h), mTrace(t) {}
@@ -41,12 +41,12 @@ class TypeInfer {
 
 class TypeInferVisitor : public AstVisitor {
  private:
-  Module_Handler  *mHandler;
-  bool          mTrace;
-  bool          mUpdated;
+  Module_Handler *mHandler;
+  bool            mTrace;
+  bool            mUpdated;
 
-  CfgFunc   *mCurrentFunction;
-  CfgBB *mCurrentBB;
+  CfgFunc *mCurrentFunction;
+  CfgBB   *mCurrentBB;
 
  public:
   explicit TypeInferVisitor(Module_Handler *h, bool t, bool base = false)
@@ -57,8 +57,12 @@ class TypeInferVisitor : public AstVisitor {
   void SetUpdated(bool b) {mUpdated = b;}
 
   void UpdateTypeId(TreeNode *node, TypeId id);
+  void UpdateArrayElemTypeIdMap(TreeNode *node, TypeId id);
 
   TypeId MergeTypeId(TypeId tia, TypeId tib);
+
+  bool IsArray(DeclNode *node);
+  bool IsArray(TreeNode *node);
 
   TreeNode *VisitClassField(TreeNode *node);
 

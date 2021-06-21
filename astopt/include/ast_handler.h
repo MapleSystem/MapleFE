@@ -55,6 +55,8 @@ class Module_Handler {
   std::unordered_map<unsigned, CfgBB *> mBbId2BbMap;
   // scope node id to scope
   std::unordered_map<unsigned, ASTScope *> mNodeId2Scope;
+  // array's element type: decl node id to typeid
+  std::unordered_map<unsigned, TypeId> mArrayDeclId2EleTypeIdMap;
 
  public:
   explicit Module_Handler(bool trace) :

@@ -67,14 +67,47 @@ void TypeInferVisitor::UpdateTypeId(TreeNode *node, TypeId id) {
   if (!node || id == TY_None) {
     return;
   }
+  id = MergeTypeId(node->GetTypeId(), id);
   if (node->GetTypeId() != id) {
-    if (node->GetTypeId() != TY_None) {
-      if (mTrace) std::cout << "UpdateTypeId() new non TY_None: " << std::endl;
-      id = MergeTypeId(node->GetTypeId(), id);
-    }
     node->SetTypeId(id);
     mUpdated = true;
   }
+}
+
+void TypeInferVisitor::UpdateArrayElemTypeIdMap(TreeNode *node, TypeId id) {
+  if (!node || id == TY_None || !IsArray(node)) {
+    return;
+  }
+  unsigned nid = node->GetNodeId();
+  auto it = mHandler->mArrayDeclId2EleTypeIdMap.find(nid);
+  if (it != mHandler->mArrayDeclId2EleTypeIdMap.end()) {
+    id = MergeTypeId(id, mHandler->mArrayDeclId2EleTypeIdMap[nid]);
+  }
+  if (mHandler->mArrayDeclId2EleTypeIdMap[nid] != id) {
+    mHandler->mArrayDeclId2EleTypeIdMap[node->GetNodeId()] = id;
+    mUpdated = true;
+  }
+}
+
+bool TypeInferVisitor::IsArray(DeclNode *node) {
+  if (!node) {
+    return false;
+  }
+  TreeNode *var = node->GetVar();
+  return IsArray(var);
+}
+
+bool TypeInferVisitor::IsArray(TreeNode *node) {
+  if (!node) {
+    return false;
+  }
+  if (node->IsIdentifier()) {
+    IdentifierNode *id = static_cast<IdentifierNode *>(node);
+    if (id && id->GetType() && id->GetType()->GetKind() == NK_PrimArrayType) {
+      return true;
+    }
+  }
+  return false;
 }
 
 TreeNode *TypeInferVisitor::VisitClassField(TreeNode *node) {
@@ -101,11 +134,23 @@ AnnotationTypeNode *TypeInferVisitor::VisitAnnotationTypeNode(AnnotationTypeNode
 
 ArrayElementNode *TypeInferVisitor::VisitArrayElementNode(ArrayElementNode *node) {
   (void) AstVisitor::VisitArrayElementNode(node);
+  TreeNode *array = node->GetArray();
+  if (array) {
+    array->SetTypeId(TY_Array);
+    if (array->IsIdentifier()) {
+      TreeNode *decl = mHandler->FindDecl(static_cast<IdentifierNode *>(array));
+      if (decl) {
+        decl->SetTypeId(TY_Array);
+        UpdateArrayElemTypeIdMap(decl, node->GetTypeId());
+        UpdateTypeId(node, mHandler->mArrayDeclId2EleTypeIdMap[decl->GetNodeId()]);
+      }
+    }
+  }
   return node;
 }
 
 ArrayLiteralNode *TypeInferVisitor::VisitArrayLiteralNode(ArrayLiteralNode *node) {
-  UpdateTypeId(node, TY_Object);
+  UpdateTypeId(node, TY_Array);
   (void) AstVisitor::VisitArrayLiteralNode(node);
   return node;
 }
@@ -136,10 +181,12 @@ BindingPatternNode *TypeInferVisitor::VisitBindingPatternNode(BindingPatternNode
 }
 
 BinOperatorNode *TypeInferVisitor::VisitBinOperatorNode(BinOperatorNode *node) {
-  (void) AstVisitor::VisitBinOperatorNode(node);
+  // (void) AstVisitor::VisitBinOperatorNode(node);
   OprId op = node->GetOprId();
   TreeNode *ta = node->GetOpndA();
   TreeNode *tb = node->GetOpndB();
+  (void) VisitTreeNode(tb);
+  (void) VisitTreeNode(ta);
   // modified operand
   TreeNode *mod = NULL;
   TypeId tia = ta->GetTypeId();
@@ -279,8 +326,16 @@ DeclNode *TypeInferVisitor::VisitDeclNode(DeclNode *node) {
   TreeNode *init = node->GetInit();
   TreeNode *var = node->GetVar();
   TypeId merged = TY_None;
+  TypeId elemTypeId = TY_None;
   if (init) {
     merged = MergeTypeId(node->GetTypeId(), init->GetTypeId());
+    // collect array element typeid
+    if (init->IsArrayLiteral()) {
+      ArrayLiteralNode *al = static_cast<ArrayLiteralNode *>(init);
+      if (al->GetLiteralsNum()) {
+        elemTypeId = al->GetLiteral(0)->GetTypeId();
+      }
+    }
   }
   if (var) {
     merged = MergeTypeId(merged, var->GetTypeId());
@@ -288,6 +343,9 @@ DeclNode *TypeInferVisitor::VisitDeclNode(DeclNode *node) {
   UpdateTypeId(node, merged);
   UpdateTypeId(init, merged);
   UpdateTypeId(var, merged);
+  if (IsArray(node)) {
+    UpdateArrayElemTypeIdMap(node, elemTypeId);
+  }
   return node;
 }
 

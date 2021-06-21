@@ -17,6 +17,7 @@
 // and the parser.
 
 TYPE(None)
+TYPE(Array)
 TYPE(Object)
 TYPE(Function)  // function/lambda decl
 TYPE(Class)     // class/interface decl
