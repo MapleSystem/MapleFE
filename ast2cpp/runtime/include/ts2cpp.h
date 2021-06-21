@@ -133,6 +133,8 @@ extern CtorObj* Object;
 
 } // namespace t2crt
 
+using namespace std::string_literals;
+
 template <typename T>
 std::ostream& operator<< (std::ostream& out, const std::vector<T>& v) {
   if(v.empty())

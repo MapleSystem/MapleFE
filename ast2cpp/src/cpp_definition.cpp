@@ -123,7 +123,7 @@ static bool QuoteStringLiteral(std::string &s, bool quoted = false) {
   if(!quoted)
     s = s.substr(1, s.length() - 2);
   Emitter::Replace(s, "\"", "\\\"", 0);
-  s = "\"" + s + "\"";
+  s = "\"" + s + "\"s";
   return true;
 }
 
@@ -400,6 +400,17 @@ std::string CppDef::EmitTemplateLiteralNode(TemplateLiteralNode *node) {
     }
   }
   mPrecedence = '\016';
+  if (node->IsStmt())
+    str += ";\n"s;
+  return str;
+}
+
+std::string CppDef::EmitLiteralNode(LiteralNode *node) {
+  if (node == nullptr)
+    return std::string();
+  std::string str(AstDump::GetEnumLitData(node->GetData()));
+  QuoteStringLiteral(str);
+  mPrecedence = '\030';
   if (node->IsStmt())
     str += ";\n"s;
   return str;
