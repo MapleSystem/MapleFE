@@ -177,7 +177,8 @@ public:
                 mChildIndex = 0;
                 // These two don't need big memory. So set block size to 128.
                 mChildren.SetBlockSize(128); mSortedChildren.SetBlockSize(128); }
-  ~AppealNode(){mMatches.Release();}
+  ~AppealNode() {Release();}
+  void Release(){mMatches.Release(); mChildren.Release(); mSortedChildren.Release();}
 
   void AddChild(AppealNode *n) { mChildren.PushBack(n); }
   void ClearChildren() { mChildren.Clear(); }
