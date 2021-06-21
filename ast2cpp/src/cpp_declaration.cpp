@@ -92,12 +92,16 @@ std::string CppDecl::EmitFunctionNode(FunctionNode *node) {
     return std::string();
   std::string str;
   if (auto n = node->GetType()) {
-    str += EmitTreeNode(n) + " "s;
+    TypeId k = n->GetTypeId();
+    if(k != TY_None)
+      str += CppDecl::GetEnumTypeId(k);
+    else
+      str += EmitTreeNode(n);
   }
   else
-    str += "auto "s;
+    str += "auto"s;
   if(node->GetStrIdx())
-    str += node->GetName();
+    str += " "s + node->GetName();
   str += "("s;
   for (unsigned i = 0; i < node->GetParamsNum(); ++i) {
     if (i)
@@ -119,7 +123,7 @@ std::string CppDecl::EmitIdentifierNode(IdentifierNode *node) {
     return std::string();
   std::string str;
   TypeId k = node->GetTypeId();
-  if(k != TY_None && k != TY_Object)
+  if(k != TY_None)
     str += CppDecl::GetEnumTypeId(node->GetTypeId());
   else if (auto n = node->GetType())
     str += EmitTreeNode(n);
@@ -128,7 +132,6 @@ std::string CppDecl::EmitIdentifierNode(IdentifierNode *node) {
   str += " "s + node->GetName();
   return str;
 }
-
 
 std::string CppDecl::EmitPrimTypeNode(PrimTypeNode *node) {
   if (node == nullptr)

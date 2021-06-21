@@ -57,12 +57,16 @@ std::string CppDef::EmitFunctionNode(FunctionNode *node) {
     return std::string();
   std::string str;
   if (auto n = node->GetType()) {
-    str += mCppDecl.EmitTreeNode(n) + " "s;
+    TypeId k = n->GetTypeId();
+    if(k != TY_None)
+      str += CppDecl::GetEnumTypeId(k);
+    else
+      str += mCppDecl.EmitTreeNode(n);
   }
   else
-    str += "auto "s;
+    str += "auto"s;
   if(node->GetStrIdx())
-    str += GetModuleName() + "::"s + node->GetName();
+    str += " "s + GetModuleName() + "::"s + node->GetName();
   str += "("s;
 
   for (unsigned i = 0; i < node->GetParamsNum(); ++i) {
