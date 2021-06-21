@@ -282,6 +282,15 @@ BreakNode *TypeInferVisitor::VisitBreakNode(BreakNode *node) {
 CallNode *TypeInferVisitor::VisitCallNode(CallNode *node) {
   TreeNode *method = node->GetMethod();
   UpdateTypeId(method, TY_Function);
+  if (method && method->IsIdentifier()) {
+    TreeNode *decl = mHandler->FindDecl(static_cast<IdentifierNode *>(method));
+    if (decl && decl->IsFunction()) {
+      FunctionNode *func = static_cast<FunctionNode *>(decl);
+      if (func->GetType()) {
+        UpdateTypeId(node, func->GetType()->GetTypeId());
+      }
+    }
+  }
   (void) AstVisitor::VisitCallNode(node);
   return node;
 }
