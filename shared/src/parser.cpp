@@ -193,6 +193,8 @@ Parser::Parser(const char *name) : filename(name) {
   mASTBuilder = new ASTBuilder(mASTModule);
   gPrimTypePool.Init();
 
+  mAppealNodePool.SetBlockSize(16*4096);
+
   // get source language type
   std::string::size_type lastDot = file.find_last_of('.');
   if (lastDot == std::string::npos) {
@@ -394,15 +396,14 @@ void Parser::ParseTemplateLiterals() {
   mLexer->ResetLineMode();
 }
 
-// Right now I didn't use mempool yet, will come back.
-// [TODO] Using mempool.
 void Parser::ClearAppealNodes() {
   for (unsigned i = 0; i < mAppealNodes.size(); i++) {
     AppealNode *node = mAppealNodes[i];
     if (node)
-      delete node;
+      node->Release();
   }
   mAppealNodes.clear();
+  mAppealNodePool.Clear();
 }
 
 // This is for the appealing of mistaken Fail cases created during the first instance
@@ -446,7 +447,7 @@ ParseStatus Parser::ParseStmt() {
   mPending = 0;
 
   // set the root appealing node
-  mRootNode = new AppealNode();
+  mRootNode = mAppealNodePool.NewAppealNode();
   mAppealNodes.push_back(mRootNode);
 
   // mActiveTokens contain some un-matched tokens from last time of TraverseStmt(),
@@ -784,7 +785,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent, Appeal
       MASSERT(!WasFailed(rule_table, mCurToken));
 
       // set the apppeal node
-      appeal = new AppealNode();
+      appeal = mAppealNodePool.NewAppealNode();
       mAppealNodes.push_back(appeal);
       appeal->SetTable(rule_table);
       appeal->SetStartIndex(mCurToken);
@@ -882,7 +883,7 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent, Appeal
 
   // We delay creation of AppealNode as much as possible.
   if (!appeal) {
-    appeal = new AppealNode();
+    appeal = mAppealNodePool.NewAppealNode();
     mAppealNodes.push_back(appeal);
     appeal->SetTable(rule_table);
     appeal->SetStartIndex(saved_mCurToken);
@@ -1078,7 +1079,7 @@ bool Parser::TraverseToken(Token *token, AppealNode *parent, AppealNode *&child_
   AppealNode *appeal = NULL;
 
   if (token == curr_token) {
-    appeal = new AppealNode();
+    appeal = mAppealNodePool.NewAppealNode();
     child_node = appeal;
     mAppealNodes.push_back(appeal);
     appeal->SetToken(curr_token);
@@ -1095,7 +1096,7 @@ bool Parser::TraverseToken(Token *token, AppealNode *parent, AppealNode *&child_
       bool alt_found = false;
       AltToken *pat = curr_token->mAltTokens;
       if (token == &gSystemTokens[pat->mAltTokenId]) {
-        appeal = new AppealNode();
+        appeal = mAppealNodePool.NewAppealNode();
         child_node = appeal;
         mAppealNodes.push_back(appeal);
         appeal->SetToken(curr_token);
