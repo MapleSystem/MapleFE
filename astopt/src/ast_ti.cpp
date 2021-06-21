@@ -89,17 +89,13 @@ void TypeInferVisitor::UpdateArrayElemTypeIdMap(TreeNode *node, TypeId id) {
   }
 }
 
-bool TypeInferVisitor::IsArray(DeclNode *node) {
-  if (!node) {
-    return false;
-  }
-  TreeNode *var = node->GetVar();
-  return IsArray(var);
-}
-
 bool TypeInferVisitor::IsArray(TreeNode *node) {
   if (!node) {
     return false;
+  }
+  if (node->IsDecl()) {
+    DeclNode *decl = static_cast<DeclNode *>(node);
+    node = decl->GetVar();
   }
   if (node->IsIdentifier()) {
     IdentifierNode *id = static_cast<IdentifierNode *>(node);

@@ -61,7 +61,6 @@ class TypeInferVisitor : public AstVisitor {
 
   TypeId MergeTypeId(TypeId tia, TypeId tib);
 
-  bool IsArray(DeclNode *node);
   bool IsArray(TreeNode *node);
 
   TreeNode *VisitClassField(TreeNode *node);
