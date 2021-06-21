@@ -489,7 +489,7 @@ ParseStatus Parser::ParseStmt() {
     if (mTraceTiming)
       gettimeofday(&start, NULL);
 
-    PatchWasSucc(mRootNode->mSortedChildren[0]);
+    PatchWasSucc(mRootNode->mSortedChildren.ValueAtIndex(0));
     if (mTraceTiming) {
       gettimeofday(&stop, NULL);
       std::cout << "PatchWasSucc Time: " << (stop.tv_sec - start.tv_sec) * 1000000 + stop.tv_usec - start.tv_usec;
@@ -538,8 +538,8 @@ bool Parser::TraverseExpression() {
     // children rules, although there is one any only one valid child
     // for a Top table. However, the mCurToken could deviate from
     // the valid children and reflect the invalid children.
-    MASSERT(mRootNode->mChildren.size() == 1);
-    AppealNode *topnode = mRootNode->mChildren[0];
+    MASSERT(mRootNode->mChildren.GetNum() == 1);
+    AppealNode *topnode = mRootNode->mChildren.ValueAtIndex(0);
     MASSERT(topnode->IsSucc());
 
     mRootNode->mResult = Succ;
@@ -574,8 +574,8 @@ bool Parser::TraverseStmt() {
       // children rules, although there is one any only one valid child
       // for a Top table. However, the mCurToken could deviate from
       // the valid children and reflect the invalid children.
-      MASSERT(mRootNode->mChildren.size() == 1);
-      AppealNode *topnode = mRootNode->mChildren[0];
+      MASSERT(mRootNode->mChildren.GetNum() == 1);
+      AppealNode *topnode = mRootNode->mChildren.ValueAtIndex(0);
       MASSERT(topnode->IsSucc());
 
       // Top level table should have only one valid matching. Otherwise,
@@ -1561,14 +1561,13 @@ static std::deque<AppealNode*> to_be_sorted;
 
 void Parser::SortOut() {
   // we remove all failed children, leaving only succ child
-  std::vector<AppealNode*>::iterator it = mRootNode->mChildren.begin();
-  for (; it != mRootNode->mChildren.end(); it++) {
-    AppealNode *n = *it;
+  for (unsigned i = 0; i < mRootNode->mChildren.GetNum(); i++) {
+    AppealNode *n = mRootNode->mChildren.ValueAtIndex(i);
     if (!n->IsFail() && !n->IsNA())
-      mRootNode->mSortedChildren.push_back(n);
+      mRootNode->mSortedChildren.PushBack(n);
   }
-  MASSERT(mRootNode->mSortedChildren.size()==1);
-  AppealNode *root = mRootNode->mSortedChildren.front();
+  MASSERT(mRootNode->mSortedChildren.GetNum()==1);
+  AppealNode *root = mRootNode->mSortedChildren.ValueAtIndex(0);
 
   // First sort the root.
   RuleTable *table = root->GetTable();
@@ -1623,7 +1622,7 @@ void Parser::SortOutNode(AppealNode *node) {
   // during matching. In SortOut, we simple return. However, when generating IR,
   // the children have to be created.
   if (node->mResult == SuccWasSucc) {
-    MASSERT(node->mChildren.size() == 0);
+    MASSERT(node->mChildren.GetNum() == 0);
     return;
   }
 
@@ -1641,9 +1640,8 @@ void Parser::SortOutNode(AppealNode *node) {
   // simply connect to previous instance(s).
   if (mRecursionAll.IsLeadNode(rule_table)) {
     bool connect_only = true;
-    std::vector<AppealNode*>::iterator it = node->mChildren.begin();
-    for (; it != node->mChildren.end(); it++) {
-      AppealNode *child = *it;
+    for (unsigned i = 0; i < node->mChildren.GetNum(); i++) {
+      AppealNode *child = node->mChildren.ValueAtIndex(i);
       if (!child->IsTable() || child->GetTable() != rule_table) {
         connect_only = false;
         break;
@@ -1692,15 +1690,14 @@ void Parser::SortOutRecursionHead(AppealNode *parent) {
   unsigned parent_match = parent->GetFinalMatch();
 
   //Find the first child having the same match as parent.
-  std::vector<AppealNode*>::iterator it = parent->mChildren.begin();
-  for (; it != parent->mChildren.end(); it++) {
-    AppealNode *child = *it;
+  for (unsigned i = 0; i < parent->mChildren.GetNum(); i++) {
+    AppealNode *child = parent->mChildren.ValueAtIndex(i);
     if (child->IsFail() || child->IsNA())
       continue;
     bool found = child->FindMatch(parent_match);
     if (found) {
       to_be_sorted.push_back(child);
-      parent->mSortedChildren.push_back(child);
+      parent->mSortedChildren.PushBack(child);
       child->SetFinalMatch(parent_match);
       child->SetSorted();
       child->SetParent(parent);
@@ -1721,9 +1718,8 @@ void Parser::SortOutOneof(AppealNode *parent) {
 
   unsigned parent_match = parent->GetFinalMatch();
   unsigned good_children = 0;
-  std::vector<AppealNode*>::iterator it = parent->mChildren.begin();
-  for (; it != parent->mChildren.end(); it++) {
-    AppealNode *child = *it;
+  for (unsigned i = 0; i < parent->mChildren.GetNum(); i++) {
+    AppealNode *child = parent->mChildren.ValueAtIndex(i);
     if (child->IsFail() || child->IsNA())
       continue;
 
@@ -1738,14 +1734,14 @@ void Parser::SortOutOneof(AppealNode *parent) {
         child->SetFinalMatch(parent_match);
         child->SetParent(parent);
         good_children++;
-        parent->mSortedChildren.push_back(child);
+        parent->mSortedChildren.PushBack(child);
       }
     } else {
       bool found = child->FindMatch(parent_match);
       if (found) {
         good_children++;
         to_be_sorted.push_back(child);
-        parent->mSortedChildren.push_back(child);
+        parent->mSortedChildren.PushBack(child);
         child->SetFinalMatch(parent_match);
         child->SetSorted();
         child->SetParent(parent);
@@ -1785,9 +1781,8 @@ void Parser::SortOutZeroormore(AppealNode *parent) {
   SmallVector<AppealNode*> sorted_children;
   while(1) {
     AppealNode *good_child = NULL;
-    std::vector<AppealNode*>::iterator it = parent->mChildren.begin();
-    for (; it != parent->mChildren.end(); it++) {
-      AppealNode *child = *it;
+    for (unsigned i = 0; i < parent->mChildren.GetNum(); i++) {
+      AppealNode *child = parent->mChildren.ValueAtIndex(i);
       if (sorted_children.Find(child))
         continue;
       if (child->IsSucc() && child->FindMatch(last_match)) {
@@ -1812,7 +1807,7 @@ void Parser::SortOutZeroormore(AppealNode *parent) {
 
   for (int i = sorted_children.GetNum() - 1; i >= 0; i--) {
     AppealNode *child = sorted_children.ValueAtIndex(i);
-    parent->mSortedChildren.push_back(child);
+    parent->mSortedChildren.PushBack(child);
     if (child->IsTable())
       to_be_sorted.push_back(child);
   }
@@ -1837,8 +1832,8 @@ void Parser::SortOutZeroorone(AppealNode *parent) {
   // 2. If the child is succ, the major work of this loop is to verify the child's SuccMatch is
   //    consistent with parent's.
 
-  MASSERT((parent->mChildren.size() == 1) && "Zeroorone has >1 valid children?");
-  AppealNode *child = parent->mChildren.front();
+  MASSERT((parent->mChildren.GetNum() == 1) && "Zeroorone has >1 valid children?");
+  AppealNode *child = parent->mChildren.ValueAtIndex(0);
 
   if (child->IsFail() || child->IsNA())
     return;
@@ -1865,7 +1860,7 @@ void Parser::SortOutZeroorone(AppealNode *parent) {
   }
 
   // Finally add the only successful child to mSortedChildren
-  parent->mSortedChildren.push_back(child);
+  parent->mSortedChildren.PushBack(child);
   child->SetParent(parent);
 }
 
@@ -1924,7 +1919,7 @@ void Parser::SortOutConcatenate(AppealNode *parent) {
 
   for (int i = sorted_children.GetNum() - 1; i >= 0; i--) {
     AppealNode *child = sorted_children.ValueAtIndex(i);
-    parent->mSortedChildren.push_back(child);
+    parent->mSortedChildren.PushBack(child);
     if (child->IsTable())
       to_be_sorted.push_back(child);
   }
@@ -1942,21 +1937,21 @@ void Parser::SortOutData(AppealNode *parent) {
   case DT_Subtable: {
     // There should be one child node, which represents the subtable.
     // we just need to add the child node to working list.
-    MASSERT((parent->mChildren.size() == 1) && "Should have only one child?");
-    AppealNode *child = parent->mChildren.front();
+    MASSERT((parent->mChildren.GetNum() == 1) && "Should have only one child?");
+    AppealNode *child = parent->mChildren.ValueAtIndex(0);
     child->SetFinalMatch(parent->GetFinalMatch());
     child->SetSorted();
     to_be_sorted.push_back(child);
-    parent->mSortedChildren.push_back(child);
+    parent->mSortedChildren.PushBack(child);
     child->SetParent(parent);
     break;
   }
   case DT_Token: {
     // token in table-data created a Child AppealNode
     // Just keep the child node. Don't need do anything.
-    AppealNode *child = parent->mChildren.front();
+    AppealNode *child = parent->mChildren.ValueAtIndex(0);
     child->SetFinalMatch(child->GetStartIndex());
-    parent->mSortedChildren.push_back(child);
+    parent->mSortedChildren.PushBack(child);
     child->SetParent(parent);
     break;
   }
@@ -2008,10 +2003,9 @@ void Parser::DumpSortOutNode(AppealNode *n) {
     if (n->mResult == SuccWasSucc)
       std::cout << "WasSucc";
 
-    std::vector<AppealNode*>::iterator it = n->mSortedChildren.begin();
-    for (; it != n->mSortedChildren.end(); it++) {
+    for (unsigned i = 0; i < n->mSortedChildren.GetNum(); i++) {
       std::cout << seq_num << ",";
-      to_be_dumped.push_back(*it);
+      to_be_dumped.push_back(n->mSortedChildren.ValueAtIndex(i));
       to_be_dumped_id.push_back(seq_num++);
     }
     std::cout << std::endl;
@@ -2057,9 +2051,8 @@ void Parser::FindWasSucc(AppealNode *root) {
           std::cout << "a token?" << std::endl;
       }
     } else {
-      std::vector<AppealNode*>::iterator it = node->mSortedChildren.begin();
-      for (; it != node->mSortedChildren.end(); it++)
-        working_list.push_back(*it);
+      for (unsigned i = 0; i < node->mSortedChildren.GetNum(); i++)
+        working_list.push_back(node->mSortedChildren.ValueAtIndex(i));
     }
   }
   return;
@@ -2102,7 +2095,7 @@ void Parser::FindPatchingNodes() {
 // This is another entry point of sort, similar as SortOut().
 // The only difference is we use 'reference' as the refrence of final match.
 void Parser::SupplementalSortOut(AppealNode *root, AppealNode *reference) {
-  MASSERT(root->mSortedChildren.size()==0 && "root should be un-sorted.");
+  MASSERT(root->mSortedChildren.GetNum()==0 && "root should be un-sorted.");
   MASSERT(root->IsTable() && "root should be a table node.");
 
   // step 1. Find the last matching token index we want.
@@ -2162,8 +2155,8 @@ void Parser::PatchWasSucc(AppealNode *root) {
       // it's the original tree. We don't want to mess it up. Think about it, if you
       // copy the mChildren to was_succ, there are duplicated tree nodes. This violates
       // the definition of the original tree.
-      for (unsigned j = 0; j < patch->mSortedChildren.size(); j++)
-        was_succ->AddSortedChild(patch->mSortedChildren[j]);
+      for (unsigned j = 0; j < patch->mSortedChildren.GetNum(); j++)
+        was_succ->AddSortedChild(patch->mSortedChildren.ValueAtIndex(j));
     }
   }
 
@@ -2183,7 +2176,7 @@ void Parser::PatchWasSucc(AppealNode *root) {
 void Parser::SimplifySortedTree() {
   // start with the only child of mRootNode.
   std::deque<AppealNode*> working_list;
-  working_list.push_back(mRootNode->mSortedChildren[0]);
+  working_list.push_back(mRootNode->mSortedChildren.ValueAtIndex(0));
 
   while(!working_list.empty()) {
     AppealNode *node = working_list.front();
@@ -2195,14 +2188,13 @@ void Parser::SimplifySortedTree() {
       continue;
     node = SimplifyShrinkEdges(node);
 
-    std::vector<AppealNode*>::iterator it = node->mSortedChildren.begin();
-    for (; it != node->mSortedChildren.end(); it++) {
-      working_list.push_back(*it);
+    for (unsigned i = 0; i < node->mSortedChildren.GetNum(); i++) {
+      working_list.push_back(node->mSortedChildren.ValueAtIndex(i));
     }
   }
 
   if (mTraceSortOut)
-    DumpSortOut(mRootNode->mSortedChildren[0], "Simplify AppealNode Trees");
+    DumpSortOut(mRootNode->mSortedChildren.ValueAtIndex(0), "Simplify AppealNode Trees");
 }
 
 // Reduce an edge is (1) Pred has only one succ
@@ -2221,9 +2213,9 @@ AppealNode* Parser::SimplifyShrinkEdges(AppealNode *node) {
 
   while(1) {
     // step 1. Check condition (1) (2)
-    if (node->mSortedChildren.size() != 1)
+    if (node->mSortedChildren.GetNum() != 1)
       break;
-    AppealNode *child = node->mSortedChildren[0];
+    AppealNode *child = node->mSortedChildren.ValueAtIndex(0);
 
     // step 2. Find out the index of child, through looking into sub-ruletable or token.
 
@@ -2274,16 +2266,15 @@ TreeNode* Parser::BuildAST() {
   mNormalModeRoot = NULL;
 
   std::stack<AppealNode*> appeal_stack;
-  appeal_stack.push(mRootNode->mSortedChildren[0]);
+  appeal_stack.push(mRootNode->mSortedChildren.ValueAtIndex(0));
 
   // 1) If all children done. Time to create tree node for 'appeal_node'
   // 2) If some are done, some not. Add the first not-done child to stack
   while(!appeal_stack.empty()) {
     AppealNode *appeal_node = appeal_stack.top();
     bool children_done = true;
-    std::vector<AppealNode*>::iterator it = appeal_node->mSortedChildren.begin();
-    for (; it != appeal_node->mSortedChildren.end(); it++) {
-      AppealNode *child = *it;
+    for (unsigned i = 0; i < appeal_node->mSortedChildren.GetNum(); i++) {
+      AppealNode *child = appeal_node->mSortedChildren.ValueAtIndex(i);
       if (!child->AstCreated()) {
         appeal_stack.push(child);
         children_done = false;
@@ -2420,9 +2411,8 @@ TreeNode* Parser::Manipulate(AppealNode *appeal_node) {
   TreeNode *sub_tree = NULL;
 
   std::vector<TreeNode*> child_trees;
-  std::vector<AppealNode*>::iterator cit = appeal_node->mSortedChildren.begin();
-  for (; cit != appeal_node->mSortedChildren.end(); cit++) {
-    AppealNode *a_node = *cit;
+  for (unsigned i = 0; i < appeal_node->mSortedChildren.GetNum(); i++) {
+    AppealNode *a_node = appeal_node->mSortedChildren.ValueAtIndex(i);
     TreeNode *t_node = a_node->GetAstTreeNode();
     if (t_node)
       child_trees.push_back(t_node);
@@ -2673,23 +2663,11 @@ void AppealNode::CopyMatch(AppealNode *another) {
     mResult = another->mResult;
 }
 
-void AppealNode::RemoveChild(AppealNode *child) {
-  std::vector<AppealNode*> temp_vector;
-  std::vector<AppealNode*>::iterator it = mChildren.begin();
-  for (; it != mChildren.end(); it++) {
-    if (*it != child)
-      temp_vector.push_back(*it);
-  }
-
-  mChildren.clear();
-  mChildren.assign(temp_vector.begin(), temp_vector.end());
-}
-
 void AppealNode::ReplaceSortedChild(AppealNode *existing, AppealNode *replacement) {
   unsigned index;
   bool found = false;
-  for (unsigned i = 0; i < mSortedChildren.size(); i++) {
-    if (mSortedChildren[i] == existing) {
+  for (unsigned i = 0; i < mSortedChildren.GetNum(); i++) {
+    if (mSortedChildren.ValueAtIndex(i) == existing) {
       index = i;
       found = true;
       break;
@@ -2697,14 +2675,13 @@ void AppealNode::ReplaceSortedChild(AppealNode *existing, AppealNode *replacemen
   }
   MASSERT(found && "ReplaceSortedChild could not find existing node?");
 
-  mSortedChildren[index] = replacement;
+  *(mSortedChildren.RefAtIndex(index)) = replacement;
   replacement->SetParent(this);
 }
 
 AppealNode* AppealNode::GetSortedChild(unsigned index) {
-  std::vector<AppealNode*>::iterator it = mSortedChildren.begin();
-  for (; it != mSortedChildren.end(); it++) {
-    AppealNode *child = *it;
+  for (unsigned i = 0; i < mSortedChildren.GetNum(); i++) {
+    AppealNode *child = mSortedChildren.ValueAtIndex(i);
     unsigned id = child->GetChildIndex();
     if (id == index)
       return child;
@@ -2715,9 +2692,8 @@ AppealNode* AppealNode::GetSortedChild(unsigned index) {
 // Look for a specific un-sorted child having the child index and match.
 AppealNode* AppealNode::FindIndexedChild(unsigned match, unsigned index) {
   AppealNode *ret_child = NULL;
-  std::vector<AppealNode*>::iterator it = mChildren.begin();
-  for (; it != mChildren.end(); it++) {
-    AppealNode *child = *it;
+  for (unsigned i = 0; i < mChildren.GetNum(); i++) {
+    AppealNode *child = mChildren.ValueAtIndex(i);
     if (child->IsSucc() &&
         child->FindMatch(match) &&
         (index == child->GetChildIndex())) {

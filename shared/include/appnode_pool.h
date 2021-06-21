@@ -39,11 +39,10 @@ public:
   ~AppealNodePool() {mMP.Release();}
 
   void  SetBlockSize(unsigned s) {mMP.SetBlockSize(s);}
+  AppealNode* NewAppealNode();
 
   // Clear all data, keep the memory
   void  Clear() {mMP.Clear();}
-
-  char* NewAppealNode(unsigned);
 };
 
 }

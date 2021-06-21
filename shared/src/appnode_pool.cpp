@@ -17,9 +17,10 @@
 
 namespace maplefe {
 
-char* AppealNodePool::NewAppealNode(unsigned size) {
-  char *addr = mMP.Alloc(size);
-  return addr;
+AppealNode* AppealNodePool::NewAppealNode() {
+  AppealNode *node = (AppealNode*)mMP.Alloc(sizeof(AppealNode));
+  new (node) AppealNode();
+  return node;
 }
 
 }

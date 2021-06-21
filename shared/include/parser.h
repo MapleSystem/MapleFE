@@ -152,7 +152,7 @@ public:
 
   Token       *mAltToken;         // The alt token it matches.
 
-  std::vector<AppealNode*> mChildren;
+  SmallVector<AppealNode*> mChildren;
 
   // I use an additional vector for the sorted out children. Why do we have two duplicated
   // children vectors? The reason is coming from sortout. After SortOut we need remove some
@@ -163,7 +163,7 @@ public:
   // During AST tree generation, for the SuccWasSucc child we need find the original matching
   // tree. That means the original mChildren vector needs to be traversed to locate that tree.
   // So we keep mChildren untouched and define a second vector for the SortOut-ed children.
-  std::vector<AppealNode*> mSortedChildren;
+  SmallVector<AppealNode*> mSortedChildren;
 
   // A Succ mResult doesn't mean 'really' matching tokens. e.g. Zeroorxxx rules could
   // match nothing, but it is succ.
@@ -174,15 +174,16 @@ public:
                 mStartIndex = 0; mSorted = false; mFinalMatch = 0;
                 m1stAltTokenMatched = false; mAltToken = NULL;
                 mIsPseudo = false; mAstTreeNode = NULL; mAstCreated = false;
-                mChildIndex = 0;}
+                mChildIndex = 0;
+                // These two don't need big memory. So set block size to 128.
+                mChildren.SetBlockSize(128); mSortedChildren.SetBlockSize(128); }
   ~AppealNode(){mMatches.Release();}
 
-  void AddChild(AppealNode *n) { mChildren.push_back(n); }
-  void RemoveChild(AppealNode *n);
-  void ClearChildren() { mChildren.clear(); }
+  void AddChild(AppealNode *n) { mChildren.PushBack(n); }
+  void ClearChildren() { mChildren.Clear(); }
 
   void ReplaceSortedChild(AppealNode *existing, AppealNode *replacement);
-  void AddSortedChild(AppealNode *n) { mSortedChildren.push_back(n); }
+  void AddSortedChild(AppealNode *n) { mSortedChildren.PushBack(n); }
   AppealNode* GetSortedChild(unsigned idx);
   AppealNode* FindIndexedChild(unsigned match, unsigned index);
 
