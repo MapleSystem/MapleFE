@@ -332,23 +332,37 @@ DeclNode *TypeInferVisitor::VisitDeclNode(DeclNode *node) {
   TreeNode *var = node->GetVar();
   TypeId merged = TY_None;
   TypeId elemTypeId = TY_None;
+  bool isArray = false;
   if (init) {
     merged = MergeTypeId(node->GetTypeId(), init->GetTypeId());
     // collect array element typeid
-    if (init->IsArrayLiteral()) {
-      ArrayLiteralNode *al = static_cast<ArrayLiteralNode *>(init);
+    TreeNode *n = init;
+    while (n->IsArrayLiteral()) {
+      isArray = true;
+      ArrayLiteralNode *al = static_cast<ArrayLiteralNode *>(n);
       if (al->GetLiteralsNum()) {
-        elemTypeId = al->GetLiteral(0)->GetTypeId();
+        n = al->GetLiteral(0);
+      } else {
+        break;
       }
     }
+    elemTypeId = n->GetTypeId();
   }
   if (var) {
     merged = MergeTypeId(merged, var->GetTypeId());
   }
-  UpdateTypeId(node, merged);
-  UpdateTypeId(init, merged);
-  UpdateTypeId(var, merged);
-  if (IsArray(node)) {
+  // override TypeId for array
+  if (isArray) {
+    merged = TY_Array;
+    node->SetTypeId(merged);
+    init->SetTypeId(merged);
+    var->SetTypeId(merged);
+  } else {
+    UpdateTypeId(node, merged);
+    UpdateTypeId(init, merged);
+    UpdateTypeId(var, merged);
+  }
+  if (isArray || IsArray(node)) {
     UpdateArrayElemTypeIdMap(node, elemTypeId);
   }
   return node;
