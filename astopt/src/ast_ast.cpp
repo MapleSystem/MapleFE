@@ -108,6 +108,7 @@ void AST_AST::AdjustAST() {
 // move init from identifier to decl
 // copy stridx to decl
 DeclNode *AdjustASTVisitor::VisitDeclNode(DeclNode *node) {
+  (void) AstVisitor::VisitDeclNode(node);
   TreeNode *var = node->GetVar();
 
   // Check if need to split Decl
@@ -212,22 +213,52 @@ ForLoopNode *AdjustASTVisitor::VisitForLoopNode(ForLoopNode *node) {
   return node;
 }
 
-// lamda : use BlockNode for body, add a ReturnNode
+static unsigned uniq_number = 1;
+
+// lamda : create a FunctionNode for it
+//         use BlockNode for body, add a ReturnNode
 LambdaNode *AdjustASTVisitor::VisitLambdaNode(LambdaNode *node) {
-  TreeNode *tn = VisitTreeNode(node->GetBody());
-  if (tn && !tn->IsBlock()) {
-    BlockNode *blk = (BlockNode*)gTreePool.NewTreeNode(sizeof(BlockNode));
-    new (blk) BlockNode();
+  FunctionNode *func = (FunctionNode*)gTreePool.NewTreeNode(sizeof(FunctionNode));
+  new (func) FunctionNode();
 
-    ReturnNode *ret = (ReturnNode*)gTreePool.NewTreeNode(sizeof(ReturnNode));
-    new (ret) ReturnNode();
-    ret->SetResult(tn);
-    blk->AddChild(ret);
+  // func name
+  std::string str("maplefe_lambda_");
+  str += std::to_string(uniq_number++);
+  IdentifierNode *name = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
+  unsigned stridx = gStringPool.GetStrIdx(str);
+  new (name) IdentifierNode(stridx);
+  func->SetStrIdx(stridx);
+  func->SetFuncName(name);
 
-    node->SetBody(blk);
-    mUpdated = true;
+  // func parameters
+  for (int i = 0; i < node->GetParamsNum(); i++) {
+    func->AddParam(node->GetParam(i));
   }
-  return node;
+
+  // func return type
+  func->SetType(node->GetType());
+
+  // func body
+  TreeNode *tn = VisitTreeNode(node->GetBody());
+  if (tn) {
+    if (tn->IsBlock()) {
+      func->SetBody(static_cast<BlockNode*>(tn));
+    } else {
+      BlockNode *blk = (BlockNode*)gTreePool.NewTreeNode(sizeof(BlockNode));
+      new (blk) BlockNode();
+
+      ReturnNode *ret = (ReturnNode*)gTreePool.NewTreeNode(sizeof(ReturnNode));
+      new (ret) ReturnNode();
+      ret->SetResult(tn);
+      blk->AddChild(ret);
+
+      func->SetBody(blk);
+    }
+  }
+
+  mUpdated = true;
+  // note: the following conversion is only for the visitor to notice the node is updated
+  return (LambdaNode*)func;
 }
 
 }
