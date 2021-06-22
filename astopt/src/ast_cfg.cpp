@@ -100,7 +100,7 @@ CfgBB *CfgBuilder::LookUp(TargetBBStack &stack, TreeNode *label) {
     idx = static_cast<IdentifierNode *>(label)->GetStrIdx();
   if(idx == 0) {
     for(auto it = stack.rbegin(); it != stack.rend(); ++it)
-      if(it->first->GetKind() == BK_Join)
+      if(it->first->GetKind() != BK_Join2)
         return it->first;
   } else {
     for(auto it = stack.rbegin(); it != stack.rend(); ++it)
