@@ -1,0 +1,23 @@
+Matched 7 tokens.
+Matched 58 tokens.
+============= Module ===========
+== Sub Tree ==
+js_var Decl: x=10
+== Sub Tree ==
+cond-branch cond:x GT 0
+true branch :
+  outer:
+  cond-branch cond:x GT 5
+  true branch :
+    cond-branch cond:x GT 8
+    true branch :
+      console.log("x is greater than 8")
+      break:outer
+
+    false branch :
+
+    console.log("x is greater than 5")
+  false branch :
+    console.log("x is less than or equal to 5")
+false branch :
+
