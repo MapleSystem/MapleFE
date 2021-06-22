@@ -152,11 +152,16 @@ CondBranchNode *CfgBuilder::VisitCondBranchNode(CondBranchNode *node) {
   mCurrentBB = NewBB(BK_Uncond);
   current_bb->AddSuccessor(mCurrentBB);
 
-  // Visit true branch first
-  VisitTreeNode(node->GetTrueBranch());
-
   // Create a BB for the join point
   CfgBB *join = NewBB(BK_Join);
+
+  // Handle the label of current if-statement
+  TreeNode *label = node->GetLabel();
+  if(label)
+    CfgBuilder::Push(mBreakBBs, join, label);
+
+  // Visit true branch first
+  VisitTreeNode(node->GetTrueBranch());
   mCurrentBB->AddSuccessor(join);
 
   TreeNode *false_branch = node->GetFalseBranch();
@@ -169,6 +174,10 @@ CondBranchNode *CfgBuilder::VisitCondBranchNode(CondBranchNode *node) {
     VisitTreeNode(false_branch);
     mCurrentBB->AddSuccessor(join);
   }
+
+  if(label)
+    CfgBuilder::Pop(mBreakBBs);
+
   // Keep going with the BB at the join point
   mCurrentBB = join;
   return node;
@@ -339,7 +348,7 @@ SwitchNode *CfgBuilder::VisitSwitchNode(SwitchNode *node) {
 
   // Create a new BB for getting out of the switch block
   CfgBB *exit = NewBB(BK_Join);
-  CfgBuilder::Push(mBreakBBs, exit, nullptr);
+  CfgBuilder::Push(mBreakBBs, exit, node->GetLabel());
   CfgBB *prev_block = nullptr;
   TreeNode *switch_expr = node->GetExpr();
   for (unsigned i = 0; i < node->GetCasesNum(); ++i) {
@@ -500,7 +509,11 @@ BlockNode *CfgBuilder::VisitBlockNode(BlockNode *node) {
       break;
     }
   }
-  if(i >= num) {
+
+  // Handle the label of current block statement
+  TreeNode *label = node->GetLabel();
+
+  if(i >= num && label == nullptr) {
     // Do not create BB for current block when no JS_Let or JS_Const DeclNode inside
     // Visit all child nodes
     AstVisitor::VisitBlockNode(node);
@@ -511,6 +524,9 @@ BlockNode *CfgBuilder::VisitBlockNode(BlockNode *node) {
 
     // Create a BB for the join point
     CfgBB *join = NewBB(BK_Join);
+
+    if(label)
+      CfgBuilder::Push(mBreakBBs, join, label);
 
     // Needs BBs for current block
     // Save current BB
@@ -525,6 +541,9 @@ BlockNode *CfgBuilder::VisitBlockNode(BlockNode *node) {
     mCurrentBB->AddSuccessor(join);
     // This edge is to determine the block range for JS_Let or JS_Const DeclNode
     //current_bb->AddSuccessor(join);
+
+    if(label)
+      CfgBuilder::Pop(mBreakBBs);
 
     mCurrentBB = join;
   }
