@@ -37,7 +37,8 @@ enum BBKind {
   BK_Finally,     // BB for a finally block
   BK_Yield,       // Yield BB eneded with a yield statement
   BK_Terminated,  // Return BB endded with a return/break/continue statement
-  BK_Join,        // BB at join point
+  BK_Join,        // BB at join point for loops and switch
+  BK_Join2,       // BB at join point for if-stmt and block
 };
 
 enum BBAttribute : unsigned {

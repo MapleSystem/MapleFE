@@ -98,11 +98,15 @@ CfgBB *CfgBuilder::LookUp(TargetBBStack &stack, TreeNode *label) {
   unsigned idx = 0;
   if(label && label->GetKind() == NK_Identifier)
     idx = static_cast<IdentifierNode *>(label)->GetStrIdx();
-  if(idx == 0)
-    return stack.back().first;
-  for(auto it = stack.rbegin(); it != stack.rend(); ++it)
-    if(it->second && it->second == idx)
-      return it->first;
+  if(idx == 0) {
+    for(auto it = stack.rbegin(); it != stack.rend(); ++it)
+      if(it->first->GetKind() == BK_Join)
+        return it->first;
+  } else {
+    for(auto it = stack.rbegin(); it != stack.rend(); ++it)
+      if(it->second == idx)
+        return it->first;
+  }
   MASSERT(0 && "Unexpected: Target not found.");
   return nullptr;
 }
@@ -153,7 +157,7 @@ CondBranchNode *CfgBuilder::VisitCondBranchNode(CondBranchNode *node) {
   current_bb->AddSuccessor(mCurrentBB);
 
   // Create a BB for the join point
-  CfgBB *join = NewBB(BK_Join);
+  CfgBB *join = NewBB(BK_Join2);
 
   // Handle the label of current if-statement
   TreeNode *label = node->GetLabel();
@@ -523,7 +527,7 @@ BlockNode *CfgBuilder::VisitBlockNode(BlockNode *node) {
     mCurrentBB->SetAuxNode(node);
 
     // Create a BB for the join point
-    CfgBB *join = NewBB(BK_Join);
+    CfgBB *join = NewBB(BK_Join2);
 
     if(label)
       CfgBuilder::Push(mBreakBBs, join, label);
@@ -705,7 +709,7 @@ CfgBB *CfgBuilder::NewBB(BBKind k) {
 static std::string BBLabelStr(CfgBB *bb, const char *shape = nullptr, const char *fn = nullptr) {
   static const char* const kBBNames[] =
   { "unknown", "uncond", "block", "branch", "loop", "switch", "case", "try", "catch", "finally",
-    "yield", "term", "join" };
+    "yield", "term", "join", "join2" };
   if(shape == nullptr)
     return kBBNames[bb->GetKind()];
   std::string str("BB" + std::to_string(bb->GetId()));
