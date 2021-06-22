@@ -222,8 +222,9 @@ LambdaNode *AdjustASTVisitor::VisitLambdaNode(LambdaNode *node) {
   new (func) FunctionNode();
 
   // func name
-  std::string str("maplefe_lambda_");
+  std::string str("__lambda_");
   str += std::to_string(uniq_number++);
+  str += "__";
   IdentifierNode *name = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
   unsigned stridx = gStringPool.GetStrIdx(str);
   new (name) IdentifierNode(stridx);
