@@ -155,15 +155,35 @@ ExportNode *AdjustASTVisitor::VisitExportNode(ExportNode *node) {
             // update p
             p->SetBefore(n);
             mUpdated = true;
-            // insert bfnode into AST after node
+            // insert func into AST after node
             if (parent->IsBlock()) {
-              static_cast<BlockNode *>(parent)->InsertStmtAfter(bfnode, node);
+              static_cast<BlockNode *>(parent)->InsertStmtAfter(func, node);
             } else if (parent->IsModule()) {
-              static_cast<ModuleNode *>(parent)->InsertAfter(bfnode, node);
+              static_cast<ModuleNode *>(parent)->InsertAfter(func, node);
+            }
+            // cp annotation from node to func
+            for (unsigned i = 0; i < node->GetAnnotationsNum(); i++) {
+              func->AddAnnotation(node->GetAnnotationAtIndex(i));
             }
             break;
           }
           case NK_Class: {
+            ClassNode *classnode = static_cast<ClassNode *>(bfnode);
+            IdentifierNode *n = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
+            new (n) IdentifierNode(classnode->GetStrIdx());
+            // update p
+            p->SetBefore(n);
+            mUpdated = true;
+            // insert classnode into AST after node
+            if (parent->IsBlock()) {
+              static_cast<BlockNode *>(parent)->InsertStmtAfter(classnode, node);
+            } else if (parent->IsModule()) {
+              static_cast<ModuleNode *>(parent)->InsertAfter(classnode, node);
+            }
+            // cp annotation from node to classnode
+            for (unsigned i = 0; i < node->GetAnnotationsNum(); i++) {
+              classnode->AddAnnotation(node->GetAnnotationAtIndex(i));
+            }
             break;
           }
         }

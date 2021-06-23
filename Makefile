@@ -77,9 +77,11 @@ clean:
 clobber:
 	rm -rf output
 
+r: rebuild
+
 rebuild:
 	make clobber
-	make -j8
+	make -j
 
 .PHONY: $(TARGS) test
 
