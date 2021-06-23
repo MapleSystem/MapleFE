@@ -1096,6 +1096,19 @@ std::string Emitter::EmitFunctionNode(FunctionNode *node) {
   if(node->GetStrIdx())
     str += node->GetName();
 
+  auto num = node->GetTypeParamsNum();
+  if(num) {
+    str += "<"s;
+    for (unsigned i = 0; i < num; ++i) {
+      if (i)
+        str += ", "s;
+      if (auto n = node->GetTypeParamAtIndex(i)) {
+        str += EmitTreeNode(n);
+      }
+    }
+    str += ">"s;
+  }
+
   /*
   for (unsigned i = 0; i < node->GetAnnotationsNum(); ++i) {
     if (auto n = node->GetAnnotationAtIndex(i)) {
