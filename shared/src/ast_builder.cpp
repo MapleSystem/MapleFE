@@ -583,7 +583,6 @@ TreeNode* ASTBuilder::BuildUnaryOperation() {
     TreeNode *tn = CreateTokenTreeNode(p_b.mData.mToken);
     n->SetOpnd(tn);
   }
-  n->GetOpnd()->SetParent(n);
 
   mLastTreeNode = n;
   return n;
@@ -625,7 +624,6 @@ TreeNode* ASTBuilder::BuildBinaryOperation() {
     TreeNode *tn = CreateTokenTreeNode(p_a.mData.mToken);
     n->SetOpndA(tn);
   }
-  n->GetOpndA()->SetParent(n);
 
   // set 2nd param
   if (p_c.mIsTreeNode)
@@ -634,7 +632,6 @@ TreeNode* ASTBuilder::BuildBinaryOperation() {
     TreeNode *tn = CreateTokenTreeNode(p_c.mData.mToken);
     n->SetOpndB(tn);
   }
-  n->GetOpndB()->SetParent(n);
 
   return n;
 }
@@ -656,15 +653,12 @@ TreeNode* ASTBuilder::BuildTernaryOperation() {
 
   MASSERT(p_a.mIsTreeNode);
   n->SetOpndA(p_a.mData.mTreeNode);
-  n->GetOpndA()->SetParent(n);
 
   MASSERT(p_b.mIsTreeNode);
   n->SetOpndB(p_b.mData.mTreeNode);
-  n->GetOpndB()->SetParent(n);
 
   MASSERT(p_c.mIsTreeNode);
   n->SetOpndC(p_c.mData.mTreeNode);
-  n->GetOpndC()->SetParent(n);
 
   return n;
 }

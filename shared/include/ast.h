@@ -572,7 +572,7 @@ public:
   TreeNode*   GetInit() {return mInit;}
   DimensionNode* GetDims() {return mDims;}
 
-  void SetType(TreeNode *t)      {mType = t; SETPARENT(t);}
+  void SetType(TreeNode *t)      {mType = t;}
   void SetInit(TreeNode *t)      {mInit = t; SETPARENT(t);}
   void ClearInit()               {mInit = NULL;}
   void SetDims(DimensionNode *t) {mDims = t; SETPARENT(t);}
@@ -838,7 +838,7 @@ public:
   unsigned  GetLiteralsNum()       {return mLiterals.GetNum();}
   TreeNode* GetLiteral(unsigned i) {return mLiterals.ValueAtIndex(i);}
   void      SetLiteral(unsigned i, TreeNode* n) {*(mLiterals.RefAtIndex(i)) = n; SETPARENT(n);}
-  void      AddLiteral(TreeNode *n){mLiterals.PushBack(n);}
+  void      AddLiteral(TreeNode *n){mLiterals.PushBack(n); SETPARENT(n);}
 
   void Release() {mLiterals.Release();}
   void Dump(unsigned);

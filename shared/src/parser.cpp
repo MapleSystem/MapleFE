@@ -2496,8 +2496,6 @@ TreeNode* Parser::BuildBinaryOperation(TreeNode *childA, TreeNode *childB, OprId
   new (n) BinOperatorNode(id);
   n->SetOpndA(childA);
   n->SetOpndB(childB);
-  childA->SetParent(n);
-  childB->SetParent(n);
   return n;
 }
 
