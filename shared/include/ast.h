@@ -233,6 +233,7 @@ class ExportNode : public TreeNode {
 private:
   TreeNode       *mTarget;    // the exported package in Java or module in JS
   SmallVector<XXportAsPairNode*> mPairs;
+  SmallVector<AnnotationNode*> mAnnotations; //annotation or pragma
 public:
   ExportNode() : TreeNode(NK_Export), mTarget(NULL) {}
   ~ExportNode(){}
@@ -244,6 +245,12 @@ public:
   XXportAsPairNode* GetPair(unsigned i) {return mPairs.ValueAtIndex(i);}
   void SetPair(unsigned i, XXportAsPairNode* n) {*(mPairs.RefAtIndex(i)) = n;}
   void AddPair(TreeNode *p);
+
+  // Annotation/Pragma related
+  unsigned GetAnnotationsNum()           {return mAnnotations.GetNum();}
+  void     AddAnnotation(AnnotationNode *n) {mAnnotations.PushBack(n);}
+  AnnotationNode* GetAnnotationAtIndex(unsigned i) {return mAnnotations.ValueAtIndex(i);}
+  void            SetAnnotationAtIndex(unsigned i, AnnotationNode* n) {*(mAnnotations.RefAtIndex(i)) = n;}
 
   void Dump(unsigned indent);
 };

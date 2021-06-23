@@ -1351,21 +1351,22 @@ rule ImportedBinding : BindingIdentifier
 ## export default HoistableDeclaration[Default]
 ## export default ClassDeclaration[Default]
 ## export default [lookahead ∉ {function, class}] AssignmentExpression[In] ;
-rule ExportDeclaration : ONEOF("export" + '*' + FromClause + ';',
-                               "export" + ExportClause + FromClause + ';',
-                               "export" + ExportClause + ';',
-                               "export" + VariableStatement,
-                               "export" + Declaration,
-                               "export" + "default" + HoistableDeclaration,
-                               "export" + "default" + ClassDeclaration,
-                               "export" + "default" + AssignmentExpression + ';')
+rule ExportDeclaration : ONEOF(ZEROORMORE(Annotation) + "export" + '*' + FromClause + ';',
+                               ZEROORMORE(Annotation) + "export" + ExportClause + FromClause + ';',
+                               ZEROORMORE(Annotation) + "export" + ExportClause + ';',
+                               ZEROORMORE(Annotation) + "export" + VariableStatement,
+                               ZEROORMORE(Annotation) + "export" + Declaration,
+                               ZEROORMORE(Annotation) + "export" + "default" + HoistableDeclaration,
+                               ZEROORMORE(Annotation) + "export" + "default" + ClassDeclaration,
+                               ZEROORMORE(Annotation) + "export" + "default" + AssignmentExpression + ';')
   attr.property : Top
   attr.action.%1,%2,%3,%4,%5,%6,%7,%8 : BuildExport()
+  attr.action.%1,%2,%3,%4,%5,%6,%7,%8 : AddModifier(%1)
   attr.action.%1       :    SetIsEverything()
-  attr.action.%2,%3,%4,%5 : SetPairs(%2)
-  attr.action.%6,%7,%8 :    SetPairs(%3)
+  attr.action.%2,%3,%4,%5 : SetPairs(%3)
+  attr.action.%6,%7,%8 :    SetPairs(%4)
   attr.action.%6,%7,%8 :    SetIsDefault()
-  attr.action.%1,%2 :       SetFromModule(%3)
+  attr.action.%1,%2 :       SetFromModule(%4)
 
 ## See 15.2.3
 ## ExportClause :

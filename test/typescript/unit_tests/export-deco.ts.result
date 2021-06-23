@@ -1,0 +1,17 @@
+Matched 18 tokens.
+Matched 32 tokens.
+============= Module ===========
+== Sub Tree ==
+func  class_deco(ctor)  throws: 
+  console.log("Class constructor is :",ctor)
+
+== Sub Tree ==
+export {class  Foo
+  Fields: 
+    foo_var=1
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+} 
