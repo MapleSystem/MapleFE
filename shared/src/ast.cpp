@@ -587,6 +587,22 @@ void DeclNode::Dump(unsigned indent) {
 //                          ArrayElement and ArrayLiteral
 //////////////////////////////////////////////////////////////////////////////////////
 
+void ArrayElementNode::AddAsTypes(TreeNode *type) {
+  if (!type)
+    return;
+
+  if (type->IsPass()) {
+    PassNode *pass_node = (PassNode*)type;
+    for (unsigned i = 0; i < pass_node->GetChildrenNum(); i++)
+      AddAsTypes(pass_node->GetChild(i));
+  } else if (type->IsAsType()) {
+    AsTypeNode *asn = (AsTypeNode*)type;
+    AddAsType(asn);
+  } else {
+    MERROR("unsupported as-type in AddAsType.");
+  }
+}
+
 void ArrayElementNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   mArray->Dump(0);

@@ -794,6 +794,7 @@ class ArrayElementNode : public TreeNode {
 private:
   TreeNode              *mArray;
   SmallVector<TreeNode*> mExprs;  // index expressions.
+  SmallVector<AsTypeNode*> mAsTypes;
 public:
   ArrayElementNode() : TreeNode(NK_ArrayElement), mArray(NULL) {}
   ~ArrayElementNode() {Release();}
@@ -805,6 +806,13 @@ public:
   TreeNode* GetExprAtIndex(unsigned i) {return mExprs.ValueAtIndex(i);}
   void      SetExprAtIndex(unsigned i, TreeNode* n) {*(mExprs.RefAtIndex(i)) = n; SETPARENT(n);}
   void      AddExpr(TreeNode *n){mExprs.PushBack(n); SETPARENT(n);}
+
+  // AsType related
+  unsigned GetAsTypesNum()           {return mAsTypes.GetNum();}
+  void     AddAsType(AsTypeNode *n)  {mAsTypes.PushBack(n);}
+  void     AddAsTypes(TreeNode *n);
+  AsTypeNode* GetAsTypeAtIndex(unsigned i) {return mAsTypes.ValueAtIndex(i);}
+  void        SetAsTypeAtIndex(unsigned i, AsTypeNode* n) {*(mAsTypes.RefAtIndex(i)) = n;}
 
   void Release() {mExprs.Release();}
   void Dump(unsigned);

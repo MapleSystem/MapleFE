@@ -1321,7 +1321,8 @@ TreeNode* ASTBuilder::AddAsType() {
   }
 
   if (tree_type) {
-    MASSERT(node->IsIdentifier() || node->IsUserType() || node->IsField() || node->IsCall());
+    MASSERT(node->IsIdentifier() || node->IsUserType() ||
+            node->IsField() || node->IsCall() || node->IsArrayElement());
     if (node->IsIdentifier()) {
       IdentifierNode *id = (IdentifierNode*)node;
       id->AddAsTypes(tree_type);
@@ -1333,6 +1334,9 @@ TreeNode* ASTBuilder::AddAsType() {
       id->AddAsTypes(tree_type);
     } else if (node->IsCall()) {
       CallNode *id = (CallNode*)node;
+      id->AddAsTypes(tree_type);
+    } else if (node->IsArrayElement()) {
+      ArrayElementNode *id = (ArrayElementNode*)node;
       id->AddAsTypes(tree_type);
     }
     mLastTreeNode = node;
