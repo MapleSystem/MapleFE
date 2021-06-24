@@ -20,11 +20,15 @@ my $pwd = getcwd;
 my $currdir = "$pwd";
 
 my @failed_file;
+my @failed_file1;
+my @failed_file2;
 my @successed_file;
 
 my $count = 0;
 my $counttotal = 0;
 my $countfailedcases = 0;
+my $countfailedcases1 = 0;
+my $countfailedcases2 = 0;
 my $countsub = 0;
 
 my $pinput = '';
@@ -113,8 +117,8 @@ foreach my $file (@paths) {
         if ($res1 > 0) {
           print "$cmnd1 $outroot/$file.ast\n";
           print " ==$pinput===> $file\n";
-          $countfailedcases ++;
-          push(@failed_file, $pinput.":  ".$file);
+          $countfailedcases1 ++;
+          push(@failed_file1, $pinput.":  ".$file);
           #print "---------------------------\n";
           next;
         }
@@ -126,8 +130,8 @@ foreach my $file (@paths) {
         }
         print "\nOriginal file $origresult does NOT exists!\n";
         system("mkdir -p $notexistsdir/$file && touch $notexistsdir/$file");
-        $countfailedcases ++;
-        push(@failed_file, $pinput.": result file not exists: ".$origresult);
+        $countfailedcases2 ++;
+        push(@failed_file2, $pinput.": result file not exists: ".$origresult);
       } else {
         if ((!(-e "$outroot/$outresult")) || (-z "$outroot/$outresult")) {
           if(!(-e "$notexistsdir")) {
@@ -136,8 +140,8 @@ foreach my $file (@paths) {
 
           print "\n$outroot/$outresult either empty or not exists!\n";
           system("mkdir -p $notexistsdir/$file && touch $notexistsdir/$file");
-          $countfailedcases ++;
-          push(@failed_file, $pinput.": file empty or not exists: ".$file);
+          $countfailedcases2 ++;
+          push(@failed_file2, $pinput.": file empty or not exists: ".$file);
         } else {
           my $res2 = system("diff $origresult $outroot/$outresult");
           if ($res2 > 0) {
@@ -148,8 +152,8 @@ foreach my $file (@paths) {
             print "\n$origresult $outroot/$outresult are different!!!\n";
             print "\ncp $outroot/$outresult $origresult\n";
             system("mkdir -p $diffdir/$diff_file && touch $diffdir/$diff_file");
-            $countfailedcases ++;
-            push(@failed_file, $pinput.": result files diff: ".$origresult);
+            $countfailedcases2 ++;
+            push(@failed_file2, $pinput.": result files diff: ".$origresult);
           } else {
             push(@successed_file, $file." ".$pinput);
           }
@@ -161,7 +165,7 @@ foreach my $file (@paths) {
 
 }
 
-my $countFailed = $countfailedcases;
+my $countFailed = $countfailedcases + $countfailedcases1 + $countfailedcases2;
 my $countPassed = $count - $countFailed;
 
 my $reportFile = "$outroot/report.txt";
@@ -185,10 +189,30 @@ if ($countFailed eq 0) {
   }
   print "\n=========================\nfailed $countFailed tests:\n\n";
   if(scalar(@failed_file) > 0){
-    print("=== failed : $countfailedcases tests\n");
+    print("=== failed : $countfailedcases tests - $cmnd\n");
     print $fh "$countfailedcases testcases failed\n";
 
     foreach $failed (@failed_file) {
+      print $failed."\n";
+      print $fh $failed."\n";
+    }
+    print "\n";
+  }
+  if(scalar(@failed_file1) > 0){
+    print("=== failed : $countfailedcases1 tests - $cmnd1\n");
+    print $fh "$countfailedcases1 testcases failed\n";
+
+    foreach $failed (@failed_file1) {
+      print $failed."\n";
+      print $fh $failed."\n";
+    }
+    print "\n";
+  }
+  if(scalar(@failed_file2) > 0){
+    print("=== failed : $countfailedcases2 tests - result\n");
+    print $fh "$countfailedcases2 testcases failed\n";
+
+    foreach $failed (@failed_file2) {
       print $failed."\n";
       print $fh $failed."\n";
     }
