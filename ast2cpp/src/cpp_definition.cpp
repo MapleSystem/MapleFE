@@ -219,6 +219,44 @@ std::string CppDef::EmitFieldNode(FieldNode *node) {
   return str;
 }
 
+std::string CppDef::EmitCondBranchNode(CondBranchNode *node) {
+  if (node == nullptr)
+    return std::string();
+  std::string str("if("s);
+  if (auto n = node->GetCond()) {
+    auto cond = EmitTreeNode(n);
+    str += Clean(cond);
+  }
+  str += ")"s;
+  if (auto n = node->GetTrueBranch()) {
+    str += EmitTreeNode(n);
+  }
+  if (auto n = node->GetFalseBranch()) {
+    str += "else"s + EmitTreeNode(n);
+  }
+  if(auto n = node->GetLabel()) {
+    str += "__label_break_"s + EmitTreeNode(n) + ":;\n"s;
+  }
+  return str;
+}
+
+std::string CppDef::EmitBlockNode(BlockNode *node) {
+  if (node == nullptr)
+    return std::string();
+  std::string str("{\n");
+  for (unsigned i = 0; i < node->GetChildrenNum(); ++i) {
+    if (auto n = node->GetChildAtIndex(i)) {
+      str += EmitTreeNode(n);
+    }
+  }
+  str += "}\n"s;
+  if(auto n = node->GetLabel()) {
+    str += "__label_break_"s + EmitTreeNode(n) + ":;\n"s;
+  }
+  mPrecedence = '\030';
+  return str;
+}
+
 std::string CppDef::EmitForLoopNode(ForLoopNode *node) {
   if (node == nullptr)
     return std::string();
@@ -288,7 +326,7 @@ std::string CppDef::EmitForLoopNode(ForLoopNode *node) {
     str += EmitTreeNode(n);
   }
   if(label)
-    str += "__label_cont_" + lstr + ":;\n}\n"s + "__label_break_" + lstr + ":;\n"s;
+    str += "__label_cont_"s + lstr + ":;\n}\n"s + "__label_break_"s + lstr + ":;\n"s;
   return str;
 }
 

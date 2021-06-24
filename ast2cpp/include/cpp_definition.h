@@ -36,12 +36,14 @@ public:
 
   virtual std::string EmitUnaOperatorNode(UnaOperatorNode *node);
   virtual std::string EmitBinOperatorNode(BinOperatorNode *node);
+  virtual std::string EmitBlockNode(BlockNode *node);
   virtual std::string EmitIdentifierNode(IdentifierNode *node);
   virtual std::string EmitDeclNode(DeclNode *node);
   virtual std::string EmitFieldNode(FieldNode *node);
   virtual std::string EmitArrayLiteralNode(ArrayLiteralNode *node);
   virtual std::string EmitTemplateLiteralNode(TemplateLiteralNode *node);
   virtual std::string EmitLiteralNode(LiteralNode *node);
+  virtual std::string EmitCondBranchNode(CondBranchNode *node);
   virtual std::string EmitBreakNode(BreakNode *node);
   virtual std::string EmitContinueNode(ContinueNode *node);
   virtual std::string EmitForLoopNode(ForLoopNode *node);
