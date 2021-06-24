@@ -2772,10 +2772,16 @@ TreeNode* ASTBuilder::AddFunctionBody() {
   // It's possible that the func body is empty, such as in the
   // function header declaration. Usually it's just a token ';'.
   Param p_body = mParams[0];
-  if (!p_body.mIsEmpty && p_body.mIsTreeNode) {
+  if (!p_body.mIsEmpty) {
+    MASSERT(p_body.mIsTreeNode);
     TreeNode *tree_node = p_body.mData.mTreeNode;
     MASSERT(tree_node->IsBlock() && "Class body is not a BlockNode?");
     BlockNode *block = (BlockNode*)tree_node;
+    func->SetBody(block);
+  } else {
+    // It is an 'empty' function body. Not a NULL pointer of function body.
+    BlockNode *block = (BlockNode*)gTreePool.NewTreeNode(sizeof(BlockNode));
+    new (block) BlockNode();
     func->SetBody(block);
   }
 
