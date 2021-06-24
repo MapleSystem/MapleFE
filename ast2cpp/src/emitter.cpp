@@ -201,7 +201,12 @@ std::string Emitter::EmitImportNode(ImportNode *node) {
     if (i)
       str += ", "s;
     if (auto n = node->GetPair(i)) {
-      str += EmitXXportAsPairNode(n);
+      std::string s = EmitXXportAsPairNode(n);
+      auto len = s.length();
+      if(len > 13 && s.substr(len - 13) == " as default }"s)
+        str += s.substr(1, len - 13); // default export from a module
+      else
+        str += s;
     }
   }
   if (auto n = node->GetTarget()) {
