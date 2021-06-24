@@ -26,6 +26,7 @@ STRUCT KeyWord : ((boolean),
                   (string),
                   (any),
                   (unknown),
+                  (never),
                   (undefined),
                   (type),
 
