@@ -414,7 +414,7 @@ std::string Emitter::EmitIdentifierNode(IdentifierNode *node) {
   if(node->IsRestParam())
     str += "..."s;
   str += node->GetName();
-  if(node->IsOptionalParam())
+  if(node->IsOptionalParam() || node->IsOptional())
     str += "?"s;
   //if (auto n = node->GetDims()) {
   //  str += " "s + EmitDimensionNode(n);
