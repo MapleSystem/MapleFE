@@ -193,7 +193,14 @@ std::string CppDecl::EmitPrimArrayTypeNode(PrimArrayTypeNode *node) {
     return std::string();
   std::string str;
   if (auto n = node->GetPrim()) {
-    str += "std::vector<"s + EmitPrimTypeNode(n) + "> "s;;
+    str = "std::vector<"s + EmitPrimTypeNode(n) + "> "s;;
+    auto d = node->GetDims();
+    if(d && d->GetKind() == NK_Dimension) {
+      auto num = (static_cast<DimensionNode *>(d))->GetDimensionsNum();
+      for (unsigned i = 1; i < num; ++i) {
+        str = "std::vector<"s + str + "> "s;;
+      }
+    }
   }
   /*
   if (auto n = node->GetDims()) {
