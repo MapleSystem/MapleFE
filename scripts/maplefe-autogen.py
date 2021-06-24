@@ -758,6 +758,7 @@ bool PutNode(TreeNode *n) {{
       case NK_Catch:       *mOs << NodeColor(thistle); break;
       case NK_Finally:     *mOs << NodeColor(thistle); break;
       case NK_Throw:       *mOs << NodeColor(plum); break;
+      case NK_Dimension:   *mOs << static_cast<DimensionNode *>(n)->GetDimensionsNum() << " dim(s)"; break;
     }}
     if(n->IsStmt())
        *mOs << "\\",penwidth=2,color=\\"tomato";
