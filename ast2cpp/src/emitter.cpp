@@ -1437,10 +1437,21 @@ std::string Emitter::EmitUserTypeNode(UserTypeNode *node) {
   auto ca = node->GetChildA();
   auto cb = node->GetChildB();
   if (auto n = node->GetId()) {
-    if(ca || cb)
-      str = "type "s + EmitTreeNode(n) + " = "s;
-    else
-      str = EmitTreeNode(n);
+    std::string id = EmitTreeNode(n);
+    str = ca || cb ? "type "s + id : id;
+    auto num = node->GetTypeGenericsNum();
+    if(num) {
+      str += "<"s;
+      for (unsigned i = 0; i < num; ++i) {
+        if (i)
+          str += ", "s;
+        if (auto n = node->GetTypeGeneric(i)) {
+          str += EmitTreeNode(n);
+        }
+      }
+      str += ">"s;
+    }
+    str += ca || cb ? " = "s : ""s;
   }
   if(ca)
     str += EmitTreeNode(node->GetChildA());
