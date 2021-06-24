@@ -256,14 +256,12 @@ LambdaNode *AdjustASTVisitor::VisitLambdaNode(LambdaNode *node) {
     func->AddParam(node->GetParam(i));
   }
 
-  // func return type
-  func->SetType(node->GetType());
-
   // func body
   TreeNode *tn = VisitTreeNode(node->GetBody());
   if (tn) {
     if (tn->IsBlock()) {
       func->SetBody(static_cast<BlockNode*>(tn));
+      func->SetType(node->GetType());
     } else {
       BlockNode *blk = (BlockNode*)gTreePool.NewTreeNode(sizeof(BlockNode));
       new (blk) BlockNode();
@@ -274,6 +272,12 @@ LambdaNode *AdjustASTVisitor::VisitLambdaNode(LambdaNode *node) {
       blk->AddChild(ret);
 
       func->SetBody(blk);
+
+      // func return type
+      PrimTypeNode *rettype = (PrimTypeNode*)gTreePool.NewTreeNode(sizeof(PrimTypeNode));
+      new (rettype) PrimTypeNode();
+      rettype->SetPrimType(TY_Number);
+      func->SetType(rettype);
     }
   }
 
