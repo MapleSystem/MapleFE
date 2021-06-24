@@ -3197,9 +3197,14 @@ TreeNode* ASTBuilder::BuildArrayType() {
   PrimTypeNode *prim_type = NULL;       //
   PrimArrayTypeNode *prim_array_type = NULL; // or prim_array_type
 
-  if (basic->IsUserType()) {
+  DimensionNode *dims = NULL;
+
+  if (basic->IsPrimArrayType()) {
+    prim_array_type = (PrimArrayTypeNode*)basic;
+    dims = prim_array_type->GetDims();
+  } else if (basic->IsUserType()) {
     user_type = (UserTypeNode*)basic;
-    MASSERT(!user_type->GetDims());
+    dims = user_type->GetDims();
   } else if (basic->IsPrimType()) {
     prim_type = (PrimTypeNode*)basic;
     prim_array_type = (PrimArrayTypeNode*)gTreePool.NewTreeNode(sizeof(PrimArrayTypeNode));
@@ -3211,8 +3216,10 @@ TreeNode* ASTBuilder::BuildArrayType() {
     user_type->SetId(basic);
   }
 
-  DimensionNode *dims = (DimensionNode*)gTreePool.NewTreeNode(sizeof(DimensionNode));
-  new (dims) DimensionNode();
+  if (!dims) {
+    dims = (DimensionNode*)gTreePool.NewTreeNode(sizeof(DimensionNode));
+    new (dims) DimensionNode();
+  }
 
   for (unsigned i = 1; i < mParams.size(); i++) {
     Param p_dim = mParams[i];
@@ -3226,11 +3233,13 @@ TreeNode* ASTBuilder::BuildArrayType() {
   }
 
   if (user_type) {
-    user_type->SetDims(dims);
+    if (!user_type->GetDims())
+      user_type->SetDims(dims);
     mLastTreeNode = user_type;
   } else {
     MASSERT(prim_array_type);
-    prim_array_type->SetDims(dims);
+    if (!prim_array_type->GetDims())
+      prim_array_type->SetDims(dims);
     mLastTreeNode = prim_array_type;
   }
 
