@@ -693,6 +693,10 @@ StructNode *CfgBuilder::VisitStructNode(StructNode *node) {
   return node;
 }
 
+TreeNode *CfgBuilder::BaseTreeNode(TreeNode *node) {
+  return node;
+}
+
 // Allocate a new CfgFunc node
 CfgFunc *CfgBuilder::NewFunction(TreeNode *node)   {
   CfgFunc *func = new(mHandler->GetMemPool()->Alloc(sizeof(CfgFunc))) CfgFunc;

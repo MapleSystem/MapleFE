@@ -326,7 +326,11 @@ std::string Emitter::EmitTypeParameterNode(TypeParameterNode *node) {
 std::string Emitter::EmitBlockNode(BlockNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str = "{\n"s;
+  std::string str;
+  if(auto n = node->GetLabel()) {
+    str = EmitTreeNode(n) + ":\n"s;
+  }
+  str += "{\n"s;
   for (unsigned i = 0; i < node->GetChildrenNum(); ++i) {
     if (auto n = node->GetChildAtIndex(i)) {
       str += EmitTreeNode(n);
@@ -851,7 +855,11 @@ std::string Emitter::EmitReturnNode(ReturnNode *node) {
 std::string Emitter::EmitCondBranchNode(CondBranchNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str = "if("s;
+  std::string str;
+  if(auto n = node->GetLabel()) {
+    str = EmitTreeNode(n) + ":\n"s;
+  }
+  str += "if("s;
   if (auto n = node->GetCond()) {
     auto cond = EmitTreeNode(n);
     str += Clean(cond);
