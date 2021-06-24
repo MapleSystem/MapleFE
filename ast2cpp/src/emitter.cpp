@@ -1095,14 +1095,16 @@ std::string Emitter::EmitFunctionNode(FunctionNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
-  for (unsigned i = 0; i < node->GetAttrsNum(); ++i) {
-    str += GetEnumAttrId(node->GetAttrAtIndex(i));
+  auto body = node->GetBody();
+  if(body) {
+    for (unsigned i = 0; i < node->GetAttrsNum(); ++i) {
+      str += GetEnumAttrId(node->GetAttrAtIndex(i));
+    }
+    if(str.empty())
+      str = "function "s + str;
+    if(node->GetStrIdx())
+      str += node->GetName();
   }
-  if(str.empty())
-    str = "function "s + str;
-
-  if(node->GetStrIdx())
-    str += node->GetName();
 
   auto num = node->GetTypeParamsNum();
   if(num) {
@@ -1142,17 +1144,16 @@ std::string Emitter::EmitFunctionNode(FunctionNode *node) {
   str += ")"s;
 
   if (auto n = node->GetType()) {
-    str += " : "s + EmitTreeNode(n);
+    str += (body ? " : "s : " => ") + EmitTreeNode(n);
   }
 
-  if (auto n = node->GetBody()) {
-    auto s = EmitBlockNode(n);
+  if (body) {
+    auto s = EmitBlockNode(body);
     if(s.empty() || s.front() != '{')
       str += "{"s + s + "}\n"s;
     else
       str += s;
-  } else
-    str += "{}\n"s;
+  }
   /*
   if (auto n = node->GetDims()) {
     str += " "s + EmitDimensionNode(n);
