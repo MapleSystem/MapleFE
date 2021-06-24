@@ -782,7 +782,8 @@ rule VariableDeclarationList : ONEOF(
 
 # Typescript ask for explicit type. But it also allows implicit type if referrable.
 rule VariableDeclaration : ONEOF(BindingIdentifier + ':' + Type + ZEROORONE(Initializer),
-                                 BindingIdentifier + ZEROORONE(Initializer))
+                                 BindingIdentifier + ZEROORONE(Initializer),
+                                 BindingPattern + ZEROORONE(TypeAnnotation) + Initializer)
   attr.action.%1 : AddInitTo(%1, %4)
   attr.action.%1 : BuildDecl(%3, %1)
   attr.action.%1 : SetJSVar()
