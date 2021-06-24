@@ -859,12 +859,11 @@ using namespace std::string_literals;
 
 astemit_init = [
 """
-using Precedence = char;
-
-private:
-ModuleNode   *mASTModule;
 protected:
+using Precedence = char;
 Precedence    mPrecedence;
+
+ModuleNode   *mASTModule;
 
 public:
 {gen_args1}(ModuleNode *m) : mASTModule(m) {{}}

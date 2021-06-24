@@ -1454,6 +1454,9 @@ std::string Emitter::EmitUserTypeNode(UserTypeNode *node) {
     }
   }
   */
+  if (auto n = node->GetDims()) {
+    str += EmitDimensionNode(n);
+  }
   if (node->IsStmt())
     str += ";\n"s;
   return str;
