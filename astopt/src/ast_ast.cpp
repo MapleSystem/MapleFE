@@ -278,11 +278,6 @@ LambdaNode *AdjustASTVisitor::VisitLambdaNode(LambdaNode *node) {
   // func return type
   if (node->GetType()) {
     func->SetType(node->GetType());
-  } else {
-    PrimTypeNode *rettype = (PrimTypeNode*)gTreePool.NewTreeNode(sizeof(PrimTypeNode));
-    new (rettype) PrimTypeNode();
-    rettype->SetPrimType(TY_Number);
-    func->SetType(rettype);
   }
 
   mUpdated = true;
