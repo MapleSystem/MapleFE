@@ -561,8 +561,6 @@ void DumpLE(unsigned size) {{
   if(size)
     *mOs << indstr.substr(0, indent + 2) << "]" << std::endl;
 }}
-
-void DumpAsTypeNode(AsTypeNode *node) {{ AstDumpAsTypeNode(node); }}
 """.format(gen_args1=gen_args[1], gen_args2=gen_args[2])
 ] # astdump_init
 
@@ -579,6 +577,9 @@ gen_call_child_node = lambda dictionary, node_name, field_name, node_type, acces
     + '->GetNodeId()) : std::string("null")));\n' if field_name == "mParent" else \
     'Dump("' + padding_name(field_name) + ': ' + short_name(node_type) + '*", ' + accessor + ');\n' \
     + prefixfuncname + short_name(node_type) + '(' + accessor + ');') if field_name != '' else ''
+gen_call_nth_child_node = lambda dictionary, node_name, field_name, node_type, accessor: \
+    'Dump(std::to_string(i + 1) + ": ' + short_name(node_type) + '*", ' + accessor + ');\n' \
+    + "Ast" + gen_args[2] + short_name(node_type) + '(' + accessor + ');'
 handle_yaml(treenode_yaml, gen_handler_ast_node)
 handle_src_include_files(Finalization)
 
