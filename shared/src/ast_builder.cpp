@@ -1315,24 +1315,7 @@ TreeNode* ASTBuilder::AddAsType() {
   }
 
   if (tree_type) {
-    MASSERT(node->IsIdentifier() || node->IsUserType() ||
-            node->IsField() || node->IsCall() || node->IsArrayElement());
-    if (node->IsIdentifier()) {
-      IdentifierNode *id = (IdentifierNode*)node;
-      id->AddAsTypes(tree_type);
-    } else if (node->IsUserType()) {
-      UserTypeNode *id = (UserTypeNode*)node;
-      id->AddAsTypes(tree_type);
-    } else if (node->IsField()) {
-      FieldNode *id = (FieldNode*)node;
-      id->AddAsTypes(tree_type);
-    } else if (node->IsCall()) {
-      CallNode *id = (CallNode*)node;
-      id->AddAsTypes(tree_type);
-    } else if (node->IsArrayElement()) {
-      ArrayElementNode *id = (ArrayElementNode*)node;
-      id->AddAsTypes(tree_type);
-    }
+    node->AddAsTypes(tree_type);
     mLastTreeNode = node;
   }
 

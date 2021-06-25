@@ -72,6 +72,7 @@ enum NodeKind {
 // if needed in order to invoke the derived class destructor.
 
 class AnnotationNode;
+class AsTypeNode;
 class TreeNode {
 protected:
   NodeKind  mKind;
@@ -86,6 +87,10 @@ protected:
                           // This design is first coming from Javascript.
   bool      mIsNonNull;   // if a node is asserted to be non-null.
                           // This design is first coming from Typescript.
+
+  // This is a feature coming from TypeScript. Almost every expression in Typescript has
+  // this information. So it's here.
+  SmallVector<AsTypeNode*> mAsTypes;
 
 public:
   TreeNode(NodeKind k, unsigned i)
@@ -128,8 +133,15 @@ public:
   virtual void ReplaceChild(TreeNode *oldchild, TreeNode *newchild){}
   virtual void AddAttr(AttrId) {}
   virtual void AddAnnotation(AnnotationNode *n){}
-  virtual void Dump(unsigned){}
 
+  // AsType related
+  unsigned GetAsTypesNum()           {return mAsTypes.GetNum();}
+  void     AddAsType(AsTypeNode *n)  {mAsTypes.PushBack(n);}
+  void     AddAsTypes(TreeNode *n);
+  AsTypeNode* GetAsTypeAtIndex(unsigned i) {return mAsTypes.ValueAtIndex(i);}
+  void        SetAsTypeAtIndex(unsigned i, AsTypeNode* n) {*(mAsTypes.RefAtIndex(i)) = n;}
+
+  virtual void Dump(unsigned){}
   void DumpIndentation(unsigned);
   void DumpLabel(unsigned);
 
@@ -556,7 +568,6 @@ private:
 
   SmallVector<AnnotationNode*> mAnnotations; //annotation or pragma
 
-  SmallVector<AsTypeNode*> mAsTypes;
 
   bool           mOptionalParam; // A optional parameter.
   bool           mRestParam;     // A rest parameter.
@@ -602,13 +613,6 @@ public:
   void     AddAnnotation(AnnotationNode *n) {mAnnotations.PushBack(n);}
   AnnotationNode* GetAnnotationAtIndex(unsigned i) {return mAnnotations.ValueAtIndex(i);}
   void            SetAnnotationAtIndex(unsigned i, AnnotationNode* n) {*(mAnnotations.RefAtIndex(i)) = n;}
-
-  // AsType related
-  unsigned GetAsTypesNum()           {return mAsTypes.GetNum();}
-  void     AddAsType(AsTypeNode *n)  {mAsTypes.PushBack(n);}
-  void     AddAsTypes(TreeNode *n);
-  AsTypeNode* GetAsTypeAtIndex(unsigned i) {return mAsTypes.ValueAtIndex(i);}
-  void        SetAsTypeAtIndex(unsigned i, AsTypeNode* n) {*(mAsTypes.RefAtIndex(i)) = n;}
 
   void Release();
   void Dump(unsigned);
@@ -762,20 +766,12 @@ class FieldNode : public TreeNode {
 private:
   TreeNode       *mUpper; // The upper enclosing structure
   IdentifierNode *mField;
-  SmallVector<AsTypeNode*> mAsTypes;
 public:
   FieldNode() : TreeNode(NK_Field), mField(NULL), mUpper(NULL) {}
-  ~FieldNode(){mAsTypes.Release();}
+  ~FieldNode(){}
 
   IdentifierNode* GetField() {return mField;}
   void SetField(IdentifierNode *f) {mField = f; SETPARENT(f);}
-
-  // AsType related
-  unsigned GetAsTypesNum()           {return mAsTypes.GetNum();}
-  void     AddAsType(AsTypeNode *n)  {mAsTypes.PushBack(n);}
-  void     AddAsTypes(TreeNode *n);
-  AsTypeNode* GetAsTypeAtIndex(unsigned i) {return mAsTypes.ValueAtIndex(i);}
-  void        SetAsTypeAtIndex(unsigned i, AsTypeNode* n) {*(mAsTypes.RefAtIndex(i)) = n;}
 
   TreeNode *GetUpper()       {return mUpper;}
   void SetUpper(TreeNode *n) {
@@ -801,7 +797,6 @@ class ArrayElementNode : public TreeNode {
 private:
   TreeNode              *mArray;
   SmallVector<TreeNode*> mExprs;  // index expressions.
-  SmallVector<AsTypeNode*> mAsTypes;
 public:
   ArrayElementNode() : TreeNode(NK_ArrayElement), mArray(NULL) {}
   ~ArrayElementNode() {Release();}
@@ -813,13 +808,6 @@ public:
   TreeNode* GetExprAtIndex(unsigned i) {return mExprs.ValueAtIndex(i);}
   void      SetExprAtIndex(unsigned i, TreeNode* n) {*(mExprs.RefAtIndex(i)) = n; SETPARENT(n);}
   void      AddExpr(TreeNode *n){mExprs.PushBack(n); SETPARENT(n);}
-
-  // AsType related
-  unsigned GetAsTypesNum()           {return mAsTypes.GetNum();}
-  void     AddAsType(AsTypeNode *n)  {mAsTypes.PushBack(n);}
-  void     AddAsTypes(TreeNode *n);
-  AsTypeNode* GetAsTypeAtIndex(unsigned i) {return mAsTypes.ValueAtIndex(i);}
-  void        SetAsTypeAtIndex(unsigned i, AsTypeNode* n) {*(mAsTypes.RefAtIndex(i)) = n;}
 
   void Release() {mExprs.Release();}
   void Dump(unsigned);
@@ -1521,7 +1509,6 @@ private:
   TreeNode    *mMethod;
   ExprListNode mArgs;
   SmallVector<TreeNode*> mTypeArguments;
-  SmallVector<AsTypeNode*> mAsTypes;
 public:
   CallNode() : TreeNode(NK_Call), mMethod(NULL) {}
   ~CallNode(){Release();}
@@ -1541,14 +1528,7 @@ public:
   void      SetTypeArgumentAtIndex(unsigned i, TreeNode* n) {*(mTypeArguments.RefAtIndex(i)) = n; SETPARENT(n);}
   void      AddTypeArgument(TreeNode *);
 
-  // AsType related
-  unsigned GetAsTypesNum()           {return mAsTypes.GetNum();}
-  void     AddAsType(AsTypeNode *n)  {mAsTypes.PushBack(n);}
-  void     AddAsTypes(TreeNode *n);
-  AsTypeNode* GetAsTypeAtIndex(unsigned i) {return mAsTypes.ValueAtIndex(i);}
-  void        SetAsTypeAtIndex(unsigned i, AsTypeNode* n) {*(mAsTypes.RefAtIndex(i)) = n;}
-
-  void Release() {mArgs.Release(); mTypeArguments.Release(); mAsTypes.Release();}
+  void Release() {mArgs.Release(); mTypeArguments.Release();}
   void Dump(unsigned);
 };
 

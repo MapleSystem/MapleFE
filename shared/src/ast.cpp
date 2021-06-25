@@ -57,6 +57,22 @@ static const char* GetOperatorName(OprId opr) {
 //                               TreeNode
 //////////////////////////////////////////////////////////////////////////////////////
 
+void TreeNode::AddAsTypes(TreeNode *type) {
+  if (!type)
+    return;
+
+  if (type->IsPass()) {
+    PassNode *pass_node = (PassNode*)type;
+    for (unsigned i = 0; i < pass_node->GetChildrenNum(); i++)
+      AddAsTypes(pass_node->GetChild(i));
+  } else if (type->IsAsType()) {
+    AsTypeNode *asn = (AsTypeNode*)type;
+    AddAsType(asn);
+  } else {
+    MERROR("unsupported as-type in AddAsType.");
+  }
+}
+
 // return true iff:
 //   both are type nodes, either UserTypeNode or PrimTypeNode, and
 //   they are type equal.
@@ -346,22 +362,6 @@ void UnaOperatorNode::Dump(unsigned indent) {
 //                           FieldNode
 //////////////////////////////////////////////////////////////////////////////////////
 
-void FieldNode::AddAsTypes(TreeNode *type) {
-  if (!type)
-    return;
-
-  if (type->IsPass()) {
-    PassNode *pass_node = (PassNode*)type;
-    for (unsigned i = 0; i < pass_node->GetChildrenNum(); i++)
-      AddAsTypes(pass_node->GetChild(i));
-  } else if (type->IsAsType()) {
-    AsTypeNode *asn = (AsTypeNode*)type;
-    AddAsType(asn);
-  } else {
-    MERROR("unsupported as-type in AddAsType.");
-  }
-}
-
 void FieldNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   mUpper->Dump(0);
@@ -453,22 +453,6 @@ void CallNode::AddTypeArgument(TreeNode *arg) {
   }
 }
 
-void CallNode::AddAsTypes(TreeNode *type) {
-  if (!type)
-    return;
-
-  if (type->IsPass()) {
-    PassNode *pass_node = (PassNode*)type;
-    for (unsigned i = 0; i < pass_node->GetChildrenNum(); i++)
-      AddAsTypes(pass_node->GetChild(i));
-  } else if (type->IsAsType()) {
-    AsTypeNode *asn = (AsTypeNode*)type;
-    AddAsType(asn);
-  } else {
-    MERROR("unsupported as-type in AddAsType.");
-  }
-}
-
 void CallNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   mMethod->Dump(0);
@@ -516,28 +500,11 @@ void DimensionNode::Merge(const TreeNode *node) {
 //                          IdentifierNode
 //////////////////////////////////////////////////////////////////////////////////////
 
-void IdentifierNode::AddAsTypes(TreeNode *type) {
-  if (!type)
-    return;
-
-  if (type->IsPass()) {
-    PassNode *pass_node = (PassNode*)type;
-    for (unsigned i = 0; i < pass_node->GetChildrenNum(); i++)
-      AddAsTypes(pass_node->GetChild(i));
-  } else if (type->IsAsType()) {
-    AsTypeNode *asn = (AsTypeNode*)type;
-    AddAsType(asn);
-  } else {
-    MERROR("unsupported as-type in AddAsType.");
-  }
-}
-
 void IdentifierNode::Release() {
   if (mDims)
      mDims->Release();
   mAttrs.Release();
   mAnnotations.Release();
-  mAsTypes.Release();
 }
 
 void IdentifierNode::Dump(unsigned indent) {
@@ -586,22 +553,6 @@ void DeclNode::Dump(unsigned indent) {
 //////////////////////////////////////////////////////////////////////////////////////
 //                          ArrayElement and ArrayLiteral
 //////////////////////////////////////////////////////////////////////////////////////
-
-void ArrayElementNode::AddAsTypes(TreeNode *type) {
-  if (!type)
-    return;
-
-  if (type->IsPass()) {
-    PassNode *pass_node = (PassNode*)type;
-    for (unsigned i = 0; i < pass_node->GetChildrenNum(); i++)
-      AddAsTypes(pass_node->GetChild(i));
-  } else if (type->IsAsType()) {
-    AsTypeNode *asn = (AsTypeNode*)type;
-    AddAsType(asn);
-  } else {
-    MERROR("unsupported as-type in AddAsType.");
-  }
-}
 
 void ArrayElementNode::Dump(unsigned indent) {
   DumpIndentation(indent);
