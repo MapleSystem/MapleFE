@@ -3186,6 +3186,26 @@ TreeNode* ASTBuilder::BuildTypeAlias() {
 }
 
 // It takes at least one argument, the basic type.
+TreeNode* ASTBuilder::BuildNeverArrayType() {
+  if (mTrace)
+    std::cout << "In BuildNeverArrayType" << std::endl;
+
+  PrimTypeNode *prim_type = gPrimTypePool.FindType(TY_Never);
+  PrimArrayTypeNode *prim_array_type = (PrimArrayTypeNode*)gTreePool.NewTreeNode(sizeof(PrimArrayTypeNode));
+  new (prim_array_type) PrimArrayTypeNode();
+  prim_array_type->SetPrim(prim_type);
+
+  DimensionNode *dims = (DimensionNode*)gTreePool.NewTreeNode(sizeof(DimensionNode));
+  new (dims) DimensionNode();
+  dims->AddDimension(0);
+
+  prim_array_type->SetDims(dims);
+  mLastTreeNode = prim_array_type;
+
+  return mLastTreeNode;
+}
+
+// It takes at least one argument, the basic type.
 // The rest argument represent the dimensions.
 //
 // [NOTE] For each dimension, we are using a trick. If the size of a dimension is unknown,

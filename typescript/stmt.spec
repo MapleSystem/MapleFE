@@ -1460,7 +1460,11 @@ rule PrimaryType: ONEOF(ParenthesizedType,
                         ArrayType,
                         TupleType,
                         TypeQuery,
-                        ThisType)
+                        ThisType,
+                        NeverArrayType)
+
+rule NeverArrayType : '[' + ']'
+  attr.action : BuildNeverArrayType()
 
 ## rule ParenthesizedType: ( Type )
 rule ParenthesizedType: '(' + Type + ')'

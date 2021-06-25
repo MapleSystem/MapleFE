@@ -200,6 +200,7 @@ ACTION(BuildArrayType)      // From Spec point of view,
                             // In languages like TS, dimension info is attached to type.
                             // In C/C++, dimension info is attached to identifier.
                             // However, the AST design is up to each implementation.
+ACTION(BuildNeverArrayType) // Special 'never' array type.
 
 ACTION(BuildTypeAlias)
 ACTION(BuildTypeParameter)
