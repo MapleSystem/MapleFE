@@ -1,0 +1,39 @@
+Matched 36 tokens.
+Matched 87 tokens.
+Matched 100 tokens.
+Matched 117 tokens.
+============= Module ===========
+== Sub Tree ==
+class  Car
+  Fields: 
+    _make
+  Instance Initializer: 
+  Constructors: 
+    constructor  (make)  throws: 
+      this._make Assign make
+  Methods: 
+    func  getMake()  throws: 
+      return this._make
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+class  Model
+  Fields: 
+    _model
+  Instance Initializer: 
+  Constructors: 
+    constructor  (make,model)  throws: 
+      super
+      make
+      this._model Assign model
+  Methods: 
+    func  getModel()  throws: 
+      return this._model
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+js_let Decl: passat=new Model("VW","Passat")
+== Sub Tree ==
+console.log(passat.getMake(),passat.getModel())

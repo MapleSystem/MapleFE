@@ -1,0 +1,13 @@
+Matched 9 tokens.
+Matched 23 tokens.
+Matched 37 tokens.
+Matched 44 tokens.
+============= Module ===========
+== Sub Tree ==
+js_const Decl: arr=[]
+== Sub Tree ==
+arr.push([])
+== Sub Tree ==
+arr.push.apply(arr, {})
+== Sub Tree ==
+console.log(arr)
