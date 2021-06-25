@@ -74,6 +74,24 @@ void TypeInferVisitor::UpdateTypeId(TreeNode *node, TypeId id) {
   }
 }
 
+void TypeInferVisitor::UpdateFuncRetTypeId(FunctionNode *node, TypeId id) {
+  if (!node || id == TY_None || node->GetTypeId() == id) {
+    return;
+  }
+  PrimTypeNode *ret = (PrimTypeNode*)gTreePool.NewTreeNode(sizeof(PrimTypeNode));
+  new (ret) PrimTypeNode();
+  if (node->GetType()) {
+    id = MergeTypeId(node->GetType()->GetTypeId(), id);
+  }
+  TreeNode *type = node->GetType();
+  if (type && type->IsPrimType()) {
+    PrimTypeNode *pt = static_cast<PrimTypeNode *>(type);
+    ret->SetPrimType(pt->GetPrimType());
+  }
+  node->SetType(ret);
+  ret->SetTypeId(id);
+}
+
 void TypeInferVisitor::UpdateArrayElemTypeIdMap(TreeNode *node, TypeId id) {
   if (!node || id == TY_None || !IsArray(node)) {
     return;
@@ -568,7 +586,7 @@ ReturnNode *TypeInferVisitor::VisitReturnNode(ReturnNode *node) {
   TreeNode *tn = mHandler->FindFunc(node);
   if (tn) {
     FunctionNode *func = static_cast<FunctionNode *>(tn);
-    UpdateTypeId(func->GetType(), node->GetTypeId());
+    UpdateFuncRetTypeId(func, node->GetTypeId());
   }
   return node;
 }
