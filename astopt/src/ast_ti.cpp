@@ -392,8 +392,10 @@ CallNode *TypeInferVisitor::VisitCallNode(CallNode *node) {
         NOTYETIMPL("call and func with different number of arguments");
         return node;
       }
-      for (unsigned i = 0; i < node->GetArgsNum(); i++) {
-        UpdateTypeUseNode(func->GetParam(i), node->GetArg(i));
+      if (ExportedDeclIds.find(decl->GetNodeId()) == ExportedDeclIds.end()) {
+        for (unsigned i = 0; i < node->GetArgsNum(); i++) {
+          UpdateTypeUseNode(func->GetParam(i), node->GetArg(i));
+        }
       }
     } else {
       NOTYETIMPL("VisitCallNode null method or not function node");
@@ -504,6 +506,15 @@ ExceptionNode *TypeInferVisitor::VisitExceptionNode(ExceptionNode *node) {
 
 ExportNode *TypeInferVisitor::VisitExportNode(ExportNode *node) {
   (void) AstVisitor::VisitExportNode(node);
+  XXportAsPairNode *p = node->GetPair(0);
+  TreeNode *bfnode = p->GetBefore();
+  if (bfnode->IsIdentifier()) {
+    IdentifierNode *idnode = static_cast<IdentifierNode *>(bfnode);
+    TreeNode *decl = mHandler->FindDecl(idnode);
+    if (decl) {
+      ExportedDeclIds.insert(decl->GetNodeId());
+    }
+  }
   return node;
 }
 

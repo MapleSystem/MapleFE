@@ -45,8 +45,7 @@ class TypeInferVisitor : public AstVisitor {
   bool            mTrace;
   bool            mUpdated;
 
-  CfgFunc *mCurrentFunction;
-  CfgBB   *mCurrentBB;
+  std::unordered_set<unsigned> ExportedDeclIds;
 
  public:
   explicit TypeInferVisitor(Module_Handler *h, bool t, bool base = false)
