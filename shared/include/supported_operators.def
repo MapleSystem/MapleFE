@@ -75,8 +75,9 @@ OPERATOR(Arrow, Binary)
 // It could appear in other languages. So I define Diamond.
 OPERATOR(Diamond, Unary)
 
-// This part comes from JS
+// This part comes from JS/TS
 OPERATOR(StEq, Binary)
 OPERATOR(StNe, Binary)
 OPERATOR(ArrowFunction, Binary)
+OPERATOR(NullCoalesce, Binary)
 

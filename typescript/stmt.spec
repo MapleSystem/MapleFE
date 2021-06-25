@@ -621,8 +621,10 @@ rule AssignmentExpression : ONEOF(
 #  [+Yield] YieldExpression[?In]
   ArrowFunction,
   LeftHandSideExpression + '=' + AssignmentExpression,
-  LeftHandSideExpression + AssignmentOperator + AssignmentExpression)
+  LeftHandSideExpression + AssignmentOperator + AssignmentExpression,
+  ConditionalExpression + "??" + ConditionalExpression)
   attr.action.%3,%4 : BuildAssignment(%1, %2, %3)
+  attr.action.%5 :    BuildBinaryOperation(%1, %2, %3)
 
 rule AssignmentOperator : ONEOF("*=", "/=", "%=", "+=", "-=", "<<=", ">>=", ">>>=", "&=", "^=", "|=")
 
