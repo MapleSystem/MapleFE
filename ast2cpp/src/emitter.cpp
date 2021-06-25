@@ -1867,6 +1867,8 @@ const char *Emitter::GetEnumOprId(OprId k) {
     return          "\013!==";
   case OPR_ArrowFunction:
     return          "\030 OPR_ArrowFunction";
+  case OPR_NullCoalesce:
+    return          "\023??";
   case OPR_NA:
     return          "\030 OPR_NA";
   default:
