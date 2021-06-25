@@ -57,6 +57,8 @@
 rule KeywordIdentifier : ONEOF("get",
                                "set",
                                "type",
+                               "boolean",
+                               "string",
                                "catch",
                                "undefined",
                                "never",

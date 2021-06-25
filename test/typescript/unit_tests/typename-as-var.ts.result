@@ -1,0 +1,19 @@
+Matched 5 tokens.
+Matched 14 tokens.
+Matched 23 tokens.
+Matched 28 tokens.
+Matched 37 tokens.
+Matched 46 tokens.
+============= Module ===========
+== Sub Tree ==
+js_const Decl: boolean=Boolean
+== Sub Tree ==
+js_var Decl: b=new boolean(false)
+== Sub Tree ==
+console.log(boolean,b)
+== Sub Tree ==
+js_const Decl: string=String
+== Sub Tree ==
+js_var Decl: s=new string("abc")
+== Sub Tree ==
+console.log(string,s)
