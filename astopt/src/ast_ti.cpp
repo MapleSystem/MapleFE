@@ -549,6 +549,10 @@ FunctionNode *TypeInferVisitor::VisitFunctionNode(FunctionNode *node) {
 }
 
 IdentifierNode *TypeInferVisitor::VisitIdentifierNode(IdentifierNode *node) {
+  TreeNode *type = node->GetType();
+  if (type && type->IsPrimArrayType()) {
+    node->SetTypeId(TY_Array);
+  }
   (void) AstVisitor::VisitIdentifierNode(node);
   TreeNode *decl = mHandler->FindDecl(node);
   if (decl) {
