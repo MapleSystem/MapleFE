@@ -1437,13 +1437,13 @@ TreeNode* ASTBuilder::BuildArrayLiteral() {
   if (!p_literals.mIsEmpty) {
     MASSERT(p_literals.mIsTreeNode);
     TreeNode *literals = p_literals.mData.mTreeNode;
-    MASSERT(literals->IsLiteral() || literals->IsExprList() || literals->IsFieldLiteral());
-
-    if (literals->IsLiteral()) {
-      array_literal->AddLiteral(literals);
-    } else if (literals->IsFieldLiteral()) {
-      array_literal->AddLiteral(literals);
-    } else if (literals->IsExprList()) {
+    MASSERT(literals->IsLiteral() ||
+            literals->IsIdentifier() ||
+            literals->IsExprList() ||
+            literals->IsArrayLiteral() ||
+            literals->IsStructLiteral() ||
+            literals->IsFieldLiteral());
+    if (literals->IsExprList()) {
       ExprListNode *el = (ExprListNode*)literals;
       for (unsigned i = 0; i < el->GetExprsNum(); i++) {
         TreeNode *expr = el->GetExprAtIndex(i);
@@ -1454,6 +1454,8 @@ TreeNode* ASTBuilder::BuildArrayLiteral() {
                 expr->IsIdentifier());
         array_literal->AddLiteral(expr);
       }
+    } else {
+      array_literal->AddLiteral(literals);
     }
   }
 
