@@ -54,11 +54,13 @@ class TypeInferVisitor : public AstVisitor {
   ~TypeInferVisitor() = default;
 
   bool GetUpdated() {return mUpdated;}
-  void SetUpdated(bool b) {mUpdated = b;}
+  void SetUpdated(bool b = true) {mUpdated = b;}
 
-  void UpdateTypeId(TreeNode *node, TypeId id);
-  void UpdateFuncRetTypeId(FunctionNode *node, TypeId id);
-  void UpdateArrayElemTypeIdMap(TreeNode *node, TypeId id);
+  void UpdateTypeId(TreeNode *node, TypeId tid);
+  void UpdateFuncRetTypeId(FunctionNode *node, TypeId tid);
+  void UpdateTypeUseNode(TreeNode *target, TreeNode *input);
+  void UpdateArrayElemTypeIdMap(TreeNode *node, TypeId tid);
+  TypeId GetArrayElemTypeId(TreeNode *node);
 
   TypeId MergeTypeId(TypeId tia, TypeId tib);
 

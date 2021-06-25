@@ -63,25 +63,64 @@ TypeId TypeInferVisitor::MergeTypeId(TypeId tia,  TypeId tib) {
   return result;
 }
 
-void TypeInferVisitor::UpdateTypeId(TreeNode *node, TypeId id) {
-  if (!node || id == TY_None) {
+// use input node's type info to update target node's type info
+// used to refine function's formals with corresponding calls' parameters passed in
+void TypeInferVisitor::UpdateTypeUseNode(TreeNode *target, TreeNode *input) {
+  TypeId nid = target->GetTypeId();
+  TypeId iid = input->GetTypeId();
+  if (nid == iid) {
+    switch (nid) {
+      case TY_Array: {
+        if (input->IsIdentifier()) {
+          TreeNode *decl = mHandler->FindDecl(static_cast<IdentifierNode *>(input));
+          TypeId elemTypeId = GetArrayElemTypeId(target);
+          TypeId inid = GetArrayElemTypeId(decl);
+          if (elemTypeId != inid) {
+            UpdateArrayElemTypeIdMap(target, inid);
+          }
+          elemTypeId = GetArrayElemTypeId(target);
+          TreeNode *type = static_cast<IdentifierNode *>(target)->GetType();
+          MASSERT(target->IsIdentifier() && "target node not identifier");
+          if (type->IsPrimArrayType()) {
+            PrimArrayTypeNode *pat = static_cast<PrimArrayTypeNode*>(type);
+            PrimTypeNode *pt = (PrimTypeNode*)gTreePool.NewTreeNode(sizeof(PrimTypeNode));
+            new (pt) PrimTypeNode();
+            pt->SetPrimType(elemTypeId);
+            pat->SetPrim(pt);
+            SetUpdated();
+          }
+        } else {
+          NOTYETIMPL("parameter not identifier");
+        }
+        break;
+      }
+      default:
+        NOTYETIMPL("TypeId not handled");
+        break;
+    }
+  }
+  return;
+}
+
+void TypeInferVisitor::UpdateTypeId(TreeNode *node, TypeId tid) {
+  if (!node || tid == TY_None) {
     return;
   }
-  id = MergeTypeId(node->GetTypeId(), id);
-  if (node->GetTypeId() != id) {
-    node->SetTypeId(id);
-    mUpdated = true;
+  tid = MergeTypeId(node->GetTypeId(), tid);
+  if (node->GetTypeId() != tid) {
+    node->SetTypeId(tid);
+    SetUpdated();
   }
 }
 
-void TypeInferVisitor::UpdateFuncRetTypeId(FunctionNode *node, TypeId id) {
-  if (!node || id == TY_None || node->GetTypeId() == id) {
+void TypeInferVisitor::UpdateFuncRetTypeId(FunctionNode *node, TypeId tid) {
+  if (!node || tid == TY_None || node->GetTypeId() == tid) {
     return;
   }
   PrimTypeNode *ret = (PrimTypeNode*)gTreePool.NewTreeNode(sizeof(PrimTypeNode));
   new (ret) PrimTypeNode();
   if (node->GetType()) {
-    id = MergeTypeId(node->GetType()->GetTypeId(), id);
+    tid = MergeTypeId(node->GetType()->GetTypeId(), tid);
   }
   TreeNode *type = node->GetType();
   if (type && type->IsPrimType()) {
@@ -89,21 +128,48 @@ void TypeInferVisitor::UpdateFuncRetTypeId(FunctionNode *node, TypeId id) {
     ret->SetPrimType(pt->GetPrimType());
   }
   node->SetType(ret);
-  ret->SetTypeId(id);
+  ret->SetTypeId(tid);
 }
 
-void TypeInferVisitor::UpdateArrayElemTypeIdMap(TreeNode *node, TypeId id) {
-  if (!node || id == TY_None || !IsArray(node)) {
+TypeId TypeInferVisitor::GetArrayElemTypeId(TreeNode *node) {
+  TypeId tid = TY_None;
+  unsigned nodeid = node->GetNodeId();
+  auto it = mHandler->mArrayDeclId2EleTypeIdMap.find(nodeid);
+  if (it != mHandler->mArrayDeclId2EleTypeIdMap.end()) {
+    tid = mHandler->mArrayDeclId2EleTypeIdMap[nodeid];
+  }
+  return tid;
+}
+
+void TypeInferVisitor::UpdateArrayElemTypeIdMap(TreeNode *node, TypeId tid) {
+  if (!node || tid == TY_None || !IsArray(node)) {
     return;
   }
-  unsigned nid = node->GetNodeId();
-  auto it = mHandler->mArrayDeclId2EleTypeIdMap.find(nid);
+  unsigned nodeid = node->GetNodeId();
+  auto it = mHandler->mArrayDeclId2EleTypeIdMap.find(nodeid);
   if (it != mHandler->mArrayDeclId2EleTypeIdMap.end()) {
-    id = MergeTypeId(id, mHandler->mArrayDeclId2EleTypeIdMap[nid]);
+    tid = MergeTypeId(tid, mHandler->mArrayDeclId2EleTypeIdMap[nodeid]);
   }
-  if (mHandler->mArrayDeclId2EleTypeIdMap[nid] != id) {
-    mHandler->mArrayDeclId2EleTypeIdMap[node->GetNodeId()] = id;
-    mUpdated = true;
+  if (mHandler->mArrayDeclId2EleTypeIdMap[nodeid] != tid) {
+    mHandler->mArrayDeclId2EleTypeIdMap[node->GetNodeId()] = tid;
+    SetUpdated();
+
+    // update array's PrimType node with a new node
+    if (node->IsDecl()) {
+      DeclNode *decl = static_cast<DeclNode *>(node);
+      node = decl->GetVar();
+    }
+    if (node->IsIdentifier()) {
+      IdentifierNode *in = static_cast<IdentifierNode *>(node);
+      TreeNode *type = in->GetType();
+      if (type->IsPrimArrayType()) {
+        PrimArrayTypeNode *pat = static_cast<PrimArrayTypeNode *>(type);
+        PrimTypeNode *pt = (PrimTypeNode*)gTreePool.NewTreeNode(sizeof(PrimTypeNode));
+        new (pt) PrimTypeNode();
+        pt->SetPrimType(tid);
+        pat->SetPrim(pt);
+      }
+    }
   }
 }
 
@@ -116,22 +182,26 @@ bool TypeInferVisitor::IsArray(TreeNode *node) {
     node = decl->GetVar();
   }
   if (node->IsIdentifier()) {
-    IdentifierNode *id = static_cast<IdentifierNode *>(node);
-    if (id && id->GetType() && id->GetType()->GetKind() == NK_PrimArrayType) {
+    IdentifierNode *idnode = static_cast<IdentifierNode *>(node);
+    if (idnode && idnode->GetType() && idnode->GetType()->GetKind() == NK_PrimArrayType) {
       return true;
     }
+  } else {
+    NOTYETIMPL("array not identifier");
   }
   return false;
 }
 
 TreeNode *TypeInferVisitor::VisitClassField(TreeNode *node) {
   if (node->IsIdentifier()) {
-    IdentifierNode *id = static_cast<IdentifierNode *>(node);
-    TreeNode *init = id->GetInit();
+    IdentifierNode *idnode = static_cast<IdentifierNode *>(node);
+    TreeNode *init = idnode->GetInit();
     if (init) {
       VisitTreeNode(init);
       UpdateTypeId(node, init->GetTypeId());
     }
+  } else {
+    NOTYETIMPL("field not idenfier");
   }
   return node;
 }
@@ -153,11 +223,11 @@ ArrayElementNode *TypeInferVisitor::VisitArrayElementNode(ArrayElementNode *node
     array->SetTypeId(TY_Array);
     if (array->IsIdentifier()) {
       TreeNode *decl = mHandler->FindDecl(static_cast<IdentifierNode *>(array));
-      if (decl) {
-        decl->SetTypeId(TY_Array);
-        UpdateArrayElemTypeIdMap(decl, node->GetTypeId());
-        UpdateTypeId(node, mHandler->mArrayDeclId2EleTypeIdMap[decl->GetNodeId()]);
-      }
+      decl->SetTypeId(TY_Array);
+      UpdateArrayElemTypeIdMap(decl, node->GetTypeId());
+      UpdateTypeId(node, mHandler->mArrayDeclId2EleTypeIdMap[decl->GetNodeId()]);
+    } else {
+      NOTYETIMPL("array not idenfier");
     }
   }
   return node;
@@ -300,9 +370,20 @@ CallNode *TypeInferVisitor::VisitCallNode(CallNode *node) {
     TreeNode *decl = mHandler->FindDecl(static_cast<IdentifierNode *>(method));
     if (decl && decl->IsFunction()) {
       FunctionNode *func = static_cast<FunctionNode *>(decl);
+      // update call's return type
       if (func->GetType()) {
         UpdateTypeId(node, func->GetType()->GetTypeId());
       }
+      // update function's argument types
+      if (func->GetParamsNum() != node->GetArgsNum()) {
+        NOTYETIMPL("call and func with different number of arguments");
+        return node;
+      }
+      for (unsigned i = 0; i < node->GetArgsNum(); i++) {
+        UpdateTypeUseNode(func->GetParam(i), node->GetArg(i));
+      }
+    } else {
+      NOTYETIMPL("VisitCallNode null method or not function node");
     }
   }
   (void) AstVisitor::VisitCallNode(node);
@@ -368,6 +449,8 @@ DeclNode *TypeInferVisitor::VisitDeclNode(DeclNode *node) {
   }
   if (var) {
     merged = MergeTypeId(merged, var->GetTypeId());
+  } else {
+    NOTYETIMPL("var null");
   }
   // override TypeId for array
   if (isArray) {
