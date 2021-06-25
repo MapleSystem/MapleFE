@@ -63,6 +63,18 @@ TypeId TypeInferVisitor::MergeTypeId(TypeId tia,  TypeId tib) {
   return result;
 }
 
+PrimTypeNode *TypeInferVisitor::GetOrClonePrimTypeNode(PrimTypeNode *pt, TypeId tid) {
+  PrimTypeNode *new_pt = pt;
+  if (pt->GetTypeId() == TY_None) {
+    new_pt = (PrimTypeNode*)gTreePool.NewTreeNode(sizeof(PrimTypeNode));
+    new (new_pt) PrimTypeNode();
+    new_pt->SetPrimType(pt->GetPrimType());
+    new_pt->SetTypeId(tid);
+    SetUpdated();
+  }
+  return new_pt;
+}
+
 // use input node's type info to update target node's type info
 // used to refine function's formals with corresponding calls' parameters passed in
 void TypeInferVisitor::UpdateTypeUseNode(TreeNode *target, TreeNode *input) {
@@ -82,12 +94,10 @@ void TypeInferVisitor::UpdateTypeUseNode(TreeNode *target, TreeNode *input) {
           TreeNode *type = static_cast<IdentifierNode *>(target)->GetType();
           MASSERT(target->IsIdentifier() && "target node not identifier");
           if (type->IsPrimArrayType()) {
-            PrimArrayTypeNode *pat = static_cast<PrimArrayTypeNode*>(type);
-            PrimTypeNode *pt = (PrimTypeNode*)gTreePool.NewTreeNode(sizeof(PrimTypeNode));
-            new (pt) PrimTypeNode();
-            pt->SetPrimType(elemTypeId);
-            pat->SetPrim(pt);
-            SetUpdated();
+            PrimArrayTypeNode *pat = static_cast<PrimArrayTypeNode *>(type);
+            PrimTypeNode *pt = pat->GetPrim();
+            PrimTypeNode *new_pt = GetOrClonePrimTypeNode(pt, elemTypeId);
+            pat->SetPrim(new_pt);
           }
         } else {
           NOTYETIMPL("parameter not identifier");
@@ -168,10 +178,9 @@ void TypeInferVisitor::UpdateArrayElemTypeIdMap(TreeNode *node, TypeId tid) {
       TreeNode *type = in->GetType();
       if (type->IsPrimArrayType()) {
         PrimArrayTypeNode *pat = static_cast<PrimArrayTypeNode *>(type);
-        PrimTypeNode *pt = (PrimTypeNode*)gTreePool.NewTreeNode(sizeof(PrimTypeNode));
-        new (pt) PrimTypeNode();
-        pt->SetPrimType(tid);
-        pat->SetPrim(pt);
+        PrimTypeNode *pt = pat->GetPrim();
+        PrimTypeNode *new_pt = GetOrClonePrimTypeNode(pt, tid);
+        pat->SetPrim(new_pt);
       }
     }
   }

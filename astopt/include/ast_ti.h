@@ -66,6 +66,8 @@ class TypeInferVisitor : public AstVisitor {
 
   bool IsArray(TreeNode *node);
 
+  PrimTypeNode *GetOrClonePrimTypeNode(PrimTypeNode *node, TypeId tid);
+
   TreeNode *VisitClassField(TreeNode *node);
 
   AnnotationNode *VisitAnnotationNode(AnnotationNode *node);
