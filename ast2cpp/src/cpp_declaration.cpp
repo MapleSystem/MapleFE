@@ -146,7 +146,7 @@ std::string CppDecl::EmitPrimTypeNode(PrimTypeNode *node) {
     case TY_None:
       return "auto "s;
   }
-  return Emitter::GetEnumTypeId(node->GetPrimType());
+  return GetEnumTypeId(node->GetPrimType());
 }
 
 std::string CppDecl::EmitDeclNode(DeclNode *node) {
