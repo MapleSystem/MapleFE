@@ -561,6 +561,8 @@ void DumpLE(unsigned size) {{
   if(size)
     *mOs << indstr.substr(0, indent + 2) << "]" << std::endl;
 }}
+
+void DumpAsTypeNode(AsTypeNode *node) {{ AstDumpAsTypeNode(node); }}
 """.format(gen_args1=gen_args[1], gen_args2=gen_args[2])
 ] # astdump_init
 
