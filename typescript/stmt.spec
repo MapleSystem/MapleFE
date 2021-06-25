@@ -1784,12 +1784,18 @@ rule PropertyMemberDeclaration: ONEOF(MemberVariableDeclaration,
                                       MemberAccessorDeclaration)
 
 ## MemberVariableDeclaration: AccessibilityModifieropt staticopt PropertyName TypeAnnotationopt Initializeropt ;
-rule MemberVariableDeclaration:
-  ZEROORONE(Annotation) + ZEROORMORE(AccessibilityModifier) + PropertyName + ZEROORONE(TypeAnnotation) + ZEROORONE(Initializer) + ';'
-  attr.action: AddInitTo(%3, %5)
-  attr.action: AddType(%3, %4)
-  attr.action: AddModifierTo(%3, %2)
-  attr.action: BuildDecl(%4, %3)
+rule MemberVariableDeclaration: ONEOF(
+  ZEROORONE(Annotation) + ZEROORMORE(AccessibilityModifier) + PropertyName + ZEROORONE(TypeAnnotation) + ZEROORONE(Initializer) + ';',
+  ZEROORONE(Annotation) + ZEROORMORE(AccessibilityModifier) + PropertyName + '?' + ZEROORONE(TypeAnnotation) + ZEROORONE(Initializer) + ';')
+  attr.action.%1: AddInitTo(%3, %5)
+  attr.action.%1: AddType(%3, %4)
+  attr.action.%1: AddModifierTo(%3, %2)
+  attr.action.%1: BuildDecl(%4, %3)
+  attr.action.%2: AddInitTo(%3, %6)
+  attr.action.%2: AddType(%3, %5)
+  attr.action.%2: AddModifierTo(%3, %2)
+  attr.action.%2: SetIsOptional(%3)
+  attr.action.%2: BuildDecl(%4, %3)
 
 
 ## MemberFunctionDeclaration: AccessibilityModifieropt staticopt PropertyName CallSignature { FunctionBody } AccessibilityModifieropt staticopt PropertyName CallSignature ;
