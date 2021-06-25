@@ -68,8 +68,8 @@ TypeId TypeInferVisitor::MergeTypeId(TypeId tia,  TypeId tib) {
 void TypeInferVisitor::UpdateTypeUseNode(TreeNode *target, TreeNode *input) {
   TypeId nid = target->GetTypeId();
   TypeId iid = input->GetTypeId();
-  if (nid == iid) {
-    switch (nid) {
+  if (nid == TY_None || nid == iid) {
+    switch (iid) {
       case TY_Array: {
         if (input->IsIdentifier()) {
           TreeNode *decl = mHandler->FindDecl(static_cast<IdentifierNode *>(input));
@@ -92,6 +92,10 @@ void TypeInferVisitor::UpdateTypeUseNode(TreeNode *target, TreeNode *input) {
         } else {
           NOTYETIMPL("parameter not identifier");
         }
+        break;
+      }
+      case TY_Int: {
+        target->SetTypeId(MergeTypeId(nid, iid));
         break;
       }
       default:
