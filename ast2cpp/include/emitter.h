@@ -113,7 +113,7 @@ public:
   virtual std::string EmitPrimArrayTypeNode(PrimArrayTypeNode *node);
 
   virtual std::string EmitTreeNode(TreeNode *node);
-  virtual std::string HandleTreeNode(TreeNode *node);
+  virtual std::string& HandleTreeNode(std::string &str, TreeNode *node);
 
   static void Replace(std::string &str, const char *o, const char *n, int cnt = 0);
   static std::string GetEnumTypeId(TypeId k);

@@ -97,7 +97,7 @@ std::string Emitter::EmitAnnotationNode(AnnotationNode *node) {
   //}
   if (node->IsStmt())
     str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitPackageNode(PackageNode *node) {
@@ -109,7 +109,7 @@ std::string Emitter::EmitPackageNode(PackageNode *node) {
   }
   if (node->IsStmt())
     str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitXXportAsPairNode(XXportAsPairNode *node) {
@@ -136,7 +136,7 @@ std::string Emitter::EmitXXportAsPairNode(XXportAsPairNode *node) {
   }
   if (node->IsStmt())
     str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitDeclareNode(DeclareNode *node) {
@@ -148,7 +148,7 @@ std::string Emitter::EmitDeclareNode(DeclareNode *node) {
   }
   if (node->IsStmt())
     str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitExportNode(ExportNode *node) {
@@ -169,7 +169,7 @@ std::string Emitter::EmitExportNode(ExportNode *node) {
   mPrecedence = '\030';
   if (node->IsStmt())
     str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitImportNode(ImportNode *node) {
@@ -214,7 +214,7 @@ std::string Emitter::EmitImportNode(ImportNode *node) {
   }
   if (node->IsStmt())
     str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitUnaOperatorNode(UnaOperatorNode *node) {
@@ -240,7 +240,7 @@ std::string Emitter::EmitUnaOperatorNode(UnaOperatorNode *node) {
   mPrecedence = precd;
   if (node->IsStmt())
     str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitBinOperatorNode(BinOperatorNode *node) {
@@ -268,7 +268,7 @@ std::string Emitter::EmitBinOperatorNode(BinOperatorNode *node) {
   mPrecedence = precd;
   if (node->IsStmt())
     str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitTerOperatorNode(TerOperatorNode *node) {
@@ -296,7 +296,7 @@ std::string Emitter::EmitTerOperatorNode(TerOperatorNode *node) {
   mPrecedence = '\004';
   if (node->IsStmt())
     str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitAsTypeNode(AsTypeNode *node) {
@@ -309,7 +309,7 @@ std::string Emitter::EmitAsTypeNode(AsTypeNode *node) {
   mPrecedence = '\030';
   if (node->IsStmt())
     str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitTypeParameterNode(TypeParameterNode *node) {
@@ -325,7 +325,7 @@ std::string Emitter::EmitTypeParameterNode(TypeParameterNode *node) {
   mPrecedence = '\030';
   if (node->IsStmt())
     str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitBlockNode(BlockNode *node) {
@@ -355,7 +355,7 @@ std::string Emitter::EmitBlockNode(BlockNode *node) {
   }
   */
   mPrecedence = '\030';
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitNewNode(NewNode *node) {
@@ -381,7 +381,7 @@ std::string Emitter::EmitNewNode(NewNode *node) {
   mPrecedence = '\024';
   if (node->IsStmt())
     str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitDeleteNode(DeleteNode *node) {
@@ -394,7 +394,7 @@ std::string Emitter::EmitDeleteNode(DeleteNode *node) {
   mPrecedence = '\030';
   if (node->IsStmt())
     str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitDimensionNode(DimensionNode *node) {
@@ -406,7 +406,7 @@ std::string Emitter::EmitDimensionNode(DimensionNode *node) {
     std::string d(n ? std::to_string(n) : ""s);
     str += "["s + d + "]"s;
   }
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitIdentifierNode(IdentifierNode *node) {
@@ -439,7 +439,7 @@ std::string Emitter::EmitIdentifierNode(IdentifierNode *node) {
   mPrecedence = '\030';
   if (node->IsStmt())
     str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitDeclNode(DeclNode *node) {
@@ -455,7 +455,7 @@ std::string Emitter::EmitDeclNode(DeclNode *node) {
   mPrecedence = '\030';
   if (node->IsStmt())
     str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitAnnotationTypeNode(AnnotationTypeNode *node) {
@@ -468,7 +468,7 @@ std::string Emitter::EmitAnnotationTypeNode(AnnotationTypeNode *node) {
   mPrecedence = '\030';
   if (node->IsStmt())
     str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitCastNode(CastNode *node) {
@@ -484,7 +484,7 @@ std::string Emitter::EmitCastNode(CastNode *node) {
   mPrecedence = '\021';
   if (node->IsStmt())
     str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitParenthesisNode(ParenthesisNode *node) {
@@ -497,7 +497,7 @@ std::string Emitter::EmitParenthesisNode(ParenthesisNode *node) {
   mPrecedence = '\025';
   if (node->IsStmt())
     str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitFieldNode(FieldNode *node) {
@@ -513,7 +513,7 @@ std::string Emitter::EmitFieldNode(FieldNode *node) {
   mPrecedence = '\024';
   if (node->IsStmt())
     str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitArrayElementNode(ArrayElementNode *node) {
@@ -533,7 +533,7 @@ std::string Emitter::EmitArrayElementNode(ArrayElementNode *node) {
   mPrecedence = '\030';
   if (node->IsStmt())
     str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitArrayLiteralNode(ArrayLiteralNode *node) {
@@ -551,7 +551,7 @@ std::string Emitter::EmitArrayLiteralNode(ArrayLiteralNode *node) {
   mPrecedence = '\030';
   if (node->IsStmt())
     str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitBindingElementNode(BindingElementNode *node) {
@@ -569,7 +569,7 @@ std::string Emitter::EmitBindingElementNode(BindingElementNode *node) {
   mPrecedence = '\030';
   if (node->IsStmt())
     str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitBindingPatternNode(BindingPatternNode *node) {
@@ -595,7 +595,7 @@ std::string Emitter::EmitBindingPatternNode(BindingPatternNode *node) {
   mPrecedence = '\030';
   if (node->IsStmt())
     str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitNumIndexSigNode(NumIndexSigNode *node) {
@@ -608,7 +608,7 @@ std::string Emitter::EmitNumIndexSigNode(NumIndexSigNode *node) {
   mPrecedence = '\030';
   if (node->IsStmt())
     str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitStrIndexSigNode(StrIndexSigNode *node) {
@@ -621,7 +621,7 @@ std::string Emitter::EmitStrIndexSigNode(StrIndexSigNode *node) {
   mPrecedence = '\030';
   if (node->IsStmt())
     str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitStructNode(StructNode *node) {
@@ -657,7 +657,7 @@ std::string Emitter::EmitStructNode(StructNode *node) {
     }
   }
   str += "}\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitFieldLiteralNode(FieldLiteralNode *node) {
@@ -678,7 +678,7 @@ std::string Emitter::EmitFieldLiteralNode(FieldLiteralNode *node) {
       str += s;
   }
   mPrecedence = '\030';
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitStructLiteralNode(StructLiteralNode *node) {
@@ -694,7 +694,7 @@ std::string Emitter::EmitStructLiteralNode(StructLiteralNode *node) {
   }
   str += "}"s;
   mPrecedence = '\030';
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitNamespaceNode(NamespaceNode *node) {
@@ -707,7 +707,7 @@ std::string Emitter::EmitNamespaceNode(NamespaceNode *node) {
     }
   }
   str += "}\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitVarListNode(VarListNode *node) {
@@ -724,7 +724,7 @@ std::string Emitter::EmitVarListNode(VarListNode *node) {
   mPrecedence = '\030';
   if (node->IsStmt())
     str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitExprListNode(ExprListNode *node) {
@@ -741,7 +741,7 @@ std::string Emitter::EmitExprListNode(ExprListNode *node) {
   mPrecedence = '\030';
   if (node->IsStmt())
     str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitTemplateLiteralNode(TemplateLiteralNode *node) {
@@ -759,7 +759,7 @@ std::string Emitter::EmitTemplateLiteralNode(TemplateLiteralNode *node) {
   mPrecedence = '\030';
   if (node->IsStmt())
     str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitLiteralNode(LiteralNode *node) {
@@ -769,7 +769,7 @@ std::string Emitter::EmitLiteralNode(LiteralNode *node) {
   mPrecedence = '\030';
   if (node->IsStmt())
     str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitThrowNode(ThrowNode *node) {
@@ -782,7 +782,7 @@ std::string Emitter::EmitThrowNode(ThrowNode *node) {
     }
   }
   str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitCatchNode(CatchNode *node) {
@@ -800,7 +800,7 @@ std::string Emitter::EmitCatchNode(CatchNode *node) {
   if (auto n = node->GetBlock()) {
     str += EmitBlockNode(n);
   }
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitFinallyNode(FinallyNode *node) {
@@ -812,7 +812,7 @@ std::string Emitter::EmitFinallyNode(FinallyNode *node) {
   }
   else
     str += "{}\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitTryNode(TryNode *node) {
@@ -830,7 +830,7 @@ std::string Emitter::EmitTryNode(TryNode *node) {
   if (auto n = node->GetFinally()) {
     str += EmitFinallyNode(n);
   }
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitExceptionNode(ExceptionNode *node) {
@@ -843,7 +843,7 @@ std::string Emitter::EmitExceptionNode(ExceptionNode *node) {
   mPrecedence = '\030';
   if (node->IsStmt())
     str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitReturnNode(ReturnNode *node) {
@@ -854,7 +854,7 @@ std::string Emitter::EmitReturnNode(ReturnNode *node) {
     str += " "s + EmitTreeNode(n);
   }
   str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitCondBranchNode(CondBranchNode *node) {
@@ -876,7 +876,7 @@ std::string Emitter::EmitCondBranchNode(CondBranchNode *node) {
   if (auto n = node->GetFalseBranch()) {
     str += "else"s + EmitTreeNode(n);
   }
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitBreakNode(BreakNode *node) {
@@ -887,7 +887,7 @@ std::string Emitter::EmitBreakNode(BreakNode *node) {
     str += " "s + EmitTreeNode(n);
   }
   str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitContinueNode(ContinueNode *node) {
@@ -898,7 +898,7 @@ std::string Emitter::EmitContinueNode(ContinueNode *node) {
     str += " "s + EmitTreeNode(n);
   }
   str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitForLoopNode(ForLoopNode *node) {
@@ -966,7 +966,7 @@ std::string Emitter::EmitForLoopNode(ForLoopNode *node) {
   if (auto n = node->GetBody()) {
     str += EmitTreeNode(n);
   }
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitWhileLoopNode(WhileLoopNode *node) {
@@ -985,7 +985,7 @@ std::string Emitter::EmitWhileLoopNode(WhileLoopNode *node) {
   if (auto n = node->GetBody()) {
     str += EmitTreeNode(n);
   }
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitDoLoopNode(DoLoopNode *node) {
@@ -1005,7 +1005,7 @@ std::string Emitter::EmitDoLoopNode(DoLoopNode *node) {
     str += Clean(s);
   }
   str += ");\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitSwitchLabelNode(SwitchLabelNode *node) {
@@ -1018,7 +1018,7 @@ std::string Emitter::EmitSwitchLabelNode(SwitchLabelNode *node) {
     auto ce = EmitTreeNode(n);
     str += "case "s + Clean(ce) + ":\n";
   }
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitSwitchCaseNode(SwitchCaseNode *node) {
@@ -1034,7 +1034,7 @@ std::string Emitter::EmitSwitchCaseNode(SwitchCaseNode *node) {
     if (auto t = node->GetStmtAtIndex(i))
       str += EmitTreeNode(t);
   }
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitSwitchNode(SwitchNode *node) {
@@ -1051,7 +1051,7 @@ std::string Emitter::EmitSwitchNode(SwitchNode *node) {
       str += EmitTreeNode(n);
   }
   str += "}\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitAssertNode(AssertNode *node) {
@@ -1067,7 +1067,7 @@ std::string Emitter::EmitAssertNode(AssertNode *node) {
   mPrecedence = '\030';
   if (node->IsStmt())
     str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitCallNode(CallNode *node) {
@@ -1093,7 +1093,7 @@ std::string Emitter::EmitCallNode(CallNode *node) {
   mPrecedence = '\024';
   if (node->IsStmt())
     str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitFunctionNode(FunctionNode *node) {
@@ -1168,7 +1168,7 @@ std::string Emitter::EmitFunctionNode(FunctionNode *node) {
   str += " "s + std::to_string(node->IsConstructor());
   */
   mPrecedence = '\030';
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitInterfaceNode(InterfaceNode *node) {
@@ -1196,7 +1196,7 @@ std::string Emitter::EmitInterfaceNode(InterfaceNode *node) {
   }
 
   str += "};\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitClassNode(ClassNode *node) {
@@ -1260,7 +1260,7 @@ std::string Emitter::EmitClassNode(ClassNode *node) {
   }
 
   str += "};\n";
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitPassNode(PassNode *node) {
@@ -1278,7 +1278,7 @@ std::string Emitter::EmitPassNode(PassNode *node) {
   mPrecedence = '\030';
   if (node->IsStmt())
     str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitLambdaNode(LambdaNode *node) {
@@ -1321,7 +1321,7 @@ std::string Emitter::EmitLambdaNode(LambdaNode *node) {
   mPrecedence = '\030';
   if (node->IsStmt())
     str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitInstanceOfNode(InstanceOfNode *node) {
@@ -1348,7 +1348,7 @@ std::string Emitter::EmitInstanceOfNode(InstanceOfNode *node) {
   mPrecedence = precd;
   if (node->IsStmt())
     str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitTypeOfNode(TypeOfNode *node) {
@@ -1367,7 +1367,7 @@ std::string Emitter::EmitTypeOfNode(TypeOfNode *node) {
   mPrecedence = precd;
   if (node->IsStmt())
     str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitKeyOfNode(KeyOfNode *node) {
@@ -1386,7 +1386,7 @@ std::string Emitter::EmitKeyOfNode(KeyOfNode *node) {
   mPrecedence = precd;
   if (node->IsStmt())
     str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 
@@ -1404,7 +1404,7 @@ std::string Emitter::EmitInNode(InNode *node) {
   mPrecedence = '\014';
   if (node->IsStmt())
     str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitAttrNode(AttrNode *node) {
@@ -1414,7 +1414,7 @@ std::string Emitter::EmitAttrNode(AttrNode *node) {
   str += " "s + AstDump::GetEnumAttrId(node->GetId());
   if (node->IsStmt())
     str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 static std::string GetTypeOp(UserTypeNode *node) {
@@ -1478,7 +1478,7 @@ std::string Emitter::EmitUserTypeNode(UserTypeNode *node) {
   }
   if (node->IsStmt())
     str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitPrimTypeNode(PrimTypeNode *node) {
@@ -1500,7 +1500,7 @@ std::string Emitter::EmitPrimArrayTypeNode(PrimArrayTypeNode *node) {
   }
   if (node->IsStmt())
     str += ";\n"s;
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitModuleNode(ModuleNode *node) {
@@ -1527,7 +1527,7 @@ std::string Emitter::EmitModuleNode(ModuleNode *node) {
       str += EmitTreeNode(n);
     }
   }
-  return str + HandleTreeNode(node);
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitTreeNode(TreeNode *node) {
@@ -1741,14 +1741,15 @@ std::string Emitter::EmitTreeNode(TreeNode *node) {
   return std::string();
 }
 
-std::string Emitter::HandleTreeNode(TreeNode *node) {
+std::string &Emitter::HandleTreeNode(std::string &str, TreeNode *node) {
   auto num = node->GetAsTypesNum();
   if(num == 0)
-    return std::string();
-  std::string str;
+    return str;
+  str = "("s + str;
   for (unsigned i = 0; i < num; ++i)
     if (auto t = node->GetAsTypeAtIndex(i))
       str += EmitAsTypeNode(t);
+  str += ")"s;
   return str;
 }
 
