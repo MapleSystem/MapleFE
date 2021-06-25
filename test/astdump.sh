@@ -39,7 +39,7 @@ while [ $# -gt 0 ]; do
 done
 if [ -n "$CLEAN" ]; then
   echo Cleaning up generated files...
-  find -maxdepth 1 -regex '.*\.ts-[0-9]+\.out.[ct][ps]p*\|.*\.ts-[0-9]+\.[pd][no][gt]\|.*\.ts.[ca][ps][pt]' -exec rm '{}' \;
+  find -maxdepth 1 -regex '.*\.ts-[0-9]+\.out.[ctj][ps]p*\|.*\.ts-[0-9]+\.[pd][no][gt]\|.*\.ts.[ca][ps][pt]' -exec rm '{}' \;
   echo Done.
 fi
 [ -n "$LIST" ] || { echo Please specify one or more TypeScript files.; usage; }
