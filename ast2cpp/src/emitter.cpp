@@ -1149,7 +1149,9 @@ std::string Emitter::EmitFunctionNode(FunctionNode *node) {
   str += ")"s;
 
   if (auto n = node->GetType()) {
-    str += (body ? " : "s : " => ") + EmitTreeNode(n);
+    std::string s = EmitTreeNode(n);
+    if(!s.empty())
+      str += (body ? " : "s : " => "s) + s;
   }
 
   if (body) {
@@ -1482,7 +1484,8 @@ std::string Emitter::EmitUserTypeNode(UserTypeNode *node) {
 std::string Emitter::EmitPrimTypeNode(PrimTypeNode *node) {
   if (node == nullptr)
     return std::string();
-  return Emitter::GetEnumTypeId(node->GetPrimType());
+  auto k = node->GetPrimType();
+  return k == TY_None ? std::string() : Emitter::GetEnumTypeId(k);
 }
 
 std::string Emitter::EmitPrimArrayTypeNode(PrimArrayTypeNode *node) {
