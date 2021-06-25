@@ -390,9 +390,10 @@ rule Arguments : ONEOF(
 ##  ArgumentList[?Yield] , AssignmentExpression[In, ?Yield]
 ##  ArgumentList[?Yield] , ... AssignmentExpression[In, ?Yield]
 
+## child #3, I added ZEROORONE() since ECMAScript 2017 allows empty argument after ','.
 rule ArgumentList : ONEOF(AssignmentExpression,
                           "..." + AssignmentExpression,
-                          ArgumentList + ',' + AssignmentExpression,
+                          ArgumentList + ',' + ZEROORONE(AssignmentExpression),
                           ArgumentList + ',' + "..." + AssignmentExpression)
 
 ##-----------------------------------
