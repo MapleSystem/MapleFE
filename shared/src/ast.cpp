@@ -186,12 +186,14 @@ void ExportNode::AddPair(TreeNode *t) {
     }
   } else if (t->IsXXportAsPair()) {
     mPairs.PushBack((XXportAsPairNode*)t);
+    SETPARENT(t);
   } else {
     // We create a new pair to save 't'.
     XXportAsPairNode *n = (XXportAsPairNode*)gTreePool.NewTreeNode(sizeof(XXportAsPairNode));
     new (n) XXportAsPairNode();
     n->SetBefore(t);
     mPairs.PushBack(n);
+    SETPARENT(n);
   }
 }
 

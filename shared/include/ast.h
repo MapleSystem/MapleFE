@@ -250,12 +250,12 @@ public:
   ExportNode() : TreeNode(NK_Export), mTarget(NULL) {}
   ~ExportNode(){}
 
-  void SetTarget(TreeNode *t) {mTarget = t;}
+  void SetTarget(TreeNode *t) {mTarget = t; SETPARENT(t);}
   TreeNode* GetTarget() {return mTarget;}
 
   unsigned GetPairsNum() {return mPairs.GetNum();}
   XXportAsPairNode* GetPair(unsigned i) {return mPairs.ValueAtIndex(i);}
-  void SetPair(unsigned i, XXportAsPairNode* n) {*(mPairs.RefAtIndex(i)) = n;}
+  void SetPair(unsigned i, XXportAsPairNode* n) {*(mPairs.RefAtIndex(i)) = n; SETPARENT(n);}
   void AddPair(TreeNode *p);
 
   // Annotation/Pragma related

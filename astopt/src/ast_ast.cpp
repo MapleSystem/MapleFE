@@ -99,8 +99,10 @@ void AST_AST::RemoveDeadBlocks(CfgFunc *func) {
 void AST_AST::AdjustAST() {
   if (mTrace) std::cout << "============== AdjustAST ==============" << std::endl;
   AdjustASTVisitor visitor(mHandler, mTrace, true);
-  for(unsigned i = 0; i < mHandler->GetASTModule()->GetTreesNum(); i++) {
-    TreeNode *it = mHandler->GetASTModule()->GetTree(i);
+  ModuleNode *module = mHandler->GetASTModule();
+  for(unsigned i = 0; i < module->GetTreesNum(); i++) {
+    TreeNode *it = module->GetTree(i);
+    it->SetParent(module);
     visitor.Visit(it);
   }
 }
@@ -154,6 +156,7 @@ ExportNode *AdjustASTVisitor::VisitExportNode(ExportNode *node) {
             new (n) IdentifierNode(func->GetStrIdx());
             // update p
             p->SetBefore(n);
+            n->SetParent(p);
             mUpdated = true;
             // insert func into AST after node
             if (parent->IsBlock()) {
@@ -173,6 +176,7 @@ ExportNode *AdjustASTVisitor::VisitExportNode(ExportNode *node) {
             new (n) IdentifierNode(classnode->GetStrIdx());
             // update p
             p->SetBefore(n);
+            n->SetParent(p);
             mUpdated = true;
             // insert classnode into AST after node
             if (parent->IsBlock()) {
