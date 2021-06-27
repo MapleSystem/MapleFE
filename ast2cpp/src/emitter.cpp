@@ -529,6 +529,7 @@ std::string Emitter::EmitArrayElementNode(ArrayElementNode *node) {
       str += "["s + EmitTreeNode(n) + "]"s;
     }
   }
+  Replace(str, "?[", "?.[");
 
   mPrecedence = '\030';
   if (node->IsStmt())
