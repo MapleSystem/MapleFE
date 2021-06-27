@@ -1,13 +1,15 @@
-Matched 6 tokens.
-Matched 9 tokens.
-Matched 21 tokens.
-Matched 33 tokens.
+Matched 19 tokens.
+Matched 34 tokens.
+Matched 44 tokens.
+Matched 53 tokens.
 ============= Module ===========
 == Sub Tree ==
-js_let Decl: obj1= {}
+func  func(arr?)  throws: 
+  return arr?[0]
+
 == Sub Tree ==
-js_let Decl: obj2
+js_let Decl: arr=[1,2,3]
 == Sub Tree ==
-console.log(obj1.hasOwnProperty('prop1'))
+console.log(func(arr))
 == Sub Tree ==
-console.log(obj2?.hasOwnProperty('prop1'))
+console.log(func())

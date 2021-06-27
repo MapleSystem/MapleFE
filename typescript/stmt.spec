@@ -314,7 +314,8 @@ rule MemberExpression : ONEOF(
   "new" + MemberExpression + ZEROORONE(Arguments),
 # NOTE: I created this rule. Typescript extended Type system and allow 'new'
 #       on a TypeReference
-  "new" + TypeReference + ZEROORONE(Arguments))
+  "new" + TypeReference + ZEROORONE(Arguments),
+  MemberExpression + "?." + '[' + Expression + ']' + ZEROORMORE(AsType))
   attr.action.%1 : AddAsType(%1, %2)
   attr.action.%2 : BuildArrayElement(%1, %3)
   attr.action.%2 : AddAsType(%5)
@@ -324,6 +325,9 @@ rule MemberExpression : ONEOF(
   attr.action.%4 : BuildField(%1, %3)
   attr.action.%4 : AddAsType(%4)
   attr.action.%6,%7 : BuildNewOperation(%2, %3)
+  attr.action.%8 : SetIsOptional(%1)
+  attr.action.%8 : BuildArrayElement(%1, %4)
+  attr.action.%8 : AddAsType(%6)
 
 ##-----------------------------------
 ##rule SuperProperty[Yield] :
