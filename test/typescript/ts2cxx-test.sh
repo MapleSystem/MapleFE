@@ -1,5 +1,5 @@
 #!/bin/bash -x
-# Usage: cd MapleFE/test/typescript/unit_tests; ../ts2cpp.sh *.ts
+# Usage: cd MapleFE/test/typescript/unit_tests; ../ts2cpp-test.sh *.ts
 SUCC=
 log=cxx.log
 for f; do
