@@ -1419,27 +1419,29 @@ std::string Emitter::EmitAttrNode(AttrNode *node) {
 }
 
 std::string Emitter::GetTypeString(UserTypeNode *node) {
+  std::string op;
   switch(node->GetType()) {
     case UT_Regular:
-      return " UT_Regular "s;
+      break;
     case UT_Union:
-      return " | "s;
+      op = " | "s;
+      break;
     case UT_Inter:
-      return " & "s;
+      op = " & "s;
+      break;
     case UT_Alias:
-      {
-        std::string str;
-        for (unsigned i = 0; i < node->GetUnionInterTypesNum(); ++i) {
-          if(i)
-            str += " | "s;
-          str += EmitTreeNode(node->GetUnionInterType(i));
-        }
-        return str;
-      }
+      op = " | "s;
+      break;
     default:
       MASSERT(0 && "Unexpected enumerator");
   }
-  return "UNEXPECTED UT_Type"s;
+  std::string str;
+  for (unsigned i = 0; i < node->GetUnionInterTypesNum(); ++i) {
+    if(i)
+      str += op;
+    str += EmitTreeNode(node->GetUnionInterType(i));
+  }
+  return str;
 }
 
 std::string Emitter::EmitUserTypeNode(UserTypeNode *node) {
