@@ -335,7 +335,7 @@ BinOperatorNode *TypeInferVisitor::VisitBinOperatorNode(BinOperatorNode *node) {
         UpdateTypeId(ta, tib);
         mod = ta;
       }
-      UpdateTypeId(node, TY_Boolean);
+      node->SetTypeId(TY_Boolean);
       break;
     }
     case OPR_Assign:
@@ -357,7 +357,8 @@ BinOperatorNode *TypeInferVisitor::VisitBinOperatorNode(BinOperatorNode *node) {
         UpdateTypeId(tb, tia);
         mod = tb;
       }
-      UpdateTypeId(node, tib);
+      TypeId ti = MergeTypeId(tia, tib);
+      UpdateTypeId(node, ti);
       break;
     }
     case OPR_Add:
