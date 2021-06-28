@@ -3196,8 +3196,6 @@ TreeNode* ASTBuilder::BuildTypeAlias() {
     if ((u_o->GetType() == UT_Union || u_o->GetType() == UT_Inter) &&
         (u_o->GetId() == NULL)) {
       u_o->SetId(name);
-      u_o->SetType(UT_Alias);
-
       mLastTreeNode = u_o;
       return mLastTreeNode;
     }

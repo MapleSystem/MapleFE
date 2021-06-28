@@ -95,6 +95,7 @@ void UserTypeNode::Dump(unsigned ind) {
 
   size = mUnionInterTypes.GetNum();
   if (size > 0) {
+    DUMP0_NORETURN(" = ");
     for (unsigned i = 0; i < size; i++) {
       TreeNode *inode = mUnionInterTypes.ValueAtIndex(i);
       inode->Dump(0);
