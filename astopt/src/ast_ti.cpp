@@ -131,18 +131,17 @@ void TypeInferVisitor::UpdateFuncRetTypeId(FunctionNode *node, TypeId tid) {
   if (!node || tid == TY_None || node->GetTypeId() == tid) {
     return;
   }
-  PrimTypeNode *ret = (PrimTypeNode*)gTreePool.NewTreeNode(sizeof(PrimTypeNode));
-  new (ret) PrimTypeNode();
-  if (node->GetType()) {
-    tid = MergeTypeId(node->GetType()->GetTypeId(), tid);
-  }
   TreeNode *type = node->GetType();
-  if (type && type->IsPrimType()) {
-    PrimTypeNode *pt = static_cast<PrimTypeNode *>(type);
-    ret->SetPrimType(pt->GetPrimType());
+  // create new return type node if it was shared
+
+  if (type) {
+    if (type->IsPrimType() && type->GetTypeId() == TY_None) {
+      type = GetOrClonePrimTypeNode((PrimTypeNode *)type, tid);
+      node->SetType(type);
+    }
+    tid = MergeTypeId(type->GetTypeId(), tid);
+    type->SetTypeId(tid);
   }
-  node->SetType(ret);
-  ret->SetTypeId(tid);
 }
 
 TypeId TypeInferVisitor::GetArrayElemTypeId(TreeNode *node) {
