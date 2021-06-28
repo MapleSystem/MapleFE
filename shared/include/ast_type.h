@@ -71,8 +71,8 @@ namespace maplefe {
 enum UT_Type {
   UT_Regular, // the normal user type, it could be just a name.
   UT_Union,   // Union of two other types.
-  UT_Inter,   // Intersection of two other types.
-  UT_Alias,   // Intersection of two other types.
+  UT_Inter,   // Intersection of other types.
+  UT_Alias,   // Intersection of other types.
 };
 
 class UserTypeNode : public TreeNode {
@@ -82,11 +82,11 @@ private:
   TreeNode *mId;
 
   UT_Type   mType;
-  TreeNode *mChildA;    // first child type in UT_Union or UT_Inter.
-                        // or it's the orig type in UT_Alias.
-  TreeNode *mChildB;    // second child type.
-
+  TreeNode *mAliased;     // The orig type in UT_Alias.
   DimensionNode *mDims;
+
+  // the set of types in union or intersection.
+  SmallVector<TreeNode*> mUnionInterTypes;
 
   // There are two scenarios type generic info are used.
   // 1. It's a type argument
@@ -95,12 +95,17 @@ private:
 
 public:
   UserTypeNode(TreeNode *n) : TreeNode(NK_UserType),
-    mId(n), mChildA(NULL), mChildB(NULL), mType(UT_Regular), mDims(NULL) {}
+    mId(n), mType(UT_Regular), mDims(NULL), mAliased(NULL) {}
   UserTypeNode() : UserTypeNode(NULL) {}
   ~UserTypeNode(){Release();}
 
   TreeNode* GetId() {return mId;}
   void SetId(TreeNode *n) {mId = n;}
+
+  unsigned  GetUnionInterTypesNum()                    {return mUnionInterTypes.GetNum();}
+  void      AddUnionInterType(TreeNode *n);
+  TreeNode* GetUnionInterType(unsigned i)              {return mUnionInterTypes.ValueAtIndex(i);}
+  void      SetUnionInterType(unsigned i, TreeNode* n) {*(mUnionInterTypes.RefAtIndex(i)) = n;}
 
   unsigned  GetTypeGenericsNum()                    {return mTypeGenerics.GetNum();}
   void      AddTypeGeneric(TreeNode *n);
@@ -110,12 +115,8 @@ public:
   UT_Type GetType() {return mType;}
   void SetType(UT_Type t) {mType = t;}
 
-  TreeNode* GetChildA() {return mChildA;}
-  TreeNode* GetChildB() {return mChildB;}
-  void SetChildA(TreeNode *t) {mChildA = t;}
-  void SetChildB(TreeNode *t) {mChildB = t;}
-
-  void SetAlias(TreeNode *t) {mChildA = t; mType = UT_Alias;}
+  void SetAliased(TreeNode *t) {mAliased = t; mType = UT_Alias;}
+  TreeNode* GetAliased() {return mAliased;}
 
   DimensionNode* GetDims()       {return mDims;}
   void SetDims(DimensionNode *d) {mDims = d;}
@@ -128,7 +129,7 @@ public:
 
   bool TypeEquivalent(UserTypeNode *);
 
-  void Release() {mTypeGenerics.Release();}
+  void Release() {mTypeGenerics.Release(); mUnionInterTypes.Release();}
   void Dump(unsigned);
 };
 

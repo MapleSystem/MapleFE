@@ -3080,10 +3080,12 @@ TreeNode* ASTBuilder::AddTypeGenerics() {
 }
 
 // It takes two arguments to build a union type, child-a and child-b
-// A child could be a prim type or user type.
+// A child could be a prim type or user type, or even a union user type.
 TreeNode* ASTBuilder::BuildUnionUserType() {
   if (mTrace)
     std::cout << "In BuildUnionUserType" << std::endl;
+
+  UserTypeNode *user_type = NULL;
 
   Param p_a = mParams[0];
   MASSERT (p_a.mIsTreeNode);
@@ -3093,12 +3095,31 @@ TreeNode* ASTBuilder::BuildUnionUserType() {
   MASSERT (p_b.mIsTreeNode);
   TreeNode *child_b = p_b.mData.mTreeNode;
 
-  UserTypeNode *user_type = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
-  new (user_type) UserTypeNode();
+  if (child_a->IsUserType()) {
+    UserTypeNode *ut = (UserTypeNode*)child_a;
+    if (ut->GetType() == UT_Union) {
+      user_type = ut;
+      user_type->AddUnionInterType(child_b);
+    }
+  }
 
-  user_type->SetChildA(child_a);
-  user_type->SetChildB(child_b);
-  user_type->SetType(UT_Union);
+  if (child_b->IsUserType()) {
+    UserTypeNode *ut = (UserTypeNode*)child_b;
+    if (ut->GetType() == UT_Union) {
+      // assert, both children cannot be UnionUserType at the same time.
+      MASSERT(!user_type);
+      user_type = ut;
+      user_type->AddUnionInterType(child_a);
+    }
+  }
+
+  if (!user_type) { 
+    user_type = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
+    new (user_type) UserTypeNode();
+    user_type->SetType(UT_Union);
+    user_type->AddUnionInterType(child_a);
+    user_type->AddUnionInterType(child_b);
+  }
 
   mLastTreeNode = user_type;
   return mLastTreeNode;
@@ -3110,6 +3131,8 @@ TreeNode* ASTBuilder::BuildInterUserType() {
   if (mTrace)
     std::cout << "In BuildInterUserType" << std::endl;
 
+  UserTypeNode *user_type = NULL;
+
   Param p_a = mParams[0];
   MASSERT (p_a.mIsTreeNode);
   TreeNode *child_a = p_a.mData.mTreeNode;
@@ -3118,12 +3141,31 @@ TreeNode* ASTBuilder::BuildInterUserType() {
   MASSERT (p_b.mIsTreeNode);
   TreeNode *child_b = p_b.mData.mTreeNode;
 
-  UserTypeNode *user_type = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
-  new (user_type) UserTypeNode();
+  if (child_a->IsUserType()) {
+    UserTypeNode *ut = (UserTypeNode*)child_a;
+    if (ut->GetType() == UT_Inter) {
+      user_type = ut;
+      user_type->AddUnionInterType(child_b);
+    }
+  }
 
-  user_type->SetChildA(child_a);
-  user_type->SetChildB(child_b);
-  user_type->SetType(UT_Inter);
+  if (child_b->IsUserType()) {
+    UserTypeNode *ut = (UserTypeNode*)child_b;
+    if (ut->GetType() == UT_Inter) {
+      // assert, both children cannot be UnionUserType at the same time.
+      MASSERT(!user_type);
+      user_type = ut;
+      user_type->AddUnionInterType(child_a);
+    }
+  }
+
+  if (!user_type) { 
+    user_type = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
+    new (user_type) UserTypeNode();
+    user_type->SetType(UT_Inter);
+    user_type->AddUnionInterType(child_a);
+    user_type->AddUnionInterType(child_b);
+  }
 
   mLastTreeNode = user_type;
   return mLastTreeNode;
@@ -3164,7 +3206,7 @@ TreeNode* ASTBuilder::BuildTypeAlias() {
   UserTypeNode *user_type = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
   new (user_type) UserTypeNode();
   user_type->SetId(name);
-  user_type->SetAlias(orig);
+  user_type->SetAliased(orig);
 
   mLastTreeNode = user_type;
   return mLastTreeNode;

@@ -27,6 +27,20 @@ namespace maplefe {
 //                           UserTypeNode                               //
 //////////////////////////////////////////////////////////////////////////
 
+void UserTypeNode::AddUnionInterType(TreeNode *args) {
+  if (args->IsIdentifier() || args->IsPrimType() || args->IsUserType()) {
+    mUnionInterTypes.PushBack(args);
+  } else if (args->IsPass()) {
+    PassNode *p = (PassNode*)args;
+    for (unsigned i = 0; i < p->GetChildrenNum(); i++) {
+      TreeNode *a = p->GetChild(i);
+      AddTypeGeneric(a);
+    }
+  } else {
+    MASSERT(0 && "Unsupported tree node in UserTypeNode::AddUnionInterType()");
+  }
+}
+
 void UserTypeNode::AddTypeGeneric(TreeNode *args) {
   if (args->IsIdentifier() || args->IsPrimType() || args->IsUserType()) {
     mTypeGenerics.PushBack(args);
@@ -74,18 +88,24 @@ void UserTypeNode::Dump(unsigned ind) {
     DUMP0_NORETURN('>');
   }
 
-  if (mChildA) {
+  if (mAliased) {
     DUMP0_NORETURN("=");
-    mChildA->Dump(0);
+    mAliased->Dump(0);
   }
 
-  if (mType == UT_Union)
-    DUMP0_NORETURN(" | ");
-  else if (mType == UT_Inter)
-    DUMP0_NORETURN(" & ");
-
-  if (mChildB)
-    mChildB->Dump(0);
+  size = mUnionInterTypes.GetNum();
+  if (size > 0) {
+    for (unsigned i = 0; i < size; i++) {
+      TreeNode *inode = mUnionInterTypes.ValueAtIndex(i);
+      inode->Dump(0);
+      if (i < size - 1) {
+        if (mType == UT_Union)
+          DUMP0_NORETURN(" | ");
+        else if (mType == UT_Inter)
+          DUMP0_NORETURN(" & ");
+      }
+    }
+  }
 
   if (mDims) {
     for (unsigned i = 0; i < GetDimsNum(); i++)
