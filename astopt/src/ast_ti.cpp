@@ -85,12 +85,25 @@ PrimTypeNode *TypeInferVisitor::GetOrClonePrimTypeNode(PrimTypeNode *pt, TypeId 
   return new_pt;
 }
 
+bool static IsScalar(TypeId tid) {
+  switch (tid) {
+    case TY_Int:
+    case TY_Long:
+    case TY_Float:
+    case TY_Double:
+      return true;
+    default:
+      return false;
+  }
+  return false;
+}
+
 // use input node's type info to update target node's type info
 // used to refine function's formals with corresponding calls' parameters passed in
 void TypeInferVisitor::UpdateTypeUseNode(TreeNode *target, TreeNode *input) {
   TypeId nid = target->GetTypeId();
   TypeId iid = input->GetTypeId();
-  if (nid == iid || (iid == TY_Array && nid != iid)) {
+  if ((nid == iid && IsScalar(nid)) || (iid == TY_Array && nid != iid)) {
     return;
   }
   switch (iid) {

@@ -1,0 +1,9 @@
+Matched 14 tokens.
+Matched 19 tokens.
+============= Module ===========
+== Sub Tree ==
+func  bar(value)  throws: 
+  return value
+
+== Sub Tree ==
+bar(13)

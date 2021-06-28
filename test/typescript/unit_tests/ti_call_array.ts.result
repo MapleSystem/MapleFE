@@ -1,0 +1,12 @@
+Matched 20 tokens.
+Matched 33 tokens.
+Matched 40 tokens.
+============= Module ===========
+== Sub Tree ==
+func  foo(array,value)  throws: 
+  return 0
+
+== Sub Tree ==
+js_var Decl: arr=[13,21]
+== Sub Tree ==
+foo(arr,13)

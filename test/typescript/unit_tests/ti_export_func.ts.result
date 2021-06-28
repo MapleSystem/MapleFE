@@ -1,0 +1,9 @@
+Matched 15 tokens.
+Matched 20 tokens.
+============= Module ===========
+== Sub Tree ==
+export {func  bar(value)  throws: 
+  return value
+} 
+== Sub Tree ==
+bar(13)
