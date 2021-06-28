@@ -46,6 +46,7 @@ public:
   void SetASTModule(ModuleNode *m) { mASTModule = m; }
 
   virtual std::string EmitAnnotationNode(AnnotationNode *node);
+  virtual std::string EmitAsTypeNode(AsTypeNode *node);
   virtual std::string EmitPackageNode(PackageNode *node);
   virtual std::string EmitXXportAsPairNode(XXportAsPairNode *node);
   virtual std::string EmitDeclareNode(DeclareNode *node);
@@ -54,7 +55,6 @@ public:
   virtual std::string EmitUnaOperatorNode(UnaOperatorNode *node);
   virtual std::string EmitBinOperatorNode(BinOperatorNode *node);
   virtual std::string EmitTerOperatorNode(TerOperatorNode *node);
-  virtual std::string EmitAsTypeNode(AsTypeNode *node);
   virtual std::string EmitTypeParameterNode(TypeParameterNode *node);
   virtual std::string EmitBlockNode(BlockNode *node);
   virtual std::string EmitNewNode(NewNode *node);
@@ -127,6 +127,7 @@ public:
   //static const char *GetEnumStructProp(StructProp k);
   //static const char *GetEnumForLoopProp(ForLoopProp k);
   //static const char *GetEnumLambdaProperty(LambdaProperty k);
+  std::string GetTypeString(UserTypeNode *node);
 
 };
 

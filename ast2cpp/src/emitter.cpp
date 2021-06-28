@@ -1418,7 +1418,7 @@ std::string Emitter::EmitAttrNode(AttrNode *node) {
   return HandleTreeNode(str, node);
 }
 
-static std::string GetTypeOp(UserTypeNode *node) {
+std::string Emitter::GetTypeString(UserTypeNode *node) {
   switch(node->GetType()) {
     case UT_Regular:
       return " UT_Regular "s;
@@ -1427,11 +1427,15 @@ static std::string GetTypeOp(UserTypeNode *node) {
     case UT_Inter:
       return " & "s;
     case UT_Alias:
-      if(auto t = node->GetChildA()) {
-        if(t->GetKind() == NK_UserType)
-          return GetTypeOp(static_cast<UserTypeNode *>(t));
+      {
+        std::string str;
+        for (unsigned i = 0; i < node->GetUnionInterTypesNum(); ++i) {
+          if(i)
+            str += " | "s;
+          str += EmitTreeNode(node->GetUnionInterType(i));
+        }
+        return str;
       }
-      return " | "s;
     default:
       MASSERT(0 && "Unexpected enumerator");
   }
@@ -1442,11 +1446,10 @@ std::string Emitter::EmitUserTypeNode(UserTypeNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
-  auto ca = node->GetChildA();
-  auto cb = node->GetChildB();
+  auto numOfTypes = node->GetUnionInterTypesNum();
   if (auto n = node->GetId()) {
     std::string id = EmitTreeNode(n);
-    str = ca || cb ? "type "s + id : id;
+    str = numOfTypes ? "type "s + id : id;
     auto num = node->GetTypeGenericsNum();
     if(num) {
       str += "<"s;
@@ -1459,12 +1462,10 @@ std::string Emitter::EmitUserTypeNode(UserTypeNode *node) {
       }
       str += ">"s;
     }
-    str += ca || cb ? " = "s : ""s;
+    str += numOfTypes ? " = "s : ""s;
   }
-  if(ca)
-    str += EmitTreeNode(node->GetChildA());
-  if(cb)
-    str += GetTypeOp(node) + EmitTreeNode(node->GetChildB());
+  if(numOfTypes)
+    str += GetTypeString(node);
   /*
   for (unsigned i = 0; i < node->GetTypeArgumentsNum(); ++i) {
     if (i)
