@@ -57,6 +57,9 @@ TypeId TypeInferVisitor::MergeTypeId(TypeId tia,  TypeId tib) {
   } else if ((tia == TY_Long && tib == TY_Float) ||
              (tib == TY_Long && tia == TY_Float)) {
     result = TY_Double;
+  } else if (((tia == TY_Long || tia == TY_Int) && tib == TY_Double) ||
+             ((tib == TY_Long || tib == TY_Int) && tia == TY_Double)) {
+    result = TY_Double;
   } else {
     NOTYETIMPL("MergeTypeId()");
   }
@@ -65,10 +68,17 @@ TypeId TypeInferVisitor::MergeTypeId(TypeId tia,  TypeId tib) {
 
 PrimTypeNode *TypeInferVisitor::GetOrClonePrimTypeNode(PrimTypeNode *pt, TypeId tid) {
   PrimTypeNode *new_pt = pt;
-  if (pt->GetTypeId() == TY_None) {
-    new_pt = (PrimTypeNode*)gTreePool.NewTreeNode(sizeof(PrimTypeNode));
-    new (new_pt) PrimTypeNode();
-    new_pt->SetPrimType(pt->GetPrimType());
+  TypeId oldtid = pt->GetTypeId();
+  // merge tids
+  tid = MergeTypeId(oldtid, tid);
+  // check if we need update
+  if (tid != oldtid) {
+    // check if we need clone PrimTypeNode to avoid using the shared one
+    if (oldtid == TY_None) {
+      new_pt = (PrimTypeNode*)gTreePool.NewTreeNode(sizeof(PrimTypeNode));
+      new (new_pt) PrimTypeNode();
+      new_pt->SetPrimType(pt->GetPrimType());
+    }
     new_pt->SetTypeId(tid);
     SetUpdated();
   }
@@ -80,38 +90,49 @@ PrimTypeNode *TypeInferVisitor::GetOrClonePrimTypeNode(PrimTypeNode *pt, TypeId 
 void TypeInferVisitor::UpdateTypeUseNode(TreeNode *target, TreeNode *input) {
   TypeId nid = target->GetTypeId();
   TypeId iid = input->GetTypeId();
-  if (nid == TY_None || nid == iid) {
-    switch (iid) {
-      case TY_Array: {
-        if (input->IsIdentifier()) {
-          TreeNode *decl = mHandler->FindDecl(static_cast<IdentifierNode *>(input));
-          TypeId elemTypeId = GetArrayElemTypeId(target);
-          TypeId inid = GetArrayElemTypeId(decl);
-          if (elemTypeId != inid) {
-            UpdateArrayElemTypeIdMap(target, inid);
-          }
-          elemTypeId = GetArrayElemTypeId(target);
+  if (nid == iid || (iid == TY_Array && nid != iid)) {
+    return;
+  }
+  switch (iid) {
+    case TY_Array: {
+      if (input->IsIdentifier()) {
+        TreeNode *decl = mHandler->FindDecl(static_cast<IdentifierNode *>(input));
+        TypeId old_elemTypeId = GetArrayElemTypeId(target);
+        TypeId inid = GetArrayElemTypeId(decl);
+        if (old_elemTypeId != inid) {
+          UpdateArrayElemTypeIdMap(target, inid);
+        }
+        TypeId new_elemTypeId = GetArrayElemTypeId(target);
+        if (old_elemTypeId != new_elemTypeId) {
           TreeNode *type = static_cast<IdentifierNode *>(target)->GetType();
           MASSERT(target->IsIdentifier() && "target node not identifier");
           if (type->IsPrimArrayType()) {
             PrimArrayTypeNode *pat = static_cast<PrimArrayTypeNode *>(type);
             PrimTypeNode *pt = pat->GetPrim();
-            PrimTypeNode *new_pt = GetOrClonePrimTypeNode(pt, elemTypeId);
+            PrimTypeNode *new_pt = GetOrClonePrimTypeNode(pt, new_elemTypeId);
             pat->SetPrim(new_pt);
+            SetUpdated();
           }
-        } else {
-          NOTYETIMPL("parameter not identifier");
         }
-        break;
+      } else {
+        NOTYETIMPL("parameter not identifier");
       }
-      case TY_Int: {
-        target->SetTypeId(MergeTypeId(nid, iid));
-        break;
-      }
-      default:
-        NOTYETIMPL("TypeId not handled");
-        break;
+      break;
     }
+    case TY_Int:
+    case TY_Long:
+    case TY_Float:
+    case TY_Double: {
+      TypeId merged = MergeTypeId(nid, iid);
+      if (merged != nid) {
+        target->SetTypeId(merged);
+        SetUpdated();
+      }
+      break;
+    }
+    default:
+      NOTYETIMPL("TypeId not handled");
+      break;
   }
   return;
 }
