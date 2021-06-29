@@ -1440,7 +1440,8 @@ std::string Emitter::EmitUserTypeNode(UserTypeNode *node) {
 
   auto k = node->GetType();
   if(k != UT_Regular) {
-    str = "type "s + str + " = "s;
+    if(!str.empty())
+      str = "type "s + str + " = "s;
     if(k == UT_Alias)
       str += EmitTreeNode(node->GetAliased());
     else {
