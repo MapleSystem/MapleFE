@@ -497,7 +497,6 @@ void Dump(const char *title, std::ostream *os) {{
 }}
 
 static std::string GetEnumLitData(LitData lit) {{
-  std::string str = GetEnumLitId(lit.mType);
   switch (lit.mType) {{
     case LT_IntegerLiteral:
       return std::to_string(lit.mData.mInt);
@@ -519,8 +518,10 @@ static std::string GetEnumLitData(LitData lit) {{
       return std::string("super");
     case LT_NA:
       return std::string("NA");
-    default:;
+    default:
+      MASSERT(0 && "Unexpected LitData");
   }}
+  return std::string("Unexpected");
 }}
 
 private:
