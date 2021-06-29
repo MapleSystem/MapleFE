@@ -127,7 +127,6 @@ public:
   //static const char *GetEnumStructProp(StructProp k);
   //static const char *GetEnumForLoopProp(ForLoopProp k);
   //static const char *GetEnumLambdaProperty(LambdaProperty k);
-  std::string GetTypeString(UserTypeNode *node);
 
 };
 

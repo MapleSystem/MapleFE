@@ -1418,40 +1418,12 @@ std::string Emitter::EmitAttrNode(AttrNode *node) {
   return HandleTreeNode(str, node);
 }
 
-std::string Emitter::GetTypeString(UserTypeNode *node) {
-  std::string op;
-  switch(node->GetType()) {
-    case UT_Regular:
-      break;
-    case UT_Union:
-      op = " | "s;
-      break;
-    case UT_Inter:
-      op = " & "s;
-      break;
-    case UT_Alias:
-      op = " | "s;
-      break;
-    default:
-      MASSERT(0 && "Unexpected enumerator");
-  }
-  std::string str;
-  for (unsigned i = 0; i < node->GetUnionInterTypesNum(); ++i) {
-    if(i)
-      str += op;
-    str += EmitTreeNode(node->GetUnionInterType(i));
-  }
-  return str;
-}
-
 std::string Emitter::EmitUserTypeNode(UserTypeNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
-  auto numOfTypes = node->GetUnionInterTypesNum();
   if (auto n = node->GetId()) {
-    std::string id = EmitTreeNode(n);
-    str = numOfTypes ? "type "s + id : id;
+    str = EmitTreeNode(n);
     auto num = node->GetTypeGenericsNum();
     if(num) {
       str += "<"s;
@@ -1464,19 +1436,23 @@ std::string Emitter::EmitUserTypeNode(UserTypeNode *node) {
       }
       str += ">"s;
     }
-    str += numOfTypes ? " = "s : ""s;
   }
-  if(numOfTypes)
-    str += GetTypeString(node);
-  /*
-  for (unsigned i = 0; i < node->GetTypeArgumentsNum(); ++i) {
-    if (i)
-      str += " | "s;
-    if (auto n = node->GetTypeArgument(i)) {
-      str += EmitIdentifierNode(n);
+
+  auto k = node->GetType();
+  if(k != UT_Regular) {
+    str = "type "s + str + " = "s;
+    if(k == UT_Alias)
+      str += EmitTreeNode(node->GetAliased());
+    else {
+      std::string op = k == UT_Union ? " | "s : " & "s;
+      for (unsigned i = 0; i < node->GetUnionInterTypesNum(); ++i) {
+        if(i)
+          str += op;
+        str += EmitTreeNode(node->GetUnionInterType(i));
+      }
     }
   }
-  */
+
   if (auto n = node->GetDims()) {
     str += EmitDimensionNode(n);
   }
