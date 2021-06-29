@@ -47,6 +47,7 @@ public:
   virtual std::string EmitBreakNode(BreakNode *node);
   virtual std::string EmitContinueNode(ContinueNode *node);
   virtual std::string EmitForLoopNode(ForLoopNode *node);
+  virtual std::string EmitSwitchNode(SwitchNode *node);
   virtual std::string EmitCallNode(CallNode *node);
   virtual std::string EmitFunctionNode(FunctionNode *node);
   virtual std::string EmitPrimTypeNode(PrimTypeNode *node);

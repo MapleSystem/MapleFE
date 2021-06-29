@@ -458,4 +458,76 @@ std::string CppDef::EmitLiteralNode(LiteralNode *node) {
   return str;
 }
 
+std::string CppDef::EmitSwitchNode(SwitchNode *node) {
+  if (node == nullptr)
+    return std::string();
+  bool all_int = true;
+  for (unsigned i = 0; i < node->GetCasesNum(); ++i) {
+    if (SwitchCaseNode* c = node->GetCaseAtIndex(i)) {
+      for (unsigned j = 0; j < c->GetLabelsNum(); ++j) {
+        auto l = c->GetLabelAtIndex(i);
+        if (l && l->GetKind() == NK_SwitchLabel) {
+          auto ln = static_cast<SwitchLabelNode*>(l);
+          auto v = ln->GetValue();
+          all_int = all_int && v->GetKind() == NK_Literal && v->GetTypeId() == TY_Int;
+          if(!all_int)
+            goto out_of_loops;
+        }
+      }
+    }
+  }
+out_of_loops:
+  std::string str;
+  if(all_int) {
+    str = "switch("s;
+    if (TreeNode* n = node->GetExpr()) {
+      std::string expr = EmitTreeNode(n);
+      str += Clean(expr);
+    }
+    str += "){\n"s;
+    for (unsigned i = 0; i < node->GetCasesNum(); ++i) {
+      if(SwitchCaseNode* n = node->GetCaseAtIndex(i))
+        str += EmitTreeNode(n);
+    }
+    str += "}\n"s;
+  } else {
+    std::string label = "__label_switch_" + std::to_string(node->GetNodeId());
+    std::string tmp = "__tmp_"s + std::to_string(node->GetNodeId());
+    str = "do { // switch\nauto "s + tmp + " = "s;
+    if (TreeNode* n = node->GetExpr()) {
+      std::string expr = EmitTreeNode(n);
+      str += Clean(expr);
+    }
+    str += ";\n"s;
+    std::string body;
+    for (unsigned i = 0; i < node->GetCasesNum(); ++i) {
+      if (SwitchCaseNode* cn = node->GetCaseAtIndex(i)) {
+        for (unsigned j = 0; j < cn->GetLabelsNum(); ++j) {
+          if (SwitchLabelNode* ln = cn->GetLabelAtIndex(j)) {
+            if(ln->IsDefault())
+              str += "else\ngoto __case_"s + std::to_string(cn->GetNodeId()) + ";\n"s;
+            else {
+              std::string le = EmitTreeNode(ln->GetValue());
+              str += "if("s + tmp + " == ("s + Clean(le)
+                + "))\ngoto __case_"s + std::to_string(cn->GetNodeId()) + ";\n"s;
+            }
+          }
+        }
+        body += "__case_"s + std::to_string(cn->GetNodeId()) + ":\n"s;
+        for (unsigned s = 0; s < cn->GetStmtsNum(); ++s) {
+          if (TreeNode* t = cn->GetStmtAtIndex(s))
+            body += EmitTreeNode(t);
+        }
+        body += "goto "s + label + ";\n"s;
+      }
+    }
+    str += body;
+    str += "} while(0);\n"s + label + ":;\n"s;
+  }
+  if(TreeNode* n = node->GetLabel()) {
+    str += "__label_break_"s + EmitTreeNode(n) + ":;\n"s;
+  }
+  return str;
+}
+
 } // namespace maplefe
