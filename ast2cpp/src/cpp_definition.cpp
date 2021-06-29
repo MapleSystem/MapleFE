@@ -461,24 +461,25 @@ std::string CppDef::EmitLiteralNode(LiteralNode *node) {
 std::string CppDef::EmitSwitchNode(SwitchNode *node) {
   if (node == nullptr)
     return std::string();
-  bool all_int = true;
+  bool doable = true;
   for (unsigned i = 0; i < node->GetCasesNum(); ++i) {
     if (SwitchCaseNode* c = node->GetCaseAtIndex(i)) {
       for (unsigned j = 0; j < c->GetLabelsNum(); ++j) {
-        auto l = c->GetLabelAtIndex(i);
+        auto l = c->GetLabelAtIndex(j);
         if (l && l->GetKind() == NK_SwitchLabel) {
           auto ln = static_cast<SwitchLabelNode*>(l);
-          auto v = ln->GetValue();
-          all_int = all_int && v->GetKind() == NK_Literal && v->GetTypeId() == TY_Int;
-          if(!all_int)
-            goto out_of_loops;
+          if (auto v = ln->GetValue())
+            if(v->GetKind() != NK_Literal || v->GetTypeId() != TY_Int) {
+              doable = false;
+              goto out_of_loops;
+            }
         }
       }
     }
   }
 out_of_loops:
   std::string str;
-  if(all_int) {
+  if(doable) {
     str = "switch("s;
     if (TreeNode* n = node->GetExpr()) {
       std::string expr = EmitTreeNode(n);
@@ -500,12 +501,13 @@ out_of_loops:
     }
     str += ";\n"s;
     std::string body;
+    std::string other = "goto "s + label + ";\n"s;;
     for (unsigned i = 0; i < node->GetCasesNum(); ++i) {
       if (SwitchCaseNode* cn = node->GetCaseAtIndex(i)) {
         for (unsigned j = 0; j < cn->GetLabelsNum(); ++j) {
           if (SwitchLabelNode* ln = cn->GetLabelAtIndex(j)) {
             if(ln->IsDefault())
-              str += "else\ngoto __case_"s + std::to_string(cn->GetNodeId()) + ";\n"s;
+              other = "goto __case_"s + std::to_string(cn->GetNodeId()) + ";\n"s;
             else {
               std::string le = EmitTreeNode(ln->GetValue());
               str += "if("s + tmp + " == ("s + Clean(le)
@@ -521,7 +523,7 @@ out_of_loops:
         body += "goto "s + label + ";\n"s;
       }
     }
-    str += body;
+    str += other + body;
     str += "} while(0);\n"s + label + ":;\n"s;
   }
   if(TreeNode* n = node->GetLabel()) {
