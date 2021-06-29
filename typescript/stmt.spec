@@ -1449,7 +1449,9 @@ rule TypeArgument: Type
 rule Type : ONEOF(UnionOrIntersectionOrPrimaryType,
                   FunctionType,
                   ConstructorType,
-                  "keyof" + Identifier)
+                  "keyof" + Identifier,
+                  UnionLiteralType,
+                  InterLiteralType)
   attr.action.%4 : BuildKeyOf(%2)
 
 #rule UnionOrIntersectionOrPrimaryType: ONEOF(UnionType,
@@ -1536,6 +1538,12 @@ rule UnionType: UnionOrIntersectionOrPrimaryType + '|' + IntersectionOrPrimaryTy
 ## rule IntersectionType: IntersectionOrPrimaryType & PrimaryType
 rule IntersectionType: IntersectionOrPrimaryType + '&' + PrimaryType
   attr.action : BuildInterUserType(%1, %3)
+
+## Typescript allows union and intersection of literals as types.
+rule UnionLiteralType : ONEOF(UnionLiteralType + '|' + Literal, Literal)
+  attr.action.%1 : BuildUnionUserType(%1, %3)
+rule InterLiteralType : ONEOF(InterLiteralType + '&' + Literal, Literal)
+  attr.action.%1 : BuildInterUserType(%1, %3)
 
 ## rule FunctionType: TypeParametersopt ( ParameterListopt ) => Type
 rule FunctionType: ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList) + ')' + "=>" + Type
