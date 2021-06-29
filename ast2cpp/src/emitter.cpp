@@ -1478,6 +1478,7 @@ std::string Emitter::EmitPrimArrayTypeNode(PrimArrayTypeNode *node) {
   }
   if (auto n = node->GetDims()) {
     str += EmitDimensionNode(n);
+    Replace(str, "never[", "[");
   }
   if (node->IsStmt())
     str += ";\n"s;
