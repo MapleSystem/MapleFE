@@ -562,6 +562,7 @@ ClassNode *BuildScopeVisitor::VisitClassNode(ClassNode *node) {
   // inner class is a decl
   if (parent) {
     parent->AddDecl(node);
+    parent->AddType(node);
   }
   ASTScope *scope = mASTModule->NewScope(parent);
   scope->SetTree(node);
@@ -588,6 +589,7 @@ InterfaceNode *BuildScopeVisitor::VisitInterfaceNode(InterfaceNode *node) {
   // inner interface is a decl
   if (parent) {
     parent->AddDecl(node);
+    parent->AddType(node);
   }
 
   ASTScope *scope = mASTModule->NewScope(parent);
@@ -613,6 +615,17 @@ DeclNode *BuildScopeVisitor::VisitDeclNode(DeclNode *node) {
   ASTScope *parent = mScopeStack.top();
   AstVisitor::VisitDeclNode(node);
   parent->AddDecl(node);
+  return node;
+}
+
+UserTypeNode *BuildScopeVisitor::VisitUserTypeNode(UserTypeNode *node) {
+  ASTScope *parent = mScopeStack.top();
+  AstVisitor::VisitUserTypeNode(node);
+  TreeNode *p = node->GetParent();
+  // type decls
+  if (p && p->IsScope()) {
+    parent->AddType(node);
+  }
   return node;
 }
 

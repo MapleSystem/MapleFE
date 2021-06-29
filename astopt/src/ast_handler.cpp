@@ -68,23 +68,23 @@ void Module_Handler::BuildScope() {
 }
 
 // input an identifire ===> returen the decl node with same name
-TreeNode *Module_Handler::FindDecl(IdentifierNode *inode) {
-  if (!inode) {
+TreeNode *Module_Handler::FindDecl(IdentifierNode *node) {
+  if (!node) {
     return NULL;
   }
-  unsigned nid = inode->GetNodeId();
+  unsigned nid = node->GetNodeId();
   // search the map mNodeId2Decl first
   if (mNodeId2Decl.find(nid) != mNodeId2Decl.end()) {
     return mNodeId2Decl[nid];
   }
 
   TreeNode *decl = NULL;
-  TreeNode *p = inode->GetParent();
+  TreeNode *p = node->GetParent();
   while (p) {
     if (p->IsScope()) {
       ASTScope *scope = mNodeId2Scope[p->GetNodeId()];
       // it will trace back to top level
-      decl = scope->FindDeclOf(inode);
+      decl = scope->FindDeclOf(node);
       break;
     }
     p = p->GetParent();
@@ -95,6 +95,25 @@ TreeNode *Module_Handler::FindDecl(IdentifierNode *inode) {
     mNodeId2Decl[nid] = decl;
   }
   return decl;
+}
+
+TreeNode *Module_Handler::FindType(IdentifierNode *node) {
+  if (!node) {
+    return NULL;
+  }
+  TreeNode *type = NULL;
+  TreeNode *p = node->GetParent();
+  while (p) {
+    if (p->IsScope()) {
+      ASTScope *scope = mNodeId2Scope[p->GetNodeId()];
+      // it will trace back to top level
+      type = scope->FindTypeOf(node);
+      break;
+    }
+    p = p->GetParent();
+  }
+
+  return type;
 }
 
 // input a node ==> return the function node contains it

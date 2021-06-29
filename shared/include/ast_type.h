@@ -95,12 +95,12 @@ private:
 
 public:
   UserTypeNode(TreeNode *n) : TreeNode(NK_UserType),
-    mId(n), mType(UT_Regular), mDims(NULL), mAliased(NULL) {}
+    mId(n), mType(UT_Regular), mDims(NULL), mAliased(NULL) { if(n) n->SetParent(this); }
   UserTypeNode() : UserTypeNode(NULL) {}
   ~UserTypeNode(){Release();}
 
   TreeNode* GetId() {return mId;}
-  void SetId(TreeNode *n) {mId = n;}
+  void SetId(TreeNode *n) {mId = n; if(n) n->SetParent(this);}
 
   unsigned  GetUnionInterTypesNum()                    {return mUnionInterTypes.GetNum();}
   void      AddUnionInterType(TreeNode *n);

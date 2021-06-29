@@ -510,9 +510,13 @@ DeclNode *TypeInferVisitor::VisitDeclNode(DeclNode *node) {
     elemTypeId = n->GetTypeId();
   }
   if (var) {
+    MASSERT(var->IsIdentifier() && "var is not an identifier");
+    IdentifierNode *id = static_cast<IdentifierNode *>(var);
+    TreeNode *type = id->GetType();
+
     merged = MergeTypeId(merged, var->GetTypeId());
   } else {
-    NOTYETIMPL("var null");
+    MASSERT("var null");
   }
   // override TypeId for array
   if (isArray) {
@@ -852,11 +856,18 @@ UnaOperatorNode *TypeInferVisitor::VisitUnaOperatorNode(UnaOperatorNode *node) {
 }
 
 UserTypeNode *TypeInferVisitor::VisitUserTypeNode(UserTypeNode *node) {
-  TreeNode *parent = node->GetParent();
-  if (parent) {
-    UpdateTypeId(parent, TY_Object);
-  }
   (void) AstVisitor::VisitUserTypeNode(node);
+  TreeNode *idnode = node->GetId();
+  if (idnode && idnode->IsIdentifier()) {
+    IdentifierNode *id = static_cast<IdentifierNode *>(idnode);
+    TreeNode *type = mHandler->FindType(id);
+    if (type && type->IsUserType()) {
+      UserTypeNode *ut = static_cast<UserTypeNode *>(type);
+      node->SetType(ut->GetType());
+      // share UserNode (?)
+      // return ut;
+    }
+  }
   return node;
 }
 
