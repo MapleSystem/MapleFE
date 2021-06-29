@@ -39,6 +39,18 @@ class TypeInfer {
   void TypeInference();
 };
 
+class BuildIdNodeToDeclVisitor : public AstVisitor {
+  Module_Handler *mHandler;
+  bool            mTrace;
+
+  public:
+  explicit BuildIdNodeToDeclVisitor(Module_Handler *h, bool t, bool base = false)
+    : mHandler(h), mTrace(t), AstVisitor(t && base) {}
+  ~BuildIdNodeToDeclVisitor() = default;
+
+  IdentifierNode *VisitIdentifierNode(IdentifierNode *node);
+};
+
 class TypeInferVisitor : public AstVisitor {
  private:
   Module_Handler *mHandler;

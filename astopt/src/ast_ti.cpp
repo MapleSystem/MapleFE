@@ -24,6 +24,12 @@ namespace maplefe {
 
 void TypeInfer::TypeInference() {
   if (mTrace) std::cout << "============== TypeInfer ==============" << std::endl;
+
+  // build mNodeId2Decl
+  BuildIdNodeToDeclVisitor visitor0(mHandler, mTrace, true);
+  visitor0.Visit(mHandler->GetASTModule());
+
+  // type inference
   TypeInferVisitor visitor(mHandler, mTrace, true);
   visitor.SetUpdated(true);
   int count = 0;
@@ -34,6 +40,13 @@ void TypeInfer::TypeInference() {
     if (count > 10) break;
   }
   if (mTrace) std::cout << "\n>>>>>> TypeInference() iterated " << count << " times\n" << std::endl;
+}
+
+// build up mNodeId2Decl by visit each Identifier
+IdentifierNode *BuildIdNodeToDeclVisitor::VisitIdentifierNode(IdentifierNode *node) {
+  (void) AstVisitor::VisitIdentifierNode(node);
+  (void) mHandler->FindDecl(node);
+  return node;
 }
 
 TypeId TypeInferVisitor::MergeTypeId(TypeId tia,  TypeId tib) {

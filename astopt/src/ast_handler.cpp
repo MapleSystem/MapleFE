@@ -69,6 +69,15 @@ void Module_Handler::BuildScope() {
 
 // input an identifire ===> returen the decl node with same name
 TreeNode *Module_Handler::FindDecl(IdentifierNode *inode) {
+  if (!inode) {
+    return NULL;
+  }
+  unsigned nid = inode->GetNodeId();
+  // search the map mNodeId2Decl first
+  if (mNodeId2Decl.find(nid) != mNodeId2Decl.end()) {
+    return mNodeId2Decl[nid];
+  }
+
   TreeNode *decl = NULL;
   TreeNode *p = inode->GetParent();
   while (p) {
@@ -79,6 +88,11 @@ TreeNode *Module_Handler::FindDecl(IdentifierNode *inode) {
       break;
     }
     p = p->GetParent();
+  }
+
+  if (decl) {
+    unsigned did = decl->GetNodeId();
+    mNodeId2Decl[nid] = decl;
   }
   return decl;
 }
