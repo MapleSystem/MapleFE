@@ -1041,7 +1041,11 @@ std::string Emitter::EmitSwitchCaseNode(SwitchCaseNode *node) {
 std::string Emitter::EmitSwitchNode(SwitchNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str = "switch("s;
+  std::string str;
+  if(auto n = node->GetLabel()) {
+    str = EmitTreeNode(n) + ":\n"s;
+  }
+  str += "switch("s;
   if (auto n = node->GetExpr()) {
     auto expr = EmitTreeNode(n);
     str += Clean(expr);
