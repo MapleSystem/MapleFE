@@ -115,7 +115,7 @@ public:
   UT_Type GetType() {return mType;}
   void SetType(UT_Type t) {mType = t;}
 
-  void SetAliased(TreeNode *t) {mAliased = t; mType = UT_Alias;}
+  void SetAliased(TreeNode *t) {mAliased = t;}
   TreeNode* GetAliased() {return mAliased;}
 
   DimensionNode* GetDims()       {return mDims;}

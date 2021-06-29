@@ -3113,7 +3113,7 @@ TreeNode* ASTBuilder::BuildUnionUserType() {
     }
   }
 
-  if (!user_type) { 
+  if (!user_type) {
     user_type = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
     new (user_type) UserTypeNode();
     user_type->SetType(UT_Union);
@@ -3159,7 +3159,7 @@ TreeNode* ASTBuilder::BuildInterUserType() {
     }
   }
 
-  if (!user_type) { 
+  if (!user_type) {
     user_type = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
     new (user_type) UserTypeNode();
     user_type->SetType(UT_Inter);
@@ -3205,6 +3205,7 @@ TreeNode* ASTBuilder::BuildTypeAlias() {
   new (user_type) UserTypeNode();
   user_type->SetId(name);
   user_type->SetAliased(orig);
+  user_type->SetType(UT_Alias);
 
   mLastTreeNode = user_type;
   return mLastTreeNode;
