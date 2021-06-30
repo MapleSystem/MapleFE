@@ -18,7 +18,7 @@
 #include "ast_handler.h"
 #include "ast_ti.h"
 
-#define NOTYETIMPL(K)      { if (mTrace) { MNYI(K);      }}
+#define NOTYETIMPL(K) {if(mTrace){MNYI(K);}}
 
 namespace maplefe {
 
@@ -26,8 +26,8 @@ void TypeInfer::TypeInference() {
   if (mTrace) std::cout << "============== TypeInfer ==============" << std::endl;
 
   // build mNodeId2Decl
-  BuildIdNodeToDeclVisitor visitor0(mHandler, mTrace, true);
-  visitor0.Visit(mHandler->GetASTModule());
+  BuildIdNodeToDeclVisitor visitor_pass0(mHandler, mTrace, true);
+  visitor_pass0.Visit(mHandler->GetASTModule());
 
   // type inference
   TypeInferVisitor visitor(mHandler, mTrace, true);
@@ -49,31 +49,106 @@ IdentifierNode *BuildIdNodeToDeclVisitor::VisitIdentifierNode(IdentifierNode *no
   return node;
 }
 
-TypeId TypeInferVisitor::MergeTypeId(TypeId tia,  TypeId tib) {
+TypeId TypeInferVisitor::MergeTypeId(TypeId tia, TypeId tib) {
+  if (tia == tib || tib == TY_None) {
+    return tia;
+  }
+
+  if (tib == TY_User) {
+    return TY_User;
+  }
+
+  // tia != tib && tib != TY_None
   TypeId result = TY_None;
-  if (tia == tib) {
-    result = tia;
-  } else if (tib == TY_None) {
-    result = tia;
-  } else if (tia == TY_None) {
-    result = tib;
-  } else if (tib == TY_Object) {
-    result = tib;
-  } else if (tia == TY_Object) {
-    result = tia;
-  } else if ((tia == TY_Int && tib == TY_Long) ||
-             (tib == TY_Int && tia == TY_Long)) {
-    result = TY_Long;
-  } else if ((tia == TY_Int && tib == TY_Float) ||
-             (tib == TY_Int && tia == TY_Float)) {
-    result = TY_Float;
-  } else if ((tia == TY_Long && tib == TY_Float) ||
-             (tib == TY_Long && tia == TY_Float)) {
-    result = TY_Double;
-  } else if (((tia == TY_Long || tia == TY_Int) && tib == TY_Double) ||
-             ((tib == TY_Long || tib == TY_Int) && tia == TY_Double)) {
-    result = TY_Double;
-  } else {
+  switch (tia) {
+    case TY_None:        result = tib;       break;
+    case TY_Object:      result = TY_Object; break;
+    case TY_User:        result = TY_User;   break;
+
+    case TY_String:
+    case TY_Function:
+    case TY_Class:
+    case TY_Array:       result = TY_Merge;  break;
+
+    case TY_Boolean: {
+      switch (tib) {
+        case TY_Int:
+        case TY_Long:
+        case TY_Float:
+        case TY_Double:  result = tib;       break;
+        case TY_Merge:
+        case TY_String:
+        case TY_Function:
+        case TY_Class:
+        case TY_Array:   result = TY_Merge;  break;
+        default: break;
+      }
+      break;
+    }
+    case TY_Int: {
+      switch (tib) {
+        case TY_Boolean: result = TY_Int;    break;
+        case TY_Long:
+        case TY_Float:
+        case TY_Double:  result = tib;       break;
+        case TY_Merge:
+        case TY_String:
+        case TY_Function:
+        case TY_Class:
+        case TY_Array:   result = TY_Merge;  break;
+        default: break;
+      }
+      break;
+    }
+    case TY_Long: {
+      switch (tib) {
+        case TY_Boolean:
+        case TY_Int:     result = TY_Long;   break;
+        case TY_Float:
+        case TY_Double:  result = TY_Double; break;
+        case TY_Merge:
+        case TY_String:
+        case TY_Function:
+        case TY_Class:
+        case TY_Array:   result = TY_Merge;  break;
+        default: break;
+      }
+      break;
+    }
+    case TY_Float: {
+      switch (tib) {
+        case TY_Boolean:
+        case TY_Int:     result = TY_Float;  break;
+        case TY_Long:
+        case TY_Double:  result = TY_Double; break;
+        case TY_Merge:
+        case TY_String:
+        case TY_Function:
+        case TY_Class:
+        case TY_Array:   result = TY_Merge;  break;
+        default: break;
+      }
+      break;
+    }
+    case TY_Double: {
+      switch (tib) {
+        case TY_Boolean:
+        case TY_Int:
+        case TY_Long:
+        case TY_Double:  result = TY_Double; break;
+        case TY_Merge:
+        case TY_String:
+        case TY_Function:
+        case TY_Class:
+        case TY_Array:   result = TY_Merge;  break;
+        default: break;
+      }
+      break;
+    }
+    default:
+      break;
+  }
+  if (result == TY_None) {
     NOTYETIMPL("MergeTypeId()");
   }
   return result;
@@ -148,7 +223,11 @@ void TypeInferVisitor::UpdateTypeUseNode(TreeNode *target, TreeNode *input) {
     case TY_Int:
     case TY_Long:
     case TY_Float:
-    case TY_Double: {
+    case TY_Double:
+    case TY_String:
+    case TY_Class:
+    case TY_Object:
+    case TY_Function: {
       TypeId merged = MergeTypeId(nid, iid);
       if (merged != nid) {
         target->SetTypeId(merged);
@@ -857,6 +936,14 @@ UnaOperatorNode *TypeInferVisitor::VisitUnaOperatorNode(UnaOperatorNode *node) {
 
 UserTypeNode *TypeInferVisitor::VisitUserTypeNode(UserTypeNode *node) {
   (void) AstVisitor::VisitUserTypeNode(node);
+  TreeNode *parent = node->GetParent();
+  if (parent && parent->IsIdentifier()) {
+    // typeid: merge -> user
+    if (parent->GetTypeId() == TY_Merge) {
+      parent->SetTypeId(TY_User);
+      SetUpdated();
+    }
+  }
   TreeNode *idnode = node->GetId();
   if (idnode && idnode->IsIdentifier()) {
     IdentifierNode *id = static_cast<IdentifierNode *>(idnode);
