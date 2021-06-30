@@ -948,11 +948,18 @@ UserTypeNode *TypeInferVisitor::VisitUserTypeNode(UserTypeNode *node) {
   if (idnode && idnode->IsIdentifier()) {
     IdentifierNode *id = static_cast<IdentifierNode *>(idnode);
     TreeNode *type = mHandler->FindType(id);
-    if (type && type->IsUserType()) {
+    if (type && type != node && type->IsUserType()) {
       UserTypeNode *ut = static_cast<UserTypeNode *>(type);
-      node->SetType(ut->GetType());
-      // share UserNode (?)
-      return ut;
+      if (parent->IsIdentifier()) {
+        IdentifierNode *pid = static_cast<IdentifierNode *>(parent);
+        TreeNode *t = ut->GetParent();
+        // this updats parent for ut
+        pid->SetType(ut);
+        // restore parent for ut
+        ut->SetParent(t);
+        // clear parent for node
+        node->SetParent(NULL);
+      }
     }
   }
   return node;
