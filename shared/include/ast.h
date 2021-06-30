@@ -142,6 +142,7 @@ public:
   void        SetAsTypeAtIndex(unsigned i, AsTypeNode* n) {*(mAsTypes.RefAtIndex(i)) = n;}
 
   virtual void Dump(unsigned){}
+  virtual void D(){Dump(0); std::cout << std::endl;}
   void DumpIndentation(unsigned);
   void DumpLabel(unsigned);
 
