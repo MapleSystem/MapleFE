@@ -74,6 +74,8 @@ enum NodeKind {
 class AnnotationNode;
 class AsTypeNode;
 class IdentifierNode;
+class UserTypeNode;
+
 class TreeNode {
 protected:
   NodeKind  mKind;
@@ -436,14 +438,14 @@ public:
 
 class TypeAliasNode : public TreeNode {
 private:
-  IdentifierNode *mId;
-  TreeNode       *mAlias;
+  UserTypeNode *mId;
+  TreeNode     *mAlias;
 public:
   TypeAliasNode() : TreeNode(NK_TypeAlias), mId(NULL), mAlias(NULL){}
   ~TypeAliasNode() {}
 
-  IdentifierNode* GetId() {return mId;}
-  void SetId(IdentifierNode *id) {mId = id;}
+  UserTypeNode* GetId() {return mId;}
+  void SetId(UserTypeNode *id) {mId = id;}
 
   TreeNode* GetAlias() {return mAlias;}
   void SetAlias(TreeNode *n) {mAlias = n;}

@@ -3063,7 +3063,11 @@ TreeNode* ASTBuilder::AddTypeGenerics() {
   TreeNode *args = p_args.mData.mTreeNode;
   MASSERT(args);
 
-  if (mLastTreeNode->IsUserType()) {
+  if (mLastTreeNode->IsTypeAlias()) {
+    TypeAliasNode *type_alias = (TypeAliasNode*)mLastTreeNode;
+    UserTypeNode *n = type_alias->GetId();
+    n->AddTypeGeneric(args);
+  } else if (mLastTreeNode->IsUserType()) {
     UserTypeNode *type_node = (UserTypeNode*)mLastTreeNode;
     type_node->AddTypeGeneric(args);
   } else if (mLastTreeNode->IsCall()) {
@@ -3171,13 +3175,7 @@ TreeNode* ASTBuilder::BuildInterUserType() {
   return mLastTreeNode;
 }
 
-// This is a bit complicated.
-//
 // It takes two arguments. The alias name, and they orig type.
-// 1. If the original type has no ID, and it's just a union/inter type created on the fly,
-//    we will reuse the orig and simply apply the name to it.
-// 2. For everything else, we create a new UserType
-
 TreeNode* ASTBuilder::BuildTypeAlias() {
   if (mTrace)
     std::cout << "In BuildTypeAlias" << std::endl;
@@ -3186,28 +3184,22 @@ TreeNode* ASTBuilder::BuildTypeAlias() {
   MASSERT (p_name.mIsTreeNode);
   TreeNode *name = p_name.mData.mTreeNode;
   MASSERT(name->IsIdentifier());
+  IdentifierNode *id = (IdentifierNode*)name;
+
+  UserTypeNode *user_type = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
+  new (user_type) UserTypeNode();
+  user_type->SetId(id);
 
   Param p_orig = mParams[1];
   MASSERT (p_orig.mIsTreeNode);
   TreeNode *orig = p_orig.mData.mTreeNode;
 
-  if (orig->IsUserType()) {
-    UserTypeNode *u_o = (UserTypeNode*)orig;
-    if ((u_o->GetType() == UT_Union || u_o->GetType() == UT_Inter) &&
-        (u_o->GetId() == NULL)) {
-      u_o->SetId(name);
-      mLastTreeNode = u_o;
-      return mLastTreeNode;
-    }
-  }
+  TypeAliasNode *type_alias = (TypeAliasNode*)gTreePool.NewTreeNode(sizeof(TypeAliasNode));
+  new (type_alias) TypeAliasNode();
+  type_alias->SetId(user_type);
+  type_alias->SetAlias(orig);
 
-  UserTypeNode *user_type = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
-  new (user_type) UserTypeNode();
-  user_type->SetId(name);
-  user_type->SetAliased(orig);
-  user_type->SetType(UT_Alias);
-
-  mLastTreeNode = user_type;
+  mLastTreeNode = type_alias;
   return mLastTreeNode;
 }
 
