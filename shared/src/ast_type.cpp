@@ -70,8 +70,6 @@ void UserTypeNode::Dump(unsigned ind) {
     DUMP0_NORETURN("union ");
   else if (mType == UT_Inter)
     DUMP0_NORETURN("intersect ");
-  else if (mType == UT_Alias)
-    DUMP0_NORETURN("alias ");
 
   if (mId)
     mId->Dump(0);
@@ -86,11 +84,6 @@ void UserTypeNode::Dump(unsigned ind) {
         DUMP0_NORETURN(',');
     }
     DUMP0_NORETURN('>');
-  }
-
-  if (mAliased) {
-    DUMP0_NORETURN("=");
-    mAliased->Dump(0);
   }
 
   size = mUnionInterTypes.GetNum();

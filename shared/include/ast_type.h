@@ -72,7 +72,6 @@ enum UT_Type {
   UT_Regular, // the normal user type, it could be just a name.
   UT_Union,   // Union of two other types.
   UT_Inter,   // Intersection of other types.
-  UT_Alias,   // Intersection of other types.
 };
 
 class UserTypeNode : public TreeNode {
@@ -82,7 +81,6 @@ private:
   TreeNode *mId;
 
   UT_Type   mType;
-  TreeNode *mAliased;     // The orig type in UT_Alias.
   DimensionNode *mDims;
 
   // the set of types in union or intersection.
@@ -95,7 +93,7 @@ private:
 
 public:
   UserTypeNode(TreeNode *n) : TreeNode(NK_UserType),
-    mId(n), mType(UT_Regular), mDims(NULL), mAliased(NULL) { if(n) n->SetParent(this); }
+    mId(n), mType(UT_Regular), mDims(NULL) { if(n) n->SetParent(this); }
   UserTypeNode() : UserTypeNode(NULL) {}
   ~UserTypeNode(){Release();}
 
@@ -114,9 +112,6 @@ public:
 
   UT_Type GetType() {return mType;}
   void SetType(UT_Type t) {mType = t;}
-
-  void SetAliased(TreeNode *t) {mAliased = t;}
-  TreeNode* GetAliased() {return mAliased;}
 
   DimensionNode* GetDims()       {return mDims;}
   void SetDims(DimensionNode *d) {mDims = d;}

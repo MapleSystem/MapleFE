@@ -1462,15 +1462,11 @@ std::string Emitter::EmitUserTypeNode(UserTypeNode *node) {
   if(k != UT_Regular) {
     if(!str.empty())
       str = "type "s + str + " = "s;
-    if(k == UT_Alias)
-      str += EmitTreeNode(node->GetAliased());
-    else {
-      std::string op = k == UT_Union ? " | "s : " & "s;
-      for (unsigned i = 0; i < node->GetUnionInterTypesNum(); ++i) {
-        if(i)
-          str += op;
-        str += EmitTreeNode(node->GetUnionInterType(i));
-      }
+    std::string op = k == UT_Union ? " | "s : " & "s;
+    for (unsigned i = 0; i < node->GetUnionInterTypesNum(); ++i) {
+      if(i)
+        str += op;
+      str += EmitTreeNode(node->GetUnionInterType(i));
     }
   }
 
