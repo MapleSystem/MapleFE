@@ -693,6 +693,12 @@ StructNode *CfgBuilder::VisitStructNode(StructNode *node) {
   return node;
 }
 
+// For statement of current BB
+TypeAliasNode *CfgBuilder::VisitTypeAliasNode(TypeAliasNode *node) {
+  mCurrentBB->AddStatement(node);
+  return node;
+}
+
 TreeNode *CfgBuilder::BaseTreeNode(TreeNode *node) {
   return node;
 }

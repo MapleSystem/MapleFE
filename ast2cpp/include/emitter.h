@@ -47,6 +47,8 @@ public:
 
   virtual std::string EmitAnnotationNode(AnnotationNode *node);
   virtual std::string EmitAsTypeNode(AsTypeNode *node);
+  virtual std::string EmitIdentifierNode(IdentifierNode *node);
+  virtual std::string EmitUserTypeNode(UserTypeNode *node);
   virtual std::string EmitPackageNode(PackageNode *node);
   virtual std::string EmitXXportAsPairNode(XXportAsPairNode *node);
   virtual std::string EmitDeclareNode(DeclareNode *node);
@@ -55,12 +57,12 @@ public:
   virtual std::string EmitUnaOperatorNode(UnaOperatorNode *node);
   virtual std::string EmitBinOperatorNode(BinOperatorNode *node);
   virtual std::string EmitTerOperatorNode(TerOperatorNode *node);
+  virtual std::string EmitTypeAliasNode(TypeAliasNode *node);
   virtual std::string EmitTypeParameterNode(TypeParameterNode *node);
   virtual std::string EmitBlockNode(BlockNode *node);
   virtual std::string EmitNewNode(NewNode *node);
   virtual std::string EmitDeleteNode(DeleteNode *node);
   virtual std::string EmitDimensionNode(DimensionNode *node);
-  virtual std::string EmitIdentifierNode(IdentifierNode *node);
   virtual std::string EmitDeclNode(DeclNode *node);
   virtual std::string EmitAnnotationTypeNode(AnnotationTypeNode *node);
   virtual std::string EmitCastNode(CastNode *node);
@@ -108,7 +110,6 @@ public:
   virtual std::string EmitInNode(InNode *node);
   virtual std::string EmitModuleNode(ModuleNode *node);
   virtual std::string EmitAttrNode(AttrNode *node);
-  virtual std::string EmitUserTypeNode(UserTypeNode *node);
   virtual std::string EmitPrimTypeNode(PrimTypeNode *node);
   virtual std::string EmitPrimArrayTypeNode(PrimArrayTypeNode *node);
 
