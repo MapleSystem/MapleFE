@@ -462,8 +462,8 @@ std::string CppDef::EmitSwitchNode(SwitchNode *node) {
   if (node == nullptr)
     return std::string();
   bool doable = true;
-  for (unsigned i = 0; i < node->GetCasesNum(); ++i) {
-    if (SwitchCaseNode* c = node->GetCaseAtIndex(i)) {
+  for (unsigned i = 0; i < node->GetCasesNum(); ++i)
+    if (SwitchCaseNode* c = node->GetCaseAtIndex(i))
       for (unsigned j = 0; j < c->GetLabelsNum(); ++j) {
         auto l = c->GetLabelAtIndex(j);
         if (l && l->GetKind() == NK_SwitchLabel) {
@@ -475,8 +475,6 @@ std::string CppDef::EmitSwitchNode(SwitchNode *node) {
             }
         }
       }
-    }
-  }
 out_of_loops:
   std::string str;
   if(doable) {
@@ -502,9 +500,9 @@ out_of_loops:
     str += ";\n"s;
     std::string body;
     std::string other = "goto "s + label + ";\n"s;;
-    for (unsigned i = 0; i < node->GetCasesNum(); ++i) {
+    for (unsigned i = 0; i < node->GetCasesNum(); ++i)
       if (SwitchCaseNode* cn = node->GetCaseAtIndex(i)) {
-        for (unsigned j = 0; j < cn->GetLabelsNum(); ++j) {
+        for (unsigned j = 0; j < cn->GetLabelsNum(); ++j)
           if (SwitchLabelNode* ln = cn->GetLabelAtIndex(j)) {
             if(ln->IsDefault())
               other = "goto __case_"s + std::to_string(cn->GetNodeId()) + ";\n"s;
@@ -514,21 +512,16 @@ out_of_loops:
                 + "))\ngoto __case_"s + std::to_string(cn->GetNodeId()) + ";\n"s;
             }
           }
-        }
         body += "__case_"s + std::to_string(cn->GetNodeId()) + ":\n"s;
-        for (unsigned s = 0; s < cn->GetStmtsNum(); ++s) {
+        for (unsigned s = 0; s < cn->GetStmtsNum(); ++s)
           if (TreeNode* t = cn->GetStmtAtIndex(s))
             body += EmitTreeNode(t);
-        }
-        body += "goto "s + label + ";\n"s;
       }
-    }
     str += other + body;
     str += "} while(0);\n"s + label + ":;\n"s;
   }
-  if(TreeNode* n = node->GetLabel()) {
+  if(TreeNode* n = node->GetLabel())
     str += "__label_break_"s + EmitTreeNode(n) + ":;\n"s;
-  }
   return str;
 }
 
