@@ -301,9 +301,10 @@ std::string CppDef::EmitForLoopNode(ForLoopNode *node) {
     case FLP_JSOf:
       {
         if (auto n = node->GetVariable()) {
-          str += EmitTreeNode(n);
+          std::string s = EmitTreeNode(n);
+          str += "auto "s + Clean(s);
         }
-        str += " of "s;
+        str += " : "s;
         if (auto n = node->GetSet()) {
           str += EmitTreeNode(n);
         }
