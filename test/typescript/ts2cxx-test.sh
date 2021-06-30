@@ -1,12 +1,15 @@
 #!/bin/bash -x
 # Usage: cd MapleFE/test/typescript/unit_tests; ../ts2cpp-test.sh *.ts
 SUCC=
+TSOUT=$(cd $(dirname $0)/../../; pwd)/output/typescript
+TS2AST=$TSOUT/bin/ts2ast
+AST2CPP=$TSOUT/bin/ast2cpp
 log=cxx.log
 for f; do
   t=$(basename $f .ts)
   [ -f $t.ts ] && f=$t.ts
-  ts2ast $f || continue
-  ast2cpp $f.ast || continue
+  $TS2AST $f || continue
+  $AST2CPP $f.ast || continue
   g++ $t.cpp -o $t || continue
   ./$t || continue
   SUCC="$SUCC $t"
