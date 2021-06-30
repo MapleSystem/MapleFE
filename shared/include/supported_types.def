@@ -21,6 +21,8 @@ TYPE(Array)
 TYPE(Object)
 TYPE(Function)  // function/lambda decl
 TYPE(Class)     // class/interface decl
+TYPE(User)      // user types
+TYPE(Merge)     // merge of two types, unexpected
 
 TYPE(Boolean)
 TYPE(Byte)
