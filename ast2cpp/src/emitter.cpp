@@ -92,9 +92,15 @@ std::string Emitter::EmitAnnotationNode(AnnotationNode *node) {
   if (auto n = node->GetType()) {
     str += " "s + EmitAnnotationTypeNode(n);
   }
-  //if (auto n = node->GetExpr()) {
-  //  str += " "s + EmitTreeNode(n);
-  //}
+
+  for (unsigned i = 0; i < node->GetArgsNum(); ++i) {
+    if (i)
+      str += ", "s;
+    if (auto n = node->GetArgAtIndex(i)) {
+      str += " "s + EmitTreeNode(n);
+    }
+  }
+
   if (node->IsStmt())
     str += ";\n"s;
   return HandleTreeNode(str, node);
@@ -141,6 +147,46 @@ std::string Emitter::EmitIdentifierNode(IdentifierNode *node) {
     }
   }
   mPrecedence = '\030';
+  if (node->IsStmt())
+    str += ";\n"s;
+  return HandleTreeNode(str, node);
+}
+
+std::string Emitter::EmitUserTypeNode(UserTypeNode *node) {
+  if (node == nullptr)
+    return std::string();
+  std::string str;
+  if (auto n = node->GetId()) {
+    str = EmitTreeNode(n);
+    auto num = node->GetTypeGenericsNum();
+    if(num) {
+      str += "<"s;
+      for (unsigned i = 0; i < num; ++i) {
+        if (i)
+          str += ", "s;
+        if (auto n = node->GetTypeGeneric(i)) {
+          str += EmitTreeNode(n);
+        }
+      }
+      str += ">"s;
+    }
+  }
+
+  auto k = node->GetType();
+  if(k != UT_Regular) {
+    if(!str.empty())
+      str = "type "s + str + " = "s;
+    std::string op = k == UT_Union ? " | "s : " & "s;
+    for (unsigned i = 0; i < node->GetUnionInterTypesNum(); ++i) {
+      if(i)
+        str += op;
+      str += EmitTreeNode(node->GetUnionInterType(i));
+    }
+  }
+
+  if (auto n = node->GetDims()) {
+    str += EmitDimensionNode(n);
+  }
   if (node->IsStmt())
     str += ";\n"s;
   return HandleTreeNode(str, node);
@@ -1428,51 +1474,38 @@ std::string Emitter::EmitInNode(InNode *node) {
   return HandleTreeNode(str, node);
 }
 
+std::string Emitter::EmitModuleNode(ModuleNode *node) {
+  if (node == nullptr)
+    return std::string();
+  std::string str("// Filename: "s);
+  str += node->GetFileName() + "\n"s;
+  //str += AstDump::GetEnumSrcLang(node->GetSrcLang());
+  /*
+  if (auto n = node->GetPackage()) {
+    str += " "s + EmitPackageNode(n);
+  }
+
+  for (unsigned i = 0; i < node->GetImportsNum(); ++i) {
+    if (i)
+      str += ", "s;
+    if (auto n = node->GetImport(i)) {
+      str += " "s + EmitImportNode(n);
+    }
+  }
+  */
+  for (unsigned i = 0; i < node->GetTreesNum(); ++i) {
+    if (auto n = node->GetTree(i)) {
+      str += EmitTreeNode(n);
+    }
+  }
+  return HandleTreeNode(str, node);
+}
+
 std::string Emitter::EmitAttrNode(AttrNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
   str += " "s + AstDump::GetEnumAttrId(node->GetId());
-  if (node->IsStmt())
-    str += ";\n"s;
-  return HandleTreeNode(str, node);
-}
-
-std::string Emitter::EmitUserTypeNode(UserTypeNode *node) {
-  if (node == nullptr)
-    return std::string();
-  std::string str;
-  if (auto n = node->GetId()) {
-    str = EmitTreeNode(n);
-    auto num = node->GetTypeGenericsNum();
-    if(num) {
-      str += "<"s;
-      for (unsigned i = 0; i < num; ++i) {
-        if (i)
-          str += ", "s;
-        if (auto n = node->GetTypeGeneric(i)) {
-          str += EmitTreeNode(n);
-        }
-      }
-      str += ">"s;
-    }
-  }
-
-  auto k = node->GetType();
-  if(k != UT_Regular) {
-    if(!str.empty())
-      str = "type "s + str + " = "s;
-    std::string op = k == UT_Union ? " | "s : " & "s;
-    for (unsigned i = 0; i < node->GetUnionInterTypesNum(); ++i) {
-      if(i)
-        str += op;
-      str += EmitTreeNode(node->GetUnionInterType(i));
-    }
-  }
-
-  if (auto n = node->GetDims()) {
-    str += EmitDimensionNode(n);
-  }
   if (node->IsStmt())
     str += ";\n"s;
   return HandleTreeNode(str, node);
@@ -1498,33 +1531,6 @@ std::string Emitter::EmitPrimArrayTypeNode(PrimArrayTypeNode *node) {
   }
   if (node->IsStmt())
     str += ";\n"s;
-  return HandleTreeNode(str, node);
-}
-
-std::string Emitter::EmitModuleNode(ModuleNode *node) {
-  if (node == nullptr)
-    return std::string();
-  std::string str("// Filename: "s);
-  str += node->GetFileName() + "\n"s;
-  //str += AstDump::GetEnumSrcLang(node->GetSrcLang());
-  /*
-  if (auto n = node->GetPackage()) {
-    str += " "s + EmitPackageNode(n);
-  }
-
-  for (unsigned i = 0; i < node->GetImportsNum(); ++i) {
-    if (i)
-      str += ", "s;
-    if (auto n = node->GetImport(i)) {
-      str += " "s + EmitImportNode(n);
-    }
-  }
-  */
-  for (unsigned i = 0; i < node->GetTreesNum(); ++i) {
-    if (auto n = node->GetTree(i)) {
-      str += EmitTreeNode(n);
-    }
-  }
   return HandleTreeNode(str, node);
 }
 
