@@ -445,10 +445,10 @@ public:
   ~TypeAliasNode() {}
 
   UserTypeNode* GetId() {return mId;}
-  void SetId(UserTypeNode *id) {mId = id;}
+  void SetId(UserTypeNode *id);
 
   TreeNode* GetAlias() {return mAlias;}
-  void SetAlias(TreeNode *n) {mAlias = n;}
+  void SetAlias(TreeNode *n);
 
   void Dump(unsigned);
 };

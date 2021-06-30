@@ -952,7 +952,7 @@ UserTypeNode *TypeInferVisitor::VisitUserTypeNode(UserTypeNode *node) {
       UserTypeNode *ut = static_cast<UserTypeNode *>(type);
       node->SetType(ut->GetType());
       // share UserNode (?)
-      // return ut;
+      return ut;
     }
   }
   return node;

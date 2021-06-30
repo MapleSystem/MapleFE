@@ -629,4 +629,14 @@ UserTypeNode *BuildScopeVisitor::VisitUserTypeNode(UserTypeNode *node) {
   return node;
 }
 
+TypeAliasNode *BuildScopeVisitor::VisitTypeAliasNode(TypeAliasNode *node) {
+  ASTScope *parent = mScopeStack.top();
+  AstVisitor::VisitTypeAliasNode(node);
+  UserTypeNode *ut = node->GetId();
+  if (ut) {
+    parent->AddType(ut);
+  }
+  return node;
+}
+
 }

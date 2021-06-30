@@ -149,6 +149,7 @@ class BuildScopeVisitor : public AstVisitor {
   InterfaceNode *VisitInterfaceNode(InterfaceNode *node);
   DeclNode *VisitDeclNode(DeclNode *node);
   UserTypeNode *VisitUserTypeNode(UserTypeNode *node);
+  TypeAliasNode *VisitTypeAliasNode(TypeAliasNode *node);
 };
 
 }

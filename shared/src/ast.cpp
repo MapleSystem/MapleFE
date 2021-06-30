@@ -375,6 +375,16 @@ void FieldNode::Dump(unsigned indent) {
 //                           TypeAlias Node
 //////////////////////////////////////////////////////////////////////////////////////
 
+void TypeAliasNode::SetId(UserTypeNode *id) {
+  mId = id;
+  SETPARENT(mId);
+}
+
+void TypeAliasNode::SetAlias(TreeNode *n) {
+  mAlias = n;
+  SETPARENT(mAlias);
+}
+
 void TypeAliasNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   DUMP0_NORETURN(" type ");
