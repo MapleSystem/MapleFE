@@ -73,6 +73,7 @@ enum NodeKind {
 
 class AnnotationNode;
 class AsTypeNode;
+class IdentifierNode;
 class TreeNode {
 protected:
   NodeKind  mKind;
@@ -424,6 +425,28 @@ public:
   void SetOpndA(TreeNode* t) {mOpndA = t; SETPARENT(t);}
   void SetOpndB(TreeNode* t) {mOpndB = t; SETPARENT(t);}
   void SetOpndC(TreeNode* t) {mOpndC = t; SETPARENT(t);}
+
+  void Dump(unsigned);
+};
+
+//////////////////////////////////////////////////////////////////////////
+//                      TypeAliasNode
+// The syntax is type alias in Typescript, typedef in c/c++
+//////////////////////////////////////////////////////////////////////////
+
+class TypeAliasNode : public TreeNode {
+private:
+  IdentifierNode *mId;
+  TreeNode       *mAlias;
+public:
+  TypeAliasNode() : TreeNode(NK_TypeAlias), mId(NULL), mAlias(NULL){}
+  ~TypeAliasNode() {}
+
+  IdentifierNode* GetId() {return mId;}
+  void SetId(IdentifierNode *id) {mId = id;}
+
+  TreeNode* GetAlias() {return mAlias;}
+  void SetAlias(TreeNode *n) {mAlias = n;}
 
   void Dump(unsigned);
 };

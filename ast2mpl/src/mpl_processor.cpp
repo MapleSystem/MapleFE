@@ -877,6 +877,10 @@ maple::BaseNode *A2M::ProcessBindingPattern(StmtExprKind skind, TreeNode *tnode,
   return nullptr;
 }
 
+maple::BaseNode *A2M::ProcessTypeAlias(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
+  return nullptr;
+}
+
 maple::BaseNode *A2M::ProcessAsType(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
   return nullptr;
 }

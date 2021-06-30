@@ -474,6 +474,10 @@ void Verifier::VerifyTypeOf(TypeOfNode *tree){
   return;
 }
 
+void Verifier::VerifyTypeAlias(TypeAliasNode *tree){
+  return;
+}
+
 void Verifier::VerifyAsType(AsTypeNode *tree){
   return;
 }
