@@ -477,6 +477,12 @@ std::string CppDef::EmitSwitchNode(SwitchNode *node) {
         }
       }
 out_of_loops:
+  std::string label;
+  TreeNode* lab = node->GetLabel();
+  if(lab)
+    label = "__label_break_"s + EmitTreeNode(lab);
+  else
+    label = "__label_switch_" + std::to_string(node->GetNodeId());
   std::string str;
   if(doable) {
     str = "switch("s;
@@ -491,7 +497,6 @@ out_of_loops:
     }
     str += "}\n"s;
   } else {
-    std::string label = "__label_switch_" + std::to_string(node->GetNodeId());
     std::string tmp = "__tmp_"s + std::to_string(node->GetNodeId());
     str = "do { // switch\nauto "s + tmp + " = "s;
     if (TreeNode* n = node->GetExpr()) {
@@ -519,10 +524,10 @@ out_of_loops:
             body += EmitTreeNode(t);
       }
     str += other + body;
-    str += "} while(0);\n"s + label + ":;\n"s;
+    str += "} while(0);\n"s;
   }
-  if(TreeNode* n = node->GetLabel())
-    str += "__label_break_"s + EmitTreeNode(n) + ":;\n"s;
+  if(!doable || lab)
+    str += label + ":;\n"s;
   return str;
 }
 
