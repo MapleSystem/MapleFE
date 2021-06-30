@@ -1939,7 +1939,7 @@ public:
   ~TypeOfNode(){Release();}
 
   TreeNode* GetExpr()            {return mExpr;}
-  void      SetExpr(TreeNode *n) {mExpr = n;}
+  void      SetExpr(TreeNode *n) {mExpr = n; SETPARENT(n);}
 
   void Dump(unsigned);
 };
