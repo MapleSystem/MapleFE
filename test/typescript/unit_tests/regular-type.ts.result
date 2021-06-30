@@ -13,6 +13,6 @@ class  Klass
   LocalInterfaces: 
 
 == Sub Tree ==
-alias K=Klass
+ type K = Klass
 == Sub Tree ==
 js_var Decl: a

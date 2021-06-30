@@ -11,7 +11,7 @@ ts_interface: A {id }
 == Sub Tree ==
 ts_interface: B {name }
 == Sub Tree ==
-intersect I = A & B
+ type I = intersect  = A & B
 == Sub Tree ==
 js_let Decl: v
 == Sub Tree ==
