@@ -16,6 +16,7 @@
 #ifndef __TS2CPP_RT_HEADER__
 #define __TS2CPP_RT_HEADER__
 
+#include <iostream>
 #include <vector>
 #include <string>
 #include <unordered_map>
@@ -34,57 +35,51 @@ class BaseObj;
 
 // JS types for props
 typedef enum JS_Type : uint8_t {
-  CG_Undef,     // "undefined"
-  CG_Null,      // "object"
-  CG_Bool,      // "boolean"
-  CG_Long,      // "number"
-  CG_Double,    // "number"
-  CG_BigInt,    // "bigint"
-  CG_String,    // "string"
-  CG_Symbol,    // "symbol"
-  CG_Function,  // "function"
-  CG_Object,    // "object"
-  CG_LAST,
-  RT_Undef = 16,
-  RT_Null,
-  RT_Bool,
-  RT_Long,
-  RT_Double,
-  RT_BigInt,
-  RT_String,
-  RT_Symbol,
-  RT_Function,
-  RT_Object,
-  RT_LAST
+  TY_Undef,     // "undefined"
+  TY_Null,      // "object"
+  TY_Bool,      // "boolean"
+  TY_Long,      // "number"
+  TY_Double,    // "number"
+  TY_BigInt,    // "bigint"
+  TY_String,    // "string"
+  TY_Symbol,    // "symbol"
+  TY_Function,  // "function"
+  TY_Object,    // "object"
+  TY_LAST,
 } JS_Type;
 
-typedef union JS_Val {
-  void*    field;      // used by compiler genereted fields only
-  bool     val_bool;
-  long     val_long;
-  double   val_double;
-  long     val_bigint;
-  std::string* val_string; // JS string primitive (not JS String object)
-  BaseObj* val_obj;    // for function, object (incl. String objects)
-} JS_Val;
+struct JS_Val {
+  union {
+    void*        field;      // used by compiler genereted fields only
+    bool         val_bool;
+    long         val_long;
+    double       val_double;
+    long         val_bigint;
+    std::string* val_string; // JS string primitive (not JS String object)
+    BaseObj*     val_obj;    // for function, object (incl. String objects)
+  } x;
+  JS_Type type;
+  bool    cxx;  // if it is a cxx field
+};
 
 typedef struct JS_Prop {
   JS_Val  val;
-  JS_Type type;
 
   // Prop directly generated as class fields when TS is compiled into CPP
   JS_Prop(JS_Type jstype, void* field) {
-    type = jstype;
-    val.field = field;
+    val.type = jstype;
+    val.x.field = field;
+    val.cxx = true;
   }
 
   // Prop created at runtime
-  JS_Prop(JS_Type jstype, JS_Val jsval) {
-    type = jstype;
-    val  = jsval;
+  JS_Prop(JS_Type jstype, bool v) {
+    val.type = jstype;
+    val.x.val_bool = v;
+    val.cxx = false;
   }
 
-  bool IsCompilerGenProp() { return !(type & 0x10); }
+  bool IsCxxProp() { return val.cxx; }
 
 } JS_Prop;
 
