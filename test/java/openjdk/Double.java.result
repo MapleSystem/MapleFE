@@ -2,7 +2,7 @@ Matched 5 tokens.
 Matched 12 tokens.
 Matched 19 tokens.
 Matched 26 tokens.
-Matched 976 tokens.
+Matched 973 tokens.
 ============= Module ===========
 == Sub Tree ==
 package java.lang
@@ -15,7 +15,7 @@ import sun.misc.DoubleConsts
 == Sub Tree ==
 class  Double
   Fields: 
-    POSITIVE_INFINITY=1 Div 0    NEGATIVE_INFINITY=Minus 1 Div 0    NaN=0 Div 0    MAX_VALUE=1.79769e+308    MIN_NORMAL=2.22507e-308    MIN_VALUE=4.94066e-324    MAX_EXPONENT=1023    MIN_EXPONENT=Minus 1022    SIZE=64    BYTES=SIZE Div Byte.SIZE    TYPE=()double.getComponentType()    value    serialVersionUID=Minus -694942468
+    POSITIVE_INFINITY=1 Div 0    NEGATIVE_INFINITY=Minus 1 Div 0    NaN=0 Div 0    MAX_VALUE=1.79769e+308    MIN_NORMAL=2.22507e-308    MIN_VALUE=4.94066e-324    MAX_EXPONENT=1023    MIN_EXPONENT=-1022    SIZE=64    BYTES=SIZE Div Byte.SIZE    TYPE=()double.getComponentType()    value    serialVersionUID=694942468
   Instance Initializer: 
   Constructors: 
     constructor  Double(value)  throws: 

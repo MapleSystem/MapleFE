@@ -1,12 +1,12 @@
 Matched 5 tokens.
-Matched 909 tokens.
+Matched 906 tokens.
 ============= Module ===========
 == Sub Tree ==
 package java.lang
 == Sub Tree ==
 class  Byte
   Fields: 
-    MIN_VALUE=Minus 128    MAX_VALUE=127    TYPE=()byte.getComponentType()    value    SIZE=8    BYTES=SIZE Div Byte.SIZE    serialVersionUID=Minus 296684260    DIGITS=    UPPER_CASE_DIGITS=
+    MIN_VALUE=-128    MAX_VALUE=127    TYPE=()byte.getComponentType()    value    SIZE=8    BYTES=SIZE Div Byte.SIZE    serialVersionUID=-296684260    DIGITS=    UPPER_CASE_DIGITS=
   Instance Initializer: 
   Constructors: 
     constructor  Byte(value)  throws: 

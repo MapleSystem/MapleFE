@@ -1,12 +1,12 @@
 Matched 5 tokens.
-Matched 44 tokens.
+Matched 43 tokens.
 ============= Module ===========
 == Sub Tree ==
 package java.lang
 == Sub Tree ==
 class  NoSuchFieldError
   Fields: 
-    serialVersionUID=Minus 1085931403
+    serialVersionUID=-1085931403
   Instance Initializer: 
   Constructors: 
     constructor  NoSuchFieldError()  throws: 

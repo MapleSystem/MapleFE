@@ -2,7 +2,7 @@ Matched 5 tokens.
 Matched 12 tokens.
 Matched 19 tokens.
 Matched 26 tokens.
-Matched 848 tokens.
+Matched 844 tokens.
 ============= Module ===========
 == Sub Tree ==
 package java.lang
@@ -15,7 +15,7 @@ import sun.misc.DoubleConsts
 == Sub Tree ==
 class  Float
   Fields: 
-    POSITIVE_INFINITY=1 Div 0    NEGATIVE_INFINITY=Minus 1 Div 0    NaN=0 Div 0    MAX_VALUE=3.40282e+38    MIN_NORMAL=1.17549e-38    MIN_VALUE=1.4013e-45    MAX_EXPONENT=127    MIN_EXPONENT=Minus 126    SIZE=32    BYTES=SIZE Div Byte.SIZE    TYPE=()float.getComponentType()    value    serialVersionUID=Minus 616763156
+    POSITIVE_INFINITY=1 Div 0    NEGATIVE_INFINITY=-1 Div 0    NaN=0 Div 0    MAX_VALUE=3.40282e+38    MIN_NORMAL=1.17549e-38    MIN_VALUE=1.4013e-45    MAX_EXPONENT=127    MIN_EXPONENT=-126    SIZE=32    BYTES=SIZE Div Byte.SIZE    TYPE=()float.getComponentType()    value    serialVersionUID=-616763156
   Instance Initializer: 
   Constructors: 
     constructor  Float(value)  throws: 

@@ -1,12 +1,12 @@
 Matched 5 tokens.
-Matched 44 tokens.
+Matched 43 tokens.
 ============= Module ===========
 == Sub Tree ==
 package java.lang
 == Sub Tree ==
 class  ClassCastException
   Fields: 
-    serialVersionUID=Minus 832051876
+    serialVersionUID=-832051876
   Instance Initializer: 
   Constructors: 
     constructor  ClassCastException()  throws: 

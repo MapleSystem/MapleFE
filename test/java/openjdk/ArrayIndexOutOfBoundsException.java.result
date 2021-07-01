@@ -1,12 +1,12 @@
 Matched 5 tokens.
-Matched 110 tokens.
+Matched 109 tokens.
 ============= Module ===========
 == Sub Tree ==
 package java.lang
 == Sub Tree ==
 class  ArrayIndexOutOfBoundsException
   Fields: 
-    serialVersionUID=Minus -1467917380
+    serialVersionUID=1467917380
   Instance Initializer: 
   Constructors: 
     constructor  ArrayIndexOutOfBoundsException()  throws: 

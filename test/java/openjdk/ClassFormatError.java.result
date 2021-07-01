@@ -1,12 +1,12 @@
 Matched 5 tokens.
-Matched 44 tokens.
+Matched 43 tokens.
 ============= Module ===========
 == Sub Tree ==
 package java.lang
 == Sub Tree ==
 class  ClassFormatError
   Fields: 
-    serialVersionUID=Minus -344126837
+    serialVersionUID=344126837
   Instance Initializer: 
   Constructors: 
     constructor  ClassFormatError()  throws: 

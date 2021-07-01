@@ -1,12 +1,12 @@
 Matched 5 tokens.
-Matched 44 tokens.
+Matched 43 tokens.
 ============= Module ===========
 == Sub Tree ==
 package java.lang
 == Sub Tree ==
 class  InstantiationException
   Fields: 
-    serialVersionUID=Minus -1305838986
+    serialVersionUID=1305838986
   Instance Initializer: 
   Constructors: 
     constructor  InstantiationException()  throws: 

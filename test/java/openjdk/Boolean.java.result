@@ -1,12 +1,12 @@
 Matched 5 tokens.
-Matched 442 tokens.
+Matched 440 tokens.
 ============= Module ===========
 == Sub Tree ==
 package java.lang
 == Sub Tree ==
 class  Boolean
   Fields: 
-    TRUE=new Boolean(true)    FALSE=new Boolean(false)    TYPE=()boolean.getComponentType()    value    serialVersionUID=Minus 711132434
+    TRUE=new Boolean(true)    FALSE=new Boolean(false)    TYPE=()boolean.getComponentType()    value    serialVersionUID=-711132434
   Instance Initializer: 
   Constructors: 
     constructor  Boolean(value)  throws: 

@@ -267,6 +267,62 @@ bool Parser::WasFailed(RuleTable *table, unsigned token) {
   return gFailed[table->mIndex].GetBit(token);
 }
 
+// return true if t can be merged with previous tokens.
+// This happens when "-3" is lexed as operator Sub and literal 3.
+// For Lexer' stance, this is the right thing to do. However, we do
+// need literal -3.
+bool Parser::TokenMerge(Token *t) {
+  if (!t->IsLiteral())
+    return false;
+  unsigned size = mActiveTokens.GetNum();
+  if (size < 2)
+    return false;
+
+  // We take care of a few scenarios.
+  //   = -1   <-- sep is an assignment operator
+  //   [-1    <-- sep is a separtor
+  Token *sep = mActiveTokens.ValueAtIndex(size - 2);
+  bool is_sep = false;
+  if (sep->IsSeparator() && (sep->GetSepId() != SEP_Rparen))
+    is_sep = true;
+  if (sep->IsOperator() && sep->GetOprId() == OPR_Assign)
+    is_sep = true;
+  if (!is_sep)
+    return false;
+
+  Token *opr = mActiveTokens.ValueAtIndex(size - 1);
+  if (!opr->IsOperator())
+    return false;
+
+  if ((opr->GetOprId() != OPR_Sub) && (opr->GetOprId() != OPR_Add))
+    return false;
+
+  LitData data = t->GetLitData();
+  if ((data.mType == LT_IntegerLiteral)) {
+    if (opr->GetOprId() == OPR_Sub) {
+      data.mData.mInt = (-1) * data.mData.mInt;
+      t->SetLiteral(data);
+      mActiveTokens.SetElem(size - 1, t);
+      return true;
+    } else if (opr->GetOprId() == OPR_Add) {
+      mActiveTokens.SetElem(size - 1, t);
+      return true;
+    }
+  } else if (data.mType == LT_FPLiteral) {
+    if (opr->GetOprId() == OPR_Sub) {
+      data.mData.mFloat = (-1) * data.mData.mFloat;
+      t->SetLiteral(data);
+      mActiveTokens.SetElem(size - 1, t);
+      return true;
+    } else if (opr->GetOprId() == OPR_Add) {
+      mActiveTokens.SetElem(size - 1, t);
+      return true;
+    }
+  }
+
+  return false;
+}
+
 // Lex all tokens in a line, save to mActiveTokens.
 // If no valuable in current line, we continue to the next line.
 // Returns the number of valuable tokens read. Returns 0 if EOF.
@@ -291,8 +347,10 @@ unsigned Parser::LexOneLine() {
         }
         // Put into the token storage, as Pending tokens.
         if (!is_whitespace && !t->IsComment()) {
-          mActiveTokens.PushBack(t);
-          token_num++;
+          if (!TokenMerge(t)) {
+            mActiveTokens.PushBack(t);
+            token_num++;
+          }
         }
       } else {
         MASSERT(0 && "Non token got? Problem here!");

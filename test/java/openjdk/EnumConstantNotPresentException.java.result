@@ -1,12 +1,12 @@
 Matched 5 tokens.
-Matched 105 tokens.
+Matched 104 tokens.
 ============= Module ===========
 == Sub Tree ==
 package java.lang
 == Sub Tree ==
 class  EnumConstantNotPresentException
   Fields: 
-    serialVersionUID=Minus 180673940    enumType    constantName
+    serialVersionUID=-180673940    enumType    constantName
   Instance Initializer: 
   Constructors: 
     constructor  EnumConstantNotPresentException(enumType,constantName)  throws: 

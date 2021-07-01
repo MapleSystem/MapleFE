@@ -1,12 +1,12 @@
 Matched 5 tokens.
-Matched 44 tokens.
+Matched 43 tokens.
 ============= Module ===========
 == Sub Tree ==
 package java.lang
 == Sub Tree ==
 class  NegativeArraySizeException
   Fields: 
-    serialVersionUID=Minus -868449419
+    serialVersionUID=868449419
   Instance Initializer: 
   Constructors: 
     constructor  NegativeArraySizeException()  throws: 

@@ -1,12 +1,12 @@
 Matched 5 tokens.
-Matched 44 tokens.
+Matched 43 tokens.
 ============= Module ===========
 == Sub Tree ==
 package java.lang
 == Sub Tree ==
 class  IllegalThreadStateException
   Fields: 
-    serialVersionUID=Minus 944817870
+    serialVersionUID=-944817870
   Instance Initializer: 
   Constructors: 
     constructor  IllegalThreadStateException()  throws: 

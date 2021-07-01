@@ -1,12 +1,12 @@
 Matched 5 tokens.
-Matched 44 tokens.
+Matched 43 tokens.
 ============= Module ===========
 == Sub Tree ==
 package java.lang
 == Sub Tree ==
 class  NoSuchMethodError
   Fields: 
-    serialVersionUID=Minus 515885159
+    serialVersionUID=-515885159
   Instance Initializer: 
   Constructors: 
     constructor  NoSuchMethodError()  throws: 

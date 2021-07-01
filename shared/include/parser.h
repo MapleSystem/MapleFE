@@ -390,8 +390,10 @@ public:
 
   bool Parse();
   ParseStatus  ParseStmt();
+
   void InitRecursion();
   unsigned LexOneLine();
+  bool TokenMerge(Token *);
 };
 
 }

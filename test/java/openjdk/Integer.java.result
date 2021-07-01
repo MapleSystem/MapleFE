@@ -1,6 +1,6 @@
 Matched 5 tokens.
 Matched 14 tokens.
-Matched 3758 tokens.
+Matched 3756 tokens.
 Convert unary --> binary
 Convert unary --> binary
 ============= Module ===========
@@ -473,7 +473,7 @@ while val NE 0 Land charPos GT 0
   LocalClasses: 
     class  IntegerCache
       Fields: 
-        low=Minus 128        high        cache[]
+        low=-128        high        cache[]
       Instance Initializer: 
         InstInit- 0
       Constructors: 
