@@ -27,14 +27,11 @@ namespace t2crt {
 using std::to_string;
 inline std::string to_string(std::string t) {return t;}
 
-// __JSVAL is set to be double for now
-// Should be a JS value type
-typedef double __JSVAL;
-
 class BaseObj;
 
 // JS types for props
 typedef enum JS_Type : uint8_t {
+  TY_None,      // Placeholder for non-existing property
   TY_Undef,     // "undefined"
   TY_Null,      // "object"
   TY_Bool,      // "boolean"
@@ -52,14 +49,20 @@ struct JS_Val {
   union {
     void*        field;      // used by compiler genereted fields only
     bool         val_bool;
-    long         val_long;
+    int64_t      val_long;
     double       val_double;
-    long         val_bigint;
+    void*        val_bigint;
     std::string* val_string; // JS string primitive (not JS String object)
     BaseObj*     val_obj;    // for function, object (incl. String objects)
   } x;
   JS_Type type;
   bool    cxx;  // if it is a cxx field
+
+  JS_Val() { x.val_long = 0l; type = TY_Undef; cxx = false; }
+  JS_Val(int64_t l, JS_Type t, bool c) { x.val_long = l; type = t; cxx = c; }
+  JS_Val(bool b)    { x.val_bool = b; type = TY_Bool; cxx = false; }
+  JS_Val(int64_t l) { x.val_long = l; type = TY_Long; cxx = false; }
+  JS_Val(double d)  { x.val_double = d; type = TY_Double; cxx = false; }
 };
 
 typedef struct JS_Prop {
@@ -67,16 +70,12 @@ typedef struct JS_Prop {
 
   // Prop directly generated as class fields when TS is compiled into CPP
   JS_Prop(JS_Type jstype, void* field) {
-    val.type = jstype;
-    val.x.field = field;
-    val.cxx = true;
+    val = { (int64_t)field, jstype, true };
   }
 
   // Prop created at runtime
   JS_Prop(JS_Type jstype, bool v) {
-    val.type = jstype;
-    val.x.val_bool = v;
-    val.cxx = false;
+    val = { (int64_t)v, jstype, false };
   }
 
   bool IsCxxProp() { return val.cxx; }
@@ -144,5 +143,24 @@ std::ostream& operator<< (std::ostream& out, const std::vector<T>& v) {
   }
   return out;
 }
+
+std::ostream& operator<< (std::ostream& out, const t2crt::JS_Val& v) {
+  switch(v.type) {
+    case t2crt::TY_None: out << "None"; break;
+    case t2crt::TY_Undef: out << "undefined"; break;
+    case t2crt::TY_Null: out << "null"; break;
+    case t2crt::TY_Bool: out << v.x.val_bool; break;
+    case t2crt::TY_Long: out << v.x.val_long; break;
+    case t2crt::TY_Double: out << v.x.val_double; break;
+    case t2crt::TY_BigInt: out << "bigint"; break;
+    case t2crt::TY_String: out << "string"; break;
+    case t2crt::TY_Symbol: out << "symbol"; break;
+    case t2crt::TY_Function: out << "function"; break;
+    case t2crt::TY_Object: out << "object"; break;
+  }
+  return out;
+}
+
+const t2crt::JS_Val undefined = { 0, t2crt::TY_Undef, false };
 
 #endif

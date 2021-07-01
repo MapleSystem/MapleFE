@@ -128,7 +128,7 @@ std::string CppDecl::EmitIdentifierNode(IdentifierNode *node) {
   else if (auto n = node->GetType())
     str += EmitTreeNode(n);
   else
-    str += "t2crt::__JSVAL"s; // Use __JSVAL for unknown type
+    str += "t2crt::JS_Val"s;
   str += " "s + node->GetName();
   return str;
 }
