@@ -516,6 +516,8 @@ static std::string GetEnumLitData(LitData lit) {{
       return std::string("this");
     case LT_SuperLiteral:
       return std::string("super");
+    case LT_VoidLiteral:
+      return std::string("void 0");
     case LT_NA:
       return std::string("NA");
     default:
