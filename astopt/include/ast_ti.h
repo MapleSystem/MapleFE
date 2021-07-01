@@ -155,6 +155,7 @@ class ShareUTVisitor : public AstVisitor {
   bool            mTrace;
   bool            mUpdated;
 
+  std::stack<ASTScope *> mScopeStack;
   std::unordered_set<unsigned> ExportedDeclIds;
 
  public:
@@ -162,6 +163,14 @@ class ShareUTVisitor : public AstVisitor {
     : mHandler(h), mTrace(t), AstVisitor(t && base) {}
   ~ShareUTVisitor() = default;
 
+  void Push(ASTScope *scope) { mScopeStack.push(scope); }
+  void Pop() { mScopeStack.pop(); }
+
+  BlockNode *VisitBlockNode(BlockNode *node);
+  FunctionNode *VisitFunctionNode(FunctionNode *node);
+  LambdaNode *VisitLambdaNode(LambdaNode *node);
+  ClassNode *VisitClassNode(ClassNode *node);
+  InterfaceNode *VisitInterfaceNode(InterfaceNode *node);
   UserTypeNode *VisitUserTypeNode(UserTypeNode *node);
 };
 

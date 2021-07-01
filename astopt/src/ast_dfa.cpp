@@ -528,6 +528,11 @@ FunctionNode *BuildScopeVisitor::VisitFunctionNode(FunctionNode *node) {
     scope->AddDecl(it);
   }
 
+  for(unsigned i = 0; i < node->GetTypeParamsNum(); i++) {
+    TreeNode *it = node->GetTypeParamAtIndex(i);
+    scope->AddType(it);
+  }
+
   mScopeStack.push(scope);
 
   AstVisitor::VisitFunctionNode(node);

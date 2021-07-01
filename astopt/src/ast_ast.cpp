@@ -117,12 +117,38 @@ IdentifierNode *AdjustASTVisitor::VisitIdentifierNode(IdentifierNode *node) {
   return node;
 }
 
-// set parent for some function return type
+TreeNode *AdjustASTVisitor::CreateTypeNodeFromName(IdentifierNode *node) {
+  UserTypeNode *ut = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
+  new (ut) UserTypeNode(node);
+  return ut;
+}
+
+// set UserTypeNode's mStrIdx to be its mId's if exist
+UserTypeNode *AdjustASTVisitor::VisitUserTypeNode(UserTypeNode *node) {
+  (void) AstVisitor::VisitUserTypeNode(node);
+  TreeNode *id = node->GetId();
+  if (id && id->IsIdentifier()) {
+    node->SetStrIdx(id->GetStrIdx());
+  }
+  return node;
+}
+
 FunctionNode *AdjustASTVisitor::VisitFunctionNode(FunctionNode *node) {
   (void) AstVisitor::VisitFunctionNode(node);
   TreeNode *type = node->GetType();
   if (type && type->IsUserType()) {
     type->SetParent(node);
+  }
+  // Refine function TypeParames
+  for(unsigned i = 0; i < node->GetTypeParamsNum(); i++) {
+    type = node->GetTypeParamAtIndex(i);
+    if (type->IsIdentifier()) {
+      IdentifierNode *inode = static_cast<IdentifierNode *>(type);
+      TreeNode *newtype = CreateTypeNodeFromName(inode);
+      node->SetTypeParamAtIndex(i, newtype);
+      newtype->SetParent(node);
+      newtype->SetStrIdx(inode->GetStrIdx());
+    }
   }
   return node;
 }

@@ -55,7 +55,7 @@ class AdjustASTVisitor : public AstVisitor {
     : mHandler(h), mTrace(t), AstVisitor(t && base) {}
   ~AdjustASTVisitor() = default;
 
-  void SetCurrentBB(CfgBB *b) { mCurrentBB = b; }
+  TreeNode *CreateTypeNodeFromName(IdentifierNode *node);
 
   DeclNode *VisitDeclNode(DeclNode *node);
   ExportNode *VisitExportNode(ExportNode *node);
@@ -64,6 +64,7 @@ class AdjustASTVisitor : public AstVisitor {
   LambdaNode *VisitLambdaNode(LambdaNode *node);
   IdentifierNode *VisitIdentifierNode(IdentifierNode *node);
   FunctionNode *VisitFunctionNode(FunctionNode *node);
+  UserTypeNode *VisitUserTypeNode(UserTypeNode *node);
 };
 
 }

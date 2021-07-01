@@ -25,9 +25,11 @@ namespace maplefe {
 void TypeInfer::TypeInference() {
   if (mTrace) std::cout << "============== TypeInfer ==============" << std::endl;
 
+  ModuleNode *module = mHandler->GetASTModule();
+
   // build mNodeId2Decl
   BuildIdNodeToDeclVisitor visitor_pass0(mHandler, mTrace, true);
-  visitor_pass0.Visit(mHandler->GetASTModule());
+  visitor_pass0.Visit(module);
 
   // type inference
   TypeInferVisitor visitor_pass1(mHandler, mTrace, true);
@@ -36,13 +38,14 @@ void TypeInfer::TypeInference() {
   while (visitor_pass1.GetUpdated()) {
     count++;
     visitor_pass1.SetUpdated(false);
-    visitor_pass1.Visit(mHandler->GetASTModule());
+    visitor_pass1.Visit(module);
     if (count > 10) break;
   }
 
   // share UserType
   ShareUTVisitor visitor_pass2(mHandler, mTrace, true);
-  visitor_pass2.Visit(mHandler->GetASTModule());
+  visitor_pass2.Push(module->GetRootScope());
+  visitor_pass2.Visit(module);
 
   if (mTrace) std::cout << "\n>>>>>> TypeInference() iterated " << count << " times\n" << std::endl;
 }
@@ -967,68 +970,83 @@ XXportAsPairNode *TypeInferVisitor::VisitXXportAsPairNode(XXportAsPairNode *node
   return node;
 }
 
+BlockNode *ShareUTVisitor::VisitBlockNode(BlockNode *node) {
+  if (mHandler->mNodeId2Scope.find(node->GetNodeId()) != mHandler->mNodeId2Scope.end()) {
+    ASTScope *scope = mHandler->mNodeId2Scope[node->GetNodeId()];
+    mScopeStack.push(scope);
+    (void) AstVisitor::VisitBlockNode(node);
+    mScopeStack.pop();
+  } else {
+    MASSERT(false && "no scope");
+  }
+  return node;
+}
+
+FunctionNode *ShareUTVisitor::VisitFunctionNode(FunctionNode *node) {
+  if (mHandler->mNodeId2Scope.find(node->GetNodeId()) != mHandler->mNodeId2Scope.end()) {
+    ASTScope *scope = mHandler->mNodeId2Scope[node->GetNodeId()];
+    mScopeStack.push(scope);
+    (void) AstVisitor::VisitFunctionNode(node);
+    mScopeStack.pop();
+  } else {
+    MASSERT(false && "no scope");
+  }
+  return node;
+}
+
+LambdaNode *ShareUTVisitor::VisitLambdaNode(LambdaNode *node) {
+  if (mHandler->mNodeId2Scope.find(node->GetNodeId()) != mHandler->mNodeId2Scope.end()) {
+    ASTScope *scope = mHandler->mNodeId2Scope[node->GetNodeId()];
+    mScopeStack.push(scope);
+    (void) AstVisitor::VisitLambdaNode(node);
+    mScopeStack.pop();
+  } else {
+    MASSERT(false && "no scope");
+  }
+  return node;
+}
+
+ClassNode *ShareUTVisitor::VisitClassNode(ClassNode *node) {
+  if (mHandler->mNodeId2Scope.find(node->GetNodeId()) != mHandler->mNodeId2Scope.end()) {
+    ASTScope *scope = mHandler->mNodeId2Scope[node->GetNodeId()];
+    mScopeStack.push(scope);
+    (void) AstVisitor::VisitClassNode(node);
+    mScopeStack.pop();
+  } else {
+    MASSERT(false && "no scope");
+  }
+  return node;
+}
+
+InterfaceNode *ShareUTVisitor::VisitInterfaceNode(InterfaceNode *node) {
+  if (mHandler->mNodeId2Scope.find(node->GetNodeId()) != mHandler->mNodeId2Scope.end()) {
+    ASTScope *scope = mHandler->mNodeId2Scope[node->GetNodeId()];
+    mScopeStack.push(scope);
+    (void) AstVisitor::VisitInterfaceNode(node);
+    mScopeStack.pop();
+  } else {
+    MASSERT(false && "no scope");
+  }
+  return node;
+}
+
 UserTypeNode *ShareUTVisitor::VisitUserTypeNode(UserTypeNode *node) {
   (void) AstVisitor::VisitUserTypeNode(node);
-  TreeNode *parent = node->GetParent();
-  if (parent) {
-    TypeId tid = TY_None;
-    UserTypeNode *ut = NULL;
-    IdentifierNode *var = NULL;
-    FunctionNode *func = NULL;
-    bool share = false;
 
-    if (parent->IsIdentifier()) {
-      var = static_cast<IdentifierNode *>(parent);
-      // var is user type, use original UserType
-      tid = var->GetTypeId();
-      if (tid == TY_None) {
-        tid = TY_User;
-      }
-    } else if (parent->IsFunction()) {
-      func = static_cast<FunctionNode *>(parent);
-      MASSERT(func->GetType() == node && "not function return type");
-      tid = func->GetType()->GetTypeId();
-    }
-
-    switch (tid) {
-      case TY_User: {
-        TreeNode *idnode = node->GetId();
-        if (idnode && idnode->IsIdentifier()) {
-          IdentifierNode *id = static_cast<IdentifierNode *>(idnode);
-          TreeNode *type = mHandler->FindType(id);
-          if (type && type != node && type->IsUserType()) {
-            ut = static_cast<UserTypeNode *>(type);
-            if (node->GetType() == ut->GetType()) {
-              // do not share if there are generics
-              share = (ut->GetTypeGenericsNum() == 0);
-            }
-          }
+  TreeNode *idnode = node->GetId();
+  if (idnode && idnode->IsIdentifier()) {
+    IdentifierNode *id = static_cast<IdentifierNode *>(idnode);
+    ASTScope *scope = mScopeStack.top();
+    TreeNode *type = scope->FindTypeOf(id);
+    if (type && type != node && type->IsUserType()) {
+      UserTypeNode *ut = static_cast<UserTypeNode *>(type);
+      if (node->GetType() == ut->GetType()) {
+        // do not share if there are generics
+        if (ut->GetTypeGenericsNum() == 0) {
+          return ut;
         }
-        break;
-      }
-      // reduced to more restrictive type
-      case TY_Int:
-      case TY_Long:
-      case TY_Float:
-      case TY_Double: {
-        // use dummy type node of the kind
-        // share = true;
-        break;
-      }
-      default:
-        break;
-    }
-
-    if (share) {
-      if (parent->IsIdentifier()) {
-        var->SetType(ut);
-        return ut;
-      } else if (parent->IsFunction()) {
-        func->SetType(ut);
-        return ut;
       }
     }
-
   }
   return node;
 }
