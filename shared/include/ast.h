@@ -609,7 +609,7 @@ public:
   TreeNode*   GetInit() {return mInit;}
   DimensionNode* GetDims() {return mDims;}
 
-  void SetType(TreeNode *t)      {mType = t; SETPARENT(t);}
+  void SetType(TreeNode *t)      {mType = t;}
   void SetInit(TreeNode *t)      {mInit = t; SETPARENT(t);}
   void ClearInit()               {mInit = NULL;}
   void SetDims(DimensionNode *t) {mDims = t; SETPARENT(t);}

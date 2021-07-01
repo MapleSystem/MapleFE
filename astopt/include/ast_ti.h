@@ -149,5 +149,21 @@ class TypeInferVisitor : public AstVisitor {
   XXportAsPairNode *VisitXXportAsPairNode(XXportAsPairNode *node);
 };
 
+class ShareUTVisitor : public AstVisitor {
+ private:
+  Module_Handler *mHandler;
+  bool            mTrace;
+  bool            mUpdated;
+
+  std::unordered_set<unsigned> ExportedDeclIds;
+
+ public:
+  explicit ShareUTVisitor(Module_Handler *h, bool t, bool base = false)
+    : mHandler(h), mTrace(t), AstVisitor(t && base) {}
+  ~ShareUTVisitor() = default;
+
+  UserTypeNode *VisitUserTypeNode(UserTypeNode *node);
+};
+
 }
 #endif

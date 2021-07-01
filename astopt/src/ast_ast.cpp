@@ -107,6 +107,26 @@ void AST_AST::AdjustAST() {
   }
 }
 
+// set parent for some identifier's type
+IdentifierNode *AdjustASTVisitor::VisitIdentifierNode(IdentifierNode *node) {
+  (void) AstVisitor::VisitIdentifierNode(node);
+  TreeNode *type = node->GetType();
+  if (type && type->IsUserType()) {
+    type->SetParent(node);
+  }
+  return node;
+}
+
+// set parent for some function return type
+FunctionNode *AdjustASTVisitor::VisitFunctionNode(FunctionNode *node) {
+  (void) AstVisitor::VisitFunctionNode(node);
+  TreeNode *type = node->GetType();
+  if (type && type->IsUserType()) {
+    type->SetParent(node);
+  }
+  return node;
+}
+
 // move init from identifier to decl
 // copy stridx to decl
 DeclNode *AdjustASTVisitor::VisitDeclNode(DeclNode *node) {

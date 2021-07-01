@@ -30,15 +30,20 @@ void TypeInfer::TypeInference() {
   visitor_pass0.Visit(mHandler->GetASTModule());
 
   // type inference
-  TypeInferVisitor visitor(mHandler, mTrace, true);
-  visitor.SetUpdated(true);
+  TypeInferVisitor visitor_pass1(mHandler, mTrace, true);
+  visitor_pass1.SetUpdated(true);
   int count = 0;
-  while (visitor.GetUpdated()) {
+  while (visitor_pass1.GetUpdated()) {
     count++;
-    visitor.SetUpdated(false);
-    visitor.Visit(mHandler->GetASTModule());
+    visitor_pass1.SetUpdated(false);
+    visitor_pass1.Visit(mHandler->GetASTModule());
     if (count > 10) break;
   }
+
+  // share UserType
+  ShareUTVisitor visitor_pass2(mHandler, mTrace, true);
+  visitor_pass2.Visit(mHandler->GetASTModule());
+
   if (mTrace) std::cout << "\n>>>>>> TypeInference() iterated " << count << " times\n" << std::endl;
 }
 
@@ -944,24 +949,6 @@ UserTypeNode *TypeInferVisitor::VisitUserTypeNode(UserTypeNode *node) {
       SetUpdated();
     }
   }
-  TreeNode *idnode = node->GetId();
-  if (idnode && idnode->IsIdentifier()) {
-    IdentifierNode *id = static_cast<IdentifierNode *>(idnode);
-    TreeNode *type = mHandler->FindType(id);
-    if (type && type != node && type->IsUserType()) {
-      UserTypeNode *ut = static_cast<UserTypeNode *>(type);
-      if (parent->IsIdentifier()) {
-        IdentifierNode *pid = static_cast<IdentifierNode *>(parent);
-        TreeNode *t = ut->GetParent();
-        // this updats parent for ut
-        pid->SetType(ut);
-        // restore parent for ut
-        ut->SetParent(t);
-        // clear parent for node
-        node->SetParent(NULL);
-      }
-    }
-  }
   return node;
 }
 
@@ -977,6 +964,64 @@ WhileLoopNode *TypeInferVisitor::VisitWhileLoopNode(WhileLoopNode *node) {
 
 XXportAsPairNode *TypeInferVisitor::VisitXXportAsPairNode(XXportAsPairNode *node) {
   (void) AstVisitor::VisitXXportAsPairNode(node);
+  return node;
+}
+
+UserTypeNode *ShareUTVisitor::VisitUserTypeNode(UserTypeNode *node) {
+  (void) AstVisitor::VisitUserTypeNode(node);
+  TreeNode *parent = node->GetParent();
+  if (parent) {
+    TypeId tid = TY_None;
+    UserTypeNode *ut = NULL;
+    IdentifierNode *var = NULL;
+    FunctionNode *func = NULL;
+    bool share = false;
+
+    if (parent->IsIdentifier()) {
+      var = static_cast<IdentifierNode *>(parent);
+      // var is user type, use original UserType
+      tid = var->GetTypeId();
+    } else if (parent->IsFunction()) {
+      func = static_cast<FunctionNode *>(parent);
+      MASSERT(func->GetType() == node && "not function return type");
+      tid = func->GetType()->GetTypeId();
+    }
+
+    switch (tid) {
+      case TY_User: {
+        TreeNode *idnode = node->GetId();
+        if (idnode && idnode->IsIdentifier()) {
+          IdentifierNode *id = static_cast<IdentifierNode *>(idnode);
+          TreeNode *type = mHandler->FindType(id);
+          if (type && type != node && type->IsUserType()) {
+            ut = static_cast<UserTypeNode *>(type);
+            share = true;
+          }
+        }
+        break;
+      }
+      // reduced to more restrictive type
+      case TY_Int:
+      case TY_Long:
+      case TY_Float:
+      case TY_Double: {
+        // use dummy type node of the kind
+        // share = true;
+        break;
+      }
+    }
+
+    if (share) {
+      if (parent->IsIdentifier()) {
+        var->SetType(ut);
+        return ut;
+      } else if (parent->IsFunction()) {
+        func->SetType(ut);
+        return ut;
+      }
+    }
+
+  }
   return node;
 }
 

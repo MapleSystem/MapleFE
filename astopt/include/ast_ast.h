@@ -62,6 +62,8 @@ class AdjustASTVisitor : public AstVisitor {
   CondBranchNode *VisitCondBranchNode(CondBranchNode *node);
   ForLoopNode *VisitForLoopNode(ForLoopNode *node);
   LambdaNode *VisitLambdaNode(LambdaNode *node);
+  IdentifierNode *VisitIdentifierNode(IdentifierNode *node);
+  FunctionNode *VisitFunctionNode(FunctionNode *node);
 };
 
 }
