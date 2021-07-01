@@ -63,8 +63,8 @@ TreeNode* ASTScope::FindDeclOf(IdentifierNode *inode) {
 TreeNode* ASTScope::FindTypeOf(IdentifierNode *inode) {
   ASTScope *scope = this;
   while (scope) {
-    for (unsigned i = 0; i < GetTypeNum(); i++) {
-      TreeNode *tree = GetType(i);
+    for (unsigned i = 0; i < scope->GetTypeNum(); i++) {
+      TreeNode *tree = scope->GetType(i);
       if (tree->GetStrIdx() == inode->GetStrIdx()) {
         return tree;
       }
