@@ -34,10 +34,12 @@ public:
     return EmitTreeNode(GetASTModule());
   }
 
+  virtual std::string EmitIdentifierNode(IdentifierNode *node);
+  virtual std::string EmitXXportAsPairNode(XXportAsPairNode *node);
+  virtual std::string EmitExportNode(ExportNode *node);
   virtual std::string EmitUnaOperatorNode(UnaOperatorNode *node);
   virtual std::string EmitBinOperatorNode(BinOperatorNode *node);
   virtual std::string EmitBlockNode(BlockNode *node);
-  virtual std::string EmitIdentifierNode(IdentifierNode *node);
   virtual std::string EmitDeclNode(DeclNode *node);
   virtual std::string EmitFieldNode(FieldNode *node);
   virtual std::string EmitArrayLiteralNode(ArrayLiteralNode *node);
@@ -50,9 +52,9 @@ public:
   virtual std::string EmitSwitchNode(SwitchNode *node);
   virtual std::string EmitCallNode(CallNode *node);
   virtual std::string EmitFunctionNode(FunctionNode *node);
+  virtual std::string EmitModuleNode(ModuleNode *node);
   virtual std::string EmitPrimTypeNode(PrimTypeNode *node);
   virtual std::string EmitPrimArrayTypeNode(PrimArrayTypeNode *node);
-  virtual std::string EmitModuleNode(ModuleNode *node);
 };
 
 } // namespace maplefe

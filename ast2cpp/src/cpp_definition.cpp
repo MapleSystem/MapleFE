@@ -52,6 +52,49 @@ int main(int argc, char **argv) {
   return str;
 }
 
+std::string CppDef::EmitExportNode(ExportNode *node) {
+  if (node == nullptr)
+    return std::string();
+  std::string str;
+  std::string target;
+  if (auto n = node->GetTarget()) {
+    target = EmitTreeNode(n);
+    str += "// target: "s + target + "\n"s;
+  }
+  auto num = node->GetPairsNum();
+  for (unsigned i = 0; i < node->GetPairsNum(); ++i) {
+    if (auto n = node->GetPair(i))
+      str += EmitXXportAsPairNode(n);
+  }
+  return HandleTreeNode(str, node);
+}
+
+std::string CppDef::EmitXXportAsPairNode(XXportAsPairNode *node) {
+  if (node == nullptr)
+    return std::string();
+  std::string str;
+  if (node->IsDefault()) {
+    if (auto n = node->GetBefore())
+      str += "{ "s + EmitTreeNode(n) + " as default }"s;
+  } else if (node->IsEverything()) {
+    str += " * "s;
+    if (auto n = node->GetBefore())
+      str += "as "s + EmitTreeNode(n);
+  } else {
+    if (auto n = node->GetBefore()) {
+      if (n->GetKind() == NK_Identifier)
+        str += "{ "s;
+      str += EmitTreeNode(n);
+      if (auto n = node->GetAfter())
+        str += " as "s + EmitTreeNode(n);
+      if (n->GetKind() == NK_Identifier)
+        str += " }"s;
+    }
+  }
+  str = "// "s + str + ";\n"s;;
+  return HandleTreeNode(str, node);
+}
+
 std::string CppDef::EmitFunctionNode(FunctionNode *node) {
   if (isInit || node == nullptr)
     return std::string();

@@ -91,21 +91,19 @@ typedef struct JS_Prop {
   JS_Val  val;
 
   // Prop directly generated as class fields when TS is compiled into CPP
-  JS_Prop(JS_Type jstype, void* field) {
-    val = { (int64_t)field, jstype, true };
-  }
+  JS_Prop(JS_Type jstype, void* field) { val = { (int64_t)field, jstype, true }; }
 
   // Prop created at runtime
-  JS_Prop(JS_Type jstype, bool v) {
-    val = { (int64_t)v, jstype, false };
-  }
+  JS_Prop(JS_Type jstype, bool v) { val = { (int64_t)v, jstype, false }; }
+  JS_Prop(JS_Val v) { val = v; }
+  JS_Prop() { val = { 0, t2crt::TY_Undef, false }; }
 
   bool IsCxxProp() { return val.cxx; }
 
 } JS_Prop;
 
 
-typedef std::unordered_map<std::string, JS_Prop*> JS_PropList;
+typedef std::unordered_map<std::string, JS_Prop> JS_PropList;
 
 class BaseObj {
   public:
@@ -116,6 +114,10 @@ class BaseObj {
       JS_PropList::iterator it;
       it = propList.find(key);
       return (it != propList.end());
+    }
+
+    void AddProp(std::string key, JS_Val val) {
+      propList[key] = { val };
     }
 };
 

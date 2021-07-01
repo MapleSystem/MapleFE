@@ -80,7 +80,8 @@ void __init_func__();
   }
 
   str += R"""(
-  // export table here
+  // exports
+  BaseObj exports;
 };
 
 extern )""" + name + " _"s + name + ";\n#endif\n"s;
