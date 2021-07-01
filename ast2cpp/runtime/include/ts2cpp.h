@@ -63,6 +63,28 @@ struct JS_Val {
   JS_Val(bool b)    { x.val_bool = b; type = TY_Bool; cxx = false; }
   JS_Val(int64_t l) { x.val_long = l; type = TY_Long; cxx = false; }
   JS_Val(double d)  { x.val_double = d; type = TY_Double; cxx = false; }
+
+#define OPERATORS(op) \
+  JS_Val operator op(const JS_Val &v) { \
+    JS_Val res; \
+    if(type == v.type) \
+      switch(type) { \
+        case TY_Long:   return { x.val_long op v.x.val_long }; \
+        case TY_Double: return { x.val_double op v.x.val_double }; \
+      } \
+    else { \
+      if(type == TY_Long && v.type == TY_Double) \
+        return { (double)x.val_long op v.x.val_double }; \
+      if(type == TY_Double && v.type == TY_Long) \
+        return { x.val_double op (double)v.x.val_long }; \
+    } \
+    return res; \
+  }
+
+  OPERATORS(+)
+  OPERATORS(-)
+  OPERATORS(*)
+
 };
 
 typedef struct JS_Prop {
