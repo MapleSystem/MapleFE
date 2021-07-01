@@ -623,23 +623,21 @@ UserTypeNode *BuildScopeVisitor::VisitUserTypeNode(UserTypeNode *node) {
   AstVisitor::VisitUserTypeNode(node);
   TreeNode *p = node->GetParent();
   if (p) {
-    // exclude function return type
     if (p->IsFunction()) {
+      // exclude function return type
       FunctionNode *f = static_cast<FunctionNode *>(p);
       if (f->GetType() == node) {
         return node;
       }
-    }
-    // typalias id
-    if (p->IsTypeAlias()) {
+    } else if (p->IsTypeAlias()) {
+      // typalias id
       TypeAliasNode *ta = static_cast<TypeAliasNode *>(p);
       if (ta->GetId() == node) {
         parent->AddType(node);
         return node;
       }
-    }
-    // normal type decl
-    if (p->IsScope()) {
+    } else if (p->IsScope()) {
+      // normal type decl
       parent->AddType(node);
     }
   }

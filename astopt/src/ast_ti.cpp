@@ -981,6 +981,9 @@ UserTypeNode *ShareUTVisitor::VisitUserTypeNode(UserTypeNode *node) {
       var = static_cast<IdentifierNode *>(parent);
       // var is user type, use original UserType
       tid = var->GetTypeId();
+      if (tid == TY_None) {
+        tid = TY_User;
+      }
     } else if (parent->IsFunction()) {
       func = static_cast<FunctionNode *>(parent);
       MASSERT(func->GetType() == node && "not function return type");
@@ -995,7 +998,10 @@ UserTypeNode *ShareUTVisitor::VisitUserTypeNode(UserTypeNode *node) {
           TreeNode *type = mHandler->FindType(id);
           if (type && type != node && type->IsUserType()) {
             ut = static_cast<UserTypeNode *>(type);
-            share = true;
+            if (node->GetType() == ut->GetType()) {
+              // do not share if there are generics
+              share = (ut->GetTypeGenericsNum() == 0);
+            }
           }
         }
         break;
@@ -1009,6 +1015,8 @@ UserTypeNode *ShareUTVisitor::VisitUserTypeNode(UserTypeNode *node) {
         // share = true;
         break;
       }
+      default:
+        break;
     }
 
     if (share) {
