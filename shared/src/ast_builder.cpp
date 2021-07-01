@@ -558,6 +558,35 @@ TreeNode* ASTBuilder::BuildCast() {
   return n;
 }
 
+// It takes one parameter, the word tells what literal it is.
+TreeNode* ASTBuilder::BuildLiteral() {
+  if (mTrace)
+    std::cout << "In BuildLiteral" << std::endl;
+
+  MASSERT(mParams.size() == 1);
+  Param p_a = mParams[0];
+  MASSERT(p_a.mIsTreeNode);
+
+  TreeNode *tree = p_a.mData.mTreeNode;
+  bool is_void = false;
+  if (tree->IsPrimType()) {
+    PrimTypeNode *prim = (PrimTypeNode*)tree;
+    if (prim->GetPrimType() == TY_Void)
+      is_void = true;
+  }
+
+  if (is_void) {
+    LitData data;
+    data.mType = LT_VoidLiteral;
+    LiteralNode *n = (LiteralNode*)gTreePool.NewTreeNode(sizeof(LiteralNode));
+    new (n) LiteralNode(data);
+    mLastTreeNode = n;
+    return n;
+  } else {
+    MERROR("Unspported in BuildLiteral().");
+  }
+}
+
 
 // For first parameter has to be an operator.
 TreeNode* ASTBuilder::BuildUnaryOperation() {

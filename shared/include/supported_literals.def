@@ -27,4 +27,4 @@ LITERAL(StringLiteral)
 LITERAL(NullLiteral)
 LITERAL(ThisLiteral)
 LITERAL(SuperLiteral)
-
+LITERAL(VoidLiteral)

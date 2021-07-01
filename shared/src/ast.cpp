@@ -935,6 +935,9 @@ void LiteralNode::Dump(unsigned indent) {
   case LT_SuperLiteral:
     DUMP0_NORETURN("super");
     break;
+  case LT_VoidLiteral:
+    DUMP0_NORETURN("void");
+    break;
   case LT_NA:
   default:
     DUMP0_NORETURN("NA Token:");
