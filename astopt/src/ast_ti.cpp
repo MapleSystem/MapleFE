@@ -970,53 +970,13 @@ XXportAsPairNode *TypeInferVisitor::VisitXXportAsPairNode(XXportAsPairNode *node
   return node;
 }
 
-BlockNode *ShareUTVisitor::VisitBlockNode(BlockNode *node) {
-  ASTScope *scope = node->GetScope();
-  mScopeStack.push(scope);
-  (void) AstVisitor::VisitBlockNode(node);
-  mScopeStack.pop();
-  return node;
-}
-
-FunctionNode *ShareUTVisitor::VisitFunctionNode(FunctionNode *node) {
-  ASTScope *scope = node->GetScope();
-  mScopeStack.push(scope);
-  (void) AstVisitor::VisitFunctionNode(node);
-  mScopeStack.pop();
-  return node;
-}
-
-LambdaNode *ShareUTVisitor::VisitLambdaNode(LambdaNode *node) {
-  ASTScope *scope = node->GetScope();
-  mScopeStack.push(scope);
-  (void) AstVisitor::VisitLambdaNode(node);
-  mScopeStack.pop();
-  return node;
-}
-
-ClassNode *ShareUTVisitor::VisitClassNode(ClassNode *node) {
-  ASTScope *scope = node->GetScope();
-  mScopeStack.push(scope);
-  (void) AstVisitor::VisitClassNode(node);
-  mScopeStack.pop();
-  return node;
-}
-
-InterfaceNode *ShareUTVisitor::VisitInterfaceNode(InterfaceNode *node) {
-  ASTScope *scope = node->GetScope();
-  mScopeStack.push(scope);
-  (void) AstVisitor::VisitInterfaceNode(node);
-  mScopeStack.pop();
-  return node;
-}
-
 UserTypeNode *ShareUTVisitor::VisitUserTypeNode(UserTypeNode *node) {
   (void) AstVisitor::VisitUserTypeNode(node);
 
   TreeNode *idnode = node->GetId();
   if (idnode && idnode->IsIdentifier()) {
     IdentifierNode *id = static_cast<IdentifierNode *>(idnode);
-    ASTScope *scope = mScopeStack.top();
+    ASTScope *scope = id->GetScope();
     TreeNode *type = scope->FindTypeOf(id);
     if (type && type != node && type->IsUserType()) {
       UserTypeNode *ut = static_cast<UserTypeNode *>(type);

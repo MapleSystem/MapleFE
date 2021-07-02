@@ -166,15 +166,16 @@ InterfaceNode *BuildScopeVisitor::VisitInterfaceNode(InterfaceNode *node) {
 }
 
 DeclNode *BuildScopeVisitor::VisitDeclNode(DeclNode *node) {
-  ASTScope *parent = mScopeStack.top();
+  ASTScope *scope = mScopeStack.top();
+  node->SetScope(scope);
   AstVisitor::VisitDeclNode(node);
-  parent->AddDecl(node);
-  node->SetScope(parent);
+  scope->AddDecl(node);
   return node;
 }
 
 UserTypeNode *BuildScopeVisitor::VisitUserTypeNode(UserTypeNode *node) {
-  ASTScope *parent = mScopeStack.top();
+  ASTScope *scope = mScopeStack.top();
+  node->SetScope(scope);
   AstVisitor::VisitUserTypeNode(node);
   TreeNode *p = node->GetParent();
   if (p) {
@@ -188,23 +189,58 @@ UserTypeNode *BuildScopeVisitor::VisitUserTypeNode(UserTypeNode *node) {
       // typalias id
       TypeAliasNode *ta = static_cast<TypeAliasNode *>(p);
       if (ta->GetId() == node) {
-        parent->AddType(node);
+        scope->AddType(node);
         return node;
       }
     } else if (p->IsScope()) {
       // normal type decl
-      parent->AddType(node);
+      scope->AddType(node);
     }
   }
   return node;
 }
 
 TypeAliasNode *BuildScopeVisitor::VisitTypeAliasNode(TypeAliasNode *node) {
-  ASTScope *parent = mScopeStack.top();
+  ASTScope *scope = mScopeStack.top();
+  node->SetScope(scope);
   AstVisitor::VisitTypeAliasNode(node);
   UserTypeNode *ut = node->GetId();
   if (ut) {
-    parent->AddType(ut);
+    scope->AddType(ut);
+  }
+  return node;
+}
+
+TreeNode *BuildScopeVisitor::VisitTreeNode(TreeNode *node) {
+  if (node == nullptr) {
+    return node;
+  }
+  switch (node->GetKind()) {
+    case NK_Module:
+      return VisitModuleNode(static_cast<ModuleNode *>(node));
+    case NK_Block:
+      return VisitBlockNode(static_cast<BlockNode *>(node));
+    case NK_Lambda:
+      return VisitLambdaNode(static_cast<LambdaNode *>(node));
+    case NK_Function:
+      return VisitFunctionNode(static_cast<FunctionNode *>(node));
+    case NK_Class:
+      return VisitClassNode(static_cast<ClassNode *>(node));
+    case NK_Interface:
+      return VisitInterfaceNode(static_cast<InterfaceNode *>(node));
+
+    case NK_Decl:
+      return VisitDeclNode(static_cast<DeclNode *>(node));
+    case NK_UserType:
+      return VisitUserTypeNode(static_cast<UserTypeNode *>(node));
+    case NK_TypeAlias:
+      return VisitTypeAliasNode(static_cast<TypeAliasNode *>(node));
+
+    default:
+      ASTScope *scope = mScopeStack.top();
+      node->SetScope(scope);
+      AstVisitor::VisitTreeNode(node);
+      break;
   }
   return node;
 }

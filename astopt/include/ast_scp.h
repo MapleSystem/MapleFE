@@ -61,11 +61,16 @@ class BuildScopeVisitor : public AstVisitor {
     }
   ~BuildScopeVisitor() = default;
 
+  TreeNode *VisitTreeNode(TreeNode *node);
+
+  // scope nodes
   BlockNode *VisitBlockNode(BlockNode *node);
   FunctionNode *VisitFunctionNode(FunctionNode *node);
   LambdaNode *VisitLambdaNode(LambdaNode *node);
   ClassNode *VisitClassNode(ClassNode *node);
   InterfaceNode *VisitInterfaceNode(InterfaceNode *node);
+
+  // related node with scope : decl, type
   DeclNode *VisitDeclNode(DeclNode *node);
   UserTypeNode *VisitUserTypeNode(UserTypeNode *node);
   TypeAliasNode *VisitTypeAliasNode(TypeAliasNode *node);

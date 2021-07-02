@@ -1690,7 +1690,7 @@ public:
 
   unsigned  GetTypeParamsNum()            {return mTypeParams.GetNum();}
   TreeNode* GetTypeParamAtIndex(unsigned i) {return mTypeParams.ValueAtIndex(i);}
-  void      SetTypeParamAtIndex(unsigned i, TreeNode* n) {*(mTypeParams.RefAtIndex(i)) = n; SETPARENT(n);}
+  void      SetTypeParamAtIndex(unsigned i, TreeNode* n) {*(mTypeParams.RefAtIndex(i)) = n;}
   void      AddTypeParam(TreeNode *);
 
   void SetType(TreeNode *t) {mType = t;}

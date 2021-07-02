@@ -166,11 +166,6 @@ class ShareUTVisitor : public AstVisitor {
   void Push(ASTScope *scope) { mScopeStack.push(scope); }
   void Pop() { mScopeStack.pop(); }
 
-  BlockNode *VisitBlockNode(BlockNode *node);
-  FunctionNode *VisitFunctionNode(FunctionNode *node);
-  LambdaNode *VisitLambdaNode(LambdaNode *node);
-  ClassNode *VisitClassNode(ClassNode *node);
-  InterfaceNode *VisitInterfaceNode(InterfaceNode *node);
   UserTypeNode *VisitUserTypeNode(UserTypeNode *node);
 };
 
