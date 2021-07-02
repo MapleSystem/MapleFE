@@ -530,7 +530,23 @@ FunctionNode *BuildScopeVisitor::VisitFunctionNode(FunctionNode *node) {
 
   for(unsigned i = 0; i < node->GetTypeParamsNum(); i++) {
     TreeNode *it = node->GetTypeParamAtIndex(i);
-    scope->AddType(it);
+
+    // add it to scope's mTypes only if it is a new type
+    TreeNode *tn = it;
+    if (it->IsUserType()) {
+      UserTypeNode *ut = static_cast<UserTypeNode *>(it);
+      tn = ut->GetId();
+    }
+    TreeNode *decl = NULL;
+    if (tn->IsIdentifier()) {
+      IdentifierNode *id = static_cast<IdentifierNode *>(tn);
+      // check if it is a known type
+      decl = scope->FindTypeOf(id);
+    }
+    // add it if not found
+    if (!decl) {
+      scope->AddType(it);
+    }
   }
 
   mScopeStack.push(scope);
