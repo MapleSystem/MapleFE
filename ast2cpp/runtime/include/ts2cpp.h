@@ -28,6 +28,7 @@ using std::to_string;
 inline std::string to_string(std::string t) {return t;}
 
 class BaseObj;
+class Ctor;
 
 // JS types for props
 typedef enum JS_Type : uint8_t {
@@ -63,6 +64,7 @@ struct JS_Val {
   JS_Val(bool b)    { x.val_bool = b; type = TY_Bool; cxx = false; }
   JS_Val(int64_t l) { x.val_long = l; type = TY_Long; cxx = false; }
   JS_Val(double d)  { x.val_double = d; type = TY_Double; cxx = false; }
+  JS_Val(BaseObj* o){ x.val_obj = o; type = TY_Object; cxx = false; }
 
 #define OPERATORS(op) \
   JS_Val operator op(const JS_Val &v) { \
@@ -108,8 +110,12 @@ typedef std::unordered_map<std::string, JS_Prop> JS_PropList;
 class BaseObj {
   public:
     JS_PropList propList;
-    BaseObj* __proto__;    // link to prototype chain of object
+    BaseObj* _proto;    // prototype chain
+    Ctor*    _ctor;     // constructor of object
   public:
+    BaseObj(): _proto(nullptr) {}
+    BaseObj(Ctor* ctor, BaseObj* proto): _ctor(ctor), _proto(proto) {}
+
     bool hasOwnProp(std::string key) {
       JS_PropList::iterator it;
       it = propList.find(key);
@@ -123,9 +129,17 @@ class BaseObj {
 
 
 // JavaScript class/function constructor
-class CtorObj : public BaseObj {
+class Ctor : public BaseObj {
   public:
-    BaseObj* prototype;    // prototype property of constructor
+    BaseObj* _prototype;    // prototype property
+  public:
+    Ctor(Ctor* ctor, BaseObj* proto, BaseObj* prototype) {
+      JS_Val val(this);
+      _ctor = ctor;
+      _proto = proto;
+      _prototype = prototype;
+      _prototype->AddProp("constructor", val);
+    }
 };
 
 template <class T>
@@ -146,8 +160,8 @@ class ClassFld {
     JS_Prop* newProp(JS_Type type) {return new JS_Prop(type, field.addr);}
 };
 
-extern CtorObj* Function;
-extern CtorObj* Object;
+extern Ctor* Function;
+extern Ctor* Object;
 
 } // namespace t2crt
 
