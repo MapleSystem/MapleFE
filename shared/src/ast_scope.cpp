@@ -18,13 +18,6 @@
 
 namespace maplefe {
 
-ASTScope::ASTScope(ASTScope *parent) {
-  mParent = NULL;
-  mTree = NULL;
-  if (parent)
-    SetParent(parent);
-}
-
 void ASTScope::AddChild(ASTScope *s) {
   for (unsigned i = 0; i < mChildren.GetNum(); i++) {
     ASTScope *scope = mChildren.ValueAtIndex(i);

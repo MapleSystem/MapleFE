@@ -83,6 +83,7 @@ public:
   void          SetScopePool(ASTScopePool &s) {mScopePool = s;}
 
   ASTScope* NewScope(ASTScope *p);
+  ASTScope* NewScope(ASTScope *p, TreeNode *t);
 
   void Dump();
 };

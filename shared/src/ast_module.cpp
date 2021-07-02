@@ -21,6 +21,7 @@ namespace maplefe {
 ModuleNode::ModuleNode() : TreeNode(NK_Module), mPackage(NULL), mSrcLang(SrcLangUnknown) {
   mRootScope = mScopePool.NewScope(NULL);
   mRootScope->SetTree(this);
+  this->SetScope(mRootScope);
 }
 
 ModuleNode::~ModuleNode() {
@@ -55,6 +56,13 @@ std::string ModuleNode::GetSrcLangString() {
 // Set the parent<->child relation between it and p.
 ASTScope* ModuleNode::NewScope(ASTScope *p) {
   ASTScope *newscope = mScopePool.NewScope(p);
+  return newscope;
+}
+
+ASTScope* ModuleNode::NewScope(ASTScope *p, TreeNode *t) {
+  ASTScope *newscope = mScopePool.NewScope(p);
+  newscope->SetTree(t);
+  t->SetScope(newscope);
   return newscope;
 }
 

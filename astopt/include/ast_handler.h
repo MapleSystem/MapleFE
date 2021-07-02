@@ -55,8 +55,6 @@ class Module_Handler {
   std::unordered_map<unsigned, std::vector<CfgFunc *>> mModuleFuncsMap;
   // only reachable BBs
   std::unordered_map<unsigned, CfgBB *> mBbId2BbMap;
-  // scope node id to scope
-  std::unordered_map<unsigned, ASTScope *> mNodeId2Scope;
   // identifier node id to decl
   std::unordered_map<unsigned, TreeNode *> mNodeId2Decl;
   // array's element type: decl node id to typeid

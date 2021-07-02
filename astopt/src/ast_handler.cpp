@@ -83,7 +83,7 @@ TreeNode *Module_Handler::FindDecl(IdentifierNode *node) {
   TreeNode *p = node->GetParent();
   while (p) {
     if (p->IsScope()) {
-      ASTScope *scope = mNodeId2Scope[p->GetNodeId()];
+      ASTScope *scope = p->GetScope();
       // it will trace back to top level
       decl = scope->FindDeclOf(node);
       break;
@@ -106,7 +106,7 @@ TreeNode *Module_Handler::FindType(IdentifierNode *node) {
   TreeNode *p = node->GetParent();
   while (p) {
     if (p->IsScope()) {
-      ASTScope *scope = mNodeId2Scope[p->GetNodeId()];
+      ASTScope *scope = p->GetScope();
       // it will trace back to top level
       type = scope->FindTypeOf(node);
       break;

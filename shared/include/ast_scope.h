@@ -53,15 +53,16 @@ private:
 
 public:
   ASTScope() : mParent(NULL), mTree(NULL) {}
-  ASTScope(ASTScope *p);
+  ASTScope(ASTScope *p) : mTree(NULL) { SetParent(p); }
+  ASTScope(ASTScope *p, TreeNode *t)  { SetParent(p); SetTree(t); }
   ~ASTScope() {Release();}
 
   // It's the caller's duty to make sure p is not NULL
-  void SetParent(ASTScope *p) {mParent = p; p->AddChild(this);}
+  void SetParent(ASTScope *p) {mParent = p; if(p) p->AddChild(this);}
   ASTScope* GetParent() {return mParent;}
 
   TreeNode* GetTree() {return mTree;}
-  void SetTree(TreeNode* t) {mTree = t;}
+  void SetTree(TreeNode* t) {mTree = t; if(t) t->SetScope(this);}
 
   void AddChild(ASTScope*);
 

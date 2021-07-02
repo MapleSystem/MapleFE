@@ -30,7 +30,7 @@ void AST_SCP::BuildScope() {
   }
   ModuleNode *module = mHandler->GetASTModule();
   visitor.mScopeStack.push(module->GetRootScope());
-  mHandler->mNodeId2Scope[module->GetNodeId()] = module->GetRootScope();
+  module->SetScope(module->GetRootScope());
 
   for(unsigned i = 0; i < module->GetTreesNum(); i++) {
     TreeNode *it = module->GetTree(i);
@@ -40,10 +40,7 @@ void AST_SCP::BuildScope() {
 
 BlockNode *BuildScopeVisitor::VisitBlockNode(BlockNode *node) {
   ASTScope *parent = mScopeStack.top();
-  ASTScope *scope = mASTModule->NewScope(parent);
-  scope->SetTree(node);
-  mHandler->mNodeId2Scope[node->GetNodeId()] = scope;
-  parent->AddChild(scope);
+  ASTScope *scope = mASTModule->NewScope(parent, node);
 
   mScopeStack.push(scope);
 
@@ -57,15 +54,13 @@ FunctionNode *BuildScopeVisitor::VisitFunctionNode(FunctionNode *node) {
   ASTScope *parent = mScopeStack.top();
   // function is a decl
   parent->AddDecl(node);
-  ASTScope *scope = mASTModule->NewScope(parent);
-  scope->SetTree(node);
-  mHandler->mNodeId2Scope[node->GetNodeId()] = scope;
-  parent->AddChild(scope);
+  ASTScope *scope = mASTModule->NewScope(parent, node);
 
   // add parameters as decl
   for(unsigned i = 0; i < node->GetParamsNum(); i++) {
     TreeNode *it = node->GetParam(i);
     scope->AddDecl(it);
+    it->SetScope(scope);
   }
 
   for(unsigned i = 0; i < node->GetTypeParamsNum(); i++) {
@@ -99,15 +94,13 @@ FunctionNode *BuildScopeVisitor::VisitFunctionNode(FunctionNode *node) {
 
 LambdaNode *BuildScopeVisitor::VisitLambdaNode(LambdaNode *node) {
   ASTScope *parent = mScopeStack.top();
-  ASTScope *scope = mASTModule->NewScope(parent);
-  scope->SetTree(node);
-  mHandler->mNodeId2Scope[node->GetNodeId()] = scope;
-  parent->AddChild(scope);
+  ASTScope *scope = mASTModule->NewScope(parent, node);
 
   // add parameters as decl
   for(unsigned i = 0; i < node->GetParamsNum(); i++) {
     TreeNode *it = node->GetParam(i);
     scope->AddDecl(it);
+    it->SetScope(scope);
   }
 
   mScopeStack.push(scope);
@@ -124,17 +117,17 @@ ClassNode *BuildScopeVisitor::VisitClassNode(ClassNode *node) {
   if (parent) {
     parent->AddDecl(node);
     parent->AddType(node);
+    node->SetScope(parent);
   }
-  ASTScope *scope = mASTModule->NewScope(parent);
-  scope->SetTree(node);
-  mHandler->mNodeId2Scope[node->GetNodeId()] = scope;
-  parent->AddChild(scope);
+  ASTScope *scope = mASTModule->NewScope(parent, node);
 
   // add fields as decl
   for(unsigned i = 0; i < node->GetFieldsNum(); i++) {
     TreeNode *it = node->GetField(i);
-    if (it->IsIdentifier())
+    if (it->IsIdentifier()) {
       scope->AddDecl(it);
+      it->SetScope(scope);
+    }
   }
 
   mScopeStack.push(scope);
@@ -151,18 +144,18 @@ InterfaceNode *BuildScopeVisitor::VisitInterfaceNode(InterfaceNode *node) {
   if (parent) {
     parent->AddDecl(node);
     parent->AddType(node);
+    node->SetScope(parent);
   }
 
-  ASTScope *scope = mASTModule->NewScope(parent);
-  scope->SetTree(node);
-  mHandler->mNodeId2Scope[node->GetNodeId()] = scope;
-  parent->AddChild(scope);
+  ASTScope *scope = mASTModule->NewScope(parent, node);
 
   // add fields as decl
   for(unsigned i = 0; i < node->GetFieldsNum(); i++) {
     TreeNode *it = node->GetFieldAtIndex(i);
-    if (it->IsIdentifier())
+    if (it->IsIdentifier()) {
       scope->AddDecl(it);
+      it->SetScope(scope);
+    }
   }
   mScopeStack.push(scope);
 
@@ -176,6 +169,7 @@ DeclNode *BuildScopeVisitor::VisitDeclNode(DeclNode *node) {
   ASTScope *parent = mScopeStack.top();
   AstVisitor::VisitDeclNode(node);
   parent->AddDecl(node);
+  node->SetScope(parent);
   return node;
 }
 

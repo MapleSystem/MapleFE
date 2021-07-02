@@ -75,6 +75,7 @@ class AnnotationNode;
 class AsTypeNode;
 class IdentifierNode;
 class UserTypeNode;
+class ASTScope;
 
 class TreeNode {
 protected:
@@ -84,6 +85,7 @@ protected:
   TreeNode *mLabel;   // label of a statement, or expression.
   unsigned  mStrIdx;
   TypeId    mTypeId;      // typeId of the node
+  ASTScope *mScope;
 
   bool      mIsStmt;      // if a node is a statement
   bool      mIsOptional;  // if a node is optionally existing during runtime.
@@ -98,7 +100,7 @@ protected:
 public:
   TreeNode(NodeKind k, unsigned i)
     : mKind(k), mLabel(NULL), mParent(NULL), mStrIdx(i), mIsStmt(false), mTypeId(TY_None),
-      mIsOptional(false), mIsNonNull(false) {}
+      mScope(NULL), mIsOptional(false), mIsNonNull(false) {}
   TreeNode(NodeKind k) : TreeNode(k, 0) {}
   //TreeNode() : TreeNode(NK_Null, 0) {}
   virtual ~TreeNode() {}
@@ -115,12 +117,14 @@ public:
   void SetParent(TreeNode *p) {mParent = p;}
   void SetLabel (TreeNode *p) {mLabel = p;}
   void SetTypeId(TypeId id)   {mTypeId = id;}
+  void SetScope(ASTScope *s)   {mScope = s;}
 
   NodeKind GetKind()    {return mKind;}
   unsigned GetNodeId()  {return mNodeId;}
   TreeNode* GetParent() {return mParent;}
   TreeNode* GetLabel()  {return mLabel;}
   TypeId GetTypeId()    {return mTypeId;}
+  ASTScope *GetScope()   {return mScope;}
 
   bool IsStmt()                    {return mIsStmt;}
   void SetIsStmt(bool b = true)    {mIsStmt = b;}

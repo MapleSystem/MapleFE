@@ -971,62 +971,42 @@ XXportAsPairNode *TypeInferVisitor::VisitXXportAsPairNode(XXportAsPairNode *node
 }
 
 BlockNode *ShareUTVisitor::VisitBlockNode(BlockNode *node) {
-  if (mHandler->mNodeId2Scope.find(node->GetNodeId()) != mHandler->mNodeId2Scope.end()) {
-    ASTScope *scope = mHandler->mNodeId2Scope[node->GetNodeId()];
-    mScopeStack.push(scope);
-    (void) AstVisitor::VisitBlockNode(node);
-    mScopeStack.pop();
-  } else {
-    MASSERT(false && "no scope");
-  }
+  ASTScope *scope = node->GetScope();
+  mScopeStack.push(scope);
+  (void) AstVisitor::VisitBlockNode(node);
+  mScopeStack.pop();
   return node;
 }
 
 FunctionNode *ShareUTVisitor::VisitFunctionNode(FunctionNode *node) {
-  if (mHandler->mNodeId2Scope.find(node->GetNodeId()) != mHandler->mNodeId2Scope.end()) {
-    ASTScope *scope = mHandler->mNodeId2Scope[node->GetNodeId()];
-    mScopeStack.push(scope);
-    (void) AstVisitor::VisitFunctionNode(node);
-    mScopeStack.pop();
-  } else {
-    MASSERT(false && "no scope");
-  }
+  ASTScope *scope = node->GetScope();
+  mScopeStack.push(scope);
+  (void) AstVisitor::VisitFunctionNode(node);
+  mScopeStack.pop();
   return node;
 }
 
 LambdaNode *ShareUTVisitor::VisitLambdaNode(LambdaNode *node) {
-  if (mHandler->mNodeId2Scope.find(node->GetNodeId()) != mHandler->mNodeId2Scope.end()) {
-    ASTScope *scope = mHandler->mNodeId2Scope[node->GetNodeId()];
-    mScopeStack.push(scope);
-    (void) AstVisitor::VisitLambdaNode(node);
-    mScopeStack.pop();
-  } else {
-    MASSERT(false && "no scope");
-  }
+  ASTScope *scope = node->GetScope();
+  mScopeStack.push(scope);
+  (void) AstVisitor::VisitLambdaNode(node);
+  mScopeStack.pop();
   return node;
 }
 
 ClassNode *ShareUTVisitor::VisitClassNode(ClassNode *node) {
-  if (mHandler->mNodeId2Scope.find(node->GetNodeId()) != mHandler->mNodeId2Scope.end()) {
-    ASTScope *scope = mHandler->mNodeId2Scope[node->GetNodeId()];
-    mScopeStack.push(scope);
-    (void) AstVisitor::VisitClassNode(node);
-    mScopeStack.pop();
-  } else {
-    MASSERT(false && "no scope");
-  }
+  ASTScope *scope = node->GetScope();
+  mScopeStack.push(scope);
+  (void) AstVisitor::VisitClassNode(node);
+  mScopeStack.pop();
   return node;
 }
 
 InterfaceNode *ShareUTVisitor::VisitInterfaceNode(InterfaceNode *node) {
-  if (mHandler->mNodeId2Scope.find(node->GetNodeId()) != mHandler->mNodeId2Scope.end()) {
-    ASTScope *scope = mHandler->mNodeId2Scope[node->GetNodeId()];
-    mScopeStack.push(scope);
-    (void) AstVisitor::VisitInterfaceNode(node);
-    mScopeStack.pop();
-  } else {
-    MASSERT(false && "no scope");
-  }
+  ASTScope *scope = node->GetScope();
+  mScopeStack.push(scope);
+  (void) AstVisitor::VisitInterfaceNode(node);
+  mScopeStack.pop();
   return node;
 }
 
