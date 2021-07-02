@@ -1,0 +1,12 @@
+Matched 10 tokens.
+============= Module ===========
+== Sub Tree ==
+export {declare class  Klass
+  Fields: 
+    obj
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+} 
