@@ -1,0 +1,29 @@
+Matched 36 tokens.
+Matched 74 tokens.
+Matched 83 tokens.
+Matched 92 tokens.
+============= Module ===========
+== Sub Tree ==
+func  prop_deco(msg)  throws: 
+  return func  (target,name)  throws: 
+  console.log("Accessed",name,msg,target)
+
+
+== Sub Tree ==
+class  Klass
+  Fields: 
+    _x
+  Instance Initializer: 
+  Constructors: 
+    constructor  (i)  throws: 
+      this._x Assign i
+  Methods: 
+    get x()  throws: 
+      return this._x
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+js_var Decl: c=new Klass(3)
+== Sub Tree ==
+console.log(c.x)

@@ -4,9 +4,9 @@ Matched 54 tokens.
 Matched 63 tokens.
 ============= Module ===========
 == Sub Tree ==
-js_const Decl: obj= {prop:'foo', getProp:func  getProp()  throws: 
+js_const Decl: obj= {prop:'foo', getProp:get getProp()  throws: 
   return this.prop
-, setProp:func  setProp(newVal)  throws: 
+, setProp:set setProp(newVal)  throws: 
   this.prop Assign newVal
 }
 == Sub Tree ==

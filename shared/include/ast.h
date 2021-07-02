@@ -1635,6 +1635,8 @@ private:
   BlockNode                   *mBody;
   DimensionNode               *mDims;
   bool                         mIsConstructor;
+  bool                         mIsGetAccessor;
+  bool                         mIsSetAccessor;
 
 public:
   FunctionNode();
@@ -1652,6 +1654,10 @@ public:
 
   bool IsConstructor()    {return mIsConstructor;}
   void SetIsConstructor(bool b = true) {mIsConstructor = b;}
+  bool IsGetAccessor()               {return mIsGetAccessor;}
+  void SetIsGetAccessor(bool b = true) {mIsGetAccessor = b;}
+  bool IsSetAccessor()               {return mIsSetAccessor;}
+  void SetIsSetAccessor(bool b = true) {mIsSetAccessor = b;}
 
   unsigned  GetParamsNum()        {return mParams.GetNum();}
   TreeNode* GetParam(unsigned i)  {return mParams.ValueAtIndex(i);}

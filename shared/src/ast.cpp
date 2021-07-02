@@ -1339,7 +1339,8 @@ void ClassNode::Dump(unsigned indent) {
 //////////////////////////////////////////////////////////////////////////////////////
 
 FunctionNode::FunctionNode() : TreeNode(NK_Function),
-  mFuncName(NULL), mType(NULL), mBody(NULL), mDims(NULL), mIsConstructor(false) {}
+  mFuncName(NULL), mType(NULL), mBody(NULL), mDims(NULL),
+  mIsConstructor(false), mIsGetAccessor(false), mIsSetAccessor(false) {}
 
 void FunctionNode::AddTypeParam(TreeNode *param) {
   if (param->IsPass()) {
@@ -1444,6 +1445,10 @@ void FunctionNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   if (mIsConstructor)
     DUMP0_NORETURN("constructor  ");
+  else if (mIsGetAccessor)
+    DUMP0_NORETURN("get ");
+  else if (mIsSetAccessor)
+    DUMP0_NORETURN("set ");
   else
     DUMP0_NORETURN("func  ");
 

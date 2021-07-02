@@ -115,6 +115,8 @@ ACTION(BuildFunction)
 ACTION(BuildConstructor)
 ACTION(AddFunctionBody)
 ACTION(AddFunctionBodyTo)
+ACTION(SetGetAccessor)   // TS 'get' accessor
+ACTION(SetSetAccessor)   // TS 'set' accessor
 
 // For callsite
 ACTION(BuildCall)

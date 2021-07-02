@@ -1680,6 +1680,7 @@ rule PropertyDefinition: ONEOF(IdentifierReference,
 ## GetAccessor: get PropertyName ( ) TypeAnnotationopt { FunctionBody }
 rule GetAccessor: "get" + PropertyName + '(' + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}'
   attr.action : BuildFunction(%2)
+  attr.action : SetGetAccessor()
   attr.action : AddType(%5)
   attr.action : AddFunctionBody(%7)
   attr.action : AddModifier(%1)
@@ -1688,6 +1689,7 @@ rule GetAccessor: "get" + PropertyName + '(' + ')' + ZEROORONE(TypeAnnotation) +
 rule SetAccessor: "set" + PropertyName + '(' + BindingIdentifierOrPattern + ZEROORONE(TypeAnnotation) + ')' + '{' + FunctionBody + '}'
   attr.action : AddType(%4, %5)
   attr.action : BuildFunction(%2)
+  attr.action : SetSetAccessor()
   attr.action : AddParams(%4)
   attr.action : AddFunctionBody(%8)
   attr.action : AddModifier(%1)
@@ -1805,10 +1807,12 @@ rule MemberVariableDeclaration: ONEOF(
   attr.action.%1: AddInitTo(%3, %5)
   attr.action.%1: AddType(%3, %4)
   attr.action.%1: AddModifierTo(%3, %2)
+  attr.action.%1: AddModifierTo(%3, %1)
   attr.action.%1: BuildDecl(%4, %3)
   attr.action.%2: AddInitTo(%3, %6)
   attr.action.%2: AddType(%3, %5)
   attr.action.%2: AddModifierTo(%3, %2)
+  attr.action.%2: AddModifierTo(%3, %1)
   attr.action.%2: SetIsOptional(%3)
   attr.action.%2: BuildDecl(%4, %3)
 
@@ -1817,18 +1821,20 @@ rule MemberVariableDeclaration: ONEOF(
 #NOTE: I inlined CallSignature to make it easier for building function.
 #rule CallSignature: ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation)
 rule MemberFunctionDeclaration: ONEOF(
-  ZEROORMORE(AccessibilityModifier) + PropertyName + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}',
-  ZEROORMORE(AccessibilityModifier) + PropertyName + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + ';')
-  attr.action.%1,%2 : BuildFunction(%2)
+  ZEROORONE(Annotation) + ZEROORMORE(AccessibilityModifier) + PropertyName + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}',
+  ZEROORONE(Annotation) + ZEROORMORE(AccessibilityModifier) + PropertyName + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + ';')
+  attr.action.%1,%2 : BuildFunction(%3)
+  attr.action.%1,%2 : AddModifier(%2)
   attr.action.%1,%2 : AddModifier(%1)
-  attr.action.%1,%2 : AddParams(%5)
-  attr.action.%1,%2 : AddType(%7)
-  attr.action.%1    : AddFunctionBody(%9)
+  attr.action.%1,%2 : AddParams(%6)
+  attr.action.%1,%2 : AddType(%8)
+  attr.action.%1    : AddFunctionBody(%10)
 
 ## MemberAccessorDeclaration: AccessibilityModifieropt staticopt GetAccessor AccessibilityModifieropt staticopt SetAccessor
 rule MemberAccessorDeclaration: ONEOF(
-  ZEROORMORE(AccessibilityModifier) + GetAccessor,
-  ZEROORMORE(AccessibilityModifier) + SetAccessor)
+  ZEROORONE(Annotation) + ZEROORMORE(AccessibilityModifier) + GetAccessor,
+  ZEROORONE(Annotation) + ZEROORMORE(AccessibilityModifier) + SetAccessor)
+  attr.action.%1,%2 : AddModifierTo(%3, %1)
 
 ## IndexMemberDeclaration: IndexSignature ;
 rule IndexMemberDeclaration: IndexSignature + ';'
