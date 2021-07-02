@@ -336,6 +336,23 @@ TreeNode* ASTBuilder::SetPairs() {
   return mLastTreeNode;
 }
 
+TreeNode* ASTBuilder::SetDefaultPairs() {
+  TreeNode *pairs = NULL;
+  Param p = mParams[0];
+  if (!p.mIsEmpty && p.mIsTreeNode) {
+    pairs = p.mData.mTreeNode;
+    if (mLastTreeNode->IsImport()) {
+      ImportNode *inode = (ImportNode*)mLastTreeNode;
+      inode->AddDefaultPair(pairs);
+    } else if (mLastTreeNode->IsExport()) {
+      ExportNode *enode = (ExportNode*)mLastTreeNode;
+      enode->AddDefaultPair(pairs);
+    }
+  }
+
+  return mLastTreeNode;
+}
+
 // Takes one argument, the 'from' module
 TreeNode* ASTBuilder::SetFromModule() {
   Param p = mParams[0];
@@ -364,33 +381,6 @@ TreeNode* ASTBuilder::SetIsEverything() {
   XXportAsPairNode *n = (XXportAsPairNode*)gTreePool.NewTreeNode(sizeof(XXportAsPairNode));
   new (n) XXportAsPairNode();
   n->SetIsEverything();
-
-  if (mParams.size() == 1) {
-    Param p = mParams[0];
-    if (!p.mIsEmpty && p.mIsTreeNode) {
-      TreeNode *expr = p.mData.mTreeNode;
-      n->SetBefore(expr);
-    }
-  }
-
-  if (mLastTreeNode->IsImport()) {
-    ImportNode *inode = (ImportNode*)mLastTreeNode;
-    MASSERT(!inode->GetPairsNum());
-    inode->AddPair(n);
-  } else if (mLastTreeNode->IsExport()) {
-    ExportNode *enode = (ExportNode*)mLastTreeNode;
-    MASSERT(!enode->GetPairsNum());
-    enode->AddPair(n);
-  }
-
-  return mLastTreeNode;
-}
-
-// Similar as SetIsEverything.
-TreeNode* ASTBuilder::SetIsDefault() {
-  XXportAsPairNode *n = (XXportAsPairNode*)gTreePool.NewTreeNode(sizeof(XXportAsPairNode));
-  new (n) XXportAsPairNode();
-  n->SetIsDefault();
 
   if (mParams.size() == 1) {
     Param p = mParams[0];

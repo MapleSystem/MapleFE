@@ -261,6 +261,7 @@ public:
   XXportAsPairNode* GetPair(unsigned i) {return mPairs.ValueAtIndex(i);}
   void SetPair(unsigned i, XXportAsPairNode* n) {*(mPairs.RefAtIndex(i)) = n; SETPARENT(n);}
   void AddPair(TreeNode *p);
+  void AddDefaultPair(TreeNode *p);
 
   // Annotation/Pragma related
   unsigned GetAnnotationsNum()           {return mAnnotations.GetNum();}
@@ -339,6 +340,7 @@ public:
   XXportAsPairNode* GetPair(unsigned i) {return mPairs.ValueAtIndex(i);}
   void SetPair(unsigned i, XXportAsPairNode* n) {*(mPairs.RefAtIndex(i)) = n;}
   void AddPair(TreeNode *p);
+  void AddDefaultPair(TreeNode *p);
 
   void Dump(unsigned indent);
 };

@@ -152,6 +152,27 @@ void ImportNode::AddPair(TreeNode *t) {
   }
 }
 
+void ImportNode::AddDefaultPair(TreeNode *t) {
+  if (t->IsPass()) {
+    PassNode *n = (PassNode*)t;
+    for (unsigned i = 0; i < n->GetChildrenNum(); i++) {
+      TreeNode *child = n->GetChild(i);
+      AddDefaultPair(child);
+    }
+  } else if (t->IsXXportAsPair()) {
+    XXportAsPairNode *p = (XXportAsPairNode*)t;
+    p->SetIsDefault();
+    mPairs.PushBack((XXportAsPairNode*)p);
+  } else {
+    // We create a new pair to save 't'.
+    XXportAsPairNode *n = (XXportAsPairNode*)gTreePool.NewTreeNode(sizeof(XXportAsPairNode));
+    new (n) XXportAsPairNode();
+    n->SetBefore(t);
+    n->SetIsDefault();
+    mPairs.PushBack(n);
+  }
+}
+
 void ImportNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   DUMP0_NORETURN("import ");
@@ -192,6 +213,29 @@ void ExportNode::AddPair(TreeNode *t) {
     XXportAsPairNode *n = (XXportAsPairNode*)gTreePool.NewTreeNode(sizeof(XXportAsPairNode));
     new (n) XXportAsPairNode();
     n->SetBefore(t);
+    mPairs.PushBack(n);
+    SETPARENT(n);
+  }
+}
+
+void ExportNode::AddDefaultPair(TreeNode *t) {
+  if (t->IsPass()) {
+    PassNode *n = (PassNode*)t;
+    for (unsigned i = 0; i < n->GetChildrenNum(); i++) {
+      TreeNode *child = n->GetChild(i);
+      AddPair(child);
+    }
+  } else if (t->IsXXportAsPair()) {
+    XXportAsPairNode *p = (XXportAsPairNode*)t;
+    p->SetIsDefault();
+    mPairs.PushBack(p);
+    SETPARENT(t);
+  } else {
+    // We create a new pair to save 't'.
+    XXportAsPairNode *n = (XXportAsPairNode*)gTreePool.NewTreeNode(sizeof(XXportAsPairNode));
+    new (n) XXportAsPairNode();
+    n->SetBefore(t);
+    n->SetIsDefault();
     mPairs.PushBack(n);
     SETPARENT(n);
   }

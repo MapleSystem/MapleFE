@@ -1376,8 +1376,7 @@ rule ExportDeclaration : ONEOF(ZEROORMORE(Annotation) + "export" + '*' + FromCla
   attr.action.%1,%2,%3,%4,%5,%6,%7,%8 : AddModifier(%1)
   attr.action.%1       :    SetIsEverything()
   attr.action.%2,%3,%4,%5 : SetPairs(%3)
-  attr.action.%6,%7,%8 :    SetPairs(%4)
-  attr.action.%6,%7,%8 :    SetIsDefault()
+  attr.action.%6,%7,%8 :    SetDefaultPairs(%4)
   attr.action.%1,%2 :       SetFromModule(%4)
 
 ## See 15.2.3

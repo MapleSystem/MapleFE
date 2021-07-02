@@ -1,0 +1,20 @@
+Matched 7 tokens.
+Matched 11 tokens.
+Matched 15 tokens.
+Matched 27 tokens.
+Matched 41 tokens.
+============= Module ===========
+== Sub Tree ==
+js_var Decl: x=2
+== Sub Tree ==
+export { default as x} 
+== Sub Tree ==
+x Assign 12
+== Sub Tree ==
+export {func  getx()  throws: 
+  return x
+} 
+== Sub Tree ==
+export {func  setx(v)  throws: 
+  x Assign v
+} 

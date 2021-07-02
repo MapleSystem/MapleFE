@@ -43,8 +43,8 @@ ACTION(BuildExternalDeclaration)   // style like c/c++ include all in .h file
 ACTION(BuildImport)
 ACTION(BuildExport)
 ACTION(SetPairs)
+ACTION(SetDefaultPairs)
 ACTION(SetFromModule)
-ACTION(SetIsDefault)      // Apply to all pairs in import/export
 ACTION(SetIsEverything)   // Apply to all pairs in import/export
 
 ACTION(BuildXXportAsPair)             // normal pair
