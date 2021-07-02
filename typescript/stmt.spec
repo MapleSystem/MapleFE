@@ -1364,6 +1364,9 @@ rule ImportedBinding : BindingIdentifier
 ## export default HoistableDeclaration[Default]
 ## export default ClassDeclaration[Default]
 ## export default [lookahead ∉ {function, class}] AssignmentExpression[In] ;
+
+# export = expr;
+# is for export single syntax.
 rule ExportDeclaration : ONEOF(ZEROORMORE(Annotation) + "export" + '*' + FromClause + ';',
                                ZEROORMORE(Annotation) + "export" + ExportClause + FromClause + ';',
                                ZEROORMORE(Annotation) + "export" + ExportClause + ';',
@@ -1371,14 +1374,16 @@ rule ExportDeclaration : ONEOF(ZEROORMORE(Annotation) + "export" + '*' + FromCla
                                ZEROORMORE(Annotation) + "export" + Declaration,
                                ZEROORMORE(Annotation) + "export" + "default" + HoistableDeclaration,
                                ZEROORMORE(Annotation) + "export" + "default" + ClassDeclaration,
-                               ZEROORMORE(Annotation) + "export" + "default" + AssignmentExpression + ';')
+                               ZEROORMORE(Annotation) + "export" + "default" + AssignmentExpression + ';',
+                               ZEROORMORE(Annotation) + "export" + "=" + AssignmentExpression + ';')
   attr.property : Top
-  attr.action.%1,%2,%3,%4,%5,%6,%7,%8 : BuildExport()
-  attr.action.%1,%2,%3,%4,%5,%6,%7,%8 : AddModifier(%1)
+  attr.action.%1,%2,%3,%4,%5,%6,%7,%8,%9 : BuildExport()
+  attr.action.%1,%2,%3,%4,%5,%6,%7,%8,%9 : AddModifier(%1)
   attr.action.%1       :    SetIsEverything()
   attr.action.%2,%3,%4,%5 : SetPairs(%3)
   attr.action.%6,%7,%8 :    SetDefaultPairs(%4)
   attr.action.%1,%2 :       SetFromModule(%4)
+  attr.action.%9          : SetPairs(%4)
 
 ## See 15.2.3
 ## ExportClause :
