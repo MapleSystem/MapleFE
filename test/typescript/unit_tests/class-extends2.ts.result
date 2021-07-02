@@ -1,7 +1,7 @@
 Matched 36 tokens.
-Matched 83 tokens.
-Matched 96 tokens.
-Matched 113 tokens.
+Matched 89 tokens.
+Matched 102 tokens.
+Matched 119 tokens.
 ============= Module ===========
 == Sub Tree ==
 class  Car
@@ -25,7 +25,7 @@ class  Model
   Constructors: 
     constructor  (make,model)  throws: 
       super(make)
-      this._model Assign model
+      this._model Assign super.getMake() Add model
   Methods: 
     func  getModel()  throws: 
       return this._model

@@ -24,8 +24,7 @@ class  Model
   Instance Initializer: 
   Constructors: 
     constructor  (make,model)  throws: 
-      super
-      make
+      super(make)
       this._model Assign model
   Methods: 
     func  getModel()  throws: 

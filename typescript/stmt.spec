@@ -127,6 +127,7 @@ rule LabelIdentifier : ONEOF(
 
 rule PrimaryExpression : ONEOF(
   "this",
+  "super",
   IdentifierReference,
   Literal,
   ArrayLiteral,
