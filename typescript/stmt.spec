@@ -1523,8 +1523,7 @@ rule TypeMember : ONEOF(PropertySignature,
                         CallSignature,
                         ConstructSignature,
                         IndexSignature,
-                        ##MethodSignature
-                       )
+                        MethodSignature)
 
 ## rule ArrayType: PrimaryType [no LineTerminator here] [ ]
 rule ArrayType: PrimaryType + '[' + ']'
@@ -1660,6 +1659,18 @@ rule IndexSignature: ONEOF(
   attr.action.%2 : BuildNumIndexSig(%6)
 
 ## rule MethodSignature: PropertyName ?opt CallSignature
+## I inlined CallSignature
+rule MethodSignature: ONEOF(
+    PropertyName + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + ';',
+    PropertyName + '?' + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + ';')
+  attr.action.%1,%2 : BuildFunction(%1)
+  attr.action.%1 : AddParams(%4)
+  attr.action.%1 : AddType(%6)
+  attr.action.%1 : AddTypeGenerics(%2)
+  attr.action.%2 : SetIsOptional(%1)
+  attr.action.%2 : AddParams(%5)
+  attr.action.%2 : AddType(%7)
+  attr.action.%2 : AddTypeGenerics(%3)
 
 ## rule TypeAliasDeclaration: type BindingIdentifier TypeParametersopt = Type ;
 rule TypeAliasDeclaration: "type" + BindingIdentifier + ZEROORONE(TypeParameters) + '=' + Type + ';'
