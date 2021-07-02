@@ -160,8 +160,22 @@ class ClassFld {
     JS_Prop* newProp(JS_Type type) {return new JS_Prop(type, field.addr);}
 };
 
-extern Ctor* Function;
-extern Ctor* Object;
+
+// For JS builtins
+class Ctor_Function : public Ctor {
+  public:
+    Ctor_Function(Ctor* ctor, BaseObj* proto, BaseObj* prototype) : Ctor(ctor, proto, prototype) {}
+};
+class Ctor_Object   : public Ctor {
+  public:
+    Ctor_Object(Ctor* ctor, BaseObj* proto, BaseObj* prototype) : Ctor(ctor, proto, prototype) {}
+};
+class Function : public BaseObj {};
+
+extern BaseObj Object_prototype;
+extern BaseObj Function_prototype;
+extern Ctor_Function Function_ctor;
+extern Ctor_Object   Object_ctor;
 
 } // namespace t2crt
 
