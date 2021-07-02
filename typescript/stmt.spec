@@ -1935,11 +1935,9 @@ rule EntityName: ONEOF(NamespaceName,
   attr.action.%2 : BuildField(%1, %3)
 
 #################################################################################################
-#################################################################################################
-##                      Many syntax are not in the typescript spec.
-##                      They are specified below
-#################################################################################################
+#                      declare syntax
 #################################################################################################
 
-rule ExternalDeclaration : ONEOF("declare" + NamespaceDeclaration)
-  attr.action.%1 : BuildExternalDeclaration(%2)
+rule ExternalDeclaration : ONEOF("declare" + NamespaceDeclaration,
+                                 "declare" + VariableStatement)
+  attr.action.%1,%2 : BuildExternalDeclaration(%2)
