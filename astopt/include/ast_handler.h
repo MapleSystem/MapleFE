@@ -32,6 +32,7 @@ class CfgBB;
 class CfgFunc;
 class AST_AST;
 class AST_DFA;
+class AST_SCP;
 class AST_Handler;
 class TypeInfer;
 
@@ -43,6 +44,7 @@ class Module_Handler {
   CfgFunc      *mCfgFunc;   // initial CfgFunc in module scope
   AST_AST      *mAST;
   AST_DFA      *mDFA;
+  AST_SCP      *mSCP;
   TypeInfer    *mTI;
   const char   *mOutputFileName;
   bool          mTrace;
@@ -65,6 +67,7 @@ class Module_Handler {
     mCfgFunc(nullptr),
     mAST(nullptr),
     mDFA(nullptr),
+    mSCP(nullptr),
     mTI(nullptr),
     mTrace(trace) {}
   ~Module_Handler() {}
@@ -74,6 +77,7 @@ class Module_Handler {
   void BuildCFG();
   void ASTCollectAndDBRemoval(CfgFunc *func);
   void BuildDFA(CfgFunc *func);
+  void BuildSCP();
   void TypeInference();
 
   const char *GetOutputFileName()          {return mOutputFileName;}
@@ -99,9 +103,11 @@ class Module_Handler {
   bool GetTrace() {return mTrace;}
   AST_AST *GetAST() {return mAST;}
   AST_DFA *GetDFA() {return mDFA;}
+  AST_SCP *GetSCP() {return mSCP;}
   TypeInfer *GetTI() {return mTI;}
   void SetAST(AST_AST *p) {mAST = p;}
   void SetDFA(AST_DFA *p) {mDFA = p;}
+  void SetSCP(AST_SCP *p) {mSCP = p;}
   void SetTI(TypeInfer *p) {mTI = p;}
 
   DeclNode *GetDeclOf(IdentifierNode *inode);

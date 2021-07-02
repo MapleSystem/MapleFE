@@ -19,6 +19,7 @@
 #include "ast_cfg.h"
 #include "ast_ast.h"
 #include "ast_dfa.h"
+#include "ast_scp.h"
 #include "ast_ti.h"
 
 namespace maplefe {
@@ -61,10 +62,10 @@ void Module_Handler::BuildDFA(CfgFunc *func) {
 }
 
 void Module_Handler::BuildScope() {
-  if (!mDFA) {
-    mDFA = new(GetMemPool()->Alloc(sizeof(AST_DFA))) AST_DFA(this, mTrace);
+  if (!mSCP) {
+    mSCP = new(GetMemPool()->Alloc(sizeof(AST_SCP))) AST_SCP(this, mTrace);
   }
-  mDFA->BuildScope();
+  mSCP->BuildScope();
 }
 
 // input an identifire ===> returen the decl node with same name
