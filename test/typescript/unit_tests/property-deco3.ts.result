@@ -1,0 +1,27 @@
+Matched 36 tokens.
+Matched 63 tokens.
+Matched 72 tokens.
+Matched 81 tokens.
+============= Module ===========
+== Sub Tree ==
+func  type(msg)  throws: 
+  return func  (target,name)  throws: 
+  console.log("Accessed",name,msg,target)
+
+
+== Sub Tree ==
+class  Klass
+  Fields: 
+    x
+  Instance Initializer: 
+  Constructors: 
+    constructor  (i)  throws: 
+      this.x Assign i
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+js_var Decl: c=new Klass(3)
+== Sub Tree ==
+console.log(c.x)
