@@ -180,20 +180,19 @@ extern BaseObj Function_prototype;
 extern Ctor_Function Function_ctor;
 extern Ctor_Object   Object_ctor;
 
-template <typename T> std::string __js_typeof(T& v) {
-  typedef typename std::remove_reference<T>::type TY;
-  if (std::numeric_limits<TY>::is_signed)
+template <typename T> std::string __js_typeof(T v) {
+  if (std::numeric_limits<T>::is_signed)
     return "number"s;
-  if (std::numeric_limits<TY>::is_integer)
+  if (std::numeric_limits<T>::is_integer)
     return "boolean"s;
   return "unknown"s;
 }
 
-template <> inline std::string __js_typeof<std::string>(std::string& v) {
+template <> inline std::string __js_typeof<std::string>(std::string v) {
   return "string"s;
 }
 
-template <> inline std::string __js_typeof<t2crt::JS_Val>(t2crt::JS_Val& v) {
+template <> inline std::string __js_typeof<t2crt::JS_Val>(t2crt::JS_Val v) {
     switch(v.type) {
     case t2crt::TY_Undef:
       return "undefined"s;
