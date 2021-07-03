@@ -1,0 +1,19 @@
+Matched 4 tokens.
+Matched 17 tokens.
+Matched 31 tokens.
+============= Module ===========
+== Sub Tree ==
+class  Klass
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+export {ts_interface: Interf {string index type: any }} 
+== Sub Tree ==
+export {ts_interface: Interf2 {func  func(component)  throws: 
+ }} 
