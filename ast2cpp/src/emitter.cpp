@@ -152,6 +152,81 @@ std::string Emitter::EmitIdentifierNode(IdentifierNode *node) {
   return HandleTreeNode(str, node);
 }
 
+std::string Emitter::EmitFunctionNode(FunctionNode *node) {
+  if (node == nullptr)
+    return std::string();
+  std::string str;
+  auto body = node->GetBody();
+  if(body) {
+    for (unsigned i = 0; i < node->GetAttrsNum(); ++i) {
+      str += GetEnumAttrId(node->GetAttrAtIndex(i));
+    }
+    if(str.empty())
+      str = "function "s + str;
+    if(node->GetStrIdx())
+      str += node->GetName();
+  }
+
+  auto num = node->GetTypeParamsNum();
+  if(num) {
+    str += "<"s;
+    for (unsigned i = 0; i < num; ++i) {
+      if (i)
+        str += ", "s;
+      if (auto n = node->GetTypeParamAtIndex(i)) {
+        str += EmitTreeNode(n);
+      }
+    }
+    str += ">"s;
+  }
+
+  /*
+  for (unsigned i = 0; i < node->GetAnnotationsNum(); ++i) {
+    if (auto n = node->GetAnnotationAtIndex(i)) {
+      str += " "s + EmitAnnotationNode(n);
+    }
+  }
+
+  for (unsigned i = 0; i < node->GetThrowsNum(); ++i) {
+    if (auto n = node->GetThrowAtIndex(i)) {
+      str += " "s + EmitExceptionNode(n);
+    }
+  }
+  */
+
+  str += "("s;
+  for (unsigned i = 0; i < node->GetParamsNum(); ++i) {
+    if (i)
+      str += ", "s;
+    if (auto n = node->GetParam(i)) {
+      str += EmitTreeNode(n);
+    }
+  }
+  str += ")"s;
+
+  if (auto n = node->GetType()) {
+    std::string s = EmitTreeNode(n);
+    if(!s.empty())
+      str += (body ? " : "s : " => "s) + s;
+  }
+
+  if (body) {
+    auto s = EmitBlockNode(body);
+    if(s.empty() || s.front() != '{')
+      str += "{"s + s + "}\n"s;
+    else
+      str += s;
+  }
+  /*
+  if (auto n = node->GetDims()) {
+    str += " "s + EmitDimensionNode(n);
+  }
+  str += " "s + std::to_string(node->IsConstructor());
+  */
+  mPrecedence = '\030';
+  return HandleTreeNode(str, node);
+}
+
 std::string Emitter::EmitUserTypeNode(UserTypeNode *node) {
   if (node == nullptr)
     return std::string();
@@ -1160,81 +1235,6 @@ std::string Emitter::EmitCallNode(CallNode *node) {
   mPrecedence = '\024';
   if (node->IsStmt())
     str += ";\n"s;
-  return HandleTreeNode(str, node);
-}
-
-std::string Emitter::EmitFunctionNode(FunctionNode *node) {
-  if (node == nullptr)
-    return std::string();
-  std::string str;
-  auto body = node->GetBody();
-  if(body) {
-    for (unsigned i = 0; i < node->GetAttrsNum(); ++i) {
-      str += GetEnumAttrId(node->GetAttrAtIndex(i));
-    }
-    if(str.empty())
-      str = "function "s + str;
-    if(node->GetStrIdx())
-      str += node->GetName();
-  }
-
-  auto num = node->GetTypeParamsNum();
-  if(num) {
-    str += "<"s;
-    for (unsigned i = 0; i < num; ++i) {
-      if (i)
-        str += ", "s;
-      if (auto n = node->GetTypeParamAtIndex(i)) {
-        str += EmitTreeNode(n);
-      }
-    }
-    str += ">"s;
-  }
-
-  /*
-  for (unsigned i = 0; i < node->GetAnnotationsNum(); ++i) {
-    if (auto n = node->GetAnnotationAtIndex(i)) {
-      str += " "s + EmitAnnotationNode(n);
-    }
-  }
-
-  for (unsigned i = 0; i < node->GetThrowsNum(); ++i) {
-    if (auto n = node->GetThrowAtIndex(i)) {
-      str += " "s + EmitExceptionNode(n);
-    }
-  }
-  */
-
-  str += "("s;
-  for (unsigned i = 0; i < node->GetParamsNum(); ++i) {
-    if (i)
-      str += ", "s;
-    if (auto n = node->GetParam(i)) {
-      str += EmitTreeNode(n);
-    }
-  }
-  str += ")"s;
-
-  if (auto n = node->GetType()) {
-    std::string s = EmitTreeNode(n);
-    if(!s.empty())
-      str += (body ? " : "s : " => "s) + s;
-  }
-
-  if (body) {
-    auto s = EmitBlockNode(body);
-    if(s.empty() || s.front() != '{')
-      str += "{"s + s + "}\n"s;
-    else
-      str += s;
-  }
-  /*
-  if (auto n = node->GetDims()) {
-    str += " "s + EmitDimensionNode(n);
-  }
-  str += " "s + std::to_string(node->IsConstructor());
-  */
-  mPrecedence = '\030';
   return HandleTreeNode(str, node);
 }
 

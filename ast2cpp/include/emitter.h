@@ -48,6 +48,7 @@ public:
   virtual std::string EmitAnnotationNode(AnnotationNode *node);
   virtual std::string EmitAsTypeNode(AsTypeNode *node);
   virtual std::string EmitIdentifierNode(IdentifierNode *node);
+  virtual std::string EmitFunctionNode(FunctionNode *node);
   virtual std::string EmitUserTypeNode(UserTypeNode *node);
   virtual std::string EmitPackageNode(PackageNode *node);
   virtual std::string EmitXXportAsPairNode(XXportAsPairNode *node);
@@ -99,7 +100,6 @@ public:
   virtual std::string EmitSwitchNode(SwitchNode *node);
   virtual std::string EmitAssertNode(AssertNode *node);
   virtual std::string EmitCallNode(CallNode *node);
-  virtual std::string EmitFunctionNode(FunctionNode *node);
   virtual std::string EmitInterfaceNode(InterfaceNode *node);
   virtual std::string EmitClassNode(ClassNode *node);
   virtual std::string EmitPassNode(PassNode *node);
