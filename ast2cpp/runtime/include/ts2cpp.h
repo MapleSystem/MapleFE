@@ -196,6 +196,7 @@ std::ostream& operator<< (std::ostream& out, const std::vector<T>& v) {
   return out;
 }
 
-const t2crt::JS_Val undefined = { 0, t2crt::TY_Undef, false };
+extern const t2crt::JS_Val undefined;
+extern std::ostream& operator<< (std::ostream& out, const t2crt::JS_Val& v);
 
 #endif

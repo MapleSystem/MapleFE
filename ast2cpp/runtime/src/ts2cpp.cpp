@@ -1,4 +1,6 @@
-#include "ts2cpp.h"
+#include "../include/ts2cpp.h"
+
+const t2crt::JS_Val undefined = { 0, t2crt::TY_Undef, false };
 
 std::ostream& operator<< (std::ostream& out, const t2crt::JS_Val& v) {
   switch(v.type) {

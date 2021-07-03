@@ -1,4 +1,4 @@
-#include "ts2cpp.h"
+#include "../include/ts2cpp.h"
 
 namespace t2crt {
 
