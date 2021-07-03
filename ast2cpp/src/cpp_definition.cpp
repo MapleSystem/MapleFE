@@ -576,7 +576,7 @@ out_of_loops:
 std::string CppDef::EmitTypeOfNode(TypeOfNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str("__js_typeof("s), rhs;
+  std::string str("t2crt::__js_typeof("s), rhs;
   if (auto n = node->GetExpr())
     rhs = EmitTreeNode(n);
   str += rhs + ")"s;

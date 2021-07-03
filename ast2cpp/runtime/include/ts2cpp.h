@@ -22,9 +22,12 @@
 #include <unordered_map>
 #include <cmath>
 
+using namespace std::string_literals;
+
 namespace t2crt {
 
 using std::to_string;
+
 inline std::string to_string(std::string t) {return t;}
 
 class BaseObj;
@@ -177,9 +180,45 @@ extern BaseObj Function_prototype;
 extern Ctor_Function Function_ctor;
 extern Ctor_Object   Object_ctor;
 
-} // namespace t2crt
+template <typename T> std::string __js_typeof(T& v) {
+  typedef typename std::remove_reference<T>::type TY;
+  if (std::numeric_limits<TY>::is_signed)
+    return "number"s;
+  if (std::numeric_limits<TY>::is_integer)
+    return "boolean"s;
+  return "unknown"s;
+}
 
-using namespace std::string_literals;
+template <> inline std::string __js_typeof<std::string>(std::string& v) {
+  return "string"s;
+}
+
+template <> inline std::string __js_typeof<t2crt::JS_Val>(t2crt::JS_Val& v) {
+    switch(v.type) {
+    case t2crt::TY_Undef:
+      return "undefined"s;
+    case t2crt::TY_Null:
+      return "object"s;
+    case t2crt::TY_Bool:
+      return "boolean"s;
+    case t2crt::TY_Long:
+    case t2crt::TY_Double:
+      return "number"s;
+    case t2crt::TY_BigInt:
+      return "bigint"s;
+    case t2crt::TY_String:
+      return "string"s;
+    case t2crt::TY_Symbol:
+      return "symbol"s;
+    case t2crt::TY_Function:
+      return "function"s;
+    case t2crt::TY_Object:
+      return "object"s;
+  }
+  return "unknown"s;
+}
+
+} // namespace t2crt
 
 template <typename T>
 std::ostream& operator<< (std::ostream& out, const std::vector<T>& v) {
@@ -196,7 +235,7 @@ std::ostream& operator<< (std::ostream& out, const std::vector<T>& v) {
   return out;
 }
 
-extern const t2crt::JS_Val undefined;
 extern std::ostream& operator<< (std::ostream& out, const t2crt::JS_Val& v);
+extern const t2crt::JS_Val undefined;
 
 #endif
