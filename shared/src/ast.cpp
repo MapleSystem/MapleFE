@@ -696,6 +696,8 @@ void StructNode::AddChild(TreeNode *field) {
     }
   } else if (field->IsIdentifier()) {
     AddField((IdentifierNode*)field);
+  } else if (field->IsFunction()) {
+    AddMethod((FunctionNode*)field);
   } else if (field->IsNumIndexSig()) {
     SetNumIndexSig((NumIndexSigNode*)field);
   } else if (field->IsStrIndexSig()) {
@@ -747,6 +749,12 @@ void StructNode::Dump(unsigned indent) {
   for (unsigned i = 0; i < mFields.GetNum(); i++) {
     mFields.ValueAtIndex(i)->Dump(0);
     if (i != mFields.GetNum()-1)
+      DUMP0_NORETURN(";");
+  }
+
+  for (unsigned i = 0; i < mMethods.GetNum(); i++) {
+    mMethods.ValueAtIndex(i)->Dump(0);
+    if (i != mMethods.GetNum()-1)
       DUMP0_NORETURN(";");
   }
   DUMP0_NORETURN(" }");
@@ -1498,6 +1506,8 @@ void FunctionNode::Dump(unsigned indent) {
 
   if (mStrIdx)
     DUMP0_NORETURN(GetName());
+  if (mFuncName && mFuncName->IsOptional())
+    DUMP0_NORETURN("?");
 
   if (GetTypeParamsNum() > 0) {
     DUMP0_NORETURN("<");

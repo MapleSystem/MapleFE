@@ -1,0 +1,11 @@
+Matched 4 tokens.
+Matched 12 tokens.
+Matched 25 tokens.
+============= Module ===========
+== Sub Tree ==
+ts_interface: Klass1 {Klass1 }
+== Sub Tree ==
+ts_interface: Klass2 {name }
+== Sub Tree ==
+ts_interface: Klass3 {func  getObj(o)  throws: 
+ }

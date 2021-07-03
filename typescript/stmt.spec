@@ -1578,11 +1578,12 @@ rule TypeQueryExpression: ONEOF(IdentifierReference,
 rule ThisType: "this"
 
 ## rule PropertySignature: PropertyName ?opt TypeAnnotationopt
-rule PropertySignature: ONEOF(PropertyName + ZEROORONE(TypeAnnotation),
-                              PropertyName + '?' + ZEROORONE(TypeAnnotation))
-  attr.action.%1 : AddType(%1, %2)
-  attr.action.%2 : AddType(%1, %3)
-  attr.action.%2 : SetIsOptional(%1)
+rule PropertySignature: ONEOF(ZEROORONE(AccessibilityModifier) + PropertyName + ZEROORONE(TypeAnnotation),
+                              ZEROORONE(AccessibilityModifier) + PropertyName + '?' + ZEROORONE(TypeAnnotation))
+  attr.action.%1 : AddType(%2, %3)
+  attr.action.%2 : AddType(%2, %4)
+  attr.action.%2 : SetIsOptional(%2)
+  attr.action.%1,%2: AddModifierTo(%2, %1)
 
 ## JS ECMA has more definition than this Typescript one. I use ECMA one.
 ## rule PropertyName: IdentifierName StringLiteral NumericLiteral

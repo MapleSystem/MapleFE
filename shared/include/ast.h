@@ -74,6 +74,7 @@ enum NodeKind {
 class AnnotationNode;
 class AsTypeNode;
 class IdentifierNode;
+class FunctionNode;
 class UserTypeNode;
 class ASTScope;
 
@@ -963,11 +964,14 @@ public:
   void Dump(unsigned);
 };
 
+// C++ struct or Typescript interface.
+// The methods in Typescript interface has no function body.
 class StructNode : public TreeNode {
 private:
   StructProp      mProp;
   IdentifierNode *mStructId;
   SmallVector<IdentifierNode*> mFields;
+  SmallVector<FunctionNode*>   mMethods;
 
   // These are for 'number' or 'string' index data type
   NumIndexSigNode *mNumIndexSig;
@@ -994,9 +998,14 @@ public:
   void            SetField(unsigned i, IdentifierNode* n) {*(mFields.RefAtIndex(i)) = n;}
   void            AddField(IdentifierNode *n) {mFields.PushBack(n);}
 
+  unsigned      GetMethodsNum() {return mMethods.GetNum();}
+  FunctionNode* GetMethod(unsigned i) {return mMethods.ValueAtIndex(i);}
+  void          SetMethod(unsigned i, FunctionNode* n) {*(mMethods.RefAtIndex(i)) = n;}
+  void          AddMethod(FunctionNode *n) {mMethods.PushBack(n);}
+
   void AddChild(TreeNode *);
 
-  void Release() {mFields.Release();}
+  void Release() {mFields.Release(); mMethods.Release();}
   void Dump(unsigned);
 };
 

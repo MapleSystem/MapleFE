@@ -1,0 +1,19 @@
+Matched 8 tokens.
+Matched 34 tokens.
+Matched 56 tokens.
+Matched 69 tokens.
+Matched 74 tokens.
+============= Module ===========
+== Sub Tree ==
+ts_interface: Base {name }
+== Sub Tree ==
+ts_interface: Derived {age;impl?func  initialize?(c)  throws: 
+ }
+== Sub Tree ==
+func  dump(obj)  throws: 
+  console.log(obj.name,obj.age)
+
+== Sub Tree ==
+js_let Decl: o= {name:"John", age:30}
+== Sub Tree ==
+dump(o)
