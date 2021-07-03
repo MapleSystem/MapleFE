@@ -35,7 +35,7 @@ class Ctor;
 
 // JS types for props
 typedef enum JS_Type : uint8_t {
-  TY_None,      // Placeholder for non-existing property
+  TY_None = 0,  // Placeholder for non-existing property
   TY_Undef,     // "undefined"
   TY_Null,      // "object"
   TY_Bool,      // "boolean"
@@ -193,28 +193,20 @@ template <> inline std::string __js_typeof<std::string>(std::string v) {
 }
 
 template <> inline std::string __js_typeof<t2crt::JS_Val>(t2crt::JS_Val v) {
-    switch(v.type) {
-    case t2crt::TY_Undef:
-      return "undefined"s;
-    case t2crt::TY_Null:
-      return "object"s;
-    case t2crt::TY_Bool:
-      return "boolean"s;
-    case t2crt::TY_Long:
-    case t2crt::TY_Double:
-      return "number"s;
-    case t2crt::TY_BigInt:
-      return "bigint"s;
-    case t2crt::TY_String:
-      return "string"s;
-    case t2crt::TY_Symbol:
-      return "symbol"s;
-    case t2crt::TY_Function:
-      return "function"s;
-    case t2crt::TY_Object:
-      return "object"s;
-  }
-  return "unknown"s;
+  static std::string names[t2crt::TY_LAST] = {
+    [t2crt::TY_None]     =  "none"s,
+    [t2crt::TY_Undef]    = "undefined"s,
+    [t2crt::TY_Null]     = "object"s,
+    [t2crt::TY_Bool]     = "boolean"s,
+    [t2crt::TY_Long]     = "number"s,
+    [t2crt::TY_Double]   = "number"s,
+    [t2crt::TY_BigInt]   = "bigint"s,
+    [t2crt::TY_String]   = "string"s,
+    [t2crt::TY_Symbol]   = "symbol"s,
+    [t2crt::TY_Function] = "function"s,
+    [t2crt::TY_Object]   = "object"s,
+  };
+  return names[v.type];
 }
 
 } // namespace t2crt
