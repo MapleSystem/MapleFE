@@ -218,4 +218,49 @@ std::string CppDecl::GetTypeString(TreeNode *node, TreeNode *child) {
   return "t2crt::JS_Val "s;
 }
 
+std::string CppDecl::EmitUserTypeNode(UserTypeNode *node) {
+  if (node == nullptr)
+    return std::string();
+  {
+    auto k = node->GetType();
+    if(k == UT_Union || k == UT_Inter)
+      return "t2crt::JS_Val"s;
+  }
+  std::string str;
+  if (auto n = node->GetId()) {
+    str = EmitTreeNode(n);
+    auto num = node->GetTypeGenericsNum();
+    if(num) {
+      str += "<"s;
+      for (unsigned i = 0; i < num; ++i) {
+        if (i)
+          str += ", "s;
+        if (auto n = node->GetTypeGeneric(i)) {
+          str += EmitTreeNode(n);
+        }
+      }
+      str += ">"s;
+    }
+  }
+
+  auto k = node->GetType();
+  if(k != UT_Regular) {
+    if(!str.empty())
+      str = "using "s + str + " = "s;
+    std::string op = k == UT_Union ? " | "s : " & "s;
+    for (unsigned i = 0; i < node->GetUnionInterTypesNum(); ++i) {
+      if(i)
+        str += op;
+      str += EmitTreeNode(node->GetUnionInterType(i));
+    }
+  }
+
+  if (auto n = node->GetDims()) {
+    str += EmitDimensionNode(n);
+  }
+  if (node->IsStmt())
+    str += ";\n"s;
+  return HandleTreeNode(str, node);
+}
+
 } // namespace maplefe

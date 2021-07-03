@@ -32,6 +32,7 @@ public:
     return EmitTreeNode(GetASTModule());
   }
 
+  virtual std::string EmitUserTypeNode(UserTypeNode *node);
   virtual std::string EmitBinOperatorNode(BinOperatorNode *node);
   virtual std::string EmitIdentifierNode(IdentifierNode *node);
   virtual std::string EmitDeclNode(DeclNode *node);
