@@ -574,4 +574,16 @@ out_of_loops:
   return str;
 }
 
+std::string CppDef::EmitTypeOfNode(TypeOfNode *node) {
+  if (node == nullptr)
+    return std::string();
+  std::string str("__js_typeof("s), rhs;
+  if (auto n = node->GetExpr())
+    rhs = EmitTreeNode(n);
+  str += rhs + ")"s;
+  if (node->IsStmt())
+    str += ";\n"s;
+  return HandleTreeNode(str, node);
+}
+
 } // namespace maplefe

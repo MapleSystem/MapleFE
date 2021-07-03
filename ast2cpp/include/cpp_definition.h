@@ -52,6 +52,7 @@ public:
   virtual std::string EmitSwitchNode(SwitchNode *node);
   virtual std::string EmitCallNode(CallNode *node);
   virtual std::string EmitFunctionNode(FunctionNode *node);
+  virtual std::string EmitTypeOfNode(TypeOfNode *node);
   virtual std::string EmitModuleNode(ModuleNode *node);
   virtual std::string EmitPrimTypeNode(PrimTypeNode *node);
   virtual std::string EmitPrimArrayTypeNode(PrimArrayTypeNode *node);
