@@ -98,16 +98,7 @@ std::string CppDef::EmitXXportAsPairNode(XXportAsPairNode *node) {
 std::string CppDef::EmitFunctionNode(FunctionNode *node) {
   if (isInit || node == nullptr)
     return std::string();
-  std::string str;
-  if (auto n = node->GetType()) {
-    TypeId k = n->GetTypeId();
-    if(k != TY_None && k != TY_Object && k != TY_Function && k != TY_Array)
-      str += CppDecl::GetEnumTypeId(k);
-    else
-      str += mCppDecl.EmitTreeNode(n);
-  }
-  else
-    str += "auto"s;
+  std::string str(mCppDecl.GetTypeString(node->GetType(), node->GetType()));
   if(node->GetStrIdx())
     str += " "s + GetModuleName() + "::"s + node->GetName();
   str += "("s;

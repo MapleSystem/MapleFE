@@ -91,16 +91,7 @@ extern )""" + name + " _"s + name + ";\n#endif\n"s;
 std::string CppDecl::EmitFunctionNode(FunctionNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str;
-  if (auto n = node->GetType()) {
-    TypeId k = n->GetTypeId();
-    if(k != TY_None && k != TY_Object && k != TY_Function && k != TY_Array)
-      str += CppDecl::GetEnumTypeId(k);
-    else
-      str += EmitTreeNode(n);
-  }
-  else
-    str += "auto"s;
+  std::string str(GetTypeString(node->GetType(), node->GetType()));
   if(node->GetStrIdx())
     str += " "s + node->GetName();
   str += "("s;
@@ -122,14 +113,7 @@ std::string CppDecl::EmitBinOperatorNode(BinOperatorNode *node) {
 std::string CppDecl::EmitIdentifierNode(IdentifierNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str;
-  TypeId k = node->GetTypeId();
-  if(k != TY_None && k != TY_Object && k != TY_Function && k != TY_Array)
-    str += CppDecl::GetEnumTypeId(node->GetTypeId());
-  else if (auto n = node->GetType())
-    str += EmitTreeNode(n);
-  else
-    str += "t2crt::JS_Val"s;
+  std::string str(GetTypeString(node, node->GetType()));
   str += " "s + node->GetName();
   return str;
 }
@@ -137,17 +121,7 @@ std::string CppDecl::EmitIdentifierNode(IdentifierNode *node) {
 std::string CppDecl::EmitPrimTypeNode(PrimTypeNode *node) {
   if (node == nullptr)
     return std::string();
-  switch(node->GetPrimType()) {
-    case TY_Number:
-      return "double "s;
-    case TY_Boolean:
-      return "bool "s;
-    case TY_String:
-      return "std::string "s;
-    case TY_None:
-      return "auto "s;
-  }
-  return GetEnumTypeId(node->GetPrimType());
+  return GetTypeString(node);
 }
 
 std::string CppDecl::EmitDeclNode(DeclNode *node) {
@@ -215,22 +189,33 @@ std::string CppDecl::EmitFieldNode(FieldNode *node) {
   return std::string();
 }
 
-std::string CppDecl::GetEnumTypeId(TypeId k) {
-  switch (k) {
-  case TY_Object:
-    return "t2crt::BaseObj*";
-  case TY_Function:
-    return "t2crt::BaseObj*";
-  case TY_Boolean:
-    return "bool";
-  case TY_Int:
-    return "long";
-  case TY_String:
-    return "std::string";
-  case TY_Number:
-    return "double";
+std::string CppDecl::GetTypeString(TreeNode *node, TreeNode *child) {
+  if (node) {
+    TypeId k = node->GetTypeId();
+    if(k == TY_None && node->GetKind() == NK_PrimType)
+      k = static_cast<PrimTypeNode*>(node)->GetPrimType();
+    switch(k) {
+      case TY_Object:
+        return "t2crt::BaseObj* "s;
+      case TY_Function:
+        return "t2crt::BaseObj* "s;
+      case TY_Boolean:
+        return "bool "s;
+      case TY_Int:
+        return "long "s;
+      case TY_String:
+        return "std::string "s;
+      case TY_Number:
+      case TY_Double:
+        return "double "s;
+    }
+    {
+      std::string str = child ? EmitTreeNode(child) : Emitter::GetEnumTypeId(k);
+      if (str != "none"s)
+        return str + " "s;
+    }
   }
-  return Emitter::GetEnumTypeId(k);
+  return "t2crt::JS_Val "s;
 }
 
 } // namespace maplefe

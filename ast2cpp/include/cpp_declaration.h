@@ -48,7 +48,8 @@ public:
   virtual std::string EmitPrimArrayTypeNode(PrimArrayTypeNode *node);
   virtual std::string EmitModuleNode(ModuleNode *node);
 
-  static std::string GetEnumTypeId(TypeId k);
+  std::string GetTypeString(TreeNode *node, TreeNode *child = nullptr);
+
 };
 
 } // namespace maplefe
