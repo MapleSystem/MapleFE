@@ -165,7 +165,7 @@ std::string CppDef::EmitDeclNode(DeclNode *node) {
 }
 
 static bool QuoteStringLiteral(std::string &s, bool quoted = false) {
-  if(!quoted && (s.front() != '"' || s.back() != '"'))
+  if(!quoted && (s.front() != '"' || s.front() != '\''|| s.back() != '"' || s.back() != '\'' ))
     return false;
   if(!quoted)
     s = s.substr(1, s.length() - 2);
@@ -491,11 +491,19 @@ std::string CppDef::EmitTemplateLiteralNode(TemplateLiteralNode *node) {
   return str;
 }
 
+static std::string GetEnumLitData(LitData lit) {
+  if(lit.mType == LT_VoidLiteral)
+    return "undefined"s;
+  std::string str = AstDump::GetEnumLitData(lit);
+  if(lit.mType == LT_StringLiteral)
+    QuoteStringLiteral(str);
+  return str;
+}
+
 std::string CppDef::EmitLiteralNode(LiteralNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str(AstDump::GetEnumLitData(node->GetData()));
-  QuoteStringLiteral(str);
+  std::string str(GetEnumLitData(node->GetData()));
   mPrecedence = '\030';
   if (node->IsStmt())
     str += ";\n"s;
