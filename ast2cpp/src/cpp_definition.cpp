@@ -91,7 +91,7 @@ std::string CppDef::EmitXXportAsPairNode(XXportAsPairNode *node) {
         str += " }"s;
     }
   }
-  str = "// "s + str + ";\n"s;;
+  str = "/* CppDef::EmitXXportAsPairNode \n "s + str + ";\n*/"s;;
   return HandleTreeNode(str, node);
 }
 
