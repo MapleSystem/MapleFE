@@ -1439,8 +1439,7 @@ TreeNode* ASTBuilder::BuildArrayElement() {
   return mLastTreeNode;
 }
 
-// It takes only one parameter.
-// It could be a literal or an ExprList of literals.
+// It takes only one parameter, the literals.
 TreeNode* ASTBuilder::BuildArrayLiteral() {
   if (mTrace)
     std::cout << "In BuildArrayLiteral" << std::endl;
@@ -1458,6 +1457,7 @@ TreeNode* ASTBuilder::BuildArrayLiteral() {
     TreeNode *literals = p_literals.mData.mTreeNode;
     MASSERT(literals->IsLiteral() ||
             literals->IsIdentifier() ||
+            literals->IsNew() ||
             literals->IsExprList() ||
             literals->IsArrayLiteral() ||
             literals->IsStructLiteral() ||
@@ -1467,6 +1467,7 @@ TreeNode* ASTBuilder::BuildArrayLiteral() {
       for (unsigned i = 0; i < el->GetExprsNum(); i++) {
         TreeNode *expr = el->GetExprAtIndex(i);
         MASSERT(expr->IsLiteral() ||
+                expr->IsNew() ||
                 expr->IsArrayLiteral() ||
                 expr->IsFieldLiteral() ||
                 expr->IsStructLiteral() ||
