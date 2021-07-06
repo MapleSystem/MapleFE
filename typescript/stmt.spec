@@ -1526,8 +1526,9 @@ rule TypeMember : ONEOF(PropertySignature,
                         MethodSignature)
 
 ## rule ArrayType: PrimaryType [no LineTerminator here] [ ]
-rule ArrayType: PrimaryType + '[' + ']'
-  attr.action : BuildArrayType(%1, %1)
+rule ArrayType: ZEROORONE("readonly") + PrimaryType + '[' + ']'
+  attr.action : BuildArrayType(%2, %2)
+  attr.action : AddModifier(%1)
 
 ## rule TupleType: [ TupleElementTypes ]
 rule TupleType: '[' + TupleElementTypes + ']'

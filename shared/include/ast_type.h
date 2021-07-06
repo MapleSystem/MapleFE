@@ -91,6 +91,8 @@ private:
   // 2. It's a type parameter. Type parameter may have default value.
   SmallVector<TreeNode*> mTypeGenerics;
 
+  SmallVector<AttrId> mAttrs;
+
 public:
   UserTypeNode(TreeNode *n) : TreeNode(NK_UserType),
     mId(n), mType(UT_Regular), mDims(NULL) { if(n) n->SetParent(this); }
@@ -122,6 +124,12 @@ public:
   unsigned GetNthNum(unsigned n) {return mDims->GetDimension(n);} // 0 means unspecified.
   void     SetNthNum(unsigned n, unsigned i) {mDims->SetDimension(n, i);}
 
+  // Attributes related
+  unsigned GetAttrsNum() const        {return mAttrs.GetNum();}
+  void     AddAttr(AttrId a)          {mAttrs.PushBack(a);}
+  AttrId   GetAttrAtIndex(unsigned i) {return mAttrs.ValueAtIndex(i);}
+  void     SetAttrAtIndex(unsigned i, AttrId n) {*(mAttrs.RefAtIndex(i)) = n;}
+
   bool TypeEquivalent(UserTypeNode *);
 
   void Release() {mTypeGenerics.Release(); mUnionInterTypes.Release();}
@@ -152,6 +160,8 @@ class PrimArrayTypeNode : public TreeNode {
 private:
   PrimTypeNode  *mPrim;
   DimensionNode *mDims;
+  SmallVector<AttrId> mAttrs;
+
 public:
   PrimArrayTypeNode() : TreeNode(NK_PrimArrayType), mPrim(NULL), mDims(NULL) {}
   ~PrimArrayTypeNode(){}
@@ -160,6 +170,12 @@ public:
   void SetDims(DimensionNode *d) {mDims = d;}
   PrimTypeNode*  GetPrim() {return mPrim;}
   DimensionNode* GetDims(){return mDims;}
+
+  // Attributes related
+  unsigned GetAttrsNum() const        {return mAttrs.GetNum();}
+  void     AddAttr(AttrId a)          {mAttrs.PushBack(a);}
+  AttrId   GetAttrAtIndex(unsigned i) {return mAttrs.ValueAtIndex(i);}
+  void     SetAttrAtIndex(unsigned i, AttrId n) {*(mAttrs.RefAtIndex(i)) = n;}
 
   void Dump(unsigned);
 };
