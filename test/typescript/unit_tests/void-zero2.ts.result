@@ -1,0 +1,19 @@
+Matched 10 tokens.
+Matched 17 tokens.
+Matched 25 tokens.
+Matched 29 tokens.
+Matched 36 tokens.
+Matched 44 tokens.
+============= Module ===========
+== Sub Tree ==
+js_var Decl: x=void
+== Sub Tree ==
+console.log(x)
+== Sub Tree ==
+console.log( typeof x)
+== Sub Tree ==
+x Assign 123
+== Sub Tree ==
+console.log(x)
+== Sub Tree ==
+console.log( typeof x)
