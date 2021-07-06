@@ -1656,8 +1656,8 @@ rule IndexSignature: ONEOF(
 ## rule MethodSignature: PropertyName ?opt CallSignature
 ## I inlined CallSignature
 rule MethodSignature: ONEOF(
-    PropertyName + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + ';',
-    PropertyName + '?' + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + ';')
+    PropertyName + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation),
+    PropertyName + '?' + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation))
   attr.action.%1,%2 : BuildFunction(%1)
   attr.action.%1 : AddParams(%4)
   attr.action.%1 : AddType(%6)
