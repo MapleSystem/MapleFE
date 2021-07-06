@@ -1,0 +1,13 @@
+Matched 5 tokens.
+Matched 14 tokens.
+Matched 23 tokens.
+Matched 30 tokens.
+============= Module ===========
+== Sub Tree ==
+export { *} "./M"
+== Sub Tree ==
+export { default as x} "./M"
+== Sub Tree ==
+import { default as x} "./M"
+== Sub Tree ==
+export { default as x} 

@@ -1340,8 +1340,10 @@ rule ImportsList : ONEOF(ImportSpecifier,
 ## ImportedBinding
 ## IdentifierName as ImportedBinding
 rule ImportSpecifier : ONEOF(ImportedBinding,
-                             JSIdentifier + "as" + ImportedBinding)
+                             JSIdentifier + "as" + ImportedBinding,
+                             "default" + "as" + ImportedBinding)
   attr.action.%2 : BuildXXportAsPair(%1, %3)
+  attr.action.%3 : BuildXXportAsPairDefault(%3)
 
 ## See 15.2.2
 ## ModuleSpecifier :
