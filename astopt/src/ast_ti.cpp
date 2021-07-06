@@ -646,7 +646,7 @@ ExportNode *TypeInferVisitor::VisitExportNode(ExportNode *node) {
   (void) AstVisitor::VisitExportNode(node);
   XXportAsPairNode *p = node->GetPair(0);
   TreeNode *bfnode = p->GetBefore();
-  if (bfnode->IsIdentifier()) {
+  if (bfnode && bfnode->IsIdentifier()) {
     IdentifierNode *idnode = static_cast<IdentifierNode *>(bfnode);
     TreeNode *decl = mHandler->FindDecl(idnode);
     if (decl) {
