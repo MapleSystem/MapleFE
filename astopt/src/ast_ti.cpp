@@ -597,11 +597,15 @@ DeclNode *TypeInferVisitor::VisitDeclNode(DeclNode *node) {
     elemTypeId = n->GetTypeId();
   }
   if (var) {
-    MASSERT(var->IsIdentifier() && "var is not an identifier");
-    IdentifierNode *id = static_cast<IdentifierNode *>(var);
-    TreeNode *type = id->GetType();
+    if(var->IsIdentifier()) {
+      MASSERT(var->IsIdentifier() && "var is not an identifier");
+      IdentifierNode *id = static_cast<IdentifierNode *>(var);
+      TreeNode *type = id->GetType();
 
-    merged = MergeTypeId(merged, var->GetTypeId());
+      merged = MergeTypeId(merged, var->GetTypeId());
+    } else {
+      // BindingPatternNode
+    }
   } else {
     MASSERT("var null");
   }

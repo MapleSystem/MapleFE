@@ -158,25 +158,29 @@ FunctionNode *AdjustASTVisitor::VisitFunctionNode(FunctionNode *node) {
 DeclNode *AdjustASTVisitor::VisitDeclNode(DeclNode *node) {
   (void) AstVisitor::VisitDeclNode(node);
   TreeNode *var = node->GetVar();
+  if (var->IsIdentifier()) {
 
-  // Check if need to split Decl
-  MASSERT(var->IsIdentifier() && "var not Identifier");
+    // Check if need to split Decl
+    MASSERT(var->IsIdentifier() && "var not Identifier");
 
-  IdentifierNode *inode = static_cast<IdentifierNode *>(var);
+    IdentifierNode *inode = static_cast<IdentifierNode *>(var);
 
-  // copy stridx from Identifier to Decl
-  unsigned stridx = inode->GetStrIdx();
-  if (stridx) {
-    node->SetStrIdx(stridx);
-    mUpdated = true;
-  }
+    // copy stridx from Identifier to Decl
+    unsigned stridx = inode->GetStrIdx();
+    if (stridx) {
+      node->SetStrIdx(stridx);
+      mUpdated = true;
+    }
 
-  // move init from Identifier to Decl
-  TreeNode *init = inode->GetInit();
-  if (init) {
-    node->SetInit(init);
-    inode->ClearInit();
-    mUpdated = true;
+    // move init from Identifier to Decl
+    TreeNode *init = inode->GetInit();
+    if (init) {
+      node->SetInit(init);
+      inode->ClearInit();
+      mUpdated = true;
+    }
+  } else {
+    // BindingPatternNode
   }
   return node;
 }
