@@ -1,0 +1,30 @@
+Matched 18 tokens.
+Matched 34 tokens.
+Matched 43 tokens.
+Matched 59 tokens.
+Matched 66 tokens.
+Matched 83 tokens.
+Matched 93 tokens.
+Matched 103 tokens.
+Matched 112 tokens.
+============= Module ===========
+== Sub Tree ==
+export {a,o,func,u as U,v as V} 
+== Sub Tree ==
+js_var Decl: a=[1,2,3]
+== Sub Tree ==
+console.log(a.length)
+== Sub Tree ==
+js_var Decl: o= {x:1, y:"abc"}
+== Sub Tree ==
+console.log(o)
+== Sub Tree ==
+func  func(n)  throws: 
+  return n Mul n
+
+== Sub Tree ==
+console.log(func(10))
+== Sub Tree ==
+js_var Decl: {:u, :v}
+== Sub Tree ==
+console.log(u,v)

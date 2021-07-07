@@ -803,12 +803,15 @@ rule VariableDeclaration : ONEOF(BindingIdentifier + ':' + Type + ZEROORONE(Init
   attr.action.%2 : AddInitTo(%1, %2)
   attr.action.%2 : BuildDecl(%1)
   attr.action.%2 : SetJSVar()
+  attr.action.%3 : AddInitTo(%1, %3)
+  attr.action.%3 : BuildDecl(%2, %1)
+  attr.action.%3 : SetJSVar()
 
 ##-----------------------------------
 ##rule BindingPattern[Yield] :
 ##  ObjectBindingPattern[?Yield]
 ##  ArrayBindingPattern[?Yield]
-rule BindingPattern : ONEOF(ObjectBindingPattern)
+rule BindingPattern : ONEOF(ObjectBindingPattern, ArrayBindingPattern)
 
 ##-----------------------------------
 ##rule ObjectBindingPattern[Yield] :
@@ -826,6 +829,12 @@ rule ObjectBindingPattern : ONEOF('{' + '}',
 ##  [ Elisionopt BindingRestElement[?Yield]opt ]
 ##  [ BindingElementList[?Yield] ]
 ##  [ BindingElementList[?Yield] , Elisionopt BindingRestElement[?Yield]opt ]
+rule ArrayBindingPattern : ONEOF(
+  '[' + ZEROORONE(Elision) + ZEROORONE(BindingRestElement) + ']',
+  '[' + BindingElementList + ']',
+  '[' + BindingElementList + ',' + ZEROORONE(Elision) + ZEROORONE(BindingRestElement) + ']')
+  attr.action.%1 :    BuildBindingPattern(%3)
+  attr.action.%2,%3 : BuildBindingPattern(%2)
 
 ##-----------------------------------
 ##rule BindingPropertyList[Yield] :
@@ -838,10 +847,15 @@ rule BindingPropertyList : ONEOF(BindingProperty,
 ##rule BindingElementList[Yield] :
 ##  BindingElisionElement[?Yield]
 ##  BindingElementList[?Yield] , BindingElisionElement[?Yield]
+rule BindingElementList : ONEOF(
+  BindingElisionElement,
+  BindingElementList + ',' + BindingElisionElement)
 
 ##-----------------------------------
 ##rule BindingElisionElement[Yield] :
 ##  Elisionopt BindingElement[?Yield]
+rule BindingElisionElement : ZEROORONE(Elision) + BindingElement
+  attr.action : PassChild(%2)
 
 ##-----------------------------------
 ##rule BindingProperty[Yield] :
