@@ -231,8 +231,11 @@ template <> inline std::string __js_typeof<t2crt::JS_Val>(t2crt::JS_Val v) {
   return names[v.type];
 }
 
+void GenerateDOTGraph( std::vector<BaseObj *>&obj, std::vector<std::string>&name);
+
 } // namespace t2crt
 
+ 
 template <typename T>
 std::ostream& operator<< (std::ostream& out, const std::vector<T>& v) {
   if(v.empty())
