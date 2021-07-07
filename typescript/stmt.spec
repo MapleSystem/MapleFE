@@ -1605,7 +1605,7 @@ rule ParameterList: ONEOF(RequiredParameterList,
 
 ## rule RequiredParameterList: RequiredParameter RequiredParameterList , RequiredParameter
 rule RequiredParameterList: ONEOF(RequiredParameter,
-                                  RequiredParameterList + ',' + RequiredParameter)
+                                  RequiredParameterList + ',' + ZEROORONE(RequiredParameter))
 
 ## rule RequiredParameter: AccessibilityModifieropt BindingIdentifierOrPattern TypeAnnotationopt BindingIdentifier : StringLiteral
 ## NOTE: I extend StringLiteral to Literal.
