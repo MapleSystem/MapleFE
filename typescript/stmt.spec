@@ -1834,8 +1834,8 @@ rule PropertyMemberDeclaration: ONEOF(MemberVariableDeclaration,
 
 ## MemberVariableDeclaration: AccessibilityModifieropt staticopt PropertyName TypeAnnotationopt Initializeropt ;
 rule MemberVariableDeclaration: ONEOF(
-  ZEROORMORE(Annotation) + ZEROORMORE(AccessibilityModifier) + PropertyName + ZEROORONE(TypeAnnotation) + ZEROORONE(Initializer) + ';',
-  ZEROORMORE(Annotation) + ZEROORMORE(AccessibilityModifier) + PropertyName + '?' + ZEROORONE(TypeAnnotation) + ZEROORONE(Initializer) + ';')
+  ZEROORMORE(Annotation) + ZEROORMORE(AccessibilityModifier) + PropertyName + ZEROORONE(TypeAnnotation) + ZEROORONE(Initializer) + ZEROORONE(';'),
+  ZEROORMORE(Annotation) + ZEROORMORE(AccessibilityModifier) + PropertyName + '?' + ZEROORONE(TypeAnnotation) + ZEROORONE(Initializer) + ZEROORONE(';'))
   attr.action.%1: AddInitTo(%3, %5)
   attr.action.%1: AddType(%3, %4)
   attr.action.%1: AddModifierTo(%3, %2)

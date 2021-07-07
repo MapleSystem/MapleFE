@@ -1,0 +1,16 @@
+Matched 16 tokens.
+Matched 27 tokens.
+============= Module ===========
+== Sub Tree ==
+class  CLS_test
+  Fields: 
+    get=() -> return 1
+
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+console.log(CLS_test.get())
