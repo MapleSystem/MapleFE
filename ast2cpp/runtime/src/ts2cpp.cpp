@@ -1,9 +1,5 @@
 #include "../include/ts2cpp.h"
 
-namespace t2crt {
-
-const t2crt::JS_Val undefined = { 0, t2crt::TY_Undef, false };
-
 std::ostream& operator<< (std::ostream& out, const t2crt::JS_Val& v) {
   switch(v.type) {
     case t2crt::TY_None: out << "None"; break;
@@ -21,7 +17,11 @@ std::ostream& operator<< (std::ostream& out, const t2crt::JS_Val& v) {
   return out;
 }
 
-// Generate DOT graph output to show object inheritance with 
+namespace t2crt {
+
+const t2crt::JS_Val undefined = { 0, t2crt::TY_Undef, false };
+
+// Generate DOT graph output to show object inheritance with
 // constructor, prototype chain and prototype property linkages
 void GenerateDOTGraph( std::vector<BaseObj *>&obj, std::vector<std::string>&name) {
   for(int g = 0; g < 2; ++g) {
