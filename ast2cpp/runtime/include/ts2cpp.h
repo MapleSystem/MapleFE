@@ -126,7 +126,7 @@ class BaseObj {
     BaseObj(): _proto(nullptr) {}
     BaseObj(Ctor* ctor, BaseObj* proto): _ctor(ctor), _proto(proto) {}
 
-    bool hasOwnProp(std::string key) {
+    bool HasOwnProp(std::string key) {
       JS_PropList::iterator it;
       it = propList.find(key);
       return (it != propList.end());
@@ -136,7 +136,7 @@ class BaseObj {
       propList[key] = { val };
     }
 
-    bool isFuncObj() {
+    bool IsFuncObj() {
       return (this->_ctor == reinterpret_cast<Ctor *>(&Function_ctor));
     }
 };
@@ -169,9 +169,9 @@ class ClassFld {
   public:
     ClassFld(void* addr) {field.addr = addr;}
     ClassFld(T offset)   {field.offset = offset;}
-    void* addr()         {return field.addr;}
-    T     offset()       {return field.offset;}
-    JS_Prop* newProp(JS_Type type) {return new JS_Prop(type, field.addr);}
+    void* Addr()         {return field.addr;}
+    T     Offset()       {return field.offset;}
+    JS_Prop* NewProp(JS_Type type) {return new JS_Prop(type, field.addr);}
 };
 
 
