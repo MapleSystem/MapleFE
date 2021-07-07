@@ -42,7 +42,10 @@ void UserTypeNode::AddUnionInterType(TreeNode *args) {
 }
 
 void UserTypeNode::AddTypeGeneric(TreeNode *args) {
-  if (args->IsIdentifier() || args->IsPrimType() || args->IsUserType()) {
+  if (args->IsIdentifier() ||
+      args->IsPrimType() ||
+      args->IsUserType() ||
+      args->IsTypeOf()) {
     mTypeGenerics.PushBack(args);
   } else if (args->IsPass()) {
     PassNode *p = (PassNode*)args;
