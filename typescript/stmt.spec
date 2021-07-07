@@ -331,6 +331,12 @@ rule MemberExpression : ONEOF(
   attr.action.%8 : BuildArrayElement(%1, %4)
   attr.action.%8 : AddAsType(%6)
 
+rule IsExpression: MemberExpression + "is" + Type
+  attr.action : BuildIs(%1, %2)
+
+rule AssertExpression : "asserts" + MemberExpression
+  attr.action : BuildAssert(%2)
+
 ##-----------------------------------
 ##rule SuperProperty[Yield] :
 ##  super [ Expression[In, ?Yield] ]

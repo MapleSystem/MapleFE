@@ -3473,6 +3473,34 @@ TreeNode* ASTBuilder::BuildIn() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+//                       Is Expression
+////////////////////////////////////////////////////////////////////////////////
+
+TreeNode* ASTBuilder::BuildIs() {
+  if (mTrace)
+    std::cout << "In BuildIs" << std::endl;
+
+  Param l_param = mParams[0];
+  MASSERT(!l_param.mIsEmpty);
+  MASSERT(l_param.mIsTreeNode);
+  TreeNode *left = l_param.mData.mTreeNode;
+
+  Param r_param = mParams[1];
+  MASSERT(!r_param.mIsEmpty);
+  MASSERT(r_param.mIsTreeNode);
+  TreeNode *right = r_param.mData.mTreeNode;
+
+  IsNode *isnode = (IsNode*)gTreePool.NewTreeNode(sizeof(IsNode));
+  new (isnode) IsNode();
+
+  isnode->SetLeft(left);
+  isnode->SetRight(right);
+
+  mLastTreeNode = isnode;
+  return mLastTreeNode;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 //                       TypeOf Expression
 ////////////////////////////////////////////////////////////////////////////////
 

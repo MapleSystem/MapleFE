@@ -73,6 +73,7 @@ STRUCT KeyWord : ((boolean),
                   (delete),
                   (import),
                   (try),
+                  (asserts),
 
 #this part is for strict mode
                   (let),

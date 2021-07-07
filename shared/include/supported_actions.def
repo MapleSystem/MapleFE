@@ -64,6 +64,7 @@ ACTION(BuildTernaryOperation)
 ACTION(BuildPostfixOperation)
 ACTION(BuildInstanceOf)
 ACTION(BuildIn)
+ACTION(BuildIs)
 ACTION(BuildTypeOf)
 ACTION(BuildKeyOf)
 
