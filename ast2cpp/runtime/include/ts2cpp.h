@@ -32,6 +32,13 @@ inline std::string to_string(std::string t) {return t;}
 
 class BaseObj;
 class Ctor;
+class Ctor_Function;
+class Ctor_Object;
+
+extern BaseObj Object_prototype;
+extern BaseObj Function_prototype;
+extern Ctor_Function Function_ctor;
+extern Ctor_Object   Object_ctor;
 
 // JS types for props
 typedef enum JS_Type : uint8_t {
@@ -128,6 +135,10 @@ class BaseObj {
     void AddProp(std::string key, JS_Val val) {
       propList[key] = { val };
     }
+
+    bool isFuncObj() {
+      return (this->_ctor == reinterpret_cast<Ctor *>(&Function_ctor));
+    }
 };
 
 
@@ -175,10 +186,6 @@ class Ctor_Object   : public Ctor {
 };
 class Function : public BaseObj {};
 
-extern BaseObj Object_prototype;
-extern BaseObj Function_prototype;
-extern Ctor_Function Function_ctor;
-extern Ctor_Object   Object_ctor;
 
 template <typename T> std::string __js_typeof(T v) {
   if (std::numeric_limits<T>::is_signed)
