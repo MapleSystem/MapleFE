@@ -470,6 +470,10 @@ void Verifier::VerifyIn(InNode *tree){
   return;
 }
 
+void Verifier::VerifyIs(IsNode *tree){
+  return;
+}
+
 void Verifier::VerifyTypeOf(TypeOfNode *tree){
   return;
 }

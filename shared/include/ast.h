@@ -2006,5 +2006,28 @@ public:
   void Dump(unsigned);
 };
 
+////////////////////////////////////////////////////////////////////////////
+//                  Is Expression
+// First coming from Typescript. It's like
+// A is B.
+// B is usually a type.
+////////////////////////////////////////////////////////////////////////////
+
+class IsNode : public TreeNode {
+private:
+  TreeNode *mLeft;
+  TreeNode *mRight;
+public:
+  IsNode() : TreeNode(NK_In), mLeft(NULL), mRight(NULL) {}
+  ~IsNode(){Release();}
+
+  TreeNode* GetLeft() {return mLeft;}
+  void SetLeft(TreeNode *n) {mLeft = n;}
+  TreeNode* GetRight() {return mRight;}
+  void SetRight(TreeNode *n){mRight = n;}
+
+  void Dump(unsigned);
+};
+
 }
 #endif
