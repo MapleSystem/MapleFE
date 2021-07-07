@@ -23,9 +23,9 @@ const t2crt::JS_Val undefined = { 0, t2crt::TY_Undef, false };
 
 // Generate DOT graph output to show object inheritance with
 // constructor, prototype chain and prototype property linkages
-void GenerateDOTGraph( std::vector<BaseObj *>&obj, std::vector<std::string>&name) {
+void GenerateDOTGraph( std::vector<Object *>&obj, std::vector<std::string>&name) {
   for(int g = 0; g < 2; ++g) {
-    std::vector<BaseObj*> objs = obj;
+    std::vector<Object*> objs = obj;
     std::vector<std::string> names = name;
     std::cout << "digraph JS" << g << " {\nranksep=0.6;\nnodesep=0.6;\n" << (g == 0 ? "newrank=true;\n" : "") << std::endl;
     int num = objs.size();

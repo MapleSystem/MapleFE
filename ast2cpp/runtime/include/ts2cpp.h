@@ -30,15 +30,15 @@ using std::to_string;
 
 inline std::string to_string(std::string t) {return t;}
 
-class BaseObj;
+class Object;
 class Ctor;
 class Ctor_Function;
 class Ctor_Object;
 class Ctor_Array;
 
-extern BaseObj Object_prototype;
-extern BaseObj Function_prototype;
-extern BaseObj Array_prototype;
+extern Object Object_prototype;
+extern Object Function_prototype;
+extern Object Array_prototype;
 extern Ctor_Function Function_ctor;
 extern Ctor_Object   Object_ctor;
 extern Ctor_Array    Array_ctor;
@@ -67,7 +67,7 @@ struct JS_Val {
     double       val_double;
     void*        val_bigint;
     std::string* val_string; // JS string primitive (not JS String object)
-    BaseObj*     val_obj;    // for function, object (incl. String objects)
+    Object*     val_obj;    // for function, object (incl. String objects)
   } x;
   JS_Type type;
   bool    cxx;  // if it is a cxx field
@@ -77,7 +77,7 @@ struct JS_Val {
   JS_Val(bool b)    { x.val_bool = b; type = TY_Bool; cxx = false; }
   JS_Val(int64_t l) { x.val_long = l; type = TY_Long; cxx = false; }
   JS_Val(double d)  { x.val_double = d; type = TY_Double; cxx = false; }
-  JS_Val(BaseObj* o){ x.val_obj = o; type = TY_Object; cxx = false; }
+  JS_Val(Object* o){ x.val_obj = o; type = TY_Object; cxx = false; }
 
 #define OPERATORS(op) \
   JS_Val operator op(const JS_Val &v) { \
@@ -120,14 +120,14 @@ typedef struct JS_Prop {
 
 typedef std::unordered_map<std::string, JS_Prop> JS_PropList;
 
-class BaseObj {
+class Object {
   public:
     JS_PropList propList;
-    BaseObj* _proto;    // prototype chain
-    Ctor*    _ctor;     // constructor of object
+    Object* _proto;       // prototype chain
+    Ctor*    _ctor;       // constructor of object
   public:
-    BaseObj(): _proto(nullptr) {}
-    BaseObj(Ctor* ctor, BaseObj* proto): _ctor(ctor), _proto(proto) {}
+    Object(): _proto(nullptr) {}
+    Object(Ctor* ctor, Object* proto): _ctor(ctor), _proto(proto) {}
 
     bool HasOwnProp(std::string key) {
       JS_PropList::iterator it;
@@ -142,15 +142,29 @@ class BaseObj {
     bool IsFuncObj() {
       return (this->_ctor == reinterpret_cast<Ctor *>(&Function_ctor));
     }
+
+    // Implement JS Object.prototype props as static fields and methods here
+    // and add to propList of Object_prototype object on system init.
 };
 
+class Function : public Object {
+  public:
+    Object* _prototype;    // prototype property
+
+    // Implemente JS Function.prototype props as static fields and methods here.
+    // and add to propList of Function_prototype object on system init.
+};
+
+class Array    : public Function {
+  public:
+    // Imeplement JS Array.prototype props as static fields and methods here.
+    // and add to proplist of Array_prototype object on system init.
+};
 
 // JavaScript class/function constructor
-class Ctor : public BaseObj {
+class Ctor : public Function {
   public:
-    BaseObj* _prototype;    // prototype property
-  public:
-    Ctor(Ctor* ctor, BaseObj* proto, BaseObj* prototype) {
+    Ctor(Ctor* ctor, Object* proto, Object* prototype) {
       JS_Val val(this);
       _ctor = ctor;
       _proto = proto;
@@ -158,6 +172,38 @@ class Ctor : public BaseObj {
       _prototype->AddProp("constructor", val);
     }
 };
+
+
+// For JS builtins
+
+class Ctor_Function : public Ctor {
+  public:
+    Ctor_Function(Ctor* ctor, Object* proto, Object* prototype) : Ctor(ctor, proto, prototype) {}
+};
+
+class Ctor_Object   : public Ctor {
+  public:
+    Ctor_Object(Ctor* ctor, Object* proto, Object* prototype) : Ctor(ctor, proto, prototype) {}
+
+    Object* _new() {
+      Object* obj = new Object();
+      obj->_ctor  = this;
+      obj->_proto = this->_prototype;
+      return obj;
+    }
+};
+class Ctor_Array: public Ctor {
+  public:
+    Ctor_Array(Ctor* ctor, Object* proto, Object* prototype) : Ctor(ctor, proto, prototype) {}
+
+    Array* _new() {
+      Array* obj  = new Array();
+      obj->_ctor  = this;
+      obj->_proto = this->_prototype;
+      return obj;
+    }
+};
+
 
 template <class T>
 class ClassFld {
@@ -177,30 +223,6 @@ class ClassFld {
     JS_Prop* NewProp(JS_Type type) {return new JS_Prop(type, field.addr);}
 };
 
-
-// For JS builtins
-class Function : public BaseObj {};
-class Array    : public BaseObj {};
-
-class Ctor_Function : public Ctor {
-  public:
-    Ctor_Function(Ctor* ctor, BaseObj* proto, BaseObj* prototype) : Ctor(ctor, proto, prototype) {}
-};
-class Ctor_Object   : public Ctor {
-  public:
-    Ctor_Object(Ctor* ctor, BaseObj* proto, BaseObj* prototype) : Ctor(ctor, proto, prototype) {}
-};
-class Ctor_Array: public Ctor {
-  public:
-    Ctor_Array(Ctor* ctor, BaseObj* proto, BaseObj* prototype) : Ctor(ctor, proto, prototype) {}
-
-    Array* _new() {
-      Array* obj = new Array();
-      obj->_ctor  = this;
-      obj->_proto = this->_prototype;
-      return obj;
-    }
-};
 
 template <typename T> std::string __js_typeof(T v) {
   if (std::numeric_limits<T>::is_signed)
@@ -231,7 +253,7 @@ template <> inline std::string __js_typeof<t2crt::JS_Val>(t2crt::JS_Val v) {
   return names[v.type];
 }
 
-void GenerateDOTGraph( std::vector<BaseObj *>&obj, std::vector<std::string>&name);
+void GenerateDOTGraph( std::vector<Object *>&obj, std::vector<std::string>&name);
 
 } // namespace t2crt
 
