@@ -34,11 +34,14 @@ class BaseObj;
 class Ctor;
 class Ctor_Function;
 class Ctor_Object;
+class Ctor_Array;
 
 extern BaseObj Object_prototype;
 extern BaseObj Function_prototype;
+extern BaseObj Array_prototype;
 extern Ctor_Function Function_ctor;
 extern Ctor_Object   Object_ctor;
+extern Ctor_Array    Array_ctor;
 
 // JS types for props
 typedef enum JS_Type : uint8_t {
@@ -176,6 +179,9 @@ class ClassFld {
 
 
 // For JS builtins
+class Function : public BaseObj {};
+class Array    : public BaseObj {};
+
 class Ctor_Function : public Ctor {
   public:
     Ctor_Function(Ctor* ctor, BaseObj* proto, BaseObj* prototype) : Ctor(ctor, proto, prototype) {}
@@ -184,8 +190,17 @@ class Ctor_Object   : public Ctor {
   public:
     Ctor_Object(Ctor* ctor, BaseObj* proto, BaseObj* prototype) : Ctor(ctor, proto, prototype) {}
 };
-class Function : public BaseObj {};
+class Ctor_Array: public Ctor {
+  public:
+    Ctor_Array(Ctor* ctor, BaseObj* proto, BaseObj* prototype) : Ctor(ctor, proto, prototype) {}
 
+    Array* _new() {
+      Array* obj = new Array();
+      obj->_ctor  = this;
+      obj->_proto = this->_prototype;
+      return obj;
+    }
+};
 
 template <typename T> std::string __js_typeof(T v) {
   if (std::numeric_limits<T>::is_signed)
