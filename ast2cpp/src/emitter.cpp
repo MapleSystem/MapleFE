@@ -1220,7 +1220,8 @@ std::string Emitter::EmitCallNode(CallNode *node) {
   std::string str;
   if (auto n = node->GetMethod()) {
     auto s = EmitTreeNode(n);
-    if(n->GetKind() == NK_Function)
+    auto k = n->GetKind();
+    if(k == NK_Function || k == NK_Lambda)
       str += "("s + s + ")"s;
     else
       str += s;
