@@ -1,0 +1,13 @@
+Matched 19 tokens.
+Matched 26 tokens.
+Matched 34 tokens.
+Matched 41 tokens.
+============= Module ===========
+== Sub Tree ==
+js_var Decl: x=[1,2,3]
+== Sub Tree ==
+console.log(x)
+== Sub Tree ==
+x Assign ["abc","def"]
+== Sub Tree ==
+console.log(x)

@@ -28,7 +28,11 @@ namespace maplefe {
 //////////////////////////////////////////////////////////////////////////
 
 void UserTypeNode::AddUnionInterType(TreeNode *args) {
-  if (args->IsIdentifier() || args->IsPrimType() || args->IsUserType() || args->IsLiteral()) {
+  if (args->IsIdentifier() ||
+      args->IsPrimType() ||
+      args->IsPrimArrayType() ||
+      args->IsUserType() ||
+      args->IsLiteral()) {
     mUnionInterTypes.PushBack(args);
   } else if (args->IsPass()) {
     PassNode *p = (PassNode*)args;
