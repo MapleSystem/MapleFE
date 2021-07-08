@@ -1634,11 +1634,11 @@ rule RequiredParameterList: ONEOF(RequiredParameter,
 ## NOTE: I extend StringLiteral to Literal.
 ## NOTE: I Added initializer. I guess the spec missed this part.
 rule RequiredParameter: ONEOF(
-  ZEROORMORE(AccessibilityModifier) + BindingIdentifierOrPattern + ZEROORONE(Initializer) + ZEROORONE(TypeAnnotation),
+  ZEROORMORE(AccessibilityModifier) + BindingIdentifierOrPattern + ZEROORONE(TypeAnnotation) + ZEROORONE(Initializer),
   "this" + TypeAnnotation,
   BindingIdentifier + ':' + Literal)
-  attr.action.%1 : AddInitTo(%2, %3)
-  attr.action.%1 : BuildDecl(%4, %2)
+  attr.action.%1 : AddInitTo(%2, %4)
+  attr.action.%1 : BuildDecl(%3, %2)
   attr.action.%2 : BuildDecl(%2, %1)
 
 ## rule AccessibilityModifier: public private protected
