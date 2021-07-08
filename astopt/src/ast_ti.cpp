@@ -62,17 +62,19 @@ TypeId TypeInferVisitor::MergeTypeId(TypeId tia, TypeId tib) {
     return tia;
   }
 
-  if (tib == TY_User) {
-    return TY_User;
+  if (tib == TY_Object || tib == TY_User) {
+    return tib;
   }
 
   // tia != tib && tib != TY_None
   TypeId result = TY_None;
   switch (tia) {
     case TY_None:        result = tib;       break;
-    case TY_Object:      result = TY_Object; break;
-    case TY_User:        result = TY_User;   break;
 
+    case TY_Object:
+    case TY_User:        result = tia;
+
+    case TY_Undefined:
     case TY_String:
     case TY_Function:
     case TY_Class:
@@ -85,6 +87,7 @@ TypeId TypeInferVisitor::MergeTypeId(TypeId tia, TypeId tib) {
         case TY_Float:
         case TY_Double:  result = tib;       break;
         case TY_Merge:
+        case TY_Undefined:
         case TY_String:
         case TY_Function:
         case TY_Class:
@@ -100,6 +103,7 @@ TypeId TypeInferVisitor::MergeTypeId(TypeId tia, TypeId tib) {
         case TY_Float:
         case TY_Double:  result = tib;       break;
         case TY_Merge:
+        case TY_Undefined:
         case TY_String:
         case TY_Function:
         case TY_Class:
@@ -115,6 +119,7 @@ TypeId TypeInferVisitor::MergeTypeId(TypeId tia, TypeId tib) {
         case TY_Float:
         case TY_Double:  result = TY_Double; break;
         case TY_Merge:
+        case TY_Undefined:
         case TY_String:
         case TY_Function:
         case TY_Class:
@@ -130,6 +135,7 @@ TypeId TypeInferVisitor::MergeTypeId(TypeId tia, TypeId tib) {
         case TY_Long:
         case TY_Double:  result = TY_Double; break;
         case TY_Merge:
+        case TY_Undefined:
         case TY_String:
         case TY_Function:
         case TY_Class:
@@ -145,6 +151,7 @@ TypeId TypeInferVisitor::MergeTypeId(TypeId tia, TypeId tib) {
         case TY_Long:
         case TY_Double:  result = TY_Double; break;
         case TY_Merge:
+        case TY_Undefined:
         case TY_String:
         case TY_Function:
         case TY_Class:
@@ -251,7 +258,7 @@ void TypeInferVisitor::UpdateTypeUseNode(TreeNode *target, TreeNode *input) {
 }
 
 void TypeInferVisitor::UpdateTypeId(TreeNode *node, TypeId tid) {
-  if (!node || tid == TY_None) {
+  if (tid == TY_None || !node || node->IsLiteral()) {
     return;
   }
   tid = MergeTypeId(node->GetTypeId(), tid);
@@ -450,14 +457,14 @@ BinOperatorNode *TypeInferVisitor::VisitBinOperatorNode(BinOperatorNode *node) {
     case OPR_BorAssign:
     case OPR_BxorAssign:
     case OPR_ZextAssign: {
-      if (ta->GetTypeId() == TY_None) {
-        UpdateTypeId(ta, tib);
+      TypeId ti = MergeTypeId(tia, tib);
+      if (tia == TY_None || (ta->IsIdentifier() && tia != ti)) {
+        UpdateTypeId(ta, ti);
         mod = ta;
-      } else if (tb->GetTypeId() == TY_None) {
-        UpdateTypeId(tb, tia);
+      } else if (tib == TY_None) {
+        UpdateTypeId(tb, ti);
         mod = tb;
       }
-      TypeId ti = MergeTypeId(tia, tib);
       UpdateTypeId(node, ti);
       break;
     }
@@ -597,8 +604,8 @@ DeclNode *TypeInferVisitor::VisitDeclNode(DeclNode *node) {
     elemTypeId = n->GetTypeId();
   }
   if (var) {
+    // normal cases
     if(var->IsIdentifier()) {
-      MASSERT(var->IsIdentifier() && "var is not an identifier");
       IdentifierNode *id = static_cast<IdentifierNode *>(var);
       TreeNode *type = id->GetType();
 
@@ -613,8 +620,8 @@ DeclNode *TypeInferVisitor::VisitDeclNode(DeclNode *node) {
   if (isArray) {
     merged = TY_Array;
     node->SetTypeId(merged);
-    init->SetTypeId(merged);
     var->SetTypeId(merged);
+    init->SetTypeId(merged);
   } else {
     UpdateTypeId(node, merged);
     UpdateTypeId(init, merged);
@@ -768,16 +775,19 @@ LiteralNode *TypeInferVisitor::VisitLiteralNode(LiteralNode *node) {
   LitId id = node->GetData().mType;
   switch (id) {
     case LT_IntegerLiteral:
-      UpdateTypeId(node, TY_Int);
+      node->SetTypeId(TY_Int);
       break;
     case LT_FPLiteral:
-      UpdateTypeId(node, TY_Float);
+      node->SetTypeId(TY_Float);
       break;
     case LT_DoubleLiteral:
-      UpdateTypeId(node, TY_Double);
+      node->SetTypeId(TY_Double);
       break;
     case LT_StringLiteral:
-      UpdateTypeId(node, TY_String);
+      node->SetTypeId(TY_String);
+      break;
+    case LT_VoidLiteral:
+      node->SetTypeId(TY_Undefined);
       break;
     default:
       break;
