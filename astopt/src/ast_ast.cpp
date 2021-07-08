@@ -18,6 +18,8 @@
 #include "ast_handler.h"
 #include "ast_ast.h"
 
+#define NOTYETIMPL(K) {if(mTrace){MNYI(K);}}
+
 namespace maplefe {
 
 void AST_AST::ASTCollectAndDBRemoval(CfgFunc *func) {
@@ -159,10 +161,6 @@ DeclNode *AdjustASTVisitor::VisitDeclNode(DeclNode *node) {
   (void) AstVisitor::VisitDeclNode(node);
   TreeNode *var = node->GetVar();
   if (var->IsIdentifier()) {
-
-    // Check if need to split Decl
-    MASSERT(var->IsIdentifier() && "var not Identifier");
-
     IdentifierNode *inode = static_cast<IdentifierNode *>(var);
 
     // copy stridx from Identifier to Decl
@@ -179,8 +177,11 @@ DeclNode *AdjustASTVisitor::VisitDeclNode(DeclNode *node) {
       inode->ClearInit();
       mUpdated = true;
     }
+  } else if (var->IsBindingPattern()) {
+    BindingPatternNode *bind = static_cast<BindingPatternNode *>(var);
+    VisitBindingPatternNode(bind);
   } else {
-    // BindingPatternNode
+    NOTYETIMPL("decl not idenfier or bind pattern");
   }
   return node;
 }

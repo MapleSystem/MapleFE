@@ -190,6 +190,7 @@ PrimTypeNode *TypeInferVisitor::GetOrClonePrimTypeNode(PrimTypeNode *pt, TypeId 
 
 bool static IsScalar(TypeId tid) {
   switch (tid) {
+    case TY_None:
     case TY_Int:
     case TY_Long:
     case TY_Float:
@@ -330,17 +331,21 @@ bool TypeInferVisitor::IsArray(TreeNode *node) {
   if (!node) {
     return false;
   }
+  TreeNode *tn = node;
   if (node->IsDecl()) {
     DeclNode *decl = static_cast<DeclNode *>(node);
-    node = decl->GetVar();
+    tn = decl->GetVar();
   }
-  if (node->IsIdentifier()) {
-    IdentifierNode *idnode = static_cast<IdentifierNode *>(node);
+  if (tn->IsIdentifier()) {
+    IdentifierNode *idnode = static_cast<IdentifierNode *>(tn);
     if (idnode && idnode->GetType() && idnode->GetType()->GetKind() == NK_PrimArrayType) {
       return true;
     }
+  } else if (tn->IsBindingPattern()) {
+    // could be either object or array destructuring
+    return false;
   } else {
-    NOTYETIMPL("array not identifier");
+    NOTYETIMPL("array not identifier or bind pattern");
   }
   return false;
 }
@@ -373,6 +378,15 @@ ArrayElementNode *TypeInferVisitor::VisitArrayElementNode(ArrayElementNode *node
       NOTYETIMPL("array not idenfier");
     }
   }
+  return node;
+}
+
+FieldLiteralNode *TypeInferVisitor::VisitFieldLiteralNode(FieldLiteralNode *node) {
+  (void) AstVisitor::VisitFieldLiteralNode(node);
+  TreeNode *name = node->GetFieldName();
+  TreeNode *lit = node->GetLiteral();
+  UpdateTypeId(name, lit->GetTypeId());
+  UpdateTypeId(node, lit->GetTypeId());
   return node;
 }
 

@@ -105,6 +105,7 @@ class TypeInferVisitor : public TypeInferBaseVisitor {
   ClassNode *VisitClassNode(ClassNode *node);
   DeclNode *VisitDeclNode(DeclNode *node);
   ExportNode *VisitExportNode(ExportNode *node);
+  FieldLiteralNode *VisitFieldLiteralNode(FieldLiteralNode *node);
   FieldNode *VisitFieldNode(FieldNode *node);
   FunctionNode *VisitFunctionNode(FunctionNode *node);
   IdentifierNode *VisitIdentifierNode(IdentifierNode *node);
