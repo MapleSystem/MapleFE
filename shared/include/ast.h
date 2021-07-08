@@ -1649,6 +1649,12 @@ private:
   SmallVector<TreeNode*>       mParams;      //
   BlockNode                   *mBody;
   DimensionNode               *mDims;
+  TreeNode                    *mAssert;      // In typescript, a function could have asserts
+                                             // like: func () : asserts v is string
+                                             // or a type predicate signature, like
+                                             //    func() : v is string
+                                             // So mAssert could be either an AssertNode or
+                                             // an IsNode.
   bool                         mIsConstructor;
   bool                         mIsGetAccessor;
   bool                         mIsSetAccessor;
@@ -1666,6 +1672,9 @@ public:
 
   BlockNode* GetBody() {return mBody;}
   void SetBody(BlockNode *b) {mBody = b; SETPARENT(b); if(b) CleanUp();}
+
+  TreeNode* GetAssert() {return mAssert;}
+  void SetAssert(TreeNode *b) {mAssert = b; SETPARENT(b);}
 
   bool IsConstructor()    {return mIsConstructor;}
   void SetIsConstructor(bool b = true) {mIsConstructor = b;}

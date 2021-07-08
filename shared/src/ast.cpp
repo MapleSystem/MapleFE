@@ -1392,7 +1392,8 @@ void ClassNode::Dump(unsigned indent) {
 
 FunctionNode::FunctionNode() : TreeNode(NK_Function),
   mFuncName(NULL), mType(NULL), mBody(NULL), mDims(NULL),
-  mIsConstructor(false), mIsGetAccessor(false), mIsSetAccessor(false) {}
+  mIsConstructor(false), mIsGetAccessor(false),
+  mIsSetAccessor(false), mAssert(NULL) {}
 
 void FunctionNode::AddTypeParam(TreeNode *param) {
   if (param->IsPass()) {
@@ -1529,6 +1530,11 @@ void FunctionNode::Dump(unsigned indent) {
       DUMP0_NORETURN(",");
   }
   DUMP0_NORETURN(")");
+
+  if (mAssert) {
+    DUMP0_NORETURN(" : ");
+    mAssert->Dump(0);
+  }
 
   // dump throws
   DUMP0_NORETURN("  throws: ");

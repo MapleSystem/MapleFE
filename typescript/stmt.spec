@@ -317,7 +317,8 @@ rule MemberExpression : ONEOF(
 # NOTE: I created this rule. Typescript extended Type system and allow 'new'
 #       on a TypeReference
   "new" + TypeReference + ZEROORONE(Arguments),
-  MemberExpression + "?." + '[' + Expression + ']' + ZEROORMORE(AsType))
+  MemberExpression + "?." + '[' + Expression + ']' + ZEROORMORE(AsType),
+  IsExpression)
   attr.action.%1 : AddAsType(%1, %2)
   attr.action.%2 : BuildArrayElement(%1, %3)
   attr.action.%2 : AddAsType(%5)
@@ -331,8 +332,8 @@ rule MemberExpression : ONEOF(
   attr.action.%8 : BuildArrayElement(%1, %4)
   attr.action.%8 : AddAsType(%6)
 
-rule IsExpression: MemberExpression + "is" + Type
-  attr.action : BuildIs(%1, %2)
+rule IsExpression: PrimaryExpression + "is" + Type
+  attr.action : BuildIs(%1, %3)
 
 rule AssertExpression : "asserts" + MemberExpression
   attr.action : BuildAssert(%2)
@@ -1761,12 +1762,16 @@ rule FunctionExpression :
 # NOTE: Inline Call signature to make it easier to write action.
 rule FunctionDeclaration : ONEOF(
   "function" + ZEROORONE(BindingIdentifier) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}',
+  "function" + ZEROORONE(BindingIdentifier) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ':' + AssertExpression + '{' + FunctionBody + '}',
+  "function" + ZEROORONE(BindingIdentifier) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ':' + IsExpression + '{' + FunctionBody + '}',
   "function" + ZEROORONE(BindingIdentifier) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation)  + ';')
-  attr.action.%1,%2 : BuildFunction(%2)
-  attr.action.%1,%2 : AddParams(%5)
-  attr.action.%1,%2 : AddType(%7)
-  attr.action.%1,%2 : AddTypeGenerics(%3)
-  attr.action.%1 :    AddFunctionBody(%9)
+  attr.action.%1,%2,%3,%4 : BuildFunction(%2)
+  attr.action.%1,%2,%3,%4 : AddParams(%5)
+  attr.action.%1,%4    : AddType(%7)
+  attr.action.%1,%2,%3,%4 : AddTypeGenerics(%3)
+  attr.action.%2,%3    : AddAssert(%8)
+  attr.action.%1       : AddFunctionBody(%9)
+  attr.action.%2,%3    : AddFunctionBody(%10)
 
 ##############################################################################################
 ##                               A.5 Interface

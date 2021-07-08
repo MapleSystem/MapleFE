@@ -1,0 +1,28 @@
+Matched 46 tokens.
+Matched 50 tokens.
+Matched 60 tokens.
+Matched 68 tokens.
+============= Module ===========
+== Sub Tree ==
+func  nonNullable<T>(e) : assert e is NonNullable<T> :   throws: 
+  cond-branch cond:e StEq null Lor e StEq undefined
+  true branch :
+    throw new Error("Assertion failure")
+  false branch :
+
+  console.log("nonNullable",e)
+
+== Sub Tree ==
+class  Klass
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+js_var Decl: obj=new Klass()
+== Sub Tree ==
+nonNullable<Klass>(obj)

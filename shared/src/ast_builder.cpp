@@ -2441,6 +2441,26 @@ void ASTBuilder::AddParams(TreeNode *func, TreeNode *decl_params) {
   }
 }
 
+// AddAssert takes one parameter, the asserts expression, and apply it to mLastTreeNode
+TreeNode* ASTBuilder::AddAssert() {
+  if (mTrace)
+    std::cout << "In AddAssert " << std::endl;
+
+  FunctionNode *f = NULL;
+  TreeNode *a = NULL;
+
+  Param p_type = mParams[0];
+  if(!p_type.mIsEmpty && p_type.mIsTreeNode) {
+    a = p_type.mData.mTreeNode;
+    MASSERT(mLastTreeNode->IsFunction());
+    f = (FunctionNode*)mLastTreeNode;
+  }
+
+  if (f && a)
+    f->SetAssert(a);
+
+  return mLastTreeNode;
+}
 ////////////////////////////////////////////////////////////////////////////////
 //                    New & Delete operation related
 ////////////////////////////////////////////////////////////////////////////////
