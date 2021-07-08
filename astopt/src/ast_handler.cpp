@@ -79,17 +79,9 @@ TreeNode *Module_Handler::FindDecl(IdentifierNode *node) {
     return mNodeId2Decl[nid];
   }
 
-  TreeNode *decl = NULL;
-  TreeNode *p = node->GetParent();
-  while (p) {
-    if (p->IsScope()) {
-      ASTScope *scope = p->GetScope();
-      // it will trace back to top level
-      decl = scope->FindDeclOf(node);
-      break;
-    }
-    p = p->GetParent();
-  }
+  ASTScope *scope = node->GetScope();
+  MASSERT(scope && "null scope");
+  TreeNode *decl = scope->FindDeclOf(node);
 
   if (decl) {
     unsigned did = decl->GetNodeId();
@@ -102,29 +94,23 @@ TreeNode *Module_Handler::FindType(IdentifierNode *node) {
   if (!node) {
     return NULL;
   }
-  TreeNode *type = NULL;
-  TreeNode *p = node->GetParent();
-  while (p) {
-    if (p->IsScope()) {
-      ASTScope *scope = p->GetScope();
-      // it will trace back to top level
-      type = scope->FindTypeOf(node);
-      break;
-    }
-    p = p->GetParent();
-  }
+  ASTScope *scope = node->GetScope();
+  MASSERT(scope && "null scope");
+  TreeNode *type = scope->FindTypeOf(node);
 
   return type;
 }
 
 // input a node ==> return the function node contains it
 TreeNode *Module_Handler::FindFunc(TreeNode *node) {
-  TreeNode *p = node->GetParent();
-  while (p) {
-    if (p->IsFunction()) {
-      return p;
+  ASTScope *scope = node->GetScope();
+  MASSERT(scope && "null scope");
+  while (scope) {
+    TreeNode *sn = scope->GetTree();
+    if (sn->IsFunction()) {
+      return sn;
     }
-    p = p->GetParent();
+    scope = scope->GetParent();
   }
   return NULL;
 }

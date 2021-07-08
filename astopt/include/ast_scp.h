@@ -45,23 +45,40 @@ class AST_SCP {
   void BuildScope();
 };
 
-class BuildScopeVisitor : public AstVisitor {
+class BuildScopeBaseVisitor : public AstVisitor {
  private:
-  Module_Handler *mHandler;
-  ModuleNode     *mASTModule;
   bool            mTrace;
 
  public:
   std::stack<ASTScope *> mScopeStack;
 
  public:
+  explicit BuildScopeBaseVisitor(bool t, bool base = false)
+    : mTrace(t), AstVisitor(t && base) {}
+  ~BuildScopeBaseVisitor() = default;
+
+#undef  NODEKIND
+#define NODEKIND(K) virtual K##Node *Visit##K##Node(K##Node *node) {\
+  ASTScope *scope = mScopeStack.top(); \
+  node->SetScope(scope); \
+  (void) AstVisitor::Visit##K##Node(node); \
+  return node; \
+}
+#include "ast_nk.def"
+};
+
+class BuildScopeVisitor : public BuildScopeBaseVisitor {
+ private:
+  Module_Handler *mHandler;
+  ModuleNode     *mASTModule;
+  bool            mTrace;
+
+ public:
   explicit BuildScopeVisitor(Module_Handler *h, bool t, bool base = false)
-    : mHandler(h), mTrace(t), AstVisitor(t && base) {
+    : mHandler(h), mTrace(t), BuildScopeBaseVisitor(t, base) {
       mASTModule = mHandler->GetASTModule();
     }
   ~BuildScopeVisitor() = default;
-
-  TreeNode *VisitTreeNode(TreeNode *node);
 
   // scope nodes
   BlockNode *VisitBlockNode(BlockNode *node);
@@ -74,6 +91,7 @@ class BuildScopeVisitor : public AstVisitor {
   DeclNode *VisitDeclNode(DeclNode *node);
   UserTypeNode *VisitUserTypeNode(UserTypeNode *node);
   TypeAliasNode *VisitTypeAliasNode(TypeAliasNode *node);
+
 };
 
 }

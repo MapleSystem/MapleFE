@@ -211,38 +211,4 @@ TypeAliasNode *BuildScopeVisitor::VisitTypeAliasNode(TypeAliasNode *node) {
   return node;
 }
 
-TreeNode *BuildScopeVisitor::VisitTreeNode(TreeNode *node) {
-  if (node == nullptr) {
-    return node;
-  }
-  switch (node->GetKind()) {
-    case NK_Module:
-      return VisitModuleNode(static_cast<ModuleNode *>(node));
-    case NK_Block:
-      return VisitBlockNode(static_cast<BlockNode *>(node));
-    case NK_Lambda:
-      return VisitLambdaNode(static_cast<LambdaNode *>(node));
-    case NK_Function:
-      return VisitFunctionNode(static_cast<FunctionNode *>(node));
-    case NK_Class:
-      return VisitClassNode(static_cast<ClassNode *>(node));
-    case NK_Interface:
-      return VisitInterfaceNode(static_cast<InterfaceNode *>(node));
-
-    case NK_Decl:
-      return VisitDeclNode(static_cast<DeclNode *>(node));
-    case NK_UserType:
-      return VisitUserTypeNode(static_cast<UserTypeNode *>(node));
-    case NK_TypeAlias:
-      return VisitTypeAliasNode(static_cast<TypeAliasNode *>(node));
-
-    default:
-      ASTScope *scope = mScopeStack.top();
-      node->SetScope(scope);
-      AstVisitor::VisitTreeNode(node);
-      break;
-  }
-  return node;
-}
-
 }
