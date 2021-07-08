@@ -56,7 +56,7 @@ std::string CppDecl::EmitModuleNode(ModuleNode *node) {
   str += R"""(
 #include "ts2cpp.h"
 
-class )""" + name + R"""( : public t2crt::BaseObj {
+class )""" + name + R"""( : public t2crt::Object {
 public: // all top level variables in the module
 )""";
 
@@ -81,7 +81,7 @@ void __init_func__();
 
   str += R"""(
   // exports
-  BaseObj exports;
+  Object exports;
 };
 
 extern )""" + name + " _"s + name + ";\n#endif\n"s;
@@ -196,9 +196,9 @@ std::string CppDecl::GetTypeString(TreeNode *node, TreeNode *child) {
       k = static_cast<PrimTypeNode*>(node)->GetPrimType();
     switch(k) {
       case TY_Object:
-        return "t2crt::BaseObj* "s;
+        return "t2crt::Object* "s;
       case TY_Function:
-        return "t2crt::BaseObj* "s;
+        return "t2crt::Object* "s;
       case TY_Boolean:
         return "bool "s;
       case TY_Int:
