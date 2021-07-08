@@ -2027,7 +2027,7 @@ private:
   TreeNode *mLeft;
   TreeNode *mRight;
 public:
-  IsNode() : TreeNode(NK_In), mLeft(NULL), mRight(NULL) {}
+  IsNode() : TreeNode(NK_Is), mLeft(NULL), mRight(NULL) {}
   ~IsNode(){Release();}
 
   TreeNode* GetLeft() {return mLeft;}
