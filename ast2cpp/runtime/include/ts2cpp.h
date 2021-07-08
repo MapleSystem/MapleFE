@@ -257,7 +257,7 @@ void GenerateDOTGraph( std::vector<Object *>&obj, std::vector<std::string>&name)
 
 } // namespace t2crt
 
- 
+
 template <typename T>
 std::ostream& operator<< (std::ostream& out, const std::vector<T>& v) {
   if(v.empty())

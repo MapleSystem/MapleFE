@@ -17,9 +17,9 @@ std::ostream& operator<< (std::ostream& out, const t2crt::JS_Val& v) {
   return out;
 }
 
-namespace t2crt {
-
 const t2crt::JS_Val undefined = { 0, t2crt::TY_Undef, false };
+
+namespace t2crt {
 
 // Generate DOT graph output to show object inheritance with
 // constructor, prototype chain and prototype property linkages
