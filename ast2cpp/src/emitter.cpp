@@ -204,6 +204,9 @@ std::string Emitter::EmitFunctionNode(FunctionNode *node) {
   }
   str += ")"s;
 
+  if (auto n = node->GetAssert())
+    str += " : asserts "s + EmitTreeNode(n);
+
   if (auto n = node->GetType()) {
     std::string s = EmitTreeNode(n);
     if(!s.empty())
