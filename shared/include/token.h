@@ -47,6 +47,7 @@ typedef enum TK_Type {
   TT_OP,    // operator
   TT_CM,    // comment
   TT_TL,    // template literal. coming from Javascript first.
+  TT_RE,    // regular expression, coming from most script languages.
   TT_NA     // N.A.
 }TK_Type;
 
@@ -102,6 +103,13 @@ struct TempLitData {
   SmallVector<const char*> mStrings;
 };
 
+// Regular expressions have two data. One is the expression,
+// the other is the flags. Both are saved as strings.
+struct RegExpr {
+  const char *mExpr;
+  const char *mFlags;
+};
+
 struct Token {
   TK_Type mTkType;
   union {
@@ -110,6 +118,7 @@ struct Token {
     SepId       mSepId;
     OprId       mOprId;
     TempLitData *mTempLitData;
+    RegExpr      mRegExpr;
   }mData;
 
   AltToken     *mAltTokens;
@@ -121,10 +130,12 @@ struct Token {
   bool IsKeyword()    const { return mTkType == TT_KW; }
   bool IsComment()    const { return mTkType == TT_CM; }
   bool IsTempLit()    const { return mTkType == TT_TL; }
+  bool IsRegExpr()    const { return mTkType == TT_RE; }
 
   void SetIdentifier(const char *name) {mTkType = TT_ID; mData.mName = name;}
   void SetLiteral(LitData data)        {mTkType = TT_LT; mData.mLitData = data;}
   void SetTempLit(TempLitData *data)   {mTkType = TT_TL; mData.mTempLitData = data;}
+  void SetRegExpr(RegExpr data)        {mTkType = TT_RE; mData.mRegExpr = data;}
 
   const char*  GetName() const;
   LitData      GetLitData()   const {return mData.mLitData;}
@@ -132,6 +143,7 @@ struct Token {
   SepId        GetSepId()     const {return mData.mSepId;}
   bool         IsWhiteSpace() const {return mData.mSepId == SEP_Whitespace;}
   TempLitData* GetTempLitData()   const {return mData.mTempLitData;}
+  RegExpr      GetRegExpr()   const {return mData.mRegExpr;}
 
   void Dump();
 };

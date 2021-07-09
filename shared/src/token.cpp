@@ -116,6 +116,9 @@ void Token::Dump() {
   case TT_TL:
     DUMP0("TemplateLiteral Token: ");
     break;
+  case TT_RE:
+    DUMP2("RegExpr Token: ", mData.mRegExpr.mExpr, mData.mRegExpr.mFlags);
+    break;
   case TT_LT:
     LiteralTokenDump(mData.mLitData);
     break;
