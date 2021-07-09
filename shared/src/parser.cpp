@@ -339,9 +339,15 @@ Token* Parser::GetRegExpr(Token *t) {
   // We take care of only the following scenarios.
   // If more need support, we will add later.
   //   (/abc*/g, )
+  //   =/abc*/g;
 
   Token *sep = mActiveTokens.ValueAtIndex(size - 1);
-  if (!sep->IsSeparator() || (sep->GetSepId() != SEP_Lparen))
+  bool is_sep = false;
+  if (sep->IsSeparator() && (sep->GetSepId() == SEP_Lparen))
+    is_sep = true;
+  if (sep->IsOperator() && (sep->GetOprId() == OPR_Assign))
+    is_sep = true;
+  if (!is_sep)
     return t;
 
   Token *regexpr = mLexer->FindRegExprToken();

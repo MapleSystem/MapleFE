@@ -257,9 +257,7 @@ Token* Lexer::LexTokenNoNewLine(void) {
 
 // We only look for the reg expr ending with / and a few flags like 'g'.
 // Flags include: d, g, i, m, s, u, y.
-//
-// The finish of reg expr is zero-or-more(white space) + ',', or
-//                           zero-or-more(white space) + ')'.
+// Anything else finishes the flag.
 //
 // The content in the reg expr could be many character, we just allow
 // all char excluding /.
@@ -268,7 +266,62 @@ Token* Lexer::FindRegExprToken() {
   // for a regular expr, /a\b/g
   // curidx is pointing to 'a' right now.
   unsigned old_cur_idx = curidx;
-  return NULL;
+  unsigned work_idx = curidx;
+  unsigned expr_beg_idx = curidx; // the first char of reg expr.
+  unsigned expr_length = 0;
+  unsigned flag_beg_idx = 0; // the first char of flags.
+  unsigned flag_length = 0;  // the number of char of flags.
+
+  bool on_flags = false;
+
+  while (work_idx < current_line_size - 1) {
+    if (line[work_idx] == '/') {
+      flag_beg_idx = work_idx + 1;
+      on_flags = true;
+    } else if (on_flags) {
+      if (line[work_idx] == 'd' ||
+          line[work_idx] == 'g' ||
+          line[work_idx] == 'i' ||
+          line[work_idx] == 'm' ||
+          line[work_idx] == 's' ||
+          line[work_idx] == 'u' ||
+          line[work_idx] == 'y')
+        flag_length++;
+      else
+        break;
+    } else {
+     expr_length++;
+    }
+    work_idx++;
+  }
+
+  if (expr_length > 0) {
+    // set curidx
+    curidx = work_idx;
+
+    const char *addr_expr = NULL;
+    std::string s(line + expr_beg_idx, expr_length);
+    addr_expr = gStringPool.FindString(s);
+
+    const char *addr_flag = NULL;
+    if (flag_length > 0) {
+      std::string sf(line + flag_beg_idx, flag_length);
+      addr_flag = gStringPool.FindString(sf);
+    }
+
+    RegExpr reg = {addr_expr, addr_flag};
+
+    Token *t = (Token*)mTokenPool.NewToken(sizeof(Token)); 
+    t->SetRegExpr(reg);
+    if (mTrace) {
+      std::cout << "Find a reg expr: ";
+      t->Dump();
+    }
+    return t;
+
+  } else {
+    return NULL;
+  }
 }
 
 // NOTE: right now we rely on 'tsc' to assure the input is legal,
