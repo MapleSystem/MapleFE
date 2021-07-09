@@ -1,7 +1,7 @@
 Matched 5 tokens.
 Matched 12 tokens.
 Matched 19 tokens.
-Matched 1472 tokens.
+Matched 1469 tokens.
 ============= Module ===========
 == Sub Tree ==
 package java.lang
@@ -34,9 +34,9 @@ class  StrictMath
     func  cbrt(a)  throws: 
     func  IEEEremainder(f1,f2)  throws: 
     func  ceil(a)  throws: 
-      return floorOrCeil(a,Minus 0,1,1)
+      return floorOrCeil(a,-0,1,1)
     func  floor(a)  throws: 
-      return floorOrCeil(a,Minus 1,0,Minus 1)
+      return floorOrCeil(a,-1,0,-1)
     func  floorOrCeil(a,negativeBoundary,positiveBoundary,sign)  throws: 
       Decl: exponent=Math.getExponent(a)
       cond-branch cond:exponent LT 0

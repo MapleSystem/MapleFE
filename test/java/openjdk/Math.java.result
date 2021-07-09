@@ -3,7 +3,7 @@ Matched 14 tokens.
 Matched 21 tokens.
 Matched 28 tokens.
 Matched 35 tokens.
-Matched 3287 tokens.
+Matched 3286 tokens.
 Convert unary --> binary
 Convert unary --> binary
 ============= Module ===========
@@ -20,7 +20,7 @@ import sun.misc.DoubleConsts
 == Sub Tree ==
 class  Math
   Fields: 
-    E=2.71828    PI=3.14159    negativeZeroFloatBits=Float.floatToRawIntBits(-0)    negativeZeroDoubleBits=Double.doubleToRawLongBits(Minus 0)    twoToTheDoubleScaleUp=powerOfTwoD(512)    twoToTheDoubleScaleDown=powerOfTwoD(-512)
+    E=2.71828    PI=3.14159    negativeZeroFloatBits=Float.floatToRawIntBits(-0)    negativeZeroDoubleBits=Double.doubleToRawLongBits(-0)    twoToTheDoubleScaleUp=powerOfTwoD(512)    twoToTheDoubleScaleDown=powerOfTwoD(-512)
   Instance Initializer: 
   Constructors: 
     constructor  Math()  throws: 
