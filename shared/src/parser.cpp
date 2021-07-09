@@ -298,26 +298,25 @@ bool Parser::TokenMerge(Token *t) {
     return false;
 
   LitData data = t->GetLitData();
-  if ((data.mType == LT_IntegerLiteral)) {
-    if (opr->GetOprId() == OPR_Sub) {
+  if ((data.mType != LT_IntegerLiteral) &&
+      (data.mType != LT_FPLiteral) &&
+      (data.mType != LT_DoubleLiteral))
+    return false;
+
+  if (opr->GetOprId() == OPR_Sub) {
+    if ((data.mType == LT_IntegerLiteral)) {
       data.mData.mInt = (-1) * data.mData.mInt;
-      t->SetLiteral(data);
-      mActiveTokens.SetElem(size - 1, t);
-      return true;
-    } else if (opr->GetOprId() == OPR_Add) {
-      mActiveTokens.SetElem(size - 1, t);
-      return true;
-    }
-  } else if (data.mType == LT_FPLiteral) {
-    if (opr->GetOprId() == OPR_Sub) {
+    } else if (data.mType == LT_FPLiteral) {
       data.mData.mFloat = (-1) * data.mData.mFloat;
-      t->SetLiteral(data);
-      mActiveTokens.SetElem(size - 1, t);
-      return true;
-    } else if (opr->GetOprId() == OPR_Add) {
-      mActiveTokens.SetElem(size - 1, t);
-      return true;
+    } else if (data.mType == LT_DoubleLiteral) {
+      data.mData.mDouble = (-1) * data.mData.mDouble;
     }
+    t->SetLiteral(data);
+    mActiveTokens.SetElem(size - 1, t);
+    return true;
+  } else if (opr->GetOprId() == OPR_Add) {
+    mActiveTokens.SetElem(size - 1, t);
+    return true;
   }
 
   return false;
