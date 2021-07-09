@@ -914,6 +914,14 @@ std::string Emitter::EmitLiteralNode(LiteralNode *node) {
   return HandleTreeNode(str, node);
 }
 
+std::string Emitter::EmitRegExprNode(RegExprNode *node) {
+  if (node == nullptr)
+    return std::string();
+  std::string str;
+  str = "/"s + node->GetData().mExpr + "/"s + node->GetData().mFlags;
+  return str;
+}
+
 std::string Emitter::EmitThrowNode(ThrowNode *node) {
   if (node == nullptr)
     return std::string();

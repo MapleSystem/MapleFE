@@ -83,6 +83,7 @@ public:
   virtual std::string EmitExprListNode(ExprListNode *node);
   virtual std::string EmitTemplateLiteralNode(TemplateLiteralNode *node);
   virtual std::string EmitLiteralNode(LiteralNode *node);
+  virtual std::string EmitRegExprNode(RegExprNode *node);
   virtual std::string EmitThrowNode(ThrowNode *node);
   virtual std::string EmitCatchNode(CatchNode *node);
   virtual std::string EmitFinallyNode(FinallyNode *node);
