@@ -907,9 +907,12 @@ std::string Emitter::EmitTemplateLiteralNode(TemplateLiteralNode *node) {
 std::string Emitter::EmitLiteralNode(LiteralNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str(AstDump::GetEnumLitData(node->GetData()));
-  Replace(str, "\"", "\\\"", 0);
-  str = "\"" + str + "\"";
+  LitData lit = node->GetData();
+  std::string str(AstDump::GetEnumLitData(lit));
+  if(lit.mType == LT_StringLiteral) {
+    Replace(str, "\"", "\\\"", 0);
+    str = "\"" + str + "\"";
+  }
   mPrecedence = '\030';
   if (node->IsStmt())
     str += ";\n"s;
