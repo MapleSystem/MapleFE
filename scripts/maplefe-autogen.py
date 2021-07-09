@@ -424,6 +424,9 @@ def get_data_based_on_type(val_type, accessor):
         return val_type + ', " + std::to_string(' + accessor + ')'
     elif val_type == 'const char *':
         return 'const char*, " + (' + accessor + ' ? std::string("\\"") + ' + accessor + ' + "\\"" : "null")'
+    elif val_type == 'RegExprData':
+        return 'RegExprData, Expr: " + std::string("\\"") + ' + accessor + '.mExpr + "\\", Flags: " + std::string("\\"") + ' \
+                + accessor + '.mFlags + "\\""'
     return val_type + ', " + "value" /* Warning: failed to get value */'
 
 def short_name(node_type):
@@ -918,6 +921,8 @@ def get_data_based_on_type(val_type, accessor):
                 + 'WriteValue(' + accessor + '.mData.mInt64);'
     elif val_type == 'const char *':
         return 'WriteString(' + accessor + ');'
+    elif val_type == 'RegExprData':
+        return 'WriteString(' + accessor + '.mExpr);\nWriteString(' + accessor + '.mFlags);'
     return 'Failed to get value with ' + val_type + ", " + accessor + ';'
 
 def short_name(node_type):
@@ -1115,6 +1120,8 @@ def set_data_based_on_type(val_type, accessor, setter):
            + 'n.mData.mInt64 = mStrMap[ReadValue()]; else n.mData.mInt64 = ReadValue();' + setter(accessor) + ';'
     elif val_type == 'const char *':
         return val_type + ' n = ReadString();' + setter(accessor) + ';'
+    elif val_type == 'RegExprData':
+        return val_type + ' n; n.mExpr = ReadString(); n.mFlags = ReadString();' + setter(accessor) + ';'
     return 'Failed to get value with ' + val_type + ", " + accessor + ';'
 
 # The follwoing gen_func_* and gen_call* functions are for AstLoad
