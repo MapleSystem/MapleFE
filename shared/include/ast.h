@@ -995,8 +995,8 @@ public:
 
   unsigned        GetFieldsNum() {return mFields.GetNum();}
   IdentifierNode* GetField(unsigned i) {return mFields.ValueAtIndex(i);}
-  void            SetField(unsigned i, IdentifierNode* n) {*(mFields.RefAtIndex(i)) = n;}
-  void            AddField(IdentifierNode *n) {mFields.PushBack(n);}
+  void            SetField(unsigned i, IdentifierNode* n) {*(mFields.RefAtIndex(i)) = n; SETPARENT(n);}
+  void            AddField(IdentifierNode *n) {mFields.PushBack(n); SETPARENT(n);}
 
   unsigned      GetMethodsNum() {return mMethods.GetNum();}
   FunctionNode* GetMethod(unsigned i) {return mMethods.ValueAtIndex(i);}
@@ -1043,8 +1043,8 @@ public:
 
   unsigned          GetFieldsNum() {return mFields.GetNum();}
   FieldLiteralNode* GetField(unsigned i) {return mFields.ValueAtIndex(i);}
-  void              SetField(unsigned i, FieldLiteralNode* n) {*(mFields.RefAtIndex(i)) = n;}
-  void              AddField(TreeNode *d);
+  void              SetField(unsigned i, FieldLiteralNode* n) {*(mFields.RefAtIndex(i)) = n; SETPARENT(n);}
+  void              AddField(TreeNode *n);
 
   void Dump(unsigned);
 };
@@ -1771,9 +1771,9 @@ public:
   void           SetSuperInterfaceAtIndex(unsigned i, InterfaceNode* n) {*(mSuperInterfaces.RefAtIndex(i)) = n;}
 
   unsigned        GetFieldsNum()              {return mFields.GetNum();}
-  void            AddField(IdentifierNode* a) {mFields.PushBack(a);}
+  void            AddField(IdentifierNode* n) {mFields.PushBack(n); SETPARENT(n);}
   IdentifierNode* GetFieldAtIndex(unsigned i) {return mFields.ValueAtIndex(i);}
-  void            SetFieldAtIndex(unsigned i, IdentifierNode* n) {*(mFields.RefAtIndex(i)) = n;}
+  void            SetFieldAtIndex(unsigned i, IdentifierNode* n) {*(mFields.RefAtIndex(i)) = n; SETPARENT(n);}
 
   unsigned      GetMethodsNum()              {return mMethods.GetNum();}
   void          AddMethod(FunctionNode* a)   {mMethods.PushBack(a);}
@@ -1829,7 +1829,7 @@ public:
   void AddSuperClass(ClassNode *n)         {mSuperClasses.PushBack(n);}
   void AddSuperInterface(InterfaceNode *n) {mSuperInterfaces.PushBack(n);}
   void AddAttribute(AttrId a) {mAttributes.PushBack(a);}
-  void AddField(IdentifierNode *n) {mFields.PushBack(n);}
+  void AddField(IdentifierNode *n) {mFields.PushBack(n); SETPARENT(n);}
   void AddMethod(FunctionNode *n) {mMethods.PushBack(n);}
   void AddConstructor(FunctionNode *n) {mConstructors.PushBack(n);}
   void AddInstInit(BlockNode *n) {mInstInits.PushBack(n);}
@@ -1857,7 +1857,7 @@ public:
   AttrId GetAttribute(unsigned i)              {return mAttributes.ValueAtIndex(i);}
   void   SetAttribute(unsigned i, AttrId n) {*(mAttributes.RefAtIndex(i)) = n;}
   IdentifierNode* GetField(unsigned i)         {return mFields.ValueAtIndex(i);}
-  void            SetField(unsigned i, IdentifierNode* n) {*(mFields.RefAtIndex(i)) = n;}
+  void            SetField(unsigned i, IdentifierNode* n) {*(mFields.RefAtIndex(i)) = n; SETPARENT(n);}
   FunctionNode* GetMethod(unsigned i)          {return mMethods.ValueAtIndex(i);}
   void          SetMethod(unsigned i, FunctionNode* n) {*(mMethods.RefAtIndex(i)) = n;}
   FunctionNode* GetConstructor(unsigned i)     {return mConstructors.ValueAtIndex(i);}
