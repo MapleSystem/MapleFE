@@ -909,7 +909,9 @@ std::string Emitter::EmitLiteralNode(LiteralNode *node) {
     return std::string();
   LitData lit = node->GetData();
   std::string str(AstDump::GetEnumLitData(lit));
-  if(lit.mType == LT_StringLiteral) {
+  if(lit.mType == LT_StringLiteral
+      && !(str.front() == '"' && str.back() == '\"'
+           || str.front() == '\'' && str.back() == '\'')) {
     Replace(str, "\"", "\\\"", 0);
     str = "\"" + str + "\"";
   }
