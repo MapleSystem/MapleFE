@@ -420,13 +420,13 @@ def get_data_based_on_type(val_type, accessor):
             or val_type == 'unsigned' or val_type == 'int' or val_type == 'int32_t' or val_type == 'int64_t' :
         if accessor.find("GetStrIdx()") >= 0:
             return val_type + ', " + std::to_string(' + accessor + ') + " => " + (' + accessor \
-                    + '? "\\"" + std::string(gStringPool.GetStringFromStrIdx(' + accessor + ')) + "\\"": "null")'
+                    + '? "\\""s + gStringPool.GetStringFromStrIdx(' + accessor + ') + "\\""s : "null"s)'
         return val_type + ', " + std::to_string(' + accessor + ')'
     elif val_type == 'const char *':
-        return 'const char*, " + (' + accessor + ' ? std::string("\\"") + ' + accessor + ' + "\\"" : "null")'
+        return 'const char*, " + (' + accessor + ' ? "\\""s + ' + accessor + ' + "\\""s : "null"s)'
     elif val_type == 'RegExprData':
-        return 'RegExprData, Expr: " + std::string("\\"") + ' + accessor + '.mExpr + "\\", Flags: " + std::string("\\"") + ' \
-                + accessor + '.mFlags + "\\""'
+        return 'RegExprData, Expr: " + "\\""s + ' + accessor + '.mExpr + "\\", Flags: \\""s + ' \
+                + accessor + '.mFlags + "\\""s'
     return val_type + ', " + "value" /* Warning: failed to get value */'
 
 def short_name(node_type):
@@ -451,7 +451,7 @@ gen_call_child_node = lambda dictionary, node_name, field_name, node_type, acces
         ('Dump("' + padding_name(field_name) + ': ' + short_name(node_type) + '*", ' + accessor  + ');\n' \
         if field_name != '' else '') + gen_args[2] + short_name(node_type) + '(' + accessor + ');'
 gen_call_child_value = lambda dictionary, node_name, field_name, val_type, accessor: \
-        'Dump(std::string("' + padding_name(field_name) + ': ") + "' + get_data_based_on_type(val_type, accessor) + ');'
+        'Dump("' + padding_name(field_name) + ': "s + "' + get_data_based_on_type(val_type, accessor) + ');'
 gen_call_children_node = lambda dictionary, node_name, field_name, node_type, accessor: \
         'DumpLB("' + padding_name(field_name) + ': ' + short_name(node_type) + ', size=", ' + accessor+ ');'
 gen_call_children_node_end = lambda dictionary, node_name, field_name, node_type, accessor: 'DumpLE(' + accessor + ');'
@@ -470,7 +470,9 @@ gen_args = [
         "gen_astdump", # Filename
         "AstDump",     # Class name
         "AstDump",     # Prefix of function name
-        "",            # Extra include directives
+        """
+using namespace std::string_literals;
+""",                   # Extra include directives
         "",            # Base class
         ]
 astdump = gen_args[0]
@@ -508,25 +510,25 @@ static std::string GetEnumLitData(LitData lit) {{
     case LT_DoubleLiteral:
       return std::to_string(lit.mData.mDouble);
     case LT_BooleanLiteral:
-      return std::string(lit.mData.mBool ? "true" : "false");
+      return lit.mData.mBool ? "true" : "false";
     case LT_CharacterLiteral:
       return std::string(1, lit.mData.mChar.mData.mChar); // TODO: Unicode support
     case LT_StringLiteral:
       return std::string(gStringPool.GetStringFromStrIdx(lit.mData.mStrIdx));
     case LT_NullLiteral:
-      return std::string("null");
+      return "null";
     case LT_ThisLiteral:
-      return std::string("this");
+      return "this";
     case LT_SuperLiteral:
-      return std::string("super");
+      return "super";
     case LT_VoidLiteral:
-      return std::string("void 0");
+      return "void 0";
     case LT_NA:
-      return std::string("NA");
+      return "NA";
     default:
       MASSERT(0 && "Unexpected LitData");
   }}
-  return std::string("Unexpected");
+  return "Unexpected";
 }}
 
 private:
@@ -580,7 +582,7 @@ gen_padding = "^ "
 gen_call_child_node = lambda dictionary, node_name, field_name, node_type, accessor: \
     ('Dump("' + padding_name(field_name) + ': ' + short_name(node_type) \
     + '*, " + (' + accessor + ' ? "NodeId=" + std::to_string(' + accessor \
-    + '->GetNodeId()) : std::string("null")));\n' if field_name == "mParent" else \
+    + '->GetNodeId()) : "null"s));\n' if field_name == "mParent" else \
     'Dump("' + padding_name(field_name) + ': ' + short_name(node_type) + '*", ' + accessor + ');\n' \
     + prefixfuncname + short_name(node_type) + '(' + accessor + ');') if field_name != '' else ''
 gen_call_nth_child_node = lambda dictionary, node_name, field_name, node_type, accessor: \
