@@ -393,7 +393,9 @@ public:
 
   void InitRecursion();
   unsigned LexOneLine();
-  bool TokenMerge(Token *);
+
+  bool   TokenMerge(Token *);
+  Token* GetRegExpr(Token *);
 };
 
 }

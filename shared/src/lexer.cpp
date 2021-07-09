@@ -255,6 +255,15 @@ Token* Lexer::LexTokenNoNewLine(void) {
   return NULL;
 }
 
+//
+Token* Lexer::FindRegExprToken() {
+  unsigned old_cur_idx = curidx;
+  if (line[curidx] == '`') {
+    MASSERT(line[curidx] == '`');
+  }
+  return NULL;
+}
+
 // NOTE: right now we rely on 'tsc' to assure the input is legal,
 //       so I'll make many things easier and will skip many lexical
 //       checks. Just make it easy for now.

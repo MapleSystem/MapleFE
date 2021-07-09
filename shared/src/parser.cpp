@@ -323,6 +323,34 @@ bool Parser::TokenMerge(Token *t) {
   return false;
 }
 
+// Return a reg expr token instead of t if t is the beginning of a regular expression.
+// Or return t.
+Token* Parser::GetRegExpr(Token *t) {
+  if (!t->IsOperator())
+    return t;
+
+  if (t->GetOprId() != OPR_Div)
+    return t;
+
+  unsigned size = mActiveTokens.GetNum();
+  if (size < 2)
+    return t;
+
+  // We take care of only the following scenarios.
+  // If more need support, we will add later.
+  //   (/abc*/g, )
+
+  Token *sep = mActiveTokens.ValueAtIndex(size - 1);
+  if (!sep->IsSeparator() || (sep->GetSepId() != SEP_Lparen))
+    return t;
+
+  Token *regexpr = mLexer->FindRegExprToken();
+  if (regexpr)
+    t = regexpr;
+
+  return t;
+}
+
 // Lex all tokens in a line, save to mActiveTokens.
 // If no valuable in current line, we continue to the next line.
 // Returns the number of valuable tokens read. Returns 0 if EOF.
@@ -348,6 +376,7 @@ unsigned Parser::LexOneLine() {
         // Put into the token storage, as Pending tokens.
         if (!is_whitespace && !t->IsComment()) {
           if (!TokenMerge(t)) {
+            t = GetRegExpr(t);
             mActiveTokens.PushBack(t);
             token_num++;
           }
