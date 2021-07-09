@@ -1658,6 +1658,9 @@ std::string Emitter::EmitTreeNode(TreeNode *node) {
   case NK_TemplateLiteral:
     return EmitTemplateLiteralNode(static_cast<TemplateLiteralNode *>(node));
     break;
+  case NK_RegExpr:
+    return EmitRegExprNode(static_cast<RegExprNode *>(node));
+    break;
   case NK_Literal:
     return EmitLiteralNode(static_cast<LiteralNode *>(node));
     break;
