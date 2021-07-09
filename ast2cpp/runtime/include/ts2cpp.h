@@ -31,7 +31,7 @@ using std::to_string;
 inline std::string to_string(std::string t) {return t;}
 
 class Object;
-class Ctor;
+class Function;
 class Ctor_Function;
 class Ctor_Object;
 class Ctor_Array;
@@ -123,11 +123,11 @@ typedef std::unordered_map<std::string, JS_Prop> JS_PropList;
 class Object {
   public:
     JS_PropList propList;
-    Object* _proto;       // prototype chain
-    Ctor*    _ctor;       // constructor of object
+    Object*   __proto__;       // prototype chain
+    Function* constructor;     // constructor of object
   public:
-    Object(): _proto(nullptr) {}
-    Object(Ctor* ctor, Object* proto): _ctor(ctor), _proto(proto) {}
+    Object(): __proto__(nullptr) {}
+    Object(Function* ctor, Object* proto): constructor(ctor), __proto__(proto) {}
 
     bool HasOwnProp(std::string key) {
       JS_PropList::iterator it;
@@ -140,67 +140,62 @@ class Object {
     }
 
     bool IsFuncObj() {
-      return (this->_ctor == reinterpret_cast<Ctor *>(&Function_ctor));
+      return (this->constructor == reinterpret_cast<Function *>(&Function_ctor));
     }
 
-    // Implement JS Object.prototype props as static fields and methods here
+    // Put code for JS Object.prototype props as static fields and methods here
     // and add to propList of Object_prototype object on system init.
 };
 
 class Function : public Object {
   public:
-    Object* _prototype;    // prototype property
+    Object* prototype;    // prototype property
 
-    // Implemente JS Function.prototype props as static fields and methods here.
+    Function(Function* ctor, Object* proto, Object* proto_prop) : Object(ctor, proto), prototype(proto_prop) {
+      JS_Val val(this);
+      prototype->AddProp("constructor", val);
+    }
+
+    // Put code for JS Function.prototype props as static fields and methods here.
     // and add to propList of Function_prototype object on system init.
 };
 
-class Array    : public Function {
+
+// JS builtins
+class Array : public Object {
   public:
+    Array(Function* ctor, Object* proto): Object(ctor, proto) {}
     // Imeplement JS Array.prototype props as static fields and methods here.
     // and add to proplist of Array_prototype object on system init.
 };
 
-// JavaScript class/function constructor
-class Ctor : public Function {
+class Ctor_Function : public Function {
   public:
-    Ctor(Ctor* ctor, Object* proto, Object* prototype) {
-      JS_Val val(this);
-      _ctor = ctor;
-      _proto = proto;
-      _prototype = prototype;
-      _prototype->AddProp("constructor", val);
-    }
+    Ctor_Function(Function* ctor, Object* proto, Object* prototype) : Function(ctor, proto, prototype) {}
+
+#if 0
+    // todo: how to handle "new Function(...)";
+    Function* _new() {
+      return new Function(this, this->prototype);
+     }
+#endif
 };
 
-
-// For JS builtins
-
-class Ctor_Function : public Ctor {
+class Ctor_Object   : public Function {
   public:
-    Ctor_Function(Ctor* ctor, Object* proto, Object* prototype) : Ctor(ctor, proto, prototype) {}
-};
-
-class Ctor_Object   : public Ctor {
-  public:
-    Ctor_Object(Ctor* ctor, Object* proto, Object* prototype) : Ctor(ctor, proto, prototype) {}
+    Ctor_Object(Function* ctor, Object* proto, Object* prototype) : Function(ctor, proto, prototype) {}
 
     Object* _new() {
-      Object* obj = new Object();
-      obj->_ctor  = this;
-      obj->_proto = this->_prototype;
-      return obj;
+      return new Object(this, this->prototype);
     }
 };
-class Ctor_Array: public Ctor {
+
+class Ctor_Array: public Function {
   public:
-    Ctor_Array(Ctor* ctor, Object* proto, Object* prototype) : Ctor(ctor, proto, prototype) {}
+    Ctor_Array(Function* ctor, Object* proto, Object* prototype) : Function(ctor, proto, prototype) {}
 
     Array* _new() {
-      Array* obj  = new Array();
-      obj->_ctor  = this;
-      obj->_proto = this->_prototype;
-      return obj;
+      return new Array(this, this->prototype);
     }
 };
 
@@ -254,7 +249,6 @@ template <> inline std::string __js_typeof<t2crt::JS_Val>(t2crt::JS_Val v) {
 }
 
 void GenerateDOTGraph( std::vector<Object *>&obj, std::vector<std::string>&name);
-
 } // namespace t2crt
 
 
