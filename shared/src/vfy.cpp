@@ -177,6 +177,10 @@ void Verifier::VerifyTemplateLiteral(TemplateLiteralNode *tree){
   return;
 }
 
+void Verifier::VerifyRegExpr(RegExprNode *tree){
+  return;
+}
+
 void Verifier::VerifyUnaOperator(UnaOperatorNode *tree){
 }
 

@@ -105,7 +105,7 @@ struct TempLitData {
 
 // Regular expressions have two data. One is the expression,
 // the other is the flags. Both are saved as strings.
-struct RegExpr {
+struct RegExprData {
   const char *mExpr;
   const char *mFlags;
 };
@@ -118,7 +118,7 @@ struct Token {
     SepId       mSepId;
     OprId       mOprId;
     TempLitData *mTempLitData;
-    RegExpr      mRegExpr;
+    RegExprData  mRegExprData;
   }mData;
 
   AltToken     *mAltTokens;
@@ -135,7 +135,7 @@ struct Token {
   void SetIdentifier(const char *name) {mTkType = TT_ID; mData.mName = name;}
   void SetLiteral(LitData data)        {mTkType = TT_LT; mData.mLitData = data;}
   void SetTempLit(TempLitData *data)   {mTkType = TT_TL; mData.mTempLitData = data;}
-  void SetRegExpr(RegExpr data)        {mTkType = TT_RE; mData.mRegExpr = data;}
+  void SetRegExpr(RegExprData data)    {mTkType = TT_RE; mData.mRegExprData = data;}
 
   const char*  GetName() const;
   LitData      GetLitData()   const {return mData.mLitData;}
@@ -143,7 +143,7 @@ struct Token {
   SepId        GetSepId()     const {return mData.mSepId;}
   bool         IsWhiteSpace() const {return mData.mSepId == SEP_Whitespace;}
   TempLitData* GetTempLitData()   const {return mData.mTempLitData;}
-  RegExpr      GetRegExpr()   const {return mData.mRegExpr;}
+  RegExprData  GetRegExpr()   const {return mData.mRegExprData;}
 
   void Dump();
 };

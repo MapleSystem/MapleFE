@@ -309,7 +309,7 @@ Token* Lexer::FindRegExprToken() {
       addr_flag = gStringPool.FindString(sf);
     }
 
-    RegExpr reg = {addr_expr, addr_flag};
+    RegExprData reg = {addr_expr, addr_flag};
 
     Token *t = (Token*)mTokenPool.NewToken(sizeof(Token)); 
     t->SetRegExpr(reg);

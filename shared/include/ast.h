@@ -1190,6 +1190,23 @@ public:
 };
 
 //////////////////////////////////////////////////////////////////////////
+//                         RegExpr Nodes
+//////////////////////////////////////////////////////////////////////////
+
+class RegExprNode : public TreeNode {
+private:
+  RegExprData mData;
+public:
+  RegExprNode() : TreeNode(NK_RegExpr) {mData.mExpr = NULL; mData.mFlags = NULL;}
+  ~RegExprNode(){}
+
+  RegExprData GetData() {return mData;}
+  void SetData(RegExprData d) {mData = d;}
+
+  void Dump(unsigned);
+};
+
+//////////////////////////////////////////////////////////////////////////
 //                         ThrowNode
 // This is the throw statement.
 // In Java some functions throw exception in declaration, and they are
