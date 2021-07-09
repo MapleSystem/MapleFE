@@ -35,7 +35,7 @@ void GenerateDOTGraph( std::vector<Object *>&obj, std::vector<std::string>&name)
       bool isFuncObj = objs[i]->IsFuncObj();
       if (isFuncObj) {
         // only function objects have prototype prop
-        objs.push_back(((Ctor *)objs[i])->_prototype);
+        objs.push_back(((Function *)objs[i])->prototype);
         names.push_back(names[i] + "_prototype");
         if (g == 0) {
           std::cout << "subgraph cluster_" << names[i] << " {\nrank=same;\ncolor=white;\n"
@@ -51,10 +51,10 @@ void GenerateDOTGraph( std::vector<Object *>&obj, std::vector<std::string>&name)
     num = objs.size();
     for (int i=0; i<num; ++i) {
       for (int j=0; j<num; ++j) {
-        if(g > 0 && objs[i]->_ctor== objs[j])
+        if(g > 0 && objs[i]->constructor == objs[j])
           std::cout << names[i] << " -> " << names[j] << " [label=\"ctor\", color=darkgreen, fontcolor=darkgreen];" << std::endl;
 
-        if(objs[i]->_proto == objs[j])
+        if(objs[i]->__proto__ == objs[j])
           std::cout << names[i] << " -> " << names[j] << " [label=\"__proto__\", color=red, fontcolor=red];" << std::endl;
       }
     }

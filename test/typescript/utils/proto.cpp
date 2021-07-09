@@ -18,8 +18,9 @@ extern Ctor_Vehicle  Vehicle_ctor;
 extern Ctor_Car      Car_ctor;
 extern Ctor_MyCar    MyCar_ctor;
 
-class Vehicle : public Function {
+class Vehicle : public Object {
   public:
+    Vehicle(Function* ctor, Object* proto): Object(ctor, proto) {}
     // Vehicle.prototype props (use static)
 
   public:
@@ -29,6 +30,7 @@ class Vehicle : public Function {
 
 class Car : public Vehicle {
   public:
+    Car(Function* ctor, Object* proto): Vehicle(ctor, proto) {}
     // Car.prototype props (use static)
 
   public:
@@ -38,6 +40,7 @@ class Car : public Vehicle {
 // C++ Class def for instance props and prototype props 
 class MyCar : public Car {
   public:
+    MyCar(Function* ctor, Object* proto): Car(ctor, proto) {}
     // MyCar.prototype props (use static)
 
   public:
@@ -46,16 +49,14 @@ class MyCar : public Car {
 
 // Class def for function constructors
 
-class Ctor_Vehicle : public Ctor {
+class Ctor_Vehicle : public Function {
   public:
-    Ctor_Vehicle(Ctor* ctor, Object* proto, Object* prototype) : Ctor(ctor, proto, prototype) {}
+    Ctor_Vehicle(Function* ctor, Object* proto, Object* prototype) : Function(ctor, proto, prototype) {}
 
     Vehicle* _new() {
-      Vehicle* obj = new Vehicle();
-      obj->_ctor  = this;
-      obj->_proto = this->_prototype;
-      return obj;
+      return  new Vehicle(this, this->prototype);
     }
+
     void operator()(Vehicle* obj , std::string name) {
       // add instance props to instance prop list
       ClassFld<std::string Vehicle::*> field(&Vehicle::name);
@@ -65,15 +66,12 @@ class Ctor_Vehicle : public Ctor {
     }
 };
 
-class Ctor_Car : public Ctor {
+class Ctor_Car : public Ctor_Vehicle {
   public:
-    Ctor_Car(Ctor* ctor, Object* proto, Object* prototype) : Ctor(ctor, proto, prototype) {}
+    Ctor_Car(Function* ctor, Object* proto, Object* prototype) : Ctor_Vehicle(ctor, proto, prototype) {}
 
     Car* _new() {
-      Car* obj = new Car();
-      obj->_ctor = this;
-      obj->_proto = this->_prototype;
-      return obj;
+      return new Car(this, this->prototype);
     }
 
     void operator()(Car* obj , std::string name) {
@@ -81,15 +79,12 @@ class Ctor_Car : public Ctor {
     }
 };
 
-class Ctor_MyCar : public Ctor {
+class Ctor_MyCar : public Ctor_Car {
   public:
-    Ctor_MyCar(Ctor* ctor, Object* proto, Object* prototype) : Ctor(ctor, proto, prototype) {}
+    Ctor_MyCar(Function* ctor, Object* proto, Object* prototype) : Ctor_Car(ctor, proto, prototype) {}
 
     MyCar* _new() {
-      MyCar* obj  = new MyCar();
-      obj->_ctor  = this;
-      obj->_proto = this->_prototype;
-      return obj;
+      return new MyCar(this, this->prototype);
     }
 
     void operator()(MyCar* obj , std::string name) {
@@ -98,9 +93,9 @@ class Ctor_MyCar : public Ctor {
 };
 
 // Prototype property
-Object    Vehicle_prototype ((Ctor *)&Vehicle_ctor, &Object_prototype);
-Object    Car_prototype     ((Ctor *)&Car_ctor,     &Vehicle_prototype);
-Object    MyCar_prototype   ((Ctor *)&MyCar_ctor,   &Car_prototype);
+Object    Vehicle_prototype ((Function *)&Vehicle_ctor, &Object_prototype);
+Object    Car_prototype     ((Function *)&Car_ctor,     &Vehicle_prototype);
+Object    MyCar_prototype   ((Function *)&MyCar_ctor,   &Car_prototype);
 
 // Function constructors 
 Ctor_MyCar    MyCar_ctor   (&Function_ctor, &Car_ctor,           &MyCar_prototype);
@@ -108,9 +103,9 @@ Ctor_Car      Car_ctor     (&Function_ctor, &Vehicle_ctor,       &Car_prototype)
 Ctor_Vehicle  Vehicle_ctor (&Function_ctor, &Function_prototype, &Vehicle_prototype);
 
 // Object instances
-Car* car = Car_ctor._new();
-MyCar* mycar = MyCar_ctor._new();
-Array* arr = Array_ctor._new();
+Car* car    = Car_ctor._new();
+MyCar* mycar= MyCar_ctor._new();
+Array* arr  = Array_ctor._new();
 Object* obj = Object_ctor._new();
 
 int main(int argc, char* argv[]) {
