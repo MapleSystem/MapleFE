@@ -255,12 +255,19 @@ Token* Lexer::LexTokenNoNewLine(void) {
   return NULL;
 }
 
+// We only look for the reg expr ending with / and a few flags like 'g'.
+// Flags include: d, g, i, m, s, u, y.
 //
+// The finish of reg expr is zero-or-more(white space) + ',', or
+//                           zero-or-more(white space) + ')'.
+//
+// The content in the reg expr could be many character, we just allow
+// all char excluding /.
 Token* Lexer::FindRegExprToken() {
+
+  // for a regular expr, /a\b/g
+  // curidx is pointing to 'a' right now.
   unsigned old_cur_idx = curidx;
-  if (line[curidx] == '`') {
-    MASSERT(line[curidx] == '`');
-  }
   return NULL;
 }
 
