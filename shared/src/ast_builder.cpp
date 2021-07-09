@@ -80,6 +80,16 @@ TreeNode* ASTBuilder::CreateTokenTreeNode(const Token *token) {
     mLastTreeNode = n;
     return n;
 
+  } else if (token->IsRegExpr()) {
+    RegExprNode *n = (RegExprNode*)gTreePool.NewTreeNode(sizeof(RegExprNode));
+    new (n) RegExprNode();
+
+    RegExprData d = token->GetRegExpr();
+    n->SetData(d);
+
+    mLastTreeNode = n;
+    return n;
+
   } else if (token->IsKeyword()) {
     mNameForBuildIdentifier = NULL;
     const char *keyword = token->GetName();

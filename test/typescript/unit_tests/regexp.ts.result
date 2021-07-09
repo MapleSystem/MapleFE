@@ -1,0 +1,13 @@
+Matched 7 tokens.
+Matched 14 tokens.
+Matched 25 tokens.
+Matched 32 tokens.
+============= Module ===========
+== Sub Tree ==
+js_var Decl: str='abcba'
+== Sub Tree ==
+console.log(str)
+== Sub Tree ==
+str Assign str.replace(reg expr :  b  g,B)
+== Sub Tree ==
+console.log(str)

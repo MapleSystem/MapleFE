@@ -135,7 +135,7 @@ rule PrimaryExpression : ONEOF(
   FunctionExpression,
 #  ClassExpression[?Yield]
 #  GeneratorExpression
-#  RegularExpressionLiteral
+  RegularExpression,
   TemplateLiteral,
   ParenthesizedExpression)
 

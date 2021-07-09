@@ -738,6 +738,8 @@ void Parser::DumpExitTable(const char *table_name, unsigned indent,
     std::cout << " fail@NotIdentifer" << "}" << std::endl;
   else if (reason == FailNotLiteral)
     std::cout << " fail@NotLiteral" << "}" << std::endl;
+  else if (reason == FailNotRegExpr)
+    std::cout << " fail@NotRegExpr" << "}" << std::endl;
   else if (reason == FailChildrenFailed)
     std::cout << " fail@ChildrenFailed" << "}" << std::endl;
   else if (reason == Fail2ndOf1st)
@@ -793,11 +795,11 @@ bool Parser::LookAheadFail(RuleTable *rule_table, unsigned token) {
     case LA_Token:
       if (curr_token == &gSystemTokens[la.mData.mTokenId])
         found = true;
-      // TemplateLiteral is treated as a special keyword.
+      // TemplateLiteral, Regular Expression is treated as a special keyword.
       {
         Token *t = &gSystemTokens[la.mData.mTokenId];
         if (t->IsKeyword() && !strncmp(t->GetName(), "this_is_for_fake_rule", 21)) {
-          if (curr_token->IsTempLit())
+          if (curr_token->IsTempLit() || curr_token->IsRegExpr())
             found = true;
         }
       }
@@ -1106,6 +1108,9 @@ bool Parser::TraverseRuleTableRegular(RuleTable *rule_table, AppealNode *appeal)
   if ((rule_table == &TblTemplateLiteral))
     return TraverseTemplateLiteral(rule_table, appeal);
 
+  if ((rule_table == &TblRegularExpression))
+    return TraverseRegularExpression(rule_table, appeal);
+
   EntryType type = rule_table->mType;
   switch(type) {
   case ET_Oneof:
@@ -1283,6 +1288,25 @@ bool Parser::TraverseTemplateLiteral(RuleTable *rule_table, AppealNode *appeal) 
     TraverseSpecialTableSucc(rule_table, appeal);
   } else {
     appeal->mResult = FailNotLiteral;
+    AddFailed(rule_table, mCurToken);
+  }
+
+  return found;
+}
+
+// We don't go into RegularExpressionLiteral table.
+// 'appeal' is the node for this rule table. This is different than TraverseOneof
+// or the others where 'appeal' is actually a parent node.
+bool Parser::TraverseRegularExpression(RuleTable *rule_table, AppealNode *appeal) {
+  Token *curr_token = GetActiveToken(mCurToken);
+  const char *name = GetRuleTableName(rule_table);
+  bool found = false;
+
+  if (curr_token->IsRegExpr()) {
+    found = true;
+    TraverseSpecialTableSucc(rule_table, appeal);
+  } else {
+    appeal->mResult = FailNotRegExpr;
     AddFailed(rule_table, mCurToken);
   }
 
@@ -1613,7 +1637,10 @@ void Parser::SetIsDone(unsigned group_id, unsigned start_token) {
 
 void Parser::SetIsDone(RuleTable *rt, unsigned start_token) {
   // We don't save SuccMatch for TblLiteral and TblIdentifier
-  if((rt == &TblLiteral) || (rt == &TblIdentifier) || (rt == &TblTemplateLiteral))
+  if((rt == &TblLiteral) ||
+     (rt == &TblIdentifier) ||
+     (rt == &TblRegularExpression) ||
+     (rt == &TblTemplateLiteral))
     return;
 
   SuccMatch *succ = &gSucc[rt->mIndex];

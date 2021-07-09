@@ -45,6 +45,7 @@ typedef enum AppealStatus {
   FailNotRightToken,
   FailNotIdentifier,
   FailNotLiteral,
+  FailNotRegExpr,
   FailChildrenFailed,
   Fail2ndOf1st,
   FailLookAhead,
@@ -301,6 +302,7 @@ private:
   bool TraverseLiteral(RuleTable*, AppealNode*);
   bool TraverseIdentifier(RuleTable*, AppealNode*);
   bool TraverseTemplateLiteral(RuleTable*, AppealNode*);
+  bool TraverseRegularExpression(RuleTable*, AppealNode*);
   void TraverseSpecialTableSucc(RuleTable*, AppealNode*);
 
   bool IsVisited(RuleTable*);
