@@ -211,4 +211,98 @@ TypeAliasNode *BuildScopeVisitor::VisitTypeAliasNode(TypeAliasNode *node) {
   return node;
 }
 
+void AST_SCP::RenameVar() {
+  if (mTrace) std::cout << "============== RenameVar ==============" << std::endl;
+  RenameVarVisitor visitor(mHandler, mTrace, true);
+  ModuleNode *module = mHandler->GetASTModule();
+  visitor.mPass = 0;
+  visitor.Visit(module);
+
+  visitor.mPass = 1;
+  for (auto it: visitor.mStridx2DeclIdMap) {
+    unsigned stridx = it.first;
+    unsigned size = visitor.mStridx2DeclIdMap[stridx].size();
+    if (size > 1) {
+      const char *name = gStringPool.GetStringFromStrIdx(stridx);
+
+      if (mTrace) {
+        std::cout << "\nstridx: " << stridx << " " << name << std::endl;
+        std::cout << "decl nid : ";
+        for (auto i : visitor.mStridx2DeclIdMap[stridx]) {
+          std::cout << " " << i;
+        }
+        std::cout << std::endl;
+      }
+
+      std::deque<unsigned>::reverse_iterator rit = visitor.mStridx2DeclIdMap[stridx].rbegin();
+      size--;
+      for (; size && rit!= visitor.mStridx2DeclIdMap[stridx].rend(); --size, ++rit) {
+        unsigned nid = *rit;
+        std::string str(name);
+        str += "__v";
+        str += std::to_string(size);
+        visitor.mOldStrIdx = stridx;
+        visitor.mNewStrIdx = gStringPool.GetStrIdx(str);
+        TreeNode *tn = visitor.mNodeId2NodeMap[nid];
+        ASTScope *scope = tn->GetScope();
+        tn = scope->GetTree();
+        if (mTrace) {
+          std::cout << "update name : "
+                    << gStringPool.GetStringFromStrIdx(visitor.mOldStrIdx)
+                    << " --> "
+                    << gStringPool.GetStringFromStrIdx(visitor.mNewStrIdx)
+                    << std::endl;
+        }
+        visitor.Visit(tn);
+      }
+    }
+  }
+}
+
+// fields are not renamed
+bool RenameVarVisitor::SkipRename(IdentifierNode *node) {
+  TreeNode *parent = node->GetParent();
+  if (parent) {
+    switch (parent->GetKind()) {
+      case NK_Struct:
+      case NK_Class:
+      case NK_Interface:
+      case NK_Field:
+        return true;
+      default:
+        return false;
+    }
+  }
+  return true;
+}
+
+IdentifierNode *RenameVarVisitor::VisitIdentifierNode(IdentifierNode *node) {
+  AstVisitor::VisitIdentifierNode(node);
+  // fields are not renamed
+  if (SkipRename(node)) {
+    return node;
+  }
+  if (mPass == 0) {
+    unsigned id = node->GetNodeId();
+    unsigned stridx = node->GetStrIdx();
+    mNodeId2NodeMap[id] = node;
+    if (stridx) {
+      TreeNode *parent = node->GetParent();
+      if (parent) {
+        if (parent->IsDecl() || parent->IsFunction()) {
+          mStridx2DeclIdMap[stridx].push_back(id);
+        }
+      }
+    } else {
+      if (mTrace) std::cout << "Unexpected - decl without name stridx" << std::endl;
+    }
+  } else {
+    if (node->GetStrIdx() == mOldStrIdx) {
+      node->SetStrIdx(mNewStrIdx);
+      if (mTrace) std::cout << "   name updated" << std::endl;
+    }
+  }
+  return node;
+}
+
 }

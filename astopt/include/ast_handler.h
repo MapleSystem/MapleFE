@@ -72,10 +72,10 @@ class Module_Handler {
 
   void AdjustAST();
   void BuildScope();
+  void RenameVar();
   void BuildCFG();
   void ASTCollectAndDBRemoval(CfgFunc *func);
   void BuildDFA(CfgFunc *func);
-  void BuildSCP();
   void TypeInference();
 
   const char *GetOutputFileName()          {return mOutputFileName;}

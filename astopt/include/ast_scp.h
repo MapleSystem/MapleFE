@@ -17,6 +17,7 @@
 #define __AST_SCP_HEADER__
 
 #include <stack>
+#include <deque>
 #include <utility>
 
 #include "stringpool.h"
@@ -28,11 +29,6 @@
 
 namespace maplefe {
 
-// DefPosition of Def: <stridx, nodeid>
-typedef std::pair<unsigned, unsigned> DefPosition;
-// map <bbid, BitVector>
-typedef std::unordered_map<unsigned, BitVector*> BVMap;
-
 class AST_SCP {
  private:
   Module_Handler  *mHandler;
@@ -43,6 +39,7 @@ class AST_SCP {
   ~AST_SCP();
 
   void BuildScope();
+  void RenameVar();
 };
 
 class BuildScopeBaseVisitor : public AstVisitor {
@@ -92,6 +89,30 @@ class BuildScopeVisitor : public BuildScopeBaseVisitor {
   UserTypeNode *VisitUserTypeNode(UserTypeNode *node);
   TypeAliasNode *VisitTypeAliasNode(TypeAliasNode *node);
 
+};
+
+class RenameVarVisitor : public AstVisitor {
+ private:
+  Module_Handler *mHandler;
+  ModuleNode     *mASTModule;
+  bool            mTrace;
+
+ public:
+  unsigned        mPass;
+  unsigned        mOldStrIdx;
+  unsigned        mNewStrIdx;
+  std::unordered_map<unsigned, TreeNode*> mNodeId2NodeMap;
+  std::unordered_map<unsigned, std::deque<unsigned>> mStridx2DeclIdMap;
+
+ public:
+  explicit RenameVarVisitor(Module_Handler *h, bool t, bool base = false)
+    : mHandler(h), mTrace(t), AstVisitor(t && base) {
+      mASTModule = mHandler->GetASTModule();
+    }
+  ~RenameVarVisitor() = default;
+
+  bool SkipRename(IdentifierNode *node);
+  IdentifierNode *VisitIdentifierNode(IdentifierNode *node);
 };
 
 }

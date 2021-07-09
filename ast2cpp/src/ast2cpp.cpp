@@ -56,7 +56,15 @@ void A2C::ProcessAST() {
       graph.DumpGraph("After LoadFromAstBuf()", &std::cout);
     }
 
+    // rewirte some AST nodes
     handler->AdjustAST();
+
+    // build scope info
+    handler->BuildScope();
+
+    // rename var with same name, i --> i__vN where N is 1, 2, 3 ...
+    handler->RenameVar();
+
     if (mTraceA2C) {
       std::cout << "============= After AdjustAST ===========" << std::endl;
       for(unsigned i = 0; i < module->GetTreesNum(); i++) {
@@ -76,7 +84,6 @@ void A2C::ProcessAST() {
     }
 
     // module level information build
-    handler->BuildScope();
     handler->TypeInference();
 
     if (mTraceA2C) {

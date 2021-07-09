@@ -68,6 +68,13 @@ void Module_Handler::BuildScope() {
   mSCP->BuildScope();
 }
 
+void Module_Handler::RenameVar() {
+  if (!mSCP) {
+    mSCP = new(GetMemPool()->Alloc(sizeof(AST_SCP))) AST_SCP(this, mTrace);
+  }
+  mSCP->RenameVar();
+}
+
 // input an identifire ===> returen the decl node with same name
 TreeNode *Module_Handler::FindDecl(IdentifierNode *node) {
   if (!node) {
