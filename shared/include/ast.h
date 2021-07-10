@@ -232,12 +232,19 @@ public:
 class DeclareNode : public TreeNode {
 private:
   TreeNode *mDecl;    // the exported package in Java or module in JS
+  SmallVector<AttrId> mAttrs;
 public:
   DeclareNode() : TreeNode(NK_Declare), mDecl(NULL) {}
-  ~DeclareNode(){}
+  ~DeclareNode(){mAttrs.Release();}
 
   void SetDecl(TreeNode *t) {mDecl = t;}
   TreeNode* GetDecl() {return mDecl;}
+
+  // Attributes related
+  unsigned GetAttrsNum() const        {return mAttrs.GetNum();}
+  void     AddAttr(AttrId a)          {mAttrs.PushBack(a);}
+  AttrId   GetAttrAtIndex(unsigned i) {return mAttrs.ValueAtIndex(i);}
+  void     SetAttrAtIndex(unsigned i, AttrId n) {*(mAttrs.RefAtIndex(i)) = n;}
 
   void Dump(unsigned indent);
 };
