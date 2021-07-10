@@ -1305,8 +1305,8 @@ rule ModuleItem : ONEOF(ImportDeclaration,
 ## ImportDeclaration :
 ## import ImportClause FromClause ;
 ## import ModuleSpecifier ;
-rule ImportDeclaration : ONEOF("import" + ImportClause + FromClause + ';',
-                               "import" + ModuleSpecifier + ';')
+rule ImportDeclaration : ONEOF("import" + ImportClause + FromClause + ZEROORONE(';'),
+                               "import" + ModuleSpecifier + ZEROORONE(';'))
   attr.property : Top
   attr.action.%1,%2 : BuildImport()
   attr.action.%1 :    SetPairs(%2)
