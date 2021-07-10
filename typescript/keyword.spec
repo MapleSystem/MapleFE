@@ -85,6 +85,7 @@ STRUCT KeyWord : ((boolean),
                   (interface),
                   (private),
                   (public),
+                  (abstract),
 
                   (readonly),
 

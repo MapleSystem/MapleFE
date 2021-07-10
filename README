@@ -45,6 +45,8 @@ sudo apt install -y clang-tools-10 clang-format-10 python3 libyaml-cpp-dev
 3. make
 4. If you are working at Java frontend, you will see output/java/java/java2mpl. This is the executable
    frontend.
+4. If you are working at Typescript frontend, you will see output/typescript/bin/ts2ast. This is the executable
+   frontend. You can also see output/typescript/bin/ast2cpp, which translate AST to cpp source code.
 
 [How to test]
 
@@ -55,3 +57,4 @@ run a single test, say t1.java:
 2. make t1
 
 You can find all Java test cases in test/java.
+You can find all Typescript test cases in test/typescript.

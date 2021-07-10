@@ -1,0 +1,15 @@
+Matched 43 tokens.
+============= Module ===========
+== Sub Tree ==
+class  Foo
+  Fields: 
+    f1=0    f2=0
+  Instance Initializer: 
+  Constructors: 
+    constructor  (a,b)  throws: 
+      this.f1 Assign a
+      this.f2 Assign b
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+

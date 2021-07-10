@@ -1805,12 +1805,13 @@ rule ClassOrInterfaceType: TypeReference
 ## ClassDeclaration: ( Modified ) class BindingIdentifieropt TypeParametersopt ClassHeritage { ClassBody }
 ## NOTE. I inlined ClassHeritage to avoid 'lookahead fail'
 rule ClassDeclaration:
-  ZEROORMORE(Annotation) + "class" + ZEROORONE(BindingIdentifier) + ZEROORONE(TypeParameters) + ZEROORONE(ClassExtendsClause) + ZEROORONE(ImplementsClause) + '{' + ZEROORONE(ClassBody) + '}'
-  attr.action : BuildClass(%3)
+  ZEROORMORE(Annotation) + ZEROORONE("abstract") + "class" + ZEROORONE(BindingIdentifier) + ZEROORONE(TypeParameters) + ZEROORONE(ClassExtendsClause) + ZEROORONE(ImplementsClause) + '{' + ZEROORONE(ClassBody) + '}'
+  attr.action : BuildClass(%4)
   attr.action : AddModifier(%1)
-  attr.action : AddSuperClass(%5)
-  attr.action : AddSuperInterface(%6)
-  attr.action : AddClassBody(%8)
+  attr.action : AddModifier(%2)
+  attr.action : AddSuperClass(%6)
+  attr.action : AddSuperInterface(%7)
+  attr.action : AddClassBody(%9)
 
 rule Annotation : '@' + JSIdentifier + ZEROORONE(Arguments)
   attr.action : BuildAnnotation(%2)
