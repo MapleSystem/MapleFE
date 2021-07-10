@@ -1393,15 +1393,15 @@ rule ImportedBinding : BindingIdentifier
 
 # export = expr;
 # is for export single syntax.
-rule ExportDeclaration : ONEOF(ZEROORMORE(Annotation) + "export" + '*' + FromClause + ';',
-                               ZEROORMORE(Annotation) + "export" + ExportClause + FromClause + ';',
-                               ZEROORMORE(Annotation) + "export" + ExportClause + ';',
+rule ExportDeclaration : ONEOF(ZEROORMORE(Annotation) + "export" + '*' + FromClause + ZEROORONE(';'),
+                               ZEROORMORE(Annotation) + "export" + ExportClause + FromClause + ZEROORONE(';'),
+                               ZEROORMORE(Annotation) + "export" + ExportClause + ZEROORONE(';'),
                                ZEROORMORE(Annotation) + "export" + VariableStatement,
                                ZEROORMORE(Annotation) + "export" + Declaration,
                                ZEROORMORE(Annotation) + "export" + "default" + HoistableDeclaration,
                                ZEROORMORE(Annotation) + "export" + "default" + ClassDeclaration,
-                               ZEROORMORE(Annotation) + "export" + "default" + AssignmentExpression + ';',
-                               ZEROORMORE(Annotation) + "export" + "=" + AssignmentExpression + ';')
+                               ZEROORMORE(Annotation) + "export" + "default" + AssignmentExpression + ZEROORONE(';'),
+                               ZEROORMORE(Annotation) + "export" + "=" + AssignmentExpression + ZEROORONE(';'))
   attr.property : Top
   attr.action.%1,%2,%3,%4,%5,%6,%7,%8,%9 : BuildExport()
   attr.action.%1,%2,%3,%4,%5,%6,%7,%8,%9 : AddModifier(%1)
