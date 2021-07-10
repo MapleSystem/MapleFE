@@ -211,6 +211,7 @@ ACTION(BuildNeverArrayType) // Special 'never' array type.
 ACTION(BuildTypeAlias)
 ACTION(BuildTypeParameter)
 ACTION(BuildAsType)
+ACTION(BuildConditionalType)
 
 // This is a special action to pass a child to parent
 ACTION(PassChild)

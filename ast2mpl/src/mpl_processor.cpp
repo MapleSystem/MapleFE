@@ -895,6 +895,10 @@ maple::BaseNode *A2M::ProcessAsType(StmtExprKind skind, TreeNode *tnode, BlockNo
   return nullptr;
 }
 
+maple::BaseNode *A2M::ProcessConditionalType(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
+  return nullptr;
+}
+
 maple::BaseNode *A2M::ProcessTypeParameter(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
   return nullptr;
 }

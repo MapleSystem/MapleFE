@@ -461,6 +461,35 @@ public:
 };
 
 //////////////////////////////////////////////////////////////////////////
+//                      ConditionalType
+// The syntax is n Typescript,
+//   type-a extends type-b ? type-c : type-d
+//////////////////////////////////////////////////////////////////////////
+
+class ConditionalTypeNode : public TreeNode {
+private:
+  TreeNode *mTypeA;
+  TreeNode *mTypeB;
+  TreeNode *mTypeC;
+  TreeNode *mTypeD;
+public:
+  ConditionalTypeNode() : TreeNode(NK_ConditionalType),
+                          mTypeA(NULL), mTypeB(NULL), mTypeC(NULL), mTypeD(NULL){}
+  ~ConditionalTypeNode() {}
+
+  TreeNode* GetTypeA() {return mTypeA;}
+  TreeNode* GetTypeB() {return mTypeB;}
+  TreeNode* GetTypeC() {return mTypeC;}
+  TreeNode* GetTypeD() {return mTypeD;}
+  void SetTypeA(TreeNode *n) {mTypeA = n;}
+  void SetTypeB(TreeNode *n) {mTypeB = n;}
+  void SetTypeC(TreeNode *n) {mTypeC = n;}
+  void SetTypeD(TreeNode *n) {mTypeD = n;}
+
+  void Dump(unsigned);
+};
+
+//////////////////////////////////////////////////////////////////////////
 //                      AstType
 // The syntax is like: variable as type-a as type-b ...
 // It tells what type is the 'variable'

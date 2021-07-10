@@ -490,6 +490,10 @@ void Verifier::VerifyAsType(AsTypeNode *tree){
   return;
 }
 
+void Verifier::VerifyConditionalType(ConditionalTypeNode *tree){
+  return;
+}
+
 void Verifier::VerifyTypeParameter(TypeParameterNode *tree){
   return;
 }

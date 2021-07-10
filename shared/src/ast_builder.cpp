@@ -3111,6 +3111,31 @@ TreeNode* ASTBuilder::BuildAsType() {
   return mLastTreeNode;
 }
 
+// Takes four argument, type a, type b, type c , type d.
+TreeNode* ASTBuilder::BuildConditionalType() {
+  if (mTrace)
+    std::cout << "In BuildConditionalType" << std::endl;
+
+  Param p_a = mParams[0];
+  TreeNode *type_a = p_a.mData.mTreeNode;
+  Param p_b = mParams[1];
+  TreeNode *type_b = p_b.mData.mTreeNode;
+  Param p_c = mParams[2];
+  TreeNode *type_c = p_c.mData.mTreeNode;
+  Param p_d = mParams[3];
+  TreeNode *type_d = p_d.mData.mTreeNode;
+
+  ConditionalTypeNode *tp = (ConditionalTypeNode*)gTreePool.NewTreeNode(sizeof(ConditionalTypeNode));
+  new (tp) ConditionalTypeNode();
+  tp->SetTypeA(type_a);
+  tp->SetTypeB(type_b);
+  tp->SetTypeC(type_c);
+  tp->SetTypeD(type_d);
+
+  mLastTreeNode = tp;
+  return mLastTreeNode;
+}
+
 
 TreeNode* ASTBuilder::AddTypeGenerics() {
   if (mTrace)

@@ -37,6 +37,7 @@ NODEKIND(UserType)
 NODEKIND(TypeParameter)
 NODEKIND(AsType)
 NODEKIND(TypeAlias)
+NODEKIND(ConditionalType)  // Conditional types in Typescript
 
 //
 NODEKIND(Cast)

@@ -1,0 +1,13 @@
+Matched 21 tokens.
+Matched 37 tokens.
+Matched 44 tokens.
+Matched 53 tokens.
+============= Module ===========
+== Sub Tree ==
+export { type X<A=> = A extends true ? prim array-TBD : string} 
+== Sub Tree ==
+js_var Decl: x=[1,2,3]
+== Sub Tree ==
+js_var Decl: y="abc"
+== Sub Tree ==
+console.log(x,y)

@@ -1477,13 +1477,17 @@ rule TypeArgumentList: ONEOF(TypeArgument,
 ## rule TypeArgument: Type
 rule TypeArgument: Type
 
+rule ConditionalType : Type + "extends" + Type + '?' + Type + ':' + Type
+  attr.action : BuildConditionalType(%1, %3, %5, %7)
+
 #rule Type : ONEOF(UnionOrIntersectionOrPrimaryType,
 #                  FunctionType,
 #                  ConstructorType)
 rule Type : ONEOF(UnionOrIntersectionOrPrimaryType,
                   FunctionType,
                   ConstructorType,
-                  "keyof" + Identifier)
+                  "keyof" + Identifier,
+                  ConditionalType)
   attr.action.%4 : BuildKeyOf(%2)
 
 #rule UnionOrIntersectionOrPrimaryType: ONEOF(UnionType,
