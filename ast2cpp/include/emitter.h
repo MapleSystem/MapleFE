@@ -59,6 +59,7 @@ public:
   virtual std::string EmitBinOperatorNode(BinOperatorNode *node);
   virtual std::string EmitTerOperatorNode(TerOperatorNode *node);
   virtual std::string EmitTypeAliasNode(TypeAliasNode *node);
+  virtual std::string EmitConditionalTypeNode(ConditionalTypeNode *node);
   virtual std::string EmitTypeParameterNode(TypeParameterNode *node);
   virtual std::string EmitBlockNode(BlockNode *node);
   virtual std::string EmitNewNode(NewNode *node);

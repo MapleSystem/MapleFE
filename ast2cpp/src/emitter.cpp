@@ -486,6 +486,27 @@ std::string Emitter::EmitTypeAliasNode(TypeAliasNode *node) {
   return str;
 }
 
+std::string Emitter::EmitConditionalTypeNode(ConditionalTypeNode *node) {
+  if (node == nullptr)
+    return std::string();
+  std::string str;
+  if (auto n = node->GetTypeA()) {
+    str = EmitTreeNode(n);
+  }
+  if (auto n = node->GetTypeB()) {
+    str += " extends "s + EmitTreeNode(n);
+  }
+  if (auto n = node->GetTypeC()) {
+    str += " ? "s + EmitTreeNode(n);
+  }
+  if (auto n = node->GetTypeD()) {
+    str += " : "s + EmitTreeNode(n);
+  }
+  if (node->IsStmt())
+    str += ";\n"s;
+  return str;
+}
+
 std::string Emitter::EmitTypeParameterNode(TypeParameterNode *node) {
   if (node == nullptr)
     return std::string();
@@ -1622,6 +1643,9 @@ std::string Emitter::EmitTreeNode(TreeNode *node) {
     break;
   case NK_TypeAlias:
     return EmitTypeAliasNode(static_cast<TypeAliasNode *>(node));
+    break;
+  case NK_ConditionalType:
+    return EmitConditionalTypeNode(static_cast<ConditionalTypeNode *>(node));
     break;
   case NK_Cast:
     return EmitCastNode(static_cast<CastNode *>(node));
