@@ -1339,6 +1339,7 @@ void ClassNode::Release() {
   mLocalInterfaces.Release();
   mImports.Release();
   mExports.Release();
+  mDeclares.Release();
 }
 
 void ClassNode::Dump(unsigned indent) {

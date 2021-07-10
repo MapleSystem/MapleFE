@@ -1842,6 +1842,8 @@ private:
   SmallVector<ImportNode*>     mImports;
   SmallVector<ExportNode*>     mExports;
 
+  SmallVector<DeclareNode*>    mDeclares; // First coming from TS.
+
 public:
   ClassNode() : TreeNode(NK_Class), mIsJavaEnum(false) {}
   ~ClassNode() {Release();}
@@ -1866,6 +1868,7 @@ public:
   void AddLocalInterface(InterfaceNode *n) {mLocalInterfaces.PushBack(n);}
   void AddImport(ImportNode *n) {mImports.PushBack(n);}
   void AddExport(ExportNode *n) {mExports.PushBack(n);}
+  void AddDeclare(DeclareNode *n) {mDeclares.PushBack(n);}
 
   unsigned GetSuperClassesNum()    {return mSuperClasses.GetNum();}
   unsigned GetSuperInterfacesNum() {return mSuperInterfaces.GetNum();}
@@ -1878,6 +1881,7 @@ public:
   unsigned GetLocalInterfacesNum() {return mLocalInterfaces.GetNum();}
   unsigned GetImportsNum()         {return mImports.GetNum();}
   unsigned GetExportsNum()         {return mExports.GetNum();}
+  unsigned GetDeclaresNum()        {return mDeclares.GetNum();}
 
   ClassNode* GetSuperClass(unsigned i)         {return mSuperClasses.ValueAtIndex(i);}
   void       SetSuperClass(unsigned i, ClassNode* n) {*(mSuperClasses.RefAtIndex(i)) = n;}
@@ -1901,6 +1905,8 @@ public:
   void        SetImport(unsigned i, ImportNode* n) {*(mImports.RefAtIndex(i)) = n;}
   ExportNode* GetExport(unsigned i)                {return mExports.ValueAtIndex(i);}
   void        SetExport(unsigned i, ExportNode* n) {*(mExports.RefAtIndex(i)) = n;}
+  DeclareNode* GetDeclare(unsigned i)                 {return mDeclares.ValueAtIndex(i);}
+  void         SetDeclare(unsigned i, DeclareNode* n) {*(mDeclares.RefAtIndex(i)) = n;}
 
   void Construct(BlockNode*);
   void Release();
