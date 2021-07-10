@@ -487,11 +487,11 @@ TreeNode* ASTBuilder::BuildXXportAsPairDefault() {
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
-//          BuildExternalDeclaration
+//          BuildDeclaration
 /////////////////////////////////////////////////////////////////////////////////////////
 
 // It takes one arguments
-TreeNode* ASTBuilder::BuildExternalDeclaration() {
+TreeNode* ASTBuilder::BuildDeclaration() {
   MASSERT(mParams.size() == 1);
 
   TreeNode *tree = NULL;

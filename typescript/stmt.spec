@@ -1983,4 +1983,4 @@ rule ExternalDeclaration : ONEOF("declare" + NamespaceDeclaration,
                                  "declare" + LexicalDeclaration,
                                  "declare" + ClassDeclaration,
                                  "declare" + VariableStatement)
-  attr.action.%1,%2,%3,%4 : BuildExternalDeclaration(%2)
+  attr.action.%1,%2,%3,%4 : BuildDeclaration(%2)
