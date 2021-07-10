@@ -512,12 +512,11 @@ std::string Emitter::EmitTypeParameterNode(TypeParameterNode *node) {
     return std::string();
   std::string str;
   if (auto n = node->GetId()) {
-    str += " "s + EmitTreeNode(n);
+    str = EmitTreeNode(n);
   }
   if (auto n = node->GetDefault()) {
-    str += " "s + EmitTreeNode(n);
+    str += " = "s + EmitTreeNode(n);
   }
-  mPrecedence = '\030';
   if (node->IsStmt())
     str += ";\n"s;
   return HandleTreeNode(str, node);
