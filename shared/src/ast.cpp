@@ -1321,6 +1321,9 @@ void ClassNode::Construct(BlockNode *block) {
     } else if (tree_node->IsExport()) {
       mExports.PushBack((ExportNode*)tree_node);
       tree_node->SetParent(this);
+    } else if (tree_node->IsDeclare()) {
+      mDeclares.PushBack((DeclareNode*)tree_node);
+      tree_node->SetParent(this);
     } else
       MASSERT("Unsupported tree node in class body.");
   }
@@ -1409,6 +1412,15 @@ void ClassNode::Dump(unsigned indent) {
   }
   for (unsigned i = 0; i < mExports.GetNum(); i++) {
     TreeNode *node = mExports.ValueAtIndex(i);
+    node->Dump(indent + 4);
+  }
+
+  if (mDeclares.GetNum() > 0) {
+    DumpIndentation(indent + 2);
+    DUMP0("Declares: ");
+  }
+  for (unsigned i = 0; i < mDeclares.GetNum(); i++) {
+    TreeNode *node = mDeclares.ValueAtIndex(i);
     node->Dump(indent + 4);
   }
 }

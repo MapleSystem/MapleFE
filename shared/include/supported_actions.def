@@ -37,7 +37,7 @@ ACTION(BuildSingleStaticImport)    // style like java single static import
 ACTION(BuildAllStaticImport)       // style like java ondemand static import
 ACTION(BuildAllImport)             // style like c/c++ include all in .h file
 
-ACTION(BuildDeclaration)           // c/c++ external decl, typescript declare.
+ACTION(BuildExternalDeclaration)           // c/c++ external decl, typescript declare.
 
 // Special actions for JS import/export
 ACTION(BuildImport)

@@ -1846,7 +1846,8 @@ rule ConstructorDeclaration: ONEOF(
 ## PropertyMemberDeclaration: MemberVariableDeclaration MemberFunctionDeclaration MemberAccessorDeclaration
 rule PropertyMemberDeclaration: ONEOF(MemberVariableDeclaration,
                                       MemberFunctionDeclaration,
-                                      MemberAccessorDeclaration)
+                                      MemberAccessorDeclaration,
+                                      MemberExternalDeclaration)
 
 ## MemberVariableDeclaration: AccessibilityModifieropt staticopt PropertyName TypeAnnotationopt Initializeropt ;
 rule MemberVariableDeclaration: ONEOF(
@@ -1887,6 +1888,9 @@ rule MemberAccessorDeclaration: ONEOF(
 ## IndexMemberDeclaration: IndexSignature ;
 rule IndexMemberDeclaration: IndexSignature + ';'
 
+rule MemberExternalDeclaration : ZEROORMORE(AccessibilityModifier) + "declare" + VariableDeclaration + ';'
+  attr.action : BuildExternalDeclaration(%3)
+  attr.action : AddModifier(%1)
 #################################################################################################
 #                                          A.7 Enums
 #################################################################################################
@@ -1983,4 +1987,4 @@ rule ExternalDeclaration : ONEOF("declare" + NamespaceDeclaration,
                                  "declare" + LexicalDeclaration,
                                  "declare" + ClassDeclaration,
                                  "declare" + VariableStatement)
-  attr.action.%1,%2,%3,%4 : BuildDeclaration(%2)
+  attr.action.%1,%2,%3,%4 : BuildExternalDeclaration(%2)

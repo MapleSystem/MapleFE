@@ -1,0 +1,14 @@
+Matched 10 tokens.
+Matched 11 tokens.
+============= Module ===========
+== Sub Tree ==
+class  CLS_test
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+  Declares: 
+    declare js_var Decl: priv_fd
