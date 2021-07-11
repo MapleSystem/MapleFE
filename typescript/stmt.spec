@@ -63,7 +63,8 @@ rule KeywordIdentifier : ONEOF("get",
                                "undefined",
                                "never",
                                "number",
-                               "constructor")
+                               "constructor",
+                               "delete")
   attr.action : BuildIdentifier()
 
 rule JSIdentifier: ONEOF(Identifier,

@@ -1,0 +1,20 @@
+Matched 22 tokens.
+Matched 32 tokens.
+Matched 39 tokens.
+============= Module ===========
+== Sub Tree ==
+class  Klass
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+    func  delete(s)  throws: 
+      console.log("delete " Add s)
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+js_var Decl: obj=new Klass()
+== Sub Tree ==
+obj.delete("key")
