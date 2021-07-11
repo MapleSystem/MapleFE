@@ -1,0 +1,7 @@
+Matched 8 tokens.
+Matched 25 tokens.
+============= Module ===========
+== Sub Tree ==
+ts_interface: IntfX {IntfX_fd }
+== Sub Tree ==
+ type Test = intersect  = IntfX & intersect_fd

@@ -51,7 +51,8 @@ void UserTypeNode::AddTypeGeneric(TreeNode *args) {
       args->IsUserType() ||
       args->IsTypeParameter() ||
       args->IsLiteral() ||
-      args->IsTypeOf()) {
+      args->IsTypeOf() ||
+      args->IsArrayElement()) {
     mTypeGenerics.PushBack(args);
   } else if (args->IsPass()) {
     PassNode *p = (PassNode*)args;
