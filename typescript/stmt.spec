@@ -985,8 +985,8 @@ rule ForBinding : ONEOF(BindingIdentifier,
 ##  continue ;
 ##  continue [no LineTerminator here] LabelIdentifier[?Yield] ;
 rule ContinueStatement : ONEOF(
-  "continue" + ';'
-  "continue" + LabelIdentifier + ';')
+  "continue" + ZEROORONE(';'),
+  "continue" + LabelIdentifier + ZEROORONE(';'))
   attr.action.%1 : BuildContinue()
   attr.action.%2 : BuildContinue(%2)
 
@@ -995,8 +995,8 @@ rule ContinueStatement : ONEOF(
 ##  break ;
 ##  break [no LineTerminator here] LabelIdentifier[?Yield] ;
 rule BreakStatement : ONEOF(
-  "break" + ';'
-  "break" + LabelIdentifier + ';')
+  "break" + ZEROORONE(';'),
+  "break" + LabelIdentifier + ZEROORONE(';'))
   attr.action.%1 : BuildBreak()
   attr.action.%2 : BuildBreak(%2)
 
