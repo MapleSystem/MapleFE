@@ -1066,7 +1066,7 @@ public:
   TreeNode* GetFieldName() {return mFieldName;}
   TreeNode* GetLiteral() {return mLiteral;}
 
-  FieldLiteralNode() : TreeNode(NK_FieldLiteral) {}
+  FieldLiteralNode() : mFieldName(nullptr), TreeNode(NK_FieldLiteral) {}
   ~FieldLiteralNode(){}
 };
 
