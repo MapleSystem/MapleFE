@@ -370,10 +370,11 @@ ArrayElementNode *TypeInferVisitor::VisitArrayElementNode(ArrayElementNode *node
   if (array) {
     array->SetTypeId(TY_Array);
     if (array->IsIdentifier()) {
-      TreeNode *decl = mHandler->FindDecl(static_cast<IdentifierNode *>(array));
-      decl->SetTypeId(TY_Array);
-      UpdateArrayElemTypeIdMap(decl, node->GetTypeId());
-      UpdateTypeId(node, mHandler->mArrayDeclId2EleTypeIdMap[decl->GetNodeId()]);
+      if (TreeNode *decl = mHandler->FindDecl(static_cast<IdentifierNode *>(array))) {
+        decl->SetTypeId(TY_Array);
+        UpdateArrayElemTypeIdMap(decl, node->GetTypeId());
+        UpdateTypeId(node, mHandler->mArrayDeclId2EleTypeIdMap[decl->GetNodeId()]);
+      }
     } else {
       NOTYETIMPL("array not idenfier");
     }
