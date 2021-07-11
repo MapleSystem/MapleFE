@@ -1650,7 +1650,7 @@ rule RequiredParameter: ONEOF(
   attr.action.%2 : BuildDecl(%2, %1)
 
 ## rule AccessibilityModifier: public private protected
-rule AccessibilityModifier: ONEOF("public", "private", "protected", "readonly", "static")
+rule AccessibilityModifier: ONEOF("public", "private", "protected", "readonly", "static", "abstract")
 
 ## rule BindingIdentifierOrPattern: BindingIdentifier BindingPattern
 rule BindingIdentifierOrPattern: ONEOF(BindingIdentifier, BindingPattern)
