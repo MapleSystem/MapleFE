@@ -1701,7 +1701,7 @@ rule MethodSignature: ONEOF(
   attr.action.%2 : AddTypeGenerics(%3)
 
 ## rule TypeAliasDeclaration: type BindingIdentifier TypeParametersopt = Type ;
-rule TypeAliasDeclaration: "type" + BindingIdentifier + ZEROORONE(TypeParameters) + '=' + Type + ';'
+rule TypeAliasDeclaration: "type" + BindingIdentifier + ZEROORONE(TypeParameters) + '=' + Type + ZEROORONE(';')
   attr.action : BuildTypeAlias(%2, %5)
   attr.action : AddTypeGenerics(%3)
 
