@@ -1,0 +1,10 @@
+Matched 5 tokens.
+Matched 16 tokens.
+Matched 23 tokens.
+============= Module ===========
+== Sub Tree ==
+js_var Decl: s="abc de fg"
+== Sub Tree ==
+s Assign s.replace(reg expr :  [^A-Za-z0-9\+\/\=]  g,'')
+== Sub Tree ==
+console.log(s)

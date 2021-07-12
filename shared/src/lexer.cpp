@@ -278,6 +278,11 @@ Token* Lexer::FindRegExprToken() {
     if (line[work_idx] == '/') {
       flag_beg_idx = work_idx + 1;
       on_flags = true;
+    } else if (line[work_idx] == '\\') {
+      // An escape.
+      expr_length += 2;
+      work_idx += 2;
+      continue;
     } else if (on_flags) {
       if (line[work_idx] == 'd' ||
           line[work_idx] == 'g' ||
