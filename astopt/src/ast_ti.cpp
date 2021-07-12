@@ -783,7 +783,7 @@ UserTypeNode *ShareUTVisitor::VisitUserTypeNode(UserTypeNode *node) {
   if (idnode && idnode->IsIdentifier()) {
     IdentifierNode *id = static_cast<IdentifierNode *>(idnode);
     ASTScope *scope = id->GetScope();
-    TreeNode *type = scope->FindTypeOf(id);
+    TreeNode *type = scope->FindTypeOf(id->GetStrIdx());
     if (type && type != node && type->IsUserType()) {
       UserTypeNode *ut = static_cast<UserTypeNode *>(type);
       if (node->GetType() == ut->GetType()) {

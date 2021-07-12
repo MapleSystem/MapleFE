@@ -76,7 +76,7 @@ FunctionNode *BuildScopeVisitor::VisitFunctionNode(FunctionNode *node) {
     if (tn->IsIdentifier()) {
       IdentifierNode *id = static_cast<IdentifierNode *>(tn);
       // check if it is a known type
-      decl = scope->FindTypeOf(id);
+      decl = scope->FindTypeOf(id->GetStrIdx());
     }
     // add it if not found
     if (!decl) {

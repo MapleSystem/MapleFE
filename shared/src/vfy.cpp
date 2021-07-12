@@ -117,7 +117,7 @@ void Verifier::VerifyIdentifier(IdentifierNode *inode) {
   ASTScope *scope = mCurrScope;
   IdentifierNode *decl = NULL;
   while (scope) {
-    if (decl = (IdentifierNode*) scope->FindDeclOf(inode))
+    if (decl = (IdentifierNode*) scope->FindDeclOf(inode->GetStrIdx()))
       break;
     scope = scope->GetParent();
   }
@@ -344,7 +344,7 @@ void Verifier::VerifyType(IdentifierNode *inode) {
   ASTScope *scope = mCurrScope;
   TreeNode *type = NULL;
   while (scope) {
-    if (type = scope->FindTypeOf(inode))
+    if (type = scope->FindTypeOf(inode->GetStrIdx()))
       break;
     scope = scope->GetParent();
   }

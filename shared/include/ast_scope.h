@@ -71,8 +71,8 @@ public:
   TreeNode* GetDecl(unsigned i) {return mDecls.ValueAtIndex(i);}
   TreeNode* GetType(unsigned i) {return mTypes.ValueAtIndex(i);}
 
-  TreeNode* FindDeclOf(IdentifierNode*);
-  TreeNode* FindTypeOf(IdentifierNode*);
+  TreeNode* FindDeclOf(unsigned stridx);
+  TreeNode* FindTypeOf(unsigned stridx);
 
   void AddDecl(TreeNode *n) {mDecls.PushBack(n);}
   void AddType(TreeNode *n) {mTypes.PushBack(n);}

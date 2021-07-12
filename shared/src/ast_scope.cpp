@@ -29,18 +29,14 @@ void ASTScope::AddChild(ASTScope *s) {
   s->SetParent(this);
 }
 
-// This is to find the decl having the same name as 'inode'.
+// This is to find the decl having the name as stridx
 // starting from local scope
-TreeNode* ASTScope::FindDeclOf(IdentifierNode *inode) {
+TreeNode* ASTScope::FindDeclOf(unsigned stridx) {
   ASTScope *scope = this;
   while (scope) {
     for (unsigned i = 0; i < scope->GetDeclNum(); i++) {
       TreeNode *tree = scope->GetDecl(i);
-      if (tree->IsIdentifier()) {
-        IdentifierNode *id = (IdentifierNode*)tree;
-        // MASSERT(id->GetType() && "Identifier has no type?");
-      }
-      if (tree->GetStrIdx() == inode->GetStrIdx()) {
+      if (tree->GetStrIdx() == stridx) {
         return tree;
       }
     }
@@ -50,15 +46,15 @@ TreeNode* ASTScope::FindDeclOf(IdentifierNode *inode) {
   return NULL;
 }
 
-// This is to find the type having the same name as 'inode'.
+// This is to find the type having the name as stridx.
 //
 // starting from local scope
-TreeNode* ASTScope::FindTypeOf(IdentifierNode *inode) {
+TreeNode* ASTScope::FindTypeOf(unsigned stridx) {
   ASTScope *scope = this;
   while (scope) {
     for (unsigned i = 0; i < scope->GetTypeNum(); i++) {
       TreeNode *tree = scope->GetType(i);
-      if (tree->GetStrIdx() == inode->GetStrIdx()) {
+      if (tree->GetStrIdx() == stridx) {
         return tree;
       }
     }

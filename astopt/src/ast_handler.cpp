@@ -88,7 +88,7 @@ TreeNode *Module_Handler::FindDecl(IdentifierNode *node) {
 
   ASTScope *scope = node->GetScope();
   MASSERT(scope && "null scope");
-  TreeNode *decl = scope->FindDeclOf(node);
+  TreeNode *decl = scope->FindDeclOf(node->GetStrIdx());
 
   if (decl) {
     unsigned did = decl->GetNodeId();
@@ -103,7 +103,7 @@ TreeNode *Module_Handler::FindType(IdentifierNode *node) {
   }
   ASTScope *scope = node->GetScope();
   MASSERT(scope && "null scope");
-  TreeNode *type = scope->FindTypeOf(node);
+  TreeNode *type = scope->FindTypeOf(node->GetStrIdx());
 
   return type;
 }
