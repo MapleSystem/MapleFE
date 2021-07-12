@@ -261,6 +261,10 @@ Token* Lexer::LexTokenNoNewLine(void) {
 //
 // The content in the reg expr could be many character, we just allow
 // all char excluding /.
+//
+// [NOTE] This function will later be implemented as an overriden function
+//        of a child class of Lexer. Each lang will have its own
+//        implementation of this function.
 Token* Lexer::FindRegExprToken() {
 
   // for a regular expr, /a\b/g
@@ -274,10 +278,25 @@ Token* Lexer::FindRegExprToken() {
 
   bool on_flags = false;
 
+  // In Typescript, [ ] includes characters and the escape inside
+  // is defferent than outside. / is considered non-escape.
+  bool on_bracket = false;   //
+
   while (work_idx < current_line_size - 1) {
-    if (line[work_idx] == '/') {
-      flag_beg_idx = work_idx + 1;
-      on_flags = true;
+    if (line[work_idx] == '[') {
+      on_bracket = true;
+      expr_length++;
+    } else if (line[work_idx] == ']') {
+      MASSERT(on_bracket);
+      on_bracket = false;
+      expr_length++;
+    } else if (line[work_idx] == '/') {
+      if (on_bracket) {
+        expr_length++;
+      } else {
+        flag_beg_idx = work_idx + 1;
+        on_flags = true;
+      }
     } else if (line[work_idx] == '\\') {
       // An escape.
       expr_length += 2;
@@ -295,7 +314,7 @@ Token* Lexer::FindRegExprToken() {
       else
         break;
     } else {
-     expr_length++;
+      expr_length++;
     }
     work_idx++;
   }
