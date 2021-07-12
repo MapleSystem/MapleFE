@@ -5,12 +5,12 @@ Matched 30 tokens.
 Matched 37 tokens.
 ============= Module ===========
 == Sub Tree ==
-js_var Decl: str='abc/ab/1234abcdef'
+js_var Decl: str="abc/ab/1234abcdef"
 == Sub Tree ==
 js_var Decl: re=reg expr :  .*[/\\][0-9a-fA-F]{2}[/\\]([0-9a-fA-F-@]{8,}).*
 == Sub Tree ==
 console.log(str)
 == Sub Tree ==
-str Assign str.replace(re,'replaced')
+str Assign str.replace(re,"replaced")
 == Sub Tree ==
 console.log(str)

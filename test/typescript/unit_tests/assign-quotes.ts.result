@@ -4,8 +4,8 @@ Matched 15 tokens.
 == Sub Tree ==
 js_var Decl: foo
 == Sub Tree ==
-cond-branch cond:foo StEq ''
+cond-branch cond:foo StEq ""
 true branch :
-  foo Assign '""'
+  foo Assign """"
 false branch :
 

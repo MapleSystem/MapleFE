@@ -4,7 +4,7 @@ Matched 54 tokens.
 Matched 63 tokens.
 ============= Module ===========
 == Sub Tree ==
-js_const Decl: obj= {prop:'foo', getProp:get getProp()  throws: 
+js_const Decl: obj= {prop:"foo", getProp:get getProp()  throws: 
   return this.prop
 , setProp:set setProp(newVal)  throws: 
   this.prop Assign newVal
@@ -12,6 +12,6 @@ js_const Decl: obj= {prop:'foo', getProp:get getProp()  throws:
 == Sub Tree ==
 console.log(obj.getProp)
 == Sub Tree ==
-obj.setProp Assign 'bar'
+obj.setProp Assign "bar"
 == Sub Tree ==
 console.log(obj.getProp)

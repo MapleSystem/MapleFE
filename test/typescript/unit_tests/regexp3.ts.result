@@ -5,6 +5,6 @@ Matched 23 tokens.
 == Sub Tree ==
 js_var Decl: s="abc de fg"
 == Sub Tree ==
-s Assign s.replace(reg expr :  [^A-Za-z0-9\+\/\=]  g,'')
+s Assign s.replace(reg expr :  [^A-Za-z0-9\+\/\=]  g,"")
 == Sub Tree ==
 console.log(s)

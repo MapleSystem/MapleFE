@@ -4,7 +4,7 @@ Matched 25 tokens.
 Matched 32 tokens.
 ============= Module ===========
 == Sub Tree ==
-js_var Decl: str='abcba'
+js_var Decl: str="abcba"
 == Sub Tree ==
 console.log(str)
 == Sub Tree ==

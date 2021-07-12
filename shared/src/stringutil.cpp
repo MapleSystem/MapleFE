@@ -179,8 +179,21 @@ Char StringToValue::StringToChar(std::string &str) {
 // 4. StringToValue need convert the two characters into an escape character.
 //    This is what we are doing here.
 
-const char* StringToValue::StringToString(std::string &str) {
+const char* StringToValue::StringToString(std::string &in_str) {
   std::string target;
+
+  // For most languages, the input 'in_str' still contains the leading " or ' and the
+  // ending " or '. They need to be removed.
+  std::string str;
+
+  // If empty string literal, return the empty 'target'.
+  if (in_str.size() == 2) {
+    const char *s = gStringPool.FindString(target);
+    return s;
+  } else {
+    str.assign(in_str, 1, in_str.size() - 2);
+  }
+
   for (unsigned i = 0; i < str.size(); i++) {
     char c = str[i];
     if ((c == '\\') && (i < str.size() - 1)) {

@@ -4,7 +4,7 @@ Matched 70 tokens.
 for ( )
   try     cond-branch cond:i EQ 0
     true branch :
-      throw new Error('Zero')
+      throw new Error("Zero")
     false branch :
 
     console.log("try",3 Div i)

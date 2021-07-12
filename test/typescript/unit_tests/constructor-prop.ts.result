@@ -15,6 +15,6 @@ console.log(f.constructor)
 == Sub Tree ==
 f.constructor.prop1 Assign 1
 == Sub Tree ==
-Object.defineProperty(f.constructor,'prop2', {value:2, writable:true, enumerable:true})
+Object.defineProperty(f.constructor,"prop2", {value:2, writable:true, enumerable:true})
 == Sub Tree ==
 console.log(f.constructor)

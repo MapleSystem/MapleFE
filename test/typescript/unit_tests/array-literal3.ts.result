@@ -2,6 +2,6 @@ Matched 7 tokens.
 Matched 17 tokens.
 ============= Module ===========
 == Sub Tree ==
-this['_2'] Assign 22
+this["_2"] Assign 22
 == Sub Tree ==
-console.log(this['_2'])
+console.log(this["_2"])

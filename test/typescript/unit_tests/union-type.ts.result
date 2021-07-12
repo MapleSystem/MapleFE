@@ -7,7 +7,7 @@ Matched 77 tokens.
  type UnionType = union  = number | string
 == Sub Tree ==
 func  add(x,y)  throws: 
-  cond-branch cond: typeof x StEq 'number' Land  typeof y EQ 'number'
+  cond-branch cond: typeof x StEq "number" Land  typeof y EQ "number"
   true branch :
     return x Add y  false branch :
     return x.toString() Add y.toString()

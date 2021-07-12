@@ -8,6 +8,6 @@ ts_interface: Foo {string index type: number }
 == Sub Tree ==
 js_let Decl: bar= {}
 == Sub Tree ==
-bar['key1'] Assign 1
+bar["key1"] Assign 1
 == Sub Tree ==
-console.log(bar['key1'])
+console.log(bar["key1"])
