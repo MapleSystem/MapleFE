@@ -1426,10 +1426,15 @@ TreeNode* ASTBuilder::BuildArrayElement() {
   Param p_array = mParams[0];
   MASSERT(p_array.mIsTreeNode);
   TreeNode *array = p_array.mData.mTreeNode;
-  MASSERT(array->IsIdentifier() || array->IsArrayElement() || array->IsField());
+  MASSERT(array->IsIdentifier() ||
+          array->IsArrayElement() ||
+          array->IsField() ||
+          (array->IsLiteral() && ((LiteralNode*)array)->IsThis()));
 
   ArrayElementNode *array_element = NULL;
-  if (array->IsIdentifier() || array->IsField()) {
+  if (array->IsIdentifier() ||
+      array->IsField() ||
+      (array->IsLiteral() && ((LiteralNode*)array)->IsThis())) {
     array_element = (ArrayElementNode*)gTreePool.NewTreeNode(sizeof(ArrayElementNode));
     new (array_element) ArrayElementNode();
     array_element->SetArray(array);

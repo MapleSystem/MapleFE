@@ -1222,6 +1222,8 @@ public:
   TreeNode* GetType()            {return mType;}
   void      SetType(TreeNode *t) {mType = t;}
 
+  bool IsThis() {return mData.mType == LT_ThisLiteral;}
+
   void Dump(unsigned);
 };
 
