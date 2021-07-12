@@ -50,7 +50,7 @@ void TypeInfer::TypeInference() {
   if (mTrace) std::cout << "\n>>>>>> TypeInference() iterated " << count << " times\n" << std::endl;
 }
 
-// build up mNodeId2Decl by visit each Identifier
+// build up mNodeId2Decl by visiting each Identifier
 IdentifierNode *BuildIdNodeToDeclVisitor::VisitIdentifierNode(IdentifierNode *node) {
   (void) AstVisitor::VisitIdentifierNode(node);
   (void) mHandler->FindDecl(node);
@@ -370,10 +370,13 @@ ArrayElementNode *TypeInferVisitor::VisitArrayElementNode(ArrayElementNode *node
   if (array) {
     array->SetTypeId(TY_Array);
     if (array->IsIdentifier()) {
-      if (TreeNode *decl = mHandler->FindDecl(static_cast<IdentifierNode *>(array))) {
+      TreeNode *decl = mHandler->FindDecl(static_cast<IdentifierNode *>(array));
+      if (decl) {
         decl->SetTypeId(TY_Array);
         UpdateArrayElemTypeIdMap(decl, node->GetTypeId());
         UpdateTypeId(node, mHandler->mArrayDeclId2EleTypeIdMap[decl->GetNodeId()]);
+      } else {
+        NOTYETIMPL("array not declared");
       }
     } else {
       NOTYETIMPL("array not idenfier");
@@ -482,6 +485,8 @@ BinOperatorNode *TypeInferVisitor::VisitBinOperatorNode(BinOperatorNode *node) {
     TreeNode *decl = mHandler->FindDecl(static_cast<IdentifierNode *>(mod));
     if (decl) {
       UpdateTypeId(decl, mod->GetTypeId());
+    } else {
+      NOTYETIMPL("mod not declared");
     }
   }
   return node;
@@ -635,6 +640,8 @@ IdentifierNode *TypeInferVisitor::VisitIdentifierNode(IdentifierNode *node) {
   TreeNode *decl = mHandler->FindDecl(node);
   if (decl) {
     UpdateTypeId(node, decl->GetTypeId());
+  } else {
+    NOTYETIMPL("node not declared");
   }
   return node;
 }
