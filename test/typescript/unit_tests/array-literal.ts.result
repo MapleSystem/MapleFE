@@ -1,0 +1,7 @@
+Matched 18 tokens.
+Matched 25 tokens.
+============= Module ===========
+== Sub Tree ==
+js_var Decl: arr=[Math.ceil(5 Div 3)]
+== Sub Tree ==
+console.log(arr)
