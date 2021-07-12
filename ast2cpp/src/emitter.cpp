@@ -945,7 +945,10 @@ std::string Emitter::EmitRegExprNode(RegExprNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
-  str = "/"s + node->GetData().mExpr + "/"s + node->GetData().mFlags;
+  if (const char* e = node->GetData().mExpr)
+    str = "/"s + e + "/"s;
+  if (const char* f = node->GetData().mFlags)
+    str += f;
   return str;
 }
 
