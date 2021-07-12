@@ -300,6 +300,10 @@ IdentifierNode *RenameVarVisitor::VisitIdentifierNode(IdentifierNode *node) {
     if (node->GetStrIdx() == mOldStrIdx) {
       node->SetStrIdx(mNewStrIdx);
       if (mTrace) std::cout << "   name updated" << std::endl;
+      TreeNode *parent = node->GetParent();
+      if (parent && parent->IsDecl()) {
+        parent->SetStrIdx(mNewStrIdx);
+      }
     }
   }
   return node;
