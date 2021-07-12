@@ -33,7 +33,8 @@ void UserTypeNode::AddUnionInterType(TreeNode *args) {
       args->IsPrimArrayType() ||
       args->IsUserType() ||
       args->IsLiteral() ||
-      args->IsLambda()) {
+      args->IsLambda() ||
+      args->IsTypeOf()) {
     mUnionInterTypes.PushBack(args);
   } else if (args->IsPass()) {
     PassNode *p = (PassNode*)args;
