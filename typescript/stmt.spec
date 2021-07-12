@@ -1547,8 +1547,8 @@ rule TypeBody : ONEOF(TypeMemberList + ZEROORONE(';'),
 
 ## rule TypeMemberList: TypeMember TypeMemberList ; TypeMember TypeMemberList , TypeMember
 rule TypeMemberList : ONEOF(TypeMember,
-                            TypeMemberList + ';' + TypeMember,
-                            TypeMemberList + ',' + TypeMember)
+                            TypeMemberList + ZEROORONE(';') + TypeMember,
+                            TypeMemberList + ZEROORONE(',') + TypeMember)
 
 ## rule TypeMember: PropertySignature CallSignature ConstructSignature IndexSignature MethodSignature
 rule TypeMember : ONEOF(PropertySignature,
