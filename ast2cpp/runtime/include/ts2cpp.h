@@ -139,8 +139,8 @@ class Object {
       propList[key] = { val };
     }
 
-    bool IsFuncObj() {
-      return (this->constructor == reinterpret_cast<Function *>(&Function_ctor));
+    virtual bool IsFuncObj() {
+      return false;
     }
 
     // Put code for JS Object.prototype props as static fields and methods here
@@ -154,6 +154,10 @@ class Function : public Object {
     Function(Function* ctor, Object* proto, Object* proto_prop) : Object(ctor, proto), prototype(proto_prop) {
       JS_Val val(this);
       prototype->AddProp("constructor", val);
+    }
+
+    bool IsFuncObj() {
+      return true;
     }
 
     // Put code for JS Function.prototype props as static fields and methods here.
