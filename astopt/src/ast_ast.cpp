@@ -119,6 +119,15 @@ IdentifierNode *AdjustASTVisitor::VisitIdentifierNode(IdentifierNode *node) {
   return node;
 }
 
+StructNode *AdjustASTVisitor::VisitStructNode(StructNode *node) {
+  (void) AstVisitor::VisitStructNode(node);
+  IdentifierNode *id = node->GetStructId();
+  if (id && node->GetStrIdx() == 0) {
+    node->SetStrIdx(id->GetStrIdx());
+  }
+  return node;
+}
+
 TreeNode *AdjustASTVisitor::CreateTypeNodeFromName(IdentifierNode *node) {
   UserTypeNode *ut = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
   new (ut) UserTypeNode(node);

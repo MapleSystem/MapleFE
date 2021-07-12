@@ -112,8 +112,10 @@ class TypeInferVisitor : public TypeInferBaseVisitor {
   InterfaceNode *VisitInterfaceNode(InterfaceNode *node);
   LambdaNode *VisitLambdaNode(LambdaNode *node);
   LiteralNode *VisitLiteralNode(LiteralNode *node);
+  PrimTypeNode *VisitPrimTypeNode(PrimTypeNode *node);
   ReturnNode *VisitReturnNode(ReturnNode *node);
   StructLiteralNode *VisitStructLiteralNode(StructLiteralNode *node);
+  StructNode *VisitStructNode(StructNode *node);
   TemplateLiteralNode *VisitTemplateLiteralNode(TemplateLiteralNode *node);
   TerOperatorNode *VisitTerOperatorNode(TerOperatorNode *node);
   TypeOfNode *VisitTypeOfNode(TypeOfNode *node);

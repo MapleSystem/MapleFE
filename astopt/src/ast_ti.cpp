@@ -350,9 +350,19 @@ bool TypeInferVisitor::IsArray(TreeNode *node) {
   return false;
 }
 
+PrimTypeNode *TypeInferVisitor::VisitPrimTypeNode(PrimTypeNode *node) {
+  node->SetTypeId(node->GetPrimType());
+  return node;
+}
+
 TreeNode *TypeInferVisitor::VisitClassField(TreeNode *node) {
+  (void) AstVisitor::VisitTreeNode(node);
   if (node->IsIdentifier()) {
     IdentifierNode *idnode = static_cast<IdentifierNode *>(node);
+    TreeNode *type = idnode->GetType();
+    if (type) {
+      node->SetTypeId(type->GetTypeId());
+    }
     TreeNode *init = idnode->GetInit();
     if (init) {
       VisitTreeNode(init);
@@ -372,9 +382,29 @@ ArrayElementNode *TypeInferVisitor::VisitArrayElementNode(ArrayElementNode *node
     if (array->IsIdentifier()) {
       TreeNode *decl = mHandler->FindDecl(static_cast<IdentifierNode *>(array));
       if (decl) {
-        decl->SetTypeId(TY_Array);
-        UpdateArrayElemTypeIdMap(decl, node->GetTypeId());
-        UpdateTypeId(node, mHandler->mArrayDeclId2EleTypeIdMap[decl->GetNodeId()]);
+        // indexed access type
+        if (decl->IsStruct()) {
+          array->SetTypeId(TY_Class);
+          TreeNode *exp = node->GetExprAtIndex(0);
+          if (exp->IsLiteral() && exp->GetTypeId() == TY_String) {
+            unsigned stridx = (static_cast<LiteralNode *>(exp))->GetData().mData.mStrIdx;
+            StructNode *structure = static_cast<StructNode *>(decl);
+            for (int i = 0; i < structure->GetFieldsNum(); i++) {
+              IdentifierNode *f = structure->GetField(i);
+              if (f->GetStrIdx() == stridx) {
+                TypeId tid = f->GetTypeId();
+                UpdateTypeId(node, tid);
+              }
+            }
+          } else {
+            NOTYETIMPL("indexed access type index not literal");
+          }
+        } else {
+          // default
+          decl->SetTypeId(TY_Array);
+          UpdateArrayElemTypeIdMap(decl, node->GetTypeId());
+          UpdateTypeId(node, mHandler->mArrayDeclId2EleTypeIdMap[decl->GetNodeId()]);
+        }
       } else {
         NOTYETIMPL("array not declared");
       }
@@ -653,6 +683,16 @@ InterfaceNode *TypeInferVisitor::VisitInterfaceNode(InterfaceNode *node) {
     (void) VisitClassField(t);
   }
   (void) AstVisitor::VisitInterfaceNode(node);
+  return node;
+}
+
+StructNode *TypeInferVisitor::VisitStructNode(StructNode *node) {
+  UpdateTypeId(node, TY_Class);
+  for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
+    TreeNode *t = node->GetField(i);
+    (void) VisitClassField(t);
+  }
+  (void) AstVisitor::VisitStructNode(node);
   return node;
 }
 

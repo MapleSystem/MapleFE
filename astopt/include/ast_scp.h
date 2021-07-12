@@ -82,6 +82,7 @@ class BuildScopeVisitor : public BuildScopeBaseVisitor {
   FunctionNode *VisitFunctionNode(FunctionNode *node);
   LambdaNode *VisitLambdaNode(LambdaNode *node);
   ClassNode *VisitClassNode(ClassNode *node);
+  StructNode *VisitStructNode(StructNode *node);
   InterfaceNode *VisitInterfaceNode(InterfaceNode *node);
 
   // related node with scope : decl, type

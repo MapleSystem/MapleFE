@@ -165,6 +165,33 @@ InterfaceNode *BuildScopeVisitor::VisitInterfaceNode(InterfaceNode *node) {
   return node;
 }
 
+StructNode *BuildScopeVisitor::VisitStructNode(StructNode *node) {
+  ASTScope *parent = mScopeStack.top();
+  // struct is a decl
+  if (parent) {
+    parent->AddDecl(node);
+    parent->AddType(node);
+    node->SetScope(parent);
+  }
+
+  ASTScope *scope = mASTModule->NewScope(parent, node);
+
+  // add fields as decl
+  for(unsigned i = 0; i < node->GetFieldsNum(); i++) {
+    TreeNode *it = node->GetField(i);
+    if (it->IsIdentifier()) {
+      scope->AddDecl(it);
+      it->SetScope(scope);
+    }
+  }
+  mScopeStack.push(scope);
+
+  AstVisitor::VisitStructNode(node);
+
+  mScopeStack.pop();
+  return node;
+}
+
 DeclNode *BuildScopeVisitor::VisitDeclNode(DeclNode *node) {
   ASTScope *scope = mScopeStack.top();
   node->SetScope(scope);
