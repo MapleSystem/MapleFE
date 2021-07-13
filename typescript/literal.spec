@@ -124,7 +124,7 @@ rule BooleanLiteral : ONEOF ("true", "false")
 # I decided to simplify the unicode escape a little bit. I don't want to
 # handle all odd cases.
 rule UnicodeEscape: '\' + 'u' + HEXDIGIT + HEXDIGIT + HEXDIGIT + HEXDIGIT
-rule RawInputCharacter : ONEOF(ASCII, ESCAPE)
+rule RawInputCharacter : ONEOF(ASCII, ESCAPE, UTF8)
 rule SingleCharacter: ONEOF(UnicodeEscape, RawInputCharacter)
 
 rule OctalEscape : ONEOF('\' + '0', '\' + '1')

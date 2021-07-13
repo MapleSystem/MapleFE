@@ -903,6 +903,17 @@ bool Lexer::TraverseSecondTry(const RuleTable *rule_table) {
 
 bool Lexer::Traverse(const RuleTable *rule_table) {
 
+  if (rule_table == &TblUTF8) {
+    char c = *(line + curidx);
+    unsigned i = (unsigned)c;
+    if(i >= 0x80) {
+      curidx += 1;
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   // CHAR, DIGIT are reserved rules. It should NOT be changed. We can
   // expediate the lexing.
   if (rule_table == &TblCHAR) {
