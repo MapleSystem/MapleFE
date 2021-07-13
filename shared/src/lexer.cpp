@@ -184,6 +184,10 @@ Token* Lexer::FindCommentToken() {
 //
 /////////////////////////////////////////////////////////////////////////////
 
+//1. mLexer could cross the line if it's a template literal in Javascript.
+//2. During some language lexing, like Typescript template literal, we
+//   may add \n in a place holder (the line to be lexed). This \n should
+//   be removed when lexing the expressions in place holder.
 void Lexer::ClearLeadingNewLine() {
   while (line[curidx] == '\n') {
     curidx ++;
@@ -380,13 +384,12 @@ TempLitData* Lexer::GetTempLit() {
     while(1) {
       // Try string
       end_idx = 0;
-      bool s_found = FindNextTLFormat(start_idx, end_idx);
+      std::string fmt_str;
+      bool s_found = FindNextTLFormat(start_idx, fmt_str, end_idx);
       const char *addr = NULL;
       if (s_found) {
-        unsigned len = end_idx - start_idx + 1;
-        MASSERT(len > 0 && "found token has 0 data?");
-        std::string s(GetLine() + start_idx, len);
-        addr = gStringPool.FindString(s);
+        MASSERT(fmt_str.size() > 0 && "found token has 0 data?");
+        addr = gStringPool.FindString(fmt_str);
         start_idx = end_idx + 1;
       }
 
@@ -422,7 +425,7 @@ TempLitData* Lexer::GetTempLit() {
 
 // Find the pure string of a template literal.
 // Set end_idx as the last char of string.
-bool Lexer::FindNextTLFormat(unsigned start_idx, unsigned& end_idx) {
+bool Lexer::FindNextTLFormat(unsigned start_idx, std::string &str, unsigned& end_idx) {
   unsigned working_idx = start_idx;
   while(1) {
     if ((line[working_idx] == '$' && line[working_idx+1] == '{')
@@ -430,10 +433,23 @@ bool Lexer::FindNextTLFormat(unsigned start_idx, unsigned& end_idx) {
       end_idx = working_idx - 1;
       break;
     }
+
+    // Template Literal allows \n in format and place holder.
+    // the \n was removed by Lexer in the beginning of ReadALine();
+    if (working_idx == current_line_size) {
+      str += '\n';
+      ReadALine();
+      if (endoffile)
+        return false;
+      working_idx = 0;
+      continue;
+    }
+
+    str += line[working_idx];
     working_idx++;
   }
 
-  if (end_idx >= start_idx && end_idx <= 0xFFFFFF)
+  if (str.size() > 0)
     return true;
   else
     return false;
@@ -451,6 +467,8 @@ bool Lexer::FindNextTLPlaceHolder(unsigned start_idx, std::string& str, unsigned
     if (line[working_idx] == '}')
       break;
 
+    // Template Literal allows \n in format and place holder.
+    // the \n was removed by Lexer in the beginning of ReadALine();
     if (working_idx == current_line_size) {
       str += '\n';
       ReadALine();

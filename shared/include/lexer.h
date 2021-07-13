@@ -123,7 +123,7 @@ public:
   bool         GetComment();
 
   TempLitData* GetTempLit();
-  bool     FindNextTLFormat(unsigned /*start*/, unsigned& /*end*/);
+  bool     FindNextTLFormat(unsigned /*start*/, std::string&, unsigned& /*end*/);
   bool     FindNextTLPlaceHolder(unsigned /*start*/, std::string&, unsigned& /*end*/);
 
   // replace keyword/opr/sep... with tokens
