@@ -1843,8 +1843,8 @@ private:
   // dedicated EnumNode for them.
   bool                         mIsJavaEnum;
 
-  SmallVector<ClassNode*>      mSuperClasses;
-  SmallVector<InterfaceNode*>  mSuperInterfaces;
+  SmallVector<TreeNode*>      mSuperClasses;
+  SmallVector<TreeNode*>      mSuperInterfaces;
   SmallVector<AttrId>          mAttributes;
   SmallVector<AnnotationNode*> mAnnotations; //annotation or pragma
 
@@ -1872,8 +1872,16 @@ public:
   AnnotationNode* GetAnnotationAtIndex(unsigned i) {return mAnnotations.ValueAtIndex(i);}
   void            SetAnnotationAtIndex(unsigned i, AnnotationNode* n) {*(mAnnotations.RefAtIndex(i)) = n;}
 
-  void AddSuperClass(ClassNode *n)         {mSuperClasses.PushBack(n);}
-  void AddSuperInterface(InterfaceNode *n) {mSuperInterfaces.PushBack(n);}
+  void      AddSuperClass(TreeNode *n)  {mSuperClasses.PushBack(n);}
+  unsigned  GetSuperClassesNum()        {return mSuperClasses.GetNum();}
+  TreeNode* GetSuperClass(unsigned i)   {return mSuperClasses.ValueAtIndex(i);}
+  void      SetSuperClass(unsigned i, TreeNode* n) {*(mSuperClasses.RefAtIndex(i)) = n;}
+
+  void      AddSuperInterface(TreeNode *n) {mSuperInterfaces.PushBack(n);}
+  unsigned  GetSuperInterfacesNum()        {return mSuperInterfaces.GetNum();}
+  TreeNode* GetSuperInterface(unsigned i)  {return mSuperInterfaces.ValueAtIndex(i);}
+  void      SetSuperInterface(unsigned i, TreeNode* n) {*(mSuperInterfaces.RefAtIndex(i)) = n;}
+
   void AddAttribute(AttrId a) {mAttributes.PushBack(a);}
   void AddField(IdentifierNode *n) {mFields.PushBack(n); SETPARENT(n);}
   void AddMethod(FunctionNode *n) {mMethods.PushBack(n);}
@@ -1885,8 +1893,7 @@ public:
   void AddExport(ExportNode *n) {mExports.PushBack(n);}
   void AddDeclare(DeclareNode *n) {mDeclares.PushBack(n);}
 
-  unsigned GetSuperClassesNum()    {return mSuperClasses.GetNum();}
-  unsigned GetSuperInterfacesNum() {return mSuperInterfaces.GetNum();}
+
   unsigned GetAttributesNum()      {return mAttributes.GetNum();}
   unsigned GetFieldsNum()          {return mFields.GetNum();}
   unsigned GetMethodsNum()         {return mMethods.GetNum();}
@@ -1898,10 +1905,6 @@ public:
   unsigned GetExportsNum()         {return mExports.GetNum();}
   unsigned GetDeclaresNum()        {return mDeclares.GetNum();}
 
-  ClassNode* GetSuperClass(unsigned i)         {return mSuperClasses.ValueAtIndex(i);}
-  void       SetSuperClass(unsigned i, ClassNode* n) {*(mSuperClasses.RefAtIndex(i)) = n;}
-  InterfaceNode* GetSuperInterface(unsigned i) {return mSuperInterfaces.ValueAtIndex(i);}
-  void           SetSuperInterface(unsigned i, InterfaceNode* n) {*(mSuperInterfaces.RefAtIndex(i)) = n;}
   AttrId GetAttribute(unsigned i)              {return mAttributes.ValueAtIndex(i);}
   void   SetAttribute(unsigned i, AttrId n) {*(mAttributes.RefAtIndex(i)) = n;}
   IdentifierNode* GetField(unsigned i)         {return mFields.ValueAtIndex(i);}

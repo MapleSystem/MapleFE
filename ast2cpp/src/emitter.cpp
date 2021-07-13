@@ -1335,13 +1335,13 @@ std::string Emitter::EmitClassNode(ClassNode *node) {
 
   for (unsigned i = 0; i < node->GetSuperClassesNum(); ++i) {
     if (auto n = node->GetSuperClass(i)) {
-      str += " "s + EmitClassNode(n);
+      str += " "s + EmitTreeNode(n);
     }
   }
 
   for (unsigned i = 0; i < node->GetSuperInterfacesNum(); ++i) {
     if (auto n = node->GetSuperInterface(i)) {
-      str += " "s + EmitInterfaceNode(n);
+      str += " "s + EmitTreeNode(n);
     }
   }
 
