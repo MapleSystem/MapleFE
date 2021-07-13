@@ -10,10 +10,6 @@ class Vehicle;
 class Car;
 class MyCar;
 
-extern Object Vehicle_prototype;
-extern Object Car_prototype;
-extern Object MyCar_prototype;
-
 extern Ctor_Vehicle  Vehicle_ctor;
 extern Ctor_Car      Car_ctor;
 extern Ctor_MyCar    MyCar_ctor;
@@ -92,15 +88,10 @@ class Ctor_MyCar : public Ctor_Car {
     }
 };
 
-// Prototype property
-Object    Vehicle_prototype ((Function *)&Vehicle_ctor, &Object_prototype);
-Object    Car_prototype     ((Function *)&Car_ctor,     &Vehicle_prototype);
-Object    MyCar_prototype   ((Function *)&MyCar_ctor,   &Car_prototype);
-
 // Function constructors 
-Ctor_MyCar    MyCar_ctor   (&Function_ctor, &Car_ctor,           &MyCar_prototype);
-Ctor_Car      Car_ctor     (&Function_ctor, &Vehicle_ctor,       &Car_prototype);
-Ctor_Vehicle  Vehicle_ctor (&Function_ctor, &Function_prototype, &Vehicle_prototype);
+Ctor_MyCar    MyCar_ctor   (&Function_ctor, &Car_ctor,               Car_ctor.prototype);
+Ctor_Car      Car_ctor     (&Function_ctor, &Vehicle_ctor,           Vehicle_ctor.prototype);
+Ctor_Vehicle  Vehicle_ctor (&Function_ctor, Function_ctor.prototype, Object_ctor.prototype);
 
 // Object instances
 Car* car    = Car_ctor._new();

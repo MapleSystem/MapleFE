@@ -151,8 +151,9 @@ class Function : public Object {
   public:
     Object* prototype;    // prototype property
 
-    Function(Function* ctor, Object* proto, Object* proto_prop) : Object(ctor, proto), prototype(proto_prop) {
+    Function(Function* ctor, Object* proto, Object* prototype_proto) : Object(ctor, proto) {
       JS_Val val(this);
+      prototype = new Object(this, prototype_proto);
       prototype->AddProp("constructor", val);
     }
 
@@ -175,7 +176,7 @@ class Array : public Object {
 
 class Ctor_Function : public Function {
   public:
-    Ctor_Function(Function* ctor, Object* proto, Object* prototype) : Function(ctor, proto, prototype) {}
+    Ctor_Function(Function* ctor, Object* proto, Object* prototype_proto) : Function(ctor, proto, prototype_proto) {}
 
 #if 0
     // todo: how to handle "new Function(...)";
@@ -187,7 +188,7 @@ class Ctor_Function : public Function {
 
 class Ctor_Object   : public Function {
   public:
-    Ctor_Object(Function* ctor, Object* proto, Object* prototype) : Function(ctor, proto, prototype) {}
+    Ctor_Object(Function* ctor, Object* proto, Object* prototype_proto) : Function(ctor, proto, prototype_proto) {}
 
     Object* _new() {
       return new Object(this, this->prototype);
@@ -196,7 +197,7 @@ class Ctor_Object   : public Function {
 
 class Ctor_Array: public Function {
   public:
-    Ctor_Array(Function* ctor, Object* proto, Object* prototype) : Function(ctor, proto, prototype) {}
+    Ctor_Array(Function* ctor, Object* proto, Object* prototype_proto) : Function(ctor, proto, prototype_proto) {}
 
     Array* _new() {
       return new Array(this, this->prototype);
