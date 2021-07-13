@@ -1008,6 +1008,7 @@ private:
   IdentifierNode *mStructId;
   SmallVector<IdentifierNode*> mFields;
   SmallVector<FunctionNode*>   mMethods;
+  SmallVector<TreeNode*>       mSupers;
 
   // These are for 'number' or 'string' index data type
   NumIndexSigNode *mNumIndexSig;
@@ -1034,6 +1035,11 @@ public:
   void            SetField(unsigned i, IdentifierNode* n) {*(mFields.RefAtIndex(i)) = n; SETPARENT(n);}
   void            AddField(IdentifierNode *n) {mFields.PushBack(n); SETPARENT(n);}
 
+  unsigned  GetSupersNum() {return mSupers.GetNum();}
+  TreeNode* GetSuper(unsigned i) {return mSupers.ValueAtIndex(i);}
+  void      SetSuper(unsigned i, TreeNode* n) {*(mSupers.RefAtIndex(i)) = n;}
+  void      AddSuper(TreeNode *n);
+
   unsigned      GetMethodsNum() {return mMethods.GetNum();}
   FunctionNode* GetMethod(unsigned i) {return mMethods.ValueAtIndex(i);}
   void          SetMethod(unsigned i, FunctionNode* n) {*(mMethods.RefAtIndex(i)) = n;}
@@ -1041,7 +1047,7 @@ public:
 
   void AddChild(TreeNode *);
 
-  void Release() {mFields.Release(); mMethods.Release();}
+  void Release() {mFields.Release(); mMethods.Release(); mSupers.Release();}
   void Dump(unsigned);
 };
 

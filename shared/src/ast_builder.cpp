@@ -2169,10 +2169,23 @@ TreeNode* ASTBuilder::AddSuperClass() {
   return mLastTreeNode;
 }
 
+// It takes one argument, the super interface.
+// Add it to the mLastTreeNode.
 TreeNode* ASTBuilder::AddSuperInterface() {
   if (mTrace)
     std::cout << "In AddSuperInterface" << std::endl;
-  Param p_attr = mParams[0];
+  Param p_super = mParams[0];
+  if (p_super.mIsEmpty)
+    return mLastTreeNode;
+
+  MASSERT(p_super.mIsTreeNode);
+  TreeNode *t_super = p_super.mData.mTreeNode;
+
+  if (mLastTreeNode->IsStruct()) {
+    StructNode *sn = (StructNode*)mLastTreeNode;
+    sn->AddSuper(t_super);
+  }
+
   return mLastTreeNode;
 }
 

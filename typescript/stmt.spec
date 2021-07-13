@@ -1791,6 +1791,7 @@ rule InterfaceDeclaration :
   attr.action : BuildStruct(%2)
   attr.action : SetTSInterface()
   attr.action : AddStructField(%5)
+  attr.action : AddSuperInterface(%4)
 
 ##InterfaceExtendsClause: extends ClassOrInterfaceTypeList
 rule InterfaceExtendsClause: "extends" + ClassOrInterfaceTypeList

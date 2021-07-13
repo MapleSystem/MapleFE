@@ -701,6 +701,19 @@ void BindingPatternNode::Dump(unsigned indent) {
 //                          StructNode
 //////////////////////////////////////////////////////////////////////////////////////
 
+void StructNode::AddSuper(TreeNode *the_super) {
+  if (!the_super)
+    return;
+
+  if (the_super->IsPass()) {
+    PassNode *pass_node = (PassNode*)the_super;
+    for (unsigned i = 0; i < pass_node->GetChildrenNum(); i++)
+      AddSuper(pass_node->GetChild(i));
+  } else {
+    mSupers.PushBack(the_super);
+  }
+}
+
 // Child could be a field or index signature.
 void StructNode::AddChild(TreeNode *field) {
   if (field->IsPass()) {
