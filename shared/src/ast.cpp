@@ -1290,6 +1290,32 @@ void PassNode::Dump(unsigned ind) {
 //                          ClassNode
 //////////////////////////////////////////////////////////////////////////////////////
 
+void ClassNode::AddSuperClass(TreeNode *the_super) {
+  if (!the_super)
+    return;
+
+  if (the_super->IsPass()) {
+    PassNode *pass_node = (PassNode*)the_super;
+    for (unsigned i = 0; i < pass_node->GetChildrenNum(); i++)
+      AddSuperClass(pass_node->GetChild(i));
+  } else {
+    mSuperClasses.PushBack(the_super);
+  }
+}
+
+void ClassNode::AddSuperInterface(TreeNode *the_super) {
+  if (!the_super)
+    return;
+
+  if (the_super->IsPass()) {
+    PassNode *pass_node = (PassNode*)the_super;
+    for (unsigned i = 0; i < pass_node->GetChildrenNum(); i++)
+      AddSuperInterface(pass_node->GetChild(i));
+  } else {
+    mSuperInterfaces.PushBack(the_super);
+  }
+}
+
 // When the class body, a BlockNode, is added to the ClassNode, we need further
 // categorize the subtrees into members, methods, local classes, interfaces, etc.
 void ClassNode::Construct(BlockNode *block) {

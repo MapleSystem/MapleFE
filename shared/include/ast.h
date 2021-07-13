@@ -1872,12 +1872,12 @@ public:
   AnnotationNode* GetAnnotationAtIndex(unsigned i) {return mAnnotations.ValueAtIndex(i);}
   void            SetAnnotationAtIndex(unsigned i, AnnotationNode* n) {*(mAnnotations.RefAtIndex(i)) = n;}
 
-  void      AddSuperClass(TreeNode *n)  {mSuperClasses.PushBack(n);}
+  void      AddSuperClass(TreeNode *n);
   unsigned  GetSuperClassesNum()        {return mSuperClasses.GetNum();}
   TreeNode* GetSuperClass(unsigned i)   {return mSuperClasses.ValueAtIndex(i);}
   void      SetSuperClass(unsigned i, TreeNode* n) {*(mSuperClasses.RefAtIndex(i)) = n;}
 
-  void      AddSuperInterface(TreeNode *n) {mSuperInterfaces.PushBack(n);}
+  void      AddSuperInterface(TreeNode *n);
   unsigned  GetSuperInterfacesNum()        {return mSuperInterfaces.GetNum();}
   TreeNode* GetSuperInterface(unsigned i)  {return mSuperInterfaces.ValueAtIndex(i);}
   void      SetSuperInterface(unsigned i, TreeNode* n) {*(mSuperInterfaces.RefAtIndex(i)) = n;}

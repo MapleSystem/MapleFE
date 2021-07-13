@@ -2165,7 +2165,18 @@ TreeNode* ASTBuilder::BuildInstInit() {
 TreeNode* ASTBuilder::AddSuperClass() {
   if (mTrace)
     std::cout << "In AddSuperClass" << std::endl;
-  Param p_attr = mParams[0];
+  Param p_super = mParams[0];
+  if (p_super.mIsEmpty)
+    return mLastTreeNode;
+
+  MASSERT(p_super.mIsTreeNode);
+  TreeNode *t_super = p_super.mData.mTreeNode;
+
+  if (mLastTreeNode->IsClass()) {
+    ClassNode *sn = (ClassNode*)mLastTreeNode;
+    sn->AddSuperClass(t_super);
+  }
+
   return mLastTreeNode;
 }
 
@@ -2184,6 +2195,9 @@ TreeNode* ASTBuilder::AddSuperInterface() {
   if (mLastTreeNode->IsStruct()) {
     StructNode *sn = (StructNode*)mLastTreeNode;
     sn->AddSuper(t_super);
+  } else if (mLastTreeNode->IsClass()) {
+    ClassNode *sn = (ClassNode*)mLastTreeNode;
+    sn->AddSuperInterface(t_super);
   }
 
   return mLastTreeNode;
