@@ -32,16 +32,6 @@ inline std::string to_string(std::string t) {return t;}
 
 class Object;
 class Function;
-class Ctor_Function;
-class Ctor_Object;
-class Ctor_Array;
-
-extern Object Object_prototype;
-extern Object Function_prototype;
-extern Object Array_prototype;
-extern Ctor_Function Function_ctor;
-extern Ctor_Object   Object_ctor;
-extern Ctor_Array    Array_ctor;
 
 // JS types for props
 typedef enum JS_Type : uint8_t {
@@ -67,7 +57,7 @@ struct JS_Val {
     double       val_double;
     void*        val_bigint;
     std::string* val_string; // JS string primitive (not JS String object)
-    Object*     val_obj;    // for function, object (incl. String objects)
+    Object*      val_obj;    // for function, object (incl. String objects)
   } x;
   JS_Type type;
   bool    cxx;  // if it is a cxx field
@@ -143,8 +133,8 @@ class Object {
       return false;
     }
 
-    // Put code for JS Object.prototype props as static fields and methods here
-    // and add to propList of Object_prototype object on system init.
+    // Put code for JS Object.prototype props as static fields and methods in this class 
+    // and add to propList of Object_ctor.prototype object on system init.
 };
 
 class Function : public Object {
@@ -161,47 +151,8 @@ class Function : public Object {
       return true;
     }
 
-    // Put code for JS Function.prototype props as static fields and methods here.
-    // and add to propList of Function_prototype object on system init.
-};
-
-
-// JS builtins
-class Array : public Object {
-  public:
-    Array(Function* ctor, Object* proto): Object(ctor, proto) {}
-    // Imeplement JS Array.prototype props as static fields and methods here.
-    // and add to proplist of Array_prototype object on system init.
-};
-
-class Ctor_Function : public Function {
-  public:
-    Ctor_Function(Function* ctor, Object* proto, Object* prototype_proto) : Function(ctor, proto, prototype_proto) {}
-
-#if 0
-    // todo: how to handle "new Function(...)";
-    Function* _new() {
-      return new Function(this, this->prototype);
-     }
-#endif
-};
-
-class Ctor_Object   : public Function {
-  public:
-    Ctor_Object(Function* ctor, Object* proto, Object* prototype_proto) : Function(ctor, proto, prototype_proto) {}
-
-    Object* _new() {
-      return new Object(this, this->prototype);
-    }
-};
-
-class Ctor_Array: public Function {
-  public:
-    Ctor_Array(Function* ctor, Object* proto, Object* prototype_proto) : Function(ctor, proto, prototype_proto) {}
-
-    Array* _new() {
-      return new Array(this, this->prototype);
-    }
+    // Put code for JS Function.prototype props as static fields and methods in this class
+    // and add to propList of Function_ctor.prototype object on system init.
 };
 
 
@@ -254,6 +205,9 @@ template <> inline std::string __js_typeof<t2crt::JS_Val>(t2crt::JS_Val v) {
 }
 
 void GenerateDOTGraph( std::vector<Object *>&obj, std::vector<std::string>&name);
+
+#include "builtins.h"
+
 } // namespace t2crt
 
 
