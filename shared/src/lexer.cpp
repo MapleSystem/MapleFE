@@ -184,9 +184,22 @@ Token* Lexer::FindCommentToken() {
 //
 /////////////////////////////////////////////////////////////////////////////
 
-// Read a token until end of file.
-// If no remaining tokens in current line, we move to the next line.
+void Lexer::ClearLeadingNewLine() {
+  while (line[curidx] == '\n') {
+    curidx ++;
+    if (curidx == current_line_size) {
+      ReadALine();
+      if (EndOfFile())
+        return;
+    }
+  }
+}
+
 Token* Lexer::LexToken(void) {
+  ClearLeadingNewLine();
+  if (EndOfFile())
+    return NULL;
+
   return LexTokenNoNewLine();
 }
 
@@ -380,13 +393,12 @@ TempLitData* Lexer::GetTempLit() {
       // Try pattern
       end_idx = 0;
       const char *addr_ph = NULL;
-      bool p_found = FindNextTLPlaceHolder(start_idx, end_idx);
+      std::string pl_str;
+      bool p_found = FindNextTLPlaceHolder(start_idx, pl_str, end_idx);
       if (p_found) {
-        unsigned p_s = start_idx + 2;
-        unsigned len = end_idx - p_s + 1;
+        unsigned len = pl_str.size();
         MASSERT(len > 0 && "found token has 0 data?");
-        std::string s(GetLine() + p_s, len);
-        addr_ph = gStringPool.FindString(s);
+        addr_ph = gStringPool.FindString(pl_str);
         // We need skip the ending '}' of a pattern.
         start_idx = end_idx + 2;
       }
@@ -429,17 +441,26 @@ bool Lexer::FindNextTLFormat(unsigned start_idx, unsigned& end_idx) {
 
 // Find the pattern string of a template literal.
 // Set end_idx as the last char of string.
-bool Lexer::FindNextTLPlaceHolder(unsigned start_idx, unsigned& end_idx) {
+bool Lexer::FindNextTLPlaceHolder(unsigned start_idx, std::string& str, unsigned& end_idx) {
   unsigned working_idx = start_idx;
   if (line[working_idx] != '$' || line[working_idx+1] != '{')
     return false;
 
   working_idx = start_idx + 2;
   while(1) {
-    if (line[working_idx] == '}') {
+    if (line[working_idx] == '}')
       break;
+
+    if (working_idx == current_line_size) {
+      str += '\n';
+      ReadALine();
+      if (endoffile)
+        return false;
+      working_idx = 0;
+    } else {
+      str += line[working_idx];
+      working_idx++;
     }
-    working_idx++;
   }
 
   end_idx = working_idx - 1;

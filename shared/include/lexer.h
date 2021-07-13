@@ -102,6 +102,9 @@ public:
 
   friend class Parser;
 
+  // clear the leading \n in line.
+  void ClearLeadingNewLine();
+
   // These are for autogen table testing
   Token* LexToken();  // always return token until end of file.
   Token* LexTokenNoNewLine(); // try to get token untile end of line.
@@ -121,7 +124,7 @@ public:
 
   TempLitData* GetTempLit();
   bool     FindNextTLFormat(unsigned /*start*/, unsigned& /*end*/);
-  bool     FindNextTLPlaceHolder(unsigned /*start*/, unsigned& /*end*/);
+  bool     FindNextTLPlaceHolder(unsigned /*start*/, std::string&, unsigned& /*end*/);
 
   // replace keyword/opr/sep... with tokens
   //void PlantTokens();

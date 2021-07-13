@@ -369,7 +369,10 @@ unsigned Parser::LexOneLine() {
 
   while (!token_num) {
     // read until end of line
-    // NOTE: mLexer could cross the line if it's a template literal in Javascript.
+    // NOTE: 1. mLexer could cross the line if it's a template literal in Javascript.
+    //       2. During some language lexing, like Typescript template literal, we
+    //          may add \n in a place holder (the line to be lexed). This \n should
+    //          be removed when lexing the expressions in place holder.
     while (!mLexer->EndOfLine() && !mLexer->EndOfFile()) {
       t = mLexer->LexToken();
       if (t) {
