@@ -82,6 +82,27 @@ void Emitter::Replace(std::string &str, const char *o, const char *n, int cnt) {
   }
 }
 
+std::string Emitter::EncodeLiteral(std::string &str) {
+  std::string enc;
+  for (auto&c : str) {
+    switch(c) {
+      case '\'': enc += "\\'"s; break;
+      case '\"': enc += "\\\""s; break;
+      case '\?': enc += "\\?"s; break;
+      case '\\': enc += "\\\\"s; break;
+      case '\a': enc += "\\a"s; break;
+      case '\b': enc += "\\b"s; break;
+      case '\f': enc += "\\f"s; break;
+      case '\n': enc += "\\n"s; break;
+      case '\r': enc += "\\r"s; break;
+      case '\t': enc += "\\t"s; break;
+      case '\v': enc += "\\v"s; break;
+      default: enc += c; // TODO: Unicode
+    }
+  }
+  return enc;
+}
+
 std::string Emitter::EmitAnnotationNode(AnnotationNode *node) {
   if (node == nullptr)
     return std::string();
@@ -929,11 +950,8 @@ std::string Emitter::EmitLiteralNode(LiteralNode *node) {
     return std::string();
   LitData lit = node->GetData();
   std::string str(AstDump::GetEnumLitData(lit));
-  if((lit.mType == LT_StringLiteral || lit.mType == LT_CharacterLiteral)
-      && !(str.front() == '"' && str.back() == '\"'
-           || str.front() == '\'' && str.back() == '\'')) {
-    Replace(str, "\"", "\\\"", 0);
-    str = "\"" + str + "\"";
+  if(lit.mType == LT_StringLiteral || lit.mType == LT_CharacterLiteral) {
+    str = "\"" + EncodeLiteral(str) + "\"";
   }
   mPrecedence = '\030';
   if (node->IsStmt())
