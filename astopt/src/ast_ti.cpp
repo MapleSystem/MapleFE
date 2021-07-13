@@ -350,18 +350,22 @@ bool TypeInferVisitor::IsArray(TreeNode *node) {
   return false;
 }
 
-PrimTypeNode *TypeInferVisitor::VisitPrimTypeNode(PrimTypeNode *node) {
-  node->SetTypeId(node->GetPrimType());
-  return node;
-}
-
 TreeNode *TypeInferVisitor::VisitClassField(TreeNode *node) {
   (void) AstVisitor::VisitTreeNode(node);
   if (node->IsIdentifier()) {
     IdentifierNode *idnode = static_cast<IdentifierNode *>(node);
     TreeNode *type = idnode->GetType();
     if (type) {
-      node->SetTypeId(type->GetTypeId());
+      TypeId tid = type->GetTypeId();
+      if (type->IsPrimType()) {
+        PrimTypeNode *ptn = static_cast<PrimTypeNode *>(type);
+        tid = ptn->GetPrimType();
+        // use mPrimType for non TY_Number
+        if (tid != TY_Number) {
+          node->SetTypeId(tid);
+        }
+      }
+      node->SetTypeId(tid);
     }
     TreeNode *init = idnode->GetInit();
     if (init) {
