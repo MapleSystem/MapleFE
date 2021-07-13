@@ -118,6 +118,7 @@ class Object {
   public:
     Object(): __proto__(nullptr) {}
     Object(Function* ctor, Object* proto): constructor(ctor), __proto__(proto) {}
+    virtual ~Object() {}
 
     bool HasOwnProp(std::string key) {
       JS_PropList::iterator it;
