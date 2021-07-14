@@ -223,6 +223,7 @@ class CfgBuilder : public AstVisitor {
   // For class and interface
   ClassNode *VisitClassNode(ClassNode *node);
   InterfaceNode *VisitInterfaceNode(InterfaceNode *node);
+  StructNode *VisitStructNode(StructNode *node);
 
   // For statements of control flow
   ReturnNode *VisitReturnNode(ReturnNode *node);

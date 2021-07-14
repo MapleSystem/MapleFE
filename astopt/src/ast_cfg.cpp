@@ -129,10 +129,17 @@ LambdaNode *CfgBuilder::VisitLambdaNode(LambdaNode *node) {
 }
 
 ClassNode *CfgBuilder::VisitClassNode(ClassNode *node) {
+  mCurrentBB->AddStatement(node);
   return node;
 }
 
 InterfaceNode *CfgBuilder::VisitInterfaceNode(InterfaceNode *node) {
+  mCurrentBB->AddStatement(node);
+  return node;
+}
+
+StructNode *CfgBuilder::VisitStructNode(StructNode *node) {
+  mCurrentBB->AddStatement(node);
   return node;
 }
 
