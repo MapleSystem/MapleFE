@@ -1,0 +1,23 @@
+Matched 17 tokens.
+Matched 30 tokens.
+Matched 46 tokens.
+Matched 55 tokens.
+============= Module ===========
+== Sub Tree ==
+func  func<T>(x)  throws: 
+  return x
+
+== Sub Tree ==
+js_var Decl: list= {f1:0, f2:1}
+== Sub Tree ==
+class  Klass
+  Fields: 
+    fd=func( {:...list})
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+console.log(Klass.fd)

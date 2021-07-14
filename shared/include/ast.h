@@ -93,6 +93,7 @@ protected:
                           // This design is first coming from Javascript.
   bool      mIsNonNull;   // if a node is asserted to be non-null.
                           // This design is first coming from Typescript.
+  bool      mIsRest;      // A spread or rest syntax in Javascript.
 
   // This is a feature coming from TypeScript. Almost every expression in Typescript has
   // this information. So it's here.
@@ -101,7 +102,7 @@ protected:
 public:
   TreeNode(NodeKind k, unsigned i)
     : mKind(k), mLabel(NULL), mParent(NULL), mStrIdx(i), mIsStmt(false), mTypeId(TY_None),
-      mScope(NULL), mIsOptional(false), mIsNonNull(false) {}
+      mScope(NULL), mIsOptional(false), mIsNonNull(false), mIsRest(false) {}
   TreeNode(NodeKind k) : TreeNode(k, 0) {}
   //TreeNode() : TreeNode(NK_Null, 0) {}
   virtual ~TreeNode() {}
@@ -133,6 +134,8 @@ public:
   void SetIsOptional(bool b = true){mIsOptional = b;}
   bool IsNonNull()                 {return mIsNonNull;}
   void SetIsNonNull(bool b = true) {mIsNonNull = b;}
+  bool IsRest()                    {return mIsRest;}
+  void SetIsRest(bool b = true)    {mIsRest = b;}
 
   virtual unsigned GetStrIdx() {return mStrIdx;}
   virtual void SetStrIdx(unsigned id) {mStrIdx = id;}
@@ -639,11 +642,10 @@ private:
 
 
   bool           mOptionalParam; // A optional parameter.
-  bool           mRestParam;     // A rest parameter.
 public:
   IdentifierNode(unsigned id, TreeNode *t) : TreeNode(NK_Identifier, id),
     mType(t), mInit(NULL), mDims(NULL),
-    mOptionalParam(false), mRestParam(false) {}
+    mOptionalParam(false) {}
   IdentifierNode(unsigned id) : IdentifierNode(id, NULL) {}
   IdentifierNode() : IdentifierNode(0, NULL) {}
   ~IdentifierNode(){Release();}
@@ -660,9 +662,6 @@ public:
   bool IsOptionalParam()       {return mOptionalParam;}
   bool GetOptionalParam()      {return mOptionalParam;}
   void SetOptionalParam(bool b){mOptionalParam = b;}
-  bool IsRestParam()       {return mRestParam;}
-  bool GetRestParam()      {return mRestParam;}
-  void SetRestParam(bool b){mRestParam = b;}
 
   unsigned GetDimsNum()          {return mDims->GetDimensionsNum();}
   unsigned GetDim(unsigned n)    {return mDims->GetDimension(n);} // 0 means unspecified.
@@ -913,19 +912,15 @@ class BindingElementNode : public TreeNode {
 private:
   TreeNode *mVariable;  // The new variable to bind element to
   TreeNode *mElement;   // the elements in the source struct or array
-  bool      mIsRest;    // In array binding, 'rest' is a syntax sugar for the rest
-                        // elements.
 public:
   BindingElementNode() : TreeNode(NK_BindingElement),
-                         mVariable(NULL), mElement(NULL), mIsRest(false) {}
+                         mVariable(NULL), mElement(NULL) {}
   ~BindingElementNode() {}
 
   TreeNode* GetVariable()            {return mVariable;}
   void      SetVariable(TreeNode* n) {mVariable = n;}
   TreeNode* GetElement()             {return mElement;}
   void      SetElement(TreeNode* n)  {mElement = n;}
-  bool IsRest()          {return mIsRest;}
-  void SetIsRest(bool b) {mIsRest = b;}
 
   void Dump(unsigned);
 };

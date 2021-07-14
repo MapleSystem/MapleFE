@@ -90,7 +90,6 @@ ACTION(BuildField)
 ACTION(BuildVarList)
 
 ACTION(BuildBindingElement)
-ACTION(BuildBindingRestElement)
 ACTION(BuildBindingPattern)
 
 // For struct
@@ -111,7 +110,6 @@ ACTION(BuildArrayLiteral)
 // For function
 ACTION(AddParams)
 ACTION(SetOptionalParam)  // TS defines optional parameters.
-ACTION(SetRestParam)      // TS defines rest parameters.
 ACTION(BuildFunction)
 ACTION(BuildConstructor)
 ACTION(AddFunctionBody)
@@ -158,10 +156,11 @@ ACTION(BuildDims)
 ACTION(AddDims)
 ACTION(AddDimsTo)
 
-// Set a tree node as a statement, optional
+// Set a tree node as ... properties
 ACTION(SetIsStmt)
 ACTION(SetIsOptional)
 ACTION(SetIsNonNull)
+ACTION(SetIsRest)
 
 // statment, control flow
 ACTION(BuildAssignment)

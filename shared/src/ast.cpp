@@ -592,7 +592,7 @@ void IdentifierNode::Release() {
 
 void IdentifierNode::Dump(unsigned indent) {
   DumpIndentation(indent);
-  if (mRestParam)
+  if (mIsRest)
     DUMP0_NORETURN("...");
   DUMP0_NORETURN(GetName());
   if (mOptionalParam || mIsOptional)

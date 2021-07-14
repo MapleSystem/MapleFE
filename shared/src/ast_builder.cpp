@@ -740,6 +740,22 @@ TreeNode* ASTBuilder::SetIsNonNull() {
   return mLastTreeNode;
 }
 
+// Takes one argument. Set the tree as a rest or spread node.
+// We still return the previous mLastTreeNode.
+TreeNode* ASTBuilder::SetIsRest() {
+  if (mTrace)
+    std::cout << "In SetIsRest" << std::endl;
+
+  Param p_tree = mParams[0];
+  if (!p_tree.mIsEmpty) {
+    MASSERT(p_tree.mIsTreeNode);
+    TreeNode *treenode = p_tree.mData.mTreeNode;
+    treenode->SetIsRest();
+  }
+
+  return mLastTreeNode;
+}
+
 // Assignment is actually a binary operator.
 TreeNode* ASTBuilder::BuildAssignment() {
   if (mTrace)
@@ -1550,27 +1566,6 @@ TreeNode* ASTBuilder::BuildBindingElement() {
   } else {
     MASSERT(0 && "unsupported number of arguments in BuildBindingElemnt.");
   }
-
-  mLastTreeNode = be_node;
-  return mLastTreeNode;
-}
-
-// It take one argument,  the 'element'
-TreeNode* ASTBuilder::BuildBindingRestElement() {
-  if (mTrace)
-    std::cout << "In BuildBindingRestElement" << std::endl;
-
-  BindingElementNode *be_node = NULL;
-  MASSERT(mParams.size() == 1);
-
-  Param p_element = mParams[0];
-  MASSERT(p_element.mIsTreeNode);
-  TreeNode *element = p_element.mData.mTreeNode;
-
-  be_node = (BindingElementNode*)gTreePool.NewTreeNode(sizeof(BindingElementNode));
-  new (be_node) BindingElementNode();
-  be_node->SetElement(element);
-  be_node->SetIsRest(true);
 
   mLastTreeNode = be_node;
   return mLastTreeNode;
@@ -2779,23 +2774,6 @@ TreeNode* ASTBuilder::SetOptionalParam() {
   MASSERT(param->IsIdentifier());
   IdentifierNode *id = (IdentifierNode*)param;
   id->SetOptionalParam(true);
-
-  mLastTreeNode = id;
-  return mLastTreeNode;
-}
-
-// Takes one argument, set it as optional param.
-TreeNode* ASTBuilder::SetRestParam() {
-  if (mTrace)
-    std::cout << "In SetRestParam" << std::endl;
-
-  MASSERT(mParams.size() == 1);
-  Param p_param = mParams[0];
-  MASSERT(!p_param.mIsEmpty && p_param.mIsTreeNode);
-  TreeNode *param = p_param.mData.mTreeNode;
-  MASSERT(param->IsIdentifier());
-  IdentifierNode *id = (IdentifierNode*)param;
-  id->SetRestParam(true);
 
   mLastTreeNode = id;
   return mLastTreeNode;

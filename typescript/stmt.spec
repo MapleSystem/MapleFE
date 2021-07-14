@@ -223,6 +223,7 @@ rule Elision : ONEOF(',',
 ##rule SpreadElement[Yield] :
 ##  ... AssignmentExpression[In, ?Yield]
 rule SpreadElement : "..." + AssignmentExpression
+  attr.action : SetIsRest(%2)
 
 ##-----------------------------------
 ##rule ObjectLiteral[Yield] :
@@ -421,6 +422,8 @@ rule ArgumentList : ONEOF(AssignmentExpression,
                           "..." + AssignmentExpression,
                           ArgumentList + ',' + ZEROORONE(AssignmentExpression),
                           ArgumentList + ',' + "..." + AssignmentExpression)
+  attr.action.%2 : SetIsRest(%2)
+  attr.action.%4 : SetIsRest(%4)
 
 ##-----------------------------------
 ##rule LeftHandSideExpression[Yield] :
@@ -904,7 +907,8 @@ rule SingleNameBinding : BindingIdentifier + ZEROORONE(Initializer)
 ##rule BindingRestElement[Yield] :
 ##  ... BindingIdentifier[?Yield]
 rule BindingRestElement : "..." + BindingIdentifier
-  attr.action : BuildBindingRestElement(%2)
+  attr.action : SetIsRest(%2)
+  attr.action : BuildBindingElement(%2)
 
 ##-----------------------------------
 ##rule EmptyStatement :
@@ -1685,7 +1689,7 @@ rule OptionalParameter: ONEOF(
 ## rule RestParameter: ... BindingIdentifier TypeAnnotationopt
 rule RestParameter: "..." + BindingIdentifier + ZEROORONE(TypeAnnotation)
   attr.action : AddType(%2, %3)
-  attr.action : SetRestParam(%2)
+  attr.action : SetIsRest(%2)
 
 ## rule ConstructSignature: new TypeParametersopt ( ParameterListopt ) TypeAnnotationopt
 rule ConstructSignature :
@@ -1729,7 +1733,8 @@ rule PropertyDefinition: ONEOF(IdentifierReference,
                                PropertyName + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')'
                                  + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}',
                                GetAccessor,
-                               SetAccessor)
+                               SetAccessor,
+                               SpreadElement)
   attr.action.%3 : BuildFieldLiteral(%1, %3)
   attr.action.%4 : BuildFunction(%1)
   attr.action.%4 : AddType(%6)
