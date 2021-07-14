@@ -128,6 +128,14 @@ LambdaNode *CfgBuilder::VisitLambdaNode(LambdaNode *node) {
   return node;
 }
 
+ClassNode *CfgBuilder::VisitClassNode(ClassNode *node) {
+  return node;
+}
+
+InterfaceNode *CfgBuilder::VisitInterfaceNode(InterfaceNode *node) {
+  return node;
+}
+
 // For control flow
 ReturnNode *CfgBuilder::VisitReturnNode(ReturnNode *node) {
   mCurrentBB->AddStatement(node);

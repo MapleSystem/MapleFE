@@ -220,6 +220,10 @@ class CfgBuilder : public AstVisitor {
   FunctionNode *VisitFunctionNode(FunctionNode *node);
   LambdaNode *VisitLambdaNode(LambdaNode *node);
 
+  // For class and interface
+  ClassNode *VisitClassNode(ClassNode *node);
+  InterfaceNode *VisitInterfaceNode(InterfaceNode *node);
+
   // For statements of control flow
   ReturnNode *VisitReturnNode(ReturnNode *node);
   CondBranchNode *VisitCondBranchNode(CondBranchNode *node);

@@ -833,12 +833,31 @@ std::string Emitter::EmitStructNode(StructNode *node) {
   if (auto n = node->GetStructId()) {
     str += EmitIdentifierNode(n);
   }
-  str += "{\n"s;
+  for (unsigned i = 0; i < node->GetSupersNum(); ++i) {
+    str += i ? ", "s : " extends "s;
+    if (auto n = node->GetSuper(i))
+      str += EmitTreeNode(n);
+  }
+  str += " {\n"s;
   for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
     if (auto n = node->GetField(i)) {
       str += EmitIdentifierNode(n) + suffix;
     }
   }
+
+  if (auto n = node->GetNumIndexSig()) {
+    str += EmitNumIndexSigNode(n) + "\n"s;;
+  }
+  if (auto n = node->GetStrIndexSig()) {
+    str += EmitStrIndexSigNode(n) + "\n";
+  }
+
+  for (unsigned i = 0; i < node->GetMethodsNum(); ++i) {
+    if (auto n = node->GetMethod(i)) {
+      str += EmitFunctionNode(n) + "\n"s;
+    }
+  }
+
   str += "}\n"s;
   return HandleTreeNode(str, node);
 }
@@ -1302,62 +1321,55 @@ std::string Emitter::EmitCallNode(CallNode *node) {
 std::string Emitter::EmitInterfaceNode(InterfaceNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str = "interface "s + node->GetName() + " {"s;
-  str += std::to_string(node->IsAnnotation());
+  std::string str = "interface "s + node->GetName();
 
   for (unsigned i = 0; i < node->GetSuperInterfacesNum(); ++i) {
-    if (auto n = node->GetSuperInterfaceAtIndex(i)) {
-      str += " "s + EmitInterfaceNode(n);
-    }
+    str += i ? ", "s : " extends "s;
+    if (auto n = node->GetSuperInterfaceAtIndex(i))
+      str += EmitTreeNode(n);
   }
+  str += " {\n"s;
 
   for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
     if (auto n = node->GetFieldAtIndex(i)) {
-      str += " "s + EmitIdentifierNode(n);
+      str += EmitIdentifierNode(n) + ";\n"s;
     }
   }
 
   for (unsigned i = 0; i < node->GetMethodsNum(); ++i) {
-    if (auto n = node->GetMethodAtIndex(i)) {
-      str += " "s + EmitFunctionNode(n);
-    }
+    if (auto n = node->GetMethodAtIndex(i))
+      str += EmitFunctionNode(n) + "\n"s;
   }
 
-  str += "};\n"s;
+  str += "}\n"s;
   return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitClassNode(ClassNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str = "class "s + node->GetName() + " {"s;
-  //str += " "s + std::to_string(node->IsJavaEnum());
 
-  for (unsigned i = 0; i < node->GetSuperClassesNum(); ++i) {
-    if (auto n = node->GetSuperClass(i)) {
-      str += " "s + EmitTreeNode(n);
-    }
+  std::string str;
+  for (unsigned i = 0; i < node->GetAttributesNum(); ++i)
+    str += AstDump::GetEnumAttrId(node->GetAttribute(i)) + " "s;
+
+  str += "class "s + node->GetName();
+  auto classNum = node->GetSuperClassesNum();
+  for (unsigned i = 0; i < classNum; ++i) {
+    str += i ? ", "s : " extends "s;
+    if (auto n = node->GetSuperClass(i))
+      str += EmitTreeNode(n);
   }
-
   for (unsigned i = 0; i < node->GetSuperInterfacesNum(); ++i) {
-    if (auto n = node->GetSuperInterface(i)) {
-      str += " "s + EmitTreeNode(n);
-    }
+    str += i || classNum ? ", "s : " extends "s;
+    if (auto n = node->GetSuperInterface(i))
+      str += EmitTreeNode(n);
   }
-
-  for (unsigned i = 0; i < node->GetAttributesNum(); ++i) {
-    str += " "s + AstDump::GetEnumAttrId(node->GetAttribute(i));
-  }
+  str += " {\n"s;
 
   for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
     if (auto n = node->GetField(i)) {
       str += " "s + EmitIdentifierNode(n) + ";\n"s;
-    }
-  }
-
-  for (unsigned i = 0; i < node->GetMethodsNum(); ++i) {
-    if (auto n = node->GetMethod(i)) {
-      str += " "s + EmitFunctionNode(n);
     }
   }
 
@@ -1369,25 +1381,30 @@ std::string Emitter::EmitClassNode(ClassNode *node) {
     }
   }
 
+  for (unsigned i = 0; i < node->GetMethodsNum(); ++i) {
+    if (auto n = node->GetMethod(i))
+      str += EmitFunctionNode(n) + "\n"s;
+  }
+
   for (unsigned i = 0; i < node->GetInstInitsNum(); ++i) {
     if (auto n = node->GetInstInit(i)) {
-      str += " "s + EmitBlockNode(n);
+      str += EmitBlockNode(n) + "\n"s;
     }
   }
 
   for (unsigned i = 0; i < node->GetLocalClassesNum(); ++i) {
     if (auto n = node->GetLocalClass(i)) {
-      str += " "s + EmitClassNode(n);
+      str += EmitClassNode(n) + "\n"s;
     }
   }
 
   for (unsigned i = 0; i < node->GetLocalInterfacesNum(); ++i) {
     if (auto n = node->GetLocalInterface(i)) {
-      str += " "s + EmitInterfaceNode(n);
+      str += EmitInterfaceNode(n) + "\n"s;
     }
   }
 
-  str += "};\n";
+  str += "}\n";
   return HandleTreeNode(str, node);
 }
 
