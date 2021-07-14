@@ -936,7 +936,7 @@ private:
   TreeNode              *mType;        // The type
   TreeNode              *mInit;        // An initializer
 public:
-  BindingPatternNode() : TreeNode(NK_BindingPattern), mInit(NULL) {}
+  BindingPatternNode() : TreeNode(NK_BindingPattern), mInit(NULL), mType(NULL) {}
   ~BindingPatternNode() {Release();}
 
   unsigned  GetElementsNum()       {return mElements.GetNum();}
