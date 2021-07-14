@@ -1335,8 +1335,10 @@ std::string Emitter::EmitInterfaceNode(InterfaceNode *node) {
   }
 
   for (unsigned i = 0; i < node->GetMethodsNum(); ++i) {
-    if (auto n = node->GetMethodAtIndex(i))
-      str += EmitFunctionNode(n) + "\n"s;
+    if (auto n = node->GetMethodAtIndex(i)) {
+      std::string func = EmitFunctionNode(n);
+      str += func.length() > 2 && func.substr(func.length() - 2) == ";\n" ? func : func + ";\n"s;
+    }
   }
 
   str += "}\n"s;
@@ -1367,7 +1369,7 @@ std::string Emitter::EmitClassNode(ClassNode *node) {
 
   for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
     if (auto n = node->GetField(i)) {
-      str += " "s + EmitIdentifierNode(n) + ";\n"s;
+      str += EmitIdentifierNode(n) + ";\n"s;
     }
   }
 
@@ -1375,13 +1377,15 @@ std::string Emitter::EmitClassNode(ClassNode *node) {
     if (auto n = node->GetConstructor(i)) {
       std::string func = EmitFunctionNode(n);
       Replace(func, "function", "constructor", 1);
-      str += " "s + func;
+      str += func;
     }
   }
 
   for (unsigned i = 0; i < node->GetMethodsNum(); ++i) {
-    if (auto n = node->GetMethod(i))
-      str += EmitFunctionNode(n) + "\n"s;
+    if (auto n = node->GetMethod(i)) {
+      std::string func = EmitFunctionNode(n);
+      str += func.length() > 2 && func.substr(func.length() - 2) == ";\n" ? func : func + ";\n"s;
+    }
   }
 
   for (unsigned i = 0; i < node->GetInstInitsNum(); ++i) {
