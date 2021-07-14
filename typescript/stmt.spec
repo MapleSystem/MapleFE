@@ -1635,17 +1635,17 @@ rule TypeAnnotation: ':' + Type
 rule CallSignature: ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation)
 
 ## rule ParameterList: RequiredParameterList OptionalParameterList RestParameter RequiredParameterList , OptionalParameterList RequiredParameterList , RestParameter OptionalParameterList , RestParameter RequiredParameterList , OptionalParameterList , RestParameter
-rule ParameterList: ONEOF(RequiredParameterList,
-                          OptionalParameterList,
+rule ParameterList: ONEOF(RequiredParameterList + ZEROORONE(Elision),
+                          OptionalParameterList + ZEROORONE(Elision),
                           RestParameter,
-                          RequiredParameterList + ',' + OptionalParameterList,
+                          RequiredParameterList + ',' + OptionalParameterList + ZEROORONE(Elision),
                           RequiredParameterList + ',' + RestParameter,
                           OptionalParameterList + ',' + RestParameter,
                           RequiredParameterList + ',' + OptionalParameterList + ',' + RestParameter)
 
 ## rule RequiredParameterList: RequiredParameter RequiredParameterList , RequiredParameter
 rule RequiredParameterList: ONEOF(RequiredParameter,
-                                  RequiredParameterList + ',' + ZEROORONE(RequiredParameter))
+                                  RequiredParameterList + ',' + RequiredParameter)
 
 ## rule RequiredParameter: AccessibilityModifieropt BindingIdentifierOrPattern TypeAnnotationopt BindingIdentifier : StringLiteral
 ## NOTE: I extend StringLiteral to Literal.
