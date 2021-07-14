@@ -1,0 +1,10 @@
+Matched 11 tokens.
+Matched 28 tokens.
+Matched 35 tokens.
+============= Module ===========
+== Sub Tree ==
+ts_enum: E {LEFT="left";RIGHT="right" }
+== Sub Tree ==
+js_var Decl: arr=[E.LEFT,E.RIGHT]
+== Sub Tree ==
+console.log(arr)
