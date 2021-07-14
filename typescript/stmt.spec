@@ -385,7 +385,7 @@ rule CallExpression : ONEOF(
   CallExpression + '[' + Expression + ']',
   CallExpression + '.' + JSIdentifier,
   CallExpression + TemplateLiteral,
-  CallExpression + '!')
+  CallExpression + '!' + ZEROORMORE(AsType))
   attr.action.%1,%3 : BuildCall(%1)
   attr.action.%1 : AddAsType(%4)
   attr.action.%1 : AddTypeGenerics(%2)
@@ -394,6 +394,7 @@ rule CallExpression : ONEOF(
   attr.action.%3 : AddAsType(%3)
   attr.action.%5 : BuildField(%1, %3)
   attr.action.%7 : SetIsNonNull(%1)
+  attr.action.%7 : AddAsType(%3)
 
 ##-----------------------------------
 ##rule SuperCall[Yield] :
