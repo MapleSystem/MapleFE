@@ -1,0 +1,7 @@
+Matched 23 tokens.
+Matched 30 tokens.
+============= Module ===========
+== Sub Tree ==
+js_var Decl: map=new Map()
+== Sub Tree ==
+console.log(map)
