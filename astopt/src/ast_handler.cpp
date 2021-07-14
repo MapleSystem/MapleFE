@@ -47,18 +47,18 @@ void Module_Handler::AdjustAST() {
   mAST->AdjustAST();
 }
 
-void Module_Handler::ASTCollectAndDBRemoval(CfgFunc *func) {
+void Module_Handler::ASTCollectAndDBRemoval() {
   if (!mAST) {
     mAST = new(GetMemPool()->Alloc(sizeof(AST_AST))) AST_AST(this, mTrace);
   }
-  mAST->ASTCollectAndDBRemoval(func);
+  mAST->ASTCollectAndDBRemoval();
 }
 
-void Module_Handler::BuildDFA(CfgFunc *func) {
+void Module_Handler::BuildDFA() {
   if (!mDFA) {
     mDFA = new(GetMemPool()->Alloc(sizeof(AST_DFA))) AST_DFA(this, mTrace);
   }
-  mDFA->Build(func);
+  mDFA->Build();
 }
 
 void Module_Handler::BuildScope() {

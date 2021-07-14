@@ -67,6 +67,12 @@ void AST_DFA::TestBV() {
   free(bv2);
 }
 
+void AST_DFA::Build() {
+  for (auto func: mHandler->mModuleFuncs) {
+    Build(func);
+  }
+}
+
 void AST_DFA::Build(CfgFunc *func) {
   Clear();
   // TestBV();

@@ -811,7 +811,7 @@ void CfgBuilder::Build() {
 
   // Set the init function for current module
   CfgFunc *func = InitCfgFunc(module);
-  mHandler->mModuleFuncsMap[module->GetNodeId()].push_back(func);
+  mHandler->mModuleFuncs.push_back(func);
 
   mHandler->SetCfgFunc(func);
 
@@ -837,7 +837,7 @@ void CfgBuilder::Build() {
     for(unsigned i = 0; i < func->GetNestedFuncsNum(); ++i) {
       CfgFunc *f = func->GetNestedFuncAtIndex(i);
       funcQueue.push(f);
-      mHandler->mModuleFuncsMap[module->GetNodeId()].push_back(f);
+      mHandler->mModuleFuncs.push_back(f);
     }
   }
 }

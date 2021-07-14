@@ -51,8 +51,8 @@ class Module_Handler {
   std::unordered_map<unsigned, CfgBB *> mNodeId2BbMap;
 
  public:
-  // module node id to its ast function vector
-  std::unordered_map<unsigned, std::vector<CfgFunc *>> mModuleFuncsMap;
+  // module's ast function vector
+  std::vector<CfgFunc *> mModuleFuncs;
   // only reachable BBs
   std::unordered_map<unsigned, CfgBB *> mBbId2BbMap;
   // identifier node id to decl
@@ -74,8 +74,8 @@ class Module_Handler {
   void BuildScope();
   void RenameVar();
   void BuildCFG();
-  void ASTCollectAndDBRemoval(CfgFunc *func);
-  void BuildDFA(CfgFunc *func);
+  void ASTCollectAndDBRemoval();
+  void BuildDFA();
   void TypeInference();
 
   const char *GetOutputFileName()          {return mOutputFileName;}

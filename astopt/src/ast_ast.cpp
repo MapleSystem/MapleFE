@@ -22,9 +22,11 @@
 
 namespace maplefe {
 
-void AST_AST::ASTCollectAndDBRemoval(CfgFunc *func) {
-  CollectASTInfo(func);
-  RemoveDeadBlocks(func);
+void AST_AST::ASTCollectAndDBRemoval() {
+  for (auto func: mHandler->mModuleFuncs) {
+    CollectASTInfo(func);
+    RemoveDeadBlocks(func);
+  }
 
   ModuleNode *module = mHandler->GetASTModule();
   if (mTrace) {

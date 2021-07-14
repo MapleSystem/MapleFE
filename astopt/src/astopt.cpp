@@ -55,12 +55,11 @@ void AstOpt::ProcessAST(bool trace_a2c) {
     // build CFG
     handler->BuildCFG();
 
-    // loop through functions in the module
-    for (auto func: handler->mModuleFuncsMap[module->GetNodeId()]) {
-      handler->ASTCollectAndDBRemoval(func);
+    // remove dead blocks
+    handler->ASTCollectAndDBRemoval();
 
-      handler->BuildDFA(func);
-    }
+    //data flow analysis for the module
+    handler->BuildDFA();
 
     AstStore saveAst(module);
     saveAst.StoreInAstBuf();

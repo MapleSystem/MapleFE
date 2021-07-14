@@ -98,17 +98,15 @@ void A2C::ProcessAST() {
       astdump.Dump("After BuildCFG()", &std::cout);
     }
 
-    // loop through functions in the module
-    for (auto func: handler->mModuleFuncsMap[module->GetNodeId()]) {
-      handler->ASTCollectAndDBRemoval(func);
-      if (mTraceA2C) {
-        handler->Dump("After ASTCollectAndDBRemoval()");
-      }
+    handler->ASTCollectAndDBRemoval();
+    if (mTraceA2C) {
+      handler->Dump("After ASTCollectAndDBRemoval()");
+    }
 
-      handler->BuildDFA(func);
-      if (mTraceA2C) {
-        // handler->Dump("After BuildDFA()");
-      }
+    // data flow analysis for the module
+    handler->BuildDFA();
+    if (mTraceA2C) {
+      // handler->Dump("After BuildDFA()");
     }
 
     if (mTraceA2C) {
