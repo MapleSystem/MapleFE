@@ -43,8 +43,14 @@ void AstOpt::ProcessAST(bool trace_a2c) {
       }
     }
 
-    // adjust source code
+    // rewirte some AST nodes
     handler->AdjustAST();
+
+    // build scope info
+    handler->BuildScope();
+
+    // rename var with same name, i --> i__vN where N is 1, 2, 3 ...
+    handler->RenameVar();
 
     // build CFG
     handler->BuildCFG();

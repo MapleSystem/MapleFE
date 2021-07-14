@@ -402,7 +402,7 @@ ArrayElementNode *TypeInferVisitor::VisitArrayElementNode(ArrayElementNode *node
               }
             }
           } else {
-            NOTYETIMPL("indexed access type index not literal");
+            NOTYETIMPL("indexed access type index not string literal");
           }
         } else {
           // default
