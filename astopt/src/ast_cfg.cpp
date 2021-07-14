@@ -144,10 +144,11 @@ CondBranchNode *CfgBuilder::VisitCondBranchNode(CondBranchNode *node) {
   //mCurrentBB->AddStatement(node);
   mCurrentBB->SetAuxNode(node);
 
-  TreeNode *cond = node->GetCond();
-  // Set predicate of current BB
-  mCurrentBB->SetPredicate(cond);
-  mCurrentBB->AddStatement(cond);
+  if(TreeNode *cond = node->GetCond()) {
+    // Set predicate of current BB
+    mCurrentBB->SetPredicate(cond);
+    mCurrentBB->AddStatement(cond);
+  }
 
   // Save current BB
   CfgBB *current_bb = mCurrentBB;
@@ -207,10 +208,11 @@ ForLoopNode *CfgBuilder::VisitForLoopNode(ForLoopNode *node) {
   current_bb = mCurrentBB;
 
   if(node->GetProp() == FLP_Regular) {
-    TreeNode *cond = node->GetCond();
-    // Set predicate of current BB
-    mCurrentBB->SetPredicate(cond);
-    mCurrentBB->AddStatement(cond);
+    if(TreeNode *cond = node->GetCond()) {
+      // Set predicate of current BB
+      mCurrentBB->SetPredicate(cond);
+      mCurrentBB->AddStatement(cond);
+    }
   } else
     // Set predicate to be current ForLoopNode when it is FLP_JSIn or FLP_JSOf
     mCurrentBB->SetPredicate(node);
@@ -252,10 +254,11 @@ WhileLoopNode *CfgBuilder::VisitWhileLoopNode(WhileLoopNode *node) {
   // Set current_bb to be loop header
   current_bb = mCurrentBB;
 
-  TreeNode *cond = node->GetCond();
-  // Set predicate of current BB
-  mCurrentBB->SetPredicate(cond);
-  mCurrentBB->AddStatement(cond);
+  if(TreeNode *cond = node->GetCond()) {
+    // Set predicate of current BB
+    mCurrentBB->SetPredicate(cond);
+    mCurrentBB->AddStatement(cond);
+  }
 
   // Create a BB for loop body
   mCurrentBB = NewBB(BK_Uncond);
@@ -304,10 +307,11 @@ DoLoopNode *CfgBuilder::VisitDoLoopNode(DoLoopNode *node) {
   CfgBuilder::Pop(mContinueBBs);
   CfgBuilder::Pop(mBreakBBs);
 
-  TreeNode *cond = node->GetCond();
-  // Set predicate of current BB
-  mCurrentBB->SetPredicate(cond);
-  mCurrentBB->AddStatement(cond);
+  if(TreeNode *cond = node->GetCond()) {
+    // Set predicate of current BB
+    mCurrentBB->SetPredicate(cond);
+    mCurrentBB->AddStatement(cond);
+  }
 
   // Add a back edge to loop header
   mCurrentBB->AddSuccessor(current_bb);
