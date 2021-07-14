@@ -261,7 +261,6 @@ class CfgBuilder : public AstVisitor {
   UserTypeNode *VisitUserTypeNode(UserTypeNode *node);
   IdentifierNode *VisitIdentifierNode(IdentifierNode *node);
   LiteralNode *VisitLiteralNode(LiteralNode *node);
-  StructNode *VisitStructNode(StructNode *node);
   TypeAliasNode *VisitTypeAliasNode(TypeAliasNode *node);
 
   TreeNode *BaseTreeNode(TreeNode *node);

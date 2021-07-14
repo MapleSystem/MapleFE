@@ -707,12 +707,6 @@ LiteralNode *CfgBuilder::VisitLiteralNode(LiteralNode *node) {
 }
 
 // For statement of current BB
-StructNode *CfgBuilder::VisitStructNode(StructNode *node) {
-  mCurrentBB->AddStatement(node);
-  return node;
-}
-
-// For statement of current BB
 TypeAliasNode *CfgBuilder::VisitTypeAliasNode(TypeAliasNode *node) {
   mCurrentBB->AddStatement(node);
   return node;

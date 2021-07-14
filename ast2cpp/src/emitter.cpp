@@ -178,15 +178,13 @@ std::string Emitter::EmitFunctionNode(FunctionNode *node) {
     return std::string();
   std::string str;
   auto body = node->GetBody();
-  if(body) {
-    for (unsigned i = 0; i < node->GetAttrsNum(); ++i) {
-      str += GetEnumAttrId(node->GetAttrAtIndex(i));
-    }
-    if(str.empty())
-      str = "function "s + str;
-    if(node->GetStrIdx())
-      str += node->GetName();
+  for (unsigned i = 0; i < node->GetAttrsNum(); ++i) {
+    str += GetEnumAttrId(node->GetAttrAtIndex(i));
   }
+  if(str.empty())
+    str = "function "s + str;
+  if(node->GetStrIdx())
+    str += node->GetName();
 
   auto num = node->GetTypeParamsNum();
   if(num) {
