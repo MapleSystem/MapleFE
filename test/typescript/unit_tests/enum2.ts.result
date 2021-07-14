@@ -1,0 +1,10 @@
+Matched 21 tokens.
+Matched 28 tokens.
+Matched 35 tokens.
+============= Module ===========
+== Sub Tree ==
+export {ts_enum: ET {TOP=1 Shl 0;BOTTOM=1 Shl 1 }} 
+== Sub Tree ==
+js_let Decl: et=ET.TOP
+== Sub Tree ==
+console.log(et)

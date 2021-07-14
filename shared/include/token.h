@@ -142,6 +142,7 @@ struct Token {
   OprId        GetOprId()     const {return mData.mOprId;}
   SepId        GetSepId()     const {return mData.mSepId;}
   bool         IsWhiteSpace() const {return mData.mSepId == SEP_Whitespace;}
+  bool         IsTab()        const {return mData.mSepId == SEP_Tab;}
   TempLitData* GetTempLitData()   const {return mData.mTempLitData;}
   RegExprData  GetRegExpr()   const {return mData.mRegExprData;}
 

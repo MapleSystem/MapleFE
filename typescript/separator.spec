@@ -40,4 +40,5 @@ STRUCT Separator : ((" ", Whitespace),
                     (":", Colon),
                     ("?", Select),
                     ("?.",Optional),
-                    ("@", At))
+                    ("@", At),
+                    ("\t", Tab))

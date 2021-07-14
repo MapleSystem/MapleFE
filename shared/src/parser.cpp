@@ -377,8 +377,13 @@ unsigned Parser::LexOneLine() {
           if (t->IsWhiteSpace())
             is_whitespace = true;
         }
+        bool is_tab = false;
+        if (t->IsSeparator()) {
+          if (t->IsTab())
+            is_tab = true;
+        }
         // Put into the token storage, as Pending tokens.
-        if (!is_whitespace && !t->IsComment()) {
+        if (!is_whitespace && !is_tab && !t->IsComment()) {
           if (!TokenMerge(t)) {
             t = GetRegExpr(t);
             mActiveTokens.PushBack(t);
