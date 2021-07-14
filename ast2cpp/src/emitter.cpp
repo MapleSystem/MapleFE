@@ -157,7 +157,13 @@ std::string Emitter::EmitIdentifierNode(IdentifierNode *node) {
   //}
 
   if (auto n = node->GetType()) {
-    str += ": "s + EmitTreeNode(n);
+    std::string s = EmitTreeNode(n);
+    if(s.length() > 9 && s.substr(0, 9) == "function ") {
+      std::size_t loc = s.find("(");
+      if(loc != std::string::npos)
+        s = s.substr(loc);
+    }
+    str += ": "s + s;
   }
   if (auto n = node->GetInit()) {
     str += " = "s + EmitTreeNode(n);
