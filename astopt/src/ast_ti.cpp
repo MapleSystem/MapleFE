@@ -398,6 +398,7 @@ ArrayElementNode *TypeInferVisitor::VisitArrayElementNode(ArrayElementNode *node
               if (f->GetStrIdx() == stridx) {
                 TypeId tid = f->GetTypeId();
                 UpdateTypeId(node, tid);
+                break;
               }
             }
           } else {
