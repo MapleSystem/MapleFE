@@ -1,0 +1,113 @@
+Matched 9 tokens.
+Matched 18 tokens.
+Matched 27 tokens.
+Matched 36 tokens.
+Matched 45 tokens.
+Matched 54 tokens.
+Matched 63 tokens.
+Matched 72 tokens.
+Matched 81 tokens.
+Matched 90 tokens.
+Matched 99 tokens.
+Matched 108 tokens.
+Matched 117 tokens.
+Matched 126 tokens.
+Matched 135 tokens.
+Matched 144 tokens.
+Matched 153 tokens.
+Matched 162 tokens.
+Matched 171 tokens.
+Matched 180 tokens.
+Matched 189 tokens.
+Matched 198 tokens.
+Matched 207 tokens.
+Matched 216 tokens.
+Matched 225 tokens.
+Matched 234 tokens.
+Matched 243 tokens.
+Matched 252 tokens.
+============= Module ===========
+== Sub Tree ==
+func  abstract()  throws: 
+  return "abstract"
+
+== Sub Tree ==
+console.log(abstract())
+== Sub Tree ==
+func  as()  throws: 
+  return "as"
+
+== Sub Tree ==
+console.log(as())
+== Sub Tree ==
+func  async()  throws: 
+  return "async"
+
+== Sub Tree ==
+console.log(async())
+== Sub Tree ==
+func  await()  throws: 
+  return "await"
+
+== Sub Tree ==
+console.log(await())
+== Sub Tree ==
+func  constructor()  throws: 
+  return "constructor"
+
+== Sub Tree ==
+console.log(constructor())
+== Sub Tree ==
+func  declare()  throws: 
+  return "declare"
+
+== Sub Tree ==
+console.log(declare())
+== Sub Tree ==
+func  from()  throws: 
+  return "from"
+
+== Sub Tree ==
+console.log(from())
+== Sub Tree ==
+func  get()  throws: 
+  return "get"
+
+== Sub Tree ==
+console.log(get())
+== Sub Tree ==
+func  is()  throws: 
+  return "is"
+
+== Sub Tree ==
+console.log(is())
+== Sub Tree ==
+func  module()  throws: 
+  return "module"
+
+== Sub Tree ==
+console.log(module())
+== Sub Tree ==
+func  namespace()  throws: 
+  return "namespace"
+
+== Sub Tree ==
+console.log(namespace())
+== Sub Tree ==
+func  of()  throws: 
+  return "of"
+
+== Sub Tree ==
+console.log(of())
+== Sub Tree ==
+func  require()  throws: 
+  return "require"
+
+== Sub Tree ==
+console.log(require())
+== Sub Tree ==
+func  set()  throws: 
+  return "set"
+
+== Sub Tree ==
+console.log(set())

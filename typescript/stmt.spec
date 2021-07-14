@@ -64,7 +64,16 @@ rule KeywordIdentifier : ONEOF("get",
                                "never",
                                "number",
                                "constructor",
-                               "delete")
+                               "delete",
+                               "abstract",
+                               "as",
+                               "async",
+                               "await",
+                               "from",
+                               "is",
+                               "of",
+                               "declare",
+                               "namespace")
   attr.action : BuildIdentifier()
 
 rule JSIdentifier: ONEOF(Identifier,

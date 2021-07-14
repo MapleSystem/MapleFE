@@ -92,6 +92,7 @@ STRUCT KeyWord : ((boolean),
 #this part is for future reserved
                   (enum),
                   (await),
+                  (async),
 
 #this is for 'fake rule only'
                   (this_is_for_fake_rule))
