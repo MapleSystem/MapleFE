@@ -1549,6 +1549,8 @@ rule NamespaceName: ONEOF(IdentifierReference,
 
 ## rule ObjectType: { TypeBodyopt }
 rule ObjectType : '{' + ZEROORONE(TypeBody) + '}'
+  attr.action : BuildStruct()
+  attr.action : AddStructField(%2)
 
 ## rule TypeBody: TypeMemberList ;opt TypeMemberList ,opt
 rule TypeBody : ONEOF(TypeMemberList + ZEROORONE(';'),
@@ -1796,10 +1798,10 @@ rule FunctionDeclaration : ONEOF(
 
 ##InterfaceDeclaration: interface BindingIdentifier TypeParametersopt InterfaceExtendsClauseopt ObjectType
 rule InterfaceDeclaration :
-  "interface" + BindingIdentifier + ZEROORONE(TypeParameters) + ZEROORONE(InterfaceExtendsClause) + ObjectType
+  "interface" + BindingIdentifier + ZEROORONE(TypeParameters) + ZEROORONE(InterfaceExtendsClause) + '{' + ZEROORONE(TypeBody) + '}' 
   attr.action : BuildStruct(%2)
   attr.action : SetTSInterface()
-  attr.action : AddStructField(%5)
+  attr.action : AddStructField(%6)
   attr.action : AddSuperInterface(%4)
 
 ##InterfaceExtendsClause: extends ClassOrInterfaceTypeList

@@ -7,4 +7,4 @@ ts_interface: JQueryEventObjectTest {data;which;metaKey }
 == Sub Tree ==
 ts_interface: SecondEvent {data }
 == Sub Tree ==
-ts_interface: Third {Third }
+ts_interface: Third { }

@@ -4,4 +4,4 @@ Matched 25 tokens.
 == Sub Tree ==
 ts_interface: IntfX {IntfX_fd }
 == Sub Tree ==
- type Test = intersect  = IntfX & intersect_fd
+ type Test = intersect  = IntfX &  {intersect_fd }

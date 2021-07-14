@@ -761,7 +761,10 @@ void StructNode::Dump(unsigned indent) {
   default:
     break;
   }
-  mStructId->Dump(0);
+
+  if (mStructId)
+    mStructId->Dump(0);
+
   DUMP0_NORETURN(" {");
 
   if (mNumIndexSig) {

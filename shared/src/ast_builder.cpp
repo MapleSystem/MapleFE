@@ -1644,14 +1644,19 @@ TreeNode* ASTBuilder::BuildStrIndexSig() {
 }
 
 // It takes only one parameter: name.
+// Or it take no param, meaning the name is empty.
 TreeNode* ASTBuilder::BuildStruct() {
   if (mTrace)
     std::cout << "In BuildStruct" << std::endl;
 
-  Param p_name = mParams[0];
-  MASSERT(p_name.mIsTreeNode);
-  TreeNode *name = p_name.mData.mTreeNode;
-  MASSERT(name->IsIdentifier());
+  TreeNode *name = NULL;
+
+  if (mParams.size() == 1) {
+    Param p_name = mParams[0];
+    MASSERT(p_name.mIsTreeNode);
+    name = p_name.mData.mTreeNode;
+    MASSERT(name->IsIdentifier());
+  }
 
   StructNode *struct_node = (StructNode*)gTreePool.NewTreeNode(sizeof(StructNode));
   new (struct_node) StructNode((IdentifierNode*)name);
@@ -1665,13 +1670,14 @@ TreeNode* ASTBuilder::AddStructField() {
   if (mTrace)
     std::cout << "In AddStructField" << std::endl;
   Param p_field = mParams[0];
-  MASSERT(p_field.mIsTreeNode);
-  TreeNode *field = p_field.mData.mTreeNode;
-
-  MASSERT(mLastTreeNode->IsStruct());
-  StructNode *struct_node = (StructNode*)mLastTreeNode;
-  struct_node->AddChild(field);
-
+  if (!p_field.mIsEmpty) {
+    MASSERT(p_field.mIsTreeNode);
+    TreeNode *field = p_field.mData.mTreeNode;
+  
+    MASSERT(mLastTreeNode->IsStruct());
+    StructNode *struct_node = (StructNode*)mLastTreeNode;
+    struct_node->AddChild(field);
+  }
   return mLastTreeNode;
 }
 

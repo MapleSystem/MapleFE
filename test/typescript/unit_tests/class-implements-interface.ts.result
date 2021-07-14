@@ -4,7 +4,7 @@ Matched 17 tokens.
 Matched 29 tokens.
 ============= Module ===========
 == Sub Tree ==
-ts_interface: Intf1 {Intf1 }
+ts_interface: Intf1 { }
 == Sub Tree ==
 class  C1
   Fields: 
@@ -16,7 +16,7 @@ class  C1
   LocalInterfaces: 
 
 == Sub Tree ==
-ts_interface: Intf2 {Intf2 }
+ts_interface: Intf2 { }
 == Sub Tree ==
 class  C2
   Fields: 
