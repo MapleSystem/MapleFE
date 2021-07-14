@@ -283,7 +283,9 @@ bool Parser::TokenMerge(Token *t) {
   //   [-1    <-- sep is a separtor
   Token *sep = mActiveTokens.ValueAtIndex(size - 2);
   bool is_sep = false;
-  if (sep->IsSeparator() && (sep->GetSepId() != SEP_Rparen))
+  if (sep->IsSeparator() &&
+     (sep->GetSepId() != SEP_Rparen) &&
+     (sep->GetSepId() != SEP_Rbrack))
     is_sep = true;
   if (sep->IsOperator() && sep->GetOprId() == OPR_Assign)
     is_sep = true;

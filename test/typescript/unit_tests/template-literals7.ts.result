@@ -1,0 +1,13 @@
+Matched 15 tokens.
+Matched 22 tokens.
+Matched 29 tokens.
+Matched 35 tokens.
+Matched 41 tokens.
+Matched 47 tokens.
+============= Module ===========
+== Sub Tree ==
+js_var Decl: arr=[1,2,3]
+== Sub Tree ==
+js_var Decl: s= template-literal: NULL,arr[0] Add 1,"/",arr[1] Add 1,"/",arr[2] Add 1
+== Sub Tree ==
+console.log(s)
