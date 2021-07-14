@@ -7,7 +7,7 @@ func  foo()  throws:
   return new Array()
 
 == Sub Tree ==
-export {js_const Decl: obj=() -> return  as Array<number>
+export {js_const Decl: obj=() -> return foo()
 ()} 
 == Sub Tree ==
 console.log(obj)

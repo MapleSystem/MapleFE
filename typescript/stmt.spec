@@ -394,7 +394,7 @@ rule CallExpression : ONEOF(
   attr.action.%3 : AddAsType(%3)
   attr.action.%5 : BuildField(%1, %3)
   attr.action.%7 : SetIsNonNull(%1)
-  attr.action.%7 : AddAsType(%3)
+  attr.action.%7 : AddAsType(%1, %3)
 
 ##-----------------------------------
 ##rule SuperCall[Yield] :
