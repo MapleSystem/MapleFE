@@ -51,6 +51,7 @@ void UserTypeNode::AddUnionInterType(TreeNode *args) {
 void UserTypeNode::AddTypeGeneric(TreeNode *args) {
   if (args->IsIdentifier() ||
       args->IsPrimType() ||
+      args->IsPrimArrayType() ||
       args->IsUserType() ||
       args->IsTypeParameter() ||
       args->IsLiteral() ||
