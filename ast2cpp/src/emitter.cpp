@@ -776,7 +776,10 @@ std::string Emitter::EmitBindingElementNode(BindingElementNode *node) {
 std::string Emitter::EmitBindingPatternNode(BindingPatternNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str = "["s;
+  // Needs a flag to distinguish between array destructuring and object destructuring
+  // Object destructuring: optional-prop.ts
+  // Array destructuring:  trailing-commas.ts
+  std::string str = "{"s;
 
   for (unsigned i = 0; i < node->GetElementsNum(); ++i) {
     if (i)
@@ -785,7 +788,7 @@ std::string Emitter::EmitBindingPatternNode(BindingPatternNode *node) {
       str += EmitTreeNode(n);
     }
   }
-  str += "]"s;
+  str += "}"s;
 
   if (auto n = node->GetType()) {
     str += ": "s + EmitTreeNode(n);
