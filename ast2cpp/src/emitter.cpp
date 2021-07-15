@@ -1389,7 +1389,7 @@ std::string Emitter::EmitClassNode(ClassNode *node) {
 
   for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
     if (auto n = node->GetField(i)) {
-      str += EmitIdentifierNode(n) + ";\n"s;
+      str += EmitTreeNode(n) + ";\n"s;
     }
   }
 

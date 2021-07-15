@@ -1844,7 +1844,7 @@ private:
   SmallVector<AttrId>          mAttributes;
   SmallVector<AnnotationNode*> mAnnotations; //annotation or pragma
 
-  SmallVector<IdentifierNode*> mFields;       // aka Field
+  SmallVector<TreeNode*>       mFields;  // a Field could be identifier or computed name
   SmallVector<FunctionNode*>   mMethods;
   SmallVector<FunctionNode*>   mConstructors;
   SmallVector<BlockNode*>      mInstInits;     // instance initializer
@@ -1879,7 +1879,7 @@ public:
   void      SetSuperInterface(unsigned i, TreeNode* n) {*(mSuperInterfaces.RefAtIndex(i)) = n;}
 
   void AddAttribute(AttrId a) {mAttributes.PushBack(a);}
-  void AddField(IdentifierNode *n) {mFields.PushBack(n); SETPARENT(n);}
+  void AddField(TreeNode *n) {mFields.PushBack(n); SETPARENT(n);}
   void AddMethod(FunctionNode *n) {mMethods.PushBack(n);}
   void AddConstructor(FunctionNode *n) {mConstructors.PushBack(n);}
   void AddInstInit(BlockNode *n) {mInstInits.PushBack(n);}
@@ -1903,8 +1903,8 @@ public:
 
   AttrId GetAttribute(unsigned i)              {return mAttributes.ValueAtIndex(i);}
   void   SetAttribute(unsigned i, AttrId n) {*(mAttributes.RefAtIndex(i)) = n;}
-  IdentifierNode* GetField(unsigned i)         {return mFields.ValueAtIndex(i);}
-  void            SetField(unsigned i, IdentifierNode* n) {*(mFields.RefAtIndex(i)) = n; SETPARENT(n);}
+  TreeNode* GetField(unsigned i)         {return mFields.ValueAtIndex(i);}
+  void      SetField(unsigned i, TreeNode* n) {*(mFields.RefAtIndex(i)) = n; SETPARENT(n);}
   FunctionNode* GetMethod(unsigned i)          {return mMethods.ValueAtIndex(i);}
   void          SetMethod(unsigned i, FunctionNode* n) {*(mMethods.RefAtIndex(i)) = n;}
   FunctionNode* GetConstructor(unsigned i)     {return mConstructors.ValueAtIndex(i);}

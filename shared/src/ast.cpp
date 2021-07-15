@@ -1337,10 +1337,9 @@ void ClassNode::Construct(BlockNode *block) {
           inode->SetParent(this);
           mFields.PushBack(inode);
         }
-      } else if (var->IsIdentifier()) {
-        IdentifierNode *inode = (IdentifierNode*)var;
-        mFields.PushBack(inode);
-        inode->SetParent(this);
+      } else if (var->IsIdentifier() || var->IsComputedName()) {
+        mFields.PushBack(var);
+        var->SetParent(this);
       } else
         MERROR("Unsupported class field.");
     } else if (tree_node->IsFunction()) {

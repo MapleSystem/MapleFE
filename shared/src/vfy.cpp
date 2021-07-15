@@ -85,7 +85,7 @@ void Verifier::CollectAllDeclsTypes(ASTScope *scope) {
   // All fields, methods, local classes, local interfaces are decls.
   // All local classes/interfaces are types.
   for (unsigned i = 0; i < klass->GetFieldsNum(); i++) {
-    IdentifierNode *in = klass->GetField(i);
+    TreeNode *in = klass->GetField(i);
     scope->AddDecl(in);
   }
   for (unsigned i = 0; i < klass->GetMethodsNum(); i++) {
@@ -250,7 +250,7 @@ void Verifier::VerifyFunction(FunctionNode *func){
 void Verifier::VerifyClassFields(ClassNode *klass) {
   // rule 1. No duplicated fields name with another decls.
   for (unsigned i = 0; i < klass->GetFieldsNum(); i++) {
-    IdentifierNode *na = klass->GetField(i);
+    TreeNode *na = klass->GetField(i);
     bool hit_self = false;
     for (unsigned j = 0; j < mCurrScope->GetDeclNum(); j++) {
       TreeNode *nb = mCurrScope->GetDecl(j);
