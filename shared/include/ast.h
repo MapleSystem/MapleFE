@@ -2081,6 +2081,29 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////
+//                  InKeyOf Expression
+// First coming from Javascript. It's like
+// A is IN B.
+// B is a set of properties. A is one of the properties.
+////////////////////////////////////////////////////////////////////////////
+
+class InKeyOfNode : public TreeNode {
+private:
+  TreeNode *mLeft;
+  TreeNode *mRight;
+public:
+  InKeyOfNode() : TreeNode(NK_InKeyOf), mLeft(NULL), mRight(NULL) {}
+  ~InKeyOfNode(){Release();}
+
+  TreeNode* GetLeft() {return mLeft;}
+  void SetLeft(TreeNode *n) {mLeft = n;}
+  TreeNode* GetRight() {return mRight;}
+  void SetRight(TreeNode *n){mRight = n;}
+
+  void Dump(unsigned);
+};
+
+////////////////////////////////////////////////////////////////////////////
 //                  Is Expression
 // First coming from Typescript. It's like
 // A is B.
