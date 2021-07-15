@@ -66,8 +66,10 @@ public:
 
   void AddChild(ASTScope*);
 
+  unsigned GetChildrenNum() {return mChildren.GetNum();}
   unsigned GetDeclNum() {return mDecls.GetNum();}
   unsigned GetTypeNum() {return mTypes.GetNum();}
+  ASTScope* GetChild(unsigned i) {return mChildren.ValueAtIndex(i);}
   TreeNode* GetDecl(unsigned i) {return mDecls.ValueAtIndex(i);}
   TreeNode* GetType(unsigned i) {return mTypes.ValueAtIndex(i);}
 

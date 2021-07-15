@@ -20,9 +20,9 @@ namespace maplefe {
 
 void ASTScope::AddChild(ASTScope *s) {
   for (unsigned i = 0; i < mChildren.GetNum(); i++) {
-    ASTScope *scope = mChildren.ValueAtIndex(i);
-    if (s == scope)
+    if (s == GetChild(i)) {
       return;
+    }
   }
 
   mChildren.PushBack(s);
@@ -121,15 +121,37 @@ ASTScope* ASTScopePool::NewScope(ASTScope *parent) {
 
 void ASTScope::Dump(unsigned indent) {
   mTree->DumpIndentation(indent);
-  std::cout << "name: " << AstDump::GetEnumNodeKind(mTree->GetKind()) << " " <<mTree->GetName() << std::endl;
-  for (unsigned i = 0; i < mDecls.GetNum(); i++) {
-    DeclNode *dn = static_cast<DeclNode *>(mDecls.ValueAtIndex(i));
-    dn->DumpIndentation(indent);
-    std::cout << "  decl: " << dn->GetName() << std::endl;
+  std::cout << "name: " << AstDump::GetEnumNodeKind(mTree->GetKind()) << " " << mTree->GetName() << " " << mTree->GetNodeId() << std::endl;
+  for (unsigned i = 0; i < GetDeclNum(); i++) {
+    TreeNode *node = GetDecl(i);
+    node->DumpIndentation(indent);
+    switch (node->GetKind()) {
+      case NK_Identifier: {
+        IdentifierNode *n = static_cast<IdentifierNode *>(node);
+        std::cout << "  decl: " << n->GetName() << " " << n->GetNodeId() << std::endl;
+        break;
+      }
+      case NK_Decl: {
+        DeclNode *n = static_cast<DeclNode *>(node);
+        std::cout << "  func: " << n->GetName() << " " << n->GetNodeId() << std::endl;
+        break;
+      }
+      case NK_Function: {
+        FunctionNode *n = static_cast<FunctionNode *>(node);
+        std::cout << "  func: " << n->GetName() << " " << n->GetNodeId() << std::endl;
+        break;
+      }
+    }
   }
 
-  for (unsigned i = 0; i < mChildren.GetNum(); i++) {
-    ASTScope *scope = mChildren.ValueAtIndex(i);
+  for (unsigned i = 0; i < GetTypeNum(); i++) {
+    TreeNode *node = GetType(i);
+    node->DumpIndentation(indent);
+    std::cout << "  type: " << node->GetName() << " " << node->GetNodeId() << std::endl;
+  }
+
+  for (unsigned i = 0; i < GetChildrenNum(); i++) {
+    ASTScope *scope = GetChild(i);
     scope->Dump(indent + 2);
   }
 }
