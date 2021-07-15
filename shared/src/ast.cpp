@@ -1342,6 +1342,9 @@ void ClassNode::Construct(BlockNode *block) {
         var->SetParent(this);
       } else
         MERROR("Unsupported class field.");
+    } else if (tree_node->IsNumIndexSig() || tree_node->IsStrIndexSig()) {
+      mFields.PushBack(tree_node);
+      tree_node->SetParent(this);
     } else if (tree_node->IsFunction()) {
       FunctionNode *f = (FunctionNode*)tree_node;
       if (f->IsConstructor())

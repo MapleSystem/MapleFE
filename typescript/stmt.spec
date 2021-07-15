@@ -1705,8 +1705,8 @@ rule ConstructSignature :
 rule IndexSignature: ONEOF(
   '[' + BindingIdentifier + ':' + "string" + ']' + TypeAnnotation,
   '[' + BindingIdentifier + ':' + "number" + ']' + TypeAnnotation)
-  attr.action.%1 : BuildStrIndexSig(%6)
-  attr.action.%2 : BuildNumIndexSig(%6)
+  attr.action.%1 : BuildStrIndexSig(%2, %6)
+  attr.action.%2 : BuildNumIndexSig(%2, %6)
 
 ## rule MethodSignature: PropertyName ?opt CallSignature
 ## I inlined CallSignature
@@ -1880,7 +1880,8 @@ rule PropertyMemberDeclaration: ONEOF(MemberVariableDeclaration,
 ## MemberVariableDeclaration: AccessibilityModifieropt staticopt PropertyName TypeAnnotationopt Initializeropt ;
 rule MemberVariableDeclaration: ONEOF(
   ZEROORMORE(Annotation) + ZEROORMORE(AccessibilityModifier) + PropertyName + ZEROORONE(TypeAnnotation) + ZEROORONE(Initializer) + ZEROORONE(';'),
-  ZEROORMORE(Annotation) + ZEROORMORE(AccessibilityModifier) + PropertyName + '?' + ZEROORONE(TypeAnnotation) + ZEROORONE(Initializer) + ZEROORONE(';'))
+  ZEROORMORE(Annotation) + ZEROORMORE(AccessibilityModifier) + PropertyName + '?' + ZEROORONE(TypeAnnotation) + ZEROORONE(Initializer) + ZEROORONE(';'),
+  IndexSignature)
   attr.action.%1: AddInitTo(%3, %5)
   attr.action.%1: AddType(%3, %4)
   attr.action.%1: AddModifierTo(%3, %2)

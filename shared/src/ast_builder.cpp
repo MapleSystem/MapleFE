@@ -1607,34 +1607,44 @@ TreeNode* ASTBuilder::BuildBindingPattern() {
 //                         StructNode, StructLiteralNode, FieldLiteralNode
 //////////////////////////////////////////////////////////////////////////////////
 
-// It takes only one parameter: the data type.
+// It takes two parameters: name of key, the data type.
 TreeNode* ASTBuilder::BuildNumIndexSig() {
   if (mTrace)
     std::cout << "In BuildNumIndexSig" << std::endl;
 
-  Param p_data = mParams[0];
+  Param p_key = mParams[0];
+  MASSERT(p_key.mIsTreeNode);
+  TreeNode *key = p_key.mData.mTreeNode;
+
+  Param p_data = mParams[1];
   MASSERT(p_data.mIsTreeNode);
   TreeNode *data = p_data.mData.mTreeNode;
 
   NumIndexSigNode *sig = (NumIndexSigNode*)gTreePool.NewTreeNode(sizeof(NumIndexSigNode));
   new (sig) NumIndexSigNode();
+  sig->SetKey(key);
   sig->SetDataType(data);
 
   mLastTreeNode = sig;
   return mLastTreeNode;
 }
 
-// It takes only one parameter: the data type.
+// It takes two parameters: name of key, the data type.
 TreeNode* ASTBuilder::BuildStrIndexSig() {
   if (mTrace)
     std::cout << "In BuildStrIndexSig" << std::endl;
 
-  Param p_data = mParams[0];
+  Param p_key = mParams[0];
+  MASSERT(p_key.mIsTreeNode);
+  TreeNode *key = p_key.mData.mTreeNode;
+
+  Param p_data = mParams[1];
   MASSERT(p_data.mIsTreeNode);
   TreeNode *data = p_data.mData.mTreeNode;
 
   StrIndexSigNode *sig = (StrIndexSigNode*)gTreePool.NewTreeNode(sizeof(StrIndexSigNode));
   new (sig) StrIndexSigNode();
+  sig->SetKey(key);
   sig->SetDataType(data);
 
   mLastTreeNode = sig;

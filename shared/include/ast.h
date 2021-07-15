@@ -974,24 +974,30 @@ enum StructProp {
 
 class NumIndexSigNode : public TreeNode{
 public:
+  TreeNode *mKey;
   TreeNode *mDataType;
 
+  void      SetKey(TreeNode *t) {mKey = t;}
+  TreeNode* GetKey()            {return mKey;}
   void      SetDataType(TreeNode *t) {mDataType = t;}
   TreeNode* GetDataType()            {return mDataType;}
 
-  NumIndexSigNode() : TreeNode(NK_NumIndexSig), mDataType(NULL) {}
+  NumIndexSigNode() : TreeNode(NK_NumIndexSig), mDataType(NULL), mKey(NULL) {}
   ~NumIndexSigNode(){}
   void Dump(unsigned);
 };
 
 class StrIndexSigNode : public TreeNode{
 public:
+  TreeNode *mKey;
   TreeNode *mDataType;
 
+  void      SetKey(TreeNode *t) {mKey = t;}
+  TreeNode* GetKey()            {return mKey;}
   void      SetDataType(TreeNode *t) {mDataType = t;}
   TreeNode* GetDataType()            {return mDataType;}
 
-  StrIndexSigNode() : TreeNode(NK_StrIndexSig), mDataType(NULL) {}
+  StrIndexSigNode() : TreeNode(NK_StrIndexSig), mDataType(NULL), mKey(NULL) {}
   ~StrIndexSigNode(){}
   void Dump(unsigned);
 };

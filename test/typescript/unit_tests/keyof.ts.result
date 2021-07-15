@@ -8,7 +8,7 @@ Matched 49 tokens.
 == Sub Tree ==
 class  Klass
   Fields: 
-
+    number
   Instance Initializer: 
   Constructors: 
   Methods: 
