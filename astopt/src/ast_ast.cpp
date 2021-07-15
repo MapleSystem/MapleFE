@@ -163,16 +163,6 @@ FunctionNode *AdjustASTVisitor::VisitFunctionNode(FunctionNode *node) {
       newtype->SetStrIdx(inode->GetStrIdx());
     }
   }
-  // fill stridx
-  if (node->GetStrIdx() == 0) {
-    if (node->IsConstructor()) {
-      node->SetStrIdx(gStringPool.GetStrIdx("constructor"));
-    } else if (node->IsGetAccessor()) {
-      node->SetStrIdx(gStringPool.GetStrIdx("get"));
-    } else if (node->IsSetAccessor()) {
-      node->SetStrIdx(gStringPool.GetStrIdx("set"));
-    }
-  }
   return node;
 }
 
