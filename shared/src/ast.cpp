@@ -730,6 +730,8 @@ void StructNode::AddChild(TreeNode *field) {
     SetNumIndexSig((NumIndexSigNode*)field);
   } else if (field->IsStrIndexSig()) {
     SetStrIndexSig((StrIndexSigNode*)field);
+  } else if (field->IsInKeyOf()) {
+    AddInKeyOf((InKeyOfNode*)field);
   } else
     MERROR("Unsupported struct field type.");
 }
@@ -788,6 +790,13 @@ void StructNode::Dump(unsigned indent) {
     if (i != mMethods.GetNum()-1)
       DUMP0_NORETURN(";");
   }
+
+  for (unsigned i = 0; i < mInKeyOfs.GetNum(); i++) {
+    mInKeyOfs.ValueAtIndex(i)->Dump(0);
+    if (i != mInKeyOfs.GetNum()-1)
+      DUMP0_NORETURN(";");
+  }
+
   DUMP0_NORETURN(" }");
 }
 
@@ -1687,7 +1696,9 @@ void InKeyOfNode::Dump(unsigned indent) {
   mLeft->Dump(0);
   DUMP0_NORETURN(" in keyof ");
   mRight->Dump(0);
-  DUMP0_NORETURN("]");
+  DUMP0_NORETURN("] : ");
+  if (mExtendType)
+    mExtendType->Dump(0);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////

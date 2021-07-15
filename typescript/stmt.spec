@@ -1493,7 +1493,7 @@ rule TypeArgumentList: ONEOF(TypeArgument,
 ## rule TypeArgument: Type
 rule TypeArgument: Type
 
-rule ConditionalType : Type + "extends" + Type + '?' + Type + ':' + Type
+rule ConditionalType : MemberExpression + "extends" + Type + '?' + Type + ':' + Type
   attr.action : BuildConditionalType(%1, %3, %5, %7)
 
 #rule Type : ONEOF(UnionOrIntersectionOrPrimaryType,
@@ -1621,13 +1621,18 @@ rule TypeQueryExpression: ONEOF(IdentifierReference,
 ## rule ThisType: this
 rule ThisType: "this"
 
+rule InKeyOf : '[' + Identifier + "in" + "keyof" + Identifier + ']'
+  attr.action : BuildInKeyOf(%2, %5)
+
 ## rule PropertySignature: PropertyName ?opt TypeAnnotationopt
 rule PropertySignature: ONEOF(ZEROORONE(AccessibilityModifier) + PropertyName + ZEROORONE(TypeAnnotation),
-                              ZEROORONE(AccessibilityModifier) + PropertyName + '?' + ZEROORONE(TypeAnnotation))
+                              ZEROORONE(AccessibilityModifier) + PropertyName + '?' + ZEROORONE(TypeAnnotation),
+                              InKeyOf + TypeAnnotation)
   attr.action.%1 : AddType(%2, %3)
   attr.action.%2 : AddType(%2, %4)
   attr.action.%2 : SetIsOptional(%2)
   attr.action.%1,%2: AddModifierTo(%2, %1)
+  attr.action.%3 : AddType(%1, %2)
 
 ## JS ECMA has more definition than this Typescript one. I use ECMA one.
 ## rule PropertyName: IdentifierName StringLiteral NumericLiteral

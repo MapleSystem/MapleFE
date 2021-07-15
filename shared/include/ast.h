@@ -76,6 +76,7 @@ class AsTypeNode;
 class IdentifierNode;
 class FunctionNode;
 class UserTypeNode;
+class InKeyOfNode;
 class ASTScope;
 
 class TreeNode {
@@ -1004,6 +1005,7 @@ private:
   SmallVector<IdentifierNode*> mFields;
   SmallVector<FunctionNode*>   mMethods;
   SmallVector<TreeNode*>       mSupers;
+  SmallVector<InKeyOfNode*>    mInKeyOfs;
 
   // These are for 'number' or 'string' index data type
   NumIndexSigNode *mNumIndexSig;
@@ -1040,9 +1042,14 @@ public:
   void          SetMethod(unsigned i, FunctionNode* n) {*(mMethods.RefAtIndex(i)) = n;}
   void          AddMethod(FunctionNode *n) {mMethods.PushBack(n);}
 
+  unsigned      GetInKeyOfsNum() {return mInKeyOfs.GetNum();}
+  InKeyOfNode*  GetInKeyOf(unsigned i) {return mInKeyOfs.ValueAtIndex(i);}
+  void          SetInKeyOf(unsigned i, InKeyOfNode* n) {*(mInKeyOfs.RefAtIndex(i)) = n;}
+  void          AddInKeyOf(InKeyOfNode *n) {mInKeyOfs.PushBack(n);}
+
   void AddChild(TreeNode *);
 
-  void Release() {mFields.Release(); mMethods.Release(); mSupers.Release();}
+  void Release() {mFields.Release(); mMethods.Release(); mSupers.Release(); mInKeyOfs.Release();}
   void Dump(unsigned);
 };
 
@@ -2083,22 +2090,26 @@ public:
 ////////////////////////////////////////////////////////////////////////////
 //                  InKeyOf Expression
 // First coming from Javascript. It's like
-// A is IN B.
-// B is a set of properties. A is one of the properties.
+// [A in keyof B] : ExtendType
 ////////////////////////////////////////////////////////////////////////////
 
 class InKeyOfNode : public TreeNode {
 private:
   TreeNode *mLeft;
   TreeNode *mRight;
+  TreeNode *mExtendType;  // This is usually the type extending expression
+                          // following the InKeyOf
 public:
-  InKeyOfNode() : TreeNode(NK_InKeyOf), mLeft(NULL), mRight(NULL) {}
+  InKeyOfNode() : TreeNode(NK_InKeyOf),
+                  mLeft(NULL), mRight(NULL), mExtendType(NULL) {}
   ~InKeyOfNode(){Release();}
 
   TreeNode* GetLeft() {return mLeft;}
   void SetLeft(TreeNode *n) {mLeft = n;}
   TreeNode* GetRight() {return mRight;}
   void SetRight(TreeNode *n){mRight = n;}
+  TreeNode* GetExtendType() {return mExtendType;}
+  void SetExtendType(TreeNode *n){mExtendType = n;}
 
   void Dump(unsigned);
 };
