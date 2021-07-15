@@ -1,0 +1,4 @@
+Matched 23 tokens.
+============= Module ===========
+== Sub Tree ==
+ type mutableType<T> =  {[prop in  keyof T] : T[prop] }

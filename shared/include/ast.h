@@ -2093,19 +2093,30 @@ public:
 // [ xxx ]
 ////////////////////////////////////////////////////////////////////////////
 
+enum CompNameProp {
+  CNP_Rem_ReadOnly,
+  CNP_Add_ReadOnly,
+  CNP_Rem_Optional,
+  CNP_Add_Optional,
+  CNP_NA
+};
+
 class ComputedNameNode : public TreeNode {
 private:
+  CompNameProp mProp;
   TreeNode *mExpr;
   TreeNode *mExtendType;  // This is the type extending expression
                           // of the mapped property
 public:
   ComputedNameNode() : TreeNode(NK_ComputedName),
-                  mExpr(NULL), mExtendType(NULL) {}
+    mProp(CNP_NA), mExpr(NULL), mExtendType(NULL) {}
   ~ComputedNameNode(){Release();}
+
+  CompNameProp GetProp()               {return mProp;}
+  void         SetProp(CompNameProp p) {mProp = p;}
 
   TreeNode* GetExpr()            {return mExpr;}
   void      SetExpr(TreeNode *n) {mExpr = n;}
-
   TreeNode* GetExtendType()            {return mExtendType;}
   void      SetExtendType(TreeNode *n) {mExtendType = n;}
 

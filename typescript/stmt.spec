@@ -277,8 +277,10 @@ rule LiteralPropertyName : ONEOF(JSIdentifier, Literal)
 ##-----------------------------------
 ##rule ComputedPropertyName[Yield] :
 ##  [ AssignmentExpression[In, ?Yield] ]
-rule ComputedPropertyName : '[' + AssignmentExpression + ']'
-  attr.action : BuildComputedName(%2)
+rule ComputedPropertyName : ONEOF('[' + AssignmentExpression + ']',
+                                  '-' + "readonly" + '[' + AssignmentExpression + ']')
+  attr.action.%1 : BuildComputedName(%2)
+  attr.action.%2 : BuildComputedName(%4)
 
 ##-----------------------------------
 ##rule CoverInitializedName[Yield] :
