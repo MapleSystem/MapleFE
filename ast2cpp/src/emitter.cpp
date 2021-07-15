@@ -1360,6 +1360,8 @@ std::string Emitter::EmitInterfaceNode(InterfaceNode *node) {
   for (unsigned i = 0; i < node->GetMethodsNum(); ++i) {
     if (auto n = node->GetMethodAtIndex(i)) {
       std::string func = EmitFunctionNode(n);
+      if (func.substr(0, 9) == "function ")
+        func = func.substr(9);
       str += func.length() > 2 && func.substr(func.length() - 2) == ";\n" ? func : func + ";\n"s;
     }
   }
@@ -1399,14 +1401,18 @@ std::string Emitter::EmitClassNode(ClassNode *node) {
   for (unsigned i = 0; i < node->GetConstructorsNum(); ++i) {
     if (auto n = node->GetConstructor(i)) {
       std::string func = EmitFunctionNode(n);
-      Replace(func, "function", "constructor", 1);
-      str += func;
+      if (func.substr(0, 9) == "function ")
+        str += func.substr(9);
+      else
+        str += func;
     }
   }
 
   for (unsigned i = 0; i < node->GetMethodsNum(); ++i) {
     if (auto n = node->GetMethod(i)) {
       std::string func = EmitFunctionNode(n);
+      if (func.substr(0, 9) == "function ")
+        func = func.substr(9);
       str += func.length() > 2 && func.substr(func.length() - 2) == ";\n" ? func : func + ";\n"s;
     }
   }
