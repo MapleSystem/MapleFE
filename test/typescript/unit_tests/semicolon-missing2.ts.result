@@ -1,0 +1,15 @@
+Matched 35 tokens.
+============= Module ===========
+== Sub Tree ==
+export {class  Klass
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+    func  f1(a)  throws: 
+    func  f2(a)  throws: 
+    func  f3()  throws: 
+  LocalClasses: 
+  LocalInterfaces: 
+} 
