@@ -295,6 +295,20 @@ std::string Emitter::EmitUserTypeNode(UserTypeNode *node) {
   return HandleTreeNode(str, node);
 }
 
+std::string Emitter::EmitComputedNameNode(ComputedNameNode *node) {
+  if (node == nullptr)
+    return std::string();
+  std::string str = "["s;
+  if (auto n = node->GetExpr()) {
+    str += EmitTreeNode(n);
+  }
+  str += "] : "s;
+  if (auto n = node->GetExtendType()) {
+    str += EmitTreeNode(n);
+  }
+  return str;
+}
+
 std::string Emitter::EmitPackageNode(PackageNode *node) {
   if (node == nullptr)
     return std::string();
@@ -828,7 +842,7 @@ std::string Emitter::EmitStructNode(StructNode *node) {
       suffix = ",\n";
       break;
     case SProp_NA:
-      str = "SProp_NA "s;
+      str = ""s;
       break;
     default:
       MASSERT(0 && "Unexpected enumerator");
@@ -1718,6 +1732,9 @@ std::string Emitter::EmitTreeNode(TreeNode *node) {
     break;
   case NK_StrIndexSig:
     return EmitStrIndexSigNode(static_cast<StrIndexSigNode *>(node));
+    break;
+  case NK_ComputedName:
+    return EmitComputedNameNode(static_cast<ComputedNameNode *>(node));
     break;
   case NK_ArrayElement:
     return EmitArrayElementNode(static_cast<ArrayElementNode *>(node));

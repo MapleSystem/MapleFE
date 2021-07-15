@@ -50,6 +50,7 @@ public:
   virtual std::string EmitIdentifierNode(IdentifierNode *node);
   virtual std::string EmitFunctionNode(FunctionNode *node);
   virtual std::string EmitUserTypeNode(UserTypeNode *node);
+  virtual std::string EmitComputedNameNode(ComputedNameNode *node);
   virtual std::string EmitPackageNode(PackageNode *node);
   virtual std::string EmitXXportAsPairNode(XXportAsPairNode *node);
   virtual std::string EmitDeclareNode(DeclareNode *node);
