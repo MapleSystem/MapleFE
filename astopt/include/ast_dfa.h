@@ -76,10 +76,9 @@ class AST_DFA {
   explicit AST_DFA(Module_Handler *h, bool t) : mHandler(h), mTrace(t) {}
   ~AST_DFA();
 
-  void Build();
-  void Build(CfgFunc *func);
+  void DataFlowAnalysis();
 
-  void CollectDefNodes(CfgFunc *func);
+  void CollectDefNodes();
   void CollectUseNodes();
   void BuildBitVectors();
   void BuildDefUseChain();

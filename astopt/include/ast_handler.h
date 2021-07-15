@@ -73,10 +73,10 @@ class Module_Handler {
   void AdjustAST();
   void BuildScope();
   void RenameVar();
-  void BuildCFG();
-  void ASTCollectAndDBRemoval();
-  void BuildDFA();
   void TypeInference();
+  void BuildCFG();
+  void RemoveDeadBlocks();
+  void DataFlowAnalysis();
 
   const char *GetOutputFileName()          {return mOutputFileName;}
   void SetOutputFileName(const char *name) {mOutputFileName = name;}

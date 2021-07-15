@@ -35,30 +35,11 @@ void AST_Handler::AddModule(ModuleNode *m) {
   mModuleHandlers.PushBack(handler);
 }
 
-void Module_Handler::BuildCFG() {
-  CfgBuilder builder(this, mTrace);
-  builder.Build();
-}
-
 void Module_Handler::AdjustAST() {
   if (!mAST) {
     mAST = new(GetMemPool()->Alloc(sizeof(AST_AST))) AST_AST(this, mTrace);
   }
   mAST->AdjustAST();
-}
-
-void Module_Handler::ASTCollectAndDBRemoval() {
-  if (!mAST) {
-    mAST = new(GetMemPool()->Alloc(sizeof(AST_AST))) AST_AST(this, mTrace);
-  }
-  mAST->ASTCollectAndDBRemoval();
-}
-
-void Module_Handler::BuildDFA() {
-  if (!mDFA) {
-    mDFA = new(GetMemPool()->Alloc(sizeof(AST_DFA))) AST_DFA(this, mTrace);
-  }
-  mDFA->Build();
 }
 
 void Module_Handler::BuildScope() {
@@ -73,6 +54,32 @@ void Module_Handler::RenameVar() {
     mSCP = new(GetMemPool()->Alloc(sizeof(AST_SCP))) AST_SCP(this, mTrace);
   }
   mSCP->RenameVar();
+}
+
+void Module_Handler::TypeInference() {
+  if (!mTI) {
+    mTI = new(GetMemPool()->Alloc(sizeof(TypeInfer))) TypeInfer(this, mTrace);
+  }
+  mTI->TypeInference();
+}
+
+void Module_Handler::BuildCFG() {
+  CfgBuilder builder(this, mTrace);
+  builder.Build();
+}
+
+void Module_Handler::RemoveDeadBlocks() {
+  if (!mAST) {
+    mAST = new(GetMemPool()->Alloc(sizeof(AST_AST))) AST_AST(this, mTrace);
+  }
+  mAST->RemoveDeadBlocks();
+}
+
+void Module_Handler::DataFlowAnalysis() {
+  if (!mDFA) {
+    mDFA = new(GetMemPool()->Alloc(sizeof(AST_DFA))) AST_DFA(this, mTrace);
+  }
+  mDFA->DataFlowAnalysis();
 }
 
 // input an identifire ===> returen the decl node with same name
@@ -120,13 +127,6 @@ TreeNode *Module_Handler::FindFunc(TreeNode *node) {
     scope = scope->GetParent();
   }
   return NULL;
-}
-
-void Module_Handler::TypeInference() {
-  if (!mTI) {
-    mTI = new(GetMemPool()->Alloc(sizeof(TypeInfer))) TypeInfer(this, mTrace);
-  }
-  mTI->TypeInference();
 }
 
 void Module_Handler::Dump(char *msg) {

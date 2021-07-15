@@ -78,12 +78,16 @@ void A2C::ProcessAST() {
       graph.DumpGraph("After AdjustAST()", &std::cout);
     }
 
+    // build CFG
     handler->BuildCFG();
     if (mTraceA2C) {
       handler->Dump("After BuildCFG()");
     }
 
-    // module level information build
+    // remove dead blocks
+    handler->RemoveDeadBlocks();
+
+    // type inference
     handler->TypeInference();
 
     if (mTraceA2C) {
@@ -98,15 +102,10 @@ void A2C::ProcessAST() {
       astdump.Dump("After BuildCFG()", &std::cout);
     }
 
-    handler->ASTCollectAndDBRemoval();
-    if (mTraceA2C) {
-      handler->Dump("After ASTCollectAndDBRemoval()");
-    }
-
     // data flow analysis for the module
-    handler->BuildDFA();
+    handler->DataFlowAnalysis();
     if (mTraceA2C) {
-      // handler->Dump("After BuildDFA()");
+      handler->Dump("After DataFlowAnalysis()");
     }
 
     if (mTraceA2C) {

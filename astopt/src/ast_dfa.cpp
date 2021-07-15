@@ -67,16 +67,10 @@ void AST_DFA::TestBV() {
   free(bv2);
 }
 
-void AST_DFA::Build() {
-  for (auto func: mHandler->mModuleFuncs) {
-    Build(func);
-  }
-}
-
-void AST_DFA::Build(CfgFunc *func) {
+void AST_DFA::DataFlowAnalysis() {
   Clear();
   // TestBV();
-  CollectDefNodes(func);
+  CollectDefNodes();
   BuildBitVectors();
   CollectUseNodes();
   // DumpUse();
@@ -222,49 +216,52 @@ unsigned AST_DFA::AddDef(TreeNode *node, unsigned &bitnum, unsigned bbid) {
 }
 
 // this calcuates mDefPositionVec mBbIdVec
-void AST_DFA::CollectDefNodes(CfgFunc *func) {
+void AST_DFA::CollectDefNodes() {
   if (mTrace) std::cout << "============== CollectDefNodes ==============" << std::endl;
   std::unordered_set<unsigned> done_list;
   std::deque<CfgBB *> working_list;
 
-  CfgBB *bb = func->GetEntryBB();
-  MASSERT(bb && "null BB");
-  unsigned bbid = bb->GetId();
-
-  working_list.push_back(bb);
-
-  unsigned bitnum = 0;
-
-  while(working_list.size()) {
-    bb = working_list.front();
+  // process each functions
+  for (auto func: mHandler->mModuleFuncs) {
+    CfgBB *bb = func->GetEntryBB();
     MASSERT(bb && "null BB");
-    bbid = bb->GetId();
+    unsigned bbid = bb->GetId();
 
-    // process bb not visited
-    if (done_list.find(bbid) == done_list.end()) {
-      if (mTrace) std::cout << "working_list work " << bbid << std::endl;
-      for (int i = 0; i < bb->GetStatementsNum(); i++) {
-        TreeNode *stmt = bb->GetStatementAtIndex(i);
-        unsigned sid = stmt->GetNodeId();
-        mStmtIdVec.PushBack(sid);
-        mStmtId2StmtMap[sid] = stmt;
-        mStmtId2BbIdMap[sid] = bbid;
-        unsigned nid = AddDef(stmt, bitnum, bbid);
-        if (nid) {
-          mNodeId2StmtIdMap[nid] = sid;
+    working_list.push_back(bb);
+
+    unsigned bitnum = 0;
+
+    while(working_list.size()) {
+      bb = working_list.front();
+      MASSERT(bb && "null BB");
+      bbid = bb->GetId();
+
+      // process bb not visited
+      if (done_list.find(bbid) == done_list.end()) {
+        if (mTrace) std::cout << "working_list work " << bbid << std::endl;
+        for (int i = 0; i < bb->GetStatementsNum(); i++) {
+          TreeNode *stmt = bb->GetStatementAtIndex(i);
+          unsigned sid = stmt->GetNodeId();
+          mStmtIdVec.PushBack(sid);
+          mStmtId2StmtMap[sid] = stmt;
+          mStmtId2BbIdMap[sid] = bbid;
+          unsigned nid = AddDef(stmt, bitnum, bbid);
+          if (nid) {
+            mNodeId2StmtIdMap[nid] = sid;
+          }
         }
+
+        for (int i = 0; i < bb->GetSuccessorsNum(); i++) {
+          working_list.push_back(bb->GetSuccessorAtIndex(i));
+        }
+
+        done_list.insert(bbid);
+        mBbIdVec.push_back(bbid);
+        mBbId2BBMap[bbid] = bb;
       }
 
-      for (int i = 0; i < bb->GetSuccessorsNum(); i++) {
-        working_list.push_back(bb->GetSuccessorAtIndex(i));
-      }
-
-      done_list.insert(bbid);
-      mBbIdVec.push_back(bbid);
-      mBbId2BBMap[bbid] = bb;
+      working_list.pop_front();
     }
-
-    working_list.pop_front();
   }
 
   if (mTrace) DumpDefPositionVec();

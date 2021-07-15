@@ -37,9 +37,9 @@ class AST_AST {
 
   void AdjustAST();
 
-  void CollectASTInfo(CfgFunc *func);
-  void RemoveDeadBlocks(CfgFunc *func);
-  void ASTCollectAndDBRemoval();
+  void CollectReachableBB();
+  void RemoveUnreachableBB();
+  void RemoveDeadBlocks();
 };
 
 class AdjustASTVisitor : public AstVisitor {

@@ -56,10 +56,13 @@ void AstOpt::ProcessAST(bool trace_a2c) {
     handler->BuildCFG();
 
     // remove dead blocks
-    handler->ASTCollectAndDBRemoval();
+    handler->RemoveDeadBlocks();
+
+    // type inference
+    handler->TypeInference();
 
     //data flow analysis for the module
-    handler->BuildDFA();
+    handler->DataFlowAnalysis();
 
     AstStore saveAst(module);
     saveAst.StoreInAstBuf();

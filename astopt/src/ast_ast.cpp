@@ -22,11 +22,9 @@
 
 namespace maplefe {
 
-void AST_AST::ASTCollectAndDBRemoval() {
-  for (auto func: mHandler->mModuleFuncs) {
-    CollectASTInfo(func);
-    RemoveDeadBlocks(func);
-  }
+void AST_AST::RemoveDeadBlocks() {
+  CollectReachableBB();
+  RemoveUnreachableBB();
 
   ModuleNode *module = mHandler->GetASTModule();
   if (mTrace) {
@@ -39,43 +37,45 @@ void AST_AST::ASTCollectAndDBRemoval() {
 }
 
 // this calcuates mNodeId2BbMap
-void AST_AST::CollectASTInfo(CfgFunc *func) {
-  if (mTrace) std::cout << "============== CollectASTInfo ==============" << std::endl;
+void AST_AST::CollectReachableBB() {
+  if (mTrace) std::cout << "============== CollectReachableBB ==============" << std::endl;
   mReachableBbIdx.clear();
   std::deque<CfgBB *> working_list;
 
-  working_list.push_back(func->GetEntryBB());
+  // process each functions
+  for (auto func: mHandler->mModuleFuncs) {
+    // initialisze work list with all entry BB
+    working_list.push_back(func->GetEntryBB());
 
-  unsigned bitnum = 0;
+    while(working_list.size()) {
+      CfgBB *bb = working_list.front();
+      MASSERT(bb && "null BB");
+      unsigned bbid = bb->GetId();
 
-  while(working_list.size()) {
-    CfgBB *bb = working_list.front();
-    MASSERT(bb && "null BB");
-    unsigned bbid = bb->GetId();
+      // skip bb already visited
+      if (mReachableBbIdx.find(bbid) != mReachableBbIdx.end()) {
+        working_list.pop_front();
+        continue;
+      }
 
-    // skip bb already visited
-    if (mReachableBbIdx.find(bbid) != mReachableBbIdx.end()) {
+      for (int i = 0; i < bb->GetSuccessorsNum(); i++) {
+        working_list.push_back(bb->GetSuccessorAtIndex(i));
+      }
+
+      for (int i = 0; i < bb->GetStatementsNum(); i++) {
+        TreeNode *node = bb->GetStatementAtIndex(i);
+        mHandler->SetBbFromNodeId(node->GetNodeId(), bb);
+      }
+
+      mHandler->SetBbFromBbId(bbid, bb);
+
+      mReachableBbIdx.insert(bbid);
       working_list.pop_front();
-      continue;
     }
-
-    for (int i = 0; i < bb->GetSuccessorsNum(); i++) {
-      working_list.push_back(bb->GetSuccessorAtIndex(i));
-    }
-
-    for (int i = 0; i < bb->GetStatementsNum(); i++) {
-      TreeNode *node = bb->GetStatementAtIndex(i);
-      mHandler->SetBbFromNodeId(node->GetNodeId(), bb);
-    }
-
-    mHandler->SetBbFromBbId(bbid, bb);
-
-    mReachableBbIdx.insert(bbid);
-    working_list.pop_front();
   }
 }
 
-void AST_AST::RemoveDeadBlocks(CfgFunc *func) {
+void AST_AST::RemoveUnreachableBB() {
   std::set<CfgBB *> deadBb;
   CfgBB *bb = nullptr;
   for (auto id: mReachableBbIdx) {
