@@ -1402,9 +1402,10 @@ std::string Emitter::EmitClassNode(ClassNode *node) {
     if (auto n = node->GetConstructor(i)) {
       std::string func = EmitFunctionNode(n);
       if (func.substr(0, 9) == "function ")
-        str += func.substr(9);
-      else
-        str += func;
+        func = func.substr(9);
+      if (func.substr(0, 11) != "constructor")
+        func = "constructor "s + func;
+      str += func;
     }
   }
 
