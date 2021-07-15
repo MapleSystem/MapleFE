@@ -474,6 +474,10 @@ void Verifier::VerifyIn(InNode *tree){
   return;
 }
 
+void Verifier::VerifyInKeyOf(InKeyOfNode *tree){
+  return;
+}
+
 void Verifier::VerifyIs(IsNode *tree){
   return;
 }

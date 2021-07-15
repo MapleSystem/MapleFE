@@ -581,6 +581,10 @@ maple::BaseNode *A2M::ProcessIn(StmtExprKind skind, TreeNode *tnode, BlockNode *
   return nullptr;
 }
 
+maple::BaseNode *A2M::ProcessInKeyOf(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
+  return nullptr;
+}
+
 maple::BaseNode *A2M::ProcessIs(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
   NOTYETIMPL("ProcessIs()");
   IsNode *node = static_cast<IsNode *>(tnode);
