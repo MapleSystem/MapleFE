@@ -463,9 +463,20 @@ bool Lexer::FindNextTLPlaceHolder(unsigned start_idx, std::string& str, unsigned
     return false;
 
   working_idx = start_idx + 2;
+
+  // It could be {..} inside placeholder.
+  unsigned num_left_brace = 0;
+
   while(1) {
-    if (line[working_idx] == '}')
-      break;
+    if (line[working_idx] == '{')
+      num_left_brace++;
+
+    if (line[working_idx] == '}') {
+      if (num_left_brace > 0)
+        num_left_brace--;
+      else
+        break;
+    }
 
     // Template Literal allows \n in format and place holder.
     // the \n was removed by Lexer in the beginning of ReadALine();

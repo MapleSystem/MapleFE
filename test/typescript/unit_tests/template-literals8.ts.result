@@ -1,0 +1,10 @@
+Matched 9 tokens.
+Matched 18 tokens.
+Matched 20 tokens.
+============= Module ===========
+== Sub Tree ==
+func  func()  throws: 
+  return  template-literal: NULL, {}
+
+== Sub Tree ==
+console.log(func())
