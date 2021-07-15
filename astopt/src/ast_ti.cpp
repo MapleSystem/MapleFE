@@ -360,12 +360,11 @@ TreeNode *TypeInferVisitor::VisitClassField(TreeNode *node) {
       if (type->IsPrimType()) {
         PrimTypeNode *ptn = static_cast<PrimTypeNode *>(type);
         tid = ptn->GetPrimType();
-        // use mPrimType for non TY_Number
-        if (tid != TY_Number) {
-          node->SetTypeId(tid);
-        }
       }
-      node->SetTypeId(tid);
+      // use non TY_Number
+      if (tid != TY_Number) {
+        node->SetTypeId(tid);
+      }
     }
     TreeNode *init = idnode->GetInit();
     if (init) {
