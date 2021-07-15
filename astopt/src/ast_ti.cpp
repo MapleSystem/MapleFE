@@ -72,7 +72,7 @@ TypeId TypeInferVisitor::MergeTypeId(TypeId tia, TypeId tib) {
     case TY_None:        result = tib;       break;
 
     case TY_Object:
-    case TY_User:        result = tia;
+    case TY_User:        result = tia;       break;
 
     case TY_Undefined:
     case TY_String:
