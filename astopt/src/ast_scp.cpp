@@ -44,7 +44,7 @@ BlockNode *BuildScopeVisitor::VisitBlockNode(BlockNode *node) {
 
   mScopeStack.push(scope);
 
-  AstVisitor::VisitBlockNode(node);
+  BuildScopeBaseVisitor::VisitBlockNode(node);
 
   mScopeStack.pop();
   return node;
@@ -60,7 +60,6 @@ FunctionNode *BuildScopeVisitor::VisitFunctionNode(FunctionNode *node) {
   for(unsigned i = 0; i < node->GetParamsNum(); i++) {
     TreeNode *it = node->GetParam(i);
     scope->AddDecl(it);
-    it->SetScope(scope);
   }
 
   for(unsigned i = 0; i < node->GetTypeParamsNum(); i++) {
@@ -86,7 +85,7 @@ FunctionNode *BuildScopeVisitor::VisitFunctionNode(FunctionNode *node) {
 
   mScopeStack.push(scope);
 
-  AstVisitor::VisitFunctionNode(node);
+  BuildScopeBaseVisitor::VisitFunctionNode(node);
 
   mScopeStack.pop();
   return node;
@@ -100,12 +99,11 @@ LambdaNode *BuildScopeVisitor::VisitLambdaNode(LambdaNode *node) {
   for(unsigned i = 0; i < node->GetParamsNum(); i++) {
     TreeNode *it = node->GetParam(i);
     scope->AddDecl(it);
-    it->SetScope(scope);
   }
 
   mScopeStack.push(scope);
 
-  AstVisitor::VisitLambdaNode(node);
+  BuildScopeBaseVisitor::VisitLambdaNode(node);
 
   mScopeStack.pop();
   return node;
@@ -117,7 +115,6 @@ ClassNode *BuildScopeVisitor::VisitClassNode(ClassNode *node) {
   if (parent) {
     parent->AddDecl(node);
     parent->AddType(node);
-    node->SetScope(parent);
   }
   ASTScope *scope = mASTModule->NewScope(parent, node);
 
@@ -126,13 +123,12 @@ ClassNode *BuildScopeVisitor::VisitClassNode(ClassNode *node) {
     TreeNode *it = node->GetField(i);
     if (it->IsIdentifier()) {
       scope->AddDecl(it);
-      it->SetScope(scope);
     }
   }
 
   mScopeStack.push(scope);
 
-  AstVisitor::VisitClassNode(node);
+  BuildScopeBaseVisitor::VisitClassNode(node);
 
   mScopeStack.pop();
   return node;
@@ -144,7 +140,6 @@ InterfaceNode *BuildScopeVisitor::VisitInterfaceNode(InterfaceNode *node) {
   if (parent) {
     parent->AddDecl(node);
     parent->AddType(node);
-    node->SetScope(parent);
   }
 
   ASTScope *scope = mASTModule->NewScope(parent, node);
@@ -154,12 +149,11 @@ InterfaceNode *BuildScopeVisitor::VisitInterfaceNode(InterfaceNode *node) {
     TreeNode *it = node->GetFieldAtIndex(i);
     if (it->IsIdentifier()) {
       scope->AddDecl(it);
-      it->SetScope(scope);
     }
   }
   mScopeStack.push(scope);
 
-  AstVisitor::VisitInterfaceNode(node);
+  BuildScopeBaseVisitor::VisitInterfaceNode(node);
 
   mScopeStack.pop();
   return node;
@@ -171,7 +165,6 @@ StructNode *BuildScopeVisitor::VisitStructNode(StructNode *node) {
   if (parent) {
     parent->AddDecl(node);
     parent->AddType(node);
-    node->SetScope(parent);
   }
 
   ASTScope *scope = mASTModule->NewScope(parent, node);
@@ -181,29 +174,26 @@ StructNode *BuildScopeVisitor::VisitStructNode(StructNode *node) {
     TreeNode *it = node->GetField(i);
     if (it->IsIdentifier()) {
       scope->AddDecl(it);
-      it->SetScope(scope);
     }
   }
   mScopeStack.push(scope);
 
-  AstVisitor::VisitStructNode(node);
+  BuildScopeBaseVisitor::VisitStructNode(node);
 
   mScopeStack.pop();
   return node;
 }
 
 DeclNode *BuildScopeVisitor::VisitDeclNode(DeclNode *node) {
+  BuildScopeBaseVisitor::VisitDeclNode(node);
   ASTScope *scope = mScopeStack.top();
-  node->SetScope(scope);
-  AstVisitor::VisitDeclNode(node);
   scope->AddDecl(node);
   return node;
 }
 
 UserTypeNode *BuildScopeVisitor::VisitUserTypeNode(UserTypeNode *node) {
+  BuildScopeBaseVisitor::VisitUserTypeNode(node);
   ASTScope *scope = mScopeStack.top();
-  node->SetScope(scope);
-  AstVisitor::VisitUserTypeNode(node);
   TreeNode *p = node->GetParent();
   if (p) {
     if (p->IsFunction()) {
@@ -219,7 +209,9 @@ UserTypeNode *BuildScopeVisitor::VisitUserTypeNode(UserTypeNode *node) {
         scope->AddType(node);
         return node;
       }
-    } else if (p->IsScope()) {
+    }
+
+    if (p->IsScope()) {
       // normal type decl
       scope->AddType(node);
     }
@@ -229,8 +221,7 @@ UserTypeNode *BuildScopeVisitor::VisitUserTypeNode(UserTypeNode *node) {
 
 TypeAliasNode *BuildScopeVisitor::VisitTypeAliasNode(TypeAliasNode *node) {
   ASTScope *scope = mScopeStack.top();
-  node->SetScope(scope);
-  AstVisitor::VisitTypeAliasNode(node);
+  BuildScopeBaseVisitor::VisitTypeAliasNode(node);
   UserTypeNode *ut = node->GetId();
   if (ut) {
     scope->AddType(ut);
