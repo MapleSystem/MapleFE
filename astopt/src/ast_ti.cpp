@@ -17,8 +17,11 @@
 #include <set>
 #include "ast_handler.h"
 #include "ast_ti.h"
+#include "gen_astdump.h"
 
 #define NOTYETIMPL(K) {if(mTrace){MNYI(K);}}
+
+#define ITERATEMAX 10
 
 namespace maplefe {
 
@@ -35,11 +38,10 @@ void TypeInfer::TypeInference() {
   TypeInferVisitor visitor_pass1(mHandler, mTrace, true);
   visitor_pass1.SetUpdated(true);
   int count = 0;
-  while (visitor_pass1.GetUpdated()) {
-    count++;
+  while (visitor_pass1.GetUpdated() && count++ <= ITERATEMAX) {
+    if (mTrace) std::cout << "\n TypeInference iterate " << count << std::endl;
     visitor_pass1.SetUpdated(false);
     visitor_pass1.Visit(module);
-    if (count > 10) break;
   }
 
   // share UserType
@@ -165,6 +167,12 @@ TypeId TypeInferVisitor::MergeTypeId(TypeId tia, TypeId tib) {
   }
   if (result == TY_None) {
     NOTYETIMPL("MergeTypeId()");
+  }
+  if (mTrace) {
+    std::cout << " Type Merge: "
+              << AstDump::GetEnumTypeId(tia) << " "
+              << AstDump::GetEnumTypeId(tib) << " --> "
+              << AstDump::GetEnumTypeId(result) << std::endl;
   }
   return result;
 }
