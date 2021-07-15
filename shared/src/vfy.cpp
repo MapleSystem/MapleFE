@@ -474,7 +474,7 @@ void Verifier::VerifyIn(InNode *tree){
   return;
 }
 
-void Verifier::VerifyInKeyOf(InKeyOfNode *tree){
+void Verifier::VerifyComputedName(ComputedNameNode *tree){
   return;
 }
 

@@ -76,7 +76,7 @@ class AsTypeNode;
 class IdentifierNode;
 class FunctionNode;
 class UserTypeNode;
-class InKeyOfNode;
+class ComputedNameNode;
 class ASTScope;
 
 class TreeNode {
@@ -1002,10 +1002,9 @@ class StructNode : public TreeNode {
 private:
   StructProp      mProp;
   IdentifierNode *mStructId;
-  SmallVector<IdentifierNode*> mFields;
+  SmallVector<TreeNode*>       mFields;
   SmallVector<FunctionNode*>   mMethods;
   SmallVector<TreeNode*>       mSupers;
-  SmallVector<InKeyOfNode*>    mInKeyOfs;
 
   // These are for 'number' or 'string' index data type
   NumIndexSigNode *mNumIndexSig;
@@ -1027,10 +1026,10 @@ public:
   void SetNumIndexSig(NumIndexSigNode *t) {mNumIndexSig = t;}
   void SetStrIndexSig(StrIndexSigNode *t) {mStrIndexSig = t;}
 
-  unsigned        GetFieldsNum() {return mFields.GetNum();}
-  IdentifierNode* GetField(unsigned i) {return mFields.ValueAtIndex(i);}
-  void            SetField(unsigned i, IdentifierNode* n) {*(mFields.RefAtIndex(i)) = n; SETPARENT(n);}
-  void            AddField(IdentifierNode *n) {mFields.PushBack(n); SETPARENT(n);}
+  unsigned  GetFieldsNum() {return mFields.GetNum();}
+  TreeNode* GetField(unsigned i) {return mFields.ValueAtIndex(i);}
+  void      SetField(unsigned i, TreeNode* n) {*(mFields.RefAtIndex(i)) = n; SETPARENT(n);}
+  void      AddField(TreeNode *n) {mFields.PushBack(n); SETPARENT(n);}
 
   unsigned  GetSupersNum() {return mSupers.GetNum();}
   TreeNode* GetSuper(unsigned i) {return mSupers.ValueAtIndex(i);}
@@ -1042,14 +1041,9 @@ public:
   void          SetMethod(unsigned i, FunctionNode* n) {*(mMethods.RefAtIndex(i)) = n;}
   void          AddMethod(FunctionNode *n) {mMethods.PushBack(n);}
 
-  unsigned      GetInKeyOfsNum() {return mInKeyOfs.GetNum();}
-  InKeyOfNode*  GetInKeyOf(unsigned i) {return mInKeyOfs.ValueAtIndex(i);}
-  void          SetInKeyOf(unsigned i, InKeyOfNode* n) {*(mInKeyOfs.RefAtIndex(i)) = n;}
-  void          AddInKeyOf(InKeyOfNode *n) {mInKeyOfs.PushBack(n);}
-
   void AddChild(TreeNode *);
 
-  void Release() {mFields.Release(); mMethods.Release(); mSupers.Release(); mInKeyOfs.Release();}
+  void Release() {mFields.Release(); mMethods.Release(); mSupers.Release();}
   void Dump(unsigned);
 };
 
@@ -2088,28 +2082,26 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////
-//                  InKeyOf Expression
+//                  ComputedName Expression
 // First coming from Javascript. It's like
-// [A in keyof B] : ExtendType
+// [ xxx ]
 ////////////////////////////////////////////////////////////////////////////
 
-class InKeyOfNode : public TreeNode {
+class ComputedNameNode : public TreeNode {
 private:
-  TreeNode *mLeft;
-  TreeNode *mRight;
-  TreeNode *mExtendType;  // This is usually the type extending expression
-                          // following the InKeyOf
+  TreeNode *mExpr;
+  TreeNode *mExtendType;  // This is the type extending expression
+                          // of the mapped property
 public:
-  InKeyOfNode() : TreeNode(NK_InKeyOf),
-                  mLeft(NULL), mRight(NULL), mExtendType(NULL) {}
-  ~InKeyOfNode(){Release();}
+  ComputedNameNode() : TreeNode(NK_ComputedName),
+                  mExpr(NULL), mExtendType(NULL) {}
+  ~ComputedNameNode(){Release();}
 
-  TreeNode* GetLeft() {return mLeft;}
-  void SetLeft(TreeNode *n) {mLeft = n;}
-  TreeNode* GetRight() {return mRight;}
-  void SetRight(TreeNode *n){mRight = n;}
-  TreeNode* GetExtendType() {return mExtendType;}
-  void SetExtendType(TreeNode *n){mExtendType = n;}
+  TreeNode* GetExpr()            {return mExpr;}
+  void      SetExpr(TreeNode *n) {mExpr = n;}
+
+  TreeNode* GetExtendType()            {return mExtendType;}
+  void      SetExtendType(TreeNode *n) {mExtendType = n;}
 
   void Dump(unsigned);
 };

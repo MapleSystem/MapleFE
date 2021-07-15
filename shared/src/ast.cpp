@@ -722,16 +722,15 @@ void StructNode::AddChild(TreeNode *field) {
       TreeNode *child = pass->GetChild(i);
       AddChild(child);
     }
-  } else if (field->IsIdentifier()) {
-    AddField((IdentifierNode*)field);
+  } else if (field->IsIdentifier() ||
+             field->IsComputedName()) {
+    AddField(field);
   } else if (field->IsFunction()) {
     AddMethod((FunctionNode*)field);
   } else if (field->IsNumIndexSig()) {
     SetNumIndexSig((NumIndexSigNode*)field);
   } else if (field->IsStrIndexSig()) {
     SetStrIndexSig((StrIndexSigNode*)field);
-  } else if (field->IsInKeyOf()) {
-    AddInKeyOf((InKeyOfNode*)field);
   } else
     MERROR("Unsupported struct field type.");
 }
@@ -788,12 +787,6 @@ void StructNode::Dump(unsigned indent) {
   for (unsigned i = 0; i < mMethods.GetNum(); i++) {
     mMethods.ValueAtIndex(i)->Dump(0);
     if (i != mMethods.GetNum()-1)
-      DUMP0_NORETURN(";");
-  }
-
-  for (unsigned i = 0; i < mInKeyOfs.GetNum(); i++) {
-    mInKeyOfs.ValueAtIndex(i)->Dump(0);
-    if (i != mInKeyOfs.GetNum()-1)
       DUMP0_NORETURN(";");
   }
 
@@ -1687,15 +1680,13 @@ void InNode::Dump(unsigned indent) {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
-//                              InKeyOfNode
+//                              MappedPropertyNode
 //////////////////////////////////////////////////////////////////////////////////////
 
-void InKeyOfNode::Dump(unsigned indent) {
+void ComputedNameNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   DUMP0_NORETURN("[");
-  mLeft->Dump(0);
-  DUMP0_NORETURN(" in keyof ");
-  mRight->Dump(0);
+  mExpr->Dump(0);
   DUMP0_NORETURN("] : ");
   if (mExtendType)
     mExtendType->Dump(0);

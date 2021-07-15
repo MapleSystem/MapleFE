@@ -56,6 +56,9 @@ NODEKIND(FieldLiteral)
 NODEKIND(NumIndexSig)
 NODEKIND(StrIndexSig)
 
+// Typescript, computed name
+NODEKIND(ComputedName)
+
 // Array related
 NODEKIND(ArrayElement)
 NODEKIND(ArrayLiteral)
@@ -77,7 +80,6 @@ NODEKIND(InstanceOf)
 NODEKIND(TypeOf)
 NODEKIND(KeyOf)
 NODEKIND(In)
-NODEKIND(InKeyOf)
 NODEKIND(Is)
 
 NODEKIND(Block)

@@ -67,7 +67,6 @@ ACTION(BuildIn)
 ACTION(BuildIs)
 ACTION(BuildTypeOf)
 ACTION(BuildKeyOf)
-ACTION(BuildInKeyOf)
 
 ACTION(BuildLambda)
 ACTION(SetJavaLambda)       // java lambda
@@ -89,6 +88,7 @@ ACTION(SetJSConst)
 
 ACTION(BuildField)
 ACTION(BuildVarList)
+ACTION(BuildComputedName)
 
 ACTION(BuildBindingElement)
 ACTION(BuildBindingPattern)

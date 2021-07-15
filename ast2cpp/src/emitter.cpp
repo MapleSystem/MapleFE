@@ -845,7 +845,7 @@ std::string Emitter::EmitStructNode(StructNode *node) {
   str += " {\n"s;
   for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
     if (auto n = node->GetField(i)) {
-      str += EmitIdentifierNode(n) + suffix;
+      str += EmitTreeNode(n) + suffix;
     }
   }
 

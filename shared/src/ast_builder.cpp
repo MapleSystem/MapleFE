@@ -186,9 +186,9 @@ static void add_type_to(TreeNode *tree, TreeNode *type) {
   } else if (tree->IsBindingPattern()) {
     BindingPatternNode *bp = (BindingPatternNode*)tree;
     bp->SetType(type);
-  } else if (tree->IsInKeyOf()) {
-    InKeyOfNode *keyof = (InKeyOfNode*)tree;
-    keyof->SetExtendType(type);
+  } else if (tree->IsComputedName()) {
+    ComputedNameNode *mp = (ComputedNameNode*)tree;
+    mp->SetExtendType(type);
   } else {
     MERROR("Unsupported tree node in add_type_to()");
   }
@@ -3553,28 +3553,21 @@ TreeNode* ASTBuilder::BuildIn() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-//                       InKeyOf Expression
+//                       ComputedNameNode Expression
 ////////////////////////////////////////////////////////////////////////////////
 
-TreeNode* ASTBuilder::BuildInKeyOf() {
+TreeNode* ASTBuilder::BuildComputedName() {
   if (mTrace)
-    std::cout << "In BuildInKeyOf" << std::endl;
+    std::cout << "In BuildComputedName" << std::endl;
 
   Param l_param = mParams[0];
   MASSERT(!l_param.mIsEmpty);
   MASSERT(l_param.mIsTreeNode);
-  TreeNode *left = l_param.mData.mTreeNode;
+  TreeNode *in = l_param.mData.mTreeNode;
 
-  Param r_param = mParams[1];
-  MASSERT(!r_param.mIsEmpty);
-  MASSERT(r_param.mIsTreeNode);
-  TreeNode *right = r_param.mData.mTreeNode;
-
-  InKeyOfNode *innode = (InKeyOfNode*)gTreePool.NewTreeNode(sizeof(InKeyOfNode));
-  new (innode) InKeyOfNode();
-
-  innode->SetLeft(left);
-  innode->SetRight(right);
+  ComputedNameNode *innode = (ComputedNameNode*)gTreePool.NewTreeNode(sizeof(ComputedNameNode));
+  new (innode) ComputedNameNode();
+  innode->SetExpr(in);
 
   mLastTreeNode = innode;
   return mLastTreeNode;

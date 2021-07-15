@@ -278,6 +278,7 @@ rule LiteralPropertyName : ONEOF(JSIdentifier, Literal)
 ##rule ComputedPropertyName[Yield] :
 ##  [ AssignmentExpression[In, ?Yield] ]
 rule ComputedPropertyName : '[' + AssignmentExpression + ']'
+  attr.action : BuildComputedName(%2)
 
 ##-----------------------------------
 ##rule CoverInitializedName[Yield] :
@@ -551,17 +552,19 @@ rule ShiftExpression : ONEOF(AdditiveExpression,
 ##  RelationalExpression[?In, ?Yield] instanceof ShiftExpression[?Yield]
 ##  [+In] RelationalExpression[In, ?Yield] in ShiftExpression[?Yield]
 
+rule InExpression : RelationalExpression + "in" + ONEOF(ShiftExpression, Type)
+## "
+  attr.action : BuildIn(%1, %3)
+
 rule RelationalExpression : ONEOF(ShiftExpression,
                                   RelationalExpression + '<' + ShiftExpression,
                                   RelationalExpression + '>' + ShiftExpression,
                                   RelationalExpression + "<=" + ShiftExpression,
                                   RelationalExpression + ">=" + ShiftExpression,
                                   RelationalExpression + "instanceof" + ShiftExpression,
-                                  RelationalExpression + "in" + ShiftExpression)
-## " This line is to make my vim works well colofully.
+                                  InExpression)
   attr.action.%2,%3,%4,%5 : BuildBinaryOperation(%1, %2, %3)
   attr.action.%6 : BuildInstanceOf(%1, %3)
-  attr.action.%7 : BuildIn(%1, %3)
 
 
 ##-----------------------------------
@@ -1499,14 +1502,16 @@ rule ConditionalType : MemberExpression + "extends" + Type + '?' + Type + ':' + 
 #rule Type : ONEOF(UnionOrIntersectionOrPrimaryType,
 #                  FunctionType,
 #                  ConstructorType)
+rule KeyOf : "keyof" + Identifier
+  attr.action : BuildKeyOf(%2)
+
 rule Type : ONEOF(UnionOrIntersectionOrPrimaryType,
                   FunctionType,
                   ConstructorType,
-                  "keyof" + Identifier,
+                  KeyOf,
                   ConditionalType,
                   # Typescript interface[index] can be seen as a type
                   Identifier + '[' + Literal + ']')
-  attr.action.%4 : BuildKeyOf(%2)
   attr.action.%6 : BuildArrayElement(%1, %3)
 
 #rule UnionOrIntersectionOrPrimaryType: ONEOF(UnionType,
@@ -1621,18 +1626,13 @@ rule TypeQueryExpression: ONEOF(IdentifierReference,
 ## rule ThisType: this
 rule ThisType: "this"
 
-rule InKeyOf : '[' + Identifier + "in" + "keyof" + Identifier + ']'
-  attr.action : BuildInKeyOf(%2, %5)
-
 ## rule PropertySignature: PropertyName ?opt TypeAnnotationopt
 rule PropertySignature: ONEOF(ZEROORONE(AccessibilityModifier) + PropertyName + ZEROORONE(TypeAnnotation),
-                              ZEROORONE(AccessibilityModifier) + PropertyName + '?' + ZEROORONE(TypeAnnotation),
-                              InKeyOf + TypeAnnotation)
+                              ZEROORONE(AccessibilityModifier) + PropertyName + '?' + ZEROORONE(TypeAnnotation))
   attr.action.%1 : AddType(%2, %3)
   attr.action.%2 : AddType(%2, %4)
   attr.action.%2 : SetIsOptional(%2)
   attr.action.%1,%2: AddModifierTo(%2, %1)
-  attr.action.%3 : AddType(%1, %2)
 
 ## JS ECMA has more definition than this Typescript one. I use ECMA one.
 ## rule PropertyName: IdentifierName StringLiteral NumericLiteral

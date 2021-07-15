@@ -393,7 +393,7 @@ ArrayElementNode *TypeInferVisitor::VisitArrayElementNode(ArrayElementNode *node
             unsigned stridx = (static_cast<LiteralNode *>(exp))->GetData().mData.mStrIdx;
             StructNode *structure = static_cast<StructNode *>(decl);
             for (int i = 0; i < structure->GetFieldsNum(); i++) {
-              IdentifierNode *f = structure->GetField(i);
+              TreeNode *f = structure->GetField(i);
               if (f->GetStrIdx() == stridx) {
                 TypeId tid = f->GetTypeId();
                 UpdateTypeId(node, tid);
