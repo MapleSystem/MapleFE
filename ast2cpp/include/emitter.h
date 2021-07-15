@@ -110,7 +110,6 @@ public:
   virtual std::string EmitTypeOfNode(TypeOfNode *node);
   virtual std::string EmitKeyOfNode(KeyOfNode *node);
   virtual std::string EmitInNode(InNode *node);
-  virtual std::string EmitInKeyOfNode(InKeyOfNode *node);
   virtual std::string EmitIsNode(IsNode *node);
   virtual std::string EmitModuleNode(ModuleNode *node);
   virtual std::string EmitAttrNode(AttrNode *node);

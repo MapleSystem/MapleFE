@@ -1560,19 +1560,6 @@ std::string Emitter::EmitInNode(InNode *node) {
   return HandleTreeNode(str, node);
 }
 
-std::string Emitter::EmitInKeyOfNode(InKeyOfNode *node) {
-  if (node == nullptr)
-    return std::string();
-  std::string str;
-  if (auto n = node->GetLeft()) {
-    str += EmitTreeNode(n);
-  }
-  if (auto n = node->GetRight()) {
-    str += " in keyof "s + EmitTreeNode(n);
-  }
-  return str;
-}
-
 std::string Emitter::EmitIsNode(IsNode *node) {
   if (node == nullptr)
     return std::string();
@@ -1776,9 +1763,6 @@ std::string Emitter::EmitTreeNode(TreeNode *node) {
     break;
   case NK_In:
     return EmitInNode(static_cast<InNode *>(node));
-    break;
-  case NK_InKeyOf:
-    return EmitInKeyOfNode(static_cast<InKeyOfNode *>(node));
     break;
   case NK_Is:
     return EmitIsNode(static_cast<IsNode *>(node));
