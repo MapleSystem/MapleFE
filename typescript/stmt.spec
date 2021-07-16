@@ -75,6 +75,7 @@ rule KeywordIdentifier : ONEOF("get",
                                "of",
                                "declare",
                                "readonly",
+                               "debugger",
                                "namespace")
   attr.action : BuildIdentifier()
 
