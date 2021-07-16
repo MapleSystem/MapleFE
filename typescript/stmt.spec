@@ -92,7 +92,7 @@ rule JSIdentifier: ONEOF(Identifier,
   attr.action.%4 : SetIsOptional(%1)
   attr.action.%5 : SetIsOptional(%1)
 
-rule AsType : "as" + PrimaryType
+rule AsType : "as" + Type
   attr.action : BuildAsType(%2)
 
 ##-----------------------------------
@@ -822,7 +822,7 @@ rule LexicalBinding : ONEOF(BindingIdentifier + ZEROORONE(Initializer),
 ##-----------------------------------
 ##rule VariableStatement[Yield] :
 ##  var VariableDeclarationList[In, ?Yield] ;
-rule VariableStatement : "var" + VariableDeclarationList + ';'
+rule VariableStatement : "var" + VariableDeclarationList + ZEROORONE(';')
   attr.action : PassChild(%2)
 
 ##-----------------------------------

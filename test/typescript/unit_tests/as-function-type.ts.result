@@ -1,0 +1,19 @@
+Matched 30 tokens.
+Matched 53 tokens.
+Matched 69 tokens.
+Matched 76 tokens.
+============= Module ===========
+== Sub Tree ==
+func  func(cb)  throws: 
+  console.log(cb("abc"))
+  return "OK"
+
+== Sub Tree ==
+js_var Decl: fn=func  (s)  throws: 
+  console.log(s)
+  return 123
+
+== Sub Tree ==
+js_const Decl: f=func(fn)
+== Sub Tree ==
+console.log(f)
