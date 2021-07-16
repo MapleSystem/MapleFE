@@ -725,7 +725,7 @@ rule Statement : ONEOF(
 ## NOTE. Typescript added InterfaceDeclaration, TypeAliasDeclaration, EnumDeclaration
 rule Declaration : ONEOF(HoistableDeclaration,
                          ClassDeclaration,
-                         LexicalDeclaration,
+                         LexicalDeclaration + ZEROORONE(';'),
                          InterfaceDeclaration,
                          TypeAliasDeclaration,
                          EnumDeclaration,
@@ -774,8 +774,8 @@ rule StatementListItem : ONEOF(Statement, Declaration)
 ##-----------------------------------
 ##rule LexicalDeclaration[In, Yield] :
 ##  LetOrConst BindingList[?In, ?Yield] ;
-rule LexicalDeclaration : ONEOF("let" + BindingList + ';',
-                                "const" + BindingList + ';')
+rule LexicalDeclaration : ONEOF("let" + BindingList,
+                                "const" + BindingList)
   attr.action.%1,%2 : BuildDecl(%2)
   attr.action.%1    : SetJSLet()
   attr.action.%2    : SetJSConst()
@@ -960,7 +960,7 @@ rule IterationStatement : ONEOF(
   "while" + '(' + Expression + ')' + Statement,
   "for" + '(' + ZEROORONE(Expression) + ';' + ZEROORONE(Expression) + ';' + ZEROORONE(Expression) + ')' + Statement,
   "for" + '(' + "var" + VariableDeclarationList + ';' + ZEROORONE(Expression) + ';' + ZEROORONE(Expression) + ')' + Statement,
-  "for" + '(' + LexicalDeclaration + ZEROORONE(Expression) + ';' + ZEROORONE(Expression) + ')' + Statement,
+  "for" + '(' + LexicalDeclaration + ';' + ZEROORONE(Expression) + ';' + ZEROORONE(Expression) + ')' + Statement,
   "for" + '(' + LeftHandSideExpression + "in" + Expression + ')' + Statement,
   "for" + '(' + "var" + ForBinding + "in" + Expression + ')' + Statement,
   "for" + '(' + ForDeclaration + "in" + Expression + ')' + Statement,
@@ -973,7 +973,7 @@ rule IterationStatement : ONEOF(
   attr.action.%2 : BuildWhileLoop(%3, %5)
   attr.action.%3 : BuildForLoop(%3, %5, %7, %9)
   attr.action.%4 : BuildForLoop(%4, %6, %8, %10)
-  attr.action.%5 : BuildForLoop(%3, %4, %6, %8)
+  attr.action.%5 : BuildForLoop(%3, %5, %7, %9)
 
   attr.action.%7,%10 : BuildDecl(%4)
   attr.action.%7,%10 : SetJSVar()
@@ -1973,7 +1973,7 @@ rule NamespaceElements: ONEOF(NamespaceElement,
 
 ##NamespaceElement: Statement LexicalDeclaration FunctionDeclaration GeneratorDeclaration ClassDeclaration InterfaceDeclaration TypeAliasDeclaration EnumDeclaration NamespaceDeclaration AmbientDeclaration ImportAliasDeclaration ExportNamespaceElement
 rule NamespaceElement: ONEOF(Statement,
-                             LexicalDeclaration,
+                             LexicalDeclaration + ';',
                              FunctionDeclaration,
                              #GeneratorDeclaration,
                              ClassDeclaration,
@@ -1987,7 +1987,7 @@ rule NamespaceElement: ONEOF(Statement,
 
 ##ExportNamespaceElement: export VariableStatement export LexicalDeclaration export FunctionDeclaration export GeneratorDeclaration export ClassDeclaration export InterfaceDeclaration export TypeAliasDeclaration export EnumDeclaration export NamespaceDeclaration export AmbientDeclaration export ImportAliasDeclaration
 rule ExportNamespaceElement: ONEOF("export" + VariableStatement,
-                                   "export" + LexicalDeclaration
+                                   "export" + LexicalDeclaration + ZEROORONE(';'),
                                    "export" + FunctionDeclaration,
 #                                   "export" + GeneratorDeclaration,
                                    "export" + ClassDeclaration,
@@ -2018,7 +2018,7 @@ rule EntityName: ONEOF(NamespaceName,
 #################################################################################################
 
 rule ExternalDeclaration : ONEOF("declare" + NamespaceDeclaration,
-                                 "declare" + LexicalDeclaration,
+                                 "declare" + LexicalDeclaration + ';',
                                  "declare" + ClassDeclaration,
                                  "declare" + VariableStatement)
   attr.action.%1,%2,%3,%4 : BuildExternalDeclaration(%2)

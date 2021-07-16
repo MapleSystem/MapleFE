@@ -1,0 +1,9 @@
+Matched 16 tokens.
+Matched 26 tokens.
+============= Module ===========
+== Sub Tree ==
+js_let Decl: func=func  (n)  throws: 
+  return n
+
+== Sub Tree ==
+console.log(func(123))
