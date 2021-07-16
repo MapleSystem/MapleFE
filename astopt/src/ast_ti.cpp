@@ -88,13 +88,7 @@ TypeId TypeInferVisitor::MergeTypeId(TypeId tia, TypeId tib) {
         case TY_Long:
         case TY_Float:
         case TY_Double:  result = tib;       break;
-        case TY_Merge:
-        case TY_Undefined:
-        case TY_String:
-        case TY_Function:
-        case TY_Class:
-        case TY_Array:   result = TY_Merge;  break;
-        default: break;
+        default:         result = TY_Merge;  break;
       }
       break;
     }
@@ -104,13 +98,7 @@ TypeId TypeInferVisitor::MergeTypeId(TypeId tia, TypeId tib) {
         case TY_Long:
         case TY_Float:
         case TY_Double:  result = tib;       break;
-        case TY_Merge:
-        case TY_Undefined:
-        case TY_String:
-        case TY_Function:
-        case TY_Class:
-        case TY_Array:   result = TY_Merge;  break;
-        default: break;
+        default:         result = TY_Merge;  break;
       }
       break;
     }
@@ -120,13 +108,7 @@ TypeId TypeInferVisitor::MergeTypeId(TypeId tia, TypeId tib) {
         case TY_Int:     result = TY_Long;   break;
         case TY_Float:
         case TY_Double:  result = TY_Double; break;
-        case TY_Merge:
-        case TY_Undefined:
-        case TY_String:
-        case TY_Function:
-        case TY_Class:
-        case TY_Array:   result = TY_Merge;  break;
-        default: break;
+        default:         result = TY_Merge;  break;
       }
       break;
     }
@@ -136,13 +118,7 @@ TypeId TypeInferVisitor::MergeTypeId(TypeId tia, TypeId tib) {
         case TY_Int:     result = TY_Float;  break;
         case TY_Long:
         case TY_Double:  result = TY_Double; break;
-        case TY_Merge:
-        case TY_Undefined:
-        case TY_String:
-        case TY_Function:
-        case TY_Class:
-        case TY_Array:   result = TY_Merge;  break;
-        default: break;
+        default:         result = TY_Merge;  break;
       }
       break;
     }
@@ -152,13 +128,7 @@ TypeId TypeInferVisitor::MergeTypeId(TypeId tia, TypeId tib) {
         case TY_Int:
         case TY_Long:
         case TY_Double:  result = TY_Double; break;
-        case TY_Merge:
-        case TY_Undefined:
-        case TY_String:
-        case TY_Function:
-        case TY_Class:
-        case TY_Array:   result = TY_Merge;  break;
-        default: break;
+        default:         result = TY_Merge;  break;
       }
       break;
     }
