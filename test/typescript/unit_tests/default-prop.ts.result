@@ -1,0 +1,7 @@
+Matched 11 tokens.
+Matched 18 tokens.
+============= Module ===========
+== Sub Tree ==
+js_const Decl: obj= {default: {}}
+== Sub Tree ==
+console.log(obj)

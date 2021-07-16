@@ -6,8 +6,8 @@ Matched 30 tokens.
 == Sub Tree ==
 export { *} "./M"
 == Sub Tree ==
-export { default as x} "./M"
+export {default as x} "./M"
 == Sub Tree ==
-import { default as x} "./M"
+import {default as x} "./M"
 == Sub Tree ==
-export { default as x} 
+export {x as default} 

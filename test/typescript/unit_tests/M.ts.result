@@ -6,7 +6,7 @@ Matched 40 tokens.
 == Sub Tree ==
 js_var Decl: x=2
 == Sub Tree ==
-export { default as x} 
+export {x as default} 
 == Sub Tree ==
 export {func  getx()  throws: 
   return x

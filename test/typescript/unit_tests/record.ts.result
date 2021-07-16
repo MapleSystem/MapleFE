@@ -1,0 +1,10 @@
+Matched 8 tokens.
+Matched 41 tokens.
+Matched 48 tokens.
+============= Module ===========
+== Sub Tree ==
+ts_enum: Direction {LEFT;RIGHT }
+== Sub Tree ==
+js_const Decl: rec= {[Direction.LEFT] : :"left", [Direction.RIGHT] : :"right", default:"Unknown"}
+== Sub Tree ==
+console.log(rec)
