@@ -680,7 +680,7 @@ InterfaceNode *TypeInferVisitor::VisitInterfaceNode(InterfaceNode *node) {
 }
 
 StructNode *TypeInferVisitor::VisitStructNode(StructNode *node) {
-  UpdateTypeId(node, TY_Class);
+  node->SetTypeId(TY_Class);
   for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
     TreeNode *t = node->GetField(i);
     (void) VisitClassField(t);
@@ -735,7 +735,11 @@ ReturnNode *TypeInferVisitor::VisitReturnNode(ReturnNode *node) {
 }
 
 StructLiteralNode *TypeInferVisitor::VisitStructLiteralNode(StructLiteralNode *node) {
-  UpdateTypeId(node, TY_Object);
+  node->SetTypeId(TY_Class);
+  for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
+    FieldLiteralNode *t = node->GetField(i);
+    (void) VisitFieldLiteralNode(t);
+  }
   (void) AstVisitor::VisitStructLiteralNode(node);
   return node;
 }
