@@ -344,7 +344,8 @@ rule MemberExpression : ONEOF(
   "new" + TypeReference + ZEROORONE(Arguments),
   MemberExpression + "?." + '[' + Expression + ']' + ZEROORMORE(AsType),
   IsExpression,
-  MemberExpression + '[' + KeyOf + ']')
+  MemberExpression + '[' + KeyOf + ']',
+  MemberExpression + '!')
   attr.action.%1 : AddAsType(%1, %2)
   attr.action.%2 : BuildArrayElement(%1, %3)
   attr.action.%2 : AddAsType(%5)
@@ -358,6 +359,7 @@ rule MemberExpression : ONEOF(
   attr.action.%8 : BuildArrayElement(%1, %4)
   attr.action.%8 : AddAsType(%6)
   attr.action.%10: BuildArrayElement(%1, %3)
+  attr.action.%11: SetIsNonNull(%1)
 
 rule IsExpression: PrimaryExpression + "is" + Type
   attr.action : BuildIs(%1, %3)
