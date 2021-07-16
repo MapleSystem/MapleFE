@@ -1,0 +1,10 @@
+Matched 8 tokens.
+Matched 19 tokens.
+Matched 26 tokens.
+============= Module ===========
+== Sub Tree ==
+import {K} "./type-only-export"
+== Sub Tree ==
+js_var Decl: x= {n:123}
+== Sub Tree ==
+console.log(x)
