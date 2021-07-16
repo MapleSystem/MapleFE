@@ -1526,8 +1526,9 @@ rule ConditionalType : MemberExpression + "extends" + Type + '?' + Type + ':' + 
 rule KeyOf : "keyof" + Identifier
   attr.action : BuildKeyOf(%2)
 
-rule TypeArray : PrimaryType + '[' + PrimaryExpression + ']'
-  attr.action : BuildArrayElement(%1, %3)
+rule TypeArray : ONEOF(PrimaryType + '[' + PrimaryExpression + ']',
+                       TypeArray + '[' + PrimaryExpression + ']')
+  attr.action.%1,%2 : BuildArrayElement(%1, %3)
 
 rule Type : ONEOF(UnionOrIntersectionOrPrimaryType,
                   FunctionType,

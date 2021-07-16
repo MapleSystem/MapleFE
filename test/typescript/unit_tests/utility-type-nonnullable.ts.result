@@ -1,0 +1,7 @@
+Matched 12 tokens.
+Matched 26 tokens.
+============= Module ===========
+== Sub Tree ==
+ts_interface: Interf {prop }
+== Sub Tree ==
+ type TYPE = NonNullable<Interf["prop"]["pos"]>
