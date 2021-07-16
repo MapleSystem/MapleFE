@@ -41,11 +41,8 @@ void AST_SCP::BuildScope() {
 BlockNode *BuildScopeVisitor::VisitBlockNode(BlockNode *node) {
   ASTScope *parent = mScopeStack.top();
   ASTScope *scope = mASTModule->NewScope(parent, node);
-
   mScopeStack.push(scope);
-
   BuildScopeBaseVisitor::VisitBlockNode(node);
-
   mScopeStack.pop();
   return node;
 }
@@ -82,11 +79,8 @@ FunctionNode *BuildScopeVisitor::VisitFunctionNode(FunctionNode *node) {
       scope->AddType(it);
     }
   }
-
   mScopeStack.push(scope);
-
   BuildScopeBaseVisitor::VisitFunctionNode(node);
-
   mScopeStack.pop();
   return node;
 }
@@ -100,11 +94,8 @@ LambdaNode *BuildScopeVisitor::VisitLambdaNode(LambdaNode *node) {
     TreeNode *it = node->GetParam(i);
     scope->AddDecl(it);
   }
-
   mScopeStack.push(scope);
-
   BuildScopeBaseVisitor::VisitLambdaNode(node);
-
   mScopeStack.pop();
   return node;
 }
@@ -125,11 +116,8 @@ ClassNode *BuildScopeVisitor::VisitClassNode(ClassNode *node) {
       scope->AddDecl(it);
     }
   }
-
   mScopeStack.push(scope);
-
   BuildScopeBaseVisitor::VisitClassNode(node);
-
   mScopeStack.pop();
   return node;
 }
@@ -152,9 +140,7 @@ InterfaceNode *BuildScopeVisitor::VisitInterfaceNode(InterfaceNode *node) {
     }
   }
   mScopeStack.push(scope);
-
   BuildScopeBaseVisitor::VisitInterfaceNode(node);
-
   mScopeStack.pop();
   return node;
 }
@@ -177,9 +163,7 @@ StructNode *BuildScopeVisitor::VisitStructNode(StructNode *node) {
     }
   }
   mScopeStack.push(scope);
-
   BuildScopeBaseVisitor::VisitStructNode(node);
-
   mScopeStack.pop();
   return node;
 }
@@ -230,18 +214,25 @@ TypeAliasNode *BuildScopeVisitor::VisitTypeAliasNode(TypeAliasNode *node) {
 }
 
 ForLoopNode *BuildScopeVisitor::VisitForLoopNode(ForLoopNode *node) {
+  ASTScope *parent = mScopeStack.top();
+  ASTScope *scope = parent;
   if (node->GetProp() == FLP_JSIn) {
-    ASTScope *parent = mScopeStack.top();
-    ASTScope *scope = mASTModule->NewScope(parent, node);
+    scope = mASTModule->NewScope(parent, node);
     TreeNode *var = node->GetVariable();
     if (var) {
       if (var->IsDecl()) {
         TreeNode *id = (static_cast<DeclNode *>(var))->GetVar();
-        scope->AddDecl(id);
+        scope->AddDecl(var);
       }
     }
+    mScopeStack.push(scope);
   }
+
   BuildScopeBaseVisitor::VisitForLoopNode(node);
+
+  if (scope != parent) {
+    mScopeStack.pop();
+  }
   return node;
 }
 

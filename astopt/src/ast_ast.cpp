@@ -283,12 +283,8 @@ CondBranchNode *AdjustASTVisitor::VisitCondBranchNode(CondBranchNode *node) {
 
 // for : use BlockNode for body
 ForLoopNode *AdjustASTVisitor::VisitForLoopNode(ForLoopNode *node) {
-  TreeNode *tn = NULL;
-  for (int i = 0; i < node->GetInitsNum(); i++) {
-    tn = VisitTreeNode(node->GetInitAtIndex(i));
-  }
-  tn = VisitTreeNode(node->GetCond());
-  tn = VisitTreeNode(node->GetBody());
+  (void) AstVisitor::VisitForLoopNode(node);
+  TreeNode *tn = node->GetBody();
   if (tn && !tn->IsBlock()) {
     BlockNode *blk = (BlockNode*)gTreePool.NewTreeNode(sizeof(BlockNode));
     new (blk) BlockNode();
