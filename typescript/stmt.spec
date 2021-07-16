@@ -1533,8 +1533,12 @@ rule Type : ONEOF(UnionOrIntersectionOrPrimaryType,
                   ConditionalType,
                   # Typescript interface[index] can be seen as a type
                   Identifier + '[' + Literal + ']',
-                  Identifier + '[' + Identifier + ']')
+                  Identifier + '[' + Identifier + ']',
+                  Identifier + ZEROORONE(TypeArguments) + '[' + Literal + ']',
+                  Identifier + ZEROORONE(TypeArguments) + '[' + Identifier + ']')
   attr.action.%6,%7 : BuildArrayElement(%1, %3)
+  attr.action.%8,%9 : BuildUserType(%1)
+  attr.action.%8,%9 : AddTypeGenerics(%2)
 
 #rule UnionOrIntersectionOrPrimaryType: ONEOF(UnionType,
 #                                             IntersectionOrPrimaryType)

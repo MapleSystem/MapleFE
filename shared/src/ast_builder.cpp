@@ -3172,6 +3172,7 @@ TreeNode* ASTBuilder::BuildConditionalType() {
 }
 
 
+// It takes one argument, the type param or type arg
 TreeNode* ASTBuilder::AddTypeGenerics() {
   if (mTrace)
     std::cout << "In AddTypeGenerics" << std::endl;
