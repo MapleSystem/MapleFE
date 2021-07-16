@@ -667,6 +667,17 @@ FieldNode *TypeInferVisitor::VisitFieldNode(FieldNode *node) {
   return node;
 }
 
+ForLoopNode *TypeInferVisitor::VisitForLoopNode(ForLoopNode *node) {
+  if (node->GetProp() == FLP_JSIn) {
+    TreeNode *var = node->GetVariable();
+    if (var) {
+      var->SetTypeId(TY_Int);
+    }
+  }
+  (void) AstVisitor::VisitForLoopNode(node);
+  return node;
+}
+
 FunctionNode *TypeInferVisitor::VisitFunctionNode(FunctionNode *node) {
   UpdateTypeId(node, node->IsArray() ? TY_Object : TY_Function);
   (void) AstVisitor::VisitFunctionNode(node);

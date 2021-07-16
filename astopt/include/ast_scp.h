@@ -84,6 +84,7 @@ class BuildScopeVisitor : public BuildScopeBaseVisitor {
   ClassNode *VisitClassNode(ClassNode *node);
   StructNode *VisitStructNode(StructNode *node);
   InterfaceNode *VisitInterfaceNode(InterfaceNode *node);
+  ForLoopNode *VisitForLoopNode(ForLoopNode *node);
 
   // related node with scope : decl, type
   DeclNode *VisitDeclNode(DeclNode *node);

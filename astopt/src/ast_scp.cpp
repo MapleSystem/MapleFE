@@ -229,6 +229,22 @@ TypeAliasNode *BuildScopeVisitor::VisitTypeAliasNode(TypeAliasNode *node) {
   return node;
 }
 
+ForLoopNode *BuildScopeVisitor::VisitForLoopNode(ForLoopNode *node) {
+  if (node->GetProp() == FLP_JSIn) {
+    ASTScope *parent = mScopeStack.top();
+    ASTScope *scope = mASTModule->NewScope(parent, node);
+    TreeNode *var = node->GetVariable();
+    if (var) {
+      if (var->IsDecl()) {
+        TreeNode *id = (static_cast<DeclNode *>(var))->GetVar();
+        scope->AddDecl(id);
+      }
+    }
+  }
+  BuildScopeBaseVisitor::VisitForLoopNode(node);
+  return node;
+}
+
 void AST_SCP::RenameVar() {
   if (mTrace) std::cout << "============== RenameVar ==============" << std::endl;
   RenameVarVisitor visitor(mHandler, mTrace, true);
