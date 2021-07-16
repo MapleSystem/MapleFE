@@ -1921,17 +1921,20 @@ rule MemberFunctionDeclaration: ONEOF(
   ZEROORONE(Annotation) + ZEROORMORE(AccessibilityModifier) + PropertyName + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}',
   ZEROORONE(Annotation) + ZEROORMORE(AccessibilityModifier) + PropertyName + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + ZEROORONE(';'),
   ZEROORONE(Annotation) + ZEROORMORE(AccessibilityModifier) + PropertyName + '?' + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}',
-  ZEROORONE(Annotation) + ZEROORMORE(AccessibilityModifier) + PropertyName + '?' + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + ZEROORONE(';'))
-  attr.action.%1,%2,%3,%4 : BuildFunction(%3)
-  attr.action.%1,%2,%3,%4 : AddModifier(%2)
-  attr.action.%1,%2,%3,%4 : AddModifier(%1)
-  attr.action.%1,%2 : AddParams(%6)
+  ZEROORONE(Annotation) + ZEROORMORE(AccessibilityModifier) + PropertyName + '?' + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + ZEROORONE(';'),
+  ZEROORONE(Annotation) + ZEROORMORE(AccessibilityModifier) + PropertyName + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ':' + IsExpression + '{' + FunctionBody + '}',
+  ZEROORONE(Annotation) + ZEROORMORE(AccessibilityModifier) + PropertyName + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ':' + IsExpression + ZEROORONE(';'))
+  attr.action.%1,%2,%3,%4,%5,%6 : BuildFunction(%3)
+  attr.action.%1,%2,%3,%4,%5,%6 : AddModifier(%2)
+  attr.action.%1,%2,%3,%4,%5,%6 : AddModifier(%1)
+  attr.action.%1,%2,%5,%6 : AddParams(%6)
   attr.action.%1,%2 : AddType(%8)
   attr.action.%1    : AddFunctionBody(%10)
   attr.action.%3,%4 : AddParams(%7)
   attr.action.%3,%4 : AddType(%9)
   attr.action.%3    : AddFunctionBody(%11)
   attr.action.%3,%4 : SetIsOptional(%3)
+  attr.action.%5,%6 : AddType(%9)
 
 ## MemberAccessorDeclaration: AccessibilityModifieropt staticopt GetAccessor AccessibilityModifieropt staticopt SetAccessor
 rule MemberAccessorDeclaration: ONEOF(
