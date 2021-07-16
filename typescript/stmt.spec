@@ -80,6 +80,8 @@ rule KeywordIdentifier : ONEOF("get",
                                "namespace")
   attr.action : BuildIdentifier()
 
+## "
+
 rule JSIdentifier: ONEOF(Identifier,
                          KeywordIdentifier,
                          Identifier + '!',
@@ -443,7 +445,11 @@ rule ArgumentList : ONEOF(AssignmentExpression,
 ##  NewExpression[?Yield]
 ##  CallExpression[?Yield]
 
-rule LeftHandSideExpression : ONEOF(NewExpression, CallExpression)
+rule LeftHandSideExpression : ONEOF(NewExpression,
+                                    CallExpression,
+                                    "..." + NewExpression,
+                                    "..." + CallExpression)
+  attr.action.%3,%4 : SetIsRest(%2)
 
 ##-----------------------------------
 ##rule PostfixExpression[Yield] :
