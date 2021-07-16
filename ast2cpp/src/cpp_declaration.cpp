@@ -18,6 +18,21 @@
 
 namespace maplefe {
 
+class ClassDecls : public AstVisitor {
+  private:
+    CppDecl     *mCppDecl;
+    std::string  mDecls;
+
+  public:
+    ClassDecls(CppDecl *c) : mCppDecl(c) {}
+
+    ClassNode *VisitClassNode(ClassNode *node) {
+      mDecls += mCppDecl->EmitTreeNode(node);
+      return node;
+    }
+    std::string GetDecls() { return mDecls; }
+};
+
 class CollectDecls : public AstVisitor {
   private:
     CppDecl     *mCppDecl;
@@ -56,6 +71,13 @@ std::string CppDecl::EmitModuleNode(ModuleNode *node) {
   str += R"""(
 #include "ts2cpp.h"
 
+)""";
+
+  ClassDecls clsDecls(this);
+  clsDecls.VisitTreeNode(node);
+  str += clsDecls.GetDecls();
+
+  str += R"""(
 class )""" + name + R"""( : public t2crt::Object {
 public: // all top level variables in the module
 )""";
@@ -76,7 +98,9 @@ void __init_func__();
   for(unsigned i = 0; i < num; ++i) {
     CfgFunc *func = module->GetNestedFuncAtIndex(i);
     TreeNode *node = func->GetFuncNode();
-    str += EmitTreeNode(node);
+    if (node->GetParent() && node->GetParent()->GetKind() != NK_Class) {
+      str += EmitTreeNode(node);
+    }
   }
 
   str += R"""(
@@ -114,6 +138,14 @@ std::string CppDecl::EmitIdentifierNode(IdentifierNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str(GetTypeString(node, node->GetType()));
+
+  TreeNode* t = node->GetType();
+  if (node->GetType() && node->GetType()->GetKind()==NK_UserType) {
+    UserTypeNode* n = static_cast<UserTypeNode*>(node->GetType());
+    if (n->GetId() && n->GetId()->GetKind() == NK_Identifier && n->GetId()->GetTypeId() == TY_Class) {
+      str += "*"s;
+    }
+  }
   str += " "s + node->GetName();
   return str;
 }
@@ -208,6 +240,8 @@ std::string CppDecl::GetTypeString(TreeNode *node, TreeNode *child) {
       case TY_Number:
       case TY_Double:
         return "double "s;
+      case TY_Class:
+        return ""s;
     }
     {
       std::string str = child ? EmitTreeNode(child) : Emitter::GetEnumTypeId(k);
@@ -262,5 +296,68 @@ std::string CppDecl::EmitUserTypeNode(UserTypeNode *node) {
     str += ";\n"s;
   return HandleTreeNode(str, node);
 }
+
+std::string CppDecl::EmitClassNode(ClassNode *node) {
+  std::string str;
+  std::string base;
+
+  if (node == nullptr)
+    return std::string();
+
+  // 1. c++ class for JS object
+  base = (node->GetSuperClassesNum() != 0)? node->GetSuperClass(0)->GetName() : "Object";
+  str += "class "s + node->GetName() + " : public "s + base + " {\n"s;
+
+  str += "  public:\n";
+  // constructor decl,  field init
+  for (unsigned i = 0; i < node->GetConstructorsNum(); ++i) {
+    if (auto t = node->GetConstructor(i)) {
+      std::string init;
+      for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
+        if (i)
+          init += ", "s;
+        if (IdentifierNode* n = reinterpret_cast<IdentifierNode *>(node->GetField(i))) {
+          if (n->GetInit()) {
+            init += n->GetName();
+            init += "("s + EmitTreeNode(n->GetInit()) + ")"s;
+          }
+        }
+      }
+      str += node->GetName() + "(Function* ctor, Object* proto): "s + base + "(ctor, proto)" + (init.empty()? init: ","s + init) + " {}\n"s;
+      str += "~"s + node->GetName() + "{}\n";
+    }
+  }
+  // field decl. TODO: handle static, private, protected attrs.
+  for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
+    str += EmitTreeNode(node->GetField(i)) + ";";
+  }
+  // TODO: class methods decl
+  str += "};\n\n";
+
+  // 2. c++ class for JS object's corresponding JS constructor
+  base = (node->GetSuperClassesNum() != 0)? ("Ctor_"s+node->GetSuperClass(0)->GetName()) : "Function";
+  str += "class "s + "Ctor_" + node->GetName() + " : public "s + base + " {\n"s;
+  str += "  public:\n";
+  str += "Ctor_"s+node->GetName()+"(Function* ctor, Object* proto, Object* prototype_proto) : "+base+"(ctor, proto, prototype_proto) {}\n";
+
+  for (unsigned i = 0; i < node->GetConstructorsNum(); ++i) {
+    std::string ctor;
+    if (auto c = node->GetConstructor(i)) {
+      ctor = "  "s+node->GetName() + "* operator()("s;
+      for (unsigned k = 0; k < c->GetParamsNum(); ++k) {
+        if (k)
+          ctor += ", "s;
+        if (auto n = c->GetParam(k)) {
+          ctor += EmitTreeNode(n);
+        }
+      }
+      ctor += ");";
+      str += ctor;
+    }
+  }
+  str += "};\n\n";
+  return str;
+}
+
 
 } // namespace maplefe

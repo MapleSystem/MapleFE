@@ -48,6 +48,7 @@ public:
   virtual std::string EmitPrimTypeNode(PrimTypeNode *node);
   virtual std::string EmitPrimArrayTypeNode(PrimArrayTypeNode *node);
   virtual std::string EmitModuleNode(ModuleNode *node);
+  virtual std::string EmitClassNode(ClassNode *node);
 
   std::string GetTypeString(TreeNode *node, TreeNode *child = nullptr);
 
