@@ -355,35 +355,50 @@ TreeNode *TypeInferVisitor::VisitClassField(TreeNode *node) {
   return node;
 }
 
+// ArrayElementNode are for
+// 1. array access
+// 2. indexed access of class/structure for fields, field types
 ArrayElementNode *TypeInferVisitor::VisitArrayElementNode(ArrayElementNode *node) {
   (void) AstVisitor::VisitArrayElementNode(node);
   TreeNode *array = node->GetArray();
   if (array) {
-    array->SetTypeId(TY_Array);
     if (array->IsIdentifier()) {
       TreeNode *decl = mHandler->FindDecl(static_cast<IdentifierNode *>(array));
       if (decl) {
-        // indexed access type
-        if (decl->IsStruct()) {
+        // indexed access of class fields or types
+        if (decl->GetTypeId() == TY_Class) {
           array->SetTypeId(TY_Class);
           TreeNode *exp = node->GetExprAtIndex(0);
-          if (exp->IsLiteral() && exp->GetTypeId() == TY_String) {
-            unsigned stridx = (static_cast<LiteralNode *>(exp))->GetData().mData.mStrIdx;
-            StructNode *structure = static_cast<StructNode *>(decl);
-            for (int i = 0; i < structure->GetFieldsNum(); i++) {
-              TreeNode *f = structure->GetField(i);
-              if (f->GetStrIdx() == stridx) {
-                TypeId tid = f->GetTypeId();
-                UpdateTypeId(node, tid);
-                break;
+          if (exp->IsLiteral()) {
+            if (exp->GetTypeId() == TY_String) {
+              // indexed access of types
+              unsigned stridx = (static_cast<LiteralNode *>(exp))->GetData().mData.mStrIdx;
+              if (decl->IsStruct()) {
+                StructNode *structure = static_cast<StructNode *>(decl);
+                for (int i = 0; i < structure->GetFieldsNum(); i++) {
+                  TreeNode *f = structure->GetField(i);
+                  if (f->GetStrIdx() == stridx) {
+                    TypeId tid = f->GetTypeId();
+                    UpdateTypeId(node, tid);
+                    break;
+                  }
+                }
               }
+            } else if (exp->GetTypeId() == TY_Int) {
+              // indexed access of fields
+              unsigned i = (static_cast<LiteralNode *>(exp))->GetData().mData.mInt64;
+              NOTYETIMPL("indexed access with literal field id");
+            } else {
+              AstVisitor::VisitTreeNode(exp);
+              NOTYETIMPL("indexed access not literal");
             }
           } else {
-            NOTYETIMPL("indexed access type index not string literal");
+            AstVisitor::VisitTreeNode(exp);
           }
         } else {
           // default
-          decl->SetTypeId(TY_Array);
+          UpdateTypeId(array, TY_Array);
+          UpdateTypeId(decl, TY_Array);
           UpdateArrayElemTypeIdMap(decl, node->GetTypeId());
           UpdateTypeId(node, mHandler->mArrayDeclId2EleTypeIdMap[decl->GetNodeId()]);
         }
@@ -547,11 +562,11 @@ DeclNode *TypeInferVisitor::VisitDeclNode(DeclNode *node) {
   (void) AstVisitor::VisitDeclNode(node);
   TreeNode *init = node->GetInit();
   TreeNode *var = node->GetVar();
-  TypeId merged = TY_None;
+  TypeId merged = node->GetTypeId();
   TypeId elemTypeId = TY_None;
   bool isArray = false;
   if (init) {
-    merged = MergeTypeId(node->GetTypeId(), init->GetTypeId());
+    merged = MergeTypeId(merged, init->GetTypeId());
     // collect array element typeid
     TreeNode *n = init;
     while (n->IsArrayLiteral()) {
