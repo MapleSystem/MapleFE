@@ -74,13 +74,18 @@ rule KeywordIdentifier : ONEOF("get",
                                "is",
                                "of",
                                "declare",
+                               "readonly",
                                "namespace")
   attr.action : BuildIdentifier()
 
 rule JSIdentifier: ONEOF(Identifier,
                          KeywordIdentifier,
-                         Identifier + '!')
+                         Identifier + '!',
+                         Identifier + '?',
+                         KeywordIdentifier + '?')
   attr.action.%3 : SetIsNonNull(%1)
+  attr.action.%4 : SetIsOptional(%1)
+  attr.action.%5 : SetIsOptional(%1)
 
 rule AsType : "as" + PrimaryType
   attr.action : BuildAsType(%2)
