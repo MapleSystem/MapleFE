@@ -1526,19 +1526,16 @@ rule ConditionalType : MemberExpression + "extends" + Type + '?' + Type + ':' + 
 rule KeyOf : "keyof" + Identifier
   attr.action : BuildKeyOf(%2)
 
+rule TypeArray : PrimaryType + '[' + PrimaryExpression + ']'
+  attr.action : BuildArrayElement(%1, %3)
+
 rule Type : ONEOF(UnionOrIntersectionOrPrimaryType,
                   FunctionType,
                   ConstructorType,
                   KeyOf,
                   ConditionalType,
                   # Typescript interface[index] can be seen as a type
-                  Identifier + '[' + Literal + ']',
-                  Identifier + '[' + Identifier + ']',
-                  Identifier + ZEROORONE(TypeArguments) + '[' + Literal + ']',
-                  Identifier + ZEROORONE(TypeArguments) + '[' + Identifier + ']')
-  attr.action.%6,%7 : BuildArrayElement(%1, %3)
-  attr.action.%8,%9 : BuildUserType(%1)
-  attr.action.%8,%9 : AddTypeGenerics(%2)
+                  TypeArray)
 
 #rule UnionOrIntersectionOrPrimaryType: ONEOF(UnionType,
 #                                             IntersectionOrPrimaryType)
