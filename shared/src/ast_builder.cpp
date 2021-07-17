@@ -103,6 +103,7 @@ TreeNode* ASTBuilder::CreateTokenTreeNode(const Token *token) {
     PrimTypeNode *type = gPrimTypePool.FindType(keyword);
     if (type) {
       mLastTreeNode = type;
+      mNameForBuildIdentifier = keyword;
       return type;
     }
     // We define special literal tree node for 'this', 'super'.
@@ -1466,13 +1467,15 @@ TreeNode* ASTBuilder::BuildArrayElement() {
           array->IsArrayElement() ||
           array->IsField() ||
           array->IsUserType() ||
-          (array->IsLiteral() && ((LiteralNode*)array)->IsThis()));
+          (array->IsLiteral() && ((LiteralNode*)array)->IsThis()) ||
+          array->IsPrimType());
 
   ArrayElementNode *array_element = NULL;
   if (array->IsIdentifier() ||
       array->IsField() ||
       array->IsUserType() ||
-      (array->IsLiteral() && ((LiteralNode*)array)->IsThis())) {
+      (array->IsLiteral() && ((LiteralNode*)array)->IsThis()) ||
+      array->IsPrimType()) {
     array_element = (ArrayElementNode*)gTreePool.NewTreeNode(sizeof(ArrayElementNode));
     new (array_element) ArrayElementNode();
     array_element->SetArray(array);
