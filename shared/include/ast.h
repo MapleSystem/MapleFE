@@ -95,6 +95,7 @@ protected:
   bool      mIsNonNull;   // if a node is asserted to be non-null.
                           // This design is first coming from Typescript.
   bool      mIsRest;      // A spread or rest syntax in Javascript.
+  bool      mIsConst;     // A constant node. Readonly.
 
   // This is a feature coming from TypeScript. Almost every expression in Typescript has
   // this information. So it's here.
@@ -103,7 +104,7 @@ protected:
 public:
   TreeNode(NodeKind k, unsigned i)
     : mKind(k), mLabel(NULL), mParent(NULL), mStrIdx(i), mIsStmt(false), mTypeId(TY_None),
-      mScope(NULL), mIsOptional(false), mIsNonNull(false), mIsRest(false) {}
+      mScope(NULL), mIsOptional(false), mIsNonNull(false), mIsRest(false), mIsConst(false) {}
   TreeNode(NodeKind k) : TreeNode(k, 0) {}
   //TreeNode() : TreeNode(NK_Null, 0) {}
   virtual ~TreeNode() {}
@@ -137,6 +138,8 @@ public:
   void SetIsNonNull(bool b = true) {mIsNonNull = b;}
   bool IsRest()                    {return mIsRest;}
   void SetIsRest(bool b = true)    {mIsRest = b;}
+  bool IsConst()                   {return mIsConst;}
+  void SetIsConst(bool b = true)   {mIsConst = b;}
 
   virtual unsigned GetStrIdx() {return mStrIdx;}
   virtual void SetStrIdx(unsigned id) {mStrIdx = id;}

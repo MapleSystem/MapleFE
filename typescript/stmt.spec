@@ -146,19 +146,22 @@ rule LabelIdentifier : ONEOF(
 ##  TemplateLiteral[?Yield]
 ##  CoverParenthesizedExpressionAndArrowParameterList[?Yield]
 
-rule PrimaryExpression : ONEOF(
-  "this",
-  "super",
-  IdentifierReference,
-  Literal,
-  ArrayLiteral,
-  ObjectLiteral,
-  FunctionExpression,
-#  ClassExpression[?Yield]
-#  GeneratorExpression
-  RegularExpression,
-  TemplateLiteral,
-  ParenthesizedExpression)
+rule PrimaryExpression : ONEOF("this",
+                               "super",
+                               IdentifierReference,
+                               Literal,
+                               ArrayLiteral,
+                               ObjectLiteral,
+                               FunctionExpression,
+#                              ClassExpression[?Yield]
+#                              GeneratorExpression
+                               RegularExpression,
+                               TemplateLiteral,
+                               ParenthesizedExpression,
+                               Literal + "as" + "const",
+                               ArrayLiteral + "as" + "const",
+                               ObjectLiteral + "as" + "const")
+  attr.action.%11,%12,%13 : SetIsConst(%1)
 
 ##-----------------------------------
 ##rule CoverParenthesizedExpressionAndArrowParameterList[Yield] :

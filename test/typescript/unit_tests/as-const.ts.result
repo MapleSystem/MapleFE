@@ -1,0 +1,7 @@
+Matched 7 tokens.
+Matched 14 tokens.
+============= Module ===========
+== Sub Tree ==
+js_let Decl: s=
+== Sub Tree ==
+console.log(s)

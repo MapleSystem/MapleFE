@@ -162,6 +162,7 @@ ACTION(SetIsStmt)
 ACTION(SetIsOptional)
 ACTION(SetIsNonNull)
 ACTION(SetIsRest)
+ACTION(SetIsConst)
 
 // statment, control flow
 ACTION(BuildAssignment)

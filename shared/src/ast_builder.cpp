@@ -759,6 +759,23 @@ TreeNode* ASTBuilder::SetIsRest() {
   return mLastTreeNode;
 }
 
+// Takes one argument. Set the tree as a constant node.
+// We still return the previous mLastTreeNode.
+TreeNode* ASTBuilder::SetIsConst() {
+  if (mTrace)
+    std::cout << "In SetIsConst" << std::endl;
+
+  Param p_tree = mParams[0];
+  if (!p_tree.mIsEmpty) {
+    MASSERT(p_tree.mIsTreeNode);
+    TreeNode *treenode = p_tree.mData.mTreeNode;
+    treenode->SetIsConst();
+  }
+
+  return mLastTreeNode;
+}
+
+
 // Assignment is actually a binary operator.
 TreeNode* ASTBuilder::BuildAssignment() {
   if (mTrace)
