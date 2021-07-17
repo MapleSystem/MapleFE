@@ -1539,7 +1539,9 @@ rule Type : ONEOF(UnionOrIntersectionOrPrimaryType,
                   KeyOf,
                   ConditionalType,
                   # Typescript interface[index] can be seen as a type
-                  TypeArray)
+                  TypeArray,
+                  MemberExpression + '[' + KeyOf + ']')
+  attr.action.%7 : BuildArrayElement(%1, %3)
 
 #rule UnionOrIntersectionOrPrimaryType: ONEOF(UnionType,
 #                                             IntersectionOrPrimaryType)
