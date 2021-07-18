@@ -147,8 +147,6 @@ std::string Emitter::EmitIdentifierNode(IdentifierNode *node) {
   for (unsigned i = 0; i < node->GetAttrsNum(); ++i) {
     str += GetEnumAttrId(node->GetAttrAtIndex(i));
   }
-  if(node->IsRest())
-    str += "..."s;
   str += node->GetName();
   if(node->IsOptionalParam() || node->IsOptional())
     str += "?"s;
@@ -759,8 +757,6 @@ std::string Emitter::EmitBindingElementNode(BindingElementNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
-  if(node->IsRest())
-    str += "..."s;
   if (auto n = node->GetVariable()) {
     str += " "s + EmitTreeNode(n);
   }
@@ -1885,6 +1881,12 @@ std::string Emitter::EmitTreeNode(TreeNode *node) {
 }
 
 std::string &Emitter::HandleTreeNode(std::string &str, TreeNode *node) {
+  if(node->IsOptional())
+    str += "?"s;
+  if(node->IsNonNull())
+    str += "!"s;
+  if(node->IsRest())
+    str = "..."s + str;
   if(node->IsConst())
     str += " as const"s;
   auto num = node->GetAsTypesNum();
