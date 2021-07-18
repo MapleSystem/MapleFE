@@ -1628,8 +1628,8 @@ std::string Emitter::EmitModuleNode(ModuleNode *node) {
 std::string Emitter::EmitAttrNode(AttrNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str;
-  str += " "s + AstDump::GetEnumAttrId(node->GetId());
+  std::string str(AstDump::GetEnumAttrId(node->GetId()));
+  Replace(str, "ATTR_", "");
   if (node->IsStmt())
     str += ";\n"s;
   return HandleTreeNode(str, node);
@@ -1885,6 +1885,8 @@ std::string Emitter::EmitTreeNode(TreeNode *node) {
 }
 
 std::string &Emitter::HandleTreeNode(std::string &str, TreeNode *node) {
+  if(node->IsConst())
+    str += " as const"s;
   auto num = node->GetAsTypesNum();
   if(num == 0)
     return str;
