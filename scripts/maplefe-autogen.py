@@ -1043,7 +1043,7 @@ void WriteAddress(TreeNode *node) {{
   if(node)
     WriteNum('A', static_cast<int64_t>(node->GetNodeId()));
   else
-    WriteNum('A', 0);
+    WriteNum('A', -1);
 }}
 
 void WriteValue(int64_t val) {{
@@ -1250,7 +1250,7 @@ void ReadNode(TreeNode *node) {{
 
 TreeNode *ReadAddress() {{
   int64_t n = ReadNum('A');
-  return n ? mNodeMap[static_cast<unsigned>(n)] : nullptr;
+  return n != -1 ? mNodeMap[static_cast<unsigned>(n)] : nullptr;
 }}
 
 int64_t ReadValue() {{
