@@ -1,0 +1,12 @@
+Matched 19 tokens.
+Matched 30 tokens.
+Matched 37 tokens.
+============= Module ===========
+== Sub Tree ==
+func  func()  throws: 
+  return  {list:[1,2,3]}
+
+== Sub Tree ==
+js_let Decl: s=func().list
+== Sub Tree ==
+console.log(s)
