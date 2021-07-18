@@ -148,8 +148,9 @@ std::string Emitter::EmitIdentifierNode(IdentifierNode *node) {
     str += GetEnumAttrId(node->GetAttrAtIndex(i));
   }
   str += node->GetName();
-  if(node->IsOptionalParam() || node->IsOptional())
-    str += "?"s;
+  //if(node->IsOptionalParam() || node->IsOptional())
+  //  str += "?"s;
+  str = HandleTreeNode(str, node);
   //if (auto n = node->GetDims()) {
   //  str += " "s + EmitDimensionNode(n);
   //}
@@ -174,7 +175,8 @@ std::string Emitter::EmitIdentifierNode(IdentifierNode *node) {
   mPrecedence = '\030';
   if (node->IsStmt())
     str += ";\n"s;
-  return HandleTreeNode(str, node);
+  //return HandleTreeNode(str, node);
+  return str;
 }
 
 std::string Emitter::EmitFunctionNode(FunctionNode *node) {
@@ -300,9 +302,9 @@ std::string Emitter::EmitComputedNameNode(ComputedNameNode *node) {
   if (auto n = node->GetExpr()) {
     str += EmitTreeNode(n);
   }
-  str += "] : "s;
+  str += "] "s;
   if (auto n = node->GetExtendType()) {
-    str += EmitTreeNode(n);
+    str += ": "s + EmitTreeNode(n);
   }
   return str;
 }
