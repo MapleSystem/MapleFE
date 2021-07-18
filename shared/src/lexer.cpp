@@ -384,7 +384,7 @@ TempLitData* Lexer::GetTempLit() {
     while(1) {
       // Try string
       end_idx = 0;
-      std::string fmt_str;
+      std::string fmt_str = "";
       bool s_found = FindNextTLFormat(start_idx, fmt_str, end_idx);
       const char *addr = NULL;
       if (s_found) {
@@ -396,7 +396,7 @@ TempLitData* Lexer::GetTempLit() {
       // Try pattern
       end_idx = 0;
       const char *addr_ph = NULL;
-      std::string pl_str;
+      std::string pl_str = "";
       bool p_found = FindNextTLPlaceHolder(start_idx, pl_str, end_idx);
       if (p_found) {
         unsigned len = pl_str.size();

@@ -2,6 +2,6 @@ Matched 7 tokens.
 Matched 14 tokens.
 ============= Module ===========
 == Sub Tree ==
-js_let Decl: s=
+js_let Decl: s="abc"
 == Sub Tree ==
 console.log(s)

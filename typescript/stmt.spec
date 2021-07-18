@@ -162,6 +162,7 @@ rule PrimaryExpression : ONEOF("this",
                                ArrayLiteral + "as" + "const",
                                ObjectLiteral + "as" + "const")
   attr.action.%11,%12,%13 : SetIsConst(%1)
+  attr.action.%11,%12,%13 : PassChild(%1)
 
 ##-----------------------------------
 ##rule CoverParenthesizedExpressionAndArrowParameterList[Yield] :
