@@ -45,7 +45,12 @@ private:
   StringMap            *mMap;
   std::vector<SPBlock>  mBlocks;
   int                   mFirstAvail; // -1 means no available.
-  std::vector<const char *> mStringTable;
+
+  std::vector<char*> mLongStrings; // for strings longer than block size,
+                                   // we allocate them by malloc.
+
+  std::vector<const char*> mStringTable;
+
   friend class StringMap;
 
 public:

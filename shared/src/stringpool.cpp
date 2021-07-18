@@ -49,6 +49,14 @@ StringPool::~StringPool() {
     free(addr);
   }
   mStringTable.clear();
+
+  // Release the long strings
+  std::vector<char*>::iterator long_it;
+  for (long_it = mLongStrings.begin(); long_it != mLongStrings.end(); long_it++) {
+    char *addr = *long_it;
+    free(addr);
+  }
+  mLongStrings.clear();
   
   // Release the StringMap
   delete mMap;
@@ -61,11 +69,14 @@ char* StringPool::Alloc(const std::string &s) {
 // 's' must guarantee to end with NULL
 char* StringPool::Alloc(const char *s) {
   size_t size = strlen(s) + 1;
+  char *addr = NULL;
   if (size > BLOCK_SIZE) {
-    MERROR ("Requsted size is bigger than block size");
+    addr = (char*)malloc(size);
+    mLongStrings.push_back(addr);
+  } else {
+    addr = Alloc(size);
   }
 
-  char *addr = Alloc(size);
   MASSERT (addr && "StringPool failed to alloc for string");
 
   strncpy(addr, s, size - 1);
@@ -118,20 +129,20 @@ char* StringPool::AllocBlock() {
 }
 
 // This is the public interface to find a string in the pool.
-// If not found, add it.
+// If not found, allocate in the pool and save in the map.
 const char* StringPool::FindString(const std::string &s) {
   return mMap->LookupEntryFor(s)->GetAddr();
 }
 
 // This is the public interface to find a string in the pool.
-// If not found, add it.
+// If not found, allocate in the pool and save in the map.
 const char* StringPool::FindString(const char *str) {
   std::string s(str);
   return mMap->LookupEntryFor(s)->GetAddr();
 }
 
 // This is the public interface to find a string in the pool.
-// If not found, add it.
+// If not found, allocate in the pool and save in the map.
 const char* StringPool::FindString(const char *str, size_t len) {
   std::string s;
   s.assign(str, len);
@@ -139,14 +150,14 @@ const char* StringPool::FindString(const char *str, size_t len) {
 }
 
 // This is the public interface to find a string in the pool.
-// If not found, add it.
+// If not found, allocate in the pool and save in the map.
 unsigned StringPool::GetStrIdx(const std::string &s) {
   if (s.empty()) return 1;
   return mMap->LookupEntryFor(s)->GetStrIdx();
 }
 
 // This is the public interface to find a string in the pool.
-// If not found, add it.
+// If not found, allocate in the pool and save in the map.
 unsigned StringPool::GetStrIdx(const char *str) {
   if (strlen(str) == 0) return 1;
   std::string s(str);
@@ -154,7 +165,7 @@ unsigned StringPool::GetStrIdx(const char *str) {
 }
 
 // This is the public interface to find a string in the pool.
-// If not found, add it.
+// If not found, allocate in the pool and save in the map.
 unsigned StringPool::GetStrIdx(const char *str, size_t len) {
   if (len == 0) return 1;
   std::string s;
