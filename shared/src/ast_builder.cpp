@@ -1521,7 +1521,8 @@ TreeNode* ASTBuilder::BuildArrayLiteral() {
             literals->IsCall() ||
             literals->IsArrayElement() ||
             literals->IsField() ||
-            literals->IsBinOperator());
+            literals->IsBinOperator() ||
+            literals->IsLambda());
     if (literals->IsExprList()) {
       ExprListNode *el = (ExprListNode*)literals;
       for (unsigned i = 0; i < el->GetExprsNum(); i++) {
@@ -1535,7 +1536,8 @@ TreeNode* ASTBuilder::BuildArrayLiteral() {
                 expr->IsCall() ||
                 expr->IsArrayElement() ||
                 expr->IsField() ||
-                expr->IsBinOperator());
+                expr->IsBinOperator() ||
+                expr->IsLambda());
         array_literal->AddLiteral(expr);
       }
     } else {
