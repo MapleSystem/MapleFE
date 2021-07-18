@@ -1250,7 +1250,7 @@ void ReadNode(TreeNode *node) {{
 
 TreeNode *ReadAddress() {{
   int64_t n = ReadNum('A');
-  return mNodeMap[static_cast<unsigned>(n)];
+  return n ? mNodeMap[static_cast<unsigned>(n)] : nullptr;
 }}
 
 int64_t ReadValue() {{
