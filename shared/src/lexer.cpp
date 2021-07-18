@@ -464,15 +464,21 @@ bool Lexer::FindNextTLPlaceHolder(unsigned start_idx, std::string& str, unsigned
 
   working_idx = start_idx + 2;
 
-  // It could be {..} inside placeholder.
+  // There could be {..} inside placeholder.
   unsigned num_left_brace = 0;
 
-  while(1) {
-    if (line[working_idx] == '{')
-      num_left_brace++;
+  // There could be string literal inside placeholder,
+  bool in_string_literal = false;
 
-    if (line[working_idx] == '}') {
-      if (num_left_brace > 0)
+  while(1) {
+
+    if (line[working_idx] == '\'') {
+      in_string_literal = in_string_literal ? false : true;
+    } else if (line[working_idx] == '{') {
+      if (!in_string_literal)
+        num_left_brace++;
+    } else if (line[working_idx] == '}') {
+      if (num_left_brace > 0 && !in_string_literal)
         num_left_brace--;
       else
         break;
