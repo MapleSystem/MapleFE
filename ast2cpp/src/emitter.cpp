@@ -181,7 +181,6 @@ std::string Emitter::EmitFunctionNode(FunctionNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
-  auto body = node->GetBody();
   for (unsigned i = 0; i < node->GetAttrsNum(); ++i) {
     str += GetEnumAttrId(node->GetAttrAtIndex(i));
   }
@@ -230,6 +229,7 @@ std::string Emitter::EmitFunctionNode(FunctionNode *node) {
   if (auto n = node->GetAssert())
     str += " : asserts "s + EmitTreeNode(n);
 
+  auto body = node->GetBody();
   if (auto n = node->GetType()) {
     std::string s = EmitTreeNode(n);
     if(!s.empty())
@@ -802,8 +802,10 @@ std::string Emitter::EmitNumIndexSigNode(NumIndexSigNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
+  if (auto n = node->GetKey())
+    str += "[ "s + EmitTreeNode(n) + " ]";
   if (auto n = node->GetDataType()) {
-    str += " "s + EmitTreeNode(n);
+    str += " : "s + EmitTreeNode(n);
   }
   mPrecedence = '\030';
   if (node->IsStmt())
@@ -815,8 +817,10 @@ std::string Emitter::EmitStrIndexSigNode(StrIndexSigNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
+  if (auto n = node->GetKey())
+    str += "[ "s + EmitTreeNode(n) + " ]";
   if (auto n = node->GetDataType()) {
-    str += " "s + EmitTreeNode(n);
+    str += " : "s + EmitTreeNode(n);
   }
   mPrecedence = '\030';
   if (node->IsStmt())
