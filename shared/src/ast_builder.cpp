@@ -761,18 +761,25 @@ TreeNode* ASTBuilder::SetIsRest() {
 }
 
 // Takes one argument. Set the tree as a constant node.
+// Or takes no argument. Set mLastTreeNode as constant.
 // We still return the previous mLastTreeNode.
 TreeNode* ASTBuilder::SetIsConst() {
   if (mTrace)
     std::cout << "In SetIsConst" << std::endl;
 
-  Param p_tree = mParams[0];
-  if (!p_tree.mIsEmpty) {
-    MASSERT(p_tree.mIsTreeNode);
-    TreeNode *treenode = p_tree.mData.mTreeNode;
-    treenode->SetIsConst();
+  TreeNode *treenode = NULL;
+
+  if (mParams.size() == 1) {
+    Param p_tree = mParams[0];
+    if (!p_tree.mIsEmpty) {
+      MASSERT(p_tree.mIsTreeNode);
+      treenode = p_tree.mData.mTreeNode;
+    }
+  } else {
+    treenode = mLastTreeNode;
   }
 
+  treenode->SetIsConst();
   return mLastTreeNode;
 }
 
