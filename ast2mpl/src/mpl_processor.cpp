@@ -907,6 +907,14 @@ maple::BaseNode *A2M::ProcessTypeParameter(StmtExprKind skind, TreeNode *tnode, 
   return nullptr;
 }
 
+maple::BaseNode *A2M::ProcessNameTypePair(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
+  return nullptr;
+}
+
+maple::BaseNode *A2M::ProcessTupleType(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
+  return nullptr;
+}
+
 maple::BaseNode *A2M::ProcessStruct(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
   NOTYETIMPL("ProcessStruct()");
   StructNode *node = static_cast<StructNode *>(tnode);

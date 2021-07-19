@@ -526,6 +526,14 @@ void Verifier::VerifyStruct(StructNode *tree){
   return;
 }
 
+void Verifier::VerifyNameTypePair(NameTypePairNode *tree){
+  return;
+}
+
+void Verifier::VerifyTupleType(TupleTypeNode *tree){
+  return;
+}
+
 void Verifier::VerifyBindingElement(BindingElementNode *tree){
   return;
 }

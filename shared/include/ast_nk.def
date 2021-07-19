@@ -30,6 +30,9 @@ NODEKIND(Field)
 NODEKIND(Dimension)
 NODEKIND(Attr)
 
+// A pair of <name, type>
+NODEKIND(NameTypePair)
+
 // Type related
 NODEKIND(PrimType)
 NODEKIND(PrimArrayType)
@@ -38,6 +41,7 @@ NODEKIND(TypeParameter)
 NODEKIND(AsType)
 NODEKIND(TypeAlias)
 NODEKIND(ConditionalType)  // Conditional types in Typescript
+NODEKIND(TupleType)        // tuple types in Typescript
 
 //
 NODEKIND(Cast)

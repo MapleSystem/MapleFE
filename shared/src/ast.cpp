@@ -1726,6 +1726,34 @@ void KeyOfNode::Dump(unsigned indent) {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
+//                              NameTypePairNode
+//////////////////////////////////////////////////////////////////////////////////////
+
+void NameTypePairNode::Dump(unsigned indent) {
+  DumpIndentation(indent);
+  if (mVar)
+    mVar->Dump(0);
+  DUMP0_NORETURN(" : ");
+  if (mType)
+    mType->Dump(0);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////
+//                              TupleTypeNode
+//////////////////////////////////////////////////////////////////////////////////////
+
+void TupleTypeNode::Dump(unsigned indent) {
+  DumpIndentation(indent);
+  DUMP0_NORETURN(" [ ");
+  for (unsigned i = 0; i < mFields.GetNum(); i++) {
+    NameTypePairNode *node = mFields.ValueAtIndex(i);
+    node->Dump(0);
+    DUMP0_NORETURN(" , ");
+  }
+  DUMP0_NORETURN(" ] ");
+}
+
+//////////////////////////////////////////////////////////////////////////////////////
 //                             InterfaceNode
 //////////////////////////////////////////////////////////////////////////////////////
 
@@ -1770,4 +1798,5 @@ void InterfaceNode::Dump(unsigned indent) {
     node->Dump(indent + 4);
   }
 }
+
 }

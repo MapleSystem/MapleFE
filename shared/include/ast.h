@@ -2149,5 +2149,42 @@ public:
   void Dump(unsigned);
 };
 
+////////////////////////////////////////////////////////////////////////////
+//                  Tuple Type
+// [label : type, label : type, ...]
+////////////////////////////////////////////////////////////////////////////
+
+class NameTypePairNode : public TreeNode {
+private:
+  TreeNode *mVar;
+  TreeNode *mType;
+public:
+  NameTypePairNode() : TreeNode(NK_NameTypePair), mVar(NULL), mType(NULL) {}
+  ~NameTypePairNode() {}
+
+  TreeNode* GetVar()  {return mVar;}
+  TreeNode* GetType() {return mType;}
+  void SetVar(TreeNode* t)  {mVar = t; SETPARENT(t);}
+  void SetType(TreeNode* t) {mType = t; SETPARENT(t);}
+
+  void Dump(unsigned);
+};
+
+class TupleTypeNode : public TreeNode {
+private:
+  SmallVector<NameTypePairNode*>       mFields;
+public:
+  TupleTypeNode() : TreeNode(NK_TupleType) {}
+  ~TupleTypeNode() {Release();}
+
+  unsigned  GetFieldsNum() {return mFields.GetNum();}
+  NameTypePairNode* GetField(unsigned i) {return mFields.ValueAtIndex(i);}
+  void      SetField(unsigned i, NameTypePairNode* n) {*(mFields.RefAtIndex(i)) = n; SETPARENT(n);}
+  void      AddField(NameTypePairNode *n) {mFields.PushBack(n); SETPARENT(n);}
+
+  void Release() {mFields.Release();}
+  void Dump(unsigned);
+};
+
 }
 #endif
