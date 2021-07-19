@@ -167,11 +167,6 @@ std::string Emitter::EmitIdentifierNode(IdentifierNode *node) {
   if (auto n = node->GetInit()) {
     str += " = "s + EmitTreeNode(n);
   }
-  for (unsigned i = 0; i < node->GetAsTypesNum(); ++i) {
-    if (auto n = node->GetAsTypeAtIndex(i)) {
-      str += " "s + EmitAsTypeNode(n);
-    }
-  }
   mPrecedence = '\030';
   if (node->IsStmt())
     str += ";\n"s;
