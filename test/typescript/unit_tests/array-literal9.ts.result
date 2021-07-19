@@ -1,0 +1,47 @@
+Matched 42 tokens.
+Matched 66 tokens.
+Matched 71 tokens.
+Matched 78 tokens.
+Matched 94 tokens.
+Matched 101 tokens.
+Matched 111 tokens.
+Matched 114 tokens.
+Matched 127 tokens.
+Matched 134 tokens.
+Matched 135 tokens.
+Matched 136 tokens.
+============= Module ===========
+== Sub Tree ==
+class  Foo
+  Fields: 
+    f1=0    f2=0
+  Instance Initializer: 
+  Constructors: 
+    constructor  (a,b)  throws: 
+      this.f1 Assign a
+      this.f2 Assign b
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+func  func()  throws: 
+  console.log("Returning a new object")
+  return new Foo(789,0)
+
+== Sub Tree ==
+js_var Decl: obj
+== Sub Tree ==
+js_var Decl: i=1
+== Sub Tree ==
+js_var Decl: res=obj Lor func()[ template-literal: "f",i]
+== Sub Tree ==
+console.log(res)
+== Sub Tree ==
+obj Assign new Foo(123,456)
+== Sub Tree ==
+PreInc i
+== Sub Tree ==
+res Assign obj Lor func()[ template-literal: "f",i]
+== Sub Tree ==
+console.log(res)
