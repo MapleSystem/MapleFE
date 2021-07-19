@@ -1,0 +1,15 @@
+Matched 14 tokens.
+Matched 25 tokens.
+Matched 39 tokens.
+Matched 48 tokens.
+============= Module ===========
+== Sub Tree ==
+func  func(x)  throws: 
+  return x
+
+== Sub Tree ==
+js_let Decl: a= {f:false}
+== Sub Tree ==
+js_let Decl: b=func(a).f NullCoalesce true
+== Sub Tree ==
+console.log(a,b)
