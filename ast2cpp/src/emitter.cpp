@@ -1600,6 +1600,38 @@ std::string Emitter::EmitIsNode(IsNode *node) {
   return str;
 }
 
+std::string Emitter::EmitNameTypePairNode(NameTypePairNode *node) {
+  if (node == nullptr)
+    return std::string();
+  std::string str;
+  if (auto n = node->GetVar()) {
+    str += EmitTreeNode(n) + ": "s;
+  }
+  if (auto n = node->GetType()) {
+    str += EmitTreeNode(n);
+  }
+  return str;
+}
+
+std::string Emitter::EmitTupleTypeNode(TupleTypeNode *node) {
+  if (node == nullptr)
+    return std::string();
+  std::string str = "[ "s;
+
+  for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
+    if (i)
+      str += ", "s;
+    if (auto n = node->GetField(i)) {
+      str += EmitNameTypePairNode(n);
+    }
+  }
+  str += " ]"s;
+
+  mPrecedence = '\030';
+  if (node->IsStmt())
+    str += ";\n"s;
+  return str;
+}
 std::string Emitter::EmitModuleNode(ModuleNode *node) {
   if (node == nullptr)
     return std::string();
@@ -1697,6 +1729,9 @@ std::string Emitter::EmitTreeNode(TreeNode *node) {
   case NK_Attr:
     return EmitAttrNode(static_cast<AttrNode *>(node));
     break;
+  case NK_NameTypePair:
+    return EmitNameTypePairNode(static_cast<NameTypePairNode *>(node));
+    break;
   case NK_PrimType:
     return EmitPrimTypeNode(static_cast<PrimTypeNode *>(node));
     break;
@@ -1717,6 +1752,9 @@ std::string Emitter::EmitTreeNode(TreeNode *node) {
     break;
   case NK_ConditionalType:
     return EmitConditionalTypeNode(static_cast<ConditionalTypeNode *>(node));
+    break;
+  case NK_TupleType:
+    return EmitTupleTypeNode(static_cast<TupleTypeNode *>(node));
     break;
   case NK_Cast:
     return EmitCastNode(static_cast<CastNode *>(node));
