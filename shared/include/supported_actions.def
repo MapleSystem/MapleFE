@@ -200,6 +200,7 @@ ACTION(AddFinally)
 
 // User Types
 ACTION(BuildUserType)
+ACTION(BuildTupleType)      // Comes from Typescript.
 ACTION(AddTypeGenerics)     // add type arguments or type parameters or type generics
 ACTION(BuildUnionUserType)  // build union type
 ACTION(BuildInterUserType)  // build intersect type
@@ -213,6 +214,8 @@ ACTION(BuildTypeAlias)
 ACTION(BuildTypeParameter)
 ACTION(BuildAsType)
 ACTION(BuildConditionalType)
+
+ACTION(BuildNameTypePair)
 
 // This is a special action to pass a child to parent
 ACTION(PassChild)

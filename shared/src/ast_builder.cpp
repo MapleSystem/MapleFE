@@ -233,6 +233,31 @@ TreeNode* ASTBuilder::BuildIdentifier() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
+//                      NameTypePair
+////////////////////////////////////////////////////////////////////////////////////////
+
+TreeNode* ASTBuilder::BuildNameTypePair() {
+  if (mTrace)
+    std::cout << "In BuildNameTypePair" << std::endl;
+
+  MASSERT(mParams.size() == 2);
+  Param p_a = mParams[0];
+  Param p_b = mParams[1];
+
+  NameTypePairNode *n = (NameTypePairNode*)gTreePool.NewTreeNode(sizeof(NameTypePairNode));
+  new (n) NameTypePairNode();
+  mLastTreeNode = n;
+
+  if (!p_a.mIsEmpty && p_a.mIsTreeNode)
+    n->SetVar(p_a.mData.mTreeNode);
+
+  if (!p_b.mIsEmpty && p_b.mIsTreeNode)
+    n->SetType(p_b.mData.mTreeNode);
+
+  return mLastTreeNode;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
 //                      Interfaces for Java style package  and import
 ////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1708,6 +1733,18 @@ TreeNode* ASTBuilder::BuildStruct() {
   return mLastTreeNode;
 }
 
+// It take no param.
+TreeNode* ASTBuilder::BuildTupleType() {
+  if (mTrace)
+    std::cout << "In BuildTupleType" << std::endl;
+
+  TupleTypeNode *tuple_type = (TupleTypeNode*)gTreePool.NewTreeNode(sizeof(TupleTypeNode));
+  new (tuple_type) TupleTypeNode();
+
+  mLastTreeNode = tuple_type;
+  return mLastTreeNode;
+}
+
 // It takes only one parameter: Field.
 TreeNode* ASTBuilder::AddStructField() {
   if (mTrace)
@@ -1717,9 +1754,15 @@ TreeNode* ASTBuilder::AddStructField() {
     MASSERT(p_field.mIsTreeNode);
     TreeNode *field = p_field.mData.mTreeNode;
   
-    MASSERT(mLastTreeNode->IsStruct());
-    StructNode *struct_node = (StructNode*)mLastTreeNode;
-    struct_node->AddChild(field);
+    if (mLastTreeNode->IsStruct()) {
+      StructNode *struct_node = (StructNode*)mLastTreeNode;
+      struct_node->AddChild(field);
+    } else if (mLastTreeNode->IsTupleType()) {
+      TupleTypeNode *tt = (TupleTypeNode*)mLastTreeNode;
+      tt->AddChild(field);
+    } else {
+      MERROR("Unsupported in AddStructField()");
+    }
   }
   return mLastTreeNode;
 }

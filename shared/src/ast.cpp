@@ -1742,6 +1742,21 @@ void NameTypePairNode::Dump(unsigned indent) {
 //                              TupleTypeNode
 //////////////////////////////////////////////////////////////////////////////////////
 
+// Child should be NameTypePairNode
+void TupleTypeNode::AddChild(TreeNode *field) {
+  if (field->IsPass()) {
+    PassNode *pass = (PassNode*)field;
+    for (unsigned i = 0; i < pass->GetChildrenNum(); i++) {
+      TreeNode *child = pass->GetChild(i);
+      AddChild(child);
+    }
+  } else {
+    MASSERT(field->IsNameTypePair());
+    NameTypePairNode *node = (NameTypePairNode*)field;
+    AddField(node);
+  }
+}
+
 void TupleTypeNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   DUMP0_NORETURN(" [ ");

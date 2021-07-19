@@ -1,0 +1,25 @@
+Matched 45 tokens.
+Matched 72 tokens.
+Matched 83 tokens.
+Matched 92 tokens.
+============= Module ===========
+== Sub Tree ==
+class  Foo
+  Fields: 
+    s
+  Instance Initializer: 
+  Constructors: 
+    constructor  (f)  throws: 
+      this.s Assign f()
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+func  func(args,obj?)  throws: 
+  return "abc"
+
+== Sub Tree ==
+js_var Decl: obj=new Foo(func)
+== Sub Tree ==
+console.log(obj.s)

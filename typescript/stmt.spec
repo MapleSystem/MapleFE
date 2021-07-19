@@ -1630,13 +1630,16 @@ rule ArrayType: ZEROORONE("readonly") + PrimaryType + '[' + ']'
 
 ## rule TupleType: [ TupleElementTypes ]
 rule TupleType: '[' + TupleElementTypes + ']'
+  attr.action : BuildTupleType()
+  attr.action : AddStructField(%2)
 
 ## rule TupleElementTypes: TupleElementType TupleElementTypes , TupleElementType
 rule TupleElementTypes: ONEOF(TupleElementType,
                               TupleElementTypes + ',' + TupleElementType)
 
 ## rule TupleElementType: Type
-rule TupleElementType: Type
+rule TupleElementType: ZEROORONE(JSIdentifier + ':') + Type
+  attr.action : BuildNameTypePair(%1, %2)
 
 ## rule UnionType: UnionOrIntersectionOrPrimaryType | IntersectionOrPrimaryType
 rule UnionType: UnionOrIntersectionOrPrimaryType + '|' + IntersectionOrPrimaryType

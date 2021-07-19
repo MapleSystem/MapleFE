@@ -2181,6 +2181,7 @@ public:
   NameTypePairNode* GetField(unsigned i) {return mFields.ValueAtIndex(i);}
   void      SetField(unsigned i, NameTypePairNode* n) {*(mFields.RefAtIndex(i)) = n; SETPARENT(n);}
   void      AddField(NameTypePairNode *n) {mFields.PushBack(n); SETPARENT(n);}
+  void      AddChild(TreeNode *n);
 
   void Release() {mFields.Release();}
   void Dump(unsigned);
