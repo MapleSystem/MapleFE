@@ -1,0 +1,25 @@
+Matched 14 tokens.
+Matched 19 tokens.
+Matched 36 tokens.
+Matched 55 tokens.
+============= Module ===========
+== Sub Tree ==
+class  Klass
+  Fields: 
+    func
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+js_var Decl: obj
+== Sub Tree ==
+obj.func Assign func  (n)  throws: 
+  return n
+
+== Sub Tree ==
+export {func  show()  throws: 
+  console.log(obj.func(123))
+} 

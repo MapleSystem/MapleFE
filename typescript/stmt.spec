@@ -951,7 +951,17 @@ rule EmptyStatement : ';'
 ##rule ExpressionStatement[Yield] :
 ##  [lookahead NotIn {{, function, class, let [}] Expression[In, ?Yield] ;
 
-rule ExpressionStatement : Expression + ';'
+rule ExpressionStatement : ONEOF(
+  ConditionalExpression + ';',
+#  [+Yield] YieldExpression[?In]
+  ArrowFunction + ';',
+  LeftHandSideExpression + '=' + AssignmentExpression + ZEROORONE(';'),
+  LeftHandSideExpression + AssignmentOperator + AssignmentExpression + ZEROORONE(';'),
+  ConditionalExpression + "??" + ConditionalExpression + ';',
+  Expression + ',' + AssignmentExpression + ';',
+  "undefined" + ';')
+  attr.action.%3,%4 : BuildAssignment(%1, %2, %3)
+  attr.action.%5 :    BuildBinaryOperation(%1, %2, %3)
 
 ##-----------------------------------
 ##rule IfStatement[Yield, Return] :
