@@ -345,7 +345,7 @@ std::string CppDecl::EmitClassNode(ClassNode *node) {
         }
       }
       str += node->GetName() + "(Function* ctor, Object* proto): "s + base + "(ctor, proto)" + (init.empty()? init: ","s + init) + " {}\n"s;
-      str += "~"s + node->GetName() + "{}\n";
+      str += "~"s + node->GetName() + "(){}\n";
     }
   }
   // field decl. TODO: handle static, private, protected attrs.
