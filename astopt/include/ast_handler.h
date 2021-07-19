@@ -26,6 +26,10 @@
 #include "ast_type.h"
 #include "gen_astvisitor.h"
 
+#define NOTYETIMPL(M) { if (mTrace) { MNYI(M);        }}
+#define MSGNOLOC0(M)  { if (mTrace) { MMSGNOLOC0(M);  }}
+#define MSGNOLOC(M,v) { if (mTrace) { MMSGNOLOC(M,v); }}
+
 namespace maplefe {
 
 class CfgBB;

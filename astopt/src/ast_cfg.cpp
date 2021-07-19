@@ -805,7 +805,7 @@ void CfgFunc::Dump() {
 }
 
 void CfgBuilder::Build() {
-  if (mTrace) std::cout << "============== BuildCFG ==============" << std::endl;
+  MMSGNOLOC0("============== BuildCFG ==============");
 
   ModuleNode *module = mHandler->GetASTModule();
 

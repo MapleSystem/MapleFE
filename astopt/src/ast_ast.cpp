@@ -18,8 +18,6 @@
 #include "ast_handler.h"
 #include "ast_ast.h"
 
-#define NOTYETIMPL(K) {if(mTrace){MNYI(K);}}
-
 namespace maplefe {
 
 void AST_AST::RemoveDeadBlocks() {
@@ -38,7 +36,7 @@ void AST_AST::RemoveDeadBlocks() {
 
 // this calcuates mNodeId2BbMap
 void AST_AST::CollectReachableBB() {
-  if (mTrace) std::cout << "============== CollectReachableBB ==============" << std::endl;
+  MMSGNOLOC0("============== CollectReachableBB ==============");
   mReachableBbIdx.clear();
   std::deque<CfgBB *> working_list;
 
@@ -101,7 +99,7 @@ void AST_AST::RemoveUnreachableBB() {
 }
 
 void AST_AST::AdjustAST() {
-  if (mTrace) std::cout << "============== AdjustAST ==============" << std::endl;
+  MMSGNOLOC0("============== AdjustAST ==============");
   AdjustASTVisitor visitor(mHandler, mTrace, true);
   ModuleNode *module = mHandler->GetASTModule();
   for(unsigned i = 0; i < module->GetTreesNum(); i++) {

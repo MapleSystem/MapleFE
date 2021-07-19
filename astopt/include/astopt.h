@@ -26,11 +26,6 @@
 
 namespace maplefe {
 
-#define NOTYETIMPL(K)      { if (mTraceA2c) { MNYI(K);      }}
-#define AST2CPPMSG0(K)     { if (mTraceA2c) { MMSG0(K);     }}
-#define AST2CPPMSG(K,v)    { if (mTraceA2c) { MMSG(K,v);    }}
-#define AST2CPPMSG2(K,v,w) { if (mTraceA2c) { MMSG2(K,v,w); }}
-
 class AST_Handler;
 
 class AstOpt {

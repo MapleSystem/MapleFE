@@ -130,7 +130,7 @@ TreeNode *Module_Handler::FindFunc(TreeNode *node) {
 }
 
 void Module_Handler::Dump(char *msg) {
-  std::cout << std::endl << msg << ":" << std::endl;
+  std::cout << msg << " : " << std::endl;
   CfgFunc *func = GetCfgFunc();
   func->Dump();
 }

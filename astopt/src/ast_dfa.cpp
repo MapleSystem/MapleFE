@@ -217,7 +217,7 @@ unsigned AST_DFA::AddDef(TreeNode *node, unsigned &bitnum, unsigned bbid) {
 
 // this calcuates mDefPositionVec mBbIdVec
 void AST_DFA::CollectDefNodes() {
-  if (mTrace) std::cout << "============== CollectDefNodes ==============" << std::endl;
+  MMSGNOLOC0("============== CollectDefNodes ==============");
   std::unordered_set<unsigned> done_list;
   std::deque<CfgBB *> working_list;
 
@@ -268,7 +268,7 @@ void AST_DFA::CollectDefNodes() {
 }
 
 void AST_DFA::BuildBitVectors() {
-  if (mTrace) std::cout << "============== BuildBitVectors ==============" << std::endl;
+  MMSGNOLOC0("============== BuildBitVectors ==============");
   std::unordered_set<unsigned> done_list;
   std::deque<CfgBB *> working_list;
 
@@ -391,11 +391,11 @@ void AST_DFA::BuildBitVectors() {
 }
 
 void AST_DFA::DumpAllBVMaps() {
-  std::cout << "=== mPrsvMap ===" << std::endl;
+  MMSGNOLOC0("=== mPrsvMap ===");
   DumpBVMap(mPrsvMap);
-  std::cout << "=== mGenMap ===" << std::endl;
+  MMSGNOLOC0("=== mGenMap ===");
   DumpBVMap(mGenMap);
-  std::cout << "=== mRchInMap ===" << std::endl;
+  MMSGNOLOC0("=== mRchInMap ===");
   DumpBVMap(mRchInMap);
 }
 
@@ -423,7 +423,7 @@ void AST_DFA::DumpBV(BitVector *bv) {
 }
 
 void AST_DFA::DumpUse() {
-  if (mTrace) std::cout << "============== Dump Use ==============" << std::endl;
+  MMSGNOLOC0("============== Dump Use ==============");
   for (auto stridx: mDefStrIdxSet) {
     std::cout << "stridx: " << stridx << " " << gStringPool.GetStringFromStrIdx(stridx) << std::endl;
     for (auto nid: mUsePositionMap[stridx]) {
@@ -439,7 +439,7 @@ void AST_DFA::DumpUse() {
 }
 
 void AST_DFA::CollectUseNodes() {
-  if (mTrace) std::cout << "============== CollectUseNodes ==============" << std::endl;
+  MMSGNOLOC0("============== CollectUseNodes ==============");
   CollectUseVisitor visitor(mHandler, mTrace, true);
   for (auto bbid: mBbIdVec) {
     visitor.SetBbId(bbid);

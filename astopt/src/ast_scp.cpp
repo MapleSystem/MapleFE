@@ -23,7 +23,7 @@
 namespace maplefe {
 
 void AST_SCP::BuildScope() {
-  if (mTrace) std::cout << "============== BuildScope ==============" << std::endl;
+  MSGNOLOC0("============== BuildScope ==============");
   BuildScopeVisitor visitor(mHandler, mTrace, true);
   while(!visitor.mScopeStack.empty()) {
     visitor.mScopeStack.pop();
@@ -221,8 +221,9 @@ ForLoopNode *BuildScopeVisitor::VisitForLoopNode(ForLoopNode *node) {
     TreeNode *var = node->GetVariable();
     if (var) {
       if (var->IsDecl()) {
-        TreeNode *id = (static_cast<DeclNode *>(var))->GetVar();
         scope->AddDecl(var);
+      } else {
+        NOTYETIMPL("VisitForLoopNode() FLP_JSIn var not decl");
       }
     }
     mScopeStack.push(scope);
@@ -237,7 +238,7 @@ ForLoopNode *BuildScopeVisitor::VisitForLoopNode(ForLoopNode *node) {
 }
 
 void AST_SCP::RenameVar() {
-  if (mTrace) std::cout << "============== RenameVar ==============" << std::endl;
+  MSGNOLOC0("============== RenameVar ==============");
   RenameVarVisitor visitor(mHandler, mTrace, true);
   ModuleNode *module = mHandler->GetASTModule();
   visitor.mPass = 0;
@@ -319,12 +320,12 @@ IdentifierNode *RenameVarVisitor::VisitIdentifierNode(IdentifierNode *node) {
         }
       }
     } else {
-      if (mTrace) std::cout << "Unexpected - decl without name stridx" << std::endl;
+      NOTYETIMPL("Unexpected - decl without name stridx");
     }
-  } else {
+  } else if (mPass == 1) {
     if (node->GetStrIdx() == mOldStrIdx) {
       node->SetStrIdx(mNewStrIdx);
-      if (mTrace) std::cout << "   name updated" << std::endl;
+      MSGNOLOC0("   name updated");
       TreeNode *parent = node->GetParent();
       if (parent && parent->IsDecl()) {
         parent->SetStrIdx(mNewStrIdx);

@@ -19,14 +19,12 @@
 #include "ast_ti.h"
 #include "gen_astdump.h"
 
-#define NOTYETIMPL(K) {if(mTrace){MNYI(K);}}
-
 #define ITERATEMAX 10
 
 namespace maplefe {
 
 void TypeInfer::TypeInference() {
-  if (mTrace) std::cout << "============== TypeInfer ==============" << std::endl;
+  MSGNOLOC0("============== TypeInfer ==============");
 
   ModuleNode *module = mHandler->GetASTModule();
 
@@ -39,7 +37,7 @@ void TypeInfer::TypeInference() {
   visitor_pass1.SetUpdated(true);
   int count = 0;
   while (visitor_pass1.GetUpdated() && count++ <= ITERATEMAX) {
-    if (mTrace) std::cout << "\n TypeInference iterate " << count << std::endl;
+    MSGNOLOC("\n TypeInference iterate ", count);
     visitor_pass1.SetUpdated(false);
     visitor_pass1.Visit(module);
   }
