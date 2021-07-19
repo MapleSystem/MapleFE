@@ -29,6 +29,7 @@ void TypeInfer::TypeInference() {
   ModuleNode *module = mHandler->GetASTModule();
 
   // build mNodeId2Decl
+  InitDummyNodes();
   BuildIdNodeToDeclVisitor visitor_pass0(mHandler, mTrace, true);
   visitor_pass0.Visit(module);
 
@@ -48,6 +49,35 @@ void TypeInfer::TypeInference() {
   visitor_pass2.Visit(module);
 
   if (mTrace) std::cout << "\n>>>>>> TypeInference() iterated " << count << " times\n" << std::endl;
+}
+
+void TypeInfer::InitDummyNodes() {
+  // add dummpy console.log()
+
+  // class console
+  ClassNode *console = (ClassNode*)gTreePool.NewTreeNode(sizeof(ClassNode));
+  new (console) ClassNode();
+  unsigned idx1 = gStringPool.GetStrIdx("console");
+  console->SetStrIdx(idx1);
+
+  // method log
+  FunctionNode *log = (FunctionNode*)gTreePool.NewTreeNode(sizeof(FunctionNode));
+  new (log) FunctionNode();
+  unsigned idx2 = gStringPool.GetStrIdx("log");
+  log->SetStrIdx(idx2);
+
+  IdentifierNode *name = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
+  new (name) IdentifierNode(idx2);
+  log->SetFuncName(name);
+
+  // add log to console
+  console->AddMethod(log);
+
+  // add console and log to root scope
+  ModuleNode *module = mHandler->GetASTModule();
+  module->GetRootScope()->AddType(console);
+  module->GetRootScope()->AddDecl(console);
+  module->GetRootScope()->AddDecl(log);
 }
 
 // build up mNodeId2Decl by visiting each Identifier
@@ -678,6 +708,7 @@ IdentifierNode *TypeInferVisitor::VisitIdentifierNode(IdentifierNode *node) {
     UpdateTypeId(node, decl->GetTypeId());
   } else {
     NOTYETIMPL("node not declared");
+    MSGNOLOC0(node->GetName());
   }
   return node;
 }

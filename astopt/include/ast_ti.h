@@ -36,6 +36,7 @@ class TypeInfer {
   explicit TypeInfer(Module_Handler *h, bool t) : mHandler(h), mTrace(t) {}
   ~TypeInfer() {}
 
+  void InitDummyNodes();
   void TypeInference();
 };
 
