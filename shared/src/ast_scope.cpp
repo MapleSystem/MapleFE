@@ -119,6 +119,17 @@ ASTScope* ASTScopePool::NewScope(ASTScope *parent) {
   return s;
 }
 
+bool ASTScope::IsAncestor(ASTScope *ancestor) {
+  ASTScope *p = this;
+  while (p) {
+    if (p == ancestor) {
+      return true;
+    }
+    p = p->GetParent();
+  }
+  return false;
+}
+
 void ASTScope::Dump(unsigned indent) {
   mTree->DumpIndentation(indent);
   std::cout << "name: " << AstDump::GetEnumNodeKind(mTree->GetKind()) << " " << mTree->GetName() << " " << mTree->GetNodeId() << std::endl;

@@ -81,6 +81,8 @@ public:
   void TryAddDecl(TreeNode *n);
   void TryAddType(TreeNode *n);
 
+  bool IsAncestor(ASTScope *ancestor);
+
   void Dump(unsigned indent = 0);
 
   virtual void Release();
