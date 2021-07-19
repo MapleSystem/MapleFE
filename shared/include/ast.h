@@ -565,14 +565,14 @@ public:
   ~NewNode() {mArgs.Release();}
 
   TreeNode* GetId()          {return mId;}
-  void SetId(TreeNode *n)    {mId = n;}
+  void SetId(TreeNode *n)    {mId = n; SETPARENT(n);}
   BlockNode* GetBody()       {return mBody;}
   void SetBody(BlockNode *n) {mBody = n;}
 
   unsigned  GetArgsNum()        {return mArgs.GetNum();}
   TreeNode* GetArg(unsigned i)  {return mArgs.ValueAtIndex(i);}
-  void      SetArg(unsigned i, TreeNode* n) {*(mArgs.RefAtIndex(i)) = n;}
-  void      AddArg(TreeNode *t) {mArgs.PushBack(t);}
+  void      SetArg(unsigned i, TreeNode* n) {*(mArgs.RefAtIndex(i)) = n; SETPARENT(n);}
+  void      AddArg(TreeNode *t) {mArgs.PushBack(t); SETPARENT(t);}
 
   void ReplaceChild(TreeNode *oldone, TreeNode *newone);
   void Dump(unsigned);
@@ -2142,9 +2142,9 @@ public:
   ~IsNode(){Release();}
 
   TreeNode* GetLeft() {return mLeft;}
-  void SetLeft(TreeNode *n) {mLeft = n;}
+  void SetLeft(TreeNode *n) {mLeft = n; SETPARENT(n);}
   TreeNode* GetRight() {return mRight;}
-  void SetRight(TreeNode *n){mRight = n;}
+  void SetRight(TreeNode *n){mRight = n; SETPARENT(n);}
 
   void Dump(unsigned);
 };
