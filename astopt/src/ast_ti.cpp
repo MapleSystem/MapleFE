@@ -433,8 +433,20 @@ ArrayElementNode *TypeInferVisitor::VisitArrayElementNode(ArrayElementNode *node
       } else {
         NOTYETIMPL("array not declared");
       }
+    } else if (array->IsArrayElement()) {
+      NOTYETIMPL("array in ArrayElementNode IsArrayElement");
+    } else if (array->IsField()) {
+      NOTYETIMPL("array in ArrayElementNode IsField");
+    } else if (array->IsUserType()) {
+      NOTYETIMPL("array in ArrayElementNode IsUserType");
+    } else if (array->IsBinOperator()) {
+      NOTYETIMPL("array in ArrayElementNode IsBinOperator");
+    } else if (array->IsLiteral() && ((LiteralNode*)array)->IsThis()) {
+      NOTYETIMPL("array in ArrayElementNode IsLiteral");
+    } else if (array->IsPrimType()) {
+      NOTYETIMPL("array in ArrayElementNode IsPrimType");
     } else {
-      NOTYETIMPL("array not idenfier");
+      NOTYETIMPL("array in ArrayElementNode unknown");
     }
   }
   return node;
