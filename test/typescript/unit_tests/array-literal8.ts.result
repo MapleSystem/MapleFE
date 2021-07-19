@@ -1,0 +1,10 @@
+Matched 5 tokens.
+Matched 19 tokens.
+Matched 26 tokens.
+============= Module ===========
+== Sub Tree ==
+js_var Decl: i=10
+== Sub Tree ==
+js_var Decl: face=[0,i Sub 2,Minus i]
+== Sub Tree ==
+console.log(face)

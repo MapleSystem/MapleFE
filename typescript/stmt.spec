@@ -78,10 +78,10 @@ rule KeywordIdentifier : ONEOF("get",
                                "readonly",
                                "debugger",
                                "default",
-                               "namespace")
-  attr.action : BuildIdentifier()
-
+                               "namespace",
+                               "import")
 ## "
+  attr.action : BuildIdentifier()
 
 rule JSIdentifier: ONEOF(Identifier,
                          KeywordIdentifier,
