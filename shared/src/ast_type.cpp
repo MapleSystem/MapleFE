@@ -35,6 +35,7 @@ void UserTypeNode::AddUnionInterType(TreeNode *args) {
       args->IsLiteral() ||
       args->IsLambda() ||
       args->IsTypeOf() ||
+      args->IsTupleType() ||
       args->IsStruct()) {
     mUnionInterTypes.PushBack(args);
   } else if (args->IsPass()) {
@@ -58,6 +59,7 @@ void UserTypeNode::AddTypeGeneric(TreeNode *args) {
       args->IsTypeOf() ||
       args->IsArrayElement() ||
       args->IsStruct() ||
+      args->IsTupleType() ||
       args->IsLambda()) {
     mTypeGenerics.PushBack(args);
   } else if (args->IsPass()) {

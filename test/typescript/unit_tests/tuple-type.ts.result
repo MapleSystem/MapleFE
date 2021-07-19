@@ -1,0 +1,12 @@
+Matched 21 tokens.
+Matched 28 tokens.
+Matched 38 tokens.
+============= Module ===========
+== Sub Tree ==
+func  func(t)  throws: 
+  return  typeof t
+
+== Sub Tree ==
+js_var Decl: f=func
+== Sub Tree ==
+console.log(func(f))
