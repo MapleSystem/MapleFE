@@ -114,6 +114,7 @@ class RenameVarVisitor : public AstVisitor {
   ~RenameVarVisitor() = default;
 
   bool SkipRename(IdentifierNode *node);
+  void InsertToStridx2DeclIdMap(unsigned stridx, IdentifierNode *node);
   IdentifierNode *VisitIdentifierNode(IdentifierNode *node);
 };
 

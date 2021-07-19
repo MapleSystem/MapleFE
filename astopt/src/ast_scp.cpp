@@ -273,7 +273,7 @@ void AST_SCP::RenameVar() {
         ASTScope *scope = tn->GetScope();
         tn = scope->GetTree();
         if (mTrace) {
-          std::cout << "update name : "
+          std::cout << "\nupdate name : "
                     << gStringPool.GetStringFromStrIdx(visitor.mOldStrIdx)
                     << " --> "
                     << gStringPool.GetStringFromStrIdx(visitor.mNewStrIdx)
@@ -302,6 +302,24 @@ bool RenameVarVisitor::SkipRename(IdentifierNode *node) {
   return true;
 }
 
+// insert in order according to scopes hierachey to ensure proper name version
+void RenameVarVisitor::InsertToStridx2DeclIdMap(unsigned stridx, IdentifierNode *node) {
+  unsigned id = node->GetNodeId();
+  ASTScope *scope = node->GetScope();
+  std::deque<unsigned>::iterator it;
+  unsigned i = 0;
+  for (it = mStridx2DeclIdMap[stridx].begin(); it!= mStridx2DeclIdMap[stridx].end(); ++it) {
+    i = *it;
+    TreeNode *t = mNodeId2NodeMap[i];
+    ASTScope *s = t->GetScope();
+    if (s->IsAncestor(scope)) {
+      mStridx2DeclIdMap[stridx].insert(it, id);
+      return;
+    }
+  }
+  mStridx2DeclIdMap[stridx].push_back(id);
+}
+
 IdentifierNode *RenameVarVisitor::VisitIdentifierNode(IdentifierNode *node) {
   AstVisitor::VisitIdentifierNode(node);
   // fields are not renamed
@@ -316,7 +334,9 @@ IdentifierNode *RenameVarVisitor::VisitIdentifierNode(IdentifierNode *node) {
       TreeNode *parent = node->GetParent();
       if (parent) {
         if (parent->IsDecl() || parent->IsFunction()) {
-          mStridx2DeclIdMap[stridx].push_back(id);
+          // decl or func parameters
+          // insert in order according to scopes hierachey to ensure proper name version
+          InsertToStridx2DeclIdMap(stridx, node);
         }
       }
     } else {
