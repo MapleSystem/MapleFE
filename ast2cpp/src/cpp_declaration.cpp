@@ -15,6 +15,7 @@
 
 #include "cpp_declaration.h"
 #include "gen_astvisitor.h"
+#include <algorithm>
 
 namespace maplefe {
 
@@ -70,6 +71,7 @@ std::string CppDecl::EmitModuleNode(ModuleNode *node) {
   str += "#ifndef "s + header + "#define "s + header;
   str += R"""(
 #include "ts2cpp.h"
+using namespace t2crt;
 
 )""";
 
@@ -138,14 +140,6 @@ std::string CppDecl::EmitIdentifierNode(IdentifierNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str(GetTypeString(node, node->GetType()));
-
-  TreeNode* t = node->GetType();
-  if (node->GetType() && node->GetType()->GetKind()==NK_UserType) {
-    UserTypeNode* n = static_cast<UserTypeNode*>(node->GetType());
-    if (n->GetId() && n->GetId()->GetKind() == NK_Identifier && n->GetId()->GetTypeId() == TY_Class) {
-      str += "*"s;
-    }
-  }
   str += " "s + node->GetName();
   return str;
 }
@@ -221,11 +215,40 @@ std::string CppDecl::EmitFieldNode(FieldNode *node) {
   return std::string();
 }
 
+// TODO: Add other builtin obj types
+std::vector<std::string>builtins = {"Object", "Function", "Array"};
+
+bool IsBuiltinObj(std::string name) {
+ return std::find(builtins.begin(), builtins.end(), name) != builtins.end();
+}
+
 std::string CppDecl::GetTypeString(TreeNode *node, TreeNode *child) {
+  std::string str;
   if (node) {
     TypeId k = node->GetTypeId();
-    if(k == TY_None && node->GetKind() == NK_PrimType)
-      k = static_cast<PrimTypeNode*>(node)->GetPrimType();
+    if (k == TY_None) {
+      switch(node->GetKind()) {
+        case NK_PrimType:
+          k = static_cast<PrimTypeNode*>(node)->GetPrimType();
+          break;
+        case NK_Identifier:
+        case NK_Function:
+          if (child && child->GetKind() == NK_UserType) {
+            // UserType - handle user defined classes and builtin obj types
+            UserTypeNode* n = node->GetKind() == NK_Identifier?
+              static_cast<UserTypeNode*>((static_cast<IdentifierNode *>(node))->GetType()):
+              static_cast<UserTypeNode*>((static_cast<FunctionNode *>(node))->GetType());
+            if (n && n->GetId() && n->GetId()->GetKind() == NK_Identifier) {
+              if (n->GetId()->GetTypeId() == TY_Class)
+                str = n->GetName() + "*"s;
+              else if (IsBuiltinObj(n->GetId()->GetName()))
+                str = "t2crt::"s + n->GetId()->GetName() + "*"s;
+              return str;
+            }
+          }
+          break;
+      }
+    }
     switch(k) {
       case TY_Object:
         return "t2crt::Object* "s;
@@ -240,11 +263,9 @@ std::string CppDecl::GetTypeString(TreeNode *node, TreeNode *child) {
       case TY_Number:
       case TY_Double:
         return "double "s;
-      case TY_Class:
-        return ""s;
     }
     {
-      std::string str = child ? EmitTreeNode(child) : Emitter::GetEnumTypeId(k);
+      str = child ? EmitTreeNode(child) : Emitter::GetEnumTypeId(k);
       if (str != "none"s)
         return str + " "s;
     }
