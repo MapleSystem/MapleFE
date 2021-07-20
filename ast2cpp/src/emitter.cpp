@@ -183,8 +183,10 @@ std::string Emitter::EmitFunctionNode(FunctionNode *node) {
   }
   if(str.empty())
     str = "function "s + str;
-  if(node->GetStrIdx())
-    str += node->GetName();
+  auto name = node->GetFuncName();
+  if(name) {
+    str += EmitTreeNode(name);
+  }
 
   auto num = node->GetTypeParamsNum();
   if(num) {
