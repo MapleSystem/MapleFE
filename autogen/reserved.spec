@@ -22,8 +22,8 @@ rule CHAR  : ONEOF('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','
 # DIGIT refers to the 10 digits
 rule DIGIT : ONEOF('0', '1', '2', '3', '4', '5', '6', '7', '8', '9')
 
-# The ASCII character exclude ", ', and \
-#
+# The ASCII character exclude ", ', \, and \n
+# \n and \ will be handled in lexer.cpp if some language allows them in string literal.
 rule ASCII : ONEOF(' ', '!', '#', '$', '%', '&', '(', ')', '*', '+', ',', '-', '.', '/', ':', ';', '<', '=', '>', '?', '@', '[', ']', '^', '_', '`', '{', '|', '}', '~', CHAR, DIGIT)
 
 # About the handling of escape character in autogen, xx_gen.cpp/h, and stringutil.cpp

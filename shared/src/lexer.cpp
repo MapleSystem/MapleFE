@@ -181,7 +181,8 @@ Token* Lexer::FindCommentToken() {
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//
+// Both ClearLeadingNewLine() and AddEndingNewLine() will later be implemented
+// as language specific, and they will be overriding functions.
 /////////////////////////////////////////////////////////////////////////////
 
 //1. mLexer could cross the line if it's a template literal in Javascript.
@@ -199,8 +200,106 @@ void Lexer::ClearLeadingNewLine() {
   }
 }
 
+// We are starting a new token, if current char is ' or ",
+// it's the beginning of a string literal. We traverse until the end of the
+// current line, if there is no ending ' or ", it means the string goes to next
+// line and we add an ending \n, and concatenate the next line.
+void Lexer::AddEndingNewLine() {
+  bool single_quote = false;
+  bool double_quote = false;
+
+  if (line[curidx] == '\'')
+    single_quote = true;
+  if (line[curidx] == '\"')
+    double_quote = true;
+
+  if (!single_quote && !double_quote)
+    return;
+
+  unsigned working_idx = curidx + 1;
+
+  // If we are in escape
+  bool in_escape = false;
+
+  // Reading a raw data, meaning we get the data through getline() directly.
+  // If we do ReadALine(), it's not a raw data because the ending \n or \r are removed.
+  bool raw_data = false;
+
+  while(1) {
+
+    // We reach the end of the line, and not done yet.
+    // So read in a new line and add \n to the end if it's Not raw data.
+    if (working_idx == current_line_size) {
+      // Add ending NewLine
+      if (!raw_data) {
+        line[working_idx] = '\n';
+        current_line_size++;
+        working_idx++;
+      }
+
+      // Read new line.
+      char *new_buf = NULL;
+      size_t new_buf_size = 0;
+      ssize_t new_line_size = getline(&new_buf, &new_buf_size, srcfile);
+      if (new_line_size <= 0) {  // EOF
+        fclose(srcfile);
+        MERROR("EOF Error reading multi-line string literal.");
+      } else {
+        // add new_buf to line
+        strncpy(line + working_idx, new_buf, new_line_size);
+        current_line_size += new_line_size;
+      }
+
+      free(new_buf);
+
+      in_escape = false;
+      raw_data = true;
+    }
+
+    // Handle escape
+    if (line[working_idx] == '\\') {
+      if (!in_escape) {
+        in_escape = true;
+        working_idx++;
+        continue;
+      }
+    }
+ 
+    // return if string literal end.
+    if (!in_escape && 
+        ( (line[working_idx] == '\'' && single_quote) ||
+          (line[working_idx] == '\"' && double_quote))) {
+      if (raw_data) {
+        // Need remove the ending \n or \r for the regular token reading.
+        if ((line[current_line_size - 1] == '\n') ||
+            (line[current_line_size - 1] == '\r')) {
+          line[current_line_size - 1] = '\0';
+          current_line_size--;
+        }
+        // Handle the second last escape
+        if ((line[current_line_size - 1] == '\n') ||
+            (line[current_line_size - 1] == '\r')) {
+          line[current_line_size - 1] = '\0';
+          current_line_size--;
+        }
+      }
+
+      // Finally We are done!
+      return;
+    }
+
+    in_escape = false;
+    working_idx++;
+  }
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 Token* Lexer::LexToken(void) {
   ClearLeadingNewLine();
+  AddEndingNewLine();
   if (EndOfFile())
     return NULL;
 
@@ -933,9 +1032,12 @@ bool Lexer::Traverse(const RuleTable *rule_table) {
 
   // CHAR, DIGIT are reserved rules. It should NOT be changed. We can
   // expediate the lexing.
+  //
+  // [NOTE] Since there is no way to describe \n in .spec files, we decided
+  //        to handle here.
   if (rule_table == &TblCHAR) {
     char c = *(line + curidx);
-    if( (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
+    if( (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '\n' || c == '\\') {
       curidx += 1;
       return true;
     } else {

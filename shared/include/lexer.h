@@ -102,8 +102,10 @@ public:
 
   friend class Parser;
 
-  // clear the leading \n in line.
-  void ClearLeadingNewLine();
+  // These two functions are both due to weird literal or template literal
+  // in script language which allows \n directly in their literals.
+  void ClearLeadingNewLine(); // clear the leading \n in line.
+  void AddEndingNewLine();    // add the ending \n in a line.
 
   // These are for autogen table testing
   Token* LexToken();  // always return token until end of file.
