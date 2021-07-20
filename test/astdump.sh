@@ -2,7 +2,7 @@
 function usage {
 cat << EOF
 
-Usage: astdump.sh [-d] [-f] [-p <PREFIX>] [-a] [-c] [-k] [-A] [-C] <file1> [<file2> ...]
+Usage: astdump.sh [-d] [-f] [-p <PREFIX>] [-a] [-c] [-k] [-A] [-C] [-n] <file1> [<file2> ...]
 
 Short/long options:
   -d | --dot             Use Graphviz dot to generate the graph and view it with viewnior
@@ -14,12 +14,13 @@ Short/long options:
   -k | --keep            Keep generated files *.ts-[0-9]*.out.ts which fail to compile with tsc
   -A | --all             Process all .ts files in current directory excluding *.ts-[0-9]*.out.ts
   -C | --clean           Clean up generated files (*.ts-[0-9]*.out.ts)
+  -n | --name            Keep original names by removing suffixes "__v[0-9]*" from generated code
   <file1> [<file2> ...]  Specify one or more TypeScript files to be processed
 EOF
 exit 1
 }
 
-DOT= PRE= LIST= VIEWOP= HIGHLIGHT="cat" TSCERR= KEEP= CLEAN=
+DOT= PRE= LIST= VIEWOP= HIGHLIGHT="cat" TSCERR= KEEP= CLEAN= NAME=
 while [ $# -gt 0 ]; do
     case $1 in
         -d|--dot)        DOT=dot;;
@@ -32,6 +33,7 @@ while [ $# -gt 0 ]; do
         -k|--keep)       KEEP=keep ;;
         -C|--clean)      CLEAN=clean ;;
         -A|--all)        LIST="$LIST $(find -maxdepth 1 -name '*.ts' | grep -v '\.ts-[0-9][0-9]*\.out.ts')" ;;
+        -n|--name)       NAME="original" ;;
         -*)              usage;;
         *)               LIST="$LIST $1"
     esac
@@ -68,6 +70,7 @@ for ts in $LIST; do
   if [ "x${cmd:0:4}" = "xsed " ]; then
     T=$ts-$$.out.ts
     eval $cmd <<< "$out" > "$T"
+    [ -z "$NAME" ] || sed -i 's/__v[0-9][0-9]*//g' "$T"
     clang-format-10 -i --style="{ColumnLimit: 120}" "$T"
     echo -e "\n====== TS Reformated ======\n"
     $HIGHLIGHT "$T"
