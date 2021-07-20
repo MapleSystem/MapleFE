@@ -75,6 +75,7 @@ using namespace t2crt;
 
 )""";
 
+  // declarations of user defined classes
   ClassDecls clsDecls(this);
   clsDecls.VisitTreeNode(node);
   str += clsDecls.GetDecls();

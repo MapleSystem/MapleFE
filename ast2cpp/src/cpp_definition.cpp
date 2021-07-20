@@ -16,7 +16,6 @@
 #include "cpp_definition.h"
 
 namespace maplefe {
-
 std::string CppDef::EmitModuleNode(ModuleNode *node) {
   if (node == nullptr)
     return std::string();
@@ -31,6 +30,7 @@ std::string CppDef::EmitModuleNode(ModuleNode *node) {
   for(unsigned i = 0; i < num; ++i) {
     CfgFunc *func = module->GetNestedFuncAtIndex(i);
     TreeNode *node = func->GetFuncNode();
+    TreeNode *parent =  node->GetParent();
     str += EmitTreeNode(node);
   }
 
@@ -38,7 +38,8 @@ std::string CppDef::EmitModuleNode(ModuleNode *node) {
   isInit = true;
   for (unsigned i = 0; i < node->GetTreesNum(); ++i) {
     if (auto n = node->GetTree(i)) {
-      str += EmitTreeNode(n);
+      if (n->GetKind() != NK_Class)
+        str += EmitTreeNode(n);
     }
   }
   str += "}\n\n"s + name + " _"s + name + R"""(;
@@ -95,12 +96,45 @@ std::string CppDef::EmitXXportAsPairNode(XXportAsPairNode *node) {
   return HandleTreeNode(str, node);
 }
 
+std::string GetClassName(FunctionNode* f) {
+  TreeNode* n = f->GetParent();
+  if (n && n->GetKind()==NK_Class)
+    return n->GetName();
+  return ""s;
+}
+
+std::string EmitCtorInstance(FunctionNode *node) {
+  // assert(node->IsConstructor());
+  ClassNode* c = static_cast<ClassNode*>(node->GetParent());
+  std::string str, thisClass, baseClass, ctor, proto, prototypeProto;
+  ctor = "&Function_ctor";
+  thisClass = c->GetName();
+  if (c->GetSuperClassesNum() == 0) {
+    proto = "Function_ctor.prototype";
+    prototypeProto = "Object_ctor.prototype";
+  } else {
+    baseClass = "Ctor_"s+c->GetSuperClass(0)->GetName(); 
+    proto = "&"s+baseClass;
+    prototypeProto = baseClass+".prototype"s;
+  }
+  str = "\n// Instantiate constructor"s;
+  str += "\nCtor_"s+thisClass +" "+ thisClass+"_ctor("s +ctor+","s+proto+","+prototypeProto+");\n"s;
+  return str;  
+}
+
 std::string CppDef::EmitFunctionNode(FunctionNode *node) {
   if (isInit || node == nullptr)
     return std::string();
-  std::string str(mCppDecl.GetTypeString(node->GetType(), node->GetType()));
-  if(node->GetStrIdx())
-    str += " "s + GetModuleName() + "::"s + node->GetName();
+
+  std::string str, className;
+  if (node->IsConstructor()) {
+    className = GetClassName(node);
+    str = className + "*"s + " Ctor_"s + className + "::operator()"s;
+  } else {
+    str = mCppDecl.GetTypeString(node->GetType(), node->GetType());
+    if(node->GetStrIdx())
+      str += " "s + GetModuleName() + "::"s + node->GetName();
+  }
   str += "("s;
 
   for (unsigned i = 0; i < node->GetParamsNum(); ++i) {
@@ -111,6 +145,7 @@ std::string CppDef::EmitFunctionNode(FunctionNode *node) {
     }
   }
   str += ")"s;
+  int bodyPos = str.size();
   if (auto n = node->GetBody()) {
     auto s = EmitBlockNode(n);
     if(s.empty() || s.front() != '{')
@@ -119,6 +154,17 @@ std::string CppDef::EmitFunctionNode(FunctionNode *node) {
       str += s;
   } else
     str += "{}\n"s;
+
+  if (node->IsConstructor()) {
+    Emitter::Replace(str, "this.", "obj->", 0);
+    std::string newObj = "\n  "s+className+"* obj = new "s+className+"(this, this->prototype);"s;
+    str.insert(bodyPos+1, newObj, 0, std::string::npos);
+    std::string ctorBody;
+    ctorBody += "  return obj;\n"s;
+    str.insert(str.size()-2, ctorBody, 0, std::string::npos);
+    str += EmitCtorInstance(node);
+  }
+
   return str;
 }
 
@@ -567,6 +613,38 @@ std::string CppDef::EmitTypeOfNode(TypeOfNode *node) {
   if (auto n = node->GetExpr())
     rhs = EmitTreeNode(n);
   str += rhs + ")"s;
+  if (node->IsStmt())
+    str += ";\n"s;
+  return HandleTreeNode(str, node);
+}
+
+std::string CppDef::EmitNewNode(NewNode *node) {
+  if (node == nullptr)
+    return std::string();
+
+  std::string str;
+  if (auto n = node->GetId()) {
+    if (n->GetTypeId() == TY_Class)
+      // Generate call to object constructor if doing new on class obj
+      str = n->GetName() + "_ctor"s;
+    else 
+      str = "new "s + EmitTreeNode(n);
+  }
+
+  str += "("s;
+  auto num = node->GetArgsNum();
+  for (unsigned i = 0; i < num; ++i) {
+    if (i)
+      str += ", "s;
+    if (auto n = node->GetArg(i)) {
+      str += EmitTreeNode(n);
+    }
+  }
+  str += ")"s;
+  if (auto n = node->GetBody()) {
+    str += " "s + EmitBlockNode(n);
+  }
+  mPrecedence = '\024';
   if (node->IsStmt())
     str += ";\n"s;
   return HandleTreeNode(str, node);
