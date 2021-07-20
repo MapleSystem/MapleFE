@@ -896,7 +896,9 @@ void NamespaceNode::AddBody(TreeNode *tree) {
 
 void NamespaceNode::Dump(unsigned indent) {
   DumpIndentation(indent);
-  DUMP1_NORETURN("namespace ", GetName());
+  DUMP0_NORETURN("namespace  ");
+  if (mId)
+    mId->Dump(0);
   DUMP_RETURN();
   for (unsigned i = 0; i < mElements.GetNum(); i++) {
     DumpIndentation(indent + 2);

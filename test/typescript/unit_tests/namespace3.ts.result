@@ -1,0 +1,12 @@
+Matched 25 tokens.
+Matched 38 tokens.
+============= Module ===========
+== Sub Tree ==
+namespace  ns.a
+  js_var Decl: hello="hello"
+  export {func  foo()  throws: 
+  return hello
+} 
+
+== Sub Tree ==
+console.log(ns.a.foo())

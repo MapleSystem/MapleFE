@@ -1106,9 +1106,13 @@ public:
 class NamespaceNode : public TreeNode {
 private:
   SmallVector<TreeNode*> mElements;
+  TreeNode *mId;   // the name of namespace
 public:
-  NamespaceNode() : TreeNode(NK_Namespace) {}
+  NamespaceNode() : TreeNode(NK_Namespace), mId(NULL) {}
   ~NamespaceNode() {Release();}
+
+  void SetId(TreeNode *id) {mId = id; SETPARENT(id);}
+  TreeNode* GetId() {return mId;}
 
   unsigned  GetElementsNum()              {return mElements.GetNum();}
   TreeNode* GetElementAtIndex(unsigned i) {return mElements.ValueAtIndex(i);}

@@ -2091,13 +2091,11 @@ TreeNode* ASTBuilder::BuildNamespace() {
   MASSERT(p_name.mIsTreeNode);
   TreeNode *node_name = p_name.mData.mTreeNode;
 
-  if (!node_name->IsIdentifier())
-    MERROR("The namespace name should be an indentifier node. Not?");
-  IdentifierNode *in = (IdentifierNode*)node_name;
+  MASSERT(node_name->IsIdentifier() || node_name->IsField());
 
   NamespaceNode *ns = (NamespaceNode*)gTreePool.NewTreeNode(sizeof(NamespaceNode));
   new (ns) NamespaceNode();
-  ns->SetStrIdx(in->GetStrIdx());
+  ns->SetId(node_name);
 
   mLastTreeNode = ns;
   return mLastTreeNode;
