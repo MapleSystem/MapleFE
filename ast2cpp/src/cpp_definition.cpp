@@ -96,11 +96,15 @@ std::string CppDef::EmitXXportAsPairNode(XXportAsPairNode *node) {
   return HandleTreeNode(str, node);
 }
 
-std::string GetClassName(FunctionNode* f) {
+inline std::string GetClassName(FunctionNode* f) {
   TreeNode* n = f->GetParent();
   if (n && n->GetKind()==NK_Class)
     return n->GetName();
   return ""s;
+}
+
+inline bool IsClassMethod(FunctionNode* f) {
+  return (f && f->GetParent() && f->GetParent()->GetKind()==NK_Class);
 }
 
 std::string EmitCtorInstance(FunctionNode *node) {
@@ -118,7 +122,7 @@ std::string EmitCtorInstance(FunctionNode *node) {
     prototypeProto = baseClass+".prototype"s;
   }
   str = "\n// Instantiate constructor"s;
-  str += "\nCtor_"s+thisClass +" "+ thisClass+"_ctor("s +ctor+","s+proto+","+prototypeProto+");\n"s;
+  str += "\nCtor_"s+thisClass +" "+ thisClass+"_ctor("s +ctor+","s+proto+","+prototypeProto+");\n\n"s;
   return str;  
 }
 
@@ -129,11 +133,12 @@ std::string CppDef::EmitFunctionNode(FunctionNode *node) {
   std::string str, className;
   if (node->IsConstructor()) {
     className = GetClassName(node);
-    str = className + "*"s + " Ctor_"s + className + "::operator()"s;
+    str = "\n"s;
+    str += className + "*"s + " Ctor_"s + className + "::operator()"s;
   } else {
     str = mCppDecl.GetTypeString(node->GetType(), node->GetType());
     if(node->GetStrIdx())
-      str += " "s + GetModuleName() + "::"s + node->GetName();
+      str += " "s + (IsClassMethod(node)?GetClassName(node):GetModuleName()) + "::"s + node->GetName();
   }
   str += "("s;
 
