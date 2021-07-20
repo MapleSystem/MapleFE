@@ -14,7 +14,7 @@ Short/long options:
   -k | --keep            Keep generated files *.ts-[0-9]*.out.ts which fail to compile with tsc
   -A | --all             Process all .ts files in current directory excluding *.ts-[0-9]*.out.ts
   -C | --clean           Clean up generated files (*.ts-[0-9]*.out.ts)
-  -n | --name            Keep original names by removing suffixes "__v[0-9]*" from generated code
+  -n | --name            Keep original names by removing "__lambda_[0-9]*__" and "__v[0-9]*" from generated code
   <file1> [<file2> ...]  Specify one or more TypeScript files to be processed
 EOF
 exit 1
@@ -70,7 +70,7 @@ for ts in $LIST; do
   if [ "x${cmd:0:4}" = "xsed " ]; then
     T=$ts-$$.out.ts
     eval $cmd <<< "$out" > "$T"
-    [ -z "$NAME" ] || sed -i 's/__v[0-9][0-9]*//g' "$T"
+    [ -z "$NAME" ] || sed -i -e 's/__v[0-9][0-9]*//g' -e 's/ __lambda_[0-9][0-9]*__/ /' -e 's/function *\((.*) => \)/\1/' "$T"
     clang-format-10 -i --style="{ColumnLimit: 120}" "$T"
     echo -e "\n====== TS Reformated ======\n"
     $HIGHLIGHT "$T"
