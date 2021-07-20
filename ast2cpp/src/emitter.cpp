@@ -1361,6 +1361,7 @@ std::string Emitter::EmitInterfaceNode(InterfaceNode *node) {
       std::string func = EmitFunctionNode(n);
       if (func.substr(0, 9) == "function ")
         func = func.substr(9);
+      Replace(func, "=>", ":");
       str += func.length() > 2 && func.substr(func.length() - 2) == ";\n" ? func : func + ";\n"s;
     }
   }
@@ -1413,6 +1414,7 @@ std::string Emitter::EmitClassNode(ClassNode *node) {
       std::string func = EmitFunctionNode(n);
       if (func.substr(0, 9) == "function ")
         func = func.substr(9);
+      Replace(func, "=>", ":");
       str += func.length() > 2 && func.substr(func.length() - 2) == ";\n" ? func : func + ";\n"s;
     }
   }
