@@ -811,7 +811,7 @@ std::string Emitter::EmitNumIndexSigNode(NumIndexSigNode *node) {
     return std::string();
   std::string str;
   if (auto n = node->GetKey())
-    str += "[ "s + EmitTreeNode(n) + " ]";
+    str += "[ "s + EmitTreeNode(n) + " : number ]";
   if (auto n = node->GetDataType()) {
     str += " : "s + EmitTreeNode(n);
   }
@@ -826,7 +826,7 @@ std::string Emitter::EmitStrIndexSigNode(StrIndexSigNode *node) {
     return std::string();
   std::string str;
   if (auto n = node->GetKey())
-    str += "[ "s + EmitTreeNode(n) + " ]";
+    str += "[ "s + EmitTreeNode(n) + " : string ]";
   if (auto n = node->GetDataType()) {
     str += " : "s + EmitTreeNode(n);
   }
