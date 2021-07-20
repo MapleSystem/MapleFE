@@ -256,8 +256,10 @@ std::string Emitter::EmitUserTypeNode(UserTypeNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
+  auto prec = '\030';;
   if (auto n = node->GetId()) {
     str = EmitTreeNode(n);
+    prec = mPrecedence;
     auto num = node->GetTypeGenericsNum();
     if(num) {
       str += "<"s;
@@ -285,7 +287,10 @@ std::string Emitter::EmitUserTypeNode(UserTypeNode *node) {
   }
 
   if (auto n = node->GetDims()) {
-    str += EmitDimensionNode(n);
+    std::string s = EmitDimensionNode(n);
+    if (prec > mPrecedence)
+      str = "("s + str + ")"s;
+     str += s;
   }
   if (node->IsStmt())
     str += ";\n"s;
@@ -636,6 +641,7 @@ std::string Emitter::EmitDimensionNode(DimensionNode *node) {
     std::string d(n ? std::to_string(n) : ""s);
     str += "["s + d + "]"s;
   }
+  mPrecedence = '\024';
   return HandleTreeNode(str, node);
 }
 
