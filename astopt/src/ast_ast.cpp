@@ -112,6 +112,7 @@ void AST_AST::AdjustAST() {
 // set parent for some identifier's type
 IdentifierNode *AdjustASTVisitor::VisitIdentifierNode(IdentifierNode *node) {
   (void) AstVisitor::VisitIdentifierNode(node);
+  // MASSERT(node->GetParent() && "identifier with NULL parent");
   TreeNode *type = node->GetType();
   if (type && type->IsUserType()) {
     type->SetParent(node);

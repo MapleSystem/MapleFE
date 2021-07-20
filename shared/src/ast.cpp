@@ -1104,6 +1104,7 @@ void CatchNode::AddParam(TreeNode *t) {
       AddParam(pass_node->GetChild(i));
   } else {
     mParams.PushBack(t);
+    SETPARENT(t);
   }
 }
 
@@ -1491,6 +1492,7 @@ void FunctionNode::AddTypeParam(TreeNode *param) {
     }
   } else {
     mTypeParams.PushBack(param);
+    SETPARENT(param);
   }
 }
 
