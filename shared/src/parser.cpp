@@ -346,6 +346,8 @@ Token* Parser::GetRegExpr(Token *t) {
   bool is_sep = false;
   if (sep->IsSeparator() && (sep->GetSepId() == SEP_Lparen))
     is_sep = true;
+  if (sep->IsSeparator() && (sep->GetSepId() == SEP_Lbrack))
+    is_sep = true;
   if (sep->IsOperator() && (sep->GetOprId() == OPR_Assign))
     is_sep = true;
   if (!is_sep)

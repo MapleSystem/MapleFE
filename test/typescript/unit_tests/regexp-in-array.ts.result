@@ -1,0 +1,10 @@
+Matched 15 tokens.
+Matched 26 tokens.
+Matched 33 tokens.
+============= Module ===========
+== Sub Tree ==
+js_var Decl: x=[]
+== Sub Tree ==
+x.push([reg expr :  &lt;  g,<])
+== Sub Tree ==
+console.log(x)
