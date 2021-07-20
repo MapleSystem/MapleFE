@@ -1357,7 +1357,7 @@ std::string Emitter::EmitInterfaceNode(InterfaceNode *node) {
   std::string str = "interface "s + node->GetName();
 
   for (unsigned i = 0; i < node->GetSuperInterfacesNum(); ++i) {
-    str += i ? ", "s : " extends "s;
+    str += i ? ", "s : " implements "s;
     if (auto n = node->GetSuperInterfaceAtIndex(i))
       str += EmitTreeNode(n);
   }
@@ -1399,7 +1399,7 @@ std::string Emitter::EmitClassNode(ClassNode *node) {
       str += EmitTreeNode(n);
   }
   for (unsigned i = 0; i < node->GetSuperInterfacesNum(); ++i) {
-    str += i || classNum ? ", "s : " extends "s;
+    str += i || classNum ? ", "s : " implements "s;
     if (auto n = node->GetSuperInterface(i))
       str += EmitTreeNode(n);
   }
