@@ -883,7 +883,11 @@ std::string Emitter::EmitStructNode(StructNode *node) {
 
   for (unsigned i = 0; i < node->GetMethodsNum(); ++i) {
     if (auto n = node->GetMethod(i)) {
-      str += EmitFunctionNode(n) + "\n"s;
+      std::string func = EmitFunctionNode(n);
+      if (func.substr(0, 9) == "function ")
+        func = func.substr(9);
+      Replace(func, "=>", ":");
+      str += func.length() > 2 && func.substr(func.length() - 2) == ";\n" ? func : func + ";\n"s;
     }
   }
 
