@@ -80,6 +80,7 @@ rule KeywordIdentifier : ONEOF("get",
                                "default",
                                "namespace",
                                "extends",
+                               "switch",
                                "import")
 ## "
   attr.action : BuildIdentifier()
