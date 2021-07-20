@@ -1032,12 +1032,22 @@ bool Lexer::Traverse(const RuleTable *rule_table) {
 
   // CHAR, DIGIT are reserved rules. It should NOT be changed. We can
   // expediate the lexing.
+  if (rule_table == &TblCHAR) {
+    char c = *(line + curidx);
+    if((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
+      curidx += 1;
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   //
   // [NOTE] Since there is no way to describe \n in .spec files, we decided
   //        to handle here.
-  if (rule_table == &TblCHAR) {
+  if (rule_table == &TblIRREGULAR_CHAR) {
     char c = *(line + curidx);
-    if( (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '\n' || c == '\\') {
+    if(c == '\n' || c == '\\') {
       curidx += 1;
       return true;
     } else {

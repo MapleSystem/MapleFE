@@ -26,6 +26,7 @@ extern RuleTable TblASCII;
 extern RuleTable TblESCAPE;
 extern RuleTable TblHEXDIGIT;
 extern RuleTable TblUTF8;
+extern RuleTable TblIRREGULAR_CHAR;
 
 extern RuleTable TblTemplateLiteral;
 extern RuleTable TblRegularExpression;

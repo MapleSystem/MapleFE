@@ -23,7 +23,6 @@ rule CHAR  : ONEOF('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','
 rule DIGIT : ONEOF('0', '1', '2', '3', '4', '5', '6', '7', '8', '9')
 
 # The ASCII character exclude ", ', \, and \n
-# \n and \ will be handled in lexer.cpp if some language allows them in string literal.
 rule ASCII : ONEOF(' ', '!', '#', '$', '%', '&', '(', ')', '*', '+', ',', '-', '.', '/', ':', ';', '<', '=', '>', '?', '@', '[', ']', '^', '_', '`', '{', '|', '}', '~', CHAR, DIGIT)
 
 # About the handling of escape character in autogen, xx_gen.cpp/h, and stringutil.cpp
@@ -31,6 +30,9 @@ rule ASCII : ONEOF(' ', '!', '#', '$', '%', '&', '(', ')', '*', '+', ',', '-', '
 rule ESCAPE : ONEOF('\' + 'b', '\' + 't', '\' + 'n', '\' + 'f', '\' + 'r', '\' + '"', '\' + ''', '\' + '\')
 
 rule HEXDIGIT : ONEOF(DIGIT, 'a', 'b', 'c', 'd', 'e', 'f', 'A', 'B', 'C', 'D', 'E', 'F')
+
+# \n and \ will be handled in lexer.cpp if some language allows them in string literal.
+rule IRREGULAR_CHAR : "this_is_for_fake_rule"
 
 # We will catch any utf-8 char in lexer in a short-cut.
 rule UTF8 : "this_is_for_fake_rule"
