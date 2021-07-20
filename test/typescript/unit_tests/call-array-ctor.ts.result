@@ -1,0 +1,10 @@
+Matched 16 tokens.
+Matched 33 tokens.
+Matched 42 tokens.
+============= Module ===========
+== Sub Tree ==
+js_var Decl: obj1=Array("first","second","third")
+== Sub Tree ==
+js_var Decl: obj2=new Array("1","2","3")
+== Sub Tree ==
+console.log(obj1,obj2)
