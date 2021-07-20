@@ -723,7 +723,8 @@ void StructNode::AddChild(TreeNode *field) {
       AddChild(child);
     }
   } else if (field->IsIdentifier() ||
-             field->IsComputedName()) {
+             field->IsComputedName() ||
+             field->IsLiteral()) {
     AddField(field);
   } else if (field->IsFunction()) {
     AddMethod((FunctionNode*)field);
@@ -1031,6 +1032,11 @@ void LiteralNode::Dump(unsigned indent) {
   default:
     DUMP0_NORETURN("NA Token:");
     break;
+  }
+
+  if (mInit) {
+    DUMP0_NORETURN(" = ");
+    mInit->Dump(0);
   }
 }
 

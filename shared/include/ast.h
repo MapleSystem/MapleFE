@@ -1223,11 +1223,15 @@ private:
   // to have a dedicated type. So here comes 'mType'.
   TreeNode *mType;
 
+  // Typescript allows a string literal to be used as an Identifier, so it allows
+  // an init value.
+  TreeNode *mInit;
+
 private:
   void InitName();
 
 public:
-  LiteralNode(LitData d) : TreeNode(NK_Literal), mData(d), mType(NULL) {}
+  LiteralNode(LitData d) : TreeNode(NK_Literal), mData(d), mType(NULL), mInit(NULL) {}
   LiteralNode() : LiteralNode({.mType = LT_NA, .mData.mInt = 0}) {}
   ~LiteralNode(){}
 
@@ -1236,6 +1240,8 @@ public:
 
   TreeNode* GetType()            {return mType;}
   void      SetType(TreeNode *t) {mType = t;}
+  TreeNode*   GetInit()                 {return mInit;}
+  void        SetInit(TreeNode *t)      {mInit = t; SETPARENT(t);}
 
   bool IsThis() {return mData.mType == LT_ThisLiteral;}
 

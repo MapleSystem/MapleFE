@@ -2077,6 +2077,10 @@ TreeNode* ASTBuilder::AddInitTo() {
     BindingPatternNode *in = (BindingPatternNode*)node_decl;
     in->SetInit(node_init);
     return in;
+  } else if (node_decl->IsLiteral()) {
+    LiteralNode *in = (LiteralNode*)node_decl;
+    in->SetInit(node_init);
+    return in;
   } else {
     MERROR("The target of AddInitTo is unsupported.");
   }
