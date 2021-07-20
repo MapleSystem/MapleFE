@@ -79,6 +79,7 @@ rule KeywordIdentifier : ONEOF("get",
                                "debugger",
                                "default",
                                "namespace",
+                               "extends",
                                "import")
 ## "
   attr.action : BuildIdentifier()
