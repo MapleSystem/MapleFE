@@ -1646,8 +1646,8 @@ rule TupleElementType: ZEROORONE(JSIdentifier + ':') + Type
   attr.action : BuildNameTypePair(%1, %2)
 
 ## rule UnionType: UnionOrIntersectionOrPrimaryType | IntersectionOrPrimaryType
-rule UnionType: UnionOrIntersectionOrPrimaryType + '|' + IntersectionOrPrimaryType
-  attr.action : BuildUnionUserType(%1, %3)
+rule UnionType: ZEROORONE('|') + UnionOrIntersectionOrPrimaryType + '|' + IntersectionOrPrimaryType
+  attr.action : BuildUnionUserType(%2, %4)
 
 ## rule IntersectionType: IntersectionOrPrimaryType & PrimaryType
 rule IntersectionType: IntersectionOrPrimaryType + '&' + PrimaryType
