@@ -282,7 +282,10 @@ std::string Emitter::EmitUserTypeNode(UserTypeNode *node) {
     for (unsigned i = 0; i < node->GetUnionInterTypesNum(); ++i) {
       if(i)
         str += op;
-      str += EmitTreeNode(node->GetUnionInterType(i));
+      std::string s = EmitTreeNode(node->GetUnionInterType(i));
+      if (mPrecedence > '\012')
+        s = "("s + s + ")"s;
+      str += s;
     }
   }
 
@@ -1678,6 +1681,7 @@ std::string Emitter::EmitPrimTypeNode(PrimTypeNode *node) {
   if (node == nullptr)
     return std::string();
   auto k = node->GetPrimType();
+  mPrecedence = '\000';
   return k == TY_None ? std::string() : Emitter::GetEnumTypeId(k);
 }
 
