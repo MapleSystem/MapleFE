@@ -302,6 +302,16 @@ bool RenameVarVisitor::SkipRename(IdentifierNode *node) {
   return true;
 }
 
+// check if node is of same name as a parameter of func
+bool RenameVarVisitor::IsFuncArg(FunctionNode *func, IdentifierNode *node) {
+  for (unsigned i = 0; i < func->GetParamsNum(); i++) {
+    if (func->GetParam(i)->GetStrIdx() == node->GetStrIdx()) {
+      return true;
+    }
+  }
+  return false;
+}
+
 // insert in order according to scopes hierachey to ensure proper name version
 void RenameVarVisitor::InsertToStridx2DeclIdMap(unsigned stridx, IdentifierNode *node) {
   unsigned id = node->GetNodeId();
@@ -333,7 +343,8 @@ IdentifierNode *RenameVarVisitor::VisitIdentifierNode(IdentifierNode *node) {
     if (stridx) {
       TreeNode *parent = node->GetParent();
       if (parent) {
-        if (parent->IsDecl() || parent->IsFunction()) {
+        if (parent->IsDecl() ||
+            (parent->IsFunction() && IsFuncArg(static_cast<FunctionNode *>(parent), node))) {
           // decl or func parameters
           // insert in order according to scopes hierachey to ensure proper name version
           InsertToStridx2DeclIdMap(stridx, node);
