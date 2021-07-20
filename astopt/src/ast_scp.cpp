@@ -260,6 +260,7 @@ void AST_SCP::RenameVar() {
         std::cout << std::endl;
       }
 
+      // variable renaming is in reverse order starting from smaller scope variables
       std::deque<unsigned>::reverse_iterator rit = visitor.mStridx2DeclIdMap[stridx].rbegin();
       size--;
       for (; size && rit!= visitor.mStridx2DeclIdMap[stridx].rend(); --size, ++rit) {
@@ -312,22 +313,26 @@ bool RenameVarVisitor::IsFuncArg(FunctionNode *func, IdentifierNode *node) {
   return false;
 }
 
-// insert in order according to scopes hierachey to ensure proper name version
+// insert decl in lattice order of scopes hierachy to ensure proper name versions.
+//
+// the entries of node id in mStridx2DeclIdMap are inserted to a list from larger scopes to smaller scopes
+// later variable renaming is performed in reverse from bottom up of AST within the scope of the variable
+//
 void RenameVarVisitor::InsertToStridx2DeclIdMap(unsigned stridx, IdentifierNode *node) {
-  unsigned id = node->GetNodeId();
-  ASTScope *scope = node->GetScope();
+  ASTScope *s0 = node->GetScope();
   std::deque<unsigned>::iterator it;
   unsigned i = 0;
-  for (it = mStridx2DeclIdMap[stridx].begin(); it!= mStridx2DeclIdMap[stridx].end(); ++it) {
+  for (it = mStridx2DeclIdMap[stridx].begin(); it != mStridx2DeclIdMap[stridx].end(); ++it) {
     i = *it;
-    TreeNode *t = mNodeId2NodeMap[i];
-    ASTScope *s = t->GetScope();
-    if (s->IsAncestor(scope)) {
-      mStridx2DeclIdMap[stridx].insert(it, id);
+    TreeNode *node1 = mNodeId2NodeMap[i];
+    ASTScope *s1 = node1->GetScope();
+    // do not insert node after node1 if node's scope s0 is an ancestor of node1's scope s1
+    if (s1->IsAncestor(s0)) {
+      mStridx2DeclIdMap[stridx].insert(it, node->GetNodeId());
       return;
     }
   }
-  mStridx2DeclIdMap[stridx].push_back(id);
+  mStridx2DeclIdMap[stridx].push_back(node->GetNodeId());
 }
 
 IdentifierNode *RenameVarVisitor::VisitIdentifierNode(IdentifierNode *node) {
@@ -346,7 +351,7 @@ IdentifierNode *RenameVarVisitor::VisitIdentifierNode(IdentifierNode *node) {
         if (parent->IsDecl() ||
             (parent->IsFunction() && IsFuncArg(static_cast<FunctionNode *>(parent), node))) {
           // decl or func parameters
-          // insert in order according to scopes hierachey to ensure proper name version
+          // insert in order according to scopes hierachy to ensure proper name version
           InsertToStridx2DeclIdMap(stridx, node);
         }
       }
