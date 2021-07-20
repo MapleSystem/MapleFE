@@ -1,4 +1,4 @@
-#include "../../../ast2cpp/runtime/include/ts2cpp.h"
+#include "../../ast2cpp/runtime/include/ts2cpp.h"
 
 using namespace t2crt;
 
@@ -21,7 +21,7 @@ class Vehicle : public Object {
 
   public:
     // Vehicle instance props
-    std::string name;   
+    std::string name;
 };
 
 class Car : public Vehicle {
@@ -33,7 +33,7 @@ class Car : public Vehicle {
     // Car instance props
 };
 
-// C++ Class def for instance props and prototype props 
+// C++ Class def for instance props and prototype props
 class MyCar : public Car {
   public:
     MyCar(Function* ctor, Object* proto): Car(ctor, proto) {}
@@ -88,7 +88,7 @@ class Ctor_MyCar : public Ctor_Car {
     }
 };
 
-// Function constructors 
+// Function constructors
 Ctor_MyCar    MyCar_ctor   (&Function_ctor, &Car_ctor,               Car_ctor.prototype);
 Ctor_Car      Car_ctor     (&Function_ctor, &Vehicle_ctor,           Vehicle_ctor.prototype);
 Ctor_Vehicle  Vehicle_ctor (&Function_ctor, Function_ctor.prototype, Object_ctor.prototype);
@@ -100,7 +100,7 @@ Array* arr  = Array_ctor._new();
 Object* obj = Object_ctor._new();
 
 int main(int argc, char* argv[]) {
-  // InitAllProtoTypeProps(); 
+  // InitAllProtoTypeProps();
 
   Car_ctor(car, "Tesla");
   MyCar_ctor(mycar, "Tesla Model X");

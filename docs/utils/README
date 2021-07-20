@@ -7,7 +7,7 @@ o  proto.js
 o  proto.cpp
   - Sample C++ program based on proto.js to demonstrate how JavaSCript object inheritance can be modeled in C++.
   - Run with following commands: 
-      g++ ../../../ast2cpp/runtime/src/builtins.cpp ../../../ast2cpp/runtime/src/ts2cpp.cpp proto.cpp;
+      g++ ../../ast2cpp/runtime/src/builtins.cpp ../../ast2cpp/runtime/src/ts2cpp.cpp proto.cpp;
       ./a.out | ./viewdot.sh
 
 note: requires dot and viewnior for graph generation and display.
