@@ -1585,6 +1585,16 @@ std::string Emitter::EmitKeyOfNode(KeyOfNode *node) {
   return HandleTreeNode(str, node);
 }
 
+std::string Emitter::EmitInferNode(InferNode *node) {
+  if (node == nullptr)
+    return std::string();
+  std::string str = "infer "s;
+  if (auto n = node->GetExpr()) {
+    str += EmitTreeNode(n);
+  }
+  mPrecedence = '\030';
+  return str;
+}
 
 std::string Emitter::EmitInNode(InNode *node) {
   if (node == nullptr)
@@ -1851,6 +1861,9 @@ std::string Emitter::EmitTreeNode(TreeNode *node) {
     break;
   case NK_Is:
     return EmitIsNode(static_cast<IsNode *>(node));
+    break;
+  case NK_Infer:
+    return EmitInferNode(static_cast<InferNode *>(node));
     break;
   case NK_Block:
     return EmitBlockNode(static_cast<BlockNode *>(node));

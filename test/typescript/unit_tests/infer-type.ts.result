@@ -1,4 +1,7 @@
-Matched 18 tokens.
+Matched 9 tokens.
+Matched 27 tokens.
 ============= Module ===========
+== Sub Tree ==
+ type U =  {n }
 == Sub Tree ==
  type E<T> = T extends Array< infer U> ? T : U
