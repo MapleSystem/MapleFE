@@ -3740,4 +3740,26 @@ TreeNode* ASTBuilder::BuildKeyOf() {
   return mLastTreeNode;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+//                       Infer Expression
+////////////////////////////////////////////////////////////////////////////////
+
+TreeNode* ASTBuilder::BuildInfer() {
+  if (mTrace)
+    std::cout << "In BuildInfer" << std::endl;
+
+  Param l_param = mParams[0];
+  MASSERT(!l_param.mIsEmpty);
+  MASSERT(l_param.mIsTreeNode);
+  TreeNode *expr = l_param.mData.mTreeNode;
+
+  InferNode *infer = (InferNode*)gTreePool.NewTreeNode(sizeof(InferNode));
+  new (infer) InferNode();
+
+  infer->SetExpr(expr);
+
+  mLastTreeNode = infer;
+  return mLastTreeNode;
+}
+
 }

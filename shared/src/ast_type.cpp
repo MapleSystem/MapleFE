@@ -60,7 +60,8 @@ void UserTypeNode::AddTypeGeneric(TreeNode *args) {
       args->IsArrayElement() ||
       args->IsStruct() ||
       args->IsTupleType() ||
-      args->IsLambda()) {
+      args->IsLambda() ||
+      args->IsInfer()) {
     mTypeGenerics.PushBack(args);
     SETPARENT(args);
   } else if (args->IsPass()) {

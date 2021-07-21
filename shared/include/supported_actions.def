@@ -67,6 +67,7 @@ ACTION(BuildIn)
 ACTION(BuildIs)
 ACTION(BuildTypeOf)
 ACTION(BuildKeyOf)
+ACTION(BuildInfer)
 
 ACTION(BuildLambda)
 ACTION(SetJavaLambda)       // java lambda

@@ -2078,6 +2078,24 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////
+//                  Infer Expression
+// First coming from typescript.
+////////////////////////////////////////////////////////////////////////////
+
+class InferNode : public TreeNode {
+private:
+  TreeNode *mExpr;
+public:
+  InferNode() : TreeNode(NK_Infer), mExpr(NULL) {}
+  ~InferNode(){Release();}
+
+  TreeNode* GetExpr()            {return mExpr;}
+  void      SetExpr(TreeNode *n) {mExpr = n; SETPARENT(n);}
+
+  void Dump(unsigned);
+};
+
+////////////////////////////////////////////////////////////////////////////
 //                  In Expression
 // First coming from Javascript. It's like
 // A is IN B.

@@ -81,6 +81,7 @@ rule KeywordIdentifier : ONEOF("get",
                                "namespace",
                                "extends",
                                "switch",
+                               "infer",
                                "import")
 ## "
   attr.action : BuildIdentifier()
@@ -1544,18 +1545,21 @@ rule TypeArgument: Type
 rule ConditionalType : MemberExpression + "extends" + Type + '?' + Type + ':' + Type
   attr.action : BuildConditionalType(%1, %3, %5, %7)
 
-#rule Type : ONEOF(UnionOrIntersectionOrPrimaryType,
-#                  FunctionType,
-#                  ConstructorType)
 rule KeyOf : ONEOF("keyof" + Identifier,
                    "keyof" + '(' + TypeQuery + ')')
   attr.action.%1 : BuildKeyOf(%2)
   attr.action.%2 : BuildKeyOf(%3)
 
+rule InferType : "infer" + Identifier
+  attr.action : BuildInfer(%2)
+
 rule TypeArray : ONEOF(PrimaryType + '[' + PrimaryExpression + ']',
                        TypeArray + '[' + PrimaryExpression + ']')
   attr.action.%1,%2 : BuildArrayElement(%1, %3)
 
+#rule Type : ONEOF(UnionOrIntersectionOrPrimaryType,
+#                  FunctionType,
+#                  ConstructorType)
 rule Type : ONEOF(UnionOrIntersectionOrPrimaryType,
                   FunctionType,
                   ConstructorType,
@@ -1563,7 +1567,8 @@ rule Type : ONEOF(UnionOrIntersectionOrPrimaryType,
                   ConditionalType,
                   # Typescript interface[index] can be seen as a type
                   TypeArray,
-                  MemberExpression + '[' + KeyOf + ']')
+                  MemberExpression + '[' + KeyOf + ']',
+                  InferType)
   attr.action.%7 : BuildArrayElement(%1, %3)
 
 #rule UnionOrIntersectionOrPrimaryType: ONEOF(UnionType,
