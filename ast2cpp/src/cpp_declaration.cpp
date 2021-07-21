@@ -353,7 +353,9 @@ std::string CppDecl::EmitClassNode(ClassNode *node) {
   for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
     str += EmitTreeNode(node->GetField(i)) + ";";
   }
-  // TODO: class methods decl
+  for (unsigned i = 0; i < node->GetMethodsNum(); ++i) {
+    str += EmitFunctionNode(node->GetMethod(i));
+  }
   str += "};\n\n";
 
   // 2. c++ class for JS object's corresponding JS constructor
