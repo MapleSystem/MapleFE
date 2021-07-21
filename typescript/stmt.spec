@@ -413,7 +413,8 @@ rule CallExpression : ONEOF(
   CallExpression + '.' + JSIdentifier + ZEROORMORE(AsType),
   CallExpression + TemplateLiteral,
   CallExpression + '!' + ZEROORMORE(AsType),
-  CallExpression + "?." + JSIdentifier + ZEROORMORE(AsType))
+  CallExpression + "?." + JSIdentifier + ZEROORMORE(AsType),
+  MemberExpression + "?." + ZEROORONE(TypeArguments) + Arguments + ZEROORMORE(AsType))
   attr.action.%1,%3 : BuildCall(%1)
   attr.action.%1 : AddAsType(%4)
   attr.action.%1 : AddTypeGenerics(%2)
@@ -427,6 +428,11 @@ rule CallExpression : ONEOF(
   attr.action.%8 : SetIsOptional(%1)
   attr.action.%8 : BuildField(%1, %3)
   attr.action.%8 : AddAsType(%4)
+  attr.action.%9 : SetIsOptional(%1)
+  attr.action.%9 : BuildCall(%1)
+  attr.action.%9 : AddTypeGenerics(%3)
+  attr.action.%9 : AddArguments(%4)
+  attr.action.%9 : AddAsType(%5)
 
 ##-----------------------------------
 ##rule SuperCall[Yield] :
