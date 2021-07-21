@@ -1,0 +1,7 @@
+Matched 12 tokens.
+Matched 19 tokens.
+============= Module ===========
+== Sub Tree ==
+js_var Decl: x=true Land reg expr :  \/t.test("/test")
+== Sub Tree ==
+console.log(x)

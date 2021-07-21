@@ -601,6 +601,10 @@ maple::BaseNode *A2M::ProcessKeyOf(StmtExprKind skind, TreeNode *tnode, BlockNod
   return nullptr;
 }
 
+maple::BaseNode *A2M::ProcessInfer(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
+  return nullptr;
+}
+
 maple::BaseNode *A2M::ProcessBlockDecl(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
   BlockNode *ast_block = static_cast<BlockNode *>(tnode);
   for (int i = 0; i < ast_block->GetChildrenNum(); i++) {

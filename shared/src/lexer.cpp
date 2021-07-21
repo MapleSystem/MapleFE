@@ -375,7 +375,7 @@ Token* Lexer::LexTokenNoNewLine(void) {
 // Flags include: d, g, i, m, s, u, y.
 // Anything else finishes the flag.
 //
-// The content in the reg expr could be many character, we just allow
+// The content in the reg expr could be any character, we just allow
 // all char excluding /.
 //
 // [NOTE] This function will later be implemented as an overriden function

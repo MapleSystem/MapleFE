@@ -506,6 +506,10 @@ void Verifier::VerifyKeyOf(KeyOfNode *tree){
   return;
 }
 
+void Verifier::VerifyInfer(InferNode *tree){
+  return;
+}
+
 void Verifier::VerifyArrayElement(ArrayElementNode *tree){
   return;
 }
