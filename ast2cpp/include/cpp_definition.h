@@ -57,6 +57,7 @@ public:
   virtual std::string EmitPrimTypeNode(PrimTypeNode *node);
   virtual std::string EmitPrimArrayTypeNode(PrimArrayTypeNode *node);
   virtual std::string EmitNewNode(NewNode *node);
+  virtual std::string EmitClassProps(TreeNode *node);
 };
 
 } // namespace maplefe

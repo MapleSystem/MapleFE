@@ -126,6 +126,35 @@ std::string EmitCtorInstance(FunctionNode *node) {
   return str;  
 }
 
+std::map<TypeId, std::string>TypeIdToJSType = {
+  // AST TypeId to t2crt JSType string mapping
+  {TY_Object,  "TY_Object"},
+  {TY_Function,"TY_Function"},
+  {TY_Boolean, "TY_Bool"},
+  {TY_Int,     "TY_Long"},
+  {TY_String,  "TY_String"},
+  {TY_Number,  "TY_Double"},
+  {TY_Double,  "TY_Double"}
+};
+
+std::string CppDef::EmitClassProps(TreeNode* node) {
+  std::string clsFd, addProp;
+  assert(node->GetKind()==NK_Class);
+  ClassNode* c = static_cast<ClassNode*>(node);
+  for (unsigned i = 0; i < c->GetFieldsNum(); ++i) {
+    auto node = c->GetField(i);
+    std::string fdName = node->GetName();
+    std::string fdType = mCppDecl.GetTypeString(node);
+    TypeId typeId = node->GetTypeId();
+    // C++ Code template for adding class field (e.g. a long field Foo::f1) to object prop list
+    //   ClassFld<long Foo::*> field(&Foo::f1);
+    //   obj->AddProp("f1", field.NewProp(TY_Long));
+    clsFd   += "  ClassFld<"s + fdType + " "s + c->GetName() + "::*> _field"s + std::to_string(i) +"(&"s +c->GetName()+ "::"s + fdName +");\n"s;
+    addProp += "  obj->AddProp(\""s + fdName + "\", "s + "_field"s + std::to_string(i) + ".NewProp("s + TypeIdToJSType[typeId] + "));\n"s; 
+  }
+  return "\n  // Add class fields to obj prop list\n"s + clsFd + addProp;
+}
+
 std::string CppDef::EmitFunctionNode(FunctionNode *node) {
   if (isInit || node == nullptr)
     return std::string();
@@ -165,6 +194,7 @@ std::string CppDef::EmitFunctionNode(FunctionNode *node) {
     std::string newObj = "\n  "s+className+"* obj = new "s+className+"(this, this->prototype);"s;
     str.insert(bodyPos+1, newObj, 0, std::string::npos);
     std::string ctorBody;
+    ctorBody = EmitClassProps(node->GetParent());
     ctorBody += "  return obj;\n"s;
     str.insert(str.size()-2, ctorBody, 0, std::string::npos);
     str += EmitCtorInstance(node);
