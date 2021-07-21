@@ -237,6 +237,7 @@ class CfgBuilder : public AstVisitor {
   TryNode *VisitTryNode(TryNode *node);
   ThrowNode *VisitThrowNode(ThrowNode *node);
   BlockNode *VisitBlockNode(BlockNode *node);
+  NamespaceNode *VisitNamespaceNode(NamespaceNode *node);
 
   // For statements of a BB
   PassNode *VisitPassNode(PassNode *node);
@@ -262,6 +263,7 @@ class CfgBuilder : public AstVisitor {
   IdentifierNode *VisitIdentifierNode(IdentifierNode *node);
   LiteralNode *VisitLiteralNode(LiteralNode *node);
   TypeAliasNode *VisitTypeAliasNode(TypeAliasNode *node);
+  FieldNode *VisitFieldNode(FieldNode *node);
 
   TreeNode *BaseTreeNode(TreeNode *node);
 };

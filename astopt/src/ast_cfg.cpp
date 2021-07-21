@@ -573,6 +573,33 @@ BlockNode *CfgBuilder::VisitBlockNode(BlockNode *node) {
   return node;
 }
 
+// For control flow
+NamespaceNode *CfgBuilder::VisitNamespaceNode(NamespaceNode *node) {
+  //mCurrentBB->AddStatement(node);
+  mCurrentBB->SetKind(BK_Block);
+  // Set the auxiliary node of this BB
+  mCurrentBB->SetAuxNode(node);
+
+  // Create a BB for the join point
+  CfgBB *join = NewBB(BK_Join2);
+
+  // Save current BB
+  CfgBB *current_bb = mCurrentBB;
+  // Create a new BB for current block node
+  mCurrentBB = NewBB(BK_Uncond);
+  current_bb->AddSuccessor(mCurrentBB);
+
+  // Visit all child nodes
+  AstVisitor::VisitNamespaceNode(node);
+
+  mCurrentBB->AddSuccessor(join);
+  // This edge is to determine the namespace range
+  //current_bb->AddSuccessor(join);
+
+  mCurrentBB = join;
+  return node;
+}
+
 // For PassNode
 PassNode *CfgBuilder::VisitPassNode(PassNode *node) {
   mCurrentBB->AddStatement(node);
@@ -708,6 +735,12 @@ LiteralNode *CfgBuilder::VisitLiteralNode(LiteralNode *node) {
 
 // For statement of current BB
 TypeAliasNode *CfgBuilder::VisitTypeAliasNode(TypeAliasNode *node) {
+  mCurrentBB->AddStatement(node);
+  return node;
+}
+
+// For statement of current BB
+FieldNode *CfgBuilder::VisitFieldNode(FieldNode *node) {
   mCurrentBB->AddStatement(node);
   return node;
 }
