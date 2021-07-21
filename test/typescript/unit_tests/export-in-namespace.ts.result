@@ -1,0 +1,15 @@
+Matched 15 tokens.
+============= Module ===========
+== Sub Tree ==
+export {declare namespace  ns
+  class  Klass
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+  export {Klass} 
+} 

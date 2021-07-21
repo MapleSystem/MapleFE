@@ -2082,7 +2082,8 @@ rule ExportNamespaceElement: ONEOF("export" + VariableStatement,
                                    "export" + EnumDeclaration,
                                    "export" + NamespaceDeclaration,
 #                                   "export" + AmbientDeclaration,
-                                   "export" + ImportAliasDeclaration)
+                                   "export" + ImportAliasDeclaration,
+                                   ExportDeclaration)
   attr.action.%1,%2,%3,%4,%5,%6,%7,%8,%9 : BuildExport()
   attr.action.%1,%2,%3,%4,%5,%6,%7,%8,%9 : SetPairs(%2)
 
