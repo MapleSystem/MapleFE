@@ -935,7 +935,12 @@ std::string Emitter::EmitStructLiteralNode(StructLiteralNode *node) {
 std::string Emitter::EmitNamespaceNode(NamespaceNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str = "namespace "s + node->GetName() + " {"s;
+  std::string str = "namespace "s;
+  if (auto n = node->GetId()) {
+    std::string s = EmitTreeNode(n);
+    str += Clean(s);
+  }
+  str += " {"s;
   for (unsigned i = 0; i < node->GetElementsNum(); ++i) {
     if (auto n = node->GetElementAtIndex(i)) {
       str += EmitTreeNode(n);
