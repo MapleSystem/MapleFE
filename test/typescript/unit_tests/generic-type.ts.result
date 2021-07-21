@@ -1,0 +1,4 @@
+Matched 25 tokens.
+============= Module ===========
+== Sub Tree ==
+ type TYPE<T,K> =  {[P in K] : T[P] }

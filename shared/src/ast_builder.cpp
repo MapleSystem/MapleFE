@@ -3214,6 +3214,27 @@ TreeNode* ASTBuilder::BuildTypeParameter() {
   return mLastTreeNode;
 }
 
+// It takes one argument, the constraint which could be empty.
+TreeNode* ASTBuilder::AddTypeParameterConstraint() {
+  if (mTrace)
+    std::cout << "In AddTypeParameterConstraint" << std::endl;
+
+  Param p_id = mParams[0];
+  if (p_id.mIsEmpty)
+    return mLastTreeNode;
+
+  MASSERT(p_id.mIsTreeNode);
+  TreeNode *id = p_id.mData.mTreeNode;
+
+  MASSERT(mLastTreeNode->IsTypeParameter());
+  TypeParameterNode *tp = (TypeParameterNode*)mLastTreeNode;
+  tp->SetConstraint(id);
+
+  mLastTreeNode = tp;
+  return mLastTreeNode;
+}
+
+
 // Takes one argument, the as 'type'.
 TreeNode* ASTBuilder::BuildAsType() {
   if (mTrace)

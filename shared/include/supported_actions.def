@@ -212,9 +212,11 @@ ACTION(BuildArrayType)      // From Spec point of view,
 ACTION(BuildNeverArrayType) // Special 'never' array type.
 
 ACTION(BuildTypeAlias)
-ACTION(BuildTypeParameter)
 ACTION(BuildAsType)
 ACTION(BuildConditionalType)
+
+ACTION(BuildTypeParameter)
+ACTION(AddTypeParameterConstraint)
 
 ACTION(BuildNameTypePair)
 

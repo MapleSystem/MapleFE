@@ -26,7 +26,7 @@ class  Derived
   LocalInterfaces: 
 
 == Sub Tree ==
- type T<E,Base> =  {[key in E[ keyof E]] : string }
+ type T<E> =  {[key in E[ keyof E]] : string }
 == Sub Tree ==
 js_var Decl: obj= {str:"abc"}
 == Sub Tree ==

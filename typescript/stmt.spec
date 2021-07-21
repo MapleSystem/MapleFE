@@ -1532,11 +1532,13 @@ rule TypeParameterList: ONEOF(TypeParameter,
 rule TypeParameter: BindingIdentifier + ZEROORONE(Constraint) + ZEROORONE(TypeInitializer)
   attr.action : BuildTypeParameter(%1)
   attr.action : AddInit(%3)
+  attr.action : AddTypeParameterConstraint(%2)
 
 rule TypeInitializer : '=' + Type
 
 ## rule Constraint: extends Type
 rule Constraint: "extends" + Type
+  attr.action : PassChild(%2)
 
 ## rule TypeArguments: < TypeArgumentList >
 rule TypeArguments: '<' + TypeArgumentList + '>'
