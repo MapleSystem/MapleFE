@@ -110,16 +110,16 @@ inline bool IsClassMethod(FunctionNode* f) {
 std::string EmitCtorInstance(FunctionNode *node) {
   // assert(node->IsConstructor());
   ClassNode* c = static_cast<ClassNode*>(node->GetParent());
-  std::string str, thisClass, baseClass, ctor, proto, prototypeProto;
+  std::string str, thisClass, ctor, proto, prototypeProto;
   ctor = "&Function_ctor";
   thisClass = c->GetName();
   if (c->GetSuperClassesNum() == 0) {
     proto = "Function_ctor.prototype";
     prototypeProto = "Object_ctor.prototype";
   } else {
-    baseClass = "Ctor_"s+c->GetSuperClass(0)->GetName(); 
-    proto = "&"s+baseClass;
-    prototypeProto = baseClass+".prototype"s;
+    proto = c->GetSuperClass(0)->GetName() + "_ctor"s;
+    prototypeProto = proto + ".prototype"s;
+    proto.insert(0, "&"s, 0, std::string::npos);
   }
   str = "\n// Instantiate constructor"s;
   str += "\nCtor_"s+thisClass +" "+ thisClass+"_ctor("s +ctor+","s+proto+","+prototypeProto+");\n\n"s;
@@ -198,6 +198,8 @@ std::string CppDef::EmitFunctionNode(FunctionNode *node) {
     ctorBody += "  return obj;\n"s;
     str.insert(str.size()-2, ctorBody, 0, std::string::npos);
     str += EmitCtorInstance(node);
+  } else if (IsClassMethod(node)) {
+    Emitter::Replace(str, "this.", "this->", 0);
   }
 
   return str;
@@ -259,8 +261,10 @@ std::string CppDef::EmitCallNode(CallNode *node) {
       if(s.compare(0, 11, "console.log") == 0) {
         str += "std::cout"s;
         log = true;
-      } else
+      } else {
+        Emitter::Replace(s, ".", "->", 0);
         str += s;
+      }
     }
   }
   if(!log)
