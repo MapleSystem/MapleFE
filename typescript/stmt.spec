@@ -1584,7 +1584,7 @@ rule UnionOrIntersectionOrPrimaryType: ONEOF(UnionType,
 
 #rule IntersectionOrPrimaryType : ONEOF(IntersectionType,
 #                                       PrimaryType)
-rule IntersectionOrPrimaryType : ONEOF(IntersectionType, PrimaryType)
+rule IntersectionOrPrimaryType : ONEOF(IntersectionType, PrimaryType, TypeArray)
 
 ## rule PrimaryType: ParenthesizedType PredefinedType TypeReference ObjectType ArrayType TupleType TypeQuery ThisType
 rule PrimaryType: ONEOF(ParenthesizedType,

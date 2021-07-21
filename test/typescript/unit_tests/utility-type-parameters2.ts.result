@@ -1,0 +1,14 @@
+Matched 20 tokens.
+Matched 59 tokens.
+Matched 71 tokens.
+============= Module ===========
+== Sub Tree ==
+func  func(n,s)  throws: 
+  return n Add s
+
+== Sub Tree ==
+func  wrapper(n,s)  throws: 
+  return func(n,s)
+
+== Sub Tree ==
+console.log(wrapper(123,"abc"))

@@ -36,6 +36,7 @@ void UserTypeNode::AddUnionInterType(TreeNode *args) {
       args->IsLambda() ||
       args->IsTypeOf() ||
       args->IsTupleType() ||
+      args->IsArrayElement() ||
       args->IsStruct()) {
     mUnionInterTypes.PushBack(args);
   } else if (args->IsPass()) {
