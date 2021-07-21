@@ -190,7 +190,7 @@ std::string CppDef::EmitFunctionNode(FunctionNode *node) {
     str += "{}\n"s;
 
   if (node->IsConstructor()) {
-    Emitter::Replace(str, "this.", "obj->", 0);
+    Emitter::Replace(str, "this->", "obj->", 0);
     std::string newObj = "\n  "s+className+"* obj = new "s+className+"(this, this->prototype);"s;
     str.insert(bodyPos+1, newObj, 0, std::string::npos);
     std::string ctorBody;
@@ -198,8 +198,6 @@ std::string CppDef::EmitFunctionNode(FunctionNode *node) {
     ctorBody += "  return obj;\n"s;
     str.insert(str.size()-2, ctorBody, 0, std::string::npos);
     str += EmitCtorInstance(node);
-  } else if (IsClassMethod(node)) {
-    Emitter::Replace(str, "this.", "this->", 0);
   }
 
   return str;
@@ -331,7 +329,10 @@ std::string CppDef::EmitFieldNode(FieldNode *node) {
   if (auto n = node->GetField()) {
     std::string field = EmitIdentifierNode(n);
     Emitter::Replace(field, "length", "size()");
-    str += "."s + field;
+    if (str.compare("console") == 0)
+      str += "."s + field;
+    else
+      str += "->"s + field;
   }
   if (node->IsStmt())
     str += ";\n"s;
