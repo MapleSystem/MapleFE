@@ -1,0 +1,20 @@
+Matched 13 tokens.
+Matched 74 tokens.
+Matched 80 tokens.
+Matched 91 tokens.
+Matched 92 tokens.
+============= Module ===========
+== Sub Tree ==
+js_var Decl: obj= {x:"abc", name:""}
+== Sub Tree ==
+Object.defineProperty(obj,"name", {:get ()  throws: 
+  console.log("Return obj.x")
+  return this[x]
+, :set (val)  throws: 
+  console.log( template-literal: "Set obj.x to '",val,"'",NULL)
+  this[x] Assign val
+, enumerable:false})
+== Sub Tree ==
+obj.name Assign "def"
+== Sub Tree ==
+console.log(obj,obj.name)

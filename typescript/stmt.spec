@@ -1814,21 +1814,34 @@ rule PropertyDefinition: ONEOF(IdentifierReference,
   attr.action.%4 : AddFunctionBody(%8)
 
 ## GetAccessor: get PropertyName ( ) TypeAnnotationopt { FunctionBody }
-rule GetAccessor: "get" + PropertyName + '(' + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}'
-  attr.action : BuildFunction(%2)
-  attr.action : SetGetAccessor()
-  attr.action : AddType(%5)
-  attr.action : AddFunctionBody(%7)
-  attr.action : AddModifier(%1)
+rule GetAccessor: ONEOF("get" + PropertyName + '(' + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}',
+                        "get" + '(' + "this" + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}')
+  attr.action.%1 : BuildFunction(%2)
+  attr.action.%1 : SetGetAccessor()
+  attr.action.%1 : AddType(%5)
+  attr.action.%1 : AddFunctionBody(%7)
+  attr.action.%1 : AddModifier(%1)
+  attr.action.%2 : BuildFunction()
+  attr.action.%2 : SetGetAccessor()
+  attr.action.%2 : AddType(%5)
+  attr.action.%2 : AddFunctionBody(%7)
+  attr.action.%2 : AddModifier(%1)
 
 ## SetAccessor: set PropertyName ( BindingIdentifierOrPattern TypeAnnotationopt ) { FunctionBody }
-rule SetAccessor: "set" + PropertyName + '(' + BindingIdentifierOrPattern + ZEROORONE(TypeAnnotation) + ')' + '{' + FunctionBody + '}'
-  attr.action : AddType(%4, %5)
-  attr.action : BuildFunction(%2)
-  attr.action : SetSetAccessor()
-  attr.action : AddParams(%4)
-  attr.action : AddFunctionBody(%8)
-  attr.action : AddModifier(%1)
+rule SetAccessor: ONEOF("set" + PropertyName + '(' + BindingIdentifierOrPattern + ZEROORONE(TypeAnnotation) + ')' + '{' + FunctionBody + '}',
+                        "set" + '(' + "this" + ',' + BindingIdentifierOrPattern + ZEROORONE(TypeAnnotation) + ')' + '{' + FunctionBody + '}')
+  attr.action.%1 : AddType(%4, %5)
+  attr.action.%1 : BuildFunction(%2)
+  attr.action.%1 : SetSetAccessor()
+  attr.action.%1 : AddParams(%4)
+  attr.action.%1 : AddFunctionBody(%8)
+  attr.action.%1 : AddModifier(%1)
+  attr.action.%2 : AddType(%5, %6)
+  attr.action.%2 : BuildFunction()
+  attr.action.%2 : SetSetAccessor()
+  attr.action.%2 : AddParams(%5)
+  attr.action.%2 : AddFunctionBody(%9)
+  attr.action.%2 : AddModifier(%1)
 
 ## FunctionExpression: ( Modified ) function BindingIdentifieropt CallSignature { FunctionBody }
 ## FunctionExpression has the same syntax as FunctionDeclaration. But it appears as an expression. We will build it

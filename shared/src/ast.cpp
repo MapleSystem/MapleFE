@@ -806,8 +806,11 @@ void StructLiteralNode::AddField(TreeNode *tree) {
     FunctionNode *node = (FunctionNode*)tree;
     FieldLiteralNode *func_lit = (FieldLiteralNode*)gTreePool.NewTreeNode(sizeof(FieldLiteralNode));
     new (func_lit) FieldLiteralNode();
-    MASSERT(node->GetFuncName()->IsIdentifier());
-    func_lit->SetFieldName((IdentifierNode*)(node->GetFuncName()));
+    TreeNode *func_name = node->GetFuncName();
+    if (func_name) {
+      MASSERT(func_name->IsIdentifier());
+      func_lit->SetFieldName((IdentifierNode*)func_name);
+    }
     func_lit->SetLiteral(node);
     mFields.PushBack(func_lit);
   } else if (tree->IsLiteral() || tree->IsIdentifier() || tree->IsField()) {
