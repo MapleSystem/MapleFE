@@ -1558,6 +1558,7 @@ TreeNode* ASTBuilder::BuildArrayLiteral() {
             literals->IsBinOperator() ||
             literals->IsUnaOperator() ||
             literals->IsRegExpr() ||
+            literals->IsFunction() ||
             literals->IsLambda());
     if (literals->IsExprList()) {
       ExprListNode *el = (ExprListNode*)literals;
@@ -1575,6 +1576,7 @@ TreeNode* ASTBuilder::BuildArrayLiteral() {
                 expr->IsBinOperator() ||
                 expr->IsUnaOperator() ||
                 expr->IsRegExpr() ||
+                expr->IsFunction() ||
                 expr->IsLambda());
         array_literal->AddLiteral(expr);
       }
