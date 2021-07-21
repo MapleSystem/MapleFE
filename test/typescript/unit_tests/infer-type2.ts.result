@@ -1,0 +1,4 @@
+Matched 62 tokens.
+============= Module ===========
+== Sub Tree ==
+declare  type RecursivePartial<T> =  {[P in  keyof T] : T[P] extends Array< infer U> ? Array<RecursivePartial<U>> : T[P] extends ReadonlyArray< infer V> ? ReadonlyArray<RecursivePartial<V>> : RecursivePartial<T[P]> }
