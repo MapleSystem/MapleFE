@@ -1,0 +1,21 @@
+Matched 23 tokens.
+Matched 33 tokens.
+Matched 59 tokens.
+Matched 66 tokens.
+============= Module ===========
+== Sub Tree ==
+class  Klass
+  Fields: 
+    arr=[ {list: {f1:0, f2:1}}]
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+js_var Decl: obj=new Klass()
+== Sub Tree ==
+js_var Decl: list2=true ?  {:obj.arr[0]} : obj.arr[0].list
+== Sub Tree ==
+console.log(list2)

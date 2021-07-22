@@ -813,7 +813,10 @@ void StructLiteralNode::AddField(TreeNode *tree) {
     }
     func_lit->SetLiteral(node);
     mFields.PushBack(func_lit);
-  } else if (tree->IsLiteral() || tree->IsIdentifier() || tree->IsField()) {
+  } else if (tree->IsLiteral() ||
+             tree->IsIdentifier() ||
+             tree->IsField() ||
+             tree->IsArrayElement()) {
     FieldLiteralNode *fln = (FieldLiteralNode*)gTreePool.NewTreeNode(sizeof(FieldLiteralNode));
     new (fln) FieldLiteralNode();
     fln->SetLiteral(tree);
