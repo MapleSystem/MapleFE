@@ -1,0 +1,7 @@
+Matched 11 tokens.
+Matched 29 tokens.
+============= Module ===========
+== Sub Tree ==
+ts_enum: TypeID {Array_Class=0;Array }
+== Sub Tree ==
+ type TYPE =  [  : string ,  : prim array-TBD ,  : number ,  : ...TypeID[] ,  ] 
