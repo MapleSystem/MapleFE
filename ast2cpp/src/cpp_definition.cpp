@@ -139,7 +139,7 @@ std::map<TypeId, std::string>TypeIdToJSType = {
 
 std::string CppDef::EmitClassProps(TreeNode* node) {
   std::string clsFd, addProp;
-  assert(node->GetKind()==NK_Class);
+  MASSERT(node->GetKind()==NK_Class && "Not NK_Class node");
   ClassNode* c = static_cast<ClassNode*>(node);
   for (unsigned i = 0; i < c->GetFieldsNum(); ++i) {
     auto node = c->GetField(i);
@@ -163,16 +163,16 @@ std::string CppDef::EmitFunctionNode(FunctionNode *node) {
   if (node->IsConstructor()) {
     className = GetClassName(node);
     str = "\n"s;
-    str += className + "*"s + " Ctor_"s + className + "::operator()"s;
+    str += className + "*"s + " Ctor_"s + className + "::operator()("s + className + "* obj"s;
   } else {
     str = mCppDecl.GetTypeString(node->GetType(), node->GetType());
     if(node->GetStrIdx())
       str += " "s + (IsClassMethod(node)?GetClassName(node):GetModuleName()) + "::"s + node->GetName();
+    str += "("s;
   }
-  str += "("s;
 
   for (unsigned i = 0; i < node->GetParamsNum(); ++i) {
-    if (i)
+    if (i || node->IsConstructor())
       str += ", "s;
     if (auto n = node->GetParam(i)) {
       str += mCppDecl.EmitTreeNode(n);
@@ -191,8 +191,6 @@ std::string CppDef::EmitFunctionNode(FunctionNode *node) {
 
   if (node->IsConstructor()) {
     Emitter::Replace(str, "this->", "obj->", 0);
-    std::string newObj = "\n  "s+className+"* obj = new "s+className+"(this, this->prototype);"s;
-    str.insert(bodyPos+1, newObj, 0, std::string::npos);
     std::string ctorBody;
     ctorBody = EmitClassProps(node->GetParent());
     ctorBody += "  return obj;\n"s;
@@ -246,10 +244,23 @@ static bool QuoteStringLiteral(std::string &s, bool quoted = false) {
   return true;
 }
 
+std::string EmitSuperCtorCall(TreeNode* node) {
+  while (node->GetKind() && node->GetKind() != NK_Class)
+    node = node->GetParent();
+  if (node && node->GetKind()==NK_Class) {
+    std::string base, str;
+    base = (static_cast<ClassNode*>(node)->GetSuperClassesNum() != 0)? static_cast<ClassNode*>(node)->GetSuperClass(0)->GetName() : "Object";
+    str = "  "s + base + "_ctor"s;
+    return str;
+  }
+  return ""s;
+}
+
 std::string CppDef::EmitCallNode(CallNode *node) {
   if (node == nullptr)
     return std::string();
   bool log = false;
+  bool isSuper = false;
   std::string str;
   if (auto n = node->GetMethod()) {
     auto s = EmitTreeNode(n);
@@ -259,14 +270,18 @@ std::string CppDef::EmitCallNode(CallNode *node) {
       if(s.compare(0, 11, "console.log") == 0) {
         str += "std::cout"s;
         log = true;
-      } else {
+      } else if (s.compare("super") == 0) {
+        isSuper = true;
+        str += EmitSuperCtorCall(node);
+      }
+      else {
         Emitter::Replace(s, ".", "->", 0);
         str += s;
       }
     }
   }
   if(!log)
-    str += "("s;
+    str += isSuper? "(obj"s : "("s;
   unsigned num = node->GetArgsNum();
   for (unsigned i = 0; i < num; ++i) {
     if(log) {
@@ -280,7 +295,7 @@ std::string CppDef::EmitCallNode(CallNode *node) {
         str += " << ' ' "s;
       str += " << "s + s;
     } else {
-      if (i)
+      if (i || isSuper)
         str += ", "s;
       if (auto n = node->GetArg(i))
         str += EmitTreeNode(n);
@@ -663,18 +678,18 @@ std::string CppDef::EmitNewNode(NewNode *node) {
     return std::string();
 
   std::string str;
-  if (auto n = node->GetId()) {
-    if (n->GetTypeId() == TY_Class)
-      // Generate call to object constructor if doing new on class obj
-      str = n->GetName() + "_ctor"s;
-    else 
-      str = "new "s + EmitTreeNode(n);
+  MASSERT(node->GetId() && "No mId on NewNode");
+  if (node->GetId() && node->GetId()->GetTypeId() == TY_Class) {
+    // Generate code to create new obj and call constructor
+    str = node->GetId()->GetName() + "_ctor("s + node->GetId()->GetName() + "_ctor._new()"s;
+  } else {
+    str = "new "s + EmitTreeNode(node->GetId());
+    str += "("s;
   }
 
-  str += "("s;
   auto num = node->GetArgsNum();
   for (unsigned i = 0; i < num; ++i) {
-    if (i)
+    if (i || node->GetId()->GetTypeId()==TY_Class)
       str += ", "s;
     if (auto n = node->GetArg(i)) {
       str += EmitTreeNode(n);

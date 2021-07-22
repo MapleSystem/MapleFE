@@ -331,24 +331,22 @@ std::string CppDecl::EmitClassNode(ClassNode *node) {
   str += "class "s + node->GetName() + " : public "s + base + " {\n"s;
 
   str += "  public:\n";
+
   // constructor decl,  field init
-  for (unsigned i = 0; i < node->GetConstructorsNum(); ++i) {
-    if (auto t = node->GetConstructor(i)) {
-      std::string init;
-      for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
-        if (i)
-          init += ", "s;
-        if (IdentifierNode* n = reinterpret_cast<IdentifierNode *>(node->GetField(i))) {
-          if (n->GetInit()) {
-            init += n->GetName();
-            init += "("s + EmitTreeNode(n->GetInit()) + ")"s;
-          }
-        }
+  std::string init;
+  for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
+    if (i)
+      init += ", "s;
+    if (IdentifierNode* n = reinterpret_cast<IdentifierNode *>(node->GetField(i))) {
+      if (n->GetInit()) {
+        init += n->GetName();
+        init += "("s + EmitTreeNode(n->GetInit()) + ")"s;
       }
-      str += node->GetName() + "(Function* ctor, Object* proto): "s + base + "(ctor, proto)" + (init.empty()? init: ","s + init) + " {}\n"s;
-      str += "~"s + node->GetName() + "(){}\n";
     }
   }
+  str += node->GetName() + "(Function* ctor, Object* proto): "s + base + "(ctor, proto)" + (init.empty()? init: ","s + init) + " {}\n"s;
+  str += "~"s + node->GetName() + "(){}\n";
+
   // field decl. TODO: handle static, private, protected attrs.
   for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
     str += EmitTreeNode(node->GetField(i)) + ";";
@@ -364,13 +362,13 @@ std::string CppDecl::EmitClassNode(ClassNode *node) {
   str += "  public:\n";
   str += "Ctor_"s+node->GetName()+"(Function* ctor, Object* proto, Object* prototype_proto) : "+base+"(ctor, proto, prototype_proto) {}\n";
 
+  // constructor function
   for (unsigned i = 0; i < node->GetConstructorsNum(); ++i) {
     std::string ctor;
     if (auto c = node->GetConstructor(i)) {
-      ctor = "  "s+node->GetName() + "* operator()("s;
+      ctor = "  "s + node->GetName() + "* operator()("s + node->GetName() + "* obj"s;
       for (unsigned k = 0; k < c->GetParamsNum(); ++k) {
-        if (k)
-          ctor += ", "s;
+        ctor += ", "s;
         if (auto n = c->GetParam(k)) {
           ctor += EmitTreeNode(n);
         }
@@ -379,6 +377,8 @@ std::string CppDecl::EmitClassNode(ClassNode *node) {
       str += ctor;
     }
   }
+  // new function
+  str += "  "s+node->GetName()+"* _new() {return new "s+node->GetName()+"(this, this->prototype);}\n"s;
   str += "};\n\n";
   return str;
 }
