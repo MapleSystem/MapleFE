@@ -1951,6 +1951,7 @@ rule ImplementsClause: "implements" + ClassOrInterfaceTypeList
 rule ClassElement: ONEOF(ConstructorDeclaration,
                          PropertyMemberDeclaration,
                          IndexMemberDeclaration)
+  attr.property : Single
 
 ## ConstructorDeclaration: AccessibilityModifieropt constructor ( ParameterListopt ) { FunctionBody } AccessibilityModifieropt constructor ( ParameterListopt ) ;
 rule ConstructorDeclaration: ONEOF(
@@ -1962,15 +1963,14 @@ rule ConstructorDeclaration: ONEOF(
 
 ## PropertyMemberDeclaration: MemberVariableDeclaration MemberFunctionDeclaration MemberAccessorDeclaration
 rule PropertyMemberDeclaration: ONEOF(MemberVariableDeclaration,
-                                      MemberFunctionDeclaration,
-                                      MemberAccessorDeclaration,
+                                      MemberFunctionDeclaration + ZEROORONE(';'),
+                                      MemberAccessorDeclaration + ZEROORONE(';'),
                                       MemberExternalDeclaration)
 
 ## MemberVariableDeclaration: AccessibilityModifieropt staticopt PropertyName TypeAnnotationopt Initializeropt ;
 rule MemberVariableDeclaration: ONEOF(
   ZEROORMORE(Annotation) + ZEROORMORE(AccessibilityModifier) + PropertyName + ZEROORONE(TypeAnnotation) + ZEROORONE(Initializer) + ZEROORONE(';'),
-  ZEROORMORE(Annotation) + ZEROORMORE(AccessibilityModifier) + PropertyName + '?' + ZEROORONE(TypeAnnotation) + ZEROORONE(Initializer) + ZEROORONE(';'),
-  IndexSignature)
+  ZEROORMORE(Annotation) + ZEROORMORE(AccessibilityModifier) + PropertyName + '?' + ZEROORONE(TypeAnnotation) + ZEROORONE(Initializer) + ZEROORONE(';'))
   attr.action.%1: AddInitTo(%3, %5)
   attr.action.%1: AddType(%3, %4)
   attr.action.%1: AddModifierTo(%3, %2)
@@ -2013,7 +2013,7 @@ rule MemberAccessorDeclaration: ONEOF(
   attr.action.%1,%2 : AddModifierTo(%3, %1)
 
 ## IndexMemberDeclaration: IndexSignature ;
-rule IndexMemberDeclaration: IndexSignature + ';'
+rule IndexMemberDeclaration: IndexSignature + ZEROORONE(';')
 
 rule MemberExternalDeclaration : ZEROORMORE(AccessibilityModifier) + "declare" + VariableDeclaration + ';'
   attr.action : BuildExternalDeclaration(%3)

@@ -1,0 +1,30 @@
+Matched 53 tokens.
+Matched 63 tokens.
+Matched 72 tokens.
+Matched 78 tokens.
+Matched 87 tokens.
+============= Module ===========
+== Sub Tree ==
+class  Klass
+  Fields: 
+    prop
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+    get getProp()  throws: 
+      return this.prop
+    func  init(val)  throws: 
+      this.prop Assign val
+    set setProp(newVal)  throws: 
+      this.init(newVal)
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+js_var Decl: obj=new Klass()
+== Sub Tree ==
+console.log(obj.getProp)
+== Sub Tree ==
+obj.setProp Assign "bar"
+== Sub Tree ==
+console.log(obj.getProp)

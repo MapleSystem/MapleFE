@@ -440,6 +440,21 @@ Token* Parser::GetActiveToken(unsigned i) {
   return mActiveTokens.ValueAtIndex(i);
 }
 
+// insert token at position idx.
+void Parser::InsertToken(unsigned idx, Token *token) {
+  if (idx >= mActiveTokens.GetNum())
+    MASSERT(0 && "mActiveTokens OutOfBound");
+  // enlarge the size by 1.
+  mActiveTokens.PushBack(NULL);
+  // Copy each of them forwards.
+  unsigned i = mActiveTokens.GetNum() - 2;
+  for (; i >= idx; i--) {
+    Token *move_t = mActiveTokens.ValueAtIndex(i);
+    mActiveTokens.SetElem(i + 1, move_t);
+  }
+  mActiveTokens.SetElem(idx, token);
+}
+
 bool Parser::Parse() {
   gTemplateLiteralNodes.Clear();
   mASTBuilder->SetTrace(mTraceAstBuild);
@@ -1186,6 +1201,28 @@ bool Parser::TraverseToken(Token *token, AppealNode *parent, AppealNode *&child_
   bool use_alt_token = false;
   AppealNode *appeal = NULL;
 
+  // [TODO]
+  // We enable skipping semi-colon. Later we will implement TS specific version of parser
+  // which overried TraverseToken().
+  // We handle one case: if we see } instead of ';', we can skip
+  // There are many other cases. Will handle later.
+  if (token->IsSeparator() && token->GetSepId() == SEP_Semicolon) {
+    if (curr_token->IsSeparator() && curr_token->GetSepId() == SEP_Rbrace) {
+      // There are rule like ZEROORMORE(';'). In this case,
+      // we need check cases where we already have one previous ';'.
+      Token *prev = mActiveTokens.ValueAtIndex(mCurToken - 1);
+      if (prev != token) {
+        // The simpliest way is to insert a semicolon token in mActiveTokens.
+        // Just pretend we lex a semicolon.
+        InsertToken(mCurToken, token);
+        curr_token = token;
+        if (mTraceTable) {
+          std::cout << "Auto-insert one semicolon." << std::endl;
+        }
+      }
+    }
+  }
+
   if (token == curr_token) {
     appeal = mAppealNodePool.NewAppealNode();
     child_node = appeal;
@@ -1458,6 +1495,7 @@ bool Parser::TraverseOneof(RuleTable *rule_table, AppealNode *appeal) {
       mCurToken = old_mCurToken;
 
       // Some ONEOF rules can have only children matching current token seq.
+      // Or the language desiner just want to match the first children rule.
       if (rule_table->mProperties & RP_Single) {
         break;
       }

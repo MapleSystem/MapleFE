@@ -320,6 +320,7 @@ private:
 
   bool MoveCurToken();             // move mCurToken one step.
   Token* GetActiveToken(unsigned); // Get an active token.
+  void InsertToken(unsigned, Token*);  //
 
   // Appealing System
   std::vector<AppealNode*> mAppealNodes;

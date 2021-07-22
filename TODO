@@ -1,0 +1,4 @@
+1. Implement language specific lexer through overriding. Right now some functions are in shared lexer
+   template literal related code
+2. Implement language specific through overriding. Right now semi-coloning skipping is in shared parser.
+   See code in Parser::TraverseToken()
