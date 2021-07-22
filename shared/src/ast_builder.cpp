@@ -2991,6 +2991,15 @@ TreeNode* ASTBuilder::SetSetAccessor() {
   return mLastTreeNode;
 }
 
+// It take no arugment. It uses mLastTreeNode which is
+// a function node.
+TreeNode* ASTBuilder::SetCallSignature() {
+  MASSERT(mLastTreeNode->IsFunction());
+  FunctionNode *node = (FunctionNode*)mLastTreeNode;
+  node->SetIsCallSignature();
+  return mLastTreeNode;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 //                   Try, Catch, Throw
 ////////////////////////////////////////////////////////////////////////////////

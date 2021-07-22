@@ -1715,6 +1715,10 @@ rule TypeAnnotation: ':' + Type
 
 ## rule CallSignature: TypeParametersopt ( ParameterListopt ) TypeAnnotationopt
 rule CallSignature: ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation)
+  attr.action : BuildFunction()
+  attr.action : AddParams(%3)
+  attr.action : AddType(%5)
+  attr.action : SetCallSignature()
 
 ## rule ParameterList: RequiredParameterList OptionalParameterList RestParameter RequiredParameterList , OptionalParameterList RequiredParameterList , RestParameter OptionalParameterList , RestParameter RequiredParameterList , OptionalParameterList , RestParameter
 rule ParameterList: ONEOF(RequiredParameterList + ZEROORONE(Elision),

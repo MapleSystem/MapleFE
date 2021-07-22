@@ -118,6 +118,7 @@ ACTION(AddFunctionBody)
 ACTION(AddFunctionBodyTo)
 ACTION(SetGetAccessor)   // TS 'get' accessor
 ACTION(SetSetAccessor)   // TS 'set' accessor
+ACTION(SetCallSignature) // TS call signature
 ACTION(AddAssert)
 
 // For callsite

@@ -1739,9 +1739,10 @@ private:
                                              //    func() : v is string
                                              // So mAssert could be either an AssertNode or
                                              // an IsNode.
-  bool                         mIsConstructor;
-  bool                         mIsGetAccessor;
-  bool                         mIsSetAccessor;
+  bool mIsConstructor;
+  bool mIsGetAccessor;
+  bool mIsSetAccessor;
+  bool mIsCallSignature; // no func name, no func body
 
 public:
   FunctionNode();
@@ -1764,8 +1765,10 @@ public:
   void SetIsConstructor(bool b = true) {mIsConstructor = b;}
   bool IsGetAccessor()               {return mIsGetAccessor;}
   void SetIsGetAccessor(bool b = true) {mIsGetAccessor = b;}
-  bool IsSetAccessor()               {return mIsSetAccessor;}
+  bool IsSetAccessor()                 {return mIsSetAccessor;}
   void SetIsSetAccessor(bool b = true) {mIsSetAccessor = b;}
+  bool IsCallSignature()                 {return mIsCallSignature;}
+  void SetIsCallSignature(bool b = true) {mIsCallSignature = b;}
 
   unsigned  GetParamsNum()        {return mParams.GetNum();}
   TreeNode* GetParam(unsigned i)  {return mParams.ValueAtIndex(i);}
