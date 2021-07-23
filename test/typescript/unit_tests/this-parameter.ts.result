@@ -1,0 +1,27 @@
+Matched 77 tokens.
+Matched 104 tokens.
+Matched 109 tokens.
+Matched 120 tokens.
+============= Module ===========
+== Sub Tree ==
+js_var Decl: func=(obj) -> js_const Decl: desc=Object.getOwnPropertyDescriptor(obj,f)
+console.log(desc)
+cond-branch cond: typeof desc.value StEq "function"
+true branch :
+  js_const Decl: v=desc.value
+  obj[f] Assign func  (this)  throws: 
+  console.log("Calling the new function")
+  return v.call(this,...arguments)
+
+false branch :
+
+
+== Sub Tree ==
+js_var Decl: o= {n:123, f:func  ()  throws: 
+  console.log("Calling f()")
+  return this
+}
+== Sub Tree ==
+func(o)
+== Sub Tree ==
+console.log(o.f())

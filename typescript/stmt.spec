@@ -1744,7 +1744,7 @@ rule RequiredParameterList: ONEOF(RequiredParameter,
 ## NOTE: I Added initializer. I guess the spec missed this part.
 rule RequiredParameter: ONEOF(
   ZEROORMORE(AccessibilityModifier) + BindingIdentifierOrPattern + ZEROORONE(TypeAnnotation) + ZEROORONE(Initializer),
-  "this" + TypeAnnotation,
+  "this" + ZEROORONE(TypeAnnotation),
   BindingIdentifier + ':' + Literal,
   ObjectType)
   attr.action.%1 : AddInitTo(%2, %4)
