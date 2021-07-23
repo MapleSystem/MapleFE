@@ -334,7 +334,7 @@ private:
   TreeNode       *mTarget;
 
 public:
-  ImportNode() : TreeNode(NK_Import), mProperty(ImpNone) {}
+  ImportNode() : TreeNode(NK_Import), mProperty(ImpNone), mTarget(nullptr) {}
   ~ImportNode(){mPairs.Release();}
 
   void SetProperty(ImportProperty p) {mProperty = p;}
