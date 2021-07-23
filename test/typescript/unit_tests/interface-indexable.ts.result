@@ -1,0 +1,21 @@
+Matched 11 tokens.
+Matched 15 tokens.
+Matched 42 tokens.
+Matched 58 tokens.
+============= Module ===========
+== Sub Tree ==
+ts_enum: TypeID {Array_Class=0;Array }
+== Sub Tree ==
+class  Klass
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+ts_interface: DataTypes {[TypeID.Array_Class] : DataTypes[TypeID.Array][];[TypeID.Array] : Klass }
+== Sub Tree ==
+ type TYPE = DataTypes[Exclude< keyof DataTypes,>]

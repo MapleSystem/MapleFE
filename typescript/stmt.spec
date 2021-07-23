@@ -1562,8 +1562,9 @@ rule InferType : "infer" + Identifier
   attr.action : BuildInfer(%2)
 
 rule TypeArray : ONEOF(PrimaryType + '[' + PrimaryExpression + ']',
+                       PrimaryType + '[' + TypeReference + ']',
                        TypeArray + '[' + PrimaryExpression + ']')
-  attr.action.%1,%2 : BuildArrayElement(%1, %3)
+  attr.action.%1,%2,%3 : BuildArrayElement(%1, %3)
 
 #rule Type : ONEOF(UnionOrIntersectionOrPrimaryType,
 #                  FunctionType,
@@ -1647,10 +1648,12 @@ rule TypeMember : ONEOF(PropertySignature,
 
 ## rule ArrayType: PrimaryType [no LineTerminator here] [ ]
 rule ArrayType: ONEOF(ZEROORONE("readonly") + PrimaryType + '[' + ']',
-                      SpreadElement + '[' + ']')
+                      SpreadElement + '[' + ']',
+                      MemberExpression + '[' + ']')
   attr.action.%1 : BuildArrayType(%2, %2)
   attr.action.%1 : AddModifier(%1)
   attr.action.%2 : BuildArrayType(%1, %1)
+  attr.action.%3 : BuildArrayType(%1, %1)
 
 ## rule TupleType: [ TupleElementTypes ]
 rule TupleType: '[' + TupleElementTypes + ']'

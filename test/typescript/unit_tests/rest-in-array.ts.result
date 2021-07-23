@@ -4,4 +4,4 @@ Matched 29 tokens.
 == Sub Tree ==
 ts_enum: TypeID {Array_Class=0;Array }
 == Sub Tree ==
- type TYPE =  [  : string ,  : prim array-TBD ,  : number ,  : ...TypeID[] ,  ] 
+ type TYPE =  [  : string ,  : string[] ,  : number ,  : ...TypeID[] ,  ] 
