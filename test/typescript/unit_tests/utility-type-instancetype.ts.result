@@ -1,0 +1,25 @@
+Matched 24 tokens.
+Matched 40 tokens.
+============= Module ===========
+== Sub Tree ==
+class  Klass
+  Fields: 
+    x=33
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+    func  getNum()  throws: 
+      return this.x Shr 2
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+class  Klass2
+  Fields: 
+    map
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+

@@ -1110,6 +1110,19 @@ bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent, Appeal
 //
 
 bool Parser::TraverseRuleTableRegular(RuleTable *rule_table, AppealNode *appeal) {
+  // In TraverseToken(), alt tokens are traversed. The intermediate status of matching
+  // are needed. However, if a matching failed in the middle of alt token serial, the
+  // status is not cleared in TraverseToken(). It's hard to clear in TraverseToken()
+  // as it doesn't know the context of traversal.
+  //
+  // A better solution is to clear each time entering a top rule table.
+  if (rule_table->mProperties & RP_Top) {
+    mInAltTokensMatching = false;
+    mNextAltTokenIndex = 0;
+    if (mTraceTable)
+      std::cout << "Clear alt token status." << std::endl;
+  }
+
   bool matched = false;
   unsigned saved_mCurToken = mCurToken;
 
@@ -1258,6 +1271,10 @@ bool Parser::TraverseToken(Token *token, AppealNode *parent, AppealNode *&child_
         }
         mNextAltTokenIndex++;
 
+        if (mTraceTable) {
+          std::cout << "Work on alt token, index : " << mNextAltTokenIndex << std::endl;
+        }
+
         appeal->mResult = Succ;
         appeal->AddMatch(mCurToken);
         appeal->mAltToken = token;
@@ -1269,6 +1286,10 @@ bool Parser::TraverseToken(Token *token, AppealNode *parent, AppealNode *&child_
           MoveCurToken();
           mInAltTokensMatching = false;
           mNextAltTokenIndex = 0;
+          if (mTraceTable) {
+            std::cout << "Work on alt token, succ, index : " << mNextAltTokenIndex << std::endl;
+          }
+
         }
       }
     }
