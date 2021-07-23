@@ -1745,7 +1745,8 @@ rule RequiredParameterList: ONEOF(RequiredParameter,
 rule RequiredParameter: ONEOF(
   ZEROORMORE(AccessibilityModifier) + BindingIdentifierOrPattern + ZEROORONE(TypeAnnotation) + ZEROORONE(Initializer),
   "this" + TypeAnnotation,
-  BindingIdentifier + ':' + Literal)
+  BindingIdentifier + ':' + Literal,
+  ObjectType)
   attr.action.%1 : AddInitTo(%2, %4)
   attr.action.%1 : BuildDecl(%3, %2)
   attr.action.%2 : BuildDecl(%2, %1)

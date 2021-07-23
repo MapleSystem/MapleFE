@@ -2584,6 +2584,13 @@ void ASTBuilder::AddParams(TreeNode *func, TreeNode *decl_params) {
       ((LambdaNode*)func)->AddParam(decl_params);
     else
       MERROR("Unsupported yet.");
+  } else if (decl_params->IsStruct()) {
+    if (func->IsFunction())
+      ((FunctionNode*)func)->AddParam(decl_params);
+    else if (func->IsLambda())
+      ((LambdaNode*)func)->AddParam(decl_params);
+    else
+      MERROR("Unsupported yet.");
   } else {
     MERROR("Unsupported yet.");
   }

@@ -1,0 +1,13 @@
+Matched 31 tokens.
+============= Module ===========
+== Sub Tree ==
+class  Klass
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+    func  func(map)  throws: 
+  LocalClasses: 
+  LocalInterfaces: 
+
