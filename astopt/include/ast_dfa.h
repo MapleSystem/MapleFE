@@ -28,7 +28,7 @@
 
 namespace maplefe {
 
-// DefPosition of Def: <stridx, nodeid>
+// def positions: <stridx, nodeid>
 typedef std::pair<unsigned, unsigned> DefPosition;
 // map <bbid, BitVector>
 typedef std::unordered_map<unsigned, BitVector*> BVMap;
@@ -45,7 +45,7 @@ class AST_DFA {
 
   // def node id set
   std::unordered_set<unsigned> mDefNodeIdSet;
-  // def use positions, def index
+  // def positions, def index
   SmallVector<DefPosition> mDefPositionVec;
   // use stridx to set of node id
   std::unordered_map<unsigned, std::set<unsigned>> mUsePositionMap;
@@ -123,6 +123,7 @@ class CollectUseVisitor : public AstVisitor {
   void SetBbId(unsigned id)    { mBbId    = id; }
 
   IdentifierNode *VisitIdentifierNode(IdentifierNode *node);
+  BinOperatorNode *VisitBinOperatorNode(BinOperatorNode *node);
 };
 
 }
