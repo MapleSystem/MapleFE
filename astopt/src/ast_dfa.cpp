@@ -72,8 +72,8 @@ void AST_DFA::DataFlowAnalysis() {
   // TestBV();
   CollectDefNodes();
   BuildBitVectors();
-  CollectUseNodes();
-  DumpUse();
+  // CollectUseNodes();
+  // DumpUse();
   BuildDefUseChain();
 }
 
@@ -455,12 +455,6 @@ void AST_DFA::CollectUseNodes() {
   }
 }
 
-void AST_DFA::BuildDefUseChain() {
-  for (int i = 0; i < mDefPositionVec.GetNum(); i++) {
-    DefPosition pos = mDefPositionVec.ValueAtIndex(i);
-  }
-}
-
 IdentifierNode *CollectUseVisitor::VisitIdentifierNode(IdentifierNode *node) {
   (void) AstVisitor::VisitIdentifierNode(node);
   unsigned stridx = node->GetStrIdx();
@@ -491,6 +485,7 @@ IdentifierNode *CollectUseVisitor::VisitIdentifierNode(IdentifierNode *node) {
 }
 
 BinOperatorNode *CollectUseVisitor::VisitBinOperatorNode(BinOperatorNode *node) {
+  if (mTrace) std::cout << "Visiting BinOperatorNode, id=" << node->GetNodeId() << "..." << std::endl;
   BinOperatorNode *bon = static_cast<BinOperatorNode *>(node);
   OprId op = bon->GetOprId();
   switch (op) {
@@ -520,5 +515,86 @@ BinOperatorNode *CollectUseVisitor::VisitBinOperatorNode(BinOperatorNode *node) 
   }
   return node;
 }
+
+void AST_DFA::BuildDefUseChain() {
+  MMSGNOLOC0("============== BuildDefUseChain ==============");
+  for (int i = 0; i < mDefPositionVec.GetNum(); i++) {
+    DefPosition pos = mDefPositionVec.ValueAtIndex(i);
+  }
+  DefUseChainVisitor visitor(mHandler, mTrace, true);
+  // loop through each BB and each statement
+  for (auto bbid: mBbIdVec) {
+    visitor.SetBbId(bbid);
+    if (mTrace) std::cout << " == bbid " << bbid << std::endl;
+    CfgBB *bb = mBbId2BBMap[bbid];
+    for (int i = 0; i < bb->GetStatementsNum(); i++) {
+      TreeNode *node = bb->GetStatementAtIndex(i);
+      visitor.SetStmtIdx(node->GetNodeId());
+      visitor.Visit(node);
+    }
+  }
+}
+
+IdentifierNode *DefUseChainVisitor::VisitIdentifierNode(IdentifierNode *node) {
+  (void) AstVisitor::VisitIdentifierNode(node);
+  unsigned stridx = node->GetStrIdx();
+  // only collect use with def
+  if (mDFA->mDefStrIdxSet.find(stridx) == mDFA->mDefStrIdxSet.end()) {
+    return node;
+  }
+
+  // exclude def
+  unsigned nid = node->GetNodeId();
+  if (mHandler->GetDFA()->IsDef(nid)) {
+    return node;
+  }
+
+  // exclude its own decl
+  TreeNode *p = node->GetParent();
+  if (p && p->IsDecl()) {
+    DeclNode *dn = static_cast<DeclNode *>(p);
+    if (dn->GetVar() == node) {
+      return node;
+    }
+  }
+
+  // add to mUsePositionMap
+  mDFA->mUsePositionMap[stridx].insert(nid);
+  mDFA->mNodeId2StmtIdMap[nid] = mStmtIdx;
+  return node;
+}
+
+BinOperatorNode *DefUseChainVisitor::VisitBinOperatorNode(BinOperatorNode *node) {
+  if (mTrace) std::cout << "Visiting BinOperatorNode, id=" << node->GetNodeId() << "..." << std::endl;
+  BinOperatorNode *bon = static_cast<BinOperatorNode *>(node);
+  OprId op = bon->GetOprId();
+  switch (op) {
+    case OPR_Assign:
+    case OPR_AddAssign:
+    case OPR_SubAssign:
+    case OPR_MulAssign:
+    case OPR_DivAssign:
+    case OPR_ModAssign:
+    case OPR_ShlAssign:
+    case OPR_ShrAssign:
+    case OPR_BandAssign:
+    case OPR_BorAssign:
+    case OPR_BxorAssign:
+    case OPR_ZextAssign: {
+      // visit rhs first due to computation use/def order
+      TreeNode *rhs = bon->GetOpndB();
+      (void) AstVisitor::VisitTreeNode(rhs);
+
+      TreeNode *lhs = bon->GetOpndA();
+      (void) AstVisitor::VisitTreeNode(lhs);
+      break;
+    }
+    default:
+      (void) AstVisitor::VisitBinOperatorNode(node);
+      break;
+  }
+  return node;
+}
+
 
 }

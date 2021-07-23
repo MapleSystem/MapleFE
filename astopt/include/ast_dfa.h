@@ -71,6 +71,7 @@ class AST_DFA {
   std::unordered_set<unsigned, std::set<unsigned>> mDefUseMap;
 
   friend class CollectUseVisitor;
+  friend class DefUseChainVisitor;
 
  public:
   explicit AST_DFA(Module_Handler *h, bool t) : mHandler(h), mTrace(t) {}
@@ -118,6 +119,26 @@ class CollectUseVisitor : public AstVisitor {
   explicit CollectUseVisitor(Module_Handler *h, bool t, bool base = false)
     : mHandler(h), mDFA(h->GetDFA()), mTrace(t), AstVisitor(t && base) {}
   ~CollectUseVisitor() = default;
+
+  void SetStmtIdx(unsigned id) { mStmtIdx = id; }
+  void SetBbId(unsigned id)    { mBbId    = id; }
+
+  IdentifierNode *VisitIdentifierNode(IdentifierNode *node);
+  BinOperatorNode *VisitBinOperatorNode(BinOperatorNode *node);
+};
+
+class DefUseChainVisitor : public AstVisitor {
+ private:
+  Module_Handler  *mHandler;
+  AST_DFA      *mDFA;
+  bool          mTrace;
+  unsigned      mStmtIdx;
+  unsigned      mBbId;
+
+ public:
+  explicit DefUseChainVisitor(Module_Handler *h, bool t, bool base = false)
+    : mHandler(h), mDFA(h->GetDFA()), mTrace(t), AstVisitor(t && base) {}
+  ~DefUseChainVisitor() = default;
 
   void SetStmtIdx(unsigned id) { mStmtIdx = id; }
   void SetBbId(unsigned id)    { mBbId    = id; }
