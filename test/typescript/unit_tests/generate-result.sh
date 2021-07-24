@@ -13,8 +13,7 @@
 # 
 
 #!/bin/bash
-FILES=( abstract-class.ts array-literal10.ts array-literal9.ts class.ts class3.ts class4.ts generics-array.ts objects.ts property-deco.ts property-deco3.ts property-deco4.ts)
-
+FILES=( class-extends.ts class-extends2.ts class-generics-arrowfunc.ts class2.ts conditional-type2.ts construct-signature.ts delete-func.ts dynamic-import.ts generic-function.ts generic-type.ts generics-array.ts generics2.ts infer-type.ts interface-intersect-nonnullable-intf-fd.ts interface2.ts lambda3.ts mapped-type.ts non-null-assertion-this.ts prop-name-extends.ts property-deco2.ts record-parameter.ts semicolon-missing.ts semicolon-missing5.ts static.ts this-as-any.ts type-assertion-retval.ts type-assertion-this.ts union-type5.ts utility-type-instancetype.ts utility-type-nonnullable.ts)
 
 for f in ${FILES[@]}
 do

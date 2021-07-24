@@ -1221,10 +1221,15 @@ bool Parser::TraverseToken(Token *token, AppealNode *parent, AppealNode *&child_
   // There are many other cases. Will handle later.
   if (token->IsSeparator() && token->GetSepId() == SEP_Semicolon) {
     if (curr_token->IsSeparator() && curr_token->GetSepId() == SEP_Rbrace) {
-      // There are rule like ZEROORMORE(';'). In this case,
-      // we need check cases where we already have one previous ';'.
+      // 1. There are rule like ZEROORMORE(';'). In this case, we don't insert
+      RuleTable *parent_rt = parent->GetTable();
+      bool need_insert = true;
+      if (parent_rt->mType == ET_Zeroormore || parent_rt->mType == ET_Zeroorone)
+        need_insert = false;
+
+      // 2. we need check cases where we already have one previous ';'.
       Token *prev = mActiveTokens.ValueAtIndex(mCurToken - 1);
-      if (prev != token) {
+      if (prev != token && need_insert) {
         // The simpliest way is to insert a semicolon token in mActiveTokens.
         // Just pretend we lex a semicolon.
         InsertToken(mCurToken, token);
