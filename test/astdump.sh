@@ -72,7 +72,7 @@ for ts in $LIST; do
     eval $cmd <<< "$out" > "$T"
     [ -z "$NAME" ] || sed -i -e 's/__v[0-9][0-9]*//g' -e 's/ __lambda_[0-9][0-9]*__/ /' -e 's/function *\((.*) => \)/\1/' "$T"
     clang-format-10 -i --style="{ColumnLimit: 120}" "$T"
-    echo -e "\n====== TS Reformated ======\n"
+    echo -e "\n====== TS Reformatted ======\n"
     $HIGHLIGHT "$T"
     eval tsc -t es6 --lib es2015,es2017,dom -m commonjs --experimentalDecorators "$T" $TSCERR
     # --strict  --downlevelIteration --esModuleInterop --noImplicitAny --isolatedModules "$T" $TSCERR
