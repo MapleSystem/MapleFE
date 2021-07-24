@@ -1557,6 +1557,7 @@ TreeNode* ASTBuilder::BuildArrayLiteral() {
             literals->IsField() ||
             literals->IsBinOperator() ||
             literals->IsUnaOperator() ||
+            literals->IsTerOperator() ||
             literals->IsRegExpr() ||
             literals->IsFunction() ||
             literals->IsLambda());
@@ -1575,6 +1576,7 @@ TreeNode* ASTBuilder::BuildArrayLiteral() {
                 expr->IsField() ||
                 expr->IsBinOperator() ||
                 expr->IsUnaOperator() ||
+                expr->IsTerOperator() ||
                 expr->IsRegExpr() ||
                 expr->IsFunction() ||
                 expr->IsLambda());
