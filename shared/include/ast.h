@@ -1908,7 +1908,9 @@ public:
   TreeNode* GetSuperInterface(unsigned i)  {return mSuperInterfaces.ValueAtIndex(i);}
   void      SetSuperInterface(unsigned i, TreeNode* n) {*(mSuperInterfaces.RefAtIndex(i)) = n;}
 
+  void AddAttr(AttrId a)      {mAttributes.PushBack(a);}
   void AddAttribute(AttrId a) {mAttributes.PushBack(a);}
+
   void AddField(TreeNode *n) {mFields.PushBack(n); SETPARENT(n);}
   void AddMethod(FunctionNode *n) {mMethods.PushBack(n);}
   void AddConstructor(FunctionNode *n) {mConstructors.PushBack(n);}
