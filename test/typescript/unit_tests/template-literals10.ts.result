@@ -1,0 +1,13 @@
+Matched 5 tokens.
+Matched 10 tokens.
+Matched 19 tokens.
+Matched 22 tokens.
+Matched 23 tokens.
+Matched 28 tokens.
+============= Module ===========
+== Sub Tree ==
+js_var Decl: flag=false
+== Sub Tree ==
+js_var Decl: a=".x"
+== Sub Tree ==
+console.log( template-literal: NULL, template-literal: "if(typeof ",flag ? "(prop)" : "prop","!=="object"){",NULL Add o,NULL,a,"=prop;",NULL Add  template-literal: "}",NULL)

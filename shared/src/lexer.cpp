@@ -556,6 +556,15 @@ bool Lexer::FindNextTLFormat(unsigned start_idx, std::string &str, unsigned& end
 
 // Find the pattern string of a template literal.
 // Set end_idx as the last char of string.
+//
+// [NOTE] For nested template literals, we will matching the outmost
+//        template literal and treat the inner template literal as
+//        a plain string. The innter template literal will later
+//        be handled by the parsing of the outmost template literal.
+//        This makes things easier.
+//
+// [NOTE] We only support two level of nesting temp lit !!
+
 bool Lexer::FindNextTLPlaceHolder(unsigned start_idx, std::string& str, unsigned& end_idx) {
   unsigned working_idx = start_idx;
   if (line[working_idx] != '$' || line[working_idx+1] != '{')
@@ -569,22 +578,55 @@ bool Lexer::FindNextTLPlaceHolder(unsigned start_idx, std::string& str, unsigned
   // There could be string literal inside placeholder,
   bool in_string_literal = false;
 
+  // There could be nested template literal inside a place holder.
+  bool in_nested_temp_lit = false;
+  bool waiting_right_brace = false;
+  unsigned num_left_brace_inner = 0; // there could be {..} for inner temp lit.
+
   while(1) {
 
-    if (line[working_idx] == '\'') {
+    if (line[working_idx] == '`') {
+      if (in_nested_temp_lit) {
+        // finish inner temp lit. Need clear the status.
+        in_nested_temp_lit = false;
+        num_left_brace_inner = 0;
+      } else {
+        in_nested_temp_lit = true;
+      }
+    } else if (line[working_idx] == '$' && line[working_idx+1] == '{') {
+      MASSERT(in_nested_temp_lit);
+      str += line[working_idx];
+      str += line[working_idx + 1];
+      working_idx += 2;
+      waiting_right_brace = true;
+      continue;
+    } else if (line[working_idx] == '\'') {
       in_string_literal = in_string_literal ? false : true;
     } else if (line[working_idx] == '{') {
-      if (!in_string_literal)
-        num_left_brace++;
+      if (!in_string_literal) {
+        if (in_nested_temp_lit)
+          num_left_brace_inner++;
+        else
+          num_left_brace++;
+      }
     } else if (line[working_idx] == '}') {
-      if (num_left_brace > 0 && !in_string_literal)
-        num_left_brace--;
-      else
-        break;
+      if (!in_string_literal) {
+        if (waiting_right_brace)
+          waiting_right_brace = false;
+        else if (!in_nested_temp_lit && num_left_brace > 0)
+          num_left_brace--;
+        else if (in_nested_temp_lit && num_left_brace_inner > 0)
+          num_left_brace_inner--;
+        else
+          break;
+      }
     }
 
     // Template Literal allows \n in format and place holder.
     // the \n was removed by Lexer in the beginning of ReadALine();
+    // 
+    // I don't need worry about if the template literal is ended or not,
+    // since tsc guarantees it's correct.
     if (working_idx == current_line_size) {
       str += '\n';
       ReadALine();
