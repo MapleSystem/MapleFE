@@ -1401,7 +1401,7 @@ std::string Emitter::EmitClassNode(ClassNode *node) {
 
   std::string str;
   for (unsigned i = 0; i < node->GetAttributesNum(); ++i)
-    str += AstDump::GetEnumAttrId(node->GetAttribute(i)) + " "s;
+    str += GetEnumAttrId(node->GetAttribute(i)) + " "s;
 
   str += "class "s + node->GetName();
   auto classNum = node->GetSuperClassesNum();
@@ -1696,8 +1696,7 @@ std::string Emitter::EmitModuleNode(ModuleNode *node) {
 std::string Emitter::EmitAttrNode(AttrNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str(AstDump::GetEnumAttrId(node->GetId()));
-  Replace(str, "ATTR_", "");
+  std::string str(GetEnumAttrId(node->GetId()));
   if (node->IsStmt())
     str += ";\n"s;
   return HandleTreeNode(str, node);
