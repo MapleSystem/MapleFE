@@ -652,13 +652,15 @@ DeclNode *TypeInferVisitor::VisitDeclNode(DeclNode *node) {
 
 ExportNode *TypeInferVisitor::VisitExportNode(ExportNode *node) {
   (void) AstVisitor::VisitExportNode(node);
-  XXportAsPairNode *p = node->GetPair(0);
-  TreeNode *bfnode = p->GetBefore();
-  if (bfnode && bfnode->IsIdentifier()) {
-    IdentifierNode *idnode = static_cast<IdentifierNode *>(bfnode);
-    TreeNode *decl = mHandler->FindDecl(idnode);
-    if (decl) {
-      ExportedDeclIds.insert(decl->GetNodeId());
+  if(node->GetPairsNum() > 0) {
+    XXportAsPairNode *p = node->GetPair(0);
+    TreeNode *bfnode = p->GetBefore();
+    if (bfnode && bfnode->IsIdentifier()) {
+      IdentifierNode *idnode = static_cast<IdentifierNode *>(bfnode);
+      TreeNode *decl = mHandler->FindDecl(idnode);
+      if (decl) {
+        ExportedDeclIds.insert(decl->GetNodeId());
+      }
     }
   }
   return node;
