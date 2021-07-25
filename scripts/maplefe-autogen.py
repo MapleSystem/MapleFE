@@ -425,8 +425,8 @@ def get_data_based_on_type(val_type, accessor):
     elif val_type == 'const char *':
         return 'const char*, " + (' + accessor + ' ? "\\""s + ' + accessor + ' + "\\""s : "null"s)'
     elif val_type == 'RegExprData':
-        return 'RegExprData, Expr: " + "\\""s + ' + accessor + '.mExpr + "\\", Flags: \\""s + ' \
-                + accessor + '.mFlags + "\\""s'
+        return 'RegExprData, Expr: " + "\\""s + ' + accessor + '.mExpr + "\\", Flags: \\""s + (' \
+                + accessor + '.mFlags ? ' + accessor + '.mFlags : ""s) + "\\""s'
     return val_type + ', " + "value" /* Warning: failed to get value */'
 
 def short_name(node_type):
