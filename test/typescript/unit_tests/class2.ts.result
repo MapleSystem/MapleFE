@@ -24,6 +24,7 @@ class  Foo
       this.f2 Assign b
   Methods: 
     func  test(obj)  throws: 
+      return obj instanceof Klass
   LocalClasses: 
   LocalInterfaces: 
 

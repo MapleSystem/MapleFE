@@ -531,12 +531,12 @@ private:
   TreeNode *mId;      // The name of the type parameter
   TreeNode *mDefault; // The default value of this type parameter.
                       // some languages support default value.
-  TreeNode *mConstraint; // The constraint of this type parameter.
+  TreeNode *mExtends; // The constraint of this type parameter.
                          // In Typescript, the syntax is like: T<X extends Y>
 
 public:
   TypeParameterNode() : TreeNode(NK_TypeParameter), mId(NULL), mDefault(NULL),
-                        mConstraint(NULL) {}
+                        mExtends(NULL) {}
   ~TypeParameterNode() {}
 
   TreeNode* GetId()            {return mId;}
@@ -545,8 +545,8 @@ public:
   TreeNode* GetDefault()            {return mDefault;}
   void      SetDefault(TreeNode* t) {mDefault = t; SETPARENT(t);}
 
-  TreeNode* GetConstraint()            {return mConstraint;}
-  void      SetConstraint(TreeNode* t) {mConstraint = t; SETPARENT(t);}
+  TreeNode* GetExtends()            {return mExtends;}
+  void      SetExtends(TreeNode* t) {mExtends = t; SETPARENT(t);}
 
   void Dump(unsigned);
 };

@@ -217,7 +217,7 @@ ACTION(BuildAsType)
 ACTION(BuildConditionalType)
 
 ACTION(BuildTypeParameter)
-ACTION(AddTypeParameterConstraint)
+ACTION(AddTypeParameterExtends)
 
 ACTION(BuildNameTypePair)
 

@@ -3233,9 +3233,9 @@ TreeNode* ASTBuilder::BuildTypeParameter() {
 }
 
 // It takes one argument, the constraint which could be empty.
-TreeNode* ASTBuilder::AddTypeParameterConstraint() {
+TreeNode* ASTBuilder::AddTypeParameterExtends() {
   if (mTrace)
-    std::cout << "In AddTypeParameterConstraint" << std::endl;
+    std::cout << "In AddTypeParameterExtends" << std::endl;
 
   Param p_id = mParams[0];
   if (p_id.mIsEmpty)
@@ -3246,7 +3246,7 @@ TreeNode* ASTBuilder::AddTypeParameterConstraint() {
 
   MASSERT(mLastTreeNode->IsTypeParameter());
   TypeParameterNode *tp = (TypeParameterNode*)mLastTreeNode;
-  tp->SetConstraint(id);
+  tp->SetExtends(id);
 
   mLastTreeNode = tp;
   return mLastTreeNode;

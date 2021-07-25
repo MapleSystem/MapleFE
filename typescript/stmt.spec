@@ -1532,7 +1532,7 @@ rule TypeParameterList: ONEOF(TypeParameter,
 rule TypeParameter: BindingIdentifier + ZEROORONE(Constraint) + ZEROORONE(TypeInitializer)
   attr.action : BuildTypeParameter(%1)
   attr.action : AddInit(%3)
-  attr.action : AddTypeParameterConstraint(%2)
+  attr.action : AddTypeParameterExtends(%2)
 
 rule TypeInitializer : '=' + Type
 
@@ -2009,6 +2009,7 @@ rule MemberFunctionDeclaration: ONEOF(
   attr.action.%3    : AddFunctionBody(%11)
   attr.action.%3,%4 : SetIsOptional(%3)
   attr.action.%5,%6 : AddType(%9)
+  attr.action.%5    : AddFunctionBody(%11)
 
 ## MemberAccessorDeclaration: AccessibilityModifieropt staticopt GetAccessor AccessibilityModifieropt staticopt SetAccessor
 rule MemberAccessorDeclaration: ONEOF(
