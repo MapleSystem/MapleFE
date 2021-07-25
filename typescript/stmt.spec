@@ -2119,6 +2119,7 @@ rule EntityName: ONEOF(NamespaceName,
 rule ExternalDeclaration : ONEOF("declare" + NamespaceDeclaration,
                                  "declare" + LexicalDeclaration + ';',
                                  "declare" + ClassDeclaration,
+                                 "declare" + FunctionDeclaration,
                                  "declare" + VariableStatement,
                                  "declare" + TypeAliasDeclaration)
-  attr.action.%1,%2,%3,%4,%5 : BuildExternalDeclaration(%2)
+  attr.action.%1,%2,%3,%4,%5,%6 : BuildExternalDeclaration(%2)
