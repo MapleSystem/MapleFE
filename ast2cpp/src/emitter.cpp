@@ -562,6 +562,9 @@ std::string Emitter::EmitTypeParameterNode(TypeParameterNode *node) {
   if (auto n = node->GetId()) {
     str = EmitTreeNode(n);
   }
+  if (auto n = node->GetExtends()) {
+    str += " extends "s + EmitTreeNode(n);
+  }
   if (auto n = node->GetDefault()) {
     str += " = "s + EmitTreeNode(n);
   }
