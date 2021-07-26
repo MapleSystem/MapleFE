@@ -16,12 +16,53 @@
 #include "cpp_definition.h"
 
 namespace maplefe {
+
+
+std::string EmitCtorInstance(ClassNode *c) {
+  std::string str, thisClass, ctor, proto, prototypeProto;
+  ctor = "&Function_ctor";
+  thisClass = c->GetName();
+  if (c->GetSuperClassesNum() == 0) {
+    proto = "Function_ctor.prototype";
+    prototypeProto = "Object_ctor.prototype";
+  } else {
+    proto = c->GetSuperClass(0)->GetName() + "_ctor"s;
+    prototypeProto = proto + ".prototype"s;
+    proto.insert(0, "&"s, 0, std::string::npos);
+  }
+  str = "\n// Instantiate constructor"s;
+  str += "\nCtor_"s+thisClass +" "+ thisClass+"_ctor("s +ctor+","s+proto+","+prototypeProto+");\n\n"s;
+  return str;
+}
+
+// Emit default constructor func def and instance
+std::string EmitDefaultCtor(ClassNode *c) {
+  if (c == nullptr)
+    return std::string();
+
+  std::string str, className;
+  className = c->GetName();
+  str = "\n"s;
+  str += className + "*"s + " Ctor_"s + className + "::operator()("s + className + "* obj)"s;
+  str += "{ return obj; }\n"s;
+  str += EmitCtorInstance(c);
+
+  return str;
+}
+
 std::string CppDef::EmitModuleNode(ModuleNode *node) {
   if (node == nullptr)
     return std::string();
   std::string name = GetModuleName();
   std::string str("// TypeScript filename: "s + node->GetFileName() + "\n"s);
   str += "#include <iostream>\n#include \""s + GetBaseFileName() + ".h\"\n\n"s;
+
+  // definition of default class constructors.
+  for (unsigned i = 0; i < node->GetTreesNum(); ++i) {
+    if (auto n = node->GetTree(i))
+      if (n->GetKind() == NK_Class && static_cast<ClassNode*>(n)->GetConstructorsNum() == 0)
+        str += EmitDefaultCtor(static_cast<ClassNode*>(n));
+  }
 
   // definitions of all top-level functions
   isInit = false;
@@ -107,25 +148,6 @@ inline bool IsClassMethod(FunctionNode* f) {
   return (f && f->GetParent() && f->GetParent()->GetKind()==NK_Class);
 }
 
-std::string EmitCtorInstance(FunctionNode *node) {
-  // assert(node->IsConstructor());
-  ClassNode* c = static_cast<ClassNode*>(node->GetParent());
-  std::string str, thisClass, ctor, proto, prototypeProto;
-  ctor = "&Function_ctor";
-  thisClass = c->GetName();
-  if (c->GetSuperClassesNum() == 0) {
-    proto = "Function_ctor.prototype";
-    prototypeProto = "Object_ctor.prototype";
-  } else {
-    proto = c->GetSuperClass(0)->GetName() + "_ctor"s;
-    prototypeProto = proto + ".prototype"s;
-    proto.insert(0, "&"s, 0, std::string::npos);
-  }
-  str = "\n// Instantiate constructor"s;
-  str += "\nCtor_"s+thisClass +" "+ thisClass+"_ctor("s +ctor+","s+proto+","+prototypeProto+");\n\n"s;
-  return str;  
-}
-
 std::map<TypeId, std::string>TypeIdToJSType = {
   // AST TypeId to t2crt JSType string mapping
   {TY_Object,  "TY_Object"},
@@ -195,7 +217,7 @@ std::string CppDef::EmitFunctionNode(FunctionNode *node) {
     ctorBody = EmitClassProps(node->GetParent());
     ctorBody += "  return obj;\n"s;
     str.insert(str.size()-2, ctorBody, 0, std::string::npos);
-    str += EmitCtorInstance(node);
+    str += EmitCtorInstance(static_cast<ClassNode*>(node->GetParent()));
   }
 
   return str;
@@ -224,7 +246,9 @@ std::string CppDef::EmitDeclNode(DeclNode *node) {
     str += isInit ? EmitTreeNode(n) : mCppDecl.EmitTreeNode(n);
   }
   if (auto n = node->GetInit()) {
-    if(n->GetKind() == NK_ArrayLiteral)
+    if (node->GetTypeId() == TY_Class)
+      str += "= &"s + n->GetName() + "_ctor"s;
+    else if(n->GetKind() == NK_ArrayLiteral)
       str += ".clear();\n"s + str + ".insert("s + str + ".end(), "s
         + EmitTreeNode(n) + ")"s;
     else

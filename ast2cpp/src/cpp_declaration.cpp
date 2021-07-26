@@ -156,7 +156,12 @@ std::string CppDecl::EmitDeclNode(DeclNode *node) {
     return std::string();
   std::string str;
   if (auto n = node->GetVar()) {
-    str += " "s + EmitTreeNode(n) + ";\n"s;
+    if (node->GetInit() && node->GetInit()->GetTypeId() == TY_Class) {
+      // generate "Ctor_<class> *<var> = &<class>_ctor" for TS decl "<var> = <class>"
+      str = "Ctor_"s + node->GetInit()->GetName() + " *"s +  n->GetName() + ";\n"s;
+    } else {
+      str += " "s + EmitTreeNode(n) + ";\n"s;
+    }
   }
   return str;
 }
@@ -377,7 +382,12 @@ std::string CppDecl::EmitClassNode(ClassNode *node) {
       str += ctor;
     }
   }
-  // new function
+
+  // Generate decl for default constructor function if none declared for class
+  if (node->GetConstructorsNum() == 0)
+    str += "  "s + node->GetName() + "* operator()("s + node->GetName() + "* obj);"s;
+
+  // Generate new() function
   str += "  "s+node->GetName()+"* _new() {return new "s+node->GetName()+"(this, this->prototype);}\n"s;
   str += "};\n\n";
   return str;
