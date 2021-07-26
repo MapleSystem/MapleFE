@@ -248,7 +248,7 @@ std::string Emitter::EmitFunctionNode(FunctionNode *node) {
   }
   str += " "s + std::to_string(node->IsConstructor());
   */
-  mPrecedence = '\030';
+  mPrecedence = '\023';
   return HandleTreeNode(str, node);
 }
 
@@ -291,7 +291,7 @@ std::string Emitter::EmitUserTypeNode(UserTypeNode *node) {
 
   if (auto n = node->GetDims()) {
     std::string s = EmitDimensionNode(n);
-    if (prec > mPrecedence)
+    if (prec < mPrecedence)
       str = "("s + str + ")"s;
      str += s;
   }
