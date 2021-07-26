@@ -2122,5 +2122,6 @@ rule ExternalDeclaration : ONEOF("declare" + NamespaceDeclaration,
                                  "declare" + ClassDeclaration,
                                  "declare" + FunctionDeclaration,
                                  "declare" + VariableStatement,
-                                 "declare" + TypeAliasDeclaration)
-  attr.action.%1,%2,%3,%4,%5,%6 : BuildExternalDeclaration(%2)
+                                 "declare" + TypeAliasDeclaration,
+                                 "declare" + EnumDeclaration)
+  attr.action.%1,%2,%3,%4,%5,%6,%7 : BuildExternalDeclaration(%2)
