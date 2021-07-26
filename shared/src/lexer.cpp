@@ -715,10 +715,17 @@ LitData Lexer::GetLiteral() {
 //      This is the end of line
 //  (2) /* .. */
 //      This is the traditional comments
+//  (3) #!
+//      This is the common Shebang. We takes it as a comment.
 //
 // Return true if a comment is read. The contents are ignore.
 bool Lexer::GetComment() {
   if (line[curidx] == '/' && line[curidx+1] == '/') {
+    curidx = current_line_size;
+    return true;
+  }
+
+  if (line[curidx] == '#' && line[curidx+1] == '!') {
     curidx = current_line_size;
     return true;
   }
