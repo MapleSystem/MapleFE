@@ -677,6 +677,10 @@ ExportNode *TypeInferVisitor::VisitExportNode(ExportNode *node) {
           }
           break;
         }
+        default: {
+          NOTYETIMPL("export node kind");
+          break;
+        }
       }
     }
   }

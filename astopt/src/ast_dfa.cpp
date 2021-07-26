@@ -72,9 +72,9 @@ void AST_DFA::DataFlowAnalysis() {
   // TestBV();
   CollectDefNodes();
   BuildBitVectors();
-  // CollectUseNodes();
-  // DumpUse();
-  BuildDefUseChain();
+  CollectUseNodes();
+  if (mTrace) DumpUse();
+  // BuildDefUseChain();
 }
 
 void AST_DFA::Clear() {
