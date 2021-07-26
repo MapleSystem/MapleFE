@@ -887,6 +887,37 @@ UserTypeNode *TypeInferVisitor::VisitUserTypeNode(UserTypeNode *node) {
     if (parent->GetTypeId() == TY_Merge) {
       parent->SetTypeId(TY_User);
       SetUpdated();
+    } else if (parent->GetTypeId() == TY_Array) {
+      TreeNode *idnode = node->GetId();
+      if (idnode && idnode->IsIdentifier()) {
+        // number, string could have been used
+        // as usertype identifier instand of primtype by parser
+        IdentifierNode *id = static_cast<IdentifierNode *>(idnode);
+        TypeId tid = TY_None;
+        if (id->GetStrIdx() == gStringPool.GetStrIdx("number")) {
+          tid = TY_Number;
+        } else if (id->GetStrIdx() == gStringPool.GetStrIdx("string")) {
+          tid = TY_String;
+        }
+        if (tid != TY_None) {
+          PrimArrayTypeNode *type = (PrimArrayTypeNode*)gTreePool.NewTreeNode(sizeof(PrimArrayTypeNode));
+          new (type) PrimArrayTypeNode();
+          PrimTypeNode *pt = (PrimTypeNode*)gTreePool.NewTreeNode(sizeof(PrimTypeNode));
+          new (pt) PrimTypeNode();
+          pt->SetPrimType(tid);
+          type->SetPrim(pt);
+          type->SetDims(node->GetDims());
+          IdentifierNode *parentid = static_cast<IdentifierNode *>(parent);
+          parentid->SetType(type);
+
+          // clean up parent info
+          id->SetParent(NULL);
+          node->SetParent(NULL);
+
+          // set updated
+          SetUpdated();
+        }
+      }
     }
   }
   return node;
