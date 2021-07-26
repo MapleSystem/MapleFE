@@ -898,6 +898,8 @@ UserTypeNode *TypeInferVisitor::VisitUserTypeNode(UserTypeNode *node) {
           tid = TY_Number;
         } else if (id->GetStrIdx() == gStringPool.GetStrIdx("string")) {
           tid = TY_String;
+        } else {
+          NOTYETIMPL("other keywords");
         }
         if (tid != TY_None) {
           PrimArrayTypeNode *type = (PrimArrayTypeNode*)gTreePool.NewTreeNode(sizeof(PrimArrayTypeNode));
