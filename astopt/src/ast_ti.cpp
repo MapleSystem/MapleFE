@@ -652,14 +652,31 @@ DeclNode *TypeInferVisitor::VisitDeclNode(DeclNode *node) {
 
 ExportNode *TypeInferVisitor::VisitExportNode(ExportNode *node) {
   (void) AstVisitor::VisitExportNode(node);
-  if(node->GetPairsNum() > 0) {
-    XXportAsPairNode *p = node->GetPair(0);
+  for (unsigned i = 0; i < node->GetPairsNum(); i++) {
+    XXportAsPairNode *p = node->GetPair(i);
     TreeNode *bfnode = p->GetBefore();
-    if (bfnode && bfnode->IsIdentifier()) {
-      IdentifierNode *idnode = static_cast<IdentifierNode *>(bfnode);
-      TreeNode *decl = mHandler->FindDecl(idnode);
-      if (decl) {
-        ExportedDeclIds.insert(decl->GetNodeId());
+    if (bfnode) {
+      switch (bfnode->GetKind()) {
+        case NK_Decl: {
+          ExportedDeclIds.insert(bfnode->GetNodeId());
+          break;
+        }
+        case NK_Declare: {
+          DeclareNode *declare = static_cast<DeclareNode *>(bfnode);
+          TreeNode *decl = declare->GetDecl();
+          if (decl) {
+            ExportedDeclIds.insert(decl->GetNodeId());
+          }
+          break;
+        }
+        case NK_Identifier: {
+          IdentifierNode *idnode = static_cast<IdentifierNode *>(bfnode);
+          TreeNode *decl = mHandler->FindDecl(idnode);
+          if (decl) {
+            ExportedDeclIds.insert(decl->GetNodeId());
+          }
+          break;
+        }
       }
     }
   }
