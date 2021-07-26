@@ -1888,12 +1888,13 @@ rule FunctionDeclaration : ONEOF(
   "function" + ZEROORONE(BindingIdentifier) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}',
   "function" + ZEROORONE(BindingIdentifier) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ':' + AssertExpression + '{' + FunctionBody + '}',
   "function" + ZEROORONE(BindingIdentifier) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ':' + IsExpression + '{' + FunctionBody + '}',
-  "function" + ZEROORONE(BindingIdentifier) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation)  + ';')
-  attr.action.%1,%2,%3,%4 : BuildFunction(%2)
-  attr.action.%1,%2,%3,%4 : AddParams(%5)
+  "function" + ZEROORONE(BindingIdentifier) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation)  + ';',
+  "function" + ZEROORONE(BindingIdentifier) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ':' + IsExpression + ';')
+  attr.action.%1,%2,%3,%4,%5 : BuildFunction(%2)
+  attr.action.%1,%2,%3,%4,%5 : AddParams(%5)
   attr.action.%1,%4    : AddType(%7)
-  attr.action.%1,%2,%3,%4 : AddTypeGenerics(%3)
-  attr.action.%2,%3    : AddAssert(%8)
+  attr.action.%1,%2,%3,%4,%5 : AddTypeGenerics(%3)
+  attr.action.%2,%3,%5 : AddAssert(%8)
   attr.action.%1       : AddFunctionBody(%9)
   attr.action.%2,%3    : AddFunctionBody(%10)
 
