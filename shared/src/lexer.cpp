@@ -828,7 +828,7 @@ bool Lexer::TraverseTableData(TableData *data) {
     if( !strncmp(line + curidx, data->mData.mString, strlen(data->mData.mString))) {
       // Need to make sure the following text is a separator
       curidx += strlen(data->mData.mString);
-      if (mCheckSeparator && (TraverseSepTable() != SEP_NA) && (TraverseOprTable() != OPR_NA)) {
+      if (mCheckSeparator && ((TraverseSepTable() != SEP_NA) || (TraverseOprTable() != OPR_NA))) {
         // TraverseSepTable() moves 'curidx', need restore it
         curidx = old_pos + strlen(data->mData.mString);
         // Put into gStringPool

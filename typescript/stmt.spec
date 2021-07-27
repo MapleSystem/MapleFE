@@ -82,6 +82,7 @@ rule KeywordIdentifier : ONEOF("get",
                                "extends",
                                "switch",
                                "infer",
+                               "asserts",
                                "import")
 ## "
   attr.action : BuildIdentifier()
