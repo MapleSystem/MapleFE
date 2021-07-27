@@ -2,8 +2,8 @@
 if [ $# -lt 1 ]; then
   out=$(cat)
   ts=/tmp/viewdot-$$
-  grep -n -e "^digraph [^{]* {" -e "^}" <<< "$out" | grep -A1 "digraph [^{]* {" |
-    grep -v ^-- | sed 'N;s/\n/ /' | sed -e 's/:digraph [^{]* { */,/' -e 's/:.*/p/g' |
+  grep -n -e "digraph [^{]* {" -e "^}" <<< "$out" | grep -A1 "digraph [^{]* {" |
+    grep -v ^-- | sed 'N;s/\n/ /' | sed -e 's/:.*digraph [^{]* { */,/' -e 's/:.*/p/g' |
       { while read cmd; do
         idx=$((idx+1))
         sed -n $cmd <<< "$out" > "$ts"-$idx.dot
