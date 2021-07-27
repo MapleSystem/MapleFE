@@ -45,6 +45,7 @@ class AST_DFA {
 
   // def node id set
   std::unordered_set<unsigned> mDefNodeIdSet;
+  std::unordered_set<unsigned> mDefUseNodeIdSet;  // both def and use: i in i++; i+=j;
   // def positions, def index
   SmallVector<DefPosition> mDefPositionVec;
   // use stridx to set of node id
@@ -68,7 +69,7 @@ class AST_DFA {
   // def stridx set
   std::unordered_set<unsigned> mDefStrIdxSet;
   // def-use : key is def node id to a set of use node id
-  std::unordered_set<unsigned, std::set<unsigned>> mDefUseMap;
+  std::unordered_map<unsigned, std::set<unsigned>> mDefUseMap;
 
   friend class CollectUseVisitor;
   friend class DefUseChainVisitor;
@@ -85,6 +86,7 @@ class AST_DFA {
   void BuildDefUseChain();
 
   bool IsDef(unsigned nid) { return mDefNodeIdSet.find(nid) != mDefNodeIdSet.end();}
+  bool IsDefUse(unsigned nid) { return mDefUseNodeIdSet.find(nid) != mDefUseNodeIdSet.end();}
   // return def stridx, return 0 if no def
   unsigned GetDefStrIdx(TreeNode *node);
   // return def nodeId, return 0 if no def
@@ -95,7 +97,7 @@ class AST_DFA {
   TreeNode *GetStmtFromStmtId(unsigned id) { return mStmtId2StmtMap[id]; }
   CfgBB *GetBbFromBbId(unsigned id) { return mBbId2BBMap[id]; }
 
-  void DumpDefPosition(DefPosition pos);
+  void DumpDefPosition(unsigned idx, DefPosition pos);
   void DumpDefPositionVec();
   void DumpReachDefIn();
 
@@ -103,6 +105,7 @@ class AST_DFA {
   void DumpBVMap(BVMap &bvmap);
   void DumpAllBVMaps();
   void DumpUse();
+  void DumpDefUse();
   void TestBV();
   void Clear();
 };
@@ -136,12 +139,19 @@ class DefUseChainVisitor : public AstVisitor {
   unsigned      mBbId;
 
  public:
+  unsigned      mDefNodeId;
+  unsigned      mDefStrIdx;
+  unsigned      mReachDef;
+  unsigned      mReachNewDef;
+
+ public:
   explicit DefUseChainVisitor(Module_Handler *h, bool t, bool base = false)
     : mHandler(h), mDFA(h->GetDFA()), mTrace(t), AstVisitor(t && base) {}
   ~DefUseChainVisitor() = default;
 
   void SetStmtIdx(unsigned id) { mStmtIdx = id; }
   void SetBbId(unsigned id)    { mBbId    = id; }
+  void VisitBB(unsigned bbid);
 
   IdentifierNode *VisitIdentifierNode(IdentifierNode *node);
   BinOperatorNode *VisitBinOperatorNode(BinOperatorNode *node);
