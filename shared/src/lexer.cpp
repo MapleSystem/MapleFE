@@ -826,14 +826,21 @@ bool Lexer::TraverseTableData(TableData *data) {
 
   case DT_String: {
     if( !strncmp(line + curidx, data->mData.mString, strlen(data->mData.mString))) {
+      bool special_need_check = false;
+      if (!strncmp(data->mData.mString, "false", 5) && (strlen(data->mData.mString) == 5))
+        special_need_check = true;
+      if (!strncmp(data->mData.mString, "true", 4) && (strlen(data->mData.mString) == 4))
+        special_need_check = true;
       // Need to make sure the following text is a separator
       curidx += strlen(data->mData.mString);
-      if (mCheckSeparator && ((TraverseSepTable() != SEP_NA) || (TraverseOprTable() != OPR_NA))) {
-        // TraverseSepTable() moves 'curidx', need restore it
-        curidx = old_pos + strlen(data->mData.mString);
-        // Put into gStringPool
-        gStringPool.FindString(data->mData.mString);
-        found = true;
+      if (mCheckSeparator || special_need_check) {
+        if ((TraverseSepTable() != SEP_NA) || (TraverseOprTable() != OPR_NA)) {
+          // TraverseSepTable() moves 'curidx', need restore it
+          curidx = old_pos + strlen(data->mData.mString);
+          // Put into gStringPool
+          gStringPool.FindString(data->mData.mString);
+          found = true;
+        }
       } else {
         found = true;
       }

@@ -1,0 +1,13 @@
+Matched 33 tokens.
+============= Module ===========
+== Sub Tree ==
+export {declare class  Foo
+  Fields: 
+    asserts    trueType    falseType
+  Instance Initializer: 
+  Constructors: 
+    constructor  (asserts,trueType,falseType)  throws: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+} 
