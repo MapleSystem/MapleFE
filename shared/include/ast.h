@@ -1578,6 +1578,7 @@ public:
   TreeNode* GetStmtAtIndex(unsigned i) {return mStmts.ValueAtIndex(i);}
   void      SetStmtAtIndex(unsigned i, TreeNode* n) {*(mStmts.RefAtIndex(i)) = n; SETPARENT(n);}
   void      AddStmt(TreeNode*);
+  void      PopStmt() {mStmts.PopBack();}
 
   void Release() {mStmts.Release(); mLabels.Release();}
   void Dump(unsigned);

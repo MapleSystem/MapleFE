@@ -1265,7 +1265,44 @@ void SwitchNode::AddSwitchCase(TreeNode *t) {
     for (unsigned i = 0; i < cases->GetChildrenNum(); i++)
       AddSwitchCase(cases->GetChild(i));
   } else if (t->IsSwitchCase()) {
-    AddCase((SwitchCaseNode*)t);
+    // Need go through the statements in this case. Some stmt like
+    // default : xxx
+    // are parsed as a labeled stmt inside this case, which they
+    // are actually a case of switch.
+    SwitchCaseNode *the_case = (SwitchCaseNode*)t;
+    SwitchCaseNode *new_case = NULL;
+    for (unsigned i = 0; i < the_case->GetStmtsNum(); i++) {
+      TreeNode *stmt = the_case->GetStmtAtIndex(i);
+      TreeNode *label = stmt->GetLabel();
+      if (label) {
+        MASSERT(label->IsIdentifier());
+        IdentifierNode *id = (IdentifierNode*)label;
+        const char *name = id->GetName();
+        if (!strncmp(name, "default", 7) && (strlen(name) == 7)) {
+          MASSERT(i == the_case->GetStmtsNum() - 1);
+          the_case->PopStmt();
+
+          // 1. clear the label of stmt.
+          stmt->SetLabel(NULL);
+          // 2. build switch label
+          SwitchLabelNode *default_label =
+            (SwitchLabelNode*)gTreePool.NewTreeNode(sizeof(SwitchLabelNode));
+          new (default_label) SwitchLabelNode();
+          default_label->SetIsDefault(true);
+          // 3. build the switch case
+          new_case = (SwitchCaseNode*)gTreePool.NewTreeNode(sizeof(SwitchCaseNode));
+          new (new_case) SwitchCaseNode();
+          // 4. set the label and stmt for this case.
+          new_case->AddLabel(default_label);
+          new_case->AddStmt(stmt);
+        }
+      }
+    }
+
+    AddCase(the_case);
+    if (new_case)
+      AddCase(new_case);
+
   } else if (t->IsSwitchLabel()) {
     SwitchCaseNode *casenode = SwitchLabelToCase((SwitchLabelNode*)t);
     AddCase(casenode);
