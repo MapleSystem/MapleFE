@@ -1599,6 +1599,9 @@ public:
   void            SetCaseAtIndex(unsigned i, SwitchCaseNode* n) {*(mCases.RefAtIndex(i)) = n;}
   void AddCase(SwitchCaseNode* n) {mCases.PushBack(n); SETPARENT(n);}
 
+  void            AddSwitchCase(TreeNode *t);
+  SwitchCaseNode* SwitchLabelToCase(SwitchLabelNode*);
+
   void Release() {mCases.Release();}
   void Dump(unsigned);
 };

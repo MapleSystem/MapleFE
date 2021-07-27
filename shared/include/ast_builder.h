@@ -78,9 +78,6 @@ public:
   void ClearParams() {mParams.clear();}
   bool ParamsEmpty() {return mParams.empty();}
 
-  // add a case to switch
-  void AddSwitchCase(TreeNode *s, TreeNode *c);
-
   // Create Functions for Token
   TreeNode* CreateTokenTreeNode(const Token*);
 
@@ -92,7 +89,6 @@ public:
 
   void AddArguments(TreeNode *call, TreeNode *args);
   void AddParams(TreeNode *func, TreeNode *params);
-  SwitchCaseNode* SwitchLabelToCase(SwitchLabelNode*);
 };
 
 }

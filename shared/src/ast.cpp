@@ -1251,6 +1251,27 @@ void SwitchCaseNode::AddStmt(TreeNode *t) {
 void SwitchCaseNode::Dump(unsigned ind) {
 }
 
+SwitchCaseNode* SwitchNode::SwitchLabelToCase(SwitchLabelNode *label) {
+  SwitchCaseNode *case_node =
+    (SwitchCaseNode*)gTreePool.NewTreeNode(sizeof(SwitchCaseNode));
+  new (case_node) SwitchCaseNode();
+  case_node->AddLabel(label);
+  return case_node;
+}
+
+void SwitchNode::AddSwitchCase(TreeNode *t) {
+  if (t->IsPass()) {
+    PassNode *cases = (PassNode*)t;
+    for (unsigned i = 0; i < cases->GetChildrenNum(); i++)
+      AddSwitchCase(cases->GetChild(i));
+  } else if (t->IsSwitchCase()) {
+    AddCase((SwitchCaseNode*)t);
+  } else if (t->IsSwitchLabel()) {
+    SwitchCaseNode *casenode = SwitchLabelToCase((SwitchLabelNode*)t);
+    AddCase(casenode);
+  }
+}
+
 void SwitchNode::Dump(unsigned ind) {
   DumpIndentation(ind);
   DUMP0("A switch");

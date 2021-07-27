@@ -1288,30 +1288,6 @@ TreeNode* ASTBuilder::BuildOneCase() {
   return case_node;
 }
 
-SwitchCaseNode* ASTBuilder::SwitchLabelToCase(SwitchLabelNode *label) {
-  SwitchCaseNode *case_node =
-    (SwitchCaseNode*)gTreePool.NewTreeNode(sizeof(SwitchCaseNode));
-  new (case_node) SwitchCaseNode();
-  case_node->AddLabel(label);
-  return case_node;
-}
-
-void ASTBuilder::AddSwitchCase(TreeNode *s, TreeNode *t) {
-  if (s->IsSwitch()) {
-    SwitchNode *sn = static_cast<SwitchNode *>(s);
-    if (t->IsPass()) {
-      PassNode *cases = (PassNode*)t;
-      for (unsigned i = 0; i < cases->GetChildrenNum(); i++)
-        AddSwitchCase(sn, cases->GetChild(i));
-    } else if (t->IsSwitchCase()) {
-      sn->AddCase((SwitchCaseNode*)t);
-    } else if (t->IsSwitchLabel()) {
-      SwitchCaseNode *casenode = SwitchLabelToCase((SwitchLabelNode*)t);
-      sn->AddCase(casenode);
-    }
-  }
-}
-
 TreeNode* ASTBuilder::BuildSwitch() {
   if (mTrace)
     std::cout << "In BuildSwitch " << std::endl;
@@ -1333,11 +1309,7 @@ TreeNode* ASTBuilder::BuildSwitch() {
   MASSERT(p_cases.mIsTreeNode && "Cases in BuildSwitch is not a tree.");
   TreeNode *cases = p_cases.mData.mTreeNode;
 
-  // in some case, it's just a label without statements. I created a SwitchCaseNode for it.
-  if (cases->IsSwitchLabel())
-    cases = SwitchLabelToCase((SwitchLabelNode*)cases);
-
-  AddSwitchCase(switch_node, cases);
+  switch_node->AddSwitchCase(cases);
 
   mLastTreeNode = switch_node;
   return switch_node;
