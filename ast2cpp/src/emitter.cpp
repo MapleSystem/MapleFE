@@ -249,6 +249,8 @@ std::string Emitter::EmitFunctionNode(FunctionNode *node) {
   str += " "s + std::to_string(node->IsConstructor());
   */
   mPrecedence = '\023';
+  if (node->IsStmt())
+    str += ";\n"s;
   return HandleTreeNode(str, node);
 }
 
