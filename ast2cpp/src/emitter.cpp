@@ -871,6 +871,19 @@ std::string Emitter::EmitStructNode(StructNode *node) {
   if (auto n = node->GetStructId()) {
     str += EmitIdentifierNode(n);
   }
+
+  auto num = node->GetTypeParametersNum();
+  if(num) {
+    str += "<"s;
+    for (unsigned i = 0; i < num; ++i) {
+      if (i)
+        str += ", "s;
+      if (auto n = node->GetTypeParameterAtIndex(i))
+        str += EmitTreeNode(n);
+    }
+    str += ">"s;
+  }
+
   for (unsigned i = 0; i < node->GetSupersNum(); ++i) {
     str += i ? ", "s : " extends "s;
     if (auto n = node->GetSuper(i))
