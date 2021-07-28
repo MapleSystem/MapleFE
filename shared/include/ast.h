@@ -1873,10 +1873,11 @@ private:
   // dedicated EnumNode for them.
   bool                         mIsJavaEnum;
 
-  SmallVector<TreeNode*>      mSuperClasses;
-  SmallVector<TreeNode*>      mSuperInterfaces;
-  SmallVector<AttrId>          mAttributes;
-  SmallVector<AnnotationNode*> mAnnotations; //annotation or pragma
+  SmallVector<TreeNode*>          mSuperClasses;
+  SmallVector<TreeNode*>          mSuperInterfaces;
+  SmallVector<AttrId>             mAttributes;
+  SmallVector<AnnotationNode*>    mAnnotations; //annotation or pragma
+  SmallVector<TypeParameterNode*> mTypeParameters;
 
   SmallVector<TreeNode*>       mFields;  // a Field could be identifier or computed name
   SmallVector<FunctionNode*>   mMethods;
@@ -1901,6 +1902,12 @@ public:
   void     AddAnnotation(AnnotationNode *n) {mAnnotations.PushBack(n);}
   AnnotationNode* GetAnnotationAtIndex(unsigned i) {return mAnnotations.ValueAtIndex(i);}
   void            SetAnnotationAtIndex(unsigned i, AnnotationNode* n) {*(mAnnotations.RefAtIndex(i)) = n;}
+
+  // TypeParameter
+  unsigned GetTypeParametersNum()           {return mTypeParameters.GetNum();}
+  void     AddTypeParameter(TypeParameterNode *n) {mTypeParameters.PushBack(n);}
+  TypeParameterNode* GetTypeParameterAtIndex(unsigned i) {return mTypeParameters.ValueAtIndex(i);}
+  void               SetTypeParameterAtIndex(unsigned i, TypeParameterNode* n) {*(mTypeParameters.RefAtIndex(i)) = n;}
 
   void      AddSuperClass(TreeNode *n);
   unsigned  GetSuperClassesNum()        {return mSuperClasses.GetNum();}

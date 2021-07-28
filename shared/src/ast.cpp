@@ -1457,6 +1457,7 @@ void ClassNode::Release() {
   mSuperInterfaces.Release();
   mAttributes.Release();
   mAnnotations.Release();
+  mTypeParameters.Release();
   mFields.Release();
   mMethods.Release();
   mLocalClasses.Release();
@@ -1473,6 +1474,16 @@ void ClassNode::Dump(unsigned indent) {
   else
     DUMP1_NORETURN("class ", GetName());
   DUMP_RETURN();
+
+  if (mTypeParameters.GetNum() > 0) {
+    DUMP0_NORETURN("<");
+    for (unsigned i = 0; i < mTypeParameters.GetNum(); i++) {
+      TypeParameterNode *node = mTypeParameters.ValueAtIndex(i);
+      node->Dump(0);
+      DUMP0_NORETURN(",");
+    }
+    DUMP0_NORETURN(">");
+  }
 
   DumpIndentation(indent + 2);
   DUMP0("Fields: ");
