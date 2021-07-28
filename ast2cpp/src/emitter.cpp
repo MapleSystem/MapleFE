@@ -1358,11 +1358,15 @@ std::string Emitter::EmitCallNode(CallNode *node) {
   std::string str;
   if (auto n = node->GetMethod()) {
     auto s = EmitTreeNode(n);
+    if (n->IsOptional())
+      Replace(s, "?", "", -1);
     auto k = n->GetKind();
     if(k == NK_Function || k == NK_Lambda)
       str += "("s + s + ")"s;
     else
       str += s;
+    if (n->IsOptional())
+      str += "?."s; // for optional chaining
   }
   str += "("s;
   for (unsigned i = 0; i < node->GetArgsNum(); ++i) {
