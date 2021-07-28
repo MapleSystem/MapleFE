@@ -775,10 +775,10 @@ std::string Emitter::EmitBindingElementNode(BindingElementNode *node) {
     return std::string();
   std::string str;
   if (auto n = node->GetVariable()) {
-    str += " "s + EmitTreeNode(n);
+    str += EmitTreeNode(n);
   }
   if (auto n = node->GetElement()) {
-    str += EmitTreeNode(n);
+    str += ": "s + EmitTreeNode(n);
   }
   mPrecedence = '\030';
   if (node->IsStmt())
