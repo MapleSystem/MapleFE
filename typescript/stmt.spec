@@ -1908,6 +1908,7 @@ rule InterfaceDeclaration :
   "interface" + BindingIdentifier + ZEROORONE(TypeParameters) + ZEROORONE(InterfaceExtendsClause) + '{' + ZEROORONE(TypeBody) + '}' 
   attr.action : BuildStruct(%2)
   attr.action : SetTSInterface()
+  attr.action : AddTypeGenerics(%3)
   attr.action : AddStructField(%6)
   attr.action : AddSuperInterface(%4)
 

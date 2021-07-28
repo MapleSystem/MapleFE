@@ -6,7 +6,7 @@ Matched 45 tokens.
 == Sub Tree ==
  type T_Ctor<T> = () -> 
 == Sub Tree ==
-ts_interface: I_Class {__vals__ }
+ts_interface: I_Class<T,> {__vals__ }
 == Sub Tree ==
  type AnyCtor = T_Ctor<Object>
 == Sub Tree ==

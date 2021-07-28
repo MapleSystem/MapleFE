@@ -16,7 +16,7 @@ class  C1
   LocalInterfaces: 
 
 == Sub Tree ==
-ts_interface: Intf2 { }
+ts_interface: Intf2<T,> { }
 == Sub Tree ==
 class  C2
 <T,>  Fields: 

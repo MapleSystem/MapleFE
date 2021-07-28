@@ -1,4 +1,4 @@
 Matched 20 tokens.
 ============= Module ===========
 == Sub Tree ==
-ts_interface: Interf {name;val }
+ts_interface: Interf<T,> {name;val }

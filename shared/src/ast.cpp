@@ -701,6 +701,20 @@ void BindingPatternNode::Dump(unsigned indent) {
 //                          StructNode
 //////////////////////////////////////////////////////////////////////////////////////
 
+void StructNode::AddTypeParameter(TreeNode *param) {
+  if (param->IsPass()) {
+    PassNode *n = (PassNode*)param;
+    for (unsigned i = 0; i < n->GetChildrenNum(); i++) {
+      TreeNode *child = n->GetChild(i);
+      AddTypeParameter(child);
+    }
+  } else {
+    MASSERT(param->IsTypeParameter());
+    mTypeParameters.PushBack((TypeParameterNode*)param);
+    SETPARENT(param);
+  }
+}
+
 void StructNode::AddSuper(TreeNode *the_super) {
   if (!the_super)
     return;
@@ -766,6 +780,16 @@ void StructNode::Dump(unsigned indent) {
 
   if (mStructId)
     mStructId->Dump(0);
+
+  if (mTypeParameters.GetNum() > 0) {
+    DUMP0_NORETURN("<");
+    for (unsigned i = 0; i < mTypeParameters.GetNum(); i++) {
+      TypeParameterNode *node = mTypeParameters.ValueAtIndex(i);
+      node->Dump(0);
+      DUMP0_NORETURN(",");
+    }
+    DUMP0_NORETURN(">");
+  }
 
   DUMP0_NORETURN(" {");
 

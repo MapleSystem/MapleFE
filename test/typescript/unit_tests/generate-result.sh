@@ -13,7 +13,7 @@
 # 
 
 #!/bin/bash
-FILES=( class-generics-arrowfunc.ts class-implements-interface.ts generic-prim-array.ts generic-type2.ts generic-typeof.ts generics-array.ts generics2.ts trailing-commas2.ts)
+FILES=( class-implements-interface.ts construct-signature.ts interface-keyof.ts)
 
 
 for f in ${FILES[@]}

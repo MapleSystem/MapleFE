@@ -1019,6 +1019,7 @@ class StructNode : public TreeNode {
 private:
   StructProp      mProp;
   IdentifierNode *mStructId;
+  SmallVector<TypeParameterNode*> mTypeParameters;
   SmallVector<TreeNode*>       mFields;
   SmallVector<FunctionNode*>   mMethods;
   SmallVector<TreeNode*>       mSupers;
@@ -1043,6 +1044,12 @@ public:
   void SetNumIndexSig(NumIndexSigNode *t) {mNumIndexSig = t;}
   void SetStrIndexSig(StrIndexSigNode *t) {mStrIndexSig = t;}
 
+  // TypeParameter
+  unsigned GetTypeParametersNum()           {return mTypeParameters.GetNum();}
+  void     AddTypeParameter(TreeNode *n);
+  TypeParameterNode* GetTypeParameterAtIndex(unsigned i) {return mTypeParameters.ValueAtIndex(i);}
+  void               SetTypeParameterAtIndex(unsigned i, TypeParameterNode* n) {*(mTypeParameters.RefAtIndex(i)) = n;}
+
   unsigned  GetFieldsNum() {return mFields.GetNum();}
   TreeNode* GetField(unsigned i) {return mFields.ValueAtIndex(i);}
   void      SetField(unsigned i, TreeNode* n) {*(mFields.RefAtIndex(i)) = n; SETPARENT(n);}
@@ -1060,7 +1067,7 @@ public:
 
   void AddChild(TreeNode *);
 
-  void Release() {mFields.Release(); mMethods.Release(); mSupers.Release();}
+  void Release() {mFields.Release(); mMethods.Release(); mSupers.Release(); mTypeParameters.Release();}
   void Dump(unsigned);
 };
 
