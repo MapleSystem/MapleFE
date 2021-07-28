@@ -42,10 +42,12 @@ class AST_DFA {
   // stmt id
   SmallVector<unsigned> mStmtIdVec;
   std::unordered_map<unsigned, TreeNode*> mStmtId2StmtMap;
+  std::unordered_map<unsigned, CfgFunc*> mFuncId2CfgFuncMap;
 
   // def node id set
   std::unordered_set<unsigned> mDefNodeIdSet;
-  std::unordered_set<unsigned> mDefUseNodeIdSet;  // both def and use: i in i++; i+=j;
+  // def and use id set: i in i++; i+=j;
+  std::unordered_set<unsigned> mDefUseNodeIdSet;
   // def positions, def index
   SmallVector<DefPosition> mDefPositionVec;
   // use stridx to set of node id
@@ -61,10 +63,6 @@ class AST_DFA {
   std::unordered_map<unsigned, unsigned> mNodeId2StmtIdMap;
   // stmtid --> bbid
   std::unordered_map<unsigned, unsigned> mStmtId2BbIdMap;
-  // bbid --> bb
-  std::unordered_map<unsigned, CfgBB *> mBbId2BBMap;
-  // bbid vec
-  std::vector<unsigned> mBbIdVec;
 
   // def stridx set
   std::unordered_set<unsigned> mDefStrIdxSet;
@@ -80,6 +78,7 @@ class AST_DFA {
 
   void DataFlowAnalysis();
 
+  void CollectInfo();
   void CollectDefNodes();
   void CollectUseNodes();
   void BuildBitVectors();
@@ -92,10 +91,11 @@ class AST_DFA {
   // return def nodeId, return 0 if no def
   unsigned AddDef(TreeNode *node, unsigned &bitnum, unsigned bbid);
 
+  void SetNodeId2StmtId(unsigned nid, unsigned sid) { mNodeId2StmtIdMap[nid] = sid; }
   unsigned GetStmtIdFromNodeId(unsigned id) { return mNodeId2StmtIdMap[id]; }
   unsigned GetBbIdFromStmtId(unsigned id) { return mStmtId2BbIdMap[id]; }
   TreeNode *GetStmtFromStmtId(unsigned id) { return mStmtId2StmtMap[id]; }
-  CfgBB *GetBbFromBbId(unsigned id) { return mBbId2BBMap[id]; }
+  CfgBB *GetBbFromBbId(unsigned id) { return mHandler->mBbId2BbMap[id]; }
 
   void DumpDefPosition(unsigned idx, DefPosition pos);
   void DumpDefPositionVec();
@@ -108,6 +108,25 @@ class AST_DFA {
   void DumpDefUse();
   void TestBV();
   void Clear();
+};
+
+class CollectInfoVisitor : public AstVisitor {
+ private:
+  Module_Handler  *mHandler;
+  AST_DFA      *mDFA;
+  bool          mTrace;
+  unsigned      mStmtIdx;
+  unsigned      mBbId;
+
+ public:
+  explicit CollectInfoVisitor(Module_Handler *h, bool t, bool base = false)
+    : mHandler(h), mDFA(h->GetDFA()), mTrace(t), AstVisitor(t && base) {}
+  ~CollectInfoVisitor() = default;
+
+  void SetStmtIdx(unsigned id) { mStmtIdx = id; }
+  void SetBbId(unsigned id)    { mBbId    = id; }
+
+  IdentifierNode *VisitIdentifierNode(IdentifierNode *node);
 };
 
 class CollectUseVisitor : public AstVisitor {

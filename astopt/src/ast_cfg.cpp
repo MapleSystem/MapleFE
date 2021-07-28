@@ -758,7 +758,9 @@ CfgFunc *CfgBuilder::NewFunction(TreeNode *node)   {
 
 // Allocate a new CfgBB node
 CfgBB *CfgBuilder::NewBB(BBKind k) {
-  return new(mHandler->GetMemPool()->Alloc(sizeof(CfgBB))) CfgBB(k);
+  CfgBB *bb = new(mHandler->GetMemPool()->Alloc(sizeof(CfgBB))) CfgBB(k);
+  mHandler->AddBB(bb);
+  return bb;
 }
 
 // Helper for a node in dot graph

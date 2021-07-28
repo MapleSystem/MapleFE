@@ -59,6 +59,8 @@ class Module_Handler {
   std::vector<CfgFunc *> mModuleFuncs;
   // only reachable BBs
   std::unordered_map<unsigned, CfgBB *> mBbId2BbMap;
+  // bbid vec
+  std::vector<unsigned> mBbIdVec;
   // identifier node id to decl
   std::unordered_map<unsigned, TreeNode *> mNodeId2Decl;
   // array's element type: decl node id to typeid
@@ -72,7 +74,7 @@ class Module_Handler {
     mSCP(nullptr),
     mTI(nullptr),
     mTrace(trace) {}
-  ~Module_Handler() {}
+  ~Module_Handler();
 
   void AdjustAST();
   void BuildScope();
@@ -101,6 +103,12 @@ class Module_Handler {
 
   void SetBbFromBbId(unsigned id, CfgBB *bb) { mBbId2BbMap[id] = bb; }
   CfgBB *GetBbFromBbId(unsigned id)          { return mBbId2BbMap[id]; }
+
+  void AddBB(CfgBB *bb) {
+    unsigned bbid = bb->GetId();
+    mBbIdVec.push_back(bbid);
+    mBbId2BbMap[bbid] = bb;
+  }
 
   bool GetTrace() {return mTrace;}
   AST_AST *GetAST() {return mAST;}

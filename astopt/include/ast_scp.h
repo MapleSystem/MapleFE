@@ -36,7 +36,7 @@ class AST_SCP {
 
  public:
   explicit AST_SCP(Module_Handler *h, bool t) : mHandler(h), mTrace(t) {}
-  ~AST_SCP();
+  ~AST_SCP() {};
 
   void BuildScope();
   void RenameVar();

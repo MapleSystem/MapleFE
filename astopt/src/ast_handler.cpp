@@ -24,6 +24,20 @@
 
 namespace maplefe {
 
+Module_Handler::~Module_Handler() {
+  mNodeId2BbMap.clear();
+  mModuleFuncs.clear();
+  mBbId2BbMap.clear();
+  mBbIdVec.clear();
+  mNodeId2Decl.clear();
+  mArrayDeclId2EleTypeIdMap.clear();
+  delete mCfgFunc;
+  delete mAST;
+  delete mDFA;
+  delete mSCP;
+  delete mTI;
+}
+
 MemPool *Module_Handler::GetMemPool() {
   return mASTHandler->GetMemPool();
 }
