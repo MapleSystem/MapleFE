@@ -19,7 +19,7 @@ class  C1
 ts_interface: Intf2 { }
 == Sub Tree ==
 class  C2
-  Fields: 
+<T,>  Fields: 
 
   Instance Initializer: 
   Constructors: 

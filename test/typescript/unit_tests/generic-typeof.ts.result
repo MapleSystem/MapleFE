@@ -6,7 +6,7 @@ Matched 46 tokens.
 ============= Module ===========
 == Sub Tree ==
 class  Klass
-  Fields: 
+<T,>  Fields: 
     f
   Instance Initializer: 
   Constructors: 

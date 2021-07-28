@@ -1368,6 +1368,20 @@ void PassNode::Dump(unsigned ind) {
 //                          ClassNode
 //////////////////////////////////////////////////////////////////////////////////////
 
+void ClassNode::AddTypeParameter(TreeNode *param) {
+  if (param->IsPass()) {
+    PassNode *n = (PassNode*)param;
+    for (unsigned i = 0; i < n->GetChildrenNum(); i++) {
+      TreeNode *child = n->GetChild(i);
+      AddTypeParameter(child);
+    }
+  } else {
+    MASSERT(param->IsTypeParameter());
+    mTypeParameters.PushBack((TypeParameterNode*)param);
+    SETPARENT(param);
+  }
+}
+
 void ClassNode::AddSuperClass(TreeNode *the_super) {
   if (!the_super)
     return;

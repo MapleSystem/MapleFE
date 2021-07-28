@@ -1932,6 +1932,7 @@ rule ClassDeclaration:
   attr.action : BuildClass(%4)
   attr.action : AddModifier(%1)
   attr.action : AddModifier(%2)
+  attr.action : AddTypeGenerics(%5)
   attr.action : AddSuperClass(%6)
   attr.action : AddSuperInterface(%7)
   attr.action : AddClassBody(%9)

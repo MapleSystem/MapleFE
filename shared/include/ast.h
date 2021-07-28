@@ -1905,7 +1905,7 @@ public:
 
   // TypeParameter
   unsigned GetTypeParametersNum()           {return mTypeParameters.GetNum();}
-  void     AddTypeParameter(TypeParameterNode *n) {mTypeParameters.PushBack(n);}
+  void     AddTypeParameter(TreeNode *n);
   TypeParameterNode* GetTypeParameterAtIndex(unsigned i) {return mTypeParameters.ValueAtIndex(i);}
   void               SetTypeParameterAtIndex(unsigned i, TypeParameterNode* n) {*(mTypeParameters.RefAtIndex(i)) = n;}
 

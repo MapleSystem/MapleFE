@@ -4,7 +4,7 @@ Matched 88 tokens.
 ============= Module ===========
 == Sub Tree ==
 class  Foo
-  Fields: 
+<T,>  Fields: 
     _ctor
   Instance Initializer: 
   Constructors: 

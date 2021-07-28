@@ -13,7 +13,8 @@
 # 
 
 #!/bin/bash
-FILES=( class-extends.ts class-extends2.ts class-generics-arrowfunc.ts class2.ts conditional-type2.ts construct-signature.ts delete-func.ts dynamic-import.ts generic-function.ts generic-type.ts generics-array.ts generics2.ts infer-type.ts interface-intersect-nonnullable-intf-fd.ts interface2.ts lambda3.ts mapped-type.ts non-null-assertion-this.ts prop-name-extends.ts property-deco2.ts record-parameter.ts semicolon-missing.ts semicolon-missing5.ts static.ts this-as-any.ts type-assertion-retval.ts type-assertion-this.ts union-type5.ts utility-type-instancetype.ts utility-type-nonnullable.ts)
+FILES=( class-generics-arrowfunc.ts class-implements-interface.ts generic-prim-array.ts generic-type2.ts generic-typeof.ts generics-array.ts generics2.ts trailing-commas2.ts)
+
 
 for f in ${FILES[@]}
 do

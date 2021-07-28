@@ -4,7 +4,7 @@ Matched 52 tokens.
 ============= Module ===========
 == Sub Tree ==
 class  Klass
-  Fields: 
+<T,>  Fields: 
     n
   Instance Initializer: 
   Constructors: 

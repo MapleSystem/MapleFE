@@ -3302,6 +3302,9 @@ TreeNode* ASTBuilder::AddTypeGenerics() {
   } else if (mLastTreeNode->IsFunction()) {
     FunctionNode *func = (FunctionNode*)mLastTreeNode;
     func->AddTypeParam(args);
+  } else if (mLastTreeNode->IsClass()) {
+    ClassNode *c = (ClassNode*)mLastTreeNode;
+    c->AddTypeParameter(args);
   } else {
     MERROR("Unsupported node in AddTypeGenerics()");
   }
