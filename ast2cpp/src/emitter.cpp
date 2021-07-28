@@ -1370,6 +1370,20 @@ std::string Emitter::EmitInterfaceNode(InterfaceNode *node) {
     return std::string();
   std::string str = "interface "s + node->GetName();
 
+  /*
+  auto num = node->GetTypeParametersNum();
+  if(num) {
+    str += "<"s;
+    for (unsigned i = 0; i < num; ++i) {
+      if (i)
+        str += ", "s;
+      if (auto n = node->GetTypeParameterAtIndex(i))
+        str += EmitTreeNode(n);
+    }
+    str += ">"s;
+  }
+  */
+
   for (unsigned i = 0; i < node->GetSuperInterfacesNum(); ++i) {
     str += i ? ", "s : " implements "s;
     if (auto n = node->GetSuperInterfaceAtIndex(i))
@@ -1406,6 +1420,19 @@ std::string Emitter::EmitClassNode(ClassNode *node) {
     str += GetEnumAttrId(node->GetAttribute(i)) + " "s;
 
   str += "class "s + node->GetName();
+
+  auto num = node->GetTypeParametersNum();
+  if(num) {
+    str += "<"s;
+    for (unsigned i = 0; i < num; ++i) {
+      if (i)
+        str += ", "s;
+      if (auto n = node->GetTypeParameterAtIndex(i))
+        str += EmitTreeNode(n);
+    }
+    str += ">"s;
+  }
+
   auto classNum = node->GetSuperClassesNum();
   for (unsigned i = 0; i < classNum; ++i) {
     str += i ? ", "s : " extends "s;
