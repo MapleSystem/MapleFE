@@ -35,7 +35,7 @@ while [ $# -gt 0 ]; do
         -C|--clean)      CLEAN=clean ;;
         -A|--all)        LIST="$LIST $(find -maxdepth 1 -name '*.ts' | grep -v '\.ts-[0-9][0-9]*\.out.ts')" ;;
         -n|--name)       NAME="original" ;;
-        -t|--treediff)   TREEDIFF=yes; NAME="original" ;;
+        -t|--treediff)   TREEDIFF="--emit-ts-only"; NAME="original" ;;
         -*)              echo "Unknown option $1"; usage;;
         *)               LIST="$LIST $1"
     esac
@@ -62,8 +62,8 @@ for ts in $LIST; do
   if [ $? -ne 0 ]; then
     Failed="$Failed $ts"
   else
-    echo "$AST2CPP" "$ts".ast --trace-a2c
-    out=$("$AST2CPP" "$ts".ast --trace-a2c 2>&1)
+    echo "$AST2CPP" "$ts".ast --trace-a2c $TREEDIFF
+    out=$("$AST2CPP" "$ts".ast --trace-a2c $TREEDIFF 2>&1)
     [ $? -eq 0 ] || Failed="$Failed $ts"
   fi
   echo "$out"
