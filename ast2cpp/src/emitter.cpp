@@ -1016,7 +1016,10 @@ std::string Emitter::EmitTemplateLiteralNode(TemplateLiteralNode *node) {
   for (unsigned i = 0; i < num; ++i) {
     if (auto n = node->GetTreeAtIndex(i)) {
       std::string s(EmitTreeNode(n));
-      str += i & 0x1 ? "${"s + s+ "}"s : s;
+      if (i & 0x1)
+        str += "${"s + s+ "}"s;
+      else
+        str += s.front() == '"' && s.back() == '"' && s.size() >= 2 ? s.substr(1, s.size() - 2) : s;
     }
   }
   str += "`"s;
