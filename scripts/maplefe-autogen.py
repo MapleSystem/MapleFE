@@ -423,7 +423,7 @@ def get_data_based_on_type(val_type, accessor):
                     + '? "\\""s + gStringPool.GetStringFromStrIdx(' + accessor + ') + "\\""s : "null"s)'
         return val_type + ', " + std::to_string(' + accessor + ')'
     elif val_type == 'const char *':
-        return 'const char*, " + (' + accessor + ' ? "\\""s + ' + accessor + ' + "\\""s : "null"s)'
+        return 'const char*, " + (' + accessor + ' ? "\\""s + EncodeLiteral(' + accessor + ') + "\\""s : "null"s)'
     elif val_type == 'RegExprData':
         return 'RegExprData, Expr: " + "\\""s + ' + accessor + '.mExpr + "\\", Flags: \\""s + (' \
                 + accessor + '.mFlags ? ' + accessor + '.mFlags : ""s) + "\\""s'
@@ -501,6 +501,27 @@ void Dump(const char *title, std::ostream *os) {{
   *mOs << "}}\\n";
 }}
 
+static std::string EncodeLiteral(std::string str) {{
+  std::string enc;
+  for (auto&c : str) {{
+    switch(c) {{
+      case '\\'': enc += "\\\\'"; break;
+      case '\\"': enc += "\\\\\\""; break;
+      case '\\?': enc += "\\\\?"; break;
+      //case '\\\\': enc += "\\\\\\\\"; break;
+      case '\\a': enc += "\\\\a"; break;
+      case '\\b': enc += "\\\\b"; break;
+      case '\\f': enc += "\\\\f"; break;
+      case '\\n': enc += "\\\\n"; break;
+      case '\\r': enc += "\\\\r"; break;
+      case '\\t': enc += "\\\\t"; break;
+      case '\\v': enc += "\\\\v"; break;
+      default: enc += c; // TODO: Unicode support
+    }}
+  }}
+  return enc;
+}}
+
 static std::string GetEnumLitData(LitData lit) {{
   switch (lit.mType) {{
     case LT_IntegerLiteral:
@@ -512,9 +533,13 @@ static std::string GetEnumLitData(LitData lit) {{
     case LT_BooleanLiteral:
       return lit.mData.mBool ? "true" : "false";
     case LT_CharacterLiteral:
-      return std::string(1, lit.mData.mChar.mData.mChar); // TODO: Unicode support
+      {{ std::string s = std::string(1, lit.mData.mChar.mData.mChar);
+         return EncodeLiteral(s);
+      }}
     case LT_StringLiteral:
-      return std::string(gStringPool.GetStringFromStrIdx(lit.mData.mStrIdx));
+      {{ std::string s = std::string(gStringPool.GetStringFromStrIdx(lit.mData.mStrIdx));
+         return EncodeLiteral(s);
+      }}
     case LT_NullLiteral:
       return "null";
     case LT_ThisLiteral:

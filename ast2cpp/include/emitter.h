@@ -124,7 +124,6 @@ public:
   virtual std::string& HandleTreeNode(std::string &str, TreeNode *node);
 
   static void Replace(std::string &str, const char *o, const char *n, int cnt = 0);
-  std::string EncodeLiteral(std::string &str);
   static std::string GetEnumTypeId(TypeId k);
   //static const char *GetEnumSepId(SepId k);
   static const char *GetEnumOprId(OprId k);
