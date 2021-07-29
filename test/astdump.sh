@@ -89,7 +89,7 @@ for ts in $LIST; do
       rm -f "$T"
     else
       clang-format-10 $ts > $ts.tmp.ts
-      ts2ast $ts.tmp.ts --dump-ast | sed -n '/^AstDump:/,$p' > $ts.orig
+      ts2ast $ts.tmp.ts --dump-ast | sed -n '/^AstDump:/,$p' | sed 's/LT_CharacterLiteral/LT_StringLiteral/' > $ts.orig
       ts2ast $T --dump-ast | sed -n '/^AstDump:/,$p' | sed "s|$T|$ts.tmp.ts|" > $ts.gen
       echo --- "$ts"; cat "$ts"
       diff $ts.orig $ts.gen
