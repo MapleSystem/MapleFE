@@ -93,7 +93,7 @@ class AST_DFA {
   unsigned GetStmtIdFromNodeId(unsigned id) { return mNodeId2StmtIdMap[id]; }
   unsigned GetBbIdFromStmtId(unsigned id) { return mStmtId2BbIdMap[id]; }
   TreeNode *GetStmtFromStmtId(unsigned id) { return mStmtId2StmtMap[id]; }
-  CfgBB *GetBbFromBbId(unsigned id) { return mHandler->mBbId2BbMap[id]; }
+  CfgBB *GetBbFromBbId(unsigned id) { return mHandler->GetBbFromBbId(id); }
 
   void DumpDefPosition(unsigned idx, DefPosition pos);
   void DumpDefPositionVec();

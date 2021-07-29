@@ -66,6 +66,7 @@ void AST_AST::CollectReachableBB() {
       }
 
       mHandler->SetBbFromBbId(bbid, bb);
+      mHandler->mBbIdVec.push_back(bbid);
 
       mReachableBbIdx.insert(bbid);
       working_list.pop_front();
