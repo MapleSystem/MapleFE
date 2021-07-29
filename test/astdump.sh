@@ -89,11 +89,19 @@ for ts in $LIST; do
       rm -f "$T"
     else
       clang-format-10 $ts > $ts.tmp.ts
-      ts2ast $ts.tmp.ts --dump-ast | sed -n '/^AstDump:/,$p' | sed 's/LT_CharacterLiteral/LT_StringLiteral/' > $ts.orig
-      ts2ast $T --dump-ast | sed -n '/^AstDump:/,$p' | sed "s|$T|$ts.tmp.ts|" > $ts.gen
+      $TS2AST $ts.tmp.ts
+      if [ $? -eq 0 ]; then
+        $AST2CPP $ts.tmp.ts.ast $TREEDIFF | sed -n '/^AstDump:/,$p' | sed -e 's/LT_CharacterLiteral/LT_StringLiteral/' \
+          -e 's/\(mStrIdx: unsigned int, \)[0-9]* =>/\1=>/'
+      fi > $ts.orig
+      ts2ast $T
+      if [ $? -eq 0 ]; then
+        $AST2CPP $T.ast $TREEDIFF | sed -n '/^AstDump:/,$p' | sed -e "s|$T|$ts.tmp.ts|" \
+          -e 's/\(mStrIdx: unsigned int, \)[0-9]* =>/\1=>/'
+      fi > $ts.gen
       echo --- "$ts"; cat "$ts"
       diff $ts.orig $ts.gen
-      if [ $? -eq 0 ]; then
+      if [ $? -eq 0 -a -s $ts.orig -a -s $ts.gen ]; then
         echo Passed with $ts
         Passed="$Passed $ts"
       else
