@@ -2,6 +2,10 @@ Matched 13 tokens.
 Matched 21 tokens.
 ============= Module ===========
 == Sub Tree ==
-
+js_var Decl: x
+== Sub Tree ==
+js_var Decl: y
+== Sub Tree ==
+js_var Decl: z
 == Sub Tree ==
 x Assign y Assign z Assign 1

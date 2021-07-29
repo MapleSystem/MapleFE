@@ -52,6 +52,21 @@ std::string ModuleNode::GetSrcLangString() {
   }
   return "Unknown";
 }
+
+// The tree could be PassNode
+void ModuleNode::AddTree(TreeNode *tree) {
+  if (tree->IsPass()) {
+    PassNode *pass_node = (PassNode*)tree;
+    for (unsigned i = 0; i < pass_node->GetChildrenNum(); i++) {
+      TreeNode *child = pass_node->GetChild(i);
+      AddTree(child);
+    }
+  } else {
+    mTrees.PushBack(tree);
+    tree->SetParent(this);
+  }
+}
+
 // Return a new scope newly created.
 // Set the parent<->child relation between it and p.
 ASTScope* ModuleNode::NewScope(ASTScope *p) {

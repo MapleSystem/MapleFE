@@ -15,7 +15,9 @@ js_var Decl: i
 == Sub Tree ==
 js_var Decl: len
 == Sub Tree ==
-
+i Assign 0
+== Sub Tree ==
+len Assign arr.length
 == Sub Tree ==
 for ( )
   sum AddAssign arr[i]
