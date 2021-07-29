@@ -100,6 +100,13 @@ for ts in $LIST; do
         echo Failed to compare with the AST of $ts
         Failed="$Failed (ast)$ts"
       fi
+      if [ -n "$DOT" ]; then
+        for tf in $ts.tmp.ts $T; do
+          echo "=== $tf"
+          cat $tf
+          out="$out"$'\n'"$(ts2ast $tf --dump-dot)"
+        done
+      fi
       rm -f "$T" $ts.orig $ts.gen $ts.tmp.ts
     fi
   fi
