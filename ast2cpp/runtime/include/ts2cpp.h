@@ -68,6 +68,7 @@ struct JS_Val {
   JS_Val(int64_t l) { x.val_long = l; type = TY_Long; cxx = false; }
   JS_Val(double d)  { x.val_double = d; type = TY_Double; cxx = false; }
   JS_Val(Object* o){ x.val_obj = o; type = TY_Object; cxx = false; }
+  JS_Val(std::string* s) {x.val_string = s; type = TY_String; cxx = false; }
 
 #define OPERATORS(op) \
   JS_Val operator op(const JS_Val &v) { \
@@ -109,6 +110,7 @@ typedef struct JS_Prop {
 
 
 typedef std::unordered_map<std::string, JS_Prop> JS_PropList;
+typedef std::pair<std::string, JS_Val> ObjectProp;
 
 class Object {
   public:
@@ -118,6 +120,12 @@ class Object {
   public:
     Object(): __proto__(nullptr) {}
     Object(Function* ctor, Object* proto): constructor(ctor), __proto__(proto) {}
+    Object(Function* ctor, Object* proto, std::vector<ObjectProp> props): constructor(ctor), __proto__(proto)
+    {
+      for (int i=0; i<props.size(); ++i)
+        this->AddProp(props[i].first, props[i].second);
+    }
+
     virtual ~Object() {}
 
     bool HasOwnProp(std::string key) {
@@ -128,6 +136,32 @@ class Object {
 
     void AddProp(std::string key, JS_Val val) {
       propList[key] = { val };
+    }
+
+    JS_Prop GetProp(std::string key) {
+      return propList[key];
+    }
+
+    bool GetPropBool(std::string key) {
+      return propList[key].val.x.val_bool;
+    }
+    long GetPropLong(std::string key) {
+      return propList[key].val.x.val_long;
+    }
+    double GetPropDouble(std::string key) {
+      return propList[key].val.x.val_double;
+    }
+    void* GetPropBigInt(std::string key) {
+      return propList[key].val.x.val_bigint;
+    }
+    std::string GetPropStr(std::string key) {
+      return *propList[key].val.x.val_string;
+    }
+    Object* GetPropObj(std::string key) {
+      return propList[key].val.x.val_obj;
+    }
+    void* GetPropField(std::string key) {
+      return propList[key].val.x.field;
     }
 
     virtual bool IsFuncObj() {
