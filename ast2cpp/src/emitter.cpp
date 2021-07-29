@@ -186,12 +186,6 @@ std::string Emitter::EmitFunctionNode(FunctionNode *node) {
   }
 
   /*
-  for (unsigned i = 0; i < node->GetAnnotationsNum(); ++i) {
-    if (auto n = node->GetAnnotationAtIndex(i)) {
-      str += " "s + EmitAnnotationNode(n);
-    }
-  }
-
   for (unsigned i = 0; i < node->GetThrowsNum(); ++i) {
     if (auto n = node->GetThrowAtIndex(i)) {
       str += " "s + EmitExceptionNode(n);
@@ -1361,6 +1355,17 @@ std::string Emitter::EmitCallNode(CallNode *node) {
       str += s;
     if (n->IsOptional())
       str += "?."s; // for optional chaining
+  }
+  if(auto num = node->GetTypeArgumentsNum()) {
+    str += "<"s;
+    for (unsigned i = 0; i < num; ++i) {
+      if (i)
+        str += ", "s;
+      if (auto n = node->GetTypeArgumentAtIndex(i)) {
+        str += EmitTreeNode(n);
+      }
+    }
+    str += ">"s;
   }
   str += "("s;
   for (unsigned i = 0; i < node->GetArgsNum(); ++i) {
