@@ -25,16 +25,26 @@
 
 namespace maplefe {
 
+enum A2C_Flags {
+  FLG_trace_a2c = 0x01,
+  FLG_emit_ts_only = 0x10
+};
+
 class A2C : public AstOpt {
 private:
   AST_Handler *mASTHandler;
-  bool            mTraceA2C;
+  bool         mTraceA2C;
+  bool         mEmitTSOnly;
 
 public:
-  explicit A2C(AST_Handler *h, bool trace) : AstOpt(h, trace), mASTHandler(h), mTraceA2C(trace) {}
+  explicit A2C(AST_Handler *h, unsigned flag) : AstOpt(h, flag & FLG_trace_a2c), mASTHandler(h) {
+    mTraceA2C = (flag & FLG_trace_a2c);
+    mEmitTSOnly = (flag & FLG_emit_ts_only) != 0;
+  }
   ~A2C() = default;
 
   void SetTraceA2C(bool t) { mTraceA2C = t; }
+  void EmitTS();
   void ProcessAST();
 };
 

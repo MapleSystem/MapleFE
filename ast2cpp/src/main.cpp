@@ -25,6 +25,7 @@ static void help() {
   std::cout << "   --out=x.cpp      : cpp output file" << std::endl;
   std::cout << "   --help           : print this help" << std::endl;
   std::cout << "   --trace-a2c      : Trace MPL Builder" << std::endl;
+  std::cout << "   --emit-ts-only   : Emit ts code only" << std::endl;
   std::cout << "default out name uses the first input name: a.cpp" << std::endl;
 }
 
@@ -34,7 +35,7 @@ int main (int argc, char *argv[]) {
     exit(-1);
   }
 
-  bool trace_a2c = false;
+  unsigned flag;
   // one or more input .ast files separated by ','
   const char *inputname = argv[1];
   // output .cpp file
@@ -43,7 +44,9 @@ int main (int argc, char *argv[]) {
   // Parse the argument
   for (unsigned i = 2; i < argc; i++) {
     if (!strncmp(argv[i], "--trace-a2c", 11) && (strlen(argv[i]) == 11)) {
-      trace_a2c = true;
+      flag |= maplefe::FLG_trace_a2c;
+    } else if (!strncmp(argv[i], "--emit-ts-only", 14)) {
+      flag |= maplefe::FLG_emit_ts_only;
     } else if (!strncmp(argv[i], "--in=", 5)) {
       inputname = argv[i]+5;
     } else if (!strncmp(argv[i], "--out=", 6)) {
@@ -66,6 +69,7 @@ int main (int argc, char *argv[]) {
     }
   }
 
+  bool trace_a2c = (flag & maplefe::FLG_trace_a2c) != 0;
   maplefe::AST_Handler handler(trace_a2c);
   for (auto astfile: inputfiles) {
     std::ifstream input(astfile, std::ifstream::binary);
@@ -81,7 +85,7 @@ int main (int argc, char *argv[]) {
     }
   }
 
-  maplefe::A2C *a2c = new maplefe::A2C(&handler, trace_a2c);
+  maplefe::A2C *a2c = new maplefe::A2C(&handler, flag);
   a2c->ProcessAST();
 
   return 0;

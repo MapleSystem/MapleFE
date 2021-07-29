@@ -29,9 +29,34 @@ namespace maplefe {
 #define AST2CPPMSG(K,v)    { if (mTraceA2C) { MMSG(K,v);    }}
 #define AST2CPPMSG2(K,v,w) { if (mTraceA2C) { MMSG2(K,v,w); }}
 
+void A2C::EmitTS() {
+  unsigned size = mASTHandler->mModuleHandlers.GetNum();
+  for (int i = 0; i < size; i++) {
+    Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
+    ModuleNode *module = handler->GetASTModule();
+    // build CFG
+    handler->BuildCFG();
+  }
+
+  std::cout << "============= Emitter ===========" << std::endl;
+  for (int i = 0; i < size; i++) {
+    Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
+    ModuleNode *module = handler->GetASTModule();
+    maplefe::Emitter emitter(module);
+    std::string code = emitter.Emit("Convert AST to TypeScript code");
+    std::cout << code;
+  }
+}
+
 // starting point of AST
 void A2C::ProcessAST() {
   // loop through module handlers
+
+  if (mEmitTSOnly) {
+    EmitTS();
+    return;
+  }
+
   unsigned size = mASTHandler->mModuleHandlers.GetNum();
   for (int i = 0; i < size; i++) {
     Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
