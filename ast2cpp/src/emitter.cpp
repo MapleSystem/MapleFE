@@ -1151,12 +1151,12 @@ std::string Emitter::EmitCondBranchNode(CondBranchNode *node) {
     auto cond = EmitTreeNode(n);
     str += Clean(cond);
   }
-  str += ")"s;
+  str += ")\n"s;
   if (auto n = node->GetTrueBranch()) {
     str += EmitTreeNode(n);
   }
   if (auto n = node->GetFalseBranch()) {
-    str += "else"s + EmitTreeNode(n);
+    str += "else\n"s + EmitTreeNode(n);
   }
   return HandleTreeNode(str, node);
 }
