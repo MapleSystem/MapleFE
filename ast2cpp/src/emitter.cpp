@@ -87,18 +87,20 @@ std::string Emitter::EmitAnnotationNode(AnnotationNode *node) {
     return std::string();
   std::string str;
   if (auto n = node->GetId()) {
-    str += " "s + EmitIdentifierNode(n);
+    str += EmitIdentifierNode(n);
+  }
+  if (auto num = node->GetArgsNum()) {
+    str += "("s;
+    for (unsigned i = 0; i < num; ++i) {
+      if (i)
+        str += ", "s;
+      if (auto n = node->GetArgAtIndex(i))
+        str += EmitTreeNode(n);
+    }
+    str += ")"s;
   }
   if (auto n = node->GetType()) {
-    str += " "s + EmitAnnotationTypeNode(n);
-  }
-
-  for (unsigned i = 0; i < node->GetArgsNum(); ++i) {
-    if (i)
-      str += ", "s;
-    if (auto n = node->GetArgAtIndex(i)) {
-      str += " "s + EmitTreeNode(n);
-    }
+    str += ": "s + EmitAnnotationTypeNode(n);
   }
 
   if (node->IsStmt())
@@ -157,6 +159,9 @@ std::string Emitter::EmitFunctionNode(FunctionNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
+  for (unsigned i = 0; i < node->GetAnnotationsNum(); ++i)
+    if (auto n = node->GetAnnotationAtIndex(i))
+      str += "@"s + EmitTreeNode(n) + "\n"s;
   for (unsigned i = 0; i < node->GetAttrsNum(); ++i) {
     str += GetEnumAttrId(node->GetAttrAtIndex(i));
   }
@@ -1420,8 +1425,10 @@ std::string Emitter::EmitInterfaceNode(InterfaceNode *node) {
 std::string Emitter::EmitClassNode(ClassNode *node) {
   if (node == nullptr)
     return std::string();
-
   std::string str;
+  for (unsigned i = 0; i < node->GetAnnotationsNum(); ++i)
+    if (auto n = node->GetAnnotationAtIndex(i))
+      str += "@"s + EmitTreeNode(n) + "\n"s;
   for (unsigned i = 0; i < node->GetAttributesNum(); ++i)
     str += GetEnumAttrId(node->GetAttribute(i)) + " "s;
 
