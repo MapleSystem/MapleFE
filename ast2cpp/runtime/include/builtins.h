@@ -24,11 +24,6 @@ extern Ctor_Function Function_ctor;
 extern Ctor_Object   Object_ctor;
 extern Ctor_Array    Array_ctor;
 
-class Ctor_Function : public Function {
-  public:
-    Ctor_Function(Function* ctor, Object* proto, Object* prototype_proto) : Function(ctor, proto, prototype_proto) {}
-};
-
 class Ctor_Object   : public Function {
   public:
     Ctor_Object(Function* ctor, Object* proto, Object* prototype_proto) : Function(ctor, proto, prototype_proto) {}
@@ -36,6 +31,16 @@ class Ctor_Object   : public Function {
     Object* _new() {
       return new Object(this, this->prototype);
     }
+};
+
+class Ctor_Function : public Function {
+  public:
+    Ctor_Function(Function* ctor, Object* proto, Object* prototype_proto) : Function(ctor, proto, prototype_proto) {}
+
+    Function* _new() {
+      return new Function(this, this->prototype, Object_ctor.prototype);
+    }
+
 };
 
 class Array : public Object {
