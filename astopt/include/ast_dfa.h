@@ -69,7 +69,6 @@ class AST_DFA {
   // def-use : key is def node id to a set of use node id
   std::unordered_map<unsigned, std::set<unsigned>> mDefUseMap;
 
-  friend class CollectUseVisitor;
   friend class DefUseChainVisitor;
 
  public:
@@ -80,7 +79,6 @@ class AST_DFA {
 
   void CollectInfo();
   void CollectDefNodes();
-  void CollectUseNodes();
   void BuildBitVectors();
   void BuildDefUseChain();
 
@@ -104,7 +102,6 @@ class AST_DFA {
   void DumpBV(BitVector *bv);
   void DumpBVMap(BVMap &bvmap);
   void DumpAllBVMaps();
-  void DumpUse();
   void DumpDefUse();
   void TestBV();
   void Clear();
@@ -127,26 +124,6 @@ class CollectInfoVisitor : public AstVisitor {
   void SetBbId(unsigned id)    { mBbId    = id; }
 
   IdentifierNode *VisitIdentifierNode(IdentifierNode *node);
-};
-
-class CollectUseVisitor : public AstVisitor {
- private:
-  Module_Handler  *mHandler;
-  AST_DFA      *mDFA;
-  bool          mTrace;
-  unsigned      mStmtIdx;
-  unsigned      mBbId;
-
- public:
-  explicit CollectUseVisitor(Module_Handler *h, bool t, bool base = false)
-    : mHandler(h), mDFA(h->GetDFA()), mTrace(t), AstVisitor(t && base) {}
-  ~CollectUseVisitor() = default;
-
-  void SetStmtIdx(unsigned id) { mStmtIdx = id; }
-  void SetBbId(unsigned id)    { mBbId    = id; }
-
-  IdentifierNode *VisitIdentifierNode(IdentifierNode *node);
-  BinOperatorNode *VisitBinOperatorNode(BinOperatorNode *node);
 };
 
 class DefUseChainVisitor : public AstVisitor {
