@@ -778,7 +778,9 @@ std::string Emitter::EmitBindingElementNode(BindingElementNode *node) {
     str += EmitTreeNode(n);
   }
   if (auto n = node->GetElement()) {
-    str += ": "s + EmitTreeNode(n);
+    if (!str.empty())
+      str += ": "s;
+    str += EmitTreeNode(n);
   }
   mPrecedence = '\030';
   if (node->IsStmt())
@@ -1481,11 +1483,12 @@ std::string Emitter::EmitClassNode(ClassNode *node) {
   }
 
   for (unsigned i = 0; i < node->GetMethodsNum(); ++i) {
-    if (auto n = node->GetMethod(i)) {
+    if (FunctionNode *n = node->GetMethod(i)) {
       std::string func = EmitFunctionNode(n);
       if (func.substr(0, 9) == "function ")
         func = func.substr(9);
-      Replace(func, "=>", ":");
+      if (n->GetType() && n->GetBody() == nullptr)
+        Replace(func, "=>", ":", -1);
       str += func.length() > 2 && func.substr(func.length() - 2) == ";\n" ? func : func + ";\n"s;
     }
   }
