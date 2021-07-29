@@ -328,8 +328,6 @@ std::string Emitter::EmitXXportAsPairNode(XXportAsPairNode *node) {
         str += " }"s;
     }
   }
-  if (node->IsStmt())
-    str += ";\n"s;
   return HandleTreeNode(str, node);
 }
 
@@ -359,7 +357,6 @@ std::string Emitter::EmitExportNode(ExportNode *node) {
     if (auto n = node->GetPair(i))
       str += EmitXXportAsPairNode(n);
   }
-  Replace(str, "}, {", ", ", 0);
   if (auto n = node->GetTarget()) {
     str += " from "s + EmitTreeNode(n);
   }
