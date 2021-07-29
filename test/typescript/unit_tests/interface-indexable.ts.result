@@ -18,4 +18,4 @@ class  Klass
 == Sub Tree ==
 ts_interface: DataTypes {[TypeID.Array_Class] : DataTypes[TypeID.Array][];[TypeID.Array] : Klass }
 == Sub Tree ==
- type TYPE = DataTypes[Exclude< keyof DataTypes,>]
+ type TYPE = DataTypes[Exclude< keyof DataTypes,TypeID.Array_Class>]

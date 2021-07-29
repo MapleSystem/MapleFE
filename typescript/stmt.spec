@@ -1621,10 +1621,12 @@ rule TypeReference: TypeName + ZEROORONE(TypeArguments) + ZEROORMORE(AsType)
 ## rule TypeName: IdentifierReference NamespaceName . IdentifierReference
 rule TypeName: ONEOF(IdentifierReference,
                      NamespaceName + '.' + IdentifierReference)
+  attr.action.%2 : BuildField(%1, %3)
 
 ## rule NamespaceName: IdentifierReference NamespaceName . IdentifierReference
 rule NamespaceName: ONEOF(IdentifierReference,
                           NamespaceName + '.' + IdentifierReference)
+  attr.action.%2 : BuildField(%1, %3)
 
 ## rule ObjectType: { TypeBodyopt }
 rule ObjectType : '{' + ZEROORONE(TypeBody) + '}'
