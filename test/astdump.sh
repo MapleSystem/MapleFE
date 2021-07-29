@@ -2,7 +2,7 @@
 function usage {
 cat << EOF
 
-Usage: astdump.sh [-d] [-f] [-p <PREFIX>] [-a] [-c] [-k] [-A] [-C] [-n] <file1> [<file2> ...]
+Usage: astdump.sh [-d] [-f] [-p <PREFIX>] [-a] [-c] [-k] [-A] [-C] [-n] [-t] <file1> [<file2> ...]
 
 Short/long options:
   -d | --dot             Use Graphviz dot to generate the graph and view it with viewnior
@@ -15,12 +15,13 @@ Short/long options:
   -A | --all             Process all .ts files in current directory excluding *.ts-[0-9]*.out.ts
   -C | --clean           Clean up generated files (*.ts-[0-9]*.out.ts)
   -n | --name            Keep original names by removing "__lambda_[0-9]*__" and "__v[0-9]*" from generated code
+  -t | --treediff        Compare the AST of generated TS code with the one of original TS code
   <file1> [<file2> ...]  Specify one or more TypeScript files to be processed
 EOF
 exit 1
 }
 
-DOT= PRE= LIST= VIEWOP= HIGHLIGHT="cat" TSCERR= KEEP= CLEAN= NAME=
+DOT= PRE= LIST= VIEWOP= HIGHLIGHT="cat" TSCERR= KEEP= CLEAN= NAME= TREEDIFF=
 while [ $# -gt 0 ]; do
     case $1 in
         -d|--dot)        DOT=dot;;
@@ -34,7 +35,8 @@ while [ $# -gt 0 ]; do
         -C|--clean)      CLEAN=clean ;;
         -A|--all)        LIST="$LIST $(find -maxdepth 1 -name '*.ts' | grep -v '\.ts-[0-9][0-9]*\.out.ts')" ;;
         -n|--name)       NAME="original" ;;
-        -*)              usage;;
+        -t|--treediff)   TREEDIFF=yes; NAME="original" ;;
+        -*)              echo "Unknown option $1"; usage;;
         *)               LIST="$LIST $1"
     esac
     shift
@@ -82,9 +84,23 @@ for ts in $LIST; do
       Failed="$Failed ($E)$ts"
       echo Failed to compile "$T" with tsc
       [ -n "$KEEP" ] || rm -f "$T"
-    else
+    elif [ -z $TREEDIFF ]; then
       Passed="$Passed $ts"
       rm -f "$T"
+    else
+      clang-format-10 $ts > $ts.tmp.ts
+      ts2ast $ts.tmp.ts --dump-ast | sed -n '/^AstDump:/,$p' > $ts.orig
+      ts2ast $T --dump-ast | sed -n '/^AstDump:/,$p' | sed "s|$T|$ts.tmp.ts|" > $ts.gen
+      echo --- "$ts"; cat "$ts"
+      diff $ts.orig $ts.gen
+      if [ $? -eq 0 ]; then
+        echo Passed with $ts
+        Passed="$Passed $ts"
+      else
+        echo Failed to compare with the AST of $ts
+        Failed="$Failed (ast)$ts"
+      fi
+      rm -f "$T" $ts.orig $ts.gen $ts.tmp.ts
     fi
   fi
   if [ -n "$DOT" ]; then
