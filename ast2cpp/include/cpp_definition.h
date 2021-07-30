@@ -27,7 +27,8 @@ public:
   Module_Handler *mHandler;
   bool            isInit;
   CppDecl        &mCppDecl;
-
+  std::string    *emitStr;
+  size_t         emitStrInsertPos;
   CppDef(Module_Handler *h, CppDecl &d) : mHandler(h), mCppDecl(d), Emitter(h->GetASTModule()) {}
 
   std::string Emit() {
@@ -58,6 +59,7 @@ public:
   virtual std::string EmitPrimArrayTypeNode(PrimArrayTypeNode *node);
   virtual std::string EmitNewNode(NewNode *node);
   virtual std::string EmitClassProps(TreeNode *node);
+  std::string EmitStructLiteralProps(std::string propsName, StructLiteralNode* node);
 };
 
 } // namespace maplefe

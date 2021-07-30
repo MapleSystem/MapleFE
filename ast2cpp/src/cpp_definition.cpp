@@ -77,6 +77,8 @@ std::string CppDef::EmitModuleNode(ModuleNode *node) {
 
   str += "\n\n void "s + name + "::__init_func__() { // bind \"this\" to current module\n"s;
   isInit = true;
+  emitStr = &str;
+  emitStrInsertPos = str.size();
   for (unsigned i = 0; i < node->GetTreesNum(); ++i) {
     if (auto n = node->GetTree(i)) {
       if (n->GetKind() != NK_Class)
@@ -237,22 +239,79 @@ std::string CppDef::EmitIdentifierNode(IdentifierNode *node) {
   return str;
 }
 
+// Generate vector of ObjectProp to be passed to Object constructor.
+std::string CppDef::EmitStructLiteralProps(std::string propsName, StructLiteralNode* node) {
+  std::string str;
+  str += "  std::vector<ObjectProp>"s + propsName + " = {\n"s;
+  for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
+    if (i)
+      str += ",\n"s;
+    if (auto field = node->GetField(i)) {
+      auto lit = field->GetLiteral();
+      std::string fieldName = EmitTreeNode(field->GetFieldName());
+      TypeId typId = lit->GetTypeId();
+      std::string fieldVal = EmitTreeNode(lit);
+      switch(typId) {
+        case TY_Object:
+          break;
+        case TY_Function:
+          break;
+        case TY_Boolean:
+          str += "    std::make_pair(\""s + fieldName + "\", JS_Val(bool("s + fieldVal + ")))"s;
+          break;
+        case TY_None:
+          if (fieldVal.compare("true") == 0 || fieldVal.compare("false") == 0)
+            str += "    std::make_pair(\""s + fieldName + "\", JS_Val(bool("s + fieldVal + ")))"s;
+          break;
+        case TY_Int:
+          str += "    std::make_pair(\""s + fieldName + "\", JS_Val(int64_t("s + fieldVal + ")))"s;
+          break;
+        case TY_String:
+          str += "    std::make_pair(\""s + fieldName + "\", JS_Val(new std::string("s + fieldVal + ")))"s;
+          break;
+        case TY_Number:
+        case TY_Double:
+          str += "    std::make_pair(\""s + fieldName + "\", JS_Val(double("s + fieldVal + ")))"s;
+          break;
+        case TY_Class:
+          // Handle embedded ObjectLiterals recursively
+          if (lit->GetKind() == NK_StructLiteral) {
+            std::string props = EmitStructLiteralProps(fieldName+"Props"s, static_cast<StructLiteralNode*>(lit));
+            emitStr->insert(emitStrInsertPos, props);
+            emitStrInsertPos += props.size();
+            str += "    std::make_pair(\""s + fieldName + "\", JS_Val(new Object(&Object_ctor, Object_ctor.prototype, "s + fieldName + "Props)))"s;
+          }
+          break;
+      }
+    }
+  }
+  str += "  };\n"s;
+  return str;
+}
+
 std::string CppDef::EmitDeclNode(DeclNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str;
+  std::string str, name;
   //std::string str(Emitter::GetEnumDeclProp(node->GetProp()));
   if (auto n = node->GetVar()) {
-    str += isInit ? EmitTreeNode(n) : mCppDecl.EmitTreeNode(n);
+    name += isInit ? EmitTreeNode(n) : mCppDecl.EmitTreeNode(n);
   }
   if (auto n = node->GetInit()) {
-    if (node->GetTypeId() == TY_Class)
-      str += "= &"s + n->GetName() + "_ctor"s;
+    if (node->GetTypeId() == TY_Class && node->GetInit()->GetKind() == NK_StructLiteral) {
+      // Emit obj instance with object/struct literal init
+      std::string props = EmitStructLiteralProps(name+"Props"s, static_cast<StructLiteralNode*>( node->GetInit()));
+      emitStr->insert(emitStrInsertPos, props);
+      emitStrInsertPos += props.size();
+      str += "  "s + name + " = new Object(&Object_ctor, Object_ctor.prototype, "s + name + "Props)"s;
+    }
+    else if (node->GetTypeId() == TY_Class)
+      str += name + "= &"s + n->GetName() + "_ctor"s;
     else if(n->GetKind() == NK_ArrayLiteral)
-      str += ".clear();\n"s + str + ".insert("s + str + ".end(), "s
+      str += name + ".clear();\n"s + str + ".insert("s + str + ".end(), "s
         + EmitTreeNode(n) + ")"s;
     else
-      str += " = "s + EmitTreeNode(n);
+      str += name + " = "s + EmitTreeNode(n);
   }
   str += ";\n"s;
   return str;

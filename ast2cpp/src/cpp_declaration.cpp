@@ -156,12 +156,17 @@ std::string CppDecl::EmitDeclNode(DeclNode *node) {
     return std::string();
   std::string str;
   if (auto n = node->GetVar()) {
-    if (node->GetInit() && node->GetInit()->GetTypeId() == TY_Class) {
-      // generate "Ctor_<class> *<var> = &<class>_ctor" for TS decl "<var> = <class>"
-      str = "Ctor_"s + node->GetInit()->GetName() + " *"s +  n->GetName() + ";\n"s;
+    if (IsVarInitStructLiteral(node)) {
+      // generate obj instance decl
+      str = "Object* "s + n->GetName();
+    } else if (IsVarInitClass(node)) {
+      // generate obj instance with class constructor:
+      // C++ decl: "Ctor_<class> *<var> = &<class>_ctor" for TS decl: "<var> = <class>"
+      str = "Ctor_"s + node->GetInit()->GetName() + " *"s +  n->GetName();
     } else {
-      str += " "s + EmitTreeNode(n) + ";\n"s;
+      str += " "s + EmitTreeNode(n);
     }
+    str += ";\n"s;
   }
   return str;
 }
