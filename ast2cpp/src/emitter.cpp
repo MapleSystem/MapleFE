@@ -1437,7 +1437,7 @@ std::string Emitter::EmitClassNode(ClassNode *node) {
     if (auto n = node->GetAnnotationAtIndex(i))
       str += "@"s + EmitTreeNode(n) + "\n"s;
   for (unsigned i = 0; i < node->GetAttributesNum(); ++i)
-    str += GetEnumAttrId(node->GetAttribute(i)) + " "s;
+    str += GetEnumAttrId(node->GetAttribute(i));
 
   str += "class "s + node->GetName();
 
@@ -1764,6 +1764,9 @@ std::string Emitter::EmitPrimArrayTypeNode(PrimArrayTypeNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
+  for (unsigned i = 0; i < node->GetAttrsNum(); ++i) {
+    str += GetEnumAttrId(node->GetAttrAtIndex(i));
+  }
   if (auto n = node->GetPrim()) {
     str += EmitPrimTypeNode(n);
   }
