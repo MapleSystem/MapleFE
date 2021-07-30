@@ -279,7 +279,7 @@ std::string CppDef::EmitStructLiteralProps(std::string propsName, StructLiteralN
             std::string props = EmitStructLiteralProps(fieldName+"Props"s, static_cast<StructLiteralNode*>(lit));
             emitStr->insert(emitStrInsertPos, props);
             emitStrInsertPos += props.size();
-            str += "    std::make_pair(\""s + fieldName + "\", JS_Val(new Object(&Object_ctor, Object_ctor.prototype, "s + fieldName + "Props)))"s;
+            str += "    std::make_pair(\""s + fieldName + "\", JS_Val(Object_ctor._new("s + fieldName + "Props)))"s;
           }
           break;
       }
@@ -303,7 +303,7 @@ std::string CppDef::EmitDeclNode(DeclNode *node) {
       std::string props = EmitStructLiteralProps(name+"Props"s, static_cast<StructLiteralNode*>( node->GetInit()));
       emitStr->insert(emitStrInsertPos, props);
       emitStrInsertPos += props.size();
-      str += "  "s + name + " = new Object(&Object_ctor, Object_ctor.prototype, "s + name + "Props)"s;
+      str += "  "s + name + " = Object_ctor._new("s + name + "Props)"s;
     }
     else if (node->GetTypeId() == TY_Class)
       str += name + "= &"s + n->GetName() + "_ctor"s;

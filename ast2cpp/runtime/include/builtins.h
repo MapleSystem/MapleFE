@@ -31,6 +31,10 @@ class Ctor_Object   : public Function {
     Object* _new() {
       return new Object(this, this->prototype);
     }
+
+    Object* _new(std::vector<ObjectProp> props) {
+      return new Object(this, this->prototype, props);
+    }
 };
 
 class Ctor_Function : public Function {
