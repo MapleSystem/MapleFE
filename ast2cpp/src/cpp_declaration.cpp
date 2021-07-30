@@ -90,9 +90,8 @@ public: // all top level variables in the module
   str += decls.GetDecls();
 
   str += R"""(
-
 public: // all top level functions in the module
-void __init_func__();
+  void __init_func__();
 )""";
 
   // declarations of all top-level functions
@@ -158,11 +157,11 @@ std::string CppDecl::EmitDeclNode(DeclNode *node) {
   if (auto n = node->GetVar()) {
     if (IsVarInitStructLiteral(node)) {
       // generate obj instance decl
-      str = "Object* "s + n->GetName();
+      str = "  Object* "s + n->GetName();
     } else if (IsVarInitClass(node)) {
       // generate obj instance with class constructor:
       // C++ decl: "Ctor_<class> *<var> = &<class>_ctor" for TS decl: "<var> = <class>"
-      str = "Ctor_"s + node->GetInit()->GetName() + " *"s +  n->GetName();
+      str = "  Ctor_"s + node->GetInit()->GetName() + " *"s +  n->GetName();
     } else {
       str += " "s + EmitTreeNode(n);
     }
@@ -340,7 +339,7 @@ std::string CppDecl::EmitClassNode(ClassNode *node) {
   base = (node->GetSuperClassesNum() != 0)? node->GetSuperClass(0)->GetName() : "Object";
   str += "class "s + node->GetName() + " : public "s + base + " {\n"s;
 
-  str += "  public:\n";
+  str += "public:\n";
 
   // constructor decl,  field init
   std::string init;
@@ -349,17 +348,16 @@ std::string CppDecl::EmitClassNode(ClassNode *node) {
       init += ", "s;
     if (IdentifierNode* n = reinterpret_cast<IdentifierNode *>(node->GetField(i))) {
       if (n->GetInit()) {
-        init += n->GetName();
-        init += "("s + EmitTreeNode(n->GetInit()) + ")"s;
+        init += "  "s + n->GetName() + "("s + EmitTreeNode(n->GetInit()) + ")"s;
       }
     }
   }
-  str += node->GetName() + "(Function* ctor, Object* proto): "s + base + "(ctor, proto)" + (init.empty()? init: ","s + init) + " {}\n"s;
-  str += "~"s + node->GetName() + "(){}\n";
+  str += "  "s + node->GetName() + "(Function* ctor, Object* proto): "s + base + "(ctor, proto)" + (init.empty()? init: ","s + init) + " {}\n"s;
+  str += "  ~"s + node->GetName() + "(){}\n";
 
   // field decl. TODO: handle static, private, protected attrs.
   for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
-    str += EmitTreeNode(node->GetField(i)) + ";";
+    str += "  "s + EmitTreeNode(node->GetField(i)) + ";\n";
   }
   for (unsigned i = 0; i < node->GetMethodsNum(); ++i) {
     str += EmitFunctionNode(node->GetMethod(i));
@@ -369,8 +367,8 @@ std::string CppDecl::EmitClassNode(ClassNode *node) {
   // 2. c++ class for JS object's corresponding JS constructor
   base = (node->GetSuperClassesNum() != 0)? ("Ctor_"s+node->GetSuperClass(0)->GetName()) : "Function";
   str += "class "s + "Ctor_" + node->GetName() + " : public "s + base + " {\n"s;
-  str += "  public:\n";
-  str += "Ctor_"s+node->GetName()+"(Function* ctor, Object* proto, Object* prototype_proto) : "+base+"(ctor, proto, prototype_proto) {}\n";
+  str += "public:\n";
+  str += "  Ctor_"s+node->GetName()+"(Function* ctor, Object* proto, Object* prototype_proto) : "+base+"(ctor, proto, prototype_proto) {}\n";
 
   // constructor function
   for (unsigned i = 0; i < node->GetConstructorsNum(); ++i) {

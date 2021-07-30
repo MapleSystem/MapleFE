@@ -389,7 +389,7 @@ std::string CppDef::EmitCallNode(CallNode *node) {
   if(!log)
     str += ")"s;
   else
-    str += " << std::endl;";
+    str += " << std::endl";
   mPrecedence = '\024';
   if (node->IsStmt())
     str += ";\n"s;
