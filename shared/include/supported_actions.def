@@ -28,6 +28,8 @@
 //          It also shows the internal parameters when parser creates the AST tree node.
 //          Please refer autogen/README.ACTIONS for details.
 
+ACTION(BuildModule)
+
 ACTION(BuildPackageName)
 
 // These are about import/include

@@ -196,6 +196,37 @@ static void add_type_to(TreeNode *tree, TreeNode *type) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
+//                          BuildModule
+////////////////////////////////////////////////////////////////////////////////////////
+
+// Take one argument, the module name
+TreeNode* ASTBuilder::BuildModule() {
+  ModuleNode *n = (ModuleNode*)gTreePool.NewTreeNode(sizeof(ModuleNode));
+  new (n) ModuleNode();
+
+  MASSERT(mParams.size() == 1);
+  Param p_a = mParams[0];
+  if (!p_a.mIsEmpty && p_a.mIsTreeNode) {
+    TreeNode *tree = p_a.mData.mTreeNode;
+    if (tree->IsIdentifier()) {
+      const char *name = tree->GetName();
+      n->SetFileName(name);
+    } else if (tree->IsLiteral()) {
+      LiteralNode *lit = (LiteralNode*)tree;
+      LitData data = lit->GetData();
+      MASSERT(data.mType == LT_StringLiteral);
+      const char *name = gStringPool.GetStringFromStrIdx(data.mData.mStrIdx);
+      n->SetFileName(name);
+    } else {
+      MERROR("Unsupported module name.");
+    }
+  }
+
+  mLastTreeNode = n;
+  return mLastTreeNode;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
 //                          BuildIdentifier
 ////////////////////////////////////////////////////////////////////////////////////////
 
