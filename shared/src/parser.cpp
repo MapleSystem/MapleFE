@@ -471,7 +471,7 @@ bool Parser::Parse() {
   FixUpVisitor worker(mASTModule);
   worker.FixUp();
 
-  mASTModule->Dump();
+  mASTModule->Dump(0);
   return (res==ParseFail)? false: true;
 }
 

@@ -2139,10 +2139,16 @@ rule ExternalDeclaration : ONEOF("declare" + NamespaceDeclaration,
 
 # The module name could be an identifier or string literal.
 rule ExternalModuleDeclaration : "module" + PrimaryExpression + '{' + DeclarationModule + '}'
+  attr.action : BuildModule(%2)
+  attr.action : AddModuleBody(%4)
 
 #DeclarationElement: InterfaceDeclaration TypeAliasDeclaration NamespaceDeclaration AmbientDeclaration ImportAliasDeclaration
 rule DeclarationElement: ONEOF(InterfaceDeclaration,
                                TypeAliasDeclaration,
+                               VariableDeclaration,
+                               FunctionDeclaration,
+                               ClassDeclaration,
+                               EnumDeclaration,
                                NamespaceDeclaration,
                                AmbientDeclaration,
                                ImportAliasDeclaration)
@@ -2173,9 +2179,9 @@ rule DeclarationModuleElement: ONEOF(DeclarationElement,
 #################################################################################################
 
 # AmbientDeclaration: declare AmbientVariableDeclaration declare AmbientFunctionDeclaration declare AmbientClassDeclaration declare AmbientEnumDeclaration declare AmbientNamespaceDeclaration
-rule AmbientDeclaration: ONEOF(ZEROORONE("declare") + VariableDeclaration,
-                               ZEROORONE("declare") + FunctionDeclaration,
-                               ZEROORONE("declare") + ClassDeclaration,
-                               ZEROORONE("declare") + EnumDeclaration,
-                               ZEROORONE("declare") + NamespaceDeclaration)
+rule AmbientDeclaration: ONEOF("declare" + VariableDeclaration,
+                               "declare" + FunctionDeclaration,
+                               "declare" + ClassDeclaration,
+                               "declare" + EnumDeclaration,
+                               "declare" + NamespaceDeclaration)
   attr.action.%1,%2,%3,%4,%5 : BuildExternalDeclaration(%2)

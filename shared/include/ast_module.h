@@ -85,7 +85,7 @@ public:
   ASTScope* NewScope(ASTScope *p);
   ASTScope* NewScope(ASTScope *p, TreeNode *t);
 
-  void Dump();
+  void Dump(unsigned);
 };
 
 }

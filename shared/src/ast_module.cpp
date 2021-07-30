@@ -81,7 +81,7 @@ ASTScope* ModuleNode::NewScope(ASTScope *p, TreeNode *t) {
   return newscope;
 }
 
-void ModuleNode::Dump() {
+void ModuleNode::Dump(unsigned indent) {
   std::cout << "============= Module ===========" << std::endl;
   for (unsigned i = 0; i < mTrees.GetNum(); i++) {
     TreeNode *tree = GetTree(i);
