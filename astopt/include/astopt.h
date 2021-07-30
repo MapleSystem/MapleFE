@@ -31,16 +31,16 @@ class AST_Handler;
 class AstOpt {
 private:
   AST_Handler *mASTHandler;
-  bool         mTraceAstOpt;
+  unsigned     mFlags;
   unsigned     mUniqNum;
 
 public:
-  explicit AstOpt(AST_Handler *h, bool trace) :
-    mASTHandler(h), mTraceAstOpt(trace) {}
+  explicit AstOpt(AST_Handler *h, unsigned f) :
+    mASTHandler(h), mFlags(f) {}
   ~AstOpt() = default;
 
   AST_Handler *GetASTHandler() {return mASTHandler;}
-  void ProcessAST(bool trace_opt);
+  void ProcessAST(unsigned trace);
 };
 
 }

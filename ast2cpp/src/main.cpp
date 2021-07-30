@@ -15,7 +15,7 @@
 
 #include <sstream>
 #include <fstream>
-#include<iterator>
+#include <iterator>
 #include "gen_astload.h"
 #include "ast_handler.h"
 #include "ast2cpp.h"
@@ -24,8 +24,12 @@ static void help() {
   std::cout << "ast2cpp a.ast[,b.ast] [options]:" << std::endl;
   std::cout << "   --out=x.cpp      : cpp output file" << std::endl;
   std::cout << "   --help           : print this help" << std::endl;
-  std::cout << "   --trace-a2c      : Trace MPL Builder" << std::endl;
+  std::cout << "   --trace=n        : Emit trace with 4-bit combo levels 1...15" << std::endl;
+  std::cout << "           1        : Emit ast tree visits" << std::endl;
+  std::cout << "           2        : Emit graph" << std::endl;
   std::cout << "   --emit-ts-only   : Emit ts code only" << std::endl;
+  std::cout << "   --emit-ts        : Emit ts code" << std::endl;
+  std::cout << "   --format-cpp     : Format cpp" << std::endl;
   std::cout << "default out name uses the first input name: a.cpp" << std::endl;
 }
 
@@ -35,7 +39,7 @@ int main (int argc, char *argv[]) {
     exit(-1);
   }
 
-  unsigned flag;
+  unsigned flags;
   // one or more input .ast files separated by ','
   const char *inputname = argv[1];
   // output .cpp file
@@ -43,10 +47,19 @@ int main (int argc, char *argv[]) {
 
   // Parse the argument
   for (unsigned i = 2; i < argc; i++) {
-    if (!strncmp(argv[i], "--trace-a2c", 11) && (strlen(argv[i]) == 11)) {
-      flag |= maplefe::FLG_trace_a2c;
+    if (!strncmp(argv[i], "--trace=", 8)) {
+      int val = atoi(argv[i] + 8);
+      if (val < 1 || val > 15) {
+        help();
+        exit(-1);
+      }
+      flags |= val;
     } else if (!strncmp(argv[i], "--emit-ts-only", 14)) {
-      flag |= maplefe::FLG_emit_ts_only;
+      flags |= maplefe::FLG_emit_ts_only;
+    } else if (!strncmp(argv[i], "--emit-ts", 9)) {
+      flags |= maplefe::FLG_emit_ts;
+    } else if (!strncmp(argv[i], "--format-cpp", 12)) {
+      flags |= maplefe::FLG_format_cpp;
     } else if (!strncmp(argv[i], "--in=", 5)) {
       inputname = argv[i]+5;
     } else if (!strncmp(argv[i], "--out=", 6)) {
@@ -69,8 +82,8 @@ int main (int argc, char *argv[]) {
     }
   }
 
-  bool trace_a2c = (flag & maplefe::FLG_trace_a2c) != 0;
-  maplefe::AST_Handler handler(trace_a2c);
+  unsigned trace = (flags & maplefe::FLG_trace);
+  maplefe::AST_Handler handler(trace);
   for (auto astfile: inputfiles) {
     std::ifstream input(astfile, std::ifstream::binary);
     input >> std::noskipws;
@@ -85,7 +98,7 @@ int main (int argc, char *argv[]) {
     }
   }
 
-  maplefe::A2C *a2c = new maplefe::A2C(&handler, flag);
+  maplefe::A2C *a2c = new maplefe::A2C(&handler, flags);
   a2c->ProcessAST();
 
   return 0;

@@ -23,21 +23,20 @@
 namespace maplefe {
 
 // starting point of AST
-void AstOpt::ProcessAST(bool trace_a2c) {
+void AstOpt::ProcessAST(unsigned flags) {
   // loop through module handlers
   unsigned size = mASTHandler->mModuleHandlers.GetNum();
   for (int i = 0; i < size; i++) {
     Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
     ModuleNode *module = handler->GetASTModule();
 
-    mTraceAstOpt = trace_a2c;
-    if (mTraceAstOpt) {
+    mFlags = flags;
+    if (mFlags & FLG_trace) {
       std::cout << "============= in ProcessAST ===========" << std::endl;
       std::cout << "srcLang : " << module->GetSrcLangString() << std::endl;
-    }
-    for(unsigned i = 0; i < module->GetTreesNum(); i++) {
-      TreeNode *tnode = module->GetTree(i);
-      if (mTraceAstOpt) {
+
+      for(unsigned i = 0; i < module->GetTreesNum(); i++) {
+        TreeNode *tnode = module->GetTree(i);
         tnode->Dump(0);
         std::cout << std::endl;
       }

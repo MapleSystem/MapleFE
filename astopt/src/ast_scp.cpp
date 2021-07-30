@@ -24,7 +24,7 @@ namespace maplefe {
 
 void AST_SCP::BuildScope() {
   MSGNOLOC0("============== BuildScope ==============");
-  BuildScopeVisitor visitor(mHandler, mTrace, true);
+  BuildScopeVisitor visitor(mHandler, mFlags, true);
   while(!visitor.mScopeStack.empty()) {
     visitor.mScopeStack.pop();
   }
@@ -239,7 +239,7 @@ ForLoopNode *BuildScopeVisitor::VisitForLoopNode(ForLoopNode *node) {
 
 void AST_SCP::RenameVar() {
   MSGNOLOC0("============== RenameVar ==============");
-  RenameVarVisitor visitor(mHandler, mTrace, true);
+  RenameVarVisitor visitor(mHandler, mFlags, true);
   ModuleNode *module = mHandler->GetASTModule();
   visitor.mPass = 0;
   visitor.Visit(module);
@@ -251,7 +251,7 @@ void AST_SCP::RenameVar() {
     if (size > 1) {
       const char *name = gStringPool.GetStringFromStrIdx(stridx);
 
-      if (mTrace) {
+      if (mFlags & FLG_trace_3) {
         std::cout << "\nstridx: " << stridx << " " << name << std::endl;
         std::cout << "decl nid : ";
         for (auto i : visitor.mStridx2DeclIdMap[stridx]) {
@@ -273,7 +273,7 @@ void AST_SCP::RenameVar() {
         TreeNode *tn = visitor.mNodeId2NodeMap[nid];
         ASTScope *scope = tn->GetScope();
         tn = scope->GetTree();
-        if (mTrace) {
+        if (mFlags & FLG_trace_3) {
           std::cout << "\nupdate name : "
                     << gStringPool.GetStringFromStrIdx(visitor.mOldStrIdx)
                     << " --> "

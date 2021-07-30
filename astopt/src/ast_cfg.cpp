@@ -838,7 +838,7 @@ void CfgFunc::Dump() {
 }
 
 void CfgBuilder::Build() {
-  MMSGNOLOC0("============== BuildCFG ==============");
+  MSGNOLOC0("============== BuildCFG ==============");
 
   ModuleNode *module = mHandler->GetASTModule();
 

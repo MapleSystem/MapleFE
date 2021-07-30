@@ -30,11 +30,11 @@ void TypeInfer::TypeInference() {
 
   // build mNodeId2Decl
   InitDummyNodes();
-  BuildIdNodeToDeclVisitor visitor_pass0(mHandler, mTrace, true);
+  BuildIdNodeToDeclVisitor visitor_pass0(mHandler, mFlags, true);
   visitor_pass0.Visit(module);
 
   // type inference
-  TypeInferVisitor visitor_pass1(mHandler, mTrace, true);
+  TypeInferVisitor visitor_pass1(mHandler, mFlags, true);
   visitor_pass1.SetUpdated(true);
   int count = 0;
   while (visitor_pass1.GetUpdated() && count++ <= ITERATEMAX) {
@@ -44,11 +44,11 @@ void TypeInfer::TypeInference() {
   }
 
   // share UserType
-  ShareUTVisitor visitor_pass2(mHandler, mTrace, true);
+  ShareUTVisitor visitor_pass2(mHandler, mFlags, true);
   visitor_pass2.Push(module->GetRootScope());
   visitor_pass2.Visit(module);
 
-  if (mTrace) std::cout << "\n>>>>>> TypeInference() iterated " << count << " times\n" << std::endl;
+  if (mFlags & FLG_trace_3) std::cout << "\n>>>>>> TypeInference() iterated " << count << " times\n" << std::endl;
 }
 
 void TypeInfer::InitDummyNodes() {
@@ -166,7 +166,7 @@ TypeId TypeInferVisitor::MergeTypeId(TypeId tia, TypeId tib) {
   if (result == TY_None) {
     NOTYETIMPL("MergeTypeId()");
   }
-  if (mTrace) {
+  if (mFlags & FLG_trace_3) {
     std::cout << " Type Merge: "
               << AstDump::GetEnumTypeId(tia) << " "
               << AstDump::GetEnumTypeId(tib) << " --> "

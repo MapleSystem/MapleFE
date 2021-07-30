@@ -24,11 +24,6 @@
 
 namespace maplefe {
 
-#define NOTYETIMPL(K)      { if (mTraceA2C) { MNYI(K);      }}
-#define AST2CPPMSG0(K)     { if (mTraceA2C) { MMSG0(K);     }}
-#define AST2CPPMSG(K,v)    { if (mTraceA2C) { MMSG(K,v);    }}
-#define AST2CPPMSG2(K,v,w) { if (mTraceA2C) { MMSG2(K,v,w); }}
-
 void A2C::EmitTS() {
   unsigned size = mASTHandler->mModuleHandlers.GetNum();
   for (int i = 0; i < size; i++) {
@@ -53,32 +48,32 @@ void A2C::EmitTS() {
 
 // starting point of AST
 void A2C::ProcessAST() {
-  // loop through module handlers
-
-  if (mEmitTSOnly) {
+  // used for FE verification
+  if (mFlags & FLG_emit_ts_only) {
     EmitTS();
     return;
   }
 
+  // loop through module handlers
   unsigned size = mASTHandler->mModuleHandlers.GetNum();
   for (int i = 0; i < size; i++) {
     Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
     ModuleNode *module = handler->GetASTModule();
 
-    if (mTraceA2C) {
+    if (mFlags & FLG_trace) {
       std::cout << "============= in ProcessAST ===========" << std::endl;
       std::cout << "srcLang : " << module->GetSrcLangString() << std::endl;
-    }
 
-    for(unsigned i = 0; i < module->GetTreesNum(); i++) {
-      TreeNode *tnode = module->GetTree(i);
-      if (mTraceA2C) {
-        tnode->Dump(0);
-        std::cout << std::endl;
+      for(unsigned i = 0; i < module->GetTreesNum(); i++) {
+        TreeNode *tnode = module->GetTree(i);
+        if (mFlags & FLG_trace_1) {
+          tnode->Dump(0);
+          std::cout << std::endl;
+        }
       }
     }
 
-    if (mTraceA2C) {
+    if (mFlags & FLG_trace_2) {
       std::cout << "============= AstGraph ===========" << std::endl;
       AstGraph graph(module);
       graph.DumpGraph("After LoadFromAstBuf()", &std::cout);
@@ -93,11 +88,11 @@ void A2C::ProcessAST() {
     // rename var with same name, i --> i__vN where N is 1, 2, 3 ...
     handler->RenameVar();
 
-    if (mTraceA2C) {
+    if (mFlags & FLG_trace_2) {
       std::cout << "============= After AdjustAST ===========" << std::endl;
       for(unsigned i = 0; i < module->GetTreesNum(); i++) {
         TreeNode *tnode = module->GetTree(i);
-        if (mTraceA2C) {
+        if (mFlags & FLG_trace_1) {
           tnode->Dump(0);
           std::cout << std::endl;
         }
@@ -108,7 +103,7 @@ void A2C::ProcessAST() {
 
     // build CFG
     handler->BuildCFG();
-    if (mTraceA2C) {
+    if (mFlags & FLG_trace_2) {
       handler->Dump("After BuildCFG()");
     }
 
@@ -118,13 +113,13 @@ void A2C::ProcessAST() {
     // type inference
     handler->TypeInference();
 
-    if (mTraceA2C) {
+    if (mFlags & FLG_trace_2) {
       std::cout << "============= AstGraph ===========" << std::endl;
       AstGraph graph(module);
       graph.DumpGraph("After BuildCFG()", &std::cout);
     }
 
-    if (mTraceA2C) {
+    if (mFlags & FLG_trace_2) {
       std::cout << "============= AstDump ===========" << std::endl;
       AstDump astdump(module);
       astdump.Dump("After BuildCFG()", &std::cout);
@@ -132,17 +127,17 @@ void A2C::ProcessAST() {
 
     // data flow analysis for the module
     handler->DataFlowAnalysis();
-    if (mTraceA2C) {
+    if (mFlags & FLG_trace_2) {
       handler->Dump("After DataFlowAnalysis()");
     }
 
-    if (mTraceA2C) {
+    if (mFlags & FLG_trace_2) {
       std::cout << "============== Dump Scope ==============" << std::endl;
       module->GetRootScope()->Dump(0);
     }
   }
 
-  if (mTraceA2C) {
+  if (mFlags & FLG_emit_ts) {
     std::cout << "============= Emitter ===========" << std::endl;
     unsigned size = mASTHandler->mModuleHandlers.GetNum();
     for (int i = 0; i < size; i++) {
@@ -154,7 +149,7 @@ void A2C::ProcessAST() {
     }
   }
 
-  maplefe::CppEmitter cppemitter(mASTHandler);
+  maplefe::CppEmitter cppemitter(mASTHandler, mFlags);
   cppemitter.EmitCxxFiles();
 }
 }

@@ -35,8 +35,8 @@ typedef std::unordered_map<unsigned, BitVector*> BVMap;
 
 class AST_DFA {
  private:
-  Module_Handler  *mHandler;
-  bool          mTrace;
+  Module_Handler *mHandler;
+  unsigned        mFlags;
   std::unordered_map<unsigned, unsigned> mVar2DeclMap; // var to decl, both NodeId
 
   // stmt id
@@ -72,7 +72,7 @@ class AST_DFA {
   friend class DefUseChainVisitor;
 
  public:
-  explicit AST_DFA(Module_Handler *h, bool t) : mHandler(h), mTrace(t) {}
+  explicit AST_DFA(Module_Handler *h, unsigned f) : mHandler(h), mFlags(f) {}
   ~AST_DFA();
 
   void DataFlowAnalysis();
@@ -109,15 +109,15 @@ class AST_DFA {
 
 class CollectInfoVisitor : public AstVisitor {
  private:
-  Module_Handler  *mHandler;
-  AST_DFA      *mDFA;
-  bool          mTrace;
-  unsigned      mStmtIdx;
-  unsigned      mBbId;
+  Module_Handler *mHandler;
+  AST_DFA        *mDFA;
+  unsigned        mFlags;
+  unsigned        mStmtIdx;
+  unsigned        mBbId;
 
  public:
-  explicit CollectInfoVisitor(Module_Handler *h, bool t, bool base = false)
-    : mHandler(h), mDFA(h->GetDFA()), mTrace(t), AstVisitor(t && base) {}
+  explicit CollectInfoVisitor(Module_Handler *h, unsigned f, bool base = false)
+    : mHandler(h), mDFA(h->GetDFA()), mFlags(f), AstVisitor((f & FLG_trace_1) && base) {}
   ~CollectInfoVisitor() = default;
 
   void SetStmtIdx(unsigned id) { mStmtIdx = id; }
@@ -128,11 +128,11 @@ class CollectInfoVisitor : public AstVisitor {
 
 class DefUseChainVisitor : public AstVisitor {
  private:
-  Module_Handler  *mHandler;
-  AST_DFA      *mDFA;
-  bool          mTrace;
-  unsigned      mStmtIdx;
-  unsigned      mBbId;
+  Module_Handler *mHandler;
+  AST_DFA        *mDFA;
+  unsigned        mFlags;
+  unsigned        mStmtIdx;
+  unsigned        mBbId;
 
  public:
   unsigned      mDefNodeId;
@@ -141,8 +141,8 @@ class DefUseChainVisitor : public AstVisitor {
   unsigned      mReachNewDef;
 
  public:
-  explicit DefUseChainVisitor(Module_Handler *h, bool t, bool base = false)
-    : mHandler(h), mDFA(h->GetDFA()), mTrace(t), AstVisitor(t && base) {}
+  explicit DefUseChainVisitor(Module_Handler *h, unsigned f, bool base = false)
+    : mHandler(h), mDFA(h->GetDFA()), mFlags(f), AstVisitor((f & FLG_trace_1) && base) {}
   ~DefUseChainVisitor() = default;
 
   void SetStmtIdx(unsigned id) { mStmtIdx = id; }

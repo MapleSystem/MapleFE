@@ -30,10 +30,10 @@ class Module_Handler;
 class TypeInfer {
  private:
   Module_Handler *mHandler;
-  bool            mTrace;
+  unsigned        mFlags;
 
  public:
-  explicit TypeInfer(Module_Handler *h, bool t) : mHandler(h), mTrace(t) {}
+  explicit TypeInfer(Module_Handler *h, unsigned f) : mHandler(h), mFlags(f) {}
   ~TypeInfer() {}
 
   void InitDummyNodes();
@@ -42,11 +42,11 @@ class TypeInfer {
 
 class BuildIdNodeToDeclVisitor : public AstVisitor {
   Module_Handler *mHandler;
-  bool            mTrace;
+  unsigned        mFlags;
 
   public:
-  explicit BuildIdNodeToDeclVisitor(Module_Handler *h, bool t, bool base = false)
-    : mHandler(h), mTrace(t), AstVisitor(t && base) {}
+  explicit BuildIdNodeToDeclVisitor(Module_Handler *h, unsigned f, bool base = false)
+    : mHandler(h), mFlags(f), AstVisitor((f & FLG_trace_1) && base) {}
   ~BuildIdNodeToDeclVisitor() = default;
 
   IdentifierNode *VisitIdentifierNode(IdentifierNode *node);
@@ -54,11 +54,11 @@ class BuildIdNodeToDeclVisitor : public AstVisitor {
 
 class TypeInferBaseVisitor : public AstVisitor {
  private:
-  bool            mTrace;
+  unsigned mFlags;
 
  public:
-  explicit TypeInferBaseVisitor(bool t, bool base = false)
-    : mTrace(t), AstVisitor(t && base) {}
+  explicit TypeInferBaseVisitor(unsigned f, bool base = false)
+    : mFlags(f), AstVisitor((f & FLG_trace_1) && base) {}
   ~TypeInferBaseVisitor() = default;
 
 #undef  NODEKIND
@@ -72,14 +72,14 @@ class TypeInferBaseVisitor : public AstVisitor {
 class TypeInferVisitor : public TypeInferBaseVisitor {
  private:
   Module_Handler *mHandler;
-  bool            mTrace;
+  unsigned        mFlags;
   bool            mUpdated;
 
   std::unordered_set<unsigned> ExportedDeclIds;
 
  public:
-  explicit TypeInferVisitor(Module_Handler *h, bool t, bool base = false)
-    : mHandler(h), mTrace(t), TypeInferBaseVisitor(t, base) {}
+  explicit TypeInferVisitor(Module_Handler *h, unsigned f, bool base = false)
+    : mHandler(h), mFlags(f), TypeInferBaseVisitor(f, base) {}
   ~TypeInferVisitor() = default;
 
   bool GetUpdated() {return mUpdated;}
@@ -127,15 +127,15 @@ class TypeInferVisitor : public TypeInferBaseVisitor {
 class ShareUTVisitor : public AstVisitor {
  private:
   Module_Handler *mHandler;
-  bool            mTrace;
+  unsigned        mFlags;
   bool            mUpdated;
 
   std::stack<ASTScope *> mScopeStack;
   std::unordered_set<unsigned> ExportedDeclIds;
 
  public:
-  explicit ShareUTVisitor(Module_Handler *h, bool t, bool base = false)
-    : mHandler(h), mTrace(t), AstVisitor(t && base) {}
+  explicit ShareUTVisitor(Module_Handler *h, unsigned f, bool base = false)
+    : mHandler(h), mFlags(f), AstVisitor((f & FLG_trace_1) && base) {}
   ~ShareUTVisitor() = default;
 
   void Push(ASTScope *scope) { mScopeStack.push(scope); }

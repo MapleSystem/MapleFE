@@ -25,7 +25,7 @@ void AST_AST::RemoveDeadBlocks() {
   RemoveUnreachableBB();
 
   ModuleNode *module = mHandler->GetASTModule();
-  if (mTrace) {
+  if (mFlags & FLG_trace_3) {
     for(unsigned i = 0; i < module->GetTreesNum(); i++) {
       TreeNode *it = module->GetTree(i);
       it->Dump(0);
@@ -36,7 +36,7 @@ void AST_AST::RemoveDeadBlocks() {
 
 // this calcuates mNodeId2BbMap
 void AST_AST::CollectReachableBB() {
-  MMSGNOLOC0("============== CollectReachableBB ==============");
+  MSGNOLOC0("============== CollectReachableBB ==============");
   mReachableBbIdx.clear();
   std::deque<CfgBB *> working_list;
 
@@ -88,20 +88,20 @@ void AST_AST::RemoveUnreachableBB() {
     }
   }
   for (auto it: deadBb) {
-    if (mTrace) std::cout << "deleted BB :";
+    if (mFlags & FLG_trace_3) std::cout << "deleted BB :";
     for (int i = 0; i < it->GetSuccessorsNum(); i++) {
       bb = it->GetSuccessorAtIndex(i);
       bb->mPredecessors.Remove(it);
     }
-    if (mTrace) std::cout << " BB" << it->GetId();
+    if (mFlags & FLG_trace_3) std::cout << " BB" << it->GetId();
     it->~CfgBB();
   }
-  if (mTrace) std::cout << std::endl;
+  if (mFlags & FLG_trace_3) std::cout << std::endl;
 }
 
 void AST_AST::AdjustAST() {
-  MMSGNOLOC0("============== AdjustAST ==============");
-  AdjustASTVisitor visitor(mHandler, mTrace, true);
+  MSGNOLOC0("============== AdjustAST ==============");
+  AdjustASTVisitor visitor(mHandler, mFlags, true);
   ModuleNode *module = mHandler->GetASTModule();
   for(unsigned i = 0; i < module->GetTreesNum(); i++) {
     TreeNode *it = module->GetTree(i);

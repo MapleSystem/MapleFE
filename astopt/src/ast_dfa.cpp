@@ -75,7 +75,7 @@ void AST_DFA::DataFlowAnalysis() {
   CollectDefNodes();
   BuildBitVectors();
   BuildDefUseChain();
-  if (mTrace) DumpDefUse();
+  if (mFlags & FLG_trace_3) DumpDefUse();
 }
 
 void AST_DFA::Clear() {
@@ -228,7 +228,7 @@ unsigned AST_DFA::AddDef(TreeNode *node, unsigned &bitnum, unsigned bbid) {
 
 // this calcuates mDefPositionVec
 void AST_DFA::CollectDefNodes() {
-  MMSGNOLOC0("============== CollectDefNodes ==============");
+  MSGNOLOC0("============== CollectDefNodes ==============");
   std::unordered_set<unsigned> done_list;
   std::deque<CfgBB *> working_list;
 
@@ -268,7 +268,7 @@ void AST_DFA::CollectDefNodes() {
 
       // process bb not visited
       if (done_list.find(bbid) == done_list.end()) {
-        if (mTrace) std::cout << "working_list work " << bbid << std::endl;
+        if (mFlags & FLG_trace_3) std::cout << "working_list work " << bbid << std::endl;
         for (int i = 0; i < bb->GetStatementsNum(); i++) {
           TreeNode *stmt = bb->GetStatementAtIndex(i);
           unsigned nid = AddDef(stmt, bitnum, bbid);
@@ -285,11 +285,11 @@ void AST_DFA::CollectDefNodes() {
     }
   }
 
-  if (mTrace) DumpDefPositionVec();
+  if (mFlags & FLG_trace_3) DumpDefPositionVec();
 }
 
 void AST_DFA::BuildBitVectors() {
-  MMSGNOLOC0("============== BuildBitVectors ==============");
+  MSGNOLOC0("============== BuildBitVectors ==============");
   std::unordered_set<unsigned> done_list;
   std::deque<CfgBB *> working_list;
 
@@ -408,15 +408,15 @@ void AST_DFA::BuildBitVectors() {
 
   delete old_bv;
   delete tmp_bv;
-  if (mTrace) DumpAllBVMaps();
+  if (mFlags & FLG_trace_3) DumpAllBVMaps();
 }
 
 void AST_DFA::DumpAllBVMaps() {
-  MMSGNOLOC0("=== mPrsvMap ===");
+  MSGNOLOC0("=== mPrsvMap ===");
   DumpBVMap(mPrsvMap);
-  MMSGNOLOC0("=== mGenMap ===");
+  MSGNOLOC0("=== mGenMap ===");
   DumpBVMap(mGenMap);
-  MMSGNOLOC0("=== mRchInMap ===");
+  MSGNOLOC0("=== mRchInMap ===");
   DumpBVMap(mRchInMap);
 }
 
@@ -444,7 +444,7 @@ void AST_DFA::DumpBV(BitVector *bv) {
 }
 
 void AST_DFA::DumpDefUse() {
-  MMSGNOLOC0("============== Dump DefUse ==============");
+  MSGNOLOC0("============== Dump DefUse ==============");
   for (unsigned i = 0; i < mDefPositionVec.GetNum(); i++) {
     DefPosition pos = mDefPositionVec.ValueAtIndex(i);
     DumpDefPosition(i, pos);
@@ -458,7 +458,7 @@ void AST_DFA::DumpDefUse() {
 }
 
 void AST_DFA::CollectInfo() {
-  MMSGNOLOC0("============== CollectInfo ==============");
+  MSGNOLOC0("============== CollectInfo ==============");
   // process each functions for arguments
   for (auto func: mHandler->mModuleFuncs) {
     // add arguments as def
@@ -481,10 +481,10 @@ void AST_DFA::CollectInfo() {
   }
 
   // loop through each BB and each statement
-  CollectInfoVisitor visitor(mHandler, mTrace, true);
+  CollectInfoVisitor visitor(mHandler, mFlags, true);
   for (auto bbid: mHandler->mBbIdVec) {
     visitor.SetBbId(bbid);
-    if (mTrace) std::cout << " == bbid " << bbid << std::endl;
+    if (mFlags & FLG_trace_3) std::cout << " == bbid " << bbid << std::endl;
     CfgBB *bb = mHandler->mBbId2BbMap[bbid];
     for (int i = 0; i < bb->GetStatementsNum(); i++) {
       TreeNode *stmt = bb->GetStatementAtIndex(i);
@@ -511,8 +511,8 @@ IdentifierNode *CollectInfoVisitor::VisitIdentifierNode(IdentifierNode *node) {
 }
 
 void AST_DFA::BuildDefUseChain() {
-  MMSGNOLOC0("============== BuildDefUseChain ==============");
-  DefUseChainVisitor visitor(mHandler, mTrace, true);
+  MSGNOLOC0("============== BuildDefUseChain ==============");
+  DefUseChainVisitor visitor(mHandler, mFlags, true);
   std::unordered_set<unsigned> defStrIdxs;
   std::unordered_set<unsigned> done_list;
   CfgBB *bb;
@@ -520,7 +520,7 @@ void AST_DFA::BuildDefUseChain() {
   // loop through each variable def
   for (int i = 0; i < mDefPositionVec.GetNum(); i++) {
     DefPosition pos = mDefPositionVec.ValueAtIndex(i);
-    if (mTrace) DumpDefPosition(i, pos);
+    if (mFlags & FLG_trace_3) DumpDefPosition(i, pos);
     std::deque<CfgBB *> working_list;
 
     // def stridx
@@ -602,7 +602,7 @@ void DefUseChainVisitor::VisitBB(unsigned bbid) {
 }
 
 IdentifierNode *DefUseChainVisitor::VisitIdentifierNode(IdentifierNode *node) {
-  if (mTrace) std::cout << "Visiting IdentifierNode, id=" << node->GetNodeId() << "..." << std::endl;
+  if (mFlags & FLG_trace_1) std::cout << "Visiting IdentifierNode, id=" << node->GetNodeId() << "..." << std::endl;
 
   // only deal with use with same stridx of current def
   unsigned stridx = node->GetStrIdx();
@@ -645,7 +645,7 @@ IdentifierNode *DefUseChainVisitor::VisitIdentifierNode(IdentifierNode *node) {
 }
 
 BinOperatorNode *DefUseChainVisitor::VisitBinOperatorNode(BinOperatorNode *node) {
-  if (mTrace) std::cout << "Visiting BinOperatorNode, id=" << node->GetNodeId() << "..." << std::endl;
+  if (mFlags & FLG_trace_1) std::cout << "Visiting BinOperatorNode, id=" << node->GetNodeId() << "..." << std::endl;
 
   BinOperatorNode *bon = static_cast<BinOperatorNode *>(node);
   OprId op = bon->GetOprId();

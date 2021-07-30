@@ -31,11 +31,11 @@ namespace maplefe {
 
 class AST_SCP {
  private:
-  Module_Handler  *mHandler;
-  bool          mTrace;
+  Module_Handler *mHandler;
+  unsigned        mFlags;
 
  public:
-  explicit AST_SCP(Module_Handler *h, bool t) : mHandler(h), mTrace(t) {}
+  explicit AST_SCP(Module_Handler *h, unsigned f) : mHandler(h), mFlags(f) {}
   ~AST_SCP() {};
 
   void BuildScope();
@@ -44,14 +44,14 @@ class AST_SCP {
 
 class BuildScopeBaseVisitor : public AstVisitor {
  private:
-  bool            mTrace;
+  unsigned mFlags;
 
  public:
   std::stack<ASTScope *> mScopeStack;
 
  public:
-  explicit BuildScopeBaseVisitor(bool t, bool base = false)
-    : mTrace(t), AstVisitor(t && base) {}
+  explicit BuildScopeBaseVisitor(unsigned f, bool base = false)
+    : mFlags(f), AstVisitor((f & FLG_trace_1) && base) {}
   ~BuildScopeBaseVisitor() = default;
 
 #undef  NODEKIND
@@ -68,11 +68,11 @@ class BuildScopeVisitor : public BuildScopeBaseVisitor {
  private:
   Module_Handler *mHandler;
   ModuleNode     *mASTModule;
-  bool            mTrace;
+  unsigned        mFlags;
 
  public:
-  explicit BuildScopeVisitor(Module_Handler *h, bool t, bool base = false)
-    : mHandler(h), mTrace(t), BuildScopeBaseVisitor(t, base) {
+  explicit BuildScopeVisitor(Module_Handler *h, unsigned f, bool base = false)
+    : mHandler(h), mFlags(f), BuildScopeBaseVisitor(f, base) {
       mASTModule = mHandler->GetASTModule();
     }
   ~BuildScopeVisitor() = default;
@@ -97,7 +97,7 @@ class RenameVarVisitor : public AstVisitor {
  private:
   Module_Handler *mHandler;
   ModuleNode     *mASTModule;
-  bool            mTrace;
+  unsigned        mFlags;
 
  public:
   unsigned        mPass;
@@ -107,8 +107,8 @@ class RenameVarVisitor : public AstVisitor {
   std::unordered_map<unsigned, std::deque<unsigned>> mStridx2DeclIdMap;
 
  public:
-  explicit RenameVarVisitor(Module_Handler *h, bool t, bool base = false)
-    : mHandler(h), mTrace(t), AstVisitor(t && base) {
+  explicit RenameVarVisitor(Module_Handler *h, unsigned f, bool base = false)
+    : mHandler(h), mFlags(f), AstVisitor((f & FLG_trace_1) && base) {
       mASTModule = mHandler->GetASTModule();
     }
   ~RenameVarVisitor() = default;

@@ -186,8 +186,8 @@ class CfgBuilder : public AstVisitor {
   using TargetBBStack = std::vector<TargetBB>;
 
  private:
-  Module_Handler   *mHandler;
-  bool           mTrace;
+  Module_Handler *mHandler;
+  unsigned        mFlags;
 
   CfgFunc   *mCurrentFunction;
   CfgBB *mCurrentBB;
@@ -197,8 +197,8 @@ class CfgBuilder : public AstVisitor {
   TargetBBStack  mThrowBBs;
 
  public:
-  explicit CfgBuilder(Module_Handler *h, bool trace)
-    : mHandler(h), mTrace(trace), AstVisitor(false) {}
+  explicit CfgBuilder(Module_Handler *h, unsigned f)
+    : mHandler(h), mFlags(f), AstVisitor(false) {}
   ~CfgBuilder() = default;
 
   void Build();

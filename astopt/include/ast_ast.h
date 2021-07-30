@@ -28,11 +28,11 @@ namespace maplefe {
 class AST_AST {
  private:
   Module_Handler  *mHandler;
-  bool          mTrace;
+  unsigned         mFlags;
   std::unordered_set<unsigned> mReachableBbIdx;;
 
  public:
-  explicit AST_AST(Module_Handler *h, bool t) : mHandler(h), mTrace(t) {}
+  explicit AST_AST(Module_Handler *h, unsigned f) : mHandler(h), mFlags(f) {}
   ~AST_AST() {}
 
   void AdjustAST();
@@ -44,15 +44,15 @@ class AST_AST {
 
 class AdjustASTVisitor : public AstVisitor {
  private:
-  Module_Handler  *mHandler;
-  bool          mTrace;
-  bool          mUpdated;
+  Module_Handler *mHandler;
+  unsigned       mFlags;
+  bool           mUpdated;
 
   CfgBB *mCurrentBB;
 
  public:
-  explicit AdjustASTVisitor(Module_Handler *h, bool t, bool base = false)
-    : mHandler(h), mTrace(t), AstVisitor(t && base) {}
+  explicit AdjustASTVisitor(Module_Handler *h, unsigned f, bool base = false)
+    : mHandler(h), mFlags(f), AstVisitor((f & FLG_trace_1) && base) {}
   ~AdjustASTVisitor() = default;
 
   TreeNode *CreateTypeNodeFromName(IdentifierNode *node);

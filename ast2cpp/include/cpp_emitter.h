@@ -23,9 +23,10 @@ namespace maplefe {
 class CppEmitter {
 private:
   AST_Handler *mASTHandler;
+  unsigned     mFlags;
 
 public:
-  CppEmitter(AST_Handler *h) : mASTHandler(h) {}
+  CppEmitter(AST_Handler *h, unsigned f) : mASTHandler(h), mFlags(f) {}
   bool EmitCxxFiles();
 };
 

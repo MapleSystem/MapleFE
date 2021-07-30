@@ -26,11 +26,23 @@
 #include "ast_type.h"
 #include "gen_astvisitor.h"
 
-#define NOTYETIMPL(M) { if (mTrace) { MNYI(M);        }}
-#define MSGNOLOC0(M)  { if (mTrace) { MMSGNOLOC0(M);  }}
-#define MSGNOLOC(M,v) { if (mTrace) { MMSGNOLOC(M,v); }}
-
 namespace maplefe {
+
+#define NOTYETIMPL(M) { if (mFlags & FLG_trace) { MNYI(M);        }}
+#define MSGNOLOC0(M)  { if (mFlags & FLG_trace) { MMSGNOLOC0(M);  }}
+#define MSGNOLOC(M,v) { if (mFlags & FLG_trace) { MMSGNOLOC(M,v); }}
+
+enum AST_Flags {
+  FLG_trace_1      = 0x00000001,
+  FLG_trace_2      = 0x00000002,
+  FLG_trace_3      = 0x00000004,
+  FLG_trace_4      = 0x00000008,
+  FLG_trace        = 0x0000000f,
+
+  FLG_emit_ts      = 0x00000010,
+  FLG_emit_ts_only = 0x00000020,
+  FLG_format_cpp   = 0x00000040,
+};
 
 class CfgBB;
 class CfgFunc;
@@ -51,7 +63,7 @@ class Module_Handler {
   AST_SCP      *mSCP;
   TypeInfer    *mTI;
   const char   *mOutputFileName;
-  bool          mTrace;
+  unsigned      mFlags;
   std::unordered_map<unsigned, CfgBB *> mNodeId2BbMap;
 
  public:
@@ -67,13 +79,13 @@ class Module_Handler {
   std::unordered_map<unsigned, TypeId> mArrayDeclId2EleTypeIdMap;
 
  public:
-  explicit Module_Handler(bool trace) :
+  explicit Module_Handler(unsigned f) :
     mCfgFunc(nullptr),
     mAST(nullptr),
     mDFA(nullptr),
     mSCP(nullptr),
     mTI(nullptr),
-    mTrace(trace) {}
+    mFlags(f) {}
   ~Module_Handler();
 
   void AdjustAST();
@@ -104,7 +116,7 @@ class Module_Handler {
   void SetBbFromBbId(unsigned id, CfgBB *bb) { mBbId2BbMap[id] = bb; }
   CfgBB *GetBbFromBbId(unsigned id)          { return mBbId2BbMap[id]; }
 
-  bool GetTrace() {return mTrace;}
+  unsigned GetFlags() {return mFlags;}
   AST_AST *GetAST() {return mAST;}
   AST_DFA *GetDFA() {return mDFA;}
   AST_SCP *GetSCP() {return mSCP;}
@@ -125,13 +137,13 @@ class Module_Handler {
 
 class AST_Handler {
  private:
-  MemPool mMemPool;    // Memory pool for all CfgFunc, CfgBB, etc.
-  bool    mTrace;
+  MemPool  mMemPool;    // Memory pool for all CfgFunc, CfgBB, etc.
+  unsigned mFlags;
  public:
   // vector of all AST modules
   SmallVector<Module_Handler *> mModuleHandlers;
 
-  explicit AST_Handler(bool trace) : mTrace(trace) {}
+  explicit AST_Handler(unsigned f) : mFlags(f) {}
   ~AST_Handler() {mMemPool.Release();}
 
   MemPool *GetMemPool() {return &mMemPool;}
