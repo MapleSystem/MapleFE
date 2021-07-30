@@ -361,6 +361,11 @@ std::string Emitter::EmitDeclareNode(DeclareNode *node) {
 std::string Emitter::EmitExportNode(ExportNode *node) {
   if (node == nullptr)
     return std::string();
+  std::string deco;
+  for (unsigned i = 0; i < node->GetAnnotationsNum(); ++i)
+    if (auto n = node->GetAnnotationAtIndex(i))
+      deco += "@"s + EmitTreeNode(n) + "\n"s;
+
   std::string str;
   auto num = node->GetPairsNum();
   for (unsigned i = 0; i < node->GetPairsNum(); ++i) {
@@ -372,7 +377,7 @@ std::string Emitter::EmitExportNode(ExportNode *node) {
   if (auto n = node->GetTarget()) {
     str += " from "s + EmitTreeNode(n);
   }
-  str = str.empty() ? "export {}"s : "export "s + str;
+  str = deco + (str.empty() ? "export {}"s : "export "s + str);
 
   mPrecedence = '\030';
   if (node->IsStmt())
