@@ -522,16 +522,7 @@ BinOperatorNode *TypeInferVisitor::VisitBinOperatorNode(BinOperatorNode *node) {
     case OPR_Add:
     case OPR_Sub:
     case OPR_Mul:
-    case OPR_Div:
-    case OPR_Mod:
-    case OPR_Band:
-    case OPR_Bor:
-    case OPR_Bxor:
-    case OPR_Shl:
-    case OPR_Shr:
-    case OPR_Zext:
-    case OPR_Land:
-    case OPR_Lor: {
+    case OPR_Div: {
       if (tia != TY_None && tib == TY_None) {
         UpdateTypeId(tb, tia);
         mod = tb;
@@ -541,6 +532,31 @@ BinOperatorNode *TypeInferVisitor::VisitBinOperatorNode(BinOperatorNode *node) {
       }
       TypeId ti = MergeTypeId(tia, tib);
       UpdateTypeId(node, ti);
+      break;
+    }
+    case OPR_Mod:
+    case OPR_Band:
+    case OPR_Bor:
+    case OPR_Bxor:
+    case OPR_Shl:
+    case OPR_Shr:
+    case OPR_Zext: {
+      ta->SetTypeId(TY_Int);
+      tb->SetTypeId(TY_Int);
+      node->SetTypeId(TY_Int);
+      break;
+    }
+    case OPR_Land:
+    case OPR_Lor: {
+      ta->SetTypeId(TY_Boolean);
+      tb->SetTypeId(TY_Boolean);
+      node->SetTypeId(TY_Boolean);
+      break;
+    }
+    case OPR_Exp: {
+      if (tia == TY_Int && tib == TY_Int) {
+        node->SetTypeId(TY_Int);
+      }
       break;
     }
     default: {
