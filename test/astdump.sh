@@ -62,8 +62,8 @@ for ts in $LIST; do
   if [ $? -ne 0 ]; then
     Failed="$Failed $ts"
   else
-    echo "$AST2CPP" "$ts".ast --trace=2 $TREEDIFF
-    out=$("$AST2CPP" "$ts".ast --trace=2 $TREEDIFF 2>&1)
+    echo "$AST2CPP" "$ts".ast --emit-ts $TREEDIFF
+    out=$("$AST2CPP" "$ts".ast --emit-ts $TREEDIFF 2>&1)
     [ $? -eq 0 ] || Failed="$Failed $ts"
   fi
   echo "$out"
