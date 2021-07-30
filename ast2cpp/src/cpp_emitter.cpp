@@ -32,8 +32,8 @@ bool CppEmitter::EmitCxxFiles() {
       std::ofstream out(fn.c_str(), std::ofstream::out);
       out << decl_code;
       out.close();
-      std::string cmd = "clang-format-10 -i --sort-includes=0 "s + fn;
-      std::system(cmd.c_str());
+      //std::string cmd = "clang-format-10 -i --sort-includes=0 "s + fn;
+      //std::system(cmd.c_str());
     }
     { // Emit C++ implementation file
       CppDef def(handler, decl);
@@ -42,8 +42,8 @@ bool CppEmitter::EmitCxxFiles() {
       std::ofstream out(fn.c_str(), std::ofstream::out);
       out << def_code;
       out.close();
-      std::string cmd = "clang-format-10 -i --sort-includes=0 "s + fn;
-      std::system(cmd.c_str());
+      //std::string cmd = "clang-format-10 -i --sort-includes=0 "s + fn;
+      //std::system(cmd.c_str());
     }
   }
   return true;

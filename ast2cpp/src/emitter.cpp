@@ -296,6 +296,7 @@ std::string Emitter::EmitComputedNameNode(ComputedNameNode *node) {
     str += EmitTreeNode(n);
   }
   str += "] "s;
+  str = HandleTreeNode(str, node);
   if (auto n = node->GetExtendType()) {
     str += ": "s + EmitTreeNode(n);
   }
@@ -1585,7 +1586,7 @@ std::string Emitter::EmitLambdaNode(LambdaNode *node) {
     }
   }
 
-  mPrecedence = '\030';
+  mPrecedence = '\023';
   if (node->IsStmt())
     str += ";\n"s;
   return HandleTreeNode(str, node);
