@@ -373,8 +373,9 @@ rule MemberExpression : ONEOF(
   attr.action.%12: BuildField(%1, %3)
   attr.action.%12: SetIsConst()
 
-rule IsExpression: PrimaryExpression + "is" + Type
-  attr.action : BuildIs(%1, %3)
+rule IsExpression: ONEOF(PrimaryExpression + "is" + Type,
+                         ArrowFunction + "is" + Type)
+  attr.action.%1,%2 : BuildIs(%1, %3)
 
 rule AssertExpression : "asserts" + MemberExpression
   attr.action : BuildAssert(%2)
@@ -1580,7 +1581,8 @@ rule Type : ONEOF(UnionOrIntersectionOrPrimaryType,
                   TypeArray,
                   MemberExpression + '[' + KeyOf + ']',
                   PrimaryType + '[' + KeyOf + ']',
-                  InferType)
+                  InferType,
+                  IsExpression)
   attr.action.%7,%8 : BuildArrayElement(%1, %3)
 
 #rule UnionOrIntersectionOrPrimaryType: ONEOF(UnionType,

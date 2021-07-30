@@ -1,0 +1,5 @@
+Matched 36 tokens.
+============= Module ===========
+== Sub Tree ==
+ts_interface: Foo<T,> {func  func<T>(callback,thisArg?)  throws: 
+ }

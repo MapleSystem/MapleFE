@@ -1,5 +1,5 @@
 Matched 25 tokens.
 ============= Module ===========
 == Sub Tree ==
-export {declare func  isPromise<T>(obj) : obj is Promise<T>  throws: 
+export {declare func  isPromise<T>(obj)  throws: 
 } 
