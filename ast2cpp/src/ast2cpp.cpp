@@ -60,7 +60,7 @@ void A2C::ProcessAST() {
     Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
     ModuleNode *module = handler->GetASTModule();
 
-    if (mFlags & FLG_trace) {
+    if (mFlags & FLG_trace_1) {
       std::cout << "============= in ProcessAST ===========" << std::endl;
       std::cout << "srcLang : " << module->GetSrcLangString() << std::endl;
 

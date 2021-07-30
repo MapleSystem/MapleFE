@@ -29,8 +29,8 @@
 namespace maplefe {
 
 #define NOTYETIMPL(M) { if (mFlags & FLG_trace) { MNYI(M);        }}
-#define MSGNOLOC0(M)  { if (mFlags & FLG_trace) { MMSGNOLOC0(M);  }}
-#define MSGNOLOC(M,v) { if (mFlags & FLG_trace) { MMSGNOLOC(M,v); }}
+#define MSGNOLOC0(M)  { if (mFlags & FLG_trace_3) { MMSGNOLOC0(M);  }}
+#define MSGNOLOC(M,v) { if (mFlags & FLG_trace_3) { MMSGNOLOC(M,v); }}
 
 enum AST_Flags {
   FLG_trace_1      = 0x00000001,

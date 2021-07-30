@@ -31,7 +31,7 @@ void AstOpt::ProcessAST(unsigned flags) {
     ModuleNode *module = handler->GetASTModule();
 
     mFlags = flags;
-    if (mFlags & FLG_trace) {
+    if (mFlags & FLG_trace_3) {
       std::cout << "============= in ProcessAST ===========" << std::endl;
       std::cout << "srcLang : " << module->GetSrcLangString() << std::endl;
 
