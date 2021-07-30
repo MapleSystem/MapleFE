@@ -99,7 +99,6 @@ for ts in $LIST; do
         $AST2CPP $T.ast $TREEDIFF | sed -n '/^AstDump:/,$p' | sed -e "s|$T|$ts.tmp.ts|" \
           -e 's/\(mStrIdx: unsigned int, \)[0-9]* =>/\1=>/'
       fi > $ts.gen
-      echo --- "$ts"; cat "$ts"
       diff $ts.orig $ts.gen
       if [ $? -eq 0 -a -s $ts.orig -a -s $ts.gen ]; then
         echo Passed with $ts
@@ -108,6 +107,9 @@ for ts in $LIST; do
         echo Failed to compare with the AST of $ts
         Failed="$Failed (ast)$ts"
       fi
+      echo === "$T"; cat "$T"
+      echo --- "$ts"; cat "$ts"
+      echo ===
       if [ -n "$DOT" ]; then
         for tf in $ts.tmp.ts $T; do
           echo "=== $tf"
