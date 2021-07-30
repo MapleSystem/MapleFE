@@ -79,6 +79,7 @@ rule KeywordIdentifier : ONEOF("get",
                                "debugger",
                                "default",
                                "namespace",
+                               "module",
                                "extends",
                                "switch",
                                "infer",
@@ -2128,5 +2129,53 @@ rule ExternalDeclaration : ONEOF("declare" + NamespaceDeclaration,
                                  "declare" + FunctionDeclaration,
                                  "declare" + VariableStatement,
                                  "declare" + TypeAliasDeclaration,
-                                 "declare" + EnumDeclaration)
-  attr.action.%1,%2,%3,%4,%5,%6,%7 : BuildExternalDeclaration(%2)
+                                 "declare" + EnumDeclaration,
+                                 "declare" + ExternalModuleDeclaration)
+  attr.action.%1,%2,%3,%4,%5,%6,%7,%8 : BuildExternalDeclaration(%2)
+
+#################################################################################################
+#                                 A.9 Scripts and Modules
+#################################################################################################
+
+# The module name could be an identifier or string literal.
+rule ExternalModuleDeclaration : "module" + PrimaryExpression + '{' + DeclarationModule + '}'
+
+#DeclarationElement: InterfaceDeclaration TypeAliasDeclaration NamespaceDeclaration AmbientDeclaration ImportAliasDeclaration
+rule DeclarationElement: ONEOF(InterfaceDeclaration,
+                               TypeAliasDeclaration,
+                               NamespaceDeclaration,
+                               AmbientDeclaration,
+                               ImportAliasDeclaration)
+
+# ImplementationModule: ImplementationModuleElementsopt
+# ImplementationModuleElements: ImplementationModuleElement ImplementationModuleElements ImplementationModuleElement
+# ImplementationModuleElement: ImplementationElement ImportDeclaration ImportAliasDeclaration ImportRequireDeclaration ExportImplementationElement ExportDefaultImplementationElement ExportListDeclaration ExportAssignment
+
+# DeclarationModule: DeclarationModuleElementsopt
+rule DeclarationModule: ZEROORONE(DeclarationModuleElements)
+
+# DeclarationModuleElements: DeclarationModuleElement DeclarationModuleElements DeclarationModuleElement
+rule DeclarationModuleElements: ONEOF(DeclarationModuleElement,
+                                      DeclarationModuleElements + DeclarationModuleElement)
+
+# DeclarationModuleElement: DeclarationElement ImportDeclaration ImportAliasDeclaration ExportDeclarationElement ExportDefaultDeclarationElement ExportListDeclaration ExportAssignment
+rule DeclarationModuleElement: ONEOF(DeclarationElement,
+                                     ImportDeclaration,
+                                     ImportAliasDeclaration,
+                                     ExportDeclaration)
+                                     #ExportDefaultDeclarationElement,
+                                     #ExportListDeclaration,
+                                     #ExportAssignment)
+
+#################################################################################################
+#                                 A.10 Ambient
+# NOTE : I changed the rules a lot, making it quite different than v1.8 spec.
+#################################################################################################
+
+# AmbientDeclaration: declare AmbientVariableDeclaration declare AmbientFunctionDeclaration declare AmbientClassDeclaration declare AmbientEnumDeclaration declare AmbientNamespaceDeclaration
+rule AmbientDeclaration: ONEOF(ZEROORONE("declare") + VariableDeclaration,
+                               ZEROORONE("declare") + FunctionDeclaration,
+                               ZEROORONE("declare") + ClassDeclaration,
+                               ZEROORONE("declare") + EnumDeclaration,
+                               ZEROORONE("declare") + NamespaceDeclaration)
+  attr.action.%1,%2,%3,%4,%5 : BuildExternalDeclaration(%2)

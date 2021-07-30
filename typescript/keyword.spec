@@ -36,6 +36,7 @@ STRUCT KeyWord : ((boolean),
                   (from),
                   (constructor),
                   (namespace),
+                  (module),
                   (declare),
 
                   (break),
