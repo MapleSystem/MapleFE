@@ -125,6 +125,11 @@ std::string Emitter::EmitIdentifierNode(IdentifierNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
+
+  for (unsigned i = 0; i < node->GetAnnotationsNum(); ++i)
+    if (auto n = node->GetAnnotationAtIndex(i))
+      str += "@"s + EmitTreeNode(n) + "\n"s;
+
   for (unsigned i = 0; i < node->GetAttrsNum(); ++i) {
     str += GetEnumAttrId(node->GetAttrAtIndex(i));
   }
