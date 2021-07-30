@@ -240,10 +240,13 @@ std::string Emitter::EmitFunctionNode(FunctionNode *node) {
 std::string Emitter::EmitUserTypeNode(UserTypeNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str;
   auto prec = '\030';;
+  std::string str;
+  for (unsigned i = 0; i < node->GetAttrsNum(); ++i) {
+    str += GetEnumAttrId(node->GetAttrAtIndex(i));
+  }
   if (auto n = node->GetId()) {
-    str = EmitTreeNode(n);
+    str += EmitTreeNode(n);
     prec = mPrecedence;
     auto num = node->GetTypeGenericsNum();
     if(num) {
