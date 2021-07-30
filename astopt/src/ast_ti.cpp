@@ -104,6 +104,7 @@ TypeId TypeInferVisitor::MergeTypeId(TypeId tia, TypeId tib) {
     case TY_Object:
     case TY_User:        result = tia;       break;
 
+    case TY_Merge:
     case TY_Undefined:
     case TY_String:
     case TY_Function:
