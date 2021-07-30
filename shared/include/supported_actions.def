@@ -29,6 +29,7 @@
 //          Please refer autogen/README.ACTIONS for details.
 
 ACTION(BuildModule)
+ACTION(AddModuleBody)
 
 ACTION(BuildPackageName)
 

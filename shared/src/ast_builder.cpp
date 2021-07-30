@@ -226,6 +226,23 @@ TreeNode* ASTBuilder::BuildModule() {
   return mLastTreeNode;
 }
 
+// Takes one parameter which is the tree of module body.
+TreeNode* ASTBuilder::AddModuleBody() {
+  if (mTrace)
+    std::cout << "In AddModuleBody" << std::endl;
+
+  Param p_body = mParams[0];
+  if (!p_body.mIsTreeNode)
+    MERROR("The module body is not a tree node.");
+  TreeNode *tn = p_body.mData.mTreeNode;
+
+  MASSERT(mLastTreeNode->IsModule());
+  ModuleNode *mod = (ModuleNode*)mLastTreeNode;
+  mod->AddTree(tn);
+
+  return mLastTreeNode;
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////
 //                          BuildIdentifier
 ////////////////////////////////////////////////////////////////////////////////////////
