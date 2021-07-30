@@ -343,6 +343,9 @@ std::string Emitter::EmitDeclareNode(DeclareNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
+  for (unsigned i = 0; i < node->GetAttrsNum(); ++i) {
+    str += GetEnumAttrId(node->GetAttrAtIndex(i));
+  }
   if (auto n = node->GetDecl()) {
     std::string s = EmitTreeNode(n);
     if (s.substr(0, 9) == "function ")
@@ -1468,6 +1471,14 @@ std::string Emitter::EmitClassNode(ClassNode *node) {
       str += EmitTreeNode(n);
   }
   str += " {\n"s;
+
+  for (unsigned i = 0; i < node->GetDeclaresNum(); ++i) {
+    if (auto n = node->GetDeclare(i)) {
+      std::string s = EmitTreeNode(n);
+      Replace(s, " var ", " "); // TODO: JS_Var for field
+      str += s + ";\n"s;
+    }
+  }
 
   for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
     if (auto n = node->GetField(i)) {
