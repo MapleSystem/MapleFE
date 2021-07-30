@@ -308,10 +308,12 @@ std::string CppDef::EmitDeclNode(DeclNode *node) {
     else if (node->GetTypeId() == TY_Class)
       str += name + "= &"s + n->GetName() + "_ctor"s;
     else if(n->GetKind() == NK_ArrayLiteral)
-      str += name + ".clear();\n"s + str + ".insert("s + str + ".end(), "s
+      str += name + ".clear();\n"s + name + ".insert("s + name + ".end(), "s
         + EmitTreeNode(n) + ")"s;
     else
       str += name + " = "s + EmitTreeNode(n);
+  } else {
+    str = name;
   }
   str += ";\n"s;
   return str;
