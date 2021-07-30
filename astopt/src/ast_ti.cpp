@@ -480,6 +480,7 @@ BinOperatorNode *TypeInferVisitor::VisitBinOperatorNode(BinOperatorNode *node) {
   TypeId tia = ta->GetTypeId();
   TypeId tib = tb->GetTypeId();
   switch (op) {
+    case OPR_StEq:
     case OPR_EQ:
     case OPR_NE:
     case OPR_GT:
@@ -559,6 +560,8 @@ BinOperatorNode *TypeInferVisitor::VisitBinOperatorNode(BinOperatorNode *node) {
       }
       break;
     }
+    case OPR_NullCoalesce:
+      break;
     default: {
       NOTYETIMPL("VisitBinOperatorNode()");
       break;
