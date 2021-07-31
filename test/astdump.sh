@@ -44,6 +44,7 @@ done
 if [ -n "$CLEAN" ]; then
   echo Cleaning up generated files...
   find -maxdepth 1 -regex '.*\.ts-[0-9]+\.out.[ctj][ps]p*\|.*\.ts-[0-9]+\.[pd][no][gt]\|.*\.ts.[ca][ps][pt]' -exec rm '{}' \;
+  rm -rf *.ts.orig *.ts.gen *.ts.tmp.ts
   echo Done.
 fi
 [ -n "$LIST" ] || { echo Please specify one or more TypeScript files.; usage; }
@@ -117,7 +118,7 @@ for ts in $LIST; do
           out="$out"$'\n'"$(ts2ast $tf --dump-dot)"
         done
       fi
-      rm -f "$T" $ts.orig $ts.gen $ts.tmp.ts
+      [ -n "$KEEP" ] || rm -f "$T" $ts.orig $ts.gen $ts.tmp.ts
     fi
   fi
   if [ -n "$DOT" ]; then
