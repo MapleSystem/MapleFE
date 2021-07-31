@@ -1,6 +1,6 @@
 function func(name: string) {
-    return Function('target',
+    return Function("target",
         `${'try {\n'
-        + '  target.'}${name}();\n`
+        + "  target."}${name}();\n`
         + `}`);
 }
