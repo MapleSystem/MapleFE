@@ -727,7 +727,10 @@ std::string Emitter::EmitArrayElementNode(ArrayElementNode *node) {
   std::string str;
   if (auto n = node->GetArray()) {
     str = EmitTreeNode(n);
+    if(mPrecedence < '\024')
+      str = "("s + str + ")"s;
   }
+
 
   for (unsigned i = 0; i < node->GetExprsNum(); ++i) {
     if (auto n = node->GetExprAtIndex(i)) {
