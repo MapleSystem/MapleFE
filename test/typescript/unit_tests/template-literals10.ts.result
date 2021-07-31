@@ -10,4 +10,4 @@ js_var Decl: flag=false
 == Sub Tree ==
 js_var Decl: a=".x"
 == Sub Tree ==
-console.log( template-literal: NULL, template-literal: "if(typeof ",flag ? "(prop)" : "prop","!=="object"){",NULL Add o,NULL,a,"=prop;",NULL Add  template-literal: "}",NULL)
+console.log( template-literal: NULL, template-literal: "if(typeof ",flag ? "(prop)" : "prop","!=="object"){",NULL Add "o",NULL,a,"=prop;",NULL Add  template-literal: "}",NULL)
