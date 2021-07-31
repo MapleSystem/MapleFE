@@ -1584,7 +1584,8 @@ std::string Emitter::EmitLambdaNode(LambdaNode *node) {
     if (auto t = node->GetType()) {
       str += ": "s + EmitTreeNode(t);
     }
-    str += " => "s + EmitTreeNode(n);
+    std::string s = EmitTreeNode(n);
+    str += " => "s + Clean(s);
   }
   else {
     if (auto t = node->GetType()) {

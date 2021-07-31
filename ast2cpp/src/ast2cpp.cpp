@@ -39,6 +39,9 @@ void A2C::EmitTS() {
     std::cout << "============= AstDump ===========" << std::endl;
     AstDump astdump(module);
     astdump.Dump("After BuildCFG()", &std::cout);
+    std::cout << "============= AstGraph ===========" << std::endl;
+    AstGraph graph(module);
+    graph.DumpGraph("After BuildCFG()", &std::cout);
     std::cout << "============= Emitter ===========" << std::endl;
     maplefe::Emitter emitter(module);
     std::string code = emitter.Emit("Convert AST to TypeScript code");
