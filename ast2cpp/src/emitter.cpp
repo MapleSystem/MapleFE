@@ -918,9 +918,17 @@ std::string Emitter::EmitFieldLiteralNode(FieldLiteralNode *node) {
   std::string str;
   auto lit = node->GetLiteral();
   if (auto n = node->GetFieldName()) {
-    str = EmitTreeNode(n);
-    if(lit)
-      str += ": "s;
+    if(lit && lit->GetKind() == NK_Function &&
+        static_cast<FunctionNode *>(lit)->GetFuncName() == n) {
+      str = EmitTreeNode(lit);
+      if (str.substr(0, 9) == "function ")
+        Replace(str, "function ", "");
+      lit = nullptr;
+    } else {
+      str = EmitTreeNode(n);
+      if(lit)
+        str += ": "s;
+    }
   }
   if(lit) {
     auto s = EmitTreeNode(lit);
