@@ -33,16 +33,16 @@ void A2C::EmitTS() {
     handler->BuildCFG();
   }
 
-  std::cout << "============= Emitter ===========" << std::endl;
   for (int i = 0; i < size; i++) {
     Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
     ModuleNode *module = handler->GetASTModule();
-    maplefe::Emitter emitter(module);
-    std::string code = emitter.Emit("Convert AST to TypeScript code");
-    std::cout << code;
     std::cout << "============= AstDump ===========" << std::endl;
     AstDump astdump(module);
     astdump.Dump("After BuildCFG()", &std::cout);
+    std::cout << "============= Emitter ===========" << std::endl;
+    maplefe::Emitter emitter(module);
+    std::string code = emitter.Emit("Convert AST to TypeScript code");
+    std::cout << code;
   }
 }
 
