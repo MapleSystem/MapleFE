@@ -861,7 +861,11 @@ void CfgBuilder::Build() {
         Visit(static_cast<FunctionNode*>(node)->GetBody());;
         break;
       case NK_Lambda:
-        Visit(static_cast<LambdaNode*>(node)->GetBody());;
+        {
+          auto n = static_cast<LambdaNode*>(node)->GetBody();
+          if(n->GetKind() == NK_Block)
+            Visit(n);
+        }
         break;
       default:
         Visit(node);

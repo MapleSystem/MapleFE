@@ -1585,7 +1585,10 @@ std::string Emitter::EmitLambdaNode(LambdaNode *node) {
       str += ": "s + EmitTreeNode(t);
     }
     std::string s = EmitTreeNode(n);
-    str += " => "s + Clean(s);
+    s = Clean(s);
+    if (n->GetKind() == NK_StructLiteral)
+      s = "("s + s + ")"s;
+    str += " => "s + s;
   }
   else {
     if (auto t = node->GetType()) {
