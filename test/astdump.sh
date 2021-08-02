@@ -112,7 +112,7 @@ for ts in $LIST; do
         $AST2CPP $ts.tmp.ts.ast $TREEDIFF | sed -n '/^AstDump:/,/^}/p' | sed -e 's/LT_CharacterLiteral/LT_StringLiteral/' \
           -e 's/\(mStrIdx: unsigned int, \)[0-9]* =>/\1=>/'
       fi > $ts.orig
-      ts2ast $T
+      $TS2AST $T
       if [ $? -eq 0 ]; then
         $AST2CPP $T.ast $TREEDIFF | sed -n '/^AstDump:/,/^}/p' | sed -e "s|$T|$ts.tmp.ts|" \
           -e 's/\(mStrIdx: unsigned int, \)[0-9]* =>/\1=>/'
@@ -122,7 +122,7 @@ for ts in $LIST; do
         Passed="$Passed $ts"
         echo "MSG: Passed with $ts"
       else
-        echo "MSG: Failed with --treediff for (ast)$ts"
+        echo "MSG: Failed with --treediff for (diff-ast)$ts"
       fi
       echo === "$T"; cat "$T"
       echo --- "$ts"; cat "$ts"
@@ -131,7 +131,7 @@ for ts in $LIST; do
         for tf in $ts.tmp.ts $T; do
           echo "=== $tf"
           cat $tf
-          out="$out"$'\n'"$(ts2ast $tf --dump-dot)"
+          out="$out"$'\n'"$($TS2AST $tf --dump-dot)"
         done
       fi
       [ -n "$KEEP" ] || rm -f "$T" $ts.orig $ts.gen $ts.tmp.ts
