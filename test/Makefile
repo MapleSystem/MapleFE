@@ -22,7 +22,7 @@ ifeq ($(SRCLANG),java)
   FLAGS := --trace-a2m
 else ifeq ($(SRCLANG),typescript)
   FLAGS1 := --trace-lexer
-  FLAGS2 := --trace=3
+  FLAGS2 := --trace=3 --format-cpp
 endif
 
 DIRS := . $(shell find $(SRCLANG) -type d)
