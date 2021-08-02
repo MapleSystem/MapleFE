@@ -1557,8 +1557,9 @@ rule ConditionalType : MemberExpression + "extends" + Type + '?' + Type + ':' + 
   attr.action : BuildConditionalType(%1, %3, %5, %7)
 
 rule KeyOf : ONEOF("keyof" + Identifier,
-                   "keyof" + '(' + TypeQuery + ')')
-  attr.action.%1 : BuildKeyOf(%2)
+                   "keyof" + '(' + TypeQuery + ')',
+                   "keyof" + TypeQuery)
+  attr.action.%1,%3 : BuildKeyOf(%2)
   attr.action.%2 : BuildKeyOf(%3)
 
 rule InferType : "infer" + Identifier

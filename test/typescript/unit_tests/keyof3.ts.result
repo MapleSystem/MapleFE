@@ -1,0 +1,24 @@
+Matched 12 tokens.
+Matched 23 tokens.
+Matched 32 tokens.
+Matched 42 tokens.
+Matched 49 tokens.
+============= Module ===========
+== Sub Tree ==
+class  Klass
+  Fields: 
+    number
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+js_var Decl: o= {abc:10}
+== Sub Tree ==
+js_var Decl: x="abc"
+== Sub Tree ==
+console.log(o[x])
+== Sub Tree ==
+o[x] Assign 3
