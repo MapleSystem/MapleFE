@@ -1,0 +1,10 @@
+Matched 26 tokens.
+Matched 35 tokens.
+============= Module ===========
+== Sub Tree ==
+func  func()  throws: 
+  js_const Decl: res= {pos:[0.5,-0.5,0]}
+  return res
+
+== Sub Tree ==
+console.log(func())
