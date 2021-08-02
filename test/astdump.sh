@@ -78,11 +78,11 @@ for ts in $LIST; do
   echo "$TS2AST" "$ts"
   out=$("$TS2AST" "$ts")
   if [ $? -ne 0 ]; then
-    echo "MSG: Failed with ts2ast for (ts2ast)$ts"
+    echo "MSG: Failed, test case (ts2ast)$ts"
   else
     echo "$AST2CPP" "$ts".ast --trace=2 --emit-ts $TREEDIFF
     out=$("$AST2CPP" "$ts".ast --trace=2 --emit-ts $TREEDIFF 2>&1)
-    [ $? -eq 0 ] || echo "MSG: Failed with ast2cpp for (ast2cpp)$ts"
+    [ $? -eq 0 ] || echo "MSG: Failed, test case (ast2cpp)$ts"
   fi
   echo "$out"
   cmd=$(grep -n -e "^// .Beginning of Emitter:" -e "// End of Emitter.$" <<< "$out" |
@@ -97,12 +97,12 @@ for ts in $LIST; do
     eval tsc -t es6 --lib es2015,es2017,dom -m commonjs --experimentalDecorators "$T" $TSCERR
     # --strict  --downlevelIteration --esModuleInterop --noImplicitAny --isolatedModules "$T" $TSCERR
     if [ $? -ne 0 ]; then
-      E="tsc"
+      E="tsc-failed"
       grep -qm1 "PassNode *{" <<< "$out" && E="$E,PassNode"
-      echo "MSG: Failed with tsc for ($E)$ts"
+      echo "MSG: Failed, test case ($E)$ts"
       [ -n "$KEEP" ] || rm -f "$T"
     elif [ -z $TREEDIFF ]; then
-      echo "MSG: Passed with $ts"
+      echo "MSG: Passed, test case $ts"
       Passed="$Passed $ts"
       rm -f "$T"
     else
@@ -120,9 +120,9 @@ for ts in $LIST; do
       diff $ts.orig $ts.gen
       if [ $? -eq 0 -a -s $ts.orig -a -s $ts.gen ]; then
         Passed="$Passed $ts"
-        echo "MSG: Passed with $ts"
+        echo "MSG: Passed, test case $ts"
       else
-        echo "MSG: Failed with --treediff for (diff-ast)$ts"
+        echo "MSG: Failed, test case (diff-ast)$ts"
       fi
       echo === "$T"; cat "$T"
       echo --- "$ts"; cat "$ts"
@@ -156,13 +156,19 @@ for ts in $LIST; do
 done
 wait
 
+TC=$(ls *.$PROCID-dump.out)
+[ -n "$TC" ] || exit 1
 echo
 echo "Test case(s) passed:"
-grep "MSG: Passed with " *.$PROCID-dump.out | sed 's/.*MSG: Passed with //' | env LC_ALL=C sort | nl
-echo
-grep -q "MSG: Failed with " *.$PROCID-dump.out
+grep "^MSG: Passed, test case " $TC | sed 's/.*MSG: Passed, test case //' | env LC_ALL=C sort | nl
+grep -q -m1 "^MSG: Failed, test case " $TC
 if [ $? -eq 0 ]; then
+  echo
   echo "Test case(s) failed:"
-  grep "MSG: Failed with " *.$PROCID-dump.out | sed 's/.*MSG: Failed with [^ ]* for //' | env LC_ALL=C sort | nl
+  grep "^MSG: Failed," $TC | sed 's/.*MSG: Failed, test case //' | env LC_ALL=C sort | nl
+  echo
+  echo Total: $(grep "^MSG: [PF]a[si][sl]ed," $TC | wc -l), Passed: $(grep "^MSG: Passed," $TC | wc -l), Failed: $(grep "^MSG: Failed," $TC | wc -l)
+  grep "^MSG: Failed," $TC | sed 's/.*MSG: Failed, test case (\([^)]*\).*/due to \1/' | sort | uniq -c
+  echo
   exit 1
 fi
