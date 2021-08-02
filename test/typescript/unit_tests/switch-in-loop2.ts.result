@@ -1,0 +1,14 @@
+Matched 55 tokens.
+Matched 64 tokens.
+============= Module ===========
+== Sub Tree ==
+func  func()  throws: 
+  js_var Decl: obj= {}
+  for ( )
+    A switch
+
+
+  return obj
+
+== Sub Tree ==
+console.log(func())

@@ -1298,12 +1298,16 @@ void SwitchNode::AddSwitchCase(TreeNode *t) {
     for (unsigned i = 0; i < the_case->GetStmtsNum(); i++) {
       TreeNode *stmt = the_case->GetStmtAtIndex(i);
       TreeNode *label = stmt->GetLabel();
+      bool need_break = false;
       if (label) {
         MASSERT(label->IsIdentifier());
         IdentifierNode *id = (IdentifierNode*)label;
         const char *name = id->GetName();
+
+        // If it's a default case, all remaining statements belong
+        // to this default case.
         if (!strncmp(name, "default", 7) && (strlen(name) == 7)) {
-          MASSERT(i == the_case->GetStmtsNum() - 1);
+          need_break = true;
           the_case->PopStmt();
 
           // 1. clear the label of stmt.
@@ -1319,8 +1323,16 @@ void SwitchNode::AddSwitchCase(TreeNode *t) {
           // 4. set the label and stmt for this case.
           new_case->AddLabel(default_label);
           new_case->AddStmt(stmt);
+          // 5. All all remaining stmts to new_case
+          for (unsigned j = i+1; j < the_case->GetStmtsNum(); j++) {
+            TreeNode *rem_stmt = the_case->GetStmtAtIndex(j);
+            new_case->AddStmt(rem_stmt);
+          }
         }
       }
+
+      if (need_break)
+        break;
     }
 
     AddCase(the_case);
