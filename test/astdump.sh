@@ -44,7 +44,7 @@ done
 if [ -n "$CLEAN" ]; then
   echo Cleaning up generated files...
   find -maxdepth 1 -regex '.*\.ts-[0-9]+\.out.[ctj][ps]p*\|.*\.ts-[0-9]+\.[pd][no][gt]\|.*\.ts.[ca][ps][pt]' -exec rm '{}' \;
-  rm -rf *.ts.orig *.ts.gen *.ts.tmp.ts
+  rm -rf *.ts.orig *.ts.gen *.ts.tmp.ts *[0-9]-dump.out
   echo Done.
 fi
 [ -n "$LIST" ] || { echo Please specify one or more TypeScript files.; usage; }
@@ -54,24 +54,41 @@ TS2AST=$TSOUT/bin/ts2ast
 AST2CPP=$TSOUT/bin/ast2cpp
 [ -x "$TS2AST" ] || { echo Cannot execute $TS2AST; exit 1; }
 [ -x "$AST2CPP" ] || { echo Cannot execute $AST2CPP; exit 1; }
-Passed=
-Failed=
+
+# Acquire/release a lock
+typeset -i LockVar
+LockVar=1
+function AcquireLock {
+    while [[ $LockVar -ne 0 ]] || sleep 0.3; do
+        ln -s Lock_$2 $1-lock-$((LockVar=(LockVar+1)%$3)) > /dev/null 2>&1 && break
+    done
+}
+function ReleaseLock {
+    rm -f $1-lock-$LockVar
+}
+
+PROCID=$$
+rm -rf *$PROCID-dump.out *$PROCID.out.ts
+cnt=0
 for ts in $LIST; do
-  echo ---------
+  echo $((++cnt)): $ts
+  base=$(basename $ts)
+  AcquireLock ts2cxx for_$base $(nproc)
+  (echo ---------
   echo "$TS2AST" "$ts"
   out=$("$TS2AST" "$ts")
   if [ $? -ne 0 ]; then
-    Failed="$Failed $ts"
+    echo "MSG: Failed with ts2ast for (ts2ast)$ts"
   else
     echo "$AST2CPP" "$ts".ast --trace=2 --emit-ts $TREEDIFF
     out=$("$AST2CPP" "$ts".ast --trace=2 --emit-ts $TREEDIFF 2>&1)
-    [ $? -eq 0 ] || Failed="$Failed $ts"
+    [ $? -eq 0 ] || echo "MSG: Failed with ast2cpp for (ast2cpp)$ts"
   fi
   echo "$out"
   cmd=$(grep -n -e "^// .Beginning of Emitter:" -e "// End of Emitter.$" <<< "$out" |
     tail -2 | sed 's/:.*//' | xargs | sed 's/\([^ ]*\) \(.*\)/sed -n \1,$((\2))p/')
   if [ "x${cmd:0:4}" = "xsed " ]; then
-    T=$ts-$$.out.ts
+    T=$ts-$PROCID.out.ts
     eval $cmd <<< "$out" > "$T"
     [ -z "$NAME" ] || sed -i -e 's/__v[0-9][0-9]*//g' -e 's/ __lambda_[0-9][0-9]*__/ /' -e 's/function *\((.*) => \)/\1/' "$T"
     clang-format-10 -i --style="{ColumnLimit: 120}" "$T"
@@ -82,10 +99,10 @@ for ts in $LIST; do
     if [ $? -ne 0 ]; then
       E="tsc"
       grep -qm1 "PassNode *{" <<< "$out" && E="$E,PassNode"
-      Failed="$Failed ($E)$ts"
-      echo Failed to compile "$T" with tsc
+      echo "MSG: Failed with tsc for ($E)$ts"
       [ -n "$KEEP" ] || rm -f "$T"
     elif [ -z $TREEDIFF ]; then
+      echo "MSG: Passed with $ts"
       Passed="$Passed $ts"
       rm -f "$T"
     else
@@ -102,11 +119,10 @@ for ts in $LIST; do
       fi > $ts.gen
       diff $ts.orig $ts.gen
       if [ $? -eq 0 -a -s $ts.orig -a -s $ts.gen ]; then
-        echo Passed with $ts
         Passed="$Passed $ts"
+        echo "MSG: Passed with $ts"
       else
-        echo Failed to compare with the AST of $ts
-        Failed="$Failed (ast)$ts"
+        echo "MSG: Failed with --treediff for (ast)$ts"
       fi
       echo === "$T"; cat "$T"
       echo --- "$ts"; cat "$ts"
@@ -135,12 +151,18 @@ for ts in $LIST; do
       wait
       rm -f "$ts"-[0-9]*.png "$ts"-[0-9]*.dot; }
   fi
+  ReleaseLock ts2cxx
+) >& $base.$PROCID-dump.out &
 done
+wait
+
 echo
 echo "Test case(s) passed:"
-echo $Passed | xargs -n1 | env LC_ALL=C sort | nl
+grep "MSG: Passed with " *.$PROCID-dump.out | sed 's/.*MSG: Passed with //' | env LC_ALL=C sort | nl
 echo
-[ -n "$Failed" ] || exit 0
-echo "Test case(s) failed:"
-echo $Failed | xargs -n1 | env LC_ALL=C sort | sed 's/)/) /' | nl
-exit 1
+grep -q "MSG: Failed with " *.$PROCID-dump.out
+if [ $? -eq 0 ]; then
+  echo "Test case(s) failed:"
+  grep "MSG: Failed with " *.$PROCID-dump.out | sed 's/.*MSG: Failed with [^ ]* for //' | env LC_ALL=C sort | nl
+  exit 1
+fi
