@@ -34,7 +34,7 @@ while [ $# -gt 0 ]; do
         -e|--tscerror)   TSCERR= ;;
         -k|--keep)       KEEP=keep ;;
         -C|--clean)      CLEAN=clean ;;
-        -A|--all)        LIST="$LIST $(find -maxdepth 1 -name '*.ts' | grep -v '\.ts-[0-9][0-9]*\.out.ts')" ;;
+        -A|--all)        LIST="$LIST $(find -maxdepth 1 -name '*.ts')" ;;
         -n|--name)       NAME="original" ;;
         -t|--treediff)   TREEDIFF="--emit-ts-only"; NAME="original"; TSC=yes ;;
         -T|--Treediff)   TREEDIFF="--emit-ts-only"; NAME="original"; TSC= ;;
@@ -43,10 +43,14 @@ while [ $# -gt 0 ]; do
     esac
     shift
 done
+LIST=$(echo $LIST | xargs -n1 | grep -v '\.ts-[0-9][0-9]*\.out.ts' | grep -vF .ts.tmp.ts)
 if [ -n "$CLEAN" ]; then
   echo Cleaning up generated files...
   find -maxdepth 1 -regex '.*\.ts-[0-9]+\.out.[ctj][ps]p*\|.*\.ts-[0-9]+\.[pd][no][gt]\|.*\.ts.[ca][ps][pt]' -exec rm '{}' \;
   rm -rf *.ts.orig *.ts.gen *.ts.tmp.ts *[0-9]-dump.out ts2cxx-lock-*
+  for ts in $LIST; do
+    rm -rf $ts.orig $ts.gen $ts.tmp.ts $ts.*[0-9]-dump.out $ts-*[0-9].out.ts
+  done
   echo Done.
 fi
 [ -n "$LIST" ] || { echo Please specify one or more TypeScript files.; usage; }
@@ -70,13 +74,13 @@ function ReleaseLock {
 }
 
 PROCID=$$
-rm -rf *$PROCID-dump.out *$PROCID.out.ts ts2cxx-lock-*
+rm -rf *$PROCID-dump.out $PROCID-summary.out *$PROCID.out.ts ts2cxx-lock-*
 cnt=0
 for ts in $LIST; do
   echo $((++cnt)): $ts
-  base=$(basename $ts)
-  AcquireLock ts2cxx for_$base $(nproc)
-  (set -x
+  AcquireLock ts2cxx for_$(basename $ts) $(nproc)
+  (if true; then
+  set -x
   echo ---------
   echo "$TS2AST" "$ts"
   out=$("$TS2AST" "$ts")
@@ -94,7 +98,7 @@ for ts in $LIST; do
     T=$ts-$PROCID.out.ts
     eval $cmd <<< "$out" > "$T"
     [ -z "$NAME" ] || sed -i -e 's/__v[0-9][0-9]*//g' -e 's/ __lambda_[0-9][0-9]*__/ /' -e 's/function *\((.*) => \)/\1/' "$T"
-    clang-format-10 -i --style="{ColumnLimit: 120}" "$T"
+    #clang-format-10 -i --style="{ColumnLimit: 120}" "$T"
     echo -e "\n====== TS Reformatted ======\n"
     $HIGHLIGHT "$T"
     echo TREEDIFF=$TREEDIFF
@@ -114,7 +118,8 @@ for ts in $LIST; do
       Passed="$Passed $ts"
       rm -f "$T"
     else
-      clang-format-10 $ts > $ts.tmp.ts
+      #clang-format-10 $ts > $ts.tmp.ts
+      cp $ts $ts.tmp.ts
       $TS2AST $ts.tmp.ts
       if [ $? -eq 0 ]; then
         $AST2CPP $ts.tmp.ts.ast $TREEDIFF | sed -n '/^AstDump:/,/^}/p' | sed -e 's/LT_CharacterLiteral/LT_StringLiteral/' \
@@ -160,22 +165,26 @@ for ts in $LIST; do
       rm -f "$ts"-[0-9]*.png "$ts"-[0-9]*.dot; }
   fi
   ReleaseLock ts2cxx
-) >& $base.$PROCID-dump.out &
+  set +x
+  fi >& $ts.$PROCID-dump.out
+  grep -a "^MSG: [PF]a[si][sl]ed," $ts.$PROCID-dump.out >> $PROCID-summary.out
+  ) &
 done
 wait
+echo Done.
 
-TC=$(ls *.$PROCID-dump.out)
-[ -n "$TC" ] || exit 1
+[ -f $PROCID-summary.out ] || exit 1
+msg=$(grep -a "^MSG: [PF]a[si][sl]ed," $PROCID-summary.out)
 echo
 echo "Test case(s) passed:"
-grep -a "^MSG: Passed, test case " $TC | sed 's/.*MSG: Passed, test case //' | env LC_ALL=C sort | nl
-grep -aq -m1 "^MSG: Failed, test case " $TC
+grep -a "^MSG: Passed, test case " <<< "$msg" | sed 's/MSG: Passed, test case //' | env LC_ALL=C sort | nl
+grep -aq -m1 "^MSG: Failed, test case " <<< "$msg"
 if [ $? -eq 0 ]; then
   echo
   echo "Test case(s) failed:"
-  grep -a "^MSG: Failed," $TC | sed 's/.*MSG: Failed, test case //' | env LC_ALL=C sort | nl
+  grep -a "^MSG: Failed," <<< "$msg" | sed 's/MSG: Failed, test case //' | env LC_ALL=C sort | nl
   echo
-  echo Total: $(grep -a "^MSG: [PF]a[si][sl]ed," $TC | wc -l), Passed: $(grep -a "^MSG: Passed," $TC | wc -l), Failed: $(grep -a "^MSG: Failed," $TC | wc -l)
-  grep -a "^MSG: Failed," $TC | sed 's/.*MSG: Failed, test case (\([^)]*\).*/due to \1/' | sort | uniq -c
+  echo Total: $(wc -l <<< "$msg"), Passed: $(grep -ac "^MSG: Passed," <<< "$msg"), Failed: $(grep -ac "^MSG: Failed," <<< "$msg")
+  grep -a "^MSG: Failed," <<< "$msg" | sed 's/MSG: Failed, test case (\([^)]*\).*/due to \1/' | sort | uniq -c
   exit 1
 fi
