@@ -1484,7 +1484,7 @@ std::string Emitter::EmitClassNode(ClassNode *node) {
       str += EmitTreeNode(n);
   }
   for (unsigned i = 0; i < node->GetSuperInterfacesNum(); ++i) {
-    str += i || classNum ? ", "s : " implements "s;
+    str += i ? ", "s : " implements "s;
     if (auto n = node->GetSuperInterface(i))
       str += EmitTreeNode(n);
   }
