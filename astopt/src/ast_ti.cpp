@@ -913,8 +913,8 @@ UnaOperatorNode *TypeInferVisitor::VisitUnaOperatorNode(UnaOperatorNode *node) {
   OprId op = node->GetOprId();
   TreeNode *ta = node->GetOpnd();
   switch (op) {
-    case OPR_Add:
-    case OPR_Sub:
+    case OPR_Plus:
+    case OPR_Minus:
       UpdateTypeId(node, ta->GetTypeId());
       break;
     case OPR_PreInc:
