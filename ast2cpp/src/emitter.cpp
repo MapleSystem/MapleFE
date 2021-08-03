@@ -367,10 +367,14 @@ std::string Emitter::EmitExportNode(ExportNode *node) {
   std::string str;
   auto num = node->GetPairsNum();
   for (unsigned i = 0; i < node->GetPairsNum(); ++i) {
-    if (i)
-      str += ", "s;
-    if (auto n = node->GetPair(i))
-      str += EmitXXportAsPairNode(n);
+    if (auto n = node->GetPair(i)) {
+      std::string s = EmitXXportAsPairNode(n);
+      if (!s.empty() && s.front() == '{' && !str.empty() && str.back() == '}') {
+        str.pop_back();
+        s.erase(0, 1);
+      }
+      str += i ? ", "s + s : s;
+    }
   }
   if (auto n = node->GetTarget()) {
     str += " from "s + EmitTreeNode(n);
