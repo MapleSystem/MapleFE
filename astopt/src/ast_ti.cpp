@@ -591,25 +591,54 @@ CallNode *TypeInferVisitor::VisitCallNode(CallNode *node) {
   TreeNode *method = node->GetMethod();
   UpdateTypeId(method, TY_Function);
   if (method && method->IsIdentifier()) {
-    TreeNode *decl = mHandler->FindDecl(static_cast<IdentifierNode *>(method));
-    if (decl && decl->IsFunction()) {
-      FunctionNode *func = static_cast<FunctionNode *>(decl);
-      // update call's return type
-      if (func->GetType()) {
-        UpdateTypeId(node, func->GetType()->GetTypeId());
-      }
-      // update function's argument types
-      if (func->GetParamsNum() != node->GetArgsNum()) {
-        NOTYETIMPL("call and func with different number of arguments");
-        return node;
-      }
-      if (ExportedDeclIds.find(decl->GetNodeId()) == ExportedDeclIds.end()) {
-        for (unsigned i = 0; i < node->GetArgsNum(); i++) {
-          UpdateTypeUseNode(func->GetParam(i), node->GetArg(i));
+    IdentifierNode *mid = static_cast<IdentifierNode *>(method);
+    TreeNode *decl = mHandler->FindDecl(mid);
+    if (decl) {
+      if (decl->IsDecl()) {
+        DeclNode *d = static_cast<DeclNode *>(decl);
+        if (d->GetInit()) {
+          decl = d->GetInit();
         }
       }
+      if (decl && decl->IsIdentifier()) {
+        IdentifierNode *id = static_cast<IdentifierNode *>(decl);
+        if (id->GetType()) {
+          decl = id->GetType();
+        } else if (id->GetTypeId() == TY_Function) {
+          NOTYETIMPL("VisitCallNode nTY_Function");
+        }
+      }
+      if (decl) {
+        if (decl->IsFunction()) {
+          FunctionNode *func = static_cast<FunctionNode *>(decl);
+          // update call's return type
+          if (func->GetType()) {
+            UpdateTypeId(node, func->GetType()->GetTypeId());
+          }
+          // update function's argument types
+          if (func->GetParamsNum() != node->GetArgsNum()) {
+            NOTYETIMPL("call and func with different number of arguments");
+            return node;
+          }
+          if (ExportedDeclIds.find(decl->GetNodeId()) == ExportedDeclIds.end()) {
+            for (unsigned i = 0; i < node->GetArgsNum(); i++) {
+              UpdateTypeUseNode(func->GetParam(i), node->GetArg(i));
+            }
+          }
+        } else {
+          NOTYETIMPL("VisitCallNode not function node");
+        }
+      } else {
+        NOTYETIMPL("VisitCallNode null decl");
+      }
     } else {
-      NOTYETIMPL("VisitCallNode null method or not function node");
+      // calling constructor like Array(...) could also end up here
+      TreeNode *type = mHandler->FindType(mid);
+      if (type) {
+        NOTYETIMPL("VisitCallNode type");
+      } else {
+        NOTYETIMPL("VisitCallNode null decl and null type");
+      }
     }
   }
   (void) AstVisitor::VisitCallNode(node);
