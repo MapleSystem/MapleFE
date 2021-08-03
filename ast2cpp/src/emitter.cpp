@@ -409,15 +409,16 @@ std::string Emitter::EmitImportNode(ImportNode *node) {
   */
   auto num = node->GetPairsNum();
   for (unsigned i = 0; i < node->GetPairsNum(); ++i) {
-    if (i)
-      str += ", "s;
     if (auto n = node->GetPair(i)) {
       std::string s = EmitXXportAsPairNode(n);
       auto len = s.length();
       if(len > 13 && s.substr(len - 13) == " as default }"s)
-        str += s.substr(1, len - 13); // default export from a module
-      else
-        str += s;
+         s = s.substr(1, len - 13); // default export from a module
+      if (!s.empty() && s.front() == '{' && !str.empty() && str.back() == '}') {
+        str.pop_back();
+        s.erase(0, 1);
+      }
+      str += i ? ", "s + s : s;
     }
   }
   if (auto n = node->GetTarget()) {

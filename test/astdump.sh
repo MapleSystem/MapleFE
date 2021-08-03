@@ -98,7 +98,7 @@ for ts in $LIST; do
     T=$ts-$PROCID.out.ts
     eval $cmd <<< "$out" > "$T"
     [ -z "$NAME" ] || sed -i -e 's/__v[0-9][0-9]*//g' -e 's/ __lambda_[0-9][0-9]*__/ /' -e 's/function *\((.*) => \)/\1/' "$T"
-    #clang-format-10 -i --style="{ColumnLimit: 120}" "$T"
+    clang-format-10 -i --style="{ColumnLimit: 120}" "$T"
     echo -e "\n====== TS Reformatted ======\n"
     $HIGHLIGHT "$T"
     echo TREEDIFF=$TREEDIFF
@@ -118,8 +118,7 @@ for ts in $LIST; do
       Passed="$Passed $ts"
       rm -f "$T"
     else
-      #clang-format-10 $ts > $ts.tmp.ts
-      cp $ts $ts.tmp.ts
+      clang-format-10 $ts > $ts.tmp.ts
       $TS2AST $ts.tmp.ts
       if [ $? -eq 0 ]; then
         $AST2CPP $ts.tmp.ts.ast $TREEDIFF | sed -n '/^AstDump:/,/^}/p' | sed -e 's/LT_CharacterLiteral/LT_StringLiteral/' \
