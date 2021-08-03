@@ -57,6 +57,8 @@ std::string CppDef::EmitModuleNode(ModuleNode *node) {
   std::string str("// TypeScript filename: "s + node->GetFileName() + "\n"s);
   str += "#include <iostream>\n#include \""s + GetBaseFileName() + ".h\"\n\n"s;
 
+  emitStr = &str;
+  emitStrInsertPos = str.size();
   // definition of default class constructors.
   for (unsigned i = 0; i < node->GetTreesNum(); ++i) {
     if (auto n = node->GetTree(i))
@@ -64,6 +66,7 @@ std::string CppDef::EmitModuleNode(ModuleNode *node) {
         str += EmitDefaultCtor(static_cast<ClassNode*>(n));
   }
 
+  emitStrInsertPos = str.size();
   // definitions of all top-level functions
   isInit = false;
   CfgFunc *module = mHandler->GetCfgFunc();
@@ -77,7 +80,6 @@ std::string CppDef::EmitModuleNode(ModuleNode *node) {
 
   str += "\n\n void "s + name + "::__init_func__() { // bind \"this\" to current module\n"s;
   isInit = true;
-  emitStr = &str;
   emitStrInsertPos = str.size();
   for (unsigned i = 0; i < node->GetTreesNum(); ++i) {
     if (auto n = node->GetTree(i)) {
@@ -256,6 +258,8 @@ std::string CppDef::EmitStructLiteralProps(std::string propsName, StructLiteralN
           break;
         case TY_Function:
           break;
+        case TY_Array:
+          break;
         case TY_Boolean:
           str += "    std::make_pair(\""s + fieldName + "\", JS_Val(bool("s + fieldVal + ")))"s;
           break;
@@ -295,15 +299,18 @@ std::string CppDef::EmitDeclNode(DeclNode *node) {
   std::string str, name;
   //std::string str(Emitter::GetEnumDeclProp(node->GetProp()));
   if (auto n = node->GetVar()) {
-    name += isInit ? EmitTreeNode(n) : mCppDecl.EmitTreeNode(n);
+    if (IsVarInitStructLiteral(node))
+      name = "  Object* "s + n->GetName();
+    else
+      name += isInit ? EmitTreeNode(n) : mCppDecl.EmitTreeNode(n);
   }
   if (auto n = node->GetInit()) {
     if (node->GetTypeId() == TY_Class && node->GetInit()->GetKind() == NK_StructLiteral) {
       // Emit obj instance with object/struct literal init
-      std::string props = EmitStructLiteralProps(name+"Props"s, static_cast<StructLiteralNode*>( node->GetInit()));
+      std::string props = EmitStructLiteralProps(DeclVarName(node)+"Props"s, static_cast<StructLiteralNode*>( node->GetInit()));
       emitStr->insert(emitStrInsertPos, props);
       emitStrInsertPos += props.size();
-      str += "  "s + name + " = Object_ctor._new("s + name + "Props)"s;
+      str += "  "s + name + " = Object_ctor._new("s + DeclVarName(node) + "Props)"s;
     }
     else if (node->GetTypeId() == TY_Class)
       str += name + "= &"s + n->GetName() + "_ctor"s;

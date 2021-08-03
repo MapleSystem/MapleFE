@@ -66,5 +66,9 @@ inline bool IsVarInitClass(DeclNode* node) {
          node->GetInit()->GetKind() != NK_StructLiteral;
 }
 
+inline std::string DeclVarName(DeclNode* node) {
+  return node->GetVar()->GetName();
+}
+
 } // namespace maplefe
 #endif
