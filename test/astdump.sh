@@ -2,7 +2,7 @@
 function usage {
 cat << EOF
 
-Usage: astdump.sh [-d] [-f] [-p <PREFIX>] [-a] [-c] [-k] [-A] [-C] [-n] [-t] <file1> [<file2> ...]
+Usage: astdump.sh [-d] [-f] [-p <PREFIX>] [-a] [-c] [-k] [-A] [-C] [-n] [-t|-T] <file1> [<file2> ...]
 
 Short/long options:
   -d | --dot             Use Graphviz dot to generate the graph and view it with viewnior
@@ -16,12 +16,13 @@ Short/long options:
   -C | --clean           Clean up generated files (*.ts-[0-9]*.out.ts)
   -n | --name            Keep original names by removing "__lambda_[0-9]*__" and "__v[0-9]*" from generated code
   -t | --treediff        Compare the AST of generated TS code with the one of original TS code
+  -T | --Treediff        Same as -t/--treediff except that it disables tsc for generated TS code
   <file1> [<file2> ...]  Specify one or more TypeScript files to be processed
 EOF
 exit 1
 }
 
-DOT= PRE= LIST= VIEWOP= HIGHLIGHT="cat" TSCERR= KEEP= CLEAN= NAME= TREEDIFF=
+DOT= PRE= LIST= VIEWOP= HIGHLIGHT="cat" TSCERR= KEEP= CLEAN= NAME= TREEDIFF= TSC=yes
 while [ $# -gt 0 ]; do
     case $1 in
         -d|--dot)        DOT=dot;;
@@ -35,7 +36,8 @@ while [ $# -gt 0 ]; do
         -C|--clean)      CLEAN=clean ;;
         -A|--all)        LIST="$LIST $(find -maxdepth 1 -name '*.ts' | grep -v '\.ts-[0-9][0-9]*\.out.ts')" ;;
         -n|--name)       NAME="original" ;;
-        -t|--treediff)   TREEDIFF="--emit-ts-only"; NAME="original" ;;
+        -t|--treediff)   TREEDIFF="--emit-ts-only"; NAME="original"; TSC=yes ;;
+        -T|--Treediff)   TREEDIFF="--emit-ts-only"; NAME="original"; TSC= ;;
         -*)              echo "Unknown option $1"; usage;;
         *)               LIST="$LIST $1"
     esac
@@ -74,7 +76,8 @@ for ts in $LIST; do
   echo $((++cnt)): $ts
   base=$(basename $ts)
   AcquireLock ts2cxx for_$base $(nproc)
-  (echo ---------
+  (set -x
+  echo ---------
   echo "$TS2AST" "$ts"
   out=$("$TS2AST" "$ts")
   if [ $? -ne 0 ]; then
@@ -94,7 +97,12 @@ for ts in $LIST; do
     clang-format-10 -i --style="{ColumnLimit: 120}" "$T"
     echo -e "\n====== TS Reformatted ======\n"
     $HIGHLIGHT "$T"
-    eval tsc -t es6 --lib es2015,es2017,dom -m commonjs --experimentalDecorators "$T" $TSCERR
+    echo TREEDIFF=$TREEDIFF
+    if [ -z $TREEDIFF -o -n "$TSC" ]; then
+      eval tsc -t es6 --lib es2015,es2017,dom -m commonjs --experimentalDecorators "$T" $TSCERR
+    else
+      echo Skipping tsc for tree diff
+    fi
     # --strict  --downlevelIteration --esModuleInterop --noImplicitAny --isolatedModules "$T" $TSCERR
     if [ $? -ne 0 ]; then
       E="tsc-failed"
