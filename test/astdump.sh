@@ -44,7 +44,7 @@ done
 if [ -n "$CLEAN" ]; then
   echo Cleaning up generated files...
   find -maxdepth 1 -regex '.*\.ts-[0-9]+\.out.[ctj][ps]p*\|.*\.ts-[0-9]+\.[pd][no][gt]\|.*\.ts.[ca][ps][pt]' -exec rm '{}' \;
-  rm -rf *.ts.orig *.ts.gen *.ts.tmp.ts *[0-9]-dump.out
+  rm -rf *.ts.orig *.ts.gen *.ts.tmp.ts *[0-9]-dump.out ts2cxx-lock-*
   echo Done.
 fi
 [ -n "$LIST" ] || { echo Please specify one or more TypeScript files.; usage; }
@@ -68,7 +68,7 @@ function ReleaseLock {
 }
 
 PROCID=$$
-rm -rf *$PROCID-dump.out *$PROCID.out.ts
+rm -rf *$PROCID-dump.out *$PROCID.out.ts ts2cxx-lock-*
 cnt=0
 for ts in $LIST; do
   echo $((++cnt)): $ts
@@ -160,15 +160,14 @@ TC=$(ls *.$PROCID-dump.out)
 [ -n "$TC" ] || exit 1
 echo
 echo "Test case(s) passed:"
-grep "^MSG: Passed, test case " $TC | sed 's/.*MSG: Passed, test case //' | env LC_ALL=C sort | nl
-grep -q -m1 "^MSG: Failed, test case " $TC
+grep -a "^MSG: Passed, test case " $TC | sed 's/.*MSG: Passed, test case //' | env LC_ALL=C sort | nl
+grep -aq -m1 "^MSG: Failed, test case " $TC
 if [ $? -eq 0 ]; then
   echo
   echo "Test case(s) failed:"
-  grep "^MSG: Failed," $TC | sed 's/.*MSG: Failed, test case //' | env LC_ALL=C sort | nl
+  grep -a "^MSG: Failed," $TC | sed 's/.*MSG: Failed, test case //' | env LC_ALL=C sort | nl
   echo
-  echo Total: $(grep "^MSG: [PF]a[si][sl]ed," $TC | wc -l), Passed: $(grep "^MSG: Passed," $TC | wc -l), Failed: $(grep "^MSG: Failed," $TC | wc -l)
-  grep "^MSG: Failed," $TC | sed 's/.*MSG: Failed, test case (\([^)]*\).*/due to \1/' | sort | uniq -c
-  echo
+  echo Total: $(grep -a "^MSG: [PF]a[si][sl]ed," $TC | wc -l), Passed: $(grep -a "^MSG: Passed," $TC | wc -l), Failed: $(grep -a "^MSG: Failed," $TC | wc -l)
+  grep -a "^MSG: Failed," $TC | sed 's/.*MSG: Failed, test case (\([^)]*\).*/due to \1/' | sort | uniq -c
   exit 1
 fi
