@@ -102,7 +102,7 @@ for ts in $LIST; do
     echo -e "\n====== TS Reformatted ======\n"
     $HIGHLIGHT "$T"
     echo TREEDIFF=$TREEDIFF
-    if [ -z $TREEDIFF -o -n "$TSC" ]; then
+    if [ -z "$TREEDIFF" -o -n "$TSC" ]; then
       eval tsc -t es6 --lib es2015,es2017,dom -m commonjs --experimentalDecorators "$T" $TSCERR
     else
       echo Skipping tsc for tree diff
