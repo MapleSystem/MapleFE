@@ -319,7 +319,7 @@ std::string Emitter::EmitXXportAsPairNode(XXportAsPairNode *node) {
   std::string str;
   if (node->IsDefault()) {
     if (auto n = node->GetBefore())
-      str += "{ "s + EmitTreeNode(n) + " as default }"s;
+      str += "default "s + EmitTreeNode(n);
   } else if (node->IsEverything()) {
     str += " * "s;
     if (auto n = node->GetBefore())
@@ -414,6 +414,8 @@ std::string Emitter::EmitImportNode(ImportNode *node) {
       auto len = s.length();
       if(len > 13 && s.substr(len - 13) == " as default }"s)
          s = s.substr(1, len - 13); // default export from a module
+      if(len > 8 && s.substr(0, 8) == "default "s)
+        s = s.substr(8, len - 1);
       if (!s.empty() && s.front() == '{' && !str.empty() && str.back() == '}') {
         str.pop_back();
         s.erase(0, 1);
