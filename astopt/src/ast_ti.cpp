@@ -378,8 +378,14 @@ TreeNode *TypeInferVisitor::VisitClassField(TreeNode *node) {
       VisitTreeNode(init);
       UpdateTypeId(node, init->GetTypeId());
     }
+  } else if (node->IsLiteral()) {
+    MSGNOLOC0("field is Literal");
+  } else if (node->IsComputedName()) {
+    MSGNOLOC0("field is ComputedName");
+  } else if (node->IsStrIndexSig()) {
+    MSGNOLOC0("field is StrIndexSig");
   } else {
-    NOTYETIMPL("field not idenfier");
+    NOTYETIMPL("field new kind");
   }
   return node;
 }
