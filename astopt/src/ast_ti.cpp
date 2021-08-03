@@ -617,8 +617,26 @@ CallNode *TypeInferVisitor::VisitCallNode(CallNode *node) {
           }
           // update function's argument types
           if (func->GetParamsNum() != node->GetArgsNum()) {
-            NOTYETIMPL("call and func with different number of arguments");
-            return node;
+            // count minimun number of args need to be passed
+            // check arg about whether it is optional or has default value
+            unsigned min = 0;
+            for (unsigned i = 0; i < func->GetParamsNum(); i++) {
+              TreeNode *arg = func->GetParam(i);
+              if (arg->IsOptional()) {
+                continue;
+              } else if(arg->IsIdentifier()) {
+                IdentifierNode *id = static_cast<IdentifierNode *>(arg);
+                if (!id->GetInit()) {
+                  min++;
+                }
+              } else {
+                min++;
+              }
+            }
+            if (min > node->GetArgsNum()) {
+              NOTYETIMPL("call and func number of arguments not compatible");
+              return node;
+            }
           }
           if (ExportedDeclIds.find(decl->GetNodeId()) == ExportedDeclIds.end()) {
             for (unsigned i = 0; i < node->GetArgsNum(); i++) {
