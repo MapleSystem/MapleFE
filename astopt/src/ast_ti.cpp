@@ -683,6 +683,8 @@ ExportNode *TypeInferVisitor::VisitExportNode(ExportNode *node) {
     TreeNode *bfnode = p->GetBefore();
     if (bfnode) {
       switch (bfnode->GetKind()) {
+        case NK_Struct:
+        case NK_Function:
         case NK_Decl: {
           ExportedDeclIds.insert(bfnode->GetNodeId());
           break;
@@ -703,6 +705,8 @@ ExportNode *TypeInferVisitor::VisitExportNode(ExportNode *node) {
           }
           break;
         }
+        case NK_TypeAlias:
+          break;
         default: {
           NOTYETIMPL("export node kind");
           break;
