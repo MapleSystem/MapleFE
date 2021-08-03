@@ -218,6 +218,8 @@ void TypeInferVisitor::UpdateTypeUseNode(TreeNode *target, TreeNode *input) {
     return;
   }
   switch (iid) {
+    case TY_None:
+      break;
     case TY_Array: {
       if (input->IsIdentifier()) {
         TreeNode *decl = mHandler->FindDecl(static_cast<IdentifierNode *>(input));
@@ -928,8 +930,6 @@ UserTypeNode *TypeInferVisitor::VisitUserTypeNode(UserTypeNode *node) {
           tid = TY_Number;
         } else if (id->GetStrIdx() == gStringPool.GetStrIdx("string")) {
           tid = TY_String;
-        } else {
-          NOTYETIMPL("other keywords");
         }
         if (tid != TY_None) {
           PrimArrayTypeNode *type = (PrimArrayTypeNode*)gTreePool.NewTreeNode(sizeof(PrimArrayTypeNode));
