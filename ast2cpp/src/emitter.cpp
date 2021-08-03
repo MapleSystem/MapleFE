@@ -428,7 +428,8 @@ std::string Emitter::EmitImportNode(ImportNode *node) {
     }
   }
   if (auto n = node->GetTarget()) {
-    str += " from "s + EmitTreeNode(n);
+    std::string s = EmitTreeNode(n);
+    str += num ? " from "s + s : s;
   }
   if (node->IsStmt())
     str += ";\n"s;
