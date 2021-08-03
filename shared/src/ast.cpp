@@ -1295,10 +1295,10 @@ void SwitchNode::AddSwitchCase(TreeNode *t) {
     // are actually a case of switch.
     SwitchCaseNode *the_case = (SwitchCaseNode*)t;
     SwitchCaseNode *new_case = NULL;
-    for (unsigned i = 0; i < the_case->GetStmtsNum(); i++) {
+    unsigned stmt_num = the_case->GetStmtsNum();
+    for (unsigned i = 0; i < stmt_num; i++) {
       TreeNode *stmt = the_case->GetStmtAtIndex(i);
       TreeNode *label = stmt->GetLabel();
-      bool need_break = false;
       if (label) {
         MASSERT(label->IsIdentifier());
         IdentifierNode *id = (IdentifierNode*)label;
@@ -1307,9 +1307,6 @@ void SwitchNode::AddSwitchCase(TreeNode *t) {
         // If it's a default case, all remaining statements belong
         // to this default case.
         if (!strncmp(name, "default", 7) && (strlen(name) == 7)) {
-          need_break = true;
-          the_case->PopStmt();
-
           // 1. clear the label of stmt.
           stmt->SetLabel(NULL);
           // 2. build switch label
@@ -1323,16 +1320,17 @@ void SwitchNode::AddSwitchCase(TreeNode *t) {
           // 4. set the label and stmt for this case.
           new_case->AddLabel(default_label);
           new_case->AddStmt(stmt);
-          // 5. All all remaining stmts to new_case
-          for (unsigned j = i+1; j < the_case->GetStmtsNum(); j++) {
+          // 5. add all remaining stmts to new_case
+          for (unsigned j = i+1; j < stmt_num; j++) {
             TreeNode *rem_stmt = the_case->GetStmtAtIndex(j);
             new_case->AddStmt(rem_stmt);
           }
+          // 6. remove the stmts added to new_case from the_case
+          for (unsigned j = i; j < stmt_num; j++)
+            the_case->PopStmt();
+          break;
         }
       }
-
-      if (need_break)
-        break;
     }
 
     AddCase(the_case);
