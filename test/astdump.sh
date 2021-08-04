@@ -129,7 +129,7 @@ for ts in $LIST; do
         $AST2CPP $T.ast $TREEDIFF | sed -n '/^AstDump:/,/^}/p' | sed -e "s|$T|$ts.tmp.ts|" \
           -e 's/\(mStrIdx: unsigned int, \)[0-9]* =>/\1=>/'
       fi > $ts.gen
-      diff $ts.orig $ts.gen
+      diff $ts.orig $ts.gen || sed 's/\\"/'"'/g" $ts.gen | diff $ts.orig -
       if [ $? -eq 0 -a -s $ts.orig -a -s $ts.gen ]; then
         Passed="$Passed $ts"
         echo "MSG: Passed, test case $ts"
