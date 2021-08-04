@@ -174,7 +174,10 @@ std::string Emitter::EmitFunctionNode(FunctionNode *node) {
     str = "function "s + str;
   auto name = node->GetFuncName();
   if(name) {
-    str += EmitTreeNode(name);
+    std::string s = EmitTreeNode(name);
+    str += s;
+    if (s.substr(0, 9) == "__lambda_")
+      name = nullptr;
   }
 
   auto num = node->GetTypeParamsNum();
@@ -215,7 +218,7 @@ std::string Emitter::EmitFunctionNode(FunctionNode *node) {
   if (auto n = node->GetType()) {
     std::string s = EmitTreeNode(n);
     if(!s.empty())
-      str += (body ? " : "s : " => "s) + s;
+      str += (body || name? " : "s : " => "s) + s;
   }
 
   if (body) {
