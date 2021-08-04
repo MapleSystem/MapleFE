@@ -1079,6 +1079,7 @@ rule BreakStatement : ONEOF(
 ##  return [no LineTerminator here] Expression[In, ?Yield] ;
 rule ReturnStatement :ONEOF("return" + ZEROORONE(';'),
                             "return" + Expression + ZEROORONE(';'))
+  attr.action.%1 : BuildReturn()
   attr.action.%2 : BuildReturn(%2)
 
 ##-----------------------------------

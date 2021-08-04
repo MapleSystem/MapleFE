@@ -865,6 +865,7 @@ TreeNode* ASTBuilder::BuildAssignment() {
 }
 
 // Takes one argument, the result expression
+// Or takes 0 argument, and it's a simple return stmt.
 TreeNode* ASTBuilder::BuildReturn() {
   if (mTrace)
     std::cout << "In BuildReturn" << std::endl;
@@ -872,12 +873,14 @@ TreeNode* ASTBuilder::BuildReturn() {
   ReturnNode *result = (ReturnNode*)gTreePool.NewTreeNode(sizeof(ReturnNode));
   new (result) ReturnNode();
 
-  Param p_result = mParams[0];
-  if (!p_result.mIsEmpty) {
-    if (!p_result.mIsTreeNode)
-      MERROR("The return value is not a tree node.");
-    TreeNode *result_value = p_result.mData.mTreeNode;
-    result->SetResult(result_value);
+  if (mParams.size() == 1) {
+    Param p_result = mParams[0];
+    if (!p_result.mIsEmpty) {
+      if (!p_result.mIsTreeNode)
+        MERROR("The return value is not a tree node.");
+      TreeNode *result_value = p_result.mData.mTreeNode;
+      result->SetResult(result_value);
+    }
   }
 
   mLastTreeNode = result;
