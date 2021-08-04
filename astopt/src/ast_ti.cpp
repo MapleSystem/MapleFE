@@ -887,11 +887,11 @@ ReturnNode *TypeInferVisitor::VisitReturnNode(ReturnNode *node) {
   TreeNode *tn = mHandler->FindFunc(node);
   if (tn) {
     FunctionNode *func = static_cast<FunctionNode *>(tn);
-    TreeNode *type = NULL;
+    // use dummy PrimTypeNode as return type of function if not set to carry return TypeId
     if (!func->GetType()) {
-      type = (PrimTypeNode*)gTreePool.NewTreeNode(sizeof(PrimTypeNode));
+      PrimTypeNode *type = (PrimTypeNode*)gTreePool.NewTreeNode(sizeof(PrimTypeNode));
       new (type) PrimTypeNode();
-      ((PrimTypeNode*)type)->SetPrimType(TY_None);
+      type->SetPrimType(TY_None);
       func->SetType(type);
     }
     UpdateFuncRetTypeId(func, node->GetTypeId());
