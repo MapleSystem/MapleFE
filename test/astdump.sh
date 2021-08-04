@@ -102,6 +102,8 @@ for ts in $LIST; do
     echo -e "\n====== TS Reformatted ======\n"
     $HIGHLIGHT "$T"
     echo TREEDIFF=$TREEDIFF
+    E=
+    grep -qm1 "PassNode *{" <<< "$out" && E=",PassNode"
     if [ -z "$TREEDIFF" -o -n "$TSC" ]; then
       eval tsc -t es6 --lib es2015,es2017,dom -m commonjs --experimentalDecorators "$T" $TSCERR
     else
@@ -109,9 +111,7 @@ for ts in $LIST; do
     fi
     # --strict  --downlevelIteration --esModuleInterop --noImplicitAny --isolatedModules "$T" $TSCERR
     if [ $? -ne 0 ]; then
-      E="tsc-failed"
-      grep -qm1 "PassNode *{" <<< "$out" && E="$E,PassNode"
-      echo "MSG: Failed, test case ($E)$ts"
+      echo "MSG: Failed, test case (tsc-failed$E)$ts"
       [ -n "$KEEP" ] || rm -f "$T"
     elif [ -z $TREEDIFF ]; then
       echo "MSG: Passed, test case $ts"
@@ -134,7 +134,7 @@ for ts in $LIST; do
         Passed="$Passed $ts"
         echo "MSG: Passed, test case $ts"
       else
-        echo "MSG: Failed, test case (diff-ast)$ts"
+        echo "MSG: Failed, test case (diff-ast$E)$ts"
       fi
       echo === "$T"; cat "$T"
       echo --- "$ts"; cat "$ts"
