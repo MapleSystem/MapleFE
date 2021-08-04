@@ -717,13 +717,16 @@ std::string Emitter::EmitFieldNode(FieldNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
+  const Precedence precd = '\024';
   if (auto n = node->GetUpper()) {
-    str += EmitTreeNode(n);
+    str = EmitTreeNode(n);
+    if (precd > mPrecedence)
+      str = "("s + str + ")"s;
   }
   if (auto n = node->GetField()) {
     str += "."s + EmitIdentifierNode(n);
   }
-  mPrecedence = '\024';
+  mPrecedence = precd;
   if (node->IsStmt())
     str += ";\n"s;
   return HandleTreeNode(str, node);
