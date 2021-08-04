@@ -13,6 +13,8 @@
 # See the Mulan PSL v2 for more details.
 #
 
+set -e
+
 if [ ! -d $MAPLEALL_ROOT ]; then
   cd $MAPLE_ROOT
   git clone https://gitee.com/openarkcompiler/OpenArkCompiler.git
