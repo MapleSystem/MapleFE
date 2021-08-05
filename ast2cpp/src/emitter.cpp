@@ -388,10 +388,17 @@ std::string Emitter::EmitExportNode(ExportNode *node) {
   if (auto n = node->GetTarget()) {
     str += " from "s + EmitTreeNode(n);
   }
-  str = deco + (str.empty() ? "export {}"s : "export "s + str);
-
+  str = Clean(str);
+  if (str.empty())
+    str = "{};"s;
+  else if (str.size() > 9 && str.back() == '}') {
+    if (str.substr(0, 10) != "interface " && str.substr(0, 6) != "class ")
+      str += ";"s;
+  }
+  else
+    str += ";"s;
+  str = deco + "export "s + str + "\n"s;
   mPrecedence = '\030';
-  str += ";\n"s; // always emits a semicolon and a new-line at the end
   return HandleTreeNode(str, node);
 }
 
