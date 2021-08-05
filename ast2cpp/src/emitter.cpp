@@ -385,8 +385,7 @@ std::string Emitter::EmitExportNode(ExportNode *node) {
   str = deco + (str.empty() ? "export {}"s : "export "s + str);
 
   mPrecedence = '\030';
-  if (node->IsStmt())
-    str += ";\n"s;
+  str += ";\n"s; // always emits a semicolon and a new-line at the end
   return HandleTreeNode(str, node);
 }
 
