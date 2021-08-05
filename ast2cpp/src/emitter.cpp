@@ -30,7 +30,9 @@ std::string Emitter::Emit(const char *title) {
 
 std::string Emitter::Clean(std::string &s) {
   auto len = s.length();
-  if(len >= 2 && s.substr(len - 2) == ";\n")
+  if(len >= 1 && s.back() == '\n')
+    s = s.erase(len - 1);
+  if(len >= 2 && s.back() == ';')
     return s.erase(len - 2);
   return s;
 }
@@ -1521,7 +1523,8 @@ std::string Emitter::EmitClassNode(ClassNode *node) {
         func = func.substr(9);
       if (func.substr(0, 11) != "constructor")
         func = "constructor "s + func;
-      str += func;
+      func = Clean(func);
+      str += func.back() == '}' ? func : func + ";\n"s;
     }
   }
 
@@ -1532,7 +1535,8 @@ std::string Emitter::EmitClassNode(ClassNode *node) {
         func = func.substr(9);
       if (n->GetType() && n->GetBody() == nullptr)
         Replace(func, "=>", ":", -1);
-      str += func.length() > 2 && func.substr(func.length() - 2) == ";\n" ? func : func + ";\n"s;
+      func = Clean(func);
+      str += func.back() == '}' ? func : func + ";\n"s;
     }
   }
 
