@@ -391,8 +391,9 @@ std::string Emitter::EmitExportNode(ExportNode *node) {
   str = Clean(str);
   if (str.empty())
     str = "{};"s;
-  else if (str.size() > 9 && str.back() == '}') {
-    if (str.substr(0, 10) != "interface " && str.substr(0, 6) != "class ")
+  else if (str.size() > 6 && str.back() == '}') {
+    if (str.substr(0, 10) != "interface " && str.substr(0, 6) != "class "
+        && str.substr(0, 17) != "default function " && str.substr(0, 9) != "function ")
       str += ";"s;
   }
   else
