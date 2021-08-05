@@ -576,6 +576,13 @@ std::string CppDef::EmitContinueNode(ContinueNode *node) {
   return str;
 }
 
+
+inline bool IsObjPropBracketNotation(TreeNode *node) {
+  return node->GetKind() == NK_ArrayElement &&
+         static_cast<ArrayElementNode*>(node)->GetArray()->GetTypeId() == TY_Class;
+}
+
+
 std::string CppDef::EmitBinOperatorNode(BinOperatorNode *node) {
   if (node == nullptr)
     return std::string();
@@ -583,10 +590,33 @@ std::string CppDef::EmitBinOperatorNode(BinOperatorNode *node) {
   const Precedence precd = *op & 0x3f;
   const bool rl_assoc = *op >> 6; // false: left-to-right, true: right-to-left
   std::string lhs, rhs;
+  std::string objName, propKey, propVal;
+  TypeId propKeyType, propValType;
+  bool islhsObjProp = false;
   if (auto n = node->GetOpndA()) {
-    lhs = EmitTreeNode(n);
-    if(precd > mPrecedence || (precd == mPrecedence && rl_assoc))
-      lhs = "("s + lhs + ")"s;
+    if ((islhsObjProp = IsObjPropBracketNotation(n)) == true) {
+      // lhs is object prop with bracket notation
+      ArrayElementNode *ae = static_cast<ArrayElementNode *>(n);
+      MASSERT(ae->GetExprsNum() == 1 && "ArrayElementNode ExprsNum 1 expected");
+      objName     = ae->GetArray()->GetName();
+      propValType = node->GetTypeId();
+      propKeyType = ae->GetExprAtIndex(0)->GetTypeId();
+      switch (propKeyType) {
+        case TY_Int:
+          propKey = "to_string("s + EmitTreeNode(ae->GetExprAtIndex(0)) + ")"s;
+          break;
+        case TY_String:
+          propKey = EmitTreeNode(ae->GetExprAtIndex(0));
+          break;
+        default:
+          MASSERT(0 && "Encounter unsupported prop key type in bracket notation");
+          break;
+      }
+    } else {
+      lhs = EmitTreeNode(n);
+      if(precd > mPrecedence || (precd == mPrecedence && rl_assoc))
+        lhs = "("s + lhs + ")"s;
+    }
   }
   else
     lhs = "(NIL) "s;
@@ -615,7 +645,11 @@ std::string CppDef::EmitBinOperatorNode(BinOperatorNode *node) {
         op = "\015>>";
         break;
     }
-    str = lhs + " "s + std::string(op + 1) + " "s + rhs;
+    if (islhsObjProp) {
+      str = "JS_Val prop("s + rhs + ");\n"s;
+      str += objName + "->AddProp(" + propKey + ", prop)"s;
+    } else
+      str = lhs + " "s + std::string(op + 1) + " "s + rhs;
   }
   mPrecedence = precd;
   if (node->IsStmt())

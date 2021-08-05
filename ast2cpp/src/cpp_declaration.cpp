@@ -273,6 +273,8 @@ std::string CppDecl::GetTypeString(TreeNode *node, TreeNode *child) {
       case TY_Number:
       case TY_Double:
         return "double "s;
+      case TY_Class:
+        return "Object* "s;
     }
     {
       str = child ? EmitTreeNode(child) : Emitter::GetEnumTypeId(k);
