@@ -128,6 +128,8 @@ for ts in $LIST; do
       if [ $? -eq 0 ]; then
         $AST2CPP $T.ast $TREEDIFF | sed -n '/^AstDump:/,/^}/p' | sed -e "s|$T|$ts.tmp.ts|" \
           -e 's/\(mStrIdx: unsigned int, \)[0-9]* =>/\1=>/'
+      else
+        E="$E,ts2ast"
       fi > $ts.gen
       diff $ts.orig $ts.gen || sed 's/\\"/'"'/g" $ts.gen | diff $ts.orig -
       if [ $? -eq 0 -a -s $ts.orig -a -s $ts.gen ]; then
