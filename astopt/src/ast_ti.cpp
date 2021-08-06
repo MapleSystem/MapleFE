@@ -643,6 +643,8 @@ CallNode *TypeInferVisitor::VisitCallNode(CallNode *node) {
               UpdateTypeUseNode(func->GetParam(i), node->GetArg(i));
             }
           }
+        } else if (decl->IsCall()) {
+          (void) VisitCallNode(static_cast<CallNode *>(decl));
         } else {
           NOTYETIMPL("VisitCallNode not function node");
         }
