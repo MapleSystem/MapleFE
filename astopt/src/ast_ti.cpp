@@ -645,6 +645,14 @@ CallNode *TypeInferVisitor::VisitCallNode(CallNode *node) {
           }
         } else if (decl->IsCall()) {
           (void) VisitCallNode(static_cast<CallNode *>(decl));
+        } else if (decl->IsDecl()) {
+          DeclNode *d = static_cast<DeclNode *>(decl);
+          if (d->GetInit()) {
+            NOTYETIMPL("VisitCallNode decl init");
+          }
+        } else if (decl->IsLiteral()) {
+          LiteralNode *l = static_cast<LiteralNode *>(decl);
+          NOTYETIMPL("VisitCallNode literal node");
         } else {
           NOTYETIMPL("VisitCallNode not function node");
         }
