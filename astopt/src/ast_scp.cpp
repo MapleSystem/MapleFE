@@ -348,9 +348,9 @@ IdentifierNode *RenameVarVisitor::VisitIdentifierNode(IdentifierNode *node) {
     if (stridx) {
       TreeNode *parent = node->GetParent();
       if (parent) {
-        if (parent->IsDecl() ||
+        if ((parent->IsDecl() && parent->GetStrIdx() == stridx) ||
             (parent->IsFunction() && IsFuncArg(static_cast<FunctionNode *>(parent), node))) {
-          // decl or func parameters
+          // its decl or func parameters
           // insert in order according to scopes hierachy to ensure proper name version
           InsertToStridx2DeclIdMap(stridx, node);
         }
