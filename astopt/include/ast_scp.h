@@ -48,6 +48,7 @@ class BuildScopeBaseVisitor : public AstVisitor {
 
  public:
   std::stack<ASTScope *> mScopeStack;
+  std::stack<ASTScope *> mUserScopeStack;
 
  public:
   explicit BuildScopeBaseVisitor(unsigned f, bool base = false)

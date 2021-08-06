@@ -29,8 +29,10 @@ void AST_SCP::BuildScope() {
     visitor.mScopeStack.pop();
   }
   ModuleNode *module = mHandler->GetASTModule();
-  visitor.mScopeStack.push(module->GetRootScope());
-  module->SetScope(module->GetRootScope());
+  ASTScope *scope = module->GetRootScope();
+  visitor.mScopeStack.push(scope);
+  visitor.mUserScopeStack.push(scope);
+  module->SetScope(scope);
 
   for(unsigned i = 0; i < module->GetTreesNum(); i++) {
     TreeNode *it = module->GetTree(i);
@@ -80,8 +82,10 @@ FunctionNode *BuildScopeVisitor::VisitFunctionNode(FunctionNode *node) {
     }
   }
   mScopeStack.push(scope);
+  mUserScopeStack.push(scope);
   BuildScopeBaseVisitor::VisitFunctionNode(node);
   mScopeStack.pop();
+  mUserScopeStack.pop();
   return node;
 }
 
@@ -95,8 +99,10 @@ LambdaNode *BuildScopeVisitor::VisitLambdaNode(LambdaNode *node) {
     scope->AddDecl(it);
   }
   mScopeStack.push(scope);
+  mUserScopeStack.push(scope);
   BuildScopeBaseVisitor::VisitLambdaNode(node);
   mScopeStack.pop();
+  mUserScopeStack.pop();
   return node;
 }
 
@@ -170,7 +176,20 @@ StructNode *BuildScopeVisitor::VisitStructNode(StructNode *node) {
 
 DeclNode *BuildScopeVisitor::VisitDeclNode(DeclNode *node) {
   BuildScopeBaseVisitor::VisitDeclNode(node);
-  ASTScope *scope = mScopeStack.top();
+  ASTScope *scope = NULL;
+  if (node->GetProp() == JS_Let) {
+    // use current scope
+    scope = mScopeStack.top();
+  } else {
+    // promote to use function or module scope
+    scope = mUserScopeStack.top();
+
+    // update scope
+    node->SetScope(scope);
+    if (node->GetVar()) {
+      node->GetVar()->SetScope(scope);
+    }
+  }
   scope->AddDecl(node);
   return node;
 }
@@ -326,6 +345,10 @@ void RenameVarVisitor::InsertToStridx2DeclIdMap(unsigned stridx, IdentifierNode 
     i = *it;
     TreeNode *node1 = mNodeId2NodeMap[i];
     ASTScope *s1 = node1->GetScope();
+    // decl at same scope already exist
+    if (s1 == s0) {
+      return;
+    }
     // do not insert node after node1 if node's scope s0 is an ancestor of node1's scope s1
     if (s1->IsAncestor(s0)) {
       mStridx2DeclIdMap[stridx].insert(it, node->GetNodeId());
