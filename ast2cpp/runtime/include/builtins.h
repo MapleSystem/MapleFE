@@ -18,11 +18,11 @@
 
 class Ctor_Function;
 class Ctor_Object;
-class Ctor_Array;
+//class Ctor_Array;
 
 extern Ctor_Function Function_ctor;
 extern Ctor_Object   Object_ctor;
-extern Ctor_Array    Array_ctor;
+//extern Ctor_Array    Array_ctor;
 
 class Ctor_Object   : public Function {
   public:
@@ -47,20 +47,40 @@ class Ctor_Function : public Function {
 
 };
 
+template <typename T>
 class Array : public Object {
   public:
+    std::vector<T> elements;
     Array(Function* ctor, Object* proto): Object(ctor, proto) {}
+    Array(int nargs, ...) {
+      // Bypass Array_Ctor._new for now to simplify array obj instantiation
+      this->__proto__   = new Object();
+      this->__proto__->__proto__ = Object_ctor.prototype;
+      this->constructor = nullptr;
+
+      va_list args;
+      va_start(args, nargs);
+      while (nargs) {
+        elements.push_back(va_arg(args, T));
+        --nargs;
+      }
+      va_end(args);
+    }
+    T operator[](int i) {return elements[i];}
+
     // Put JS Array.prototype props as static fields and methods in this class
     // and add to proplist of Array_ctor.prototype object on system init.
 };
 
+template <typename T>
 class Ctor_Array: public Function {
   public:
     Ctor_Array(Function* ctor, Object* proto, Object* prototype_proto) : Function(ctor, proto, prototype_proto) {}
 
-    Array* _new() {
-      return new Array(this, this->prototype);
+    Array<T>* _new() {
+      return new Array<T>(this, this->prototype);
     }
+
 };
 
 #endif // __BUILTINS_H__
