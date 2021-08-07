@@ -52,21 +52,7 @@ class Array : public Object {
   public:
     std::vector<T> elements;
     Array(Function* ctor, Object* proto): Object(ctor, proto) {}
-    Array(int nargs, ...) {
-      // Bypass Array_Ctor._new for now to simplify array obj instantiation
-      this->__proto__   = new Object();
-      this->__proto__->__proto__ = Object_ctor.prototype;
-      this->constructor = nullptr;
-
-      va_list args;
-      va_start(args, nargs);
-      while (nargs) {
-        elements.push_back(va_arg(args, T));
-        --nargs;
-      }
-      va_end(args);
-    }
-    T operator[](int i) {return elements[i];}
+    T& operator[](int i) {return elements[i];}
 
     // Put JS Array.prototype props as static fields and methods in this class
     // and add to proplist of Array_ctor.prototype object on system init.
