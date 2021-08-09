@@ -1224,7 +1224,7 @@ void ForLoopNode::AddInit(TreeNode *t) {
   if (t->IsDecl()) {
     DeclNode *decl = (DeclNode*)t;
     TreeNode *var = decl->GetVar();
-    if (var->IsPass()) {
+    if (var && var->IsPass()) {
       PassNode *pass = (PassNode*)var;
       for (unsigned i = 0; i < pass->GetChildrenNum(); i++) {
         DeclNode *n = (DeclNode*)gTreePool.NewTreeNode(sizeof(DeclNode));
