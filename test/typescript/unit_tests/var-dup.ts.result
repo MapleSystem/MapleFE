@@ -1,0 +1,17 @@
+Matched 63 tokens.
+Matched 73 tokens.
+============= Module ===========
+== Sub Tree ==
+func  foo(a)  throws: 
+  js_var Decl: sum=0
+  for ( )
+    js_var Decl: i=4
+    for ( )
+      js_let Decl: i=8
+      sum AddAssign i
+
+
+  return sum
+
+== Sub Tree ==
+console.log(foo(10))
