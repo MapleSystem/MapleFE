@@ -1218,6 +1218,29 @@ void ContinueNode::Dump(unsigned ind) {
   DUMP_RETURN();
 }
 
+// 't' could be a decl with multiple var which are contained in
+// a pass node.
+void ForLoopNode::AddInit(TreeNode *t) {
+  if (t->IsDecl()) {
+    DeclNode *decl = (DeclNode*)t;
+    TreeNode *var = decl->GetVar();
+    if (var->IsPass()) {
+      PassNode *pass = (PassNode*)var;
+      for (unsigned i = 0; i < pass->GetChildrenNum(); i++) {
+        DeclNode *n = (DeclNode*)gTreePool.NewTreeNode(sizeof(DeclNode));
+        new (n) DeclNode();
+        n->SetVar(pass->GetChild(i));
+        n->SetProp(decl->GetProp());
+        AddInit(n);
+      }
+    } else {
+      mInits.PushBack(t);
+    }
+  } else {
+    mInits.PushBack(t);
+  }
+}
+
 void ForLoopNode::Dump(unsigned ind) {
   DumpLabel(ind);
   DumpIndentation(ind);

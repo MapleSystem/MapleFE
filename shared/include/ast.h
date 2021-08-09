@@ -1479,7 +1479,7 @@ public:
     mCond(NULL), mBody(NULL), mVariable(NULL), mSet(NULL), mProp(FLP_Regular) {}
   ~ForLoopNode() {Release();}
 
-  void AddInit(TreeNode *t)   {mInits.PushBack(t);}
+  void AddInit(TreeNode *t);
   void AddUpdate(TreeNode *t) {mUpdates.PushBack(t);}
   void SetCond(TreeNode *t)   {mCond = t; SETPARENT(t);}
   void SetBody(TreeNode *t)   {mBody = t; SETPARENT(t);}
