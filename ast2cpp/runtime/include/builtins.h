@@ -53,6 +53,8 @@ class Array : public Object {
     std::vector<T> elements;
     Array(Function* ctor, Object* proto): Object(ctor, proto) {}
     T& operator[](int i) {return elements[i];}
+    void operator = (const std::vector<T> &v) { elements = v; }
+    std::string dump(void) {return "";};
 
     // Put JS Array.prototype props as static fields and methods in this class
     // and add to proplist of Array_ctor.prototype object on system init.
@@ -68,5 +70,9 @@ class Ctor_Array: public Function {
     }
 
 };
+
+// For creating array and array constructor instances
+#define ARR_OBJ(NM,CTOR) NM(&CTOR, CTOR.prototype)
+#define ARR_CTOR(NM)     NM(&Function_ctor, Function_ctor.prototype, Object_ctor.prototype)
 
 #endif // __BUILTINS_H__
