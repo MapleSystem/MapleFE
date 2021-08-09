@@ -1,8 +1,6 @@
 Matched 5 tokens.
 Matched 14 tokens.
 Matched 3756 tokens.
-Convert unary --> binary
-Convert unary --> binary
 ============= Module ===========
 == Sub Tree ==
 package java.lang
@@ -37,10 +35,10 @@ class  Integer
         i Assign Minus i
       false branch :
 
-      while i LE Minus radix         Assign digits Sub (i Mod radix)
+      while i LE Minus radix         Assign 
         i Assign i Div radix
 
-       Assign digits Sub i
+       Assign 
       cond-branch cond:negative
       true branch :
          Assign -

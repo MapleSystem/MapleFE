@@ -2639,10 +2639,6 @@ TreeNode* Parser::Manipulate(AppealNode *appeal_node) {
     sub_tree = Manipulate2Cast(child_a, child_b);
     if (sub_tree)
       return sub_tree;
-
-    sub_tree = Manipulate2Binary(child_a, child_b);
-    if (sub_tree)
-      return sub_tree;
   }
 
   // In the end, if we still have no suitable solution to create the tree,

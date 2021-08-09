@@ -4,8 +4,6 @@ Matched 21 tokens.
 Matched 28 tokens.
 Matched 35 tokens.
 Matched 3286 tokens.
-Convert unary --> binary
-Convert unary --> binary
 ============= Module ===========
 == Sub Tree ==
 package java.lang
@@ -387,7 +385,7 @@ class  Math
       Decl: exp_delta=Double.NaN
       cond-branch cond:scaleFactor LT 0
       true branch :
-        scaleFactor Assign Math.max(scaleFactor Sub MAX_SCALE)
+        scaleFactor Assign Math.max(scaleFactor,Minus MAX_SCALE)
         scale_increment Assign -512
         exp_delta Assign twoToTheDoubleScaleDown
       false branch :
@@ -405,7 +403,7 @@ class  Math
       return d
     func  scalb(f,scaleFactor)  throws: 
       Decl: MAX_SCALE=FloatConsts.MAX_EXPONENT Add Minus FloatConsts.MIN_EXPONENT Add FloatConsts.SIGNIFICAND_WIDTH Add 1
-      scaleFactor Assign Math.max(Math.min(scaleFactor,MAX_SCALE) Sub MAX_SCALE)
+      scaleFactor Assign Math.max(Math.min(scaleFactor,MAX_SCALE),Minus MAX_SCALE)
       return (float)((double)f Mul powerOfTwoD(scaleFactor))
     func  powerOfTwoD(n)  throws: 
       assert (n GE DoubleConsts.MIN_EXPONENT Land n LE DoubleConsts.MAX_EXPONENT) : 
