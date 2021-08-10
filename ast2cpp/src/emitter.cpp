@@ -1229,20 +1229,26 @@ std::string Emitter::EmitForLoopNode(ForLoopNode *node) {
       {
         for (unsigned i = 0; i < node->GetInitsNum(); ++i)
           if (auto n = node->GetInitAtIndex(i)) {
-            auto init = EmitTreeNode(n);
-            if (i)
+            std::string init = EmitTreeNode(n);
+            init = Clean(init);
+            if (i) {
               str += ", "s;
-            str += Clean(init);
+              if(init.substr(0, 4) == "let " || init.substr(0, 4) == "var ")
+                init = init.substr(4);
+              else if(init.substr(0, 6) == "const ")
+                init = init.substr(6);
+            }
+            str += init;
           }
         str += "; "s;
         if (auto n = node->GetCond()) {
-          auto cond = EmitTreeNode(n);
+          std::string cond = EmitTreeNode(n);
           str += Clean(cond);
         }
         str += "; "s;
         for (unsigned i = 0; i < node->GetUpdatesNum(); ++i)
           if (auto n = node->GetUpdateAtIndex(i)) {
-            auto update = EmitTreeNode(n);
+            std::string update = EmitTreeNode(n);
             if (i)
               str += ", "s;
             str += Clean(update);
