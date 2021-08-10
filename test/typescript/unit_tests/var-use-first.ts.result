@@ -1,0 +1,11 @@
+Matched 27 tokens.
+Matched 37 tokens.
+============= Module ===========
+== Sub Tree ==
+func  foo(j)  throws: 
+  i Assign j
+  js_var Decl: i=4
+  return i Add j
+
+== Sub Tree ==
+console.log(foo(5))
