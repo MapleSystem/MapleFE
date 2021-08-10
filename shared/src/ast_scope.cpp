@@ -139,12 +139,12 @@ void ASTScope::Dump(unsigned indent) {
     switch (node->GetKind()) {
       case NK_Identifier: {
         IdentifierNode *n = static_cast<IdentifierNode *>(node);
-        std::cout << "  decl: " << n->GetName() << " " << n->GetNodeId() << std::endl;
+        std::cout << "   arg: " << n->GetName() << " " << n->GetNodeId() << std::endl;
         break;
       }
       case NK_Decl: {
         DeclNode *n = static_cast<DeclNode *>(node);
-        std::cout << "  func: " << n->GetName() << " " << n->GetNodeId() << std::endl;
+        std::cout << "  decl: " << n->GetName() << " " << n->GetNodeId() << std::endl;
         break;
       }
       case NK_Function: {

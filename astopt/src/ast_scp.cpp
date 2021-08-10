@@ -273,7 +273,7 @@ void AST_SCP::RenameVar() {
   visitor.mPass = 1;
   for (auto it: visitor.mStridx2DeclIdMap) {
     unsigned stridx = it.first;
-    unsigned size = visitor.mStridx2DeclIdMap[stridx].size();
+    unsigned size = it.second.size();
     if (size > 1) {
       const char *name = gStringPool.GetStringFromStrIdx(stridx);
 
