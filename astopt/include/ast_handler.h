@@ -47,6 +47,7 @@ enum AST_Flags {
 class CfgBB;
 class CfgFunc;
 class AST_AST;
+class AST_CFA;
 class AST_DFA;
 class AST_SCP;
 class AST_Handler;
@@ -59,9 +60,10 @@ class Module_Handler {
   ModuleNode   *mASTModule;  // for an AST module
   CfgFunc      *mCfgFunc;   // initial CfgFunc in module scope
   AST_AST      *mAST;
-  AST_DFA      *mDFA;
   AST_SCP      *mSCP;
   TypeInfer    *mTI;
+  AST_CFA      *mCFA;
+  AST_DFA      *mDFA;
   const char   *mOutputFileName;
   unsigned      mFlags;
   std::unordered_map<unsigned, CfgBB *> mNodeId2BbMap;
@@ -82,18 +84,18 @@ class Module_Handler {
   explicit Module_Handler(unsigned f) :
     mCfgFunc(nullptr),
     mAST(nullptr),
-    mDFA(nullptr),
     mSCP(nullptr),
     mTI(nullptr),
+    mCFA(nullptr),
+    mDFA(nullptr),
     mFlags(f) {}
   ~Module_Handler();
 
   void AdjustAST();
-  void BuildScope();
-  void RenameVar();
+  void ScopeAnalysis();
   void TypeInference();
   void BuildCFG();
-  void RemoveDeadBlocks();
+  void ControlFlowAnalysis();
   void DataFlowAnalysis();
 
   const char *GetOutputFileName()          {return mOutputFileName;}
@@ -118,10 +120,12 @@ class Module_Handler {
 
   unsigned GetFlags() {return mFlags;}
   AST_AST *GetAST() {return mAST;}
+  AST_CFA *GetCFA() {return mCFA;}
   AST_DFA *GetDFA() {return mDFA;}
   AST_SCP *GetSCP() {return mSCP;}
   TypeInfer *GetTI() {return mTI;}
   void SetAST(AST_AST *p) {mAST = p;}
+  void SetCFA(AST_CFA *p) {mCFA = p;}
   void SetDFA(AST_DFA *p) {mDFA = p;}
   void SetSCP(AST_SCP *p) {mSCP = p;}
   void SetTI(TypeInfer *p) {mTI = p;}

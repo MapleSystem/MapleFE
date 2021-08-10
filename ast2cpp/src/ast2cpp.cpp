@@ -85,11 +85,8 @@ void A2C::ProcessAST() {
     // rewirte some AST nodes
     handler->AdjustAST();
 
-    // build scope info
-    handler->BuildScope();
-
-    // rename var with same name, i --> i__vN where N is 1, 2, 3 ...
-    handler->RenameVar();
+    // scope analysis
+    handler->ScopeAnalysis();
 
     if (mFlags & FLG_trace_2) {
       std::cout << "============= After AdjustAST ===========" << std::endl;
@@ -110,8 +107,8 @@ void A2C::ProcessAST() {
       handler->Dump("After BuildCFG()");
     }
 
-    // remove dead blocks
-    handler->RemoveDeadBlocks();
+    // control flow analysis
+    handler->ControlFlowAnalysis();
 
     // type inference
     handler->TypeInference();
@@ -128,7 +125,7 @@ void A2C::ProcessAST() {
       astdump.Dump("After BuildCFG()", &std::cout);
     }
 
-    // data flow analysis for the module
+    // data flow analysis
     handler->DataFlowAnalysis();
     if (mFlags & FLG_trace_2) {
       handler->Dump("After DataFlowAnalysis()");

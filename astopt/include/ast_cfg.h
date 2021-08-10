@@ -77,6 +77,7 @@ class CfgBB {
   SmallList<CfgBB *>     mPredecessors;
 
   friend class AST_AST;
+  friend class AST_CFA;
 
  public:
   explicit CfgBB(BBKind k)

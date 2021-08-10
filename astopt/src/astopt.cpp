@@ -45,22 +45,19 @@ void AstOpt::ProcessAST(unsigned flags) {
     // rewirte some AST nodes
     handler->AdjustAST();
 
-    // build scope info
-    handler->BuildScope();
-
-    // rename var with same name, i --> i__vN where N is 1, 2, 3 ...
-    handler->RenameVar();
+    // scope analysis
+    handler->ScopeAnalysis();
 
     // build CFG
     handler->BuildCFG();
 
-    // remove dead blocks
-    handler->RemoveDeadBlocks();
+    // control flow analysis
+    handler->ControlFlowAnalysis();
 
     // type inference
     handler->TypeInference();
 
-    //data flow analysis for the module
+    // data flow analysis
     handler->DataFlowAnalysis();
 
     AstStore saveAst(module);

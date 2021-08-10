@@ -18,9 +18,10 @@
 #include "ast_handler.h"
 #include "ast_cfg.h"
 #include "ast_ast.h"
-#include "ast_dfa.h"
 #include "ast_scp.h"
 #include "ast_ti.h"
+#include "ast_cfa.h"
+#include "ast_dfa.h"
 
 namespace maplefe {
 
@@ -33,9 +34,10 @@ Module_Handler::~Module_Handler() {
   mArrayDeclId2EleTypeIdMap.clear();
   delete mCfgFunc;
   delete mAST;
-  delete mDFA;
   delete mSCP;
   delete mTI;
+  delete mCFA;
+  delete mDFA;
 }
 
 MemPool *Module_Handler::GetMemPool() {
@@ -56,18 +58,11 @@ void Module_Handler::AdjustAST() {
   mAST->AdjustAST();
 }
 
-void Module_Handler::BuildScope() {
+void Module_Handler::ScopeAnalysis() {
   if (!mSCP) {
     mSCP = new(GetMemPool()->Alloc(sizeof(AST_SCP))) AST_SCP(this, mFlags);
   }
-  mSCP->BuildScope();
-}
-
-void Module_Handler::RenameVar() {
-  if (!mSCP) {
-    mSCP = new(GetMemPool()->Alloc(sizeof(AST_SCP))) AST_SCP(this, mFlags);
-  }
-  mSCP->RenameVar();
+  mSCP->ScopeAnalysis();
 }
 
 void Module_Handler::TypeInference() {
@@ -82,11 +77,11 @@ void Module_Handler::BuildCFG() {
   builder.Build();
 }
 
-void Module_Handler::RemoveDeadBlocks() {
-  if (!mAST) {
-    mAST = new(GetMemPool()->Alloc(sizeof(AST_AST))) AST_AST(this, mFlags);
+void Module_Handler::ControlFlowAnalysis() {
+  if (!mCFA) {
+    mCFA = new(GetMemPool()->Alloc(sizeof(AST_CFA))) AST_CFA(this, mFlags);
   }
-  mAST->RemoveDeadBlocks();
+  mCFA->ControlFlowAnalysis();
 }
 
 void Module_Handler::DataFlowAnalysis() {

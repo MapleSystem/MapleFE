@@ -22,6 +22,12 @@
 
 namespace maplefe {
 
+void AST_SCP::ScopeAnalysis() {
+  MSGNOLOC0("============== ScopeAnalysis ==============");
+  BuildScope();
+  RenameVar();
+}
+
 void AST_SCP::BuildScope() {
   MSGNOLOC0("============== BuildScope ==============");
   BuildScopeVisitor visitor(mHandler, mFlags, true);
@@ -256,6 +262,7 @@ ForLoopNode *BuildScopeVisitor::VisitForLoopNode(ForLoopNode *node) {
   return node;
 }
 
+// rename var with same name, i --> i__vN where N is 1, 2, 3 ...
 void AST_SCP::RenameVar() {
   MSGNOLOC0("============== RenameVar ==============");
   RenameVarVisitor visitor(mHandler, mFlags, true);

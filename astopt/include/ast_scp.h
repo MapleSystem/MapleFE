@@ -38,6 +38,7 @@ class AST_SCP {
   explicit AST_SCP(Module_Handler *h, unsigned f) : mHandler(h), mFlags(f) {}
   ~AST_SCP() {};
 
+  void ScopeAnalysis();
   void BuildScope();
   void RenameVar();
 };
