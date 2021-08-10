@@ -181,6 +181,42 @@ std::string CppDef::EmitClassProps(TreeNode* node) {
   return "\n  // Add class fields to obj prop list\n"s + clsFd + addProp;
 }
 
+// return true if var del not in ctrl stmt and is at top level blk of func body
+inline bool IsVarDeclInFuncBodyTopLevelBlk(DeclNode* d) {
+  return d->GetProp() == JS_Var &&
+         d->GetParent() &&
+         d->GetParent()->GetKind() == NK_Block &&
+         d->GetParent()->GetParent()->GetKind() == NK_Function;
+}
+
+std::string CppDef::EmitFuncScopeVarDecls(FunctionNode *node) {
+  std::unordered_map<std::string, DeclNode*>varDeclsInScope;
+  ASTScope* s = node->GetScope();
+  for (int i = 0; i < s->GetDeclNum(); i++) {
+    // build list of var decls in function scope
+    TreeNode* n = s->GetDecl(i);
+    if (n->GetKind() != NK_Decl)
+      continue;
+    DeclNode* d = static_cast<DeclNode*>(n);
+    if (d->GetProp() == JS_Var) {
+      std::unordered_map<std::string, DeclNode*>::iterator it;
+      // check for var decl dups by name - rely on tsc to make sure dups are of same type
+      it = varDeclsInScope.find(d->GetVar()->GetName());
+      if (it == varDeclsInScope.end()) {
+        varDeclsInScope[d->GetVar()->GetName()] = d;
+      }
+    }
+  }
+  std::string str;
+  for (auto const&[key, val] : varDeclsInScope) {
+    if (IsVarDeclInFuncBodyTopLevelBlk(val))
+      // let EmitDeclNode handle var decls in top level block of function body
+      continue;
+    str += mCppDecl.EmitTreeNode(val->GetVar()) + ";"s;
+  }
+  return str;
+}
+
 std::string CppDef::EmitFunctionNode(FunctionNode *node) {
   if (isInit || node == nullptr)
     return std::string();
@@ -207,11 +243,13 @@ std::string CppDef::EmitFunctionNode(FunctionNode *node) {
   str += ")"s;
   int bodyPos = str.size();
   if (auto n = node->GetBody()) {
+    auto varDecls = EmitFuncScopeVarDecls(node);
     auto s = EmitBlockNode(n);
     if(s.empty() || s.front() != '{')
       str += "{"s + s + "}\n"s;
     else
       str += s;
+    str.insert(bodyPos+1, varDecls);
   } else
     str += "{}\n"s;
 
@@ -301,8 +339,15 @@ std::string CppDef::EmitDeclNode(DeclNode *node) {
   if (auto n = node->GetVar()) {
     if (IsVarInitStructLiteral(node))
       name = "  Object* "s + n->GetName();
-    else
-      name += isInit ? EmitTreeNode(n) : mCppDecl.EmitTreeNode(n);
+    else {
+      if (IsVarDeclInFuncBodyTopLevelBlk(node)) {
+        // "var" decl in top level block of function body - emit type and name
+        name += isInit ? EmitTreeNode(n) : mCppDecl.EmitTreeNode(n);
+      } else {
+        // emit just name, no type
+        name = node->GetVar()->GetName();
+      }
+    }
   }
   if (auto n = node->GetInit()) {
     if (node->GetTypeId() == TY_Class && node->GetInit()->GetKind() == NK_StructLiteral) {

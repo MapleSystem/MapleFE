@@ -60,6 +60,7 @@ public:
   virtual std::string EmitNewNode(NewNode *node);
   virtual std::string EmitClassProps(TreeNode *node);
   std::string EmitStructLiteralProps(std::string propsName, StructLiteralNode* node);
+  std::string EmitFuncScopeVarDecls(FunctionNode *node);
 };
 
 } // namespace maplefe
