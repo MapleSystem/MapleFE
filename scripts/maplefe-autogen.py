@@ -804,7 +804,7 @@ bool PutNode(TreeNode *n) {{
                              *mOs << s;
                              break;
                            }}
-      case NK_Pass:        *mOs << NodeColor(lightgrey); break;
+      case NK_Pass:        *mOs << NodeColor(darkgrey); break;
       case NK_New:         *mOs << NodeColor(khaki); break;
       case NK_Try:         *mOs << NodeColor(plum); break;
       case NK_Catch:       *mOs << NodeColor(thistle); break;
