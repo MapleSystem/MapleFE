@@ -183,6 +183,7 @@ std::string CppDef::EmitClassProps(TreeNode* node) {
 
 // return true if var del not in ctrl stmt and is at top level blk of func body
 inline bool IsVarDeclInFuncBodyTopLevelBlk(DeclNode* d) {
+  MASSERT(d->GetProp() == JS_Var && "DeclNode prop not JS_Var in var decl check");
   return d->GetProp() == JS_Var &&
          d->GetParent() &&
          d->GetParent()->GetKind() == NK_Block &&
@@ -340,8 +341,8 @@ std::string CppDef::EmitDeclNode(DeclNode *node) {
     if (IsVarInitStructLiteral(node))
       name = "  Object* "s + n->GetName();
     else {
-      if (IsVarDeclInFuncBodyTopLevelBlk(node)) {
-        // "var" decl in top level block of function body - emit type and name
+      if (node->GetProp() != JS_Var || IsVarDeclInFuncBodyTopLevelBlk(node)) {
+        // "var" decl in top level block of function body, or non-var (i.e. let or const, which are block scoped) - emit type and name
         name += isInit ? EmitTreeNode(n) : mCppDecl.EmitTreeNode(n);
       } else {
         // emit just name, no type
