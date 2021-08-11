@@ -1523,6 +1523,7 @@ TreeNode* ASTBuilder::BuildArrayElement() {
           array->IsField() ||
           array->IsUserType() ||
           array->IsBinOperator() ||
+          array->IsCall() ||
           (array->IsLiteral() && ((LiteralNode*)array)->IsThis()) ||
           array->IsPrimType());
 
@@ -1531,6 +1532,7 @@ TreeNode* ASTBuilder::BuildArrayElement() {
       array->IsField() ||
       array->IsUserType() ||
       array->IsBinOperator() ||
+      array->IsCall() ||
       (array->IsLiteral() && ((LiteralNode*)array)->IsThis()) ||
       array->IsPrimType()) {
     array_element = (ArrayElementNode*)gTreePool.NewTreeNode(sizeof(ArrayElementNode));
