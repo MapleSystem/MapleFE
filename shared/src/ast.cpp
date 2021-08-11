@@ -1710,6 +1710,8 @@ void FunctionNode::CleanUp() {
         } else {
           // If pass node is the header, insert before next.
           // If pass node is the last or any one else, insert after prev.
+          next = NULL;
+          prev = NULL;
           if (i == 0) {
             next = mBody->GetChildAtIndex(1);
           } else {
