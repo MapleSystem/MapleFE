@@ -183,10 +183,7 @@ StructNode *BuildScopeVisitor::VisitStructNode(StructNode *node) {
 DeclNode *BuildScopeVisitor::VisitDeclNode(DeclNode *node) {
   BuildScopeBaseVisitor::VisitDeclNode(node);
   ASTScope *scope = NULL;
-  if (node->GetProp() == JS_Let) {
-    // use current scope
-    scope = mScopeStack.top();
-  } else {
+  if (node->GetProp() == JS_Var) {
     // promote to use function or module scope
     scope = mUserScopeStack.top();
 
@@ -195,6 +192,9 @@ DeclNode *BuildScopeVisitor::VisitDeclNode(DeclNode *node) {
     if (node->GetVar()) {
       node->GetVar()->SetScope(scope);
     }
+  } else {
+    // use current scope
+    scope = mScopeStack.top();
   }
   scope->AddDecl(node);
   return node;
