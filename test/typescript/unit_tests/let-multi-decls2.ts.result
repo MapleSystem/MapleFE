@@ -1,0 +1,15 @@
+Matched 40 tokens.
+Matched 44 tokens.
+============= Module ===========
+== Sub Tree ==
+func  func()  throws: 
+  js_let Decl: i=1
+  js_let Decl: j=2
+  js_let Decl: k
+  i Assign 10
+  j Assign 3
+  k Assign 5
+  console.log(i Add j Add k)
+
+== Sub Tree ==
+func()

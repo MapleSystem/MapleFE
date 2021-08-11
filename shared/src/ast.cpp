@@ -1386,7 +1386,23 @@ void SwitchNode::Dump(unsigned ind) {
 //////////////////////////////////////////////////////////////////////////////////////
 
 void BlockNode::AddChild(TreeNode *tree) {
-  if (tree->IsPass()) {
+  if (tree->IsDecl()) {
+    DeclNode *decl = (DeclNode*)tree;
+    TreeNode *var = decl->GetVar();
+    if (var && var->IsPass()) {
+      PassNode *pass = (PassNode*)var;
+      for (unsigned i = 0; i < pass->GetChildrenNum(); i++) {
+        DeclNode *n = (DeclNode*)gTreePool.NewTreeNode(sizeof(DeclNode));
+        new (n) DeclNode();
+        n->SetVar(pass->GetChild(i));
+        n->SetProp(decl->GetProp());
+        AddChild(n);
+      }
+    } else {
+      mChildren.PushBack(tree);
+      tree->SetParent(this);
+    }
+  } else if (tree->IsPass()) {
     PassNode *passnode = (PassNode*)tree;
     for (unsigned j = 0; j < passnode->GetChildrenNum(); j++) {
       TreeNode *child = passnode->GetChild(j);
