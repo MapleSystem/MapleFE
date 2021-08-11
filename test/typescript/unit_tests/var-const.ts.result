@@ -1,0 +1,13 @@
+Matched 36 tokens.
+Matched 46 tokens.
+============= Module ===========
+== Sub Tree ==
+func  foo(j)  throws: 
+  js_const Decl: i=4
+  j AddAssign 10 Mul i
+
+  js_var Decl: i=8
+  return i Add j
+
+== Sub Tree ==
+console.log(foo(5))
