@@ -55,7 +55,22 @@ std::string ModuleNode::GetSrcLangString() {
 
 // The tree could be PassNode
 void ModuleNode::AddTree(TreeNode *tree) {
-  if (tree->IsPass()) {
+  if (tree->IsDecl()) {
+    DeclNode *decl = (DeclNode*)tree;
+    TreeNode *var = decl->GetVar();
+    if (var && var->IsPass()) {
+      PassNode *pass = (PassNode*)var;
+      for (unsigned i = 0; i < pass->GetChildrenNum(); i++) {
+        DeclNode *n = (DeclNode*)gTreePool.NewTreeNode(sizeof(DeclNode));
+        new (n) DeclNode();
+        n->SetVar(pass->GetChild(i));
+        n->SetProp(decl->GetProp());
+        AddTree(n);
+      }
+    } else {
+      mTrees.PushBack(tree);
+    }
+  } else if (tree->IsPass()) {
     PassNode *pass_node = (PassNode*)tree;
     for (unsigned i = 0; i < pass_node->GetChildrenNum(); i++) {
       TreeNode *child = pass_node->GetChild(i);
