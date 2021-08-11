@@ -181,15 +181,6 @@ std::string CppDef::EmitClassProps(TreeNode* node) {
   return "\n  // Add class fields to obj prop list\n"s + clsFd + addProp;
 }
 
-// return true if var del not in ctrl stmt and is at top level blk of func body
-inline bool IsVarDeclInFuncBodyTopLevelBlk(DeclNode* d) {
-  MASSERT(d->GetProp() == JS_Var && "DeclNode prop not JS_Var in var decl check");
-  return d->GetProp() == JS_Var &&
-         d->GetParent() &&
-         d->GetParent()->GetKind() == NK_Block &&
-         d->GetParent()->GetParent()->GetKind() == NK_Function;
-}
-
 std::string CppDef::EmitFuncScopeVarDecls(FunctionNode *node) {
   std::unordered_map<std::string, DeclNode*>varDeclsInScope;
   ASTScope* s = node->GetScope();
@@ -200,6 +191,8 @@ std::string CppDef::EmitFuncScopeVarDecls(FunctionNode *node) {
       continue;
     DeclNode* d = static_cast<DeclNode*>(n);
     if (d->GetProp() == JS_Var) {
+      // skip var decl name duplicates - same name but diff
+      // type is illegal in typescript so not checked here
       std::unordered_map<std::string, DeclNode*>::iterator it;
       // check for var decl dups by name - rely on tsc to make sure dups are of same type
       it = varDeclsInScope.find(d->GetVar()->GetName());
@@ -210,9 +203,8 @@ std::string CppDef::EmitFuncScopeVarDecls(FunctionNode *node) {
   }
   std::string str;
   for (auto const&[key, val] : varDeclsInScope) {
-    if (IsVarDeclInFuncBodyTopLevelBlk(val))
-      // let EmitDeclNode handle var decls in top level block of function body
-      continue;
+    // Emit decl for the var  (just type, name - init part emitted
+    // when corresponding DeclNode processed
     str += mCppDecl.EmitTreeNode(val->GetVar()) + ";"s;
   }
   return str;
@@ -341,8 +333,8 @@ std::string CppDef::EmitDeclNode(DeclNode *node) {
     if (IsVarInitStructLiteral(node))
       name = "  Object* "s + n->GetName();
     else {
-      if (node->GetProp() != JS_Var || IsVarDeclInFuncBodyTopLevelBlk(node)) {
-        // "var" decl in top level block of function body, or non-var (i.e. let or const, which are block scoped) - emit type and name
+      if (node->GetProp() != JS_Var) {
+        // emit type and name
         name += isInit ? EmitTreeNode(n) : mCppDecl.EmitTreeNode(n);
       } else {
         // emit just name, no type
@@ -351,6 +343,7 @@ std::string CppDef::EmitDeclNode(DeclNode *node) {
     }
   }
   if (auto n = node->GetInit()) {
+    // emit init part
     if (node->GetTypeId() == TY_Class && node->GetInit()->GetKind() == NK_StructLiteral) {
       // Emit obj instance with object/struct literal init
       std::string props = EmitStructLiteralProps(DeclVarName(node)+"Props"s, static_cast<StructLiteralNode*>( node->GetInit()));
