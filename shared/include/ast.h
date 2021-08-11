@@ -1480,7 +1480,7 @@ public:
   ~ForLoopNode() {Release();}
 
   void AddInit(TreeNode *t);
-  void AddUpdate(TreeNode *t) {mUpdates.PushBack(t);}
+  void AddUpdate(TreeNode *t);
   void SetCond(TreeNode *t)   {mCond = t; SETPARENT(t);}
   void SetBody(TreeNode *t)   {mBody = t; SETPARENT(t);}
 

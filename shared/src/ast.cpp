@@ -1241,6 +1241,16 @@ void ForLoopNode::AddInit(TreeNode *t) {
   }
 }
 
+void ForLoopNode::AddUpdate(TreeNode *t) {
+  if (t->IsPass()) {
+    PassNode *pass = (PassNode*)t;
+    for (unsigned i = 0; i < pass->GetChildrenNum(); i++)
+      AddUpdate(pass->GetChild(i));
+  } else {
+    mUpdates.PushBack(t);
+  }
+}
+
 void ForLoopNode::Dump(unsigned ind) {
   DumpLabel(ind);
   DumpIndentation(ind);

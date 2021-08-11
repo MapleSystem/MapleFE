@@ -1,0 +1,5 @@
+Matched 42 tokens.
+============= Module ===========
+== Sub Tree ==
+for ( )
+  console.log(i,j,k)
