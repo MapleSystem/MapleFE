@@ -132,24 +132,24 @@ bool ASTScope::IsAncestor(ASTScope *ancestor) {
 
 void ASTScope::Dump(unsigned indent) {
   mTree->DumpIndentation(indent);
-  std::cout << "name: " << AstDump::GetEnumNodeKind(mTree->GetKind()) << " " << mTree->GetName() << " " << mTree->GetNodeId() << std::endl;
+  std::cout << "scope: " << AstDump::GetEnumNodeKind(mTree->GetKind()) << " " << mTree->GetName() << " " << mTree->GetNodeId() << std::endl;
   for (unsigned i = 0; i < GetDeclNum(); i++) {
     TreeNode *node = GetDecl(i);
     node->DumpIndentation(indent);
     switch (node->GetKind()) {
       case NK_Identifier: {
         IdentifierNode *n = static_cast<IdentifierNode *>(node);
-        std::cout << "   arg: " << n->GetName() << " " << n->GetNodeId() << std::endl;
+        std::cout << "    arg: " << n->GetName() << " " << n->GetNodeId() << std::endl;
         break;
       }
       case NK_Decl: {
         DeclNode *n = static_cast<DeclNode *>(node);
-        std::cout << "  decl: " << n->GetName() << " " << n->GetNodeId() << std::endl;
+        std::cout << "   decl: " << n->GetName() << " " << n->GetNodeId() << std::endl;
         break;
       }
       case NK_Function: {
         FunctionNode *n = static_cast<FunctionNode *>(node);
-        std::cout << "  func: " << n->GetName() << " " << n->GetNodeId() << std::endl;
+        std::cout << "   func: " << n->GetName() << " " << n->GetNodeId() << std::endl;
         break;
       }
     }
@@ -158,7 +158,7 @@ void ASTScope::Dump(unsigned indent) {
   for (unsigned i = 0; i < GetTypeNum(); i++) {
     TreeNode *node = GetType(i);
     node->DumpIndentation(indent);
-    std::cout << "  type: " << node->GetName() << " " << node->GetNodeId() << std::endl;
+    std::cout << "   type: " << node->GetName() << " " << node->GetNodeId() << std::endl;
   }
 
   for (unsigned i = 0; i < GetChildrenNum(); i++) {

@@ -36,10 +36,6 @@ class AST_AST {
   ~AST_AST() {}
 
   void AdjustAST();
-
-  void CollectReachableBB();
-  void RemoveUnreachableBB();
-  void RemoveDeadBlocks();
 };
 
 class AdjustASTVisitor : public AstVisitor {
