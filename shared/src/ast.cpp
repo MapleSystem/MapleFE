@@ -1236,6 +1236,10 @@ void ForLoopNode::AddInit(TreeNode *t) {
     } else {
       mInits.PushBack(t);
     }
+  } else if (t->IsPass()) {
+    PassNode *pass = (PassNode*)t;
+    for (unsigned i = 0; i < pass->GetChildrenNum(); i++)
+      AddInit(pass->GetChild(i));
   } else {
     mInits.PushBack(t);
   }

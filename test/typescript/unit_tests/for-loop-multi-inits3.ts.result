@@ -1,0 +1,27 @@
+Matched 64 tokens.
+Matched 74 tokens.
+Matched 93 tokens.
+Matched 99 tokens.
+============= Module ===========
+== Sub Tree ==
+class  Klass
+  Fields: 
+    items=[]
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+    func  func()  throws: 
+      js_let Decl: i
+      js_let Decl: list
+      js_let Decl: len
+      for ( )
+        console.log(i,list[i])
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+js_var Decl: obj=new Klass()
+== Sub Tree ==
+obj.items.push(1,2,3,4,5,6)
+== Sub Tree ==
+obj.func()
