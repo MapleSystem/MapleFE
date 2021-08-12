@@ -1,8 +1,14 @@
-class Klass {
+abstract class Base {
   func(f: () => void): void {
     f();
   }
   public abstract func2(f: () => void): void;
+}
+
+class Klass extends Base {
+  func2(f: () => void): void {
+    f();
+  }
 }
 
 function foo() : void {
