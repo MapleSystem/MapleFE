@@ -180,12 +180,13 @@ echo
 echo "Test case(s) passed:"
 grep -a "^MSG: Passed, test case " <<< "$msg" | sed 's/MSG: Passed, test case //' | env LC_ALL=C sort | nl
 grep -aq -m1 "^MSG: Failed, test case " <<< "$msg"
-if [ $? -eq 0 ]; then
+rc=$?
+if [ $rc -eq 0 ]; then
   echo
   echo "Test case(s) failed:"
   grep -a "^MSG: Failed," <<< "$msg" | sed 's/MSG: Failed, test case //' | env LC_ALL=C sort | nl
-  echo
-  echo Total: $(wc -l <<< "$msg"), Passed: $(grep -ac "^MSG: Passed," <<< "$msg"), Failed: $(grep -ac "^MSG: Failed," <<< "$msg")
-  grep -a "^MSG: Failed," <<< "$msg" | sed 's/MSG: Failed, test case (\([^)]*\).*/due to \1/' | sort | uniq -c
-  exit 1
 fi
+echo
+echo Total: $(wc -l <<< "$msg"), Passed: $(grep -ac "^MSG: Passed," <<< "$msg"), Failed: $(grep -ac "^MSG: Failed," <<< "$msg")
+grep -a "^MSG: Failed," <<< "$msg" | sed 's/MSG: Failed, test case (\([^)]*\).*/due to \1/' | sort | uniq -c
+exit $rc
