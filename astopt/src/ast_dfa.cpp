@@ -557,11 +557,13 @@ void AST_DFA::BuildDefUseChain() {
 
       if (done_list.find(bbid) == done_list.end()) {
         // check if def is either alive at bb entry or created in bb
-        //bool alive = mRchInMap[bbid]->GetBit(i);
-        //bool gen = mGenMap[bbid]->GetBit(i);
-        //if (!(alive || gen)) {
-        //  continue;
-        //}
+        bool alive = mRchInMap[bbid]->GetBit(i);
+        bool gen = mGenMap[bbid]->GetBit(i);
+        if (!(alive || gen)) {
+          done_list.insert(bbid);
+          continue;
+        }
+
         // process bb
         visitor.VisitBB(bbid);
 
