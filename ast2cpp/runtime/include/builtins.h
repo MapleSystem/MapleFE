@@ -52,6 +52,8 @@ class Array : public Object {
   public:
     std::vector<T> elements;
     Array(Function* ctor, Object* proto): Object(ctor, proto) {}
+    Array(Function* ctor, Object* proto, std::initializer_list<T> l): Object(ctor, proto), elements(l) {}
+
     T& operator[](int i) {return elements[i];}
     void operator = (const std::vector<T> &v) { elements = v; }
     std::string dump(void) {return "";};
@@ -65,8 +67,8 @@ class Ctor_Array: public Function {
   public:
     Ctor_Array(Function* ctor, Object* proto, Object* prototype_proto) : Function(ctor, proto, prototype_proto) {}
 
-    Array<T>* _new() {
-      return new Array<T>(this, this->prototype);
+    Array<T>* _new(std::initializer_list<T>l) {
+      return new Array<T>(this, this->prototype, l );
     }
 
 };
