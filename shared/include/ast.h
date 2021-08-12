@@ -163,8 +163,6 @@ public:
 
   // Release the dynamically allocated memory by this tree node.
   virtual void Release(){}
-private:
-  static unsigned GetNextNodeId() {static unsigned id = 1; return id++; }
 };
 
 //////////////////////////////////////////////////////////////////////////

@@ -654,7 +654,7 @@ bool Parser::TraverseExpression() {
     MASSERT(child);
     mRootNode->CopyMatch(child);
     // Need adjust the mCurToken. A rule could try multiple possible
-    // children rules, although there is one any only one valid child
+    // children rules, although there is one and only one valid child
     // for a Top table. However, the mCurToken could deviate from
     // the valid children and reflect the invalid children.
     MASSERT(mRootNode->mChildren.GetNum() == 1);
@@ -690,7 +690,7 @@ bool Parser::TraverseStmt() {
       MASSERT(child);
       mRootNode->CopyMatch(child);
       // Need adjust the mCurToken. A rule could try multiple possible
-      // children rules, although there is one any only one valid child
+      // children rules, although there is one and only one valid child
       // for a Top table. However, the mCurToken could deviate from
       // the valid children and reflect the invalid children.
       MASSERT(mRootNode->mChildren.GetNum() == 1);
@@ -1533,7 +1533,7 @@ bool Parser::TraverseOneof(RuleTable *rule_table, AppealNode *appeal) {
     appeal->ClearMatch();
     appeal->AddMatch(longest);
   }
-    
+
   // move position according to the longest matching
   mCurToken = new_mCurToken;
   return found;
@@ -1751,7 +1751,7 @@ void Parser::SetIsDone(RuleTable *rt, unsigned start_token) {
 //           get a single tree.
 /////////////////////////////////////////////////////////////////////////////
 
-// We don't want to use recursive. So a deque is used here.
+// We don't want to use recursion. So a deque is used here.
 static std::deque<AppealNode*> to_be_sorted;
 
 void Parser::SortOut() {
