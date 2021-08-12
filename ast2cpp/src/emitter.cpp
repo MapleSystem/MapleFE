@@ -1551,8 +1551,6 @@ std::string Emitter::EmitClassNode(ClassNode *node) {
       std::string func = EmitFunctionNode(n);
       if (func.substr(0, 9) == "function ")
         func = func.substr(9);
-      if (n->GetType() && n->GetBody() == nullptr)
-        Replace(func, "=>", ":", -1);
       func = Clean(func);
       str += func.back() == '}' ? func : func + ";\n"s;
     }
