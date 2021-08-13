@@ -47,6 +47,7 @@ ACTION(BuildImport)
 ACTION(BuildExport)
 ACTION(SetPairs)
 ACTION(SetDefaultPairs)
+ACTION(SetSinglePairs)
 ACTION(SetFromModule)
 ACTION(SetIsEverything)   // Apply to all pairs in import/export
 

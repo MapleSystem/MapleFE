@@ -1485,7 +1485,7 @@ rule ExportDeclaration : ONEOF(ZEROORMORE(Annotation) + "export" + '*' + FromCla
   attr.action.%2,%3,%4,%5 : SetPairs(%3)
   attr.action.%6,%7,%8 :    SetDefaultPairs(%4)
   attr.action.%1,%2 :       SetFromModule(%4)
-  attr.action.%9          : SetPairs(%4)
+  attr.action.%9          : SetSinglePairs(%4)
 
 ## See 15.2.3
 ## ExportClause :

@@ -12,4 +12,4 @@ class  Klass
   LocalInterfaces: 
 
 == Sub Tree ==
-export {Klass} 
+export { SINGLE Klass} 

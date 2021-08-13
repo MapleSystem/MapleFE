@@ -173,6 +173,16 @@ void ImportNode::AddDefaultPair(TreeNode *t) {
   }
 }
 
+void ImportNode::AddSinglePair(TreeNode *before, TreeNode *after) {
+  // We create a new pair
+  XXportAsPairNode *n = (XXportAsPairNode*)gTreePool.NewTreeNode(sizeof(XXportAsPairNode));
+  new (n) XXportAsPairNode();
+  n->SetBefore(before);
+  n->SetAfter(after);
+  n->SetIsSingle();
+  mPairs.PushBack(n);
+}
+
 void ImportNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   DUMP0_NORETURN("import ");
@@ -241,6 +251,16 @@ void ExportNode::AddDefaultPair(TreeNode *t) {
   }
 }
 
+void ExportNode::AddSinglePair(TreeNode *before, TreeNode *after) {
+  // We create a new pair
+  XXportAsPairNode *n = (XXportAsPairNode*)gTreePool.NewTreeNode(sizeof(XXportAsPairNode));
+  new (n) XXportAsPairNode();
+  n->SetBefore(before);
+  n->SetAfter(after);
+  n->SetIsSingle();
+  mPairs.PushBack(n);
+}
+
 void ExportNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   DUMP0_NORETURN("export ");
@@ -277,6 +297,14 @@ void XXportAsPairNode::Dump(unsigned indent) {
     if (mBefore) {
       DUMP0_NORETURN(" as ");
       mBefore->Dump(0);
+    }
+  } else if (IsSingle()) {
+    DUMP0_NORETURN(" SINGLE ");
+    if (mBefore)
+      mBefore->Dump(0);
+    if (mAfter) {
+      DUMP0_NORETURN(" as ");
+      mAfter->Dump(0);
     }
   } else {
     MASSERT(mBefore);

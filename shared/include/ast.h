@@ -192,11 +192,23 @@ public:
 // Regarding 'default' and 'everything' (*), there are some rules of saving
 // in the XXportAsPairNode. First, let's look at the variaties of combinations
 // of default and *.
+//
 //   1) import * as x
+//        mIsEverything = true
+//        mAfter = x
 //   2) import default as x
 //   3) export x as default
 //   4) export *
+//        mIsEverything = true
+//        mAfter = NULL, mBefore = NULL
 //   5) export default declaration
+//   6) export = x                 // This exports a single object.
+//        mIsSingle = true
+//        mBefore = x
+//   7) import x = require("y")   // The counterpart of export = xxx
+//        mIsSingle = true;
+//        mBefore = y
+//        mAfter = x
 // For all these cases, we set mIsDefault or mIsEverything, and save the
 // possible 'x' to mBefore.
 //////////////////////////////////////////////////////////////////////////
@@ -205,12 +217,13 @@ class XXportAsPairNode : public TreeNode {
 private:
   bool      mIsDefault;     // import or export 'default'
   bool      mIsEverything;  // import or export '*', which is everything
+  bool      mIsSingle;      // export = xxx
   TreeNode *mBefore;        // In usual cases, name before 'as'
   TreeNode *mAfter;         // In usual cases, name after 'as'
 
 public:
   XXportAsPairNode() : TreeNode(NK_XXportAsPair),
-    mIsDefault(false), mIsEverything(false), mBefore(NULL), mAfter(NULL) {}
+    mIsDefault(false), mIsEverything(false), mIsSingle(false), mBefore(NULL), mAfter(NULL) {}
   ~XXportAsPairNode() {}
 
   bool IsDefault()    {return mIsDefault;}
@@ -218,6 +231,9 @@ public:
 
   bool IsEverything()    {return mIsEverything;}
   void SetIsEverything(bool b = true) {mIsEverything = b;}
+
+  bool IsSingle()    {return mIsSingle;}
+  void SetIsSingle(bool b = true) {mIsSingle = b;}
 
   TreeNode* GetBefore() {return mBefore;}
   void SetBefore(TreeNode *t) {mBefore = t; SETPARENT(t);}
@@ -279,6 +295,7 @@ public:
   void SetPair(unsigned i, XXportAsPairNode* n) {*(mPairs.RefAtIndex(i)) = n; SETPARENT(n);}
   void AddPair(TreeNode *p);
   void AddDefaultPair(TreeNode *p);
+  void AddSinglePair(TreeNode *before, TreeNode *after);
 
   // Annotation/Pragma related
   unsigned GetAnnotationsNum()           {return mAnnotations.GetNum();}
@@ -358,6 +375,7 @@ public:
   void SetPair(unsigned i, XXportAsPairNode* n) {*(mPairs.RefAtIndex(i)) = n;}
   void AddPair(TreeNode *p);
   void AddDefaultPair(TreeNode *p);
+  void AddSinglePair(TreeNode *before, TreeNode *after);
 
   void Dump(unsigned indent);
 };

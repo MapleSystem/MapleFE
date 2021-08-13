@@ -440,6 +440,43 @@ TreeNode* ASTBuilder::SetDefaultPairs() {
   return mLastTreeNode;
 }
 
+// It takes
+//   1. One argument:  the mBefore object. Usually happens in
+//                       export = x
+//   2. Two arguments: the mBefore and mAfter. In TS, it has
+//                       import x = require(y)
+//                     [NOTE] In .spec file, put the arguments in order of
+//                            SetSinglePairs(before, after)
+
+TreeNode* ASTBuilder::SetSinglePairs() {
+  TreeNode *before = NULL;
+  TreeNode *after = NULL;
+
+  if (mParams.size() == 2) {
+    Param p = mParams[0];
+    if (!p.mIsEmpty && p.mIsTreeNode)
+      before = p.mData.mTreeNode;
+    p = mParams[1];
+    if (!p.mIsEmpty && p.mIsTreeNode)
+      after = p.mData.mTreeNode;
+  } else {
+    MASSERT(mParams.size() == 1);
+    Param p = mParams[0];
+    if (!p.mIsEmpty && p.mIsTreeNode)
+      before = p.mData.mTreeNode;
+  }
+
+  if (mLastTreeNode->IsImport()) {
+    ImportNode *inode = (ImportNode*)mLastTreeNode;
+    inode->AddSinglePair(before, after);
+  } else if (mLastTreeNode->IsExport()) {
+    ExportNode *enode = (ExportNode*)mLastTreeNode;
+    enode->AddSinglePair(before, after);
+  }
+
+  return mLastTreeNode;
+}
+
 // Takes one argument, the 'from' module
 TreeNode* ASTBuilder::SetFromModule() {
   Param p = mParams[0];
