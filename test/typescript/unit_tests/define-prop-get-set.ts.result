@@ -9,10 +9,10 @@ js_var Decl: obj= {x:"abc", name:""}
 == Sub Tree ==
 Object.defineProperty(obj,"name", {get:func  get(this)  throws: 
   console.log("Return obj.x")
-  return this[x]
+  return this["x"]
 , set:func  set(this,val)  throws: 
   console.log( template-literal: "Set obj.x to '",val,"'",NULL)
-  this[x] Assign val
+  this["x"] Assign val
 , enumerable:false})
 == Sub Tree ==
 obj.name Assign "def"

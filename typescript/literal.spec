@@ -154,6 +154,5 @@ rule NullLiteral : "null"
 rule Literal : ONEOF(IntegerLiteral,
                      FPLiteral,
                      BooleanLiteral,
-                     CharacterLiteral,
                      StringLiteral,
                      NullLiteral)

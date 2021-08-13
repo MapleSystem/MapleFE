@@ -4,12 +4,12 @@ Matched 109 tokens.
 Matched 120 tokens.
 ============= Module ===========
 == Sub Tree ==
-js_var Decl: func=(obj) -> js_const Decl: desc=Object.getOwnPropertyDescriptor(obj,f)
+js_var Decl: func=(obj) -> js_const Decl: desc=Object.getOwnPropertyDescriptor(obj,"f")
 console.log(desc)
 cond-branch cond: typeof desc.value StEq "function"
 true branch :
   js_const Decl: v=desc.value
-  obj[f] Assign func  (this)  throws: 
+  obj["f"] Assign func  (this)  throws: 
   console.log("Calling the new function")
   return v.call(this,...arguments)
 

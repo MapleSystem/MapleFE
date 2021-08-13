@@ -8,6 +8,6 @@ js_var Decl: str="abcba"
 == Sub Tree ==
 console.log(str)
 == Sub Tree ==
-str Assign str.replace(reg expr :  b  g,B)
+str Assign str.replace(reg expr :  b  g,"B")
 == Sub Tree ==
 console.log(str)

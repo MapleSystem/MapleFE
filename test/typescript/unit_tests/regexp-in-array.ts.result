@@ -5,6 +5,6 @@ Matched 33 tokens.
 == Sub Tree ==
 js_var Decl: x=[]
 == Sub Tree ==
-x.push([reg expr :  &lt;  g,<])
+x.push([reg expr :  &lt;  g,"<"])
 == Sub Tree ==
 console.log(x)

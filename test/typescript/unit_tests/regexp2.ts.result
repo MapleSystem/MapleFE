@@ -3,7 +3,7 @@ Matched 29 tokens.
 ============= Module ===========
 == Sub Tree ==
 func  repl(s)  throws: 
-  return s.replace(reg expr :  \s\S  g,.)
+  return s.replace(reg expr :  \s\S  g,".")
 
 == Sub Tree ==
 console.log(repl("abc def gh"))
