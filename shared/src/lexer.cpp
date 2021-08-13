@@ -600,7 +600,7 @@ bool Lexer::FindNextTLPlaceHolder(unsigned start_idx, std::string& str, unsigned
       working_idx += 2;
       waiting_right_brace = true;
       continue;
-    } else if (line[working_idx] == '\'') {
+    } else if (line[working_idx] == '\'' || line[working_idx] == '\"') {
       in_string_literal = in_string_literal ? false : true;
     } else if (line[working_idx] == '{') {
       if (!in_string_literal) {

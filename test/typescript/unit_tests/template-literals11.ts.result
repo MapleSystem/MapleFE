@@ -1,0 +1,9 @@
+Matched 19 tokens.
+Matched 22 tokens.
+Matched 23 tokens.
+============= Module ===========
+== Sub Tree ==
+func  func(name)  throws: 
+  return Function("target", template-literal: NULL,"try {
+" Add "  target.",NULL,name,"();\n",NULL Add  template-literal: "}",NULL)
+
