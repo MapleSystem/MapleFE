@@ -121,8 +121,7 @@ for ts in $LIST; do
       clang-format-10 --style="{ColumnLimit: 120}" $ts > $ts.tmp.ts
       $TS2AST $ts.tmp.ts
       if [ $? -eq 0 ]; then
-        $AST2CPP $ts.tmp.ts.ast $TREEDIFF | sed -n '/^AstDump:/,/^}/p' | sed -e 's/LT_CharacterLiteral/LT_StringLiteral/' \
-          -e 's/\(mStrIdx: unsigned int, \)[0-9]* =>/\1=>/'
+        $AST2CPP $ts.tmp.ts.ast $TREEDIFF | sed -n '/^AstDump:/,/^}/p' | sed 's/\(mStrIdx: unsigned int, \)[0-9]* =>/\1=>/'
       fi > $ts.orig
       $TS2AST $T
       if [ $? -eq 0 ]; then
