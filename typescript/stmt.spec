@@ -84,6 +84,7 @@ rule KeywordIdentifier : ONEOF("get",
                                "switch",
                                "infer",
                                "asserts",
+                               "require",
                                "import")
 ## "
   attr.action : BuildIdentifier()
@@ -1381,12 +1382,14 @@ rule ModuleItem : ONEOF(ImportDeclaration,
 ## import ImportClause FromClause ;
 ## import ModuleSpecifier ;
 rule ImportDeclaration : ONEOF("import" + ImportClause + FromClause + ZEROORONE(';'),
-                               "import" + ModuleSpecifier + ZEROORONE(';'))
+                               "import" + ModuleSpecifier + ZEROORONE(';'),
+                               "import" + BindingIdentifier + '=' + "require" + '(' + AssignmentExpression + ')' + ZEROORONE(';'))
   attr.property : Top
-  attr.action.%1,%2 : BuildImport()
+  attr.action.%1,%2,%3 : BuildImport()
   attr.action.%1 :    SetPairs(%2)
   attr.action.%1 :    SetFromModule(%3)
   attr.action.%2 :    SetFromModule(%2)
+  attr.action.%3 :    SetSinglePairs(%6, %2)
 
 ## ImportClause :
 ## ImportedDefaultBinding

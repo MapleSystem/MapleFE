@@ -75,6 +75,7 @@ STRUCT KeyWord : ((boolean),
                   (throw),
                   (delete),
                   (import),
+                  (require),
                   (try),
                   (asserts),
 
