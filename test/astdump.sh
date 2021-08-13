@@ -21,7 +21,7 @@ Short/long options:
 EOF
 exit 1
 }
-
+CMDLINE="$0 $*"
 DOT= PRE= LIST= VIEWOP= HIGHLIGHT="cat" TSCERR= KEEP= CLEAN= NAME= TREEDIFF= TSC=yes
 while [ $# -gt 0 ]; do
     case $1 in
@@ -173,20 +173,21 @@ for ts in $LIST; do
 done
 wait
 echo Done.
-
-[ -f $PROCID-summary.out ] || exit 1
-msg=$(grep -a "^MSG: [PF]a[si][sl]ed," $PROCID-summary.out)
-echo
-echo "Test case(s) passed:"
-grep -a "^MSG: Passed, test case " <<< "$msg" | sed 's/MSG: Passed, test case //' | env LC_ALL=C sort | nl
-grep -aq -m1 "^MSG: Failed, test case " <<< "$msg"
-rc=$?
-if [ $rc -eq 0 ]; then
-  echo
-  echo "Test case(s) failed:"
-  grep -a "^MSG: Failed," <<< "$msg" | sed 's/MSG: Failed, test case //' | env LC_ALL=C sort | nl
+if [ -s $PROCID-summary.out ]; then
+  msg=$(grep -a "^MSG: [PF]a[si][sl]ed," $PROCID-summary.out)
+  echo "$CMDLINE" >> $PROCID-summary.out
+  if true; then
+    echo
+    echo "Test case(s) passed:"
+    grep -a "^MSG: Passed, test case " <<< "$msg" | sed 's/MSG: Passed, test case //' | env LC_ALL=C sort | nl
+    grep -aq -m1 "^MSG: Failed, test case " <<< "$msg"
+    if [ $? -eq 0 ]; then
+      echo
+      echo "Test case(s) failed:"
+      grep -a "^MSG: Failed," <<< "$msg" | sed 's/MSG: Failed, test case //' | env LC_ALL=C sort | nl
+    fi
+    echo
+    echo Total: $(wc -l <<< "$msg"), Passed: $(grep -ac "^MSG: Passed," <<< "$msg"), Failed: $(grep -ac "^MSG: Failed," <<< "$msg")
+    grep -a "^MSG: Failed," <<< "$msg" | sed 's/MSG: Failed, test case (\([^)]*\).*/due to \1/' | sort | uniq -c
+  fi | tee -a $PROCID-summary.out
 fi
-echo
-echo Total: $(wc -l <<< "$msg"), Passed: $(grep -ac "^MSG: Passed," <<< "$msg"), Failed: $(grep -ac "^MSG: Failed," <<< "$msg")
-grep -a "^MSG: Failed," <<< "$msg" | sed 's/MSG: Failed, test case (\([^)]*\).*/due to \1/' | sort | uniq -c
-exit $rc
