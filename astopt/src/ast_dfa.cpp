@@ -555,27 +555,29 @@ void AST_DFA::BuildDefUseChain() {
       MASSERT(bb && "null BB");
       unsigned bbid = bb->GetId();
 
+      // check if def is either alive at bb entry or created in bb
+      bool alive = mRchInMap[bbid]->GetBit(i);
+      bool gen = mGenMap[bbid]->GetBit(i);
+      if (!(alive || gen)) {
+        done_list.insert(bbid);
+        working_list.pop_front();
+        continue;
+      }
+
+      // process bb
+      visitor.VisitBB(bbid);
+
+      // add successors to working_list if not in done_list
       if (done_list.find(bbid) == done_list.end()) {
-        // check if def is either alive at bb entry or created in bb
-        bool alive = mRchInMap[bbid]->GetBit(i);
-        bool gen = mGenMap[bbid]->GetBit(i);
-        if (!(alive || gen)) {
-          done_list.insert(bbid);
-          continue;
-        }
-
-        // process bb
-        visitor.VisitBB(bbid);
-
+        // if new def in bb, then no need to visit successors for the current def
         if (!visitor.mReachNewDef) {
           for (int i = 0; i < bb->GetSuccessorsNum(); i++) {
             working_list.push_back(bb->GetSuccessorAtIndex(i));
           }
         }
-
-        done_list.insert(bbid);
       }
 
+      done_list.insert(bbid);
       working_list.pop_front();
     }
   }
