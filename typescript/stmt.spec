@@ -1875,6 +1875,7 @@ rule SetAccessor: ONEOF("set" + PropertyName + '(' + BindingIdentifierOrPattern 
 rule FunctionExpression :
   "function" + ZEROORONE(BindingIdentifier) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}'
   attr.action : BuildFunction(%2)
+  attr.action : AddTypeGenerics(%3)
   attr.action : AddParams(%5)
   attr.action : AddType(%7)
   attr.action : AddFunctionBody(%9)
@@ -2016,9 +2017,11 @@ rule MemberFunctionDeclaration: ONEOF(
   attr.action.%1,%2,%3,%4,%5,%6 : BuildFunction(%3)
   attr.action.%1,%2,%3,%4,%5,%6 : AddModifier(%2)
   attr.action.%1,%2,%3,%4,%5,%6 : AddModifier(%1)
+  attr.action.%1,%2,%5,%6 : AddTypeGenerics(%4)
   attr.action.%1,%2,%5,%6 : AddParams(%6)
   attr.action.%1,%2 : AddType(%8)
   attr.action.%1    : AddFunctionBody(%10)
+  attr.action.%3,%4 : AddTypeGenerics(%5)
   attr.action.%3,%4 : AddParams(%7)
   attr.action.%3,%4 : AddType(%9)
   attr.action.%3    : AddFunctionBody(%11)

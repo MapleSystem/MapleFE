@@ -9,7 +9,7 @@ class  Klass
   Instance Initializer: 
   Constructors: 
   Methods: 
-    func  func(cb)  throws: 
+    func  func<T>(cb)  throws: 
       return cb
   LocalClasses: 
   LocalInterfaces: 
