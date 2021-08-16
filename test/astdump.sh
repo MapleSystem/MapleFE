@@ -130,7 +130,7 @@ for ts in $LIST; do
       else
         E="$E,ts2ast"
       fi > $ts.gen
-      diff $ts.orig $ts.gen || sed 's/\\"/'"'/g" $ts.gen | diff $ts.orig -
+      diff $ts.orig $ts.gen || sed 's/\\"/'"'/g" $ts.gen | diff -I '[0-9]\. const char\*, "' $ts.orig -
       if [ $? -eq 0 -a -s $ts.orig -a -s $ts.gen ]; then
         Passed="$Passed $ts"
         echo "MSG: Passed, test case $ts"
