@@ -39,34 +39,6 @@ IdentifierNode *AdjustASTVisitor::VisitIdentifierNode(IdentifierNode *node) {
   if (type && type->IsUserType()) {
     type->SetParent(node);
   }
-
-  // check if it is in fact a literal, like true, false etc
-  TreeNode *p = node->GetParent();
-  if (p && p->IsFieldLiteral()) {
-    FieldLiteralNode *fl = static_cast<FieldLiteralNode *>(p);
-    if (fl->GetLiteral() == node) {
-      LitData data;
-      bool change = false;
-
-      if (node->GetStrIdx() == gStringPool.GetStrIdx("true")) {
-        data.mType = LT_BooleanLiteral;
-        data.mData.mBool = true;
-        change = true;
-      } else if (node->GetStrIdx() == gStringPool.GetStrIdx("false")) {
-        data.mType = LT_BooleanLiteral;
-        data.mData.mBool = false;
-        change = true;
-      } else {
-        NOTYETIMPL("literal identifier");
-      }
-
-      if (change) {
-        LiteralNode *lit = (LiteralNode*)gTreePool.NewTreeNode(sizeof(LiteralNode));
-        new (lit) LiteralNode(data);
-        fl->SetLiteral(lit);
-      }
-    }
-  }
   return node;
 }
 

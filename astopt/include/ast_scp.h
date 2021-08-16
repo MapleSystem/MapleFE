@@ -41,6 +41,7 @@ class AST_SCP {
   void ScopeAnalysis();
   void BuildScope();
   void RenameVar();
+  void AdjustASTWithScope();
 };
 
 class BuildScopeBaseVisitor : public AstVisitor {
@@ -118,6 +119,22 @@ class RenameVarVisitor : public AstVisitor {
   bool SkipRename(IdentifierNode *node);
   bool IsFuncArg(FunctionNode *func, IdentifierNode *node);
   void InsertToStridx2DeclIdMap(unsigned stridx, IdentifierNode *node);
+  IdentifierNode *VisitIdentifierNode(IdentifierNode *node);
+};
+
+class AdjustASTWithScopeVisitor : public AstVisitor {
+ private:
+  Module_Handler *mHandler;
+  unsigned       mFlags;
+  bool           mUpdated;
+
+  CfgBB *mCurrentBB;
+
+ public:
+  explicit AdjustASTWithScopeVisitor(Module_Handler *h, unsigned f, bool base = false)
+    : mHandler(h), mFlags(f), AstVisitor((f & FLG_trace_1) && base) {}
+  ~AdjustASTWithScopeVisitor() = default;
+
   IdentifierNode *VisitIdentifierNode(IdentifierNode *node);
 };
 

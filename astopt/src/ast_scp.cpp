@@ -26,6 +26,7 @@ void AST_SCP::ScopeAnalysis() {
   MSGNOLOC0("============== ScopeAnalysis ==============");
   BuildScope();
   RenameVar();
+  AdjustASTWithScope();
 }
 
 void AST_SCP::BuildScope() {
@@ -396,6 +397,44 @@ IdentifierNode *RenameVarVisitor::VisitIdentifierNode(IdentifierNode *node) {
       if (parent && parent->IsDecl()) {
         parent->SetStrIdx(mNewStrIdx);
       }
+    }
+  }
+  return node;
+}
+
+void AST_SCP::AdjustASTWithScope() {
+  MSGNOLOC0("============== AdjustASTWithScope ==============");
+  AdjustASTWithScopeVisitor visitor(mHandler, mFlags, true);
+  ModuleNode *module = mHandler->GetASTModule();
+  for(unsigned i = 0; i < module->GetTreesNum(); i++) {
+    TreeNode *it = module->GetTree(i);
+    it->SetParent(module);
+    visitor.Visit(it);
+  }
+}
+
+IdentifierNode *AdjustASTWithScopeVisitor::VisitIdentifierNode(IdentifierNode *node) {
+  TreeNode *decl = mHandler->FindDecl(node);
+  if (!decl) {
+    LitData data;
+    bool change = false;
+    // handle literals true false
+    if (node->GetStrIdx() == gStringPool.GetStrIdx("true")) {
+      data.mType = LT_BooleanLiteral;
+      data.mData.mBool = true;
+      change = true;
+    } else if (node->GetStrIdx() == gStringPool.GetStrIdx("false")) {
+      data.mType = LT_BooleanLiteral;
+      data.mData.mBool = false;
+      change = true;
+    } else {
+      NOTYETIMPL("literal identifier");
+    }
+
+    if (change) {
+      LiteralNode *lit = (LiteralNode*)gTreePool.NewTreeNode(sizeof(LiteralNode));
+      new (lit) LiteralNode(data);
+      return (IdentifierNode*)(lit);
     }
   }
   return node;
