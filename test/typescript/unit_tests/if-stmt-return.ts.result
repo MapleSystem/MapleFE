@@ -5,7 +5,7 @@ Matched 31 tokens.
 func  func(x)  throws: 
   cond-branch cond:x GT 10
   true branch :
-    return  false branch :
+    return   false branch :
 
   console.log(x)
 

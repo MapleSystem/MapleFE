@@ -4,7 +4,7 @@ Matched 34 tokens.
 == Sub Tree ==
 func  foo()  throws: 
   js_var Decl: v=1
-  return[]
+  return [v,v]
 
 == Sub Tree ==
 console.log(foo())

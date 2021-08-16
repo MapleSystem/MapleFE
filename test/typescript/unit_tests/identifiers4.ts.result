@@ -1,6 +1,0 @@
-Matched 22 tokens.
-============= Module ===========
-== Sub Tree ==
-ts_interface: Inferf {func  return(v)  throws: 
-;func  throw(e)  throws: 
- }

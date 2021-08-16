@@ -4,8 +4,7 @@ Matched 20 tokens.
 ============= Module ===========
 == Sub Tree ==
 func  func()  throws: 
-  return
-   template-literal: NULL, {}
+  return  template-literal: NULL, {}
 
 == Sub Tree ==
 console.log(func())

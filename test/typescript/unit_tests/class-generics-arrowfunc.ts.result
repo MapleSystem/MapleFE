@@ -12,7 +12,7 @@ class  Foo
       this._ctor Assign ctor
   Methods: 
     func  alloc()  throws: 
-      return(this._ctor())
+      return this._ctor()
   LocalClasses: 
   LocalInterfaces: 
 
