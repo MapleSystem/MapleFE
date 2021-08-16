@@ -13,8 +13,7 @@
 # 
 
 #!/bin/bash
-FILES=( class-implements-interface.ts construct-signature.ts interface-keyof.ts)
-
+FILES=( class-generics-arrowfunc.ts func-builtin.ts if-stmt-return.ts readonly-return.ts template-literals8.ts ternary-op-1.ts)
 
 for f in ${FILES[@]}
 do

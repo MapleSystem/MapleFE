@@ -85,6 +85,8 @@ rule KeywordIdentifier : ONEOF("get",
                                "infer",
                                "asserts",
                                "require",
+                               "return",
+                               "throw",
                                "import")
 ## "
   attr.action : BuildIdentifier()

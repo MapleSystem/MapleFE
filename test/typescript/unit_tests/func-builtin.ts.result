@@ -29,7 +29,7 @@ js_var Decl: func
 js_var Decl: res
 == Sub Tree ==
 func  fullName()  throws: 
-  return this.firstName Add " " Add this.lastName
+  return(this.firstName Add " " Add this.lastName)
 
 == Sub Tree ==
 res Assign fullName.call(john)

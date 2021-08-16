@@ -18,3 +18,5 @@ test/msts_failed.txt
 test/msts_passed.txt
 test/typescript/ms_tests/*.ts
 test/typescript/ms_tests/LICENSE.txt
+test/typescript/unit_tests/perf.data
+test/typescript/unit_tests/perf.data.old
