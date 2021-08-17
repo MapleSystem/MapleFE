@@ -1,0 +1,22 @@
+Matched 34 tokens.
+Matched 44 tokens.
+Matched 51 tokens.
+============= Module ===========
+== Sub Tree ==
+class  Klass
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+    func  return(x)  throws: 
+      console.log(x)
+    func  foo(x)  throws: 
+      this.return(x)
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+js_var Decl: obj=new Klass()
+== Sub Tree ==
+obj.foo(10)

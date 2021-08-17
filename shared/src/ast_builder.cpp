@@ -1928,13 +1928,17 @@ TreeNode* ASTBuilder::BuildField() {
   Param p_var_b = mParams[1];
 
   // Both variable should have been created as tree node.
-  MASSERT(p_var_a.mIsTreeNode
-          && p_var_b.mIsTreeNode
-          && "Both nodes in BuildFiled should be tree node");
+  MASSERT(p_var_a.mIsTreeNode);
 
   // The second param should be an IdentifierNode
   TreeNode *node_a = p_var_a.mIsEmpty ? NULL : p_var_a.mData.mTreeNode;
-  TreeNode *node_b = p_var_b.mIsEmpty ? NULL : p_var_b.mData.mTreeNode;
+  TreeNode *node_b = NULL;
+  if (!p_var_b.mIsEmpty) {
+    if (p_var_b.mIsTreeNode)
+      node_b = p_var_b.mData.mTreeNode;
+    else
+      node_b = BuildIdentifier(p_var_b.mData.mToken);
+  }
 
   FieldNode *field = NULL;
 

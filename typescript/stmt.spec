@@ -356,7 +356,8 @@ rule MemberExpression : ONEOF(
   IsExpression,
   MemberExpression + '[' + KeyOf + ']',
   MemberExpression + '!',
-  MemberExpression + '.' + JSIdentifier + "as" + "const")
+  MemberExpression + '.' + JSIdentifier + "as" + "const",
+  MemberExpression + '.' + "return")
   attr.action.%1 : AddAsType(%1, %2)
   attr.action.%2 : BuildArrayElement(%1, %3)
   attr.action.%2 : AddAsType(%5)
@@ -373,6 +374,7 @@ rule MemberExpression : ONEOF(
   attr.action.%11: SetIsNonNull(%1)
   attr.action.%12: BuildField(%1, %3)
   attr.action.%12: SetIsConst()
+  attr.action.%13: BuildField(%1, %3)
 
 rule IsExpression: ONEOF(PrimaryExpression + "is" + Type,
                          ArrowFunction + "is" + Type)
@@ -2015,14 +2017,15 @@ rule MemberFunctionDeclaration: ONEOF(
   ZEROORONE(Annotation) + ZEROORMORE(AccessibilityModifier) + PropertyName + '?' + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}',
   ZEROORONE(Annotation) + ZEROORMORE(AccessibilityModifier) + PropertyName + '?' + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + ZEROORONE(';'),
   ZEROORONE(Annotation) + ZEROORMORE(AccessibilityModifier) + PropertyName + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ':' + IsExpression + '{' + FunctionBody + '}',
-  ZEROORONE(Annotation) + ZEROORMORE(AccessibilityModifier) + PropertyName + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ':' + IsExpression + ZEROORONE(';'))
-  attr.action.%1,%2,%3,%4,%5,%6 : BuildFunction(%3)
-  attr.action.%1,%2,%3,%4,%5,%6 : AddModifier(%2)
-  attr.action.%1,%2,%3,%4,%5,%6 : AddModifier(%1)
-  attr.action.%1,%2,%5,%6 : AddTypeGenerics(%4)
-  attr.action.%1,%2,%5,%6 : AddParams(%6)
-  attr.action.%1,%2 : AddType(%8)
-  attr.action.%1    : AddFunctionBody(%10)
+  ZEROORONE(Annotation) + ZEROORMORE(AccessibilityModifier) + PropertyName + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ':' + IsExpression + ZEROORONE(';'),
+  ZEROORONE(Annotation) + ZEROORMORE(AccessibilityModifier) + "return" + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}')
+  attr.action.%1,%2,%3,%4,%5,%6,%7 : BuildFunction(%3)
+  attr.action.%1,%2,%3,%4,%5,%6,%7 : AddModifier(%2)
+  attr.action.%1,%2,%3,%4,%5,%6,%7 : AddModifier(%1)
+  attr.action.%1,%2,%5,%6,%7 : AddTypeGenerics(%4)
+  attr.action.%1,%2,%5,%6,%7 : AddParams(%6)
+  attr.action.%1,%2,%7 : AddType(%8)
+  attr.action.%1,%7    : AddFunctionBody(%10)
   attr.action.%3,%4 : AddTypeGenerics(%5)
   attr.action.%3,%4 : AddParams(%7)
   attr.action.%3,%4 : AddType(%9)

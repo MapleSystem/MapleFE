@@ -787,7 +787,7 @@ public:
 
 // We first give each node certain children. If it needs more, an allocation from
 // memory pool is needed.
-#define TREE_MAX_CHILDREN_NUM 12
+#define TREE_MAX_CHILDREN_NUM 16
 #define TREE_CHILDREN_NUM     4
 
 template<class T> class ContTreeNode {
