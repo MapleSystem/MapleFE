@@ -190,7 +190,7 @@ if [ -s $PROCID-summary.out ]; then
   if true; then
     echo
     echo "Test case(s) passed:"
-    grep -a "^MSG: Passed, test case " <<< "$msg" | sed 's/MSG: Passed, test case //' | env LC_ALL=C sort | nl
+    grep -a "^MSG: Passed, test case " <<< "$msg" | sed 's/MSG: Passed, test case //' | env LC_ALL=C sort -r | nl
     grep -aq -m1 "^MSG: Failed, test case " <<< "$msg"
     if [ $? -eq 0 ]; then
       echo
