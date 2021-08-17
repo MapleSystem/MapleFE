@@ -1804,11 +1804,13 @@ rule IndexSignature: ONEOF(
 ## I inlined CallSignature
 rule MethodSignature: ONEOF(
     PropertyName + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation),
-    PropertyName + '?' + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation))
-  attr.action.%1,%2 : BuildFunction(%1)
-  attr.action.%1 : AddParams(%4)
-  attr.action.%1 : AddType(%6)
-  attr.action.%1 : AddTypeGenerics(%2)
+    PropertyName + '?' + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation),
+    "return" + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation),
+    "throw"  + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation))
+  attr.action.%1,%2,%3,%4 : BuildFunction(%1)
+  attr.action.%1,%3,%4 : AddParams(%4)
+  attr.action.%1,%3,%4 : AddType(%6)
+  attr.action.%1,%3,%4 : AddTypeGenerics(%2)
   attr.action.%2 : SetIsOptional(%1)
   attr.action.%2 : AddParams(%5)
   attr.action.%2 : AddType(%7)

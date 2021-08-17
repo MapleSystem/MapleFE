@@ -280,6 +280,16 @@ TreeNode* ASTBuilder::BuildIdentifier() {
   }
 }
 
+// Build IdentifierNode from a token.
+TreeNode* ASTBuilder::BuildIdentifier(const Token *token) {
+  const char *name = token->GetName();
+  MASSERT(name);
+  IdentifierNode *n = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
+  unsigned idx = gStringPool.GetStrIdx(name);
+  new (n) IdentifierNode(idx);
+  return n;
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////
 //                      NameTypePair
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -2960,10 +2970,14 @@ TreeNode* ASTBuilder::BuildFunction() {
   if (mParams.size() > 0) {
     Param p_name = mParams[0];
     // In JS/TS the name could be empty.
-    if (!p_name.mIsEmpty && p_name.mIsTreeNode) {
-      node_name = p_name.mData.mTreeNode;
-      if (!node_name->IsIdentifier())
-        MERROR("The function name should be an indentifier node. Not?");
+    if (!p_name.mIsEmpty) {
+      if (p_name.mIsTreeNode) {
+        node_name = p_name.mData.mTreeNode;
+        if (!node_name->IsIdentifier())
+          MERROR("The function name should be an indentifier node. Not?");
+      } else {
+        node_name = BuildIdentifier(p_name.mData.mToken);
+      }
     }
   }
 

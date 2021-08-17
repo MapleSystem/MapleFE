@@ -80,6 +80,7 @@ public:
 
   // Create Functions for Token
   TreeNode* CreateTokenTreeNode(const Token*);
+  TreeNode* BuildIdentifier(const Token*);
 
   TreeNode* Build();
 
