@@ -39,6 +39,18 @@ IdentifierNode *AdjustASTVisitor::VisitIdentifierNode(IdentifierNode *node) {
   if (type && type->IsUserType()) {
     type->SetParent(node);
   }
+  // rename return() function to return__fixed()
+  unsigned stridx = node->GetStrIdx();
+  if (stridx == gStringPool.GetStrIdx("return")) {
+    unsigned idx = gStringPool.GetStrIdx("return__fixed");
+    node->SetStrIdx(idx);
+    TreeNode *parent = node->GetParent();
+    if (parent && parent->IsFunction()) {
+      FunctionNode *func = static_cast<FunctionNode *>(parent);
+      MASSERT(func->GetFuncName() == node && "return not function name");
+      func->SetStrIdx(idx);
+    }
+  }
   return node;
 }
 
