@@ -40,11 +40,7 @@ void AST_SCP::BuildScope() {
   visitor.mScopeStack.push(scope);
   visitor.mUserScopeStack.push(scope);
   module->SetScope(scope);
-
-  for(unsigned i = 0; i < module->GetTreesNum(); i++) {
-    TreeNode *it = module->GetTree(i);
-    visitor.Visit(it);
-  }
+  visitor.Visit(module);
 }
 
 BlockNode *BuildScopeVisitor::VisitBlockNode(BlockNode *node) {
@@ -406,11 +402,7 @@ void AST_SCP::AdjustASTWithScope() {
   MSGNOLOC0("============== AdjustASTWithScope ==============");
   AdjustASTWithScopeVisitor visitor(mHandler, mFlags, true);
   ModuleNode *module = mHandler->GetASTModule();
-  for(unsigned i = 0; i < module->GetTreesNum(); i++) {
-    TreeNode *it = module->GetTree(i);
-    it->SetParent(module);
-    visitor.Visit(it);
-  }
+  visitor.Visit(module);
 }
 
 IdentifierNode *AdjustASTWithScopeVisitor::VisitIdentifierNode(IdentifierNode *node) {

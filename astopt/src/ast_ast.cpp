@@ -27,8 +27,8 @@ void AST_AST::AdjustAST() {
   for(unsigned i = 0; i < module->GetTreesNum(); i++) {
     TreeNode *it = module->GetTree(i);
     it->SetParent(module);
-    visitor.Visit(it);
   }
+  visitor.Visit(module);
 }
 
 // set parent for some identifier's type
