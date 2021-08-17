@@ -526,15 +526,20 @@ void NewNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   DUMP0_NORETURN("new ");
   TreeNode *id = GetId();
-  DUMP0_NORETURN(id->GetName());
-  DUMP0_NORETURN("(");
-  for (unsigned i = 0; i < GetArgsNum(); i++) {
-    TreeNode *arg = GetArg(i);
-    arg->Dump(0);
-    if (i < GetArgsNum() - 1)
-      DUMP0_NORETURN(",");
+  if (id->IsLambda()) {
+    LambdaNode *lmd = (LambdaNode*)id;
+    lmd->Dump(0);
+  } else {
+    DUMP0_NORETURN(id->GetName());
+    DUMP0_NORETURN("(");
+    for (unsigned i = 0; i < GetArgsNum(); i++) {
+      TreeNode *arg = GetArg(i);
+      arg->Dump(0);
+      if (i < GetArgsNum() - 1)
+        DUMP0_NORETURN(",");
+    }
+    DUMP0_NORETURN(")");
   }
-  DUMP0_NORETURN(")");
 }
 
 //////////////////////////////////////////////////////////////////////////////////////

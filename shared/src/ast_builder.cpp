@@ -2698,8 +2698,8 @@ TreeNode* ASTBuilder::AddAssert() {
 //                    New & Delete operation related
 ////////////////////////////////////////////////////////////////////////////////
 
-// This function takes two or three arguments.
-// 1. The id of the class/interface/function/...
+// This function takes one, two or three arguments.
+// 1. The id of the class/interface/function/..., or a lambda
 // 2. The arguments, could be empty
 // 3. In some cases there is a third argument, for function body.
 TreeNode* ASTBuilder::BuildNewOperation() {
@@ -2709,21 +2709,22 @@ TreeNode* ASTBuilder::BuildNewOperation() {
   NewNode *new_node = (NewNode*)gTreePool.NewTreeNode(sizeof(NewNode));
   new (new_node) NewNode();
 
-  Param p_a = mParams[0];
-  Param p_b = mParams[1];
-
   // Name could not be empty
+  Param p_a = mParams[0];
   if (p_a.mIsEmpty)
     MERROR("The name in BuildNewOperation() is empty?");
   MASSERT(p_a.mIsTreeNode && "Name of new expression is not a tree?");
   TreeNode *name = p_a.mData.mTreeNode;
   new_node->SetId(name);
 
-  TreeNode *node_b = p_b.mIsEmpty ? NULL : p_b.mData.mTreeNode;
-  if (node_b)
-    AddArguments(new_node, node_b);
+  if (mParams.size() > 1) {
+    Param p_b = mParams[1];
+    TreeNode *node_b = p_b.mIsEmpty ? NULL : p_b.mData.mTreeNode;
+    if (node_b)
+      AddArguments(new_node, node_b);
+  }
 
-  if (mParams.size() == 3) {
+  if (mParams.size() > 2) {
     Param p_c = mParams[2];
     TreeNode *node_c = p_c.mIsEmpty ? NULL : p_c.mData.mTreeNode;
     if (node_c) {

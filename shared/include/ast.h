@@ -581,6 +581,9 @@ private:
   TreeNode  *mId;                  // A name could be like Outer.Inner
                                    // Hard to give a const char* as name.
                                    // So give it an id.
+                                   // In Typescript, it could be a lambda:
+                                   //   new (...) => Type
+                                   // in which mArgs and mBody are not used.
   SmallVector<TreeNode*> mArgs;    //
   BlockNode *mBody;                // When body is not empty, it's an
                                    // anonymous class.

@@ -400,7 +400,9 @@ rule AssertExpression : "asserts" + MemberExpression
 ##rule NewExpression[Yield] :
 ##  MemberExpression[?Yield]
 ##  new NewExpression[?Yield]
-rule NewExpression : ONEOF(MemberExpression, "new" + NewExpression)
+rule NewExpression : ONEOF(MemberExpression,
+                           "new" + NewExpression)
+  attr.action.%2 : BuildNewOperation(%2)
 
 ##-----------------------------------
 ##rule CallExpression[Yield] :
@@ -1697,10 +1699,9 @@ rule FunctionType: ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList) + 
   attr.action : SetFunctionType()
 
 ## rule ConstructorType: new TypeParametersopt ( ParameterListopt ) => Type
-rule ConstructorType: "new" + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList) + ')' + "=>" + Type
-  attr.action : BuildLambda(%4)
-  attr.action : AddType(%7)
-  attr.action : SetConstructorType()
+## This actually a literal.
+rule ConstructorType: "new" + FunctionType
+  attr.action : BuildNewOperation(%2)
 
 ## rule TypeQuery: typeof TypeQueryExpression
 rule TypeQuery: "typeof" + TypeQueryExpression
