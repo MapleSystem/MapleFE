@@ -130,12 +130,24 @@ for ts in $LIST; do
       else
         E="$E,ts2ast"
       fi > $ts.gen
-      diff $ts.orig $ts.gen || sed 's/\\"/'"'/g" $ts.gen | diff -I '[0-9]\. const char\*, "' $ts.orig -
+      diff $ts.orig $ts.gen
       if [ $? -eq 0 -a -s $ts.orig -a -s $ts.gen ]; then
         Passed="$Passed $ts"
         echo "MSG: Passed, test case $ts"
       else
-        echo "MSG: Failed, test case (diff-ast$E)$ts"
+        sed 's/\\"/'"'/g" $ts.gen | diff $ts.orig -
+        if [ $? -eq 0 -a -s $ts.orig -a -s $ts.gen ]; then
+          Passed="$Passed $ts"
+          echo "MSG: Passed, test case (quote-marks)$ts"
+        else
+          sed 's/\\"/'"'/g" $ts.gen | diff -I '[0-9]\. const char\*, "' $ts.orig -
+          if [ $? -eq 0 -a -s $ts.orig -a -s $ts.gen ]; then
+            Passed="$Passed $ts"
+            echo "MSG: Passed, test case (const-char*)$ts"
+          else
+            echo "MSG: Failed, test case (diff-ast$E)$ts"
+          fi
+        fi
       fi
       echo === "$T"; cat "$T"
       echo --- "$ts"; cat "$ts"
