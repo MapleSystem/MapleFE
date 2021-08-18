@@ -331,13 +331,23 @@ std::string Emitter::EmitXXportAsPairNode(XXportAsPairNode *node) {
       str += "as "s + EmitTreeNode(n);
   } else {
     if (auto n = node->GetBefore()) {
-      if (n->GetKind() == NK_Identifier)
-        str += "{ "s;
-      str += EmitTreeNode(n);
-      if (auto n = node->GetAfter())
-        str += " as "s + EmitTreeNode(n);
-      if (n->GetKind() == NK_Identifier)
-        str += " }"s;
+      std::string s = EmitTreeNode(n);
+      switch(n->GetKind()) {
+        case NK_Identifier:
+          if (auto a = node->GetAfter())
+            s += " as "s + EmitTreeNode(a);
+          s = "{ "s + s + " }"s;
+          break;
+        case NK_Literal:
+          s = "require("s + s + ")"s;
+          if (auto a = node->GetAfter())
+            s = EmitTreeNode(a) + " = "s + s;
+          break;
+        default:
+          if (auto a = node->GetAfter())
+            s += " as "s + EmitTreeNode(a);
+      }
+      str += s;
     }
   }
   return HandleTreeNode(str, node);
