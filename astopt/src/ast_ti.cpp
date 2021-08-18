@@ -24,31 +24,37 @@
 namespace maplefe {
 
 void TypeInfer::TypeInference() {
-  MSGNOLOC0("============== TypeInfer ==============");
-
   ModuleNode *module = mHandler->GetASTModule();
 
   // build mNodeId2Decl
+  MSGNOLOC0("============== Build NodeId2Decl ==============");
   InitDummyNodes();
-  BuildIdNodeToDeclVisitor visitor_pass0(mHandler, mFlags, true);
-  visitor_pass0.Visit(module);
+  BuildIdNodeToDeclVisitor visitor_build(mHandler, mFlags, true);
+  visitor_build.Visit(module);
 
   // type inference
-  TypeInferVisitor visitor_pass1(mHandler, mFlags, true);
-  visitor_pass1.SetUpdated(true);
+  MSGNOLOC0("============== TypeInfer ==============");
+  TypeInferVisitor visitor_ti(mHandler, mFlags, true);
+  visitor_ti.SetUpdated(true);
   int count = 0;
-  while (visitor_pass1.GetUpdated() && count++ <= ITERATEMAX) {
+  while (visitor_ti.GetUpdated() && count++ <= ITERATEMAX) {
     MSGNOLOC("\n TypeInference iterate ", count);
-    visitor_pass1.SetUpdated(false);
-    visitor_pass1.Visit(module);
+    visitor_ti.SetUpdated(false);
+    visitor_ti.Visit(module);
   }
 
-  // share UserType
-  ShareUTVisitor visitor_pass2(mHandler, mFlags, true);
-  visitor_pass2.Push(module->GetRootScope());
-  visitor_pass2.Visit(module);
-
   if (mFlags & FLG_trace_3) std::cout << "\n>>>>>> TypeInference() iterated " << count << " times\n" << std::endl;
+
+  // share UserType
+  MSGNOLOC0("============== Share UserType ==============");
+  ShareUTVisitor visitor_ut(mHandler, mFlags, true);
+  visitor_ut.Push(module->GetRootScope());
+  visitor_ut.Visit(module);
+
+  // Check Type
+  MSGNOLOC0("============== Check Type ==============");
+  CheckTypeVisitor visitor_check(mHandler, mFlags, true);
+  visitor_check.Visit(module);
 }
 
 void TypeInfer::InitDummyNodes() {
@@ -1034,6 +1040,85 @@ UserTypeNode *ShareUTVisitor::VisitUserTypeNode(UserTypeNode *node) {
         // do not share if there are generics
         if (ut->GetTypeGenericsNum() == 0) {
           return ut;
+        }
+      }
+    }
+  }
+  return node;
+}
+
+bool CheckTypeVisitor::IsCompatible(TypeId tid, TypeId target) {
+  if (tid == target) {
+    return true;
+  }
+
+  bool result = false;
+  switch (target) {
+    case TY_Number: {
+      switch (tid) {
+        case TY_None:
+        case TY_Int:
+        case TY_Long:
+        case TY_Float:
+        case TY_Double:
+          result = true;
+          break;
+        default:
+          result = false;
+          break;
+      }
+      break;
+    }
+    case TY_Any:
+      // TY_Any or unspecified matches everything
+      result = true;
+      break;
+    default:
+      // ok if same typeid
+      result = (target == tid);
+      break;
+  }
+
+  // tid being TY_None means untouched
+  result = result || (tid == TY_None);
+
+  return result;
+}
+
+IdentifierNode *CheckTypeVisitor::VisitIdentifierNode(IdentifierNode *node) {
+  (void) AstVisitor::VisitIdentifierNode(node);
+
+  TreeNode *d = mHandler->FindDecl(node);
+  if (d && d->IsDecl()) {
+    DeclNode *decl = static_cast<DeclNode *>(d);
+    TreeNode *var = decl->GetVar();
+    if (var && var != node && var->IsIdentifier()) {
+      IdentifierNode *id = static_cast<IdentifierNode *>(var);
+      bool result = false;
+      TreeNode *type = id->GetType();
+      if (type) {
+        TypeId id = node->GetTypeId();
+        TypeId target = TY_None;
+        switch (type->GetKind()) {
+          case NK_PrimType: {
+            PrimTypeNode *ptn = static_cast<PrimTypeNode *>(type);
+            target = ptn->GetPrimType();
+            break;
+          }
+          case NK_UserType: {
+            target = var->GetTypeId();
+            break;
+          }
+          default: {
+            target = var->GetTypeId();
+            break;
+          }
+        }
+        result = IsCompatible(id, target);
+        if (!result || (mFlags & FLG_trace_3)) {
+          std::cout << " Type Compatiblity : " << result << " : "
+                    << AstDump::GetEnumTypeId(target) << " "
+                    << AstDump::GetEnumTypeId(id) << std::endl;
         }
       }
     }

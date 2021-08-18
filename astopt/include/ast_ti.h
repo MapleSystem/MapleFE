@@ -38,6 +38,7 @@ class TypeInfer {
 
   void InitDummyNodes();
   void TypeInference();
+  void CheckType();
 };
 
 class BuildIdNodeToDeclVisitor : public AstVisitor {
@@ -142,6 +143,26 @@ class ShareUTVisitor : public AstVisitor {
   void Pop() { mScopeStack.pop(); }
 
   UserTypeNode *VisitUserTypeNode(UserTypeNode *node);
+};
+
+class CheckTypeVisitor : public AstVisitor {
+ private:
+  Module_Handler *mHandler;
+  unsigned        mFlags;
+  bool            mUpdated;
+
+  std::stack<ASTScope *> mScopeStack;
+  std::unordered_set<unsigned> ExportedDeclIds;
+
+ public:
+  explicit CheckTypeVisitor(Module_Handler *h, unsigned f, bool base = false)
+    : mHandler(h), mFlags(f), AstVisitor((f & FLG_trace_1) && base) {}
+  ~CheckTypeVisitor() = default;
+
+  // check if typeid "tid" is compatible with "target"
+  bool IsCompatible(TypeId tid, TypeId target);
+
+  IdentifierNode *VisitIdentifierNode(IdentifierNode *node);
 };
 
 }
