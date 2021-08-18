@@ -375,10 +375,12 @@ IdentifierNode *RenameVarVisitor::VisitIdentifierNode(IdentifierNode *node) {
     if (stridx) {
       TreeNode *parent = node->GetParent();
       if (parent) {
-        if ((parent->IsDecl() && parent->GetStrIdx() == stridx) ||
-            (parent->IsFunction() && IsFuncArg(static_cast<FunctionNode *>(parent), node))) {
-          // its decl or func parameters
-          // insert in order according to scopes hierachy to ensure proper name version
+        // insert in order according to scopes hierachy to ensure proper name version
+        if ((parent->IsDecl() && parent->GetStrIdx() == stridx)) {
+          // decl
+          InsertToStridx2DeclIdMap(stridx, node);
+        } else if (parent->IsFunction() && IsFuncArg(static_cast<FunctionNode *>(parent), node)) {
+          // func parameters
           InsertToStridx2DeclIdMap(stridx, node);
         }
       }
@@ -411,11 +413,12 @@ IdentifierNode *AdjustASTWithScopeVisitor::VisitIdentifierNode(IdentifierNode *n
     LitData data;
     bool change = false;
     // handle literals true false
-    if (node->GetStrIdx() == gStringPool.GetStrIdx("true")) {
+    unsigned stridx = node->GetStrIdx();
+    if (stridx == gStringPool.GetStrIdx("true")) {
       data.mType = LT_BooleanLiteral;
       data.mData.mBool = true;
       change = true;
-    } else if (node->GetStrIdx() == gStringPool.GetStrIdx("false")) {
+    } else if (stridx == gStringPool.GetStrIdx("false")) {
       data.mType = LT_BooleanLiteral;
       data.mData.mBool = false;
       change = true;

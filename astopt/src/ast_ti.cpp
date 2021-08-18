@@ -990,9 +990,10 @@ UserTypeNode *TypeInferVisitor::VisitUserTypeNode(UserTypeNode *node) {
         // as usertype identifier instand of primtype by parser
         IdentifierNode *id = static_cast<IdentifierNode *>(idnode);
         TypeId tid = TY_None;
-        if (id->GetStrIdx() == gStringPool.GetStrIdx("number")) {
+        unsigned stridx = id->GetStrIdx();
+        if (stridx == gStringPool.GetStrIdx("number")) {
           tid = TY_Number;
-        } else if (id->GetStrIdx() == gStringPool.GetStrIdx("string")) {
+        } else if (stridx == gStringPool.GetStrIdx("string")) {
           tid = TY_String;
         }
         if (tid != TY_None) {
