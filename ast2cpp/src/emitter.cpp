@@ -633,19 +633,21 @@ std::string Emitter::EmitNewNode(NewNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str = "new "s;
-  if (auto n = node->GetId()) {
-    str += " "s + EmitTreeNode(n);
-  }
-  str += "("s;
-  auto num = node->GetArgsNum();
-  for (unsigned i = 0; i < num; ++i) {
-    if (i)
-      str += ", "s;
-    if (auto n = node->GetArg(i)) {
-      str += EmitTreeNode(n);
+  if (auto id = node->GetId()) {
+    str += " "s + EmitTreeNode(id);
+    if(id->GetKind() != NK_Function && id->GetKind() != NK_Lambda) {
+      auto num = node->GetArgsNum();
+      str += "("s;
+      for (unsigned i = 0; i < num; ++i) {
+        if (i)
+          str += ", "s;
+        if (auto n = node->GetArg(i)) {
+          str += EmitTreeNode(n);
+        }
+      }
+      str += ")"s;
     }
   }
-  str += ")"s;
   if (auto n = node->GetBody()) {
     str += " "s + EmitBlockNode(n);
   }
