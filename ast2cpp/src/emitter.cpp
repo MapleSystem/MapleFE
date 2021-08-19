@@ -991,6 +991,13 @@ std::string Emitter::EmitStructLiteralNode(StructLiteralNode *node) {
       str += EmitFieldLiteralNode(n);
     }
   }
+
+  // Workaround for an identifier issue
+  if (str.length() > 6 &&
+      (str.substr(str.length() - 6) == ": true" ||
+       str.substr(str.length() - 7) == ": false"))
+    str += ","s;
+
   str += "}"s;
   mPrecedence = '\030';
   return HandleTreeNode(str, node);
