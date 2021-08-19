@@ -823,7 +823,7 @@ std::string Emitter::EmitBindingPatternNode(BindingPatternNode *node) {
   // Needs a flag to distinguish between array destructuring and object destructuring
   // Object destructuring: optional-prop.ts
   // Array destructuring:  trailing-commas.ts
-  std::string str = "{"s;
+  std::string str;
 
   for (unsigned i = 0; i < node->GetElementsNum(); ++i) {
     if (i)
@@ -832,7 +832,11 @@ std::string Emitter::EmitBindingPatternNode(BindingPatternNode *node) {
       str += EmitTreeNode(n);
     }
   }
-  str += "}"s;
+
+  if (node->GetProp() == BPP_ArrayBinding)
+    str = "["s + str + "]"s;
+  else
+    str = "{"s + str + "}"s;
 
   if (auto n = node->GetType()) {
     str += ": "s + EmitTreeNode(n);
