@@ -422,8 +422,6 @@ IdentifierNode *AdjustASTWithScopeVisitor::VisitIdentifierNode(IdentifierNode *n
       data.mType = LT_BooleanLiteral;
       data.mData.mBool = false;
       change = true;
-    } else {
-      NOTYETIMPL("literal identifier");
     }
 
     if (change) {
