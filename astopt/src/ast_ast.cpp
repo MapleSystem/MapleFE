@@ -163,6 +163,7 @@ ExportNode *AdjustASTVisitor::VisitExportNode(ExportNode *node) {
             for (unsigned i = 0; i < node->GetAnnotationsNum(); i++) {
               func->AddAnnotation(node->GetAnnotationAtIndex(i));
             }
+            node->ClearAnnotation();
             break;
           }
           case NK_Class: {
@@ -183,6 +184,7 @@ ExportNode *AdjustASTVisitor::VisitExportNode(ExportNode *node) {
             for (unsigned i = 0; i < node->GetAnnotationsNum(); i++) {
               classnode->AddAnnotation(node->GetAnnotationAtIndex(i));
             }
+            node->ClearAnnotation();
             break;
           }
         }

@@ -302,6 +302,7 @@ public:
   void     AddAnnotation(AnnotationNode *n) {mAnnotations.PushBack(n);}
   AnnotationNode* GetAnnotationAtIndex(unsigned i) {return mAnnotations.ValueAtIndex(i);}
   void            SetAnnotationAtIndex(unsigned i, AnnotationNode* n) {*(mAnnotations.RefAtIndex(i)) = n;}
+  void ClearAnnotation() {mAnnotations.Clear();}
 
   void Dump(unsigned indent);
 };
