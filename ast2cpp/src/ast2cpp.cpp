@@ -149,6 +149,9 @@ void A2C::ProcessAST() {
     }
   }
 
+  if (mFlags & FLG_trace_2) {
+    std::cout << "============= CppEmitter ===========" << std::endl;
+  }
   maplefe::CppEmitter cppemitter(mASTHandler, mFlags);
   cppemitter.EmitCxxFiles();
 }
