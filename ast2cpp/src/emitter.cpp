@@ -984,7 +984,8 @@ std::string Emitter::EmitStructLiteralNode(StructLiteralNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str = "{"s;
-  for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
+  auto num = node->GetFieldsNum();
+  for (unsigned i = 0; i < num; ++i) {
     if (i)
       str += ", "s;
     if (auto n = node->GetField(i)) {
@@ -993,7 +994,7 @@ std::string Emitter::EmitStructLiteralNode(StructLiteralNode *node) {
   }
 
   // Workaround for an identifier issue
-  if (str.length() > 6 &&
+  if (num > 1 && str.length() > 6 &&
       (str.substr(str.length() - 6) == ": true" ||
        str.substr(str.length() - 7) == ": false"))
     str += ","s;
