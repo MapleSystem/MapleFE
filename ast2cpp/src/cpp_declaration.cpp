@@ -348,9 +348,12 @@ std::string CppDecl::EmitClassNode(ClassNode *node) {
   for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
     if (i)
       init += ", "s;
-    if (IdentifierNode* n = reinterpret_cast<IdentifierNode *>(node->GetField(i))) {
-      if (n->GetInit()) {
-        init += "  "s + n->GetName() + "("s + EmitTreeNode(n->GetInit()) + ")"s;
+    if (auto n = node->GetField(i)) {
+      if (n->GetKind() == NK_Identifier) {
+        IdentifierNode* id = static_cast<IdentifierNode *>(n);
+        if (id->GetInit()) {
+          init += "  "s + id->GetName() + "("s + EmitTreeNode(id->GetInit()) + ")"s;
+        }
       }
     }
   }
