@@ -329,24 +329,21 @@ std::string Emitter::EmitXXportAsPairNode(XXportAsPairNode *node) {
     str += " * "s;
     if (auto n = node->GetBefore())
       str += "as "s + EmitTreeNode(n);
+  } else if (node->IsSingle()) {
+    if (auto a = node->GetAfter())
+      str += EmitTreeNode(a);
+    if (auto n = node->GetBefore()) {
+      str += " = "s;
+      std::string s = EmitTreeNode(n);
+      str += n->GetKind() == NK_Literal ? "require("s + s + ")"s : s;
+    }
   } else {
     if (auto n = node->GetBefore()) {
       std::string s = EmitTreeNode(n);
-      switch(n->GetKind()) {
-        case NK_Identifier:
-          if (auto a = node->GetAfter())
-            s += " as "s + EmitTreeNode(a);
-          s = "{ "s + s + " }"s;
-          break;
-        case NK_Literal:
-          s = "require("s + s + ")"s;
-          if (auto a = node->GetAfter())
-            s = EmitTreeNode(a) + " = "s + s;
-          break;
-        default:
-          if (auto a = node->GetAfter())
-            s += " as "s + EmitTreeNode(a);
-      }
+      if (auto a = node->GetAfter())
+        s += " as "s + EmitTreeNode(a);
+      if (n->GetKind() == NK_Identifier)
+        s = "{ "s + s + " }"s;
       str += s;
     }
   }
