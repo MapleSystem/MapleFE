@@ -140,7 +140,7 @@ for ts in $LIST; do
           Passed="$Passed $ts"
           echo "MSG: Passed, test case (quote-marks)$ts"
         else
-          sed 's/\\"/'"'/g" $ts.gen | diff -I '[0-9]\. const char\*, "' $ts.orig -
+          diff -I '[0-9]\. const char\*, "' $ts.orig $ts.gen
           if [ $? -eq 0 -a -s $ts.orig -a -s $ts.gen ]; then
             Passed="$Passed $ts"
             echo "MSG: Passed, test case (const-char*)$ts"
