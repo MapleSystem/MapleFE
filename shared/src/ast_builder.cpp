@@ -1743,6 +1743,20 @@ TreeNode* ASTBuilder::BuildBindingPattern() {
   return mLastTreeNode;
 }
 
+TreeNode* ASTBuilder::SetArrayBinding() {
+  MASSERT(mLastTreeNode->IsBindingPattern());
+  BindingPatternNode *b = (BindingPatternNode*)mLastTreeNode;
+  b->SetProp(BPP_ArrayBinding);
+  return mLastTreeNode;
+}
+
+TreeNode* ASTBuilder::SetObjectBinding() {
+  MASSERT(mLastTreeNode->IsBindingPattern());
+  BindingPatternNode *b = (BindingPatternNode*)mLastTreeNode;
+  b->SetProp(BPP_ObjectBinding);
+  return mLastTreeNode;
+}
+
 //////////////////////////////////////////////////////////////////////////////////
 //                         StructNode, StructLiteralNode, FieldLiteralNode
 //////////////////////////////////////////////////////////////////////////////////

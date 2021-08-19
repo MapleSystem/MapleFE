@@ -957,14 +957,25 @@ public:
   void Dump(unsigned);
 };
 
+enum BindPattProp {
+  BPP_ArrayBinding,
+  BPP_ObjectBinding,
+  BPP_NA
+};
+
 class BindingPatternNode : public TreeNode {
 private:
+  BindPattProp           mProp;
   SmallVector<TreeNode*> mElements;
   TreeNode              *mType;        // The type
   TreeNode              *mInit;        // An initializer
 public:
-  BindingPatternNode() : TreeNode(NK_BindingPattern), mInit(NULL), mType(NULL) {}
+  BindingPatternNode() :
+      TreeNode(NK_BindingPattern), mInit(NULL), mType(NULL), mProp(BPP_NA) {}
   ~BindingPatternNode() {Release();}
+
+  BindPattProp GetProp()                {return mProp;}
+  void         SetProp(BindPattProp n)  {mProp = n;}
 
   unsigned  GetElementsNum()       {return mElements.GetNum();}
   TreeNode* GetElement(unsigned i) {return mElements.ValueAtIndex(i);}

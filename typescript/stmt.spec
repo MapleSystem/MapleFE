@@ -900,6 +900,7 @@ rule ObjectBindingPattern : ONEOF('{' + '}',
                                   '{' + BindingPropertyList + ',' + '}')
   attr.action.%1 :    BuildBindingPattern()
   attr.action.%2,%3 : BuildBindingPattern(%2)
+  attr.action.%1,%2,%3 : SetObjectBinding()
 
 ##-----------------------------------
 ##rule ArrayBindingPattern[Yield] :
@@ -912,6 +913,7 @@ rule ArrayBindingPattern : ONEOF(
   '[' + BindingElementList + ',' + ZEROORONE(Elision) + ZEROORONE(BindingRestElement) + ']')
   attr.action.%1 :    BuildBindingPattern(%3)
   attr.action.%2,%3 : BuildBindingPattern(%2)
+  attr.action.%1,%2,%3 : SetArrayBinding()
 
 ##-----------------------------------
 ##rule BindingPropertyList[Yield] :

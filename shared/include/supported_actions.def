@@ -95,6 +95,8 @@ ACTION(BuildComputedName)
 
 ACTION(BuildBindingElement)
 ACTION(BuildBindingPattern)
+ACTION(SetObjectBinding)
+ACTION(SetArrayBinding)
 
 // For struct
 ACTION(BuildStruct)
