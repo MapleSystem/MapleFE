@@ -26,9 +26,8 @@
 namespace maplefe {
 
 char* ContainerMemPool::AddrOfIndex(unsigned index) {
-  unsigned num_in_blk = mBlockSize / mElemSize;
-  unsigned blk = index / num_in_blk;
-  unsigned index_in_blk = index % num_in_blk;
+  unsigned blk = index / mElemNumPerBlock;
+  unsigned index_in_blk = index % mElemNumPerBlock;
 
   Block *block = mBlocks;
   for (unsigned i = 0; i < blk; i++) {

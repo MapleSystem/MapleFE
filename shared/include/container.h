@@ -47,9 +47,13 @@ namespace maplefe {
 class ContainerMemPool : public MemPool {
 public:
   unsigned mElemSize;
+  unsigned mElemNumPerBlock;
 public:
+  ContainerMemPool() : mElemSize(1) {}
+
+  void  SetBlockSize(unsigned i) {mBlockSize = i; mElemNumPerBlock = mBlockSize / mElemSize;}
   char* AddrOfIndex(unsigned index);
-  void  SetElemSize(unsigned i) {mElemSize = i;}
+  void  SetElemSize(unsigned i) {mElemSize = i; mElemNumPerBlock = mBlockSize/mElemSize;}
   char* AllocElem() {return Alloc(mElemSize);}
 };
 
