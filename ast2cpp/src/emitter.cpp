@@ -1619,8 +1619,6 @@ std::string Emitter::EmitLambdaNode(LambdaNode *node) {
   std::string str;
   switch (node->GetProperty()) {
     case LP_JSArrowFunction:
-    case LP_TSFunctionType:
-    case LP_TSConstructorType:
       break;
     case LP_JavaLambda:
     case LP_NA:

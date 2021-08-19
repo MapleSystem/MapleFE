@@ -3701,24 +3701,6 @@ TreeNode* ASTBuilder::SetArrowFunction() {
   return mLastTreeNode;
 }
 
-// It take no arugment. It uses mLastTreeNode which is
-// a lambda node.
-TreeNode* ASTBuilder::SetFunctionType() {
-  MASSERT(mLastTreeNode->IsLambda());
-  LambdaNode *node = (LambdaNode*)mLastTreeNode;
-  node->SetProperty(LP_TSFunctionType);
-  return mLastTreeNode;
-}
-
-// It take no arugment. It uses mLastTreeNode which is
-// a lambda node.
-TreeNode* ASTBuilder::SetConstructorType() {
-  MASSERT(mLastTreeNode->IsLambda());
-  LambdaNode *node = (LambdaNode*)mLastTreeNode;
-  node->SetProperty(LP_TSConstructorType);
-  return mLastTreeNode;
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 //                       InstanceOf Expression
 ////////////////////////////////////////////////////////////////////////////////

@@ -2034,8 +2034,6 @@ public:
 enum LambdaProperty {
   LP_JavaLambda,
   LP_JSArrowFunction,
-  LP_TSFunctionType,
-  LP_TSConstructorType,
   LP_NA
 };
 

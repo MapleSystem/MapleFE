@@ -1696,7 +1696,6 @@ rule IntersectionType: IntersectionOrPrimaryType + '&' + PrimaryType
 rule FunctionType: ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList) + ')' + "=>" + Type
   attr.action : BuildLambda(%3)
   attr.action : AddType(%6)
-  attr.action : SetFunctionType()
 
 ## rule ConstructorType: new TypeParametersopt ( ParameterListopt ) => Type
 ## This actually a literal.

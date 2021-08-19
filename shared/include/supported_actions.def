@@ -76,8 +76,6 @@ ACTION(BuildInfer)
 ACTION(BuildLambda)
 ACTION(SetJavaLambda)       // java lambda
 ACTION(SetArrowFunction)    // JS arrow function
-ACTION(SetFunctionType)     // TS function type
-ACTION(SetConstructorType)  // TS constructor type
 
 // This is very special function, it changes other
 // keyword, attr node or anything into a new identifier node
