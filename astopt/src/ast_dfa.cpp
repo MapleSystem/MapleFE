@@ -22,8 +22,6 @@
 
 namespace maplefe {
 
-#define DEFAULT_VAL 0xdeadbeef
-
 AST_DFA::~AST_DFA() {
   mVar2DeclMap.clear();
   for (auto it: mStmtId2StmtMap) {
@@ -322,6 +320,28 @@ void AST_DFA::BuildBitVectors() {
       working_list.push_back(bb->GetSuccessorAtIndex(it));
     }
 
+    // function parameters are considered defined at function entry bb
+    if (bb->GetAttr() == AK_Entry) {
+      CfgFunc *func = mEntryBbId2FuncMap[bbid];
+      if(func) {
+        FunctionNode *fn = static_cast<FunctionNode *>(func->GetFuncNode());
+        for (unsigned i = 0; i < fn->GetParamsNum(); i++) {
+          TreeNode *arg = fn->GetParam(i);
+          if (arg->IsIdentifier()) {
+            for (int i = 0; i < mDefPositionVec.GetNum(); i++) {
+              // set bits for matching bbid
+              unsigned nid = mDefPositionVec.ValueAtIndex(i).second;
+              unsigned sid = GetStmtIdFromNodeId(nid);
+              unsigned bid = GetBbIdFromStmtId(sid);
+              if (bid == bbid) {
+                mGenMap[bbid]->SetBit(i);
+              }
+            }
+          }
+        }
+      }
+    }
+
     for (int it = 0; it < bb->GetStatementsNum(); it++) {
       TreeNode *node = bb->GetStatementAtIndex(it);
       unsigned stridx = GetDefStrIdx(node);
@@ -466,10 +486,12 @@ void AST_DFA::CollectInfo() {
     if (f && f->IsFunction()) {
       unsigned sid = f->GetNodeId();
       mStmtIdVec.PushBack(sid);
-      // note: sid map to CfgFunc func
-      mFuncId2CfgFuncMap[sid] = func;
-      // use special bbid DEFAULT_VAL
-      mStmtId2BbIdMap[sid] = DEFAULT_VAL;
+
+      // use entry bbid for function and its arguments
+      unsigned bbid = func->GetEntryBB()->GetId();
+      mStmtId2BbIdMap[sid] = bbid;
+      mEntryBbId2FuncMap[bbid] = func;
+
       FunctionNode *fn = static_cast<FunctionNode *>(f);
       for (unsigned i = 0; i < fn->GetParamsNum(); i++) {
         TreeNode *arg = fn->GetParam(i);
@@ -527,24 +549,18 @@ void AST_DFA::BuildDefUseChain() {
     visitor.mDefStrIdx = pos.first;
     // def nodeid
     visitor.mDefNodeId = pos.second;
-    visitor.mReachDef = false;
     visitor.mReachNewDef = false;
     unsigned sid = GetStmtIdFromNodeId(visitor.mDefNodeId);
     unsigned bid = GetBbIdFromStmtId(sid);
-
-    if (bid == DEFAULT_VAL) {
-      CfgFunc *f = static_cast<CfgFunc *>(mFuncId2CfgFuncMap[sid]);
-      TreeNode *node = f->GetFuncNode();
-      MASSERT(node && "null CfgFunc");
-      FunctionNode *func = static_cast<FunctionNode *>(node);
-      for (unsigned i = 0; i < func->GetParamsNum(); i++) {
-        TreeNode *arg = func->GetParam(i);
-        visitor.Visit(arg);
-      }
-      bb = f->GetEntryBB();
+    // check if func entry bb
+    if (mEntryBbId2FuncMap.find(bid) != mEntryBbId2FuncMap.end()) {
+      // func arguments are defined in entry bb, mark defined
+      visitor.mReachDef = true;
     } else {
-      bb = mHandler->mBbId2BbMap[bid];
+      visitor.mReachDef = false;
     }
+
+    bb = mHandler->mBbId2BbMap[bid];
 
     // loop through each BB and each statement
     working_list.push_back(bb);
@@ -554,6 +570,7 @@ void AST_DFA::BuildDefUseChain() {
       bb = working_list.front();
       MASSERT(bb && "null BB");
       unsigned bbid = bb->GetId();
+      MSGNOLOC("BB", bbid);
 
       // check if def is either alive at bb entry or created in bb
       bool alive = mRchInMap[bbid]->GetBit(i);

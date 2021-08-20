@@ -42,7 +42,7 @@ class AST_DFA {
   // stmt id
   SmallVector<unsigned> mStmtIdVec;
   std::unordered_map<unsigned, TreeNode*> mStmtId2StmtMap;
-  std::unordered_map<unsigned, CfgFunc*> mFuncId2CfgFuncMap;
+  std::unordered_map<unsigned, CfgFunc*> mEntryBbId2FuncMap;
 
   // def node id set
   std::unordered_set<unsigned> mDefNodeIdSet;
