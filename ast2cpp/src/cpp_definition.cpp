@@ -57,8 +57,6 @@ std::string CppDef::EmitModuleNode(ModuleNode *node) {
   std::string str("// TypeScript filename: "s + node->GetFileName() + "\n"s);
   str += "#include <iostream>\n#include \""s + GetBaseFileName() + ".h\"\n\n"s;
 
-  emitStr = &str;
-  emitStrInsertPos = str.size();
   // definition of default class constructors.
   for (unsigned i = 0; i < node->GetTreesNum(); ++i) {
     if (auto n = node->GetTree(i))
@@ -66,7 +64,6 @@ std::string CppDef::EmitModuleNode(ModuleNode *node) {
         str += EmitDefaultCtor(static_cast<ClassNode*>(n));
   }
 
-  emitStrInsertPos = str.size();
   // definitions of all top-level functions
   isInit = false;
   CfgFunc *module = mHandler->GetCfgFunc();
@@ -80,7 +77,6 @@ std::string CppDef::EmitModuleNode(ModuleNode *node) {
 
   str += "\n\n void "s + name + "::__init_func__() { // bind \"this\" to current module\n"s;
   isInit = true;
-  emitStrInsertPos = str.size();
   for (unsigned i = 0; i < node->GetTreesNum(); ++i) {
     if (auto n = node->GetTree(i)) {
       if (n->GetKind() != NK_Class)
@@ -273,9 +269,9 @@ std::string CppDef::EmitIdentifierNode(IdentifierNode *node) {
 }
 
 // Generate vector of ObjectProp to be passed to Object constructor.
-std::string CppDef::EmitStructLiteralProps(std::string propsName, StructLiteralNode* node) {
+std::string CppDef::EmitStructLiteralProps(StructLiteralNode* node) {
   std::string str;
-  str += "  std::vector<ObjectProp>"s + propsName + " = {\n"s;
+  str += "\n  std::vector<ObjectProp>({\n"s;
   for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
     if (i)
       str += ",\n"s;
@@ -311,16 +307,14 @@ std::string CppDef::EmitStructLiteralProps(std::string propsName, StructLiteralN
         case TY_Class:
           // Handle embedded ObjectLiterals recursively
           if (lit->GetKind() == NK_StructLiteral) {
-            std::string props = EmitStructLiteralProps(fieldName+"Props"s, static_cast<StructLiteralNode*>(lit));
-            emitStr->insert(emitStrInsertPos, props);
-            emitStrInsertPos += props.size();
-            str += "    std::make_pair(\""s + fieldName + "\", JS_Val(Object_ctor._new("s + fieldName + "Props)))"s;
+            std::string props = EmitStructLiteralProps(static_cast<StructLiteralNode*>(lit));
+            str += "    std::make_pair(\""s + fieldName + "\", JS_Val(Object_ctor._new("s + props + ")))"s;
           }
           break;
       }
     }
   }
-  str += "  };\n"s;
+  str += "  })"s;
   return str;
 }
 
@@ -346,10 +340,8 @@ std::string CppDef::EmitDeclNode(DeclNode *node) {
     // emit init part
     if (node->GetTypeId() == TY_Class && node->GetInit()->GetKind() == NK_StructLiteral) {
       // Emit obj instance with object/struct literal init
-      std::string props = EmitStructLiteralProps(DeclVarName(node)+"Props"s, static_cast<StructLiteralNode*>( node->GetInit()));
-      emitStr->insert(emitStrInsertPos, props);
-      emitStrInsertPos += props.size();
-      str += "  "s + name + " = Object_ctor._new("s + DeclVarName(node) + "Props)"s;
+      std::string props = EmitStructLiteralProps(static_cast<StructLiteralNode*>( node->GetInit()));
+      str += "  "s + name + " = Object_ctor._new("s + props +")"s;
     }
     else if (node->GetTypeId() == TY_Class)
       str += name + "= &"s + n->GetName() + "_ctor"s;
