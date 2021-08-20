@@ -1635,8 +1635,11 @@ rule TypeReference: TypeName + ZEROORONE(TypeArguments) + ZEROORMORE(AsType)
 
 ## rule TypeName: IdentifierReference NamespaceName . IdentifierReference
 rule TypeName: ONEOF(IdentifierReference,
-                     NamespaceName + '.' + IdentifierReference)
+                     NamespaceName + '.' + IdentifierReference,
+                     '(' + IdentifierReference + ')',
+                     '(' + NamespaceName + '.' + IdentifierReference + ')')
   attr.action.%2 : BuildField(%1, %3)
+  attr.action.%4 : BuildField(%2, %4)
 
 ## rule NamespaceName: IdentifierReference NamespaceName . IdentifierReference
 rule NamespaceName: ONEOF(IdentifierReference,
