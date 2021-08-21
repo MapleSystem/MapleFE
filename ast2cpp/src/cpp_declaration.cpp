@@ -343,29 +343,18 @@ std::string CppDecl::EmitClassNode(ClassNode *node) {
 
   str += "public:\n";
 
-  // constructor decl and initialization list
-  std::string init;
-  bool hasInit = false;
-  for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
-    if (auto n = node->GetField(i)) {
-      if (n->GetKind() == NK_Identifier) {
-        IdentifierNode* id = static_cast<IdentifierNode *>(n);
-        if (id->GetInit()) {
-          if (hasInit)
-            init += ", "s;
-          else
-            hasInit = true;
-          init += "  "s + id->GetName() + "("s + EmitTreeNode(id->GetInit()) + ")"s;
-        }
-      }
-    }
-  }
-  str += "  "s + node->GetName() + "(Function* ctor, Object* proto): "s + base + "(ctor, proto)" + (init.empty()? init: ","s + init) + " {}\n"s;
+  // constructor decl
+  str += "  "s + node->GetName() + "(Function* ctor, Object* proto): "s + base + "(ctor, proto)"  + " {}\n"s;
   str += "  ~"s + node->GetName() + "(){}\n";
 
-  // field decl. TODO: handle static, private, protected attrs.
+  // class field decl and init. TODO: handle static, private, protected attrs.
   for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
-    str += "  "s + EmitTreeNode(node->GetField(i)) + ";\n";
+    auto n = node->GetField(i);
+    str += "  "s + EmitTreeNode(n);
+    if (n->GetKind() == NK_Identifier && static_cast<IdentifierNode*>(n)->GetInit()) {
+      str += " = "s + EmitTreeNode(static_cast<IdentifierNode *>(n)->GetInit());
+    }
+    str += ";\n";
   }
   for (unsigned i = 0; i < node->GetMethodsNum(); ++i) {
     str += EmitFunctionNode(node->GetMethod(i));
