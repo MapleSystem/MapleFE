@@ -343,15 +343,18 @@ std::string CppDecl::EmitClassNode(ClassNode *node) {
 
   str += "public:\n";
 
-  // constructor decl,  field init
+  // constructor decl and initialization list
   std::string init;
+  bool hasInit = false;
   for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
-    if (i)
-      init += ", "s;
     if (auto n = node->GetField(i)) {
       if (n->GetKind() == NK_Identifier) {
         IdentifierNode* id = static_cast<IdentifierNode *>(n);
         if (id->GetInit()) {
+          if (hasInit)
+            init += ", "s;
+          else
+            hasInit = true;
           init += "  "s + id->GetName() + "("s + EmitTreeNode(id->GetInit()) + ")"s;
         }
       }
