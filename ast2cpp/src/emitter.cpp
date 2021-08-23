@@ -439,12 +439,21 @@ std::string Emitter::EmitImportNode(ImportNode *node) {
   }
   */
   auto num = node->GetPairsNum();
+  if (num == 1 && node->GetTarget() == nullptr)
+    if (XXportAsPairNode *pair = node->GetPair(0))
+      if (auto a = pair->GetAfter())
+        if (auto b = pair->GetBefore())
+          if (b->GetKind() == NK_Identifier && a->GetKind() == NK_Identifier) {
+            str += EmitTreeNode(a) + " = "s + EmitTreeNode(b) + ";\n"s;
+            return HandleTreeNode(str, node);
+          }
+
   for (unsigned i = 0; i < node->GetPairsNum(); ++i) {
     if (auto n = node->GetPair(i)) {
       std::string s = EmitXXportAsPairNode(n);
       auto len = s.length();
       if(len > 13 && s.substr(len - 13) == " as default }"s)
-         s = s.substr(1, len - 13); // default export from a module
+        s = s.substr(1, len - 13); // default export from a module
       if(len > 8 && s.substr(0, 8) == "default "s)
         s = s.substr(8, len - 1);
       if (!s.empty() && s.front() == '{' && !str.empty() && str.back() == '}') {
