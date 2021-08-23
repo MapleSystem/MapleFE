@@ -185,7 +185,7 @@ SmallVector<TemplateLiteralNode*> gTemplateLiteralNodes;
 //////////////////////////////////////////////////////////////////////////////////
 
 Parser::Parser(const char *name) : filename(name) {
-  mLexer = new Lexer();
+  mLexer = CreateLexer();
   const std::string file(name);
 
   mASTModule = new (gTreePool.NewTreeNode(sizeof(ModuleNode))) ModuleNode();

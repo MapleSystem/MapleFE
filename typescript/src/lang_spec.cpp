@@ -104,7 +104,7 @@ Char StringToValueImpl::StringToChar(std::string &s) {
   return ret_char;
 }
 
-// Each language has its own format of literal. So this function handles Java literals.
+// Each language has its own format of literal. So this function handles Typescript literals.
 // It translate a string into a literal.
 //
 // 'str' is in the Lexer's string pool.
@@ -163,6 +163,15 @@ LitData ProcessLiteral(LitId id, const char *str) {
   }
 
   return data;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////
+//          Implementation of typescript Lexer
+/////////////////////////////////////////////////////////////////////////////////////
+
+Lexer* CreateLexer() {
+  Lexer *lexer = new TypescriptLexer();
+  return lexer;
 }
 
 }

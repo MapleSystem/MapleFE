@@ -401,5 +401,11 @@ public:
   Token* GetRegExpr(Token *);
 };
 
+// Each language will have its own implementation of lexer. Most of lexer
+// are shared with some special functions being language specific.
+//
+// The implementation of this function is in lang/src/lang_spec.cpp.
+extern Lexer* CreateLexer();
+
 }
 #endif

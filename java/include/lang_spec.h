@@ -21,6 +21,7 @@
 
 #include "stringutil.h"
 #include "token.h"
+#include "lexer.h"
 
 namespace maplefe {
 
@@ -34,5 +35,11 @@ public:
 };
 
 extern LitData ProcessLiteral(LitId type, const char *str);
+
+//
+class JavaLexer : public Lexer {
+};
+
 }
+
 #endif
