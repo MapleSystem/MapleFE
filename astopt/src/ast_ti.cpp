@@ -622,10 +622,10 @@ CallNode *TypeInferVisitor::VisitCallNode(CallNode *node) {
             UpdateTypeId(node, func->GetType()->GetTypeId());
           }
           // update function's argument types
+          // count minimun number of args need to be passed
+          unsigned min = 0;
           if (func->GetParamsNum() != node->GetArgsNum()) {
-            // count minimun number of args need to be passed
             // check arg about whether it is optional or has default value
-            unsigned min = 0;
             for (unsigned i = 0; i < func->GetParamsNum(); i++) {
               TreeNode *arg = func->GetParam(i);
               if (arg->IsOptional()) {
@@ -645,7 +645,7 @@ CallNode *TypeInferVisitor::VisitCallNode(CallNode *node) {
             }
           }
           if (ExportedDeclIds.find(decl->GetNodeId()) == ExportedDeclIds.end()) {
-            for (unsigned i = 0; i < node->GetArgsNum(); i++) {
+            for (unsigned i = 0; i < min; i++) {
               UpdateTypeUseNode(func->GetParam(i), node->GetArg(i));
             }
           }
