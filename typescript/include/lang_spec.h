@@ -36,8 +36,14 @@ public:
 
 extern LitData ProcessLiteral(LitId type, const char *str);
 
-//
+////////////////////////////////////////////////////////////////////////////////////
+//                              Typescript Lexer
+////////////////////////////////////////////////////////////////////////////////////
+
 class TypescriptLexer : public Lexer {
+  TempLitData* GetTempLit();
+  bool FindNextTLFormat(unsigned start, std::string& s, unsigned& end);
+  bool FindNextTLPlaceHolder(unsigned start, std::string& s, unsigned& end);
 };
 
 }

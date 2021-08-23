@@ -124,9 +124,9 @@ public:
   const char*  GetIdentifier();
   bool         GetComment();
 
-  TempLitData* GetTempLit();
-  bool     FindNextTLFormat(unsigned /*start*/, std::string&, unsigned& /*end*/);
-  bool     FindNextTLPlaceHolder(unsigned /*start*/, std::string&, unsigned& /*end*/);
+  virtual TempLitData* GetTempLit() {return NULL;}
+  virtual bool FindNextTLFormat(unsigned start, std::string& s, unsigned& end) {return false;}
+  virtual bool FindNextTLPlaceHolder(unsigned start, std::string& s, unsigned& end) {return false;}
 
   // replace keyword/opr/sep... with tokens
   //void PlantTokens();
