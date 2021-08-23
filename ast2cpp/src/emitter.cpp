@@ -230,6 +230,10 @@ std::string Emitter::EmitFunctionNode(FunctionNode *node) {
     else
       str += s;
   }
+  else
+    if (auto p = node->GetParent())
+      if (p->GetKind() == NK_Block)
+        str += ";\n"s;
   /*
   if (auto n = node->GetDims()) {
     str += " "s + EmitDimensionNode(n);
