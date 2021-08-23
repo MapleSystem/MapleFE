@@ -943,7 +943,12 @@ std::string Emitter::EmitStructNode(StructNode *node) {
       std::string func = EmitFunctionNode(n);
       if (func.substr(0, 9) == "function ")
         func = func.substr(9);
-      Replace(func, "=>", ":");
+      size_t index = func.rfind(')');
+      if (index != std::string::npos) {
+        std::string t = func.substr(index);
+        Replace(t, "=>", ":");
+        func = func.substr(0, index) + t;
+      }
       str += func.length() > 2 && func.substr(func.length() - 2) == ";\n" ? func : func + ";\n"s;
     }
   }
