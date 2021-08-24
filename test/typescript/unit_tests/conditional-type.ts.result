@@ -4,7 +4,7 @@ Matched 44 tokens.
 Matched 53 tokens.
 ============= Module ===========
 == Sub Tree ==
-export { type X<A=> = A extends true ? any[] : string} 
+export { type X<A=> = A extends true ? prim array-TBD : string} 
 == Sub Tree ==
 js_var Decl: x=[1,2,3]
 == Sub Tree ==

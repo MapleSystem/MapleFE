@@ -3598,6 +3598,18 @@ TreeNode* ASTBuilder::BuildArrayType() {
 
   DimensionNode *dims = NULL;
 
+  // This is a weird behavior in Typescript. A type key word can be identifier also.
+  // I need check here.
+  if (basic->IsIdentifier()) {
+    IdentifierNode *id = (IdentifierNode*)basic;
+    const char *id_name = id->GetName();
+    if (id_name) {
+      PrimTypeNode *pt = gPrimTypePool.FindType(id_name);
+      if (pt)
+        basic = pt;
+    }
+  }
+
   if (basic->IsPrimArrayType()) {
     prim_array_type = (PrimArrayTypeNode*)basic;
     dims = prim_array_type->GetDims();

@@ -1,0 +1,7 @@
+Matched 7 tokens.
+Matched 18 tokens.
+============= Module ===========
+== Sub Tree ==
+js_var Decl: arr
+== Sub Tree ==
+js_var Decl: arr=[1]
