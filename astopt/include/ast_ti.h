@@ -76,6 +76,8 @@ class TypeInferVisitor : public TypeInferBaseVisitor {
   unsigned        mFlags;
   bool            mUpdated;
 
+  // node ids
+  std::unordered_set<unsigned> ImportedDeclIds;
   std::unordered_set<unsigned> ExportedDeclIds;
 
  public:
@@ -112,6 +114,7 @@ class TypeInferVisitor : public TypeInferBaseVisitor {
   ForLoopNode *VisitForLoopNode(ForLoopNode *node);
   FunctionNode *VisitFunctionNode(FunctionNode *node);
   IdentifierNode *VisitIdentifierNode(IdentifierNode *node);
+  ImportNode *VisitImportNode(ImportNode *node);
   InterfaceNode *VisitInterfaceNode(InterfaceNode *node);
   LambdaNode *VisitLambdaNode(LambdaNode *node);
   LiteralNode *VisitLiteralNode(LiteralNode *node);
@@ -132,7 +135,6 @@ class ShareUTVisitor : public AstVisitor {
   bool            mUpdated;
 
   std::stack<ASTScope *> mScopeStack;
-  std::unordered_set<unsigned> ExportedDeclIds;
 
  public:
   explicit ShareUTVisitor(Module_Handler *h, unsigned f, bool base = false)
@@ -152,7 +154,6 @@ class CheckTypeVisitor : public AstVisitor {
   bool            mUpdated;
 
   std::stack<ASTScope *> mScopeStack;
-  std::unordered_set<unsigned> ExportedDeclIds;
 
  public:
   explicit CheckTypeVisitor(Module_Handler *h, unsigned f, bool base = false)

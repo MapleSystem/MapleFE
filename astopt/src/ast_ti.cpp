@@ -621,30 +621,35 @@ CallNode *TypeInferVisitor::VisitCallNode(CallNode *node) {
           if (func->GetType()) {
             UpdateTypeId(node, func->GetType()->GetTypeId());
           }
-          // update function's argument types
-          // count minimun number of args need to be passed
-          unsigned min = 0;
-          if (func->GetParamsNum() != node->GetArgsNum()) {
-            // check arg about whether it is optional or has default value
-            for (unsigned i = 0; i < func->GetParamsNum(); i++) {
-              TreeNode *arg = func->GetParam(i);
-              if (arg->IsOptional()) {
-                continue;
-              } else if(arg->IsIdentifier()) {
-                IdentifierNode *id = static_cast<IdentifierNode *>(arg);
-                if (!id->GetInit()) {
+          // skip imported and exported functions as they are generic
+          // so should not restrict their types
+          if (ImportedDeclIds.find(decl->GetNodeId()) == ImportedDeclIds.end() &&
+              ExportedDeclIds.find(decl->GetNodeId()) == ExportedDeclIds.end()) {
+
+            unsigned min = func->GetParamsNum();
+            if (func->GetParamsNum() != node->GetArgsNum()) {
+              // count minimun number of args need to be passed
+              min = 0;
+              // check arg about whether it is optional or has default value
+              for (unsigned i = 0; i < func->GetParamsNum(); i++) {
+                TreeNode *arg = func->GetParam(i);
+                if (arg->IsOptional()) {
+                  continue;
+                } else if(arg->IsIdentifier()) {
+                  IdentifierNode *id = static_cast<IdentifierNode *>(arg);
+                  if (!id->GetInit()) {
+                    min++;
+                  }
+                } else {
                   min++;
                 }
-              } else {
-                min++;
+              }
+              if (min > node->GetArgsNum()) {
+                NOTYETIMPL("call and func number of arguments not compatible");
+                return node;
               }
             }
-            if (min > node->GetArgsNum()) {
-              NOTYETIMPL("call and func number of arguments not compatible");
-              return node;
-            }
-          }
-          if (ExportedDeclIds.find(decl->GetNodeId()) == ExportedDeclIds.end()) {
+            // update function's argument types
             for (unsigned i = 0; i < min; i++) {
               UpdateTypeUseNode(func->GetParam(i), node->GetArg(i));
             }
@@ -737,6 +742,19 @@ DeclNode *TypeInferVisitor::VisitDeclNode(DeclNode *node) {
   }
   if (isArray || IsArray(node)) {
     UpdateArrayElemTypeIdMap(node, elemTypeId);
+  }
+  return node;
+}
+
+ImportNode *TypeInferVisitor::VisitImportNode(ImportNode *node) {
+  (void) AstVisitor::VisitImportNode(node);
+  return node;
+  for (unsigned i = 0; i < node->GetPairsNum(); i++) {
+    XXportAsPairNode *p = node->GetPair(i);
+    TreeNode *bfnode = p->GetBefore();
+    if (bfnode) {
+      ImportedDeclIds.insert(bfnode->GetNodeId());
+    }
   }
   return node;
 }
