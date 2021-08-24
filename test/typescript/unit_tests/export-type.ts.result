@@ -1,0 +1,18 @@
+Matched 42 tokens.
+Matched 48 tokens.
+============= Module ===========
+== Sub Tree ==
+class  Foo
+  Fields: 
+    out=0    in=0
+  Instance Initializer: 
+  Constructors: 
+    constructor  (a,b)  throws: 
+      this.out Assign a
+      this.in Assign b
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+export {Foo} 
