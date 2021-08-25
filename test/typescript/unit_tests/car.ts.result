@@ -1,0 +1,33 @@
+Matched 22 tokens.
+Matched 41 tokens.
+Matched 52 tokens.
+Matched 61 tokens.
+============= Module ===========
+== Sub Tree ==
+class  Vehicle
+  Fields: 
+    name
+  Instance Initializer: 
+  Constructors: 
+    constructor  (name)  throws: 
+      this.name Assign name
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+class  Car
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+    constructor  (name)  throws: 
+      super(name)
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+js_let Decl: car=new Car("A car")
+== Sub Tree ==
+console.log(car.name)
