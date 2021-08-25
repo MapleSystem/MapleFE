@@ -57,6 +57,7 @@ public:
   virtual std::string EmitPrimArrayTypeNode(PrimArrayTypeNode *node);
   virtual std::string EmitNewNode(NewNode *node);
   virtual std::string EmitClassProps(TreeNode *node);
+  virtual std::string EmitArrayElementNode(ArrayElementNode *node);
   std::string EmitStructLiteralProps(StructLiteralNode* node);
   std::string EmitFuncScopeVarDecls(FunctionNode *node);
 };

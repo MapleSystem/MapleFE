@@ -150,20 +150,40 @@ std::string CppDecl::EmitPrimTypeNode(PrimTypeNode *node) {
   return GetTypeString(node);
 }
 
+inline NodeKind IdentifierType(TreeNode* node) {
+  return static_cast<IdentifierNode*>(node)->GetType()->GetKind();
+}
+
 std::string CppDecl::EmitDeclNode(DeclNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
   if (auto n = node->GetVar()) {
-    if (IsVarInitStructLiteral(node)) {
-      // generate obj instance decl
+    if (IsVarInitStructLiteral(node)) {   // obj instance decl
       str = "  Object* "s + n->GetName();
-    } else if (IsVarInitClass(node)) {
-      // generate obj instance with class constructor:
-      // C++ decl: "Ctor_<class> *<var> = &<class>_ctor" for TS decl: "<var> = <class>"
+    } else if (IsVarInitClass(node)) {    // class constructor instance decl for TS: <var> = <class>
       str = "  Ctor_"s + node->GetInit()->GetName() + " *"s +  n->GetName();
     } else {
       str += " "s + EmitTreeNode(n);
+    }
+
+    // Generate initializer for Array decl in header file.
+    if (auto init = node->GetInit()) {
+      if (init->GetKind() == NK_ArrayLiteral && n->GetKind() == NK_Identifier) {
+        str += " = "s;
+        switch (IdentifierType(n)) {
+          case NK_UserType:
+            str += EmitTreeNode(static_cast<IdentifierNode*>(n)->GetType());
+            break;
+          case NK_PrimArrayType: {
+            PrimArrayTypeNode* mtype = static_cast<PrimArrayTypeNode *>(static_cast<IdentifierNode*>(n)->GetType());
+            str +=  EmitArrayLiteral(static_cast<ArrayLiteralNode*>(init),
+                    mtype->GetDims()->GetDimensionsNum(),
+                    EmitPrimTypeNode(mtype->GetPrim()));
+            break;
+          }
+        }
+      }
     }
     str += ";\n"s;
   }
@@ -199,17 +219,37 @@ std::string CppDecl::EmitArrayLiteralNode(ArrayLiteralNode *node) {
   return std::string();
 }
 
+std::string CppDecl::EmitArrayLiteral(ArrayLiteralNode *node, int dim, std::string type) {
+  if (node == nullptr)
+    return std::string();
+
+  // Generate ctor call to instantiate Array, e.g. Array1D_long._new(). See builtins.h
+  std::string str("Array"s + std::to_string(dim) + "D_"s + type + "._new({"s );
+  for (unsigned i = 0; i < node->GetLiteralsNum(); ++i) {
+    if (i)
+      str += ", "s;
+    if (auto n = node->GetLiteral(i)) {
+      if (n->GetKind() == NK_ArrayLiteral)
+        str += EmitArrayLiteral(static_cast<ArrayLiteralNode*>(n), dim-1, type);
+      else
+        str += EmitTreeNode(n);
+    }
+  }
+  str += "})"s;
+  return str;
+}
+
 std::string CppDecl::EmitPrimArrayTypeNode(PrimArrayTypeNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
   if (auto n = node->GetPrim()) {
-    str = "std::vector<"s + EmitPrimTypeNode(n) + "> "s;;
+    str = "Array<"s + EmitPrimTypeNode(n) + ">* "s;;
     auto d = node->GetDims();
     if(d && d->GetKind() == NK_Dimension) {
       auto num = (static_cast<DimensionNode *>(d))->GetDimensionsNum();
       for (unsigned i = 1; i < num; ++i) {
-        str = "std::vector<"s + str + "> "s;;
+        str = "Array<"s + str + ">* "s;;
       }
     }
   }
@@ -352,7 +392,15 @@ std::string CppDecl::EmitClassNode(ClassNode *node) {
     auto n = node->GetField(i);
     str += "  "s + EmitTreeNode(n);
     if (n->GetKind() == NK_Identifier && static_cast<IdentifierNode*>(n)->GetInit()) {
-      str += " = "s + EmitTreeNode(static_cast<IdentifierNode *>(n)->GetInit());
+      auto init = static_cast<IdentifierNode*>(n)->GetInit();
+      if (init->GetKind() == NK_ArrayLiteral) {
+        // Generate initializer for Array member field decl in header file
+        PrimArrayTypeNode* mtype = static_cast<PrimArrayTypeNode *>(static_cast<IdentifierNode*>(n)->GetType());
+        MASSERT(mtype->GetKind() == NK_PrimArrayType && "Unexpected TreeNode type");
+        str += " = "s + EmitArrayLiteral(static_cast<ArrayLiteralNode*>(init),
+          mtype->GetDims()->GetDimensionsNum(), EmitPrimTypeNode(mtype->GetPrim()));
+      } else
+        str += " = "s + EmitTreeNode(static_cast<IdentifierNode *>(n)->GetInit());
     }
     str += ";\n";
   }

@@ -263,6 +263,21 @@ std::ostream& operator<< (std::ostream& out, const std::vector<T>& v) {
 }
 
 template <typename T>
+std::ostream& operator<< (std::ostream& out, const t2crt::Array<T>* v) {
+  if(v->elements.empty())
+    out << "[]";
+  else {
+    out << "[ ";
+    auto i = v->elements.begin(), e = v->elements.end();
+    out << *i++;
+    for (; i != e; ++i)
+        std::cout << ", " << *i;
+    out << " ]";
+  }
+  return out;
+}
+
+template <typename T>
 std::ostream& operator<< (std::ostream& out, const t2crt::Array<T>& v) {
   if(v.elements.empty())
     out << "[]";
@@ -276,7 +291,6 @@ std::ostream& operator<< (std::ostream& out, const t2crt::Array<T>& v) {
   }
   return out;
 }
-
 extern std::ostream& operator<< (std::ostream& out, const t2crt::JS_Val& v);
 extern const t2crt::JS_Val undefined;
 

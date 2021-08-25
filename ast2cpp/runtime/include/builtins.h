@@ -80,4 +80,22 @@ class Ctor_Array: public Function {
 #define ARR_OBJ(NM,CTOR) NM(&CTOR, CTOR.prototype)
 #define ARR_CTOR(NM)     NM(&Function_ctor, Function_ctor.prototype, Object_ctor.prototype)
 
+// predefined Array constructors for dimension 1-3 and basic types
+#define ARRAY_CTOR_DECL(type)  \
+  extern Ctor_Array<type>                 Array1D_##type; \
+  extern Ctor_Array<Array<type>*>         Array2D_##type; \
+  extern Ctor_Array<Array<Array<type>*>*> Array3D_##type;
+
+// predefined Array class constructores for dimensions 1-3 and basic types
+#define ARRAY_CTOR_DEF(type)  \
+  Ctor_Array<type>                        ARR_CTOR(Array1D_##type); \
+  Ctor_Array<Array<type>*>                ARR_CTOR(Array2D_##type); \
+  Ctor_Array<Array<Array<type>*>*>        ARR_CTOR(Array3D_##type);
+
+ARRAY_CTOR_DECL(int)
+ARRAY_CTOR_DECL(long)
+ARRAY_CTOR_DECL(double)
+ARRAY_CTOR_DECL(JS_Val)
+ARRAY_CTOR_DECL(Object)
+
 #endif // __BUILTINS_H__

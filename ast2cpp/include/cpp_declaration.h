@@ -51,7 +51,7 @@ public:
   virtual std::string EmitClassNode(ClassNode *node);
 
   std::string GetTypeString(TreeNode *node, TreeNode *child = nullptr);
-
+  std::string EmitArrayLiteral(ArrayLiteralNode *node, int dim, std::string type);
 };
 
 inline bool IsVarInitStructLiteral(DeclNode* node) {
@@ -64,10 +64,6 @@ inline bool IsVarInitClass(DeclNode* node) {
   return node->GetInit() &&
          node->GetInit()->GetTypeId() == TY_Class &&
          node->GetInit()->GetKind() != NK_StructLiteral;
-}
-
-inline std::string DeclVarName(DeclNode* node) {
-  return node->GetVar()->GetName();
 }
 
 } // namespace maplefe
