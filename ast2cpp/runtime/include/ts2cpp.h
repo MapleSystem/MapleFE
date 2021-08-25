@@ -33,6 +33,8 @@ inline std::string to_string(std::string t) {return t;}
 
 class Object;
 class Function;
+template <typename T>
+class Array;
 
 // JS types for props
 typedef enum JS_Type : uint8_t {
@@ -173,9 +175,13 @@ class Object {
     // and add to propList of Object_ctor.prototype object on system init.
 };
 
+using ArgsT = Array<JS_Val>;
+
 class Function : public Object {
   public:
     Object* prototype;    // prototype property
+    Object* _thisArg;     // from bind()
+    ArgsT*  _args;        // from bind()
 
     Function(Function* ctor, Object* proto, Object* prototype_proto) : Object(ctor, proto) {
       JS_Val val(this);
@@ -186,6 +192,9 @@ class Function : public Object {
     bool IsFuncObj() {
       return true;
     }
+
+    Object* bind(Object* obj, ArgsT* argv);
+    virtual JS_Val func(Object* obj, ArgsT& args) {JS_Val res; return res;}
 
     // Put code for JS Function.prototype props as static fields and methods in this class
     // and add to propList of Function_ctor.prototype object on system init.
