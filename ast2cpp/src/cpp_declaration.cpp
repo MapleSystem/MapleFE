@@ -169,7 +169,7 @@ std::string CppDecl::EmitDeclNode(DeclNode *node) {
 
     // Generate initializer for Array decl in header file.
     if (auto init = node->GetInit()) {
-      if (init->GetKind() == NK_ArrayLiteral && n->GetKind() == NK_Identifier) {
+      if (init->GetKind() == NK_ArrayLiteral && n->GetKind() == NK_Identifier && static_cast<IdentifierNode*>(n)->GetType()) {
         str += " = "s;
         switch (IdentifierType(n)) {
           case NK_UserType:
