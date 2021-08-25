@@ -5,5 +5,5 @@ class Klass {
 }
 
 var obj: Klass = new Klass();
-console.log(obj["flag"]);
+console.log(obj[prop]);
 
