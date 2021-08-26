@@ -22,6 +22,7 @@
 #include <cstring>
 
 #include "typetable.h"
+#include "gen_astdump.h"
 
 namespace maplefe {
 
@@ -33,8 +34,28 @@ TypeEntry::TypeEntry() {
 
 TypeEntry::TypeEntry(TreeNode *node) {
   mType = node;
-  mTypeId = node->GetTypeId();
   mTypeKind = node->GetKind();
+  if (node->GetTypeId() != TY_None) {
+    mTypeId = node->GetTypeId();
+  } else {
+    switch (mTypeKind) {
+      case NK_Struct:
+      case NK_StructLiteral:
+      case NK_Class:
+      case NK_Interface:
+        mTypeId = TY_Class;
+        break;
+      case NK_ArrayLiteral:
+        mTypeId = TY_Array;
+        break;
+      case NK_UserType:
+        mTypeId = TY_User;
+        break;
+      default:
+        mTypeId = TY_None;
+        break;
+    }
+  }
 }
 
 TypeTable::TypeTable() {
@@ -52,13 +73,28 @@ bool TypeTable::AddType(TreeNode *node) {
     return false;
   }
   mNodeId2TypeIdxMap[id] = mTypeTable.size();
-  mTypeTable.push_back(node);
+  TypeEntry *entry = new TypeEntry(node);
+  mTypeTable.push_back(entry);
   return true;
 }
 
-TreeNode *TypeTable::GetTypeFromTypeIdx(unsigned idx) {
+TypeEntry *TypeTable::GetTypeFromTypeIdx(unsigned idx) {
   MASSERT(idx < mTypeTable.size() && "type index out of range");
   return mTypeTable[idx];
+}
+
+void TypeTable::Dump() {
+  std::cout << "===================== TypeTable =====================" << std::endl;
+  unsigned idx = 1;
+  for (unsigned idx = 1; idx < mTypeTable.size(); idx++) {
+    TypeEntry *entry = mTypeTable[idx];
+    TreeNode *node = entry->GetType();
+    std::cout << "  " << idx << " : " << node->GetName() << " : " <<
+              AstDump::GetEnumTypeId(entry->GetTypeId()) << " " <<
+              AstDump::GetEnumNodeKind(node->GetKind()) << " " <<
+              node->GetNodeId() << std::endl;
+  }
+  std::cout << "===================== End TypeTable =====================" << std::endl;
 }
 
 }

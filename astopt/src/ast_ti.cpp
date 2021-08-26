@@ -17,6 +17,7 @@
 #include <set>
 #include "ast_handler.h"
 #include "ast_ti.h"
+#include "typetable.h"
 #include "gen_astdump.h"
 
 #define ITERATEMAX 10
@@ -25,6 +26,9 @@ namespace maplefe {
 
 void TypeInfer::TypeInference() {
   ModuleNode *module = mHandler->GetASTModule();
+
+  if (mFlags & FLG_trace_3)
+    mHandler->GetTypeTable()->Dump();
 
   // build mNodeId2Decl
   MSGNOLOC0("============== Build NodeId2Decl ==============");

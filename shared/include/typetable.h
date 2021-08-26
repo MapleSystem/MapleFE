@@ -38,7 +38,7 @@ class TypeEntry {
  public:
   TypeEntry();
   TypeEntry(TreeNode *node);
-  ~TypeEntry();
+  ~TypeEntry(){};
 
   NodeKind  GetTypeKind() { return mTypeKind; }
   TypeId    GetTypeId()   { return mTypeId; }
@@ -51,7 +51,7 @@ class TypeEntry {
 
 class TypeTable {
 private:
-  std::vector<TreeNode *> mTypeTable;
+  std::vector<TypeEntry *> mTypeTable;
   std::unordered_map<unsigned, unsigned> mNodeId2TypeIdxMap;
 
 public:
@@ -59,8 +59,8 @@ public:
   ~TypeTable();
 
   bool AddType(TreeNode *node);
-  TreeNode *GetTypeFromTypeIdx(unsigned idx);
-
+  TypeEntry *GetTypeFromTypeIdx(unsigned idx);
+  void Dump();
 };
 
 }
