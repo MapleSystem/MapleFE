@@ -80,6 +80,8 @@ class BuildScopeVisitor : public BuildScopeBaseVisitor {
     }
   ~BuildScopeVisitor() = default;
 
+  void AddType(ASTScope *scope, TreeNode *node);
+
   // scope nodes
   BlockNode *VisitBlockNode(BlockNode *node);
   FunctionNode *VisitFunctionNode(FunctionNode *node);

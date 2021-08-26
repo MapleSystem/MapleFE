@@ -19,6 +19,7 @@
 #include "stringpool.h"
 #include "ast_cfg.h"
 #include "ast_scp.h"
+#include "typetable.h"
 
 namespace maplefe {
 
@@ -41,6 +42,11 @@ void AST_SCP::BuildScope() {
   visitor.mUserScopeStack.push(scope);
   module->SetScope(scope);
   visitor.Visit(module);
+}
+
+void BuildScopeVisitor::AddType(ASTScope *scope, TreeNode *node) {
+  scope->AddType(node);
+  mHandler->GetTypeTable()->AddType(node);
 }
 
 BlockNode *BuildScopeVisitor::VisitBlockNode(BlockNode *node) {
@@ -81,7 +87,7 @@ FunctionNode *BuildScopeVisitor::VisitFunctionNode(FunctionNode *node) {
     }
     // add it if not found
     if (!decl) {
-      scope->AddType(it);
+      AddType(scope, it);
     }
   }
   mScopeStack.push(scope);
@@ -114,7 +120,7 @@ ClassNode *BuildScopeVisitor::VisitClassNode(ClassNode *node) {
   // inner class is a decl
   if (parent) {
     parent->AddDecl(node);
-    parent->AddType(node);
+    AddType(parent, node);
   }
   ASTScope *scope = mASTModule->NewScope(parent, node);
 
@@ -136,7 +142,7 @@ InterfaceNode *BuildScopeVisitor::VisitInterfaceNode(InterfaceNode *node) {
   // inner interface is a decl
   if (parent) {
     parent->AddDecl(node);
-    parent->AddType(node);
+    AddType(parent, node);
   }
 
   ASTScope *scope = mASTModule->NewScope(parent, node);
@@ -159,7 +165,7 @@ StructNode *BuildScopeVisitor::VisitStructNode(StructNode *node) {
   // struct is a decl
   if (parent) {
     parent->AddDecl(node);
-    parent->AddType(node);
+    AddType(parent, node);
   }
 
   ASTScope *scope = mASTModule->NewScope(parent, node);
@@ -212,14 +218,14 @@ UserTypeNode *BuildScopeVisitor::VisitUserTypeNode(UserTypeNode *node) {
       // typalias id
       TypeAliasNode *ta = static_cast<TypeAliasNode *>(p);
       if (ta->GetId() == node) {
-        scope->AddType(node);
+        AddType(scope, node);
         return node;
       }
     }
 
     if (p->IsScope()) {
       // normal type decl
-      scope->AddType(node);
+      AddType(scope, node);
     }
   }
   return node;
@@ -230,7 +236,7 @@ TypeAliasNode *BuildScopeVisitor::VisitTypeAliasNode(TypeAliasNode *node) {
   BuildScopeBaseVisitor::VisitTypeAliasNode(node);
   UserTypeNode *ut = node->GetId();
   if (ut) {
-    scope->AddType(ut);
+    AddType(scope, ut);
   }
   return node;
 }
