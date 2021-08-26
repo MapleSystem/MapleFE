@@ -86,6 +86,7 @@ protected:
   TreeNode *mParent;
   TreeNode *mLabel;   // label of a statement, or expression.
   unsigned  mStrIdx;
+  unsigned  mTypeIdx;     // typetable index
   TypeId    mTypeId;      // typeId of the node
   ASTScope *mScope;
 
@@ -103,7 +104,7 @@ protected:
 
 public:
   TreeNode(NodeKind k, unsigned i)
-    : mKind(k), mLabel(NULL), mParent(NULL), mStrIdx(i), mIsStmt(false), mTypeId(TY_None),
+    : mKind(k), mLabel(NULL), mParent(NULL), mStrIdx(i), mIsStmt(false), mTypeId(TY_None), mTypeIdx(0),
       mScope(NULL), mIsOptional(false), mIsNonNull(false), mIsRest(false), mIsConst(false) {}
   TreeNode(NodeKind k) : TreeNode(k, 0) {}
   //TreeNode() : TreeNode(NK_Null, 0) {}
@@ -121,6 +122,7 @@ public:
   void SetParent(TreeNode *p) {mParent = p;}
   void SetLabel (TreeNode *p) {mLabel = p; SETPARENT(p);}
   void SetTypeId(TypeId id)   {mTypeId = id;}
+  void SetTypeIdx(unsigned id) {mTypeIdx = id;}
   void SetScope(ASTScope *s)   {mScope = s;}
 
   NodeKind GetKind()    {return mKind;}
@@ -128,6 +130,7 @@ public:
   TreeNode* GetParent() {return mParent;}
   TreeNode* GetLabel()  {return mLabel;}
   TypeId GetTypeId()    {return mTypeId;}
+  unsigned GetTypeIdx() {return mTypeIdx;}
   ASTScope *GetScope()   {return mScope;}
 
   bool IsStmt()                    {return mIsStmt;}
