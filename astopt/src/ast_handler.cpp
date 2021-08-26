@@ -22,6 +22,7 @@
 #include "ast_ti.h"
 #include "ast_cfa.h"
 #include "ast_dfa.h"
+#include "typetable.h"
 
 namespace maplefe {
 
@@ -36,6 +37,7 @@ Module_Handler::~Module_Handler() {
   delete mAST;
   delete mSCP;
   delete mTI;
+  delete mTypeTable;
   delete mCFA;
   delete mDFA;
 }
@@ -62,12 +64,18 @@ void Module_Handler::ScopeAnalysis() {
   if (!mSCP) {
     mSCP = new(GetMemPool()->Alloc(sizeof(AST_SCP))) AST_SCP(this, mFlags);
   }
+  if (!mTypeTable) {
+    mTypeTable = new(GetMemPool()->Alloc(sizeof(TypeTable))) TypeTable();
+  }
   mSCP->ScopeAnalysis();
 }
 
 void Module_Handler::TypeInference() {
   if (!mTI) {
     mTI = new(GetMemPool()->Alloc(sizeof(TypeInfer))) TypeInfer(this, mFlags);
+  }
+  if (!mTypeTable) {
+    mTypeTable = new(GetMemPool()->Alloc(sizeof(TypeTable))) TypeTable();
   }
   mTI->TypeInference();
 }

@@ -52,6 +52,7 @@ class AST_DFA;
 class AST_SCP;
 class AST_Handler;
 class TypeInfer;
+class TypeTable;
 
 // Each source file is a module
 class Module_Handler {
@@ -62,6 +63,7 @@ class Module_Handler {
   AST_AST      *mAST;
   AST_SCP      *mSCP;
   TypeInfer    *mTI;
+  TypeTable    *mTypeTable;
   AST_CFA      *mCFA;
   AST_DFA      *mDFA;
   const char   *mOutputFileName;
@@ -86,6 +88,7 @@ class Module_Handler {
     mAST(nullptr),
     mSCP(nullptr),
     mTI(nullptr),
+    mTypeTable(nullptr),
     mCFA(nullptr),
     mDFA(nullptr),
     mFlags(f) {}
@@ -124,11 +127,13 @@ class Module_Handler {
   AST_DFA *GetDFA() {return mDFA;}
   AST_SCP *GetSCP() {return mSCP;}
   TypeInfer *GetTI() {return mTI;}
+  TypeTable *GetTypeTable() {return mTypeTable;}
   void SetAST(AST_AST *p) {mAST = p;}
   void SetCFA(AST_CFA *p) {mCFA = p;}
   void SetDFA(AST_DFA *p) {mDFA = p;}
   void SetSCP(AST_SCP *p) {mSCP = p;}
   void SetTI(TypeInfer *p) {mTI = p;}
+  void SetTypeTable(TypeTable *p) {mTypeTable = p;}
 
   DeclNode *GetDeclOf(IdentifierNode *inode);
 
