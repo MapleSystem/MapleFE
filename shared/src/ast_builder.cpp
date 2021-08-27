@@ -2992,7 +2992,7 @@ TreeNode* ASTBuilder::BuildFunction() {
     if (!p_name.mIsEmpty) {
       if (p_name.mIsTreeNode) {
         node_name = p_name.mData.mTreeNode;
-        if (!node_name->IsIdentifier())
+        if (!node_name->IsIdentifier() && !node_name->IsComputedName())
           MERROR("The function name should be an indentifier node. Not?");
       } else {
         node_name = BuildIdentifier(p_name.mData.mToken);

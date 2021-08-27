@@ -1,0 +1,23 @@
+Matched 7 tokens.
+Matched 26 tokens.
+Matched 36 tokens.
+Matched 43 tokens.
+============= Module ===========
+== Sub Tree ==
+js_let Decl: prop="foo"
+== Sub Tree ==
+class  Klass
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+    func  ()  throws: 
+      console.log(prop)
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+js_var Decl: obj=new Klass()
+== Sub Tree ==
+obj[prop]()
