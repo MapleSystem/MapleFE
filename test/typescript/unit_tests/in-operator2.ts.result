@@ -1,0 +1,13 @@
+Matched 14 tokens.
+Matched 29 tokens.
+Matched 38 tokens.
+Matched 47 tokens.
+============= Module ===========
+== Sub Tree ==
+ type T =  {name;age }
+== Sub Tree ==
+js_var Decl: obj= {name:"John", age:30}
+== Sub Tree ==
+console.log("name" in obj)
+== Sub Tree ==
+console.log("Age" in obj)
