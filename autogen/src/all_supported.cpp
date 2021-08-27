@@ -22,7 +22,9 @@ namespace maplefe {
 //////////////////////////////////////////////////////////////////////
 
 #undef  TYPE
+#undef  PRIMTYPE
 #define TYPE(T) {#T, TY_##T},
+#define PRIMTYPE(T) {#T, TY_##T},
 TypeMapping TypesSupported[TY_NA] = {
 #include "supported_types.def"
 };
@@ -36,7 +38,9 @@ TypeId FindTypeIdLangIndep(const std::string &s) {
 }
 
 #undef  TYPE
+#undef  PRIMTYPE
 #define TYPE(T) case TY_##T: return #T;
+#define PRIMTYPE(T) case TY_##T: return #T;
 char *GetTypeString(TypeId tid) {
   switch (tid) {
 #include "supported_types.def"

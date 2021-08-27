@@ -24,7 +24,9 @@ namespace maplefe {
 // The list of all supported types. This covers all the languages.
 // NOTE: autogen also relies on this set of supported separators
 #undef  TYPE
+#undef  PRIMTYPE
 #define TYPE(T) TY_##T,
+#define PRIMTYPE(T) TY_##T,
 typedef enum TypeId {
 #include "supported_types.def"
 TY_NA

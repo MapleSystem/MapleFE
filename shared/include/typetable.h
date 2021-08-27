@@ -58,6 +58,7 @@ public:
   TypeTable();
   ~TypeTable();
 
+  void AddPrimTypes();
   bool AddType(TreeNode *node);
   TypeEntry *GetTypeFromTypeIdx(unsigned idx);
   void Dump();

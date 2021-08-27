@@ -61,10 +61,30 @@ TypeEntry::TypeEntry(TreeNode *node) {
 TypeTable::TypeTable() {
   // insert a dummy so type index starting from 1
   mTypeTable.push_back(NULL);
+  AddPrimTypes();
 }
 
 TypeTable::~TypeTable() {
   mTypeTable.clear();
+}
+
+#undef  TYPE
+#undef  PRIMTYPE
+#define TYPE(T)
+#define PRIMTYPE(T) \
+ stridx = gStringPool.GetStrIdx(#T); \
+ node = (PrimTypeNode*)gTreePool.NewTreeNode(sizeof(PrimTypeNode)); \
+ new (node) PrimTypeNode(); \
+ node->SetPrimType(TY_##T); \
+ node->SetTypeId(TY_##T); \
+ node->SetStrIdx(stridx); \
+ AddType(node);
+void TypeTable::AddPrimTypes() {
+  unsigned stridx;
+  PrimTypeNode *node;
+  TypeEntry *entry;
+#include "supported_types.def"
+  return;
 }
 
 bool TypeTable::AddType(TreeNode *node) {

@@ -24,14 +24,15 @@ TYPE(Class)     // class/interface decl
 TYPE(User)      // user types
 TYPE(Merge)     // merge of two types, unexpected
 
-TYPE(Boolean)
-TYPE(Byte)
-TYPE(Short)
-TYPE(Int)
-TYPE(Long)
-TYPE(Char)
-TYPE(Float)
-TYPE(Double)
+PRIMTYPE(Boolean)
+PRIMTYPE(Byte)
+PRIMTYPE(Short)
+PRIMTYPE(Int)
+PRIMTYPE(Long)
+PRIMTYPE(Char)
+PRIMTYPE(Float)
+PRIMTYPE(Double)
+
 TYPE(Void)      // Although this is not a type, it does categorize the types.
 TYPE(Null)      // The Null type. It is a type.
 TYPE(Unknown)   // First come from TS 3.0
