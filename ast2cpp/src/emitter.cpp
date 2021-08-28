@@ -307,6 +307,9 @@ std::string Emitter::EmitComputedNameNode(ComputedNameNode *node) {
   if (auto n = node->GetExtendType()) {
     str += ": "s + EmitTreeNode(n);
   }
+  if (auto n = node->GetInit()) {
+    str += " = "s + EmitTreeNode(n);
+  }
   return str;
 }
 
