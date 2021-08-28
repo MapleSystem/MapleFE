@@ -1,5 +1,8 @@
 Matched 11 tokens.
 Matched 27 tokens.
+Matched 37 tokens.
+Matched 52 tokens.
+Matched 59 tokens.
 ============= Module ===========
 == Sub Tree ==
 class  E
@@ -21,3 +24,9 @@ class  Klass
   LocalClasses: 
   LocalInterfaces: 
 
+== Sub Tree ==
+js_var Decl: obj=new Klass()
+== Sub Tree ==
+obj.n Assign  {t: {s:"example"}}
+== Sub Tree ==
+console.log(obj)
