@@ -50,6 +50,7 @@ public:
   virtual std::string EmitModuleNode(ModuleNode *node);
   virtual std::string EmitClassNode(ClassNode *node);
 
+  virtual std::string EmitNewNode(NewNode *node);
   std::string GetTypeString(TreeNode *node, TreeNode *child = nullptr);
   std::string EmitArrayLiteral(ArrayLiteralNode *node, int dim, std::string type);
 };

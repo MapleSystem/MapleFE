@@ -10,6 +10,7 @@ ARRAY_CTOR_DEF(long)
 ARRAY_CTOR_DEF(double)
 ARRAY_CTOR_DEF(JS_Val)
 ARRAY_CTOR_DEF(Object)
+ARRAY_CTOR_DEF(ObjectP)
 
 } // namepsace t2crt
 
