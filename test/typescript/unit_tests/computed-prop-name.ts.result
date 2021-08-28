@@ -1,0 +1,21 @@
+Matched 5 tokens.
+Matched 19 tokens.
+Matched 29 tokens.
+Matched 39 tokens.
+============= Module ===========
+== Sub Tree ==
+js_const Decl: prop="flag"
+== Sub Tree ==
+class  Klass
+  Fields: 
+    [prop] : string
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+js_var Decl: obj=new Klass()
+== Sub Tree ==
+console.log(obj[prop])

@@ -2199,11 +2199,12 @@ class ComputedNameNode : public TreeNode {
 private:
   CompNameProp mProp;
   TreeNode *mExpr;
+  TreeNode *mInit;
   TreeNode *mExtendType;  // This is the type extending expression
                           // of the mapped property
 public:
   ComputedNameNode() : TreeNode(NK_ComputedName),
-    mProp(CNP_NA), mExpr(NULL), mExtendType(NULL) {}
+    mProp(CNP_NA), mExpr(NULL), mExtendType(NULL), mInit(NULL) {}
   ~ComputedNameNode(){Release();}
 
   CompNameProp GetProp()               {return mProp;}
@@ -2211,6 +2212,8 @@ public:
 
   TreeNode* GetExpr()            {return mExpr;}
   void      SetExpr(TreeNode *n) {mExpr = n;}
+  TreeNode* GetInit()            {return mInit;}
+  void      SetInit(TreeNode *n) {mInit = n;}
   TreeNode* GetExtendType()            {return mExtendType;}
   void      SetExtendType(TreeNode *n) {mExtendType = n;}
 
