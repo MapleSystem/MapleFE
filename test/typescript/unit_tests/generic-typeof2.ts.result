@@ -1,0 +1,39 @@
+Matched 25 tokens.
+Matched 47 tokens.
+Matched 52 tokens.
+Matched 64 tokens.
+Matched 82 tokens.
+Matched 89 tokens.
+============= Module ===========
+== Sub Tree ==
+class  Klass
+<T,>  Fields: 
+    f
+  Instance Initializer: 
+  Constructors: 
+    constructor  (t)  throws: 
+      this.f Assign t
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+class  Foo
+  Fields: 
+    foo
+  Instance Initializer: 
+  Constructors: 
+    constructor  (n)  throws: 
+      this.foo Assign n
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+js_const Decl: PROP="foo"
+== Sub Tree ==
+ type FooType = Klass<Foo[ typeof PROP]>
+== Sub Tree ==
+js_var Decl: obj=new Klass(123)
+== Sub Tree ==
+console.log(obj)
