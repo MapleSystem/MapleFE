@@ -8,3 +8,6 @@ class Foo {
 }
 const PROP = "foo";
 type FooType = Klass<Foo[typeof PROP]>;
+
+var obj: FooType = new Klass<Foo[typeof PROP]>(123);
+console.log(obj);
