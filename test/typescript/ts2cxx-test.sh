@@ -39,7 +39,7 @@ for f; do
   ) >& $f-ts2cpp.out &
 done 2>&1 
 wait
-echo -e "\nTest cases passed:" | tee -a $log
+echo -e "\nDate: $(date)\nTest cases passed:" | tee -a $log
 sort ts2cpp.summary.out | xargs -n1 | nl | tee -a $log
 if [ -f ts2cpp.failures.out ]; then
   echo -e "\nTest cases failed due to ts2ast or ast2cpp:" | tee -a $log
