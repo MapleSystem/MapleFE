@@ -89,7 +89,7 @@ std::string Emitter::EmitAnnotationNode(AnnotationNode *node) {
     return std::string();
   std::string str;
   if (auto n = node->GetId()) {
-    str += EmitIdentifierNode(n);
+    str += EmitTreeNode(n);
   }
   if (auto num = node->GetArgsNum()) {
     str += "("s;

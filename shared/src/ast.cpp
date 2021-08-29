@@ -707,6 +707,7 @@ void BindingElementNode::Dump(unsigned indent) {
 void BindingPatternNode::AddElement(TreeNode *tree) {
   if (tree->IsBindingElement()) {
     mElements.PushBack(tree);
+    tree->SetParent(this);
   } else if (tree->IsPass()) {
     PassNode *pass = (PassNode*)tree;
     for (unsigned i = 0; i < pass->GetChildrenNum(); i++) {
@@ -859,6 +860,7 @@ void StructLiteralNode::AddField(TreeNode *tree) {
   if (tree->IsFieldLiteral()) {
     FieldLiteralNode *fl = (FieldLiteralNode*)tree;
     mFields.PushBack(fl);
+    fl->SetParent(this);
   } else if (tree->IsFunction()) {
     FunctionNode *node = (FunctionNode*)tree;
     FieldLiteralNode *func_lit = (FieldLiteralNode*)gTreePool.NewTreeNode(sizeof(FieldLiteralNode));
@@ -870,6 +872,7 @@ void StructLiteralNode::AddField(TreeNode *tree) {
     }
     func_lit->SetLiteral(node);
     mFields.PushBack(func_lit);
+    func_lit->SetParent(this);
   } else if (tree->IsLiteral() ||
              tree->IsIdentifier() ||
              tree->IsField() ||
@@ -878,6 +881,7 @@ void StructLiteralNode::AddField(TreeNode *tree) {
     new (fln) FieldLiteralNode();
     fln->SetLiteral(tree);
     mFields.PushBack(fln);
+    fln->SetParent(this);
   } else if (tree->IsPass()) {
     PassNode *pass = (PassNode*)tree;
     for (unsigned i = 0; i < pass->GetChildrenNum(); i++) {

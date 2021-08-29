@@ -55,7 +55,7 @@
 
 namespace maplefe {
 
-#define SETPARENT(n) if(n) n->SetParent(this)
+#define SETPARENT(n) if(n && n->GetKind() != NK_PrimType) n->SetParent(this)
 
 enum NodeKind {
 #undef  NODEKIND
@@ -515,10 +515,10 @@ public:
   TreeNode* GetTypeB() {return mTypeB;}
   TreeNode* GetTypeC() {return mTypeC;}
   TreeNode* GetTypeD() {return mTypeD;}
-  void SetTypeA(TreeNode *n) {mTypeA = n;}
-  void SetTypeB(TreeNode *n) {mTypeB = n;}
-  void SetTypeC(TreeNode *n) {mTypeC = n;}
-  void SetTypeD(TreeNode *n) {mTypeD = n;}
+  void SetTypeA(TreeNode *n) {mTypeA = n; SETPARENT(n);}
+  void SetTypeB(TreeNode *n) {mTypeB = n; SETPARENT(n);}
+  void SetTypeC(TreeNode *n) {mTypeC = n; SETPARENT(n);}
+  void SetTypeD(TreeNode *n) {mTypeD = n; SETPARENT(n);}
 
   void Dump(unsigned);
 };
@@ -537,7 +537,7 @@ public:
   ~AsTypeNode() {}
 
   TreeNode* GetType() {return mType;}
-  void SetType(TreeNode *t) {mType = t;}
+  void SetType(TreeNode *t) {mType = t; SETPARENT(t);}
 
   void Dump(unsigned indent);
 };
@@ -623,6 +623,58 @@ public:
 };
 
 //////////////////////////////////////////////////////////////////////////
+//                         AnnotationNode
+//
+// Pragma or Annotation are language constructs to help (1) compiler
+// (2) runtime (3) other tools, to better analyze or execute the program.
+// It doesn't change the program behaviour, but may be improve static
+// and/or dynamic analysis and/or performance.
+//
+// We have a dedicated AnnotationNode here. The program/annotation syntax
+// could be complicated, eg. c99 introduce function call like pragma.
+//
+// The difference between Java annotation and C/c++ pragma is annotation
+// is user defined and pragma is compiler/system defined. In another word
+// Java annoation has unlimited number while pragmas are limited.
+//////////////////////////////////////////////////////////////////////////
+
+// AnnotationTypeNode defines a new Annotation
+class AnnotationTypeNode : public TreeNode {
+private:
+  IdentifierNode *mId;
+public:
+  AnnotationTypeNode() : TreeNode(NK_AnnotationType) {}
+  ~AnnotationTypeNode() {}
+  IdentifierNode* GetId() {return mId;}
+  void SetId(IdentifierNode *n) {mId = n;}
+  void Dump(unsigned);
+};
+
+// Annotation/Pragma is complicated, but everything starts from the
+// name. So at construction, we will take in the name at first.
+// Later we will initialize mType, mExpr based on the 'name' and other
+// expression.
+class AnnotationNode : public TreeNode {
+private:
+  TreeNode           *mId;
+  AnnotationTypeNode *mType;
+  SmallVector<TreeNode*> mArgs;
+public:
+  AnnotationNode() : TreeNode(NK_Annotation), mId(NULL), mType(NULL) {}
+  ~AnnotationNode(){mArgs.Release();}
+
+  TreeNode* GetId()       {return mId;}
+  void SetId(TreeNode *n) {mId = n; SETPARENT(n);}
+  AnnotationTypeNode* GetType() {return mType;}
+  void SetType(AnnotationTypeNode *n) {mType = n; SETPARENT(n);}
+
+  unsigned  GetArgsNum()       {return mArgs.GetNum();}
+  TreeNode* GetArgAtIndex(unsigned i) {return mArgs.ValueAtIndex(i);}
+  void      SetArgAtIndex(unsigned i, TreeNode* n) {*(mArgs.RefAtIndex(i)) = n;}
+  void      AddArg(TreeNode *n){mArgs.PushBack(n); SETPARENT(n);}
+};
+
+//////////////////////////////////////////////////////////////////////////
 //                         Identifier Nodes
 // Everything having a name will be treated as an Identifier node at the
 // first place. There are some issues here.
@@ -689,7 +741,7 @@ public:
   TreeNode*   GetInit() {return mInit;}
   DimensionNode* GetDims() {return mDims;}
 
-  void SetType(TreeNode *t)      {mType = t;}
+  void SetType(TreeNode *t)      {mType = t; SETPARENT(t);}
   void SetInit(TreeNode *t)      {mInit = t; SETPARENT(t);}
   void ClearInit()               {mInit = NULL;}
   void SetDims(DimensionNode *t) {mDims = t; SETPARENT(t);}
@@ -713,7 +765,7 @@ public:
 
   // Annotation/Pragma related
   unsigned GetAnnotationsNum()           {return mAnnotations.GetNum();}
-  void     AddAnnotation(AnnotationNode *n) {mAnnotations.PushBack(n);}
+  void     AddAnnotation(AnnotationNode *n) {mAnnotations.PushBack(n); SETPARENT(n);}
   AnnotationNode* GetAnnotationAtIndex(unsigned i) {return mAnnotations.ValueAtIndex(i);}
   void            SetAnnotationAtIndex(unsigned i, AnnotationNode* n) {*(mAnnotations.RefAtIndex(i)) = n;}
 
@@ -757,58 +809,6 @@ public:
   void SetProp(DeclProp p) {mProp = p;}
 
   void Dump(unsigned);
-};
-
-//////////////////////////////////////////////////////////////////////////
-//                         AnnotationNode
-//
-// Pragma or Annotation are language constructs to help (1) compiler
-// (2) runtime (3) other tools, to better analyze or execute the program.
-// It doesn't change the program behaviour, but may be improve static
-// and/or dynamic analysis and/or performance.
-//
-// We have a dedicated AnnotationNode here. The program/annotation syntax
-// could be complicated, eg. c99 introduce function call like pragma.
-//
-// The difference between Java annotation and C/c++ pragma is annotation
-// is user defined and pragma is compiler/system defined. In another word
-// Java annoation has unlimited number while pragmas are limited.
-//////////////////////////////////////////////////////////////////////////
-
-// AnnotationTypeNode defines a new Annotation
-class AnnotationTypeNode : public TreeNode {
-private:
-  IdentifierNode *mId;
-public:
-  AnnotationTypeNode() : TreeNode(NK_AnnotationType) {}
-  ~AnnotationTypeNode() {}
-  IdentifierNode* GetId() {return mId;}
-  void SetId(IdentifierNode *n) {mId = n;}
-  void Dump(unsigned);
-};
-
-// Annotation/Pragma is complicated, but everything starts from the
-// name. So at construction, we will take in the name at first.
-// Later we will initialize mType, mExpr based on the 'name' and other
-// expression.
-class AnnotationNode : public TreeNode {
-private:
-  IdentifierNode     *mId;
-  AnnotationTypeNode *mType;
-  SmallVector<TreeNode*> mArgs;
-public:
-  AnnotationNode() : TreeNode(NK_Annotation), mId(NULL), mType(NULL) {}
-  ~AnnotationNode(){mArgs.Release();}
-
-  IdentifierNode* GetId() {return mId;}
-  void SetId(IdentifierNode *n) {mId = n; SETPARENT(n);}
-  AnnotationTypeNode* GetType() {return mType;}
-  void SetType(AnnotationTypeNode *n) {mType = n;}
-
-  unsigned  GetArgsNum()       {return mArgs.GetNum();}
-  TreeNode* GetArgAtIndex(unsigned i) {return mArgs.ValueAtIndex(i);}
-  void      SetArgAtIndex(unsigned i, TreeNode* n) {*(mArgs.RefAtIndex(i)) = n;}
-  void      AddArg(TreeNode *n){mArgs.PushBack(n);}
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -953,7 +953,7 @@ public:
   ~BindingElementNode() {}
 
   TreeNode* GetVariable()            {return mVariable;}
-  void      SetVariable(TreeNode* n) {mVariable = n;}
+  void      SetVariable(TreeNode* n) {mVariable = n; SETPARENT(n);}
   TreeNode* GetElement()             {return mElement;}
   void      SetElement(TreeNode* n)  {mElement = n; SETPARENT(n);}
 
@@ -986,7 +986,7 @@ public:
   void      AddElement(TreeNode *n);
 
   TreeNode* GetType()             {return mType;}
-  void      SetType(TreeNode* n)  {mType = n;}
+  void      SetType(TreeNode* n)  {mType = n; SETPARENT(n);}
   TreeNode* GetInit()             {return mInit;}
   void      SetInit(TreeNode* n)  {mInit = n; SETPARENT(n);}
 
@@ -1039,7 +1039,7 @@ public:
 
   void      SetKey(TreeNode *t) {mKey = t; SETPARENT(t);}
   TreeNode* GetKey()            {return mKey;}
-  void      SetDataType(TreeNode *t) {mDataType = t;}
+  void      SetDataType(TreeNode *t) {mDataType = t; SETPARENT(t);}
   TreeNode* GetDataType()            {return mDataType;}
 
   StrIndexSigNode() : TreeNode(NK_StrIndexSig), mDataType(NULL), mKey(NULL) {}
@@ -1288,7 +1288,7 @@ public:
   void SetData(LitData d) {mData = d;}
 
   TreeNode* GetType()            {return mType;}
-  void      SetType(TreeNode *t) {mType = t;}
+  void      SetType(TreeNode *t) {mType = t; SETPARENT(t);}
   TreeNode*   GetInit()                 {return mInit;}
   void        SetInit(TreeNode *t)      {mInit = t; SETPARENT(t);}
 
@@ -1843,7 +1843,7 @@ public:
   void      SetTypeParamAtIndex(unsigned i, TreeNode* n) {*(mTypeParams.RefAtIndex(i)) = n; SETPARENT(n);}
   void      AddTypeParam(TreeNode *);
 
-  void SetType(TreeNode *t) {mType = t;}
+  void SetType(TreeNode *t) {mType = t; SETPARENT(t);}
   TreeNode* GetType(){return mType;}
 
   DimensionNode* GetDims()       {return mDims;}
@@ -2071,7 +2071,7 @@ public:
   void            SetProperty(LambdaProperty p) {mProperty = p;}
 
   TreeNode* GetType()            {return mType;}
-  void      SetType(TreeNode* t) {mType = t;}
+  void      SetType(TreeNode* t) {mType = t; SETPARENT(t);}
 
   unsigned  GetParamsNum()        {return mParams.GetNum();}
   TreeNode* GetParam(unsigned i)  {return mParams.ValueAtIndex(i);}
@@ -2211,7 +2211,7 @@ public:
   void         SetProp(CompNameProp p) {mProp = p;}
 
   TreeNode* GetExpr()            {return mExpr;}
-  void      SetExpr(TreeNode *n) {mExpr = n;}
+  void      SetExpr(TreeNode *n) {mExpr = n; SETPARENT(n);}
   TreeNode* GetInit()            {return mInit;}
   void      SetInit(TreeNode *n) {mInit = n;}
   TreeNode* GetExtendType()            {return mExtendType;}
