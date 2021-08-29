@@ -68,6 +68,7 @@ void TreeNode::AddAsTypes(TreeNode *type) {
   } else if (type->IsAsType()) {
     AsTypeNode *asn = (AsTypeNode*)type;
     AddAsType(asn);
+    SETPARENT(asn);
   } else {
     MERROR("unsupported as-type in AddAsType.");
   }
@@ -143,12 +144,14 @@ void ImportNode::AddPair(TreeNode *t) {
     }
   } else if (t->IsXXportAsPair()) {
     mPairs.PushBack((XXportAsPairNode*)t);
+    SETPARENT(t);
   } else {
     // We create a new pair to save 't'.
     XXportAsPairNode *n = (XXportAsPairNode*)gTreePool.NewTreeNode(sizeof(XXportAsPairNode));
     new (n) XXportAsPairNode();
     n->SetBefore(t);
     mPairs.PushBack(n);
+    SETPARENT(n);
   }
 }
 
@@ -163,6 +166,7 @@ void ImportNode::AddDefaultPair(TreeNode *t) {
     XXportAsPairNode *p = (XXportAsPairNode*)t;
     p->SetIsDefault();
     mPairs.PushBack((XXportAsPairNode*)p);
+    SETPARENT(p);
   } else {
     // We create a new pair to save 't'.
     XXportAsPairNode *n = (XXportAsPairNode*)gTreePool.NewTreeNode(sizeof(XXportAsPairNode));
@@ -170,6 +174,7 @@ void ImportNode::AddDefaultPair(TreeNode *t) {
     n->SetBefore(t);
     n->SetIsDefault();
     mPairs.PushBack(n);
+    SETPARENT(n);
   }
 }
 
@@ -181,6 +186,7 @@ void ImportNode::AddSinglePair(TreeNode *before, TreeNode *after) {
   n->SetAfter(after);
   n->SetIsSingle();
   mPairs.PushBack(n);
+  SETPARENT(n);
 }
 
 void ImportNode::Dump(unsigned indent) {
@@ -259,6 +265,7 @@ void ExportNode::AddSinglePair(TreeNode *before, TreeNode *after) {
   n->SetAfter(after);
   n->SetIsSingle();
   mPairs.PushBack(n);
+  SETPARENT(n);
 }
 
 void ExportNode::Dump(unsigned indent) {
@@ -566,6 +573,7 @@ void CallNode::AddTypeArgument(TreeNode *arg) {
     }
   } else {
     mTypeArguments.PushBack(arg);
+    SETPARENT(arg);
   }
 }
 
@@ -707,7 +715,7 @@ void BindingElementNode::Dump(unsigned indent) {
 void BindingPatternNode::AddElement(TreeNode *tree) {
   if (tree->IsBindingElement()) {
     mElements.PushBack(tree);
-    tree->SetParent(this);
+    SETPARENT(tree);
   } else if (tree->IsPass()) {
     PassNode *pass = (PassNode*)tree;
     for (unsigned i = 0; i < pass->GetChildrenNum(); i++) {
@@ -774,12 +782,16 @@ void StructNode::AddChild(TreeNode *field) {
              field->IsComputedName() ||
              field->IsLiteral()) {
     AddField(field);
+    SETPARENT(field);
   } else if (field->IsFunction()) {
     AddMethod((FunctionNode*)field);
+    SETPARENT(field);
   } else if (field->IsNumIndexSig()) {
     SetNumIndexSig((NumIndexSigNode*)field);
+    SETPARENT(field);
   } else if (field->IsStrIndexSig()) {
     SetStrIndexSig((StrIndexSigNode*)field);
+    SETPARENT(field);
   } else
     MERROR("Unsupported struct field type.");
 }
@@ -860,7 +872,7 @@ void StructLiteralNode::AddField(TreeNode *tree) {
   if (tree->IsFieldLiteral()) {
     FieldLiteralNode *fl = (FieldLiteralNode*)tree;
     mFields.PushBack(fl);
-    fl->SetParent(this);
+    SETPARENT(fl);
   } else if (tree->IsFunction()) {
     FunctionNode *node = (FunctionNode*)tree;
     FieldLiteralNode *func_lit = (FieldLiteralNode*)gTreePool.NewTreeNode(sizeof(FieldLiteralNode));
@@ -872,7 +884,7 @@ void StructLiteralNode::AddField(TreeNode *tree) {
     }
     func_lit->SetLiteral(node);
     mFields.PushBack(func_lit);
-    func_lit->SetParent(this);
+    SETPARENT(func_lit);
   } else if (tree->IsLiteral() ||
              tree->IsIdentifier() ||
              tree->IsField() ||
@@ -881,7 +893,7 @@ void StructLiteralNode::AddField(TreeNode *tree) {
     new (fln) FieldLiteralNode();
     fln->SetLiteral(tree);
     mFields.PushBack(fln);
-    fln->SetParent(this);
+    SETPARENT(fln);
   } else if (tree->IsPass()) {
     PassNode *pass = (PassNode*)tree;
     for (unsigned i = 0; i < pass->GetChildrenNum(); i++) {
@@ -914,6 +926,7 @@ void StructLiteralNode::Dump(unsigned indent) {
 
 void VarListNode::AddVar(IdentifierNode *n) {
   mVars.PushBack(n);
+  SETPARENT(n);
 }
 
 // Merge a node.
@@ -959,6 +972,7 @@ void NamespaceNode::AddBody(TreeNode *tree) {
     }
   } else {
     AddElement(tree);
+    SETPARENT(tree);
   }
 }
 
@@ -1129,6 +1143,7 @@ void ThrowNode::AddException(TreeNode *t) {
       AddException(pass_node->GetChild(i));
   } else {
     mExceptions.PushBack(t);
+    SETPARENT(t);
   }
 }
 
@@ -1156,6 +1171,7 @@ void TryNode::AddCatch(TreeNode *t) {
   } else {
     MASSERT(t->IsCatch());
     mCatches.PushBack((CatchNode*)t);
+    SETPARENT(t);
   }
 }
 
@@ -1272,6 +1288,7 @@ void ForLoopNode::AddInit(TreeNode *t) {
       }
     } else {
       mInits.PushBack(t);
+      SETPARENT(t);
     }
   } else if (t->IsPass()) {
     PassNode *pass = (PassNode*)t;
@@ -1279,6 +1296,7 @@ void ForLoopNode::AddInit(TreeNode *t) {
       AddInit(pass->GetChild(i));
   } else {
     mInits.PushBack(t);
+    SETPARENT(t);
   }
 }
 
@@ -1289,6 +1307,7 @@ void ForLoopNode::AddUpdate(TreeNode *t) {
       AddUpdate(pass->GetChild(i));
   } else {
     mUpdates.PushBack(t);
+    SETPARENT(t);
   }
 }
 
@@ -1333,6 +1352,7 @@ void SwitchCaseNode::AddLabel(TreeNode *t) {
   } else {
     MASSERT(t->IsSwitchLabel());
     mLabels.PushBack((SwitchLabelNode*)t);
+    SETPARENT(t);
   }
 }
 
@@ -1343,6 +1363,7 @@ void SwitchCaseNode::AddStmt(TreeNode *t) {
       AddStmt(pass->GetChild(i));
   } else {
     mStmts.PushBack(t);
+    SETPARENT(t);
   }
 }
 
@@ -1408,12 +1429,16 @@ void SwitchNode::AddSwitchCase(TreeNode *t) {
     }
 
     AddCase(the_case);
-    if (new_case)
+    SETPARENT(the_case);
+    if (new_case) {
       AddCase(new_case);
+      SETPARENT(new_case);
+    }
 
   } else if (t->IsSwitchLabel()) {
     SwitchCaseNode *casenode = SwitchLabelToCase((SwitchLabelNode*)t);
     AddCase(casenode);
+    SETPARENT(casenode);
   }
 }
 
@@ -1441,7 +1466,7 @@ void BlockNode::AddChild(TreeNode *tree) {
       }
     } else {
       mChildren.PushBack(tree);
-      tree->SetParent(this);
+      SETPARENT(tree);
     }
   } else if (tree->IsPass()) {
     PassNode *passnode = (PassNode*)tree;
@@ -1451,18 +1476,20 @@ void BlockNode::AddChild(TreeNode *tree) {
     }
   } else {
     mChildren.PushBack(tree);
-    tree->SetParent(this);
+    SETPARENT(tree);
   }
 }
 
 void BlockNode::InsertStmtAfter(TreeNode *new_stmt, TreeNode *exist_stmt) {
   mChildren.LocateValue(exist_stmt);
   mChildren.InsertAfter(new_stmt);
+  SETPARENT(new_stmt);
 }
 
 void BlockNode::InsertStmtBefore(TreeNode *new_stmt, TreeNode *exist_stmt) {
   mChildren.LocateValue(exist_stmt);
   mChildren.InsertBefore(new_stmt);
+  SETPARENT(new_stmt);
 }
 
 void BlockNode::Dump(unsigned ind) {
@@ -1516,6 +1543,7 @@ void ClassNode::AddSuperClass(TreeNode *the_super) {
       AddSuperClass(pass_node->GetChild(i));
   } else {
     mSuperClasses.PushBack(the_super);
+    SETPARENT(the_super);
   }
 }
 
@@ -1529,6 +1557,7 @@ void ClassNode::AddSuperInterface(TreeNode *the_super) {
       AddSuperInterface(pass_node->GetChild(i));
   } else {
     mSuperInterfaces.PushBack(the_super);
+    SETPARENT(the_super);
   }
 }
 
@@ -1537,7 +1566,7 @@ void ClassNode::AddSuperInterface(TreeNode *the_super) {
 void ClassNode::Construct(BlockNode *block) {
   for (unsigned i = 0; i < block->GetChildrenNum(); i++) {
     TreeNode *tree_node = block->GetChildAtIndex(i);
-    tree_node->SetParent(this);
+    SETPARENT(tree_node);
     if (tree_node->IsDecl()) {
       DeclNode *decl = (DeclNode*)tree_node;
       TreeNode *var = decl->GetVar();
@@ -1545,44 +1574,44 @@ void ClassNode::Construct(BlockNode *block) {
         VarListNode *vlnode = (VarListNode*)var;
         for (unsigned i = 0; i < vlnode->GetVarsNum(); i++) {
           IdentifierNode *inode = vlnode->GetVarAtIndex(i);
-          inode->SetParent(this);
+          SETPARENT(inode);
           mFields.PushBack(inode);
         }
       } else if (var->IsIdentifier() || var->IsComputedName()) {
         mFields.PushBack(var);
-        var->SetParent(this);
+        SETPARENT(var);
       } else
         MERROR("Unsupported class field.");
     } else if (tree_node->IsNumIndexSig() || tree_node->IsStrIndexSig()) {
       mFields.PushBack(tree_node);
-      tree_node->SetParent(this);
+      SETPARENT(tree_node);
     } else if (tree_node->IsFunction()) {
       FunctionNode *f = (FunctionNode*)tree_node;
       if (f->IsConstructor())
         mConstructors.PushBack(f);
       else
         mMethods.PushBack(f);
-      f->SetParent(this);
+      SETPARENT(f);
     } else if (tree_node->IsClass()) {
       mLocalClasses.PushBack((ClassNode*)tree_node);
-      tree_node->SetParent(this);
+      SETPARENT(tree_node);
     } else if (tree_node->IsInterface()) {
       mLocalInterfaces.PushBack((InterfaceNode*)tree_node);
-      tree_node->SetParent(this);
+      SETPARENT(tree_node);
     } else if (tree_node->IsBlock()) {
       BlockNode *block = (BlockNode*)tree_node;
       MASSERT(block->IsInstInit() && "unnamed block in class is not inst init?");
       mInstInits.PushBack(block);
-      tree_node->SetParent(this);
+      SETPARENT(tree_node);
     } else if (tree_node->IsImport()) {
       mImports.PushBack((ImportNode*)tree_node);
-      tree_node->SetParent(this);
+      SETPARENT(tree_node);
     } else if (tree_node->IsExport()) {
       mExports.PushBack((ExportNode*)tree_node);
-      tree_node->SetParent(this);
+      SETPARENT(tree_node);
     } else if (tree_node->IsDeclare()) {
       mDeclares.PushBack((DeclareNode*)tree_node);
-      tree_node->SetParent(this);
+      SETPARENT(tree_node);
     } else
       MASSERT("Unsupported tree node in class body.");
   }
@@ -1989,6 +2018,7 @@ void TupleTypeNode::AddChild(TreeNode *field) {
     MASSERT(field->IsNameTypePair());
     NameTypePairNode *node = (NameTypePairNode*)field;
     AddField(node);
+    SETPARENT(node);
   }
 }
 
@@ -2010,12 +2040,12 @@ void TupleTypeNode::Dump(unsigned indent) {
 void InterfaceNode::Construct(BlockNode *block) {
   for (unsigned i = 0; i < block->GetChildrenNum(); i++) {
     TreeNode *tree_node = block->GetChildAtIndex(i);
-    tree_node->SetParent(this);
+    SETPARENT(tree_node);
     if (tree_node->IsVarList()) {
       VarListNode *vlnode = (VarListNode*)tree_node;
       for (unsigned i = 0; i < vlnode->GetVarsNum(); i++) {
         IdentifierNode *inode = vlnode->GetVarAtIndex(i);
-        inode->SetParent(this);
+        SETPARENT(inode);
         mFields.PushBack(inode);
       }
     } else if (tree_node->IsIdentifier())
