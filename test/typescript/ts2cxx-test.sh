@@ -19,7 +19,7 @@ function ReleaseLock {
     rm -f $1-lock-$LockVar
 }
 
-rm -rf ts2cpp-lock-* *-ts2cpp.out ts2cpp.summary.out
+rm -rf ts2cpp-lock-* *-ts2cpp.out ts2cpp.summary.out ts2cpp.failures.out
 cnt=0
 for f; do
   echo $((++cnt)): $f
@@ -28,8 +28,8 @@ for f; do
   (set -x
   while true; do
     [ -f $t.ts ] && f=$t.ts
-    $TS2AST $f || break
-    $AST2CPP $f.ast || break
+    $TS2AST $f || { echo "(ts2ast)$f" >> ts2cpp.failures.out; break; }
+    $AST2CPP $f.ast || { echo "(ast2cpp)$f" >> ts2cpp.failures.out; break; }
     g++ $t.cpp $RTSRC/*.cpp -o $t || break
     ./$t || break
     echo $t >> ts2cpp.summary.out
@@ -39,5 +39,9 @@ for f; do
   ) >& $f-ts2cpp.out &
 done 2>&1 
 wait
-echo Test cases passed:
-cat ts2cpp.summary.out | xargs -n1 | nl | tee -a $log
+echo -e "\nTest cases passed:" | tee -a $log
+sort ts2cpp.summary.out | xargs -n1 | nl | tee -a $log
+if [ -f ts2cpp.failures.out ]; then
+  echo -e "\nTest cases failed due to ts2ast or ast2cpp:" | tee -a $log
+  sort ts2cpp.failures.out | xargs -n1 | nl | tee -a $log
+fi
