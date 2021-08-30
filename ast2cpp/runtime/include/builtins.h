@@ -80,13 +80,16 @@ class Ctor_Array: public Function {
 #define ARR_OBJ(NM,CTOR) NM(&CTOR, CTOR.prototype)
 #define ARR_CTOR(NM)     NM(&Function_ctor, Function_ctor.prototype, Object_ctor.prototype)
 
+// Need all text type name for macros to generate names for predefined Array type constuctors.
+using ObjectP = Object*;
+
 // predefined Array constructors for dimension 1-3 and basic types
 #define ARRAY_CTOR_DECL(type)  \
   extern Ctor_Array<type>                 Array1D_##type; \
   extern Ctor_Array<Array<type>*>         Array2D_##type; \
   extern Ctor_Array<Array<Array<type>*>*> Array3D_##type;
 
-// predefined Array class constructores for dimensions 1-3 and basic types
+// predefined Array class constructors for dimensions 1-3 and basic types
 #define ARRAY_CTOR_DEF(type)  \
   Ctor_Array<type>                        ARR_CTOR(Array1D_##type); \
   Ctor_Array<Array<type>*>                ARR_CTOR(Array2D_##type); \
@@ -97,5 +100,6 @@ ARRAY_CTOR_DECL(long)
 ARRAY_CTOR_DECL(double)
 ARRAY_CTOR_DECL(JS_Val)
 ARRAY_CTOR_DECL(Object)
+ARRAY_CTOR_DECL(ObjectP)
 
 #endif // __BUILTINS_H__

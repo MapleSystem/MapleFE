@@ -154,10 +154,25 @@ inline NodeKind IdentifierType(TreeNode* node) {
   return static_cast<IdentifierNode*>(node)->GetType()->GetKind();
 }
 
+void GetUserTypeArrayInfo(IdentifierNode* node, int& dims, std::string& typeName) {
+  if (auto n = node->GetType()) {
+    UserTypeNode* u = static_cast<UserTypeNode*>(n);
+    dims = u->GetDimsNum();
+    if (auto id = u->GetId()) {
+      typeName = static_cast<IdentifierNode*>(id)->GetName();
+    }
+    if (typeName.compare("Object") == 0) {
+      // Use alias type with all text name to work with predefined array types
+      // see ObjectP alias declaration in builtins.h
+      typeName = "ObjectP";
+    }
+  }
+}
+
 std::string CppDecl::EmitDeclNode(DeclNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str;
+  std::string str, type;
   if (auto n = node->GetVar()) {
     if (IsVarInitStructLiteral(node)) {   // obj instance decl
       str = "  Object* "s + n->GetName();
@@ -168,12 +183,19 @@ std::string CppDecl::EmitDeclNode(DeclNode *node) {
     }
 
     // Generate initializer for Array decl in header file.
+    int dims = 0;
     if (auto init = node->GetInit()) {
-      if (init->GetKind() == NK_ArrayLiteral && n->GetKind() == NK_Identifier && static_cast<IdentifierNode*>(n)->GetType()) {
+      if (init->GetKind() == NK_ArrayLiteral &&
+          n->GetKind() == NK_Identifier && static_cast<IdentifierNode*>(n)->GetType()) {
         str += " = "s;
         switch (IdentifierType(n)) {
           case NK_UserType:
-            str += EmitTreeNode(static_cast<IdentifierNode*>(n)->GetType());
+            if (str.compare(1, 13,"t2crt::JS_Val") == 0) // type ANY
+              str += EmitTreeNode(init);
+            else {
+              GetUserTypeArrayInfo(static_cast<IdentifierNode*>(n), dims, type);
+              str += EmitArrayLiteral(static_cast<ArrayLiteralNode*>(init), dims, type);
+            }
             break;
           case NK_PrimArrayType: {
             PrimArrayTypeNode* mtype = static_cast<PrimArrayTypeNode *>(static_cast<IdentifierNode*>(n)->GetType());
@@ -216,7 +238,18 @@ std::string CppDecl::EmitAssertNode(AssertNode *node) {
 }
 
 std::string CppDecl::EmitArrayLiteralNode(ArrayLiteralNode *node) {
-  return std::string();
+  if (node == nullptr)
+    return std::string();
+  std::string str("{"s);
+  for (unsigned i = 0; i < node->GetLiteralsNum(); ++i) {
+    if (i)
+      str += ", "s;
+    if (auto n = node->GetLiteral(i)) {
+      str += EmitTreeNode(n);
+    }
+  }
+  str += "}"s;
+  return str;
 }
 
 std::string CppDecl::EmitArrayLiteral(ArrayLiteralNode *node, int dim, std::string type) {
@@ -239,19 +272,23 @@ std::string CppDecl::EmitArrayLiteral(ArrayLiteralNode *node, int dim, std::stri
   return str;
 }
 
+std::string GetArrayTypeString(int dim, std::string typeStr) {
+  std::string str;
+  str = "Array<"s + typeStr + ">*"s;;
+  for (unsigned i = 1; i < dim; ++i) {
+    str = "Array<"s + str + ">*"s;;
+  }
+  return str;
+}
+
 std::string CppDecl::EmitPrimArrayTypeNode(PrimArrayTypeNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
-  if (auto n = node->GetPrim()) {
-    str = "Array<"s + EmitPrimTypeNode(n) + ">* "s;;
-    auto d = node->GetDims();
-    if(d && d->GetKind() == NK_Dimension) {
-      auto num = (static_cast<DimensionNode *>(d))->GetDimensionsNum();
-      for (unsigned i = 1; i < num; ++i) {
-        str = "Array<"s + str + ">* "s;;
-      }
-    }
+  if (node->GetPrim() && node->GetDims()) {
+    str = GetArrayTypeString(
+      static_cast<DimensionNode*>(node->GetDims())->GetDimensionsNum(),
+      EmitPrimTypeNode(node->GetPrim()));
   }
   /*
   if (auto n = node->GetDims()) {
@@ -272,6 +309,17 @@ bool IsBuiltinObj(std::string name) {
  return std::find(builtins.begin(), builtins.end(), name) != builtins.end();
 }
 
+std::string GetUserTypeString(UserTypeNode* n) {
+  std::string str="";
+  if (n->GetId()->GetTypeId() == TY_Class)
+    str = n->GetName() + "*"s;
+  else if (IsBuiltinObj(n->GetId()->GetName()))
+    str = "t2crt::"s + n->GetId()->GetName() + "*"s;
+  else // TypeAlias Id
+    str = n->GetId()->GetName();
+  return str;
+}
+
 std::string CppDecl::GetTypeString(TreeNode *node, TreeNode *child) {
   std::string str;
   if (node) {
@@ -283,20 +331,29 @@ std::string CppDecl::GetTypeString(TreeNode *node, TreeNode *child) {
           break;
         case NK_Identifier:
         case NK_Function:
-          if (child && child->GetKind() == NK_UserType) {
-            // UserType - handle user defined classes and builtin obj types
-            UserTypeNode* n = node->GetKind() == NK_Identifier?
-              static_cast<UserTypeNode*>((static_cast<IdentifierNode *>(node))->GetType()):
-              static_cast<UserTypeNode*>((static_cast<FunctionNode *>(node))->GetType());
-            if (n && n->GetId() && n->GetId()->GetKind() == NK_Identifier) {
-              if (n->GetId()->GetTypeId() == TY_Class)
-                str = n->GetName() + "*"s;
-              else if (IsBuiltinObj(n->GetId()->GetName()))
-                str = "t2crt::"s + n->GetId()->GetName() + "*"s;
-              return str;
-            }
+        case NK_UserType: {
+          // Handle var/array type string generation for usertype
+          UserTypeNode* u;
+          if (node->GetKind() == NK_UserType) {
+            u = static_cast<UserTypeNode*>(node);
+          } else if (node->GetKind() == NK_Identifier) {
+            if (!(child && child->GetKind() == NK_UserType)) 
+              break;
+            u = static_cast<UserTypeNode*>((static_cast<IdentifierNode *>(node))->GetType());
+          } else {
+            if (!(child && child->GetKind() == NK_UserType)) 
+              break;
+            u = static_cast<UserTypeNode*>((static_cast<FunctionNode *>(node))->GetType());
+          }
+          if (u->GetId() && u->GetId()->GetKind() == NK_Identifier) {
+            if (u->GetDims())
+              str = GetArrayTypeString(u->GetDims()->GetDimensionsNum(), GetUserTypeString(u));
+            else
+              str = GetUserTypeString(u);
+            return str;
           }
           break;
+        }
       }
     }
     switch(k) {
@@ -325,17 +382,37 @@ std::string CppDecl::GetTypeString(TreeNode *node, TreeNode *child) {
   return "t2crt::JS_Val "s;
 }
 
+//
+// Variations of UserType node sequence:
+// 1. Decl of builtin (Object,Function...) or user def class obj
+//    DeclNode --Var--> Identifier --Type--> UserType --Id--> Identifier (e.g. "Object")
+//                                           <UT_Regular>
+// 2. Decl of array of builtin or user def class obj (array-new-elemt.ts)
+//    DeclNode --Var--> Identifier --Type--> UserType --Id--> Identifier
+//    <array>           <array>                       --Dims-> Dimension
+// 3. Decl of union or intersect type obj
+//    DeclNode --Var--> Identifier --Type--> UserType --UnionInterTypes[]--> PrimType
+//                                           <UT_Union>
+// 4. Decl of array of union or intesect type obj
+//    DeclNode --Var--> Identifier --Type--> UserType --UnionInterTypes[]--> PrimArrayType --Prim--> PrimType
+//    <array>           <array>              <UT_Union>                                    --Dims--> Dimension
+//
 std::string CppDecl::EmitUserTypeNode(UserTypeNode *node) {
   if (node == nullptr)
     return std::string();
   {
     auto k = node->GetType();
     if(k == UT_Union || k == UT_Inter)
+      // Generate both vars and arrays of union/intersect type as JS_Val of type TY_Object.
       return "t2crt::JS_Val"s;
   }
   std::string str;
   if (auto n = node->GetId()) {
-    str = EmitTreeNode(n);
+    if (node->GetDims()) {
+      return GetTypeString(node, node->GetId()); 
+    } else {
+      str = EmitTreeNode(n);
+    }
     auto num = node->GetTypeGenericsNum();
     if(num) {
       str += "<"s;
@@ -392,15 +469,19 @@ std::string CppDecl::EmitClassNode(ClassNode *node) {
     auto n = node->GetField(i);
     str += "  "s + EmitTreeNode(n);
     if (n->GetKind() == NK_Identifier && static_cast<IdentifierNode*>(n)->GetInit()) {
-      auto init = static_cast<IdentifierNode*>(n)->GetInit();
-      if (init->GetKind() == NK_ArrayLiteral) {
-        // Generate initializer for Array member field decl in header file
-        PrimArrayTypeNode* mtype = static_cast<PrimArrayTypeNode *>(static_cast<IdentifierNode*>(n)->GetType());
-        MASSERT(mtype->GetKind() == NK_PrimArrayType && "Unexpected TreeNode type");
-        str += " = "s + EmitArrayLiteral(static_cast<ArrayLiteralNode*>(init),
-          mtype->GetDims()->GetDimensionsNum(), EmitPrimTypeNode(mtype->GetPrim()));
-      } else
-        str += " = "s + EmitTreeNode(static_cast<IdentifierNode *>(n)->GetInit());
+      if (auto init = static_cast<IdentifierNode*>(n)->GetInit()) {
+        if (init->GetKind() == NK_ArrayLiteral &&
+            static_cast<IdentifierNode*>(n)->GetType() &&
+            static_cast<IdentifierNode*>(n)->GetType()->GetKind() == NK_PrimArrayType ) {
+              // Generate initializer for Array member field decl in header file
+              PrimArrayTypeNode* mtype = static_cast<PrimArrayTypeNode *>(static_cast<IdentifierNode*>(n)->GetType());
+              str += " = "s + EmitArrayLiteral(static_cast<ArrayLiteralNode*>(init),
+                                mtype->GetDims()->GetDimensionsNum(),
+                                EmitPrimTypeNode(mtype->GetPrim()));
+        } else {
+          str += " = "s + EmitTreeNode(static_cast<IdentifierNode *>(n)->GetInit());
+        }
+      }
     }
     str += ";\n";
   }
@@ -441,5 +522,37 @@ std::string CppDecl::EmitClassNode(ClassNode *node) {
   return str;
 }
 
+std::string CppDecl::EmitNewNode(NewNode *node) {
+  if (node == nullptr)
+    return std::string();
+
+  std::string str;
+  MASSERT(node->GetId() && "No mId on NewNode");
+  if (node->GetId() && node->GetId()->GetTypeId() == TY_Class) {
+    // Generate code to create new obj and call constructor
+    str = node->GetId()->GetName() + "_ctor("s + node->GetId()->GetName() + "_ctor._new("s;
+  } else if (IsBuiltinObj(node->GetId()->GetName())) {
+    // Check for builtin obejcts: Object, Function, etc.
+    str = node->GetId()->GetName() + "_ctor._new("s;
+  } else  {
+    str = "new "s + EmitTreeNode(node->GetId());
+    str += "("s;
+  }
+
+  auto num = node->GetArgsNum();
+  for (unsigned i = 0; i < num; ++i) {
+    if (i || node->GetId()->GetTypeId()==TY_Class)
+      str += ", "s;
+    if (auto n = node->GetArg(i)) {
+      str += EmitTreeNode(n);
+    }
+  }
+  str += ")"s;
+  mPrecedence = '\024';
+  if (node->IsStmt()) {
+    str += ";\n"s;
+  }
+  return str;
+}
 
 } // namespace maplefe
