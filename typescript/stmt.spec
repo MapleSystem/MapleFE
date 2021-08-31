@@ -691,8 +691,10 @@ rule LogicalORExpression : ONEOF(
 ##  LogicalORExpression[?In,?Yield] ? AssignmentExpression[In, ?Yield] : AssignmentExpression[?In, ?Yield]
 rule ConditionalExpression : ONEOF(
   LogicalORExpression,
-  LogicalORExpression + '?' + AssignmentExpression + ':' + AssignmentExpression)
+  LogicalORExpression + '?' + AssignmentExpression + ':' + AssignmentExpression,
+  ConditionalExpression + "??" + ConditionalExpression)
   attr.action.%2 : BuildTernaryOperation(%1, %3, %5)
+  attr.action.%3 : BuildBinaryOperation(%1, %2, %3)
 
 ##-----------------------------------
 ##rule AssignmentExpression[In, Yield] :
@@ -708,9 +710,9 @@ rule AssignmentExpression : ONEOF(
   ArrowFunction,
   LeftHandSideExpression + '=' + AssignmentExpression,
   LeftHandSideExpression + AssignmentOperator + AssignmentExpression,
-  ConditionalExpression + "??" + ConditionalExpression)
+  ConditionalExpression + "??=" + ConditionalExpression)
   attr.action.%3,%4 : BuildAssignment(%1, %2, %3)
-  attr.action.%5 :    BuildBinaryOperation(%1, %2, %3)
+#  attr.action.%5 :    BuildBinaryOperation(%1, %2, %3)
 
 rule AssignmentOperator : ONEOF("*=", "/=", "%=", "+=", "-=", "<<=", ">>=", ">>>=", "&=", "^=", "|=")
 
@@ -983,11 +985,9 @@ rule ExpressionStatement : ONEOF(
   ArrowFunction + ';',
   LeftHandSideExpression + '=' + AssignmentExpression + ZEROORONE(';'),
   LeftHandSideExpression + AssignmentOperator + AssignmentExpression + ZEROORONE(';'),
-  ConditionalExpression + "??" + ConditionalExpression + ';',
   Expression + ',' + AssignmentExpression + ';',
   "undefined" + ';')
   attr.action.%3,%4 : BuildAssignment(%1, %2, %3)
-  attr.action.%5 :    BuildBinaryOperation(%1, %2, %3)
 
 ##-----------------------------------
 ##rule IfStatement[Yield, Return] :
