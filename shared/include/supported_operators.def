@@ -80,4 +80,5 @@ OPERATOR(StEq, Binary)
 OPERATOR(StNe, Binary)
 OPERATOR(ArrowFunction, Binary)
 OPERATOR(NullCoalesce, Binary)
+OPERATOR(NullAssign, Binary)
 

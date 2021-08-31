@@ -1,0 +1,13 @@
+Matched 21 tokens.
+Matched 31 tokens.
+Matched 40 tokens.
+============= Module ===========
+== Sub Tree ==
+func  func(num?)  throws: 
+  num NullAssign 2
+  return num Mul num
+
+== Sub Tree ==
+console.log(func(10))
+== Sub Tree ==
+console.log(func())

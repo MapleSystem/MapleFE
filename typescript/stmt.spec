@@ -709,12 +709,10 @@ rule AssignmentExpression : ONEOF(
 #  [+Yield] YieldExpression[?In]
   ArrowFunction,
   LeftHandSideExpression + '=' + AssignmentExpression,
-  LeftHandSideExpression + AssignmentOperator + AssignmentExpression,
-  ConditionalExpression + "??=" + ConditionalExpression)
+  LeftHandSideExpression + AssignmentOperator + AssignmentExpression)
   attr.action.%3,%4 : BuildAssignment(%1, %2, %3)
-#  attr.action.%5 :    BuildBinaryOperation(%1, %2, %3)
 
-rule AssignmentOperator : ONEOF("*=", "/=", "%=", "+=", "-=", "<<=", ">>=", ">>>=", "&=", "^=", "|=")
+rule AssignmentOperator : ONEOF("*=", "/=", "%=", "+=", "-=", "<<=", ">>=", ">>>=", "&=", "^=", "|=", "??=")
 
 ##-----------------------------------
 ##rule Expression[In, Yield] :

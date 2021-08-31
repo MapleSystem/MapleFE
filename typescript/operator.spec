@@ -36,6 +36,7 @@ STRUCT Operator : ONEOF(
                     ("--",   Dec),
                     ("**",   Exp),
                     ("??",   NullCoalesce),
+                    ("??=",  NullAssign),
                     # Relation
                     ("==",   EQ),
                     ("!=",   NE),
