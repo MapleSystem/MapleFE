@@ -165,21 +165,27 @@ std::string Emitter::EmitIdentifierNode(IdentifierNode *node) {
 std::string Emitter::EmitFunctionNode(FunctionNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str;
+  std::string pre;
   for (unsigned i = 0; i < node->GetAnnotationsNum(); ++i)
     if (auto n = node->GetAnnotationAtIndex(i))
-      str += "@"s + EmitTreeNode(n) + "\n"s;
+      pre += "@"s + EmitTreeNode(n) + "\n"s;
+
+  bool func = true;
   for (unsigned i = 0; i < node->GetAttrsNum(); ++i) {
-    str += GetEnumAttrId(node->GetAttrAtIndex(i));
+    std::string s = GetEnumAttrId(node->GetAttrAtIndex(i));
+    if (s == "set "s || s == "get "s)
+      func = false;
+    pre += s;
   }
-  if(str.empty())
-    str = "function "s + str;
+
+  std::string str;
   auto name = node->GetFuncName();
   if(name) {
     std::string s = EmitTreeNode(name);
-    str += s;
     if (s.substr(0, 9) == "__lambda_")
       name = nullptr;
+    else
+      str += s;
   }
 
   auto num = node->GetTypeParamsNum();
@@ -219,9 +225,19 @@ std::string Emitter::EmitFunctionNode(FunctionNode *node) {
   auto body = node->GetBody();
   if (auto n = node->GetType()) {
     std::string s = EmitTreeNode(n);
-    if(!s.empty())
-      str += (body || name? " : "s : " => "s) + s;
+    if(!s.empty()) {
+      str += (body || name ? " : "s : " => "s) + s;
+      if (!body && !name)
+        func = false;
+    }
   }
+  auto p = node->GetParent();
+  if (p) {
+    auto k = p->GetKind();
+    if (k == NK_Class)
+      func = false;
+  }
+  str = pre + (func ? "function "s : ""s) + str;
 
   if (body) {
     auto s = EmitBlockNode(body);
@@ -231,7 +247,7 @@ std::string Emitter::EmitFunctionNode(FunctionNode *node) {
       str += s;
   }
   else
-    if (auto p = node->GetParent())
+    if (p)
       if (p->GetKind() == NK_Block)
         str += ";\n"s;
   /*
