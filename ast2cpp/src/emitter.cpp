@@ -746,7 +746,7 @@ std::string Emitter::EmitCastNode(CastNode *node) {
     return std::string();
   std::string str;
   if (auto n = node->GetDestType()) {
-    str += "("s + EmitTreeNode(n) + ")";
+    str += "<"s + EmitTreeNode(n) + ">";
   }
   if (auto n = node->GetExpr()) {
     str += EmitTreeNode(n);
