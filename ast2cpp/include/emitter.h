@@ -65,9 +65,9 @@ public:
   virtual std::string EmitBlockNode(BlockNode *node);
   virtual std::string EmitNewNode(NewNode *node);
   virtual std::string EmitDeleteNode(DeleteNode *node);
+  virtual std::string EmitAnnotationTypeNode(AnnotationTypeNode *node);
   virtual std::string EmitDimensionNode(DimensionNode *node);
   virtual std::string EmitDeclNode(DeclNode *node);
-  virtual std::string EmitAnnotationTypeNode(AnnotationTypeNode *node);
   virtual std::string EmitCastNode(CastNode *node);
   virtual std::string EmitParenthesisNode(ParenthesisNode *node);
   virtual std::string EmitFieldNode(FieldNode *node);

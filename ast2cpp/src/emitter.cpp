@@ -699,6 +699,19 @@ std::string Emitter::EmitDeleteNode(DeleteNode *node) {
   return HandleTreeNode(str, node);
 }
 
+std::string Emitter::EmitAnnotationTypeNode(AnnotationTypeNode *node) {
+  if (node == nullptr)
+    return std::string();
+  std::string str;
+  if (auto n = node->GetId()) {
+    str += " "s + EmitIdentifierNode(n);
+  }
+  mPrecedence = '\030';
+  if (node->IsStmt())
+    str += ";\n"s;
+  return HandleTreeNode(str, node);
+}
+
 std::string Emitter::EmitDimensionNode(DimensionNode *node) {
   if (node == nullptr)
     return std::string();
@@ -721,19 +734,6 @@ std::string Emitter::EmitDeclNode(DeclNode *node) {
   }
   if (auto n = node->GetInit()) {
     str += " = "s + EmitTreeNode(n);
-  }
-  mPrecedence = '\030';
-  if (node->IsStmt())
-    str += ";\n"s;
-  return HandleTreeNode(str, node);
-}
-
-std::string Emitter::EmitAnnotationTypeNode(AnnotationTypeNode *node) {
-  if (node == nullptr)
-    return std::string();
-  std::string str;
-  if (auto n = node->GetId()) {
-    str += " "s + EmitIdentifierNode(n);
   }
   mPrecedence = '\030';
   if (node->IsStmt())
@@ -2258,6 +2258,8 @@ const char *Emitter::GetEnumOprId(OprId k) {
     return          "\103^=";
   case OPR_ZextAssign:
     return          "\103>>>=";
+  case OPR_NullAssign:
+    return          "\103??=";
   case OPR_Arrow:
     return          "\030 OPR_Arrow";
   case OPR_Diamond:
