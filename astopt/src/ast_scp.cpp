@@ -323,8 +323,12 @@ bool RenameVarVisitor::SkipRename(IdentifierNode *node) {
       case NK_Struct:
       case NK_Class:
       case NK_Interface:
-      case NK_Field:
         return true;
+      case NK_Field: {
+        FieldNode *f = static_cast<FieldNode *>(parent);
+        // skip for mField
+        return node == f->GetField();;
+      }
       default:
         return false;
     }
