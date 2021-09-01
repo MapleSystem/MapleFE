@@ -281,6 +281,17 @@ bool Parser::TokenMerge(Token *t) {
   // We take care of a few scenarios.
   //   = -1   <-- sep is an assignment operator
   //   [-1    <-- sep is a separtor
+  //
+  // Here is also another ugly case in Typescript.
+  //  keyword -1
+  // such as: x extends -1
+  // In normal sense, if it's a keyword we can merge tokens.
+  // However, in TS keyword can also be an identifier which means
+  // keyword - 1 could be an expression.
+  // In this case, we further look at one more token ahead, so if it's
+  //   identifier keyword -1
+  // then we know keyword is not used an identifier and we can merge tokens.
+
   Token *sep = mActiveTokens.ValueAtIndex(size - 2);
   bool is_sep = false;
   if (sep->IsSeparator() &&
@@ -289,6 +300,13 @@ bool Parser::TokenMerge(Token *t) {
     is_sep = true;
   if (sep->IsOperator() && sep->GetOprId() == OPR_Assign)
     is_sep = true;
+
+  if (sep->IsKeyword() && mActiveTokens.GetNum() >= 3) {
+    Token *idn = mActiveTokens.ValueAtIndex(size - 3);
+    if (idn->IsIdentifier())
+      is_sep = true;
+  }
+
   if (!is_sep)
     return false;
 
