@@ -18,6 +18,8 @@
 
 #include <stack>
 #include <utility>
+#include <unordered_map>
+#include <unordered_set>
 #include "ast_module.h"
 #include "ast.h"
 #include "ast_type.h"
@@ -44,12 +46,14 @@ class AdjustASTVisitor : public AstVisitor {
   unsigned       mFlags;
   bool           mUpdated;
 
-  CfgBB *mCurrentBB;
+  std::unordered_map<unsigned, std::unordered_set<StructNode *>> mFieldNum2StructNodeIdMap;
 
  public:
   explicit AdjustASTVisitor(Module_Handler *h, unsigned f, bool base = false)
     : mHandler(h), mFlags(f), AstVisitor((f & FLG_trace_1) && base) {}
   ~AdjustASTVisitor() = default;
+
+  StructNode *GetCanonicStructNode(StructNode *node);
 
   TreeNode *CreateTypeNodeFromName(IdentifierNode *node);
 

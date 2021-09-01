@@ -54,12 +54,66 @@ IdentifierNode *AdjustASTVisitor::VisitIdentifierNode(IdentifierNode *node) {
   return node;
 }
 
+StructNode *AdjustASTVisitor::GetCanonicStructNode(StructNode *node) {
+  unsigned size = node->GetFieldsNum();
+  if (mFieldNum2StructNodeIdMap.find(size) == mFieldNum2StructNodeIdMap.end()) {
+    mFieldNum2StructNodeIdMap[size].insert(node);
+    return node;
+  }
+  for (auto s: mFieldNum2StructNodeIdMap[size]) {
+    // quick check
+    if (s->GetMethodsNum() != node->GetMethodsNum() ||
+        s->GetSupersNum() != node->GetSupersNum() ||
+        s->GetTypeParametersNum() != node->GetTypeParametersNum() ||
+        s->GetProp() != node->GetProp() ||
+        s->GetStructId() != node->GetStructId()) {
+      break;
+    }
+    bool match = true;;
+    // check fields
+    for (unsigned fid = 0; fid < size; fid++) {
+      TreeNode *f0 = node->GetField(fid);
+      TreeNode *f1 = s->GetField(fid);
+      if (f0->IsIdentifier() && f1->IsIdentifier()) {
+        IdentifierNode *i0 = static_cast<IdentifierNode *>(f0);
+        IdentifierNode *i1 = static_cast<IdentifierNode *>(f1);
+        if (i0->GetStrIdx() != i1->GetStrIdx() ||
+            i0->GetType() != i1->GetType()) {
+          match = false;
+          break;
+        }
+      }
+    }
+
+    // check methods
+    size = node->GetMethodsNum();
+    for (unsigned mid = 0; mid < size; mid++) {
+      TreeNode *m0 = node->GetMethod(mid);
+      TreeNode *m1 = s->GetMethod(mid);
+      // TODO:
+      if (m0->GetStrIdx() != m1->GetStrIdx()) {
+        match = false;
+        break;
+      }
+    }
+
+    // TODO: more checks
+
+    if (match) {
+      return s;
+    }
+  }
+  mFieldNum2StructNodeIdMap[size].insert(node);
+  return node;
+}
+
 StructNode *AdjustASTVisitor::VisitStructNode(StructNode *node) {
   (void) AstVisitor::VisitStructNode(node);
   IdentifierNode *id = node->GetStructId();
   if (id && node->GetStrIdx() == 0) {
     node->SetStrIdx(id->GetStrIdx());
   }
+  node = GetCanonicStructNode(node);
   return node;
 }
 
