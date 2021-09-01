@@ -1,0 +1,39 @@
+Matched 4 tokens.
+Matched 11 tokens.
+Matched 22 tokens.
+Matched 40 tokens.
+Matched 50 tokens.
+Matched 57 tokens.
+Matched 64 tokens.
+Matched 76 tokens.
+Matched 88 tokens.
+Matched 100 tokens.
+============= Module ===========
+== Sub Tree ==
+js_const Decl: tag
+== Sub Tree ==
+symbol Assign Symbol("my symbol")
+== Sub Tree ==
+ts_interface: IFace {[tag] : number }
+== Sub Tree ==
+class  Klass
+  Fields: 
+    [tag] : number    s="example"
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+js_var Decl: obj=new Klass()
+== Sub Tree ==
+obj[tag] Assign 123
+== Sub Tree ==
+console.log(obj)
+== Sub Tree ==
+console.log(Symbol.keyFor(tag))
+== Sub Tree ==
+js_const Decl: shared=Symbol.for("shared symbol")
+== Sub Tree ==
+console.log(Symbol.keyFor(shared))
