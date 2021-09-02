@@ -2135,6 +2135,14 @@ std::string Emitter::EmitTreeNode(TreeNode *node) {
 }
 
 std::string &Emitter::HandleTreeNode(std::string &str, TreeNode *node) {
+  auto num = node->GetAsTypesNum();
+  if(num > 0) {
+    str = "(("s + str + ")"s;
+    for (unsigned i = 0; i < num; ++i)
+      if (auto t = node->GetAsTypeAtIndex(i))
+        str += EmitAsTypeNode(t);
+    str += ")"s;
+  }
   if(node->IsOptional())
     str += "?"s;
   if(node->IsNonNull())
@@ -2143,14 +2151,6 @@ std::string &Emitter::HandleTreeNode(std::string &str, TreeNode *node) {
     str = "..."s + str;
   if(node->IsConst())
     str += " as const"s;
-  auto num = node->GetAsTypesNum();
-  if(num == 0)
-    return str;
-  str = "(("s + str + ")"s;
-  for (unsigned i = 0; i < num; ++i)
-    if (auto t = node->GetAsTypeAtIndex(i))
-      str += EmitAsTypeNode(t);
-  str += ")"s;
   return str;
 }
 
