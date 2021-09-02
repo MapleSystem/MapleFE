@@ -168,6 +168,9 @@ const char* PrimTypeNode::GetTypeName() {
 }
 
 void PrimTypeNode::Dump(unsigned indent) {
+  if (mIsUnique)
+    DUMP0_NORETURN("unique ");
+
   DumpIndentation(indent);
   DUMP0_NORETURN(GetTypeName());
 }

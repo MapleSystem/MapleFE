@@ -903,6 +903,32 @@ TreeNode* ASTBuilder::SetIsConst() {
   return mLastTreeNode;
 }
 
+// Takes one argument, which is a primary type node. Set the type as unique.
+// Or takes no argument. Use mLastTreeNode as the argument.
+TreeNode* ASTBuilder::SetIsUnique() {
+  if (mTrace)
+    std::cout << "In SetIsUnique" << std::endl;
+
+  TreeNode *treenode = NULL;
+
+  if (mParams.size() == 1) {
+    Param p_tree = mParams[0];
+    if (!p_tree.mIsEmpty) {
+      MASSERT(p_tree.mIsTreeNode);
+      treenode = p_tree.mData.mTreeNode;
+    }
+  } else {
+    treenode = mLastTreeNode;
+  }
+
+  MASSERT(treenode);
+  MASSERT(treenode->IsPrimType());
+  PrimTypeNode *p = (PrimTypeNode*)treenode;
+  p->SetIsUnique();
+
+  return treenode;
+}
+
 
 // Assignment is actually a binary operator.
 TreeNode* ASTBuilder::BuildAssignment() {

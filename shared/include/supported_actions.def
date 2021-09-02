@@ -169,6 +169,7 @@ ACTION(SetIsOptional)
 ACTION(SetIsNonNull)
 ACTION(SetIsRest)
 ACTION(SetIsConst)
+ACTION(SetIsUnique)
 
 // statment, control flow
 ACTION(BuildAssignment)

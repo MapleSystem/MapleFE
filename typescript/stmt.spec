@@ -63,6 +63,8 @@ rule KeywordIdentifier : ONEOF("get",
                                "undefined",
                                "never",
                                "number",
+                               "symbol",
+                               "unique",
                                "any",
                                "constructor",
                                "delete",
@@ -1632,7 +1634,9 @@ rule NeverArrayType : '[' + ']'
 rule ParenthesizedType: '(' + Type + ')'
 
 ## rule PredefinedType: any number boolean string symbol void
-rule PredefinedType: TYPE
+rule PredefinedType: ONEOF(TYPE,
+                           "unique" + TYPE)
+  attr.action.%2 : SetIsUnique(%2)
 
 ## rule TypeReference: TypeName [no LineTerminator here] TypeArgumentsopt
 rule TypeReference: TypeName + ZEROORONE(TypeArguments) + ZEROORMORE(AsType)

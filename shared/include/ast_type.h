@@ -145,9 +145,14 @@ public:
 class PrimTypeNode : public TreeNode {
 private:
   TypeId    mPrimType; // primitive type
+  bool      mIsUnique; // This is specifically for TS "unique symbol". TS creates many
+                       // opaque syntax.
 public:
-  PrimTypeNode() : TreeNode(NK_PrimType) {}
+  PrimTypeNode() : TreeNode(NK_PrimType), mIsUnique(false) {}
   ~PrimTypeNode(){}
+
+  bool IsUnique()                 {return mIsUnique;}
+  void SetIsUnique(bool b = true) {mIsUnique = b;}
 
   TypeId    GetPrimType()     {return mPrimType;}
   void SetPrimType(TypeId id) {mPrimType = id; }

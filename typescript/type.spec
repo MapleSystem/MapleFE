@@ -61,6 +61,7 @@
 STRUCT Keyword : (("boolean",   Boolean),
                   ("string",    String),
                   ("number",    Number),
+                  ("symbol",    Symbol),
                   ("any",       Any),
                   ("void",      Void),
                   ("unknown",   Unknown),
@@ -69,6 +70,7 @@ STRUCT Keyword : (("boolean",   Boolean),
 
 rule BooleanType : "boolean"
 rule NumberType  : "number"
+rule SymbolType  : "symbol"
 rule AnyType     : "any"
 rule StringType  : "string"
 rule VoidType    : "void"
@@ -76,4 +78,4 @@ rule UnknownType : "unknown"
 rule NeverType   : "never"
 rule UndefinedType : "undefined"
 
-rule TYPE : ONEOF(BooleanType, NumberType, AnyType, StringType, VoidType, UnknownType, NeverType, UndefinedType)
+rule TYPE : ONEOF(BooleanType, NumberType, SymbolType, AnyType, StringType, VoidType, UnknownType, NeverType, UndefinedType)

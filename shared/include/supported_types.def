@@ -40,6 +40,7 @@ TYPE(Never)     // First come from TS
 TYPE(Undefined) // First come from JS
 TYPE(String)    // First come from JS
 TYPE(Number)    // First come from JS
+TYPE(Symbol)    // First come from JS
 TYPE(Any)       // First come from JS
 
 
