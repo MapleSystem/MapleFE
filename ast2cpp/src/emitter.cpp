@@ -1600,7 +1600,7 @@ std::string Emitter::EmitClassNode(ClassNode *node) {
       if (func.substr(0, 11) != "constructor")
         func = "constructor "s + func;
       func = Clean(func);
-      str += func.back() == '}' ? func : func + ";\n"s;
+      str += func.back() == '}' ? func + "\n"s : func + ";\n"s;
     }
   }
 
@@ -1610,7 +1610,7 @@ std::string Emitter::EmitClassNode(ClassNode *node) {
       if (func.substr(0, 9) == "function ")
         func = func.substr(9);
       func = Clean(func);
-      str += func.back() == '}' ? func : func + ";\n"s;
+      str += func.back() == '}' ? func + "\n"s : func + ";\n"s;
     }
   }
 
