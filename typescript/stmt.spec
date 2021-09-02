@@ -1485,7 +1485,7 @@ rule ExportDeclaration : ONEOF(ZEROORMORE(Annotation) + "export" + '*' + FromCla
                                ZEROORMORE(Annotation) + "export" + ExportClause + FromClause + ZEROORONE(';'),
                                ZEROORMORE(Annotation) + "export" + ExportClause + ZEROORONE(';'),
                                ZEROORMORE(Annotation) + "export" + VariableStatement,
-                               ZEROORMORE(Annotation) + "export" + Declaration,
+                               ZEROORMORE(Annotation) + "export" + Declaration + ZEROORONE(';'),
                                ZEROORMORE(Annotation) + "export" + "default" + HoistableDeclaration,
                                ZEROORMORE(Annotation) + "export" + "default" + ClassDeclaration,
                                ZEROORMORE(Annotation) + "export" + "default" + AssignmentExpression + ZEROORONE(';'),
@@ -1921,8 +1921,8 @@ rule FunctionDeclaration : ONEOF(
   "function" + ZEROORONE(BindingIdentifier) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}',
   "function" + ZEROORONE(BindingIdentifier) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ':' + AssertExpression + '{' + FunctionBody + '}',
   "function" + ZEROORONE(BindingIdentifier) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ':' + IsExpression + '{' + FunctionBody + '}',
-  "function" + ZEROORONE(BindingIdentifier) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation)  + ';',
-  "function" + ZEROORONE(BindingIdentifier) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ':' + IsExpression + ';')
+  "function" + ZEROORONE(BindingIdentifier) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation)  + ZEROORONE(';'),
+  "function" + ZEROORONE(BindingIdentifier) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ':' + IsExpression + ZEROORONE(';'))
   attr.action.%1,%2,%3,%4,%5 : BuildFunction(%2)
   attr.action.%1,%2,%3,%4,%5 : AddParams(%5)
   attr.action.%1,%4    : AddType(%7)
@@ -2156,7 +2156,7 @@ rule EntityName: ONEOF(NamespaceName,
 #################################################################################################
 
 rule ExternalDeclaration : ONEOF("declare" + NamespaceDeclaration,
-                                 "declare" + LexicalDeclaration + ';',
+                                 "declare" + LexicalDeclaration + ZEROORONE(';'),
                                  "declare" + ClassDeclaration,
                                  "declare" + FunctionDeclaration,
                                  "declare" + VariableStatement,

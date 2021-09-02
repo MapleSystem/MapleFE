@@ -1,0 +1,15 @@
+Matched 13 tokens.
+Matched 26 tokens.
+Matched 32 tokens.
+Matched 38 tokens.
+============= Module ===========
+== Sub Tree ==
+export {declare func  func(s)  throws: 
+} 
+== Sub Tree ==
+export {declare func  func2(s)  throws: 
+} 
+== Sub Tree ==
+export {declare js_const Decl: re1} 
+== Sub Tree ==
+export {declare js_const Decl: re2} 
