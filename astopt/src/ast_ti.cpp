@@ -219,12 +219,32 @@ bool static IsScalar(TypeId tid) {
   return false;
 }
 
+// when function arry type parameter is updated, need update all
+// caller arguments to be consistent with the array type parameter
+void TypeInferVisitor::UpdateArgArrayDecls(unsigned nid, TypeId tid) {
+  for (auto id: mParam2ArgArrayDeclMap[nid]) {
+    mHandler->mArrayDeclId2EleTypeIdMap[nid] = tid;
+    if (id && id->IsDecl()) {
+      id = static_cast<DeclNode *>(id)->GetVar();
+    }
+    if (id && id->IsIdentifier()) {
+      IdentifierNode *inode = static_cast<IdentifierNode *>(id);
+      TreeNode *type = inode->GetType();
+      if (type && type->IsPrimArrayType()) {
+        PrimArrayTypeNode *pat = static_cast<PrimArrayTypeNode *>(type);
+        pat->GetPrim()->SetTypeId(tid);
+        SetUpdated();
+      }
+    }
+  }
+}
+
 // use input node's type info to update target node's type info
 // used to refine function's formals with corresponding calls' parameters passed in
 void TypeInferVisitor::UpdateTypeUseNode(TreeNode *target, TreeNode *input) {
-  TypeId nid = target->GetTypeId();
+  TypeId tid = target->GetTypeId();
   TypeId iid = input->GetTypeId();
-  if ((nid == iid && IsScalar(nid)) || (iid == TY_Array && nid != iid)) {
+  if ((tid == iid && IsScalar(tid)) || (iid == TY_Array && tid != iid)) {
     return;
   }
   switch (iid) {
@@ -239,15 +259,19 @@ void TypeInferVisitor::UpdateTypeUseNode(TreeNode *target, TreeNode *input) {
           UpdateArrayElemTypeIdMap(target, inid);
         }
         TypeId new_elemTypeId = GetArrayElemTypeId(target);
-        if (old_elemTypeId != new_elemTypeId) {
-          TreeNode *type = static_cast<IdentifierNode *>(target)->GetType();
-          MASSERT(target->IsIdentifier() && "target node not identifier");
-          if (type->IsPrimArrayType()) {
+        TreeNode *type = static_cast<IdentifierNode *>(target)->GetType();
+        MASSERT(target->IsIdentifier() && "target node not identifier");
+        if (type->IsPrimArrayType()) {
+          unsigned nid = target->GetNodeId();
+          mParam2ArgArrayDeclMap[nid].insert(decl);
+          if (old_elemTypeId != new_elemTypeId) {
             PrimArrayTypeNode *pat = static_cast<PrimArrayTypeNode *>(type);
             PrimTypeNode *pt = pat->GetPrim();
             PrimTypeNode *new_pt = GetOrClonePrimTypeNode(pt, new_elemTypeId);
             pat->SetPrim(new_pt);
             SetUpdated();
+
+            UpdateArgArrayDecls(nid, new_elemTypeId);
           }
         }
       } else {
@@ -263,8 +287,8 @@ void TypeInferVisitor::UpdateTypeUseNode(TreeNode *target, TreeNode *input) {
     case TY_Class:
     case TY_Object:
     case TY_Function: {
-      TypeId merged = MergeTypeId(nid, iid);
-      if (merged != nid) {
+      TypeId merged = MergeTypeId(tid, iid);
+      if (merged != tid) {
         target->SetTypeId(merged);
         SetUpdated();
       }

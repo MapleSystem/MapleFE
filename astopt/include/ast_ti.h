@@ -80,6 +80,8 @@ class TypeInferVisitor : public TypeInferBaseVisitor {
   std::unordered_set<unsigned> ImportedDeclIds;
   std::unordered_set<unsigned> ExportedDeclIds;
 
+  std::unordered_map<unsigned, std::unordered_set<TreeNode *>> mParam2ArgArrayDeclMap;;
+
  public:
   explicit TypeInferVisitor(Module_Handler *h, unsigned f, bool base = false)
     : mHandler(h), mFlags(f), TypeInferBaseVisitor(f, base) {}
@@ -91,6 +93,7 @@ class TypeInferVisitor : public TypeInferBaseVisitor {
   void UpdateTypeId(TreeNode *node, TypeId tid);
   void UpdateFuncRetTypeId(FunctionNode *node, TypeId tid);
   void UpdateTypeUseNode(TreeNode *target, TreeNode *input);
+  void UpdateArgArrayDecls(unsigned nid, TypeId tid);
   void UpdateArrayElemTypeIdMap(TreeNode *node, TypeId tid);
   TypeId GetArrayElemTypeId(TreeNode *node);
 
