@@ -1,5 +1,4 @@
 Matched 13 tokens.
-Matched 19 tokens.
 Matched 23 tokens.
 Matched 30 tokens.
 Matched 37 tokens.
@@ -15,9 +14,7 @@ class  Klass
   LocalInterfaces: 
 
 == Sub Tree ==
-export { type T =  keyof Klass} 
-== Sub Tree ==
-["prop"]
+export { type T =  keyof Klass["prop"]} 
 == Sub Tree ==
 js_var Decl: n="field"
 == Sub Tree ==
