@@ -118,7 +118,8 @@ for ts in $LIST; do
       Passed="$Passed $ts"
       [ -n "$KEEP" ] || rm -f "$T"
     else
-      clang-format-10 --style="{ColumnLimit: 120}" $ts | sed 's/?? =/??=/g' > $ts.tmp.ts
+      sed 's/^import type /import /' $ts > $ts.tmp.ts
+      clang-format-10 -i --style="{ColumnLimit: 120}" $ts.tmp.ts; sed -i 's/?? =/??=/g' $ts.tmp.ts
       $TS2AST $ts.tmp.ts
       if [ $? -eq 0 ]; then
         $AST2CPP $ts.tmp.ts.ast $TREEDIFF | sed -n '/^AstDump:/,/^}/p' | sed 's/\(mStrIdx: unsigned int, \)[0-9]* =>/\1=>/'
