@@ -70,10 +70,12 @@ public:
   void InsertAfter(TreeNode *new_stmt, TreeNode *exist_stmt) {
     mTrees.LocateValue(exist_stmt);
     mTrees.InsertAfter(new_stmt);
+    if(new_stmt) new_stmt->SetParent(this);
   }
   void InsertBefore(TreeNode *new_stmt, TreeNode *exist_stmt) {
     mTrees.LocateValue(exist_stmt);
     mTrees.InsertBefore(new_stmt);
+    if(new_stmt) new_stmt->SetParent(this);
   }
 
   ASTScope* GetRootScope()            {return mRootScope;}

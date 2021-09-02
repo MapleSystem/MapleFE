@@ -69,6 +69,7 @@ void ModuleNode::AddTree(TreeNode *tree) {
       }
     } else {
       mTrees.PushBack(tree);
+      tree->SetParent(this);
     }
   } else if (tree->IsPass()) {
     PassNode *pass_node = (PassNode*)tree;
