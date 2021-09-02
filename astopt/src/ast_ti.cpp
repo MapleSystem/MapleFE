@@ -186,6 +186,33 @@ TypeId TypeInferVisitor::MergeTypeId(TypeId tia, TypeId tib) {
   return result;
 }
 
+void TypeInferVisitor::SetTypeId(TreeNode *node, TypeId tid) {
+  if (node) {
+    if (mFlags & FLG_trace_3) {
+      std::cout << " NodeId : " << node->GetNodeId() << " Update TypeId : "
+                << AstDump::GetEnumTypeId(node->GetTypeId()) << " --> "
+                << AstDump::GetEnumTypeId(tid) << std::endl;
+    }
+    node->SetTypeId(tid);
+  }
+}
+
+void TypeInferVisitor::UpdateTypeId(TreeNode *node, TypeId tid) {
+  if (tid == TY_None || !node || node->IsLiteral()) {
+    return;
+  }
+  tid = MergeTypeId(node->GetTypeId(), tid);
+  if (node->GetTypeId() != tid) {
+    if (mFlags & FLG_trace_3) {
+      std::cout << " NodeId : " << node->GetNodeId() << " Set TypeId : "
+                << AstDump::GetEnumTypeId(node->GetTypeId()) << " --> "
+                << AstDump::GetEnumTypeId(tid) << std::endl;
+    }
+    SetTypeId(node, tid);
+    SetUpdated();
+  }
+}
+
 PrimTypeNode *TypeInferVisitor::GetOrClonePrimTypeNode(PrimTypeNode *pt, TypeId tid) {
   PrimTypeNode *new_pt = pt;
   TypeId oldtid = pt->GetTypeId();
@@ -199,7 +226,7 @@ PrimTypeNode *TypeInferVisitor::GetOrClonePrimTypeNode(PrimTypeNode *pt, TypeId 
       new (new_pt) PrimTypeNode();
       new_pt->SetPrimType(pt->GetPrimType());
     }
-    new_pt->SetTypeId(tid);
+    SetTypeId(new_pt, tid);
     SetUpdated();
   }
   return new_pt;
@@ -232,7 +259,7 @@ void TypeInferVisitor::UpdateArgArrayDecls(unsigned nid, TypeId tid) {
       TreeNode *type = inode->GetType();
       if (type && type->IsPrimArrayType()) {
         PrimArrayTypeNode *pat = static_cast<PrimArrayTypeNode *>(type);
-        pat->GetPrim()->SetTypeId(tid);
+        SetTypeId(pat->GetPrim(), tid);
         SetUpdated();
       }
     }
@@ -289,7 +316,7 @@ void TypeInferVisitor::UpdateTypeUseNode(TreeNode *target, TreeNode *input) {
     case TY_Function: {
       TypeId merged = MergeTypeId(tid, iid);
       if (merged != tid) {
-        target->SetTypeId(merged);
+        SetTypeId(target, merged);
         SetUpdated();
       }
       break;
@@ -299,17 +326,6 @@ void TypeInferVisitor::UpdateTypeUseNode(TreeNode *target, TreeNode *input) {
       break;
   }
   return;
-}
-
-void TypeInferVisitor::UpdateTypeId(TreeNode *node, TypeId tid) {
-  if (tid == TY_None || !node || node->IsLiteral()) {
-    return;
-  }
-  tid = MergeTypeId(node->GetTypeId(), tid);
-  if (node->GetTypeId() != tid) {
-    node->SetTypeId(tid);
-    SetUpdated();
-  }
 }
 
 void TypeInferVisitor::UpdateFuncRetTypeId(FunctionNode *node, TypeId tid) {
@@ -325,7 +341,7 @@ void TypeInferVisitor::UpdateFuncRetTypeId(FunctionNode *node, TypeId tid) {
       node->SetType(type);
     }
     tid = MergeTypeId(type->GetTypeId(), tid);
-    type->SetTypeId(tid);
+    SetTypeId(type, tid);
   }
 }
 
@@ -406,7 +422,7 @@ TreeNode *TypeInferVisitor::VisitClassField(TreeNode *node) {
       }
       // use non TY_Number
       if (tid != TY_Number) {
-        node->SetTypeId(tid);
+        SetTypeId(node, tid);
       }
     }
     TreeNode *init = idnode->GetInit();
@@ -438,7 +454,7 @@ ArrayElementNode *TypeInferVisitor::VisitArrayElementNode(ArrayElementNode *node
       if (decl) {
         // indexed access of class fields or types
         if (decl->GetTypeId() == TY_Class) {
-          array->SetTypeId(TY_Class);
+          SetTypeId(array, TY_Class);
           TreeNode *exp = node->GetExprAtIndex(0);
           if (exp->IsLiteral()) {
             if (exp->GetTypeId() == TY_String) {
@@ -511,6 +527,7 @@ ArrayLiteralNode *TypeInferVisitor::VisitArrayLiteralNode(ArrayLiteralNode *node
 }
 
 BinOperatorNode *TypeInferVisitor::VisitBinOperatorNode(BinOperatorNode *node) {
+  if (mFlags & FLG_trace_1) std::cout << "Visiting BinOperatorNode, id=" << node->GetNodeId() << "..." << std::endl;
   // (void) AstVisitor::VisitBinOperatorNode(node);
   OprId op = node->GetOprId();
   TreeNode *ta = node->GetOpndA();
@@ -536,7 +553,7 @@ BinOperatorNode *TypeInferVisitor::VisitBinOperatorNode(BinOperatorNode *node) {
         UpdateTypeId(ta, tib);
         mod = ta;
       }
-      node->SetTypeId(TY_Boolean);
+      SetTypeId(node, TY_Boolean);
       break;
     }
     case OPR_Assign:
@@ -584,21 +601,21 @@ BinOperatorNode *TypeInferVisitor::VisitBinOperatorNode(BinOperatorNode *node) {
     case OPR_Shl:
     case OPR_Shr:
     case OPR_Zext: {
-      ta->SetTypeId(TY_Int);
-      tb->SetTypeId(TY_Int);
-      node->SetTypeId(TY_Int);
+      SetTypeId(ta, TY_Int);
+      SetTypeId(tb, TY_Int);
+      SetTypeId(node, TY_Int);
       break;
     }
     case OPR_Land:
     case OPR_Lor: {
-      ta->SetTypeId(TY_Boolean);
-      tb->SetTypeId(TY_Boolean);
-      node->SetTypeId(TY_Boolean);
+      SetTypeId(ta, TY_Boolean);
+      SetTypeId(tb, TY_Boolean);
+      SetTypeId(node, TY_Boolean);
       break;
     }
     case OPR_Exp: {
       if (tia == TY_Int && tib == TY_Int) {
-        node->SetTypeId(TY_Int);
+        SetTypeId(node, TY_Int);
       }
       break;
     }
@@ -622,6 +639,7 @@ BinOperatorNode *TypeInferVisitor::VisitBinOperatorNode(BinOperatorNode *node) {
 }
 
 CallNode *TypeInferVisitor::VisitCallNode(CallNode *node) {
+  if (mFlags & FLG_trace_1) std::cout << "Visiting CallNode, id=" << node->GetNodeId() << "..." << std::endl;
   TreeNode *method = node->GetMethod();
   UpdateTypeId(method, TY_Function);
   if (method && method->IsIdentifier()) {
@@ -713,6 +731,7 @@ CallNode *TypeInferVisitor::VisitCallNode(CallNode *node) {
 }
 
 ClassNode *TypeInferVisitor::VisitClassNode(ClassNode *node) {
+  if (mFlags & FLG_trace_1) std::cout << "Visiting ClassNode, id=" << node->GetNodeId() << "..." << std::endl;
   UpdateTypeId(node, TY_Class);
   for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
     TreeNode *t = node->GetField(i);
@@ -723,6 +742,7 @@ ClassNode *TypeInferVisitor::VisitClassNode(ClassNode *node) {
 }
 
 DeclNode *TypeInferVisitor::VisitDeclNode(DeclNode *node) {
+  if (mFlags & FLG_trace_1) std::cout << "Visiting DeclNode, id=" << node->GetNodeId() << "..." << std::endl;
   (void) AstVisitor::VisitDeclNode(node);
   TreeNode *init = node->GetInit();
   TreeNode *var = node->GetVar();
@@ -760,9 +780,9 @@ DeclNode *TypeInferVisitor::VisitDeclNode(DeclNode *node) {
   // override TypeId for array
   if (isArray) {
     merged = TY_Array;
-    node->SetTypeId(merged);
-    var->SetTypeId(merged);
-    init->SetTypeId(merged);
+    SetTypeId(node, merged);
+    SetTypeId(var, merged);
+    SetTypeId(init, merged);
   } else {
     UpdateTypeId(node, merged);
     UpdateTypeId(init, merged);
@@ -857,10 +877,11 @@ FieldNode *TypeInferVisitor::VisitFieldNode(FieldNode *node) {
 }
 
 ForLoopNode *TypeInferVisitor::VisitForLoopNode(ForLoopNode *node) {
+  if (mFlags & FLG_trace_1) std::cout << "Visiting ForLoopNode, id=" << node->GetNodeId() << "..." << std::endl;
   if (node->GetProp() == FLP_JSIn) {
     TreeNode *var = node->GetVariable();
     if (var) {
-      var->SetTypeId(TY_Int);
+      SetTypeId(var, TY_Int);
     }
   }
   (void) AstVisitor::VisitForLoopNode(node);
@@ -868,15 +889,17 @@ ForLoopNode *TypeInferVisitor::VisitForLoopNode(ForLoopNode *node) {
 }
 
 FunctionNode *TypeInferVisitor::VisitFunctionNode(FunctionNode *node) {
+  if (mFlags & FLG_trace_1) std::cout << "Visiting FunctionNode, id=" << node->GetNodeId() << "..." << std::endl;
   UpdateTypeId(node, node->IsArray() ? TY_Object : TY_Function);
   (void) AstVisitor::VisitFunctionNode(node);
   return node;
 }
 
 IdentifierNode *TypeInferVisitor::VisitIdentifierNode(IdentifierNode *node) {
+  if (mFlags & FLG_trace_1) std::cout << "Visiting IdentifierNode, id=" << node->GetNodeId() << "..." << std::endl;
   TreeNode *type = node->GetType();
   if (type && type->IsPrimArrayType()) {
-    node->SetTypeId(TY_Array);
+    SetTypeId(node, TY_Array);
   }
   (void) AstVisitor::VisitIdentifierNode(node);
   TreeNode *decl = mHandler->FindDecl(node);
@@ -899,8 +922,16 @@ InterfaceNode *TypeInferVisitor::VisitInterfaceNode(InterfaceNode *node) {
   return node;
 }
 
+NewNode *TypeInferVisitor::VisitNewNode(NewNode *node) {
+  (void) AstVisitor::VisitNewNode(node);
+  if (node->GetId()) {
+    UpdateTypeId(node, node->GetId()->GetTypeId());
+  }
+  return node;
+}
+
 StructNode *TypeInferVisitor::VisitStructNode(StructNode *node) {
-  node->SetTypeId(TY_Class);
+  SetTypeId(node, TY_Class);
   for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
     TreeNode *t = node->GetField(i);
     (void) VisitClassField(t);
@@ -910,6 +941,7 @@ StructNode *TypeInferVisitor::VisitStructNode(StructNode *node) {
 }
 
 LambdaNode *TypeInferVisitor::VisitLambdaNode(LambdaNode *node) {
+  if (mFlags & FLG_trace_1) std::cout << "Visiting LambdaNode, id=" << node->GetNodeId() << "..." << std::endl;
   UpdateTypeId(node, TY_Function);
   (void) AstVisitor::VisitLambdaNode(node);
   return node;
@@ -920,19 +952,19 @@ LiteralNode *TypeInferVisitor::VisitLiteralNode(LiteralNode *node) {
   LitId id = node->GetData().mType;
   switch (id) {
     case LT_IntegerLiteral:
-      node->SetTypeId(TY_Int);
+      SetTypeId(node, TY_Int);
       break;
     case LT_FPLiteral:
-      node->SetTypeId(TY_Float);
+      SetTypeId(node, TY_Float);
       break;
     case LT_DoubleLiteral:
-      node->SetTypeId(TY_Double);
+      SetTypeId(node, TY_Double);
       break;
     case LT_StringLiteral:
-      node->SetTypeId(TY_String);
+      SetTypeId(node, TY_String);
       break;
     case LT_VoidLiteral:
-      node->SetTypeId(TY_Undefined);
+      SetTypeId(node, TY_Undefined);
       break;
     default:
       break;
@@ -962,7 +994,7 @@ ReturnNode *TypeInferVisitor::VisitReturnNode(ReturnNode *node) {
 }
 
 StructLiteralNode *TypeInferVisitor::VisitStructLiteralNode(StructLiteralNode *node) {
-  node->SetTypeId(TY_Class);
+  SetTypeId(node, TY_Class);
   for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
     FieldLiteralNode *t = node->GetField(i);
     (void) VisitFieldLiteralNode(t);
@@ -1029,11 +1061,14 @@ UnaOperatorNode *TypeInferVisitor::VisitUnaOperatorNode(UnaOperatorNode *node) {
 
 UserTypeNode *TypeInferVisitor::VisitUserTypeNode(UserTypeNode *node) {
   (void) AstVisitor::VisitUserTypeNode(node);
+  if (node->GetId()) {
+    UpdateTypeId(node, node->GetId()->GetTypeId());
+  }
   TreeNode *parent = node->GetParent();
   if (parent && parent->IsIdentifier()) {
     // typeid: merge -> user
     if (parent->GetTypeId() == TY_Merge) {
-      parent->SetTypeId(TY_User);
+      SetTypeId(parent, TY_User);
       SetUpdated();
     } else if (parent->GetTypeId() == TY_Array) {
       TreeNode *idnode = node->GetId();

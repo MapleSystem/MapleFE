@@ -90,6 +90,7 @@ class TypeInferVisitor : public TypeInferBaseVisitor {
   bool GetUpdated() {return mUpdated;}
   void SetUpdated(bool b = true) {mUpdated = b;}
 
+  void SetTypeId(TreeNode *node, TypeId tid);
   void UpdateTypeId(TreeNode *node, TypeId tid);
   void UpdateFuncRetTypeId(FunctionNode *node, TypeId tid);
   void UpdateTypeUseNode(TreeNode *target, TreeNode *input);
@@ -121,6 +122,7 @@ class TypeInferVisitor : public TypeInferBaseVisitor {
   InterfaceNode *VisitInterfaceNode(InterfaceNode *node);
   LambdaNode *VisitLambdaNode(LambdaNode *node);
   LiteralNode *VisitLiteralNode(LiteralNode *node);
+  NewNode *VisitNewNode(NewNode *node);
   ReturnNode *VisitReturnNode(ReturnNode *node);
   StructLiteralNode *VisitStructLiteralNode(StructLiteralNode *node);
   StructNode *VisitStructNode(StructNode *node);
