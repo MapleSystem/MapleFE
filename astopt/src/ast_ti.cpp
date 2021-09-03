@@ -873,6 +873,7 @@ FieldNode *TypeInferVisitor::VisitFieldNode(FieldNode *node) {
     UpdateTypeId(node, decl->GetTypeId());
   }
   UpdateTypeId(field, node->GetTypeId());
+  SetTypeId(node, field->GetTypeId());
   return node;
 }
 
@@ -902,13 +903,39 @@ IdentifierNode *TypeInferVisitor::VisitIdentifierNode(IdentifierNode *node) {
     SetTypeId(node, TY_Array);
   }
   (void) AstVisitor::VisitIdentifierNode(node);
-  TreeNode *decl = mHandler->FindDecl(node);
+  if (node->GetInit()) {
+    UpdateTypeId(node, node->GetInit()->GetTypeId());
+    return node;
+  }
+  TreeNode *parent = node->GetParent();
+  TreeNode *decl = NULL;
+  if (parent && parent->IsField()) {
+    FieldNode *field = static_cast<FieldNode *>(parent);
+    TreeNode *upper = field->GetUpper();
+    TreeNode *fld = field->GetField();
+    if (node == upper) {
+      decl = mHandler->FindDecl(node);
+    } else if (node == fld) {
+      if (upper->IsIdentifier()) {
+        decl = mHandler->FindDecl(static_cast<IdentifierNode *>(upper));
+        if (decl) {
+          decl = decl->GetScope()->FindDeclOf(node->GetStrIdx());
+        }
+      }
+    } else {
+      NOTYETIMPL("node not in field");
+    }
+  } else {
+    decl = mHandler->FindDecl(node);
+  }
+
   if (decl) {
     UpdateTypeId(node, decl->GetTypeId());
   } else {
     NOTYETIMPL("node not declared");
     MSGNOLOC0(node->GetName());
   }
+
   return node;
 }
 
