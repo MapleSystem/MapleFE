@@ -170,7 +170,14 @@ std::string Emitter::EmitFunctionNode(FunctionNode *node) {
     if (auto n = node->GetAnnotationAtIndex(i))
       pre += "@"s + EmitTreeNode(n) + "\n"s;
 
-  bool func = true;
+  bool inside = false;
+  auto p = node->GetParent();
+  if (p) {
+    auto k = p->GetKind();
+    if (k == NK_Class || k == NK_Struct || k == NK_Interface)
+      inside = true;
+  }
+  bool func = !inside;
   for (unsigned i = 0; i < node->GetAttrsNum(); ++i) {
     std::string s = GetEnumAttrId(node->GetAttrAtIndex(i));
     if (s == "set "s || s == "get "s)
@@ -226,16 +233,10 @@ std::string Emitter::EmitFunctionNode(FunctionNode *node) {
   if (auto n = node->GetType()) {
     std::string s = EmitTreeNode(n);
     if(!s.empty()) {
-      str += (body || name ? " : "s : " => "s) + s;
+      str += ((body || name) || inside ? " : "s : " => "s) + s;
       if (!body && !name)
         func = false;
     }
-  }
-  auto p = node->GetParent();
-  if (p) {
-    auto k = p->GetKind();
-    if (k == NK_Class)
-      func = false;
   }
   str = pre + (func ? "function "s : ""s) + str;
 
@@ -912,6 +913,11 @@ std::string Emitter::EmitStrIndexSigNode(StrIndexSigNode *node) {
   return HandleTreeNode(str, node);
 }
 
+static std::string MethodString(std::string &func) {
+  size_t s = func.substr(0, 9) == "function " ? 9 : 0;
+  return func.back() == '}' ? func.substr(s) + "\n"s : func.substr(s) + ";\n"s;
+}
+
 std::string Emitter::EmitStructNode(StructNode *node) {
   if (node == nullptr)
     return std::string();
@@ -973,15 +979,8 @@ std::string Emitter::EmitStructNode(StructNode *node) {
   for (unsigned i = 0; i < node->GetMethodsNum(); ++i) {
     if (auto n = node->GetMethod(i)) {
       std::string func = EmitFunctionNode(n);
-      if (func.substr(0, 9) == "function ")
-        func = func.substr(9);
-      size_t index = func.rfind(')');
-      if (index != std::string::npos) {
-        std::string t = func.substr(index);
-        Replace(t, "=>", ":");
-        func = func.substr(0, index) + t;
-      }
-      str += func.length() > 2 && func.substr(func.length() - 2) == ";\n" ? func : func + ";\n"s;
+      func = Clean(func);
+      str += MethodString(func);
     }
   }
 
@@ -1530,10 +1529,8 @@ std::string Emitter::EmitInterfaceNode(InterfaceNode *node) {
   for (unsigned i = 0; i < node->GetMethodsNum(); ++i) {
     if (auto n = node->GetMethodAtIndex(i)) {
       std::string func = EmitFunctionNode(n);
-      if (func.substr(0, 9) == "function ")
-        func = func.substr(9);
-      Replace(func, "=>", ":");
-      str += func.length() > 2 && func.substr(func.length() - 2) == ";\n" ? func : func + ";\n"s;
+      func = Clean(func);
+      str += MethodString(func);
     }
   }
 
@@ -1607,10 +1604,8 @@ std::string Emitter::EmitClassNode(ClassNode *node) {
   for (unsigned i = 0; i < node->GetMethodsNum(); ++i) {
     if (FunctionNode *n = node->GetMethod(i)) {
       std::string func = EmitFunctionNode(n);
-      if (func.substr(0, 9) == "function ")
-        func = func.substr(9);
       func = Clean(func);
-      str += func.back() == '}' ? func + "\n"s : func + ";\n"s;
+      str += MethodString(func);
     }
   }
 
@@ -2155,6 +2150,8 @@ std::string &Emitter::HandleTreeNode(std::string &str, TreeNode *node) {
 }
 
 std::string Emitter::GetEnumTypeId(TypeId k) {
+  if (k == TY_Symbol)
+    return "unique symbol"s;
   std::string str(AstDump::GetEnumTypeId(k) + 3);
   if (k != TY_Function && k != TY_Object)
     str[0] = std::tolower(str[0]);
