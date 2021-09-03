@@ -98,7 +98,7 @@ for ts in $LIST; do
     T=$ts-$PROCID.out.ts
     eval $cmd <<< "$out" > "$T"
     [ -z "$NAME" ] || sed -i 's/__v[0-9][0-9]*//g' "$T"
-    clang-format-10 -i --style="{ColumnLimit: 120}" "$T"; sed -i 's/?? =/??=/g' "$T"
+    clang-format-10 -i --style="{ColumnLimit: 120, JavaScriptWrapImports: false}" "$T"; sed -i 's/?? =/??=/g' "$T"
     echo -e "\n====== TS Reformatted ======\n"
     $HIGHLIGHT "$T"
     echo TREEDIFF=$TREEDIFF
@@ -118,8 +118,8 @@ for ts in $LIST; do
       Passed="$Passed $ts"
       [ -n "$KEEP" ] || rm -f "$T"
     else
-      sed 's/^import type /import /' $ts > $ts.tmp.ts
-      clang-format-10 -i --style="{ColumnLimit: 120}" $ts.tmp.ts; sed -i 's/?? =/??=/g' $ts.tmp.ts
+      sed 's/^\([ei][xm]port \) *type  *{/\1{/' $ts > $ts.tmp.ts
+      clang-format-10 -i --style="{ColumnLimit: 120, JavaScriptWrapImports: false}" $ts.tmp.ts; sed -i 's/?? =/??=/g' $ts.tmp.ts
       $TS2AST $ts.tmp.ts
       if [ $? -eq 0 ]; then
         $AST2CPP $ts.tmp.ts.ast $TREEDIFF | sed -n '/^AstDump:/,/^}/p' | sed 's/\(mStrIdx: unsigned int, \)[0-9]* =>/\1=>/'
