@@ -998,7 +998,7 @@ std::string Emitter::EmitFieldLiteralNode(FieldLiteralNode *node) {
         static_cast<FunctionNode *>(lit)->GetFuncName() == n) {
       str = EmitTreeNode(lit);
       if (str.substr(0, 9) == "function ")
-        Replace(str, "function ", "");
+        str = str.substr(9);
       lit = nullptr;
     } else {
       str = EmitTreeNode(n);
