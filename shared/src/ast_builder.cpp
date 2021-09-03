@@ -832,16 +832,29 @@ TreeNode* ASTBuilder::SetIsStmt() {
   return mLastTreeNode;
 }
 
-// Takes one argument. Set the tree as an optional node.
+// 1. Takes one argument. Set the tree as an optional node.
+// 2. Takes no argument. Set mLastTreeNode as optional.
 // We still return the previous mLastTreeNode.
 TreeNode* ASTBuilder::SetIsOptional() {
   if (mTrace)
     std::cout << "In SetIsOptional" << std::endl;
 
-  Param p_tree = mParams[0];
-  if (!p_tree.mIsEmpty) {
-    MASSERT(p_tree.mIsTreeNode);
-    TreeNode *treenode = p_tree.mData.mTreeNode;
+  TreeNode *treenode = NULL;
+  if (mParams.size() > 0) {
+    Param p_tree = mParams[0];
+    if (!p_tree.mIsEmpty) {
+      MASSERT(p_tree.mIsTreeNode);
+      treenode = p_tree.mData.mTreeNode;
+    }
+  } else {
+    treenode = mLastTreeNode;
+  }
+
+  MASSERT(treenode);
+  if (treenode->IsFunction()) {
+    FunctionNode *f = (FunctionNode*)mLastTreeNode;
+    f->GetFuncName()->SetIsOptional();
+  } else {
     treenode->SetIsOptional();
   }
 

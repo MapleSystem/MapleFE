@@ -1825,8 +1825,10 @@ rule MethodSignature: ONEOF(
     PropertyName + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation),
     PropertyName + '?' + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation),
     "return" + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation),
-    "throw"  + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation))
-  attr.action.%1,%2,%3,%4 : BuildFunction(%1)
+    "throw"  + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation),
+    "return" + '?' + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation),
+    "throw"  + '?' + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation))
+  attr.action.%1,%2,%3,%4,%5,%6 : BuildFunction(%1)
   attr.action.%1,%3,%4 : AddParams(%4)
   attr.action.%1,%3,%4 : AddType(%6)
   attr.action.%1,%3,%4 : AddTypeGenerics(%2)
@@ -1834,6 +1836,10 @@ rule MethodSignature: ONEOF(
   attr.action.%2 : AddParams(%5)
   attr.action.%2 : AddType(%7)
   attr.action.%2 : AddTypeGenerics(%3)
+  attr.action.%5,%6 : SetIsOptional()
+  attr.action.%5,%6 : AddParams(%5)
+  attr.action.%5,%6 : AddType(%7)
+  attr.action.%5,%6 : AddTypeGenerics(%3)
 
 ## rule TypeAliasDeclaration: type BindingIdentifier TypeParametersopt = Type ;
 rule TypeAliasDeclaration: "type" + BindingIdentifier + ZEROORONE(TypeParameters) + '=' + Type + ZEROORONE(';')
