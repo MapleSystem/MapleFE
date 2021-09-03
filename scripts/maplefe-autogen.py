@@ -471,6 +471,7 @@ gen_args = [
         "AstDump",     # Class name
         "AstDump",     # Prefix of function name
         """
+#include <sstream>
 using namespace std::string_literals;
 """,                   # Extra include directives
         "",            # Base class
@@ -541,7 +542,10 @@ static std::string EncodeLiteral(std::string str) {{
 static std::string GetEnumLitData(LitData lit) {{
   switch (lit.mType) {{
     case LT_IntegerLiteral:
-      return std::to_string(lit.mData.mInt);
+      {{ std::stringstream s;
+         s << std::hex << "0x" << lit.mData.mInt;
+         return s.str();
+      }}
     case LT_FPLiteral:
       return std::to_string(lit.mData.mFloat);
     case LT_DoubleLiteral:
