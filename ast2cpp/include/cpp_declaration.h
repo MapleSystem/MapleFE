@@ -64,7 +64,7 @@ inline bool IsVarInitStructLiteral(DeclNode* node) {
 inline bool IsVarInitClass(DeclNode* node) {
   return node->GetInit() &&
          node->GetInit()->GetTypeId() == TY_Class &&
-         node->GetInit()->GetKind() != NK_StructLiteral;
+         node->GetInit()->GetKind() == NK_Identifier;
 }
 
 } // namespace maplefe

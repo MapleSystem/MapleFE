@@ -348,7 +348,7 @@ std::string CppDef::EmitDeclNode(DeclNode *node) {
       std::string props = EmitStructLiteralProps(static_cast<StructLiteralNode*>( node->GetInit()));
       str += "  "s + name + " = Object_ctor._new("s + props +")"s;
     }
-    else if (node->GetTypeId() == TY_Class)
+    else if (node->GetVar()->GetKind() == NK_Identifier && n->GetKind() == NK_Identifier && n->GetTypeId() == TY_Class)
       str += name + "= &"s + n->GetName() + "_ctor"s;
     else
       str += name + " = "s + EmitTreeNode(n);

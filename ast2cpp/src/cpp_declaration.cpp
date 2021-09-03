@@ -324,7 +324,7 @@ std::string CppDecl::GetTypeString(TreeNode *node, TreeNode *child) {
   std::string str;
   if (node) {
     TypeId k = node->GetTypeId();
-    if (k == TY_None) {
+    if (k == TY_None || k == TY_Class) {
       switch(node->GetKind()) {
         case NK_PrimType:
           k = static_cast<PrimTypeNode*>(node)->GetPrimType();
@@ -371,7 +371,9 @@ std::string CppDecl::GetTypeString(TreeNode *node, TreeNode *child) {
       case TY_Double:
         return "double "s;
       case TY_Class:
-        return "Object* "s;
+        if (!child)
+          return "Object* "s;
+        break;
     }
     {
       str = child ? EmitTreeNode(child) : Emitter::GetEnumTypeId(k);
