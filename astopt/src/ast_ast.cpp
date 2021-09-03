@@ -51,6 +51,17 @@ IdentifierNode *AdjustASTVisitor::VisitIdentifierNode(IdentifierNode *node) {
       func->SetStrIdx(idx);
     }
   }
+  // rename throw() function to throw__fixed()
+  else if (stridx == gStringPool.GetStrIdx("throw")) {
+    unsigned idx = gStringPool.GetStrIdx("throw__fixed");
+    node->SetStrIdx(idx);
+    TreeNode *parent = node->GetParent();
+    if (parent && parent->IsFunction()) {
+      FunctionNode *func = static_cast<FunctionNode *>(parent);
+      MASSERT(func->GetFuncName() == node && "throw not function name");
+      func->SetStrIdx(idx);
+    }
+  }
   return node;
 }
 
