@@ -1875,8 +1875,11 @@ std::string Emitter::EmitPrimTypeNode(PrimTypeNode *node) {
   if (node == nullptr)
     return std::string();
   auto k = node->GetPrimType();
+  std::string str = k == TY_None ? std::string() : Emitter::GetEnumTypeId(k);
+  if (node->IsUnique())
+    str = "unique "s + str;
   mPrecedence = '\000';
-  return k == TY_None ? std::string() : Emitter::GetEnumTypeId(k);
+  return str;
 }
 
 std::string Emitter::EmitPrimArrayTypeNode(PrimArrayTypeNode *node) {
@@ -2154,8 +2157,6 @@ std::string &Emitter::HandleTreeNode(std::string &str, TreeNode *node) {
 }
 
 std::string Emitter::GetEnumTypeId(TypeId k) {
-  if (k == TY_Symbol)
-    return "unique symbol"s;
   std::string str(AstDump::GetEnumTypeId(k) + 3);
   if (k != TY_Function && k != TY_Object)
     str[0] = std::tolower(str[0]);
