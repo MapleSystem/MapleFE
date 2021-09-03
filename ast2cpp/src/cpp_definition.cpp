@@ -649,6 +649,17 @@ inline bool IsObjPropBracketNotation(TreeNode *node) {
          static_cast<ArrayElementNode*>(node)->GetArray()->GetTypeId() == TY_Class;
 }
 
+TypeId CppDef::GetTypeFromDecl(IdentifierNode* id) {
+  TypeId type = TY_None;
+  DeclNode* decl = static_cast<DeclNode*>(mHandler->FindDecl(id));
+  if (decl && decl->GetVar() && decl->GetVar()->GetKind() == NK_Identifier) {
+    IdentifierNode* var = static_cast<IdentifierNode*>(decl->GetVar());
+    if (var->GetType() && var->GetType()->GetKind() == NK_PrimType) {
+      type = static_cast<PrimTypeNode*>(var->GetType())->GetPrimType();
+    }
+  }
+  return type;
+}
 
 std::string CppDef::EmitBinOperatorNode(BinOperatorNode *node) {
   if (node == nullptr)
@@ -668,6 +679,11 @@ std::string CppDef::EmitBinOperatorNode(BinOperatorNode *node) {
       objName     = ae->GetArray()->GetName();
       propValType = node->GetTypeId();
       propKeyType = ae->GetExprAtIndex(0)->GetTypeId();
+      if (propKeyType == TY_None) {
+        if (ae->GetExprAtIndex(0)->GetKind() == NK_Identifier) {
+          propKeyType = GetTypeFromDecl(static_cast<IdentifierNode*>(ae->GetExprAtIndex(0)));
+        }
+      }
       switch (propKeyType) {
         case TY_Int:
           propKey = "to_string("s + EmitTreeNode(ae->GetExprAtIndex(0)) + ")"s;

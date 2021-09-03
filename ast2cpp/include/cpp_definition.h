@@ -60,6 +60,7 @@ public:
   virtual std::string EmitArrayElementNode(ArrayElementNode *node);
   std::string EmitStructLiteralProps(StructLiteralNode* node);
   std::string EmitFuncScopeVarDecls(FunctionNode *node);
+  TypeId GetTypeFromDecl(IdentifierNode* id);
 };
 
 } // namespace maplefe
