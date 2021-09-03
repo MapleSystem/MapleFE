@@ -963,6 +963,17 @@ StructNode *TypeInferVisitor::VisitStructNode(StructNode *node) {
     TreeNode *t = node->GetField(i);
     (void) VisitClassField(t);
   }
+  if (node->GetProp() == SProp_TSEnum) {
+    TypeId tid = TY_None;
+    for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
+      TreeNode *t = node->GetField(i);
+      tid = MergeTypeId(tid, t->GetTypeId());
+    }
+    for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
+      TreeNode *t = node->GetField(i);
+      t->SetTypeId(tid);
+    }
+  }
   (void) AstVisitor::VisitStructNode(node);
   return node;
 }
