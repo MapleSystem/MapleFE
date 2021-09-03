@@ -675,6 +675,9 @@ std::string CppDef::EmitBinOperatorNode(BinOperatorNode *node) {
         case TY_String:
           propKey = EmitTreeNode(ae->GetExprAtIndex(0));
           break;
+        case TY_Symbol:
+          propKey = "to_string("s + EmitTreeNode(ae->GetExprAtIndex(0)) + ")"s;
+          break;
         default:
           MASSERT(0 && "Encounter unsupported prop key type in bracket notation");
           break;
