@@ -119,7 +119,7 @@ for ts in $LIST; do
       [ -n "$KEEP" ] || rm -f "$T"
     else
       sed 's/^\([ei][xm]port \) *type  *{/\1{/' $ts > $ts.tmp.ts
-      clang-format-10 -i --style="{ColumnLimit: 120, JavaScriptWrapImports: false}" $ts.tmp.ts; sed -i 's/?? =/??=/g' $ts.tmp.ts
+      clang-format-10 -i --style="{ColumnLimit: 120, JavaScriptWrapImports: false, JavaScriptQuotes: Double}" $ts.tmp.ts; sed -i 's/?? =/??=/g' $ts.tmp.ts
       $TS2AST $ts.tmp.ts
       if [ $? -eq 0 ]; then
         $AST2CPP $ts.tmp.ts.ast $TREEDIFF | sed -n '/^AstDump:/,/^}/p' | sed 's/\(mStrIdx: unsigned int, \)[0-9]* =>/\1=>/'
@@ -136,18 +136,12 @@ for ts in $LIST; do
         Passed="$Passed $ts"
         echo "MSG: Passed, test case $ts"
       else
-        sed 's/\\"/'"'/g" $ts.gen | diff $ts.orig -
+        diff -I '[0-9]\. const char\*, "' $ts.orig $ts.gen
         if [ $? -eq 0 -a -s $ts.orig -a -s $ts.gen ]; then
           Passed="$Passed $ts"
-          echo "MSG: Passed, test case (quote-marks)$ts"
+          echo "MSG: Passed, test case (const-char*)$ts"
         else
-          diff -I '[0-9]\. const char\*, "' $ts.orig $ts.gen
-          if [ $? -eq 0 -a -s $ts.orig -a -s $ts.gen ]; then
-            Passed="$Passed $ts"
-            echo "MSG: Passed, test case (const-char*)$ts"
-          else
-            echo "MSG: Failed, test case (diff-ast$E)$ts"
-          fi
+          echo "MSG: Failed, test case (diff-ast$E)$ts"
         fi
       fi
       echo === "$T"; cat "$T"
