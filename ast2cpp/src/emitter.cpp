@@ -875,7 +875,7 @@ std::string Emitter::EmitBindingPatternNode(BindingPatternNode *node) {
     str += ": "s + EmitTreeNode(n);
   }
   if (auto n = node->GetInit()) {
-    str += "= "s + EmitTreeNode(n);
+    str += " = "s + EmitTreeNode(n);
   }
   mPrecedence = '\030';
   if (node->IsStmt())
