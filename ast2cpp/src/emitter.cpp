@@ -664,8 +664,12 @@ std::string Emitter::EmitNewNode(NewNode *node) {
     return std::string();
   std::string str = "new "s;
   if (auto id = node->GetId()) {
-    str += " "s + EmitTreeNode(id);
-    if(id->GetKind() != NK_Function && id->GetKind() != NK_Lambda) {
+    std::string idstr = EmitTreeNode(id);
+    auto k = id->GetKind();
+    if (k == NK_Call)
+      idstr = "("s + idstr + ")"s;
+    str += " "s + idstr;
+    if(k != NK_Function && k != NK_Lambda) {
       auto num = node->GetArgsNum();
       str += "("s;
       for (unsigned i = 0; i < num; ++i) {
