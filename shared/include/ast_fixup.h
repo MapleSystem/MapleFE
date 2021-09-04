@@ -45,6 +45,9 @@ class FixUpVisitor : public AstVisitor {
     //    const char* GetName() {return mId->GetName();}
     //
     UserTypeNode *VisitUserTypeNode(UserTypeNode *node);
+
+    // Fix up literal boolean 'true' or 'false'
+    IdentifierNode *VisitIdentifierNode(IdentifierNode *node);
 };
 
 }
