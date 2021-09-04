@@ -969,7 +969,8 @@ enum BindPattProp {
 class BindingPatternNode : public TreeNode {
 private:
   BindPattProp           mProp;
-  SmallVector<TreeNode*> mElements;
+  SmallVector<TreeNode*> mElements;    // mostly BindingElementNode, also could be
+                                       // a nested BindingPatternNode.
   TreeNode              *mType;        // The type
   TreeNode              *mInit;        // An initializer
 public:

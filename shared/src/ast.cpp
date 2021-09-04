@@ -713,7 +713,7 @@ void BindingElementNode::Dump(unsigned indent) {
 }
 
 void BindingPatternNode::AddElement(TreeNode *tree) {
-  if (tree->IsBindingElement()) {
+  if (tree->IsBindingElement() || tree->IsBindingPattern()) {
     mElements.PushBack(tree);
     SETPARENT(tree);
   } else if (tree->IsPass()) {
