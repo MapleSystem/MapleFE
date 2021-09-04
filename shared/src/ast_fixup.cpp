@@ -18,6 +18,8 @@
 namespace maplefe {
 
 bool FixUpVisitor::FixUp() {
+  if(mASTModule->GetSrcLang() != SrcLangTypeScript)
+    return false;
   for (unsigned i = 0; i < mASTModule->GetTreesNum(); i++ ) {
     TreeNode *it = mASTModule->GetTree(i);
     Visit(it);
