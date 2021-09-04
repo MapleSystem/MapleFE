@@ -41,9 +41,7 @@ class FixUpVisitor : public AstVisitor {
     //
     UnaOperatorNode *VisitUnaOperatorNode(UnaOperatorNode *node);
 
-    // Fix up mName of UserTypeNode instead of overriding its GetName() as shown below
-    //    const char* GetName() {return mId->GetName();}
-    //
+    // Fix up literal boolean 'true' or 'false' as a type
     UserTypeNode *VisitUserTypeNode(UserTypeNode *node);
 
     // Fix up literal boolean 'true' or 'false'

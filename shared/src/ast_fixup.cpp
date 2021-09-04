@@ -51,14 +51,28 @@ UnaOperatorNode *FixUpVisitor::VisitUnaOperatorNode(UnaOperatorNode *node) {
   return AstVisitor::VisitUnaOperatorNode(node);
 }
 
-// Fix up mName of UserTypeNode
+// Fix up literal boolean 'true' or 'false' as a type
 UserTypeNode *FixUpVisitor::VisitUserTypeNode(UserTypeNode *node) {
-  if(auto id = node->GetId())
-    if(auto n = id->GetStrIdx())
-      if(node->GetStrIdx() != n) {
-        node->SetStrIdx(n);
+  auto id = node->GetId();
+  if(id && id->GetKind() == NK_Identifier) {
+    auto n = id->GetStrIdx();
+    auto true_id = gStringPool.GetStrIdx("true");
+    if(n == true_id || n == gStringPool.GetStrIdx("false")) {
+      if(node->GetType() == UT_Regular
+          && node->GetDims() == nullptr
+          && node->GetUnionInterTypesNum() == 0
+          && node->GetTypeGenericsNum() == 0
+          && node->GetAttrsNum() == 0
+          && node->GetAsTypesNum() == 0) {
         mUpdated = true;
+        LitData data;
+        data.mType = LT_BooleanLiteral;
+        data.mData.mBool = n == true_id;
+        LiteralNode *lit = new (gTreePool.NewTreeNode(sizeof(LiteralNode))) LiteralNode(data);
+        return (UserTypeNode*)lit;
       }
+    }
+  }
   return AstVisitor::VisitUserTypeNode(node);
 }
 
