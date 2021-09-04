@@ -51,9 +51,19 @@ UnaOperatorNode *FixUpVisitor::VisitUnaOperatorNode(UnaOperatorNode *node) {
   return AstVisitor::VisitUnaOperatorNode(node);
 }
 
+// Fix up the name string of a UserTypeNode
 // Fix up literal boolean 'true' or 'false' as a type
 UserTypeNode *FixUpVisitor::VisitUserTypeNode(UserTypeNode *node) {
   auto id = node->GetId();
+
+  // Java FE 'java2mpl' needs this
+  if(id)
+    if(auto n = id->GetStrIdx())
+      if(node->GetStrIdx() != n) {
+        node->SetStrIdx(n);
+        mUpdated = true;
+      }
+
   if(id && id->GetKind() == NK_Identifier) {
     auto n = id->GetStrIdx();
     auto true_id = gStringPool.GetStrIdx("true");

@@ -44,6 +44,7 @@ class FixUpVisitor : public AstVisitor {
     // Fix up literal boolean 'true' or 'false' as a type
     UserTypeNode *VisitUserTypeNode(UserTypeNode *node);
 
+    // Fix up the name string of a UserTypeNode
     // Fix up literal boolean 'true' or 'false'
     IdentifierNode *VisitIdentifierNode(IdentifierNode *node);
 };
