@@ -386,8 +386,8 @@ std::string Emitter::EmitDeclareNode(DeclareNode *node) {
     if (s.substr(0, 9) == "function ")
       Replace(s, ") => ", ") : ");
     else if (n->GetKind() == NK_Module) {
-      s = "module "s + static_cast<ModuleNode *>(n)->GetFileName()
-        + " {\n"s + s + ";\n}\n"s;
+      s = "module \""s + static_cast<ModuleNode *>(n)->GetFileName()
+        + "\" {\n"s + s + "}\n"s;
     }
     str += "declare "s + s;
   }
