@@ -391,7 +391,8 @@ std::string Emitter::EmitDeclareNode(DeclareNode *node) {
     }
     str += "declare "s + s;
   }
-  str += ";\n"s;
+  if (node->IsStmt())
+    str += ";\n"s;
   return HandleTreeNode(str, node);
 }
 
