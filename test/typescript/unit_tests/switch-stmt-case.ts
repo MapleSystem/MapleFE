@@ -1,8 +1,8 @@
-let obj : number = 1;
+let obj: number = 1;
 
 switch (typeof obj) {
-  case 'number':
-  case 'string':
+  case "number":
+  case "string":
     console.log(obj);
     break;
 }

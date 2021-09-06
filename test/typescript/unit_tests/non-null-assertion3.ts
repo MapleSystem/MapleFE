@@ -1,4 +1,4 @@
-function foo() : Object | null {
+function foo(): Object | null {
   return new Array();
 }
 

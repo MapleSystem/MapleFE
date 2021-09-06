@@ -1,11 +1,11 @@
 class E<T> {
-  t : T;
+  t: T;
 }
 
 class Klass {
-    public n: E<{ s: string }>;
+  public n: E<{ s: string }>;
 }
 
-var obj : Klass = new Klass();
-obj.n = { t: { s: "example" }, };
+var obj: Klass = new Klass();
+obj.n = { t: { s: "example" } };
 console.log(obj);

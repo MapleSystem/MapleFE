@@ -1,4 +1,4 @@
 let x: number = 3;
-(function() {
+(function () {
   console.log(x * x);
 })();

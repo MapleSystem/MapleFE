@@ -1,7 +1,6 @@
-const f1:number = 1;
-const f2:number = 2;
+const f1: number = 1;
+const f2: number = 2;
 
-function foo (arg) {
-}
+function foo(arg) {}
 
-foo({f1, f2});
+foo({ f1, f2 });

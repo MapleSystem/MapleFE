@@ -5,21 +5,21 @@
 class Foo<T> {
   private _ctor: () => T;
 
-  constructor (ctor: () => T) {
+  constructor(ctor: () => T) {
     this._ctor = ctor;
   }
 
-  public alloc () : T {
-    return (this._ctor());
- }
+  public alloc(): T {
+    return this._ctor();
+  }
 }
 
 // Create class object with String type
 // - Create class object with type String
 // - Pass an arrow function (that returns a new String object) to the class constructor
-const FooString: Foo<String> = new Foo<String>( () => new String("foo") );
+const FooString: Foo<String> = new Foo<String>(() => new String("foo"));
 
-// Optional check. 
-// - Call alloc() of new class object to get a new object and 
+// Optional check.
+// - Call alloc() of new class object to get a new object and
 // - call the object's builtin toString() method to display it.
 console.log(FooString.alloc().toString());

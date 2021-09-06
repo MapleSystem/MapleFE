@@ -2,14 +2,14 @@ class A {
   a: number;
   b: number;
 }
-var x : A;
+var x: A;
 delete x.a;
 
 void 0;
 
 typeof 8;
 
-var a : number = 8;
+var a: number = 8;
 ++a;
 --a;
 
@@ -25,4 +25,3 @@ var a : number = 8;
 
 !false;
 !true;
-

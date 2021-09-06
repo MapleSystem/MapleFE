@@ -11,10 +11,9 @@ class Klass extends Base {
   }
 }
 
-function foo() : void {
+function foo(): void {
   console.log("foo");
 }
 
 var obj: Klass = new Klass();
 obj.func(foo);
-

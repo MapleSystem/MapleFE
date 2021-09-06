@@ -1,2 +1,2 @@
-var arr:number[];
-var arr:number[] = [ 1 ];
+var arr: number[];
+var arr: number[] = [1];

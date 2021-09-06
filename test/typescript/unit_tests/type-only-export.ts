@@ -1,4 +1,4 @@
 class Klass {
-  n : number;
+  n: number;
 }
 export type K = Klass;

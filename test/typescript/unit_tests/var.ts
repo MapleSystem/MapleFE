@@ -1,2 +1,2 @@
-var a : number = 1;
+var a: number = 1;
 console.log(a);

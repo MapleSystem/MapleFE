@@ -1,4 +1,3 @@
 interface IFace {
-    for(s: string): any;
+  for(s: string): any;
 }
-

@@ -1,6 +1,6 @@
-function foo(j: number) : number {
+function foo(j: number): number {
   {
-    const i : number = 4;
+    const i: number = 4;
     j += 10 * i;
   }
   var i = 8;

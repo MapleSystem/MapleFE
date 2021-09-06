@@ -1,9 +1,9 @@
 class Klass {}
 
 export interface Interf {
-    [key: string]: any;
+  [key: string]: any;
 }
 
-export interface Interf2{
-    func(component: Klass): Interf;
+export interface Interf2 {
+  func(component: Klass): Interf;
 }

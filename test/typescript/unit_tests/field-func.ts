@@ -1,2 +1,2 @@
 interface cs {}
-declare const calls: { (): cs[]; };
+declare const calls: { (): cs[] };

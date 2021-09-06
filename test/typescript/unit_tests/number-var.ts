@@ -1,5 +1,5 @@
 var func: (number: number) => string;
-function conv(number: number) : string {
+function conv(number: number): string {
   return number as unknown as string;
 }
 

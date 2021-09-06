@@ -8,7 +8,7 @@ func  func(o)  throws:
   return o
 
 == Sub Tree ==
-js_var Decl: obj= {"x":1}
+js_var Decl: obj= {x:1}
 == Sub Tree ==
 func(obj)["x"] Assign 2
 == Sub Tree ==

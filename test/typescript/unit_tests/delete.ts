@@ -1,6 +1,5 @@
 class A {
   a: number;
 }
-var x : A = new A();
+var x: A = new A();
 delete x.a;
-

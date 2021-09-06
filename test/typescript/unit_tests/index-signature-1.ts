@@ -1,4 +1,4 @@
 interface dictionary {
   [index: string]: number;
-  id: number; 
+  id: number;
 }

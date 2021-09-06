@@ -1,7 +1,7 @@
 enum E {
   LEFT = "left",
-  RIGHT = "right"
+  RIGHT = "right",
 }
 
-var arr: E[] = [ E.LEFT, E.RIGHT ];
+var arr: E[] = [E.LEFT, E.RIGHT];
 console.log(arr);

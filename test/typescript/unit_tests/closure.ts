@@ -1,14 +1,13 @@
 var base: number = 10;
 
 function counter(private_count: number): () => number {
+  function increment(): number {
+    private_count += 1;
+    return base + private_count;
+  }
 
-    function increment(): number {
-        private_count += 1;
-        return base + private_count;
-    };
-
-    return increment;
-};
+  return increment;
+}
 
 var count: () => number = counter(0);
 console.log(count()); // output: 11

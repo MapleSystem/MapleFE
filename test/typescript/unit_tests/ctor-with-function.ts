@@ -7,6 +7,5 @@ class Klass {
     this.num = n;
   }
 }
-const obj = new Klass(() => ({n: 1}), 16);
+const obj = new Klass(() => ({ n: 1 }), 16);
 console.log(obj);
-

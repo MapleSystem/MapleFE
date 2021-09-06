@@ -1,4 +1,4 @@
 declare module "FuncModule" {
-    const func: () => boolean;
-    export = func;
+  const func: () => boolean;
+  export = func;
 }

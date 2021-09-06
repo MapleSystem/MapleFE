@@ -1,9 +1,9 @@
 interface A {
-    id: number;
+  id: number;
 }
 
 interface B {
-    name: string;
+  name: string;
 }
 
 type I = A & B;

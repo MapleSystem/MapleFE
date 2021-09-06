@@ -5,71 +5,71 @@
 //   require set type
 
 function abstract() {
-    return "abstract";
+  return "abstract";
 }
 console.log(abstract());
 
 function as() {
-    return "as";
+  return "as";
 }
 console.log(as());
 
 function async() {
-    return "async";
+  return "async";
 }
 console.log(async());
 
 function await() {
-    return "await";
+  return "await";
 }
 console.log(await());
 
 function constructor() {
-    return "constructor";
+  return "constructor";
 }
 console.log(constructor());
 
 function declare() {
-    return "declare";
+  return "declare";
 }
 console.log(declare());
 
 function from() {
-    return "from";
+  return "from";
 }
 console.log(from());
 
 function get() {
-    return "get";
+  return "get";
 }
 console.log(get());
 
 function is() {
-    return "is";
+  return "is";
 }
 console.log(is());
 
 function module() {
-    return "module";
+  return "module";
 }
 console.log(module());
 
 function namespace() {
-    return "namespace";
+  return "namespace";
 }
 console.log(namespace());
 
 function of() {
-    return "of";
+  return "of";
 }
 console.log(of());
 
 function require() {
-    return "require";
+  return "require";
 }
 console.log(require());
 
 function set() {
-    return "set";
+  return "set";
 }
 console.log(set());

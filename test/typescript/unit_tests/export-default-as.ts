@@ -1,1 +1,1 @@
-export { default as X } from './M';
+export { default as X } from "./M";

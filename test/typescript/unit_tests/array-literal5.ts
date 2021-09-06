@@ -1,6 +1,6 @@
 enum Direction {
-    LEFT,
-    RIGHT,
+  LEFT,
+  RIGHT,
 }
 
 const rec = [Direction.LEFT, Direction.RIGHT];

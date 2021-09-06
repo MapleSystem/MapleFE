@@ -3,5 +3,4 @@ const enum TypeID {
   Array,
 }
 
-type TYPE = [ string, string[], number, ...TypeID[] ];
-
+type TYPE = [string, string[], number, ...TypeID[]];

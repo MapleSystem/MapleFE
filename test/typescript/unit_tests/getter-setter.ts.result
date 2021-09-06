@@ -1,7 +1,7 @@
-Matched 39 tokens.
-Matched 48 tokens.
-Matched 54 tokens.
-Matched 63 tokens.
+Matched 40 tokens.
+Matched 49 tokens.
+Matched 55 tokens.
+Matched 64 tokens.
 ============= Module ===========
 == Sub Tree ==
 js_const Decl: obj= {prop:"foo", getProp:get getProp()  throws: 

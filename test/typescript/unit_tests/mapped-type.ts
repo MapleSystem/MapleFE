@@ -1,4 +1,6 @@
-class Base { [key: string]: number | string }
+class Base {
+  [key: string]: number | string;
+}
 class Derived extends Base {}
 type T<E extends Base> = { [key in E[keyof E]]: string };
 

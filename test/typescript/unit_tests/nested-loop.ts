@@ -3,7 +3,7 @@ var len: number = arr.length;
 for (var i = 1; i < len; ++i) {
   var j: number = i - 1;
   var n = arr[i];
-  while(n < arr[j] && j >= 0) {
+  while (n < arr[j] && j >= 0) {
     arr[j + 1] = arr[j];
     --j;
   }

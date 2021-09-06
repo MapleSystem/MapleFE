@@ -1,6 +1,6 @@
 function func(k: number): number {
   return k + k;
-};
+}
 
 type UT = string | typeof func;
 var s: UT = "abc";

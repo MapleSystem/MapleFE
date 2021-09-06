@@ -1,2 +1,1 @@
-declare module "mod/runtime" {
-}
+declare module "mod/runtime" {}

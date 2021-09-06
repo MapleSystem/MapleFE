@@ -1,4 +1,4 @@
-function func<T>(x: T) : T {
+function func<T>(x: T): T {
   return x;
 }
 var list = { f1: 0, f2: 1 };

@@ -5,6 +5,6 @@
 //   require set type
 
 function type() {
-    return "type";
+  return "type";
 }
 console.log(type());

@@ -1,7 +1,6 @@
 function func(x: unknown): number | undefined {
-    if (typeof x === "number")
-        return x * x;
-    return undefined;
+  if (typeof x === "number") return x * x;
+  return undefined;
 }
 
 let v = func("a");

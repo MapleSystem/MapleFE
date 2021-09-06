@@ -1,7 +1,7 @@
 // tsc --target es2015
 const tag: unique symbol = Symbol("my symbol");
 interface IFace {
-    [tag]?: number;
+  [tag]?: number;
 }
 
 class Klass implements IFace {

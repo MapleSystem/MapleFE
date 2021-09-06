@@ -1,8 +1,11 @@
-function func(n: number, s: string) : string {
+function func(n: number, s: string): string {
   return n + s;
 }
 
-function wrapper(n: Parameters<typeof func>[0], s: Parameters<typeof func>[1] | undefined): string {
+function wrapper(
+  n: Parameters<typeof func>[0],
+  s: Parameters<typeof func>[1] | undefined
+): string {
   return func(n, s);
 }
 

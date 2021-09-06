@@ -1,6 +1,6 @@
 enum ET {
   TOP = "top",
-  BOTTOM = "bottom"
+  BOTTOM = "bottom",
 }
 
 let et = ET.TOP;

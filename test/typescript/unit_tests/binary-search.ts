@@ -1,5 +1,4 @@
-
-function binarySearch (array: number[], value: number) : number {
+function binarySearch(array: number[], value: number): number {
   var low: number = 0;
   var high: number = array.length - 1;
   var mid: number = high >>> 1;

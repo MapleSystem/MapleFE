@@ -1,2 +1,1 @@
-import type { Foo } from "./export-type2"
-
+import type { Foo } from "./export-type2";

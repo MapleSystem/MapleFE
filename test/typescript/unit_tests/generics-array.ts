@@ -1,10 +1,10 @@
 // Define generic element pool using array
 class Pool<T> {
   private _pool: T[] = [];
-  
+
   public put(element: T) {
     this._pool.push(element);
-  } 
+  }
   public get(): T {
     return this._pool.pop();
   }

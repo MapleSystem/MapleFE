@@ -1,7 +1,7 @@
 Matched 77 tokens.
-Matched 104 tokens.
-Matched 109 tokens.
-Matched 120 tokens.
+Matched 105 tokens.
+Matched 110 tokens.
+Matched 121 tokens.
 ============= Module ===========
 == Sub Tree ==
 js_var Decl: func=(obj) -> js_const Decl: desc=Object.getOwnPropertyDescriptor(obj,"f")

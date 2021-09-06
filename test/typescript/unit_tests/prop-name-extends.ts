@@ -1,3 +1,1 @@
-function func (arg: { extends: null | Function }) {
-}
-
+function func(arg: { extends: null | Function }) {}

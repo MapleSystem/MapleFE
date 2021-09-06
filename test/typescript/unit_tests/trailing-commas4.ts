@@ -2,7 +2,6 @@ var obj = {
   x: false,
 };
 var obj2 = {
-  x: false
+  x: false,
 };
 console.log(obj, obj2);
-

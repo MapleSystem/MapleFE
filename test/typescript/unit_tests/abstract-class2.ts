@@ -1,4 +1,3 @@
 abstract class Klass {
-  public abstract func (): void;
+  public abstract func(): void;
 }
-

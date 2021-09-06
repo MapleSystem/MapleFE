@@ -1,6 +1,6 @@
 const nums: number[] = [3, 9, 8, 2, 7, 5, 1, 6, 4];
 
-for(const n of nums) { 
+for (const n of nums) {
   switch (true) {
     case n < 5:
       console.log(n, " is less than 5");

@@ -1,1 +1,3 @@
-enum E { '<None>' = 0 }
+enum E {
+  "<None>" = 0,
+}

@@ -6,7 +6,7 @@ function func() {
         break;
       default:
         obj[i] = "OK";
-      break;
+        break;
     }
   }
   return obj;

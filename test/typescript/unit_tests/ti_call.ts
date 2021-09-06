@@ -1,4 +1,4 @@
-function bar (value: number) : number {
+function bar(value: number): number {
   return value;
 }
 

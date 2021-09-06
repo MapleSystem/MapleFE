@@ -8,11 +8,11 @@ interface Derived extends Base {
 let o = { name: "John", age: 30 };
 
 function dump(obj: Base) {
-    console.log(obj.name, (<Derived>obj).age);
+  console.log(obj.name, (<Derived>obj).age);
 }
 dump(o);
 
 function dump2(obj: Base) {
-    console.log(obj.name, (obj as Derived).age);
+  console.log(obj.name, (obj as Derived).age);
 }
 dump2(o);

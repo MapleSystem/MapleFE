@@ -1,4 +1,3 @@
 interface Interf {
-    readonly?: boolean | { flag?: boolean; };
+  readonly?: boolean | { flag?: boolean };
 }
-

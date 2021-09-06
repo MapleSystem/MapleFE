@@ -1,4 +1,3 @@
-var y : "left" | "right" | string | undefined;
+var y: "left" | "right" | string | undefined;
 y = "left";
 console.log(y);
-

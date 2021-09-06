@@ -1,4 +1,4 @@
-Matched 7 tokens.
+Matched 8 tokens.
 ============= Module ===========
 == Sub Tree ==
 import {Foo} "./export-type2"

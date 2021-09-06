@@ -1,6 +1,5 @@
 class Klass {
-
-  items : number[] = [];
+  items: number[] = [];
 
   func() {
     let i, list, len;

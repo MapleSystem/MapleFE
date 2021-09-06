@@ -1,4 +1,4 @@
 export declare enum ET {
   TOP = "top",
-  BOTTOM = "bottom"
+  BOTTOM = "bottom",
 }

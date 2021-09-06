@@ -1,6 +1,6 @@
 for (var i: number = 1; i < 10; ++i) {
-  if(i < 5)
-    switch(i) {
+  if (i < 5)
+    switch (i) {
       case 2:
         console.log(i, ", continue");
         continue;
@@ -12,8 +12,8 @@ for (var i: number = 1; i < 10; ++i) {
       default:
         console.log(i, ", default");
     }
-    else {
-      console.log(i, ", else branch");
-      break;
-    }
+  else {
+    console.log(i, ", else branch");
+    break;
+  }
 }

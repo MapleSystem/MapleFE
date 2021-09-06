@@ -6,4 +6,3 @@ class Klass {
 
 var obj: Klass = new Klass();
 console.log(obj[prop]);
-

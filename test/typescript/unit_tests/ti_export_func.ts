@@ -1,4 +1,4 @@
-export function bar (value: number) : number {
+export function bar(value: number): number {
   return value;
 }
 

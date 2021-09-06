@@ -1,5 +1,5 @@
-Matched 26 tokens.
-Matched 52 tokens.
+Matched 28 tokens.
+Matched 56 tokens.
 ============= Module ===========
 == Sub Tree ==
 console.log([2,5,8,1,4].some((x) -> x GT 10))

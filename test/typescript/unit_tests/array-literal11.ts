@@ -1,7 +1,7 @@
 enum Direction {
-    LEFT,
-    RIGHT,
+  LEFT,
+  RIGHT,
 }
 
-const rec = [ true ? Direction.LEFT : Direction.RIGHT];
+const rec = [true ? Direction.LEFT : Direction.RIGHT];
 console.log(rec);

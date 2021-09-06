@@ -1,4 +1,4 @@
-function foo (array: number[], value: number) : number {
+function foo(array: number[], value: number): number {
   return 0;
 }
 

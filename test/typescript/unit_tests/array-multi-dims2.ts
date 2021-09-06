@@ -4,4 +4,3 @@ const arr = [
   [8, 1, 6],
 ];
 console.log(arr[0][0] + 1);
-

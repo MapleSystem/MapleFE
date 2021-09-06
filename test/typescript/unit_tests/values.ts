@@ -1,1 +1,1 @@
-export const values = [{"brand": "BMW", "model": "325"}, {}];
+export const values = [{ brand: "BMW", model: "325" }, {}];

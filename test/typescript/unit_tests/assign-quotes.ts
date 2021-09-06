@@ -1,5 +1,4 @@
 var foo;
-if (foo === '') {
+if (foo === "") {
   foo = '""';
 }
-

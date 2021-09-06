@@ -1,7 +1,6 @@
-function func (t: Function | [Function] | any): string {
+function func(t: Function | [Function] | any): string {
   return typeof t;
 }
 
-var f : Function = func;
+var f: Function = func;
 console.log(func(f));
-

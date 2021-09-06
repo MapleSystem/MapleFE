@@ -1,7 +1,4 @@
-var s :
-  | string
-  | number
-  = 123;
+var s: string | number = 123;
 console.log(s);
 s = "abc";
 console.log(s);

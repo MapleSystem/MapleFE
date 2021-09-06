@@ -1,4 +1,3 @@
 interface IFace<T> {
-    finally(): IFace<T>
+  finally(): IFace<T>;
 }
-

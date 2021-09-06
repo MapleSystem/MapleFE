@@ -1,5 +1,5 @@
 type Concrete<T> = {
-    [P in keyof T]-?: T[P];
+  [P in keyof T]-?: T[P];
 };
 
 interface IFace {

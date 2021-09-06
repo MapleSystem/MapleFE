@@ -1,4 +1,4 @@
 const obj = {
-    default: {},
+  default: {},
 };
 console.log(obj);

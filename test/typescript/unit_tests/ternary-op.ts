@@ -1,5 +1,5 @@
 function func(x: number): number {
-    return x > 10 ? x : x * x;
+  return x > 10 ? x : x * x;
 }
 
 let r = func(12);

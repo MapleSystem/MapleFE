@@ -3,7 +3,7 @@ class Car {
   constructor(make: string) {
     this._make = make;
   }
-  public getMake():string {
+  public getMake(): string {
     return this._make;
   }
 }
@@ -14,11 +14,10 @@ class Model extends Car {
     super(make);
     (this as any)._model = model;
   }
-  public getModel():string {
+  public getModel(): string {
     return this._model;
   }
 }
 
 let passat: Model = new Model("VW", "Passat");
 console.log(passat.getMake(), passat.getModel());
-

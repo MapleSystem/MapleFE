@@ -5,4 +5,3 @@ let Left = `${x}px`;
 let Right: string = `${x}px`;
 let Top = `${y}px`;
 let Bottom: string = `${y}px`;
-

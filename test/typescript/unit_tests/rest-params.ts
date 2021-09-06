@@ -1,4 +1,4 @@
-function func(msg: string, ...params: any []) {
+function func(msg: string, ...params: any[]) {
   console.log(msg, params);
 }
 

@@ -1,3 +1,3 @@
 class Klass {
-  protected func?() : void;
+  protected func?(): void;
 }
