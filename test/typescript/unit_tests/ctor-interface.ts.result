@@ -1,0 +1,16 @@
+Matched 8 tokens.
+Matched 18 tokens.
+============= Module ===========
+== Sub Tree ==
+class  Klass
+  Fields: 
+    f
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+ts_interface: KlassConstructor {func  ()  throws: 
+ }

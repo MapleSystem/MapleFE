@@ -1789,6 +1789,7 @@ private:
   bool mIsGetAccessor;
   bool mIsSetAccessor;
   bool mIsCallSignature; // no func name, no func body
+  bool mIsConstructSignature; // no func name, no func body, and is a construct sig in TS
 
 public:
   FunctionNode();
@@ -1815,6 +1816,8 @@ public:
   void SetIsSetAccessor(bool b = true) {mIsSetAccessor = b;}
   bool IsCallSignature()                 {return mIsCallSignature;}
   void SetIsCallSignature(bool b = true) {mIsCallSignature = b;}
+  bool IsConstructSignature()                 {return mIsConstructSignature;}
+  void SetIsConstructSignature(bool b = true) {mIsConstructSignature = b;}
 
   unsigned  GetParamsNum()        {return mParams.GetNum();}
   TreeNode* GetParam(unsigned i)  {return mParams.ValueAtIndex(i);}

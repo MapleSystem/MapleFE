@@ -3151,6 +3151,15 @@ TreeNode* ASTBuilder::SetCallSignature() {
   return mLastTreeNode;
 }
 
+// It take no arugment. It uses mLastTreeNode which is
+// a function node.
+TreeNode* ASTBuilder::SetConstructSignature() {
+  MASSERT(mLastTreeNode->IsFunction());
+  FunctionNode *node = (FunctionNode*)mLastTreeNode;
+  node->SetIsConstructSignature();
+  return mLastTreeNode;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 //                   Try, Catch, Throw
 ////////////////////////////////////////////////////////////////////////////////

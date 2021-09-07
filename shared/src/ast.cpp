@@ -1731,7 +1731,8 @@ void ClassNode::Dump(unsigned indent) {
 FunctionNode::FunctionNode() : TreeNode(NK_Function),
   mFuncName(NULL), mType(NULL), mBody(NULL), mDims(NULL),
   mIsConstructor(false), mIsGetAccessor(false),
-  mIsSetAccessor(false), mIsCallSignature(false), mAssert(NULL) {}
+  mIsSetAccessor(false), mIsCallSignature(false), mIsConstructSignature(false),
+  mAssert(NULL) {}
 
 void FunctionNode::AddTypeParam(TreeNode *param) {
   if (param->IsPass()) {

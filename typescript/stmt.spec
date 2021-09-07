@@ -1811,6 +1811,10 @@ rule RestParameter: "..." + BindingIdentifier + ZEROORONE(TypeAnnotation)
 ## rule ConstructSignature: new TypeParametersopt ( ParameterListopt ) TypeAnnotationopt
 rule ConstructSignature :
   "new" + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList) + ')' + ZEROORONE(TypeAnnotation)
+  attr.action : BuildFunction()
+  attr.action : AddParams(%4)
+  attr.action : AddType(%6)
+  attr.action : SetConstructSignature()
 
 ## rule IndexSignature: [ BindingIdentifier : string ] TypeAnnotation [ BindingIdentifier : number ] TypeAnnotation
 rule IndexSignature: ONEOF(
