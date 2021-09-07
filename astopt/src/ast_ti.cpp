@@ -547,8 +547,19 @@ FieldLiteralNode *TypeInferVisitor::VisitFieldLiteralNode(FieldLiteralNode *node
 ArrayLiteralNode *TypeInferVisitor::VisitArrayLiteralNode(ArrayLiteralNode *node) {
   UpdateTypeId(node, TY_Array);
   (void) AstVisitor::VisitArrayLiteralNode(node);
-  if (node->GetLiteralsNum()) {
-    TypeId tid = node->GetLiteral(0)->GetTypeId();
+  ArrayLiteralNode *al = node;
+  TreeNode *n = node;
+  while (n->IsArrayLiteral()) {
+    al = static_cast<ArrayLiteralNode *>(n);
+    if (al->GetLiteralsNum()) {
+      n = al->GetLiteral(0);
+    } else {
+      break;
+    }
+  }
+
+  if (al->GetLiteralsNum()) {
+    TypeId tid = al->GetLiteral(0)->GetTypeId();
     UpdateArrayElemTypeIdMap(node, tid);
   }
   return node;
@@ -779,18 +790,9 @@ DeclNode *TypeInferVisitor::VisitDeclNode(DeclNode *node) {
   bool isArray = false;
   if (init) {
     merged = MergeTypeId(merged, init->GetTypeId());
-    // collect array element typeid
-    TreeNode *n = init;
-    while (n->IsArrayLiteral()) {
-      isArray = true;
-      ArrayLiteralNode *al = static_cast<ArrayLiteralNode *>(n);
-      if (al->GetLiteralsNum()) {
-        n = al->GetLiteral(0);
-      } else {
-        break;
-      }
-    }
-    elemTypeId = n->GetTypeId();
+    // collect array element typeid if any
+    elemTypeId = GetArrayElemTypeId(init);
+    isArray = (elemTypeId != TY_None);
   }
   if (var) {
     // normal cases
