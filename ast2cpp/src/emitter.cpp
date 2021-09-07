@@ -1119,7 +1119,6 @@ std::string Emitter::EmitThrowNode(ThrowNode *node) {
       str += EmitTreeNode(n);
     }
   }
-  str += ";\n"s;
   return HandleTreeNode(str, node);
 }
 
