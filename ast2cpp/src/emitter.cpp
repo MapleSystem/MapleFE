@@ -215,6 +215,9 @@ std::string Emitter::EmitFunctionNode(FunctionNode *node) {
       str += s;
   }
 
+  if (node->IsConstructSignature())
+    str += "new"s;
+
   auto num = node->GetTypeParamsNum();
   if(num) {
     str += "<"s;
