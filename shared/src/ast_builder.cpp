@@ -232,13 +232,15 @@ TreeNode* ASTBuilder::AddModuleBody() {
     std::cout << "In AddModuleBody" << std::endl;
 
   Param p_body = mParams[0];
-  if (!p_body.mIsTreeNode)
-    MERROR("The module body is not a tree node.");
-  TreeNode *tn = p_body.mData.mTreeNode;
+  if (!p_body.mIsEmpty) {
+    if (!p_body.mIsTreeNode)
+      MERROR("The module body is not a tree node.");
+    TreeNode *tn = p_body.mData.mTreeNode;
 
-  MASSERT(mLastTreeNode->IsModule());
-  ModuleNode *mod = (ModuleNode*)mLastTreeNode;
-  mod->AddTree(tn);
+    MASSERT(mLastTreeNode->IsModule());
+    ModuleNode *mod = (ModuleNode*)mLastTreeNode;
+    mod->AddTree(tn);
+  }
 
   return mLastTreeNode;
 }
