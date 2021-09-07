@@ -1,0 +1,41 @@
+Matched 12 tokens.
+Matched 24 tokens.
+Matched 37 tokens.
+Matched 42 tokens.
+Matched 47 tokens.
+Matched 51 tokens.
+Matched 55 tokens.
+Matched 64 tokens.
+============= Module ===========
+== Sub Tree ==
+class  Foo
+  Fields: 
+    f1    f2
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+class  Bar
+  Fields: 
+    f1    f2
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+js_var Decl: x= {f1:123, f2:"John"}
+== Sub Tree ==
+js_var Decl: y
+== Sub Tree ==
+js_var Decl: z
+== Sub Tree ==
+y Assign x
+== Sub Tree ==
+z Assign y
+== Sub Tree ==
+console.log(y,z)
