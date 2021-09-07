@@ -2188,6 +2188,7 @@ rule ExternalModuleDeclaration : "module" + PrimaryExpression + '{' + Declaratio
 #DeclarationElement: InterfaceDeclaration TypeAliasDeclaration NamespaceDeclaration AmbientDeclaration ImportAliasDeclaration
 rule DeclarationElement: ONEOF(InterfaceDeclaration,
                                TypeAliasDeclaration,
+                               LexicalDeclaration + ZEROORONE(';'),
                                VariableDeclaration,
                                FunctionDeclaration,
                                ClassDeclaration,
