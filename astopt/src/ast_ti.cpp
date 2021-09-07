@@ -414,20 +414,22 @@ void TypeInferVisitor::UpdateVarTypeWithInit(TreeNode *var, TreeNode *init) {
   IdentifierNode *idnode = static_cast<IdentifierNode *>(var);
   TreeNode *type = idnode->GetType();
   // use init NewNode to set decl type
-  if (!type && init && init->IsNew()) {
-    NewNode *n = static_cast<NewNode *>(init);
-    if (n->GetId()) {
-      TreeNode *id = n->GetId();
-      if (id->IsIdentifier()) {
-        IdentifierNode *newid = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
-        new (newid) IdentifierNode(id->GetStrIdx());
-        newid->SetScope(init->GetScope());
-        UserTypeNode *utype = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
-        new (utype) UserTypeNode(newid);
-        newid->SetParent(utype);
-        utype->SetParent(idnode);
-        idnode->SetType(utype);
-        SetUpdated();
+  if (!type && init) {
+    if (init->IsNew()) {
+      NewNode *n = static_cast<NewNode *>(init);
+      if (n->GetId()) {
+        TreeNode *id = n->GetId();
+        if (id->IsIdentifier() && id->GetTypeId() == TY_Class) {
+          IdentifierNode *newid = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
+          new (newid) IdentifierNode(id->GetStrIdx());
+          newid->SetScope(init->GetScope());
+          UserTypeNode *utype = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
+          new (utype) UserTypeNode(newid);
+          newid->SetParent(utype);
+          utype->SetParent(idnode);
+          idnode->SetType(utype);
+          SetUpdated();
+        }
       }
     }
   }
