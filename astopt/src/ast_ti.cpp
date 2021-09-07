@@ -407,6 +407,32 @@ void TypeInferVisitor::UpdateArrayElemTypeIdMap(TreeNode *node, TypeId tid) {
   }
 }
 
+void TypeInferVisitor::UpdateVarTypeWithInit(TreeNode *var, TreeNode *init) {
+  if (!var->IsIdentifier()) {
+    return;
+  }
+  IdentifierNode *idnode = static_cast<IdentifierNode *>(var);
+  TreeNode *type = idnode->GetType();
+  // use init NewNode to set decl type
+  if (!type && init && init->IsNew()) {
+    NewNode *n = static_cast<NewNode *>(init);
+    if (n->GetId()) {
+      TreeNode *id = n->GetId();
+      if (id->IsIdentifier()) {
+        IdentifierNode *newid = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
+        new (newid) IdentifierNode(id->GetStrIdx());
+        newid->SetScope(init->GetScope());
+        UserTypeNode *utype = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
+        new (utype) UserTypeNode(newid);
+        newid->SetParent(utype);
+        utype->SetParent(idnode);
+        idnode->SetType(utype);
+        SetUpdated();
+      }
+    }
+  }
+}
+
 bool TypeInferVisitor::IsArray(TreeNode *node) {
   if (!node) {
     return false;
@@ -797,10 +823,8 @@ DeclNode *TypeInferVisitor::VisitDeclNode(DeclNode *node) {
   if (var) {
     // normal cases
     if(var->IsIdentifier()) {
-      IdentifierNode *id = static_cast<IdentifierNode *>(var);
-      TreeNode *type = id->GetType();
-
       merged = MergeTypeId(merged, var->GetTypeId());
+      UpdateVarTypeWithInit(var, init);
     } else {
       // BindingPatternNode
     }
