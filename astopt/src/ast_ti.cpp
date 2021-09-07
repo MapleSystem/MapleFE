@@ -267,7 +267,6 @@ void TypeInferVisitor::UpdateArgArrayDecls(unsigned nid, TypeId tid) {
 }
 
 // use input node's type info to update target node's type info
-// used to refine function's formals with corresponding calls' parameters passed in
 void TypeInferVisitor::UpdateTypeUseNode(TreeNode *target, TreeNode *input) {
   TypeId tid = target->GetTypeId();
   TypeId iid = input->GetTypeId();
@@ -278,6 +277,7 @@ void TypeInferVisitor::UpdateTypeUseNode(TreeNode *target, TreeNode *input) {
     case TY_None:
       break;
     case TY_Array: {
+      // function's formals with corresponding calls' parameters passed in
       if (input->IsIdentifier()) {
         TreeNode *decl = mHandler->FindDecl(static_cast<IdentifierNode *>(input));
         TypeId old_elemTypeId = GetArrayElemTypeId(target);
@@ -293,6 +293,27 @@ void TypeInferVisitor::UpdateTypeUseNode(TreeNode *target, TreeNode *input) {
           mParam2ArgArrayDeclMap[nid].insert(decl);
           if (old_elemTypeId != new_elemTypeId) {
             PrimArrayTypeNode *pat = static_cast<PrimArrayTypeNode *>(type);
+            PrimTypeNode *pt = pat->GetPrim();
+            PrimTypeNode *new_pt = GetOrClonePrimTypeNode(pt, new_elemTypeId);
+            pat->SetPrim(new_pt);
+            SetUpdated();
+
+            UpdateArgArrayDecls(nid, new_elemTypeId);
+          }
+        }
+      }
+      // function's return type with return statement
+      else if (input->IsArrayLiteral()) {
+        TypeId old_elemTypeId = GetArrayElemTypeId(target);
+        TypeId inid = GetArrayElemTypeId(input);
+        if (old_elemTypeId != inid) {
+          UpdateArrayElemTypeIdMap(target, inid);
+        }
+        TypeId new_elemTypeId = GetArrayElemTypeId(target);
+        if (target->IsPrimArrayType()) {
+          unsigned nid = target->GetNodeId();
+          if (old_elemTypeId != new_elemTypeId) {
+            PrimArrayTypeNode *pat = static_cast<PrimArrayTypeNode *>(target);
             PrimTypeNode *pt = pat->GetPrim();
             PrimTypeNode *new_pt = GetOrClonePrimTypeNode(pt, new_elemTypeId);
             pat->SetPrim(new_pt);
@@ -375,13 +396,13 @@ void TypeInferVisitor::UpdateArrayElemTypeIdMap(TreeNode *node, TypeId tid) {
     }
     if (node->IsIdentifier()) {
       IdentifierNode *in = static_cast<IdentifierNode *>(node);
-      TreeNode *type = in->GetType();
-      if (type->IsPrimArrayType()) {
-        PrimArrayTypeNode *pat = static_cast<PrimArrayTypeNode *>(type);
-        PrimTypeNode *pt = pat->GetPrim();
-        PrimTypeNode *new_pt = GetOrClonePrimTypeNode(pt, tid);
-        pat->SetPrim(new_pt);
-      }
+      node = in->GetType();
+    }
+    if (node->IsPrimArrayType()) {
+      PrimArrayTypeNode *pat = static_cast<PrimArrayTypeNode *>(node);
+      PrimTypeNode *pt = pat->GetPrim();
+      PrimTypeNode *new_pt = GetOrClonePrimTypeNode(pt, tid);
+      pat->SetPrim(new_pt);
     }
   }
 }
@@ -389,6 +410,9 @@ void TypeInferVisitor::UpdateArrayElemTypeIdMap(TreeNode *node, TypeId tid) {
 bool TypeInferVisitor::IsArray(TreeNode *node) {
   if (!node) {
     return false;
+  }
+  if (node->IsArrayLiteral() || node->IsPrimArrayType()) {
+    return true;
   }
   TreeNode *tn = node;
   if (node->IsDecl()) {
@@ -523,6 +547,10 @@ FieldLiteralNode *TypeInferVisitor::VisitFieldLiteralNode(FieldLiteralNode *node
 ArrayLiteralNode *TypeInferVisitor::VisitArrayLiteralNode(ArrayLiteralNode *node) {
   UpdateTypeId(node, TY_Array);
   (void) AstVisitor::VisitArrayLiteralNode(node);
+  if (node->GetLiteralsNum()) {
+    TypeId tid = node->GetLiteral(0)->GetTypeId();
+    UpdateArrayElemTypeIdMap(node, tid);
+  }
   return node;
 }
 
@@ -1027,6 +1055,10 @@ ReturnNode *TypeInferVisitor::VisitReturnNode(ReturnNode *node) {
       func->SetType(type);
     }
     UpdateFuncRetTypeId(func, node->GetTypeId());
+    if (res) {
+      // use res to update function's return type
+      UpdateTypeUseNode(func->GetType(), res);
+    }
   }
   return node;
 }
