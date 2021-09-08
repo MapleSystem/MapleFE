@@ -75,12 +75,12 @@ std::string CppDef::EmitModuleNode(ModuleNode *node) {
     str += EmitTreeNode(node) + GetEnding(node);
   }
 
-  str += "\n\n void "s + name + "::__init_func__() { // bind \"this\" to current module\n"s;
+  str += "\n\nvoid "s + name + "::__init_func__() { // bind \"this\" to current module\n"s;
   isInit = true;
   for (unsigned i = 0; i < node->GetTreesNum(); ++i) {
     if (auto n = node->GetTree(i)) {
       if (n->GetKind() != NK_Class)
-        str += EmitTreeNode(n) + ";\n"s;
+        str += "  "s + EmitTreeNode(n) + ";\n"s;
     }
   }
   str += "}\n\n"s + name + " _"s + name + R"""(;
@@ -528,7 +528,7 @@ std::string CppDef::EmitBlockNode(BlockNode *node) {
   std::string str("{\n");
   for (unsigned i = 0; i < node->GetChildrenNum(); ++i) {
     if (auto n = node->GetChildAtIndex(i)) {
-      str += EmitTreeNode(n) + GetEnding(n);
+      str += "  "s + EmitTreeNode(n) + GetEnding(n);
     }
   }
   str += "}\n"s;
