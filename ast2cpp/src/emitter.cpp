@@ -917,6 +917,8 @@ std::string Emitter::EmitStructNode(StructNode *node) {
 
   if (auto n = node->GetStructId()) {
     str += EmitIdentifierNode(n);
+    if (str.substr(0,16) == "AnonymousStruct_")
+      str = "class "s + str;
   }
 
   auto num = node->GetTypeParametersNum();
