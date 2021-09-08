@@ -72,7 +72,7 @@ std::string CppDef::EmitModuleNode(ModuleNode *node) {
     CfgFunc *func = module->GetNestedFuncAtIndex(i);
     TreeNode *node = func->GetFuncNode();
     TreeNode *parent =  node->GetParent();
-    str += EmitTreeNode(node);
+    str += EmitTreeNode(node) + GetEnding(node);
   }
 
   str += "\n\n void "s + name + "::__init_func__() { // bind \"this\" to current module\n"s;
@@ -80,7 +80,7 @@ std::string CppDef::EmitModuleNode(ModuleNode *node) {
   for (unsigned i = 0; i < node->GetTreesNum(); ++i) {
     if (auto n = node->GetTree(i)) {
       if (n->GetKind() != NK_Class)
-        str += EmitTreeNode(n);
+        str += EmitTreeNode(n) + ";\n"s;
     }
   }
   str += "}\n\n"s + name + " _"s + name + R"""(;
@@ -172,7 +172,7 @@ std::string CppDef::EmitClassProps(TreeNode* node) {
     //   ClassFld<long Foo::*> field(&Foo::f1);
     //   obj->AddProp("f1", field.NewProp(TY_Long));
     clsFd   += "  ClassFld<"s + fdType + " "s + c->GetName() + "::*> _field"s + std::to_string(i) +"(&"s +c->GetName()+ "::"s + fdName +");\n"s;
-    addProp += "  obj->AddProp(\""s + fdName + "\", "s + "_field"s + std::to_string(i) + ".NewProp("s + TypeIdToJSType[typeId] + "));\n"s; 
+    addProp += "  obj->AddProp(\""s + fdName + "\", "s + "_field"s + std::to_string(i) + ".NewProp("s + TypeIdToJSType[typeId] + "));\n"s;
   }
   return "\n  // Add class fields to obj prop list\n"s + clsFd + addProp;
 }
@@ -263,8 +263,6 @@ std::string CppDef::EmitIdentifierNode(IdentifierNode *node) {
     str += " = "s + EmitTreeNode(n);
   }
   mPrecedence = '\030';
-  if (node->IsStmt())
-    str += ";\n"s;
   return str;
 }
 
@@ -429,10 +427,8 @@ std::string CppDef::EmitCallNode(CallNode *node) {
   if(!log)
     str += ")"s;
   else
-    str += " << std::endl";
+    str += " << std::endl;";
   mPrecedence = '\024';
-  if (node->IsStmt())
-    str += ";\n"s;
   return str;
 }
 
@@ -470,8 +466,6 @@ std::string CppDef::EmitArrayElementNode(ArrayElementNode *node) {
   Replace(str, "?[", "?.[");
 
   mPrecedence = '\030';
-  if (node->IsStmt())
-    str += ";\n"s;
   return HandleTreeNode(str, node);
 }
 
@@ -505,8 +499,6 @@ std::string CppDef::EmitFieldNode(FieldNode *node) {
     else
       str += "->"s + field;
   }
-  if (node->IsStmt())
-    str += ";\n"s;
   return str;
 }
 
@@ -520,10 +512,10 @@ std::string CppDef::EmitCondBranchNode(CondBranchNode *node) {
   }
   str += ")"s;
   if (auto n = node->GetTrueBranch()) {
-    str += EmitTreeNode(n);
+    str += EmitTreeNode(n) + GetEnding(n);
   }
   if (auto n = node->GetFalseBranch()) {
-    str += "else"s + EmitTreeNode(n);
+    str += "else"s + EmitTreeNode(n) + GetEnding(n);
   }
   if(auto n = node->GetLabel()) {
     str += "__label_break_"s + EmitTreeNode(n) + ":;\n"s;
@@ -537,7 +529,7 @@ std::string CppDef::EmitBlockNode(BlockNode *node) {
   std::string str("{\n");
   for (unsigned i = 0; i < node->GetChildrenNum(); ++i) {
     if (auto n = node->GetChildAtIndex(i)) {
-      str += EmitTreeNode(n);
+      str += EmitTreeNode(n) + GetEnding(n);
     }
   }
   str += "}\n"s;
@@ -558,23 +550,20 @@ std::string CppDef::EmitForLoopNode(ForLoopNode *node) {
       {
         for (unsigned i = 0; i < node->GetInitsNum(); ++i)
           if (auto n = node->GetInitAtIndex(i)) {
-            auto init = EmitTreeNode(n);
             if (i)
               str += ", "s;
-            str += Clean(init);
+            str += EmitTreeNode(n);
           }
         str += "; "s;
         if (auto n = node->GetCond()) {
-          auto cond = EmitTreeNode(n);
-          str += Clean(cond);
+          str += EmitTreeNode(n);
         }
         str += "; "s;
         for (unsigned i = 0; i < node->GetUpdatesNum(); ++i)
           if (auto n = node->GetUpdateAtIndex(i)) {
-            auto update = EmitTreeNode(n);
             if (i)
               str += ", "s;
-            str += Clean(update);
+            str += EmitTreeNode(n);
           }
         break;
       }
@@ -618,7 +607,7 @@ std::string CppDef::EmitForLoopNode(ForLoopNode *node) {
     str += "{\n"s;
   }
   if (auto n = node->GetBody()) {
-    str += EmitTreeNode(n);
+    str += EmitTreeNode(n) + GetEnding(n);
   }
   if(label)
     str += "__label_cont_"s + lstr + ":;\n}\n"s + "__label_break_"s + lstr + ":;\n"s;
@@ -630,7 +619,6 @@ std::string CppDef::EmitBreakNode(BreakNode *node) {
     return std::string();
   auto target = node->GetTarget();
   std::string str = target ? "goto __label_break_"s + EmitTreeNode(target) : "break"s;
-  str += ";\n"s;
   return str;
 }
 
@@ -639,7 +627,6 @@ std::string CppDef::EmitContinueNode(ContinueNode *node) {
     return std::string();
   auto target = node->GetTarget();
   std::string str = target ? "goto __label_cont_"s + EmitTreeNode(target) : "continue"s;
-  str += ";\n"s;
   return str;
 }
 
@@ -740,8 +727,6 @@ std::string CppDef::EmitBinOperatorNode(BinOperatorNode *node) {
       str = lhs + " "s + std::string(op + 1) + " "s + rhs;
   }
   mPrecedence = precd;
-  if (node->IsStmt())
-    str += ";\n"s;
   return str;
 }
 
@@ -768,8 +753,6 @@ std::string CppDef::EmitUnaOperatorNode(UnaOperatorNode *node) {
   else
     str = " "s + std::string(op + 1) + opr;
   mPrecedence = precd;
-  if (node->IsStmt())
-    str += ";\n"s;
   return str;
 }
 
@@ -792,8 +775,6 @@ std::string CppDef::EmitTemplateLiteralNode(TemplateLiteralNode *node) {
     }
   }
   mPrecedence = '\016';
-  if (node->IsStmt())
-    str += ";\n"s;
   return str;
 }
 
@@ -882,8 +863,6 @@ std::string CppDef::EmitTypeOfNode(TypeOfNode *node) {
   if (auto n = node->GetExpr())
     rhs = EmitTreeNode(n);
   str += rhs + ")"s;
-  if (node->IsStmt())
-    str += ";\n"s;
   return HandleTreeNode(str, node);
 }
 
@@ -914,8 +893,6 @@ std::string CppDef::EmitNewNode(NewNode *node) {
     str += " "s + EmitBlockNode(n);
   }
   mPrecedence = '\024';
-  if (node->IsStmt())
-    str += ";\n"s;
   return HandleTreeNode(str, node);
 }
 

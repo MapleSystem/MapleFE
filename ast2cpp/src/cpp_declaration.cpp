@@ -28,7 +28,7 @@ class ClassDecls : public AstVisitor {
     ClassDecls(CppDecl *c) : mCppDecl(c) {}
 
     ClassNode *VisitClassNode(ClassNode *node) {
-      mDecls += mCppDecl->EmitTreeNode(node);
+      mDecls += mCppDecl->EmitTreeNode(node) + ";\n"s;
       return node;
     }
     std::string GetDecls() { return mDecls; }
@@ -51,7 +51,7 @@ class CollectDecls : public AstVisitor {
     }
 
     DeclNode *VisitDeclNode(DeclNode *node) {
-      mDecls += mCppDecl->EmitTreeNode(node);
+      mDecls += mCppDecl->EmitTreeNode(node) + ";\n"s;
       return node;
     }
 
@@ -101,7 +101,7 @@ public: // all top level functions in the module
     CfgFunc *func = module->GetNestedFuncAtIndex(i);
     TreeNode *node = func->GetFuncNode();
     if (node->GetParent() && node->GetParent()->GetKind() != NK_Class) {
-      str += EmitTreeNode(node);
+      str += EmitTreeNode(node) + GetEnding(node);
     }
   }
 
@@ -207,7 +207,6 @@ std::string CppDecl::EmitDeclNode(DeclNode *node) {
         }
       }
     }
-    str += ";\n"s;
   }
   return str;
 }
@@ -337,11 +336,11 @@ std::string CppDecl::GetTypeString(TreeNode *node, TreeNode *child) {
           if (node->GetKind() == NK_UserType) {
             u = static_cast<UserTypeNode*>(node);
           } else if (node->GetKind() == NK_Identifier) {
-            if (!(child && child->GetKind() == NK_UserType)) 
+            if (!(child && child->GetKind() == NK_UserType))
               break;
             u = static_cast<UserTypeNode*>((static_cast<IdentifierNode *>(node))->GetType());
           } else {
-            if (!(child && child->GetKind() == NK_UserType)) 
+            if (!(child && child->GetKind() == NK_UserType))
               break;
             u = static_cast<UserTypeNode*>((static_cast<FunctionNode *>(node))->GetType());
           }
@@ -411,7 +410,7 @@ std::string CppDecl::EmitUserTypeNode(UserTypeNode *node) {
   std::string str;
   if (auto n = node->GetId()) {
     if (node->GetDims()) {
-      return GetTypeString(node, node->GetId()); 
+      return GetTypeString(node, node->GetId());
     } else {
       str = EmitTreeNode(n);
     }
@@ -444,8 +443,6 @@ std::string CppDecl::EmitUserTypeNode(UserTypeNode *node) {
   if (auto n = node->GetDims()) {
     str += EmitDimensionNode(n);
   }
-  if (node->IsStmt())
-    str += ";\n"s;
   return HandleTreeNode(str, node);
 }
 
@@ -551,9 +548,6 @@ std::string CppDecl::EmitNewNode(NewNode *node) {
   }
   str += ")"s;
   mPrecedence = '\024';
-  if (node->IsStmt()) {
-    str += ";\n"s;
-  }
   return str;
 }
 

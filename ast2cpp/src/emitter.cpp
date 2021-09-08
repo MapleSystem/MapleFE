@@ -28,7 +28,7 @@ std::string Emitter::Emit(const char *title) {
   return code;
 }
 
-static std::string GetEnding(TreeNode *n) {
+std::string Emitter::GetEnding(TreeNode *n) {
   if (n->GetKind() == NK_Export) {
     ExportNode *ex = static_cast<ExportNode *>(n);
     if (ex->GetPairsNum() == 1) {

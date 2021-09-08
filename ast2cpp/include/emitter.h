@@ -38,6 +38,7 @@ public:
   Emitter(ModuleNode *m) : mASTModule(m) {}
 
   std::string Emit(const char *title);
+  std::string GetEnding(TreeNode *n);
   std::string Clean(std::string &s);
   std::string GetBaseFileName();
   std::string GetModuleName(const char *p = nullptr);
