@@ -311,7 +311,7 @@ bool IsBuiltinObj(std::string name) {
 std::string GetUserTypeString(UserTypeNode* n) {
   std::string str="";
   if (n->GetId()->GetTypeId() == TY_Class)
-    str = n->GetName() + "*"s;
+    str = n->GetId()->GetName() + "*"s;
   else if (IsBuiltinObj(n->GetId()->GetName()))
     str = "t2crt::"s + n->GetId()->GetName() + "*"s;
   else // TypeAlias Id
