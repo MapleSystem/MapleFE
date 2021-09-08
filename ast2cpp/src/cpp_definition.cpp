@@ -847,7 +847,7 @@ out_of_loops:
         body += "__case_"s + std::to_string(cn->GetNodeId()) + ":\n"s;
         for (unsigned s = 0; s < cn->GetStmtsNum(); ++s)
           if (TreeNode* t = cn->GetStmtAtIndex(s))
-            body += EmitTreeNode(t);
+            body += EmitTreeNode(t) + ";\n"s;
       }
     str += other + body;
     str += "} while(0);\n"s;
