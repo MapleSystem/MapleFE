@@ -552,7 +552,8 @@ std::string CppDef::EmitForLoopNode(ForLoopNode *node) {
           if (auto n = node->GetInitAtIndex(i)) {
             if (i)
               str += ", "s;
-            str += EmitTreeNode(n);
+            auto s = EmitTreeNode(n);
+            str += Clean(s);
           }
         str += "; "s;
         if (auto n = node->GetCond()) {
