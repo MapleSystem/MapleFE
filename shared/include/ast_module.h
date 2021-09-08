@@ -66,6 +66,7 @@ public:
   TreeNode* GetTree(unsigned i) {return mTrees.ValueAtIndex(i);}
   void SetTree(unsigned i, TreeNode* t)  {*(mTrees.RefAtIndex(i)) = t;}
   void AddTree(TreeNode* t);
+  void AddTreeFront(TreeNode* t);
 
   void InsertAfter(TreeNode *new_stmt, TreeNode *exist_stmt) {
     mTrees.LocateValue(exist_stmt);

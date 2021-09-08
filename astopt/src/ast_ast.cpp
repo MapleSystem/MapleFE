@@ -67,17 +67,13 @@ IdentifierNode *AdjustASTVisitor::VisitIdentifierNode(IdentifierNode *node) {
 
 StructNode *AdjustASTVisitor::GetCanonicStructNode(StructNode *node) {
   unsigned size = node->GetFieldsNum();
-  if (mFieldNum2StructNodeIdMap.find(size) == mFieldNum2StructNodeIdMap.end()) {
-    mFieldNum2StructNodeIdMap[size].insert(node);
-    return node;
-  }
   for (auto s: mFieldNum2StructNodeIdMap[size]) {
     // quick check
     if (s->GetMethodsNum() != node->GetMethodsNum() ||
         s->GetSupersNum() != node->GetSupersNum() ||
         s->GetTypeParametersNum() != node->GetTypeParametersNum() ||
         s->GetProp() != node->GetProp() ||
-        s->GetStructId() != node->GetStructId()) {
+        (s->GetStructId() && node->GetStructId() && s->GetStructId() != node->GetStructId())) {
       break;
     }
     bool match = true;;
@@ -114,8 +110,31 @@ StructNode *AdjustASTVisitor::GetCanonicStructNode(StructNode *node) {
       return s;
     }
   }
+  // not match
+  IdentifierNode *id = node->GetStructId();
+  if (!id) {
+    id = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
+    new (id) IdentifierNode(0);
+    node->SetStructId(id);
+  }
+  unsigned stridx = id->GetStrIdx();
+  // anonymous struct will be added to module scope
+  if (stridx == 0) {
+    AddAnonymousStruct(node);
+  }
   mFieldNum2StructNodeIdMap[size].insert(node);
   return node;
+}
+
+void AdjustASTVisitor::AddAnonymousStruct(StructNode *node) {
+  std::string str("AnonymousStruct_");
+  str += std::to_string(mNum++);
+  unsigned stridx = gStringPool.GetStrIdx(str);
+  node->SetStrIdx(stridx);
+  node->GetStructId()->SetStrIdx(stridx);
+
+  ModuleNode *module = mHandler->GetASTModule();
+  module->AddTreeFront(node);
 }
 
 StructNode *AdjustASTVisitor::VisitStructNode(StructNode *node) {
@@ -124,7 +143,16 @@ StructNode *AdjustASTVisitor::VisitStructNode(StructNode *node) {
   if (id && node->GetStrIdx() == 0) {
     node->SetStrIdx(id->GetStrIdx());
   }
+  TreeNode *parent = node->GetParent();
   node = GetCanonicStructNode(node);
+  if (!parent || !parent->IsModule()) {
+    IdentifierNode *newid = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
+    new (newid) IdentifierNode(node->GetStructId()->GetStrIdx());
+
+    UserTypeNode *utype = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
+    new (utype) UserTypeNode(newid);
+    node = (StructNode*)utype;
+  }
   return node;
 }
 

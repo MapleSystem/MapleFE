@@ -45,15 +45,18 @@ class AdjustASTVisitor : public AstVisitor {
   Module_Handler *mHandler;
   unsigned       mFlags;
   bool           mUpdated;
+  unsigned       mNum;
 
   std::unordered_map<unsigned, std::unordered_set<StructNode *>> mFieldNum2StructNodeIdMap;
 
  public:
   explicit AdjustASTVisitor(Module_Handler *h, unsigned f, bool base = false)
-    : mHandler(h), mFlags(f), AstVisitor((f & FLG_trace_1) && base) {}
+    : mHandler(h), mFlags(f), mUpdated(false), mNum(1),
+      AstVisitor((f & FLG_trace_1) && base) {}
   ~AdjustASTVisitor() = default;
 
   StructNode *GetCanonicStructNode(StructNode *node);
+  void AddAnonymousStruct(StructNode *node);
 
   TreeNode *CreateTypeNodeFromName(IdentifierNode *node);
 

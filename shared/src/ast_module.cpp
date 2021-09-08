@@ -53,6 +53,11 @@ std::string ModuleNode::GetSrcLangString() {
   return "Unknown";
 }
 
+void ModuleNode::AddTreeFront(TreeNode *tree) {
+  mTrees.PushFront(tree);
+  tree->SetParent(this);
+}
+
 // The tree could be PassNode
 void ModuleNode::AddTree(TreeNode *tree) {
   if (tree->IsDecl()) {
