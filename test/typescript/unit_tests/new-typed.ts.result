@@ -1,0 +1,18 @@
+Matched 8 tokens.
+Matched 15 tokens.
+Matched 25 tokens.
+============= Module ===========
+== Sub Tree ==
+class  A
+  Fields: 
+    a
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+js_var Decl: x=A
+== Sub Tree ==
+js_var Decl: y=new A()

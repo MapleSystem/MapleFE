@@ -1,0 +1,3 @@
+let john = {
+  lastName: "Smith"
+};
