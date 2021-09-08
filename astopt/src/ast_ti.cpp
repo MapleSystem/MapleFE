@@ -97,6 +97,18 @@ IdentifierNode *BuildIdNodeToDeclVisitor::VisitIdentifierNode(IdentifierNode *no
   return node;
 }
 
+#undef  TYPE
+#undef  PRIMTYPE
+#define TYPE(T)
+#define PRIMTYPE(T) case TY_##T: return true;
+bool TypeInferVisitor::IsPrimTypeId(TypeId tid) {
+  switch (tid) {
+#include "supported_types.def"
+    default: return false;
+  }
+  return false;
+}
+
 TypeId TypeInferVisitor::MergeTypeId(TypeId tia, TypeId tib) {
   if (tia == tib || tib == TY_None) {
     return tia;
@@ -423,13 +435,47 @@ void TypeInferVisitor::UpdateVarTypeWithInit(TreeNode *var, TreeNode *init) {
           IdentifierNode *newid = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
           new (newid) IdentifierNode(id->GetStrIdx());
           newid->SetScope(init->GetScope());
+
           UserTypeNode *utype = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
           new (utype) UserTypeNode(newid);
+
           newid->SetParent(utype);
           utype->SetParent(idnode);
           idnode->SetType(utype);
           SetUpdated();
         }
+      }
+    } else if (init->IsArrayLiteral()) {
+      TypeId tid = GetArrayElemTypeId(init);
+      if (IsPrimTypeId(tid)) {
+        PrimTypeNode *pt = (PrimTypeNode*)gTreePool.NewTreeNode(sizeof(PrimTypeNode));
+        new (pt) PrimTypeNode();
+        pt->SetPrimType(tid);
+
+        PrimArrayTypeNode *pat = (PrimArrayTypeNode*)gTreePool.NewTreeNode(sizeof(PrimArrayTypeNode));
+        new (pat) PrimArrayTypeNode();
+        pat->SetPrim(pt);
+
+        DimensionNode *dims = (DimensionNode*)gTreePool.NewTreeNode(sizeof(DimensionNode));
+        new (dims) DimensionNode();
+        pat->SetDims(dims);
+
+        // add each dimension
+        TreeNode *n = init;
+        while (n->IsArrayLiteral()) {
+          ArrayLiteralNode *al = static_cast<ArrayLiteralNode *>(n);
+          if (al->GetLiteralsNum()) {
+            dims->AddDimension(al->GetLiteralsNum());
+            n = al->GetLiteral(0);
+          } else {
+            dims->AddDimension(0);
+            break;
+          }
+        }
+
+        pat->SetParent(idnode);
+        idnode->SetType(pat);
+        SetUpdated();
       }
     }
   }

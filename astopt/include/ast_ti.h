@@ -87,6 +87,8 @@ class TypeInferVisitor : public TypeInferBaseVisitor {
     : mHandler(h), mFlags(f), TypeInferBaseVisitor(f, base) {}
   ~TypeInferVisitor() = default;
 
+  bool IsPrimTypeId(TypeId tid);
+
   bool GetUpdated() {return mUpdated;}
   void SetUpdated(bool b = true) {mUpdated = b;}
 
