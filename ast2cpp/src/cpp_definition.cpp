@@ -353,7 +353,6 @@ std::string CppDef::EmitDeclNode(DeclNode *node) {
   } else {
     str = name;
   }
-  str += ";\n"s;
   return str;
 }
 
@@ -552,8 +551,7 @@ std::string CppDef::EmitForLoopNode(ForLoopNode *node) {
           if (auto n = node->GetInitAtIndex(i)) {
             if (i)
               str += ", "s;
-            auto s = EmitTreeNode(n);
-            str += Clean(s);
+            str += EmitTreeNode(n);
           }
         str += "; "s;
         if (auto n = node->GetCond()) {
