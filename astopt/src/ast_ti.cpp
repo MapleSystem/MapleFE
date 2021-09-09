@@ -465,7 +465,8 @@ void TypeInferVisitor::UpdateVarTypeWithInit(TreeNode *var, TreeNode *init) {
         while (n->IsArrayLiteral()) {
           ArrayLiteralNode *al = static_cast<ArrayLiteralNode *>(n);
           if (al->GetLiteralsNum()) {
-            dims->AddDimension(al->GetLiteralsNum());
+            //dims->AddDimension(al->GetLiteralsNum());
+            dims->AddDimension(0); // Do not specify its length for an array type
             n = al->GetLiteral(0);
           } else {
             dims->AddDimension(0);

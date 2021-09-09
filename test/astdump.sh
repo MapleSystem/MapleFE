@@ -99,7 +99,7 @@ for ts in $LIST; do
     eval $cmd <<< "$out" > "$T"
     [ -z "$NAME" ] || sed -i 's/__v[0-9][0-9]*//g' "$T"
     clang-format-10 -i --style="{ColumnLimit: 120, JavaScriptWrapImports: false, AlignOperands: DontAlign}" "$T"
-    sed -i 's/?? =/??=/g' "$T"
+    sed -i -e 's/?? =/??=/g' -e 's/ int\[/ number[/g' "$T"
     echo -e "\n====== TS Reformatted ======\n"
     $HIGHLIGHT "$T"
     echo TREEDIFF=$TREEDIFF
