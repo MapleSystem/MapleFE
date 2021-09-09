@@ -143,7 +143,17 @@ StructNode *AdjustASTVisitor::VisitStructNode(StructNode *node) {
   if (id && node->GetStrIdx() == 0) {
     node->SetStrIdx(id->GetStrIdx());
   }
+
+  // skip for TypeAlias
   TreeNode *parent = node->GetParent();
+  while (parent) {
+    if (parent->IsTypeAlias()) {
+      return node;
+    }
+    parent = parent->GetParent();
+  }
+
+  parent = node->GetParent();
   node = GetCanonicStructNode(node);
   if (!parent || !parent->IsModule()) {
     IdentifierNode *newid = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
