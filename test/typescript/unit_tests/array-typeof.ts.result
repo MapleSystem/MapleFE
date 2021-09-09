@@ -1,12 +1,22 @@
 Matched 4 tokens.
-Matched 8 tokens.
-Matched 12 tokens.
-Matched 26 tokens.
+Matched 13 tokens.
+Matched 22 tokens.
+Matched 36 tokens.
 ============= Module ===========
+== Sub Tree ==
+class  VType
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
 == Sub Tree ==
 class  V2
   Fields: 
-
+    s
   Instance Initializer: 
   Constructors: 
   Methods: 
@@ -16,17 +26,7 @@ class  V2
 == Sub Tree ==
 class  V3
   Fields: 
-
-  Instance Initializer: 
-  Constructors: 
-  Methods: 
-  LocalClasses: 
-  LocalInterfaces: 
-
-== Sub Tree ==
-class  VType
-  Fields: 
-
+    n
   Instance Initializer: 
   Constructors: 
   Methods: 
