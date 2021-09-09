@@ -118,6 +118,9 @@ TreeNode *AdjustASTVisitor::GetCanonicStructNode(TreeNode *node) {
           match = false;
           break;
         }
+      } else {
+        match = false;
+        break;
       }
     }
 
