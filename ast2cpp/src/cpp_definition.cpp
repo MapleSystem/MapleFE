@@ -895,4 +895,85 @@ std::string CppDef::EmitNewNode(NewNode *node) {
   return HandleTreeNode(str, node);
 }
 
+static std::string MethodString(std::string &func) {
+  size_t s = func.substr(0, 9) == "function " ? 9 : 0;
+  return func.back() == '}' ? func.substr(s) + "\n"s : func.substr(s) + ";\n"s;
+}
+
+std::string CppDef::EmitStructNode(StructNode *node) {
+  if (node == nullptr)
+    return std::string();
+  std::string str;
+  const char *suffix = ";\n";
+  switch(node->GetProp()) {
+    case SProp_CStruct:
+      str = "struct "s;
+      break;
+    case SProp_TSInterface:
+      str = "interface "s;
+      break;
+    case SProp_TSEnum: {
+      // Create the enum type object
+      std::string enumClsName;
+      if (auto n = node->GetStructId()) {
+        enumClsName = "Enum_"s + n->GetName();
+        str += enumClsName + "* "s + n->GetName() + " = new "s + enumClsName + "();\n"s;
+        return str;
+      }
+      break;
+    }
+    case SProp_NA:
+      str = ""s;
+      break;
+    default:
+      MASSERT(0 && "Unexpected enumerator");
+  }
+
+  if (auto n = node->GetStructId()) {
+    str += EmitIdentifierNode(n);
+  }
+
+  auto num = node->GetTypeParametersNum();
+  if(num) {
+    str += "<"s;
+    for (unsigned i = 0; i < num; ++i) {
+      if (i)
+        str += ", "s;
+      if (auto n = node->GetTypeParameterAtIndex(i))
+        str += EmitTreeNode(n);
+    }
+    str += ">"s;
+  }
+
+  for (unsigned i = 0; i < node->GetSupersNum(); ++i) {
+    str += i ? ", "s : " extends "s;
+    if (auto n = node->GetSuper(i))
+      str += EmitTreeNode(n);
+  }
+  str += " {\n"s;
+  for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
+    if (auto n = node->GetField(i)) {
+      str += EmitTreeNode(n) + suffix;
+    }
+  }
+
+  if (auto n = node->GetNumIndexSig()) {
+    str += EmitNumIndexSigNode(n) + "\n"s;;
+  }
+  if (auto n = node->GetStrIndexSig()) {
+    str += EmitStrIndexSigNode(n) + "\n";
+  }
+
+  for (unsigned i = 0; i < node->GetMethodsNum(); ++i) {
+    if (auto n = node->GetMethod(i)) {
+      std::string func = EmitFunctionNode(n);
+      func = Clean(func);
+      str += MethodString(func);
+    }
+  }
+
+  str += "}\n"s;
+  return HandleTreeNode(str, node);
+}
+
 } // namespace maplefe

@@ -81,7 +81,7 @@ class Ctor_Array: public Function {
 #define ARR_CTOR(NM)     NM(&Function_ctor, Function_ctor.prototype, Object_ctor.prototype)
 
 // Need all text type name for macros to generate names for predefined Array type constuctors.
-using ObjectP = Object*;
+using ObjectP = t2crt::Object*;
 
 // predefined Array constructors for dimension 1-3 and basic types
 #define ARRAY_CTOR_DECL(type)  \
