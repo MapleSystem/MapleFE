@@ -174,6 +174,27 @@ void AdjustASTVisitor::AddAnonymousStruct(TreeNode *node) {
   module->AddTreeFront(node);
 }
 
+TypeAliasNode *AdjustASTVisitor::CreateTypeAlias(TreeNode *to, TreeNode *from) {
+  IdentifierNode *id1 = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
+  new (id1) IdentifierNode(from->GetStrIdx());
+
+  UserTypeNode *utype1 = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
+  new (utype1) UserTypeNode(id1);
+
+  IdentifierNode *id2 = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
+  new (id2) IdentifierNode(to->GetStrIdx());
+
+  UserTypeNode *utype2 = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
+  new (utype2) UserTypeNode(id2);
+
+  TypeAliasNode *alias = (TypeAliasNode*)gTreePool.NewTreeNode(sizeof(TypeAliasNode));
+  new (alias) TypeAliasNode();
+  alias->SetId(utype1);
+  alias->SetAlias(utype2);
+
+  return alias;
+}
+
 ClassNode *AdjustASTVisitor::VisitClassNode(ClassNode *node) {
   (void) AstVisitor::VisitClassNode(node);
   // skip getting canonical type if not only fields
@@ -182,28 +203,11 @@ ClassNode *AdjustASTVisitor::VisitClassNode(ClassNode *node) {
     return node;
   }
 
-  TreeNode *newnode = (ClassNode*)GetCanonicStructNode(node);
+  TreeNode *newnode = GetCanonicStructNode(node);
 
   // create a TypeAlias for duplicated type if top level
   if (newnode != node && node->GetParent() && node->GetParent()->IsModule()) {
-    IdentifierNode *id1 = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
-    new (id1) IdentifierNode(node->GetStrIdx());
-
-    UserTypeNode *utype1 = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
-    new (utype1) UserTypeNode(id1);
-
-    IdentifierNode *id2 = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
-    new (id2) IdentifierNode(newnode->GetStrIdx());
-
-    UserTypeNode *utype2 = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
-    new (utype2) UserTypeNode(id2);
-
-    TypeAliasNode *alias = (TypeAliasNode*)gTreePool.NewTreeNode(sizeof(TypeAliasNode));
-    new (alias) TypeAliasNode();
-    alias->SetId(utype1);
-    alias->SetAlias(utype2);
-
-    node = (ClassNode*)alias;
+    node = (ClassNode*)CreateTypeAlias(newnode, node);;
   } else {
     node = (ClassNode*)newnode;
   }
@@ -218,7 +222,15 @@ InterfaceNode *AdjustASTVisitor::VisitInterfaceNode(InterfaceNode *node) {
     return node;
   }
 
-  node = (InterfaceNode*)GetCanonicStructNode(node);
+  TreeNode *newnode = GetCanonicStructNode(node);
+
+  // create a TypeAlias for duplicated type if top level
+  if (newnode != node && node->GetParent() && node->GetParent()->IsModule()) {
+    node = (InterfaceNode*)CreateTypeAlias(newnode, node);;
+  } else {
+    node = (InterfaceNode*)newnode;
+  }
+
   return node;
 }
 
@@ -243,7 +255,15 @@ StructNode *AdjustASTVisitor::VisitStructNode(StructNode *node) {
     return node;
   }
 
-  node = (StructNode*)GetCanonicStructNode(node);
+  TreeNode *newnode = GetCanonicStructNode(node);
+
+  // create a TypeAlias for duplicated type if top level
+  if (newnode != node && node->GetParent() && node->GetParent()->IsModule()) {
+    node = (StructNode*)CreateTypeAlias(newnode, node);;
+  } else {
+    node = (StructNode*)newnode;
+  }
+
   return node;
 }
 

@@ -61,6 +61,7 @@ class AdjustASTVisitor : public AstVisitor {
   void AddAnonymousStruct(TreeNode *node);
 
   TreeNode *CreateTypeNodeFromName(IdentifierNode *node);
+  TypeAliasNode *CreateTypeAlias(TreeNode *to, TreeNode *from);
 
   DeclNode *VisitDeclNode(DeclNode *node);
   ExportNode *VisitExportNode(ExportNode *node);
