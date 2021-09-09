@@ -65,22 +65,51 @@ IdentifierNode *AdjustASTVisitor::VisitIdentifierNode(IdentifierNode *node) {
   return node;
 }
 
-StructNode *AdjustASTVisitor::GetCanonicStructNode(StructNode *node) {
-  unsigned size = node->GetFieldsNum();
-  for (auto s: mFieldNum2StructNodeIdMap[size]) {
-    // quick check
-    if (s->GetMethodsNum() != node->GetMethodsNum() ||
-        s->GetSupersNum() != node->GetSupersNum() ||
-        s->GetTypeParametersNum() != node->GetTypeParametersNum() ||
-        s->GetProp() != node->GetProp() ||
-        (s->GetStructId() && node->GetStructId() && s->GetStructId() != node->GetStructId())) {
+unsigned AdjustASTVisitor::GetFieldSize(TreeNode *node) {
+  unsigned size = 0;
+  switch (node->GetKind()) {
+    case NK_Struct:
+      size = static_cast<StructNode *>(node)->GetFieldsNum();
       break;
-    }
+    case NK_Class:
+      size = static_cast<ClassNode *>(node)->GetFieldsNum();
+      break;
+    case NK_Interface:
+      size = static_cast<InterfaceNode *>(node)->GetFieldsNum();
+      break;
+    default:
+      break;
+  }
+  return size;
+}
+
+TreeNode *AdjustASTVisitor::GetField(TreeNode *node, unsigned i) {
+  TreeNode *fld = NULL;
+  switch (node->GetKind()) {
+    case NK_Struct:
+      fld = static_cast<StructNode *>(node)->GetField(i);
+      break;
+    case NK_Class:
+      fld = static_cast<ClassNode *>(node)->GetField(i);
+      break;
+    case NK_Interface:
+      fld = static_cast<InterfaceNode *>(node)->GetFieldAtIndex(i);
+      break;
+    default:
+      break;
+  }
+  return fld;
+}
+
+TreeNode *AdjustASTVisitor::GetCanonicStructNode(TreeNode *node) {
+  unsigned size = GetFieldSize(node);
+
+  for (auto s: mFieldNum2StructNodeIdMap[size]) {
     bool match = true;;
     // check fields
     for (unsigned fid = 0; fid < size; fid++) {
-      TreeNode *f0 = node->GetField(fid);
-      TreeNode *f1 = s->GetField(fid);
+      TreeNode *f0 = GetField(node, fid);
+      TreeNode *f1 = GetField(s, fid);
       if (f0->IsIdentifier() && f1->IsIdentifier()) {
         IdentifierNode *i0 = static_cast<IdentifierNode *>(f0);
         IdentifierNode *i1 = static_cast<IdentifierNode *>(f1);
@@ -92,49 +121,105 @@ StructNode *AdjustASTVisitor::GetCanonicStructNode(StructNode *node) {
       }
     }
 
-    // check methods
-    size = node->GetMethodsNum();
-    for (unsigned mid = 0; mid < size; mid++) {
-      TreeNode *m0 = node->GetMethod(mid);
-      TreeNode *m1 = s->GetMethod(mid);
-      // TODO:
-      if (m0->GetStrIdx() != m1->GetStrIdx()) {
-        match = false;
-        break;
-      }
-    }
-
-    // TODO: more checks
-
     if (match) {
       return s;
     }
   }
+
   // not match
-  IdentifierNode *id = node->GetStructId();
-  if (!id) {
-    id = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
-    new (id) IdentifierNode(0);
-    node->SetStructId(id);
-  }
-  unsigned stridx = id->GetStrIdx();
+  unsigned stridx = node->GetStrIdx();
+  TreeNode *parent_orig = node->GetParent();
+
   // anonymous struct will be added to module scope
   if (stridx == 0) {
+    // parent could be modified
     AddAnonymousStruct(node);
   }
   mFieldNum2StructNodeIdMap[size].insert(node);
+
+  // for non root tree node, replace it with a UserType node
+  // node: use the node's oritinal parent_orig
+  if (!parent_orig || !parent_orig->IsModule()) {
+    IdentifierNode *newid = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
+    new (newid) IdentifierNode(node->GetStrIdx());
+
+    UserTypeNode *utype = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
+    new (utype) UserTypeNode(newid);
+    node = utype;
+  }
   return node;
 }
 
-void AdjustASTVisitor::AddAnonymousStruct(StructNode *node) {
+void AdjustASTVisitor::AddAnonymousStruct(TreeNode *node) {
   std::string str("AnonymousStruct_");
   str += std::to_string(mNum++);
   unsigned stridx = gStringPool.GetStrIdx(str);
   node->SetStrIdx(stridx);
-  node->GetStructId()->SetStrIdx(stridx);
+
+  // for struct node, set structid
+  if (node->IsStruct()) {
+    StructNode *snode = static_cast<StructNode *>(node);
+    IdentifierNode *id = snode->GetStructId();
+    if (!id) {
+      id = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
+      new (id) IdentifierNode(0);
+      snode->SetStructId(id);
+    }
+
+    // set stridx for structid
+    id->SetStrIdx(stridx);
+  }
 
   ModuleNode *module = mHandler->GetASTModule();
   module->AddTreeFront(node);
+}
+
+ClassNode *AdjustASTVisitor::VisitClassNode(ClassNode *node) {
+  (void) AstVisitor::VisitClassNode(node);
+  // skip getting canonical type if not only fields
+  if (node->GetMethodsNum() || node->GetSuperClassesNum() || node->GetSuperInterfacesNum() ||
+      node->GetSuperClassesNum() || node->GetTypeParametersNum()) {
+    return node;
+  }
+
+  TreeNode *newnode = (ClassNode*)GetCanonicStructNode(node);
+
+  // create a TypeAlias for duplicated type if top level
+  if (newnode != node && node->GetParent() && node->GetParent()->IsModule()) {
+    IdentifierNode *id1 = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
+    new (id1) IdentifierNode(node->GetStrIdx());
+
+    UserTypeNode *utype1 = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
+    new (utype1) UserTypeNode(id1);
+
+    IdentifierNode *id2 = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
+    new (id2) IdentifierNode(newnode->GetStrIdx());
+
+    UserTypeNode *utype2 = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
+    new (utype2) UserTypeNode(id2);
+
+    TypeAliasNode *alias = (TypeAliasNode*)gTreePool.NewTreeNode(sizeof(TypeAliasNode));
+    new (alias) TypeAliasNode();
+    alias->SetId(utype1);
+    alias->SetAlias(utype2);
+
+    node = (ClassNode*)alias;
+  } else {
+    node = (ClassNode*)newnode;
+  }
+
+  return node;
+}
+
+InterfaceNode *AdjustASTVisitor::VisitInterfaceNode(InterfaceNode *node) {
+  (void) AstVisitor::VisitInterfaceNode(node);
+  // skip getting canonical type if not only fields
+  if (node->GetMethodsNum() || node->GetSuperInterfacesNum()) {
+    return node;
+  }
+
+  node = (InterfaceNode*)GetCanonicStructNode(node);
+  return node;
 }
 
 StructNode *AdjustASTVisitor::VisitStructNode(StructNode *node) {
@@ -144,7 +229,7 @@ StructNode *AdjustASTVisitor::VisitStructNode(StructNode *node) {
     node->SetStrIdx(id->GetStrIdx());
   }
 
-  // skip for TypeAlias
+  // skip getting canonical type for TypeAlias
   TreeNode *parent = node->GetParent();
   while (parent) {
     if (parent->IsTypeAlias()) {
@@ -153,16 +238,12 @@ StructNode *AdjustASTVisitor::VisitStructNode(StructNode *node) {
     parent = parent->GetParent();
   }
 
-  parent = node->GetParent();
-  node = GetCanonicStructNode(node);
-  if (!parent || !parent->IsModule()) {
-    IdentifierNode *newid = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
-    new (newid) IdentifierNode(node->GetStructId()->GetStrIdx());
-
-    UserTypeNode *utype = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
-    new (utype) UserTypeNode(newid);
-    node = (StructNode*)utype;
+  // skip getting canonical type if not only fields
+  if (node->GetMethodsNum() || node->GetSupersNum() || node->GetTypeParametersNum()) {
+    return node;
   }
+
+  node = (StructNode*)GetCanonicStructNode(node);
   return node;
 }
 

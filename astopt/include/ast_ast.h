@@ -47,7 +47,7 @@ class AdjustASTVisitor : public AstVisitor {
   bool           mUpdated;
   unsigned       mNum;
 
-  std::unordered_map<unsigned, std::unordered_set<StructNode *>> mFieldNum2StructNodeIdMap;
+  std::unordered_map<unsigned, std::unordered_set<TreeNode *>> mFieldNum2StructNodeIdMap;
 
  public:
   explicit AdjustASTVisitor(Module_Handler *h, unsigned f, bool base = false)
@@ -55,8 +55,10 @@ class AdjustASTVisitor : public AstVisitor {
       AstVisitor((f & FLG_trace_1) && base) {}
   ~AdjustASTVisitor() = default;
 
-  StructNode *GetCanonicStructNode(StructNode *node);
-  void AddAnonymousStruct(StructNode *node);
+  unsigned GetFieldSize(TreeNode *node);
+  TreeNode *GetField(TreeNode *node, unsigned i);
+  TreeNode *GetCanonicStructNode(TreeNode *node);
+  void AddAnonymousStruct(TreeNode *node);
 
   TreeNode *CreateTypeNodeFromName(IdentifierNode *node);
 
@@ -67,6 +69,8 @@ class AdjustASTVisitor : public AstVisitor {
   LambdaNode *VisitLambdaNode(LambdaNode *node);
   IdentifierNode *VisitIdentifierNode(IdentifierNode *node);
   StructNode *VisitStructNode(StructNode *node);
+  ClassNode *VisitClassNode(ClassNode *node);
+  InterfaceNode *VisitInterfaceNode(InterfaceNode *node);
   FunctionNode *VisitFunctionNode(FunctionNode *node);
   UserTypeNode *VisitUserTypeNode(UserTypeNode *node);
 };
