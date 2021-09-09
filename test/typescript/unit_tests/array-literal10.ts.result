@@ -1,20 +1,20 @@
-Matched 42 tokens.
-Matched 73 tokens.
-Matched 78 tokens.
-Matched 85 tokens.
-Matched 104 tokens.
-Matched 111 tokens.
-Matched 121 tokens.
-Matched 124 tokens.
-Matched 140 tokens.
-Matched 147 tokens.
-Matched 148 tokens.
-Matched 149 tokens.
+Matched 50 tokens.
+Matched 81 tokens.
+Matched 90 tokens.
+Matched 97 tokens.
+Matched 116 tokens.
+Matched 123 tokens.
+Matched 133 tokens.
+Matched 136 tokens.
+Matched 152 tokens.
+Matched 159 tokens.
+Matched 160 tokens.
+Matched 161 tokens.
 ============= Module ===========
 == Sub Tree ==
 class  Foo
   Fields: 
-    f1=0    f2=0
+    number    f1=0    f2=0
   Instance Initializer: 
   Constructors: 
     constructor  (a,b)  throws: 
@@ -30,7 +30,7 @@ js_var Decl: funcs=[func  func()  throws:
   return new Foo(789,0)
 ]
 == Sub Tree ==
-js_var Decl: obj
+js_var Decl: obj=undefined
 == Sub Tree ==
 js_var Decl: i=1
 == Sub Tree ==

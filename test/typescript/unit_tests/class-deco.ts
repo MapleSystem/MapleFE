@@ -1,4 +1,4 @@
-function class_deco(ctor): void {
+function class_deco(ctor: Function): void {
   console.log("Class constructor is :", ctor);
 }
 @class_deco

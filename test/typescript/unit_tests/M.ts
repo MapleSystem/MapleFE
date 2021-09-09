@@ -4,6 +4,6 @@ export { x as default }; // ref
 export function getx(): number {
   return x;
 }
-export function setx(v): void {
+export function setx(v: number): void {
   x = v;
 }
