@@ -1,0 +1,32 @@
+Matched 8 tokens.
+Matched 19 tokens.
+Matched 43 tokens.
+Matched 63 tokens.
+Matched 73 tokens.
+Matched 80 tokens.
+============= Module ===========
+== Sub Tree ==
+ts_interface: IFace {name }
+== Sub Tree ==
+ts_interface: ICtor {func  (name)  throws: 
+ }
+== Sub Tree ==
+class  Car
+  Fields: 
+    name
+  Instance Initializer: 
+  Constructors: 
+    constructor  (n)  throws: 
+      this.name Assign n
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+func  carFactory(myClass,name)  throws: 
+  return new myClass(name)
+
+== Sub Tree ==
+js_let Decl: car=carFactory(Car,"myCar")
+== Sub Tree ==
+console.log(car)
