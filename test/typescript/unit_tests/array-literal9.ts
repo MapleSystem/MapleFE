@@ -1,4 +1,5 @@
 class Foo {
+  [key: string]: number;
   public f1: number = 0;
   private f2: number = 0;
   constructor(a: number, b: number) {
@@ -10,7 +11,7 @@ function func(): Foo {
   console.log("Returning a new object");
   return new Foo(789, 0);
 }
-var obj: Foo;
+var obj: Foo | undefined = undefined;
 var i: number = 1;
 var res: number = (obj || func())[`f${i}`];
 console.log(res);

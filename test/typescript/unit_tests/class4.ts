@@ -5,7 +5,7 @@ class Foo {
   }
 }
 
-function func(args: [d: string, i: string], obj?: string): string {
+function func(args?: [d: string, i: string], obj?: string): string {
   return "abc";
 }
 var obj: Foo = new Foo(func);

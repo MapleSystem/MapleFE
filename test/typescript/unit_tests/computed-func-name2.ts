@@ -1,6 +1,7 @@
 let prop: string = "foo";
 
 class Klass {
+  [key: string]: () => void;
   public [prop]() {
     console.log("prop =", prop);
   }

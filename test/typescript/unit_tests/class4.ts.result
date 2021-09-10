@@ -1,7 +1,7 @@
 Matched 45 tokens.
-Matched 72 tokens.
-Matched 83 tokens.
-Matched 92 tokens.
+Matched 73 tokens.
+Matched 84 tokens.
+Matched 93 tokens.
 ============= Module ===========
 == Sub Tree ==
 class  Foo
@@ -16,7 +16,7 @@ class  Foo
   LocalInterfaces: 
 
 == Sub Tree ==
-func  func(args,obj?)  throws: 
+func  func(args?,obj?)  throws: 
   return "abc"
 
 == Sub Tree ==

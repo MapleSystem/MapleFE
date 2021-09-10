@@ -1,7 +1,7 @@
 Matched 4 tokens.
-Matched 13 tokens.
-Matched 22 tokens.
-Matched 36 tokens.
+Matched 15 tokens.
+Matched 26 tokens.
+Matched 40 tokens.
 ============= Module ===========
 == Sub Tree ==
 class  VType
@@ -16,7 +16,7 @@ class  VType
 == Sub Tree ==
 class  V2
   Fields: 
-    s
+    s="abc"
   Instance Initializer: 
   Constructors: 
   Methods: 
@@ -26,7 +26,7 @@ class  V2
 == Sub Tree ==
 class  V3
   Fields: 
-    n
+    n=123
   Instance Initializer: 
   Constructors: 
   Methods: 

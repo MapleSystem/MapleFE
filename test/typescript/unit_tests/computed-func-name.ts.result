@@ -1,14 +1,14 @@
 Matched 7 tokens.
-Matched 26 tokens.
-Matched 36 tokens.
-Matched 43 tokens.
+Matched 37 tokens.
+Matched 47 tokens.
+Matched 54 tokens.
 ============= Module ===========
 == Sub Tree ==
 js_let Decl: prop="foo"
 == Sub Tree ==
 class  Klass
   Fields: 
-
+    () -> 
   Instance Initializer: 
   Constructors: 
   Methods: 
