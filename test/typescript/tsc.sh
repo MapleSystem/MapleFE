@@ -31,7 +31,7 @@ for f; do
 done
 wait
 if [ -f tsc.failures.out ]; then
-  echo -e "\nTest cases failed to be compiled with tsc"
+  echo -e "\nTest cases failed with tsc strict mode enabled:"
   sort tsc.failures.out | xargs -n1 | nl
   if [ $i -eq 1 -a -f $f-tsc.out ]; then
     echo
