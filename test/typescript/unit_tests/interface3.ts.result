@@ -1,0 +1,6 @@
+Matched 49 tokens.
+============= Module ===========
+== Sub Tree ==
+ts_interface: IFace {func  create<T=>(args)  throws: 
+;func  create(args)  throws: 
+ }
