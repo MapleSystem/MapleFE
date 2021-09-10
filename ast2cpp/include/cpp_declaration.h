@@ -50,6 +50,9 @@ public:
   virtual std::string EmitModuleNode(ModuleNode *node);
   virtual std::string EmitClassNode(ClassNode *node);
 
+  virtual std::string EmitNumIndexSigNode(NumIndexSigNode *node);
+  virtual std::string EmitStrIndexSigNode(StrIndexSigNode *node);
+
   virtual std::string EmitNewNode(NewNode *node);
   virtual std::string EmitStructNode(StructNode *node);
   std::string GetTypeString(TreeNode *node, TreeNode *child = nullptr);

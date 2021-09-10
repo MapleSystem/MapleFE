@@ -400,7 +400,7 @@ std::string CppDecl::GetTypeString(TreeNode *node, TreeNode *child) {
     {
       if (child && child->IsStruct() && static_cast<StructNode*>(child)->GetProp() == SProp_NA) {
         // This will change pending solution for issue #69.
-        return "Object * "s; // object literal type - dynamic-import.ts 
+        return "Object * "s; // object literal type - dynamic-import.ts
       }
       str = child ? EmitTreeNode(child) : Emitter::GetEnumTypeId(k);
       if (str != "none"s)
@@ -711,5 +711,14 @@ std::string CppDecl::EmitStructNode(StructNode *node) {
   str += "}\n"s;
   return HandleTreeNode(str, node);
 }
+
+std::string CppDecl::EmitNumIndexSigNode(NumIndexSigNode *node) {
+  return std::string();
+}
+
+std::string CppDecl::EmitStrIndexSigNode(StrIndexSigNode *node) {
+  return std::string();
+}
+
 
 } // namespace maplefe
