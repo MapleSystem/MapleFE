@@ -392,8 +392,8 @@ std::string CppDecl::GetTypeString(TreeNode *node, TreeNode *child) {
       case TY_Number:
       case TY_Double:
         return "double "s;
-//    case TY_Class:
-//      return "Object* "s;
+      case TY_Class:
+        return "Object* "s;
       case TY_Any:
         return "t2crt::JS_Val "s;
     }
