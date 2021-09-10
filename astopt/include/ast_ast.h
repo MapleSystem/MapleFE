@@ -40,6 +40,23 @@ class AST_AST {
   void AdjustAST();
 };
 
+class SortFieldsVisitor : public AstVisitor {
+ private:
+  Module_Handler *mHandler;
+  unsigned       mFlags;
+  bool           mUpdated;
+
+ public:
+  explicit SortFieldsVisitor(Module_Handler *h, unsigned f, bool base = false)
+    : mHandler(h), mFlags(f), mUpdated(false), AstVisitor((f & FLG_trace_1) && base) {}
+  ~SortFieldsVisitor() = default;
+
+  StructNode *VisitStructNode(StructNode *node);
+  StructLiteralNode *VisitStructLiteralNode(StructLiteralNode *node);
+  ClassNode *VisitClassNode(ClassNode *node);
+  InterfaceNode *VisitInterfaceNode(InterfaceNode *node);
+};
+
 class AdjustASTVisitor : public AstVisitor {
  private:
   Module_Handler *mHandler;

@@ -15,6 +15,7 @@
 
 #include <stack>
 #include <set>
+#include <algorithm>
 #include "ast_handler.h"
 #include "ast_ast.h"
 
@@ -22,13 +23,63 @@ namespace maplefe {
 
 void AST_AST::AdjustAST() {
   MSGNOLOC0("============== AdjustAST ==============");
-  AdjustASTVisitor visitor(mHandler, mFlags, true);
   ModuleNode *module = mHandler->GetASTModule();
   for(unsigned i = 0; i < module->GetTreesNum(); i++) {
     TreeNode *it = module->GetTree(i);
     it->SetParent(module);
   }
-  visitor.Visit(module);
+
+  // sort fields according to the field name stridx
+  SortFieldsVisitor sort_visitor(mHandler, mFlags, true);
+  sort_visitor.Visit(module);
+
+  // adjust ast
+  AdjustASTVisitor adjust_visitor(mHandler, mFlags, true);
+  adjust_visitor.Visit(module);
+}
+
+template <typename T1, typename T2>
+void static SortFields(T1 *node) {
+  std::vector<std::pair<unsigned, T2 *>> vec;
+  for (unsigned i = 0; i < node->GetFieldsNum(); i++) {
+    T2 *fld = node->GetField(i);
+    unsigned stridx = fld->GetStrIdx();
+    std::pair<unsigned, T2*> p(stridx, fld);
+    vec.push_back(p);
+  }
+  std::sort(vec.begin(), vec.end());
+  for (unsigned i = 0; i < node->GetFieldsNum(); i++) {
+    node->SetField(i, vec[i].second);
+  }
+}
+
+
+StructNode *SortFieldsVisitor::VisitStructNode(StructNode *node) {
+  (void) AstVisitor::VisitStructNode(node);
+  // sort fields
+  SortFields<StructNode, TreeNode>(node);
+  return node;
+}
+
+StructLiteralNode *SortFieldsVisitor::VisitStructLiteralNode(StructLiteralNode *node) {
+  (void) AstVisitor::VisitStructLiteralNode(node);
+  // sort fields
+  SortFields<StructLiteralNode, FieldLiteralNode>(node);
+  return node;
+}
+
+ClassNode *SortFieldsVisitor::VisitClassNode(ClassNode *node) {
+  (void) AstVisitor::VisitClassNode(node);
+  // sort fields
+  SortFields<ClassNode, TreeNode>(node);
+  return node;
+}
+
+InterfaceNode *SortFieldsVisitor::VisitInterfaceNode(InterfaceNode *node) {
+  (void) AstVisitor::VisitInterfaceNode(node);
+  // sort fields
+  SortFields<InterfaceNode, IdentifierNode>(node);
+  return node;
 }
 
 // set parent for some identifier's type
