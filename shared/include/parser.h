@@ -398,6 +398,7 @@ public:
   unsigned LexOneLine();
 
   bool   TokenMerge(Token *);
+  bool   TokenSplit(Token *);
   Token* GetRegExpr(Token *);
 };
 

@@ -342,6 +342,48 @@ bool Parser::TokenMerge(Token *t) {
   return false;
 }
 
+// return true if t should be split into multiple tokens.
+// [NOTE] t is not push into mActiveTokens yet.
+//
+// We will handle these cases specifically.
+//
+// We take care of only one scenarios right now..
+//   typename<typearg>= initval
+// Look at the '>='. It first recognazied by lexer as GE,
+// but it's actually a > and a =.
+
+bool Parser::TokenSplit(Token *t) {
+  if (!t->IsOperator() || t->GetOprId() != OPR_GE)
+    return false;
+  unsigned size = mActiveTokens.GetNum();
+  if (size < 2)
+    return false;
+
+  Token *type_arg = mActiveTokens.ValueAtIndex(size - 1);
+  if (!type_arg->IsIdentifier())
+    return false;
+
+  Token *lt = mActiveTokens.ValueAtIndex(size - 2);
+  if (!lt->IsOperator() || lt->GetOprId() != OPR_LT)
+    return false;
+
+  Token *type_name = mActiveTokens.ValueAtIndex(size - 3);
+  if (!type_name->IsIdentifier())
+    return false;
+
+  // Now we got a matching case.
+  Token *gt_token = mLexer->FindOperatorToken(OPR_GT);
+  Token *assign_token = mLexer->FindOperatorToken(OPR_Assign);
+  mActiveTokens.PushBack(gt_token);
+  mActiveTokens.PushBack(assign_token);
+
+  if (mLexer->mTrace) {
+    std::cout << "Split >= to > and =" << std::endl;
+  }
+
+  return true;
+}
+
 // Return a reg expr token instead of t if t is the beginning of a regular expression.
 // Or return t.
 Token* Parser::GetRegExpr(Token *t) {
@@ -407,13 +449,21 @@ unsigned Parser::LexOneLine() {
           if (t->IsTab())
             is_tab = true;
         }
-        // Put into the token storage, as Pending tokens.
+        // Put into the token storage
         if (!is_whitespace && !is_tab && !t->IsComment()) {
-          if (!TokenMerge(t)) {
-            t = GetRegExpr(t);
-            mActiveTokens.PushBack(t);
-            token_num++;
-          }
+          // 1. if need to merge
+          if (TokenMerge(t))
+            continue;
+
+          // 2. if need split tokens
+          if (TokenSplit(t))
+            continue;
+
+          // 3. handle regular expression
+          t = GetRegExpr(t);
+
+          mActiveTokens.PushBack(t);
+          token_num++;
         }
       } else {
         MASSERT(0 && "Non token got? Problem here!");
