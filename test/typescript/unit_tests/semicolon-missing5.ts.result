@@ -1,13 +1,13 @@
-Matched 51 tokens.
-Matched 61 tokens.
-Matched 70 tokens.
-Matched 76 tokens.
-Matched 85 tokens.
+Matched 53 tokens.
+Matched 63 tokens.
+Matched 72 tokens.
+Matched 78 tokens.
+Matched 87 tokens.
 ============= Module ===========
 == Sub Tree ==
 class  Klass
   Fields: 
-    prop
+    prop=""
   Instance Initializer: 
   Constructors: 
   Methods: 

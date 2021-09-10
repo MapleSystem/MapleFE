@@ -1,14 +1,25 @@
-Matched 77 tokens.
-Matched 105 tokens.
-Matched 110 tokens.
-Matched 121 tokens.
+Matched 14 tokens.
+Matched 95 tokens.
+Matched 123 tokens.
+Matched 128 tokens.
+Matched 139 tokens.
 ============= Module ===========
+== Sub Tree ==
+class  Klass
+  Fields: 
+    union  = Function | number
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
 == Sub Tree ==
 js_var Decl: func=(obj) -> js_const Decl: desc=Object.getOwnPropertyDescriptor(obj,"f")
 console.log(desc)
-cond-branch cond: typeof desc.value StEq "function"
+cond-branch cond: typeof desc!.value StEq "function"
 true branch :
-  js_const Decl: v=desc.value
+  js_const Decl: v=desc!.value
   obj["f"] Assign func  (this)  throws: 
   console.log("Calling the new function")
   return v.call(this,...arguments)

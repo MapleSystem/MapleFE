@@ -1,25 +1,25 @@
-Matched 12 tokens.
 Matched 17 tokens.
-Matched 22 tokens.
-Matched 25 tokens.
-Matched 28 tokens.
-Matched 35 tokens.
-Matched 38 tokens.
-Matched 41 tokens.
+Matched 32 tokens.
+Matched 37 tokens.
+Matched 40 tokens.
 Matched 43 tokens.
-Matched 46 tokens.
-Matched 49 tokens.
-Matched 52 tokens.
-Matched 55 tokens.
+Matched 50 tokens.
+Matched 53 tokens.
+Matched 56 tokens.
 Matched 58 tokens.
 Matched 61 tokens.
 Matched 64 tokens.
 Matched 67 tokens.
+Matched 70 tokens.
+Matched 73 tokens.
+Matched 76 tokens.
+Matched 79 tokens.
+Matched 82 tokens.
 ============= Module ===========
 == Sub Tree ==
 class  A
   Fields: 
-    a    b
+    a?=0    b=0
   Instance Initializer: 
   Constructors: 
   Methods: 
@@ -27,7 +27,7 @@ class  A
   LocalInterfaces: 
 
 == Sub Tree ==
-js_var Decl: x
+js_var Decl: x= {a:1, b:2}
 == Sub Tree ==
  delete x.a
 == Sub Tree ==

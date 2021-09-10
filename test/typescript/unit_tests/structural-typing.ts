@@ -1,11 +1,11 @@
 class Foo {
-  f1: number;
-  f2: string;
+  f1: number = 0;
+  f2: string = "";
 }
 
 class Bar {
-  f1: number;
-  f2: string;
+  f1: number = 0;
+  f2: string = "";
 }
 
 var x = { f1: 123, f2: "John" };

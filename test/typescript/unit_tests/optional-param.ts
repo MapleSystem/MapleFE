@@ -1,5 +1,5 @@
 class Foo {
-  public a: string;
+  public a: string = "";
 }
 
 function func(x?: Foo): Foo {

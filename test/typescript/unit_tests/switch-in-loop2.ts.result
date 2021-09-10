@@ -1,6 +1,17 @@
-Matched 55 tokens.
-Matched 64 tokens.
+Matched 12 tokens.
+Matched 69 tokens.
+Matched 78 tokens.
 ============= Module ===========
+== Sub Tree ==
+class  Klass
+  Fields: 
+    string
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
 == Sub Tree ==
 func  func()  throws: 
   js_var Decl: obj= {}

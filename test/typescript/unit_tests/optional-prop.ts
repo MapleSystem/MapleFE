@@ -1,5 +1,5 @@
 class Klass {
-  a: number;
+  a: number = 0;
   b?: number;
 }
 

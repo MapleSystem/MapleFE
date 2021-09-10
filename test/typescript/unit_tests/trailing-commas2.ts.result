@@ -1,11 +1,11 @@
-Matched 11 tokens.
-Matched 42 tokens.
-Matched 51 tokens.
+Matched 15 tokens.
+Matched 47 tokens.
+Matched 56 tokens.
 ============= Module ===========
 == Sub Tree ==
 class  Klass
 <T,>  Fields: 
-    n
+    n=undefined
   Instance Initializer: 
   Constructors: 
   Methods: 
@@ -14,7 +14,7 @@ class  Klass
 
 == Sub Tree ==
 func  func(x=0.5,y= {n:3})  throws: 
-  return x Add y.n
+  return x Add y.n!
 
 == Sub Tree ==
 console.log(func())

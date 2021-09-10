@@ -9,13 +9,13 @@ class Car {
 }
 
 class Model extends Car {
-  private _model: string;
+  private _model?: string;
   constructor(make: string, model: string) {
     super(make);
     (this as any)._model = model;
   }
   public getModel(): string {
-    return this._model;
+    return this._model!;
   }
 }
 

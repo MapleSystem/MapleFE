@@ -1,9 +1,9 @@
-Matched 24 tokens.
+Matched 26 tokens.
 ============= Module ===========
 == Sub Tree ==
 class  Foo
   Fields: 
-    _val
+    _val=0
   Instance Initializer: 
   Constructors: 
   Methods: 

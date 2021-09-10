@@ -1,5 +1,5 @@
 class Klass {
-  prop: string;
+  prop: string = "";
   get getProp(): string {
     return this.prop;
   }

@@ -1,12 +1,12 @@
-Matched 14 tokens.
-Matched 19 tokens.
-Matched 37 tokens.
-Matched 56 tokens.
+Matched 15 tokens.
+Matched 25 tokens.
+Matched 43 tokens.
+Matched 63 tokens.
 ============= Module ===========
 == Sub Tree ==
 class  Klass
   Fields: 
-    func
+    func?
   Instance Initializer: 
   Constructors: 
   Methods: 
@@ -14,12 +14,12 @@ class  Klass
   LocalInterfaces: 
 
 == Sub Tree ==
-js_var Decl: obj
+js_var Decl: obj=new Klass()
 == Sub Tree ==
 obj.func Assign func  (n)  throws: 
   return n
 
 == Sub Tree ==
 export {func  show()  throws: 
-  console.log(obj.func(123))
+  console.log(obj.func!(123))
 } 

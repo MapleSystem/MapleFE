@@ -1,8 +1,8 @@
 class A {
-  a: number;
-  b: number;
+  a?: number = 0;
+  b: number = 0;
 }
-var x: A;
+var x: A = {a: 1, b: 2};
 delete x.a;
 
 void 0;

@@ -1,5 +1,8 @@
+class Klass {
+  [key: number]: string;
+}
 function func() {
-  var obj = {};
+  var obj: Klass = {};
   for (var i: number = 1; i < 4; ++i) {
     switch (i) {
       case 2:

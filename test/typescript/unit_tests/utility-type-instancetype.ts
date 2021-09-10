@@ -6,5 +6,5 @@ class Klass {
 }
 
 class Klass2 {
-  map: Map<number, InstanceType<typeof Klass>>;
+  map: Map<number, InstanceType<typeof Klass>> | undefined = undefined;
 }

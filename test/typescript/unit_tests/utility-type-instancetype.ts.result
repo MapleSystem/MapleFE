@@ -1,5 +1,5 @@
 Matched 23 tokens.
-Matched 39 tokens.
+Matched 43 tokens.
 ============= Module ===========
 == Sub Tree ==
 class  Klass
@@ -16,7 +16,7 @@ class  Klass
 == Sub Tree ==
 class  Klass2
   Fields: 
-    map
+    map=undefined
   Instance Initializer: 
   Constructors: 
   Methods: 

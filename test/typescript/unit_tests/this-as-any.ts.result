@@ -1,7 +1,7 @@
 Matched 36 tokens.
-Matched 87 tokens.
-Matched 100 tokens.
-Matched 117 tokens.
+Matched 89 tokens.
+Matched 102 tokens.
+Matched 119 tokens.
 ============= Module ===========
 == Sub Tree ==
 class  Car
@@ -20,7 +20,7 @@ class  Car
 == Sub Tree ==
 class  Model
   Fields: 
-    _model
+    _model?
   Instance Initializer: 
   Constructors: 
     constructor  (make,model)  throws: 
@@ -28,7 +28,7 @@ class  Model
       this._model Assign model
   Methods: 
     func  getModel()  throws: 
-      return this._model
+      return this._model!
   LocalClasses: 
   LocalInterfaces: 
 
