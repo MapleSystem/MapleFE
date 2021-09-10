@@ -39,7 +39,7 @@ void AST_AST::AdjustAST() {
 }
 
 template <typename T1, typename T2>
-void static SortFields(T1 *node) {
+static void SortFields(T1 *node) {
   std::vector<std::pair<unsigned, T2 *>> vec;
   for (unsigned i = 0; i < node->GetFieldsNum(); i++) {
     T2 *fld = node->GetField(i);
@@ -152,10 +152,24 @@ TreeNode *AdjustASTVisitor::GetField(TreeNode *node, unsigned i) {
   return fld;
 }
 
+static bool IsInterface(TreeNode *node) {
+  bool isI = node->IsInterface();
+  if (node->IsStruct()) {
+    isI = isI || (static_cast<StructNode *>(node)->GetProp() == SProp_TSInterface);
+  }
+  return isI;
+}
+
 TreeNode *AdjustASTVisitor::GetCanonicStructNode(TreeNode *node) {
   unsigned size = GetFieldSize(node);
+  bool isI0 = IsInterface(node);
 
   for (auto s: mFieldNum2StructNodeIdMap[size]) {
+    bool isI = IsInterface(s);
+    // skip if one is interface but other is not
+    if ((isI0 && !isI) || (!isI0 && isI)) {
+      continue;
+    }
     bool match = true;;
     // check fields
     for (unsigned fid = 0; fid < size; fid++) {
