@@ -3,7 +3,7 @@ interface IFace {
 }
 
 interface ICtor {
-  new(name: string);
+  new(name: string): IFace;
 }
 
 class Car implements IFace {

@@ -1,9 +1,9 @@
 class E<T> {
-  t: T;
+  t: T | undefined = undefined;
 }
 
 class Klass {
-  public n: E<{ s: string }>;
+  public n: E<{ s: string }> | undefined = undefined;
 }
 
 var obj: Klass = new Klass();

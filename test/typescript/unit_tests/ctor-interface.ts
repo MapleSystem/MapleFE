@@ -1,5 +1,5 @@
 class Klass {
-  f: number;
+  f: number = 123;
 }
 interface KlassConstructor {
   new (): Klass;

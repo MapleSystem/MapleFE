@@ -1,6 +1,17 @@
-Matched 13 tokens.
-Matched 34 tokens.
+Matched 26 tokens.
+Matched 41 tokens.
+Matched 62 tokens.
 ============= Module ===========
+== Sub Tree ==
+class  Klass
+  Fields: 
+    union  = number | string    x=0    s=""
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
 == Sub Tree ==
 js_var Decl: obj= {x:1, s:"123"}
 == Sub Tree ==

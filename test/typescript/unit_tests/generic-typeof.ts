@@ -1,5 +1,5 @@
 class Klass<T> {
-  f: T;
+  f: T | undefined = undefined;
 }
 
 const t = new Klass<number>();

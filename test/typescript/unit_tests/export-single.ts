@@ -1,4 +1,4 @@
 class Klass {
-  name: string;
+  name: string = "";
 }
 export = Klass;

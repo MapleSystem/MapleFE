@@ -5,7 +5,7 @@ class Pool<T> {
   public put(element: T) {
     this._pool.push(element);
   }
-  public get(): T {
+  public get(): T | undefined{
     return this._pool.pop();
   }
   public size(): number {
@@ -29,4 +29,4 @@ console.log(primPool.get());
 // Create array of objects
 const objPool = new Pool<Foo>();
 objPool.put(new Foo(100));
-console.log(objPool.get()._id);
+console.log(objPool.get()?._id);

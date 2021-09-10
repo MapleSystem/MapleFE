@@ -3,19 +3,19 @@ Matched 28 tokens.
 Matched 44 tokens.
 Matched 47 tokens.
 Matched 50 tokens.
-Matched 69 tokens.
-Matched 78 tokens.
-Matched 87 tokens.
-Matched 96 tokens.
-Matched 105 tokens.
-Matched 114 tokens.
-Matched 123 tokens.
-Matched 132 tokens.
-Matched 141 tokens.
-Matched 150 tokens.
-Matched 161 tokens.
-Matched 170 tokens.
-Matched 181 tokens.
+Matched 72 tokens.
+Matched 81 tokens.
+Matched 90 tokens.
+Matched 99 tokens.
+Matched 108 tokens.
+Matched 117 tokens.
+Matched 126 tokens.
+Matched 135 tokens.
+Matched 144 tokens.
+Matched 153 tokens.
+Matched 164 tokens.
+Matched 173 tokens.
+Matched 184 tokens.
 ============= Module ===========
 == Sub Tree ==
 ts_interface: Employee {firstName;lastName }
@@ -28,7 +28,7 @@ js_var Decl: func
 == Sub Tree ==
 js_var Decl: res
 == Sub Tree ==
-func  fullName()  throws: 
+func  fullName(this)  throws: 
   return this.firstName Add " " Add this.lastName
 
 == Sub Tree ==

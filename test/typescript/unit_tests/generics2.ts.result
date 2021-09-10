@@ -1,13 +1,13 @@
-Matched 11 tokens.
-Matched 27 tokens.
-Matched 37 tokens.
-Matched 51 tokens.
-Matched 58 tokens.
+Matched 15 tokens.
+Matched 35 tokens.
+Matched 45 tokens.
+Matched 59 tokens.
+Matched 66 tokens.
 ============= Module ===========
 == Sub Tree ==
 class  E
 <T,>  Fields: 
-    t
+    t=undefined
   Instance Initializer: 
   Constructors: 
   Methods: 
@@ -17,7 +17,7 @@ class  E
 == Sub Tree ==
 class  Klass
   Fields: 
-    n
+    n=undefined
   Instance Initializer: 
   Constructors: 
   Methods: 

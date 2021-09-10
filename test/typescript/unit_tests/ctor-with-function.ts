@@ -2,7 +2,7 @@
 class Klass {
   func: () => any;
   num: number;
-  constructor(f, n) {
+  constructor(f: () => any, n: number) {
     this.func = f;
     this.num = n;
   }
