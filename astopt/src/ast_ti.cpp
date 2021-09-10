@@ -1045,7 +1045,7 @@ IdentifierNode *TypeInferVisitor::VisitIdentifierNode(IdentifierNode *node) {
 InterfaceNode *TypeInferVisitor::VisitInterfaceNode(InterfaceNode *node) {
   UpdateTypeId(node, TY_Class);
   for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
-    TreeNode *t = node->GetFieldAtIndex(i);
+    TreeNode *t = node->GetField(i);
     (void) VisitClassField(t);
   }
   (void) AstVisitor::VisitInterfaceNode(node);

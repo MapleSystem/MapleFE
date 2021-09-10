@@ -1891,15 +1891,13 @@ public:
 
   unsigned        GetFieldsNum()              {return mFields.GetNum();}
   void            AddField(IdentifierNode* n) {mFields.PushBack(n); SETPARENT(n);}
-  IdentifierNode* GetFieldAtIndex(unsigned i) {return mFields.ValueAtIndex(i);}
-  void            SetFieldAtIndex(unsigned i, IdentifierNode* n) {*(mFields.RefAtIndex(i)) = n; SETPARENT(n);}
   IdentifierNode* GetField(unsigned i) {return mFields.ValueAtIndex(i);}
   void            SetField(unsigned i, IdentifierNode* n) {*(mFields.RefAtIndex(i)) = n; SETPARENT(n);}
 
   unsigned      GetMethodsNum()              {return mMethods.GetNum();}
   void          AddMethod(FunctionNode* a)   {mMethods.PushBack(a);}
-  FunctionNode* GetMethodAtIndex(unsigned i) {return mMethods.ValueAtIndex(i);}
-  void          SetMethodAtIndex(unsigned i, FunctionNode* n) {*(mMethods.RefAtIndex(i)) = n;}
+  FunctionNode* GetMethod(unsigned i) {return mMethods.ValueAtIndex(i);}
+  void          SetMethod(unsigned i, FunctionNode* n) {*(mMethods.RefAtIndex(i)) = n;}
 
   void SetIsAnnotation(bool b) {mIsAnnotation = b;}
   bool IsAnnotation()          {return mIsAnnotation;}

@@ -144,7 +144,7 @@ TreeNode *AdjustASTVisitor::GetField(TreeNode *node, unsigned i) {
       fld = static_cast<ClassNode *>(node)->GetField(i);
       break;
     case NK_Interface:
-      fld = static_cast<InterfaceNode *>(node)->GetFieldAtIndex(i);
+      fld = static_cast<InterfaceNode *>(node)->GetField(i);
       break;
     default:
       break;

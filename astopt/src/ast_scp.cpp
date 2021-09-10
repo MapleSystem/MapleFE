@@ -149,7 +149,7 @@ InterfaceNode *BuildScopeVisitor::VisitInterfaceNode(InterfaceNode *node) {
 
   // add fields as decl
   for(unsigned i = 0; i < node->GetFieldsNum(); i++) {
-    TreeNode *it = node->GetFieldAtIndex(i);
+    TreeNode *it = node->GetField(i);
     if (it->IsIdentifier()) {
       scope->AddDecl(it);
     }

@@ -1474,13 +1474,13 @@ std::string Emitter::EmitInterfaceNode(InterfaceNode *node) {
   str += " {\n"s;
 
   for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
-    if (auto n = node->GetFieldAtIndex(i)) {
+    if (auto n = node->GetField(i)) {
       str += EmitIdentifierNode(n) + ";\n"s;
     }
   }
 
   for (unsigned i = 0; i < node->GetMethodsNum(); ++i) {
-    if (auto n = node->GetMethodAtIndex(i)) {
+    if (auto n = node->GetMethod(i)) {
       std::string func = EmitFunctionNode(n);
       func = Clean(func);
       str += MethodString(func);
