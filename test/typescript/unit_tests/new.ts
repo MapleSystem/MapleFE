@@ -1,5 +1,5 @@
 class A {
-  a: number;
+  a: number = 0;
 }
 var x = A;
 var y = new A();

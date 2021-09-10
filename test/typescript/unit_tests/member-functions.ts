@@ -5,7 +5,7 @@ class MyClass {
     this.operand = opr;
   }
 
-  calc: (x: number) => number;
+  calc?: (x: number) => number;
 
   add = (x: number): number => this.operand + x;
 }
@@ -16,5 +16,5 @@ MyClass.prototype.calc = function (this: MyClass, x: number) {
 
 var myObj = new MyClass(1);
 
-console.log(myObj.calc(2));
+console.log(myObj.calc!(2));
 console.log(myObj.add(3));

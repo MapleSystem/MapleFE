@@ -8,7 +8,7 @@ interface B {
 
 type I = A & B;
 let v: I;
-v.id = 10;
-v.name = "B";
+v!.id = 10;
+v!.name = "B";
 
-console.log(v.id, v.name);
+console.log(v!.id, v!.name);

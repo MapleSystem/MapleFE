@@ -5,6 +5,6 @@ x = 12;
 export function getx(): number {
   return x;
 }
-export function setx(v): void {
+export function setx(v: number): void {
   x = v;
 }

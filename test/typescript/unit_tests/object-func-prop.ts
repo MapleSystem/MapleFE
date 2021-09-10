@@ -1,5 +1,5 @@
 const initializer: any = {
-  foo(data) {
+  foo(data: string) {
     console.log(data);
   },
 };

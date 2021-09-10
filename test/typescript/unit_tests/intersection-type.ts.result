@@ -2,9 +2,9 @@ Matched 8 tokens.
 Matched 16 tokens.
 Matched 23 tokens.
 Matched 28 tokens.
-Matched 34 tokens.
-Matched 40 tokens.
-Matched 53 tokens.
+Matched 35 tokens.
+Matched 42 tokens.
+Matched 57 tokens.
 ============= Module ===========
 == Sub Tree ==
 ts_interface: A {id }
@@ -15,8 +15,8 @@ ts_interface: B {name }
 == Sub Tree ==
 js_let Decl: v
 == Sub Tree ==
-v.id Assign 10
+v!.id Assign 10
 == Sub Tree ==
-v.name Assign "B"
+v!.name Assign "B"
 == Sub Tree ==
-console.log(v.id,v.name)
+console.log(v!.id,v!.name)

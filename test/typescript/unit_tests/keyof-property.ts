@@ -1,5 +1,5 @@
 class Klass {
-  prop: { field: number };
+  prop: { field: number } = { field: 0};
 }
 export type T = keyof Klass["prop"];
 var n: T = "field";

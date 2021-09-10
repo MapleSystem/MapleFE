@@ -1,11 +1,11 @@
-Matched 8 tokens.
-Matched 15 tokens.
-Matched 25 tokens.
+Matched 10 tokens.
+Matched 17 tokens.
+Matched 27 tokens.
 ============= Module ===========
 == Sub Tree ==
 class  A
   Fields: 
-    a
+    a=0
   Instance Initializer: 
   Constructors: 
   Methods: 
