@@ -175,9 +175,7 @@ Char StringToValue::StringToChar(std::string &str) {
 //    When parser read it, it's just a plain text file. So it will see 6 characters actually.
 //    The backslash is itself a character.
 //    After parser read this string into buffer, you can see it in gdb is "test\\n".
-//
-// 4. StringToValue need convert the two characters into an escape character.
-//    This is what we are doing here.
+//    Lexer and Parser will keep what they saw.
 
 const char* StringToValue::StringToString(std::string &in_str) {
   std::string target;
@@ -194,44 +192,7 @@ const char* StringToValue::StringToString(std::string &in_str) {
     str.assign(in_str, 1, in_str.size() - 2);
   }
 
-  for (unsigned i = 0; i < str.size(); i++) {
-    char c = str[i];
-    if ((c == '\\') && (i < str.size() - 1)) {
-      char c_next = str[i+1];
-      char c_target = 0;
-      char c_target_next = 0;
-      if (c_next == 'n')
-        c_target = '\n';
-      else if (c_next == '\\')
-        c_target = '\\';
-      else if (c_next == '\'')
-        c_target = '\'';
-      else if (c_next == '\"')
-        c_target = '\"';
-      else if (c_next == 'u') {
-        // Unicode character is preserved the same format.
-        c_target = '\\';
-        c_target_next = 'u';
-      }
-      else if (c_next == 'b')
-        c_target = '\b';
-      else if (c_next == 'f')
-        c_target = '\f';
-      else if (c_next == 'r')
-        c_target = '\r';
-
-      if (c_target) {
-        target += c_target;
-        if (c_target_next)
-          target += c_target_next;
-        i++;
-      }
-    } else {
-      target += c;
-    }
-  }
-
-  const char *s = gStringPool.FindString(target);
+  const char *s = gStringPool.FindString(str);
   return s;
 }
 

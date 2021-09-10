@@ -1,5 +1,4 @@
 Matched 5 tokens.
 ============= Module ===========
 == Sub Tree ==
-js_var Decl: x="\
-"'"
+js_var Decl: x="\\\n\"'\b\f\r"

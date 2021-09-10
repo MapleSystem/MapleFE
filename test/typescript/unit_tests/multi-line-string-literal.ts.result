@@ -2,8 +2,8 @@ Matched 7 tokens.
 Matched 14 tokens.
 ============= Module ===========
 == Sub Tree ==
-js_var Decl: str="This 
-is 
+js_var Decl: str="This \
+is \
 a string literal"
 == Sub Tree ==
 console.log(str)
