@@ -23,7 +23,7 @@ class  Byte
       Decl: i=Integer.parseInt(s,radix)
       cond-branch cond:i LT MIN_VALUE Lor i GT MAX_VALUE
       true branch :
-        new NumberFormatException("Value out of range. Value:"" Add s Add "" Radix:" Add radix)      false branch :
+        new NumberFormatException("Value out of range. Value:\"" Add s Add "\" Radix:" Add radix)      false branch :
 
       return (byte)i
     func  parseByte(s)  throws:     NumberFormatException

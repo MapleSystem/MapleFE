@@ -30,12 +30,12 @@ class  ProcessEnvironment
     func  validateVariable(name)  throws: 
       cond-branch cond:name.indexOf(=) NE Minus 1 Lor name.indexOf(0) NE Minus 1
       true branch :
-        new IllegalArgumentException("Invalid environment variable name: "" Add name Add """)      false branch :
+        new IllegalArgumentException("Invalid environment variable name: \"" Add name Add "\"")      false branch :
 
     func  validateValue(value)  throws: 
       cond-branch cond:value.indexOf(0) NE Minus 1
       true branch :
-        new IllegalArgumentException("Invalid environment variable value: "" Add value Add """)      false branch :
+        new IllegalArgumentException("Invalid environment variable value: \"" Add value Add "\"")      false branch :
 
     func  toEnvironmentBlock(map,envc)  throws: 
       return 

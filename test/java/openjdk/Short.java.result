@@ -28,7 +28,7 @@ class  Short
         return valueOf(result)
       false branch :
 
-      new NumberFormatException("Value out of range for short: "" Add string Add """)
+      new NumberFormatException("Value out of range for short: \"" Add string Add "\"")
     func  doubleValue()  throws: 
       return value
     func  equals(object)  throws: 
@@ -51,7 +51,7 @@ class  Short
         return result
       false branch :
 
-      new NumberFormatException("Value out of range for short: "" Add string Add """)
+      new NumberFormatException("Value out of range for short: \"" Add string Add "\"")
     func  shortValue()  throws: 
       return value
     func  toString()  throws: 

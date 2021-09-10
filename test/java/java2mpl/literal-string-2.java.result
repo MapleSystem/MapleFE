@@ -10,7 +10,7 @@ class  A
     func  write(s)  throws: 
     func  foo()  throws: 
       write("doesn't")
-      write("doesn't")
+      write("doesn\'t")
   LocalClasses: 
   LocalInterfaces: 
 

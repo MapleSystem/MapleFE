@@ -9,8 +9,7 @@ class  A
   Methods: 
     func  write(s)  throws: 
     func  foo()  throws: 
-      write("test
-")
+      write("test\n")
   LocalClasses: 
   LocalInterfaces: 
 

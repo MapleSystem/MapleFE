@@ -195,7 +195,7 @@ class  Package
         new NumberFormatException("Empty version string")
       false branch :
 
-      Decl: sa=specVersion.split("\.",-1)
+      Decl: sa=specVersion.split("\\.",-1)
       Decl: si=
       for ( )
          Assign Integer.parseInt(sa,i)
@@ -204,7 +204,7 @@ class  Package
           NumberFormatException.forInputString("" Add )        false branch :
 
 
-      Decl: da=desired.split("\.",-1)
+      Decl: da=desired.split("\\.",-1)
       Decl: di=
       for ( )
          Assign Integer.parseInt(da,i)

@@ -42,16 +42,14 @@ class  Plotter
       BufferedWriter
       stream
       Files.newBufferedWriter(path,StandardOpenOption.CREATE)
-      stream.write("bits,bool,bitset
-")
+      stream.write("bits,bool,bitset\n")
       for ( )
         System.out.println("Number of bits => " Add i)
         Decl: ba=
         Decl: bitSet=new BitSet(i)
         Decl: baSize=ClassLayout.parseInstance(ba).instanceSize()
         Decl: bitSetSize=GraphLayout.parseInstance(bitSet).totalSize()
-        stream.write((i Add "," Add baSize Add "," Add bitSetSize Add "
-"))
+        stream.write((i Add "," Add baSize Add "," Add bitSetSize Add "\n"))
         cond-branch cond:i Mod 10000 EQ 0
         true branch :
           stream.flush()

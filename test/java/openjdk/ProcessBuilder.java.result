@@ -190,7 +190,7 @@ class  ProcessBuilder
 
       false branch :
 
-      new IOException("Cannot run program "" Add prog Add """ Add () Add exceptionInfo,cause)
+      new IOException("Cannot run program \"" Add prog Add "\"" Add () Add exceptionInfo,cause)
 
   LocalClasses: 
     class  NullInputStream

@@ -230,7 +230,7 @@ class  Runtime
         Decl: filename=loader.findLibrary(libraryName)
         cond-branch cond:filename EQ null
         true branch :
-          new UnsatisfiedLinkError(loader Add " couldn't find "" Add System.mapLibraryName(libraryName) Add """)
+          new UnsatisfiedLinkError(loader Add " couldn't find \"" Add System.mapLibraryName(libraryName) Add "\"")
         false branch :
 
         Decl: error=doLoad(filename,loader)

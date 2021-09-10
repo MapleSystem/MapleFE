@@ -13,7 +13,7 @@ class  NumberFormatException
     constructor  NumberFormatException(s)  throws: 
   Methods: 
     func  forInputString(s)  throws: 
-      return new NumberFormatException("For input string: "" Add s Add """)
+      return new NumberFormatException("For input string: \"" Add s Add "\"")
   LocalClasses: 
   LocalInterfaces: 
 
