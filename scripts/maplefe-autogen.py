@@ -504,7 +504,23 @@ void Dump(const char *title, std::ostream *os) {{
 
 static std::string EncodeLiteral(std::string str) {{
   std::string enc;
+  bool esc = false;
   for (auto&c : str) {{
+    if(esc) {{
+      switch(c) {{
+        //case 'a': c = '\\a'; break; '\a' is 'a' in Javascript
+        case 'b': c = '\\b'; break;
+        case 'f': c = '\\f'; break;
+        case 'n': c = '\\n'; break;
+        case 'r': c = '\\r'; break;
+        case 't': c = '\\t'; break;
+        case 'v': c = '\\v'; break;
+      }}
+      esc = false;
+    }} else if(c == '\\\\') {{
+      esc = true;
+      continue;
+    }}
     switch(c) {{
       //case '\\'': enc += "\\\\'"; break;
       case '\\"': enc += "\\\\\\""; break;
