@@ -2192,16 +2192,16 @@ public:
 ////////////////////////////////////////////////////////////////////////////
 
 enum CompNameProp {
-  CNP_Rem_ReadOnly,
-  CNP_Add_ReadOnly,
-  CNP_Rem_Optional,
-  CNP_Add_Optional,
-  CNP_NA
+  CNP_Rem_ReadOnly = 1,
+  CNP_Add_ReadOnly = 1 << 1,
+  CNP_Rem_Optional = 1 << 2,
+  CNP_Add_Optional = 1 << 3,
+  CNP_NA = 0
 };
 
 class ComputedNameNode : public TreeNode {
 private:
-  CompNameProp mProp;
+  unsigned  mProp;
   TreeNode *mExpr;
   TreeNode *mInit;
   TreeNode *mExtendType;  // This is the type extending expression
@@ -2211,8 +2211,8 @@ public:
     mProp(CNP_NA), mExpr(NULL), mExtendType(NULL), mInit(NULL) {}
   ~ComputedNameNode(){Release();}
 
-  CompNameProp GetProp()               {return mProp;}
-  void         SetProp(CompNameProp p) {mProp = p;}
+  unsigned GetProp()               {return mProp;}
+  void     SetProp(CompNameProp p) {mProp = mProp | (unsigned)p;}
 
   TreeNode* GetExpr()            {return mExpr;}
   void      SetExpr(TreeNode *n) {mExpr = n; SETPARENT(n);}

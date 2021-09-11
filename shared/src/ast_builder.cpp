@@ -2073,37 +2073,98 @@ TreeNode* ASTBuilder::BuildVarList() {
 }
 
 // Attach the modifier(s) to mLastTreeNode.
+// It takes:
+//   1. One argument, which is the solo modifier.
+//   2. Two arguments, which happens mostly in Typescript, like
+//        + readonly
+//        - readonly
+//        + ?
+//        - ?
 TreeNode* ASTBuilder::AddModifier() {
   if (mTrace)
     std::cout << "In AddModifier" << std::endl;
 
-  Param p_mod = mParams[0];
-  if (p_mod.mIsEmpty) {
-    if (mTrace)
-      std::cout << " do nothing." << std::endl;
-    return mLastTreeNode;
-  }
-
-  if (!p_mod.mIsTreeNode)
-    MERROR("The modifier is not a treenode");
-  TreeNode *mod= p_mod.mData.mTreeNode;
-
-  if (mod->IsPass()) {
-    PassNode *pass = (PassNode*)mod;
-    for (unsigned i = 0; i < pass->GetChildrenNum(); i++) {
-      TreeNode *child = pass->GetChild(i);
-      if (child->IsAnnotation()) {
-        AnnotationNode *a = (AnnotationNode*)child;
-        mLastTreeNode->AddAnnotation(a);
-      } else {
-        add_attribute_to(mLastTreeNode, child);
-      }
+  if (mParams.size() == 1) {
+    Param p_mod = mParams[0];
+    if (p_mod.mIsEmpty) {
+      if (mTrace)
+        std::cout << " do nothing." << std::endl;
+      return mLastTreeNode;
     }
-  } else if (mod->IsAnnotation()) {
-    AnnotationNode *a = (AnnotationNode*)mod;
-    mLastTreeNode->AddAnnotation(a);
-  } else {
-    add_attribute_to(mLastTreeNode, mod);
+
+    if (!p_mod.mIsTreeNode)
+      MERROR("The modifier is not a treenode");
+    TreeNode *mod= p_mod.mData.mTreeNode;
+
+    if (mod->IsPass()) {
+      PassNode *pass = (PassNode*)mod;
+      for (unsigned i = 0; i < pass->GetChildrenNum(); i++) {
+        TreeNode *child = pass->GetChild(i);
+        if (child->IsAnnotation()) {
+          AnnotationNode *a = (AnnotationNode*)child;
+          mLastTreeNode->AddAnnotation(a);
+        } else {
+          add_attribute_to(mLastTreeNode, child);
+        }
+      }
+    } else if (mod->IsAnnotation()) {
+      AnnotationNode *a = (AnnotationNode*)mod;
+      mLastTreeNode->AddAnnotation(a);
+    } else {
+      add_attribute_to(mLastTreeNode, mod);
+    }
+  } else if (mParams.size() == 2) {
+    // the two modifiers are in fixed order, with +/- at first
+    // readonly/? the second.
+    bool add = false;   // add opr if true, rem if false
+    bool readonly = false;
+    bool optional = false;
+    Param p_opr = mParams[0];
+    if (p_opr.mIsEmpty) {
+      add = true;
+    } else {
+      MASSERT(!p_opr.mIsTreeNode);
+      Token *token= p_opr.mData.mToken;
+      if (token->GetOprId() == OPR_Add)
+        add = true;
+      else if (token->GetOprId() == OPR_Sub)
+        add = false;
+      else
+        MERROR("unsupported opr id.");
+    }
+
+    Param p_prop = mParams[1];
+    MASSERT(!p_prop.mIsEmpty);
+    MASSERT(!p_prop.mIsTreeNode);
+    Token *token= p_prop.mData.mToken;
+    if (token->IsSeparator()) {
+      if (token->GetSepId() == SEP_Select)
+        optional = true;
+    } else if (token->IsKeyword()) {
+      const char *keyword = token->GetName();
+      if ((strlen(keyword) == 6) && !strncmp(keyword, "readonly", 6))
+        readonly = true;
+    } else {
+      MERROR("unsupported property.");
+    }
+
+    MASSERT(mLastTreeNode->IsComputedName());
+    ComputedNameNode *cnn = (ComputedNameNode*)mLastTreeNode;
+    if (add) {
+      if (readonly)
+        cnn->SetProp(CNP_Add_ReadOnly);
+      else if (optional)
+        cnn->SetProp(CNP_Add_Optional);
+      else
+        MERROR("unsupported property.");
+    } else {
+      if (readonly)
+        cnn->SetProp(CNP_Rem_ReadOnly);
+      else if (optional)
+        cnn->SetProp(CNP_Rem_Optional);
+      else
+        MERROR("unsupported property.");
+    }
   }
 
   return mLastTreeNode;

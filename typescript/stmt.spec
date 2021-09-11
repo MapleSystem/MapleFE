@@ -306,6 +306,8 @@ rule ComputedPropertyName : ONEOF(
   ZEROORONE(IndexSigPrefix) + ZEROORONE(IndexSigModifier) + '[' + AssignmentExpression + ']' + ZEROORONE(IndexSigPrefix) + ZEROORONE(IndexSigModifier))
   attr.action.%1 : BuildComputedName(%2)
   attr.action.%2 : BuildComputedName(%4)
+  attr.action.%2 : AddModifier(%1, %2)
+  attr.action.%2 : AddModifier(%6, %7)
 
 ##-----------------------------------
 ##rule CoverInitializedName[Yield] :
