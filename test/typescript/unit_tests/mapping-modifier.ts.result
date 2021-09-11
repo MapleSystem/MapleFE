@@ -1,0 +1,24 @@
+Matched 23 tokens.
+Matched 36 tokens.
+Matched 57 tokens.
+Matched 67 tokens.
+Matched 74 tokens.
+============= Module ===========
+== Sub Tree ==
+ type Concrete<T> =  {[P in  keyof T] : T[P] }
+== Sub Tree ==
+ts_interface: IFace {name;age? }
+== Sub Tree ==
+class  Klass
+  Fields: 
+    name="No-name"    age=0
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+js_var Decl: obj=new Klass()
+== Sub Tree ==
+console.log(obj)

@@ -301,8 +301,9 @@ rule LiteralPropertyName : ONEOF(JSIdentifier, Literal)
 ##-----------------------------------
 ##rule ComputedPropertyName[Yield] :
 ##  [ AssignmentExpression[In, ?Yield] ]
-rule ComputedPropertyName : ONEOF('[' + AssignmentExpression + ']',
-                                  '-' + "readonly" + '[' + AssignmentExpression + ']')
+rule ComputedPropertyName : ONEOF(
+  '[' + AssignmentExpression + ']',
+  ZEROORONE(IndexSigPrefix) + ZEROORONE(IndexSigModifier) + '[' + AssignmentExpression + ']' + ZEROORONE(IndexSigPrefix) + ZEROORONE(IndexSigModifier))
   attr.action.%1 : BuildComputedName(%2)
   attr.action.%2 : BuildComputedName(%4)
 
@@ -1818,11 +1819,14 @@ rule ConstructSignature :
   attr.action : SetConstructSignature()
 
 ## rule IndexSignature: [ BindingIdentifier : string ] TypeAnnotation [ BindingIdentifier : number ] TypeAnnotation
+rule IndexSigPrefix : ONEOF('+', '-')
+rule IndexSigModifier : ONEOF("readonly", '?')
+
 rule IndexSignature: ONEOF(
-  '[' + BindingIdentifier + ':' + "string" + ']' + TypeAnnotation,
-  '[' + BindingIdentifier + ':' + "number" + ']' + TypeAnnotation)
-  attr.action.%1 : BuildStrIndexSig(%2, %6)
-  attr.action.%2 : BuildNumIndexSig(%2, %6)
+  ZEROORONE(IndexSigPrefix) + ZEROORONE(IndexSigModifier) + '[' + BindingIdentifier + ':' + "string" + ']' + ZEROORONE(IndexSigPrefix) + ZEROORONE(IndexSigModifier) + TypeAnnotation,
+  ZEROORONE(IndexSigPrefix) + ZEROORONE(IndexSigModifier) + '[' + BindingIdentifier + ':' + "number" + ']' + ZEROORONE(IndexSigPrefix) + ZEROORONE(IndexSigModifier) + TypeAnnotation)
+  attr.action.%1 : BuildStrIndexSig(%4, %10)
+  attr.action.%2 : BuildNumIndexSig(%4, %10)
 
 ## rule MethodSignature: PropertyName ?opt CallSignature
 ## I inlined CallSignature
