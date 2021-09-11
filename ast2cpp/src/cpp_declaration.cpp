@@ -484,6 +484,7 @@ std::string CppDecl::EmitClassNode(ClassNode *node) {
 
   // constructor decl
   str += "  "s + node->GetName() + "(Function* ctor, Object* proto): "s + base + "(ctor, proto)"  + " {}\n"s;
+  str += "  "s + node->GetName() + "(Function* ctor, Object* proto, std::vector<ObjectProp> props): "s + base + "(ctor, proto, props) {}\n"s;
   str += "  ~"s + node->GetName() + "(){}\n";
 
   // class field decl and init. TODO: handle static, private, protected attrs.
@@ -540,6 +541,7 @@ std::string CppDecl::EmitClassNode(ClassNode *node) {
 
   // Generate new() function
   str += "  "s+node->GetName()+"* _new() {return new "s+node->GetName()+"(this, this->prototype);}\n"s;
+  str += "  "s+node->GetName()+"* _new(std::vector<ObjectProp> props) {return new "s+node->GetName()+"(this, this->prototype, props);}\n"s;
   str += "};\n\n";
   return str;
 }
