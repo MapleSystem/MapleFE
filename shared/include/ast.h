@@ -2192,11 +2192,11 @@ public:
 ////////////////////////////////////////////////////////////////////////////
 
 enum CompNameProp {
+  CNP_NA = 0,
   CNP_Rem_ReadOnly = 1,
   CNP_Add_ReadOnly = 1 << 1,
   CNP_Rem_Optional = 1 << 2,
   CNP_Add_Optional = 1 << 3,
-  CNP_NA = 0
 };
 
 class ComputedNameNode : public TreeNode {
