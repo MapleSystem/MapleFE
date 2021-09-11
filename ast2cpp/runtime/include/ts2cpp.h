@@ -219,11 +219,6 @@ class ClassFld {
     JS_Prop* NewProp(JS_Type type) {return new JS_Prop(type, field.addr);}
 };
 
-template <typename T, typename K>
-class Record {
-  std::unordered_map<T, K> records;
-};
-
 template <typename T> std::string __js_typeof(T v) {
   if (std::numeric_limits<T>::is_signed)
     return "number"s;

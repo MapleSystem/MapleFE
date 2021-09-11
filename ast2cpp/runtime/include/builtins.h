@@ -47,6 +47,15 @@ class Ctor_Function : public Function {
 
 };
 
+template <typename T1, typename T2>
+class Record : public Object {
+  public:
+    std::unordered_map<T1, T2> records;
+    Record() {}
+    ~Record() {}
+    Record(Function* ctor, Object* proto, std::vector<ObjectProp> props) : Object(ctor, proto, props) {}
+};
+
 template <typename T>
 class Array : public Object {
   public:
