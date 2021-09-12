@@ -2211,8 +2211,8 @@ public:
     mProp(CNP_NA), mExpr(NULL), mExtendType(NULL), mInit(NULL) {}
   ~ComputedNameNode(){Release();}
 
-  unsigned GetProp()               {return mProp;}
-  void     SetProp(CompNameProp p) {mProp = mProp | (unsigned)p;}
+  unsigned GetProp()           {return mProp;}
+  void     SetProp(unsigned p) {mProp = mProp | p;}
 
   TreeNode* GetExpr()            {return mExpr;}
   void      SetExpr(TreeNode *n) {mExpr = n; SETPARENT(n);}

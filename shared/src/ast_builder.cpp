@@ -2134,36 +2134,36 @@ TreeNode* ASTBuilder::AddModifier() {
     }
 
     Param p_prop = mParams[1];
-    MASSERT(!p_prop.mIsEmpty);
-    MASSERT(!p_prop.mIsTreeNode);
-    Token *token= p_prop.mData.mToken;
-    if (token->IsSeparator()) {
-      if (token->GetSepId() == SEP_Select)
+    if (!p_prop.mIsEmpty) {
+      if (!p_prop.mIsTreeNode) {
+        Token *token= p_prop.mData.mToken;
+        MASSERT(token->IsSeparator() && (token->GetSepId() == SEP_Select));
         optional = true;
-    } else if (token->IsKeyword()) {
-      const char *keyword = token->GetName();
-      if ((strlen(keyword) == 6) && !strncmp(keyword, "readonly", 6))
+      } else {
+        TreeNode *tree = p_prop.mData.mTreeNode;
+        MASSERT(tree->IsAttr());
+        AttrNode *attr = (AttrNode*)tree;
+        MASSERT(attr->GetId() == ATTR_readonly);
         readonly = true;
-    } else {
-      MERROR("unsupported property.");
-    }
+      }
 
-    MASSERT(mLastTreeNode->IsComputedName());
-    ComputedNameNode *cnn = (ComputedNameNode*)mLastTreeNode;
-    if (add) {
-      if (readonly)
-        cnn->SetProp(CNP_Add_ReadOnly);
-      else if (optional)
-        cnn->SetProp(CNP_Add_Optional);
-      else
-        MERROR("unsupported property.");
-    } else {
-      if (readonly)
-        cnn->SetProp(CNP_Rem_ReadOnly);
-      else if (optional)
-        cnn->SetProp(CNP_Rem_Optional);
-      else
-        MERROR("unsupported property.");
+      MASSERT(mLastTreeNode->IsComputedName());
+      ComputedNameNode *cnn = (ComputedNameNode*)mLastTreeNode;
+      if (add) {
+        if (readonly)
+          cnn->SetProp((unsigned)CNP_Add_ReadOnly);
+        else if (optional)
+          cnn->SetProp((unsigned)CNP_Add_Optional);
+        else
+          MERROR("unsupported property.");
+      } else {
+        if (readonly)
+          cnn->SetProp((unsigned)CNP_Rem_ReadOnly);
+        else if (optional)
+          cnn->SetProp((unsigned)CNP_Rem_Optional);
+        else
+          MERROR("unsupported property.");
+      }
     }
   }
 
