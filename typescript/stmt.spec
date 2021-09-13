@@ -1608,7 +1608,8 @@ rule Type : ONEOF(UnionOrIntersectionOrPrimaryType,
                   PrimaryType + '[' + KeyOf + ']',
                   InferType,
                   IsExpression,
-                  PrimaryType + '[' + TypeQuery + ']')
+                  PrimaryType + '[' + TypeQuery + ']',
+                  TemplateLiteral)
   attr.action.%7,%8,%11 : BuildArrayElement(%1, %3)
 
 #rule UnionOrIntersectionOrPrimaryType: ONEOF(UnionType,

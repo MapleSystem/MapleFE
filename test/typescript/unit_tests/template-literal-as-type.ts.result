@@ -1,0 +1,15 @@
+Matched 5 tokens.
+Matched 12 tokens.
+Matched 20 tokens.
+Matched 27 tokens.
+Matched 29 tokens.
+Matched 30 tokens.
+============= Module ===========
+== Sub Tree ==
+js_const Decl: X="X"
+== Sub Tree ==
+js_const Decl: T= template-literal: NULL,X,"type",NULL
+== Sub Tree ==
+console.log( typeof T)
+== Sub Tree ==
+console.log(T)
