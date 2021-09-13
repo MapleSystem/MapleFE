@@ -198,9 +198,8 @@ TreeNode *AdjustASTVisitor::GetCanonicStructNode(TreeNode *node) {
   unsigned stridx = node->GetStrIdx();
   TreeNode *parent_orig = node->GetParent();
 
-  // anonymous struct will be added to module scope
+  // node as anonymous struct will be added to module scope
   if (stridx == 0) {
-    // parent could be modified
     AddAnonymousStruct(node);
   }
   mFieldNum2StructNodeIdMap[size].insert(node);
@@ -326,7 +325,7 @@ StructNode *AdjustASTVisitor::VisitStructNode(StructNode *node) {
   TreeNode *newnode = GetCanonicStructNode(node);
 
   // create a TypeAlias for duplicated type if top level
-  if (newnode != node && node->GetParent() && node->GetParent()->IsModule()) {
+  if (newnode != node && node->GetParent() && !node->GetParent()->IsModule()) {
     node = (StructNode*)CreateTypeAlias(newnode, node);;
   } else {
     node = (StructNode*)newnode;
