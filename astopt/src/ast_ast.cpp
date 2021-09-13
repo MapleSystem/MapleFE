@@ -204,16 +204,6 @@ TreeNode *AdjustASTVisitor::GetCanonicStructNode(TreeNode *node) {
   }
   mFieldNum2StructNodeIdMap[size].insert(node);
 
-  // for non root tree node, replace it with a UserType node
-  // node: use the node's oritinal parent_orig
-  if (!parent_orig || !parent_orig->IsModule()) {
-    IdentifierNode *newid = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
-    new (newid) IdentifierNode(node->GetStrIdx());
-
-    UserTypeNode *utype = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
-    new (utype) UserTypeNode(newid);
-    node = utype;
-  }
   return node;
 }
 
@@ -328,12 +318,20 @@ StructNode *AdjustASTVisitor::VisitStructNode(StructNode *node) {
   // create a TypeAlias for duplicated type if top level
   // except newly added anonymous type which has updated parent
   if (newnode != node && parent_orig && node->GetParent()->IsModule() && node->GetParent() == parent_orig) {
-    node = (StructNode*)CreateTypeAlias(newnode, node);;
-  } else {
-    node = (StructNode*)newnode;
+    newnode = CreateTypeAlias(newnode, node);;
   }
 
-  return node;
+  // for non top level tree node, replace it with a UserType node
+  if (!parent_orig || !parent_orig->IsModule()) {
+    IdentifierNode *newid = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
+    new (newid) IdentifierNode(newnode->GetStrIdx());
+
+    UserTypeNode *utype = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
+    new (utype) UserTypeNode(newid);
+    newnode = utype;
+  }
+
+  return (StructNode*)newnode;
 }
 
 TreeNode *AdjustASTVisitor::CreateTypeNodeFromName(IdentifierNode *node) {
