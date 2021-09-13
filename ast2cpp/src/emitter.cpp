@@ -341,6 +341,18 @@ std::string Emitter::EmitComputedNameNode(ComputedNameNode *node) {
     str += EmitTreeNode(n);
   }
   str += "] "s;
+
+  if (auto prop = node->GetProp()) {
+    if (prop & CNP_Rem_ReadOnly)
+      str = "-readonly "s + str;
+    if (prop & CNP_Add_ReadOnly)
+      str = "readonly "s + str;
+    if (prop & CNP_Rem_Optional)
+      str += "-?"s;
+    if (prop & CNP_Add_Optional)
+      str += "?"s;
+  }
+
   str = HandleTreeNode(str, node);
   if (auto n = node->GetExtendType()) {
     str += ": "s + EmitTreeNode(n);
