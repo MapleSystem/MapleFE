@@ -576,6 +576,29 @@ std::string CppDecl::EmitNewNode(NewNode *node) {
   return str;
 }
 
+std::string CppDecl::EmitInterface(StructNode *node) {
+  std::string str, ifName;
+
+  if (node == nullptr)
+    return std::string();
+
+  if (auto n = node->GetStructId()) {
+    ifName = IdentifierName(n);
+    str = "class "s + ifName + " : public Object {\n"s;
+  }
+  str += "  public:\n"s;
+  for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
+    if (auto n = node->GetField(i)) {
+      str += "    "s + EmitTreeNode(n) + ";\n"s;
+    }
+  }
+  str += "    "s  + ifName + "() {};\n"s;
+  str += "    ~"s + ifName + "() {};\n"s;
+  str += "    "s  + ifName + "(Function* ctor, Object* proto, std::vector<ObjectProp> props): Object(ctor, proto, props) {}\n"s;
+  str += "};\n"s;
+  return str;
+}
+
 // Generate C++ class def for the TS num type here and instance in CppDef EmitStructNode.
 // TS enum member field can be either Identifier or Literal string (of any character).
 // TS enum member value can be either long, double, or string.
@@ -645,15 +668,15 @@ std::string CppDecl::EmitStructNode(StructNode *node) {
     case SProp_CStruct:
       str = "struct "s;
       break;
-    case SProp_TSInterface:
-      str = "class "s;
-      break;
     case SProp_NA:
       str = ""s;
       break;
 #endif
     case SProp_TSEnum:
       str = EmitTSEnum(node);
+      return str;
+    case SProp_TSInterface:
+      str = EmitInterface(node);
       return str;
     default:
       return std::string();
@@ -709,8 +732,8 @@ std::string CppDecl::EmitStructNode(StructNode *node) {
       str += func.length() > 2 && func.substr(func.length() - 2) == ";\n" ? func : func + ";\n"s;
     }
   }
-#endif
   str += "}\n"s;
+#endif
   return HandleTreeNode(str, node);
 }
 

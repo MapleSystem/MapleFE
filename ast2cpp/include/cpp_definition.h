@@ -61,6 +61,7 @@ public:
   std::string EmitFuncScopeVarDecls(FunctionNode *node);
   std::string EmitStructNode(StructNode *node);
   std::string EmitStructLiteralNode(StructLiteralNode* node);
+  std::string EmitObjWithProps(std::string varName, TreeNode* idType, std::string props);
   TypeId GetTypeFromDecl(IdentifierNode* id);
 };
 

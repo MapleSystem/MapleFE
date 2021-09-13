@@ -58,6 +58,7 @@ public:
   std::string GetTypeString(TreeNode *node, TreeNode *child = nullptr);
   std::string EmitArrayLiteral(ArrayLiteralNode *node, int dim, std::string type);
   std::string EmitTSEnum(StructNode *node);
+  std::string EmitInterface(StructNode *node);
 };
 
 inline bool IsVarInitStructLiteral(DeclNode* node) {
