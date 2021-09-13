@@ -30,12 +30,164 @@ void AST_AST::AdjustAST() {
   }
 
   // sort fields according to the field name stridx
+  // it also include first visit to named types to reduce
+  // creation of unnecessary anonymous struct
   SortFieldsVisitor sort_visitor(mHandler, mFlags, true);
   sort_visitor.Visit(module);
+
+  // collect class/interface/struct decl first to reduce
+  // introducing of unnecessary anonymous structs
+  CollectClassStructVisitor base_visitor(mHandler, mFlags, true);
+  base_visitor.Visit(module);
 
   // adjust ast
   AdjustASTVisitor adjust_visitor(mHandler, mFlags, true);
   adjust_visitor.Visit(module);
+}
+
+unsigned AST_AST::GetFieldSize(TreeNode *node) {
+  unsigned size = 0;
+  switch (node->GetKind()) {
+    case NK_Struct:
+      size = static_cast<StructNode *>(node)->GetFieldsNum();
+      break;
+    case NK_Class:
+      size = static_cast<ClassNode *>(node)->GetFieldsNum();
+      break;
+    case NK_Interface:
+      size = static_cast<InterfaceNode *>(node)->GetFieldsNum();
+      break;
+    default:
+      break;
+  }
+  return size;
+}
+
+TreeNode *AST_AST::GetField(TreeNode *node, unsigned i) {
+  TreeNode *fld = NULL;
+  switch (node->GetKind()) {
+    case NK_Struct:
+      fld = static_cast<StructNode *>(node)->GetField(i);
+      break;
+    case NK_Class:
+      fld = static_cast<ClassNode *>(node)->GetField(i);
+      break;
+    case NK_Interface:
+      fld = static_cast<InterfaceNode *>(node)->GetField(i);
+      break;
+    default:
+      break;
+  }
+  return fld;
+}
+
+bool AST_AST::IsInterface(TreeNode *node) {
+  bool isI = node->IsInterface();
+  if (node->IsStruct()) {
+    isI = isI || (static_cast<StructNode *>(node)->GetProp() == SProp_TSInterface);
+  }
+  return isI;
+}
+
+TreeNode *AST_AST::GetCanonicStructNode(TreeNode *node) {
+  unsigned size = GetFieldSize(node);
+  bool isI0 = IsInterface(node);
+
+  for (auto s: mFieldNum2StructNodeIdMap[size]) {
+    bool isI = IsInterface(s);
+    // skip if one is interface but other is not
+    if ((isI0 && !isI) || (!isI0 && isI)) {
+      continue;
+    }
+    bool match = true;;
+    // check fields
+    for (unsigned fid = 0; fid < size; fid++) {
+      TreeNode *f0 = GetField(node, fid);
+      TreeNode *f1 = GetField(s, fid);
+      if (f0->IsIdentifier() && f1->IsIdentifier()) {
+        IdentifierNode *i0 = static_cast<IdentifierNode *>(f0);
+        IdentifierNode *i1 = static_cast<IdentifierNode *>(f1);
+        if (i0->GetStrIdx() != i1->GetStrIdx() ||
+            i0->GetType() != i1->GetType()) {
+          match = false;
+          break;
+        }
+      } else {
+        match = false;
+        break;
+      }
+    }
+
+    if (match) {
+      return s;
+    }
+  }
+
+  // not match
+  unsigned stridx = node->GetStrIdx();
+
+  // node as anonymous struct will be added to module scope
+  if (GetNameAnonyStruct() && stridx == 0) {
+    AddAnonymousStruct(node);
+  }
+  mFieldNum2StructNodeIdMap[size].insert(node);
+
+  return node;
+}
+
+void AST_AST::AddAnonymousStruct(TreeNode *node) {
+  std::string str("AnonymousStruct_");
+  str += std::to_string(mNum++);
+  unsigned stridx = gStringPool.GetStrIdx(str);
+  node->SetStrIdx(stridx);
+
+  // for struct node, set structid
+  if (node->IsStruct()) {
+    StructNode *snode = static_cast<StructNode *>(node);
+    IdentifierNode *id = snode->GetStructId();
+    if (!id) {
+      id = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
+      new (id) IdentifierNode(0);
+      snode->SetStructId(id);
+    }
+
+    // set stridx for structid
+    id->SetStrIdx(stridx);
+  }
+
+  ModuleNode *module = mHandler->GetASTModule();
+  module->AddTreeFront(node);
+}
+
+StructNode *CollectClassStructVisitor::VisitStructNode(StructNode *node) {
+  // skip getting canonical type if not only fields
+  if (node->GetMethodsNum() || node->GetSupersNum() || node->GetStrIdx() == 0) {
+    return node;
+  }
+
+  mAst->GetCanonicStructNode(node);
+  return node;
+}
+
+ClassNode *CollectClassStructVisitor::VisitClassNode(ClassNode *node) {
+  // skip getting canonical type if not only fields
+  if (node->GetMethodsNum() || node->GetSuperClassesNum() || node->GetSuperInterfacesNum() ||
+      node->GetSuperClassesNum() || node->GetTypeParametersNum()) {
+    return node;
+  }
+
+  mAst->GetCanonicStructNode(node);
+  return node;
+}
+
+InterfaceNode *CollectClassStructVisitor::VisitInterfaceNode(InterfaceNode *node) {
+  // skip getting canonical type if not only fields
+  if (node->GetMethodsNum() || node->GetSuperInterfacesNum()) {
+    return node;
+  }
+
+  mAst->GetCanonicStructNode(node);
+  return node;
 }
 
 template <typename T1, typename T2>
@@ -52,7 +204,6 @@ static void SortFields(T1 *node) {
     node->SetField(i, vec[i].second);
   }
 }
-
 
 StructNode *SortFieldsVisitor::VisitStructNode(StructNode *node) {
   (void) AstVisitor::VisitStructNode(node);
@@ -116,121 +267,6 @@ IdentifierNode *AdjustASTVisitor::VisitIdentifierNode(IdentifierNode *node) {
   return node;
 }
 
-unsigned AdjustASTVisitor::GetFieldSize(TreeNode *node) {
-  unsigned size = 0;
-  switch (node->GetKind()) {
-    case NK_Struct:
-      size = static_cast<StructNode *>(node)->GetFieldsNum();
-      break;
-    case NK_Class:
-      size = static_cast<ClassNode *>(node)->GetFieldsNum();
-      break;
-    case NK_Interface:
-      size = static_cast<InterfaceNode *>(node)->GetFieldsNum();
-      break;
-    default:
-      break;
-  }
-  return size;
-}
-
-TreeNode *AdjustASTVisitor::GetField(TreeNode *node, unsigned i) {
-  TreeNode *fld = NULL;
-  switch (node->GetKind()) {
-    case NK_Struct:
-      fld = static_cast<StructNode *>(node)->GetField(i);
-      break;
-    case NK_Class:
-      fld = static_cast<ClassNode *>(node)->GetField(i);
-      break;
-    case NK_Interface:
-      fld = static_cast<InterfaceNode *>(node)->GetField(i);
-      break;
-    default:
-      break;
-  }
-  return fld;
-}
-
-static bool IsInterface(TreeNode *node) {
-  bool isI = node->IsInterface();
-  if (node->IsStruct()) {
-    isI = isI || (static_cast<StructNode *>(node)->GetProp() == SProp_TSInterface);
-  }
-  return isI;
-}
-
-TreeNode *AdjustASTVisitor::GetCanonicStructNode(TreeNode *node) {
-  unsigned size = GetFieldSize(node);
-  bool isI0 = IsInterface(node);
-
-  for (auto s: mFieldNum2StructNodeIdMap[size]) {
-    bool isI = IsInterface(s);
-    // skip if one is interface but other is not
-    if ((isI0 && !isI) || (!isI0 && isI)) {
-      continue;
-    }
-    bool match = true;;
-    // check fields
-    for (unsigned fid = 0; fid < size; fid++) {
-      TreeNode *f0 = GetField(node, fid);
-      TreeNode *f1 = GetField(s, fid);
-      if (f0->IsIdentifier() && f1->IsIdentifier()) {
-        IdentifierNode *i0 = static_cast<IdentifierNode *>(f0);
-        IdentifierNode *i1 = static_cast<IdentifierNode *>(f1);
-        if (i0->GetStrIdx() != i1->GetStrIdx() ||
-            i0->GetType() != i1->GetType()) {
-          match = false;
-          break;
-        }
-      } else {
-        match = false;
-        break;
-      }
-    }
-
-    if (match) {
-      return s;
-    }
-  }
-
-  // not match
-  unsigned stridx = node->GetStrIdx();
-  TreeNode *parent_orig = node->GetParent();
-
-  // node as anonymous struct will be added to module scope
-  if (stridx == 0) {
-    AddAnonymousStruct(node);
-  }
-  mFieldNum2StructNodeIdMap[size].insert(node);
-
-  return node;
-}
-
-void AdjustASTVisitor::AddAnonymousStruct(TreeNode *node) {
-  std::string str("AnonymousStruct_");
-  str += std::to_string(mNum++);
-  unsigned stridx = gStringPool.GetStrIdx(str);
-  node->SetStrIdx(stridx);
-
-  // for struct node, set structid
-  if (node->IsStruct()) {
-    StructNode *snode = static_cast<StructNode *>(node);
-    IdentifierNode *id = snode->GetStructId();
-    if (!id) {
-      id = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
-      new (id) IdentifierNode(0);
-      snode->SetStructId(id);
-    }
-
-    // set stridx for structid
-    id->SetStrIdx(stridx);
-  }
-
-  ModuleNode *module = mHandler->GetASTModule();
-  module->AddTreeFront(node);
-}
-
 TypeAliasNode *AdjustASTVisitor::CreateTypeAlias(TreeNode *to, TreeNode *from) {
   IdentifierNode *id1 = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
   new (id1) IdentifierNode(from->GetStrIdx());
@@ -260,7 +296,7 @@ ClassNode *AdjustASTVisitor::VisitClassNode(ClassNode *node) {
     return node;
   }
 
-  TreeNode *newnode = GetCanonicStructNode(node);
+  TreeNode *newnode = mAst->GetCanonicStructNode(node);
 
   // create a TypeAlias for duplicated type if top level
   if (newnode != node && node->GetParent() && node->GetParent()->IsModule()) {
@@ -279,7 +315,7 @@ InterfaceNode *AdjustASTVisitor::VisitInterfaceNode(InterfaceNode *node) {
     return node;
   }
 
-  TreeNode *newnode = GetCanonicStructNode(node);
+  TreeNode *newnode = mAst->GetCanonicStructNode(node);
 
   // create a TypeAlias for duplicated type if top level
   if (newnode != node && node->GetParent() && node->GetParent()->IsModule()) {
@@ -313,7 +349,7 @@ StructNode *AdjustASTVisitor::VisitStructNode(StructNode *node) {
     return node;
   }
 
-  TreeNode *newnode = GetCanonicStructNode(node);
+  TreeNode *newnode = mAst->GetCanonicStructNode(node);
 
   // create a TypeAlias for duplicated type if top level
   // except newly added anonymous type which has updated parent
