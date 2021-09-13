@@ -1590,8 +1590,9 @@ rule InferType : "infer" + Identifier
 
 rule TypeArray : ONEOF(PrimaryType + '[' + PrimaryExpression + ']',
                        PrimaryType + '[' + TypeReference + ']',
-                       TypeArray + '[' + PrimaryExpression + ']')
-  attr.action.%1,%2,%3 : BuildArrayElement(%1, %3)
+                       TypeArray + '[' + PrimaryExpression + ']',
+                       PrimaryType + '[' + ConditionalType + ']')
+  attr.action.%1,%2,%3,%4 : BuildArrayElement(%1, %3)
 
 #rule Type : ONEOF(UnionOrIntersectionOrPrimaryType,
 #                  FunctionType,

@@ -1,0 +1,4 @@
+Matched 56 tokens.
+============= Module ===========
+== Sub Tree ==
+ type UT<T,I> =  {base;ext }[I extends -1 ? "base" : "ext"]
