@@ -309,12 +309,13 @@ StructNode *AdjustASTVisitor::VisitStructNode(StructNode *node) {
   }
 
   // skip getting canonical type for TypeAlias
-  TreeNode *parent = node->GetParent();
-  while (parent) {
-    if (parent->IsTypeAlias()) {
+  TreeNode *parent_orig = node->GetParent();
+  TreeNode *p = parent_orig;
+  while (p) {
+    if (p->IsTypeAlias()) {
       return node;
     }
-    parent = parent->GetParent();
+    p = p->GetParent();
   }
 
   // skip getting canonical type if not only fields
@@ -325,7 +326,8 @@ StructNode *AdjustASTVisitor::VisitStructNode(StructNode *node) {
   TreeNode *newnode = GetCanonicStructNode(node);
 
   // create a TypeAlias for duplicated type if top level
-  if (newnode != node && node->GetParent() && !node->GetParent()->IsModule()) {
+  // except newly added anonymous type which has updated parent
+  if (newnode != node && parent_orig && node->GetParent()->IsModule() && node->GetParent() == parent_orig) {
     node = (StructNode*)CreateTypeAlias(newnode, node);;
   } else {
     node = (StructNode*)newnode;
