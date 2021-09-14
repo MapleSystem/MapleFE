@@ -273,16 +273,19 @@ TypeAliasNode *AdjustASTVisitor::CreateTypeAlias(TreeNode *to, TreeNode *from) {
 
   UserTypeNode *utype1 = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
   new (utype1) UserTypeNode(id1);
+  utype1->SetStrIdx(id1->GetStrIdx());
 
   IdentifierNode *id2 = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
   new (id2) IdentifierNode(to->GetStrIdx());
 
   UserTypeNode *utype2 = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
   new (utype2) UserTypeNode(id2);
+  utype2->SetStrIdx(id2->GetStrIdx());
 
   TypeAliasNode *alias = (TypeAliasNode*)gTreePool.NewTreeNode(sizeof(TypeAliasNode));
   new (alias) TypeAliasNode();
   alias->SetId(utype1);
+  alias->SetStrIdx(id1->GetStrIdx());
   alias->SetAlias(utype2);
 
   return alias;
@@ -364,6 +367,7 @@ StructNode *AdjustASTVisitor::VisitStructNode(StructNode *node) {
 
     UserTypeNode *utype = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
     new (utype) UserTypeNode(newid);
+    utype->SetStrIdx(newid->GetStrIdx());
     newnode = utype;
   }
 
@@ -373,15 +377,26 @@ StructNode *AdjustASTVisitor::VisitStructNode(StructNode *node) {
 TreeNode *AdjustASTVisitor::CreateTypeNodeFromName(IdentifierNode *node) {
   UserTypeNode *ut = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
   new (ut) UserTypeNode(node);
+  ut->SetStrIdx(node->GetStrIdx());
   return ut;
 }
 
-// set UserTypeNode's mStrIdx to be its mId's if exist
+// set UserTypeNode's mStrIdx to be its mId's
 UserTypeNode *AdjustASTVisitor::VisitUserTypeNode(UserTypeNode *node) {
   (void) AstVisitor::VisitUserTypeNode(node);
   TreeNode *id = node->GetId();
-  if (id && id->IsIdentifier()) {
+  if (id) {
     node->SetStrIdx(id->GetStrIdx());
+  }
+  return node;
+}
+
+// set TypeAliasNode's mStrIdx to be its mId's
+TypeAliasNode *AdjustASTVisitor::VisitTypeAliasNode(TypeAliasNode *node) {
+  (void) AstVisitor::VisitTypeAliasNode(node);
+  UserTypeNode *id = node->GetId();
+  if (id && id->GetId()) {
+    node->SetStrIdx(id->GetId()->GetStrIdx());
   }
   return node;
 }

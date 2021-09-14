@@ -215,12 +215,8 @@ UserTypeNode *BuildScopeVisitor::VisitUserTypeNode(UserTypeNode *node) {
         return node;
       }
     } else if (p->IsTypeAlias()) {
-      // typalias id
-      TypeAliasNode *ta = static_cast<TypeAliasNode *>(p);
-      if (ta->GetId() == node) {
-        AddType(scope, node);
-        return node;
-      }
+      // handled by typealias node
+      return node;
     }
 
     if (p->IsScope()) {
@@ -234,10 +230,7 @@ UserTypeNode *BuildScopeVisitor::VisitUserTypeNode(UserTypeNode *node) {
 TypeAliasNode *BuildScopeVisitor::VisitTypeAliasNode(TypeAliasNode *node) {
   ASTScope *scope = mScopeStack.top();
   BuildScopeBaseVisitor::VisitTypeAliasNode(node);
-  UserTypeNode *ut = node->GetId();
-  if (ut) {
-    AddType(scope, ut);
-  }
+  AddType(scope, node);
   return node;
 }
 

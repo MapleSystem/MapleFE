@@ -122,6 +122,7 @@ class AdjustASTVisitor : public AstVisitor {
   InterfaceNode *VisitInterfaceNode(InterfaceNode *node);
   FunctionNode *VisitFunctionNode(FunctionNode *node);
   UserTypeNode *VisitUserTypeNode(UserTypeNode *node);
+  TypeAliasNode *VisitTypeAliasNode(TypeAliasNode *node);
 };
 
 }

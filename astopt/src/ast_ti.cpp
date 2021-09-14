@@ -1172,6 +1172,16 @@ TypeOfNode *TypeInferVisitor::VisitTypeOfNode(TypeOfNode *node) {
   return node;
 }
 
+TypeAliasNode *TypeInferVisitor::VisitTypeAliasNode(TypeAliasNode *node) {
+  (void) AstVisitor::VisitTypeAliasNode(node);
+  UserTypeNode *id = node->GetId();
+  TreeNode *alias = node->GetAlias();
+  TypeId tid = alias->GetTypeId();
+  UpdateTypeId(id, tid);
+  UpdateTypeId(node, tid);
+  return node;
+}
+
 UnaOperatorNode *TypeInferVisitor::VisitUnaOperatorNode(UnaOperatorNode *node) {
   (void) AstVisitor::VisitUnaOperatorNode(node);
   OprId op = node->GetOprId();
