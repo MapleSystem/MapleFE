@@ -797,15 +797,13 @@ std::string Emitter::EmitArrayElementNode(ArrayElementNode *node) {
     if(mPrecedence < '\024')
       str = "("s + str + ")"s;
   }
-
-
+  str = Clean(str);
   for (unsigned i = 0; i < node->GetExprsNum(); ++i) {
     if (auto n = node->GetExprAtIndex(i)) {
       str += "["s + EmitTreeNode(n) + "]"s;
     }
   }
   Replace(str, "?[", "?.[");
-
   mPrecedence = '\030';
   return HandleTreeNode(str, node);
 }
