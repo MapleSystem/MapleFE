@@ -602,7 +602,7 @@ std::string CppDecl::EmitInterface(StructNode *node) {
   }
   str += "    "s  + ifName + "() {};\n"s;
   str += "    ~"s + ifName + "() {};\n"s;
-  str += "    "s  + ifName + "(Function* ctor, Object* proto, std::vector<ObjectProp> props): Object(ctor, proto, props) {}\n"s;
+  str += "    "s  + ifName + "(Function* ctor, Object* proto, std::vector<ObjectProp> props): "s + superClass + "(ctor, proto, props) {}\n"s;
   str += "};\n"s;
   return str;
 }
