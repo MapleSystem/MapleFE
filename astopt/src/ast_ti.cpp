@@ -1033,7 +1033,14 @@ IdentifierNode *TypeInferVisitor::VisitIdentifierNode(IdentifierNode *node) {
   }
 
   if (decl) {
-    UpdateTypeId(node, decl->GetTypeId());
+    // node itself is part of decl
+    if (decl == parent) {
+      if (node->GetType()) {
+        UpdateTypeId(node, node->GetType()->GetTypeId());
+      }
+    } else {
+      UpdateTypeId(node, decl->GetTypeId());
+    }
   } else {
     NOTYETIMPL("node not declared");
     MSGNOLOC0(node->GetName());
