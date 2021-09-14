@@ -230,6 +230,7 @@ UserTypeNode *BuildScopeVisitor::VisitUserTypeNode(UserTypeNode *node) {
 TypeAliasNode *BuildScopeVisitor::VisitTypeAliasNode(TypeAliasNode *node) {
   ASTScope *scope = mScopeStack.top();
   BuildScopeBaseVisitor::VisitTypeAliasNode(node);
+  scope->AddDecl(node);
   AddType(scope, node);
   return node;
 }
