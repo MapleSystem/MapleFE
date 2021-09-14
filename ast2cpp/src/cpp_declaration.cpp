@@ -582,9 +582,17 @@ std::string CppDecl::EmitInterface(StructNode *node) {
   if (node == nullptr)
     return std::string();
 
+  std::string superClass = "Object";
+  if (node->GetSupersNum() > 0) {
+    auto n = node->GetSuper(0);
+    superClass = EmitTreeNode(n);
+    if (superClass.back() == '*')
+      superClass.pop_back();
+  }
+
   if (auto n = node->GetStructId()) {
     ifName = IdentifierName(n);
-    str = "class "s + ifName + " : public Object {\n"s;
+    str = "class "s + ifName + " : public "s + superClass + " {\n"s;
   }
   str += "  public:\n"s;
   for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
