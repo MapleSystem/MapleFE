@@ -417,6 +417,16 @@ InterfaceNode *AdjustASTVisitor::VisitInterfaceNode(InterfaceNode *node) {
 StructLiteralNode *AdjustASTVisitor::VisitStructLiteralNode(StructLiteralNode *node) {
   (void) AstVisitor::VisitStructLiteralNode(node);
 
+  unsigned size = node->GetFieldsNum();
+  for (unsigned fid = 0; fid < size; fid++) {
+    FieldLiteralNode *field = node->GetField(fid);
+    TreeNode *name = field->GetFieldName();
+    TreeNode *lit = field->GetLiteral();
+    if (!name || !lit || lit->GetKind() != NK_Literal) {
+      return node;
+    }
+  }
+
   TreeNode *parent = node->GetParent();
 
   // create anonymous struct for structliteral in decl init
@@ -427,7 +437,7 @@ StructLiteralNode *AdjustASTVisitor::VisitStructLiteralNode(StructLiteralNode *n
       IdentifierNode *id = static_cast<IdentifierNode *>(var);
       if (!id->GetType()) {
         TreeNode *newnode = mAst->GetCanonicStructNode(node);
-        if (newnode != node) {
+        if (newnode && newnode != node) {
           UserTypeNode *utype = mAst->CreateUserTypeNode(newnode->GetStrIdx());
           static_cast<IdentifierNode *>(var)->SetType(utype);
         }
