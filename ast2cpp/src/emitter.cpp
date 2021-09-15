@@ -190,13 +190,9 @@ std::string Emitter::EmitFunctionNode(FunctionNode *node) {
     if (auto n = node->GetAnnotationAtIndex(i))
       pre += '@' + EmitTreeNode(n) + "\n"s;
 
-  bool inside = false;
   auto p = node->GetParent();
-  if (p) {
-    auto k = p->GetKind();
-    if (k == NK_Class || k == NK_Struct || k == NK_Interface)
-      inside = true;
-  }
+  NodeKind k = p ? p->GetKind() : NK_Null;
+  bool inside = k == NK_Class || k == NK_Struct || k == NK_Interface;
   bool func = !inside;
   for (unsigned i = 0; i < node->GetAttrsNum(); ++i) {
     std::string s = GetEnumAttrId(node->GetAttrAtIndex(i));
@@ -206,14 +202,14 @@ std::string Emitter::EmitFunctionNode(FunctionNode *node) {
   }
 
   std::string str;
-  auto name = node->GetFuncName();
-  if(name) {
+  bool has_name;
+  if(TreeNode* name = node->GetFuncName()) {
     std::string s = EmitTreeNode(name);
-    if (s.substr(0, 9) == "__lambda_")
-      name = nullptr;
-    else
+    has_name = s.substr(0, 9) != "__lambda_";
+    if (has_name)
       str += s;
-  }
+  } else
+    has_name = k == NK_XXportAsPair;
 
   if (node->IsConstructSignature())
     str += "new"s;
@@ -256,8 +252,8 @@ std::string Emitter::EmitFunctionNode(FunctionNode *node) {
   if (auto n = node->GetType()) {
     std::string s = EmitTreeNode(n);
     if(!s.empty()) {
-      str += ((body || name) || inside ? " : "s : " => "s) + s;
-      if (!body && !name)
+      str += (body || has_name || inside ? " : "s : " => "s) + s;
+      if (!body && !has_name)
         func = false;
     }
   }
