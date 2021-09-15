@@ -48,6 +48,9 @@ void AST_AST::AdjustAST() {
 unsigned AST_AST::GetFieldSize(TreeNode *node) {
   unsigned size = 0;
   switch (node->GetKind()) {
+    case NK_StructLiteral:
+      size = static_cast<StructLiteralNode *>(node)->GetFieldsNum();
+      break;
     case NK_Struct:
       size = static_cast<StructNode *>(node)->GetFieldsNum();
       break;
@@ -66,6 +69,9 @@ unsigned AST_AST::GetFieldSize(TreeNode *node) {
 TreeNode *AST_AST::GetField(TreeNode *node, unsigned i) {
   TreeNode *fld = NULL;
   switch (node->GetKind()) {
+    case NK_StructLiteral:
+      fld = static_cast<StructLiteralNode *>(node)->GetField(i);
+      break;
     case NK_Struct:
       fld = static_cast<StructNode *>(node)->GetField(i);
       break;
@@ -89,11 +95,30 @@ bool AST_AST::IsInterface(TreeNode *node) {
   return isI;
 }
 
+// check if "from" is compatible to "to"
+bool AST_AST::IsFieldCompatibleTo(IdentifierNode *from, IdentifierNode *to) {
+  if (from->GetStrIdx() != to->GetStrIdx()) {
+    return  false;
+  }
+  if (from->GetType() == to->GetType()) {
+    return true;
+  } else if ((from->GetType() && !to->GetType()) ||
+             (!from->GetType() && to->GetType())) {
+    return  false;
+  }
+  if (from->GetType()->GetKind() != to->GetType()->GetKind()) {
+    return  false;
+  }
+  NodeKind kind = from->GetType()->GetKind();
+  // TODO:
+  return true;
+}
+
 TreeNode *AST_AST::GetCanonicStructNode(TreeNode *node) {
   unsigned size = GetFieldSize(node);
   bool isI0 = IsInterface(node);
 
-  for (auto s: mFieldNum2StructNodeIdMap[size]) {
+  for (auto s: mFieldNum2StructNodeMap[size]) {
     bool isI = IsInterface(s);
     // skip if one is interface but other is not
     if ((isI0 && !isI) || (!isI0 && isI)) {
@@ -103,12 +128,14 @@ TreeNode *AST_AST::GetCanonicStructNode(TreeNode *node) {
     // check fields
     for (unsigned fid = 0; fid < size; fid++) {
       TreeNode *f0 = GetField(node, fid);
+      if (f0->IsFieldLiteral()) {
+        f0 = static_cast<FieldLiteralNode *>(f0)->GetFieldName();
+      }
       TreeNode *f1 = GetField(s, fid);
-      if (f0->IsIdentifier() && f1->IsIdentifier()) {
+      if (f0 && f1 && f0->IsIdentifier() && f1->IsIdentifier()) {
         IdentifierNode *i0 = static_cast<IdentifierNode *>(f0);
         IdentifierNode *i1 = static_cast<IdentifierNode *>(f1);
-        if (i0->GetStrIdx() != i1->GetStrIdx() ||
-            i0->GetType() != i1->GetType()) {
+        if (!IsFieldCompatibleTo(i0, i1)) {
           match = false;
           break;
         }
@@ -128,26 +155,109 @@ TreeNode *AST_AST::GetCanonicStructNode(TreeNode *node) {
 
   // node as anonymous struct will be added to module scope
   if (GetNameAnonyStruct() && stridx == 0) {
-    AddAnonymousStruct(node);
+    TreeNode *anony = GetAnonymousStruct(node);
+    if (!anony) {
+      return node;
+    } else {
+      node = anony;
+    }
   }
-  mFieldNum2StructNodeIdMap[size].insert(node);
+  mFieldNum2StructNodeMap[size].insert(node);
 
   return node;
 }
 
-void AST_AST::AddAnonymousStruct(TreeNode *node) {
+
+IdentifierNode *AST_AST::CreateIdentifierNode(unsigned stridx) {
+  IdentifierNode *node = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
+  new (node) IdentifierNode(stridx);
+  return node;
+}
+
+UserTypeNode *AST_AST::CreateUserTypeNode(unsigned stridx) {
+  IdentifierNode *node = CreateIdentifierNode(stridx);
+
+  UserTypeNode *utype = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
+  new (utype) UserTypeNode(node);
+  utype->SetStrIdx(stridx);
+  return utype;
+}
+
+UserTypeNode *AST_AST::CreateUserTypeNode(IdentifierNode *node) {
+  UserTypeNode *utype = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
+  new (utype) UserTypeNode(node);
+  utype->SetStrIdx(node->GetStrIdx());
+  return utype;
+}
+
+TypeAliasNode *AST_AST::CreateTypeAliasNode(TreeNode *to, TreeNode *from) {
+  UserTypeNode *utype1 = CreateUserTypeNode(from->GetStrIdx());
+  UserTypeNode *utype2 = CreateUserTypeNode(to->GetStrIdx());
+
+  TypeAliasNode *alias = (TypeAliasNode*)gTreePool.NewTreeNode(sizeof(TypeAliasNode));
+  new (alias) TypeAliasNode();
+  alias->SetId(utype1);
+  alias->SetStrIdx(from->GetStrIdx());
+  alias->SetAlias(utype2);
+
+  return alias;
+}
+
+StructNode *AST_AST::CreateStructFromStructLiteral(StructLiteralNode *node) {
+  StructNode *newnode = (StructNode*)gTreePool.NewTreeNode(sizeof(StructNode));
+  new (newnode) StructNode(0);
+
+  for (unsigned i = 0; i < node->GetFieldsNum(); i++) {
+    FieldLiteralNode *fl = node->GetField(i);
+    TreeNode *name = fl->GetFieldName();
+    if (!name || !name->IsIdentifier()) {
+      newnode->Release();
+      return NULL;
+    }
+
+    IdentifierNode *fid = CreateIdentifierNode(name->GetStrIdx());
+    newnode->AddField(fid);
+
+    TreeNode *lit = fl->GetLiteral();
+    if (lit && lit->IsLiteral()) {
+      LiteralNode *l = static_cast<LiteralNode *>(lit);
+      LitData data = l->GetData();
+      if (data.mType == LT_StringLiteral) {
+        unsigned idx = gStringPool.GetStrIdx("string");
+        UserTypeNode *utype = CreateUserTypeNode(idx);
+        fid->SetType(utype);
+      } else if (data.mType == LT_IntegerLiteral) {
+        NOTYETIMPL("StructLiteralNode integer literal");
+      } else {
+        NOTYETIMPL("StructLiteralNode literal data type");
+      }
+    } else {
+      NOTYETIMPL("StructLiteralNode literal field kind");
+    }
+  }
+  return newnode;
+}
+
+TreeNode *AST_AST::GetAnonymousStruct(TreeNode *node) {
   std::string str("AnonymousStruct_");
   str += std::to_string(mNum++);
   unsigned stridx = gStringPool.GetStrIdx(str);
-  node->SetStrIdx(stridx);
+  TreeNode *newnode = node;
+  if (newnode->IsStructLiteral()) {
+    StructLiteralNode *sl = static_cast<StructLiteralNode*>(node);
+    newnode = CreateStructFromStructLiteral(sl);
+    if (!newnode) {
+      return NULL;
+    }
+  }
+  newnode->SetStrIdx(stridx);
 
   // for struct node, set structid
-  if (node->IsStruct()) {
-    StructNode *snode = static_cast<StructNode *>(node);
+  if (newnode->IsStruct()) {
+    StructNode *snode = static_cast<StructNode *>(newnode);
     IdentifierNode *id = snode->GetStructId();
     if (!id) {
-      id = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
-      new (id) IdentifierNode(0);
+      id = CreateIdentifierNode(0);
       snode->SetStructId(id);
     }
 
@@ -156,7 +266,8 @@ void AST_AST::AddAnonymousStruct(TreeNode *node) {
   }
 
   ModuleNode *module = mHandler->GetASTModule();
-  module->AddTreeFront(node);
+  module->AddTreeFront(newnode);
+  return newnode;
 }
 
 StructNode *CollectClassStructVisitor::VisitStructNode(StructNode *node) {
@@ -267,30 +378,6 @@ IdentifierNode *AdjustASTVisitor::VisitIdentifierNode(IdentifierNode *node) {
   return node;
 }
 
-TypeAliasNode *AdjustASTVisitor::CreateTypeAlias(TreeNode *to, TreeNode *from) {
-  IdentifierNode *id1 = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
-  new (id1) IdentifierNode(from->GetStrIdx());
-
-  UserTypeNode *utype1 = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
-  new (utype1) UserTypeNode(id1);
-  utype1->SetStrIdx(id1->GetStrIdx());
-
-  IdentifierNode *id2 = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
-  new (id2) IdentifierNode(to->GetStrIdx());
-
-  UserTypeNode *utype2 = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
-  new (utype2) UserTypeNode(id2);
-  utype2->SetStrIdx(id2->GetStrIdx());
-
-  TypeAliasNode *alias = (TypeAliasNode*)gTreePool.NewTreeNode(sizeof(TypeAliasNode));
-  new (alias) TypeAliasNode();
-  alias->SetId(utype1);
-  alias->SetStrIdx(id1->GetStrIdx());
-  alias->SetAlias(utype2);
-
-  return alias;
-}
-
 ClassNode *AdjustASTVisitor::VisitClassNode(ClassNode *node) {
   (void) AstVisitor::VisitClassNode(node);
   // skip getting canonical type if not only fields
@@ -299,16 +386,15 @@ ClassNode *AdjustASTVisitor::VisitClassNode(ClassNode *node) {
     return node;
   }
 
+  TreeNode *parent = node->GetParent();
   TreeNode *newnode = mAst->GetCanonicStructNode(node);
 
   // create a TypeAlias for duplicated type if top level
-  if (newnode != node && node->GetParent() && node->GetParent()->IsModule()) {
-    node = (ClassNode*)CreateTypeAlias(newnode, node);;
-  } else {
-    node = (ClassNode*)newnode;
+  if (newnode != node && parent && parent->IsModule()) {
+    newnode = (ClassNode*)(mAst->CreateTypeAliasNode(newnode, node));
   }
 
-  return node;
+  return (ClassNode*)newnode;
 }
 
 InterfaceNode *AdjustASTVisitor::VisitInterfaceNode(InterfaceNode *node) {
@@ -318,15 +404,36 @@ InterfaceNode *AdjustASTVisitor::VisitInterfaceNode(InterfaceNode *node) {
     return node;
   }
 
+  TreeNode *parent = node->GetParent();
   TreeNode *newnode = mAst->GetCanonicStructNode(node);
 
   // create a TypeAlias for duplicated type if top level
-  if (newnode != node && node->GetParent() && node->GetParent()->IsModule()) {
-    node = (InterfaceNode*)CreateTypeAlias(newnode, node);;
-  } else {
-    node = (InterfaceNode*)newnode;
+  if (newnode != node && parent && parent->IsModule()) {
+    newnode = (InterfaceNode*)(mAst->CreateTypeAliasNode(newnode, node));
   }
+  return (InterfaceNode*)newnode;
+}
 
+StructLiteralNode *AdjustASTVisitor::VisitStructLiteralNode(StructLiteralNode *node) {
+  (void) AstVisitor::VisitStructLiteralNode(node);
+
+  TreeNode *parent = node->GetParent();
+
+  // create anonymous struct for structliteral in decl init
+  if (parent && parent->IsDecl()) {
+    DeclNode *decl = static_cast<DeclNode *>(parent);
+    TreeNode *var = decl->GetVar();
+    if (var->IsIdentifier()) {
+      IdentifierNode *id = static_cast<IdentifierNode *>(var);
+      if (!id->GetType()) {
+        TreeNode *newnode = mAst->GetCanonicStructNode(node);
+        if (newnode != node) {
+          UserTypeNode *utype = mAst->CreateUserTypeNode(newnode->GetStrIdx());
+          static_cast<IdentifierNode *>(var)->SetType(utype);
+        }
+      }
+    }
+  }
   return node;
 }
 
@@ -356,29 +463,17 @@ StructNode *AdjustASTVisitor::VisitStructNode(StructNode *node) {
 
   // create a TypeAlias for duplicated type if top level
   // except newly added anonymous type which has updated parent
-  if (newnode != node && parent_orig && node->GetParent()->IsModule() && node->GetParent() == parent_orig) {
-    newnode = CreateTypeAlias(newnode, node);;
+  TreeNode *parent = node->GetParent();
+  if (newnode != node && parent_orig && parent && parent == parent_orig && parent->IsModule()) {
+    newnode = mAst->CreateTypeAliasNode(newnode, node);
   }
 
   // for non top level tree node, replace it with a UserType node
   if (!parent_orig || !parent_orig->IsModule()) {
-    IdentifierNode *newid = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
-    new (newid) IdentifierNode(newnode->GetStrIdx());
-
-    UserTypeNode *utype = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
-    new (utype) UserTypeNode(newid);
-    utype->SetStrIdx(newid->GetStrIdx());
-    newnode = utype;
+    newnode = mAst->CreateUserTypeNode(newnode->GetStrIdx());
   }
 
   return (StructNode*)newnode;
-}
-
-TreeNode *AdjustASTVisitor::CreateTypeNodeFromName(IdentifierNode *node) {
-  UserTypeNode *ut = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
-  new (ut) UserTypeNode(node);
-  ut->SetStrIdx(node->GetStrIdx());
-  return ut;
 }
 
 // set UserTypeNode's mStrIdx to be its mId's
@@ -412,10 +507,9 @@ FunctionNode *AdjustASTVisitor::VisitFunctionNode(FunctionNode *node) {
     type = node->GetTypeParamAtIndex(i);
     if (type->IsIdentifier()) {
       IdentifierNode *inode = static_cast<IdentifierNode *>(type);
-      TreeNode *newtype = CreateTypeNodeFromName(inode);
+      TreeNode *newtype = mAst->CreateUserTypeNode(inode);
       node->SetTypeParamAtIndex(i, newtype);
       newtype->SetParent(node);
-      newtype->SetStrIdx(inode->GetStrIdx());
     }
   }
   return node;
@@ -424,7 +518,6 @@ FunctionNode *AdjustASTVisitor::VisitFunctionNode(FunctionNode *node) {
 // move init from identifier to decl
 // copy stridx to decl
 DeclNode *AdjustASTVisitor::VisitDeclNode(DeclNode *node) {
-  (void) AstVisitor::VisitDeclNode(node);
   TreeNode *var = node->GetVar();
   if (var->IsIdentifier()) {
     IdentifierNode *inode = static_cast<IdentifierNode *>(var);
@@ -449,6 +542,9 @@ DeclNode *AdjustASTVisitor::VisitDeclNode(DeclNode *node) {
   } else {
     NOTYETIMPL("decl not idenfier or bind pattern");
   }
+
+  // reorg before processing init
+  (void) AstVisitor::VisitDeclNode(node);
   return node;
 }
 
@@ -469,8 +565,7 @@ ExportNode *AdjustASTVisitor::VisitExportNode(ExportNode *node) {
         switch (bfnode->GetKind()) {
           case NK_Function: {
             FunctionNode *func = static_cast<FunctionNode *>(bfnode);
-            IdentifierNode *n = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
-            new (n) IdentifierNode(func->GetStrIdx());
+            IdentifierNode *n = mAst->CreateIdentifierNode(func->GetStrIdx());
             // update p
             p->SetBefore(n);
             n->SetParent(p);
@@ -490,8 +585,7 @@ ExportNode *AdjustASTVisitor::VisitExportNode(ExportNode *node) {
           }
           case NK_Class: {
             ClassNode *classnode = static_cast<ClassNode *>(bfnode);
-            IdentifierNode *n = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
-            new (n) IdentifierNode(classnode->GetStrIdx());
+            IdentifierNode *n = mAst->CreateIdentifierNode(classnode->GetStrIdx());
             // update p
             p->SetBefore(n);
             n->SetParent(p);
@@ -564,9 +658,8 @@ LambdaNode *AdjustASTVisitor::VisitLambdaNode(LambdaNode *node) {
   std::string str("__lambda_");
   str += std::to_string(uniq_number++);
   str += "__";
-  IdentifierNode *name = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
   unsigned stridx = gStringPool.GetStrIdx(str);
-  new (name) IdentifierNode(stridx);
+  IdentifierNode *name = mAst->CreateIdentifierNode(stridx);
   func->SetStrIdx(stridx);
   func->SetFuncName(name);
 

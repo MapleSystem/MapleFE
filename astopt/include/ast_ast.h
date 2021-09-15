@@ -35,7 +35,7 @@ class AST_AST {
   bool            mNameAnonyStruct;
 
   std::unordered_set<unsigned> mReachableBbIdx;;
-  std::unordered_map<unsigned, std::unordered_set<TreeNode *>> mFieldNum2StructNodeIdMap;
+  std::unordered_map<unsigned, std::unordered_set<TreeNode *>> mFieldNum2StructNodeMap;
 
  public:
   explicit AST_AST(Module_Handler *h, unsigned f) : mHandler(h), mFlags(f), mNum(1),
@@ -47,8 +47,18 @@ class AST_AST {
   unsigned GetFieldSize(TreeNode *node);
   TreeNode *GetField(TreeNode *node, unsigned i);
   TreeNode *GetCanonicStructNode(TreeNode *node);
-  void AddAnonymousStruct(TreeNode *node);
+
+  IdentifierNode *CreateIdentifierNode(unsigned stridx);
+  UserTypeNode *CreateUserTypeNode(unsigned stridx);
+  UserTypeNode *CreateUserTypeNode(IdentifierNode *node);
+  TypeAliasNode *CreateTypeAliasNode(TreeNode *to, TreeNode *from);
+  StructNode *CreateStructFromStructLiteral(StructLiteralNode *node);
+
+  TreeNode *GetAnonymousStruct(TreeNode *node);
+
   bool IsInterface(TreeNode *node);
+  bool IsFieldCompatibleTo(IdentifierNode *from, IdentifierNode *to);
+
   void SetNameAnonyStruct(bool b) { mNameAnonyStruct = b; }
   bool GetNameAnonyStruct() { return mNameAnonyStruct; }
 };
@@ -108,9 +118,6 @@ class AdjustASTVisitor : public AstVisitor {
     }
   ~AdjustASTVisitor() = default;
 
-  TreeNode *CreateTypeNodeFromName(IdentifierNode *node);
-  TypeAliasNode *CreateTypeAlias(TreeNode *to, TreeNode *from);
-
   DeclNode *VisitDeclNode(DeclNode *node);
   ExportNode *VisitExportNode(ExportNode *node);
   CondBranchNode *VisitCondBranchNode(CondBranchNode *node);
@@ -118,6 +125,7 @@ class AdjustASTVisitor : public AstVisitor {
   LambdaNode *VisitLambdaNode(LambdaNode *node);
   IdentifierNode *VisitIdentifierNode(IdentifierNode *node);
   StructNode *VisitStructNode(StructNode *node);
+  StructLiteralNode *VisitStructLiteralNode(StructLiteralNode *node);
   ClassNode *VisitClassNode(ClassNode *node);
   InterfaceNode *VisitInterfaceNode(InterfaceNode *node);
   FunctionNode *VisitFunctionNode(FunctionNode *node);
