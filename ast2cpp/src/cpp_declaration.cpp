@@ -753,5 +753,11 @@ std::string CppDecl::EmitStrIndexSigNode(StrIndexSigNode *node) {
   return std::string();
 }
 
+std::string ident(int n) {
+  std::string str;
+  for (unsigned i = 0; i < n; ++i)
+    str += "  "s;
+  return str;
+}
 
 } // namespace maplefe

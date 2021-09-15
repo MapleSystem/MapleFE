@@ -159,6 +159,21 @@ std::map<TypeId, std::string>TypeIdToJSType = {
   {TY_Double,  "TY_Double"}
 };
 
+// Generate call to create obj prop with ptr to c++ class fld member
+// example emit result for class Foo member f1, type long
+// obj->AddProp("f1", ClassFld<long Foo::*>(&Foo::f1).NewProp(TY_Long));
+std::string EmitAddPropWithClassFld(std::string objName,
+                                  std::string className,
+                                  std::string fdName,
+                                  std::string fdCType,
+                                  std::string fdJSType)  {
+  std::string str;
+  str = objName+ "->AddProp(\""s + fdName + "\", ClassFld<"s + fdCType +
+        " "s + className + "::*>(&"s + className + "::"s + fdName +
+        ").NewProp("s + fdJSType + "))"s;
+  return str;
+}
+
 std::string CppDef::EmitClassProps(TreeNode* node) {
   std::string clsFd, addProp;
   MASSERT(node->GetKind()==NK_Class && "Not NK_Class node");
@@ -168,11 +183,9 @@ std::string CppDef::EmitClassProps(TreeNode* node) {
     std::string fdName = node->GetName();
     std::string fdType = mCppDecl.GetTypeString(node);
     TypeId typeId = node->GetTypeId();
-    // C++ Code template for adding class field (e.g. a long field Foo::f1) to object prop list
-    //   ClassFld<long Foo::*> field(&Foo::f1);
-    //   obj->AddProp("f1", field.NewProp(TY_Long));
-    clsFd   += "  ClassFld<"s + fdType + " "s + c->GetName() + "::*> _field"s + std::to_string(i) +"(&"s +c->GetName()+ "::"s + fdName +");\n"s;
-    addProp += "  obj->AddProp(\""s + fdName + "\", "s + "_field"s + std::to_string(i) + ".NewProp("s + TypeIdToJSType[typeId] + "));\n"s;
+    addProp += "  "s
+               + EmitAddPropWithClassFld("obj", c->GetName(), fdName, fdType, TypeIdToJSType[typeId])
+               + ";\n"s;
   }
   return "\n  // Add class fields to obj prop list\n"s + clsFd + addProp;
 }
@@ -277,7 +290,8 @@ std::string CppDef::EmitIdentifierNode(IdentifierNode *node) {
 // Generate vector of ObjectProp to be passed to Object constructor.
 std::string CppDef::EmitStructLiteralNode(StructLiteralNode* node) {
   std::string str;
-  str += "\n  std::vector<ObjectProp>({\n"s;
+  int stops = 2;
+  str += "\n"s + ident(stops) + "std::vector<ObjectProp>({\n"s;
   for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
     if (i)
       str += ",\n"s;
@@ -286,6 +300,7 @@ std::string CppDef::EmitStructLiteralNode(StructLiteralNode* node) {
       std::string fieldName = EmitTreeNode(field->GetFieldName());
       TypeId typId = lit->GetTypeId();
       std::string fieldVal = EmitTreeNode(lit);
+      str += ident(stops+1);
       switch(typId) {
         case TY_Object:
           break;
@@ -294,33 +309,33 @@ std::string CppDef::EmitStructLiteralNode(StructLiteralNode* node) {
         case TY_Array:
           break;
         case TY_Boolean:
-          str += "    std::make_pair(\""s + fieldName + "\", JS_Val(bool("s + fieldVal + ")))"s;
+          str += "std::make_pair(\""s + fieldName + "\", JS_Val(bool("s + fieldVal + ")))"s;
           break;
         case TY_None:
           if (fieldVal.compare("true") == 0 || fieldVal.compare("false") == 0)
-            str += "    std::make_pair(\""s + fieldName + "\", JS_Val(bool("s + fieldVal + ")))"s;
+            str += "std::make_pair(\""s + fieldName + "\", JS_Val(bool("s + fieldVal + ")))"s;
           break;
         case TY_Int:
-          str += "    std::make_pair(\""s + fieldName + "\", JS_Val(int64_t("s + fieldVal + ")))"s;
+          str += "std::make_pair(\""s + fieldName + "\", JS_Val(int64_t("s + fieldVal + ")))"s;
           break;
         case TY_String:
-          str += "    std::make_pair(\""s + fieldName + "\", JS_Val(new std::string("s + fieldVal + ")))"s;
+          str += "std::make_pair(\""s + fieldName + "\", JS_Val(new std::string("s + fieldVal + ")))"s;
           break;
         case TY_Number:
         case TY_Double:
-          str += "    std::make_pair(\""s + fieldName + "\", JS_Val(double("s + fieldVal + ")))"s;
+          str += "std::make_pair(\""s + fieldName + "\", JS_Val(double("s + fieldVal + ")))"s;
           break;
         case TY_Class:
           // Handle embedded ObjectLiterals recursively
           if (lit->GetKind() == NK_StructLiteral) {
             std::string props = EmitStructLiteralNode(static_cast<StructLiteralNode*>(lit));
-            str += "    std::make_pair(\""s + fieldName + "\", JS_Val(Object_ctor._new("s + props + ")))"s;
+            str += "std::make_pair(\""s + fieldName + "\", JS_Val(Object_ctor._new("s + props + ")))"s;
           }
           break;
       }
     }
   }
-  str += "  })"s;
+  str += " })"s;
   return str;
 }
 
@@ -334,15 +349,15 @@ std::string CppDef::EmitObjWithProps(std::string varName, TreeNode* varIdType, s
 
   if (userType == nullptr) {
     // no type info - create instance of builtin Object
-    str = "  "s +varName+ " = Object_ctor._new("s +props+")"s;
+    str = varName+ " = Object_ctor._new("s +props+")"s;
   } else if (mHandler->FindDecl(static_cast<IdentifierNode*>(userType->GetId())) &&
              mHandler->FindDecl(static_cast<IdentifierNode*>(userType->GetId()))->IsClass()) {
     // type is user def class - create instance of user defined class. (todo: handle class with generics)
-    str = "  "s +varName+ " = "s +userType->GetId()->GetName()+ "_ctor._new("s +props+")"s;
+    str = varName+ " = "s +userType->GetId()->GetName()+ "_ctor._new("s +props+")"s;
   } else {
     // type is builtin (e.g. Record) and StructNode types (e.g. TSInterface)
     // create instance of type but set constructor to the builtin Object.
-    str = "  "s +varName+ " = new "s +EmitUserTypeNode(userType)+ "(&Object_ctor, Object_ctor.prototype, "s +props+")"s;
+    str = varName+ " = new "s +EmitUserTypeNode(userType)+ "(&Object_ctor, Object_ctor.prototype, "s +props+")"s;
   }
   return str;
 }

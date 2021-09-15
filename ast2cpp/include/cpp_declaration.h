@@ -73,5 +73,7 @@ inline bool IsVarInitClass(DeclNode* node) {
          node->GetInit()->GetKind() == NK_Identifier;
 }
 
+std::string ident(int n);
+
 } // namespace maplefe
 #endif
