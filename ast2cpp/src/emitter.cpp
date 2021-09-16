@@ -276,21 +276,31 @@ std::string Emitter::EmitFunctionNode(FunctionNode *node) {
   }
   str += ' ' + std::to_string(node->IsConstructor());
   */
-  mPrecedence = '\023';
+  mPrecedence = '\004';
   return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitUserTypeNode(UserTypeNode *node) {
   if (node == nullptr)
     return std::string();
-  auto prec = '\030';;
+  auto k = node->GetType();
+  Precedence precd;
+  switch (k) {
+    case UT_Union:
+      precd = '\010';
+      break;
+    case UT_Inter:
+      precd = '\012';
+      break;
+    default:
+      precd = '\030';
+  }
   std::string str;
   for (unsigned i = 0; i < node->GetAttrsNum(); ++i) {
     str += GetEnumAttrId(node->GetAttrAtIndex(i));
   }
   if (auto n = node->GetId()) {
     str += EmitTreeNode(n);
-    prec = mPrecedence;
     auto num = node->GetTypeGenericsNum();
     if(num) {
       str += '<';
@@ -303,9 +313,9 @@ std::string Emitter::EmitUserTypeNode(UserTypeNode *node) {
       }
       str += '>';
     }
+    precd = mPrecedence;
   }
 
-  auto k = node->GetType();
   if(k != UT_Regular) {
     if(!str.empty())
       str = "type "s + str + " = "s;
@@ -314,15 +324,16 @@ std::string Emitter::EmitUserTypeNode(UserTypeNode *node) {
       if(i)
         str += op;
       std::string s = EmitTreeNode(node->GetUnionInterType(i));
-      if (mPrecedence > '\012')
+      if (precd >= mPrecedence)
         s = '(' + s + ')';
       str += s;
     }
+    mPrecedence = precd;
   }
 
   if (auto n = node->GetDims()) {
     std::string s = EmitDimensionNode(n);
-    if (prec < mPrecedence)
+    if (precd < mPrecedence)
       str = '(' + str + ')';
      str += s;
   }
@@ -1647,7 +1658,7 @@ std::string Emitter::EmitLambdaNode(LambdaNode *node) {
     }
   }
 
-  mPrecedence = '\023';
+  mPrecedence = '\004';
   return HandleTreeNode(str, node);
 }
 
@@ -1821,7 +1832,7 @@ std::string Emitter::EmitPrimTypeNode(PrimTypeNode *node) {
   std::string str = k == TY_None ? std::string() : Emitter::GetEnumTypeId(k);
   if (node->IsUnique())
     str = "unique "s + str;
-  mPrecedence = '\000';
+  mPrecedence = '\030';
   return str;
 }
 
