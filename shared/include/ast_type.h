@@ -95,22 +95,22 @@ private:
 
 public:
   UserTypeNode(TreeNode *n) : TreeNode(NK_UserType),
-    mId(n), mType(UT_Regular), mDims(NULL) { if(n) n->SetParent(this); }
+    mId(n), mType(UT_Regular), mDims(NULL) { SETPARENT(n); }
   UserTypeNode() : UserTypeNode(NULL) {}
   ~UserTypeNode(){Release();}
 
   TreeNode* GetId() {return mId;}
-  void SetId(TreeNode *n) {mId = n; if(n) n->SetParent(this);}
+  void SetId(TreeNode *n) {mId = n; SETPARENT(n);}
 
   unsigned  GetUnionInterTypesNum()                    {return mUnionInterTypes.GetNum();}
   void      AddUnionInterType(TreeNode *n);
   TreeNode* GetUnionInterType(unsigned i)              {return mUnionInterTypes.ValueAtIndex(i);}
-  void      SetUnionInterType(unsigned i, TreeNode* n) {*(mUnionInterTypes.RefAtIndex(i)) = n;}
+  void      SetUnionInterType(unsigned i, TreeNode* n) {*(mUnionInterTypes.RefAtIndex(i)) = n; SETPARENT(n);}
 
   unsigned  GetTypeGenericsNum()                    {return mTypeGenerics.GetNum();}
   void      AddTypeGeneric(TreeNode *n);
   TreeNode* GetTypeGeneric(unsigned i)              {return mTypeGenerics.ValueAtIndex(i);}
-  void      SetTypeGeneric(unsigned i, TreeNode* n) {*(mTypeGenerics.RefAtIndex(i)) = n;}
+  void      SetTypeGeneric(unsigned i, TreeNode* n) {*(mTypeGenerics.RefAtIndex(i)) = n; SETPARENT(n);}
 
   UT_Type GetType() {return mType;}
   void SetType(UT_Type t) {mType = t;}
@@ -171,8 +171,8 @@ public:
   PrimArrayTypeNode() : TreeNode(NK_PrimArrayType), mPrim(NULL), mDims(NULL) {}
   ~PrimArrayTypeNode(){}
 
-  void SetPrim(PrimTypeNode *p) {mPrim = p;}
-  void SetDims(DimensionNode *d) {mDims = d;}
+  void SetPrim(PrimTypeNode *p) {mPrim = p; SETPARENT(p);}
+  void SetDims(DimensionNode *d) {mDims = d; SETPARENT(d);}
   PrimTypeNode*  GetPrim() {return mPrim;}
   DimensionNode* GetDims(){return mDims;}
 
