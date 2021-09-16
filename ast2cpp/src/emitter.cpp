@@ -295,9 +295,9 @@ std::string Emitter::EmitUserTypeNode(UserTypeNode *node) {
     default:
       precd = '\030';
   }
-  std::string str;
+  std::string attrs, str;
   for (unsigned i = 0; i < node->GetAttrsNum(); ++i) {
-    str += GetEnumAttrId(node->GetAttrAtIndex(i));
+    attrs += GetEnumAttrId(node->GetAttrAtIndex(i));
   }
   if (auto n = node->GetId()) {
     str += EmitTreeNode(n);
@@ -337,6 +337,7 @@ std::string Emitter::EmitUserTypeNode(UserTypeNode *node) {
       str = '(' + str + ')';
      str += s;
   }
+  str = attrs + str;
   return HandleTreeNode(str, node);
 }
 
