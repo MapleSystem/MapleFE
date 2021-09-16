@@ -611,10 +611,14 @@ std::string Emitter::EmitConditionalTypeNode(ConditionalTypeNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
+  Precedence precd = '\030';
   if (auto n = node->GetTypeA()) {
     str = EmitTreeNode(n);
+    precd = mPrecedence;
   }
   if (auto n = node->GetTypeB()) {
+    if (precd < '\024')
+      str = '(' + str + ')';
     str += " extends "s + EmitTreeNode(n);
   }
   if (auto n = node->GetTypeC()) {
@@ -623,6 +627,7 @@ std::string Emitter::EmitConditionalTypeNode(ConditionalTypeNode *node) {
   if (auto n = node->GetTypeD()) {
     str += " : "s + EmitTreeNode(n);
   }
+  mPrecedence = '\004';
   return str;
 }
 
