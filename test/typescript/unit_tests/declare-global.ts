@@ -1,4 +1,4 @@
-// declare a variable in the global scope
+// declare an interface in the global scope
 declare global {
   interface IFace { name: string; }
 }
