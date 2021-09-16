@@ -410,9 +410,7 @@ std::string Emitter::EmitDeclareNode(DeclareNode *node) {
   }
   if (auto n = node->GetDecl()) {
     std::string s = EmitTreeNode(n);
-    if (s.substr(0, 9) == "function ")
-      Replace(s, ") => ", ") : ");
-    else if (n->GetKind() == NK_Module) {
+    if (n->GetKind() == NK_Module) {
       s = "module \""s + static_cast<ModuleNode *>(n)->GetFileName()
         + "\" {\n"s + s + "}\n"s;
     }
