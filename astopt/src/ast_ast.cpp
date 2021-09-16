@@ -45,6 +45,66 @@ void AST_AST::AdjustAST() {
   adjust_visitor.Visit(module);
 }
 
+TypeId AST_AST::GetTypeId(TreeNode *node) {
+  TypeId tid = TY_None;
+  switch (node->GetKind()) {
+    case NK_Literal: {
+      LiteralNode *lit = static_cast<LiteralNode *>(node);
+      LitData data = lit->GetData();
+      LitId id = data.mType;
+      switch (id) {
+        case LT_IntegerLiteral:
+        case LT_FPLiteral:
+        case LT_DoubleLiteral:
+          tid = TY_Number;
+          break;
+        case LT_BooleanLiteral:
+          tid = TY_Boolean;
+          break;
+        case LT_CharacterLiteral:
+        case LT_StringLiteral:
+          tid = TY_String;
+          break;
+        case LT_NullLiteral:
+          tid = TY_Null;
+          break;
+        case LT_ThisLiteral:
+        case LT_SuperLiteral:
+          tid = TY_Symbol;
+          break;
+        case LT_VoidLiteral:
+          tid = TY_Void;
+          break;
+        default:
+          break;
+      }
+      break;
+    }
+    case NK_PrimType: {
+      PrimTypeNode *ptn = static_cast<PrimTypeNode *>(node);
+      tid = ptn->GetPrimType();
+      break;
+    }
+    case NK_UserType: {
+      UserTypeNode *utn = static_cast<UserTypeNode *>(node);
+      TreeNode *id = utn->GetId();
+      if (id->GetTypeId() != TY_None) {
+        tid = id->GetTypeId();
+        break;
+      }
+      unsigned idx = gStringPool.GetStrIdx("String");
+      if (id->GetStrIdx() == idx) {
+        tid = TY_String;
+        id->SetStrIdx(idx);
+      }
+      break;
+    }
+    default:
+      break;
+  }
+  return tid;
+}
+
 unsigned AST_AST::GetFieldSize(TreeNode *node) {
   unsigned size = 0;
   switch (node->GetKind()) {
@@ -95,23 +155,109 @@ bool AST_AST::IsInterface(TreeNode *node) {
   return isI;
 }
 
-// check if "from" is compatible to "to"
-bool AST_AST::IsFieldCompatibleTo(IdentifierNode *from, IdentifierNode *to) {
-  if (from->GetStrIdx() != to->GetStrIdx()) {
-    return  false;
-  }
-  if (from->GetType() == to->GetType()) {
+bool AST_AST::IsTypeCompatible(TreeNode *node1, TreeNode *node2) {
+  if (node1 == node2) {
     return true;
-  } else if ((from->GetType() && !to->GetType()) ||
-             (!from->GetType() && to->GetType())) {
-    return  false;
   }
-  if (from->GetType()->GetKind() != to->GetType()->GetKind()) {
-    return  false;
+  // only one is NULL
+  if ((!node1 && node2) || (node1 && !node2)) {
+    return false;
   }
-  NodeKind kind = from->GetType()->GetKind();
-  // TODO:
-  return true;
+  // at least one is prim
+  if (node1->GetKind() == NK_PrimType || node2->GetKind() == NK_PrimType) {
+    TypeId tid_field = GetTypeId(node2);
+    TypeId tid_target = GetTypeId(node1);
+    return (tid_field == tid_target);
+  }
+  // not same kind
+  if (node1->GetKind() != node2->GetKind()) {
+    return false;
+  }
+  bool result = false;
+  // same kind
+  NodeKind nk = node1->GetKind();
+  switch (nk) {
+    case NK_UserType: {
+      UserTypeNode *ut1 = static_cast<UserTypeNode *>(node1);
+      UserTypeNode *ut2 = static_cast<UserTypeNode *>(node2);
+      result = IsTypeCompatible(ut1->GetId(), ut2->GetId());
+    }
+    case NK_PrimType: {
+      PrimTypeNode *pt1 = static_cast<PrimTypeNode *>(node1);
+      PrimTypeNode *pt2 = static_cast<PrimTypeNode *>(node2);
+      result = (pt1->GetPrimType() == pt2->GetPrimType());
+    }
+    case NK_PrimArrayType: {
+      PrimArrayTypeNode *pat1 = static_cast<PrimArrayTypeNode *>(node1);
+      PrimArrayTypeNode *pat2 = static_cast<PrimArrayTypeNode *>(node2);
+      result = IsTypeCompatible(pat1->GetPrim(), pat2->GetPrim());
+      if (!result) {
+        break;
+      }
+      result = IsTypeCompatible(pat1->GetDims(), pat2->GetDims());
+    }
+    case NK_Dimension: {
+      DimensionNode *dim1 = static_cast<DimensionNode *>(node1);
+      DimensionNode *dim2 = static_cast<DimensionNode *>(node2);
+      result = (dim1->GetDimensionsNum() == dim2->GetDimensionsNum());
+      if (!result) {
+        break;
+      }
+      for (unsigned i = 0; i < dim1->GetDimensionsNum(); i++) {
+        result = result && (dim1->GetDimension(i) == dim2->GetDimension(i));
+      }
+      break;
+    }
+    default: {
+      break;
+    }
+  }
+  return result;
+}
+
+// check if "field" is compatible to "target"
+bool AST_AST::IsFieldCompatibleTo(TreeNode *field, TreeNode *target) {
+  if (!target->IsIdentifier()) {
+    return false;
+  }
+  unsigned stridx_target = target->GetStrIdx();
+  IdentifierNode *id_target = static_cast<IdentifierNode *>(target);
+
+  unsigned stridx_field = 0;
+  bool result = false;
+
+  // is identifier
+  if (field->IsIdentifier()) {
+    stridx_field = field->GetStrIdx();
+    if (stridx_field != stridx_target) {
+      return false;
+    }
+    IdentifierNode *id_field = static_cast<IdentifierNode *>(field);
+    TreeNode *type_target = id_target->GetType();
+    TreeNode *type_field = id_field->GetType();
+    result = IsTypeCompatible(type_field, type_target);
+  }
+  // field literal
+  else if (field->IsFieldLiteral()) {
+    FieldLiteralNode *fln = static_cast<FieldLiteralNode *>(field);
+    TreeNode *name = fln->GetFieldName();
+    if (name->IsIdentifier()) {
+      stridx_field = name->GetStrIdx();
+    }
+    if (stridx_field != stridx_target) {
+      return false;
+    }
+    TreeNode *lit = fln->GetLiteral();
+    if (!lit->IsLiteral()) {
+      return false;
+    }
+    LiteralNode *ln = static_cast<LiteralNode *>(lit);
+    TypeId tid_field = GetTypeId(ln);
+    TypeId tid_target = GetTypeId(id_target->GetType());
+    result = (tid_field == tid_target);
+  }
+
+  return result;
 }
 
 TreeNode *AST_AST::GetCanonicStructNode(TreeNode *node) {
@@ -119,6 +265,10 @@ TreeNode *AST_AST::GetCanonicStructNode(TreeNode *node) {
   bool isI0 = IsInterface(node);
 
   for (auto s: mFieldNum2StructNodeMap[size]) {
+    // found itself
+    if (node == s) {
+      return s;
+    }
     bool isI = IsInterface(s);
     // skip if one is interface but other is not
     if ((isI0 && !isI) || (!isI0 && isI)) {
@@ -128,18 +278,8 @@ TreeNode *AST_AST::GetCanonicStructNode(TreeNode *node) {
     // check fields
     for (unsigned fid = 0; fid < size; fid++) {
       TreeNode *f0 = GetField(node, fid);
-      if (f0->IsFieldLiteral()) {
-        f0 = static_cast<FieldLiteralNode *>(f0)->GetFieldName();
-      }
       TreeNode *f1 = GetField(s, fid);
-      if (f0 && f1 && f0->IsIdentifier() && f1->IsIdentifier()) {
-        IdentifierNode *i0 = static_cast<IdentifierNode *>(f0);
-        IdentifierNode *i1 = static_cast<IdentifierNode *>(f1);
-        if (!IsFieldCompatibleTo(i0, i1)) {
-          match = false;
-          break;
-        }
-      } else {
+      if (!IsFieldCompatibleTo(f0, f1)) {
         match = false;
         break;
       }
@@ -220,17 +360,11 @@ StructNode *AST_AST::CreateStructFromStructLiteral(StructLiteralNode *node) {
 
     TreeNode *lit = fl->GetLiteral();
     if (lit && lit->IsLiteral()) {
-      LiteralNode *l = static_cast<LiteralNode *>(lit);
-      LitData data = l->GetData();
-      if (data.mType == LT_StringLiteral) {
-        unsigned idx = gStringPool.GetStrIdx("string");
-        UserTypeNode *utype = CreateUserTypeNode(idx);
-        fid->SetType(utype);
-      } else if (data.mType == LT_IntegerLiteral) {
-        NOTYETIMPL("StructLiteralNode integer literal");
-      } else {
-        NOTYETIMPL("StructLiteralNode literal data type");
-      }
+      TypeId tid = GetTypeId(lit);
+      PrimTypeNode *type = (PrimTypeNode*)gTreePool.NewTreeNode(sizeof(PrimTypeNode));
+      new (type) PrimTypeNode();
+      type->SetPrimType(tid);
+      fid->SetType(type);
     } else {
       NOTYETIMPL("StructLiteralNode literal field kind");
     }

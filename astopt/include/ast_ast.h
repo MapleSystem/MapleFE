@@ -44,6 +44,7 @@ class AST_AST {
 
   void AdjustAST();
 
+  TypeId GetTypeId(TreeNode *node);
   unsigned GetFieldSize(TreeNode *node);
   TreeNode *GetField(TreeNode *node, unsigned i);
   TreeNode *GetCanonicStructNode(TreeNode *node);
@@ -57,7 +58,8 @@ class AST_AST {
   TreeNode *GetAnonymousStruct(TreeNode *node);
 
   bool IsInterface(TreeNode *node);
-  bool IsFieldCompatibleTo(IdentifierNode *from, IdentifierNode *to);
+  bool IsTypeCompatible(TreeNode *node1, TreeNode *node2);
+  bool IsFieldCompatibleTo(TreeNode *from, TreeNode *to);
 
   void SetNameAnonyStruct(bool b) { mNameAnonyStruct = b; }
   bool GetNameAnonyStruct() { return mNameAnonyStruct; }
