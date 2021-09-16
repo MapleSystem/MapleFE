@@ -1115,6 +1115,7 @@ std::string Emitter::EmitLiteralNode(LiteralNode *node) {
   std::string str(AstDump::GetEnumLitData(lit));
   if(lit.mType == LT_StringLiteral || lit.mType == LT_CharacterLiteral)
     str = "\"" + str + "\"";
+  str = HandleTreeNode(str, node);
   if (auto n = node->GetType()) {
     str += ": "s + EmitTreeNode(n);
   }
@@ -1122,7 +1123,7 @@ std::string Emitter::EmitLiteralNode(LiteralNode *node) {
     str += " = "s + EmitTreeNode(n);
   }
   mPrecedence = '\030';
-  return HandleTreeNode(str, node);
+  return str;
 }
 
 std::string Emitter::EmitRegExprNode(RegExprNode *node) {
