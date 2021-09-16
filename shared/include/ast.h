@@ -2217,9 +2217,9 @@ public:
   TreeNode* GetExpr()            {return mExpr;}
   void      SetExpr(TreeNode *n) {mExpr = n; SETPARENT(n);}
   TreeNode* GetInit()            {return mInit;}
-  void      SetInit(TreeNode *n) {mInit = n;}
+  void      SetInit(TreeNode *n) {mInit = n; SETPARENT(n);}
   TreeNode* GetExtendType()            {return mExtendType;}
-  void      SetExtendType(TreeNode *n) {mExtendType = n;}
+  void      SetExtendType(TreeNode *n) {mExtendType = n; SETPARENT(n);}
 
   void Dump(unsigned);
 };
