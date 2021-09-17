@@ -50,7 +50,7 @@ class AST_AST {
   TreeNode *GetCanonicStructNode(TreeNode *node);
 
   IdentifierNode *CreateIdentifierNode(unsigned stridx);
-  UserTypeNode *CreateUserTypeNode(unsigned stridx);
+  UserTypeNode *CreateUserTypeNode(unsigned stridx, ASTScope *scope = NULL);
   UserTypeNode *CreateUserTypeNode(IdentifierNode *node);
   TypeAliasNode *CreateTypeAliasNode(TreeNode *to, TreeNode *from);
   StructNode *CreateStructFromStructLiteral(StructLiteralNode *node);
