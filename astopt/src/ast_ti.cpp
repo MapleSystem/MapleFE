@@ -16,6 +16,7 @@
 #include <stack>
 #include <set>
 #include "ast_handler.h"
+#include "ast_ast.h"
 #include "ast_ti.h"
 #include "typetable.h"
 #include "gen_astdump.h"
@@ -32,7 +33,7 @@ void TypeInfer::TypeInference() {
 
   // build mNodeId2Decl
   MSGNOLOC0("============== Build NodeId2Decl ==============");
-  InitDummyNodes();
+  InitInternalNodes();
   BuildIdNodeToDeclVisitor visitor_build(mHandler, mFlags, true);
   visitor_build.Visit(module);
 
@@ -61,33 +62,46 @@ void TypeInfer::TypeInference() {
   visitor_check.Visit(module);
 }
 
-void TypeInfer::InitDummyNodes() {
-  // add dummpy console.log()
+ClassNode *TypeInfer::AddClass(std::string name) {
+  ClassNode *node = (ClassNode*)gTreePool.NewTreeNode(sizeof(ClassNode));
+  new (node) ClassNode();
+  unsigned idx = gStringPool.GetStrIdx(name);
+  node->SetStrIdx(idx);
 
-  // class console
-  ClassNode *console = (ClassNode*)gTreePool.NewTreeNode(sizeof(ClassNode));
-  new (console) ClassNode();
-  unsigned idx1 = gStringPool.GetStrIdx("console");
-  console->SetStrIdx(idx1);
-
-  // method log
-  FunctionNode *log = (FunctionNode*)gTreePool.NewTreeNode(sizeof(FunctionNode));
-  new (log) FunctionNode();
-  unsigned idx2 = gStringPool.GetStrIdx("log");
-  log->SetStrIdx(idx2);
-
-  IdentifierNode *name = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
-  new (name) IdentifierNode(idx2);
-  log->SetFuncName(name);
-
-  // add log to console
-  console->AddMethod(log);
-
-  // add console and log to root scope
   ModuleNode *module = mHandler->GetASTModule();
-  module->GetRootScope()->AddType(console);
-  module->GetRootScope()->AddDecl(console);
-  module->GetRootScope()->AddDecl(log);
+  ASTScope *scope = module->GetRootScope();
+  scope->AddType(node);
+  scope->AddDecl(node);
+  return node;
+}
+
+FunctionNode *TypeInfer::AddFunction(std::string name) {
+  FunctionNode *func = (FunctionNode*)gTreePool.NewTreeNode(sizeof(FunctionNode));
+  new (func) FunctionNode();
+  unsigned idx = gStringPool.GetStrIdx(name);
+  func->SetStrIdx(idx);
+
+  IdentifierNode *id = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
+  new (id) IdentifierNode(idx);
+  func->SetFuncName(id);
+
+  // add console and func to root scope
+  ModuleNode *module = mHandler->GetASTModule();
+  ASTScope *scope = module->GetRootScope();
+  scope->AddDecl(func);
+  id->SetScope(scope);
+  return func;
+}
+
+void TypeInfer::InitInternalNodes() {
+  // add builtins
+  (void) AddClass("String");
+  (void) AddClass("Boolean");
+
+  // add dummpy console.log()
+  ClassNode *console = AddClass("console");
+  FunctionNode *log = AddFunction("log");
+  console->AddMethod(log);
 }
 
 // build up mNodeId2Decl by visiting each Identifier
