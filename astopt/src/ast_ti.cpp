@@ -446,18 +446,20 @@ void TypeInferVisitor::UpdateVarTypeWithInit(TreeNode *var, TreeNode *init) {
       if (n->GetId()) {
         TreeNode *id = n->GetId();
         if (id->IsIdentifier() && id->GetTypeId() == TY_Class) {
-          IdentifierNode *newid = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
-          new (newid) IdentifierNode(id->GetStrIdx());
-          newid->SetScope(init->GetScope());
-
-          UserTypeNode *utype = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
-          new (utype) UserTypeNode(newid);
-
-          newid->SetParent(utype);
+          UserTypeNode *utype = mHandler->GetAST()->CreateUserTypeNode(id->GetStrIdx(), var->GetScope());
           utype->SetParent(idnode);
           idnode->SetType(utype);
           SetUpdated();
         }
+      }
+    } else if (init->IsIdentifier()) {
+      TreeNode *decl = mHandler->FindDecl(static_cast<IdentifierNode *>(init));
+      if (decl && decl->IsClass()) {
+        unsigned stridx = gStringPool.GetStrIdx("Function");
+        UserTypeNode *utype = mHandler->GetAST()->CreateUserTypeNode(stridx, init->GetScope());
+        utype->SetParent(idnode);
+        idnode->SetType(utype);
+        SetUpdated();
       }
     } else if (init->IsArrayLiteral()) {
       TypeId tid = GetArrayElemTypeId(init);
