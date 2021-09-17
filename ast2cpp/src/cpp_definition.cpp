@@ -30,8 +30,8 @@ std::string EmitCtorInstance(ClassNode *c) {
     prototypeProto = proto + ".prototype"s;
     proto.insert(0, "&"s, 0, std::string::npos);
   }
-  str = "\n// Instantiate constructor"s;
-  str += "\nCtor_"s+thisClass +" "+ thisClass+"_ctor("s +ctor+","s+proto+","+prototypeProto+");\n\n"s;
+  str = "\n// Instantiate constructor\n"s;
+  str += "Ctor_"s+thisClass +" "+ thisClass+"_ctor("s +ctor+","s+proto+","+prototypeProto+");\n"s;
   return str;
 }
 
@@ -50,6 +50,14 @@ std::string EmitDefaultCtor(ClassNode *c) {
   return str;
 }
 
+std::string CppDef::EmitCppCtor(ClassNode* node) {
+  std::string str, base, props;
+  props = EmitClassProps(node);
+  base = (node->GetSuperClassesNum() != 0)? node->GetSuperClass(0)->GetName() : "Object";
+  str += node->GetName() + "::"s + node->GetName() + "(Function* ctor, Object* proto): "s + base + "(ctor, proto)"  + " {\n"s + props +"}\n"s;
+  return str;
+}
+
 std::string CppDef::EmitModuleNode(ModuleNode *node) {
   if (node == nullptr)
     return std::string();
@@ -60,8 +68,11 @@ std::string CppDef::EmitModuleNode(ModuleNode *node) {
   // definition of default class constructors.
   for (unsigned i = 0; i < node->GetTreesNum(); ++i) {
     if (auto n = node->GetTree(i))
-      if (n->GetKind() == NK_Class && static_cast<ClassNode*>(n)->GetConstructorsNum() == 0)
-        str += EmitDefaultCtor(static_cast<ClassNode*>(n));
+      if (n->GetKind() == NK_Class) {
+        str += EmitCppCtor(static_cast<ClassNode*>(n));
+        if (static_cast<ClassNode*>(n)->GetConstructorsNum() == 0)
+          str += EmitDefaultCtor(static_cast<ClassNode*>(n));
+      }
   }
 
   // definitions of all top-level functions
@@ -156,7 +167,8 @@ std::map<TypeId, std::string>TypeIdToJSType = {
   {TY_Int,     "TY_Long"},
   {TY_String,  "TY_String"},
   {TY_Number,  "TY_Double"},
-  {TY_Double,  "TY_Double"}
+  {TY_Double,  "TY_Double"},
+  {TY_Array,   "TY_Object"}
 };
 
 // Generate call to create obj prop with ptr to c++ class fld member
@@ -180,14 +192,17 @@ std::string CppDef::EmitClassProps(TreeNode* node) {
   ClassNode* c = static_cast<ClassNode*>(node);
   for (unsigned i = 0; i < c->GetFieldsNum(); ++i) {
     auto node = c->GetField(i);
+    if (!node->IsIdentifier())
+      // StrIndexSig, NumIndexSig, ComputedName have to be handled at run time
+      continue;
     std::string fdName = node->GetName();
-    std::string fdType = mCppDecl.GetTypeString(node);
+    std::string fdType = mCppDecl.GetTypeString(node, static_cast<IdentifierNode*>(node)->GetType());
     TypeId typeId = node->GetTypeId();
     addProp += "  "s
-               + EmitAddPropWithClassFld("obj", c->GetName(), fdName, fdType, TypeIdToJSType[typeId])
+               + EmitAddPropWithClassFld("this", c->GetName(), fdName, fdType, TypeIdToJSType[typeId])
                + ";\n"s;
   }
-  return "\n  // Add class fields to obj prop list\n"s + clsFd + addProp;
+  return "  // Add class fields to obj prop list\n"s + clsFd + addProp;
 }
 
 // "var" declarations in TS/JS functions are function scope.
@@ -266,7 +281,6 @@ std::string CppDef::EmitFunctionNode(FunctionNode *node) {
   if (node->IsConstructor()) {
     Emitter::Replace(str, "this->", "obj->", 0);
     std::string ctorBody;
-    ctorBody = EmitClassProps(node->GetParent());
     ctorBody += "  return obj;\n"s;
     str.insert(str.size()-2, ctorBody, 0, std::string::npos);
     str += EmitCtorInstance(static_cast<ClassNode*>(node->GetParent()));
@@ -307,6 +321,7 @@ std::string CppDef::EmitStructLiteralNode(StructLiteralNode* node) {
         case TY_Function:
           break;
         case TY_Array:
+          //str += "std::make_pair(\""s + fieldName + "\", JS_Val(Object*("s + fieldVal + ")))"s;
           break;
         case TY_Boolean:
           str += "std::make_pair(\""s + fieldName + "\", JS_Val(bool("s + fieldVal + ")))"s;
@@ -353,7 +368,7 @@ std::string CppDef::EmitObjWithProps(std::string varName, TreeNode* varIdType, s
   } else if (mHandler->FindDecl(static_cast<IdentifierNode*>(userType->GetId())) &&
              mHandler->FindDecl(static_cast<IdentifierNode*>(userType->GetId()))->IsClass()) {
     // type is user def class - create instance of user defined class. (todo: handle class with generics)
-    str = varName+ " = "s +userType->GetId()->GetName()+ "_ctor._new("s +props+")"s;
+    str = varName+ " = "s +userType->GetId()->GetName()+ "_ctor._new()"s;
   } else {
     // type is builtin (e.g. Record) and StructNode types (e.g. TSInterface)
     // create instance of type but set constructor to the builtin Object.

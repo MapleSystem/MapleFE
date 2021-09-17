@@ -62,6 +62,7 @@ public:
   std::string EmitStructNode(StructNode *node);
   std::string EmitStructLiteralNode(StructLiteralNode* node);
   std::string EmitObjWithProps(std::string varName, TreeNode* idType, std::string props);
+  std::string EmitCppCtor(ClassNode* node);
   TypeId GetTypeFromDecl(IdentifierNode* id);
 };
 
