@@ -1057,4 +1057,8 @@ std::string CppDef::EmitStructNode(StructNode *node) {
   return HandleTreeNode(str, node);
 }
 
+std::string CppDef::EmitTypeAliasNode(TypeAliasNode *node) {
+  return std::string();
+}
+
 } // namespace maplefe

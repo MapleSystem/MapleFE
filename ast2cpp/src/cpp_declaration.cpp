@@ -38,6 +38,11 @@ class ClassDecls : public AstVisitor {
       return node;
     }
 
+    TypeAliasNode *VisitTypeAliasNode(TypeAliasNode* node) {
+      mDecls += mCppDecl->EmitTypeAliasNode(node);
+      return node;
+    }
+
     std::string GetDecls() { return mDecls; }
 };
 
@@ -749,6 +754,31 @@ std::string CppDecl::EmitNumIndexSigNode(NumIndexSigNode *node) {
 
 std::string CppDecl::EmitStrIndexSigNode(StrIndexSigNode *node) {
   return std::string();
+}
+
+std::string CppDecl::EmitTypeAliasNode(TypeAliasNode* node) {
+  if (node == nullptr)
+    return std::string();
+  std::string str, alias;
+
+  if (auto n = node->GetId()) {
+    if (n->IsUserType()) {
+      str = EmitTreeNode(n);
+      if (str.back() == '*')
+        str.pop_back();
+    }
+  }
+  if (auto m = node->GetAlias()) {
+    if (m->IsUserType()) {
+      alias = EmitTreeNode(m);
+      if (alias.back() == '*')
+        alias.pop_back();
+      str = "using "s + str + " = "s + alias + ";\n";
+    } else if (m->IsStruct()) {
+      // todo
+    }
+  }
+  return str;
 }
 
 std::string ident(int n) {
