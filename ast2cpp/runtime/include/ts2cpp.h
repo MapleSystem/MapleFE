@@ -72,6 +72,7 @@ struct JS_Val {
   JS_Val(double d)  { x.val_double = d; type = TY_Double; cxx = false; }
   JS_Val(Object* o){ x.val_obj = o; type = TY_Object; cxx = false; }
   JS_Val(std::string* s) {x.val_string = s; type = TY_String; cxx = false; }
+  JS_Val(int i) { x.val_long = i; type = TY_Long; cxx = false; }
 
 #define OPERATORS(op) \
   JS_Val operator op(const JS_Val &v) { \

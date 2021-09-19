@@ -801,8 +801,7 @@ std::string CppDef::EmitBinOperatorNode(BinOperatorNode *node) {
         break;
     }
     if (islhsObjProp) {
-      str = "JS_Val prop("s + rhs + ");\n"s;
-      str += objName + "->AddProp(" + propKey + ", prop)"s;
+      str += objName + "->AddProp(" + propKey + ", JS_Val("s + rhs + "))"s;
     } else
       str = lhs + " "s + std::string(op + 1) + " "s + rhs;
   }
