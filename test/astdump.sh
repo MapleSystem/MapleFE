@@ -72,6 +72,7 @@ function AcquireLock {
 function ReleaseLock {
     rm -f $1-lock-$LockVar
 }
+trap "{ pstree -p $$ | tr ')' '\n' | sed 's/.*(//' | xargs kill -9 2> /dev/null; rm -f ts2cxx-lock-*; }" SIGINT SIGQUIT SIGKILL SIGTERM
 
 PROCID=$$
 rm -rf *$PROCID-dump.out $PROCID-summary.out *$PROCID.out.ts ts2cxx-lock-*
@@ -98,7 +99,7 @@ for ts in $LIST; do
     T=$ts-$PROCID.out.ts
     eval $cmd <<< "$out" > "$T"
     [ -z "$NAME" ] || sed -i 's/__v[0-9][0-9]*//g' "$T"
-    clang-format-10 -i --style="{ColumnLimit: 120, JavaScriptWrapImports: false, AlignOperands: DontAlign}" "$T"
+    clang-format-10 -i --style="{ColumnLimit: 120, JavaScriptWrapImports: false, AlignOperands: false}" "$T"
     sed -i -e 's/?? =/??=/g' -e 's/ int\[/ number[/g' "$T"
     echo -e "\n====== TS Reformatted ======\n"
     $HIGHLIGHT "$T"
@@ -120,7 +121,7 @@ for ts in $LIST; do
       [ -n "$KEEP" ] || rm -f "$T"
     else
       sed 's/^\([ei][xm]port \) *type  *{/\1{/' $ts > $ts.tmp.ts
-      clang-format-10 -i --style="{ColumnLimit: 120, JavaScriptWrapImports: false, AlignOperands: DontAlign, JavaScriptQuotes: Double}" $ts.tmp.ts
+      clang-format-10 -i --style="{ColumnLimit: 120, JavaScriptWrapImports: false, AlignOperands: false, JavaScriptQuotes: Double}" $ts.tmp.ts
       sed -i 's/?? =/??=/g' $ts.tmp.ts
       $TS2AST $ts.tmp.ts
       if [ $? -eq 0 ]; then

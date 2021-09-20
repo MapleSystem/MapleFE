@@ -18,7 +18,7 @@ function AcquireLock {
 function ReleaseLock {
     rm -f $1-lock-$LockVar
 }
-
+trap "{ pstree -p $$ | tr ')' '\n' | sed 's/.*(//' | xargs kill -9 2> /dev/null; rm -f ts2cpp-lock-*; }" SIGINT SIGQUIT SIGKILL SIGTERM
 rm -rf ts2cpp-lock-* *-ts2cpp.out ts2cpp.summary.out ts2cpp.failures*.out
 cnt=0
 for f; do
