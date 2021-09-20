@@ -1043,16 +1043,14 @@ std::string Emitter::EmitNamespaceNode(NamespaceNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str("namespace ");
-  auto id = node->GetId();
-  if (id) {
-    std::string s = EmitTreeNode(id);
+  if (auto n = node->GetId()) {
+    std::string s = EmitTreeNode(n);
     str += Clean(s);
   }
   str += " {\n"s;
   for (unsigned i = 0; i < node->GetElementsNum(); ++i) {
     if (auto n = node->GetElementAtIndex(i)) {
-      if (id != n)
-        str += EmitTreeNode(n) + GetEnding(n);
+      str += EmitTreeNode(n) + GetEnding(n);
     }
   }
   str += "}\n"s;
