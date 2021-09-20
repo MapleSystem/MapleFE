@@ -1,0 +1,5 @@
+Matched 30 tokens.
+============= Module ===========
+== Sub Tree ==
+ts_interface: IFace {func  any<T>(arg)  throws: 
+ }

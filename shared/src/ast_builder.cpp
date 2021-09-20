@@ -3580,7 +3580,9 @@ TreeNode* ASTBuilder::BuildUnionUserType() {
 
   if (child_a->IsUserType()) {
     UserTypeNode *ut = (UserTypeNode*)child_a;
-    if (ut->GetType() == UT_Union) {
+    // for case like : (a | b)[] | c
+    // We won't merge c into the array type.
+    if (ut->GetType() == UT_Union && !ut->GetDims()) {
       user_type = ut;
       user_type->AddUnionInterType(child_b);
     }
@@ -3588,7 +3590,7 @@ TreeNode* ASTBuilder::BuildUnionUserType() {
 
   if (child_b->IsUserType()) {
     UserTypeNode *ut = (UserTypeNode*)child_b;
-    if (ut->GetType() == UT_Union) {
+    if (ut->GetType() == UT_Union && !ut->GetDims()) {
       // assert, both children cannot be UnionUserType at the same time.
       MASSERT(!user_type);
       user_type = ut;
