@@ -36,6 +36,7 @@ class AST_AST {
 
   std::unordered_set<unsigned> mReachableBbIdx;;
   std::unordered_map<unsigned, std::unordered_set<TreeNode *>> mFieldNum2StructNodeMap;
+  std::unordered_map<unsigned, SmallVector<TreeNode*>> mStructId2FieldsMap;
 
  public:
   explicit AST_AST(Module_Handler *h, unsigned f) : mHandler(h), mFlags(f), mNum(1),
@@ -47,6 +48,9 @@ class AST_AST {
   TypeId GetTypeId(TreeNode *node);
   unsigned GetFieldSize(TreeNode *node);
   TreeNode *GetField(TreeNode *node, unsigned i);
+  unsigned GetSuperSize(TreeNode *node, unsigned idx);
+  TreeNode *GetSuper(TreeNode *node, unsigned i, unsigned idx);
+
   TreeNode *GetCanonicStructNode(TreeNode *node);
 
   IdentifierNode *CreateIdentifierNode(unsigned stridx);
@@ -63,6 +67,9 @@ class AST_AST {
 
   void SetNameAnonyStruct(bool b) { mNameAnonyStruct = b; }
   bool GetNameAnonyStruct() { return mNameAnonyStruct; }
+
+  template <typename T1, typename T2> void SortFields(T1 *node);
+  template <typename T1> void ExtendFields(T1 *node, TreeNode *sup);
 };
 
 class CollectClassStructVisitor : public AstVisitor {
