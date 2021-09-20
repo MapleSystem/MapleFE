@@ -1639,6 +1639,19 @@ std::string Emitter::EmitLambdaNode(LambdaNode *node) {
       MASSERT(0 && "Unexpected enumerator");
   }
 
+  auto num = node->GetTypeParametersNum();
+  if(num) {
+    str += '<';
+    for (unsigned i = 0; i < num; ++i) {
+      if (i)
+        str += ", "s;
+      if (auto n = node->GetTypeParameterAtIndex(i)) {
+        str += EmitTreeNode(n);
+      }
+    }
+    str += '>';
+  }
+
   str += '(';
   for (unsigned i = 0; i < node->GetParamsNum(); ++i) {
     if (i)
