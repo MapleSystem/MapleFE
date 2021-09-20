@@ -33,10 +33,12 @@ class AST_AST {
   unsigned        mFlags;
   unsigned        mNum;
   bool            mNameAnonyStruct;
+  unsigned        mPass;
 
   std::unordered_set<unsigned> mReachableBbIdx;;
   std::unordered_map<unsigned, std::unordered_set<TreeNode *>> mFieldNum2StructNodeMap;
   std::unordered_map<unsigned, SmallVector<TreeNode*>> mStructId2FieldsMap;
+  std::unordered_map<unsigned, TreeNode *> mStrIdx2StructMap;
 
  public:
   explicit AST_AST(Module_Handler *h, unsigned f) : mHandler(h), mFlags(f), mNum(1),
@@ -45,11 +47,15 @@ class AST_AST {
 
   void AdjustAST();
 
+  unsigned GetPass() { return mPass; }
   TypeId GetTypeId(TreeNode *node);
-  unsigned GetFieldSize(TreeNode *node);
-  TreeNode *GetField(TreeNode *node, unsigned i);
+  unsigned GetFieldSize(TreeNode *node, bool native = false);
+  TreeNode *GetField(TreeNode *node, unsigned i, bool native = false);
   unsigned GetSuperSize(TreeNode *node, unsigned idx);
   TreeNode *GetSuper(TreeNode *node, unsigned i, unsigned idx);
+
+  void SetStrIdx2Struct(unsigned stridx, TreeNode *node) { mStrIdx2StructMap[stridx] = node; }
+  TreeNode *GetStructFromStrIdx(unsigned stridx) { return mStrIdx2StructMap[stridx]; }
 
   TreeNode *GetCanonicStructNode(TreeNode *node);
 
@@ -72,7 +78,7 @@ class AST_AST {
   template <typename T1> void ExtendFields(T1 *node, TreeNode *sup);
 };
 
-class CollectClassStructVisitor : public AstVisitor {
+class ClassStructVisitor : public AstVisitor {
  private:
   Module_Handler *mHandler;
   AST_AST        *mAst;
@@ -80,36 +86,16 @@ class CollectClassStructVisitor : public AstVisitor {
   bool           mUpdated;
 
  public:
-  explicit CollectClassStructVisitor(Module_Handler *h, unsigned f, bool base = false)
+  explicit ClassStructVisitor(Module_Handler *h, unsigned f, bool base = false)
     : mHandler(h), mFlags(f), mUpdated(false), AstVisitor((f & FLG_trace_1) && base) {
       mAst = mHandler->GetAST();
     }
-  ~CollectClassStructVisitor() = default;
+  ~ClassStructVisitor() = default;
 
+  virtual StructLiteralNode *VisitStructLiteralNode(StructLiteralNode *node);
   virtual StructNode *VisitStructNode(StructNode *node);
   virtual ClassNode *VisitClassNode(ClassNode *node);
   virtual InterfaceNode *VisitInterfaceNode(InterfaceNode *node);
-};
-
-class SortFieldsVisitor : public AstVisitor {
- private:
-  Module_Handler *mHandler;
-  AST_AST        *mAst;
-  unsigned       mFlags;
-  bool           mUpdated;
-
- public:
-  explicit SortFieldsVisitor(Module_Handler *h, unsigned f, bool base = false)
-    : mHandler(h), mFlags(f), mUpdated(false), AstVisitor((f & FLG_trace_1) && base) {
-      mAst = mHandler->GetAST();
-      mAst->SetNameAnonyStruct(false);
-    }
-  ~SortFieldsVisitor() = default;
-
-  StructNode *VisitStructNode(StructNode *node);
-  StructLiteralNode *VisitStructLiteralNode(StructLiteralNode *node);
-  ClassNode *VisitClassNode(ClassNode *node);
-  InterfaceNode *VisitInterfaceNode(InterfaceNode *node);
 };
 
 class AdjustASTVisitor : public AstVisitor {

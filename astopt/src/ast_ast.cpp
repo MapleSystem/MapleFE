@@ -29,16 +29,24 @@ void AST_AST::AdjustAST() {
     it->SetParent(module);
   }
 
+  // collect class/interface/struct decl
+  mPass = 0;
+  MSGNOLOC0("============== Collect class/interface/struct ==============");
+  ClassStructVisitor visitor(mHandler, mFlags, true);
+  visitor.Visit(module);
+
   // sort fields according to the field name stridx
   // it also include first visit to named types to reduce
   // creation of unnecessary anonymous struct
-  SortFieldsVisitor sort_visitor(mHandler, mFlags, true);
-  sort_visitor.Visit(module);
+  mPass = 1;
+  MSGNOLOC0("============== super fields and Sort fields ==============");
+  visitor.Visit(module);
 
-  // collect class/interface/struct decl first to reduce
+  // merge class/interface/struct decl first to reduce
   // introducing of unnecessary anonymous structs
-  CollectClassStructVisitor base_visitor(mHandler, mFlags, true);
-  base_visitor.Visit(module);
+  mPass = 2;
+  MSGNOLOC0("============== merge class/interface/struct ==============");
+  visitor.Visit(module);
 
   // adjust ast
   AdjustASTVisitor adjust_visitor(mHandler, mFlags, true);
@@ -105,8 +113,13 @@ TypeId AST_AST::GetTypeId(TreeNode *node) {
   return tid;
 }
 
-unsigned AST_AST::GetFieldSize(TreeNode *node) {
+unsigned AST_AST::GetFieldSize(TreeNode *node, bool native) {
   unsigned size = 0;
+  unsigned nid = node->GetNodeId();
+  if (!native && mStructId2FieldsMap.find(nid) != mStructId2FieldsMap.end()) {
+    size = mStructId2FieldsMap[nid].GetNum();
+    return size;
+  }
   switch (node->GetKind()) {
     case NK_StructLiteral:
       size = static_cast<StructLiteralNode *>(node)->GetFieldsNum();
@@ -126,8 +139,13 @@ unsigned AST_AST::GetFieldSize(TreeNode *node) {
   return size;
 }
 
-TreeNode *AST_AST::GetField(TreeNode *node, unsigned i) {
+TreeNode *AST_AST::GetField(TreeNode *node, unsigned i, bool native) {
   TreeNode *fld = NULL;
+  unsigned nid = node->GetNodeId();
+  if (!native && mStructId2FieldsMap.find(nid) != mStructId2FieldsMap.end()) {
+    fld = mStructId2FieldsMap[nid].ValueAtIndex(i);
+    return fld;
+  }
   switch (node->GetKind()) {
     case NK_StructLiteral:
       fld = static_cast<StructLiteralNode *>(node)->GetField(i);
@@ -318,9 +336,11 @@ TreeNode *AST_AST::GetCanonicStructNode(TreeNode *node) {
       return s;
     }
     bool isI = IsInterface(s);
-    // skip if one is interface but other is not
-    if ((isI0 && !isI) || (!isI0 && isI)) {
-      continue;
+      // skip if one is interface but other is not
+      if ((isI0 && !isI) || (!isI0 && isI)) {
+        continue;
+      }
+    if (!node->IsStructLiteral()) {
     }
     bool match = true;;
     // check fields
@@ -457,45 +477,98 @@ TreeNode *AST_AST::GetAnonymousStruct(TreeNode *node) {
   return newnode;
 }
 
-StructNode *CollectClassStructVisitor::VisitStructNode(StructNode *node) {
-  // skip getting canonical type if not only fields
-  if (node->GetMethodsNum() || node->GetSupersNum() || node->GetStrIdx() == 0) {
-    return node;
+StructLiteralNode *ClassStructVisitor::VisitStructLiteralNode(StructLiteralNode *node) {
+  (void) AstVisitor::VisitStructLiteralNode(node);
+  if (mAst->GetPass() == 0) {
+    // field literal stridx to its ids'
+    for (unsigned i = 0; i < node->GetFieldsNum(); i++) {
+      FieldLiteralNode *fln = node->GetField(i);
+      TreeNode *name = fln->GetFieldName();
+      if (name) {
+        fln->SetStrIdx(name->GetStrIdx());
+      }
+    }
+  } else if (mAst->GetPass() == 1) {
+    // sort fields
+    mAst->SortFields<StructLiteralNode, FieldLiteralNode>(node);
   }
-
-  mAst->GetCanonicStructNode(node);
   return node;
 }
 
-ClassNode *CollectClassStructVisitor::VisitClassNode(ClassNode *node) {
-  // skip getting canonical type if not only fields
-  if (node->GetMethodsNum() || node->GetSuperClassesNum() || node->GetSuperInterfacesNum() ||
-      node->GetSuperClassesNum() || node->GetTypeParametersNum()) {
-    return node;
-  }
+StructNode *ClassStructVisitor::VisitStructNode(StructNode *node) {
+  if (mAst->GetPass() == 0) {
+    IdentifierNode *id = node->GetStructId();
+    if (id && node->GetStrIdx() == 0) {
+      node->SetStrIdx(id->GetStrIdx());
+    }
 
-  mAst->GetCanonicStructNode(node);
+    mAst->SetStrIdx2Struct(node->GetStrIdx(), node);
+  } else if (mAst->GetPass() == 1) {
+    // extends
+    mAst->ExtendFields<StructNode>(node, NULL);
+    // sort fields
+    mAst->SortFields<StructNode, TreeNode>(node);
+  } else if (mAst->GetPass() == 2) {
+    // skip getting canonical type if not only fields
+    if (node->GetMethodsNum() || node->GetStrIdx() == 0) {
+      return node;
+    }
+    mAst->GetCanonicStructNode(node);
+  }
   return node;
 }
 
-InterfaceNode *CollectClassStructVisitor::VisitInterfaceNode(InterfaceNode *node) {
-  // skip getting canonical type if not only fields
-  if (node->GetMethodsNum() || node->GetSuperInterfacesNum()) {
-    return node;
+ClassNode *ClassStructVisitor::VisitClassNode(ClassNode *node) {
+  if (mAst->GetPass() == 0) {
+    mAst->SetStrIdx2Struct(node->GetStrIdx(), node);
+  } else if (mAst->GetPass() == 1) {
+    // include super class fields
+    mAst->ExtendFields<ClassNode>(node, NULL);
+    // sort fields
+    mAst->SortFields<ClassNode, TreeNode>(node);
+  } else if (mAst->GetPass() == 2) {
+    // skip getting canonical type if not only fields
+    if (node->GetMethodsNum() || node->GetTypeParametersNum()) {
+      return node;
+    }
+    mAst->GetCanonicStructNode(node);
   }
+  return node;
+}
 
-  mAst->GetCanonicStructNode(node);
+InterfaceNode *ClassStructVisitor::VisitInterfaceNode(InterfaceNode *node) {
+  if (mAst->GetPass() == 0) {
+    mAst->SetStrIdx2Struct(node->GetStrIdx(), node);
+  } else if (mAst->GetPass() == 1) {
+    // sort fields
+    mAst->SortFields<InterfaceNode, IdentifierNode>(node);
+  } else if (mAst->GetPass() == 2) {
+    // skip getting canonical type if not only fields
+    if (node->GetMethodsNum() || node->GetSuperInterfacesNum()) {
+      return node;
+    }
+    mAst->GetCanonicStructNode(node);
+  }
   return node;
 }
 
 template <typename T1>
 void AST_AST::ExtendFields(T1 *node, TreeNode *sup) {
-  unsigned nid = node->GetNodeId();
   if (sup == NULL) {
     sup = node;
   }
-  for (unsigned i = 0; i < GetFieldSize(sup); i++) {
-    TreeNode *fld = GetField(node, i);
+  unsigned nid = node->GetNodeId();
+  if (sup && sup->IsUserType()) {
+    sup = static_cast<UserTypeNode *>(sup)->GetId();
+  }
+  if (sup && sup->IsIdentifier()) {
+    sup = GetStructFromStrIdx(sup->GetStrIdx());
+  }
+  if (!sup) {
+    return;
+  }
+  for (unsigned i = 0; i < GetFieldSize(sup, true); i++) {
+    TreeNode *fld = GetField(sup, i, true);
     mStructId2FieldsMap[nid].PushBack(fld);
   }
   for (unsigned i = 0; i < GetSuperSize(sup, 1); i++) {
@@ -508,22 +581,33 @@ void AST_AST::ExtendFields(T1 *node, TreeNode *sup) {
   }
 }
 
+template <typename T1>
+static void DumpVec(std::vector<std::pair<unsigned, T1 *>> vec) {
+  unsigned size = vec.size();
+  std::cout << "================ Dump Vec ================" << std::endl;
+  for (unsigned i = 0; i < size; i++) {
+    std::cout << "item #" << i
+              << " nodeid " << vec[i].second->GetNodeId()
+              << " stridx " << vec[i].second->GetStrIdx()
+              << std::endl;
+  }
+}
+
 template <typename T1, typename T2>
 void AST_AST::SortFields(T1 *node) {
   std::vector<std::pair<unsigned, T2 *>> vec;
-  unsigned size = GetFieldSize(node);
-  if (!size) {
-    return;
-  }
-  for (unsigned i = 0; i < size; i++) {
-    T2 *fld = node->GetField(i);
-    unsigned stridx = fld->GetStrIdx();
-    std::pair<unsigned, T2*> p(stridx, fld);
-    vec.push_back(p);
-  }
-  std::sort(vec.begin(), vec.end());
-  for (unsigned i = 0; i < size; i++) {
-    node->SetField(i, vec[i].second);
+  unsigned size = GetFieldSize(node, true);
+  if (size) {
+    for (unsigned i = 0; i < size; i++) {
+      T2 *fld = node->GetField(i);
+      unsigned stridx = fld->GetStrIdx();
+      std::pair<unsigned, T2*> p(stridx, fld);
+      vec.push_back(p);
+    }
+    std::sort(vec.begin(), vec.end());
+    for (unsigned i = 0; i < size; i++) {
+      node->SetField(i, vec[i].second);
+    }
   }
 
   unsigned nid = node->GetNodeId();
@@ -541,37 +625,6 @@ void AST_AST::SortFields(T1 *node) {
       *(mStructId2FieldsMap[nid].RefAtIndex(i)) = vec[i].second;
     }
   }
-}
-
-StructNode *SortFieldsVisitor::VisitStructNode(StructNode *node) {
-  (void) AstVisitor::VisitStructNode(node);
-  // extends
-  mAst->ExtendFields<StructNode>(node, NULL);
-  // sort fields
-  mAst->SortFields<StructNode, TreeNode>(node);
-  return node;
-}
-
-StructLiteralNode *SortFieldsVisitor::VisitStructLiteralNode(StructLiteralNode *node) {
-  (void) AstVisitor::VisitStructLiteralNode(node);
-  // sort fields
-  mAst->SortFields<StructLiteralNode, FieldLiteralNode>(node);
-  return node;
-}
-
-ClassNode *SortFieldsVisitor::VisitClassNode(ClassNode *node) {
-  (void) AstVisitor::VisitClassNode(node);
-  mAst->ExtendFields<ClassNode>(node, NULL);
-  // sort fields
-  mAst->SortFields<ClassNode, TreeNode>(node);
-  return node;
-}
-
-InterfaceNode *SortFieldsVisitor::VisitInterfaceNode(InterfaceNode *node) {
-  (void) AstVisitor::VisitInterfaceNode(node);
-  // sort fields
-  mAst->SortFields<InterfaceNode, IdentifierNode>(node);
-  return node;
 }
 
 // set parent for some identifier's type
@@ -679,11 +732,6 @@ StructLiteralNode *AdjustASTVisitor::VisitStructLiteralNode(StructLiteralNode *n
 
 StructNode *AdjustASTVisitor::VisitStructNode(StructNode *node) {
   (void) AstVisitor::VisitStructNode(node);
-  IdentifierNode *id = node->GetStructId();
-  if (id && node->GetStrIdx() == 0) {
-    node->SetStrIdx(id->GetStrIdx());
-  }
-
   // skip getting canonical type for TypeAlias
   TreeNode *parent_orig = node->GetParent();
   TreeNode *p = parent_orig;
