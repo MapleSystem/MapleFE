@@ -2315,13 +2315,15 @@ TreeNode* ASTBuilder::AddNamespaceBody() {
     std::cout << "In AddNamespaceBody" << std::endl;
 
   Param p_body = mParams[0];
-  if (!p_body.mIsTreeNode)
-    MERROR("The namespace body is not a tree node.");
-  TreeNode *tree = p_body.mData.mTreeNode;
+  if (!p_body.mIsEmpty) {
+    if(!p_body.mIsTreeNode)
+      MERROR("The namespace body is not a tree node.");
+    TreeNode *tree = p_body.mData.mTreeNode;
 
-  MASSERT(mLastTreeNode->IsNamespace());
-  NamespaceNode *ns = (NamespaceNode*)mLastTreeNode;
-  ns->AddBody(tree);
+    MASSERT(mLastTreeNode->IsNamespace());
+    NamespaceNode *ns = (NamespaceNode*)mLastTreeNode;
+    ns->AddBody(tree);
+  }
 
   return mLastTreeNode;
 }
