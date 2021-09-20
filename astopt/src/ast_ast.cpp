@@ -336,11 +336,11 @@ TreeNode *AST_AST::GetCanonicStructNode(TreeNode *node) {
       return s;
     }
     bool isI = IsInterface(s);
+    if (!node->IsStructLiteral()) {
       // skip if one is interface but other is not
       if ((isI0 && !isI) || (!isI0 && isI)) {
         continue;
       }
-    if (!node->IsStructLiteral()) {
     }
     bool match = true;;
     // check fields
