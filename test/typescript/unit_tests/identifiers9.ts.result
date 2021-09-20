@@ -1,0 +1,10 @@
+Matched 7 tokens.
+Matched 16 tokens.
+Matched 23 tokens.
+============= Module ===========
+== Sub Tree ==
+ts_enum: E {package="package" }
+== Sub Tree ==
+js_var Decl: x=E.package
+== Sub Tree ==
+console.log(x)

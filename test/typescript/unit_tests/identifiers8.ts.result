@@ -1,0 +1,7 @@
+Matched 8 tokens.
+Matched 15 tokens.
+============= Module ===========
+== Sub Tree ==
+js_var Decl: func=() -> 1
+== Sub Tree ==
+export {func as function} 
