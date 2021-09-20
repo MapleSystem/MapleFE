@@ -1587,6 +1587,19 @@ void ClassNode::Construct(BlockNode *block) {
       SETPARENT(tree_node);
     } else if (tree_node->IsFunction()) {
       FunctionNode *f = (FunctionNode*)tree_node;
+      // There is an ugly case from Typescript, which use keyword 'constructor'
+      // as an identifier. This causes a constructor to be recoganized as normal function.
+      // We do adjustment here.
+      TreeNode *name = f->GetFuncName();
+      if (name && name->IsIdentifier()) {
+        IdentifierNode *id = (IdentifierNode*)name;
+        const char *name_str = id->GetName();
+        if (!strncmp(name_str, "constructor", 11) && (strlen(name_str) == 11)) {
+          f->SetFuncName(NULL);
+          f->SetStrIdx(0);
+          f->SetIsConstructor();
+        }
+      }
       if (f->IsConstructor())
         mConstructors.PushBack(f);
       else

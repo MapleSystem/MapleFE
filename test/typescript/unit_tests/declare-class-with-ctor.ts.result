@@ -1,0 +1,25 @@
+Matched 15 tokens.
+Matched 31 tokens.
+============= Module ===========
+== Sub Tree ==
+declare class  Klass
+  Fields: 
+    name
+  Instance Initializer: 
+  Constructors: 
+    constructor  (name)  throws: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+declare class  Klass2
+  Fields: 
+    name
+  Instance Initializer: 
+  Constructors: 
+    constructor  (name)  throws: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
