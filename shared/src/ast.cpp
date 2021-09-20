@@ -1908,6 +1908,20 @@ void FunctionNode::Dump(unsigned indent) {
 //                              LambdaNode
 //////////////////////////////////////////////////////////////////////////////////////
 
+void LambdaNode::AddTypeParameter(TreeNode *param) {
+  if (param->IsPass()) {
+    PassNode *n = (PassNode*)param;
+    for (unsigned i = 0; i < n->GetChildrenNum(); i++) {
+      TreeNode *child = n->GetChild(i);
+      AddTypeParameter(child);
+    }
+  } else {
+    MASSERT(param->IsTypeParameter());
+    mTypeParameters.PushBack((TypeParameterNode*)param);
+    SETPARENT(param);
+  }
+}
+
 void LambdaNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   std::string dump;

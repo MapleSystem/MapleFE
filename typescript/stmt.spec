@@ -1275,6 +1275,7 @@ rule ArrowFunction : ONEOF(
   attr.action.%1 : BuildLambda(%1, %3)
   attr.action.%2 : BuildLambda(%3, %7)
   attr.action.%2 : AddType(%5)
+  attr.action.%2 : AddTypeGenerics(%1)
   attr.action.%1,%2 : SetArrowFunction()
 
 ## See 14.2
@@ -1719,6 +1720,7 @@ rule IntersectionType: IntersectionOrPrimaryType + '&' + PrimaryType
 rule FunctionType: ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList) + ')' + "=>" + Type
   attr.action : BuildLambda(%3)
   attr.action : AddType(%6)
+  attr.action : AddTypeGenerics(%1)
 
 ## rule ConstructorType: new TypeParametersopt ( ParameterListopt ) => Type
 ## This actually a literal.

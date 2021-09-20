@@ -3550,6 +3550,9 @@ TreeNode* ASTBuilder::AddTypeGenerics() {
   } else if (mLastTreeNode->IsStruct()) {
     StructNode *c = (StructNode*)mLastTreeNode;
     c->AddTypeParameter(args);
+  } else if (mLastTreeNode->IsLambda()) {
+    LambdaNode *c = (LambdaNode*)mLastTreeNode;
+    c->AddTypeParameter(args);
   } else {
     MERROR("Unsupported node in AddTypeGenerics()");
   }

@@ -1,0 +1,7 @@
+Matched 36 tokens.
+Matched 50 tokens.
+============= Module ===========
+== Sub Tree ==
+js_const Decl: func=() -> (x) -> x Land  typeof x.length StEq "number"()
+== Sub Tree ==
+console.log(func([1,2]))
