@@ -1,0 +1,13 @@
+Matched 9 tokens.
+Matched 22 tokens.
+Matched 29 tokens.
+Matched 42 tokens.
+============= Module ===========
+== Sub Tree ==
+import { default as myX, * as M} "./M-copy"
+== Sub Tree ==
+console.log(myX,M.getx())
+== Sub Tree ==
+M.setx(3)
+== Sub Tree ==
+console.log(myX,M.getx())
