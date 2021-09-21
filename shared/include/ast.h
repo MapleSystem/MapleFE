@@ -257,12 +257,16 @@ class DeclareNode : public TreeNode {
 private:
   TreeNode *mDecl;    // the exported package in Java or module in JS
   SmallVector<AttrId> mAttrs;
+  bool      mIsGlobal;//
 public:
-  DeclareNode() : TreeNode(NK_Declare), mDecl(NULL) {}
+  DeclareNode() : TreeNode(NK_Declare), mDecl(NULL), mIsGlobal(false) {}
   ~DeclareNode(){mAttrs.Release();}
 
   void SetDecl(TreeNode *t) {mDecl = t;}
   TreeNode* GetDecl() {return mDecl;}
+
+  bool IsGlobal()                 {return mIsGlobal;}
+  void SetIsGlobal(bool b = true) {mIsGlobal = b;}
 
   // Attributes related
   unsigned GetAttrsNum() const        {return mAttrs.GetNum();}

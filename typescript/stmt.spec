@@ -68,7 +68,6 @@ rule KeywordIdentifier : ONEOF("get",
                                "any",
                                "constructor",
                                "function",
-                               "package",
                                "delete",
                                "abstract",
                                "as",
@@ -91,6 +90,7 @@ rule KeywordIdentifier : ONEOF("get",
                                "asserts",
                                "require",
                                "import",
+                               "global",
                                "for")
 ## "
   attr.action : BuildIdentifier()
@@ -787,7 +787,8 @@ rule Declaration : ONEOF(HoistableDeclaration,
                          TypeAliasDeclaration,
                          EnumDeclaration,
                          NamespaceDeclaration,
-                         ExternalDeclaration)
+                         ExternalDeclaration,
+                         GlobalDeclaration)
   attr.property : Top
 
 ##-----------------------------------
@@ -2188,6 +2189,20 @@ rule ExternalDeclaration : ONEOF("declare" + NamespaceDeclaration,
                                  "declare" + EnumDeclaration,
                                  "declare" + ExternalModuleDeclaration)
   attr.action.%1,%2,%3,%4,%5,%6,%7,%8 : BuildExternalDeclaration(%2)
+
+## for global declaration
+## https://www.typescriptlang.org/docs/handbook/declaration-files/templates/global-modifying-module-d-ts.html
+rule GlobalDeclMember : ONEOF(NamespaceDeclaration,
+                              LexicalDeclaration + ZEROORONE(';'),
+                              ClassDeclaration,
+                              InterfaceDeclaration,
+                              FunctionDeclaration,
+                              VariableStatement,
+                              TypeAliasDeclaration,
+                              EnumDeclaration,
+                              ExternalModuleDeclaration)
+rule GlobalDeclaration : "declare" + "global" + '{' + ZEROORMORE(GlobalDeclMember) + '}'
+  attr.action : BuildGlobalExternalDeclaration(%4)
 
 #################################################################################################
 #                                 A.9 Scripts and Modules

@@ -613,7 +613,7 @@ TreeNode* ASTBuilder::BuildXXportAsPairDefault() {
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
-//          BuildExternalDeclaration
+//          BuildExternalDeclaration and BuildGlobalExternalDeclaration
 /////////////////////////////////////////////////////////////////////////////////////////
 
 // It takes one arguments
@@ -632,6 +632,37 @@ TreeNode* ASTBuilder::BuildExternalDeclaration() {
 
   if (tree)
     n->SetDecl(tree);
+
+  mLastTreeNode = n;
+  return mLastTreeNode;
+}
+
+// It takes one arguments
+TreeNode* ASTBuilder::BuildGlobalExternalDeclaration() {
+  MASSERT(mParams.size() == 1);
+
+  TreeNode *tree = NULL;
+
+  Param p = mParams[0];
+  if (!p.mIsEmpty && p.mIsTreeNode) {
+    tree = p.mData.mTreeNode;
+  }
+
+  DeclareNode *n = NULL;
+  if (tree && tree->IsPass()) {
+    PassNode *pass_node = (PassNode*)tree;
+    for (unsigned i = 0; i < pass_node->GetChildrenNum(); i++) {
+      TreeNode *child = pass_node->GetChild(i);
+      n = (DeclareNode*)gTreePool.NewTreeNode(sizeof(DeclareNode));
+      new (n) DeclareNode();
+      n->SetDecl(child);
+      n->SetIsGlobal();
+    }
+  } else {
+    n = (DeclareNode*)gTreePool.NewTreeNode(sizeof(DeclareNode));
+    new (n) DeclareNode();
+    n->SetDecl(tree);
+  }
 
   mLastTreeNode = n;
   return mLastTreeNode;

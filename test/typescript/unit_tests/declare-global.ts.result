@@ -1,0 +1,7 @@
+Matched 12 tokens.
+Matched 24 tokens.
+============= Module ===========
+== Sub Tree ==
+declare ts_interface: IFace {name }
+== Sub Tree ==
+export {js_var Decl: obj= {name:"abc"}} 

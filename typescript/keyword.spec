@@ -85,7 +85,6 @@ STRUCT KeyWord : ((boolean),
                   (let),
                   (static),
                   (implements),
-                  (package),
                   (protected),
                   (interface),
                   (private),
@@ -98,6 +97,8 @@ STRUCT KeyWord : ((boolean),
                   (enum),
                   (await),
                   (async),
+
+                  (global),
 
 #this is for 'fake rule only'
                   (this_is_for_fake_rule))
