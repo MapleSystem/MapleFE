@@ -27,6 +27,8 @@
 
 namespace maplefe {
 
+class FindStrIdxVisitor;
+
 class AST_AST {
  private:
   Module_Handler *mHandler;
@@ -34,11 +36,14 @@ class AST_AST {
   unsigned        mNum;
   bool            mNameAnonyStruct;
   unsigned        mPass;
+  FindStrIdxVisitor *mStrIdxVistor;
 
   std::unordered_set<unsigned> mReachableBbIdx;;
   std::unordered_map<unsigned, std::unordered_set<TreeNode *>> mFieldNum2StructNodeMap;
   std::unordered_map<unsigned, SmallVector<TreeNode*>> mStructId2FieldsMap;
   std::unordered_map<unsigned, TreeNode *> mStrIdx2StructMap;
+  std::unordered_set<unsigned> mTypeParamStrIdxSet;
+  std::unordered_set<unsigned> mWithTypeParamNodeSet;
 
  public:
   explicit AST_AST(Module_Handler *h, unsigned f) : mHandler(h), mFlags(f), mNum(1),
@@ -76,6 +81,12 @@ class AST_AST {
 
   template <typename T1, typename T2> void SortFields(T1 *node);
   template <typename T1> void ExtendFields(T1 *node, TreeNode *sup);
+
+  bool WithStrIdx(TreeNode *node, unsigned stridx);
+  bool WithTypeParam(TreeNode *node);
+  bool WithTypeParamFast(TreeNode *node);
+  void InsertTypeParamStrIdx(unsigned stridx) { mTypeParamStrIdxSet.insert(stridx); }
+  void InsertWithTypeParamNode(TreeNode *node) { mWithTypeParamNodeSet.insert(node->GetNodeId()); }
 };
 
 class ClassStructVisitor : public AstVisitor {
@@ -92,10 +103,32 @@ class ClassStructVisitor : public AstVisitor {
     }
   ~ClassStructVisitor() = default;
 
-  virtual StructLiteralNode *VisitStructLiteralNode(StructLiteralNode *node);
-  virtual StructNode *VisitStructNode(StructNode *node);
-  virtual ClassNode *VisitClassNode(ClassNode *node);
-  virtual InterfaceNode *VisitInterfaceNode(InterfaceNode *node);
+  StructLiteralNode *VisitStructLiteralNode(StructLiteralNode *node);
+  StructNode *VisitStructNode(StructNode *node);
+  ClassNode *VisitClassNode(ClassNode *node);
+  InterfaceNode *VisitInterfaceNode(InterfaceNode *node);
+  TypeParameterNode *VisitTypeParameterNode(TypeParameterNode *node);
+};
+
+class FindStrIdxVisitor : public AstVisitor {
+ private:
+  Module_Handler *mHandler;
+  AST_AST        *mAst;
+  unsigned       mFlags;
+  unsigned       mStrIdx;
+  bool           mFound;
+
+ public:
+  explicit FindStrIdxVisitor(Module_Handler *h, unsigned f, bool base = false)
+    : mHandler(h), mFlags(f), mStrIdx(0), mFound(false),
+      AstVisitor((f & FLG_trace_1) && base) {
+      mAst = mHandler->GetAST();
+    }
+  ~FindStrIdxVisitor() = default;
+
+  void Init(unsigned stridx) { mStrIdx = stridx; mFound = false; }
+  bool GetFound() { return mFound; }
+  IdentifierNode *VisitIdentifierNode(IdentifierNode *node);
 };
 
 class AdjustASTVisitor : public AstVisitor {

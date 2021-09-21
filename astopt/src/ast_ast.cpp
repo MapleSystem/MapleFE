@@ -29,6 +29,10 @@ void AST_AST::AdjustAST() {
     it->SetParent(module);
   }
 
+  // collect type parameters
+  MSGNOLOC0("============== Type Parameter ==============");
+  mStrIdxVistor = new FindStrIdxVisitor(mHandler, mFlags, true);
+
   // collect class/interface/struct decl
   mPass = 0;
   MSGNOLOC0("============== Collect class/interface/struct ==============");
@@ -358,6 +362,11 @@ TreeNode *AST_AST::GetCanonicStructNode(TreeNode *node) {
     }
   }
 
+  // do not proceed if node contains type parameter
+  if (WithTypeParamFast(node)) {
+    return node;
+  }
+
   // not match
   unsigned stridx = node->GetStrIdx();
 
@@ -374,7 +383,6 @@ TreeNode *AST_AST::GetCanonicStructNode(TreeNode *node) {
 
   return node;
 }
-
 
 IdentifierNode *AST_AST::CreateIdentifierNode(unsigned stridx) {
   IdentifierNode *node = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
@@ -477,6 +485,25 @@ TreeNode *AST_AST::GetAnonymousStruct(TreeNode *node) {
   return newnode;
 }
 
+bool AST_AST::WithStrIdx(TreeNode *node, unsigned stridx) {
+  mStrIdxVistor->Init(stridx);
+  mStrIdxVistor->Visit(node);
+  return mStrIdxVistor->GetFound();
+}
+
+bool AST_AST::WithTypeParam(TreeNode *node) {
+  for (auto idx: mTypeParamStrIdxSet) {
+    if (WithStrIdx(node, idx)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool AST_AST::WithTypeParamFast(TreeNode *node) {
+  return (mWithTypeParamNodeSet.find(node->GetNodeId()) != mWithTypeParamNodeSet.end());
+}
+
 StructLiteralNode *ClassStructVisitor::VisitStructLiteralNode(StructLiteralNode *node) {
   (void) AstVisitor::VisitStructLiteralNode(node);
   if (mAst->GetPass() == 0) {
@@ -489,6 +516,9 @@ StructLiteralNode *ClassStructVisitor::VisitStructLiteralNode(StructLiteralNode 
       }
     }
   } else if (mAst->GetPass() == 1) {
+    if (mAst->WithTypeParam(node)) {
+      mAst->InsertWithTypeParamNode(node);
+    }
     // sort fields
     mAst->SortFields<StructLiteralNode, FieldLiteralNode>(node);
   }
@@ -496,6 +526,7 @@ StructLiteralNode *ClassStructVisitor::VisitStructLiteralNode(StructLiteralNode 
 }
 
 StructNode *ClassStructVisitor::VisitStructNode(StructNode *node) {
+  (void) AstVisitor::VisitStructNode(node);
   if (mAst->GetPass() == 0) {
     IdentifierNode *id = node->GetStructId();
     if (id && node->GetStrIdx() == 0) {
@@ -504,6 +535,9 @@ StructNode *ClassStructVisitor::VisitStructNode(StructNode *node) {
 
     mAst->SetStrIdx2Struct(node->GetStrIdx(), node);
   } else if (mAst->GetPass() == 1) {
+    if (mAst->WithTypeParam(node)) {
+      mAst->InsertWithTypeParamNode(node);
+    }
     // extends
     mAst->ExtendFields<StructNode>(node, NULL);
     // sort fields
@@ -519,9 +553,13 @@ StructNode *ClassStructVisitor::VisitStructNode(StructNode *node) {
 }
 
 ClassNode *ClassStructVisitor::VisitClassNode(ClassNode *node) {
+  (void) AstVisitor::VisitClassNode(node);
   if (mAst->GetPass() == 0) {
     mAst->SetStrIdx2Struct(node->GetStrIdx(), node);
   } else if (mAst->GetPass() == 1) {
+    if (mAst->WithTypeParam(node)) {
+      mAst->InsertWithTypeParamNode(node);
+    }
     // include super class fields
     mAst->ExtendFields<ClassNode>(node, NULL);
     // sort fields
@@ -537,9 +575,13 @@ ClassNode *ClassStructVisitor::VisitClassNode(ClassNode *node) {
 }
 
 InterfaceNode *ClassStructVisitor::VisitInterfaceNode(InterfaceNode *node) {
+  (void) AstVisitor::VisitInterfaceNode(node);
   if (mAst->GetPass() == 0) {
     mAst->SetStrIdx2Struct(node->GetStrIdx(), node);
   } else if (mAst->GetPass() == 1) {
+    if (mAst->WithTypeParam(node)) {
+      mAst->InsertWithTypeParamNode(node);
+    }
     // sort fields
     mAst->SortFields<InterfaceNode, IdentifierNode>(node);
   } else if (mAst->GetPass() == 2) {
@@ -548,6 +590,26 @@ InterfaceNode *ClassStructVisitor::VisitInterfaceNode(InterfaceNode *node) {
       return node;
     }
     mAst->GetCanonicStructNode(node);
+  }
+  return node;
+}
+
+TypeParameterNode *ClassStructVisitor::VisitTypeParameterNode(TypeParameterNode *node) {
+  (void) AstVisitor::VisitTypeParameterNode(node);
+  if (mAst->GetPass() == 0) {
+    TreeNode *id = node->GetId();
+    if (id) {
+      unsigned stridx = id->GetStrIdx();
+      mAst->InsertTypeParamStrIdx(stridx);
+    }
+  }
+  return node;
+}
+
+IdentifierNode *FindStrIdxVisitor::VisitIdentifierNode(IdentifierNode *node) {
+  (void) AstVisitor::VisitIdentifierNode(node);
+  if (node->GetStrIdx() == mStrIdx) {
+    mFound = true;
   }
   return node;
 }
@@ -671,9 +733,12 @@ ClassNode *AdjustASTVisitor::VisitClassNode(ClassNode *node) {
 
   TreeNode *parent = node->GetParent();
   TreeNode *newnode = mAst->GetCanonicStructNode(node);
+  if (newnode == node) {
+    return node;
+  }
 
   // create a TypeAlias for duplicated type if top level
-  if (newnode != node && parent && parent->IsModule()) {
+  if (parent && parent->IsModule()) {
     newnode = (ClassNode*)(mAst->CreateTypeAliasNode(newnode, node));
   }
 
@@ -689,9 +754,12 @@ InterfaceNode *AdjustASTVisitor::VisitInterfaceNode(InterfaceNode *node) {
 
   TreeNode *parent = node->GetParent();
   TreeNode *newnode = mAst->GetCanonicStructNode(node);
+  if (newnode == node) {
+    return node;
+  }
 
   // create a TypeAlias for duplicated type if top level
-  if (newnode != node && parent && parent->IsModule()) {
+  if (parent && parent->IsModule()) {
     newnode = (InterfaceNode*)(mAst->CreateTypeAliasNode(newnode, node));
   }
   return (InterfaceNode*)newnode;
@@ -720,7 +788,7 @@ StructLiteralNode *AdjustASTVisitor::VisitStructLiteralNode(StructLiteralNode *n
       IdentifierNode *id = static_cast<IdentifierNode *>(var);
       if (!id->GetType()) {
         TreeNode *newnode = mAst->GetCanonicStructNode(node);
-        if (newnode && newnode != node) {
+        if (newnode != node) {
           UserTypeNode *utype = mAst->CreateUserTypeNode(newnode->GetStrIdx());
           static_cast<IdentifierNode *>(var)->SetType(utype);
         }
@@ -758,7 +826,11 @@ StructNode *AdjustASTVisitor::VisitStructNode(StructNode *node) {
 
   // for non top level tree node, replace it with a UserType node
   if (!parent_orig || !parent_orig->IsModule()) {
-    newnode = mAst->CreateUserTypeNode(newnode->GetStrIdx());
+    if (newnode->GetStrIdx()) {
+      // for anonymous class, check it is given a name
+      // not skipped due to type parameters
+      newnode = mAst->CreateUserTypeNode(newnode->GetStrIdx());
+    }
   }
 
   return (StructNode*)newnode;
