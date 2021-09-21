@@ -135,21 +135,35 @@ void ASTScope::Dump(unsigned indent) {
   std::cout << "scope: " << AstDump::GetEnumNodeKind(mTree->GetKind()) << " " << mTree->GetName() << " " << mTree->GetNodeId() << std::endl;
   for (unsigned i = 0; i < GetDeclNum(); i++) {
     TreeNode *node = GetDecl(i);
-    node->DumpIndentation(indent);
     switch (node->GetKind()) {
       case NK_Identifier: {
         IdentifierNode *n = static_cast<IdentifierNode *>(node);
+        node->DumpIndentation(indent);
         std::cout << "    arg: " << n->GetName() << " " << n->GetNodeId() << std::endl;
         break;
       }
       case NK_Decl: {
         DeclNode *n = static_cast<DeclNode *>(node);
+        node->DumpIndentation(indent);
         std::cout << "   decl: " << n->GetName() << " " << n->GetNodeId() << std::endl;
         break;
       }
       case NK_Function: {
         FunctionNode *n = static_cast<FunctionNode *>(node);
+        node->DumpIndentation(indent);
         std::cout << "   func: " << n->GetName() << " " << n->GetNodeId() << std::endl;
+        break;
+      }
+      case NK_Struct: {
+        StructNode *n = static_cast<StructNode *>(node);
+        node->DumpIndentation(indent);
+        std::cout << " struct: " << n->GetName() << " " << n->GetNodeId() << std::endl;
+        break;
+      }
+      case NK_Class: {
+        ClassNode *n = static_cast<ClassNode *>(node);
+        node->DumpIndentation(indent);
+        std::cout << "  class: " << n->GetName() << " " << n->GetNodeId() << std::endl;
         break;
       }
     }

@@ -601,6 +601,7 @@ TypeParameterNode *ClassStructVisitor::VisitTypeParameterNode(TypeParameterNode 
     if (id) {
       unsigned stridx = id->GetStrIdx();
       mAst->InsertTypeParamStrIdx(stridx);
+      node->SetStrIdx(stridx);
     }
   }
   return node;
