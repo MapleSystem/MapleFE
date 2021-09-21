@@ -267,9 +267,8 @@ std::string Emitter::EmitFunctionNode(FunctionNode *node) {
       str += s;
   }
   else
-    if (p)
-      if (p->GetKind() == NK_Block)
-        str += ";\n"s;
+    if (k == NK_Block || k == NK_Struct || k == NK_Class)
+      str += ";\n"s;
   /*
   if (auto n = node->GetDims()) {
     str += ' ' + EmitDimensionNode(n);
