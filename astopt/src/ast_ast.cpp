@@ -1029,6 +1029,11 @@ LambdaNode *AdjustASTVisitor::VisitLambdaNode(LambdaNode *node) {
     func->AddParam(node->GetParam(i));
   }
 
+  // func type parameters
+  for (int i = 0; i < node->GetTypeParametersNum(); i++) {
+    func->AddTypeParam(node->GetTypeParameterAtIndex(i));
+  }
+
   // func body
   TreeNode *tn = VisitTreeNode(node->GetBody());
   if (tn) {
