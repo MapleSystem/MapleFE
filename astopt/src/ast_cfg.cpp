@@ -88,7 +88,7 @@ void CfgBuilder::FinalizeFunction() {
 // Push a BB to target BB stack
 void CfgBuilder::Push(TargetBBStack &stack, CfgBB* bb, TreeNode *label) {
   unsigned idx = 0;
-  if(label && label->GetKind() == NK_Identifier)
+  if(label && label->IsIdentifier())
     idx = static_cast<IdentifierNode *>(label)->GetStrIdx();
   stack.push_back(TargetBB{bb, idx});
 }
@@ -96,7 +96,7 @@ void CfgBuilder::Push(TargetBBStack &stack, CfgBB* bb, TreeNode *label) {
 // Look up a target BB
 CfgBB *CfgBuilder::LookUp(TargetBBStack &stack, TreeNode *label) {
   unsigned idx = 0;
-  if(label && label->GetKind() == NK_Identifier)
+  if(label && label->IsIdentifier())
     idx = static_cast<IdentifierNode *>(label)->GetStrIdx();
   if(idx == 0) {
     for(auto it = stack.rbegin(); it != stack.rend(); ++it)
@@ -386,10 +386,10 @@ SwitchNode *CfgBuilder::VisitSwitchNode(SwitchNode *node) {
 
     bool is_default = false;
     TreeNode *case_expr = nullptr;
-    if(case_node->GetKind() == NK_SwitchCase) {
+    if(case_node->IsSwitchCase()) {
       // Use the first label node of current SwitchCaseNode
       TreeNode *label_node = static_cast<SwitchCaseNode *>(case_node)->GetLabelAtIndex(0);
-      if(label_node->GetKind() == NK_SwitchLabel) {
+      if(label_node->IsSwitchLabel()) {
         is_default = static_cast<SwitchLabelNode *>(label_node)->IsDefault();
         case_expr = static_cast<SwitchLabelNode *>(label_node)->GetValue();
       }
@@ -410,7 +410,7 @@ SwitchNode *CfgBuilder::VisitSwitchNode(SwitchNode *node) {
     }
 
     // Visit all statements of current case
-    if(case_node->GetKind() == NK_SwitchCase) {
+    if(case_node->IsSwitchCase()) {
       SwitchCaseNode *cnode = static_cast<SwitchCaseNode *>(case_node);
       for (unsigned i = 0; i < cnode->GetStmtsNum(); ++i) {
         if (auto t = cnode->GetStmtAtIndex(i))
@@ -524,7 +524,7 @@ BlockNode *CfgBuilder::VisitBlockNode(BlockNode *node) {
   unsigned i, num = node->GetChildrenNum();
   for (i = 0; i < num; ++i) {
     TreeNode *child = node->GetChildAtIndex(i);
-    if(child == nullptr || child->GetKind() != NK_Decl) {
+    if(child == nullptr || !child->IsDecl()) {
       continue;
     }
     DeclNode *decl = static_cast<DeclNode *>(child);
@@ -863,7 +863,7 @@ void CfgBuilder::Build() {
       case NK_Lambda:
         {
           auto n = static_cast<LambdaNode*>(node)->GetBody();
-          if(n->GetKind() == NK_Block)
+          if(n->IsBlock())
             Visit(n);
         }
         break;

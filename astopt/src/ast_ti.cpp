@@ -512,7 +512,7 @@ bool TypeInferVisitor::IsArray(TreeNode *node) {
   }
   if (tn->IsIdentifier()) {
     IdentifierNode *idnode = static_cast<IdentifierNode *>(tn);
-    if (idnode && idnode->GetType() && idnode->GetType()->GetKind() == NK_PrimArrayType) {
+    if (idnode && idnode->GetType() && idnode->GetType()->IsPrimArrayType()) {
       return true;
     }
   } else if (tn->IsBindingPattern()) {

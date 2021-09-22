@@ -157,7 +157,7 @@ class CfgFunc {
   TreeNode *GetFuncNode()               {return mFuncNode;}
 
   const char *GetName() {
-    return mFuncNode->GetKind() == NK_Module ? "_init_" :
+    return mFuncNode->IsModule() ? "_init_" :
       (mFuncNode->GetStrIdx() ? mFuncNode->GetName() : "_anonymous_");
   }
 

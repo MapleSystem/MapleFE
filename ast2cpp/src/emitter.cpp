@@ -29,14 +29,14 @@ std::string Emitter::Emit(const char *title) {
 }
 
 std::string Emitter::GetEnding(TreeNode *n) {
-  if (n->GetKind() == NK_Export) {
+  if (n->IsExport()) {
     ExportNode *ex = static_cast<ExportNode *>(n);
     if (ex->GetPairsNum() == 1) {
       if (auto p = ex->GetPair(0)->GetBefore())
         n = p;
     }
   }
-  if (n->GetKind() == NK_Declare)
+  if (n->IsDeclare())
     if (auto p = static_cast<DeclareNode *>(n)->GetDecl())
       n = p;
   std::string str;
@@ -397,14 +397,14 @@ std::string Emitter::EmitXXportAsPairNode(XXportAsPairNode *node) {
     if (auto n = node->GetBefore()) {
       str += " = "s;
       std::string s = EmitTreeNode(n);
-      str += n->GetKind() == NK_Literal ? "require("s + s + ')' : s;
+      str += n->IsLiteral() ? "require("s + s + ')' : s;
     }
   } else {
     if (auto n = node->GetBefore()) {
       std::string s = EmitTreeNode(n);
       if (auto a = node->GetAfter())
         s += " as "s + EmitTreeNode(a);
-      if (n->GetKind() == NK_Identifier)
+      if (n->IsIdentifier())
         s = "{ "s + s + " }"s;
       str += s;
     }
@@ -421,7 +421,7 @@ std::string Emitter::EmitDeclareNode(DeclareNode *node) {
   }
   if (auto n = node->GetDecl()) {
     std::string s = EmitTreeNode(n);
-    if (n->GetKind() == NK_Module) {
+    if (n->IsModule()) {
       s = "module \""s + static_cast<ModuleNode *>(n)->GetFileName()
         + "\" {\n"s + s + "}\n"s;
     }
@@ -490,7 +490,7 @@ std::string Emitter::EmitImportNode(ImportNode *node) {
     if (XXportAsPairNode *pair = node->GetPair(0))
       if (auto a = pair->GetAfter())
         if (auto b = pair->GetBefore())
-          if (b->GetKind() == NK_Identifier && a->GetKind() == NK_Identifier) {
+          if (b->IsIdentifier() && a->IsIdentifier()) {
             str += EmitTreeNode(a) + " = "s + EmitTreeNode(b);
             return HandleTreeNode(str, node);
           }
@@ -991,7 +991,7 @@ std::string Emitter::EmitFieldLiteralNode(FieldLiteralNode *node) {
   std::string str;
   auto lit = node->GetLiteral();
   if (auto n = node->GetFieldName()) {
-    if(lit && lit->GetKind() == NK_Function &&
+    if(lit && lit->IsFunction() &&
         static_cast<FunctionNode *>(lit)->GetFuncName() == n) {
       str = EmitTreeNode(lit);
       if (str.substr(0, 9) == "function ")
@@ -1665,7 +1665,7 @@ std::string Emitter::EmitLambdaNode(LambdaNode *node) {
     }
     std::string s = EmitTreeNode(n);
     s = Clean(s);
-    if (n->GetKind() == NK_StructLiteral)
+    if (n->IsStructLiteral())
       s = '(' + s + ')';
     str += " => "s + s;
   }

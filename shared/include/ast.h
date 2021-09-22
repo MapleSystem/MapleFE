@@ -55,7 +55,7 @@
 
 namespace maplefe {
 
-#define SETPARENT(n) if(n && n->GetKind() != NK_PrimType) n->SetParent(this)
+#define SETPARENT(n) if(n && !n->IsPrimType()) n->SetParent(this)
 
 enum NodeKind {
 #undef  NODEKIND

@@ -68,7 +68,7 @@ std::string CppDef::EmitModuleNode(ModuleNode *node) {
   // definition of default class constructors.
   for (unsigned i = 0; i < node->GetTreesNum(); ++i) {
     if (auto n = node->GetTree(i))
-      if (n->GetKind() == NK_Class) {
+      if (n->IsClass()) {
         str += EmitCppCtor(static_cast<ClassNode*>(n));
         if (static_cast<ClassNode*>(n)->GetConstructorsNum() == 0)
           str += EmitDefaultCtor(static_cast<ClassNode*>(n));
@@ -90,7 +90,7 @@ std::string CppDef::EmitModuleNode(ModuleNode *node) {
   isInit = true;
   for (unsigned i = 0; i < node->GetTreesNum(); ++i) {
     if (auto n = node->GetTree(i)) {
-      if (n->GetKind() != NK_Class)
+      if (!n->IsClass())
         str += "  "s + EmitTreeNode(n) + ";\n"s;
     }
   }
@@ -135,12 +135,12 @@ std::string CppDef::EmitXXportAsPairNode(XXportAsPairNode *node) {
       str += "as "s + EmitTreeNode(n);
   } else {
     if (auto n = node->GetBefore()) {
-      if (n->GetKind() == NK_Identifier)
+      if (n->IsIdentifier())
         str += "{ "s;
       str += EmitTreeNode(n);
       if (auto n = node->GetAfter())
         str += " as "s + EmitTreeNode(n);
-      if (n->GetKind() == NK_Identifier)
+      if (n->IsIdentifier())
         str += " }"s;
     }
   }
@@ -150,13 +150,13 @@ std::string CppDef::EmitXXportAsPairNode(XXportAsPairNode *node) {
 
 inline std::string GetClassName(FunctionNode* f) {
   TreeNode* n = f->GetParent();
-  if (n && n->GetKind()==NK_Class)
+  if (n && n->IsClass())
     return n->GetName();
   return ""s;
 }
 
 inline bool IsClassMethod(FunctionNode* f) {
-  return (f && f->GetParent() && f->GetParent()->GetKind()==NK_Class);
+  return (f && f->GetParent() && f->GetParent()->IsClass());
 }
 
 std::map<TypeId, std::string>TypeIdToJSType = {
@@ -188,7 +188,7 @@ std::string EmitAddPropWithClassFld(std::string objName,
 
 std::string CppDef::EmitClassProps(TreeNode* node) {
   std::string clsFd, addProp;
-  MASSERT(node->GetKind()==NK_Class && "Not NK_Class node");
+  MASSERT(node->IsClass() && "Not NK_Class node");
   ClassNode* c = static_cast<ClassNode*>(node);
   for (unsigned i = 0; i < c->GetFieldsNum(); ++i) {
     auto node = c->GetField(i);
@@ -220,7 +220,7 @@ std::string CppDef::EmitFuncScopeVarDecls(FunctionNode *node) {
   for (int i = 0; i < s->GetDeclNum(); i++) {
     // build list of var decls (no dups) in function scope
     TreeNode* n = s->GetDecl(i);
-    if (n->GetKind() != NK_Decl)
+    if (!n->IsDecl())
       continue;
     DeclNode* d = static_cast<DeclNode*>(n);
     if (d->GetProp() == JS_Var) {
@@ -342,7 +342,7 @@ std::string CppDef::EmitStructLiteralNode(StructLiteralNode* node) {
           break;
         case TY_Class:
           // Handle embedded ObjectLiterals recursively
-          if (lit->GetKind() == NK_StructLiteral) {
+          if (lit->IsStructLiteral()) {
             std::string props = EmitStructLiteralNode(static_cast<StructLiteralNode*>(lit));
             str += "std::make_pair(\""s + fieldName + "\", JS_Val(Object_ctor._new("s + props + ")))"s;
           }
@@ -448,9 +448,9 @@ static bool QuoteStringLiteral(std::string &s, bool quoted = false) {
 }
 
 std::string EmitSuperCtorCall(TreeNode* node) {
-  while (node->GetKind() && node->GetKind() != NK_Class)
+  while (node->GetKind() && !node->IsClass())
     node = node->GetParent();
-  if (node && node->GetKind()==NK_Class) {
+  if (node && node->IsClass()) {
     std::string base, str;
     base = (static_cast<ClassNode*>(node)->GetSuperClassesNum() != 0)? static_cast<ClassNode*>(node)->GetSuperClass(0)->GetName() : "Object";
     str = "  "s + base + "_ctor"s;
@@ -467,7 +467,7 @@ std::string CppDef::EmitCallNode(CallNode *node) {
   std::string str;
   if (auto n = node->GetMethod()) {
     auto s = EmitTreeNode(n);
-    if(n->GetKind() == NK_Function)
+    if(n->IsFunction())
       str += "("s + s + ")"s;
     else {
       if(s.compare(0, 11, "console.log") == 0) {
@@ -667,7 +667,7 @@ std::string CppDef::EmitForLoopNode(ForLoopNode *node) {
         str += " : "s;
         if (auto n = node->GetSet()) {
           str += EmitTreeNode(n);
-          if (n->GetKind() == NK_Identifier && static_cast<IdentifierNode*>(n)->GetTypeId() == TY_Array) {
+          if (n->IsIdentifier() && static_cast<IdentifierNode*>(n)->GetTypeId() == TY_Array) {
             str += "->elements"s;
           }
         }
@@ -712,16 +712,16 @@ std::string CppDef::EmitContinueNode(ContinueNode *node) {
 
 
 inline bool IsObjPropBracketNotation(TreeNode *node) {
-  return node->GetKind() == NK_ArrayElement &&
+  return node->IsArrayElement() &&
          static_cast<ArrayElementNode*>(node)->GetArray()->GetTypeId() == TY_Class;
 }
 
 TypeId CppDef::GetTypeFromDecl(IdentifierNode* id) {
   TypeId type = TY_None;
   DeclNode* decl = static_cast<DeclNode*>(mHandler->FindDecl(id));
-  if (decl && decl->GetVar() && decl->GetVar()->GetKind() == NK_Identifier) {
+  if (decl && decl->GetVar() && decl->GetVar()->IsIdentifier()) {
     IdentifierNode* var = static_cast<IdentifierNode*>(decl->GetVar());
-    if (var->GetType() && var->GetType()->GetKind() == NK_PrimType) {
+    if (var->GetType() && var->GetType()->IsPrimType()) {
       type = static_cast<PrimTypeNode*>(var->GetType())->GetPrimType();
     }
   }
@@ -747,7 +747,7 @@ std::string CppDef::EmitBinOperatorNode(BinOperatorNode *node) {
       propValType = node->GetTypeId();
       propKeyType = ae->GetExprAtIndex(0)->GetTypeId();
       if (propKeyType == TY_None) {
-        if (ae->GetExprAtIndex(0)->GetKind() == NK_Identifier) {
+        if (ae->GetExprAtIndex(0)->IsIdentifier()) {
           propKeyType = GetTypeFromDecl(static_cast<IdentifierNode*>(ae->GetExprAtIndex(0)));
         }
       }
@@ -767,7 +767,7 @@ std::string CppDef::EmitBinOperatorNode(BinOperatorNode *node) {
       }
     } else {
       lhs = EmitTreeNode(n);
-      if (n->GetKind() == NK_Identifier && n->GetTypeId() == TY_Array)
+      if (n->IsIdentifier() && n->GetTypeId() == TY_Array)
         lhs = "*"s + lhs;
       if(precd > mPrecedence || (precd == mPrecedence && rl_assoc))
         lhs = "("s + lhs + ")"s;
@@ -871,10 +871,10 @@ std::string CppDef::EmitSwitchNode(SwitchNode *node) {
     if (SwitchCaseNode* c = node->GetCaseAtIndex(i))
       for (unsigned j = 0; j < c->GetLabelsNum(); ++j) {
         auto l = c->GetLabelAtIndex(j);
-        if (l && l->GetKind() == NK_SwitchLabel) {
+        if (l && l->IsSwitchLabel()) {
           auto ln = static_cast<SwitchLabelNode*>(l);
           if (auto v = ln->GetValue())
-            if(v->GetKind() != NK_Literal || v->GetTypeId() != TY_Int) {
+            if(!v->IsLiteral() || v->GetTypeId() != TY_Int) {
               doable = false;
               goto out_of_loops;
             }

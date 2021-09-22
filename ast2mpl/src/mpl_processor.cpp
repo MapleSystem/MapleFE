@@ -790,7 +790,7 @@ maple::BaseNode *A2M::ProcessClassDecl(StmtExprKind skind, TreeNode *tnode, Bloc
   TreeNode *parent = GetSuperClass(classnode);
   // mangle the name for inner classes
   if (parent) {
-    if (parent->GetKind() == NK_Class) {
+    if (parent->IsClass()) {
       std::string str = parent->GetName();
       str.append("$");   // indicate inner class name
       str.append(std::to_string(mUniqNum++));
@@ -1098,7 +1098,7 @@ maple::BaseNode *A2M::ProcessNew(StmtExprKind skind, TreeNode *tnode, BlockNode 
 
   // search for constructor to call
   TreeNode *id = node->GetId();
-  if (id->GetKind() != NK_Class) {
+  if (!id->IsClass()) {
     NOTYETIMPL("ProcessNew() mId not class");
     return bn;
   }

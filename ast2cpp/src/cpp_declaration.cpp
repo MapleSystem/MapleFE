@@ -112,7 +112,7 @@ public: // all top level functions in the module
   for(unsigned i = 0; i < num; ++i) {
     CfgFunc *func = module->GetNestedFuncAtIndex(i);
     TreeNode *node = func->GetFuncNode();
-    if (node->GetParent() && node->GetParent()->GetKind() != NK_Class) {
+    if (node->GetParent() && !node->GetParent()->IsClass()) {
       str += EmitTreeNode(node) + GetEnding(node);
     }
   }
@@ -307,7 +307,7 @@ std::string CppDecl::EmitArrayLiteral(ArrayLiteralNode *node, int dim, std::stri
     if (i)
       str += ", "s;
     if (auto n = node->GetLiteral(i)) {
-      if (n->GetKind() == NK_ArrayLiteral)
+      if (n->IsArrayLiteral())
         str += EmitArrayLiteral(static_cast<ArrayLiteralNode*>(n), dim-1, type);
       else
         str += EmitTreeNode(n);
@@ -495,11 +495,11 @@ std::string CppDecl::EmitClassNode(ClassNode *node) {
   for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
     auto n = node->GetField(i);
     str += "  "s + EmitTreeNode(n);
-    if (n->GetKind() == NK_Identifier && static_cast<IdentifierNode*>(n)->GetInit()) {
+    if (n->IsIdentifier() && static_cast<IdentifierNode*>(n)->GetInit()) {
       if (auto init = static_cast<IdentifierNode*>(n)->GetInit()) {
-        if (init->GetKind() == NK_ArrayLiteral &&
+        if (init->IsArrayLiteral() &&
             static_cast<IdentifierNode*>(n)->GetType() &&
-            static_cast<IdentifierNode*>(n)->GetType()->GetKind() == NK_PrimArrayType ) {
+            static_cast<IdentifierNode*>(n)->GetType()->IsPrimArrayType() ) {
               // Generate initializer for Array member field decl in header file
               PrimArrayTypeNode* mtype = static_cast<PrimArrayTypeNode *>(static_cast<IdentifierNode*>(n)->GetType());
               str += " = "s + EmitArrayLiteral(static_cast<ArrayLiteralNode*>(init),

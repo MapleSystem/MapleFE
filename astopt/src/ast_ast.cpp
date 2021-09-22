@@ -234,7 +234,7 @@ bool AST_AST::IsTypeCompatible(TreeNode *node1, TreeNode *node2) {
     return false;
   }
   // at least one is prim
-  if (node1->GetKind() == NK_PrimType || node2->GetKind() == NK_PrimType) {
+  if (node1->IsPrimType() || node2->IsPrimType()) {
     TypeId tid_field = GetTypeId(node2);
     TypeId tid_target = GetTypeId(node1);
     return (tid_field == tid_target);
@@ -774,7 +774,7 @@ StructLiteralNode *AdjustASTVisitor::VisitStructLiteralNode(StructLiteralNode *n
     FieldLiteralNode *field = node->GetField(fid);
     TreeNode *name = field->GetFieldName();
     TreeNode *lit = field->GetLiteral();
-    if (!name || !lit || lit->GetKind() != NK_Literal) {
+    if (!name || !lit || !lit->IsLiteral()) {
       return node;
     }
   }

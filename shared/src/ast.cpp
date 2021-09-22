@@ -1928,7 +1928,7 @@ void LambdaNode::Dump(unsigned indent) {
   dump += "(";
   for (unsigned i = 0; i < mParams.GetNum(); i++) {
     TreeNode *in = mParams.ValueAtIndex(i);
-    if(in->GetKind() == NK_Decl)
+    if(in->IsDecl())
       dump += static_cast<DeclNode*>(in)->GetVar()->GetName();
     else
       dump += in->GetName();

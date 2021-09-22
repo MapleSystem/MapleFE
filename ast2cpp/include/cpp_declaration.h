@@ -65,13 +65,13 @@ public:
 inline bool IsVarInitStructLiteral(DeclNode* node) {
   return node->GetInit() &&
          node->GetInit()->GetTypeId() == TY_Class &&
-         node->GetInit()->GetKind() == NK_StructLiteral;
+         node->GetInit()->IsStructLiteral();
 }
 
 inline bool IsVarInitClass(DeclNode* node) {
   return node->GetInit() &&
          node->GetInit()->GetTypeId() == TY_Class &&
-         node->GetInit()->GetKind() == NK_Identifier;
+         node->GetInit()->IsIdentifier();
 }
 
 std::string ident(int n);
