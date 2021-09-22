@@ -31,7 +31,7 @@ void AST_AST::AdjustAST() {
 
   // collect type parameters
   MSGNOLOC0("============== Type Parameter ==============");
-  mStrIdxVistor = new FindStrIdxVisitor(mHandler, mFlags, true);
+  mStrIdxVisitor = new FindStrIdxVisitor(mHandler, mFlags, true);
 
   // collect class/interface/struct decl
   mPass = 0;
@@ -486,9 +486,9 @@ TreeNode *AST_AST::GetAnonymousStruct(TreeNode *node) {
 }
 
 bool AST_AST::WithStrIdx(TreeNode *node, unsigned stridx) {
-  mStrIdxVistor->Init(stridx);
-  mStrIdxVistor->Visit(node);
-  return mStrIdxVistor->GetFound();
+  mStrIdxVisitor->Init(stridx);
+  mStrIdxVisitor->Visit(node);
+  return mStrIdxVisitor->GetFound();
 }
 
 bool AST_AST::WithTypeParam(TreeNode *node) {
@@ -927,6 +927,7 @@ DeclNode *AdjustASTVisitor::VisitDeclNode(DeclNode *node) {
 // split export decl and body
 // export {func add(y)}  ==> export {add}; func add(y)
 ExportNode *AdjustASTVisitor::VisitExportNode(ExportNode *node) {
+  (void) AstVisitor::VisitExportNode(node);
   TreeNode *parent = node->GetParent();
   if (!parent || parent->IsNamespace()) {
     // Export declarations are not permitted in a namespace

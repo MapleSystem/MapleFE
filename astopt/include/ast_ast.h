@@ -36,7 +36,7 @@ class AST_AST {
   unsigned        mNum;
   bool            mNameAnonyStruct;
   unsigned        mPass;
-  FindStrIdxVisitor *mStrIdxVistor;
+  FindStrIdxVisitor *mStrIdxVisitor;
 
   std::unordered_set<unsigned> mReachableBbIdx;;
   std::unordered_map<unsigned, std::unordered_set<TreeNode *>> mFieldNum2StructNodeMap;
