@@ -356,7 +356,7 @@ bool IsBuiltinObj(std::string name) {
 
 std::string GetUserTypeString(UserTypeNode* n) {
   std::string str="";
-  if (n->GetId()->GetTypeId() == TY_Class)
+  if (n->GetId()->IsTypeIdClass())
     str = n->GetId()->GetName() + "*"s;
   else if (IsBuiltinObj(n->GetId()->GetName()))
     str = "t2crt::"s + n->GetId()->GetName() + "*"s;
@@ -427,7 +427,7 @@ std::string CppDecl::EmitUserTypeNode(UserTypeNode *node) {
   std::string str, usrType;
 
   if (auto n = node->GetId()) {
-    if (n->GetTypeId() == TY_Class)
+    if (n->IsTypeIdClass())
       usrType = n->GetName() + "*"s;
     else if (IsBuiltinObj(n->GetName()))
       usrType = "t2crt::"s + n->GetName() + "*"s;
@@ -555,7 +555,7 @@ std::string CppDecl::EmitNewNode(NewNode *node) {
 
   std::string str;
   MASSERT(node->GetId() && "No mId on NewNode");
-  if (node->GetId() && node->GetId()->GetTypeId() == TY_Class) {
+  if (node->GetId() && node->GetId()->IsTypeIdClass()) {
     // Generate code to create new obj and call constructor
     str = node->GetId()->GetName() + "_ctor("s + node->GetId()->GetName() + "_ctor._new("s;
   } else if (IsBuiltinObj(node->GetId()->GetName())) {
@@ -568,7 +568,7 @@ std::string CppDecl::EmitNewNode(NewNode *node) {
 
   auto num = node->GetArgsNum();
   for (unsigned i = 0; i < num; ++i) {
-    if (i || node->GetId()->GetTypeId()==TY_Class)
+    if (i || node->GetId()->IsTypeIdClass())
       str += ", "s;
     if (auto n = node->GetArg(i)) {
       str += EmitTreeNode(n);
@@ -623,7 +623,7 @@ std::string CppDecl::EmitTSEnum(StructNode *node) {
 
   for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
     // Enum member field default to TY_Int if not specified - should this be set by FE?
-    if (node->GetField(i)->GetTypeId() == TY_None)
+    if (node->GetField(i)->IsTypeIdNone())
       node->GetField(i)->SetTypeId(TY_Int);
   }
 

@@ -100,7 +100,7 @@ TypeId AST_AST::GetTypeId(TreeNode *node) {
     case NK_UserType: {
       UserTypeNode *utn = static_cast<UserTypeNode *>(node);
       TreeNode *id = utn->GetId();
-      if (id->GetTypeId() != TY_None) {
+      if (!id->IsTypeIdNone()) {
         tid = id->GetTypeId();
         break;
       }

@@ -114,6 +114,12 @@ public:
 #define NODEKIND(K) bool Is##K() const {return mKind == NK_##K;}
 #include "ast_nk.def"
 
+#undef  TYPE
+#undef  PRIMTYPE
+#define TYPE(K) bool IsTypeId##K() const {return mTypeId == TY_##K;}
+#define PRIMTYPE(K) bool IsTypeId##K() const {return mTypeId == TY_##K;}
+#include "supported_types.def"
+
   bool IsScope() {return IsBlock() || IsClass() || IsFunction() || IsInterface() || IsModule();}
   bool TypeEquivalent(TreeNode*);
 
