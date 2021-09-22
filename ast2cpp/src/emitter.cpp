@@ -36,9 +36,12 @@ std::string Emitter::GetEnding(TreeNode *n) {
         n = p;
     }
   }
-  if (n->IsDeclare())
-    if (auto p = static_cast<DeclareNode *>(n)->GetDecl())
-      n = p;
+  if (n->IsDeclare()) {
+    DeclareNode *d = static_cast<DeclareNode *>(n);
+    if (d->GetDeclsNum() == 1)
+      if (auto p = d->GetDeclAtIndex(0))
+        n = p;
+  }
   std::string str;
   switch(n->GetKind()) {
     default:
@@ -53,6 +56,7 @@ std::string Emitter::GetEnding(TreeNode *n) {
     case NK_Class:
     case NK_Struct:
     case NK_Namespace:
+    case NK_Declare:
       str += "\n"s;
   }
   return str;
@@ -419,13 +423,27 @@ std::string Emitter::EmitDeclareNode(DeclareNode *node) {
   for (unsigned i = 0; i < node->GetAttrsNum(); ++i) {
     str += GetEnumAttrId(node->GetAttrAtIndex(i));
   }
-  if (auto n = node->GetDecl()) {
-    std::string s = EmitTreeNode(n);
-    if (n->IsModule()) {
-      s = "module \""s + static_cast<ModuleNode *>(n)->GetFileName()
-        + "\" {\n"s + s + "}\n"s;
+
+  unsigned num = node->GetDeclsNum();
+  if (node->IsGlobal() || num != 1) {
+    str += "declare "s;
+    if (node->IsGlobal())
+      str += "global "s;
+    str += "{\n"s;
+    for (unsigned i = 0; i < num; ++i) {
+      if (auto n = node->GetDeclAtIndex(i))
+        str += EmitTreeNode(n) + GetEnding(n);
     }
-    str += "declare "s + s;
+    str += "}\n"s;
+  } else {
+    if (auto n = node->GetDeclAtIndex(0)) {
+      std::string s = EmitTreeNode(n);
+      if (n->IsModule()) {
+        s = "module \""s + static_cast<ModuleNode *>(n)->GetFileName()
+          + "\" {\n"s + s + "}\n"s;
+      }
+      str += "declare "s + s;
+    }
   }
   return HandleTreeNode(str, node);
 }
