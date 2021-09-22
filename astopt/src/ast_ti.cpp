@@ -941,9 +941,11 @@ ExportNode *TypeInferVisitor::VisitExportNode(ExportNode *node) {
         }
         case NK_Declare: {
           DeclareNode *declare = static_cast<DeclareNode *>(bfnode);
-          TreeNode *decl = declare->GetDecl();
-          if (decl) {
-            ExportedDeclIds.insert(decl->GetNodeId());
+          for (unsigned i = 0; i < declare-> GetDeclsNum(); i++) {
+            TreeNode *decl = declare->GetDeclAtIndex(i);
+            if (decl) {
+              ExportedDeclIds.insert(decl->GetNodeId());
+            }
           }
           break;
         }
