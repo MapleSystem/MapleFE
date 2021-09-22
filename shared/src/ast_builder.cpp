@@ -649,6 +649,7 @@ TreeNode* ASTBuilder::BuildGlobalExternalDeclaration() {
   DeclareNode *n = (DeclareNode*)gTreePool.NewTreeNode(sizeof(DeclareNode));
   new (n) DeclareNode();
   n->AddDecl(tree);
+  n->SetIsGlobal();
 
   mLastTreeNode = n;
   return mLastTreeNode;
