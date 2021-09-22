@@ -49,6 +49,8 @@ typedef enum JS_Type : uint8_t {
   TY_Symbol,    // "symbol"
   TY_Function,  // "function"
   TY_Object,    // "object"
+  TY_Array,
+  TY_Class,
   TY_LAST,
 } JS_Type;
 

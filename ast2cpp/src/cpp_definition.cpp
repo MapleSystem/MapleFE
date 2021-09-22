@@ -168,7 +168,8 @@ std::map<TypeId, std::string>TypeIdToJSType = {
   {TY_String,  "TY_String"},
   {TY_Number,  "TY_Double"},
   {TY_Double,  "TY_Double"},
-  {TY_Array,   "TY_Object"}
+  {TY_Array,   "TY_Array"},
+  {TY_Class,   "TY_Class"}
 };
 
 // Generate call to create obj prop with ptr to c++ class fld member
@@ -198,6 +199,14 @@ std::string CppDef::EmitClassProps(TreeNode* node) {
     std::string fdName = node->GetName();
     std::string fdType = mCppDecl.GetTypeString(node, static_cast<IdentifierNode*>(node)->GetType());
     TypeId typeId = node->GetTypeId();
+    if (typeId == TY_None) {
+      if (auto n = static_cast<IdentifierNode*>(node)->GetType()) {
+        if (n->IsPrimType())
+          typeId = static_cast<PrimTypeNode*>(n)->GetPrimType();
+        else if (n->IsUserType())
+          typeId = static_cast<UserTypeNode*>(n)->GetTypeId();
+      }
+    }
     addProp += "  "s
                + EmitAddPropWithClassFld("this", c->GetName(), fdName, fdType, TypeIdToJSType[typeId])
                + ";\n"s;
