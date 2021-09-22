@@ -257,19 +257,23 @@ public:
 //                         Declare Nodes
 // C/C++ extern decl,
 // Typescript declare.
+//
+// A declare node could declare more than one declarations, like
+//   declare global {
+//      interface a {}
+//      var b;
+//      ..
+//   }
 //////////////////////////////////////////////////////////////////////////
 
 class DeclareNode : public TreeNode {
 private:
-  TreeNode *mDecl;    // the exported package in Java or module in JS
-  SmallVector<AttrId> mAttrs;
-  bool      mIsGlobal;//
+  SmallVector<TreeNode*> mDecls;
+  SmallVector<AttrId>    mAttrs;
+  bool                   mIsGlobal;//
 public:
-  DeclareNode() : TreeNode(NK_Declare), mDecl(NULL), mIsGlobal(false) {}
-  ~DeclareNode(){mAttrs.Release();}
-
-  void SetDecl(TreeNode *t) {mDecl = t;}
-  TreeNode* GetDecl() {return mDecl;}
+  DeclareNode() : TreeNode(NK_Declare), mIsGlobal(false) {}
+  ~DeclareNode(){mAttrs.Release(); mDecls.Release();}
 
   bool IsGlobal()                 {return mIsGlobal;}
   void SetIsGlobal(bool b = true) {mIsGlobal = b;}
@@ -279,6 +283,12 @@ public:
   void     AddAttr(AttrId a)          {mAttrs.PushBack(a);}
   AttrId   GetAttrAtIndex(unsigned i) {return mAttrs.ValueAtIndex(i);}
   void     SetAttrAtIndex(unsigned i, AttrId n) {*(mAttrs.RefAtIndex(i)) = n;}
+
+  // Declares
+  unsigned GetDeclsNum() const        {return mDecls.GetNum();}
+  void     AddDecl(TreeNode*);
+  TreeNode* GetDeclAtIndex(unsigned i)              {return mDecls.ValueAtIndex(i);}
+  void      SetDeclAtIndex(unsigned i, TreeNode *n) {*(mDecls.RefAtIndex(i)) = n;}
 
   void Dump(unsigned indent);
 };

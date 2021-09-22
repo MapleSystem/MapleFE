@@ -123,12 +123,30 @@ void PackageNode::Dump(unsigned indent) {
 //                          DeclareNode
 //////////////////////////////////////////////////////////////////////////////////////
 
+void DeclareNode::AddDecl(TreeNode *t) {
+  if (!t)
+    return;
+
+  if (t->IsPass()) {
+    PassNode *n = (PassNode*)t;
+    for (unsigned i = 0; i < n->GetChildrenNum(); i++) {
+      TreeNode *child = n->GetChild(i);
+      AddDecl(child);
+    }
+  } else {
+    mDecls.PushBack(t);
+    SETPARENT(t);
+  }
+}
+
 void DeclareNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   DUMP0_NORETURN("declare ");
 
-  if (mDecl)
-    mDecl->Dump(0);
+  for (unsigned i = 0; i < mDecls.GetNum(); i++) {
+    TreeNode *tree = mDecls.ValueAtIndex(i);
+    tree->Dump(0);
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////////////////

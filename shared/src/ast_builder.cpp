@@ -629,9 +629,7 @@ TreeNode* ASTBuilder::BuildExternalDeclaration() {
 
   DeclareNode *n = (DeclareNode*)gTreePool.NewTreeNode(sizeof(DeclareNode));
   new (n) DeclareNode();
-
-  if (tree)
-    n->SetDecl(tree);
+  n->AddDecl(tree);
 
   mLastTreeNode = n;
   return mLastTreeNode;
@@ -648,21 +646,9 @@ TreeNode* ASTBuilder::BuildGlobalExternalDeclaration() {
     tree = p.mData.mTreeNode;
   }
 
-  DeclareNode *n = NULL;
-  if (tree && tree->IsPass()) {
-    PassNode *pass_node = (PassNode*)tree;
-    for (unsigned i = 0; i < pass_node->GetChildrenNum(); i++) {
-      TreeNode *child = pass_node->GetChild(i);
-      n = (DeclareNode*)gTreePool.NewTreeNode(sizeof(DeclareNode));
-      new (n) DeclareNode();
-      n->SetDecl(child);
-      n->SetIsGlobal();
-    }
-  } else {
-    n = (DeclareNode*)gTreePool.NewTreeNode(sizeof(DeclareNode));
-    new (n) DeclareNode();
-    n->SetDecl(tree);
-  }
+  DeclareNode *n = (DeclareNode*)gTreePool.NewTreeNode(sizeof(DeclareNode));
+  new (n) DeclareNode();
+  n->AddDecl(tree);
 
   mLastTreeNode = n;
   return mLastTreeNode;
