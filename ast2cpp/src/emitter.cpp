@@ -2105,6 +2105,12 @@ std::string Emitter::EmitTreeNode(TreeNode *node) {
   return std::string();
 }
 
+static std::string &AddParentheses(std::string &str, TreeNode *node) {
+  if (!node->IsIdentifier() && !node->IsLiteral() && !node->IsArrayLiteral())
+    str = '(' + str + ')';
+  return str;
+}
+
 std::string &Emitter::HandleTreeNode(std::string &str, TreeNode *node) {
   auto num = node->GetAsTypesNum();
   if(num > 0) {
@@ -2115,13 +2121,13 @@ std::string &Emitter::HandleTreeNode(std::string &str, TreeNode *node) {
     str += ')';
   }
   if(node->IsOptional())
-    str += '?';
+    str = AddParentheses(str, node) + '?';
   if(node->IsNonNull())
-    str += '!';
+    str = AddParentheses(str, node) + '!';
   if(node->IsRest())
-    str = "..."s + str;
+    str = "..."s + AddParentheses(str, node);
   if(node->IsConst())
-    str += " as const"s;
+    str = AddParentheses(str, node) + " as const"s;
   return str;
 }
 
