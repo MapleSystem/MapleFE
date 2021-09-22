@@ -1,0 +1,12 @@
+Matched 13 tokens.
+============= Module ===========
+== Sub Tree ==
+export { default as class  
+  Fields: 
+    f1    f2
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+} 

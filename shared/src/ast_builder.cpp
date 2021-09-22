@@ -2351,19 +2351,23 @@ TreeNode* ASTBuilder::BuildClass() {
   if (mTrace)
     std::cout << "In BuildClass" << std::endl;
 
+  IdentifierNode *in = NULL;
+
   Param p_name = mParams[0];
+  if (!p_name.mIsEmpty) {
+    if (!p_name.mIsTreeNode)
+      MERROR("The class name is not a treenode in BuildClass()");
+    TreeNode *node_name = p_name.mData.mTreeNode;
 
-  if (!p_name.mIsTreeNode)
-    MERROR("The class name is not a treenode in BuildClass()");
-  TreeNode *node_name = p_name.mData.mTreeNode;
-
-  if (!node_name->IsIdentifier())
-    MERROR("The class name should be an indentifier node. Not?");
-  IdentifierNode *in = (IdentifierNode*)node_name;
+    if (!node_name->IsIdentifier())
+      MERROR("The class name should be an indentifier node. Not?");
+    in = (IdentifierNode*)node_name;
+  }
 
   ClassNode *node_class = (ClassNode*)gTreePool.NewTreeNode(sizeof(ClassNode));
   new (node_class) ClassNode();
-  node_class->SetStrIdx(in->GetStrIdx());
+  if (in)
+    node_class->SetStrIdx(in->GetStrIdx());
 
   mLastTreeNode = node_class;
   return mLastTreeNode;
