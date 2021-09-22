@@ -100,7 +100,7 @@ TypeId AST_AST::GetTypeId(TreeNode *node) {
     case NK_UserType: {
       UserTypeNode *utn = static_cast<UserTypeNode *>(node);
       TreeNode *id = utn->GetId();
-      if (id->GetTypeId() != TY_None) {
+      if (!id->IsTypeIdNone()) {
         tid = id->GetTypeId();
         break;
       }
@@ -1027,6 +1027,11 @@ LambdaNode *AdjustASTVisitor::VisitLambdaNode(LambdaNode *node) {
   // func parameters
   for (int i = 0; i < node->GetParamsNum(); i++) {
     func->AddParam(node->GetParam(i));
+  }
+
+  // func type parameters
+  for (int i = 0; i < node->GetTypeParametersNum(); i++) {
+    func->AddTypeParam(node->GetTypeParameterAtIndex(i));
   }
 
   // func body

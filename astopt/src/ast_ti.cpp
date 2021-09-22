@@ -383,7 +383,7 @@ void TypeInferVisitor::UpdateFuncRetTypeId(FunctionNode *node, TypeId tid) {
   // create new return type node if it was shared
 
   if (type) {
-    if (type->IsPrimType() && type->GetTypeId() == TY_None) {
+    if (type->IsPrimType() && type->IsTypeIdNone()) {
       type = GetOrClonePrimTypeNode((PrimTypeNode *)type, tid);
       node->SetType(type);
     }
@@ -445,7 +445,7 @@ void TypeInferVisitor::UpdateVarTypeWithInit(TreeNode *var, TreeNode *init) {
       NewNode *n = static_cast<NewNode *>(init);
       if (n->GetId()) {
         TreeNode *id = n->GetId();
-        if (id->IsIdentifier() && id->GetTypeId() == TY_Class) {
+        if (id->IsIdentifier() && id->IsTypeIdClass()) {
           UserTypeNode *utype = mHandler->GetAST()->CreateUserTypeNode(id->GetStrIdx(), var->GetScope());
           utype->SetParent(idnode);
           idnode->SetType(utype);
@@ -568,11 +568,11 @@ ArrayElementNode *TypeInferVisitor::VisitArrayElementNode(ArrayElementNode *node
       TreeNode *decl = mHandler->FindDecl(static_cast<IdentifierNode *>(array));
       if (decl) {
         // indexed access of class fields or types
-        if (decl->GetTypeId() == TY_Class) {
+        if (decl->IsTypeIdClass()) {
           SetTypeId(array, TY_Class);
           TreeNode *exp = node->GetExprAtIndex(0);
           if (exp->IsLiteral()) {
-            if (exp->GetTypeId() == TY_String) {
+            if (exp->IsTypeIdString()) {
               // indexed access of types
               unsigned stridx = (static_cast<LiteralNode *>(exp))->GetData().mData.mStrIdx;
               if (decl->IsStruct()) {
@@ -586,7 +586,7 @@ ArrayElementNode *TypeInferVisitor::VisitArrayElementNode(ArrayElementNode *node
                   }
                 }
               }
-            } else if (exp->GetTypeId() == TY_Int) {
+            } else if (exp->IsTypeIdInt()) {
               // indexed access of fields
               unsigned i = (static_cast<LiteralNode *>(exp))->GetData().mData.mInt64;
               NOTYETIMPL("indexed access with literal field id");
@@ -786,7 +786,7 @@ CallNode *TypeInferVisitor::VisitCallNode(CallNode *node) {
         IdentifierNode *id = static_cast<IdentifierNode *>(decl);
         if (id->GetType()) {
           decl = id->GetType();
-        } else if (id->GetTypeId() == TY_Function) {
+        } else if (id->IsTypeIdFunction()) {
           NOTYETIMPL("VisitCallNode nTY_Function");
         }
       }
@@ -1245,10 +1245,10 @@ UserTypeNode *TypeInferVisitor::VisitUserTypeNode(UserTypeNode *node) {
   TreeNode *parent = node->GetParent();
   if (parent && parent->IsIdentifier()) {
     // typeid: merge -> user
-    if (parent->GetTypeId() == TY_Merge) {
+    if (parent->IsTypeIdMerge()) {
       SetTypeId(parent, TY_User);
       SetUpdated();
-    } else if (parent->GetTypeId() == TY_Array) {
+    } else if (parent->IsTypeIdArray()) {
       TreeNode *idnode = node->GetId();
       if (idnode && idnode->IsIdentifier()) {
         // number, string could have been used

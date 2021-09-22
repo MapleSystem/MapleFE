@@ -35,7 +35,7 @@ TypeEntry::TypeEntry() {
 TypeEntry::TypeEntry(TreeNode *node) {
   mType = node;
   mTypeKind = node->GetKind();
-  if (node->GetTypeId() != TY_None) {
+  if (node->IsTypeIdNone()) {
     mTypeId = node->GetTypeId();
   } else {
     switch (mTypeKind) {
