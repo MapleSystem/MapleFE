@@ -818,6 +818,21 @@ StructNode *AdjustASTVisitor::VisitStructNode(StructNode *node) {
 
   TreeNode *newnode = mAst->GetCanonicStructNode(node);
 
+  // if returned itself that means it should be added to the moudule if not yet
+  if (newnode == node) {
+    ModuleNode *module = mHandler->GetASTModule();
+    bool found = false;
+    for (unsigned i = 0; i < module->GetTreesNum(); ++i) {
+      if (newnode == module->GetTree(i)) {
+        found = true;
+        break;
+      }
+    }
+    if (!found) {
+      module->AddTreeFront(newnode);
+    }
+  }
+
   // create a TypeAlias for duplicated type if top level
   // except newly added anonymous type which has updated parent
   TreeNode *parent = node->GetParent();
