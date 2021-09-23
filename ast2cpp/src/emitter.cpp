@@ -710,7 +710,7 @@ std::string Emitter::EmitNewNode(NewNode *node) {
   if (auto id = node->GetId()) {
     std::string idstr = EmitTreeNode(id);
     auto k = id->GetKind();
-    if (k == NK_Call)
+    if (k == NK_Call || k == NK_BinOperator)
       idstr = '(' + idstr + ')';
     str += ' ' + idstr;
     if(k != NK_Function && k != NK_Lambda) {
