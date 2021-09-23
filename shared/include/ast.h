@@ -367,6 +367,7 @@ private:
   ImportProperty  mProperty;  // This is solely for Java.
 
   // Solely for javascript right now.
+  // In many languages, mPairs could be empty. In such case it import the whole module.
   SmallVector<XXportAsPairNode*> mPairs;
 
   // the imported target, a package in Java, or a module in JS

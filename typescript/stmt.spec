@@ -1600,6 +1600,10 @@ rule TypeArray : ONEOF(PrimaryType + '[' + PrimaryExpression + ']',
                        PrimaryType + '[' + ConditionalType + ']')
   attr.action.%1,%2,%3,%4 : BuildArrayElement(%1, %3)
 
+rule ImportedType : "import" + '(' + Literal + ')'
+  attr.action : BuildImport()
+  attr.action : SetFromModule(%3)
+
 #rule Type : ONEOF(UnionOrIntersectionOrPrimaryType,
 #                  FunctionType,
 #                  ConstructorType)
@@ -1615,8 +1619,11 @@ rule Type : ONEOF(UnionOrIntersectionOrPrimaryType,
                   InferType,
                   IsExpression,
                   PrimaryType + '[' + TypeQuery + ']',
-                  TemplateLiteral)
+                  TemplateLiteral,
+                  ImportedType,
+                  ImportedType + '.' + JSIdentifier)
   attr.action.%7,%8,%11 : BuildArrayElement(%1, %3)
+  attr.action.%14 : BuildField(%1, %3)
 
 #rule UnionOrIntersectionOrPrimaryType: ONEOF(UnionType,
 #                                             IntersectionOrPrimaryType)
