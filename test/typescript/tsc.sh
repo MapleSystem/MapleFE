@@ -10,7 +10,13 @@ function AcquireLock {
 function ReleaseLock {
     rm -f $1-lock-$LockVar
 }
-rm -rf tsc-lock-* *-tsc.out tsc.summary.out tsc.failures*.out
+rm -rf -- tsc-lock-* *-tsc.out tsc.summary.out tsc.failures*.out
+
+OPT=
+while [ "x${1:0:1}" = "x-" ]; do
+ OPT="$OPT $1"
+ shift
+done
 i=0
 for f; do
   echo $((++i)). $f
@@ -23,6 +29,7 @@ for f; do
     --downlevelIteration \
     --esModuleInterop \
     --experimentalDecorators \
+    $OPT \
     $f" || echo $f >> tsc.failures.out
 # --sourceMap \
 # --isolatedModules \
@@ -37,6 +44,6 @@ if [ -f tsc.failures.out ]; then
     echo
     cat $f-tsc.out
   fi
-else
+elif [ $# -gt 0 ]; then
   echo All passed
 fi
