@@ -1420,7 +1420,8 @@ rule ImportClause : ONEOF(ImportedDefaultBinding,
                           NamedImports,
                           ImportedDefaultBinding + ',' + NameSpaceImport,
                           ImportedDefaultBinding + ',' + NamedImports,
-                          "type" + NamedImports)
+                          "type" + NamedImports,
+                          "type" + NameSpaceImport)
 
 ## See 15.2.2
 ## ImportedDefaultBinding :
