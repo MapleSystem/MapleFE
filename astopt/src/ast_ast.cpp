@@ -117,7 +117,7 @@ TypeId AST_AST::GetTypeId(TreeNode *node) {
   return tid;
 }
 
-unsigned AST_AST::GetFieldSize(TreeNode *node, bool native) {
+unsigned AST_AST::GetFieldsSize(TreeNode *node, bool native) {
   unsigned size = 0;
   unsigned nid = node->GetNodeId();
   if (!native && mStructId2FieldsMap.find(nid) != mStructId2FieldsMap.end()) {
@@ -167,6 +167,21 @@ TreeNode *AST_AST::GetField(TreeNode *node, unsigned i, bool native) {
       break;
   }
   return fld;
+}
+
+void AST_AST::AddField(TreeNode *container, TreeNode *node) {
+  unsigned nid = container->GetNodeId();
+  if (mStructId2FieldsMap.find(nid) == mStructId2FieldsMap.end()) {
+    for (unsigned i = 0; i < GetFieldsSize(container, true); i++) {
+      TreeNode *fld = GetField(container, i, true);
+      mStructId2FieldsMap[nid].PushBack(node);
+    }
+  }
+  AddField(nid, node);
+}
+
+void AST_AST::AddField(unsigned nid, TreeNode *node) {
+  mStructId2FieldsMap[nid].PushBack(node);
 }
 
 unsigned AST_AST::GetSuperSize(TreeNode *node, unsigned idx) {
@@ -331,7 +346,7 @@ bool AST_AST::IsFieldCompatibleTo(TreeNode *field, TreeNode *target) {
 }
 
 TreeNode *AST_AST::GetCanonicStructNode(TreeNode *node) {
-  unsigned size = GetFieldSize(node);
+  unsigned size = GetFieldsSize(node);
   bool isI0 = IsInterface(node);
 
   for (auto s: mFieldNum2StructNodeMap[size]) {
@@ -618,6 +633,7 @@ IdentifierNode *FindStrIdxVisitor::VisitIdentifierNode(IdentifierNode *node) {
 template <typename T1>
 void AST_AST::ExtendFields(T1 *node, TreeNode *sup) {
   if (sup == NULL) {
+    // let sup be node itself
     sup = node;
   }
   unsigned nid = node->GetNodeId();
@@ -630,9 +646,9 @@ void AST_AST::ExtendFields(T1 *node, TreeNode *sup) {
   if (!sup) {
     return;
   }
-  for (unsigned i = 0; i < GetFieldSize(sup, true); i++) {
+  for (unsigned i = 0; i < GetFieldsSize(sup, true); i++) {
     TreeNode *fld = GetField(sup, i, true);
-    mStructId2FieldsMap[nid].PushBack(fld);
+    AddField(nid, fld);
   }
   for (unsigned i = 0; i < GetSuperSize(sup, 1); i++) {
     TreeNode *s = GetSuper(sup, i, 1);
@@ -659,7 +675,7 @@ static void DumpVec(std::vector<std::pair<unsigned, T1 *>> vec) {
 template <typename T1, typename T2>
 void AST_AST::SortFields(T1 *node) {
   std::vector<std::pair<unsigned, T2 *>> vec;
-  unsigned size = GetFieldSize(node, true);
+  unsigned size = GetFieldsSize(node, true);
   if (size) {
     for (unsigned i = 0; i < size; i++) {
       T2 *fld = node->GetField(i);

@@ -575,15 +575,29 @@ ArrayElementNode *TypeInferVisitor::VisitArrayElementNode(ArrayElementNode *node
             if (exp->IsTypeIdString()) {
               // indexed access of types
               unsigned stridx = (static_cast<LiteralNode *>(exp))->GetData().mData.mStrIdx;
-              if (decl->IsStruct()) {
-                StructNode *structure = static_cast<StructNode *>(decl);
-                for (int i = 0; i < structure->GetFieldsNum(); i++) {
-                  TreeNode *f = structure->GetField(i);
+              if (decl->IsDecl() && decl->IsTypeIdClass()) {
+                TreeNode *var = static_cast<DeclNode *>(decl)->GetVar();
+                TreeNode * type = static_cast<IdentifierNode *>(var)->GetType();
+                if (type && type->IsUserType()) {
+                  UserTypeNode *ut = static_cast<UserTypeNode *>(type);
+                  decl = mHandler->FindDecl(static_cast<IdentifierNode *>(ut->GetId()));
+                }
+              }
+              if (decl->IsStruct() || decl->IsClass()) {
+                bool found = false;
+                for (int i = 0; i < mAst->GetFieldsSize(decl); i++) {
+                  TreeNode *f = mAst->GetField(decl, i);
                   if (f->GetStrIdx() == stridx) {
-                    TypeId tid = f->GetTypeId();
-                    UpdateTypeId(node, tid);
+                    UpdateTypeId(node, f->GetTypeId());
+                    UpdateTypeId(f, node->GetTypeId());
+                    found = true;
                     break;
                   }
+                }
+                // new field
+                if (!found) {
+                  IdentifierNode *id = mAst->CreateIdentifierNode(stridx);
+                  mAst->AddField(decl, id);
                 }
               }
             } else if (exp->IsTypeIdInt()) {
@@ -756,15 +770,8 @@ BinOperatorNode *TypeInferVisitor::VisitBinOperatorNode(BinOperatorNode *node) {
       break;
     }
   }
-  // if mod is an identifier, update its decl
-  if (mod && mod->IsIdentifier()) {
-    TreeNode *decl = mHandler->FindDecl(static_cast<IdentifierNode *>(mod));
-    if (decl) {
-      UpdateTypeId(decl, mod->GetTypeId());
-    } else {
-      NOTYETIMPL("mod not declared");
-    }
-  }
+  // visit mod to update its content
+  (void) VisitTreeNode(mod);
   return node;
 }
 
@@ -1055,9 +1062,11 @@ IdentifierNode *TypeInferVisitor::VisitIdentifierNode(IdentifierNode *node) {
     if (decl == parent) {
       if (node->GetType()) {
         UpdateTypeId(node, node->GetType()->GetTypeId());
+        UpdateTypeId(node->GetType(), node->GetTypeId());
       }
     } else {
       UpdateTypeId(node, decl->GetTypeId());
+      UpdateTypeId(decl, node->GetTypeId());
     }
   } else {
     NOTYETIMPL("node not declared");

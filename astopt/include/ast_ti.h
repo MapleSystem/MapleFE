@@ -78,6 +78,7 @@ class TypeInferVisitor : public TypeInferBaseVisitor {
   Module_Handler *mHandler;
   unsigned        mFlags;
   bool            mUpdated;
+  AST_AST        *mAst;
 
   // node ids
   std::unordered_set<unsigned> ImportedDeclIds;
@@ -87,7 +88,7 @@ class TypeInferVisitor : public TypeInferBaseVisitor {
 
  public:
   explicit TypeInferVisitor(Module_Handler *h, unsigned f, bool base = false)
-    : mHandler(h), mFlags(f), TypeInferBaseVisitor(f, base) {}
+    : mHandler(h), mFlags(f), mAst(h->GetAST()), TypeInferBaseVisitor(f, base) {}
   ~TypeInferVisitor() = default;
 
   bool IsPrimTypeId(TypeId tid);

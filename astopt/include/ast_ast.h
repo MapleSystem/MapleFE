@@ -45,6 +45,8 @@ class AST_AST {
   std::unordered_set<unsigned> mTypeParamStrIdxSet;
   std::unordered_set<unsigned> mWithTypeParamNodeSet;
 
+  void AddField(unsigned nid, TreeNode *node);
+
  public:
   explicit AST_AST(Module_Handler *h, unsigned f) : mHandler(h), mFlags(f), mNum(1),
            mNameAnonyStruct(false) {}
@@ -54,8 +56,9 @@ class AST_AST {
 
   unsigned GetPass() { return mPass; }
   TypeId GetTypeId(TreeNode *node);
-  unsigned GetFieldSize(TreeNode *node, bool native = false);
+  unsigned GetFieldsSize(TreeNode *node, bool native = false);
   TreeNode *GetField(TreeNode *node, unsigned i, bool native = false);
+  void AddField(TreeNode *container, TreeNode *node);
   unsigned GetSuperSize(TreeNode *node, unsigned idx);
   TreeNode *GetSuper(TreeNode *node, unsigned i, unsigned idx);
 
