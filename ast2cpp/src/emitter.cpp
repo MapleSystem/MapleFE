@@ -530,7 +530,15 @@ std::string Emitter::EmitImportNode(ImportNode *node) {
   }
   if (auto n = node->GetTarget()) {
     std::string s = EmitTreeNode(n);
-    str += num ? " from "s + s : s;
+    if (num)
+      str += " from "s + s;
+    else {
+      auto p = node->GetParent();
+      if (p && p->IsField())
+        str += '(' + s + ')';
+      else
+        str += s;
+    }
   }
   return HandleTreeNode(str, node);
 }
