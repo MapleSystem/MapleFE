@@ -2153,7 +2153,10 @@ std::string &Emitter::HandleTreeNode(std::string &str, TreeNode *node) {
   if(node->IsRest())
     str = "..."s + AddParentheses(str, node);
   if(node->IsConst())
-    str = AddParentheses(str, node) + " as const"s;
+    if(node->IsField())
+      str += " as const"s;
+    else
+      str = AddParentheses(str, node) + " as const"s;
   return str;
 }
 
