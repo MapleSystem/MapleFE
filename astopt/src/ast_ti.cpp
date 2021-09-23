@@ -1095,7 +1095,9 @@ NewNode *TypeInferVisitor::VisitNewNode(NewNode *node) {
 }
 
 StructNode *TypeInferVisitor::VisitStructNode(StructNode *node) {
-  SetTypeId(node, TY_Class);
+  if (node->GetProp() != SProp_TSEnum) {
+    SetTypeId(node, TY_Class);
+  }
   for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
     TreeNode *t = node->GetField(i);
     (void) VisitClassField(t);
@@ -1110,6 +1112,7 @@ StructNode *TypeInferVisitor::VisitStructNode(StructNode *node) {
       TreeNode *t = node->GetField(i);
       t->SetTypeId(tid);
     }
+    node->SetTypeId(tid);
   }
   (void) AstVisitor::VisitStructNode(node);
   return node;
