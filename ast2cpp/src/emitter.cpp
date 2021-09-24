@@ -161,10 +161,15 @@ std::string Emitter::EmitIdentifierNode(IdentifierNode *node) {
     if (auto n = node->GetAnnotationAtIndex(i))
       str += '@' + EmitTreeNode(n) + "\n"s;
 
+  std::string accessor;
   for (unsigned i = 0; i < node->GetAttrsNum(); ++i) {
-    str += GetEnumAttrId(node->GetAttrAtIndex(i));
+    std::string s = GetEnumAttrId(node->GetAttrAtIndex(i));
+    if (s == "get "s || s == "set "s)
+      accessor += s;
+    else
+      str += s;
   }
-  str += node->GetName();
+  str += accessor + node->GetName();
   str = HandleTreeNode(str, node);
   //if (auto n = node->GetDims()) {
   //  str += ' ' + EmitDimensionNode(n);
@@ -198,12 +203,16 @@ std::string Emitter::EmitFunctionNode(FunctionNode *node) {
   NodeKind k = p ? p->GetKind() : NK_Null;
   bool inside = k == NK_Class || k == NK_Struct || k == NK_Interface;
   bool func = !inside;
+  std::string accessor;
   for (unsigned i = 0; i < node->GetAttrsNum(); ++i) {
     std::string s = GetEnumAttrId(node->GetAttrAtIndex(i));
-    if (s == "set "s || s == "get "s)
+    if (s == "get "s || s == "set "s) {
       func = false;
-    pre += s;
+      accessor += s;
+    } else
+      pre += s;
   }
+  pre += accessor;
 
   std::string str;
   bool has_name;
@@ -298,10 +307,15 @@ std::string Emitter::EmitUserTypeNode(UserTypeNode *node) {
     default:
       precd = '\030';
   }
-  std::string attrs, str;
+  std::string attrs, accessor, str;
   for (unsigned i = 0; i < node->GetAttrsNum(); ++i) {
-    attrs += GetEnumAttrId(node->GetAttrAtIndex(i));
+    std::string s = GetEnumAttrId(node->GetAttrAtIndex(i));
+    if (s == "get "s || s == "set "s)
+      accessor += s;
+    else
+      attrs += s;
   }
+  attrs += accessor;
   if (auto n = node->GetId()) {
     str += EmitTreeNode(n);
     auto num = node->GetTypeGenericsNum();
@@ -419,10 +433,15 @@ std::string Emitter::EmitXXportAsPairNode(XXportAsPairNode *node) {
 std::string Emitter::EmitDeclareNode(DeclareNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str;
+  std::string str, accessor;
   for (unsigned i = 0; i < node->GetAttrsNum(); ++i) {
-    str += GetEnumAttrId(node->GetAttrAtIndex(i));
+    std::string s = GetEnumAttrId(node->GetAttrAtIndex(i));
+    if (s == "get "s || s == "set "s)
+      accessor += s;
+    else
+      str += s;
   }
+  str += accessor;
 
   unsigned num = node->GetDeclsNum();
   if (node->IsGlobal() || num != 1) {
@@ -687,18 +706,6 @@ std::string Emitter::EmitBlockNode(BlockNode *node) {
     }
   }
   str += "}\n"s;
-
-  /*
-  str += ' ' + std::to_string(node->IsInstInit());
-
-  for (unsigned i = 0; i < node->GetAttrsNum(); ++i) {
-    str += ' ' + AstDump::GetEnumAttrId(node->GetAttrAtIndex(i));
-  }
-
-  if (auto n = const_cast<TreeNode *>(node->GetSync())) {
-    str += ' ' + EmitTreeNode(n);
-  }
-  */
   mPrecedence = '\030';
   return HandleTreeNode(str, node);
 }
@@ -1547,6 +1554,7 @@ std::string Emitter::EmitClassNode(ClassNode *node) {
   for (unsigned i = 0; i < node->GetAnnotationsNum(); ++i)
     if (auto n = node->GetAnnotationAtIndex(i))
       str += '@' + EmitTreeNode(n) + "\n"s;
+
   for (unsigned i = 0; i < node->GetAttributesNum(); ++i)
     str += GetEnumAttrId(node->GetAttribute(i));
 
@@ -1882,10 +1890,15 @@ std::string Emitter::EmitPrimTypeNode(PrimTypeNode *node) {
 std::string Emitter::EmitPrimArrayTypeNode(PrimArrayTypeNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str;
+  std::string str, accessor;
   for (unsigned i = 0; i < node->GetAttrsNum(); ++i) {
-    str += GetEnumAttrId(node->GetAttrAtIndex(i));
+    std::string s = GetEnumAttrId(node->GetAttrAtIndex(i));
+    if (s == "get "s || s == "set "s)
+      accessor += s;
+    else
+      str += s;
   }
+  str += accessor;
   if (auto n = node->GetPrim()) {
     str += EmitPrimTypeNode(n);
   }
