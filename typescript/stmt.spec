@@ -2077,7 +2077,7 @@ rule MemberVariableDeclaration: ONEOF(
   attr.action.%3,%4: AddInitTo(%5)
   attr.action.%3,%4: AddModifier(%2)
   attr.action.%3,%4: AddModifier(%1)
-  attr.action.%3,%4: BuildDecl(%4, %3)
+  attr.action.%3,%4: BuildDecl()
 
 
 ## MemberFunctionDeclaration: AccessibilityModifieropt staticopt PropertyName CallSignature { FunctionBody } AccessibilityModifieropt staticopt PropertyName CallSignature ;

@@ -304,6 +304,7 @@ TreeNode* ASTBuilder::BuildIdentifier(const Token *token) {
   IdentifierNode *n = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
   unsigned idx = gStringPool.GetStrIdx(name);
   new (n) IdentifierNode(idx);
+  mLastTreeNode = n;
   return n;
 }
 
@@ -318,6 +319,7 @@ TreeNode* ASTBuilder::BuildIdentifier(const TreeNode *tree) {
     IdentifierNode *n = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
     unsigned idx = gStringPool.GetStrIdx(FindAttrKeyword(aid));
     new (n) IdentifierNode(idx);
+    mLastTreeNode = n;
     return n;
   }
 
