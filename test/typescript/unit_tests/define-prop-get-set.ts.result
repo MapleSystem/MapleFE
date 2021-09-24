@@ -7,10 +7,10 @@ Matched 92 tokens.
 == Sub Tree ==
 js_var Decl: obj= {x:"abc", name:""}
 == Sub Tree ==
-Object.defineProperty(obj,"name", {get:func  get(this)  throws: 
+Object.defineProperty(obj,"name", {:get ()  throws: 
   console.log("Return obj.x")
   return this["x"]
-, set:func  set(this,val)  throws: 
+, :set (val)  throws: 
   console.log( template-literal: "Set obj.x to '",val,"'",NULL)
   this["x"] Assign val
 , enumerable:false})
