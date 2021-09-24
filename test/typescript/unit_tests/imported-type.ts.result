@@ -3,11 +3,11 @@ Matched 18 tokens.
 == Sub Tree ==
 declare class  Klass
   Fields: 
-    get
+
   Instance Initializer: 
   Constructors: 
   Methods: 
-    func  flag()  throws: 
+    get flag()  throws: 
   LocalClasses: 
   LocalInterfaces: 
 

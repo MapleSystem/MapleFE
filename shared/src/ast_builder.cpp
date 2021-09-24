@@ -249,9 +249,24 @@ TreeNode* ASTBuilder::AddModuleBody() {
 //                          BuildIdentifier
 ////////////////////////////////////////////////////////////////////////////////////////
 
-// Take on argument, the mLastTreeNode.
+// 1. It takes one argument, the target to build into identifier.
+// 2. It takes no argument, then mLastTreeNode is the target.
 // It could be a token or tree.
 TreeNode* ASTBuilder::BuildIdentifier() {
+  if (mParams.size() == 1) {
+    Param target = mParams[0];
+    if (!target.mIsEmpty) {
+      if (target.mIsTreeNode) {
+        TreeNode *tn = target.mData.mTreeNode;
+        return BuildIdentifier(tn);
+      } else {
+        Token *tn = target.mData.mToken;
+        return BuildIdentifier(tn);
+      }
+    }
+    return NULL;
+  }
+
   if (mNameForBuildIdentifier) {
     IdentifierNode *n = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
     unsigned idx = gStringPool.GetStrIdx(mNameForBuildIdentifier);
@@ -290,6 +305,23 @@ TreeNode* ASTBuilder::BuildIdentifier(const Token *token) {
   unsigned idx = gStringPool.GetStrIdx(name);
   new (n) IdentifierNode(idx);
   return n;
+}
+
+// Build IdentifierNode from a TreeNode.
+TreeNode* ASTBuilder::BuildIdentifier(const TreeNode *tree) {
+  if (!tree)
+    return NULL;
+
+  if (tree->IsAttr()) {
+    AttrNode *an = (AttrNode*)tree;
+    AttrId aid = an->GetId();
+    IdentifierNode *n = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
+    unsigned idx = gStringPool.GetStrIdx(FindAttrKeyword(aid));
+    new (n) IdentifierNode(idx);
+    return n;
+  }
+
+  return NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -1551,6 +1583,7 @@ TreeNode* ASTBuilder::AddAsType() {
 
 // BuildDecl usually takes two parameters, 1) type; 2) name
 // It can also take only one parameter: name.
+// It can also take zero parameter, it's mLastTreeNode handled.
 TreeNode* ASTBuilder::BuildDecl() {
   if (mTrace)
     std::cout << "In BuildDecl" << std::endl;
@@ -1571,11 +1604,13 @@ TreeNode* ASTBuilder::BuildDecl() {
     if (tree_type)
       add_type_to(var, tree_type);
 
-  } else {
+  } else if (mParams.size() == 1) {
     Param p_name = mParams[0];
     if (!p_name.mIsTreeNode)
       MERROR("The variable name should be a IdentifierNode already, but actually NOT?");
     var = p_name.mData.mTreeNode;
+  } else {
+    var = mLastTreeNode;
   }
 
   DeclNode *decl = decl = (DeclNode*)gTreePool.NewTreeNode(sizeof(DeclNode));
@@ -2011,10 +2046,16 @@ TreeNode* ASTBuilder::BuildField() {
   TreeNode *node_a = p_var_a.mIsEmpty ? NULL : p_var_a.mData.mTreeNode;
   TreeNode *node_b = NULL;
   if (!p_var_b.mIsEmpty) {
-    if (p_var_b.mIsTreeNode)
+    if (p_var_b.mIsTreeNode) {
       node_b = p_var_b.mData.mTreeNode;
-    else
+      if (!node_b->IsIdentifier() && !node_b->IsComputedName()) {
+        TreeNode *id = BuildIdentifier(node_b);
+        if (id)
+          node_b = id;
+      }
+    } else {
       node_b = BuildIdentifier(p_var_b.mData.mToken);
+    }
   }
 
   FieldNode *field = NULL;
@@ -2265,27 +2306,35 @@ TreeNode* ASTBuilder::AddInit() {
   }
 }
 
-// It takes two arguments
+// It takes (1) two arguments or (2) one argument
 TreeNode* ASTBuilder::AddInitTo() {
   if (mTrace)
     std::cout << "In AddInitTo" << std::endl;
-  Param p_decl = mParams[0];
-  Param p_init;
+
+  TreeNode *node_decl = NULL;
+  TreeNode *node_init = NULL;
 
   // If there is no init value, return NULL.
-  if (mParams.size() == 1)
-    return NULL;
+  if (mParams.size() == 1) {
+    Param p_init = mParams[0];
+    if (p_init.mIsEmpty)
+      return NULL;
+    node_init = p_init.mData.mTreeNode;
+    node_decl = mLastTreeNode;
+  } else {
+    Param p_decl = mParams[0];
+    Param p_init;
+    p_init = mParams[1];
+    if (p_init.mIsEmpty)
+      return NULL;
 
-  p_init = mParams[1];
-  if (p_init.mIsEmpty)
-    return NULL;
+    // Both variable should have been created as tree node.
+    if (!p_decl.mIsTreeNode || !p_init.mIsTreeNode)
+      MERROR("The decl or init is not a treenode in AddInitTo()");
 
-  // Both variable should have been created as tree node.
-  if (!p_decl.mIsTreeNode || !p_init.mIsTreeNode)
-    MERROR("The decl or init is not a treenode in AddInitTo()");
-
-  TreeNode *node_decl = p_decl.mData.mTreeNode;
-  TreeNode *node_init = p_init.mData.mTreeNode;
+    node_decl = p_decl.mData.mTreeNode;
+    node_init = p_init.mData.mTreeNode;
+  }
 
   if (node_decl->IsIdentifier()) {
     IdentifierNode *in = (IdentifierNode*)node_decl;
@@ -2962,6 +3011,11 @@ TreeNode* ASTBuilder::BuildCall() {
     method = p_method.mData.mTreeNode;
   }
 
+  // In Typescript, get/set are keywords of attributes. But it also allowed to be
+  // function name. So we need transfer this AttrNode to IdentifierNode.
+  if (method && method->IsAttr())
+    method = BuildIdentifier(method);
+
   call->SetMethod(method);
 
   mLastTreeNode = call;
@@ -3126,7 +3180,9 @@ TreeNode* ASTBuilder::BuildFunction() {
     if (!p_name.mIsEmpty) {
       if (p_name.mIsTreeNode) {
         node_name = p_name.mData.mTreeNode;
-        if (!node_name->IsIdentifier() && !node_name->IsComputedName())
+        if (node_name->IsAttr()) {
+          node_name = BuildIdentifier(node_name);
+        } else if (!node_name->IsIdentifier() && !node_name->IsComputedName())
           MERROR("The function name should be an indentifier node. Not?");
       } else {
         node_name = BuildIdentifier(p_name.mData.mToken);

@@ -54,9 +54,7 @@
 #                                    A.2 Expressions
 #-------------------------------------------------------------------------------
 
-rule KeywordIdentifier : ONEOF("get",
-                               "set",
-                               "type",
+rule KeywordIdentifier : ONEOF("type",
                                "boolean",
                                "string",
                                "catch",
@@ -368,7 +366,9 @@ rule MemberExpression : ONEOF(
   MemberExpression + '!',
   MemberExpression + '.' + JSIdentifier + "as" + "const",
   MemberExpression + '.' + "return",
-  '<' + Type + '>' + PrimaryExpression)
+  '<' + Type + '>' + PrimaryExpression,
+  MemberExpression + '.' + "get",
+  MemberExpression + '.' + "set")
   attr.action.%1 : AddAsType(%1, %2)
   attr.action.%2 : BuildArrayElement(%1, %3)
   attr.action.%2 : AddAsType(%5)
@@ -385,7 +385,7 @@ rule MemberExpression : ONEOF(
   attr.action.%11: SetIsNonNull(%1)
   attr.action.%12: BuildField(%1, %3)
   attr.action.%12: SetIsConst()
-  attr.action.%13: BuildField(%1, %3)
+  attr.action.%13,%15,%16: BuildField(%1, %3)
   attr.action.%14: BuildCast(%2, %4)
 
 rule IsExpression: ONEOF(PrimaryExpression + "is" + Type,
@@ -434,11 +434,13 @@ rule CallExpression : ONEOF(
   CallExpression + TemplateLiteral,
   CallExpression + '!' + ZEROORMORE(AsType),
   CallExpression + "?." + JSIdentifier + ZEROORMORE(AsType),
-  MemberExpression + "?." + ZEROORONE(TypeArguments) + Arguments + ZEROORMORE(AsType))
-  attr.action.%1,%3 : BuildCall(%1)
-  attr.action.%1 : AddAsType(%4)
-  attr.action.%1 : AddTypeGenerics(%2)
-  attr.action.%1 : AddArguments(%3)
+  MemberExpression + "?." + ZEROORONE(TypeArguments) + Arguments + ZEROORMORE(AsType),
+  "set" + ZEROORONE(TypeArguments) + Arguments + ZEROORMORE(AsType),
+  "get" + ZEROORONE(TypeArguments) + Arguments + ZEROORMORE(AsType))
+  attr.action.%1,%3,%10,%11 : BuildCall(%1)
+  attr.action.%1,%10,%11 : AddAsType(%4)
+  attr.action.%1,%10,%11 : AddTypeGenerics(%2)
+  attr.action.%1,%10,%11 : AddArguments(%3)
   attr.action.%3 : AddArguments(%2)
   attr.action.%3 : AddAsType(%3)
   attr.action.%4 : BuildArrayElement(%1, %3)
@@ -1894,40 +1896,53 @@ rule PropertyDefinition: ONEOF(IdentifierReference,
   attr.action.%4 : AddFunctionBody(%8)
 
 ## GetAccessor: get PropertyName ( ) TypeAnnotationopt { FunctionBody }
-rule GetAccessor: ONEOF("get" + PropertyName + '(' + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}',
-                        "get" + '(' + "this" + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}')
-  attr.action.%1 : BuildFunction(%2)
-  attr.action.%1 : SetGetAccessor()
-  attr.action.%1 : AddType(%5)
-  attr.action.%1 : AddFunctionBody(%7)
-  attr.action.%1 : AddModifier(%1)
-  attr.action.%2 : BuildFunction()
-  attr.action.%2 : SetGetAccessor()
-  attr.action.%2 : AddType(%5)
-  attr.action.%2 : AddFunctionBody(%7)
-  attr.action.%2 : AddModifier(%1)
+rule GetAccessor: ONEOF(ZEROORONE(AccessibilityModifier) + "get" + PropertyName + '(' + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}',
+                        ZEROORONE(AccessibilityModifier) + "get" + '(' + "this" + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}',
+                        ZEROORONE(AccessibilityModifier) + "get" + PropertyName + '(' + ')' + ZEROORONE(TypeAnnotation) + ';',
+                        ZEROORONE(AccessibilityModifier) + "get" + '(' + "this" + ')' + ZEROORONE(TypeAnnotation) + ';')
+  attr.action.%1,%3 : BuildFunction(%3)
+  attr.action.%1,%3 : SetGetAccessor()
+  attr.action.%1,%3 : AddType(%6)
+  attr.action.%1 : AddFunctionBody(%8)
+  attr.action.%1,%3 : AddModifier(%2)
+  attr.action.%1,%3 : AddModifier(%1)
+  attr.action.%2,%4 : BuildFunction()
+  attr.action.%2,%4 : SetGetAccessor()
+  attr.action.%2,%4 : AddType(%6)
+  attr.action.%2 : AddFunctionBody(%8)
+  attr.action.%2,%4 : AddModifier(%2)
+  attr.action.%2,%4 : AddModifier(%1)
 
 ## SetAccessor: set PropertyName ( BindingIdentifierOrPattern TypeAnnotationopt ) { FunctionBody }
-rule SetAccessor: ONEOF("set" + PropertyName + '(' + BindingIdentifierOrPattern + ZEROORONE(TypeAnnotation) + ')' + '{' + FunctionBody + '}',
-                        "set" + '(' + "this" + ',' + BindingIdentifierOrPattern + ZEROORONE(TypeAnnotation) + ')' + '{' + FunctionBody + '}')
-  attr.action.%1 : AddType(%4, %5)
-  attr.action.%1 : BuildFunction(%2)
-  attr.action.%1 : SetSetAccessor()
-  attr.action.%1 : AddParams(%4)
-  attr.action.%1 : AddFunctionBody(%8)
-  attr.action.%1 : AddModifier(%1)
-  attr.action.%2 : AddType(%5, %6)
-  attr.action.%2 : BuildFunction()
-  attr.action.%2 : SetSetAccessor()
-  attr.action.%2 : AddParams(%5)
-  attr.action.%2 : AddFunctionBody(%9)
-  attr.action.%2 : AddModifier(%1)
+rule SetAccessor: ONEOF(ZEROORONE(AccessibilityModifier) + "set" + PropertyName + '(' + BindingIdentifierOrPattern + ZEROORONE(TypeAnnotation) + ')' + '{' + FunctionBody + '}',
+                        ZEROORONE(AccessibilityModifier) + "set" + '(' + "this" + ',' + BindingIdentifierOrPattern + ZEROORONE(TypeAnnotation) + ')' + '{' + FunctionBody + '}',
+                        ZEROORONE(AccessibilityModifier) + "set" + PropertyName + '(' + BindingIdentifierOrPattern + ZEROORONE(TypeAnnotation) + ')' + ';',
+                        ZEROORONE(AccessibilityModifier) + "set" + '(' + "this" + ',' + BindingIdentifierOrPattern + ZEROORONE(TypeAnnotation) + ')' + ';')
+  attr.action.%1,%3 : AddType(%5, %6)
+  attr.action.%1,%3 : BuildFunction(%3)
+  attr.action.%1,%3 : SetSetAccessor()
+  attr.action.%1,%3 : AddParams(%5)
+  attr.action.%1 : AddFunctionBody(%9)
+  attr.action.%1,%3 : AddModifier(%2)
+  attr.action.%1,%3 : AddModifier(%1)
+  attr.action.%2,%4 : AddType(%6, %7)
+  attr.action.%2,%4 : BuildFunction()
+  attr.action.%2,%4 : SetSetAccessor()
+  attr.action.%2,%4 : AddParams(%6)
+  attr.action.%2 : AddFunctionBody(%10)
+  attr.action.%2,%4 : AddModifier(%2)
+  attr.action.%2,%4 : AddModifier(%1)
+
+## We allow get/set as identifier for function name only.
+## we don't want to see keywords as identifier happening in everywhere.
+rule FunctionNameKeyword : ONEOF("get", "set")
+rule FunctionName : ONEOF(BindingIdentifier, FunctionNameKeyword)
 
 ## FunctionExpression: ( Modified ) function BindingIdentifieropt CallSignature { FunctionBody }
 ## FunctionExpression has the same syntax as FunctionDeclaration. But it appears as an expression. We will build it
 ## as a FunctionNode in AST.
 rule FunctionExpression :
-  "function" + ZEROORONE(BindingIdentifier) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}'
+  "function" + ZEROORONE(FunctionName) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}'
   attr.action : BuildFunction(%2)
   attr.action : AddTypeGenerics(%3)
   attr.action : AddParams(%5)
@@ -1952,11 +1967,11 @@ rule FunctionExpression :
 
 # NOTE: Inline Call signature to make it easier to write action.
 rule FunctionDeclaration : ONEOF(
-  "function" + ZEROORONE(BindingIdentifier) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}',
-  "function" + ZEROORONE(BindingIdentifier) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ':' + AssertExpression + '{' + FunctionBody + '}',
-  "function" + ZEROORONE(BindingIdentifier) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ':' + IsExpression + '{' + FunctionBody + '}',
-  "function" + ZEROORONE(BindingIdentifier) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation)  + ZEROORONE(';'),
-  "function" + ZEROORONE(BindingIdentifier) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ':' + IsExpression + ZEROORONE(';'))
+  "function" + ZEROORONE(FunctionName) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}',
+  "function" + ZEROORONE(FunctionName) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ':' + AssertExpression + '{' + FunctionBody + '}',
+  "function" + ZEROORONE(FunctionName) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ':' + IsExpression + '{' + FunctionBody + '}',
+  "function" + ZEROORONE(FunctionName) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation)  + ZEROORONE(';'),
+  "function" + ZEROORONE(FunctionName) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ':' + IsExpression + ZEROORONE(';'))
   attr.action.%1,%2,%3,%4,%5 : BuildFunction(%2)
   attr.action.%1,%2,%3,%4,%5 : AddParams(%5)
   attr.action.%1,%4    : AddType(%7)
@@ -2044,7 +2059,9 @@ rule PropertyMemberDeclaration: ONEOF(MemberVariableDeclaration,
 ## MemberVariableDeclaration: AccessibilityModifieropt staticopt PropertyName TypeAnnotationopt Initializeropt ;
 rule MemberVariableDeclaration: ONEOF(
   ZEROORMORE(Annotation) + ZEROORMORE(AccessibilityModifier) + PropertyName + ZEROORONE(TypeAnnotation) + ZEROORONE(Initializer) + ZEROORONE(';'),
-  ZEROORMORE(Annotation) + ZEROORMORE(AccessibilityModifier) + PropertyName + '?' + ZEROORONE(TypeAnnotation) + ZEROORONE(Initializer) + ZEROORONE(';'))
+  ZEROORMORE(Annotation) + ZEROORMORE(AccessibilityModifier) + PropertyName + '?' + ZEROORONE(TypeAnnotation) + ZEROORONE(Initializer) + ZEROORONE(';'),
+  ZEROORMORE(Annotation) + ZEROORMORE(AccessibilityModifier) + "get" + '=' + ArrowFunction + ZEROORONE(';'),
+  ZEROORMORE(Annotation) + ZEROORMORE(AccessibilityModifier) + "set" + '=' + ArrowFunction + ZEROORONE(';'))
   attr.action.%1: AddInitTo(%3, %5)
   attr.action.%1: AddType(%3, %4)
   attr.action.%1: AddModifierTo(%3, %2)
@@ -2056,6 +2073,11 @@ rule MemberVariableDeclaration: ONEOF(
   attr.action.%2: AddModifierTo(%3, %1)
   attr.action.%2: SetIsOptional(%3)
   attr.action.%2: BuildDecl(%4, %3)
+  attr.action.%3,%4: BuildIdentifier(%3)
+  attr.action.%3,%4: AddInitTo(%5)
+  attr.action.%3,%4: AddModifier(%2)
+  attr.action.%3,%4: AddModifier(%1)
+  attr.action.%3,%4: BuildDecl(%4, %3)
 
 
 ## MemberFunctionDeclaration: AccessibilityModifieropt staticopt PropertyName CallSignature { FunctionBody } AccessibilityModifieropt staticopt PropertyName CallSignature ;
@@ -2068,14 +2090,16 @@ rule MemberFunctionDeclaration: ONEOF(
   ZEROORONE(Annotation) + ZEROORMORE(AccessibilityModifier) + PropertyName + '?' + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + ZEROORONE(';'),
   ZEROORONE(Annotation) + ZEROORMORE(AccessibilityModifier) + PropertyName + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ':' + IsExpression + '{' + FunctionBody + '}',
   ZEROORONE(Annotation) + ZEROORMORE(AccessibilityModifier) + PropertyName + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ':' + IsExpression + ZEROORONE(';'),
-  ZEROORONE(Annotation) + ZEROORMORE(AccessibilityModifier) + "return" + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}')
-  attr.action.%1,%2,%3,%4,%5,%6,%7 : BuildFunction(%3)
-  attr.action.%1,%2,%3,%4,%5,%6,%7 : AddModifier(%2)
-  attr.action.%1,%2,%3,%4,%5,%6,%7 : AddModifier(%1)
-  attr.action.%1,%2,%5,%6,%7 : AddTypeGenerics(%4)
-  attr.action.%1,%2,%5,%6,%7 : AddParams(%6)
-  attr.action.%1,%2,%7 : AddType(%8)
-  attr.action.%1,%7    : AddFunctionBody(%10)
+  ZEROORONE(Annotation) + ZEROORMORE(AccessibilityModifier) + "return" + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}',
+  ZEROORONE(Annotation) + ZEROORMORE(AccessibilityModifier) + "get" + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}',
+  ZEROORONE(Annotation) + ZEROORMORE(AccessibilityModifier) + "set" + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}')
+  attr.action.%1,%2,%3,%4,%5,%6,%7,%8,%9 : BuildFunction(%3)
+  attr.action.%1,%2,%3,%4,%5,%6,%7,%8,%9 : AddModifier(%2)
+  attr.action.%1,%2,%3,%4,%5,%6,%7,%8,%9 : AddModifier(%1)
+  attr.action.%1,%2,%5,%6,%7,%8,%9 : AddTypeGenerics(%4)
+  attr.action.%1,%2,%5,%6,%7,%8,%9 : AddParams(%6)
+  attr.action.%1,%2,%7,%8,%9 : AddType(%8)
+  attr.action.%1,%7,%8,%9    : AddFunctionBody(%10)
   attr.action.%3,%4 : AddTypeGenerics(%5)
   attr.action.%3,%4 : AddParams(%7)
   attr.action.%3,%4 : AddType(%9)
