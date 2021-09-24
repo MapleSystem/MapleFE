@@ -213,13 +213,14 @@ TypeId TypeInferVisitor::MergeTypeId(TypeId tia, TypeId tib) {
 }
 
 void TypeInferVisitor::SetTypeId(TreeNode *node, TypeId tid) {
-  if (node) {
+  if (node && node->GetTypeId() != tid) {
     if (mFlags & FLG_trace_3) {
-      std::cout << " NodeId : " << node->GetNodeId() << " Update TypeId : "
+      std::cout << " NodeId : " << node->GetNodeId() << " Set TypeId : "
                 << AstDump::GetEnumTypeId(node->GetTypeId()) << " --> "
                 << AstDump::GetEnumTypeId(tid) << std::endl;
     }
     node->SetTypeId(tid);
+    SetUpdated();
   }
 }
 
@@ -228,14 +229,19 @@ void TypeInferVisitor::UpdateTypeId(TreeNode *node, TypeId tid) {
     return;
   }
   tid = MergeTypeId(node->GetTypeId(), tid);
-  if (node->GetTypeId() != tid) {
-    if (mFlags & FLG_trace_3) {
-      std::cout << " NodeId : " << node->GetNodeId() << " Set TypeId : "
-                << AstDump::GetEnumTypeId(node->GetTypeId()) << " --> "
-                << AstDump::GetEnumTypeId(tid) << std::endl;
-    }
-    SetTypeId(node, tid);
-    SetUpdated();
+  SetTypeId(node, tid);
+}
+
+void TypeInferVisitor::UpdateTypeId(TreeNode *node1, TreeNode *node2) {
+  if (!node1 || !node2) {
+    return;
+  }
+  TypeId tid = MergeTypeId(node1->GetTypeId(), node2->GetTypeId());
+  if (!node1->IsLiteral()) {
+    SetTypeId(node1, tid);
+  }
+  if (!node2->IsLiteral()) {
+    SetTypeId(node2, tid);
   }
 }
 
@@ -588,8 +594,7 @@ ArrayElementNode *TypeInferVisitor::VisitArrayElementNode(ArrayElementNode *node
                 for (int i = 0; i < mAst->GetFieldsSize(decl); i++) {
                   TreeNode *f = mAst->GetField(decl, i);
                   if (f->GetStrIdx() == stridx) {
-                    UpdateTypeId(node, f->GetTypeId());
-                    UpdateTypeId(f, node->GetTypeId());
+                    UpdateTypeId(node, f);
                     found = true;
                     break;
                   }
@@ -614,7 +619,7 @@ ArrayElementNode *TypeInferVisitor::VisitArrayElementNode(ArrayElementNode *node
         } else {
           // default
           UpdateTypeId(array, TY_Array);
-          UpdateTypeId(decl, TY_Array);
+          UpdateTypeId(decl, array);
           UpdateArrayElemTypeIdMap(decl, node->GetTypeId());
           UpdateTypeId(node, mHandler->mArrayDeclId2EleTypeIdMap[decl->GetNodeId()]);
         }
@@ -645,7 +650,7 @@ FieldLiteralNode *TypeInferVisitor::VisitFieldLiteralNode(FieldLiteralNode *node
   TreeNode *name = node->GetFieldName();
   TreeNode *lit = node->GetLiteral();
   UpdateTypeId(name, lit->GetTypeId());
-  UpdateTypeId(node, lit->GetTypeId());
+  UpdateTypeId(node, name);
   return node;
 }
 
@@ -998,10 +1003,9 @@ FieldNode *TypeInferVisitor::VisitFieldNode(FieldNode *node) {
     }
   }
   if (decl) {
-    UpdateTypeId(node, decl->GetTypeId());
+    UpdateTypeId(node, decl);
   }
-  UpdateTypeId(field, node->GetTypeId());
-  SetTypeId(node, field->GetTypeId());
+  UpdateTypeId(field, node);
   return node;
 }
 
@@ -1061,12 +1065,10 @@ IdentifierNode *TypeInferVisitor::VisitIdentifierNode(IdentifierNode *node) {
     // node itself is part of decl
     if (decl == parent) {
       if (node->GetType()) {
-        UpdateTypeId(node, node->GetType()->GetTypeId());
-        UpdateTypeId(node->GetType(), node->GetTypeId());
+        UpdateTypeId(node, node->GetType());
       }
     } else {
-      UpdateTypeId(node, decl->GetTypeId());
-      UpdateTypeId(decl, node->GetTypeId());
+      UpdateTypeId(node, decl);
     }
   } else {
     NOTYETIMPL("node not declared");
