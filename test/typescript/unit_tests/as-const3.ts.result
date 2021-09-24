@@ -5,6 +5,6 @@ Matched 26 tokens.
 == Sub Tree ==
 ts_enum: Color {Blue="blue" }
 == Sub Tree ==
-js_const Decl: s=
+js_const Decl: s=Color.Blue
 == Sub Tree ==
 console.log(s)

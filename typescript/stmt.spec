@@ -388,6 +388,7 @@ rule MemberExpression : ONEOF(
   attr.action.%12: SetIsConst()
   attr.action.%13,%15,%16: BuildField(%1, %3)
   attr.action.%14: BuildCast(%2, %4)
+  attr.action.%17: PassChild(%1)
   attr.action.%17: SetIsConst()
 
 rule IsExpression: ONEOF(PrimaryExpression + "is" + Type,
