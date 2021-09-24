@@ -1,0 +1,10 @@
+Matched 8 tokens.
+Matched 19 tokens.
+Matched 26 tokens.
+============= Module ===========
+== Sub Tree ==
+ts_enum: Color {Blue="blue" }
+== Sub Tree ==
+js_const Decl: s=
+== Sub Tree ==
+console.log(s)
