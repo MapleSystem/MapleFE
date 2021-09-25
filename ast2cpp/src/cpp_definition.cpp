@@ -90,8 +90,20 @@ std::string CppDef::EmitModuleNode(ModuleNode *node) {
   isInit = true;
   for (unsigned i = 0; i < node->GetTreesNum(); ++i) {
     if (auto n = node->GetTree(i)) {
+#if 0
       if (!n->IsClass())
         str += "  "s + EmitTreeNode(n) + ";\n"s;
+#else
+      if (n->GetKind() != NK_Class) {
+        str += "  "s + EmitTreeNode(n);
+        if (str.back() == '\n')
+          continue;
+        else if (str.back() == ';')
+          str += "\n"s;
+        else
+          str += ";\n"s;
+      }
+#endif
     }
   }
   str += "}\n\n"s + name + " _"s + name + R"""(;
