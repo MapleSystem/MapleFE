@@ -65,7 +65,9 @@ public:
   std::string EmitObjPropInit(std::string varName, TreeNode* idType, StructLiteralNode* n);
   std::string EmitDirectFieldInit(std::string varName, StructLiteralNode* node);
   std::string EmitCppCtor(ClassNode* node);
+  std::string EmitBracketNotationProp(ArrayElementNode* ae, OprId binOpId, bool isLhs, bool& isDynProp);
   TypeId GetTypeFromDecl(IdentifierNode* id);
+  bool   IsClassField(ArrayElementNode* node, std::string propKey);
 };
 
 } // namespace maplefe

@@ -132,6 +132,12 @@ class Object {
         this->AddProp(props[i].first, props[i].second);
     }
 
+    JS_Val& operator[] (std::string key)
+    {
+      if (!HasOwnProp(key)) AddProp(key, JS_Val());
+      return GetPropVal(key);
+    }
+
     virtual ~Object() {}
 
     bool HasOwnProp(std::string key) {
@@ -146,6 +152,10 @@ class Object {
 
     JS_Prop GetProp(std::string key) {
       return propList[key];
+    }
+
+    JS_Val& GetPropVal(std::string key) {
+      return propList[key].val;
     }
 
     bool GetPropBool(std::string key) {

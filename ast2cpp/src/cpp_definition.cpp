@@ -529,10 +529,20 @@ std::string CppDef::EmitPrimArrayTypeNode(PrimArrayTypeNode *node) {
   return std::string();
 }
 
+inline bool IsBracketNotationProp(TreeNode *node) {
+  return node->IsArrayElement() &&
+         static_cast<ArrayElementNode*>(node)->GetArray()->IsTypeIdClass();
+}
+
 std::string CppDef::EmitArrayElementNode(ArrayElementNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str;
+  if (IsBracketNotationProp(node)) {
+    bool unused;
+    str = EmitBracketNotationProp(node, OPR_Arrow, false, unused);
+    return str;
+  }
   if (auto n = node->GetArray()) {
     str = "(*"s;
     str += EmitTreeNode(n);
@@ -719,12 +729,6 @@ std::string CppDef::EmitContinueNode(ContinueNode *node) {
   return str;
 }
 
-
-inline bool IsObjPropBracketNotation(TreeNode *node) {
-  return node->IsArrayElement() &&
-         static_cast<ArrayElementNode*>(node)->GetArray()->IsTypeIdClass();
-}
-
 TypeId CppDef::GetTypeFromDecl(IdentifierNode* id) {
   TypeId type = TY_None;
   DeclNode* decl = static_cast<DeclNode*>(mHandler->FindDecl(id));
@@ -737,6 +741,131 @@ TypeId CppDef::GetTypeFromDecl(IdentifierNode* id) {
   return type;
 }
 
+bool CppDef::IsClassField(ArrayElementNode* node, std::string propKey) {
+  IdentifierNode* classId = nullptr;
+
+//  MASSERT(node->GetArray()->IsIdentifier() && "Unexpected node type");
+  if (!node->GetArray()->IsIdentifier()) {
+    return false;
+  }
+  if (auto n = mHandler->FindDecl(static_cast<IdentifierNode*>(node->GetArray()))) {
+    // find declaration of object and if class instance, get class identifer
+    if (n->IsDecl())
+      if (auto var = static_cast<DeclNode*>(n)->GetVar())
+        if (var->IsIdentifier())
+          if (auto type = static_cast<IdentifierNode*>(var)->GetType())
+            if (type->IsUserType() && static_cast<UserTypeNode*>(type)->IsTypeIdClass())
+              classId = static_cast<IdentifierNode*>(static_cast<UserTypeNode*>(type)->GetId());
+  }
+  if (classId) {
+    // look for class decl and check if propkey is in field list
+    if (auto n = mHandler->FindDecl(classId)) {
+      if (n->IsClass()) {
+        for (unsigned i = 0; i < static_cast<ClassNode*>(n)->GetFieldsNum(); ++i) {
+          auto fd = static_cast<ClassNode*>(n)->GetField(i);
+          if (fd->IsIdentifier())
+            // skip leading and trailing quote in propKey when comparing
+            if (propKey.compare(1, propKey.length()-2, static_cast<IdentifierNode*>(fd)->GetName()) == 0)
+              return true;
+        }
+      }
+    }
+  }
+  return false;
+}
+
+//
+// For property access using bracket notation (e.g. bar["prop"]):
+//   1) If the property is a member field in the object's class, emit: bar->prop
+//   2) Otherwise it is a property created dynamically at runtime:
+//      - If it is a lvalue, emit: (*bar)["prop"] - [] operator overloaded in ts2cpp.h
+//      - If it is a rvalue, emit: bar->GetPropXX("prop") - XX is one of union types in JS_Val
+//   3) For OP_Assign, if lvalue on lhs is dynamic prop, wrap rhs with JS_Val() macro.
+//      e.g.   (*bar)["p1"] = JS_Val(0xa);
+//             (*bar)["p2"] = JS_Val(bar->f2);
+//             (*bar)["p2"] = JS_Val(bar->GetPropLong("p1"));
+//             (*bar)["p2"] = JS_Val((uint32_t)(bar->GetPropLong("p2") >> bar->GetPropLong("p1")));
+//
+// *note: to do 1), the property key must be a string literal. if the property key
+//        is an identfier, then we have to do 2) because the identfier can be
+//        a var or a TS symobol resolvable only at runtime.
+//        Also, the object may be an expression, in which case, it can only be evaluated at runtime
+//
+std::string CppDef::EmitBracketNotationProp(ArrayElementNode* ae, OprId binOpId, bool isLhs, bool& isDynProp) {
+  if (ae == nullptr)
+    return std::string();
+
+  isDynProp = true;
+  std::string str, propKey;
+  std::string objName = ae->GetArray()->GetName();
+
+  if (ae->GetArray()->IsIdentifier()) {
+    objName = ae->GetArray()->GetName();
+  } else {
+    // case where the object is an expression - re: call-func.ts
+    objName = EmitTreeNode(ae->GetArray());
+  }
+
+  TypeId propKeyType  = ae->GetExprAtIndex(0)->GetTypeId();
+  if (propKeyType == TY_String && ae->GetExprAtIndex(0)->IsLiteral()) {
+    propKey = EmitTreeNode(ae->GetExprAtIndex(0));
+    if (IsClassField(ae, propKey)) {
+      // property is class member field
+      str = objName + "->"s + propKey.substr(1, propKey.length()-2);
+      isDynProp = false;
+      return str;
+    }
+  }
+  if (propKeyType == TY_None && ae->GetExprAtIndex(0)->IsIdentifier()) {
+    propKeyType = GetTypeFromDecl(static_cast<IdentifierNode*>(ae->GetExprAtIndex(0)));
+  }
+  // resolve propKey at runtime
+  switch (propKeyType) {
+    case TY_Int:
+      propKey = "to_string("s + EmitTreeNode(ae->GetExprAtIndex(0)) + ")"s;
+      break;
+    case TY_String:
+      propKey = EmitTreeNode(ae->GetExprAtIndex(0));
+      break;
+    case TY_Symbol:
+      propKey = "to_string("s + EmitTreeNode(ae->GetExprAtIndex(0)) + ")"s;
+      break;
+    default:
+      MASSERT(0 && "Encounter unsupported prop key type in bracket notation");
+      break;
+  }
+
+  if (binOpId == OPR_Assign && isLhs) {
+    // prop is lvalue
+    str = "(*"s + objName + ")["s + propKey + "]"s;
+  } else {
+    switch(ae->GetTypeId()) {
+      case TY_Long:
+      case TY_Int:
+        str = objName + "->GetPropLong("s + propKey + ")"s;
+        break;
+      case TY_Double:
+        str = objName + "->GetPropDouble("s + propKey + ")"s;
+        break;
+      case TY_String:
+        str = objName + "->GetPropString("s + propKey + ")"s;
+        break;
+      case TY_Boolean:
+        str = objName + "->GetPropBool("s + propKey + ")"s;
+        break;
+      case TY_Function:
+      case TY_Object:
+        str = objName + "->GetPropiObj("s + propKey + ")"s;
+        break;
+    }
+
+    // prop is rvalue
+    // emit: bar->GetPropXX("prop")
+    // Need type info for each property
+  }
+  return str;
+}
+
 std::string CppDef::EmitBinOperatorNode(BinOperatorNode *node) {
   if (node == nullptr)
     return std::string();
@@ -744,53 +873,34 @@ std::string CppDef::EmitBinOperatorNode(BinOperatorNode *node) {
   const Precedence precd = *op & 0x3f;
   const bool rl_assoc = *op >> 6; // false: left-to-right, true: right-to-left
   std::string lhs, rhs;
-  std::string objName, propKey, propVal;
-  TypeId propKeyType, propValType;
-  bool islhsObjProp = false;
+  bool lhsIsDynProp = false;
+  bool rhsIsDynProp = false;
+
   if (auto n = node->GetOpndA()) {
-    if ((islhsObjProp = IsObjPropBracketNotation(n)) == true) {
-      // lhs is object prop with bracket notation
-      ArrayElementNode *ae = static_cast<ArrayElementNode *>(n);
-      MASSERT(ae->GetExprsNum() == 1 && "ArrayElementNode ExprsNum 1 expected");
-      objName     = ae->GetArray()->GetName();
-      propValType = node->GetTypeId();
-      propKeyType = ae->GetExprAtIndex(0)->GetTypeId();
-      if (propKeyType == TY_None) {
-        if (ae->GetExprAtIndex(0)->IsIdentifier()) {
-          propKeyType = GetTypeFromDecl(static_cast<IdentifierNode*>(ae->GetExprAtIndex(0)));
-        }
-      }
-      switch (propKeyType) {
-        case TY_Int:
-          propKey = "to_string("s + EmitTreeNode(ae->GetExprAtIndex(0)) + ")"s;
-          break;
-        case TY_String:
-          propKey = EmitTreeNode(ae->GetExprAtIndex(0));
-          break;
-        case TY_Symbol:
-          propKey = "to_string("s + EmitTreeNode(ae->GetExprAtIndex(0)) + ")"s;
-          break;
-        default:
-          MASSERT(0 && "Encounter unsupported prop key type in bracket notation");
-          break;
-      }
+    if (IsBracketNotationProp(n)) {
+      lhs = EmitBracketNotationProp(static_cast<ArrayElementNode*>(n), node->GetOprId(), true, lhsIsDynProp);
     } else {
       lhs = EmitTreeNode(n);
       if (n->IsIdentifier() && n->IsTypeIdArray())
         lhs = "*"s + lhs;
-      if(precd > mPrecedence || (precd == mPrecedence && rl_assoc))
-        lhs = "("s + lhs + ")"s;
     }
+    if(precd > mPrecedence || (precd == mPrecedence && rl_assoc))
+      lhs = "("s + lhs + ")"s;
   }
   else
     lhs = "(NIL) "s;
+
   if (auto n = node->GetOpndB()) {
-    rhs = EmitTreeNode(n);
+    if (IsBracketNotationProp(n)) {
+      rhs = EmitBracketNotationProp(static_cast<ArrayElementNode*>(n), node->GetOprId(), false, rhsIsDynProp);
+    } else
+      rhs = EmitTreeNode(n);
     if(precd > mPrecedence || (precd == mPrecedence && !rl_assoc))
       rhs = "("s + rhs + ")"s;
   }
   else
     rhs = " (NIL)"s;
+
   OprId k = node->GetOprId();
   std::string str;
   if(k == OPR_Exp) {
@@ -802,17 +912,16 @@ std::string CppDef::EmitBinOperatorNode(BinOperatorNode *node) {
       case OPR_Bxor:
       case OPR_Shl:
       case OPR_Shr:
-        lhs = "static_cast<int32_t>("s + lhs + ")"s;
+        lhs = "static_cast<int64_t>(static_cast<int32_t>("s + lhs + "))"s;
         break;
       case OPR_Zext:
-        lhs = "static_cast<uint32_t>("s + lhs + ")"s;
+        lhs = "static_cast<int64_t>(static_cast<uint32_t>("s + lhs + "))"s;
         op = "\015>>";
         break;
     }
-    if (islhsObjProp) {
-      str += objName + "->AddProp(" + propKey + ", JS_Val("s + rhs + "))"s;
-    } else
-      str = lhs + " "s + std::string(op + 1) + " "s + rhs;
+    if (k == OPR_Assign && lhsIsDynProp)
+      rhs = "JS_Val("s + rhs + ")"s;
+    str = lhs + " "s + std::string(op + 1) + " "s + rhs;
   }
   mPrecedence = precd;
   return str;
