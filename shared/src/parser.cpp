@@ -298,7 +298,9 @@ bool Parser::TokenMerge(Token *t) {
      (sep->GetSepId() != SEP_Rparen) &&
      (sep->GetSepId() != SEP_Rbrack))
     is_sep = true;
-  if (sep->IsOperator() && sep->GetOprId() == OPR_Assign)
+  if (sep->IsOperator() &&
+        (sep->GetOprId() == OPR_Assign ||
+         sep->GetOprId() == OPR_Bor))
     is_sep = true;
 
   if (sep->IsKeyword() && mActiveTokens.GetNum() >= 3) {
