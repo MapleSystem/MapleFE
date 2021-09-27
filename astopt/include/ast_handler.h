@@ -22,6 +22,7 @@
 #include <unordered_set>
 #include <cstring>
 #include <map>
+#include <climits>
 #include "ast_module.h"
 #include "ast.h"
 #include "ast_cfg.h"
@@ -152,6 +153,9 @@ struct StrLess {
   }
 };
 
+using HandlerIndex = unsigned;
+const HandlerIndex HandlerNotFound = UINT_MAX;
+
 class AST_Handler {
  private:
   MemPool  mMemPool;    // Memory pool for all CfgFunc, CfgBB, etc.
@@ -160,20 +164,24 @@ class AST_Handler {
   // vector of all AST modules
   SmallVector<Module_Handler *> mModuleHandlers;
   // mapping of mModuleHandlers index with its corresponding filename as its key
-  std::map<const char*, ModuleNode*, StrLess> mModuleMap;
+  std::map<const char*, HandlerIndex, StrLess> mModuleHandlerMap;
 
   explicit AST_Handler(unsigned f) : mFlags(f) {}
   ~AST_Handler() {mMemPool.Release();}
 
   MemPool *GetMemPool() {return &mMemPool;}
 
-  // If m does not exist in mModuleMap, create an object of Module_Handler for module m,
-  // add m to mModuleMap and return true
-  // Otherwise return false
+  // If m does not exist in mModuleHandlerMap,
+  //    create an object of Module_Handler for module m
+  //    add this object to mModuleHandlers
+  //    map its corresponding filename and the index of this object in mModuleHandlers in mModuleHandlerMap
+  //    return true
+  // Otherwise,
+  //    return false
   bool AddModule(ModuleNode *m);
 
-  // Return a module node if filename exists in mModuleMap, otherwise return nullptr
-  ModuleNode* GetModule(const char *filename);
+  // Return an index of mModuleHandlers if filename exists in mModuleHandlerMap, otherwise return HandlerNotFound
+  HandlerIndex GetHandlerIndex(const char *filename);
 };
 
 }

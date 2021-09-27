@@ -25,15 +25,15 @@
 namespace maplefe {
 
 void A2C::EmitTS() {
-  unsigned size = mASTHandler->mModuleHandlers.GetNum();
-  for (int i = 0; i < size; i++) {
+  HandlerIndex size = mASTHandler->mModuleHandlers.GetNum();
+  for (HandlerIndex i = 0; i < size; i++) {
     Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
     ModuleNode *module = handler->GetASTModule();
     // build CFG
     handler->BuildCFG();
   }
 
-  for (int i = 0; i < size; i++) {
+  for (HandlerIndex i = 0; i < size; i++) {
     Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
     ModuleNode *module = handler->GetASTModule();
     std::cout << "============= AstDump ===========" << std::endl;
@@ -58,8 +58,8 @@ void A2C::ProcessAST() {
   }
 
   // loop through module handlers
-  unsigned size = mASTHandler->mModuleHandlers.GetNum();
-  for (int i = 0; i < size; i++) {
+  HandlerIndex size = mASTHandler->mModuleHandlers.GetNum();
+  for (HandlerIndex i = 0; i < size; i++) {
     Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
     ModuleNode *module = handler->GetASTModule();
 
@@ -139,8 +139,8 @@ void A2C::ProcessAST() {
 
   if (mFlags & FLG_emit_ts) {
     std::cout << "============= Emitter ===========" << std::endl;
-    unsigned size = mASTHandler->mModuleHandlers.GetNum();
-    for (int i = 0; i < size; i++) {
+    HandlerIndex size = mASTHandler->mModuleHandlers.GetNum();
+    for (HandlerIndex i = 0; i < size; i++) {
       Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
       ModuleNode *module = handler->GetASTModule();
       maplefe::Emitter emitter(module);
