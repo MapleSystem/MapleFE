@@ -29,13 +29,22 @@ class A2C : public AstOpt {
 private:
   AST_Handler *mASTHandler;
   unsigned     mFlags;
+  unsigned     mIndexImported;
 
 public:
-  explicit A2C(AST_Handler *h, unsigned flags) : AstOpt(h, flags), mASTHandler(h), mFlags(flags) {}
+  explicit A2C(AST_Handler *h, unsigned flags) :
+    AstOpt(h, flags),
+    mASTHandler(h),
+    mFlags(flags),
+    mIndexImported(0) {}
   ~A2C() = default;
 
   void EmitTS();
-  void ProcessAST();
+  bool LoadImportedModules();
+
+  // return 0 if successful
+  // return non-zero if failed
+  int ProcessAST();
 };
 
 }

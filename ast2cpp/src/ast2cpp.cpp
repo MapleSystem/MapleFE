@@ -13,6 +13,11 @@
 * See the Mulan PSL v2 for more details.
 */
 
+#include <queue>
+#include <sstream>
+#include <fstream>
+#include <iterator>
+
 #include "ast2cpp.h"
 #include "ast_handler.h"
 #include "gen_astdump.h"
@@ -28,7 +33,6 @@ void A2C::EmitTS() {
   HandlerIndex size = mASTHandler->mModuleHandlers.GetNum();
   for (HandlerIndex i = 0; i < size; i++) {
     Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
-    ModuleNode *module = handler->GetASTModule();
     // build CFG
     handler->BuildCFG();
   }
@@ -49,13 +53,81 @@ void A2C::EmitTS() {
   }
 }
 
+class ImportedFiles : public AstVisitor {
+  public:
+    std::vector<std::string> mFilenames;
+
+  public:
+    ImportNode *VisitImportNode(ImportNode *node) {
+      if (auto n = node->GetTarget()) {
+        if (n->IsLiteral()) {
+          LiteralNode *lit = static_cast<LiteralNode *>(n);
+          LitData data = lit->GetData();
+          std::string filename(AstDump::GetEnumLitData(data));
+          filename += ".ts.ast"s;
+          mFilenames.push_back(filename);
+        }
+      }
+      return node;
+    }
+};
+
+bool A2C::LoadImportedModules() {
+  std::queue<std::string> queue;
+  HandlerIndex size = mASTHandler->mModuleHandlers.GetNum();
+  for (HandlerIndex i = 0; i < size; i++) {
+    Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
+    ModuleNode *module = handler->GetASTModule();
+    ImportedFiles imported;
+    imported.VisitTreeNode(module);
+    for(const auto &e: imported.mFilenames)
+      queue.push(e);
+  }
+
+  bool err = false;
+  while(!queue.empty()) {
+    std::string filename = queue.front();
+    queue.pop();
+    if(mASTHandler->GetHandlerIndex(filename.c_str()) == HandlerNotFound) {
+      std::ifstream input(filename, std::ifstream::binary);
+      if(input.fail()) {
+        std::cerr << "Error: File " << filename << " not found for imported module" << std::endl;
+        err = true;
+        continue;
+      }
+      input >> std::noskipws;
+      std::istream_iterator<uint8_t> s(input), e;
+      maplefe::AstBuffer vec(s, e);
+      maplefe::AstLoad loadAst;
+      maplefe::ModuleNode *mod = loadAst.LoadFromAstBuf(vec);
+      // add mod to the vector
+      while(mod) {
+        mASTHandler->AddModule(mod);
+        ImportedFiles imported;
+        imported.VisitTreeNode(mod);
+        for(const auto &e: imported.mFilenames)
+          queue.push(e);
+        mod = loadAst.Next();
+      }
+    }
+  }
+  return err;
+}
+
 // starting point of AST
-void A2C::ProcessAST() {
+int A2C::ProcessAST() {
+  mIndexImported = mASTHandler->mModuleHandlers.GetNum();
+
   // used for FE verification
   if (mFlags & FLG_emit_ts_only) {
     EmitTS();
-    return;
+    return 0;
   }
+
+  // load all imported modules
+  if (!(mFlags & FLG_no_imported))
+    if (LoadImportedModules())
+      return 1;
 
   // loop through module handlers
   HandlerIndex size = mASTHandler->mModuleHandlers.GetNum();
@@ -154,6 +226,7 @@ void A2C::ProcessAST() {
   }
   maplefe::CppEmitter cppemitter(mASTHandler, mFlags);
   cppemitter.EmitCxxFiles();
+  return 0;
 }
 }
 

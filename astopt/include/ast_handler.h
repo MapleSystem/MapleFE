@@ -45,6 +45,7 @@ enum AST_Flags {
   FLG_emit_ts      = 0x00000010,
   FLG_emit_ts_only = 0x00000020,
   FLG_format_cpp   = 0x00000040,
+  FLG_no_imported  = 0x00000080,
 };
 
 class CfgBB;

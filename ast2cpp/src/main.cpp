@@ -30,6 +30,7 @@ static void help() {
   std::cout << "   --emit-ts-only   : Emit ts code only" << std::endl;
   std::cout << "   --emit-ts        : Emit ts code" << std::endl;
   std::cout << "   --format-cpp     : Format cpp" << std::endl;
+  std::cout << "   --no-imported    : Do not process the imported modules" << std::endl;
   std::cout << "default out name uses the first input name: a.cpp" << std::endl;
 }
 
@@ -60,6 +61,8 @@ int main (int argc, char *argv[]) {
       flags |= maplefe::FLG_emit_ts;
     } else if (!strncmp(argv[i], "--format-cpp", 12)) {
       flags |= maplefe::FLG_format_cpp;
+    } else if (!strncmp(argv[i], "--no-imported", 13)) {
+      flags |= maplefe::FLG_no_imported;
     } else if (!strncmp(argv[i], "--in=", 5)) {
       inputname = argv[i]+5;
     } else if (!strncmp(argv[i], "--out=", 6)) {
@@ -99,7 +102,7 @@ int main (int argc, char *argv[]) {
   }
 
   maplefe::A2C *a2c = new maplefe::A2C(&handler, flags);
-  a2c->ProcessAST();
+  int res = a2c->ProcessAST();
 
-  return 0;
+  return res;
 }

@@ -34,7 +34,8 @@ while [ $# -gt 0 ]; do
         -e|--tscerror)   TSCERR= ;;
         -k|--keep)       KEEP=keep ;;
         -C|--clean)      CLEAN=clean ;;
-        -A|--all)        LIST="$LIST $(find -maxdepth 1 -name '*.ts')" ;;
+        -A|--all)        LIST="$LIST $(find -maxdepth 1 -name '*.ts' -exec grep -l "^ *export " {} \;) "
+                         LIST="$LIST $(find -maxdepth 1 -name '*.ts' -exec grep -L "^ *export " {} \;) " ;;
         -n|--name)       NAME="original" ;;
         -t|--treediff)   TREEDIFF="--emit-ts-only"; NAME="original"; TSC=yes ;;
         -T|--Treediff)   TREEDIFF="--emit-ts-only"; NAME="original"; TSC= ;;

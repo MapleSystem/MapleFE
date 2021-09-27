@@ -112,7 +112,7 @@ foreach my $file (@paths) {
         #print "---------------------------\n";
         next;
       } else {
-        my $res1 = system("$cmnd1 $outroot/$file.ast > $outroot/$outresult.1");
+        my $res1 = system("$cmnd1 $outroot/$file.ast --no-imported > $outroot/$outresult.1");
 
         if ($res1 > 0) {
           print " ==$pinput===> $file\n";
