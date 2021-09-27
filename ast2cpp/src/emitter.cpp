@@ -161,15 +161,19 @@ std::string Emitter::EmitIdentifierNode(IdentifierNode *node) {
     if (auto n = node->GetAnnotationAtIndex(i))
       str += '@' + EmitTreeNode(n) + "\n"s;
 
-  std::string accessor;
+  std::string accessor1, accessor2;
   for (unsigned i = 0; i < node->GetAttrsNum(); ++i) {
     std::string s = GetEnumAttrId(node->GetAttrAtIndex(i));
     if (s == "get "s || s == "set "s)
-      accessor += s;
+      accessor2 += s;
     else
-      str += s;
+      accessor1 += s;
   }
-  str += accessor + node->GetName();
+  std::string name(node->GetName());
+  if (accessor1 == "private "s && name == "private"s)
+    str += "#private"s;
+  else
+    str += accessor1 + accessor2 + name;
   str = HandleTreeNode(str, node);
   //if (auto n = node->GetDims()) {
   //  str += ' ' + EmitDimensionNode(n);
