@@ -46,11 +46,23 @@ MemPool *Module_Handler::GetMemPool() {
   return mASTHandler->GetMemPool();
 }
 
-void AST_Handler::AddModule(ModuleNode *m) {
+ModuleNode* AST_Handler::GetModule(const char *filename) {
+  if (mModuleMap.find(filename) == mModuleMap.end())
+   return nullptr;
+  return mModuleMap.at(filename);
+}
+
+bool AST_Handler::AddModule(ModuleNode *m) {
+  const char *filename = m->GetFileName();
+  if (mModuleMap.find(filename) != mModuleMap.end())
+    return false;
+  mModuleMap[filename] = m;
+
   Module_Handler *handler = new(mMemPool.Alloc(sizeof(Module_Handler))) Module_Handler(mFlags);
   handler->SetASTModule(m);
   handler->SetASTHandler(this);
   mModuleHandlers.PushBack(handler);
+  return true;
 }
 
 void Module_Handler::AdjustAST() {

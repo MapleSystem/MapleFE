@@ -20,6 +20,8 @@
 #include <utility>
 #include <unordered_map>
 #include <unordered_set>
+#include <cstring>
+#include <map>
 #include "ast_module.h"
 #include "ast.h"
 #include "ast_cfg.h"
@@ -144,6 +146,12 @@ class Module_Handler {
   void Dump(char *msg);
 };
 
+struct StrLess {
+  bool operator()(const char *p, const char *q) const {
+    return std::strcmp(p, q) < 0;
+  }
+};
+
 class AST_Handler {
  private:
   MemPool  mMemPool;    // Memory pool for all CfgFunc, CfgBB, etc.
@@ -151,13 +159,21 @@ class AST_Handler {
  public:
   // vector of all AST modules
   SmallVector<Module_Handler *> mModuleHandlers;
+  // mapping of mModuleHandlers index with its corresponding filename as its key
+  std::map<const char*, ModuleNode*, StrLess> mModuleMap;
 
   explicit AST_Handler(unsigned f) : mFlags(f) {}
   ~AST_Handler() {mMemPool.Release();}
 
   MemPool *GetMemPool() {return &mMemPool;}
-  // Create an object of Module_Handler and set it for module m
-  void AddModule(ModuleNode *m);
+
+  // If m does not exist in mModuleMap, create an object of Module_Handler for module m,
+  // add m to mModuleMap and return true
+  // Otherwise return false
+  bool AddModule(ModuleNode *m);
+
+  // Return a module node if filename exists in mModuleMap, otherwise return nullptr
+  ModuleNode* GetModule(const char *filename);
 };
 
 }
