@@ -1,0 +1,28 @@
+Matched 8 tokens.
+Matched 16 tokens.
+Matched 36 tokens.
+Matched 77 tokens.
+Matched 86 tokens.
+Matched 95 tokens.
+============= Module ===========
+== Sub Tree ==
+ts_interface: Foo {foo }
+== Sub Tree ==
+ts_interface: Bar {bar }
+== Sub Tree ==
+func  isFoo(arg)  throws: 
+  return arg.foo StNe undefined
+
+== Sub Tree ==
+func  doStuff(arg)  throws: 
+  cond-branch cond:isFoo(arg)
+  true branch :
+    console.log(arg.foo)
+  false branch :
+    console.log(arg.bar)
+
+
+== Sub Tree ==
+doStuff( {foo:123})
+== Sub Tree ==
+doStuff( {bar:123})
