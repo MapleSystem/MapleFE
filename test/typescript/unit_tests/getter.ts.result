@@ -1,0 +1,12 @@
+Matched 9 tokens.
+Matched 29 tokens.
+Matched 38 tokens.
+============= Module ===========
+== Sub Tree ==
+js_var Decl: obj= {name:"dummy"}
+== Sub Tree ==
+Object.defineProperty(obj,"name", {:get ()  throws: 
+  return "Name"
+})
+== Sub Tree ==
+console.log(obj.name)

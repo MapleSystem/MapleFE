@@ -1902,25 +1902,29 @@ rule PropertyDefinition: ONEOF(IdentifierReference,
 rule GetAccessor: ONEOF(ZEROORONE(AccessibilityModifier) + "get" + PropertyName + '(' + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}',
                         ZEROORONE(AccessibilityModifier) + "get" + '(' + "this" + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}',
                         ZEROORONE(AccessibilityModifier) + "get" + PropertyName + '(' + ')' + ZEROORONE(TypeAnnotation) + ';',
-                        ZEROORONE(AccessibilityModifier) + "get" + '(' + "this" + ')' + ZEROORONE(TypeAnnotation) + ';')
+                        ZEROORONE(AccessibilityModifier) + "get" + '(' + "this" + ')' + ZEROORONE(TypeAnnotation) + ';',
+                        ZEROORONE(AccessibilityModifier) + "get" + '(' + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}')
   attr.action.%1,%3 : BuildFunction(%3)
   attr.action.%1,%3 : SetGetAccessor()
   attr.action.%1,%3 : AddType(%6)
   attr.action.%1 : AddFunctionBody(%8)
   attr.action.%1,%3 : AddModifier(%2)
   attr.action.%1,%3 : AddModifier(%1)
-  attr.action.%2,%4 : BuildFunction()
-  attr.action.%2,%4 : SetGetAccessor()
+  attr.action.%2,%4,%5 : BuildFunction()
+  attr.action.%2,%4,%5 : SetGetAccessor()
   attr.action.%2,%4 : AddType(%6)
   attr.action.%2 : AddFunctionBody(%8)
   attr.action.%2,%4 : AddModifier(%2)
   attr.action.%2,%4 : AddModifier(%1)
+  attr.action.%5 : AddType(%5)
+  attr.action.%5 : AddFunctionBody(%7)
 
 ## SetAccessor: set PropertyName ( BindingIdentifierOrPattern TypeAnnotationopt ) { FunctionBody }
 rule SetAccessor: ONEOF(ZEROORONE(AccessibilityModifier) + "set" + PropertyName + '(' + BindingIdentifierOrPattern + ZEROORONE(TypeAnnotation) + ')' + '{' + FunctionBody + '}',
                         ZEROORONE(AccessibilityModifier) + "set" + '(' + "this" + ',' + BindingIdentifierOrPattern + ZEROORONE(TypeAnnotation) + ')' + '{' + FunctionBody + '}',
                         ZEROORONE(AccessibilityModifier) + "set" + PropertyName + '(' + BindingIdentifierOrPattern + ZEROORONE(TypeAnnotation) + ')' + ';',
-                        ZEROORONE(AccessibilityModifier) + "set" + '(' + "this" + ',' + BindingIdentifierOrPattern + ZEROORONE(TypeAnnotation) + ')' + ';')
+                        ZEROORONE(AccessibilityModifier) + "set" + '(' + "this" + ',' + BindingIdentifierOrPattern + ZEROORONE(TypeAnnotation) + ')' + ';',
+                        ZEROORONE(AccessibilityModifier) + "set" + '(' BindingIdentifierOrPattern + ZEROORONE(TypeAnnotation) + ')' + '{' + FunctionBody + '}')
   attr.action.%1,%3 : AddType(%5, %6)
   attr.action.%1,%3 : BuildFunction(%3)
   attr.action.%1,%3 : SetSetAccessor()
@@ -1929,12 +1933,15 @@ rule SetAccessor: ONEOF(ZEROORONE(AccessibilityModifier) + "set" + PropertyName 
   attr.action.%1,%3 : AddModifier(%2)
   attr.action.%1,%3 : AddModifier(%1)
   attr.action.%2,%4 : AddType(%6, %7)
-  attr.action.%2,%4 : BuildFunction()
-  attr.action.%2,%4 : SetSetAccessor()
+  attr.action.%2,%4,%5 : BuildFunction()
+  attr.action.%2,%4,%5 : SetSetAccessor()
   attr.action.%2,%4 : AddParams(%6)
   attr.action.%2 : AddFunctionBody(%10)
   attr.action.%2,%4 : AddModifier(%2)
   attr.action.%2,%4 : AddModifier(%1)
+  attr.action.%5 : AddParams(%4)
+  attr.action.%5 : AddFunctionBody(%8)
+  attr.action.%5 : AddModifier(%1)
 
 ## We allow get/set as identifier for function name only.
 ## we don't want to see keywords as identifier happening in everywhere.
