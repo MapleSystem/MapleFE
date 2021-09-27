@@ -58,6 +58,8 @@ rule KeywordIdentifier : ONEOF("type",
                                "boolean",
                                "string",
                                "catch",
+                               "get",
+                               "set",
                                "undefined",
                                "never",
                                "number",
@@ -1910,7 +1912,7 @@ rule GetAccessor: ONEOF(ZEROORONE(AccessibilityModifier) + "get" + PropertyName 
   attr.action.%1 : AddFunctionBody(%8)
   attr.action.%1,%3 : AddModifier(%2)
   attr.action.%1,%3 : AddModifier(%1)
-  attr.action.%2,%4,%5 : BuildFunction()
+  attr.action.%2,%4,%5 : BuildFunction(%2)
   attr.action.%2,%4,%5 : SetGetAccessor()
   attr.action.%2,%4 : AddType(%6)
   attr.action.%2 : AddFunctionBody(%8)

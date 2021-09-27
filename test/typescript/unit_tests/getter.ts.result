@@ -5,7 +5,7 @@ Matched 38 tokens.
 == Sub Tree ==
 js_var Decl: obj= {name:"dummy"}
 == Sub Tree ==
-Object.defineProperty(obj,"name", {:get ()  throws: 
+Object.defineProperty(obj,"name", {get:func  get()  throws: 
   return "Name"
 })
 == Sub Tree ==
