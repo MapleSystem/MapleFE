@@ -29,7 +29,7 @@ for f; do
   while true; do
     [ -f $t.ts ] && f=$t.ts
     $TS2AST $f || { echo "(ts2ast)$f" >> ts2cpp.failures.out; break; }
-    $AST2CPP $f.ast || { echo "(ast2cpp)$f" >> ts2cpp.failures.out; break; }
+    $AST2CPP $f.ast --no-imported || { echo "(ast2cpp)$f" >> ts2cpp.failures.out; break; }
     g++ $t.cpp $RTSRC/*.cpp -o $t || { echo "(g++)$f" >> ts2cpp.failures2.out; break; }
     ./$t || { echo "(run)$f" >> ts2cpp.failures2.out; break; }
     echo $t >> ts2cpp.summary.out
