@@ -117,7 +117,7 @@ enum LAType {
 struct LookAhead {
   LAType mType;   // the type of look ahead
   union{
-    char        mChar;
+    unsigned char  mChar;
     const char *mString;
     unsigned    mTokenId;
   }mData;

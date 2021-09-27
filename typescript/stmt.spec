@@ -2071,7 +2071,9 @@ rule MemberVariableDeclaration: ONEOF(
   ZEROORMORE(Annotation) + ZEROORMORE(AccessibilityModifier) + PropertyName + ZEROORONE(TypeAnnotation) + ZEROORONE(Initializer) + ZEROORONE(';'),
   ZEROORMORE(Annotation) + ZEROORMORE(AccessibilityModifier) + PropertyName + '?' + ZEROORONE(TypeAnnotation) + ZEROORONE(Initializer) + ZEROORONE(';'),
   ZEROORMORE(Annotation) + ZEROORMORE(AccessibilityModifier) + "get" + '=' + ArrowFunction + ZEROORONE(';'),
-  ZEROORMORE(Annotation) + ZEROORMORE(AccessibilityModifier) + "set" + '=' + ArrowFunction + ZEROORONE(';'))
+  ZEROORMORE(Annotation) + ZEROORMORE(AccessibilityModifier) + "set" + '=' + ArrowFunction + ZEROORONE(';'),
+  '#' + PropertyName + ZEROORONE(TypeAnnotation) + ZEROORONE(Initializer) + ZEROORONE(';'),
+  '#' + "private" + ZEROORONE(TypeAnnotation) + ZEROORONE(Initializer) + ZEROORONE(';'))
   attr.action.%1: AddInitTo(%3, %5)
   attr.action.%1: AddType(%3, %4)
   attr.action.%1: AddModifierTo(%3, %2)
@@ -2088,6 +2090,12 @@ rule MemberVariableDeclaration: ONEOF(
   attr.action.%3,%4: AddModifier(%2)
   attr.action.%3,%4: AddModifier(%1)
   attr.action.%3,%4: BuildDecl()
+  attr.action.%5:    AddInitTo(%2, %4)
+  attr.action.%6:    BuildIdentifier(%2)
+  attr.action.%6:    AddInitTo(%4)
+  attr.action.%5,%6: AddType(%3)
+  attr.action.%5,%6: AddModifier(%1)
+  attr.action.%5,%6: BuildDecl()
 
 
 ## MemberFunctionDeclaration: AccessibilityModifieropt staticopt PropertyName CallSignature { FunctionBody } AccessibilityModifieropt staticopt PropertyName CallSignature ;

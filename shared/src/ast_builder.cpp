@@ -2155,9 +2155,21 @@ TreeNode* ASTBuilder::AddModifier() {
       return mLastTreeNode;
     }
 
-    if (!p_mod.mIsTreeNode)
-      MERROR("The modifier is not a treenode");
-    TreeNode *mod= p_mod.mData.mTreeNode;
+    TreeNode *mod = NULL;
+    if (!p_mod.mIsTreeNode) {
+      Token *token = p_mod.mData.mToken;
+      if (token->IsSeparator() && token->GetSepId()==SEP_Pound) {
+        // This is a '#' in front of class member in Javascript.
+        // This is a 'private' modifier.
+        AttrNode *an = gAttrPool.GetAttrNode(ATTR_private);
+        MASSERT(an);
+        mod = an;
+      } else {
+        MERROR("The modifier is not a treenode");
+      }
+    } else {
+      mod= p_mod.mData.mTreeNode;
+    }
 
     if (mod->IsPass()) {
       PassNode *pass = (PassNode*)mod;
