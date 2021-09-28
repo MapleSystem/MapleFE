@@ -17,12 +17,13 @@ Short/long options:
   -n | --name            Keep original names by removing "__v[0-9]*" from generated code
   -t | --treediff        Compare the AST of generated TS code with the one of original TS code
   -T | --Treediff        Same as -t/--treediff except that it disables tsc for generated TS code
+  -i | --ignore-imported Ignore all imported modules
   <file1> [<file2> ...]  Specify one or more TypeScript files to be processed
 EOF
 exit 1
 }
 CMDLINE="$0 $*"
-DOT= PRE= LIST= VIEWOP= HIGHLIGHT="cat" TSCERR= KEEP= CLEAN= NAME= TREEDIFF= TSC=yes
+DOT= PRE= LIST= VIEWOP= HIGHLIGHT="cat" TSCERR= KEEP= CLEAN= NAME= TREEDIFF= TSC=yes NOIMPORTED=
 while [ $# -gt 0 ]; do
     case $1 in
         -d|--dot)        DOT=dot;;
@@ -39,6 +40,7 @@ while [ $# -gt 0 ]; do
         -n|--name)       NAME="original" ;;
         -t|--treediff)   TREEDIFF="--emit-ts-only"; NAME="original"; TSC=yes ;;
         -T|--Treediff)   TREEDIFF="--emit-ts-only"; NAME="original"; TSC= ;;
+        -i|--ignore-imported) NOIMPORTED="--no-imported" ;;
         -*)              echo "Unknown option $1"; usage;;
         *)               LIST="$LIST $1"
     esac
@@ -89,8 +91,8 @@ for ts in $LIST; do
   if [ $? -ne 0 ]; then
     echo "MSG: Failed, test case (ts2ast)$ts"
   else
-    echo "$AST2CPP" "$ts".ast --trace=2 --emit-ts $TREEDIFF
-    out=$("$AST2CPP" "$ts".ast --trace=2 --emit-ts $TREEDIFF 2>&1)
+    echo "$AST2CPP" "$ts".ast --trace=2 --emit-ts $TREEDIFF $NOIMPORTED
+    out=$("$AST2CPP" "$ts".ast --trace=2 --emit-ts $TREEDIFF $NOIMPORTED 2>&1)
     [ $? -eq 0 ] || echo "MSG: Failed, test case (ast2cpp)$ts"
   fi
   echo "$out"
