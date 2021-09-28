@@ -26,6 +26,7 @@
 #include "gen_astload.h"
 #include "emitter.h"
 #include "cpp_emitter.h"
+#include "a2c_util.h"
 
 namespace maplefe {
 
@@ -52,25 +53,6 @@ void A2C::EmitTS() {
     std::cout << code;
   }
 }
-
-class ImportedFiles : public AstVisitor {
-  public:
-    std::vector<std::string> mFilenames;
-
-  public:
-    ImportNode *VisitImportNode(ImportNode *node) {
-      if (auto n = node->GetTarget()) {
-        if (n->IsLiteral()) {
-          LiteralNode *lit = static_cast<LiteralNode *>(n);
-          LitData data = lit->GetData();
-          std::string filename(AstDump::GetEnumLitData(data));
-          filename += ".ts.ast"s;
-          mFilenames.push_back(filename);
-        }
-      }
-      return node;
-    }
-};
 
 bool A2C::LoadImportedModules() {
   std::queue<std::string> queue;
