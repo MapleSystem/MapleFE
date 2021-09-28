@@ -1,0 +1,7 @@
+Matched 13 tokens.
+============= Module ===========
+== Sub Tree ==
+declare namespace  NS
+  js_const Decl: num
+  ts_interface: IFace { }
+

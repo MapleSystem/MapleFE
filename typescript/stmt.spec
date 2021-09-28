@@ -2188,7 +2188,7 @@ rule NamespaceElements: ONEOF(NamespaceElement,
 
 ##NamespaceElement: Statement LexicalDeclaration FunctionDeclaration GeneratorDeclaration ClassDeclaration InterfaceDeclaration TypeAliasDeclaration EnumDeclaration NamespaceDeclaration AmbientDeclaration ImportAliasDeclaration ExportNamespaceElement
 rule NamespaceElement: ONEOF(Statement,
-                             LexicalDeclaration + ';',
+                             LexicalDeclaration + ZEROORONE(';'),
                              FunctionDeclaration,
                              #GeneratorDeclaration,
                              ClassDeclaration,
