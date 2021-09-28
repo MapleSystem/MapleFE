@@ -39,6 +39,7 @@ class AST_SCP {
   ~AST_SCP() {};
 
   void ScopeAnalysis();
+
   void BuildScope();
   void RenameVar();
   void AdjustASTWithScope();
@@ -80,7 +81,12 @@ class BuildScopeVisitor : public BuildScopeBaseVisitor {
     }
   ~BuildScopeVisitor() = default;
 
+  void InitInternalTypes();
+  ClassNode *AddClass(std::string name, unsigned tyidx = 0);
+  FunctionNode *AddFunction(std::string name);
+
   void AddType(ASTScope *scope, TreeNode *node);
+  void AddTypeAndDecl(ASTScope *scope, TreeNode *node);
 
   // scope nodes
   BlockNode *VisitBlockNode(BlockNode *node);

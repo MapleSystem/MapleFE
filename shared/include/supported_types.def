@@ -17,12 +17,6 @@
 // and the parser.
 
 TYPE(None)
-TYPE(Array)
-TYPE(Object)
-TYPE(Function)  // function/lambda decl
-TYPE(Class)     // class/interface decl
-TYPE(User)      // user types
-TYPE(Merge)     // merge of two types, unexpected
 
 PRIMTYPE(Boolean)
 PRIMTYPE(Byte)
@@ -32,6 +26,13 @@ PRIMTYPE(Long)
 PRIMTYPE(Char)
 PRIMTYPE(Float)
 PRIMTYPE(Double)
+
+TYPE(Array)
+TYPE(Object)
+TYPE(Function)  // function/lambda decl
+TYPE(Class)     // class/interface decl
+TYPE(User)      // user types
+TYPE(Merge)     // merge of two types, unexpected
 
 TYPE(Void)      // Although this is not a type, it does categorize the types.
 TYPE(Null)      // The Null type. It is a type.
@@ -43,4 +44,6 @@ TYPE(Number)    // First come from JS
 TYPE(Symbol)    // First come from JS
 TYPE(Any)       // First come from JS
 
+// last entry
+TYPE(Max)
 

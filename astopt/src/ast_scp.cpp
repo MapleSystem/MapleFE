@@ -40,12 +40,67 @@ void AST_SCP::BuildScope() {
   ASTScope *scope = module->GetRootScope();
   visitor.mScopeStack.push(scope);
   visitor.mUserScopeStack.push(scope);
+
+  visitor.InitInternalTypes();
+
   module->SetScope(scope);
   visitor.Visit(module);
+
+  if (mFlags & FLG_trace_3) {
+    mHandler->GetTypeTable()->Dump();
+  }
+}
+
+void BuildScopeVisitor::InitInternalTypes() {
+  // add builtins
+  (void) AddClass("String", TY_String);
+  (void) AddClass("Number", TY_Number);
+
+  // add dummpy console.log()
+  ClassNode *console = AddClass("console");
+  FunctionNode *log = AddFunction("log");
+  console->AddMethod(log);
+}
+
+ClassNode *BuildScopeVisitor::AddClass(std::string name, unsigned tyidx) {
+  ClassNode *node = (ClassNode*)gTreePool.NewTreeNode(sizeof(ClassNode));
+  new (node) ClassNode();
+  unsigned idx = gStringPool.GetStrIdx(name);
+  node->SetStrIdx(idx);
+  node->SetTypeIdx(tyidx);
+
+  ModuleNode *module = mHandler->GetASTModule();
+  ASTScope *scope = module->GetRootScope();
+  AddTypeAndDecl(scope, node);
+  return node;
+}
+
+FunctionNode *BuildScopeVisitor::AddFunction(std::string name) {
+  FunctionNode *func = (FunctionNode*)gTreePool.NewTreeNode(sizeof(FunctionNode));
+  new (func) FunctionNode();
+  unsigned idx = gStringPool.GetStrIdx(name);
+  func->SetStrIdx(idx);
+
+  IdentifierNode *id = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
+  new (id) IdentifierNode(idx);
+  func->SetFuncName(id);
+
+  // add console and func to root scope
+  ModuleNode *module = mHandler->GetASTModule();
+  ASTScope *scope = module->GetRootScope();
+  scope->AddDecl(func);
+  id->SetScope(scope);
+  return func;
 }
 
 void BuildScopeVisitor::AddType(ASTScope *scope, TreeNode *node) {
   scope->AddType(node);
+  mHandler->GetTypeTable()->AddType(node);
+}
+
+void BuildScopeVisitor::AddTypeAndDecl(ASTScope *scope, TreeNode *node) {
+  scope->AddType(node);
+  scope->AddDecl(node);
   mHandler->GetTypeTable()->AddType(node);
 }
 

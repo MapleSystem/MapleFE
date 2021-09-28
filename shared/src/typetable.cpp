@@ -92,7 +92,9 @@ bool TypeTable::AddType(TreeNode *node) {
   if (mNodeId2TypeIdxMap.find(id) != mNodeId2TypeIdxMap.end()) {
     return false;
   }
-  mNodeId2TypeIdxMap[id] = mTypeTable.size();
+  unsigned tyidx = mTypeTable.size();
+  mNodeId2TypeIdxMap[id] = tyidx;
+  node->SetTypeIdx(tyidx);
   TypeEntry *entry = new TypeEntry(node);
   mTypeTable.push_back(entry);
   return true;
@@ -105,12 +107,13 @@ TypeEntry *TypeTable::GetTypeFromTypeIdx(unsigned idx) {
 
 void TypeTable::Dump() {
   std::cout << "===================== TypeTable =====================" << std::endl;
+  std::cout << " tid:type-name: node-kind  node-id" << std::endl;
+  std::cout << "--------------------------------" << std::endl;
   unsigned idx = 1;
   for (unsigned idx = 1; idx < mTypeTable.size(); idx++) {
     TypeEntry *entry = mTypeTable[idx];
     TreeNode *node = entry->GetType();
     std::cout << "  " << idx << " : " << node->GetName() << " : " <<
-              AstDump::GetEnumTypeId(entry->GetTypeId()) << " " <<
               AstDump::GetEnumNodeKind(node->GetKind()) << " " <<
               node->GetNodeId() << std::endl;
   }

@@ -36,10 +36,6 @@ class TypeInfer {
   explicit TypeInfer(Module_Handler *h, unsigned f) : mHandler(h), mFlags(f) {}
   ~TypeInfer() {}
 
-  void InitInternalNodes();
-  ClassNode *AddClass(std::string name);
-  FunctionNode *AddFunction(std::string name);
-
   void TypeInference();
   void CheckType();
 };
