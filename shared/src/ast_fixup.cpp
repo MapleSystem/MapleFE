@@ -108,7 +108,14 @@ IdentifierNode *FixUpVisitor::VisitIdentifierNode(IdentifierNode *node) {
 ModuleNode *FixUpVisitor::VisitModuleNode(ModuleNode *node) {
   const char* filename = node->GetFilename();
   std::filesystem::path orig = filename;
-  std::filesystem::path uniq = std::filesystem::canonical(orig);
+  std::filesystem::path uniq;
+  try {
+    uniq = std::filesystem::canonical(orig);
+  }
+  catch(std::filesystem::filesystem_error const& ex) {
+    // Use orig if std::filesystem::filesystem_error is thrown
+    uniq = orig;
+  }
   std::string p = uniq.string();
   if(p != filename) {
     const char *res = gStringPool.FindString(p.c_str());
