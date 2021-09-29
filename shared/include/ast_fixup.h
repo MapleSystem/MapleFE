@@ -47,6 +47,9 @@ class FixUpVisitor : public AstVisitor {
     // Fix up the name string of a UserTypeNode
     // Fix up literal boolean 'true' or 'false'
     IdentifierNode *VisitIdentifierNode(IdentifierNode *node);
+
+    // Update mFilename of a ModuleNode with a connonical absolute path
+    ModuleNode *VisitModuleNode(ModuleNode *node);
 };
 
 }

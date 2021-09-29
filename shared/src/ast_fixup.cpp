@@ -13,15 +13,14 @@
 * See the Mulan PSL v2 for more details.
 */
 
+#include <filesystem>
 #include "ast_fixup.h"
+#include "stringpool.h"
 
 namespace maplefe {
 
 bool FixUpVisitor::FixUp() {
-  for (unsigned i = 0; i < mASTModule->GetTreesNum(); i++ ) {
-    TreeNode *it = mASTModule->GetTree(i);
-    Visit(it);
-  }
+  Visit(mASTModule);
   return mUpdated;
 }
 
@@ -103,6 +102,20 @@ IdentifierNode *FixUpVisitor::VisitIdentifierNode(IdentifierNode *node) {
     }
   }
   return AstVisitor::VisitIdentifierNode(node);
+}
+
+// Fix up the filename of a ModuleNode
+ModuleNode *FixUpVisitor::VisitModuleNode(ModuleNode *node) {
+  const char* filename = node->GetFilename();
+  std::filesystem::path orig = filename;
+  std::filesystem::path uniq = std::filesystem::canonical(orig);
+  std::string p = uniq.string();
+  if(p != filename) {
+    const char *res = gStringPool.FindString(p.c_str());
+    node->SetFilename(res);
+    mUpdated = true;
+  }
+  return AstVisitor::VisitModuleNode(node);;
 }
 
 }
