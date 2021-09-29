@@ -1,0 +1,7 @@
+Matched 14 tokens.
+Matched 31 tokens.
+============= Module ===========
+== Sub Tree ==
+ type MyType<T> = T extends string ? T : string
+== Sub Tree ==
+ type UT<T> = MyType<T> extends string ? string : number

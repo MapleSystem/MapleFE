@@ -1588,8 +1588,9 @@ rule TypeArgumentList: ONEOF(TypeArgument,
 ## rule TypeArgument: Type
 rule TypeArgument: Type
 
-rule ConditionalType : MemberExpression + "extends" + Type + '?' + Type + ':' + Type
-  attr.action : BuildConditionalType(%1, %3, %5, %7)
+rule ConditionalType : ONEOF(MemberExpression + "extends" + Type + '?' + Type + ':' + Type,
+                             TypeReference + "extends" + Type + '?' + Type + ':' + Type)
+  attr.action.%1,%2 : BuildConditionalType(%1, %3, %5, %7)
 
 rule KeyOf : ONEOF("keyof" + Identifier,
                    "keyof" + '(' + TypeQuery + ')',
