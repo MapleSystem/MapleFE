@@ -1,0 +1,10 @@
+Matched 5 tokens.
+Matched 10 tokens.
+Matched 37 tokens.
+============= Module ===========
+== Sub Tree ==
+ type Default = "default"
+== Sub Tree ==
+ type DefaultUnknown = "unknown"
+== Sub Tree ==
+ type MyType =  {string index type:  typeof K extends Default ? string :  typeof K extends DefaultUnknown ? unknown : never }

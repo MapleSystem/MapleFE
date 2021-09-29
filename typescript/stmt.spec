@@ -1753,7 +1753,8 @@ rule TypeQuery: "typeof" + TypeQueryExpression
 ## rule TypeQueryExpression: IdentifierReference TypeQueryExpression . IdentifierName
 rule TypeQueryExpression: ONEOF(IdentifierReference,
                                 TypeQueryExpression + '.' + JSIdentifier,
-                                UnaryExpression)
+                                UnaryExpression,
+                                ConditionalType)
   attr.action.%2 : BuildField(%1, %3)
 
 ## rule ThisType: this
