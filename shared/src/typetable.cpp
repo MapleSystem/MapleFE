@@ -60,7 +60,7 @@ TypeEntry::TypeEntry(TreeNode *node) {
 
 TypeTable::TypeTable() {
   // insert a dummy so type index starting from 1
-  mTypeTable.push_back(NULL);
+  // mTypeTable.push_back(NULL);
   AddPrimAndBuiltinTypes();
 }
 
@@ -74,7 +74,7 @@ TreeNode *TypeTable::CreatePrimType(std::string name, TypeId tyid) {
   new (node) PrimTypeNode();
   node->SetStrIdx(stridx);
   node->SetPrimType(tyid);
-  node->SetTypeId(tyid);
+  node->SetTypeId(TY_Class);
   return node;
 }
 
@@ -115,9 +115,14 @@ void TypeTable::AddPrimAndBuiltinTypes() {
   return;
 }
 
-TypeEntry *TypeTable::GetTypeFromTypeIdx(unsigned idx) {
+TypeEntry *TypeTable::GetTypeEntryFromTypeIdx(unsigned idx) {
   MASSERT(idx < mTypeTable.size() && "type index out of range");
   return mTypeTable[idx];
+}
+
+TreeNode *TypeTable::GetTypeFromTypeIdx(unsigned idx) {
+  MASSERT(idx < mTypeTable.size() && "type index out of range");
+  return mTypeTable[idx]->GetType();
 }
 
 void TypeTable::Dump() {

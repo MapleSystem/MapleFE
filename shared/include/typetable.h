@@ -62,7 +62,8 @@ public:
   TreeNode *CreateBuiltinType(std::string name, TypeId tyid);
   void AddPrimAndBuiltinTypes();
   bool AddType(TreeNode *node);
-  TypeEntry *GetTypeFromTypeIdx(unsigned idx);
+  TypeEntry *GetTypeEntryFromTypeIdx(unsigned idx);
+  TreeNode *GetTypeFromTypeIdx(unsigned idx);
   void Dump();
 };
 

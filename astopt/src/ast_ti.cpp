@@ -71,13 +71,17 @@ IdentifierNode *BuildIdNodeToDeclVisitor::VisitIdentifierNode(IdentifierNode *no
 #undef  TYPE
 #undef  PRIMTYPE
 #define TYPE(T)
-#define PRIMTYPE(T) case TY_##T: return true;
+#define PRIMTYPE(T) case TY_##T:
 bool TypeInferVisitor::IsPrimTypeId(TypeId tid) {
+  bool result = false;
   switch (tid) {
 #include "supported_types.def"
-    default: return false;
+      result = true;
+      break;
+    default:
+      break;
   }
-  return false;
+  return result;
 }
 
 TypeId TypeInferVisitor::MergeTypeId(TypeId tia, TypeId tib) {
@@ -87,6 +91,10 @@ TypeId TypeInferVisitor::MergeTypeId(TypeId tia, TypeId tib) {
 
   if (tib == TY_Object || tib == TY_User) {
     return tib;
+  }
+
+  if ((tia == TY_Function && tib == TY_Class) || (tib == TY_Function && tia == TY_Class)) {
+    return TY_None;
   }
 
   // tia != tib && tib != TY_None
@@ -170,7 +178,7 @@ TypeId TypeInferVisitor::MergeTypeId(TypeId tia, TypeId tib) {
 }
 
 void TypeInferVisitor::SetTypeId(TreeNode *node, TypeId tid) {
-  if (node && node->GetTypeId() != tid) {
+  if (tid != TY_None && node && node->GetTypeId() != tid) {
     if (mFlags & FLG_trace_3) {
       std::cout << " NodeId : " << node->GetNodeId() << " Set TypeId : "
                 << AstDump::GetEnumTypeId(node->GetTypeId()) << " --> "
@@ -325,7 +333,7 @@ void TypeInferVisitor::UpdateTypeUseNode(TreeNode *target, TreeNode *input) {
     case TY_Object:
     case TY_Function: {
       TypeId merged = MergeTypeId(tid, iid);
-      if (merged != tid) {
+      if (merged != tid && merged != TY_None) {
         SetTypeId(target, merged);
         SetUpdated();
       }
@@ -396,9 +404,11 @@ void TypeInferVisitor::UpdateArrayElemTypeIdMap(TreeNode *node, TypeId tid) {
   }
 }
 
-void TypeInferVisitor::UpdateVarTypeWithInit(TreeNode *var, TreeNode *init) {
+// return true if identifier is constructor
+bool TypeInferVisitor::UpdateVarTypeWithInit(TreeNode *var, TreeNode *init) {
+  bool result = var->IsFunction();
   if (!var->IsIdentifier()) {
-    return;
+    return result;
   }
   IdentifierNode *idnode = static_cast<IdentifierNode *>(var);
   TreeNode *type = idnode->GetType();
@@ -417,12 +427,13 @@ void TypeInferVisitor::UpdateVarTypeWithInit(TreeNode *var, TreeNode *init) {
       }
     } else if (init->IsIdentifier()) {
       TreeNode *decl = mHandler->FindDecl(static_cast<IdentifierNode *>(init));
-      if (decl && decl->IsClass()) {
-        unsigned stridx = gStringPool.GetStrIdx("Function");
-        UserTypeNode *utype = mHandler->GetAST()->CreateUserTypeNode(stridx, init->GetScope());
+      if (decl && (decl->IsClass() || decl->GetTypeIdx() < (unsigned)TY_Max)) {
+        TreeNode *utype = mHandler->GetTypeTable()->GetTypeFromTypeIdx((unsigned)TY_Function);
         utype->SetParent(idnode);
         idnode->SetType(utype);
+        idnode->SetTypeId(TY_Function);
         SetUpdated();
+        result = true;
       }
     } else if (init->IsArrayLiteral()) {
       TypeId tid = GetArrayElemTypeId(init);
@@ -459,6 +470,7 @@ void TypeInferVisitor::UpdateVarTypeWithInit(TreeNode *var, TreeNode *init) {
       }
     }
   }
+  return result;
 }
 
 bool TypeInferVisitor::IsArray(TreeNode *node) {
@@ -858,7 +870,11 @@ DeclNode *TypeInferVisitor::VisitDeclNode(DeclNode *node) {
     // normal cases
     if(var->IsIdentifier()) {
       merged = MergeTypeId(merged, var->GetTypeId());
-      UpdateVarTypeWithInit(var, init);
+      bool isFunc = UpdateVarTypeWithInit(var, init);
+      if (isFunc) {
+        UpdateTypeId(node, var->GetTypeId());
+        return node;
+      }
     } else {
       // BindingPatternNode
     }
@@ -1019,12 +1035,8 @@ IdentifierNode *TypeInferVisitor::VisitIdentifierNode(IdentifierNode *node) {
   }
 
   if (decl) {
-    // node itself is part of decl
-    if (decl == parent) {
-      if (node->GetType()) {
-        UpdateTypeId(node, node->GetType());
-      }
-    } else {
+    // check node itself is part of decl
+    if (decl != parent) {
       UpdateTypeId(node, decl);
     }
   } else {
@@ -1048,7 +1060,7 @@ InterfaceNode *TypeInferVisitor::VisitInterfaceNode(InterfaceNode *node) {
 NewNode *TypeInferVisitor::VisitNewNode(NewNode *node) {
   (void) AstVisitor::VisitNewNode(node);
   if (node->GetId()) {
-    UpdateTypeId(node, node->GetId()->GetTypeId());
+    UpdateTypeId(node, TY_Class);
   }
   return node;
 }

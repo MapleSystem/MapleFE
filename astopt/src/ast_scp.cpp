@@ -52,9 +52,17 @@ void AST_SCP::BuildScope() {
 }
 
 void BuildScopeVisitor::InitInternalTypes() {
-  // add builtins
-  (void) AddClass("String", TY_String);
-  (void) AddClass("Number", TY_Number);
+  // add prim and builtin typesto root scope
+  ModuleNode *module = mHandler->GetASTModule();
+  ASTScope *scope = module->GetRootScope();
+  for (unsigned i = 0; i <= (unsigned)TY_Max; i++) {
+    TreeNode *node = mHandler->GetTypeTable()->GetTypeFromTypeIdx(i);
+    node->SetScope(scope);
+    if (node->IsUserType()) {
+      static_cast<UserTypeNode *>(node)->GetId()->SetScope(scope);
+    }
+    AddTypeAndDecl(scope, node);
+  }
 
   // add dummpy console.log()
   ClassNode *console = AddClass("console");

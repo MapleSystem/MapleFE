@@ -99,7 +99,7 @@ class TypeInferVisitor : public TypeInferBaseVisitor {
   void UpdateTypeUseNode(TreeNode *target, TreeNode *input);
   void UpdateArgArrayDecls(unsigned nid, TypeId tid);
   void UpdateArrayElemTypeIdMap(TreeNode *node, TypeId tid);
-  void UpdateVarTypeWithInit(TreeNode *var, TreeNode *init);
+  bool UpdateVarTypeWithInit(TreeNode *var, TreeNode *init);
   TypeId GetArrayElemTypeId(TreeNode *node);
 
   TypeId MergeTypeId(TypeId tia, TypeId tib);
