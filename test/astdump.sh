@@ -81,6 +81,7 @@ PROCID=$$
 rm -rf *$PROCID-dump.out $PROCID-summary.out *$PROCID.out.ts ts2cxx-lock-*
 cnt=0
 for ts in $LIST; do
+  ts=$(sed 's|^\./||' <<< "$ts")
   echo $((++cnt)): $ts
   AcquireLock ts2cxx for_$(basename $ts) $(nproc)
   (if true; then
@@ -132,7 +133,7 @@ for ts in $LIST; do
       fi > $ts.orig
       $TS2AST $T
       if [ $? -eq 0 ]; then
-        $AST2CPP $T.ast $TREEDIFF | sed -n '/^AstDump:/,/^}/p' | sed -e "s|$T|$ts.tmp.ts|" \
+        $AST2CPP $T.ast $TREEDIFF | sed -n '/^AstDump:/,/^}/p' | sed -e "s|/$T|/$ts.tmp.ts|" \
           -e 's/\(mStrIdx: unsigned int, \)[0-9]* =>/\1=>/'
       else
         E="$E,ts2ast"

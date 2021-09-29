@@ -219,6 +219,8 @@ std::string Emitter::EmitFunctionNode(FunctionNode *node) {
   pre += accessor;
 
   std::string str;
+  if (node->IsConstructor())
+    str = "constructor "s;
   bool has_name;
   if(TreeNode* name = node->GetFuncName()) {
     std::string s = EmitTreeNode(name);
@@ -1608,8 +1610,6 @@ std::string Emitter::EmitClassNode(ClassNode *node) {
       std::string func = EmitFunctionNode(n);
       if (func.substr(0, 9) == "function ")
         func = func.substr(9);
-      if (func.substr(0, 11) != "constructor")
-        func = "constructor "s + func;
       func = Clean(func);
       str += func.back() == '}' ? func + "\n"s : func + ";\n"s;
     }
