@@ -407,6 +407,7 @@ IdentifierNode *AST_AST::CreateIdentifierNode(unsigned stridx) {
 
 UserTypeNode *AST_AST::CreateUserTypeNode(unsigned stridx, ASTScope *scope) {
   IdentifierNode *node = CreateIdentifierNode(stridx);
+  node->SetTypeId(TY_Class);
   if (scope) {
     node->SetScope(scope);
   }
@@ -414,14 +415,17 @@ UserTypeNode *AST_AST::CreateUserTypeNode(unsigned stridx, ASTScope *scope) {
   UserTypeNode *utype = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
   new (utype) UserTypeNode(node);
   utype->SetStrIdx(stridx);
+  utype->SetTypeId(TY_Class);
   node->SetParent(utype);
   return utype;
 }
 
 UserTypeNode *AST_AST::CreateUserTypeNode(IdentifierNode *node) {
+  node->SetTypeId(TY_Class);
   UserTypeNode *utype = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
   new (utype) UserTypeNode(node);
   utype->SetStrIdx(node->GetStrIdx());
+  utype->SetTypeId(TY_Class);
   node->SetParent(utype);
   return utype;
 }
