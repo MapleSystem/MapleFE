@@ -26,14 +26,17 @@
 
 namespace maplefe {
 
-// A helper function to get the target filename of an ImportNode
-std::string GetTargetFilename(ImportNode *node);
-
 //  To collect all filenames for imported modules
 class ImportedFiles : public AstVisitor {
   public:
+    ModuleNode              *mModule;
     std::vector<std::string> mFilenames;
   public:
+    ImportedFiles(ModuleNode *m) : mModule(m) {}
+
+    // A helper function to get the target filename of an ImportNode
+    std::string GetTargetFilename(ImportNode *node);
+
     ImportNode *VisitImportNode(ImportNode *node);
 };
 

@@ -13,12 +13,13 @@
 * See the Mulan PSL v2 for more details.
 */
 
+#include <filesystem>
 #include "a2c_util.h"
 #include "gen_astdump.h"
 
 namespace maplefe {
 
-std::string GetTargetFilename(ImportNode *node) {
+std::string ImportedFiles::GetTargetFilename(ImportNode *node) {
   std::string filename;
   if (auto n = node->GetTarget()) {
     if (n->IsLiteral()) {
@@ -26,6 +27,17 @@ std::string GetTargetFilename(ImportNode *node) {
       LitData data = lit->GetData();
       filename = AstDump::GetEnumLitData(data);
       filename += ".ts.ast"s;
+      if(filename.front() != '/') {
+        std::filesystem::path p = mModule->GetFilename();
+        try {
+          p = std::filesystem::canonical(p.parent_path() / filename);
+          filename = p.string();
+        }
+        catch(std::filesystem::filesystem_error const& ex) {
+          // Ignore std::filesystem::filesystem_error exception
+          // keep filename without converting it to a cannonical path
+        }
+      }
     }
   }
   return filename;

@@ -60,7 +60,7 @@ bool A2C::LoadImportedModules() {
   for (HandlerIndex i = 0; i < size; i++) {
     Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
     ModuleNode *module = handler->GetASTModule();
-    ImportedFiles imported;
+    ImportedFiles imported(module);
     imported.VisitTreeNode(module);
     for(const auto &e: imported.mFilenames)
       queue.push(e);
@@ -85,7 +85,7 @@ bool A2C::LoadImportedModules() {
       // add mod to the vector
       while(mod) {
         mASTHandler->AddModule(mod);
-        ImportedFiles imported;
+        ImportedFiles imported(mod);
         imported.VisitTreeNode(mod);
         for(const auto &e: imported.mFilenames)
           queue.push(e);
