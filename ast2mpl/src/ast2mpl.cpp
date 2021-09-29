@@ -22,8 +22,8 @@
 namespace maplefe {
 
 A2M::A2M(ModuleNode *m) : mASTModule(m) {
-  mFileName = mASTModule->GetFileName();
-  mMirModule = new maple::MIRModule(mFileName);
+  mFilename = mASTModule->GetFilename();
+  mMirModule = new maple::MIRModule(mFilename);
   maple::theMIRModule = mMirModule;
   mMirBuilder = new FEMIRBuilder(mMirModule);
   mFieldData = new FieldData();
@@ -48,11 +48,11 @@ void A2M::Init() {
   mMirModule->SetSrcLang(maple::kSrcLangJava);
 
   // setup INFO_filename
-  maple::GStrIdx idx = maple::GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(mFileName);
+  maple::GStrIdx idx = maple::GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(mFilename);
   SET_INFO_PAIR(mMirModule, "INFO_filename", idx.GetIdx(), true);
 
   // add to src file list
-  std::string str(mFileName);
+  std::string str(mFilename);
   size_t pos = str.rfind('/');
   if (pos != std::string::npos) {
     idx = maple::GlobalTables::GetStrTable().GetOrCreateStrIdxFromName(str.substr(pos+1));

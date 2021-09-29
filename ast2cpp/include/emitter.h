@@ -40,7 +40,7 @@ public:
   std::string Emit(const char *title);
   std::string GetEnding(TreeNode *n);
   std::string Clean(std::string &s);
-  std::string GetBaseFileName();
+  std::string GetBaseFilename();
   std::string GetModuleName(const char *p = nullptr);
 
   ModuleNode *GetASTModule() { return mASTModule; }

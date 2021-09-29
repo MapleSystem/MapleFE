@@ -62,8 +62,8 @@ std::string CppDef::EmitModuleNode(ModuleNode *node) {
   if (node == nullptr)
     return std::string();
   std::string name = GetModuleName();
-  std::string str("// TypeScript filename: "s + node->GetFileName() + "\n"s);
-  str += "#include <iostream>\n#include \""s + GetBaseFileName() + ".h\"\n\n"s;
+  std::string str("// TypeScript filename: "s + node->GetFilename() + "\n"s);
+  str += "#include <iostream>\n#include \""s + GetBaseFilename() + ".h\"\n\n"s;
 
   // definition of default class constructors.
   for (unsigned i = 0; i < node->GetTreesNum(); ++i) {

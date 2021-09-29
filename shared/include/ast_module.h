@@ -33,7 +33,7 @@ enum SrcLang {
 // The module is a member of class Parser.
 class ModuleNode : public TreeNode {
 public:
-  const char              *mFileName;
+  const char              *mFilename;
   PackageNode             *mPackage;
   SmallVector<ImportNode*> mImports;
 public:
@@ -47,8 +47,8 @@ public:
   ModuleNode();
   ~ModuleNode();
 
-  void        SetFileName(const char *f) {mFileName = f;}
-  const char *GetFileName() {return mFileName;}
+  void        SetFilename(const char *f) {mFilename = f;}
+  const char *GetFilename() {return mFilename;}
 
   void         SetPackage(PackageNode *p);
   PackageNode *GetPackage() {return mPackage;};

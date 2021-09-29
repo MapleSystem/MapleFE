@@ -70,7 +70,7 @@ class Module_Handler {
   TypeTable    *mTypeTable;
   AST_CFA      *mCFA;
   AST_DFA      *mDFA;
-  const char   *mOutputFileName;
+  const char   *mOutputFilename;
   unsigned      mFlags;
   std::unordered_map<unsigned, CfgBB *> mNodeId2BbMap;
 
@@ -105,8 +105,8 @@ class Module_Handler {
   void ControlFlowAnalysis();
   void DataFlowAnalysis();
 
-  const char *GetOutputFileName()          {return mOutputFileName;}
-  void SetOutputFileName(const char *name) {mOutputFileName = name;}
+  const char *GetOutputFilename()          {return mOutputFilename;}
+  void SetOutputFilename(const char *name) {mOutputFilename = name;}
 
   void SetASTHandler(AST_Handler *h) {mASTHandler = h;}
   AST_Handler *GetASTHandler()       {return mASTHandler;}

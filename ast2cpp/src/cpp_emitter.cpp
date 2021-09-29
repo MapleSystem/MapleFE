@@ -28,7 +28,7 @@ bool CppEmitter::EmitCxxFiles() {
     CppDecl decl(handler);
     { // Emit C++ header file
       std::string decl_code = decl.Emit();
-      std::string fn = decl.GetBaseFileName() + ".h"s;
+      std::string fn = decl.GetBaseFilename() + ".h"s;
       std::ofstream out(fn.c_str(), std::ofstream::out);
       out << decl_code;
       out.close();
@@ -40,7 +40,7 @@ bool CppEmitter::EmitCxxFiles() {
     { // Emit C++ implementation file
       CppDef def(handler, decl);
       std::string def_code = def.Emit();
-      std::string fn = def.GetBaseFileName() + ".cpp"s;
+      std::string fn = def.GetBaseFilename() + ".cpp"s;
       std::ofstream out(fn.c_str(), std::ofstream::out);
       out << def_code;
       out.close();

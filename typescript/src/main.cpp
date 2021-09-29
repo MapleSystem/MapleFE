@@ -112,7 +112,7 @@ int main (int argc, char *argv[]) {
   maplefe::AstBuffer &ast_buf = saveAst.GetAstBuf();
 
   std::ofstream ofs;
-  std::string fname(module->GetFileName());
+  std::string fname(module->GetFilename());
   fname += ".ast";
   ofs.open(fname, std::ofstream::out);
   const char *addr = (const char *)(&(ast_buf[0]));

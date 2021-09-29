@@ -773,7 +773,7 @@ bool PutNode(TreeNode *n) {{
     if(tid != "TY_None") *mOs << "<" << static_cast<char>(std::tolower(tid[3])) << tid.substr(4) << ">\\\\n";
     switch(n->GetKind()) {{
       case NK_Module:    {{
-                           auto fn = static_cast<ModuleNode *>(n)->GetFileName();
+                           auto fn = static_cast<ModuleNode *>(n)->GetFilename();
                            if(auto p = std::strrchr(fn, '/'))
                              fn = p + 1;
                            *mOs << fn << "\\\\n" << mTitle << "\\",shape=\\"box"; break;
@@ -929,7 +929,7 @@ public:
 
 std::string {gen_args2}(const char *title);
 std::string Clean(std::string &s);
-std::string GetBaseFileName();
+std::string GetBaseFilename();
 std::string GetModuleName(const char *p = nullptr);
 
 ModuleNode *GetASTModule() {{ return mASTModule; }}

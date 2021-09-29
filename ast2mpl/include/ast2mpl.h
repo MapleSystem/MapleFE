@@ -48,7 +48,7 @@ enum bool3 {
 
 class A2M {
 private:
-  const char *mFileName;
+  const char *mFilename;
   ModuleNode *mASTModule;
   bool mTraceA2m;
   FEMIRBuilder *mMirBuilder;

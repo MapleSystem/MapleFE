@@ -71,8 +71,8 @@ std::string Emitter::Clean(std::string &s) {
   return s;
 }
 
-std::string Emitter::GetBaseFileName() {
-  std::string str(mASTModule->GetFileName());
+std::string Emitter::GetBaseFilename() {
+  std::string str(mASTModule->GetFilename());
   auto len = str.length();
   if(len >= 3 && str.substr(len - 3) == ".ts")
     return str.erase(len - 3);
@@ -80,7 +80,7 @@ std::string Emitter::GetBaseFileName() {
 }
 
 std::string Emitter::GetModuleName(const char *p) {
-  std::string str = p ? p : GetBaseFileName();
+  std::string str = p ? p : GetBaseFilename();
   size_t pos = str.rfind("/", std::string::npos);
   str = pos == std::string::npos ? str : str.substr(pos);
   for (auto &c : str)
@@ -462,7 +462,7 @@ std::string Emitter::EmitDeclareNode(DeclareNode *node) {
     if (auto n = node->GetDeclAtIndex(0)) {
       std::string s = EmitTreeNode(n);
       if (n->IsModule()) {
-        s = "module \""s + static_cast<ModuleNode *>(n)->GetFileName()
+        s = "module \""s + static_cast<ModuleNode *>(n)->GetFilename()
           + "\" {\n"s + s + "}\n"s;
       }
       str += "declare "s + s;
@@ -1850,7 +1850,7 @@ std::string Emitter::EmitModuleNode(ModuleNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str("// Filename: "s);
-  str += node->GetFileName() + "\n"s;
+  str += node->GetFilename() + "\n"s;
   //str += AstDump::GetEnumSrcLang(node->GetSrcLang());
   /*
   if (auto n = node->GetPackage()) {

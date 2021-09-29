@@ -189,7 +189,7 @@ Parser::Parser(const char *name) : filename(name) {
   const std::string file(name);
 
   mASTModule = new (gTreePool.NewTreeNode(sizeof(ModuleNode))) ModuleNode();
-  mASTModule->SetFileName(name);
+  mASTModule->SetFilename(name);
   mASTBuilder = new ASTBuilder(mASTModule);
   gPrimTypePool.Init();
 

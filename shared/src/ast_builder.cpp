@@ -210,13 +210,13 @@ TreeNode* ASTBuilder::BuildModule() {
     TreeNode *tree = p_a.mData.mTreeNode;
     if (tree->IsIdentifier()) {
       const char *name = tree->GetName();
-      n->SetFileName(name);
+      n->SetFilename(name);
     } else if (tree->IsLiteral()) {
       LiteralNode *lit = (LiteralNode*)tree;
       LitData data = lit->GetData();
       MASSERT(data.mType == LT_StringLiteral);
       const char *name = gStringPool.GetStringFromStrIdx(data.mData.mStrIdx);
-      n->SetFileName(name);
+      n->SetFilename(name);
     } else {
       MERROR("Unsupported module name.");
     }

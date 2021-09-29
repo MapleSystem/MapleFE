@@ -53,7 +53,7 @@ HandlerIndex AST_Handler::GetHandlerIndex(const char *filename) {
 }
 
 bool AST_Handler::AddModule(ModuleNode *m) {
-  const char *filename = m->GetFileName();
+  const char *filename = m->GetFilename();
   if (mModuleHandlerMap.find(filename) != mModuleHandlerMap.end())
     return false;
   mModuleHandlerMap[filename] = mModuleHandlers.GetNum();
