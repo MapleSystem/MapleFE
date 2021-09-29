@@ -61,30 +61,35 @@ TypeEntry::TypeEntry(TreeNode *node) {
 TypeTable::TypeTable() {
   // insert a dummy so type index starting from 1
   mTypeTable.push_back(NULL);
-  AddPrimTypes();
+  AddPrimAndBuiltinTypes();
 }
 
 TypeTable::~TypeTable() {
   mTypeTable.clear();
 }
 
-#undef  TYPE
-#undef  PRIMTYPE
-#define TYPE(T)
-#define PRIMTYPE(T) \
- stridx = gStringPool.GetStrIdx(#T); \
- node = (PrimTypeNode*)gTreePool.NewTreeNode(sizeof(PrimTypeNode)); \
- new (node) PrimTypeNode(); \
- node->SetPrimType(TY_##T); \
- node->SetTypeId(TY_##T); \
- node->SetStrIdx(stridx); \
- AddType(node);
-void TypeTable::AddPrimTypes() {
-  unsigned stridx;
-  PrimTypeNode *node;
-  TypeEntry *entry;
-#include "supported_types.def"
-  return;
+TreeNode *TypeTable::CreatePrimType(std::string name, TypeId tyid) {
+  unsigned stridx = gStringPool.GetStrIdx(name);
+  PrimTypeNode *node = (PrimTypeNode*)gTreePool.NewTreeNode(sizeof(PrimTypeNode));
+  new (node) PrimTypeNode();
+  node->SetStrIdx(stridx);
+  node->SetPrimType(tyid);
+  node->SetTypeId(tyid);
+  return node;
+}
+
+TreeNode *TypeTable::CreateBuiltinType(std::string name, TypeId tyid) {
+  unsigned stridx = gStringPool.GetStrIdx(name);
+  IdentifierNode *node = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
+  new (node) IdentifierNode(stridx);
+  node->SetTypeId(TY_Class);
+
+  UserTypeNode *utype = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
+  new (utype) UserTypeNode(node);
+  utype->SetStrIdx(stridx);
+  utype->SetTypeId(TY_Class);
+  node->SetParent(utype);
+  return utype;
 }
 
 bool TypeTable::AddType(TreeNode *node) {
@@ -98,6 +103,16 @@ bool TypeTable::AddType(TreeNode *node) {
   TypeEntry *entry = new TypeEntry(node);
   mTypeTable.push_back(entry);
   return true;
+}
+
+#undef  TYPE
+#undef  PRIMTYPE
+#define TYPE(T)     node = CreateBuiltinType(#T, TY_##T); AddType(node);
+#define PRIMTYPE(T) node = CreatePrimType( #T, TY_##T); AddType(node);
+void TypeTable::AddPrimAndBuiltinTypes() {
+  TreeNode *node;
+#include "supported_types.def"
+  return;
 }
 
 TypeEntry *TypeTable::GetTypeFromTypeIdx(unsigned idx) {

@@ -58,7 +58,9 @@ public:
   TypeTable();
   ~TypeTable();
 
-  void AddPrimTypes();
+  TreeNode *CreatePrimType(std::string name, TypeId tyid);
+  TreeNode *CreateBuiltinType(std::string name, TypeId tyid);
+  void AddPrimAndBuiltinTypes();
   bool AddType(TreeNode *node);
   TypeEntry *GetTypeFromTypeIdx(unsigned idx);
   void Dump();
