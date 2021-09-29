@@ -2060,6 +2060,7 @@ rule ConstructorDeclaration: ONEOF(
   ZEROORONE(AccessibilityModifier) + "constructor" + '(' + ZEROORONE(ParameterList) + ')' + ';')
   attr.action.%1,%2 : BuildConstructor()
   attr.action.%1,%2 : AddParams(%4)
+  attr.action.%1,%2 : AddModifier(%1)
   attr.action.%1 : AddFunctionBody(%7)
 
 ## PropertyMemberDeclaration: MemberVariableDeclaration MemberFunctionDeclaration MemberAccessorDeclaration

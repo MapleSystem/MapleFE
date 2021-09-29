@@ -1,0 +1,15 @@
+Matched 18 tokens.
+============= Module ===========
+== Sub Tree ==
+declare namespace  NS
+  class  Klass
+  Fields: 
+    n
+  Instance Initializer: 
+  Constructors: 
+    constructor  ()  throws: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+
