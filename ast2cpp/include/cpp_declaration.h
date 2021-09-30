@@ -23,9 +23,7 @@ namespace maplefe {
 
 class CppDecl : public Emitter {
 public:
-  Module_Handler *mHandler;
-
-  CppDecl(Module_Handler *h) : mHandler(h), Emitter(h->GetASTModule()) {}
+  CppDecl(Module_Handler *h) : Emitter(h) {}
   CppDecl() : CppDecl(nullptr) {}
 
   std::string Emit() {

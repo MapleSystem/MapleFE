@@ -48,7 +48,7 @@ void A2C::EmitTS() {
     AstGraph graph(module);
     graph.DumpGraph("After BuildCFG()", &std::cout);
     std::cout << "============= Emitter ===========" << std::endl;
-    maplefe::Emitter emitter(module);
+    maplefe::Emitter emitter(handler);
     std::string code = emitter.Emit("Convert AST to TypeScript code");
     std::cout << code;
   }
@@ -196,8 +196,7 @@ int A2C::ProcessAST() {
     HandlerIndex size = mASTHandler->mModuleHandlers.GetNum();
     for (HandlerIndex i = 0; i < size; i++) {
       Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
-      ModuleNode *module = handler->GetASTModule();
-      maplefe::Emitter emitter(module);
+      maplefe::Emitter emitter(handler);
       std::string code = emitter.Emit("Convert AST to TypeScript code");
       std::cout << code;
     }

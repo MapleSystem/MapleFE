@@ -24,10 +24,9 @@ namespace maplefe {
 
 class CppDef : public Emitter {
 public:
-  Module_Handler *mHandler;
   bool            isInit;
   CppDecl        &mCppDecl;
-  CppDef(Module_Handler *h, CppDecl &d) : mHandler(h), mCppDecl(d), Emitter(h->GetASTModule()) {}
+  CppDef(Module_Handler *h, CppDecl &d) : mCppDecl(d), Emitter(h) {}
 
   std::string Emit() {
     return EmitTreeNode(GetASTModule());

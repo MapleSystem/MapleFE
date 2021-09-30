@@ -20,6 +20,7 @@
 #include "ast_attr.h"
 #include "ast_module.h"
 #include "ast_type.h"
+#include "ast_handler.h"
 
 #include "gen_astdump.h"
 using namespace std::string_literals;
@@ -29,13 +30,13 @@ namespace maplefe {
 class Emitter {
 
 protected:
-  using Precedence = char;
+  using Precedence = unsigned char;
   Precedence mPrecedence;
 
-  ModuleNode *mASTModule;
+  Module_Handler *mHandler;
 
 public:
-  Emitter(ModuleNode *m) : mASTModule(m) {}
+  Emitter(Module_Handler *h) : mHandler(h) {}
 
   std::string Emit(const char *title);
   std::string GetEnding(TreeNode *n);
@@ -43,8 +44,7 @@ public:
   std::string GetBaseFilename();
   std::string GetModuleName(const char *p = nullptr);
 
-  ModuleNode *GetASTModule() { return mASTModule; }
-  void SetASTModule(ModuleNode *m) { mASTModule = m; }
+  ModuleNode *GetASTModule() { return mHandler->GetASTModule(); }
 
   virtual std::string EmitAnnotationNode(AnnotationNode *node);
   virtual std::string EmitAsTypeNode(AsTypeNode *node);
