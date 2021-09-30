@@ -61,6 +61,8 @@ ACTION(BuildBlock)
 ACTION(AddToBlock)
 ACTION(AddSyncToBlock)             // Java allows a sync obj to block
 
+ACTION(BuildAwait)
+
 ACTION(BuildCast)
 ACTION(BuildParenthesis)
 ACTION(BuildBinaryOperation)

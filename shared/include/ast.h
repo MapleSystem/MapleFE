@@ -2084,6 +2084,7 @@ private:
   TreeNode              *mBody;         // the body could be an expression, or block.
                                         // NULL as TS FunctionType and ConstructorType
   SmallVector<TypeParameterNode*> mTypeParameters;
+  SmallVector<AttrId>    mAttrs;
 public:
   LambdaNode() : TreeNode(NK_Lambda),
     mBody(NULL), mProperty(LP_JSArrowFunction), mType(NULL) {}
@@ -2109,6 +2110,12 @@ public:
   void     AddTypeParameter(TreeNode *n);
   TypeParameterNode* GetTypeParameterAtIndex(unsigned i) {return mTypeParameters.ValueAtIndex(i);}
   void               SetTypeParameterAtIndex(unsigned i, TypeParameterNode* n) {*(mTypeParameters.RefAtIndex(i)) = n;}
+
+  // Attributes related
+  unsigned GetAttrsNum() const        {return mAttrs.GetNum();}
+  void     AddAttr(AttrId a)          {mAttrs.PushBack(a);}
+  AttrId   GetAttrAtIndex(unsigned i) {return mAttrs.ValueAtIndex(i);}
+  void     SetAttrAtIndex(unsigned i, AttrId n) {*(mAttrs.RefAtIndex(i)) = n;}
 
   void Release() {mParams.Release();}
   void Dump(unsigned);

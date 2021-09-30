@@ -4116,4 +4116,26 @@ TreeNode* ASTBuilder::BuildInfer() {
   return mLastTreeNode;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+//                       Await
+////////////////////////////////////////////////////////////////////////////////
+
+// For first parameter has to be an operator.
+TreeNode* ASTBuilder::BuildAwait() {
+  if (mTrace)
+    std::cout << "In BuildAwait" << std::endl;
+
+  MASSERT(mParams.size() == 1);
+  Param p_a = mParams[0];
+  MASSERT(!p_a.mIsEmpty && p_a.mIsTreeNode);
+  TreeNode *expr = p_a.mData.mTreeNode;
+
+  AwaitNode *n = (AwaitNode*)gTreePool.NewTreeNode(sizeof(AwaitNode));
+  new (n) AwaitNode();
+  n->SetExpr(expr);
+
+  mLastTreeNode = n;
+  return n;
+}
+
 }

@@ -500,8 +500,11 @@ rule ArgumentList : ONEOF(AssignmentExpression,
 rule LeftHandSideExpression : ONEOF(NewExpression,
                                     CallExpression,
                                     "..." + NewExpression,
-                                    "..." + CallExpression)
+                                    "..." + CallExpression,
+                                    "await" + CallExpression,
+                                    "await" + NewExpression)
   attr.action.%3,%4 : SetIsRest(%2)
+  attr.action.%5,%6 : BuildAwait(%2)
 
 ##-----------------------------------
 ##rule PostfixExpression[Yield] :
@@ -1282,11 +1285,12 @@ rule FunctionStatementList : ZEROORONE(StatementList)
 #     to CallSignature in Typescript. I inline CallSignature here.
 rule ArrowFunction : ONEOF(
   BindingIdentifier + "=>" + ConciseBody,
-  ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + "=>" + ConciseBody)
+  ZEROORONE(AccessibilityModifier) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + "=>" + ConciseBody)
   attr.action.%1 : BuildLambda(%1, %3)
-  attr.action.%2 : BuildLambda(%3, %7)
-  attr.action.%2 : AddType(%5)
-  attr.action.%2 : AddTypeGenerics(%1)
+  attr.action.%2 : BuildLambda(%4, %8)
+  attr.action.%2 : AddType(%6)
+  attr.action.%2 : AddTypeGenerics(%2)
+  attr.action.%2 : AddModifier(%1)
   attr.action.%1,%2 : SetArrowFunction()
 
 ## See 14.2

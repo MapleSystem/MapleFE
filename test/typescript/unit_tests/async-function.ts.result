@@ -1,0 +1,11 @@
+Matched 10 tokens.
+Matched 36 tokens.
+============= Module ===========
+== Sub Tree ==
+func  func()  throws: 
+  return "done"
+
+== Sub Tree ==
+() -> js_const Decl: val= await func()
+console.log(val)
+()
