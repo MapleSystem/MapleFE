@@ -21,6 +21,20 @@ const t2crt::JS_Val undefined = { 0, t2crt::TY_Undef, false };
 
 namespace t2crt {
 
+bool InstanceOf(JS_Val val, Function* ctor) {
+  if (val.type != TY_Object || val.x.val_obj == nullptr || ctor == nullptr)
+    return false;
+
+  Object* p = val.x.val_obj->__proto__;
+  while (p) {
+    if (p == ctor->prototype)
+      return true;
+    else
+      p = p->__proto__;
+  }
+  return false;
+}
+
 // Generate DOT graph output to show object inheritance with
 // constructor, prototype chain and prototype property linkages
 void GenerateDOTGraph( std::vector<Object *>&obj, std::vector<std::string>&name) {

@@ -261,6 +261,26 @@ template <> inline std::string __js_typeof<t2crt::JS_Val>(t2crt::JS_Val v) {
   return names[v.type];
 }
 
+// TSC restricts Lhs of instanceof operator to either type any or an object type.
+bool InstanceOf(JS_Val val, Function* ctor);
+
+// Our implementation returns true if the prototype property of the func/class
+// constructor appers in the proto chain of the object.
+template <class T>
+bool InstanceOf(T* val, Function* ctor) {
+  if (ctor == nullptr)
+    return false;
+
+  Object* p = val->__proto__;
+  while (p) {
+    if (p == ctor->prototype)
+      return true;
+    else
+      p = p->__proto__;
+  }
+  return false;
+}
+
 void GenerateDOTGraph( std::vector<Object *>&obj, std::vector<std::string>&name);
 
 #include "builtins.h"
