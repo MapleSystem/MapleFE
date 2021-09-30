@@ -20,8 +20,8 @@
 #include "ast_attr.h"
 #include "ast_module.h"
 #include "ast_type.h"
-#include "ast_handler.h"
 
+#include "ast_handler.h"
 #include "gen_astdump.h"
 using namespace std::string_literals;
 
@@ -114,6 +114,7 @@ public:
   virtual std::string EmitInferNode(InferNode *node);
   virtual std::string EmitInNode(InNode *node);
   virtual std::string EmitIsNode(IsNode *node);
+  virtual std::string EmitAwaitNode(AwaitNode *node);
   virtual std::string EmitNameTypePairNode(NameTypePairNode *node);
   virtual std::string EmitTupleTypeNode(TupleTypeNode *node);
   virtual std::string EmitModuleNode(ModuleNode *node);

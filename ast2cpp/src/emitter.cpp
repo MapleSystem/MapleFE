@@ -1664,7 +1664,6 @@ std::string Emitter::EmitPassNode(PassNode *node) {
 std::string Emitter::EmitLambdaNode(LambdaNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str;
   switch (node->GetProperty()) {
     case LP_JSArrowFunction:
       break;
@@ -1674,6 +1673,11 @@ std::string Emitter::EmitLambdaNode(LambdaNode *node) {
       MASSERT(0 && "Unexpected enumerator");
   }
 
+  std::string str;
+  for (unsigned i = 0; i < node->GetAttrsNum(); ++i) {
+    std::string s = GetEnumAttrId(node->GetAttrAtIndex(i));
+    str += s;
+  }
   auto num = node->GetTypeParametersNum();
   if(num) {
     str += '<';
@@ -1813,6 +1817,19 @@ std::string Emitter::EmitIsNode(IsNode *node) {
   if (auto n = node->GetRight()) {
     str += EmitTreeNode(n);
   }
+  return str;
+}
+
+std::string Emitter::EmitAwaitNode(AwaitNode *node) {
+  if (node == nullptr)
+    return std::string();
+  std::string str("await "s);
+  if (auto n = node->GetExpr()) {
+    str += EmitTreeNode(n);
+  }
+  mPrecedence = '\030';
+  if (node->IsStmt())
+    str += ";\n"s;
   return str;
 }
 
@@ -2093,6 +2110,9 @@ std::string Emitter::EmitTreeNode(TreeNode *node) {
     break;
   case NK_Throw:
     return EmitThrowNode(static_cast<ThrowNode *>(node));
+    break;
+  case NK_Await:
+    return EmitAwaitNode(static_cast<AwaitNode *>(node));
     break;
   case NK_Return:
     return EmitReturnNode(static_cast<ReturnNode *>(node));

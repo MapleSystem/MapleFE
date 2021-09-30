@@ -858,7 +858,6 @@ handle_src_include_files(Finalization)
 #                                                                              #
 ################################################################################
 
-
 def get_data_based_on_type(val_type, accessor):
     e = get_enum_type(val_type)
     if e == "ASTScope *":
@@ -909,6 +908,7 @@ gen_args = [
         "Emitter",       # Class name
         "Emit",          # Prefix of function name
         """
+#include "ast_handler.h"
 #include "{astdump}.h"
 using namespace std::string_literals;
 """.format(astdump = astdump),  # Extra include directives
@@ -919,23 +919,23 @@ using namespace std::string_literals;
 astemit_init = [
 """
 protected:
-using Precedence = char;
+using Precedence = unsigned char;
 Precedence    mPrecedence;
 
-ModuleNode   *mASTModule;
+Module_Handler *mHandler;
 
 public:
-{gen_args1}(ModuleNode *m) : mASTModule(m) {{}}
+{gen_args1}(Module_Handler *h) : mHandler(h) {{}}
 
 std::string {gen_args2}(const char *title);
+std::string GetEnding(TreeNode *n);
 std::string Clean(std::string &s);
 std::string GetBaseFilename();
 std::string GetModuleName(const char *p = nullptr);
 
-ModuleNode *GetASTModule() {{ return mASTModule; }}
-void SetASTModule(ModuleNode *m) {{ mASTModule = m; }}
+ModuleNode *GetASTModule() {{ return mHandler->GetASTModule(); }}
 
-""".format(gen_args1=gen_args[1], gen_args2=gen_args[2], astdumpclass=astdumpclass)
+""".format(gen_args1=gen_args[1], gen_args2=gen_args[2])
 ] # astemit_init
 
 if False:
