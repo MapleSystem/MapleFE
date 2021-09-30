@@ -482,6 +482,10 @@ void Verifier::VerifyIs(IsNode *tree){
   return;
 }
 
+void Verifier::VerifyAwait(AwaitNode *tree){
+  return;
+}
+
 void Verifier::VerifyTypeOf(TypeOfNode *tree){
   return;
 }

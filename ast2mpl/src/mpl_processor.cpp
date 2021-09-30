@@ -597,6 +597,10 @@ maple::BaseNode *A2M::ProcessTypeOf(StmtExprKind skind, TreeNode *tnode, BlockNo
   return nullptr;
 }
 
+maple::BaseNode *A2M::ProcessAwait(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
+  return nullptr;
+}
+
 maple::BaseNode *A2M::ProcessKeyOf(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
   return nullptr;
 }

@@ -110,6 +110,8 @@ NODEKIND(Exception)
 // This is for the throw statement. Not the "exceptions thrown by functions".
 NODEKIND(Throw)
 
+NODEKIND(Await)
+
 // These are statement nodes, or control flow related nodes. They are
 // common in most languages.
 NODEKIND(Return)
