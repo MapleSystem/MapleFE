@@ -35,5 +35,6 @@ STRUCT Attribute : (("abstract", abstract),
                     ("default", default),
                     ("get", getter),
                     ("set", setter),
+                    ("async", async),
                     ("synchronized", synchronized))
 

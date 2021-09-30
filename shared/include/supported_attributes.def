@@ -28,6 +28,7 @@ ATTRIBUTE(static)
 ATTRIBUTE(strictfp)
 ATTRIBUTE(default)
 ATTRIBUTE(synchronized)
+ATTRIBUTE(async)
 ATTRIBUTE(readonly)           // Typescript
 ATTRIBUTE(getter)             // Javascript getter function
 ATTRIBUTE(setter)             // Javascript setter function

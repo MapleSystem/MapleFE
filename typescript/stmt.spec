@@ -1812,7 +1812,7 @@ rule RequiredParameter: ONEOF(
   attr.action.%2 : BuildDecl(%2, %1)
 
 ## rule AccessibilityModifier: public private protected
-rule AccessibilityModifier: ONEOF("public", "private", "protected", "readonly", "static", "abstract")
+rule AccessibilityModifier: ONEOF("public", "private", "protected", "readonly", "static", "abstract", "async")
 
 ## rule BindingIdentifierOrPattern: BindingIdentifier BindingPattern
 rule BindingIdentifierOrPattern: ONEOF(BindingIdentifier, BindingPattern)
@@ -1981,18 +1981,19 @@ rule FunctionExpression :
 
 # NOTE: Inline Call signature to make it easier to write action.
 rule FunctionDeclaration : ONEOF(
-  "function" + ZEROORONE(FunctionName) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}',
-  "function" + ZEROORONE(FunctionName) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ':' + AssertExpression + '{' + FunctionBody + '}',
-  "function" + ZEROORONE(FunctionName) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ':' + IsExpression + '{' + FunctionBody + '}',
-  "function" + ZEROORONE(FunctionName) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation)  + ZEROORONE(';'),
-  "function" + ZEROORONE(FunctionName) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ':' + IsExpression + ZEROORONE(';'))
-  attr.action.%1,%2,%3,%4,%5 : BuildFunction(%2)
-  attr.action.%1,%2,%3,%4,%5 : AddParams(%5)
-  attr.action.%1,%4    : AddType(%7)
-  attr.action.%1,%2,%3,%4,%5 : AddTypeGenerics(%3)
-  attr.action.%2,%3,%5 : AddAssert(%8)
-  attr.action.%1       : AddFunctionBody(%9)
-  attr.action.%2,%3    : AddFunctionBody(%10)
+  ZEROORMORE(AccessibilityModifier) + "function" + ZEROORONE(FunctionName) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}',
+  ZEROORMORE(AccessibilityModifier) + "function" + ZEROORONE(FunctionName) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ':' + AssertExpression + '{' + FunctionBody + '}',
+  ZEROORMORE(AccessibilityModifier) + "function" + ZEROORONE(FunctionName) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ':' + IsExpression + '{' + FunctionBody + '}',
+  ZEROORMORE(AccessibilityModifier) + "function" + ZEROORONE(FunctionName) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation)  + ZEROORONE(';'),
+  ZEROORMORE(AccessibilityModifier) + "function" + ZEROORONE(FunctionName) + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ':' + IsExpression + ZEROORONE(';'))
+  attr.action.%1,%2,%3,%4,%5 : BuildFunction(%3)
+  attr.action.%1,%2,%3,%4,%5 : AddParams(%6)
+  attr.action.%1,%2,%3,%4,%5 : AddModifier(%1)
+  attr.action.%1,%4    : AddType(%8)
+  attr.action.%1,%2,%3,%4,%5 : AddTypeGenerics(%4)
+  attr.action.%2,%3,%5 : AddAssert(%9)
+  attr.action.%1       : AddFunctionBody(%10)
+  attr.action.%2,%3    : AddFunctionBody(%11)
 
 ##############################################################################################
 ##                               A.5 Interface
