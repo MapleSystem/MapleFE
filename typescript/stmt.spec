@@ -2244,12 +2244,13 @@ rule EntityName: ONEOF(NamespaceName,
 rule ExternalDeclaration : ONEOF("declare" + NamespaceDeclaration,
                                  "declare" + LexicalDeclaration + ZEROORONE(';'),
                                  "declare" + ClassDeclaration,
+                                 "declare" + InterfaceDeclaration,
                                  "declare" + FunctionDeclaration,
                                  "declare" + VariableStatement,
                                  "declare" + TypeAliasDeclaration,
                                  "declare" + EnumDeclaration,
                                  "declare" + ExternalModuleDeclaration)
-  attr.action.%1,%2,%3,%4,%5,%6,%7,%8 : BuildExternalDeclaration(%2)
+  attr.action.%1,%2,%3,%4,%5,%6,%7,%8,%9 : BuildExternalDeclaration(%2)
 
 ## for global declaration
 ## https://www.typescriptlang.org/docs/handbook/declaration-files/templates/global-modifying-module-d-ts.html
