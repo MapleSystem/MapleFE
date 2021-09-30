@@ -210,7 +210,7 @@ void TypeInferVisitor::UpdateTypeId(TreeNode *node, TypeId tid) {
 }
 
 void TypeInferVisitor::UpdateTypeId(TreeNode *node1, TreeNode *node2) {
-  if (!node1 || !node2) {
+  if (!node1 || !node2 || node1 == node2) {
     return;
   }
   TypeId tid = MergeTypeId(node1->GetTypeId(), node2->GetTypeId());

@@ -33,18 +33,30 @@ void AST_SCP::ScopeAnalysis() {
 void AST_SCP::BuildScope() {
   MSGNOLOC0("============== BuildScope ==============");
   BuildScopeVisitor visitor(mHandler, mFlags, true);
-  while(!visitor.mScopeStack.empty()) {
-    visitor.mScopeStack.pop();
-  }
   ModuleNode *module = mHandler->GetASTModule();
   ASTScope *scope = module->GetRootScope();
-  visitor.mScopeStack.push(scope);
-  visitor.mUserScopeStack.push(scope);
 
   visitor.InitInternalTypes();
 
   module->SetScope(scope);
-  visitor.Visit(module);
+  visitor.SetRunIt(true);
+  unsigned count = 0;
+  // run twice if necessary in case struct's scope is used before set
+  while (visitor.GetRunIt() && count  < 2) {
+    visitor.SetRunIt(false);
+    while(!visitor.mScopeStack.empty()) {
+      visitor.mScopeStack.pop();
+    }
+    visitor.mScopeStack.push(scope);
+
+    while(!visitor.mUserScopeStack.empty()) {
+      visitor.mUserScopeStack.pop();
+    }
+    visitor.mUserScopeStack.push(scope);
+
+    visitor.Visit(module);
+    count++;
+  }
 
   if (mFlags & FLG_trace_3) {
     mHandler->GetTypeTable()->Dump();
@@ -156,8 +168,8 @@ FunctionNode *BuildScopeVisitor::VisitFunctionNode(FunctionNode *node) {
   mScopeStack.push(scope);
   mUserScopeStack.push(scope);
   BuildScopeBaseVisitor::VisitFunctionNode(node);
-  mScopeStack.pop();
   mUserScopeStack.pop();
+  mScopeStack.pop();
   return node;
 }
 
@@ -173,8 +185,8 @@ LambdaNode *BuildScopeVisitor::VisitLambdaNode(LambdaNode *node) {
   mScopeStack.push(scope);
   mUserScopeStack.push(scope);
   BuildScopeBaseVisitor::VisitLambdaNode(node);
-  mScopeStack.pop();
   mUserScopeStack.pop();
+  mScopeStack.pop();
   return node;
 }
 
@@ -185,7 +197,11 @@ ClassNode *BuildScopeVisitor::VisitClassNode(ClassNode *node) {
     parent->AddDecl(node);
     AddType(parent, node);
   }
+
   ASTScope *scope = mASTModule->NewScope(parent, node);
+  if (node->GetStrIdx()) {
+    mStrIdx2ScopeMap[node->GetStrIdx()] = scope;
+  }
 
   // add fields as decl
   for(unsigned i = 0; i < node->GetFieldsNum(); i++) {
@@ -209,6 +225,9 @@ InterfaceNode *BuildScopeVisitor::VisitInterfaceNode(InterfaceNode *node) {
   }
 
   ASTScope *scope = mASTModule->NewScope(parent, node);
+  if (node->GetStrIdx()) {
+    mStrIdx2ScopeMap[node->GetStrIdx()] = scope;
+  }
 
   // add fields as decl
   for(unsigned i = 0; i < node->GetFieldsNum(); i++) {
@@ -232,6 +251,9 @@ StructNode *BuildScopeVisitor::VisitStructNode(StructNode *node) {
   }
 
   ASTScope *scope = mASTModule->NewScope(parent, node);
+  if (node->GetStructId() && node->GetStructId()->GetStrIdx()) {
+    mStrIdx2ScopeMap[node->GetStructId()->GetStrIdx()] = scope;
+  }
 
   // add fields as decl
   for(unsigned i = 0; i < node->GetFieldsNum(); i++) {
@@ -319,6 +341,27 @@ ForLoopNode *BuildScopeVisitor::VisitForLoopNode(ForLoopNode *node) {
   if (scope != parent) {
     mScopeStack.pop();
   }
+  return node;
+}
+
+FieldNode *BuildScopeVisitor::VisitFieldNode(FieldNode *node) {
+  BuildScopeBaseVisitor::VisitFieldNode(node);
+
+  TreeNode *upper = node->GetUpper();
+  TreeNode *field = node->GetField();
+
+  if (upper && upper->GetStrIdx()) {
+    ASTScope *scope = mStrIdx2ScopeMap[upper->GetStrIdx()];
+
+    if (scope) {
+      mScopeStack.push(scope);
+      BuildScopeBaseVisitor::Visit(field);
+      mScopeStack.pop();
+    } else {
+      mRunIt = true;
+    }
+  }
+
   return node;
 }
 

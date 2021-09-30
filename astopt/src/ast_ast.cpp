@@ -547,9 +547,11 @@ StructLiteralNode *ClassStructVisitor::VisitStructLiteralNode(StructLiteralNode 
 }
 
 StructNode *ClassStructVisitor::VisitStructNode(StructNode *node) {
-  node->SetTypeId(TY_Class);
-  if (node->GetStructId()) {
-    node->GetStructId()->SetTypeId(TY_Class);
+  if (node->GetProp() != SProp_TSEnum) {
+    node->SetTypeId(TY_Class);
+    if (node->GetStructId()) {
+      node->GetStructId()->SetTypeId(TY_Class);
+    }
   }
   (void) AstVisitor::VisitStructNode(node);
   if (mAst->GetPass() == 0) {

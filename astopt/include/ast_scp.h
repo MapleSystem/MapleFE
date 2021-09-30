@@ -73,6 +73,10 @@ class BuildScopeVisitor : public BuildScopeBaseVisitor {
   Module_Handler *mHandler;
   ModuleNode     *mASTModule;
   unsigned        mFlags;
+  bool            mRunIt;
+
+  // stridx to scope map for struct/class
+  std::unordered_map<unsigned, ASTScope *> mStrIdx2ScopeMap;;
 
  public:
   explicit BuildScopeVisitor(Module_Handler *h, unsigned f, bool base = false)
@@ -80,6 +84,9 @@ class BuildScopeVisitor : public BuildScopeBaseVisitor {
       mASTModule = mHandler->GetASTModule();
     }
   ~BuildScopeVisitor() = default;
+
+  bool GetRunIt() { return mRunIt; }
+  void SetRunIt(bool b) { mRunIt = b; }
 
   void InitInternalTypes();
   ClassNode *AddClass(std::string name, unsigned tyidx = 0);
@@ -96,6 +103,8 @@ class BuildScopeVisitor : public BuildScopeBaseVisitor {
   StructNode *VisitStructNode(StructNode *node);
   InterfaceNode *VisitInterfaceNode(InterfaceNode *node);
   ForLoopNode *VisitForLoopNode(ForLoopNode *node);
+
+  FieldNode *VisitFieldNode(FieldNode *node);
 
   // related node with scope : decl, type
   DeclNode *VisitDeclNode(DeclNode *node);
