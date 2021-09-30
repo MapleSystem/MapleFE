@@ -28,8 +28,9 @@ namespace maplefe {
 void TypeInfer::TypeInference() {
   ModuleNode *module = mHandler->GetASTModule();
 
-  if (mFlags & FLG_trace_3)
+  if (mFlags & FLG_trace_3) {
     mHandler->GetTypeTable()->Dump();
+  }
 
   // build mNodeId2Decl
   MSGNOLOC0("============== Build NodeId2Decl ==============");
@@ -64,7 +65,18 @@ void TypeInfer::TypeInference() {
 // build up mNodeId2Decl by visiting each Identifier
 IdentifierNode *BuildIdNodeToDeclVisitor::VisitIdentifierNode(IdentifierNode *node) {
   (void) AstVisitor::VisitIdentifierNode(node);
-  (void) mHandler->FindDecl(node);
+  TreeNode *decl = mHandler->FindDecl(node);
+  if (decl) {
+    node->SetTypeId(decl->GetTypeId());
+    node->SetTypeIdx(decl->GetTypeIdx());
+  }
+  TreeNode *type = node->GetType();
+  if (type && type->IsPrimType()) {
+    PrimTypeNode *ptn = static_cast<PrimTypeNode *>(type);
+    TypeId tid = ptn->GetPrimType();
+    // node->SetTypeId(tid);
+    node->SetTypeIdx(tid);
+  }
   return node;
 }
 
@@ -997,6 +1009,9 @@ ForLoopNode *TypeInferVisitor::VisitForLoopNode(ForLoopNode *node) {
 FunctionNode *TypeInferVisitor::VisitFunctionNode(FunctionNode *node) {
   if (mFlags & FLG_trace_1) std::cout << "Visiting FunctionNode, id=" << node->GetNodeId() << "..." << std::endl;
   UpdateTypeId(node, node->IsArray() ? TY_Object : TY_Function);
+  if (node->GetFuncName()) {
+    node->GetFuncName()->SetTypeId(node->GetTypeId());
+  }
   (void) AstVisitor::VisitFunctionNode(node);
   return node;
 }
@@ -1054,6 +1069,25 @@ InterfaceNode *TypeInferVisitor::VisitInterfaceNode(InterfaceNode *node) {
     (void) VisitClassField(t);
   }
   (void) AstVisitor::VisitInterfaceNode(node);
+  return node;
+}
+
+IsNode *TypeInferVisitor::VisitIsNode(IsNode *node) {
+  (void) AstVisitor::VisitIsNode(node);
+  TreeNode *parent = node->GetParent();
+  if (parent->IsFunction()) {
+    FunctionNode *func = static_cast<FunctionNode *>(parent);
+    if (func->GetType() == node) {
+      TreeNode *left = node->GetLeft();
+      TreeNode *right = node->GetRight();
+      if (right->IsUserType()) {
+        TreeNode *id = static_cast<UserTypeNode *>(right)->GetId();
+        right->SetTypeIdx(id->GetTypeIdx());
+        mFuncIsNodeMap[func->GetNodeId()] = id->GetTypeIdx();
+      }
+    }
+  }
+
   return node;
 }
 

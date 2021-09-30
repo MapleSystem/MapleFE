@@ -446,6 +446,7 @@ TypeAliasNode *AST_AST::CreateTypeAliasNode(TreeNode *to, TreeNode *from) {
 StructNode *AST_AST::CreateStructFromStructLiteral(StructLiteralNode *node) {
   StructNode *newnode = (StructNode*)gTreePool.NewTreeNode(sizeof(StructNode));
   new (newnode) StructNode(0);
+  newnode->SetTypeId(TY_Class);
 
   for (unsigned i = 0; i < node->GetFieldsNum(); i++) {
     FieldLiteralNode *fl = node->GetField(i);
@@ -524,6 +525,7 @@ bool AST_AST::WithTypeParamFast(TreeNode *node) {
 }
 
 StructLiteralNode *ClassStructVisitor::VisitStructLiteralNode(StructLiteralNode *node) {
+  node->SetTypeId(TY_Class);
   (void) AstVisitor::VisitStructLiteralNode(node);
   if (mAst->GetPass() == 0) {
     // field literal stridx to its ids'
@@ -545,6 +547,10 @@ StructLiteralNode *ClassStructVisitor::VisitStructLiteralNode(StructLiteralNode 
 }
 
 StructNode *ClassStructVisitor::VisitStructNode(StructNode *node) {
+  node->SetTypeId(TY_Class);
+  if (node->GetStructId()) {
+    node->GetStructId()->SetTypeId(TY_Class);
+  }
   (void) AstVisitor::VisitStructNode(node);
   if (mAst->GetPass() == 0) {
     IdentifierNode *id = node->GetStructId();
@@ -572,6 +578,7 @@ StructNode *ClassStructVisitor::VisitStructNode(StructNode *node) {
 }
 
 ClassNode *ClassStructVisitor::VisitClassNode(ClassNode *node) {
+  node->SetTypeId(TY_Class);
   (void) AstVisitor::VisitClassNode(node);
   if (mAst->GetPass() == 0) {
     mAst->SetStrIdx2Struct(node->GetStrIdx(), node);
@@ -594,6 +601,7 @@ ClassNode *ClassStructVisitor::VisitClassNode(ClassNode *node) {
 }
 
 InterfaceNode *ClassStructVisitor::VisitInterfaceNode(InterfaceNode *node) {
+  node->SetTypeId(TY_Class);
   (void) AstVisitor::VisitInterfaceNode(node);
   if (mAst->GetPass() == 0) {
     mAst->SetStrIdx2Struct(node->GetStrIdx(), node);

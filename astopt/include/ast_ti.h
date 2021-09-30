@@ -82,6 +82,9 @@ class TypeInferVisitor : public TypeInferBaseVisitor {
 
   std::unordered_map<unsigned, std::unordered_set<TreeNode *>> mParam2ArgArrayDeclMap;;
 
+  // func nodeid to typeidx
+  std::unordered_map<unsigned, unsigned> mFuncIsNodeMap;;
+
  public:
   explicit TypeInferVisitor(Module_Handler *h, unsigned f, bool base = false)
     : mHandler(h), mFlags(f), mAst(h->GetAST()), TypeInferBaseVisitor(f, base) {}
@@ -124,6 +127,7 @@ class TypeInferVisitor : public TypeInferBaseVisitor {
   IdentifierNode *VisitIdentifierNode(IdentifierNode *node);
   ImportNode *VisitImportNode(ImportNode *node);
   InterfaceNode *VisitInterfaceNode(InterfaceNode *node);
+  IsNode *VisitIsNode(IsNode *node);
   LambdaNode *VisitLambdaNode(LambdaNode *node);
   LiteralNode *VisitLiteralNode(LiteralNode *node);
   NewNode *VisitNewNode(NewNode *node);
