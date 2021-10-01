@@ -1,0 +1,18 @@
+Matched 32 tokens.
+Matched 56 tokens.
+Matched 65 tokens.
+Matched 66 tokens.
+Matched 67 tokens.
+============= Module ===========
+== Sub Tree ==
+func  bar(a,b,c)  throws: 
+  return "bar: a=[" Add a Add "] b=[" Add b Add "] c=[" Add c Add "]"
+
+== Sub Tree ==
+func  f()  throws: 
+  js_let Decl: x=10
+  js_let Decl: y="abc"
+  return bar()
+
+== Sub Tree ==
+console.log(f())
