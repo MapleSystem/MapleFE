@@ -20,6 +20,31 @@
 
 namespace maplefe {
 
+class ImportModules : public AstVisitor {
+  private:
+    CppDecl     *mCppDecl;
+    std::string  mIncludes;
+    std::string  mImports;
+
+  public:
+    ImportModules(CppDecl *c) : mCppDecl(c) {}
+
+    ImportNode *VisitImportNode(ImportNode *node) {
+      auto n = node->GetTarget();
+      if (n && n->IsLiteral()) {
+        LiteralNode *lit = static_cast<LiteralNode *>(n);
+        LitData data = lit->GetData();
+        std::string filename = AstDump::GetEnumLitData(data);
+        // may have some duplicated include directives which do not hurt
+        mIncludes += "#include \""s + filename + ".h\"\n"s;
+      }
+      return node;
+    }
+
+    std::string GetIncludes() { return mIncludes; }
+    std::string GetImports() { return mImports; }
+};
+
 class ClassDecls : public AstVisitor {
   private:
     CppDecl     *mCppDecl;
@@ -86,6 +111,11 @@ std::string CppDecl::EmitModuleNode(ModuleNode *node) {
 using namespace t2crt;
 
 )""";
+
+  // import modules
+  ImportModules importModules(this);
+  importModules.VisitTreeNode(node);
+  str += importModules.GetIncludes();
 
   // declarations of user defined classes
   ClassDecls clsDecls(this);
