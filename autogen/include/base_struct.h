@@ -37,7 +37,7 @@ class StringPool;
 // 2-tuple or 3 tuple. The data in each StructElem could be number, string,
 // string literal (those quoted with ").
 //
-// Each type of .spec has its own definition of STRUCT and so its data in 
+// Each type of .spec has its own definition of STRUCT and so its data in
 // StructElem. So the parsing of a StructElem is left to each .spec parser.
 // But we do provide some common functions of parsing certain StructElem.
 //
@@ -114,7 +114,7 @@ public:
   void SetName(const char *s) { mName = s; }
   bool Empty() {return mStructElems.size() == 0;}
   void Dump();
-  void Sort(unsigned i);  // sort by the length of i-th element which is astring 
+  void Sort(unsigned i);  // sort by the length of i-th element which is astring
 };
 
 }

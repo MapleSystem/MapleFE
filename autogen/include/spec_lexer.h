@@ -107,7 +107,7 @@ class SPECLexer {
     return _thekind;
   }
 
-  char *GetLine() const { return line; } 
+  char *GetLine() const { return line; }
   int GetLineNum() const { return _linenum; }
   int GetCuridx() const { return curidx; }
   const std::string &GetTheName() const { return thename; }

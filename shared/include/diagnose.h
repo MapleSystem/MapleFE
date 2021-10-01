@@ -31,7 +31,7 @@ public:
   unsigned Col;
   char     Msg[256];
 public:
-  DiagMessage(const char*, unsigned, unsigned, const char*); 
+  DiagMessage(const char*, unsigned, unsigned, const char*);
 }
 
 // We save OBJECT not POINTER of DiagMessage in Diagnose.

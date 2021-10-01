@@ -18,7 +18,7 @@
 // which takes an ASTModule recently generated. At this point we have a complete
 // module with AST trees created by ASTBuilder.
 //
-// The verification is a top-down traversal on the AST trees. 
+// The verification is a top-down traversal on the AST trees.
 //
 // It carries on more than one jobs.
 // Verification : Checks the validity of semanteme

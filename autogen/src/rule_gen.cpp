@@ -77,14 +77,14 @@ namespace maplefe {
 // Generate the table name for mRule
 std::string RuleGen::GetTblName(const Rule *rule) {
   std::string tn = "Tbl" + rule->mName;
-  return tn; 
+  return tn;
 }
 
 // Generate the table name for sub rules in mRule
 // The table id will be introduced here
 std::string RuleGen::GetSubTblName() {
   std::string tn = "Tbl" + mRule->mName + "_sub" + std::to_string(mSubTblNum);
-  return tn; 
+  return tn;
 }
 
 std::string RuleGen::GetPropertyName(const RuleAttr *attr) {
@@ -122,7 +122,7 @@ std::string RuleGen::GetEntryTypeName(ElemType type, RuleOp op) {
     name = "ET_Data";
     break;
   case ET_Op: {
-    switch(op) { 
+    switch(op) {
     case RO_Oneof:
       name = "ET_Oneof";
       break;
@@ -190,7 +190,7 @@ std::string RuleGen::Gen4RuleElem(const RuleElem *elem) {
     // Note: The table could be defined in other files. Need include them.
     data += "DT_Subtable, &";
     data += GetTblName(elem->mData.mRule);
-    break; 
+    break;
   case ET_Op: {
     // Each Op will be generated as a new sub table
     mSubTblNum++;
@@ -336,7 +336,7 @@ void RuleGen::Gen4Table(const Rule *rule, const RuleElem *elem){
       }
     }
   }
-  
+
   Gen4RuleAttr(rule_table_name, attr);
   Gen4TableHeader(rule_table_name);
   unsigned index = gRuleTableNum;
@@ -347,7 +347,7 @@ void RuleGen::Gen4Table(const Rule *rule, const RuleElem *elem){
   std::string rule_table;
 
   // 1. Add the LHS of table decl
-  rule_table = "RuleTable " + rule_table_name + " =";    
+  rule_table = "RuleTable " + rule_table_name + " =";
   rule_table_data = "TableData " + rule_table_data_name + "[";
   std::string elemnum = std::to_string(elem->mSubElems.size());
 
@@ -358,7 +358,7 @@ void RuleGen::Gen4Table(const Rule *rule, const RuleElem *elem){
   if (elem && (elem->mSubElems.size() == 0))
     elemnum = "1";
 
-  rule_table_data += elemnum + "] =";    
+  rule_table_data += elemnum + "] =";
 
   // 2. Add the beginning '{'
   rule_table += '{';
@@ -389,7 +389,7 @@ void RuleGen::Gen4Table(const Rule *rule, const RuleElem *elem){
 
   rule_table += "};";
 
- 
+
   // 4. go through the rule elements, generate rule table data
   std::string data = Gen4TableData(elem);
   rule_table_data += '{';
@@ -405,7 +405,7 @@ void RuleGen::Gen4Table(const Rule *rule, const RuleElem *elem){
 
 // The structure of rule and its sub-rule can be viewed as a tree.
 // We generate tables for rule and its sub-rules in depth first order.
-// 
+//
 void RuleGen::Generate() {
   bool need_patch = true;
   if ((mRule->mName.compare("CHAR") == 0) ||

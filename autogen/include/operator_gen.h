@@ -14,7 +14,7 @@
 */
 ////////////////////////////////////////////////////////////////////////
 //                      Operator Generation
-// The output of this Operator Generation is a table in gen_operator.cpp 
+// The output of this Operator Generation is a table in gen_operator.cpp
 //
 //   OprTableEntry OprTable[OPR_Null] = {
 //     {"xxx", OPR_Xxx},
@@ -37,7 +37,7 @@ namespace maplefe {
 // For each operator, it has three parts involved in the generation.
 //   1. OprId: Used inside autogen, connection between LANGUAGE and
 //             shared/supported.h files
-//   2. Name:  Name of OPR ID, to be generated in gen_operator.cpp 
+//   2. Name:  Name of OPR ID, to be generated in gen_operator.cpp
 //   4. Text:  LANGUAGE syntax text, to be in gen_operator.cpp
 
 // The SUPPORTED operator and their name.

@@ -43,7 +43,7 @@ class TypeEntry {
   NodeKind  GetTypeKind() { return mTypeKind; }
   TypeId    GetTypeId()   { return mTypeId; }
   TreeNode *GetType()     { return mType; }
-  
+
   void SetTypeKind(NodeKind k) { mTypeKind = k; }
   void SetTypeId(TypeId i)     { mTypeId = i; }
   void SetType(TreeNode *n)    { mType = n; }

@@ -37,7 +37,7 @@ namespace maplefe {
 //    on every recursion group in a wavefront manner. Although after each iteration of
 //    the wavefront we got succ/fail info, but it's not complete yet. This field tells
 //    if we have reached the fixed point or not.
-//    
+//
 //    The second 'unsigned' in mMatches is not used, since putting IsDone in mNodes
 //    is enough.
 //

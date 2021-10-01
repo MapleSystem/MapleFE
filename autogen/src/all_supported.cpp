@@ -87,7 +87,7 @@ LiteralSuppStruct LiteralsSupported[LT_NA] = {
 #include "supported_literals.def"
 };
 
-// s : the name 
+// s : the name
 // return the LitId
 LitId FindLiteralId(const std::string &s) {
   for (unsigned u = 0; u < LT_NA; u++) {

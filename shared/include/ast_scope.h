@@ -40,7 +40,7 @@ private:
   // tree with it. It actually related to the module. Local scope always
   // has a local TreeNode with it.
   TreeNode *mTree;
- 
+
   SmallVector<ASTScope*> mChildren;
 
   // Local User types like local class,etc.
@@ -101,7 +101,7 @@ private:
 public:
   ASTScopePool() {}
   ~ASTScopePool();
-  
+
   ASTScope* NewScope(ASTScope *parent);
 };
 

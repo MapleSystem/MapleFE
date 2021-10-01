@@ -264,9 +264,9 @@ void Lexer::AddEndingNewLine() {
         continue;
       }
     }
- 
+
     // return if string literal end.
-    if (!in_escape && 
+    if (!in_escape &&
         ( (line[working_idx] == '\'' && single_quote) ||
           (line[working_idx] == '\"' && double_quote))) {
       if (raw_data) {
@@ -343,7 +343,7 @@ Token* Lexer::LexTokenNoNewLine(void) {
 
   LitData ld = GetLiteral();
   if (ld.mType != LT_NA) {
-    Token *t = (Token*)mTokenPool.NewToken(sizeof(Token)); 
+    Token *t = (Token*)mTokenPool.NewToken(sizeof(Token));
     t->SetLiteral(ld);
     if (mTrace)
       t->Dump();
@@ -361,7 +361,7 @@ Token* Lexer::LexTokenNoNewLine(void) {
 
   TempLitData* tldata = GetTempLit();
   if (tldata != NULL) {
-    Token *t = (Token*)mTokenPool.NewToken(sizeof(Token)); 
+    Token *t = (Token*)mTokenPool.NewToken(sizeof(Token));
     t->SetTempLit(tldata);
     if (mTrace)
       t->Dump();
@@ -451,7 +451,7 @@ Token* Lexer::FindRegExprToken() {
 
     RegExprData reg = {addr_expr, addr_flag};
 
-    Token *t = (Token*)mTokenPool.NewToken(sizeof(Token)); 
+    Token *t = (Token*)mTokenPool.NewToken(sizeof(Token));
     t->SetRegExpr(reg);
     if (mTrace) {
       std::cout << "Find a reg expr: ";
@@ -985,7 +985,7 @@ bool Lexer::Traverse(const RuleTable *rule_table) {
     }
 
     curidx = new_pos;
-    matched = found; 
+    matched = found;
     break;
   }
 

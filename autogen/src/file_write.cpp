@@ -47,7 +47,7 @@ void FileWriter::WriteSimpleBuffers(const FormattedBuffer *fb) {
   std::vector<OneBuffer*>::const_iterator it = fb->mBuffers.begin();
   for (; it != fb->mBuffers.end(); it++) {
     OneBuffer *one = *it;
-    if (one->mIsSimple) { 
+    if (one->mIsSimple) {
       RectBuffer *rect = one->GetRectBuffer();
       if (rect) {
         mIndentation = rect->mIndentation;

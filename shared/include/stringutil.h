@@ -31,7 +31,7 @@ namespace maplefe {
 // http://license.coscl.org.cn/MulanPSL2
 static inline unsigned HashString(const std::string &s) {
   unsigned Result = 0;
-  for (size_t i = 0; i < s.size(); i++) 
+  for (size_t i = 0; i < s.size(); i++)
     Result = Result * 33 + (unsigned char)s[i];
   return Result;
 }

@@ -36,7 +36,7 @@ const bool KeywordGen::EnumEnd(){
 const std::string KeywordGen::EnumNextElem(){
   std::string keyword = "\"" + *mEnumIter + "\"";
   mEnumIter++;
-  return keyword; 
+  return keyword;
 }
 
 /////////////////////////////////////////////////////////////////////

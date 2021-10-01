@@ -46,7 +46,7 @@ namespace maplefe {
 //      The most straightforward idea is to put the function pointers in the rule table
 //      with additional information. However, the signatures of a function makes the idea
 //      complicated.
-//      
+//
 //      So I finally decided to have an Id for each check function, and Id is written into
 //      the rule tables by Autogen.
 

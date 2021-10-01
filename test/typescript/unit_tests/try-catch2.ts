@@ -3,7 +3,7 @@ class Klass {
 }
 function func(obj: Klass) {
   if (obj.str === "yes") {
-    return obj; 
+    return obj;
   } else {
     try {
       throw "Exception";

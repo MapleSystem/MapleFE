@@ -40,17 +40,17 @@ StringMap::~StringMap() {
       temp = entry->Next;
       delete entry;
       entry = temp;
-    } 
+    }
   }
 
   delete [] mBuckets;
 }
 
 void StringMap::Init(unsigned Num) {
-  MASSERT((Num & (Num-1)) == 0 && 
-        "Init Size must be a power of 2 or zero!"); 
-  mNumBuckets = Num ? Num : DEFAULT_BUCKETS_NUM; 
-   
+  MASSERT((Num & (Num-1)) == 0 &&
+        "Init Size must be a power of 2 or zero!");
+  mNumBuckets = Num ? Num : DEFAULT_BUCKETS_NUM;
+
   mBuckets = new StringMapEntry[mNumBuckets];
   StringMapEntry *E = mBuckets;
   for (unsigned i = 0; i < mNumBuckets; i++, E++) {
@@ -60,16 +60,16 @@ void StringMap::Init(unsigned Num) {
 }
 
 // Get the bucket no for 'S'.
-unsigned StringMap::BucketNoFor(const std::string &S) { 
-  unsigned HTSize = mNumBuckets; 
-  if (HTSize == 0) {  // Hash table unallocated so far? 
-    Init(DEFAULT_BUCKETS_NUM); 
-    HTSize = mNumBuckets; 
-  } 
-  unsigned FullHashValue = HashString(S); 
-  unsigned BucketNo = FullHashValue & (HTSize-1); 
-  return BucketNo;  
-} 
+unsigned StringMap::BucketNoFor(const std::string &S) {
+  unsigned HTSize = mNumBuckets;
+  if (HTSize == 0) {  // Hash table unallocated so far?
+    Init(DEFAULT_BUCKETS_NUM);
+    HTSize = mNumBuckets;
+  }
+  unsigned FullHashValue = HashString(S);
+  unsigned BucketNo = FullHashValue & (HTSize-1);
+  return BucketNo;
+}
 
 // Look up to find the address in the string pool of 'S'.
 // If 'S' is not in the string pool, insert it.
@@ -86,21 +86,21 @@ StringMapEntry *StringMap::LookupEntryFor(const std::string &S) {
     mPool->mStringTable.push_back(addr);
     return E;
   }
-  
+
   while (E && E->Addr) {
     if (S.compare(E->Addr) == 0) {
       return E;
     }
     E = E->Next;
   }
-   
+
   // We cannot find an existing string for 'S'. Need to allocate
   char *addr = mPool->Alloc(S);
   unsigned idx = mPool->mStringTable.size();
   mPool->mStringTable.push_back(addr);
   E = InsertEntry(addr, idx, BucketNo);
   return E;
-} 
+}
 
 // Add a new entry in 'bucket'.
 // 'addr' is the address in the string pool

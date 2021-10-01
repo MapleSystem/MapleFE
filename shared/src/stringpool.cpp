@@ -57,7 +57,7 @@ StringPool::~StringPool() {
     free(addr);
   }
   mLongStrings.clear();
-  
+
   // Release the StringMap
   delete mMap;
 }

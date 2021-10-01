@@ -27,7 +27,7 @@ namespace maplefe {
 //     the recursions. We differentiate a recursion using the first node, ie, the topmost
 //     node in the tree in this recursion.
 //  2) Each node (ie rule table) could have multiple recursions.
-//  3) Recursions could include children recursions inside. 
+//  3) Recursions could include children recursions inside.
 //
 // [NOTE] The key point in recursion detector is to make sure for each loop, there
 //        should be one and only one recursion counted, even if there are multiple
@@ -548,7 +548,7 @@ TResult RecDetector::DetectData(RuleTable *rule_table, ContTreeNode<RuleTable*> 
 
 // At any point when we want to return, we need take the remaining elements
 // to ToDo list, if they are not in any of InProcess, Done and ToDo.
- 
+
 TResult RecDetector::DetectConcatenate(RuleTable *rule_table, ContTreeNode<RuleTable*> *p) {
   // We use 'res' to record the status of the leading children. TRS_MaybeZero is good
   // for the beginning as it means it's empty right now.
@@ -571,7 +571,7 @@ TResult RecDetector::DetectConcatenate(RuleTable *rule_table, ContTreeNode<RuleT
       // won't be counted, and we return TRS_Fail at the end.
       temp_res = TRS_Fail;
     }
-  
+
     MASSERT((res == TRS_MaybeZero));
 
     if (temp_res == TRS_Fail) {
@@ -1123,7 +1123,7 @@ void RecDetector::WriteRecursionGroups() {
     }
     group += "};";
     mCppFile->WriteOneLine(group.c_str(), group.size());
-  } 
+  }
 
   // LeftRecursion **recursion_groups[N] = {RecursionGroup_1, RecursionGroup_2...};
   // LeftRecursion ***gRecursionGroups = recursion_groups;
@@ -1146,7 +1146,7 @@ void RecDetector::WriteRecursionGroups() {
 
 // We want to dump like below.
 //   unsigned gRule2GroupNum = X;
-//   
+//
 
 void RecDetector::WriteRule2Group() {
   std::string comment = "// Rule2Group mapping";

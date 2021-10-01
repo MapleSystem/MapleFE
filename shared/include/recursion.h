@@ -32,7 +32,7 @@ namespace maplefe {
 struct LeftRecursion {
   RuleTable *mRuleTable;
   unsigned   mNum;  // How many recursions
-  unsigned **mCircles; // 
+  unsigned **mCircles; //
 };
 
 extern LeftRecursion **gLeftRecursions; //

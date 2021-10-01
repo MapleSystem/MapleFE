@@ -14,7 +14,7 @@
 */
 ////////////////////////////////////////////////////////////////////////
 //                      Separator Generation
-// The output of this Separator Generation is a table in gen_separator.cpp 
+// The output of this Separator Generation is a table in gen_separator.cpp
 //
 //   SepTableEntry SepTable[SEP_Null] = {
 //     {"xxx", SEP_Xxx},
@@ -45,7 +45,7 @@ namespace maplefe {
 // For each separator, it has three parts involved in the generation.
 //   1. SepId:   Used inside autogen, connection between LANGUAGE and SUPPORTED
 //               .spec files
-//   2. Name:    Name of SEP_ID, to be generated in gen_separator.cpp 
+//   2. Name:    Name of SEP_ID, to be generated in gen_separator.cpp
 //   4. Keyword: LANGUAGE syntax text, to be in gen_separator.cpp
 
 // The SUPPORTED separator and their name.

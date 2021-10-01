@@ -66,7 +66,7 @@ public:
 
   void PatchTokenOnElem(RuleElem*);
   void PatchToken();
-  void Generate(); 
+  void Generate();
 };
 
 }

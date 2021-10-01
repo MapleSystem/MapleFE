@@ -69,7 +69,7 @@ public:
   bool ParseStruct();
   bool ParseStructElements();
   bool ParseElemData(StructElem *elem);
-  
+
   bool ParseType();
 
   bool ParseAttr();

@@ -42,7 +42,7 @@ public:
 public:
   RecPath(){};
   ~RecPath() {mPath.Release();}
-  
+
 };
 
 enum RecTraInstance {

@@ -131,7 +131,7 @@ bool FileReader::SkipTRAComment(){
       Assert(0, "No ending */ of traditional comment)");
     }
   }
-  return false; 
+  return false;
 }
 
 // Skip the next separator designated by 'c'.
@@ -173,7 +173,7 @@ bool FileReader::ReadLineNonEmpty(){
     if (mCurLine.size() > 0)
       return true;
   }
-  return false; 
+  return false;
 }
 
 // Read line from the file, and return the number of read chars.

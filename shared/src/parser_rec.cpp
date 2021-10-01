@@ -182,7 +182,7 @@ bool RecursionTraversal::ConnectPrevious(AppealNode *curr_node) {
       // will handle the multiple parents issue.
       curr_node->AddChild(prev_lead);
       prev_lead->AddParent(curr_node);
-      
+
       // there should be only one match.
       MASSERT(!found);
       found = true;

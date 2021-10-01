@@ -274,7 +274,7 @@ void Recursion::FindFronNodes(unsigned circle_index) {
     case ET_Oneof: {
       // Look into every childof 'prev'. If it's not 'next' and
       // not in 'mRecursionNodes', it's a FronNode.
-      // 
+      //
       // [NOTE] This is a per circle algorithm. So a FronNode found here could
       //        be a recursion node in another circle.
       // Actually if it's Recursion node, we can still include it as FronNode,

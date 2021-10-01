@@ -31,7 +31,7 @@ namespace maplefe {
 
 //////////////////////////////////////////////////////////////////////////////
 
-void SPECParser::ParserError(std::string msg, std::string str) { 
+void SPECParser::ParserError(std::string msg, std::string str) {
   std::cout << "\n================================= spec file syntax error ============================" << std::endl;
   std::cout << "file " << mFilename << std::endl;
   std::cout << "line " << mLexer->GetLineNum() << std::endl;

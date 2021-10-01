@@ -488,7 +488,7 @@ void LADetector::Release() {
 }
 
 // To write the external decl of all LookAheadTable of each rule.
-//   
+//
 //   extern LookAheadTable TblStatementLookAheadTable;
 //   extern LookAhead     *TblStatementLookAhead;
 //   ...

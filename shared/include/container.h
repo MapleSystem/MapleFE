@@ -484,7 +484,7 @@ private:
   //   Add more elements, on the knob.
   // This is common scenario. To implement, it requires a temporary
   // pointer to the located knob. This temp knob is used ONLY when
-  // paired operations, PairedFindOrCreateKnob() and PairedAddElem() 
+  // paired operations, PairedFindOrCreateKnob() and PairedAddElem()
   Knob *mTempKnob;
 
 private:

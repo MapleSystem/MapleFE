@@ -49,7 +49,7 @@ public:
 
   void   MoveCursor(int i) {mCurChar += i; mPos += i;} // i can be <0.
   void   MoveToEndOfLine() {mPos = mCurLine.size();}
-  bool   MoveUntil(const char*);   
+  bool   MoveUntil(const char*);
 
   bool   Good() { return mDefFile.good(); }
   bool   EndOfLine() {return mPos == mCurLine.size();}

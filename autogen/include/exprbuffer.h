@@ -99,8 +99,8 @@ public:
   // the following functions are used for un-determined number of children.
   void AllocChildren(unsigned i, ExprBuffer *buf);
   ExprNode* GetChild(unsigned index);
-}; 
-  
+};
+
 class ExprBuffer {
 private:
   char     *mData;
@@ -126,7 +126,7 @@ public:
 
 public:
   ExprBuffer();
-  ~ExprBuffer(); 
+  ~ExprBuffer();
 
   // write the expr to the buffer, mData, in text format
   void Write2Buffer();

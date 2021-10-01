@@ -27,7 +27,7 @@ OperatorId OprsSupported[OPR_NA] = {
 #include "supported_operators.def"
 };
 
-// s : the literal name 
+// s : the literal name
 // return the OprId
 OprId FindOperatorId(const std::string &s) {
   for (unsigned u = 0; u < OPR_NA; u++) {
@@ -75,7 +75,7 @@ const std::string OperatorGen::EnumNextElem(){
   enum_item = enum_item + "\"" + opr.mText + "\", OPR_" + FindOperatorName(opr.mID);
   enum_item = enum_item + "}";
   mEnumIter++;
-  return enum_item; 
+  return enum_item;
 }
 
 /////////////////////////////////////////////////////////////////////

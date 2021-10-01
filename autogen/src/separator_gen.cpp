@@ -28,7 +28,7 @@ SuppSepId SepsSupported[SEP_NA] = {
 #include "supported_separators.def"
 };
 
-// s : the literal name 
+// s : the literal name
 // return the SepId
 SepId FindSeparatorId(const std::string &s) {
   for (unsigned u = 0; u < SEP_NA; u++) {
@@ -75,7 +75,7 @@ const std::string SeparatorGen::EnumNextElem(){
   enum_item = enum_item + "\"" + sep.mKeyword + "\", SEP_" + FindSeparatorName(sep.mID);
   enum_item = enum_item + "}";
   mEnumIter++;
-  return enum_item; 
+  return enum_item;
 }
 
 /////////////////////////////////////////////////////////////////////

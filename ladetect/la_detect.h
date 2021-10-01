@@ -62,7 +62,7 @@ public:
   void AddDependent(RuleTable *rt) {mDependents.PushBack(rt);}
 
   void Release() {mDependents.Release();}
-}; 
+};
 
 // Return result of most detect functions.
 enum TResult {

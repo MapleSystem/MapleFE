@@ -16,7 +16,7 @@
 //
 // StringMap is heavily used in the StringPool. It's used to locate the address
 // of string in the StringPool. Here is how it works:
-//   (1) std::string ---> Hash value, --> Locate the Bucket in StringMap 
+//   (1) std::string ---> Hash value, --> Locate the Bucket in StringMap
 //       --> get the addr from StringMapEntry
 //   (2) If conflicted in the Bucket, iterate to find the right StringMapEntry
 //   (3) If not found, a) Add std::string to the StringPool
@@ -39,7 +39,7 @@ class StringMapEntry {
 public:
   char           *Addr;   // Addr in the string pool
   unsigned        StrIdx; // String index
-  StringMapEntry *Next; 
+  StringMapEntry *Next;
 public:
   StringMapEntry() { Addr = NULL; StrIdx = 0; Next = NULL; }
   StringMapEntry(char *A, unsigned idx) { Addr = A; StrIdx = idx; Next = NULL; }

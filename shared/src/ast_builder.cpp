@@ -1947,7 +1947,7 @@ TreeNode* ASTBuilder::AddStructField() {
   if (!p_field.mIsEmpty) {
     MASSERT(p_field.mIsTreeNode);
     TreeNode *field = p_field.mData.mTreeNode;
-  
+
     if (mLastTreeNode->IsStruct()) {
       StructNode *struct_node = (StructNode*)mLastTreeNode;
       struct_node->AddChild(field);

@@ -21,7 +21,7 @@ namespace maplefe {
 
 // Note: This must be in the order as in 'enum OprCode', and this is the
 //       reason I duplicate OprCode here in order to make the code easy
-//       to maintain. 
+//       to maintain.
 OprInfo gOprInfo[OPC_Null] = {
   {OPC_Add, OPT_Bin, "+"},
   {OPC_Sub, OPT_Bin, "-"},
@@ -71,21 +71,21 @@ void ExprNode::SetCall(const char *s) {
   unsigned len = strlen(s);
   MASSERT(len < NAME_SIZE);
   strncpy(mName, s, len);
-  mOpc = OPC_Call; 
+  mOpc = OPC_Call;
 }
 
 void ExprNode::SetString(const char *s) {
   unsigned len = strlen(s);
   MASSERT(len < NAME_SIZE);
   strncpy(mName, s, len);
-  mOpc = OPC_Str; 
+  mOpc = OPC_Str;
 }
 
 void ExprNode::SetLiteral(const char *s) {
   unsigned len = strlen(s);
   MASSERT(len < NAME_SIZE);
   strncpy(mName, s, len);
-  mOpc = OPC_Lit; 
+  mOpc = OPC_Lit;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -94,7 +94,7 @@ void ExprNode::SetLiteral(const char *s) {
 
 ExprBuffer::ExprBuffer() {
   mSize = EXPR_SIZE;
-  mData = (char*)malloc(mSize); 
+  mData = (char*)malloc(mSize);
   MASSERT(mData && "Cannot malloc buffer for ExprBuffer");
   mPos = 0;
   mRoot = (ExprNode*)mMemPool.Alloc(sizeof(ExprNode));
@@ -105,7 +105,7 @@ ExprBuffer::ExprBuffer() {
 // the caller of ExprBuffer.
 ExprBuffer::~ExprBuffer() {
   if (mData);
-    free(mData); 
+    free(mData);
 }
 
 // Extend the size of mData
@@ -134,7 +134,7 @@ ExprNode* ExprBuffer::NewExprNodes(unsigned num) {
 // In-Order
 void ExprBuffer::Write2Buffer(){
   MASSERT(mRoot && "Root of expression is NULL!");
-  W2BRecursive(mRoot); 
+  W2BRecursive(mRoot);
 }
 
 void ExprBuffer::WriteStringNode(const ExprNode *n){
@@ -143,7 +143,7 @@ void ExprBuffer::WriteStringNode(const ExprNode *n){
     Extend(mPos + len);
 
   strncpy(mData+mPos, n->mName, len);
-  mPos += len; 
+  mPos += len;
 }
 
 void ExprBuffer::WriteLiteralNode(const ExprNode *n){
@@ -153,7 +153,7 @@ void ExprBuffer::WriteLiteralNode(const ExprNode *n){
 
   WriteChar('\"');
   strncpy(mData+mPos, n->mName, len);
-  mPos += len; 
+  mPos += len;
   WriteChar('\"');
 }
 
@@ -170,7 +170,7 @@ void ExprBuffer::WriteOperatorNode(const ExprNode *n){
   if (mPos + len > mSize)
     Extend(mPos + len);
   strncpy(mData + mPos, text, len);
-  mPos += len; 
+  mPos += len;
 }
 
 void ExprBuffer::WriteChar(const char c){
