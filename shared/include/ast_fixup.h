@@ -50,6 +50,9 @@ class FixUpVisitor : public AstVisitor {
 
     // Update mFilename of a ModuleNode with a connonical absolute path
     ModuleNode *VisitModuleNode(ModuleNode *node);
+
+    // Replace a PassNode with a CallNode for tagged template literal
+    PassNode *VisitPassNode(PassNode *node);
 };
 
 }

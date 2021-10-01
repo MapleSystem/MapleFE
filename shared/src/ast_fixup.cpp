@@ -125,4 +125,21 @@ ModuleNode *FixUpVisitor::VisitModuleNode(ModuleNode *node) {
   return AstVisitor::VisitModuleNode(node);;
 }
 
+// Fux up a PassNode for tagged template literal
+PassNode *FixUpVisitor::VisitPassNode(PassNode *node) {
+  AstVisitor::VisitPassNode(node);
+  unsigned num = node->GetChildrenNum();
+  if (num == 2) {
+    TreeNode *child0 = node->GetChild(0);
+    TreeNode *child1 = node->GetChild(1);
+    if (child0 && child1 && child1->IsTemplateLiteral()) {
+      CallNode *call = new (gTreePool.NewTreeNode(sizeof(CallNode))) CallNode();
+      call->SetMethod(child0);
+      call->SetTaggedTemplate(static_cast<TemplateLiteralNode *>(child1));
+      return (PassNode*)call;
+    }
+  }
+  return node;
+}
+
 }

@@ -104,8 +104,8 @@ protected:
 
 public:
   TreeNode(NodeKind k, unsigned i)
-    : mKind(k), mLabel(NULL), mParent(NULL), mStrIdx(i), mIsStmt(false), mTypeId(TY_None), mTypeIdx(0),
-      mScope(NULL), mIsOptional(false), mIsNonNull(false), mIsRest(false), mIsConst(false) {}
+    : mKind(k), mLabel(nullptr), mParent(nullptr), mStrIdx(i), mIsStmt(false), mTypeId(TY_None), mTypeIdx(0),
+      mScope(nullptr), mIsOptional(false), mIsNonNull(false), mIsRest(false), mIsConst(false) {}
   TreeNode(NodeKind k) : TreeNode(k, 0) {}
   //TreeNode() : TreeNode(NK_Null, 0) {}
   virtual ~TreeNode() {}
@@ -209,7 +209,7 @@ public:
 //   3) export x as default
 //   4) export *
 //        mIsEverything = true
-//        mAfter = NULL, mBefore = NULL
+//        mAfter = nullptr, mBefore = nullptr
 //   5) export default declaration
 //   6) export = x                 // This exports a single object.
 //        mIsSingle = true
@@ -232,7 +232,7 @@ private:
 
 public:
   XXportAsPairNode() : TreeNode(NK_XXportAsPair),
-    mIsDefault(false), mIsEverything(false), mIsSingle(false), mBefore(NULL), mAfter(NULL) {}
+    mIsDefault(false), mIsEverything(false), mIsSingle(false), mBefore(nullptr), mAfter(nullptr) {}
   ~XXportAsPairNode() {}
 
   bool IsDefault()    {return mIsDefault;}
@@ -307,7 +307,7 @@ private:
   SmallVector<XXportAsPairNode*> mPairs;
   SmallVector<AnnotationNode*> mAnnotations; //annotation or pragma
 public:
-  ExportNode() : TreeNode(NK_Export), mTarget(NULL) {}
+  ExportNode() : TreeNode(NK_Export), mTarget(nullptr) {}
   ~ExportNode(){}
 
   void SetTarget(TreeNode *t) {mTarget = t; SETPARENT(t);}
@@ -434,7 +434,7 @@ private:
   TreeNode *mOpnd;
 public:
   UnaOperatorNode(OprId id) : TreeNode(NK_UnaOperator),
-    mOprId(id), mOpnd(NULL), mIsPost(false) {}
+    mOprId(id), mOpnd(nullptr), mIsPost(false) {}
   UnaOperatorNode() : UnaOperatorNode(OPR_NA) {}
   ~UnaOperatorNode() {}
 
@@ -503,7 +503,7 @@ private:
   UserTypeNode *mId;
   TreeNode     *mAlias;
 public:
-  TypeAliasNode() : TreeNode(NK_TypeAlias), mId(NULL), mAlias(NULL){}
+  TypeAliasNode() : TreeNode(NK_TypeAlias), mId(nullptr), mAlias(nullptr){}
   ~TypeAliasNode() {}
 
   UserTypeNode* GetId() {return mId;}
@@ -529,7 +529,7 @@ private:
   TreeNode *mTypeD;
 public:
   ConditionalTypeNode() : TreeNode(NK_ConditionalType),
-                          mTypeA(NULL), mTypeB(NULL), mTypeC(NULL), mTypeD(NULL){}
+                          mTypeA(nullptr), mTypeB(nullptr), mTypeC(nullptr), mTypeD(nullptr){}
   ~ConditionalTypeNode() {}
 
   TreeNode* GetTypeA() {return mTypeA;}
@@ -554,7 +554,7 @@ class AsTypeNode : public TreeNode {
 private:
   TreeNode *mType;
 public:
-  AsTypeNode() : TreeNode(NK_AsType), mType(NULL) {}
+  AsTypeNode() : TreeNode(NK_AsType), mType(nullptr) {}
   ~AsTypeNode() {}
 
   TreeNode* GetType() {return mType;}
@@ -576,8 +576,8 @@ private:
                          // In Typescript, the syntax is like: T<X extends Y>
 
 public:
-  TypeParameterNode() : TreeNode(NK_TypeParameter), mId(NULL), mDefault(NULL),
-                        mExtends(NULL) {}
+  TypeParameterNode() : TreeNode(NK_TypeParameter), mId(nullptr), mDefault(nullptr),
+                        mExtends(nullptr) {}
   ~TypeParameterNode() {}
 
   TreeNode* GetId()            {return mId;}
@@ -613,7 +613,7 @@ private:
   BlockNode *mBody;                // When body is not empty, it's an
                                    // anonymous class.
 public:
-  NewNode() : TreeNode(NK_New), mId(NULL), mBody(NULL) {}
+  NewNode() : TreeNode(NK_New), mId(nullptr), mBody(nullptr) {}
   ~NewNode() {mArgs.Release();}
 
   TreeNode* GetId()          {return mId;}
@@ -634,7 +634,7 @@ class DeleteNode : public TreeNode {
 private:
   TreeNode *mExpr;
 public:
-  DeleteNode() : TreeNode(NK_Delete), mExpr(NULL) {}
+  DeleteNode() : TreeNode(NK_Delete), mExpr(nullptr) {}
   ~DeleteNode(){}
 
   TreeNode* GetExpr()            {return mExpr;}
@@ -681,7 +681,7 @@ private:
   AnnotationTypeNode *mType;
   SmallVector<TreeNode*> mArgs;
 public:
-  AnnotationNode() : TreeNode(NK_Annotation), mId(NULL), mType(NULL) {}
+  AnnotationNode() : TreeNode(NK_Annotation), mId(nullptr), mType(nullptr) {}
   ~AnnotationNode(){mArgs.Release();}
 
   TreeNode* GetId()       {return mId;}
@@ -752,10 +752,10 @@ private:
   bool           mOptionalParam; // A optional parameter.
 public:
   IdentifierNode(unsigned id, TreeNode *t) : TreeNode(NK_Identifier, id),
-    mType(t), mInit(NULL), mDims(NULL),
+    mType(t), mInit(nullptr), mDims(nullptr),
     mOptionalParam(false) {}
-  IdentifierNode(unsigned id) : IdentifierNode(id, NULL) {}
-  IdentifierNode() : IdentifierNode(0, NULL) {}
+  IdentifierNode(unsigned id) : IdentifierNode(id, nullptr) {}
+  IdentifierNode() : IdentifierNode(0, nullptr) {}
   ~IdentifierNode(){Release();}
 
   TreeNode*   GetType() {return mType;}
@@ -764,7 +764,7 @@ public:
 
   void SetType(TreeNode *t)      {mType = t; SETPARENT(t);}
   void SetInit(TreeNode *t)      {mInit = t; SETPARENT(t);}
-  void ClearInit()               {mInit = NULL;}
+  void ClearInit()               {mInit = nullptr;}
   void SetDims(DimensionNode *t) {mDims = t; SETPARENT(t);}
 
   bool IsOptionalParam()       {return mOptionalParam;}
@@ -817,7 +817,7 @@ private:
 public:
   DeclNode(TreeNode *t) : TreeNode(NK_Decl),
     mVar(t), mInit(nullptr), mProp(DP_NA) {SETPARENT(t);}
-  DeclNode() : DeclNode(NULL) {}
+  DeclNode() : DeclNode(nullptr) {}
   ~DeclNode(){}
 
   TreeNode* GetVar() {return mVar;}
@@ -842,7 +842,7 @@ private:
   TreeNode *mDestType;
   TreeNode *mExpr;
 public:
-  CastNode() : TreeNode(NK_Cast), mDestType(NULL), mExpr(NULL) {}
+  CastNode() : TreeNode(NK_Cast), mDestType(nullptr), mExpr(nullptr) {}
   ~CastNode(){}
 
   TreeNode* GetDestType() {return mDestType;}
@@ -871,7 +871,7 @@ class ParenthesisNode : public TreeNode {
 private:
   TreeNode *mExpr;
 public:
-  ParenthesisNode() : TreeNode(NK_Parenthesis), mExpr(NULL) {}
+  ParenthesisNode() : TreeNode(NK_Parenthesis), mExpr(nullptr) {}
   ~ParenthesisNode(){}
 
   TreeNode* GetExpr() {return mExpr;}
@@ -891,7 +891,7 @@ private:
   TreeNode       *mUpper; // The upper enclosing structure
   IdentifierNode *mField;
 public:
-  FieldNode() : TreeNode(NK_Field), mField(NULL), mUpper(NULL) {}
+  FieldNode() : TreeNode(NK_Field), mField(nullptr), mUpper(nullptr) {}
   ~FieldNode(){}
 
   IdentifierNode* GetField() {return mField;}
@@ -922,7 +922,7 @@ private:
   TreeNode              *mArray;
   SmallVector<TreeNode*> mExprs;  // index expressions.
 public:
-  ArrayElementNode() : TreeNode(NK_ArrayElement), mArray(NULL) {}
+  ArrayElementNode() : TreeNode(NK_ArrayElement), mArray(nullptr) {}
   ~ArrayElementNode() {Release();}
 
   TreeNode* GetArray()            {return mArray;}
@@ -970,7 +970,7 @@ private:
   TreeNode *mElement;   // the elements in the source struct or array
 public:
   BindingElementNode() : TreeNode(NK_BindingElement),
-                         mVariable(NULL), mElement(NULL) {}
+                         mVariable(nullptr), mElement(nullptr) {}
   ~BindingElementNode() {}
 
   TreeNode* GetVariable()            {return mVariable;}
@@ -996,7 +996,7 @@ private:
   TreeNode              *mInit;        // An initializer
 public:
   BindingPatternNode() :
-      TreeNode(NK_BindingPattern), mInit(NULL), mType(NULL), mProp(BPP_NA) {}
+      TreeNode(NK_BindingPattern), mInit(nullptr), mType(nullptr), mProp(BPP_NA) {}
   ~BindingPatternNode() {Release();}
 
   BindPattProp GetProp()                {return mProp;}
@@ -1049,7 +1049,7 @@ public:
   void      SetDataType(TreeNode *t) {mDataType = t;}
   TreeNode* GetDataType()            {return mDataType;}
 
-  NumIndexSigNode() : TreeNode(NK_NumIndexSig), mDataType(NULL), mKey(NULL) {}
+  NumIndexSigNode() : TreeNode(NK_NumIndexSig), mDataType(nullptr), mKey(nullptr) {}
   ~NumIndexSigNode(){}
   void Dump(unsigned);
 };
@@ -1064,7 +1064,7 @@ public:
   void      SetDataType(TreeNode *t) {mDataType = t; SETPARENT(t);}
   TreeNode* GetDataType()            {return mDataType;}
 
-  StrIndexSigNode() : TreeNode(NK_StrIndexSig), mDataType(NULL), mKey(NULL) {}
+  StrIndexSigNode() : TreeNode(NK_StrIndexSig), mDataType(nullptr), mKey(nullptr) {}
   ~StrIndexSigNode(){}
   void Dump(unsigned);
 };
@@ -1086,8 +1086,8 @@ private:
 
 public:
   StructNode(IdentifierNode *n) : TreeNode(NK_Struct), mStructId(n), mProp(SProp_NA),
-                                  mNumIndexSig(NULL), mStrIndexSig(NULL) {SETPARENT(n);}
-  StructNode() : StructNode(NULL) {}
+                                  mNumIndexSig(nullptr), mStrIndexSig(nullptr) {SETPARENT(n);}
+  StructNode() : StructNode(nullptr) {}
   ~StructNode() {Release();}
 
   StructProp GetProp() {return mProp;}
@@ -1134,8 +1134,8 @@ public:
 // We save the XetAccessor as a field literal with fieldname being func
 // name and literal being function node itself.
 
-// mFieldName could be NULL, like {3, 4} or {a, b}, 3, 4, a and b are literals without
-// a name. but mLiteral may not be NULL.
+// mFieldName could be nullptr, like {3, 4} or {a, b}, 3, 4, a and b are literals without
+// a name. but mLiteral may not be nullptr.
 class FieldLiteralNode : public TreeNode{
 public:
   TreeNode *mFieldName;  // Generally a field is an identifier. However, in JS/TS
@@ -1179,7 +1179,7 @@ private:
   SmallVector<TreeNode*> mElements;
   TreeNode *mId;   // the name of namespace
 public:
-  NamespaceNode() : TreeNode(NK_Namespace), mId(NULL) {}
+  NamespaceNode() : TreeNode(NK_Namespace), mId(nullptr) {}
   ~NamespaceNode() {Release();}
 
   void SetId(TreeNode *id) {mId = id; SETPARENT(id);}
@@ -1256,7 +1256,7 @@ private:
   SmallVector<const char*> mStrings;
 
   // It's tree nodes of pairs of <format, placeholder>. So it would be pairs
-  // of <TreeNode*, TreeNode*>, For any missing element, a NULL is saved
+  // of <TreeNode*, TreeNode*>, For any missing element, a nullptr is saved
   // in its position.
   // Even index elements are for formats, Odd index elements are for placeholder.
   SmallVector<TreeNode*> mTrees;
@@ -1302,7 +1302,7 @@ private:
   void InitName();
 
 public:
-  LiteralNode(LitData d) : TreeNode(NK_Literal), mData(d), mType(NULL), mInit(NULL) {}
+  LiteralNode(LitData d) : TreeNode(NK_Literal), mData(d), mType(nullptr), mInit(nullptr) {}
   LiteralNode() : LiteralNode({.mType = LT_NA, .mData.mInt = 0}) {}
   ~LiteralNode(){}
 
@@ -1327,7 +1327,7 @@ class RegExprNode : public TreeNode {
 private:
   RegExprData mData;
 public:
-  RegExprNode() : TreeNode(NK_RegExpr) {mData.mExpr = NULL; mData.mFlags = NULL;}
+  RegExprNode() : TreeNode(NK_RegExpr) {mData.mExpr = nullptr; mData.mFlags = nullptr;}
   ~RegExprNode(){}
 
   RegExprData GetData() {return mData;}
@@ -1370,7 +1370,7 @@ private:
   SmallVector<TreeNode *> mParams;  // In Java, this sould be exception node.
   BlockNode              *mBlock;
 public:
-  CatchNode() : TreeNode(NK_Catch), mBlock(NULL) {}
+  CatchNode() : TreeNode(NK_Catch), mBlock(nullptr) {}
   ~CatchNode(){}
 
   BlockNode* GetBlock()       {return mBlock;}
@@ -1388,7 +1388,7 @@ class FinallyNode : public TreeNode {
 private:
   BlockNode              *mBlock;
 public:
-  FinallyNode() : TreeNode(NK_Finally), mBlock(NULL) {}
+  FinallyNode() : TreeNode(NK_Finally), mBlock(nullptr) {}
   ~FinallyNode(){}
 
   BlockNode* GetBlock()       {return mBlock;}
@@ -1404,7 +1404,7 @@ private:
   SmallVector<CatchNode*> mCatches; // There could be >1 catches.
 
 public:
-  TryNode() : TreeNode(NK_Try), mBlock(NULL), mFinally(NULL) {}
+  TryNode() : TreeNode(NK_Try), mBlock(nullptr), mFinally(nullptr) {}
   ~TryNode(){}
 
   BlockNode* GetBlock()       {return mBlock;}
@@ -1431,7 +1431,7 @@ private:
   IdentifierNode *mException;
 public:
   ExceptionNode(IdentifierNode *inode) : TreeNode(NK_Exception), mException(inode) {}
-  ExceptionNode() : ExceptionNode(NULL) {}
+  ExceptionNode() : ExceptionNode(nullptr) {}
   ~ExceptionNode(){}
 
   IdentifierNode* GetException()       {return mException;}
@@ -1448,7 +1448,7 @@ class ReturnNode : public TreeNode {
 private:
   TreeNode *mResult;
 public:
-  ReturnNode() : TreeNode(NK_Return), mResult(NULL) {}
+  ReturnNode() : TreeNode(NK_Return), mResult(nullptr) {}
   ~ReturnNode(){}
 
   void SetResult(TreeNode *t) {mResult = t; SETPARENT(t);}
@@ -1481,7 +1481,7 @@ class BreakNode : public TreeNode {
 private:
   TreeNode* mTarget;
 public:
-  BreakNode() : TreeNode(NK_Break), mTarget(NULL) {}
+  BreakNode() : TreeNode(NK_Break), mTarget(nullptr) {}
   ~BreakNode(){}
 
   TreeNode* GetTarget()           {return mTarget;}
@@ -1495,7 +1495,7 @@ class ContinueNode : public TreeNode {
 private:
   TreeNode* mTarget;
 public:
-  ContinueNode() : TreeNode(NK_Continue), mTarget(NULL) {}
+  ContinueNode() : TreeNode(NK_Continue), mTarget(nullptr) {}
   ~ContinueNode(){}
 
   TreeNode* GetTarget()           {return mTarget;}
@@ -1532,7 +1532,7 @@ private:
 
 public:
   ForLoopNode() : TreeNode(NK_ForLoop),
-    mCond(NULL), mBody(NULL), mVariable(NULL), mSet(NULL), mProp(FLP_Regular) {}
+    mCond(nullptr), mBody(nullptr), mVariable(nullptr), mSet(nullptr), mProp(FLP_Regular) {}
   ~ForLoopNode() {Release();}
 
   void AddInit(TreeNode *t);
@@ -1567,7 +1567,7 @@ private:
   TreeNode *mCond;
   TreeNode *mBody; // This could be a single statement, or a block node
 public:
-  WhileLoopNode() : TreeNode(NK_WhileLoop), mCond(NULL), mBody(NULL) {}
+  WhileLoopNode() : TreeNode(NK_WhileLoop), mCond(nullptr), mBody(nullptr) {}
   ~WhileLoopNode() {Release();}
 
   void SetCond(TreeNode *t) {mCond = t; SETPARENT(t);}
@@ -1584,7 +1584,7 @@ private:
   TreeNode *mCond;
   TreeNode *mBody; // This could be a single statement, or a block node
 public:
-  DoLoopNode() : TreeNode(NK_DoLoop), mCond(NULL), mBody(NULL) {}
+  DoLoopNode() : TreeNode(NK_DoLoop), mCond(nullptr), mBody(nullptr) {}
   ~DoLoopNode(){Release();}
 
   void SetCond(TreeNode *t) {mCond = t; SETPARENT(t);}
@@ -1609,7 +1609,7 @@ private:
   bool      mIsDefault; // default lable
   TreeNode *mValue;     // the constant expression
 public:
-  SwitchLabelNode() : TreeNode(NK_SwitchLabel), mIsDefault(false), mValue(NULL) {}
+  SwitchLabelNode() : TreeNode(NK_SwitchLabel), mIsDefault(false), mValue(nullptr) {}
   ~SwitchLabelNode(){}
 
   void SetIsDefault(bool b) {mIsDefault = b;}
@@ -1652,7 +1652,7 @@ private:
   TreeNode *mExpr;
   SmallVector<SwitchCaseNode*> mCases;
 public:
-  SwitchNode() : TreeNode(NK_Switch), mExpr(NULL) {}
+  SwitchNode() : TreeNode(NK_Switch), mExpr(nullptr) {}
   ~SwitchNode() {Release();}
 
   TreeNode* GetExpr() {return mExpr;}
@@ -1681,7 +1681,7 @@ private:
   TreeNode  *mExpr;
   TreeNode  *mMsg;
 public:
-  AssertNode() : TreeNode(NK_Assert), mExpr(NULL), mMsg(NULL) {}
+  AssertNode() : TreeNode(NK_Assert), mExpr(nullptr), mMsg(nullptr) {}
   ~AssertNode(){}
 
   TreeNode* GetExpr() {return mExpr;}
@@ -1701,14 +1701,18 @@ private:
   TreeNode    *mMethod;
   ExprListNode mArgs;
   SmallVector<TreeNode*> mTypeArguments;
+  TemplateLiteralNode *mTaggedTemplate;
 public:
-  CallNode() : TreeNode(NK_Call), mMethod(NULL) {}
+  CallNode() : TreeNode(NK_Call), mMethod(nullptr), mTaggedTemplate(nullptr) {}
   ~CallNode(){Release();}
 
   void Init();
 
   TreeNode* GetMethod() {return mMethod;}
   void SetMethod(TreeNode *t) {mMethod = t; SETPARENT(t);}
+
+  TemplateLiteralNode* GetTaggedTemplate() {return mTaggedTemplate;}
+  void SetTaggedTemplate(TemplateLiteralNode *t) {mTaggedTemplate = t; SETPARENT(t);}
 
   void AddArg(TreeNode *t) {mArgs.Merge(t); SETPARENT(t);}
   unsigned GetArgsNum() {return mArgs.GetExprsNum();}
@@ -1754,7 +1758,7 @@ public:
   TreeNode           *mSync;       // Java allows a sync object on a Block.
 
 public:
-  BlockNode() : TreeNode(NK_Block), mIsInstInit(false), mSync(NULL) {}
+  BlockNode() : TreeNode(NK_Block), mIsInstInit(false), mSync(nullptr) {}
   ~BlockNode() {Release();}
 
   // Instance Initializer and Attributes related
@@ -2079,15 +2083,15 @@ enum LambdaProperty {
 class LambdaNode : public TreeNode {
 private:
   LambdaProperty         mProperty;
-  TreeNode              *mType;         // The return type. NULL as Java Lambda.
+  TreeNode              *mType;         // The return type. nullptr as Java Lambda.
   SmallVector<TreeNode*> mParams;       // A param could be an IdentifierNode or DeclNode.
   TreeNode              *mBody;         // the body could be an expression, or block.
-                                        // NULL as TS FunctionType and ConstructorType
+                                        // nullptr as TS FunctionType and ConstructorType
   SmallVector<TypeParameterNode*> mTypeParameters;
   SmallVector<AttrId>    mAttrs;
 public:
   LambdaNode() : TreeNode(NK_Lambda),
-    mBody(NULL), mProperty(LP_JSArrowFunction), mType(NULL) {}
+    mBody(nullptr), mProperty(LP_JSArrowFunction), mType(nullptr) {}
   ~LambdaNode(){Release();}
 
 
@@ -2132,7 +2136,7 @@ private:
   TreeNode *mLeft;
   TreeNode *mRight;
 public:
-  InstanceOfNode() : TreeNode(NK_InstanceOf), mLeft(NULL), mRight(NULL) {}
+  InstanceOfNode() : TreeNode(NK_InstanceOf), mLeft(nullptr), mRight(nullptr) {}
   ~InstanceOfNode(){Release();}
 
   TreeNode* GetLeft() {return mLeft;}
@@ -2152,7 +2156,7 @@ class TypeOfNode : public TreeNode {
 private:
   TreeNode *mExpr;
 public:
-  TypeOfNode() : TreeNode(NK_TypeOf), mExpr(NULL) {}
+  TypeOfNode() : TreeNode(NK_TypeOf), mExpr(nullptr) {}
   ~TypeOfNode(){Release();}
 
   TreeNode* GetExpr()            {return mExpr;}
@@ -2170,7 +2174,7 @@ class KeyOfNode : public TreeNode {
 private:
   TreeNode *mExpr;
 public:
-  KeyOfNode() : TreeNode(NK_KeyOf), mExpr(NULL) {}
+  KeyOfNode() : TreeNode(NK_KeyOf), mExpr(nullptr) {}
   ~KeyOfNode(){Release();}
 
   TreeNode* GetExpr()            {return mExpr;}
@@ -2188,7 +2192,7 @@ class InferNode : public TreeNode {
 private:
   TreeNode *mExpr;
 public:
-  InferNode() : TreeNode(NK_Infer), mExpr(NULL) {}
+  InferNode() : TreeNode(NK_Infer), mExpr(nullptr) {}
   ~InferNode(){Release();}
 
   TreeNode* GetExpr()            {return mExpr;}
@@ -2209,7 +2213,7 @@ private:
   TreeNode *mLeft;
   TreeNode *mRight;
 public:
-  InNode() : TreeNode(NK_In), mLeft(NULL), mRight(NULL) {}
+  InNode() : TreeNode(NK_In), mLeft(nullptr), mRight(nullptr) {}
   ~InNode(){Release();}
 
   TreeNode* GetLeft() {return mLeft;}
@@ -2243,7 +2247,7 @@ private:
                           // of the mapped property
 public:
   ComputedNameNode() : TreeNode(NK_ComputedName),
-    mProp(CNP_NA), mExpr(NULL), mExtendType(NULL), mInit(NULL) {}
+    mProp(CNP_NA), mExpr(nullptr), mExtendType(nullptr), mInit(nullptr) {}
   ~ComputedNameNode(){Release();}
 
   unsigned GetProp()           {return mProp;}
@@ -2271,7 +2275,7 @@ private:
   TreeNode *mLeft;
   TreeNode *mRight;
 public:
-  IsNode() : TreeNode(NK_Is), mLeft(NULL), mRight(NULL) {}
+  IsNode() : TreeNode(NK_Is), mLeft(nullptr), mRight(nullptr) {}
   ~IsNode(){Release();}
 
   TreeNode* GetLeft() {return mLeft;}
@@ -2291,7 +2295,7 @@ class AwaitNode : public TreeNode {
 private:
   TreeNode *mExpr;
 public:
-  AwaitNode() : TreeNode(NK_Await), mExpr(NULL) {}
+  AwaitNode() : TreeNode(NK_Await), mExpr(nullptr) {}
   ~AwaitNode() {}
 
   TreeNode* GetExpr() {return mExpr;}
@@ -2310,7 +2314,7 @@ private:
   TreeNode *mVar;
   TreeNode *mType;
 public:
-  NameTypePairNode() : TreeNode(NK_NameTypePair), mVar(NULL), mType(NULL) {}
+  NameTypePairNode() : TreeNode(NK_NameTypePair), mVar(nullptr), mType(nullptr) {}
   ~NameTypePairNode() {}
 
   TreeNode* GetVar()  {return mVar;}

@@ -1497,14 +1497,18 @@ std::string Emitter::EmitCallNode(CallNode *node) {
     }
     str += '>';
   }
-  str += '(';
-  for (unsigned i = 0; i < node->GetArgsNum(); ++i) {
-    if (i)
-      str += ", "s;
-    if (auto n = node->GetArg(i))
-      str += EmitTreeNode(n);
+  if (auto tagged = node->GetTaggedTemplate()) {
+    str += EmitTreeNode(tagged);
+  } else {
+    str += '(';
+    for (unsigned i = 0; i < node->GetArgsNum(); ++i) {
+      if (i)
+        str += ", "s;
+      if (auto n = node->GetArg(i))
+        str += EmitTreeNode(n);
+    }
+    str += ')';
   }
-  str += ')';
   mPrecedence = '\024';
   return HandleTreeNode(str, node);
 }
