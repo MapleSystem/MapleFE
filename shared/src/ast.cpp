@@ -761,16 +761,16 @@ void BindingPatternNode::Dump(unsigned indent) {
 //                          StructNode
 //////////////////////////////////////////////////////////////////////////////////////
 
-void StructNode::AddTypeParameter(TreeNode *param) {
+void StructNode::AddTypeParam(TreeNode *param) {
   if (param->IsPass()) {
     PassNode *n = (PassNode*)param;
     for (unsigned i = 0; i < n->GetChildrenNum(); i++) {
       TreeNode *child = n->GetChild(i);
-      AddTypeParameter(child);
+      AddTypeParam(child);
     }
   } else {
     MASSERT(param->IsTypeParameter());
-    mTypeParameters.PushBack((TypeParameterNode*)param);
+    mTypeParams.PushBack((TypeParameterNode*)param);
     SETPARENT(param);
   }
 }
@@ -845,10 +845,10 @@ void StructNode::Dump(unsigned indent) {
   if (mStructId)
     mStructId->Dump(0);
 
-  if (mTypeParameters.GetNum() > 0) {
+  if (mTypeParams.GetNum() > 0) {
     DUMP0_NORETURN("<");
-    for (unsigned i = 0; i < mTypeParameters.GetNum(); i++) {
-      TypeParameterNode *node = mTypeParameters.ValueAtIndex(i);
+    for (unsigned i = 0; i < mTypeParams.GetNum(); i++) {
+      TypeParameterNode *node = mTypeParams.ValueAtIndex(i);
       node->Dump(0);
       DUMP0_NORETURN(",");
     }
@@ -1537,16 +1537,16 @@ void PassNode::Dump(unsigned ind) {
 //                          ClassNode
 //////////////////////////////////////////////////////////////////////////////////////
 
-void ClassNode::AddTypeParameter(TreeNode *param) {
+void ClassNode::AddTypeParam(TreeNode *param) {
   if (param->IsPass()) {
     PassNode *n = (PassNode*)param;
     for (unsigned i = 0; i < n->GetChildrenNum(); i++) {
       TreeNode *child = n->GetChild(i);
-      AddTypeParameter(child);
+      AddTypeParam(child);
     }
   } else {
     MASSERT(param->IsTypeParameter());
-    mTypeParameters.PushBack((TypeParameterNode*)param);
+    mTypeParams.PushBack((TypeParameterNode*)param);
     SETPARENT(param);
   }
 }
@@ -1655,7 +1655,7 @@ void ClassNode::Release() {
   mSuperInterfaces.Release();
   mAttributes.Release();
   mAnnotations.Release();
-  mTypeParameters.Release();
+  mTypeParams.Release();
   mFields.Release();
   mMethods.Release();
   mLocalClasses.Release();
@@ -1673,10 +1673,10 @@ void ClassNode::Dump(unsigned indent) {
     DUMP1_NORETURN("class ", GetName());
   DUMP_RETURN();
 
-  if (mTypeParameters.GetNum() > 0) {
+  if (mTypeParams.GetNum() > 0) {
     DUMP0_NORETURN("<");
-    for (unsigned i = 0; i < mTypeParameters.GetNum(); i++) {
-      TypeParameterNode *node = mTypeParameters.ValueAtIndex(i);
+    for (unsigned i = 0; i < mTypeParams.GetNum(); i++) {
+      TypeParameterNode *node = mTypeParams.ValueAtIndex(i);
       node->Dump(0);
       DUMP0_NORETURN(",");
     }
@@ -1926,16 +1926,16 @@ void FunctionNode::Dump(unsigned indent) {
 //                              LambdaNode
 //////////////////////////////////////////////////////////////////////////////////////
 
-void LambdaNode::AddTypeParameter(TreeNode *param) {
+void LambdaNode::AddTypeParam(TreeNode *param) {
   if (param->IsPass()) {
     PassNode *n = (PassNode*)param;
     for (unsigned i = 0; i < n->GetChildrenNum(); i++) {
       TreeNode *child = n->GetChild(i);
-      AddTypeParameter(child);
+      AddTypeParam(child);
     }
   } else {
     MASSERT(param->IsTypeParameter());
-    mTypeParameters.PushBack((TypeParameterNode*)param);
+    mTypeParams.PushBack((TypeParameterNode*)param);
     SETPARENT(param);
   }
 }

@@ -981,13 +981,13 @@ std::string Emitter::EmitStructNode(StructNode *node) {
       str = "class "s + str;
   }
 
-  auto num = node->GetTypeParametersNum();
+  auto num = node->GetTypeParamsNum();
   if(num) {
     str += '<';
     for (unsigned i = 0; i < num; ++i) {
       if (i)
         str += ", "s;
-      if (auto n = node->GetTypeParameterAtIndex(i))
+      if (auto n = node->GetTypeParamAtIndex(i))
         str += EmitTreeNode(n);
     }
     str += '>';
@@ -1519,13 +1519,13 @@ std::string Emitter::EmitInterfaceNode(InterfaceNode *node) {
   std::string str = "interface "s + node->GetName();
 
   /*
-  auto num = node->GetTypeParametersNum();
+  auto num = node->GetTypeParamsNum();
   if(num) {
     str += '<';
     for (unsigned i = 0; i < num; ++i) {
       if (i)
         str += ", "s;
-      if (auto n = node->GetTypeParameterAtIndex(i))
+      if (auto n = node->GetTypeParamAtIndex(i))
         str += EmitTreeNode(n);
     }
     str += '>';
@@ -1570,13 +1570,13 @@ std::string Emitter::EmitClassNode(ClassNode *node) {
 
   str += "class "s + node->GetName();
 
-  auto num = node->GetTypeParametersNum();
+  auto num = node->GetTypeParamsNum();
   if(num) {
     str += '<';
     for (unsigned i = 0; i < num; ++i) {
       if (i)
         str += ", "s;
-      if (auto n = node->GetTypeParameterAtIndex(i))
+      if (auto n = node->GetTypeParamAtIndex(i))
         str += EmitTreeNode(n);
     }
     str += '>';
@@ -1682,13 +1682,13 @@ std::string Emitter::EmitLambdaNode(LambdaNode *node) {
     std::string s = GetEnumAttrId(node->GetAttrAtIndex(i));
     str += s;
   }
-  auto num = node->GetTypeParametersNum();
+  auto num = node->GetTypeParamsNum();
   if(num) {
     str += '<';
     for (unsigned i = 0; i < num; ++i) {
       if (i)
         str += ", "s;
-      if (auto n = node->GetTypeParameterAtIndex(i)) {
+      if (auto n = node->GetTypeParamAtIndex(i)) {
         str += EmitTreeNode(n);
       }
     }

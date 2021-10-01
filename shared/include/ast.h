@@ -1075,7 +1075,7 @@ class StructNode : public TreeNode {
 private:
   StructProp      mProp;
   IdentifierNode *mStructId;
-  SmallVector<TypeParameterNode*> mTypeParameters;
+  SmallVector<TypeParameterNode*> mTypeParams;
   SmallVector<TreeNode*>       mFields;
   SmallVector<FunctionNode*>   mMethods;
   SmallVector<TreeNode*>       mSupers;
@@ -1101,10 +1101,10 @@ public:
   void SetStrIndexSig(StrIndexSigNode *t) {mStrIndexSig = t;}
 
   // TypeParameter
-  unsigned GetTypeParametersNum()           {return mTypeParameters.GetNum();}
-  void     AddTypeParameter(TreeNode *n);
-  TypeParameterNode* GetTypeParameterAtIndex(unsigned i) {return mTypeParameters.ValueAtIndex(i);}
-  void               SetTypeParameterAtIndex(unsigned i, TypeParameterNode* n) {*(mTypeParameters.RefAtIndex(i)) = n;}
+  unsigned GetTypeParamsNum()           {return mTypeParams.GetNum();}
+  void     AddTypeParam(TreeNode *n);
+  TypeParameterNode* GetTypeParamAtIndex(unsigned i) {return mTypeParams.ValueAtIndex(i);}
+  void               SetTypeParamAtIndex(unsigned i, TypeParameterNode* n) {*(mTypeParams.RefAtIndex(i)) = n;}
 
   unsigned  GetFieldsNum() {return mFields.GetNum();}
   TreeNode* GetField(unsigned i) {return mFields.ValueAtIndex(i);}
@@ -1123,7 +1123,7 @@ public:
 
   void AddChild(TreeNode *);
 
-  void Release() {mFields.Release(); mMethods.Release(); mSupers.Release(); mTypeParameters.Release();}
+  void Release() {mFields.Release(); mMethods.Release(); mSupers.Release(); mTypeParams.Release();}
   void Dump(unsigned);
 };
 
@@ -1947,7 +1947,7 @@ private:
   SmallVector<TreeNode*>          mSuperInterfaces;
   SmallVector<AttrId>             mAttributes;
   SmallVector<AnnotationNode*>    mAnnotations; //annotation or pragma
-  SmallVector<TypeParameterNode*> mTypeParameters;
+  SmallVector<TypeParameterNode*> mTypeParams;
 
   SmallVector<TreeNode*>       mFields;  // a Field could be identifier or computed name
   SmallVector<FunctionNode*>   mMethods;
@@ -1974,10 +1974,10 @@ public:
   void            SetAnnotationAtIndex(unsigned i, AnnotationNode* n) {*(mAnnotations.RefAtIndex(i)) = n;}
 
   // TypeParameter
-  unsigned GetTypeParametersNum()           {return mTypeParameters.GetNum();}
-  void     AddTypeParameter(TreeNode *n);
-  TypeParameterNode* GetTypeParameterAtIndex(unsigned i) {return mTypeParameters.ValueAtIndex(i);}
-  void               SetTypeParameterAtIndex(unsigned i, TypeParameterNode* n) {*(mTypeParameters.RefAtIndex(i)) = n;}
+  unsigned GetTypeParamsNum()           {return mTypeParams.GetNum();}
+  void     AddTypeParam(TreeNode *n);
+  TypeParameterNode* GetTypeParamAtIndex(unsigned i) {return mTypeParams.ValueAtIndex(i);}
+  void               SetTypeParamAtIndex(unsigned i, TypeParameterNode* n) {*(mTypeParams.RefAtIndex(i)) = n;}
 
   void      AddSuperClass(TreeNode *n);
   unsigned  GetSuperClassesNum()        {return mSuperClasses.GetNum();}
@@ -2087,7 +2087,7 @@ private:
   SmallVector<TreeNode*> mParams;       // A param could be an IdentifierNode or DeclNode.
   TreeNode              *mBody;         // the body could be an expression, or block.
                                         // nullptr as TS FunctionType and ConstructorType
-  SmallVector<TypeParameterNode*> mTypeParameters;
+  SmallVector<TypeParameterNode*> mTypeParams;
   SmallVector<AttrId>    mAttrs;
 public:
   LambdaNode() : TreeNode(NK_Lambda),
@@ -2110,10 +2110,10 @@ public:
   void      AddParam(TreeNode *n) {mParams.PushBack(n); SETPARENT(n);}
 
   // TypeParameter
-  unsigned GetTypeParametersNum()           {return mTypeParameters.GetNum();}
-  void     AddTypeParameter(TreeNode *n);
-  TypeParameterNode* GetTypeParameterAtIndex(unsigned i) {return mTypeParameters.ValueAtIndex(i);}
-  void               SetTypeParameterAtIndex(unsigned i, TypeParameterNode* n) {*(mTypeParameters.RefAtIndex(i)) = n;}
+  unsigned GetTypeParamsNum()           {return mTypeParams.GetNum();}
+  void     AddTypeParam(TreeNode *n);
+  TypeParameterNode* GetTypeParamAtIndex(unsigned i) {return mTypeParams.ValueAtIndex(i);}
+  void               SetTypeParamAtIndex(unsigned i, TypeParameterNode* n) {*(mTypeParams.RefAtIndex(i)) = n;}
 
   // Attributes related
   unsigned GetAttrsNum() const        {return mAttrs.GetNum();}

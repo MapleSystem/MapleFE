@@ -594,7 +594,7 @@ ClassNode *ClassStructVisitor::VisitClassNode(ClassNode *node) {
     mAst->SortFields<ClassNode, TreeNode>(node);
   } else if (mAst->GetPass() == 2) {
     // skip getting canonical type if not only fields
-    if (node->GetMethodsNum() || node->GetTypeParametersNum()) {
+    if (node->GetMethodsNum() || node->GetTypeParamsNum()) {
       return node;
     }
     mAst->GetCanonicStructNode(node);
@@ -758,7 +758,7 @@ ClassNode *AdjustASTVisitor::VisitClassNode(ClassNode *node) {
   (void) AstVisitor::VisitClassNode(node);
   // skip getting canonical type if not only fields
   if (node->GetMethodsNum() || node->GetSuperClassesNum() || node->GetSuperInterfacesNum() ||
-      node->GetSuperClassesNum() || node->GetTypeParametersNum()) {
+      node->GetSuperClassesNum() || node->GetTypeParamsNum()) {
     return node;
   }
 
@@ -842,7 +842,7 @@ StructNode *AdjustASTVisitor::VisitStructNode(StructNode *node) {
   }
 
   // skip getting canonical type if not only fields
-  if (node->GetMethodsNum() || node->GetSupersNum() || node->GetTypeParametersNum()) {
+  if (node->GetMethodsNum() || node->GetSupersNum() || node->GetTypeParamsNum()) {
     return node;
   }
 
@@ -1081,8 +1081,8 @@ LambdaNode *AdjustASTVisitor::VisitLambdaNode(LambdaNode *node) {
   }
 
   // func type parameters
-  for (int i = 0; i < node->GetTypeParametersNum(); i++) {
-    func->AddTypeParam(node->GetTypeParameterAtIndex(i));
+  for (int i = 0; i < node->GetTypeParamsNum(); i++) {
+    func->AddTypeParam(node->GetTypeParamAtIndex(i));
   }
 
   // func body

@@ -3640,13 +3640,13 @@ TreeNode* ASTBuilder::AddTypeGenerics() {
     func->AddTypeParam(args);
   } else if (mLastTreeNode->IsClass()) {
     ClassNode *c = (ClassNode*)mLastTreeNode;
-    c->AddTypeParameter(args);
+    c->AddTypeParam(args);
   } else if (mLastTreeNode->IsStruct()) {
     StructNode *c = (StructNode*)mLastTreeNode;
-    c->AddTypeParameter(args);
+    c->AddTypeParam(args);
   } else if (mLastTreeNode->IsLambda()) {
     LambdaNode *c = (LambdaNode*)mLastTreeNode;
-    c->AddTypeParameter(args);
+    c->AddTypeParam(args);
   } else {
     MERROR("Unsupported node in AddTypeGenerics()");
   }

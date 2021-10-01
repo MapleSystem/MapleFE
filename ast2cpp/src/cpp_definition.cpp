@@ -1143,13 +1143,13 @@ std::string CppDef::EmitStructNode(StructNode *node) {
     str += EmitIdentifierNode(n);
   }
 
-  auto num = node->GetTypeParametersNum();
+  auto num = node->GetTypeParamsNum();
   if(num) {
     str += "<"s;
     for (unsigned i = 0; i < num; ++i) {
       if (i)
         str += ", "s;
-      if (auto n = node->GetTypeParameterAtIndex(i))
+      if (auto n = node->GetTypeParamAtIndex(i))
         str += EmitTreeNode(n);
     }
     str += ">"s;
