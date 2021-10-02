@@ -29,7 +29,7 @@ for f; do
   while true; do
     [ -f $t.ts ] && f=$t.ts
     $TS2AST $f || { echo "(ts2ast)$f" >> ts2cpp.failures.out; break; }
-    dep=$(grep "^import.* from " "$f" | sed "s/^ *import.* from .\([^'\"]*\).*/\1.cpp/")
+    dep=$(grep "^import.* from " "$f" | sed "s/^ *import.* from .\([^'\"]*\).*/\1.cpp/" | sort -u)
     for cpp in $dep; do
       $TS2AST $(sed 's/\.cpp/.ts/' <<< "$cpp")
     done

@@ -56,9 +56,9 @@ class ImportExportModules : public AstVisitor {
           std::string str;
           if (x->IsDefault()) {
             if (auto n = x->GetBefore()) {
-              std::string m = mod + "__default"s;
+              std::string v = mod + "__default"s;
               std::string s = mEmitter->EmitTreeNode(n);
-              mImports += "static constexpr decltype("s + m + ") &"s + s + " = "s + m + ";\n"s;
+              mImports += "static constexpr decltype("s + v + ") &"s + s + " = "s + v + ";\n"s;
             }
           } else if (x->IsSingle()) {
             if (auto a = x->GetAfter())
@@ -75,11 +75,13 @@ class ImportExportModules : public AstVisitor {
             }
           } else {
             if (auto n = x->GetBefore()) {
+              std::string v = mEmitter->EmitTreeNode(n);
               if (auto a = x->GetAfter()) {
-                std::string v = mEmitter->EmitTreeNode(n);
-                std::string d = mEmitter->EmitTreeNode(a);
-                if (d == "default") {
+                std::string after = mEmitter->EmitTreeNode(a);
+                if (after == "default") {
                 }
+              } else {
+                mImports += "static constexpr decltype("s + mod + '.' + v + ") &"s + v + " = "s + mod + '.' + v + ";\n"s;
               }
             }
           }
@@ -109,12 +111,16 @@ class ImportExportModules : public AstVisitor {
               str += n->IsLiteral() ? "require("s + s + ')' : s;
             }
           } else if (!x->IsEverything()) {
-            if (auto n = x->GetBefore()) {
+            if (auto b = x->GetBefore()) {
               if (auto a = x->GetAfter()) {
-                std::string v = mEmitter->EmitTreeNode(n);
-                std::string d = mEmitter->EmitTreeNode(a);
-                if (d == "default")
-                  mExportDefault = "#define "s + m + "__default "s + m + '.' + v + '\n';
+                std::string before = mEmitter->EmitTreeNode(b);
+                std::string after = mEmitter->EmitTreeNode(a);
+                if (before == "default") {
+                  mImports += "static constexpr decltype("s + m + "__default) &"s + after + " = "s + m + "__default;\n"s;
+                  before = m + "__default";
+                }
+                if (after == "default")
+                  mExportDefault = "#define "s + m + "__default "s + m + '.' + before + '\n';
               }
             }
           }
