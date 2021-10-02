@@ -1,9 +1,11 @@
 Matched 4 tokens.
-Matched 14 tokens.
-Matched 24 tokens.
-Matched 34 tokens.
-Matched 43 tokens.
-Matched 54 tokens.
+Matched 12 tokens.
+Matched 22 tokens.
+Matched 32 tokens.
+Matched 38 tokens.
+Matched 47 tokens.
+Matched 58 tokens.
+Matched 69 tokens.
 ============= Module ===========
 == Sub Tree ==
 class  Foo
@@ -18,7 +20,7 @@ class  Foo
 == Sub Tree ==
 class  Bar
   Fields: 
-    foo=Foo
+    foo
   Instance Initializer: 
   Constructors: 
   Methods: 
@@ -30,6 +32,10 @@ js_var Decl: foo=new Foo()
 == Sub Tree ==
 js_var Decl: bar=new Bar()
 == Sub Tree ==
+bar.foo Assign Foo
+== Sub Tree ==
 console.log(foo instanceof Bar)
 == Sub Tree ==
 console.log(foo instanceof bar.foo)
+== Sub Tree ==
+console.log(bar.foo instanceof Bar)
