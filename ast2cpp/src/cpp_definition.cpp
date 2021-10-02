@@ -86,7 +86,11 @@ std::string CppDef::EmitModuleNode(ModuleNode *node) {
     str += EmitTreeNode(node) + GetEnding(node);
   }
 
-  str += "\n\nvoid "s + name + "::__init_func__() { // bind \"this\" to current module\n"s;
+  str += "\n\nvoid "s + name + R"""(::__init_func__() { // bind \"this\" to current module
+static bool __init_once = false;
+if (__init_once) return;
+__init_once = true;
+)""";
   isInit = true;
   for (unsigned i = 0; i < node->GetTreesNum(); ++i) {
     if (auto n = node->GetTree(i)) {
