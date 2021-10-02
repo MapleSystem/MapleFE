@@ -86,10 +86,10 @@ std::string CppDef::EmitModuleNode(ModuleNode *node) {
     str += EmitTreeNode(node) + GetEnding(node);
   }
 
-  str += "\n\nvoid "s + klass + R"""(::__init_func__() { // bind \"this\" to current module
-static bool __init_once = false;
-if (__init_once) return;
-__init_once = true;
+  str += "\n\nvoid "s + klass + R"""(::__init_func__() { // bind "this" to current module
+  static bool __init_once = false;
+  if (__init_once) return;
+  __init_once = true;
 )""";
   isInit = true;
   for (unsigned i = 0; i < node->GetTreesNum(); ++i) {
@@ -143,30 +143,21 @@ std::string CppDef::EmitExportNode(ExportNode *node) {
   return HandleTreeNode(str, node);
 }
 
-std::string CppDef::EmitXXportAsPairNode(XXportAsPairNode *node) {
-  if (node == nullptr)
-    return std::string();
+std::string CppDef::EmitImportNode(ImportNode *node) {
   std::string str;
-  if (node->IsDefault()) {
-    if (auto n = node->GetBefore())
-      str += "{ "s + EmitTreeNode(n) + " as default }"s;
-  } else if (node->IsEverything()) {
-    str += " * "s;
-    if (auto n = node->GetBefore())
-      str += "as "s + EmitTreeNode(n);
-  } else {
-    if (auto n = node->GetBefore()) {
-      if (n->IsIdentifier())
-        str += "{ "s;
-      str += EmitTreeNode(n);
-      if (auto n = node->GetAfter())
-        str += " as "s + EmitTreeNode(n);
-      if (n->IsIdentifier())
-        str += " }"s;
+  if (auto n = node->GetTarget()) {
+    if (n->IsLiteral()) {
+      LiteralNode *lit = static_cast<LiteralNode *>(n);
+      LitData data = lit->GetData();
+      str = AstDump::GetEnumLitData(data);
+      str = '_' + GetModuleName(str.c_str()) + ".__init_func__();\n"s;
     }
   }
-  str = "/* CppDef::EmitXXportAsPairNode \n "s + str + ";\n*/"s;;
-  return HandleTreeNode(str, node);
+  return str;
+}
+
+std::string CppDef::EmitXXportAsPairNode(XXportAsPairNode *node) {
+  return std::string();
 }
 
 inline std::string GetClassName(FunctionNode* f) {

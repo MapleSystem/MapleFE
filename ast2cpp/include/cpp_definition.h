@@ -33,6 +33,7 @@ public:
   }
 
   virtual std::string EmitIdentifierNode(IdentifierNode *node);
+  virtual std::string EmitImportNode(ImportNode *node);
   virtual std::string EmitXXportAsPairNode(XXportAsPairNode *node);
   virtual std::string EmitExportNode(ExportNode *node);
   virtual std::string EmitUnaOperatorNode(UnaOperatorNode *node);
