@@ -59,6 +59,7 @@ public:
   virtual std::string EmitClassProps(TreeNode *node);
   virtual std::string EmitArrayElementNode(ArrayElementNode *node);
   virtual std::string EmitTypeAliasNode(TypeAliasNode* node);
+  virtual std::string EmitInstanceOfNode(InstanceOfNode *node);
   std::string EmitFuncScopeVarDecls(FunctionNode *node);
   std::string EmitStructNode(StructNode *node);
   std::string EmitStructLiteralNode(StructLiteralNode* node);
@@ -66,8 +67,11 @@ public:
   std::string EmitDirectFieldInit(std::string varName, StructLiteralNode* node);
   std::string EmitCppCtor(ClassNode* node);
   std::string EmitBracketNotationProp(ArrayElementNode* ae, OprId binOpId, bool isLhs, bool& isDynProp);
-  TypeId GetTypeFromDecl(IdentifierNode* id);
+  TypeId GetTypeIdFromDecl(TreeNode* id);
   bool   IsClassField(ArrayElementNode* node, std::string propKey);
+  bool   IsClassId(TreeNode* node);
+  std::string GetTypeForTemplateArg(TreeNode* node);
+  TreeNode*   FindDeclType(TreeNode* node);
 };
 
 } // namespace maplefe

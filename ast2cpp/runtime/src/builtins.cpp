@@ -4,6 +4,7 @@ namespace t2crt {
 
 Ctor_Function Function_ctor(&Function_ctor, Function_ctor.prototype, Object_ctor.prototype);
 Ctor_Object   Object_ctor  (&Function_ctor, Function_ctor.prototype, nullptr);
+Ctor_Function Number_ctor  (&Function_ctor, Function_ctor.prototype, Object_ctor.prototype);
 
 ARRAY_CTOR_DEF(int)
 ARRAY_CTOR_DEF(long)

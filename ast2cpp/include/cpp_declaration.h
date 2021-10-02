@@ -74,5 +74,7 @@ inline bool IsVarInitClass(DeclNode* node) {
 
 std::string ident(int n);
 
+bool IsBuiltinObj(std::string name);
+
 } // namespace maplefe
 #endif

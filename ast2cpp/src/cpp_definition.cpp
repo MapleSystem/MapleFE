@@ -401,8 +401,7 @@ std::string CppDef::EmitObjPropInit(std::string varName, TreeNode* varIdType, St
   if (userType == nullptr) {
     // no type info - create instance of builtin Object with proplist
     str = varName+ " = Object_ctor._new("s + EmitTreeNode(node) + ")"s;
-  } else if (mHandler->FindDecl(static_cast<IdentifierNode*>(userType->GetId())) &&
-             mHandler->FindDecl(static_cast<IdentifierNode*>(userType->GetId()))->IsClass()) {
+  } else if (IsClassId(userType->GetId())) {
     // user def class type
     // - create obj instance of user defined class and do direct field access init
     // - todo: handle class with generics
@@ -742,48 +741,35 @@ std::string CppDef::EmitContinueNode(ContinueNode *node) {
   return str;
 }
 
-TypeId CppDef::GetTypeFromDecl(IdentifierNode* id) {
-  TypeId type = TY_None;
-  DeclNode* decl = static_cast<DeclNode*>(mHandler->FindDecl(id));
-  if (decl && decl->GetVar() && decl->GetVar()->IsIdentifier()) {
-    IdentifierNode* var = static_cast<IdentifierNode*>(decl->GetVar());
-    if (var->GetType() && var->GetType()->IsPrimType()) {
-      type = static_cast<PrimTypeNode*>(var->GetType())->GetPrimType();
-    }
+TypeId CppDef::GetTypeIdFromDecl(TreeNode* node) {
+  TypeId typeId = TY_None;
+
+  if (auto typ = FindDeclType(node)) {
+    if (typ->IsPrimType())
+      typeId = static_cast<PrimTypeNode*>(typ)->GetPrimType();
   }
-  return type;
+  return typeId;
 }
 
+// Check if a bracket notation property is a class member field
 bool CppDef::IsClassField(ArrayElementNode* node, std::string propKey) {
-  IdentifierNode* classId = nullptr;
-
-//  MASSERT(node->GetArray()->IsIdentifier() && "Unexpected node type");
   if (!node->GetArray()->IsIdentifier()) {
     return false;
   }
-  if (auto n = mHandler->FindDecl(static_cast<IdentifierNode*>(node->GetArray()))) {
-    // find declaration of object and if class instance, get class identifer
-    if (n->IsDecl())
-      if (auto var = static_cast<DeclNode*>(n)->GetVar())
-        if (var->IsIdentifier())
-          if (auto type = static_cast<IdentifierNode*>(var)->GetType())
-            if (type->IsUserType() && static_cast<UserTypeNode*>(type)->IsTypeIdClass())
-              classId = static_cast<IdentifierNode*>(static_cast<UserTypeNode*>(type)->GetId());
-  }
-  if (classId) {
-    // look for class decl and check if propkey is in field list
-    if (auto n = mHandler->FindDecl(classId)) {
-      if (n->IsClass()) {
-        for (unsigned i = 0; i < static_cast<ClassNode*>(n)->GetFieldsNum(); ++i) {
-          auto fd = static_cast<ClassNode*>(n)->GetField(i);
-          if (fd->IsIdentifier())
-            // skip leading and trailing quote in propKey when comparing
-            if (propKey.compare(1, propKey.length()-2, static_cast<IdentifierNode*>(fd)->GetName()) == 0)
-              return true;
-        }
-      }
-    }
-  }
+  // find declared type of bracket notation obj; if class type
+  // if class type, lookup class decl and check if prop is a class member fd
+  if (auto typ = FindDeclType(node->GetArray()))
+    if (typ->IsUserType() && static_cast<UserTypeNode*>(typ)->IsTypeIdClass())
+      if (auto classId = static_cast<UserTypeNode*>(typ)->GetId())
+        if (auto n = mHandler->FindDecl(static_cast<IdentifierNode*>(classId)))
+          if (n->IsClass())
+            for (unsigned i = 0; i < static_cast<ClassNode*>(n)->GetFieldsNum(); ++i) {
+              auto fd = static_cast<ClassNode*>(n)->GetField(i);
+              if (fd->IsIdentifier())
+                // skip leading and trailing quote in propKey when comparing
+                if (propKey.compare(1, propKey.length()-2, static_cast<IdentifierNode*>(fd)->GetName()) == 0)
+                  return true;
+            }
   return false;
 }
 
@@ -829,8 +815,8 @@ std::string CppDef::EmitBracketNotationProp(ArrayElementNode* ae, OprId binOpId,
       return str;
     }
   }
-  if (propKeyType == TY_None && ae->GetExprAtIndex(0)->IsIdentifier()) {
-    propKeyType = GetTypeFromDecl(static_cast<IdentifierNode*>(ae->GetExprAtIndex(0)));
+  if (propKeyType == TY_None) {
+    propKeyType = GetTypeIdFromDecl(ae->GetExprAtIndex(0));
   }
   // resolve propKey at runtime
   switch (propKeyType) {
@@ -879,6 +865,18 @@ std::string CppDef::EmitBracketNotationProp(ArrayElementNode* ae, OprId binOpId,
   return str;
 }
 
+// return true if identifier is a class
+bool CppDef::IsClassId(TreeNode* node) {
+  if (node != nullptr &&
+      node->IsIdentifier() &&
+      node->IsTypeIdClass() &&
+      mHandler->FindDecl(static_cast<IdentifierNode*>(node)) &&
+      mHandler->FindDecl(static_cast<IdentifierNode*>(node))->IsClass())
+    return true;
+  else
+    return false;
+}
+
 std::string CppDef::EmitBinOperatorNode(BinOperatorNode *node) {
   if (node == nullptr)
     return std::string();
@@ -906,6 +904,8 @@ std::string CppDef::EmitBinOperatorNode(BinOperatorNode *node) {
   if (auto n = node->GetOpndB()) {
     if (IsBracketNotationProp(n)) {
       rhs = EmitBracketNotationProp(static_cast<ArrayElementNode*>(n), node->GetOprId(), false, rhsIsDynProp);
+    } else if (IsClassId(n)) {
+      rhs = "&"s + n->GetName() + "_ctor"s;
     } else
       rhs = EmitTreeNode(n);
     if(precd > mPrecedence || (precd == mPrecedence && !rl_assoc))
@@ -1189,6 +1189,96 @@ std::string CppDef::EmitStructNode(StructNode *node) {
 
 std::string CppDef::EmitTypeAliasNode(TypeAliasNode *node) {
   return std::string();
+}
+
+// Return the declared type for an identifier
+TreeNode* CppDef::FindDeclType(TreeNode* node) {
+  if (node == nullptr || !node->IsIdentifier())
+    return nullptr;
+
+  if (auto n = mHandler->FindDecl(static_cast<IdentifierNode*>(node)))
+    if (n->IsDecl())
+      if (auto var = static_cast<DeclNode*>(n)->GetVar())
+        if (var->IsIdentifier())
+          if (auto type = static_cast<IdentifierNode*>(var)->GetType())
+            return type;
+
+  return nullptr;
+}
+
+// Get template argument for calling InstanceOf template func.
+std::string CppDef::GetTypeForTemplateArg(TreeNode* node) {
+  if (node == nullptr)
+    return std::string();
+
+  std::string str;
+  if (auto n = FindDeclType(node)) {
+    // lhs type of instanceof operator is either object or ANY
+    switch(n->GetKind()) {
+      case NK_UserType:
+        str = EmitTreeNode(n);
+        break;
+      case NK_PrimType:
+        str = EmitTreeNode(n);
+        if (str.find("JS_Val") != std::string::npos)
+          str = "JS_Val";
+        break;
+      default:
+        MASSERT(0 && "Unexpected node type");
+    }
+  } else if (node->IsField()) {
+    // Lookup declared type of the obj in mUpper, then find
+    // mField from the obj field list to get the field type.
+    //
+    // The result is used as template argument for the InstanceOf
+    // template func. However, without this information
+    // the compiler does template argument deduction
+    // to call the template func, and has work ok for testcases.
+    // So implementation of this part is deferred until needed.
+  } else {
+    // No info - return ANY for now...
+    str = "JS_Val"s;
+    //MASSERT(0 && "Unexpected node type");
+  }
+  return str;
+}
+
+std::string CppDef::EmitInstanceOfNode(InstanceOfNode *node) {
+  if (node == nullptr)
+    return std::string();
+  const Precedence precd = '\014';
+  const bool rl_assoc = false;         // false: left-to-right
+  std::string lhs, rhs, typ;
+  if (auto n = node->GetLeft()) {
+    lhs = EmitTreeNode(n);
+    typ = GetTypeForTemplateArg(n);
+    if (typ.compare("JS_Val") == 0) {
+      lhs = "JS_Val("s + lhs + ")"s;
+      typ = "";
+    }
+    else if (!typ.empty())
+      typ = "<"s + typ + ">"s;        // InstanceOf<typ>
+
+    if(precd > mPrecedence)
+      lhs = '(' + lhs + ')';
+  }
+  else
+    lhs = "(NIL) "s;
+
+  if (auto n = node->GetRight()) {
+    if (IsClassId(n) || IsBuiltinObj(n->GetName()))
+      rhs = "&"s + n->GetName() + "_ctor"s;
+    else
+      rhs = EmitTreeNode(n);
+    if(precd > mPrecedence || (precd == mPrecedence && !rl_assoc))
+      rhs = '(' + rhs + ')';
+  }
+  else
+    rhs = " (NIL)"s;
+
+  std::string str("InstanceOf"s + typ + "("s + lhs + ", "s + rhs + ")"s);
+  mPrecedence = precd;
+  return HandleTreeNode(str, node);
 }
 
 } // namespace maplefe

@@ -454,7 +454,7 @@ std::string CppDecl::EmitFieldNode(FieldNode *node) {
 }
 
 // TODO: Add other builtin obj types
-std::vector<std::string>builtins = {"Object", "Function", "Array", "Record"};
+std::vector<std::string>builtins = {"Object", "Function", "Number", "Array", "Record"};
 
 bool IsBuiltinObj(std::string name) {
  return std::find(builtins.begin(), builtins.end(), name) != builtins.end();

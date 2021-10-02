@@ -22,6 +22,7 @@ class Ctor_Object;
 
 extern Ctor_Function Function_ctor;
 extern Ctor_Object   Object_ctor;
+extern Ctor_Function Number_ctor;
 //extern Ctor_Array    Array_ctor;
 
 class Ctor_Object   : public Function {
