@@ -61,7 +61,7 @@ std::string CppDef::EmitCppCtor(ClassNode* node) {
 std::string CppDef::EmitModuleNode(ModuleNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string name = GetModuleName();
+  std::string klass = GetModuleName();
   std::string str("// TypeScript filename: "s + node->GetFilename() + "\n"s);
   str += "#include <iostream>\n#include \""s + GetBaseFilename() + ".h\"\n\n"s;
 
@@ -86,7 +86,7 @@ std::string CppDef::EmitModuleNode(ModuleNode *node) {
     str += EmitTreeNode(node) + GetEnding(node);
   }
 
-  str += "\n\nvoid "s + name + R"""(::__init_func__() { // bind \"this\" to current module
+  str += "\n\nvoid "s + klass + R"""(::__init_func__() { // bind \"this\" to current module
 static bool __init_once = false;
 if (__init_once) return;
 __init_once = true;
@@ -110,14 +110,19 @@ __init_once = true;
 #endif
     }
   }
-  str += "}\n\n"s + name + " _"s + name + R"""(;
+  str += "}\n\n"s + klass + " _"s + klass + ";\n"s;
 
+  AST_Handler *handler = mHandler->GetASTHandler();
+  HandlerIndex idx = handler->GetHandlerIndex(node->GetFilename());
+  if (idx == 0) {
+    str += R"""(
 // If the program starts from this module, generate the main function
 int main(int argc, char **argv) {
-)""" + "  _"s + name + R"""(.__init_func__(); // only call to its __init_func__()
-  return 0;
+)""" + "  _"s + klass + R"""(.__init_func__(); // only call to its __init_func__()
+return 0;
 }
 )""";
+  }
   return str;
 }
 
