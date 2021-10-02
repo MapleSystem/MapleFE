@@ -138,8 +138,15 @@ std::string CppDef::EmitExportNode(ExportNode *node) {
   }
   auto num = node->GetPairsNum();
   for (unsigned i = 0; i < node->GetPairsNum(); ++i) {
-    if (auto n = node->GetPair(i))
-      str += EmitXXportAsPairNode(n);
+    if (auto x = node->GetPair(i)) {
+      if (x->IsDefault()) {
+        if (auto n = x->GetBefore()) {
+          std::string v = EmitTreeNode(n);
+          str += "__default_"s + v + " = "s + v + ";\n"s;
+        }
+      }
+      //str += EmitXXportAsPairNode(n);
+    }
   }
   return HandleTreeNode(str, node);
 }

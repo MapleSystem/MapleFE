@@ -84,13 +84,17 @@ class ImportExportModules : public AstVisitor {
     }
 
     ExportNode *VisitExportNode(ExportNode *node) {
+      std::string m = "_"s + mCppDecl->GetModuleName();
       for (unsigned i = 0; i < node->GetPairsNum(); ++i) {
         if (auto x = node->GetPair(i)) {
-          std::string str;
           if (x->IsDefault()) {
-            if (auto n = x->GetBefore())
-              str += "default "s + mEmitter->EmitTreeNode(n);
+            if (auto n = x->GetBefore()) {
+              std::string v = mEmitter->EmitTreeNode(n);
+              mExportDefault = "#define "s + m + "__default "s + m + ".__default_"s + v + '\n';
+              mImports += "decltype("s + v + ") __default_"s + v + ";\n"s;
+            }
           } else if (x->IsSingle()) {
+            std::string str;
             if (auto a = x->GetAfter())
               str += mEmitter->EmitTreeNode(a);
             if (auto n = x->GetBefore()) {
@@ -103,10 +107,8 @@ class ImportExportModules : public AstVisitor {
               if (auto a = x->GetAfter()) {
                 std::string v = mEmitter->EmitTreeNode(n);
                 std::string d = mEmitter->EmitTreeNode(a);
-                if (d == "default") {
-                  std::string m = "_"s + mCppDecl->GetModuleName();
+                if (d == "default")
                   mExportDefault = "#define "s + m + "__default "s + m + '.' + v + '\n';
-                }
               }
             }
           }
@@ -201,11 +203,11 @@ using namespace t2crt;
   str += R"""(
 class )""" + name + R"""( : public t2crt::Object {
 public: // all top level variables in the module
-)""" + xxportModules.GetImports();
+)""";
 
   CollectDecls decls(this);
   decls.VisitTreeNode(node);
-  str += decls.GetDecls();
+  str += decls.GetDecls() + xxportModules.GetImports();
 
   str += R"""(
 public: // all top level functions in the module
