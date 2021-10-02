@@ -134,6 +134,8 @@ std::string CppDef::EmitExportNode(ExportNode *node) {
   std::string target;
   if (auto n = node->GetTarget()) {
     target = EmitTreeNode(n);
+    // 'export *' does not re-export a default, it re-exports only named exports
+    // Multiple 'export *'s fails if they export multiple exports with same name
     str += "// re-export: "s + target + "\n"s;
   }
   auto num = node->GetPairsNum();
