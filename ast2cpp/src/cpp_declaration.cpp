@@ -35,16 +35,21 @@ class ImportExportModules : public AstVisitor {
     }
     ~ImportExportModules() { delete mEmitter; }
 
-    ImportNode *VisitImportNode(ImportNode *node) {
+    std::string AddIncludes(TreeNode *node) {
       std::string filename;
-      if (auto n = node->GetTarget()) {
-        filename = mEmitter->EmitTreeNode(n);
+      if (node) {
+        filename = mEmitter->EmitTreeNode(node);
         auto len = filename.size();
         filename = len >= 2 && filename.back() == '"' ? filename.substr(1, len - 2) : std::string();
         // may have some duplicated include directives which do not hurt
         if (!filename.empty())
           mIncludes += "#include \""s + filename + ".h\"\n"s;
       }
+      return filename;
+    }
+
+    ImportNode *VisitImportNode(ImportNode *node) {
+      std::string filename = AddIncludes(node->GetTarget());
       std::string mod = "_"s + mCppDecl->GetModuleName(filename.c_str());
       for (unsigned i = 0; i < node->GetPairsNum(); ++i) {
         if (auto x = node->GetPair(i)) {
@@ -84,7 +89,8 @@ class ImportExportModules : public AstVisitor {
     }
 
     ExportNode *VisitExportNode(ExportNode *node) {
-      std::string m = "_"s + mCppDecl->GetModuleName();
+      std::string filename = AddIncludes(node->GetTarget());
+      std::string m = "_"s + mCppDecl->GetModuleName(filename.c_str());
       for (unsigned i = 0; i < node->GetPairsNum(); ++i) {
         if (auto x = node->GetPair(i)) {
           if (x->IsDefault()) {

@@ -80,7 +80,7 @@ std::string Emitter::GetBaseFilename() {
 }
 
 std::string Emitter::GetModuleName(const char *p) {
-  std::string str = p ? p : GetBaseFilename();
+  std::string str = p && *p ? p : GetBaseFilename();
   size_t pos = str.rfind("/", std::string::npos);
   str = pos == std::string::npos ? str : str.substr(pos);
   for (auto &c : str)
