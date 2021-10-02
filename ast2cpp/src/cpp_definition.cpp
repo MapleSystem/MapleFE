@@ -134,7 +134,7 @@ std::string CppDef::EmitExportNode(ExportNode *node) {
   std::string target;
   if (auto n = node->GetTarget()) {
     target = EmitTreeNode(n);
-    str += "// target: "s + target + "\n"s;
+    str += "// re-export: "s + target + "\n"s;
   }
   auto num = node->GetPairsNum();
   for (unsigned i = 0; i < node->GetPairsNum(); ++i) {
@@ -145,15 +145,9 @@ std::string CppDef::EmitExportNode(ExportNode *node) {
 }
 
 std::string CppDef::EmitImportNode(ImportNode *node) {
-  std::string str;
-  if (auto n = node->GetTarget()) {
-    if (n->IsLiteral()) {
-      LiteralNode *lit = static_cast<LiteralNode *>(n);
-      LitData data = lit->GetData();
-      str = AstDump::GetEnumLitData(data);
-      str = '_' + GetModuleName(str.c_str()) + ".__init_func__();\n"s;
-    }
-  }
+  std::string str = GetModuleName(node->GetTarget());
+  if (!str.empty())
+    str = '_' + str + ".__init_func__();\n"s;
   return str;
 }
 

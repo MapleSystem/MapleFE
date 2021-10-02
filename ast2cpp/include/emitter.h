@@ -43,6 +43,7 @@ public:
   std::string Clean(std::string &s);
   std::string GetBaseFilename();
   std::string GetModuleName(const char *p = nullptr);
+  std::string GetModuleName(TreeNode *node);
 
   Module_Handler *GetModuleHandler() { return mHandler; }
   ModuleNode *GetASTModule() { return mHandler->GetASTModule(); }

@@ -37,13 +37,13 @@ class ImportExportModules : public AstVisitor {
 
     ImportNode *VisitImportNode(ImportNode *node) {
       std::string filename;
-      auto n = node->GetTarget();
-      if (n && n->IsLiteral()) {
-        LiteralNode *lit = static_cast<LiteralNode *>(n);
-        LitData data = lit->GetData();
-        filename = AstDump::GetEnumLitData(data);
+      if (auto n = node->GetTarget()) {
+        filename = mEmitter->EmitTreeNode(n);
+        auto len = filename.size();
+        filename = len >= 2 && filename.back() == '"' ? filename.substr(1, len - 2) : std::string();
         // may have some duplicated include directives which do not hurt
-        mIncludes += "#include \""s + filename + ".h\"\n"s;
+        if (!filename.empty())
+          mIncludes += "#include \""s + filename + ".h\"\n"s;
       }
       std::string mod = "_"s + mCppDecl->GetModuleName(filename.c_str());
       for (unsigned i = 0; i < node->GetPairsNum(); ++i) {

@@ -89,6 +89,17 @@ std::string Emitter::GetModuleName(const char *p) {
   return "M_"s + str;
 }
 
+std::string Emitter::GetModuleName(TreeNode *node) {
+  if (node == nullptr)
+    return std::string();
+  std::string str = EmitTreeNode(node);
+  auto len = str.length();
+  if (len <= 2 || str.back() != '"' || str.front() != '"')
+    return std::string();
+  str = str.substr(1, len - 2);
+  return GetModuleName(str.c_str());
+}
+
 std::string Emitter::GetEnumAttrId(AttrId k) {
   std::string str(AstDump::GetEnumAttrId(k) + 5);
   Emitter::Replace(str, "etter", "et");
