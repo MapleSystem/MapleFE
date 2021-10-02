@@ -44,6 +44,7 @@ public:
   std::string GetBaseFilename();
   std::string GetModuleName(const char *p = nullptr);
 
+  Module_Handler *GetModuleHandler() { return mHandler; }
   ModuleNode *GetASTModule() { return mHandler->GetASTModule(); }
 
   virtual std::string EmitAnnotationNode(AnnotationNode *node);

@@ -20,29 +20,105 @@
 
 namespace maplefe {
 
-class ImportModules : public AstVisitor {
+class ImportExportModules : public AstVisitor {
   private:
     CppDecl     *mCppDecl;
+    Emitter     *mEmitter;
     std::string  mIncludes;
     std::string  mImports;
+    std::string  mExports;
+    std::string  mExportDefault;
 
   public:
-    ImportModules(CppDecl *c) : mCppDecl(c) {}
+    ImportExportModules(CppDecl *c) : mCppDecl(c) {
+      mEmitter = new Emitter(c->GetModuleHandler());
+    }
+    ~ImportExportModules() { delete mEmitter; }
 
     ImportNode *VisitImportNode(ImportNode *node) {
+      std::string filename;
       auto n = node->GetTarget();
       if (n && n->IsLiteral()) {
         LiteralNode *lit = static_cast<LiteralNode *>(n);
         LitData data = lit->GetData();
-        std::string filename = AstDump::GetEnumLitData(data);
+        filename = AstDump::GetEnumLitData(data);
         // may have some duplicated include directives which do not hurt
         mIncludes += "#include \""s + filename + ".h\"\n"s;
+      }
+      std::string mod = "_"s + mCppDecl->GetModuleName(filename.c_str());
+      for (unsigned i = 0; i < node->GetPairsNum(); ++i) {
+        if (auto x = node->GetPair(i)) {
+          std::string str;
+          if (x->IsDefault()) {
+            if (auto n = x->GetBefore()) {
+              std::string m = mod + "__default"s;
+              std::string s = mEmitter->EmitTreeNode(n);
+              mImports += "static constexpr decltype("s + m + ") &"s + s + " = "s + m + ";\n"s;
+            }
+          } else if (x->IsSingle()) {
+            if (auto a = x->GetAfter())
+              str += mEmitter->EmitTreeNode(a);
+            if (auto n = x->GetBefore()) {
+              str += " = "s;
+              std::string s = mEmitter->EmitTreeNode(n);
+              str += n->IsLiteral() ? "require("s + s + ')' : s;
+            }
+          } else if (x->IsEverything()) {
+            if (auto n = x->GetBefore()) {
+              std::string s = mEmitter->EmitTreeNode(n);
+              mImports += "static constexpr auto "s + s + " = &" + mod + ";\n"s;
+            }
+          } else {
+            if (auto n = x->GetBefore()) {
+              if (auto a = x->GetAfter()) {
+                std::string v = mEmitter->EmitTreeNode(n);
+                std::string d = mEmitter->EmitTreeNode(a);
+                if (d == "default") {
+                }
+              }
+            }
+          }
+        }
+      }
+      return node;
+    }
+
+    ExportNode *VisitExportNode(ExportNode *node) {
+      for (unsigned i = 0; i < node->GetPairsNum(); ++i) {
+        if (auto x = node->GetPair(i)) {
+          std::string str;
+          if (x->IsDefault()) {
+            if (auto n = x->GetBefore())
+              str += "default "s + mEmitter->EmitTreeNode(n);
+          } else if (x->IsSingle()) {
+            if (auto a = x->GetAfter())
+              str += mEmitter->EmitTreeNode(a);
+            if (auto n = x->GetBefore()) {
+              str += " = "s;
+              std::string s = mEmitter->EmitTreeNode(n);
+              str += n->IsLiteral() ? "require("s + s + ')' : s;
+            }
+          } else if (!x->IsEverything()) {
+            if (auto n = x->GetBefore()) {
+              if (auto a = x->GetAfter()) {
+                std::string v = mEmitter->EmitTreeNode(n);
+                std::string d = mEmitter->EmitTreeNode(a);
+                if (d == "default") {
+                  std::string m = "_"s + mCppDecl->GetModuleName();
+                  mExportDefault = "#define "s + m + "__default "s + m + '.' + v + '\n';
+                }
+              }
+            }
+          }
+        }
       }
       return node;
     }
 
     std::string GetIncludes() { return mIncludes; }
     std::string GetImports() { return mImports; }
+    std::string GetExports() { return mExports; }
+    std::string GetExportDefault() { return mExportDefault; }
 };
 
 class ClassDecls : public AstVisitor {
@@ -113,9 +189,9 @@ using namespace t2crt;
 )""";
 
   // import modules
-  ImportModules importModules(this);
-  importModules.VisitTreeNode(node);
-  str += importModules.GetIncludes();
+  ImportExportModules xxportModules(this);
+  xxportModules.VisitTreeNode(node);
+  str += xxportModules.GetIncludes();
 
   // declarations of user defined classes
   ClassDecls clsDecls(this);
@@ -125,7 +201,7 @@ using namespace t2crt;
   str += R"""(
 class )""" + name + R"""( : public t2crt::Object {
 public: // all top level variables in the module
-)""";
+)""" + xxportModules.GetImports();
 
   CollectDecls decls(this);
   decls.VisitTreeNode(node);
@@ -152,7 +228,7 @@ public: // all top level functions in the module
   Object exports;
 };
 
-extern )""" + name + " _"s + name + ";\n#endif\n"s;
+extern )""" + name + " _"s + name + ";\n"s + xxportModules.GetExportDefault() + "#endif\n"s;
   return str;
 }
 

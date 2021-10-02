@@ -30,8 +30,9 @@ for f; do
     [ -f $t.ts ] && f=$t.ts
     $TS2AST $f || { echo "(ts2ast)$f" >> ts2cpp.failures.out; break; }
     $AST2CPP $f.ast --no-imported || { echo "(ast2cpp)$f" >> ts2cpp.failures.out; break; }
-    g++ $t.cpp $RTSRC/*.cpp -o $t || { echo "(g++)$f" >> ts2cpp.failures2.out; break; }
-    ./$t || { echo "(run)$f" >> ts2cpp.failures2.out; break; }
+    dep=$(grep "^import.* from " "$f" | sed "s/^ *import.* from .\([^'\"]*\).*/\1.cpp/")
+    g++ $t.cpp $RTSRC/*.cpp $dep -o $t.out || { echo "(g++)$f" >> ts2cpp.failures2.out; break; }
+    ./$t.out || { echo "(run)$f" >> ts2cpp.failures2.out; break; }
     echo $t >> ts2cpp.summary.out
     break
   done
