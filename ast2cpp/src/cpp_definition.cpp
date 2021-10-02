@@ -99,13 +99,14 @@ std::string CppDef::EmitModuleNode(ModuleNode *node) {
         str += "  "s + EmitTreeNode(n) + ";\n"s;
 #else
       if (n->GetKind() != NK_Class) {
-        str += "  "s + EmitTreeNode(n);
-        if (str.back() == '\n')
+        std::string s = EmitTreeNode(n);
+        if (s.back() == '\n') {
+          str += ' ' + s;
           continue;
-        else if (str.back() == ';')
-          str += "\n"s;
-        else
-          str += ";\n"s;
+        } else if (s.back() == ';')
+          str += ' ' + s + "\n"s;
+        else if (!s.empty())
+          str += ' ' + s + ";\n"s;
       }
 #endif
     }
