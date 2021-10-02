@@ -11,6 +11,7 @@ output/
 *.out.ts
 *.ts.ast
 gdbfile
+cxx.log
 test/typescript/**/*.cpp
 test/typescript/**/*.h
 test/TypeScript/
