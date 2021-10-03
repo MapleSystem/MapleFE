@@ -198,7 +198,7 @@ std::string CppDecl::EmitModuleNode(ModuleNode *node) {
   str += "#ifndef "s + header + "#define "s + header;
   str += R"""(
 #include "ts2cpp.h"
-using namespace t2crt;
+// using namespace t2crt;
 
 )""";
 
@@ -239,7 +239,7 @@ public: // all top level functions in the module
 
   str += R"""(
   // exports
-  Object exports;
+  t2crt::Object exports;
 };
 
 extern )""" + name + " _"s + name + ";\n"s + xxportModules.GetExportDefault() + "#endif\n"s;
@@ -338,7 +338,7 @@ std::string CppDecl::EmitDeclNode(DeclNode *node) {
   if (auto n = node->GetVar()) {
     str += "  "s + EmitTreeNode(n);
 
-    // Generate initializer for Array decl in header file.
+    // Generate initializer for t2crt::Array decl in header file.
     int dims = 0;
     if (auto init = node->GetInit()) {
       if (init->IsArrayLiteral() &&
@@ -351,13 +351,13 @@ std::string CppDecl::EmitDeclNode(DeclNode *node) {
             if (auto id = u->GetId()) {
               // Get name of user defined class or TS builtin objects to work with
               // names of multi dim array generated with templates in builtins.h
-              // ("Object" need to be translated into ObjectP which is alias to type
-              // Object* (see builtins.h)). Works ok with user defined classes and
+              // ("t2crt::Object" need to be translated into t2crt::ObjectP which is alias to type
+              // t2crt::Object* (see builtins.h)). Works ok with user defined classes and
               // builtin such as in array-new-elems.ts but still need more work
               // to handle more TS builtin object types.
               type = id->GetName();
-              if (type.compare("Object") == 0)
-                type = "ObjectP";
+              if (type.compare("t2crt::Object") == 0)
+                type = "t2crt::ObjectP";
             }
             dims = u->GetDims()? u->GetDimsNum(): 0;
             str += EmitArrayLiteral(static_cast<ArrayLiteralNode*>(init), dims, type);
@@ -421,8 +421,8 @@ std::string CppDecl::EmitArrayLiteral(ArrayLiteralNode *node, int dim, std::stri
   if (node == nullptr)
     return std::string();
 
-  // Generate ctor call to instantiate Array, e.g. Array1D_long._new(). See builtins.h
-  std::string str("Array"s + std::to_string(dim) + "D_"s + type + "._new({"s );
+  // Generate ctor call to instantiate t2crt::Array, e.g. t2crt::Array1D_long._new(). See builtins.h
+  std::string str("t2crt::Array"s + std::to_string(dim) + "D_"s + type + "._new({"s );
   for (unsigned i = 0; i < node->GetLiteralsNum(); ++i) {
     if (i)
       str += ", "s;
@@ -439,9 +439,9 @@ std::string CppDecl::EmitArrayLiteral(ArrayLiteralNode *node, int dim, std::stri
 
 std::string GetArrayTypeString(int dim, std::string typeStr) {
   std::string str;
-  str = "Array<"s + typeStr + ">*"s;;
+  str = "t2crt::Array<"s + typeStr + ">*"s;;
   for (unsigned i = 1; i < dim; ++i) {
-    str = "Array<"s + str + ">*"s;;
+    str = "t2crt::Array<"s + str + ">*"s;;
   }
   return str;
 }
@@ -468,7 +468,7 @@ std::string CppDecl::EmitFieldNode(FieldNode *node) {
 }
 
 // TODO: Add other builtin obj types
-std::vector<std::string>builtins = {"Object", "Function", "Number", "Array", "Record"};
+std::vector<std::string>builtins = {"t2crt::Object", "t2crt::Function", "t2crt::Number", "t2crt::Array", "t2crt::Record"};
 
 bool IsBuiltinObj(std::string name) {
  return std::find(builtins.begin(), builtins.end(), name) != builtins.end();
@@ -518,14 +518,14 @@ std::string CppDecl::GetTypeString(TreeNode *node, TreeNode *child) {
       case TY_Double:
         return "double "s;
       case TY_Class:
-        return "Object* "s;
+        return "t2crt::Object* "s;
       case TY_Any:
         return "t2crt::JS_Val "s;
     }
     {
       if (child && child->IsStruct() && static_cast<StructNode*>(child)->GetProp() == SProp_NA) {
         // This will change pending solution for issue #69.
-        return "Object * "s; // object literal type - dynamic-import.ts
+        return "t2crt::Object * "s; // object literal type - dynamic-import.ts
       }
       str = child ? EmitTreeNode(child) : Emitter::GetEnumTypeId(k);
       if (str != "none"s)
@@ -541,7 +541,7 @@ std::string CppDecl::EmitUserTypeNode(UserTypeNode *node) {
   {
     auto k = node->GetType();
     if(k == UT_Union || k == UT_Inter)
-      // Generate both vars and arrays of union/intersect type as JS_Val of type TY_Object.
+      // Generate both vars and arrays of union/intersect type as t2crt::JS_Val of type TY_Object.
       return "t2crt::JS_Val"s;
   }
   std::string str, usrType;
@@ -602,13 +602,13 @@ std::string CppDecl::EmitClassNode(ClassNode *node) {
     return std::string();
 
   // 1. c++ class for JS object
-  base = (node->GetSuperClassesNum() != 0)? node->GetSuperClass(0)->GetName() : "Object";
+  base = (node->GetSuperClassesNum() != 0)? node->GetSuperClass(0)->GetName() : "t2crt::Object";
   str += "class "s + node->GetName() + " : public "s + base + " {\n"s;
 
   str += "public:\n";
 
   // constructor decl
-  str += "  "s + node->GetName() + "(Function* ctor, Object* proto);\n"s;
+  str += "  "s + node->GetName() + "(t2crt::Function* ctor, t2crt::Object* proto);\n"s;
   str += "  ~"s + node->GetName() + "(){}\n";
 
   // class field decl and init. TODO: handle static, private, protected attrs.
@@ -620,7 +620,7 @@ std::string CppDecl::EmitClassNode(ClassNode *node) {
         if (init->IsArrayLiteral() &&
             static_cast<IdentifierNode*>(n)->GetType() &&
             static_cast<IdentifierNode*>(n)->GetType()->IsPrimArrayType() ) {
-              // Generate initializer for Array member field decl in header file
+              // Generate initializer for t2crt::Array member field decl in header file
               PrimArrayTypeNode* mtype = static_cast<PrimArrayTypeNode *>(static_cast<IdentifierNode*>(n)->GetType());
               str += " = "s + EmitArrayLiteral(static_cast<ArrayLiteralNode*>(init),
                                 mtype->GetDims()->GetDimensionsNum(),
@@ -638,10 +638,10 @@ std::string CppDecl::EmitClassNode(ClassNode *node) {
   str += "};\n\n";
 
   // 2. c++ class for JS object's corresponding JS constructor
-  base = (node->GetSuperClassesNum() != 0)? ("Ctor_"s+node->GetSuperClass(0)->GetName()) : "Function";
+  base = (node->GetSuperClassesNum() != 0)? ("Ctor_"s+node->GetSuperClass(0)->GetName()) : "t2crt::Function";
   str += "class "s + "Ctor_" + node->GetName() + " : public "s + base + " {\n"s;
   str += "public:\n";
-  str += "  Ctor_"s+node->GetName()+"(Function* ctor, Object* proto, Object* prototype_proto) : "+base+"(ctor, proto, prototype_proto) {}\n";
+  str += "  Ctor_"s+node->GetName()+"(t2crt::Function* ctor, t2crt::Object* proto, t2crt::Object* prototype_proto) : "+base+"(ctor, proto, prototype_proto) {}\n";
 
   // constructor function
   for (unsigned i = 0; i < node->GetConstructorsNum(); ++i) {
@@ -679,7 +679,7 @@ std::string CppDecl::EmitNewNode(NewNode *node) {
     // Generate code to create new obj and call constructor
     str = node->GetId()->GetName() + "_ctor("s + node->GetId()->GetName() + "_ctor._new("s;
   } else if (IsBuiltinObj(node->GetId()->GetName())) {
-    // Check for builtin obejcts: Object, Function, etc.
+    // Check for builtin obejcts: t2crt::Object, t2crt::Function, etc.
     str = node->GetId()->GetName() + "_ctor._new("s;
   } else  {
     str = "new "s + EmitTreeNode(node->GetId());
@@ -705,7 +705,7 @@ std::string CppDecl::EmitInterface(StructNode *node) {
   if (node == nullptr)
     return std::string();
 
-  std::string superClass = "Object";
+  std::string superClass = "t2crt::Object";
   if (node->GetSupersNum() > 0) {
     auto n = node->GetSuper(0);
     superClass = EmitTreeNode(n);
@@ -725,7 +725,7 @@ std::string CppDecl::EmitInterface(StructNode *node) {
   }
   str += "    "s  + ifName + "() {};\n"s;
   str += "    ~"s + ifName + "() {};\n"s;
-  str += "    "s  + ifName + "(Function* ctor, Object* proto, std::vector<ObjectProp> props): "s + superClass + "(ctor, proto, props) {}\n"s;
+  str += "    "s  + ifName + "(t2crt::Function* ctor, t2crt::Object* proto, std::vector<t2crt::ObjectProp> props): "s + superClass + "(ctor, proto, props) {}\n"s;
   str += "};\n"s;
   return str;
 }
@@ -758,7 +758,7 @@ std::string CppDecl::EmitTSEnum(StructNode *node) {
   std::string enumClsName;
   if (auto n = node->GetStructId()) {
     enumClsName = "Enum_"s + IdentifierName(n);
-    str += enumClsName + " : public Object {\n"s;
+    str += enumClsName + " : public t2crt::Object {\n"s;
   }
   str += "  public:\n"s;
   for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {

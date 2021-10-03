@@ -20,11 +20,11 @@ namespace maplefe {
 
 std::string EmitCtorInstance(ClassNode *c) {
   std::string str, thisClass, ctor, proto, prototypeProto;
-  ctor = "&Function_ctor";
+  ctor = "&t2crt::Function_ctor";
   thisClass = c->GetName();
   if (c->GetSuperClassesNum() == 0) {
-    proto = "Function_ctor.prototype";
-    prototypeProto = "Object_ctor.prototype";
+    proto = "t2crt::Function_ctor.prototype";
+    prototypeProto = "t2crt::Object_ctor.prototype";
   } else {
     proto = c->GetSuperClass(0)->GetName() + "_ctor"s;
     prototypeProto = proto + ".prototype"s;
@@ -53,8 +53,8 @@ std::string EmitDefaultCtor(ClassNode *c) {
 std::string CppDef::EmitCppCtor(ClassNode* node) {
   std::string str, base, props;
   props = EmitClassProps(node);
-  base = (node->GetSuperClassesNum() != 0)? node->GetSuperClass(0)->GetName() : "Object";
-  str += node->GetName() + "::"s + node->GetName() + "(Function* ctor, Object* proto): "s + base + "(ctor, proto)"  + " {\n"s + props +"}\n"s;
+  base = (node->GetSuperClassesNum() != 0)? node->GetSuperClass(0)->GetName() : "t2crt::Object";
+  str += node->GetName() + "::"s + node->GetName() + "(t2crt::Function* ctor, t2crt::Object* proto): "s + base + "(ctor, proto)"  + " {\n"s + props +"}\n"s;
   return str;
 }
 
@@ -177,27 +177,27 @@ inline bool IsClassMethod(FunctionNode* f) {
 
 std::map<TypeId, std::string>TypeIdToJSType = {
   // AST TypeId to t2crt JSType string mapping
-  {TY_Object,  "TY_Object"},
-  {TY_Function,"TY_Function"},
-  {TY_Boolean, "TY_Bool"},
-  {TY_Int,     "TY_Long"},
-  {TY_String,  "TY_String"},
-  {TY_Number,  "TY_Double"},
-  {TY_Double,  "TY_Double"},
-  {TY_Array,   "TY_Array"},
-  {TY_Class,   "TY_Class"}
+  {TY_Object,  "t2crt::TY_Object"},
+  {TY_Function,"t2crt::TY_Function"},
+  {TY_Boolean, "t2crt::TY_Bool"},
+  {TY_Int,     "t2crt::TY_Long"},
+  {TY_String,  "t2crt::TY_String"},
+  {TY_Number,  "t2crt::TY_Double"},
+  {TY_Double,  "t2crt::TY_Double"},
+  {TY_Array,   "t2crt::TY_Array"},
+  {TY_Class,   "t2crt::TY_Class"}
 };
 
 // Generate call to create obj prop with ptr to c++ class fld member
 // example emit result for class Foo member f1, type long
-// obj->AddProp("f1", ClassFld<long Foo::*>(&Foo::f1).NewProp(TY_Long));
+// obj->AddProp("f1", t2crt::ClassFld<long Foo::*>(&Foo::f1).NewProp(TY_Long));
 std::string EmitAddPropWithClassFld(std::string objName,
                                   std::string className,
                                   std::string fdName,
                                   std::string fdCType,
                                   std::string fdJSType)  {
   std::string str;
-  str = objName+ "->AddProp(\""s + fdName + "\", ClassFld<"s + fdCType +
+  str = objName+ "->AddProp(\""s + fdName + "\", t2crt::ClassFld<"s + fdCType +
         " "s + className + "::*>(&"s + className + "::"s + fdName +
         ").NewProp("s + fdJSType + "))"s;
   return str;
@@ -326,11 +326,11 @@ std::string CppDef::EmitIdentifierNode(IdentifierNode *node) {
   return str;
 }
 
-// Generate vector of ObjectProp to be passed to Object constructor.
+// Generate vector of t2crt::ObjectProp to be passed to t2crt::Object constructor.
 std::string CppDef::EmitStructLiteralNode(StructLiteralNode* node) {
   std::string str;
   int stops = 2;
-  str += "\n"s + ident(stops) + "std::vector<ObjectProp>({\n"s;
+  str += "\n"s + ident(stops) + "std::vector<t2crt::ObjectProp>({\n"s;
   for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
     if (i)
       str += ",\n"s;
@@ -346,30 +346,30 @@ std::string CppDef::EmitStructLiteralNode(StructLiteralNode* node) {
         case TY_Function:
           break;
         case TY_Array:
-          //str += "std::make_pair(\""s + fieldName + "\", JS_Val(Object*("s + fieldVal + ")))"s;
+          //str += "std::make_pair(\""s + fieldName + "\", t2crt::JS_Val(t2crt::Object*("s + fieldVal + ")))"s;
           break;
         case TY_Boolean:
-          str += "std::make_pair(\""s + fieldName + "\", JS_Val(bool("s + fieldVal + ")))"s;
+          str += "std::make_pair(\""s + fieldName + "\", t2crt::JS_Val(bool("s + fieldVal + ")))"s;
           break;
         case TY_None:
           if (fieldVal.compare("true") == 0 || fieldVal.compare("false") == 0)
-            str += "std::make_pair(\""s + fieldName + "\", JS_Val(bool("s + fieldVal + ")))"s;
+            str += "std::make_pair(\""s + fieldName + "\", t2crt::JS_Val(bool("s + fieldVal + ")))"s;
           break;
         case TY_Int:
-          str += "std::make_pair(\""s + fieldName + "\", JS_Val(int64_t("s + fieldVal + ")))"s;
+          str += "std::make_pair(\""s + fieldName + "\", t2crt::JS_Val(int64_t("s + fieldVal + ")))"s;
           break;
         case TY_String:
-          str += "std::make_pair(\""s + fieldName + "\", JS_Val(new std::string("s + fieldVal + ")))"s;
+          str += "std::make_pair(\""s + fieldName + "\", t2crt::JS_Val(new std::string("s + fieldVal + ")))"s;
           break;
         case TY_Number:
         case TY_Double:
-          str += "std::make_pair(\""s + fieldName + "\", JS_Val(double("s + fieldVal + ")))"s;
+          str += "std::make_pair(\""s + fieldName + "\", t2crt::JS_Val(double("s + fieldVal + ")))"s;
           break;
         case TY_Class:
-          // Handle embedded ObjectLiterals recursively
+          // Handle embedded t2crt::ObjectLiterals recursively
           if (lit->IsStructLiteral()) {
             std::string props = EmitStructLiteralNode(static_cast<StructLiteralNode*>(lit));
-            str += "std::make_pair(\""s + fieldName + "\", JS_Val(Object_ctor._new("s + props + ")))"s;
+            str += "std::make_pair(\""s + fieldName + "\", t2crt::JS_Val(t2crt::Object_ctor._new("s + props + ")))"s;
           }
           break;
       }
@@ -398,12 +398,12 @@ std::string CppDef::EmitObjPropInit(std::string varName, TreeNode* varIdType, St
     return std::string();
 
   std::string str;
-  // UserType can be TS interface, class, type alias, builtin (Object, Record..)
+  // UserType can be TS interface, class, type alias, builtin (t2crt::Object, t2crt::Record..)
   UserTypeNode* userType = (varIdType && varIdType->IsUserType())? (UserTypeNode*)varIdType: nullptr;
 
   if (userType == nullptr) {
-    // no type info - create instance of builtin Object with proplist
-    str = varName+ " = Object_ctor._new("s + EmitTreeNode(node) + ")"s;
+    // no type info - create instance of builtin t2crt::Object with proplist
+    str = varName+ " = t2crt::Object_ctor._new("s + EmitTreeNode(node) + ")"s;
   } else if (IsClassId(userType->GetId())) {
     // user def class type
     // - create obj instance of user defined class and do direct field access init
@@ -412,9 +412,9 @@ std::string CppDef::EmitObjPropInit(std::string varName, TreeNode* varIdType, St
     str = varName+ " = "s +userType->GetId()->GetName()+ "_ctor._new();\n"s;
     str += EmitDirectFieldInit(varName, node);
   } else {
-    // type is builtin (e.g. Record) and StructNode types (e.g. TSInterface)
-    // create instance of type but set constructor to the builtin Object.
-    str = varName+ " = new "s +EmitUserTypeNode(userType)+ "(&Object_ctor, Object_ctor.prototype, "s + EmitTreeNode(node) +");\n"s;
+    // type is builtin (e.g. t2crt::Record) and StructNode types (e.g. TSInterface)
+    // create instance of type but set constructor to the builtin t2crt::Object.
+    str = varName+ " = new "s +EmitUserTypeNode(userType)+ "(&t2crt::Object_ctor, t2crt::Object_ctor.prototype, "s + EmitTreeNode(node) +");\n"s;
     auto n = mHandler->FindDecl(static_cast<IdentifierNode*>(userType->GetId()));
     if (n && n->IsStruct() && static_cast<StructNode*>(n)->GetProp() == SProp_TSInterface) {
       str += EmitDirectFieldInit(varName, node); // do direct field init
@@ -435,7 +435,7 @@ std::string CppDef::EmitDeclNode(DeclNode *node) {
   TreeNode* idType = nullptr;
   //std::string str(Emitter::GetEnumDeclProp(node->GetProp()));
 
-  // Global vars are already declared in .h. Function vars of type JS_Var are
+  // Global vars are already declared in .h. t2crt::Function vars of type JS_Var are
   // already declared in EmitFuncSCopeVarDecls, so for both cases, emit var name.
   // For function var of JS_Let/JS_Const, emit both var type & name
   if (auto n = node->GetVar()) {
@@ -476,7 +476,7 @@ std::string EmitSuperCtorCall(TreeNode* node) {
     node = node->GetParent();
   if (node && node->IsClass()) {
     std::string base, str;
-    base = (static_cast<ClassNode*>(node)->GetSuperClassesNum() != 0)? static_cast<ClassNode*>(node)->GetSuperClass(0)->GetName() : "Object";
+    base = (static_cast<ClassNode*>(node)->GetSuperClassesNum() != 0)? static_cast<ClassNode*>(node)->GetSuperClass(0)->GetName() : "t2crt::Object";
     str = "  "s + base + "_ctor"s;
     return str;
   }
@@ -781,12 +781,12 @@ bool CppDef::IsClassField(ArrayElementNode* node, std::string propKey) {
 //   1) If the property is a member field in the object's class, emit: bar->prop
 //   2) Otherwise it is a property created dynamically at runtime:
 //      - If it is a lvalue, emit: (*bar)["prop"] - [] operator overloaded in ts2cpp.h
-//      - If it is a rvalue, emit: bar->GetPropXX("prop") - XX is one of union types in JS_Val
-//   3) For OP_Assign, if lvalue on lhs is dynamic prop, wrap rhs with JS_Val() macro.
-//      e.g.   (*bar)["p1"] = JS_Val(0xa);
-//             (*bar)["p2"] = JS_Val(bar->f2);
-//             (*bar)["p2"] = JS_Val(bar->GetPropLong("p1"));
-//             (*bar)["p2"] = JS_Val((uint32_t)(bar->GetPropLong("p2") >> bar->GetPropLong("p1")));
+//      - If it is a rvalue, emit: bar->GetPropXX("prop") - XX is one of union types in t2crt::JS_Val
+//   3) For OP_Assign, if lvalue on lhs is dynamic prop, wrap rhs with t2crt::JS_Val() macro.
+//      e.g.   (*bar)["p1"] = t2crt::JS_Val(0xa);
+//             (*bar)["p2"] = t2crt::JS_Val(bar->f2);
+//             (*bar)["p2"] = t2crt::JS_Val(bar->GetPropLong("p1"));
+//             (*bar)["p2"] = t2crt::JS_Val((uint32_t)(bar->GetPropLong("p2") >> bar->GetPropLong("p1")));
 //
 // *note: to do 1), the property key must be a string literal. if the property key
 //        is an identfier, then we have to do 2) because the identfier can be
@@ -824,13 +824,13 @@ std::string CppDef::EmitBracketNotationProp(ArrayElementNode* ae, OprId binOpId,
   // resolve propKey at runtime
   switch (propKeyType) {
     case TY_Int:
-      propKey = "to_string("s + EmitTreeNode(ae->GetExprAtIndex(0)) + ")"s;
+      propKey = "t2crt::to_string("s + EmitTreeNode(ae->GetExprAtIndex(0)) + ")"s;
       break;
     case TY_String:
       propKey = EmitTreeNode(ae->GetExprAtIndex(0));
       break;
     case TY_Symbol:
-      propKey = "to_string("s + EmitTreeNode(ae->GetExprAtIndex(0)) + ")"s;
+      propKey = "t2crt::to_string("s + EmitTreeNode(ae->GetExprAtIndex(0)) + ")"s;
       break;
     default:
       MASSERT(0 && "Encounter unsupported prop key type in bracket notation");
@@ -936,7 +936,7 @@ std::string CppDef::EmitBinOperatorNode(BinOperatorNode *node) {
         break;
     }
     if (k == OPR_Assign && lhsIsDynProp)
-      rhs = "JS_Val("s + rhs + ")"s;
+      rhs = "t2crt::JS_Val("s + rhs + ")"s;
     str = lhs + " "s + std::string(op + 1) + " "s + rhs;
   }
   mPrecedence = precd;
@@ -1223,8 +1223,8 @@ std::string CppDef::GetTypeForTemplateArg(TreeNode* node) {
         break;
       case NK_PrimType:
         str = EmitTreeNode(n);
-        if (str.find("JS_Val") != std::string::npos)
-          str = "JS_Val";
+        if (str.find("t2crt::JS_Val") != std::string::npos)
+          str = "t2crt::JS_Val";
         break;
       default:
         MASSERT(0 && "Unexpected node type");
@@ -1240,7 +1240,7 @@ std::string CppDef::GetTypeForTemplateArg(TreeNode* node) {
     // So implementation of this part is deferred until needed.
   } else {
     // No info - return ANY for now...
-    str = "JS_Val"s;
+    str = "t2crt::JS_Val"s;
     //MASSERT(0 && "Unexpected node type");
   }
   return str;
@@ -1255,8 +1255,8 @@ std::string CppDef::EmitInstanceOfNode(InstanceOfNode *node) {
   if (auto n = node->GetLeft()) {
     lhs = EmitTreeNode(n);
     typ = GetTypeForTemplateArg(n);
-    if (typ.compare("JS_Val") == 0) {
-      lhs = "JS_Val("s + lhs + ")"s;
+    if (typ.compare("t2crt::JS_Val") == 0) {
+      lhs = "t2crt::JS_Val("s + lhs + ")"s;
       typ = "";
     }
     else if (!typ.empty())
@@ -1279,7 +1279,7 @@ std::string CppDef::EmitInstanceOfNode(InstanceOfNode *node) {
   else
     rhs = " (NIL)"s;
 
-  std::string str("InstanceOf"s + typ + "("s + lhs + ", "s + rhs + ")"s);
+  std::string str("t2crt::InstanceOf"s + typ + "("s + lhs + ", "s + rhs + ")"s);
   mPrecedence = precd;
   return HandleTreeNode(str, node);
 }

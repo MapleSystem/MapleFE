@@ -16,6 +16,7 @@
 #ifndef __BUILTINS_H__
 #define __BUILTINS_H__
 
+namespace t2crt {
 class Ctor_Function;
 class Ctor_Object;
 //class Ctor_Array;
@@ -111,5 +112,8 @@ ARRAY_CTOR_DECL(double)
 ARRAY_CTOR_DECL(JS_Val)
 ARRAY_CTOR_DECL(Object)
 ARRAY_CTOR_DECL(ObjectP)
+} // namespace t2crt
 
+using t2crt::Number_ctor;
+using t2crt::Record;
 #endif // __BUILTINS_H__

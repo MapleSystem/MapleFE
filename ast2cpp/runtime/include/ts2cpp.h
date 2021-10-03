@@ -283,10 +283,9 @@ bool InstanceOf(T* val, Function* ctor) {
 
 void GenerateDOTGraph( std::vector<Object *>&obj, std::vector<std::string>&name);
 
-#include "builtins.h"
-
 } // namespace t2crt
 
+#include "builtins.h"
 
 template <typename T>
 std::ostream& operator<< (std::ostream& out, const std::vector<T>& v) {
@@ -334,5 +333,9 @@ std::ostream& operator<< (std::ostream& out, const t2crt::Array<T>& v) {
 }
 extern std::ostream& operator<< (std::ostream& out, const t2crt::JS_Val& v);
 extern const t2crt::JS_Val undefined;
+
+using t2crt::Object;
+using t2crt::Function;
+using t2crt::Array;
 
 #endif
