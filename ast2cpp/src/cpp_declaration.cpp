@@ -30,8 +30,7 @@ class ImportExportModules : public AstVisitor {
     std::string  mExportDefault;
 
   public:
-    ImportExportModules(CppDecl *c) :
-      mCppDecl(c),
+    ImportExportModules(CppDecl *c) : mCppDecl(c),
       mIncludes("// include directives\n"),
       mImports("// imports\n"),
       mExports("// exports\n"),
@@ -92,7 +91,7 @@ class ImportExportModules : public AstVisitor {
                 if (after == "default") {
                 }
               } else {
-                mImports += "inline const decltype("s + module + '.' + v + ") &"s + v + " = "s + module + '.' + v + ";\n"s;
+                mImports += "inline const decltype("s + module + "::"s + v + ") &"s + v + " = "s + module + "::"s + v + ";\n"s;
               }
             }
           }
@@ -109,7 +108,9 @@ class ImportExportModules : public AstVisitor {
           if (x->IsDefault()) {
             if (auto n = x->GetBefore()) {
               std::string v = mEmitter->EmitTreeNode(n);
-              mImports += "extern decltype("s + v + ") __default_"s + v + ";\n"s;
+              std::string def = "decltype("s + v + ") __default_"s + v + ";\n"s;
+              mCppDecl->AddDefinition(def);
+              mImports += "extern "s + def;
               mExportDefault = "#define "s + module + "__default "s + module + "::__default_"s + v + '\n';
             }
           } else if (x->IsSingle()) {
@@ -184,9 +185,9 @@ class CollectDecls : public AstVisitor {
     }
 
     DeclNode *VisitDeclNode(DeclNode *node) {
-      std::string decl = mCppDecl->EmitTreeNode(node);
-      mDecls += "extern "s + decl.substr(0, decl.find('=')) + ";\n"s;
-      mCppDecl->AddDecl(decl + ";\n"s);
+      std::string def = mCppDecl->EmitTreeNode(node);
+      mDecls += "extern "s + def.substr(0, def.find('=')) + ";\n"s;
+      mCppDecl->AddDefinition(def + ";\n"s);
       return node;
     }
 

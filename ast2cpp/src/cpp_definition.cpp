@@ -80,8 +80,8 @@ std::string CppDef::EmitModuleNode(ModuleNode *node) {
       }
   }
 
-  // declarations of vars
-  str += mCppDecl.GetDecls();
+  // definitions
+  str += mCppDecl.GetDefinitions();
 
   // definitions of all functions in current module
   isInit = false;

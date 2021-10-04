@@ -25,7 +25,7 @@ namespace maplefe {
 class CppDecl : public Emitter {
 private:
   std::set<std::string> mImportedModules;
-  std::string           mDecls;
+  std::string           mDefinitions;
 
 public:
   CppDecl(Module_Handler *h) : Emitter(h) {}
@@ -38,8 +38,8 @@ public:
   void AddImportedModule(const std::string& module);
   bool IsImportedModule(const std::string& module);
 
-  void AddDecl(const std::string& decl) { mDecls += decl; }
-  std::string GetDecls() { return mDecls; }
+  void AddDefinition(const std::string& def) { mDefinitions += def; }
+  std::string GetDefinitions() { return mDefinitions; }
 
   virtual std::string EmitUserTypeNode(UserTypeNode *node);
   virtual std::string EmitBinOperatorNode(BinOperatorNode *node);

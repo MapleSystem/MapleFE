@@ -41,7 +41,7 @@ for f in $list; do
       $TS2AST $(sed 's/\.cpp/.ts/' <<< "$cpp")
     done
     $AST2CPP $f.ast || { echo "(ast2cpp)$f" >> ts2cpp.failures.out; break; }
-    g++ $t.cpp $RTSRC/*.cpp $dep -o $t.out || { echo "(g++)$f" >> ts2cpp.failures2.out; break; }
+    g++ -std=c++17 $t.cpp $RTSRC/*.cpp $dep -o $t.out || { echo "(g++)$f" >> ts2cpp.failures2.out; break; }
     ./$t.out || { echo "(run)$f" >> ts2cpp.failures2.out; break; }
     echo $t >> ts2cpp.summary.out
     break
