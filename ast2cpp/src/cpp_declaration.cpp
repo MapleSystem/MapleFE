@@ -30,10 +30,20 @@ class ImportExportModules : public AstVisitor {
     std::string  mExportDefault;
 
   public:
-    ImportExportModules(CppDecl *c) : mCppDecl(c) {
+    ImportExportModules(CppDecl *c) :
+      mCppDecl(c),
+      mIncludes("// include directives\n"),
+      mImports("// imports\n"),
+      mExports("// exports\n"),
+      mExportDefault("// export default\n") {
       mEmitter = new Emitter(c->GetModuleHandler());
     }
     ~ImportExportModules() { delete mEmitter; }
+
+    std::string GetIncludes() { return mIncludes; }
+    std::string GetImports() { return mImports; }
+    std::string GetExports() { return mExports; }
+    std::string GetExportDefault() { return mExportDefault; }
 
     std::string AddIncludes(TreeNode *node) {
       std::string filename;
@@ -58,7 +68,7 @@ class ImportExportModules : public AstVisitor {
             if (auto n = x->GetBefore()) {
               std::string v = module + "__default"s;
               std::string s = mEmitter->EmitTreeNode(n);
-              mImports += "static constexpr decltype("s + v + ") &"s + s + " = "s + v + ";\n"s;
+              mImports += "inline const decltype("s + v + ") &"s + s + " = "s + v + ";\n"s;
             }
           } else if (x->IsSingle()) {
             if (auto a = x->GetAfter())
@@ -82,7 +92,7 @@ class ImportExportModules : public AstVisitor {
                 if (after == "default") {
                 }
               } else {
-                mImports += "static constexpr decltype("s + module + '.' + v + ") &"s + v + " = "s + module + '.' + v + ";\n"s;
+                mImports += "inline const decltype("s + module + '.' + v + ") &"s + v + " = "s + module + '.' + v + ";\n"s;
               }
             }
           }
@@ -99,7 +109,7 @@ class ImportExportModules : public AstVisitor {
           if (x->IsDefault()) {
             if (auto n = x->GetBefore()) {
               std::string v = mEmitter->EmitTreeNode(n);
-              mImports += "decltype("s + v + ") __default_"s + v + ";\n"s;
+              mImports += "extern decltype("s + v + ") __default_"s + v + ";\n"s;
               mExportDefault = "#define "s + module + "__default "s + module + "::__default_"s + v + '\n';
             }
           } else if (x->IsSingle()) {
@@ -117,7 +127,7 @@ class ImportExportModules : public AstVisitor {
                 std::string before = mEmitter->EmitTreeNode(b);
                 std::string after = mEmitter->EmitTreeNode(a);
                 if (before == "default") {
-                  mImports += "static constexpr decltype("s + module + "__default) &"s + after + " = "s + module + "__default;\n"s;
+                  mImports += "inline const decltype("s + module + "__default) &"s + after + " = "s + module + "__default;\n"s;
                   before = module + "__default";
                 }
                 if (after == "default")
@@ -129,11 +139,6 @@ class ImportExportModules : public AstVisitor {
       }
       return node;
     }
-
-    std::string GetIncludes() { return mIncludes; }
-    std::string GetImports() { return mImports; }
-    std::string GetExports() { return mExports; }
-    std::string GetExportDefault() { return mExportDefault; }
 };
 
 class ClassDecls : public AstVisitor {
@@ -142,7 +147,7 @@ class ClassDecls : public AstVisitor {
     std::string  mDecls;
 
   public:
-    ClassDecls(CppDecl *c) : mCppDecl(c) {}
+    ClassDecls(CppDecl *c) : mCppDecl(c), mDecls("// class decls\n") {}
 
     ClassNode *VisitClassNode(ClassNode *node) {
       mDecls += mCppDecl->EmitTreeNode(node) + ";\n"s;
@@ -168,7 +173,7 @@ class CollectDecls : public AstVisitor {
     std::string  mDecls;
 
   public:
-    CollectDecls(CppDecl *c) : mCppDecl(c) {}
+    CollectDecls(CppDecl *c) : mCppDecl(c), mDecls("// var decls\n") {}
 
     FunctionNode *VisitFunctionNode(FunctionNode *node) {
       return node;
@@ -222,9 +227,6 @@ std::string CppDecl::EmitModuleNode(ModuleNode *node) {
 namespace )""" + module + R"""( {
 )""";
 
-  // Generate code for all imports
-  str += xxportModules.GetImports();
-
   ClassDecls clsDecls(this);
   clsDecls.VisitTreeNode(node);
   // declarations of user defined classes
@@ -245,6 +247,9 @@ namespace )""" + module + R"""( {
       str += EmitTreeNode(node) + GetEnding(node);
     }
   }
+
+  // Generate code for all imports
+  str += xxportModules.GetImports();
 
   // export default
   str += xxportModules.GetExportDefault();

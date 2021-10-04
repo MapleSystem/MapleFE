@@ -21,7 +21,14 @@ function ReleaseLock {
 trap "{ pstree -p $$ | tr ')' '\n' | sed 's/.*(//' | xargs kill -9 2> /dev/null; rm -f ts2cpp-lock-*; }" SIGINT SIGQUIT SIGKILL SIGTERM
 rm -rf ts2cpp-lock-* *-ts2cpp.out ts2cpp.summary.out ts2cpp.failures*.out
 cnt=0
-for f; do
+if [ $# -gt 1 ]; then
+list1=$(grep -l "^ *export " "$@")
+list2=$(grep -L "^ *export " "$@")
+else
+  list1="$@" list2=
+fi
+for list in "$list1" "$list2"; do
+for f in $list; do
   echo $((++cnt)): $f
   t=$(basename $f .ts)
   AcquireLock ts2cpp for_$t $(nproc)
@@ -43,6 +50,7 @@ for f; do
   ) >& $f-ts2cpp.out &
 done 2>&1 
 wait
+done
 if [ -f ts2cpp.summary.out ]; then
   echo -e "\nDate: $(date)\nTest cases passed:" | tee -a $log
   sort ts2cpp.summary.out | xargs -n1 | nl | tee -a $log
