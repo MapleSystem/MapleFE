@@ -69,12 +69,32 @@ class TypeInferBaseVisitor : public AstVisitor {
 #include "ast_nk.def"
 };
 
+class ChangeTypeIdxVisitor : public AstVisitor {
+ private:
+  Module_Handler *mHandler;
+  unsigned        mFlags;
+  unsigned        mStrIdx;
+  unsigned        mTypeIdx;
+  bool            mUpdated;
+
+ public:
+  explicit ChangeTypeIdxVisitor(Module_Handler *h, unsigned f, bool base = false)
+    : mHandler(h), mFlags(f), AstVisitor((f & FLG_trace_1) && base) {}
+  ~ChangeTypeIdxVisitor() = default;
+
+  void Setup(unsigned stridx, unsigned tidx) { mStrIdx = stridx; mTypeIdx = tidx;}
+
+  IdentifierNode *VisitIdentifierNode(IdentifierNode *node);
+};
+
 class TypeInferVisitor : public TypeInferBaseVisitor {
  private:
   Module_Handler *mHandler;
   unsigned        mFlags;
   bool            mUpdated;
   AST_AST        *mAst;
+
+  ChangeTypeIdxVisitor *mChangeTypeIdxVisitor;
 
   // node ids
   std::unordered_set<unsigned> ImportedDeclIds;
@@ -84,10 +104,14 @@ class TypeInferVisitor : public TypeInferBaseVisitor {
 
   // func nodeid to typeidx
   std::unordered_map<unsigned, unsigned> mFuncIsNodeMap;;
+  std::unordered_map<unsigned, std::unordered_set<unsigned>> mCbFuncIsDone;
 
  public:
   explicit TypeInferVisitor(Module_Handler *h, unsigned f, bool base = false)
-    : mHandler(h), mFlags(f), mAst(h->GetAST()), TypeInferBaseVisitor(f, base) {}
+    : mHandler(h), mFlags(f), mAst(h->GetAST()), TypeInferBaseVisitor(f, base) {
+      mChangeTypeIdxVisitor = new ChangeTypeIdxVisitor(h, f, true);
+    }
+
   ~TypeInferVisitor() = default;
 
   bool IsPrimTypeId(TypeId tid);
@@ -118,6 +142,7 @@ class TypeInferVisitor : public TypeInferBaseVisitor {
   BinOperatorNode *VisitBinOperatorNode(BinOperatorNode *node);
   CallNode *VisitCallNode(CallNode *node);
   ClassNode *VisitClassNode(ClassNode *node);
+  CondBranchNode *VisitCondBranchNode(CondBranchNode *node);
   DeclNode *VisitDeclNode(DeclNode *node);
   ExportNode *VisitExportNode(ExportNode *node);
   FieldLiteralNode *VisitFieldLiteralNode(FieldLiteralNode *node);

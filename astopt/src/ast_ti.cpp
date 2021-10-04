@@ -864,6 +864,72 @@ ClassNode *TypeInferVisitor::VisitClassNode(ClassNode *node) {
   return node;
 }
 
+CondBranchNode *TypeInferVisitor::VisitCondBranchNode(CondBranchNode *node) {
+  (void) AstVisitor::VisitCondBranchNode(node);
+  TreeNode *cond = node->GetCond();
+  TreeNode *blockT = NULL;
+  TreeNode *blockF = NULL;
+  if (cond->IsUnaOperator()) {
+    cond = static_cast<UnaOperatorNode *>(cond)->GetOpnd();
+    blockT = node->GetFalseBranch();
+    blockF = node->GetTrueBranch();
+  } else {
+    blockT = node->GetTrueBranch();
+    blockF = node->GetFalseBranch();
+  }
+
+  if (cond->IsCall()) {
+    CallNode *call = static_cast<CallNode *>(cond);
+    TreeNode *method = call->GetMethod();
+    if (method && method->IsIdentifier()) {
+      IdentifierNode *id = static_cast<IdentifierNode *>(method);
+      unsigned mid = id->GetStrIdx();
+      unsigned nid = node->GetNodeId();
+      // check if already visited for mid and nodeid
+      if (mCbFuncIsDone.find(mid) != mCbFuncIsDone.end() &&
+          mCbFuncIsDone[mid].find(nid) != mCbFuncIsDone[mid].end()) {
+        return node;
+      }
+      TreeNode *decl = mHandler->FindDecl(id);
+      if (decl && decl->IsFunction()) {
+        unsigned fid = decl->GetNodeId();
+        if (mFuncIsNodeMap.find(fid) != mFuncIsNodeMap.end()) {
+          unsigned tidx = mFuncIsNodeMap[fid];
+          TreeNode *arg = call->GetArg(0);
+          if (arg->IsIdentifier()) {
+            unsigned stridx = arg->GetStrIdx();
+            mChangeTypeIdxVisitor->Setup(stridx, tidx);
+            mChangeTypeIdxVisitor->Visit(blockT);
+            mCbFuncIsDone[mid].insert(nid);
+            SetUpdated();
+
+            // if union of 2 types, update other branch with other type
+            TreeNode *argdecl = mHandler->FindDecl(static_cast<IdentifierNode *>(arg));
+            if (argdecl && argdecl->IsIdentifier()) {
+              TreeNode *type = static_cast<IdentifierNode *>(argdecl)->GetType();
+              if (type->IsUserType()) {
+                UserTypeNode *ut = static_cast<UserTypeNode *>(type);
+                if (ut->GetType() == UT_Union && ut->GetUnionInterTypesNum() == 2) {
+                  TreeNode *u0 = ut->GetUnionInterType(0);
+                  TreeNode *u1 = ut->GetUnionInterType(1);
+                  tidx = (u0->GetTypeIdx() == tidx) ? u1->GetTypeIdx() : u0->GetTypeIdx();
+                  mChangeTypeIdxVisitor->Setup(stridx, tidx);
+                  mChangeTypeIdxVisitor->Visit(blockF);
+                }
+              }
+            }
+          }
+        }
+      }
+
+    } else {
+      NOTYETIMPL("mentod null or not identifier");
+    }
+  }
+
+  return node;
+}
+
 DeclNode *TypeInferVisitor::VisitDeclNode(DeclNode *node) {
   if (mFlags & FLG_trace_1) std::cout << "Visiting DeclNode, id=" << node->GetNodeId() << "..." << std::endl;
   (void) AstVisitor::VisitDeclNode(node);
@@ -1260,6 +1326,7 @@ UserTypeNode *TypeInferVisitor::VisitUserTypeNode(UserTypeNode *node) {
   (void) AstVisitor::VisitUserTypeNode(node);
   if (node->GetId()) {
     UpdateTypeId(node, node->GetId()->GetTypeId());
+    node->SetTypeIdx(node->GetId()->GetTypeIdx());
   }
   TreeNode *parent = node->GetParent();
   if (parent && parent->IsIdentifier()) {
@@ -1400,6 +1467,14 @@ IdentifierNode *CheckTypeVisitor::VisitIdentifierNode(IdentifierNode *node) {
         }
       }
     }
+  }
+  return node;
+}
+
+IdentifierNode *ChangeTypeIdxVisitor::VisitIdentifierNode(IdentifierNode *node) {
+  (void) AstVisitor::VisitIdentifierNode(node);
+  if (node->GetStrIdx() == mStrIdx) {
+    node->SetTypeIdx(mTypeIdx);
   }
   return node;
 }
