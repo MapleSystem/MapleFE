@@ -17,7 +17,6 @@
 
 namespace maplefe {
 
-
 std::string EmitCtorInstance(ClassNode *c) {
   std::string str, thisClass, ctor, proto, prototypeProto;
   ctor = "&t2crt::Function_ctor";
@@ -54,18 +53,24 @@ std::string CppDef::EmitCppCtor(ClassNode* node) {
   std::string str, base, props;
   props = EmitClassProps(node);
   base = (node->GetSuperClassesNum() != 0)? node->GetSuperClass(0)->GetName() : "t2crt::Object";
-  str += node->GetName() + "::"s + node->GetName() + "(t2crt::Function* ctor, t2crt::Object* proto): "s + base + "(ctor, proto)"  + " {\n"s + props +"}\n"s;
+  str += node->GetName() + "::"s + node->GetName() + "(t2crt::Function* ctor, t2crt::Object* proto): "s
+    + base + "(ctor, proto)"  + " {\n"s + props +"}\n"s;
   return str;
 }
 
 std::string CppDef::EmitModuleNode(ModuleNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string klass = GetModuleName();
+  std::string module = GetModuleName();
+
+  // include directives
   std::string str("// TypeScript filename: "s + node->GetFilename() + "\n"s);
   str += "#include <iostream>\n#include \""s + GetBaseFilename() + ".h\"\n\n"s;
 
-  // definition of default class constructors.
+  // start a namespace for this module
+  str += "namespace "s + module + " {\n"s;
+
+  // definitions of default class constructors
   for (unsigned i = 0; i < node->GetTreesNum(); ++i) {
     if (auto n = node->GetTree(i))
       if (n->IsClass()) {
@@ -75,18 +80,23 @@ std::string CppDef::EmitModuleNode(ModuleNode *node) {
       }
   }
 
-  // definitions of all top-level functions
+  // declarations of vars
+  str += mCppDecl.GetDecls();
+
+  // definitions of all functions in current module
   isInit = false;
-  CfgFunc *module = mHandler->GetCfgFunc();
-  auto num = module->GetNestedFuncsNum();
+  CfgFunc *mod = mHandler->GetCfgFunc();
+  auto num = mod->GetNestedFuncsNum();
   for(unsigned i = 0; i < num; ++i) {
-    CfgFunc *func = module->GetNestedFuncAtIndex(i);
+    CfgFunc *func = mod->GetNestedFuncAtIndex(i);
     TreeNode *node = func->GetFuncNode();
     TreeNode *parent =  node->GetParent();
     str += EmitTreeNode(node) + GetEnding(node);
   }
 
-  str += "\n\nvoid "s + klass + R"""(::__init_func__() { // bind "this" to current module
+  // definition of init function of current module
+  str += R"""(void __init_func__() {
+  // bind "this" to current module
   static bool __init_once = false;
   if (__init_once) return;
   __init_once = true;
@@ -111,15 +121,19 @@ std::string CppDef::EmitModuleNode(ModuleNode *node) {
 #endif
     }
   }
-  str += "}\n\n"s + klass + " _"s + klass + ";\n"s;
+  str += R"""(}
+
+  t2crt::Object __dynamic_props;
+} // namespace of current module
+)""";
 
   AST_Handler *handler = mHandler->GetASTHandler();
   HandlerIndex idx = handler->GetHandlerIndex(node->GetFilename());
+  // If the program starts from this module, generate the main function
   if (idx == 0) {
     str += R"""(
-// If the program starts from this module, generate the main function
 int main(int argc, char **argv) {
-)""" + "  _"s + klass + R"""(.__init_func__(); // only call to its __init_func__()
+)""" + "  "s + module + R"""(::__init_func__(); // call its __init_func__()
 return 0;
 }
 )""";
@@ -156,7 +170,7 @@ std::string CppDef::EmitExportNode(ExportNode *node) {
 std::string CppDef::EmitImportNode(ImportNode *node) {
   std::string str = GetModuleName(node->GetTarget());
   if (!str.empty())
-    str = '_' + str + ".__init_func__();\n"s;
+    str = str + "::__init_func__();\n"s;
   return str;
 }
 
@@ -279,7 +293,7 @@ std::string CppDef::EmitFunctionNode(FunctionNode *node) {
   } else {
     str = mCppDecl.GetTypeString(node->GetType(), node->GetType());
     if(node->GetStrIdx())
-      str += " "s + (IsClassMethod(node)?GetClassName(node):GetModuleName()) + "::"s + node->GetName();
+      str += " "s + (IsClassMethod(node) ? GetClassName(node) + "::"s : ""s) + node->GetName();
     str += "("s;
   }
 
@@ -610,6 +624,8 @@ std::string CppDef::EmitFieldNode(FieldNode *node) {
     Emitter::Replace(field, "length", "size()");
     if (str.compare("console") == 0)
       str += "."s + field;
+    else if (mCppDecl.IsImportedModule(str))
+      str += "::"s + field;
     else
       str += "->"s + field;
   }

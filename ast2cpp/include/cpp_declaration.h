@@ -16,12 +16,17 @@
 #ifndef __CPPDECL_HEADER__
 #define __CPPDECL_HEADER__
 
+#include <set>
 #include "ast_handler.h"
 #include "emitter.h"
 
 namespace maplefe {
 
 class CppDecl : public Emitter {
+private:
+  std::set<std::string> mImportedModules;
+  std::string           mDecls;
+
 public:
   CppDecl(Module_Handler *h) : Emitter(h) {}
   CppDecl() : CppDecl(nullptr) {}
@@ -29,6 +34,12 @@ public:
   std::string Emit() {
     return EmitTreeNode(GetASTModule());
   }
+
+  void AddImportedModule(const std::string& module);
+  bool IsImportedModule(const std::string& module);
+
+  void AddDecl(const std::string& decl) { mDecls += decl; }
+  std::string GetDecls() { return mDecls; }
 
   virtual std::string EmitUserTypeNode(UserTypeNode *node);
   virtual std::string EmitBinOperatorNode(BinOperatorNode *node);

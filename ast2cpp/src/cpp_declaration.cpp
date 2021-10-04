@@ -50,13 +50,13 @@ class ImportExportModules : public AstVisitor {
 
     ImportNode *VisitImportNode(ImportNode *node) {
       std::string filename = AddIncludes(node->GetTarget());
-      std::string mod = "_"s + mCppDecl->GetModuleName(filename.c_str());
+      std::string module = mCppDecl->GetModuleName(filename.c_str());
       for (unsigned i = 0; i < node->GetPairsNum(); ++i) {
         if (auto x = node->GetPair(i)) {
           std::string str;
           if (x->IsDefault()) {
             if (auto n = x->GetBefore()) {
-              std::string v = mod + "__default"s;
+              std::string v = module + "__default"s;
               std::string s = mEmitter->EmitTreeNode(n);
               mImports += "static constexpr decltype("s + v + ") &"s + s + " = "s + v + ";\n"s;
             }
@@ -71,7 +71,8 @@ class ImportExportModules : public AstVisitor {
           } else if (x->IsEverything()) {
             if (auto n = x->GetBefore()) {
               std::string s = mEmitter->EmitTreeNode(n);
-              mImports += "static constexpr auto "s + s + " = &" + mod + ";\n"s;
+              mImports += "namespace "s + s + " = " + module + ";\n"s;
+              mCppDecl->AddImportedModule(s);
             }
           } else {
             if (auto n = x->GetBefore()) {
@@ -81,7 +82,7 @@ class ImportExportModules : public AstVisitor {
                 if (after == "default") {
                 }
               } else {
-                mImports += "static constexpr decltype("s + mod + '.' + v + ") &"s + v + " = "s + mod + '.' + v + ";\n"s;
+                mImports += "static constexpr decltype("s + module + '.' + v + ") &"s + v + " = "s + module + '.' + v + ";\n"s;
               }
             }
           }
@@ -92,14 +93,14 @@ class ImportExportModules : public AstVisitor {
 
     ExportNode *VisitExportNode(ExportNode *node) {
       std::string filename = AddIncludes(node->GetTarget());
-      std::string m = "_"s + mCppDecl->GetModuleName(filename.c_str());
+      std::string module = mCppDecl->GetModuleName(filename.c_str());
       for (unsigned i = 0; i < node->GetPairsNum(); ++i) {
         if (auto x = node->GetPair(i)) {
           if (x->IsDefault()) {
             if (auto n = x->GetBefore()) {
               std::string v = mEmitter->EmitTreeNode(n);
-              mExportDefault = "#define "s + m + "__default "s + m + ".__default_"s + v + '\n';
               mImports += "decltype("s + v + ") __default_"s + v + ";\n"s;
+              mExportDefault = "#define "s + module + "__default "s + module + "::__default_"s + v + '\n';
             }
           } else if (x->IsSingle()) {
             std::string str;
@@ -116,11 +117,11 @@ class ImportExportModules : public AstVisitor {
                 std::string before = mEmitter->EmitTreeNode(b);
                 std::string after = mEmitter->EmitTreeNode(a);
                 if (before == "default") {
-                  mImports += "static constexpr decltype("s + m + "__default) &"s + after + " = "s + m + "__default;\n"s;
-                  before = m + "__default";
+                  mImports += "static constexpr decltype("s + module + "__default) &"s + after + " = "s + module + "__default;\n"s;
+                  before = module + "__default";
                 }
                 if (after == "default")
-                  mExportDefault = "#define "s + m + "__default "s + m + '.' + before + '\n';
+                  mExportDefault = "#define "s + module + "__default "s + module + "::"s + before + '\n';
               }
             }
           }
@@ -178,7 +179,9 @@ class CollectDecls : public AstVisitor {
     }
 
     DeclNode *VisitDeclNode(DeclNode *node) {
-      mDecls += mCppDecl->EmitTreeNode(node) + ";\n"s;
+      std::string decl = mCppDecl->EmitTreeNode(node);
+      mDecls += "extern "s + decl.substr(0, decl.find('=')) + ";\n"s;
+      mCppDecl->AddDecl(decl + ";\n"s);
       return node;
     }
 
@@ -186,63 +189,78 @@ class CollectDecls : public AstVisitor {
 };
 
 
+void CppDecl::AddImportedModule(const std::string& module) {
+  mImportedModules.insert(module);
+}
+
+bool CppDecl::IsImportedModule(const std::string& module) {
+  auto res = mImportedModules.find(module);
+  return res != mImportedModules.end();
+}
+
 std::string CppDecl::EmitModuleNode(ModuleNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string name = GetModuleName();
+  std::string module = GetModuleName();
   std::string header("__");
-  for(auto &c : name)
+  for(auto &c : module)
     header += std::toupper(c);
   header += "__HEADER__\n";
   std::string str("// TypeScript filename: "s + node->GetFilename() + "\n"s);
   str += "#ifndef "s + header + "#define "s + header;
   str += R"""(
 #include "ts2cpp.h"
-// using namespace t2crt;
-
 )""";
 
-  // import modules
   ImportExportModules xxportModules(this);
-  xxportModules.VisitTreeNode(node);
+  xxportModules.Visit(node);
+  // All include directived from import/export statements
   str += xxportModules.GetIncludes();
 
-  // declarations of user defined classes
+  // Generate the namespace of current module
+  str += R"""(
+namespace )""" + module + R"""( {
+)""";
+
+  // Generate code for all imports
+  str += xxportModules.GetImports();
+
   ClassDecls clsDecls(this);
   clsDecls.VisitTreeNode(node);
+  // declarations of user defined classes
   str += clsDecls.GetDecls();
-
-  str += R"""(
-class )""" + name + R"""( : public t2crt::Object {
-public: // all top level variables in the module
-)""";
 
   CollectDecls decls(this);
   decls.VisitTreeNode(node);
-  str += decls.GetDecls() + xxportModules.GetImports();
+  // declarations of all variables
+  str += decls.GetDecls();
 
-  str += R"""(
-public: // all top level functions in the module
-  void __init_func__();
-)""";
-
-  // declarations of all top-level functions
-  CfgFunc *module = mHandler->GetCfgFunc();
-  auto num = module->GetNestedFuncsNum();
+  // declarations of all functions
+  CfgFunc *mod = mHandler->GetCfgFunc();
+  auto num = mod->GetNestedFuncsNum();
   for(unsigned i = 0; i < num; ++i) {
-    CfgFunc *func = module->GetNestedFuncAtIndex(i);
+    CfgFunc *func = mod->GetNestedFuncAtIndex(i);
     TreeNode *node = func->GetFuncNode();
     if (node->GetParent() && !node->GetParent()->IsClass()) {
       str += EmitTreeNode(node) + GetEnding(node);
     }
   }
 
-  str += R"""(
-  // exports
-  t2crt::Object exports;
-};
+  // export default
+  str += xxportModules.GetExportDefault();
 
-extern )""" + name + " _"s + name + ";\n"s + xxportModules.GetExportDefault() + "#endif\n"s;
+  // init function and an object for dynamic properties
+  str += R"""(
+  // init function for current module
+  void __init_func__();
+
+  // all dynamic properties of current module
+  extern t2crt::Object __dynamic_props;
+
+} // namespace of current module
+
+#endif
+)""";
   return str;
 }
 
