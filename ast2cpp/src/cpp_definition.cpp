@@ -123,7 +123,7 @@ std::string CppDef::EmitModuleNode(ModuleNode *node) {
   }
   str += R"""(}
 
-  t2crt::Object __dynamic_props;
+  t2crt::Object __module;
 } // namespace of current module
 )""";
 

@@ -261,7 +261,7 @@ namespace )""" + module + R"""( {
   void __init_func__();
 
   // all dynamic properties of current module
-  extern t2crt::Object __dynamic_props;
+  extern t2crt::Object __module;
 
 } // namespace of current module
 
