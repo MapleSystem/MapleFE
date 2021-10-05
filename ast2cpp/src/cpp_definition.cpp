@@ -90,8 +90,12 @@ std::string CppDef::EmitModuleNode(ModuleNode *node) {
   for(unsigned i = 0; i < num; ++i) {
     CfgFunc *func = mod->GetNestedFuncAtIndex(i);
     TreeNode *node = func->GetFuncNode();
-    TreeNode *parent =  node->GetParent();
-    str += EmitTreeNode(node) + GetEnding(node);
+    std::string s = EmitTreeNode(node) + GetEnding(node);
+    std::string id = EmitTreeNode(static_cast<FunctionNode *>(node)->GetFuncName());
+    if (mCppDecl.IsExportedId(id))
+      str += "namespace __export {\n"s + s + "}\n"s;
+    else
+      str += s;
   }
 
   // definition of init function of current module

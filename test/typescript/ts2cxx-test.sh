@@ -22,11 +22,12 @@ trap "{ pstree -p $$ | tr ')' '\n' | sed 's/.*(//' | xargs kill -9 2> /dev/null;
 rm -rf ts2cpp-lock-* *-ts2cpp.out ts2cpp.summary.out ts2cpp.failures*.out
 cnt=0
 if [ $# -gt 1 ]; then
-list1=$(grep -l "^ *export " "$@")
-list2=$(grep -L "^ *export " "$@")
+list1=$(grep -L -e "^ *import " -e "^ *export .* from " "$@")
+list2=$(grep -l -e "^ *import " -e "^ *export .* from " "$@")
 else
   list1="$@" list2=
 fi
+single="no"
 for list in "$list1" "$list2"; do
 for f in $list; do
   echo $((++cnt)): $f
@@ -36,10 +37,13 @@ for f in $list; do
   while true; do
     [ -f $t.ts ] && f=$t.ts
     $TS2AST $f || { echo "(ts2ast)$f" >> ts2cpp.failures.out; break; }
-    dep=$(grep "^import.* from " "$f" | sed "s/^ *import.* from .\([^'\"]*\).*/\1.cpp/" | sort -u)
+    dep=$(grep "^[ei][xm]port.* from " "$f" | sed "s/^ *[ei][xm]port.* from .\([^'\"]*\).*/\1.cpp/" | sort -u)
     for cpp in $dep; do
-      $TS2AST $(sed 's/\.cpp/.ts/' <<< "$cpp")
+      ts=$(sed 's/\.cpp/.ts/' <<< "$cpp")
+      $TS2AST $ts
+      dep="$dep "$(grep "^[ei][xm]port.* from " "$ts" | sed "s/^ *[ei][xm]port.* from .\([^'\"]*\).*/\1.cpp/" | sort -u)
     done
+    dep=$(echo $dep | xargs -n1 | sort -u)
     $AST2CPP $f.ast || { echo "(ast2cpp)$f" >> ts2cpp.failures.out; break; }
     g++ -std=c++17 $t.cpp $RTSRC/*.cpp $dep -o $t.out || { echo "(g++)$f" >> ts2cpp.failures2.out; break; }
     ./$t.out || { echo "(run)$f" >> ts2cpp.failures2.out; break; }
@@ -48,8 +52,12 @@ for f in $list; do
   done
   ReleaseLock ts2cpp
   ) >& $f-ts2cpp.out &
+  if [ $single = "yes" ]; then
+    wait
+  fi
 done 2>&1 
 wait
+single="yes"
 done
 if [ -f ts2cpp.summary.out ]; then
   echo -e "\nDate: $(date)\nTest cases passed:" | tee -a $log

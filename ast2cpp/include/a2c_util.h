@@ -35,9 +35,10 @@ class ImportedFiles : public AstVisitor {
     ImportedFiles(ModuleNode *m) : mModule(m) {}
 
     // A helper function to get the target filename of an ImportNode
-    std::string GetTargetFilename(ImportNode *node);
+    std::string GetTargetFilename(TreeNode *node);
 
     ImportNode *VisitImportNode(ImportNode *node);
+    ExportNode *VisitExportNode(ExportNode *node);
 };
 
 }

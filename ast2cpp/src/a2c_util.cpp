@@ -19,24 +19,22 @@
 
 namespace maplefe {
 
-std::string ImportedFiles::GetTargetFilename(ImportNode *node) {
+std::string ImportedFiles::GetTargetFilename(TreeNode *node) {
   std::string filename;
-  if (auto n = node->GetTarget()) {
-    if (n->IsLiteral()) {
-      LiteralNode *lit = static_cast<LiteralNode *>(n);
-      LitData data = lit->GetData();
-      filename = AstDump::GetEnumLitData(data);
-      filename += ".ts.ast"s;
-      if(filename.front() != '/') {
-        std::filesystem::path p = mModule->GetFilename();
-        try {
-          p = std::filesystem::canonical(p.parent_path() / filename);
-          filename = p.string();
-        }
-        catch(std::filesystem::filesystem_error const& ex) {
-          // Ignore std::filesystem::filesystem_error exception
-          // keep filename without converting it to a cannonical path
-        }
+  if (node && node->IsLiteral()) {
+    LiteralNode *lit = static_cast<LiteralNode *>(node);
+    LitData data = lit->GetData();
+    filename = AstDump::GetEnumLitData(data);
+    filename += ".ts.ast"s;
+    if(filename.front() != '/') {
+      std::filesystem::path p = mModule->GetFilename();
+      try {
+        p = std::filesystem::canonical(p.parent_path() / filename);
+        filename = p.string();
+      }
+      catch(std::filesystem::filesystem_error const& ex) {
+        // Ignore std::filesystem::filesystem_error exception
+        // keep filename without converting it to a cannonical path
       }
     }
   }
@@ -44,7 +42,14 @@ std::string ImportedFiles::GetTargetFilename(ImportNode *node) {
 }
 
 ImportNode *ImportedFiles::VisitImportNode(ImportNode *node) {
-  std::string name = GetTargetFilename(node);
+  std::string name = GetTargetFilename(node->GetTarget());
+  if (!name.empty())
+      mFilenames.push_back(name);
+  return node;
+}
+
+ExportNode *ImportedFiles::VisitExportNode(ExportNode *node) {
+  std::string name = GetTargetFilename(node->GetTarget());
   if (!name.empty())
       mFilenames.push_back(name);
   return node;

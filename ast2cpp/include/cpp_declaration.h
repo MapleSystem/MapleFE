@@ -25,6 +25,7 @@ namespace maplefe {
 class CppDecl : public Emitter {
 private:
   std::set<std::string> mImportedModules;
+  std::set<std::string> mExportedIds;
   std::string           mDefinitions;
 
 public:
@@ -35,6 +36,8 @@ public:
     return EmitTreeNode(GetASTModule());
   }
 
+  void AddExportedId(const std::string& id);
+  bool IsExportedId(const std::string& id);
   void AddImportedModule(const std::string& module);
   bool IsImportedModule(const std::string& module);
 

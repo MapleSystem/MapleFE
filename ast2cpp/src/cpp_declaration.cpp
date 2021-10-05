@@ -122,10 +122,13 @@ class ImportExportModules : public AstVisitor {
               std::string s = mEmitter->EmitTreeNode(n);
               str += n->IsLiteral() ? "require("s + s + ')' : s;
             }
-          } else if (!x->IsEverything()) {
+          } else if (x->IsEverything()) {
+            mImports += "using namespace "s + module + "::__export;\n"s;
+          } else {
             if (auto b = x->GetBefore()) {
+              std::string before = mEmitter->EmitTreeNode(b);
+              mCppDecl->AddExportedId(before);
               if (auto a = x->GetAfter()) {
-                std::string before = mEmitter->EmitTreeNode(b);
                 std::string after = mEmitter->EmitTreeNode(a);
                 if (before == "default") {
                   mImports += "inline const decltype("s + module + "__default) &"s + after + " = "s + module + "__default;\n"s;
@@ -186,14 +189,30 @@ class CollectDecls : public AstVisitor {
 
     DeclNode *VisitDeclNode(DeclNode *node) {
       std::string def = mCppDecl->EmitTreeNode(node);
-      mDecls += "extern "s + def.substr(0, def.find('=')) + ";\n"s;
-      mCppDecl->AddDefinition(def + ";\n"s);
+      std::string var = mCppDecl->EmitTreeNode(node->GetVar());
+      if (mCppDecl->IsExportedId(var)) {
+        mDecls += "namespace __export { extern "s + def.substr(0, def.find('=')) + ";}\n"s;
+        mCppDecl->AddDefinition("namespace __export { "s + def + ";}\n"s);
+      } else {
+        mDecls += "extern "s + def.substr(0, def.find('=')) + ";\n"s;
+        mCppDecl->AddDefinition(def + ";\n"s);
+      }
       return node;
     }
 
     std::string GetDecls() { return mDecls; }
 };
 
+void CppDecl::AddExportedId(const std::string& id) {
+  mExportedIds.insert(id);
+}
+
+bool CppDecl::IsExportedId(const std::string& id) {
+  std::size_t loc = id.rfind(' ');
+  std::string key = loc == std::string::npos ? id : id.substr(loc + 1);
+  auto res = mExportedIds.find(key);
+  return res != mExportedIds.end();
+}
 
 void CppDecl::AddImportedModule(const std::string& module) {
   mImportedModules.insert(module);
@@ -245,9 +264,22 @@ namespace )""" + module + R"""( {
     CfgFunc *func = mod->GetNestedFuncAtIndex(i);
     TreeNode *node = func->GetFuncNode();
     if (node->GetParent() && !node->GetParent()->IsClass()) {
-      str += EmitTreeNode(node) + GetEnding(node);
+      std::string func = EmitTreeNode(node);
+      std::string id = EmitTreeNode(static_cast<FunctionNode *>(node)->GetFuncName());
+      if (IsExportedId(id)) {
+        AddDefinition("namespace __export { "s + func + "}\n"s);
+        str += "namespace __export { extern "s + func + "}\n"s;
+      } else {
+        AddDefinition(func);
+        str += "extern "s + func;
+      }
     }
   }
+
+  str += R"""(
+  namespace __export {}
+  using namespace __export;
+)""";
 
   // Generate code for all imports
   str += xxportModules.GetImports();
