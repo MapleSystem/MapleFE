@@ -1,0 +1,19 @@
+Matched 16 tokens.
+Matched 48 tokens.
+Matched 63 tokens.
+============= Module ===========
+== Sub Tree ==
+class  Klass
+  Fields: 
+    f1=123    f2="abc"
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+js_const Decl: obj= {func:(o) -> return (any) {:...o, private:false}
+}
+== Sub Tree ==
+console.log(obj.func(new Klass()))
