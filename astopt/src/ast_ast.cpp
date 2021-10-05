@@ -17,6 +17,7 @@
 #include <set>
 #include <algorithm>
 #include "ast_handler.h"
+#include "typetable.h"
 #include "ast_ast.h"
 
 namespace maplefe {
@@ -28,6 +29,9 @@ void AST_AST::AdjustAST() {
     TreeNode *it = module->GetTree(i);
     it->SetParent(module);
   }
+
+  // initialize gTypeTable with builtin types
+  gTypeTable.AddPrimAndBuiltinTypes();
 
   // collect type parameters
   MSGNOLOC0("============== Type Parameter ==============");

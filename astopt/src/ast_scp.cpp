@@ -59,7 +59,7 @@ void AST_SCP::BuildScope() {
   }
 
   if (mFlags & FLG_trace_3) {
-    mHandler->GetTypeTable()->Dump();
+    gTypeTable.Dump();
   }
 }
 
@@ -68,7 +68,7 @@ void BuildScopeVisitor::InitInternalTypes() {
   ModuleNode *module = mHandler->GetASTModule();
   ASTScope *scope = module->GetRootScope();
   for (unsigned i = 0; i <= (unsigned)TY_Max; i++) {
-    TreeNode *node = mHandler->GetTypeTable()->GetTypeFromTypeIdx(i);
+    TreeNode *node = gTypeTable.GetTypeFromTypeIdx(i);
     node->SetScope(scope);
     if (node->IsUserType()) {
       static_cast<UserTypeNode *>(node)->GetId()->SetScope(scope);
@@ -115,13 +115,13 @@ FunctionNode *BuildScopeVisitor::AddFunction(std::string name) {
 
 void BuildScopeVisitor::AddType(ASTScope *scope, TreeNode *node) {
   scope->AddType(node);
-  mHandler->GetTypeTable()->AddType(node);
+  gTypeTable.AddType(node);
 }
 
 void BuildScopeVisitor::AddTypeAndDecl(ASTScope *scope, TreeNode *node) {
   scope->AddType(node);
   scope->AddDecl(node);
-  mHandler->GetTypeTable()->AddType(node);
+  gTypeTable.AddType(node);
 }
 
 BlockNode *BuildScopeVisitor::VisitBlockNode(BlockNode *node) {

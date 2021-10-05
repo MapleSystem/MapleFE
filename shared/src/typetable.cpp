@@ -26,6 +26,8 @@
 
 namespace maplefe {
 
+TypeTable gTypeTable;
+
 TypeEntry::TypeEntry(TreeNode *node) {
   mType = node;
   if (!node->IsTypeIdNone()) {
@@ -49,16 +51,6 @@ TypeEntry::TypeEntry(TreeNode *node) {
         break;
     }
   }
-}
-
-TypeTable::TypeTable() {
-  // insert a dummy so type index starting from 1
-  // mTypeTable.push_back(NULL);
-  AddPrimAndBuiltinTypes();
-}
-
-TypeTable::~TypeTable() {
-  mTypeTable.clear();
 }
 
 TreeNode *TypeTable::CreatePrimType(std::string name, TypeId tyid) {

@@ -29,7 +29,7 @@ void TypeInfer::TypeInference() {
   ModuleNode *module = mHandler->GetASTModule();
 
   if (mFlags & FLG_trace_3) {
-    mHandler->GetTypeTable()->Dump();
+    gTypeTable.Dump();
   }
 
   // build mNodeId2Decl
@@ -440,7 +440,7 @@ bool TypeInferVisitor::UpdateVarTypeWithInit(TreeNode *var, TreeNode *init) {
     } else if (init->IsIdentifier()) {
       TreeNode *decl = mHandler->FindDecl(static_cast<IdentifierNode *>(init));
       if (decl && (decl->IsClass() || decl->GetTypeIdx() < (unsigned)TY_Max)) {
-        TreeNode *utype = mHandler->GetTypeTable()->GetTypeFromTypeIdx((unsigned)TY_Function);
+        TreeNode *utype = gTypeTable.GetTypeFromTypeIdx((unsigned)TY_Function);
         utype->SetParent(idnode);
         idnode->SetType(utype);
         idnode->SetTypeId(TY_Function);

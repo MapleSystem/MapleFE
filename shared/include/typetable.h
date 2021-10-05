@@ -52,8 +52,8 @@ private:
   std::unordered_map<unsigned, unsigned> mNodeId2TypeIdxMap;
 
 public:
-  TypeTable();
-  ~TypeTable();
+  TypeTable() {};
+  ~TypeTable() { mTypeTable.clear(); };
 
   TreeNode *CreatePrimType(std::string name, TypeId tyid);
   TreeNode *CreateBuiltinType(std::string name, TypeId tyid);
@@ -63,6 +63,9 @@ public:
   TreeNode *GetTypeFromTypeIdx(unsigned idx);
   void Dump();
 };
+
+extern TypeTable gTypeTable;
+
 
 }
 #endif  // __TYPETABLE_H__
