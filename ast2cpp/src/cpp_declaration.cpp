@@ -547,7 +547,7 @@ std::string CppDecl::GetTypeString(TreeNode *node, TreeNode *child) {
         // This will change pending solution for issue #69.
         return "t2crt::Object * "s; // object literal type - dynamic-import.ts
       }
-      str = child ? EmitTreeNode(child) : Emitter::GetEnumTypeId(k);
+      str = child ? EmitTreeNode(child) : (k == TY_Array ? "t2crt::Array<t2crt::JS_Val>* "s : Emitter::GetEnumTypeId(k));
       if (str != "none"s)
         return str + " "s;
     }
