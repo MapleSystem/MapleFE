@@ -69,6 +69,8 @@ public:
   std::string EmitDirectFieldInit(std::string varName, StructLiteralNode* node);
   std::string EmitCppCtor(ClassNode* node);
   std::string EmitBracketNotationProp(ArrayElementNode* ae, OprId binOpId, bool isLhs, bool& isDynProp);
+  std::string EmitArrayLiteral(TreeNode* arrType, TreeNode* arrLiteral);
+  std::string EmitArrayLiterals(TreeNode* arrLiteral, int dim, std::string type);
   TypeId GetTypeIdFromDecl(TreeNode* id);
   bool   IsClassField(ArrayElementNode* node, std::string propKey);
   bool   IsClassId(TreeNode* node);

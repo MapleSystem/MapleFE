@@ -393,42 +393,6 @@ std::string CppDecl::EmitDeclNode(DeclNode *node) {
   std::string str, type;
   if (auto n = node->GetVar()) {
     str += "  "s + EmitTreeNode(n);
-
-    // Generate initializer for t2crt::Array decl in header file.
-    int dims = 0;
-    if (auto init = node->GetInit()) {
-      if (init->IsArrayLiteral() &&
-          n->IsIdentifier() && static_cast<IdentifierNode*>(n)->GetType()) {
-        IdentifierNode* id = static_cast<IdentifierNode*>(n);
-        str += " = "s;
-        switch (id->GetType()->GetKind()) {
-          case NK_UserType: {
-            UserTypeNode* u = static_cast<UserTypeNode*>(id->GetType());
-            if (auto id = u->GetId()) {
-              // Get name of user defined class or TS builtin objects to work with
-              // names of multi dim array generated with templates in builtins.h
-              // ("t2crt::Object" need to be translated into t2crt::ObjectP which is alias to type
-              // t2crt::Object* (see builtins.h)). Works ok with user defined classes and
-              // builtin such as in array-new-elems.ts but still need more work
-              // to handle more TS builtin object types.
-              type = id->GetName();
-              if (type.compare("t2crt::Object") == 0)
-                type = "t2crt::ObjectP";
-            }
-            dims = u->GetDims()? u->GetDimsNum(): 0;
-            str += EmitArrayLiteral(static_cast<ArrayLiteralNode*>(init), dims, type);
-            break;
-          }
-          case NK_PrimArrayType: {
-            PrimArrayTypeNode* mtype = static_cast<PrimArrayTypeNode *>(id->GetType());
-            str +=  EmitArrayLiteral(static_cast<ArrayLiteralNode*>(init),
-                    mtype->GetDims()->GetDimensionsNum(),
-                    EmitPrimTypeNode(mtype->GetPrim()));
-            break;
-          }
-        }
-      }
-    }
   }
   return str;
 }
@@ -477,7 +441,7 @@ std::string CppDecl::EmitArrayLiteral(ArrayLiteralNode *node, int dim, std::stri
   if (node == nullptr)
     return std::string();
 
-  // Generate ctor call to instantiate t2crt::Array, e.g. t2crt::Array1D_long._new(). See builtins.h
+  // Generate ctor call to instantiate array, e.g. t2crt::Array1D_long._new(). See builtins.h
   std::string str("t2crt::Array"s + std::to_string(dim) + "D_"s + type + "._new({"s );
   for (unsigned i = 0; i < node->GetLiteralsNum(); ++i) {
     if (i)
