@@ -1304,4 +1304,8 @@ std::string CppDef::EmitInstanceOfNode(InstanceOfNode *node) {
   return HandleTreeNode(str, node);
 }
 
+std::string CppDef::EmitDeclareNode(DeclareNode *node) {
+  return std::string();
+}
+
 } // namespace maplefe

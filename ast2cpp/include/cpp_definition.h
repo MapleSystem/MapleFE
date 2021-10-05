@@ -60,6 +60,8 @@ public:
   virtual std::string EmitArrayElementNode(ArrayElementNode *node);
   virtual std::string EmitTypeAliasNode(TypeAliasNode* node);
   virtual std::string EmitInstanceOfNode(InstanceOfNode *node);
+  virtual std::string EmitDeclareNode(DeclareNode *node);
+
   std::string EmitFuncScopeVarDecls(FunctionNode *node);
   std::string EmitStructNode(StructNode *node);
   std::string EmitStructLiteralNode(StructLiteralNode* node);
