@@ -33,18 +33,15 @@ class TypeEntry {
  private:
   TreeNode *mType;
   TypeId    mTypeId;
-  NodeKind  mTypeKind;
 
  public:
-  TypeEntry();
+  TypeEntry() : mType(NULL), mTypeId(TY_None) {}
   TypeEntry(TreeNode *node);
   ~TypeEntry(){};
 
-  NodeKind  GetTypeKind() { return mTypeKind; }
   TypeId    GetTypeId()   { return mTypeId; }
   TreeNode *GetType()     { return mType; }
 
-  void SetTypeKind(NodeKind k) { mTypeKind = k; }
   void SetTypeId(TypeId i)     { mTypeId = i; }
   void SetType(TreeNode *n)    { mType = n; }
 };

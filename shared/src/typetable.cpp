@@ -26,19 +26,12 @@
 
 namespace maplefe {
 
-TypeEntry::TypeEntry() {
-  mType = NULL;
-  mTypeId = TY_None;
-  mTypeKind = NK_Null;
-}
-
 TypeEntry::TypeEntry(TreeNode *node) {
   mType = node;
-  mTypeKind = node->GetKind();
-  if (node->IsTypeIdNone()) {
+  if (!node->IsTypeIdNone()) {
     mTypeId = node->GetTypeId();
   } else {
-    switch (mTypeKind) {
+    switch (node->GetKind()) {
       case NK_Struct:
       case NK_StructLiteral:
       case NK_Class:
