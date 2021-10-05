@@ -1324,9 +1324,11 @@ UnaOperatorNode *TypeInferVisitor::VisitUnaOperatorNode(UnaOperatorNode *node) {
 
 UserTypeNode *TypeInferVisitor::VisitUserTypeNode(UserTypeNode *node) {
   (void) AstVisitor::VisitUserTypeNode(node);
-  if (node->GetId()) {
-    UpdateTypeId(node, node->GetId()->GetTypeId());
-    node->SetTypeIdx(node->GetId()->GetTypeIdx());
+  if (node->GetDims()) {
+    node->SetTypeId(TY_Array);
+    node->SetTypeIdx(TY_Array);
+  } else if (node->GetId()) {
+    UpdateTypeId(node, node->GetId());
   }
   TreeNode *parent = node->GetParent();
   if (parent && parent->IsIdentifier()) {
@@ -1373,6 +1375,11 @@ UserTypeNode *TypeInferVisitor::VisitUserTypeNode(UserTypeNode *node) {
 
 UserTypeNode *ShareUTVisitor::VisitUserTypeNode(UserTypeNode *node) {
   (void) AstVisitor::VisitUserTypeNode(node);
+
+  // skip for array
+  if (node->GetDims()) {
+    return node;
+  }
 
   TreeNode *idnode = node->GetId();
   if (idnode && idnode->IsIdentifier()) {
