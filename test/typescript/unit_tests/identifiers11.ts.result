@@ -1,0 +1,26 @@
+Matched 11 tokens.
+Matched 33 tokens.
+Matched 49 tokens.
+============= Module ===========
+== Sub Tree ==
+ts_enum: ET {type="type";with="with" }
+== Sub Tree ==
+class  Base
+<U,V,>  Fields: 
+    f1    f2
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+declare class  Klass
+  Fields: 
+
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+

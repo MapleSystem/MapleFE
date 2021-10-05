@@ -55,6 +55,7 @@
 #-------------------------------------------------------------------------------
 
 rule KeywordIdentifier : ONEOF("type",
+                               "with",
                                "boolean",
                                "string",
                                "catch",
