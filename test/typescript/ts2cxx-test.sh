@@ -6,7 +6,6 @@ RTSRC=$(cd $(dirname $0)/../../; pwd)/ast2cpp/runtime/src
 TS2AST=$TSOUT/bin/ts2ast
 AST2CPP=$TSOUT/bin/ast2cpp
 TSCSH=$(dirname $0)/tsc.sh
-log=cxx.log
 
 # Acquire/release a lock
 typeset -i LockVar
@@ -62,6 +61,11 @@ done 2>&1
 wait
 single="yes"
 done
+log=cxx.log
+num=$(echo $list1 $list2 | wc -w)
+if [ $num -lt 100 ]; then
+  log=/dev/null
+fi
 if [ -f ts2cpp.summary.out ]; then
   echo -e "\nDate: $(date)\nTest cases passed:" | tee -a $log
   sort ts2cpp.summary.out | xargs -n1 | nl | tee -a $log
