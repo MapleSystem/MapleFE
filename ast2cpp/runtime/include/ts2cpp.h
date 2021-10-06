@@ -73,7 +73,8 @@ struct JS_Val {
   JS_Val(int64_t l) { x.val_long = l; type = TY_Long; cxx = false; }
   JS_Val(double d)  { x.val_double = d; type = TY_Double; cxx = false; }
   JS_Val(Object* o){ x.val_obj = o; type = TY_Object; cxx = false; }
-  JS_Val(std::string* s) {x.val_string = s; type = TY_String; cxx = false; }
+  JS_Val(std::string* s) { x.val_string = s; type = TY_String; cxx = false; }
+  JS_Val(const char* s) { x.val_string = new std::string(s); type = TY_String; cxx = false; }
   JS_Val(int i) { x.val_long = i; type = TY_Long; cxx = false; }
 
 #define OPERATORS(op) \
