@@ -1,0 +1,18 @@
+Matched 15 tokens.
+Matched 24 tokens.
+============= Module ===========
+== Sub Tree ==
+func  func()  throws: 
+  class  Car
+    Fields: 
+
+    Instance Initializer: 
+    Constructors: 
+    Methods: 
+    LocalClasses: 
+    LocalInterfaces: 
+
+  return Car
+
+== Sub Tree ==
+console.log(func())
