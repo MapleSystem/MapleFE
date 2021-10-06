@@ -533,11 +533,10 @@ std::string CppDef::EmitDeclNode(DeclNode *node) {
   return str;
 }
 
-static bool QuoteStringLiteral(std::string &s, bool quoted = false) {
-  if(!quoted && (s.front() != '"' || s.back() != '"'))
+static bool QuoteStringLiteral(std::string &s) {
+  if(s.front() != '"' || s.back() != '"')
     return false;
-  if(!quoted)
-    s = s.substr(1, s.length() - 2);
+  s = s.substr(1, s.length() - 2);
   Emitter::Replace(s, "\"", "\\\"", 0);
   s = "\"" + s + "\"";
   return true;
@@ -1056,7 +1055,7 @@ std::string CppDef::EmitTemplateLiteralNode(TemplateLiteralNode *node) {
       if(i & 0x1)
         str += "t2crt::to_string("s + s+ ")"s;
       else {
-        QuoteStringLiteral(s, true);
+        QuoteStringLiteral(s);
         str += s;
       }
     }
