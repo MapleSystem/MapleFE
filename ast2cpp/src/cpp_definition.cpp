@@ -1060,6 +1060,9 @@ std::string CppDef::EmitTemplateLiteralNode(TemplateLiteralNode *node) {
 std::string CppDef::EmitLiteralNode(LiteralNode *node) {
   if (node == nullptr)
     return std::string();
+  LitData lit = node->GetData();
+  if(lit.mType == LT_VoidLiteral)
+    return "undefined";
   return Emitter::EmitLiteralNode(node);
 }
 
