@@ -12,7 +12,14 @@ function ReleaseLock {
 }
 rm -rf -- tsc-lock-* *-tsc.out tsc.summary.out tsc.failures*.out
 
-OPT=
+OPT="--target es6 \
+     --lib es2015,es2017,dom \
+     --module commonjs \
+     --downlevelIteration \
+     --esModuleInterop \
+     --experimentalDecorators"
+# --sourceMap \
+# --isolatedModules \
 while [ "x${1:0:1}" = "x-" ]; do
  OPT="$OPT $1"
  shift
@@ -20,30 +27,34 @@ done
 i=0
 for f; do
   echo $((++i)). $f
+  js=$(dirname $f)/$(basename $f .ts).js
+  rm -f $js
   AcquireLock tsc for_$t $(nproc)
-  (bash -x -c "tsc \
-    --target es6 \
-    --lib es2015,es2017,dom \
-    --module commonjs \
-    --strict \
-    --downlevelIteration \
-    --esModuleInterop \
-    --experimentalDecorators \
-    $OPT \
-    $f" || echo $f >> tsc.failures.out
-# --sourceMap \
-# --isolatedModules \
-  ReleaseLock tsc
+  (bash -x -c "tsc --strict $OPT $f"
+   if [ $? -ne 0 ]; then
+     echo "(--strict)"$f >> tsc.failures.out
+     bash -x -c "tsc $OPT $f" || echo "(non-strict)"$f >> tsc.failures.out
+   fi
+   bash -x -c "node $js" 2>&1 > $f-nodejs.out
+   ReleaseLock tsc
   ) >& $f-tsc.out &
 done
 wait
+rc=0
 if [ -f tsc.failures.out ]; then
   echo -e "\nTest cases failed with tsc strict mode enabled:"
-  sort tsc.failures.out | xargs -n1 | nl
-  if [ $i -eq 1 -a -f $f-tsc.out ]; then
-    echo
-    cat $f-tsc.out
+  sort tsc.failures.out | grep "(--strict)" | xargs -n1 | nl
+  grep -q "(non-strict)" tsc.failures.out
+  if [ $? -eq 0 ]; then
+    echo -e "\nTest cases failed with non-strict mode:"
+    sort tsc.failures.out | grep "(non-strict)" | xargs -n1 | nl
+    rc=2
+  else
+    echo -e "\nAll passed with tsc non-strict mode."
+    rc=1
   fi
 elif [ $# -gt 0 ]; then
   echo All passed
 fi
+[ $i -eq 1 -a -f $f-tsc.out ] && cat $f-tsc.out $f-nodejs.out
+exit $rc
