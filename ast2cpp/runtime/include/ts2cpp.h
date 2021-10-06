@@ -333,6 +333,7 @@ std::ostream& operator<< (std::ostream& out, const t2crt::Array<T>& v) {
   return out;
 }
 extern std::ostream& operator<< (std::ostream& out, const t2crt::JS_Val& v);
+extern std::ostream& operator<< (std::ostream& out, const t2crt::Object* obj);
 extern const t2crt::JS_Val undefined;
 
 using t2crt::Object;

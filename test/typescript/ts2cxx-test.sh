@@ -23,8 +23,8 @@ trap "{ pstree -p $$ | tr ')' '\n' | sed 's/.*(//' | xargs kill -9 2> /dev/null;
 rm -rf ts2cpp-lock-* *-ts2cpp.out ts2cpp.summary.out ts2cpp.failures*.out
 cnt=0
 if [ $# -gt 1 ]; then
-list1=$(grep -L -e "^ *import " -e "^ *export .* from " "$@")
-list2=$(grep -l -e "^ *import " -e "^ *export .* from " "$@")
+  list1=$(grep -L -e "^ *import " -e "^ *export .* from " "$@")
+  list2=$(grep -l -e "^ *import " -e "^ *export .* from " "$@")
 else
   list1="$@" list2=
 fi
@@ -46,7 +46,7 @@ for f in $list; do
     done
     dep=$(echo $dep | xargs -n1 | sort -u)
     $AST2CPP $f.ast || { echo "(ast2cpp)$f" >> ts2cpp.failures.out; break; }
-    g++ -std=c++17 $t.cpp $RTSRC/*.cpp $dep -o $t.out || { echo "(g++)$f" >> ts2cpp.failures2.out; break; }
+    g++ -std=c++17 -g $t.cpp $RTSRC/*.cpp $dep -o $t.out || { echo "(g++)$f" >> ts2cpp.failures2.out; break; }
     ./$t.out 2>&1 > $f-run.out || { echo "(run)$f" >> ts2cpp.failures2.out; break; }
     $TSCSH $f
     diff $f-run.out $f-nodejs.out || { echo "(result)$f" >> ts2cpp.failures3.out; break; }
