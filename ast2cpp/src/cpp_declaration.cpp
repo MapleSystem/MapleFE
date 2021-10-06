@@ -487,8 +487,8 @@ std::string CppDecl::EmitFieldNode(FieldNode *node) {
   return std::string();
 }
 
-// TODO: Add other builtin obj types
-std::vector<std::string>builtins = {"t2crt::Object", "t2crt::Function", "t2crt::Number", "t2crt::Array", "t2crt::Record"};
+// note: entries below are to match values from ast nodes. Do not prepend with "t2crt::" 
+std::vector<std::string>builtins = {"Object", "Function", "Number", "Array", "Record"};
 
 bool IsBuiltinObj(std::string name) {
  return std::find(builtins.begin(), builtins.end(), name) != builtins.end();
