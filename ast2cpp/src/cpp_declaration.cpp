@@ -57,6 +57,11 @@ class ImportExportModules : public AstVisitor {
       return filename;
     }
 
+    std::string Comment(TreeNode *node) {
+      std::string s = mEmitter->EmitTreeNode(node);
+      return s.empty() ? s : "// "s + s + '\n';
+    }
+
     ImportNode *VisitImportNode(ImportNode *node) {
       std::string filename = AddIncludes(node->GetTarget());
       std::string module = mCppDecl->GetModuleName(filename.c_str());
@@ -67,7 +72,7 @@ class ImportExportModules : public AstVisitor {
             if (auto n = x->GetBefore()) {
               std::string v = module + "__default"s;
               std::string s = mEmitter->EmitTreeNode(n);
-              mImports += "inline const decltype("s + v + ") &"s + s + " = "s + v + ";\n"s;
+              mImports += Comment(node) + "inline const decltype("s + v + ") &"s + s + " = "s + v + ";\n"s;
             }
           } else if (x->IsSingle()) {
             if (auto a = x->GetAfter())
@@ -80,7 +85,7 @@ class ImportExportModules : public AstVisitor {
           } else if (x->IsEverything()) {
             if (auto n = x->GetBefore()) {
               std::string s = mEmitter->EmitTreeNode(n);
-              mImports += "namespace "s + s + " = " + module + ";\n"s;
+              mImports += Comment(node) + "namespace "s + s + " = " + module + ";\n"s;
               mCppDecl->AddImportedModule(s);
             }
           } else {
@@ -88,10 +93,16 @@ class ImportExportModules : public AstVisitor {
               std::string v = mEmitter->EmitTreeNode(n);
               if (auto a = x->GetAfter()) {
                 std::string after = mEmitter->EmitTreeNode(a);
-                if (after == "default") {
+                if (v == "default") {
+                  mImports += Comment(node) + "inline const decltype("s + module + "__default) &"s + after
+                    + " = "s + module + "__default;\n"s;
+                } else {
+                  mImports += Comment(node) + "inline const decltype("s + module + "::"s + v + ") &"s + after
+                    + " = "s + module + "::"s + v + ";\n"s;
                 }
               } else {
-                mImports += "inline const decltype("s + module + "::"s + v + ") &"s + v + " = "s + module + "::"s + v + ";\n"s;
+                mImports += Comment(node) + "inline const decltype("s + module + "::"s + v + ") &"s + v
+                  + " = "s + module + "::"s + v + ";\n"s;
               }
             }
           }
@@ -101,6 +112,8 @@ class ImportExportModules : public AstVisitor {
     }
 
     ExportNode *VisitExportNode(ExportNode *node) {
+      // 'export *' does not re-export a default, it re-exports only named exports
+      // Multiple 'export *'s fails with tsc if they export multiple exports with same name
       std::string filename = AddIncludes(node->GetTarget());
       std::string module = mCppDecl->GetModuleName(filename.c_str());
       for (unsigned i = 0; i < node->GetPairsNum(); ++i) {
@@ -110,8 +123,8 @@ class ImportExportModules : public AstVisitor {
               std::string v = mEmitter->EmitTreeNode(n);
               std::string def = "decltype("s + v + ") __default_"s + v + ";\n"s;
               mCppDecl->AddDefinition(def);
-              mImports += "extern "s + def;
-              mExportDefault = "#define "s + module + "__default "s + module + "::__default_"s + v + '\n';
+              mImports += Comment(node) + "extern "s + def;
+              mExportDefault = Comment(node) + "#define "s + module + "__default "s + module + "::__default_"s + v + '\n';
             }
           } else if (x->IsSingle()) {
             std::string str;
@@ -123,7 +136,7 @@ class ImportExportModules : public AstVisitor {
               str += n->IsLiteral() ? "require("s + s + ')' : s;
             }
           } else if (x->IsEverything()) {
-            mImports += "using namespace "s + module + "::__export;\n"s;
+            mImports += Comment(node) + "namespace __export { using namespace "s + module + "::__export; }\n"s;
           } else {
             if (auto b = x->GetBefore()) {
               std::string before = mEmitter->EmitTreeNode(b);
@@ -131,11 +144,12 @@ class ImportExportModules : public AstVisitor {
               if (auto a = x->GetAfter()) {
                 std::string after = mEmitter->EmitTreeNode(a);
                 if (before == "default") {
-                  mImports += "inline const decltype("s + module + "__default) &"s + after + " = "s + module + "__default;\n"s;
+                  mImports += Comment(node) + "namespace __export { inline const decltype("s + module + "__default) &"s + after
+                    + " = "s + module + "__default; }\n"s;
                   before = module + "__default";
                 }
                 if (after == "default")
-                  mExportDefault = "#define "s + module + "__default "s + module + "::"s + before + '\n';
+                  mExportDefault = Comment(node) + "#define "s + module + "__default "s + module + "::"s + before + '\n';
               }
             }
           }
@@ -276,13 +290,13 @@ namespace )""" + module + R"""( {
     }
   }
 
+  // Generate code for all imports
+  str += xxportModules.GetImports();
+
   str += R"""(
   namespace __export {}
   using namespace __export;
 )""";
-
-  // Generate code for all imports
-  str += xxportModules.GetImports();
 
   // export default
   str += xxportModules.GetExportDefault();
@@ -487,7 +501,7 @@ std::string CppDecl::EmitFieldNode(FieldNode *node) {
   return std::string();
 }
 
-// note: entries below are to match values from ast nodes. Do not prepend with "t2crt::" 
+// note: entries below are to match values from ast nodes. Do not prepend with "t2crt::"
 std::vector<std::string>builtins = {"Object", "Function", "Number", "Array", "Record"};
 
 bool IsBuiltinObj(std::string name) {
