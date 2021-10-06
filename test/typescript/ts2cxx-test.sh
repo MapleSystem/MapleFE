@@ -5,6 +5,7 @@ TSOUT=$(cd $(dirname $0)/../../; pwd)/output/typescript
 RTSRC=$(cd $(dirname $0)/../../; pwd)/ast2cpp/runtime/src
 TS2AST=$TSOUT/bin/ts2ast
 AST2CPP=$TSOUT/bin/ast2cpp
+TSCSH=$(dirname $0)/tsc.sh
 log=cxx.log
 
 # Acquire/release a lock
@@ -46,7 +47,9 @@ for f in $list; do
     dep=$(echo $dep | xargs -n1 | sort -u)
     $AST2CPP $f.ast || { echo "(ast2cpp)$f" >> ts2cpp.failures.out; break; }
     g++ -std=c++17 $t.cpp $RTSRC/*.cpp $dep -o $t.out || { echo "(g++)$f" >> ts2cpp.failures2.out; break; }
-    ./$t.out || { echo "(run)$f" >> ts2cpp.failures2.out; break; }
+    ./$t.out 2>&1 > $f-run.out || { echo "(run)$f" >> ts2cpp.failures2.out; break; }
+    $TSCSH $f
+    diff $f-run.out $f-nodejs.out || { echo "(result)$f" >> ts2cpp.failures3.out; break; }
     echo $t >> ts2cpp.summary.out
     break
   done
@@ -62,6 +65,10 @@ done
 if [ -f ts2cpp.summary.out ]; then
   echo -e "\nDate: $(date)\nTest cases passed:" | tee -a $log
   sort ts2cpp.summary.out | xargs -n1 | nl | tee -a $log
+fi
+if [ -f ts2cpp.failures3.out ]; then
+  echo -e "\nTest cases failed due to unexpected results:" | tee -a $log
+  sort ts2cpp.failures3.out | xargs -n1 | nl | tee -a $log
 fi
 if [ -f ts2cpp.failures2.out ]; then
   echo -e "\nTest cases failed due to g++ or run:" | tee -a $log
