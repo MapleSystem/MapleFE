@@ -534,12 +534,12 @@ std::string CppDef::EmitDeclNode(DeclNode *node) {
 }
 
 static bool QuoteStringLiteral(std::string &s, bool quoted = false) {
-  if(!quoted && (s.front() != '"' || s.front() != '\''|| s.back() != '"' || s.back() != '\'' ))
+  if(!quoted && (s.front() != '"' || s.back() != '"'))
     return false;
   if(!quoted)
     s = s.substr(1, s.length() - 2);
   Emitter::Replace(s, "\"", "\\\"", 0);
-  s = "\"" + s + "\"s";
+  s = "\"" + s + "\"";
   return true;
 }
 
@@ -587,7 +587,7 @@ std::string CppDef::EmitCallNode(CallNode *node) {
       std::string s = EmitTreeNode(node->GetArg(i));
       if(QuoteStringLiteral(s)) {
         if(num > 1)
-          s += "\"'"s + s + "'\""s;
+          s = "\"'\""s + s + "\"'\""s;
       } else if(mPrecedence <= 13) // '\015'
         s = "("s + s + ")"s;
       if (i)

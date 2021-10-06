@@ -1161,7 +1161,7 @@ std::string Emitter::EmitLiteralNode(LiteralNode *node) {
   LitData lit = node->GetData();
   std::string str(AstDump::GetEnumLitData(lit));
   if(lit.mType == LT_StringLiteral || lit.mType == LT_CharacterLiteral)
-    str = "\"" + str + "\"";
+    str = '"' + str + '"';
   str = HandleTreeNode(str, node);
   if (auto n = node->GetType()) {
     str += ": "s + EmitTreeNode(n);
