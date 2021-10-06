@@ -137,8 +137,9 @@ std::string CppDef::EmitModuleNode(ModuleNode *node) {
   if (idx == 0) {
     str += R"""(
 int main(int argc, char **argv) {
+  std::cout << std::boolalpha;
 )""" + "  "s + module + R"""(::__init_func__(); // call its __init_func__()
-return 0;
+  return 0;
 }
 )""";
   }
