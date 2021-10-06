@@ -1144,12 +1144,13 @@ IsNode *TypeInferVisitor::VisitIsNode(IsNode *node) {
   if (parent->IsFunction()) {
     FunctionNode *func = static_cast<FunctionNode *>(parent);
     if (func->GetType() == node) {
-      TreeNode *left = node->GetLeft();
       TreeNode *right = node->GetRight();
       if (right->IsUserType()) {
         TreeNode *id = static_cast<UserTypeNode *>(right)->GetId();
         right->SetTypeIdx(id->GetTypeIdx());
         mFuncIsNodeMap[func->GetNodeId()] = id->GetTypeIdx();
+      } else {
+        NOTYETIMPL("isnode right not user type");
       }
     }
   }
@@ -1329,6 +1330,7 @@ UserTypeNode *TypeInferVisitor::VisitUserTypeNode(UserTypeNode *node) {
     node->SetTypeIdx(TY_Array);
   } else if (node->GetId()) {
     UpdateTypeId(node, node->GetId());
+    node->SetTypeIdx(node->GetId()->GetTypeIdx());
   }
   TreeNode *parent = node->GetParent();
   if (parent && parent->IsIdentifier()) {
