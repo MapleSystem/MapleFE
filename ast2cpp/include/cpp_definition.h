@@ -61,6 +61,7 @@ public:
   virtual std::string EmitTypeAliasNode(TypeAliasNode* node);
   virtual std::string EmitInstanceOfNode(InstanceOfNode *node);
   virtual std::string EmitDeclareNode(DeclareNode *node);
+  virtual std::string& HandleTreeNode(std::string &str, TreeNode *node);
 
   std::string EmitFuncScopeVarDecls(FunctionNode *node);
   std::string EmitStructNode(StructNode *node);

@@ -67,6 +67,7 @@ class Array : public Object {
 
     T& operator[](int i) {return elements[i];}
     void operator = (const std::vector<T> &v) { elements = v; }
+    long size() { return elements.size(); }
 
     // Put JS Array.prototype props as static fields and methods in this class
     // and add to proplist of Array_ctor.prototype object on system init.

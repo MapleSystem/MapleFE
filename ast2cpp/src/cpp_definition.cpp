@@ -1357,4 +1357,31 @@ std::string CppDef::EmitDeclareNode(DeclareNode *node) {
   return std::string();
 }
 
+std::string &CppDef::HandleTreeNode(std::string &str, TreeNode *node) {
+  auto num = node->GetAsTypesNum();
+  if(num > 0) {
+    str = "(("s + str + ')';
+    for (unsigned i = 0; i < num; ++i)
+      if (auto t = node->GetAsTypeAtIndex(i))
+        str += EmitAsTypeNode(t);
+    str += ')';
+  }
+  /*
+  if(node->IsOptional())
+    str = AddParentheses(str, node) + '?';
+  if(node->IsNonNull())
+    str = AddParentheses(str, node) + '!';
+  */
+  if(node->IsRest())
+    str = "..."s; // + AddParentheses(str, node);
+  /*
+  if(node->IsConst())
+    if(node->IsField())
+      str += " as const"s;
+    else
+      str = AddParentheses(str, node) + " as const"s;
+  */
+  return str;
+}
+
 } // namespace maplefe
