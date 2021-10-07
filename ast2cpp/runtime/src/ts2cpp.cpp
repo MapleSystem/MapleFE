@@ -23,6 +23,7 @@ std::ostream& operator<< (std::ostream& out, const t2crt::Object *obj) {
 }
 
 const t2crt::JS_Val undefined = { 0, t2crt::TY_Undef, false };
+const t2crt::JS_Val null = { 0, t2crt::TY_Null, false };
 
 namespace t2crt {
 
