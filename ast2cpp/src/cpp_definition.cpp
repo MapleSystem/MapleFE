@@ -986,25 +986,33 @@ std::string CppDef::EmitBinOperatorNode(BinOperatorNode *node) {
 
   OprId k = node->GetOprId();
   std::string str;
-  if(k == OPR_Exp) {
-    str = "std::pow("s + lhs + ", "s + rhs + ")";
-  } else {
-    switch(k) {
-      case OPR_Band:
-      case OPR_Bor:
-      case OPR_Bxor:
-      case OPR_Shl:
-      case OPR_Shr:
-        lhs = "static_cast<int64_t>(static_cast<int32_t>("s + lhs + "))"s;
-        break;
-      case OPR_Zext:
-        lhs = "static_cast<int64_t>(static_cast<uint32_t>("s + lhs + "))"s;
-        op = "\015>>";
-        break;
-    }
-    if (k == OPR_Assign && lhsIsDynProp)
-      rhs = "t2crt::JS_Val("s + rhs + ")"s;
-    str = lhs + " "s + std::string(op + 1) + " "s + rhs;
+  switch(k) {
+    case OPR_Exp:
+      str = "std::pow("s + lhs + ", "s + rhs + ")";
+      break;
+    case OPR_StEq:
+      str = "t2crt::StrictEqu("s + lhs + ',' + rhs + ')';
+      break;
+    case OPR_StNe:
+      str = "t2crt::StrictNotEqu("s + lhs + ',' + rhs + ')';
+      break;
+    default:
+      switch(k) {
+        case OPR_Band:
+        case OPR_Bor:
+        case OPR_Bxor:
+        case OPR_Shl:
+        case OPR_Shr:
+          lhs = "static_cast<int64_t>(static_cast<int32_t>("s + lhs + "))"s;
+          break;
+        case OPR_Zext:
+          lhs = "static_cast<int64_t>(static_cast<uint32_t>("s + lhs + "))"s;
+          op = "\015>>";
+          break;
+      }
+      if (k == OPR_Assign && lhsIsDynProp)
+        rhs = "t2crt::JS_Val("s + rhs + ")"s;
+      str = lhs + " "s + std::string(op + 1) + " "s + rhs;
   }
   mPrecedence = precd;
   return str;

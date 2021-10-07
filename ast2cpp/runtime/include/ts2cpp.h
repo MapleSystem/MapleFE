@@ -75,6 +75,7 @@ struct JS_Val {
   JS_Val(double d)  { x.val_double = d; type = TY_Double; cxx = false; }
   JS_Val(Object* o){ x.val_obj = o; type = TY_Object; cxx = false; }
   JS_Val(std::string* s) { x.val_string = s; type = TY_String; cxx = false; }
+  JS_Val(std::string s) { x.val_string = new std::string(s); type = TY_String; cxx = false; }
   JS_Val(const char* s) { x.val_string = new std::string(s); type = TY_String; cxx = false; }
   JS_Val(int i) { x.val_long = i; type = TY_Long; cxx = false; }
 
@@ -270,6 +271,10 @@ bool InstanceOf(T* val, Function* ctor) {
   }
   return false;
 }
+
+// TODO: To be implemented
+inline bool StrictEqu(JS_Val lhs, JS_Val rhs) { return false; }
+inline bool StrictNotEqu(JS_Val lhs, JS_Val rhs) { return true; }
 
 void GenerateDOTGraph( std::vector<Object *>&obj, std::vector<std::string>&name);
 
