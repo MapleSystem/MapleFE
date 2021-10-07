@@ -73,10 +73,18 @@ fi
 if [ -f ts2cpp.failures3.out ]; then
   echo -e "\nTest cases failed due to unexpected results:" | tee -a $log
   sort ts2cpp.failures3.out | xargs -n1 | nl | tee -a $log
+  if [ $num -eq 1 ]; then
+    echo -e  "\ndiff $t.ts-nodejs.out $t.ts-run.out"
+    diff $t.ts-nodejs.out $t.ts-run.out
+  fi
 fi
 if [ -f ts2cpp.failures2.out ]; then
   echo -e "\nTest cases failed due to g++ or run:" | tee -a $log
   sort ts2cpp.failures2.out | xargs -n1 | nl | tee -a $log
+  if [ $num -eq 1 ]; then
+    echo -e  "\nCommand line to compile $t.cpp:"
+    grep -- "-std=c++17" $t.ts-ts2cpp.out | sed 's/^+/ /'
+  fi
 fi
 if [ -f ts2cpp.failures.out ]; then
   echo -e "\nTest cases failed due to ts2ast or ast2cpp:" | tee -a $log
