@@ -515,6 +515,7 @@ static std::string EncodeLiteral(std::string str) {{
         case 'r': c = '\\r'; break;
         case 't': c = '\\t'; break;
         case 'v': c = '\\v'; break;
+        default: enc += '\\\\';
       }}
       esc = false;
     }} else if(c == '\\\\') {{
