@@ -67,6 +67,7 @@ struct JS_Val {
   JS_Type type;
   bool    cxx;  // if it is a cxx field
 
+  bool IsCxxProp() { return cxx; }
   JS_Val() { x.val_long = 0l; type = TY_Undef; cxx = false; }
   JS_Val(int64_t l, JS_Type t, bool c) { x.val_long = l; type = t; cxx = c; }
   JS_Val(bool b)    { x.val_bool = b; type = TY_Bool; cxx = false; }
@@ -76,6 +77,10 @@ struct JS_Val {
   JS_Val(std::string* s) { x.val_string = s; type = TY_String; cxx = false; }
   JS_Val(const char* s) { x.val_string = new std::string(s); type = TY_String; cxx = false; }
   JS_Val(int i) { x.val_long = i; type = TY_Long; cxx = false; }
+
+  // Prop directly generated as class fields when TS is compiled into CPP
+  JS_Val(JS_Type jstype, void* field) { x.field = field; type = jstype; cxx = true; }
+  JS_Val(JS_Type jstype, bool v) { x.val_long = (int64_t)v; type = jstype; cxx = false; }
 
 #define OPERATORS(op) \
   JS_Val operator op(const JS_Val &v) { \
@@ -100,23 +105,7 @@ struct JS_Val {
 
 };
 
-typedef struct JS_Prop {
-  JS_Val  val;
-
-  // Prop directly generated as class fields when TS is compiled into CPP
-  JS_Prop(JS_Type jstype, void* field) { val = { (int64_t)field, jstype, true }; }
-
-  // Prop created at runtime
-  JS_Prop(JS_Type jstype, bool v) { val = { (int64_t)v, jstype, false }; }
-  JS_Prop(JS_Val v) { val = v; }
-  JS_Prop() { val = { 0, t2crt::TY_Undef, false }; }
-
-  bool IsCxxProp() { return val.cxx; }
-
-} JS_Prop;
-
-
-typedef std::unordered_map<std::string, JS_Prop> JS_PropList;
+typedef std::unordered_map<std::string, JS_Val> JS_PropList;
 typedef std::pair<std::string, JS_Val> ObjectProp;
 
 class Object {
@@ -148,37 +137,37 @@ class Object {
     }
 
     void AddProp(std::string key, JS_Val val) {
-      propList[key] = { val };
+      propList[key] = val;
     }
 
-    JS_Prop GetProp(std::string key) {
+    JS_Val GetProp(std::string key) {
       return propList[key];
     }
 
     JS_Val& GetPropVal(std::string key) {
-      return propList[key].val;
+      return propList[key];
     }
 
     bool GetPropBool(std::string key) {
-      return propList[key].val.x.val_bool;
+      return propList[key].x.val_bool;
     }
     long GetPropLong(std::string key) {
-      return propList[key].val.x.val_long;
+      return propList[key].x.val_long;
     }
     double GetPropDouble(std::string key) {
-      return propList[key].val.x.val_double;
+      return propList[key].x.val_double;
     }
     void* GetPropBigInt(std::string key) {
-      return propList[key].val.x.val_bigint;
+      return propList[key].x.val_bigint;
     }
     std::string GetPropStr(std::string key) {
-      return *propList[key].val.x.val_string;
+      return *propList[key].x.val_string;
     }
     Object* GetPropObj(std::string key) {
-      return propList[key].val.x.val_obj;
+      return propList[key].x.val_obj;
     }
     void* GetPropField(std::string key) {
-      return propList[key].val.x.field;
+      return propList[key].x.field;
     }
 
     virtual bool IsFuncObj() {
@@ -230,7 +219,7 @@ class ClassFld {
     ClassFld(T offset)   {field.offset = offset;}
     void* Addr()         {return field.addr;}
     T     Offset()       {return field.offset;}
-    JS_Prop* NewProp(JS_Type type) {return new JS_Prop(type, field.addr);}
+    JS_Val NewProp(JS_Type type) {return JS_Val(type, field.addr);}
 };
 
 template <typename T> std::string __js_typeof(T v) {
