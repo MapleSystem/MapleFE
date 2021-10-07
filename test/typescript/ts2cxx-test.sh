@@ -1,5 +1,6 @@
 #!/bin/bash
 # Usage: cd MapleFE/test/typescript/unit_tests; ../ts2cpp-test.sh *.ts
+[ $# -lt 1 ] && exec $0 $(git ls-files "*.ts")
 SUCC=
 TSOUT=$(cd $(dirname $0)/../../; pwd)/output/typescript
 RTSRC=$(cd $(dirname $0)/../../; pwd)/ast2cpp/runtime/src
@@ -61,11 +62,10 @@ done 2>&1
 wait
 single="yes"
 done
-log=cxx.log
+log=/dev/null
 num=$(echo $list1 $list2 | wc -w)
-if [ $num -lt 100 ]; then
-  log=/dev/null
-fi
+total=$(git ls-files "*.ts" | wc -w)
+[ $num -eq $total ] && log=cxx.log
 if [ -f ts2cpp.summary.out ]; then
   echo -e "\nDate: $(date)\nTest cases passed:" | tee -a $log
   sort ts2cpp.summary.out | xargs -n1 | nl | tee -a $log
@@ -89,4 +89,10 @@ fi
 if [ -f ts2cpp.failures.out ]; then
   echo -e "\nTest cases failed due to ts2ast or ast2cpp:" | tee -a $log
   sort ts2cpp.failures.out | xargs -n1 | nl | tee -a $log
+fi
+if [ $num -eq $total ]; then
+  grep -c ": error:" *.ts-ts2cpp.out | sort -nrt: -k2 | grep -v :0 | sed 's/-ts2cpp.out//' > cxx-error.log
+  lines=$(grep -n -e "Test cases passed:" -e "Test cases failed due to g++ or run:" $log | \
+    grep -A1 ":Test cases passed:" | tail -2 | cut -d: -f1)
+  sed -n $(echo $lines | sed 's/[^0-9]/,/')p $log | grep "[0-9]" | expand | cut -c9- > cxx-succ.log
 fi
