@@ -1741,8 +1741,9 @@ rule UnionType: ZEROORONE('|') + UnionOrIntersectionOrPrimaryType + '|' + Inters
   attr.action : BuildUnionUserType(%2, %4)
 
 ## rule IntersectionType: IntersectionOrPrimaryType & PrimaryType
-rule IntersectionType: IntersectionOrPrimaryType + '&' + PrimaryType
-  attr.action : BuildInterUserType(%1, %3)
+rule IntersectionType: ONEOF(IntersectionOrPrimaryType + '&' + PrimaryType,
+                             IntersectionOrPrimaryType + '&' + ConditionalType)
+  attr.action.%1,%2 : BuildInterUserType(%1, %3)
 
 ## rule FunctionType: TypeParametersopt ( ParameterListopt ) => Type
 rule FunctionType: ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList) + ')' + "=>" + Type

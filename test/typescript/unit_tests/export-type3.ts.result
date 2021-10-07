@@ -1,0 +1,4 @@
+Matched 55 tokens.
+============= Module ===========
+== Sub Tree ==
+export { type Type<B,K=> = intersect  = Pick<B,Exclude< keyof B,K>> & Partial<Pick<B,K>> extends  infer U ?  {[KT in  keyof U] : U[KT] } : never} 
