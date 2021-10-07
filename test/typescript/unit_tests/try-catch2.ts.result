@@ -1,0 +1,29 @@
+Matched 10 tokens.
+Matched 59 tokens.
+Matched 72 tokens.
+============= Module ===========
+== Sub Tree ==
+class  Klass
+  Fields: 
+    str="no"
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+func  func(obj)  throws: 
+  cond-branch cond:obj.str StEq "yes"
+  true branch :
+    return obj
+  false branch :
+    try       throw "Exception"
+
+    catch()      console.log(e)
+      return obj
+
+
+
+== Sub Tree ==
+console.log(func(new Klass()))

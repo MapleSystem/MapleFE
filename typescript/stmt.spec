@@ -1205,7 +1205,9 @@ rule Finally : "finally" + Block
 ##rule CatchParameter[Yield] :
 ##  BindingIdentifier[?Yield]
 ##  BindingPattern[?Yield]
-rule CatchParameter : ONEOF(BindingIdentifier, BindingPattern)
+rule CatchParameter : ONEOF(BindingIdentifier + ZEROORONE(TypeAnnotation),
+                            BindingPattern)
+  attr.action.%1 : AddType(%1, %2)
 
 ##-----------------------------------
 rule DebuggerStatement : "debugger" + ';'
