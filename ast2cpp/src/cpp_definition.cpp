@@ -469,11 +469,12 @@ std::string CppDef::EmitArrayLiteral(TreeNode* arrType, TreeNode* arrLiteral) {
       dims = static_cast<UserTypeNode*>(arrType)->GetDimsNum();
     if (auto id = static_cast<UserTypeNode*>(arrType)->GetId()) {
       // Get class name or TS builtin obj name for array of usertyp objects.
-      // ("t2crt::Object" need to be translated into its type alias t2crt::ObjectP
-      // see builtins.h). todo: handle other TS builtin object types
+      // ("Object" need to be translated into its type alias "ObjectP"
+      // see builtins.h).
       type = id->GetName();
-      if (type.compare("t2crt::Object") == 0)
-        type = "t2crt::ObjectP";
+      if (type.compare("t2crt::Object") == 0 ||
+          type.compare("Object") == 0)
+        type = "ObjectP";
     }
     str = EmitArrayLiterals(arrLiteral, dims, type);
   } else if (arrType->IsPrimArrayType()) { // array of prim type
@@ -1156,7 +1157,10 @@ std::string CppDef::EmitNewNode(NewNode *node) {
   MASSERT(node->GetId() && "No mId on NewNode");
   if (node->GetId() && node->GetId()->IsTypeIdClass()) {
     // Generate code to create new obj and call constructor
-    str = node->GetId()->GetName() + "_ctor("s + node->GetId()->GetName() + "_ctor._new()"s;
+    std::string clsName = EmitTreeNode(node->GetId());
+    if (IsBuiltinObj(clsName))
+      clsName = "t2crt::"s + clsName;
+    str = clsName + "_ctor("s + clsName + "_ctor._new()"s;
   } else {
     str = "new "s + EmitTreeNode(node->GetId());
     str += "("s;

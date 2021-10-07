@@ -19,16 +19,18 @@
 namespace t2crt {
 class Ctor_Function;
 class Ctor_Object;
-//class Ctor_Array;
 
 extern Ctor_Function Function_ctor;
 extern Ctor_Object   Object_ctor;
 extern Ctor_Function Number_ctor;
-//extern Ctor_Array    Array_ctor;
 
-class Ctor_Object   : public Function {
+class Ctor_Object : public Function {
   public:
     Ctor_Object(Function* ctor, Object* proto, Object* prototype_proto) : Function(ctor, proto, prototype_proto) {}
+
+    Object* operator()(Object* obj) {
+      return(obj);
+    }
 
     Object* _new() {
       return new Object(this, this->prototype);
