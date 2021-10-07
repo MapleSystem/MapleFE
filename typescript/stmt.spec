@@ -2272,8 +2272,10 @@ rule GlobalDeclMember : ONEOF(NamespaceDeclaration,
                               TypeAliasDeclaration,
                               EnumDeclaration,
                               ExternalModuleDeclaration)
-rule GlobalDeclaration : "declare" + "global" + '{' + ZEROORMORE(GlobalDeclMember) + '}'
-  attr.action : BuildGlobalExternalDeclaration(%4)
+rule GlobalDeclMembers : "global" + '{' + ZEROORMORE(GlobalDeclMember) + '}'
+  attr.action : BuildGlobalExternalDeclaration(%3)
+rule GlobalDeclaration : "declare" + GlobalDeclMembers
+  attr.action : PassChild(%2)
 
 #################################################################################################
 #                                 A.9 Scripts and Modules
@@ -2294,6 +2296,7 @@ rule DeclarationElement: ONEOF(InterfaceDeclaration,
                                EnumDeclaration,
                                NamespaceDeclaration,
                                AmbientDeclaration,
+                               GlobalDeclMembers,
                                ImportAliasDeclaration)
 
 # ImplementationModule: ImplementationModuleElementsopt
