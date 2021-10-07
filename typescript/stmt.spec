@@ -1769,11 +1769,15 @@ rule ThisType: "this"
 
 ## rule PropertySignature: PropertyName ?opt TypeAnnotationopt
 rule PropertySignature: ONEOF(ZEROORONE(AccessibilityModifier) + PropertyName + ZEROORONE(TypeAnnotation),
-                              ZEROORONE(AccessibilityModifier) + PropertyName + '?' + ZEROORONE(TypeAnnotation))
+                              ZEROORONE(AccessibilityModifier) + PropertyName + '?' + ZEROORONE(TypeAnnotation),
+                              ZEROORONE(AccessibilityModifier) + "break" + ZEROORONE(TypeAnnotation))
   attr.action.%1 : AddType(%2, %3)
   attr.action.%2 : AddType(%2, %4)
   attr.action.%2 : SetIsOptional(%2)
   attr.action.%1,%2: AddModifierTo(%2, %1)
+  attr.action.%3 : BuildIdentifier(%2)
+  attr.action.%3 : AddType(%3)
+  attr.action.%3 : AddModifier(%1)
 
 ## JS ECMA has more definition than this Typescript one. I use ECMA one.
 ## rule PropertyName: IdentifierName StringLiteral NumericLiteral
