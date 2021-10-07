@@ -1357,14 +1357,25 @@ std::string CppDef::EmitDeclareNode(DeclareNode *node) {
   return std::string();
 }
 
+std::string CppDef::EmitAsTypeNode(AsTypeNode *node) {
+  if (node == nullptr)
+    return std::string();
+  std::string str;
+  if (auto n = node->GetType())
+    str = EmitTreeNode(n);
+  if (!str.empty())
+    str = '(' + str + ')';
+  return str;
+}
+
 std::string &CppDef::HandleTreeNode(std::string &str, TreeNode *node) {
   auto num = node->GetAsTypesNum();
   if(num > 0) {
-    str = "(("s + str + ')';
+    std::string as;
     for (unsigned i = 0; i < num; ++i)
       if (auto t = node->GetAsTypeAtIndex(i))
-        str += EmitAsTypeNode(t);
-    str += ')';
+        as = EmitAsTypeNode(t) + as;
+    str = as + '(' + str + ')';
   }
   /*
   if(node->IsOptional())
