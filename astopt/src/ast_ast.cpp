@@ -33,8 +33,7 @@ void AST_AST::AdjustAST() {
   // initialize gTypeTable with builtin types
   gTypeTable.AddPrimAndBuiltinTypes();
 
-  // visitor to check with a node of specific name stridx
-  // can be used to check type parameters
+  // collect type parameters
   MSGNOLOC0("============== Type Parameter ==============");
   mStrIdxVisitor = new FindStrIdxVisitor(mHandler, mFlags, true);
 
