@@ -104,6 +104,12 @@ IdentifierNode *FixUpVisitor::VisitIdentifierNode(IdentifierNode *node) {
   return AstVisitor::VisitIdentifierNode(node);
 }
 
+// Insert import nodes into module's mImports
+ImportNode *FixUpVisitor::VisitImportNode(ImportNode *node) {
+  mASTModule->AddImport(node);
+  return node;
+}
+
 // Fix up the filename of a ModuleNode
 ModuleNode *FixUpVisitor::VisitModuleNode(ModuleNode *node) {
   const char* filename = node->GetFilename();
@@ -122,6 +128,8 @@ ModuleNode *FixUpVisitor::VisitModuleNode(ModuleNode *node) {
     node->SetFilename(res);
     mUpdated = true;
   }
+  // mImports is not setup as of now
+  MASSERT(node->GetImportsNum() == 0 && "already has mImports setup");
   return AstVisitor::VisitModuleNode(node);;
 }
 
