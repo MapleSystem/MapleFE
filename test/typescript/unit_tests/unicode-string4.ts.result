@@ -1,0 +1,7 @@
+Matched 5 tokens.
+Matched 12 tokens.
+============= Module ===========
+== Sub Tree ==
+js_const Decl: str="\u001F"
+== Sub Tree ==
+console.log(str)

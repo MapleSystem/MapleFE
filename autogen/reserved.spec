@@ -31,7 +31,7 @@ rule ESCAPE : ONEOF('\' + 'b', '\' + 't', '\' + 'n', '\' + 'f', '\' + 'r', '\' +
 
 rule HEXDIGIT : ONEOF(DIGIT, 'a', 'b', 'c', 'd', 'e', 'f', 'A', 'B', 'C', 'D', 'E', 'F')
 
-# \n and \ will be handled in lexer.cpp if some language allows them in string literal.
+# irregular char like  \n,  \, DEL, etc. will be handled in lexer.cpp if some language allows them in string literal.
 rule IRREGULAR_CHAR : "this_is_for_fake_rule"
 
 # We will catch any utf-8 char in lexer in a short-cut.

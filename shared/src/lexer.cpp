@@ -920,11 +920,11 @@ bool Lexer::Traverse(const RuleTable *rule_table) {
   }
 
   //
-  // [NOTE] Since there is no way to describe \n in .spec files, we decided
+  // [NOTE] Since there is no way to describe special char in .spec files, we decided
   //        to handle here.
   if (rule_table == &TblIRREGULAR_CHAR) {
     char c = *(line + curidx);
-    if(c == '\n' || c == '\\') {
+    if(c == '\n' || c == '\\' || (unsigned)c == 127) {
       curidx += 1;
       return true;
     } else {
