@@ -197,7 +197,7 @@ std::map<TypeId, std::string>TypeIdToJSType = {
   {TY_Number,  "t2crt::TY_Double"},
   {TY_Double,  "t2crt::TY_Double"},
   {TY_Array,   "t2crt::TY_Array"},
-  {TY_Class,   "t2crt::TY_Class"}
+  {TY_Class,   "t2crt::TY_Object"}
 };
 
 // Generate call to create obj prop with ptr to c++ class fld member
@@ -924,7 +924,7 @@ std::string CppDef::EmitBracketNotationProp(ArrayElementNode* ae, OprId binOpId,
         break;
       case TY_Function:
       case TY_Object:
-        str = objName + "->GetPropiObj("s + propKey + ")"s;
+        str = objName + "->GetPropObj("s + propKey + ")"s;
         break;
     }
 

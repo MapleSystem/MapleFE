@@ -52,7 +52,6 @@ typedef enum JS_Type : uint8_t {
   TY_Function,  // "function"
   TY_Object,    // "object"
   TY_Array,
-  TY_Class,
   TY_LAST,
   TY_CXX_Undef = TY_Undef | TY_CXX,
   TY_CXX_Null,
@@ -65,7 +64,6 @@ typedef enum JS_Type : uint8_t {
   TY_CXX_Function,
   TY_CXX_Object,
   TY_CXX_Array,
-  TY_CXX_Class,
   TY_CXX_LAST,
 } JS_Type;
 

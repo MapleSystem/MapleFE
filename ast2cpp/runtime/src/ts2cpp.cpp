@@ -15,7 +15,6 @@ std::ostream& operator<< (std::ostream& out, const t2crt::JS_Val& v) {
     case t2crt::TY_Symbol: out << "symbol"; break;
     case t2crt::TY_Function: out << "function"; break;
     case t2crt::TY_Object: out << v.x.val_obj; break;
-    case t2crt::TY_Class:  out << v.x.val_obj; break;
 
     case t2crt::TY_CXX_Undef: out  << "undefined"; break;
     case t2crt::TY_CXX_Null: out   << "null"; break;
@@ -27,7 +26,6 @@ std::ostream& operator<< (std::ostream& out, const t2crt::JS_Val& v) {
     case t2crt::TY_CXX_Symbol: out << "symbol"; break;
     case t2crt::TY_CXX_Function: out << "function"; break;
     case t2crt::TY_CXX_Object: out << *(Object**)v.x.field; break;
-    case t2crt::TY_CXX_Class:  out << *(Object**)v.x.field; break;
  }
   return out;
 }
@@ -44,8 +42,7 @@ std::ostream& operator<< (std::ostream& out, const t2crt::Object *obj) {
       for (auto it = obj->propList.begin(); it != obj->propList.end(); it++) {
         std::stringstream buf;
         auto k = it->second.type;
-        auto b = k == t2crt::TY_Object || k == t2crt::TY_CXX_Object ||
-                 k == t2crt::TY_Class  || k == t2crt::TY_CXX_Class;
+        auto b = k == t2crt::TY_Object || k == t2crt::TY_CXX_Object;
         if (b == flag) {
           if (isdigit(it->first.front()))
             buf << '\'' << it->first << "': ";
