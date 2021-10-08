@@ -1,0 +1,7 @@
+Matched 12 tokens.
+Matched 33 tokens.
+============= Module ===========
+== Sub Tree ==
+ts_interface: IFace {s;n }
+== Sub Tree ==
+declare  type Type =  {[K in  keyof Pick<IFace,"s">] : true }
