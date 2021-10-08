@@ -12,13 +12,35 @@ std::ostream& operator<< (std::ostream& out, const t2crt::JS_Val& v) {
     case t2crt::TY_String: out << *v.x.val_string; break;
     case t2crt::TY_Symbol: out << "symbol"; break;
     case t2crt::TY_Function: out << "function"; break;
-    case t2crt::TY_Object: out << "object"; break;
-  }
+    case t2crt::TY_Object: out << v.x.val_obj; break;
+    case t2crt::TY_Class:  out << v.x.val_obj; break;
+
+    case t2crt::TY_CXX_Undef: out  << "undefined"; break;
+    case t2crt::TY_CXX_Null: out   << "null"; break;
+    case t2crt::TY_CXX_Bool: out   << *(bool*)v.x.field; break;
+    case t2crt::TY_CXX_Long: out   << *(int64_t*)v.x.field; break;
+    case t2crt::TY_CXX_Double: out << *(double *)v.x.field; break;
+    case t2crt::TY_CXX_BigInt: out << "bigint"; break;
+    case t2crt::TY_CXX_String: out << *(*(std::string**)v.x.field); break;
+    case t2crt::TY_CXX_Symbol: out << "symbol"; break;
+    case t2crt::TY_CXX_Function: out << "function"; break;
+    case t2crt::TY_CXX_Object: out << *(Object**)v.x.field; break;
+    case t2crt::TY_CXX_Class:  out << *(Object**)v.x.field; break;
+ }
   return out;
 }
 
 std::ostream& operator<< (std::ostream& out, const t2crt::Object *obj) {
-  out << "Object";
+  out << "{";
+  for (auto it = obj->propList.begin(); it != obj->propList.end(); it++) {
+    if (it != obj->propList.begin())
+      out << ", ";
+    if (it->second.type == t2crt::TY_Object)
+      out << "Object";
+    else
+      out << it->first << ": " << it->second;
+  }
+  out << "}";
   return out;
 }
 

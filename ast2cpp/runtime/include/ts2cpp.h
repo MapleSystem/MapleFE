@@ -37,6 +37,7 @@ template <typename T>
 class Array;
 
 // JS types for props
+#define TY_CXX 0x20
 typedef enum JS_Type : uint8_t {
   TY_None = 0,  // Placeholder for non-existing property
   TY_Undef,     // "undefined"
@@ -52,6 +53,19 @@ typedef enum JS_Type : uint8_t {
   TY_Array,
   TY_Class,
   TY_LAST,
+  TY_CXX_Undef = TY_Undef | TY_CXX,
+  TY_CXX_Null,
+  TY_CXX_Bool,
+  TY_CXX_Long,
+  TY_CXX_Double,
+  TY_CXX_BigInt,
+  TY_CXX_String,
+  TY_CXX_Symbol,
+  TY_CXX_Function,
+  TY_CXX_Object,
+  TY_CXX_Array,
+  TY_CXX_Class,
+  TY_CXX_LAST,
 } JS_Type;
 
 struct JS_Val {
@@ -65,23 +79,23 @@ struct JS_Val {
     Object*      val_obj;    // for function, object (incl. String objects)
   } x;
   JS_Type type;
-  bool    cxx;  // if it is a cxx field
 
-  bool IsCxxProp() { return cxx; }
-  JS_Val() { x.val_long = 0l; type = TY_Undef; cxx = false; }
-  JS_Val(int64_t l, JS_Type t, bool c) { x.val_long = l; type = t; cxx = c; }
-  JS_Val(bool b)    { x.val_bool = b; type = TY_Bool; cxx = false; }
-  JS_Val(int64_t l) { x.val_long = l; type = TY_Long; cxx = false; }
-  JS_Val(double d)  { x.val_double = d; type = TY_Double; cxx = false; }
-  JS_Val(Object* o){ x.val_obj = o; type = TY_Object; cxx = false; }
-  JS_Val(std::string* s) { x.val_string = s; type = TY_String; cxx = false; }
-  JS_Val(std::string s) { x.val_string = new std::string(s); type = TY_String; cxx = false; }
-  JS_Val(const char* s) { x.val_string = new std::string(s); type = TY_String; cxx = false; }
-  JS_Val(int i) { x.val_long = i; type = TY_Long; cxx = false; }
+  bool IsCxxProp() { return type & TY_CXX; } // true if a cxx field
+
+  JS_Val() { x.val_long = 0l; type = TY_Undef; }
+  JS_Val(int64_t l, JS_Type t, bool c) { x.val_long = l; type = t; }
+  JS_Val(bool b)    { x.val_bool = b; type = TY_Bool; }
+  JS_Val(int64_t l) { x.val_long = l; type = TY_Long; }
+  JS_Val(double d)  { x.val_double = d; type = TY_Double; }
+  JS_Val(Object* o){ x.val_obj = o; type = TY_Object; }
+  JS_Val(std::string* s) { x.val_string = s; type = TY_String; }
+  JS_Val(std::string s) { x.val_string = new std::string(s); type = TY_String; }
+  JS_Val(const char* s) { x.val_string = new std::string(s); type = TY_String; }
+  JS_Val(int i) { x.val_long = i; type = TY_Long; }
+  JS_Val(JS_Type jstype, bool v) { x.val_long = (int64_t)v; type = jstype; }
 
   // Prop directly generated as class fields when TS is compiled into CPP
-  JS_Val(JS_Type jstype, void* field) { x.field = field; type = jstype; cxx = true; }
-  JS_Val(JS_Type jstype, bool v) { x.val_long = (int64_t)v; type = jstype; cxx = false; }
+  JS_Val(JS_Type jstype, void* field) { x.field = field; type = static_cast<JS_Type>(jstype|TY_CXX); }
 
 #define OPERATORS(op) \
   JS_Val operator op(const JS_Val &v) { \
@@ -207,20 +221,21 @@ class Function : public Object {
 
 template <class T>
 class ClassFld {
-  // convert between class member offset and void ptr
+  // Helper class for converting between class field offset, void ptr and integer val
+  // NewProp() creates a JS_Val of type TY_CXX_<xxx> with pointer to objet member field.
   typedef union {
-    void* addr;
+//  void* addr;
     T     offset;
+    int   fld_offset;
   } FldAddr;
 
   public:
     FldAddr field;
   public:
-    ClassFld(void* addr) {field.addr = addr;}
+//  JS_Val NewProp(JS_Type type) {return JS_Val(type, field.addr);}
     ClassFld(T offset)   {field.offset = offset;}
-    void* Addr()         {return field.addr;}
     T     Offset()       {return field.offset;}
-    JS_Val NewProp(JS_Type type) {return JS_Val(type, field.addr);}
+    JS_Val NewProp(void* obj, JS_Type type) {return JS_Val(type, (void*)((char*)obj+field.fld_offset));}
 };
 
 template <typename T> std::string __js_typeof(T v) {

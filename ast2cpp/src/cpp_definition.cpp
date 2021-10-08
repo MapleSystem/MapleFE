@@ -202,7 +202,7 @@ std::map<TypeId, std::string>TypeIdToJSType = {
 
 // Generate call to create obj prop with ptr to c++ class fld member
 // example emit result for class Foo member f1, type long
-// obj->AddProp("f1", t2crt::ClassFld<long Foo::*>(&Foo::f1).NewProp(TY_Long));
+// obj->AddProp("f1", t2crt::ClassFld<long Foo::*>(&Foo::f1).NewProp(this, t2crt::TY_Long));
 std::string EmitAddPropWithClassFld(std::string objName,
                                   std::string className,
                                   std::string fdName,
@@ -211,7 +211,7 @@ std::string EmitAddPropWithClassFld(std::string objName,
   std::string str;
   str = objName+ "->AddProp(\""s + fdName + "\", t2crt::ClassFld<"s + fdCType +
         " "s + className + "::*>(&"s + className + "::"s + fdName +
-        ").NewProp("s + fdJSType + "))"s;
+        ").NewProp(this, "s + fdJSType + "))"s;
   return str;
 }
 
