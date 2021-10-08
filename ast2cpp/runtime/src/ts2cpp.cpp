@@ -33,28 +33,34 @@ std::ostream& operator<< (std::ostream& out, const t2crt::JS_Val& v) {
 }
 
 std::ostream& operator<< (std::ostream& out, const t2crt::Object *obj) {
+  out << obj->__GetClassName();
   if (obj->IsEmpty())
     out << "{}";
   else {
     std::vector<std::string> vec;
-    for (auto it = obj->propList.begin(); it != obj->propList.end(); it++) {
-      std::stringstream buf;
-      auto k = it->second.type;
-      if (k == t2crt::TY_Object)
-        buf << "Object";
-      else {
-        if (isdigit(it->first.front()))
-          buf << '\'' << it->first << "': ";
-        else
-          buf << it->first << ": ";
-        if (k == t2crt::TY_String || k == t2crt::TY_CXX_String)
-          buf << '\'' << it->second << '\'';
-        else
-          buf << it->second;
+    unsigned cnt = 0;
+    // non-object fields go first
+    for (bool flag: { false, true }) {
+      for (auto it = obj->propList.begin(); it != obj->propList.end(); it++) {
+        std::stringstream buf;
+        auto k = it->second.type;
+        auto b = k == t2crt::TY_Object || k == t2crt::TY_CXX_Object ||
+                 k == t2crt::TY_Class  || k == t2crt::TY_CXX_Class;
+        if (b == flag) {
+          if (isdigit(it->first.front()))
+            buf << '\'' << it->first << "': ";
+          else
+            buf << it->first << ": ";
+          if (k == t2crt::TY_String || k == t2crt::TY_CXX_String)
+            buf << '\'' << it->second << '\'';
+          else
+            buf << it->second;
+          vec.push_back(buf.str());
+        }
       }
-      vec.push_back(buf.str());
+      std::sort(vec.begin() + cnt, vec.end());
+      cnt = vec.size();
     }
-    std::sort(vec.begin(), vec.end());
     const char *p = "{ ";
     for (auto prop: vec) {
       out << p << prop;

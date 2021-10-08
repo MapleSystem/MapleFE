@@ -194,6 +194,10 @@ class Object {
       return propList.empty();
     }
 
+    virtual const char* __GetClassName() const {
+      return "";
+    }
+
     // Put code for JS Object.prototype props as static fields and methods in this class
     // and add to propList of Object_ctor.prototype object on system init.
 };

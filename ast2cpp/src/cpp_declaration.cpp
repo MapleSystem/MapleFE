@@ -666,6 +666,7 @@ std::string CppDecl::EmitClassNode(ClassNode *node) {
   for (unsigned i = 0; i < node->GetMethodsNum(); ++i) {
     str += EmitFunctionNode(node->GetMethod(i));
   }
+  str += "  virtual const char* __GetClassName() const {return \""s + node->GetName() + " \";}\n"s;
   str += "};\n\n";
 
   // 2. c++ class for JS object's corresponding JS constructor
