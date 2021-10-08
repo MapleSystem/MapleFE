@@ -1,0 +1,52 @@
+Matched 18 tokens.
+Matched 74 tokens.
+Matched 107 tokens.
+Matched 120 tokens.
+Matched 127 tokens.
+Matched 140 tokens.
+Matched 147 tokens.
+============= Module ===========
+== Sub Tree ==
+class  Bar
+  Fields: 
+    b1=5    b2=6
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+class  Foo
+  Fields: 
+    f1=0    f2=0    bar
+  Instance Initializer: 
+  Constructors: 
+    constructor  (a,b)  throws: 
+      this.f1 Assign a
+      this.f2 Assign b
+      this.bar Assign new Bar()
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+class  App
+  Fields: 
+    foo
+  Instance Initializer: 
+  Constructors: 
+    constructor  (a,b)  throws: 
+      this.foo Assign new Foo(a,b)
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+js_var Decl: foo=new Foo(1,2)
+== Sub Tree ==
+console.log(foo)
+== Sub Tree ==
+js_var Decl: app=new App(3,4)
+== Sub Tree ==
+console.log(app)
