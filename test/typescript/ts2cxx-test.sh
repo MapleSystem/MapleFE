@@ -62,9 +62,9 @@ done 2>&1
 wait
 single="yes"
 done
-log=/dev/null
 num=$(echo $list1 $list2 | wc -w)
 total=$(git ls-files "*.ts" | wc -w)
+log=cxx-tmp.log
 [ $num -eq $total ] && log=cxx.log
 if [ -f ts2cpp.summary.out ]; then
   echo -e "\nDate: $(date)\nTest cases passed:" | tee -a $log
@@ -95,4 +95,6 @@ if [ $num -eq $total ]; then
   lines=$(grep -n -e "Test cases passed:" -e "Test cases failed due to g++ or run:" $log | \
     grep -A1 ":Test cases passed:" | tail -2 | cut -d: -f1)
   sed -n $(echo $lines | sed 's/[^0-9]/,/')p $log | grep "[0-9]" | expand | cut -c9- > cxx-succ.log
+else
+  echo Saved testing results to file $log
 fi
