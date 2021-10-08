@@ -515,6 +515,8 @@ static std::string EncodeLiteral(std::string str) {{
         case 'r': c = '\\r'; break;
         case 't': c = '\\t'; break;
         case 'v': c = '\\v'; break;
+        case '\\'': c = '\\''; break;
+        case '\\"': c = '"'; break;
         default: enc += '\\\\';
       }}
       esc = false;
@@ -523,8 +525,7 @@ static std::string EncodeLiteral(std::string str) {{
       continue;
     }}
     switch(c) {{
-      case '\\?': enc += "\\\\?"; break;
-      //case '\\a': enc += "\\\\a"; break;
+      case '"': enc += "\\\\\\""; break;
       case '\\b': enc += "\\\\b"; break;
       case '\\f': enc += "\\\\f"; break;
       case '\\n': enc += "\\\\n"; break;
