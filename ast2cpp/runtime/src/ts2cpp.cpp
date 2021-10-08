@@ -1,3 +1,5 @@
+#include <algorithm>
+#include <sstream>
 #include "../include/ts2cpp.h"
 
 std::ostream& operator<< (std::ostream& out, const t2crt::JS_Val& v) {
@@ -31,16 +33,35 @@ std::ostream& operator<< (std::ostream& out, const t2crt::JS_Val& v) {
 }
 
 std::ostream& operator<< (std::ostream& out, const t2crt::Object *obj) {
-  out << "{";
-  for (auto it = obj->propList.begin(); it != obj->propList.end(); it++) {
-    if (it != obj->propList.begin())
-      out << ", ";
-    if (it->second.type == t2crt::TY_Object)
-      out << "Object";
-    else
-      out << it->first << ": " << it->second;
+  if (obj->IsEmpty())
+    out << "{}";
+  else {
+    std::vector<std::string> vec;
+    for (auto it = obj->propList.begin(); it != obj->propList.end(); it++) {
+      std::stringstream buf;
+      auto k = it->second.type;
+      if (k == t2crt::TY_Object)
+        buf << "Object";
+      else {
+        if (isdigit(it->first.front()))
+          buf << '\'' << it->first << "': ";
+        else
+          buf << it->first << ": ";
+        if (k == t2crt::TY_String || k == t2crt::TY_CXX_String)
+          buf << '\'' << it->second << '\'';
+        else
+          buf << it->second;
+      }
+      vec.push_back(buf.str());
+    }
+    std::sort(vec.begin(), vec.end());
+    const char *p = "{ ";
+    for (auto prop: vec) {
+      out << p << prop;
+      p = ", ";
+    }
+    out << " }";
   }
-  out << "}";
   return out;
 }
 

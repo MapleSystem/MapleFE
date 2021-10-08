@@ -22,6 +22,7 @@
 #include <unordered_map>
 #include <cmath>
 #include <cstdarg>
+#include <cctype>
 
 using namespace std::string_literals;
 
@@ -187,6 +188,10 @@ class Object {
 
     virtual bool IsFuncObj() {
       return false;
+    }
+
+    bool IsEmpty() const {
+      return propList.empty();
     }
 
     // Put code for JS Object.prototype props as static fields and methods in this class
