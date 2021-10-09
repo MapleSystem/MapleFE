@@ -49,7 +49,17 @@ for f in $list; do
     g++ -std=c++17 -g $t.cpp $RTSRC/*.cpp $dep -o $t.out || { echo "(g++)$f" >> ts2cpp.failures2.out; break; }
     ./$t.out 2>&1 > $f-run.out || { echo "(run)$f" >> ts2cpp.failures2.out; break; }
     $TSCSH $f
-    diff $f-run.out $f-nodejs.out || { echo "(result)$f" >> ts2cpp.failures3.out; break; }
+    diff $f-run.out $f-nodejs.out
+    if [ $? -ne 0 ]; then
+       sed -e 's/^[A-Za-z]* {/{/' $f-run.out | diff - $f-nodejs.out
+       if [ $? -ne 0 ]; then
+         sed -e 's/^[A-Za-z]* {/{/' -e 's/} [A-Za-z]* {/} {/' $f-run.out | diff - $f-nodejs.out
+         if [ $? -ne 0 ]; then
+           echo "(result)$f" >> ts2cpp.failures3.out
+           break
+         fi
+       fi
+    fi
     echo $t >> ts2cpp.summary.out
     break
   done
