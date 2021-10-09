@@ -109,6 +109,7 @@ std::string Emitter::GetEnumAttrId(AttrId k) {
 
 void Emitter::Replace(std::string &str, const char *o, const char *n, int cnt) {
   size_t len = std::strlen(o);
+  size_t nlen = std::strlen(n);
   if(cnt > 0) {
     size_t index = 0;
     int num = cnt;
@@ -116,7 +117,7 @@ void Emitter::Replace(std::string &str, const char *o, const char *n, int cnt) {
       index = str.find(o, index);
       if (index == std::string::npos) break;
       str.replace(index, len, n);
-      index += len;
+      index += nlen;
     } while(--num && index < str.size());
   } else {
     size_t index = std::string::npos;
@@ -125,6 +126,7 @@ void Emitter::Replace(std::string &str, const char *o, const char *n, int cnt) {
       index = str.rfind(o, index);
       if (index == std::string::npos) break;
       str.replace(index, len, n);
+      index -= len;
     } while(--num);
   }
 }
