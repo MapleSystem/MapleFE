@@ -22,7 +22,7 @@ std::ostream& operator<< (std::ostream& out, const t2crt::JS_Val& v) {
     case t2crt::TY_CXX_Long: out   << *(int64_t*)v.x.field; break;
     case t2crt::TY_CXX_Double: out << *(double *)v.x.field; break;
     case t2crt::TY_CXX_BigInt: out << "bigint"; break;
-    case t2crt::TY_CXX_String: out << *(*(std::string**)v.x.field); break;
+    case t2crt::TY_CXX_String: out << *(std::string*)v.x.field; break;
     case t2crt::TY_CXX_Symbol: out << "symbol"; break;
     case t2crt::TY_CXX_Function: out << "function"; break;
     case t2crt::TY_CXX_Object: out << *(Object**)v.x.field; break;
