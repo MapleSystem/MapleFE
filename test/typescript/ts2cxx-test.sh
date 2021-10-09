@@ -33,10 +33,10 @@ for list in "$list1" "$list2"; do
 for f in $list; do
   echo $((++cnt)): $f
   t=$(basename $f .ts)
+  [ -f $t.ts ] && f=$t.ts
   AcquireLock ts2cpp for_$t $(nproc)
   (set -x
   while true; do
-    [ -f $t.ts ] && f=$t.ts
     $TS2AST $f || { echo "(ts2ast)$f" >> ts2cpp.failures.out; break; }
     dep=$(grep "^[ei][xm]port.* from " "$f" | sed "s/^ *[ei][xm]port.* from .\([^'\"]*\).*/\1.cpp/" | sort -u)
     for cpp in $dep; do
