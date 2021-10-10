@@ -37,13 +37,15 @@ std::ostream& operator<< (std::ostream& out, const t2crt::Object *obj) {
   else {
     std::vector<std::string> vec;
     unsigned cnt = 0;
+    std::stringstream buf;
+    buf << std::boolalpha;
     // non-object fields go first
     for (bool flag: { false, true }) {
       for (auto it = obj->propList.begin(); it != obj->propList.end(); it++) {
-        std::stringstream buf;
         auto k = it->second.type;
         auto b = k == t2crt::TY_Object || k == t2crt::TY_CXX_Object;
         if (b == flag) {
+          buf.str(std::string());
           if (isdigit(it->first.front()))
             buf << '\'' << it->first << "': ";
           else
