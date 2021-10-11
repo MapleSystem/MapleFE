@@ -573,9 +573,17 @@ TreeNode* ASTBuilder::SetIsEverything() {
   return mLastTreeNode;
 }
 
-// It takes two arguments, before and after.
+// Right now it takes no argument. mLastTreeNode is the implicit argument
+TreeNode* ASTBuilder::SetAsNamespace() {
+  MASSERT(mLastTreeNode->IsXXportAsPair());
+  XXportAsPairNode *pair = (XXportAsPairNode*)mLastTreeNode;
+  pair->SetAsNamespace();
+  return mLastTreeNode;
+}
+
+// 1. It takes two arguments, before and after.
+// 2. It takes one argument, before.
 TreeNode* ASTBuilder::BuildXXportAsPair() {
-  MASSERT(mParams.size() == 2);
 
   TreeNode *before = NULL;
   TreeNode *after = NULL;
@@ -585,9 +593,11 @@ TreeNode* ASTBuilder::BuildXXportAsPair() {
     before = p.mData.mTreeNode;
   }
 
-  p = mParams[1];
-  if (!p.mIsEmpty && p.mIsTreeNode) {
-    after = p.mData.mTreeNode;
+  if (mParams.size() == 2) {
+    p = mParams[1];
+    if (!p.mIsEmpty && p.mIsTreeNode) {
+      after = p.mData.mTreeNode;
+    }
   }
 
   XXportAsPairNode *n = (XXportAsPairNode*)gTreePool.NewTreeNode(sizeof(XXportAsPairNode));

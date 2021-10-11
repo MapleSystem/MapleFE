@@ -51,6 +51,7 @@ ACTION(SetDefaultPairs)
 ACTION(SetSinglePairs)
 ACTION(SetFromModule)
 ACTION(SetIsEverything)   // Apply to all pairs in import/export
+ACTION(SetAsNamespace)    // Apply to all pairs in import/export
 
 ACTION(BuildXXportAsPair)             // normal pair
 ACTION(BuildXXportAsPairEverything)   // '*'
