@@ -84,7 +84,6 @@ std::string CppDef::EmitModuleNode(ModuleNode *node) {
   str += mCppDecl.GetDefinitions();
 
   // definitions of all functions in current module
-  isInit = false;
   CfgFunc *mod = mHandler->GetCfgFunc();
   auto num = mod->GetNestedFuncsNum();
   for(unsigned i = 0; i < num; ++i) {
@@ -105,7 +104,7 @@ std::string CppDef::EmitModuleNode(ModuleNode *node) {
   if (__init_once) return;
   __init_once = true;
 )""";
-  isInit = true;
+  mIsInit = true;
   for (unsigned i = 0; i < node->GetTreesNum(); ++i) {
     if (auto n = node->GetTree(i)) {
 #if 0
@@ -280,7 +279,7 @@ std::string CppDef::EmitFuncScopeVarDecls(FunctionNode *node) {
 }
 
 std::string CppDef::EmitFunctionNode(FunctionNode *node) {
-  if (isInit || node == nullptr)
+  if (mIsInit || node == nullptr)
     return std::string();
 
   std::string str, className;
@@ -500,7 +499,7 @@ std::string CppDef::EmitDeclNode(DeclNode *node) {
   // For func var of JS_Var and global vars, emit var name
   // For func var of JS_Let/JS_Const, emit both var type & name
   if (auto n = node->GetVar()) {
-    if (isInit || node->GetProp() == JS_Var) {
+    if (mIsInit || node->GetProp() == JS_Var) {
       // handle declnode inside for-of/for-in (uses GetSet() and has null GetInit())
       if (!node->GetInit() && node->GetParent() && !node->GetParent()->IsForLoop())
         return std::string();
@@ -624,9 +623,11 @@ std::string CppDef::EmitArrayElementNode(ArrayElementNode *node) {
     return str;
   }
   if (auto n = node->GetArray()) {
-    str = "(*"s;
-    str += EmitTreeNode(n);
-    str += ")"s;
+    std::string s = EmitTreeNode(n);
+    if (mIsInit && s == "this")
+      str = "__module"s;
+    else
+      str = "(*"s + s + ")"s;
     if(mPrecedence < '\024')
       str = "("s + str + ")"s;
   }
