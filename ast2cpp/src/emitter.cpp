@@ -436,6 +436,9 @@ std::string Emitter::EmitXXportAsPairNode(XXportAsPairNode *node) {
       std::string s = EmitTreeNode(n);
       str += n->IsLiteral() ? "require("s + s + ')' : s;
     }
+  } else if (node->GetAsNamespace()) {
+    if (auto n = node->GetBefore())
+      str += " as namespace "s + EmitTreeNode(n);
   } else {
     if (auto n = node->GetBefore()) {
       std::string s = EmitTreeNode(n);

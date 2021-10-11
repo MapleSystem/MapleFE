@@ -35,7 +35,9 @@ for f; do
      echo "(--strict)"$f >> tsc.failures.out
      bash -x -c "tsc $OPT $f" || echo "(non-strict)"$f >> tsc.failures.out
    fi
-   bash -x -c "node $js" 2>&1 > $f-nodejs.out
+   if [ -f "$js" ]; then
+     bash -x -c "node $js"
+   fi 2>&1 > $f-nodejs.out
    ReleaseLock tsc
   ) >& $f-tsc.out &
 done

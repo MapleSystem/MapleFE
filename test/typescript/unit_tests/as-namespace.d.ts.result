@@ -1,10 +1,7 @@
-Matched 8 tokens.
-Matched 13 tokens.
-Matched 17 tokens.
+Matched 6 tokens.
+Matched 11 tokens.
 ============= Module ===========
 == Sub Tree ==
-export {js_var Decl: x=123} 
+export {js_var Decl: x} 
 == Sub Tree ==
 export {NS} 
-== Sub Tree ==
-export { SINGLE NS} 

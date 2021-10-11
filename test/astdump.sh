@@ -100,7 +100,7 @@ for ts in $LIST; do
   cmd=$(grep -n -e "^// .Beginning of Emitter:" -e "// End of Emitter.$" <<< "$out" |
     tail -2 | sed 's/:.*//' | xargs | sed 's/\([^ ]*\) \(.*\)/sed -n \1,$((\2))p/')
   if [ "x${cmd:0:4}" = "xsed " ]; then
-    T=$ts-$PROCID.out.ts
+    T=$(sed -e "s/\(.*\)\(\.d\)\(\.ts-$PROCID.out\)/\1\3\2/" <<< "$ts-$PROCID.out.ts")
     eval $cmd <<< "$out" > "$T"
     [ -z "$NAME" ] || sed -i 's/__v[0-9][0-9]*//g' "$T"
     clang-format-10 -i --style="{ColumnLimit: 120, JavaScriptWrapImports: false, AlignOperands: false}" "$T"
