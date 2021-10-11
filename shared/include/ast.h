@@ -227,12 +227,14 @@ private:
   bool      mIsDefault;     // import or export 'default'
   bool      mIsEverything;  // import or export '*', which is everything
   bool      mIsSingle;      // export = xxx
+  bool      mAsNamespace;   // export as namespace xxx;
   TreeNode *mBefore;        // In usual cases, name before 'as'
   TreeNode *mAfter;         // In usual cases, name after 'as'
 
 public:
   XXportAsPairNode() : TreeNode(NK_XXportAsPair),
-    mIsDefault(false), mIsEverything(false), mIsSingle(false), mBefore(nullptr), mAfter(nullptr) {}
+    mIsDefault(false), mIsEverything(false), mIsSingle(false), mAsNamespace(false),
+    mBefore(nullptr), mAfter(nullptr) {}
   ~XXportAsPairNode() {}
 
   bool IsDefault()    {return mIsDefault;}
@@ -243,6 +245,9 @@ public:
 
   bool IsSingle()    {return mIsSingle;}
   void SetIsSingle(bool b = true) {mIsSingle = b;}
+
+  bool GetAsNamespace()    {return mAsNamespace;}
+  void SetAsNamespace(bool b = true) {mAsNamespace = b;}
 
   TreeNode* GetBefore() {return mBefore;}
   void SetBefore(TreeNode *t) {mBefore = t; SETPARENT(t);}
