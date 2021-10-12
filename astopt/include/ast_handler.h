@@ -50,7 +50,8 @@ enum AST_Flags {
 
 class CfgBB;
 class CfgFunc;
-class AST_AST;
+class AST_INFO;
+class AST_ADJ;
 class AST_CFA;
 class AST_DFA;
 class AST_SCP;
@@ -64,7 +65,8 @@ class Module_Handler {
   AST_Handler  *mASTHandler;
   ModuleNode   *mASTModule;  // for an AST module
   CfgFunc      *mCfgFunc;   // initial CfgFunc in module scope
-  AST_AST      *mAST;
+  AST_INFO     *mINFO;
+  AST_ADJ      *mADJ;
   AST_SCP      *mSCP;
   TypeInfer    *mTI;
   AST_CFA      *mCFA;
@@ -88,7 +90,8 @@ class Module_Handler {
  public:
   explicit Module_Handler(unsigned f) :
     mCfgFunc(nullptr),
-    mAST(nullptr),
+    mINFO(nullptr),
+    mADJ(nullptr),
     mSCP(nullptr),
     mTI(nullptr),
     mCFA(nullptr),
@@ -96,6 +99,7 @@ class Module_Handler {
     mFlags(f) {}
   ~Module_Handler();
 
+  void CollectInfo();
   void AdjustAST();
   void ScopeAnalysis();
   void TypeInference();
@@ -124,12 +128,14 @@ class Module_Handler {
   CfgBB *GetBbFromBbId(unsigned id)          { return mBbId2BbMap[id]; }
 
   unsigned GetFlags() {return mFlags;}
-  AST_AST *GetAST() {return mAST;}
+  AST_INFO *GetINFO() {return mINFO;}
+  AST_ADJ *GetADJ() {return mADJ;}
   AST_CFA *GetCFA() {return mCFA;}
   AST_DFA *GetDFA() {return mDFA;}
   AST_SCP *GetSCP() {return mSCP;}
   TypeInfer *GetTI() {return mTI;}
-  void SetAST(AST_AST *p) {mAST = p;}
+  void SetINFO(AST_INFO *p) {mINFO = p;}
+  void SetADJ(AST_ADJ *p) {mADJ = p;}
   void SetCFA(AST_CFA *p) {mCFA = p;}
   void SetDFA(AST_DFA *p) {mDFA = p;}
   void SetSCP(AST_SCP *p) {mSCP = p;}

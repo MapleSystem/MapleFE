@@ -17,7 +17,8 @@
 #include <set>
 #include "ast_handler.h"
 #include "ast_cfg.h"
-#include "ast_ast.h"
+#include "ast_info.h"
+#include "ast_adj.h"
 #include "ast_scp.h"
 #include "ast_ti.h"
 #include "ast_cfa.h"
@@ -34,7 +35,8 @@ Module_Handler::~Module_Handler() {
   mNodeId2Decl.clear();
   mArrayDeclId2EleTypeIdMap.clear();
   delete mCfgFunc;
-  delete mAST;
+  delete mINFO;
+  delete mADJ;
   delete mSCP;
   delete mTI;
   delete mCFA;
@@ -64,11 +66,18 @@ bool AST_Handler::AddModule(ModuleNode *m) {
   return true;
 }
 
-void Module_Handler::AdjustAST() {
-  if (!mAST) {
-    mAST = new(GetMemPool()->Alloc(sizeof(AST_AST))) AST_AST(this, mFlags);
+void Module_Handler::CollectInfo() {
+  if (!mINFO) {
+    mINFO = new(GetMemPool()->Alloc(sizeof(AST_INFO))) AST_INFO(this, mFlags);
   }
-  mAST->AdjustAST();
+  mINFO->CollectInfo();
+}
+
+void Module_Handler::AdjustAST() {
+  if (!mADJ) {
+    mADJ = new(GetMemPool()->Alloc(sizeof(AST_ADJ))) AST_ADJ(this, mFlags);
+  }
+  mADJ->AdjustAST();
 }
 
 void Module_Handler::ScopeAnalysis() {

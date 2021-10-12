@@ -136,6 +136,9 @@ int A2C::ProcessAST() {
       graph.DumpGraph("After LoadFromAstBuf()", &std::cout);
     }
 
+    // collect AST info
+    handler->CollectInfo();
+
     // rewirte some AST nodes
     handler->AdjustAST();
 

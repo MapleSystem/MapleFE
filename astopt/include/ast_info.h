@@ -13,8 +13,8 @@
 * See the Mulan PSL v2 for more details.
 */
 
-#ifndef __AST_AST_HEADER__
-#define __AST_AST_HEADER__
+#ifndef __AST_INFO_HEADER__
+#define __AST_INFO_HEADER__
 
 #include <stack>
 #include <utility>
@@ -29,7 +29,7 @@ namespace maplefe {
 
 class FindStrIdxVisitor;
 
-class AST_AST {
+class AST_INFO {
  private:
   Module_Handler *mHandler;
   unsigned        mFlags;
@@ -48,11 +48,11 @@ class AST_AST {
   void AddField(unsigned nid, TreeNode *node);
 
  public:
-  explicit AST_AST(Module_Handler *h, unsigned f) : mHandler(h), mFlags(f), mNum(1),
+  explicit AST_INFO(Module_Handler *h, unsigned f) : mHandler(h), mFlags(f), mNum(1),
            mNameAnonyStruct(false) {}
-  ~AST_AST() {}
+  ~AST_INFO() {}
 
-  void AdjustAST();
+  void CollectInfo();
 
   unsigned GetPass() { return mPass; }
   TypeId GetTypeId(TreeNode *node);
@@ -95,14 +95,14 @@ class AST_AST {
 class ClassStructVisitor : public AstVisitor {
  private:
   Module_Handler *mHandler;
-  AST_AST        *mAst;
+  AST_INFO       *mInfo;
   unsigned       mFlags;
   bool           mUpdated;
 
  public:
   explicit ClassStructVisitor(Module_Handler *h, unsigned f, bool base = false)
     : mHandler(h), mFlags(f), mUpdated(false), AstVisitor((f & FLG_trace_1) && base) {
-      mAst = mHandler->GetAST();
+      mInfo= mHandler->GetINFO();
     }
   ~ClassStructVisitor() = default;
 
@@ -116,7 +116,7 @@ class ClassStructVisitor : public AstVisitor {
 class FindStrIdxVisitor : public AstVisitor {
  private:
   Module_Handler *mHandler;
-  AST_AST        *mAst;
+  AST_INFO       *mInfo;
   unsigned       mFlags;
   unsigned       mStrIdx;
   bool           mFound;
@@ -125,43 +125,13 @@ class FindStrIdxVisitor : public AstVisitor {
   explicit FindStrIdxVisitor(Module_Handler *h, unsigned f, bool base = false)
     : mHandler(h), mFlags(f), mStrIdx(0), mFound(false),
       AstVisitor((f & FLG_trace_1) && base) {
-      mAst = mHandler->GetAST();
+      mInfo = mHandler->GetINFO();
     }
   ~FindStrIdxVisitor() = default;
 
   void Init(unsigned stridx) { mStrIdx = stridx; mFound = false; }
   bool GetFound() { return mFound; }
   IdentifierNode *VisitIdentifierNode(IdentifierNode *node);
-};
-
-class AdjustASTVisitor : public AstVisitor {
- private:
-  Module_Handler *mHandler;
-  AST_AST        *mAst;
-  unsigned       mFlags;
-  bool           mUpdated;
-
- public:
-  explicit AdjustASTVisitor(Module_Handler *h, unsigned f, bool base = false)
-    : mHandler(h), mFlags(f), mUpdated(false), AstVisitor((f & FLG_trace_1) && base) {
-      mAst = mHandler->GetAST();
-      mAst->SetNameAnonyStruct(true);
-    }
-  ~AdjustASTVisitor() = default;
-
-  DeclNode *VisitDeclNode(DeclNode *node);
-  ExportNode *VisitExportNode(ExportNode *node);
-  CondBranchNode *VisitCondBranchNode(CondBranchNode *node);
-  ForLoopNode *VisitForLoopNode(ForLoopNode *node);
-  LambdaNode *VisitLambdaNode(LambdaNode *node);
-  IdentifierNode *VisitIdentifierNode(IdentifierNode *node);
-  StructNode *VisitStructNode(StructNode *node);
-  StructLiteralNode *VisitStructLiteralNode(StructLiteralNode *node);
-  ClassNode *VisitClassNode(ClassNode *node);
-  InterfaceNode *VisitInterfaceNode(InterfaceNode *node);
-  FunctionNode *VisitFunctionNode(FunctionNode *node);
-  UserTypeNode *VisitUserTypeNode(UserTypeNode *node);
-  TypeAliasNode *VisitTypeAliasNode(TypeAliasNode *node);
 };
 
 }

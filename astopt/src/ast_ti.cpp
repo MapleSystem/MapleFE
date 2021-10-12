@@ -16,7 +16,7 @@
 #include <stack>
 #include <set>
 #include "ast_handler.h"
-#include "ast_ast.h"
+#include "ast_info.h"
 #include "ast_ti.h"
 #include "typetable.h"
 #include "gen_astdump.h"
@@ -431,7 +431,7 @@ bool TypeInferVisitor::UpdateVarTypeWithInit(TreeNode *var, TreeNode *init) {
       if (n->GetId()) {
         TreeNode *id = n->GetId();
         if (id->IsIdentifier() && id->IsTypeIdClass()) {
-          UserTypeNode *utype = mHandler->GetAST()->CreateUserTypeNode(id->GetStrIdx(), var->GetScope());
+          UserTypeNode *utype = mHandler->GetINFO()->CreateUserTypeNode(id->GetStrIdx(), var->GetScope());
           utype->SetParent(idnode);
           idnode->SetType(utype);
           SetUpdated();
@@ -572,8 +572,8 @@ ArrayElementNode *TypeInferVisitor::VisitArrayElementNode(ArrayElementNode *node
               }
               if (decl->IsStruct() || decl->IsClass()) {
                 bool found = false;
-                for (int i = 0; i < mAst->GetFieldsSize(decl); i++) {
-                  TreeNode *f = mAst->GetField(decl, i);
+                for (int i = 0; i < mInfo->GetFieldsSize(decl); i++) {
+                  TreeNode *f = mInfo->GetField(decl, i);
                   if (f->GetStrIdx() == stridx) {
                     UpdateTypeId(node, f);
                     found = true;
@@ -582,8 +582,8 @@ ArrayElementNode *TypeInferVisitor::VisitArrayElementNode(ArrayElementNode *node
                 }
                 // new field
                 if (!found) {
-                  IdentifierNode *id = mAst->CreateIdentifierNode(stridx);
-                  mAst->AddField(decl, id);
+                  IdentifierNode *id = mInfo->CreateIdentifierNode(stridx);
+                  mInfo->AddField(decl, id);
                 }
               }
             } else if (exp->IsTypeIdInt()) {
