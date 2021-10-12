@@ -1,0 +1,10 @@
+Matched 12 tokens.
+Matched 33 tokens.
+Matched 40 tokens.
+============= Module ===========
+== Sub Tree ==
+ts_interface: IFace {Num;Str }
+== Sub Tree ==
+declare js_const Decl: func
+== Sub Tree ==
+export {IFace,func} 

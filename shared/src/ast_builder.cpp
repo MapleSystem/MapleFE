@@ -3184,11 +3184,17 @@ TreeNode* ASTBuilder::SetOptionalParam() {
   Param p_param = mParams[0];
   MASSERT(!p_param.mIsEmpty && p_param.mIsTreeNode);
   TreeNode *param = p_param.mData.mTreeNode;
-  MASSERT(param->IsIdentifier());
-  IdentifierNode *id = (IdentifierNode*)param;
-  id->SetOptionalParam(true);
+  if (param->IsIdentifier()) {
+    IdentifierNode *id = (IdentifierNode*)param;
+    id->SetOptionalParam(true);
+  } else if (param->IsBindingPattern()) {
+    BindingPatternNode *id = (BindingPatternNode*)param;
+    id->SetIsOptional();
+  } else {
+    MERROR("Unsupported optional param.");
+  }
 
-  mLastTreeNode = id;
+  mLastTreeNode = param;
   return mLastTreeNode;
 }
 
