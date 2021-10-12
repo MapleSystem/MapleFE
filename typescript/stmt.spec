@@ -783,7 +783,10 @@ rule Statement : ONEOF(
 #  WithStatement[?Yield, ?Return]
   LabelledStatement,
   ThrowStatement,
-  TryStatement)
+  TryStatement,
+## I suppose to include CallExpression in ExpressionStatement, but due to the
+## complexity of auto-insert-semicolon of TS, I put CallExpression here.
+  CallExpression)
 #  DebuggerStatement
   attr.property : Top
 
@@ -1173,7 +1176,7 @@ rule LabelledItem : ONEOF(Statement, FunctionDeclaration)
 ##-----------------------------------
 ##rule ThrowStatement[Yield] :
 ##  throw [no LineTerminator here] Expression[In, ?Yield] ;
-rule ThrowStatement : "throw" + Expression + ';'
+rule ThrowStatement : "throw" + Expression + ZEROORONE(';')
   attr.action : BuildThrows(%2)
 
 ##-----------------------------------

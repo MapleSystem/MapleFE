@@ -1,0 +1,15 @@
+Matched 15 tokens.
+Matched 37 tokens.
+============= Module ===========
+== Sub Tree ==
+func  func(f)  throws: 
+  f()
+
+== Sub Tree ==
+func((e) -> cond-branch cond:e
+true branch :
+  throw e
+false branch :
+
+console.log("OK")
+)
