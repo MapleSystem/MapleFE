@@ -61,6 +61,15 @@ int Lexer::ReadALine() {
   }
 
   curidx = 0;
+
+  // There are some special UTF-8 encoding in the beginning of some file format, like BOM
+  // with \357\273\277. We skip this mark.
+  if ( *(line+curidx) == -17 &&
+       *(line+curidx+1) == -69 &&
+       *(line+curidx+2) == -65) {
+    curidx += 3;
+  }
+
   return current_line_size;
 }
 
