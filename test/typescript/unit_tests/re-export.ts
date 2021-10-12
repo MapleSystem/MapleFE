@@ -1,4 +1,4 @@
 export * from "./M";
 export { default as x } from "./M";
-import { default as x } from "./M";
-export { x as default };
+import { default as xx } from "./M";
+export { xx as default };

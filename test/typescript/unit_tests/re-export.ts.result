@@ -8,6 +8,6 @@ export { *} "./M"
 == Sub Tree ==
 export {default as x} "./M"
 == Sub Tree ==
-import {default as x} "./M"
+import {default as xx} "./M"
 == Sub Tree ==
-export {x as default} 
+export {xx as default} 
