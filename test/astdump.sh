@@ -23,6 +23,7 @@ EOF
 exit 1
 }
 CMDLINE="$0 $*"
+GITTS=$(git ls-files "*.ts")
 DOT= PRE= LIST= VIEWOP= HIGHLIGHT="cat" TSCERR= KEEP= CLEAN= NAME= TREEDIFF= TSC=yes NOIMPORTED=
 while [ $# -gt 0 ]; do
     case $1 in
@@ -35,8 +36,8 @@ while [ $# -gt 0 ]; do
         -e|--tscerror)   TSCERR= ;;
         -k|--keep)       KEEP=keep ;;
         -C|--clean)      CLEAN=clean ;;
-        -A|--all)        LIST="$LIST $(find -maxdepth 1 -name '*.ts' -exec grep -l "^ *export " {} \;) "
-                         LIST="$LIST $(find -maxdepth 1 -name '*.ts' -exec grep -L "^ *export " {} \;) " ;;
+        -A|--all)        LIST="$LIST $(echo $GITTS | xargs grep -l '^ *export ') "
+                         LIST="$LIST $(echo $GITTS | xargs grep -L '^ *export ') " ;;
         -n|--name)       NAME="original" ;;
         -t|--treediff)   TREEDIFF="--emit-ts-only"; NAME="original"; TSC=yes ;;
         -T|--Treediff)   TREEDIFF="--emit-ts-only"; NAME="original"; TSC= ;;
@@ -46,13 +47,13 @@ while [ $# -gt 0 ]; do
     esac
     shift
 done
-LIST=$(echo $LIST | xargs -n1 | grep -v '\.ts-[0-9][0-9]*\.out.ts' | grep -vF .ts.tmp.ts)
+LIST=$(echo $LIST | xargs -n1 | grep -v '\.ts-[0-9][0-9]*\.out\.[d.]*ts' | grep -vF .ts.tmp.ts)
 if [ -n "$CLEAN" ]; then
   echo Cleaning up generated files...
   find -maxdepth 1 -regex '.*\.ts-[0-9]+\.out.[ctj][ps]p*\|.*\.ts-[0-9]+\.[pd][no][gt]\|.*\.ts.[ca][ps][pt]' -exec rm '{}' \;
   rm -rf *.ts.orig *.ts.gen *.ts.tmp.ts *[0-9]-dump.out ts2cxx-lock-*
-  for ts in $LIST; do
-    rm -rf $ts.orig $ts.gen $ts.tmp.ts $ts.*[0-9]-dump.out $ts-*[0-9].out.ts
+  for ts in $LIST $GITTS; do
+    rm -rf $ts.orig $ts.gen $ts.tmp.ts $ts.*[0-9]-dump.out $ts-*[0-9].out.ts $ts-*[0-9].out.d.ts
   done
   echo Done.
 fi
@@ -100,7 +101,7 @@ for ts in $LIST; do
   cmd=$(grep -n -e "^// .Beginning of Emitter:" -e "// End of Emitter.$" <<< "$out" |
     tail -2 | sed 's/:.*//' | xargs | sed 's/\([^ ]*\) \(.*\)/sed -n \1,$((\2))p/')
   if [ "x${cmd:0:4}" = "xsed " ]; then
-    T=$(sed -e "s/\(.*\)\(\.d\)\(\.ts-$PROCID.out\)/\1\3\2/" <<< "$ts-$PROCID.out.ts")
+    T=$(sed -e "s/\(.*\)\(\.d\)\(\.ts-$PROCID.out\)/\1\2\3\2/" <<< "$ts-$PROCID.out.ts")
     eval $cmd <<< "$out" > "$T"
     [ -z "$NAME" ] || sed -i 's/__v[0-9][0-9]*//g' "$T"
     clang-format-10 -i --style="{ColumnLimit: 120, JavaScriptWrapImports: false, AlignOperands: false}" "$T"
