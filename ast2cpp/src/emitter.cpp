@@ -926,6 +926,7 @@ std::string Emitter::EmitBindingPatternNode(BindingPatternNode *node) {
     str = '[' + str + ']';
   else
     str = '{' + str + '}';
+  str = HandleTreeNode(str, node);
 
   if (auto n = node->GetType()) {
     str += ": "s + EmitTreeNode(n);
@@ -934,7 +935,7 @@ std::string Emitter::EmitBindingPatternNode(BindingPatternNode *node) {
     str += " = "s + EmitTreeNode(n);
   }
   mPrecedence = '\030';
-  return HandleTreeNode(str, node);
+  return str;
 }
 
 std::string Emitter::EmitNumIndexSigNode(NumIndexSigNode *node) {
@@ -2189,7 +2190,10 @@ std::string Emitter::EmitTreeNode(TreeNode *node) {
 }
 
 static std::string &AddParentheses(std::string &str, TreeNode *node) {
-  if (!node->IsIdentifier() && !node->IsLiteral() && !node->IsArrayLiteral())
+  if (!node->IsIdentifier() &&
+      !node->IsLiteral() &&
+      !node->IsArrayLiteral() &&
+      !node->IsBindingPattern())
     str = '(' + str + ')';
   return str;
 }
