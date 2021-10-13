@@ -1,0 +1,7 @@
+Matched 16 tokens.
+Matched 29 tokens.
+============= Module ===========
+== Sub Tree ==
+export {declare js_const Decl: E} 
+== Sub Tree ==
+export {declare  type A =  typeof E[number]} 
