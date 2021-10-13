@@ -1085,7 +1085,10 @@ std::string CppDef::EmitLiteralNode(LiteralNode *node) {
   LitData lit = node->GetData();
   if(lit.mType == LT_VoidLiteral)
     return "undefined";
-  return Emitter::EmitLiteralNode(node);
+  std::string str = Emitter::EmitLiteralNode(node);
+  if (node->GetTypeId() == TY_Int)
+    str = "(int)"s + str;
+  return str;
 }
 
 std::string CppDef::EmitSwitchNode(SwitchNode *node) {
