@@ -1,0 +1,4 @@
+Matched 26 tokens.
+============= Module ===========
+== Sub Tree ==
+ type U<T> = T extends unknown ? unknown extends T ? T extends true ? true : false : false : false
