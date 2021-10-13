@@ -158,7 +158,19 @@ std::string CppDef::EmitExportNode(ExportNode *node) {
           str += "__default_"s + v + " = "s + v + ";\n"s;
         }
       }
-      //str += EmitXXportAsPairNode(n);
+      if(node->GetTarget() == nullptr &&
+          !x->IsDefault() &&
+          !x->IsEverything() &&
+          !x->GetAsNamespace() &&
+          !x->IsSingle()) {
+        //str += EmitXXportAsPairNode(x);
+        if (auto n = x->GetBefore())
+          if ((!n->IsIdentifier() || static_cast<IdentifierNode *>(n)->GetInit() != nullptr) &&
+              !n->IsStruct() &&
+              !n->IsClass() &&
+              !n->IsUserType())
+            str += EmitTreeNode(n);
+      }
     }
   }
   return HandleTreeNode(str, node);
@@ -461,7 +473,7 @@ std::string CppDef::EmitArrayLiteral(TreeNode* arrType, TreeNode* arrLiteral) {
   std::string str, type;
   int dims = 1;  // default to 1 dim array if no Dims info
   if (arrType == nullptr || arrLiteral == nullptr)
-    return std::string();
+    return "nullptr"s;
 
   if (arrType->IsUserType()) {             // array of usertyp
     if (static_cast<UserTypeNode*>(arrType)->GetDims())
@@ -554,10 +566,10 @@ std::string CppDef::EmitCallNode(CallNode *node) {
   bool isSuper = false;
   std::string str;
   if (auto n = node->GetMethod()) {
-    auto s = EmitTreeNode(n);
-    if(n->IsFunction())
-      str += "("s + s + ")"s;
-    else {
+    if(n->IsFunction()) {
+      str += static_cast<FunctionNode *>(n)->GetName();
+    } else {
+      auto s = EmitTreeNode(n);
       if(s.compare(0, 11, "console.log") == 0) {
         str += "std::cout"s;
         log = true;
