@@ -1,0 +1,8 @@
+Matched 37 tokens.
+============= Module ===========
+== Sub Tree ==
+export {func  prop_deco(msg)  throws: 
+  return func  (target,name)  throws: 
+  console.log("Accessed",name,msg,target)
+
+} 
