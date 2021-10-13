@@ -2673,12 +2673,9 @@ TreeNode* ASTBuilder::BuildAnnotation() {
     MERROR("The annotationtype name is not a treenode in BuildAnnotation()");
   TreeNode *iden = p_name.mData.mTreeNode;
 
-  if (!iden->IsIdentifier())
-    MERROR("The annotation name is NOT an indentifier node.");
-
   AnnotationNode *annot = (AnnotationNode*)gTreePool.NewTreeNode(sizeof(AnnotationNode));
   new (annot) AnnotationNode();
-  annot->SetId((IdentifierNode*)iden);
+  annot->SetId(iden);
 
   // set last tree node and return it.
   mLastTreeNode = annot;

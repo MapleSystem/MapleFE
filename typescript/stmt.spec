@@ -2059,7 +2059,7 @@ rule ClassDeclaration:
   attr.action : AddSuperInterface(%7)
   attr.action : AddClassBody(%9)
 
-rule Annotation : '@' + JSIdentifier + ZEROORONE(Arguments)
+rule Annotation : '@' + MemberExpression + ZEROORONE(Arguments)
   attr.action : BuildAnnotation(%2)
   attr.action : AddArguments(%3)
 
