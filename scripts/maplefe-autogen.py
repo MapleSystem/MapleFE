@@ -769,7 +769,7 @@ bool PutNode(TreeNode *n) {{
     mNodes.insert(n);
     *mOs << NodeName(n,\'_\') << " [label=\\"" << NodeName(n,',') << "\\\\n";
     std::string tid(EnumVal(TreeNode, TypeId, TypeId));
-    if(tid != "TY_None" || n->GetTypeIdx() != 0) *mOs << "<" << static_cast<char>(std::tolower(tid[3])) << tid.substr(4) << " " << n->GetTypeIdx() << ">\\\\n";
+    if(tid != "TY_None" || n->GetTypeIdx() != 0) *mOs << "<" << tid << " " << n->GetTypeIdx() << ">\\\\n";
 
     switch(n->GetKind()) {{
       case NK_Module:    {{
