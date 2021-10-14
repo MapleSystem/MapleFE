@@ -1,0 +1,23 @@
+Matched 10 tokens.
+Matched 20 tokens.
+Matched 30 tokens.
+Matched 40 tokens.
+Matched 50 tokens.
+Matched 62 tokens.
+Matched 72 tokens.
+Illegal syntax detected!
+============= Module ===========
+== Sub Tree ==
+console.log( typeof undefined)
+== Sub Tree ==
+console.log( typeof null)
+== Sub Tree ==
+console.log( typeof true)
+== Sub Tree ==
+console.log( typeof false)
+== Sub Tree ==
+console.log( typeof "abc")
+== Sub Tree ==
+console.log( typeof Symbol())
+== Sub Tree ==
+console.log( typeof 123)
