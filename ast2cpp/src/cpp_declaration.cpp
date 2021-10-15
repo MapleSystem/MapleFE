@@ -16,7 +16,7 @@
 #include "cpp_declaration.h"
 #include "gen_astvisitor.h"
 #include <algorithm>
-#include <string.h>
+#include <cstring>
 
 namespace maplefe {
 
@@ -646,6 +646,8 @@ std::string CppDecl::EmitClassNode(ClassNode *node) {
   // class field decl and init. TODO: handle static, private, protected attrs.
   for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
     auto n = node->GetField(i);
+    if (n->IsIdentifier() && std::strcmp(static_cast<IdentifierNode*>(n)->GetName(), "private") == 0)
+      continue;
     str += "  "s + EmitTreeNode(n);
     if (n->IsIdentifier() && static_cast<IdentifierNode*>(n)->GetInit()) {
       if (auto init = static_cast<IdentifierNode*>(n)->GetInit()) {
