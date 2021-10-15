@@ -82,7 +82,7 @@ class ImportExportModules : public AstVisitor {
           } else if (x->IsEverything()) {
             if (auto n = x->GetBefore()) {
               std::string s = mEmitter->EmitTreeNode(n);
-              mXXports += Comment(node) + "namespace "s + s + " = " + module + ";\n"s;
+              mXXports += Comment(node) + "namespace "s + s + " = " + module + "::__export;\n"s;
               mCppDecl->AddImportedModule(s);
             }
           } else {
