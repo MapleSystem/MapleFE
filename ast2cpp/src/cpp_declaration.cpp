@@ -94,12 +94,12 @@ class ImportExportModules : public AstVisitor {
                   mXXports += Comment(node) + "inline const decltype("s + module + "__default) &"s + after
                     + " = "s + module + "__default;\n"s;
                 } else {
-                  mXXports += Comment(node) + "inline const decltype("s + module + "::"s + v + ") &"s + after
-                    + " = "s + module + "::"s + v + ";\n"s;
+                  mXXports += Comment(node) + "inline const decltype("s + module + "::__export::"s + v + ") &"s + after
+                    + " = "s + module + "::__export::"s + v + ";\n"s;
                 }
               } else {
-                mXXports += Comment(node) + "inline const decltype("s + module + "::"s + v + ") &"s + v
-                  + " = "s + module + "::"s + v + ";\n"s;
+                mXXports += Comment(node) + "inline const decltype("s + module + "::__export::"s + v + ") &"s + v
+                  + " = "s + module + "::__export::"s + v + ";\n"s;
               }
             }
           }
@@ -202,8 +202,8 @@ class CollectDecls : public AstVisitor {
       std::string def = mCppDecl->EmitTreeNode(node);
       std::string var = mCppDecl->EmitTreeNode(node->GetVar());
       if (mCppDecl->IsExportedId(var)) {
-        mDecls += "namespace __export { extern "s + def.substr(0, def.find('=')) + ";}\n"s;
-        mCppDecl->AddDefinition("namespace __export { "s + def + ";}\n"s);
+        mDecls += "namespace __observable { extern "s + def.substr(0, def.find('=')) + ";}\n"s;
+        mCppDecl->AddDefinition("namespace __observable { "s + def + ";}\n"s);
       } else {
         mDecls += "extern "s + def.substr(0, def.find('=')) + ";\n"s;
         mCppDecl->AddDefinition(def + ";\n"s);
@@ -278,8 +278,8 @@ namespace )""" + module + R"""( {
       std::string func = EmitTreeNode(node);
       std::string id = EmitTreeNode(static_cast<FunctionNode *>(node)->GetFuncName());
       if (IsExportedId(id)) {
-        AddDefinition("namespace __export { "s + func + "}\n"s);
-        str += "namespace __export { extern "s + func + "}\n"s;
+        AddDefinition("namespace __observable { "s + func + "}\n"s);
+        str += "namespace __observable { extern "s + func + "}\n"s;
       } else {
         AddDefinition(func);
         str += "extern "s + func;
@@ -291,8 +291,9 @@ namespace )""" + module + R"""( {
   str += xxportModules.GetXXports();
 
   str += R"""(
-  namespace __export {}
-  using namespace __export;
+  namespace __observable {}
+  namespace __export { using namespace __observable; }
+  using namespace __observable;
 )""";
 
   // export default

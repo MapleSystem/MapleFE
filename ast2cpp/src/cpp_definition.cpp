@@ -92,7 +92,7 @@ std::string CppDef::EmitModuleNode(ModuleNode *node) {
     std::string s = EmitTreeNode(node) + GetEnding(node);
     std::string id = EmitTreeNode(static_cast<FunctionNode *>(node)->GetFuncName());
     if (mCppDecl.IsExportedId(id))
-      str += "namespace __export {\n"s + s + "}\n"s;
+      str += "namespace __observable {\n"s + s + "}\n"s;
     else
       str += s;
   }
