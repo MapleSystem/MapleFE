@@ -37,6 +37,9 @@ void AST_INFO::CollectInfo() {
   MSGNOLOC0("============== Type Parameter ==============");
   mStrIdxVisitor = new FindStrIdxVisitor(mHandler, mFlags, true);
 
+  // collect import/export info
+  ImportExportVisitor xxport_visitor(mHandler, mFlags, true);
+
   // collect class/interface/struct decl
   mPass = 0;
   MSGNOLOC0("============== Collect class/interface/struct ==============");
@@ -524,6 +527,94 @@ bool AST_INFO::WithTypeParamFast(TreeNode *node) {
   return (mWithTypeParamNodeSet.find(node->GetNodeId()) != mWithTypeParamNodeSet.end());
 }
 
+template <typename T1>
+void AST_INFO::ExtendFields(T1 *node, TreeNode *sup) {
+  if (sup == NULL) {
+    // let sup be node itself
+    sup = node;
+  }
+  unsigned nid = node->GetNodeId();
+  if (sup && sup->IsUserType()) {
+    sup = static_cast<UserTypeNode *>(sup)->GetId();
+  }
+  if (sup && sup->IsIdentifier()) {
+    sup = GetStructFromStrIdx(sup->GetStrIdx());
+  }
+  if (!sup) {
+    return;
+  }
+  for (unsigned i = 0; i < GetFieldsSize(sup, true); i++) {
+    TreeNode *fld = GetField(sup, i, true);
+    AddField(nid, fld);
+  }
+  for (unsigned i = 0; i < GetSuperSize(sup, 1); i++) {
+    TreeNode *s = GetSuper(sup, i, 1);
+    ExtendFields<T1>(node, s);
+  }
+  for (unsigned i = 0; i < GetSuperSize(sup, 2); i++) {
+    TreeNode *s = GetSuper(sup, i, 2);
+    ExtendFields<T1>(node, s);
+  }
+}
+
+template <typename T1>
+static void DumpVec(std::vector<std::pair<unsigned, T1 *>> vec) {
+  unsigned size = vec.size();
+  std::cout << "================ Dump Vec ================" << std::endl;
+  for (unsigned i = 0; i < size; i++) {
+    std::cout << "item #" << i
+              << " nodeid " << vec[i].second->GetNodeId()
+              << " stridx " << vec[i].second->GetStrIdx()
+              << std::endl;
+  }
+}
+
+template <typename T1, typename T2>
+void AST_INFO::SortFields(T1 *node) {
+  std::vector<std::pair<unsigned, T2 *>> vec;
+  unsigned size = GetFieldsSize(node, true);
+  if (size) {
+    for (unsigned i = 0; i < size; i++) {
+      T2 *fld = node->GetField(i);
+      unsigned stridx = fld->GetStrIdx();
+      std::pair<unsigned, T2*> p(stridx, fld);
+      vec.push_back(p);
+    }
+    std::sort(vec.begin(), vec.end());
+    for (unsigned i = 0; i < size; i++) {
+      node->SetField(i, vec[i].second);
+    }
+  }
+
+  unsigned nid = node->GetNodeId();
+  if (mStructId2FieldsMap.find(nid) != mStructId2FieldsMap.end()) {
+    std::vector<std::pair<unsigned, TreeNode *>> vec;
+    unsigned size = mStructId2FieldsMap[nid].GetNum();
+    for (unsigned i = 0; i < size; i++) {
+      TreeNode *fld = mStructId2FieldsMap[nid].ValueAtIndex(i);
+      unsigned stridx = fld->GetStrIdx();
+      std::pair<unsigned, TreeNode*> p(stridx, fld);
+      vec.push_back(p);
+    }
+    std::sort(vec.begin(), vec.end());
+    for (unsigned i = 0; i < size; i++) {
+      *(mStructId2FieldsMap[nid].RefAtIndex(i)) = vec[i].second;
+    }
+  }
+}
+
+ImportNode *ImportExportVisitor::VisitImportNode(ImportNode *node) {
+  (void) AstVisitor::VisitImportNode(node);
+  mInfo->AddImport(node);
+  return node;
+}
+
+ExportNode *ImportExportVisitor::VisitExportNode(ExportNode *node) {
+  (void) AstVisitor::VisitExportNode(node);
+  mInfo->AddExport(node);
+  return node;
+}
+
 StructLiteralNode *ClassStructVisitor::VisitStructLiteralNode(StructLiteralNode *node) {
   node->SetTypeId(TY_Class);
   (void) AstVisitor::VisitStructLiteralNode(node);
@@ -634,82 +725,6 @@ TypeParameterNode *ClassStructVisitor::VisitTypeParameterNode(TypeParameterNode 
     }
   }
   return node;
-}
-
-template <typename T1>
-void AST_INFO::ExtendFields(T1 *node, TreeNode *sup) {
-  if (sup == NULL) {
-    // let sup be node itself
-    sup = node;
-  }
-  unsigned nid = node->GetNodeId();
-  if (sup && sup->IsUserType()) {
-    sup = static_cast<UserTypeNode *>(sup)->GetId();
-  }
-  if (sup && sup->IsIdentifier()) {
-    sup = GetStructFromStrIdx(sup->GetStrIdx());
-  }
-  if (!sup) {
-    return;
-  }
-  for (unsigned i = 0; i < GetFieldsSize(sup, true); i++) {
-    TreeNode *fld = GetField(sup, i, true);
-    AddField(nid, fld);
-  }
-  for (unsigned i = 0; i < GetSuperSize(sup, 1); i++) {
-    TreeNode *s = GetSuper(sup, i, 1);
-    ExtendFields<T1>(node, s);
-  }
-  for (unsigned i = 0; i < GetSuperSize(sup, 2); i++) {
-    TreeNode *s = GetSuper(sup, i, 2);
-    ExtendFields<T1>(node, s);
-  }
-}
-
-template <typename T1>
-static void DumpVec(std::vector<std::pair<unsigned, T1 *>> vec) {
-  unsigned size = vec.size();
-  std::cout << "================ Dump Vec ================" << std::endl;
-  for (unsigned i = 0; i < size; i++) {
-    std::cout << "item #" << i
-              << " nodeid " << vec[i].second->GetNodeId()
-              << " stridx " << vec[i].second->GetStrIdx()
-              << std::endl;
-  }
-}
-
-template <typename T1, typename T2>
-void AST_INFO::SortFields(T1 *node) {
-  std::vector<std::pair<unsigned, T2 *>> vec;
-  unsigned size = GetFieldsSize(node, true);
-  if (size) {
-    for (unsigned i = 0; i < size; i++) {
-      T2 *fld = node->GetField(i);
-      unsigned stridx = fld->GetStrIdx();
-      std::pair<unsigned, T2*> p(stridx, fld);
-      vec.push_back(p);
-    }
-    std::sort(vec.begin(), vec.end());
-    for (unsigned i = 0; i < size; i++) {
-      node->SetField(i, vec[i].second);
-    }
-  }
-
-  unsigned nid = node->GetNodeId();
-  if (mStructId2FieldsMap.find(nid) != mStructId2FieldsMap.end()) {
-    std::vector<std::pair<unsigned, TreeNode *>> vec;
-    unsigned size = mStructId2FieldsMap[nid].GetNum();
-    for (unsigned i = 0; i < size; i++) {
-      TreeNode *fld = mStructId2FieldsMap[nid].ValueAtIndex(i);
-      unsigned stridx = fld->GetStrIdx();
-      std::pair<unsigned, TreeNode*> p(stridx, fld);
-      vec.push_back(p);
-    }
-    std::sort(vec.begin(), vec.end());
-    for (unsigned i = 0; i < size; i++) {
-      *(mStructId2FieldsMap[nid].RefAtIndex(i)) = vec[i].second;
-    }
-  }
 }
 
 IdentifierNode *FindStrIdxVisitor::VisitIdentifierNode(IdentifierNode *node) {
