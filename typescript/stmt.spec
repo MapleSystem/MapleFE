@@ -1916,16 +1916,16 @@ rule TypeAliasDeclaration: "type" + BindingIdentifier + ZEROORONE(TypeParameters
 rule PropertyDefinition: ONEOF(IdentifierReference,
                                CoverInitializedName,
                                PropertyName + ':' + AssignmentExpression,
-                               PropertyName + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')'
+                               ZEROORONE(AccessibilityModifier) + PropertyName + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')'
                                  + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}',
                                GetAccessor,
                                SetAccessor,
                                SpreadElement)
   attr.action.%3 : BuildFieldLiteral(%1, %3)
-  attr.action.%4 : BuildFunction(%1)
-  attr.action.%4 : AddType(%6)
-  attr.action.%4 : AddParams(%4)
-  attr.action.%4 : AddFunctionBody(%8)
+  attr.action.%4 : BuildFunction(%2)
+  attr.action.%4 : AddType(%7)
+  attr.action.%4 : AddParams(%5)
+  attr.action.%4 : AddFunctionBody(%9)
 
 ## GetAccessor: get PropertyName ( ) TypeAnnotationopt { FunctionBody }
 rule GetAccessor: ONEOF(ZEROORONE(AccessibilityModifier) + "get" + PropertyName + '(' + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}',

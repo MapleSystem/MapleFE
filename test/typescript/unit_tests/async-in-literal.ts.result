@@ -1,0 +1,11 @@
+Matched 20 tokens.
+Matched 33 tokens.
+============= Module ===========
+== Sub Tree ==
+func  func()  throws: 
+  return  {message:func  message()  throws: 
+  return "done"
+}
+
+== Sub Tree ==
+console.log(func().message())
