@@ -880,7 +880,7 @@ std::string CppDef::EmitBracketNotationProp(ArrayElementNode* ae, OprId binOpId,
 
   isDynProp = true;
   std::string str, propKey;
-  std::string objName = ae->GetArray()->GetName();
+  std::string objName;
 
   if (ae->GetArray()->IsIdentifier()) {
     objName = ae->GetArray()->GetName();
@@ -940,6 +940,8 @@ std::string CppDef::EmitBracketNotationProp(ArrayElementNode* ae, OprId binOpId,
       case TY_Object:
         str = objName + "->GetPropObj("s + propKey + ")"s;
         break;
+      default:
+        str = "(*"s + objName + ")["s + propKey + ']';
     }
 
     // prop is rvalue
