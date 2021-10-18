@@ -570,7 +570,7 @@ std::string CppDef::EmitCallNode(CallNode *node) {
       str += static_cast<FunctionNode *>(n)->GetName();
     } else {
       auto s = EmitTreeNode(n);
-      if(s.compare(0, 11, "console.log") == 0) {
+      if(s.compare(0, 12, "console->log") == 0) {
         str += "std::cout"s;
         log = true;
       } else if (s.compare("super") == 0) {
@@ -679,21 +679,20 @@ std::string CppDef::EmitArrayLiteralNode(ArrayLiteralNode *node) {
 std::string CppDef::EmitFieldNode(FieldNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str;
-  if (auto n = node->GetUpper()) {
-    str += EmitTreeNode(n);
-  }
-  if (auto n = node->GetField()) {
-    std::string field = EmitIdentifierNode(n);
-    Emitter::Replace(field, "length", "size()");
-    if (str.compare("console") == 0)
-      str += "."s + field;
-    else if (mCppDecl.IsImportedModule(str))
-      str += "::"s + field;
-    else
-      str += "->"s + field;
-  }
-  return str;
+  std::string upper, field;
+  if (auto n = node->GetUpper())
+    upper = EmitTreeNode(n);
+  if (auto n = node->GetField())
+    field = EmitIdentifierNode(n);
+  if (upper.empty() || field.empty()) // Error if either is empty
+    return "%%%Empty%%%";
+  if (field == "length") // for length property
+    return upper + "->size()"s;
+  if (mCppDecl.IsImportedModule(upper)) // for imported module
+    return upper + "::"s + field;
+  if (true) // TODO: needs to check if it accesses a Cxx class field
+    return upper + "->"s + field;
+  return "(*"s + upper + ")[\""s + field + "\"]"s;
 }
 
 std::string CppDef::EmitCondBranchNode(CondBranchNode *node) {
