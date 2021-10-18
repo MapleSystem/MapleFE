@@ -421,8 +421,9 @@ rule AssertExpression : "asserts" + MemberExpression
 ##  MemberExpression[?Yield]
 ##  new NewExpression[?Yield]
 rule NewExpression : ONEOF(MemberExpression,
-                           "new" + NewExpression)
-  attr.action.%2 : BuildNewOperation(%2)
+                           "new" + NewExpression,
+                           "new" + ClassDeclaration)
+  attr.action.%2,%3 : BuildNewOperation(%2)
 
 ##-----------------------------------
 ##rule CallExpression[Yield] :
@@ -544,11 +545,13 @@ rule UnaryExpression : ONEOF(
    '+' + UnaryExpression,
    '-' + UnaryExpression,
    '~' + UnaryExpression,
-   '!' + UnaryExpression)
+   '!' + UnaryExpression,
+  "typeof" + '(' + ClassDeclaration + ')')
   attr.action.%2 : BuildDeleteOperation(%2)
   attr.action.%3 : BuildLiteral(%1)
   attr.action.%4 : BuildTypeOf(%2)
   attr.action.%5,%6,%7,%8,%9,%10 : BuildUnaryOperation(%1, %2)
+  attr.action.%11 : BuildTypeOf(%3)
 
 ## UpdateExpression[Yield]:
 ## LeftHandSideExpression[?Yield]
@@ -637,9 +640,10 @@ rule RelationalExpression : ONEOF(ShiftExpression,
                                   RelationalExpression + "<=" + ShiftExpression,
                                   RelationalExpression + ">=" + ShiftExpression,
                                   RelationalExpression + "instanceof" + ShiftExpression,
+                                  ClassDeclaration + "instanceof" + ShiftExpression,
                                   InExpression)
   attr.action.%2,%3,%4,%5 : BuildBinaryOperation(%1, %2, %3)
-  attr.action.%6 : BuildInstanceOf(%1, %3)
+  attr.action.%6,%7 : BuildInstanceOf(%1, %3)
 
 
 ##-----------------------------------
@@ -1769,8 +1773,10 @@ rule ConstructorType: "new" + FunctionType
   attr.action : BuildNewOperation(%2)
 
 ## rule TypeQuery: typeof TypeQueryExpression
-rule TypeQuery: "typeof" + TypeQueryExpression
-  attr.action : BuildTypeOf(%2)
+rule TypeQuery: ONEOF("typeof" + TypeQueryExpression,
+                      "typeof" + '(' + ClassDeclaration + ')')
+  attr.action.%1 : BuildTypeOf(%2)
+  attr.action.%2 : BuildTypeOf(%3)
 
 ## rule TypeQueryExpression: IdentifierReference TypeQueryExpression . IdentifierName
 rule TypeQueryExpression: ONEOF(IdentifierReference,

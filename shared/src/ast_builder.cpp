@@ -2614,6 +2614,9 @@ TreeNode* ASTBuilder::AddClassBody() {
     std::cout << "In AddClassBody" << std::endl;
 
   Param p_body = mParams[0];
+  if (p_body.mIsEmpty)
+    return mLastTreeNode;
+
   if (!p_body.mIsTreeNode)
     MERROR("The class body is not a tree node.");
 
@@ -4071,14 +4074,21 @@ TreeNode* ASTBuilder::BuildIs() {
 //                       TypeOf Expression
 ////////////////////////////////////////////////////////////////////////////////
 
+// It takes (1) one argument
+//          (2) zero argument. Use mLastTreeNode as the argument.
 TreeNode* ASTBuilder::BuildTypeOf() {
   if (mTrace)
     std::cout << "In BuildTypeOf" << std::endl;
 
-  Param l_param = mParams[0];
-  MASSERT(!l_param.mIsEmpty);
-  MASSERT(l_param.mIsTreeNode);
-  TreeNode *expr = l_param.mData.mTreeNode;
+  TreeNode *expr = NULL;
+
+  if (mParams.size() == 0) {
+    expr = mLastTreeNode;
+  } else {
+    Param l_param = mParams[0];
+    MASSERT(l_param.mIsTreeNode);
+    expr = l_param.mData.mTreeNode;
+  }
 
   TypeOfNode *typeof = (TypeOfNode*)gTreePool.NewTreeNode(sizeof(TypeOfNode));
   new (typeof) TypeOfNode();

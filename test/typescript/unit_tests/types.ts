@@ -6,7 +6,7 @@ console.log(typeof(false));        // boolean
 console.log(typeof("abc"));        // string
 console.log(typeof(Symbol()));     // symbol
 console.log(typeof(123));          // number
-console.log(typeof(123n));         // bigint
+//console.log(typeof(123n));         // bigint
 console.log(typeof(BigInt(123)));  // bigint
 
 // complex/compound type
