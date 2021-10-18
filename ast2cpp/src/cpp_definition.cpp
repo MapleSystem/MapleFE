@@ -410,7 +410,10 @@ std::string CppDef::EmitDirectFieldInit(std::string varName, StructLiteralNode* 
       auto lit = field->GetLiteral();
       std::string fieldName = EmitTreeNode(field->GetFieldName());
       std::string fieldVal = EmitTreeNode(lit);
-      str += ident(2) + varName + "->"s + fieldName + " = "s + fieldVal + ";\n"s;
+      if (false) // TODO: Check if it accesses a Cxx class field
+        str += ident(2) + varName + "->"s + fieldName + " = "s + fieldVal + ";\n"s;
+      else
+        str += ident(2) + "(*"s + varName + ")[\""s + fieldName + "\"] = "s + fieldVal + ";\n"s;
     }
   }
   return str;
@@ -655,7 +658,6 @@ std::string CppDef::EmitArrayElementNode(ArrayElementNode *node) {
         str += expr;
     }
   }
-  Replace(str, "?[", "?.[");
 
   mPrecedence = '\030';
   return HandleTreeNode(str, node);
