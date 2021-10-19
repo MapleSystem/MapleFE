@@ -201,6 +201,17 @@ void TypeInferVisitor::SetTypeId(TreeNode *node, TypeId tid) {
   }
 }
 
+void TypeInferVisitor::SetTypeIdx(TreeNode *node, unsigned tidx) {
+  if (node->GetTypeIdx() != tidx) {
+    if (mFlags & FLG_trace_3) {
+      std::cout << " NodeId : " << node->GetNodeId() << " Set TypeIdx : "
+                << node->GetTypeIdx() << " --> " << tidx << std::endl;
+    }
+    node->SetTypeIdx(tidx);
+    SetUpdated();
+  }
+}
+
 void TypeInferVisitor::UpdateTypeId(TreeNode *node, TypeId tid) {
   if (tid == TY_None || !node || node->IsLiteral()) {
     return;
@@ -443,7 +454,7 @@ bool TypeInferVisitor::UpdateVarTypeWithInit(TreeNode *var, TreeNode *init) {
         TreeNode *utype = gTypeTable.GetTypeFromTypeIdx((unsigned)TY_Function);
         utype->SetParent(idnode);
         idnode->SetType(utype);
-        idnode->SetTypeId(TY_Function);
+        SetTypeId(idnode, TY_Function);
         SetUpdated();
         result = true;
       }
@@ -684,6 +695,7 @@ BinOperatorNode *TypeInferVisitor::VisitBinOperatorNode(BinOperatorNode *node) {
         mod = ta;
       }
       SetTypeId(node, TY_Boolean);
+      SetTypeIdx(node, TY_Boolean);
       break;
     }
     case OPR_Assign:
@@ -1140,6 +1152,7 @@ InterfaceNode *TypeInferVisitor::VisitInterfaceNode(InterfaceNode *node) {
 
 IsNode *TypeInferVisitor::VisitIsNode(IsNode *node) {
   (void) AstVisitor::VisitIsNode(node);
+  node->SetTypeIdx(TY_Boolean);
   TreeNode *parent = node->GetParent();
   if (parent->IsFunction()) {
     FunctionNode *func = static_cast<FunctionNode *>(parent);
@@ -1182,9 +1195,9 @@ StructNode *TypeInferVisitor::VisitStructNode(StructNode *node) {
     }
     for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
       TreeNode *t = node->GetField(i);
-      t->SetTypeId(tid);
+      SetTypeId(t, tid);
     }
-    node->SetTypeId(tid);
+    SetTypeId(node, tid);
   }
   (void) AstVisitor::VisitStructNode(node);
   return node;
@@ -1203,15 +1216,19 @@ LiteralNode *TypeInferVisitor::VisitLiteralNode(LiteralNode *node) {
   switch (id) {
     case LT_IntegerLiteral:
       SetTypeId(node, TY_Int);
+      SetTypeIdx(node, TY_Int);
       break;
     case LT_FPLiteral:
       SetTypeId(node, TY_Float);
+      SetTypeIdx(node, TY_Float);
       break;
     case LT_DoubleLiteral:
       SetTypeId(node, TY_Double);
+      SetTypeIdx(node, TY_Double);
       break;
     case LT_StringLiteral:
       SetTypeId(node, TY_String);
+      SetTypeIdx(node, TY_String);
       break;
     case LT_VoidLiteral:
       SetTypeId(node, TY_Undefined);
@@ -1227,6 +1244,7 @@ ReturnNode *TypeInferVisitor::VisitReturnNode(ReturnNode *node) {
   TreeNode *res = node->GetResult();
   if (res) {
     UpdateTypeId(node, res->GetTypeId());
+    SetTypeIdx(node, res->GetTypeIdx());
   }
   TreeNode *tn = mHandler->FindFunc(node);
   if (tn) {
@@ -1326,7 +1344,7 @@ UnaOperatorNode *TypeInferVisitor::VisitUnaOperatorNode(UnaOperatorNode *node) {
 UserTypeNode *TypeInferVisitor::VisitUserTypeNode(UserTypeNode *node) {
   (void) AstVisitor::VisitUserTypeNode(node);
   if (node->GetDims()) {
-    node->SetTypeId(TY_Array);
+    SetTypeId(node, TY_Array);
     node->SetTypeIdx(TY_Array);
   } else if (node->GetId()) {
     UpdateTypeId(node, node->GetId());

@@ -27,22 +27,25 @@ PRIMTYPE(Char)
 PRIMTYPE(Float)
 PRIMTYPE(Double)
 
-TYPE(Array)
-TYPE(Object)
-TYPE(Function)  // function/lambda decl
-TYPE(Class)     // class/interface decl
-TYPE(User)      // user types
-TYPE(Merge)     // merge of two types, unexpected
+// keep these two after primitive types as we are going to create
+// primitive types for them as well
+TYPE(Number)    // First come from JS
+TYPE(String)    // First come from JS
 
 TYPE(Void)      // Although this is not a type, it does categorize the types.
 TYPE(Null)      // The Null type. It is a type.
 TYPE(Unknown)   // First come from TS 3.0
 TYPE(Never)     // First come from TS
 TYPE(Undefined) // First come from JS
-TYPE(String)    // First come from JS
-TYPE(Number)    // First come from JS
 TYPE(Symbol)    // First come from JS
 TYPE(Any)       // First come from JS
+
+TYPE(Array)
+TYPE(Object)
+TYPE(Function)  // function/lambda decl
+TYPE(Class)     // class/interface decl
+TYPE(User)      // user types
+TYPE(Merge)     // merge of two types, unexpected
 
 // last entry
 TYPE(Max)

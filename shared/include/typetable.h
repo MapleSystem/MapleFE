@@ -55,6 +55,7 @@ public:
   TypeTable() {};
   ~TypeTable() { mTypeTable.clear(); };
 
+  unsigned size() { return mTypeTable.size(); }
   TreeNode *CreatePrimType(std::string name, TypeId tyid);
   TreeNode *CreateBuiltinType(std::string name, TypeId tyid);
   void AddPrimAndBuiltinTypes();

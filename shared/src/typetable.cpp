@@ -53,21 +53,21 @@ TypeEntry::TypeEntry(TreeNode *node) {
   }
 }
 
-TreeNode *TypeTable::CreatePrimType(std::string name, TypeId tyid) {
+TreeNode *TypeTable::CreatePrimType(std::string name, TypeId tid) {
   unsigned stridx = gStringPool.GetStrIdx(name);
   PrimTypeNode *node = (PrimTypeNode*)gTreePool.NewTreeNode(sizeof(PrimTypeNode));
   new (node) PrimTypeNode();
   node->SetStrIdx(stridx);
-  node->SetPrimType(tyid);
-  node->SetTypeId(TY_Class);
+  node->SetPrimType(tid);
+  node->SetTypeId(tid);
   return node;
 }
 
-TreeNode *TypeTable::CreateBuiltinType(std::string name, TypeId tyid) {
+TreeNode *TypeTable::CreateBuiltinType(std::string name, TypeId tid) {
   unsigned stridx = gStringPool.GetStrIdx(name);
   IdentifierNode *node = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
   new (node) IdentifierNode(stridx);
-  node->SetTypeId(TY_Class);
+  node->SetTypeId(tid);
 
   UserTypeNode *utype = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
   new (utype) UserTypeNode(node);
@@ -92,11 +92,26 @@ bool TypeTable::AddType(TreeNode *node) {
 
 #undef  TYPE
 #undef  PRIMTYPE
-#define TYPE(T)     node = CreateBuiltinType(#T, TY_##T); AddType(node);
-#define PRIMTYPE(T) node = CreatePrimType( #T, TY_##T); AddType(node);
 void TypeTable::AddPrimAndBuiltinTypes() {
   TreeNode *node;
+  // add a NULL entry so real typeidx starting from 1
+  TypeEntry *entry = new TypeEntry();
+  mTypeTable.push_back(entry);
+
+  // first are primitive types, and their typeid TY_Xyz is their typeidx as well
+#define TYPE(T)
+#define PRIMTYPE(T) node = CreatePrimType( #T, TY_##T); AddType(node);
 #include "supported_types.def"
+  // add additional primitive types for number and string
+  PRIMTYPE(Number);
+  PRIMTYPE(String);
+
+#define TYPE(T)     node = CreateBuiltinType(#T, TY_##T); AddType(node);
+#define PRIMTYPE(T)
+  // additional usertype Boolean
+  TYPE(Boolean);
+#include "supported_types.def"
+
   return;
 }
 
@@ -118,8 +133,13 @@ void TypeTable::Dump() {
   for (unsigned idx = 1; idx < mTypeTable.size(); idx++) {
     TypeEntry *entry = mTypeTable[idx];
     TreeNode *node = entry->GetType();
+    TypeId tid = node->GetTypeId();
+    if (node->IsUserType()) {
+      tid = static_cast<UserTypeNode*>(node)->GetId()->GetTypeId();
+    }
     std::cout << "  " << idx << " : " << node->GetName() << " : " <<
               AstDump::GetEnumNodeKind(node->GetKind()) << " " <<
+              AstDump::GetEnumTypeId(tid) << " " << tid << " " <<
               node->GetNodeId() << std::endl;
   }
   std::cout << "===================== End TypeTable =====================" << std::endl;

@@ -64,16 +64,18 @@ void AST_SCP::BuildScope() {
 }
 
 void BuildScopeVisitor::InitInternalTypes() {
-  // add prim and builtin typesto root scope
+  // add primitive and builtin types to root scope
   ModuleNode *module = mHandler->GetASTModule();
   ASTScope *scope = module->GetRootScope();
-  for (unsigned i = 0; i <= (unsigned)TY_Max; i++) {
+  for (unsigned i = 1; i < gTypeTable.size(); i++) {
     TreeNode *node = gTypeTable.GetTypeFromTypeIdx(i);
     node->SetScope(scope);
     if (node->IsUserType()) {
       static_cast<UserTypeNode *>(node)->GetId()->SetScope(scope);
+      AddTypeAndDecl(scope, node);
+    } else {
+      AddType(scope, node);
     }
-    AddTypeAndDecl(scope, node);
   }
 
   // add dummpy console.log()

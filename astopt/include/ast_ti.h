@@ -120,6 +120,7 @@ class TypeInferVisitor : public TypeInferBaseVisitor {
   void SetUpdated(bool b = true) {mUpdated = b;}
 
   void SetTypeId(TreeNode *node, TypeId tid);
+  void SetTypeIdx(TreeNode *node, unsigned tidx);
   void UpdateTypeId(TreeNode *node, TypeId tid);
   void UpdateTypeId(TreeNode *node1, TreeNode *node2);
   void UpdateFuncRetTypeId(FunctionNode *node, TypeId tid);
