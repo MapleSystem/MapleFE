@@ -1424,13 +1424,17 @@ rule ModuleItem : ONEOF(ImportDeclaration,
 ## import ModuleSpecifier ;
 rule ImportDeclaration : ONEOF("import" + ImportClause + FromClause + ZEROORONE(';'),
                                "import" + ModuleSpecifier + ZEROORONE(';'),
-                               "import" + BindingIdentifier + '=' + "require" + '(' + AssignmentExpression + ')' + ZEROORONE(';'))
+                               "import" + BindingIdentifier + '=' + "require" + '(' + AssignmentExpression + ')' + ZEROORONE(';'),
+                               "import" + "type" + NamedImports + FromClause + ZEROORONE(';'),
+                               "import" + "type" + NameSpaceImport + FromClause + ZEROORONE(';'))
   attr.property : Top
-  attr.action.%1,%2,%3 : BuildImport()
+  attr.action.%1,%2,%3,%4,%5 : BuildImport()
   attr.action.%1 :    SetPairs(%2)
   attr.action.%1 :    SetFromModule(%3)
   attr.action.%2 :    SetFromModule(%2)
   attr.action.%3 :    SetSinglePairs(%6, %2)
+  attr.action.%4,%5 : SetPairs(%3)
+  attr.action.%4,%5 : SetFromModule(%4)
 
 ## ImportClause :
 ## ImportedDefaultBinding
@@ -1442,9 +1446,7 @@ rule ImportClause : ONEOF(ImportedDefaultBinding,
                           NameSpaceImport,
                           NamedImports,
                           ImportedDefaultBinding + ',' + NameSpaceImport,
-                          ImportedDefaultBinding + ',' + NamedImports,
-                          "type" + NamedImports,
-                          "type" + NameSpaceImport)
+                          ImportedDefaultBinding + ',' + NamedImports)
 
 ## See 15.2.2
 ## ImportedDefaultBinding :
