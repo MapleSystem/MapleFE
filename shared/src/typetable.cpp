@@ -93,6 +93,11 @@ bool TypeTable::AddType(TreeNode *node) {
 #undef  TYPE
 #undef  PRIMTYPE
 void TypeTable::AddPrimAndBuiltinTypes() {
+  // only initialize once
+  if (mTypeTable.size() != 0) {
+    return;
+  }
+
   TreeNode *node;
   // add a NULL entry so real typeidx starting from 1
   TypeEntry *entry = new TypeEntry();
@@ -100,7 +105,7 @@ void TypeTable::AddPrimAndBuiltinTypes() {
 
   // first are primitive types, and their typeid TY_Xyz is their typeidx as well
 #define TYPE(T)
-#define PRIMTYPE(T) node = CreatePrimType( #T, TY_##T); AddType(node);
+#define PRIMTYPE(T) node = CreatePrimType(#T, TY_##T); AddType(node);
 #include "supported_types.def"
   // add additional primitive types for number and string
   PRIMTYPE(Number);

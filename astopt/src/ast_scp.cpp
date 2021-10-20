@@ -72,9 +72,10 @@ void BuildScopeVisitor::InitInternalTypes() {
     node->SetScope(scope);
     if (node->IsUserType()) {
       static_cast<UserTypeNode *>(node)->GetId()->SetScope(scope);
-      AddTypeAndDecl(scope, node);
+      scope->AddType(node);
+      scope->AddDecl(node);
     } else {
-      AddType(scope, node);
+      scope->AddType(node);
     }
   }
 
