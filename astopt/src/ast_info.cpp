@@ -177,7 +177,7 @@ void AST_INFO::AddField(TreeNode *container, TreeNode *node) {
   if (mStructId2FieldsMap.find(nid) == mStructId2FieldsMap.end()) {
     for (unsigned i = 0; i < GetFieldsSize(container, true); i++) {
       TreeNode *fld = GetField(container, i, true);
-      mStructId2FieldsMap[nid].PushBack(node);
+      mStructId2FieldsMap[nid].PushBack(fld);
     }
   }
   AddField(nid, node);
@@ -185,6 +185,21 @@ void AST_INFO::AddField(TreeNode *container, TreeNode *node) {
 
 void AST_INFO::AddField(unsigned nid, TreeNode *node) {
   mStructId2FieldsMap[nid].PushBack(node);
+}
+
+// get the filed in nid, including its super, with name stridx
+// return NULL if not found
+TreeNode *AST_INFO::GetField(unsigned nid, unsigned stridx) {
+  if (mStructId2FieldsMap.find(nid) != mStructId2FieldsMap.end()) {
+    unsigned size = mStructId2FieldsMap[nid].GetNum();
+    for (unsigned i = 0; i < size; i++) {
+      TreeNode *fld = mStructId2FieldsMap[nid].ValueAtIndex(i);
+      if (fld->GetStrIdx() == stridx) {
+        return fld;
+      }
+    }
+  }
+  return NULL;
 }
 
 unsigned AST_INFO::GetSuperSize(TreeNode *node, unsigned idx) {
@@ -461,6 +476,7 @@ StructNode *AST_INFO::CreateStructFromStructLiteral(StructLiteralNode *node) {
 
     IdentifierNode *fid = CreateIdentifierNode(name->GetStrIdx());
     newnode->AddField(fid);
+    mHandler->AddDirectField(fid);
 
     TreeNode *lit = fl->GetLiteral();
     if (lit && lit->IsLiteral()) {
@@ -650,8 +666,12 @@ StructNode *ClassStructVisitor::VisitStructNode(StructNode *node) {
     if (id && node->GetStrIdx() == 0) {
       node->SetStrIdx(id->GetStrIdx());
     }
-
     mInfo->SetStrIdx2Struct(node->GetStrIdx(), node);
+    for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
+      if (auto t = node->GetField(i)) {
+        mHandler->AddDirectField(t);
+      }
+    }
   } else if (mInfo->GetPass() == 1) {
     if (mInfo->WithTypeParam(node)) {
       mInfo->InsertWithTypeParamNode(node);
@@ -675,6 +695,11 @@ ClassNode *ClassStructVisitor::VisitClassNode(ClassNode *node) {
   (void) AstVisitor::VisitClassNode(node);
   if (mInfo->GetPass() == 0) {
     mInfo->SetStrIdx2Struct(node->GetStrIdx(), node);
+    for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
+      if (auto t = node->GetField(i)) {
+        mHandler->AddDirectField(t);
+      }
+    }
   } else if (mInfo->GetPass() == 1) {
     if (mInfo->WithTypeParam(node)) {
       mInfo->InsertWithTypeParamNode(node);
@@ -698,6 +723,11 @@ InterfaceNode *ClassStructVisitor::VisitInterfaceNode(InterfaceNode *node) {
   (void) AstVisitor::VisitInterfaceNode(node);
   if (mInfo->GetPass() == 0) {
     mInfo->SetStrIdx2Struct(node->GetStrIdx(), node);
+    for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
+      if (auto t = node->GetField(i)) {
+        mHandler->AddDirectField(t);
+      }
+    }
   } else if (mInfo->GetPass() == 1) {
     if (mInfo->WithTypeParam(node)) {
       mInfo->InsertWithTypeParamNode(node);

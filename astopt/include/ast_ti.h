@@ -52,6 +52,20 @@ class BuildIdNodeToDeclVisitor : public AstVisitor {
   IdentifierNode *VisitIdentifierNode(IdentifierNode *node);
 };
 
+class BuildIdDirectFieldVisitor : public AstVisitor {
+  Module_Handler *mHandler;
+  unsigned        mFlags;
+
+  public:
+  explicit BuildIdDirectFieldVisitor(Module_Handler *h, unsigned f, bool base = false)
+    : mHandler(h), mFlags(f), AstVisitor((f & FLG_trace_1) && base) {}
+  ~BuildIdDirectFieldVisitor() = default;
+
+  FieldNode *VisitFieldNode(FieldNode *node);
+  ArrayElementNode *VisitArrayElementNode(ArrayElementNode *node);
+  void Dump();
+};
+
 class TypeInferBaseVisitor : public AstVisitor {
  private:
   unsigned mFlags;

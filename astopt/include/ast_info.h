@@ -62,6 +62,7 @@ class AST_INFO {
   unsigned GetFieldsSize(TreeNode *node, bool native = false);
   TreeNode *GetField(TreeNode *node, unsigned i, bool native = false);
   void AddField(TreeNode *container, TreeNode *node);
+  TreeNode *GetField(unsigned nid, unsigned stridx);
   unsigned GetSuperSize(TreeNode *node, unsigned idx);
   TreeNode *GetSuper(TreeNode *node, unsigned i, unsigned idx);
 
@@ -96,6 +97,7 @@ class AST_INFO {
 
   void AddImport(ImportNode *node) { mImports.insert(node); }
   void AddExport(ExportNode *node) { mExports.insert(node); }
+
 };
 
 class ImportExportVisitor : public AstVisitor {

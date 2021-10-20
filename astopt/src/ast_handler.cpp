@@ -126,7 +126,16 @@ TreeNode *Module_Handler::FindDecl(IdentifierNode *node) {
 
   ASTScope *scope = node->GetScope();
   MASSERT(scope && "null scope");
-  TreeNode *decl = scope->FindDeclOf(node->GetStrIdx());
+  TreeNode *decl = NULL;
+
+  TreeNode *tree = scope->GetTree();
+  unsigned stridx = node->GetStrIdx();
+
+  decl = mINFO->GetField(tree->GetNodeId(), stridx);
+
+  if (!decl) {
+    decl = scope->FindDeclOf(stridx);
+  }
 
   if (decl) {
     unsigned did = decl->GetNodeId();

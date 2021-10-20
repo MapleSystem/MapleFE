@@ -37,6 +37,14 @@ void TypeInfer::TypeInference() {
   BuildIdNodeToDeclVisitor visitor_build(mHandler, mFlags, true);
   visitor_build.Visit(module);
 
+  // build mDirectFieldSet
+  MSGNOLOC0("============== Build DirectFieldSet ==============");
+  BuildIdDirectFieldVisitor visitor_field(mHandler, mFlags, true);
+  visitor_field.Visit(module);
+  if (mFlags & FLG_trace_3) {
+    visitor_field.Dump();
+  }
+
   // type inference
   MSGNOLOC0("============== TypeInfer ==============");
   TypeInferVisitor visitor_ti(mHandler, mFlags, true);
@@ -65,6 +73,7 @@ void TypeInfer::TypeInference() {
 // build up mNodeId2Decl by visiting each Identifier
 IdentifierNode *BuildIdNodeToDeclVisitor::VisitIdentifierNode(IdentifierNode *node) {
   (void) AstVisitor::VisitIdentifierNode(node);
+  // mHandler->FindDecl() will use/add entries to mNodeId2Decl
   TreeNode *decl = mHandler->FindDecl(node);
   if (decl) {
     node->SetTypeId(decl->GetTypeId());
@@ -78,6 +87,63 @@ IdentifierNode *BuildIdNodeToDeclVisitor::VisitIdentifierNode(IdentifierNode *no
     node->SetTypeIdx(tid);
   }
   return node;
+}
+
+FieldNode *BuildIdDirectFieldVisitor::VisitFieldNode(FieldNode *node) {
+  (void) AstVisitor::VisitFieldNode(node);
+  TreeNode *upper = node->GetUpper();
+  IdentifierNode *field = static_cast<IdentifierNode *>(node->GetField());
+  TreeNode *decl = NULL;
+  decl = mHandler->FindDecl(field);
+  if (decl) {
+    mHandler->AddDirectField(field);
+    mHandler->AddDirectField(node);
+  }
+  return node;
+}
+
+ArrayElementNode *BuildIdDirectFieldVisitor::VisitArrayElementNode(ArrayElementNode *node) {
+  (void) AstVisitor::VisitArrayElementNode(node);
+  TreeNode *array = node->GetArray();
+  if (!array || !array->IsIdentifier()) {
+    return node;
+  }
+
+  TreeNode *decl = mHandler->FindDecl(static_cast<IdentifierNode *>(array));
+  if (decl && decl->IsTypeIdClass()) {
+    TreeNode *exp = node->GetExprAtIndex(0);
+    if (exp->IsLiteral() && exp->IsTypeIdString()) {
+      // indexed access of types
+      unsigned stridx = (static_cast<LiteralNode *>(exp))->GetData().mData.mStrIdx;
+      if (decl->IsDecl()) {
+        TreeNode *var = static_cast<DeclNode *>(decl)->GetVar();
+        TreeNode * type = static_cast<IdentifierNode *>(var)->GetType();
+        if (type && type->IsUserType()) {
+          UserTypeNode *ut = static_cast<UserTypeNode *>(type);
+          decl = mHandler->FindDecl(static_cast<IdentifierNode *>(ut->GetId()));
+        }
+      }
+      if (decl->IsStruct() || decl->IsClass()) {
+        for (int i = 0; i < mHandler->GetINFO()->GetFieldsSize(decl); i++) {
+          TreeNode *f = mHandler->GetINFO()->GetField(decl, i);
+          if (f->GetStrIdx() == stridx) {
+            mHandler->AddDirectField(exp);
+            mHandler->AddDirectField(node);
+            return node;
+          }
+        }
+      }
+    }
+  }
+  return node;
+}
+
+void BuildIdDirectFieldVisitor::Dump() {
+  MSGNOLOC0("============== Direct Field NodeIds ==============");
+  for (auto i: mHandler->mDirectFieldSet) {
+    std::cout << " " << i;
+  }
+  std::cout << std::endl;
 }
 
 #undef  TYPE
@@ -573,7 +639,7 @@ ArrayElementNode *TypeInferVisitor::VisitArrayElementNode(ArrayElementNode *node
             if (exp->IsTypeIdString()) {
               // indexed access of types
               unsigned stridx = (static_cast<LiteralNode *>(exp))->GetData().mData.mStrIdx;
-              if (decl->IsDecl() && decl->IsTypeIdClass()) {
+              if (decl->IsDecl()) {
                 TreeNode *var = static_cast<DeclNode *>(decl)->GetVar();
                 TreeNode * type = static_cast<IdentifierNode *>(var)->GetType();
                 if (type && type->IsUserType()) {

@@ -86,6 +86,8 @@ class Module_Handler {
   std::unordered_map<unsigned, TreeNode *> mNodeId2Decl;
   // array's element type: decl node id to typeid
   std::unordered_map<unsigned, TypeId> mArrayDeclId2EleTypeIdMap;
+  // fields' nodeid set
+  std::unordered_set<unsigned> mDirectFieldSet;
 
  public:
   explicit Module_Handler(unsigned f) :
@@ -146,6 +148,11 @@ class Module_Handler {
   TreeNode *FindDecl(IdentifierNode *node);
   TreeNode *FindType(IdentifierNode *node);
   TreeNode *FindFunc(TreeNode *node);
+
+  void AddDirectField(unsigned nid) { mDirectFieldSet.insert(nid); }
+  void AddDirectField(TreeNode *node) { mDirectFieldSet.insert(node->GetNodeId()); }
+  bool IsDirectField(unsigned nid) { return mDirectFieldSet.find(nid) != mDirectFieldSet.end(); }
+  bool IsDirectField(TreeNode *node) { return mDirectFieldSet.find(node->GetNodeId()) != mDirectFieldSet.end(); }
 
   void Dump(char *msg);
 };
