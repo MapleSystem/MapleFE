@@ -80,6 +80,10 @@ class ImportExportModules : public AstVisitor {
             return GetIdentifierName(static_cast<UserTypeNode *>(node)->GetId());
         case NK_TypeAlias:
             return GetIdentifierName(static_cast<TypeAliasNode *>(node)->GetId());
+        case NK_Namespace:
+            return GetIdentifierName(static_cast<NamespaceNode *>(node)->GetId());
+        case NK_Module:
+            return mCppDecl->GetModuleName(static_cast<ModuleNode *>(node)->GetFilename());
         case NK_Declare:
             { auto n = static_cast<DeclareNode *>(node);
               auto num = n->GetDeclsNum();
