@@ -355,7 +355,19 @@ FieldNode *BuildScopeVisitor::VisitFieldNode(FieldNode *node) {
 
   if (upper && upper->GetStrIdx()) {
     ASTScope *scope = mStrIdx2ScopeMap[upper->GetStrIdx()];
-
+    if (!scope && upper->IsIdentifier()) {
+      TreeNode *decl = mHandler->FindDecl(static_cast<IdentifierNode *>(upper));
+      if (decl && decl->IsIdentifier()) {
+        IdentifierNode *id = static_cast<IdentifierNode *>(decl);
+        TreeNode *type = id->GetType();
+        if (type && type->IsUserType()) {
+          TreeNode *id = static_cast<UserTypeNode *>(type)->GetId();
+          if (id) {
+            scope = mStrIdx2ScopeMap[id->GetStrIdx()];
+          }
+        }
+      }
+    }
     if (scope) {
       mScopeStack.push(scope);
       BuildScopeBaseVisitor::Visit(field);
