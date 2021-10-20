@@ -311,12 +311,17 @@ private:
   TreeNode       *mTarget;    // the exported package in Java or module in JS
   SmallVector<XXportAsPairNode*> mPairs;
   SmallVector<AnnotationNode*> mAnnotations; //annotation or pragma
+  bool            mIsExportType;
+
 public:
-  ExportNode() : TreeNode(NK_Export), mTarget(nullptr) {}
+  ExportNode() : TreeNode(NK_Export), mTarget(nullptr), mIsExportType(false) {}
   ~ExportNode(){}
 
   void SetTarget(TreeNode *t) {mTarget = t; SETPARENT(t);}
   TreeNode* GetTarget() {return mTarget;}
+
+  bool IsExportType()                 {return mIsExportType;}
+  void SetIsExportType(bool b = true) {mIsExportType = b;}
 
   unsigned GetPairsNum() {return mPairs.GetNum();}
   XXportAsPairNode* GetPair(unsigned i) {return mPairs.ValueAtIndex(i);}
@@ -368,8 +373,7 @@ inline ImportProperty operator&(ImportProperty p, ImportProperty q) {
 
 class ImportNode : public TreeNode {
 private:
-  // Solely for Java.
-  ImportProperty  mProperty;  // This is solely for Java.
+  ImportProperty  mProperty;
 
   // Solely for javascript right now.
   // In many languages, mPairs could be empty. In such case it import the whole module.

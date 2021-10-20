@@ -1,4 +1,4 @@
 Matched 8 tokens.
 ============= Module ===========
 == Sub Tree ==
-export {Foo} "./export-type"
+export type {Foo} "./export-type"

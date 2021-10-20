@@ -1435,6 +1435,7 @@ rule ImportDeclaration : ONEOF("import" + ImportClause + FromClause + ZEROORONE(
   attr.action.%3 :    SetSinglePairs(%6, %2)
   attr.action.%4,%5 : SetPairs(%3)
   attr.action.%4,%5 : SetFromModule(%4)
+  attr.action.%4,%5 : SetIsXXportType()
 
 ## ImportClause :
 ## ImportedDefaultBinding
@@ -1538,6 +1539,7 @@ rule ExportDeclaration : ONEOF(ZEROORMORE(Annotation) + "export" + '*' + FromCla
   attr.action.%1,%2 :       SetFromModule(%4)
   attr.action.%9          : SetSinglePairs(%4)
   attr.action.%10,%11     : SetPairs(%4)
+  attr.action.%10,%11     : SetIsXXportType()
   attr.action.%10         : SetFromModule(%5)
 
 rule AsNamespace : "as" + "namespace" + JSIdentifier

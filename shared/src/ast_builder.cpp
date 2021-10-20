@@ -449,6 +449,21 @@ TreeNode* ASTBuilder::BuildExport() {
   return mLastTreeNode;
 }
 
+// It set mLastTreeNode to a type import/export.
+TreeNode* ASTBuilder::SetIsXXportType() {
+  if (mLastTreeNode->IsImport()) {
+    ImportNode *inode = (ImportNode*)mLastTreeNode;
+    inode->SetImportType();
+  } else if (mLastTreeNode->IsExport()) {
+    ExportNode *enode = (ExportNode*)mLastTreeNode;
+    enode->SetIsExportType();
+  } else {
+    MERROR("Unsupported action.");
+  }
+
+  return mLastTreeNode;
+}
+
 // It takes one argument, the pairs.
 // The pairs could be complicated in Javascript. We will let ImportNode or
 // ExportNode to handle by themselves.

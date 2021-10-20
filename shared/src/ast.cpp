@@ -289,6 +289,8 @@ void ExportNode::AddSinglePair(TreeNode *before, TreeNode *after) {
 void ExportNode::Dump(unsigned indent) {
   DumpIndentation(indent);
   DUMP0_NORETURN("export ");
+  if (mIsExportType)
+    DUMP0_NORETURN("type ");
 
   if (mPairs.GetNum() > 0) {
     DUMP0_NORETURN('{');

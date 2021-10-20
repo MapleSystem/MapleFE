@@ -15,4 +15,4 @@ class  Foo
   LocalInterfaces: 
 
 == Sub Tree ==
-export {Foo} 
+export type {Foo} 

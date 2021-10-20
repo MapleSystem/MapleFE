@@ -37,7 +37,7 @@ ACTION(BuildPackageName)
 ACTION(BuildSingleTypeImport)      // style like java single type import
 ACTION(BuildAllTypeImport)         // style like java ondemand type import
 ACTION(BuildSingleStaticImport)    // style like java single static import
-ACTION(BuildAllStaticImport)       // style like java ondemand static import
+ACTION(BuildAllStaticImport)       // style like java on-demand static import
 ACTION(BuildAllImport)             // style like c/c++ include all in .h file
 
 ACTION(BuildExternalDeclaration)           // c/c++ external decl, typescript declare.
@@ -46,6 +46,7 @@ ACTION(BuildGlobalExternalDeclaration)     // typescript global declare.
 // Special actions for JS import/export
 ACTION(BuildImport)
 ACTION(BuildExport)
+ACTION(SetIsXXportType)
 ACTION(SetPairs)
 ACTION(SetDefaultPairs)
 ACTION(SetSinglePairs)
