@@ -125,7 +125,7 @@ for ts in $LIST; do
       Passed="$Passed $ts"
       [ -n "$KEEP" ] || rm -f "$T"
     else
-      sed 's/^\([ei][xm]port \) *type  *{/\1{/' $ts > $ts.tmp.ts
+      cp $ts $ts.tmp.ts
       clang-format-10 -i --style="{ColumnLimit: 120, JavaScriptWrapImports: false, AlignOperands: false, JavaScriptQuotes: Double}" $ts.tmp.ts
       sed -i 's/?? =/??=/g' $ts.tmp.ts
       $TS2AST $ts.tmp.ts

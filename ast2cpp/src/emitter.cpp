@@ -515,7 +515,7 @@ std::string Emitter::EmitExportNode(ExportNode *node) {
   str = Clean(str);
   if (str.empty())
     str = "{}"s;
-  str = deco + "export "s + str;
+  str = deco + (node->IsExportType() ? "export type "s : "export "s) + str;
   mPrecedence = '\030';
   return HandleTreeNode(str, node);
 }
