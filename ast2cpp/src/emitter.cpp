@@ -524,6 +524,8 @@ std::string Emitter::EmitImportNode(ImportNode *node) {
   if (node == nullptr)
     return std::string();
   std::string str("import ");
+  if (node->IsImportType())
+    str += "type "s;
   /*
   switch (node->GetProperty()) {
     case ImpNone:
