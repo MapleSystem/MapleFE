@@ -56,7 +56,37 @@ class ImportExportModules : public AstVisitor {
 
     std::string Comment(TreeNode *node) {
       std::string s = mEmitter->EmitTreeNode(node);
-      return s.empty() ? s : "//--- "s + s + '\n';
+      return s.empty() ? s : "//--- "s + s.substr(0, s.find('\n')) + '\n';
+    }
+
+    std::string GetIdentifierName(TreeNode *node) {
+      switch (node->GetKind()) {
+        case NK_Identifier:
+            return std::string(static_cast<IdentifierNode *>(node)->GetName());
+        case NK_Decl:
+            return GetIdentifierName(static_cast<DeclNode *>(node)->GetVar());
+        case NK_Struct:
+            return GetIdentifierName(static_cast<StructNode *>(node)->GetStructId());
+        case NK_Function:
+            return GetIdentifierName(static_cast<FunctionNode *>(node)->GetFuncName());
+        case NK_Class:
+            return std::string(static_cast<ClassNode *>(node)->GetName());
+        case NK_Interface:
+            return std::string(static_cast<InterfaceNode *>(node)->GetName());
+        case NK_UserType:
+            return GetIdentifierName(static_cast<UserTypeNode *>(node)->GetId());
+        case NK_TypeAlias:
+            return GetIdentifierName(static_cast<TypeAliasNode *>(node)->GetId());
+        case NK_Declare:
+            { auto n = static_cast<DeclareNode *>(node);
+              auto num = n->GetDeclsNum();
+              if (num == 1)
+                return GetIdentifierName(n->GetDeclAtIndex(0));
+              return "Failed: one decl is expected"s;
+            }
+        default:
+            return "Failed to get the name of "s + AstDump::GetEnumNodeKind(node->GetKind());
+      }
     }
 
     ImportNode *VisitImportNode(ImportNode *node) {
@@ -136,18 +166,30 @@ class ImportExportModules : public AstVisitor {
             mXXports += Comment(node) + "namespace __export { using namespace "s + module + "::__export; }\n"s;
           } else {
             if (auto b = x->GetBefore()) {
-              std::string before = mEmitter->EmitTreeNode(b);
-              mCppDecl->AddExportedId(before);
-              if (auto a = x->GetAfter()) {
-                std::string after = mEmitter->EmitTreeNode(a);
-                if (before == "default") {
-                  mXXports += Comment(node) + "namespace __export { inline const decltype("s + module + "__default) &"s + after
-                    + " = "s + module + "__default; }\n"s;
-                  before = module + "__default";
-                }
-                if (after == "default")
-                  mExportDefault = Comment(node) + "#define "s + module + "__default "s + module + "::"s + before + '\n';
+              if (b->IsImport()) {
+                mXXports += Comment(node) + "TODO: export import ...\n"s;
+                continue;
               }
+              std::string target = GetIdentifierName(b);
+              bool emit = true;
+              if (auto a = x->GetAfter()) {
+                std::string after = GetIdentifierName(a);
+                if (target == "default") {
+                  target = module + "__default";
+                  if (after != "default")
+                    mXXports += Comment(node) + "namespace __export { inline const decltype("s + target + ") &"s
+                      + after + " = "s + target + "; }\n"s;
+                  emit = false;
+                }
+                if (after == "default") {
+                  mExportDefault = Comment(node) + "#define "s + mCppDecl->GetModuleName() + "__default "s
+                    + (emit ? module + "::"s : std::string()) + target + '\n';
+                  emit = false;
+                }
+                target = after;
+              }
+              if (emit)
+                mXXports += Comment(node) + "namespace __export { using "s + module + "::"s + target + "; }\n"s;
             }
           }
         }
@@ -201,29 +243,13 @@ class CollectDecls : public AstVisitor {
     DeclNode *VisitDeclNode(DeclNode *node) {
       std::string def = mCppDecl->EmitTreeNode(node);
       std::string var = mCppDecl->EmitTreeNode(node->GetVar());
-      if (mCppDecl->IsExportedId(var)) {
-        mDecls += "namespace __observable { extern "s + def.substr(0, def.find('=')) + ";}\n"s;
-        mCppDecl->AddDefinition("namespace __observable { "s + def + ";}\n"s);
-      } else {
-        mDecls += "extern "s + def.substr(0, def.find('=')) + ";\n"s;
-        mCppDecl->AddDefinition(def + ";\n"s);
-      }
+      mDecls += "extern "s + def.substr(0, def.find('=')) + ";\n"s;
+      mCppDecl->AddDefinition(def + ";\n"s);
       return node;
     }
 
     std::string GetDecls() { return mDecls; }
 };
-
-void CppDecl::AddExportedId(const std::string& id) {
-  mExportedIds.insert(id);
-}
-
-bool CppDecl::IsExportedId(const std::string& id) {
-  std::size_t loc = id.rfind(' ');
-  std::string key = loc == std::string::npos ? id : id.substr(loc + 1);
-  auto res = mExportedIds.find(key);
-  return res != mExportedIds.end();
-}
 
 void CppDecl::AddImportedModule(const std::string& module) {
   mImportedModules.insert(module);
@@ -277,24 +303,13 @@ namespace )""" + module + R"""( {
     if (node->GetParent() && !node->GetParent()->IsClass()) {
       std::string func = EmitTreeNode(node);
       std::string id = EmitTreeNode(static_cast<FunctionNode *>(node)->GetFuncName());
-      if (IsExportedId(id)) {
-        AddDefinition("namespace __observable { "s + func + "}\n"s);
-        str += "namespace __observable { extern "s + func + "}\n"s;
-      } else {
-        AddDefinition(func);
-        str += "extern "s + func;
-      }
+      AddDefinition(func);
+      str += "extern "s + func;
     }
   }
 
   // Generate code for all imports/exports
-  str += xxportModules.GetXXports();
-
-  str += R"""(
-  namespace __observable {}
-  namespace __export { using namespace __observable; }
-  using namespace __observable;
-)""";
+  str += xxportModules.GetXXports() + "\nnamespace __export {}\n"s;
 
   // export default
   str += xxportModules.GetExportDefault();

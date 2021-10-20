@@ -91,10 +91,7 @@ std::string CppDef::EmitModuleNode(ModuleNode *node) {
     TreeNode *node = func->GetFuncNode();
     std::string s = EmitTreeNode(node) + GetEnding(node);
     std::string id = EmitTreeNode(static_cast<FunctionNode *>(node)->GetFuncName());
-    if (mCppDecl.IsExportedId(id))
-      str += "namespace __observable {\n"s + s + "}\n"s;
-    else
-      str += s;
+    str += s;
   }
 
   // definition of init function of current module
