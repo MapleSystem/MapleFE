@@ -23,6 +23,7 @@
 #include "ast_ti.h"
 #include "ast_cfa.h"
 #include "ast_dfa.h"
+#include "ast_util.h"
 #include "typetable.h"
 
 namespace maplefe {
@@ -41,6 +42,7 @@ Module_Handler::~Module_Handler() {
   delete mTI;
   delete mCFA;
   delete mDFA;
+  delete mUtil;
 }
 
 MemPool *Module_Handler::GetMemPool() {
@@ -67,6 +69,9 @@ bool AST_Handler::AddModule(ModuleNode *m) {
 }
 
 void Module_Handler::CollectInfo() {
+  if (!mUtil) {
+    mUtil = new(GetMemPool()->Alloc(sizeof(AST_Util))) AST_Util(this);
+  }
   if (!mINFO) {
     mINFO = new(GetMemPool()->Alloc(sizeof(AST_INFO))) AST_INFO(this, mFlags);
   }
@@ -167,6 +172,18 @@ TreeNode *Module_Handler::FindFunc(TreeNode *node) {
     scope = scope->GetParent();
   }
   return NULL;
+}
+
+void Module_Handler::AddDirectField(TreeNode *node) {
+  mDirectFieldSet.insert(node->GetNodeId());
+}
+
+bool Module_Handler::IsDirectField(TreeNode *node) {
+  return mDirectFieldSet.find(node->GetNodeId()) != mDirectFieldSet.end();
+}
+
+bool Module_Handler::IsCppField(TreeNode *node) {
+  return mUtil->IsCppField(node);
 }
 
 void Module_Handler::Dump(char *msg) {

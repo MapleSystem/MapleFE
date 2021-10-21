@@ -55,6 +55,7 @@ class AST_ADJ;
 class AST_CFA;
 class AST_DFA;
 class AST_SCP;
+class AST_Util;
 class AST_Handler;
 class TypeInfer;
 class TypeTable;
@@ -71,6 +72,7 @@ class Module_Handler {
   TypeInfer    *mTI;
   AST_CFA      *mCFA;
   AST_DFA      *mDFA;
+  AST_Util     *mUtil;
   const char   *mOutputFilename;
   unsigned      mFlags;
   std::unordered_map<unsigned, CfgBB *> mNodeId2BbMap;
@@ -98,6 +100,7 @@ class Module_Handler {
     mTI(nullptr),
     mCFA(nullptr),
     mDFA(nullptr),
+    mUtil(nullptr),
     mFlags(f) {}
   ~Module_Handler();
 
@@ -149,10 +152,13 @@ class Module_Handler {
   TreeNode *FindType(IdentifierNode *node);
   TreeNode *FindFunc(TreeNode *node);
 
-  void AddDirectField(unsigned nid) { mDirectFieldSet.insert(nid); }
-  void AddDirectField(TreeNode *node) { mDirectFieldSet.insert(node->GetNodeId()); }
-  bool IsDirectField(unsigned nid) { return mDirectFieldSet.find(nid) != mDirectFieldSet.end(); }
-  bool IsDirectField(TreeNode *node) { return mDirectFieldSet.find(node->GetNodeId()) != mDirectFieldSet.end(); }
+  void AddDirectField(TreeNode *node);
+  bool IsDirectField(TreeNode *node);
+
+  // API to check a node is c++ field which satisfy both:
+  // 1. direct field
+  // 2. its name is valid in c++
+  bool IsCppField(TreeNode *node);
 
   void Dump(char *msg);
 };
