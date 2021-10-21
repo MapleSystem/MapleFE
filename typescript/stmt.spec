@@ -1445,16 +1445,17 @@ rule ImportDeclaration : ONEOF("import" + ImportClause + FromClause + ZEROORONE(
                                "import" + ModuleSpecifier + ZEROORONE(';'),
                                "import" + BindingIdentifier + '=' + "require" + '(' + AssignmentExpression + ')' + ZEROORONE(';'),
                                "import" + "type" + NamedImports + FromClause + ZEROORONE(';'),
-                               "import" + "type" + NameSpaceImport + FromClause + ZEROORONE(';'))
+                               "import" + "type" + NameSpaceImport + FromClause + ZEROORONE(';'),
+                               "import" + "type" + ImportedDefaultBinding + FromClause + ZEROORONE(';'))
   attr.property : Top
-  attr.action.%1,%2,%3,%4,%5 : BuildImport()
+  attr.action.%1,%2,%3,%4,%5,%6 : BuildImport()
   attr.action.%1 :    SetPairs(%2)
   attr.action.%1 :    SetFromModule(%3)
   attr.action.%2 :    SetFromModule(%2)
   attr.action.%3 :    SetSinglePairs(%6, %2)
-  attr.action.%4,%5 : SetPairs(%3)
-  attr.action.%4,%5 : SetFromModule(%4)
-  attr.action.%4,%5 : SetIsXXportType()
+  attr.action.%4,%5,%6 : SetPairs(%3)
+  attr.action.%4,%5,%6 : SetFromModule(%4)
+  attr.action.%4,%5,%6 : SetIsXXportType()
 
 ## ImportClause :
 ## ImportedDefaultBinding

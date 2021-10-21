@@ -1,0 +1,10 @@
+Matched 6 tokens.
+Matched 21 tokens.
+Matched 28 tokens.
+============= Module ===========
+== Sub Tree ==
+import { default as Klass} "./export-default-class"
+== Sub Tree ==
+js_var Decl: obj= {f1:123, f2:"abc"}
+== Sub Tree ==
+console.log(obj)
