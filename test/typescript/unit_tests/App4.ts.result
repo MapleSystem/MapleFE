@@ -1,0 +1,13 @@
+Matched 11 tokens.
+Matched 24 tokens.
+Matched 31 tokens.
+Matched 44 tokens.
+============= Module ===========
+== Sub Tree ==
+import { default as myX,MM as M} "./re-export4"
+== Sub Tree ==
+console.log(myX,M.getx())
+== Sub Tree ==
+M.setx(3)
+== Sub Tree ==
+console.log(myX,M.getx())
