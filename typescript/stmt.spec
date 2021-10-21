@@ -733,11 +733,11 @@ rule ConditionalExpression : ONEOF(
 
 rule AssignmentExpression : ONEOF(
   ConditionalExpression,
-#  [+Yield] YieldExpression[?In]
+  YieldExpression,
   ArrowFunction,
   LeftHandSideExpression + '=' + AssignmentExpression,
   LeftHandSideExpression + AssignmentOperator + AssignmentExpression)
-  attr.action.%3,%4 : BuildAssignment(%1, %2, %3)
+  attr.action.%4,%5 : BuildAssignment(%1, %2, %3)
 
 rule AssignmentOperator : ONEOF("*=", "/=", "%=", "+=", "-=", "<<=", ">>=", ">>>=", "&=", "^=", "|=", "??=")
 
@@ -1010,13 +1010,13 @@ rule EmptyStatement : ';'
 
 rule ExpressionStatement : ONEOF(
   ConditionalExpression + ';',
-#  [+Yield] YieldExpression[?In]
+  YieldExpression + ';',
   ArrowFunction + ';',
   LeftHandSideExpression + '=' + AssignmentExpression + ZEROORONE(';'),
   LeftHandSideExpression + AssignmentOperator + AssignmentExpression + ZEROORONE(';'),
   Expression + ',' + AssignmentExpression + ';',
   "undefined" + ';')
-  attr.action.%3,%4 : BuildAssignment(%1, %2, %3)
+  attr.action.%4,%5 : BuildAssignment(%1, %2, %3)
 
 ##-----------------------------------
 ##rule IfStatement[Yield, Return] :
@@ -1349,11 +1349,17 @@ rule ConciseBody : ONEOF(AssignmentExpression,
 ## See 14.4
 ## GeneratorBody :
 ## FunctionBody[Yield]
+
 ## See 14.4
 ## YieldExpression[In] :
 ## yield
 ## yield [no LineTerminator here] AssignmentExpression[?In, Yield]
 ## yield [no LineTerminator here] * AssignmentExpression[?In, Yield]
+
+rule YieldExpression : ONEOF("yield",
+                             "yield" + AssignmentExpression,
+                             "yield" + '*' + AssignmentExpression)
+
 ## See 14.5
 ## ClassDeclaration[Yield, Default] :
 ## class BindingIdentifier[?Yield] ClassTail[?Yield]
