@@ -95,6 +95,7 @@ public:
   virtual std::string EmitTryNode(TryNode *node);
   virtual std::string EmitExceptionNode(ExceptionNode *node);
   virtual std::string EmitReturnNode(ReturnNode *node);
+  virtual std::string EmitYieldNode(YieldNode *node);
   virtual std::string EmitCondBranchNode(CondBranchNode *node);
   virtual std::string EmitBreakNode(BreakNode *node);
   virtual std::string EmitContinueNode(ContinueNode *node);

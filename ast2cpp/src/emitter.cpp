@@ -289,7 +289,8 @@ std::string Emitter::EmitFunctionNode(FunctionNode *node) {
         func = false;
     }
   }
-  str = pre + (func ? "function "s : ""s) + str;
+
+  str = pre + (func ? (node->IsGenerator() ? "function* "s : "function "s) : ""s) + str;
 
   if (body) {
     auto s = EmitBlockNode(body);
@@ -1273,6 +1274,17 @@ std::string Emitter::EmitReturnNode(ReturnNode *node) {
   return HandleTreeNode(str, node);
 }
 
+std::string Emitter::EmitYieldNode(YieldNode *node) {
+  if (node == nullptr)
+    return std::string();
+  std::string str("yield ");
+  if (auto n = node->GetResult()) {
+    str += EmitTreeNode(n);
+  }
+  mPrecedence = '\024';
+  return str;
+}
+
 std::string Emitter::EmitCondBranchNode(CondBranchNode *node) {
   if (node == nullptr)
     return std::string();
@@ -2139,6 +2151,9 @@ std::string Emitter::EmitTreeNode(TreeNode *node) {
     break;
   case NK_Return:
     return EmitReturnNode(static_cast<ReturnNode *>(node));
+    break;
+  case NK_Yield:
+    return EmitYieldNode(static_cast<YieldNode *>(node));
     break;
   case NK_CondBranch:
     return EmitCondBranchNode(static_cast<CondBranchNode *>(node));
