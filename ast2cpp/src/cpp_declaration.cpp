@@ -955,18 +955,16 @@ std::string CppDecl::EmitTypeAliasNode(TypeAliasNode* node) {
       if (alias.back() == '*')
         alias.pop_back();
       str = "using "s + str + " = "s + alias + ";\n";
-    } else if (m->IsStruct()) {
+    } else { // if (m->IsStruct()) {
       // todo
+      str = "// type alias for "s + str + '\n';;
     }
   }
   return str;
 }
 
 std::string ident(int n) {
-  std::string str;
-  for (unsigned i = 0; i < n; ++i)
-    str += "  "s;
-  return str;
+  return std::string(n << 1, ' ');
 }
 
 } // namespace maplefe
