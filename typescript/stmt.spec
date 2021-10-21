@@ -1359,6 +1359,9 @@ rule ConciseBody : ONEOF(AssignmentExpression,
 rule YieldExpression : ONEOF("yield",
                              "yield" + AssignmentExpression,
                              "yield" + '*' + AssignmentExpression)
+  attr.action.%1: BuildYield()
+  attr.action.%2: BuildYield(%2)
+  attr.action.%3: BuildYield(%3)
 
 ## See 14.5
 ## ClassDeclaration[Yield, Default] :

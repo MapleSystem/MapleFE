@@ -1052,6 +1052,29 @@ TreeNode* ASTBuilder::BuildReturn() {
   return mLastTreeNode;
 }
 
+// Takes one argument, the result expression
+// Or takes 0 argument, and it's a simple return stmt.
+TreeNode* ASTBuilder::BuildYield() {
+  if (mTrace)
+    std::cout << "In BuildYield" << std::endl;
+
+  YieldNode *result = (YieldNode*)gTreePool.NewTreeNode(sizeof(YieldNode));
+  new (result) YieldNode();
+
+  if (mParams.size() == 1) {
+    Param p_result = mParams[0];
+    if (!p_result.mIsEmpty) {
+      if (!p_result.mIsTreeNode)
+        MERROR("The return value is not a tree node.");
+      TreeNode *result_value = p_result.mData.mTreeNode;
+      result->SetResult(result_value);
+    }
+  }
+
+  mLastTreeNode = result;
+  return mLastTreeNode;
+}
+
 // Takes one argument, the condition expression
 TreeNode* ASTBuilder::BuildCondBranch() {
   if (mTrace)
