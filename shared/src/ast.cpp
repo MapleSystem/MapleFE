@@ -1764,7 +1764,7 @@ void ClassNode::Dump(unsigned indent) {
 
 FunctionNode::FunctionNode() : TreeNode(NK_Function),
   mFuncName(NULL), mType(NULL), mBody(NULL), mDims(NULL),
-  mIsConstructor(false), mIsGetAccessor(false),
+  mIsConstructor(false), mIsGenerator(false), mIsGetAccessor(false),
   mIsSetAccessor(false), mIsCallSignature(false), mIsConstructSignature(false),
   mAssert(NULL) {}
 
@@ -1878,6 +1878,8 @@ void FunctionNode::Dump(unsigned indent) {
     DUMP0_NORETURN("get ");
   else if (mIsSetAccessor)
     DUMP0_NORETURN("set ");
+  else if (mIsGenerator)
+    DUMP0_NORETURN("generator ");
   else
     DUMP0_NORETURN("func  ");
 

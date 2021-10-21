@@ -1822,7 +1822,8 @@ private:
   bool mIsConstructor;
   bool mIsGetAccessor;
   bool mIsSetAccessor;
-  bool mIsCallSignature; // no func name, no func body
+  bool mIsGenerator;          // JS/TS generator
+  bool mIsCallSignature;      // no func name, no func body
   bool mIsConstructSignature; // no func name, no func body, and is a construct sig in TS
 
 public:
@@ -1842,8 +1843,10 @@ public:
   TreeNode* GetAssert() {return mAssert;}
   void SetAssert(TreeNode *b) {mAssert = b; SETPARENT(b);}
 
-  bool IsConstructor()    {return mIsConstructor;}
+  bool IsConstructor()                 {return mIsConstructor;}
   void SetIsConstructor(bool b = true) {mIsConstructor = b;}
+  bool IsGenerator()                 {return mIsGenerator;}
+  void SetIsGenerator(bool b = true) {mIsGenerator = b;}
   bool IsGetAccessor()               {return mIsGetAccessor;}
   void SetIsGetAccessor(bool b = true) {mIsGetAccessor = b;}
   bool IsSetAccessor()                 {return mIsSetAccessor;}
