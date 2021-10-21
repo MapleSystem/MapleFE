@@ -3341,6 +3341,15 @@ TreeNode* ASTBuilder::AddFunctionBodyTo() {
 
 // It take no arugment. It uses mLastTreeNode which is
 // a function node.
+TreeNode* ASTBuilder::SetIsGenerator() {
+  MASSERT(mLastTreeNode->IsFunction());
+  FunctionNode *node = (FunctionNode*)mLastTreeNode;
+  node->SetIsGenerator();
+  return mLastTreeNode;
+}
+
+// It take no arugment. It uses mLastTreeNode which is
+// a function node.
 TreeNode* ASTBuilder::SetGetAccessor() {
   MASSERT(mLastTreeNode->IsFunction());
   FunctionNode *node = (FunctionNode*)mLastTreeNode;

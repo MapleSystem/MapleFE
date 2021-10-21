@@ -816,8 +816,8 @@ rule Declaration : ONEOF(HoistableDeclaration,
 ##rule HoistableDeclaration[Yield, Default] :
 ##  FunctionDeclaration[?Yield,?Default]
 ##  GeneratorDeclaration[?Yield, ?Default]
-rule HoistableDeclaration : ONEOF(FunctionDeclaration)
-##  GeneratorDeclaration[?Yield, ?Default]
+rule HoistableDeclaration : ONEOF(FunctionDeclaration,
+                                  GeneratorDeclaration)
 
 ##-----------------------------------
 ##rule BreakableStatement[Yield, Return] :
@@ -1339,13 +1339,23 @@ rule ConciseBody : ONEOF(AssignmentExpression,
 ## See 14.4
 ## GeneratorMethod[Yield] :
 ## * PropertyName[?Yield] ( StrictFormalParameters[Yield] ) { GeneratorBody }
+
 ## See 14.4
 ## GeneratorDeclaration[Yield, Default] :
 ## function * BindingIdentifier[?Yield] ( FormalParameters[Yield] ) { GeneratorBody }
 ## [+Default] function * ( FormalParameters[Yield] ) { GeneratorBody }
+rule GeneratorDeclaration :
+ "function" + '*' + BindingIdentifier + '(' + ZEROORONE(ParameterList) + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}'
+  attr.action : BuildFunction(%3)
+  attr.action : AddParams(%5)
+  attr.action : AddType(%7)
+  attr.action : AddFunctionBody(%9)
+  attr.action : SetIsGenerator()
+
 ## See 14.4
 ## GeneratorExpression :
 ## function * BindingIdentifier[Yield]opt ( FormalParameters[Yield] ) { GeneratorBody }
+
 ## See 14.4
 ## GeneratorBody :
 ## FunctionBody[Yield]

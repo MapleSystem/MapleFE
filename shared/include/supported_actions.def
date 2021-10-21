@@ -129,6 +129,7 @@ ACTION(SetGetAccessor)   // TS 'get' accessor
 ACTION(SetSetAccessor)   // TS 'set' accessor
 ACTION(SetCallSignature) // TS call signature
 ACTION(SetConstructSignature) // TS construct signature
+ACTION(SetIsGenerator)   // JS generator
 ACTION(AddAssert)
 
 // For callsite
