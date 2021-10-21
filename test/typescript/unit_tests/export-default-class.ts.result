@@ -1,9 +1,9 @@
-Matched 13 tokens.
+Matched 17 tokens.
 ============= Module ===========
 == Sub Tree ==
 export { default as class  
   Fields: 
-    f1    f2
+    f1=0    f2=""
   Instance Initializer: 
   Constructors: 
   Methods: 
