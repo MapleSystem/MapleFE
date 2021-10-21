@@ -80,6 +80,7 @@ class AST_INFO {
   TreeNode *GetAnonymousStruct(TreeNode *node);
 
   bool IsInterface(TreeNode *node);
+  bool IsTypeIdCompatibleTo(TypeId field, TypeId target);
   bool IsTypeCompatible(TreeNode *node1, TreeNode *node2);
   bool IsFieldCompatibleTo(TreeNode *from, TreeNode *to);
 
@@ -98,6 +99,26 @@ class AST_INFO {
   void AddImport(ImportNode *node) { mImports.insert(node); }
   void AddExport(ExportNode *node) { mExports.insert(node); }
 
+};
+
+class FillNodeInfoVisitor : public AstVisitor {
+ private:
+  Module_Handler *mHandler;
+  AST_INFO       *mInfo;
+  unsigned       mFlags;
+  bool           mUpdated;
+
+ public:
+  explicit FillNodeInfoVisitor(Module_Handler *h, unsigned f, bool base = false)
+    : mHandler(h), mFlags(f), mUpdated(false), AstVisitor((f & FLG_trace_1) && base) {
+      mInfo= mHandler->GetINFO();
+    }
+  ~FillNodeInfoVisitor() = default;
+
+  LiteralNode *VisitLiteralNode(LiteralNode *node);
+  PrimTypeNode *VisitPrimTypeNode(PrimTypeNode *node);
+  UserTypeNode *VisitUserTypeNode(UserTypeNode *node);
+  IdentifierNode *VisitIdentifierNode(IdentifierNode *node);
 };
 
 class ImportExportVisitor : public AstVisitor {

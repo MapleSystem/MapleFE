@@ -37,6 +37,10 @@ void AST_INFO::CollectInfo() {
   MSGNOLOC0("============== Type Parameter ==============");
   mStrIdxVisitor = new FindStrIdxVisitor(mHandler, mFlags, true);
 
+  MSGNOLOC0("============== Fill node info ==============");
+  FillNodeInfoVisitor visitor_node(mHandler, mFlags, true);
+  visitor_node.Visit(module);
+
   // collect import/export info
   ImportExportVisitor xxport_visitor(mHandler, mFlags, true);
 
@@ -61,63 +65,7 @@ void AST_INFO::CollectInfo() {
 }
 
 TypeId AST_INFO::GetTypeId(TreeNode *node) {
-  TypeId tid = TY_None;
-  switch (node->GetKind()) {
-    case NK_Literal: {
-      LiteralNode *lit = static_cast<LiteralNode *>(node);
-      LitData data = lit->GetData();
-      LitId id = data.mType;
-      switch (id) {
-        case LT_IntegerLiteral:
-        case LT_FPLiteral:
-        case LT_DoubleLiteral:
-          tid = TY_Number;
-          break;
-        case LT_BooleanLiteral:
-          tid = TY_Boolean;
-          break;
-        case LT_CharacterLiteral:
-        case LT_StringLiteral:
-          tid = TY_String;
-          break;
-        case LT_NullLiteral:
-          tid = TY_Null;
-          break;
-        case LT_ThisLiteral:
-        case LT_SuperLiteral:
-          tid = TY_Symbol;
-          break;
-        case LT_VoidLiteral:
-          tid = TY_Void;
-          break;
-        default:
-          break;
-      }
-      break;
-    }
-    case NK_PrimType: {
-      PrimTypeNode *ptn = static_cast<PrimTypeNode *>(node);
-      tid = ptn->GetPrimType();
-      break;
-    }
-    case NK_UserType: {
-      UserTypeNode *utn = static_cast<UserTypeNode *>(node);
-      TreeNode *id = utn->GetId();
-      if (!id->IsTypeIdNone()) {
-        tid = id->GetTypeId();
-        break;
-      }
-      unsigned idx = gStringPool.GetStrIdx("String");
-      if (id->GetStrIdx() == idx) {
-        tid = TY_String;
-        id->SetStrIdx(idx);
-      }
-      break;
-    }
-    default:
-      break;
-  }
-  return tid;
+  return node->GetTypeId();
 }
 
 unsigned AST_INFO::GetFieldsSize(TreeNode *node, bool native) {
@@ -318,6 +266,17 @@ bool AST_INFO::IsTypeCompatible(TreeNode *node1, TreeNode *node2) {
   return result;
 }
 
+bool AST_INFO::IsTypeIdCompatibleTo(TypeId field, TypeId target) {
+  if (target == TY_None) {
+    return true;
+  }  else if (target == TY_Number) {
+    return field == TY_Int || field == TY_Long || field == TY_Float || field == TY_Double;
+  } else {
+    return field == target;
+  }
+  return false;
+}
+
 // check if "field" is compatible to "target"
 bool AST_INFO::IsFieldCompatibleTo(TreeNode *field, TreeNode *target) {
   if (!target->IsIdentifier()) {
@@ -357,7 +316,7 @@ bool AST_INFO::IsFieldCompatibleTo(TreeNode *field, TreeNode *target) {
     LiteralNode *ln = static_cast<LiteralNode *>(lit);
     TypeId tid_field = GetTypeId(ln);
     TypeId tid_target = GetTypeId(id_target->GetType());
-    result = (tid_field == tid_target);
+    result = IsTypeIdCompatibleTo(tid_field, tid_target);
   }
 
   return result;
@@ -617,6 +576,78 @@ void AST_INFO::SortFields(T1 *node) {
       *(mStructId2FieldsMap[nid].RefAtIndex(i)) = vec[i].second;
     }
   }
+}
+
+IdentifierNode *FillNodeInfoVisitor::VisitIdentifierNode(IdentifierNode *node) {
+  (void) AstVisitor::VisitIdentifierNode(node);
+  TreeNode *type = node->GetType();
+  if (type && type->IsPrimType()) {
+    PrimTypeNode *ptn = static_cast<PrimTypeNode *>(type);
+    node->SetTypeId(ptn->GetTypeId());
+    node->SetTypeIdx(ptn->GetTypeId());
+  }
+  return node;
+}
+
+LiteralNode *FillNodeInfoVisitor::VisitLiteralNode(LiteralNode *node) {
+  (void) AstVisitor::VisitLiteralNode(node);
+  LitData data = node->GetData();
+  LitId id = data.mType;
+  switch (id) {
+    case LT_IntegerLiteral:
+      node->SetTypeId(TY_Int);
+      node->SetTypeIdx(TY_Int);
+      break;
+    case LT_FPLiteral:
+      node->SetTypeId(TY_Float);
+      node->SetTypeIdx(TY_Float);
+      break;
+    case LT_DoubleLiteral:
+      node->SetTypeId(TY_Double);
+      node->SetTypeIdx(TY_Double);
+      break;
+    case LT_BooleanLiteral:
+      node->SetTypeId(TY_Boolean);
+      node->SetTypeIdx(TY_Boolean);
+      break;
+    case LT_CharacterLiteral:
+      node->SetTypeId(TY_Char);
+      node->SetTypeIdx(TY_Char);
+      break;
+    case LT_StringLiteral:
+      node->SetTypeId(TY_String);
+      node->SetTypeIdx(TY_String);
+      node->SetStrIdx(data.mData.mStrIdx);
+      break;
+    case LT_NullLiteral:
+      node->SetTypeId(TY_Null);
+      break;
+    case LT_ThisLiteral:
+    case LT_SuperLiteral:
+      node->SetTypeId(TY_Symbol);
+      break;
+    case LT_VoidLiteral:
+      node->SetTypeId(TY_Void);
+      break;
+    default:
+      break;
+  }
+  return node;
+}
+
+PrimTypeNode *FillNodeInfoVisitor::VisitPrimTypeNode(PrimTypeNode *node) {
+  (void) AstVisitor::VisitPrimTypeNode(node);
+  // node->SetTypeId(node->GetPrimType());
+  return node;
+}
+
+UserTypeNode *FillNodeInfoVisitor::VisitUserTypeNode(UserTypeNode *node) {
+  (void) AstVisitor::VisitUserTypeNode(node);
+  TreeNode *id = node->GetId();
+  if (id && !id->IsTypeIdNone()) {
+    node->SetTypeId(id->GetTypeId());
+  }
+  return node;
 }
 
 ImportNode *ImportExportVisitor::VisitImportNode(ImportNode *node) {

@@ -313,6 +313,7 @@ PrimTypeNode *TypeInferVisitor::GetOrClonePrimTypeNode(PrimTypeNode *pt, TypeId 
       new_pt->SetPrimType(pt->GetPrimType());
     }
     SetTypeId(new_pt, tid);
+    SetTypeIdx(new_pt, tid);
     SetUpdated();
   }
   return new_pt;
