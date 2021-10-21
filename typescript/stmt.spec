@@ -1777,8 +1777,10 @@ rule TupleElementType: ZEROORONE(JSIdentifier + ':') + Type
   attr.action : BuildNameTypePair(%1, %2)
 
 ## rule UnionType: UnionOrIntersectionOrPrimaryType | IntersectionOrPrimaryType
-rule UnionType: ZEROORONE('|') + UnionOrIntersectionOrPrimaryType + '|' + IntersectionOrPrimaryType
-  attr.action : BuildUnionUserType(%2, %4)
+rule UnionType : ONEOF(ZEROORONE('|') + UnionOrIntersectionOrPrimaryType + '|' + IntersectionOrPrimaryType,
+                       UnionOrIntersectionOrPrimaryType + '|' + KeyOf)
+  attr.action.%1 : BuildUnionUserType(%2, %4)
+  attr.action.%2 : BuildUnionUserType(%1, %3)
 
 ## rule IntersectionType: IntersectionOrPrimaryType & PrimaryType
 rule IntersectionType: ONEOF(IntersectionOrPrimaryType + '&' + PrimaryType,
