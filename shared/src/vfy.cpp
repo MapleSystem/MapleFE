@@ -320,6 +320,9 @@ void Verifier::VerifyException(ExceptionNode *tree){
 void Verifier::VerifyReturn(ReturnNode *tree){
 }
 
+void Verifier::VerifyYield(YieldNode *tree){
+}
+
 void Verifier::VerifyCondBranch(CondBranchNode *tree){
 }
 

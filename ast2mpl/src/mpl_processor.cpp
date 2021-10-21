@@ -990,6 +990,10 @@ maple::BaseNode *A2M::ProcessReturn(StmtExprKind skind, TreeNode *tnode, BlockNo
   return stmt;
 }
 
+maple::BaseNode *A2M::ProcessYield(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
+  return nullptr;
+}
+
 maple::BaseNode *A2M::ProcessCondBranch(StmtExprKind skind, TreeNode *tnode, BlockNode *block) {
   CondBranchNode *node = static_cast<CondBranchNode *>(tnode);
   maple::BaseNode *cond = ProcessNode(SK_Expr, node->GetCond(), block);

@@ -1255,6 +1255,14 @@ void ReturnNode::Dump(unsigned ind) {
     GetResult()->Dump(0);
 }
 
+void YieldNode::Dump(unsigned ind) {
+  DumpLabel(ind);
+  DumpIndentation(ind);
+  DUMP0_NORETURN("yield ");
+  if (GetResult())
+    GetResult()->Dump(0);
+}
+
 CondBranchNode::CondBranchNode() : TreeNode(NK_CondBranch),
   mCond(NULL), mTrueBranch(NULL), mFalseBranch(NULL) {}
 

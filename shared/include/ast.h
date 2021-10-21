@@ -1465,6 +1465,18 @@ public:
   void Dump(unsigned);
 };
 
+class YieldNode : public TreeNode {
+private:
+  TreeNode *mResult;
+public:
+  YieldNode() : TreeNode(NK_Yield), mResult(nullptr) {}
+  ~YieldNode(){}
+
+  void SetResult(TreeNode *t) {mResult = t; SETPARENT(t);}
+  TreeNode* GetResult() { return mResult; }
+  void Dump(unsigned);
+};
+
 class CondBranchNode : public TreeNode {
 private:
   TreeNode *mCond;
