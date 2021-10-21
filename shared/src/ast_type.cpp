@@ -38,6 +38,7 @@ void UserTypeNode::AddUnionInterType(TreeNode *args) {
       args->IsTupleType() ||
       args->IsArrayElement() ||
       args->IsConditionalType() ||
+      args->IsNew() ||
       args->IsStruct()) {
     mUnionInterTypes.PushBack(args);
     SETPARENT(args);

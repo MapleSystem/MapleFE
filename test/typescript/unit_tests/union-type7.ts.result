@@ -1,0 +1,4 @@
+Matched 13 tokens.
+============= Module ===========
+== Sub Tree ==
+ type AType = union  = new () ->  | Error
