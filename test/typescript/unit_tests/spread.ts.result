@@ -1,0 +1,21 @@
+Matched 15 tokens.
+Matched 25 tokens.
+Matched 32 tokens.
+Matched 49 tokens.
+Matched 63 tokens.
+Matched 70 tokens.
+============= Module ===========
+== Sub Tree ==
+js_const Decl: arr=[1,2,3]
+== Sub Tree ==
+js_var Decl: arr2=[0,...arr]
+== Sub Tree ==
+console.log(arr2)
+== Sub Tree ==
+func  func()  throws: 
+  return  {f1:123, f2:"abc"}
+
+== Sub Tree ==
+js_var Decl: obj2= {f0:"OK", :func()}
+== Sub Tree ==
+console.log(obj2)
