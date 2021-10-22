@@ -1,0 +1,10 @@
+Matched 7 tokens.
+Matched 14 tokens.
+Matched 23 tokens.
+============= Module ===========
+== Sub Tree ==
+js_const Decl: x=0.2
+== Sub Tree ==
+js_const Decl: y=-0.2
+== Sub Tree ==
+console.log(x,y)

@@ -334,8 +334,30 @@ Token* Lexer::LexTokenNoNewLine(void) {
     return t;
   }
 
+  // There is a corner case: .2
+  // The dot is lexed as separator, and 2 is an integer. But actually it's a decimal.
+  unsigned old_curidx = curidx;
   SepId sep = GetSeparator();
+  unsigned new_curidx = curidx;
+
   if (sep != SEP_NA) {
+    if (sep == SEP_Dot) {
+      // restore curidx
+      curidx = old_curidx;
+      // try decimal literal
+      LitData ld = GetLiteral();
+      if (ld.mType != LT_NA) {
+        MASSERT(ld.mType == LT_FPLiteral || ld.mType == LT_DoubleLiteral);
+        Token *t = (Token*)mTokenPool.NewToken(sizeof(Token));
+        t->SetLiteral(ld);
+        if (mTrace)
+          t->Dump();
+        return t;
+      } else {
+        curidx = new_curidx;
+      }
+    }
+
     Token *t = FindSeparatorToken(sep);
     if (mTrace)
       t->Dump();
