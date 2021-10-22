@@ -68,6 +68,7 @@ void UserTypeNode::AddTypeGeneric(TreeNode *args) {
       args->IsLambda() ||
       args->IsKeyOf() ||
       args->IsField() ||
+      args->IsConditionalType() ||
       args->IsInfer()) {
     mTypeGenerics.PushBack(args);
     SETPARENT(args);
