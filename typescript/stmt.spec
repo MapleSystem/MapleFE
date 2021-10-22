@@ -1681,7 +1681,7 @@ rule Type : ONEOF(UnionOrIntersectionOrPrimaryType,
                   PrimaryType + '[' + TypeQuery + ']',
                   TemplateLiteral,
                   ImportedType,
-                  ImportedType + '.' + JSIdentifier)
+                  ImportedType + '.' + TypeReference)
   attr.action.%7,%8,%11 : BuildArrayElement(%1, %3)
   attr.action.%14 : BuildField(%1, %3)
 

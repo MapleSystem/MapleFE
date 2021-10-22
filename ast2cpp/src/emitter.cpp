@@ -850,7 +850,7 @@ std::string Emitter::EmitFieldNode(FieldNode *node) {
       str = '(' + str + ')';
   }
   if (auto n = node->GetField()) {
-    str += '.' + EmitIdentifierNode(n);
+    str += '.' + EmitTreeNode(n);
   }
   mPrecedence = precd;
   return HandleTreeNode(str, node);

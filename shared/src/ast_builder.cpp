@@ -2129,11 +2129,12 @@ TreeNode* ASTBuilder::BuildField() {
       upper = field;
     }
   } else {
-    MASSERT(node_b->IsIdentifier());
+    MASSERT(node_b->IsIdentifier() ||
+            node_b->IsUserType());
     field = (FieldNode*)gTreePool.NewTreeNode(sizeof(FieldNode));
     new (field) FieldNode();
     field->SetUpper(node_a);
-    field->SetField((IdentifierNode*)node_b);
+    field->SetField(node_b);
   }
 
   mLastTreeNode = field;

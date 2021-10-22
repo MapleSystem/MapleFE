@@ -653,7 +653,7 @@ std::string CppDef::EmitFieldNode(FieldNode *node) {
   if (auto n = node->GetUpper())
     upper = EmitTreeNode(n);
   if (auto n = node->GetField())
-    field = EmitIdentifierNode(n);
+    field = EmitTreeNode(n);
   if (upper.empty() || field.empty()) // Error if either is empty
     return "%%%Empty%%%";
   if (field == "length") // for length property

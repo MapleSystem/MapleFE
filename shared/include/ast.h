@@ -897,14 +897,14 @@ public:
 
 class FieldNode : public TreeNode {
 private:
-  TreeNode       *mUpper; // The upper enclosing structure
-  IdentifierNode *mField;
+  TreeNode *mUpper; // The upper enclosing structure
+  TreeNode *mField;
 public:
   FieldNode() : TreeNode(NK_Field), mField(nullptr), mUpper(nullptr) {}
   ~FieldNode(){}
 
-  IdentifierNode* GetField() {return mField;}
-  void SetField(IdentifierNode *f) {mField = f; SETPARENT(f);}
+  TreeNode* GetField() {return mField;}
+  void SetField(TreeNode *f) {mField = f; SETPARENT(f);}
 
   TreeNode *GetUpper()       {return mUpper;}
   void SetUpper(TreeNode *n) {
