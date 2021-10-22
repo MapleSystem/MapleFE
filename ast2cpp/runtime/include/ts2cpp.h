@@ -147,14 +147,23 @@ struct JS_Val {
     return *this;
   }
 
-  // converts int to double
+  // convert int to numeric type in target JS_Val
   JS_Val& operator=(int val)  {
     if (IsCxxProp()) {
-      type = TY_CXX_Double;
-      *(double *)x.field = (double)val;
+      if (type == TY_CXX_Long)
+        *(long*)x.field = (long)val;
+      else if (type == TY_CXX_Double)
+        *(double *)x.field = (double)val;
     } else {
-      type = TY_Double;
-      x.val_double = (double)val;
+      if (type == TY_Long)
+        x.val_long = (long)val;
+      else if (type == TY_Double)
+        x.val_double = (double)val;
+      else if (type == TY_Undef) {
+        // if target JS_Val is undef, convert to long
+        type = TY_Long;
+        x.val_long = (long)val;
+      }
     }
     return *this;
   }
