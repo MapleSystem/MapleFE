@@ -1850,11 +1850,11 @@ rule CallSignature: ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  
 ## rule ParameterList: RequiredParameterList OptionalParameterList RestParameter RequiredParameterList , OptionalParameterList RequiredParameterList , RestParameter OptionalParameterList , RestParameter RequiredParameterList , OptionalParameterList , RestParameter
 rule ParameterList: ONEOF(RequiredParameterList + ZEROORONE(Elision),
                           OptionalParameterList + ZEROORONE(Elision),
-                          RestParameter,
+                          RestParameter + ZEROORONE(Elision),
                           RequiredParameterList + ',' + OptionalParameterList + ZEROORONE(Elision),
-                          RequiredParameterList + ',' + RestParameter,
-                          OptionalParameterList + ',' + RestParameter,
-                          RequiredParameterList + ',' + OptionalParameterList + ',' + RestParameter)
+                          RequiredParameterList + ',' + RestParameter + ZEROORONE(Elision),
+                          OptionalParameterList + ',' + RestParameter + ZEROORONE(Elision),
+                          RequiredParameterList + ',' + OptionalParameterList + ',' + RestParameter + ZEROORONE(Elision))
 
 ## rule RequiredParameterList: RequiredParameter RequiredParameterList , RequiredParameter
 rule RequiredParameterList: ONEOF(RequiredParameter,

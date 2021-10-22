@@ -1,0 +1,5 @@
+Matched 45 tokens.
+============= Module ===========
+== Sub Tree ==
+declare func  func<T,U>(s1,s2,...ss)  throws: 
+
