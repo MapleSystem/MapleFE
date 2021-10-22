@@ -1549,14 +1549,15 @@ rule ExportDeclaration : ONEOF(ZEROORMORE(Annotation) + "export" + '*' + FromCla
                                ZEROORMORE(Annotation) + "export" + "type" + ExportClause + FromClause + ZEROORONE(';'),
                                ZEROORMORE(Annotation) + "export" + "type" + ExportClause + ZEROORONE(';'),
                                ZEROORMORE(Annotation) + "export" + AsNamespace + ZEROORONE(';'),
-                               ZEROORMORE(Annotation) + "export" + ExternalModuleDeclaration + ZEROORONE(';'))
+                               ZEROORMORE(Annotation) + "export" + ExternalModuleDeclaration + ZEROORONE(';'),
+                               ZEROORMORE(Annotation) + "export" + NameSpaceExport + FromClause + ZEROORONE(';'))
   attr.property : Top
-  attr.action.%1,%2,%3,%4,%5,%6,%7,%8,%9,%10,%11,%12,%13 : BuildExport()
-  attr.action.%1,%2,%3,%4,%5,%6,%7,%8,%9,%10,%11,%12,%13 : AddModifier(%1)
+  attr.action.%1,%2,%3,%4,%5,%6,%7,%8,%9,%10,%11,%12,%13,%14 : BuildExport()
+  attr.action.%1,%2,%3,%4,%5,%6,%7,%8,%9,%10,%11,%12,%13,%14 : AddModifier(%1)
   attr.action.%1       :    SetIsEverything()
-  attr.action.%2,%3,%4,%5,%12,%13 : SetPairs(%3)
+  attr.action.%2,%3,%4,%5,%12,%13,%14 : SetPairs(%3)
   attr.action.%6,%7,%8 :    SetDefaultPairs(%4)
-  attr.action.%1,%2 :       SetFromModule(%4)
+  attr.action.%1,%2,%14 :   SetFromModule(%4)
   attr.action.%9          : SetSinglePairs(%4)
   attr.action.%10,%11     : SetPairs(%4)
   attr.action.%10,%11     : SetIsXXportType()
@@ -1565,6 +1566,9 @@ rule ExportDeclaration : ONEOF(ZEROORMORE(Annotation) + "export" + '*' + FromCla
 rule AsNamespace : "as" + "namespace" + JSIdentifier
   attr.action : BuildXXportAsPair(%3)
   attr.action : SetAsNamespace()
+
+rule NameSpaceExport : '*' + "as" + JSIdentifier
+  attr.action : BuildXXportAsPairEverything(%3)
 
 ## See 15.2.3
 ## ExportClause :
