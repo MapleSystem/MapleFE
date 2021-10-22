@@ -17,6 +17,7 @@
 #include "gen_astvisitor.h"
 #include <algorithm>
 #include <cstring>
+#include "helper.h"
 
 namespace maplefe {
 
@@ -761,6 +762,7 @@ std::string CppDecl::EmitNewNode(NewNode *node) {
 
 std::string CppDecl::EmitInterface(StructNode *node) {
   std::string str, ifName;
+  std::string def;
 
   if (node == nullptr)
     return std::string();
@@ -781,12 +783,21 @@ std::string CppDecl::EmitInterface(StructNode *node) {
   for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
     if (auto n = node->GetField(i)) {
       str += "    "s + EmitTreeNode(n) + ";\n"s;
+      if (n->IsIdentifier()) {
+        def += indent(1) + hlpClassFldAddProp("this", ifName, n->GetName(),
+          GetTypeString(n, static_cast<IdentifierNode*>(n)->GetType()),
+          TypeIdToJSTypeCXX[hlpGetTypeId(n)]) + ";\n"s;
+      }
     }
   }
   str += "    "s  + ifName + "() {};\n"s;
   str += "    ~"s + ifName + "() {};\n"s;
-  str += "    "s  + ifName + "(t2crt::Function* ctor, t2crt::Object* proto, std::vector<t2crt::ObjectProp> props): "s + superClass + "(ctor, proto, props) {}\n"s;
+  str += "    "s + ifName + "(t2crt::Function* ctor, t2crt::Object* proto);\n"s;
+  str += "    "s + ifName + "(t2crt::Function* ctor, t2crt::Object* proto, std::vector<t2crt::ObjectProp> props): "s + superClass + "(ctor, proto, props) {}\n"s;
   str += "};\n"s;
+
+  def = ifName + "::"s + ifName + "(t2crt::Function* ctor, t2crt::Object* proto): "s + superClass + "(ctor, proto) {\n" + def + "}\n";
+  AddDefinition(def);
   return str;
 }
 
@@ -961,10 +972,6 @@ std::string CppDecl::EmitTypeAliasNode(TypeAliasNode* node) {
     }
   }
   return str;
-}
-
-std::string ident(int n) {
-  return std::string(n << 1, ' ');
 }
 
 } // namespace maplefe

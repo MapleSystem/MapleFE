@@ -64,6 +64,7 @@ typedef enum JS_Type : uint8_t {
   TY_CXX_Function,
   TY_CXX_Object,
   TY_CXX_Array,
+  TY_CXX_Any,   //indicate JS_Val::x.field pointing to a JS_Val
   TY_CXX_LAST,
 } JS_Type;
 
@@ -116,6 +117,71 @@ struct JS_Val {
   OPERATORS(+)
   OPERATORS(-)
   OPERATORS(*)
+
+  // Handle assigning value to a JS_Val obj
+#define ASSIGN_OPR(ctype, jstype, jscxxtype) \
+    JS_Val& operator=(ctype val)  { \
+      if (IsCxxProp()) {            \
+        type = jscxxtype;           \
+        *(ctype *)x.field = val;    \
+      } else {                      \
+        type = jstype;              \
+        x.val_##ctype = val;        \
+      }                             \
+      return *this;                 \
+    }
+
+  ASSIGN_OPR(double, TY_Double, TY_CXX_Double)
+  ASSIGN_OPR(long, TY_Long, TY_CXX_Long)
+  ASSIGN_OPR(bool, TY_Bool, TY_CXX_Bool)
+
+  // assign Object ptr to JS_Val
+  JS_Val& operator=(Object* val)  {
+    if (IsCxxProp()) {
+      type = TY_CXX_Object;
+      *(Object **)x.field = val;
+    } else {
+      type = TY_Object;
+      x.val_obj = val;
+    }
+    return *this;
+  }
+
+  // converts int to double
+  JS_Val& operator=(int val)  {
+    if (IsCxxProp()) {
+      type = TY_CXX_Double;
+      *(double *)x.field = (double)val;
+    } else {
+      type = TY_Double;
+      x.val_double = (double)val;
+    }
+    return *this;
+  }
+
+  JS_Val& operator=(std::string &val)  {
+    if (IsCxxProp()) {
+      type = TY_CXX_String;
+      // x.field already pt to a str fd in a c++ obj
+      *(std::string *)x.field = val;
+    } else {
+      type = TY_String;
+      x.val_string = new std::string(val);
+    }
+    return *this;
+  }
+
+  JS_Val& operator=(char* val)  {
+    if (IsCxxProp()) {
+      type = TY_CXX_String;
+      *(std::string *)x.field = std::string(val);
+    } else {
+      type = TY_String;
+      x.val_string = new std::string(val);
+    }
+    return *this;
+  }
+
 
 };
 

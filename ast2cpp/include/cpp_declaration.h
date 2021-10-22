@@ -83,8 +83,6 @@ inline bool IsVarInitClass(DeclNode* node) {
          node->GetInit()->IsIdentifier();
 }
 
-std::string ident(int n);
-
 bool IsBuiltinObj(std::string name);
 
 } // namespace maplefe

@@ -14,6 +14,7 @@
  */
 
 #include "cpp_definition.h"
+#include "helper.h"
 
 namespace maplefe {
 
@@ -195,34 +196,6 @@ inline bool IsClassMethod(FunctionNode* f) {
   return (f && f->GetParent() && f->GetParent()->IsClass());
 }
 
-std::map<TypeId, std::string>TypeIdToJSType = {
-  // AST TypeId to t2crt JSType string mapping
-  {TY_Object,  "t2crt::TY_Object"},
-  {TY_Function,"t2crt::TY_Function"},
-  {TY_Boolean, "t2crt::TY_Bool"},
-  {TY_Int,     "t2crt::TY_Long"},
-  {TY_String,  "t2crt::TY_String"},
-  {TY_Number,  "t2crt::TY_Double"},
-  {TY_Double,  "t2crt::TY_Double"},
-  {TY_Array,   "t2crt::TY_Array"},
-  {TY_Class,   "t2crt::TY_Object"}
-};
-
-// Generate call to create obj prop with ptr to c++ class fld member
-// example emit result for class Foo member f1, type long
-// obj->AddProp("f1", t2crt::ClassFld<long Foo::*>(&Foo::f1).NewProp(this, t2crt::TY_Long));
-std::string EmitAddPropWithClassFld(std::string objName,
-                                  std::string className,
-                                  std::string fdName,
-                                  std::string fdCType,
-                                  std::string fdJSType)  {
-  std::string str;
-  str = objName+ "->AddProp(\""s + fdName + "\", t2crt::ClassFld<"s + fdCType +
-        " "s + className + "::*>(&"s + className + "::"s + fdName +
-        ").NewProp(this, "s + fdJSType + "))"s;
-  return str;
-}
-
 std::string CppDef::EmitClassProps(TreeNode* node) {
   std::string clsFd, addProp;
   MASSERT(node->IsClass() && "Not NK_Class node");
@@ -243,9 +216,7 @@ std::string CppDef::EmitClassProps(TreeNode* node) {
           typeId = static_cast<UserTypeNode*>(n)->GetTypeId();
       }
     }
-    addProp += "  "s
-               + EmitAddPropWithClassFld("this", c->GetName(), fdName, fdType, TypeIdToJSType[typeId])
-               + ";\n"s;
+    addProp += "  "s + hlpClassFldAddProp("this", c->GetName(), fdName, fdType, TypeIdToJSTypeCXX[typeId]) + ";\n"s;
   }
   return "  // Add class fields to obj prop list\n"s + clsFd + addProp;
 }
@@ -350,7 +321,7 @@ std::string CppDef::EmitIdentifierNode(IdentifierNode *node) {
 std::string CppDef::EmitStructLiteralNode(StructLiteralNode* node) {
   std::string str;
   int stops = 2;
-  str += "\n"s + ident(stops) + "std::vector<t2crt::ObjectProp>({\n"s;
+  str += "\n"s + indent(stops) + "std::vector<t2crt::ObjectProp>({\n"s;
   for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
     if (i)
       str += ",\n"s;
@@ -359,7 +330,7 @@ std::string CppDef::EmitStructLiteralNode(StructLiteralNode* node) {
       std::string fieldName = EmitTreeNode(field->GetFieldName());
       TypeId typId = lit->GetTypeId();
       std::string fieldVal = EmitTreeNode(lit);
-      str += ident(stops+1);
+      str += indent(stops+1);
       switch(typId) {
         case TY_Object:
           break;
@@ -408,9 +379,9 @@ std::string CppDef::EmitDirectFieldInit(std::string varName, StructLiteralNode* 
       std::string fieldName = EmitTreeNode(field->GetFieldName());
       std::string fieldVal = EmitTreeNode(lit);
       if (false) // TODO: Check if it accesses a Cxx class field
-        str += ident(2) + varName + "->"s + fieldName + " = "s + fieldVal + ";\n"s;
+        str += indent(2) + varName + "->"s + fieldName + " = "s + fieldVal + ";\n"s;
       else
-        str += ident(2) + "(*"s + varName + ")[\""s + fieldName + "\"] = "s + fieldVal + ";\n"s;
+        str += indent(2) + "(*"s + varName + ")[\""s + fieldName + "\"] = "s + fieldVal + ";\n"s;
     }
   }
   return str;
@@ -437,7 +408,7 @@ std::string CppDef::EmitObjPropInit(std::string varName, TreeNode* varIdType, St
   } else {
     // type is builtin (e.g. t2crt::Record) and StructNode types (e.g. TSInterface)
     // create instance of type but set constructor to the builtin t2crt::Object.
-    str = varName+ " = new "s +EmitUserTypeNode(userType)+ "(&t2crt::Object_ctor, t2crt::Object_ctor.prototype, "s + EmitTreeNode(node) +");\n"s;
+    str = varName+ " = new "s +EmitUserTypeNode(userType)+ "(&t2crt::Object_ctor, t2crt::Object_ctor.prototype);\n"s;
     auto n = mHandler->FindDecl(static_cast<IdentifierNode*>(userType->GetId()));
     if (n && n->IsStruct() && static_cast<StructNode*>(n)->GetProp() == SProp_TSInterface) {
       str += EmitDirectFieldInit(varName, node); // do direct field init
