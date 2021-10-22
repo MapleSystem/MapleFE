@@ -65,6 +65,8 @@ public:
   virtual std::string EmitNewNode(NewNode *node);
   virtual std::string EmitStructNode(StructNode *node);
   virtual std::string EmitTypeAliasNode(TypeAliasNode* node);
+  std::string GetIdentifierName(TreeNode *node);
+
   std::string GetTypeString(TreeNode *node, TreeNode *child = nullptr);
   std::string EmitArrayLiteral(ArrayLiteralNode *node, int dim, std::string type);
   std::string EmitTSEnum(StructNode *node);

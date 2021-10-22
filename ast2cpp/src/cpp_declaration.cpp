@@ -63,39 +63,6 @@ class ImportExportModules : public AstVisitor {
       return s.empty() ? s : "//--- "s + s.substr(0, s.find('\n')) + '\n';
     }
 
-    std::string GetIdentifierName(TreeNode *node) {
-      switch (node->GetKind()) {
-        case NK_Identifier:
-            return std::string(static_cast<IdentifierNode *>(node)->GetName());
-        case NK_Decl:
-            return GetIdentifierName(static_cast<DeclNode *>(node)->GetVar());
-        case NK_Struct:
-            return GetIdentifierName(static_cast<StructNode *>(node)->GetStructId());
-        case NK_Function:
-            return GetIdentifierName(static_cast<FunctionNode *>(node)->GetFuncName());
-        case NK_Class:
-            return std::string(static_cast<ClassNode *>(node)->GetName());
-        case NK_Interface:
-            return std::string(static_cast<InterfaceNode *>(node)->GetName());
-        case NK_UserType:
-            return GetIdentifierName(static_cast<UserTypeNode *>(node)->GetId());
-        case NK_TypeAlias:
-            return GetIdentifierName(static_cast<TypeAliasNode *>(node)->GetId());
-        case NK_Namespace:
-            return GetIdentifierName(static_cast<NamespaceNode *>(node)->GetId());
-        case NK_Module:
-            return mCppDecl->GetModuleName(static_cast<ModuleNode *>(node)->GetFilename());
-        case NK_Declare:
-            { auto n = static_cast<DeclareNode *>(node);
-              auto num = n->GetDeclsNum();
-              if (num == 1)
-                return GetIdentifierName(n->GetDeclAtIndex(0));
-              return "Failed: one decl is expected"s;
-            }
-        default:
-            return "Failed to get the name of "s + AstDump::GetEnumNodeKind(node->GetKind());
-      }
-    }
 
     ImportNode *VisitImportNode(ImportNode *node) {
       std::string filename = AddIncludes(node->GetTarget());
@@ -178,10 +145,10 @@ class ImportExportModules : public AstVisitor {
                 mExports += Comment(node) + "TODO: export import ...\n"s;
                 continue;
               }
-              std::string target = GetIdentifierName(b);
+              std::string target = mCppDecl->GetIdentifierName(b);
               bool emit = true;
               if (auto a = x->GetAfter()) {
-                std::string after = GetIdentifierName(a);
+                std::string after = mCppDecl->GetIdentifierName(a);
                 if (target == "default") {
                   target = module + "__default";
                   if (after != "default")
@@ -258,6 +225,40 @@ class CollectDecls : public AstVisitor {
 
     std::string GetDecls() { return mDecls; }
 };
+
+std::string CppDecl::GetIdentifierName(TreeNode *node) {
+  switch (node->GetKind()) {
+    case NK_Identifier:
+        return std::string(static_cast<IdentifierNode *>(node)->GetName());
+    case NK_Decl:
+        return GetIdentifierName(static_cast<DeclNode *>(node)->GetVar());
+    case NK_Struct:
+        return GetIdentifierName(static_cast<StructNode *>(node)->GetStructId());
+    case NK_Function:
+        return GetIdentifierName(static_cast<FunctionNode *>(node)->GetFuncName());
+    case NK_Class:
+        return std::string(static_cast<ClassNode *>(node)->GetName());
+    case NK_Interface:
+        return std::string(static_cast<InterfaceNode *>(node)->GetName());
+    case NK_UserType:
+        return GetIdentifierName(static_cast<UserTypeNode *>(node)->GetId());
+    case NK_TypeAlias:
+        return GetIdentifierName(static_cast<TypeAliasNode *>(node)->GetId());
+    case NK_Namespace:
+        return GetIdentifierName(static_cast<NamespaceNode *>(node)->GetId());
+    case NK_Module:
+        return GetModuleName(static_cast<ModuleNode *>(node)->GetFilename());
+    case NK_Declare:
+        { auto n = static_cast<DeclareNode *>(node);
+          auto num = n->GetDeclsNum();
+          if (num == 1)
+            return GetIdentifierName(n->GetDeclAtIndex(0));
+          return "Failed: one decl is expected"s;
+        }
+    default:
+        return "Failed to get the name of "s + AstDump::GetEnumNodeKind(node->GetKind());
+  }
+}
 
 void CppDecl::AddImportedModule(const std::string& module) {
   mImportedModules.insert(module);
@@ -410,13 +411,6 @@ std::string CppDecl::EmitIdentifierNode(IdentifierNode *node) {
   std::string str(GetTypeString(node, node->GetType()));
   str += " "s + node->GetName();
   return str;
-}
-
-std::string IdentifierName(TreeNode* node) {
-  if (node == nullptr)
-    return std::string();
-  MASSERT(node->IsIdentifier() && "Unexpected node type");
-  return node->GetName();
 }
 
 std::string CppDecl::EmitPrimTypeNode(PrimTypeNode *node) {
@@ -776,7 +770,7 @@ std::string CppDecl::EmitInterface(StructNode *node) {
   }
 
   if (auto n = node->GetStructId()) {
-    ifName = IdentifierName(n);
+    ifName = GetIdentifierName(n);
     str = "class "s + ifName + " : public "s + superClass + " {\n"s;
   }
   str += "  public:\n"s;
@@ -828,7 +822,7 @@ std::string CppDecl::EmitTSEnum(StructNode *node) {
   str = "class "s;
   std::string enumClsName;
   if (auto n = node->GetStructId()) {
-    enumClsName = "Enum_"s + IdentifierName(n);
+    enumClsName = "Enum_"s + GetIdentifierName(n);
     str += enumClsName + " : public t2crt::Object {\n"s;
   }
   str += "  public:\n"s;
@@ -847,7 +841,7 @@ std::string CppDecl::EmitTSEnum(StructNode *node) {
           if (i == 0)
             init = "0";
           else
-            init = IdentifierName(node->GetField(i-1)) + "+1"s;
+            init = GetIdentifierName(node->GetField(i-1)) + "+1"s;
         }
       }
       str += "    const "s + EmitTreeNode(n) + " = "s + init + ";\n"s;
