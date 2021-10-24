@@ -1,0 +1,18 @@
+Matched 15 tokens.
+Matched 24 tokens.
+Matched 33 tokens.
+Matched 37 tokens.
+Matched 46 tokens.
+============= Module ===========
+== Sub Tree ==
+func  func()  throws: 
+  return  {[prop] : :"abc"}
+
+== Sub Tree ==
+js_var Decl: prop="my key"
+== Sub Tree ==
+console.log(func())
+== Sub Tree ==
+prop Assign -12.3
+== Sub Tree ==
+console.log(func())
