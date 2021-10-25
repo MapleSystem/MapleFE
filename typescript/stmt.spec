@@ -95,6 +95,7 @@ rule KeywordIdentifier : ONEOF("type",
                                "import",
                                "global",
                                "throw",
+                               "class",
                                "for")
 ## "
   attr.action : BuildIdentifier()
