@@ -99,6 +99,8 @@ class AST_INFO {
   void AddImport(ImportNode *node) { mImports.insert(node); }
   void AddExport(ExportNode *node) { mExports.insert(node); }
 
+  void SetTypeId(TreeNode *node, TypeId tid);
+  void SetTypeIdx(TreeNode *node, unsigned tidx);
 };
 
 class FillNodeInfoVisitor : public AstVisitor {

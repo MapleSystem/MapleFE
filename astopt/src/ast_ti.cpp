@@ -17,6 +17,7 @@
 #include <set>
 #include "ast_handler.h"
 #include "ast_info.h"
+#include "ast_util.h"
 #include "ast_ti.h"
 #include "typetable.h"
 #include "gen_astdump.h"
@@ -76,15 +77,15 @@ IdentifierNode *BuildIdNodeToDeclVisitor::VisitIdentifierNode(IdentifierNode *no
   // mHandler->FindDecl() will use/add entries to mNodeId2Decl
   TreeNode *decl = mHandler->FindDecl(node);
   if (decl) {
-    node->SetTypeId(decl->GetTypeId());
-    node->SetTypeIdx(decl->GetTypeIdx());
+    mHandler->GetUtil()->SetTypeId(node, decl->GetTypeId());
+    mHandler->GetUtil()->SetTypeIdx(node, decl->GetTypeIdx());
   }
   TreeNode *type = node->GetType();
   if (type && type->IsPrimType()) {
     PrimTypeNode *ptn = static_cast<PrimTypeNode *>(type);
     TypeId tid = ptn->GetPrimType();
-    // node->SetTypeId(tid);
-    node->SetTypeIdx(tid);
+    // mHandler->GetUtil()->SetTypeId(node, tid);
+    mHandler->GetUtil()->SetTypeIdx(node, tid);
   }
   return node;
 }
@@ -256,24 +257,20 @@ TypeId TypeInferVisitor::MergeTypeId(TypeId tia, TypeId tib) {
 }
 
 void TypeInferVisitor::SetTypeId(TreeNode *node, TypeId tid) {
-  if (tid != TY_None && node && node->GetTypeId() != tid) {
-    if (mFlags & FLG_trace_3) {
-      std::cout << " NodeId : " << node->GetNodeId() << " Set TypeId : "
-                << AstDump::GetEnumTypeId(node->GetTypeId()) << " --> "
-                << AstDump::GetEnumTypeId(tid) << std::endl;
+  TypeId id = node->GetTypeId();
+  mHandler->GetUtil()->SetTypeId(node, tid);
+  if (tid != id) {
+    id = node->GetTypeId();
+    if (id < TY_Void) {
+      SetTypeIdx(node, id);
     }
-    node->SetTypeId(tid);
     SetUpdated();
   }
 }
 
 void TypeInferVisitor::SetTypeIdx(TreeNode *node, unsigned tidx) {
+  mHandler->GetUtil()->SetTypeIdx(node, tidx);
   if (node->GetTypeIdx() != tidx) {
-    if (mFlags & FLG_trace_3) {
-      std::cout << " NodeId : " << node->GetNodeId() << " Set TypeIdx : "
-                << node->GetTypeIdx() << " --> " << tidx << std::endl;
-    }
-    node->SetTypeIdx(tidx);
     SetUpdated();
   }
 }
@@ -813,6 +810,7 @@ BinOperatorNode *TypeInferVisitor::VisitBinOperatorNode(BinOperatorNode *node) {
       SetTypeId(ta, TY_Int);
       SetTypeId(tb, TY_Int);
       SetTypeId(node, TY_Int);
+      SetTypeIdx(node, TY_Int);
       break;
     }
     case OPR_Land:
@@ -820,11 +818,13 @@ BinOperatorNode *TypeInferVisitor::VisitBinOperatorNode(BinOperatorNode *node) {
       SetTypeId(ta, TY_Boolean);
       SetTypeId(tb, TY_Boolean);
       SetTypeId(node, TY_Boolean);
+      SetTypeIdx(node, TY_Boolean);
       break;
     }
     case OPR_Exp: {
       if (tia == TY_Int && tib == TY_Int) {
         SetTypeId(node, TY_Int);
+        SetTypeIdx(node, TY_Int);
       }
       break;
     }
@@ -844,87 +844,114 @@ CallNode *TypeInferVisitor::VisitCallNode(CallNode *node) {
   if (mFlags & FLG_trace_1) std::cout << "Visiting CallNode, id=" << node->GetNodeId() << "..." << std::endl;
   TreeNode *method = node->GetMethod();
   UpdateTypeId(method, TY_Function);
-  if (method && method->IsIdentifier()) {
-    IdentifierNode *mid = static_cast<IdentifierNode *>(method);
-    TreeNode *decl = mHandler->FindDecl(mid);
-    if (decl) {
-      if (decl->IsDecl()) {
-        DeclNode *d = static_cast<DeclNode *>(decl);
-        if (d->GetInit()) {
-          decl = d->GetInit();
-        }
-      }
-      if (decl && decl->IsIdentifier()) {
-        IdentifierNode *id = static_cast<IdentifierNode *>(decl);
-        if (id->GetType()) {
-          decl = id->GetType();
-        } else if (id->IsTypeIdFunction()) {
-          NOTYETIMPL("VisitCallNode nTY_Function");
-        }
-      }
+  if (method) {
+    if (method->IsField()) {
+      FieldNode *field = static_cast<FieldNode *>(method);
+      method = field->GetField();
+    }
+    if (method->IsIdentifier()) {
+      IdentifierNode *mid = static_cast<IdentifierNode *>(method);
+      SetTypeIdx(node, method->GetTypeIdx());
+      TreeNode *decl = mHandler->FindDecl(mid);
       if (decl) {
-        if (decl->IsFunction()) {
-          FunctionNode *func = static_cast<FunctionNode *>(decl);
-          // update call's return type
-          if (func->GetType()) {
-            UpdateTypeId(node, func->GetType()->GetTypeId());
-          }
-          // skip imported and exported functions as they are generic
-          // so should not restrict their types
-          if (ImportedDeclIds.find(decl->GetNodeId()) == ImportedDeclIds.end() &&
-              ExportedDeclIds.find(decl->GetNodeId()) == ExportedDeclIds.end()) {
-
-            unsigned min = func->GetParamsNum();
-            if (func->GetParamsNum() != node->GetArgsNum()) {
-              // count minimun number of args need to be passed
-              min = 0;
-              // check arg about whether it is optional or has default value
-              for (unsigned i = 0; i < func->GetParamsNum(); i++) {
-                TreeNode *arg = func->GetParam(i);
-                if (arg->IsOptional()) {
-                  continue;
-                } else if(arg->IsIdentifier()) {
-                  IdentifierNode *id = static_cast<IdentifierNode *>(arg);
-                  if (!id->GetInit()) {
-                    min++;
-                  }
-                } else {
-                  min++;
-                }
-              }
-              if (min > node->GetArgsNum()) {
-                NOTYETIMPL("call and func number of arguments not compatible");
-                return node;
-              }
-            }
-            // update function's argument types
-            for (unsigned i = 0; i < min; i++) {
-              UpdateTypeUseNode(func->GetParam(i), node->GetArg(i));
-            }
-          }
-        } else if (decl->IsCall()) {
-          (void) VisitCallNode(static_cast<CallNode *>(decl));
-        } else if (decl->IsDecl()) {
+        if (decl->IsDecl()) {
           DeclNode *d = static_cast<DeclNode *>(decl);
           if (d->GetInit()) {
-            NOTYETIMPL("VisitCallNode decl init");
+            decl = d->GetInit();
           }
-        } else if (decl->IsLiteral()) {
-          LiteralNode *l = static_cast<LiteralNode *>(decl);
-          NOTYETIMPL("VisitCallNode literal node");
+        }
+        if (decl && decl->IsIdentifier()) {
+          IdentifierNode *id = static_cast<IdentifierNode *>(decl);
+          if (id->GetType()) {
+            decl = id->GetType();
+          } else if (id->IsTypeIdFunction()) {
+            NOTYETIMPL("VisitCallNode nTY_Function");
+          }
+        }
+        if (decl) {
+          if (decl->IsFunction()) {
+            FunctionNode *func = static_cast<FunctionNode *>(decl);
+            // update call's return type
+            if (func->GetType()) {
+              UpdateTypeId(node, func->GetType()->GetTypeId());
+            }
+            // skip imported and exported functions as they are generic
+            // so should not restrict their types
+            if (ImportedDeclIds.find(decl->GetNodeId()) == ImportedDeclIds.end() &&
+                ExportedDeclIds.find(decl->GetNodeId()) == ExportedDeclIds.end()) {
+
+              unsigned min = func->GetParamsNum();
+              if (func->GetParamsNum() != node->GetArgsNum()) {
+                // count minimun number of args need to be passed
+                min = 0;
+                // check arg about whether it is optional or has default value
+                for (unsigned i = 0; i < func->GetParamsNum(); i++) {
+                  TreeNode *arg = func->GetParam(i);
+                  if (arg->IsOptional()) {
+                    continue;
+                  } else if(arg->IsIdentifier()) {
+                    IdentifierNode *id = static_cast<IdentifierNode *>(arg);
+                    TreeNode *d = mHandler->FindDecl(id);
+                    if (d) {
+                      SetTypeId(id, d->GetTypeId());
+                      SetTypeIdx(id, d->GetTypeIdx());
+                    }
+                    if (!id->GetInit()) {
+                      min++;
+                    }
+                  } else {
+                    min++;
+                  }
+                }
+                if (min > node->GetArgsNum()) {
+                  NOTYETIMPL("call and func number of arguments not compatible");
+                  return node;
+                }
+              }
+              // update function's argument types
+              for (unsigned i = 0; i < min; i++) {
+                UpdateTypeUseNode(func->GetParam(i), node->GetArg(i));
+              }
+
+              // dummy functions like console.log
+              if (func->GetTypeId() == TY_None) {
+                for (unsigned i = 0; i < node->GetArgsNum(); i++) {
+                  TreeNode *arg = node->GetArg(i);
+                  if(arg->IsIdentifier()) {
+                    IdentifierNode *id = static_cast<IdentifierNode *>(arg);
+                    TreeNode *d = mHandler->FindDecl(id);
+                    if (d) {
+                      SetTypeId(id, d->GetTypeId());
+                      SetTypeIdx(id, d->GetTypeIdx());
+                    }
+                  }
+                }
+              }
+            }
+          } else if (decl->IsCall()) {
+            (void) VisitCallNode(static_cast<CallNode *>(decl));
+          } else if (decl->IsDecl()) {
+            DeclNode *d = static_cast<DeclNode *>(decl);
+            if (d->GetInit()) {
+              NOTYETIMPL("VisitCallNode decl init");
+            }
+          } else if (decl->IsLiteral()) {
+            LiteralNode *l = static_cast<LiteralNode *>(decl);
+            NOTYETIMPL("VisitCallNode literal node");
+          } else {
+            NOTYETIMPL("VisitCallNode not function node");
+          }
         } else {
-          NOTYETIMPL("VisitCallNode not function node");
+          NOTYETIMPL("VisitCallNode null decl");
         }
       } else {
-        NOTYETIMPL("VisitCallNode null decl");
-      }
-    } else {
-      // calling constructor like Array(...) could also end up here
-      TreeNode *type = mHandler->FindType(mid);
-      if (type) {
-        NOTYETIMPL("VisitCallNode type");
-      } else {
-        NOTYETIMPL("VisitCallNode null decl and null type");
+        // calling constructor like Array(...) could also end up here
+        TreeNode *type = mHandler->FindType(mid);
+        if (type) {
+          NOTYETIMPL("VisitCallNode type");
+        } else {
+          NOTYETIMPL("VisitCallNode null decl and null type");
+        }
       }
     }
   }
@@ -1042,13 +1069,14 @@ DeclNode *TypeInferVisitor::VisitDeclNode(DeclNode *node) {
   if (isArray) {
     merged = TY_Array;
     SetTypeId(node, merged);
-    SetTypeId(var, merged);
     SetTypeId(init, merged);
+    SetTypeId(var, merged);
   } else {
     UpdateTypeId(node, merged);
     UpdateTypeId(init, merged);
     UpdateTypeId(var, merged);
   }
+  SetTypeIdx(node, var->GetTypeIdx());
   if (isArray || IsArray(node)) {
     UpdateArrayElemTypeIdMap(node, elemTypeId);
   }
@@ -1155,7 +1183,7 @@ FunctionNode *TypeInferVisitor::VisitFunctionNode(FunctionNode *node) {
   if (mFlags & FLG_trace_1) std::cout << "Visiting FunctionNode, id=" << node->GetNodeId() << "..." << std::endl;
   UpdateTypeId(node, node->IsArray() ? TY_Object : TY_Function);
   if (node->GetFuncName()) {
-    node->GetFuncName()->SetTypeId(node->GetTypeId());
+    SetTypeId(node->GetFuncName(), node->GetTypeId());
   }
   (void) AstVisitor::VisitFunctionNode(node);
   return node;
@@ -1164,8 +1192,16 @@ FunctionNode *TypeInferVisitor::VisitFunctionNode(FunctionNode *node) {
 IdentifierNode *TypeInferVisitor::VisitIdentifierNode(IdentifierNode *node) {
   if (mFlags & FLG_trace_1) std::cout << "Visiting IdentifierNode, id=" << node->GetNodeId() << "..." << std::endl;
   TreeNode *type = node->GetType();
-  if (type && type->IsPrimArrayType()) {
-    SetTypeId(node, TY_Array);
+  if (type) {
+    if (type->IsPrimArrayType()) {
+      SetTypeId(node, TY_Array);
+      SetUpdated();
+    }
+    unsigned tidx = type->GetTypeIdx();
+    if (tidx && node->GetTypeIdx() != tidx) {
+      SetTypeIdx(node, tidx);
+      SetUpdated();
+    }
   }
   (void) AstVisitor::VisitIdentifierNode(node);
   if (node->GetInit()) {
@@ -1219,7 +1255,7 @@ InterfaceNode *TypeInferVisitor::VisitInterfaceNode(InterfaceNode *node) {
 
 IsNode *TypeInferVisitor::VisitIsNode(IsNode *node) {
   (void) AstVisitor::VisitIsNode(node);
-  node->SetTypeIdx(TY_Boolean);
+  SetTypeIdx(node, TY_Boolean);
   TreeNode *parent = node->GetParent();
   if (parent->IsFunction()) {
     FunctionNode *func = static_cast<FunctionNode *>(parent);
@@ -1227,7 +1263,7 @@ IsNode *TypeInferVisitor::VisitIsNode(IsNode *node) {
       TreeNode *right = node->GetRight();
       if (right->IsUserType()) {
         TreeNode *id = static_cast<UserTypeNode *>(right)->GetId();
-        right->SetTypeIdx(id->GetTypeIdx());
+        SetTypeIdx(right, id->GetTypeIdx());
         mFuncIsNodeMap[func->GetNodeId()] = id->GetTypeIdx();
       } else {
         NOTYETIMPL("isnode right not user type");
@@ -1242,6 +1278,7 @@ NewNode *TypeInferVisitor::VisitNewNode(NewNode *node) {
   (void) AstVisitor::VisitNewNode(node);
   if (node->GetId()) {
     UpdateTypeId(node, TY_Class);
+    SetTypeIdx(node, node->GetId()->GetTypeIdx());
   }
   return node;
 }
@@ -1412,10 +1449,10 @@ UserTypeNode *TypeInferVisitor::VisitUserTypeNode(UserTypeNode *node) {
   (void) AstVisitor::VisitUserTypeNode(node);
   if (node->GetDims()) {
     SetTypeId(node, TY_Array);
-    node->SetTypeIdx(TY_Array);
+    SetTypeIdx(node, TY_Array);
   } else if (node->GetId()) {
     UpdateTypeId(node, node->GetId());
-    node->SetTypeIdx(node->GetId()->GetTypeIdx());
+    SetTypeIdx(node, node->GetId()->GetTypeIdx());
   }
   TreeNode *parent = node->GetParent();
   if (parent && parent->IsIdentifier()) {
@@ -1568,7 +1605,7 @@ IdentifierNode *CheckTypeVisitor::VisitIdentifierNode(IdentifierNode *node) {
 IdentifierNode *ChangeTypeIdxVisitor::VisitIdentifierNode(IdentifierNode *node) {
   (void) AstVisitor::VisitIdentifierNode(node);
   if (node->GetStrIdx() == mStrIdx) {
-    node->SetTypeIdx(mTypeIdx);
+    mHandler->GetUtil()->SetTypeIdx(node, mTypeIdx);
   }
   return node;
 }

@@ -70,7 +70,7 @@ bool AST_Handler::AddModule(ModuleNode *m) {
 
 void Module_Handler::CollectInfo() {
   if (!mUtil) {
-    mUtil = new(GetMemPool()->Alloc(sizeof(AST_Util))) AST_Util(this);
+    mUtil = new(GetMemPool()->Alloc(sizeof(AST_Util))) AST_Util(this, mFlags);
   }
   if (!mINFO) {
     mINFO = new(GetMemPool()->Alloc(sizeof(AST_INFO))) AST_INFO(this, mFlags);

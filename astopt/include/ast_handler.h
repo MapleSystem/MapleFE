@@ -139,12 +139,14 @@ class Module_Handler {
   AST_DFA *GetDFA() {return mDFA;}
   AST_SCP *GetSCP() {return mSCP;}
   TypeInfer *GetTI() {return mTI;}
+  AST_Util *GetUtil() {return mUtil;}
   void SetINFO(AST_INFO *p) {mINFO = p;}
   void SetADJ(AST_ADJ *p) {mADJ = p;}
   void SetCFA(AST_CFA *p) {mCFA = p;}
   void SetDFA(AST_DFA *p) {mDFA = p;}
   void SetSCP(AST_SCP *p) {mSCP = p;}
   void SetTI(TypeInfer *p) {mTI = p;}
+  void SetUtil(AST_Util *p) {mUtil = p;}
 
   DeclNode *GetDeclOf(IdentifierNode *inode);
 

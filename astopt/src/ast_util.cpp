@@ -16,6 +16,7 @@
 #include "ast.h"
 #include "ast_util.h"
 #include "ast_handler.h"
+#include "gen_astdump.h"
 
 namespace maplefe {
 
@@ -75,6 +76,27 @@ bool AST_Util::IsCppField(TreeNode *node) {
     return false;
   }
   return true;
+}
+
+void AST_Util::SetTypeId(TreeNode *node, TypeId tid) {
+  if (tid != TY_None && node && node->GetTypeId() != tid) {
+    if (mFlags & FLG_trace_3) {
+      std::cout << " NodeId : " << node->GetNodeId() << " Set TypeId : "
+                << AstDump::GetEnumTypeId(node->GetTypeId()) << " --> "
+                << AstDump::GetEnumTypeId(tid) << std::endl;
+    }
+    node->SetTypeId(tid);
+  }
+}
+
+void AST_Util::SetTypeIdx(TreeNode *node, unsigned tidx) {
+  if (node->GetTypeIdx() != tidx) {
+    if (mFlags & FLG_trace_3) {
+      std::cout << " NodeId : " << node->GetNodeId() << " Set TypeIdx : "
+                << node->GetTypeIdx() << " --> " << tidx << std::endl;
+    }
+    node->SetTypeIdx(tidx);
+  }
 }
 
 }

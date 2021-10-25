@@ -29,13 +29,14 @@ class Module_Handler;
 class AST_Util {
  private:
   Module_Handler *mHandler;
+  unsigned        mFlags;
 
   std::unordered_set<unsigned> mCppKeywords;
 
   void BuildCppKeyWordSet();
 
  public:
-  explicit AST_Util(Module_Handler *h) : mHandler(h) {
+  explicit AST_Util(Module_Handler *h, unsigned f) : mHandler(h), mFlags(f) {
     BuildCppKeyWordSet();
   }
   ~AST_Util() {}
@@ -45,6 +46,9 @@ class AST_Util {
   bool IsCppKeyWord(std::string name);
   bool IsCppName(std::string name);
   bool IsCppField(TreeNode *node);
+
+  void SetTypeId(TreeNode *node, TypeId tid);
+  void SetTypeIdx(TreeNode *node, unsigned tidx);
 };
 
 }

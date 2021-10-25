@@ -18,6 +18,7 @@
 #include <algorithm>
 #include "ast_handler.h"
 #include "typetable.h"
+#include "ast_util.h"
 #include "ast_info.h"
 
 namespace maplefe {
@@ -384,7 +385,7 @@ IdentifierNode *AST_INFO::CreateIdentifierNode(unsigned stridx) {
 
 UserTypeNode *AST_INFO::CreateUserTypeNode(unsigned stridx, ASTScope *scope) {
   IdentifierNode *node = CreateIdentifierNode(stridx);
-  node->SetTypeId(TY_Class);
+  SetTypeId(node, TY_Class);
   if (scope) {
     node->SetScope(scope);
   }
@@ -392,17 +393,17 @@ UserTypeNode *AST_INFO::CreateUserTypeNode(unsigned stridx, ASTScope *scope) {
   UserTypeNode *utype = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
   new (utype) UserTypeNode(node);
   utype->SetStrIdx(stridx);
-  utype->SetTypeId(TY_Class);
+  SetTypeId(utype, TY_Class);
   node->SetParent(utype);
   return utype;
 }
 
 UserTypeNode *AST_INFO::CreateUserTypeNode(IdentifierNode *node) {
-  node->SetTypeId(TY_Class);
+  SetTypeId(node, TY_Class);
   UserTypeNode *utype = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
   new (utype) UserTypeNode(node);
   utype->SetStrIdx(node->GetStrIdx());
-  utype->SetTypeId(TY_Class);
+  SetTypeId(utype, TY_Class);
   node->SetParent(utype);
   return utype;
 }
@@ -423,7 +424,7 @@ TypeAliasNode *AST_INFO::CreateTypeAliasNode(TreeNode *to, TreeNode *from) {
 StructNode *AST_INFO::CreateStructFromStructLiteral(StructLiteralNode *node) {
   StructNode *newnode = (StructNode*)gTreePool.NewTreeNode(sizeof(StructNode));
   new (newnode) StructNode(0);
-  newnode->SetTypeId(TY_Class);
+  SetTypeId(newnode, TY_Class);
 
   for (unsigned i = 0; i < node->GetFieldsNum(); i++) {
     FieldLiteralNode *fl = node->GetField(i);
@@ -578,13 +579,21 @@ void AST_INFO::SortFields(T1 *node) {
   }
 }
 
+void AST_INFO::SetTypeId(TreeNode *node, TypeId tid) {
+  mHandler->GetUtil()->SetTypeId(node, tid);
+}
+
+void AST_INFO::SetTypeIdx(TreeNode *node, unsigned tidx) {
+  mHandler->GetUtil()->SetTypeIdx(node, tidx);
+}
+
 IdentifierNode *FillNodeInfoVisitor::VisitIdentifierNode(IdentifierNode *node) {
   (void) AstVisitor::VisitIdentifierNode(node);
   TreeNode *type = node->GetType();
   if (type && type->IsPrimType()) {
     PrimTypeNode *ptn = static_cast<PrimTypeNode *>(type);
-    node->SetTypeId(ptn->GetTypeId());
-    node->SetTypeIdx(ptn->GetTypeId());
+    mInfo->SetTypeId(node, ptn->GetTypeId());
+    mInfo->SetTypeIdx(node, ptn->GetTypeId());
   }
   return node;
 }
@@ -595,39 +604,39 @@ LiteralNode *FillNodeInfoVisitor::VisitLiteralNode(LiteralNode *node) {
   LitId id = data.mType;
   switch (id) {
     case LT_IntegerLiteral:
-      node->SetTypeId(TY_Int);
-      node->SetTypeIdx(TY_Int);
+      mInfo->SetTypeId(node, TY_Int);
+      mInfo->SetTypeIdx(node, TY_Int);
       break;
     case LT_FPLiteral:
-      node->SetTypeId(TY_Float);
-      node->SetTypeIdx(TY_Float);
+      mInfo->SetTypeId(node, TY_Float);
+      mInfo->SetTypeIdx(node, TY_Float);
       break;
     case LT_DoubleLiteral:
-      node->SetTypeId(TY_Double);
-      node->SetTypeIdx(TY_Double);
+      mInfo->SetTypeId(node, TY_Double);
+      mInfo->SetTypeIdx(node, TY_Double);
       break;
     case LT_BooleanLiteral:
-      node->SetTypeId(TY_Boolean);
-      node->SetTypeIdx(TY_Boolean);
+      mInfo->SetTypeId(node, TY_Boolean);
+      mInfo->SetTypeIdx(node, TY_Boolean);
       break;
     case LT_CharacterLiteral:
-      node->SetTypeId(TY_Char);
-      node->SetTypeIdx(TY_Char);
+      mInfo->SetTypeId(node, TY_Char);
+      mInfo->SetTypeIdx(node, TY_Char);
       break;
     case LT_StringLiteral:
-      node->SetTypeId(TY_String);
-      node->SetTypeIdx(TY_String);
+      mInfo->SetTypeId(node, TY_String);
+      mInfo->SetTypeIdx(node, TY_String);
       node->SetStrIdx(data.mData.mStrIdx);
       break;
     case LT_NullLiteral:
-      node->SetTypeId(TY_Null);
+      mInfo->SetTypeId(node, TY_Null);
       break;
     case LT_ThisLiteral:
     case LT_SuperLiteral:
-      node->SetTypeId(TY_Symbol);
+      mInfo->SetTypeId(node, TY_Symbol);
       break;
     case LT_VoidLiteral:
-      node->SetTypeId(TY_Void);
+      mInfo->SetTypeId(node, TY_Void);
       break;
     default:
       break;
@@ -637,7 +646,7 @@ LiteralNode *FillNodeInfoVisitor::VisitLiteralNode(LiteralNode *node) {
 
 PrimTypeNode *FillNodeInfoVisitor::VisitPrimTypeNode(PrimTypeNode *node) {
   (void) AstVisitor::VisitPrimTypeNode(node);
-  // node->SetTypeId(node->GetPrimType());
+  // mInfo->SetTypeId(node, node->GetPrimType());
   return node;
 }
 
@@ -645,7 +654,7 @@ UserTypeNode *FillNodeInfoVisitor::VisitUserTypeNode(UserTypeNode *node) {
   (void) AstVisitor::VisitUserTypeNode(node);
   TreeNode *id = node->GetId();
   if (id && !id->IsTypeIdNone()) {
-    node->SetTypeId(id->GetTypeId());
+    mInfo->SetTypeId(node, id->GetTypeId());
   }
   return node;
 }
@@ -663,7 +672,7 @@ ExportNode *ImportExportVisitor::VisitExportNode(ExportNode *node) {
 }
 
 StructLiteralNode *ClassStructVisitor::VisitStructLiteralNode(StructLiteralNode *node) {
-  node->SetTypeId(TY_Class);
+  mInfo->SetTypeId(node, TY_Class);
   (void) AstVisitor::VisitStructLiteralNode(node);
   if (mInfo->GetPass() == 0) {
     // field literal stridx to its ids'
@@ -686,9 +695,9 @@ StructLiteralNode *ClassStructVisitor::VisitStructLiteralNode(StructLiteralNode 
 
 StructNode *ClassStructVisitor::VisitStructNode(StructNode *node) {
   if (node->GetProp() != SProp_TSEnum) {
-    node->SetTypeId(TY_Class);
+    mInfo->SetTypeId(node, TY_Class);
     if (node->GetStructId()) {
-      node->GetStructId()->SetTypeId(TY_Class);
+      mInfo->SetTypeId(node->GetStructId(), TY_Class);
     }
   }
   (void) AstVisitor::VisitStructNode(node);
@@ -722,7 +731,7 @@ StructNode *ClassStructVisitor::VisitStructNode(StructNode *node) {
 }
 
 ClassNode *ClassStructVisitor::VisitClassNode(ClassNode *node) {
-  node->SetTypeId(TY_Class);
+  mInfo->SetTypeId(node, TY_Class);
   (void) AstVisitor::VisitClassNode(node);
   if (mInfo->GetPass() == 0) {
     mInfo->SetStrIdx2Struct(node->GetStrIdx(), node);
@@ -750,7 +759,7 @@ ClassNode *ClassStructVisitor::VisitClassNode(ClassNode *node) {
 }
 
 InterfaceNode *ClassStructVisitor::VisitInterfaceNode(InterfaceNode *node) {
-  node->SetTypeId(TY_Class);
+  mInfo->SetTypeId(node, TY_Class);
   (void) AstVisitor::VisitInterfaceNode(node);
   if (mInfo->GetPass() == 0) {
     mInfo->SetStrIdx2Struct(node->GetStrIdx(), node);
