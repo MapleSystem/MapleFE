@@ -1720,6 +1720,7 @@ TreeNode* ASTBuilder::BuildArrayElement() {
           array->IsStruct() ||
           array->IsNew() ||
           array->IsTypeOf() ||
+          array->IsCast() ||
           array->IsPrimType());
 
   ArrayElementNode *array_element = NULL;
@@ -1733,6 +1734,7 @@ TreeNode* ASTBuilder::BuildArrayElement() {
       array->IsStruct() ||
       array->IsNew() ||
       array->IsTypeOf() ||
+      array->IsCast() ||
       array->IsPrimType()) {
     array_element = (ArrayElementNode*)gTreePool.NewTreeNode(sizeof(ArrayElementNode));
     new (array_element) ArrayElementNode();

@@ -1,0 +1,50 @@
+Matched 22 tokens.
+Matched 55 tokens.
+Matched 106 tokens.
+Matched 117 tokens.
+Matched 127 tokens.
+Matched 140 tokens.
+Matched 150 tokens.
+============= Module ===========
+== Sub Tree ==
+class  Base
+  Fields: 
+    str
+  Instance Initializer: 
+  Constructors: 
+    constructor  (s)  throws: 
+      this.str Assign s
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+class  Derived
+  Fields: 
+    num
+  Instance Initializer: 
+  Constructors: 
+    constructor  (s,n)  throws: 
+      super(s)
+      this.num Assign n
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+func  func(...args)  throws: 
+  cond-branch cond:args.length StEq 1 Land args[0] instanceof Derived
+  true branch :
+    return (Derived)args[0]
+  false branch :
+
+  return  {str:"Unkown", num:0}
+
+== Sub Tree ==
+js_var Decl: b=new Base("Base")
+== Sub Tree ==
+console.log(func(b))
+== Sub Tree ==
+js_var Decl: d=new Derived("Derived",123)
+== Sub Tree ==
+console.log(func(d))
