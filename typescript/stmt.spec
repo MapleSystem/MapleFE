@@ -1449,7 +1449,8 @@ rule ImportDeclaration : ONEOF("import" + ImportClause + FromClause + ZEROORONE(
                                "import" + BindingIdentifier + '=' + "require" + '(' + AssignmentExpression + ')' + ZEROORONE(';'),
                                "import" + "type" + NamedImports + FromClause + ZEROORONE(';'),
                                "import" + "type" + NameSpaceImport + FromClause + ZEROORONE(';'),
-                               "import" + "type" + ImportedDefaultBinding + FromClause + ZEROORONE(';'))
+                               "import" + "type" + ImportedDefaultBinding + FromClause + ZEROORONE(';'),
+                               ImportAliasDeclaration)
   attr.property : Top
   attr.action.%1,%2,%3,%4,%5,%6 : BuildImport()
   attr.action.%1 :    SetPairs(%2)
