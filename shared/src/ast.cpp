@@ -1606,7 +1606,8 @@ void ClassNode::Construct(BlockNode *block) {
           SETPARENT(inode);
           mFields.PushBack(inode);
         }
-      } else if (var->IsIdentifier() || var->IsComputedName()) {
+      } else if (var->IsIdentifier() || var->IsComputedName() || var->IsLiteral()) {
+        // string literal is allowed to be a field.
         mFields.PushBack(var);
         SETPARENT(var);
       } else
