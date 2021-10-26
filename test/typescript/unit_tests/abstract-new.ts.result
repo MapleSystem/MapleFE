@@ -1,0 +1,4 @@
+Matched 35 tokens.
+============= Module ===========
+== Sub Tree ==
+ type Type<T> = T extends new (args) ->  ? P : never

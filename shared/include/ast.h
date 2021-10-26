@@ -621,6 +621,7 @@ private:
   SmallVector<TreeNode*> mArgs;    //
   BlockNode *mBody;                // When body is not empty, it's an
                                    // anonymous class.
+  SmallVector<AttrId>          mAttrs;
 public:
   NewNode() : TreeNode(NK_New), mId(nullptr), mBody(nullptr) {}
   ~NewNode() {mArgs.Release();}
@@ -634,6 +635,12 @@ public:
   TreeNode* GetArg(unsigned i)  {return mArgs.ValueAtIndex(i);}
   void      SetArg(unsigned i, TreeNode* n) {*(mArgs.RefAtIndex(i)) = n; SETPARENT(n);}
   void      AddArg(TreeNode *t) {mArgs.PushBack(t); SETPARENT(t);}
+
+  // Attributes related
+  unsigned GetAttrsNum()              {return mAttrs.GetNum();}
+  void     AddAttr(AttrId a)          {mAttrs.PushBack(a);}
+  AttrId   GetAttrAtIndex(unsigned i) {return mAttrs.ValueAtIndex(i);}
+  void     SetAttrAtIndex(unsigned i, AttrId n) {*(mAttrs.RefAtIndex(i)) = n;}
 
   void ReplaceChild(TreeNode *oldone, TreeNode *newone);
   void Dump(unsigned);

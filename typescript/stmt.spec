@@ -1800,8 +1800,9 @@ rule FunctionType: ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList) + 
 
 ## rule ConstructorType: new TypeParametersopt ( ParameterListopt ) => Type
 ## This actually a literal.
-rule ConstructorType: "new" + FunctionType
-  attr.action : BuildNewOperation(%2)
+rule ConstructorType: ZEROORONE(AccessibilityModifier) + "new" + FunctionType
+  attr.action : BuildNewOperation(%3)
+  attr.action : AddModifier(%1)
 
 ## rule TypeQuery: typeof TypeQueryExpression
 rule TypeQuery: ONEOF("typeof" + TypeQueryExpression,
