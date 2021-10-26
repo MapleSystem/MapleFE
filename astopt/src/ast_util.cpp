@@ -90,7 +90,7 @@ void AST_Util::SetTypeId(TreeNode *node, TypeId tid) {
 }
 
 void AST_Util::SetTypeIdx(TreeNode *node, unsigned tidx) {
-  if (node->GetTypeIdx() != tidx) {
+  if (node && node->GetTypeIdx() != tidx) {
     if (mFlags & FLG_trace_3) {
       std::cout << " NodeId : " << node->GetNodeId() << " Set TypeIdx : "
                 << node->GetTypeIdx() << " --> " << tidx << std::endl;

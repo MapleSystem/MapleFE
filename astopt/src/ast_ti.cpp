@@ -256,12 +256,32 @@ TypeId TypeInferVisitor::MergeTypeId(TypeId tia, TypeId tib) {
   return result;
 }
 
+unsigned TypeInferVisitor::MergeTypeIdx(unsigned tia, unsigned tib) {
+  if (tia == tib || tib == 0) {
+    return tia;
+  }
+
+  if (tia == 0) {
+    return tib;
+  }
+
+  unsigned result = tia;
+
+  if (mFlags & FLG_trace_3) {
+    std::cout << " Type idx Merge: "
+              << tia << " "
+              << tib << " --> "
+              << result << std::endl;
+  }
+  return result;
+}
+
 void TypeInferVisitor::SetTypeId(TreeNode *node, TypeId tid) {
   TypeId id = node->GetTypeId();
   mHandler->GetUtil()->SetTypeId(node, tid);
   if (tid != id) {
     id = node->GetTypeId();
-    if (id < TY_Void) {
+    if (IsPrimTypeIdx(id) && node->GetTypeIdx() == 0) {
       SetTypeIdx(node, id);
     }
     SetUpdated();
@@ -270,7 +290,7 @@ void TypeInferVisitor::SetTypeId(TreeNode *node, TypeId tid) {
 
 void TypeInferVisitor::SetTypeIdx(TreeNode *node, unsigned tidx) {
   mHandler->GetUtil()->SetTypeIdx(node, tidx);
-  if (node->GetTypeIdx() != tidx) {
+  if (node && node->GetTypeIdx() != tidx) {
     SetUpdated();
   }
 }
@@ -293,6 +313,25 @@ void TypeInferVisitor::UpdateTypeId(TreeNode *node1, TreeNode *node2) {
   }
   if (!node2->IsLiteral()) {
     SetTypeId(node2, tid);
+  }
+}
+
+void TypeInferVisitor::UpdateTypeIdx(TreeNode *node, unsigned tidx) {
+  if (tidx == 0 || !node || node->IsLiteral()) {
+    return;
+  }
+  tidx = MergeTypeIdx(node->GetTypeIdx(), tidx);
+  SetTypeIdx(node, tidx);
+}
+
+void TypeInferVisitor::UpdateTypeIdx(TreeNode *node1, TreeNode *node2) {
+  if (!node1 || !node2 || node1 == node2) {
+    return;
+  }
+  unsigned tidx = MergeTypeIdx(node1->GetTypeIdx(), node2->GetTypeIdx());
+  if (tidx != 0) {
+    SetTypeIdx(node1, tidx);
+    SetTypeIdx(node2, tidx);
   }
 }
 
@@ -851,9 +890,11 @@ CallNode *TypeInferVisitor::VisitCallNode(CallNode *node) {
     }
     if (method->IsIdentifier()) {
       IdentifierNode *mid = static_cast<IdentifierNode *>(method);
-      SetTypeIdx(node, method->GetTypeIdx());
       TreeNode *decl = mHandler->FindDecl(mid);
       if (decl) {
+        SetTypeIdx(node, decl->GetTypeIdx());
+        SetTypeIdx(mid, decl->GetTypeIdx());
+
         if (decl->IsDecl()) {
           DeclNode *d = static_cast<DeclNode *>(decl);
           if (d->GetInit()) {
@@ -1042,10 +1083,12 @@ DeclNode *TypeInferVisitor::VisitDeclNode(DeclNode *node) {
   TreeNode *init = node->GetInit();
   TreeNode *var = node->GetVar();
   TypeId merged = node->GetTypeId();
+  unsigned mergedtidx = node->GetTypeIdx();
   TypeId elemTypeId = TY_None;
   bool isArray = false;
   if (init) {
     merged = MergeTypeId(merged, init->GetTypeId());
+    mergedtidx = MergeTypeIdx(mergedtidx, init->GetTypeIdx());
     // collect array element typeid if any
     elemTypeId = GetArrayElemTypeId(init);
     isArray = (elemTypeId != TY_None);
@@ -1054,6 +1097,7 @@ DeclNode *TypeInferVisitor::VisitDeclNode(DeclNode *node) {
     // normal cases
     if(var->IsIdentifier()) {
       merged = MergeTypeId(merged, var->GetTypeId());
+      mergedtidx = MergeTypeIdx(mergedtidx, var->GetTypeIdx());
       bool isFunc = UpdateVarTypeWithInit(var, init);
       if (isFunc) {
         UpdateTypeId(node, var->GetTypeId());
@@ -1075,6 +1119,11 @@ DeclNode *TypeInferVisitor::VisitDeclNode(DeclNode *node) {
     UpdateTypeId(node, merged);
     UpdateTypeId(init, merged);
     UpdateTypeId(var, merged);
+    if (mergedtidx > 0) {
+      UpdateTypeIdx(node, mergedtidx);
+      UpdateTypeIdx(init, mergedtidx);
+      UpdateTypeIdx(var, mergedtidx);
+    }
   }
   SetTypeIdx(node, var->GetTypeIdx());
   if (isArray || IsArray(node)) {
@@ -1182,10 +1231,13 @@ ForLoopNode *TypeInferVisitor::VisitForLoopNode(ForLoopNode *node) {
 FunctionNode *TypeInferVisitor::VisitFunctionNode(FunctionNode *node) {
   if (mFlags & FLG_trace_1) std::cout << "Visiting FunctionNode, id=" << node->GetNodeId() << "..." << std::endl;
   UpdateTypeId(node, node->IsArray() ? TY_Object : TY_Function);
+  (void) AstVisitor::VisitFunctionNode(node);
   if (node->GetFuncName()) {
     SetTypeId(node->GetFuncName(), node->GetTypeId());
   }
-  (void) AstVisitor::VisitFunctionNode(node);
+  if (node->GetType()) {
+    SetTypeIdx(node, node->GetType()->GetTypeIdx());
+  }
   return node;
 }
 
@@ -1197,15 +1249,19 @@ IdentifierNode *TypeInferVisitor::VisitIdentifierNode(IdentifierNode *node) {
       SetTypeId(node, TY_Array);
       SetUpdated();
     }
+  }
+  (void) AstVisitor::VisitIdentifierNode(node);
+  if (type) {
     unsigned tidx = type->GetTypeIdx();
     if (tidx && node->GetTypeIdx() != tidx) {
-      SetTypeIdx(node, tidx);
+      UpdateTypeIdx(node, tidx);
       SetUpdated();
     }
   }
-  (void) AstVisitor::VisitIdentifierNode(node);
   if (node->GetInit()) {
     UpdateTypeId(node, node->GetInit()->GetTypeId());
+    UpdateTypeIdx(node, node->GetInit()->GetTypeIdx());
+    SetUpdated();
     return node;
   }
   TreeNode *parent = node->GetParent();
@@ -1234,6 +1290,7 @@ IdentifierNode *TypeInferVisitor::VisitIdentifierNode(IdentifierNode *node) {
     // check node itself is part of decl
     if (decl != parent) {
       UpdateTypeId(node, decl);
+      UpdateTypeIdx(node, decl);
     }
   } else {
     NOTYETIMPL("node not declared");
@@ -1348,7 +1405,7 @@ ReturnNode *TypeInferVisitor::VisitReturnNode(ReturnNode *node) {
   TreeNode *res = node->GetResult();
   if (res) {
     UpdateTypeId(node, res->GetTypeId());
-    SetTypeIdx(node, res->GetTypeIdx());
+    UpdateTypeIdx(node, res->GetTypeIdx());
   }
   TreeNode *tn = mHandler->FindFunc(node);
   if (tn) {
@@ -1452,7 +1509,7 @@ UserTypeNode *TypeInferVisitor::VisitUserTypeNode(UserTypeNode *node) {
     SetTypeIdx(node, TY_Array);
   } else if (node->GetId()) {
     UpdateTypeId(node, node->GetId());
-    SetTypeIdx(node, node->GetId()->GetTypeIdx());
+    UpdateTypeIdx(node, node->GetId());
   }
   TreeNode *parent = node->GetParent();
   if (parent && parent->IsIdentifier()) {

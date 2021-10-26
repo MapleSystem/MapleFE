@@ -121,6 +121,7 @@ class FillNodeInfoVisitor : public AstVisitor {
   PrimTypeNode *VisitPrimTypeNode(PrimTypeNode *node);
   UserTypeNode *VisitUserTypeNode(UserTypeNode *node);
   IdentifierNode *VisitIdentifierNode(IdentifierNode *node);
+  FunctionNode *VisitFunctionNode(FunctionNode *node);
 };
 
 class ImportExportVisitor : public AstVisitor {

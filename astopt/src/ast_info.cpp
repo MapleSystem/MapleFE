@@ -590,10 +590,19 @@ void AST_INFO::SetTypeIdx(TreeNode *node, unsigned tidx) {
 IdentifierNode *FillNodeInfoVisitor::VisitIdentifierNode(IdentifierNode *node) {
   (void) AstVisitor::VisitIdentifierNode(node);
   TreeNode *type = node->GetType();
-  if (type && type->IsPrimType()) {
-    PrimTypeNode *ptn = static_cast<PrimTypeNode *>(type);
-    mInfo->SetTypeId(node, ptn->GetTypeId());
-    mInfo->SetTypeIdx(node, ptn->GetTypeId());
+  if (type) {
+    mInfo->SetTypeId(node, type->GetTypeId());
+    mInfo->SetTypeIdx(node, type->GetTypeIdx());
+  }
+  return node;
+}
+
+FunctionNode *FillNodeInfoVisitor::VisitFunctionNode(FunctionNode *node) {
+  (void) AstVisitor::VisitFunctionNode(node);
+  TreeNode *type = node->GetType();
+  if (type) {
+    mInfo->SetTypeId(node, type->GetTypeId());
+    mInfo->SetTypeIdx(node, type->GetTypeIdx());
   }
   return node;
 }
@@ -646,7 +655,7 @@ LiteralNode *FillNodeInfoVisitor::VisitLiteralNode(LiteralNode *node) {
 
 PrimTypeNode *FillNodeInfoVisitor::VisitPrimTypeNode(PrimTypeNode *node) {
   (void) AstVisitor::VisitPrimTypeNode(node);
-  // mInfo->SetTypeId(node, node->GetPrimType());
+  mInfo->SetTypeIdx(node, node->GetPrimType());
   return node;
 }
 

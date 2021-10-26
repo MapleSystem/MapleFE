@@ -137,6 +137,8 @@ class TypeInferVisitor : public TypeInferBaseVisitor {
   void SetTypeIdx(TreeNode *node, unsigned tidx);
   void UpdateTypeId(TreeNode *node, TypeId tid);
   void UpdateTypeId(TreeNode *node1, TreeNode *node2);
+  void UpdateTypeIdx(TreeNode *node, unsigned tidx);
+  void UpdateTypeIdx(TreeNode *node1, TreeNode *node2);
   void UpdateFuncRetTypeId(FunctionNode *node, TypeId tid);
   void UpdateTypeUseNode(TreeNode *target, TreeNode *input);
   void UpdateArgArrayDecls(unsigned nid, TypeId tid);
@@ -145,8 +147,11 @@ class TypeInferVisitor : public TypeInferBaseVisitor {
   TypeId GetArrayElemTypeId(TreeNode *node);
 
   TypeId MergeTypeId(TypeId tia, TypeId tib);
+  unsigned MergeTypeIdx(unsigned tia, unsigned tib);
 
   bool IsArray(TreeNode *node);
+  // refer to shared/include/supported_types.def
+  bool IsPrimTypeIdx(unsigned tidx) { return tidx > 0 && tidx < TY_Void; }
 
   PrimTypeNode *GetOrClonePrimTypeNode(PrimTypeNode *node, TypeId tid);
 
