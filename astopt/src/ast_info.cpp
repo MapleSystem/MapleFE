@@ -642,7 +642,7 @@ LiteralNode *FillNodeInfoVisitor::VisitLiteralNode(LiteralNode *node) {
       break;
     case LT_ThisLiteral:
     case LT_SuperLiteral:
-      mInfo->SetTypeId(node, TY_Symbol);
+      mInfo->SetTypeId(node, TY_Object);
       break;
     case LT_VoidLiteral:
       mInfo->SetTypeId(node, TY_Void);
