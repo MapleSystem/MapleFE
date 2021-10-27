@@ -1277,7 +1277,7 @@ std::string Emitter::EmitReturnNode(ReturnNode *node) {
 std::string Emitter::EmitYieldNode(YieldNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str("yield ");
+  std::string str(node->IsTransfer() ? "yield* " : "yield ");
   if (auto n = node->GetResult()) {
     str += EmitTreeNode(n);
   }
