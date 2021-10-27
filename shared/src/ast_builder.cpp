@@ -2044,9 +2044,13 @@ TreeNode* ASTBuilder::BuildFieldLiteral() {
   if (mTrace)
     std::cout << "In BuildFieldLiteral" << std::endl;
 
+  TreeNode *field = NULL;
   Param p_field = mParams[0];
-  MASSERT(p_field.mIsTreeNode);
-  TreeNode *field = p_field.mData.mTreeNode;
+  if (p_field.mIsTreeNode) {
+    field = p_field.mData.mTreeNode;
+  } else {
+    field = BuildIdentifier(p_field.mData.mToken);
+  }
 
   Param p_value = mParams[1];
   MASSERT(p_value.mIsTreeNode);

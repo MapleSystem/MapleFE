@@ -1827,14 +1827,15 @@ rule ThisType: "this"
 rule PropertySignature: ONEOF(ZEROORONE(AccessibilityModifier) + PropertyName + ZEROORONE(TypeAnnotation),
                               ZEROORONE(AccessibilityModifier) + PropertyName + '?' + ZEROORONE(TypeAnnotation),
                               ZEROORONE(AccessibilityModifier) + "break" + ZEROORONE(TypeAnnotation),
-                              ZEROORONE(AccessibilityModifier) + "this" + ZEROORONE(TypeAnnotation))
+                              ZEROORONE(AccessibilityModifier) + "this" + ZEROORONE(TypeAnnotation),
+                              ZEROORONE(AccessibilityModifier) + "export" + ZEROORONE(TypeAnnotation))
   attr.action.%1 : AddType(%2, %3)
   attr.action.%2 : AddType(%2, %4)
   attr.action.%2 : SetIsOptional(%2)
   attr.action.%1,%2: AddModifierTo(%2, %1)
-  attr.action.%3,%4 : BuildIdentifier(%2)
-  attr.action.%3,%4 : AddType(%3)
-  attr.action.%3,%4 : AddModifier(%1)
+  attr.action.%3,%4,%5 : BuildIdentifier(%2)
+  attr.action.%3,%4,%5 : AddType(%3)
+  attr.action.%3,%4,%5 : AddModifier(%1)
 
 ## JS ECMA has more definition than this Typescript one. I use ECMA one.
 ## rule PropertyName: IdentifierName StringLiteral NumericLiteral
@@ -1963,8 +1964,9 @@ rule PropertyDefinition: ONEOF(IdentifierReference,
                                GetAccessor,
                                SetAccessor,
                                SpreadElement,
-                               "this" + ':' + AssignmentExpression)
-  attr.action.%3,%8 : BuildFieldLiteral(%1, %3)
+                               "this" + ':' + AssignmentExpression,
+                               "export" + ':' + AssignmentExpression)
+  attr.action.%3,%8,%9 : BuildFieldLiteral(%1, %3)
   attr.action.%4 : BuildFunction(%2)
   attr.action.%4 : AddType(%7)
   attr.action.%4 : AddParams(%5)

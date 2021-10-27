@@ -1,0 +1,11 @@
+Matched 10 tokens.
+Matched 24 tokens.
+Matched 31 tokens.
+============= Module ===========
+== Sub Tree ==
+ts_interface: IFace {exportfunc  ()  throws: 
+ }
+== Sub Tree ==
+js_var Decl: obj= {export:() -> "Export"}
+== Sub Tree ==
+console.log(obj)
