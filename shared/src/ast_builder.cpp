@@ -321,6 +321,16 @@ TreeNode* ASTBuilder::BuildIdentifier(const TreeNode *tree) {
     new (n) IdentifierNode(idx);
     mLastTreeNode = n;
     return n;
+  } else if (tree->IsLiteral()) {
+    LiteralNode *lit = (LiteralNode*)tree;
+    LitData data = lit->GetData();
+    if (data.mType == LT_ThisLiteral) {
+      IdentifierNode *n = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
+      unsigned idx = gStringPool.GetStrIdx("this");
+      new (n) IdentifierNode(idx);
+      mLastTreeNode = n;
+      return n;
+    }
   }
 
   return NULL;

@@ -1823,16 +1823,18 @@ rule TypeQueryExpression: ONEOF(IdentifierReference,
 rule ThisType: "this"
 
 ## rule PropertySignature: PropertyName ?opt TypeAnnotationopt
+## Some ugly TS/JS features allowing break, this as property name.
 rule PropertySignature: ONEOF(ZEROORONE(AccessibilityModifier) + PropertyName + ZEROORONE(TypeAnnotation),
                               ZEROORONE(AccessibilityModifier) + PropertyName + '?' + ZEROORONE(TypeAnnotation),
-                              ZEROORONE(AccessibilityModifier) + "break" + ZEROORONE(TypeAnnotation))
+                              ZEROORONE(AccessibilityModifier) + "break" + ZEROORONE(TypeAnnotation),
+                              ZEROORONE(AccessibilityModifier) + "this" + ZEROORONE(TypeAnnotation))
   attr.action.%1 : AddType(%2, %3)
   attr.action.%2 : AddType(%2, %4)
   attr.action.%2 : SetIsOptional(%2)
   attr.action.%1,%2: AddModifierTo(%2, %1)
-  attr.action.%3 : BuildIdentifier(%2)
-  attr.action.%3 : AddType(%3)
-  attr.action.%3 : AddModifier(%1)
+  attr.action.%3,%4 : BuildIdentifier(%2)
+  attr.action.%3,%4 : AddType(%3)
+  attr.action.%3,%4 : AddModifier(%1)
 
 ## JS ECMA has more definition than this Typescript one. I use ECMA one.
 ## rule PropertyName: IdentifierName StringLiteral NumericLiteral
@@ -1960,8 +1962,9 @@ rule PropertyDefinition: ONEOF(IdentifierReference,
                                  + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}',
                                GetAccessor,
                                SetAccessor,
-                               SpreadElement)
-  attr.action.%3 : BuildFieldLiteral(%1, %3)
+                               SpreadElement,
+                               "this" + ':' + AssignmentExpression)
+  attr.action.%3,%8 : BuildFieldLiteral(%1, %3)
   attr.action.%4 : BuildFunction(%2)
   attr.action.%4 : AddType(%7)
   attr.action.%4 : AddParams(%5)

@@ -1,0 +1,14 @@
+Matched 8 tokens.
+Matched 9 tokens.
+Matched 24 tokens.
+Matched 31 tokens.
+Matched 41 tokens.
+============= Module ===========
+== Sub Tree ==
+ts_interface: IFace {this }
+== Sub Tree ==
+js_var Decl: obj= {this: {name:"Name"}}
+== Sub Tree ==
+console.log(obj)
+== Sub Tree ==
+console.log(obj["this"])
