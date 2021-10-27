@@ -135,6 +135,11 @@ int A2C::ProcessAST() {
       AstGraph graph(module);
       graph.DumpGraph("After LoadFromAstBuf()", &std::cout);
     }
+  }
+
+  for (HandlerIndex i = 0; i < size; i++) {
+    Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
+    ModuleNode *module = handler->GetASTModule();
 
     // collect AST info
     handler->CollectInfo();
@@ -144,6 +149,11 @@ int A2C::ProcessAST() {
 
     // scope analysis
     handler->ScopeAnalysis();
+  }
+
+  for (HandlerIndex i = 0; i < size; i++) {
+    Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
+    ModuleNode *module = handler->GetASTModule();
 
     if (mFlags & FLG_trace_2) {
       std::cout << "============= After AdjustAST ===========" << std::endl;
@@ -157,6 +167,11 @@ int A2C::ProcessAST() {
       AstGraph graph(module);
       graph.DumpGraph("After AdjustAST()", &std::cout);
     }
+  }
+
+  for (HandlerIndex i = 0; i < size; i++) {
+    Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
+    ModuleNode *module = handler->GetASTModule();
 
     // build CFG
     handler->BuildCFG();
@@ -169,6 +184,11 @@ int A2C::ProcessAST() {
 
     // type inference
     handler->TypeInference();
+  }
+
+  for (HandlerIndex i = 0; i < size; i++) {
+    Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
+    ModuleNode *module = handler->GetASTModule();
 
     if (mFlags & FLG_trace_2) {
       std::cout << "============= AstGraph ===========" << std::endl;
@@ -181,12 +201,22 @@ int A2C::ProcessAST() {
       AstDump astdump(module);
       astdump.Dump("After BuildCFG()", &std::cout);
     }
+  }
+
+  for (HandlerIndex i = 0; i < size; i++) {
+    Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
+    ModuleNode *module = handler->GetASTModule();
 
     // data flow analysis
     handler->DataFlowAnalysis();
     if (mFlags & FLG_trace_2) {
       handler->Dump("After DataFlowAnalysis()");
     }
+  }
+
+  for (HandlerIndex i = 0; i < size; i++) {
+    Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
+    ModuleNode *module = handler->GetASTModule();
 
     if (mFlags & FLG_trace_2) {
       std::cout << "============== Dump Scope ==============" << std::endl;
