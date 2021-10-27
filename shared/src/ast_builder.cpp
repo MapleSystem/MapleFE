@@ -1608,14 +1608,13 @@ TreeNode* ASTBuilder::AddAsType() {
   if (mParams.size() == 2) {
     Param p_type = mParams[1];
     Param p_name = mParams[0];
-
-    if(!p_type.mIsEmpty && p_type.mIsTreeNode)
-      tree_type = p_type.mData.mTreeNode;
-
-    if (!p_name.mIsTreeNode)
-      MERROR("The variable name should be a IdentifierNode already, but actually NOT?");
+    if(!p_type.mIsEmpty) {
+      if(p_type.mIsTreeNode)
+        tree_type = p_type.mData.mTreeNode;
+      else
+        MERROR("The variable name should be a IdentifierNode already, but actually NOT?");
+    }
     node = p_name.mData.mTreeNode;
-
   } else {
     Param p_type = mParams[0];
     if(!p_type.mIsEmpty && p_type.mIsTreeNode)

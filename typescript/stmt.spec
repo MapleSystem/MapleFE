@@ -120,23 +120,22 @@ rule AsType : "as" + Type
 ##  [~Yield] yield
 
 rule IdentifierReference : ONEOF(
-  JSIdentifier,
-  "yield")
+  JSIdentifier)
+#  "yield")
 
 ##-----------------------------------
 ##rule BindingIdentifier[Yield] :
 ##  Identifier
 ##  [~Yield] yield
 
-rule BindingIdentifier : ONEOF(JSIdentifier, "yield")
+rule BindingIdentifier : ONEOF(JSIdentifier)
 
 ##-----------------------------------
 ##rule LabelIdentifier[Yield] :
 ##  Identifier
 ##  [~Yield] yield
 rule LabelIdentifier : ONEOF(
-  JSIdentifier,
-  "yield")
+  JSIdentifier)
 
 ##-----------------------------------
 ##rule Identifier :

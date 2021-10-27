@@ -1,0 +1,36 @@
+Matched 26 tokens.
+Matched 87 tokens.
+Matched 104 tokens.
+Matched 115 tokens.
+Matched 127 tokens.
+Matched 139 tokens.
+Matched 150 tokens.
+============= Module ===========
+== Sub Tree ==
+generator delegate(num)  throws: 
+  js_let Decl: r=yield num Add 100
+  return r
+
+== Sub Tree ==
+generator gen(n)  throws: 
+  for ( )
+    js_let Decl: res=yield delegate(i)
+    console.log(res)
+    cond-branch cond:res
+    true branch :
+      break:
+    false branch :
+
+
+  return "done"
+
+== Sub Tree ==
+js_const Decl: obj=gen(10)
+== Sub Tree ==
+console.log(obj.next())
+== Sub Tree ==
+console.log(obj.next(false))
+== Sub Tree ==
+console.log(obj.next(true))
+== Sub Tree ==
+console.log(obj.next())
