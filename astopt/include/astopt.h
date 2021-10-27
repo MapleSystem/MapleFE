@@ -41,6 +41,14 @@ public:
 
   AST_Handler *GetASTHandler() {return mASTHandler;}
   void ProcessAST(unsigned trace);
+
+  void CollectInfo();
+  void AdjustAST();
+  void ScopeAnalysis();
+  void BuildCFG();
+  void ControlFlowAnalysis();
+  void TypeInference();
+  void DataFlowAnalysis();
 };
 
 }

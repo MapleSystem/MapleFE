@@ -31,13 +31,10 @@
 namespace maplefe {
 
 void A2C::EmitTS() {
-  HandlerIndex size = mASTHandler->mModuleHandlers.GetNum();
-  for (HandlerIndex i = 0; i < size; i++) {
-    Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
-    // build CFG
-    handler->BuildCFG();
-  }
+  // build CFG
+  BuildCFG();
 
+  HandlerIndex size = mASTHandler->mModuleHandlers.GetNum();
   for (HandlerIndex i = 0; i < size; i++) {
     Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
     ModuleNode *module = handler->GetASTModule();
@@ -137,19 +134,14 @@ int A2C::ProcessAST() {
     }
   }
 
-  for (HandlerIndex i = 0; i < size; i++) {
-    Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
-    ModuleNode *module = handler->GetASTModule();
+  // collect AST info
+  CollectInfo();
 
-    // collect AST info
-    handler->CollectInfo();
+  // rewirte some AST nodes
+  AdjustAST();
 
-    // rewirte some AST nodes
-    handler->AdjustAST();
-
-    // scope analysis
-    handler->ScopeAnalysis();
-  }
+  // scope analysis
+  ScopeAnalysis();
 
   for (HandlerIndex i = 0; i < size; i++) {
     Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
@@ -169,22 +161,23 @@ int A2C::ProcessAST() {
     }
   }
 
+  // build CFG
+  BuildCFG();
+
   for (HandlerIndex i = 0; i < size; i++) {
     Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
     ModuleNode *module = handler->GetASTModule();
 
-    // build CFG
-    handler->BuildCFG();
     if (mFlags & FLG_trace_2) {
       handler->Dump("After BuildCFG()");
     }
-
-    // control flow analysis
-    handler->ControlFlowAnalysis();
-
-    // type inference
-    handler->TypeInference();
   }
+
+  // control flow analysis
+  ControlFlowAnalysis();
+
+  // type inference
+  TypeInference();
 
   for (HandlerIndex i = 0; i < size; i++) {
     Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
@@ -203,24 +196,15 @@ int A2C::ProcessAST() {
     }
   }
 
+  // data flow analysis
+  DataFlowAnalysis();
+
   for (HandlerIndex i = 0; i < size; i++) {
     Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
     ModuleNode *module = handler->GetASTModule();
 
-    // data flow analysis
-    handler->DataFlowAnalysis();
     if (mFlags & FLG_trace_2) {
       handler->Dump("After DataFlowAnalysis()");
-    }
-  }
-
-  for (HandlerIndex i = 0; i < size; i++) {
-    Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
-    ModuleNode *module = handler->GetASTModule();
-
-    if (mFlags & FLG_trace_2) {
-      std::cout << "============== Dump Scope ==============" << std::endl;
-      module->GetRootScope()->Dump(0);
     }
   }
 

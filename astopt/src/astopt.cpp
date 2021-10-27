@@ -41,24 +41,32 @@ void AstOpt::ProcessAST(unsigned flags) {
         std::cout << std::endl;
       }
     }
+  }
 
-    // rewirte some AST nodes
-    handler->AdjustAST();
+  // collect AST info
+  CollectInfo();
 
-    // scope analysis
-    handler->ScopeAnalysis();
+  // rewirte some AST nodes
+  AdjustAST();
 
-    // build CFG
-    handler->BuildCFG();
+  // scope analysis
+  ScopeAnalysis();
 
-    // control flow analysis
-    handler->ControlFlowAnalysis();
+  // build CFG
+  BuildCFG();
 
-    // type inference
-    handler->TypeInference();
+  // control flow analysis
+  ControlFlowAnalysis();
 
-    // data flow analysis
-    handler->DataFlowAnalysis();
+  // type inference
+  TypeInference();
+
+  // data flow analysis
+  DataFlowAnalysis();
+
+  for (int i = 0; i < size; i++) {
+    Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
+    ModuleNode *module = handler->GetASTModule();
 
     AstStore saveAst(module);
     saveAst.StoreInAstBuf();
@@ -66,4 +74,67 @@ void AstOpt::ProcessAST(unsigned flags) {
 
   return;
 }
+
+void AstOpt::CollectInfo() {
+  unsigned size = mASTHandler->mModuleHandlers.GetNum();
+  for (int i = 0; i < size; i++) {
+    Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
+    handler->CollectInfo();
+  }
+}
+
+void AstOpt::AdjustAST() {
+  unsigned size = mASTHandler->mModuleHandlers.GetNum();
+  for (int i = 0; i < size; i++) {
+    Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
+    handler->AdjustAST();
+  }
+}
+
+void AstOpt::ScopeAnalysis() {
+  unsigned size = mASTHandler->mModuleHandlers.GetNum();
+  for (int i = 0; i < size; i++) {
+    Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
+    handler->ScopeAnalysis();
+
+    if (mFlags & FLG_trace_2) {
+      std::cout << "============== Dump Scope ==============" << std::endl;
+      ModuleNode *module = handler->GetASTModule();
+      module->GetRootScope()->Dump(0);
+    }
+  }
+}
+
+void AstOpt::BuildCFG() {
+  unsigned size = mASTHandler->mModuleHandlers.GetNum();
+  for (int i = 0; i < size; i++) {
+    Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
+    handler->BuildCFG();
+  }
+}
+
+void AstOpt::ControlFlowAnalysis() {
+  unsigned size = mASTHandler->mModuleHandlers.GetNum();
+  for (int i = 0; i < size; i++) {
+    Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
+    handler->ControlFlowAnalysis();
+  }
+}
+
+void AstOpt::TypeInference() {
+  unsigned size = mASTHandler->mModuleHandlers.GetNum();
+  for (int i = 0; i < size; i++) {
+    Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
+    handler->TypeInference();
+  }
+}
+
+void AstOpt::DataFlowAnalysis() {
+  unsigned size = mASTHandler->mModuleHandlers.GetNum();
+  for (int i = 0; i < size; i++) {
+    Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
+    handler->DataFlowAnalysis();
+  }
+}
+
 }
