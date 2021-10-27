@@ -14,7 +14,7 @@ generator delegate(num)  throws:
 == Sub Tree ==
 generator gen(n)  throws: 
   for ( )
-    js_let Decl: res=yield delegate(i)
+    js_let Decl: res=yield* delegate(i)
     console.log(res)
     cond-branch cond:res
     true branch :

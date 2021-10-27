@@ -1475,9 +1475,13 @@ public:
 class YieldNode : public TreeNode {
 private:
   TreeNode *mResult;
+  bool      mIsTransfer;  // In TS, yeild* tranfers to another generator
 public:
-  YieldNode() : TreeNode(NK_Yield), mResult(nullptr) {}
+  YieldNode() : TreeNode(NK_Yield), mResult(nullptr), mIsTransfer(false) {}
   ~YieldNode(){}
+
+  void SetIsTransfer(bool b = true) {mIsTransfer = b;}
+  bool IsTransfer()          {return mIsTransfer;}
 
   void SetResult(TreeNode *t) {mResult = t; SETPARENT(t);}
   TreeNode* GetResult() { return mResult; }

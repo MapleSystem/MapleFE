@@ -1258,7 +1258,10 @@ void ReturnNode::Dump(unsigned ind) {
 void YieldNode::Dump(unsigned ind) {
   DumpLabel(ind);
   DumpIndentation(ind);
-  DUMP0_NORETURN("yield ");
+  if (mIsTransfer)
+    DUMP0_NORETURN("yield* ");
+  else
+    DUMP0_NORETURN("yield ");
   if (GetResult())
     GetResult()->Dump(0);
 }

@@ -3367,6 +3367,15 @@ TreeNode* ASTBuilder::SetIsGenerator() {
 }
 
 // It take no arugment. It uses mLastTreeNode which is
+// a yield node.
+TreeNode* ASTBuilder::SetIsTransfer() {
+  MASSERT(mLastTreeNode->IsYield());
+  YieldNode *node = (YieldNode*)mLastTreeNode;
+  node->SetIsTransfer();
+  return mLastTreeNode;
+}
+
+// It take no arugment. It uses mLastTreeNode which is
 // a function node.
 TreeNode* ASTBuilder::SetGetAccessor() {
   MASSERT(mLastTreeNode->IsFunction());

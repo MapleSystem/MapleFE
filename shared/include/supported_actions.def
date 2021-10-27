@@ -178,11 +178,13 @@ ACTION(SetIsRest)
 ACTION(SetIsConst)
 ACTION(SetIsUnique)
 
+ACTION(BuildYield)
+ACTION(SetIsTransfer)
+
 // statment, control flow
 ACTION(BuildAssignment)
 ACTION(BuildAssert)
 ACTION(BuildReturn)
-ACTION(BuildYield)
 ACTION(BuildCondBranch)
 ACTION(AddCondBranchTrueStatement)
 ACTION(AddCondBranchFalseStatement)

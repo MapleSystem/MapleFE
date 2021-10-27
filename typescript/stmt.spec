@@ -1374,6 +1374,7 @@ rule YieldExpression : ONEOF("yield",
   attr.action.%1: BuildYield()
   attr.action.%2: BuildYield(%2)
   attr.action.%3: BuildYield(%3)
+  attr.action.%3: SetIsTransfer()
 
 ## See 14.5
 ## ClassDeclaration[Yield, Default] :
