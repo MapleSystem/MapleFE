@@ -134,14 +134,8 @@ int A2C::ProcessAST() {
     }
   }
 
-  // collect AST info
-  CollectInfo();
-
-  // rewirte some AST nodes
-  AdjustAST();
-
-  // scope analysis
-  ScopeAnalysis();
+  // basic analysis
+  BasicAnalysis();
 
   for (HandlerIndex i = 0; i < size; i++) {
     Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
@@ -206,13 +200,9 @@ int A2C::ProcessAST() {
     if (mFlags & FLG_trace_2) {
       handler->Dump("After DataFlowAnalysis()");
     }
-  }
 
-  if (mFlags & FLG_emit_ts) {
-    std::cout << "============= Emitter ===========" << std::endl;
-    HandlerIndex size = mASTHandler->mModuleHandlers.GetNum();
-    for (HandlerIndex i = 0; i < size; i++) {
-      Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
+    if (mFlags & FLG_emit_ts) {
+      std::cout << "============= Emitter ===========" << std::endl;
       maplefe::Emitter emitter(handler);
       std::string code = emitter.Emit("Convert AST to TypeScript code");
       std::cout << code;

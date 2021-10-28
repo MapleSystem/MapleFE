@@ -27,26 +27,10 @@
 #include "ast.h"
 #include "ast_cfg.h"
 #include "ast_type.h"
+#include "ast_common.h"
 #include "gen_astvisitor.h"
 
 namespace maplefe {
-
-#define NOTYETIMPL(M) { if (mFlags & FLG_trace) { MNYI(M);        }}
-#define MSGNOLOC0(M)  { if (mFlags & FLG_trace_3) { MMSGNOLOC0(M);  }}
-#define MSGNOLOC(M,v) { if (mFlags & FLG_trace_3) { MMSGNOLOC(M,v); }}
-
-enum AST_Flags {
-  FLG_trace_1      = 0x00000001,
-  FLG_trace_2      = 0x00000002,
-  FLG_trace_3      = 0x00000004,
-  FLG_trace_4      = 0x00000008,
-  FLG_trace        = 0x0000000f,
-
-  FLG_emit_ts      = 0x00000010,
-  FLG_emit_ts_only = 0x00000020,
-  FLG_format_cpp   = 0x00000040,
-  FLG_no_imported  = 0x00000080,
-};
 
 class CfgBB;
 class CfgFunc;
