@@ -31,12 +31,13 @@
 namespace maplefe {
 
 void A2C::EmitTS() {
-  // build CFG
-  BuildCFG();
-
   HandlerIndex size = mASTHandler->mModuleHandlers.GetNum();
   for (HandlerIndex i = 0; i < size; i++) {
     Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
+
+    // build CFG
+    handler->BuildCFG();
+
     ModuleNode *module = handler->GetASTModule();
     std::cout << "============= AstDump ===========" << std::endl;
     AstDump astdump(module);
