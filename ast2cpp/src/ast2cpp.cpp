@@ -31,9 +31,8 @@
 namespace maplefe {
 
 void A2C::EmitTS() {
-  HandlerIndex size = mASTHandler->mModuleHandlers.GetNum();
-  for (HandlerIndex i = 0; i < size; i++) {
-    Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
+  for (HandlerIndex i = 0; i < GetModuleNum(); i++) {
+    Module_Handler *handler = mASTHandler->GetModuleHandler(i);
 
     // build CFG
     handler->BuildCFG();
@@ -54,9 +53,8 @@ void A2C::EmitTS() {
 
 bool A2C::LoadImportedModules() {
   std::queue<std::string> queue;
-  HandlerIndex size = mASTHandler->mModuleHandlers.GetNum();
-  for (HandlerIndex i = 0; i < size; i++) {
-    Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
+  for (HandlerIndex i = 0; i < GetModuleNum(); i++) {
+    Module_Handler *handler = mASTHandler->GetModuleHandler(i);
     ModuleNode *module = handler->GetASTModule();
     ImportedFiles imported(module);
     imported.VisitTreeNode(module);
@@ -96,7 +94,7 @@ bool A2C::LoadImportedModules() {
 
 // starting point of AST
 int A2C::ProcessAST() {
-  mIndexImported = mASTHandler->mModuleHandlers.GetNum();
+  mIndexImported = GetModuleNum();
 
   // used for FE verification
   if (mFlags & FLG_emit_ts_only) {
@@ -110,9 +108,8 @@ int A2C::ProcessAST() {
       return 1;
 
   // loop through module handlers
-  HandlerIndex size = mASTHandler->mModuleHandlers.GetNum();
-  for (HandlerIndex i = 0; i < size; i++) {
-    Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
+  for (HandlerIndex i = 0; i < GetModuleNum(); i++) {
+    Module_Handler *handler = mASTHandler->GetModuleHandler(i);
     ModuleNode *module = handler->GetASTModule();
 
     if (mFlags & FLG_trace_1) {
@@ -138,8 +135,8 @@ int A2C::ProcessAST() {
   // basic analysis
   BasicAnalysis();
 
-  for (HandlerIndex i = 0; i < size; i++) {
-    Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
+  for (HandlerIndex i = 0; i < GetModuleNum(); i++) {
+    Module_Handler *handler = mASTHandler->GetModuleHandler(i);
     ModuleNode *module = handler->GetASTModule();
 
     if (mFlags & FLG_trace_2) {
@@ -159,8 +156,8 @@ int A2C::ProcessAST() {
   // build CFG
   BuildCFG();
 
-  for (HandlerIndex i = 0; i < size; i++) {
-    Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
+  for (HandlerIndex i = 0; i < GetModuleNum(); i++) {
+    Module_Handler *handler = mASTHandler->GetModuleHandler(i);
     ModuleNode *module = handler->GetASTModule();
 
     if (mFlags & FLG_trace_2) {
@@ -174,8 +171,8 @@ int A2C::ProcessAST() {
   // type inference
   TypeInference();
 
-  for (HandlerIndex i = 0; i < size; i++) {
-    Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
+  for (HandlerIndex i = 0; i < GetModuleNum(); i++) {
+    Module_Handler *handler = mASTHandler->GetModuleHandler(i);
     ModuleNode *module = handler->GetASTModule();
 
     if (mFlags & FLG_trace_2) {
@@ -194,8 +191,8 @@ int A2C::ProcessAST() {
   // data flow analysis
   DataFlowAnalysis();
 
-  for (HandlerIndex i = 0; i < size; i++) {
-    Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
+  for (HandlerIndex i = 0; i < GetModuleNum(); i++) {
+    Module_Handler *handler = mASTHandler->GetModuleHandler(i);
     ModuleNode *module = handler->GetASTModule();
 
     if (mFlags & FLG_trace_2) {

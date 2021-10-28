@@ -22,9 +22,9 @@
 namespace maplefe {
 
 bool CppEmitter::EmitCxxFiles() {
-  unsigned size = mASTHandler->mModuleHandlers.GetNum();
+  unsigned size = mASTHandler->GetSize();
   for (int i = 0; i < size; i++) {
-    Module_Handler *handler = mASTHandler->mModuleHandlers.ValueAtIndex(i);
+    Module_Handler *handler = mASTHandler->GetModuleHandler(i);
     CppDecl decl(handler);
     { // Emit C++ header file
       std::string decl_code = decl.Emit();

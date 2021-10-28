@@ -38,23 +38,23 @@ class AstOpt {
 private:
   AST_Handler *mASTHandler;
   unsigned     mFlags;
-  unsigned     mUniqNum;
 
   std::list<unsigned> mHandlersIdxInOrder;
   std::unordered_map<unsigned, std::unordered_set<unsigned>> mHandlerIdx2DependentHandlerIdxMap;
   std::unordered_map<unsigned, unsigned> mStrIdx2HandlerIdxMap;
 
 public:
-  explicit AstOpt(AST_Handler *h, unsigned f) :
-    mASTHandler(h), mFlags(f) {}
+  explicit AstOpt(AST_Handler *h, unsigned f);
   ~AstOpt() = default;
 
   AST_Handler *GetASTHandler() {return mASTHandler;}
+  unsigned GetModuleNum();
+
   virtual void ProcessAST(unsigned trace);
 
-  void SetModuleStrIdx(unsigned i);
-  void AddHandler(unsigned i);
-  void SortHandler(unsigned i);
+  void SetModuleStrIdx();
+  void AddHandler();
+  void SortHandler();
 
   void BuildModuleOrder();
   void CollectInfo();
@@ -67,8 +67,8 @@ public:
   void TypeInference();
   void DataFlowAnalysis();
 
-  void AddHandlerIdx2DependentHandlerIdxMap(unsigned hdlidx, unsigned stridx) {
-    mHandlerIdx2DependentHandlerIdxMap[hdlidx].insert(stridx);
+  void AddHandlerIdx2DependentHandlerIdxMap(unsigned hdlIdx, unsigned depHdlIdx) {
+    mHandlerIdx2DependentHandlerIdxMap[hdlIdx].insert(depHdlIdx);
   }
 
   unsigned GetHandleIdxFromStrIdx(unsigned stridx) {

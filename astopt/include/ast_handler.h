@@ -161,17 +161,24 @@ const HandlerIndex HandlerNotFound = UINT_MAX;
 class AST_Handler {
  private:
   MemPool  mMemPool;    // Memory pool for all CfgFunc, CfgBB, etc.
+  unsigned mSize;
   unsigned mFlags;
- public:
+
   // vector of all AST modules
   SmallVector<Module_Handler *> mModuleHandlers;
+
+ public:
   // mapping of mModuleHandlers index with its corresponding filename as its key
   std::map<const char*, HandlerIndex, StrLess> mModuleHandlerMap;
 
-  explicit AST_Handler(unsigned f) : mFlags(f) {}
+  explicit AST_Handler(unsigned f) : mSize(0), mFlags(f) {}
   ~AST_Handler() {mMemPool.Release();}
 
   MemPool *GetMemPool() {return &mMemPool;}
+
+  Module_Handler *GetModuleHandler(unsigned i) {return mModuleHandlers.ValueAtIndex(i);}
+
+  unsigned GetSize() {return mSize;}
 
   // If m does not exist in mModuleHandlerMap,
   //    create an object of Module_Handler for module m
