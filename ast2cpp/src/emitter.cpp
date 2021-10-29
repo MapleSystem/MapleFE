@@ -552,7 +552,7 @@ std::string Emitter::EmitImportNode(ImportNode *node) {
     if (XXportAsPairNode *pair = node->GetPair(0))
       if (auto a = pair->GetAfter())
         if (auto b = pair->GetBefore())
-          if (b->IsIdentifier() && a->IsIdentifier()) {
+          if (a->IsIdentifier() && !b->IsLiteral()) {
             str += EmitTreeNode(a) + " = "s + EmitTreeNode(b);
             return HandleTreeNode(str, node);
           }
