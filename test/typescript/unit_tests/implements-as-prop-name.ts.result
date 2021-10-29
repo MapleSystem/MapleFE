@@ -1,0 +1,10 @@
+Matched 8 tokens.
+Matched 19 tokens.
+Matched 26 tokens.
+============= Module ===========
+== Sub Tree ==
+ts_interface: IFace {implements }
+== Sub Tree ==
+js_var Decl: obj= {:"implements"}
+== Sub Tree ==
+console.log(obj)
