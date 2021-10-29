@@ -13,10 +13,9 @@
 * See the Mulan PSL v2 for more details.
 */
 
-#include <filesystem>
 #include "astopt.h"
 #include "ast_handler.h"
-#include "gen_astdump.h"
+#include "ast_xxport.h"
 #include "gen_astgraph.h"
 #include "gen_aststore.h"
 #include "gen_astload.h"
@@ -27,6 +26,7 @@ class ImportedFiles;
 
 AstOpt::AstOpt(AST_Handler *h, unsigned f) {
   mASTHandler = h;
+  mASTXxport = new AST_Xxport(this, f);
   mFlags = f;
 }
 
@@ -69,9 +69,8 @@ void AstOpt::ProcessAST(unsigned flags) {
   // data flow analysis
   DataFlowAnalysis();
 
-  for (int i = 0; i < GetModuleNum(); i++) {
-    Module_Handler *handler = mASTHandler->GetModuleHandler(i);
-    ModuleNode *module = handler->GetASTModule();
+  for (auto it: mHandlersIdxInOrder) {
+    ModuleNode *module = it->GetASTModule();
 
     AstStore saveAst(module);
     saveAst.StoreInAstBuf();
@@ -80,64 +79,9 @@ void AstOpt::ProcessAST(unsigned flags) {
   return;
 }
 
-void AstOpt::BuildModuleOrder() {
-  // setup module stridx
-  SetModuleStrIdx();
-
-  // collect dependent info
-  AddHandler();
-
-  // sort handlers with dependency
-  SortHandler();
-
-  if (mFlags & FLG_trace_2) {
-    std::cout << "============== Module Order ==============" << std::endl;
-    std::list<unsigned>::iterator it = mHandlersIdxInOrder.begin();
-    for (; it != mHandlersIdxInOrder.end(); it++) {
-      unsigned idx = *it;
-      Module_Handler *handler = mASTHandler->GetModuleHandler(idx);
-      ModuleNode *module = handler->GetASTModule();
-      std::cout << "module : " << gStringPool.GetStringFromStrIdx(module->GetStrIdx()) << std::endl;
-    }
-  }
-}
-
-void AstOpt::CollectInfo() {
-  std::list<unsigned>::iterator it = mHandlersIdxInOrder.begin();
-  for (; it != mHandlersIdxInOrder.end(); it++) {
-    unsigned i = *it;
-    Module_Handler *handler = mASTHandler->GetModuleHandler(i);
-    handler->CollectInfo();
-  }
-}
-
-void AstOpt::AdjustAST() {
-  std::list<unsigned>::iterator it = mHandlersIdxInOrder.begin();
-  for (; it != mHandlersIdxInOrder.end(); it++) {
-    unsigned i = *it;
-    Module_Handler *handler = mASTHandler->GetModuleHandler(i);
-    handler->AdjustAST();
-  }
-}
-
-void AstOpt::ScopeAnalysis() {
-  std::list<unsigned>::iterator it = mHandlersIdxInOrder.begin();
-  for (; it != mHandlersIdxInOrder.end(); it++) {
-    unsigned i = *it;
-    Module_Handler *handler = mASTHandler->GetModuleHandler(i);
-    handler->ScopeAnalysis();
-
-    if (mFlags & FLG_trace_2) {
-      std::cout << "============== Dump Scope ==============" << std::endl;
-      ModuleNode *module = handler->GetASTModule();
-      module->GetRootScope()->Dump(0);
-    }
-  }
-}
-
 void AstOpt::BasicAnalysis() {
   // list modules according to dependency
-  BuildModuleOrder();
+  mASTXxport->BuildModuleOrder();
 
   // collect AST info
   CollectInfo();
@@ -149,154 +93,52 @@ void AstOpt::BasicAnalysis() {
   ScopeAnalysis();
 }
 
+void AstOpt::CollectInfo() {
+  for (auto it: mHandlersIdxInOrder) {
+    it->CollectInfo();
+  }
+}
+
+void AstOpt::AdjustAST() {
+  for (auto it: mHandlersIdxInOrder) {
+    it->AdjustAST();
+  }
+}
+
+void AstOpt::ScopeAnalysis() {
+  for (auto it: mHandlersIdxInOrder) {
+    it->ScopeAnalysis();
+
+    if (mFlags & FLG_trace_2) {
+      std::cout << "============== Dump Scope ==============" << std::endl;
+      ModuleNode *module = it->GetASTModule();
+      module->GetRootScope()->Dump(0);
+    }
+  }
+}
+
 void AstOpt::BuildCFG() {
-  std::list<unsigned>::iterator it = mHandlersIdxInOrder.begin();
-  for (; it != mHandlersIdxInOrder.end(); it++) {
-    unsigned i = *it;
-    Module_Handler *handler = mASTHandler->GetModuleHandler(i);
-    handler->BuildCFG();
+  for (auto it: mHandlersIdxInOrder) {
+    it->BuildCFG();
   }
 }
 
 void AstOpt::ControlFlowAnalysis() {
-  std::list<unsigned>::iterator it = mHandlersIdxInOrder.begin();
-  for (; it != mHandlersIdxInOrder.end(); it++) {
-    unsigned i = *it;
-    Module_Handler *handler = mASTHandler->GetModuleHandler(i);
-    handler->ControlFlowAnalysis();
+  for (auto it: mHandlersIdxInOrder) {
+    it->ControlFlowAnalysis();
   }
 }
 
 void AstOpt::TypeInference() {
-  std::list<unsigned>::iterator it = mHandlersIdxInOrder.begin();
-  for (; it != mHandlersIdxInOrder.end(); it++) {
-    unsigned i = *it;
-    Module_Handler *handler = mASTHandler->GetModuleHandler(i);
-    handler->TypeInference();
+  for (auto it: mHandlersIdxInOrder) {
+    it->TypeInference();
   }
 }
 
 void AstOpt::DataFlowAnalysis() {
-  std::list<unsigned>::iterator it = mHandlersIdxInOrder.begin();
-  for (; it != mHandlersIdxInOrder.end(); it++) {
-    unsigned i = *it;
-    Module_Handler *handler = mASTHandler->GetModuleHandler(i);
-    handler->DataFlowAnalysis();
+  for (auto it: mHandlersIdxInOrder) {
+    it->DataFlowAnalysis();
   }
-}
-
-void AstOpt::SetModuleStrIdx() {
-  for (int i = 0; i < GetModuleNum(); i++) {
-    Module_Handler *handler = mASTHandler->GetModuleHandler(i);
-    ModuleNode *module = handler->GetASTModule();
-
-    // setup module node stridx with module file name
-    unsigned stridx = gStringPool.GetStrIdx(module->GetFilename());
-    module->SetStrIdx(stridx);
-    mStrIdx2HandlerIdxMap[stridx] = i;
-
-    if (mFlags & FLG_trace_2) {
-      std::cout << "module : " << gStringPool.GetStringFromStrIdx(module->GetStrIdx()) << std::endl;
-    }
-  }
-}
-
-void AstOpt::AddHandler() {
-  for (int i = 0; i < GetModuleNum(); i++) {
-    Module_Handler *handler = mASTHandler->GetModuleHandler(i);
-    ModuleNode *module = handler->GetASTModule();
-
-    XXportNodeVisitor visitor(this, handler, i, mFlags);
-    visitor.Visit(module);
-  }
-}
-
-void AstOpt::SortHandler() {
-  for (int i = 0; i < GetModuleNum(); i++) {
-    if (mHandlersIdxInOrder.size() == 0) {
-      mHandlersIdxInOrder.push_back(i);
-      continue;
-    }
-
-    bool added = false;
-    std::list<unsigned>::iterator it = mHandlersIdxInOrder.begin();
-    for (; it != mHandlersIdxInOrder.end(); it++) {
-      unsigned idx = *it;
-      // check if handler idx has dependency on i
-      if (mHandlerIdx2DependentHandlerIdxMap[idx].find(i) != mHandlerIdx2DependentHandlerIdxMap[i].end()) {
-        mHandlersIdxInOrder.insert(it, i);
-        added = true;
-        break;
-      }
-    }
-
-    if (!added) {
-      mHandlersIdxInOrder.push_back(i);
-    }
-  }
-}
-
-// set up import node stridx with target module file name stridx
-ImportNode *XXportNodeVisitor::VisitImportNode(ImportNode *node) {
-  (void) AstVisitor::VisitImportNode(node);
-
-  TreeNode *target = node->GetTarget();
-  if (target) {
-    std::string name = GetTargetFilename(target);
-
-    // store name's string index in node
-    unsigned stridx = gStringPool.GetStrIdx(name);
-    node->SetStrIdx(stridx);
-
-    // update handler dependency map
-    unsigned dep = mAstOpt->GetHandleIdxFromStrIdx(stridx);
-    mAstOpt->AddHandlerIdx2DependentHandlerIdxMap(mHandlerIdx, dep);
-  }
-
-  return node;
-}
-
-// set up export node stridx with target module file name stridx
-ExportNode *XXportNodeVisitor::VisitExportNode(ExportNode *node) {
-  (void) AstVisitor::VisitExportNode(node);
-
-  TreeNode *target = node->GetTarget();
-  if (target) {
-    std::string name = GetTargetFilename(target);
-
-    // store name's string index in node
-    unsigned stridx = gStringPool.GetStrIdx(name);
-    node->SetStrIdx(stridx);
-
-    // update handler dependency map
-    unsigned dep = mAstOpt->GetHandleIdxFromStrIdx(stridx);
-    mAstOpt->AddHandlerIdx2DependentHandlerIdxMap(mHandlerIdx, dep);
-  }
-
-  return node;
-}
-
-std::string XXportNodeVisitor::GetTargetFilename(TreeNode *node) {
-  std::string filename;
-  if (node && node->IsLiteral()) {
-    LiteralNode *lit = static_cast<LiteralNode *>(node);
-    LitData data = lit->GetData();
-    filename = AstDump::GetEnumLitData(data);
-    filename += ".ts"s;
-    if(filename.front() != '/') {
-      ModuleNode *module = mHandler->GetASTModule();
-      std::filesystem::path p = module->GetFilename();
-      try {
-        p = std::filesystem::canonical(p.parent_path() / filename);
-        filename = p.string();
-      }
-      catch(std::filesystem::filesystem_error const& ex) {
-        // Ignore std::filesystem::filesystem_error exception
-        // keep filename without converting it to a cannonical path
-      }
-    }
-  }
-  return filename;
 }
 
 }
