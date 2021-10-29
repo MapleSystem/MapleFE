@@ -57,6 +57,7 @@ std::string Emitter::GetEnding(TreeNode *n) {
     case NK_Struct:
     case NK_Namespace:
     case NK_Declare:
+    case NK_Module:
       str += "\n"s;
   }
   return str;
@@ -500,6 +501,15 @@ std::string Emitter::EmitExportNode(ExportNode *node) {
 
   std::string str;
   auto num = node->GetPairsNum();
+  if (num == 1 && node->GetTarget() == nullptr)
+    if (XXportAsPairNode *pair = node->GetPair(0))
+      if (auto b = pair->GetBefore())
+        if (b->IsModule() && pair->GetAfter() == nullptr) {
+          std::string s = EmitTreeNode(b);
+          str = "export module "s + static_cast<ModuleNode *>(b)->GetFilename()
+          + " {\n"s + s + "}\n"s;
+          return str;
+        }
   for (unsigned i = 0; i < num; ++i) {
     if (auto n = node->GetPair(i)) {
       std::string s = EmitXXportAsPairNode(n);
