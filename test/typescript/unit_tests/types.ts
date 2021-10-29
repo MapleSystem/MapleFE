@@ -7,7 +7,7 @@ console.log(typeof("abc"));        // string
 console.log(typeof(Symbol()));     // symbol
 console.log(typeof(123));          // number
 //console.log(typeof(123n));         // bigint
-console.log(typeof(BigInt(123)));  // bigint
+//console.log(typeof(BigInt(123)));  // bigint
 
 // complex/compound type
 console.log(typeof({}));           // object
@@ -26,7 +26,7 @@ console.log(typeof(String()));           // string
 console.log(typeof(Boolean()));          // boolean
 console.log(typeof(Date()));             // string
 console.log(typeof(Number()));           // number
-console.log(typeof(BigInt(123)));        // bigint
+//console.log(typeof(BigInt(123)));        // bigint
 console.log(typeof(new String()));       // object
 console.log(typeof(new Boolean()));      // object
 console.log(typeof(new Date()));         // object

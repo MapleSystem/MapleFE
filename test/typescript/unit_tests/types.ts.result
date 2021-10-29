@@ -5,34 +5,32 @@ Matched 40 tokens.
 Matched 50 tokens.
 Matched 62 tokens.
 Matched 72 tokens.
-Matched 85 tokens.
-Matched 96 tokens.
-Matched 106 tokens.
-Matched 117 tokens.
-Matched 127 tokens.
-Matched 138 tokens.
-Matched 145 tokens.
-Matched 155 tokens.
-Matched 166 tokens.
-Matched 177 tokens.
-Matched 187 tokens.
-Matched 199 tokens.
-Matched 211 tokens.
-Matched 223 tokens.
+Matched 83 tokens.
+Matched 93 tokens.
+Matched 104 tokens.
+Matched 114 tokens.
+Matched 125 tokens.
+Matched 132 tokens.
+Matched 142 tokens.
+Matched 153 tokens.
+Matched 164 tokens.
+Matched 174 tokens.
+Matched 186 tokens.
+Matched 198 tokens.
+Matched 210 tokens.
+Matched 222 tokens.
 Matched 235 tokens.
 Matched 248 tokens.
 Matched 261 tokens.
 Matched 274 tokens.
-Matched 287 tokens.
-Matched 300 tokens.
-Matched 312 tokens.
-Matched 324 tokens.
-Matched 336 tokens.
-Matched 348 tokens.
-Matched 360 tokens.
-Matched 371 tokens.
-Matched 384 tokens.
-Matched 396 tokens.
+Matched 286 tokens.
+Matched 298 tokens.
+Matched 310 tokens.
+Matched 322 tokens.
+Matched 334 tokens.
+Matched 345 tokens.
+Matched 358 tokens.
+Matched 370 tokens.
 ============= Module ===========
 == Sub Tree ==
 console.log( typeof undefined)
@@ -48,8 +46,6 @@ console.log( typeof "abc")
 console.log( typeof Symbol())
 == Sub Tree ==
 console.log( typeof 123)
-== Sub Tree ==
-console.log( typeof BigInt(123))
 == Sub Tree ==
 console.log( typeof  {})
 == Sub Tree ==
@@ -78,8 +74,6 @@ console.log( typeof Boolean())
 console.log( typeof Date())
 == Sub Tree ==
 console.log( typeof Number())
-== Sub Tree ==
-console.log( typeof BigInt(123))
 == Sub Tree ==
 console.log( typeof new String())
 == Sub Tree ==
