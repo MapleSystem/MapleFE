@@ -1,0 +1,4 @@
+Matched 55 tokens.
+============= Module ===========
+== Sub Tree ==
+ type NT<T,R> = union  = (args) ->  | (args) ->  | (args) -> 

@@ -1344,15 +1344,19 @@ bool Parser::TraverseToken(Token *token, AppealNode *parent, AppealNode *&child_
         found = true;
         alt_found = true;
         mATMToken = mCurToken;
-        if (!mInAltTokensMatching) {
-          mInAltTokensMatching = true;
-          appeal->m1stAltTokenMatched = true;
-        }
-        mNextAltTokenIndex++;
 
         if (mTraceTable) {
           std::cout << "Work on alt token, index : " << mNextAltTokenIndex << std::endl;
         }
+
+        if (!mInAltTokensMatching) {
+          mInAltTokensMatching = true;
+          appeal->m1stAltTokenMatched = true;
+          if (mTraceTable) {
+            std::cout << "Turn On mInAltTokensMatching " << std::endl;
+          }
+        }
+        mNextAltTokenIndex++;
 
         appeal->mResult = Succ;
         appeal->AddMatch(mCurToken);
@@ -1366,9 +1370,9 @@ bool Parser::TraverseToken(Token *token, AppealNode *parent, AppealNode *&child_
           mInAltTokensMatching = false;
           mNextAltTokenIndex = 0;
           if (mTraceTable) {
-            std::cout << "Work on alt token, succ, index : " << mNextAltTokenIndex << std::endl;
+            std::cout << "Work on alt token is successfully finised. Set mNextAltTokenIndex to : " << mNextAltTokenIndex << std::endl;
+            std::cout << "Turn Off mInAltTokensMatching " << std::endl;
           }
-
         }
       }
     }
@@ -1644,13 +1648,27 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *appeal) {
   int last_matched = mCurToken - 1;
   prev_succ_tokens.PushBack(last_matched);
 
+  // This is regarding the matching of Alternative Tokens. For example,
+  //    a<b<c>>
+  // >> needs to be matched as two '>'.
+  // mInAltTokensMatching is used to control if we are in the middle of matching such tokens.
+  // However, there is a complicated case, that is  "c>", which could be matched as part
+  // RelationshipExpression, and it turned on mInAltTokensMatching. But it actually fails
+  // to be a RelationshipExpression and mInAltTokensMatching should be turned off.
+  bool turned_on_AltToken = false;
+
   for (unsigned i = 0; i < rule_table->mNum; i++) {
     bool is_zeroxxx = false;
+    bool is_token = false;
+    bool old_mInAltTokensMatching = mInAltTokensMatching;
+
     TableData *data = rule_table->mData + i;
     if (data->mType == DT_Subtable) {
       RuleTable *zero_rt = data->mData.mEntry;
       if (zero_rt->mType == ET_Zeroormore || zero_rt->mType == ET_Zeroorone)
         is_zeroxxx = true;
+    } else if (data->mType == DT_Token) {
+      is_token = true;
     }
 
     SmallVector<unsigned> carry_on_prev;
@@ -1701,8 +1719,12 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *appeal) {
         if (!prev_succ_tokens.Find(token))
           prev_succ_tokens.PushBack(token);
       }
+      // alert mInAltTokensMatching is turned on
+      if (is_token && mInAltTokensMatching && !old_mInAltTokensMatching) {
+        turned_on_AltToken = true;
+      }
     } else {
-      // Once a single child rule fails, the 'appeal' fails.
+      // Once a child rule fails, the 'appeal' fails.
       found = false;
       break;
     }
@@ -1725,6 +1747,10 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *appeal) {
     appeal->mResult = Succ;
     if (appeal->GetMatchNum() > 0)
       mCurToken = appeal->LongestMatch() + 1;
+  } else if (turned_on_AltToken) {
+    mInAltTokensMatching = false;
+    if (mTraceTable)
+      std::cout << "Turned Off mInAltTokensMatching." << std::endl;
   }
 
   return found;
@@ -1736,8 +1762,13 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *appeal) {
 //    Oneof and Zeroormore should be handled differently.
 // 3. The mCurToken moves if found target, or restore the original location.
 bool Parser::TraverseTableData(TableData *data, AppealNode *appeal, AppealNode *&child_node) {
-  if (mEndOfFile)
-    return false;
+  // Usually mCurToken is a new token to be matched. So if it's end of file, we simply return false.
+  // However, if mCurToken is actually an ATMToken, which means it needs to be matched
+  // multiple times, we are NOT at the end yet.
+  if (mEndOfFile) {
+    if (!(mInAltTokensMatching && (mCurToken == mATMToken)))
+      return false;
+  }
 
   unsigned old_pos = mCurToken;
   bool     found = false;
