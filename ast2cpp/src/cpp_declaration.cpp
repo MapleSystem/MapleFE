@@ -96,13 +96,9 @@ class ImportExportModules : public AstVisitor {
               if (auto a = x->GetAfter()) {
                 std::string after = mEmitter->EmitTreeNode(a);
                 if (node->GetTarget()) {
-                  if (v == "default") {
-                    mImports += Comment(node) + "inline const decltype("s + module + "__default) &"s + after
-                      + " = "s + module + "__default;\n"s;
-                  } else {
-                    mImports += Comment(node) + "inline const decltype("s + module + "::__export::"s + v + ") &"s + after
-                      + " = "s + module + "::__export::"s + v + ";\n"s;
-                  }
+                  v = (v == "default" ? "__"s  : "::__export::"s) + v;
+                  mImports += Comment(node) + "inline const decltype("s + module + v + ") &"s + after
+                    + " = "s + module + v + ";\n"s;
                 } else {
                   mEmitter->Replace(v, ".", "::");
                   mImports += Comment(node) + "inline const decltype("s + v + ") &"s + after + " = "s + v + ";\n"s;
