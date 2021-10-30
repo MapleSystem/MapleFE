@@ -162,7 +162,7 @@ std::string Emitter::EmitAsTypeNode(AsTypeNode *node) {
   if (auto n = node->GetType()) {
     str += " as "s + EmitTreeNode(n);
   }
-  mPrecedence = '\030';
+  mPrecedence = '\023';
   return HandleTreeNode(str, node);
 }
 
@@ -188,6 +188,7 @@ std::string Emitter::EmitIdentifierNode(IdentifierNode *node) {
     str += "#private"s;
   else
     str += accessor1 + accessor2 + name;
+  mPrecedence = '\030';
   str = HandleTreeNode(str, node);
   //if (auto n = node->GetDims()) {
   //  str += ' ' + EmitDimensionNode(n);
@@ -205,7 +206,6 @@ std::string Emitter::EmitIdentifierNode(IdentifierNode *node) {
   if (auto n = node->GetInit()) {
     str += " = "s + EmitTreeNode(n);
   }
-  mPrecedence = '\030';
   return str;
 }
 
@@ -1181,6 +1181,7 @@ std::string Emitter::EmitLiteralNode(LiteralNode *node) {
   std::string str(AstDump::GetEnumLitData(lit));
   if(lit.mType == LT_StringLiteral || lit.mType == LT_CharacterLiteral)
     str = '"' + str + '"';
+  mPrecedence = '\030';
   str = HandleTreeNode(str, node);
   if (auto n = node->GetType()) {
     str += ": "s + EmitTreeNode(n);
@@ -1188,7 +1189,6 @@ std::string Emitter::EmitLiteralNode(LiteralNode *node) {
   if (auto n = node->GetInit()) {
     str += " = "s + EmitTreeNode(n);
   }
-  mPrecedence = '\030';
   return str;
 }
 
@@ -2228,11 +2228,9 @@ static std::string &AddParentheses(std::string &str, TreeNode *node) {
 std::string &Emitter::HandleTreeNode(std::string &str, TreeNode *node) {
   auto num = node->GetAsTypesNum();
   if(num > 0) {
-    str = "(("s + str + ')';
     for (unsigned i = 0; i < num; ++i)
       if (auto t = node->GetAsTypeAtIndex(i))
         str += EmitAsTypeNode(t);
-    str += ')';
   }
   if(node->IsOptional())
     str = AddParentheses(str, node) + '?';
@@ -2240,11 +2238,13 @@ std::string &Emitter::HandleTreeNode(std::string &str, TreeNode *node) {
     str = AddParentheses(str, node) + '!';
   if(node->IsRest())
     str = "..."s + AddParentheses(str, node);
-  if(node->IsConst())
+  if(node->IsConst()) {
     if(node->IsField())
       str += " as const"s;
     else
       str = AddParentheses(str, node) + " as const"s;
+    mPrecedence = '\023';
+  }
   return str;
 }
 
