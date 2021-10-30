@@ -1626,8 +1626,10 @@ std::string Emitter::EmitClassNode(ClassNode *node) {
   auto classNum = node->GetSuperClassesNum();
   for (unsigned i = 0; i < classNum; ++i) {
     str += i ? ", "s : " extends "s;
-    if (auto n = node->GetSuperClass(i))
-      str += EmitTreeNode(n);
+    if (auto n = node->GetSuperClass(i)) {
+      std::string s = EmitTreeNode(n);
+      str += mPrecedence > '\023' ? s : '(' + s + ')';
+    }
   }
   for (unsigned i = 0; i < node->GetSuperInterfacesNum(); ++i) {
     str += i ? ", "s : " implements "s;
