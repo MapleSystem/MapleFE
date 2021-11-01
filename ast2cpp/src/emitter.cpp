@@ -1874,7 +1874,7 @@ std::string Emitter::EmitAwaitNode(AwaitNode *node) {
   if (auto n = node->GetExpr()) {
     str += EmitTreeNode(n);
   }
-  mPrecedence = '\030';
+  mPrecedence = '\023';
   if (node->IsStmt())
     str += ";\n"s;
   return str;
