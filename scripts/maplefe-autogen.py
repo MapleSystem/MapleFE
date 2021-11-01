@@ -718,8 +718,7 @@ gen_func_declaration = lambda dictionary, node_name: \
         'void ' + gen_args[2] + node_name + '(' + node_name + '* node);'
 gen_func_definition = lambda dictionary, node_name: \
         'void ' + gen_args[1] + '::' + gen_args[2] + node_name + '(' + node_name + '* node) {' \
-        + '\nif(node != nullptr' + (' && PutNode(node)) {' \
-        + 'if(auto t = node->GetLabel()) { PutEdge(node, t, "Label", NK_Null); DumpGraphTreeNode(t);}' \
+        + '\nif(node != nullptr' + (' && PutNode(node)) {\nHandleTreeNode(node);' \
         if node_name != "TreeNode" else ') {')
 gen_call_child_node = lambda dictionary, node_name, field_name, node_type, accessor: \
         'if(auto t = ' + accessor + ') {' + ('PutEdge(node, t, "' + field_name[1:] + \
@@ -809,6 +808,7 @@ bool PutNode(TreeNode *n) {{
                              break;
                            }}
       case NK_Pass:        *mOs << NodeColor(darkgrey); break;
+      case NK_AsType:      *mOs << NodeColor(bisque); break;
       case NK_New:         *mOs << NodeColor(khaki); break;
       case NK_Try:         *mOs << NodeColor(plum); break;
       case NK_Catch:       *mOs << NodeColor(thistle); break;
@@ -837,6 +837,18 @@ void PutChildEdge(TreeNode *from, TreeNode *to, const char *field, unsigned idx,
   if(to)
     *mOs << NodeName(from,\'_\') << " -> " << NodeName(to,\'_\') << "[label=\\"" << field
       << "[" << idx << "]\\"" << (to->GetParent() == from ? ",arrowhead=diamond" : "") << "];\\n";
+}}
+
+void HandleTreeNode(TreeNode *node) {{
+  if (auto t = node->GetLabel()) {{
+    PutEdge(node, t, "Label", NK_Null);
+    DumpGraphTreeNode(t);
+  }}
+  for (unsigned i = 0; i < node->GetAsTypesNum(); ++i)
+    if (auto t = node->GetAsTypeAtIndex(i)) {{
+      PutChildEdge(node, t, "AsTypes", i, NK_AsType);
+      DumpGraphAsTypeNode(t);
+    }}
 }}
 
 private:
