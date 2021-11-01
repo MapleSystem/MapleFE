@@ -2220,6 +2220,7 @@ std::string Emitter::EmitTreeNode(TreeNode *node) {
 
 static std::string &AddParentheses(std::string &str, TreeNode *node) {
   if (!node->IsIdentifier() &&
+      !node->IsField() &&
       !node->IsLiteral() &&
       !node->IsArrayLiteral() &&
       !node->IsBindingPattern())
