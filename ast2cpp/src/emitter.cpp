@@ -190,6 +190,8 @@ std::string Emitter::EmitIdentifierNode(IdentifierNode *node) {
     str += accessor1 + accessor2 + name;
   mPrecedence = '\030';
   str = HandleTreeNode(str, node);
+  if (node->IsOptionalParam())
+    str += '?';
   //if (auto n = node->GetDims()) {
   //  str += ' ' + EmitDimensionNode(n);
   //}
