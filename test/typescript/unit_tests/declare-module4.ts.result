@@ -1,0 +1,10 @@
+Matched 6 tokens.
+Matched 22 tokens.
+============= Module ===========
+== Sub Tree ==
+export {js_var Decl: x} 
+== Sub Tree ==
+declare ============= Module ===========
+== Sub Tree ==
+ts_interface: IFace {expect }
+
