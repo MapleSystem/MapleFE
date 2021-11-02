@@ -2244,6 +2244,7 @@ std::string &Emitter::HandleTreeNode(std::string &str, TreeNode *node) {
   if(num > 0) {
     if (node->IsBinOperator() ||
         node->IsUnaOperator() ||
+        node->IsTerOperator() ||
         node->IsNew()) {
       str = '(' + str + ')';
       mPrecedence = '\030';
