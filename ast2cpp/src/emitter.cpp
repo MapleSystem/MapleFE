@@ -1808,7 +1808,7 @@ std::string Emitter::EmitTypeOfNode(TypeOfNode *node) {
   std::string str("typeof "s), rhs;
   if (auto n = node->GetExpr()) {
     rhs = EmitTreeNode(n);
-    if(precd > mPrecedence) // right-to-left
+    if(precd > mPrecedence && !n->IsConditionalType()) // right-to-left
       rhs = '(' + rhs + ')';
   }
   else
