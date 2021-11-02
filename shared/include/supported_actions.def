@@ -120,7 +120,7 @@ ACTION(BuildArrayLiteral)
 
 // For function
 ACTION(AddParams)
-ACTION(SetOptionalParam)  // TS defines optional parameters.
+ACTION(SetIsOptional)    // TS defines optional parameters.
 ACTION(BuildFunction)
 ACTION(BuildConstructor)
 ACTION(AddFunctionBody)

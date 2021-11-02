@@ -764,12 +764,9 @@ private:
 
   SmallVector<AnnotationNode*> mAnnotations; //annotation or pragma
 
-
-  bool           mOptionalParam; // A optional parameter.
 public:
   IdentifierNode(unsigned id, TreeNode *t) : TreeNode(NK_Identifier, id),
-    mType(t), mInit(nullptr), mDims(nullptr),
-    mOptionalParam(false) {}
+    mType(t), mInit(nullptr), mDims(nullptr) {}
   IdentifierNode(unsigned id) : IdentifierNode(id, nullptr) {}
   IdentifierNode() : IdentifierNode(0, nullptr) {}
   ~IdentifierNode(){Release();}
@@ -782,10 +779,6 @@ public:
   void SetInit(TreeNode *t)      {mInit = t; SETPARENT(t);}
   void ClearInit()               {mInit = nullptr;}
   void SetDims(DimensionNode *t) {mDims = t; SETPARENT(t);}
-
-  bool IsOptionalParam()       {return mOptionalParam;}
-  bool GetOptionalParam()      {return mOptionalParam;}
-  void SetOptionalParam(bool b){mOptionalParam = b;}
 
   unsigned GetDimsNum()          {return mDims->GetDimensionsNum();}
   unsigned GetDim(unsigned n)    {return mDims->GetDimension(n);} // 0 means unspecified.

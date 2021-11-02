@@ -3242,7 +3242,7 @@ TreeNode* ASTBuilder::SetOptionalParam() {
   TreeNode *param = p_param.mData.mTreeNode;
   if (param->IsIdentifier()) {
     IdentifierNode *id = (IdentifierNode*)param;
-    id->SetOptionalParam(true);
+    id->SetIsOptional(true);
   } else if (param->IsBindingPattern()) {
     BindingPatternNode *id = (BindingPatternNode*)param;
     id->SetIsOptional();
