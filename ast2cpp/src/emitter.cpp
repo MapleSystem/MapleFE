@@ -1061,6 +1061,7 @@ std::string Emitter::EmitStructNode(StructNode *node) {
   }
 
   str += "}\n"s;
+  mPrecedence = '\030';
   return HandleTreeNode(str, node);
 }
 
