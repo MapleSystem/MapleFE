@@ -38,7 +38,7 @@ std::string Emitter::GetEnding(TreeNode *n) {
   }
   if (n->IsDeclare()) {
     DeclareNode *d = static_cast<DeclareNode *>(n);
-    if (d->GetDeclsNum() == 1)
+    if (d->GetDeclsNum() == 1 && !d->IsGlobal())
       if (auto p = d->GetDeclAtIndex(0))
         n = p;
   }
@@ -470,8 +470,15 @@ std::string Emitter::EmitDeclareNode(DeclareNode *node) {
   unsigned num = node->GetDeclsNum();
   if (node->IsGlobal() || num != 1) {
     str += "declare "s;
-    if (node->IsGlobal())
+    if (node->IsGlobal()) {
+      TreeNode *n = node;
+      while(n = n->GetParent())
+        if (n->IsDeclare()) {
+          str = std::string();
+          break;
+        }
       str += "global "s;
+    }
     str += "{\n"s;
     for (unsigned i = 0; i < num; ++i) {
       if (auto n = node->GetDeclAtIndex(i))
