@@ -43,13 +43,14 @@ class AST_Util;
 class AST_Handler;
 class TypeInfer;
 class TypeTable;
+class AstOpt;
 
 // Each source file is a module
 class Module_Handler {
  private:
   AST_Handler  *mASTHandler;
   ModuleNode   *mASTModule;  // for an AST module
-  CfgFunc      *mCfgFunc;   // initial CfgFunc in module scope
+  CfgFunc      *mCfgFunc;    // initial CfgFunc in module scope
   AST_INFO     *mINFO;
   AST_ADJ      *mADJ;
   AST_SCP      *mSCP;
@@ -58,7 +59,10 @@ class Module_Handler {
   AST_DFA      *mDFA;
   AST_Util     *mUtil;
   const char   *mOutputFilename;
+  unsigned      mHidx;       // handler index in AST_Handler
+
   unsigned      mFlags;
+
   std::unordered_map<unsigned, CfgBB *> mNodeId2BbMap;
 
  public:
@@ -117,6 +121,7 @@ class Module_Handler {
   CfgBB *GetBbFromBbId(unsigned id)          { return mBbId2BbMap[id]; }
 
   unsigned GetFlags() {return mFlags;}
+  unsigned GetHidx() {return mHidx;}
   AST_INFO *GetINFO() {return mINFO;}
   AST_ADJ *GetADJ() {return mADJ;}
   AST_CFA *GetCFA() {return mCFA;}
@@ -124,6 +129,8 @@ class Module_Handler {
   AST_SCP *GetSCP() {return mSCP;}
   TypeInfer *GetTI() {return mTI;}
   AST_Util *GetUtil() {return mUtil;}
+
+  void SetHidx(unsigned idx) {mHidx = idx;}
   void SetINFO(AST_INFO *p) {mINFO = p;}
   void SetADJ(AST_ADJ *p) {mADJ = p;}
   void SetCFA(AST_CFA *p) {mCFA = p;}
@@ -161,6 +168,7 @@ const HandlerIndex HandlerNotFound = UINT_MAX;
 class AST_Handler {
  private:
   MemPool  mMemPool;    // Memory pool for all CfgFunc, CfgBB, etc.
+  AstOpt  *mAstOpt;
   unsigned mSize;
   unsigned mFlags;
 
@@ -175,6 +183,9 @@ class AST_Handler {
   ~AST_Handler() {mMemPool.Release();}
 
   MemPool *GetMemPool() {return &mMemPool;}
+
+  AstOpt *GetAstOpt() {return mAstOpt;}
+  void SetAstOpt(AstOpt *opt) {mAstOpt = opt;}
 
   Module_Handler *GetModuleHandler(unsigned i) {return mModuleHandlers.ValueAtIndex(i);}
 

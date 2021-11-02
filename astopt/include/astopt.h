@@ -41,9 +41,10 @@ private:
 
 public:
   explicit AstOpt(AST_Handler *h, unsigned f);
-  ~AstOpt() = default;
+  ~AstOpt() { delete mASTHandler; }
 
   AST_Handler *GetASTHandler() {return mASTHandler;}
+  AST_Xxport *GetASTXxport() {return mASTXxport;}
   unsigned GetModuleNum();
   Module_Handler *GetModuleHandler(unsigned i) { return mHandlersIdxInOrder[i]; }
   void AddModuleHandler(Module_Handler *h) { mHandlersIdxInOrder.push_back(h); }

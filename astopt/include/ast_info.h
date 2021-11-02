@@ -52,9 +52,6 @@ class AST_INFO {
            mNameAnonyStruct(false) {}
   ~AST_INFO() {}
 
-  std::unordered_set<ImportNode *> mImports;;
-  std::unordered_set<ExportNode *> mExports;;
-
   void CollectInfo();
 
   unsigned GetPass() { return mPass; }
@@ -96,9 +93,6 @@ class AST_INFO {
   void InsertTypeParamStrIdx(unsigned stridx) { mTypeParamStrIdxSet.insert(stridx); }
   void InsertWithTypeParamNode(TreeNode *node) { mWithTypeParamNodeSet.insert(node->GetNodeId()); }
 
-  void AddImport(ImportNode *node) { mImports.insert(node); }
-  void AddExport(ExportNode *node) { mExports.insert(node); }
-
   void SetTypeId(TreeNode *node, TypeId tid);
   void SetTypeIdx(TreeNode *node, unsigned tidx);
 };
@@ -122,24 +116,6 @@ class FillNodeInfoVisitor : public AstVisitor {
   UserTypeNode *VisitUserTypeNode(UserTypeNode *node);
   IdentifierNode *VisitIdentifierNode(IdentifierNode *node);
   FunctionNode *VisitFunctionNode(FunctionNode *node);
-};
-
-class ImportExportVisitor : public AstVisitor {
- private:
-  Module_Handler *mHandler;
-  AST_INFO       *mInfo;
-  unsigned       mFlags;
-  bool           mUpdated;
-
- public:
-  explicit ImportExportVisitor(Module_Handler *h, unsigned f, bool base = false)
-    : mHandler(h), mFlags(f), mUpdated(false), AstVisitor((f & FLG_trace_1) && base) {
-      mInfo= mHandler->GetINFO();
-    }
-  ~ImportExportVisitor() = default;
-
-  ImportNode *VisitImportNode(ImportNode *node);
-  ExportNode *VisitExportNode(ExportNode *node);
 };
 
 class ClassStructVisitor : public AstVisitor {

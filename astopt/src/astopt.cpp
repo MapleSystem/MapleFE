@@ -26,6 +26,7 @@ class ImportedFiles;
 
 AstOpt::AstOpt(AST_Handler *h, unsigned f) {
   mASTHandler = h;
+  h->SetAstOpt(this);
   mASTXxport = new AST_Xxport(this, f);
   mFlags = f;
 }
@@ -39,6 +40,7 @@ void AstOpt::ProcessAST(unsigned flags) {
   // loop through module handlers
   for (int i = 0; i < GetModuleNum(); i++) {
     Module_Handler *handler = mASTHandler->GetModuleHandler(i);
+    handler->SetHidx(i);
     ModuleNode *module = handler->GetASTModule();
 
     mFlags = flags;

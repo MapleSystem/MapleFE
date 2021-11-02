@@ -40,10 +40,16 @@ void AST_Xxport::BuildModuleOrder() {
   SetModuleStrIdx();
 
   // collect dependent info
+  CollectXxportNodes();
+
+  // collect dependent info
   AddHandler();
 
   // sort handlers with dependency
   SortHandler();
+
+  // collect import/export info
+  CollectXxportInfo();
 
   if (mFlags & FLG_trace_2) {
     std::cout << "============== Module Order ==============" << std::endl;
@@ -73,13 +79,27 @@ void AST_Xxport::SetModuleStrIdx() {
   }
 }
 
-void AST_Xxport::AddHandler() {
+void AST_Xxport::CollectXxportNodes() {
   for (int i = 0; i < GetModuleNum(); i++) {
     Module_Handler *handler = mASTHandler->GetModuleHandler(i);
     ModuleNode *module = handler->GetASTModule();
 
-    XXportNodeVisitor visitor(this, handler, i, mFlags);
+    XXportBasicVisitor visitor(this, handler, i, mFlags);
     visitor.Visit(module);
+  }
+}
+
+void AST_Xxport::AddHandler() {
+  for (unsigned hidx = 0; hidx < GetModuleNum(); hidx++) {
+    Module_Handler *handler = mASTHandler->GetModuleHandler(hidx);
+    for (auto it : mImportNodeSets[hidx]) {
+      ImportNode *node = it;
+      UpdateDependency(hidx, node);
+    }
+    for (auto it : mExportNodeSets[hidx]) {
+      ExportNode *node = it;
+      UpdateDependency(hidx, node);
+    }
   }
 }
 
@@ -116,47 +136,80 @@ void AST_Xxport::SortHandler() {
   }
 }
 
-// set up import node stridx with target module file name stridx
-ImportNode *XXportNodeVisitor::VisitImportNode(ImportNode *node) {
+void AST_Xxport::CollectXxportInfo() {
+  for (unsigned hidx = 0; hidx < GetModuleNum(); hidx++) {
+    Module_Handler *handler = mASTHandler->GetModuleHandler(hidx);
+    ModuleNode *module = handler->GetASTModule();
+
+    for (auto it : mImportNodeSets[hidx]) {
+      ImportNode *node = it;
+      TreeNode *target = node->GetTarget();
+      XXportInfo *info = new XXportInfo(target ? target->GetStrIdx() : 0);;
+
+      for (unsigned i = 0; i < node->GetPairsNum(); i++) {
+        XXportAsPairNode *p = node->GetPair(i);
+        TreeNode *bfnode = p->GetBefore();
+        TreeNode *afnode = p->GetAfter();
+        MASSERT(bfnode && "before node NULL for default");
+        if (p->IsDefault()) {
+          info->mDefaultNodeId = bfnode->GetNodeId();
+        } else if (bfnode) {
+          std::pair<unsigned, unsigned> p(bfnode->GetNodeId(), afnode ? afnode->GetNodeId() : 0);
+          info->mNodeIdPairs.insert(p);
+        }
+      }
+      mImports[hidx].insert(info);
+    }
+
+    for (auto it : mExportNodeSets[hidx]) {
+      ExportNode *node = it;
+      TreeNode *target = node->GetTarget();
+      XXportInfo *info = new XXportInfo(target ? target->GetStrIdx() : 0);;
+
+      for (unsigned i = 0; i < node->GetPairsNum(); i++) {
+        XXportAsPairNode *p = node->GetPair(i);
+        TreeNode *bfnode = p->GetBefore();
+        TreeNode *afnode = p->GetAfter();
+        // export * from "./M"
+        if (!bfnode) {
+          continue;
+        }
+        if (afnode && afnode->GetStrIdx() == gStringPool.GetStrIdx("default")) {
+          info->mDefaultNodeId = bfnode->GetNodeId();
+        } else {
+          std::pair<unsigned, unsigned> p(bfnode->GetNodeId(), afnode ? afnode->GetNodeId() : 0);
+          info->mNodeIdPairs.insert(p);
+        }
+        mExports[hidx].insert(info);
+      }
+    }
+  }
+}
+
+ImportNode *XXportBasicVisitor::VisitImportNode(ImportNode *node) {
   (void) AstVisitor::VisitImportNode(node);
-
-  TreeNode *target = node->GetTarget();
-  if (target) {
-    std::string name = GetTargetFilename(target);
-
-    // store name's string index in node
-    unsigned stridx = gStringPool.GetStrIdx(name);
-    node->SetStrIdx(stridx);
-
-    // update handler dependency map
-    unsigned dep = mASTXxport->GetHandleIdxFromStrIdx(stridx);
-    mASTXxport->AddHandlerIdx2DependentHandlerIdxMap(mHandlerIdx, dep);
-  }
-
+  mASTXxport->mImportNodeSets[mHandlerIdx].insert(node);
   return node;
 }
 
-// set up export node stridx with target module file name stridx
-ExportNode *XXportNodeVisitor::VisitExportNode(ExportNode *node) {
+ExportNode *XXportBasicVisitor::VisitExportNode(ExportNode *node) {
   (void) AstVisitor::VisitExportNode(node);
-
-  TreeNode *target = node->GetTarget();
-  if (target) {
-    std::string name = GetTargetFilename(target);
-
-    // store name's string index in node
-    unsigned stridx = gStringPool.GetStrIdx(name);
-    node->SetStrIdx(stridx);
-
-    // update handler dependency map
-    unsigned dep = mASTXxport->GetHandleIdxFromStrIdx(stridx);
-    mASTXxport->AddHandlerIdx2DependentHandlerIdxMap(mHandlerIdx, dep);
-  }
-
+  mASTXxport->mExportNodeSets[mHandlerIdx].insert(node);
   return node;
 }
 
-std::string XXportNodeVisitor::GetTargetFilename(TreeNode *node) {
+TreeNode *AST_Xxport::GetTarget(TreeNode *node) {
+  TreeNode *tree = NULL;
+  if (node->IsImport()) {
+    tree = static_cast<ImportNode *>(node)->GetTarget();
+  } else if (node->IsExport()) {
+    tree = static_cast<ExportNode *>(node)->GetTarget();
+  }
+  return tree;
+}
+
+// borrowed from ast2cpp
+std::string AST_Xxport::GetTargetFilename(unsigned hidx, TreeNode *node) {
   std::string filename;
   if (node && node->IsLiteral()) {
     LiteralNode *lit = static_cast<LiteralNode *>(node);
@@ -164,7 +217,8 @@ std::string XXportNodeVisitor::GetTargetFilename(TreeNode *node) {
     filename = AstDump::GetEnumLitData(data);
     filename += ".ts"s;
     if(filename.front() != '/') {
-      ModuleNode *module = mHandler->GetASTModule();
+      Module_Handler *handler = mASTHandler->GetModuleHandler(hidx);
+      ModuleNode *module = handler->GetASTModule();
       std::filesystem::path p = module->GetFilename();
       try {
         p = std::filesystem::canonical(p.parent_path() / filename);
@@ -177,6 +231,22 @@ std::string XXportNodeVisitor::GetTargetFilename(TreeNode *node) {
     }
   }
   return filename;
+}
+
+// set up import/export node stridx with target module file name stridx
+void AST_Xxport::UpdateDependency(unsigned hidx, TreeNode *node) {
+  TreeNode *target = GetTarget(node);
+  if (target) {
+    std::string name = GetTargetFilename(hidx, target);
+
+    // store name's string index in node
+    unsigned stridx = gStringPool.GetStrIdx(name);
+    node->SetStrIdx(stridx);
+
+    // update handler dependency map
+    unsigned dep = GetHandleIdxFromStrIdx(stridx);
+    mHandlerIdx2DependentHandlerIdxMap[hidx].insert(dep);
+  }
 }
 
 }

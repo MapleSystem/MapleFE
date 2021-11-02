@@ -42,9 +42,6 @@ void AST_INFO::CollectInfo() {
   FillNodeInfoVisitor visitor_node(mHandler, mFlags, true);
   visitor_node.Visit(module);
 
-  // collect import/export info
-  ImportExportVisitor xxport_visitor(mHandler, mFlags, true);
-
   // collect class/interface/struct decl
   mPass = 0;
   MSGNOLOC0("============== Collect class/interface/struct ==============");
@@ -63,6 +60,8 @@ void AST_INFO::CollectInfo() {
   mPass = 2;
   MSGNOLOC0("============== merge class/interface/struct ==============");
   visitor.Visit(module);
+
+  delete mStrIdxVisitor;
 }
 
 TypeId AST_INFO::GetTypeId(TreeNode *node) {
@@ -665,18 +664,6 @@ UserTypeNode *FillNodeInfoVisitor::VisitUserTypeNode(UserTypeNode *node) {
   if (id && !id->IsTypeIdNone()) {
     mInfo->SetTypeId(node, id->GetTypeId());
   }
-  return node;
-}
-
-ImportNode *ImportExportVisitor::VisitImportNode(ImportNode *node) {
-  (void) AstVisitor::VisitImportNode(node);
-  mInfo->AddImport(node);
-  return node;
-}
-
-ExportNode *ImportExportVisitor::VisitExportNode(ExportNode *node) {
-  (void) AstVisitor::VisitExportNode(node);
-  mInfo->AddExport(node);
   return node;
 }
 

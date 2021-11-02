@@ -19,6 +19,7 @@
 #include <list>
 #include <unordered_map>
 #include <unordered_set>
+#include <set>
 #include "ast_module.h"
 #include "ast.h"
 #include "gen_astvisitor.h"
@@ -29,18 +30,38 @@ class AstOpt;
 class AST_Handler;
 class Module_Handler;
 
+class XXportInfo {
+ public:
+  unsigned mModuleStrIdx;
+  unsigned mDefaultNodeId;
+  std::set<std::pair<unsigned, unsigned>> mNodeIdPairs;
+
+ public:
+  explicit XXportInfo(unsigned m) : mModuleStrIdx(m) {}
+  ~XXportInfo() = default;
+};
+
 class AST_Xxport {
  private:
   AstOpt      *mAstOpt;
   AST_Handler *mASTHandler;
-  unsigned        mFlags;
+  unsigned     mFlags;
 
   std::list<unsigned> mHandlersIdxInOrder;
   std::unordered_map<unsigned, std::unordered_set<unsigned>> mHandlerIdx2DependentHandlerIdxMap;
   std::unordered_map<unsigned, unsigned> mStrIdx2HandlerIdxMap;
 
-  std::unordered_set<ImportNode *> mImports;;
-  std::unordered_set<ExportNode *> mExports;;
+  // module handler idx to set of XXportInfo
+  std::unordered_map<unsigned, std::unordered_set<XXportInfo *>> mImports;
+  std::unordered_map<unsigned, std::unordered_set<XXportInfo *>> mExports;
+
+ public:
+  // module handler idx to import/export nodes in the module
+  std::unordered_map<unsigned, std::unordered_set<ImportNode *>> mImportNodeSets;
+  std::unordered_map<unsigned, std::unordered_set<ExportNode *>> mExportNodeSets;
+
+  std::unordered_map<unsigned, std::unordered_set<unsigned>> ImportedDeclIds;
+  std::unordered_map<unsigned, std::unordered_set<unsigned>> ExportedDeclIds;
 
  public:
   explicit AST_Xxport(AstOpt *o, unsigned f);
@@ -51,8 +72,16 @@ class AST_Xxport {
   void BuildModuleOrder();
 
   void SetModuleStrIdx();
+  void CollectXxportNodes();
+
+  TreeNode *GetTarget(TreeNode *node);
+  std::string GetTargetFilename(unsigned hidx, TreeNode *node);
+  void UpdateDependency(unsigned hidx, TreeNode *node);
   void AddHandler();
+
   void SortHandler();
+
+  void CollectXxportInfo();
 
   void AddHandlerIdx2DependentHandlerIdxMap(unsigned hdlIdx, unsigned depHdlIdx) {
     mHandlerIdx2DependentHandlerIdxMap[hdlIdx].insert(depHdlIdx);
@@ -61,9 +90,14 @@ class AST_Xxport {
   unsigned GetHandleIdxFromStrIdx(unsigned stridx) {
     return mStrIdx2HandlerIdxMap[stridx];
   }
+
+  bool IsImportExportDeclId(unsigned hidx, unsigned id) {
+    return (ImportedDeclIds[hidx].find(id) != ImportedDeclIds[hidx].end() ||
+            ExportedDeclIds[hidx].find(id) != ExportedDeclIds[hidx].end());
+  }
 };
 
-class XXportNodeVisitor : public AstVisitor {
+class XXportBasicVisitor : public AstVisitor {
  private:
   AST_Xxport     *mASTXxport;
   Module_Handler *mHandler;
@@ -74,16 +108,13 @@ class XXportNodeVisitor : public AstVisitor {
   std::unordered_set<ModuleNode *> mImported;
 
  public:
-  explicit XXportNodeVisitor(AST_Xxport *xx, Module_Handler *h, unsigned i, unsigned f, bool base = false)
+  explicit XXportBasicVisitor(AST_Xxport *xx, Module_Handler *h, unsigned i, unsigned f, bool base = false)
     : mASTXxport(xx), mHandler(h), mHandlerIdx(i), mFlags(f), AstVisitor((f & FLG_trace_1) && base) {}
-  ~XXportNodeVisitor() = default;
-
-  std::string GetTargetFilename(TreeNode *node);
+  ~XXportBasicVisitor() = default;
 
   ImportNode *VisitImportNode(ImportNode *node);
   ExportNode *VisitExportNode(ExportNode *node);
 };
-
 
 }
 #endif
