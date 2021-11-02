@@ -2218,22 +2218,31 @@ std::string Emitter::EmitTreeNode(TreeNode *node) {
   return std::string();
 }
 
-static std::string &AddParentheses(std::string &str, TreeNode *node) {
-  if (!node->IsIdentifier() &&
-      !node->IsField() &&
-      !node->IsLiteral() &&
-      !node->IsArrayLiteral() &&
-      !node->IsBindingPattern())
+std::string &Emitter::AddParentheses(std::string &str, TreeNode *node) {
+  if (mPrecedence < '\024' ||
+      (!node->IsIdentifier() &&
+       !node->IsField() &&
+       !node->IsLiteral() &&
+       !node->IsArrayLiteral() &&
+       !node->IsBindingPattern())) {
     str = '(' + str + ')';
+    mPrecedence = '\030';
+  }
   return str;
 }
 
 std::string &Emitter::HandleTreeNode(std::string &str, TreeNode *node) {
   auto num = node->GetAsTypesNum();
   if(num > 0) {
+    if (node->IsBinOperator()) {
+      str = '(' + str + ')';
+      mPrecedence = '\030';
+    }
     for (unsigned i = 0; i < num; ++i)
-      if (auto t = node->GetAsTypeAtIndex(i))
+      if (auto t = node->GetAsTypeAtIndex(i)) {
         str += EmitAsTypeNode(t);
+        mPrecedence = '\023';
+      }
   }
   if(node->IsOptional())
     str = AddParentheses(str, node) + '?';
@@ -2242,10 +2251,7 @@ std::string &Emitter::HandleTreeNode(std::string &str, TreeNode *node) {
   if(node->IsRest())
     str = "..."s + AddParentheses(str, node);
   if(node->IsConst()) {
-    if(node->IsField())
-      str += " as const"s;
-    else
-      str = AddParentheses(str, node) + " as const"s;
+    str = AddParentheses(str, node) + " as const"s;
     mPrecedence = '\023';
   }
   return str;
