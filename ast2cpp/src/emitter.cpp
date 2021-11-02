@@ -781,7 +781,7 @@ std::string Emitter::EmitNewNode(NewNode *node) {
   if (auto n = node->GetBody()) {
     str += ' ' + EmitBlockNode(n);
   }
-  mPrecedence = '\024';
+  mPrecedence = '\004';
   return HandleTreeNode(str, node);
 }
 
