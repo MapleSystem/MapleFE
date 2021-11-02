@@ -118,6 +118,7 @@ rule ReferenceType        : ONEOF(ClassOrInterfaceType, TypeVariable, ArrayType)
 #  Final one
 ###########################
 rule TYPE: ONEOF(PrimitiveType, ReferenceType, NullType)
+rule Type : TYPE
 
 #####################################################################################
 #                       Abnormal types                                              #
