@@ -761,11 +761,10 @@ std::string Emitter::EmitNewNode(NewNode *node) {
   str += "new"s;
   if (auto id = node->GetId()) {
     std::string idstr = EmitTreeNode(id);
-    auto k = id->GetKind();
-    if (k == NK_Call || k == NK_BinOperator)
+    if (id->IsCall() || id->IsBinOperator())
       idstr = '(' + idstr + ')';
     str += ' ' + idstr;
-    if(k != NK_Function && k != NK_Lambda) {
+    if(!id->IsFunction() && !id->IsLambda() && !id->IsClass()) {
       auto num = node->GetArgsNum();
       str += '(';
       for (unsigned i = 0; i < num; ++i) {
@@ -1530,8 +1529,7 @@ std::string Emitter::EmitCallNode(CallNode *node) {
     bool optional = n->IsOptional();
     if (optional && !s.empty() && s.back() == '?')
       s.pop_back();
-    auto k = n->GetKind();
-    if(k == NK_Function || k == NK_Lambda)
+    if(n->IsFunction() || n->IsLambda())
       str += '(' + s + ')';
     else
       str += s;
@@ -1700,6 +1698,7 @@ std::string Emitter::EmitClassNode(ClassNode *node) {
   }
 
   str += "}\n";
+  mPrecedence = '\020';
   return HandleTreeNode(str, node);
 }
 
