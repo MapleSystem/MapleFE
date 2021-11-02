@@ -755,7 +755,10 @@ std::string Emitter::EmitBlockNode(BlockNode *node) {
 std::string Emitter::EmitNewNode(NewNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str("new ");
+  std::string str;
+  for (unsigned i = 0; i < node->GetAttrsNum(); ++i)
+    str += GetEnumAttrId(node->GetAttrAtIndex(i));
+  str += "new"s;
   if (auto id = node->GetId()) {
     std::string idstr = EmitTreeNode(id);
     auto k = id->GetKind();
@@ -1728,10 +1731,8 @@ std::string Emitter::EmitLambdaNode(LambdaNode *node) {
   }
 
   std::string str;
-  for (unsigned i = 0; i < node->GetAttrsNum(); ++i) {
-    std::string s = GetEnumAttrId(node->GetAttrAtIndex(i));
-    str += s;
-  }
+  for (unsigned i = 0; i < node->GetAttrsNum(); ++i)
+    str += GetEnumAttrId(node->GetAttrAtIndex(i));
   auto num = node->GetTypeParamsNum();
   if(num) {
     str += '<';
