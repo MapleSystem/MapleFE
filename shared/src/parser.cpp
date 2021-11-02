@@ -667,7 +667,7 @@ ParseStatus Parser::ParseStmt() {
 
   bool succ = false;
   if (mLineMode)
-    succ = TraverseExpression();
+    succ = TraverseTempLiteral();
   else
     succ = TraverseStmt();
 
@@ -717,24 +717,56 @@ ParseStatus Parser::ParseStmt() {
 
 // return true : if all tokens in mActiveTokens are matched.
 //       false : if faled.
-bool Parser::TraverseExpression() {
-  bool succ = false;
+// For the place holders in Typescript Template Literal, there are usually two
+// syntax, expression and type.
+
+bool Parser::TraverseTempLiteral() {
+  bool succ_expr = false;
+  bool succ_type = false;
+  unsigned saved_mCurToken = mCurToken;
+  unsigned new_mCurToken_expr = 0;
+  unsigned new_mCurToken_type = 0;
+
+  mRootNode->ClearChildren();
 
   RuleTable *t = &TblExpression;
-  mRootNode->ClearChildren();
   AppealNode *child = NULL;
-  succ = TraverseRuleTable(t, mRootNode, child);
-  if (succ) {
+  succ_expr = TraverseRuleTable(t, mRootNode, child);
+  if (succ_expr) {
     MASSERT(child);
     mRootNode->CopyMatch(child);
     // Need adjust the mCurToken. A rule could try multiple possible
     // children rules, although there is one and only one valid child
     // for a Top table. However, the mCurToken could deviate from
     // the valid children and reflect the invalid children.
-    MASSERT(mRootNode->mChildren.GetNum() == 1);
-    AppealNode *topnode = mRootNode->mChildren.ValueAtIndex(0);
-    MASSERT(topnode->IsSucc());
+    //MASSERT(mRootNode->mChildren.GetNum() == 1);
+    //AppealNode *topnode = mRootNode->mChildren.ValueAtIndex(0);
+    //MASSERT(topnode->IsSucc());
+    new_mCurToken_expr = mCurToken;
+  }
 
+  // Type TblType
+  mCurToken = saved_mCurToken;
+  t = &TblType;
+  child = NULL;
+  succ_type = TraverseRuleTable(t, mRootNode, child);
+  if (succ_type) {
+    MASSERT(child);
+    mRootNode->CopyMatch(child);
+    // Need adjust the mCurToken. A rule could try multiple possible
+    // children rules, although there is one and only one valid child
+    // for a Top table. However, the mCurToken could deviate from
+    // the valid children and reflect the invalid children.
+    //MASSERT(mRootNode->mChildren.GetNum() == 1);
+    //AppealNode *topnode = mRootNode->mChildren.ValueAtIndex(0);
+    //MASSERT(topnode->IsSucc());
+    new_mCurToken_type = mCurToken;
+  }
+
+  mCurToken = new_mCurToken_expr > new_mCurToken_type ? new_mCurToken_expr : new_mCurToken_type;
+
+  bool succ = succ_expr | succ_type;
+  if (succ) {
     mRootNode->mResult = Succ;
     SortOut();
   }
@@ -1861,13 +1893,28 @@ static std::deque<AppealNode*> to_be_sorted;
 
 void Parser::SortOut() {
   // we remove all failed children, leaving only succ child
-  for (unsigned i = 0; i < mRootNode->mChildren.GetNum(); i++) {
-    AppealNode *n = mRootNode->mChildren.ValueAtIndex(i);
-    if (!n->IsFail() && !n->IsNA())
-      mRootNode->mSortedChildren.PushBack(n);
+  AppealNode *root = NULL;
+  if (!mLineMode) {
+    for (unsigned i = 0; i < mRootNode->mChildren.GetNum(); i++) {
+      AppealNode *n = mRootNode->mChildren.ValueAtIndex(i);
+      if (!n->IsFail() && !n->IsNA())
+        mRootNode->mSortedChildren.PushBack(n);
+    }
+    MASSERT(mRootNode->mSortedChildren.GetNum()==1);
+    root = mRootNode->mSortedChildren.ValueAtIndex(0);
+  } else {
+    // LineMode could have >1 matching children
+    // Find the longest match
+    unsigned longest = mRootNode->LongestMatch();
+    for (unsigned i = 0; i < mRootNode->mChildren.GetNum(); i++) {
+      AppealNode *n = mRootNode->mChildren.ValueAtIndex(i);
+      if (n->LongestMatch() == longest) {
+        root = n;
+        mRootNode->mSortedChildren.PushBack(n);
+        break;
+      }
+    }
   }
-  MASSERT(mRootNode->mSortedChildren.GetNum()==1);
-  AppealNode *root = mRootNode->mSortedChildren.ValueAtIndex(0);
 
   // First sort the root.
   RuleTable *table = root->GetTable();

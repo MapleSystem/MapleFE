@@ -1,0 +1,19 @@
+Matched 47 tokens.
+Matched 57 tokens.
+Matched 67 tokens.
+Matched 77 tokens.
+Matched 87 tokens.
+Matched 89 tokens.
+Matched 90 tokens.
+Matched 92 tokens.
+============= Module ===========
+== Sub Tree ==
+ type Split<S,D> = string extends S ? prim array-TBD : S extends "" ? prim array-TBD : S extends  template-literal: NULL, infer T,NULL,D,NULL, infer U ? [T,...Split] :  [  : S ,  ] 
+== Sub Tree ==
+ type T40 = Split<"foo",".">
+== Sub Tree ==
+ type T41 = Split<"foo.bar.baz",".">
+== Sub Tree ==
+ type T42 = Split<"foo.bar","">
+== Sub Tree ==
+ type T43 = Split<any,".">

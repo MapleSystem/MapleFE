@@ -31,6 +31,7 @@ extern RuleTable TblIRREGULAR_CHAR;
 extern RuleTable TblTemplateLiteral;
 extern RuleTable TblRegularExpression;
 extern RuleTable TblExpression;
+extern RuleTable TblType;
 
 //
 extern RuleTable TblIdentifier;

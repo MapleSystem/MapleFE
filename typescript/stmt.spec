@@ -254,8 +254,9 @@ rule Elision : ONEOF(',',
 ##-----------------------------------
 ##rule SpreadElement[Yield] :
 ##  ... AssignmentExpression[In, ?Yield]
-rule SpreadElement : "..." + AssignmentExpression
+rule SpreadElement : "..." + AssignmentExpression + ZEROORONE(TypeArguments)
   attr.action : SetIsRest(%2)
+  attr.action : PassChild(%2)
 
 ##-----------------------------------
 ##rule ObjectLiteral[Yield] :
@@ -1709,7 +1710,8 @@ rule PrimaryType: ONEOF(ParenthesizedType,
                         TypeQuery,
                         ThisType,
                         NeverArrayType,
-                        Literal)
+                        Literal,
+                        ArrayLiteral)
 
 rule NeverArrayType : '[' + ']'
   attr.action : BuildNeverArrayType()
