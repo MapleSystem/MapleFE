@@ -2241,7 +2241,7 @@ std::string &Emitter::HandleTreeNode(std::string &str, TreeNode *node) {
     for (unsigned i = 0; i < num; ++i)
       if (auto t = node->GetAsTypeAtIndex(i)) {
         str += EmitAsTypeNode(t);
-        mPrecedence = '\023';
+        mPrecedence = '\003';
       }
   }
   if(node->IsOptional())
@@ -2252,7 +2252,7 @@ std::string &Emitter::HandleTreeNode(std::string &str, TreeNode *node) {
     str = "..."s + AddParentheses(str, node);
   if(node->IsConst()) {
     str = AddParentheses(str, node) + " as const"s;
-    mPrecedence = '\023';
+    mPrecedence = '\003';
   }
   return str;
 }
