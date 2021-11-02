@@ -2242,7 +2242,7 @@ std::string &Emitter::AddParentheses(std::string &str, TreeNode *node) {
 std::string &Emitter::HandleTreeNode(std::string &str, TreeNode *node) {
   auto num = node->GetAsTypesNum();
   if(num > 0) {
-    if (node->IsBinOperator()) {
+    if (node->IsBinOperator() || node->IsUnaOperator()) {
       str = '(' + str + ')';
       mPrecedence = '\030';
     }
