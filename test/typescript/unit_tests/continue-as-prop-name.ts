@@ -1,0 +1,3 @@
+interface IFace {
+    continue: string;
+}
