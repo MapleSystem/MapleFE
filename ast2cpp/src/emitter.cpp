@@ -490,10 +490,6 @@ std::string Emitter::EmitDeclareNode(DeclareNode *node) {
   } else {
     if (auto n = node->GetDeclAtIndex(0)) {
       std::string s = EmitTreeNode(n);
-      if (n->IsModule()) {
-        s = "module \""s + static_cast<ModuleNode *>(n)->GetFilename()
-          + "\" {\n"s + s + "}\n"s;
-      }
       str += "declare "s + s;
     }
   }
@@ -513,12 +509,8 @@ std::string Emitter::EmitExportNode(ExportNode *node) {
   if (num == 1 && node->GetTarget() == nullptr)
     if (XXportAsPairNode *pair = node->GetPair(0))
       if (auto b = pair->GetBefore())
-        if (b->IsModule() && pair->GetAfter() == nullptr) {
-          std::string s = EmitTreeNode(b);
-          str = "export module "s + static_cast<ModuleNode *>(b)->GetFilename()
-          + " {\n"s + s + "}\n"s;
-          return str;
-        }
+        if (b->IsModule() && pair->GetAfter() == nullptr)
+          return "export "s + EmitTreeNode(b);
   for (unsigned i = 0; i < num; ++i) {
     if (auto n = node->GetPair(i)) {
       std::string s = EmitXXportAsPairNode(n);
@@ -1943,6 +1935,12 @@ std::string Emitter::EmitModuleNode(ModuleNode *node) {
     if (auto n = node->GetTree(i)) {
       str += EmitTreeNode(n) + GetEnding(n);
     }
+  }
+  if (auto p = node->GetParent()) {
+    std::string name = node->GetFilename();
+    if (!p->IsXXportAsPair()) // TODO: Needs a flag for ambient module with quoted name
+      name = '"' + name + '"';
+    str = "module "s + name + " {\n"s + str + "}\n"s;
   }
   return HandleTreeNode(str, node);
 }
