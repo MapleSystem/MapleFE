@@ -620,8 +620,12 @@ TreeNode* ASTBuilder::BuildXXportAsPair() {
 
   if (mParams.size() == 2) {
     p = mParams[1];
-    if (!p.mIsEmpty && p.mIsTreeNode) {
-      after = p.mData.mTreeNode;
+    if (!p.mIsEmpty) {
+      if (p.mIsTreeNode) {
+        after = p.mData.mTreeNode;
+      } else {
+        after = BuildIdentifier(p.mData.mToken);
+      }
     }
   }
 

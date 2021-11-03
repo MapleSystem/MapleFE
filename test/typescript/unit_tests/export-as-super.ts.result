@@ -1,0 +1,8 @@
+Matched 8 tokens.
+Matched 15 tokens.
+============= Module ===========
+== Sub Tree ==
+declare func  func()  throws: 
+
+== Sub Tree ==
+export {func as super} 
