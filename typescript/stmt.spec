@@ -1671,6 +1671,9 @@ rule ImportedType : "import" + '(' + Literal + ')'
   attr.action : BuildImport()
   attr.action : SetFromModule(%3)
 
+rule PrimaryTypeKeyOf : PrimaryType + '[' + KeyOf + ']'
+  attr.action : BuildArrayElement(%1, %3)
+
 #rule Type : ONEOF(UnionOrIntersectionOrPrimaryType,
 #                  FunctionType,
 #                  ConstructorType)
@@ -1682,14 +1685,14 @@ rule Type : ONEOF(UnionOrIntersectionOrPrimaryType,
                   # Typescript interface[index] can be seen as a type
                   TypeArray,
                   MemberExpression + '[' + KeyOf + ']',
-                  PrimaryType + '[' + KeyOf + ']',
+                  PrimaryTypeKeyOf,
                   InferType,
                   IsExpression,
                   PrimaryType + '[' + TypeQuery + ']',
                   TemplateLiteral,
                   ImportedType,
                   ImportedType + '.' + TypeReference)
-  attr.action.%7,%8,%11 : BuildArrayElement(%1, %3)
+  attr.action.%7,%11 : BuildArrayElement(%1, %3)
   attr.action.%14 : BuildField(%1, %3)
 
 #rule UnionOrIntersectionOrPrimaryType: ONEOF(UnionType,
@@ -1796,8 +1799,9 @@ rule UnionType : ONEOF(ZEROORONE('|') + UnionOrIntersectionOrPrimaryType + '|' +
 
 ## rule IntersectionType: IntersectionOrPrimaryType & PrimaryType
 rule IntersectionType: ONEOF(IntersectionOrPrimaryType + '&' + PrimaryType,
-                             IntersectionOrPrimaryType + '&' + ConditionalType)
-  attr.action.%1,%2 : BuildInterUserType(%1, %3)
+                             IntersectionOrPrimaryType + '&' + ConditionalType,
+                             PrimaryTypeKeyOf + '&' + PrimaryType)
+  attr.action.%1,%2,%3 : BuildInterUserType(%1, %3)
 
 ## rule FunctionType: TypeParametersopt ( ParameterListopt ) => Type
 rule FunctionType: ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList) + ')' + "=>" + Type

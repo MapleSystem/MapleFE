@@ -1,0 +1,4 @@
+Matched 25 tokens.
+============= Module ===========
+== Sub Tree ==
+declare  type Type<T> = intersect  =  {[K in  keyof T] : K }[ keyof T] & string
