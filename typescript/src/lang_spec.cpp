@@ -166,8 +166,21 @@ LitData ProcessLiteral(LitId id, const char *str) {
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
-//          Implementation of typescript Lexer
 /////////////////////////////////////////////////////////////////////////////////////
+//                   Implementation of typescript Lexer
+/////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////
+
+#define MAX_LINE_SIZE 4096
+
+TypescriptLexer::TypescriptLexer() {
+  // allocate the lookahead line buffer.
+  linebuf_size = (size_t)MAX_LINE_SIZE;
+  lookahead_line = static_cast<char *>(malloc(linebuf_size));  // initial line buffer.
+  if (!lookahead_line) {
+    MASSERT("cannot allocate lookahead line buffer\n");
+  }
+}
 
 // NOTE: right now we rely on 'tsc' to assure the input is legal,
 //       so I'll make many things easier and will skip many lexical

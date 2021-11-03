@@ -41,6 +41,23 @@ extern LitData ProcessLiteral(LitId type, const char *str);
 ////////////////////////////////////////////////////////////////////////////////////
 
 class TypescriptLexer : public Lexer {
+public:
+  // In Typescript we need read one line ahead to see if current line is the last line.
+  // If it's the last line, we need add a ';' to the end, in order to parse
+  // the last expression as a statement.
+  char    *lookahead_line;
+  ssize_t  lookahead_line_size;
+
+public:
+  TypescriptLexer();
+  ~TypescriptLexer(void) {
+    if (lookahead_line) {
+      free(lookahead_line);
+      lookahead_line = nullptr;
+    }
+  }
+
+public:
   TempLitData* GetTempLit();
   bool FindNextTLFormat(unsigned start, std::string& s, unsigned& end);
   bool FindNextTLPlaceHolder(unsigned start, std::string& s, unsigned& end);
