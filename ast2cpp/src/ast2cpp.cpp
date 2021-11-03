@@ -116,8 +116,8 @@ int A2C::ProcessAST() {
       std::cout << "============= in ProcessAST ===========" << std::endl;
       std::cout << "srcLang : " << module->GetSrcLangString() << std::endl;
 
-      for(unsigned i = 0; i < module->GetTreesNum(); i++) {
-        TreeNode *tnode = module->GetTree(i);
+      for(unsigned k = 0; k < module->GetTreesNum(); k++) {
+        TreeNode *tnode = module->GetTree(k);
         if (mFlags & FLG_trace_1) {
           tnode->Dump(0);
           std::cout << std::endl;
@@ -135,14 +135,15 @@ int A2C::ProcessAST() {
   // basic analysis
   BasicAnalysis();
 
+  // loop through module handlers in import/export order
   for (HandlerIndex i = 0; i < GetModuleNum(); i++) {
-    Module_Handler *handler = mASTHandler->GetModuleHandler(i);
+    Module_Handler *handler = GetModuleHandler(i);
     ModuleNode *module = handler->GetASTModule();
 
     if (mFlags & FLG_trace_2) {
       std::cout << "============= After AdjustAST ===========" << std::endl;
-      for(unsigned i = 0; i < module->GetTreesNum(); i++) {
-        TreeNode *tnode = module->GetTree(i);
+      for(unsigned k = 0; k < module->GetTreesNum(); k++) {
+        TreeNode *tnode = module->GetTree(k);
         if (mFlags & FLG_trace_1) {
           tnode->Dump(0);
           std::cout << std::endl;
@@ -157,7 +158,7 @@ int A2C::ProcessAST() {
   BuildCFG();
 
   for (HandlerIndex i = 0; i < GetModuleNum(); i++) {
-    Module_Handler *handler = mASTHandler->GetModuleHandler(i);
+    Module_Handler *handler = GetModuleHandler(i);
     ModuleNode *module = handler->GetASTModule();
 
     if (mFlags & FLG_trace_2) {
@@ -172,7 +173,7 @@ int A2C::ProcessAST() {
   TypeInference();
 
   for (HandlerIndex i = 0; i < GetModuleNum(); i++) {
-    Module_Handler *handler = mASTHandler->GetModuleHandler(i);
+    Module_Handler *handler = GetModuleHandler(i);
     ModuleNode *module = handler->GetASTModule();
 
     if (mFlags & FLG_trace_2) {
@@ -192,7 +193,7 @@ int A2C::ProcessAST() {
   DataFlowAnalysis();
 
   for (HandlerIndex i = 0; i < GetModuleNum(); i++) {
-    Module_Handler *handler = mASTHandler->GetModuleHandler(i);
+    Module_Handler *handler = GetModuleHandler(i);
     ModuleNode *module = handler->GetASTModule();
 
     if (mFlags & FLG_trace_2) {
