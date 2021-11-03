@@ -143,8 +143,7 @@ void AST_Xxport::CollectXxportInfo() {
 
     for (auto it : mImportNodeSets[hidx]) {
       ImportNode *node = it;
-      TreeNode *target = node->GetTarget();
-      XXportInfo *info = new XXportInfo(target ? target->GetStrIdx() : 0);;
+      XXportInfo *info = new XXportInfo(module->GetStrIdx());;
 
       for (unsigned i = 0; i < node->GetPairsNum(); i++) {
         XXportAsPairNode *p = node->GetPair(i);
@@ -154,34 +153,42 @@ void AST_Xxport::CollectXxportInfo() {
         if (p->IsDefault()) {
           info->mDefaultNodeId = bfnode->GetNodeId();
         } else if (bfnode) {
-          std::pair<unsigned, unsigned> p(bfnode->GetNodeId(), afnode ? afnode->GetNodeId() : 0);
-          info->mNodeIdPairs.insert(p);
+          std::pair<unsigned, unsigned> pnid(bfnode->GetNodeId(), afnode ? afnode->GetNodeId() : 0);
+          info->mNodeIdPairs.insert(pnid);
         }
       }
+
       mImports[hidx].insert(info);
     }
 
     for (auto it : mExportNodeSets[hidx]) {
       ExportNode *node = it;
-      TreeNode *target = node->GetTarget();
-      XXportInfo *info = new XXportInfo(target ? target->GetStrIdx() : 0);;
+      XXportInfo *info = new XXportInfo(module->GetStrIdx());;
 
       for (unsigned i = 0; i < node->GetPairsNum(); i++) {
         XXportAsPairNode *p = node->GetPair(i);
         TreeNode *bfnode = p->GetBefore();
         TreeNode *afnode = p->GetAfter();
-        // export * from "./M"
-        if (!bfnode) {
-          continue;
+        if (p->IsEverything()) {
+          info->SetEverything();
+          if (bfnode) {
+            // export * as MM from "./M";
+            // bfnode represents a module
+            bfnode->SetTypeId(TY_Module);
+          } else {
+            // export * from "./M"
+            continue;
+          }
         }
         if (afnode && afnode->GetStrIdx() == gStringPool.GetStrIdx("default")) {
           info->mDefaultNodeId = bfnode->GetNodeId();
         } else {
-          std::pair<unsigned, unsigned> p(bfnode->GetNodeId(), afnode ? afnode->GetNodeId() : 0);
-          info->mNodeIdPairs.insert(p);
+          std::pair<unsigned, unsigned> pnid(bfnode->GetNodeId(), afnode ? afnode->GetNodeId() : 0);
+          info->mNodeIdPairs.insert(pnid);
         }
-        mExports[hidx].insert(info);
       }
+
+      mExports[hidx].insert(info);
     }
   }
 }
@@ -242,6 +249,7 @@ void AST_Xxport::UpdateDependency(unsigned hidx, TreeNode *node) {
     // store name's string index in node
     unsigned stridx = gStringPool.GetStrIdx(name);
     node->SetStrIdx(stridx);
+    target->SetStrIdx(stridx);
 
     // update handler dependency map
     unsigned dep = GetHandleIdxFromStrIdx(stridx);

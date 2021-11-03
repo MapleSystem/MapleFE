@@ -34,11 +34,15 @@ class XXportInfo {
  public:
   unsigned mModuleStrIdx;
   unsigned mDefaultNodeId;
+  bool     mEverything;
   std::set<std::pair<unsigned, unsigned>> mNodeIdPairs;
 
  public:
-  explicit XXportInfo(unsigned m) : mModuleStrIdx(m) {}
+  explicit XXportInfo(unsigned m) : mModuleStrIdx(m), mDefaultNodeId(0), mEverything(false) {}
   ~XXportInfo() = default;
+
+  void SetEverything() {mEverything = true;}
+  void Dump();
 };
 
 class AST_Xxport {
@@ -95,6 +99,8 @@ class AST_Xxport {
     return (ImportedDeclIds[hidx].find(id) != ImportedDeclIds[hidx].end() ||
             ExportedDeclIds[hidx].find(id) != ExportedDeclIds[hidx].end());
   }
+
+  void Dump();
 };
 
 class XXportBasicVisitor : public AstVisitor {
