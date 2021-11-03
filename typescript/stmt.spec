@@ -2198,16 +2198,20 @@ rule MemberFunctionDeclaration: ONEOF(
   ZEROORONE(Annotation) + ZEROORMORE(AccessibilityModifier) + PropertyName + '?' + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + ZEROORONE(';'),
   ZEROORONE(Annotation) + ZEROORMORE(AccessibilityModifier) + PropertyName + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ':' + IsExpression + '{' + FunctionBody + '}',
   ZEROORONE(Annotation) + ZEROORMORE(AccessibilityModifier) + PropertyName + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ':' + IsExpression + ZEROORONE(';'),
+
   ZEROORONE(Annotation) + ZEROORMORE(AccessibilityModifier) + "return" + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}',
   ZEROORONE(Annotation) + ZEROORMORE(AccessibilityModifier) + "get" + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}',
-  ZEROORONE(Annotation) + ZEROORMORE(AccessibilityModifier) + "set" + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}')
-  attr.action.%1,%2,%3,%4,%5,%6,%7,%8,%9 : BuildFunction(%3)
-  attr.action.%1,%2,%3,%4,%5,%6,%7,%8,%9 : AddModifier(%2)
-  attr.action.%1,%2,%3,%4,%5,%6,%7,%8,%9 : AddModifier(%1)
-  attr.action.%1,%2,%5,%6,%7,%8,%9 : AddTypeGenerics(%4)
-  attr.action.%1,%2,%5,%6,%7,%8,%9 : AddParams(%6)
-  attr.action.%1,%2,%7,%8,%9 : AddType(%8)
-  attr.action.%1,%7,%8,%9    : AddFunctionBody(%10)
+  ZEROORONE(Annotation) + ZEROORMORE(AccessibilityModifier) + "set" + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}',
+  ZEROORONE(Annotation) + ZEROORMORE(AccessibilityModifier) + "export" + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}',
+
+  ZEROORONE(Annotation) + ZEROORMORE(AccessibilityModifier) + "export" + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation) + ZEROORONE(';'))
+  attr.action.%1,%2,%3,%4,%5,%6,%7,%8,%9,%10,%11 : BuildFunction(%3)
+  attr.action.%1,%2,%3,%4,%5,%6,%7,%8,%9,%10,%11 : AddModifier(%2)
+  attr.action.%1,%2,%3,%4,%5,%6,%7,%8,%9,%10,%11 : AddModifier(%1)
+  attr.action.%1,%2,%5,%6,%7,%8,%9,%10,%11 : AddTypeGenerics(%4)
+  attr.action.%1,%2,%5,%6,%7,%8,%9,%10,%11 : AddParams(%6)
+  attr.action.%1,%2,%7,%8,%9,%10,%11 : AddType(%8)
+  attr.action.%1,%7,%8,%9,%10    : AddFunctionBody(%10)
   attr.action.%3,%4 : AddTypeGenerics(%5)
   attr.action.%3,%4 : AddParams(%7)
   attr.action.%3,%4 : AddType(%9)
