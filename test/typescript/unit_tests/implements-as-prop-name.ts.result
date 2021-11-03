@@ -5,6 +5,6 @@ Matched 26 tokens.
 == Sub Tree ==
 ts_interface: IFace {implements }
 == Sub Tree ==
-js_var Decl: obj= {:"implements"}
+js_var Decl: obj= {implements:"implements"}
 == Sub Tree ==
 console.log(obj)
