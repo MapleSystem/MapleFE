@@ -796,6 +796,8 @@ rule Statement : ONEOF(
   CallExpression)
 #  DebuggerStatement
   attr.property : Top
+  attr.property : Single  # This is extremely important to give CallExpression the
+                          # last chance IFF all previous rules fail.
 
 ##-----------------------------------
 ##rule Declaration[Yield] :
