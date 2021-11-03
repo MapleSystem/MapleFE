@@ -1835,14 +1835,15 @@ rule PropertySignature: ONEOF(ZEROORONE(AccessibilityModifier) + PropertyName + 
                               ZEROORONE(AccessibilityModifier) + "export" + ZEROORONE(TypeAnnotation),
                               ZEROORONE(AccessibilityModifier) + "public" + ZEROORONE(TypeAnnotation),
                               ZEROORONE(AccessibilityModifier) + "const" + ZEROORONE(TypeAnnotation),
+                              ZEROORONE(AccessibilityModifier) + "if" + ZEROORONE(TypeAnnotation),
                               ZEROORONE(AccessibilityModifier) + "implements" + ZEROORONE(TypeAnnotation))
   attr.action.%1 : AddType(%2, %3)
   attr.action.%2 : AddType(%2, %4)
   attr.action.%2 : SetIsOptional(%2)
   attr.action.%1,%2: AddModifierTo(%2, %1)
-  attr.action.%3,%4,%5,%6,%7,%8 : BuildIdentifier(%2)
-  attr.action.%3,%4,%5,%6,%7,%8 : AddType(%3)
-  attr.action.%3,%4,%5,%6,%7,%8 : AddModifier(%1)
+  attr.action.%3,%4,%5,%6,%7,%8,%9 : BuildIdentifier(%2)
+  attr.action.%3,%4,%5,%6,%7,%8,%9 : AddType(%3)
+  attr.action.%3,%4,%5,%6,%7,%8,%9 : AddModifier(%1)
 
 ## JS ECMA has more definition than this Typescript one. I use ECMA one.
 ## rule PropertyName: IdentifierName StringLiteral NumericLiteral
@@ -1975,8 +1976,9 @@ rule PropertyDefinition: ONEOF(IdentifierReference,
                                "export"     + ':' + AssignmentExpression,
                                "public"     + ':' + AssignmentExpression,
                                "const"      + ':' + AssignmentExpression,
+                               "if"         + ':' + AssignmentExpression,
                                "implements" + ':' + AssignmentExpression)
-  attr.action.%3,%8,%9,%10,%11,%12 : BuildFieldLiteral(%1, %3)
+  attr.action.%3,%8,%9,%10,%11,%12,%13 : BuildFieldLiteral(%1, %3)
   attr.action.%4 : BuildFunction(%2)
   attr.action.%4 : AddType(%7)
   attr.action.%4 : AddParams(%5)
