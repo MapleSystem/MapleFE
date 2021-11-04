@@ -958,7 +958,8 @@ rule ArrayBindingPattern : ONEOF(
 ##  BindingProperty[?Yield]
 ##  BindingPropertyList[?Yield] , BindingProperty[?Yield]
 rule BindingPropertyList : ONEOF(BindingProperty,
-                                 BindingPropertyList + ',' + BindingProperty)
+                                 BindingPropertyList + ',' + BindingProperty,
+                                 BindingPropertyList + ',' + BindingRestProperty)
 
 ##-----------------------------------
 ##rule BindingElementList[Yield] :
@@ -981,6 +982,8 @@ rule BindingElisionElement : ZEROORONE(Elision) + BindingElement
 rule BindingProperty : ONEOF(SingleNameBinding,
                              PropertyName + ':' + BindingElement)
   attr.action.%2 : BuildBindingElement(%1, %3)
+
+rule BindingRestProperty : BindingRestElement
 
 ##-----------------------------------
 ##rule BindingElement[Yield] :

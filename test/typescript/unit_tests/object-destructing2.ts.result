@@ -1,0 +1,10 @@
+Matched 24 tokens.
+Matched 46 tokens.
+============= Module ===========
+== Sub Tree ==
+func  func(args)  throws: 
+  js_const Decl: {:foo, :...others}
+  return others
+
+== Sub Tree ==
+console.log(func( {foo:"Foo", bar:"Bar", tee:"Tee"}))
