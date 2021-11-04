@@ -1844,7 +1844,15 @@ rule PropertySignature: ONEOF(ZEROORONE(AccessibilityModifier) + PropertyName + 
                               ZEROORONE(AccessibilityModifier) + "const" + ZEROORONE(TypeAnnotation),
                               ZEROORONE(AccessibilityModifier) + "if" + ZEROORONE(TypeAnnotation),
                               ZEROORONE(AccessibilityModifier) + "continue" + ZEROORONE(TypeAnnotation),
-                              ZEROORONE(AccessibilityModifier) + "implements" + ZEROORONE(TypeAnnotation))
+                              ZEROORONE(AccessibilityModifier) + "implements" + ZEROORONE(TypeAnnotation),
+                              ZEROORONE(AccessibilityModifier) + "break"      + '?' + ZEROORONE(TypeAnnotation),
+                              ZEROORONE(AccessibilityModifier) + "this"       + '?' + ZEROORONE(TypeAnnotation),
+                              ZEROORONE(AccessibilityModifier) + "export"     + '?' + ZEROORONE(TypeAnnotation),
+                              ZEROORONE(AccessibilityModifier) + "public"     + '?' + ZEROORONE(TypeAnnotation),
+                              ZEROORONE(AccessibilityModifier) + "const"      + '?' + ZEROORONE(TypeAnnotation),
+                              ZEROORONE(AccessibilityModifier) + "if"         + '?' + ZEROORONE(TypeAnnotation),
+                              ZEROORONE(AccessibilityModifier) + "continue"   + '?' + ZEROORONE(TypeAnnotation),
+                              ZEROORONE(AccessibilityModifier) + "implements" + '?' + ZEROORONE(TypeAnnotation))
   attr.action.%1 : AddType(%2, %3)
   attr.action.%2 : AddType(%2, %4)
   attr.action.%2 : SetIsOptional(%2)
@@ -1852,6 +1860,10 @@ rule PropertySignature: ONEOF(ZEROORONE(AccessibilityModifier) + PropertyName + 
   attr.action.%3,%4,%5,%6,%7,%8,%9,%10 : BuildIdentifier(%2)
   attr.action.%3,%4,%5,%6,%7,%8,%9,%10 : AddType(%3)
   attr.action.%3,%4,%5,%6,%7,%8,%9,%10 : AddModifier(%1)
+  attr.action.%11,%12,%13,%14,%15,%16,%17,%18 : BuildIdentifier(%2)
+  attr.action.%11,%12,%13,%14,%15,%16,%17,%18 : SetIsOptional(%2)
+  attr.action.%11,%12,%13,%14,%15,%16,%17,%18 : AddType(%4)
+  attr.action.%11,%12,%13,%14,%15,%16,%17,%18 : AddModifier(%1)
 
 ## JS ECMA has more definition than this Typescript one. I use ECMA one.
 ## rule PropertyName: IdentifierName StringLiteral NumericLiteral

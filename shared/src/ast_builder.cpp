@@ -936,8 +936,10 @@ TreeNode* ASTBuilder::SetIsOptional() {
   if (mParams.size() > 0) {
     Param p_tree = mParams[0];
     if (!p_tree.mIsEmpty) {
-      MASSERT(p_tree.mIsTreeNode);
-      treenode = p_tree.mData.mTreeNode;
+      if (p_tree.mIsTreeNode)
+        treenode = p_tree.mData.mTreeNode;
+      else
+        treenode = BuildIdentifier(p_tree.mData.mToken);
     }
   } else {
     treenode = mLastTreeNode;
