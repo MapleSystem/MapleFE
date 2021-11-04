@@ -40,6 +40,8 @@ int Lexer::ReadALine() {
   }
 
   current_line_size = getline(&line, &linebuf_size, srcfile);
+  _linenum++;
+
   if (current_line_size <= 0) {  // EOF
     fclose(srcfile);
     line[0] = '\0';
@@ -88,6 +90,7 @@ Lexer::Lexer()
     mPredefinedTokenNum(0),
     mTrace(false),
     mLineMode(false),
+    _total_linenum(0),
     _linenum(0) {
       seencomments.clear();
       mCheckSeparator = true;
@@ -96,12 +99,21 @@ Lexer::Lexer()
 }
 
 void Lexer::PrepareForFile(const std::string filename) {
-  // open file
+  // Find the total line number in the file
   srcfile = fopen(filename.c_str(), "r");
   if (!srcfile) {
     std::cerr << "cannot open file " << filename << std::endl;
     exit(1);
   }
+  while (getline(&line, &linebuf_size, srcfile) > 0) {
+    _total_linenum++;
+  }
+
+  fclose(srcfile);
+  line[0] = '\0';
+
+  // open file
+  srcfile = fopen(filename.c_str(), "r");
 
   // allocate line buffer.
   linebuf_size = (size_t)MAX_LINE_SIZE;
@@ -111,11 +123,7 @@ void Lexer::PrepareForFile(const std::string filename) {
   }
 
   // try to read the first line
-  if (ReadALine() < 0) {
-    _linenum = 0;
-  } else {
-    _linenum = 1;
-  }
+  ReadALine();
 }
 
 void Lexer::PrepareForString(const char *str) {
@@ -597,7 +605,6 @@ bool Lexer::GetComment() {
           len = ReadALine();
         if (len < 0)
           return true;
-        _linenum++;  // a new line read.
       }
       if ((line[curidx] == '*' && line[curidx+1] == '/')) {
         get_ending = true;

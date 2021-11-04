@@ -55,6 +55,7 @@ public:
   ssize_t current_line_size;
   uint32_t curidx;
   uint32_t _linenum;
+  uint32_t _total_linenum;  // total line number of the file
   bool endoffile;
   int ReadALine();  // read a line from def file.
 
