@@ -72,6 +72,9 @@ int Lexer::ReadALine() {
     curidx += 3;
   }
 
+  if (current_line_size > 0 && _linenum == _total_linenum)
+    AppendSemiColon();
+
   return current_line_size;
 }
 

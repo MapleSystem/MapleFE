@@ -1,0 +1,10 @@
+Matched 6 tokens.
+Matched 10 tokens.
+Matched 16 tokens.
+============= Module ===========
+== Sub Tree ==
+console.log("hello")
+== Sub Tree ==
+console.log
+== Sub Tree ==
+console.log("world")

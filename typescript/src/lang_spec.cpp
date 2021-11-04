@@ -171,6 +171,12 @@ LitData ProcessLiteral(LitId id, const char *str) {
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
+// Add a ';' to the end of _line.
+void TypescriptLexer::AppendSemiColon() {
+  //line[current_line_size] = ';';
+  //current_line_size++;
+}
+
 // NOTE: right now we rely on 'tsc' to assure the input is legal,
 //       so I'll make many things easier and will skip many lexical
 //       checks. Just make it easy for now.

@@ -125,6 +125,9 @@ public:
   const char*  GetIdentifier();
   bool         GetComment();
 
+  // For most languages, this does nothing. TS/JS are doing something.
+  virtual void AppendSemiColon() {}
+
   virtual TempLitData* GetTempLit() {return NULL;}
   virtual bool FindNextTLFormat(unsigned start, std::string& s, unsigned& end) {return false;}
   virtual bool FindNextTLPlaceHolder(unsigned start, std::string& s, unsigned& end) {return false;}
