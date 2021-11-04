@@ -732,7 +732,7 @@ std::string CppDecl::EmitClassNode(ClassNode *node) {
 }
 
 std::string CppDecl::EmitNewNode(NewNode *node) {
-  if (node == nullptr)
+  if (node == nullptr || node->GetAttrsNum() > 0)
     return std::string();
 
   std::string str;
