@@ -1557,12 +1557,13 @@ rule ExportDeclaration : ONEOF(ZEROORMORE(Annotation) + "export" + '*' + FromCla
                                ZEROORMORE(Annotation) + "export" + "type" + ExportClause + ZEROORONE(';'),
                                ZEROORMORE(Annotation) + "export" + AsNamespace + ZEROORONE(';'),
                                ZEROORMORE(Annotation) + "export" + ExternalModuleDeclaration + ZEROORONE(';'),
-                               ZEROORMORE(Annotation) + "export" + NameSpaceExport + FromClause + ZEROORONE(';'))
+                               ZEROORMORE(Annotation) + "export" + NameSpaceExport + FromClause + ZEROORONE(';'),
+                               ZEROORMORE(Annotation) + "export" + ImportAliasDeclaration)
   attr.property : Top
-  attr.action.%1,%2,%3,%4,%5,%6,%7,%8,%9,%10,%11,%12,%13,%14 : BuildExport()
-  attr.action.%1,%2,%3,%4,%5,%6,%7,%8,%9,%10,%11,%12,%13,%14 : AddModifier(%1)
+  attr.action.%1,%2,%3,%4,%5,%6,%7,%8,%9,%10,%11,%12,%13,%14,%15 : BuildExport()
+  attr.action.%1,%2,%3,%4,%5,%6,%7,%8,%9,%10,%11,%12,%13,%14,%15 : AddModifier(%1)
   attr.action.%1       :    SetIsEverything()
-  attr.action.%2,%3,%4,%5,%12,%13,%14 : SetPairs(%3)
+  attr.action.%2,%3,%4,%5,%12,%13,%14,%15 : SetPairs(%3)
   attr.action.%6,%7,%8 :    SetDefaultPairs(%4)
   attr.action.%1,%2,%14 :   SetFromModule(%4)
   attr.action.%9          : SetSinglePairs(%4)
