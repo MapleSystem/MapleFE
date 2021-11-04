@@ -1,0 +1,7 @@
+Matched 8 tokens.
+Matched 26 tokens.
+============= Module ===========
+== Sub Tree ==
+ts_interface: IFace {num }
+== Sub Tree ==
+ts_interface: IFace2<T,> {prop }

@@ -1620,8 +1620,8 @@ rule ExportSpecifier : ONEOF(JSIdentifier,
 ## rule TypeParameters: < TypeParameterList >
 rule TypeParameters: '<' + TypeParameterList + '>'
 
-rule TypeParameterList: ONEOF(TypeParameter,
-                              TypeParameterList + ',' + TypeParameter)
+rule TypeParameterList: ONEOF(TypeParameter + ZEROORONE(Elision),
+                              TypeParameterList + ',' + TypeParameter + ZEROORONE(Elision))
 
 ## rule TypeParameter: BindingIdentifier Constraintopt
 ## It supports default type value of type parameter now.
