@@ -145,7 +145,11 @@ class ImportExportModules : public AstVisitor {
               str += n->IsLiteral() ? "require("s + s + ')' : s;
             }
           } else if (x->IsEverything()) {
-            mExports += Comment(node) + "namespace __export { using namespace "s + module + "::__export; }\n"s;
+            if (auto b = x->GetBefore())
+              mExports += Comment(node) + "namespace __export { namespace "s + mCppDecl->GetIdentifierName(b)
+                + " = " + module + "::__export; }\n"s;
+            else
+              mExports += Comment(node) + "namespace __export { using namespace "s + module + "::__export; }\n"s;
           } else {
             if (auto b = x->GetBefore()) {
               if (b->IsImport()) {
