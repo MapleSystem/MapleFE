@@ -181,11 +181,15 @@ void AST_XXport::CollectXXportInfo() {
           if (bfnode) {
             // export * as MM from "./M";
             // bfnode represents a module
-            bfnode->SetTypeId(TY_Module);
-
             TreeNode *t = GetTarget(node);
             MASSERT(t && "everything export no target");
             SetIdStrIdx2ModuleStrIdx(bfnode->GetStrIdx(), t->GetStrIdx());
+
+            unsigned hidx = GetHandleIdxFromStrIdx(t->GetStrIdx());
+            Module_Handler *handler = mASTHandler->GetModuleHandler(hidx);
+            ModuleNode *module = handler->GetASTModule();
+            bfnode->SetTypeId(TY_Module);
+            bfnode->SetTypeIdx(module->GetTypeIdx());
           } else {
             // export * from "./M"
             continue;
@@ -275,7 +279,11 @@ unsigned AST_XXport::ExtractTargetStrIdx(TreeNode *node) {
     TreeNode *upper = fld->GetUpper();
     stridx = GetModuleStrIdxFromIdStrIdx(upper->GetStrIdx());
     if (stridx) {
+      unsigned hidx = GetHandleIdxFromStrIdx(stridx);
+      Module_Handler *handler = mASTHandler->GetModuleHandler(hidx);
+      ModuleNode *module = handler->GetASTModule();
       upper->SetTypeId(TY_Module);
+      upper->SetTypeIdx(module->GetTypeIdx());
     }
   }
   return stridx;

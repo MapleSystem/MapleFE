@@ -31,9 +31,6 @@ void AST_INFO::CollectInfo() {
     it->SetParent(module);
   }
 
-  // initialize gTypeTable with builtin types
-  gTypeTable.AddPrimAndBuiltinTypes();
-
   // collect type parameters
   MSGNOLOC0("============== Type Parameter ==============");
   mStrIdxVisitor = new FindStrIdxVisitor(mHandler, mFlags, true);
