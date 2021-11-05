@@ -1,0 +1,7 @@
+Matched 21 tokens.
+Matched 28 tokens.
+============= Module ===========
+== Sub Tree ==
+js_const Decl: obj= {arr:[ {ex1:reg expr :  [/\\]@cocos1, ex2:reg expr :  [/\\]@cocos2}]}
+== Sub Tree ==
+console.log(obj)
