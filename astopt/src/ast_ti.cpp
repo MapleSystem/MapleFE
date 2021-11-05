@@ -18,11 +18,13 @@
 #include "ast_handler.h"
 #include "ast_info.h"
 #include "ast_util.h"
+#include "ast_xxport.h"
 #include "ast_ti.h"
 #include "typetable.h"
 #include "gen_astdump.h"
 
 #define ITERATEMAX 10
+#define DEFAULTVALUE 0xdeadbeef
 
 namespace maplefe {
 
@@ -918,9 +920,7 @@ CallNode *TypeInferVisitor::VisitCallNode(CallNode *node) {
             }
             // skip imported and exported functions as they are generic
             // so should not restrict their types
-            if (ImportedDeclIds.find(decl->GetNodeId()) == ImportedDeclIds.end() &&
-                ExportedDeclIds.find(decl->GetNodeId()) == ExportedDeclIds.end()) {
-
+            if (!mXXport->IsImportExportDeclId(mHandler->GetHidx(), decl->GetNodeId())) {
               unsigned min = func->GetParamsNum();
               if (func->GetParamsNum() != node->GetArgsNum()) {
                 // count minimun number of args need to be passed
@@ -1134,12 +1134,55 @@ DeclNode *TypeInferVisitor::VisitDeclNode(DeclNode *node) {
 
 ImportNode *TypeInferVisitor::VisitImportNode(ImportNode *node) {
   (void) AstVisitor::VisitImportNode(node);
-  return node;
+  TreeNode *target = node->GetTarget();
+  unsigned hidx = DEFAULTVALUE;
+  unsigned hstridx = 0;
+  if (target) {
+    std::string name = mXXport->GetTargetFilename(mHandler->GetHidx(), target);
+    // store name's string index in node
+    hstridx = gStringPool.GetStrIdx(name);
+    hidx = mXXport->GetHandleIdxFromStrIdx(hstridx);
+  }
   for (unsigned i = 0; i < node->GetPairsNum(); i++) {
     XXportAsPairNode *p = node->GetPair(i);
     TreeNode *bfnode = p->GetBefore();
+    TreeNode *afnode = p->GetAfter();
     if (bfnode) {
-      ImportedDeclIds.insert(bfnode->GetNodeId());
+      mXXport->AddImportedDeclIds(mHandler->GetHidx(), bfnode->GetNodeId());
+
+      if (hidx == DEFAULTVALUE) {
+        hstridx = mXXport->ExtractTargetStrIdx(bfnode);
+        if (hstridx) {
+          hidx = mXXport->GetHandleIdxFromStrIdx(hstridx);
+        } else {
+          NOTYETIMPL("can not find import target");
+          return node;
+        }
+      }
+      if (p->IsDefault()) {
+        TreeNode *dflt = mXXport->GetExportedDefault(hstridx);
+        if (dflt) {
+          UpdateTypeId(bfnode, dflt->GetTypeId());
+          UpdateTypeIdx(bfnode, dflt->GetTypeIdx());
+        } else {
+          NOTYETIMPL("can not find exported default");
+        }
+      } else {
+        TreeNode *exported = mXXport->GetExportedNamedNode(hidx, bfnode->GetStrIdx());
+        if (exported) {
+          UpdateTypeId(bfnode, exported->GetTypeId());
+          UpdateTypeIdx(bfnode, exported->GetTypeIdx());
+        } else {
+          NOTYETIMPL("can not find exported node");
+        }
+      }
+
+      UpdateTypeId(p, bfnode->GetTypeId());
+      UpdateTypeIdx(p, bfnode->GetTypeIdx());
+      if (afnode) {
+        UpdateTypeId(afnode, bfnode->GetTypeId());
+        UpdateTypeIdx(afnode, bfnode->GetTypeIdx());
+      }
     }
   }
   return node;
@@ -1147,15 +1190,17 @@ ImportNode *TypeInferVisitor::VisitImportNode(ImportNode *node) {
 
 ExportNode *TypeInferVisitor::VisitExportNode(ExportNode *node) {
   (void) AstVisitor::VisitExportNode(node);
+  unsigned hidx = mHandler->GetHidx();
   for (unsigned i = 0; i < node->GetPairsNum(); i++) {
     XXportAsPairNode *p = node->GetPair(i);
     TreeNode *bfnode = p->GetBefore();
+    TreeNode *afnode = p->GetAfter();
     if (bfnode) {
       switch (bfnode->GetKind()) {
         case NK_Struct:
         case NK_Function:
         case NK_Decl: {
-          ExportedDeclIds.insert(bfnode->GetNodeId());
+          mXXport->AddExportedDeclIds(hidx, bfnode->GetNodeId());
           break;
         }
         case NK_Declare: {
@@ -1163,7 +1208,7 @@ ExportNode *TypeInferVisitor::VisitExportNode(ExportNode *node) {
           for (unsigned i = 0; i < declare-> GetDeclsNum(); i++) {
             TreeNode *decl = declare->GetDeclAtIndex(i);
             if (decl) {
-              ExportedDeclIds.insert(decl->GetNodeId());
+              mXXport->AddExportedDeclIds(hidx, decl->GetNodeId());
             }
           }
           break;
@@ -1172,16 +1217,33 @@ ExportNode *TypeInferVisitor::VisitExportNode(ExportNode *node) {
           IdentifierNode *idnode = static_cast<IdentifierNode *>(bfnode);
           TreeNode *decl = mHandler->FindDecl(idnode);
           if (decl) {
-            ExportedDeclIds.insert(decl->GetNodeId());
+            mXXport->AddExportedDeclIds(hidx, decl->GetNodeId());
+          }
+          if (mXXport->IsDefault(bfnode)) {
+            unsigned stridx = node->GetStrIdx();
+            TreeNode *dflt = mXXport->GetExportedDefault(stridx);
+            if (dflt) {
+              UpdateTypeId(bfnode, dflt->GetTypeId());
+              UpdateTypeIdx(bfnode, dflt->GetTypeIdx());
+            } else {
+              NOTYETIMPL("can not find exported default");
+            }
           }
           break;
         }
         case NK_TypeAlias:
           break;
         default: {
-          NOTYETIMPL("export node kind");
+          NOTYETIMPL("new export node kind");
           break;
         }
+      }
+
+      UpdateTypeId(p, bfnode->GetTypeId());
+      UpdateTypeIdx(p, bfnode->GetTypeIdx());
+      if (afnode) {
+        UpdateTypeId(afnode, bfnode->GetTypeId());
+        UpdateTypeIdx(afnode, bfnode->GetTypeIdx());
       }
     }
   }

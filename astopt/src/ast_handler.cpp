@@ -24,6 +24,7 @@
 #include "ast_cfa.h"
 #include "ast_dfa.h"
 #include "ast_util.h"
+#include "astopt.h"
 #include "typetable.h"
 
 namespace maplefe {
@@ -117,6 +118,14 @@ void Module_Handler::DataFlowAnalysis() {
     mDFA = new(GetMemPool()->Alloc(sizeof(AST_DFA))) AST_DFA(this, mFlags);
   }
   mDFA->DataFlowAnalysis();
+}
+
+AstOpt *Module_Handler::GetAstOpt() {
+  return mASTHandler->GetAstOpt();
+}
+
+AST_XXport *Module_Handler::GetASTXXport() {
+  return mASTHandler->GetAstOpt()->GetASTXXport();
 }
 
 // input an identifire ===> returen the decl node with same name

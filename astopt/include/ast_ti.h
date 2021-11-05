@@ -14,7 +14,7 @@
 */
 
 #ifndef __AST_TYPE_INFERENCE_HEADER__
-#define __AST_TYPE_INFERENCEHEADER__
+#define __AST_TYPE_INFERENCE_HEADER__
 
 #include <stack>
 #include <utility>
@@ -22,6 +22,7 @@
 #include "ast.h"
 #include "ast_type.h"
 #include "gen_astvisitor.h"
+#include "ast_common.h"
 
 namespace maplefe {
 
@@ -107,12 +108,9 @@ class TypeInferVisitor : public TypeInferBaseVisitor {
   unsigned        mFlags;
   bool            mUpdated;
   AST_INFO       *mInfo;
+  AST_XXport     *mXXport;
 
   ChangeTypeIdxVisitor *mChangeTypeIdxVisitor;
-
-  // node ids
-  std::unordered_set<unsigned> ImportedDeclIds;
-  std::unordered_set<unsigned> ExportedDeclIds;
 
   std::unordered_map<unsigned, std::unordered_set<TreeNode *>> mParam2ArgArrayDeclMap;;
 
@@ -124,6 +122,7 @@ class TypeInferVisitor : public TypeInferBaseVisitor {
   explicit TypeInferVisitor(Module_Handler *h, unsigned f, bool base = false)
     : mHandler(h), mFlags(f), mInfo(h->GetINFO()), TypeInferBaseVisitor(f, base) {
       mChangeTypeIdxVisitor = new ChangeTypeIdxVisitor(h, f, true);
+      mXXport = h->GetASTXXport();
     }
 
   ~TypeInferVisitor() = default;

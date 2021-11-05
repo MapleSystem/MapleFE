@@ -117,19 +117,20 @@ class RenameVarVisitor : public AstVisitor {
  private:
   Module_Handler *mHandler;
   ModuleNode     *mASTModule;
+  AstOpt         *mAstOpt;
   unsigned        mFlags;
 
  public:
   unsigned        mPass;
   unsigned        mOldStrIdx;
   unsigned        mNewStrIdx;
-  std::unordered_map<unsigned, TreeNode*> mNodeId2NodeMap;
   std::unordered_map<unsigned, std::deque<unsigned>> mStridx2DeclIdMap;
 
  public:
   explicit RenameVarVisitor(Module_Handler *h, unsigned f, bool base = false)
     : mHandler(h), mFlags(f), AstVisitor((f & FLG_trace_1) && base) {
       mASTModule = mHandler->GetASTModule();
+      mAstOpt = mHandler->GetASTHandler()->GetAstOpt();
     }
   ~RenameVarVisitor() = default;
 

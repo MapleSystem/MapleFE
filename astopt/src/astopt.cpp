@@ -27,7 +27,7 @@ class ImportedFiles;
 AstOpt::AstOpt(AST_Handler *h, unsigned f) {
   mASTHandler = h;
   h->SetAstOpt(this);
-  mASTXxport = new AST_Xxport(this, f);
+  mASTXXport = new AST_XXport(this, f);
   mFlags = f;
 }
 
@@ -83,7 +83,7 @@ void AstOpt::ProcessAST(unsigned flags) {
 
 void AstOpt::BasicAnalysis() {
   // list modules according to dependency
-  mASTXxport->BuildModuleOrder();
+  PreprocessModules();
 
   // collect AST info
   CollectInfo();
@@ -93,6 +93,19 @@ void AstOpt::BasicAnalysis() {
 
   // scope analysis
   ScopeAnalysis();
+}
+
+void AstOpt::PreprocessModules() {
+  // scan through modules to setup mNodeId2NodeMap
+  BuildNodeIdToNodeVisitor visitor(this, mFlags);
+  for (int i = 0; i < GetModuleNum(); i++) {
+    Module_Handler *handler = mASTHandler->GetModuleHandler(i);
+    ModuleNode *module = handler->GetASTModule();
+    visitor.Visit(module);
+  }
+
+  // list modules according to dependency
+  mASTXXport->BuildModuleOrder();
 }
 
 void AstOpt::CollectInfo() {

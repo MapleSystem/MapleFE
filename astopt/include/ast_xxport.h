@@ -33,19 +33,21 @@ class Module_Handler;
 class XXportInfo {
  public:
   unsigned mModuleStrIdx;
+  unsigned mXXportNodeId;
   unsigned mDefaultNodeId;
   bool     mEverything;
   std::set<std::pair<unsigned, unsigned>> mNodeIdPairs;
 
  public:
-  explicit XXportInfo(unsigned m) : mModuleStrIdx(m), mDefaultNodeId(0), mEverything(false) {}
+  explicit XXportInfo(unsigned mod, unsigned nid) :
+    mModuleStrIdx(mod), mXXportNodeId(nid), mDefaultNodeId(0), mEverything(false) {}
   ~XXportInfo() = default;
 
   void SetEverything() {mEverything = true;}
   void Dump();
 };
 
-class AST_Xxport {
+class AST_XXport {
  private:
   AstOpt      *mAstOpt;
   AST_Handler *mASTHandler;
@@ -55,28 +57,30 @@ class AST_Xxport {
   std::unordered_map<unsigned, std::unordered_set<unsigned>> mHandlerIdx2DependentHandlerIdxMap;
   std::unordered_map<unsigned, unsigned> mStrIdx2HandlerIdxMap;
 
+  std::unordered_map<unsigned, unsigned> mIdStrIdx2ModuleStrIdxMap;
+
+ public:
   // module handler idx to set of XXportInfo
   std::unordered_map<unsigned, std::unordered_set<XXportInfo *>> mImports;
   std::unordered_map<unsigned, std::unordered_set<XXportInfo *>> mExports;
 
- public:
   // module handler idx to import/export nodes in the module
   std::unordered_map<unsigned, std::unordered_set<ImportNode *>> mImportNodeSets;
   std::unordered_map<unsigned, std::unordered_set<ExportNode *>> mExportNodeSets;
 
-  std::unordered_map<unsigned, std::unordered_set<unsigned>> ImportedDeclIds;
-  std::unordered_map<unsigned, std::unordered_set<unsigned>> ExportedDeclIds;
+  std::unordered_map<unsigned, std::unordered_set<unsigned>> mImportedDeclIds;
+  std::unordered_map<unsigned, std::unordered_set<unsigned>> mExportedDeclIds;
 
  public:
-  explicit AST_Xxport(AstOpt *o, unsigned f);
-  ~AST_Xxport() {}
+  explicit AST_XXport(AstOpt *o, unsigned f);
+  ~AST_XXport() {}
 
   unsigned GetModuleNum();
 
   void BuildModuleOrder();
 
   void SetModuleStrIdx();
-  void CollectXxportNodes();
+  void CollectXXportNodes();
 
   TreeNode *GetTarget(TreeNode *node);
   std::string GetTargetFilename(unsigned hidx, TreeNode *node);
@@ -85,27 +89,37 @@ class AST_Xxport {
 
   void SortHandler();
 
-  void CollectXxportInfo();
+  void CollectXXportInfo();
 
   void AddHandlerIdx2DependentHandlerIdxMap(unsigned hdlIdx, unsigned depHdlIdx) {
     mHandlerIdx2DependentHandlerIdxMap[hdlIdx].insert(depHdlIdx);
   }
 
-  unsigned GetHandleIdxFromStrIdx(unsigned stridx) {
-    return mStrIdx2HandlerIdxMap[stridx];
-  }
+  unsigned GetHandleIdxFromStrIdx(unsigned stridx) { return mStrIdx2HandlerIdxMap[stridx]; }
+
+  bool IsDefault(TreeNode *node) { return node->GetStrIdx() == gStringPool.GetStrIdx("default"); }
 
   bool IsImportExportDeclId(unsigned hidx, unsigned id) {
-    return (ImportedDeclIds[hidx].find(id) != ImportedDeclIds[hidx].end() ||
-            ExportedDeclIds[hidx].find(id) != ExportedDeclIds[hidx].end());
+    return (mImportedDeclIds[hidx].find(id) != mImportedDeclIds[hidx].end() ||
+            mExportedDeclIds[hidx].find(id) != mExportedDeclIds[hidx].end());
   }
+
+  void AddImportedDeclIds(unsigned hidx, unsigned nid) {mImportedDeclIds[hidx].insert(nid);}
+  void AddExportedDeclIds(unsigned hidx, unsigned nid) {mExportedDeclIds[hidx].insert(nid);}
+
+  unsigned ExtractTargetStrIdx(TreeNode *node);
+  unsigned GetModuleStrIdxFromIdStrIdx(unsigned stridx) {return mIdStrIdx2ModuleStrIdxMap[stridx];}
+  void SetIdStrIdx2ModuleStrIdx(unsigned id, unsigned mod) {mIdStrIdx2ModuleStrIdxMap[id] = mod;}
+
+  TreeNode *GetExportedDefault(unsigned hstridx);
+  TreeNode *GetExportedNamedNode(unsigned hidx, unsigned stridx);
 
   void Dump();
 };
 
 class XXportBasicVisitor : public AstVisitor {
  private:
-  AST_Xxport     *mASTXxport;
+  AST_XXport     *mASTXXport;
   Module_Handler *mHandler;
   unsigned       mHandlerIdx;
   unsigned       mFlags;
@@ -114,8 +128,8 @@ class XXportBasicVisitor : public AstVisitor {
   std::unordered_set<ModuleNode *> mImported;
 
  public:
-  explicit XXportBasicVisitor(AST_Xxport *xx, Module_Handler *h, unsigned i, unsigned f, bool base = false)
-    : mASTXxport(xx), mHandler(h), mHandlerIdx(i), mFlags(f), AstVisitor((f & FLG_trace_1) && base) {}
+  explicit XXportBasicVisitor(AST_XXport *xx, Module_Handler *h, unsigned i, unsigned f, bool base = false)
+    : mASTXXport(xx), mHandler(h), mHandlerIdx(i), mFlags(f), AstVisitor((f & FLG_trace_1) && base) {}
   ~XXportBasicVisitor() = default;
 
   ImportNode *VisitImportNode(ImportNode *node);

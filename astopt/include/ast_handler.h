@@ -40,6 +40,7 @@ class AST_CFA;
 class AST_DFA;
 class AST_SCP;
 class AST_Util;
+class AST_XXport;;
 class AST_Handler;
 class TypeInfer;
 class TypeTable;
@@ -129,6 +130,8 @@ class Module_Handler {
   AST_SCP *GetSCP() {return mSCP;}
   TypeInfer *GetTI() {return mTI;}
   AST_Util *GetUtil() {return mUtil;}
+  AstOpt *GetAstOpt();
+  AST_XXport *GetASTXXport();
 
   void SetHidx(unsigned idx) {mHidx = idx;}
   void SetINFO(AST_INFO *p) {mINFO = p;}

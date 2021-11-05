@@ -17,6 +17,7 @@
 #include <set>
 #include <tuple>
 #include "stringpool.h"
+#include "astopt.h"
 #include "ast_cfg.h"
 #include "ast_scp.h"
 #include "typetable.h"
@@ -414,7 +415,7 @@ void AST_SCP::RenameVar() {
         str += std::to_string(size);
         visitor.mOldStrIdx = stridx;
         visitor.mNewStrIdx = gStringPool.GetStrIdx(str);
-        TreeNode *tn = visitor.mNodeId2NodeMap[nid];
+        TreeNode *tn = mHandler->GetAstOpt()->GetNodeFromNodeId(nid);
         ASTScope *scope = tn->GetScope();
         tn = scope->GetTree();
         if (mFlags & FLG_trace_3) {
@@ -472,7 +473,7 @@ void RenameVarVisitor::InsertToStridx2DeclIdMap(unsigned stridx, IdentifierNode 
   unsigned i = 0;
   for (it = mStridx2DeclIdMap[stridx].begin(); it != mStridx2DeclIdMap[stridx].end(); ++it) {
     i = *it;
-    TreeNode *node1 = mNodeId2NodeMap[i];
+    TreeNode *node1 = mHandler->GetAstOpt()->GetNodeFromNodeId(i);
     ASTScope *s1 = node1->GetScope();
     // decl at same scope already exist
     if (s1 == s0) {
@@ -496,7 +497,6 @@ IdentifierNode *RenameVarVisitor::VisitIdentifierNode(IdentifierNode *node) {
   if (mPass == 0) {
     unsigned id = node->GetNodeId();
     unsigned stridx = node->GetStrIdx();
-    mNodeId2NodeMap[id] = node;
     if (stridx) {
       TreeNode *parent = node->GetParent();
       if (parent) {
