@@ -1,0 +1,10 @@
+Matched 5 tokens.
+Matched 28 tokens.
+Matched 35 tokens.
+============= Module ===========
+== Sub Tree ==
+js_const Decl: str="foo bar tee"
+== Sub Tree ==
+js_let Decl: res=reg expr :  Foo.exec(str) Lor reg expr :  bar.exec(str)
+== Sub Tree ==
+console.log(res)

@@ -407,6 +407,7 @@ Token* Parser::GetRegExpr(Token *t) {
   //   &&  /abc*/g;
   //   ,/abc*/g;
   //   : /abc*/g;
+  //   || /abc*/g;
 
   Token *sep = mActiveTokens.ValueAtIndex(size - 1);
   bool is_sep = false;
@@ -421,6 +422,8 @@ Token* Parser::GetRegExpr(Token *t) {
   if (sep->IsOperator() && (sep->GetOprId() == OPR_Assign))
     is_sep = true;
   if (sep->IsOperator() && (sep->GetOprId() == OPR_Land))
+    is_sep = true;
+  if (sep->IsOperator() && (sep->GetOprId() == OPR_Lor))
     is_sep = true;
   if (!is_sep)
     return t;
