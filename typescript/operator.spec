@@ -25,7 +25,7 @@
 # eg., ':' in Java 8, it's both a separator colon and operator select.
 # We need avoid such duplication in .spec files.
 
-STRUCT Operator : ONEOF(
+STRUCT Operator : (
                     # Arithmetic
                     ("+",    Add),
                     ("-",    Sub),
