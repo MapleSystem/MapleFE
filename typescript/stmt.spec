@@ -377,7 +377,8 @@ rule MemberExpression : ONEOF(
   '<' + Type + '>' + PrimaryExpression,
   MemberExpression + '.' + "get",
   MemberExpression + '.' + "set",
-  PrimaryExpression + "as" + "const")
+  PrimaryExpression + "as" + "const",
+  MemberExpression + '.' + "if")
   attr.action.%1 : AddAsType(%1, %2)
   attr.action.%2 : BuildArrayElement(%1, %3)
   attr.action.%2 : AddAsType(%5)
@@ -394,7 +395,7 @@ rule MemberExpression : ONEOF(
   attr.action.%11: SetIsNonNull(%1)
   attr.action.%12: BuildField(%1, %3)
   attr.action.%12: SetIsConst()
-  attr.action.%13,%15,%16: BuildField(%1, %3)
+  attr.action.%13,%15,%16,%18: BuildField(%1, %3)
   attr.action.%14: BuildCast(%2, %4)
   attr.action.%17: PassChild(%1)
   attr.action.%17: SetIsConst()
@@ -2186,7 +2187,8 @@ rule MemberVariableDeclaration: ONEOF(
   ZEROORMORE(Annotation) + ZEROORMORE(AccessibilityModifier) + "get" + '=' + ArrowFunction + ZEROORONE(';'),
   ZEROORMORE(Annotation) + ZEROORMORE(AccessibilityModifier) + "set" + '=' + ArrowFunction + ZEROORONE(';'),
   '#' + PropertyName + ZEROORONE(TypeAnnotation) + ZEROORONE(Initializer) + ZEROORONE(';'),
-  '#' + "private" + ZEROORONE(TypeAnnotation) + ZEROORONE(Initializer) + ZEROORONE(';'))
+  '#' + "private" + ZEROORONE(TypeAnnotation) + ZEROORONE(Initializer) + ZEROORONE(';'),
+  ZEROORMORE(Annotation) + ZEROORMORE(AccessibilityModifier) + "if" + ZEROORONE(TypeAnnotation) + ZEROORONE(Initializer) + ZEROORONE(';'))
   attr.action.%1: AddInitTo(%3, %5)
   attr.action.%1: AddType(%3, %4)
   attr.action.%1: AddModifierTo(%3, %2)
@@ -2209,6 +2211,11 @@ rule MemberVariableDeclaration: ONEOF(
   attr.action.%5,%6: AddType(%3)
   attr.action.%5,%6: AddModifier(%1)
   attr.action.%5,%6: BuildDecl()
+  attr.action.%7 : BuildIdentifier(%2)
+  attr.action.%7 : AddType(%3)
+  attr.action.%7 : AddModifier(%1)
+  attr.action.%7 : AddInitTo(%5)
+  attr.action.%7 : BuildDecl()
 
 
 ## MemberFunctionDeclaration: AccessibilityModifieropt staticopt PropertyName CallSignature { FunctionBody } AccessibilityModifieropt staticopt PropertyName CallSignature ;

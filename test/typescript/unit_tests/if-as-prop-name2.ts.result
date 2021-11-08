@@ -1,0 +1,15 @@
+Matched 11 tokens.
+Matched 20 tokens.
+============= Module ===========
+== Sub Tree ==
+class  Klass
+  Fields: 
+    static="prop"
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+console.log(Klass.if)
