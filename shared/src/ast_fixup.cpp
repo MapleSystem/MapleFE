@@ -88,7 +88,8 @@ UserTypeNode *FixUpVisitor::VisitUserTypeNode(UserTypeNode *node) {
 // Fix up literal 'true' or 'false'
 IdentifierNode *FixUpVisitor::VisitIdentifierNode(IdentifierNode *node) {
   auto p = node->GetParent();
-  if(p && (p->IsFieldLiteral() || p->IsTerOperator() || p->IsIdentifier()) && node->GetInit() == nullptr) {
+  if(p && node->GetInit() == nullptr &&
+      (p->IsFieldLiteral() || p->IsTerOperator() || p->IsIdentifier() || p->IsBinOperator())) {
     if(auto n = node->GetStrIdx()) {
       auto true_id = gStringPool.GetStrIdx("true");
       if(n == true_id || n == gStringPool.GetStrIdx("false")) {
