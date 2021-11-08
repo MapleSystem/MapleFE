@@ -50,6 +50,10 @@ MemPool *Module_Handler::GetMemPool() {
   return mASTHandler->GetMemPool();
 }
 
+Module_Handler *AST_Handler::GetModuleHandler(unsigned i) {
+  return mModuleHandlers.ValueAtIndex(i);
+}
+
 HandlerIndex AST_Handler::GetHandlerIndex(const char *filename) {
   if (mModuleHandlerMap.find(filename) == mModuleHandlerMap.end())
    return HandlerNotFound;

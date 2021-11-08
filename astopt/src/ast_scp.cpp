@@ -87,8 +87,7 @@ void BuildScopeVisitor::InitInternalTypes() {
 }
 
 ClassNode *BuildScopeVisitor::AddClass(std::string name, unsigned tyidx) {
-  ClassNode *node = (ClassNode*)gTreePool.NewTreeNode(sizeof(ClassNode));
-  new (node) ClassNode();
+  ClassNode *node = mHandler->NewTreeNode<ClassNode>();
   unsigned idx = gStringPool.GetStrIdx(name);
   node->SetStrIdx(idx);
   node->SetTypeIdx(tyidx);
@@ -100,13 +99,12 @@ ClassNode *BuildScopeVisitor::AddClass(std::string name, unsigned tyidx) {
 }
 
 FunctionNode *BuildScopeVisitor::AddFunction(std::string name) {
-  FunctionNode *func = (FunctionNode*)gTreePool.NewTreeNode(sizeof(FunctionNode));
-  new (func) FunctionNode();
+  FunctionNode *func = mHandler->NewTreeNode<FunctionNode>();
   unsigned idx = gStringPool.GetStrIdx(name);
   func->SetStrIdx(idx);
 
-  IdentifierNode *id = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
-  new (id) IdentifierNode(idx);
+  IdentifierNode *id = mHandler->NewTreeNode<IdentifierNode>();
+  id->SetStrIdx(idx);
   func->SetFuncName(id);
 
   // add console and func to root scope
@@ -550,8 +548,8 @@ IdentifierNode *AdjustASTWithScopeVisitor::VisitIdentifierNode(IdentifierNode *n
     }
 
     if (change) {
-      LiteralNode *lit = (LiteralNode*)gTreePool.NewTreeNode(sizeof(LiteralNode));
-      new (lit) LiteralNode(data);
+      LiteralNode *lit = mHandler->NewTreeNode<LiteralNode>();
+      lit->SetData(data);
       return (IdentifierNode*)(lit);
     }
   }

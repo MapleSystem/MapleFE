@@ -25,6 +25,7 @@
 #include <climits>
 #include "ast_module.h"
 #include "ast.h"
+#include "astopt.h"
 #include "ast_cfg.h"
 #include "ast_type.h"
 #include "ast_common.h"
@@ -41,10 +42,58 @@ class AST_DFA;
 class AST_SCP;
 class AST_Util;
 class AST_XXport;;
-class AST_Handler;
+class Module_Handler;
 class TypeInfer;
 class TypeTable;
 class AstOpt;
+
+using HandlerIndex = unsigned;
+const HandlerIndex HandlerNotFound = UINT_MAX;
+
+struct StrLess {
+  bool operator()(const char *p, const char *q) const {
+    return std::strcmp(p, q) < 0;
+  }
+};
+
+class AST_Handler {
+ private:
+  MemPool  mMemPool;    // Memory pool for all CfgFunc, CfgBB, etc.
+  AstOpt  *mAstOpt;
+  unsigned mSize;
+  unsigned mFlags;
+
+  // vector of all AST modules
+  SmallVector<Module_Handler *> mModuleHandlers;
+
+ public:
+  // mapping of mModuleHandlers index with its corresponding filename as its key
+  std::map<const char*, HandlerIndex, StrLess> mModuleHandlerMap;
+
+  explicit AST_Handler(unsigned f) : mSize(0), mFlags(f) {}
+  ~AST_Handler() {mMemPool.Release();}
+
+  MemPool *GetMemPool() {return &mMemPool;}
+
+  AstOpt *GetAstOpt() {return mAstOpt;}
+  void SetAstOpt(AstOpt *opt) {mAstOpt = opt;}
+
+  Module_Handler *GetModuleHandler(unsigned i);
+
+  unsigned GetSize() {return mSize;}
+
+  // If m does not exist in mModuleHandlerMap,
+  //    create an object of Module_Handler for module m
+  //    add this object to mModuleHandlers
+  //    map its corresponding filename and the index of this object in mModuleHandlers in mModuleHandlerMap
+  //    return true
+  // Otherwise,
+  //    return false
+  bool AddModule(ModuleNode *m);
+
+  // Return an index of mModuleHandlers if filename exists in mModuleHandlerMap, otherwise return HandlerNotFound
+  HandlerIndex GetHandlerIndex(const char *filename);
+};
 
 // Each source file is a module
 class Module_Handler {
@@ -151,60 +200,21 @@ class Module_Handler {
   void AddDirectField(TreeNode *node);
   bool IsDirectField(TreeNode *node);
 
+  template <typename T>
+  T *NewTreeNode() {
+    T *node = (T*)gTreePool.NewTreeNode(sizeof(T));
+    new (node) T();
+    AstOpt *opt = mASTHandler->GetAstOpt();
+    opt->AddNodeId2NodeMap(node);
+    return node;
+  }
+
   // API to check a node is c++ field which satisfy both:
   // 1. direct field
   // 2. its name is valid in c++
   bool IsCppField(TreeNode *node);
 
   void Dump(char *msg);
-};
-
-struct StrLess {
-  bool operator()(const char *p, const char *q) const {
-    return std::strcmp(p, q) < 0;
-  }
-};
-
-using HandlerIndex = unsigned;
-const HandlerIndex HandlerNotFound = UINT_MAX;
-
-class AST_Handler {
- private:
-  MemPool  mMemPool;    // Memory pool for all CfgFunc, CfgBB, etc.
-  AstOpt  *mAstOpt;
-  unsigned mSize;
-  unsigned mFlags;
-
-  // vector of all AST modules
-  SmallVector<Module_Handler *> mModuleHandlers;
-
- public:
-  // mapping of mModuleHandlers index with its corresponding filename as its key
-  std::map<const char*, HandlerIndex, StrLess> mModuleHandlerMap;
-
-  explicit AST_Handler(unsigned f) : mSize(0), mFlags(f) {}
-  ~AST_Handler() {mMemPool.Release();}
-
-  MemPool *GetMemPool() {return &mMemPool;}
-
-  AstOpt *GetAstOpt() {return mAstOpt;}
-  void SetAstOpt(AstOpt *opt) {mAstOpt = opt;}
-
-  Module_Handler *GetModuleHandler(unsigned i) {return mModuleHandlers.ValueAtIndex(i);}
-
-  unsigned GetSize() {return mSize;}
-
-  // If m does not exist in mModuleHandlerMap,
-  //    create an object of Module_Handler for module m
-  //    add this object to mModuleHandlers
-  //    map its corresponding filename and the index of this object in mModuleHandlers in mModuleHandlerMap
-  //    return true
-  // Otherwise,
-  //    return false
-  bool AddModule(ModuleNode *m);
-
-  // Return an index of mModuleHandlers if filename exists in mModuleHandlerMap, otherwise return HandlerNotFound
-  HandlerIndex GetHandlerIndex(const char *filename);
 };
 
 }

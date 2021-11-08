@@ -374,8 +374,8 @@ TreeNode *AST_INFO::GetCanonicStructNode(TreeNode *node) {
 }
 
 IdentifierNode *AST_INFO::CreateIdentifierNode(unsigned stridx) {
-  IdentifierNode *node = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
-  new (node) IdentifierNode(stridx);
+  IdentifierNode *node = mHandler->NewTreeNode<IdentifierNode>();
+  node->SetStrIdx(stridx);
   return node;
 }
 
@@ -386,8 +386,8 @@ UserTypeNode *AST_INFO::CreateUserTypeNode(unsigned stridx, ASTScope *scope) {
     node->SetScope(scope);
   }
 
-  UserTypeNode *utype = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
-  new (utype) UserTypeNode(node);
+  UserTypeNode *utype = mHandler->NewTreeNode<UserTypeNode>();
+  utype->SetId(node);
   utype->SetStrIdx(stridx);
   SetTypeId(utype, TY_Class);
   node->SetParent(utype);
@@ -396,8 +396,8 @@ UserTypeNode *AST_INFO::CreateUserTypeNode(unsigned stridx, ASTScope *scope) {
 
 UserTypeNode *AST_INFO::CreateUserTypeNode(IdentifierNode *node) {
   SetTypeId(node, TY_Class);
-  UserTypeNode *utype = (UserTypeNode*)gTreePool.NewTreeNode(sizeof(UserTypeNode));
-  new (utype) UserTypeNode(node);
+  UserTypeNode *utype = mHandler->NewTreeNode<UserTypeNode>();
+  utype->SetId(node);
   utype->SetStrIdx(node->GetStrIdx());
   SetTypeId(utype, TY_Class);
   node->SetParent(utype);
@@ -408,8 +408,7 @@ TypeAliasNode *AST_INFO::CreateTypeAliasNode(TreeNode *to, TreeNode *from) {
   UserTypeNode *utype1 = CreateUserTypeNode(from->GetStrIdx());
   UserTypeNode *utype2 = CreateUserTypeNode(to->GetStrIdx());
 
-  TypeAliasNode *alias = (TypeAliasNode*)gTreePool.NewTreeNode(sizeof(TypeAliasNode));
-  new (alias) TypeAliasNode();
+  TypeAliasNode *alias = mHandler->NewTreeNode<TypeAliasNode>();
   alias->SetId(utype1);
   alias->SetStrIdx(from->GetStrIdx());
   alias->SetAlias(utype2);
@@ -418,8 +417,7 @@ TypeAliasNode *AST_INFO::CreateTypeAliasNode(TreeNode *to, TreeNode *from) {
 }
 
 StructNode *AST_INFO::CreateStructFromStructLiteral(StructLiteralNode *node) {
-  StructNode *newnode = (StructNode*)gTreePool.NewTreeNode(sizeof(StructNode));
-  new (newnode) StructNode(0);
+  StructNode *newnode = mHandler->NewTreeNode<StructNode>();
   SetTypeId(newnode, TY_Class);
 
   for (unsigned i = 0; i < node->GetFieldsNum(); i++) {
@@ -437,8 +435,7 @@ StructNode *AST_INFO::CreateStructFromStructLiteral(StructLiteralNode *node) {
     TreeNode *lit = fl->GetLiteral();
     if (lit && lit->IsLiteral()) {
       TypeId tid = GetTypeId(lit);
-      PrimTypeNode *type = (PrimTypeNode*)gTreePool.NewTreeNode(sizeof(PrimTypeNode));
-      new (type) PrimTypeNode();
+      PrimTypeNode *type = mHandler->NewTreeNode<PrimTypeNode>();
       type->SetPrimType(tid);
       fid->SetType(type);
     } else {

@@ -346,8 +346,7 @@ PrimTypeNode *TypeInferVisitor::GetOrClonePrimTypeNode(PrimTypeNode *pt, TypeId 
   if (tid != oldtid) {
     // check if we need clone PrimTypeNode to avoid using the shared one
     if (oldtid == TY_None) {
-      new_pt = (PrimTypeNode*)gTreePool.NewTreeNode(sizeof(PrimTypeNode));
-      new (new_pt) PrimTypeNode();
+      new_pt = mHandler->NewTreeNode<PrimTypeNode>();
       new_pt->SetPrimType(pt->GetPrimType());
     }
     SetTypeId(new_pt, tid);
@@ -566,16 +565,13 @@ bool TypeInferVisitor::UpdateVarTypeWithInit(TreeNode *var, TreeNode *init) {
     } else if (init->IsArrayLiteral()) {
       TypeId tid = GetArrayElemTypeId(init);
       if (IsPrimTypeId(tid)) {
-        PrimTypeNode *pt = (PrimTypeNode*)gTreePool.NewTreeNode(sizeof(PrimTypeNode));
-        new (pt) PrimTypeNode();
+        PrimTypeNode *pt = mHandler->NewTreeNode<PrimTypeNode>();
         pt->SetPrimType(tid);
 
-        PrimArrayTypeNode *pat = (PrimArrayTypeNode*)gTreePool.NewTreeNode(sizeof(PrimArrayTypeNode));
-        new (pat) PrimArrayTypeNode();
+        PrimArrayTypeNode *pat = mHandler->NewTreeNode<PrimArrayTypeNode>();
         pat->SetPrim(pt);
 
-        DimensionNode *dims = (DimensionNode*)gTreePool.NewTreeNode(sizeof(DimensionNode));
-        new (dims) DimensionNode();
+        DimensionNode *dims = mHandler->NewTreeNode<DimensionNode>();
         pat->SetDims(dims);
 
         // add each dimension
@@ -1474,8 +1470,7 @@ ReturnNode *TypeInferVisitor::VisitReturnNode(ReturnNode *node) {
     FunctionNode *func = static_cast<FunctionNode *>(tn);
     // use dummy PrimTypeNode as return type of function if not set to carry return TypeId
     if (!func->GetType()) {
-      PrimTypeNode *type = (PrimTypeNode*)gTreePool.NewTreeNode(sizeof(PrimTypeNode));
-      new (type) PrimTypeNode();
+      PrimTypeNode *type = mHandler->NewTreeNode<PrimTypeNode>();
       type->SetPrimType(TY_None);
       func->SetType(type);
     }
@@ -1593,10 +1588,8 @@ UserTypeNode *TypeInferVisitor::VisitUserTypeNode(UserTypeNode *node) {
           tid = TY_String;
         }
         if (tid != TY_None) {
-          PrimArrayTypeNode *type = (PrimArrayTypeNode*)gTreePool.NewTreeNode(sizeof(PrimArrayTypeNode));
-          new (type) PrimArrayTypeNode();
-          PrimTypeNode *pt = (PrimTypeNode*)gTreePool.NewTreeNode(sizeof(PrimTypeNode));
-          new (pt) PrimTypeNode();
+          PrimArrayTypeNode *type = mHandler->NewTreeNode<PrimArrayTypeNode>();
+          PrimTypeNode *pt = mHandler->NewTreeNode<PrimTypeNode>();
           pt->SetPrimType(tid);
           type->SetPrim(pt);
           type->SetDims(node->GetDims());

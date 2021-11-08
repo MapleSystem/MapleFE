@@ -338,16 +338,14 @@ CondBranchNode *AdjustASTVisitor::VisitCondBranchNode(CondBranchNode *node) {
   TreeNode *tn = VisitTreeNode(node->GetCond());
   tn = VisitTreeNode(node->GetTrueBranch());
   if (tn && !tn->IsBlock()) {
-    BlockNode *blk = (BlockNode*)gTreePool.NewTreeNode(sizeof(BlockNode));
-    new (blk) BlockNode();
+    BlockNode *blk = mHandler->NewTreeNode<BlockNode>();
     blk->AddChild(tn);
     node->SetTrueBranch(blk);
     mUpdated = true;
   }
   tn = VisitTreeNode(node->GetFalseBranch());
   if (tn && !tn->IsBlock()) {
-    BlockNode *blk = (BlockNode*)gTreePool.NewTreeNode(sizeof(BlockNode));
-    new (blk) BlockNode();
+    BlockNode *blk = mHandler->NewTreeNode<BlockNode>();
     blk->AddChild(tn);
     node->SetFalseBranch(blk);
     mUpdated = true;
@@ -360,8 +358,7 @@ ForLoopNode *AdjustASTVisitor::VisitForLoopNode(ForLoopNode *node) {
   (void) AstVisitor::VisitForLoopNode(node);
   TreeNode *tn = node->GetBody();
   if (tn && !tn->IsBlock()) {
-    BlockNode *blk = (BlockNode*)gTreePool.NewTreeNode(sizeof(BlockNode));
-    new (blk) BlockNode();
+    BlockNode *blk = mHandler->NewTreeNode<BlockNode>();
     blk->AddChild(tn);
     node->SetBody(blk);
     mUpdated = true;
@@ -374,8 +371,7 @@ static unsigned uniq_number = 1;
 // lamda : create a FunctionNode for it
 //         use BlockNode for body, add a ReturnNode
 LambdaNode *AdjustASTVisitor::VisitLambdaNode(LambdaNode *node) {
-  FunctionNode *func = (FunctionNode*)gTreePool.NewTreeNode(sizeof(FunctionNode));
-  new (func) FunctionNode();
+  FunctionNode *func = mHandler->NewTreeNode<FunctionNode>();
 
   // func name
   std::string str("__lambda_");
@@ -408,11 +404,8 @@ LambdaNode *AdjustASTVisitor::VisitLambdaNode(LambdaNode *node) {
       func->SetBody(static_cast<BlockNode*>(tn));
       func->SetType(node->GetType());
     } else {
-      BlockNode *blk = (BlockNode*)gTreePool.NewTreeNode(sizeof(BlockNode));
-      new (blk) BlockNode();
-
-      ReturnNode *ret = (ReturnNode*)gTreePool.NewTreeNode(sizeof(ReturnNode));
-      new (ret) ReturnNode();
+      BlockNode *blk = mHandler->NewTreeNode<BlockNode>();
+      ReturnNode *ret = mHandler->NewTreeNode<ReturnNode>();
       ret->SetResult(tn);
       blk->AddChild(ret);
 
