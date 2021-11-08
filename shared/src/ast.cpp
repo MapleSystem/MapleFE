@@ -899,8 +899,8 @@ void StructLiteralNode::AddField(TreeNode *tree) {
     new (func_lit) FieldLiteralNode();
     TreeNode *func_name = node->GetFuncName();
     if (func_name) {
-      MASSERT(func_name->IsIdentifier());
-      func_lit->SetFieldName((IdentifierNode*)func_name);
+      MASSERT(func_name->IsIdentifier() || func_name->IsComputedName());
+      func_lit->SetFieldName(func_name);
     }
     func_lit->SetLiteral(node);
     mFields.PushBack(func_lit);

@@ -1,0 +1,14 @@
+Matched 8 tokens.
+Matched 42 tokens.
+Matched 71 tokens.
+============= Module ===========
+== Sub Tree ==
+ts_interface: Iface {name }
+== Sub Tree ==
+js_const Decl: myIter=Object.freeze( {next:func  next()  throws: 
+  return  {done:true, value:undefined}
+})
+== Sub Tree ==
+js_const Decl: iter=Object.freeze( {[Symbol.iterator] : :func  ()  throws: 
+  return myIter
+})
