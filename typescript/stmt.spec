@@ -378,7 +378,8 @@ rule MemberExpression : ONEOF(
   MemberExpression + '.' + "get",
   MemberExpression + '.' + "set",
   PrimaryExpression + "as" + "const",
-  MemberExpression + '.' + "if")
+  MemberExpression + '.' + "if",
+  MemberExpression + '.' + "implements")
   attr.action.%1 : AddAsType(%1, %2)
   attr.action.%2 : BuildArrayElement(%1, %3)
   attr.action.%2 : AddAsType(%5)
@@ -395,7 +396,7 @@ rule MemberExpression : ONEOF(
   attr.action.%11: SetIsNonNull(%1)
   attr.action.%12: BuildField(%1, %3)
   attr.action.%12: SetIsConst()
-  attr.action.%13,%15,%16,%18: BuildField(%1, %3)
+  attr.action.%13,%15,%16,%18,%19: BuildField(%1, %3)
   attr.action.%14: BuildCast(%2, %4)
   attr.action.%17: PassChild(%1)
   attr.action.%17: SetIsConst()
