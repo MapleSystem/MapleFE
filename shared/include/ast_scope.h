@@ -51,6 +51,9 @@ private:
   // So TreeNode is the only choice for it.
   SmallVector<TreeNode*> mDecls;
 
+  // Imported Decles
+  SmallVector<TreeNode*> mImportedDecls;
+
 public:
   ASTScope() : mParent(NULL), mTree(NULL) {}
   ASTScope(ASTScope *p) : mTree(NULL) { SetParent(p); }
@@ -68,15 +71,18 @@ public:
 
   unsigned GetChildrenNum() {return mChildren.GetNum();}
   unsigned GetDeclNum() {return mDecls.GetNum();}
+  unsigned GetImportedDeclNum() {return mImportedDecls.GetNum();}
   unsigned GetTypeNum() {return mTypes.GetNum();}
   ASTScope* GetChild(unsigned i) {return mChildren.ValueAtIndex(i);}
   TreeNode* GetDecl(unsigned i) {return mDecls.ValueAtIndex(i);}
+  TreeNode* GetImportedDecl(unsigned i) {return mImportedDecls.ValueAtIndex(i);}
   TreeNode* GetType(unsigned i) {return mTypes.ValueAtIndex(i);}
 
   TreeNode* FindDeclOf(unsigned stridx);
   TreeNode* FindTypeOf(unsigned stridx);
 
   void AddDecl(TreeNode *n) {mDecls.PushBack(n);}
+  void AddImportDecl(TreeNode *n) {mImportedDecls.PushBack(n);}
   void AddType(TreeNode *n) {mTypes.PushBack(n);}
   void TryAddDecl(TreeNode *n);
   void TryAddType(TreeNode *n);

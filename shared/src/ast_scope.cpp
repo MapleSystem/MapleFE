@@ -40,6 +40,12 @@ TreeNode* ASTScope::FindDeclOf(unsigned stridx) {
         return tree;
       }
     }
+    for (unsigned i = 0; i < scope->GetImportedDeclNum(); i++) {
+      TreeNode *tree = scope->GetImportedDecl(i);
+      if (tree->GetStrIdx() == stridx) {
+        return tree;
+      }
+    }
     // search parent scope
     scope = scope->mParent;
   }
