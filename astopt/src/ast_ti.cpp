@@ -916,7 +916,7 @@ CallNode *TypeInferVisitor::VisitCallNode(CallNode *node) {
             }
             // skip imported and exported functions as they are generic
             // so should not restrict their types
-            if (!mXXport->IsImportExportDeclId(mHandler->GetHidx(), decl->GetNodeId())) {
+            if (!mXXport->IsImportedExportedDeclId(mHandler->GetHidx(), decl->GetNodeId())) {
               unsigned min = func->GetParamsNum();
               if (func->GetParamsNum() != node->GetArgsNum()) {
                 // count minimun number of args need to be passed

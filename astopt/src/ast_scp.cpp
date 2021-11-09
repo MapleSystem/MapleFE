@@ -20,6 +20,7 @@
 #include "astopt.h"
 #include "ast_cfg.h"
 #include "ast_scp.h"
+#include "ast_xxport.h"
 #include "typetable.h"
 
 namespace maplefe {
@@ -34,12 +35,22 @@ void AST_SCP::ScopeAnalysis() {
 void AST_SCP::BuildScope() {
   MSGNOLOC0("============== BuildScope ==============");
   BuildScopeVisitor visitor(mHandler, mFlags, true);
+
+  // add all module themselves to the stridx to scope map
+  AST_Handler *asthandler = mHandler->GetASTHandler();
+  for (int i = 0; i < asthandler->GetSize(); i++) {
+    Module_Handler *handler = asthandler->GetModuleHandler(i);
+    ModuleNode *module = handler->GetASTModule();
+    ASTScope *scope = module->GetRootScope();
+    module->SetScope(scope);
+    visitor.AddScopeMap(module->GetStrIdx(), scope);
+  }
+
   ModuleNode *module = mHandler->GetASTModule();
   ASTScope *scope = module->GetRootScope();
 
   visitor.InitInternalTypes();
 
-  module->SetScope(scope);
   visitor.SetRunIt(true);
   unsigned count = 0;
   // run twice if necessary in case struct's scope is used before set
@@ -364,6 +375,8 @@ FieldNode *BuildScopeVisitor::VisitFieldNode(FieldNode *node) {
           if (id) {
             scope = mStrIdx2ScopeMap[id->GetStrIdx()];
           }
+        } else if (id->GetParent() && id->GetParent()->IsXXportAsPair()) {
+          scope = id->GetScope();
         }
       }
     }
@@ -373,6 +386,69 @@ FieldNode *BuildScopeVisitor::VisitFieldNode(FieldNode *node) {
       mScopeStack.pop();
     } else {
       mRunIt = true;
+    }
+  }
+
+  return node;
+}
+
+ImportNode *BuildScopeVisitor::VisitImportNode(ImportNode *node) {
+  (void) AstVisitor::VisitImportNode(node);
+  ASTScope *scope = mScopeStack.top();
+
+  Module_Handler *targetHandler = NULL;
+  TreeNode *target = node->GetTarget();
+  if (target) {
+    unsigned hstridx = target->GetStrIdx();
+    unsigned hidx = mXXport->GetHandleIdxFromStrIdx(hstridx);
+    targetHandler = mHandler->GetASTHandler()->GetModuleHandler(hidx);
+  }
+
+  for (unsigned i = 0; i < node->GetPairsNum(); i++) {
+    XXportAsPairNode *p = node->GetPair(i);
+    TreeNode *bfnode = p->GetBefore();
+    TreeNode *afnode = p->GetAfter();
+    if (p->IsDefault()) {
+      if (bfnode) {
+        bfnode->SetScope(scope);
+        scope->AddImportDecl(bfnode);
+      }
+    } else if (afnode) {
+      afnode->SetScope(scope);
+      scope->AddImportDecl(afnode);
+
+      if (bfnode && targetHandler) {
+        ModuleNode *mod = targetHandler->GetASTModule();
+        ASTScope *modscp = mod->GetScope();
+        bfnode->SetScope(modscp);
+      }
+    }
+  }
+
+  return node;
+}
+
+ExportNode *BuildScopeVisitor::VisitExportNode(ExportNode *node) {
+  (void) AstVisitor::VisitExportNode(node);
+  ASTScope *scope = mScopeStack.top();
+
+  Module_Handler *targetHandler = NULL;
+  TreeNode *target = node->GetTarget();
+  // re-export
+  if (target) {
+    unsigned hstridx = target->GetStrIdx();
+    unsigned hidx = mXXport->GetHandleIdxFromStrIdx(hstridx);
+    targetHandler = mHandler->GetASTHandler()->GetModuleHandler(hidx);
+
+    for (unsigned i = 0; i < node->GetPairsNum(); i++) {
+      XXportAsPairNode *p = node->GetPair(i);
+      TreeNode *bfnode = p->GetBefore();
+      TreeNode *afnode = p->GetAfter();
+      if (bfnode && targetHandler) {
+        ModuleNode *mod = targetHandler->GetASTModule();
+        ASTScope *modscp = mod->GetScope();
+        bfnode->SetScope(modscp);
+      }
     }
   }
 

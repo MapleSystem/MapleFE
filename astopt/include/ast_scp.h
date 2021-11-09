@@ -74,6 +74,7 @@ class BuildScopeVisitor : public BuildScopeBaseVisitor {
   ModuleNode     *mASTModule;
   unsigned        mFlags;
   bool            mRunIt;
+  AST_XXport     *mXXport;
 
   // stridx to scope map for struct/class
   std::unordered_map<unsigned, ASTScope *> mStrIdx2ScopeMap;;
@@ -82,6 +83,7 @@ class BuildScopeVisitor : public BuildScopeBaseVisitor {
   explicit BuildScopeVisitor(Module_Handler *h, unsigned f, bool base = false)
     : mHandler(h), mFlags(f), BuildScopeBaseVisitor(f, base) {
       mASTModule = mHandler->GetASTModule();
+      mXXport = h->GetASTXXport();
     }
   ~BuildScopeVisitor() = default;
 
@@ -94,6 +96,8 @@ class BuildScopeVisitor : public BuildScopeBaseVisitor {
 
   void AddType(ASTScope *scope, TreeNode *node);
   void AddTypeAndDecl(ASTScope *scope, TreeNode *node);
+
+  void AddScopeMap(unsigned stridx, ASTScope *scope) { mStrIdx2ScopeMap[stridx] = scope; }
 
   // scope nodes
   BlockNode *VisitBlockNode(BlockNode *node);
@@ -110,7 +114,8 @@ class BuildScopeVisitor : public BuildScopeBaseVisitor {
   DeclNode *VisitDeclNode(DeclNode *node);
   UserTypeNode *VisitUserTypeNode(UserTypeNode *node);
   TypeAliasNode *VisitTypeAliasNode(TypeAliasNode *node);
-
+  ImportNode *VisitImportNode(ImportNode *node);
+  ExportNode *VisitExportNode(ExportNode *node);
 };
 
 class RenameVarVisitor : public AstVisitor {

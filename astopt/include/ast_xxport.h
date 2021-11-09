@@ -99,9 +99,16 @@ class AST_XXport {
 
   bool IsDefault(TreeNode *node) { return node->GetStrIdx() == gStringPool.GetStrIdx("default"); }
 
-  bool IsImportExportDeclId(unsigned hidx, unsigned id) {
-    return (mImportedDeclIds[hidx].find(id) != mImportedDeclIds[hidx].end() ||
-            mExportedDeclIds[hidx].find(id) != mExportedDeclIds[hidx].end());
+  bool IsImportedDeclId(unsigned hidx, unsigned id) {
+    return (mImportedDeclIds[hidx].find(id) != mImportedDeclIds[hidx].end());
+  }
+
+  bool IsExportedDeclId(unsigned hidx, unsigned id) {
+    return (mExportedDeclIds[hidx].find(id) != mExportedDeclIds[hidx].end());
+  }
+
+  bool IsImportedExportedDeclId(unsigned hidx, unsigned id) {
+    return IsImportedDeclId(hidx, id) || IsExportedDeclId(hidx, id);
   }
 
   void AddImportedDeclIds(unsigned hidx, unsigned nid) {mImportedDeclIds[hidx].insert(nid);}
