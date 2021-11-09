@@ -561,8 +561,8 @@ std::string CppDef::EmitCallNode(CallNode *node) {
     if(log) {
       std::string s = EmitTreeNode(node->GetArg(i));
       if(QuoteStringLiteral(s)) {
-        if(num > 1)
-          s = "\"'\""s + s + "\"'\""s;
+        //if(num > 1)
+        //  s = "\"'\""s + s + "\"'\""s;
       } else if(mPrecedence <= 13) // '\015'
         s = "("s + s + ")"s;
       if (i)
