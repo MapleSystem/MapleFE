@@ -1,0 +1,4 @@
+Matched 26 tokens.
+============= Module ===========
+== Sub Tree ==
+export {declare  type Type<T> =  {t }} 
