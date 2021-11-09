@@ -1801,6 +1801,7 @@ TreeNode* ASTBuilder::BuildArrayLiteral() {
             literals->IsTerOperator() ||
             literals->IsRegExpr() ||
             literals->IsFunction() ||
+            literals->IsTemplateLiteral() ||
             literals->IsLambda());
     if (literals->IsExprList()) {
       ExprListNode *el = (ExprListNode*)literals;
@@ -1820,6 +1821,7 @@ TreeNode* ASTBuilder::BuildArrayLiteral() {
                 expr->IsTerOperator() ||
                 expr->IsRegExpr() ||
                 expr->IsFunction() ||
+                expr->IsTemplateLiteral() ||
                 expr->IsLambda());
         array_literal->AddLiteral(expr);
       }

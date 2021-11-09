@@ -1,0 +1,7 @@
+Matched 24 tokens.
+Matched 31 tokens.
+============= Module ===========
+== Sub Tree ==
+js_var Decl: arr=[null,[ template-literal: "template literal",NULL,null]]
+== Sub Tree ==
+console.log(arr)
