@@ -3,8 +3,8 @@ Matched 19 tokens.
 Matched 26 tokens.
 ============= Module ===========
 == Sub Tree ==
-import { SINGLE "./export-class" as Foo} 
+import { SINGLE "./export-class" as Bar} 
 == Sub Tree ==
-js_let Decl: obj=new Foo(123,456)
+js_let Decl: obj=new Bar(123,456)
 == Sub Tree ==
 console.log(obj)
