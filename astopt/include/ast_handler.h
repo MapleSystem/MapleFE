@@ -203,7 +203,7 @@ class Module_Handler {
   void AddDirectField(TreeNode *node);
   bool IsDirectField(TreeNode *node);
 
-  bool IsFromLambda(unsigned nid);
+  bool IsFromLambda(TreeNode *node);
 
   template <typename T>
   T *NewTreeNode() {

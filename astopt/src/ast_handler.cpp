@@ -208,7 +208,11 @@ bool Module_Handler::IsDirectField(TreeNode *node) {
   return mDirectFieldSet.find(node->GetNodeId()) != mDirectFieldSet.end();
 }
 
-bool Module_Handler::IsFromLambda(unsigned nid) {
+bool Module_Handler::IsFromLambda(TreeNode *node) {
+  if (!node) {
+    return false;
+  }
+  unsigned nid = node->GetNodeId();
   return mINFO->IsFromLambda(nid);
 }
 
