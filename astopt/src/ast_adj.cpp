@@ -381,6 +381,7 @@ LambdaNode *AdjustASTVisitor::VisitLambdaNode(LambdaNode *node) {
   IdentifierNode *name = mInfo->CreateIdentifierNode(stridx);
   func->SetStrIdx(stridx);
   func->SetFuncName(name);
+  mInfo->AddFromLambda(func->GetNodeId());
 
   // func parameters
   for (int i = 0; i < node->GetParamsNum(); i++) {

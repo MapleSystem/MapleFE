@@ -44,6 +44,7 @@ class AST_INFO {
   std::unordered_map<unsigned, TreeNode *> mStrIdx2StructMap;
   std::unordered_set<unsigned> mTypeParamStrIdxSet;
   std::unordered_set<unsigned> mWithTypeParamNodeSet;
+  std::unordered_set<unsigned> mFromLambda;
 
   void AddField(unsigned nid, TreeNode *node);
 
@@ -95,6 +96,9 @@ class AST_INFO {
 
   void SetTypeId(TreeNode *node, TypeId tid);
   void SetTypeIdx(TreeNode *node, unsigned tidx);
+
+  void AddFromLambda(unsigned nid) { mFromLambda.insert(nid); }
+  bool IsFromLambda(unsigned nid) { return mFromLambda.find(nid) != mFromLambda.end(); }
 };
 
 class FillNodeInfoVisitor : public AstVisitor {

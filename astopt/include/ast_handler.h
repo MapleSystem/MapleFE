@@ -203,6 +203,8 @@ class Module_Handler {
   void AddDirectField(TreeNode *node);
   bool IsDirectField(TreeNode *node);
 
+  bool IsFromLambda(unsigned nid);
+
   template <typename T>
   T *NewTreeNode() {
     T *node = (T*)gTreePool.NewTreeNode(sizeof(T));
