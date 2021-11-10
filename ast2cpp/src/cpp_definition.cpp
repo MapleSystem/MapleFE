@@ -1055,8 +1055,6 @@ std::string CppDef::EmitLiteralNode(LiteralNode *node) {
   if(lit.mType == LT_VoidLiteral)
     return "undefined";
   std::string str = Emitter::EmitLiteralNode(node);
-  if (node->GetTypeId() == TY_Int)
-    str = "(int)"s + str;
   return str;
 }
 
