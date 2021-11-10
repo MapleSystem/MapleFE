@@ -1031,14 +1031,18 @@ rule EmptyStatement : ';'
 ##  [lookahead NotIn {{, function, class, let [}] Expression[In, ?Yield] ;
 
 rule ExpressionStatement : ONEOF(
-  ConditionalExpression + ';',
-  YieldExpression + ';',
-  ArrowFunction + ';',
-  LeftHandSideExpression + '=' + AssignmentExpression + ZEROORONE(';'),
-  LeftHandSideExpression + AssignmentOperator + AssignmentExpression + ZEROORONE(';'),
-  Expression + ',' + AssignmentExpression + ';',
-  "undefined" + ';')
+                                 ConditionalExpression + ';',
+                                 YieldExpression + ';',
+                                 ArrowFunction + ';',
+                                 LeftHandSideExpression + '=' + AssignmentExpression + ZEROORONE(';'),
+                                 LeftHandSideExpression + AssignmentOperator + AssignmentExpression + ZEROORONE(';'),
+                                 Expression + ',' + AssignmentExpression + ';',
+                                 "undefined" + ';',
+                                 LeftHandSideExpression + "++",
+                                 LeftHandSideExpression + "--")
+
   attr.action.%4,%5 : BuildAssignment(%1, %2, %3)
+  attr.action.%8,%9 : BuildPostfixOperation(%2, %1)
 
 ##-----------------------------------
 ##rule IfStatement[Yield, Return] :

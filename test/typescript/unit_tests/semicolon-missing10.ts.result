@@ -1,0 +1,15 @@
+Matched 46 tokens.
+Matched 64 tokens.
+============= Module ===========
+== Sub Tree ==
+func  func(arr)  throws: 
+  js_var Decl: len=arr.length
+  js_var Decl: sum=0
+  while len GT 0    len Dec
+
+    sum AddAssign arr[len]
+
+  return sum
+
+== Sub Tree ==
+console.log(func([1,2,3,4]))
