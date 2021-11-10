@@ -542,7 +542,7 @@ static std::string GetEnumLitData(LitData lit) {{
   switch (lit.mType) {{
     case LT_IntegerLiteral:
       {{ std::stringstream s;
-         s << std::hex << "0x" << lit.mData.mInt;
+         s << lit.mData.mInt;
          return s.str();
       }}
     case LT_FPLiteral:
