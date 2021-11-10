@@ -292,6 +292,18 @@ TreeNode* ASTBuilder::BuildIdentifier() {
     new (n) IdentifierNode(idx);
     mLastTreeNode = n;
     return n;
+  } else if (mLastTreeNode->IsLiteral()) {
+    LiteralNode *lit = (LiteralNode*)mLastTreeNode;
+    LitData data = lit->GetData();
+    if (data.mType == LT_ThisLiteral) {
+      IdentifierNode *n = (IdentifierNode*)gTreePool.NewTreeNode(sizeof(IdentifierNode));
+      unsigned idx = gStringPool.GetStrIdx("this");
+      new (n) IdentifierNode(idx);
+      mLastTreeNode = n;
+      return n;
+    } else {
+      MERROR("Unsupported node type in BuildIdentifier()");
+    }
   } else {
     MERROR("Unsupported node type in BuildIdentifier()");
   }

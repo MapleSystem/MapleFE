@@ -1981,27 +1981,18 @@ rule TypeAliasDeclaration: "type" + BindingIdentifier + ZEROORONE(TypeParameters
 ##                              A.2 Expression
 ##############################################################################################
 
+rule AllPropertyName : ONEOF(PropertyName, KeywordPropName)
+
 ## PropertyDefinition: ( Modified ) IdentifierReference CoverInitializedName PropertyName : AssignmentExpression PropertyName CallSignature { FunctionBody } GetAccessor SetAccessor
 rule PropertyDefinition: ONEOF(IdentifierReference,
                                CoverInitializedName,
-                               PropertyName + ':' + AssignmentExpression,
+                               AllPropertyName + ':' + AssignmentExpression,
                                ZEROORONE(AccessibilityModifier) + PropertyName + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')'
                                  + ZEROORONE(TypeAnnotation) + '{' + FunctionBody + '}',
                                GetAccessor,
                                SetAccessor,
-                               SpreadElement,
-                               "this"       + ':' + AssignmentExpression,
-                               "export"     + ':' + AssignmentExpression,
-                               "public"     + ':' + AssignmentExpression,
-                               "const"      + ':' + AssignmentExpression,
-                               "if"         + ':' + AssignmentExpression,
-                               "continue"   + ':' + AssignmentExpression,
-                               "implements" + ':' + AssignmentExpression,
-                               "enum"       + ':' + AssignmentExpression,
-                               "let"        + ':' + AssignmentExpression,
-                               "break"      + ':' + AssignmentExpression,
-                               "var"        + ':' + AssignmentExpression)
-  attr.action.%3,%8,%9,%10,%11,%12,%13,%14,%15,%16,%17,%18 : BuildFieldLiteral(%1, %3)
+                               SpreadElement)
+  attr.action.%3 : BuildFieldLiteral(%1, %3)
   attr.action.%4 : BuildFunction(%2)
   attr.action.%4 : AddType(%7)
   attr.action.%4 : AddParams(%5)
