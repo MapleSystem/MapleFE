@@ -1,0 +1,52 @@
+Matched 43 tokens.
+Matched 52 tokens.
+Matched 72 tokens.
+Matched 115 tokens.
+Matched 124 tokens.
+Matched 144 tokens.
+Matched 187 tokens.
+Matched 196 tokens.
+Matched 216 tokens.
+============= Module ===========
+== Sub Tree ==
+export {func  func(arg)  throws: 
+  cond-branch cond:Not arg.let
+  true branch :
+    console.log("null")
+  false branch :
+    arg.let()
+
+} 
+== Sub Tree ==
+func( {let:null})
+== Sub Tree ==
+func( {let:() -> console.log("calling let()")
+})
+== Sub Tree ==
+export {func  func1(arg)  throws: 
+  cond-branch cond:Not arg.var
+  true branch :
+    console.log("null")
+  false branch :
+    arg.var()
+
+} 
+== Sub Tree ==
+func1( {var:null})
+== Sub Tree ==
+func1( {var:() -> console.log("calling var()")
+})
+== Sub Tree ==
+export {func  func2(arg)  throws: 
+  cond-branch cond:Not arg.break
+  true branch :
+    console.log("null")
+  false branch :
+    arg.break()
+
+} 
+== Sub Tree ==
+func2( {break:null})
+== Sub Tree ==
+func2( {break:() -> console.log("calling break()")
+})

@@ -356,6 +356,22 @@ rule Initializer : '=' + AssignmentExpression
 ##  MetaProperty
 ##  new MemberExpression[?Yield] Arguments[?Yield]
 
+rule KeywordPropName : ONEOF("break",
+                             "this",
+                             "export",
+                             "public",
+                             "const",
+                             "if",
+                             "continue",
+                             "implements",
+                             "enum",
+                             "let",
+                             "return",
+                             "get",
+                             "set",
+                             "var")
+  attr.action : BuildIdentifier()
+
 rule MemberExpression : ONEOF(
   PrimaryExpression + ZEROORMORE(AsType),
   MemberExpression + '[' + Expression + ']' + ZEROORMORE(AsType),
@@ -373,13 +389,9 @@ rule MemberExpression : ONEOF(
   MemberExpression + '[' + KeyOf + ']',
   MemberExpression + '!',
   MemberExpression + '.' + JSIdentifier + "as" + "const",
-  MemberExpression + '.' + "return",
   '<' + Type + '>' + PrimaryExpression,
-  MemberExpression + '.' + "get",
-  MemberExpression + '.' + "set",
   PrimaryExpression + "as" + "const",
-  MemberExpression + '.' + "if",
-  MemberExpression + '.' + "implements")
+  MemberExpression + '.' + KeywordPropName)
   attr.action.%1 : AddAsType(%1, %2)
   attr.action.%2 : BuildArrayElement(%1, %3)
   attr.action.%2 : AddAsType(%5)
@@ -396,10 +408,10 @@ rule MemberExpression : ONEOF(
   attr.action.%11: SetIsNonNull(%1)
   attr.action.%12: BuildField(%1, %3)
   attr.action.%12: SetIsConst()
-  attr.action.%13,%15,%16,%18,%19: BuildField(%1, %3)
-  attr.action.%14: BuildCast(%2, %4)
-  attr.action.%17: PassChild(%1)
-  attr.action.%17: SetIsConst()
+  attr.action.%13: BuildCast(%2, %4)
+  attr.action.%14: PassChild(%1)
+  attr.action.%14: SetIsConst()
+  attr.action.%15 : BuildField(%1, %3)
 
 rule IsExpression: ONEOF(PrimaryExpression + "is" + Type,
                          ArrowFunction + "is" + Type)
@@ -1840,39 +1852,16 @@ rule TypeQueryExpression: ONEOF(IdentifierReference,
 ## rule ThisType: this
 rule ThisType: "this"
 
+rule PropertySignatureName : ONEOF(PropertyName, KeywordPropName)
+
 ## rule PropertySignature: PropertyName ?opt TypeAnnotationopt
 ## Some ugly TS/JS features allowing break, this as property name.
-rule PropertySignature: ONEOF(ZEROORONE(AccessibilityModifier) + PropertyName + ZEROORONE(TypeAnnotation),
-                              ZEROORONE(AccessibilityModifier) + PropertyName + '?' + ZEROORONE(TypeAnnotation),
-                              ZEROORONE(AccessibilityModifier) + "break" + ZEROORONE(TypeAnnotation),
-                              ZEROORONE(AccessibilityModifier) + "this" + ZEROORONE(TypeAnnotation),
-                              ZEROORONE(AccessibilityModifier) + "export" + ZEROORONE(TypeAnnotation),
-                              ZEROORONE(AccessibilityModifier) + "public" + ZEROORONE(TypeAnnotation),
-                              ZEROORONE(AccessibilityModifier) + "const" + ZEROORONE(TypeAnnotation),
-                              ZEROORONE(AccessibilityModifier) + "if" + ZEROORONE(TypeAnnotation),
-                              ZEROORONE(AccessibilityModifier) + "continue" + ZEROORONE(TypeAnnotation),
-                              ZEROORONE(AccessibilityModifier) + "implements" + ZEROORONE(TypeAnnotation),
-                              ZEROORONE(AccessibilityModifier) + "enum" + ZEROORONE(TypeAnnotation),
-                              ZEROORONE(AccessibilityModifier) + "break"      + '?' + ZEROORONE(TypeAnnotation),
-                              ZEROORONE(AccessibilityModifier) + "this"       + '?' + ZEROORONE(TypeAnnotation),
-                              ZEROORONE(AccessibilityModifier) + "export"     + '?' + ZEROORONE(TypeAnnotation),
-                              ZEROORONE(AccessibilityModifier) + "public"     + '?' + ZEROORONE(TypeAnnotation),
-                              ZEROORONE(AccessibilityModifier) + "const"      + '?' + ZEROORONE(TypeAnnotation),
-                              ZEROORONE(AccessibilityModifier) + "if"         + '?' + ZEROORONE(TypeAnnotation),
-                              ZEROORONE(AccessibilityModifier) + "continue"   + '?' + ZEROORONE(TypeAnnotation),
-                              ZEROORONE(AccessibilityModifier) + "implements" + '?' + ZEROORONE(TypeAnnotation),
-                              ZEROORONE(AccessibilityModifier) + "enum"       + '?' + ZEROORONE(TypeAnnotation))
+rule PropertySignature: ONEOF(ZEROORONE(AccessibilityModifier) + PropertySignatureName + ZEROORONE(TypeAnnotation),
+                              ZEROORONE(AccessibilityModifier) + PropertySignatureName + '?' + ZEROORONE(TypeAnnotation))
   attr.action.%1 : AddType(%2, %3)
   attr.action.%2 : AddType(%2, %4)
   attr.action.%2 : SetIsOptional(%2)
   attr.action.%1,%2: AddModifierTo(%2, %1)
-  attr.action.%3,%4,%5,%6,%7,%8,%9,%10,%11 : BuildIdentifier(%2)
-  attr.action.%3,%4,%5,%6,%7,%8,%9,%10,%11 : AddType(%3)
-  attr.action.%3,%4,%5,%6,%7,%8,%9,%10,%11 : AddModifier(%1)
-  attr.action.%12,%13,%14,%15,%16,%17,%18,%19,%20 : BuildIdentifier(%2)
-  attr.action.%12,%13,%14,%15,%16,%17,%18,%19,%20 : SetIsOptional(%2)
-  attr.action.%12,%13,%14,%15,%16,%17,%18,%19,%20 : AddType(%4)
-  attr.action.%12,%13,%14,%15,%16,%17,%18,%19,%20 : AddModifier(%1)
 
 ## JS ECMA has more definition than this Typescript one. I use ECMA one.
 ## rule PropertyName: IdentifierName StringLiteral NumericLiteral
@@ -2008,8 +1997,11 @@ rule PropertyDefinition: ONEOF(IdentifierReference,
                                "if"         + ':' + AssignmentExpression,
                                "continue"   + ':' + AssignmentExpression,
                                "implements" + ':' + AssignmentExpression,
-                               "enum"       + ':' + AssignmentExpression)
-  attr.action.%3,%8,%9,%10,%11,%12,%13,%14,%15 : BuildFieldLiteral(%1, %3)
+                               "enum"       + ':' + AssignmentExpression,
+                               "let"        + ':' + AssignmentExpression,
+                               "break"      + ':' + AssignmentExpression,
+                               "var"        + ':' + AssignmentExpression)
+  attr.action.%3,%8,%9,%10,%11,%12,%13,%14,%15,%16,%17,%18 : BuildFieldLiteral(%1, %3)
   attr.action.%4 : BuildFunction(%2)
   attr.action.%4 : AddType(%7)
   attr.action.%4 : AddParams(%5)
