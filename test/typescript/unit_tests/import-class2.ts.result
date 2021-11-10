@@ -1,0 +1,10 @@
+Matched 9 tokens.
+Matched 20 tokens.
+Matched 27 tokens.
+============= Module ===========
+== Sub Tree ==
+import {default as Bar} "./export-class"
+== Sub Tree ==
+js_let Decl: obj=new Bar(123,456)
+== Sub Tree ==
+console.log(obj)
