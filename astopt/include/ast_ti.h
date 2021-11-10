@@ -109,6 +109,7 @@ class TypeInferVisitor : public TypeInferBaseVisitor {
   bool            mUpdated;
   AST_INFO       *mInfo;
   AST_XXport     *mXXport;
+  AstOpt         *mAstOpt;
 
   ChangeTypeIdxVisitor *mChangeTypeIdxVisitor;
 
@@ -120,9 +121,11 @@ class TypeInferVisitor : public TypeInferBaseVisitor {
 
  public:
   explicit TypeInferVisitor(Module_Handler *h, unsigned f, bool base = false)
-    : mHandler(h), mFlags(f), mInfo(h->GetINFO()), TypeInferBaseVisitor(f, base) {
+    : mHandler(h), mFlags(f), TypeInferBaseVisitor(f, base) {
       mChangeTypeIdxVisitor = new ChangeTypeIdxVisitor(h, f, true);
+      mInfo = h->GetINFO();
       mXXport = h->GetASTXXport();
+      mAstOpt = h->GetAstOpt();
     }
 
   ~TypeInferVisitor() = default;

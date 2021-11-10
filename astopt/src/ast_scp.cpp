@@ -79,7 +79,7 @@ void BuildScopeVisitor::InitInternalTypes() {
   // add primitive and builtin types to root scope
   ModuleNode *module = mHandler->GetASTModule();
   ASTScope *scope = module->GetRootScope();
-  for (unsigned i = 1; i < gTypeTable.size(); i++) {
+  for (unsigned i = 1; i < gTypeTable.GetPreBuildSize(); i++) {
     TreeNode *node = gTypeTable.GetTypeFromTypeIdx(i);
     node->SetScope(scope);
     if (node->IsUserType()) {
@@ -94,6 +94,7 @@ void BuildScopeVisitor::InitInternalTypes() {
   // add dummpy console.log()
   ClassNode *console = AddClass("console");
   FunctionNode *log = AddFunction("log");
+  log->SetTypeIdx(TY_Void);
   console->AddMethod(log);
 }
 
@@ -118,7 +119,7 @@ FunctionNode *BuildScopeVisitor::AddFunction(std::string name) {
   id->SetStrIdx(idx);
   func->SetFuncName(id);
 
-  // add console and func to root scope
+  // add func to module scope
   ModuleNode *module = mHandler->GetASTModule();
   ASTScope *scope = module->GetRootScope();
   scope->AddDecl(func);

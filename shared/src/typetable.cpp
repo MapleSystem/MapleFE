@@ -117,6 +117,7 @@ void TypeTable::AddPrimAndBuiltinTypes() {
   TYPE(Boolean);
 #include "supported_types.def"
 
+  mPreBuildSize = size();
   return;
 }
 

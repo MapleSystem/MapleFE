@@ -45,6 +45,9 @@ private:
   // nodeid to node map for all nodes in all modules
   std::unordered_map<unsigned, TreeNode*> mNodeId2NodeMap;
 
+  // nodeid to handler map for all nodes in all modules
+  std::unordered_map<unsigned, Module_Handler*> mNodeId2HandlerMap;
+
 public:
   explicit AstOpt(AST_Handler *h, unsigned f);
   ~AstOpt() { delete mASTHandler; }
@@ -70,21 +73,28 @@ public:
 
   TreeNode *GetNodeFromNodeId(unsigned nid) { return mNodeId2NodeMap[nid]; }
   void AddNodeId2NodeMap(TreeNode *node) { mNodeId2NodeMap[node->GetNodeId()] = node; }
+
+  Module_Handler *GetHandlerFromNodeId(unsigned nid) { return mNodeId2HandlerMap[nid]; }
+  void AddNodeId2HandlerMap(unsigned nid, Module_Handler *h) { mNodeId2HandlerMap[nid] = h; }
 };
 
 class BuildNodeIdToNodeVisitor : public AstVisitor {
-  AstOpt   *mAstOpt;
-  unsigned  mFlags;
+  AstOpt         *mAstOpt;
+  Module_Handler *mHandler;
+  unsigned        mFlags;
 
   public:
   explicit BuildNodeIdToNodeVisitor(AstOpt *opt, unsigned f, bool base = false)
     : mAstOpt(opt), mFlags(f), AstVisitor((f & FLG_trace_1) && base) {}
   ~BuildNodeIdToNodeVisitor() = default;
 
+  void SetHandler(Module_Handler *handler) { mHandler = handler; }
+
   TreeNode *VisitTreeNode(TreeNode *node) {
     if (mFlags & FLG_trace_3) std::cout << "nodeid2node:   " << node->GetNodeId() << std::endl;
     (void) AstVisitor::VisitTreeNode(node);
     mAstOpt->AddNodeId2NodeMap(node);
+    mAstOpt->AddNodeId2HandlerMap(node->GetNodeId(), mHandler);
     return node;
   }
 
@@ -92,6 +102,7 @@ class BuildNodeIdToNodeVisitor : public AstVisitor {
     if (mFlags & FLG_trace_3) std::cout << "nodeid2node: b " << node->GetNodeId() << std::endl;
     (void) AstVisitor::BaseTreeNode(node);
     mAstOpt->AddNodeId2NodeMap(node);
+    mAstOpt->AddNodeId2HandlerMap(node->GetNodeId(), mHandler);
     return node;
   }
 };

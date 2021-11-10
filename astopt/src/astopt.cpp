@@ -112,6 +112,7 @@ void AstOpt::PreprocessModules() {
     module->SetTypeId(TY_Module);
     gTypeTable.AddType(module);
 
+    visitor.SetHandler(handler);
     visitor.Visit(module);
   }
 

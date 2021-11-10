@@ -193,7 +193,10 @@ class Module_Handler {
 
   DeclNode *GetDeclOf(IdentifierNode *inode);
 
-  TreeNode *FindDecl(IdentifierNode *node);
+  // deep true  : find Decl in imported module as well
+  //      false : find Decl in current module only
+  TreeNode *FindDecl(IdentifierNode *node, bool deep = false);
+
   TreeNode *FindType(IdentifierNode *node);
   TreeNode *FindFunc(TreeNode *node);
 

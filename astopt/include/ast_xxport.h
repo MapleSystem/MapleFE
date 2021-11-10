@@ -39,8 +39,8 @@ class XXportInfo {
   std::set<std::pair<unsigned, unsigned>> mNodeIdPairs;
 
  public:
-  explicit XXportInfo(unsigned mod, unsigned nid) :
-    mModuleStrIdx(mod), mXXportNodeId(nid), mDefaultNodeId(0), mEverything(false) {}
+  explicit XXportInfo(unsigned stridx, unsigned nid) :
+    mModuleStrIdx(stridx), mXXportNodeId(nid), mDefaultNodeId(0), mEverything(false) {}
   ~XXportInfo() = default;
 
   void SetEverything() {mEverything = true;}
@@ -97,12 +97,15 @@ class AST_XXport {
 
   unsigned GetHandleIdxFromStrIdx(unsigned stridx) { return mStrIdx2HandlerIdxMap[stridx]; }
 
+  // check if node is identifier with name "default"
   bool IsDefault(TreeNode *node) { return node->GetStrIdx() == gStringPool.GetStrIdx("default"); }
 
+  // check if node with id is imported decl
   bool IsImportedDeclId(unsigned hidx, unsigned id) {
     return (mImportedDeclIds[hidx].find(id) != mImportedDeclIds[hidx].end());
   }
 
+  // check if node with id is exported decl
   bool IsExportedDeclId(unsigned hidx, unsigned id) {
     return (mExportedDeclIds[hidx].find(id) != mExportedDeclIds[hidx].end());
   }
@@ -114,12 +117,22 @@ class AST_XXport {
   void AddImportedDeclIds(unsigned hidx, unsigned nid) {mImportedDeclIds[hidx].insert(nid);}
   void AddExportedDeclIds(unsigned hidx, unsigned nid) {mExportedDeclIds[hidx].insert(nid);}
 
+  // get stridx of M from M.get()
   unsigned ExtractTargetStrIdx(TreeNode *node);
+
+  // get/set full module file name stridx of M.ts from an identifier of that module M
   unsigned GetModuleStrIdxFromIdStrIdx(unsigned stridx) {return mIdStrIdx2ModuleStrIdxMap[stridx];}
   void SetIdStrIdx2ModuleStrIdx(unsigned id, unsigned mod) {mIdStrIdx2ModuleStrIdxMap[id] = mod;}
 
+  // find default exported node in handler
   TreeNode *GetExportedDefault(unsigned hstridx);
+
+  // find exported node of given name in handler hidx
   TreeNode *GetExportedNamedNode(unsigned hidx, unsigned stridx);
+
+  // find the exported node in exporting module given imported node
+  // hidx is the handler index of node with index nid
+  TreeNode *GetExportedNodeFromImportedNode(unsigned hidx, unsigned nid);
 
   void Dump();
 };

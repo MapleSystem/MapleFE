@@ -143,7 +143,9 @@ void AST_XXport::CollectXXportInfo() {
 
     for (auto it : mImportNodeSets[hidx]) {
       ImportNode *node = it;
-      XXportInfo *info = new XXportInfo(module->GetStrIdx(), node->GetNodeId());;
+      TreeNode *target = GetTarget(node);
+      unsigned stridx = (target && target->GetStrIdx()) ? target->GetStrIdx() : module->GetStrIdx();
+      XXportInfo *info = new XXportInfo(stridx, node->GetNodeId());;
 
       for (unsigned i = 0; i < node->GetPairsNum(); i++) {
         XXportAsPairNode *p = node->GetPair(i);
@@ -153,9 +155,8 @@ void AST_XXport::CollectXXportInfo() {
         if (p->IsEverything()) {
           info->SetEverything();
 
-          TreeNode *t = GetTarget(node);
-          MASSERT(t && "everything export no target");
-          SetIdStrIdx2ModuleStrIdx(bfnode->GetStrIdx(), t->GetStrIdx());
+          MASSERT(target && "everything export no target");
+          SetIdStrIdx2ModuleStrIdx(bfnode->GetStrIdx(), target->GetStrIdx());
         }
         if (p->IsDefault()) {
           info->mDefaultNodeId = bfnode->GetNodeId();
@@ -170,7 +171,9 @@ void AST_XXport::CollectXXportInfo() {
 
     for (auto it : mExportNodeSets[hidx]) {
       ExportNode *node = it;
-      XXportInfo *info = new XXportInfo(module->GetStrIdx(), node->GetNodeId());;
+      TreeNode *target = GetTarget(node);
+      unsigned stridx = (target && target->GetStrIdx()) ? target->GetStrIdx() : module->GetStrIdx();
+      XXportInfo *info = new XXportInfo(stridx, node->GetNodeId());;
 
       for (unsigned i = 0; i < node->GetPairsNum(); i++) {
         XXportAsPairNode *p = node->GetPair(i);
@@ -181,11 +184,10 @@ void AST_XXport::CollectXXportInfo() {
           if (bfnode) {
             // export * as MM from "./M";
             // bfnode represents a module
-            TreeNode *t = GetTarget(node);
-            MASSERT(t && "everything export no target");
-            SetIdStrIdx2ModuleStrIdx(bfnode->GetStrIdx(), t->GetStrIdx());
+            MASSERT(target && "everything export no target");
+            SetIdStrIdx2ModuleStrIdx(bfnode->GetStrIdx(), target->GetStrIdx());
 
-            unsigned hidx = GetHandleIdxFromStrIdx(t->GetStrIdx());
+            unsigned hidx = GetHandleIdxFromStrIdx(target->GetStrIdx());
             Module_Handler *handler = mASTHandler->GetModuleHandler(hidx);
             ModuleNode *module = handler->GetASTModule();
             bfnode->SetTypeId(TY_Module);
@@ -310,6 +312,32 @@ TreeNode *AST_XXport::GetExportedNamedNode(unsigned hidx, unsigned stridx) {
       TreeNode *node = mAstOpt->GetNodeFromNodeId(nid);
       if (node->GetStrIdx() == stridx ) {
         return node;
+      }
+    }
+  }
+  return NULL;
+}
+
+// hidx is the index of handler, string is the string index of identifier
+TreeNode *AST_XXport::GetExportedNodeFromImportedNode(unsigned hidx, unsigned nid) {
+  TreeNode *node = mAstOpt->GetNodeFromNodeId(nid);
+  unsigned stridx = node->GetStrIdx();
+
+  for (auto it : mImports[hidx]) {
+    if (it->mDefaultNodeId == nid) {
+      TreeNode *node = GetExportedDefault(it->mModuleStrIdx);
+      return node;
+    }
+    for (auto it1 : it->mNodeIdPairs) {
+      unsigned nid2 = it1.second;
+      if (nid2 == nid) {
+        unsigned nid1 = it1.first;
+        TreeNode *node1 = mAstOpt->GetNodeFromNodeId(nid1);
+        if (node1->GetStrIdx() == stridx ) {
+          unsigned hexpidx = GetHandleIdxFromStrIdx(it->mModuleStrIdx);
+          TreeNode *n = GetExportedNamedNode(hexpidx, stridx);
+          return n;
+        }
       }
     }
   }

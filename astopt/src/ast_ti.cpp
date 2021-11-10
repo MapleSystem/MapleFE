@@ -316,6 +316,9 @@ void TypeInferVisitor::UpdateTypeId(TreeNode *node1, TreeNode *node2) {
   if (!node2->IsLiteral()) {
     SetTypeId(node2, tid);
   }
+
+  // update type idx as well
+  UpdateTypeIdx(node1, node2);
 }
 
 void TypeInferVisitor::UpdateTypeIdx(TreeNode *node, unsigned tidx) {
@@ -880,11 +883,14 @@ BinOperatorNode *TypeInferVisitor::VisitBinOperatorNode(BinOperatorNode *node) {
 CallNode *TypeInferVisitor::VisitCallNode(CallNode *node) {
   if (mFlags & FLG_trace_1) std::cout << "Visiting CallNode, id=" << node->GetNodeId() << "..." << std::endl;
   TreeNode *method = node->GetMethod();
+  Module_Handler *handler = mHandler;
   UpdateTypeId(method, TY_Function);
   if (method) {
     if (method->IsField()) {
       FieldNode *field = static_cast<FieldNode *>(method);
       method = field->GetField();
+      TreeNode *upper = field->GetUpper();
+      handler = mAstOpt->GetHandlerFromNodeId(upper->GetNodeId());
     }
     if (method->IsIdentifier()) {
       IdentifierNode *mid = static_cast<IdentifierNode *>(method);
@@ -1254,17 +1260,20 @@ FieldNode *TypeInferVisitor::VisitFieldNode(FieldNode *node) {
   if (!upper) {
     decl = mHandler->FindDecl(field);
   } else {
-    switch (upper->GetKind()) {
-      case NK_Literal: {
-        LiteralNode *ln = static_cast<LiteralNode *>(upper);
-        // this.f
-        if (ln->GetData().mType == LT_ThisLiteral) {
-          decl = mHandler->FindDecl(field);
-        }
-        break;
+    if (upper->IsLiteral()) {
+      LiteralNode *ln = static_cast<LiteralNode *>(upper);
+      // this.f
+      if (ln->GetData().mType == LT_ThisLiteral) {
+        decl = mHandler->FindDecl(field);
       }
-      default:
-        break;
+    }
+    if (!decl) {
+      unsigned tidx = upper->GetTypeIdx();
+      if (tidx) {
+        TreeNode *n = gTypeTable.GetTypeFromTypeIdx(tidx);
+        ASTScope *scope = n->GetScope();
+        decl = scope->FindDeclOf(field->GetStrIdx());
+      }
     }
   }
   if (decl) {
@@ -1329,19 +1338,26 @@ IdentifierNode *TypeInferVisitor::VisitIdentifierNode(IdentifierNode *node) {
     TreeNode *upper = field->GetUpper();
     TreeNode *fld = field->GetField();
     if (node == upper) {
-      decl = mHandler->FindDecl(node);
+      decl = mHandler->FindDecl(node, true);
     } else if (node == fld) {
       if (upper->IsIdentifier()) {
-        decl = mHandler->FindDecl(static_cast<IdentifierNode *>(upper));
+        decl = mHandler->FindDecl(static_cast<IdentifierNode *>(upper), true);
         if (decl) {
-          decl = decl->GetScope()->FindDeclOf(node->GetStrIdx());
+          ASTScope *scope = NULL;
+          // for imported decl, need trace down the import/export chain
+          if (mXXport->IsImportedDeclId(mHandler->GetHidx(), decl->GetNodeId())) {
+            scope = decl->GetScope();
+          } else {
+            scope = decl->GetScope();
+          }
+          decl = scope->FindDeclOf(node->GetStrIdx());
         }
       }
     } else {
       NOTYETIMPL("node not in field");
     }
   } else {
-    decl = mHandler->FindDecl(node);
+    decl = mHandler->FindDecl(node, true);
   }
 
   if (decl) {

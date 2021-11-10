@@ -24,6 +24,7 @@
 #include "ast_cfa.h"
 #include "ast_dfa.h"
 #include "ast_util.h"
+#include "ast_xxport.h"
 #include "astopt.h"
 #include "typetable.h"
 
@@ -133,19 +134,25 @@ AST_XXport *Module_Handler::GetASTXXport() {
 }
 
 // input an identifire ===> returen the decl node with same name
-TreeNode *Module_Handler::FindDecl(IdentifierNode *node) {
+TreeNode *Module_Handler::FindDecl(IdentifierNode *node, bool deep) {
+  TreeNode *decl = NULL;
   if (!node) {
-    return NULL;
+    return decl;
   }
   unsigned nid = node->GetNodeId();
-  // search the map mNodeId2Decl first
+
+  // search the existing map mNodeId2Decl first
   if (mNodeId2Decl.find(nid) != mNodeId2Decl.end()) {
-    return mNodeId2Decl[nid];
+    decl = mNodeId2Decl[nid];
+    // deep and decl is imported, chase down
+    if (deep && GetASTXXport()->IsImportedDeclId(mHidx, decl->GetNodeId())) {
+      decl = GetASTXXport()->GetExportedNodeFromImportedNode(mHidx, decl->GetNodeId());
+    }
+    return decl;
   }
 
   ASTScope *scope = node->GetScope();
   MASSERT(scope && "null scope");
-  TreeNode *decl = NULL;
 
   TreeNode *tree = scope->GetTree();
   unsigned stridx = node->GetStrIdx();
@@ -160,6 +167,11 @@ TreeNode *Module_Handler::FindDecl(IdentifierNode *node) {
     unsigned did = decl->GetNodeId();
     mNodeId2Decl[nid] = decl;
   }
+
+  if (deep && decl && GetASTXXport()->IsImportedDeclId(mHidx, decl->GetNodeId())) {
+    decl = GetASTXXport()->GetExportedNodeFromImportedNode(mHidx, decl->GetNodeId());
+  }
+
   return decl;
 }
 
