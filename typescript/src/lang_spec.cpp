@@ -116,9 +116,9 @@ LitData ProcessLiteral(LitId id, const char *str) {
 
   switch (id) {
   case LT_IntegerLiteral: {
-    int i = s2v.StringToInt(value_text);
+    long l = s2v.StringToLong(value_text);
     data.mType = LT_IntegerLiteral;
-    data.mData.mInt = i;
+    data.mData.mInt = l;
     break;
   }
   case LT_FPLiteral: {

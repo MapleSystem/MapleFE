@@ -63,7 +63,7 @@ typedef enum TK_Type {
 struct LitData {
   LitId mType;
   union {
-    int    mInt;
+    long   mInt;
     float  mFloat;
     double mDouble;
     bool   mBool;
