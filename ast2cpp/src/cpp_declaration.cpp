@@ -135,33 +135,34 @@ class ImportExportModules : public AstVisitor {
       std::string module = mCppDecl->GetModuleName(filename.c_str());
       for (unsigned i = 0; i < node->GetPairsNum(); ++i) {
         if (auto x = node->GetPair(i)) {
+          mExports += Comment(node);
           if (x->IsDefault()) {
             if (auto n = x->GetBefore()) {
               std::string v = mEmitter->EmitTreeNode(n);
               std::string def = "decltype("s + v + ") __default_"s + v + ";\n"s;
               mCppDecl->AddDefinition(def);
-              mExports += Comment(node) + "extern "s + def;
-              mExportDefault = Comment(node) + "#define "s + module + "__default "s + module + "::__default_"s + v + '\n';
+              mExports += "extern "s + def;
+              mExportDefault = "#define "s + module + "__default "s + module + "::__default_"s + v + '\n';
             }
           } else if (x->IsSingle()) {
             std::string str;
             if (auto a = x->GetAfter())
-              str += mEmitter->EmitTreeNode(a);
-            if (auto n = x->GetBefore()) {
-              str += " = "s;
-              std::string s = mEmitter->EmitTreeNode(n);
-              str += n->IsLiteral() ? "require("s + s + ')' : s;
+              mExports += "TODO: " + mEmitter->EmitTreeNode(a) + '\n';
+            else if (auto b = x->GetBefore()) {
+              std::string s = mEmitter->EmitTreeNode(b);
+              if (b->GetTypeId() == TY_Class)
+                mExports += "namespace __export { using "s + module + "::"s + s + "; }\n"s;
             }
           } else if (x->IsEverything()) {
             if (auto b = x->GetBefore())
-              mExports += Comment(node) + "namespace __export { namespace "s + mCppDecl->GetIdentifierName(b)
+              mExports += "namespace __export { namespace "s + mCppDecl->GetIdentifierName(b)
                 + " = " + module + "::__export; }\n"s;
             else
-              mExports += Comment(node) + "namespace __export { using namespace "s + module + "::__export; }\n"s;
+              mExports += "namespace __export { using namespace "s + module + "::__export; }\n"s;
           } else {
             if (auto b = x->GetBefore()) {
               if (b->IsImport()) {
-                mExports += Comment(node) + "TODO: export import ...\n"s;
+                mExports += "TODO: export import ...\n"s;
                 continue;
               }
               std::string target = mCppDecl->GetIdentifierName(b);
@@ -171,19 +172,19 @@ class ImportExportModules : public AstVisitor {
                 if (target == "default") {
                   target = module + "__default";
                   if (after != "default")
-                    mExports += Comment(node) + "namespace __export { inline const decltype("s + target + ") &"s
+                    mExports += "namespace __export { inline const decltype("s + target + ") &"s
                       + after + " = "s + target + "; }\n"s;
                   emit = false;
                 }
                 if (after == "default") {
-                  mExportDefault = Comment(node) + "#define "s + mCppDecl->GetModuleName() + "__default "s
+                  mExportDefault = "#define "s + mCppDecl->GetModuleName() + "__default "s
                     + (emit ? module + "::"s : std::string()) + target + '\n';
                   emit = false;
                 }
                 target = after;
               }
               if (emit)
-                mExports += Comment(node) + "namespace __export { using "s + module + "::"s + target + "; }\n"s;
+                mExports += "namespace __export { using "s + module + "::"s + target + "; }\n"s;
             }
           }
         }
