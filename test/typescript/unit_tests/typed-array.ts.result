@@ -1,0 +1,101 @@
+Matched 9 tokens.
+Matched 18 tokens.
+Matched 43 tokens.
+Matched 52 tokens.
+Matched 61 tokens.
+Matched 89 tokens.
+Matched 98 tokens.
+Matched 107 tokens.
+Matched 135 tokens.
+Matched 144 tokens.
+Matched 153 tokens.
+Matched 181 tokens.
+Matched 190 tokens.
+Matched 199 tokens.
+Matched 227 tokens.
+Matched 236 tokens.
+Matched 245 tokens.
+Matched 273 tokens.
+Matched 282 tokens.
+Matched 291 tokens.
+Matched 319 tokens.
+Matched 328 tokens.
+Matched 337 tokens.
+Matched 365 tokens.
+Matched 374 tokens.
+Matched 383 tokens.
+Matched 411 tokens.
+Matched 420 tokens.
+Matched 429 tokens.
+Matched 457 tokens.
+============= Module ===========
+== Sub Tree ==
+js_let Decl: buf=new ArrayBuffer(16)
+== Sub Tree ==
+js_let Decl: bytes=new Uint8Array(buf)
+== Sub Tree ==
+for ( )
+  bytes[i] Assign i Mul 15
+== Sub Tree ==
+console.log("\nInt8Array",Int8Array)
+== Sub Tree ==
+js_let Decl: Int8View=new Int8Array(buf)
+== Sub Tree ==
+for ( )
+  console.log(i,Int8View[i])
+== Sub Tree ==
+console.log("\nUint8Array",Uint8Array)
+== Sub Tree ==
+js_let Decl: Uint8View=new Uint8Array(buf)
+== Sub Tree ==
+for ( )
+  console.log(i,Uint8View[i])
+== Sub Tree ==
+console.log("\nUint8ClampedArray",Uint8ClampedArray)
+== Sub Tree ==
+js_let Decl: Uint8ClampedView=new Uint8ClampedArray(buf)
+== Sub Tree ==
+for ( )
+  console.log(i,Uint8ClampedView[i])
+== Sub Tree ==
+console.log("\nInt16Array",Int16Array)
+== Sub Tree ==
+js_let Decl: Int16View=new Int16Array(buf)
+== Sub Tree ==
+for ( )
+  console.log(i,Int16View[i])
+== Sub Tree ==
+console.log("\nUint16Array",Uint16Array)
+== Sub Tree ==
+js_let Decl: Uint16View=new Uint16Array(buf)
+== Sub Tree ==
+for ( )
+  console.log(i,Uint16View[i])
+== Sub Tree ==
+console.log("\nInt32Array",Int32Array)
+== Sub Tree ==
+js_let Decl: Int32View=new Int32Array(buf)
+== Sub Tree ==
+for ( )
+  console.log(i,Int32View[i])
+== Sub Tree ==
+console.log("\nUint32Array",Uint32Array)
+== Sub Tree ==
+js_let Decl: Uint32View=new Uint32Array(buf)
+== Sub Tree ==
+for ( )
+  console.log(i,Uint32View[i])
+== Sub Tree ==
+console.log("\nFloat32Array",Float32Array)
+== Sub Tree ==
+js_let Decl: Float32View=new Float32Array(buf)
+== Sub Tree ==
+for ( )
+  console.log(i,Float32View[i])
+== Sub Tree ==
+console.log("\nFloat64Array",Float64Array)
+== Sub Tree ==
+js_let Decl: Float64View=new Float64Array(buf)
+== Sub Tree ==
+for ( )
+  console.log(i,Float64View[i])
