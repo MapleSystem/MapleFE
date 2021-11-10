@@ -52,8 +52,14 @@ class ImportExportModules : public AstVisitor {
         auto len = filename.size();
         filename = len >= 2 && filename.back() == '"' ? filename.substr(1, len - 2) : std::string();
         // may have some duplicated include directives which do not hurt
-        if (!filename.empty())
-          mIncludes += "#include \""s + filename + ".h\"\n"s;
+        if (!filename.empty()) {
+          std::string incl = "#include \""s + filename + ".h\"\n"s;
+          std::size_t found = mIncludes.find(incl);
+          if (found == std::string::npos) {
+            mIncludes += "#include \""s + filename + ".h\"\n"s;
+            mCppDecl->AddInit(mCppDecl->GetModuleName(filename.c_str()) + "::__init_func__();\n"s);
+          }
+        }
       }
       return filename;
     }
@@ -99,6 +105,8 @@ class ImportExportModules : public AstVisitor {
                   v = (v == "default" ? "__"s  : "::__export::"s) + v;
                   if (node->IsImportType())
                     mImports += Comment(node) + "using "s + after + " = "s + module + v + ";\n"s;
+                  else if (a->GetTypeId() == TY_Module)
+                    mImports += Comment(node) + "namespace "s + after + " = "s + module + v + ";\n"s;
                   else
                     mImports += Comment(node) + "inline const decltype("s + module + v + ") &"s + after
                       + " = "s + module + v + ";\n"s;

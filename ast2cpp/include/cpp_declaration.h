@@ -26,6 +26,7 @@ class CppDecl : public Emitter {
 private:
   std::set<std::string> mImportedModules;
   std::string           mDefinitions;
+  std::string           mInits;
 
 public:
   CppDecl(Module_Handler *h) : Emitter(h) {}
@@ -40,6 +41,8 @@ public:
 
   void AddDefinition(const std::string& def) { mDefinitions += def; }
   std::string GetDefinitions() { return mDefinitions; }
+  void AddInit(const std::string& init) { mInits += init; }
+  std::string GetInits() { return mInits; }
 
   virtual std::string EmitUserTypeNode(UserTypeNode *node);
   virtual std::string EmitBinOperatorNode(BinOperatorNode *node);

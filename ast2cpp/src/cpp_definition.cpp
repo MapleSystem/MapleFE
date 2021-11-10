@@ -101,7 +101,7 @@ std::string CppDef::EmitModuleNode(ModuleNode *node) {
   static bool __init_once = false;
   if (__init_once) return;
   __init_once = true;
-)""";
+)""" + mCppDecl.GetInits();
   mIsInit = true;
   for (unsigned i = 0; i < node->GetTreesNum(); ++i) {
     if (auto n = node->GetTree(i)) {
@@ -175,10 +175,7 @@ std::string CppDef::EmitExportNode(ExportNode *node) {
 }
 
 std::string CppDef::EmitImportNode(ImportNode *node) {
-  std::string str = GetModuleName(node->GetTarget());
-  if (!str.empty())
-    str = str + "::__init_func__();\n"s;
-  return str;
+  return std::string();
 }
 
 std::string CppDef::EmitXXportAsPairNode(XXportAsPairNode *node) {
@@ -650,15 +647,16 @@ std::string CppDef::EmitFieldNode(FieldNode *node) {
   if (node == nullptr)
     return std::string();
   std::string upper, field;
-  if (auto n = node->GetUpper())
-    upper = EmitTreeNode(n);
+  auto upnode = node->GetUpper();
+  if (upnode)
+    upper = EmitTreeNode(upnode);
   if (auto n = node->GetField())
     field = EmitTreeNode(n);
   if (upper.empty() || field.empty()) // Error if either is empty
     return "%%%Empty%%%";
   if (field == "length") // for length property
     return upper + "->size()"s;
-  if (mCppDecl.IsImportedModule(upper)) // for imported module
+  if (mCppDecl.IsImportedModule(upper) || upnode->GetTypeId() == TY_Module) // for imported module
     return upper + "::"s + field;
   if (true) // TODO: needs to check if it accesses a Cxx class field
     return upper + "->"s + field;
