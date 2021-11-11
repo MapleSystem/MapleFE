@@ -150,7 +150,7 @@ std::string CppDef::EmitExportNode(ExportNode *node) {
   auto num = node->GetPairsNum();
   for (unsigned i = 0; i < node->GetPairsNum(); ++i) {
     if (auto x = node->GetPair(i)) {
-      if (x->IsDefault()) {
+      if (x->IsDefault() && !x->IsRef()) {
         if (auto n = x->GetBefore()) {
           std::string v = EmitTreeNode(n);
           str += "__export::__default = "s + v + ";\n"s;

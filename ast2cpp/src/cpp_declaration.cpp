@@ -149,9 +149,27 @@ class ImportExportModules : public AstVisitor {
         if (auto x = node->GetPair(i)) {
           mExports += Comment(node);
           if (x->IsDefault()) {
-            if (auto n = x->GetBefore()) {
-              std::string v = mEmitter->EmitTreeNode(n);
-              mExports += "namespace __export { inline decltype("s + v + ") __default; }\n"s;
+            if (x->IsRef()) {
+              auto b = x->GetBefore();
+              std::string target = mCppDecl->GetIdentifierName(b);
+              bool emit = true;
+              if (target == "default") {
+                target = module + "::__export::__default";
+                mExports += "namespace __export { inline const decltype("s + target + ") &"s
+                  + "__"s + "default" + " = "s + target + "; }\n"s;
+                emit = false;
+              }
+              if (emit) {
+                mExports += "namespace __export { inline const decltype("s + target + ") &__default = "s + target + "; }\n"s;
+                emit = false;
+              }
+              if (emit)
+                mExports += "namespace __export { using "s + module + "::"s + "default; }\n"s;
+            } else {
+              if (auto n = x->GetBefore()) {
+                std::string v = mEmitter->EmitTreeNode(n);
+                mExports += "namespace __export { inline decltype("s + v + ") __default; }\n"s;
+              }
             }
           } else if (x->IsSingle()) {
             std::string str;
@@ -187,10 +205,6 @@ class ImportExportModules : public AstVisitor {
                   target = module + "::__export::__default";
                   mExports += "namespace __export { inline const decltype("s + target + ") &"s
                     + (after == "default" ? "__"s + after : after) + " = "s + target + "; }\n"s;
-                  emit = false;
-                }
-                if (after == "default" && emit) {
-                  mExports += "namespace __export { inline const decltype("s + target + ") &__default = "s + target + "; }\n"s;
                   emit = false;
                 }
                 target = after;
