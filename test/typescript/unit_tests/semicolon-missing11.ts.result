@@ -1,0 +1,4 @@
+Matched 8 tokens.
+============= Module ===========
+== Sub Tree ==
+export { type Type = union  = string | number} 

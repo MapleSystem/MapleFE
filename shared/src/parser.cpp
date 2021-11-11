@@ -580,7 +580,6 @@ void Parser::ParseTemplateLiterals() {
       if (ph_str) {
         mLexer->PrepareForString(ph_str);
         // Clear some status
-        mEndOfFile = false;
         ParseStatus result = ParseStmt();
         MASSERT(result == ParseSucc);
         MASSERT(mLineModeRoot);
@@ -979,7 +978,7 @@ bool Parser::LookAheadFail(RuleTable *rule_table, unsigned token) {
 //
 // 'child' is the AppealNode of 'rule_table'.
 bool Parser::TraverseRuleTable(RuleTable *rule_table, AppealNode *parent, AppealNode *&child) {
-  if (mEndOfFile)
+  if (mEndOfFile && mCurToken >= mActiveTokens.GetNum())
     return false;
 
   mIndentation += 2;
@@ -1301,8 +1300,6 @@ bool Parser::TraverseRuleTableRegular(RuleTable *rule_table, AppealNode *appeal)
   } else {
     appeal->mResult = FailChildrenFailed;
     mCurToken = saved_mCurToken;
-    if (mEndOfFile)
-      mEndOfFile = false;
     AddFailed(rule_table, mCurToken);
     return false;
   }
@@ -1801,9 +1798,14 @@ bool Parser::TraverseConcatenate(RuleTable *rule_table, AppealNode *appeal) {
 // 3. The mCurToken moves if found target, or restore the original location.
 bool Parser::TraverseTableData(TableData *data, AppealNode *appeal, AppealNode *&child_node) {
   // Usually mCurToken is a new token to be matched. So if it's end of file, we simply return false.
-  // However, if mCurToken is actually an ATMToken, which means it needs to be matched
-  // multiple times, we are NOT at the end yet.
-  if (mEndOfFile) {
+  // However, (1) if mCurToken is actually an ATMToken, which means it needs to be matched
+  //              multiple times, we are NOT at the end yet.
+  //          (2) If we are traverse a Concatenate rule, and the previous sub-rule has multiple matches,
+  //              and we are trying the current sub-rule, ie. 'data', using one of the matches.
+  //              The lexer actually reaches the EndOfFile in previous matchings, but the mCurToken
+  //              we are working on right now is not the last token. It's one of the previous matches.
+  // So we need check if we are matching the last token.
+  if (mEndOfFile && mCurToken >= mActiveTokens.GetNum()) {
     if (!(mInAltTokensMatching && (mCurToken == mATMToken)))
       return false;
   }
