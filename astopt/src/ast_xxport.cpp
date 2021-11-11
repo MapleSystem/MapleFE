@@ -240,18 +240,6 @@ void AST_XXport::CollectXXportInfo() {
   }
 }
 
-ImportNode *XXportBasicVisitor::VisitImportNode(ImportNode *node) {
-  (void) AstVisitor::VisitImportNode(node);
-  mASTXXport->mImportNodeSets[mHandlerIdx].insert(node);
-  return node;
-}
-
-ExportNode *XXportBasicVisitor::VisitExportNode(ExportNode *node) {
-  (void) AstVisitor::VisitExportNode(node);
-  mASTXXport->mExportNodeSets[mHandlerIdx].insert(node);
-  return node;
-}
-
 TreeNode *AST_XXport::GetTarget(TreeNode *node) {
   TreeNode *tree = NULL;
   if (node->IsImport()) {
@@ -372,6 +360,38 @@ TreeNode *AST_XXport::GetExportedNodeFromImportedNode(unsigned hidx, unsigned ni
     }
   }
   return NULL;
+}
+
+ImportNode *XXportBasicVisitor::VisitImportNode(ImportNode *node) {
+  (void) AstVisitor::VisitImportNode(node);
+  mASTXXport->mImportNodeSets[mHandlerIdx].insert(node);
+
+  TreeNode *target = mASTXXport->GetTarget(node);
+  if (!target) {
+    // extract target info for
+    // import Bar = require("./Foo");
+    for (unsigned i = 0; i < node->GetPairsNum(); i++) {
+      XXportAsPairNode *p = node->GetPair(i);
+      TreeNode *bfnode = p->GetBefore();
+      if (bfnode && bfnode->IsLiteral()) {
+        LiteralNode *lit = static_cast<LiteralNode *>(bfnode);
+        LitId id = lit->GetData().mType;
+        if (id == LT_StringLiteral) {
+          node->SetTarget(bfnode);
+          p->SetBefore(p->GetAfter());
+          p->SetAfter(NULL);
+          p->SetIsDefault(true);
+        }
+      }
+    }
+  }
+  return node;
+}
+
+ExportNode *XXportBasicVisitor::VisitExportNode(ExportNode *node) {
+  (void) AstVisitor::VisitExportNode(node);
+  mASTXXport->mExportNodeSets[mHandlerIdx].insert(node);
+  return node;
 }
 
 }

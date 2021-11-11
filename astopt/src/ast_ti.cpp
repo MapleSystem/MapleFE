@@ -1357,7 +1357,7 @@ IdentifierNode *TypeInferVisitor::VisitIdentifierNode(IdentifierNode *node) {
       NOTYETIMPL("node not in field");
     }
   } else {
-    decl = mHandler->FindDecl(node, true);
+    decl = mHandler->FindDecl(node);
   }
 
   if (decl) {
