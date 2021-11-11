@@ -28,14 +28,12 @@ class ImportExportModules : public AstVisitor {
     std::string  mIncludes;
     std::string  mImports;
     std::string  mExports;
-    std::string  mExportDefault;
 
   public:
     ImportExportModules(CppDecl *c) : mCppDecl(c),
       mIncludes("// include directives\n"),
       mImports("// imports\n"),
-      mExports("// exports\n"),
-      mExportDefault("// export default\n") {
+      mExports("// exports\n") {
       mEmitter = new Emitter(c->GetModuleHandler());
     }
     ~ImportExportModules() { delete mEmitter; }
@@ -43,7 +41,6 @@ class ImportExportModules : public AstVisitor {
     std::string GetIncludes() { return mIncludes; }
     std::string GetImports() { return mImports; }
     std::string GetExports() { return mExports; }
-    std::string GetExportDefault() { return mExportDefault; }
 
     std::string AddIncludes(TreeNode *node) {
       std::string filename;
@@ -78,7 +75,7 @@ class ImportExportModules : public AstVisitor {
           std::string str;
           if (x->IsDefault()) {
             if (auto n = x->GetBefore()) {
-              std::string v = module + "__default"s;
+              std::string v = module + "::__export::__default"s;
               std::string s = mEmitter->EmitTreeNode(n);
               mImports += Comment(node) + "inline const decltype("s + v + ") &"s + s + " = "s + v + ";\n"s;
             }
@@ -102,7 +99,7 @@ class ImportExportModules : public AstVisitor {
               if (auto a = x->GetAfter()) {
                 std::string after = mEmitter->EmitTreeNode(a);
                 if (node->GetTarget()) {
-                  v = (v == "default" ? "__"s  : "::__export::"s) + v;
+                  v = "::__export::"s + (v == "default" ? "__"s + v : v);
                   if (node->IsImportType())
                     mImports += Comment(node) + "using "s + after + " = "s + module + v + ";\n"s;
                   else if (a->GetTypeId() == TY_Module)
@@ -115,11 +112,11 @@ class ImportExportModules : public AstVisitor {
                   mImports += Comment(node) + "inline const decltype("s + v + ") &"s + after + " = "s + v + ";\n"s;
                 }
               } else {
-                  if (node->IsImportType())
-                mImports += Comment(node) + "using "s + v + " = "s + module + "::__export::"s + v + ";\n"s;
-                  else
-                mImports += Comment(node) + "inline const decltype("s + module + "::__export::"s + v + ") &"s + v
-                  + " = "s + module + "::__export::"s + v + ";\n"s;
+                auto u = module + "::__export::"s + v;
+                if (node->IsImportType())
+                  mImports += Comment(node) + "using "s + v + " = "s + u + ";\n"s;
+                else
+                  mImports += Comment(node) + "inline const decltype("s + u + ") &"s + v + " = "s + u + ";\n"s;
               }
             }
           }
@@ -139,10 +136,7 @@ class ImportExportModules : public AstVisitor {
           if (x->IsDefault()) {
             if (auto n = x->GetBefore()) {
               std::string v = mEmitter->EmitTreeNode(n);
-              std::string def = "decltype("s + v + ") __default_"s + v + ";\n"s;
-              mCppDecl->AddDefinition(def);
-              mExports += "extern "s + def;
-              mExportDefault = "#define "s + module + "__default "s + module + "::__default_"s + v + '\n';
+              mExports += "namespace __export { inline decltype("s + v + ") __default; }\n"s;
             }
           } else if (x->IsSingle()) {
             std::string str;
@@ -170,15 +164,13 @@ class ImportExportModules : public AstVisitor {
               if (auto a = x->GetAfter()) {
                 std::string after = mCppDecl->GetIdentifierName(a);
                 if (target == "default") {
-                  target = module + "__default";
-                  if (after != "default")
-                    mExports += "namespace __export { inline const decltype("s + target + ") &"s
-                      + after + " = "s + target + "; }\n"s;
+                  target = module + "::__export::__default";
+                  mExports += "namespace __export { inline const decltype("s + target + ") &"s
+                    + (after == "default" ? "__"s + after : after) + " = "s + target + "; }\n"s;
                   emit = false;
                 }
-                if (after == "default") {
-                  mExportDefault = "#define "s + mCppDecl->GetModuleName() + "__default "s
-                    + (emit ? module + "::"s : std::string()) + target + '\n';
+                if (after == "default" && emit) {
+                  mExports += "namespace __export { inline const decltype("s + target + ") &__default = "s + target + "; }\n"s;
                   emit = false;
                 }
                 target = after;
@@ -342,9 +334,6 @@ namespace )""" + module + R"""( {
 
   // Generate code for all exports
   str += xxportModules.GetExports() + "\nnamespace __export {}\n"s;
-
-  // export default
-  str += xxportModules.GetExportDefault();
 
   // init function and an object for dynamic properties
   str += R"""(

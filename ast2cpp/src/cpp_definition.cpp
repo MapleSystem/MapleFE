@@ -153,7 +153,7 @@ std::string CppDef::EmitExportNode(ExportNode *node) {
       if (x->IsDefault()) {
         if (auto n = x->GetBefore()) {
           std::string v = EmitTreeNode(n);
-          str += "__default_"s + v + " = "s + v + ";\n"s;
+          str += "__export::__default = "s + v + ";\n"s;
         }
       }
       if(node->GetTarget() == nullptr &&
