@@ -45,6 +45,12 @@ ImportNode *ImportedFiles::VisitImportNode(ImportNode *node) {
   std::string name = GetTargetFilename(node->GetTarget());
   if (!name.empty())
       mFilenames.push_back(name);
+  for (unsigned i = 0; i < node->GetPairsNum(); ++i)
+    if (auto x = node->GetPair(i); x->IsSingle()) {
+      std::string s = GetTargetFilename(x->GetBefore());
+      if (!s.empty())
+        mFilenames.push_back(s);
+    }
   return node;
 }
 
