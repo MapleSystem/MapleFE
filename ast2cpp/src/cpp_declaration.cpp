@@ -733,7 +733,6 @@ std::string CppDecl::EmitClassNode(ClassNode *node) {
     str += EmitFunctionNode(node->GetMethod(i));
   }
   str += "  virtual const char* __GetClassName() const {return \""s + node->GetName() + " \";}\n"s;
-  str += "};\n\n";
 
   // 2. c++ class for JS object's corresponding JS constructor
   base = (node->GetSuperClassesNum() != 0)? ("Ctor_"s+node->GetSuperClass(0)->GetName()) : "t2crt::Function";
@@ -763,6 +762,7 @@ std::string CppDecl::EmitClassNode(ClassNode *node) {
 
   // Generate new() function
   str += "  "s+node->GetName()+"* _new() {return new "s+node->GetName()+"(this, this->prototype);}\n"s;
+  str += "};\n\n";
   str += "};\n\n";
   return str;
 }

@@ -31,7 +31,7 @@ std::string EmitCtorInstance(ClassNode *c) {
     proto.insert(0, "&"s, 0, std::string::npos);
   }
   str = "\n// Instantiate constructor\n"s;
-  str += "Ctor_"s+thisClass +" "+ thisClass+"_ctor("s +ctor+","s+proto+","+prototypeProto+");\n"s;
+  str += thisClass + "::Ctor_"s+thisClass +" "+ thisClass+"_ctor("s +ctor+","s+proto+","+prototypeProto+");\n"s;
   return str;
 }
 
@@ -43,7 +43,7 @@ std::string EmitDefaultCtor(ClassNode *c) {
   std::string str, className;
   className = c->GetName();
   str = "\n"s;
-  str += className + "*"s + " Ctor_"s + className + "::operator()("s + className + "* obj)"s;
+  str += className + "* "s + className + "::Ctor_"s + className + "::operator()("s + className + "* obj)"s;
   str += "{ return obj; }\n"s;
   str += EmitCtorInstance(c);
 
@@ -263,7 +263,7 @@ std::string CppDef::EmitFunctionNode(FunctionNode *node) {
   if (node->IsConstructor()) {
     className = GetClassName(node);
     str = "\n"s;
-    str += className + "*"s + " Ctor_"s + className + "::operator()("s + className + "* obj"s;
+    str += className + "* "s + className + "::Ctor_"s + className + "::operator()("s + className + "* obj"s;
   } else {
     str = mCppDecl.GetTypeString(node->GetType(), node->GetType());
     if(node->GetStrIdx())
