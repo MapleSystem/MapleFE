@@ -74,12 +74,16 @@ class ImportExportModules : public AstVisitor {
       std::string module = mCppDecl->GetModuleName(filename.c_str());
       for (unsigned i = 0; i < node->GetPairsNum(); ++i) {
         if (auto x = node->GetPair(i)) {
+          mImports += Comment(node);
           std::string str;
           if (x->IsDefault()) {
-            if (auto n = x->GetBefore()) {
+            if (auto b = x->GetBefore()) {
               std::string v = module + "::__export::__default"s;
-              std::string s = mEmitter->EmitTreeNode(n);
-              mImports += Comment(node) + "inline const decltype("s + v + ") &"s + s + " = "s + v + ";\n"s;
+              std::string s = mEmitter->EmitTreeNode(b);
+              if (b->GetTypeId() == TY_Class)
+                mImports += "using "s + s + " = "s + v + ";\n"s;
+              else
+                mImports += "inline const decltype("s + v + ") &"s + s + " = "s + v + ";\n"s;
             }
           } else if (x->IsSingle()) {
             if (auto a = x->GetAfter())
@@ -92,7 +96,7 @@ class ImportExportModules : public AstVisitor {
           } else if (x->IsEverything()) {
             if (auto n = x->GetBefore()) {
               std::string s = mEmitter->EmitTreeNode(n);
-              mImports += Comment(node) + "namespace "s + s + " = " + module + "::__export;\n"s;
+              mImports += "namespace "s + s + " = " + module + "::__export;\n"s;
               mCppDecl->AddImportedModule(s);
             }
           } else {
@@ -103,24 +107,24 @@ class ImportExportModules : public AstVisitor {
                 if (node->GetTarget()) {
                   v = "::__export::"s + (v == "default" ? "__"s + v : v);
                   if (node->IsImportType())
-                    mImports += Comment(node) + "using "s + after + " = "s + module + v + ";\n"s;
+                    mImports += "using "s + after + " = "s + module + v + ";\n"s;
                   else if (a->GetTypeId() == TY_Module)
-                    mImports += Comment(node) + "namespace "s + after + " = "s + module + v + ";\n"s;
+                    mImports += "namespace "s + after + " = "s + module + v + ";\n"s;
                   else
-                    mImports += Comment(node) + "inline const decltype("s + module + v + ") &"s + after
+                    mImports += "inline const decltype("s + module + v + ") &"s + after
                       + " = "s + module + v + ";\n"s;
                 } else {
                   mEmitter->Replace(v, ".", "::");
-                  mImports += Comment(node) + "inline const decltype("s + v + ") &"s + after + " = "s + v + ";\n"s;
+                  mImports += "inline const decltype("s + v + ") &"s + after + " = "s + v + ";\n"s;
                 }
                 if (mExFlag)
                   mExports += "namespace __export { using "s + mCppDecl->GetModuleName() + "::"s + after + "; }\n"s;
               } else {
                 auto u = module + "::__export::"s + v;
                 if (node->IsImportType())
-                  mImports += Comment(node) + "using "s + v + " = "s + u + ";\n"s;
+                  mImports += "using "s + v + " = "s + u + ";\n"s;
                 else
-                  mImports += Comment(node) + "inline const decltype("s + u + ") &"s + v + " = "s + u + ";\n"s;
+                  mImports += "inline const decltype("s + u + ") &"s + v + " = "s + u + ";\n"s;
               }
             }
           }
