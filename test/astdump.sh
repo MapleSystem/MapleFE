@@ -80,6 +80,12 @@ trap "{ pstree -p $$ | tr ')' '\n' | sed 's/.*(//' | xargs kill -9 2> /dev/null;
 
 PROCID=$$
 rm -rf *$PROCID-dump.out $PROCID-summary.out *$PROCID.out.ts ts2cxx-lock-*
+OPT="--target es6 \
+     --lib es2015,es2017,dom \
+     --module commonjs \
+     --downlevelIteration \
+     --esModuleInterop \
+     --experimentalDecorators"
 cnt=0
 for ts in $LIST; do
   ts=$(sed 's|^\./||' <<< "$ts")
@@ -112,7 +118,7 @@ for ts in $LIST; do
     E=
     grep -qm1 "PassNode *{" <<< "$out" && E=",PassNode"
     if [ -z "$TREEDIFF" -o -n "$TSC" ]; then
-      eval tsc -t es6 --lib es2015,es2017,dom -m commonjs --experimentalDecorators "$T" $TSCERR
+      eval tsc $OPT "$T" $TSCERR
     else
       echo Skipping tsc for tree diff
     fi
