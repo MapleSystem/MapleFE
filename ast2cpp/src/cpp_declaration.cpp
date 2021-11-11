@@ -28,12 +28,14 @@ class ImportExportModules : public AstVisitor {
     std::string  mIncludes;
     std::string  mImports;
     std::string  mExports;
+    bool         mExFlag;
 
   public:
     ImportExportModules(CppDecl *c) : mCppDecl(c),
       mIncludes("// include directives\n"),
       mImports("// imports\n"),
-      mExports("// exports\n") {
+      mExports("// exports\n"),
+      mExFlag(false) {
       mEmitter = new Emitter(c->GetModuleHandler());
     }
     ~ImportExportModules() { delete mEmitter; }
@@ -111,6 +113,8 @@ class ImportExportModules : public AstVisitor {
                   mEmitter->Replace(v, ".", "::");
                   mImports += Comment(node) + "inline const decltype("s + v + ") &"s + after + " = "s + v + ";\n"s;
                 }
+                if (mExFlag)
+                  mExports += "namespace __export { using "s + mCppDecl->GetModuleName() + "::"s + after + "; }\n"s;
               } else {
                 auto u = module + "::__export::"s + v;
                 if (node->IsImportType())
@@ -145,7 +149,10 @@ class ImportExportModules : public AstVisitor {
             else if (auto b = x->GetBefore()) {
               std::string s = mEmitter->EmitTreeNode(b);
               if (b->GetTypeId() == TY_Class)
-                mExports += "namespace __export { using "s + module + "::"s + s + "; }\n"s;
+                mExports += "namespace __export { using __default = "s + module + "::"s + s + "; }\n"s;
+              else
+                mExports += "namespace __export { inline const decltype("s + module + "::"s + s + ") &__default = "s
+                  + module + "::"s + s + "; }\n"s;
             }
           } else if (x->IsEverything()) {
             if (auto b = x->GetBefore())
@@ -156,7 +163,9 @@ class ImportExportModules : public AstVisitor {
           } else {
             if (auto b = x->GetBefore()) {
               if (b->IsImport()) {
-                mExports += "TODO: export import ...\n"s;
+                mExFlag = true;
+                VisitImportNode(static_cast<ImportNode *>(b));
+                mExFlag = false;
                 continue;
               }
               std::string target = mCppDecl->GetIdentifierName(b);
