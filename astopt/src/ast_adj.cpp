@@ -270,6 +270,29 @@ DeclNode *AdjustASTVisitor::VisitDeclNode(DeclNode *node) {
   return node;
 }
 
+// check if node is identifier with name "default"
+static bool IsDefault(TreeNode *node) {
+  return node->GetStrIdx() == gStringPool.GetStrIdx("default");
+}
+
+// unify import default using mIsDefault field
+ImportNode *AdjustASTVisitor::VisitImportNode(ImportNode *node) {
+  (void) AstVisitor::VisitImportNode(node);
+  for (unsigned i = 0; i < node->GetPairsNum(); i++) {
+    XXportAsPairNode *p = node->GetPair(i);
+    TreeNode *bfnode = p->GetBefore();
+    TreeNode *afnode = p->GetAfter();
+    if (IsDefault(bfnode) && !p->IsDefault()) {
+      p->SetIsDefault(true);
+      p->SetBefore(afnode);
+      p->SetAfter(NULL);
+    }
+  }
+
+  return node;
+}
+
+// if-then-else : use BlockNode for then and else bodies
 // split export decl and body
 // export {func add(y)}  ==> export {add}; func add(y)
 ExportNode *AdjustASTVisitor::VisitExportNode(ExportNode *node) {
@@ -333,7 +356,6 @@ ExportNode *AdjustASTVisitor::VisitExportNode(ExportNode *node) {
   return node;
 }
 
-// if-then-else : use BlockNode for then and else bodies
 CondBranchNode *AdjustASTVisitor::VisitCondBranchNode(CondBranchNode *node) {
   TreeNode *tn = VisitTreeNode(node->GetCond());
   tn = VisitTreeNode(node->GetTrueBranch());

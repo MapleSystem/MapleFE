@@ -55,6 +55,7 @@ class AdjustASTVisitor : public AstVisitor {
   ~AdjustASTVisitor() = default;
 
   DeclNode *VisitDeclNode(DeclNode *node);
+  ImportNode *VisitImportNode(ImportNode *node);
   ExportNode *VisitExportNode(ExportNode *node);
   CondBranchNode *VisitCondBranchNode(CondBranchNode *node);
   ForLoopNode *VisitForLoopNode(ForLoopNode *node);
