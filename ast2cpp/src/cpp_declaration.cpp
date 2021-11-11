@@ -68,7 +68,6 @@ class ImportExportModules : public AstVisitor {
       return s.empty() ? s : "//--- "s + s.substr(0, s.find('\n')) + '\n';
     }
 
-
     ImportNode *VisitImportNode(ImportNode *node) {
       std::string filename = AddIncludes(node->GetTarget());
       std::string module = mCppDecl->GetModuleName(filename.c_str());
@@ -86,12 +85,20 @@ class ImportExportModules : public AstVisitor {
                 mImports += "inline const decltype("s + v + ") &"s + s + " = "s + v + ";\n"s;
             }
           } else if (x->IsSingle()) {
-            if (auto a = x->GetAfter())
-              str += mEmitter->EmitTreeNode(a);
-            if (auto n = x->GetBefore()) {
-              str += " = "s;
-              std::string s = mEmitter->EmitTreeNode(n);
-              str += n->IsLiteral() ? "require("s + s + ')' : s;
+            if (auto b = x->GetBefore(); b->IsLiteral()) {
+                if (auto a = x->GetAfter()) {
+                  // import X = require("./module");
+                  std::string after = mEmitter->EmitTreeNode(a);
+                  filename = AddIncludes(b);
+                  module = mCppDecl->GetModuleName(filename.c_str());
+                  std::string v = module + "::__export::__default"s;
+                  if(a->GetTypeId() == TY_Module)
+                    mImports += "namespace "s + after + " = "s + module + v + ";\n"s;
+                  else if (a->GetTypeId() == TY_Class)
+                    mImports += "using "s + after + " = "s + v + ";\n"s;
+                  else
+                    mImports += "inline const decltype("s + v + ") &"s + after + " = "s + v + ";\n"s;
+                }
             }
           } else if (x->IsEverything()) {
             if (auto n = x->GetBefore()) {
