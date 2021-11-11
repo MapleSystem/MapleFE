@@ -158,6 +158,16 @@ void AST_XXport::CollectXXportInfo() {
           MASSERT(target && "everything export no target");
           SetIdStrIdx2ModuleStrIdx(bfnode->GetStrIdx(), target->GetStrIdx());
         }
+
+        // reformat default import
+        if (!p->IsDefault()) {
+          if (IsDefault(bfnode) ) {
+            p->SetIsDefault(true);
+            p->SetBefore(afnode);
+            p->SetAfter(NULL);
+          }
+        }
+
         if (p->IsDefault()) {
           info->mDefaultNodeId = bfnode->GetNodeId();
         } else {
@@ -197,9 +207,28 @@ void AST_XXport::CollectXXportInfo() {
             continue;
           }
         }
-        // if only one exported, it is treated as the default as well
-        if ((afnode && IsDefault(afnode)) || (mExportNodeSets[hidx].size() == 1 && node->GetPairsNum() == 1)) {
+
+        // reformat default export
+        if (p->IsDefault()) {
+          p->SetIsRef(false);
+        } else if (afnode && IsDefault(afnode)) {
+          p->SetIsDefault(true);
+          p->SetBefore(bfnode);
+          p->SetAfter(NULL);
+        }
+
+        bfnode = p->GetBefore();
+        afnode = p->GetAfter();
+        if (p->IsDefault()) {
+          if (afnode) {
+            info->mDefaultNodeId = afnode->GetNodeId();
+          } else {
+            info->mDefaultNodeId = bfnode->GetNodeId();
+          }
+        } else if (mExportNodeSets[hidx].size() == 1 && node->GetPairsNum() == 1) {
           info->mDefaultNodeId = bfnode->GetNodeId();
+          std::pair<unsigned, unsigned> pnid(bfnode->GetNodeId(), afnode ? afnode->GetNodeId() : 0);
+          info->mNodeIdPairs.insert(pnid);
         } else {
           std::pair<unsigned, unsigned> pnid(bfnode->GetNodeId(), afnode ? afnode->GetNodeId() : 0);
           info->mNodeIdPairs.insert(pnid);

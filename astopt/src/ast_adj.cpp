@@ -275,19 +275,8 @@ static bool IsDefault(TreeNode *node) {
   return node->GetStrIdx() == gStringPool.GetStrIdx("default");
 }
 
-// unify import default using mIsDefault field
 ImportNode *AdjustASTVisitor::VisitImportNode(ImportNode *node) {
   (void) AstVisitor::VisitImportNode(node);
-  for (unsigned i = 0; i < node->GetPairsNum(); i++) {
-    XXportAsPairNode *p = node->GetPair(i);
-    TreeNode *bfnode = p->GetBefore();
-    TreeNode *afnode = p->GetAfter();
-    if (IsDefault(bfnode) && !p->IsDefault()) {
-      p->SetIsDefault(true);
-      p->SetBefore(afnode);
-      p->SetAfter(NULL);
-    }
-  }
 
   return node;
 }
