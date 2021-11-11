@@ -198,7 +198,7 @@ void AST_XXport::CollectXXportInfo() {
           }
         }
         // if only one exported, it is treated as the default as well
-        if ((afnode && IsDefault(afnode)) || (node->GetPairsNum() == 1)) {
+        if ((afnode && IsDefault(afnode)) || (mExportNodeSets[hidx].size() == 1 && node->GetPairsNum() == 1)) {
           info->mDefaultNodeId = bfnode->GetNodeId();
         } else {
           std::pair<unsigned, unsigned> pnid(bfnode->GetNodeId(), afnode ? afnode->GetNodeId() : 0);
