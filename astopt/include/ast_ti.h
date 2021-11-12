@@ -141,7 +141,7 @@ class TypeInferVisitor : public TypeInferBaseVisitor {
   void UpdateTypeId(TreeNode *node1, TreeNode *node2);
   void UpdateTypeIdx(TreeNode *node, unsigned tidx);
   void UpdateTypeIdx(TreeNode *node1, TreeNode *node2);
-  void UpdateFuncRetTypeId(FunctionNode *node, TypeId tid);
+  void UpdateFuncRetTypeId(FunctionNode *node, TypeId tid, unsigned tidx);
   void UpdateTypeUseNode(TreeNode *target, TreeNode *input);
   void UpdateArgArrayDecls(unsigned nid, TypeId tid);
   void UpdateArrayElemTypeIdMap(TreeNode *node, TypeId tid);

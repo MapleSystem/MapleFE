@@ -476,8 +476,8 @@ void TypeInferVisitor::UpdateTypeUseNode(TreeNode *target, TreeNode *input) {
   return;
 }
 
-void TypeInferVisitor::UpdateFuncRetTypeId(FunctionNode *node, TypeId tid) {
-  if (!node || tid == TY_None || node->GetTypeId() == tid) {
+void TypeInferVisitor::UpdateFuncRetTypeId(FunctionNode *node, TypeId tid, unsigned tidx) {
+  if (!node || (node->GetTypeId() == tid && node->GetTypeIdx() == tidx)) {
     return;
   }
   TreeNode *type = node->GetType();
@@ -490,6 +490,8 @@ void TypeInferVisitor::UpdateFuncRetTypeId(FunctionNode *node, TypeId tid) {
     }
     tid = MergeTypeId(type->GetTypeId(), tid);
     SetTypeId(type, tid);
+    tidx = MergeTypeIdx(type->GetTypeIdx(), tidx);
+    SetTypeIdx(type, tidx);
   }
 }
 
@@ -558,9 +560,6 @@ bool TypeInferVisitor::UpdateVarTypeWithInit(TreeNode *var, TreeNode *init) {
     } else if (init->IsIdentifier()) {
       TreeNode *decl = mHandler->FindDecl(static_cast<IdentifierNode *>(init));
       if (decl && (decl->IsClass() || decl->GetTypeIdx() < (unsigned)TY_Max)) {
-        TreeNode *utype = gTypeTable.GetTypeFromTypeIdx((unsigned)TY_Function);
-        utype->SetParent(idnode);
-        idnode->SetType(utype);
         SetTypeId(idnode, TY_Function);
         SetUpdated();
         result = true;
@@ -823,6 +822,8 @@ BinOperatorNode *TypeInferVisitor::VisitBinOperatorNode(BinOperatorNode *node) {
         mod = tb;
       }
       UpdateTypeId(node, ti);
+      unsigned tix = MergeTypeIdx(ta->GetTypeIdx(), tb->GetTypeIdx());
+      UpdateTypeIdx(node, tix);
       break;
     }
     case OPR_Add:
@@ -838,6 +839,8 @@ BinOperatorNode *TypeInferVisitor::VisitBinOperatorNode(BinOperatorNode *node) {
       }
       TypeId ti = MergeTypeId(tia, tib);
       UpdateTypeId(node, ti);
+      unsigned tix = MergeTypeIdx(ta->GetTypeIdx(), tb->GetTypeIdx());
+      UpdateTypeIdx(node, tix);
       break;
     }
     case OPR_Mod:
@@ -1103,6 +1106,8 @@ DeclNode *TypeInferVisitor::VisitDeclNode(DeclNode *node) {
       bool isFunc = UpdateVarTypeWithInit(var, init);
       if (isFunc) {
         UpdateTypeId(node, var->GetTypeId());
+        UpdateTypeIdx(node, mergedtidx);
+        UpdateTypeIdx(var, mergedtidx);
         return node;
       }
     } else {
@@ -1490,7 +1495,7 @@ ReturnNode *TypeInferVisitor::VisitReturnNode(ReturnNode *node) {
       type->SetPrimType(TY_None);
       func->SetType(type);
     }
-    UpdateFuncRetTypeId(func, node->GetTypeId());
+    UpdateFuncRetTypeId(func, node->GetTypeId(), node->GetTypeIdx());
     if (res) {
       // use res to update function's return type
       UpdateTypeUseNode(func->GetType(), res);
