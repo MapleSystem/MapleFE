@@ -111,6 +111,8 @@ void TypeTable::AddPrimAndBuiltinTypes() {
   PRIMTYPE(Number);
   PRIMTYPE(String);
 
+  mPrimSize = size();
+
 #define TYPE(T)     node = CreateBuiltinType(#T, TY_##T); AddType(node);
 #define PRIMTYPE(T)
   // additional usertype Boolean

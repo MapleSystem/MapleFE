@@ -50,6 +50,7 @@ class TypeTable {
 private:
   std::vector<TypeEntry *> mTypeTable;
   std::unordered_map<unsigned, unsigned> mNodeId2TypeIdxMap;
+  unsigned mPrimSize;
   unsigned mPreBuildSize;
 
 public:
@@ -58,6 +59,7 @@ public:
 
   unsigned size() { return mTypeTable.size(); }
   unsigned GetPreBuildSize() { return mPreBuildSize; }
+  unsigned GetPrimSize() { return mPrimSize; }
   TreeNode *CreatePrimType(std::string name, TypeId tyid);
   TreeNode *CreateBuiltinType(std::string name, TypeId tyid);
   void AddPrimAndBuiltinTypes();
