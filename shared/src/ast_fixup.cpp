@@ -34,6 +34,29 @@ UnaOperatorNode *FixUpVisitor::VisitUnaOperatorNode(UnaOperatorNode *node) {
     case OPR_Sub:
       node->SetOprId(OPR_Minus);
       mUpdated = true;
+    case OPR_Minus:
+      if (TreeNode *n = node->GetOpnd(); n && n->IsLiteral()) {
+        LiteralNode *lit = static_cast<LiteralNode *>(n);
+        LitData data = lit->GetData();
+        switch(data.mType) {
+          case LT_IntegerLiteral:
+            data.mData.mInt = -data.mData.mInt;
+            break;
+          case LT_FPLiteral:
+            data.mData.mFloat = -data.mData.mFloat;
+            break;
+          case LT_DoubleLiteral:
+            data.mData.mDouble = -data.mData.mDouble;
+            break;
+          default:
+            goto skip;
+        }
+        lit->SetData(data);
+        lit->SetParent(node->GetParent());
+        mUpdated = true;
+        return (UnaOperatorNode *)lit;
+      }
+    skip:
       break;
     case OPR_Inc:
       if(!node->IsPost()) {
