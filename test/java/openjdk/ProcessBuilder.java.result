@@ -83,12 +83,12 @@ class  ProcessBuilder
         String
         envstring
         envp
-        cond-branch cond:envstring.indexOf((int)0) NE Minus 1
+        cond-branch cond:envstring.indexOf((int)0) NE -1
         true branch :
           envstring Assign envstring.replaceFirst("\u0000.*","")        false branch :
 
         Decl: eqlsign=envstring.indexOf(=,ProcessEnvironment.MIN_NAME_LENGTH)
-        cond-branch cond:eqlsign NE Minus 1
+        cond-branch cond:eqlsign NE -1
         true branch :
           environment.put(envstring.substring(0,eqlsign),envstring.substring(eqlsign Add 1))        false branch :
 
@@ -201,7 +201,7 @@ class  ProcessBuilder
         constructor  NullInputStream()  throws: 
       Methods: 
         func  read()  throws: 
-          return Minus 1
+          return -1
         func  available()  throws: 
           return 0
       LocalClasses: 

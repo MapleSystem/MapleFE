@@ -84,7 +84,7 @@ class  Float
     func  compare(f1,f2)  throws: 
       cond-branch cond:f1 LT f2
       true branch :
-        return Minus 1      false branch :
+        return -1      false branch :
 
       cond-branch cond:f1 GT f2
       true branch :

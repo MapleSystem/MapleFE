@@ -260,7 +260,7 @@ while val NE 0 Land charPos GT 0
       return Long.valueOf(parseLong(s,10))
     func  valueOf(l)  throws: 
       Decl: offset=128
-      cond-branch cond:l GE Minus 128 Land l LE 127
+      cond-branch cond:l GE -128 Land l LE 127
       true branch :
         return 
       false branch :

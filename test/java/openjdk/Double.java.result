@@ -30,7 +30,7 @@ class  Double
       true branch :
         return Double.toString(d)      false branch :
         Decl: answer=new StringBuilder(24)
-        cond-branch cond:Math.copySign(1,d) EQ Minus 1
+        cond-branch cond:Math.copySign(1,d) EQ -1
         true branch :
           answer.append("-")        false branch :
 
@@ -101,7 +101,7 @@ class  Double
     func  compare(d1,d2)  throws: 
       cond-branch cond:d1 LT d2
       true branch :
-        return Minus 1      false branch :
+        return -1      false branch :
 
       cond-branch cond:d1 GT d2
       true branch :

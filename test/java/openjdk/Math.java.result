@@ -48,7 +48,7 @@ class  Math
       Decl: intBits=Float.floatToRawIntBits(a)
       Decl: biasedExp=(intBits Band FloatConsts.EXP_BIT_MASK) Shr (FloatConsts.SIGNIFICAND_WIDTH Sub 1)
       Decl: shift=(FloatConsts.SIGNIFICAND_WIDTH Sub 2 Add FloatConsts.EXP_BIAS) Sub biasedExp
-      cond-branch cond:(shift Band Minus 32) EQ 0
+      cond-branch cond:(shift Band -32) EQ 0
       true branch :
         Decl: r=((intBits Band FloatConsts.SIGNIF_BIT_MASK) Bor (FloatConsts.SIGNIF_BIT_MASK Add 1))
         cond-branch cond:intBits LT 0
@@ -64,7 +64,7 @@ class  Math
       Decl: longBits=Double.doubleToRawLongBits(a)
       Decl: biasedExp=(longBits Band DoubleConsts.EXP_BIT_MASK) Shr (DoubleConsts.SIGNIFICAND_WIDTH Sub 1)
       Decl: shift=(DoubleConsts.SIGNIFICAND_WIDTH Sub 2 Add DoubleConsts.EXP_BIAS) Sub biasedExp
-      cond-branch cond:(shift Band Minus 64) EQ 0
+      cond-branch cond:(shift Band -64) EQ 0
       true branch :
         Decl: r=((longBits Band DoubleConsts.SIGNIF_BIT_MASK) Bor (DoubleConsts.SIGNIF_BIT_MASK Add 1))
         cond-branch cond:longBits LT 0
@@ -130,7 +130,7 @@ class  Math
       Decl: ay=Math.abs(y)
       cond-branch cond:((ax Bor ay) Zext 31 NE 0)
       true branch :
-        cond-branch cond:((y NE 0) Land (r Div y NE x)) Lor (x EQ Long.MIN_VALUE Land y EQ Minus 1)
+        cond-branch cond:((y NE 0) Land (r Div y NE x)) Lor (x EQ Long.MIN_VALUE Land y EQ -1)
         true branch :
           new ArithmeticException("long overflow")
         false branch :

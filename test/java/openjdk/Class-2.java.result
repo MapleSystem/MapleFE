@@ -288,7 +288,7 @@ class  Class
 
         Decl: baseName=c.getName()
         Decl: index=baseName.lastIndexOf(.)
-        cond-branch cond:index NE Minus 1
+        cond-branch cond:index NE -1
         true branch :
           name Assign baseName.substring(0,index).replace(.,/) Add "/" Add name
         false branch :

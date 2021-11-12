@@ -219,7 +219,7 @@ class  Runtime
       java.lang.System.logE("java.lang.Runtime#loadLibrary(String, ClassLoader)" Add " is private and will be removed in a future Android release")
       loadLibrary0(classLoader,libname)
     func  loadLibrary0(loader,libname)  throws: 
-      cond-branch cond:libname.indexOf((int)File.separatorChar) NE Minus 1
+      cond-branch cond:libname.indexOf((int)File.separatorChar) NE -1
       true branch :
         new UnsatisfiedLinkError("Directory separator should not appear in library name: " Add libname)
       false branch :

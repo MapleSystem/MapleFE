@@ -428,7 +428,7 @@ class  Character
     func  digit(codePoint,radix)  throws: 
       cond-branch cond:radix LT MIN_RADIX Lor radix GT MAX_RADIX
       true branch :
-        return Minus 1
+        return -1
       false branch :
 
       cond-branch cond:codePoint LT 128
@@ -472,7 +472,7 @@ class  Character
           return codePoint Sub (A Sub 10)
         false branch :
 
-        return Minus 1
+        return -1
       false branch :
 
       cond-branch cond:codePoint GE 65313 Land codePoint LE 65338
