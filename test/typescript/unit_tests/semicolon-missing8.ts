@@ -2,7 +2,7 @@ function func(f: Function): void {
   f();
 }
 
-func((e) => {
+func((e:any) => {
   if (e) throw e
   console.log('OK')
 })

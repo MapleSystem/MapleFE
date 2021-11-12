@@ -1,16 +1,16 @@
-Matched 8 tokens.
-Matched 16 tokens.
-Matched 24 tokens.
-Matched 42 tokens.
-Matched 47 tokens.
-Matched 54 tokens.
-Matched 61 tokens.
-Matched 76 tokens.
+Matched 10 tokens.
+Matched 20 tokens.
+Matched 30 tokens.
+Matched 48 tokens.
+Matched 63 tokens.
+Matched 70 tokens.
+Matched 77 tokens.
+Matched 92 tokens.
 ============= Module ===========
 == Sub Tree ==
 class  A
   Fields: 
-    id
+    id=0
   Instance Initializer: 
   Constructors: 
   Methods: 
@@ -20,7 +20,7 @@ class  A
 == Sub Tree ==
 class  B
   Fields: 
-    flag
+    flag=false
   Instance Initializer: 
   Constructors: 
   Methods: 
@@ -30,7 +30,7 @@ class  B
 == Sub Tree ==
 class  C
   Fields: 
-    name
+    name=""
   Instance Initializer: 
   Constructors: 
   Methods: 
@@ -40,7 +40,7 @@ class  C
 == Sub Tree ==
  type I = intersect  = A & B["flag"] extends true ? B : C
 == Sub Tree ==
-js_let Decl: v
+js_let Decl: v= {id:0, name:""}
 == Sub Tree ==
 v!.id Assign 10
 == Sub Tree ==
