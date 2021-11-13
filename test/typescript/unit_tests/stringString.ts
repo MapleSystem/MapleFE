@@ -1,6 +1,6 @@
 class Student {
-  name: string;
+  name: string = "";
 };
 class Parent {
-  name: String;
+  name: String = "";
 };
