@@ -1,1 +1,1 @@
-export declare const map: (m: import("typescript").MapLike<string[]>) => string;
+export declare const map: (m: import("./export-interface").MapLike<string[]>) => string;
