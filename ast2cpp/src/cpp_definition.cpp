@@ -31,7 +31,7 @@ std::string EmitCtorInstance(ClassNode *c) {
     proto.insert(0, "&"s, 0, std::string::npos);
   }
   str = "\n// Instantiate constructor\n"s;
-  str += thisClass + "::Ctor_"s+thisClass +" "+ thisClass+"_ctor("s +ctor+","s+proto+","+prototypeProto+");\n"s;
+  str += thisClass + "::Ctor "s + thisClass+"_ctor("s +ctor+","s+proto+","+prototypeProto+");\n"s;
   return str;
 }
 
@@ -43,7 +43,7 @@ std::string EmitDefaultCtor(ClassNode *c) {
   std::string str, className;
   className = c->GetName();
   str = "\n"s;
-  str += className + "* "s + className + "::Ctor_"s + className + "::operator()("s + className + "* obj)"s;
+  str += className + "* "s + className + "::Ctor::operator()("s + className + "* obj)"s;
   str += "{ return obj; }\n"s;
   str += EmitCtorInstance(c);
 
@@ -263,7 +263,7 @@ std::string CppDef::EmitFunctionNode(FunctionNode *node) {
   if (node->IsConstructor()) {
     className = GetClassName(node);
     str = "\n"s;
-    str += className + "* "s + className + "::Ctor_"s + className + "::operator()("s + className + "* obj"s;
+    str += className + "* "s + className + "::Ctor::operator()("s + className + "* obj"s;
   } else {
     str = mCppDecl.GetTypeString(node->GetType(), node->GetType());
     if(node->GetStrIdx())
@@ -318,7 +318,7 @@ std::string CppDef::EmitIdentifierNode(IdentifierNode *node) {
 std::string CppDef::EmitStructLiteralNode(StructLiteralNode* node) {
   std::string str;
   int stops = 2;
-  str += "\n"s + indent(stops) + "std::vector<t2crt::ObjectProp>({\n"s;
+  str += "\n"s + tab(stops) + "std::vector<t2crt::ObjectProp>({\n"s;
   for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
     if (i)
       str += ",\n"s;
@@ -327,7 +327,7 @@ std::string CppDef::EmitStructLiteralNode(StructLiteralNode* node) {
       std::string fieldName = EmitTreeNode(field->GetFieldName());
       TypeId typId = lit->GetTypeId();
       std::string fieldVal = EmitTreeNode(lit);
-      str += indent(stops+1);
+      str += tab(stops+1);
       switch(typId) {
         case TY_Object:
           break;
@@ -376,9 +376,9 @@ std::string CppDef::EmitDirectFieldInit(std::string varName, StructLiteralNode* 
       std::string fieldName = EmitTreeNode(field->GetFieldName());
       std::string fieldVal = EmitTreeNode(lit);
       if (false) // TODO: Check if it accesses a Cxx class field
-        str += indent(2) + varName + "->"s + fieldName + " = "s + fieldVal + ";\n"s;
+        str += tab(2) + varName + "->"s + fieldName + " = "s + fieldVal + ";\n"s;
       else
-        str += indent(2) + "(*"s + varName + ")[\""s + fieldName + "\"] = "s + fieldVal + ";\n"s;
+        str += tab(2) + "(*"s + varName + ")[\""s + fieldName + "\"] = "s + fieldVal + ";\n"s;
     }
   }
   return str;

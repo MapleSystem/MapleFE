@@ -61,7 +61,7 @@ std::string hlpClassFldAddProp(std::string objName,
   return str;
 }
 
-std::string indent(int n) {
+std::string tab(int n) {
   return std::string(n*2,' ');
 }
 

@@ -29,7 +29,7 @@ extern std::unordered_map<TypeId, std::string>TypeIdToJSType;
 extern std::unordered_map<TypeId, std::string>TypeIdToJSTypeCXX;
 extern TypeId hlpGetTypeId(TreeNode* node);
 extern std::string hlpClassFldAddProp(std::string, std::string, std::string, std::string, std::string);
-extern std::string indent(int n);
+extern std::string tab(int n);
 }
 #endif  // __HELPER_H__
 

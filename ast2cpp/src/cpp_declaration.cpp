@@ -601,7 +601,7 @@ std::string CppDecl::GetTypeString(TreeNode *node, TreeNode *child) {
     switch(k) {
       case TY_Object:
         return "t2crt::Object* "s;
-      case TY_Function: // Need to handle class constructor type: Ctor_<class>*
+      case TY_Function:
         return "t2crt::Function* "s;
       case TY_Boolean:
         return "bool "s;
@@ -735,16 +735,17 @@ std::string CppDecl::EmitClassNode(ClassNode *node) {
   str += "  virtual const char* __GetClassName() const {return \""s + node->GetName() + " \";}\n"s;
 
   // 2. c++ class for JS object's corresponding JS constructor
-  base = (node->GetSuperClassesNum() != 0)? ("Ctor_"s+node->GetSuperClass(0)->GetName()) : "t2crt::Function";
-  str += "class "s + "Ctor_" + node->GetName() + " : public "s + base + " {\n"s;
-  str += "public:\n";
-  str += "  Ctor_"s+node->GetName()+"(t2crt::Function* ctor, t2crt::Object* proto, t2crt::Object* prototype_proto) : "+base+"(ctor, proto, prototype_proto) {}\n";
+  std::string indent = tab(1);
+  base = (node->GetSuperClassesNum() != 0)? (node->GetSuperClass(0)->GetName()+"::Ctor"s) : "t2crt::Function";
+  str += indent + "class Ctor : public "s + base + " {\n"s;
+  str += indent + "public:\n";
+  str += indent + "  Ctor(t2crt::Function* ctor, t2crt::Object* proto, t2crt::Object* prototype_proto) : "s+base+"(ctor, proto, prototype_proto) {}\n";
 
   // constructor function
   for (unsigned i = 0; i < node->GetConstructorsNum(); ++i) {
     std::string ctor;
     if (auto c = node->GetConstructor(i)) {
-      ctor = "  "s + node->GetName() + "* operator()("s + node->GetName() + "* obj"s;
+      ctor = indent + "  "s + node->GetName() + "* operator()("s + node->GetName() + "* obj"s;
       for (unsigned k = 0; k < c->GetParamsNum(); ++k) {
         ctor += ", "s;
         if (auto n = c->GetParam(k)) {
@@ -758,11 +759,11 @@ std::string CppDecl::EmitClassNode(ClassNode *node) {
 
   // Generate decl for default constructor function if none declared for class
   if (node->GetConstructorsNum() == 0)
-    str += "  "s + node->GetName() + "* operator()("s + node->GetName() + "* obj);\n"s;
+    str += indent + "  "s + node->GetName() + "* operator()("s + node->GetName() + "* obj);\n"s;
 
   // Generate new() function
-  str += "  "s+node->GetName()+"* _new() {return new "s+node->GetName()+"(this, this->prototype);}\n"s;
-  str += "};\n\n";
+  str += indent + "  "s+node->GetName()+"* _new() {return new "s+node->GetName()+"(this, this->prototype);}\n"s;
+  str += indent + "};\n";
   str += "};\n\n";
   return str;
 }
@@ -821,7 +822,7 @@ std::string CppDecl::EmitInterface(StructNode *node) {
     if (auto n = node->GetField(i)) {
       str += "    "s + EmitTreeNode(n) + ";\n"s;
       if (n->IsIdentifier()) {
-        def += indent(1) + hlpClassFldAddProp("this", ifName, n->GetName(),
+        def += tab(1) + hlpClassFldAddProp("this", ifName, n->GetName(),
           GetTypeString(n, static_cast<IdentifierNode*>(n)->GetType()),
           TypeIdToJSTypeCXX[hlpGetTypeId(n)]) + ";\n"s;
       }
