@@ -1,11 +1,11 @@
 Matched 4 tokens.
-Matched 12 tokens.
-Matched 22 tokens.
-Matched 32 tokens.
-Matched 38 tokens.
-Matched 47 tokens.
-Matched 58 tokens.
-Matched 69 tokens.
+Matched 17 tokens.
+Matched 27 tokens.
+Matched 37 tokens.
+Matched 43 tokens.
+Matched 52 tokens.
+Matched 63 tokens.
+Matched 74 tokens.
 ============= Module ===========
 == Sub Tree ==
 class  Foo
@@ -20,7 +20,7 @@ class  Foo
 == Sub Tree ==
 class  Bar
   Fields: 
-    foo
+    foo=() -> null
   Instance Initializer: 
   Constructors: 
   Methods: 

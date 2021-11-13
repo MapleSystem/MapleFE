@@ -1,7 +1,7 @@
 class Foo {}
 
 class Bar {
-  foo: Function;
+  foo: Function = () => null;
 }
 
 var foo:Foo = new Foo();
