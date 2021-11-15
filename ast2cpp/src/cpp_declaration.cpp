@@ -207,7 +207,10 @@ class ImportExportModules : public AstVisitor {
                     + (after == "default" ? "__"s + after : after) + " = "s + target + "; }\n"s;
                   emit = false;
                 }
-                target = after;
+                else if (target != after) {
+                  mExports += "namespace __export { using "s + after + " = "s + module + "::"s + target + "; }\n"s;
+                  emit = false;
+                }
               }
               if (emit)
                 mExports += "namespace __export { using "s + module + "::"s + target + "; }\n"s;
