@@ -345,6 +345,38 @@ ExportNode *AdjustASTVisitor::VisitExportNode(ExportNode *node) {
   return node;
 }
 
+NamespaceNode *AdjustASTVisitor::VisitNamespaceNode(NamespaceNode *node) {
+  (void) AstVisitor::VisitNamespaceNode(node);
+  TreeNode *id = node->GetId();
+  if (id) {
+    // for namespace with nested id, split into namespaces
+    if (id->IsField()) {
+      FieldNode *fld = static_cast<FieldNode *>(id);
+      TreeNode *upper = fld->GetUpper();
+      TreeNode *field = fld->GetField();
+      // rename node with upper
+      node->SetId(upper);
+
+      NamespaceNode *ns = mHandler->NewTreeNode<NamespaceNode>();
+      // name node with field
+      ns->SetId(field);
+      // move elements of node ot ns
+      for (unsigned i = 0; i < node->GetElementsNum(); i++) {
+        ns->AddElement(node->GetElementAtIndex(i));
+      }
+      node->Release();
+      // add ns as element of node
+      node->AddElement(ns);
+
+      // recursive if needed
+      if (!upper->IsIdentifier()) {
+        node = VisitNamespaceNode(static_cast<NamespaceNode *>(node));
+      }
+    }
+  }
+  return node;
+}
+
 CondBranchNode *AdjustASTVisitor::VisitCondBranchNode(CondBranchNode *node) {
   TreeNode *tn = VisitTreeNode(node->GetCond());
   tn = VisitTreeNode(node->GetTrueBranch());
