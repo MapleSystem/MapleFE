@@ -45,6 +45,7 @@ TYPE(Object)
 TYPE(Function)  // function/lambda decl
 TYPE(Class)     // class/interface decl
 TYPE(Module)    // import/export module
+TYPE(Namespace) // namespace
 TYPE(User)      // user types
 TYPE(Merge)     // merge of two types, unexpected
 

@@ -143,11 +143,12 @@ void ASTScope::Dump(unsigned indent) {
     TreeNode *node = GetDecl(i);
     std::string str = "";
     switch (node->GetKind()) {
-      case NK_Identifier: str = "    arg: "; break;
-      case NK_Decl:       str = "   decl: "; break;
-      case NK_Function:   str = "   func: "; break;
-      case NK_Struct:     str = " struct: "; break;
-      case NK_Class:      str = "  class: "; break;
+      case NK_Identifier: str = "       arg: "; break;
+      case NK_Decl:       str = "      decl: "; break;
+      case NK_Function:   str = "      func: "; break;
+      case NK_Struct:     str = "    struct: "; break;
+      case NK_Class:      str = "     class: "; break;
+      case NK_Namespace:  str = " namespace: "; break;
     }
     if (str.length()) {
       node->DumpIndentation(indent);
@@ -160,7 +161,7 @@ void ASTScope::Dump(unsigned indent) {
     TreeNode *node = GetType(i);
     node->DumpIndentation(indent);
     std::string name = node->GetStrIdx() ? node->GetName() : "-";
-    std::cout << "   type: " << name << " " << node->GetNodeId() << std::endl;
+    std::cout << "      type: " << name << " " << node->GetNodeId() << std::endl;
   }
 
   for (unsigned i = 0; i < GetChildrenNum(); i++) {

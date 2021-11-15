@@ -75,6 +75,39 @@ void AST_SCP::BuildScope() {
   }
 }
 
+void BuildScopeVisitor::AddDecl(ASTScope *scope, TreeNode *node) {
+  unsigned sid = scope->GetTree()->GetNodeId();
+  if (mScope2DeclsMap[sid].find(node->GetNodeId()) ==
+      mScope2DeclsMap[sid].end()) {
+    scope->AddDecl(node);
+    mScope2DeclsMap[sid].insert(node->GetNodeId());
+  }
+}
+
+void BuildScopeVisitor::AddImportedDecl(ASTScope *scope, TreeNode *node) {
+  unsigned sid = scope->GetTree()->GetNodeId();
+  if (mScope2ImportedDeclsMap[sid].find(node->GetNodeId()) ==
+      mScope2ImportedDeclsMap[sid].end()) {
+    scope->AddImportDecl(node);
+    mScope2ImportedDeclsMap[sid].insert(node->GetNodeId());
+  }
+}
+
+void BuildScopeVisitor::AddType(ASTScope *scope, TreeNode *node) {
+  unsigned sid = scope->GetTree()->GetNodeId();
+  if (mScope2TypesMap[sid].find(node->GetNodeId()) ==
+      mScope2TypesMap[sid].end()) {
+    scope->AddType(node);
+    gTypeTable.AddType(node);
+    mScope2TypesMap[sid].insert(node->GetNodeId());
+  }
+}
+
+void BuildScopeVisitor::AddTypeAndDecl(ASTScope *scope, TreeNode *node) {
+  AddType(scope, node);
+  AddDecl(scope, node);
+}
+
 void BuildScopeVisitor::InitInternalTypes() {
   // add primitive and builtin types to root scope
   ModuleNode *module = mHandler->GetASTModule();
@@ -84,10 +117,10 @@ void BuildScopeVisitor::InitInternalTypes() {
     node->SetScope(scope);
     if (node->IsUserType()) {
       static_cast<UserTypeNode *>(node)->GetId()->SetScope(scope);
-      scope->AddType(node);
-      scope->AddDecl(node);
+      AddType(scope, node);
+      AddDecl(scope, node);
     } else {
-      scope->AddType(node);
+      AddType(scope, node);
     }
   }
 
@@ -122,25 +155,23 @@ FunctionNode *BuildScopeVisitor::AddFunction(std::string name) {
   // add func to module scope
   ModuleNode *module = mHandler->GetASTModule();
   ASTScope *scope = module->GetRootScope();
-  scope->AddDecl(func);
+  AddDecl(scope, func);
   id->SetScope(scope);
   return func;
 }
 
-void BuildScopeVisitor::AddType(ASTScope *scope, TreeNode *node) {
-  scope->AddType(node);
-  gTypeTable.AddType(node);
-}
-
-void BuildScopeVisitor::AddTypeAndDecl(ASTScope *scope, TreeNode *node) {
-  scope->AddType(node);
-  scope->AddDecl(node);
-  gTypeTable.AddType(node);
+ASTScope *BuildScopeVisitor::NewScope(ASTScope *parent, TreeNode *node) {
+  MASSERT(parent && "parent scope NULL");
+  ASTScope *scope = node->GetScope();
+  if (!scope || (scope && scope->GetTree() != node)) {
+    scope = mASTModule->NewScope(parent, node);
+  }
+  return scope;
 }
 
 BlockNode *BuildScopeVisitor::VisitBlockNode(BlockNode *node) {
   ASTScope *parent = mScopeStack.top();
-  ASTScope *scope = mASTModule->NewScope(parent, node);
+  ASTScope *scope = NewScope(parent, node);
   mScopeStack.push(scope);
   BuildScopeBaseVisitor::VisitBlockNode(node);
   mScopeStack.pop();
@@ -150,13 +181,13 @@ BlockNode *BuildScopeVisitor::VisitBlockNode(BlockNode *node) {
 FunctionNode *BuildScopeVisitor::VisitFunctionNode(FunctionNode *node) {
   ASTScope *parent = mScopeStack.top();
   // function is a decl
-  parent->AddDecl(node);
-  ASTScope *scope = mASTModule->NewScope(parent, node);
+  AddDecl(parent, node);
+  ASTScope *scope = NewScope(parent, node);
 
   // add parameters as decl
   for(unsigned i = 0; i < node->GetParamsNum(); i++) {
     TreeNode *it = node->GetParam(i);
-    scope->AddDecl(it);
+    AddDecl(scope, it);
   }
 
   for(unsigned i = 0; i < node->GetTypeParamsNum(); i++) {
@@ -189,12 +220,12 @@ FunctionNode *BuildScopeVisitor::VisitFunctionNode(FunctionNode *node) {
 
 LambdaNode *BuildScopeVisitor::VisitLambdaNode(LambdaNode *node) {
   ASTScope *parent = mScopeStack.top();
-  ASTScope *scope = mASTModule->NewScope(parent, node);
+  ASTScope *scope = NewScope(parent, node);
 
   // add parameters as decl
   for(unsigned i = 0; i < node->GetParamsNum(); i++) {
     TreeNode *it = node->GetParam(i);
-    scope->AddDecl(it);
+    AddDecl(scope, it);
   }
   mScopeStack.push(scope);
   mUserScopeStack.push(scope);
@@ -208,11 +239,11 @@ ClassNode *BuildScopeVisitor::VisitClassNode(ClassNode *node) {
   ASTScope *parent = mScopeStack.top();
   // inner class is a decl
   if (parent) {
-    parent->AddDecl(node);
+    AddDecl(parent, node);
     AddType(parent, node);
   }
 
-  ASTScope *scope = mASTModule->NewScope(parent, node);
+  ASTScope *scope = NewScope(parent, node);
   if (node->GetStrIdx()) {
     mStrIdx2ScopeMap[node->GetStrIdx()] = scope;
   }
@@ -221,7 +252,7 @@ ClassNode *BuildScopeVisitor::VisitClassNode(ClassNode *node) {
   for(unsigned i = 0; i < node->GetFieldsNum(); i++) {
     TreeNode *it = node->GetField(i);
     if (it->IsIdentifier()) {
-      scope->AddDecl(it);
+      AddDecl(scope, it);
     }
   }
   mScopeStack.push(scope);
@@ -234,11 +265,11 @@ InterfaceNode *BuildScopeVisitor::VisitInterfaceNode(InterfaceNode *node) {
   ASTScope *parent = mScopeStack.top();
   // inner interface is a decl
   if (parent) {
-    parent->AddDecl(node);
+    AddDecl(parent, node);
     AddType(parent, node);
   }
 
-  ASTScope *scope = mASTModule->NewScope(parent, node);
+  ASTScope *scope = NewScope(parent, node);
   if (node->GetStrIdx()) {
     mStrIdx2ScopeMap[node->GetStrIdx()] = scope;
   }
@@ -247,7 +278,7 @@ InterfaceNode *BuildScopeVisitor::VisitInterfaceNode(InterfaceNode *node) {
   for(unsigned i = 0; i < node->GetFieldsNum(); i++) {
     TreeNode *it = node->GetField(i);
     if (it->IsIdentifier()) {
-      scope->AddDecl(it);
+      AddDecl(scope, it);
     }
   }
   mScopeStack.push(scope);
@@ -260,11 +291,11 @@ StructNode *BuildScopeVisitor::VisitStructNode(StructNode *node) {
   ASTScope *parent = mScopeStack.top();
   // struct is a decl
   if (parent) {
-    parent->AddDecl(node);
+    AddDecl(parent, node);
     AddType(parent, node);
   }
 
-  ASTScope *scope = mASTModule->NewScope(parent, node);
+  ASTScope *scope = NewScope(parent, node);
   if (node->GetStructId() && node->GetStructId()->GetStrIdx()) {
     mStrIdx2ScopeMap[node->GetStructId()->GetStrIdx()] = scope;
   }
@@ -273,11 +304,39 @@ StructNode *BuildScopeVisitor::VisitStructNode(StructNode *node) {
   for(unsigned i = 0; i < node->GetFieldsNum(); i++) {
     TreeNode *it = node->GetField(i);
     if (it->IsIdentifier()) {
-      scope->AddDecl(it);
+      AddDecl(scope, it);
     }
   }
   mScopeStack.push(scope);
   BuildScopeBaseVisitor::VisitStructNode(node);
+  mScopeStack.pop();
+  return node;
+}
+
+NamespaceNode *BuildScopeVisitor::VisitNamespaceNode(NamespaceNode *node) {
+  node->SetTypeId(TY_Namespace);
+  TreeNode *id = node->GetId();
+  unsigned stridx = 0;
+  if (id && id->GetStrIdx()) {
+    stridx = id->GetStrIdx();
+    node->SetStrIdx(stridx);
+  }
+
+  ASTScope *parent = mScopeStack.top();
+  // inner namespace is a decl
+  if (parent) {
+    AddTypeAndDecl(parent, node);
+  }
+
+  ASTScope *scope = NewScope(parent, node);
+  if (stridx != 0) {
+    mStrIdx2ScopeMap[stridx] = scope;
+  }
+
+  mScopeStack.push(scope);
+  mUserScopeStack.push(scope);
+  BuildScopeBaseVisitor::VisitNamespaceNode(node);
+  mUserScopeStack.pop();
   mScopeStack.pop();
   return node;
 }
@@ -298,7 +357,7 @@ DeclNode *BuildScopeVisitor::VisitDeclNode(DeclNode *node) {
     // use current scope
     scope = mScopeStack.top();
   }
-  scope->AddDecl(node);
+  AddDecl(scope, node);
   return node;
 }
 
@@ -329,7 +388,7 @@ UserTypeNode *BuildScopeVisitor::VisitUserTypeNode(UserTypeNode *node) {
 TypeAliasNode *BuildScopeVisitor::VisitTypeAliasNode(TypeAliasNode *node) {
   ASTScope *scope = mScopeStack.top();
   BuildScopeBaseVisitor::VisitTypeAliasNode(node);
-  scope->AddDecl(node);
+  AddDecl(scope, node);
   AddType(scope, node);
   return node;
 }
@@ -338,11 +397,11 @@ ForLoopNode *BuildScopeVisitor::VisitForLoopNode(ForLoopNode *node) {
   ASTScope *parent = mScopeStack.top();
   ASTScope *scope = parent;
   if (node->GetProp() == FLP_JSIn) {
-    scope = mASTModule->NewScope(parent, node);
+    scope = NewScope(parent, node);
     TreeNode *var = node->GetVariable();
     if (var) {
       if (var->IsDecl()) {
-        scope->AddDecl(var);
+        AddDecl(scope, var);
       } else {
         NOTYETIMPL("VisitForLoopNode() FLP_JSIn var not decl");
       }
@@ -412,11 +471,11 @@ ImportNode *BuildScopeVisitor::VisitImportNode(ImportNode *node) {
     if (p->IsDefault()) {
       if (bfnode) {
         bfnode->SetScope(scope);
-        scope->AddImportDecl(bfnode);
+        AddImportedDecl(scope, bfnode);
       }
     } else if (afnode) {
       afnode->SetScope(scope);
-      scope->AddImportDecl(afnode);
+      AddImportedDecl(scope, afnode);
 
       if (bfnode && targetHandler) {
         ModuleNode *mod = targetHandler->GetASTModule();

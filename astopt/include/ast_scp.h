@@ -79,6 +79,10 @@ class BuildScopeVisitor : public BuildScopeBaseVisitor {
   // stridx to scope map for struct/class
   std::unordered_map<unsigned, ASTScope *> mStrIdx2ScopeMap;;
 
+  std::unordered_map<unsigned, std::unordered_set<unsigned>> mScope2DeclsMap;
+  std::unordered_map<unsigned, std::unordered_set<unsigned>> mScope2ImportedDeclsMap;
+  std::unordered_map<unsigned, std::unordered_set<unsigned>> mScope2TypesMap;
+
  public:
   explicit BuildScopeVisitor(Module_Handler *h, unsigned f, bool base = false)
     : mHandler(h), mFlags(f), BuildScopeBaseVisitor(f, base) {
@@ -95,7 +99,10 @@ class BuildScopeVisitor : public BuildScopeBaseVisitor {
   FunctionNode *AddFunction(std::string name);
 
   void AddType(ASTScope *scope, TreeNode *node);
+  void AddImportedDecl(ASTScope *scope, TreeNode *node);
+  void AddDecl(ASTScope *scope, TreeNode *node);
   void AddTypeAndDecl(ASTScope *scope, TreeNode *node);
+  ASTScope *NewScope(ASTScope *parent, TreeNode *node);
 
   void AddScopeMap(unsigned stridx, ASTScope *scope) { mStrIdx2ScopeMap[stridx] = scope; }
 
@@ -106,6 +113,7 @@ class BuildScopeVisitor : public BuildScopeBaseVisitor {
   ClassNode *VisitClassNode(ClassNode *node);
   StructNode *VisitStructNode(StructNode *node);
   InterfaceNode *VisitInterfaceNode(InterfaceNode *node);
+  NamespaceNode *VisitNamespaceNode(NamespaceNode *node);
   ForLoopNode *VisitForLoopNode(ForLoopNode *node);
 
   FieldNode *VisitFieldNode(FieldNode *node);
