@@ -576,10 +576,10 @@ std::string CppDef::EmitCallNode(CallNode *node) {
         str += "(*"s + s + ")"s;
       } else if (hFuncTable.IsFieldImported(s)) {
         str += "(*"s + s + ")"s;
-      } else {
-        Emitter::Replace(s, ".", "->", 0);
-        str += "(*"s + s + ")"s;
-      }
+      } else if (s.find("->") != std::string::npos)
+        str += s;
+      else
+        str += "(*("s + s + "))"s;
     }
   }
   if(!log)
