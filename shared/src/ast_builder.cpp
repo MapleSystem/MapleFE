@@ -2165,6 +2165,7 @@ TreeNode* ASTBuilder::BuildField() {
     }
   } else {
     MASSERT(node_b->IsIdentifier() ||
+            node_b->IsCall() ||
             node_b->IsUserType());
     field = (FieldNode*)gTreePool.NewTreeNode(sizeof(FieldNode));
     new (field) FieldNode();
