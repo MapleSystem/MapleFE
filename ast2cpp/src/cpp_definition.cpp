@@ -578,7 +578,7 @@ std::string CppDef::EmitCallNode(CallNode *node) {
         str += "(*"s + s + ")"s;
       } else {
         Emitter::Replace(s, ".", "->", 0);
-        str += s;
+        str += "(*"s + s + ")"s;
       }
     }
   }
