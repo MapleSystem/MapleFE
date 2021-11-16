@@ -1,0 +1,6 @@
+Matched 22 tokens.
+============= Module ===========
+== Sub Tree ==
+export { default as func  <T>(arg)  throws: 
+  return [arg]
+} 

@@ -68,7 +68,6 @@ rule KeywordIdentifier : ONEOF("type",
                                "unique",
                                "any",
                                "constructor",
-                               "function",
                                "delete",
                                "abstract",
                                "private",
@@ -1624,8 +1623,9 @@ rule ExportSpecifier : ONEOF(JSIdentifier,
                              JSIdentifier + "as" + BindingIdentifier,
                              JSIdentifier + "as" + "default",
                              "default" + "as" + JSIdentifier,
-                             JSIdentifier + "as" + "super")
-  attr.action.%2,%5 : BuildXXportAsPair(%1, %3)
+                             JSIdentifier + "as" + "super",
+                             JSIdentifier + "as" + "function")
+  attr.action.%2,%5,%6 : BuildXXportAsPair(%1, %3)
   attr.action.%3 : BuildXXportAsPairDefault(%1)
   attr.action.%4 : BuildXXportAsPairDefault(%3)
 
