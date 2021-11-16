@@ -1326,7 +1326,12 @@ bool Parser::TraverseToken(Token *token, AppealNode *parent, AppealNode *&child_
   // [TODO]
   // We enable skipping semi-colon. Later we will implement TS specific version of parser
   // which overried TraverseToken().
-  // We handle one case: if we see } instead of ';', we can skip
+  // We handle one case:
+  //   The rule expects:
+  //       { statement ;}
+  //   But we see :
+  //       { statement }  // No ';'
+  // In this case we can skip the checking of ';' since '}' actually closes everything.
   // There are many other cases. Will handle later.
   if (token->IsSeparator() && token->GetSepId() == SEP_Semicolon) {
     if (curr_token->IsSeparator() && curr_token->GetSepId() == SEP_Rbrace) {
