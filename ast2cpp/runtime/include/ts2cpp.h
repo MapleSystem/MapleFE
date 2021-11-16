@@ -273,6 +273,10 @@ class Object {
 
     // Put code for JS Object.prototype props as static fields and methods in this class
     // and add to propList of Object_ctor.prototype object on system init.
+
+    virtual std::string TypeId() {
+      return "object"s;
+    }
 };
 
 using ArgsT = Array<JS_Val>;
@@ -298,6 +302,10 @@ class Function : public Object {
 
     // Put code for JS Function.prototype props as static fields and methods in this class
     // and add to propList of Function_ctor.prototype object on system init.
+
+    std::string TypeId() override {
+      return "function"s;
+    }
 };
 
 
@@ -320,10 +328,14 @@ class ClassFld {
     JS_Val NewProp(void* obj, JS_Type type) {return JS_Val(type, (void*)((char*)obj+field.fld_offset));}
 };
 
+template <typename T> std::string __js_typeof(T* v) {
+  return v->TypeId();
+}
+
 template <typename T> std::string __js_typeof(T v) {
-  if (std::numeric_limits<T>::is_signed)
+  if (std::is_signed<T>::value)
     return "number"s;
-  if (std::numeric_limits<T>::is_integer)
+  if (std::is_integral<T>::value)
     return "boolean"s;
   return "unknown"s;
 }
