@@ -2287,6 +2287,7 @@ rule EnumValue: AssignmentExpression
 
 ##NamespaceDeclaration: namespace IdentifierPath { NamespaceBody }
 rule NamespaceDeclaration: "namespace" + IdentifierPath + '{' + NamespaceBody + '}'
+  attr.property : Top
   attr.action : BuildNamespace(%2)
   attr.action : AddNamespaceBody(%4)
 
@@ -2382,6 +2383,7 @@ rule GlobalDeclaration : "declare" + GlobalDeclMembers
 
 # The module name could be an identifier or string literal.
 rule ExternalModuleDeclaration : "module" + PrimaryExpression + '{' + DeclarationModule + '}'
+  attr.property : Top
   attr.action : BuildModule(%2)
   attr.action : AddModuleBody(%4)
 
@@ -2413,7 +2415,8 @@ rule DeclarationModuleElements: ONEOF(DeclarationModuleElement,
 rule DeclarationModuleElement: ONEOF(DeclarationElement,
                                      ImportDeclaration,
                                      ImportAliasDeclaration,
-                                     ExportDeclaration)
+                                     ExportDeclaration,
+                                     Statement)
                                      #ExportDefaultDeclarationElement,
                                      #ExportListDeclaration,
                                      #ExportAssignment)

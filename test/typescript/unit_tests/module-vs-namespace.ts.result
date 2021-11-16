@@ -1,0 +1,37 @@
+Matched 41 tokens.
+Matched 77 tokens.
+Matched 118 tokens.
+Matched 154 tokens.
+============= Module ===========
+== Sub Tree ==
+============= Module ===========
+== Sub Tree ==
+js_let Decl: arr=[12,34,56]
+== Sub Tree ==
+for ( )
+  console.log(x,arr[x])
+
+
+== Sub Tree ==
+============= Module ===========
+== Sub Tree ==
+js_let Decl: arr=[11,22,33]
+== Sub Tree ==
+for ( )
+  console.log(x)
+
+
+== Sub Tree ==
+namespace  ns_for_in
+  js_let Decl: arr=[12,34,56]
+  for ( )
+  console.log(x,arr[x])
+
+
+== Sub Tree ==
+namespace  ns_for_of
+  js_let Decl: arr=[11,22,33]
+  for ( )
+  console.log(x)
+
+
