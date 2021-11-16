@@ -659,6 +659,7 @@ rule RelationalExpression : ONEOF(ShiftExpression,
                                   RelationalExpression + "instanceof" + ShiftExpression,
                                   ClassDeclaration + "instanceof" + ShiftExpression,
                                   InExpression)
+  attr.property.%3 : NoAltToken
   attr.action.%2,%3,%4,%5 : BuildBinaryOperation(%1, %2, %3)
   attr.action.%6,%7 : BuildInstanceOf(%1, %3)
 

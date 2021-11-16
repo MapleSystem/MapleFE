@@ -1,0 +1,6 @@
+Matched 23 tokens.
+============= Module ===========
+== Sub Tree ==
+func  func<T>(f)  throws: 
+  return (() -> )f
+

@@ -1372,7 +1372,17 @@ bool Parser::TraverseToken(Token *token, AppealNode *parent, AppealNode *&child_
     if (curr_token->mAltTokens) {
       bool alt_found = false;
       AltToken *pat = curr_token->mAltTokens;
-      if (token == &gSystemTokens[pat->mAltTokenId]) {
+
+      // Sometimes a rule which has literally good alt tokens doesn't want to be
+      // considered as alt token matching, eg.
+      //  RelationalExpression :   expr + '>' + expr
+      // This '>' won't be suitable for alt tokens of >> or >>>, because so far
+      // there is no expr ending with '>'.
+      bool parent_ok = true;
+      if (parent->GetTable()->mProperties & RP_NoAltToken)
+        parent_ok = false;
+
+      if (parent_ok && (token == &gSystemTokens[pat->mAltTokenId])) {
         appeal = mAppealNodePool.NewAppealNode();
         child_node = appeal;
         mAppealNodes.push_back(appeal);

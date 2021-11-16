@@ -97,6 +97,8 @@ enum RuleProp {
                     // match, and it's ok. However, some concatenate rules do require
                     // certain sub-rules NOT to match the longest so that the later
                     // sub-rules can match, and so the whole rule.
+  RP_NoAltToken = 16, // don't do alternative token matching for some special tokens
+                      // inside the current rule.
 };
 
 // A rule has a limited set of beginning tokens. These are called LookAhead.
