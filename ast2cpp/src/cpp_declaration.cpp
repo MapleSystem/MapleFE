@@ -276,6 +276,8 @@ class CollectDecls : public AstVisitor {
 };
 
 std::string CppDecl::GetIdentifierName(TreeNode *node) {
+  if (node == nullptr)
+    return std::string();
   switch (node->GetKind()) {
     case NK_Identifier:
         return std::string(static_cast<IdentifierNode *>(node)->GetName());
@@ -339,7 +341,7 @@ std::string CppDecl::GenFunctionClass(FunctionNode* node) {
     }
   }
   // The emitter's C++ mapping for TS funcs has a "this" obj in the c++ func param list
-  // which will be generated from AST if declared as a TS func parameter as required by 
+  // which will be generated from AST if declared as a TS func parameter as required by
   // TS strict node, but TS funcs that do not reference 'this' are not required to declare
   // it, in which case emitter has to check and insert a generic this param for C++ func.
   if (node->GetParamsNum() == 0) {               // TS func param list empty
