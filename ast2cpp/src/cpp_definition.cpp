@@ -84,14 +84,15 @@ std::string CppDef::EmitModuleNode(ModuleNode *node) {
   // definitions
   str += mCppDecl.GetDefinitions();
 
-  // definitions of all functions in current module
+  // definitions of all top level functions in current module
   CfgFunc *mod = mHandler->GetCfgFunc();
   auto num = mod->GetNestedFuncsNum();
   for(unsigned i = 0; i < num; ++i) {
     CfgFunc *func = mod->GetNestedFuncAtIndex(i);
     TreeNode *node = func->GetFuncNode();
+    hFuncTable.AddTopLevelFunc(node);
+    hFuncTable.AddNameIsTopLevelFunc(node->GetName());
     std::string s = EmitTreeNode(node) + GetEnding(node);
-    std::string id = EmitTreeNode(static_cast<FunctionNode *>(node)->GetFuncName());
     str += s;
   }
 
@@ -213,7 +214,7 @@ std::string CppDef::EmitClassProps(TreeNode* node) {
           typeId = static_cast<UserTypeNode*>(n)->GetTypeId();
       }
     }
-    addProp += "  "s + hlpClassFldAddProp("this", c->GetName(), fdName, fdType, TypeIdToJSTypeCXX[typeId]) + ";\n"s;
+    addProp += "  "s + GenClassFldAddProp("this", c->GetName(), fdName, fdType, TypeIdToJSTypeCXX[typeId]) + ";\n"s;
   }
   return "  // Add class fields to obj prop list\n"s + clsFd + addProp;
 }
@@ -256,6 +257,7 @@ std::string CppDef::EmitFuncScopeVarDecls(FunctionNode *node) {
 }
 
 std::string CppDef::EmitFunctionNode(FunctionNode *node) {
+  bool isTopLevel = hFuncTable.IsTopLevelFunc(node);
   if (mIsInit || node == nullptr)
     return std::string();
 
@@ -266,19 +268,39 @@ std::string CppDef::EmitFunctionNode(FunctionNode *node) {
     str += className + "* "s + className + "::Ctor::operator()("s + className + "* obj"s;
   } else {
     str = mCppDecl.GetTypeString(node->GetType(), node->GetType());
-    if(node->GetStrIdx())
-      str += " "s + (IsClassMethod(node) ? GetClassName(node) + "::"s : ""s) + node->GetName();
+    if(node->GetStrIdx()) {
+      str += " "s;
+      if (IsClassMethod(node))
+        str += GetClassName(node) + "::"s + node->GetName();
+      else if (isTopLevel)
+        str += "Cls_"s + node->GetName() + "::_body"s; // emit body of top level function
+      else
+        str += node->GetName();
+    }
     str += "("s;
   }
 
+  std::string params;
   for (unsigned i = 0; i < node->GetParamsNum(); ++i) {
     if (i || node->IsConstructor())
-      str += ", "s;
+      params += ", "s;
     if (auto n = node->GetParam(i)) {
-      str += mCppDecl.EmitTreeNode(n);
+      params += mCppDecl.EmitTreeNode(n);
     }
   }
-  str += ")"s;
+
+  if (isTopLevel && !IsClassMethod(node)) {
+    // The emitter's C++ mapping for top level TS funcs has a "this" obj in the c++ func param
+    // list which will be generated from AST if declared as a TS func parameter as required by
+    // TS strict node, but TS funcs that do not reference 'this' are not required to declare
+    // it, in which case emitter has to check and insert a generic this param for C++ func.
+    if (node->GetParamsNum() == 0)                 // TS func param list empty
+      params = "t2crt::Object* _this"s;
+    else if (!node->GetParam(0)->IsLiteral() ||    // TS func 1st param is not "this"
+             !AstDump::GetEnumLitData(static_cast<LiteralNode*>(node->GetParam(0))->GetData()).compare("this") == 0)
+      params = "t2crt::Object* _this, "s + params;
+  }
+  str += params + ")"s;
   int bodyPos = str.size();
   if (auto n = node->GetBody()) {
     auto varDecls = EmitFuncScopeVarDecls(node);
@@ -498,7 +520,12 @@ std::string CppDef::EmitDeclNode(DeclNode *node) {
       str += EmitObjPropInit(varStr, idType, static_cast<StructLiteralNode*>(n));
     else if (node->GetVar()->IsIdentifier() && n->IsIdentifier() && n->IsTypeIdClass())
       str += varStr + "= &"s + n->GetName() + "_ctor"s;           // init with ctor address
-    else
+    else if (n->IsFunction()) {
+      if (hFuncTable.IsTopLevelFunc(n)) {
+        str += varStr + " = new "s + "Cls_" + n->GetName() + "()"s;
+        hFuncTable.AddNameIsTopLevelFunc(varStr);
+      }
+    } else
       str += varStr + " = "s + EmitTreeNode(n);
   } else {
     str = varStr;
@@ -544,8 +571,12 @@ std::string CppDef::EmitCallNode(CallNode *node) {
       } else if (s.compare("super") == 0) {
         isSuper = true;
         str += EmitSuperCtorCall(node);
-      }
-      else {
+      } else if (hFuncTable.IsNameTopLevelFunc(s)) {
+        // s can be either ts function or ts var of function type
+        str += "(*"s + s + ")"s;
+      } else if (hFuncTable.IsFieldImported(s)) {
+        str += "(*"s + s + ")"s;
+      } else {
         Emitter::Replace(s, ".", "->", 0);
         str += s;
       }
@@ -657,7 +688,7 @@ std::string CppDef::EmitFieldNode(FieldNode *node) {
   if (field == "length") // for length property
     return upper + "->size()"s;
   if (mCppDecl.IsImportedModule(upper) || upnode->GetTypeId() == TY_Module) // for imported module
-    return upper + "::"s + field;
+    return hFuncTable.AddFieldIsImported(upper + "::"s + field);
   if (true) // TODO: needs to check if it accesses a Cxx class field
     return upper + "->"s + field;
   return "(*"s + upper + ")[\""s + field + "\"]"s;

@@ -36,6 +36,8 @@ public:
     return EmitTreeNode(GetASTModule());
   }
 
+  std::string GenFunctionClass(FunctionNode* node);
+
   void AddImportedModule(const std::string& module);
   bool IsImportedModule(const std::string& module);
 
@@ -68,6 +70,7 @@ public:
   virtual std::string EmitNewNode(NewNode *node);
   virtual std::string EmitStructNode(StructNode *node);
   virtual std::string EmitTypeAliasNode(TypeAliasNode* node);
+  virtual std::string EmitLiteralNode(LiteralNode* node);
   std::string GetIdentifierName(TreeNode *node);
 
   std::string GetTypeString(TreeNode *node, TreeNode *child = nullptr);

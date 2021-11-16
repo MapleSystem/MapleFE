@@ -304,6 +304,13 @@ std::string CppDecl::GetIdentifierName(TreeNode *node) {
             return GetIdentifierName(n->GetDeclAtIndex(0));
           return "Failed: one decl is expected"s;
         }
+    case NK_Literal:
+    {   // Piggybaggin on this function to parse for "this" literal.
+        std::string lit(AstDump::GetEnumLitData(static_cast<LiteralNode*>(node)->GetData()));
+        if (lit.compare("this") == 0)
+          lit = "_"s + lit;
+        return lit;
+    }
     default:
         return "Failed to get the name of "s + AstDump::GetEnumNodeKind(node->GetKind());
   }
@@ -316,6 +323,35 @@ void CppDecl::AddImportedModule(const std::string& module) {
 bool CppDecl::IsImportedModule(const std::string& module) {
   auto res = mImportedModules.find(module);
   return res != mImportedModules.end();
+}
+
+// Generate class to encap TS/JS required func interfaces
+std::string CppDecl::GenFunctionClass(FunctionNode* node) {
+  std::string params, args, retType;
+  for (unsigned i = 0; i < node->GetParamsNum(); ++i) {
+    if (i) {
+      params += ", "s;
+      args += ", "s;
+    }
+    if (auto n = node->GetParam(i)) {
+      params += EmitTreeNode(n);
+      args += GetIdentifierName(n);
+    }
+  }
+  // The emitter's C++ mapping for TS funcs has a "this" obj in the c++ func param list
+  // which will be generated from AST if declared as a TS func parameter as required by 
+  // TS strict node, but TS funcs that do not reference 'this' are not required to declare
+  // it, in which case emitter has to check and insert a generic this param for C++ func.
+  if (node->GetParamsNum() == 0) {               // TS func param list empty
+    params = "t2crt::Object* _this"s;
+    args = "_this"s;
+  }
+  else if (!node->GetParam(0)->IsLiteral() ||    // TS func 1st param is not "this"
+           !AstDump::GetEnumLitData(static_cast<LiteralNode*>(node->GetParam(0))->GetData()).compare("this") == 0) {
+    params = "t2crt::Object* _this, "s + params;
+    args = "_this, "s + args;
+  }
+  return GenFuncClass(GetTypeString(node->GetType(), nullptr), GetIdentifierName(node), params, args);
 }
 
 std::string CppDecl::EmitModuleNode(ModuleNode *node) {
@@ -350,24 +386,28 @@ namespace )""" + module + R"""( {
   // declarations of user defined classes
   str += clsDecls.GetDecls();
 
-  CollectDecls decls(this);
-  decls.VisitTreeNode(node);
-  // declarations of all variables
-  str += decls.GetDecls();
-
-  // declarations of all functions
+  // declarations of all top level functions
   CfgFunc *mod = mHandler->GetCfgFunc();
   auto num = mod->GetNestedFuncsNum();
   for(unsigned i = 0; i < num; ++i) {
     CfgFunc *func = mod->GetNestedFuncAtIndex(i);
     TreeNode *node = func->GetFuncNode();
-    if (node->GetParent() && !node->GetParent()->IsClass()) {
-      std::string func = EmitTreeNode(node);
-      std::string id = EmitTreeNode(static_cast<FunctionNode *>(node)->GetFuncName());
-      AddDefinition(func);
-      str += "extern "s + func;
+    if (!IsClassMethod(node)) {
+      str += GenFunctionClass(static_cast<FunctionNode*>(node));  // gen func cls for each top level func
+      if (!mHandler->IsFromLambda(node)) {
+        // top level funcs instantiated here as function objects from their func class
+        // top level lamda funcs instantiated later in assignment stmts
+        std::string func = ClsName(node->GetName()) + "* "s + node->GetName() + " = new "s + ClsName(node->GetName()) + "();\n"s;
+        AddDefinition(func);
+        str += "extern "s + ClsName(node->GetName()) + "* "s + node->GetName() + ";\n"s;
+      }
     }
   }
+
+  CollectDecls decls(this);
+  decls.VisitTreeNode(node);
+  // declarations of all variables
+  str += decls.GetDecls();
 
   // Generate code for all exports
   str += xxportModules.GetExports() + "\nnamespace __export {}\n"s;
@@ -468,7 +508,7 @@ std::string CppDecl::EmitPrimTypeNode(PrimTypeNode *node) {
 std::string CppDecl::EmitDeclNode(DeclNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str, type;
+  std::string str;
   if (auto n = node->GetVar()) {
     str += "  "s + EmitTreeNode(n);
   }
@@ -604,8 +644,14 @@ std::string CppDecl::GetTypeString(TreeNode *node, TreeNode *child) {
     switch(k) {
       case TY_Object:
         return "t2crt::Object* "s;
-      case TY_Function:
-        return "t2crt::Function* "s;
+      case TY_Function: // Need to handle class constructor type: Ctor_<class>*
+      {
+        std::string funcName = GetClassOfAssignedFunc(node);
+        if (!funcName.empty())
+          return funcName + "* ";
+        else
+          return "t2crt::Function* "s;
+      }
       case TY_Boolean:
         return "bool "s;
       case TY_Int:
@@ -825,7 +871,7 @@ std::string CppDecl::EmitInterface(StructNode *node) {
     if (auto n = node->GetField(i)) {
       str += "    "s + EmitTreeNode(n) + ";\n"s;
       if (n->IsIdentifier()) {
-        def += tab(1) + hlpClassFldAddProp("this", ifName, n->GetName(),
+        def += tab(1) + GenClassFldAddProp("this", ifName, n->GetName(),
           GetTypeString(n, static_cast<IdentifierNode*>(n)->GetType()),
           TypeIdToJSTypeCXX[hlpGetTypeId(n)]) + ";\n"s;
       }
@@ -1011,6 +1057,34 @@ std::string CppDecl::EmitTypeAliasNode(TypeAliasNode* node) {
       // todo
       str = "// type alias for "s + str + '\n';;
     }
+  }
+  return str;
+}
+
+std::string CppDecl::EmitLiteralNode(LiteralNode *node) {
+  if (node == nullptr)
+    return std::string();
+  LitData lit = node->GetData();
+  std::string str(AstDump::GetEnumLitData(lit));
+  if(lit.mType == LT_StringLiteral || lit.mType == LT_CharacterLiteral)
+    str = '"' + str + '"';
+  mPrecedence = '\030';
+  str = HandleTreeNode(str, node);
+  if (auto n = node->GetType()) {
+    if (str.compare("this") == 0) {
+      // handle special literal "this"
+      std::string type = EmitTreeNode(n);
+      if (type.compare("t2crt::JS_Val ") == 0)
+        // map type ANY for "this" to generic object type
+        str = "t2crt::Object* "s + "_this"s;
+      else
+        str = type + " _this";
+    }
+    else
+      str += ": "s + EmitTreeNode(n);
+  }
+  if (auto n = node->GetInit()) {
+    str += " = "s + EmitTreeNode(n);
   }
   return str;
 }

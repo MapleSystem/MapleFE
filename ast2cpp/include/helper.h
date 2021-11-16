@@ -19,17 +19,70 @@
 #include <unordered_map>
 #include <vector>
 #include <string>
+#include <algorithm>
+#include <set>
 #include "massert.h"
 #include "ast.h"
 #include "typetable.h"
+
+using namespace std::string_literals;
 
 namespace maplefe {
 
 extern std::unordered_map<TypeId, std::string>TypeIdToJSType;
 extern std::unordered_map<TypeId, std::string>TypeIdToJSTypeCXX;
 extern TypeId hlpGetTypeId(TreeNode* node);
-extern std::string hlpClassFldAddProp(std::string, std::string, std::string, std::string, std::string);
+extern std::string GenClassFldAddProp(std::string, std::string, std::string, std::string, std::string);
+extern std::string GenFuncClass(std::string retType, std::string funcName, std::string params, std::string args);
 extern std::string tab(int n);
+extern bool IsClassMethod(TreeNode* node);
+extern std::string GetClassOfAssignedFunc(TreeNode* node);
+
+inline std::string ClsName(std::string func) { return "Cls_"s + func; }
+
+class FuncTable {
+private:
+  std::unordered_map<unsigned, TreeNode*> TopLevelFunc; // map nodeId to TreeNode*
+  std::set<std::string> VarIsTopLevelFunc;
+  std::set<std::string> FieldIsImported;
+
+public:
+  FuncTable() {}
+  ~FuncTable() {}
+
+  // Verify if node is top level function
+  void AddTopLevelFunc(TreeNode* node) {
+    assert(node->IsFunction());
+    if (!static_cast<FunctionNode*>(node)->IsConstructor())
+      TopLevelFunc[node->GetNodeId()] = node;
+  }
+  bool IsTopLevelFunc(TreeNode* node) {
+    assert(node->IsFunction());
+    std::unordered_map<unsigned, TreeNode*>::iterator it;
+    it = TopLevelFunc.find(node->GetNodeId());
+    return(it != TopLevelFunc.end());
+  }
+
+  // Verify if name is top level func
+  void AddNameIsTopLevelFunc(std::string name) {
+    VarIsTopLevelFunc.insert(name); // name can be 1st level func, or func typed var
+  }
+  bool IsNameTopLevelFunc(std::string& name) {
+    return(VarIsTopLevelFunc.find(name) != VarIsTopLevelFunc.end());
+  }
+
+  // Verify if string (xxx::yyy) is an Imported fields
+  std::string& AddFieldIsImported(std::string field) {
+    FieldIsImported.insert(field);
+    return(field);
+  }
+  bool IsFieldImported(std::string& field) {
+    return(FieldIsImported.find(field) != FieldIsImported.end());
+  }
+};
+
+extern FuncTable hFuncTable;
+
 }
 #endif  // __HELPER_H__
 
