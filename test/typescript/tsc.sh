@@ -37,6 +37,7 @@ for f; do
    fi
    if [ -f "$js" ]; then
      bash -x -c "node $js"
+     [ $? -ne 0 ] && echo "(nodejs)"$f >> tsc.failures.out
    fi 2>&1 > $f-nodejs.out
    ReleaseLock tsc
   ) >& $f-tsc.out &
@@ -46,10 +47,10 @@ rc=0
 if [ -f tsc.failures.out ]; then
   echo -e "\nTest cases failed with tsc strict mode enabled:"
   sort tsc.failures.out | grep "(--strict)" | xargs -n1 | nl
-  grep -q "(non-strict)" tsc.failures.out
+  grep -q -e "(non-strict)" -e "(nodejs)" tsc.failures.out
   if [ $? -eq 0 ]; then
-    echo -e "\nTest cases failed with non-strict mode:"
-    sort tsc.failures.out | grep "(non-strict)" | xargs -n1 | nl
+    echo -e "\nTest cases failed with non-strict mode or nodejs:"
+    sort tsc.failures.out | grep -e "(non-strict)" -e "(nodejs)" | xargs -n1 | nl
     rc=2
   else
     echo -e "\nAll passed with tsc non-strict mode."
