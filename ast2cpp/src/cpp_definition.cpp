@@ -64,9 +64,11 @@ std::string CppDef::EmitDefaultCtor(ClassNode *c) {
 std::string CppDef::EmitCppCtor(ClassNode* node) {
   std::string str, base, props;
   props = EmitClassProps(node);
+  if (!props.empty())
+    props = "\n"s + props;
   base = (node->GetSuperClassesNum() != 0)? node->GetSuperClass(0)->GetName() : "t2crt::Object";
   str += node->GetName() + "::"s + node->GetName() + "(t2crt::Function* ctor, t2crt::Object* proto): "s
-    + base + "(ctor, proto)"  + " {\n"s + props +"}\n"s;
+    + base + "(ctor, proto)"  + " {"s + props +"}\n"s;
   return str;
 }
 
@@ -117,21 +119,11 @@ std::string CppDef::EmitModuleNode(ModuleNode *node) {
   mIsInit = true;
   for (unsigned i = 0; i < node->GetTreesNum(); ++i) {
     if (auto n = node->GetTree(i)) {
-#if 0
-      if (!n->IsClass())
-        str += "  "s + EmitTreeNode(n) + ";\n"s;
-#else
-      if (n->GetKind() != NK_Class) {
-        std::string s = tab(1) + EmitTreeNode(n);
-        if (s.back() == '\n') {
-          str += s;
-          continue;
-        } else if (s.back() == ';')
-          str += s + "\n"s;
-        else if (!s.empty())
-          str += s + ";\n"s;
+      if (!n->IsClass()) {
+        std::string s = EmitTreeNode(n);
+        if (!s.empty())
+          str += "  "s + s + ";\n"s;
       }
-#endif
     }
   }
   str += R"""(}
@@ -266,7 +258,7 @@ std::string CppDef::EmitFuncScopeVarDecls(FunctionNode *node) {
   for (auto const&[key, val] : varDeclsInScope) {
     // Emit decl for the var  (just type, name - init part emitted
     // when corresponding DeclNode processed
-    str += mCppDecl.EmitTreeNode(val->GetVar()) + ";"s;
+    str += tab(1) + mCppDecl.EmitTreeNode(val->GetVar()) + ";\n"s;
   }
   return str;
 }
@@ -315,16 +307,16 @@ std::string CppDef::EmitFunctionNode(FunctionNode *node) {
              !AstDump::GetEnumLitData(static_cast<LiteralNode*>(node->GetParam(0))->GetData()).compare("this") == 0)
       params = "t2crt::Object* _this, "s + params;
   }
-  str += params + ")"s;
+  str += params + ") "s;
   int bodyPos = str.size();
   if (auto n = node->GetBody()) {
     auto varDecls = EmitFuncScopeVarDecls(node);
     auto s = EmitBlockNode(n);
     if(s.empty() || s.front() != '{')
-      str += "{"s + s + "}\n"s;
+      str += "{\n"s + s + "}\n"s;
     else
       str += s;
-    str.insert(bodyPos+1, varDecls);
+    str.insert(bodyPos+2, varDecls);  // skip over leading "{\n" of generated block
   } else
     str += "{}\n"s;
 
@@ -413,9 +405,9 @@ std::string CppDef::EmitDirectFieldInit(std::string varName, StructLiteralNode* 
       std::string fieldName = EmitTreeNode(field->GetFieldName());
       std::string fieldVal = EmitTreeNode(lit);
       if (false) // TODO: Check if it accesses a Cxx class field
-        str += tab(2) + varName + "->"s + fieldName + " = "s + fieldVal + ";\n"s;
+        str += tab(1) + varName + "->"s + fieldName + " = "s + fieldVal + ";\n"s;
       else
-        str += tab(2) + "(*"s + varName + ")[\""s + fieldName + "\"] = "s + fieldVal + ";\n"s;
+        str += tab(1) + "(*"s + varName + ")[\""s + fieldName + "\"] = "s + fieldVal + ";\n"s;
     }
   }
   return str;
@@ -749,7 +741,9 @@ std::string CppDef::EmitBlockNode(BlockNode *node) {
   std::string str("{\n");
   for (unsigned i = 0; i < node->GetChildrenNum(); ++i) {
     if (auto n = node->GetChildAtIndex(i)) {
-      str += "  "s + EmitTreeNode(n) + GetEnding(n);
+      std::string s = EmitTreeNode(n);
+      if (!s.empty())
+        str += "  "s + s + GetEnding(n);
     }
   }
   str += "}\n"s;

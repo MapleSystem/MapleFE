@@ -882,6 +882,8 @@ std::string CppDecl::EmitInterface(StructNode *node) {
     str = "class "s + ifName + " : public "s + superClass + " {\n"s;
   }
   str += "  public:\n"s;
+
+  // Generate code to add prop in class constructor
   for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
     if (auto n = node->GetField(i)) {
       str += "    "s + EmitTreeNode(n) + ";\n"s;
@@ -892,13 +894,16 @@ std::string CppDecl::EmitInterface(StructNode *node) {
       }
     }
   }
+  if (!def.empty())
+    def = "\n"+def;
+
   str += "    "s  + ifName + "() {};\n"s;
   str += "    ~"s + ifName + "() {};\n"s;
   str += "    "s + ifName + "(t2crt::Function* ctor, t2crt::Object* proto);\n"s;
   str += "    "s + ifName + "(t2crt::Function* ctor, t2crt::Object* proto, std::vector<t2crt::ObjectProp> props): "s + superClass + "(ctor, proto, props) {}\n"s;
   str += "};\n"s;
 
-  def = ifName + "::"s + ifName + "(t2crt::Function* ctor, t2crt::Object* proto): "s + superClass + "(ctor, proto) {\n" + def + "}\n";
+  def = ifName + "::"s + ifName + "(t2crt::Function* ctor, t2crt::Object* proto): "s + superClass + "(ctor, proto) {" + def + "}\n";
   AddDefinition(def);
   return str;
 }

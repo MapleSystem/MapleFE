@@ -44,9 +44,11 @@ std::string Emitter::GetEnding(TreeNode *n) {
   }
   std::string str;
   switch(n->GetKind()) {
+    case NK_Function:
+      str = "\n"s;
+      break;
     default:
       str += ';';
-    //case NK_Function:
     case NK_Block:
     case NK_Switch:
     case NK_ForLoop:
