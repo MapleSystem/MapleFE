@@ -1936,7 +1936,7 @@ std::string Emitter::EmitModuleNode(ModuleNode *node) {
   }
   if (auto p = node->GetParent()) {
     std::string name = node->GetFilename();
-    if (!p->IsXXportAsPair()) // TODO: Needs a flag for ambient module with quoted name
+    if (p->IsDeclare()) // TODO: Needs a flag for ambient module with quoted name
       name = '"' + name + '"';
     str = "module "s + name + " {\n"s + str + "}\n"s;
   }
