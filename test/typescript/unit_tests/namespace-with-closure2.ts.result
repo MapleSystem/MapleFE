@@ -1,0 +1,30 @@
+Matched 27 tokens.
+Matched 34 tokens.
+Matched 43 tokens.
+Matched 52 tokens.
+Matched 61 tokens.
+Matched 69 tokens.
+Matched 78 tokens.
+Matched 87 tokens.
+============= Module ===========
+== Sub Tree ==
+namespace  ns
+  js_let Decl: i=10
+  export {func  func()  throws: 
+  return () -> PreInc i
+} 
+
+== Sub Tree ==
+import {ns.func as myFunc} 
+== Sub Tree ==
+js_var Decl: f=myFunc()
+== Sub Tree ==
+console.log(f())
+== Sub Tree ==
+console.log(f())
+== Sub Tree ==
+f Assign ns.func()
+== Sub Tree ==
+console.log(f())
+== Sub Tree ==
+console.log(f())
