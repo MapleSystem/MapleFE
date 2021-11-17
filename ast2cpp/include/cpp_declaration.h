@@ -93,5 +93,15 @@ inline bool IsVarInitClass(DeclNode* node) {
 
 bool IsBuiltinObj(std::string name);
 
+template <class T>
+bool HasAttrStatic(T* node) {
+  for (unsigned i = 0; i < node->GetAttrsNum(); ++i) {
+    std::string s = Emitter::GetEnumAttrId(node->GetAttrAtIndex(i));
+    if (s.compare("static ") == 0)
+      return true;
+  }
+  return false;
+}
+
 } // namespace maplefe
 #endif

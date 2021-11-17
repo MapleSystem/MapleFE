@@ -71,6 +71,8 @@ public:
   std::string EmitObjPropInit(std::string varName, TreeNode* idType, StructLiteralNode* n);
   std::string EmitDirectFieldInit(std::string varName, StructLiteralNode* node);
   std::string EmitCppCtor(ClassNode* node);
+  std::string EmitCtorInstance(ClassNode *c);
+  std::string EmitDefaultCtor(ClassNode *c);
   std::string EmitBracketNotationProp(ArrayElementNode* ae, OprId binOpId, bool isLhs, bool& isDynProp);
   std::string EmitArrayLiteral(TreeNode* arrType, TreeNode* arrLiteral);
   std::string EmitArrayLiterals(TreeNode* arrLiteral, int dim, std::string type);

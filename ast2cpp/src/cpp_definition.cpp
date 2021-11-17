@@ -18,7 +18,7 @@
 
 namespace maplefe {
 
-std::string EmitCtorInstance(ClassNode *c) {
+std::string CppDef::EmitCtorInstance(ClassNode *c) {
   std::string str, thisClass, ctor, proto, prototypeProto;
   ctor = "&t2crt::Function_ctor";
   thisClass = c->GetName();
@@ -32,11 +32,22 @@ std::string EmitCtorInstance(ClassNode *c) {
   }
   str = "\n// Instantiate constructor\n"s;
   str += thisClass + "::Ctor "s + thisClass+"_ctor("s +ctor+","s+proto+","+prototypeProto+");\n"s;
+
+  // piggy back generation of static field definition
+  for (unsigned i = 0; i < c->GetFieldsNum(); ++i) {
+    auto n = c->GetField(i);
+    if (n->IsIdentifier() &&
+        HasAttrStatic<IdentifierNode>(static_cast<IdentifierNode*>(n))) {
+      str += mCppDecl.GetTypeString(n, n) + " "s + thisClass + "::"s + EmitTreeNode(n);
+      str += ";\n";
+    }
+  }
+
   return str;
 }
 
 // Emit default constructor func def and instance
-std::string EmitDefaultCtor(ClassNode *c) {
+std::string CppDef::EmitDefaultCtor(ClassNode *c) {
   if (c == nullptr)
     return std::string();
 
@@ -111,14 +122,14 @@ std::string CppDef::EmitModuleNode(ModuleNode *node) {
         str += "  "s + EmitTreeNode(n) + ";\n"s;
 #else
       if (n->GetKind() != NK_Class) {
-        std::string s = EmitTreeNode(n);
+        std::string s = tab(1) + EmitTreeNode(n);
         if (s.back() == '\n') {
-          str += ' ' + s;
+          str += s;
           continue;
         } else if (s.back() == ';')
-          str += ' ' + s + "\n"s;
+          str += s + "\n"s;
         else if (!s.empty())
-          str += ' ' + s + ";\n"s;
+          str += s + ";\n"s;
       }
 #endif
     }
@@ -183,8 +194,9 @@ std::string CppDef::EmitXXportAsPairNode(XXportAsPairNode *node) {
   return std::string();
 }
 
-inline std::string GetClassName(FunctionNode* f) {
-  TreeNode* n = f->GetParent();
+// Return class name from class method or class field
+inline std::string GetClassName(TreeNode* node) {
+  TreeNode* n = node->GetParent();
   if (n && n->IsClass())
     return n->GetName();
   return ""s;
@@ -203,11 +215,14 @@ std::string CppDef::EmitClassProps(TreeNode* node) {
     if (!node->IsIdentifier())
       // StrIndexSig, NumIndexSig, ComputedName have to be handled at run time
       continue;
+    IdentifierNode* id = static_cast<IdentifierNode*>(node);
+    if (HasAttrStatic<IdentifierNode>(id)) // static props are added to class ctor
+      continue;
     std::string fdName = node->GetName();
-    std::string fdType = mCppDecl.GetTypeString(node, static_cast<IdentifierNode*>(node)->GetType());
+    std::string fdType = mCppDecl.GetTypeString(node, id->GetType());
     TypeId typeId = node->GetTypeId();
     if (typeId == TY_None) {
-      if (auto n = static_cast<IdentifierNode*>(node)->GetType()) {
+      if (auto n = id->GetType()) {
         if (n->IsPrimType())
           typeId = static_cast<PrimTypeNode*>(n)->GetPrimType();
         else if (n->IsUserType())
@@ -571,11 +586,13 @@ std::string CppDef::EmitCallNode(CallNode *node) {
       } else if (s.compare("super") == 0) {
         isSuper = true;
         str += EmitSuperCtorCall(node);
-      } else if (hFuncTable.IsNameTopLevelFunc(s)) {
+      } else if (hFuncTable.IsTopLevelFuncName(s)) {
         // s can be either ts function or ts var of function type
         str += "(*"s + s + ")"s;
-      } else if (hFuncTable.IsFieldImported(s)) {
+      } else if (hFuncTable.IsImportedField(s)) {
         str += "(*"s + s + ")"s;
+      } else if (hFuncTable.IsStaticMember(s)) {
+        str += "("s + s +")"s;
       } else if (s.find("->") != std::string::npos)
         str += s;
       else
@@ -681,8 +698,19 @@ std::string CppDef::EmitFieldNode(FieldNode *node) {
   auto upnode = node->GetUpper();
   if (upnode)
     upper = EmitTreeNode(upnode);
-  if (auto n = node->GetField())
+  if (auto n = node->GetField()) {
     field = EmitTreeNode(n);
+    if (n->IsIdentifier()) {  // check for static class field or method
+      if (auto decl = mHandler->FindDecl(static_cast<IdentifierNode*>(n))) {
+        if ((decl->IsFunction()   && HasAttrStatic<FunctionNode>(static_cast<FunctionNode*>(decl))) ||
+            (decl->IsIdentifier() && HasAttrStatic<IdentifierNode>(static_cast<IdentifierNode*>(decl)))) {
+          std::string fdStr = GetClassName(decl) + "::"s + field;
+          hFuncTable.AddMemberIsStatic(fdStr);
+          return fdStr;
+        }
+      }
+    }
+  }
   if (upper.empty() || field.empty()) // Error if either is empty
     return "%%%Empty%%%";
   if (field == "length") // for length property

@@ -37,20 +37,20 @@ extern std::string GenFuncClass(std::string retType, std::string funcName, std::
 extern std::string tab(int n);
 extern bool IsClassMethod(TreeNode* node);
 extern std::string GetClassOfAssignedFunc(TreeNode* node);
-
 inline std::string ClsName(std::string func) { return "Cls_"s + func; }
 
 class FuncTable {
 private:
   std::unordered_map<unsigned, TreeNode*> TopLevelFunc; // map nodeId to TreeNode*
-  std::set<std::string> VarIsTopLevelFunc;
-  std::set<std::string> FieldIsImported;
+  std::set<std::string> TopLevelFuncNm;   // name of top level func or name of var assigned top level func
+  std::set<std::string> ImportedFields;
+  std::set<std::string> StaticMembers;
 
 public:
   FuncTable() {}
   ~FuncTable() {}
 
-  // Verify if node is top level function
+  // Check if node is top level function
   void AddTopLevelFunc(TreeNode* node) {
     assert(node->IsFunction());
     if (!static_cast<FunctionNode*>(node)->IsConstructor())
@@ -63,21 +63,30 @@ public:
     return(it != TopLevelFunc.end());
   }
 
-  // Verify if name is top level func
+  // Check if name is top level func
   void AddNameIsTopLevelFunc(std::string name) {
-    VarIsTopLevelFunc.insert(name); // name can be 1st level func, or func typed var
+    TopLevelFuncNm.insert(name); // name can be 1st level func, or func typed var
   }
-  bool IsNameTopLevelFunc(std::string& name) {
-    return(VarIsTopLevelFunc.find(name) != VarIsTopLevelFunc.end());
+  bool IsTopLevelFuncName(std::string& name) {
+    return(TopLevelFuncNm.find(name) != TopLevelFuncNm.end());
   }
 
-  // Verify if string (xxx::yyy) is an Imported fields
+  // Check if string (xxx::yyy) is an Imported field
   std::string& AddFieldIsImported(std::string field) {
-    FieldIsImported.insert(field);
+    ImportedFields.insert(field);
     return(field);
   }
-  bool IsFieldImported(std::string& field) {
-    return(FieldIsImported.find(field) != FieldIsImported.end());
+  bool IsImportedField(std::string& field) {
+    return(ImportedFields.find(field) != ImportedFields.end());
+  }
+
+  // Check if a class member (field or method) is static
+  std::string& AddMemberIsStatic(std::string field) {
+    StaticMembers.insert(field);
+    return(field);
+  }
+  bool IsStaticMember(std::string& field) {
+    return(StaticMembers.find(field) != StaticMembers.end());
   }
 };
 

@@ -444,6 +444,9 @@ std::string CppDecl::EmitFunctionNode(FunctionNode *node) {
     }
   }
   str += ");\n"s;
+
+  if (HasAttrStatic<FunctionNode>(node))
+    str = "static "s + str;
   return str;
 }
 
@@ -498,6 +501,9 @@ std::string CppDecl::EmitIdentifierNode(IdentifierNode *node) {
     return std::string();
   std::string str(GetTypeString(node, node->GetType()));
   str += " "s + node->GetName();
+
+  if (HasAttrStatic<IdentifierNode>(node))
+    str = "static "s + str;
   return str;
 }
 
@@ -743,6 +749,7 @@ std::string CppDecl::EmitUserTypeNode(UserTypeNode *node) {
 std::string CppDecl::EmitClassNode(ClassNode *node) {
   std::string str;
   std::string base;
+  std::string staticProps;
 
   if (node == nullptr)
     return std::string();
@@ -757,40 +764,46 @@ std::string CppDecl::EmitClassNode(ClassNode *node) {
   str += "  "s + node->GetName() + "(t2crt::Function* ctor, t2crt::Object* proto);\n"s;
   str += "  ~"s + node->GetName() + "(){}\n";
 
-  // class field decl and init. TODO: handle static, private, protected attrs.
+  // class field decl and init. TODO: handle private, protected attrs.
   for (unsigned i = 0; i < node->GetFieldsNum(); ++i) {
     auto n = node->GetField(i);
-    if (n->IsIdentifier() && std::strcmp(static_cast<IdentifierNode*>(n)->GetName(), "private") == 0)
+    if (n->IsIdentifier() && GetIdentifierName(n).compare("private")==0)
       continue;
     str += "  "s + EmitTreeNode(n);
-    if (n->IsIdentifier() && static_cast<IdentifierNode*>(n)->GetInit()) {
-      if (auto init = static_cast<IdentifierNode*>(n)->GetInit()) {
-        if (init->IsArrayLiteral() &&
-            static_cast<IdentifierNode*>(n)->GetType() &&
-            static_cast<IdentifierNode*>(n)->GetType()->IsPrimArrayType() ) {
-              // Generate initializer for t2crt::Array member field decl in header file
-              PrimArrayTypeNode* mtype = static_cast<PrimArrayTypeNode *>(static_cast<IdentifierNode*>(n)->GetType());
-              str += " = "s + EmitArrayLiteral(static_cast<ArrayLiteralNode*>(init),
-                                mtype->GetDims()->GetDimensionsNum(),
-                                EmitPrimTypeNode(mtype->GetPrim()));
+
+    if (n->IsIdentifier()) {
+      IdentifierNode* id = static_cast<IdentifierNode*>(n);
+      if (HasAttrStatic<IdentifierNode>(id)) {
+        // static field - add field to ctor prop and init later at field def in cpp
+        staticProps += tab(3) + "this->AddProp(\""s + n->GetName() + "\", t2crt::JS_Val("s +
+          TypeIdToJSTypeCXX[n->GetTypeId()] + ", &"s + node->GetName() + "::"s + id->GetName() + "));\n"s;
+      } else if (auto init = id->GetInit()) {
+        if (init->IsArrayLiteral() && id->GetType() && id->GetType()->IsPrimArrayType()) {
+          // Generate initializer for t2crt::Array member field decl in header file
+          PrimArrayTypeNode* mtype = static_cast<PrimArrayTypeNode *>(id->GetType());
+          str += " = "s + EmitArrayLiteral(static_cast<ArrayLiteralNode*>(init),
+                            mtype->GetDims()->GetDimensionsNum(),
+                            EmitPrimTypeNode(mtype->GetPrim()));
         } else {
-          str += " = "s + EmitTreeNode(static_cast<IdentifierNode *>(n)->GetInit());
+          str += " = "s + EmitTreeNode(init);
         }
       }
     }
     str += ";\n";
   }
   for (unsigned i = 0; i < node->GetMethodsNum(); ++i) {
-    str += EmitFunctionNode(node->GetMethod(i));
+    str += tab(1) + EmitFunctionNode(node->GetMethod(i));
   }
   str += "  virtual const char* __GetClassName() const {return \""s + node->GetName() + " \";}\n"s;
 
-  // 2. c++ class for JS object's corresponding JS constructor
+  // 2. c++ class for the JS object's JS constructor
   std::string indent = tab(1);
+  if (!staticProps.empty()) staticProps = "\n"s + staticProps;
   base = (node->GetSuperClassesNum() != 0)? (node->GetSuperClass(0)->GetName()+"::Ctor"s) : "t2crt::Function";
   str += indent + "class Ctor : public "s + base + " {\n"s;
   str += indent + "public:\n";
-  str += indent + "  Ctor(t2crt::Function* ctor, t2crt::Object* proto, t2crt::Object* prototype_proto) : "s+base+"(ctor, proto, prototype_proto) {}\n";
+  str += indent + "  Ctor(t2crt::Function* ctor, t2crt::Object* proto, t2crt::Object* prototype_proto) : "s +
+    base + "(ctor, proto, prototype_proto) {"s + staticProps + tab(2) + "}\n"s;
 
   // constructor function
   for (unsigned i = 0; i < node->GetConstructorsNum(); ++i) {
