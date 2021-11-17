@@ -17,54 +17,54 @@
 #define __CPPDEFINITIONEMITTER_HEADER__
 
 #include "ast_handler.h"
-#include "emitter.h"
+#include "cpp_emitter.h"
 #include "cpp_declaration.h"
 
 namespace maplefe {
 
-class CppDef : public Emitter {
+class CppDef : public CppEmitter {
 public:
   CppDecl        &mCppDecl;
   bool            mIsInit;
 
-  CppDef(Module_Handler *h, CppDecl &d) : Emitter(h), mCppDecl(d), mIsInit(false) {}
+  CppDef(Module_Handler *h, CppDecl &d) : CppEmitter(h), mCppDecl(d), mIsInit(false) {}
 
   std::string Emit() {
     return EmitTreeNode(GetASTModule());
   }
 
-  virtual std::string EmitIdentifierNode(IdentifierNode *node);
-  virtual std::string EmitImportNode(ImportNode *node);
-  virtual std::string EmitXXportAsPairNode(XXportAsPairNode *node);
-  virtual std::string EmitExportNode(ExportNode *node);
-  virtual std::string EmitUnaOperatorNode(UnaOperatorNode *node);
-  virtual std::string EmitBinOperatorNode(BinOperatorNode *node);
-  virtual std::string EmitBlockNode(BlockNode *node);
-  virtual std::string EmitDeclNode(DeclNode *node);
-  virtual std::string EmitFieldNode(FieldNode *node);
-  virtual std::string EmitArrayLiteralNode(ArrayLiteralNode *node);
-  virtual std::string EmitTemplateLiteralNode(TemplateLiteralNode *node);
-  virtual std::string EmitLiteralNode(LiteralNode *node);
-  virtual std::string EmitCondBranchNode(CondBranchNode *node);
-  virtual std::string EmitBreakNode(BreakNode *node);
-  virtual std::string EmitContinueNode(ContinueNode *node);
-  virtual std::string EmitForLoopNode(ForLoopNode *node);
-  virtual std::string EmitSwitchNode(SwitchNode *node);
-  virtual std::string EmitCallNode(CallNode *node);
-  virtual std::string EmitFunctionNode(FunctionNode *node);
-  virtual std::string EmitTypeOfNode(TypeOfNode *node);
-  virtual std::string EmitModuleNode(ModuleNode *node);
-  virtual std::string EmitPrimTypeNode(PrimTypeNode *node);
-  virtual std::string EmitPrimArrayTypeNode(PrimArrayTypeNode *node);
-  virtual std::string EmitNewNode(NewNode *node);
-  virtual std::string EmitClassProps(TreeNode *node);
-  virtual std::string EmitArrayElementNode(ArrayElementNode *node);
-  virtual std::string EmitTypeAliasNode(TypeAliasNode* node);
-  virtual std::string EmitInstanceOfNode(InstanceOfNode *node);
-  virtual std::string EmitDeclareNode(DeclareNode *node);
-  virtual std::string EmitAsTypeNode(AsTypeNode *node);
-  virtual std::string& HandleTreeNode(std::string &str, TreeNode *node);
+  std::string EmitIdentifierNode(IdentifierNode *node) override;
+  std::string EmitImportNode(ImportNode *node) override;
+  std::string EmitXXportAsPairNode(XXportAsPairNode *node) override;
+  std::string EmitExportNode(ExportNode *node) override;
+  std::string EmitUnaOperatorNode(UnaOperatorNode *node) override;
+  std::string EmitBinOperatorNode(BinOperatorNode *node) override;
+  std::string EmitBlockNode(BlockNode *node) override;
+  std::string EmitDeclNode(DeclNode *node) override;
+  std::string EmitFieldNode(FieldNode *node) override;
+  std::string EmitArrayLiteralNode(ArrayLiteralNode *node) override;
+  std::string EmitTemplateLiteralNode(TemplateLiteralNode *node) override;
+  std::string EmitLiteralNode(LiteralNode *node) override;
+  std::string EmitCondBranchNode(CondBranchNode *node) override;
+  std::string EmitBreakNode(BreakNode *node) override;
+  std::string EmitContinueNode(ContinueNode *node) override;
+  std::string EmitForLoopNode(ForLoopNode *node) override;
+  std::string EmitSwitchNode(SwitchNode *node) override;
+  std::string EmitCallNode(CallNode *node) override;
+  std::string EmitFunctionNode(FunctionNode *node) override;
+  std::string EmitTypeOfNode(TypeOfNode *node) override;
+  std::string EmitModuleNode(ModuleNode *node) override;
+  std::string EmitPrimTypeNode(PrimTypeNode *node) override;
+  std::string EmitPrimArrayTypeNode(PrimArrayTypeNode *node) override;
+  std::string EmitNewNode(NewNode *node) override;
+  std::string EmitArrayElementNode(ArrayElementNode *node) override;
+  std::string EmitTypeAliasNode(TypeAliasNode* node) override;
+  std::string EmitInstanceOfNode(InstanceOfNode *node) override;
+  std::string EmitDeclareNode(DeclareNode *node) override;
+  std::string EmitAsTypeNode(AsTypeNode *node) override;
+  std::string& HandleTreeNode(std::string &str, TreeNode *node) override;
 
+  std::string EmitClassProps(TreeNode *node);
   std::string EmitFuncScopeVarDecls(FunctionNode *node);
   std::string EmitStructNode(StructNode *node);
   std::string EmitStructLiteralNode(StructLiteralNode* node);

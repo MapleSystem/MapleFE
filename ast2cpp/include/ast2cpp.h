@@ -22,6 +22,7 @@
 
 #include "astopt.h"
 #include "ast_handler.h"
+#include "ast_module.h"
 
 namespace maplefe {
 
@@ -45,6 +46,16 @@ public:
   // return 0 if successful
   // return non-zero if failed
   int ProcessAST();
+};
+
+class CppHandler {
+private:
+  AST_Handler *mASTHandler;
+  unsigned     mFlags;
+
+public:
+  CppHandler(AST_Handler *h, unsigned f) : mASTHandler(h), mFlags(f) {}
+  bool EmitCxxFiles();
 };
 
 }

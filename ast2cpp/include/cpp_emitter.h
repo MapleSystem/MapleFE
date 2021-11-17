@@ -17,17 +17,16 @@
 #define __CPPEMITTER_HEADER__
 
 #include "ast_module.h"
+#include "emitter.h"
 
 namespace maplefe {
 
-class CppEmitter {
-private:
-  AST_Handler *mASTHandler;
-  unsigned     mFlags;
+// Class CppEmitter includes all functionalities which are common for Cpp definition and declaration
+class CppEmitter : public Emitter {
 
 public:
-  CppEmitter(AST_Handler *h, unsigned f) : mASTHandler(h), mFlags(f) {}
-  bool EmitCxxFiles();
+  CppEmitter(Module_Handler *h) : Emitter(h) {}
+
 };
 
 } // namespace maplefe

@@ -13,44 +13,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-#include <fstream>
-#include <cstdlib>
-#include "cpp_definition.h"
-#include "cpp_declaration.h"
-#include "cpp_emitter.h"
-
 namespace maplefe {
 
-bool CppEmitter::EmitCxxFiles() {
-  unsigned size = mASTHandler->GetSize();
-  for (int i = 0; i < size; i++) {
-    Module_Handler *handler = mASTHandler->GetModuleHandler(i);
-    CppDecl decl(handler);
-    { // Emit C++ header file
-      std::string decl_code = decl.Emit();
-      std::string fn = decl.GetBaseFilename() + ".h"s;
-      std::ofstream out(fn.c_str(), std::ofstream::out);
-      out << decl_code;
-      out.close();
-      if (mFlags & FLG_format_cpp) {
-        std::string cmd = "clang-format-10 -i --sort-includes=0 "s + fn;
-        std::system(cmd.c_str());
-      }
-    }
-    { // Emit C++ implementation file
-      CppDef def(handler, decl);
-      std::string def_code = def.Emit();
-      std::string fn = def.GetBaseFilename() + ".cpp"s;
-      std::ofstream out(fn.c_str(), std::ofstream::out);
-      out << def_code;
-      out.close();
-      if (mFlags & FLG_format_cpp) {
-        std::string cmd = "clang-format-10 -i --sort-includes=0 "s + fn;
-        std::system(cmd.c_str());
-      }
-    }
-  }
-  return true;
-}
 
 } // namespace maplefe
