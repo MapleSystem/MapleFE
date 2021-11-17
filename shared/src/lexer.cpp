@@ -440,7 +440,7 @@ Token* Lexer::FindRegExprToken() {
   // is defferent than outside. / is considered non-escape.
   bool on_bracket = false;   //
 
-  while (work_idx < current_line_size - 1) {
+  while (work_idx < current_line_size) {
     if (line[work_idx] == '[') {
       on_bracket = true;
       expr_length++;

@@ -1,0 +1,4 @@
+Matched 5 tokens.
+============= Module ===========
+== Sub Tree ==
+export {js_const Decl: re=reg expr :  ["\u0000-\u001f]  g} 
