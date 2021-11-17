@@ -1676,8 +1676,9 @@ rule TypeArgument: Type
 rule ConditionalType : ONEOF(MemberExpression + "extends" + Type + '?' + Type + ':' + Type,
                              TypeReference + "extends" + Type + '?' + Type + ':' + Type,
                              ObjectType + "extends" + Type + '?' + Type + ':' + Type,
-                             "unknown" + "extends" + Type + '?' + Type + ':' + Type)
-  attr.action.%1,%2,%3,%4 : BuildConditionalType(%1, %3, %5, %7)
+                             "unknown" + "extends" + Type + '?' + Type + ':' + Type,
+                             PrimaryType + "extends" + Type + '?' + Type + ':' + Type)
+  attr.action.%1,%2,%3,%4,%5 : BuildConditionalType(%1, %3, %5, %7)
 
 rule KeyOf : ONEOF("keyof" + Identifier,
                    "keyof" + '(' + TypeQuery + ')',

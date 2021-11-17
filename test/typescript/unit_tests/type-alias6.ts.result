@@ -1,0 +1,4 @@
+Matched 50 tokens.
+============= Module ===========
+== Sub Tree ==
+ type RemoveFirstType<T> = T["length"] extends 0 ? undefined : (b) ->  extends (a,b) ->  ? I : prim array-TBD
