@@ -444,8 +444,7 @@ Token* Lexer::FindRegExprToken() {
     if (line[work_idx] == '[') {
       on_bracket = true;
       expr_length++;
-    } else if (line[work_idx] == ']') {
-      MASSERT(on_bracket);
+    } else if (on_bracket && line[work_idx] == ']') {
       on_bracket = false;
       expr_length++;
     } else if (line[work_idx] == '/') {
