@@ -75,7 +75,7 @@ public:
 
 public:
   SimpleBuffer(unsigned ind) : mIndentation(ind) {}
-  ~SimpleBuffer() {}
+  virtual ~SimpleBuffer() = default;
 
   virtual WriteStatus AddChar(const char) = 0;
   virtual WriteStatus AddString(const char*) = 0;
