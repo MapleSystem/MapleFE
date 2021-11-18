@@ -1746,7 +1746,10 @@ rule PrimaryType: ONEOF(ParenthesizedType,
                         ThisType,
                         NeverArrayType,
                         Literal,
-                        ArrayLiteral)
+                        ArrayLiteral,
+                        ImportedType,
+                        ImportedType + '.' + TypeReference)
+  attr.action.%13 : BuildField(%1, %3)
 
 rule NeverArrayType : '[' + ']'
   attr.action : BuildNeverArrayType()
@@ -1825,9 +1828,10 @@ rule TupleElementType: ZEROORONE(JSIdentifier + ':') + Type
 ## rule UnionType: UnionOrIntersectionOrPrimaryType | IntersectionOrPrimaryType
 rule UnionType : ONEOF(ZEROORONE('|') + UnionOrIntersectionOrPrimaryType + '|' + IntersectionOrPrimaryType,
                        UnionOrIntersectionOrPrimaryType + '|' + KeyOf,
-                       KeyOf + '|' + UnionOrIntersectionOrPrimaryType)
+                       KeyOf + '|' + UnionOrIntersectionOrPrimaryType,
+                       TypeQuery + '|' + UnionOrIntersectionOrPrimaryType)
   attr.action.%1 : BuildUnionUserType(%2, %4)
-  attr.action.%2,%3 : BuildUnionUserType(%1, %3)
+  attr.action.%2,%3,%4 : BuildUnionUserType(%1, %3)
 
 ## rule IntersectionType: IntersectionOrPrimaryType & PrimaryType
 rule IntersectionType: ONEOF(IntersectionOrPrimaryType + '&' + PrimaryType,
@@ -1857,7 +1861,8 @@ rule TypeQuery: ONEOF("typeof" + TypeQueryExpression,
 rule TypeQueryExpression: ONEOF(IdentifierReference,
                                 TypeQueryExpression + '.' + JSIdentifier,
                                 UnaryExpression,
-                                ConditionalType)
+                                ConditionalType,
+                                ImportedType)
   attr.action.%2 : BuildField(%1, %3)
 
 ## rule ThisType: this
