@@ -5,23 +5,23 @@ class A {
 var x: A = {a: 1, b: 2};
 delete x.a;
 
-void 0;
+console.log(void 0);
 
-typeof 8;
+console.log(typeof 8);
 
 var a: number = 8;
-++a;
---a;
+console.log(++a);
+console.log(--a);
 
-+8;
-+"-8";
+console.log(+8);
+console.log(+"-8");
 
--"8";
--a;
+console.log(-"8");
+console.log(-a);
 
-~8;
-~"8";
-~a;
+console.log(~8);
+console.log(~"8");
+console.log(~a);
 
-!false;
-!true;
+console.log(!false);
+console.log(!true);

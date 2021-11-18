@@ -1,20 +1,20 @@
 Matched 17 tokens.
 Matched 32 tokens.
 Matched 37 tokens.
-Matched 40 tokens.
-Matched 43 tokens.
-Matched 50 tokens.
+Matched 45 tokens.
 Matched 53 tokens.
-Matched 56 tokens.
-Matched 58 tokens.
-Matched 61 tokens.
-Matched 64 tokens.
-Matched 67 tokens.
-Matched 70 tokens.
-Matched 73 tokens.
+Matched 60 tokens.
+Matched 68 tokens.
 Matched 76 tokens.
-Matched 79 tokens.
-Matched 82 tokens.
+Matched 83 tokens.
+Matched 91 tokens.
+Matched 99 tokens.
+Matched 107 tokens.
+Matched 115 tokens.
+Matched 123 tokens.
+Matched 131 tokens.
+Matched 139 tokens.
+Matched 147 tokens.
 ============= Module ===========
 == Sub Tree ==
 class  A
@@ -31,30 +31,30 @@ js_var Decl: x= {a:1, b:2}
 == Sub Tree ==
  delete x.a
 == Sub Tree ==
-void
+console.log(void)
 == Sub Tree ==
- typeof 8
+console.log( typeof 8)
 == Sub Tree ==
 js_var Decl: a=8
 == Sub Tree ==
-PreInc a
+console.log(PreInc a)
 == Sub Tree ==
-PreDec a
+console.log(PreDec a)
 == Sub Tree ==
-8
+console.log(8)
 == Sub Tree ==
-Plus "-8"
+console.log(Plus "-8")
 == Sub Tree ==
-Minus "8"
+console.log(Minus "8")
 == Sub Tree ==
-Minus a
+console.log(Minus a)
 == Sub Tree ==
-Bcomp 8
+console.log(Bcomp 8)
 == Sub Tree ==
-Bcomp "8"
+console.log(Bcomp "8")
 == Sub Tree ==
-Bcomp a
+console.log(Bcomp a)
 == Sub Tree ==
-Not false
+console.log(Not false)
 == Sub Tree ==
-Not true
+console.log(Not true)
