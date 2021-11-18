@@ -1,0 +1,11 @@
+Matched 22 tokens.
+Matched 48 tokens.
+============= Module ===========
+== Sub Tree ==
+func  func<T>(e)  throws: 
+  return [e]
+
+== Sub Tree ==
+func  foo<T>(arg)  throws: 
+  return func<T>(arg)[0]
+

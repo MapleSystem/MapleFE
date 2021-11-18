@@ -454,7 +454,7 @@ rule CallExpression : ONEOF(
   MemberExpression + ZEROORONE(TypeArguments) + Arguments + ZEROORMORE(AsType),
   SuperCall,
   CallExpression + Arguments + ZEROORMORE(AsType),
-  CallExpression + '[' + Expression + ']',
+  CallExpression + '[' + Expression + ']' + ZEROORONE(AsType),
   CallExpression + '.' + JSIdentifier + ZEROORMORE(AsType),
   CallExpression + TemplateLiteral,
   CallExpression + '!' + ZEROORMORE(AsType),
@@ -470,6 +470,7 @@ rule CallExpression : ONEOF(
   attr.action.%3 : AddArguments(%2)
   attr.action.%3 : AddAsType(%3)
   attr.action.%4 : BuildArrayElement(%1, %3)
+  attr.action.%4 : AddAsType(%5)
   attr.action.%5 : BuildField(%1, %3)
   attr.action.%5 : AddAsType(%4)
   attr.action.%7 : SetIsNonNull(%1)
