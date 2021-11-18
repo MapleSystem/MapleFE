@@ -755,7 +755,10 @@ std::string Emitter::EmitNewNode(NewNode *node) {
   str += "new"s;
   if (auto id = node->GetId()) {
     std::string idstr = EmitTreeNode(id);
-    if (id->IsCall() || id->IsBinOperator())
+    if (mPrecedence <= '\024'
+        && !id->IsUserType()
+        && !id->IsLambda()
+        && !id->IsFunction())
       idstr = '(' + idstr + ')';
     str += ' ' + idstr;
     if(!id->IsFunction() && !id->IsLambda() && !id->IsClass()) {
@@ -774,6 +777,7 @@ std::string Emitter::EmitNewNode(NewNode *node) {
   if (auto n = node->GetBody()) {
     str += ' ' + EmitBlockNode(n);
   }
+  // Set mPrecedence, e.g. type AType = (new () => Error)|Error;
   mPrecedence = '\004';
   return HandleTreeNode(str, node);
 }
@@ -785,7 +789,7 @@ std::string Emitter::EmitDeleteNode(DeleteNode *node) {
   if (auto n = node->GetExpr()) {
     str += EmitTreeNode(n);
   }
-  mPrecedence = '\030';
+  mPrecedence = '\021';
   return HandleTreeNode(str, node);
 }
 
