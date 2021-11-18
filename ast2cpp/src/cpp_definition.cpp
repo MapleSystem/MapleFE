@@ -122,7 +122,7 @@ std::string CppDef::EmitModuleNode(ModuleNode *node) {
       if (!n->IsClass()) {
         std::string s = EmitTreeNode(n);
         if (!s.empty())
-          str += "  "s + s + ";\n"s;
+          str += tab(1) + s + (s.back()=='\n'? "": ";\n");
       }
     }
   }
