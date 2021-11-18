@@ -131,4 +131,8 @@ std::string tab(int n) {
   return std::string(n*2,' ');
 }
 
+std::string GenAnonFuncName(TreeNode* node) {
+  return "_anon_func_"s + std::to_string(node->GetNodeId());
+}
+
 } // namespace maplefe

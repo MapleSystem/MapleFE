@@ -286,7 +286,10 @@ std::string CppDecl::GetIdentifierName(TreeNode *node) {
     case NK_Struct:
         return GetIdentifierName(static_cast<StructNode *>(node)->GetStructId());
     case NK_Function:
-        return GetIdentifierName(static_cast<FunctionNode *>(node)->GetFuncName());
+        if (static_cast<FunctionNode *>(node)->GetFuncName())
+          return GetIdentifierName(static_cast<FunctionNode *>(node)->GetFuncName());
+        else
+          return GenAnonFuncName(node);
     case NK_Class:
         return std::string(static_cast<ClassNode *>(node)->GetName());
     case NK_Interface:

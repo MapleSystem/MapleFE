@@ -37,6 +37,7 @@ extern std::string GenFuncClass(std::string retType, std::string funcName, std::
 extern std::string tab(int n);
 extern bool IsClassMethod(TreeNode* node);
 extern std::string GetClassOfAssignedFunc(TreeNode* node);
+extern std::string GenAnonFuncName(TreeNode* node);
 inline std::string ClsName(std::string func) { return "Cls_"s + func; }
 
 class FuncTable {
