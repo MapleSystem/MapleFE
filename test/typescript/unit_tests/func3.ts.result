@@ -1,0 +1,28 @@
+Matched 12 tokens.
+Matched 13 tokens.
+Matched 49 tokens.
+Matched 64 tokens.
+Matched 77 tokens.
+Matched 86 tokens.
+Matched 93 tokens.
+Matched 100 tokens.
+============= Module ===========
+== Sub Tree ==
+ts_interface: Foo {val1;val2 }
+== Sub Tree ==
+func  func(this,arg)  throws: 
+  js_var Decl: x
+  this.val1 Assign arg
+  x Assign this.val1
+  this.val2 Assign x
+
+== Sub Tree ==
+js_var Decl: a= {val1:0, val2:0}
+== Sub Tree ==
+js_var Decl: b=new func(456)
+== Sub Tree ==
+func.call(a,123)
+== Sub Tree ==
+console.log(a)
+== Sub Tree ==
+console.log(b)

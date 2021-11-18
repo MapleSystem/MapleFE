@@ -1,0 +1,24 @@
+Matched 36 tokens.
+Matched 42 tokens.
+Matched 55 tokens.
+Matched 64 tokens.
+Matched 71 tokens.
+Matched 78 tokens.
+============= Module ===========
+== Sub Tree ==
+func  func(this,arg)  throws: 
+  js_var Decl: x
+  this.val1 Assign arg
+  x Assign this.val1
+  this.val2 Assign x
+
+== Sub Tree ==
+js_var Decl: a= {}
+== Sub Tree ==
+js_var Decl: b=new func(456)
+== Sub Tree ==
+func.call(a,123)
+== Sub Tree ==
+console.log(a)
+== Sub Tree ==
+console.log(b)
