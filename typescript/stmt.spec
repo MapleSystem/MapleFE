@@ -438,8 +438,10 @@ rule AssertExpression : "asserts" + MemberExpression
 ##  new NewExpression[?Yield]
 rule NewExpression : ONEOF(MemberExpression,
                            "new" + NewExpression,
-                           "new" + ClassDeclaration)
+                           "new" + ClassDeclaration,
+                           "new" + '(' + ClassDeclaration + ')')
   attr.action.%2,%3 : BuildNewOperation(%2)
+  attr.action.%4    : BuildNewOperation(%3)
 
 ##-----------------------------------
 ##rule CallExpression[Yield] :

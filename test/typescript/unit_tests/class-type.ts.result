@@ -1,0 +1,7 @@
+Matched 13 tokens.
+Matched 31 tokens.
+============= Module ===========
+== Sub Tree ==
+console.log( typeof new ())
+== Sub Tree ==
+console.log(new ())
