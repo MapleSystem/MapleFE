@@ -361,4 +361,59 @@ Lexer* CreateLexer() {
   return lexer;
 }
 
+/////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////
+//                   Implementation of typescript Parser
+/////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////
+
+// Return a reg expr token instead of t if t is the beginning of a regular expression.
+// Or return t.
+Token* TypescriptParser::GetRegExpr(Token *t) {
+  if (!t->IsOperator())
+    return t;
+
+  if (t->GetOprId() != OPR_Div)
+    return t;
+
+  unsigned size = mActiveTokens.GetNum();
+  if (size < 2)
+    return t;
+
+  // We take care of only the following scenarios.
+  // If more need support, we will add later.
+  //   (/abc*/g, )
+  //   [/abc*/g, ]
+  //   =/abc*/g;
+  //   &&  /abc*/g;
+  //   ,/abc*/g;
+  //   : /abc*/g;
+  //   || /abc*/g;
+
+  Token *sep = mActiveTokens.ValueAtIndex(size - 1);
+  bool is_sep = false;
+  if (sep->IsSeparator() && (sep->GetSepId() == SEP_Lparen))
+    is_sep = true;
+  if (sep->IsSeparator() && (sep->GetSepId() == SEP_Lbrack))
+    is_sep = true;
+  if (sep->IsSeparator() && (sep->GetSepId() == SEP_Comma))
+    is_sep = true;
+  if (sep->IsSeparator() && (sep->GetSepId() == SEP_Colon))
+    is_sep = true;
+  if (sep->IsOperator() && (sep->GetOprId() == OPR_Assign))
+    is_sep = true;
+  if (sep->IsOperator() && (sep->GetOprId() == OPR_Land))
+    is_sep = true;
+  if (sep->IsOperator() && (sep->GetOprId() == OPR_Lor))
+    is_sep = true;
+  if (!is_sep)
+    return t;
+
+  Token *regexpr = mLexer->FindRegExprToken();
+  if (regexpr)
+    t = regexpr;
+
+  return t;
+}
+
 }

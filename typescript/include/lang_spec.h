@@ -22,6 +22,7 @@
 #include "stringutil.h"
 #include "token.h"
 #include "lexer.h"
+#include "parser.h"
 
 namespace maplefe {
 
@@ -47,6 +48,16 @@ public:
   TempLitData* GetTempLit();
   bool FindNextTLFormat(unsigned start, std::string& s, unsigned& end);
   bool FindNextTLPlaceHolder(unsigned start, std::string& s, unsigned& end);
+};
+
+////////////////////////////////////////////////////////////////////////////////////
+//                              Typescript Parser
+////////////////////////////////////////////////////////////////////////////////////
+
+class TypescriptParser : public Parser {
+public:
+  TypescriptParser(const char *f) : Parser(f) {}
+  Token* GetRegExpr(Token *t);
 };
 
 }

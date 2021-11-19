@@ -274,7 +274,7 @@ public:
   void DumpSortOut(AppealNode *root, const char * /*hint*/);
   void DumpSortOutNode(AppealNode*);
 
-private:
+public:
   SmallVector<Token*>   mActiveTokens;   // vector for tokens during matching.
   unsigned              mCurToken;       // index in mActiveTokens, the next token to be matched.
   unsigned              mPending;        // index in mActiveTokens, the first pending token.
@@ -399,7 +399,8 @@ public:
 
   bool   TokenMerge(Token *);
   bool   TokenSplit(Token *);
-  Token* GetRegExpr(Token *);
+  virtual Token* GetRegExpr(Token *t) {return t;}  // This is language specific.
+                                           // See examples in Typescript.
 };
 
 // Each language will have its own implementation of lexer. Most of lexer

@@ -22,6 +22,7 @@
 #include "gen_aststore.h"
 #include "gen_astdump.h"
 #include "gen_astgraph.h"
+#include "lang_spec.h"
 
 static void help() {
   std::cout << "ts2ast sourcefile [options]:\n" << std::endl;
@@ -47,7 +48,7 @@ int main (int argc, char *argv[]) {
     exit(-1);
   }
 
-  maplefe::Parser *parser = new maplefe::Parser(argv[1]);
+  maplefe::Parser *parser = new maplefe::TypescriptParser(argv[1]);
 
   bool dump_ast = false;
   bool dump_dot = false;
