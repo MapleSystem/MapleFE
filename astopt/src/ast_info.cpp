@@ -31,10 +31,6 @@ void AST_INFO::CollectInfo() {
     it->SetParent(module);
   }
 
-  // collect type parameters
-  MSGNOLOC0("============== Type Parameter ==============");
-  mStrIdxVisitor = new FindStrIdxVisitor(mHandler, mFlags, true);
-
   MSGNOLOC0("============== Fill node info ==============");
   FillNodeInfoVisitor visitor_node(mHandler, mFlags, true);
   visitor_node.Visit(module);
@@ -44,6 +40,14 @@ void AST_INFO::CollectInfo() {
   MSGNOLOC0("============== Collect class/interface/struct ==============");
   ClassStructVisitor visitor(mHandler, mFlags, true);
   visitor.Visit(module);
+
+  if (module->GetSrcLang() != SrcLangTypeScript) {
+    return;
+  }
+
+  // collect type parameters
+  MSGNOLOC0("============== Type Parameter ==============");
+  mStrIdxVisitor = new FindStrIdxVisitor(mHandler, mFlags, true);
 
   // sort fields according to the field name stridx
   // it also include first visit to named types to reduce
