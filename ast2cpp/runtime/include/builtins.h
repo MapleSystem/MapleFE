@@ -17,39 +17,10 @@
 #define __BUILTINS_H__
 
 namespace t2crt {
-class Ctor_Function;
-class Ctor_Object;
 
-extern Ctor_Function Function_ctor;
-extern Ctor_Object   Object_ctor;
-extern Ctor_Function Number_ctor;
-
-class Ctor_Object : public Function {
-  public:
-    Ctor_Object(Function* ctor, Object* proto, Object* prototype_proto) : Function(ctor, proto, prototype_proto) {}
-
-    Object* operator()(Object* obj) {
-      return(obj);
-    }
-
-    Object* _new() {
-      return new Object(this, this->prototype);
-    }
-
-    Object* _new(std::vector<ObjectProp> props) {
-      return new Object(this, this->prototype, props);
-    }
-};
-
-class Ctor_Function : public Function {
-  public:
-    Ctor_Function(Function* ctor, Object* proto, Object* prototype_proto) : Function(ctor, proto, prototype_proto) {}
-
-    Function* _new() {
-      return new Function(this, this->prototype, Object_ctor.prototype);
-    }
-
-};
+extern Function::Ctor  Function_ctor;
+extern Object::Ctor    Object_ctor;
+extern Function::Ctor  Number_ctor;
 
 template <typename T1, typename T2>
 class Record : public Object {

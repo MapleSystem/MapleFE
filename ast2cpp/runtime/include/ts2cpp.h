@@ -202,6 +202,7 @@ class Object {
     JS_PropList propList;
     Object*   __proto__;       // prototype chain
     Function* constructor;     // constructor of object
+
   public:
     Object(): __proto__(nullptr) {}
     Object(Function* ctor, Object* proto): constructor(ctor), __proto__(proto) {}
@@ -210,6 +211,8 @@ class Object {
       for (int i=0; i<props.size(); ++i)
         this->AddProp(props[i].first, props[i].second);
     }
+    virtual ~Object() {}
+    class Ctor;
 
     JS_Val& operator[] (std::string key)
     {
@@ -217,7 +220,6 @@ class Object {
       return GetPropVal(key);
     }
 
-    virtual ~Object() {}
 
     bool HasOwnProp(std::string key) {
       JS_PropList::iterator it;
@@ -279,6 +281,7 @@ class Object {
     }
 };
 
+
 using ArgsT = Array<JS_Val>;
 
 class Function : public Object {
@@ -292,6 +295,7 @@ class Function : public Object {
       prototype = new Object(this, prototype_proto);
       prototype->AddProp("constructor", val);
     }
+    class Ctor;
 
     bool IsFuncObj() {
       return true;
@@ -308,6 +312,27 @@ class Function : public Object {
     }
 };
 
+
+
+class Object::Ctor : public Function {
+  public:
+    Ctor(Function* ctor, Object* proto) : Function(ctor, proto, nullptr) {}
+
+    Object* operator()(Object* obj) {
+      return(obj);
+    }
+    Object* _new() {
+      return new Object(this, this->prototype);
+    }
+    Object* _new(std::vector<ObjectProp> props) {
+      return new Object(this, this->prototype, props);
+    }
+};
+
+class Function::Ctor : public Function {
+  public:
+    Ctor(Function* ctor, Object* proto, Object* prototype_proto) : Function(ctor, proto, prototype_proto) {}
+};
 
 template <class T>
 class ClassFld {
