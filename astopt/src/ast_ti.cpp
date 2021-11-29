@@ -1345,18 +1345,33 @@ IdentifierNode *TypeInferVisitor::VisitIdentifierNode(IdentifierNode *node) {
     if (node == upper) {
       decl = mHandler->FindDecl(node, true);
     } else if (node == fld) {
+      ASTScope *scope = NULL;
       if (upper->IsIdentifier()) {
         decl = mHandler->FindDecl(static_cast<IdentifierNode *>(upper), true);
         if (decl) {
-          ASTScope *scope = NULL;
           // for imported decl, need trace down the import/export chain
           if (mXXport->IsImportedDeclId(mHandler->GetHidx(), decl->GetNodeId())) {
             scope = decl->GetScope();
           } else {
             scope = decl->GetScope();
           }
-          decl = scope->FindDeclOf(node->GetStrIdx());
         }
+      } else if (upper->IsLiteral()) {
+        LiteralNode *ln = static_cast<LiteralNode *>(upper);
+        // this.f
+        if (ln->GetData().mType == LT_ThisLiteral) {
+          scope = upper->GetScope();;
+          while (scope && !scope->GetTree()->IsClass() && !scope->GetTree()->IsInterface()) {
+            scope = scope->GetParent();
+          }
+          if (scope) {
+            upper->SetTypeId(scope->GetTree()->GetTypeId());
+            upper->SetTypeIdx(scope->GetTree()->GetTypeIdx());
+          }
+        }
+      }
+      if (scope) {
+        decl = scope->FindDeclOf(node->GetStrIdx());
       }
     } else {
       NOTYETIMPL("node not in field");
