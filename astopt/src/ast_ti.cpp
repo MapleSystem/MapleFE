@@ -1360,8 +1360,9 @@ IdentifierNode *TypeInferVisitor::VisitIdentifierNode(IdentifierNode *node) {
         LiteralNode *ln = static_cast<LiteralNode *>(upper);
         // this.f
         if (ln->GetData().mType == LT_ThisLiteral) {
-          scope = upper->GetScope();;
-          while (scope && !scope->GetTree()->IsClass() && !scope->GetTree()->IsInterface()) {
+          scope = upper->GetScope();
+          // this is the parent with typeid TY_Class
+          while (scope && scope->GetTree()->GetTypeId() != TY_Class) {
             scope = scope->GetParent();
           }
           if (scope) {
