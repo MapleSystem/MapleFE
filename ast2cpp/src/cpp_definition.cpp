@@ -104,7 +104,7 @@ std::string CppDef::EmitModuleNode(ModuleNode *node) {
     CfgFunc *func = mod->GetNestedFuncAtIndex(i);
     TreeNode *node = func->GetFuncNode();
     hFuncTable.AddTopLevelFunc(node);
-    hFuncTable.AddNameIsTopLevelFunc(mCppDecl.GetIdentifierName(node));
+    hFuncTable.AddNameIsTopLevelFunc(GetIdentifierName(node));
     std::string s = EmitTreeNode(node) + GetEnding(node);
     str += s;
   }
@@ -275,7 +275,7 @@ std::string CppDef::EmitFunctionNode(FunctionNode *node) {
     str += className + "* "s + className + "::Ctor::operator()("s + className + "* obj"s;
   } else {
     str = mCppDecl.GetTypeString(node->GetType(), node->GetType());
-    std::string funcName = mCppDecl.GetIdentifierName(node);
+    std::string funcName = GetIdentifierName(node);
     str += " "s;
 
     if (IsClassMethod(node))

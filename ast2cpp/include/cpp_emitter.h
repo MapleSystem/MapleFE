@@ -27,6 +27,7 @@ class CppEmitter : public Emitter {
 public:
   CppEmitter(Module_Handler *h) : Emitter(h) {}
 
+  std::string GetIdentifierName(TreeNode *node);
 };
 
 } // namespace maplefe

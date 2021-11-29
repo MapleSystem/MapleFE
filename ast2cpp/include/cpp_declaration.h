@@ -71,7 +71,6 @@ public:
   std::string EmitStructNode(StructNode *node) override;
   std::string EmitTypeAliasNode(TypeAliasNode* node) override;
   std::string EmitLiteralNode(LiteralNode* node) override;
-  std::string GetIdentifierName(TreeNode *node);
 
   std::string GetTypeString(TreeNode *node, TreeNode *child = nullptr);
   std::string EmitArrayLiteral(ArrayLiteralNode *node, int dim, std::string type);
