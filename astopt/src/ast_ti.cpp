@@ -24,7 +24,6 @@
 #include "gen_astdump.h"
 
 #define ITERATEMAX 10
-#define DEFAULTVALUE 0xdeadbeef
 
 namespace maplefe {
 
@@ -960,7 +959,7 @@ CallNode *TypeInferVisitor::VisitCallNode(CallNode *node) {
               }
 
               // dummy functions like console.log
-              if (func->GetTypeId() == TY_None) {
+              if (func->IsTypeIdNone()) {
                 for (unsigned i = 0; i < node->GetArgsNum(); i++) {
                   TreeNode *arg = node->GetArg(i);
                   if(arg->IsIdentifier()) {

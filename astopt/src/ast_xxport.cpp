@@ -136,6 +136,13 @@ void AST_XXport::SortHandler() {
   }
 }
 
+unsigned AST_XXport::GetHandleIdxFromStrIdx(unsigned stridx) {
+  if (mStrIdx2HandlerIdxMap.find(stridx) != mStrIdx2HandlerIdxMap.end()) {
+    return mStrIdx2HandlerIdxMap[stridx];
+  }
+  return FLG_no_imported ? 0 : DEFAULTVALUE;
+}
+
 void AST_XXport::CollectXXportInfo() {
   for (unsigned hidx = 0; hidx < GetModuleNum(); hidx++) {
     Module_Handler *handler = mASTHandler->GetModuleHandler(hidx);
@@ -152,11 +159,20 @@ void AST_XXport::CollectXXportInfo() {
         TreeNode *bfnode = p->GetBefore();
         TreeNode *afnode = p->GetAfter();
         MASSERT(bfnode && "before node NULL for default");
+
+        // import * as MM from "./M";
+        // bfnode represents a module
         if (p->IsEverything()) {
           info->SetEverything();
 
           MASSERT(target && "everything export no target");
           SetIdStrIdx2ModuleStrIdx(bfnode->GetStrIdx(), target->GetStrIdx());
+
+          unsigned hidx = GetHandleIdxFromStrIdx(target->GetStrIdx());
+          Module_Handler *handler = mASTHandler->GetModuleHandler(hidx);
+          ModuleNode *module = handler->GetASTModule();
+          bfnode->SetTypeId(TY_Module);
+          bfnode->SetTypeIdx(module->GetTypeIdx());
         }
 
         // reformat default import

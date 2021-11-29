@@ -145,7 +145,8 @@ TreeNode *Module_Handler::FindDecl(IdentifierNode *node, bool deep) {
   if (mNodeId2Decl.find(nid) != mNodeId2Decl.end()) {
     decl = mNodeId2Decl[nid];
     // deep and decl is imported, chase down
-    if (deep && GetASTXXport()->IsImportedDeclId(mHidx, decl->GetNodeId())) {
+    if (deep && decl && !decl->IsTypeIdModule() &&
+        GetASTXXport()->IsImportedDeclId(mHidx, decl->GetNodeId())) {
       decl = GetASTXXport()->GetExportedNodeFromImportedNode(mHidx, decl->GetNodeId());
     }
     return decl;
@@ -168,7 +169,8 @@ TreeNode *Module_Handler::FindDecl(IdentifierNode *node, bool deep) {
     mNodeId2Decl[nid] = decl;
   }
 
-  if (deep && decl && GetASTXXport()->IsImportedDeclId(mHidx, decl->GetNodeId())) {
+  if (deep && decl && !decl->IsTypeIdModule() &&
+      GetASTXXport()->IsImportedDeclId(mHidx, decl->GetNodeId())) {
     decl = GetASTXXport()->GetExportedNodeFromImportedNode(mHidx, decl->GetNodeId());
   }
 

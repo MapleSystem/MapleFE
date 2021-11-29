@@ -632,7 +632,9 @@ LiteralNode *FillNodeInfoVisitor::VisitLiteralNode(LiteralNode *node) {
     case LT_StringLiteral:
       mInfo->SetTypeId(node, TY_String);
       mInfo->SetTypeIdx(node, TY_String);
-      node->SetStrIdx(data.mData.mStrIdx);
+      if (node->GetStrIdx() == 0) {
+        node->SetStrIdx(data.mData.mStrIdx);
+      }
       break;
     case LT_NullLiteral:
       mInfo->SetTypeId(node, TY_Null);

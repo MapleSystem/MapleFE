@@ -31,6 +31,8 @@
 #include "ast_common.h"
 #include "gen_astvisitor.h"
 
+#define DEFAULTVALUE 0xdeadbeef
+
 namespace maplefe {
 
 class CfgBB;
@@ -204,6 +206,10 @@ class Module_Handler {
   bool IsDirectField(TreeNode *node);
 
   bool IsFromLambda(TreeNode *node);
+
+  void AddNodeId2DeclMap(unsigned nid, TreeNode *node) {
+    mNodeId2Decl[nid] = node;
+  }
 
   template <typename T>
   T *NewTreeNode() {

@@ -86,10 +86,12 @@ void BuildScopeVisitor::AddDecl(ASTScope *scope, TreeNode *node) {
 
 void BuildScopeVisitor::AddImportedDecl(ASTScope *scope, TreeNode *node) {
   unsigned sid = scope->GetTree()->GetNodeId();
-  if (mScope2ImportedDeclsMap[sid].find(node->GetNodeId()) ==
+  unsigned nid = node->GetNodeId();
+  if (mScope2ImportedDeclsMap[sid].find(nid) ==
       mScope2ImportedDeclsMap[sid].end()) {
     scope->AddImportDecl(node);
-    mScope2ImportedDeclsMap[sid].insert(node->GetNodeId());
+    mScope2ImportedDeclsMap[sid].insert(nid);
+    mHandler->AddNodeId2DeclMap(nid, node);
   }
 }
 
@@ -472,6 +474,13 @@ ImportNode *BuildScopeVisitor::VisitImportNode(ImportNode *node) {
       if (bfnode) {
         bfnode->SetScope(scope);
         AddImportedDecl(scope, bfnode);
+      }
+    } else if (p->IsEverything()) {
+      if (bfnode) {
+        AddImportedDecl(scope, bfnode);
+        // imported scope
+        scope = targetHandler->GetASTModule()->GetScope();
+        bfnode->SetScope(scope);
       }
     } else if (afnode) {
       afnode->SetScope(scope);

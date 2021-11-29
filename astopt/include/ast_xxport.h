@@ -95,7 +95,7 @@ class AST_XXport {
     mHandlerIdx2DependentHandlerIdxMap[hdlIdx].insert(depHdlIdx);
   }
 
-  unsigned GetHandleIdxFromStrIdx(unsigned stridx) { return mStrIdx2HandlerIdxMap[stridx]; }
+  unsigned GetHandleIdxFromStrIdx(unsigned stridx);
 
   // check if node is identifier with name "default"
   bool IsDefault(TreeNode *node) { return node->GetStrIdx() == gStringPool.GetStrIdx("default"); }
