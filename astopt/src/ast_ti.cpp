@@ -1173,7 +1173,7 @@ ImportNode *TypeInferVisitor::VisitImportNode(ImportNode *node) {
         } else {
           NOTYETIMPL("can not find exported default");
         }
-      } else {
+      } else if (!bfnode->IsTypeIdModule()) {
         TreeNode *exported = mXXport->GetExportedNamedNode(hidx, bfnode->GetStrIdx());
         if (exported) {
           UpdateTypeId(bfnode, exported->GetTypeId());
