@@ -3482,24 +3482,35 @@ TreeNode* ASTBuilder::BuildFinally() {
   return mLastTreeNode;
 }
 
-// Takes two arguments, the parameters and the block
+// 1. Takes two arguments, the parameters and the block
+// 2. Takes one argument, the block
 TreeNode* ASTBuilder::BuildCatch() {
   if (mTrace)
     std::cout << "In BuildCatch" << std::endl;
 
-  Param p_params = mParams[0];
-  Param p_block = mParams[1];
+  TreeNode *params = NULL;
+  TreeNode *block = NULL;
 
-  MASSERT(p_params.mIsTreeNode);
-  TreeNode *params = p_params.mData.mTreeNode;
+  if (mParams.size() == 2) {
+    Param p_params = mParams[0];
+    Param p_block = mParams[1];
 
-  MASSERT(p_block.mIsTreeNode);
-  TreeNode *block = p_block.mData.mTreeNode;
+    MASSERT(p_params.mIsTreeNode);
+    params = p_params.mData.mTreeNode;
+
+    MASSERT(p_block.mIsTreeNode);
+    block = p_block.mData.mTreeNode;
+  } else {
+    Param p_block = mParams[0];
+    MASSERT(p_block.mIsTreeNode);
+    block = p_block.mData.mTreeNode;
+  }
 
   CatchNode *catch_node = (CatchNode*)gTreePool.NewTreeNode(sizeof(CatchNode));
   new (catch_node) CatchNode();
 
-  catch_node->AddParam(params);
+  if (params)
+    catch_node->AddParam(params);
   catch_node->SetBlock((BlockNode*)block);
 
   mLastTreeNode = catch_node;

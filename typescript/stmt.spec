@@ -1232,8 +1232,10 @@ rule TryStatement : ONEOF(
 ##-----------------------------------
 ##rule Catch[Yield, Return] :
 ##  catch ( CatchParameter[?Yield] ) Block[?Yield, ?Return]
-rule Catch : "catch" + '(' + CatchParameter + ')' + Block
-  attr.action : BuildCatch(%3, %5)
+rule Catch : ONEOF("catch" + '(' + CatchParameter + ')' + Block,
+                   "catch" + Block)
+  attr.action.%1 : BuildCatch(%3, %5)
+  attr.action.%2 : BuildCatch(%2)
 
 ##-----------------------------------
 ##rule Finally[Yield, Return] :
