@@ -1277,7 +1277,7 @@ bool Parser::TraverseToken(Token *token, AppealNode *parent, AppealNode *&child_
   // [TODO]
   // We enable skipping semi-colon. Later we will implement TS specific version of parser
   // which overried TraverseToken().
-  // We handle one case:
+  // We handle one case in the following:
   //   The rule expects:
   //       { statement ;}
   //   But we see :
@@ -1290,6 +1290,11 @@ bool Parser::TraverseToken(Token *token, AppealNode *parent, AppealNode *&child_
       RuleTable *parent_rt = parent->GetTable();
       bool need_insert = true;
       if (parent_rt->mType == ET_Zeroormore || parent_rt->mType == ET_Zeroorone)
+        need_insert = false;
+
+      // We also require that '}' is the last token, at least the last in this line
+      // if not the end of file.
+      if (mActiveTokens.GetNum() > mCurToken + 1)
         need_insert = false;
 
       // 2. we need check cases where we already have one previous ';'.

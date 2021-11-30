@@ -1,6 +1,6 @@
 Matched 42 tokens.
-Matched 61 tokens.
-Matched 68 tokens.
+Matched 60 tokens.
+Matched 67 tokens.
 ============= Module ===========
 == Sub Tree ==
 class  Klass
@@ -16,7 +16,6 @@ class  Klass
   LocalInterfaces: 
 
 == Sub Tree ==
-js_const Decl: obj=new Klass(() -> 1
-,16)
+js_const Decl: obj=new Klass(() ->  {n:1},16)
 == Sub Tree ==
 console.log(obj)

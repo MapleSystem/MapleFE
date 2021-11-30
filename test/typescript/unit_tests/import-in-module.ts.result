@@ -1,0 +1,16 @@
+Matched 10 tokens.
+Matched 27 tokens.
+============= Module ===========
+== Sub Tree ==
+declare ============= Module ===========
+== Sub Tree ==
+export {ts_interface: X { }} 
+
+== Sub Tree ==
+declare ============= Module ===========
+== Sub Tree ==
+import {X} "M1"
+== Sub Tree ==
+export {namespace  NS
+} 
+
