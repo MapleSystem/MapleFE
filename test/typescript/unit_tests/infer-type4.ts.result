@@ -1,0 +1,4 @@
+Matched 32 tokens.
+============= Module ===========
+== Sub Tree ==
+ type MyType<K> = K extends  [  :  infer U ,  :  infer V ,  ]  ? Extract<V,prim array-TBD> : K

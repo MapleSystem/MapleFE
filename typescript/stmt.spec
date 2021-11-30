@@ -1826,8 +1826,11 @@ rule TupleElementTypes: ONEOF(TupleElementType,
                               TupleElementTypes + ',' + TupleElementType)
 
 ## rule TupleElementType: Type
-rule TupleElementType: ZEROORONE(JSIdentifier + ':') + Type
-  attr.action : BuildNameTypePair(%1, %2)
+rule TupleElementType: ONEOF(ZEROORONE(JSIdentifier + ':') + Type,
+                             "..." + Type)
+  attr.action.%1 : BuildNameTypePair(%1, %2)
+  attr.action.%2 : SetIsRest(%2)
+  attr.action.%2 : BuildNameTypePair(%2)
 
 ## rule UnionType: UnionOrIntersectionOrPrimaryType | IntersectionOrPrimaryType
 rule UnionType : ONEOF(ZEROORONE('|') + UnionOrIntersectionOrPrimaryType + '|' + IntersectionOrPrimaryType,

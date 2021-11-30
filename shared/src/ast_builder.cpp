@@ -352,23 +352,30 @@ TreeNode* ASTBuilder::BuildIdentifier(const TreeNode *tree) {
 //                      NameTypePair
 ////////////////////////////////////////////////////////////////////////////////////////
 
+// It could takes (1) two arguments, name and type
+//                (2) one argument, the name
 TreeNode* ASTBuilder::BuildNameTypePair() {
   if (mTrace)
     std::cout << "In BuildNameTypePair" << std::endl;
-
-  MASSERT(mParams.size() == 2);
-  Param p_a = mParams[0];
-  Param p_b = mParams[1];
 
   NameTypePairNode *n = (NameTypePairNode*)gTreePool.NewTreeNode(sizeof(NameTypePairNode));
   new (n) NameTypePairNode();
   mLastTreeNode = n;
 
-  if (!p_a.mIsEmpty && p_a.mIsTreeNode)
-    n->SetVar(p_a.mData.mTreeNode);
+  if (mParams.size() == 2) {
+    Param p_a = mParams[0];
+    Param p_b = mParams[1];
 
-  if (!p_b.mIsEmpty && p_b.mIsTreeNode)
-    n->SetType(p_b.mData.mTreeNode);
+    if (!p_a.mIsEmpty && p_a.mIsTreeNode)
+      n->SetVar(p_a.mData.mTreeNode);
+
+    if (!p_b.mIsEmpty && p_b.mIsTreeNode)
+      n->SetType(p_b.mData.mTreeNode);
+  } else {
+    Param p_b = mParams[0];
+    if (!p_b.mIsEmpty && p_b.mIsTreeNode)
+      n->SetType(p_b.mData.mTreeNode);
+  }
 
   return mLastTreeNode;
 }

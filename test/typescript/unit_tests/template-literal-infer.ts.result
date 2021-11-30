@@ -8,7 +8,7 @@ Matched 90 tokens.
 Matched 92 tokens.
 ============= Module ===========
 == Sub Tree ==
- type Split<S,D> = string extends S ? prim array-TBD : S extends "" ? prim array-TBD : S extends  template-literal: NULL, infer T,NULL,D,NULL, infer U ? [T,...Split] :  [  : S ,  ] 
+ type Split<S,D> = string extends S ? prim array-TBD : S extends "" ? prim array-TBD : S extends  template-literal: NULL, infer T,NULL,D,NULL, infer U ?  [  : T ,  : Split<U,D> ,  ]  :  [  : S ,  ] 
 == Sub Tree ==
  type T40 = Split<"foo",".">
 == Sub Tree ==
