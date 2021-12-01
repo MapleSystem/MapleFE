@@ -1256,6 +1256,7 @@ ExportNode *TypeInferVisitor::VisitExportNode(ExportNode *node) {
           break;
         }
         case NK_TypeAlias:
+        case NK_UserType:
         case NK_Import:
           break;
         default: {
