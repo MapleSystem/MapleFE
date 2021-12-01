@@ -1174,11 +1174,29 @@ ImportNode *TypeInferVisitor::VisitImportNode(ImportNode *node) {
           NOTYETIMPL("can not find exported default");
         }
       } else if (!bfnode->IsTypeIdModule()) {
-        TreeNode *exported = mXXport->GetExportedNamedNode(hidx, bfnode->GetStrIdx());
-        if (exported) {
-          UpdateTypeId(bfnode, exported->GetTypeId());
-          UpdateTypeIdx(bfnode, exported->GetTypeIdx());
+        TreeNode *exported = NULL;
+        if (bfnode->IsField()) {
+          FieldNode *field = static_cast<FieldNode *>(bfnode);
+          TreeNode *upper = field->GetUpper();
+          TreeNode *fld = field->GetField();
+          if (upper->IsTypeIdModule()) {
+            TreeNode *type = gTypeTable.GetTypeFromTypeIdx(upper->GetTypeIdx());
+            ModuleNode *mod = static_cast<ModuleNode *>(type);
+            Module_Handler *h = mHandler->GetASTHandler()->GetModuleHandler(mod);
+            exported = mXXport->GetExportedNamedNode(h->GetHidx(), fld->GetStrIdx());
+            if (exported) {
+              UpdateTypeId(bfnode, exported->GetTypeId());
+              UpdateTypeIdx(bfnode, exported->GetTypeIdx());
+            }
+          }
         } else {
+          exported = mXXport->GetExportedNamedNode(hidx, bfnode->GetStrIdx());
+          if (exported) {
+            UpdateTypeId(bfnode, exported->GetTypeId());
+            UpdateTypeIdx(bfnode, exported->GetTypeIdx());
+          }
+        }
+        if (!exported) {
           NOTYETIMPL("can not find exported node");
         }
       }
@@ -1238,6 +1256,7 @@ ExportNode *TypeInferVisitor::VisitExportNode(ExportNode *node) {
           break;
         }
         case NK_TypeAlias:
+        case NK_Import:
           break;
         default: {
           NOTYETIMPL("new export node kind");
