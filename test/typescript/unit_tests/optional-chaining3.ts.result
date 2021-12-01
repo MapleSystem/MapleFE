@@ -11,4 +11,4 @@ func  foo()  throws:
   return obj
 
 == Sub Tree ==
-console.log(foo().func?())
+console.log(foo().func())
