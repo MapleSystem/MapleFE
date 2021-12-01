@@ -205,6 +205,21 @@ void AST_XXport::CollectXXportInfo() {
         XXportAsPairNode *p = node->GetPair(i);
         TreeNode *bfnode = p->GetBefore();
         TreeNode *afnode = p->GetAfter();
+
+        // export import a = M.a
+        if (bfnode && bfnode->IsImport()) {
+          ImportNode *imp = static_cast<ImportNode *>(bfnode);
+          for (unsigned j = 0; j < imp->GetPairsNum(); j++) {
+            XXportAsPairNode *q = imp->GetPair(i);
+            TreeNode *bf = q->GetBefore();
+            TreeNode *af = q->GetAfter();
+            std::pair<unsigned, unsigned> pnid(af->GetNodeId(), bf->GetNodeId());
+            info->mNodeIdPairs.insert(pnid);
+          }
+
+          continue;
+        }
+
         if (p->IsEverything()) {
           info->SetEverything();
           if (bfnode) {
