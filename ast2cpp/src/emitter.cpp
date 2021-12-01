@@ -1226,15 +1226,19 @@ std::string Emitter::EmitThrowNode(ThrowNode *node) {
 std::string Emitter::EmitCatchNode(CatchNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str("catch(");
-  for (unsigned i = 0; i < node->GetParamsNum(); ++i) {
-    if (i)
-      str += ", "s;
-    if (auto n = node->GetParamAtIndex(i)) {
-      str += EmitTreeNode(n);
+  std::string str("catch");
+  unsigned num = node->GetParamsNum();
+  if (num > 0) {
+    str += '(';
+    for (unsigned i = 0; i < num; ++i) {
+      if (i)
+        str += ", "s;
+      if (auto n = node->GetParamAtIndex(i)) {
+        str += EmitTreeNode(n);
+      }
     }
+    str += ')';
   }
-  str += ')';
   if (auto n = node->GetBlock()) {
     str += EmitBlockNode(n);
   }
