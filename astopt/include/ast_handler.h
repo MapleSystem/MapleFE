@@ -81,6 +81,7 @@ class AST_Handler {
   void SetAstOpt(AstOpt *opt) {mAstOpt = opt;}
 
   Module_Handler *GetModuleHandler(unsigned i);
+  Module_Handler *GetModuleHandler(ModuleNode *module);
 
   unsigned GetSize() {return mSize;}
 

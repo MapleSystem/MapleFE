@@ -55,6 +55,16 @@ Module_Handler *AST_Handler::GetModuleHandler(unsigned i) {
   return mModuleHandlers.ValueAtIndex(i);
 }
 
+Module_Handler *AST_Handler::GetModuleHandler(ModuleNode *module) {
+  for (unsigned i = 0; i < mModuleHandlers.GetNum(); i++) {
+    Module_Handler *h = mModuleHandlers.ValueAtIndex(i);
+    if (h->GetASTModule() == module) {
+      return h;
+    }
+  }
+  return NULL;
+}
+
 HandlerIndex AST_Handler::GetHandlerIndex(const char *filename) {
   if (mModuleHandlerMap.find(filename) == mModuleHandlerMap.end())
    return HandlerNotFound;
