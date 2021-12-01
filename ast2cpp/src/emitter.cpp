@@ -1844,8 +1844,8 @@ std::string Emitter::EmitInferNode(InferNode *node) {
   if (auto n = node->GetExpr()) {
     str += EmitTreeNode(n);
   }
-  mPrecedence = '\004';
-  return str;
+  mPrecedence = '\024';
+  return HandleTreeNode(str, node);
 }
 
 std::string Emitter::EmitInNode(InNode *node) {
@@ -2238,6 +2238,7 @@ std::string &Emitter::AddParentheses(std::string &str, TreeNode *node) {
   if (mPrecedence < '\024' ||
       (!node->IsIdentifier() &&
        !node->IsField() &&
+       !node->IsInfer() &&
        !node->IsLiteral() &&
        !node->IsArrayLiteral() &&
        !node->IsBindingPattern())) {
