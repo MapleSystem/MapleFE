@@ -508,16 +508,27 @@ ExportNode *BuildScopeVisitor::VisitExportNode(ExportNode *node) {
     unsigned hstridx = target->GetStrIdx();
     unsigned hidx = mXXport->GetHandleIdxFromStrIdx(hstridx);
     targetHandler = mHandler->GetASTHandler()->GetModuleHandler(hidx);
+  }
 
-    for (unsigned i = 0; i < node->GetPairsNum(); i++) {
-      XXportAsPairNode *p = node->GetPair(i);
-      TreeNode *bfnode = p->GetBefore();
-      TreeNode *afnode = p->GetAfter();
-      if (bfnode && targetHandler) {
+  for (unsigned i = 0; i < node->GetPairsNum(); i++) {
+    XXportAsPairNode *p = node->GetPair(i);
+    TreeNode *bfnode = p->GetBefore();
+    TreeNode *afnode = p->GetAfter();
+    if (bfnode) {
+      if (targetHandler) {
         ModuleNode *mod = targetHandler->GetASTModule();
         ASTScope *modscp = mod->GetScope();
         bfnode->SetScope(modscp);
+
+        // reexported bfnode is treated as a decl, add directly into map
+        if (bfnode->IsIdentifier()) {
+          mHandler->AddNodeId2DeclMap(bfnode->GetNodeId(), bfnode);
+        }
       }
+    }
+    if (afnode && afnode->IsIdentifier()) {
+      // exported afnode is treated as a decl, add directly into map
+      mHandler->AddNodeId2DeclMap(afnode->GetNodeId(), afnode);
     }
   }
 
