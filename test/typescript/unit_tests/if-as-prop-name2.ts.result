@@ -4,7 +4,7 @@ Matched 20 tokens.
 == Sub Tree ==
 class  Klass
   Fields: 
-    static="prop"
+    if="prop"
   Instance Initializer: 
   Constructors: 
   Methods: 
