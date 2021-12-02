@@ -218,12 +218,50 @@ TypeAliasNode *AdjustASTVisitor::VisitTypeAliasNode(TypeAliasNode *node) {
   return node;
 }
 
+LiteralNode *AdjustASTVisitor::VisitLiteralNode(LiteralNode *node) {
+  (void) AstVisitor::VisitLiteralNode(node);
+  if (node->IsThis()) {
+    unsigned stridx = gStringPool.GetStrIdx("this");
+    IdentifierNode *id = mInfo->CreateIdentifierNode(stridx);
+    TreeNode *type = node->GetType();
+    if (type) {
+      id->SetType(type);
+      id->SetTypeId(type->GetTypeId());
+      id->SetTypeIdx(type->GetTypeIdx());
+    }
+    node = (LiteralNode *)id;
+  }
+  return node;
+}
+
 FunctionNode *AdjustASTVisitor::VisitFunctionNode(FunctionNode *node) {
   (void) AstVisitor::VisitFunctionNode(node);
   TreeNode *type = node->GetType();
   if (type && type->IsUserType()) {
     type->SetParent(node);
   }
+
+  // add "this" as argument for function using "this" in body
+  // this is required by strict modo typescript
+  if (mInfo->IsFuncBodyUseThis(node)) {
+    // first check if this is already a parameter
+    bool hasthis = false;
+    unsigned stridx = gStringPool.GetStrIdx("this");
+    for(unsigned i = 0; i < node->GetParamsNum(); i++) {
+      TreeNode *arg = node->GetParam(i);
+      if (arg->GetStrIdx() == stridx) {
+        hasthis = true;
+        break;
+      }
+    }
+
+    // add this to the end of args
+    if (!hasthis) {
+      IdentifierNode *id = mInfo->CreateIdentifierNode(stridx);
+      node->AddParam(id);
+    }
+  }
+
   // Refine function TypeParames
   for(unsigned i = 0; i < node->GetTypeParamsNum(); i++) {
     type = node->GetTypeParamAtIndex(i);

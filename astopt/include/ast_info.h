@@ -44,6 +44,7 @@ class AST_INFO {
   std::unordered_map<unsigned, TreeNode *> mStrIdx2StructMap;
   std::unordered_set<unsigned> mTypeParamStrIdxSet;
   std::unordered_set<unsigned> mWithTypeParamNodeSet;
+  std::unordered_set<unsigned> mWithThisFuncSet;;
   std::unordered_set<unsigned> mFromLambda;
 
   void AddField(unsigned nid, TreeNode *node);
@@ -94,6 +95,10 @@ class AST_INFO {
   void InsertTypeParamStrIdx(unsigned stridx) { mTypeParamStrIdxSet.insert(stridx); }
   void InsertWithTypeParamNode(TreeNode *node) { mWithTypeParamNodeSet.insert(node->GetNodeId()); }
 
+  bool WithThis(TreeNode *node);
+  void InsertWithThisFunc(TreeNode *node) { mWithThisFuncSet.insert(node->GetNodeId()); }
+  bool IsFuncBodyUseThis(TreeNode *node) { return mWithThisFuncSet.find(node->GetNodeId())!= mWithThisFuncSet.end(); }
+
   void SetTypeId(TreeNode *node, TypeId tid);
   void SetTypeIdx(TreeNode *node, unsigned tidx);
 
@@ -141,6 +146,7 @@ class ClassStructVisitor : public AstVisitor {
   ClassNode *VisitClassNode(ClassNode *node);
   InterfaceNode *VisitInterfaceNode(InterfaceNode *node);
   TypeParameterNode *VisitTypeParameterNode(TypeParameterNode *node);
+  FunctionNode *VisitFunctionNode(FunctionNode *node);
 };
 
 class FindStrIdxVisitor : public AstVisitor {
@@ -149,19 +155,23 @@ class FindStrIdxVisitor : public AstVisitor {
   AST_INFO       *mInfo;
   unsigned       mFlags;
   unsigned       mStrIdx;
+  bool           mCheckThis;
   bool           mFound;
 
  public:
   explicit FindStrIdxVisitor(Module_Handler *h, unsigned f, bool base = false)
-    : mHandler(h), mFlags(f), mStrIdx(0), mFound(false),
+    : mHandler(h), mFlags(f), mStrIdx(0), mCheckThis(false), mFound(false),
       AstVisitor((f & FLG_trace_1) && base) {
       mInfo = mHandler->GetINFO();
     }
   ~FindStrIdxVisitor() = default;
 
-  void Init(unsigned stridx) { mStrIdx = stridx; mFound = false; }
+  void ResetFound() { mFound = false; }
+  void SetStrIdx(unsigned stridx) { mStrIdx = stridx; }
+  void SetCheckThis(bool b = true) { mCheckThis = b; }
   bool GetFound() { return mFound; }
   IdentifierNode *VisitIdentifierNode(IdentifierNode *node);
+  LiteralNode *VisitLiteralNode(LiteralNode *node);
 };
 
 }

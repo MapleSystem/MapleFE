@@ -1345,6 +1345,7 @@ IdentifierNode *TypeInferVisitor::VisitIdentifierNode(IdentifierNode *node) {
   if (type) {
     unsigned tidx = type->GetTypeIdx();
     if (tidx && node->GetTypeIdx() != tidx) {
+      UpdateTypeId(node, type->GetTypeId());
       UpdateTypeIdx(node, tidx);
       SetUpdated();
     }

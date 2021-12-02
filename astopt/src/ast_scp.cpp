@@ -190,6 +190,18 @@ FunctionNode *BuildScopeVisitor::VisitFunctionNode(FunctionNode *node) {
   for(unsigned i = 0; i < node->GetParamsNum(); i++) {
     TreeNode *it = node->GetParam(i);
     AddDecl(scope, it);
+
+    // added extra this is the parent with typeid TY_Class
+    if (it->GetStrIdx() == gStringPool.GetStrIdx("this") && it->GetTypeIdx() == 0) {
+      ASTScope *scp = scope;
+      while (scp && scp->GetTree()->GetTypeId() != TY_Class) {
+        scp = scp->GetParent();
+      }
+      if (scp) {
+        it->SetTypeId(TY_Object);
+        it->SetTypeIdx(scp->GetTree()->GetTypeIdx());
+      }
+    }
   }
 
   for(unsigned i = 0; i < node->GetTypeParamsNum(); i++) {

@@ -35,6 +35,8 @@ void AST_INFO::CollectInfo() {
   FillNodeInfoVisitor visitor_node(mHandler, mFlags, true);
   visitor_node.Visit(module);
 
+  mStrIdxVisitor = new FindStrIdxVisitor(mHandler, mFlags, true);
+
   // collect class/interface/struct decl
   mPass = 0;
   MSGNOLOC0("============== Collect class/interface/struct ==============");
@@ -46,14 +48,11 @@ void AST_INFO::CollectInfo() {
   }
 
   // collect type parameters
-  MSGNOLOC0("============== Type Parameter ==============");
-  mStrIdxVisitor = new FindStrIdxVisitor(mHandler, mFlags, true);
-
   // sort fields according to the field name stridx
   // it also include first visit to named types to reduce
   // creation of unnecessary anonymous struct
   mPass = 1;
-  MSGNOLOC0("============== super fields and Sort fields ==============");
+  MSGNOLOC0("============== type parameter, super fields and Sort fields ==============");
   visitor.Visit(module);
 
   // merge class/interface/struct decl first to reduce
@@ -482,7 +481,8 @@ TreeNode *AST_INFO::GetAnonymousStruct(TreeNode *node) {
 }
 
 bool AST_INFO::WithStrIdx(TreeNode *node, unsigned stridx) {
-  mStrIdxVisitor->Init(stridx);
+  mStrIdxVisitor->ResetFound();
+  mStrIdxVisitor->SetStrIdx(stridx);
   mStrIdxVisitor->Visit(node);
   return mStrIdxVisitor->GetFound();
 }
@@ -492,6 +492,15 @@ bool AST_INFO::WithTypeParam(TreeNode *node) {
     if (WithStrIdx(node, idx)) {
       return true;
     }
+  }
+  return false;
+}
+
+bool AST_INFO::WithThis(TreeNode *node) {
+  unsigned idx = gStringPool.GetStrIdx("this");
+  mStrIdxVisitor->SetCheckThis(true);
+  if (WithStrIdx(node, idx)) {
+    return true;
   }
   return false;
 }
@@ -639,12 +648,13 @@ LiteralNode *FillNodeInfoVisitor::VisitLiteralNode(LiteralNode *node) {
     case LT_NullLiteral:
       mInfo->SetTypeId(node, TY_Null);
       break;
-    case LT_ThisLiteral:
     case LT_SuperLiteral:
       mInfo->SetTypeId(node, TY_Object);
       break;
     case LT_VoidLiteral:
       mInfo->SetTypeId(node, TY_Void);
+      break;
+    case LT_ThisLiteral:
       break;
     default:
       break;
@@ -793,9 +803,28 @@ TypeParameterNode *ClassStructVisitor::VisitTypeParameterNode(TypeParameterNode 
   return node;
 }
 
+FunctionNode *ClassStructVisitor::VisitFunctionNode(FunctionNode *node) {
+  (void) AstVisitor::VisitFunctionNode(node);
+  if (mInfo->GetPass() == 1) {
+    TreeNode *body = node->GetBody();
+    if (body && mInfo->WithThis(body)) {
+      mInfo->InsertWithThisFunc(node);
+    }
+  }
+  return node;
+}
+
 IdentifierNode *FindStrIdxVisitor::VisitIdentifierNode(IdentifierNode *node) {
   (void) AstVisitor::VisitIdentifierNode(node);
   if (node->GetStrIdx() == mStrIdx) {
+    mFound = true;
+  }
+  return node;
+}
+
+LiteralNode *FindStrIdxVisitor::VisitLiteralNode(LiteralNode *node) {
+  (void) AstVisitor::VisitLiteralNode(node);
+  if (mCheckThis && node->IsThis()) {
     mFound = true;
   }
   return node;
