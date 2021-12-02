@@ -77,6 +77,7 @@ struct JS_Val {
     void*        val_bigint;
     std::string* val_string; // JS string primitive (not JS String object)
     Object*      val_obj;    // for function, object (incl. String objects)
+    Function*    val_func;   // for function
   } x;
   JS_Type type;
 
@@ -88,6 +89,7 @@ struct JS_Val {
   JS_Val(int64_t l) { x.val_long = l; type = TY_Long; }
   JS_Val(double d)  { x.val_double = d; type = TY_Double; }
   JS_Val(Object* o){ x.val_obj = o; type = TY_Object; }
+  JS_Val(Function* o){ x.val_func = o; type = TY_Function; }
   JS_Val(std::string* s) { x.val_string = s; type = TY_String; }
   JS_Val(std::string s) { x.val_string = new std::string(s); type = TY_String; }
   JS_Val(const char* s) { x.val_string = new std::string(s); type = TY_String; }
