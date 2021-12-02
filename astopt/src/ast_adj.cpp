@@ -255,10 +255,15 @@ FunctionNode *AdjustASTVisitor::VisitFunctionNode(FunctionNode *node) {
       }
     }
 
-    // add this to the end of args
+    // add this to the beginning of args
     if (!hasthis) {
       IdentifierNode *id = mInfo->CreateIdentifierNode(stridx);
+      unsigned size = node->GetParamsNum();
       node->AddParam(id);
+      for(unsigned i = size; i > 0; i--) {
+        node->SetParam(i, node->GetParam(i-1));
+      }
+      node->SetParam(0, id);
     }
   }
 

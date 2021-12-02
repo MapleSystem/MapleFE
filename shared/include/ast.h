@@ -1880,6 +1880,7 @@ public:
   TreeNode* GetParam(unsigned i)  {return mParams.ValueAtIndex(i);}
   void      SetParam(unsigned i, TreeNode* n) {*(mParams.RefAtIndex(i)) = n; SETPARENT(n);}
   void      AddParam(TreeNode *t) {mParams.PushBack(t); SETPARENT(t);}
+  void      ClearParam()          {mParams.Clear();}
 
   // Attributes related
   unsigned GetAttrsNum()              {return mAttrs.GetNum();}
