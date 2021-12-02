@@ -243,27 +243,29 @@ FunctionNode *AdjustASTVisitor::VisitFunctionNode(FunctionNode *node) {
 
   // add "this" as argument for function using "this" in body
   // this is required by strict modo typescript
-  if (mInfo->IsFuncBodyUseThis(node)) {
-    // first check if this is already a parameter
-    bool hasthis = false;
-    unsigned stridx = gStringPool.GetStrIdx("this");
-    for(unsigned i = 0; i < node->GetParamsNum(); i++) {
-      TreeNode *arg = node->GetParam(i);
-      if (arg->GetStrIdx() == stridx) {
-        hasthis = true;
-        break;
+  if (!node->GetParent()->IsClass()) { // skip class methods
+    if (mInfo->IsFuncBodyUseThis(node)) {
+      // first check if this is already a parameter
+      bool hasthis = false;
+      unsigned stridx = gStringPool.GetStrIdx("this");
+      for(unsigned i = 0; i < node->GetParamsNum(); i++) {
+        TreeNode *arg = node->GetParam(i);
+        if (arg->GetStrIdx() == stridx) {
+          hasthis = true;
+          break;
+        }
       }
-    }
 
-    // add this to the beginning of args
-    if (!hasthis) {
-      IdentifierNode *id = mInfo->CreateIdentifierNode(stridx);
-      unsigned size = node->GetParamsNum();
-      node->AddParam(id);
-      for(unsigned i = size; i > 0; i--) {
-        node->SetParam(i, node->GetParam(i-1));
+      // add this to the beginning of args
+      if (!hasthis) {
+        IdentifierNode *id = mInfo->CreateIdentifierNode(stridx);
+        unsigned size = node->GetParamsNum();
+        node->AddParam(id);
+        for(unsigned i = size; i > 0; i--) {
+          node->SetParam(i, node->GetParam(i-1));
+        }
+        node->SetParam(0, id);
       }
-      node->SetParam(0, id);
     }
   }
 
