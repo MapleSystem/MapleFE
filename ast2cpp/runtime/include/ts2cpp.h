@@ -241,26 +241,44 @@ class Object {
       return propList[key];
     }
 
+    void* GetPropField(std::string key) {
+      return propList[key].x.field;
+    }
+
     bool GetPropBool(std::string key) {
+      if (propList[key].IsCxxProp())
+        return *(bool*)GetPropField(key);
       return propList[key].x.val_bool;
     }
     long GetPropLong(std::string key) {
+      if (propList[key].IsCxxProp())
+        return *(long*)GetPropField(key);
       return propList[key].x.val_long;
     }
     double GetPropDouble(std::string key) {
+      if (propList[key].IsCxxProp())
+        return *(double*)GetPropField(key);
       return propList[key].x.val_double;
     }
     void* GetPropBigInt(std::string key) {
+      if (propList[key].IsCxxProp())
+        return *(void**)GetPropField(key);
       return propList[key].x.val_bigint;
     }
     std::string GetPropStr(std::string key) {
+      if (propList[key].IsCxxProp())
+        return *(*(std::string**)GetPropField(key));
       return *propList[key].x.val_string;
     }
     Object* GetPropObj(std::string key) {
+      if (propList[key].IsCxxProp())
+        return *(Object**)GetPropField(key);
       return propList[key].x.val_obj;
     }
-    void* GetPropField(std::string key) {
-      return propList[key].x.field;
+    Function* GetPropFunc(std::string key) {
+      if (propList[key].IsCxxProp())
+        return *(Function**)GetPropField(key);
+      return propList[key].x.val_func;
     }
 
     virtual bool IsFuncObj() {
