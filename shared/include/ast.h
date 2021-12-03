@@ -149,6 +149,7 @@ public:
   void SetIsRest(bool b = true)    {mIsRest = b;}
   bool IsConst()                   {return mIsConst;}
   void SetIsConst(bool b = true)   {mIsConst = b;}
+  bool IsThis()                    {return mStrIdx == gStringPool.GetStrIdx("this");}
 
   virtual unsigned GetStrIdx() {return mStrIdx;}
   virtual void SetStrIdx(unsigned id) {mStrIdx = id;}
