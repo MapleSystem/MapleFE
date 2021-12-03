@@ -373,7 +373,7 @@ std::string Emitter::EmitUserTypeNode(UserTypeNode *node) {
 
   if (auto n = node->GetDims()) {
     std::string s = EmitDimensionNode(n);
-    if (precd < mPrecedence)
+    if (precd <= mPrecedence)
       str = '(' + str + ')';
      str += s;
   }
