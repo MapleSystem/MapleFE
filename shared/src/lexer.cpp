@@ -1144,6 +1144,12 @@ const char* Lexer::TraverseKeywordTable() {
       return addr;
     }
 
+    curidx = saved_curidx + len;
+    if (CharIsSeparator(line[curidx])) {
+      addr = gStringPool.FindString(addr);
+      return addr;
+    }
+
     // failed, restore curidx
     curidx = saved_curidx;
   }

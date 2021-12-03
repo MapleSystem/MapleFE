@@ -1,0 +1,5 @@
+Matched 27 tokens.
+Matched 36 tokens.
+============= Module ===========
+== Sub Tree ==
+ type MyType<B> =  {[K in  template-literal: NULL,Extract< keyof B,union  = string | number>] : B[K] }

@@ -126,6 +126,9 @@ public:
   bool         GetComment();
 
   // For most languages, this does nothing. TS/JS are doing something.
+  virtual bool CharIsSeparator(const char c) {return false;}
+
+  // For most languages, this does nothing. TS/JS are doing something.
   virtual void AppendSemiColon() {}
 
   virtual TempLitData* GetTempLit() {return NULL;}

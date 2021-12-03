@@ -171,6 +171,12 @@ LitData ProcessLiteral(LitId id, const char *str) {
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
+bool TypescriptLexer::CharIsSeparator(const char c) {
+  if (c == '`')
+    return true;
+  return false;
+}
+
 // Add a ';' to the end of _line.
 void TypescriptLexer::AppendSemiColon() {
   //line[current_line_size] = ';';
