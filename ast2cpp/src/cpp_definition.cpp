@@ -709,7 +709,8 @@ std::string CppDef::EmitFieldNode(FieldNode *node) {
     return upper + "->size()"s;
   if (mCppDecl.IsImportedModule(upper) || upnode->GetTypeId() == TY_Module) // for imported module
     return hFuncTable.AddFieldIsImported(upper + "::"s + field);
-  if (true) // TODO: needs to check if it accesses a Cxx class field
+  if (mHandler->IsCppField(node->GetField()) || // check if it accesses a Cxx class field
+      node->IsTypeIdFunction())
     return upper + "->"s + field;
   return "(*"s + upper + ")[\""s + field + "\"]"s;
 }
