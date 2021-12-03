@@ -207,6 +207,7 @@ class Module_Handler {
   bool IsDirectField(TreeNode *node);
 
   bool IsFromLambda(TreeNode *node);
+  bool IsDef(TreeNode *node);
 
   void AddNodeId2DeclMap(unsigned nid, TreeNode *node) {
     mNodeId2Decl[nid] = node;

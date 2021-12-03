@@ -228,6 +228,10 @@ bool Module_Handler::IsFromLambda(TreeNode *node) {
   return mINFO->IsFromLambda(nid);
 }
 
+bool Module_Handler::IsDef(TreeNode *node) {
+  return mDFA->IsDef(node->GetNodeId());
+}
+
 bool Module_Handler::IsCppField(TreeNode *node) {
   return mUtil->IsCppField(node);
 }
