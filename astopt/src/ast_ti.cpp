@@ -822,6 +822,8 @@ BinOperatorNode *TypeInferVisitor::VisitBinOperatorNode(BinOperatorNode *node) {
       }
       UpdateTypeId(node, ti);
       unsigned tix = MergeTypeIdx(ta->GetTypeIdx(), tb->GetTypeIdx());
+      UpdateTypeIdx(ta, tix);
+      UpdateTypeIdx(tb, tix);
       UpdateTypeIdx(node, tix);
       break;
     }
@@ -839,6 +841,8 @@ BinOperatorNode *TypeInferVisitor::VisitBinOperatorNode(BinOperatorNode *node) {
       TypeId ti = MergeTypeId(tia, tib);
       UpdateTypeId(node, ti);
       unsigned tix = MergeTypeIdx(ta->GetTypeIdx(), tb->GetTypeIdx());
+      UpdateTypeIdx(ta, tix);
+      UpdateTypeIdx(tb, tix);
       UpdateTypeIdx(node, tix);
       break;
     }
@@ -852,6 +856,8 @@ BinOperatorNode *TypeInferVisitor::VisitBinOperatorNode(BinOperatorNode *node) {
       SetTypeId(ta, TY_Int);
       SetTypeId(tb, TY_Int);
       SetTypeId(node, TY_Int);
+      SetTypeIdx(ta, TY_Int);
+      SetTypeIdx(tb, TY_Int);
       SetTypeIdx(node, TY_Int);
       break;
     }
@@ -860,6 +866,8 @@ BinOperatorNode *TypeInferVisitor::VisitBinOperatorNode(BinOperatorNode *node) {
       SetTypeId(ta, TY_Boolean);
       SetTypeId(tb, TY_Boolean);
       SetTypeId(node, TY_Boolean);
+      SetTypeIdx(ta, TY_Boolean);
+      SetTypeIdx(tb, TY_Boolean);
       SetTypeIdx(node, TY_Boolean);
       break;
     }
