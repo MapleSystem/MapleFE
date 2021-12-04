@@ -751,7 +751,6 @@ std::string CppDecl::EmitClassNode(ClassNode *node) {
   for (unsigned i = 0; i < node->GetMethodsNum(); ++i) {
     str += tab(1) + EmitFunctionNode(node->GetMethod(i));
   }
-  str += "  virtual const char* __GetClassName() const {return \""s + node->GetName() + " \";}\n"s;
 
   // 2. c++ class for the JS object's JS constructor
   std::string indent = tab(1);
@@ -784,6 +783,7 @@ std::string CppDecl::EmitClassNode(ClassNode *node) {
 
   // Generate new() function
   str += indent + "  "s+node->GetName()+"* _new() {return new "s+node->GetName()+"(this, this->prototype);}\n"s;
+  str += indent + "  virtual const char* __GetClassName() const {return \""s + node->GetName() + " \";}\n"s;
   str += indent + "};\n";
   str += "};\n\n";
   return str;

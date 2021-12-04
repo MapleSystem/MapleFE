@@ -31,7 +31,7 @@ std::ostream& operator<< (std::ostream& out, const t2crt::JS_Val& v) {
 }
 
 std::ostream& operator<< (std::ostream& out, const t2crt::Object *obj) {
-  out << obj->__GetClassName();
+  out << obj->constructor->__GetClassName();
   if (obj->IsEmpty())
     out << "{}";
   else {
