@@ -441,6 +441,9 @@ FieldNode *BuildScopeVisitor::VisitFieldNode(FieldNode *node) {
     ASTScope *scope = mStrIdx2ScopeMap[upper->GetStrIdx()];
     if (!scope && upper->IsIdentifier()) {
       TreeNode *decl = mHandler->FindDecl(static_cast<IdentifierNode *>(upper));
+      if (decl && decl->IsDecl()) {
+        decl = static_cast<DeclNode *>(decl)->GetVar();
+      }
       if (decl && decl->IsIdentifier()) {
         IdentifierNode *id = static_cast<IdentifierNode *>(decl);
         TreeNode *type = id->GetType();
