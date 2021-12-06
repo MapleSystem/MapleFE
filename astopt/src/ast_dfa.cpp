@@ -162,6 +162,9 @@ unsigned AST_DFA::AddDef(TreeNode *node, unsigned &bitnum, unsigned bbid) {
       switch (op) {
         case OPR_Assign: {
           TreeNode *lhs = bon->GetOpndA();
+          if (lhs->IsField()) {
+            lhs = static_cast<FieldNode *>(lhs)->GetUpper();
+          }
           stridx = lhs->GetStrIdx();
           nodeid = lhs->GetNodeId();
           break;
@@ -178,6 +181,9 @@ unsigned AST_DFA::AddDef(TreeNode *node, unsigned &bitnum, unsigned bbid) {
         case OPR_BxorAssign:
         case OPR_ZextAssign: {
           TreeNode *lhs = bon->GetOpndA();
+          if (lhs->IsField()) {
+            lhs = static_cast<FieldNode *>(lhs)->GetUpper();
+          }
           stridx = lhs->GetStrIdx();
           nodeid = lhs->GetNodeId();
           isDefUse = true;
