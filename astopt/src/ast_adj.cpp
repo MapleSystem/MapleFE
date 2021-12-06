@@ -260,6 +260,7 @@ UnaOperatorNode *AdjustASTVisitor::VisitUnaOperatorNode(UnaOperatorNode *node) {
         }
         LiteralNode *n = mHandler->NewTreeNode<LiteralNode>();
         n->SetData(data);
+        n->SetParent(node->GetParent());
         return (UnaOperatorNode*)n;
       }
     }
