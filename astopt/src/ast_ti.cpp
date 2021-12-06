@@ -113,26 +113,27 @@ ArrayElementNode *BuildIdDirectFieldVisitor::VisitArrayElementNode(ArrayElementN
 
   TreeNode *decl = mHandler->FindDecl(static_cast<IdentifierNode *>(array));
   if (decl && decl->IsTypeIdClass()) {
+    // indexed access of types
     TreeNode *exp = node->GetExprAtIndex(0);
+    unsigned stridx = exp->GetStrIdx();
     if (exp->IsLiteral() && exp->IsTypeIdString()) {
-      // indexed access of types
-      unsigned stridx = (static_cast<LiteralNode *>(exp))->GetData().mData.mStrIdx;
-      if (decl->IsDecl()) {
-        TreeNode *var = static_cast<DeclNode *>(decl)->GetVar();
-        TreeNode * type = static_cast<IdentifierNode *>(var)->GetType();
-        if (type && type->IsUserType()) {
-          UserTypeNode *ut = static_cast<UserTypeNode *>(type);
-          decl = mHandler->FindDecl(static_cast<IdentifierNode *>(ut->GetId()));
-        }
+      stridx = (static_cast<LiteralNode *>(exp))->GetData().mData.mStrIdx;
+    }
+    if (decl->IsDecl()) {
+      TreeNode *var = static_cast<DeclNode *>(decl)->GetVar();
+      TreeNode * type = static_cast<IdentifierNode *>(var)->GetType();
+      if (type && type->IsUserType()) {
+        UserTypeNode *ut = static_cast<UserTypeNode *>(type);
+        decl = mHandler->FindDecl(static_cast<IdentifierNode *>(ut->GetId()));
       }
-      if (decl->IsStruct() || decl->IsClass()) {
-        for (int i = 0; i < mHandler->GetINFO()->GetFieldsSize(decl); i++) {
-          TreeNode *f = mHandler->GetINFO()->GetField(decl, i);
-          if (f->GetStrIdx() == stridx) {
-            mHandler->AddDirectField(exp);
-            mHandler->AddDirectField(node);
-            return node;
-          }
+    }
+    if (decl->IsStruct() || decl->IsClass()) {
+      for (int i = 0; i < mHandler->GetINFO()->GetFieldsSize(decl); i++) {
+        TreeNode *f = mHandler->GetINFO()->GetField(decl, i);
+        if (f->GetStrIdx() == stridx) {
+          mHandler->AddDirectField(exp);
+          mHandler->AddDirectField(node);
+          return node;
         }
       }
     }
