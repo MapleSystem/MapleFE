@@ -234,6 +234,39 @@ LiteralNode *AdjustASTVisitor::VisitLiteralNode(LiteralNode *node) {
   return node;
 }
 
+UnaOperatorNode *AdjustASTVisitor::VisitUnaOperatorNode(UnaOperatorNode *node) {
+  (void) AstVisitor::VisitUnaOperatorNode(node);
+  TreeNode *opnd = node->GetOpnd();
+  OprId op = node->GetOprId();
+  TreeNode *newnode = NULL;
+  if (op == OPR_Plus || op == OPR_Minus) {
+    if (opnd->IsLiteral()) {
+      LiteralNode *lit = static_cast<LiteralNode *>(opnd);
+      if (lit->GetData().mType == LT_StringLiteral) {
+        unsigned stridx = lit->GetData().mData.mStrIdx;
+        std::string str = gStringPool.GetStringFromStrIdx(stridx);
+        double d = std::stod(str);
+        if (op == OPR_Minus) {
+          d = -d;
+        }
+        long l = (long)d;
+        LitData data;
+        if (d == l) {
+          data.mType = LT_IntegerLiteral;
+          data.mData.mInt = l;
+        } else {
+          data.mType = LT_DoubleLiteral;
+          data.mData.mDouble = d;
+        }
+        LiteralNode *n = mHandler->NewTreeNode<LiteralNode>();
+        n->SetData(data);
+        return (UnaOperatorNode*)n;
+      }
+    }
+  }
+  return node;
+}
+
 FunctionNode *AdjustASTVisitor::VisitFunctionNode(FunctionNode *node) {
   (void) AstVisitor::VisitFunctionNode(node);
   TreeNode *type = node->GetType();

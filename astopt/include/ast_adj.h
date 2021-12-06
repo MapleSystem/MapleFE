@@ -70,6 +70,7 @@ class AdjustASTVisitor : public AstVisitor {
   UserTypeNode *VisitUserTypeNode(UserTypeNode *node);
   TypeAliasNode *VisitTypeAliasNode(TypeAliasNode *node);
   LiteralNode *VisitLiteralNode(LiteralNode *node);
+  UnaOperatorNode *VisitUnaOperatorNode(UnaOperatorNode *node);
 };
 
 }
