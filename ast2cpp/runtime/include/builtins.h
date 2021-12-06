@@ -28,6 +28,7 @@ class Record : public Object {
     std::unordered_map<T1, T2> records;
     Record() {}
     ~Record() {}
+    Record(Function* ctor, Object* proto) : Object(ctor, proto) {}
     Record(Function* ctor, Object* proto, std::vector<ObjectProp> props) : Object(ctor, proto, props) {}
 };
 
