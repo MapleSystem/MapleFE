@@ -85,6 +85,9 @@ std::string GenClassFldAddProp(std::string objName,
 //   Bind  - Create and return function object binded to designated this and optional args
 // note: the parameter args is expected to be a string that start with "_this"
 //       TODO: apply and bind may be moved to ts2cpp.h Fuction class as virtual
+// note: TSC prohibits calling non-void constructor func with new(), so in the code generated below
+//       for ctor(), it calls _body() but ignores return val from _body(), and instead returns _this
+//       per TS/JS spec.
 
 std::string GenFuncClass(std::string retType, std::string funcName, std::string params, std::string args) {
   std::string str;
@@ -117,6 +120,7 @@ class )""" + clsName + R"""( : public t2crt::Function {
       func->_args = args;
       return(func);
     }
+    virtual const char* __GetClassName() const {return ")""" + funcName + R"""( ";}
 };
 
 )""";
@@ -133,6 +137,29 @@ std::string tab(int n) {
 
 std::string GenAnonFuncName(TreeNode* node) {
   return "_anon_func_"s + std::to_string(node->GetNodeId());
+}
+
+// Check 1st param of top level function for "this" and do substitution.
+void HandleThisParam(unsigned nParams, TreeNode* node, std::string& params, std::string&args) {
+  if (nParams == 0) {
+    // ts2cpp's C++ mapping for TS func has a "this" obj in the c++ func param list
+    // which will be generated from AST if "this" is declared as a TS func parameter
+    // as required by TS strict mode. However TS funcs that do not reference 'this'
+    // are not required to declare it, so emitter has to check and insert one.
+    params = "t2crt::Object* _this"s;
+    args = "_this"s;
+    return;
+  }
+
+  if (node->IsThis()) {
+    args = "_this";
+    Emitter::Replace(params, "this", "_this"); // change this to _this to avoid c++ keyword
+    Emitter::Replace(params, "t2crt::JS_Val", "t2crt::Object*"); // change type any (JS_Val) to Object* per ts2cpp func mapping to C++ interface
+  } else {
+    // if 1st func param is not "this", insert one to work with c++ mapping for TS func
+    args = "_this, "s + args;
+    params = "t2crt::Object* _this, "s + params;
+  }
 }
 
 } // namespace maplefe

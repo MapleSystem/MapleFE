@@ -81,6 +81,7 @@ public:
   bool   IsClassId(TreeNode* node);
   std::string GetTypeForTemplateArg(TreeNode* node);
   TreeNode*   FindDeclType(TreeNode* node);
+  std::string GetThisParamObjType(TreeNode *node);
 };
 
 } // namespace maplefe

@@ -24,6 +24,7 @@
 #include "massert.h"
 #include "ast.h"
 #include "typetable.h"
+#include "emitter.h"
 
 using namespace std::string_literals;
 
@@ -39,6 +40,7 @@ extern bool IsClassMethod(TreeNode* node);
 extern std::string GetClassOfAssignedFunc(TreeNode* node);
 extern std::string GenAnonFuncName(TreeNode* node);
 inline std::string ClsName(std::string func) { return "Cls_"s + func; }
+extern void HandleThisParam(unsigned nParams, TreeNode* node, std::string& params, std::string&args);
 
 class FuncTable {
 private:

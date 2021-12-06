@@ -103,8 +103,10 @@ std::string CppDef::EmitModuleNode(ModuleNode *node) {
   for(unsigned i = 0; i < num; ++i) {
     CfgFunc *func = mod->GetNestedFuncAtIndex(i);
     TreeNode *node = func->GetFuncNode();
-    hFuncTable.AddTopLevelFunc(node);
-    hFuncTable.AddNameIsTopLevelFunc(GetIdentifierName(node));
+    if (!IsClassMethod(node)) {
+      hFuncTable.AddTopLevelFunc(node);
+      hFuncTable.AddNameIsTopLevelFunc(GetIdentifierName(node));
+    }
     std::string s = EmitTreeNode(node) + GetEnding(node);
     str += s;
   }
@@ -287,31 +289,30 @@ std::string CppDef::EmitFunctionNode(FunctionNode *node) {
     str += "("s;
   }
 
-  std::string params;
+  std::string params, unused;
   for (unsigned i = 0; i < node->GetParamsNum(); ++i) {
     if (i || node->IsConstructor())
       params += ", "s;
     if (auto n = node->GetParam(i)) {
       params += mCppDecl.EmitTreeNode(n);
+      if (isTopLevel && i == 0) {
+        HandleThisParam(node->GetParamsNum(), n, params, unused);
+      }
     }
   }
 
   if (isTopLevel && !IsClassMethod(node)) {
-    // The emitter's C++ mapping for top level TS funcs has a "this" obj in the c++ func param
-    // list which will be generated from AST if declared as a TS func parameter as required by
-    // TS strict node, but TS funcs that do not reference 'this' are not required to declare
-    // it, in which case emitter has to check and insert a generic this param for C++ func.
-    if (node->GetParamsNum() == 0)                 // TS func param list empty
-      params = "t2crt::Object* _this"s;
-    else if (!node->GetParam(0)->IsLiteral() ||    // TS func 1st param is not "this"
-             !AstDump::GetEnumLitData(static_cast<LiteralNode*>(node->GetParam(0))->GetData()).compare("this") == 0)
-      params = "t2crt::Object* _this, "s + params;
+    if (node->GetParamsNum() == 0) {
+      HandleThisParam(0, nullptr, params, unused);
+    }
   }
   str += params + ") "s;
   int bodyPos = str.size();
   if (auto n = node->GetBody()) {
     auto varDecls = EmitFuncScopeVarDecls(node);
     auto s = EmitBlockNode(n);
+    if (isTopLevel)
+      Emitter::Replace(s, "this", "_this");
     if(s.empty() || s.front() != '{')
       str += "{\n"s + s + "}\n"s;
     else
@@ -1194,21 +1195,60 @@ std::string CppDef::EmitTypeOfNode(TypeOfNode *node) {
   return HandleTreeNode(str, node);
 }
 
+// Return C++ object type of "this" parameter in function param declaration
+std::string CppDef::GetThisParamObjType(TreeNode *node) {
+  if (node && !node->IsFunction())
+    return std::string();
+
+  std::string str;
+  if (static_cast<FunctionNode*>(node)->GetParamsNum()) {
+    auto n = static_cast<FunctionNode*>(node)->GetParam(0);
+    if (n->IsIdentifier() && n->IsThis()) {
+      TreeNode* tn = static_cast<IdentifierNode*>(n)->GetType();
+      str = mCppDecl.GetTypeString(tn, nullptr);
+      if (str.back() == '*')
+        str.pop_back();
+      if (!str.compare("t2crt::JS_Val ") || !str.compare("t2crt::JS_Val")) {
+        str = "t2crt::Object";
+      }
+    }
+  }
+  return str;
+}
+
 std::string CppDef::EmitNewNode(NewNode *node) {
   if (node == nullptr)
     return std::string();
 
   std::string str;
   MASSERT(node->GetId() && "No mId on NewNode");
-  if (node->GetId() && node->GetId()->IsTypeIdClass()) {
-    // Generate code to create new obj and call constructor
-    std::string clsName = EmitTreeNode(node->GetId());
-    if (IsBuiltinObj(clsName))
-      clsName = "t2crt::"s + clsName;
-    str = clsName + "_ctor("s + clsName + "_ctor._new()"s;
-  } else {
-    str = "new "s + EmitTreeNode(node->GetId());
-    str += "("s;
+
+  if (auto id = node->GetId()) {
+    if (id->IsTypeIdClass()) {
+      // Generate code to create new class obj and call class constructor
+      std::string clsName = EmitTreeNode(node->GetId());
+      if (IsBuiltinObj(clsName))
+        clsName = "t2crt::"s + clsName;
+      str = clsName + "_ctor("s + clsName + "_ctor._new()"s;
+
+    } else if (id->IsTypeIdFunction()) {  // TS: new <func> (<args..>)
+      // When calling TS new() on constructor function:
+      // A new object is created and bound to "this" of ctor func which is then invoked.
+      // The object's proto chain is linked to ctor func prototype, and constructor set
+      // to the consturctor object. The object is then returned.
+      // note: TSC allows only void functions to be called with "new" keyword.
+      //       TSC strict mode requires all funcs that refs "this" to declare it as 1st parm.
+      if (auto decl = mHandler->FindDecl(static_cast<IdentifierNode*>(id))) {
+        std::string objClass = GetThisParamObjType(decl); // "t2crt::Object" , "Foo" etc
+        std::string fnName = GetIdentifierName(id);
+        // create new obj with proto chain and ctor init'd : new <obj>(<ctor>, <ctor>->prototype)
+        std::string newObj = "new "s + objClass + "("s + fnName + ", "s + fnName + "->prototype)"s;
+        str = fnName + "->ctor("s + newObj + ", "s;  // call ctor function with new obj as this arg
+      }
+    } else {
+      str = "new "s + EmitTreeNode(node->GetId());
+      str += "("s;
+    }
   }
 
   auto num = node->GetArgsNum();

@@ -285,6 +285,7 @@ bool CppDecl::IsImportedModule(const std::string& module) {
 }
 
 // Generate class to encap TS/JS required func interfaces
+// note: for top level and nested functions only. Not for class methods.
 std::string CppDecl::GenFunctionClass(FunctionNode* node) {
   std::string params, args, retType;
   for (unsigned i = 0; i < node->GetParamsNum(); ++i) {
@@ -295,21 +296,13 @@ std::string CppDecl::GenFunctionClass(FunctionNode* node) {
     if (auto n = node->GetParam(i)) {
       params += EmitTreeNode(n);
       args += GetIdentifierName(n);
+      if (i==0)
+        HandleThisParam(node->GetParamsNum(), n, params, args);
     }
   }
-  // The emitter's C++ mapping for TS funcs has a "this" obj in the c++ func param list
-  // which will be generated from AST if declared as a TS func parameter as required by
-  // TS strict node, but TS funcs that do not reference 'this' are not required to declare
-  // it, in which case emitter has to check and insert a generic this param for C++ func.
-  if (node->GetParamsNum() == 0) {               // TS func param list empty
-    params = "t2crt::Object* _this"s;
-    args = "_this"s;
-  }
-  else if (!node->GetParam(0)->IsLiteral() ||    // TS func 1st param is not "this"
-           !AstDump::GetEnumLitData(static_cast<LiteralNode*>(node->GetParam(0))->GetData()).compare("this") == 0) {
-    params = "t2crt::Object* _this, "s + params;
-    args = "_this, "s + args;
-  }
+  if (node->GetParamsNum() == 0)
+    HandleThisParam(0, nullptr, params, args);
+
   return GenFuncClass(GetTypeString(node->GetType(), nullptr), GetIdentifierName(node), params, args);
 }
 
