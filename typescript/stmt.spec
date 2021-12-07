@@ -2402,11 +2402,12 @@ rule GlobalDeclaration : "declare" + GlobalDeclMembers
 #################################################################################################
 
 # The module name could be an identifier or string literal.
-rule ExternalModuleDeclaration : "module" + PrimaryExpression + '{' + DeclarationModule + '}'
+rule ExternalModuleDeclaration : ONEOF("module" + IdentifierReference + '{' + DeclarationModule + '}',
+                                       "module" + Literal + '{' + DeclarationModule + '}')
   attr.property : Top
-  attr.action : BuildModule(%2)
-  attr.action : SetIsAmbient()
-  attr.action : AddModuleBody(%4)
+  attr.action.%1,%2 : BuildModule(%2)
+  attr.action.%1,%2 : AddModuleBody(%4)
+  attr.action.%2    : SetIsAmbient()
 
 #DeclarationElement: InterfaceDeclaration TypeAliasDeclaration NamespaceDeclaration AmbientDeclaration ImportAliasDeclaration
 rule DeclarationElement: ONEOF(InterfaceDeclaration,
