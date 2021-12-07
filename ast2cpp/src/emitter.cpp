@@ -1923,33 +1923,21 @@ std::string Emitter::EmitTupleTypeNode(TupleTypeNode *node) {
 std::string Emitter::EmitModuleNode(ModuleNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str("// Filename: "s);
-  str += node->GetFilename() + "\n"s;
-  //str += AstDump::GetEnumSrcLang(node->GetSrcLang());
-  /*
-  if (auto n = node->GetPackage()) {
-    str += ' ' + EmitPackageNode(n);
-  }
 
-  for (unsigned i = 0; i < node->GetImportsNum(); ++i) {
-    if (i)
-      str += ", "s;
-    if (auto n = node->GetImport(i)) {
-      str += ' ' + EmitImportNode(n);
-    }
-  }
-  */
+  std::string str;
   for (unsigned i = 0; i < node->GetTreesNum(); ++i) {
     if (auto n = node->GetTree(i)) {
       str += EmitTreeNode(n) + GetEnding(n);
     }
   }
+
+  std::string name = node->GetFilename();
   if (auto p = node->GetParent()) {
-    std::string name = node->GetFilename();
-    if (p->IsDeclare()) // TODO: Needs a flag for ambient module with quoted name
+    if (node->IsAmbient())
       name = '"' + name + '"';
     str = "module "s + name + " {\n"s + str + "}\n"s;
-  }
+  } else
+    str = "// Filename: "s + name + "\n"s + str;
   return HandleTreeNode(str, node);
 }
 
