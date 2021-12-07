@@ -52,6 +52,17 @@ TreeNode* ASTScope::FindDeclOf(unsigned stridx) {
   return NULL;
 }
 
+// This is to find the exported decl having the name as stridx
+TreeNode* ASTScope::FindExportedDeclOf(unsigned stridx) {
+  for (unsigned i = 0; i < GetExportedDeclNum(); i++) {
+    TreeNode *tree = GetExportedDecl(i);
+    if (tree->GetStrIdx() == stridx) {
+      return tree;
+    }
+  }
+  return NULL;
+}
+
 // This is to find the type having the name as stridx.
 //
 // starting from local scope
@@ -143,12 +154,48 @@ void ASTScope::Dump(unsigned indent) {
     TreeNode *node = GetDecl(i);
     std::string str = "";
     switch (node->GetKind()) {
-      case NK_Identifier: str = "       arg: "; break;
+      case NK_Identifier: str = "       var: "; break;
       case NK_Decl:       str = "      decl: "; break;
       case NK_Function:   str = "      func: "; break;
       case NK_Struct:     str = "    struct: "; break;
       case NK_Class:      str = "     class: "; break;
       case NK_Namespace:  str = " namespace: "; break;
+    }
+    if (str.length()) {
+      node->DumpIndentation(indent);
+      std::string name = node->GetStrIdx() ? node->GetName() : "-";
+      std::cout << str << name << " " << node->GetNodeId() << std::endl;
+    }
+  }
+
+  for (unsigned i = 0; i < GetImportedDeclNum(); i++) {
+    TreeNode *node = GetImportedDecl(i);
+    std::string str = "";
+    switch (node->GetKind()) {
+      case NK_Identifier: str = "       var: - Imported "; break;
+      case NK_Decl:       str = "      decl: - Imported "; break;
+      case NK_Function:   str = "      func: - Imported "; break;
+      case NK_Struct:     str = "    struct: - Imported "; break;
+      case NK_Class:      str = "     class: - Imported "; break;
+      case NK_Namespace:  str = " namespace: - Imported "; break;
+    }
+    if (str.length()) {
+      node->DumpIndentation(indent);
+      std::string name = node->GetStrIdx() ? node->GetName() : "-";
+      std::cout << str << name << " " << node->GetNodeId() << std::endl;
+    }
+  }
+
+  for (unsigned i = 0; i < GetExportedDeclNum(); i++) {
+    TreeNode *node = GetExportedDecl(i);
+    std::string str = "";
+    switch (node->GetKind()) {
+      case NK_Identifier: str = "       var: - Exported "; break;
+      case NK_Decl:       str = "      decl: - Exported "; break;
+      case NK_Function:   str = "      func: - Exported "; break;
+      case NK_Struct:     str = "    struct: - Exported "; break;
+      case NK_Class:      str = "     class: - Exported "; break;
+      case NK_Namespace:  str = " namespace: - Exported "; break;
     }
     if (str.length()) {
       node->DumpIndentation(indent);
