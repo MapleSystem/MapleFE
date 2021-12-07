@@ -2227,6 +2227,7 @@ rule MemberVariableDeclaration: ONEOF(
   attr.action.%7 : BuildIdentifier(%3)
   attr.action.%7 : AddType(%4)
   attr.action.%7 : AddModifier(%1)
+  attr.action.%7 : AddModifier(%2)
   attr.action.%7 : AddInitTo(%5)
   attr.action.%7 : BuildDecl()
 
