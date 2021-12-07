@@ -95,6 +95,17 @@ void BuildScopeVisitor::AddImportedDecl(ASTScope *scope, TreeNode *node) {
   }
 }
 
+void BuildScopeVisitor::AddExportedDecl(ASTScope *scope, TreeNode *node) {
+  unsigned sid = scope->GetTree()->GetNodeId();
+  unsigned nid = node->GetNodeId();
+  if (mScope2ExportedDeclsMap[sid].find(nid) ==
+      mScope2ExportedDeclsMap[sid].end()) {
+    scope->AddExportDecl(node);
+    mScope2ExportedDeclsMap[sid].insert(nid);
+    mHandler->AddNodeId2DeclMap(nid, node);
+  }
+}
+
 void BuildScopeVisitor::AddType(ASTScope *scope, TreeNode *node) {
   unsigned sid = scope->GetTree()->GetNodeId();
   if (mScope2TypesMap[sid].find(node->GetNodeId()) ==
@@ -529,21 +540,32 @@ ExportNode *BuildScopeVisitor::VisitExportNode(ExportNode *node) {
     XXportAsPairNode *p = node->GetPair(i);
     TreeNode *bfnode = p->GetBefore();
     TreeNode *afnode = p->GetAfter();
-    if (bfnode) {
-      if (targetHandler) {
-        ModuleNode *mod = targetHandler->GetASTModule();
-        ASTScope *modscp = mod->GetScope();
-        bfnode->SetScope(modscp);
+    if (targetHandler) {
+      ModuleNode *mod = targetHandler->GetASTModule();
+      ASTScope *modscp = mod->GetScope();
 
+      if (bfnode) {
+        bfnode->SetScope(modscp);
         // reexported bfnode is treated as a decl, add directly into map
         if (bfnode->IsIdentifier()) {
           mHandler->AddNodeId2DeclMap(bfnode->GetNodeId(), bfnode);
         }
+      } else if (!afnode) {
+        // reexport everything
+        for (unsigned j = 0; j < modscp->GetExportedDeclNum(); j++) {
+          AddExportedDecl(scope, modscp->GetExportedDecl(j));
+        }
+      }
+    } else {
+      if (!p->IsDefault() && bfnode && !afnode) {
+        AddExportedDecl(scope, bfnode);
       }
     }
+
     if (afnode && afnode->IsIdentifier()) {
       // exported afnode is treated as a decl, add directly into map
       mHandler->AddNodeId2DeclMap(afnode->GetNodeId(), afnode);
+      AddExportedDecl(scope, afnode);
     }
   }
 

@@ -1399,13 +1399,12 @@ IdentifierNode *TypeInferVisitor::VisitIdentifierNode(IdentifierNode *node) {
           // for imported decl, need trace down the import/export chain
           if (mXXport->IsImportedDeclId(mHandler->GetHidx(), decl->GetNodeId())) {
             scope = decl->GetScope();
+            decl = scope->FindExportedDeclOf(node->GetStrIdx());
           } else {
             scope = decl->GetScope();
+            decl = scope->FindDeclOf(node->GetStrIdx());
           }
         }
-      }
-      if (scope) {
-        decl = scope->FindDeclOf(node->GetStrIdx());
       }
     } else {
       NOTYETIMPL("node not in field");

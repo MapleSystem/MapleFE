@@ -81,6 +81,7 @@ class BuildScopeVisitor : public BuildScopeBaseVisitor {
 
   std::unordered_map<unsigned, std::unordered_set<unsigned>> mScope2DeclsMap;
   std::unordered_map<unsigned, std::unordered_set<unsigned>> mScope2ImportedDeclsMap;
+  std::unordered_map<unsigned, std::unordered_set<unsigned>> mScope2ExportedDeclsMap;
   std::unordered_map<unsigned, std::unordered_set<unsigned>> mScope2TypesMap;
 
  public:
@@ -100,6 +101,7 @@ class BuildScopeVisitor : public BuildScopeBaseVisitor {
 
   void AddType(ASTScope *scope, TreeNode *node);
   void AddImportedDecl(ASTScope *scope, TreeNode *node);
+  void AddExportedDecl(ASTScope *scope, TreeNode *node);
   void AddDecl(ASTScope *scope, TreeNode *node);
   void AddTypeAndDecl(ASTScope *scope, TreeNode *node);
   ASTScope *NewScope(ASTScope *parent, TreeNode *node);
