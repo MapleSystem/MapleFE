@@ -102,7 +102,6 @@ void BuildScopeVisitor::AddExportedDecl(ASTScope *scope, TreeNode *node) {
       mScope2ExportedDeclsMap[sid].end()) {
     scope->AddExportDecl(node);
     mScope2ExportedDeclsMap[sid].insert(nid);
-    mHandler->AddNodeId2DeclMap(nid, node);
   }
 }
 
