@@ -687,11 +687,17 @@ std::string CppDef::EmitArrayLiteralNode(ArrayLiteralNode *node) {
 std::string CppDef::EmitFieldNode(FieldNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string upper, field;
+  std::string upper, field, propType;
+  bool isRhs = false;   // indicate if field is rhs (val) or lhs (ref)
   auto upnode = node->GetUpper();
-  if (upnode)
+  if (upnode) {
     upper = EmitTreeNode(upnode);
+    isRhs = !mHandler->IsDef(upnode);
+  }
   if (auto n = node->GetField()) {
+    if (isRhs) {
+      propType = hlpGetJSValTypeStr(hlpGetTypeId(n));
+    }
     field = EmitTreeNode(n);
     if (n->IsIdentifier()) {  // check for static class field or method
       if (auto decl = mHandler->FindDecl(static_cast<IdentifierNode*>(n))) {
@@ -713,6 +719,8 @@ std::string CppDef::EmitFieldNode(FieldNode *node) {
   if (mHandler->IsCppField(node->GetField()) || // check if it accesses a Cxx class field
       node->IsTypeIdFunction())
     return upper + "->"s + field;
+  if (isRhs)
+    return "(*"s + upper + ").GetProp"s + propType + "(\""s + field + "\")"s;
   return "(*"s + upper + ")[\""s + field + "\"]"s;
 }
 

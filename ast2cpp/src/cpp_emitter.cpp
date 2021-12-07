@@ -51,13 +51,6 @@ std::string CppEmitter::GetIdentifierName(TreeNode *node) {
             return GetIdentifierName(n->GetDeclAtIndex(0));
           return "Failed: one decl is expected"s;
         }
-    case NK_Literal:
-    {   // Piggybaggin on this function to parse for "this" literal.
-        std::string lit(AstDump::GetEnumLitData(static_cast<LiteralNode*>(node)->GetData()));
-        if (lit.compare("this") == 0)
-          lit = "_"s + lit;
-        return lit;
-    }
     default:
         return "Failed to get the name of "s + AstDump::GetEnumNodeKind(node->GetKind());
   }

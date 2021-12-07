@@ -32,6 +32,25 @@ std::unordered_map<TypeId, std::string>TypeIdToJSTypeCXX = {
 
 FuncTable hFuncTable;
 
+// Used to build GetProp<xxx> for calls to get Object (class Object in ts2cpp.h) property
+std::string hlpGetJSValTypeStr(TypeId typeId) {
+  switch(typeId) {
+    case TY_Object:
+    case TY_Class:
+    case TY_Any:
+      return "Obj";
+    case TY_Function:
+      return "Func";
+    case TY_Boolean:
+      return "bool";
+    case TY_Number:
+      return "Double";
+    case TY_String:
+      return "Str";
+  }
+  return std::string();
+}
+
 // Get TypeId info for a treenode.
 TypeId hlpGetTypeId(TreeNode* node) {
   // lookup typetable
