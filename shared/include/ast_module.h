@@ -43,9 +43,15 @@ public:
   ASTScopePool           mScopePool; // All the scopes are store in this pool. It also contains
                                      // a vector of ASTScope pointer for traversal.
   SrcLang                mSrcLang;
+
+  bool                   mIsAmbient;   // In Typescript there is an ambient module containing
+                                     // only declarations.
 public:
   ModuleNode();
   ~ModuleNode();
+
+  bool IsAmbient()                 {return mIsAmbient;}
+  void SetIsAmbient(bool b = true) {mIsAmbient = b;}
 
   void        SetFilename(const char *f) {mFilename = f;}
   const char *GetFilename() {return mFilename;}

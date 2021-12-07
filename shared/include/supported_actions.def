@@ -30,6 +30,7 @@
 
 ACTION(BuildModule)
 ACTION(AddModuleBody)
+ACTION(SetIsAmbient)
 
 ACTION(BuildPackageName)
 

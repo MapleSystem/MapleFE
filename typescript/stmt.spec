@@ -2405,6 +2405,7 @@ rule GlobalDeclaration : "declare" + GlobalDeclMembers
 rule ExternalModuleDeclaration : "module" + PrimaryExpression + '{' + DeclarationModule + '}'
   attr.property : Top
   attr.action : BuildModule(%2)
+  attr.action : SetIsAmbient()
   attr.action : AddModuleBody(%4)
 
 #DeclarationElement: InterfaceDeclaration TypeAliasDeclaration NamespaceDeclaration AmbientDeclaration ImportAliasDeclaration

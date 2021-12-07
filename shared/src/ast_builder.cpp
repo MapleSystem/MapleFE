@@ -226,6 +226,14 @@ TreeNode* ASTBuilder::BuildModule() {
   return mLastTreeNode;
 }
 
+// It takes no argument.
+TreeNode* ASTBuilder::SetIsAmbient() {
+  MASSERT(mLastTreeNode->IsModule());
+  ModuleNode *mod = (ModuleNode*)mLastTreeNode;
+  mod->SetIsAmbient();
+  return mLastTreeNode;
+}
+
 // Takes one parameter which is the tree of module body.
 TreeNode* ASTBuilder::AddModuleBody() {
   if (mTrace)
