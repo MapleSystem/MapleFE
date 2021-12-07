@@ -1,0 +1,36 @@
+Matched 18 tokens.
+Matched 19 tokens.
+Matched 55 tokens.
+Matched 63 tokens.
+Matched 76 tokens.
+Matched 85 tokens.
+Matched 92 tokens.
+Matched 99 tokens.
+============= Module ===========
+== Sub Tree ==
+class  Foo
+  Fields: 
+    val1=0    val2=0
+  Instance Initializer: 
+  Constructors: 
+  Methods: 
+  LocalClasses: 
+  LocalInterfaces: 
+
+== Sub Tree ==
+func  func(this,arg)  throws: 
+  js_var Decl: x
+  this.val1 Assign arg
+  x Assign this.val1
+  this.val2 Assign x
+
+== Sub Tree ==
+js_var Decl: a=new Foo()
+== Sub Tree ==
+js_var Decl: b=new func(456)
+== Sub Tree ==
+func.call(a,123)
+== Sub Tree ==
+console.log(a)
+== Sub Tree ==
+console.log(b)

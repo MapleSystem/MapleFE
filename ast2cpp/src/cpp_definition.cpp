@@ -1208,7 +1208,7 @@ std::string CppDef::GetThisParamObjType(TreeNode *node) {
   if (node && !node->IsFunction())
     return std::string();
 
-  std::string str;
+  std::string str = "t2crt::Object";
   if (static_cast<FunctionNode*>(node)->GetParamsNum()) {
     auto n = static_cast<FunctionNode*>(node)->GetParam(0);
     if (n->IsIdentifier() && n->IsThis()) {
@@ -1244,7 +1244,8 @@ std::string CppDef::EmitNewNode(NewNode *node) {
       // A new object is created and bound to "this" of ctor func which is then invoked.
       // The object's proto chain is linked to ctor func prototype, and constructor set
       // to the consturctor object. The object is then returned.
-      // note: TSC allows only void functions to be called with "new" keyword.
+      // note: When calling new() on functions, TSC only allows void functions that
+      //       reference 'this' or non void function that do not reference 'this'.
       //       TSC strict mode requires all funcs that refs "this" to declare it as 1st parm.
       if (auto decl = mHandler->FindDecl(static_cast<IdentifierNode*>(id))) {
         std::string objClass = GetThisParamObjType(decl); // "t2crt::Object" , "Foo" etc
