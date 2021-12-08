@@ -364,6 +364,7 @@ rule KeywordPropName : ONEOF("break",
                              "continue",
                              "implements",
                              "enum",
+                             "function",
                              "let",
                              "return",
                              "get",
@@ -2295,8 +2296,9 @@ rule EnumMemberList: ONEOF(EnumMember,
 
 ## EnumMember: PropertyName PropertyName = EnumValue
 rule EnumMember: ONEOF(PropertyName,
-                       PropertyName + '=' + EnumValue)
-  attr.action.%2 : AddInitTo(%1, %3)
+                       PropertyName + '=' + EnumValue,
+                       KeywordPropName + '=' + EnumValue)
+  attr.action.%2,%3 : AddInitTo(%1, %3)
 
 ## EnumValue: AssignmentExpression
 rule EnumValue: AssignmentExpression

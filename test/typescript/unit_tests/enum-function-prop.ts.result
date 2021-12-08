@@ -1,0 +1,7 @@
+Matched 7 tokens.
+Matched 16 tokens.
+============= Module ===========
+== Sub Tree ==
+ts_enum: E {function="function" }
+== Sub Tree ==
+console.log(E.function)
