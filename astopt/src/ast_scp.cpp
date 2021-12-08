@@ -138,9 +138,13 @@ void BuildScopeVisitor::InitInternalTypes() {
 
   // add dummpy console.log()
   ClassNode *console = AddClass("console");
+  ASTScope *scp = NewScope(scope, console);
+  mStrIdx2ScopeMap[console->GetStrIdx()] = scp;
   FunctionNode *log = AddFunction("log");
   log->SetTypeIdx(TY_Void);
   console->AddMethod(log);
+  log->SetScope(scp);
+  AddDecl(scp, log);
 }
 
 ClassNode *BuildScopeVisitor::AddClass(std::string name, unsigned tyidx) {
