@@ -109,8 +109,6 @@ void AstOpt::PreprocessModules() {
 
   // list modules according to dependency
   mASTXXport->BuildModuleOrder();
-  // collect import/export info
-  mASTXXport->CollectXXportInfo();
 }
 
 }

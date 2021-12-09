@@ -20,6 +20,7 @@
 #include "typetable.h"
 #include "ast_util.h"
 #include "ast_info.h"
+#include "ast_xxport.h"
 
 namespace maplefe {
 
@@ -30,6 +31,10 @@ void AST_INFO::CollectInfo() {
     TreeNode *it = module->GetTree(i);
     it->SetParent(module);
   }
+
+  // collect import/export info
+  MSGNOLOC0("============== XXport info ==============");
+  mHandler->GetASTXXport()->CollectXXportInfo(mHandler->GetHidx());
 
   MSGNOLOC0("============== Fill node info ==============");
   FillNodeInfoVisitor visitor_node(mHandler, mFlags, true);

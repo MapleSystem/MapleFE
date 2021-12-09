@@ -89,7 +89,7 @@ class AST_XXport {
 
   void SortHandler();
 
-  void CollectXXportInfo();
+  void CollectXXportInfo(unsigned hidx);
 
   void AddHandlerIdx2DependentHandlerIdxMap(unsigned hdlIdx, unsigned depHdlIdx) {
     mHandlerIdx2DependentHandlerIdxMap[hdlIdx].insert(depHdlIdx);

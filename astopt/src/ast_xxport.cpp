@@ -139,28 +139,87 @@ unsigned AST_XXport::GetHandleIdxFromStrIdx(unsigned stridx) {
   return FLG_no_imported ? 0 : DEFAULTVALUE;
 }
 
-void AST_XXport::CollectXXportInfo() {
-  for (auto hidx: mHandlersIdxInOrder) {
-    Module_Handler *handler = mASTHandler->GetModuleHandler(hidx);
-    ModuleNode *module = handler->GetASTModule();
+void AST_XXport::CollectXXportInfo(unsigned hidx) {
+  Module_Handler *handler = mASTHandler->GetModuleHandler(hidx);
+  ModuleNode *module = handler->GetASTModule();
 
-    for (auto it : mImportNodeSets[hidx]) {
-      ImportNode *node = it;
-      TreeNode *target = GetTarget(node);
-      unsigned stridx = (target && target->GetStrIdx()) ? target->GetStrIdx() : module->GetStrIdx();
-      XXportInfo *info = new XXportInfo(stridx, node->GetNodeId());;
+  for (auto it : mImportNodeSets[hidx]) {
+    ImportNode *node = it;
+    TreeNode *target = GetTarget(node);
+    unsigned stridx = (target && target->GetStrIdx()) ? target->GetStrIdx() : module->GetStrIdx();
+    XXportInfo *info = new XXportInfo(stridx, node->GetNodeId());;
 
-      for (unsigned i = 0; i < node->GetPairsNum(); i++) {
-        XXportAsPairNode *p = node->GetPair(i);
-        TreeNode *bfnode = p->GetBefore();
-        TreeNode *afnode = p->GetAfter();
-        MASSERT(bfnode && "before node NULL for default");
+    for (unsigned i = 0; i < node->GetPairsNum(); i++) {
+      XXportAsPairNode *p = node->GetPair(i);
+      TreeNode *bfnode = p->GetBefore();
+      TreeNode *afnode = p->GetAfter();
+      MASSERT(bfnode && "before node NULL for default");
 
-        // import * as MM from "./M";
-        // bfnode represents a module
-        if (p->IsEverything()) {
-          info->SetEverything();
+      // import * as MM from "./M";
+      // bfnode represents a module
+      if (p->IsEverything()) {
+        info->SetEverything();
 
+        MASSERT(target && "everything export no target");
+        SetIdStrIdx2ModuleStrIdx(bfnode->GetStrIdx(), target->GetStrIdx());
+
+        unsigned hidx = GetHandleIdxFromStrIdx(target->GetStrIdx());
+        Module_Handler *handler = mASTHandler->GetModuleHandler(hidx);
+        ModuleNode *module = handler->GetASTModule();
+        bfnode->SetTypeId(TY_Module);
+        bfnode->SetTypeIdx(module->GetTypeIdx());
+      }
+
+      // reformat default import
+      if (!p->IsDefault()) {
+        if (IsDefault(bfnode) ) {
+          p->SetIsDefault(true);
+          p->SetBefore(afnode);
+          p->SetAfter(NULL);
+        }
+      }
+
+      if (p->IsDefault()) {
+        info->mDefaultNodeId = bfnode->GetNodeId();
+      } else {
+        std::pair<unsigned, unsigned> pnid(bfnode->GetNodeId(), afnode ? afnode->GetNodeId() : 0);
+        info->mNodeIdPairs.insert(pnid);
+      }
+    }
+
+    mImports[hidx].insert(info);
+  }
+
+  for (auto it : mExportNodeSets[hidx]) {
+    ExportNode *node = it;
+    TreeNode *target = GetTarget(node);
+    unsigned stridx = (target && target->GetStrIdx()) ? target->GetStrIdx() : module->GetStrIdx();
+    XXportInfo *info = new XXportInfo(stridx, node->GetNodeId());;
+
+    for (unsigned i = 0; i < node->GetPairsNum(); i++) {
+      XXportAsPairNode *p = node->GetPair(i);
+      TreeNode *bfnode = p->GetBefore();
+      TreeNode *afnode = p->GetAfter();
+
+      // export import a = M.a
+      if (bfnode && bfnode->IsImport()) {
+        ImportNode *imp = static_cast<ImportNode *>(bfnode);
+        for (unsigned j = 0; j < imp->GetPairsNum(); j++) {
+          XXportAsPairNode *q = imp->GetPair(i);
+          TreeNode *bf = q->GetBefore();
+          TreeNode *af = q->GetAfter();
+          std::pair<unsigned, unsigned> pnid(af->GetNodeId(), bf->GetNodeId());
+          info->mNodeIdPairs.insert(pnid);
+        }
+
+        continue;
+      }
+
+      if (p->IsEverything()) {
+        info->SetEverything();
+        if (bfnode) {
+          // export * as MM from "./M";
+          // bfnode represents a module
           MASSERT(target && "everything export no target");
           SetIdStrIdx2ModuleStrIdx(bfnode->GetStrIdx(), target->GetStrIdx());
 
@@ -169,101 +228,40 @@ void AST_XXport::CollectXXportInfo() {
           ModuleNode *module = handler->GetASTModule();
           bfnode->SetTypeId(TY_Module);
           bfnode->SetTypeIdx(module->GetTypeIdx());
-        }
-
-        // reformat default import
-        if (!p->IsDefault()) {
-          if (IsDefault(bfnode) ) {
-            p->SetIsDefault(true);
-            p->SetBefore(afnode);
-            p->SetAfter(NULL);
-          }
-        }
-
-        if (p->IsDefault()) {
-          info->mDefaultNodeId = bfnode->GetNodeId();
         } else {
-          std::pair<unsigned, unsigned> pnid(bfnode->GetNodeId(), afnode ? afnode->GetNodeId() : 0);
-          info->mNodeIdPairs.insert(pnid);
-        }
-      }
-
-      mImports[hidx].insert(info);
-    }
-
-    for (auto it : mExportNodeSets[hidx]) {
-      ExportNode *node = it;
-      TreeNode *target = GetTarget(node);
-      unsigned stridx = (target && target->GetStrIdx()) ? target->GetStrIdx() : module->GetStrIdx();
-      XXportInfo *info = new XXportInfo(stridx, node->GetNodeId());;
-
-      for (unsigned i = 0; i < node->GetPairsNum(); i++) {
-        XXportAsPairNode *p = node->GetPair(i);
-        TreeNode *bfnode = p->GetBefore();
-        TreeNode *afnode = p->GetAfter();
-
-        // export import a = M.a
-        if (bfnode && bfnode->IsImport()) {
-          ImportNode *imp = static_cast<ImportNode *>(bfnode);
-          for (unsigned j = 0; j < imp->GetPairsNum(); j++) {
-            XXportAsPairNode *q = imp->GetPair(i);
-            TreeNode *bf = q->GetBefore();
-            TreeNode *af = q->GetAfter();
-            std::pair<unsigned, unsigned> pnid(af->GetNodeId(), bf->GetNodeId());
-            info->mNodeIdPairs.insert(pnid);
-          }
-
+          // export * from "./M"
           continue;
         }
-
-        if (p->IsEverything()) {
-          info->SetEverything();
-          if (bfnode) {
-            // export * as MM from "./M";
-            // bfnode represents a module
-            MASSERT(target && "everything export no target");
-            SetIdStrIdx2ModuleStrIdx(bfnode->GetStrIdx(), target->GetStrIdx());
-
-            unsigned hidx = GetHandleIdxFromStrIdx(target->GetStrIdx());
-            Module_Handler *handler = mASTHandler->GetModuleHandler(hidx);
-            ModuleNode *module = handler->GetASTModule();
-            bfnode->SetTypeId(TY_Module);
-            bfnode->SetTypeIdx(module->GetTypeIdx());
-          } else {
-            // export * from "./M"
-            continue;
-          }
-        }
-
-        // reformat default export
-        if (p->IsDefault()) {
-          p->SetIsRef(false);
-        } else if (afnode && IsDefault(afnode)) {
-          p->SetIsDefault(true);
-          p->SetBefore(bfnode);
-          p->SetAfter(NULL);
-        }
-
-        bfnode = p->GetBefore();
-        afnode = p->GetAfter();
-        if (p->IsDefault()) {
-          if (afnode) {
-            info->mDefaultNodeId = afnode->GetNodeId();
-          } else {
-            info->mDefaultNodeId = bfnode->GetNodeId();
-          }
-        } else if (mExportNodeSets[hidx].size() == 1 && node->GetPairsNum() == 1) {
-          info->mDefaultNodeId = bfnode->GetNodeId();
-          std::pair<unsigned, unsigned> pnid(bfnode->GetNodeId(), afnode ? afnode->GetNodeId() : 0);
-          info->mNodeIdPairs.insert(pnid);
-        } else {
-          std::pair<unsigned, unsigned> pnid(bfnode->GetNodeId(), afnode ? afnode->GetNodeId() : 0);
-          info->mNodeIdPairs.insert(pnid);
-        }
       }
 
-      mExports[hidx].insert(info);
+      // reformat default export
+      if (p->IsDefault()) {
+        p->SetIsRef(false);
+      } else if (afnode && IsDefault(afnode)) {
+        p->SetIsDefault(true);
+        p->SetBefore(bfnode);
+        p->SetAfter(NULL);
+      }
+
+      bfnode = p->GetBefore();
+      afnode = p->GetAfter();
+      if (p->IsDefault()) {
+        if (afnode) {
+          info->mDefaultNodeId = afnode->GetNodeId();
+        } else {
+          info->mDefaultNodeId = bfnode->GetNodeId();
+        }
+      } else if (mExportNodeSets[hidx].size() == 1 && node->GetPairsNum() == 1) {
+        info->mDefaultNodeId = bfnode->GetNodeId();
+        std::pair<unsigned, unsigned> pnid(bfnode->GetNodeId(), afnode ? afnode->GetNodeId() : 0);
+        info->mNodeIdPairs.insert(pnid);
+      } else {
+        std::pair<unsigned, unsigned> pnid(bfnode->GetNodeId(), afnode ? afnode->GetNodeId() : 0);
+        info->mNodeIdPairs.insert(pnid);
+      }
     }
+
+    mExports[hidx].insert(info);
   }
 }
 
