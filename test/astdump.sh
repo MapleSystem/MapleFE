@@ -176,7 +176,6 @@ for ts in $LIST; do
     idx=0
     grep -n -e "^digraph $PRE[^{]* {" -e "^}" <<< "$out" | grep -A1 "digraph [^{]* {" |
       grep -v ^-- | sed 'N;s/\n/ /' | sed -e 's/:digraph [^{]* { */,/' -e 's/:.*/p/g' |
-      sed -e 1b -e '$!d' |
       { while read cmd; do
         idx=$((idx+1))
         sed -n $cmd <<< "$out" > "$ts"-$idx.dot
