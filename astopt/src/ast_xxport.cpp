@@ -47,20 +47,6 @@ void AST_XXport::BuildModuleOrder() {
 
   // sort handlers with dependency
   SortHandler();
-
-  // collect import/export info
-  CollectXXportInfo();
-
-  if (mFlags & FLG_trace_2) {
-    std::cout << "============== Module Order ==============" << std::endl;
-    std::list<unsigned>::iterator it = mHandlersIdxInOrder.begin();
-    for (; it != mHandlersIdxInOrder.end(); it++) {
-      unsigned idx = *it;
-      Module_Handler *handler = mASTHandler->GetModuleHandler(idx);
-      ModuleNode *module = handler->GetASTModule();
-      std::cout << "module : " << gStringPool.GetStringFromStrIdx(module->GetStrIdx()) << std::endl;
-    }
-  }
 }
 
 void AST_XXport::SetModuleStrIdx() {
@@ -134,6 +120,16 @@ void AST_XXport::SortHandler() {
     Module_Handler *h = mASTHandler->GetModuleHandler(idx);
     mAstOpt->AddModuleHandler(h);
   }
+
+  if (mFlags & FLG_trace_2) {
+    std::cout << "============== Module Order ==============" << std::endl;
+    std::list<unsigned>::iterator it = mHandlersIdxInOrder.begin();
+    for (auto hidx: mHandlersIdxInOrder) {
+      Module_Handler *handler = mASTHandler->GetModuleHandler(hidx);
+      ModuleNode *module = handler->GetASTModule();
+      std::cout << "module : " << gStringPool.GetStringFromStrIdx(module->GetStrIdx()) << std::endl;
+    }
+  }
 }
 
 unsigned AST_XXport::GetHandleIdxFromStrIdx(unsigned stridx) {
@@ -144,7 +140,7 @@ unsigned AST_XXport::GetHandleIdxFromStrIdx(unsigned stridx) {
 }
 
 void AST_XXport::CollectXXportInfo() {
-  for (unsigned hidx = 0; hidx < GetModuleNum(); hidx++) {
+  for (auto hidx: mHandlersIdxInOrder) {
     Module_Handler *handler = mASTHandler->GetModuleHandler(hidx);
     ModuleNode *module = handler->GetASTModule();
 

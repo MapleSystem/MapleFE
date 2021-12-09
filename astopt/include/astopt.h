@@ -39,14 +39,15 @@ private:
   AST_XXport  *mASTXXport;
   unsigned     mFlags;
 
-  // module handlers in mASTHandler sorted by import/export dependency
-  std::vector<Module_Handler *> mHandlersIdxInOrder;
-
   // nodeid to node map for all nodes in all modules
   std::unordered_map<unsigned, TreeNode*> mNodeId2NodeMap;
 
   // nodeid to handler map for all nodes in all modules
   std::unordered_map<unsigned, Module_Handler*> mNodeId2HandlerMap;
+
+public:
+  // module handlers in mASTHandler sorted by import/export dependency
+  std::vector<Module_Handler *> mHandlersInOrder;
 
 public:
   explicit AstOpt(AST_Handler *h, unsigned f);
@@ -55,21 +56,11 @@ public:
   AST_Handler *GetASTHandler() {return mASTHandler;}
   AST_XXport *GetASTXXport() {return mASTXXport;}
   unsigned GetModuleNum();
-  Module_Handler *GetModuleHandler(unsigned i) { return mHandlersIdxInOrder[i]; }
-  void AddModuleHandler(Module_Handler *h) { mHandlersIdxInOrder.push_back(h); }
-
-  virtual void ProcessAST(unsigned trace);
+  Module_Handler *GetModuleHandler(unsigned i) { return mHandlersInOrder[i]; }
+  void AddModuleHandler(Module_Handler *h) { mHandlersInOrder.push_back(h); }
 
   void PreprocessModules();
-  void CollectInfo();
-  void AdjustAST();
-  void ScopeAnalysis();
-
-  void BasicAnalysis();
-  void BuildCFG();
-  void ControlFlowAnalysis();
-  void TypeInference();
-  void DataFlowAnalysis();
+  virtual void ProcessAST(unsigned trace);
 
   TreeNode *GetNodeFromNodeId(unsigned nid) { return mNodeId2NodeMap[nid]; }
   void AddNodeId2NodeMap(TreeNode *node) { mNodeId2NodeMap[node->GetNodeId()] = node; }

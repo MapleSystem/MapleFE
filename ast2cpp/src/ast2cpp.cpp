@@ -133,13 +133,15 @@ int A2C::ProcessAST() {
     }
   }
 
-  // basic analysis
-  BasicAnalysis();
+  // build dependency of modules
+  PreprocessModules();
 
-  // loop through module handlers in import/export order
-  for (HandlerIndex i = 0; i < GetModuleNum(); i++) {
-    Module_Handler *handler = GetModuleHandler(i);
+  // loop through module handlers in import/export dependency order
+  for (auto handler: mHandlersInOrder) {
     ModuleNode *module = handler->GetASTModule();
+
+    // basic analysis
+    handler->BasicAnalysis();
 
     if (mFlags & FLG_trace_2) {
       std::cout << "============= After AdjustAST ===========" << std::endl;
@@ -153,29 +155,19 @@ int A2C::ProcessAST() {
       AstGraph graph(module);
       graph.DumpGraph("After AdjustAST()", &std::cout);
     }
-  }
 
-  // build CFG
-  BuildCFG();
-
-  for (HandlerIndex i = 0; i < GetModuleNum(); i++) {
-    Module_Handler *handler = GetModuleHandler(i);
-    ModuleNode *module = handler->GetASTModule();
+    // build CFG
+    handler->BuildCFG();
 
     if (mFlags & FLG_trace_2) {
       handler->Dump("After BuildCFG()");
     }
-  }
 
-  // control flow analysis
-  ControlFlowAnalysis();
+    // control flow analysis
+    handler->ControlFlowAnalysis();
 
-  // type inference
-  TypeInference();
-
-  for (HandlerIndex i = 0; i < GetModuleNum(); i++) {
-    Module_Handler *handler = GetModuleHandler(i);
-    ModuleNode *module = handler->GetASTModule();
+    // type inference
+    handler->TypeInference();
 
     if (mFlags & FLG_trace_2) {
       std::cout << "============= AstGraph ===========" << std::endl;
@@ -188,18 +180,17 @@ int A2C::ProcessAST() {
       AstDump astdump(module);
       astdump.Dump("After BuildCFG()", &std::cout);
     }
-  }
 
-  // data flow analysis
-  DataFlowAnalysis();
-
-  for (HandlerIndex i = 0; i < GetModuleNum(); i++) {
-    Module_Handler *handler = GetModuleHandler(i);
-    ModuleNode *module = handler->GetASTModule();
+    // data flow analysis
+    handler->DataFlowAnalysis();
 
     if (mFlags & FLG_trace_2) {
       handler->Dump("After DataFlowAnalysis()");
     }
+  }
+
+  for (auto handler: mHandlersInOrder) {
+    ModuleNode *module = handler->GetASTModule();
 
     if (mFlags & FLG_emit_ts) {
       std::cout << "============= Emitter ===========" << std::endl;

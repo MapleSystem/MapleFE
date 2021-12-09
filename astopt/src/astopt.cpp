@@ -56,43 +56,34 @@ void AstOpt::ProcessAST(unsigned flags) {
     }
   }
 
-  // basic analysis
-  BasicAnalysis();
+  // build dependency of modules 
+  PreprocessModules();
 
-  // build CFG
-  BuildCFG();
+  for (auto handler: mHandlersInOrder) {
+    // basic analysis
+    handler->BasicAnalysis();
 
-  // control flow analysis
-  ControlFlowAnalysis();
+    // build CFG
+    handler->BuildCFG();
 
-  // type inference
-  TypeInference();
+    // control flow analysis
+    handler->ControlFlowAnalysis();
 
-  // data flow analysis
-  DataFlowAnalysis();
+    // type inference
+    handler->TypeInference();
 
-  for (auto it: mHandlersIdxInOrder) {
-    ModuleNode *module = it->GetASTModule();
+    // data flow analysis
+    handler->DataFlowAnalysis();
+  }
+
+  for (auto handler: mHandlersInOrder) {
+    ModuleNode *module = handler->GetASTModule();
 
     AstStore saveAst(module);
     saveAst.StoreInAstBuf();
   }
 
   return;
-}
-
-void AstOpt::BasicAnalysis() {
-  // list modules according to dependency
-  PreprocessModules();
-
-  // collect AST info
-  CollectInfo();
-
-  // rewirte some AST nodes
-  AdjustAST();
-
-  // scope analysis
-  ScopeAnalysis();
 }
 
 void AstOpt::PreprocessModules() {
@@ -118,54 +109,8 @@ void AstOpt::PreprocessModules() {
 
   // list modules according to dependency
   mASTXXport->BuildModuleOrder();
-}
-
-void AstOpt::CollectInfo() {
-  for (auto it: mHandlersIdxInOrder) {
-    it->CollectInfo();
-  }
-}
-
-void AstOpt::AdjustAST() {
-  for (auto it: mHandlersIdxInOrder) {
-    it->AdjustAST();
-  }
-}
-
-void AstOpt::ScopeAnalysis() {
-  for (auto it: mHandlersIdxInOrder) {
-    it->ScopeAnalysis();
-
-    if (mFlags & FLG_trace_2) {
-      std::cout << "============== Dump Scope ==============" << std::endl;
-      ModuleNode *module = it->GetASTModule();
-      module->GetRootScope()->Dump(0);
-    }
-  }
-}
-
-void AstOpt::BuildCFG() {
-  for (auto it: mHandlersIdxInOrder) {
-    it->BuildCFG();
-  }
-}
-
-void AstOpt::ControlFlowAnalysis() {
-  for (auto it: mHandlersIdxInOrder) {
-    it->ControlFlowAnalysis();
-  }
-}
-
-void AstOpt::TypeInference() {
-  for (auto it: mHandlersIdxInOrder) {
-    it->TypeInference();
-  }
-}
-
-void AstOpt::DataFlowAnalysis() {
-  for (auto it: mHandlersIdxInOrder) {
-    it->DataFlowAnalysis();
-  }
+  // collect import/export info
+  mASTXXport->CollectXXportInfo();
 }
 
 }

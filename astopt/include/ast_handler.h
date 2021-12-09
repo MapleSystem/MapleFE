@@ -145,6 +145,7 @@ class Module_Handler {
     mFlags(f) {}
   ~Module_Handler();
 
+  void BasicAnalysis();
   void CollectInfo();
   void AdjustAST();
   void ScopeAnalysis();

@@ -85,6 +85,17 @@ bool AST_Handler::AddModule(ModuleNode *m) {
   return true;
 }
 
+void Module_Handler::BasicAnalysis() {
+  // collect AST info
+  CollectInfo();
+
+  // rewirte some AST nodes
+  AdjustAST();
+
+  // scope analysis
+  ScopeAnalysis();
+}
+
 void Module_Handler::CollectInfo() {
   if (!mUtil) {
     mUtil = new(GetMemPool()->Alloc(sizeof(AST_Util))) AST_Util(this, mFlags);
@@ -107,6 +118,11 @@ void Module_Handler::ScopeAnalysis() {
     mSCP = new(GetMemPool()->Alloc(sizeof(AST_SCP))) AST_SCP(this, mFlags);
   }
   mSCP->ScopeAnalysis();
+
+  if (mFlags & FLG_trace_2) {
+    std::cout << "============== Dump Scope ==============" << std::endl;
+    mASTModule->GetRootScope()->Dump(0);
+  }
 }
 
 void Module_Handler::TypeInference() {
