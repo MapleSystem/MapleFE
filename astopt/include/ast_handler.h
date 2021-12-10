@@ -195,8 +195,6 @@ class Module_Handler {
   void SetTI(TypeInfer *p) {mTI = p;}
   void SetUtil(AST_Util *p) {mUtil = p;}
 
-  DeclNode *GetDeclOf(IdentifierNode *inode);
-
   // deep true  : find Decl in imported module as well
   //      false : find Decl in current module only
   TreeNode *FindDecl(IdentifierNode *node, bool deep = false);
