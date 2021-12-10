@@ -1,0 +1,18 @@
+Matched 24 tokens.
+Matched 32 tokens.
+Matched 45 tokens.
+Matched 58 tokens.
+============= Module ===========
+== Sub Tree ==
+generator foo(index)  throws: 
+  while index LT 2    yield index
+    index Inc
+
+
+
+== Sub Tree ==
+js_const Decl: iterator=foo(0)
+== Sub Tree ==
+console.log(iterator.next().value)
+== Sub Tree ==
+console.log(iterator.next().value)
