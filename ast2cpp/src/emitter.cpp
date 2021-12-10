@@ -384,7 +384,12 @@ std::string Emitter::EmitUserTypeNode(UserTypeNode *node) {
 std::string Emitter::EmitComputedNameNode(ComputedNameNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str("[");
+  std::string str;
+  for (unsigned i = 0; i < node->GetAttrsNum(); ++i) {
+    std::string s = GetEnumAttrId(node->GetAttrAtIndex(i));
+    str += s;
+  }
+  str += " ["s;
   if (auto n = node->GetExpr()) {
     str += EmitTreeNode(n);
   }
