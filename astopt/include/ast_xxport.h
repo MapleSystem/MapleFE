@@ -123,6 +123,8 @@ class AST_XXport {
   void AddImportedDeclIds(unsigned hidx, unsigned nid) {mImportedDeclIds[hidx].push_back(nid);}
   void AddExportedDeclIds(unsigned hidx, unsigned nid) {mExportedDeclIds[hidx].push_back(nid);}
 
+  TreeNode *FindExportedDecl(unsigned hidx, unsigned stridx);
+
   // get stridx of M from M.get()
   unsigned ExtractTargetStrIdx(TreeNode *node);
 

@@ -58,11 +58,17 @@ void AST_XXport::SetModuleStrIdx() {
     unsigned stridx = gStringPool.GetStrIdx(module->GetFilename());
     module->SetStrIdx(stridx);
     mStrIdx2HandlerIdxMap[stridx] = i;
+  }
+}
 
-    if (mFlags & FLG_trace_2) {
-      std::cout << "module : " << gStringPool.GetStringFromStrIdx(module->GetStrIdx()) << std::endl;
+TreeNode *AST_XXport::FindExportedDecl(unsigned hidx, unsigned stridx) {
+  for (auto nid : mExportedDeclIds[hidx]) {
+    TreeNode *node = mAstOpt->GetNodeFromNodeId(nid);
+    if (node->GetStrIdx() == stridx) {
+      return node;
     }
   }
+  return NULL;
 }
 
 void AST_XXport::CollectXXportNodes() {
@@ -128,6 +134,10 @@ void AST_XXport::SortHandler() {
       Module_Handler *handler = mASTHandler->GetModuleHandler(hidx);
       ModuleNode *module = handler->GetASTModule();
       std::cout << "module : " << gStringPool.GetStringFromStrIdx(module->GetStrIdx()) << std::endl;
+      for (auto nid: mExportedDeclIds[hidx]) {
+        TreeNode * node = mAstOpt->GetNodeFromNodeId(nid);
+        std::cout << " export : " << gStringPool.GetStringFromStrIdx(node->GetStrIdx()) << " " << nid << std::endl;
+      }
     }
   }
 }
@@ -154,6 +164,16 @@ void AST_XXport::CollectImportInfo(unsigned hidx) {
     unsigned stridx = (target && target->GetStrIdx()) ? target->GetStrIdx() : module->GetStrIdx();
     XXportInfo *info = new XXportInfo(stridx, node->GetNodeId());;
 
+    unsigned targethidx = DEFAULTVALUE;;
+    Module_Handler *targethandler = NULL;
+    ModuleNode *targetmodule = NULL;
+
+    if (target) {
+      targethidx = GetHandleIdxFromStrIdx(target->GetStrIdx());
+      targethandler = mASTHandler->GetModuleHandler(targethidx);
+      targetmodule = targethandler->GetASTModule();
+    }
+
     for (unsigned i = 0; i < node->GetPairsNum(); i++) {
       XXportAsPairNode *p = node->GetPair(i);
       TreeNode *bfnode = p->GetBefore();
@@ -168,27 +188,50 @@ void AST_XXport::CollectImportInfo(unsigned hidx) {
         MASSERT(target && "everything export no target");
         SetIdStrIdx2ModuleStrIdx(bfnode->GetStrIdx(), target->GetStrIdx());
 
-        unsigned hidx = GetHandleIdxFromStrIdx(target->GetStrIdx());
-        Module_Handler *handler = mASTHandler->GetModuleHandler(hidx);
-        ModuleNode *module = handler->GetASTModule();
         bfnode->SetTypeId(TY_Module);
-        bfnode->SetTypeIdx(module->GetTypeIdx());
-      }
+        bfnode->SetTypeIdx(targetmodule->GetTypeIdx());
 
-      // reformat default import
-      if (!p->IsDefault()) {
-        if (IsDefault(bfnode) ) {
-          p->SetIsDefault(true);
-          p->SetBefore(afnode);
-          p->SetAfter(NULL);
-        }
-      }
-
-      if (p->IsDefault()) {
-        info->mDefaultNodeId = bfnode->GetNodeId();
-      } else {
-        std::pair<unsigned, unsigned> pnid(bfnode->GetNodeId(), afnode ? afnode->GetNodeId() : 0);
+        std::pair<unsigned, unsigned> pnid(bfnode->GetNodeId(), 0);
         info->mNodeIdPairs.insert(pnid);
+      } else {
+        // reformat default import
+        if (!p->IsDefault()) {
+          if (IsDefault(bfnode) ) {
+            p->SetIsDefault(true);
+            p->SetBefore(afnode);
+            p->SetAfter(NULL);
+          }
+        }
+
+        bfnode = p->GetBefore();
+        afnode = p->GetAfter();
+        if (p->IsDefault()) {
+          TreeNode *exported = GetExportedDefault(targetmodule->GetStrIdx());
+          if (exported) {
+            std::pair<unsigned, unsigned> pnid(exported->GetNodeId(), bfnode->GetNodeId());
+            info->mNodeIdPairs.insert(pnid);
+            TypeId tid = exported->GetTypeId();
+            bfnode->SetTypeId(tid);
+            bfnode->SetTypeIdx(tid);
+          } else {
+            NOTYETIMPL("failed to find the exported - default");
+          }
+        } else if (afnode) {
+          TreeNode *exported = FindExportedDecl(targethidx, bfnode->GetStrIdx());
+          if (!exported) {
+            NOTYETIMPL("need to extract exported - bfnode M.x");
+            exported = bfnode;
+          }
+          std::pair<unsigned, unsigned> pnid(exported->GetNodeId(), afnode->GetNodeId());
+          info->mNodeIdPairs.insert(pnid);
+          TypeId tid = exported->GetTypeId();
+          bfnode->SetTypeId(tid);
+          bfnode->SetTypeIdx(tid);
+          afnode->SetTypeId(tid);
+          afnode->SetTypeIdx(tid);
+        } else {
+          NOTYETIMPL("failed to find the exported");
+        }
       }
     }
 
@@ -206,6 +249,16 @@ void AST_XXport::CollectExportInfo(unsigned hidx) {
     unsigned stridx = (target && target->GetStrIdx()) ? target->GetStrIdx() : module->GetStrIdx();
     XXportInfo *info = new XXportInfo(stridx, node->GetNodeId());;
 
+    unsigned targethidx = DEFAULTVALUE;
+    Module_Handler *targethandler = NULL;
+    ModuleNode *targetmodule = NULL;
+
+    if (target) {
+      targethidx = GetHandleIdxFromStrIdx(target->GetStrIdx());
+      targethandler = mASTHandler->GetModuleHandler(targethidx);
+      targetmodule = targethandler->GetASTModule();
+    }
+
     for (unsigned i = 0; i < node->GetPairsNum(); i++) {
       XXportAsPairNode *p = node->GetPair(i);
       TreeNode *bfnode = p->GetBefore();
@@ -221,7 +274,6 @@ void AST_XXport::CollectExportInfo(unsigned hidx) {
           std::pair<unsigned, unsigned> pnid(af->GetNodeId(), bf->GetNodeId());
           info->mNodeIdPairs.insert(pnid);
         }
-
         continue;
       }
 
@@ -233,13 +285,14 @@ void AST_XXport::CollectExportInfo(unsigned hidx) {
           MASSERT(target && "everything export no target");
           SetIdStrIdx2ModuleStrIdx(bfnode->GetStrIdx(), target->GetStrIdx());
 
-          unsigned hidx = GetHandleIdxFromStrIdx(target->GetStrIdx());
-          Module_Handler *handler = mASTHandler->GetModuleHandler(hidx);
-          ModuleNode *module = handler->GetASTModule();
           bfnode->SetTypeId(TY_Module);
-          bfnode->SetTypeIdx(module->GetTypeIdx());
+          bfnode->SetTypeIdx(targetmodule->GetTypeIdx());
+          AddExportedDeclIds(hidx, bfnode->GetNodeId());
         } else {
           // export * from "./M"
+          for (auto k : mExportedDeclIds[targethidx]) {
+            AddExportedDeclIds(hidx, k);
+          }
           continue;
         }
       }
@@ -255,19 +308,19 @@ void AST_XXport::CollectExportInfo(unsigned hidx) {
 
       bfnode = p->GetBefore();
       afnode = p->GetAfter();
+      unsigned exportednid = (afnode ? afnode->GetNodeId(): bfnode->GetNodeId());
       if (p->IsDefault()) {
-        if (afnode) {
-          info->mDefaultNodeId = afnode->GetNodeId();
-        } else {
-          info->mDefaultNodeId = bfnode->GetNodeId();
-        }
+        info->mDefaultNodeId = exportednid;
+        AddExportedDeclIds(hidx, exportednid);
       } else if (mExportNodeSets[hidx].size() == 1 && node->GetPairsNum() == 1) {
         info->mDefaultNodeId = bfnode->GetNodeId();
         std::pair<unsigned, unsigned> pnid(bfnode->GetNodeId(), afnode ? afnode->GetNodeId() : 0);
         info->mNodeIdPairs.insert(pnid);
+        AddExportedDeclIds(hidx, exportednid);
       } else {
         std::pair<unsigned, unsigned> pnid(bfnode->GetNodeId(), afnode ? afnode->GetNodeId() : 0);
         info->mNodeIdPairs.insert(pnid);
+        AddExportedDeclIds(hidx, exportednid);
       }
     }
 
@@ -373,8 +426,7 @@ TreeNode *AST_XXport::GetExportedNamedNode(unsigned hidx, unsigned stridx) {
 
 // hidx is the index of handler, string is the string index of identifier
 TreeNode *AST_XXport::GetExportedNodeFromImportedNode(unsigned hidx, unsigned nid) {
-  TreeNode *node = mAstOpt->GetNodeFromNodeId(nid);
-  unsigned stridx = node->GetStrIdx();
+  TreeNode *node = NULL;
 
   for (auto it : mImports[hidx]) {
     if (it->mDefaultNodeId == nid) {
@@ -386,11 +438,7 @@ TreeNode *AST_XXport::GetExportedNodeFromImportedNode(unsigned hidx, unsigned ni
       if (nid2 == nid) {
         unsigned nid1 = it1.first;
         TreeNode *node1 = mAstOpt->GetNodeFromNodeId(nid1);
-        if (node1->GetStrIdx() == stridx ) {
-          unsigned hexpidx = GetHandleIdxFromStrIdx(it->mModuleStrIdx);
-          TreeNode *n = GetExportedNamedNode(hexpidx, stridx);
-          return n;
-        }
+        return node1;
       }
     }
   }
