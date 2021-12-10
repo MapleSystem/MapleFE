@@ -199,6 +199,11 @@ class ImportExportModules : public AstVisitor {
                 + " = " + module + "; }\n"s;
           } else {
             if (auto b = x->GetBefore()) {
+              if (b->IsDeclare()) {
+                DeclareNode *decl = static_cast<DeclareNode *>(b);
+                if (decl->GetDeclsNum() == 1)
+                  b = decl->GetDeclAtIndex(0);
+              }
               if (b->IsImport()) {
                 mExFlag = true;
                 VisitImportNode(static_cast<ImportNode *>(b));
@@ -224,7 +229,10 @@ class ImportExportModules : public AstVisitor {
                 }
               }
               if (emit)
-                mExports += "namespace __export { using "s + module + "::"s + target + "; }\n"s;
+                if (b->IsNamespace())
+                  mExports += "namespace __export { namespace "s + target + " = "s + module + "::"s + target + "; }\n"s;
+                else
+                  mExports += "namespace __export { using "s + module + "::"s + target + "; }\n"s;
             }
           }
         }
