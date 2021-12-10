@@ -80,4 +80,20 @@ std::string CppEmitter::GetNamespace(TreeNode *node) {
   return ns;
 }
 
+std::string CppEmitter::GetQualifiedName(IdentifierNode *node) {
+  std::string name;
+  if (node == nullptr)
+    return name;
+  name = node->GetName();
+  TreeNode *parent = node->GetParent();
+  if (parent->IsField())
+    return name;
+  Module_Handler *handler = GetModuleHandler();
+  TreeNode *decl = handler->FindDecl(node);
+  if (decl == nullptr)
+    return name;
+  std::string ns = GetNamespace(decl);
+  return ns.empty() ? name : ns + "::"s + name;
+}
+
 } // namespace maplefe

@@ -337,8 +337,7 @@ std::string CppDef::EmitFunctionNode(FunctionNode *node) {
 std::string CppDef::EmitIdentifierNode(IdentifierNode *node) {
   if (node == nullptr)
     return std::string();
-  std::string str;
-  str += node->GetName();
+  std::string str = GetQualifiedName(node);
   if (auto n = node->GetInit()) {
     str += " = "s + EmitTreeNode(n);
   }
@@ -1475,13 +1474,7 @@ std::string CppDef::EmitNamespaceNode(NamespaceNode *node) {
   std::string str;
   for (unsigned i = 0; i < node->GetElementsNum(); ++i) {
     if (auto n = node->GetElementAtIndex(i)) {
-      std::string ns;
-      if (n->IsDecl()) {
-        ns = GetNamespace(n);
-        if (!ns.empty())
-          ns += "::"s;
-      }
-      str += ns + EmitTreeNode(n) + GetEnding(n);
+      str += EmitTreeNode(n) + GetEnding(n);
     }
   }
   return str;

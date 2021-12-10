@@ -30,6 +30,7 @@ public:
   std::string GetIdentifierName(TreeNode *node);
   bool IsInNamespace(TreeNode *node);
   std::string GetNamespace(TreeNode *node);
+  std::string GetQualifiedName(IdentifierNode *node);
 };
 
 } // namespace maplefe
