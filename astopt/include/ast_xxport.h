@@ -19,7 +19,9 @@
 #include <list>
 #include <unordered_map>
 #include <unordered_set>
+#include <vector>
 #include <set>
+#include <algorithm>
 #include "ast_module.h"
 #include "ast.h"
 #include "gen_astvisitor.h"
@@ -65,11 +67,11 @@ class AST_XXport {
   std::unordered_map<unsigned, std::unordered_set<XXportInfo *>> mExports;
 
   // module handler idx to import/export nodes in the module
-  std::unordered_map<unsigned, std::unordered_set<ImportNode *>> mImportNodeSets;
-  std::unordered_map<unsigned, std::unordered_set<ExportNode *>> mExportNodeSets;
+  std::unordered_map<unsigned, std::vector<ImportNode *>> mImportNodeSets;
+  std::unordered_map<unsigned, std::vector<ExportNode *>> mExportNodeSets;
 
-  std::unordered_map<unsigned, std::unordered_set<unsigned>> mImportedDeclIds;
-  std::unordered_map<unsigned, std::unordered_set<unsigned>> mExportedDeclIds;
+  std::unordered_map<unsigned, std::vector<unsigned>> mImportedDeclIds;
+  std::unordered_map<unsigned, std::vector<unsigned>> mExportedDeclIds;
 
  public:
   explicit AST_XXport(AstOpt *o, unsigned f);
@@ -102,20 +104,22 @@ class AST_XXport {
 
   // check if node with id is imported decl
   bool IsImportedDeclId(unsigned hidx, unsigned id) {
-    return (mImportedDeclIds[hidx].find(id) != mImportedDeclIds[hidx].end());
+    return (std::find(mImportedDeclIds[hidx].begin(),
+                     mImportedDeclIds[hidx].end(), id) != mImportedDeclIds[hidx].end());
   }
 
   // check if node with id is exported decl
   bool IsExportedDeclId(unsigned hidx, unsigned id) {
-    return (mExportedDeclIds[hidx].find(id) != mExportedDeclIds[hidx].end());
+    return (std::find(mExportedDeclIds[hidx].begin(),
+                     mExportedDeclIds[hidx].end(), id) != mExportedDeclIds[hidx].end());
   }
 
   bool IsImportedExportedDeclId(unsigned hidx, unsigned id) {
     return IsImportedDeclId(hidx, id) || IsExportedDeclId(hidx, id);
   }
 
-  void AddImportedDeclIds(unsigned hidx, unsigned nid) {mImportedDeclIds[hidx].insert(nid);}
-  void AddExportedDeclIds(unsigned hidx, unsigned nid) {mExportedDeclIds[hidx].insert(nid);}
+  void AddImportedDeclIds(unsigned hidx, unsigned nid) {mImportedDeclIds[hidx].push_back(nid);}
+  void AddExportedDeclIds(unsigned hidx, unsigned nid) {mExportedDeclIds[hidx].push_back(nid);}
 
   // get stridx of M from M.get()
   unsigned ExtractTargetStrIdx(TreeNode *node);

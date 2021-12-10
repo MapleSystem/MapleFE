@@ -389,7 +389,7 @@ TreeNode *AST_XXport::GetExportedNodeFromImportedNode(unsigned hidx, unsigned ni
 
 ImportNode *XXportBasicVisitor::VisitImportNode(ImportNode *node) {
   (void) AstVisitor::VisitImportNode(node);
-  mASTXXport->mImportNodeSets[mHandlerIdx].insert(node);
+  mASTXXport->mImportNodeSets[mHandlerIdx].push_back(node);
 
   TreeNode *target = mASTXXport->GetTarget(node);
   if (!target) {
@@ -415,7 +415,7 @@ ImportNode *XXportBasicVisitor::VisitImportNode(ImportNode *node) {
 
 ExportNode *XXportBasicVisitor::VisitExportNode(ExportNode *node) {
   (void) AstVisitor::VisitExportNode(node);
-  mASTXXport->mExportNodeSets[mHandlerIdx].insert(node);
+  mASTXXport->mExportNodeSets[mHandlerIdx].push_back(node);
   return node;
 }
 
