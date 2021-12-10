@@ -193,6 +193,10 @@ class ImportExportModules : public AstVisitor {
                 + " = " + module + "::__export; }\n"s;
             else
               mExports += "namespace __export { using namespace "s + module + "::__export; }\n"s;
+          } else if (x->GetAsNamespace()) {
+            if (auto b = x->GetBefore())
+              mExports += "namespace __export { namespace "s + mCppDecl->GetIdentifierName(b)
+                + " = " + module + "; }\n"s;
           } else {
             if (auto b = x->GetBefore()) {
               if (b->IsImport()) {
