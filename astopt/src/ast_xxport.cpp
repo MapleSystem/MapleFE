@@ -140,6 +140,11 @@ unsigned AST_XXport::GetHandleIdxFromStrIdx(unsigned stridx) {
 }
 
 void AST_XXport::CollectXXportInfo(unsigned hidx) {
+  CollectImportInfo(hidx);
+  CollectExportInfo(hidx);
+}
+
+void AST_XXport::CollectImportInfo(unsigned hidx) {
   Module_Handler *handler = mASTHandler->GetModuleHandler(hidx);
   ModuleNode *module = handler->GetASTModule();
 
@@ -189,6 +194,11 @@ void AST_XXport::CollectXXportInfo(unsigned hidx) {
 
     mImports[hidx].insert(info);
   }
+}
+
+void AST_XXport::CollectExportInfo(unsigned hidx) {
+  Module_Handler *handler = mASTHandler->GetModuleHandler(hidx);
+  ModuleNode *module = handler->GetASTModule();
 
   for (auto it : mExportNodeSets[hidx]) {
     ExportNode *node = it;
