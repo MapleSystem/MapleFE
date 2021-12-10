@@ -357,8 +357,8 @@ rule Initializer : '=' + AssignmentExpression
 
 rule KeywordPropName : ONEOF("break",
                              "this",
-                             "export",
                              "public",
+                             "export",
                              "const",
                              "if",
                              "continue",
@@ -1881,13 +1881,23 @@ rule ThisType: "this"
 rule PropertySignatureName : ONEOF(PropertyName, KeywordPropName)
 
 ## rule PropertySignature: PropertyName ?opt TypeAnnotationopt
-## Some ugly TS/JS features allowing break, this as property name.
-rule PropertySignature: ONEOF(ZEROORONE(AccessibilityModifier) + PropertySignatureName + ZEROORONE(TypeAnnotation),
-                              ZEROORONE(AccessibilityModifier) + PropertySignatureName + '?' + ZEROORONE(TypeAnnotation))
-  attr.action.%1 : AddType(%2, %3)
+##
+## NOTE: for KeywordPropName we require them to have an explicit TypeAnnotation, or ',' or ';'
+##       following it. Otherwise there will be ambiguity, like:
+##          interface A {
+##                export() : string;
+##          }
+##       It could be parsed as one property 'export' and one call signature "() : string".
+
+rule PropertySignature: ONEOF(ZEROORONE(AccessibilityModifier) + PropertyName + ZEROORONE(TypeAnnotation),
+                              ZEROORONE(AccessibilityModifier) + PropertySignatureName + '?' + ZEROORONE(TypeAnnotation),
+                              ZEROORONE(AccessibilityModifier) + KeywordPropName + TypeAnnotation,
+                              ZEROORONE(AccessibilityModifier) + KeywordPropName + ',',
+                              ZEROORONE(AccessibilityModifier) + KeywordPropName + ';')
+  attr.action.%1,%3 : AddType(%2, %3)
   attr.action.%2 : AddType(%2, %4)
   attr.action.%2 : SetIsOptional(%2)
-  attr.action.%1,%2: AddModifierTo(%2, %1)
+  attr.action.%1,%2,%3,%4,%5: AddModifierTo(%2, %1)
 
 ## JS ECMA has more definition than this Typescript one. I use ECMA one.
 ## rule PropertyName: IdentifierName StringLiteral NumericLiteral
@@ -1975,27 +1985,26 @@ rule IndexSignature: ONEOF(
   attr.action.%1 : BuildStrIndexSig(%4, %10)
   attr.action.%2 : BuildNumIndexSig(%4, %10)
 
+rule KeywordMethodName : ONEOF("return",
+                               "throw",
+                               "export")
+  attr.action : BuildIdentifier()
+
 ## rule MethodSignature: PropertyName ?opt CallSignature
 ## I inlined CallSignature
 rule MethodSignature: ONEOF(
     PropertyName + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation),
     PropertyName + '?' + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation),
-    "return" + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation),
-    "throw"  + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation),
-    "return" + '?' + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation),
-    "throw"  + '?' + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation))
-  attr.action.%1,%2,%3,%4,%5,%6 : BuildFunction(%1)
-  attr.action.%1,%3,%4 : AddParams(%4)
-  attr.action.%1,%3,%4 : AddType(%6)
-  attr.action.%1,%3,%4 : AddTypeGenerics(%2)
-  attr.action.%2 : SetIsOptional(%1)
-  attr.action.%2 : AddParams(%5)
-  attr.action.%2 : AddType(%7)
-  attr.action.%2 : AddTypeGenerics(%3)
-  attr.action.%5,%6 : SetIsOptional()
-  attr.action.%5,%6 : AddParams(%5)
-  attr.action.%5,%6 : AddType(%7)
-  attr.action.%5,%6 : AddTypeGenerics(%3)
+    KeywordMethodName  + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation),
+    KeywordMethodName  + '?' + ZEROORONE(TypeParameters) + '(' + ZEROORONE(ParameterList)  + ')' + ZEROORONE(TypeAnnotation))
+  attr.action.%1,%2,%3,%4 : BuildFunction(%1)
+  attr.action.%1,%3 : AddParams(%4)
+  attr.action.%1,%3 : AddType(%6)
+  attr.action.%1,%3 : AddTypeGenerics(%2)
+  attr.action.%2,%4 : SetIsOptional(%1)
+  attr.action.%2,%4 : AddParams(%5)
+  attr.action.%2,%4 : AddType(%7)
+  attr.action.%2,%4 : AddTypeGenerics(%3)
 
 ## rule TypeAliasDeclaration: type BindingIdentifier TypeParametersopt = Type ;
 rule TypeAliasDeclaration: "type" + BindingIdentifier + ZEROORONE(TypeParameters) + '=' + Type + ZEROORONE(';')

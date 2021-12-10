@@ -3,7 +3,7 @@ Matched 24 tokens.
 Matched 31 tokens.
 ============= Module ===========
 == Sub Tree ==
-ts_interface: IFace {exportfunc  ()  throws: 
+ts_interface: IFace {func  export()  throws: 
  }
 == Sub Tree ==
 js_var Decl: obj= {export:() -> "Export"}
