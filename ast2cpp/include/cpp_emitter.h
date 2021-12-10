@@ -28,6 +28,8 @@ public:
   CppEmitter(Module_Handler *h) : Emitter(h) {}
 
   std::string GetIdentifierName(TreeNode *node);
+  bool IsInNamespace(TreeNode *node);
+  std::string GetNamespace(TreeNode *node);
 };
 
 } // namespace maplefe

@@ -56,4 +56,28 @@ std::string CppEmitter::GetIdentifierName(TreeNode *node) {
   }
 }
 
+bool CppEmitter::IsInNamespace(TreeNode *node) {
+  while (node) {
+    if (node->IsNamespace())
+      return true;
+    node = node->GetParent();
+  }
+  return false;
+}
+
+std::string CppEmitter::GetNamespace(TreeNode *node) {
+  std::string ns;
+  while (node) {
+    if (node->IsNamespace()) {
+      TreeNode *id = static_cast<NamespaceNode *>(node)->GetId();
+      if (id->IsIdentifier()) {
+        std::string s = Emitter::EmitIdentifierNode(static_cast<IdentifierNode *>(id));
+        ns = ns.empty() ? s : s + "::"s + ns;
+      }
+    }
+    node = node->GetParent();
+  }
+  return ns;
+}
+
 } // namespace maplefe

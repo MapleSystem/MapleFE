@@ -270,9 +270,11 @@ std::string CppDef::EmitFunctionNode(FunctionNode *node) {
   if (mIsInit || node == nullptr)
     return std::string();
 
-  std::string str, className;
+  std::string str, className, ns = GetNamespace(node);
+  if (!ns.empty())
+    ns += "::"s;
   if (node->IsConstructor()) {
-    className = GetClassName(node);
+    className = ns + GetClassName(node);
     str = "\n"s;
     str += className + "* "s + className + "::Ctor::operator()("s + className + "* obj"s;
   } else {
@@ -281,11 +283,11 @@ std::string CppDef::EmitFunctionNode(FunctionNode *node) {
     str += " "s;
 
     if (IsClassMethod(node))
-      str += GetClassName(node) + "::"s + funcName;
+      str += ns + GetClassName(node) + "::"s + funcName;
     else if (isTopLevel)
-      str += "Cls_"s + funcName + "::_body"s; // emit body of top level function
+      str += ns + "Cls_"s + funcName + "::_body"s; // emit body of top level function
     else
-      str += funcName;
+      str += ns + funcName;
     str += "("s;
   }
 
@@ -714,7 +716,7 @@ std::string CppDef::EmitFieldNode(FieldNode *node) {
     return "%%%Empty%%%";
   if (field == "length") // for length property
     return upper + "->size()"s;
-  if (mCppDecl.IsImportedModule(upper) || upnode->GetTypeId() == TY_Module) // for imported module
+  if (mCppDecl.IsImportedModule(upper) || upnode->GetTypeId() == TY_Module || upnode->GetTypeId() == TY_Namespace) // for imported module
     return hFuncTable.AddFieldIsImported(upper + "::"s + field);
   if (mHandler->IsCppField(node->GetField()) || // check if it accesses a Cxx class field
       node->IsTypeIdFunction())
@@ -1463,6 +1465,25 @@ std::string CppDef::EmitAsTypeNode(AsTypeNode *node) {
     str = EmitTreeNode(n);
   if (!str.empty())
     str = '(' + str + ')';
+  return str;
+}
+
+std::string CppDef::EmitNamespaceNode(NamespaceNode *node) {
+  if (node == nullptr)
+    return std::string();
+  // emit namespace in each statement inside of current namespace
+  std::string str;
+  for (unsigned i = 0; i < node->GetElementsNum(); ++i) {
+    if (auto n = node->GetElementAtIndex(i)) {
+      std::string ns;
+      if (n->IsDecl()) {
+        ns = GetNamespace(n);
+        if (!ns.empty())
+          ns += "::"s;
+      }
+      str += ns + EmitTreeNode(n) + GetEnding(n);
+    }
+  }
   return str;
 }
 

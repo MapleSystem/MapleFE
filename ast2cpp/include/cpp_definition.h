@@ -62,6 +62,7 @@ public:
   std::string EmitInstanceOfNode(InstanceOfNode *node) override;
   std::string EmitDeclareNode(DeclareNode *node) override;
   std::string EmitAsTypeNode(AsTypeNode *node) override;
+  std::string EmitNamespaceNode(NamespaceNode *node) override;
   std::string& HandleTreeNode(std::string &str, TreeNode *node) override;
 
   std::string EmitClassProps(TreeNode *node);

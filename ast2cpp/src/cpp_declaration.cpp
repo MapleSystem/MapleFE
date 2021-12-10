@@ -92,7 +92,7 @@ class ImportExportModules : public AstVisitor {
                   filename = AddIncludes(b);
                   module = mCppDecl->GetModuleName(filename.c_str());
                   std::string v = module + "::__export::__default"s;
-                  if(a->GetTypeId() == TY_Module)
+                  if(a->GetTypeId() == TY_Module || a->GetTypeId() == TY_Namespace)
                     mImports += "namespace "s + after + " = "s + module + v + ";\n"s;
                   else if (a->GetTypeId() == TY_Class)
                     mImports += "using "s + after + " = "s + v + ";\n"s;
@@ -115,7 +115,7 @@ class ImportExportModules : public AstVisitor {
                   v = "::__export::"s + (v == "default" ? "__"s + v : v);
                   if (node->IsImportType())
                     mImports += "using "s + after + " = "s + module + v + ";\n"s;
-                  else if (a->GetTypeId() == TY_Module)
+                  else if (a->GetTypeId() == TY_Module || a->GetTypeId() == TY_Namespace)
                     mImports += "namespace "s + after + " = "s + module + v + ";\n"s;
                   else
                     mImports += "inline const decltype("s + module + v + ") &"s + after
@@ -141,6 +141,8 @@ class ImportExportModules : public AstVisitor {
     }
 
     ExportNode *VisitExportNode(ExportNode *node) {
+      if (mCppDecl->IsInNamespace(node))
+        return node;
       // 'export *' does not re-export a default, it re-exports only named exports
       // Multiple 'export *'s fails with tsc if they export multiple exports with same name
       std::string filename = AddIncludes(node->GetTarget());
@@ -179,6 +181,8 @@ class ImportExportModules : public AstVisitor {
               std::string s = mEmitter->EmitTreeNode(b);
               if (b->GetTypeId() == TY_Class)
                 mExports += "namespace __export { using __default = "s + module + "::"s + s + "; }\n"s;
+              else if (b->GetTypeId() == TY_Namespace)
+                mExports += "namespace __export { namespace __default = "s + module + "::"s + s + "; }\n"s;
               else
                 mExports += "namespace __export { inline const decltype("s + module + "::"s + s + ") &__default = "s
                   + module + "::"s + s + "; }\n"s;
@@ -208,7 +212,10 @@ class ImportExportModules : public AstVisitor {
                   emit = false;
                 }
                 else if (target != after) {
-                  mExports += "namespace __export { using "s + after + " = "s + module + "::"s + target + "; }\n"s;
+                  if (a->GetTypeId() == TY_Namespace)
+                    mExports += "namespace __export { namespace "s + after + " = "s + module + "::"s + target + "; }\n"s;
+                  else
+                    mExports += "namespace __export { using "s + after + " = "s + module + "::"s + target + "; }\n"s;
                   emit = false;
                 }
               }
@@ -231,17 +238,29 @@ class ClassDecls : public AstVisitor {
     ClassDecls(CppDecl *c) : mCppDecl(c), mDecls("// class decls\n") {}
 
     ClassNode *VisitClassNode(ClassNode *node) {
-      mDecls += mCppDecl->EmitTreeNode(node) + ";\n"s;
+      std::string ns = mCppDecl->GetNamespace(node);
+      if (ns.empty())
+        mDecls += mCppDecl->EmitTreeNode(node) + ";\n"s;
+      else
+        mDecls += "namespace "s + ns + " {\n"s + mCppDecl->EmitTreeNode(node) + ";\n}\n"s;
       return node;
     }
 
     StructNode *VisitStructNode(StructNode *node) {
-      mDecls += mCppDecl->EmitStructNode(node);
+      std::string ns = mCppDecl->GetNamespace(node);
+      if (ns.empty())
+        mDecls += mCppDecl->EmitStructNode(node);
+      else
+        mDecls += "namespace "s + ns + " {\n"s + mCppDecl->EmitTreeNode(node) + "}\n"s;
       return node;
     }
 
     TypeAliasNode *VisitTypeAliasNode(TypeAliasNode* node) {
-      mDecls += mCppDecl->EmitTypeAliasNode(node);
+      std::string ns = mCppDecl->GetNamespace(node);
+      if (ns.empty())
+        mDecls += mCppDecl->EmitTypeAliasNode(node);
+      else
+        mDecls += "namespace "s + ns + " {\n"s + mCppDecl->EmitTypeAliasNode(node) + "}\n"s;
       return node;
     }
 
@@ -267,7 +286,14 @@ class CollectDecls : public AstVisitor {
     DeclNode *VisitDeclNode(DeclNode *node) {
       std::string def = mCppDecl->EmitTreeNode(node);
       std::string var = mCppDecl->EmitTreeNode(node->GetVar());
-      mDecls += "extern "s + def.substr(0, def.find('=')) + ";\n"s;
+      std::string ns = mCppDecl->GetNamespace(node);
+      std::string ext = "extern "s + def.substr(0, def.find('=')) + ";\n"s;
+      if (ns.empty())
+        mDecls += ext;
+      else {
+        mDecls += "namespace "s + ns + " {\n"s + ext + "}\n"s;
+        def = "namespace "s + ns + " {\n"s + def + ";\n}\n"s;
+      }
       mCppDecl->AddDefinition(def + ";\n"s);
       return node;
     }
@@ -345,14 +371,22 @@ namespace )""" + module + R"""( {
     CfgFunc *func = mod->GetNestedFuncAtIndex(i);
     TreeNode *node = func->GetFuncNode();
     if (!IsClassMethod(node)) {
+      std::string ns = GetNamespace(node);
+      if (!ns.empty())
+        str += "namespace "s + ns + " {\n"s;
       str += GenFunctionClass(static_cast<FunctionNode*>(node));  // gen func cls for each top level func
       if (!mHandler->IsFromLambda(node)) {
         // top level funcs instantiated here as function objects from their func class
         // top level lamda funcs instantiated later in assignment stmts
-        std::string func = ClsName(node->GetName()) + "* "s + node->GetName() + " = new "s + ClsName(node->GetName()) + "();\n"s;
-        AddDefinition(func);
+        std::string funcinit = ClsName(node->GetName()) + "* "s + node->GetName() + " = new "s + ClsName(node->GetName()) + "();\n"s;
+        if (ns.empty())
+          AddDefinition(funcinit);
+        else
+          AddDefinition("namespace "s + ns + " {\n"s + funcinit + "\n}\n"s);
         str += "extern "s + ClsName(node->GetName()) + "* "s + node->GetName() + ";\n"s;
       }
+      if (!ns.empty())
+        str += "\n} // namespace " + ns + '\n';
     }
   }
 
