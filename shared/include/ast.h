@@ -2279,10 +2279,13 @@ private:
   TreeNode *mInit;
   TreeNode *mExtendType;  // This is the type extending expression
                           // of the mapped property
+  SmallVector<AttrId>    mAttrs;
 public:
   ComputedNameNode() : TreeNode(NK_ComputedName),
     mProp(CNP_NA), mExpr(nullptr), mExtendType(nullptr), mInit(nullptr) {}
   ~ComputedNameNode(){Release();}
+
+  void Release() {mAttrs.Release();}
 
   unsigned GetProp()           {return mProp;}
   void     SetProp(unsigned p) {mProp = mProp | p;}
@@ -2293,6 +2296,12 @@ public:
   void      SetInit(TreeNode *n) {mInit = n; SETPARENT(n);}
   TreeNode* GetExtendType()            {return mExtendType;}
   void      SetExtendType(TreeNode *n) {mExtendType = n; SETPARENT(n);}
+
+  // Attributes related
+  unsigned GetAttrsNum() const        {return mAttrs.GetNum();}
+  void     AddAttr(AttrId a)          {mAttrs.PushBack(a);}
+  AttrId   GetAttrAtIndex(unsigned i) {return mAttrs.ValueAtIndex(i);}
+  void     SetAttrAtIndex(unsigned i, AttrId n) {*(mAttrs.RefAtIndex(i)) = n;}
 
   void Dump(unsigned);
 };
