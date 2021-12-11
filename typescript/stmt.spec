@@ -86,7 +86,6 @@ rule KeywordIdentifier : ONEOF("type",
                                "default",
                                "namespace",
                                "module",
-                               "extends",
                                "switch",
                                "infer",
                                "asserts",
@@ -367,6 +366,7 @@ rule KeywordPropName : ONEOF("break",
                              "function",
                              "let",
                              "return",
+                             "extends",
                              "get",
                              "set",
                              "var")
@@ -1685,8 +1685,9 @@ rule ConditionalType : ONEOF(MemberExpression + "extends" + Type + '?' + Type + 
                              TypeReference + "extends" + Type + '?' + Type + ':' + Type,
                              ObjectType + "extends" + Type + '?' + Type + ':' + Type,
                              "unknown" + "extends" + Type + '?' + Type + ':' + Type,
-                             PrimaryType + "extends" + Type + '?' + Type + ':' + Type)
-  attr.action.%1,%2,%3,%4,%5 : BuildConditionalType(%1, %3, %5, %7)
+                             PrimaryType + "extends" + Type + '?' + Type + ':' + Type,
+                             TypeQuery + "extends" + Type + '?' + Type + ':' + Type)
+  attr.action.%1,%2,%3,%4,%5,%6 : BuildConditionalType(%1, %3, %5, %7)
 
 rule KeyOf : ONEOF("keyof" + Identifier,
                    "keyof" + '(' + TypeQuery + ')',
@@ -1871,7 +1872,6 @@ rule TypeQuery: ONEOF("typeof" + TypeQueryExpression,
 rule TypeQueryExpression: ONEOF(IdentifierReference,
                                 TypeQueryExpression + '.' + JSIdentifier,
                                 UnaryExpression,
-                                ConditionalType,
                                 ImportedType)
   attr.action.%2 : BuildField(%1, %3)
 
