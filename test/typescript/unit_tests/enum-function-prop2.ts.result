@@ -1,0 +1,7 @@
+Matched 7 tokens.
+Matched 17 tokens.
+============= Module ===========
+== Sub Tree ==
+ts_enum: E {function="function" }
+== Sub Tree ==
+ type T = Array<E.function>
